@@ -37,6 +37,8 @@ public:
 
     void drawSingle(bool shadowPass);
 
+    void setAppliedForce(glm::vec3 force);
+
     bool shouldRender() const;
     bool shouldCastShadows() const;
 
@@ -61,6 +63,11 @@ private:
         std::shared_ptr<render::Texture> envmap;
         std::shared_ptr<render::Texture> bumpmap;
     } _textures;
+
+    struct DanglymeshAnimation {
+        glm::vec3 force { 0.0f }; /**< net force applied to this scene node */
+        glm::vec3 stride { 0.0f }; /**< how far have vertices traveled from the rest position? */
+    } _danglymeshAnimation;
 
     const ModelSceneNode *_modelSceneNode;
     const render::ModelNode *_modelNode;

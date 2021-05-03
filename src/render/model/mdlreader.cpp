@@ -1088,18 +1088,17 @@ void MdlReader::readDanglymesh(ModelNode &node) {
     float period = readFloat();
     ignore(4); // unknown
 
-    node._danglymesh->displacement = displacement;
+    node._danglymesh->displacement = 0.5f * displacement;  // displacement is allegedly 1/2 meters per unit
     node._danglymesh->tightness = tightness;
     node._danglymesh->period = period;
 
     size_t pos = tell();
     seek(kMdlDataOffset + constraintArrayDef.offset);
     for (uint32_t i = 0; i < constraintArrayDef.count; ++i) {
-        float number = readFloat();
+        float multiplier = readFloat();
         vector<float> positionValues(readFloatArray(3));
-
         ModelNode::DanglymeshConstraint constraint;
-        constraint.number = number;
+        constraint.multiplier = glm::clamp(multiplier / 255.0f, 0.0f, 1.0f);
         constraint.position = glm::make_vec3(&positionValues[0]);
         node._danglymesh->constraints.push_back(move(constraint));
     }

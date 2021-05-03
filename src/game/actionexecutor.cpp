@@ -260,9 +260,11 @@ void ActionExecutor::advanceCreatureOnPath(const shared_ptr<Creature> &creature,
 
     } else if (_game->module()->area()->moveCreatureTowards(creature, dest, run, dt)) {
         creature->setMovementType(run ? Creature::MovementType::Run : Creature::MovementType::Walk);
+        creature->setAppliedForce(glm::vec3(glm::normalize(glm::vec2(dest - origin)), 0.0f));
 
     } else {
         creature->setMovementType(Creature::MovementType::None);
+        creature->setAppliedForce(glm::vec3(0.0f));
     }
 }
 

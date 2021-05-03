@@ -42,6 +42,7 @@ static constexpr int kBindingPointIndexLighting = 3;
 static constexpr int kBindingPointIndexSkeletal = 4;
 static constexpr int kBindingPointIndexParticles = 5;
 static constexpr int kBindingPointIndexGrass = 6;
+static constexpr int kBindingPointIndexDanglymesh = 7;
 
 static constexpr GLchar kShaderBaseHeader[] = R"END(
 #version 330
@@ -60,7 +61,11 @@ const int FEATURE_PARTICLES = 0x400;
 const int FEATURE_WATER = 0x800;
 const int FEATURE_HDR = 0x1000;
 const int FEATURE_CUSTOMMAT = 0x2000;
+const int FEATURE_BLUR = 0x4000;
+const int FEATURE_TEXT = 0x8000;
+const int FEATURE_GRASS = 0x10000;
 const int FEATURE_FOG = 0x20000;
+const int FEATURE_DANGLYMESH = 0x40000;
 
 const int NUM_CUBE_FACES = 6;
 const int MAX_BONES = 128;
@@ -68,6 +73,7 @@ const int MAX_LIGHTS = 16;
 const int MAX_PARTICLES = 32;
 const int MAX_CHARS = 128;
 const int MAX_GRASS_CLUSTERS = 256;
+const int MAX_DANGLYMESH_CONSTRAINTS = 512;
 
 const float PI = 3.14159265359;
 const float GAMMA = 2.2;
@@ -180,6 +186,12 @@ struct GrassCluster {
 layout(std140) uniform Grass {
     vec2 uGrassQuadSize;
     GrassCluster uGrassClusters[MAX_GRASS_CLUSTERS];
+};
+
+layout(std140) uniform Danglymesh {
+    vec4 uDanglymeshStride;
+    float uDanglymeshDisplacement;
+    vec4 uDanglymeshConstraints[MAX_DANGLYMESH_CONSTRAINTS];
 };
 
 bool isFeatureEnabled(int flag) {
@@ -508,6 +520,12 @@ void main() {
 
     } else {
         P = vec4(aPosition, 1.0);
+
+        if (isFeatureEnabled(FEATURE_DANGLYMESH)) {
+            vec3 maxStride = vec3(uDanglymeshDisplacement * uDanglymeshConstraints[gl_VertexID / 4][gl_VertexID % 4]);
+            vec3 stride = clamp(uDanglymeshStride.xyz, -maxStride, maxStride);
+            P += vec4(stride, 0.0);
+        }
     }
 
     fragPosition = vec3(uGeneral.model * P);
@@ -1192,6 +1210,7 @@ void Shaders::init() {
     glGenBuffers(1, &_uboSkeletal);
     glGenBuffers(1, &_uboParticles);
     glGenBuffers(1, &_uboGrass);
+    glGenBuffers(1, &_uboDanglymesh);
 
     for (auto &program : _programs) {
         glUseProgram(program.second);
@@ -1209,6 +1228,7 @@ void Shaders::init() {
     _defaultUniforms.skeletal = make_shared<SkeletalUniforms>();
     _defaultUniforms.particles = make_shared<ParticlesUniforms>();
     _defaultUniforms.grass = make_shared<GrassUniforms>();
+    _defaultUniforms.danglymesh = make_shared<DanglymeshUniforms>();
 
     _inited = true;
 }
@@ -1260,6 +1280,7 @@ void Shaders::initUBOs() {
     static SkeletalUniforms defaultsSkeletal;
     static ParticlesUniforms defaultsParticles;
     static GrassUniforms defaultsGrass;
+    static DanglymeshUniforms defaultsDanglymesh;
 
     initUBO("Combined", kBindingPointIndexCombined, _uboCombined, defaultsCombined, offsetof(ShaderUniforms, text));
     initUBO("Text", kBindingPointIndexText, _uboText, defaultsText);
@@ -1267,6 +1288,7 @@ void Shaders::initUBOs() {
     initUBO("Skeletal", kBindingPointIndexSkeletal, _uboSkeletal, defaultsSkeletal);
     initUBO("Particles", kBindingPointIndexParticles, _uboParticles, defaultsParticles);
     initUBO("Grass", kBindingPointIndexGrass, _uboGrass, defaultsGrass);
+    initUBO("Danglymesh", kBindingPointIndexDanglymesh, _uboDanglymesh, defaultsDanglymesh);
 }
 
 template <class T>
@@ -1323,6 +1345,10 @@ void Shaders::deinit() {
     if (_uboGrass) {
         glDeleteBuffers(1, &_uboGrass);
         _uboGrass = 0;
+    }
+    if (_uboDanglymesh) {
+        glDeleteBuffers(1, &_uboDanglymesh);
+        _uboDanglymesh = 0;
     }
 
     // Delete programs
@@ -1382,6 +1408,10 @@ void Shaders::setUniforms(const ShaderUniforms &uniforms) {
     if (uniforms.combined.featureMask & UniformFeatureFlags::grass) {
         glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexGrass, _uboGrass);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(GrassUniforms), uniforms.grass.get());
+    }
+    if (uniforms.combined.featureMask & UniformFeatureFlags::danglymesh) {
+        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexDanglymesh, _uboDanglymesh);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(DanglymeshUniforms), uniforms.danglymesh.get());
     }
 }
 

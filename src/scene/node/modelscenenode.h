@@ -50,6 +50,7 @@ public:
 
     void refreshAABB();
     void signalEvent(const std::string &name);
+    void setAppliedForce(glm::vec3 force);
 
     bool isCulledOut() const { return _culledOut; }
 

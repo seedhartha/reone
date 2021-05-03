@@ -638,6 +638,12 @@ void Creature::getOffhandDamage(int &min, int &max) const {
     getWeaponDamage(InventorySlot::leftWeapon, min, max);
 }
 
+void Creature::setAppliedForce(glm::vec3 force) {
+    if (_sceneNode && _sceneNode->type() == SceneNodeType::Model) {
+        static_pointer_cast<ModelSceneNode>(_sceneNode)->setAppliedForce(force);
+    }
+}
+
 } // namespace game
 
 } // namespace reone

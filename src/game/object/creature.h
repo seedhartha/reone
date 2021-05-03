@@ -196,9 +196,15 @@ public:
     void getMainHandDamage(int &min, int &max) const;
     void getOffhandDamage(int &min, int &max) const;
 
-    void setAttackTarget(std::shared_ptr<SpatialObject> target) { _combat.attackTarget = move(target); }
+    void setAttackTarget(std::shared_ptr<SpatialObject> target) { _combat.attackTarget = std::move(target); }
 
     // END Combat
+
+    // Physics
+
+    void setAppliedForce(glm::vec3 force);
+
+    // END Physics
 
     // Scripts
 

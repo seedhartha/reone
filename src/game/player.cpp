@@ -165,9 +165,11 @@ void Player::update(float dt) {
 
         if (_area->moveCreature(partyLeader, dir, true, dt)) {
             partyLeader->setMovementType(Creature::MovementType::Run);
+            partyLeader->setAppliedForce(glm::vec3(dir, 0.0f));
         }
     } else if (actions.isEmpty()) {
         partyLeader->setMovementType(Creature::MovementType::None);
+        partyLeader->setAppliedForce(glm::vec3(0.0f));
     }
 }
 
