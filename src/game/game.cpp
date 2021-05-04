@@ -519,12 +519,9 @@ void Game::update() {
     updateCamera(dt);
 
     bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
-    if (updModule) {
+    if (updModule && !_paused) {
         _module->update(dt);
-
-        if (!_paused) {
-            _combat.update(dt);
-        }
+        _combat.update(dt);
     }
 
     GUI *gui = getScreenGUI();

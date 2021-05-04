@@ -264,7 +264,7 @@ void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
 }
 
 void Module::update(float dt) {
-    if (!_game->isPaused() && _game->cameraType() == CameraType::ThirdPerson) {
+    if (_game->cameraType() == CameraType::ThirdPerson) {
         _player->update(dt);
     }
     _area->update(dt);
