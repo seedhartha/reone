@@ -206,9 +206,6 @@ bool ModelNodeSceneNode::isTransparent() const {
 }
 
 static bool isLightingEnabledByUsage(ModelUsage usage) {
-    if (usage == ModelUsage::Room) {
-        return isFeatureEnabled(Feature::DynamicRoomLighting);
-    }
     return usage != ModelUsage::Projectile;
 }
 
