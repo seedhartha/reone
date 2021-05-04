@@ -54,7 +54,7 @@ void TpcTool::toTGA(const fs::path &path, const fs::path &destPath) {
     tgaPath.replace_extension("tga");
 
     TgaWriter writer(tpc.texture());
-    writer.save(tgaPath);
+    writer.save(tgaPath, true);
 
     // Write TXI
 

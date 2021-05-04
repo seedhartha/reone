@@ -32,13 +32,15 @@ class TgaWriter {
 public:
     TgaWriter(std::shared_ptr<Texture> texture);
 
-    void save(std::ostream &out);
-    void save(const boost::filesystem::path &path);
+    void save(std::ostream &out, bool compress = false);
+    void save(const boost::filesystem::path &path, bool compress = false);
 
 private:
     std::shared_ptr<Texture> _texture;
 
-    std::vector<uint8_t> getTexturePixels(TGADataType &dataType, int &depth) const;
+    void writeRLE(uint8_t *pixels, int depth, std::ostream &out);
+
+    std::vector<uint8_t> getTexturePixels(bool compress, TGADataType &dataType, int &depth) const;
 };
 
 } // namespace render
