@@ -16,7 +16,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(reone)
 
-add_subdirectory(external/libtga)
 add_subdirectory(external/s3tc)
 
 option(BUILD_TOOLS "build tools executable" ON)
@@ -44,7 +43,7 @@ else()
     find_package(Threads REQUIRED)
 endif()
 
-include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${FFMPEG_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/external/libtga ${CMAKE_SOURCE_DIR}/external/s3tc)
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${FFMPEG_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/external/s3tc)
 
 if(USE_EXTERNAL_GLM)
     include_directories(${CMAKE_SOURCE_DIR}/external/glm)
@@ -165,6 +164,7 @@ set(RENDER_HEADERS
     src/render/framebuffer.h
     src/render/image/curreader.h
     src/render/image/tgareader.h
+    src/render/image/tgawriter.h
     src/render/image/tpcreader.h
     src/render/image/txireader.h
     src/render/lip/lipanimation.h
@@ -209,6 +209,7 @@ set(RENDER_SOURCES
     src/render/framebuffer.cpp
     src/render/image/curreader.cpp
     src/render/image/tgareader.cpp
+    src/render/image/tgawriter.cpp
     src/render/image/tpcreader.cpp
     src/render/image/txireader.cpp
     src/render/lip/lipanimation.cpp
@@ -700,7 +701,7 @@ if(BUILD_TOOLS)
 
     target_link_libraries(reone-tools PRIVATE
         librender libresource libcommon
-        libtga libs3tc
+        libs3tc
         GLEW::GLEW
         ${OPENGL_LIBRARIES}
         ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
