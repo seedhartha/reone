@@ -56,11 +56,32 @@ static const vector<float> g_quadFlipXYVertices {
     0.0f, 1.0f, 0.0f, 1.0f, 1.0f
 };
 
+static const vector<float> g_quadSwapVertices {
+    0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+    1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+    1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+    0.0f, 1.0f, 0.0f, 0.0f, 0.0f
+};
+
+static const vector<float> g_quadSwapFlipXVertices {
+    0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+    1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+    1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f, 0.0f, 1.0f
+};
+
 static const vector<float> g_quadNDCVertices {
     -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
      1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
      1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
     -1.0f, -1.0f, 0.0f, 0.0f, 0.0f
+};
+
+static const vector<float> g_quadNDCFlipYVertices {
+    -1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
+     1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
+     1.0f, -1.0f, 0.0f, 1.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f, 1.0f
 };
 
 static const vector<float> g_billboardVertices = {
@@ -258,7 +279,10 @@ void Meshes::init() {
         _quadFlipX = getMesh(4, g_quadFlipXVertices, g_quadIndices, g_quadOffsets);
         _quadFlipY = getMesh(4, g_quadFlipYVertices, g_quadIndices, g_quadOffsets);
         _quadFlipXY = getMesh(4, g_quadFlipXYVertices, g_quadIndices, g_quadOffsets);
+        _quadSwap = getMesh(4, g_quadSwapVertices, g_quadIndices, g_quadOffsets);
+        _quadSwapFlipX = getMesh(4, g_quadSwapFlipXVertices, g_quadIndices, g_quadOffsets);
         _quadNDC = getMesh(4, g_quadNDCVertices, g_quadIndices, g_quadOffsets);
+        _quadNDCFlipY = getMesh(4, g_quadNDCFlipYVertices, g_quadIndices, g_quadOffsets);
         _billboard = getMesh(4, g_billboardVertices, g_quadIndices, g_quadOffsets);
         _grass = getMesh(4, g_grassVertices, g_quadIndices, g_quadOffsets);
         _cube = getMesh(8, g_cubeVertices, g_cubeIndices, g_cubeOffsets);

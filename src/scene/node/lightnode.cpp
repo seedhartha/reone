@@ -59,7 +59,7 @@ void LightSceneNode::drawLensFlares(const LensFlare &flare) {
     Shaders::instance().activate(ShaderProgram::BillboardGUI, uniforms);
 
     withAdditiveBlending([]() {
-        Meshes::instance().getQuadNDC()->draw();
+        Meshes::instance().getBillboard()->draw();
     });
 }
 

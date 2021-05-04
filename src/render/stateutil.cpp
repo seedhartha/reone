@@ -76,6 +76,12 @@ void withAdditiveBlending(const function<void()> &block) {
     withBlending(GL_SRC_ALPHA, GL_ONE, GL_SRC_ALPHA, GL_ONE, block);
 }
 
+void withBackFaceCulling(const function<void()> &block) {
+    glEnable(GL_CULL_FACE);
+    block();
+    glDisable(GL_CULL_FACE);
+}
+
 void setActiveTextureUnit(int n) {
     glActiveTexture(GL_TEXTURE0 + n);
 }

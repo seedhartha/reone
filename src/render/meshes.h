@@ -43,7 +43,10 @@ public:
     std::shared_ptr<Mesh> getQuadFlipX() const { return _quadFlipX; }
     std::shared_ptr<Mesh> getQuadFlipY() const { return _quadFlipY; }
     std::shared_ptr<Mesh> getQuadFlipXY() const { return _quadFlipXY; }
+    std::shared_ptr<Mesh> getQuadSwap() const { return _quadSwap; }
+    std::shared_ptr<Mesh> getQuadSwapFlipX() const { return _quadSwapFlipX; }
     std::shared_ptr<Mesh> getQuadNDC() const { return _quadNDC; }
+    std::shared_ptr<Mesh> getQuadNDCFlipY() const { return _quadNDCFlipY; }
     std::shared_ptr<Mesh> getBillboard() const { return _billboard; }
     std::shared_ptr<Mesh> getGrass() const { return _grass; }
     std::shared_ptr<Mesh> getCube() const { return _cube; }
@@ -58,7 +61,10 @@ private:
     std::shared_ptr<Mesh> _quadFlipX;
     std::shared_ptr<Mesh> _quadFlipY;
     std::shared_ptr<Mesh> _quadFlipXY;
+    std::shared_ptr<Mesh> _quadSwap;
+    std::shared_ptr<Mesh> _quadSwapFlipX;
     std::shared_ptr<Mesh> _quadNDC;
+    std::shared_ptr<Mesh> _quadNDCFlipY;
     std::shared_ptr<Mesh> _billboard;
     std::shared_ptr<Mesh> _grass;
     std::shared_ptr<Mesh> _cube;

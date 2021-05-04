@@ -44,7 +44,6 @@ enum class ShaderProgram {
     SimpleBRDF,
     SimpleBlur,
     SimplePresentWorld,
-    SimpleDebugCubeMap,
     ModelColor,
     ModelBlinnPhong,
     ModelPBR,
@@ -240,8 +239,7 @@ private:
         FragmentPrefilter,
         FragmentBRDF,
         FragmentBlur,
-        FragmentPresentWorld,
-        FragmentDebugCubeMap
+        FragmentPresentWorld
     };
 
     bool _inited { false };
