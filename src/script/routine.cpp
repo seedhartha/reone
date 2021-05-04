@@ -46,6 +46,9 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
 
     Variable result;
     result.type = _returnType;
+    if (_returnType == VariableType::Object) {
+        result.objectId = kObjectInvalid;
+    }
 
     return move(result);
 }
