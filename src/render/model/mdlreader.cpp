@@ -1207,10 +1207,12 @@ unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
 
     vector<Animation::Event> events;
     if (eventArrayDef.count > 0) {
+        seek(kMdlDataOffset + eventArrayDef.offset);
         for (uint32_t i = 0; i < eventArrayDef.count; ++i) {
             Animation::Event event;
             event.time = readFloat();
             event.name = boost::to_lower_copy(readCString(32));
+            events.push_back(move(event));
         }
         sort(events.begin(), events.end(), [](auto &left, auto &right) { return left.time < right.time; });
     }
