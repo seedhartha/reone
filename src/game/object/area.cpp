@@ -165,8 +165,9 @@ void Area::loadPTH() {
         const Path::Point &point = points[i];
         Room *room = nullptr;
         float z = 0.0f;
+        int material = 0;
 
-        if (!getElevationAt(glm::vec2(point.x, point.y), room, z)) {
+        if (!getElevationAt(glm::vec2(point.x, point.y), room, z, material)) {
             warn(boost::format("Area: point %d elevation not found") % i);
             continue;
         }
@@ -273,8 +274,9 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
 void Area::determineObjectRoom(SpatialObject &object) {
     glm::vec3 position(object.position());
     Room *room = nullptr;
+    int material = 0;
 
-    if (getElevationAt(position, room, position.z)) {
+    if (getElevationAt(position, room, position.z, material)) {
         object.setRoom(room);
     }
 }
@@ -344,8 +346,9 @@ shared_ptr<SpatialObject> Area::getObjectByTag(const string &tag, int nth) const
 void Area::landObject(SpatialObject &object) {
     glm::vec3 position(object.position());
     Room *room = nullptr;
+    int material = 0;
 
-    if (getElevationAt(position, room, position.z, true, &object)) {
+    if (getElevationAt(position, room, position.z, material, true, &object)) {
         object.setPosition(position);
         return;
     }
@@ -353,7 +356,7 @@ void Area::landObject(SpatialObject &object) {
         float angle = i * glm::half_pi<float>();
         position = object.position() + glm::vec3(glm::sin(angle), glm::cos(angle), 0.0f);
 
-        if (getElevationAt(position, room, position.z, true, &object)) {
+        if (getElevationAt(position, room, position.z, material, true, &object)) {
             object.setPosition(position);
             return;
         }
@@ -429,7 +432,7 @@ void Area::printDebugInfo(const SpatialObject &object) {
     debug("Selected object: " + ss.str());
 }
 
-bool Area::getElevationAt(const glm::vec2 &position, Room *&room, float &z, bool creatures, const SpatialObject *except) const {
+bool Area::getElevationAt(const glm::vec2 &position, Room *&room, float &z, int &material, bool creatures, const SpatialObject *except) const {
     // Test AABB of alive creatures
     if (creatures) {
         RaycastProperties props;
@@ -471,6 +474,7 @@ bool Area::getElevationAt(const glm::vec2 &position, Room *&room, float &z, bool
         if (_collisionDetector.raycast(props, result)) {
             room = result.room;
             z = result.intersection.z;
+            material = result.material;
             return true;
         }
     }
@@ -539,12 +543,14 @@ bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &d
 bool Area::doMoveCreature(const shared_ptr<Creature> &creature, const glm::vec3 &dest) {
     float z;
     Room *room;
+    int material;
 
-    if (getElevationAt(dest, room, z)) {
+    if (getElevationAt(dest, room, z, material)) {
         const Room *oldRoom = creature->room();
 
         creature->setRoom(room);
         creature->setPosition(glm::vec3(dest.x, dest.y, z));
+        creature->setWalkmeshMaterial(material);
 
         if (creature == _game->party().getLeader()) {
             onPartyLeaderMoved(room != oldRoom);

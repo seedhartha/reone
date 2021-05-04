@@ -21,15 +21,15 @@
 
 namespace reone {
 
-namespace game {
+namespace scene {
 
-struct Surface {
-    std::string label;
-    bool walkable { false };
-    bool grass { false };
-    std::string sound;
+class IAnimationEventListener {
+public:
+    virtual ~IAnimationEventListener() = default;
+
+    virtual void onEventSignalled(const std::string &name) = 0;
 };
 
-} // namespace game
+} // namespace scene
 
 } // namespace reone

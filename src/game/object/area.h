@@ -324,7 +324,7 @@ private:
      */
     bool getCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const;
 
-    bool getElevationAt(const glm::vec2 &position, Room *&room, float &z, bool creatures = false, const SpatialObject *except = nullptr) const;
+    bool getElevationAt(const glm::vec2 &position, Room *&room, float &z, int &material, bool creatures = false, const SpatialObject *except = nullptr) const;
 
     // END Collision detection
 };

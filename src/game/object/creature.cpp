@@ -24,6 +24,7 @@
 
 #include "../../audio/player.h"
 #include "../../common/log.h"
+#include "../../common/random.h"
 #include "../../common/streamutil.h"
 #include "../../common/timer.h"
 #include "../../render/model/models.h"
@@ -35,7 +36,9 @@
 
 #include "../action/attack.h"
 #include "../animationutil.h"
+#include "../footstepsounds.h"
 #include "../portraits.h"
+#include "../surfaces.h"
 
 #include "objectfactory.h"
 
@@ -83,8 +86,9 @@ void Creature::loadFromBlueprint(const string &resRef) {
 void Creature::loadAppearance() {
     shared_ptr<TwoDA> appearances(Resources::instance().get2DA("appearance"));
     _modelType = parseModelType(appearances->getString(_appearance, "modeltype"));
-    _walkSpeed = appearances->getFloat(_appearance, "walkdist", 0.0f);
-    _runSpeed = appearances->getFloat(_appearance, "rundist", 0.0f);
+    _walkSpeed = appearances->getFloat(_appearance, "walkdist");
+    _runSpeed = appearances->getFloat(_appearance, "rundist");
+    _footstepType = appearances->getInt(_appearance, "footsteptype", -1);
 
     if (_portraitId > 0) {
         _portrait = Portraits::instance().getTextureByIndex(_portraitId);
@@ -641,6 +645,40 @@ void Creature::getOffhandDamage(int &min, int &max) const {
 void Creature::setAppliedForce(glm::vec3 force) {
     if (_sceneNode && _sceneNode->type() == SceneNodeType::Model) {
         static_pointer_cast<ModelSceneNode>(_sceneNode)->setAppliedForce(force);
+    }
+}
+
+void Creature::onEventSignalled(const string &name) {
+    if (name == "snd_footstep" && _footstepType != -1 && _walkmeshMaterial != -1) {
+        shared_ptr<FootstepTypeSounds> sounds(FootstepSounds::instance().get(_footstepType));
+        if (sounds) {
+            const Surface &surface = Surfaces::instance().getSurface(_walkmeshMaterial);
+            vector<shared_ptr<AudioStream>> materialSounds;
+            if (surface.sound == "DT") {
+                materialSounds = sounds->dirt;
+            } else if (surface.sound == "GR") {
+                materialSounds = sounds->grass;
+            } else if (surface.sound == "ST") {
+                materialSounds = sounds->stone;
+            } else if (surface.sound == "WD") {
+                materialSounds = sounds->wood;
+            } else if (surface.sound == "WT") {
+                materialSounds = sounds->water;
+            } else if (surface.sound == "CP") {
+                materialSounds = sounds->carpet;
+            } else if (surface.sound == "MT") {
+                materialSounds = sounds->metal;
+            } else if (surface.sound == "LV") {
+                materialSounds = sounds->leaves;
+            }
+            int index = random(0, 3);
+            if (index < static_cast<int>(materialSounds.size())) {
+                shared_ptr<AudioStream> sound(materialSounds[index]);
+                if (sound) {
+                    AudioPlayer::instance().play(sound, AudioType::Sound, false, 1.0f, true, _position);
+                }
+            }
+        }
     }
 }
 

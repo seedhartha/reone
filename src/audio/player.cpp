@@ -21,6 +21,8 @@
 #include <functional>
 #include <stdexcept>
 
+#include "glm/gtx/norm.hpp"
+
 #include "AL/al.h"
 
 #include "../common/log.h"
@@ -33,6 +35,9 @@ using namespace std;
 namespace reone {
 
 namespace audio {
+
+static constexpr float kMaxPositionalSoundDistance = 16.0f;
+static constexpr float kMaxPositionalSoundDistance2 = kMaxPositionalSoundDistance * kMaxPositionalSoundDistance;
 
 AudioPlayer &AudioPlayer::instance() {
     static AudioPlayer instance;
@@ -155,8 +160,11 @@ void AudioPlayer::enqueue(const shared_ptr<SoundInstance> &sound) {
 }
 
 shared_ptr<SoundHandle> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
+    if (positional && glm::distance2(_listenerPosition.load(), position) > kMaxPositionalSoundDistance2) return nullptr;
+
     auto sound = make_shared<SoundInstance>(stream, loop, getGain(type, gain), positional, move(position));
     enqueue(sound);
+
     return sound->handle();
 }
 

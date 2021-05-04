@@ -24,6 +24,7 @@
 #include "../../render/shaders.h"
 #include "../../render/walkmesh/walkmesh.h"
 
+#include "../animation/eventlistener.h"
 #include "../animation/scenenodeanimator.h"
 #include "../types.h"
 
@@ -43,7 +44,8 @@ public:
         ModelUsage usage,
         const std::shared_ptr<render::Model> &model,
         SceneGraph *sceneGraph,
-        std::set<std::string> ignoreNodes = std::set<std::string>());
+        std::set<std::string> ignoreNodes = std::set<std::string>(),
+        IAnimationEventListener *animEventListener = nullptr);
 
     void update(float dt) override;
     void draw() override;
@@ -97,6 +99,8 @@ public:
     // END Dynamic lighting
 
 private:
+    IAnimationEventListener *_animEventListener;
+
     ModelUsage _usage;
     std::shared_ptr<render::Model> _model;
     std::shared_ptr<render::Walkmesh> _walkmesh;

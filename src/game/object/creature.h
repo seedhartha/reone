@@ -26,6 +26,7 @@
 #include "../../resource/format/2dareader.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/types.h"
+#include "../../scene/animation/eventlistener.h"
 #include "../../script/types.h"
 
 #include "../d20/attributes.h"
@@ -41,7 +42,7 @@ namespace game {
 
 constexpr float kDefaultAttackRange = 2.0f;
 
-class Creature : public SpatialObject {
+class Creature : public SpatialObject, public scene::IAnimationEventListener {
 public:
     enum class ModelType {
         Creature,
@@ -124,6 +125,7 @@ public:
     RacialType racialType() const { return _race; }
     Subrace subrace() const { return _subrace; }
     NPCAIStyle aiStyle() const { return _aiStyle; }
+    int walkmeshMaterial() const { return _walkmeshMaterial; }
 
     void setGender(Gender gender) { _gender = gender; }
     void setAppearance(int appearance) { _appearance = appearance; }
@@ -133,6 +135,7 @@ public:
     void setImmortal(bool immortal) { _immortal = immortal; }
     void setXP(int xp) { _xp = xp; }
     void setAIStyle(NPCAIStyle style) { _aiStyle = style; }
+    void setWalkmeshMaterial(int material) { _walkmeshMaterial = material; }
 
     // Animation
 
@@ -213,6 +216,12 @@ public:
 
     // END Scripts
 
+    // IAnimationEventListener
+
+    void onEventSignalled(const std::string &name);
+
+    // END IAnimationEventListener
+
 private:
     Gender _gender { Gender::Male };
     int _appearance { 0 };
@@ -255,6 +264,8 @@ private:
     int _lawfulChaotic { 0 };
     int _challengeRating { 0 };
     bool _disarmable { false };
+    uint32_t _footstepType { 0 };
+    int _walkmeshMaterial { -1 };
 
     // Animation
 

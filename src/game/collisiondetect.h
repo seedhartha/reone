@@ -56,6 +56,7 @@ struct RaycastResult {
     std::shared_ptr<SpatialObject> object;
     glm::vec3 intersection { 0.0f };
     float distance { 0.0f };
+    int material { -1 };
 };
 
 class CollisionDetector : boost::noncopyable {

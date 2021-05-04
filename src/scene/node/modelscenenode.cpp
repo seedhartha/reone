@@ -47,8 +47,15 @@ const float kMinDirectionalLightRadius = 1000.0f;
 
 static bool g_debugAABB = false;
 
-ModelSceneNode::ModelSceneNode(ModelUsage usage, const shared_ptr<Model> &model, SceneGraph *sceneGraph, set<string> ignoreNodes) :
+ModelSceneNode::ModelSceneNode(
+    ModelUsage usage,
+    const shared_ptr<Model> &model,
+    SceneGraph *sceneGraph,
+    set<string> ignoreNodes,
+    IAnimationEventListener *animEventListener
+) :
     SceneNode(SceneNodeType::Model, sceneGraph),
+    _animEventListener(animEventListener),
     _usage(usage),
     _model(model),
     _animator(this, ignoreNodes) {
@@ -370,6 +377,8 @@ void ModelSceneNode::signalEvent(const string &name) {
         for (auto &emitter : _emitters) {
             emitter->detonate();
         }
+    } else if (_animEventListener) {
+        _animEventListener->onEventSignalled(name);
     }
 }
 

@@ -63,12 +63,14 @@ bool CollisionDetector::rayTestRooms(const RaycastProperties &props, RaycastResu
         shared_ptr<Walkmesh> walkmesh(room.second->walkmesh());
         if (!walkmesh) continue;
 
-        if (walkmesh->raycast(props.origin, props.direction, props.flags & RaycastFlags::walkable, distance) &&
+        int material = 0;
+        if (walkmesh->raycast(props.origin, props.direction, props.flags & RaycastFlags::walkable, distance, material) &&
             distance <= props.distance) {
 
             result.room = room.second.get();
             result.intersection = props.origin + distance * props.direction;
             result.distance = distance;
+            result.material = material;
             return true;
         }
     }
@@ -111,7 +113,9 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
         } else {
             // Test using a walkmesh
             shared_ptr<Walkmesh> walkmesh(object->getWalkmesh());
-            if (walkmesh && walkmesh->raycast(objSpaceOrigin, objSpaceDir, props.flags & RaycastFlags::walkable, distance) &&
+            int material = 0;
+
+            if (walkmesh && walkmesh->raycast(objSpaceOrigin, objSpaceDir, props.flags & RaycastFlags::walkable, distance, material) &&
                 distance <= props.distance) {
 
                 collisions.push_back(make_pair(object, distance));
