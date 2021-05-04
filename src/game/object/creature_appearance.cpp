@@ -50,7 +50,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     shared_ptr<Model> model(Models::instance().get(modelName));
     if (!model) return nullptr;
 
-    auto modelSceneNode = make_unique<ModelSceneNode>(ModelUsage::Creature, model, _sceneGraph);
+    auto modelSceneNode = make_unique<ModelSceneNode>(ModelUsage::Creature, model, _sceneGraph, set<string>(), this);
 
     // Body texture
 

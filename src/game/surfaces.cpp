@@ -43,7 +43,7 @@ void Surfaces::init() {
         surface.label = surfacemat->getString(row, "label");
         surface.walkable = surfacemat->getBool(row, "walk");
         surface.grass = surfacemat->getBool(row, "grass");
-        surface.soundResRef = boost::to_lower_copy(surfacemat->getString(row, "sound"));
+        surface.sound = surfacemat->getString(row, "sound");
         _surfaces.push_back(move(surface));
     }
 }
@@ -57,7 +57,7 @@ bool Surfaces::isWalkable(int index) const {
 
 const Surface &Surfaces::getSurface(int index) const {
     if (index < 0 || index >= static_cast<int>(_surfaces.size())) {
-        throw out_of_range("index is out of range");
+        throw out_of_range("index is out of range: " + to_string(index));
     }
     return _surfaces[index];
 }

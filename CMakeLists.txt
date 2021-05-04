@@ -289,6 +289,7 @@ set_target_properties(libvideo PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINAR
 ## libscene static library
 
 set(SCENE_HEADERS
+    src/scene/animation/eventlistener.h
     src/scene/animation/channel.h
     src/scene/animation/properties.h
     src/scene/animation/scenenodeanimator.h
@@ -429,6 +430,7 @@ set(GAME_HEADERS
     src/game/enginetype/event.h
     src/game/enginetype/location.h
     src/game/enginetype/talent.h
+    src/game/footstepsounds.h
     src/game/game.h
     src/game/gameidutil.h
     src/game/gui/barkbubble.h
@@ -535,6 +537,7 @@ set(GAME_SOURCES
     src/game/d20/classes.cpp
     src/game/d20/skills.cpp
     src/game/dialog.cpp
+    src/game/footstepsounds.cpp
     src/game/game.cpp
     src/game/game_kotor.cpp
     src/game/game_save.cpp

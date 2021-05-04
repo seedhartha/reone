@@ -27,7 +27,7 @@
 namespace reone {
 
 /**
- * Utility class for caching objects. Requires a function which computes an object by key.
+ * Utility class for caching objects. Takes a function which computes an object by key.
  */
 template <class K, class V>
 class MemoryCache : boost::noncopyable {
