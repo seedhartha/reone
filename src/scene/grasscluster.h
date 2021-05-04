@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
 namespace reone {
@@ -25,6 +26,7 @@ namespace scene {
 
 struct GrassCluster {
     glm::vec3 position { 0.0f };
+    glm::vec2 lightmapUV { 0.0f };
     int variant { 0 };
 };
 

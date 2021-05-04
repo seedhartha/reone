@@ -171,6 +171,8 @@ struct ParticlesUniforms {
 
 struct ShaderGrassCluster {
     glm::vec4 positionVariant { 0.0f }; /**< fourth component is a variant (0-3) */
+    glm::vec2 lightmapUV { 0.0f };
+    char padding[8];
 };
 
 struct GrassUniforms {

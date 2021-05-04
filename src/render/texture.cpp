@@ -24,6 +24,7 @@
 #include "SDL2/SDL_opengl.h"
 
 #include "pixelutil.h"
+#include "textureutil.h"
 
 using namespace std;
 

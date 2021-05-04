@@ -31,7 +31,7 @@ class CameraSceneNode;
 
 class GrassSceneNode : public SceneNode {
 public:
-    GrassSceneNode(SceneGraph *graph, std::shared_ptr<render::Texture> texture, glm::vec2 quadSize);
+    GrassSceneNode(SceneGraph *graph, glm::vec2 quadSize, std::shared_ptr<render::Texture> texture, std::shared_ptr<render::Texture> lightmap = nullptr);
 
     void clear();
     void addCluster(GrassCluster cluster);
@@ -41,8 +41,9 @@ public:
     const std::vector<GrassCluster> &clusters() const { return _clusters; }
 
 private:
-    std::shared_ptr<render::Texture> _texture;
     glm::vec2 _quadSize { 0.0f };
+    std::shared_ptr<render::Texture> _texture;
+    std::shared_ptr<render::Texture> _lightmap;
     std::vector<GrassCluster> _clusters;
 };
 

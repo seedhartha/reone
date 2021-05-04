@@ -34,6 +34,7 @@ class BwmReader;
 class Walkmesh : boost::noncopyable {
 public:
     struct Face {
+        int index { 0 };
         uint32_t material { 0 };
         std::vector<glm::vec3> vertices;
         glm::vec3 normal { 0.0f };

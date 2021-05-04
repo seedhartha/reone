@@ -639,12 +639,6 @@ void Area::fill(SceneGraph &sceneGraph) {
     sceneGraph.setFogFar(_fogFar);
     sceneGraph.setFogColor(_fogColor);
 
-    shared_ptr<GrassSceneNode> grass;
-    if (_grass.texture) {
-        grass = make_shared<GrassSceneNode>(&sceneGraph, _grass.texture, glm::vec2(_grass.quadSize));
-        sceneGraph.setGrass(grass);
-    }
-
     // Room models
 
     for (auto &room : _rooms) {
@@ -652,18 +646,27 @@ void Area::fill(SceneGraph &sceneGraph) {
         if (sceneNode) {
             sceneGraph.addRoot(sceneNode);
         }
-        if (grass) {
+        shared_ptr<GrassSceneNode> grass;
+        if (_grass.texture) {
+            shared_ptr<ModelNode> aabbNode(sceneNode->model()->findAABBNode());
+            auto grass = make_shared<GrassSceneNode>(&sceneGraph, glm::vec2(_grass.quadSize), _grass.texture, aabbNode ? aabbNode->mesh()->lightmapTexture() : nullptr);
             shared_ptr<Walkmesh> walkmesh(room.second->walkmesh());
             if (walkmesh) {
                 for (auto &face : walkmesh->grassFaces()) {
+                    glm::vec2 lightmapUV(0.0f);
+                    if (aabbNode) {
+                        lightmapUV = aabbNode->mesh()->mesh()->getFaceCenterUV(face.index);
+                    }
                     for (int i = 0; i < getNumGrassClusters(face); ++i) {
                         GrassCluster cluster;
                         cluster.position = getRandomPointInTriangle(face);
                         cluster.variant = getRandomGrassVariant();
+                        cluster.lightmapUV = lightmapUV;
                         grass->addCluster(move(cluster));
                     }
                 }
             }
+            sceneGraph.addRoot(grass);
         }
     }
 

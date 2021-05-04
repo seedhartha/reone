@@ -53,11 +53,8 @@ public:
     void draw(bool shadowPass = false);
 
     void clear();
-
     void addRoot(const std::shared_ptr<SceneNode> &node);
     void removeRoot(const std::shared_ptr<SceneNode> &node);
-
-    void setGrass(std::shared_ptr<GrassSceneNode> node);
 
     /**
      * Prepares this scene graph for rendering the next frame. Meshes, lights
@@ -116,7 +113,6 @@ private:
     render::GraphicsOptions _opts;
 
     std::vector<std::shared_ptr<SceneNode>> _roots;
-    std::shared_ptr<GrassSceneNode> _grass;
     std::shared_ptr<CameraSceneNode> _activeCamera;
 
     std::vector<ModelNodeSceneNode *> _opaqueMeshes;
@@ -124,8 +120,9 @@ private:
     std::vector<ModelNodeSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
+    std::vector<GrassSceneNode *> _grass;
     std::vector<std::pair<EmitterSceneNode *, std::vector<Particle *>>> _particles;
-    std::vector<GrassCluster> _grassClusters;
+    std::vector<std::pair<GrassSceneNode *, std::vector<GrassCluster>>> _grassClusters;
 
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };

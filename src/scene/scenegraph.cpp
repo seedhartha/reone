@@ -43,7 +43,6 @@ SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 
 void SceneGraph::clear() {
     _roots.clear();
-    _grass.reset();
 }
 
 void SceneGraph::addRoot(const shared_ptr<SceneNode> &node) {
@@ -55,10 +54,6 @@ void SceneGraph::removeRoot(const shared_ptr<SceneNode> &node) {
     if (maybeRoot != _roots.end()) {
         _roots.erase(maybeRoot);
     }
-}
-
-void SceneGraph::setGrass(shared_ptr<GrassSceneNode> node) {
-    _grass = move(node);
 }
 
 void SceneGraph::prepareFrame() {
@@ -85,6 +80,7 @@ void SceneGraph::refreshNodeLists() {
     _shadowMeshes.clear();
     _lights.clear();
     _emitters.clear();
+    _grass.clear();
 
     for (auto &root : _roots) {
         refreshFromSceneNode(root);
@@ -120,6 +116,9 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
             break;
         case SceneNodeType::Emitter:
             _emitters.push_back(static_pointer_cast<EmitterSceneNode>(node).get());
+            break;
+        case SceneNodeType::Grass:
+            _grass.push_back(static_pointer_cast<GrassSceneNode>(node).get());
             break;
         default:
             break;
@@ -242,29 +241,33 @@ void SceneGraph::prepareGrass() {
 
     _grassClusters.clear();
 
-    if (_grass && _activeCamera) {
+    if (_activeCamera && !_grass.empty()) {
         glm::vec3 cameraPos(_activeCamera->absoluteTransform()[3]);
         float grassDistance2 = kMaxGrassDistance * kMaxGrassDistance;
 
-        vector<pair<GrassCluster, float>> clustersZ;
-        for (auto &cluster : _grass->clusters()) {
-            float distance2 = glm::distance2(cameraPos, cluster.position);
-            if (distance2 <= grassDistance2) {
-                glm::vec3 screen(glm::project(cluster.position, _activeCamera->view(), _activeCamera->projection(), viewport));
-                if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
-                    clustersZ.push_back(make_pair(cluster, screen.z));
+        for (auto &node : _grass) {
+            vector<GrassCluster> clusters;
+            vector<pair<GrassCluster, float>> clustersZ;
+            for (auto &cluster : node->clusters()) {
+                float distance2 = glm::distance2(cameraPos, cluster.position);
+                if (distance2 <= grassDistance2) {
+                    glm::vec3 screen(glm::project(cluster.position, _activeCamera->view(), _activeCamera->projection(), viewport));
+                    if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
+                        clustersZ.push_back(make_pair(cluster, screen.z));
+                    }
                 }
             }
-        }
-        sort(clustersZ.begin(), clustersZ.end(), [](auto &left, auto &right) {
-            return left.second > right.second;
-        });
-        int numClustersToErase = glm::max(0, static_cast<int>(clustersZ.size()) - kMaxGrassClusters);
-        if (numClustersToErase > 0) {
-            clustersZ.erase(clustersZ.begin(), clustersZ.begin() + numClustersToErase);
-        }
-        for (auto &cluster : clustersZ) {
-            _grassClusters.push_back(move(cluster.first));
+            sort(clustersZ.begin(), clustersZ.end(), [](auto &left, auto &right) {
+                return left.second > right.second;
+            });
+            int numClustersToErase = glm::max(0, static_cast<int>(clustersZ.size()) - kMaxGrassClusters);
+            if (numClustersToErase > 0) {
+                clustersZ.erase(clustersZ.begin(), clustersZ.begin() + numClustersToErase);
+            }
+            for (auto &cluster : clustersZ) {
+                clusters.push_back(move(cluster.first));
+            }
+            _grassClusters.push_back(make_pair(node, move(clusters)));
         }
     }
 }
@@ -319,8 +322,8 @@ void SceneGraph::draw(bool shadowPass) {
     }
 
     // Render grass
-    if (_grass && !_grassClusters.empty()) {
-        _grass->drawClusters(_grassClusters);
+    for (auto &grass : _grassClusters) {
+        grass.first->drawClusters(grass.second);
     }
 
     // Render particles
@@ -330,7 +333,7 @@ void SceneGraph::draw(bool shadowPass) {
 
     // Render lens flares
     for (auto &light : _lights) {
-        // Ignore lights that are too far away or outside of camera frustums
+        // Ignore lights that are too far away or outside of camera frustum
         if (_activeCamera->getDistanceTo2(*light) > light->flareRadius() * light->flareRadius() ||
             !_activeCamera->isInFrustum(light->absoluteTransform()[3])) continue;
 

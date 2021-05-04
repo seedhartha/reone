@@ -23,6 +23,10 @@ namespace reone {
 
 namespace render {
 
+inline bool isCompressed(PixelFormat format) {
+    return format == PixelFormat::DXT1 || format == PixelFormat::DXT5;
+}
+
 Texture::Properties getTextureProperties(TextureUsage usage, bool headless = false);
 
 /**
