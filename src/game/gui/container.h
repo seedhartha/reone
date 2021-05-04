@@ -43,7 +43,7 @@ private:
     void configureItemsListBox();
     void transferItemsToPlayer();
 
-    std::shared_ptr<render::Texture> getItemFrameTexture(int stackSize) const;
+    std::shared_ptr<graphics::Texture> getItemFrameTexture(int stackSize) const;
 
     // Event handlers
 

@@ -26,9 +26,9 @@
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
-#include "../../render/font.h"
-#include "../../render/framebuffer.h"
-#include "../../render/texture.h"
+#include "../../graphics/font.h"
+#include "../../graphics/framebuffer.h"
+#include "../../graphics/texture.h"
 #include "../../resource/format/gffreader.h"
 #include "../../scene/node/modelscenenode.h"
 #include "../../scene/pipeline/control.h"
@@ -76,16 +76,16 @@ public:
     };
 
     struct Border {
-        std::shared_ptr<render::Texture> corner;
-        std::shared_ptr<render::Texture> edge;
-        std::shared_ptr<render::Texture> fill;
+        std::shared_ptr<graphics::Texture> corner;
+        std::shared_ptr<graphics::Texture> edge;
+        std::shared_ptr<graphics::Texture> fill;
         glm::vec3 color { 1.0f };
         int dimension { 0 };
     };
 
     struct Text {
         std::string text;
-        std::shared_ptr<render::Font> font;
+        std::shared_ptr<graphics::Font> font;
         glm::vec3 color { 1.0f };
         TextAlign align { TextAlign::CenterCenter };
     };
@@ -121,7 +121,7 @@ public:
 
     void setBorder(const Border &border);
     void setBorderFill(const std::string &resRef);
-    void setBorderFill(const std::shared_ptr<render::Texture> &texture);
+    void setBorderFill(const std::shared_ptr<graphics::Texture> &texture);
     void setBorderColor(const glm::vec3 &color);
     void setBorderColorOverride(const glm::vec3 &color);
     void setDisabled(bool disabled);
@@ -135,13 +135,13 @@ public:
     void setHilight(const Border &hilight);
     void setHilightColor(const glm::vec3 &color);
     void setHilightFill(const std::string &resRef);
-    void setHilightFill(const std::shared_ptr<render::Texture> &texture);
+    void setHilightFill(const std::shared_ptr<graphics::Texture> &texture);
     void setPadding(int padding);
     void setScene(std::unique_ptr<scene::SceneGraph> scene);
     void setText(const Text &text);
     void setTextColor(const glm::vec3 & color);
     void setTextMessage(const std::string &text);
-    void setTextFont(const std::shared_ptr<render::Font> &font);
+    void setTextFont(const std::shared_ptr<graphics::Font> &font);
     void setUseBorderColorOverride(bool use);
     void setVisible(bool visible);
 
@@ -201,7 +201,7 @@ private:
     void updateTransform();
     void updateTextLines();
 
-    void getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, render::TextGravity &gravity) const;
+    void getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, graphics::TextGravity &gravity) const;
 };
 
 } // namespace gui

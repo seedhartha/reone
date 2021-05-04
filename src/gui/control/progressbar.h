@@ -34,7 +34,7 @@ public:
 
 private:
     struct Progress {
-        std::shared_ptr<render::Texture> fill;
+        std::shared_ptr<graphics::Texture> fill;
     };
 
     Progress _progress;

@@ -36,7 +36,7 @@ namespace gui {
  */
 class SceneBuilder {
 public:
-    SceneBuilder(const render::GraphicsOptions &opts);
+    SceneBuilder(const graphics::GraphicsOptions &opts);
 
     std::unique_ptr<scene::SceneGraph> build();
 
@@ -50,7 +50,7 @@ public:
     SceneBuilder &ambientLightColor(const glm::vec3 &color);
 
 private:
-    render::GraphicsOptions _opts;
+    graphics::GraphicsOptions _opts;
 
     float _aspect { 1.0f };
     float _zNear { 0.1f };

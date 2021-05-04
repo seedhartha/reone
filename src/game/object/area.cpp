@@ -29,10 +29,10 @@
 #include "../../common/log.h"
 #include "../../common/random.h"
 #include "../../common/streamutil.h"
-#include "../../render/meshes.h"
-#include "../../render/model/models.h"
-#include "../../render/textures.h"
-#include "../../render/walkmesh/walkmeshes.h"
+#include "../../graphics/meshes.h"
+#include "../../graphics/model/models.h"
+#include "../../graphics/textures.h"
+#include "../../graphics/walkmesh/walkmeshes.h"
 #include "../../resource/format/lytreader.h"
 #include "../../resource/format/visreader.h"
 #include "../../resource/resources.h"
@@ -53,7 +53,7 @@ using namespace std::placeholders;
 
 using namespace reone::audio;
 using namespace reone::gui;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;

@@ -23,10 +23,10 @@
 #include <string>
 #include <unordered_map>
 
-#include "../../render/lip/lipanimation.h"
-#include "../../render/model/animation.h"
-#include "../../render/model/model.h"
-#include "../../render/model/modelnode.h"
+#include "../../graphics/lip/lipanimation.h"
+#include "../../graphics/model/animation.h"
+#include "../../graphics/model/model.h"
+#include "../../graphics/model/modelnode.h"
 
 #include "properties.h"
 #include "scenenodestate.h"
@@ -52,7 +52,7 @@ public:
     AnimationChannel(ModelSceneNode *sceneNode, std::set<std::string> ignoreNodes);
 
     void reset();
-    void reset(std::shared_ptr<render::Animation> anim, AnimationProperties properties, std::shared_ptr<render::LipAnimation> lipAnim = nullptr);
+    void reset(std::shared_ptr<graphics::Animation> anim, AnimationProperties properties, std::shared_ptr<graphics::LipAnimation> lipAnim = nullptr);
 
     /**
      * @param dt frame delta time
@@ -62,7 +62,7 @@ public:
 
     void freeze();
 
-    bool isSameAnimation(const render::Animation &anim, const AnimationProperties &properties, std::shared_ptr<render::LipAnimation> lipAnim = nullptr) const;
+    bool isSameAnimation(const graphics::Animation &anim, const AnimationProperties &properties, std::shared_ptr<graphics::LipAnimation> lipAnim = nullptr) const;
 
     /**
      * @return true if this animation channel contains an animation that is not finished, false otherwise
@@ -90,15 +90,15 @@ private:
     ModelSceneNode *_sceneNode;
     std::set<std::string> _ignoreNodes;
 
-    std::shared_ptr<render::Animation> _animation;
+    std::shared_ptr<graphics::Animation> _animation;
     AnimationProperties _properties;
-    std::shared_ptr<render::LipAnimation> _lipAnimation;
+    std::shared_ptr<graphics::LipAnimation> _lipAnimation;
     float _time { 0.0f };
     bool _freeze { false };
     bool _finished { false };
     std::unordered_map<uint16_t, SceneNodeState> _stateByNumber;
 
-    void computeSceneNodeStates(const render::ModelNode &animNode);
+    void computeSceneNodeStates(const graphics::ModelNode &animNode);
 };
 
 } // namespace scene

@@ -24,15 +24,15 @@
 
 #include "glm/ext.hpp"
 
-#include "../../render/fonts.h"
-#include "../../render/meshes.h"
-#include "../../render/shaders.h"
-#include "../../render/textutil.h"
-#include "../../render/window.h"
+#include "../../graphics/fonts.h"
+#include "../../graphics/meshes.h"
+#include "../../graphics/shaders.h"
+#include "../../graphics/textutil.h"
+#include "../../graphics/window.h"
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 
 namespace reone {
 
@@ -42,7 +42,7 @@ static constexpr int kFrameWidth = 125;
 static constexpr char kFontResRef[] = "fnt_console";
 static constexpr float kRefreshInterval = 1.0f; // seconds
 
-ProfileOverlay::ProfileOverlay(render::GraphicsOptions options) :
+ProfileOverlay::ProfileOverlay(graphics::GraphicsOptions options) :
     _options(move(options)),
     _refreshTimer(kRefreshInterval) {
 }

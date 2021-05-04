@@ -24,7 +24,7 @@
 #include <boost/noncopyable.hpp>
 
 #include "../../scene/scenegraph.h"
-#include "../../render/types.h"
+#include "../../graphics/types.h"
 #include "../../resource/types.h"
 
 #include "../types.h"

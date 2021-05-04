@@ -20,8 +20,8 @@
 #include <memory>
 #include <vector>
 
-#include "../../render/font.h"
-#include "../../render/types.h"
+#include "../../graphics/font.h"
+#include "../../graphics/types.h"
 
 namespace reone {
 
@@ -29,7 +29,7 @@ namespace game {
 
 class DebugOverlay {
 public:
-    DebugOverlay(const render::GraphicsOptions &opts);
+    DebugOverlay(const graphics::GraphicsOptions &opts);
 
     void load();
 
@@ -42,8 +42,8 @@ private:
         glm::vec3 screenCoords { 0.0f };
     };
 
-    render::GraphicsOptions _opts;
-    std::shared_ptr<render::Font> _font;
+    graphics::GraphicsOptions _opts;
+    std::shared_ptr<graphics::Font> _font;
     std::vector<DebugObject> _objects;
 };
 

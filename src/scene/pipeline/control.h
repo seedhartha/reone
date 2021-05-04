@@ -22,9 +22,9 @@
 #include "glm/vec2.hpp"
 #include "glm/vec4.hpp"
 
-#include "../../render/framebuffer.h"
-#include "../../render/renderbuffer.h"
-#include "../../render/texture.h"
+#include "../../graphics/framebuffer.h"
+#include "../../graphics/renderbuffer.h"
+#include "../../graphics/texture.h"
 
 #include "../scenegraph.h"
 
@@ -43,9 +43,9 @@ private:
     SceneGraph *_scene;
     glm::vec4 _extent;
 
-    render::Framebuffer _geometry;
-    std::unique_ptr<render::Texture> _geometryColor;
-    std::unique_ptr<render::Renderbuffer> _geometryDepth;
+    graphics::Framebuffer _geometry;
+    std::unique_ptr<graphics::Texture> _geometryColor;
+    std::unique_ptr<graphics::Renderbuffer> _geometryDepth;
 };
 
 } // namespace scene

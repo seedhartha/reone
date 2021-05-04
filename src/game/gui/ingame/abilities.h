@@ -40,7 +40,7 @@ private:
         Skill skill;
         std::string name;
         std::string description;
-        std::shared_ptr<render::Texture> icon;
+        std::shared_ptr<graphics::Texture> icon;
     };
 
     Game *_game;

@@ -23,7 +23,7 @@
 #include "glm/vec2.hpp"
 #include "glm/vec4.hpp"
 
-#include "../render/texture.h"
+#include "../graphics/texture.h"
 #include "../resource/format/gffreader.h"
 
 namespace reone {
@@ -58,9 +58,9 @@ private:
     glm::vec2 _mapPoint1 { 0.0f };
     glm::vec2 _mapPoint2 { 0.0f };
 
-    std::shared_ptr<render::Texture> _areaTexture;
-    std::shared_ptr<render::Texture> _arrowTexture;
-    std::shared_ptr<render::Texture> _noteTexture;
+    std::shared_ptr<graphics::Texture> _areaTexture;
+    std::shared_ptr<graphics::Texture> _arrowTexture;
+    std::shared_ptr<graphics::Texture> _noteTexture;
 
     std::shared_ptr<Waypoint> _selectedNote;
 

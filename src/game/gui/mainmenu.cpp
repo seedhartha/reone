@@ -23,7 +23,7 @@
 #include "../../common/log.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/scenebuilder.h"
-#include "../../render/model/models.h"
+#include "../../graphics/model/models.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
 
@@ -37,7 +37,7 @@ using namespace std::placeholders;
 
 using namespace reone::audio;
 using namespace reone::gui;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 

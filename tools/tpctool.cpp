@@ -22,12 +22,12 @@
 #include "s3tc.h"
 
 #include "../src/common/log.h"
-#include "../src/render/image/tgawriter.h"
-#include "../src/render/image/tpcreader.h"
+#include "../src/graphics/image/tgawriter.h"
+#include "../src/graphics/image/tpcreader.h"
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 
 namespace fs = boost::filesystem;
 

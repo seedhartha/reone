@@ -19,14 +19,14 @@
 
 #include <unordered_map>
 
-#include "../../render/font.h"
-#include "../../render/fonts.h"
-#include "../../render/meshes.h"
-#include "../../render/shaders.h"
-#include "../../render/stateutil.h"
-#include "../../render/texture.h"
-#include "../../render/textures.h"
-#include "../../render/window.h"
+#include "../../graphics/font.h"
+#include "../../graphics/fonts.h"
+#include "../../graphics/meshes.h"
+#include "../../graphics/shaders.h"
+#include "../../graphics/stateutil.h"
+#include "../../graphics/texture.h"
+#include "../../graphics/textures.h"
+#include "../../graphics/window.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"
@@ -37,7 +37,7 @@
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

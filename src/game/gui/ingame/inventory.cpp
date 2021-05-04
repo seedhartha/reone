@@ -24,7 +24,7 @@
 using namespace std;
 
 using namespace reone::gui;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

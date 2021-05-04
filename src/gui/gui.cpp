@@ -20,17 +20,17 @@
 #include <stdexcept>
 
 #include "../common/log.h"
-#include "../render/meshes.h"
-#include "../render/shaders.h"
-#include "../render/stateutil.h"
-#include "../render/textures.h"
-#include "../render/window.h"
+#include "../graphics/meshes.h"
+#include "../graphics/shaders.h"
+#include "../graphics/stateutil.h"
+#include "../graphics/textures.h"
+#include "../graphics/window.h"
 #include "../resource/resources.h"
 
 using namespace std;
 using namespace std::placeholders;
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

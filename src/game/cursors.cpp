@@ -20,13 +20,13 @@
 #include <stdexcept>
 
 #include "../common/streamutil.h"
-#include "../render/cursor.h"
-#include "../render/image/curreader.h"
+#include "../graphics/cursor.h"
+#include "../graphics/image/curreader.h"
 #include "../resource/resources.h"
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

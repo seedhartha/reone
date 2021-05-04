@@ -18,7 +18,7 @@
 #include "classselect.h"
 
 #include "../../../gui/scenebuilder.h"
-#include "../../../render/model/models.h"
+#include "../../../graphics/model/models.h"
 #include "../../../resource/strings.h"
 
 #include "../../characterutil.h"
@@ -34,7 +34,7 @@
 using namespace std;
 
 using namespace reone::gui;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 

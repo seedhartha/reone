@@ -20,7 +20,7 @@
 #include <string>
 
 #include "../audio/types.h"
-#include "../render/types.h"
+#include "../graphics/types.h"
 
 namespace reone {
 
@@ -29,7 +29,7 @@ namespace game {
 struct Options {
     bool developer { false };
     std::string module;
-    render::GraphicsOptions graphics;
+    graphics::GraphicsOptions graphics;
     audio::AudioOptions audio;
 };
 

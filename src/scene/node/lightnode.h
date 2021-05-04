@@ -19,7 +19,7 @@
 
 #include "../types.h"
 
-#include "../../render/model/lensflare.h"
+#include "../../graphics/model/lensflare.h"
 
 #include "scenenode.h"
 
@@ -31,7 +31,7 @@ class LightSceneNode : public SceneNode {
 public:
     LightSceneNode(int priority, SceneGraph *sceneGraph);
 
-    void drawLensFlares(const render::LensFlare &flare);
+    void drawLensFlares(const graphics::LensFlare &flare);
 
     bool isShadow() const { return _shadow; }
     bool isAmbientOnly() const { return _ambientOnly; }
@@ -42,7 +42,7 @@ public:
     float multiplier() const { return _multiplier; }
     float radius() const { return _radius; }
     float flareRadius() const { return _flareRadius; }
-    const std::vector<render::LensFlare> &flares() const { return _flares; }
+    const std::vector<graphics::LensFlare> &flares() const { return _flares; }
 
     void setColor(glm::vec3 color) { _color = std::move(color); }
     void setMultiplier(float multiplier) { _multiplier = multiplier; }
@@ -51,7 +51,7 @@ public:
     void setAmbientOnly(bool ambientOnly) { _ambientOnly = ambientOnly; }
     void setDirectional(bool directional) { _directional = directional; }
     void setFlareRadius(float radius) { _flareRadius = radius; }
-    void setFlares(std::vector<render::LensFlare> flares) { _flares = std::move(flares); }
+    void setFlares(std::vector<graphics::LensFlare> flares) { _flares = std::move(flares); }
 
 private:
     int _priority;
@@ -66,7 +66,7 @@ private:
     // Light flares
 
     float _flareRadius { 0.0f };
-    std::vector<render::LensFlare> _flares;
+    std::vector<graphics::LensFlare> _flares;
 
     // END Light flares
 };

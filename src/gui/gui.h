@@ -72,7 +72,7 @@ protected:
         Stretch
     };
 
-    render::GraphicsOptions _gfxOpts;
+    graphics::GraphicsOptions _gfxOpts;
     std::string _resRef;
     int _resolutionX { kDefaultResolutionX };
     int _resolutionY { kDefaultResolutionY };
@@ -81,7 +81,7 @@ protected:
     glm::ivec2 _screenCenter { 0 };
     glm::ivec2 _rootOffset { 0 };
     glm::ivec2 _controlOffset { 0 };
-    std::shared_ptr<render::Texture> _background;
+    std::shared_ptr<graphics::Texture> _background;
     std::unique_ptr<Control> _rootControl;
     std::vector<std::unique_ptr<Control>> _controls;
     std::unordered_map<std::string, Control *> _controlByTag;
@@ -90,7 +90,7 @@ protected:
     glm::vec3 _defaultHilightColor { 0.0f };
     std::unordered_map<std::string, ScalingMode> _scalingByControlTag;
 
-    GUI(const render::GraphicsOptions &opts);
+    GUI(const graphics::GraphicsOptions &opts);
 
     void loadControl(const resource::GffStruct &gffs);
     virtual void onFocusChanged(const std::string &control, bool focus);

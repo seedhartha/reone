@@ -40,11 +40,11 @@ public:
 
 private:
     struct Direction {
-        std::shared_ptr<render::Texture> image;
+        std::shared_ptr<graphics::Texture> image;
     };
 
     struct Thumb {
-        std::shared_ptr<render::Texture> image;
+        std::shared_ptr<graphics::Texture> image;
     };
 
     Direction _dir;

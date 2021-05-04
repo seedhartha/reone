@@ -29,7 +29,7 @@
 
 namespace reone {
 
-namespace render {
+namespace graphics {
 
 class Cursor;
 class Texture;
@@ -47,15 +47,15 @@ public:
     void init(GameID gameId);
     void deinit();
 
-    std::shared_ptr<render::Cursor> get(CursorType type);
+    std::shared_ptr<graphics::Cursor> get(CursorType type);
 
 private:
     GameID _gameId { GameID::KotOR };
-    std::unordered_map<CursorType, std::shared_ptr<render::Cursor>> _cache;
+    std::unordered_map<CursorType, std::shared_ptr<graphics::Cursor>> _cache;
 
     const std::pair<uint32_t, uint32_t> &getCursorNames(CursorType type);
     const std::pair<uint32_t, uint32_t> &getCursorNames(CursorType type, const std::unordered_map<CursorType, std::pair<uint32_t, uint32_t>> &nameByResRef);
-    std::shared_ptr<render::Texture> newTexture(uint32_t name);
+    std::shared_ptr<graphics::Texture> newTexture(uint32_t name);
 };
 
 } // namespace game

@@ -24,12 +24,12 @@
 
 #include "../../common/log.h"
 #include "../../common/random.h"
-#include "../../render/featureutil.h"
-#include "../../render/materials.h"
-#include "../../render/pbribl.h"
-#include "../../render/shaders.h"
-#include "../../render/stateutil.h"
-#include "../../render/textures.h"
+#include "../../graphics/featureutil.h"
+#include "../../graphics/materials.h"
+#include "../../graphics/pbribl.h"
+#include "../../graphics/shaders.h"
+#include "../../graphics/stateutil.h"
+#include "../../graphics/textures.h"
 
 #include "../scenegraph.h"
 
@@ -39,7 +39,7 @@
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 
 namespace reone {
 

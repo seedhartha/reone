@@ -33,18 +33,18 @@ public:
         const glm::ivec2 &offset,
         const std::vector<std::string> &text,
         const std::string &iconText,
-        const std::shared_ptr<render::Texture> &iconTexture,
-        const std::shared_ptr<render::Texture> &iconFrame);
+        const std::shared_ptr<graphics::Texture> &iconTexture,
+        const std::shared_ptr<graphics::Texture> &iconFrame);
 
 private:
-    std::shared_ptr<render::Texture> _iconFrame;
-    std::shared_ptr<render::Font> _iconFont;
+    std::shared_ptr<graphics::Texture> _iconFrame;
+    std::shared_ptr<graphics::Font> _iconFont;
 
     void drawIcon(
         const glm::ivec2 &offset,
         const std::string &iconText,
-        const std::shared_ptr<render::Texture> &iconTexture,
-        const std::shared_ptr<render::Texture> &iconFrame);
+        const std::shared_ptr<graphics::Texture> &iconTexture,
+        const std::shared_ptr<graphics::Texture> &iconFrame);
 };
 
 } // namespace gui

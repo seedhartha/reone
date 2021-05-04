@@ -19,9 +19,9 @@
 
 #include "scenenode.h"
 
-#include "../../render/material.h"
-#include "../../render/model/model.h"
-#include "../../render/model/modelnode.h"
+#include "../../graphics/material.h"
+#include "../../graphics/model/model.h"
+#include "../../graphics/model/modelnode.h"
 
 namespace reone {
 
@@ -31,7 +31,7 @@ class ModelSceneNode;
 
 class ModelNodeSceneNode : public SceneNode {
 public:
-    ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, render::ModelNode *modelNode);
+    ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, graphics::ModelNode *modelNode);
 
     void update(float dt) override;
 
@@ -48,20 +48,20 @@ public:
     bool isSelfIlluminated() const;
 
     const ModelSceneNode *modelSceneNode() const { return _modelSceneNode; }
-    const render::ModelNode *modelNode() const { return _modelNode; }
+    const graphics::ModelNode *modelNode() const { return _modelNode; }
     const glm::mat4 &boneTransform() const { return _boneTransform; }
 
     void setBoneTransform(const glm::mat4 &transform);
-    void setDiffuseTexture(const std::shared_ptr<render::Texture> &texture);
+    void setDiffuseTexture(const std::shared_ptr<graphics::Texture> &texture);
     void setAlpha(float alpha);
     void setSelfIllumColor(glm::vec3 color);
 
 private:
     struct NodeTextures {
-        std::shared_ptr<render::Texture> diffuse;
-        std::shared_ptr<render::Texture> lightmap;
-        std::shared_ptr<render::Texture> envmap;
-        std::shared_ptr<render::Texture> bumpmap;
+        std::shared_ptr<graphics::Texture> diffuse;
+        std::shared_ptr<graphics::Texture> lightmap;
+        std::shared_ptr<graphics::Texture> envmap;
+        std::shared_ptr<graphics::Texture> bumpmap;
     } _textures;
 
     struct DanglymeshAnimation {
@@ -70,9 +70,9 @@ private:
     } _danglymeshAnimation;
 
     const ModelSceneNode *_modelSceneNode;
-    const render::ModelNode *_modelNode;
+    const graphics::ModelNode *_modelNode;
 
-    render::Material _material;
+    graphics::Material _material;
     glm::mat4 _animTransform { 1.0f };
     glm::mat4 _boneTransform { 1.0f };
     glm::vec2 _uvOffset { 0.0f };

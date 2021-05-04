@@ -19,7 +19,7 @@
 
 #include <algorithm>
 
-#include "../render/meshes.h"
+#include "../graphics/meshes.h"
 
 #include "node/cameranode.h"
 #include "node/emitternode.h"
@@ -30,7 +30,7 @@
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 
 namespace reone {
 

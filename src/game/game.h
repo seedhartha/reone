@@ -74,7 +74,7 @@ constexpr char kOverrideDirectoryName[] = "override";
  * @see game::Module
  * @see gui::GUI
  */
-class Game : public render::IEventHandler, boost::noncopyable {
+class Game : public graphics::IEventHandler, boost::noncopyable {
 public:
     Game(const boost::filesystem::path &path, const Options &opts);
 

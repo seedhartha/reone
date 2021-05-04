@@ -23,7 +23,7 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "../render/texture.h"
+#include "../graphics/texture.h"
 
 #include "portrait.h"
 
@@ -37,8 +37,8 @@ public:
 
     void init();
 
-    std::shared_ptr<render::Texture> getTextureByIndex(int index);
-    std::shared_ptr<render::Texture> getTextureByAppearance(int appearance);
+    std::shared_ptr<graphics::Texture> getTextureByIndex(int index);
+    std::shared_ptr<graphics::Texture> getTextureByAppearance(int appearance);
 
     const std::vector<Portrait> &portraits() const { return _portraits; }
 

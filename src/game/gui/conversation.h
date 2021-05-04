@@ -19,8 +19,8 @@
 
 #include "../../audio/soundhandle.h"
 #include "../../common/timer.h"
-#include "../../render/lip/lipanimation.h"
-#include "../../render/model/model.h"
+#include "../../graphics/lip/lipanimation.h"
+#include "../../graphics/model/model.h"
 
 #include "../dialog.h"
 #include "../object/spatial.h"
@@ -74,8 +74,8 @@ protected:
 
     std::shared_ptr<Dialog> _dialog;
     std::shared_ptr<SpatialObject> _owner;
-    std::shared_ptr<render::Model> _cameraModel;
-    std::shared_ptr<render::LipAnimation> _lipAnimation;
+    std::shared_ptr<graphics::Model> _cameraModel;
+    std::shared_ptr<graphics::LipAnimation> _lipAnimation;
     const Dialog::EntryReply *_currentEntry { nullptr };
     bool _entryEnded { false };
     bool _paused { false };

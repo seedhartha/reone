@@ -20,7 +20,7 @@
 #include <string>
 #include <memory>
 
-#include "../render/texture.h"
+#include "../graphics/texture.h"
 
 namespace reone {
 

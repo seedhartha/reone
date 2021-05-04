@@ -19,12 +19,12 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../src/render/lip/lipreader.h"
-#include "../src/render/lip/lipwriter.h"
+#include "../src/graphics/lip/lipreader.h"
+#include "../src/graphics/lip/lipwriter.h"
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 
 namespace fs = boost::filesystem;
 namespace pt = boost::property_tree;

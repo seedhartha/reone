@@ -21,10 +21,10 @@
 
 #include "glm/mat4x4.hpp"
 
-#include "../../render/framebuffer.h"
-#include "../../render/renderbuffer.h"
-#include "../../render/texture.h"
-#include "../../render/types.h"
+#include "../../graphics/framebuffer.h"
+#include "../../graphics/renderbuffer.h"
+#include "../../graphics/texture.h"
+#include "../../graphics/types.h"
 
 #include "../scenegraph.h"
 
@@ -34,34 +34,34 @@ namespace scene {
 
 class WorldRenderPipeline : boost::noncopyable {
 public:
-    WorldRenderPipeline(SceneGraph *scene, const render::GraphicsOptions &opts);
+    WorldRenderPipeline(SceneGraph *scene, const graphics::GraphicsOptions &opts);
 
     void init();
     void render();
 
 private:
     SceneGraph *_scene { nullptr };
-    render::GraphicsOptions _opts;
-    glm::mat4 _lightSpaceMatrices[render::kNumCubeFaces];
+    graphics::GraphicsOptions _opts;
+    glm::mat4 _lightSpaceMatrices[graphics::kNumCubeFaces];
 
     // Framebuffers
 
-    render::Framebuffer _geometry;
-    render::Framebuffer _verticalBlur;
-    render::Framebuffer _horizontalBlur;
-    render::Framebuffer _shadows;
+    graphics::Framebuffer _geometry;
+    graphics::Framebuffer _verticalBlur;
+    graphics::Framebuffer _horizontalBlur;
+    graphics::Framebuffer _shadows;
 
     // END Framebuffers
 
     // Framebuffer targets
 
-    std::unique_ptr<render::Renderbuffer> _depthRenderbuffer;
-    std::unique_ptr<render::Texture> _geometryColor1;
-    std::unique_ptr<render::Texture> _geometryColor2;
-    std::unique_ptr<render::Texture> _verticalBlurColor;
-    std::unique_ptr<render::Texture> _horizontalBlurColor;
-    std::unique_ptr<render::Texture> _shadowsDepth;
-    std::unique_ptr<render::Texture> _cubeShadowsDepth;
+    std::unique_ptr<graphics::Renderbuffer> _depthRenderbuffer;
+    std::unique_ptr<graphics::Texture> _geometryColor1;
+    std::unique_ptr<graphics::Texture> _geometryColor2;
+    std::unique_ptr<graphics::Texture> _verticalBlurColor;
+    std::unique_ptr<graphics::Texture> _horizontalBlurColor;
+    std::unique_ptr<graphics::Texture> _shadowsDepth;
+    std::unique_ptr<graphics::Texture> _cubeShadowsDepth;
 
     // END Framebuffers targets
 

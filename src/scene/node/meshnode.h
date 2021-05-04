@@ -19,7 +19,7 @@
 
 #include "scenenode.h"
 
-#include "../../render/mesh.h"
+#include "../../graphics/mesh.h"
 
 namespace reone {
 
@@ -27,7 +27,7 @@ namespace scene {
 
 class MeshSceneNode : public SceneNode {
 public:
-    MeshSceneNode(SceneGraph *sceneGraph, const std::shared_ptr<render::Mesh> &mesh);
+    MeshSceneNode(SceneGraph *sceneGraph, const std::shared_ptr<graphics::Mesh> &mesh);
 
     void draw() override;
 
@@ -35,7 +35,7 @@ public:
     void setAlpha(float alpha);
 
 private:
-    std::shared_ptr<render::Mesh> _mesh;
+    std::shared_ptr<graphics::Mesh> _mesh;
 
     glm::vec3 _color { 1.0f };
     float _alpha { 1.0f };

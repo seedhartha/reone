@@ -25,7 +25,7 @@
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

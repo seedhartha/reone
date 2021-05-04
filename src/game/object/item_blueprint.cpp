@@ -25,15 +25,15 @@
 #include <boost/format.hpp>
 
 #include "../../audio/files.h"
-#include "../../render/model/models.h"
-#include "../../render/textures.h"
+#include "../../graphics/model/models.h"
+#include "../../graphics/textures.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

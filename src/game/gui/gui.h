@@ -30,7 +30,7 @@ namespace game {
  */
 class GameGUI : public gui::GUI {
 protected:
-    GameGUI(GameID gameId, const render::GraphicsOptions &options);
+    GameGUI(GameID gameId, const graphics::GraphicsOptions &options);
 
     void onClick(const std::string &control) override;
     void onFocusChanged(const std::string &control, bool focus) override;

@@ -18,9 +18,9 @@
 #include "listbox.h"
 
 #include "../../common/log.h"
-#include "../../render/meshes.h"
-#include "../../render/shaders.h"
-#include "../../render/textutil.h"
+#include "../../graphics/meshes.h"
+#include "../../graphics/shaders.h"
+#include "../../graphics/textutil.h"
 #include "../../resource/resources.h"
 
 #include "../gui.h"
@@ -31,7 +31,7 @@
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

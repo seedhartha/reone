@@ -21,7 +21,7 @@
 
 #include "glm/ext.hpp"
 
-#include "../../render/shaders.h"
+#include "../../graphics/shaders.h"
 
 #include "../scenegraph.h"
 
@@ -29,7 +29,7 @@
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 
 namespace reone {
 
@@ -64,6 +64,6 @@ void MeshSceneNode::setAlpha(float alpha) {
     _alpha = alpha;
 }
 
-} // namespace render
+} // namespace graphics
 
 } // namespace reone

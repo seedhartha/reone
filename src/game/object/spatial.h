@@ -26,7 +26,7 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
-#include "../../render/walkmesh/walkmesh.h"
+#include "../../graphics/walkmesh/walkmesh.h"
 #include "../../scene/node/modelscenenode.h"
 
 #include "../action/playanimation.h"
@@ -69,7 +69,7 @@ public:
     float getFacing() const { return glm::eulerAngles(_orientation).z; }
 
     std::shared_ptr<scene::ModelSceneNode> getModelSceneNode() const;
-    virtual std::shared_ptr<render::Walkmesh> getWalkmesh() const;
+    virtual std::shared_ptr<graphics::Walkmesh> getWalkmesh() const;
 
     ObjectFactory &objectFactory() { return *_objectFactory; }
     scene::SceneGraph &sceneGraph() { return *_sceneGraph; }

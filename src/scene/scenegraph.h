@@ -26,8 +26,8 @@
 
 #include "glm/vec3.hpp"
 
-#include "../render/shaders.h"
-#include "../render/types.h"
+#include "../graphics/shaders.h"
+#include "../graphics/types.h"
 
 #include "grasscluster.h"
 
@@ -47,7 +47,7 @@ class SceneNode;
 
 class SceneGraph : boost::noncopyable {
 public:
-    SceneGraph(const render::GraphicsOptions &opts);
+    SceneGraph(const graphics::GraphicsOptions &opts);
 
     void update(float dt);
     void draw(bool shadowPass = false);
@@ -63,15 +63,15 @@ public:
      */
     void prepareFrame();
 
-    const render::GraphicsOptions &options() const { return _opts; }
+    const graphics::GraphicsOptions &options() const { return _opts; }
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
-    render::ShaderUniforms uniformsPrototype() const { return _uniformsPrototype; }
+    graphics::ShaderUniforms uniformsPrototype() const { return _uniformsPrototype; }
     float exposure() const { return _exposure; }
 
     void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
     void setShadowReference(const std::shared_ptr<SceneNode> &reference);
     void setUpdate(bool update);
-    void setUniformsPrototype(render::ShaderUniforms &&uniforms);
+    void setUniformsPrototype(graphics::ShaderUniforms &&uniforms);
     void setExposure(float exposure);
 
     // Lights and shadows
@@ -83,7 +83,7 @@ public:
     void getLightsAt(
         const SceneNode &reference,
         std::vector<LightSceneNode *> &lights,
-        int count = render::kMaxLights,
+        int count = graphics::kMaxLights,
         std::function<bool(const LightSceneNode &)> predicate = [](auto &light) { return true; }) const;
 
     const glm::vec3 &ambientLightColor() const { return _ambientLightColor; }
@@ -110,7 +110,7 @@ public:
     // END Fog
 
 private:
-    render::GraphicsOptions _opts;
+    graphics::GraphicsOptions _opts;
 
     std::vector<std::shared_ptr<SceneNode>> _roots;
     std::shared_ptr<CameraSceneNode> _activeCamera;
@@ -127,7 +127,7 @@ private:
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
     bool _update { true };
-    render::ShaderUniforms _uniformsPrototype;
+    graphics::ShaderUniforms _uniformsPrototype;
     float _exposure { kDefaultExposure };
 
     // Shadows

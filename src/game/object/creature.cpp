@@ -27,8 +27,8 @@
 #include "../../common/random.h"
 #include "../../common/streamutil.h"
 #include "../../common/timer.h"
-#include "../../render/model/models.h"
-#include "../../render/textures.h"
+#include "../../graphics/model/models.h"
+#include "../../graphics/textures.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 #include "../../scene/types.h"
@@ -45,7 +45,7 @@
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;

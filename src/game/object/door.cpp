@@ -20,8 +20,8 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../../common/streamutil.h"
-#include "../../render/model/models.h"
-#include "../../render/walkmesh/walkmeshes.h"
+#include "../../graphics/model/models.h"
+#include "../../graphics/walkmesh/walkmeshes.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 #include "../../scene/node/modelscenenode.h"
@@ -30,7 +30,7 @@
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
