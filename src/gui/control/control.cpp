@@ -293,8 +293,6 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 glm::mat4 transform(1.0f);
                 transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
                 transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
-                transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
-                transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
                 ShaderUniforms uniforms;
                 uniforms.combined.general.projection = Window::instance().getOrthoProjection();
@@ -302,15 +300,14 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
                 Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-                Meshes::instance().getQuad()->draw();
+                Meshes::instance().getQuadSwapFlipX()->draw();
             }
 
             // Right edge
             {
                 glm::mat4 transform(1.0f);
-                transform = glm::translate(transform, glm::vec3(x + size.x, y, 0.0f));
+                transform = glm::translate(transform, glm::vec3(x + size.x - border.dimension, y, 0.0f));
                 transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
-                transform = glm::rotate(transform, glm::half_pi<float>(), glm::vec3(0.0f, 0.0f, 1.0f));
 
                 ShaderUniforms uniforms;
                 uniforms.combined.general.projection = Window::instance().getOrthoProjection();
@@ -318,7 +315,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
                 Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-                Meshes::instance().getQuadFlipX()->draw();
+                Meshes::instance().getQuadSwap()->draw();
             }
         }
 

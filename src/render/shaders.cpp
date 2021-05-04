@@ -1157,29 +1157,6 @@ void main() {
 }
 )END";
 
-static constexpr GLchar kShaderFragmentDebugCubeMap[] = R"END(
-const bool RGB = true;
-
-//uniform sampler2D uDiffuse;
-uniform samplerCube uDiffuse;
-
-in vec2 fragTexCoords;
-
-out vec4 fragColor;
-
-void main() {
-    vec2 cubeMapCoords = 2.0 * fragTexCoords - 1.0;
-    vec4 diffuseSample = texture(uDiffuse, vec3(cubeMapCoords.x, -1.0, -cubeMapCoords.y));
-    //vec4 diffuseSample = texture(uDiffuse, fragTexCoords);
-
-    if (RGB) {
-        fragColor = vec4(diffuseSample.rgb, 1.0);
-    } else {
-        fragColor = vec4(vec3(diffuseSample.r), 1.0);
-    }
-}
-)END";
-
 Shaders &Shaders::instance() {
     static Shaders instance;
     return instance;
@@ -1208,7 +1185,6 @@ void Shaders::init() {
     initShader(ShaderName::FragmentBRDF, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderBasePBR, kShaderBasePBRIBL, kShaderFragmentBRDF });
     initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentBlur });
     initShader(ShaderName::FragmentPresentWorld, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentPresentWorld });
-    initShader(ShaderName::FragmentDebugCubeMap, GL_FRAGMENT_SHADER, { kShaderBaseHeader, kShaderFragmentDebugCubeMap });
 
     initProgram(ShaderProgram::SimpleColor, { ShaderName::VertexSimple, ShaderName::FragmentColor });
     initProgram(ShaderProgram::SimpleDepth, { ShaderName::VertexSimple, ShaderName::GeometryDepth, ShaderName::FragmentDepth });
@@ -1218,7 +1194,6 @@ void Shaders::init() {
     initProgram(ShaderProgram::SimpleBRDF, { ShaderName::VertexSimple, ShaderName::FragmentBRDF });
     initProgram(ShaderProgram::SimpleBlur, { ShaderName::VertexSimple, ShaderName::FragmentBlur });
     initProgram(ShaderProgram::SimplePresentWorld, { ShaderName::VertexSimple, ShaderName::FragmentPresentWorld });
-    initProgram(ShaderProgram::SimpleDebugCubeMap, { ShaderName::VertexSimple, ShaderName::FragmentDebugCubeMap });
     initProgram(ShaderProgram::ModelColor, { ShaderName::VertexModel, ShaderName::FragmentColor });
     initProgram(ShaderProgram::ModelBlinnPhong, { ShaderName::VertexModel, ShaderName::FragmentBlinnPhong });
     initProgram(ShaderProgram::ModelPBR, { ShaderName::VertexModel, ShaderName::FragmentPBR });

@@ -86,10 +86,8 @@ void Video::draw() {
     _texture->bind();
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = glm::ortho(0.0f, 1.0f, 0.0f, 1.0f);
-
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->draw();
+    Meshes::instance().getQuadNDCFlipY()->draw();
 }
 
 void Video::finish() {

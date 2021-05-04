@@ -48,7 +48,6 @@ const float kShadowFarPlane = 10000.0f;
 const float kOrthographicScale = 10.0f;
 
 static bool g_wireframesEnabled = false;
-static bool g_debugCubeMap = false;
 
 WorldRenderPipeline::WorldRenderPipeline(SceneGraph *scene, const GraphicsOptions &opts) :
     _scene(scene), _opts(opts) {
@@ -135,8 +134,12 @@ void WorldRenderPipeline::init() {
 
 void WorldRenderPipeline::render() {
     computeLightSpaceMatrices();
-    drawShadows();
-    drawGeometry();
+
+    withBackFaceCulling([this]() {
+        drawShadows();
+        drawGeometry();
+    });
+
     applyHorizontalBlur();
     applyVerticalBlur();
     drawResult();
@@ -281,20 +284,15 @@ void WorldRenderPipeline::applyHorizontalBlur() {
     setActiveTextureUnit(TextureUnits::diffuse);
     _geometryColor2->bind();
 
-    glm::mat4 transform(1.0f);
-    transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
-
     ShaderUniforms uniforms;
     uniforms.combined.featureMask |= UniformFeatureFlags::blur;
-    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
-    uniforms.combined.general.model = move(transform);
     uniforms.combined.blur.resolution = glm::vec2(w, h);
     uniforms.combined.blur.direction = glm::vec2(1.0f, 0.0f);
 
     Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
 
     withDepthTest([]() {
-        Meshes::instance().getQuad()->draw();
+        Meshes::instance().getQuadNDC()->draw();
     });
 }
 
@@ -309,64 +307,30 @@ void WorldRenderPipeline::applyVerticalBlur() {
     setActiveTextureUnit(TextureUnits::diffuse);
     _horizontalBlurColor->bind();
 
-    glm::mat4 transform(1.0f);
-    transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
-
     ShaderUniforms uniforms;
     uniforms.combined.featureMask |= UniformFeatureFlags::blur;
-    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
-    uniforms.combined.general.model = move(transform);
-    uniforms.combined.blur.resolution = glm::vec2(_opts.width, _opts.height);
+    uniforms.combined.blur.resolution = glm::vec2(w, h);
     uniforms.combined.blur.direction = glm::vec2(0.0f, 1.0f);
 
     Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
 
     withDepthTest([]() {
-        Meshes::instance().getQuad()->draw();
+        Meshes::instance().getQuadNDC()->draw();
     });
 
     _verticalBlur.unbind();
 }
 
 void WorldRenderPipeline::drawResult() {
-    float w = static_cast<float>(_opts.width);
-    float h = static_cast<float>(_opts.height);
+    setActiveTextureUnit(TextureUnits::diffuse);
+    _geometryColor1->bind();
 
-    glm::mat4 transform(1.0f);
-    transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
+    setActiveTextureUnit(TextureUnits::bloom);
+    _verticalBlurColor->bind();
 
-    if (g_debugCubeMap) {
-        setActiveTextureUnit(TextureUnits::diffuse);
-        auto envmap = Textures::instance().get("cm_baremetal", TextureUsage::EnvironmentMap);
-        PBRIBL::Derived derived;
-        if (PBRIBL::instance().getDerived(envmap.get(), derived)) {
-            derived.brdfLookup->bind();
-        } else {
-            envmap->bind();
-        }
-        //_shadowsDepth->bind();
-
-        ShaderUniforms uniforms;
-        uniforms.combined.general.projection = Window::instance().getOrthoProjection();
-        uniforms.combined.general.model = move(transform);
-
-        Shaders::instance().activate(ShaderProgram::SimpleDebugCubeMap, uniforms);
-        Meshes::instance().getQuad()->draw();
-
-    } else {
-        setActiveTextureUnit(TextureUnits::diffuse);
-        _geometryColor1->bind();
-
-        setActiveTextureUnit(TextureUnits::bloom);
-        _verticalBlurColor->bind();
-
-        ShaderUniforms uniforms;
-        uniforms.combined.general.projection = Window::instance().getOrthoProjection();
-        uniforms.combined.general.model = move(transform);
-
-        Shaders::instance().activate(ShaderProgram::SimplePresentWorld, uniforms);
-        Meshes::instance().getQuad()->draw();
-    }
+    ShaderUniforms uniforms;
+    Shaders::instance().activate(ShaderProgram::SimplePresentWorld, uniforms);
+    Meshes::instance().getQuadNDC()->draw();
 }
 
 } // namespace scene
