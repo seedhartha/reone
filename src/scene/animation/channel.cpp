@@ -77,7 +77,7 @@ void AnimationChannel::update(float dt, bool visible) {
 
         // Signal animation events between the previous time and the current time
         for (auto &event : _animation->events()) {
-            if (_time < event.time && event.time <= newTime) {
+            if (event.time > _time && event.time <= newTime) {
                 _sceneNode->signalEvent(event.name);
             }
         }
