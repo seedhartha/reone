@@ -37,14 +37,14 @@ void TgaReader::doLoad() {
 
     ignore(1);
 
-    _imageType = static_cast<ImageType>(readByte());
-    switch (_imageType) {
-        case ImageType::Grayscale:
-        case ImageType::RGBA:
-        case ImageType::RGBA_RLE:
+    _dataType = static_cast<TGADataType>(readByte());
+    switch (_dataType) {
+        case TGADataType::Grayscale:
+        case TGADataType::RGBA:
+        case TGADataType::RGBA_RLE:
             break;
         default:
-            warn("TGA: unsupported image type: " + to_string(static_cast<int>(_imageType)));
+            warn("TGA: unsupported data type: " + to_string(static_cast<int>(_dataType)));
             return;
     }
 
@@ -75,11 +75,11 @@ void TgaReader::doLoad() {
 }
 
 bool TgaReader::isRGBA() const {
-    return _imageType == ImageType::RGBA || _imageType == ImageType::RGBA_RLE;
+    return _dataType == TGADataType::RGBA || _dataType == TGADataType::RGBA_RLE;
 }
 
 bool TgaReader::isGrayscale() const {
-    return _imageType == ImageType::Grayscale;
+    return _dataType == TGADataType::Grayscale;
 }
 
 void TgaReader::loadTexture() {
@@ -127,7 +127,7 @@ ByteArray TgaReader::readPixels(int w, int h) {
 }
 
 bool TgaReader::isRLE() const {
-    return _imageType == ImageType::RGBA_RLE;
+    return _dataType == TGADataType::RGBA_RLE;
 }
 
 ByteArray TgaReader::readPixelsRLE(int w, int h) {

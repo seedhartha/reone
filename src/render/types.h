@@ -74,6 +74,12 @@ enum class CubeMapFace {
     NegativeZ = 5
 };
 
+enum class TGADataType : uint8_t {
+    RGBA = 2,
+    Grayscale = 3,
+    RGBA_RLE = 10
+};
+
 struct GraphicsOptions {
     int width { 0 };
     int height { 0 };

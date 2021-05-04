@@ -18,42 +18,27 @@
 #pragma once
 
 #include <memory>
+#include <ostream>
 
-#include "../../resource/format/binreader.h"
+#include <boost/filesystem/path.hpp>
 
 #include "../texture.h"
-#include "../types.h"
 
 namespace reone {
 
 namespace render {
 
-class TgaReader : public resource::BinaryReader {
+class TgaWriter {
 public:
-    TgaReader(const std::string &resRef, TextureUsage usage);
+    TgaWriter(std::shared_ptr<Texture> texture);
 
-    std::shared_ptr<render::Texture> texture() const { return _texture; }
+    void save(std::ostream &out);
+    void save(const boost::filesystem::path &path);
 
 private:
-    std::string _resRef;
-    TextureUsage _usage;
-
-    TGADataType _dataType { TGADataType::RGBA };
-    int _width { 0 };
-    int _height { 0 };
-    bool _alpha { false };
     std::shared_ptr<Texture> _texture;
 
-    void doLoad() override;
-
-    void loadTexture();
-
-    ByteArray readPixels(int w, int h);
-    ByteArray readPixelsRLE(int w, int h);
-
-    bool isRGBA() const;
-    bool isGrayscale() const;
-    bool isRLE() const;
+    std::vector<uint8_t> getTexturePixels(TGADataType &dataType, int &depth) const;
 };
 
 } // namespace render
