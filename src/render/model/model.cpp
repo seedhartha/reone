@@ -108,6 +108,13 @@ shared_ptr<ModelNode> Model::findNodeByName(const string &name) const {
     return getFromLookupOrNull(_nodeByName, name);
 }
 
+shared_ptr<ModelNode> Model::findAABBNode() const {
+    for (auto &node : _nodeByNumber) {
+        if (node.second->isAABB()) return node.second;
+    }
+    return nullptr;
+}
+
 } // namespace render
 
 } // namespace reone

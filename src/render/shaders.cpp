@@ -181,6 +181,7 @@ layout(std140) uniform Particles {
 
 struct GrassCluster {
     vec4 positionVariant;
+    vec2 lightmapUV;
 };
 
 layout(std140) uniform Grass {
@@ -1011,6 +1012,7 @@ void main() {
 
 static constexpr GLchar kShaderFragmentGrass[] = R"END(
 uniform sampler2D uDiffuse;
+uniform sampler2D uLightmap;
 
 in vec2 fragTexCoords;
 flat in int fragInstanceID;
@@ -1023,7 +1025,15 @@ void main() {
     uv.y += 0.5 * (int(uGrassClusters[fragInstanceID].positionVariant[3]) / 2);
     uv.x += 0.5 * (int(uGrassClusters[fragInstanceID].positionVariant[3]) % 2);
 
-    fragColor = texture(uDiffuse, uv);
+    vec4 diffuseSample = texture(uDiffuse, uv);
+    vec3 objectColor = diffuseSample.rgb;
+
+    if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
+        vec4 lightmapSample = texture(uLightmap, uGrassClusters[fragInstanceID].lightmapUV);
+        objectColor *= lightmapSample.rgb;
+    }
+
+    fragColor = vec4(objectColor, diffuseSample.a);
     fragColorBright = vec4(vec3(0.0), 1.0);
 }
 )END";

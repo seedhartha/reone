@@ -65,6 +65,16 @@ public:
 
     void computeAABB();
 
+    /**
+     * Used for lightmapping grass.
+     *
+     * @return UV coordinates at face center
+     */
+    glm::vec2 getFaceCenterUV(int faceIdx) const;
+
+    const std::vector<float> &vertices() const { return _vertices; }
+    const std::vector<uint16_t> &indices() const { return _indices; }
+    const VertexOffsets &offsets() const { return _offsets; }
     const AABB &aabb() const { return _aabb; }
 
 protected:

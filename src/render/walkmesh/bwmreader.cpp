@@ -129,6 +129,7 @@ void BwmReader::makeWalkmesh() {
         bool walkable = _walkableSurfaces.count(material) > 0;
 
         Walkmesh::Face face;
+        face.index = i;
         face.material = material;
         face.vertices.push_back(glm::make_vec3(&_vertices[3 * indices[0]]));
         face.vertices.push_back(glm::make_vec3(&_vertices[3 * indices[1]]));

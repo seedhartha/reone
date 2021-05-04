@@ -67,6 +67,7 @@ public:
     std::shared_ptr<Animation> getAnimation(const std::string &name) const;
     std::shared_ptr<ModelNode> findNodeByNumber(uint16_t number) const;
     std::shared_ptr<ModelNode> findNodeByName(const std::string &name) const;
+    std::shared_ptr<ModelNode> findAABBNode() const;
 
     const std::string &name() const { return _name; }
     Classification classification() const { return _classification; }

@@ -17,6 +17,8 @@
 
 #include "mesh.h"
 
+#include <stdexcept>
+
 #include "GL/glew.h"
 #include "SDL2/SDL_opengl.h"
 
@@ -139,6 +141,25 @@ void Mesh::computeAABB() {
         _aabb.expand(glm::make_vec3(reinterpret_cast<const float *>(vertCoords)));
         vertCoords += stride;
     }
+}
+
+glm::vec2 Mesh::getFaceCenterUV(int faceIdx) const {
+    if (faceIdx < 0 || faceIdx >= _indices.size() / 3) {
+        throw out_of_range("faceIdx out of range");
+    }
+    if (_offsets.texCoords1 == -1) {
+        throw logic_error("texCoords1 undefined");
+    }
+    glm::vec2 result(0.0f);
+    const uint16_t *indices = &_indices[3 * faceIdx];
+    for (int i = 0; i < 3; ++i) {
+        const float *uv = &_vertices[(indices[i] * _offsets.stride + _offsets.texCoords1) / sizeof(float)];
+        result.x += uv[0];
+        result.y += uv[1];
+    }
+    result /= 3.0f;
+    result = glm::clamp(result);
+    return move(result);
 }
 
 } // namespace render

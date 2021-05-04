@@ -65,10 +65,6 @@ Texture::Properties getTextureProperties(TextureUsage usage, bool headless) {
     return move(properties);
 }
 
-static bool isCompressed(PixelFormat format) {
-    return format == PixelFormat::DXT1 || format == PixelFormat::DXT5;
-}
-
 static int getBitsPerPixel(PixelFormat format) {
     switch (format) {
         case PixelFormat::Grayscale:

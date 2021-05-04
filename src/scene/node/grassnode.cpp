@@ -33,10 +33,11 @@ namespace reone {
 
 namespace scene {
 
-GrassSceneNode::GrassSceneNode(SceneGraph *graph, shared_ptr<Texture> texture, glm::vec2 quadSize) :
+GrassSceneNode::GrassSceneNode(SceneGraph *graph, glm::vec2 quadSize, shared_ptr<Texture> texture, shared_ptr<Texture> lightmap) :
     SceneNode(SceneNodeType::Grass, graph),
+    _quadSize(move(quadSize)),
     _texture(texture),
-    _quadSize(move(quadSize)) {
+    _lightmap(move(lightmap)) {
 
     if (!texture) {
         throw invalid_argument("texture must not be null");
@@ -59,10 +60,18 @@ void GrassSceneNode::drawClusters(const vector<GrassCluster> &clusters) {
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
     uniforms.combined.featureMask |= UniformFeatureFlags::grass;
 
+    if (_lightmap) {
+        setActiveTextureUnit(TextureUnits::lightmap);
+        _lightmap->bind();
+
+        uniforms.combined.featureMask |= UniformFeatureFlags::lightmap;
+    }
+
     int numClusters = static_cast<int>(clusters.size());
     for (int i = 0; i < numClusters; ++i) {
         uniforms.grass->quadSize = _quadSize;
         uniforms.grass->clusters[i].positionVariant = glm::vec4(clusters[i].position, static_cast<float>(clusters[i].variant));
+        uniforms.grass->clusters[i].lightmapUV = clusters[i].lightmapUV;
     }
 
     Shaders::instance().activate(ShaderProgram::GrassGrass, uniforms);
