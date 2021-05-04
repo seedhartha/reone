@@ -43,15 +43,15 @@ TgaWriter::TgaWriter(shared_ptr<Texture> texture) : _texture(texture) {
     }
 }
 
-void TgaWriter::save(ostream &out) {
+void TgaWriter::save(ostream &out, bool compress) {
     // Image ID, color-mapped images, RLE and image orientation are not supported
 
     int width = _texture->width();
-    int height = static_cast<int>(_texture->layers().size()) * _texture->height();
+    int totalHeight = static_cast<int>(_texture->layers().size()) * _texture->height();
 
     TGADataType dataType;
     int depth;
-    vector<uint8_t> pixels(getTexturePixels(dataType, depth));
+    vector<uint8_t> pixels(getTexturePixels(compress, dataType, depth));
 
     // Write Header
 
@@ -66,8 +66,8 @@ void TgaWriter::save(ostream &out) {
     header[11] = 0; // Y origin (hi)
     header[12] = width % 256; // width (lo)
     header[13] = width / 256; // width (hi)
-    header[14] = height % 256; // height (lo)
-    header[15] = height / 256; // height (hi)
+    header[14] = totalHeight % 256; // height (lo)
+    header[15] = totalHeight / 256; // height (hi)
     header[16] = depth; // pixel size
     header[17] = depth == 32 ? 8 : 0; // image descriptor;
     out.write(reinterpret_cast<char *>(header), kHeaderSize);
@@ -75,10 +75,17 @@ void TgaWriter::save(ostream &out) {
     // Write Scanlines
 
     int scanlineSize = width * depth / 8;
-    out.write(reinterpret_cast<char *>(&pixels[0]), height * scanlineSize);
+    if (depth >= 24 && compress) {
+        for (int wrote = 0; wrote < totalHeight; ++wrote) {
+            int offset = wrote * scanlineSize;
+            writeRLE(&pixels[offset], depth, out);
+        }
+    } else {
+        out.write(reinterpret_cast<char *>(&pixels[0]), totalHeight * scanlineSize);
+    }
 }
 
-vector<uint8_t> TgaWriter::getTexturePixels(TGADataType &dataType, int &depth) const {
+vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType, int &depth) const {
     vector<uint8_t> result;
 
     switch (_texture->pixelFormat()) {
@@ -89,13 +96,13 @@ vector<uint8_t> TgaWriter::getTexturePixels(TGADataType &dataType, int &depth) c
         case PixelFormat::RGB:
         case PixelFormat::BGR:
         case PixelFormat::DXT1:
-            dataType = TGADataType::RGBA;
+            dataType = compress ? TGADataType::RGBA_RLE : TGADataType::RGBA;
             depth = 24;
             break;
         case PixelFormat::RGBA:
         case PixelFormat::BGRA:
         case PixelFormat::DXT5:
-            dataType = TGADataType::RGBA;
+            dataType = compress ? TGADataType::RGBA_RLE : TGADataType::RGBA;
             depth = 32;
             break;
         default:
@@ -172,9 +179,61 @@ vector<uint8_t> TgaWriter::getTexturePixels(TGADataType &dataType, int &depth) c
     return move(result);
 }
 
-void TgaWriter::save(const fs::path &path) {
+void TgaWriter::writeRLE(uint8_t *pixels, int depth, ostream &out) {
+    uint8_t *from = pixels;
+    uint8_t repeat = 0, direct = 0;
+    int bytes = depth / 8;
+
+    for (int x = 1; x < _texture->width(); ++x) {
+        if (memcpy(pixels, pixels + bytes, bytes)) {
+            if (repeat) {
+                out.put(128 + repeat);
+                out.write(reinterpret_cast<char *>(from), bytes);
+                from = pixels + bytes;
+                repeat = 0;
+                direct = 0;
+            } else {
+                ++direct;
+            }
+        } else {
+            if (direct) {
+                out.put(direct - 1);
+                out.write(reinterpret_cast<char *>(from), bytes * direct);
+                from = pixels;
+                direct = 0;
+                repeat = 1;
+            } else {
+                ++repeat;
+            }
+        }
+        if (repeat == 128) {
+            out.put(255);
+            out.write(reinterpret_cast<char *>(from), bytes);
+            from = pixels + bytes;
+            direct = 0;
+            repeat = 0;
+        } else if (direct == 128) {
+            out.put(127);
+            out.write(reinterpret_cast<char *>(from), bytes * direct);
+            from = pixels + bytes;
+            direct = 0;
+            repeat = 0;
+        }
+        pixels += bytes;
+    }
+
+    if (repeat > 0) {
+        out.put(128 + repeat);
+        out.write(reinterpret_cast<char *>(from), bytes);
+    } else {
+        out.put(direct);
+        out.write(reinterpret_cast<char *>(from), bytes * (direct + 1));
+    }
+}
+
+void TgaWriter::save(const fs::path &path, bool compress) {
     fs::ofstream tga(path, ios::binary);
-    save(tga);
+    save(tga, compress);
 }
 
 } // namespace render
