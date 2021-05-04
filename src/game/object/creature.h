@@ -22,7 +22,7 @@
 #include <set>
 
 #include "../../audio/stream.h"
-#include "../../render/lip/lipanimation.h"
+#include "../../graphics/lip/lipanimation.h"
 #include "../../resource/format/2dareader.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/types.h"
@@ -102,7 +102,7 @@ public:
 
     void playSound(SoundSetEntry entry, bool positional = true);
 
-    void startTalking(const std::shared_ptr<render::LipAnimation> &animation);
+    void startTalking(const std::shared_ptr<graphics::LipAnimation> &animation);
     void stopTalking();
 
     bool isSelectable() const override;
@@ -116,7 +116,7 @@ public:
     Gender gender() const { return _gender; }
     ModelType modelType() const { return _modelType; }
     int appearance() const { return _appearance; }
-    std::shared_ptr<render::Texture> portrait() const { return _portrait; }
+    std::shared_ptr<graphics::Texture> portrait() const { return _portrait; }
     float walkSpeed() const { return _walkSpeed; }
     float runSpeed() const { return _runSpeed; }
     CreatureAttributes &attributes() { return _attributes; }
@@ -143,7 +143,7 @@ public:
 
     void playAnimation(CombatAnimation anim, CreatureWieldType wield, int variant = 1);
     void playAnimation(const std::string &name, scene::AnimationProperties properties = scene::AnimationProperties(), std::shared_ptr<Action> actionToComplete = nullptr);
-    void playAnimation(const std::shared_ptr<render::Animation> &anim, scene::AnimationProperties properties = scene::AnimationProperties());
+    void playAnimation(const std::shared_ptr<graphics::Animation> &anim, scene::AnimationProperties properties = scene::AnimationProperties());
 
     void updateModelAnimation();
 
@@ -227,7 +227,7 @@ private:
     int _appearance { 0 };
     ModelType _modelType { ModelType::Creature };
     std::shared_ptr<scene::ModelSceneNode> _headModel;
-    std::shared_ptr<render::Texture> _portrait;
+    std::shared_ptr<graphics::Texture> _portrait;
     std::map<int, std::shared_ptr<Item>> _equipment;
     std::shared_ptr<Path> _path;
     float _walkSpeed { 0.0f };
@@ -272,7 +272,7 @@ private:
     bool _animDirty { true };
     bool _animFireForget { false };
     std::shared_ptr<Action> _animAction; /**< action to complete when animation is finished */
-    std::shared_ptr<render::LipAnimation> _lipAnimation;
+    std::shared_ptr<graphics::LipAnimation> _lipAnimation;
 
     // END Animation
 

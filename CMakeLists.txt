@@ -153,97 +153,97 @@ set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BI
 
 ## END libresource static library
 
-## librender static library
+## libgraphics static library
 
-set(RENDER_HEADERS
-    src/render/aabb.h
-    src/render/cursor.h
-    src/render/featureutil.h
-    src/render/font.h
-    src/render/fonts.h
-    src/render/framebuffer.h
-    src/render/image/curreader.h
-    src/render/image/tgareader.h
-    src/render/image/tgawriter.h
-    src/render/image/tpcreader.h
-    src/render/image/txireader.h
-    src/render/lip/lipanimation.h
-    src/render/lip/lipreader.h
-    src/render/lip/lips.h
-    src/render/lip/lipwriter.h
-    src/render/material.h
-    src/render/materials.h
-    src/render/mesh.h
-    src/render/meshes.h
-    src/render/model/aabbnode.h
-    src/render/model/animatedproperty.h
-    src/render/model/animation.h
-    src/render/model/emitter.h
-    src/render/model/lensflare.h
-    src/render/model/mdlreader.h
-    src/render/model/model.h
-    src/render/model/modelmesh.h
-    src/render/model/modelnode.h
-    src/render/model/models.h
-    src/render/pbribl.h
-    src/render/pixelutil.h
-    src/render/renderbuffer.h
-    src/render/shaders.h
-    src/render/stateutil.h
-    src/render/texture.h
-    src/render/textures.h
-    src/render/textureutil.h
-    src/render/textutil.h
-    src/render/types.h
-    src/render/walkmesh/bwmreader.h
-    src/render/walkmesh/walkmesh.h
-    src/render/walkmesh/walkmeshes.h
-    src/render/window.h)
+set(GRAPHICS_HEADERS
+    src/graphics/aabb.h
+    src/graphics/cursor.h
+    src/graphics/featureutil.h
+    src/graphics/font.h
+    src/graphics/fonts.h
+    src/graphics/framebuffer.h
+    src/graphics/image/curreader.h
+    src/graphics/image/tgareader.h
+    src/graphics/image/tgawriter.h
+    src/graphics/image/tpcreader.h
+    src/graphics/image/txireader.h
+    src/graphics/lip/lipanimation.h
+    src/graphics/lip/lipreader.h
+    src/graphics/lip/lips.h
+    src/graphics/lip/lipwriter.h
+    src/graphics/material.h
+    src/graphics/materials.h
+    src/graphics/mesh.h
+    src/graphics/meshes.h
+    src/graphics/model/aabbnode.h
+    src/graphics/model/animatedproperty.h
+    src/graphics/model/animation.h
+    src/graphics/model/emitter.h
+    src/graphics/model/lensflare.h
+    src/graphics/model/mdlreader.h
+    src/graphics/model/model.h
+    src/graphics/model/modelmesh.h
+    src/graphics/model/modelnode.h
+    src/graphics/model/models.h
+    src/graphics/pbribl.h
+    src/graphics/pixelutil.h
+    src/graphics/renderbuffer.h
+    src/graphics/shaders.h
+    src/graphics/stateutil.h
+    src/graphics/texture.h
+    src/graphics/textures.h
+    src/graphics/textureutil.h
+    src/graphics/textutil.h
+    src/graphics/types.h
+    src/graphics/walkmesh/bwmreader.h
+    src/graphics/walkmesh/walkmesh.h
+    src/graphics/walkmesh/walkmeshes.h
+    src/graphics/window.h)
 
-set(RENDER_SOURCES
-    src/render/aabb.cpp
-    src/render/cursor.cpp
-    src/render/featureutil.cpp
-    src/render/font.cpp
-    src/render/fonts.cpp
-    src/render/framebuffer.cpp
-    src/render/image/curreader.cpp
-    src/render/image/tgareader.cpp
-    src/render/image/tgawriter.cpp
-    src/render/image/tpcreader.cpp
-    src/render/image/txireader.cpp
-    src/render/lip/lipanimation.cpp
-    src/render/lip/lipreader.cpp
-    src/render/lip/lips.cpp
-    src/render/lip/lipwriter.cpp
-    src/render/materials.cpp
-    src/render/mesh.cpp
-    src/render/meshes.cpp
-    src/render/model/aabbnode.cpp
-    src/render/model/animation.cpp
-    src/render/model/mdlreader.cpp
-    src/render/model/model.cpp
-    src/render/model/modelmesh.cpp
-    src/render/model/modelnode.cpp
-    src/render/model/models.cpp
-    src/render/pbribl.cpp
-    src/render/pixelutil.cpp
-    src/render/renderbuffer.cpp
-    src/render/shaders.cpp
-    src/render/stateutil.cpp
-    src/render/texture.cpp
-    src/render/textures.cpp
-    src/render/textureutil.cpp
-    src/render/textutil.cpp
-    src/render/walkmesh/bwmreader.cpp
-    src/render/walkmesh/walkmesh.cpp
-    src/render/walkmesh/walkmeshes.cpp
-    src/render/window.cpp)
+set(GRAPHICS_SOURCES
+    src/graphics/aabb.cpp
+    src/graphics/cursor.cpp
+    src/graphics/featureutil.cpp
+    src/graphics/font.cpp
+    src/graphics/fonts.cpp
+    src/graphics/framebuffer.cpp
+    src/graphics/image/curreader.cpp
+    src/graphics/image/tgareader.cpp
+    src/graphics/image/tgawriter.cpp
+    src/graphics/image/tpcreader.cpp
+    src/graphics/image/txireader.cpp
+    src/graphics/lip/lipanimation.cpp
+    src/graphics/lip/lipreader.cpp
+    src/graphics/lip/lips.cpp
+    src/graphics/lip/lipwriter.cpp
+    src/graphics/materials.cpp
+    src/graphics/mesh.cpp
+    src/graphics/meshes.cpp
+    src/graphics/model/aabbnode.cpp
+    src/graphics/model/animation.cpp
+    src/graphics/model/mdlreader.cpp
+    src/graphics/model/model.cpp
+    src/graphics/model/modelmesh.cpp
+    src/graphics/model/modelnode.cpp
+    src/graphics/model/models.cpp
+    src/graphics/pbribl.cpp
+    src/graphics/pixelutil.cpp
+    src/graphics/renderbuffer.cpp
+    src/graphics/shaders.cpp
+    src/graphics/stateutil.cpp
+    src/graphics/texture.cpp
+    src/graphics/textures.cpp
+    src/graphics/textureutil.cpp
+    src/graphics/textutil.cpp
+    src/graphics/walkmesh/bwmreader.cpp
+    src/graphics/walkmesh/walkmesh.cpp
+    src/graphics/walkmesh/walkmeshes.cpp
+    src/graphics/window.cpp)
 
-add_library(librender STATIC ${RENDER_HEADERS} ${RENDER_SOURCES})
-set_target_properties(librender PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+add_library(libgraphics STATIC ${GRAPHICS_HEADERS} ${GRAPHICS_SOURCES})
+set_target_properties(libgraphics PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-## END librender static library
+## END libgraphics static library
 
 ## libaudio static library
 
@@ -661,7 +661,7 @@ add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 target_link_libraries(reone PRIVATE
-    libgame libscript libgui libscene libvideo libaudio librender libresource libcommon
+    libgame libscript libgui libscene libvideo libaudio libgraphics libresource libcommon
     libs3tc
     ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
     GLEW::GLEW
@@ -703,7 +703,7 @@ if(BUILD_TOOLS)
     set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
     target_link_libraries(reone-tools PRIVATE
-        librender libresource libcommon
+        libgraphics libresource libcommon
         libs3tc
         GLEW::GLEW
         ${OPENGL_LIBRARIES}

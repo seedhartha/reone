@@ -29,8 +29,8 @@
 #include "SDL2/SDL_events.h"
 
 #include "../gui/textinput.h"
-#include "../render/font.h"
-#include "../render/types.h"
+#include "../graphics/font.h"
+#include "../graphics/types.h"
 
 namespace reone {
 
@@ -52,8 +52,8 @@ private:
     typedef std::function<void(std::vector<std::string>)> CommandHandler;
 
     Game *_game;
-    render::GraphicsOptions _opts;
-    std::shared_ptr<render::Font> _font;
+    graphics::GraphicsOptions _opts;
+    std::shared_ptr<graphics::Font> _font;
     bool _open { false };
     gui::TextInput _input;
     std::deque<std::string> _output;

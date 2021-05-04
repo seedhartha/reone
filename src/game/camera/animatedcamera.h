@@ -42,7 +42,7 @@ public:
 
     bool isAnimationFinished() const;
 
-    void setModel(const std::shared_ptr<render::Model> &model);
+    void setModel(const std::shared_ptr<graphics::Model> &model);
     void setFieldOfView(float fovy);
 
 private:

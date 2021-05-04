@@ -23,13 +23,13 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../render/textures.h"
+#include "../../graphics/textures.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
 #include "../game.h"
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

@@ -20,9 +20,9 @@
 #include <set>
 #include <unordered_map>
 
-#include "../../render/model/model.h"
-#include "../../render/shaders.h"
-#include "../../render/walkmesh/walkmesh.h"
+#include "../../graphics/model/model.h"
+#include "../../graphics/shaders.h"
+#include "../../graphics/walkmesh/walkmesh.h"
 
 #include "../animation/eventlistener.h"
 #include "../animation/scenenodeanimator.h"
@@ -42,7 +42,7 @@ class ModelSceneNode : public SceneNode {
 public:
     ModelSceneNode(
         ModelUsage usage,
-        const std::shared_ptr<render::Model> &model,
+        const std::shared_ptr<graphics::Model> &model,
         SceneGraph *sceneGraph,
         std::set<std::string> ignoreNodes = std::set<std::string>(),
         IAnimationEventListener *animEventListener = nullptr);
@@ -65,24 +65,24 @@ public:
     const std::string &getName() const;
 
     ModelUsage usage() const { return _usage; }
-    std::shared_ptr<render::Model> model() const { return _model; }
-    std::shared_ptr<render::Walkmesh> walkmesh() const { return _walkmesh; }
+    std::shared_ptr<graphics::Model> model() const { return _model; }
+    std::shared_ptr<graphics::Walkmesh> walkmesh() const { return _walkmesh; }
     float alpha() const { return _alpha; }
     float projectileSpeed() const { return _projectileSpeed; }
     SceneNodeAnimator &animator() { return _animator; }
 
     void setVisible(bool visible) override;
 
-    void setDiffuseTexture(const std::shared_ptr<render::Texture> &texture);
+    void setDiffuseTexture(const std::shared_ptr<graphics::Texture> &texture);
     void setCulledOut(bool culled);
     void setAlpha(float alpha);
     void setProjectileSpeed(float speed);
-    void setWalkmesh(std::shared_ptr<render::Walkmesh> walkmesh);
+    void setWalkmesh(std::shared_ptr<graphics::Walkmesh> walkmesh);
 
     // Attachments
 
-    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<render::Model> &model, ModelUsage usage);
-    std::shared_ptr<ModelSceneNode> attach(ModelNodeSceneNode &parent, const std::shared_ptr<render::Model> &model, ModelUsage usage);
+    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<graphics::Model> &model, ModelUsage usage);
+    std::shared_ptr<ModelSceneNode> attach(ModelNodeSceneNode &parent, const std::shared_ptr<graphics::Model> &model, ModelUsage usage);
     void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);
 
     // END Attachments
@@ -102,8 +102,8 @@ private:
     IAnimationEventListener *_animEventListener;
 
     ModelUsage _usage;
-    std::shared_ptr<render::Model> _model;
-    std::shared_ptr<render::Walkmesh> _walkmesh;
+    std::shared_ptr<graphics::Model> _model;
+    std::shared_ptr<graphics::Walkmesh> _walkmesh;
     SceneNodeAnimator _animator;
 
     std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByIndex;
@@ -123,7 +123,7 @@ private:
 
     bool isAffectableByLight(const LightSceneNode &light) const;
 
-    std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(render::ModelNode &node) const;
+    std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(graphics::ModelNode &node) const;
 };
 
 } // namespace scene

@@ -19,7 +19,7 @@
 
 #include "glm/ext.hpp"
 
-using namespace reone::render;
+using namespace reone::graphics;
 
 namespace reone {
 

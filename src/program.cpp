@@ -26,12 +26,12 @@
 #include "common/log.h"
 #include "common/types.h"
 #include "game/game.h"
-#include "render/featureutil.h"
+#include "graphics/featureutil.h"
 
 using namespace std;
 
 using namespace reone::game;
-using namespace reone::render;
+using namespace reone::graphics;
 
 namespace fs = boost::filesystem;
 namespace po = boost::program_options;

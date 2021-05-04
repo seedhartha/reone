@@ -24,9 +24,9 @@
 #include "glm/gtc/constants.hpp"
 
 #include "../../common/random.h"
-#include "../../render/meshes.h"
-#include "../../render/shaders.h"
-#include "../../render/stateutil.h"
+#include "../../graphics/meshes.h"
+#include "../../graphics/shaders.h"
+#include "../../graphics/stateutil.h"
 
 #include "../scenegraph.h"
 
@@ -35,7 +35,7 @@
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 
 namespace reone {
 

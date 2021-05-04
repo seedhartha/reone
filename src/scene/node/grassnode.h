@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../render/texture.h"
+#include "../../graphics/texture.h"
 
 #include "../grasscluster.h"
 
@@ -31,7 +31,7 @@ class CameraSceneNode;
 
 class GrassSceneNode : public SceneNode {
 public:
-    GrassSceneNode(SceneGraph *graph, glm::vec2 quadSize, std::shared_ptr<render::Texture> texture, std::shared_ptr<render::Texture> lightmap = nullptr);
+    GrassSceneNode(SceneGraph *graph, glm::vec2 quadSize, std::shared_ptr<graphics::Texture> texture, std::shared_ptr<graphics::Texture> lightmap = nullptr);
 
     void clear();
     void addCluster(GrassCluster cluster);
@@ -42,8 +42,8 @@ public:
 
 private:
     glm::vec2 _quadSize { 0.0f };
-    std::shared_ptr<render::Texture> _texture;
-    std::shared_ptr<render::Texture> _lightmap;
+    std::shared_ptr<graphics::Texture> _texture;
+    std::shared_ptr<graphics::Texture> _lightmap;
     std::vector<GrassCluster> _clusters;
 };
 

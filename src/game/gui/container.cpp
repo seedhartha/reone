@@ -19,7 +19,7 @@
 
 #include "../../gui/control/imagebutton.h"
 #include "../../gui/control/listbox.h"
-#include "../../render/textures.h"
+#include "../../graphics/textures.h"
 #include "../../resource/strings.h"
 
 #include "../game.h"
@@ -32,7 +32,7 @@
 using namespace std;
 
 using namespace reone::gui;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

@@ -26,10 +26,10 @@
 #include "SDL2/SDL_opengl.h"
 
 #include "../common/log.h"
-#include "../render/meshes.h"
-#include "../render/stateutil.h"
-#include "../render/textures.h"
-#include "../render/window.h"
+#include "../graphics/meshes.h"
+#include "../graphics/stateutil.h"
+#include "../graphics/textures.h"
+#include "../graphics/window.h"
 #include "../resource/types.h"
 
 #include "game.h"
@@ -38,7 +38,7 @@
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

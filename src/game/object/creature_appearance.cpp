@@ -25,14 +25,14 @@
 #include <boost/format.hpp>
 
 #include "../../common/streamutil.h"
-#include "../../render/model/models.h"
-#include "../../render/textures.h"
+#include "../../graphics/model/models.h"
+#include "../../graphics/textures.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 

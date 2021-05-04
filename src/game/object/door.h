@@ -44,7 +44,7 @@ public:
     bool isStatic() const { return _static; }
     bool isKeyRequired() const { return _keyRequired; }
 
-    std::shared_ptr<render::Walkmesh> getWalkmesh() const override;
+    std::shared_ptr<graphics::Walkmesh> getWalkmesh() const override;
 
     const std::string &getOnOpen() const { return _onOpen; }
     const std::string &getOnFailToOpen() const { return _onFailToOpen; }
@@ -88,9 +88,9 @@ private:
 
     // Walkmeshes
 
-    std::shared_ptr<render::Walkmesh> _closedWalkmesh;
-    std::shared_ptr<render::Walkmesh> _open1Walkmesh;
-    std::shared_ptr<render::Walkmesh> _open2Walkmesh;
+    std::shared_ptr<graphics::Walkmesh> _closedWalkmesh;
+    std::shared_ptr<graphics::Walkmesh> _open1Walkmesh;
+    std::shared_ptr<graphics::Walkmesh> _open2Walkmesh;
 
     // END Walkmeshes
 

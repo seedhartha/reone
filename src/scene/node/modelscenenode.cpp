@@ -20,8 +20,8 @@
 
 #include "../../common/collectionutil.h"
 #include "../../common/log.h"
-#include "../../render/featureutil.h"
-#include "../../render/meshes.h"
+#include "../../graphics/featureutil.h"
+#include "../../graphics/meshes.h"
 #include "../../resource/resources.h"
 
 #include "../scenegraph.h"
@@ -36,7 +36,7 @@
 using namespace std;
 using namespace std::placeholders;
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

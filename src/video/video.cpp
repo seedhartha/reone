@@ -24,15 +24,15 @@
 
 #include "glm/ext.hpp"
 
-#include "../render/meshes.h"
-#include "../render/shaders.h"
-#include "../render/stateutil.h"
-#include "../render/textureutil.h"
+#include "../graphics/meshes.h"
+#include "../graphics/shaders.h"
+#include "../graphics/stateutil.h"
+#include "../graphics/textureutil.h"
 
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::render;
+using namespace reone::graphics;
 
 namespace reone {
 

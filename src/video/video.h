@@ -23,7 +23,7 @@
 #include "../audio/stream.h"
 #include "../common/mediastream.h"
 #include "../common/types.h"
-#include "../render/texture.h"
+#include "../graphics/texture.h"
 
 namespace reone {
 
@@ -62,7 +62,7 @@ private:
     std::shared_ptr<Frame> _frame;
     bool _finished { false };
 
-    std::shared_ptr<render::Texture> _texture;
+    std::shared_ptr<graphics::Texture> _texture;
     std::shared_ptr<audio::AudioStream> _audio;
 
     void updateFrame(float dt);

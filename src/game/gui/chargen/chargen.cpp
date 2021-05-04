@@ -20,7 +20,7 @@
 #include <stdexcept>
 
 #include "../../../gui/scenebuilder.h"
-#include "../../../render/model/models.h"
+#include "../../../graphics/model/models.h"
 #include "../../../resource/resources.h"
 
 #include "../../d20/classes.h"
@@ -34,7 +34,7 @@ using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::gui;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 

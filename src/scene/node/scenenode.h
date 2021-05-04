@@ -24,7 +24,7 @@
 
 #include "glm/mat4x4.hpp"
 
-#include "../../render/aabb.h"
+#include "../../graphics/aabb.h"
 
 #include "../types.h"
 
@@ -78,7 +78,7 @@ public:
     const glm::mat4 &localTransform() const { return _localTransform; }
     const glm::mat4 &absoluteTransform() const { return _absoluteTransform; }
     const glm::mat4 &absoluteTransformInverse() const { return _absoluteTransformInv; }
-    const render::AABB &aabb() const { return _aabb; }
+    const graphics::AABB &aabb() const { return _aabb; }
     const std::vector<std::shared_ptr<SceneNode>> &children() const { return _children; }
 
     void setParent(const SceneNode *parent);
@@ -97,7 +97,7 @@ protected:
     glm::mat4 _localTransform { 1.0f };
     glm::mat4 _absoluteTransform { 1.0f };
     glm::mat4 _absoluteTransformInv { 1.0f };
-    render::AABB _aabb;
+    graphics::AABB _aabb;
 
     bool _visible { true };
     bool _transparent { false };

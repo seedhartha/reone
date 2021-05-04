@@ -35,7 +35,7 @@ public:
 
 private:
     struct Participant {
-        std::shared_ptr<render::Model> model;
+        std::shared_ptr<graphics::Model> model;
         std::shared_ptr<Creature> creature;
     };
 

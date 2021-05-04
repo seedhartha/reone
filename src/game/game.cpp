@@ -26,16 +26,16 @@
 #include "../audio/soundhandle.h"
 #include "../common/log.h"
 #include "../common/pathutil.h"
-#include "../render/featureutil.h"
-#include "../render/lip/lips.h"
-#include "../render/materials.h"
-#include "../render/meshes.h"
-#include "../render/model/mdlreader.h"
-#include "../render/model/models.h"
-#include "../render/pbribl.h"
-#include "../render/textures.h"
-#include "../render/walkmesh/walkmeshes.h"
-#include "../render/window.h"
+#include "../graphics/featureutil.h"
+#include "../graphics/lip/lips.h"
+#include "../graphics/materials.h"
+#include "../graphics/meshes.h"
+#include "../graphics/model/mdlreader.h"
+#include "../graphics/model/models.h"
+#include "../graphics/pbribl.h"
+#include "../graphics/textures.h"
+#include "../graphics/walkmesh/walkmeshes.h"
+#include "../graphics/window.h"
 #include "../resource/resources.h"
 #include "../resource/strings.h"
 #include "../script/scripts.h"
@@ -55,7 +55,7 @@ using namespace std;
 
 using namespace reone::audio;
 using namespace reone::gui;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;

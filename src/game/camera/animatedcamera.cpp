@@ -21,12 +21,12 @@
 
 #include <boost/format.hpp>
 
-#include "../../render/model/models.h"
+#include "../../graphics/model/models.h"
 #include "../../resource/resources.h"
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::scene;
 
 namespace reone {

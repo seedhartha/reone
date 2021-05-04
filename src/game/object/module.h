@@ -23,7 +23,7 @@
 
 #include "SDL2/SDL_events.h"
 
-#include "../../render/types.h"
+#include "../../graphics/types.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/types.h"
 

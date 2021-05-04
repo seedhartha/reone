@@ -22,13 +22,13 @@
 #include "glm/ext.hpp"
 
 #include "../../common/log.h"
-#include "../../render/fonts.h"
-#include "../../render/meshes.h"
-#include "../../render/shaders.h"
-#include "../../render/stateutil.h"
-#include "../../render/textures.h"
-#include "../../render/textutil.h"
-#include "../../render/window.h"
+#include "../../graphics/fonts.h"
+#include "../../graphics/meshes.h"
+#include "../../graphics/shaders.h"
+#include "../../graphics/stateutil.h"
+#include "../../graphics/textures.h"
+#include "../../graphics/textutil.h"
+#include "../../graphics/window.h"
 #include "../../resource/strings.h"
 
 #include "../gui.h"
@@ -44,7 +44,7 @@
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 

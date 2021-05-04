@@ -18,13 +18,13 @@
 #include "debugoverlay.h"
 
 #include "../../resource/resources.h"
-#include "../../render/fonts.h"
+#include "../../graphics/fonts.h"
 
 #include "../types.h"
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

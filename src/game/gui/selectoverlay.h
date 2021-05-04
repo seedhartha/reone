@@ -30,7 +30,7 @@
 
 namespace reone {
 
-namespace render {
+namespace graphics {
 
 class Font;
 class Texture;
@@ -54,15 +54,15 @@ public:
 
 private:
     Game *_game { nullptr };
-    std::shared_ptr<render::Font> _font;
-    std::shared_ptr<render::Texture> _friendlyReticle;
-    std::shared_ptr<render::Texture> _friendlyReticle2;
-    std::shared_ptr<render::Texture> _hostileReticle;
-    std::shared_ptr<render::Texture> _hostileReticle2;
-    std::shared_ptr<render::Texture> _friendlyScroll;
-    std::shared_ptr<render::Texture> _hostileScroll;
-    std::shared_ptr<render::Texture> _hilightedScroll;
-    std::unordered_map<ContextualAction, std::shared_ptr<render::Texture>> _textureByAction;
+    std::shared_ptr<graphics::Font> _font;
+    std::shared_ptr<graphics::Texture> _friendlyReticle;
+    std::shared_ptr<graphics::Texture> _friendlyReticle2;
+    std::shared_ptr<graphics::Texture> _hostileReticle;
+    std::shared_ptr<graphics::Texture> _hostileReticle2;
+    std::shared_ptr<graphics::Texture> _friendlyScroll;
+    std::shared_ptr<graphics::Texture> _hostileScroll;
+    std::shared_ptr<graphics::Texture> _hilightedScroll;
+    std::unordered_map<ContextualAction, std::shared_ptr<graphics::Texture>> _textureByAction;
     std::shared_ptr<SpatialObject> _hilightedObject;
     std::shared_ptr<SpatialObject> _selectedObject;
     std::vector<ContextualAction> _actions;
@@ -78,7 +78,7 @@ private:
     bool handleMouseMotion(const SDL_MouseMotionEvent &event);
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
 
-    void drawReticle(render::Texture &texture, const glm::vec3 &screenCoords);
+    void drawReticle(graphics::Texture &texture, const glm::vec3 &screenCoords);
     void drawTitleBar();
     void drawHealthBar();
     void drawActionBar();

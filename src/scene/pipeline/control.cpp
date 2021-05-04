@@ -21,18 +21,18 @@
 
 #include "glm/ext.hpp"
 
-#include "../../render/meshes.h"
-#include "../../render/shaders.h"
-#include "../../render/stateutil.h"
-#include "../../render/textures.h"
-#include "../../render/textureutil.h"
+#include "../../graphics/meshes.h"
+#include "../../graphics/shaders.h"
+#include "../../graphics/stateutil.h"
+#include "../../graphics/textures.h"
+#include "../../graphics/textureutil.h"
 
 #include "../node/cameranode.h"
 #include "../scenegraph.h"
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 
 namespace reone {
 

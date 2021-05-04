@@ -23,13 +23,13 @@
 
 #include "GL/glew.h"
 
-#include "../../render/meshes.h"
-#include "../../render/pbribl.h"
-#include "../../render/shaders.h"
-#include "../../render/stateutil.h"
-#include "../../render/textures.h"
-#include "../../render/textureutil.h"
-#include "../../render/window.h"
+#include "../../graphics/meshes.h"
+#include "../../graphics/pbribl.h"
+#include "../../graphics/shaders.h"
+#include "../../graphics/stateutil.h"
+#include "../../graphics/textures.h"
+#include "../../graphics/textureutil.h"
+#include "../../graphics/window.h"
 
 #include "../node/cameranode.h"
 #include "../node/lightnode.h"
@@ -37,7 +37,7 @@
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 
 namespace reone {
 

@@ -21,7 +21,7 @@
 
 #include "../../gui/control/label.h"
 #include "../../gui/control/togglebutton.h"
-#include "../../render/textures.h"
+#include "../../graphics/textures.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 #include "../../script/types.h"
@@ -36,7 +36,7 @@
 using namespace std;
 
 using namespace reone::gui;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::script;
 

@@ -31,7 +31,7 @@
 #include "../../common/random.h"
 #include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
-#include "../../render/model/models.h"
+#include "../../graphics/model/models.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
 #include "../../script/execution.h"
@@ -46,7 +46,7 @@ using namespace std;
 
 using namespace reone::audio;
 using namespace reone::gui;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;

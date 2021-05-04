@@ -17,14 +17,14 @@
 
 #include "imagebutton.h"
 
-#include "../../render/fonts.h"
-#include "../../render/meshes.h"
-#include "../../render/stateutil.h"
-#include "../../render/window.h"
+#include "../../graphics/fonts.h"
+#include "../../graphics/meshes.h"
+#include "../../graphics/stateutil.h"
+#include "../../graphics/window.h"
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

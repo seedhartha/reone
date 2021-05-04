@@ -20,8 +20,8 @@
 #include "../../../common/collectionutil.h"
 #include "../../../common/random.h"
 #include "../../../gui/scenebuilder.h"
-#include "../../../render/model/models.h"
-#include "../../../render/textures.h"
+#include "../../../graphics/model/models.h"
+#include "../../../graphics/textures.h"
 #include "../../../resource/resources.h"
 #include "../../../scene/node/modelscenenode.h"
 
@@ -37,7 +37,7 @@ using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::gui;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 

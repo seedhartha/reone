@@ -27,7 +27,7 @@ class CharacterGeneration;
 
 class CustomCharacterGeneration : public GameGUI {
 public:
-    CustomCharacterGeneration(CharacterGeneration *charGen, GameID gameId, const render::GraphicsOptions &opts);
+    CustomCharacterGeneration(CharacterGeneration *charGen, GameID gameId, const graphics::GraphicsOptions &opts);
 
     void load() override;
 

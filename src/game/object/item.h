@@ -20,8 +20,8 @@
 #include <memory>
 
 #include "../../audio/stream.h"
-#include "../../render/model/model.h"
-#include "../../render/texture.h"
+#include "../../graphics/model/model.h"
+#include "../../graphics/texture.h"
 #include "../../resource/format/gffreader.h"
 
 #include "../types.h"
@@ -35,7 +35,7 @@ namespace game {
 class Item : public Object {
 public:
     struct AmmunitionType {
-        std::shared_ptr<render::Model> model;
+        std::shared_ptr<graphics::Model> model;
         std::shared_ptr<audio::AudioStream> shotSound1;
         std::shared_ptr<audio::AudioStream> shotSound2;
         std::shared_ptr<audio::AudioStream> impactSound1;
@@ -68,7 +68,7 @@ public:
     int stackSize() const { return _stackSize; }
     int textureVariation() const { return _textureVariation; }
     std::shared_ptr<AmmunitionType> ammunitionType() const { return _ammunitionType; }
-    std::shared_ptr<render::Texture> icon() const { return _icon; }
+    std::shared_ptr<graphics::Texture> icon() const { return _icon; }
     WeaponType weaponType() const { return _weaponType; }
     WeaponWield weaponWield() const { return _weaponWield; }
     const std::string &descIdentified() const { return _descIdentified; }
@@ -88,7 +88,7 @@ private:
     int _textureVariation { 0 };
     std::string _itemClass;
     int _modelVariation { 0 };
-    std::shared_ptr<render::Texture> _icon;
+    std::shared_ptr<graphics::Texture> _icon;
     uint32_t _equipableSlots { 0 };
     int _attackRange { 0 };
     int _numDice { 0 };

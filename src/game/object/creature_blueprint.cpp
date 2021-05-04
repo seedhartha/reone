@@ -23,7 +23,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../render/textures.h"
+#include "../../graphics/textures.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
@@ -32,7 +32,7 @@
 
 using namespace std;
 
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

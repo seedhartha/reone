@@ -25,8 +25,8 @@
 
 #include "glm/mat4x4.hpp"
 
-#include "../../render/model/animation.h"
-#include "../../render/model/modelnode.h"
+#include "../../graphics/model/animation.h"
+#include "../../graphics/model/modelnode.h"
 
 #include "channel.h"
 #include "properties.h"
@@ -58,7 +58,7 @@ public:
     void update(float dt, bool visible = true);
 
     void playAnimation(const std::string &name, AnimationProperties properties = AnimationProperties());
-    void playAnimation(std::shared_ptr<render::Animation> anim, AnimationProperties properties = AnimationProperties(), std::shared_ptr<render::LipAnimation> lipAnim = nullptr);
+    void playAnimation(std::shared_ptr<graphics::Animation> anim, AnimationProperties properties = AnimationProperties(), std::shared_ptr<graphics::LipAnimation> lipAnim = nullptr);
     void playDefaultAnimation();
 
     bool isAnimationFinished() const;
@@ -91,8 +91,8 @@ private:
     std::string _defaultAnimName;
     AnimationProperties _defaultAnimProperties;
 
-    void computeSceneNodeStates(render::ModelNode &modelNode, glm::mat4 parentTransform = glm::mat4(1.0f));
-    void applySceneNodeStates(render::ModelNode &modelNode);
+    void computeSceneNodeStates(graphics::ModelNode &modelNode, glm::mat4 parentTransform = glm::mat4(1.0f));
+    void applySceneNodeStates(graphics::ModelNode &modelNode);
 
     bool isInTransition() const;
 

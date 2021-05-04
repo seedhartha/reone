@@ -38,8 +38,8 @@ public:
         std::string tag;
         std::string text;
         std::string iconText;
-        std::shared_ptr<render::Texture> iconTexture;
-        std::shared_ptr<render::Texture> iconFrame;
+        std::shared_ptr<graphics::Texture> iconTexture;
+        std::shared_ptr<graphics::Texture> iconFrame;
 
         std::vector<std::string> _textLines;
     };

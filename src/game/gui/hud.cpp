@@ -19,8 +19,8 @@
 
 #include "../../common/log.h"
 #include "../../gui/control/label.h"
-#include "../../render/meshes.h"
-#include "../../render/window.h"
+#include "../../graphics/meshes.h"
+#include "../../graphics/window.h"
 
 #include "../game.h"
 #include "../gameidutil.h"
@@ -28,7 +28,7 @@
 using namespace std;
 
 using namespace reone::gui;
-using namespace reone::render;
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {

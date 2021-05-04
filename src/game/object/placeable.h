@@ -45,7 +45,7 @@ public:
 
     bool isUsable() const { return _usable; }
 
-    std::shared_ptr<render::Walkmesh> getWalkmesh() const override;
+    std::shared_ptr<graphics::Walkmesh> getWalkmesh() const override;
 
     // Scripts
 
@@ -58,7 +58,7 @@ private:
     int  _appearance { 0 };
     bool _hasInventory { false };
     bool _usable { false };
-    std::shared_ptr<render::Walkmesh> _walkmesh;
+    std::shared_ptr<graphics::Walkmesh> _walkmesh;
     Faction _faction { Faction::Invalid };
     bool _keyRequired { false };
     bool _lockable { false };

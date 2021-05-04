@@ -25,7 +25,7 @@
 #include "SDL2/SDL_events.h"
 
 #include "../../common/timer.h"
-#include "../../render/types.h"
+#include "../../graphics/types.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/types.h"
 
@@ -167,7 +167,7 @@ public:
 
 private:
     struct Grass {
-        std::shared_ptr<render::Texture> texture;
+        std::shared_ptr<graphics::Texture> texture;
         float density { 0.0f };
         float quadSize { 0.0f };
         int ambient { 0 };
@@ -268,7 +268,7 @@ private:
 
     bool doMoveCreature(const std::shared_ptr<Creature> &creature, const glm::vec3 &dest);
 
-    int getNumGrassClusters(const render::Walkmesh::Face &face) const;
+    int getNumGrassClusters(const graphics::Walkmesh::Face &face) const;
     int getRandomGrassVariant() const;
 
     // Loading ARE
