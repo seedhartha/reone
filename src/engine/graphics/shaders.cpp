@@ -529,8 +529,11 @@ void main() {
         }
     }
 
+    mat3 normalMatrix = transpose(inverse(mat3(uGeneral.model)));
+    vec3 N = normalize(normalMatrix * aNormal);
+
     fragPosition = vec3(uGeneral.model * P);
-    fragNormal = mat3(transpose(inverse(uGeneral.model))) * aNormal;
+    fragNormal = N;
     fragTexCoords = aTexCoords;
     fragLightmapCoords = aLightmapCoords;
 
@@ -542,10 +545,9 @@ void main() {
     }
 
     if (isFeatureEnabled(FEATURE_BUMPMAPS)) {
-        vec3 T = normalize(vec3(uGeneral.model * vec4(aTangent, 0.0)));
-        vec3 B = normalize(vec3(uGeneral.model * vec4(aBitangent, 0.0)));
-        vec3 N = normalize(vec3(uGeneral.model * vec4(aNormal, 0.0)));
-        fragTanSpace = mat3(T, B, N);
+        vec3 T = normalize(normalMatrix * aTangent);
+        vec3 B = normalize(normalMatrix * aBitangent);
+        fragTanSpace = transpose(mat3(T, B, N));
     }
 
     gl_Position = uGeneral.projection * uGeneral.view * vec4(fragPosition, 1.0);
