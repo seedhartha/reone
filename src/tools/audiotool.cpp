@@ -19,7 +19,7 @@
 
 #include <stdexcept>
 
-#include "../src/common/streamreader.h"
+#include "../engine/common/streamreader.h"
 
 using namespace std;
 

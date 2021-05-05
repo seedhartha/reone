@@ -19,8 +19,8 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../src/graphics/lip/lipreader.h"
-#include "../src/graphics/lip/lipwriter.h"
+#include "../engine/graphics/lip/lipreader.h"
+#include "../engine/graphics/lip/lipwriter.h"
 
 using namespace std;
 

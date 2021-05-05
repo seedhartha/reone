@@ -24,7 +24,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
-#include "../src/common/pathutil.h"
+#include "../engine/common/pathutil.h"
 
 #include "tools.h"
 #include "types.h"

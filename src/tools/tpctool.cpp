@@ -21,9 +21,9 @@
 
 #include "s3tc.h"
 
-#include "../src/common/log.h"
-#include "../src/graphics/image/tgawriter.h"
-#include "../src/graphics/image/tpcreader.h"
+#include "../engine/common/log.h"
+#include "../engine/graphics/image/tgawriter.h"
+#include "../engine/graphics/image/tpcreader.h"
 
 using namespace std;
 

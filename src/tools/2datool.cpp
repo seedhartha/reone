@@ -20,7 +20,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../src/resource/format/2dawriter.h"
+#include "../engine/resource/format/2dawriter.h"
 
 using namespace std;
 

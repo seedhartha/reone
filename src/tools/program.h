@@ -24,7 +24,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/program_options/options_description.hpp>
 
-#include "../src/resource/types.h"
+#include "../engine/resource/types.h"
 
 #include "tools.h"
 #include "types.h"

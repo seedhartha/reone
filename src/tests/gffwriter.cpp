@@ -21,8 +21,8 @@
 
 #include <boost/test/included/unit_test.hpp>
 
-#include "../src/resource/format/gffreader.h"
-#include "../src/resource/format/gffwriter.h"
+#include "../engine/resource/format/gffreader.h"
+#include "../engine/resource/format/gffwriter.h"
 
 using namespace std;
 

@@ -19,7 +19,7 @@
 
 #include <boost/test/included/unit_test.hpp>
 
-#include "../src/game/actionqueue.h"
+#include "../engine/game/actionqueue.h"
 
 using namespace std;
 

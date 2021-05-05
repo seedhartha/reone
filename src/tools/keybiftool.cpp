@@ -23,8 +23,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 
-#include "../src/common/pathutil.h"
-#include "../src/resource/typeutil.h"
+#include "../engine/common/pathutil.h"
+#include "../engine/resource/typeutil.h"
 
 using namespace std;
 
