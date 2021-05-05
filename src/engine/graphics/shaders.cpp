@@ -220,48 +220,33 @@ in mat3 fragTanSpace;
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
-vec2 normalizeUV(vec2 uv) {
-    vec2 result = uv;
-    if (abs(result.x) > 1.0) {
-        result.x -= int(result.x);
-    }
-    if (abs(result.y) > 1.0) {
-        result.y -= int(result.y);
-    }
-    if (result.x < 0.0) {
-        result.x = 1.0 + result.x;
-    }
-    if (result.y < 0.0) {
-        result.y = 1.0 + result.y;
-    }
-    return result;
+vec2 packUV(vec2 uv, vec4 bounds) {
+    return bounds.xy + bounds.zw * clamp(fract(uv), 0.001, 0.999);
 }
 
 vec3 getNormalFromBumpmap(vec2 uv) {
     vec3 result;
 
     if (uBumpmaps.grayscale) {
-        float oneOverGridX = 1.0 / uBumpmaps.gridSize.x;
-        float oneOverGridY = 1.0 / uBumpmaps.gridSize.y;
+        vec2 oneOverGridSize = 1.0 / uBumpmaps.gridSize;
 
-        vec2 dSTdx = dFdx(uv) * oneOverGridX;
-        vec2 dSTdy = dFdy(uv) * oneOverGridY;
+        vec4 frameBounds;
+        frameBounds[0] = oneOverGridSize.x * (uBumpmaps.frame % int(uBumpmaps.gridSize.x));
+        frameBounds[1] = oneOverGridSize.y * (uBumpmaps.frame / int(uBumpmaps.gridSize.y));
+        frameBounds[2] = oneOverGridSize.x;
+        frameBounds[3] = oneOverGridSize.y;
 
-        vec2 bumpmapUv = normalizeUV(uv);
-        bumpmapUv.x *= oneOverGridX;
-        bumpmapUv.y *= oneOverGridY;
-
-        if (uBumpmaps.frame > 0) {
-            bumpmapUv.y += oneOverGridY * (uBumpmaps.frame / int(uBumpmaps.gridSize.x));
-            bumpmapUv.x += oneOverGridX * (uBumpmaps.frame % int(uBumpmaps.gridSize.x));
-        }
-
-        float Hll = texture(uBumpmap, bumpmapUv).r;
-        float dBx = texture(uBumpmap, bumpmapUv + dSTdx).r - Hll;
-        float dBy = texture(uBumpmap, bumpmapUv + dSTdy).r - Hll;
-
-        result = vec3(0.5 - (dBx * uBumpmaps.scaling), 0.5 - (dBy * uBumpmaps.scaling), 1.0);
-
+        vec2 du = dFdx(uv);
+        vec2 dv = dFdy(uv);
+        vec2 packedUv = packUV(uv, frameBounds);
+        vec2 packedUvDu = packUV(uv + du, frameBounds);
+        vec2 packedUvDv = packUV(uv + dv, frameBounds);
+        vec4 bumpmapSample = texture(uBumpmap, packedUv);
+        vec4 bumpmapSampleDu = texture(uBumpmap, packedUvDu);
+        vec4 bumpmapSampleDv = texture(uBumpmap, packedUvDv);
+        float dBx = bumpmapSampleDu.r - bumpmapSample.r;
+        float dBy = bumpmapSampleDv.r - bumpmapSample.r;
+        result = vec3(-dBx * uBumpmaps.scaling, -dBy * uBumpmaps.scaling, 1.0);
     } else {
         vec4 bumpmapSample = texture(uBumpmap, uv);
         if (uBumpmaps.swizzled) {
@@ -269,9 +254,9 @@ vec3 getNormalFromBumpmap(vec2 uv) {
         } else {
             result = vec3(bumpmapSample.r, bumpmapSample.g, bumpmapSample.b);
         }
+        result = normalize(result * 2.0 - 1.0);
     }
 
-    result = normalize(result * 2.0 - 1.0);
     result = normalize(fragTanSpace * result);
 
     return result;
