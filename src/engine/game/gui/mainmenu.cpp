@@ -180,36 +180,49 @@ void MainMenu::onListBoxItemClick(const string &control, const string &item) {
 }
 
 void MainMenu::onModuleSelected(const string &name) {
-    string playerBlueprint;
-    string companionBlueprint;
+    string member1Blueprint;
+    string member2Blueprint;
+    string member3Blueprint;
 
     if (isTSL(_gameId)) {
-        playerBlueprint = kBlueprintResRefAtton;
-        companionBlueprint = kBlueprintResRefKreia;
+        member1Blueprint = kBlueprintResRefAtton;
+        member2Blueprint = kBlueprintResRefKreia;
     } else {
-        playerBlueprint = kBlueprintResRefCarth;
-        companionBlueprint = kBlueprintResRefBastila;
+        member1Blueprint = kBlueprintResRefCarth;
+        member2Blueprint = kBlueprintResRefBastila;
+    }
+    shared_ptr<TwoDA> defaultParty(Resources::instance().get2DA("defaultparty"));
+    if (defaultParty) {
+        for (int row = 0; row < defaultParty->getRowCount(); ++row) {
+            if (defaultParty->getBool(row, "tsl") == isTSL(_gameId)) {
+                member1Blueprint = defaultParty->getString(row, "partymember0");
+                member2Blueprint = defaultParty->getString(row, "partymember1");
+                member3Blueprint = defaultParty->getString(row, "partymember2");
+                break;
+            }
+        }
     }
 
     Party &party = _game->party();
-
-    shared_ptr<Creature> player(_game->objectFactory().newCreature());
-    player->loadFromBlueprint(playerBlueprint);
-    player->setTag(kObjectTagPlayer);
-    player->setImmortal(true);
-    party.addMember(kNpcPlayer, player);
-    party.setPlayer(player);
-
-    shared_ptr<Creature> companion(_game->objectFactory().newCreature());
-    companion->loadFromBlueprint(companionBlueprint);
-    companion->setImmortal(true);
-    party.addMember(0, companion);
-
-    if (isTSL(_gameId)) {
-        player->equip("w_blaste_01");
-        companion->equip("w_melee_06");
-    } else {
-        companion->equip("g_w_dblsbr004");
+    if (!member1Blueprint.empty()) {
+        shared_ptr<Creature> player(_game->objectFactory().newCreature());
+        player->loadFromBlueprint(member1Blueprint);
+        player->setTag(kObjectTagPlayer);
+        player->setImmortal(true);
+        party.addMember(kNpcPlayer, player);
+        party.setPlayer(player);
+    }
+    if (!member2Blueprint.empty()) {
+        shared_ptr<Creature> companion(_game->objectFactory().newCreature());
+        companion->loadFromBlueprint(member2Blueprint);
+        companion->setImmortal(true);
+        party.addMember(0, companion);
+    }
+    if (!member3Blueprint.empty()) {
+        shared_ptr<Creature> companion(_game->objectFactory().newCreature());
+        companion->loadFromBlueprint(member3Blueprint);
+        companion->setImmortal(true);
+        party.addMember(1, companion);
     }
 
     _game->loadModule(name);
