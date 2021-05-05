@@ -16,7 +16,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(reone)
 
-add_subdirectory(external/s3tc)
+add_subdirectory(src/external/s3tc)
 
 option(BUILD_TOOLS "build tools executable" ON)
 option(BUILD_LAUNCHER "build launcher executable" OFF)
@@ -43,10 +43,10 @@ else()
     find_package(Threads REQUIRED)
 endif()
 
-include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${FFMPEG_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/external/s3tc)
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${FFMPEG_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/src/external/s3tc)
 
 if(USE_EXTERNAL_GLM)
-    include_directories(${CMAKE_SOURCE_DIR}/external/glm)
+    include_directories(${CMAKE_SOURCE_DIR}/src/external/glm)
 else()
     find_package(glm REQUIRED)
 endif()
@@ -60,28 +60,28 @@ endif()
 ## libcommon static library
 
 set(COMMON_HEADERS
-    src/common/cache.h
-    src/common/collectionutil.h
-    src/common/log.h
-    src/common/mediastream.h
-    src/common/pathutil.h
-    src/common/random.h
-    src/common/stopwatch.h
-    src/common/streamreader.h
-    src/common/streamutil.h
-    src/common/streamwriter.h
-    src/common/timer.h
-    src/common/types.h)
+    src/engine/common/cache.h
+    src/engine/common/collectionutil.h
+    src/engine/common/log.h
+    src/engine/common/mediastream.h
+    src/engine/common/pathutil.h
+    src/engine/common/random.h
+    src/engine/common/stopwatch.h
+    src/engine/common/streamreader.h
+    src/engine/common/streamutil.h
+    src/engine/common/streamwriter.h
+    src/engine/common/timer.h
+    src/engine/common/types.h)
 
 set(COMMON_SOURCES
-    src/common/log.cpp
-    src/common/pathutil.cpp
-    src/common/random.cpp
-    src/common/stopwatch.cpp
-    src/common/streamreader.cpp
-    src/common/streamutil.cpp
-    src/common/streamwriter.cpp
-    src/common/timer.cpp)
+    src/engine/common/log.cpp
+    src/engine/common/pathutil.cpp
+    src/engine/common/random.cpp
+    src/engine/common/stopwatch.cpp
+    src/engine/common/streamreader.cpp
+    src/engine/common/streamutil.cpp
+    src/engine/common/streamwriter.cpp
+    src/engine/common/timer.cpp)
 
 add_library(libcommon STATIC ${COMMON_HEADERS} ${COMMON_SOURCES})
 set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -91,62 +91,62 @@ set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINA
 ## libresource static library
 
 set(RESOURCE_HEADERS
-    src/resource/2da.h
-    src/resource/gffstruct.h
-    src/resource/folder.h
-    src/resource/format/2dareader.h
-    src/resource/format/2dawriter.h
-    src/resource/format/bifreader.h
-    src/resource/format/binreader.h
-    src/resource/format/erfreader.h
-    src/resource/format/erfwriter.h
-    src/resource/format/gffreader.h
-    src/resource/format/gffwriter.h
-    src/resource/format/keyreader.h
-    src/resource/format/ltrreader.h
-    src/resource/format/lytreader.h
-    src/resource/format/pereader.h
-    src/resource/format/rimreader.h
-    src/resource/format/rimwriter.h
-    src/resource/format/ssfreader.h
-    src/resource/format/tlkreader.h
-    src/resource/format/tlkwriter.h
-    src/resource/format/visreader.h
-    src/resource/keybifprovider.h
-    src/resource/resourceprovider.h
-    src/resource/resources.h
-    src/resource/strings.h
-    src/resource/talktable.h
-    src/resource/types.h
-    src/resource/typeutil.h)
+    src/engine/resource/2da.h
+    src/engine/resource/gffstruct.h
+    src/engine/resource/folder.h
+    src/engine/resource/format/2dareader.h
+    src/engine/resource/format/2dawriter.h
+    src/engine/resource/format/bifreader.h
+    src/engine/resource/format/binreader.h
+    src/engine/resource/format/erfreader.h
+    src/engine/resource/format/erfwriter.h
+    src/engine/resource/format/gffreader.h
+    src/engine/resource/format/gffwriter.h
+    src/engine/resource/format/keyreader.h
+    src/engine/resource/format/ltrreader.h
+    src/engine/resource/format/lytreader.h
+    src/engine/resource/format/pereader.h
+    src/engine/resource/format/rimreader.h
+    src/engine/resource/format/rimwriter.h
+    src/engine/resource/format/ssfreader.h
+    src/engine/resource/format/tlkreader.h
+    src/engine/resource/format/tlkwriter.h
+    src/engine/resource/format/visreader.h
+    src/engine/resource/keybifprovider.h
+    src/engine/resource/resourceprovider.h
+    src/engine/resource/resources.h
+    src/engine/resource/strings.h
+    src/engine/resource/talktable.h
+    src/engine/resource/types.h
+    src/engine/resource/typeutil.h)
 
 set(RESOURCE_SOURCES
-    src/resource/2da.cpp
-    src/resource/gffstruct.cpp
-    src/resource/folder.cpp
-    src/resource/format/2dareader.cpp
-    src/resource/format/2dawriter.cpp
-    src/resource/format/bifreader.cpp
-    src/resource/format/binreader.cpp
-    src/resource/format/erfreader.cpp
-    src/resource/format/erfwriter.cpp
-    src/resource/format/gffreader.cpp
-    src/resource/format/gffwriter.cpp
-    src/resource/format/keyreader.cpp
-    src/resource/format/ltrreader.cpp
-    src/resource/format/lytreader.cpp
-    src/resource/format/pereader.cpp
-    src/resource/format/rimreader.cpp
-    src/resource/format/rimwriter.cpp
-    src/resource/format/ssfreader.cpp
-    src/resource/format/tlkreader.cpp
-    src/resource/format/tlkwriter.cpp
-    src/resource/format/visreader.cpp
-    src/resource/keybifprovider.cpp
-    src/resource/resources.cpp
-    src/resource/strings.cpp
-    src/resource/talktable.cpp
-    src/resource/typeutil.cpp)
+    src/engine/resource/2da.cpp
+    src/engine/resource/gffstruct.cpp
+    src/engine/resource/folder.cpp
+    src/engine/resource/format/2dareader.cpp
+    src/engine/resource/format/2dawriter.cpp
+    src/engine/resource/format/bifreader.cpp
+    src/engine/resource/format/binreader.cpp
+    src/engine/resource/format/erfreader.cpp
+    src/engine/resource/format/erfwriter.cpp
+    src/engine/resource/format/gffreader.cpp
+    src/engine/resource/format/gffwriter.cpp
+    src/engine/resource/format/keyreader.cpp
+    src/engine/resource/format/ltrreader.cpp
+    src/engine/resource/format/lytreader.cpp
+    src/engine/resource/format/pereader.cpp
+    src/engine/resource/format/rimreader.cpp
+    src/engine/resource/format/rimwriter.cpp
+    src/engine/resource/format/ssfreader.cpp
+    src/engine/resource/format/tlkreader.cpp
+    src/engine/resource/format/tlkwriter.cpp
+    src/engine/resource/format/visreader.cpp
+    src/engine/resource/keybifprovider.cpp
+    src/engine/resource/resources.cpp
+    src/engine/resource/strings.cpp
+    src/engine/resource/talktable.cpp
+    src/engine/resource/typeutil.cpp)
 
 add_library(libresource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES})
 set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -156,89 +156,89 @@ set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BI
 ## libgraphics static library
 
 set(GRAPHICS_HEADERS
-    src/graphics/aabb.h
-    src/graphics/cursor.h
-    src/graphics/featureutil.h
-    src/graphics/font.h
-    src/graphics/fonts.h
-    src/graphics/framebuffer.h
-    src/graphics/image/curreader.h
-    src/graphics/image/tgareader.h
-    src/graphics/image/tgawriter.h
-    src/graphics/image/tpcreader.h
-    src/graphics/image/txireader.h
-    src/graphics/lip/lipanimation.h
-    src/graphics/lip/lipreader.h
-    src/graphics/lip/lips.h
-    src/graphics/lip/lipwriter.h
-    src/graphics/material.h
-    src/graphics/materials.h
-    src/graphics/mesh.h
-    src/graphics/meshes.h
-    src/graphics/model/aabbnode.h
-    src/graphics/model/animatedproperty.h
-    src/graphics/model/animation.h
-    src/graphics/model/emitter.h
-    src/graphics/model/lensflare.h
-    src/graphics/model/mdlreader.h
-    src/graphics/model/model.h
-    src/graphics/model/modelmesh.h
-    src/graphics/model/modelnode.h
-    src/graphics/model/models.h
-    src/graphics/pbribl.h
-    src/graphics/pixelutil.h
-    src/graphics/renderbuffer.h
-    src/graphics/shaders.h
-    src/graphics/stateutil.h
-    src/graphics/texture.h
-    src/graphics/textures.h
-    src/graphics/textureutil.h
-    src/graphics/textutil.h
-    src/graphics/types.h
-    src/graphics/walkmesh/bwmreader.h
-    src/graphics/walkmesh/walkmesh.h
-    src/graphics/walkmesh/walkmeshes.h
-    src/graphics/window.h)
+    src/engine/graphics/aabb.h
+    src/engine/graphics/cursor.h
+    src/engine/graphics/featureutil.h
+    src/engine/graphics/font.h
+    src/engine/graphics/fonts.h
+    src/engine/graphics/framebuffer.h
+    src/engine/graphics/image/curreader.h
+    src/engine/graphics/image/tgareader.h
+    src/engine/graphics/image/tgawriter.h
+    src/engine/graphics/image/tpcreader.h
+    src/engine/graphics/image/txireader.h
+    src/engine/graphics/lip/lipanimation.h
+    src/engine/graphics/lip/lipreader.h
+    src/engine/graphics/lip/lips.h
+    src/engine/graphics/lip/lipwriter.h
+    src/engine/graphics/material.h
+    src/engine/graphics/materials.h
+    src/engine/graphics/mesh.h
+    src/engine/graphics/meshes.h
+    src/engine/graphics/model/aabbnode.h
+    src/engine/graphics/model/animatedproperty.h
+    src/engine/graphics/model/animation.h
+    src/engine/graphics/model/emitter.h
+    src/engine/graphics/model/lensflare.h
+    src/engine/graphics/model/mdlreader.h
+    src/engine/graphics/model/model.h
+    src/engine/graphics/model/modelmesh.h
+    src/engine/graphics/model/modelnode.h
+    src/engine/graphics/model/models.h
+    src/engine/graphics/pbribl.h
+    src/engine/graphics/pixelutil.h
+    src/engine/graphics/renderbuffer.h
+    src/engine/graphics/shaders.h
+    src/engine/graphics/stateutil.h
+    src/engine/graphics/texture.h
+    src/engine/graphics/textures.h
+    src/engine/graphics/textureutil.h
+    src/engine/graphics/textutil.h
+    src/engine/graphics/types.h
+    src/engine/graphics/walkmesh/bwmreader.h
+    src/engine/graphics/walkmesh/walkmesh.h
+    src/engine/graphics/walkmesh/walkmeshes.h
+    src/engine/graphics/window.h)
 
 set(GRAPHICS_SOURCES
-    src/graphics/aabb.cpp
-    src/graphics/cursor.cpp
-    src/graphics/featureutil.cpp
-    src/graphics/font.cpp
-    src/graphics/fonts.cpp
-    src/graphics/framebuffer.cpp
-    src/graphics/image/curreader.cpp
-    src/graphics/image/tgareader.cpp
-    src/graphics/image/tgawriter.cpp
-    src/graphics/image/tpcreader.cpp
-    src/graphics/image/txireader.cpp
-    src/graphics/lip/lipanimation.cpp
-    src/graphics/lip/lipreader.cpp
-    src/graphics/lip/lips.cpp
-    src/graphics/lip/lipwriter.cpp
-    src/graphics/materials.cpp
-    src/graphics/mesh.cpp
-    src/graphics/meshes.cpp
-    src/graphics/model/aabbnode.cpp
-    src/graphics/model/animation.cpp
-    src/graphics/model/mdlreader.cpp
-    src/graphics/model/model.cpp
-    src/graphics/model/modelmesh.cpp
-    src/graphics/model/modelnode.cpp
-    src/graphics/model/models.cpp
-    src/graphics/pbribl.cpp
-    src/graphics/pixelutil.cpp
-    src/graphics/renderbuffer.cpp
-    src/graphics/shaders.cpp
-    src/graphics/stateutil.cpp
-    src/graphics/texture.cpp
-    src/graphics/textures.cpp
-    src/graphics/textureutil.cpp
-    src/graphics/textutil.cpp
-    src/graphics/walkmesh/bwmreader.cpp
-    src/graphics/walkmesh/walkmesh.cpp
-    src/graphics/walkmesh/walkmeshes.cpp
-    src/graphics/window.cpp)
+    src/engine/graphics/aabb.cpp
+    src/engine/graphics/cursor.cpp
+    src/engine/graphics/featureutil.cpp
+    src/engine/graphics/font.cpp
+    src/engine/graphics/fonts.cpp
+    src/engine/graphics/framebuffer.cpp
+    src/engine/graphics/image/curreader.cpp
+    src/engine/graphics/image/tgareader.cpp
+    src/engine/graphics/image/tgawriter.cpp
+    src/engine/graphics/image/tpcreader.cpp
+    src/engine/graphics/image/txireader.cpp
+    src/engine/graphics/lip/lipanimation.cpp
+    src/engine/graphics/lip/lipreader.cpp
+    src/engine/graphics/lip/lips.cpp
+    src/engine/graphics/lip/lipwriter.cpp
+    src/engine/graphics/materials.cpp
+    src/engine/graphics/mesh.cpp
+    src/engine/graphics/meshes.cpp
+    src/engine/graphics/model/aabbnode.cpp
+    src/engine/graphics/model/animation.cpp
+    src/engine/graphics/model/mdlreader.cpp
+    src/engine/graphics/model/model.cpp
+    src/engine/graphics/model/modelmesh.cpp
+    src/engine/graphics/model/modelnode.cpp
+    src/engine/graphics/model/models.cpp
+    src/engine/graphics/pbribl.cpp
+    src/engine/graphics/pixelutil.cpp
+    src/engine/graphics/renderbuffer.cpp
+    src/engine/graphics/shaders.cpp
+    src/engine/graphics/stateutil.cpp
+    src/engine/graphics/texture.cpp
+    src/engine/graphics/textures.cpp
+    src/engine/graphics/textureutil.cpp
+    src/engine/graphics/textutil.cpp
+    src/engine/graphics/walkmesh/bwmreader.cpp
+    src/engine/graphics/walkmesh/walkmesh.cpp
+    src/engine/graphics/walkmesh/walkmeshes.cpp
+    src/engine/graphics/window.cpp)
 
 add_library(libgraphics STATIC ${GRAPHICS_HEADERS} ${GRAPHICS_SOURCES})
 set_target_properties(libgraphics PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -248,23 +248,23 @@ set_target_properties(libgraphics PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BI
 ## libaudio static library
 
 set(AUDIO_HEADERS
-    src/audio/files.h
-    src/audio/format/mp3reader.h
-    src/audio/format/wavreader.h
-    src/audio/player.h
-    src/audio/soundhandle.h
-    src/audio/soundinstance.h
-    src/audio/stream.h
-    src/audio/types.h)
+    src/engine/audio/files.h
+    src/engine/audio/format/mp3reader.h
+    src/engine/audio/format/wavreader.h
+    src/engine/audio/player.h
+    src/engine/audio/soundhandle.h
+    src/engine/audio/soundinstance.h
+    src/engine/audio/stream.h
+    src/engine/audio/types.h)
 
 set(AUDIO_SOURCES
-    src/audio/files.cpp
-    src/audio/format/mp3reader.cpp
-    src/audio/format/wavreader.cpp
-    src/audio/player.cpp
-    src/audio/soundhandle.cpp
-    src/audio/soundinstance.cpp
-    src/audio/stream.cpp)
+    src/engine/audio/files.cpp
+    src/engine/audio/format/mp3reader.cpp
+    src/engine/audio/format/wavreader.cpp
+    src/engine/audio/player.cpp
+    src/engine/audio/soundhandle.cpp
+    src/engine/audio/soundinstance.cpp
+    src/engine/audio/stream.cpp)
 
 add_library(libaudio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES})
 set_target_properties(libaudio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -274,12 +274,12 @@ set_target_properties(libaudio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINAR
 ## libvideo static library
 
 set(VIDEO_HEADERS
-    src/video/bikreader.h
-    src/video/video.h)
+    src/engine/video/bikreader.h
+    src/engine/video/video.h)
 
 set(VIDEO_SOURCES
-    src/video/bikreader.cpp
-    src/video/video.cpp)
+    src/engine/video/bikreader.cpp
+    src/engine/video/video.cpp)
 
 add_library(libvideo STATIC ${VIDEO_HEADERS} ${VIDEO_SOURCES})
 set_target_properties(libvideo PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -289,41 +289,41 @@ set_target_properties(libvideo PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINAR
 ## libscene static library
 
 set(SCENE_HEADERS
-    src/scene/animation/eventlistener.h
-    src/scene/animation/channel.h
-    src/scene/animation/properties.h
-    src/scene/animation/scenenodeanimator.h
-    src/scene/animation/scenenodestate.h
-    src/scene/grasscluster.h
-    src/scene/node/cameranode.h
-    src/scene/node/emitternode.h
-    src/scene/node/grassnode.h
-    src/scene/node/lightnode.h
-    src/scene/node/meshnode.h
-    src/scene/node/modelnodescenenode.h
-    src/scene/node/modelscenenode.h
-    src/scene/node/scenenode.h
-    src/scene/particle.h
-    src/scene/pipeline/control.h
-    src/scene/pipeline/world.h
-    src/scene/scenegraph.h
-    src/scene/types.h)
+    src/engine/scene/animation/eventlistener.h
+    src/engine/scene/animation/channel.h
+    src/engine/scene/animation/properties.h
+    src/engine/scene/animation/scenenodeanimator.h
+    src/engine/scene/animation/scenenodestate.h
+    src/engine/scene/grasscluster.h
+    src/engine/scene/node/cameranode.h
+    src/engine/scene/node/emitternode.h
+    src/engine/scene/node/grassnode.h
+    src/engine/scene/node/lightnode.h
+    src/engine/scene/node/meshnode.h
+    src/engine/scene/node/modelnodescenenode.h
+    src/engine/scene/node/modelscenenode.h
+    src/engine/scene/node/scenenode.h
+    src/engine/scene/particle.h
+    src/engine/scene/pipeline/control.h
+    src/engine/scene/pipeline/world.h
+    src/engine/scene/scenegraph.h
+    src/engine/scene/types.h)
 
 set(SCENE_SOURCES
-    src/scene/animation/channel.cpp
-    src/scene/animation/scenenodeanimator.cpp
-    src/scene/node/cameranode.cpp
-    src/scene/node/emitternode.cpp
-    src/scene/node/grassnode.cpp
-    src/scene/node/lightnode.cpp
-    src/scene/node/meshnode.cpp
-    src/scene/node/modelnodescenenode.cpp
-    src/scene/node/modelscenenode.cpp
-    src/scene/node/scenenode.cpp
-    src/scene/particle.cpp
-    src/scene/pipeline/control.cpp
-    src/scene/pipeline/world.cpp
-    src/scene/scenegraph.cpp)
+    src/engine/scene/animation/channel.cpp
+    src/engine/scene/animation/scenenodeanimator.cpp
+    src/engine/scene/node/cameranode.cpp
+    src/engine/scene/node/emitternode.cpp
+    src/engine/scene/node/grassnode.cpp
+    src/engine/scene/node/lightnode.cpp
+    src/engine/scene/node/meshnode.cpp
+    src/engine/scene/node/modelnodescenenode.cpp
+    src/engine/scene/node/modelscenenode.cpp
+    src/engine/scene/node/scenenode.cpp
+    src/engine/scene/particle.cpp
+    src/engine/scene/pipeline/control.cpp
+    src/engine/scene/pipeline/world.cpp
+    src/engine/scene/scenegraph.cpp)
 
 add_library(libscene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES})
 set_target_properties(libscene PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -333,33 +333,33 @@ set_target_properties(libscene PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINAR
 ## libgui static library
 
 set(GUI_HEADERS
-    src/gui/control/button.h
-    src/gui/control/control.h
-    src/gui/control/imagebutton.h
-    src/gui/control/label.h
-    src/gui/control/listbox.h
-    src/gui/control/panel.h
-    src/gui/control/progressbar.h
-    src/gui/control/scrollbar.h
-    src/gui/control/togglebutton.h
-    src/gui/gui.h
-    src/gui/scenebuilder.h
-    src/gui/textinput.h
-    src/gui/types.h)
+    src/engine/gui/control/button.h
+    src/engine/gui/control/control.h
+    src/engine/gui/control/imagebutton.h
+    src/engine/gui/control/label.h
+    src/engine/gui/control/listbox.h
+    src/engine/gui/control/panel.h
+    src/engine/gui/control/progressbar.h
+    src/engine/gui/control/scrollbar.h
+    src/engine/gui/control/togglebutton.h
+    src/engine/gui/gui.h
+    src/engine/gui/scenebuilder.h
+    src/engine/gui/textinput.h
+    src/engine/gui/types.h)
 
 set(GUI_SOURCES
-    src/gui/control/button.cpp
-    src/gui/control/control.cpp
-    src/gui/control/imagebutton.cpp
-    src/gui/control/label.cpp
-    src/gui/control/listbox.cpp
-    src/gui/control/panel.cpp
-    src/gui/control/progressbar.cpp
-    src/gui/control/scrollbar.cpp
-    src/gui/control/togglebutton.cpp
-    src/gui/gui.cpp
-    src/gui/scenebuilder.cpp
-    src/gui/textinput.cpp)
+    src/engine/gui/control/button.cpp
+    src/engine/gui/control/control.cpp
+    src/engine/gui/control/imagebutton.cpp
+    src/engine/gui/control/label.cpp
+    src/engine/gui/control/listbox.cpp
+    src/engine/gui/control/panel.cpp
+    src/engine/gui/control/progressbar.cpp
+    src/engine/gui/control/scrollbar.cpp
+    src/engine/gui/control/togglebutton.cpp
+    src/engine/gui/gui.cpp
+    src/engine/gui/scenebuilder.cpp
+    src/engine/gui/textinput.cpp)
 
 add_library(libgui STATIC ${GUI_HEADERS} ${GUI_SOURCES})
 set_target_properties(libgui PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -369,24 +369,24 @@ set_target_properties(libgui PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_
 ## libscript static library
 
 set(SCRIPT_HEADERS
-    src/script/enginetype.h
-    src/script/execution.h
-    src/script/instrutil.h
-    src/script/ncsreader.h
-    src/script/program.h
-    src/script/routine.h
-    src/script/scripts.h
-    src/script/types.h
-    src/script/variable.h)
+    src/engine/script/enginetype.h
+    src/engine/script/execution.h
+    src/engine/script/instrutil.h
+    src/engine/script/ncsreader.h
+    src/engine/script/program.h
+    src/engine/script/routine.h
+    src/engine/script/scripts.h
+    src/engine/script/types.h
+    src/engine/script/variable.h)
 
 set(SCRIPT_SOURCES
-    src/script/execution.cpp
-    src/script/instrutil.cpp
-    src/script/ncsreader.cpp
-    src/script/program.cpp
-    src/script/routine.cpp
-    src/script/scripts.cpp
-    src/script/variable.cpp)
+    src/engine/script/execution.cpp
+    src/engine/script/instrutil.cpp
+    src/engine/script/ncsreader.cpp
+    src/engine/script/program.cpp
+    src/engine/script/routine.cpp
+    src/engine/script/scripts.cpp
+    src/engine/script/variable.cpp)
 
 add_library(libscript STATIC ${SCRIPT_HEADERS} ${SCRIPT_SOURCES})
 set_target_properties(libscript PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -396,248 +396,248 @@ set_target_properties(libscript PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINA
 ## libgame static library
 
 set(GAME_HEADERS
-    src/game/action/action.h
-    src/game/action/attack.h
-    src/game/action/commandaction.h
-    src/game/action/follow.h
-    src/game/action/locationaction.h
-    src/game/action/movetolocation.h
-    src/game/action/movetoobject.h
-    src/game/action/movetopoint.h
-    src/game/action/objectaction.h
-    src/game/action/playanimation.h
-    src/game/action/startconversation.h
-    src/game/action/waitaction.h
-    src/game/actionexecutor.h
-    src/game/actionqueue.h
-    src/game/animationutil.h
-    src/game/camera/animatedcamera.h
-    src/game/camera/camera.h
-    src/game/camera/camerastyle.h
-    src/game/camera/dialogcamera.h
-    src/game/camera/firstperson.h
-    src/game/camera/staticcamera.h
-    src/game/camera/thirdperson.h
-    src/game/character.h
-    src/game/characterutil.h
-    src/game/collisiondetect.h
-    src/game/console.h
-    src/game/combat/combat.h
-    src/game/creaturefinder.h
-    src/game/cursors.h
-    src/game/dialog.h
-    src/game/enginetype/effect.h
-    src/game/enginetype/event.h
-    src/game/enginetype/location.h
-    src/game/enginetype/talent.h
-    src/game/footstepsounds.h
-    src/game/game.h
-    src/game/gameidutil.h
-    src/game/gui/barkbubble.h
-    src/game/gui/chargen/abilities.h
-    src/game/gui/chargen/chargen.h
-    src/game/gui/chargen/classselect.h
-    src/game/gui/chargen/custom.h
-    src/game/gui/chargen/feats.h
-    src/game/gui/chargen/levelup.h
-    src/game/gui/chargen/nameentry.h
-    src/game/gui/chargen/portraitselect.h
-    src/game/gui/chargen/quick.h
-    src/game/gui/chargen/quickorcustom.h
-    src/game/gui/chargen/skills.h
-    src/game/gui/colorutil.h
-    src/game/gui/container.h
-    src/game/gui/conversation.h
-    src/game/gui/computer.h
-    src/game/gui/debugoverlay.h
-    src/game/gui/dialog.h
-    src/game/gui/gui.h
-    src/game/gui/hud.h
-    src/game/gui/ingame/abilities.h
-    src/game/gui/ingame/character.h
-    src/game/gui/ingame/equip.h
-    src/game/gui/ingame/ingame.h
-    src/game/gui/ingame/inventory.h
-    src/game/gui/ingame/journal.h
-    src/game/gui/ingame/map.h
-    src/game/gui/ingame/messages.h
-    src/game/gui/ingame/options.h
-    src/game/gui/loadscreen.h
-    src/game/gui/mainmenu.h
-    src/game/gui/partyselect.h
-    src/game/gui/profileoverlay.h
-    src/game/gui/saveload.h
-    src/game/gui/selectoverlay.h
-    src/game/gui/sounds.h
-    src/game/map.h
-    src/game/object/area.h
-    src/game/object/creature.h
-    src/game/object/door.h
-    src/game/object/encounter.h
-    src/game/object/item.h
-    src/game/object/module.h
-    src/game/object/object.h
-    src/game/object/objectfactory.h
-    src/game/object/placeable.h
-    src/game/object/placeablecamera.h
-    src/game/object/sound.h
-    src/game/object/spatial.h
-    src/game/object/trigger.h
-    src/game/object/waypoint.h
-    src/game/objectconverter.h
-    src/game/objectselect.h
-    src/game/options.h
-    src/game/party.h
-    src/game/path.h
-    src/game/pathfinder.h
-    src/game/perception.h
-    src/game/player.h
-    src/game/portrait.h
-    src/game/portraits.h
-    src/game/reputes.h
-    src/game/room.h
-    src/game/d20/abilities.h
-    src/game/d20/attributes.h
-    src/game/d20/class.h
-    src/game/d20/classes.h
-    src/game/d20/savingthrows.h
-    src/game/d20/skills.h
-    src/game/savedgame.h
-    src/game/script/objectutil.h
-    src/game/script/routines.h
-    src/game/script/runutil.h
-    src/game/soundsets.h
-    src/game/surface.h
-    src/game/surfaces.h
-    src/game/types.h)
+    src/engine/game/action/action.h
+    src/engine/game/action/attack.h
+    src/engine/game/action/commandaction.h
+    src/engine/game/action/follow.h
+    src/engine/game/action/locationaction.h
+    src/engine/game/action/movetolocation.h
+    src/engine/game/action/movetoobject.h
+    src/engine/game/action/movetopoint.h
+    src/engine/game/action/objectaction.h
+    src/engine/game/action/playanimation.h
+    src/engine/game/action/startconversation.h
+    src/engine/game/action/waitaction.h
+    src/engine/game/actionexecutor.h
+    src/engine/game/actionqueue.h
+    src/engine/game/animationutil.h
+    src/engine/game/camera/animatedcamera.h
+    src/engine/game/camera/camera.h
+    src/engine/game/camera/camerastyle.h
+    src/engine/game/camera/dialogcamera.h
+    src/engine/game/camera/firstperson.h
+    src/engine/game/camera/staticcamera.h
+    src/engine/game/camera/thirdperson.h
+    src/engine/game/character.h
+    src/engine/game/characterutil.h
+    src/engine/game/collisiondetect.h
+    src/engine/game/console.h
+    src/engine/game/combat/combat.h
+    src/engine/game/creaturefinder.h
+    src/engine/game/cursors.h
+    src/engine/game/dialog.h
+    src/engine/game/enginetype/effect.h
+    src/engine/game/enginetype/event.h
+    src/engine/game/enginetype/location.h
+    src/engine/game/enginetype/talent.h
+    src/engine/game/footstepsounds.h
+    src/engine/game/game.h
+    src/engine/game/gameidutil.h
+    src/engine/game/gui/barkbubble.h
+    src/engine/game/gui/chargen/abilities.h
+    src/engine/game/gui/chargen/chargen.h
+    src/engine/game/gui/chargen/classselect.h
+    src/engine/game/gui/chargen/custom.h
+    src/engine/game/gui/chargen/feats.h
+    src/engine/game/gui/chargen/levelup.h
+    src/engine/game/gui/chargen/nameentry.h
+    src/engine/game/gui/chargen/portraitselect.h
+    src/engine/game/gui/chargen/quick.h
+    src/engine/game/gui/chargen/quickorcustom.h
+    src/engine/game/gui/chargen/skills.h
+    src/engine/game/gui/colorutil.h
+    src/engine/game/gui/container.h
+    src/engine/game/gui/conversation.h
+    src/engine/game/gui/computer.h
+    src/engine/game/gui/debugoverlay.h
+    src/engine/game/gui/dialog.h
+    src/engine/game/gui/gui.h
+    src/engine/game/gui/hud.h
+    src/engine/game/gui/ingame/abilities.h
+    src/engine/game/gui/ingame/character.h
+    src/engine/game/gui/ingame/equip.h
+    src/engine/game/gui/ingame/ingame.h
+    src/engine/game/gui/ingame/inventory.h
+    src/engine/game/gui/ingame/journal.h
+    src/engine/game/gui/ingame/map.h
+    src/engine/game/gui/ingame/messages.h
+    src/engine/game/gui/ingame/options.h
+    src/engine/game/gui/loadscreen.h
+    src/engine/game/gui/mainmenu.h
+    src/engine/game/gui/partyselect.h
+    src/engine/game/gui/profileoverlay.h
+    src/engine/game/gui/saveload.h
+    src/engine/game/gui/selectoverlay.h
+    src/engine/game/gui/sounds.h
+    src/engine/game/map.h
+    src/engine/game/object/area.h
+    src/engine/game/object/creature.h
+    src/engine/game/object/door.h
+    src/engine/game/object/encounter.h
+    src/engine/game/object/item.h
+    src/engine/game/object/module.h
+    src/engine/game/object/object.h
+    src/engine/game/object/objectfactory.h
+    src/engine/game/object/placeable.h
+    src/engine/game/object/placeablecamera.h
+    src/engine/game/object/sound.h
+    src/engine/game/object/spatial.h
+    src/engine/game/object/trigger.h
+    src/engine/game/object/waypoint.h
+    src/engine/game/objectconverter.h
+    src/engine/game/objectselect.h
+    src/engine/game/options.h
+    src/engine/game/party.h
+    src/engine/game/path.h
+    src/engine/game/pathfinder.h
+    src/engine/game/perception.h
+    src/engine/game/player.h
+    src/engine/game/portrait.h
+    src/engine/game/portraits.h
+    src/engine/game/reputes.h
+    src/engine/game/room.h
+    src/engine/game/d20/abilities.h
+    src/engine/game/d20/attributes.h
+    src/engine/game/d20/class.h
+    src/engine/game/d20/classes.h
+    src/engine/game/d20/savingthrows.h
+    src/engine/game/d20/skills.h
+    src/engine/game/savedgame.h
+    src/engine/game/script/objectutil.h
+    src/engine/game/script/routines.h
+    src/engine/game/script/runutil.h
+    src/engine/game/soundsets.h
+    src/engine/game/surface.h
+    src/engine/game/surfaces.h
+    src/engine/game/types.h)
 
 set(GAME_SOURCES
-    src/game/actionexecutor.cpp
-    src/game/actionqueue.cpp
-    src/game/animationutil.cpp
-    src/game/camera/animatedcamera.cpp
-    src/game/camera/camera.cpp
-    src/game/camera/camerastyle.cpp
-    src/game/camera/dialogcamera.cpp
-    src/game/camera/firstperson.cpp
-    src/game/camera/staticcamera.cpp
-    src/game/camera/thirdperson.cpp
-    src/game/characterutil.cpp
-    src/game/collisiondetect.cpp
-    src/game/combat/combat.cpp
-    src/game/combat/combat_attack.cpp
-    src/game/combat/combat_damage.cpp
-    src/game/combat/combat_projectiles.cpp
-    src/game/console.cpp
-    src/game/creaturefinder.cpp
-    src/game/cursors.cpp
-    src/game/d20/abilities.cpp
-    src/game/d20/attributes.cpp
-    src/game/d20/class.cpp
-    src/game/d20/classes.cpp
-    src/game/d20/skills.cpp
-    src/game/dialog.cpp
-    src/game/footstepsounds.cpp
-    src/game/game.cpp
-    src/game/game_kotor.cpp
-    src/game/game_save.cpp
-    src/game/game_tsl.cpp
-    src/game/gameidutil.cpp
-    src/game/gui/barkbubble.cpp
-    src/game/gui/chargen/abilities.cpp
-    src/game/gui/chargen/chargen.cpp
-    src/game/gui/chargen/classselect.cpp
-    src/game/gui/chargen/custom.cpp
-    src/game/gui/chargen/feats.cpp
-    src/game/gui/chargen/levelup.cpp
-    src/game/gui/chargen/nameentry.cpp
-    src/game/gui/chargen/portraitselect.cpp
-    src/game/gui/chargen/quick.cpp
-    src/game/gui/chargen/quickorcustom.cpp
-    src/game/gui/chargen/skills.cpp
-    src/game/gui/colorutil.cpp
-    src/game/gui/computer.cpp
-    src/game/gui/container.cpp
-    src/game/gui/conversation.cpp
-    src/game/gui/debugoverlay.cpp
-    src/game/gui/dialog.cpp
-    src/game/gui/gui.cpp
-    src/game/gui/hud.cpp
-    src/game/gui/ingame/abilities.cpp
-    src/game/gui/ingame/character.cpp
-    src/game/gui/ingame/equip.cpp
-    src/game/gui/ingame/ingame.cpp
-    src/game/gui/ingame/inventory.cpp
-    src/game/gui/ingame/journal.cpp
-    src/game/gui/ingame/map.cpp
-    src/game/gui/ingame/messages.cpp
-    src/game/gui/ingame/options.cpp
-    src/game/gui/loadscreen.cpp
-    src/game/gui/mainmenu.cpp
-    src/game/gui/partyselect.cpp
-    src/game/gui/profileoverlay.cpp
-    src/game/gui/saveload.cpp
-    src/game/gui/selectoverlay.cpp
-    src/game/gui/sounds.cpp
-    src/game/map.cpp
-    src/game/object/area.cpp
-    src/game/object/area_are.cpp
-    src/game/object/area_git.cpp
-    src/game/object/creature.cpp
-    src/game/object/creature_animations.cpp
-    src/game/object/creature_appearance.cpp
-    src/game/object/creature_blueprint.cpp
-    src/game/object/door.cpp
-    src/game/object/door_blueprint.cpp
-    src/game/object/encounter.cpp
-    src/game/object/encounter_blueprint.cpp
-    src/game/object/item.cpp
-    src/game/object/item_blueprint.cpp
-    src/game/object/module.cpp
-    src/game/object/object.cpp
-    src/game/object/objectfactory.cpp
-    src/game/object/placeable.cpp
-    src/game/object/placeable_blueprint.cpp
-    src/game/object/placeablecamera.cpp
-    src/game/object/sound.cpp
-    src/game/object/sound_blueprint.cpp
-    src/game/object/spatial.cpp
-    src/game/object/trigger.cpp
-    src/game/object/trigger_blueprint.cpp
-    src/game/object/waypoint.cpp
-    src/game/object/waypoint_blueprint.cpp
-    src/game/objectselect.cpp
-    src/game/party.cpp
-    src/game/path.cpp
-    src/game/pathfinder.cpp
-    src/game/perception.cpp
-    src/game/player.cpp
-    src/game/portraits.cpp
-    src/game/reputes.cpp
-    src/game/room.cpp
-    src/game/script/routines.cpp
-    src/game/script/routines_actions.cpp
-    src/game/script/routines_combat.cpp
-    src/game/script/routines_common.cpp
-    src/game/script/routines_d20.cpp
-    src/game/script/routines_effects.cpp
-    src/game/script/routines_events.cpp
-    src/game/script/routines_faction.cpp
-    src/game/script/routines_items.cpp
-    src/game/script/routines_kotor.cpp
-    src/game/script/routines_locations.cpp
-    src/game/script/routines_math.cpp
-    src/game/script/routines_objects.cpp
-    src/game/script/routines_party.cpp
-    src/game/script/routines_perception.cpp
-    src/game/script/routines_stealth.cpp
-    src/game/script/routines_strings.cpp
-    src/game/script/routines_time.cpp
-    src/game/script/routines_tsl.cpp
-    src/game/script/routines_vars.cpp
-    src/game/script/runutil.cpp
-    src/game/soundsets.cpp
-    src/game/surfaces.cpp)
+    src/engine/game/actionexecutor.cpp
+    src/engine/game/actionqueue.cpp
+    src/engine/game/animationutil.cpp
+    src/engine/game/camera/animatedcamera.cpp
+    src/engine/game/camera/camera.cpp
+    src/engine/game/camera/camerastyle.cpp
+    src/engine/game/camera/dialogcamera.cpp
+    src/engine/game/camera/firstperson.cpp
+    src/engine/game/camera/staticcamera.cpp
+    src/engine/game/camera/thirdperson.cpp
+    src/engine/game/characterutil.cpp
+    src/engine/game/collisiondetect.cpp
+    src/engine/game/combat/combat.cpp
+    src/engine/game/combat/combat_attack.cpp
+    src/engine/game/combat/combat_damage.cpp
+    src/engine/game/combat/combat_projectiles.cpp
+    src/engine/game/console.cpp
+    src/engine/game/creaturefinder.cpp
+    src/engine/game/cursors.cpp
+    src/engine/game/d20/abilities.cpp
+    src/engine/game/d20/attributes.cpp
+    src/engine/game/d20/class.cpp
+    src/engine/game/d20/classes.cpp
+    src/engine/game/d20/skills.cpp
+    src/engine/game/dialog.cpp
+    src/engine/game/footstepsounds.cpp
+    src/engine/game/game.cpp
+    src/engine/game/game_kotor.cpp
+    src/engine/game/game_save.cpp
+    src/engine/game/game_tsl.cpp
+    src/engine/game/gameidutil.cpp
+    src/engine/game/gui/barkbubble.cpp
+    src/engine/game/gui/chargen/abilities.cpp
+    src/engine/game/gui/chargen/chargen.cpp
+    src/engine/game/gui/chargen/classselect.cpp
+    src/engine/game/gui/chargen/custom.cpp
+    src/engine/game/gui/chargen/feats.cpp
+    src/engine/game/gui/chargen/levelup.cpp
+    src/engine/game/gui/chargen/nameentry.cpp
+    src/engine/game/gui/chargen/portraitselect.cpp
+    src/engine/game/gui/chargen/quick.cpp
+    src/engine/game/gui/chargen/quickorcustom.cpp
+    src/engine/game/gui/chargen/skills.cpp
+    src/engine/game/gui/colorutil.cpp
+    src/engine/game/gui/computer.cpp
+    src/engine/game/gui/container.cpp
+    src/engine/game/gui/conversation.cpp
+    src/engine/game/gui/debugoverlay.cpp
+    src/engine/game/gui/dialog.cpp
+    src/engine/game/gui/gui.cpp
+    src/engine/game/gui/hud.cpp
+    src/engine/game/gui/ingame/abilities.cpp
+    src/engine/game/gui/ingame/character.cpp
+    src/engine/game/gui/ingame/equip.cpp
+    src/engine/game/gui/ingame/ingame.cpp
+    src/engine/game/gui/ingame/inventory.cpp
+    src/engine/game/gui/ingame/journal.cpp
+    src/engine/game/gui/ingame/map.cpp
+    src/engine/game/gui/ingame/messages.cpp
+    src/engine/game/gui/ingame/options.cpp
+    src/engine/game/gui/loadscreen.cpp
+    src/engine/game/gui/mainmenu.cpp
+    src/engine/game/gui/partyselect.cpp
+    src/engine/game/gui/profileoverlay.cpp
+    src/engine/game/gui/saveload.cpp
+    src/engine/game/gui/selectoverlay.cpp
+    src/engine/game/gui/sounds.cpp
+    src/engine/game/map.cpp
+    src/engine/game/object/area.cpp
+    src/engine/game/object/area_are.cpp
+    src/engine/game/object/area_git.cpp
+    src/engine/game/object/creature.cpp
+    src/engine/game/object/creature_animations.cpp
+    src/engine/game/object/creature_appearance.cpp
+    src/engine/game/object/creature_blueprint.cpp
+    src/engine/game/object/door.cpp
+    src/engine/game/object/door_blueprint.cpp
+    src/engine/game/object/encounter.cpp
+    src/engine/game/object/encounter_blueprint.cpp
+    src/engine/game/object/item.cpp
+    src/engine/game/object/item_blueprint.cpp
+    src/engine/game/object/module.cpp
+    src/engine/game/object/object.cpp
+    src/engine/game/object/objectfactory.cpp
+    src/engine/game/object/placeable.cpp
+    src/engine/game/object/placeable_blueprint.cpp
+    src/engine/game/object/placeablecamera.cpp
+    src/engine/game/object/sound.cpp
+    src/engine/game/object/sound_blueprint.cpp
+    src/engine/game/object/spatial.cpp
+    src/engine/game/object/trigger.cpp
+    src/engine/game/object/trigger_blueprint.cpp
+    src/engine/game/object/waypoint.cpp
+    src/engine/game/object/waypoint_blueprint.cpp
+    src/engine/game/objectselect.cpp
+    src/engine/game/party.cpp
+    src/engine/game/path.cpp
+    src/engine/game/pathfinder.cpp
+    src/engine/game/perception.cpp
+    src/engine/game/player.cpp
+    src/engine/game/portraits.cpp
+    src/engine/game/reputes.cpp
+    src/engine/game/room.cpp
+    src/engine/game/script/routines.cpp
+    src/engine/game/script/routines_actions.cpp
+    src/engine/game/script/routines_combat.cpp
+    src/engine/game/script/routines_common.cpp
+    src/engine/game/script/routines_d20.cpp
+    src/engine/game/script/routines_effects.cpp
+    src/engine/game/script/routines_events.cpp
+    src/engine/game/script/routines_faction.cpp
+    src/engine/game/script/routines_items.cpp
+    src/engine/game/script/routines_kotor.cpp
+    src/engine/game/script/routines_locations.cpp
+    src/engine/game/script/routines_math.cpp
+    src/engine/game/script/routines_objects.cpp
+    src/engine/game/script/routines_party.cpp
+    src/engine/game/script/routines_perception.cpp
+    src/engine/game/script/routines_stealth.cpp
+    src/engine/game/script/routines_strings.cpp
+    src/engine/game/script/routines_time.cpp
+    src/engine/game/script/routines_tsl.cpp
+    src/engine/game/script/routines_vars.cpp
+    src/engine/game/script/runutil.cpp
+    src/engine/game/soundsets.cpp
+    src/engine/game/surfaces.cpp)
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -647,11 +647,11 @@ set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY
 ## reone executable
 
 set(REONE_HEADERS
-    src/program.h)
+    src/engine/program.h)
 
 set(REONE_SOURCES
-    src/main.cpp
-    src/program.cpp)
+    src/engine/main.cpp
+    src/engine/program.cpp)
 
 if(WIN32)
     list(APPEND REONE_SOURCES res/reone.rc)
@@ -681,23 +681,23 @@ endif()
 
 if(BUILD_TOOLS)
     set(TOOLS_HEADERS
-        tools/program.h
-        tools/tools.h
-        tools/types.h)
+        src/tools/program.h
+        src/tools/tools.h
+        src/tools/types.h)
 
     set(TOOLS_SOURCES
-        tools/2datool.cpp
-        tools/audiotool.cpp
-        tools/erftool.cpp
-        tools/gfftool.cpp
-        tools/keybiftool.cpp
-        tools/liptool.cpp
-        tools/main.cpp
-        tools/program.cpp
-        tools/pthtool.cpp
-        tools/rimtool.cpp
-        tools/tlktool.cpp
-        tools/tpctool.cpp)
+        src/tools/2datool.cpp
+        src/tools/audiotool.cpp
+        src/tools/erftool.cpp
+        src/tools/gfftool.cpp
+        src/tools/keybiftool.cpp
+        src/tools/liptool.cpp
+        src/tools/main.cpp
+        src/tools/program.cpp
+        src/tools/pthtool.cpp
+        src/tools/rimtool.cpp
+        src/tools/tlktool.cpp
+        src/tools/tpctool.cpp)
 
     add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
     set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -723,12 +723,12 @@ endif()
 if(BUILD_LAUNCHER)
     if(wxWidgets_FOUND)
         set(LAUNCHER_HEADERS
-            launcher/app.h
-            launcher/frame.h)
+            src/launcher/app.h
+            src/launcher/frame.h)
 
         set(LAUNCHER_SOURCES
-            launcher/app.cpp
-            launcher/frame.cpp)
+            src/launcher/app.cpp
+            src/launcher/frame.cpp)
 
         if(WIN32)
             list(APPEND LAUNCHER_SOURCES res/reone.rc)
@@ -753,7 +753,7 @@ endif()
 
 if(BUILD_TESTS)
     enable_testing()
-    file(GLOB TEST_FILES "tests/*.cpp")
+    file(GLOB TEST_FILES "src/tests/*.cpp")
     foreach(TEST_FILE ${TEST_FILES})
         get_filename_component(TEST_NAME "${TEST_FILE}" NAME_WE)
         add_executable(test_${TEST_NAME} ${TEST_FILE})

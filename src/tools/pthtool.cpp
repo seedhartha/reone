@@ -25,9 +25,9 @@
 
 #include "glm/vec3.hpp"
 
-#include "../src/common/streamutil.h"
-#include "../src/resource/format/gffreader.h"
-#include "../src/resource/format/gffwriter.h"
+#include "../engine/common/streamutil.h"
+#include "../engine/resource/format/gffreader.h"
+#include "../engine/resource/format/gffwriter.h"
 
 using namespace std;
 

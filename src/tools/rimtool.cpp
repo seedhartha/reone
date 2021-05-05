@@ -19,8 +19,8 @@
 
 #include <iostream>
 
-#include "../src/resource/format/rimwriter.h"
-#include "../src/resource/typeutil.h"
+#include "../engine/resource/format/rimwriter.h"
+#include "../engine/resource/typeutil.h"
 
 using namespace std;
 

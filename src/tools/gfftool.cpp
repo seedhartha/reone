@@ -23,9 +23,9 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../src/resource/format/gffreader.h"
-#include "../src/resource/format/gffwriter.h"
-#include "../src/resource/typeutil.h"
+#include "../engine/resource/format/gffreader.h"
+#include "../engine/resource/format/gffwriter.h"
+#include "../engine/resource/typeutil.h"
 
 using namespace std;
 

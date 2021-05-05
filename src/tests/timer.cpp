@@ -15,27 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <stdexcept>
+#define BOOST_TEST_MODULE timer
 
-#include "../src/common/log.h"
+#include <boost/test/included/unit_test.hpp>
 
-#include "program.h"
+#include "../engine/common/timer.h"
 
 using namespace std;
 
 using namespace reone;
 
-int main(int argc, char **argv) {
-    try {
-        return tools::Program(argc, argv).run();
-    }
-    catch (const exception &ex) {
-        try {
-            error(ex.what());
-        }
-        catch (...) {
-        }
+BOOST_AUTO_TEST_CASE(test_timer_times_out) {
+    Timer timer(1.0f);
 
-        return 1;
-    }
+    timer.advance(0.5f);
+
+    BOOST_TEST(!timer.isTimedOut());
+
+    timer.advance(0.6f);
+
+    BOOST_TEST(timer.isTimedOut());
 }

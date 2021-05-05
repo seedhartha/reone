@@ -19,11 +19,11 @@
 
 #include <boost/filesystem/path.hpp>
 
-#include "../src/resource/format/2dareader.h"
-#include "../src/resource/format/bifreader.h"
-#include "../src/resource/format/erfreader.h"
-#include "../src/resource/format/keyreader.h"
-#include "../src/resource/format/rimreader.h"
+#include "../engine/resource/format/2dareader.h"
+#include "../engine/resource/format/bifreader.h"
+#include "../engine/resource/format/erfreader.h"
+#include "../engine/resource/format/keyreader.h"
+#include "../engine/resource/format/rimreader.h"
 
 #include "types.h"
 
