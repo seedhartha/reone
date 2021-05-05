@@ -210,7 +210,7 @@ static bool isLightingEnabledByUsage(ModelUsage usage) {
 }
 
 bool ModelNodeSceneNode::isSelfIlluminated() const {
-    return glm::dot(_selfIllumColor, _selfIllumColor) > 0.0f;
+    return !_textures.lightmap && glm::dot(_selfIllumColor, _selfIllumColor) > 0.0f;
 }
 
 static bool isReceivingShadows(const ModelSceneNode &model, const ModelNodeSceneNode &modelNode) {
