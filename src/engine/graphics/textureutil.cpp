@@ -51,6 +51,9 @@ Texture::Properties getTextureProperties(TextureUsage usage, bool headless) {
         properties.maxFilter = Texture::Filtering::Nearest;
         properties.wrap = Texture::Wrapping::ClampToBorder;
         properties.borderColor = glm::vec4(1.0f);
+
+    } else if (usage == TextureUsage::Bumpmap) {
+        properties.minFilter = Texture::Filtering::Linear;
     }
 
     if (usage == TextureUsage::CubeMapDefault ||
