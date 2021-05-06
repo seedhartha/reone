@@ -27,7 +27,7 @@
 #include "image/tgareader.h"
 #include "image/tpcreader.h"
 #include "image/txireader.h"
-#include "stateutil.h"
+#include "statemanager.h"
 #include "textureutil.h"
 #include "types.h"
 
@@ -63,34 +63,34 @@ void Textures::invalidateCache() {
 }
 
 void Textures::bindDefaults() {
-    setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
     _default->bind();
 
-    setActiveTextureUnit(TextureUnits::lightmap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::lightmap);
     _default->bind();
 
-    setActiveTextureUnit(TextureUnits::envmap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::envmap);
     _defaultCubemap->bind();
 
-    setActiveTextureUnit(TextureUnits::bumpmap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::bumpmap);
     _default->bind();
 
-    setActiveTextureUnit(TextureUnits::bloom);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::bloom);
     _default->bind();
 
-    setActiveTextureUnit(TextureUnits::irradianceMap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::irradianceMap);
     _defaultCubemap->bind();
 
-    setActiveTextureUnit(TextureUnits::prefilterMap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::prefilterMap);
     _defaultCubemap->bind();
 
-    setActiveTextureUnit(TextureUnits::brdfLookup);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::brdfLookup);
     _default->bind();
 
-    setActiveTextureUnit(TextureUnits::shadowMap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::shadowMap);
     _default->bind();
 
-    setActiveTextureUnit(TextureUnits::cubeShadowMap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::cubeShadowMap);
     _defaultCubemap->bind();
 }
 

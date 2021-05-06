@@ -28,7 +28,7 @@
 #include "../graphics/window.h"
 
 #include "shaders.h"
-#include "stateutil.h"
+#include "statemanager.h"
 
 using namespace std;
 
@@ -65,7 +65,7 @@ void Font::load(const shared_ptr<Texture> &texture) {
 void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &color, TextGravity gravity) {
     if (text.empty()) return;
 
-    setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
     _texture->bind();
 
     glm::vec3 textOffset(getTextOffset(text, gravity), 0.0f);

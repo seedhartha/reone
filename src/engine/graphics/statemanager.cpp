@@ -15,10 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "stateutil.h"
+#include "statemanager.h"
 
 #include "GL/glew.h"
-
 #include "SDL2/SDL_opengl.h"
 
 using namespace std;
@@ -27,13 +26,18 @@ namespace reone {
 
 namespace graphics {
 
-void withWireframes(const function<void()> &block) {
+StateManager &StateManager::instance() {
+    static StateManager instance;
+    return instance;
+}
+
+void StateManager::withWireframes(const function<void()> &block) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     block();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void withViewport(const glm::ivec4 &viewport, const function<void()> &block) {
+void StateManager::withViewport(const glm::ivec4 &viewport, const function<void()> &block) {
     int oldViewport[4];
     glGetIntegerv(GL_VIEWPORT, &oldViewport[0]);
     glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
@@ -43,7 +47,7 @@ void withViewport(const glm::ivec4 &viewport, const function<void()> &block) {
     glViewport(oldViewport[0], oldViewport[1], oldViewport[2], oldViewport[3]);
 }
 
-void withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
+void StateManager::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
     glEnable(GL_SCISSOR_TEST);
     glScissor(bounds[0], bounds[1], bounds[2], bounds[3]);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -53,10 +57,21 @@ void withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
     glDisable(GL_SCISSOR_TEST);
 }
 
-void withDepthTest(const function<void()> &block) {
-    glEnable(GL_DEPTH_TEST);
+void StateManager::withDepthTest(const function<void()> &block) {
+    setDepthTestEnabled(true);
     block();
-    glDisable(GL_DEPTH_TEST);
+    setDepthTestEnabled(false);
+}
+
+void StateManager::setDepthTestEnabled(bool enabled) {
+    if (_depthTestEnabled != enabled) {
+        if (enabled) {
+            glEnable(GL_DEPTH_TEST);
+        } else {
+            glDisable(GL_DEPTH_TEST);
+        }
+        _depthTestEnabled = enabled;
+    }
 }
 
 static void withBlending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha, const function<void()> &block) {
@@ -72,18 +87,21 @@ static void withBlending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlp
     glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
 }
 
-void withAdditiveBlending(const function<void()> &block) {
+void StateManager::withAdditiveBlending(const function<void()> &block) {
     withBlending(GL_SRC_ALPHA, GL_ONE, GL_SRC_ALPHA, GL_ONE, block);
 }
 
-void withBackFaceCulling(const function<void()> &block) {
+void StateManager::withBackFaceCulling(const function<void()> &block) {
     glEnable(GL_CULL_FACE);
     block();
     glDisable(GL_CULL_FACE);
 }
 
-void setActiveTextureUnit(int n) {
-    glActiveTexture(GL_TEXTURE0 + n);
+void StateManager::setActiveTextureUnit(int n) {
+    if (_textureUnit != n) {
+        glActiveTexture(GL_TEXTURE0 + n);
+        _textureUnit = n;
+    }
 }
 
 } // namespace graphics
