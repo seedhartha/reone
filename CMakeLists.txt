@@ -230,6 +230,7 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/pixelutil.cpp
     src/engine/graphics/renderbuffer.cpp
     src/engine/graphics/shaders.cpp
+    src/engine/graphics/shaders_glsl.cpp
     src/engine/graphics/stateutil.cpp
     src/engine/graphics/texture.cpp
     src/engine/graphics/textures.cpp
