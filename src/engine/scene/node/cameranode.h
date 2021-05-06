@@ -25,8 +25,6 @@ namespace reone {
 
 namespace scene {
 
-const int kNumFrustumPlanes = 6;
-
 class CameraSceneNode : public SceneNode {
 public:
     CameraSceneNode(SceneGraph *sceneGraph, glm::mat4 projection, float aspect, float nearPlane, float farPlane);
@@ -45,10 +43,20 @@ public:
 private:
     glm::mat4 _projection { 1.0f };
     glm::mat4 _view { 1.0f };
-    glm::vec4 _frustumPlanes[kNumFrustumPlanes];
     float _aspect { 1.0f };
     float _nearPlane { 0.0f };
     float _farPlane { 0.0f };
+
+    // Frustum planes
+
+    glm::vec4 _frustumLeft { 0.0f };
+    glm::vec4 _frustumRight { 0.0f };
+    glm::vec4 _frustumBottom { 0.0f };
+    glm::vec4 _frustumTop { 0.0f };
+    glm::vec4 _frustumNear { 0.0f };
+    glm::vec4 _frustumFar { 0.0f };
+
+    // END Frustum planes
 
     void updateAbsoluteTransform() override;
 
