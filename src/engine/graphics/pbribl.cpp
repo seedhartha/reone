@@ -25,7 +25,7 @@
 #include "meshes.h"
 #include "renderbuffer.h"
 #include "shaders.h"
-#include "stateutil.h"
+#include "statemanager.h"
 #include "texture.h"
 #include "textureutil.h"
 
@@ -111,10 +111,10 @@ shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
 
     _irradianceFB.bind();
 
-    setActiveTextureUnit(TextureUnits::envmap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::envmap);
     envmap->bind();
 
-    withViewport(viewport, [&]() {
+    StateManager::instance().withViewport(viewport, [&]() {
         for (int i = 0; i < kNumCubeFaces; ++i) {
             _irradianceFB.attachCubeMapFaceAsColor(*irradianceColor, static_cast<CubeMapFace>(i));
             _irradianceFB.attachDepth(*irradianceDepth);
@@ -148,7 +148,7 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
 
     _prefilterFB.bind();
 
-    setActiveTextureUnit(TextureUnits::envmap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::envmap);
     envmap->bind();
 
     for (int mip = 0; mip < kNumPrefilterMipMaps; ++mip) {
@@ -157,7 +157,7 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
 
         for (int face = 0; face < kNumCubeFaces; ++face) {
             glm::ivec4 viewport(0, 0, mipWidth, mipHeight);
-            withViewport(viewport, [&]() {
+            StateManager::instance().withViewport(viewport, [&]() {
                 _prefilterFB.attachCubeMapFaceAsColor(*prefilterColor, static_cast<CubeMapFace>(face), 0, mip);
                 _prefilterFB.attachDepth(*prefilterDepth);
                 _prefilterFB.checkCompleteness();
@@ -197,7 +197,7 @@ shared_ptr<Texture> PBRIBL::computeBRDFLookup(const Texture *envmap) {
     _brdfLookupFB.attachDepth(*brdfLookupDepth);
     _brdfLookupFB.checkCompleteness();
 
-    withViewport(viewport, [&]() {
+    StateManager::instance().withViewport(viewport, [&]() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         Shaders::instance().activate(ShaderProgram::SimpleBRDF, Shaders::instance().defaultUniforms());
         Meshes::instance().getQuadNDC()->draw();

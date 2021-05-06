@@ -21,7 +21,7 @@
 
 #include "../../graphics/meshes.h"
 #include "../../graphics/shaders.h"
-#include "../../graphics/stateutil.h"
+#include "../../graphics/statemanager.h"
 #include "../../graphics/window.h"
 
 #include "../scenegraph.h"
@@ -45,7 +45,7 @@ void LightSceneNode::drawLensFlares(const LensFlare &flare) {
     shared_ptr<CameraSceneNode> camera(_sceneGraph->activeCamera());
     if (!camera) return;
 
-    setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
     flare.texture->bind();
 
     glm::vec4 lightPos(_absoluteTransform[3]);
@@ -74,7 +74,7 @@ void LightSceneNode::drawLensFlares(const LensFlare &flare) {
 
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    withAdditiveBlending([]() {
+    StateManager::instance().withAdditiveBlending([]() {
         Meshes::instance().getBillboard()->draw();
     });
 }

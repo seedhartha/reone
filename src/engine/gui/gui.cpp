@@ -22,7 +22,7 @@
 #include "../common/log.h"
 #include "../graphics/meshes.h"
 #include "../graphics/shaders.h"
-#include "../graphics/stateutil.h"
+#include "../graphics/statemanager.h"
 #include "../graphics/textures.h"
 #include "../graphics/window.h"
 #include "../resource/resources.h"
@@ -250,7 +250,7 @@ void GUI::draw3D() {
 }
 
 void GUI::drawBackground() {
-    setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
     _background->bind();
 
     glm::mat4 transform(1.0f);

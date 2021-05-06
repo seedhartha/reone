@@ -28,7 +28,7 @@
 #include "../../graphics/materials.h"
 #include "../../graphics/pbribl.h"
 #include "../../graphics/shaders.h"
-#include "../../graphics/stateutil.h"
+#include "../../graphics/statemanager.h"
 #include "../../graphics/textures.h"
 
 #include "../scenegraph.h"
@@ -362,36 +362,36 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
     // Setup textures
 
     if (_textures.diffuse) {
-        setActiveTextureUnit(TextureUnits::diffuse);
+        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
         _textures.diffuse->bind();
         additive = _textures.diffuse->isAdditive();
     }
     if (_textures.lightmap) {
-        setActiveTextureUnit(TextureUnits::lightmap);
+        StateManager::instance().setActiveTextureUnit(TextureUnits::lightmap);
         _textures.lightmap->bind();
     }
     if (_textures.envmap) {
-        setActiveTextureUnit(TextureUnits::envmap);
+        StateManager::instance().setActiveTextureUnit(TextureUnits::envmap);
         _textures.envmap->bind();
 
         PBRIBL::Derived derived;
         if (PBRIBL::instance().getDerived(_textures.envmap.get(), derived)) {
-            setActiveTextureUnit(TextureUnits::irradianceMap);
+            StateManager::instance().setActiveTextureUnit(TextureUnits::irradianceMap);
             derived.irradianceMap->bind();
-            setActiveTextureUnit(TextureUnits::prefilterMap);
+            StateManager::instance().setActiveTextureUnit(TextureUnits::prefilterMap);
             derived.prefilterMap->bind();
-            setActiveTextureUnit(TextureUnits::brdfLookup);
+            StateManager::instance().setActiveTextureUnit(TextureUnits::brdfLookup);
             derived.brdfLookup->bind();
         }
     }
     if (_textures.bumpmap) {
-        setActiveTextureUnit(TextureUnits::bumpmap);
+        StateManager::instance().setActiveTextureUnit(TextureUnits::bumpmap);
         _textures.bumpmap->bind();
     }
 
 
     if (additive) {
-        withAdditiveBlending([&mesh]() { mesh->draw(); });
+        StateManager::instance().withAdditiveBlending([&mesh]() { mesh->draw(); });
     } else {
         mesh->draw();
     }

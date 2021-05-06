@@ -25,7 +25,7 @@
 #include "../../graphics/fonts.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/shaders.h"
-#include "../../graphics/stateutil.h"
+#include "../../graphics/statemanager.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/textutil.h"
 #include "../../graphics/window.h"
@@ -265,12 +265,12 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
         }
 
-        setActiveTextureUnit(TextureUnits::diffuse);
+        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
         border.fill->bind();
 
         bool additive = border.fill->isAdditive();
         if (additive) {
-            withAdditiveBlending([]() {
+            StateManager::instance().withAdditiveBlending([]() {
                 Meshes::instance().getQuad()->draw();
             });
         } else {
@@ -281,7 +281,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int width = size.x - 2 * border.dimension;
         int height = size.y - 2 * border.dimension;
 
-        setActiveTextureUnit(TextureUnits::diffuse);
+        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
         border.edge->bind();
 
         if (height > 0.0f) {
@@ -358,7 +358,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int x = _extent.left + offset.x;
         int y = _extent.top + offset.y;
 
-        setActiveTextureUnit(TextureUnits::diffuse);
+        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
         border.corner->bind();
 
         // Top left corner

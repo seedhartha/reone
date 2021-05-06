@@ -26,7 +26,7 @@
 
 #include "../graphics/meshes.h"
 #include "../graphics/shaders.h"
-#include "../graphics/stateutil.h"
+#include "../graphics/statemanager.h"
 #include "../graphics/textureutil.h"
 
 using namespace std;
@@ -74,7 +74,7 @@ void Video::updateFrame(float dt) {
 void Video::updateFrameTexture() {
     if (!_frame) return;
 
-    setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
     _texture->bind();
     _texture->setPixels(_width, _height, PixelFormat::RGB, _frame->pixels);
 }
@@ -82,7 +82,7 @@ void Video::updateFrameTexture() {
 void Video::draw() {
     if (!_inited) return;
 
-    setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
     _texture->bind();
 
     ShaderUniforms uniforms;

@@ -17,11 +17,9 @@
 
 #pragma once
 
-/** @file
- * Wrapper functions to toggle OpenGL state.
- */
-
 #include <functional>
+
+#include <boost/noncopyable.hpp>
 
 #include "glm/vec4.hpp"
 
@@ -29,14 +27,27 @@ namespace reone {
 
 namespace graphics {
 
-void withWireframes(const std::function<void()> &block);
-void withViewport(const glm::ivec4 &viewport, const std::function<void()> &block);
-void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
-void withDepthTest(const std::function<void()> &block);
-void withAdditiveBlending(const std::function<void()> &block);
-void withBackFaceCulling(const std::function<void()> &block);
+class StateManager : boost::noncopyable {
+public:
+    static StateManager &instance();
 
-void setActiveTextureUnit(int n);
+    void withWireframes(const std::function<void()> &block);
+    void withViewport(const glm::ivec4 &viewport, const std::function<void()> &block);
+    void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
+    void withDepthTest(const std::function<void()> &block);
+    void withAdditiveBlending(const std::function<void()> &block);
+    void withBackFaceCulling(const std::function<void()> &block);
+
+    void setActiveTextureUnit(int n);
+
+private:
+    int _textureUnit { 0 };
+    bool _depthTestEnabled { false };
+    uint32_t _polygonMode { 0 };
+
+    void setDepthTestEnabled(bool enabled);
+};
+
 
 } // namespace graphics
 
