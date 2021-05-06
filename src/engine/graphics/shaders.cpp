@@ -937,9 +937,6 @@ void main() {
         vec3 S = vec3(1.0) - max(vec3(0.0), vec3(getShadow()) - uGeneral.ambientColor.rgb);
         objectColor *= S;
     }
-    if (isFeatureEnabled(FEATURE_FOG)) {
-        objectColor = applyFog(objectColor, length(cameraToFragment));
-    }
 
     float objectAlpha = uGeneral.alpha;
     if (!isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_BUMPMAPS)) {
@@ -955,6 +952,9 @@ void main() {
         objectColor = vec3(1.0) - exp(-objectColor * uGeneral.exposure);
         // gamma correct
         objectColor = pow(objectColor, vec3(1.0 / GAMMA));
+    }
+    if (isFeatureEnabled(FEATURE_FOG)) {
+        objectColor = applyFog(objectColor, length(cameraToFragment));
     }
 
     vec3 brightColor = vec3(0.0);
