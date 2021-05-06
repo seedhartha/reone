@@ -44,8 +44,6 @@ Placeable::Placeable(
     SceneGraph *sceneGraph
 ) :
     SpatialObject(id, ObjectType::Placeable, objectFactory, sceneGraph) {
-
-    _drawDistance = 64.0f;
 }
 
 void Placeable::loadFromGIT(const GffStruct &gffs) {
@@ -65,6 +63,8 @@ void Placeable::loadFromBlueprint(const string &resRef) {
     string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
     auto model = make_shared<ModelSceneNode>(ModelUsage::Placeable, Models::instance().get(modelName), _sceneGraph);
+    model->setCullable(true);
+    model->setDrawDistance(64.0f);
     _sceneNode = move(model);
 
     _walkmesh = Walkmeshes::instance().get(modelName, ResourceType::Pwk);

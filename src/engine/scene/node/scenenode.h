@@ -32,6 +32,8 @@ namespace reone {
 
 namespace scene {
 
+constexpr int kDefaultDrawDistance = 1024.0f;
+
 class SceneGraph;
 
 class SceneNode : boost::noncopyable {
@@ -45,11 +47,9 @@ public:
 
     bool isVisible() const { return _visible; }
     virtual bool isTransparent() const { return _transparent; }
-
-    /**
-     * @return true if this scene node has a bounding box, false if it is a point
-     */
     bool isVolumetric() const { return _volumetric; }
+    bool isCullable() const { return _cullable; }
+    bool isCulled() const { return _culled; }
 
     virtual glm::vec3 getOrigin() const;
 
@@ -80,28 +80,44 @@ public:
     const glm::mat4 &absoluteTransformInverse() const { return _absoluteTransformInv; }
     const graphics::AABB &aabb() const { return _aabb; }
     const std::vector<std::shared_ptr<SceneNode>> &children() const { return _children; }
+    float drawDistance() const { return _drawDistance; }
 
     void setParent(const SceneNode *parent);
     virtual void setLocalTransform(const glm::mat4 &transform);
     void setPosition(glm::vec3 position);
     virtual void setVisible(bool visible);
     void setTransparent(bool transparent);
+    void setDrawDistance(float distance) { _drawDistance = distance; }
+    void setCullable(bool cullable) { _cullable = cullable; }
+    void setCulled(bool culled) { _culled = culled; }
 
 protected:
     SceneNodeType _type;
     SceneGraph *_sceneGraph;
 
+    graphics::AABB _aabb;
+    float _drawDistance { kDefaultDrawDistance };
+
+    bool _visible { true };
+    bool _transparent { false };
+    bool _volumetric { false }; /**< does this model have a bounding box, or is it a point? */
+    bool _cullable { false }; /**< can this model be frustum- or distance-culled? */
+    bool _culled { false }; /**< has this model been frustum- or distance-culled? */
+
+    // Relations
+
     const SceneNode *_parent { nullptr };
     std::vector<std::shared_ptr<SceneNode>> _children;
+
+    // END Relations
+
+    // Transformation matrices
 
     glm::mat4 _localTransform { 1.0f };
     glm::mat4 _absoluteTransform { 1.0f };
     glm::mat4 _absoluteTransformInv { 1.0f };
-    graphics::AABB _aabb;
 
-    bool _visible { true };
-    bool _transparent { false };
-    bool _volumetric { false };
+    // END Transformation matrices
 
     SceneNode(SceneNodeType type, SceneGraph *sceneGraph);
 

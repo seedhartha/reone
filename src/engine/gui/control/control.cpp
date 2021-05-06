@@ -224,7 +224,6 @@ bool Control::handleClick(int x, int y) {
 void Control::update(float dt) {
     if (_scene) {
         _scene->update(dt);
-        _scene->prepareFrame();
     }
 }
 

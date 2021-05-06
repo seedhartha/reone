@@ -45,7 +45,6 @@ Door::Door(
     SceneGraph *sceneGraph
 ) :
     SpatialObject(id, ObjectType::Door, objectFactory, sceneGraph) {
-    _drawDistance = FLT_MAX;
 }
 
 void Door::loadFromGIT(const GffStruct &gffs) {
@@ -70,6 +69,8 @@ void Door::loadFromBlueprint(const string &resRef) {
     string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
     auto model = make_unique<ModelSceneNode>(ModelUsage::Door, Models::instance().get(modelName), _sceneGraph);
+    model->setCullable(true);
+    model->setDrawDistance(FLT_MAX);
     _sceneNode = move(model);
 
     _closedWalkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::Dwk);

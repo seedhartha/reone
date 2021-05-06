@@ -635,7 +635,7 @@ static glm::vec3 getRandomPointInTriangle(const Walkmesh::Face &face) {
 }
 
 void Area::fill(SceneGraph &sceneGraph) {
-    sceneGraph.clear();
+    sceneGraph.clearRoots();
 
     // Area properties
 
@@ -795,46 +795,6 @@ void Area::update3rdPersonCameraTarget() {
 void Area::updateVisibility() {
     if (_game->cameraType() != CameraType::ThirdPerson) {
         updateRoomVisibility();
-    }
-    cullObjects();
-}
-
-void Area::cullObjects() {
-    static glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
-
-    Camera *camera = _game->getActiveCamera();
-    if (!camera) return;
-
-    shared_ptr<CameraSceneNode> cameraNode(camera->sceneNode());
-
-    for (auto &object : _objects) {
-        if (!object->visible()) continue;
-
-        shared_ptr<ModelSceneNode> model(object->getModelSceneNode());
-        if (!model) continue;
-
-        bool culledOut = false;
-
-        // Stunts must never be culled out
-        if (!object->isStuntMode()) {
-            glm::vec3 objectCenter(model->getCenterOfAABB());
-            glm::vec3 cameraPosition(cameraNode->absoluteTransform()[3]);
-            float distanceToCamera2 = glm::distance2(objectCenter, cameraPosition);
-            float drawDistance2 = object->drawDistance() * object->drawDistance();
-
-            // Draw distance culling
-            if (distanceToCamera2 > drawDistance2) {
-                culledOut = true;
-            } else {
-                // Frustum culling
-                AABB aabb(model->aabb() * model->absoluteTransform());
-                if (!cameraNode->isInFrustum(aabb)) {
-                    culledOut = true;
-                }
-            }
-        }
-
-        model->setCulledOut(culledOut);
     }
 }
 

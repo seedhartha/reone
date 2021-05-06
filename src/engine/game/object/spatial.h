@@ -37,8 +37,6 @@ namespace reone {
 
 namespace game {
 
-constexpr float kDefaultDrawDistance = 1024.0f;
-
 class Item;
 class ObjectFactory;
 class Room;
@@ -78,7 +76,6 @@ public:
     const glm::mat4 &transform() const { return _transform; }
     bool visible() const { return _visible; }
     std::shared_ptr<scene::SceneNode> sceneNode() const { return _sceneNode; }
-    float drawDistance() const { return _drawDistance; }
 
     void setRoom(Room *room);
     void setPosition(const glm::vec3 &position);
@@ -143,7 +140,6 @@ protected:
     glm::mat4 _transform { 1.0f };
     bool _visible { true };
     std::shared_ptr<scene::SceneNode> _sceneNode;
-    float _drawDistance { kDefaultDrawDistance };
     Room *_room { nullptr };
     std::vector<std::shared_ptr<Item>> _items;
     std::deque<AppliedEffect> _effects;

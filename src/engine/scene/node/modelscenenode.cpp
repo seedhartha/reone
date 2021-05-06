@@ -165,7 +165,7 @@ unique_ptr<ModelNodeSceneNode> ModelSceneNode::getModelNodeSceneNode(ModelNode &
 }
 
 void ModelSceneNode::update(float dt) {
-    _animator.update(dt, _visible && !_culledOut);
+    _animator.update(dt, !_culled);
     SceneNode::update(dt);
 }
 
@@ -315,14 +315,6 @@ void ModelSceneNode::setVisible(bool visible) {
     }
     if (visible) {
         _lightingDirty = true;
-    }
-}
-
-void ModelSceneNode::setCulledOut(bool culled) {
-    _culledOut = culled;
-
-    for (auto &attached : _attachedModels) {
-        attached.second->setCulledOut(culled);
     }
 }
 
