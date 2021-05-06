@@ -974,7 +974,7 @@ void main() {
     vec4 diffuseSample = texture(uDiffuse, texCoords);
 
     fragColor = vec4(uParticles[fragInstanceID].color.rgb * diffuseSample.rgb, uParticles[fragInstanceID].alpha * diffuseSample.a);
-    fragColorBright = vec4(vec3(0.0), 1.0);
+    fragColorBright = vec4(vec3(0.0), 0.0);
 }
 )END";
 
