@@ -290,6 +290,7 @@ void SceneNodeAnimator::playAnimation(shared_ptr<Animation> anim, AnimationPrope
                     _transition = true;
                 } else {
                     _channels[0].reset(anim, properties, lipAnim);
+                    _transition = false;
                 }
             }
             break;

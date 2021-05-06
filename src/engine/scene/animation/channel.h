@@ -81,6 +81,7 @@ public:
 
     float getTransitionTime() const;
     bool getSceneNodeStateByNumber(uint16_t nodeNumber, SceneNodeState &state) const;
+    std::string getAnimationName() const;
 
     float time() const { return _time; }
 

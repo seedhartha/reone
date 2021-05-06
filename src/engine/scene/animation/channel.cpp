@@ -225,6 +225,10 @@ bool AnimationChannel::getSceneNodeStateByNumber(uint16_t nodeNumber, SceneNodeS
     return false;
 }
 
+string AnimationChannel::getAnimationName() const {
+    return _animation ? _animation->name() : "";
+}
+
 void AnimationChannel::setTime(float time) {
     _time = time;
 }
