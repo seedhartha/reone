@@ -74,7 +74,7 @@ void StateManager::setDepthTestEnabled(bool enabled) {
     }
 }
 
-static void withBlending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha, const function<void()> &block) {
+static void withBlendFunc(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha, const function<void()> &block) {
     GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
     glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcRgb);
     glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcAlpha);
@@ -88,7 +88,22 @@ static void withBlending(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlp
 }
 
 void StateManager::withAdditiveBlending(const function<void()> &block) {
-    withBlending(GL_SRC_ALPHA, GL_ONE, GL_SRC_ALPHA, GL_ONE, block);
+    withBlendFunc(GL_SRC_ALPHA, GL_ONE, GL_SRC_ALPHA, GL_ONE, block);
+}
+
+static void withBlendEquation(GLenum modeRGB, GLenum modeAlpha, const function<void()> &block) {
+    GLint startModeRGB, startModeAlpha;
+    glGetIntegerv(GL_BLEND_EQUATION_RGB, &startModeRGB);
+    glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &startModeAlpha);
+    glBlendEquationSeparate(modeRGB, modeAlpha);
+
+    block();
+
+    glBlendEquationSeparate(startModeRGB, startModeAlpha);
+}
+
+void StateManager::withLightenBlending(const function<void()> &block) {
+    withBlendEquation(GL_MAX, GL_FUNC_ADD, block);
 }
 
 void StateManager::withBackFaceCulling(const function<void()> &block) {

@@ -163,7 +163,9 @@ void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
 
     bool lighten = _emitter->blendMode() == Emitter::BlendMode::Lighten;
     if (lighten) {
-        StateManager::instance().withAdditiveBlending([&particles]() { Meshes::instance().getBillboard()->drawInstanced(static_cast<int>(particles.size())); });
+        StateManager::instance().withLightenBlending([&particles]() {
+            Meshes::instance().getBillboard()->drawInstanced(static_cast<int>(particles.size()));
+        });
     } else {
         Meshes::instance().getBillboard()->drawInstanced(static_cast<int>(particles.size()));
     }
