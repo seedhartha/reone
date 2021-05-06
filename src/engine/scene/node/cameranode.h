@@ -31,6 +31,7 @@ public:
 
     bool isInFrustum(const glm::vec3 &point) const;
     bool isInFrustum(const graphics::AABB &aabb) const;
+    bool isInFrustum(const SceneNode &other) const;
 
     const glm::mat4 &projection() const { return _projection; }
     const glm::mat4 &view() const { return _view; }

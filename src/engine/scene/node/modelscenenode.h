@@ -54,8 +54,6 @@ public:
     void signalEvent(const std::string &name);
     void setAppliedForce(glm::vec3 force);
 
-    bool isCulledOut() const { return _culledOut; }
-
     ModelNodeSceneNode *getModelNode(const std::string &name) const;
     ModelNodeSceneNode *getModelNodeByIndex(int index) const;
     LightSceneNode *getLightNodeByNumber(uint16_t nodeNumber) const;
@@ -72,9 +70,7 @@ public:
     SceneNodeAnimator &animator() { return _animator; }
 
     void setVisible(bool visible) override;
-
     void setDiffuseTexture(const std::shared_ptr<graphics::Texture> &texture);
-    void setCulledOut(bool culled);
     void setAlpha(float alpha);
     void setProjectileSpeed(float speed);
     void setWalkmesh(std::shared_ptr<graphics::Walkmesh> walkmesh);
@@ -112,7 +108,6 @@ private:
     std::vector<std::shared_ptr<EmitterSceneNode>> _emitters;
     std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
     bool _visible { true };
-    bool _culledOut { false }; /**< determined to be outside of the view frustum */
     float _alpha { 1.0f };
     std::vector<LightSceneNode *> _lightsAffectedBy;
     bool _lightingDirty { true };

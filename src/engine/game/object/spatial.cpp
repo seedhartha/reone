@@ -298,6 +298,7 @@ void SpatialObject::die() {
 void SpatialObject::startStuntMode() {
     if (_sceneNode) {
         _sceneNode->setLocalTransform(glm::mat4(1.0f));
+        _sceneNode->setCullable(false);
     }
     _stunt = true;
 }
@@ -307,6 +308,7 @@ void SpatialObject::stopStuntMode() {
 
     if (_sceneNode) {
         _sceneNode->setLocalTransform(_transform);
+        _sceneNode->setCullable(true);
     }
     _stunt = false;
 }

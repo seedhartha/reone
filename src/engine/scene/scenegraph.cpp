@@ -41,12 +41,12 @@ static constexpr float kMaxGrassDistance = 16.0f;
 SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 }
 
-void SceneGraph::clear() {
+void SceneGraph::clearRoots() {
     _roots.clear();
 }
 
-void SceneGraph::addRoot(const shared_ptr<SceneNode> &node) {
-    _roots.push_back(node);
+void SceneGraph::addRoot(shared_ptr<SceneNode> node) {
+    _roots.push_back(move(node));
 }
 
 void SceneGraph::removeRoot(const shared_ptr<SceneNode> &node) {
@@ -56,22 +56,51 @@ void SceneGraph::removeRoot(const shared_ptr<SceneNode> &node) {
     }
 }
 
-void SceneGraph::prepareFrame() {
-    if (!_activeCamera) return;
+void SceneGraph::update(float dt) {
+    if (_updateRoots) {
+        for (auto &root : _roots) {
+            root->update(dt);
+        }
+    }
+    if (_activeCamera) {
+        cullRoots();
+        refreshNodeLists();
+        refreshShadowLight();
+        updateLighting();
+        updateShadows(dt);
+        prepareTransparentMeshes();
+        prepareParticles();
+        prepareGrass();
+    }
+}
 
-    refreshNodeLists();
-    refreshShadowLight();
+void SceneGraph::cullRoots() {
+    for (auto &root : _roots) {
+        bool culled =
+            !root->isVisible() ||
+            root->getDistanceTo2(*_activeCamera) > root->drawDistance() * root->drawDistance() ||
+            (root->isCullable() && !_activeCamera->isInFrustum(*root));
 
+        root->setCulled(culled);
+    }
+}
+
+void SceneGraph::updateLighting() {
+    // Associate each model node with light sources
     for (auto &root : _roots) {
         if (root->type() == SceneNodeType::Model) {
             static_pointer_cast<ModelSceneNode>(root)->updateLighting();
         }
     }
+}
 
-    prepareOpaqueMeshes();
-    prepareTransparentMeshes();
-    prepareParticles();
-    prepareGrass();
+void SceneGraph::updateShadows(float dt) {
+    // Gradually fade the shadow in and out
+    if (_shadowFading) {
+        _shadowStrength = glm::max(0.0f, _shadowStrength - dt);
+    } else {
+        _shadowStrength = glm::min(_shadowStrength + dt, 1.0f);
+    }
 }
 
 void SceneGraph::refreshNodeLists() {
@@ -88,11 +117,15 @@ void SceneGraph::refreshNodeLists() {
 }
 
 void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
+    bool propagate = true;
+
     switch (node->type()) {
         case SceneNodeType::Model: {
-            // Skip the model and its children if it is not currently visible
+            // Ignore models that have been culled
             auto model = static_pointer_cast<ModelSceneNode>(node);
-            if (!model->isVisible() || model->isCulledOut()) return;
+            if (model->isCulled()) {
+                propagate = false;
+            }
             break;
         }
         case SceneNodeType::ModelNode: {
@@ -124,8 +157,10 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
             break;
     }
 
-    for (auto &child : node->children()) {
-        refreshFromSceneNode(child);
+    if (propagate) {
+        for (auto &child : node->children()) {
+            refreshFromSceneNode(child);
+        }
     }
 }
 
@@ -160,20 +195,6 @@ void SceneGraph::refreshShadowLight() {
     } else {
         _shadowFading = true;
     }
-}
-
-void SceneGraph::prepareOpaqueMeshes() {
-    // Sort opaque meshes by distance to camera, so as to take advantage of early Z-test. Disabled due to performance degradation.
-    /*
-    glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
-    unordered_map<SceneNode *, float> meshToCamera;
-    for (auto &mesh : _opaqueMeshes) {
-        meshToCamera.insert(make_pair(mesh, mesh->getDistanceTo(cameraPosition)));
-    }
-    sort(_opaqueMeshes.begin(), _opaqueMeshes.end(), [&meshToCamera](auto &left, auto &right) {
-        return meshToCamera.find(left)->second > meshToCamera.find(right)->second;
-    });
-    */
 }
 
 void SceneGraph::prepareTransparentMeshes() {
@@ -272,20 +293,6 @@ void SceneGraph::prepareGrass() {
     }
 }
 
-void SceneGraph::update(float dt) {
-    if (!_update) return;
-
-    for (auto &root : _roots) {
-        root->update(dt);
-    }
-
-    if (_shadowFading) {
-        _shadowStrength = glm::max(0.0f, _shadowStrength - dt);
-    } else {
-        _shadowStrength = glm::min(_shadowStrength + dt, 1.0f);
-    }
-}
-
 void SceneGraph::draw(bool shadowPass) {
     if (!_activeCamera) return;
 
@@ -378,30 +385,6 @@ void SceneGraph::getLightsAt(
     if (lights.size() > count) {
         lights.erase(lights.begin() + count, lights.end());
     }
-}
-
-void SceneGraph::setActiveCamera(const shared_ptr<CameraSceneNode> &camera) {
-    _activeCamera = camera;
-}
-
-void SceneGraph::setShadowReference(const shared_ptr<SceneNode> &reference) {
-    _shadowReference = reference;
-}
-
-void SceneGraph::setUpdate(bool update) {
-    _update = update;
-}
-
-void SceneGraph::setAmbientLightColor(const glm::vec3 &color) {
-    _ambientLightColor = color;
-}
-
-void SceneGraph::setUniformsPrototype(ShaderUniforms &&uniforms) {
-    _uniformsPrototype = uniforms;
-}
-
-void SceneGraph::setExposure(float exposure) {
-    _exposure = exposure;
 }
 
 } // namespace scene

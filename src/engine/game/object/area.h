@@ -255,7 +255,6 @@ private:
     void updateHeartbeat(float dt);
 
     void updateRoomVisibility();
-    void cullObjects();
 
     /**
      * Certain VIS files in the original game have a bug: room A is visible from

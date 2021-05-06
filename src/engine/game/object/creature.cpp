@@ -65,8 +65,6 @@ Creature::Creature(
     SceneGraph *sceneGraph
 ) :
     SpatialObject(id, ObjectType::Creature, objectFactory, sceneGraph) {
-
-    _drawDistance = 32.0f;
 }
 
 void Creature::loadFromGIT(const GffStruct &gffs) {
@@ -117,6 +115,8 @@ void Creature::updateModel() {
     }
     shared_ptr<ModelSceneNode> model(buildModel());
     if (model) {
+        model->setCullable(true);
+        model->setDrawDistance(32.0f);
         _headModel = model->getAttachedModel(g_headHookNode);
         if (!_stunt) {
             model->setLocalTransform(_transform);

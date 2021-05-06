@@ -131,6 +131,9 @@ void WorldRenderPipeline::init() {
 }
 
 void WorldRenderPipeline::render() {
+    shared_ptr<CameraSceneNode> camera(_scene->activeCamera());
+    if (!camera) return;
+
     computeLightSpaceMatrices();
 
     StateManager::instance().withBackFaceCulling([this]() {
@@ -168,11 +171,8 @@ void WorldRenderPipeline::computeLightSpaceMatrices() {
     const LightSceneNode *shadowLight = _scene->shadowLight();
     if (!shadowLight) return;
 
-    shared_ptr<CameraSceneNode> camera(_scene->activeCamera());
-    if (!camera) return;
-
     glm::vec3 lightPosition(shadowLight->absoluteTransform()[3]);
-    glm::vec3 cameraPosition(camera->absoluteTransform()[3]);
+    glm::vec3 cameraPosition(_scene->activeCamera()->absoluteTransform()[3]);
 
     if (shadowLight->isDirectional()) {
         glm::mat4 projection(glm::ortho(-kOrthographicScale, kOrthographicScale, -kOrthographicScale, kOrthographicScale, kShadowNearPlane, kShadowFarPlane));

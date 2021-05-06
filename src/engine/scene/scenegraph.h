@@ -45,39 +45,46 @@ class ModelNodeSceneNode;
 class Particle;
 class SceneNode;
 
+/**
+ * Responsible for managing drawable objects and their relations.
+ *
+ * @see SceneNode
+ */
 class SceneGraph : boost::noncopyable {
 public:
     SceneGraph(const graphics::GraphicsOptions &opts);
 
-    void update(float dt);
-    void draw(bool shadowPass = false);
-
-    void clear();
-    void addRoot(const std::shared_ptr<SceneNode> &node);
-    void removeRoot(const std::shared_ptr<SceneNode> &node);
-
     /**
-     * Prepares this scene graph for rendering the next frame. Meshes, lights
-     * and particles are extracted from the root scene nodes and sorted by
-     * distance to camera. Lighting sources are selected for each model.
+     * Recursively update the state of this scene graph. Called prior to rendering a frame.
+     * This extracts drawable nodes from roots, culls and sorts objects, updates animation, lighting, shadows and etc.
      */
-    void prepareFrame();
+    void update(float dt);
+
+    void draw(bool shadowPass = false);
 
     const graphics::GraphicsOptions &options() const { return _opts; }
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
     graphics::ShaderUniforms uniformsPrototype() const { return _uniformsPrototype; }
     float exposure() const { return _exposure; }
 
-    void setActiveCamera(const std::shared_ptr<CameraSceneNode> &camera);
-    void setShadowReference(const std::shared_ptr<SceneNode> &reference);
-    void setUpdate(bool update);
-    void setUniformsPrototype(graphics::ShaderUniforms &&uniforms);
-    void setExposure(float exposure);
+    void setUpdateRoots(bool update) { _updateRoots = update; }
+    void setExposure(float exposure) { _exposure = exposure; }
+    void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
+    void setShadowReference(std::shared_ptr<SceneNode> reference) { _shadowReference = std::move(reference); }
+    void setUniformsPrototype(graphics::ShaderUniforms &&uniforms) { _uniformsPrototype = uniforms; }
+
+    // Roots
+
+    void clearRoots();
+    void addRoot(std::shared_ptr<SceneNode> node);
+    void removeRoot(const std::shared_ptr<SceneNode> &node);
+
+    // END Roots
 
     // Lights and shadows
 
     /**
-     * Fills lights vector with up to count lights, sorted by priority and
+     * Fill lights vector with up to count lights, sorted by priority and
      * proximity to the reference node.
      */
     void getLightsAt(
@@ -90,7 +97,7 @@ public:
     const LightSceneNode *shadowLight() const { return _shadowLight; }
     float shadowStrength() const { return _shadowStrength; }
 
-    void setAmbientLightColor(const glm::vec3 &color);
+    void setAmbientLightColor(glm::vec3 color) { _ambientLightColor = std::move(color); }
 
     // END Lights and shadows
 
@@ -126,7 +133,7 @@ private:
 
     glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
-    bool _update { true };
+    bool _updateRoots { true };
     graphics::ShaderUniforms _uniformsPrototype;
     float _exposure { kDefaultExposure };
 
@@ -148,11 +155,14 @@ private:
 
     // END Fog
 
+    void cullRoots();
+    void updateLighting();
+    void updateShadows(float dt);
+
     void refreshNodeLists();
     void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);
     void refreshShadowLight();
 
-    void prepareOpaqueMeshes();
     void prepareTransparentMeshes();
     void prepareParticles();
     void prepareGrass();
