@@ -264,7 +264,7 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
             }
         }
 
-        if (_textures.lightmap) {
+        if (_textures.lightmap && !isFeatureEnabled(Feature::DynamicRoomLighting)) {
             uniforms.combined.featureMask |= UniformFeatureFlags::lightmap;
         }
 
