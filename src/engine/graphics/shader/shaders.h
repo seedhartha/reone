@@ -46,7 +46,7 @@ enum class ShaderProgram {
     SimplePresentWorld,
     ModelColor,
     ModelBlinnPhong,
-    ModelBlinnPhongTextureless,
+    ModelBlinnPhongDiffuseless,
     ModelPBR,
     ParticleParticle,
     GrassGrass,
@@ -244,7 +244,7 @@ private:
 
         // Blinn-Phong
         FragmentBlinnPhong,
-        FragmentBlinnPhongTextureless,
+        FragmentBlinnPhongDiffuseless,
 
         // PBR
         FragmentIrradiance,

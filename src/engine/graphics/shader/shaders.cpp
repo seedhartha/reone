@@ -38,6 +38,7 @@ namespace graphics {
 
 extern char g_shaderBaseHeader[];
 extern char g_shaderBaseModel[];
+extern char g_shaderBaseBlinnPhong[];
 extern char g_shaderBasePBR[];
 extern char g_shaderBasePBRIBL[];
 extern char g_shaderVertexSimple[];
@@ -56,7 +57,7 @@ extern char g_shaderFragmentGrass[];
 extern char g_shaderFragmentBlur[];
 extern char g_shaderFragmentPresentWorld[];
 extern char g_shaderFragmentBlinnPhong[];
-extern char g_shaderFragmentBlinnPhongTextureless[];
+extern char g_shaderFragmentBlinnPhongDiffuseless[];
 extern char g_shaderFragmentIrradiance[];
 extern char g_shaderFragmentPrefilter[];
 extern char g_shaderFragmentBRDF[];
@@ -93,8 +94,8 @@ void Shaders::init() {
     initShader(ShaderName::FragmentGrass, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentGrass });
     initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentBlur });
     initShader(ShaderName::FragmentPresentWorld, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentPresentWorld });
-    initShader(ShaderName::FragmentBlinnPhong, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBaseModel, g_shaderFragmentBlinnPhong });
-    initShader(ShaderName::FragmentBlinnPhongTextureless, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBaseModel, g_shaderFragmentBlinnPhongTextureless });
+    initShader(ShaderName::FragmentBlinnPhong, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhong });
+    initShader(ShaderName::FragmentBlinnPhongDiffuseless, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhongDiffuseless });
     initShader(ShaderName::FragmentIrradiance, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentIrradiance });
     initShader(ShaderName::FragmentPrefilter, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBasePBR, g_shaderBasePBRIBL, g_shaderFragmentPrefilter });
     initShader(ShaderName::FragmentBRDF, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBasePBR, g_shaderBasePBRIBL, g_shaderFragmentBRDF });
@@ -110,7 +111,7 @@ void Shaders::init() {
     initProgram(ShaderProgram::SimplePresentWorld, { ShaderName::VertexSimple, ShaderName::FragmentPresentWorld });
     initProgram(ShaderProgram::ModelColor, { ShaderName::VertexModel, ShaderName::FragmentColor });
     initProgram(ShaderProgram::ModelBlinnPhong, { ShaderName::VertexModel, ShaderName::FragmentBlinnPhong });
-    initProgram(ShaderProgram::ModelBlinnPhongTextureless, { ShaderName::VertexModel, ShaderName::FragmentBlinnPhongTextureless });
+    initProgram(ShaderProgram::ModelBlinnPhongDiffuseless, { ShaderName::VertexModel, ShaderName::FragmentBlinnPhongDiffuseless });
     initProgram(ShaderProgram::ModelPBR, { ShaderName::VertexModel, ShaderName::FragmentPBR });
     initProgram(ShaderProgram::ParticleParticle, { ShaderName::VertexParticle, ShaderName::FragmentParticle });
     initProgram(ShaderProgram::GrassGrass, { ShaderName::VertexGrass, ShaderName::FragmentGrass });
