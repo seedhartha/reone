@@ -335,6 +335,15 @@ void main() {
         objectColor = ambient + (1.0 - shadow) * Lo;
     } else {
         objectColor = albedo * ao;
+
+        if (isFeatureEnabled(FEATURE_ENVMAP)) {
+            vec3 R = reflect(-V, N);
+            vec4 envmapSample = texture(uEnvmap, R);
+            if (isFeatureEnabled(FEATURE_HDR)) {
+                envmapSample.rgb = pow(envmapSample.rgb, vec3(GAMMA));
+            }
+            objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
+        }
     }
 
     float objectAlpha = (opaque ? 1.0 : diffuseSample.a) * uGeneral.alpha;
