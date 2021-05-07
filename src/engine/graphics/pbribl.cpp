@@ -166,6 +166,7 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
                 uniforms.combined.general.projection = g_captureProjection;
                 uniforms.combined.general.view = g_captureViews[face];
                 uniforms.combined.general.roughness = mip / static_cast<float>(kNumPrefilterMipMaps - 1);
+                uniforms.combined.general.envmapResolution = static_cast<float>(envmap->width());
                 Shaders::instance().activate(ShaderProgram::SimplePrefilter, uniforms);
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

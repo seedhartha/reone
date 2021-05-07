@@ -92,6 +92,8 @@ struct ShaderGeneral {
     float exposure { 1.0f };
     float fogNear { 0.0f };
     float fogFar { 0.0f };
+    float envmapResolution { 0.0f };
+    char padding[12];
 };
 
 struct ShaderMaterial {
