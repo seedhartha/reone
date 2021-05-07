@@ -148,6 +148,7 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, Sce
     character->setAppearance(appearance);
     character->equip("g_a_clothes01");
     character->loadAppearance();
+    character->getModelSceneNode()->setCullable(false);
     character->updateModelAnimation();
 
     auto model = make_shared<ModelSceneNode>(ModelUsage::GUI, Models::instance().get("cgbody_light"), &sceneGraph);
