@@ -28,14 +28,7 @@ namespace graphics {
 char g_shaderFragmentBlinnPhong[] = R"END(
 void main() {
     vec2 texCoords = fragTexCoords + uGeneral.uvOffset;
-
-    vec4 diffuseSample;
-    if (isFeatureEnabled(FEATURE_DIFFUSE)) {
-        diffuseSample = texture(uDiffuse, texCoords);
-    } else {
-        diffuseSample = vec4(vec3(0.5), 1.0);
-    }
-
+    vec4 diffuseSample = texture(uDiffuse, texCoords);
     vec3 cameraToFragment = uGeneral.cameraPosition.xyz - fragPosition;
     vec3 V = normalize(cameraToFragment);
 
@@ -108,6 +101,42 @@ void main() {
 
     fragColor = vec4(objectColor, objectAlpha);
     fragColorBright = vec4(brightColor, 1.0);
+}
+)END";
+
+char g_shaderFragmentBlinnPhongTextureless[] = R"END(
+void main() {
+    vec3 indirect = uGeneral.ambientColor.rgb * uMaterial.ambient.rgb;
+    vec3 direct = vec3(0.0);
+
+    if (isFeatureEnabled(FEATURE_LIGHTING)) {
+        vec3 V = normalize(uGeneral.cameraPosition.xyz - fragPosition);
+        vec3 N = normalize(fragNormal);
+
+        for (int i = 0; i < uLightCount; ++i) {
+            vec3 L = normalize(uLights[i].position.xyz - fragPosition);
+            vec3 H = normalize(V + L);
+
+            vec3 diff = uMaterial.diffuse.rgb * max(dot(L, N), 0.0);
+            vec3 diffuse = uLights[i].multiplier * uLights[i].color.rgb * diff;
+
+            float spec = uMaterial.specular * pow(max(dot(N, H), 0.0), uMaterial.shininess);
+            vec3 specular = uLights[i].multiplier * uLights[i].color.rgb * spec;
+
+            float attenuation = getLightAttenuation(i);
+            diffuse *= attenuation;
+            specular *= attenuation;
+
+            direct += diffuse + specular;
+        }
+    } else if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
+        indirect *= texture(uLightmap, fragLightmapCoords).rgb;
+    }
+
+    vec3 objectColor = indirect + direct;
+
+    fragColor = vec4(objectColor, uGeneral.alpha);
+    fragColorBright = vec4(0.0);
 }
 )END";
 

@@ -46,6 +46,7 @@ enum class ShaderProgram {
     SimplePresentWorld,
     ModelColor,
     ModelBlinnPhong,
+    ModelBlinnPhongTextureless,
     ModelPBR,
     ParticleParticle,
     GrassGrass,
@@ -224,6 +225,7 @@ public:
 
 private:
     enum class ShaderName {
+        // Common
         VertexSimple,
         VertexModel,
         VertexParticle,
@@ -235,15 +237,20 @@ private:
         FragmentDepth,
         FragmentGUI,
         FragmentText,
-        FragmentBlinnPhong,
-        FragmentPBR,
         FragmentParticle,
         FragmentGrass,
+        FragmentBlur,
+        FragmentPresentWorld,
+
+        // Blinn-Phong
+        FragmentBlinnPhong,
+        FragmentBlinnPhongTextureless,
+
+        // PBR
         FragmentIrradiance,
         FragmentPrefilter,
         FragmentBRDF,
-        FragmentBlur,
-        FragmentPresentWorld
+        FragmentPBR
     };
 
     bool _inited { false };
