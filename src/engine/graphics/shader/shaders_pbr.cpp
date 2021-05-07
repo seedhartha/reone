@@ -61,9 +61,7 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
-)END";
 
-char g_shaderBasePBRIBL[] = R"END(
 float RadicalInverse_VdC(uint bits) {
      bits = (bits << 16u) | (bits >> 16u);
      bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
@@ -241,24 +239,70 @@ void getMetallicRoughness(vec4 diffuseSample, out float metallic, out float roug
 
 void main() {
     vec2 uv = getUV();
-    vec4 diffuseSample = texture(uDiffuse, uv);
+    float shadow = getShadow();
+    bool opaque = isFeatureEnabled(FEATURE_ENVMAP) || isFeatureEnabled(FEATURE_BUMPMAPS);
 
-    vec3 cameraToFragment = uGeneral.cameraPosition.xyz - fragPosition;
-    vec3 V = normalize(cameraToFragment);
+    vec3 V = normalize(uGeneral.cameraPosition.xyz - fragPosition);
     vec3 N = getNormal(uv);
     vec3 R = reflect(-V, N);
 
-    vec3 albedo = isFeatureEnabled(FEATURE_HDR) ? pow(diffuseSample.rgb, vec3(GAMMA)) : diffuseSample.rgb;
+    vec4 diffuseSample = texture(uDiffuse, uv);
+    if (isFeatureEnabled(FEATURE_HDR)) {
+        diffuseSample.rgb = pow(diffuseSample.rgb, vec3(GAMMA));
+    }
+    vec3 albedo = diffuseSample.rgb;
     float ao = 1.0;
-
     float metallic, roughness;
     getMetallicRoughness(diffuseSample, metallic, roughness);
 
     vec3 objectColor;
+    if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
+        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+        if (isFeatureEnabled(FEATURE_HDR)) {
+            lightmapSample.rgb = pow(lightmapSample.rgb, vec3(GAMMA));
+        }
+        objectColor = (1.0 - 0.5 * shadow) * lightmapSample.rgb * albedo * ao;
 
-    if (isFeatureEnabled(FEATURE_LIGHTING)) {
+        if (isFeatureEnabled(FEATURE_ENVMAP)) {
+            vec3 R = reflect(-V, N);
+            vec4 envmapSample = texture(uEnvmap, R);
+            if (isFeatureEnabled(FEATURE_HDR)) {
+                envmapSample.rgb = pow(envmapSample.rgb, vec3(GAMMA));
+            }
+            objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
+        }
+    } else if (isFeatureEnabled(FEATURE_LIGHTING)) {
         vec3 F0 = vec3(0.04);
         F0 = mix(F0, albedo, metallic);
+
+        // Indirect lighting
+
+        vec3 ambient = uGeneral.ambientColor.rgb * albedo * ao;
+
+        if (isFeatureEnabled(FEATURE_PBRIBL)) {
+            vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+
+            vec3 kS = F;
+            vec3 kD = 1.0 - kS;
+            kD *= 1.0 - metallic;
+
+            vec3 irradiance = texture(uIrradianceMap, N).rgb;
+            vec3 diffuse = irradiance * albedo;
+
+            const float MAX_REFLECTION_LOD = 4.0;
+            vec3 prefilteredColor = textureLod(uPrefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+            if (isFeatureEnabled(FEATURE_HDR)) {
+                prefilteredColor = pow(prefilteredColor, vec3(GAMMA));
+            }
+            vec2 brdf = texture(uBRDFLookup, vec2(max(dot(N, V), 0.0), roughness)).rg;
+            vec3 specular = (1.0 - diffuseSample.a) * prefilteredColor * (F * brdf.x + brdf.y);
+
+            ambient += (kD * diffuse + specular) * ao;
+        }
+
+        // END Indirect lighting
+
+        // Direct lighting
 
         vec3 Lo = vec3(0.0);
 
@@ -267,8 +311,7 @@ void main() {
             vec3 H = normalize(V + L);
 
             float attenuation = getLightAttenuation(i);
-            vec3 radiance = uLights[i].multiplier * uLights[i].color.rgb;
-            radiance *= attenuation;
+            vec3 radiance = uLights[i].multiplier * uLights[i].color.rgb * attenuation;
 
             float NDF = DistributionGGX(N, H, roughness);
             float G = GeometrySmith(N, V, L, roughness);
@@ -287,78 +330,36 @@ void main() {
             Lo += (kD * albedo / PI + specular) * radiance * NdotL;
         }
 
-        vec3 ambient = uGeneral.ambientColor.rgb * albedo * ao;
+        // END Direct lighting
 
-        if (isFeatureEnabled(FEATURE_PBRIBL)) {
-            vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
-
-            vec3 kS = F;
-            vec3 kD = 1.0 - kS;
-            kD *= 1.0 - metallic;
-
-            vec3 irradiance = texture(uIrradianceMap, N).rgb;
-            vec3 diffuse = irradiance * albedo;
-
-            const float MAX_REFLECTION_LOD = 4.0;
-            vec3 prefilteredColor = textureLod(uPrefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
-            vec2 brdf = texture(uBRDFLookup, vec2(max(dot(N, V), 0.0), roughness)).rg;
-            vec3 specular = (1.0 - diffuseSample.a) * prefilteredColor * (F * brdf.x + brdf.y);
-
-            ambient += (kD * diffuse + specular) * ao;
-        }
-
-        objectColor = ambient + Lo;
-
+        objectColor = ambient + (1.0 - shadow) * Lo;
     } else {
-        objectColor = albedo;
+        objectColor = albedo * ao;
     }
 
-    if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
-        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-        if (isFeatureEnabled(FEATURE_HDR)) {
-            lightmapSample.rgb = pow(lightmapSample.rgb, vec3(GAMMA));
-        }
-        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
-    }
-    if (!isFeatureEnabled(FEATURE_LIGHTING) && isFeatureEnabled(FEATURE_ENVMAP)) {
-        vec4 envmapSample = texture(uEnvmap, R);
-        if (isFeatureEnabled(FEATURE_HDR)) {
-            envmapSample.rgb = pow(envmapSample.rgb, vec3(GAMMA));
-        }
-        objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
-    }
-    if (isFeatureEnabled(FEATURE_SHADOWS)) {
-        vec3 S = vec3(1.0) - max(vec3(0.0), vec3(getShadow()) - uGeneral.ambientColor.rgb);
-        objectColor *= S;
-    }
+    float objectAlpha = (opaque ? 1.0 : diffuseSample.a) * uGeneral.alpha;
 
-    float objectAlpha = uGeneral.alpha;
-    if (!isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_BUMPMAPS)) {
-        objectAlpha *= diffuseSample.a;
-    }
     if (isFeatureEnabled(FEATURE_WATER)) {
         objectColor *= uGeneral.waterAlpha;
         objectAlpha *= uGeneral.waterAlpha;
     }
-
     if (isFeatureEnabled(FEATURE_HDR)) {
-        // HDR tonemapping
-        objectColor = vec3(1.0) - exp(-objectColor * uGeneral.exposure);
-        // gamma correct
+        objectColor = objectColor / (objectColor + vec3(1.0));
         objectColor = pow(objectColor, vec3(1.0 / GAMMA));
     }
     if (isFeatureEnabled(FEATURE_FOG)) {
         objectColor = applyFog(objectColor);
     }
 
-    vec3 brightColor = vec3(0.0);
-    if (isFeatureEnabled(FEATURE_SELFILLUM) && !isFeatureEnabled(FEATURE_WATER)) {
-        objectColor *= uGeneral.selfIllumColor.rgb;
-        brightColor = smoothstep(SELFILLUM_THRESHOLD, 1.0, uGeneral.selfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
+    vec3 objectColorBright;
+    if (isFeatureEnabled(FEATURE_SELFILLUM)) {
+        objectColorBright = smoothstep(SELFILLUM_THRESHOLD, 1.0, uGeneral.selfIllumColor.rgb * diffuseSample.rgb * diffuseSample.a);
+    } else {
+        objectColorBright = vec3(0.0);
     }
 
     fragColor = vec4(objectColor, objectAlpha);
-    fragColorBright = vec4(brightColor, 1.0);
+    fragColorBright = vec4(objectColorBright, objectAlpha);
 }
 )END";
 

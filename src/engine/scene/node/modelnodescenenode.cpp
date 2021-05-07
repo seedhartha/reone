@@ -241,9 +241,13 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
         program = ShaderProgram::SimpleDepth;
 
     } else {
-        program = !_textures.diffuse ?
-            ShaderProgram::ModelBlinnPhongDiffuseless :
-            (isFeatureEnabled(Feature::PBR) ? ShaderProgram::ModelPBR : ShaderProgram::ModelBlinnPhong);
+        if (!_textures.diffuse) {
+            program = ShaderProgram::ModelBlinnPhongDiffuseless;
+        } else if (isFeatureEnabled(Feature::PBR)) {
+            program = ShaderProgram::ModelPBR;
+        } else {
+            program = ShaderProgram::ModelBlinnPhong;
+        }
 
         if (_textures.diffuse) {
             uniforms.combined.featureMask |= UniformFeatureFlags::diffuse;
