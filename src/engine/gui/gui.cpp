@@ -21,7 +21,7 @@
 
 #include "../common/log.h"
 #include "../graphics/meshes.h"
-#include "../graphics/shaders.h"
+#include "../graphics/shader/shaders.h"
 #include "../graphics/statemanager.h"
 #include "../graphics/textures.h"
 #include "../graphics/window.h"

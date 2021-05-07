@@ -25,7 +25,7 @@
 
 #include "../../common/random.h"
 #include "../../graphics/meshes.h"
-#include "../../graphics/shaders.h"
+#include "../../graphics/shader/shaders.h"
 #include "../../graphics/statemanager.h"
 
 #include "../scenegraph.h"

@@ -188,7 +188,7 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/pbribl.h
     src/engine/graphics/pixelutil.h
     src/engine/graphics/renderbuffer.h
-    src/engine/graphics/shaders.h
+    src/engine/graphics/shader/shaders.h
     src/engine/graphics/statemanager.h
     src/engine/graphics/texture.h
     src/engine/graphics/textures.h
@@ -229,8 +229,10 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/pbribl.cpp
     src/engine/graphics/pixelutil.cpp
     src/engine/graphics/renderbuffer.cpp
-    src/engine/graphics/shaders.cpp
-    src/engine/graphics/shaders_glsl.cpp
+    src/engine/graphics/shader/shaders.cpp
+    src/engine/graphics/shader/shaders_common.cpp
+    src/engine/graphics/shader/shaders_pbr.cpp
+    src/engine/graphics/shader/shaders_phong.cpp
     src/engine/graphics/statemanager.cpp
     src/engine/graphics/texture.cpp
     src/engine/graphics/textures.cpp

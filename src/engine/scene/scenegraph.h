@@ -26,7 +26,7 @@
 
 #include "glm/vec3.hpp"
 
-#include "../graphics/shaders.h"
+#include "../graphics/shader/shaders.h"
 #include "../graphics/types.h"
 
 #include "grasscluster.h"
