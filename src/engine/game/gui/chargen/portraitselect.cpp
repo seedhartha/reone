@@ -106,6 +106,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
     creature->setAppearance(getAppearanceFromCurrentPortrait());
     creature->equip("g_a_clothes01");
     creature->loadAppearance();
+    creature->getModelSceneNode()->setCullable(false);
     creature->updateModelAnimation();
 
     // Attach creature model to the root scene node
