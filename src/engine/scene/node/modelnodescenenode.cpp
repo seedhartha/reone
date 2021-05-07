@@ -242,7 +242,7 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
 
     } else {
         program = !_textures.diffuse ?
-            ShaderProgram::ModelBlinnPhongTextureless :
+            ShaderProgram::ModelBlinnPhongDiffuseless :
             (isFeatureEnabled(Feature::PBR) ? ShaderProgram::ModelPBR : ShaderProgram::ModelBlinnPhong);
 
         if (_textures.diffuse) {

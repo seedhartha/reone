@@ -25,118 +25,110 @@ namespace reone {
 
 namespace graphics {
 
+char g_shaderBaseBlinnPhong[] = R"END(
+vec3 getLightingIndirect(vec3 N) {
+    return uGeneral.ambientColor.rgb * uMaterial.ambient.rgb;
+}
+
+vec3 getLightingDirect(vec3 N) {
+    vec3 result = vec3(0.0);
+    vec3 V = normalize(uGeneral.cameraPosition.xyz - fragPosition);
+
+    for (int i = 0; i < uLightCount; ++i) {
+        vec3 L = normalize(uLights[i].position.xyz - fragPosition);
+        vec3 H = normalize(V + L);
+
+        vec3 diff = uMaterial.diffuse.rgb * max(dot(L, N), 0.0);
+        vec3 diffuse = uLights[i].multiplier * uLights[i].color.rgb * diff;
+
+        float spec = uMaterial.specular * pow(max(dot(N, H), 0.0), uMaterial.shininess);
+        vec3 specular = uLights[i].multiplier * uLights[i].color.rgb * spec;
+
+        float attenuation = getLightAttenuation(i);
+        diffuse *= attenuation;
+        specular *= attenuation;
+
+        result += diffuse + specular;
+    }
+
+    return result;
+}
+)END";
+
 char g_shaderFragmentBlinnPhong[] = R"END(
 void main() {
-    vec2 texCoords = fragTexCoords + uGeneral.uvOffset;
-    vec4 diffuseSample = texture(uDiffuse, texCoords);
-    vec3 cameraToFragment = uGeneral.cameraPosition.xyz - fragPosition;
-    vec3 V = normalize(cameraToFragment);
+    vec2 uv = getUV();
+    vec3 N = getNormal(uv);
+    float shadow = getShadow();
+    vec4 diffuseSample = texture(uDiffuse, uv);
+    bool opaque = isFeatureEnabled(FEATURE_ENVMAP) || isFeatureEnabled(FEATURE_BUMPMAPS);
 
-    vec3 N;
-    if (isFeatureEnabled(FEATURE_BUMPMAPS)) {
-        N = getNormalFromBumpmap(texCoords);
-    } else {
-        N = normalize(fragNormal);
-    }
-
-    vec3 objectColor;
-
-    if (isFeatureEnabled(FEATURE_LIGHTING)) {
-        objectColor = uGeneral.ambientColor.rgb * uMaterial.ambient.rgb * diffuseSample.rgb;
-
-        for (int i = 0; i < uLightCount; ++i) {
-            vec3 L = normalize(uLights[i].position.xyz - fragPosition);
-            vec3 H = normalize(V + L);
-
-            float diff = max(dot(L, N), 0.0);
-            vec3 diffuse = uLights[i].multiplier * uLights[i].color.rgb * diff * uMaterial.diffuse.rgb * diffuseSample.rgb;
-
-            float spec = pow(max(dot(N, H), 0.0), uMaterial.shininess);
-            vec3 specular = uLights[i].multiplier * uLights[i].color.rgb * spec * vec3(uMaterial.specular);
-
-            float attenuation = getLightAttenuation(i);
-            diffuse *= attenuation;
-            specular *= attenuation;
-
-            objectColor += diffuse + specular;
-        }
-
-        objectColor = min(objectColor, diffuseSample.rgb);
-
-    } else {
-        objectColor = diffuseSample.rgb;
-    }
-
+    vec3 lighting;
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
-        objectColor = mix(objectColor, objectColor * lightmapSample.rgb, isFeatureEnabled(FEATURE_WATER) ? 0.2 : 1.0);
+        lighting = (1.0 - 0.5 * shadow) * lightmapSample.rgb;
+        if (isFeatureEnabled(FEATURE_WATER)) {
+            lighting *= 0.2;
+        }
+    } else if (isFeatureEnabled(FEATURE_LIGHTING)) {
+        vec3 indirect = getLightingIndirect(N);
+        vec3 direct = getLightingDirect(N);
+        lighting = min(vec3(1.0), indirect + (1.0 - shadow) * direct);
+    } else {
+        lighting = vec3(1.0);
     }
+
+    vec3 objectColor = lighting * uGeneral.color.rgb * diffuseSample.rgb;
+    float objectAlpha = (opaque ? 1.0 : diffuseSample.a) * uGeneral.alpha;
+
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
+        vec3 V = normalize(uGeneral.cameraPosition.xyz - fragPosition);
         vec3 R = reflect(-V, N);
         vec4 envmapSample = texture(uEnvmap, R);
         objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
-    }
-    if (isFeatureEnabled(FEATURE_SHADOWS)) {
-        vec3 S = vec3(1.0) - max(vec3(0.0), vec3(getShadow()) - uGeneral.ambientColor.rgb);
-        objectColor *= S;
-    }
-    if (isFeatureEnabled(FEATURE_FOG)) {
-        objectColor = applyFog(objectColor, length(cameraToFragment));
-    }
-
-    float objectAlpha = uGeneral.alpha;
-    if (!isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_BUMPMAPS)) {
-        objectAlpha *= diffuseSample.a;
     }
     if (isFeatureEnabled(FEATURE_WATER)) {
         objectColor *= uGeneral.waterAlpha;
         objectAlpha *= uGeneral.waterAlpha;
     }
+    if (isFeatureEnabled(FEATURE_FOG)) {
+        objectColor = applyFog(objectColor);
+    }
 
-    vec3 brightColor = vec3(0.0);
-    if (isFeatureEnabled(FEATURE_SELFILLUM) && !isFeatureEnabled(FEATURE_WATER)) {
-        objectColor *= uGeneral.selfIllumColor.rgb;
-        brightColor = smoothstep(SELFILLUM_THRESHOLD, 1.0, uGeneral.selfIllumColor.rgb * diffuseSample.rgb * objectAlpha);
+    vec3 objectColorBright;
+    if (isFeatureEnabled(FEATURE_SELFILLUM)) {
+        objectColorBright = smoothstep(SELFILLUM_THRESHOLD, 1.0, uGeneral.selfIllumColor.rgb * diffuseSample.rgb * diffuseSample.a);
+    } else {
+        objectColorBright = vec3(0.0);
     }
 
     fragColor = vec4(objectColor, objectAlpha);
-    fragColorBright = vec4(brightColor, 1.0);
+    fragColorBright = vec4(objectColorBright, objectAlpha);
 }
 )END";
 
-char g_shaderFragmentBlinnPhongTextureless[] = R"END(
+char g_shaderFragmentBlinnPhongDiffuseless[] = R"END(
 void main() {
-    vec3 indirect = uGeneral.ambientColor.rgb * uMaterial.ambient.rgb;
-    vec3 direct = vec3(0.0);
+    vec3 N = normalize(fragNormal);
+    float shadow = getShadow();
 
-    if (isFeatureEnabled(FEATURE_LIGHTING)) {
-        vec3 V = normalize(uGeneral.cameraPosition.xyz - fragPosition);
-        vec3 N = normalize(fragNormal);
-
-        for (int i = 0; i < uLightCount; ++i) {
-            vec3 L = normalize(uLights[i].position.xyz - fragPosition);
-            vec3 H = normalize(V + L);
-
-            vec3 diff = uMaterial.diffuse.rgb * max(dot(L, N), 0.0);
-            vec3 diffuse = uLights[i].multiplier * uLights[i].color.rgb * diff;
-
-            float spec = uMaterial.specular * pow(max(dot(N, H), 0.0), uMaterial.shininess);
-            vec3 specular = uLights[i].multiplier * uLights[i].color.rgb * spec;
-
-            float attenuation = getLightAttenuation(i);
-            diffuse *= attenuation;
-            specular *= attenuation;
-
-            direct += diffuse + specular;
-        }
-    } else if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
-        indirect *= texture(uLightmap, fragLightmapCoords).rgb;
+    vec3 lighting;
+    if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
+        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+        lighting = (1.0 - 0.5 * shadow) * lightmapSample.rgb;
+    } else if (isFeatureEnabled(FEATURE_LIGHTING)) {
+        vec3 indirect = getLightingIndirect(N);
+        vec3 direct = getLightingDirect(N);
+        lighting = min(vec3(1.0), indirect + (1.0 - shadow) * direct);
+    } else {
+        lighting = vec3(1.0);
     }
 
-    vec3 objectColor = indirect + direct;
+    vec3 objectColor = lighting * uGeneral.color.rgb;
+    float objectAlpha = uGeneral.alpha;
 
-    fragColor = vec4(objectColor, uGeneral.alpha);
-    fragColorBright = vec4(0.0);
+    fragColor = vec4(objectColor, objectAlpha);
+    fragColorBright = vec4(vec3(0.0), objectAlpha);
 }
 )END";
 

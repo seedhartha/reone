@@ -229,7 +229,7 @@ uniform sampler2D uBRDFLookup;
 uniform samplerCube uIrradianceMap;
 uniform samplerCube uPrefilterMap;
 
-void determineMetallicRoughness(vec4 diffuseSample, out float metallic, out float roughness) {
+void getMetallicRoughness(vec4 diffuseSample, out float metallic, out float roughness) {
     if (isFeatureEnabled(FEATURE_CUSTOMMAT) || !isFeatureEnabled(FEATURE_ENVMAP)) {
         metallic = uMaterial.metallic;
         roughness = uMaterial.roughness;
@@ -240,31 +240,19 @@ void determineMetallicRoughness(vec4 diffuseSample, out float metallic, out floa
 }
 
 void main() {
-    vec2 texCoords = fragTexCoords + uGeneral.uvOffset;
-
-    vec4 diffuseSample;
-    if (isFeatureEnabled(FEATURE_DIFFUSE)) {
-        diffuseSample = texture(uDiffuse, texCoords);
-    } else {
-        diffuseSample = vec4(vec3(0.5), 1.0);
-    }
-
-    vec3 N;
-    if (isFeatureEnabled(FEATURE_BUMPMAPS)) {
-        N = getNormalFromBumpmap(texCoords);
-    } else {
-        N = normalize(fragNormal);
-    }
+    vec2 uv = getUV();
+    vec4 diffuseSample = texture(uDiffuse, uv);
 
     vec3 cameraToFragment = uGeneral.cameraPosition.xyz - fragPosition;
     vec3 V = normalize(cameraToFragment);
+    vec3 N = getNormal(uv);
     vec3 R = reflect(-V, N);
 
     vec3 albedo = isFeatureEnabled(FEATURE_HDR) ? pow(diffuseSample.rgb, vec3(GAMMA)) : diffuseSample.rgb;
     float ao = 1.0;
 
     float metallic, roughness;
-    determineMetallicRoughness(diffuseSample, metallic, roughness);
+    getMetallicRoughness(diffuseSample, metallic, roughness);
 
     vec3 objectColor;
 
@@ -360,7 +348,7 @@ void main() {
         objectColor = pow(objectColor, vec3(1.0 / GAMMA));
     }
     if (isFeatureEnabled(FEATURE_FOG)) {
-        objectColor = applyFog(objectColor, length(cameraToFragment));
+        objectColor = applyFog(objectColor);
     }
 
     vec3 brightColor = vec3(0.0);
