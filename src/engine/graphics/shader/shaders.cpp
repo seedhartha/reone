@@ -40,7 +40,6 @@ extern char g_shaderBaseHeader[];
 extern char g_shaderBaseModel[];
 extern char g_shaderBaseBlinnPhong[];
 extern char g_shaderBasePBR[];
-extern char g_shaderBasePBRIBL[];
 extern char g_shaderVertexSimple[];
 extern char g_shaderVertexModel[];
 extern char g_shaderVertexParticle[];
@@ -97,9 +96,9 @@ void Shaders::init() {
     initShader(ShaderName::FragmentBlinnPhong, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhong });
     initShader(ShaderName::FragmentBlinnPhongDiffuseless, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhongDiffuseless });
     initShader(ShaderName::FragmentIrradiance, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentIrradiance });
-    initShader(ShaderName::FragmentPrefilter, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBasePBR, g_shaderBasePBRIBL, g_shaderFragmentPrefilter });
-    initShader(ShaderName::FragmentBRDF, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBasePBR, g_shaderBasePBRIBL, g_shaderFragmentBRDF });
-    initShader(ShaderName::FragmentPBR, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBasePBR, g_shaderBasePBRIBL, g_shaderBaseModel, g_shaderFragmentPBR });
+    initShader(ShaderName::FragmentPrefilter, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBasePBR, g_shaderFragmentPrefilter });
+    initShader(ShaderName::FragmentBRDF, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBasePBR, g_shaderFragmentBRDF });
+    initShader(ShaderName::FragmentPBR, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBasePBR, g_shaderBaseModel, g_shaderFragmentPBR });
 
     initProgram(ShaderProgram::SimpleColor, { ShaderName::VertexSimple, ShaderName::FragmentColor });
     initProgram(ShaderProgram::SimpleDepth, { ShaderName::VertexSimple, ShaderName::GeometryDepth, ShaderName::FragmentDepth });
