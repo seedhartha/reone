@@ -19,7 +19,7 @@
 
 #include "../../common/log.h"
 #include "../../graphics/meshes.h"
-#include "../../graphics/shaders.h"
+#include "../../graphics/shader/shaders.h"
 #include "../../graphics/textutil.h"
 #include "../../resource/resources.h"
 

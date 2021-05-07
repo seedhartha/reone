@@ -24,7 +24,7 @@
 
 #include "meshes.h"
 #include "renderbuffer.h"
-#include "shaders.h"
+#include "shader/shaders.h"
 #include "statemanager.h"
 #include "texture.h"
 #include "textureutil.h"
@@ -144,35 +144,37 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
     auto prefilterDepth = make_shared<Renderbuffer>();
     prefilterDepth->init();
     prefilterDepth->bind();
-    prefilterDepth->configure(128, 128, PixelFormat::Depth);
 
     _prefilterFB.bind();
+    _prefilterFB.attachDepth(*prefilterDepth);
 
     StateManager::instance().setActiveTextureUnit(TextureUnits::envmap);
     envmap->bind();
 
     for (int mip = 0; mip < kNumPrefilterMipMaps; ++mip) {
-        int mipWidth = static_cast<int>(128 * glm::pow(0.5, mip));
-        int mipHeight = static_cast<int>(128 * glm::pow(0.5, mip));
+        int mipWidth = static_cast<int>(128 * glm::pow(0.5f, mip));
+        int mipHeight = static_cast<int>(128 * glm::pow(0.5f, mip));
+        prefilterDepth->configure(mipWidth, mipHeight, PixelFormat::Depth);
+        glm::ivec4 viewport(0, 0, mipWidth, mipHeight);
 
-        for (int face = 0; face < kNumCubeFaces; ++face) {
-            glm::ivec4 viewport(0, 0, mipWidth, mipHeight);
-            StateManager::instance().withViewport(viewport, [&]() {
+        float roughness = mip / static_cast<float>(kNumPrefilterMipMaps - 1);
+
+        StateManager::instance().withViewport(viewport, [&]() {
+            for (int face = 0; face < kNumCubeFaces; ++face) {
                 _prefilterFB.attachCubeMapFaceAsColor(*prefilterColor, static_cast<CubeMapFace>(face), 0, mip);
-                _prefilterFB.attachDepth(*prefilterDepth);
                 _prefilterFB.checkCompleteness();
 
                 ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
                 uniforms.combined.general.projection = g_captureProjection;
                 uniforms.combined.general.view = g_captureViews[face];
-                uniforms.combined.general.roughness = mip / static_cast<float>(kNumPrefilterMipMaps - 1);
+                uniforms.combined.general.roughness = roughness;
                 uniforms.combined.general.envmapResolution = static_cast<float>(envmap->width());
                 Shaders::instance().activate(ShaderProgram::SimplePrefilter, uniforms);
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 Meshes::instance().getCubemap()->draw();
-            });
-        }
+            }
+        });
     }
 
     _prefilterFB.unbind();

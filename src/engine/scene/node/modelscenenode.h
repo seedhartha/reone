@@ -21,7 +21,7 @@
 #include <unordered_map>
 
 #include "../../graphics/model/model.h"
-#include "../../graphics/shaders.h"
+#include "../../graphics/shader/shaders.h"
 #include "../../graphics/walkmesh/walkmesh.h"
 
 #include "../animation/eventlistener.h"

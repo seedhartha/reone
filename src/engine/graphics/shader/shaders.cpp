@@ -27,8 +27,8 @@
 
 #include "glm/ext.hpp"
 
-#include "texture.h"
-#include "textures.h"
+#include "../texture.h"
+#include "../textures.h"
 
 using namespace std;
 

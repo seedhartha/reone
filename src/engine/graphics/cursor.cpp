@@ -23,7 +23,7 @@
 #include "glm/ext.hpp"
 
 #include "meshes.h"
-#include "shaders.h"
+#include "shader/shaders.h"
 #include "statemanager.h"
 #include "texture.h"
 #include "window.h"

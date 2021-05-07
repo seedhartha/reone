@@ -27,7 +27,7 @@
 #include "../graphics/meshes.h"
 #include "../graphics/window.h"
 
-#include "shaders.h"
+#include "shader/shaders.h"
 #include "statemanager.h"
 
 using namespace std;

@@ -22,7 +22,7 @@
 #include "../../graphics/font.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/meshes.h"
-#include "../../graphics/shaders.h"
+#include "../../graphics/shader/shaders.h"
 #include "../../graphics/statemanager.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"

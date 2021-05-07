@@ -28,7 +28,7 @@
 #include "../graphics/font.h"
 #include "../graphics/fonts.h"
 #include "../graphics/meshes.h"
-#include "../graphics/shaders.h"
+#include "../graphics/shader/shaders.h"
 #include "../graphics/window.h"
 #include "../resource/resources.h"
 #include "../scene/types.h"

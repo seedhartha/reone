@@ -21,7 +21,7 @@
 
 #include "glm/ext.hpp"
 
-#include "../../graphics/shaders.h"
+#include "../../graphics/shader/shaders.h"
 
 #include "../scenegraph.h"
 
