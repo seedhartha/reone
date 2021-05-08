@@ -261,7 +261,11 @@ void main() {
         if (isFeatureEnabled(FEATURE_HDR)) {
             lightmapSample.rgb = pow(lightmapSample.rgb, vec3(GAMMA));
         }
-        objectColor = (1.0 - 0.5 * shadow) * lightmapSample.rgb * albedo * ao;
+        vec3 lightmap = (1.0 - 0.5 * shadow) * lightmapSample.rgb;
+        if (isFeatureEnabled(FEATURE_WATER)) {
+            lightmap = mix(vec3(1.0), lightmap, 0.2);
+        }
+        objectColor = lightmap * albedo * ao;
 
         if (isFeatureEnabled(FEATURE_ENVMAP)) {
             vec3 R = reflect(-V, N);
@@ -310,7 +314,7 @@ void main() {
             vec3 L = normalize(uLights[i].position.xyz - fragPosition);
             vec3 H = normalize(V + L);
 
-            float attenuation = getLightAttenuation(i);
+            float attenuation = getAttenuationQuadratic(i);
             vec3 radiance = uLights[i].multiplier * uLights[i].color.rgb * attenuation;
 
             float NDF = DistributionGGX(N, H, roughness);

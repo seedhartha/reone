@@ -314,7 +314,9 @@ float getShadow() {
     return result;
 }
 
-float getLightAttenuation(int light) {
+float getAttenuationQuadratic(int light) {
+    if (uLights[light].position.w == 0.0) return 1.0;
+
     float D = uLights[light].radius;
     D *= D;
 
