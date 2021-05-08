@@ -44,7 +44,7 @@ vec3 getLightingDirect(vec3 N) {
         float spec = uMaterial.specular * pow(max(dot(N, H), 0.0), uMaterial.shininess);
         vec3 specular = uLights[i].multiplier * uLights[i].color.rgb * spec;
 
-        float attenuation = getLightAttenuation(i);
+        float attenuation = getAttenuationQuadratic(i);
         diffuse *= attenuation;
         specular *= attenuation;
 
@@ -68,7 +68,7 @@ void main() {
         vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
         lighting = (1.0 - 0.5 * shadow) * lightmapSample.rgb;
         if (isFeatureEnabled(FEATURE_WATER)) {
-            lighting *= 0.2;
+            lighting = mix(vec3(1.0), lighting, 0.2);
         }
     } else if (isFeatureEnabled(FEATURE_LIGHTING)) {
         vec3 indirect = getLightingIndirect(N);
