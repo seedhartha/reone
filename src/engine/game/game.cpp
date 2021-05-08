@@ -512,22 +512,7 @@ void Game::update() {
     if (gui) {
         gui->update(dt);
     }
-
-    if (!_paused) {
-        const Camera *camera = getActiveCamera();
-        if (camera) {
-            shared_ptr<SceneNode> shadowReference;
-            shared_ptr<Creature> partyLeader(_party.getLeader());
-            if (partyLeader && _cameraType == CameraType::ThirdPerson) {
-                shadowReference = partyLeader->getModelSceneNode();
-            } else {
-                shadowReference = camera->sceneNode();
-            }
-            _sceneGraph.setActiveCamera(camera->sceneNode());
-            _sceneGraph.setShadowReference(shadowReference);
-            _sceneGraph.update(dt);
-        }
-    }
+    updateSceneGraph(dt);
 
     _profileOverlay.update(dt);
 }
@@ -604,7 +589,6 @@ void Game::quit() {
 }
 
 void Game::openInGame() {
-    _sceneGraph.setUpdateRoots(!_paused);
     changeScreen(GameScreen::InGame);
 }
 
@@ -670,7 +654,6 @@ void Game::stopMovement() {
 
 void Game::openContainer(const shared_ptr<SpatialObject> &container) {
     stopMovement();
-    _sceneGraph.setUpdateRoots(false);
     setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
     _container->open(container);
@@ -736,6 +719,23 @@ void Game::updateCamera(float dt) {
         }
         AudioPlayer::instance().setListenerPosition(listenerPosition);
     }
+}
+
+void Game::updateSceneGraph(float dt) {
+    const Camera *camera = getActiveCamera();
+    if (!camera) return;
+
+    shared_ptr<SceneNode> shadowReference;
+    shared_ptr<Creature> partyLeader(_party.getLeader());
+    if (partyLeader && _cameraType == CameraType::ThirdPerson) {
+        shadowReference = partyLeader->getModelSceneNode();
+    } else {
+        shadowReference = camera->sceneNode();
+    }
+    _sceneGraph.setActiveCamera(camera->sceneNode());
+    _sceneGraph.setShadowReference(shadowReference);
+    _sceneGraph.setUpdateRoots(!_paused);
+    _sceneGraph.update(dt);
 }
 
 bool Game::handle(const SDL_Event &event) {

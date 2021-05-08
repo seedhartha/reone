@@ -275,6 +275,7 @@ private:
     void changeScreen(GameScreen screen);
     void updateVideo(float dt);
     void updateMusic();
+    void updateSceneGraph(float dt);
 
     std::string getMainMenuMusic() const;
     std::string getCharacterGenerationMusic() const;
