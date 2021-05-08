@@ -300,7 +300,6 @@ bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {
         case SDLK_SPACE: {
             bool paused = !_game->isPaused();
             _game->setPaused(paused);
-            _game->sceneGraph().setUpdateRoots(!paused);
             return true;
         }
         default:
