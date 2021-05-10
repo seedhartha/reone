@@ -162,10 +162,12 @@ void ModelNodeSceneNode::update(float dt) {
 }
 
 bool ModelNodeSceneNode::shouldRender() const {
+    if (g_debugWalkmesh) return _modelNode->isAABB();
+
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
     if (!mesh || !mesh->shouldRender() || _modelNode->alphas().getByKeyframeOrElse(0, 1.0f) == 0.0f) return false;
 
-    return _modelNode->isAABB() ? g_debugWalkmesh : true;
+    return !_modelNode->isAABB();
 }
 
 bool ModelNodeSceneNode::shouldCastShadows() const {

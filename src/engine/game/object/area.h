@@ -35,7 +35,6 @@
 #include "../camera/firstperson.h"
 #include "../camera/staticcamera.h"
 #include "../camera/thirdperson.h"
-#include "../collisiondetect.h"
 #include "../creaturefinder.h"
 #include "../map.h"
 #include "../objectselect.h"
@@ -92,7 +91,6 @@ public:
     glm::vec3 getSelectableScreenCoords(const std::shared_ptr<SpatialObject> &object, const glm::mat4 &projection, const glm::mat4 &view) const;
 
     const CameraStyle &camStyleDefault() const { return _camStyleDefault; }
-    const CollisionDetector &collisionDetector() const { return _collisionDetector; }
     const std::string &music() const { return _music; }
     const ObjectList &objects() const { return _objects; }
     ObjectSelector &objectSelector() { return _objectSelector; }
@@ -107,6 +105,8 @@ public:
     // Objects
 
     std::shared_ptr<Object> createObject(ObjectType type, const std::string &blueprintResRef, const std::shared_ptr<Location> &location);
+
+    bool isInLineOfSight(const Creature &subject, const SpatialObject &target) const;
 
     ObjectList &getObjectsByType(ObjectType type);
     std::shared_ptr<SpatialObject> getObjectByTag(const std::string &tag, int nth = 0) const;
@@ -177,7 +177,6 @@ private:
 
     Game *_game;
 
-    CollisionDetector _collisionDetector;
     ObjectSelector _objectSelector;
     ActionExecutor _actionExecutor;
     Pathfinder _pathfinder;
@@ -311,19 +310,32 @@ private:
     void determineObjectRoom(SpatialObject &object);
     void checkTriggersIntersection(const std::shared_ptr<SpatialObject> &triggerrer);
 
-    bool getCameraObstacle(const glm::vec3 &origin, const glm::vec3 &dest, glm::vec3 &intersection) const;
+    /**
+     * @param position 2D coordinates to test elevation at
+     * @param[out] z elevation at the specified 2D coordinates
+     * @param[out] room room which the walkable face belongs to, if any
+     * @param[out] material material of the walkable face, if any
+     *
+     * @return true if there is a walkable face at the specified coordinates, false otherwise
+     */
+    bool testElevationAt(const glm::vec2 &point, float &z, int &material, Room *&room) const;
 
     /**
-     * Find the closest obstacle in the creatures path.
+     * @param start start of the camera path
+     * @param end end of the camera path
+     * @param[out] intersection intersection point with a non-walkable face, if any
      *
-     * @param creature moving creature
-     * @param dest creatures destination
-     *
-     * @return true if obstacle is found, false otherwise
+     * @return true if a walkmesh or an object are blocking the camera path, false otherwise
      */
-    bool getCreatureObstacle(const Creature &creature, const glm::vec3 &dest) const;
+    bool getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::vec3 &intersection) const;
 
-    bool getElevationAt(const glm::vec2 &position, Room *&room, float &z, int &material, bool creatures = false, const SpatialObject *except = nullptr) const;
+    /**
+     * @param start start of the creature path
+     * @param end end of the creature path
+     *
+     * @return true if a walkmesh or an object are blocking the creature path, false otherwise
+     */
+    bool getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::vec3 &normal) const;
 
     // END Collision detection
 };

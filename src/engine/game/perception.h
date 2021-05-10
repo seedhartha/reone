@@ -42,8 +42,6 @@ private:
     Timer _updateTimer;
 
     void doUpdate();
-
-    bool isInLineOfSight(const Creature &subject, const SpatialObject &target) const;
 };
 
 } // namespace game

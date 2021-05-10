@@ -423,7 +423,6 @@ set(GAME_HEADERS
     src/engine/game/camera/thirdperson.h
     src/engine/game/character.h
     src/engine/game/characterutil.h
-    src/engine/game/collisiondetect.h
     src/engine/game/console.h
     src/engine/game/combat/combat.h
     src/engine/game/creaturefinder.h
@@ -526,7 +525,6 @@ set(GAME_SOURCES
     src/engine/game/camera/staticcamera.cpp
     src/engine/game/camera/thirdperson.cpp
     src/engine/game/characterutil.cpp
-    src/engine/game/collisiondetect.cpp
     src/engine/game/combat/combat.cpp
     src/engine/game/combat/combat_attack.cpp
     src/engine/game/combat/combat_damage.cpp
@@ -585,6 +583,7 @@ set(GAME_SOURCES
     src/engine/game/map.cpp
     src/engine/game/object/area.cpp
     src/engine/game/object/area_are.cpp
+    src/engine/game/object/area_collision.cpp
     src/engine/game/object/area_git.cpp
     src/engine/game/object/creature.cpp
     src/engine/game/object/creature_animations.cpp
