@@ -35,8 +35,6 @@ namespace reone {
 
 namespace scene {
 
-constexpr float kDefaultExposure = 1.0f;
-
 class CameraSceneNode;
 class EmitterSceneNode;
 class GrassSceneNode;
@@ -65,10 +63,8 @@ public:
     const graphics::GraphicsOptions &options() const { return _opts; }
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
     graphics::ShaderUniforms uniformsPrototype() const { return _uniformsPrototype; }
-    float exposure() const { return _exposure; }
 
     void setUpdateRoots(bool update) { _updateRoots = update; }
-    void setExposure(float exposure) { _exposure = exposure; }
     void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
     void setShadowReference(std::shared_ptr<SceneNode> reference) { _shadowReference = std::move(reference); }
     void setUniformsPrototype(graphics::ShaderUniforms &&uniforms) { _uniformsPrototype = uniforms; }
@@ -135,7 +131,6 @@ private:
     uint32_t _textureId { 0 };
     bool _updateRoots { true };
     graphics::ShaderUniforms _uniformsPrototype;
-    float _exposure { kDefaultExposure };
 
     // Shadows
 
