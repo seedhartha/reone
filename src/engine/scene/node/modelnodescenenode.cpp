@@ -233,7 +233,6 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
     uniforms.combined.general.model = _absoluteTransform;
     uniforms.combined.general.alpha = _modelSceneNode->alpha() * _alpha;
     uniforms.combined.general.ambientColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
-    uniforms.combined.general.exposure = _sceneGraph->exposure();
 
     ShaderProgram program;
 

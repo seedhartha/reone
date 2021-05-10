@@ -78,7 +78,6 @@ struct General {
     float alpha;
     float waterAlpha;
     float roughness;
-    float exposure;
     float fogNear;
     float fogFar;
     float envmapResolution;
