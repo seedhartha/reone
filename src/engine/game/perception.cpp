@@ -68,7 +68,7 @@ void Perception::doUpdate() {
                 heard = true;
             }
             if (distance2 <= sightRange2) {
-                seen = isInLineOfSight(*creature, *other);
+                seen = _area->isInLineOfSight(*creature, *other);
             }
 
             // Hearing
@@ -92,25 +92,6 @@ void Perception::doUpdate() {
             }
         }
     }
-}
-
-bool Perception::isInLineOfSight(const Creature &subject, const SpatialObject &target) const {
-    glm::vec3 subjectPos(subject.getModelSceneNode()->getCenterOfAABB());
-    glm::vec3 targetPos(target.getModelSceneNode()->getCenterOfAABB());
-    glm::vec3 subjectToTarget(targetPos - subjectPos);
-
-    // Ensure that subjects line of sight is not blocked by room and door walkmeshes
-
-    RaycastProperties castProps;
-    castProps.flags = RaycastFlags::rooms;
-    castProps.origin = subjectPos;
-    castProps.direction = glm::normalize(subjectToTarget);
-    castProps.objectTypes = { ObjectType::Door };
-    castProps.distance = glm::length(subjectToTarget);
-
-    RaycastResult castResult;
-
-    return !_area->collisionDetector().raycast(castProps, castResult);
 }
 
 } // namespace game

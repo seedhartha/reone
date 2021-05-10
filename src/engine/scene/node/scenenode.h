@@ -32,7 +32,7 @@ namespace reone {
 
 namespace scene {
 
-constexpr int kDefaultDrawDistance = 1024.0f;
+constexpr float kDefaultDrawDistance = 1024.0f;
 
 class SceneGraph;
 

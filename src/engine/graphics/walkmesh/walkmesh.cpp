@@ -41,29 +41,62 @@ void Walkmesh::computeAABB() {
     }
 }
 
-bool Walkmesh::raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float &distance, int &material) const {
-    float minDistance = FLT_MAX;
-
-    const vector<Face> &faces = walkable ? _walkableFaces : _nonWalkableFaces;
+bool Walkmesh::raycastWalkableFirst(const glm::vec3 &origin, const glm::vec3 &dir, float &distance, int &material) const {
     glm::vec2 baryPosition(0.0f);
-    float localDistance = 0.0f;
+    float tempDistance = 0.0f;
 
-    for (auto &face : faces) {
+    for (auto &face : _walkableFaces) {
         const glm::vec3 &p0 = face.vertices[0];
         const glm::vec3 &p1 = face.vertices[1];
         const glm::vec3 &p2 = face.vertices[2];
 
-        if (glm::intersectRayTriangle(origin, dir, p0, p1, p2, baryPosition, localDistance) && localDistance > 0.0f && localDistance < minDistance) {
-            minDistance = localDistance;
+        if (glm::intersectRayTriangle(origin, dir, p0, p1, p2, baryPosition, tempDistance) && tempDistance > 0.0f) {
+            distance = tempDistance;
             material = static_cast<int>(face.material);
+            return true;
         }
     }
 
-    if (minDistance == FLT_MAX) return false;
+    return false;
+}
 
-    distance = minDistance;
+bool Walkmesh::raycastNonWalkableFirst(const glm::vec3 &origin, const glm::vec3 &dir, float &distance, glm::vec3 &normal) const {
+    glm::vec2 baryPosition(0.0f);
+    float tempDistance = 0.0f;
 
-    return true;
+    for (auto &face : _nonWalkableFaces) {
+        const glm::vec3 &p0 = face.vertices[0];
+        const glm::vec3 &p1 = face.vertices[1];
+        const glm::vec3 &p2 = face.vertices[2];
+
+        if (glm::intersectRayTriangle(origin, dir, p0, p1, p2, baryPosition, tempDistance) && tempDistance > 0.0f) {
+            distance = tempDistance;
+            normal = face.normal;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Walkmesh::raycastNonWalkableClosest(const glm::vec3 &origin, const glm::vec3 &dir, float &distance, glm::vec3 &normal) const {
+    distance = numeric_limits<float>::max();
+
+    glm::vec2 baryPosition(0.0f);
+    float tempDistance = 0.0f;
+
+    for (auto &face : _nonWalkableFaces) {
+        const glm::vec3 &p0 = face.vertices[0];
+        const glm::vec3 &p1 = face.vertices[1];
+        const glm::vec3 &p2 = face.vertices[2];
+
+        if (glm::intersectRayTriangle(origin, dir, p0, p1, p2, baryPosition, tempDistance) && tempDistance > 0.0f && tempDistance < distance) {
+            distance = tempDistance;
+            normal = face.normal;
+        }
+    }
+
+    return distance != numeric_limits<float>::max();
 }
 
 } // namespace graphics

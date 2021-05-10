@@ -42,7 +42,9 @@ public:
         float area { 0.0f };
     };
 
-    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walkable, float &distance, int &material) const;
+    bool raycastWalkableFirst(const glm::vec3 &origin, const glm::vec3 &dir, float &distance, int &material) const;
+    bool raycastNonWalkableFirst(const glm::vec3 &origin, const glm::vec3 &dir, float &distance, glm::vec3 &normal) const;
+    bool raycastNonWalkableClosest(const glm::vec3 &origin, const glm::vec3 &dir, float &distance, glm::vec3 &normal) const;
 
     const std::vector<Face> &grassFaces() const { return _grassFaces; }
     const AABB &aabb() const { return _aabb; }

@@ -31,6 +31,7 @@ constexpr int kEngineTypeInvalid = -1;
 constexpr float kDefaultFollowDistance = 5.0f;
 constexpr char kObjectTagPlayer[] = "player";
 constexpr float kDefaultRaycastDistance = 8.0f;
+constexpr float kSelectionDistance = 8.0f;
 
 enum class GameID {
     KotOR,
