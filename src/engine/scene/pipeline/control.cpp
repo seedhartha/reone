@@ -88,21 +88,21 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
     _geometryColor->bind();
 
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(_extent[0] + offset.x, _extent[1] + offset.y, 100.0f));
-    transform = glm::scale(transform, glm::vec3(_extent[2], _extent[3], 1.0f));
-
     int viewport[4];
     glGetIntegerv(GL_VIEWPORT, &viewport[0]);
 
-    ShaderUniforms uniforms;
-    uniforms.combined.general.projection = glm::ortho(
+    glm::mat4 projection(glm::ortho(
         0.0f,
         static_cast<float>(viewport[2]),
         static_cast<float>(viewport[3]),
-        0.0f,
-        -100.0f, 100.0f);
+        0.0f));
 
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(_extent[0] + offset.x, _extent[1] + offset.y, 0.0f));
+    transform = glm::scale(transform, glm::vec3(_extent[2], _extent[3], 1.0f));
+
+    ShaderUniforms uniforms;
+    uniforms.combined.general.projection = move(projection);
     uniforms.combined.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);

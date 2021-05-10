@@ -50,7 +50,7 @@ public:
 
     bool isInFocus() const { return _focus; }
 
-    glm::mat4 getOrthoProjection(float near = -100.0f, float far = 100.0f) const;
+    glm::mat4 getOrthoProjection(float near = 0.0f, float far = 100.0f) const;
 
     void setRelativeMouseMode(bool enabled);
     void setCursor(const std::shared_ptr<Cursor> &cursor);
