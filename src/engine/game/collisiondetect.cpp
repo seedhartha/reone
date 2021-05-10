@@ -98,13 +98,7 @@ bool CollisionDetector::rayTestObjects(const RaycastProperties &props, RaycastRe
             // Test using AABB
             shared_ptr<ModelSceneNode> model(object->getModelSceneNode());
             if (model) {
-                // Prevent division by zero
-                if (objSpaceDir.x == 0.0f) objSpaceDir.x = 1e-7f;
-                if (objSpaceDir.y == 0.0f) objSpaceDir.y = 1e-7f;
-                if (objSpaceDir.z == 0.0f) objSpaceDir.z = 1e-7f;
-                glm::vec3 invDir(1.0f / objSpaceDir);
-
-                if (model->aabb().raycast(objSpaceOrigin, invDir, distance) &&
+                if (model->aabb().raycast(objSpaceOrigin, objSpaceDir, distance) &&
                     distance >= 0.0f && distance <= props.distance) {
 
                     collisions.push_back(make_pair(object, distance));
