@@ -43,22 +43,12 @@ public:
      * Casts a ray and tests if it intersects this AABB.
      *
      * @param origin ray origin
-     * @param invDir ray direction inverse
+     * @param dir ray direction
      * @param[out] distance to the intersection point (negative if ray origin is inside this AABB)
      */
-    bool raycast(const glm::vec3 &origin, const glm::vec3 &invDir, float &distance) const;
+    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, float &distance) const;
 
     glm::vec3 getSize() const;
-
-    /**
-     * @return distance from the closest point of this AABB to the specified point
-     */
-    float getDistanceFromClosestPoint(const glm::vec3 &point) const;
-
-    /**
-     * @return squared distance from the closest point of this AABB to the specified point
-     */
-    float getDistanceFromClosestPoint2(const glm::vec3 &point) const;
 
     const glm::vec3 &min() const { return _min; }
     const glm::vec3 &max() const { return _max; }
@@ -73,8 +63,6 @@ private:
     glm::mat4 _transform { 1.0f };
 
     void updateTransform();
-
-    inline glm::vec3 getClosestPoint(const glm::vec3 &point) const;
 };
 
 } // namespace graphics

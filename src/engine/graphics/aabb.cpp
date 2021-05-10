@@ -127,18 +127,20 @@ bool AABB::intersect(const AABB &other) const {
 }
 
 // Algorithm adapted from https://gamedev.stackexchange.com/a/18459
-bool AABB::raycast(const glm::vec3 &origin, const glm::vec3 &invDir, float &distance) const {
-    float tx1 = (_min.x - origin.x) * invDir.x;
-    float tx2 = (_max.x - origin.x) * invDir.x;
-    float ty1 = (_min.y - origin.y) * invDir.y;
-    float ty2 = (_max.y - origin.y) * invDir.y;
-    float tz1 = (_min.z - origin.z) * invDir.z;
-    float tz2 = (_max.z - origin.z) * invDir.z;
+bool AABB::raycast(const glm::vec3 &origin, const glm::vec3 &dir, float &distance) const {
+    glm::vec3 dirfrac(1.0f / dir);
+
+    float tx1 = (_min.x - origin.x) * dirfrac.x;
+    float tx2 = (_max.x - origin.x) * dirfrac.x;
+    float ty1 = (_min.y - origin.y) * dirfrac.y;
+    float ty2 = (_max.y - origin.y) * dirfrac.y;
+    float tz1 = (_min.z - origin.z) * dirfrac.z;
+    float tz2 = (_max.z - origin.z) * dirfrac.z;
     float tmin = glm::max(glm::max(glm::min(tx1, tx2), glm::min(ty1, ty2)), glm::min(tz1, tz2));
     float tmax = glm::min(glm::min(glm::max(tx1, tx2), glm::max(ty1, ty2)), glm::max(tz1, tz2));
 
-    if (tmax < 0.0f) return false; // backside intersection
-    if (tmax < tmin) return false; // neither backside nor frontside
+    if (tmax < 0.0f) return false; // AABB is behind
+    if (tmax < tmin) return false; // no intersection
 
     distance = tmin;
 
@@ -147,28 +149,6 @@ bool AABB::raycast(const glm::vec3 &origin, const glm::vec3 &invDir, float &dist
 
 glm::vec3 AABB::getSize() const {
     return _max - _min;
-}
-
-float AABB::getDistanceFromClosestPoint(const glm::vec3 &point) const {
-    return glm::distance(getClosestPoint(point), point);
-}
-
-glm::vec3 AABB::getClosestPoint(const glm::vec3 &point) const {
-    glm::vec3 closest;
-    for (int i = 0; i < 3; ++i) {
-        if (point[i] > _max[i]) {
-            closest[i] = _max[i];
-        } else if (point[i] < _min[i]) {
-            closest[i] = _min[i];
-        } else {
-            closest[i] = point[i];
-        }
-    }
-    return move(closest);
-}
-
-float AABB::getDistanceFromClosestPoint2(const glm::vec3 &point) const {
-    return glm::distance2(getClosestPoint(point), point);
 }
 
 } // namespace graphics

@@ -53,7 +53,7 @@ bool Walkmesh::raycast(const glm::vec3 &origin, const glm::vec3 &dir, bool walka
         const glm::vec3 &p1 = face.vertices[1];
         const glm::vec3 &p2 = face.vertices[2];
 
-        if (glm::intersectRayTriangle(origin, dir, p0, p1, p2, baryPosition, localDistance) && localDistance >= 0.0f && localDistance < minDistance) {
+        if (glm::intersectRayTriangle(origin, dir, p0, p1, p2, baryPosition, localDistance) && localDistance > 0.0f && localDistance < minDistance) {
             minDistance = localDistance;
             material = static_cast<int>(face.material);
         }

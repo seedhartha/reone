@@ -147,9 +147,8 @@ glm::vec2 Mesh::getFaceCenterUV(int faceIdx) const {
     if (faceIdx < 0 || faceIdx >= _indices.size() / 3) {
         throw out_of_range("faceIdx out of range");
     }
-    if (_offsets.texCoords1 == -1) {
-        throw logic_error("texCoords1 undefined");
-    }
+    if (_offsets.texCoords1 == -1) return glm::vec2(0.0f);
+
     glm::vec2 result(0.0f);
     const uint16_t *indices = &_indices[3 * faceIdx];
     for (int i = 0; i < 3; ++i) {
@@ -159,6 +158,7 @@ glm::vec2 Mesh::getFaceCenterUV(int faceIdx) const {
     }
     result /= 3.0f;
     result = glm::clamp(result);
+
     return move(result);
 }
 
