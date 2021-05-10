@@ -86,11 +86,10 @@ void SceneGraph::cullRoots() {
 }
 
 void SceneGraph::updateLighting() {
-    // Associate each model node with light sources
-    for (auto &root : _roots) {
-        if (root->type() == SceneNodeType::Model) {
-            static_pointer_cast<ModelSceneNode>(root)->updateLighting();
-        }
+    _closestLights.clear();
+
+    if (_lightingRefNode) {
+        getLightsAt(*_lightingRefNode, _closestLights, kMaxLights, [](auto &light) { return !light.isAmbientOnly(); });
     }
 }
 
@@ -167,9 +166,9 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
 void SceneGraph::refreshShadowLight() {
     const LightSceneNode *nextShadowLight = nullptr;
 
-    if (_shadowReference) {
+    if (_lightingRefNode) {
         vector<LightSceneNode *> lights;
-        getLightsAt(*_shadowReference, lights, 1, [](auto &light) { return light.isShadow(); });
+        getLightsAt(*_lightingRefNode, lights, 1, [](auto &light) { return light.isShadow(); });
 
         if (!lights.empty()) {
             nextShadowLight = lights.front();

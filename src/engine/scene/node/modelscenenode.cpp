@@ -246,34 +246,6 @@ void ModelSceneNode::attach(const string &parent, const shared_ptr<SceneNode> &n
     }
 }
 
-void ModelSceneNode::updateAbsoluteTransform() {
-    SceneNode::updateAbsoluteTransform();
-    _lightingDirty = true;
-}
-
-void ModelSceneNode::updateLighting() {
-    if (!_lightingDirty) return;
-
-    _lightsAffectedBy.clear();
-    _sceneGraph->getLightsAt(*this, _lightsAffectedBy, kMaxLights, bind(&ModelSceneNode::isAffectableByLight, this, _1));
-    _lightingDirty = false;
-
-    for (auto &attached : _attachedModels) {
-        attached.second->setLightsAffectedBy(_lightsAffectedBy);
-    }
-}
-
-bool ModelSceneNode::isAffectableByLight(const LightSceneNode &light) const {
-    if (light.isAmbientOnly()) {
-        return _usage == ModelUsage::Room;
-    }
-    return true;
-}
-
-void ModelSceneNode::setLightingIsDirty() {
-    _lightingDirty = true;
-}
-
 bool ModelSceneNode::getNodeAbsolutePosition(const string &name, glm::vec3 &position) const {
     shared_ptr<ModelNode> node(_model->findNodeByName(name));
     if (!node) {
@@ -313,9 +285,6 @@ void ModelSceneNode::setVisible(bool visible) {
     for (auto &attached : _attachedModels) {
         attached.second->setVisible(visible);
     }
-    if (visible) {
-        _lightingDirty = true;
-    }
 }
 
 void ModelSceneNode::setAlpha(float alpha) {
@@ -328,10 +297,6 @@ void ModelSceneNode::setAlpha(float alpha) {
 
 void ModelSceneNode::setProjectileSpeed(float speed) {
     _projectileSpeed = speed;
-}
-
-void ModelSceneNode::setLightsAffectedBy(const vector<LightSceneNode *> &lights) {
-    _lightsAffectedBy = lights;
 }
 
 void ModelSceneNode::setWalkmesh(shared_ptr<Walkmesh> walkmesh) {

@@ -83,17 +83,6 @@ public:
 
     // END Attachments
 
-    // Dynamic lighting
-
-    void updateLighting();
-    void setLightingIsDirty();
-
-    const std::vector<LightSceneNode *> &lightsAffectedBy() const { return _lightsAffectedBy; }
-
-    void setLightsAffectedBy(const std::vector<LightSceneNode *> &lights);
-
-    // END Dynamic lighting
-
 private:
     IAnimationEventListener *_animEventListener;
 
@@ -109,14 +98,9 @@ private:
     std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
     bool _visible { true };
     float _alpha { 1.0f };
-    std::vector<LightSceneNode *> _lightsAffectedBy;
-    bool _lightingDirty { true };
     float _projectileSpeed { 0.0f };
 
     void initModelNodes();
-    void updateAbsoluteTransform() override;
-
-    bool isAffectableByLight(const LightSceneNode &light) const;
 
     std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(graphics::ModelNode &node) const;
 };

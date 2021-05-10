@@ -725,15 +725,17 @@ void Game::updateSceneGraph(float dt) {
     const Camera *camera = getActiveCamera();
     if (!camera) return;
 
-    shared_ptr<SceneNode> shadowReference;
+    // Select a reference node for dynamic lighting
+    shared_ptr<SceneNode> lightingRefNode;
     shared_ptr<Creature> partyLeader(_party.getLeader());
     if (partyLeader && _cameraType == CameraType::ThirdPerson) {
-        shadowReference = partyLeader->getModelSceneNode();
+        lightingRefNode = partyLeader->getModelSceneNode();
     } else {
-        shadowReference = camera->sceneNode();
+        lightingRefNode = camera->sceneNode();
     }
+
     _sceneGraph.setActiveCamera(camera->sceneNode());
-    _sceneGraph.setShadowReference(shadowReference);
+    _sceneGraph.setLightingRefNode(lightingRefNode);
     _sceneGraph.setUpdateRoots(!_paused);
     _sceneGraph.update(dt);
 }

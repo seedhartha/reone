@@ -304,7 +304,7 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
             uniforms.combined.general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
         }
         if (isLightingEnabled()) {
-            const vector<LightSceneNode *> &lights = _modelSceneNode->lightsAffectedBy();
+            const vector<LightSceneNode *> &lights = _sceneGraph->closestLights();
 
             uniforms.combined.featureMask |= UniformFeatureFlags::lighting;
             if (_material.custom) {

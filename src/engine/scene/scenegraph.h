@@ -66,7 +66,6 @@ public:
 
     void setUpdateRoots(bool update) { _updateRoots = update; }
     void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
-    void setShadowReference(std::shared_ptr<SceneNode> reference) { _shadowReference = std::move(reference); }
     void setUniformsPrototype(graphics::ShaderUniforms &&uniforms) { _uniformsPrototype = uniforms; }
 
     // Roots
@@ -77,7 +76,7 @@ public:
 
     // END Roots
 
-    // Lights and shadows
+    // Lighting and shadows
 
     /**
      * Fill lights vector with up to count lights, sorted by priority and
@@ -90,12 +89,14 @@ public:
         std::function<bool(const LightSceneNode &)> predicate = [](auto &light) { return true; }) const;
 
     const glm::vec3 &ambientLightColor() const { return _ambientLightColor; }
+    const std::vector<LightSceneNode *> closestLights() const { return _closestLights; }
     const LightSceneNode *shadowLight() const { return _shadowLight; }
     float shadowStrength() const { return _shadowStrength; }
 
     void setAmbientLightColor(glm::vec3 color) { _ambientLightColor = std::move(color); }
+    void setLightingRefNode(std::shared_ptr<SceneNode> node) { _lightingRefNode = std::move(node); }
 
-    // END Lights and shadows
+    // END Lighting and shadows
 
     // Fog
 
@@ -127,19 +128,20 @@ private:
     std::vector<std::pair<EmitterSceneNode *, std::vector<Particle *>>> _particles;
     std::vector<std::pair<GrassSceneNode *, std::vector<GrassCluster>>> _grassClusters;
 
-    glm::vec3 _ambientLightColor { 0.5f };
     uint32_t _textureId { 0 };
     bool _updateRoots { true };
     graphics::ShaderUniforms _uniformsPrototype;
 
-    // Shadows
+    // Lighting and shadows
 
+    glm::vec3 _ambientLightColor { 0.5f };
+    std::shared_ptr<SceneNode> _lightingRefNode; /**< reference node to use when selecting closest light sources */
+    std::vector<LightSceneNode *> _closestLights;
     const LightSceneNode *_shadowLight { nullptr };
-    std::shared_ptr<SceneNode> _shadowReference;
     float _shadowStrength { 1.0f };
     bool _shadowFading { false };
 
-    // END Shadows
+    // END Lighting and shadows
 
     // Fog
 
