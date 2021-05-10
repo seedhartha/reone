@@ -255,7 +255,7 @@ void ModelSceneNode::updateLighting() {
     if (!_lightingDirty) return;
 
     _lightsAffectedBy.clear();
-    _sceneGraph->getLightsAt(*this, _lightsAffectedBy, _sceneGraph->options().numLights, bind(&ModelSceneNode::isAffectableByLight, this, _1));
+    _sceneGraph->getLightsAt(*this, _lightsAffectedBy, kMaxLights, bind(&ModelSceneNode::isAffectableByLight, this, _1));
     _lightingDirty = false;
 
     for (auto &attached : _attachedModels) {
