@@ -25,7 +25,7 @@ namespace graphics {
 
 constexpr int kNumCubeFaces = 6;
 constexpr int kMaxBones = 128;
-constexpr int kMaxLights = 16;
+constexpr int kMaxLights = 8;
 constexpr int kMaxParticles = 32;
 constexpr int kMaxCharacters = 128;
 constexpr int kMaxGrassClusters = 256;
@@ -84,7 +84,6 @@ struct GraphicsOptions {
     int width { 0 };
     int height { 0 };
     bool fullscreen { false };
-    int numLights { 8 };
     int shadowResolution { 0 };
 };
 
