@@ -169,11 +169,14 @@ bool ModelNodeSceneNode::shouldRender() const {
 }
 
 bool ModelNodeSceneNode::shouldCastShadows() const {
-    if (_modelSceneNode->usage() != ModelUsage::Creature) return false;
+    // Skin nodes must not cast shadows
+    if (static_cast<bool>(_modelNode->skin())) return false;
 
+    // Meshless nodes must not cast shadows
     shared_ptr<ModelMesh> mesh(_modelNode->mesh());
+    if (!mesh) return false;
 
-    return mesh && mesh->shouldCastShadows() && !static_cast<bool>(_modelNode->skin());
+    return mesh->shouldCastShadows();
 }
 
 bool ModelNodeSceneNode::isTransparent() const {
