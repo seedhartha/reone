@@ -195,6 +195,7 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/textureutil.h
     src/engine/graphics/textutil.h
     src/engine/graphics/types.h
+    src/engine/graphics/vertexattributes.h
     src/engine/graphics/walkmesh/bwmreader.h
     src/engine/graphics/walkmesh/walkmesh.h
     src/engine/graphics/walkmesh/walkmeshes.h

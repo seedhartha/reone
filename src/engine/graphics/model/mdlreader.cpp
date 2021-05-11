@@ -890,15 +890,15 @@ void MdlReader::readMesh(ModelNode &node) {
     _mdxReader->seek(offMdxData);
     vertices = _mdxReader->getFloatArray(header.numVertices * header.mdxVertexSize / sizeof(float));
 
-    Mesh::VertexOffsets offsets;
-    offsets.stride = header.mdxVertexSize;
-    offsets.vertexCoords = header.offMdxVertices;
-    offsets.normals = header.offMdxNormals;
-    offsets.texCoords1 = header.offMdxTexCoords1;
-    offsets.texCoords2 = header.offMdxTexCoords2;
+    VertexAttributes attributes;
+    attributes.stride = header.mdxVertexSize;
+    attributes.offCoords = header.offMdxVertices;
+    attributes.offNormals = header.offMdxNormals;
+    attributes.offTexCoords1 = header.offMdxTexCoords1;
+    attributes.offTexCoords2 = header.offMdxTexCoords2;
     if (header.offMdxTanSpace != -1) {
-        offsets.bitangents = header.offMdxTanSpace + 0 * sizeof(float);
-        offsets.tangents = header.offMdxTanSpace + 3 * sizeof(float);
+        attributes.offBitangents = header.offMdxTanSpace + 0 * sizeof(float);
+        attributes.offTangents = header.offMdxTanSpace + 3 * sizeof(float);
     }
 
     vector<uint16_t> indices;
@@ -909,7 +909,7 @@ void MdlReader::readMesh(ModelNode &node) {
 
     seek(endPos);
 
-    loadMesh(header, header.numVertices, move(vertices), move(indices), move(offsets), node);
+    loadMesh(header, header.numVertices, move(vertices), move(indices), move(attributes), node);
 }
 
 MdlReader::MeshHeader MdlReader::readMeshHeader() {
@@ -983,7 +983,7 @@ MdlReader::MeshHeader MdlReader::readMeshHeader() {
     return move(result);
 }
 
-void MdlReader::loadMesh(const MeshHeader &header, int numVertices, vector<float> &&vertices, vector<uint16_t> &&indices, Mesh::VertexOffsets &&offsets, ModelNode &node) {
+void MdlReader::loadMesh(const MeshHeader &header, int numVertices, vector<float> &&vertices, vector<uint16_t> &&indices, VertexAttributes &&offsets, ModelNode &node) {
     auto mesh = make_unique<Mesh>(numVertices, vertices, indices, offsets);
     mesh->computeAABB();
 
@@ -1020,8 +1020,8 @@ void MdlReader::readSkin(ModelNode &node) {
     vector<uint16_t> boneIndices(readUint16Array(16));
     ignore(4); // padding
 
-    node._mesh->_mesh->_offsets.boneWeights = offMdxBoneWeights;
-    node._mesh->_mesh->_offsets.boneIndices = offMdxBoneIndices;
+    node._mesh->_mesh->_attributes.offBoneWeights = offMdxBoneWeights;
+    node._mesh->_mesh->_attributes.offBoneIndices = offMdxBoneIndices;
 
     unordered_map<uint16_t, uint16_t> nodeIdxByBoneIdx;
     seek(kMdlDataOffset + offBones);
@@ -1095,11 +1095,11 @@ void MdlReader::readSaber(ModelNode &node) {
         *(verticesPtr++) = normalsPtr[2];
     }
 
-    Mesh::VertexOffsets offsets;
-    offsets.vertexCoords = 0;
-    offsets.texCoords1 = 3 * sizeof(float);
-    offsets.normals = 5 * sizeof(float);
-    offsets.stride = 8 * sizeof(float);
+    VertexAttributes attributes;
+    attributes.stride = 8 * sizeof(float);
+    attributes.offCoords = 0;
+    attributes.offTexCoords1 = 3 * sizeof(float);
+    attributes.offNormals = 5 * sizeof(float);
 
     vector<uint16_t> indices {
         0, 13, 12, 0, 1, 13,
@@ -1110,7 +1110,7 @@ void MdlReader::readSaber(ModelNode &node) {
         10, 6, 7, 10, 7, 11
     };
 
-    loadMesh(header, numVertices, move(vertices), move(indices), move(offsets), node);
+    loadMesh(header, numVertices, move(vertices), move(indices), move(attributes), node);
 }
 
 void MdlReader::readDanglymesh(ModelNode &node) {

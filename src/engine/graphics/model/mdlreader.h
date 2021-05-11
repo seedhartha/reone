@@ -99,7 +99,7 @@ private:
     void readAABB(graphics::ModelNode &node);
     void readSaber(graphics::ModelNode &node);
 
-    void loadMesh(const MeshHeader &header, int numVertices, std::vector<float> &&vertices, std::vector<uint16_t> &&indices, Mesh::VertexOffsets &&offsets, graphics::ModelNode &node);
+    void loadMesh(const MeshHeader &header, int numVertices, std::vector<float> &&vertices, std::vector<uint16_t> &&indices, VertexAttributes &&attributes, graphics::ModelNode &node);
     MeshHeader readMeshHeader();
     std::shared_ptr<AABBNode> readAABBNode(uint32_t offset);
 };
