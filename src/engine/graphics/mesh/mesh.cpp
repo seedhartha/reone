@@ -40,20 +40,33 @@ Mesh::Mesh(vector<float> vertices, vector<uint16_t> indices, VertexAttributes at
     if (attributes.stride == 0) {
         throw invalid_argument("stride in attributes must not be zero");
     }
-    _vertexCount = _vertices.size() / attributes.stride / sizeof(float);
+    _vertexCount = _vertices.size() / (attributes.stride / sizeof(float));
+
+    computeAABB();
+}
+
+void Mesh::computeAABB() {
+    _aabb.reset();
+
+    auto coordsPtr = reinterpret_cast<uint8_t *>(&_vertices[0]) + _attributes.offCoords;
+
+    for (size_t i = 0; i < _vertexCount; ++i) {
+        _aabb.expand(glm::make_vec3(reinterpret_cast<const float *>(coordsPtr)));
+        coordsPtr += _attributes.stride;
+    }
 }
 
 void Mesh::init() {
     if (_inited) return;
 
-    glGenBuffers(1, &_vbo);
-    glGenBuffers(1, &_ibo);
+    glGenBuffers(1, &_vboId);
+    glGenBuffers(1, &_iboId);
 
-    glGenVertexArrays(1, &_vao);
-    glBindVertexArray(_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+    glGenVertexArrays(1, &_vaoId);
+    glBindVertexArray(_vaoId);
+    glBindBuffer(GL_ARRAY_BUFFER, _vboId);
     glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(float), &_vertices[0], GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iboId);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(uint16_t), &_indices[0], GL_STATIC_DRAW);
 
     if (_attributes.offCoords != -1) {
@@ -99,44 +112,36 @@ Mesh::~Mesh() {
 }
 
 void Mesh::deinit() {
-    if (_inited) {
-        glDeleteVertexArrays(1, &_vao);
-        glDeleteBuffers(1, &_ibo);
-        glDeleteBuffers(1, &_vbo);
-        _inited = false;
-    }
+    if (!_inited) return;
+
+    glDeleteVertexArrays(1, &_vaoId);
+    glDeleteBuffers(1, &_iboId);
+    glDeleteBuffers(1, &_vboId);
+
+    _inited = false;
 }
 
 static GLenum getModeGL(Mesh::DrawMode mode) {
     switch (mode) {
         case Mesh::DrawMode::Lines:
             return GL_LINES;
+        case Mesh::DrawMode::Triangles:
+            return GL_TRIANGLES;
         case Mesh::DrawMode::TriangleStrip:
             return GL_TRIANGLE_STRIP;
         default:
-            return GL_TRIANGLES;
+            throw invalid_argument("Unsupported draw mode: " + to_string(static_cast<int>(mode)));
     }
 }
 
 void Mesh::draw() {
-    glBindVertexArray(_vao);
+    glBindVertexArray(_vaoId);
     glDrawElements(getModeGL(_mode), static_cast<GLsizei>(_indices.size()), GL_UNSIGNED_SHORT, nullptr);
 }
 
 void Mesh::drawInstanced(int count) {
-    glBindVertexArray(_vao);
+    glBindVertexArray(_vaoId);
     glDrawElementsInstanced(getModeGL(_mode), static_cast<GLsizei>(_indices.size()), GL_UNSIGNED_SHORT, nullptr, count);
-}
-
-void Mesh::computeAABB() {
-    _aabb.reset();
-
-    auto coordsPtr = reinterpret_cast<uint8_t *>(&_vertices[0]) + _attributes.offCoords;
-
-    for (size_t i = 0; i < _vertexCount; ++i) {
-        _aabb.expand(glm::make_vec3(reinterpret_cast<const float *>(coordsPtr)));
-        coordsPtr += _attributes.stride;
-    }
 }
 
 glm::vec2 Mesh::getFaceCenterUV(int faceIdx) const {
