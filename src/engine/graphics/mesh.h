@@ -41,7 +41,7 @@ public:
         TriangleStrip
     };
 
-    Mesh(int vertexCount, std::vector<float> vertices, std::vector<uint16_t> indices, VertexAttributes attributes, DrawMode mode = DrawMode::Triangles);
+    Mesh(std::vector<float> vertices, std::vector<uint16_t> indices, VertexAttributes attributes, DrawMode mode = DrawMode::Triangles);
     ~Mesh();
 
     void init();
@@ -65,18 +65,23 @@ public:
     VertexAttributes &attributes() { return _attributes; }
     const AABB &aabb() const { return _aabb; }
 
-protected:
-    int _vertexCount;
+private:
     std::vector<float> _vertices;
     std::vector<uint16_t> _indices;
     VertexAttributes _attributes;
     DrawMode _mode;
 
+    int _vertexCount { 0 };
     bool _inited { false };
+    AABB _aabb;
+
+    // OpenGL
+
     uint32_t _vbo { 0 };
     uint32_t _ibo { 0 };
     uint32_t _vao { 0 };
-    AABB _aabb;
+
+    // END OpenGL
 };
 
 } // namespace graphics

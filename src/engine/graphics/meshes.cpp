@@ -210,13 +210,12 @@ Meshes &Meshes::instance() {
 }
 
 static unique_ptr<Mesh> getMesh(
-    int vertexCount,
     const vector<float> &vertices,
     const vector<uint16_t> &indices,
     const VertexAttributes &attributes,
     Mesh::DrawMode mode = Mesh::DrawMode::Triangles) {
 
-    auto mesh = make_unique<Mesh>(vertexCount, vertices, indices, attributes, mode);
+    auto mesh = make_unique<Mesh>(vertices, indices, attributes, mode);
     mesh->init();
     return move(mesh);
 }
@@ -267,7 +266,7 @@ static unique_ptr<Mesh> getSphereMesh() {
         oddRow = !oddRow;
     }
 
-    auto mesh = make_unique<Mesh>(static_cast<int>(vertices.size()) / 8, move(vertices), move(indices), move(attributes), Mesh::DrawMode::TriangleStrip);
+    auto mesh = make_unique<Mesh>(move(vertices), move(indices), move(attributes), Mesh::DrawMode::TriangleStrip);
     mesh->init();
 
     return move(mesh);
@@ -275,20 +274,20 @@ static unique_ptr<Mesh> getSphereMesh() {
 
 void Meshes::init() {
     if (!_inited) {
-        _quad = getMesh(4, g_quadVertices, g_quadIndices, g_quadAttributes);
-        _quadFlipX = getMesh(4, g_quadFlipXVertices, g_quadIndices, g_quadAttributes);
-        _quadFlipY = getMesh(4, g_quadFlipYVertices, g_quadIndices, g_quadAttributes);
-        _quadFlipXY = getMesh(4, g_quadFlipXYVertices, g_quadIndices, g_quadAttributes);
-        _quadSwap = getMesh(4, g_quadSwapVertices, g_quadIndices, g_quadAttributes);
-        _quadSwapFlipX = getMesh(4, g_quadSwapFlipXVertices, g_quadIndices, g_quadAttributes);
-        _quadNDC = getMesh(4, g_quadNDCVertices, g_quadIndices, g_quadAttributes);
-        _quadNDCFlipY = getMesh(4, g_quadNDCFlipYVertices, g_quadIndices, g_quadAttributes);
-        _billboard = getMesh(4, g_billboardVertices, g_quadIndices, g_quadAttributes);
-        _grass = getMesh(4, g_grassVertices, g_quadIndices, g_quadAttributes);
-        _cube = getMesh(8, g_cubeVertices, g_cubeIndices, g_cubeAttributes);
+        _quad = getMesh(g_quadVertices, g_quadIndices, g_quadAttributes);
+        _quadFlipX = getMesh(g_quadFlipXVertices, g_quadIndices, g_quadAttributes);
+        _quadFlipY = getMesh(g_quadFlipYVertices, g_quadIndices, g_quadAttributes);
+        _quadFlipXY = getMesh(g_quadFlipXYVertices, g_quadIndices, g_quadAttributes);
+        _quadSwap = getMesh(g_quadSwapVertices, g_quadIndices, g_quadAttributes);
+        _quadSwapFlipX = getMesh(g_quadSwapFlipXVertices, g_quadIndices, g_quadAttributes);
+        _quadNDC = getMesh(g_quadNDCVertices, g_quadIndices, g_quadAttributes);
+        _quadNDCFlipY = getMesh(g_quadNDCFlipYVertices, g_quadIndices, g_quadAttributes);
+        _billboard = getMesh(g_billboardVertices, g_quadIndices, g_quadAttributes);
+        _grass = getMesh(g_grassVertices, g_quadIndices, g_quadAttributes);
+        _cube = getMesh(g_cubeVertices, g_cubeIndices, g_cubeAttributes);
         _sphere = getSphereMesh();
-        _cubemap = getMesh(24, g_cubemapVertices, g_cubemapIndices, g_cubemapAttributes);
-        _aabb = getMesh(8, g_aabbVertices, g_aabbIndices, g_aabbAttributes, Mesh::DrawMode::Lines);
+        _cubemap = getMesh(g_cubemapVertices, g_cubemapIndices, g_cubemapAttributes);
+        _aabb = getMesh(g_aabbVertices, g_aabbIndices, g_aabbAttributes, Mesh::DrawMode::Lines);
 
         _inited = true;
     }

@@ -17,12 +17,14 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace reone {
 
 namespace graphics {
 
 struct VertexAttributes {
-    int stride { 0 };
+    uint32_t stride { 0 };
     int offCoords { 0 };
     int offNormals { -1 };
     int offTexCoords1 { -1 };
