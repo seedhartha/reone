@@ -18,6 +18,7 @@
 #include "mesh.h"
 
 #include <stdexcept>
+#include <string>
 
 #include "GL/glew.h"
 #include "SDL2/SDL_opengl.h"
@@ -126,23 +127,24 @@ void Mesh::drawInstanced(int count) {
 void Mesh::computeAABB() {
     _aabb.reset();
 
-    int stride = _attributes.stride;
-    if (stride == 0) {
-        stride = 3 * sizeof(float);
-    }
-    auto vertCoords = reinterpret_cast<uint8_t *>(&_vertices[0]) + _attributes.offCoords;
+    auto coordsPtr = reinterpret_cast<uint8_t *>(&_vertices[0]) + _attributes.offCoords;
 
     for (size_t i = 0; i < _vertexCount; ++i) {
-        _aabb.expand(glm::make_vec3(reinterpret_cast<const float *>(vertCoords)));
-        vertCoords += stride;
+        _aabb.expand(glm::make_vec3(reinterpret_cast<const float *>(coordsPtr)));
+        coordsPtr += _attributes.stride;
     }
 }
 
 glm::vec2 Mesh::getFaceCenterUV(int faceIdx) const {
-    if (faceIdx < 0 || faceIdx >= _indices.size() / 3) {
+    if (_mode != DrawMode::Triangles) {
+        throw logic_error("Unsupported draw mode: " + to_string(static_cast<int>(_mode)));
+    }
+    if (faceIdx < 0 || faceIdx >= static_cast<int>(_indices.size()) / 3) {
         throw out_of_range("faceIdx out of range");
     }
-    if (_attributes.offTexCoords1 == -1) return glm::vec2(0.0f);
+    if (_attributes.offTexCoords1 == -1) {
+        return glm::vec2(0.0f);
+    }
 
     glm::vec2 result(0.0f);
     const uint16_t *indices = &_indices[3 * faceIdx];

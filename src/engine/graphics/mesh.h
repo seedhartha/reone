@@ -29,8 +29,6 @@ namespace reone {
 
 namespace graphics {
 
-class MdlReader;
-
 /**
  * Polygonal mesh, containing vertex and index data. Renders itself,
  * but does not manage textures and shaders.
@@ -64,6 +62,7 @@ public:
     const std::vector<float> &vertices() const { return _vertices; }
     const std::vector<uint16_t> &indices() const { return _indices; }
     const VertexAttributes &attributes() const { return _attributes; }
+    VertexAttributes &attributes() { return _attributes; }
     const AABB &aabb() const { return _aabb; }
 
 protected:
@@ -78,8 +77,6 @@ protected:
     uint32_t _ibo { 0 };
     uint32_t _vao { 0 };
     AABB _aabb;
-
-    friend class MdlReader;
 };
 
 } // namespace graphics
