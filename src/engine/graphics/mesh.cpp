@@ -31,12 +31,16 @@ namespace reone {
 
 namespace graphics {
 
-Mesh::Mesh(int vertexCount, vector<float> vertices, vector<uint16_t> indices, VertexAttributes attributes, DrawMode mode) :
-    _vertexCount(vertexCount),
+Mesh::Mesh(vector<float> vertices, vector<uint16_t> indices, VertexAttributes attributes, DrawMode mode) :
     _vertices(move(vertices)),
     _indices(move(indices)),
     _attributes(move(attributes)),
     _mode(mode) {
+
+    if (attributes.stride == 0) {
+        throw invalid_argument("stride in attributes must not be zero");
+    }
+    _vertexCount = _vertices.size() / attributes.stride / sizeof(float);
 }
 
 void Mesh::init() {

@@ -909,7 +909,7 @@ void MdlReader::readMesh(ModelNode &node) {
 
     seek(endPos);
 
-    loadMesh(header, header.numVertices, move(vertices), move(indices), move(attributes), node);
+    loadMesh(header, move(vertices), move(indices), move(attributes), node);
 }
 
 MdlReader::MeshHeader MdlReader::readMeshHeader() {
@@ -983,8 +983,8 @@ MdlReader::MeshHeader MdlReader::readMeshHeader() {
     return move(result);
 }
 
-void MdlReader::loadMesh(const MeshHeader &header, int numVertices, vector<float> &&vertices, vector<uint16_t> &&indices, VertexAttributes &&attributes, ModelNode &node) {
-    auto mesh = make_unique<Mesh>(numVertices, vertices, indices, attributes);
+void MdlReader::loadMesh(const MeshHeader &header, vector<float> &&vertices, vector<uint16_t> &&indices, VertexAttributes &&attributes, ModelNode &node) {
+    auto mesh = make_unique<Mesh>(vertices, indices, attributes);
     mesh->computeAABB();
 
     node._mesh = make_unique<ModelMesh>(move(mesh));
@@ -1110,7 +1110,7 @@ void MdlReader::readSaber(ModelNode &node) {
         10, 6, 7, 10, 7, 11
     };
 
-    loadMesh(header, numVertices, move(vertices), move(indices), move(attributes), node);
+    loadMesh(header, move(vertices), move(indices), move(attributes), node);
 }
 
 void MdlReader::readDanglymesh(ModelNode &node) {
