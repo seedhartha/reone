@@ -19,17 +19,18 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../common/log.h"
-#include "../common/streamutil.h"
-#include "../resource/resources.h"
+#include "../../common/log.h"
+#include "../../common/streamutil.h"
+#include "../../resource/resources.h"
 
-#include "image/curreader.h"
-#include "image/tgareader.h"
-#include "image/tpcreader.h"
-#include "image/txireader.h"
-#include "statemanager.h"
+#include "../statemanager.h"
+#include "../types.h"
+
+#include "curreader.h"
 #include "textureutil.h"
-#include "types.h"
+#include "tgareader.h"
+#include "tpcreader.h"
+#include "txireader.h"
 
 using namespace std;
 

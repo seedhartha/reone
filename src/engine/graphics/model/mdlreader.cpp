@@ -26,7 +26,7 @@
 #include "../../common/collectionutil.h"
 #include "../../common/log.h"
 
-#include "../textures.h"
+#include "../texture/textures.h"
 
 #include "models.h"
 

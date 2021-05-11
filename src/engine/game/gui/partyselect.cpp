@@ -21,7 +21,7 @@
 
 #include "../../gui/control/label.h"
 #include "../../gui/control/togglebutton.h"
-#include "../../graphics/textures.h"
+#include "../../graphics/texture/textures.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 #include "../../script/types.h"

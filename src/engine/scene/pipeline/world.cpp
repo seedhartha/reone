@@ -23,12 +23,12 @@
 
 #include "GL/glew.h"
 
-#include "../../graphics/meshes.h"
+#include "../../graphics/mesh/meshes.h"
 #include "../../graphics/pbribl.h"
 #include "../../graphics/shader/shaders.h"
 #include "../../graphics/statemanager.h"
-#include "../../graphics/textures.h"
-#include "../../graphics/textureutil.h"
+#include "../../graphics/texture/textures.h"
+#include "../../graphics/texture/textureutil.h"
 #include "../../graphics/window.h"
 
 #include "../node/cameranode.h"

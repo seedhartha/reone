@@ -21,7 +21,7 @@
 
 #include "glm/vec2.hpp"
 
-#include "../texture.h"
+#include "../texture/texture.h"
 
 namespace reone {
 

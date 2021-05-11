@@ -21,7 +21,7 @@
 #include "../../common/collectionutil.h"
 #include "../../common/log.h"
 #include "../../graphics/featureutil.h"
-#include "../../graphics/meshes.h"
+#include "../../graphics/mesh/meshes.h"
 #include "../../resource/resources.h"
 
 #include "../scenegraph.h"

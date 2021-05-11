@@ -22,12 +22,12 @@
 
 #include "glm/ext.hpp"
 
-#include "meshes.h"
+#include "mesh/meshes.h"
 #include "renderbuffer.h"
 #include "shader/shaders.h"
 #include "statemanager.h"
-#include "texture.h"
-#include "textureutil.h"
+#include "texture/texture.h"
+#include "texture/textureutil.h"
 
 using namespace std;
 

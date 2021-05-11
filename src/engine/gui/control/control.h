@@ -28,7 +28,7 @@
 
 #include "../../graphics/font.h"
 #include "../../graphics/framebuffer.h"
-#include "../../graphics/texture.h"
+#include "../../graphics/texture/texture.h"
 #include "../../resource/format/gffreader.h"
 #include "../../scene/node/modelscenenode.h"
 #include "../../scene/pipeline/control.h"

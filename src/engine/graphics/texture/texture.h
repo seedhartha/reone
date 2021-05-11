@@ -24,9 +24,9 @@
 
 #include "glm/vec3.hpp"
 
-#include "../common/types.h"
+#include "../../common/types.h"
 
-#include "types.h"
+#include "../types.h"
 
 namespace reone {
 

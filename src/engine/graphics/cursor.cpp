@@ -22,10 +22,10 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
-#include "meshes.h"
+#include "mesh/meshes.h"
 #include "shader/shaders.h"
 #include "statemanager.h"
-#include "texture.h"
+#include "texture/texture.h"
 #include "window.h"
 
 using namespace std;

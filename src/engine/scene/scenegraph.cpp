@@ -19,7 +19,7 @@
 
 #include <algorithm>
 
-#include "../graphics/meshes.h"
+#include "../graphics/mesh/meshes.h"
 
 #include "node/cameranode.h"
 #include "node/emitternode.h"

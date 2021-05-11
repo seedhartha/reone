@@ -26,7 +26,7 @@
 
 #include "../../audio/files.h"
 #include "../../graphics/model/models.h"
-#include "../../graphics/textures.h"
+#include "../../graphics/texture/textures.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 

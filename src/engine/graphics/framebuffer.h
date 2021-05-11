@@ -22,7 +22,7 @@
 #include <boost/noncopyable.hpp>
 
 #include "renderbuffer.h"
-#include "texture.h"
+#include "texture/texture.h"
 
 namespace reone {
 

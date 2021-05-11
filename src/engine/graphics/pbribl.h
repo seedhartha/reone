@@ -25,7 +25,7 @@
 #include <boost/noncopyable.hpp>
 
 #include "framebuffer.h"
-#include "texture.h"
+#include "texture/texture.h"
 
 namespace reone {
 

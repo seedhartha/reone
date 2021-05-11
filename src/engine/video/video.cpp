@@ -24,10 +24,10 @@
 
 #include "glm/ext.hpp"
 
-#include "../graphics/meshes.h"
+#include "../graphics/mesh/meshes.h"
 #include "../graphics/shader/shaders.h"
 #include "../graphics/statemanager.h"
-#include "../graphics/textureutil.h"
+#include "../graphics/texture/textureutil.h"
 
 using namespace std;
 

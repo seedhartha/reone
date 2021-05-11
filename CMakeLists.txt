@@ -162,19 +162,15 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/font.h
     src/engine/graphics/fonts.h
     src/engine/graphics/framebuffer.h
-    src/engine/graphics/image/curreader.h
-    src/engine/graphics/image/tgareader.h
-    src/engine/graphics/image/tgawriter.h
-    src/engine/graphics/image/tpcreader.h
-    src/engine/graphics/image/txireader.h
     src/engine/graphics/lip/lipanimation.h
     src/engine/graphics/lip/lipreader.h
     src/engine/graphics/lip/lips.h
     src/engine/graphics/lip/lipwriter.h
     src/engine/graphics/material.h
     src/engine/graphics/materials.h
-    src/engine/graphics/mesh.h
-    src/engine/graphics/meshes.h
+    src/engine/graphics/mesh/mesh.h
+    src/engine/graphics/mesh/meshes.h
+    src/engine/graphics/mesh/vertexattributes.h
     src/engine/graphics/model/aabbnode.h
     src/engine/graphics/model/animatedproperty.h
     src/engine/graphics/model/animation.h
@@ -189,12 +185,16 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/renderbuffer.h
     src/engine/graphics/shader/shaders.h
     src/engine/graphics/statemanager.h
-    src/engine/graphics/texture.h
-    src/engine/graphics/textures.h
-    src/engine/graphics/textureutil.h
+    src/engine/graphics/texture/curreader.h
+    src/engine/graphics/texture/texture.h
+    src/engine/graphics/texture/textures.h
+    src/engine/graphics/texture/textureutil.h
+    src/engine/graphics/texture/tgareader.h
+    src/engine/graphics/texture/tgawriter.h
+    src/engine/graphics/texture/tpcreader.h
+    src/engine/graphics/texture/txireader.h
     src/engine/graphics/textutil.h
     src/engine/graphics/types.h
-    src/engine/graphics/vertexattributes.h
     src/engine/graphics/walkmesh/bwmreader.h
     src/engine/graphics/walkmesh/walkmesh.h
     src/engine/graphics/walkmesh/walkmeshes.h
@@ -207,19 +207,13 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/font.cpp
     src/engine/graphics/fonts.cpp
     src/engine/graphics/framebuffer.cpp
-    src/engine/graphics/image/curreader.cpp
-    src/engine/graphics/image/tgareader.cpp
-    src/engine/graphics/image/tgawriter.cpp
-    src/engine/graphics/image/tpcreader.cpp
-    src/engine/graphics/image/txireader.cpp
     src/engine/graphics/lip/lipanimation.cpp
     src/engine/graphics/lip/lipreader.cpp
     src/engine/graphics/lip/lips.cpp
     src/engine/graphics/lip/lipwriter.cpp
     src/engine/graphics/materials.cpp
-    src/engine/graphics/mesh.cpp
-    src/engine/graphics/meshes.cpp
-    src/engine/graphics/model/aabbnode.cpp
+    src/engine/graphics/mesh/mesh.cpp
+    src/engine/graphics/mesh/meshes.cpp
     src/engine/graphics/model/animation.cpp
     src/engine/graphics/model/mdlreader.cpp
     src/engine/graphics/model/model.cpp
@@ -233,9 +227,14 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/shader/shaders_pbr.cpp
     src/engine/graphics/shader/shaders_phong.cpp
     src/engine/graphics/statemanager.cpp
-    src/engine/graphics/texture.cpp
-    src/engine/graphics/textures.cpp
-    src/engine/graphics/textureutil.cpp
+    src/engine/graphics/texture/curreader.cpp
+    src/engine/graphics/texture/texture.cpp
+    src/engine/graphics/texture/textures.cpp
+    src/engine/graphics/texture/textureutil.cpp
+    src/engine/graphics/texture/tgareader.cpp
+    src/engine/graphics/texture/tgawriter.cpp
+    src/engine/graphics/texture/tpcreader.cpp
+    src/engine/graphics/texture/txireader.cpp
     src/engine/graphics/textutil.cpp
     src/engine/graphics/walkmesh/bwmreader.cpp
     src/engine/graphics/walkmesh/walkmesh.cpp

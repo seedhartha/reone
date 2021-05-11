@@ -23,7 +23,7 @@
 
 #include "../../graphics/framebuffer.h"
 #include "../../graphics/renderbuffer.h"
-#include "../../graphics/texture.h"
+#include "../../graphics/texture/texture.h"
 #include "../../graphics/types.h"
 
 #include "../scenegraph.h"

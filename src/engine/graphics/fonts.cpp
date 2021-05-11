@@ -21,7 +21,7 @@
 #include "../resource/resources.h"
 
 #include "font.h"
-#include "textures.h"
+#include "texture/textures.h"
 
 using namespace std;
 using namespace std::placeholders;

@@ -17,10 +17,10 @@
 
 #include "scrollbar.h"
 
-#include "../../graphics/meshes.h"
+#include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
 #include "../../graphics/statemanager.h"
-#include "../../graphics/textures.h"
+#include "../../graphics/texture/textures.h"
 #include "../../graphics/window.h"
 #include "../../resource/resources.h"
 

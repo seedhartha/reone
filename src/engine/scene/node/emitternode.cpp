@@ -24,7 +24,7 @@
 #include "glm/gtc/constants.hpp"
 
 #include "../../common/random.h"
-#include "../../graphics/meshes.h"
+#include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
 #include "../../graphics/statemanager.h"
 
