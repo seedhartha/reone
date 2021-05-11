@@ -23,6 +23,7 @@
 #include <boost/noncopyable.hpp>
 
 #include "aabb.h"
+#include "vertexattributes.h"
 
 namespace reone {
 
@@ -42,19 +43,7 @@ public:
         TriangleStrip
     };
 
-    struct VertexOffsets {
-        int vertexCoords { 0 };
-        int normals { -1 };
-        int texCoords1 { -1 };
-        int texCoords2 { -1 };
-        int tangents { -1 };
-        int bitangents { -1 };
-        int boneWeights { -1 };
-        int boneIndices { -1 };
-        int stride { 0 };
-    };
-
-    Mesh(int vertexCount, std::vector<float> vertices, std::vector<uint16_t> indices, VertexOffsets offsets, DrawMode mode = DrawMode::Triangles);
+    Mesh(int vertexCount, std::vector<float> vertices, std::vector<uint16_t> indices, VertexAttributes attributes, DrawMode mode = DrawMode::Triangles);
     ~Mesh();
 
     void init();
@@ -74,14 +63,14 @@ public:
 
     const std::vector<float> &vertices() const { return _vertices; }
     const std::vector<uint16_t> &indices() const { return _indices; }
-    const VertexOffsets &offsets() const { return _offsets; }
+    const VertexAttributes &attributes() const { return _attributes; }
     const AABB &aabb() const { return _aabb; }
 
 protected:
     int _vertexCount;
     std::vector<float> _vertices;
     std::vector<uint16_t> _indices;
-    VertexOffsets _offsets;
+    VertexAttributes _attributes;
     DrawMode _mode;
 
     bool _inited { false };

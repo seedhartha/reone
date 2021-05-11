@@ -30,11 +30,11 @@ namespace reone {
 
 namespace graphics {
 
-Mesh::Mesh(int vertexCount, vector<float> vertices, vector<uint16_t> indices, VertexOffsets offsets, DrawMode mode) :
+Mesh::Mesh(int vertexCount, vector<float> vertices, vector<uint16_t> indices, VertexAttributes attributes, DrawMode mode) :
     _vertexCount(vertexCount),
     _vertices(move(vertices)),
     _indices(move(indices)),
-    _offsets(move(offsets)),
+    _attributes(move(attributes)),
     _mode(mode) {
 }
 
@@ -51,37 +51,37 @@ void Mesh::init() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(uint16_t), &_indices[0], GL_STATIC_DRAW);
 
-    if (_offsets.vertexCoords != -1) {
+    if (_attributes.offCoords != -1) {
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.vertexCoords));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offCoords));
     }
-    if (_offsets.normals != -1) {
+    if (_attributes.offNormals != -1) {
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.normals));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offNormals));
     }
-    if (_offsets.texCoords1 != -1) {
+    if (_attributes.offTexCoords1 != -1) {
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.texCoords1));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offTexCoords1));
     }
-    if (_offsets.texCoords2 != -1) {
+    if (_attributes.offTexCoords2 != -1) {
         glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.texCoords2));
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offTexCoords2));
     }
-    if (_offsets.tangents != -1) {
+    if (_attributes.offTangents != -1) {
         glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.tangents));
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offTangents));
     }
-    if (_offsets.bitangents != -1) {
+    if (_attributes.offBitangents != -1) {
         glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.bitangents));
+        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offBitangents));
     }
-    if (_offsets.boneWeights != -1) {
+    if (_attributes.offBoneWeights != -1) {
         glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.boneWeights));
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offBoneWeights));
     }
-    if (_offsets.boneIndices != -1) {
+    if (_attributes.offBoneIndices != -1) {
         glEnableVertexAttribArray(7);
-        glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.boneIndices));
+        glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offBoneIndices));
     }
 
     glBindVertexArray(0);
@@ -126,11 +126,11 @@ void Mesh::drawInstanced(int count) {
 void Mesh::computeAABB() {
     _aabb.reset();
 
-    int stride = _offsets.stride;
+    int stride = _attributes.stride;
     if (stride == 0) {
         stride = 3 * sizeof(float);
     }
-    auto vertCoords = reinterpret_cast<uint8_t *>(&_vertices[0]) + _offsets.vertexCoords;
+    auto vertCoords = reinterpret_cast<uint8_t *>(&_vertices[0]) + _attributes.offCoords;
 
     for (size_t i = 0; i < _vertexCount; ++i) {
         _aabb.expand(glm::make_vec3(reinterpret_cast<const float *>(vertCoords)));
@@ -142,12 +142,12 @@ glm::vec2 Mesh::getFaceCenterUV(int faceIdx) const {
     if (faceIdx < 0 || faceIdx >= _indices.size() / 3) {
         throw out_of_range("faceIdx out of range");
     }
-    if (_offsets.texCoords1 == -1) return glm::vec2(0.0f);
+    if (_attributes.offTexCoords1 == -1) return glm::vec2(0.0f);
 
     glm::vec2 result(0.0f);
     const uint16_t *indices = &_indices[3 * faceIdx];
     for (int i = 0; i < 3; ++i) {
-        const float *uv = &_vertices[(indices[i] * _offsets.stride + _offsets.texCoords1) / sizeof(float)];
+        const float *uv = &_vertices[(indices[i] * _attributes.stride + _attributes.offTexCoords1) / sizeof(float)];
         result.x += uv[0];
         result.y += uv[1];
     }
