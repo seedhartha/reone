@@ -32,7 +32,7 @@ ModelNode::ModelNode(int index, const ModelNode *parent) : _index(index), _paren
 
 void ModelNode::init() {
     if (_mesh) {
-        _mesh->init();
+        _mesh->mesh->init();
     }
     for (auto &child : _children) {
         child->init();
@@ -125,7 +125,7 @@ bool ModelNode::getScale(int leftFrameIdx, int rightFrameIdx, float interpolant,
 }
 
 const glm::vec3 &ModelNode::getCenterOfAABB() const {
-    return _mesh->mesh()->aabb().center();
+    return _mesh->mesh->aabb().center();
 }
 
 } // namespace graphics

@@ -55,9 +55,9 @@ void Model::initInternal(const shared_ptr<ModelNode> &node) {
     _nodeByNumber.insert(make_pair(node->nodeNumber(), node));
     _nodeByName.insert(make_pair(node->name(), node));
 
-    shared_ptr<ModelMesh> mesh(node->mesh());
+    shared_ptr<ModelNode::Trimesh> mesh(node->mesh());
     if (mesh) {
-        _aabb.expand(mesh->mesh()->aabb() * node->absoluteTransform());
+        _aabb.expand(mesh->mesh->aabb() * node->absoluteTransform());
     }
 
     for (auto &child : node->children()) {

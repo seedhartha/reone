@@ -70,12 +70,12 @@ ModelNodeSceneNode::ModelNodeSceneNode(SceneGraph *sceneGraph, const ModelSceneN
 }
 
 void ModelNodeSceneNode::initTextures() {
-    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::Trimesh> mesh(_modelNode->mesh());
     if (!mesh) return;
 
-    _textures.diffuse = mesh->diffuseTexture();
-    _textures.lightmap = mesh->lightmapTexture();
-    _textures.bumpmap = mesh->bumpmapTexture();
+    _textures.diffuse = mesh->diffuse;
+    _textures.lightmap = mesh->lightmap;
+    _textures.bumpmap = mesh->bumpmap;
 
     refreshMaterial();
     refreshAdditionalTextures();
@@ -105,10 +105,10 @@ void ModelNodeSceneNode::refreshAdditionalTextures() {
 }
 
 void ModelNodeSceneNode::update(float dt) {
-    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::Trimesh> mesh(_modelNode->mesh());
     if (mesh) {
         // UV animation
-        const ModelMesh::UVAnimation &uvAnimation = mesh->uvAnimation();
+        const ModelNode::UVAnimation &uvAnimation = mesh->uvAnimation;
         if (uvAnimation.animated) {
             glm::vec2 dir(uvAnimation.directionX, uvAnimation.directionY);
             _uvOffset += kUvAnimationSpeed * dir * dt;
@@ -164,8 +164,8 @@ void ModelNodeSceneNode::update(float dt) {
 bool ModelNodeSceneNode::shouldRender() const {
     if (g_debugWalkmesh) return _modelNode->isAABB();
 
-    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
-    if (!mesh || !mesh->shouldRender() || _modelNode->alphas().getByKeyframeOrElse(0, 1.0f) == 0.0f) return false;
+    shared_ptr<ModelNode::Trimesh> mesh(_modelNode->mesh());
+    if (!mesh || !mesh->render || _modelNode->alphas().getByKeyframeOrElse(0, 1.0f) == 0.0f) return false;
 
     return !_modelNode->isAABB();
 }
@@ -175,14 +175,14 @@ bool ModelNodeSceneNode::shouldCastShadows() const {
     if (static_cast<bool>(_modelNode->skin())) return false;
 
     // Meshless nodes must not cast shadows
-    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::Trimesh> mesh(_modelNode->mesh());
     if (!mesh) return false;
 
-    return mesh->shouldCastShadows();
+    return mesh->shadow;
 }
 
 bool ModelNodeSceneNode::isTransparent() const {
-    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::Trimesh> mesh(_modelNode->mesh());
     if (!mesh) return false; // Meshless nodes are opaque
 
     // Character models are opaque
@@ -195,7 +195,7 @@ bool ModelNodeSceneNode::isTransparent() const {
     if (!_textures.diffuse) return false;
 
     // Model nodes with transparency hint greater than 0 are transparent
-    if (mesh->transparency() > 0) return true;
+    if (mesh->transparency> 0) return true;
 
     // Model nodes with additive diffuse texture are opaque
     if (_textures.diffuse->isAdditive()) return true;
@@ -226,7 +226,7 @@ static bool isReceivingShadows(const ModelSceneNode &model, const ModelNodeScene
 }
 
 void ModelNodeSceneNode::drawSingle(bool shadowPass) {
-    shared_ptr<ModelMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::Trimesh> mesh(_modelNode->mesh());
     if (!mesh) return;
 
     // Setup shaders
@@ -278,7 +278,6 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
             uniforms.combined.bumpmaps.scaling = _textures.bumpmap->features().bumpMapScaling;
             uniforms.combined.bumpmaps.gridSize = glm::vec2(_textures.bumpmap->features().numX, _textures.bumpmap->features().numY);
             uniforms.combined.bumpmaps.frame = _bumpmapFrame;
-            uniforms.combined.bumpmaps.swizzled = mesh->isBumpmapSwizzled();
         }
 
         bool receivesShadows = isReceivingShadows(*_modelSceneNode, *this);
@@ -315,8 +314,8 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
             if (_material.custom) {
                 uniforms.combined.featureMask |= UniformFeatureFlags::customMat;
             }
-            uniforms.combined.material.ambient = glm::vec4(mesh->ambientColor(), 1.0f);
-            uniforms.combined.material.diffuse = glm::vec4(mesh->diffuseColor(), 1.0f);
+            uniforms.combined.material.ambient = glm::vec4(mesh->ambientColor, 1.0f);
+            uniforms.combined.material.diffuse = glm::vec4(mesh->diffuseColor, 1.0f);
             uniforms.combined.material.specular = _material.specular;
             uniforms.combined.material.shininess = _material.shininess;
             uniforms.combined.material.metallic = _material.metallic;
@@ -401,9 +400,9 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
 
 
     if (additive) {
-        StateManager::instance().withAdditiveBlending([&mesh]() { mesh->draw(); });
+        StateManager::instance().withAdditiveBlending([&mesh]() { mesh->mesh->draw(); });
     } else {
-        mesh->draw();
+        mesh->mesh->draw();
     }
 }
 

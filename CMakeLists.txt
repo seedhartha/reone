@@ -182,7 +182,6 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/model/lensflare.h
     src/engine/graphics/model/mdlreader.h
     src/engine/graphics/model/model.h
-    src/engine/graphics/model/modelmesh.h
     src/engine/graphics/model/modelnode.h
     src/engine/graphics/model/models.h
     src/engine/graphics/pbribl.h
@@ -224,7 +223,6 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/model/animation.cpp
     src/engine/graphics/model/mdlreader.cpp
     src/engine/graphics/model/model.cpp
-    src/engine/graphics/model/modelmesh.cpp
     src/engine/graphics/model/modelnode.cpp
     src/engine/graphics/model/models.cpp
     src/engine/graphics/pbribl.cpp
