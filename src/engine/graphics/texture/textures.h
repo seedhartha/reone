@@ -17,30 +17,42 @@
 
 #pragma once
 
+#include <string>
 #include <memory>
-#include <ostream>
+#include <unordered_map>
 
-#include <boost/filesystem/path.hpp>
+#include <boost/noncopyable.hpp>
 
-#include "../texture.h"
+#include "../../resource/types.h"
+
+#include "../types.h"
 
 namespace reone {
 
 namespace graphics {
 
-class TgaWriter {
-public:
-    TgaWriter(std::shared_ptr<Texture> texture);
+class Texture;
 
-    void save(std::ostream &out, bool compress = false);
-    void save(const boost::filesystem::path &path, bool compress = false);
+class Textures : boost::noncopyable {
+public:
+    static Textures &instance();
+
+    void init();
+    void invalidateCache();
+
+    /**
+     * Binds default textures to all texture units. Call once per framebuffer.
+     */
+    void bindDefaults();
+
+    std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
 
 private:
-    std::shared_ptr<Texture> _texture;
+    std::shared_ptr<graphics::Texture> _default;
+    std::shared_ptr<graphics::Texture> _defaultCubemap;
+    std::unordered_map<std::string, std::shared_ptr<Texture>> _cache;
 
-    void writeRLE(uint8_t *pixels, int depth, std::ostream &out);
-
-    std::vector<uint8_t> getTexturePixels(bool compress, TGADataType &dataType, int &depth) const;
+    std::shared_ptr<Texture> doGet(const std::string &resRef, TextureUsage usage);
 };
 
 } // namespace graphics

@@ -24,7 +24,7 @@
 
 #include "glm/gtx/quaternion.hpp"
 
-#include "../mesh.h"
+#include "../mesh/mesh.h"
 
 #include "aabbnode.h"
 #include "animatedproperty.h"

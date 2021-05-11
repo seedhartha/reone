@@ -20,7 +20,7 @@
 #include <boost/format.hpp>
 
 #include "../../audio/player.h"
-#include "../../graphics/textures.h"
+#include "../../graphics/texture/textures.h"
 
 #include "../gameidutil.h"
 

@@ -21,7 +21,7 @@
 
 #include "../../audio/stream.h"
 #include "../../graphics/model/model.h"
-#include "../../graphics/texture.h"
+#include "../../graphics/texture/texture.h"
 #include "../../resource/format/gffreader.h"
 
 #include "../types.h"

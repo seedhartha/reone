@@ -29,7 +29,7 @@
 #include "../../graphics/pbribl.h"
 #include "../../graphics/shader/shaders.h"
 #include "../../graphics/statemanager.h"
-#include "../../graphics/textures.h"
+#include "../../graphics/texture/textures.h"
 
 #include "../scenegraph.h"
 

@@ -18,7 +18,7 @@
 #include "imagebutton.h"
 
 #include "../../graphics/fonts.h"
-#include "../../graphics/meshes.h"
+#include "../../graphics/mesh/meshes.h"
 #include "../../graphics/statemanager.h"
 #include "../../graphics/window.h"
 

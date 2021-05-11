@@ -21,7 +21,7 @@
 
 #include "../../common/log.h"
 
-#include "../textureutil.h"
+#include "textureutil.h"
 
 using namespace std;
 

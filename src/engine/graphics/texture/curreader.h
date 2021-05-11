@@ -17,35 +17,29 @@
 
 #pragma once
 
-#include <istream>
-#include <memory>
+#include "../../resource/format/binreader.h"
 
-#include "../texture.h"
+#include "texture.h"
 
 namespace reone {
 
 namespace graphics {
 
-class TxiReader {
+class CurReader : public resource::BinaryReader {
 public:
-    void load(const std::shared_ptr<std::istream> &in);
+    CurReader();
 
-    const Texture::Features &features() const { return _features; }
+    std::shared_ptr<Texture> texture() { return _texture; }
 
 private:
-    enum class State {
-        None,
-        UpperLeftCoords,
-        LowerRightCoords
-    };
+    uint16_t _bitCount { 0 };
+    int _width { 0 };
+    int _height { 0 };
+    std::shared_ptr<Texture> _texture;
 
-    Texture::Features _features;
-    State _state { State::None };
-    int _upperLeftCoordCount { 0 };
-    int _lowerRightCoordCount { 0 };
-
-    void processLine(const std::vector<std::string> &tokens);
-    Texture::Blending parseBlending(const std::string &s) const;
+    void doLoad() override;
+    void loadHeader();
+    void loadData();
 };
 
 } // namespace graphics

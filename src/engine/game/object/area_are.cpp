@@ -23,7 +23,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../graphics/textures.h"
+#include "../../graphics/texture/textures.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 

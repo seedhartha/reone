@@ -21,7 +21,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../graphics/textures.h"
+#include "../graphics/texture/textures.h"
 #include "../resource/resources.h"
 
 using namespace std;

@@ -25,7 +25,7 @@
 #include "glm/ext.hpp"
 
 #include "../../graphics/fonts.h"
-#include "../../graphics/meshes.h"
+#include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
 #include "../../graphics/textutil.h"
 #include "../../graphics/window.h"

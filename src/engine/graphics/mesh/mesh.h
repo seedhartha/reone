@@ -22,7 +22,8 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "aabb.h"
+#include "../aabb.h"
+
 #include "vertexattributes.h"
 
 namespace reone {

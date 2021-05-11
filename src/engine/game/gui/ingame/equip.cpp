@@ -22,7 +22,7 @@
 
 #include "../../../gui/control/imagebutton.h"
 #include "../../../gui/control/listbox.h"
-#include "../../../graphics/textures.h"
+#include "../../../graphics/texture/textures.h"
 #include "../../../resource/strings.h"
 
 #include "../../game.h"

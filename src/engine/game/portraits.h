@@ -23,7 +23,7 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "../graphics/texture.h"
+#include "../graphics/texture/texture.h"
 
 #include "portrait.h"
 

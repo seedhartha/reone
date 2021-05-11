@@ -25,7 +25,7 @@
 #include "glm/mat4x4.hpp"
 
 #include "cursor.h"
-#include "texture.h"
+#include "texture/texture.h"
 #include "types.h"
 
 namespace reone {

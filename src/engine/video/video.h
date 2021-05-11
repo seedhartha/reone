@@ -23,7 +23,7 @@
 #include "../audio/stream.h"
 #include "../common/mediastream.h"
 #include "../common/types.h"
-#include "../graphics/texture.h"
+#include "../graphics/texture/texture.h"
 
 namespace reone {
 
