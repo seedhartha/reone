@@ -987,24 +987,25 @@ void MdlReader::loadMesh(const MeshHeader &header, vector<float> &&vertices, vec
     auto mesh = make_unique<Mesh>(vertices, indices, attributes);
     mesh->computeAABB();
 
-    node._mesh = make_unique<ModelMesh>(move(mesh));
-    node._mesh->setRender(header.render);
-    node._mesh->setTransparency(header.transparencyHint);
-    node._mesh->setShadow(header.shadow);
-    node._mesh->setBackgroundGeometry(header.backgroundGeometry);
-    node._mesh->setDiffuseColor(header.diffuse);
-    node._mesh->setAmbientColor(header.ambient);
+    node._mesh = make_unique<ModelNode::Trimesh>();
+    node._mesh->mesh = move(mesh);
+    node._mesh->render = header.render;
+    node._mesh->transparency = header.transparencyHint;
+    node._mesh->shadow = header.shadow;
+    node._mesh->backgroundGeometry = header.backgroundGeometry;
+    node._mesh->diffuseColor = header.diffuse;
+    node._mesh->ambientColor = header.ambient;
 
     if (!header.texture1.empty() && header.texture1 != "null") {
-        node._mesh->_diffuse = Textures::instance().get(header.texture1, TextureUsage::Diffuse);
+        node._mesh->diffuse = Textures::instance().get(header.texture1, TextureUsage::Diffuse);
     }
     if (!header.texture2.empty()) {
-        node._mesh->_lightmap = Textures::instance().get(header.texture2, TextureUsage::Lightmap);
+        node._mesh->lightmap = Textures::instance().get(header.texture2, TextureUsage::Lightmap);
     }
     if (header.animateUV) {
-        node._mesh->_uvAnimation.animated = true;
-        node._mesh->_uvAnimation.directionX = header.uvDirectionX;
-        node._mesh->_uvAnimation.directionY = header.uvDirectionY;
+        node._mesh->uvAnimation.animated = true;
+        node._mesh->uvAnimation.directionX = header.uvDirectionX;
+        node._mesh->uvAnimation.directionY = header.uvDirectionY;
     }
 }
 
@@ -1020,8 +1021,8 @@ void MdlReader::readSkin(ModelNode &node) {
     vector<uint16_t> boneIndices(readUint16Array(16));
     ignore(4); // padding
 
-    node._mesh->_mesh->attributes().offBoneWeights = offMdxBoneWeights;
-    node._mesh->_mesh->attributes().offBoneIndices = offMdxBoneIndices;
+    node._mesh->mesh->attributes().offBoneWeights = offMdxBoneWeights;
+    node._mesh->mesh->attributes().offBoneIndices = offMdxBoneIndices;
 
     unordered_map<uint16_t, uint16_t> nodeIdxByBoneIdx;
     seek(kMdlDataOffset + offBones);

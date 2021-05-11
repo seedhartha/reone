@@ -24,11 +24,12 @@
 
 #include "glm/gtx/quaternion.hpp"
 
+#include "../mesh.h"
+
 #include "aabbnode.h"
 #include "animatedproperty.h"
 #include "emitter.h"
 #include "lensflare.h"
-#include "modelmesh.h"
 
 namespace reone {
 
@@ -81,6 +82,30 @@ public:
         float tightness { 0.0f };
         float period { 0.0f };
         std::vector<DanglymeshConstraint> constraints;
+    };
+
+    struct UVAnimation {
+        bool animated { false };
+        float directionX { 0.0f };
+        float directionY { 0.0f };
+    };
+
+    struct Trimesh {
+        std::shared_ptr<Mesh> mesh;
+        UVAnimation uvAnimation;
+
+        int transparency { 0 };
+        glm::vec3 ambientColor { 1.0f };
+        glm::vec3 diffuseColor { 0.0f };
+
+        bool render { false };
+        bool shadow { false };
+        bool backgroundGeometry { false };
+        bool bumpmapSwizzled { false };
+
+        std::shared_ptr<Texture> diffuse;
+        std::shared_ptr<Texture> lightmap;
+        std::shared_ptr<Texture> bumpmap;
     };
 
     ModelNode(int index, const ModelNode *parent = nullptr);
@@ -136,7 +161,7 @@ public:
     std::shared_ptr<Light> light() const { return _light; }
     std::shared_ptr<Emitter> emitter() const { return _emitter; }
     std::shared_ptr<Reference> reference() const { return _reference; }
-    std::shared_ptr<ModelMesh> mesh() const { return _mesh; }
+    std::shared_ptr<Trimesh> mesh() const { return _mesh; }
     std::shared_ptr<Skin> skin() const { return _skin; }
     std::shared_ptr<Danglymesh> danglymesh() const { return _danglymesh; }
     std::shared_ptr<AABBNode> aabb() const { return _aabb; }
@@ -188,7 +213,7 @@ private:
     std::shared_ptr<Light> _light;
     std::shared_ptr<Emitter> _emitter;
     std::shared_ptr<Reference> _reference;
-    std::shared_ptr<ModelMesh> _mesh;
+    std::shared_ptr<Trimesh> _mesh;
     std::shared_ptr<Skin> _skin;
     std::shared_ptr<Danglymesh> _danglymesh;
     std::shared_ptr<AABBNode> _aabb;

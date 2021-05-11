@@ -204,8 +204,8 @@ void SceneGraph::prepareTransparentMeshes() {
         meshToCamera.insert(make_pair(mesh, mesh->getDistanceTo2(cameraPosition)));
     }
     sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&meshToCamera](auto &left, auto &right) {
-        int leftTransparency = left->modelNode()->mesh()->transparency();
-        int rightTransparency = right->modelNode()->mesh()->transparency();
+        int leftTransparency = left->modelNode()->mesh()->transparency;
+        int rightTransparency = right->modelNode()->mesh()->transparency;
 
         if (leftTransparency < rightTransparency) return true;
         if (leftTransparency > rightTransparency) return false;

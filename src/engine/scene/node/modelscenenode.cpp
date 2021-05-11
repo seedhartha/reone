@@ -315,9 +315,9 @@ void ModelSceneNode::refreshAABB() {
 
         if (node->type() == SceneNodeType::ModelNode) {
             auto modelNode = static_cast<ModelNodeSceneNode *>(node);
-            shared_ptr<ModelMesh> mesh(modelNode->modelNode()->mesh());
+            shared_ptr<ModelNode::Trimesh> mesh(modelNode->modelNode()->mesh());
             if (mesh) {
-                _aabb.expand(mesh->mesh()->aabb() * node->localTransform());
+                _aabb.expand(mesh->mesh->aabb() * node->localTransform());
             }
         }
 
