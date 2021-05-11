@@ -42,22 +42,19 @@ void Mesh::init() {
     if (_inited) return;
 
     glGenBuffers(1, &_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-    glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(float), &_vertices[0], GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
     glGenBuffers(1, &_ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(uint16_t), &_indices[0], GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     glGenVertexArrays(1, &_vao);
     glBindVertexArray(_vao);
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+    glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(float), &_vertices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(uint16_t), &_indices[0], GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.vertexCoords));
-
+    if (_offsets.vertexCoords != -1) {
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.vertexCoords));
+    }
     if (_offsets.normals != -1) {
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, _offsets.stride, reinterpret_cast<void *>(_offsets.normals));
@@ -118,13 +115,11 @@ static GLenum getModeGL(Mesh::DrawMode mode) {
 
 void Mesh::draw() {
     glBindVertexArray(_vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glDrawElements(getModeGL(_mode), static_cast<GLsizei>(_indices.size()), GL_UNSIGNED_SHORT, nullptr);
 }
 
 void Mesh::drawInstanced(int count) {
     glBindVertexArray(_vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glDrawElementsInstanced(getModeGL(_mode), static_cast<GLsizei>(_indices.size()), GL_UNSIGNED_SHORT, nullptr, count);
 }
 
