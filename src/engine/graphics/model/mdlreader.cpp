@@ -985,7 +985,6 @@ MdlReader::MeshHeader MdlReader::readMeshHeader() {
 
 void MdlReader::loadMesh(const MeshHeader &header, vector<float> &&vertices, vector<uint16_t> &&indices, VertexAttributes &&attributes, ModelNode &node) {
     auto mesh = make_unique<Mesh>(vertices, indices, attributes);
-    mesh->computeAABB();
 
     node._mesh = make_unique<ModelNode::Trimesh>();
     node._mesh->mesh = move(mesh);

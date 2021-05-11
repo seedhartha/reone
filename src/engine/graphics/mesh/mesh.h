@@ -31,8 +31,7 @@ namespace reone {
 namespace graphics {
 
 /**
- * Polygonal mesh, containing vertex and index data. Renders itself,
- * but does not manage textures and shaders.
+ * Polygon mesh. Consists of vertices and faces.
  */
 class Mesh : boost::noncopyable {
 public:
@@ -50,8 +49,6 @@ public:
 
     void draw();
     void drawInstanced(int count);
-
-    void computeAABB();
 
     /**
      * Used for lightmapping grass.
@@ -78,11 +75,13 @@ private:
 
     // OpenGL
 
-    uint32_t _vbo { 0 };
-    uint32_t _ibo { 0 };
-    uint32_t _vao { 0 };
+    uint32_t _vboId { 0 };
+    uint32_t _iboId { 0 };
+    uint32_t _vaoId { 0 };
 
     // END OpenGL
+
+    void computeAABB();
 };
 
 } // namespace graphics
