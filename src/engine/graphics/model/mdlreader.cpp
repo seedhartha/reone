@@ -983,8 +983,8 @@ MdlReader::MeshHeader MdlReader::readMeshHeader() {
     return move(result);
 }
 
-void MdlReader::loadMesh(const MeshHeader &header, int numVertices, vector<float> &&vertices, vector<uint16_t> &&indices, VertexAttributes &&offsets, ModelNode &node) {
-    auto mesh = make_unique<Mesh>(numVertices, vertices, indices, offsets);
+void MdlReader::loadMesh(const MeshHeader &header, int numVertices, vector<float> &&vertices, vector<uint16_t> &&indices, VertexAttributes &&attributes, ModelNode &node) {
+    auto mesh = make_unique<Mesh>(numVertices, vertices, indices, attributes);
     mesh->computeAABB();
 
     node._mesh = make_unique<ModelMesh>(move(mesh));
@@ -1020,8 +1020,8 @@ void MdlReader::readSkin(ModelNode &node) {
     vector<uint16_t> boneIndices(readUint16Array(16));
     ignore(4); // padding
 
-    node._mesh->_mesh->_attributes.offBoneWeights = offMdxBoneWeights;
-    node._mesh->_mesh->_attributes.offBoneIndices = offMdxBoneIndices;
+    node._mesh->_mesh->attributes().offBoneWeights = offMdxBoneWeights;
+    node._mesh->_mesh->attributes().offBoneIndices = offMdxBoneIndices;
 
     unordered_map<uint16_t, uint16_t> nodeIdxByBoneIdx;
     seek(kMdlDataOffset + offBones);
