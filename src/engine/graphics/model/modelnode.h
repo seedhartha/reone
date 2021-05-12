@@ -92,6 +92,7 @@ public:
 
     struct Trimesh {
         std::shared_ptr<Mesh> mesh;
+        std::unordered_map<uint32_t, std::vector<uint32_t>> materialFaces;
         UVAnimation uvAnimation;
 
         int transparency { 0 };
@@ -139,6 +140,8 @@ public:
     bool getScale(int leftFrameIx, int rightFrameIdx, float factor, float &scale) const;
 
     const glm::vec3 &getCenterOfAABB() const;
+
+    std::vector<uint32_t> getFacesByMaterial(uint32_t material) const;
 
     int index() const { return _index; }
     const ModelNode *parent() const { return _parent; }

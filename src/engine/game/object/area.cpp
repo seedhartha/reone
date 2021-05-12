@@ -29,6 +29,7 @@
 #include "../../common/log.h"
 #include "../../common/random.h"
 #include "../../common/streamutil.h"
+#include "../../graphics/baryutil.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/model/models.h"
 #include "../../graphics/texture/textures.h"
@@ -45,6 +46,7 @@
 #include "../game.h"
 #include "../objectconverter.h"
 #include "../room.h"
+#include "../surfaces.h"
 
 #include "objectfactory.h"
 
@@ -488,12 +490,22 @@ void Area::destroyObject(const SpatialObject &object) {
     _objectsToDestroy.insert(object.id());
 }
 
-// Adapted from https://math.stackexchange.com/q/18686
-static glm::vec3 getRandomPointInTriangle(const Walkmesh::Face &face) {
+static inline float calculateTriangleArea(const vector<glm::vec3> &verts) {
+    // Adapted from https://www.omnicalculator.com/math/herons-formula
+    float a = glm::distance(verts[0], verts[1]);
+    float b = glm::distance(verts[0], verts[2]);
+    float c = glm::distance(verts[1], verts[2]);
+    return 0.25f * glm::sqrt((a + b + c) * (-a + b + c) * (a - b + c) * (a + b - c));
+}
+
+/**
+ * @return random barycentric position
+ */
+static inline glm::vec3 getRandomBarycentric() {
+    // Adapted from https://math.stackexchange.com/q/18686
     float r1sqrt = glm::sqrt(random(0.0f, 1.0f));
     float r2 = random(0.0f, 1.0f);
-
-    return (1.0f - r1sqrt) * face.vertices[0] + r1sqrt * (1.0f - r2) * face.vertices[1] + r2 * r1sqrt * face.vertices[2];
+    return glm::vec3(1.0f - r1sqrt, r1sqrt * (1.0f - r2), r2 * r1sqrt);
 }
 
 void Area::fill(SceneGraph &sceneGraph) {
@@ -514,22 +526,22 @@ void Area::fill(SceneGraph &sceneGraph) {
         if (sceneNode) {
             sceneGraph.addRoot(sceneNode);
         }
-        shared_ptr<GrassSceneNode> grass;
-        if (_grass.texture) {
-            shared_ptr<ModelNode> aabbNode(sceneNode->model()->findAABBNode());
-            auto grass = make_shared<GrassSceneNode>(&sceneGraph, glm::vec2(_grass.quadSize), _grass.texture, aabbNode ? aabbNode->mesh()->lightmap : nullptr);
-            shared_ptr<Walkmesh> walkmesh(room.second->walkmesh());
-            if (walkmesh) {
-                for (auto &face : walkmesh->grassFaces()) {
-                    glm::vec2 lightmapUV(0.0f);
-                    if (aabbNode) {
-                        lightmapUV = aabbNode->mesh()->mesh->getFaceCenterUV(face.index);
-                    }
-                    for (int i = 0; i < getNumGrassClusters(face); ++i) {
+        shared_ptr<ModelNode> aabbNode(sceneNode->model()->findAABBNode());
+        if (aabbNode && _grass.texture) {
+            glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), room.second->position()));
+            auto grass = make_shared<GrassSceneNode>(&sceneGraph, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap);
+            for (auto &material : Surfaces::instance().getGrassSurfaceIndices()) {
+                for (auto &face : aabbNode->getFacesByMaterial(material)) {
+                    vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getTriangleCoords(face));
+                    float area = calculateTriangleArea(vertices);
+                    for (int i = 0; i < getNumGrassClusters(area); ++i) {
+                        glm::vec3 baryPosition(getRandomBarycentric());
+                        glm::vec3 position(aabbTransform * glm::vec4(barycentricToCartesian(vertices[0], vertices[1], vertices[2], baryPosition), 1.0f));
+                        glm::vec2 lightmapUV(aabbNode->mesh()->mesh->getTriangleTexCoords2(face, baryPosition));
                         GrassCluster cluster;
-                        cluster.position = getRandomPointInTriangle(face);
+                        cluster.position = move(position);
                         cluster.variant = getRandomGrassVariant();
-                        cluster.lightmapUV = lightmapUV;
+                        cluster.lightmapUV = move(lightmapUV);
                         grass->addCluster(move(cluster));
                     }
                 }
@@ -559,8 +571,8 @@ void Area::fill(SceneGraph &sceneGraph) {
     }
 }
 
-int Area::getNumGrassClusters(const Walkmesh::Face &face) const {
-    return static_cast<int>(glm::round(kGrassDensityFactor * _grass.density * face.area));
+int Area::getNumGrassClusters(float area) const {
+    return static_cast<int>(glm::round(kGrassDensityFactor * _grass.density * area));
 }
 
 int Area::getRandomGrassVariant() const {

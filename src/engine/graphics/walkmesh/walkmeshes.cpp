@@ -35,9 +35,8 @@ Walkmeshes &Walkmeshes::instance() {
     return instance;
 }
 
-void Walkmeshes::init(set<uint32_t> walkableSurfaces, set<uint32_t> grassSurfaces) {
+void Walkmeshes::init(set<uint32_t> walkableSurfaces) {
     _walkableSurfaces = move(walkableSurfaces);
-    _grassSurfaces = move(grassSurfaces);
 }
 
 void Walkmeshes::invalidateCache() {
@@ -59,7 +58,7 @@ shared_ptr<Walkmesh> Walkmeshes::doGet(const string &resRef, ResourceType type) 
     shared_ptr<Walkmesh> walkmesh;
 
     if (data) {
-        BwmReader bwm(_walkableSurfaces, _grassSurfaces);
+        BwmReader bwm(_walkableSurfaces);
         bwm.load(wrap(data));
         walkmesh = bwm.walkmesh();
     }

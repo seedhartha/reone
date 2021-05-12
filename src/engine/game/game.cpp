@@ -120,7 +120,7 @@ void Game::initSubsystems() {
     Reputes::instance().init();
     Surfaces::instance().init();
     Portraits::instance().init();
-    Walkmeshes::instance().init(Surfaces::instance().getWalkableSurfaceIndices(), Surfaces::instance().getGrassSurfaceIndices());
+    Walkmeshes::instance().init(Surfaces::instance().getWalkableSurfaceIndices());
 
     Cursors::instance().init(_gameId);
     setCursorType(CursorType::Default);

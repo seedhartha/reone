@@ -25,6 +25,8 @@
 
 #include "glm/ext.hpp"
 
+#include "../baryutil.h"
+
 using namespace std;
 
 namespace reone {
@@ -121,7 +123,7 @@ void Mesh::deinit() {
     _inited = false;
 }
 
-static GLenum getModeGL(Mesh::DrawMode mode) {
+static inline GLenum getModeGL(Mesh::DrawMode mode) {
     switch (mode) {
         case Mesh::DrawMode::Lines:
             return GL_LINES;
@@ -144,28 +146,75 @@ void Mesh::drawInstanced(int count) {
     glDrawElementsInstanced(getModeGL(_mode), static_cast<GLsizei>(_indices.size()), GL_UNSIGNED_SHORT, nullptr, count);
 }
 
-glm::vec2 Mesh::getFaceCenterUV(int faceIdx) const {
+void Mesh::ensureTriangles() const {
     if (_mode != DrawMode::Triangles) {
         throw logic_error("Unsupported draw mode: " + to_string(static_cast<int>(_mode)));
     }
+}
+
+void Mesh::drawTriangles(int startFace, int numFaces) {
+    ensureTriangles();
+    glBindVertexArray(_vaoId);
+    glDrawElements(GL_TRIANGLES, 3 * numFaces, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(3 * startFace * sizeof(uint16_t)));
+}
+
+void Mesh::drawTrianglesInstanced(int startFace, int numFaces, int count) {
+    ensureTriangles();
+    glBindVertexArray(_vaoId);
+    glDrawElementsInstanced(GL_TRIANGLES, 3 * numFaces, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(3 * startFace * sizeof(uint16_t)), count);
+}
+
+vector<glm::vec3> Mesh::getTriangleCoords(int faceIdx) const {
+    ensureTriangles();
     if (faceIdx < 0 || faceIdx >= static_cast<int>(_indices.size()) / 3) {
         throw out_of_range("faceIdx out of range");
     }
-    if (_attributes.offTexCoords1 == -1) {
-        return glm::vec2(0.0f);
-    }
 
-    glm::vec2 result(0.0f);
-    const uint16_t *indices = &_indices[3 * faceIdx];
-    for (int i = 0; i < 3; ++i) {
-        const float *uv = &_vertices[(indices[i] * _attributes.stride + _attributes.offTexCoords1) / sizeof(float)];
-        result.x += uv[0];
-        result.y += uv[1];
-    }
-    result /= 3.0f;
-    result = glm::clamp(result);
+    glm::vec3 a(getVertexCoords(_indices[3 * faceIdx + 0]));
+    glm::vec3 b(getVertexCoords(_indices[3 * faceIdx + 1]));
+    glm::vec3 c(getVertexCoords(_indices[3 * faceIdx + 2]));
 
-    return move(result);
+    return vector<glm::vec3> { a, b, c };
+}
+
+glm::vec3 Mesh::getVertexCoords(uint16_t vertexIdx) const {
+    return glm::make_vec3(&_vertices[(vertexIdx * _attributes.stride + _attributes.offCoords) / sizeof(float)]);
+}
+
+glm::vec2 Mesh::getTriangleTexCoords1(int faceIdx, const glm::vec3 &baryPosition) const {
+    ensureTriangles();
+    if (faceIdx < 0 || faceIdx >= static_cast<int>(_indices.size()) / 3) {
+        throw out_of_range("faceIdx out of range");
+    }
+    if (_attributes.offTexCoords1 == -1) return glm::vec2(0.0f);
+
+    glm::vec2 a(getVertexTexCoords1(_indices[3 * faceIdx + 0]));
+    glm::vec2 b(getVertexTexCoords1(_indices[3 * faceIdx + 1]));
+    glm::vec2 c(getVertexTexCoords1(_indices[3 * faceIdx + 2]));
+
+    return barycentricToCartesian(a, b, c, baryPosition);
+}
+
+glm::vec2 Mesh::getVertexTexCoords1(uint16_t vertexIdx) const {
+    return glm::make_vec2(&_vertices[(vertexIdx * _attributes.stride + _attributes.offTexCoords1) / sizeof(float)]);
+}
+
+glm::vec2 Mesh::getTriangleTexCoords2(int faceIdx, const glm::vec3 &baryPosition) const {
+    ensureTriangles();
+    if (faceIdx < 0 || faceIdx >= static_cast<int>(_indices.size()) / 3) {
+        throw out_of_range("faceIdx out of range");
+    }
+    if (_attributes.offTexCoords2 == -1) return glm::vec2(0.0f);
+
+    glm::vec2 a(getVertexTexCoords2(_indices[3 * faceIdx + 0]));
+    glm::vec2 b(getVertexTexCoords2(_indices[3 * faceIdx + 1]));
+    glm::vec2 c(getVertexTexCoords2(_indices[3 * faceIdx + 2]));
+
+    return barycentricToCartesian(a, b, c, baryPosition);
+}
+
+glm::vec2 Mesh::getVertexTexCoords2(uint16_t vertexIdx) const {
+    return glm::make_vec2(&_vertices[(vertexIdx * _attributes.stride + _attributes.offTexCoords2) / sizeof(float)]);
 }
 
 } // namespace graphics
