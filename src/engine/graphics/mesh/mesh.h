@@ -50,12 +50,28 @@ public:
     void draw();
     void drawInstanced(int count);
 
+    void drawTriangles(int startFace, int numFaces);
+    void drawTrianglesInstanced(int startFace, int numFaces, int count);
+
     /**
-     * Used for lightmapping grass.
-     *
-     * @return UV coordinates at face center
+     * @param faceIdx faceIdx
+     * @return coordinates of three triangle vertices
      */
-    glm::vec2 getFaceCenterUV(int faceIdx) const;
+    std::vector<glm::vec3> getTriangleCoords(int faceIdx) const;
+
+    /**
+    * @param faceIdx face index
+    * @param baryPosition barycentric point coordinates
+    * @return first texture coordinates
+    */
+    glm::vec2 getTriangleTexCoords1(int faceIdx, const glm::vec3 &baryPosition) const;
+
+    /**
+     * @param faceIdx face index
+     * @param baryPosition barycentric point coordinates
+     * @return second texture coordinates
+     */
+    glm::vec2 getTriangleTexCoords2(int faceIdx, const glm::vec3 &baryPosition) const;
 
     const std::vector<float> &vertices() const { return _vertices; }
     const std::vector<uint16_t> &indices() const { return _indices; }
@@ -82,6 +98,12 @@ private:
     // END OpenGL
 
     void computeAABB();
+
+    glm::vec3 getVertexCoords(uint16_t vertexIdx) const;
+    glm::vec2 getVertexTexCoords1(uint16_t vertexIdx) const;
+    glm::vec2 getVertexTexCoords2(uint16_t vertexIdx) const;
+
+    inline void ensureTriangles() const;
 };
 
 } // namespace graphics

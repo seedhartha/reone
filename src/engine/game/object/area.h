@@ -266,7 +266,7 @@ private:
 
     bool doMoveCreature(const std::shared_ptr<Creature> &creature, const glm::vec3 &dest);
 
-    int getNumGrassClusters(const graphics::Walkmesh::Face &face) const;
+    int getNumGrassClusters(float area) const;
     int getRandomGrassVariant() const;
 
     // Loading ARE

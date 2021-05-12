@@ -890,6 +890,25 @@ void MdlReader::readMesh(ModelNode &node) {
     _mdxReader->seek(offMdxData);
     vertices = _mdxReader->getFloatArray(header.numVertices * header.mdxVertexSize / sizeof(float));
 
+    vector<uint16_t> indices;
+    seek(kMdlDataOffset + header.offOffIndices);
+    uint32_t offIndices = readUint32();
+    seek(kMdlDataOffset + offIndices);
+    indices = readUint16Array(3 * header.numFaces);
+
+    unordered_map<uint32_t, vector<uint32_t>> materialFaces;
+    seek(kMdlDataOffset + header.offFaces);
+    for (int i = 0; i < header.numFaces; ++i) {
+        vector<float> normalValues(readFloatArray(3));
+        float distance = readFloat();
+        uint32_t material = readUint32();
+        vector<uint16_t> adjacentFaces(readUint16Array(3));
+        vector<uint16_t> faceIndices(readUint16Array(3));
+        materialFaces[material].push_back(i);
+    }
+
+    seek(endPos);
+
     VertexAttributes attributes;
     attributes.stride = header.mdxVertexSize;
     attributes.offCoords = header.offMdxVertices;
@@ -901,15 +920,7 @@ void MdlReader::readMesh(ModelNode &node) {
         attributes.offTangents = header.offMdxTanSpace + 3 * sizeof(float);
     }
 
-    vector<uint16_t> indices;
-    seek(kMdlDataOffset + header.offOffIndices);
-    uint32_t offIndices = readUint32();
-    seek(kMdlDataOffset + offIndices);
-    indices = readUint16Array(3 * header.numFaces);
-
-    seek(endPos);
-
-    loadMesh(header, move(vertices), move(indices), move(attributes), node);
+    loadMesh(header, move(vertices), move(indices), move(attributes), move(materialFaces), node);
 }
 
 MdlReader::MeshHeader MdlReader::readMeshHeader() {
@@ -965,6 +976,7 @@ MdlReader::MeshHeader MdlReader::readMeshHeader() {
     result.texture2 = move(texture2);
     result.numVertices = numVertices;
     result.numFaces = faceArrayDef.count;
+    result.offFaces = faceArrayDef.offset;
     result.offOffIndices = indicesOffsetArrayDef.offset;
     result.render = static_cast<bool>(render);
     result.shadow = static_cast<bool>(shadow);
@@ -983,11 +995,12 @@ MdlReader::MeshHeader MdlReader::readMeshHeader() {
     return move(result);
 }
 
-void MdlReader::loadMesh(const MeshHeader &header, vector<float> &&vertices, vector<uint16_t> &&indices, VertexAttributes &&attributes, ModelNode &node) {
+void MdlReader::loadMesh(const MeshHeader &header, vector<float> &&vertices, vector<uint16_t> &&indices, VertexAttributes &&attributes, MaterialMap &&materialFaces, ModelNode &node) {
     auto mesh = make_unique<Mesh>(vertices, indices, attributes);
 
     node._mesh = make_unique<ModelNode::Trimesh>();
     node._mesh->mesh = move(mesh);
+    node._mesh->materialFaces = materialFaces;
     node._mesh->render = header.render;
     node._mesh->transparency = header.transparencyHint;
     node._mesh->shadow = header.shadow;
@@ -1110,7 +1123,7 @@ void MdlReader::readSaber(ModelNode &node) {
         10, 6, 7, 10, 7, 11
     };
 
-    loadMesh(header, move(vertices), move(indices), move(attributes), node);
+    loadMesh(header, move(vertices), move(indices), move(attributes), MaterialMap(), node);
 }
 
 void MdlReader::readDanglymesh(ModelNode &node) {

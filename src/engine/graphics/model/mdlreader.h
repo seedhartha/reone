@@ -55,6 +55,7 @@ private:
         // Geometry
         int numVertices { 0 };
         int numFaces { 0 };
+        uint32_t offFaces { 0 };
         uint32_t offOffIndices { 0 };
 
         // MDX
@@ -70,6 +71,8 @@ private:
         float uvDirectionX { 0.0f };
         float uvDirectionY { 0.0f };
     };
+
+    typedef std::unordered_map<uint32_t, std::vector<uint32_t>> MaterialMap;
 
     std::unique_ptr<StreamReader> _mdxReader;
 
@@ -99,7 +102,7 @@ private:
     void readAABB(graphics::ModelNode &node);
     void readSaber(graphics::ModelNode &node);
 
-    void loadMesh(const MeshHeader &header, std::vector<float> &&vertices, std::vector<uint16_t> &&indices, VertexAttributes &&attributes, graphics::ModelNode &node);
+    void loadMesh(const MeshHeader &header, std::vector<float> &&vertices, std::vector<uint16_t> &&indices, VertexAttributes &&attributes, MaterialMap &&materialFaces, graphics::ModelNode &node);
     MeshHeader readMeshHeader();
     std::shared_ptr<AABBNode> readAABBNode(uint32_t offset);
 };
