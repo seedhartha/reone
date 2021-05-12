@@ -31,8 +31,8 @@ struct VertexAttributes {
     int offTexCoords2 { -1 };
     int offTangents { -1 };
     int offBitangents { -1 };
-    int offBoneWeights { -1 };
     int offBoneIndices { -1 };
+    int offBoneWeights { -1 };
 };
 
 } // namespace graphics

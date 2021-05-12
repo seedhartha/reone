@@ -354,8 +354,8 @@ layout(location = 2) in vec2 aTexCoords;
 layout(location = 3) in vec2 aLightmapCoords;
 layout(location = 4) in vec3 aTangent;
 layout(location = 5) in vec3 aBitangent;
-layout(location = 6) in vec4 aBoneWeights;
-layout(location = 7) in vec4 aBoneIndices;
+layout(location = 6) in vec4 aBoneIndices;
+layout(location = 7) in vec4 aBoneWeights;
 
 out vec3 fragPosition;
 out vec3 fragNormal;
@@ -368,22 +368,22 @@ void main() {
     vec4 P = vec4(0.0);
 
     if (isFeatureEnabled(FEATURE_SKELETAL)) {
-        float weight0 = aBoneWeights.x;
-        float weight1 = aBoneWeights.y;
-        float weight2 = aBoneWeights.z;
-        float weight3 = aBoneWeights.w;
+        int index1 = int(aBoneIndices.x);
+        int index2 = int(aBoneIndices.y);
+        int index3 = int(aBoneIndices.z);
+        int index4 = int(aBoneIndices.w);
 
-        int index0 = int(aBoneIndices.x);
-        int index1 = int(aBoneIndices.y);
-        int index2 = int(aBoneIndices.z);
-        int index3 = int(aBoneIndices.w);
+        float weight1 = aBoneWeights.x;
+        float weight2 = aBoneWeights.y;
+        float weight3 = aBoneWeights.z;
+        float weight4 = aBoneWeights.w;
 
         vec4 position = vec4(aPosition, 1.0);
 
-        P += weight0 * uBones[index0] * position;
         P += weight1 * uBones[index1] * position;
         P += weight2 * uBones[index2] * position;
         P += weight3 * uBones[index3] * position;
+        P += weight4 * uBones[index4] * position;
 
         P = vec4(P.xyz, 1.0);
 
