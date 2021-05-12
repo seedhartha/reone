@@ -227,16 +227,6 @@ uniform sampler2D uBRDFLookup;
 uniform samplerCube uIrradianceMap;
 uniform samplerCube uPrefilterMap;
 
-void getMetallicRoughness(vec4 diffuseSample, out float metallic, out float roughness) {
-    if (isFeatureEnabled(FEATURE_CUSTOMMAT) || !isFeatureEnabled(FEATURE_ENVMAP)) {
-        metallic = uMaterial.metallic;
-        roughness = uMaterial.roughness;
-    } else {
-        metallic = mix(uMaterial.metallic, 1.0, 1.0 - diffuseSample.a);
-        roughness = mix(uMaterial.roughness, 0.1, 1.0 - diffuseSample.a);
-    }
-}
-
 void main() {
     vec2 uv = getUV();
     float shadow = getShadow();
@@ -252,8 +242,8 @@ void main() {
     }
     vec3 albedo = diffuseSample.rgb;
     float ao = 1.0;
-    float metallic, roughness;
-    getMetallicRoughness(diffuseSample, metallic, roughness);
+    float metallic = uMaterial.metallic;
+    float roughness = uMaterial.roughness;
 
     vec3 objectColor;
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
@@ -321,9 +311,9 @@ void main() {
             float G = GeometrySmith(N, V, L, roughness);
             vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
-            vec3 nominator = NDF * G * F;
-            float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
-            vec3 specular = nominator / denominator;
+            vec3 nom = NDF * G * F;
+            float denom = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
+            vec3 specular = nom / denom;
 
             vec3 kS = F;
             vec3 kD = vec3(1.0) - kS;

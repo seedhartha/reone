@@ -19,6 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../common/collectionutil.h"
 #include "../resource/resources.h"
 
 using namespace std;
@@ -28,8 +29,6 @@ using namespace reone::resource;
 namespace reone {
 
 namespace graphics {
-
-static constexpr char kDefaultMaterialTex[] = "_default";
 
 Materials &Materials::instance() {
     static Materials instance;
@@ -42,18 +41,11 @@ void Materials::init() {
         if (materials) {
             for (int row = 0; row < materials->getRowCount(); ++row) {
                 string tex(boost::to_lower_copy(materials->getString(row, "tex")));
-                float specular = materials->getFloat(row, "specular", -1.0f);
                 float shininess = materials->getFloat(row, "shininess", -1.0f);
                 float metallic = materials->getFloat(row, "metallic", -1.0f);
                 float roughness = materials->getFloat(row, "roughness", -1.0f);
 
                 auto material = make_shared<Material>();
-                if (tex != kDefaultMaterialTex) {
-                    material->custom = true;
-                }
-                if (specular != -1.0f) {
-                    material->specular = specular;
-                }
                 if (shininess != -1.0f) {
                     material->shininess = shininess;
                 }
@@ -82,13 +74,7 @@ void Materials::deinit() {
 }
 
 shared_ptr<Material> Materials::get(const string &texResRef) const {
-    auto maybeMaterial = _materials.find(texResRef);
-    if (maybeMaterial != _materials.end()) return maybeMaterial->second;
-
-    auto maybeDefault = _materials.find(kDefaultMaterialTex);
-    if (maybeDefault != _materials.end()) return maybeDefault->second;
-
-    return nullptr;
+    return getFromLookupOrNull(_materials, texResRef);
 }
 
 } // namespace graphics

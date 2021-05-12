@@ -68,7 +68,6 @@ struct UniformFeatureFlags {
     static constexpr int particles = 0x400;
     static constexpr int water = 0x800;
     static constexpr int hdr = 0x1000;
-    static constexpr int customMat = 0x2000;
     static constexpr int blur = 0x4000;
     static constexpr int text = 0x8000;
     static constexpr int grass = 0x10000;
@@ -98,10 +97,10 @@ struct ShaderGeneral {
 struct ShaderMaterial {
     glm::vec4 ambient { 1.0f };
     glm::vec4 diffuse { 0.0f };
-    float specular { 0.0f };
     float shininess { 0.0f };
     float metallic { 0.0f };
     float roughness { 1.0f };
+    char padding[4];
 };
 
 struct ShaderShadows {
