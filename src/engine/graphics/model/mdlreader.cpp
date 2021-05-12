@@ -1033,8 +1033,8 @@ void MdlReader::readSkin(ModelNode &node) {
     vector<uint16_t> boneIndices(readUint16Array(16));
     ignore(4); // padding
 
-    node._mesh->mesh->attributes().offBoneWeights = offMdxBoneWeights;
     node._mesh->mesh->attributes().offBoneIndices = offMdxBoneIndices;
+    node._mesh->mesh->attributes().offBoneWeights = offMdxBoneWeights;
 
     unordered_map<uint16_t, uint16_t> nodeIdxByBoneIdx;
     seek(kMdlDataOffset + offBones);
