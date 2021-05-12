@@ -41,7 +41,6 @@ const int FEATURE_SHADOWS = 0x200;
 const int FEATURE_PARTICLES = 0x400;
 const int FEATURE_WATER = 0x800;
 const int FEATURE_HDR = 0x1000;
-const int FEATURE_CUSTOMMAT = 0x2000;
 const int FEATURE_BLUR = 0x4000;
 const int FEATURE_TEXT = 0x8000;
 const int FEATURE_GRASS = 0x10000;
@@ -86,7 +85,6 @@ struct General {
 struct Material {
     vec4 ambient;
     vec4 diffuse;
-    float specular;
     float shininess;
     float metallic;
     float roughness;

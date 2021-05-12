@@ -41,7 +41,7 @@ vec3 getLightingDirect(vec3 N) {
         vec3 diff = uMaterial.diffuse.rgb * max(dot(L, N), 0.0);
         vec3 diffuse = uLights[i].multiplier * uLights[i].color.rgb * diff;
 
-        float spec = uMaterial.specular * pow(max(dot(N, H), 0.0), uMaterial.shininess);
+        float spec = pow(max(dot(N, H), 0.0), uMaterial.shininess);
         vec3 specular = uLights[i].multiplier * uLights[i].color.rgb * spec;
 
         float attenuation = getAttenuationQuadratic(i);

@@ -22,15 +22,12 @@ namespace reone {
 namespace graphics {
 
 struct Material {
-    bool custom { false };
-
     // Blinn-Phong
-    float specular { 0.1f };
     float shininess { 8.0f };
 
     // PBR
     float metallic { 0.0f };
-    float roughness { 0.8f };
+    float roughness { 0.5f };
 };
 
 } // namespace graphics

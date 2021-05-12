@@ -1,211 +1,175 @@
 {
     "rows": [
         {
-            "tex": "_default",
-            "specular": "0.1",
-            "shininess": "8.0",
-            "metallic": "0.0",
-            "roughness": "0.8"
-        },
-        {
             "tex": "lhr_flr01",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.6"
         },
         {
             "tex": "lhr_flr02",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.6"
         },
         {
             "tex": "lhr_red01",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.5"
         },
         {
             "tex": "lhr_red02",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.5"
         },
         {
             "tex": "lhr_wall01",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "lhr_wall02",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "lhr_wall03",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "lhr_wall04",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "lhr_wall05",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "lhr_wall06",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "lhr_wall07",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "lhr_wall08",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "lhr_wall09",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "lhr_panl01",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.5"
         },
         {
             "tex": "lhr_panl02",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.5"
         },
         {
             "tex": "lhr_tech01",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.5"
         },
         {
             "tex": "lhr_trim01",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.5"
         },
         {
             "tex": "lhr_trim02",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.5"
         },
         {
             "tex": "plc_chair1",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "plc_chair2",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "plc_footlker",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "plc_metalbox",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "plc_koltank",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "c_drdastro01",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "c_drdastro02",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "c_drdastro03",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.7"
         },
         {
             "tex": "n_sithsoldier01",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.3"
         },
         {
             "tex": "n_sithsoldier02",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.3"
         },
         {
             "tex": "n_sithsoldier03",
-            "specular": "0.1",
             "shininess": "8.0",
             "metallic": "1.0",
             "roughness": "0.3"

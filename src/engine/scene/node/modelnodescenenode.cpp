@@ -311,12 +311,8 @@ void ModelNodeSceneNode::drawSingle(bool shadowPass) {
             const vector<LightSceneNode *> &lights = _sceneGraph->closestLights();
 
             uniforms.combined.featureMask |= UniformFeatureFlags::lighting;
-            if (_material.custom) {
-                uniforms.combined.featureMask |= UniformFeatureFlags::customMat;
-            }
             uniforms.combined.material.ambient = glm::vec4(mesh->ambientColor, 1.0f);
             uniforms.combined.material.diffuse = glm::vec4(mesh->diffuseColor, 1.0f);
-            uniforms.combined.material.specular = _material.specular;
             uniforms.combined.material.shininess = _material.shininess;
             uniforms.combined.material.metallic = _material.metallic;
             uniforms.combined.material.roughness = _material.roughness;
