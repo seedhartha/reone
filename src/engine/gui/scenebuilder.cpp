@@ -20,7 +20,7 @@
 #include <stdexcept>
 
 #include "../scene/node/cameranode.h"
-#include "../scene/node/modelnodescenenode.h"
+#include "../scene/node/meshnode.h"
 #include "../scene/scenegraph.h"
 
 using namespace std;
@@ -55,7 +55,7 @@ unique_ptr<SceneGraph> SceneBuilder::build() {
     if (_cameraNodeName.empty()) {
         camera->setLocalTransform(_cameraTransform);
     } else {
-        ModelNodeSceneNode *modelNode = model->getModelNode(_cameraNodeName);
+        MeshSceneNode *modelNode = model->getModelNode(_cameraNodeName);
         if (modelNode) {
             camera->setLocalTransform(modelNode->absoluteTransform() * _cameraTransform);
         }

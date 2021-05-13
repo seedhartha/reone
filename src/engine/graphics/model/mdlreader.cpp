@@ -209,7 +209,7 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *pare
     }
 
     vector<float> controllerData(readFloatArray(kMdlDataOffset + controllerDataArrayDef.offset, controllerDataArrayDef.count));
-    readControllers(anim, controllerArrayDef.offset, controllerArrayDef.count, controllerData, *node);
+    readControllers(controllerArrayDef.offset, controllerArrayDef.count, controllerData, anim, *node);
 
     vector<uint32_t> childOffsets(readUint32Array(kMdlDataOffset + childArrayDef.offset, childArrayDef.count));
     for (uint32_t offset : childOffsets) {
@@ -313,10 +313,10 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         float period = readFloat();
         ignore(4); // unknown
 
-        auto danglymesh = make_shared<ModelNode::DanglyMesh>();
-        danglymesh->displacement = 0.5f * displacement;  // displacement is allegedly 1/2 meters per unit
-        danglymesh->tightness = tightness;
-        danglymesh->period = period;
+        danglyMesh = make_shared<ModelNode::DanglyMesh>();
+        danglyMesh->displacement = 0.5f * displacement;  // displacement is allegedly 1/2 meters per unit
+        danglyMesh->tightness = tightness;
+        danglyMesh->period = period;
 
         seek(kMdlDataOffset + constraintArrayDef.offset);
         for (uint32_t i = 0; i < constraintArrayDef.count; ++i) {
@@ -325,7 +325,7 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
             ModelNode::DanglyMeshConstraint constraint;
             constraint.multiplier = glm::clamp(multiplier / 255.0f, 0.0f, 1.0f);
             constraint.position = glm::make_vec3(&positionValues[0]);
-            danglymesh->constraints.push_back(move(constraint));
+            danglyMesh->constraints.push_back(move(constraint));
         }
 
     } else if (flags & NodeFlags::aabb) {
@@ -631,7 +631,7 @@ shared_ptr<ModelNode::Reference> MdlReader::readReference() {
     return move(reference);
 }
 
-void MdlReader::readControllers(bool anim, uint32_t keyOffset, uint32_t keyCount, const vector<float> &data, ModelNode &node) {
+void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const vector<float> &data, bool anim, ModelNode &node) {
     uint16_t nodeFlags;
     if (anim) {
         nodeFlags = _nodeFlags.find(node.id())->second;

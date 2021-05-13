@@ -87,7 +87,7 @@ private:
     std::unique_ptr<graphics::ModelNode> readNode(uint32_t offset, const ModelNode *parent, bool anim = false);
     std::vector<std::shared_ptr<graphics::Animation>> readAnimations(const std::vector<uint32_t> &offsets);
     std::unique_ptr<graphics::Animation> readAnimation(uint32_t offset);
-    void readControllers(bool anim, uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, graphics::ModelNode &node);
+    void readControllers(uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, bool anim, graphics::ModelNode &node);
 
     std::shared_ptr<ModelNode::Reference> readReference();
     std::shared_ptr<ModelNode::Light> readLight();

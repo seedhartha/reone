@@ -21,8 +21,8 @@
 
 #include "glm/common.hpp"
 
-#include "../node/modelnodescenenode.h"
-#include "../node/modelscenenode.h"
+#include "../node/meshnode.h"
+#include "../node/modelnode.h"
 #include "../types.h"
 
 using namespace std;
@@ -103,7 +103,7 @@ void AnimationChannel::update(float dt, bool visible) {
 
 void AnimationChannel::computeSceneNodeStates(const ModelNode &animNode) {
     if (_ignoreNodes.count(animNode.name()) == 0) {
-        ModelNodeSceneNode *modelNodeSceneNode = _sceneNode->getModelNode(animNode.name());
+        MeshSceneNode *modelNodeSceneNode = _sceneNode->getModelNode(animNode.name());
         if (modelNodeSceneNode) {
             const ModelNode *modelNode = modelNodeSceneNode->modelNode();
             bool transformChanged = false;

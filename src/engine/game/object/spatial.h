@@ -27,7 +27,7 @@
 #include "glm/vec3.hpp"
 
 #include "../../graphics/walkmesh/walkmesh.h"
-#include "../../scene/node/modelscenenode.h"
+#include "../../scene/node/modelnode.h"
 
 #include "../action/playanimation.h"
 #include "../enginetype/effect.h"

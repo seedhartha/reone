@@ -24,7 +24,7 @@
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
-#include "../scene/node/modelscenenode.h"
+#include "../scene/node/modelnode.h"
 #include "../scene/scenegraph.h"
 
 namespace reone {

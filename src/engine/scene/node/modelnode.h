@@ -36,7 +36,7 @@ namespace scene {
 
 class EmitterSceneNode;
 class LightSceneNode;
-class ModelNodeSceneNode;
+class MeshSceneNode;
 
 class ModelSceneNode : public SceneNode {
 public:
@@ -54,8 +54,8 @@ public:
     void signalEvent(const std::string &name);
     void setAppliedForce(glm::vec3 force);
 
-    ModelNodeSceneNode *getModelNode(const std::string &name) const;
-    ModelNodeSceneNode *getModelNodeById(uint16_t nodeId) const;
+    MeshSceneNode *getModelNode(const std::string &name) const;
+    MeshSceneNode *getModelNodeById(uint16_t nodeId) const;
     LightSceneNode *getLightNodeById(uint16_t nodeId) const;
     std::shared_ptr<ModelSceneNode> getAttachedModel(const std::string &parent) const;
     bool getNodeAbsolutePosition(const std::string &name, glm::vec3 &position) const;
@@ -78,7 +78,7 @@ public:
     // Attachments
 
     std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<graphics::Model> &model, ModelUsage usage);
-    std::shared_ptr<ModelSceneNode> attach(ModelNodeSceneNode &parent, const std::shared_ptr<graphics::Model> &model, ModelUsage usage);
+    std::shared_ptr<ModelSceneNode> attach(MeshSceneNode &parent, const std::shared_ptr<graphics::Model> &model, ModelUsage usage);
     void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);
 
     // END Attachments
@@ -91,7 +91,7 @@ private:
     std::shared_ptr<graphics::Walkmesh> _walkmesh;
     SceneNodeAnimator _animator;
 
-    std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeById;
+    std::unordered_map<uint16_t, MeshSceneNode *> _modelNodeById;
     std::unordered_map<uint16_t, LightSceneNode *> _lightNodeById;
     std::vector<std::shared_ptr<EmitterSceneNode>> _emitters;
     std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
@@ -101,7 +101,7 @@ private:
 
     void initModelNodes();
 
-    std::unique_ptr<ModelNodeSceneNode> getModelNodeSceneNode(graphics::ModelNode &node) const;
+    std::unique_ptr<MeshSceneNode> getModelNodeSceneNode(graphics::ModelNode &node) const;
 };
 
 } // namespace scene

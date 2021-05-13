@@ -31,7 +31,7 @@
 #include "../scenegraph.h"
 
 #include "cameranode.h"
-#include "modelscenenode.h"
+#include "modelnode.h"
 
 using namespace std;
 

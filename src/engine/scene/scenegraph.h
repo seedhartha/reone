@@ -39,7 +39,7 @@ class CameraSceneNode;
 class EmitterSceneNode;
 class GrassSceneNode;
 class LightSceneNode;
-class ModelNodeSceneNode;
+class MeshSceneNode;
 class Particle;
 class SceneNode;
 
@@ -119,9 +119,9 @@ private:
     std::vector<std::shared_ptr<SceneNode>> _roots;
     std::shared_ptr<CameraSceneNode> _activeCamera;
 
-    std::vector<ModelNodeSceneNode *> _opaqueMeshes;
-    std::vector<ModelNodeSceneNode *> _transparentMeshes;
-    std::vector<ModelNodeSceneNode *> _shadowMeshes;
+    std::vector<MeshSceneNode *> _opaqueMeshes;
+    std::vector<MeshSceneNode *> _transparentMeshes;
+    std::vector<MeshSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
     std::vector<GrassSceneNode *> _grass;

@@ -39,7 +39,6 @@
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 #include "../../scene/node/grassnode.h"
-#include "../../scene/node/meshnode.h"
 #include "../../scene/types.h"
 
 #include "../enginetype/location.h"
@@ -556,17 +555,6 @@ void Area::fill(SceneGraph &sceneGraph) {
         shared_ptr<SceneNode> sceneNode(object->sceneNode());
         if (sceneNode) {
             sceneGraph.addRoot(sceneNode);
-        }
-    }
-
-    // Path points
-
-    if (g_debugPath) {
-        shared_ptr<Mesh> cubeMesh(Meshes::instance().getCube());
-        for (auto &vert : _pathfinder.vertices()) {
-            auto cubeNode = make_shared<MeshSceneNode>(&sceneGraph, cubeMesh);
-            cubeNode->setLocalTransform(glm::translate(glm::mat4(1.0f), vert));
-            sceneGraph.addRoot(cubeNode);
         }
     }
 }

@@ -20,8 +20,8 @@
 #include <stdexcept>
 
 #include "../node/lightnode.h"
-#include "../node/modelnodescenenode.h"
-#include "../node/modelscenenode.h"
+#include "../node/meshnode.h"
+#include "../node/modelnode.h"
 #include "../types.h"
 
 using namespace std;
@@ -218,7 +218,7 @@ void SceneNodeAnimator::applySceneNodeStates(ModelNode &modelNode) {
     auto maybeState = _stateById.find(modelNode.id());
     if (maybeState != _stateById.end()) {
         const SceneNodeState &state = maybeState->second;
-        ModelNodeSceneNode *sceneNode = _sceneNode->getModelNodeById(modelNode.id());
+        MeshSceneNode *sceneNode = _sceneNode->getModelNodeById(modelNode.id());
         if (state.flags & SceneNodeStateFlags::transform) {
             sceneNode->setLocalTransform(state.transform);
             sceneNode->setBoneTransform(state.transform * modelNode.absoluteTransformInverse());

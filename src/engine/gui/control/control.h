@@ -30,7 +30,7 @@
 #include "../../graphics/framebuffer.h"
 #include "../../graphics/texture/texture.h"
 #include "../../resource/format/gffreader.h"
-#include "../../scene/node/modelscenenode.h"
+#include "../../scene/node/modelnode.h"
 #include "../../scene/pipeline/control.h"
 #include "../../scene/scenegraph.h"
 #include "../types.h"
