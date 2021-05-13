@@ -17,9 +17,9 @@
 
 #include "modelnode.h"
 
-#include "glm/gtx/matrix_decompose.hpp"
-
 #include "../../common/log.h"
+
+#include "glm/gtx/transform.hpp"
 
 using namespace std;
 
@@ -27,7 +27,36 @@ namespace reone {
 
 namespace graphics {
 
-ModelNode::ModelNode(int index, const ModelNode *parent) : _index(index), _parent(parent) {
+ModelNode::ModelNode(
+    uint16_t id,
+    string name,
+    glm::vec3 restPosition,
+    glm::quat restOrientation,
+    const ModelNode *parent
+) :
+    _id(id),
+    _name(move(name)),
+    _restPosition(move(restPosition)),
+    _restOrientation(move(restOrientation)),
+    _parent(parent) {
+
+    computeLocalTransform();
+    computeAbsoluteTransform();
+}
+
+void ModelNode::computeLocalTransform() {
+    _localTransform = glm::mat4(1.0f);
+    _localTransform *= glm::translate(_restPosition);
+    _localTransform *= glm::mat4_cast(_restOrientation);
+}
+
+void ModelNode::computeAbsoluteTransform() {
+    if (_parent) {
+        _absTransform = _parent->_absTransform * _localTransform;
+    } else {
+        _absTransform = _localTransform;
+    }
+    _absTransformInv = glm::inverse(_absTransform);
 }
 
 void ModelNode::init() {
@@ -39,93 +68,56 @@ void ModelNode::init() {
     }
 }
 
-void ModelNode::addChild(shared_ptr<ModelNode> child) {
-    child->_parent = this;
+void ModelNode::addChild(std::shared_ptr<ModelNode> child) {
     _children.push_back(move(child));
 }
 
-void ModelNode::computeLocalTransforms() {
-    if (_parent) {
-        _localTransform = glm::inverse(_parent->_absTransform) * _absTransform;
-        _absTransform = _parent->_absTransform * _localTransform;
-        _absTransformInv = glm::inverse(_absTransform);
-
-        // Extract position and orientation for use in animations.
-        glm::vec3 scale, skew;
-        glm::vec4 perspective;
-        glm::decompose(_localTransform, scale, _orientation, _position, skew, perspective);
-
-    } else {
-        _localTransform = _absTransform;
-    }
-
-    _absTransform = _parent ? _parent->_absTransform * _localTransform : _localTransform;
-    _absTransformInv = glm::inverse(_absTransform);
-
-    for (auto &child : _children) {
-        child->computeLocalTransforms();
-    }
-}
-
-void ModelNode::computeAbsoluteTransforms() {
-    _absTransform = _parent ? _parent->_absTransform * _localTransform : _localTransform;
-    _absTransformInv = glm::inverse(_absTransform);
-
-    for (auto &child : _children) {
-        child->computeAbsoluteTransforms();
-    }
-}
-
 bool ModelNode::getPosition(int leftFrameIdx, int rightFrameIdx, float factor, glm::vec3 &position) const {
-    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_positions.getNumKeyframes()) ||
-        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_positions.getNumKeyframes())) return false;
+    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_position.getNumFrames()) ||
+        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_position.getNumFrames())) return false;
 
     if (leftFrameIdx == rightFrameIdx) {
-        position = _positions.getByKeyframe(leftFrameIdx);
+        position = _position.getByFrame(leftFrameIdx);
     } else {
         position = glm::mix(
-            _positions.getByKeyframe(leftFrameIdx),
-            _positions.getByKeyframe(rightFrameIdx),
+            _position.getByFrame(leftFrameIdx),
+            _position.getByFrame(rightFrameIdx),
             factor);
     }
 
     return true;
 }
 
-bool ModelNode::getOrientation(int leftFrameIdx, int rightFrameIdx, float interpolant, glm::quat &orientation) const {
-    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_orientations.getNumKeyframes()) ||
-        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_orientations.getNumKeyframes())) return false;
+bool ModelNode::getOrientation(int leftFrameIdx, int rightFrameIdx, float factor, glm::quat &orientation) const {
+    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_orientation.getNumFrames()) ||
+        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_orientation.getNumFrames())) return false;
 
     if (leftFrameIdx == rightFrameIdx) {
-        orientation = _orientations.getByKeyframe(leftFrameIdx);
+        orientation = _orientation.getByFrame(leftFrameIdx);
     } else {
         orientation = glm::slerp(
-            _orientations.getByKeyframe(leftFrameIdx),
-            _orientations.getByKeyframe(rightFrameIdx),
-            interpolant);
+            _orientation.getByFrame(leftFrameIdx),
+            _orientation.getByFrame(rightFrameIdx),
+            factor);
     }
 
     return true;
 }
 
-bool ModelNode::getScale(int leftFrameIdx, int rightFrameIdx, float interpolant, float &scale) const {
-    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_scales.getNumKeyframes()) ||
-        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_scales.getNumKeyframes())) return false;
+bool ModelNode::getScale(int leftFrameIdx, int rightFrameIdx, float factor, float &scale) const {
+    if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_scale.getNumFrames()) ||
+        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_scale.getNumFrames())) return false;
 
     if (leftFrameIdx == rightFrameIdx) {
-        scale = _scales.getByKeyframe(leftFrameIdx);
+        scale = _scale.getByFrame(leftFrameIdx);
     } else {
         scale = glm::mix(
-            _scales.getByKeyframe(leftFrameIdx),
-            _scales.getByKeyframe(rightFrameIdx),
-            interpolant);
+            _scale.getByFrame(leftFrameIdx),
+            _scale.getByFrame(rightFrameIdx),
+            factor);
     }
 
     return true;
-}
-
-const glm::vec3 &ModelNode::getCenterOfAABB() const {
-    return _mesh->mesh->aabb().center();
 }
 
 vector<uint32_t> ModelNode::getFacesByMaterial(uint32_t material) const {

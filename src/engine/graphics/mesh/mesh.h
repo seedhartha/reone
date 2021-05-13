@@ -76,7 +76,6 @@ public:
     const std::vector<float> &vertices() const { return _vertices; }
     const std::vector<uint16_t> &indices() const { return _indices; }
     const VertexAttributes &attributes() const { return _attributes; }
-    VertexAttributes &attributes() { return _attributes; }
     const AABB &aabb() const { return _aabb; }
 
 private:

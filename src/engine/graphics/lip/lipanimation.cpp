@@ -29,7 +29,7 @@ LipAnimation::LipAnimation(float length, vector<Keyframe> keyframes) :
     _length(length), _keyframes(move(keyframes)) {
 }
 
-bool LipAnimation::getKeyframes(float time, uint8_t &leftShape, uint8_t &rightShape, float &interpolant) const {
+bool LipAnimation::getKeyframes(float time, uint8_t &leftShape, uint8_t &rightShape, float &factor) const {
     if (_keyframes.empty()) return false;
 
     const Keyframe *left = &_keyframes[0];
@@ -49,9 +49,9 @@ bool LipAnimation::getKeyframes(float time, uint8_t &leftShape, uint8_t &rightSh
     rightShape = right->shape;
 
     if (&left == &right) {
-        interpolant = 0.0f;
+        factor = 0.0f;
     } else {
-        interpolant = (time - left->time) / (right->time - left->time);
+        factor = (time - left->time) / (right->time - left->time);
     }
 
     return true;

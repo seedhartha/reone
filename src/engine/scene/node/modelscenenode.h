@@ -50,16 +50,16 @@ public:
     void update(float dt) override;
     void draw() override;
 
-    void refreshAABB();
+    void computeAABB();
     void signalEvent(const std::string &name);
     void setAppliedForce(glm::vec3 force);
 
     ModelNodeSceneNode *getModelNode(const std::string &name) const;
-    ModelNodeSceneNode *getModelNodeByIndex(int index) const;
-    LightSceneNode *getLightNodeByNumber(uint16_t nodeNumber) const;
+    ModelNodeSceneNode *getModelNodeById(uint16_t nodeId) const;
+    LightSceneNode *getLightNodeById(uint16_t nodeId) const;
     std::shared_ptr<ModelSceneNode> getAttachedModel(const std::string &parent) const;
     bool getNodeAbsolutePosition(const std::string &name, glm::vec3 &position) const;
-    glm::vec3 getCenterOfAABB() const;
+    glm::vec3 getWorldCenterAABB() const;
     const std::string &getName() const;
 
     ModelUsage usage() const { return _usage; }
@@ -72,8 +72,8 @@ public:
     void setVisible(bool visible) override;
     void setDiffuseTexture(const std::shared_ptr<graphics::Texture> &texture);
     void setAlpha(float alpha);
-    void setProjectileSpeed(float speed);
-    void setWalkmesh(std::shared_ptr<graphics::Walkmesh> walkmesh);
+    void setProjectileSpeed(float speed) { _projectileSpeed = speed; }
+    void setWalkmesh(std::shared_ptr<graphics::Walkmesh> walkmesh) { _walkmesh = std::move(walkmesh); }
 
     // Attachments
 
@@ -91,9 +91,8 @@ private:
     std::shared_ptr<graphics::Walkmesh> _walkmesh;
     SceneNodeAnimator _animator;
 
-    std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByIndex;
-    std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeByNumber;
-    std::unordered_map<uint16_t, LightSceneNode *> _lightNodeByNumber;
+    std::unordered_map<uint16_t, ModelNodeSceneNode *> _modelNodeById;
+    std::unordered_map<uint16_t, LightSceneNode *> _lightNodeById;
     std::vector<std::shared_ptr<EmitterSceneNode>> _emitters;
     std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
     bool _visible { true };

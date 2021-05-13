@@ -418,7 +418,7 @@ glm::vec3 Creature::getSelectablePosition() const {
     shared_ptr<ModelSceneNode> model(getModelSceneNode());
     if (!model) return _position;
 
-    if (_dead) return model->getCenterOfAABB();
+    if (_dead) return model->getWorldCenterAABB();
 
     glm::vec3 position;
 
@@ -426,7 +426,7 @@ glm::vec3 Creature::getSelectablePosition() const {
         return model->absoluteTransform() * glm::vec4(position, 1.0f);
     }
 
-    return model->getCenterOfAABB();
+    return model->getWorldCenterAABB();
 }
 
 float Creature::getAttackRange() const {

@@ -37,13 +37,13 @@ public:
     };
 
     Animation(
-        const std::string &name,
+        std::string name,
         float length,
         float transitionTime,
-        std::vector<Event> &&events,
-        const std::shared_ptr<ModelNode> &rootNode);
+        std::shared_ptr<ModelNode> rootNode,
+        std::vector<Event> &&events);
 
-    std::shared_ptr<ModelNode> findNode(const std::string &name) const;
+    std::shared_ptr<ModelNode> getNodeByName(const std::string &name) const;
 
     const std::string &name() const { return _name; }
     float length() const { return _length; }
@@ -51,20 +51,16 @@ public:
     std::shared_ptr<ModelNode> rootNode() const { return _rootNode; }
     const std::vector<Event> &events() const { return _events; }
 
-    void setName(std::string name);
-
 private:
     std::string _name;
     float _length { 0.0f };
     float _transitionTime { 0.0f };
-    std::vector<Event> _events;
     std::shared_ptr<ModelNode> _rootNode;
+    std::vector<Event> _events;
 
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
 
-    void initNodeByName();
-
-    friend class MdlReader;
+    void fillNodeByName();
 };
 
 } // namespace graphics

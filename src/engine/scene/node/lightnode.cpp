@@ -41,7 +41,7 @@ LightSceneNode::LightSceneNode(int priority, SceneGraph *sceneGraph) :
     _priority(priority) {
 }
 
-void LightSceneNode::drawLensFlares(const LensFlare &flare) {
+void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     shared_ptr<CameraSceneNode> camera(_sceneGraph->activeCamera());
     if (!camera) return;
 

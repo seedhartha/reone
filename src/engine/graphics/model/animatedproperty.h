@@ -40,22 +40,22 @@ struct SlerpInterpolator {
     }
 };
 
-template <class V, class Interpolator = MixInterpolator<V>>
+template <class V, class Inter = MixInterpolator<V>>
 class AnimatedProperty {
 public:
-    int getNumKeyframes() const {
-        return static_cast<int>(_keyframes.size());
+    int getNumFrames() const {
+        return static_cast<int>(_frames.size());
     }
 
     bool getByTime(float time, V &value) const {
-        if (_keyframes.empty()) return false;
+        if (_frames.empty()) return false;
 
-        const std::pair<float, V> *frame1 = &_keyframes[0];
-        const std::pair<float, V> *frame2 = &_keyframes[0];
-        for (auto it = _keyframes.begin(); it != _keyframes.end(); ++it) {
+        const std::pair<float, V> *frame1 = &_frames[0];
+        const std::pair<float, V> *frame2 = &_frames[0];
+        for (auto it = _frames.begin(); it != _frames.end(); ++it) {
             if (it->first >= time) {
                 frame2 = &*it;
-                if (it != _keyframes.begin()) {
+                if (it != _frames.begin()) {
                     frame1 = &*(it - 1);
                 }
                 break;
@@ -69,33 +69,33 @@ public:
             factor = (time - frame1->first) / (frame2->first - frame1->first);
         }
 
-        value = Interpolator::interpolate(frame1->second, frame2->second, factor);
+        value = Inter::interpolate(frame1->second, frame2->second, factor);
 
         return true;
     }
 
-    V getByKeyframe(int frame) const {
-        return _keyframes[frame].second;
+    V getByFrame(int frame) const {
+        return _frames[frame].second;
     }
 
-    V getByKeyframeOrElse(int frame, V defaultValue) const {
-        return frame < static_cast<int>(_keyframes.size()) ?
-            getByKeyframe(frame) :
+    V getByFrameOrElse(int frame, V defaultValue) const {
+        return frame < static_cast<int>(_frames.size()) ?
+            getByFrame(frame) :
             std::move(defaultValue);
     }
 
-    void addKeyframe(float time, V value) {
-        _keyframes.push_back(std::make_pair(time, value));
+    void addFrame(float time, V value) {
+        _frames.push_back(std::make_pair(time, std::move(value)));
     }
 
     void update() {
-        std::sort(_keyframes.begin(), _keyframes.end(), [](auto &left, auto &right) {
+        std::sort(_frames.begin(), _frames.end(), [](auto &left, auto &right) {
             return left.first < right.first;
         });
     }
 
 private:
-    std::vector<std::pair<float, V>> _keyframes;
+    std::vector<std::pair<float, V>> _frames;
 };
 
 } // namespace graphics

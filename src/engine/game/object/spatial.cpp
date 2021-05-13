@@ -226,7 +226,7 @@ shared_ptr<Walkmesh> SpatialObject::getWalkmesh() const {
 
 glm::vec3 SpatialObject::getSelectablePosition() const {
     auto model = getModelSceneNode();
-    return model ? model->getCenterOfAABB() : _position;
+    return model ? model->getWorldCenterAABB() : _position;
 }
 
 void SpatialObject::setRoom(Room *room) {

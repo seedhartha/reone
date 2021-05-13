@@ -65,35 +65,35 @@ ModelSceneNode::ModelSceneNode(
     _volumetric = true;
 }
 
-static bool validateEmitter(const Emitter &emitter) {
-    switch (emitter.updateMode()) {
-        case Emitter::UpdateMode::Fountain:
-        case Emitter::UpdateMode::Single:
-        case Emitter::UpdateMode::Explosion:
+static bool validateEmitter(const ModelNode::Emitter &emitter) {
+    switch (emitter.updateMode) {
+        case ModelNode::Emitter::UpdateMode::Fountain:
+        case ModelNode::Emitter::UpdateMode::Single:
+        case ModelNode::Emitter::UpdateMode::Explosion:
             break;
         default:
-            warn("validateEmitter: unsupported update mode: " + to_string(static_cast<int>(emitter.updateMode())));
+            warn("validateEmitter: unsupported update mode: " + to_string(static_cast<int>(emitter.updateMode)));
             return false;
     }
 
-    switch (emitter.renderMode()) {
-        case Emitter::RenderMode::Normal:
-        case Emitter::RenderMode::BillboardToWorldZ:
-        case Emitter::RenderMode::MotionBlur:
-        case Emitter::RenderMode::BillboardToLocalZ:
-        case Emitter::RenderMode::AlignedToParticleDir:
+    switch (emitter.renderMode) {
+        case ModelNode::Emitter::RenderMode::Normal:
+        case ModelNode::Emitter::RenderMode::BillboardToWorldZ:
+        case ModelNode::Emitter::RenderMode::MotionBlur:
+        case ModelNode::Emitter::RenderMode::BillboardToLocalZ:
+        case ModelNode::Emitter::RenderMode::AlignedToParticleDir:
             break;
         default:
-            warn("validateEmitter: unsupported render mode: " + to_string(static_cast<int>(emitter.renderMode())));
+            warn("validateEmitter: unsupported render mode: " + to_string(static_cast<int>(emitter.renderMode)));
             return false;
     }
 
-    switch (emitter.blendMode()) {
-        case Emitter::BlendMode::Normal:
-        case Emitter::BlendMode::Lighten:
+    switch (emitter.blendMode) {
+        case ModelNode::Emitter::BlendMode::Normal:
+        case ModelNode::Emitter::BlendMode::Lighten:
             break;
         default:
-            warn("validateEmitter: unsupported blend mode: " + to_string(static_cast<int>(emitter.blendMode())));
+            warn("validateEmitter: unsupported blend mode: " + to_string(static_cast<int>(emitter.blendMode)));
             return false;
     }
 
@@ -112,8 +112,7 @@ void ModelSceneNode::initModelNodes() {
         nodes.pop();
 
         const ModelNode *modelNode = sceneNode->modelNode();
-        _modelNodeByIndex.insert(make_pair(modelNode->index(), sceneNode));
-        _modelNodeByNumber.insert(make_pair(modelNode->nodeNumber(), sceneNode));
+        _modelNodeById.insert(make_pair(modelNode->id(), sceneNode));
 
         for (auto &child : modelNode->children()) {
             shared_ptr<ModelNodeSceneNode> childNode(getModelNodeSceneNode(*child));
@@ -123,12 +122,12 @@ void ModelSceneNode::initModelNodes() {
             shared_ptr<ModelNode::Light> light(child->light());
             if (light) {
                 // Light is considered directional if its radius exceeds a certain threshold
-                float radius = child->lightRadii().getByKeyframeOrElse(0, 1.0f);
+                float radius = child->radius().getByFrameOrElse(0, 1.0f);
                 bool directional = radius >= kMinDirectionalLightRadius;
 
                 auto lightNode = make_shared<LightSceneNode>(light->priority, _sceneGraph);
-                lightNode->setColor(child->lightColors().getByKeyframeOrElse(0, glm::vec3(1.0f)));
-                lightNode->setMultiplier(child->lightMultipliers().getByKeyframeOrElse(0, 1.0f));
+                lightNode->setColor(child->color().getByFrameOrElse(0, glm::vec3(1.0f)));
+                lightNode->setMultiplier(child->multiplier().getByFrameOrElse(0, 1.0f));
                 lightNode->setRadius(radius);
                 lightNode->setShadow(light->shadow);
                 lightNode->setAmbientOnly(light->ambientOnly);
@@ -137,10 +136,10 @@ void ModelSceneNode::initModelNodes() {
                 lightNode->setFlares(light->flares);
 
                 childNode->addChild(lightNode);
-                _lightNodeByNumber.insert(make_pair(modelNode->nodeNumber(), lightNode.get()));
+                _lightNodeById.insert(make_pair(modelNode->id(), lightNode.get()));
             }
 
-            shared_ptr<Emitter> emitter(child->emitter());
+            shared_ptr<ModelNode::Emitter> emitter(child->emitter());
             if (emitter && validateEmitter(*emitter)) {
                 auto emitterNode = make_shared<EmitterSceneNode>(this, emitter, _sceneGraph);
                 childNode->addChild(emitterNode);
@@ -155,7 +154,7 @@ void ModelSceneNode::initModelNodes() {
         }
     }
 
-    refreshAABB();
+    computeAABB();
 }
 
 unique_ptr<ModelNodeSceneNode> ModelSceneNode::getModelNodeSceneNode(ModelNode &node) const {
@@ -188,9 +187,9 @@ shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const sh
 
 shared_ptr<ModelSceneNode> ModelSceneNode::attach(ModelNodeSceneNode &parent, const shared_ptr<Model> &model, ModelUsage usage) {
     const ModelNode *parentModelNode = parent.modelNode();
-    uint16_t parentNumber = parentModelNode->nodeNumber();
+    uint16_t parentId = parentModelNode->id();
 
-    auto maybeAttached = _attachedModels.find(parentNumber);
+    auto maybeAttached = _attachedModels.find(parentId);
     if (maybeAttached != _attachedModels.end()) {
         parent.removeChild(*maybeAttached->second);
         _attachedModels.erase(maybeAttached);
@@ -203,7 +202,7 @@ shared_ptr<ModelSceneNode> ModelSceneNode::attach(ModelNodeSceneNode &parent, co
         auto modelNode = make_shared<ModelSceneNode>(usage, model, _sceneGraph, ignoreNodes);
         parent.addChild(modelNode);
 
-        return _attachedModels.insert(make_pair(parentNumber, move(modelNode))).first->second;
+        return _attachedModels.insert(make_pair(parentId, move(modelNode))).first->second;
     }
 
     return nullptr;
@@ -211,47 +210,47 @@ shared_ptr<ModelSceneNode> ModelSceneNode::attach(ModelNodeSceneNode &parent, co
 }
 
 ModelNodeSceneNode *ModelSceneNode::getModelNode(const string &name) const {
-    shared_ptr<ModelNode> modelNode(_model->findNodeByName(name));
+    shared_ptr<ModelNode> modelNode(_model->getNodeByName(name));
     if (!modelNode) return nullptr;
 
-    return getFromLookupOrNull(_modelNodeByNumber, modelNode->nodeNumber());
+    return getFromLookupOrNull(_modelNodeById, modelNode->id());
 }
 
-ModelNodeSceneNode *ModelSceneNode::getModelNodeByIndex(int index) const {
-    return getFromLookupOrNull(_modelNodeByIndex, static_cast<uint16_t>(index));
+ModelNodeSceneNode *ModelSceneNode::getModelNodeById(uint16_t nodeId) const {
+    return getFromLookupOrNull(_modelNodeById, nodeId);
 }
 
-LightSceneNode *ModelSceneNode::getLightNodeByNumber(uint16_t nodeNumber) const {
-    return getFromLookupOrNull(_lightNodeByNumber, nodeNumber);
+LightSceneNode *ModelSceneNode::getLightNodeById(uint16_t nodeId) const {
+    return getFromLookupOrNull(_lightNodeById, nodeId);
 }
 
 shared_ptr<ModelSceneNode> ModelSceneNode::getAttachedModel(const string &parent) const {
-    shared_ptr<ModelNode> parentModelNode(_model->findNodeByName(parent));
+    shared_ptr<ModelNode> parentModelNode(_model->getNodeByName(parent));
     if (!parentModelNode) return nullptr;
 
-    return getFromLookupOrNull(_attachedModels, parentModelNode->nodeNumber());
+    return getFromLookupOrNull(_attachedModels, parentModelNode->id());
 }
 
 void ModelSceneNode::attach(const string &parent, const shared_ptr<SceneNode> &node) {
-    shared_ptr<ModelNode> parentModelNode(_model->findNodeByName(parent));
+    shared_ptr<ModelNode> parentModelNode(_model->getNodeByName(parent));
     if (!parentModelNode) {
         warn(boost::format("Scene node %s: model node not found: %s") % _model->name() % parent);
         return;
     }
-    uint16_t parentNumber = parentModelNode->nodeNumber();
+    uint16_t parentId = parentModelNode->id();
 
-    auto maybeNode = _modelNodeByNumber.find(parentNumber);
-    if (maybeNode != _modelNodeByNumber.end()) {
+    auto maybeNode = _modelNodeById.find(parentId);
+    if (maybeNode != _modelNodeById.end()) {
         maybeNode->second->addChild(node);
     }
 }
 
 bool ModelSceneNode::getNodeAbsolutePosition(const string &name, glm::vec3 &position) const {
-    shared_ptr<ModelNode> node(_model->findNodeByName(name));
+    shared_ptr<ModelNode> node(_model->getNodeByName(name));
     if (!node) {
         shared_ptr<Model> superModel(_model->superModel());
         if (superModel) {
-            node = superModel->findNodeByName(name);
+            node = superModel->getNodeByName(name);
         }
     }
     if (!node) return false;
@@ -261,7 +260,7 @@ bool ModelSceneNode::getNodeAbsolutePosition(const string &name, glm::vec3 &posi
     return true;
 }
 
-glm::vec3 ModelSceneNode::getCenterOfAABB() const {
+glm::vec3 ModelSceneNode::getWorldCenterAABB() const {
     return _absoluteTransform * glm::vec4(_aabb.center(), 1.0f);
 }
 
@@ -295,15 +294,7 @@ void ModelSceneNode::setAlpha(float alpha) {
     }
 }
 
-void ModelSceneNode::setProjectileSpeed(float speed) {
-    _projectileSpeed = speed;
-}
-
-void ModelSceneNode::setWalkmesh(shared_ptr<Walkmesh> walkmesh) {
-    _walkmesh = move(walkmesh);
-}
-
-void ModelSceneNode::refreshAABB() {
+void ModelSceneNode::computeAABB() {
     _aabb.reset();
 
     stack<SceneNode *> nodes;
@@ -315,7 +306,7 @@ void ModelSceneNode::refreshAABB() {
 
         if (node->type() == SceneNodeType::ModelNode) {
             auto modelNode = static_cast<ModelNodeSceneNode *>(node);
-            shared_ptr<ModelNode::Trimesh> mesh(modelNode->modelNode()->mesh());
+            shared_ptr<ModelNode::TriangleMesh> mesh(modelNode->modelNode()->mesh());
             if (mesh) {
                 _aabb.expand(mesh->mesh->aabb() * node->localTransform());
             }
@@ -340,7 +331,7 @@ void ModelSceneNode::signalEvent(const string &name) {
 }
 
 void ModelSceneNode::setAppliedForce(glm::vec3 force) {
-    for (auto &nodePair : _modelNodeByIndex) {
+    for (auto &nodePair : _modelNodeById) {
         nodePair.second->setAppliedForce(force);
     }
     for (auto &attached : _attachedModels) {

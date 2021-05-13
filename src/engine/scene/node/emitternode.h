@@ -24,7 +24,7 @@
 #include "glm/vec3.hpp"
 
 #include "../../common/timer.h"
-#include "../../graphics/model/emitter.h"
+#include "../../graphics/model/modelnode.h"
 
 #include "../particle.h"
 
@@ -36,7 +36,7 @@ class ModelSceneNode;
 
 class EmitterSceneNode : public SceneNode {
 public:
-    EmitterSceneNode(const ModelSceneNode *modelSceneNode, const std::shared_ptr<graphics::Emitter> &emitter, SceneGraph *sceneGraph);
+    EmitterSceneNode(const ModelSceneNode *modelSceneNode, const std::shared_ptr<graphics::ModelNode::Emitter> &emitter, SceneGraph *sceneGraph);
 
     void update(float dt) override;
 
@@ -49,12 +49,12 @@ public:
 
     void detonate();
 
-    std::shared_ptr<graphics::Emitter> emitter() const { return _emitter; }
+    std::shared_ptr<graphics::ModelNode::Emitter> emitter() const { return _emitter; }
     const std::vector<std::shared_ptr<Particle>> &particles() const { return _particles; }
 
 private:
     const ModelSceneNode *_modelSceneNode;
-    std::shared_ptr<graphics::Emitter> _emitter;
+    std::shared_ptr<graphics::ModelNode::Emitter> _emitter;
 
     float _birthInterval { 0.0f };
     Timer _birthTimer;
