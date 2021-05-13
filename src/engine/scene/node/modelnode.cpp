@@ -30,8 +30,8 @@
 #include "cameranode.h"
 #include "emitternode.h"
 #include "lightnode.h"
-#include "modelnodescenenode.h"
-#include "modelscenenode.h"
+#include "meshnode.h"
+#include "modelnode.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -101,21 +101,21 @@ static bool validateEmitter(const ModelNode::Emitter &emitter) {
 }
 
 void ModelSceneNode::initModelNodes() {
-    shared_ptr<ModelNodeSceneNode> rootNode(getModelNodeSceneNode(*_model->rootNode()));
+    shared_ptr<MeshSceneNode> rootNode(getModelNodeSceneNode(*_model->rootNode()));
     addChild(rootNode);
 
-    stack<ModelNodeSceneNode *> nodes;
+    stack<MeshSceneNode *> nodes;
     nodes.push(rootNode.get());
 
     while (!nodes.empty()) {
-        ModelNodeSceneNode *sceneNode = nodes.top();
+        MeshSceneNode *sceneNode = nodes.top();
         nodes.pop();
 
         const ModelNode *modelNode = sceneNode->modelNode();
         _modelNodeById.insert(make_pair(modelNode->id(), sceneNode));
 
         for (auto &child : modelNode->children()) {
-            shared_ptr<ModelNodeSceneNode> childNode(getModelNodeSceneNode(*child));
+            shared_ptr<MeshSceneNode> childNode(getModelNodeSceneNode(*child));
             addChild(childNode);
             nodes.push(childNode.get());
 
@@ -157,8 +157,8 @@ void ModelSceneNode::initModelNodes() {
     computeAABB();
 }
 
-unique_ptr<ModelNodeSceneNode> ModelSceneNode::getModelNodeSceneNode(ModelNode &node) const {
-    auto sceneNode = make_unique<ModelNodeSceneNode>(_sceneGraph, this, &node);
+unique_ptr<MeshSceneNode> ModelSceneNode::getModelNodeSceneNode(ModelNode &node) const {
+    auto sceneNode = make_unique<MeshSceneNode>(_sceneGraph, this, &node);
     sceneNode->setLocalTransform(node.absoluteTransform());
     return move(sceneNode);
 }
@@ -181,11 +181,11 @@ void ModelSceneNode::draw() {
 }
 
 shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const shared_ptr<Model> &model, ModelUsage usage) {
-    ModelNodeSceneNode *parentNode = getModelNode(parent);
+    MeshSceneNode *parentNode = getModelNode(parent);
     return parentNode ? attach(*parentNode, model, usage) : nullptr;
 }
 
-shared_ptr<ModelSceneNode> ModelSceneNode::attach(ModelNodeSceneNode &parent, const shared_ptr<Model> &model, ModelUsage usage) {
+shared_ptr<ModelSceneNode> ModelSceneNode::attach(MeshSceneNode &parent, const shared_ptr<Model> &model, ModelUsage usage) {
     const ModelNode *parentModelNode = parent.modelNode();
     uint16_t parentId = parentModelNode->id();
 
@@ -209,14 +209,14 @@ shared_ptr<ModelSceneNode> ModelSceneNode::attach(ModelNodeSceneNode &parent, co
 
 }
 
-ModelNodeSceneNode *ModelSceneNode::getModelNode(const string &name) const {
+MeshSceneNode *ModelSceneNode::getModelNode(const string &name) const {
     shared_ptr<ModelNode> modelNode(_model->getNodeByName(name));
     if (!modelNode) return nullptr;
 
     return getFromLookupOrNull(_modelNodeById, modelNode->id());
 }
 
-ModelNodeSceneNode *ModelSceneNode::getModelNodeById(uint16_t nodeId) const {
+MeshSceneNode *ModelSceneNode::getModelNodeById(uint16_t nodeId) const {
     return getFromLookupOrNull(_modelNodeById, nodeId);
 }
 
@@ -271,7 +271,7 @@ const string &ModelSceneNode::getName() const {
 void ModelSceneNode::setDiffuseTexture(const shared_ptr<Texture> &texture) {
     for (auto &child : _children) {
         if (child->type() == SceneNodeType::ModelNode) {
-            static_pointer_cast<ModelNodeSceneNode>(child)->setDiffuseTexture(texture);
+            static_pointer_cast<MeshSceneNode>(child)->setDiffuseTexture(texture);
         }
     }
 }
@@ -305,7 +305,7 @@ void ModelSceneNode::computeAABB() {
         nodes.pop();
 
         if (node->type() == SceneNodeType::ModelNode) {
-            auto modelNode = static_cast<ModelNodeSceneNode *>(node);
+            auto modelNode = static_cast<MeshSceneNode *>(node);
             shared_ptr<ModelNode::TriangleMesh> mesh(modelNode->modelNode()->mesh());
             if (mesh) {
                 _aabb.expand(mesh->mesh->aabb() * node->localTransform());

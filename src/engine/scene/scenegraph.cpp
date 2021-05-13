@@ -25,8 +25,8 @@
 #include "node/emitternode.h"
 #include "node/grassnode.h"
 #include "node/lightnode.h"
-#include "node/modelnodescenenode.h"
-#include "node/modelscenenode.h"
+#include "node/meshnode.h"
+#include "node/modelnode.h"
 
 using namespace std;
 
@@ -129,7 +129,7 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
         }
         case SceneNodeType::ModelNode: {
             // For model nodes, determine whether they should be rendered and cast shadows
-            auto modelNode = static_pointer_cast<ModelNodeSceneNode>(node);
+            auto modelNode = static_pointer_cast<MeshSceneNode>(node);
             if (modelNode->shouldRender()) {
                 // Sort model nodes into transparent and opaque
                 if (modelNode->isTransparent()) {

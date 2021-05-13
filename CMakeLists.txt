@@ -300,8 +300,7 @@ set(SCENE_HEADERS
     src/engine/scene/node/grassnode.h
     src/engine/scene/node/lightnode.h
     src/engine/scene/node/meshnode.h
-    src/engine/scene/node/modelnodescenenode.h
-    src/engine/scene/node/modelscenenode.h
+    src/engine/scene/node/modelnode.h
     src/engine/scene/node/scenenode.h
     src/engine/scene/particle.h
     src/engine/scene/pipeline/control.h
@@ -317,8 +316,7 @@ set(SCENE_SOURCES
     src/engine/scene/node/grassnode.cpp
     src/engine/scene/node/lightnode.cpp
     src/engine/scene/node/meshnode.cpp
-    src/engine/scene/node/modelnodescenenode.cpp
-    src/engine/scene/node/modelscenenode.cpp
+    src/engine/scene/node/modelnode.cpp
     src/engine/scene/node/scenenode.cpp
     src/engine/scene/particle.cpp
     src/engine/scene/pipeline/control.cpp

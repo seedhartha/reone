@@ -19,13 +19,23 @@
 
 #include <stdexcept>
 
-#include "glm/ext.hpp"
+#include "GL/glew.h"
+#include "SDL2/SDL_opengl.h"
 
+#include "../../common/log.h"
+#include "../../common/random.h"
+#include "../../graphics/featureutil.h"
+#include "../../graphics/materials.h"
+#include "../../graphics/pbribl.h"
 #include "../../graphics/shader/shaders.h"
+#include "../../graphics/statemanager.h"
+#include "../../graphics/texture/textures.h"
 
 #include "../scenegraph.h"
 
 #include "cameranode.h"
+#include "lightnode.h"
+#include "modelnode.h"
 
 using namespace std;
 
@@ -35,35 +45,393 @@ namespace reone {
 
 namespace scene {
 
-MeshSceneNode::MeshSceneNode(SceneGraph *sceneGraph, const shared_ptr<Mesh> &mesh) :
-    SceneNode(SceneNodeType::Mesh, sceneGraph),
-    _mesh(mesh) {
+static constexpr float kUvAnimationSpeed = 250.0f;
 
-    if (!mesh) {
-        throw invalid_argument("mesh must not be null");
+static bool g_debugWalkmesh = false;
+
+MeshSceneNode::MeshSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, ModelNode *modelNode) :
+    SceneNode(SceneNodeType::ModelNode, sceneGraph),
+    _modelSceneNode(modelSceneNode),
+    _modelNode(modelNode) {
+
+    if (!modelSceneNode) {
+        throw invalid_argument("modelSceneNode must not be null");
+    }
+    if (!modelNode) {
+        throw invalid_argument("modelNode must not be null");
+    }
+    if (_modelNode->alpha().getNumFrames() > 0) {
+        _alpha = _modelNode->alpha().getByFrame(0);
+    }
+    if (_modelNode->selfIllumColor().getNumFrames() > 0) {
+        _selfIllumColor = _modelNode->selfIllumColor().getByFrame(0);
+    }
+    initTextures();
+}
+
+void MeshSceneNode::initTextures() {
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    if (!mesh) return;
+
+    _textures.diffuse = mesh->diffuseMap;
+    _textures.lightmap = mesh->lightmap;
+    _textures.bumpmap = mesh->bumpmap;
+
+    refreshMaterial();
+    refreshAdditionalTextures();
+}
+
+void MeshSceneNode::refreshMaterial() {
+    if (!_textures.diffuse) return;
+
+    shared_ptr<Material> material(Materials::instance().get(_textures.diffuse->name()));
+    if (material) {
+        _material = *material;
     }
 }
 
-void MeshSceneNode::draw() {
+void MeshSceneNode::refreshAdditionalTextures() {
+    if (!_textures.diffuse) return;
+
+    const Texture::Features &features = _textures.diffuse->features();
+    if (!features.envmapTexture.empty()) {
+        _textures.envmap = Textures::instance().get(features.envmapTexture, TextureUsage::EnvironmentMap);
+    } else if (!features.bumpyShinyTexture.empty()) {
+        _textures.envmap = Textures::instance().get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap);
+    }
+    if (!features.bumpmapTexture.empty()) {
+        _textures.bumpmap = Textures::instance().get(features.bumpmapTexture, TextureUsage::Bumpmap);
+    }
+}
+
+void MeshSceneNode::update(float dt) {
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    if (mesh) {
+        // UV animation
+        if (mesh->uvAnimation.dir.x != 0.0f || mesh->uvAnimation.dir.y != 0.0f) {
+            _uvOffset += kUvAnimationSpeed * mesh->uvAnimation.dir * dt;
+            _uvOffset -= glm::floor(_uvOffset);
+        }
+
+        // Bumpmap UV animation
+        if (_textures.bumpmap) {
+            const Texture::Features &features = _textures.bumpmap->features();
+            if (features.procedureType == Texture::ProcedureType::Cycle) {
+                int frameCount = features.numX * features.numY;
+                float length = frameCount / static_cast<float>(features.fps);
+                _bumpmapTime = glm::min(_bumpmapTime + dt, length);
+                _bumpmapFrame = static_cast<int>(glm::round((frameCount - 1) * (_bumpmapTime / length)));
+                if (_bumpmapTime == length) {
+                    _bumpmapTime = 0.0f;
+                }
+            }
+        }
+
+        // Danglymesh animation
+        shared_ptr<ModelNode::DanglyMesh> danglyMesh(mesh->danglyMesh);
+        if (danglyMesh) {
+            bool forceApplied = glm::length2(_danglymeshAnimation.force) > 0.0f;
+            if (forceApplied) {
+                // When force is applied, stride in the opposite direction from the applied force
+                glm::vec3 strideDir(-_danglymeshAnimation.force);
+                glm::vec3 maxStride(danglyMesh->displacement);
+                _danglymeshAnimation.stride = glm::clamp(_danglymeshAnimation.stride + danglyMesh->period * strideDir * dt, -maxStride, maxStride);
+            } else {
+                // When force is not applied, gradually nullify stride
+                float strideMag2 = glm::length2(_danglymeshAnimation.stride);
+                if (strideMag2 > 0.0f) {
+                    glm::vec3 strideDir(-_danglymeshAnimation.stride);
+                    _danglymeshAnimation.stride += danglyMesh->period * strideDir * dt;
+                    if ((strideDir.x > 0.0f && _danglymeshAnimation.stride.x > 0.0f) || (strideDir.x < 0.0f && _danglymeshAnimation.stride.x < 0.0f)) {
+                        _danglymeshAnimation.stride.x = 0.0f;
+                    }
+                    if ((strideDir.y > 0.0f && _danglymeshAnimation.stride.y > 0.0f) || (strideDir.y < 0.0f && _danglymeshAnimation.stride.y < 0.0f)) {
+                        _danglymeshAnimation.stride.y = 0.0f;
+                    }
+                    if ((strideDir.z > 0.0f && _danglymeshAnimation.stride.z > 0.0f) || (strideDir.z < 0.0f && _danglymeshAnimation.stride.z < 0.0f)) {
+                        _danglymeshAnimation.stride.z = 0.0f;
+                    }
+                }
+            }
+        }
+    }
+
+    SceneNode::update(dt);
+}
+
+bool MeshSceneNode::shouldRender() const {
+    if (g_debugWalkmesh) return _modelNode->isAABBMesh();
+
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    if (!mesh || !mesh->render || _modelNode->alpha().getByFrameOrElse(0, 1.0f) == 0.0f) return false;
+
+    return !_modelNode->isAABBMesh();
+}
+
+bool MeshSceneNode::shouldCastShadows() const {
+    // Skin nodes must not cast shadows
+    if (_modelNode->isSkinMesh()) return false;
+
+    // Meshless nodes must not cast shadows
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    if (!mesh) return false;
+
+    return mesh->shadow;
+}
+
+bool MeshSceneNode::isTransparent() const {
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    if (!mesh) return false; // Meshless nodes are opaque
+
+    // Character models are opaque
+    if (_modelSceneNode->model()->classification() == Model::Classification::Character) return false;
+
+    // Model nodes with alpha less than 1.0 are transparent
+    if (_alpha < 1.0f) return true;
+
+    // Model nodes without a diffuse texture are opaque
+    if (!_textures.diffuse) return false;
+
+    // Model nodes with transparency hint greater than 0 are transparent
+    if (mesh->transparency > 0) return true;
+
+    // Model nodes with additive diffuse texture are opaque
+    if (_textures.diffuse->isAdditive()) return true;
+
+    // Model nodes with an environment map or a bump map are opaque
+    if (_textures.envmap || _textures.bumpmap) return false;
+
+    // Model nodes with RGB diffuse textures are opaque
+    PixelFormat format = _textures.diffuse->pixelFormat();
+    if (format == PixelFormat::RGB || format == PixelFormat::BGR || format == PixelFormat::DXT1) return false;
+
+    return true;
+}
+
+static bool isLightingEnabledByUsage(ModelUsage usage) {
+    return usage != ModelUsage::Projectile;
+}
+
+bool MeshSceneNode::isSelfIlluminated() const {
+    return !_textures.lightmap && glm::dot(_selfIllumColor, _selfIllumColor) > 0.0f;
+}
+
+static bool isReceivingShadows(const ModelSceneNode &model, const MeshSceneNode &modelNode) {
+    // Only room models receive shadows, unless model node is self-illuminated
+    return
+        model.usage() == ModelUsage::Room &&
+        !modelNode.isSelfIlluminated();
+}
+
+void MeshSceneNode::drawSingle(bool shadowPass) {
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    if (!mesh) return;
+
+    // Setup shaders
+
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
+    if (isFeatureEnabled(Feature::HDR)) {
+        uniforms.combined.featureMask |= UniformFeatureFlags::hdr;
+    }
     uniforms.combined.general.model = _absoluteTransform;
-    uniforms.combined.general.color = glm::vec4(_color, 1.0f);
-    uniforms.combined.general.alpha = _alpha;
-    Shaders::instance().activate(ShaderProgram::ModelColor, uniforms);
+    uniforms.combined.general.alpha = _modelSceneNode->alpha() * _alpha;
+    uniforms.combined.general.ambientColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
 
-    _mesh->draw();
+    ShaderProgram program;
 
-    SceneNode::draw();
+    if (shadowPass) {
+        program = ShaderProgram::SimpleDepth;
+
+    } else {
+        if (!_textures.diffuse) {
+            program = ShaderProgram::ModelBlinnPhongDiffuseless;
+        } else if (isFeatureEnabled(Feature::PBR)) {
+            program = ShaderProgram::ModelPBR;
+        } else {
+            program = ShaderProgram::ModelBlinnPhong;
+        }
+
+        if (_textures.diffuse) {
+            uniforms.combined.featureMask |= UniformFeatureFlags::diffuse;
+        }
+
+        if (_textures.envmap) {
+            uniforms.combined.featureMask |= UniformFeatureFlags::envmap;
+
+            if (isFeatureEnabled(Feature::PBR)) {
+                bool derived = PBRIBL::instance().contains(_textures.envmap.get());
+                if (derived) {
+                    uniforms.combined.featureMask |= UniformFeatureFlags::pbrIbl;
+                }
+            }
+        }
+
+        if (_textures.lightmap && !isFeatureEnabled(Feature::DynamicRoomLighting)) {
+            uniforms.combined.featureMask |= UniformFeatureFlags::lightmap;
+        }
+
+        if (_textures.bumpmap) {
+            uniforms.combined.featureMask |= UniformFeatureFlags::bumpmaps;
+            uniforms.combined.bumpmaps.grayscale = _textures.bumpmap->isGrayscale();
+            uniforms.combined.bumpmaps.scaling = _textures.bumpmap->features().bumpMapScaling;
+            uniforms.combined.bumpmaps.gridSize = glm::vec2(_textures.bumpmap->features().numX, _textures.bumpmap->features().numY);
+            uniforms.combined.bumpmaps.frame = _bumpmapFrame;
+        }
+
+        bool receivesShadows = isReceivingShadows(*_modelSceneNode, *this);
+        if (receivesShadows) {
+            uniforms.combined.featureMask |= UniformFeatureFlags::shadows;
+        }
+
+        if (mesh->skin) {
+            uniforms.combined.featureMask |= UniformFeatureFlags::skeletal;
+
+            for (int i = 0; i < kMaxBones; ++i) {
+                if (i < static_cast<int>(mesh->skin->boneNodeId.size())) {
+                    uint16_t nodeId = mesh->skin->boneNodeId[i];
+                    if (nodeId != 0xffff) {
+                        MeshSceneNode *bone = _modelSceneNode->getModelNodeById(nodeId);
+                        if (bone) {
+                            uniforms.skeletal->bones[i] = _modelNode->absoluteTransformInverse() * bone->boneTransform() * _modelNode->absoluteTransform();
+                        }
+                    }
+                } else {
+                    uniforms.skeletal->bones[i] = glm::mat4(1.0f);
+                }
+            }
+        }
+
+        if (isSelfIlluminated()) {
+            uniforms.combined.featureMask |= UniformFeatureFlags::selfIllum;
+            uniforms.combined.general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
+        }
+        if (isLightingEnabled()) {
+            const vector<LightSceneNode *> &lights = _sceneGraph->closestLights();
+
+            uniforms.combined.featureMask |= UniformFeatureFlags::lighting;
+            uniforms.combined.material.ambient = glm::vec4(mesh->ambient, 1.0f);
+            uniforms.combined.material.diffuse = glm::vec4(mesh->diffuse, 1.0f);
+            uniforms.combined.material.shininess = _material.shininess;
+            uniforms.combined.material.metallic = _material.metallic;
+            uniforms.combined.material.roughness = _material.roughness;
+            uniforms.lighting->lightCount = static_cast<int>(lights.size());
+
+            for (int i = 0; i < uniforms.lighting->lightCount; ++i) {
+                glm::vec4 position(lights[i]->absoluteTransform()[3]);
+                position.w = lights[i]->isDirectional() ? 0.0f : 1.0f;
+
+                ShaderLight &shaderLight = uniforms.lighting->lights[i];
+                shaderLight.position = move(position);
+                shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
+                shaderLight.multiplier = lights[i]->multiplier();
+                shaderLight.radius = lights[i]->radius();
+            }
+        }
+
+        if (_textures.diffuse) {
+            uniforms.combined.general.uvOffset = _uvOffset;
+
+            float waterAlpha = _textures.diffuse->features().waterAlpha;
+            if (waterAlpha != -1.0f) {
+                uniforms.combined.featureMask |= UniformFeatureFlags::water;
+                uniforms.combined.general.waterAlpha = waterAlpha;
+            }
+        }
+
+        if (_sceneGraph->isFogEnabled() && _modelSceneNode->model()->isAffectedByFog()) {
+            uniforms.combined.featureMask |= UniformFeatureFlags::fog;
+            uniforms.combined.general.fogNear = _sceneGraph->fogNear();
+            uniforms.combined.general.fogFar = _sceneGraph->fogFar();
+            uniforms.combined.general.fogColor = glm::vec4(_sceneGraph->fogColor(), 1.0f);
+        }
+
+        shared_ptr<ModelNode::DanglyMesh> danglyMesh(mesh->danglyMesh);
+        if (danglyMesh) {
+            uniforms.combined.featureMask |= UniformFeatureFlags::danglymesh;
+            uniforms.danglymesh->stride = glm::vec4(_danglymeshAnimation.stride, 0.0f);
+            uniforms.danglymesh->displacement = danglyMesh->displacement;
+            size_t i = 0;
+            for (i = 0; i < danglyMesh->constraints.size(); ++i) {
+                uniforms.danglymesh->constraints[i / 4][i % 4] = danglyMesh->constraints[i].multiplier;
+            }
+        }
+    }
+
+    Shaders::instance().activate(program, uniforms);
+
+
+    bool additive = false;
+
+    // Setup textures
+
+    if (_textures.diffuse) {
+        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+        _textures.diffuse->bind();
+        additive = _textures.diffuse->isAdditive();
+    }
+    if (_textures.lightmap) {
+        StateManager::instance().setActiveTextureUnit(TextureUnits::lightmap);
+        _textures.lightmap->bind();
+    }
+    if (_textures.envmap) {
+        StateManager::instance().setActiveTextureUnit(TextureUnits::envmap);
+        _textures.envmap->bind();
+
+        PBRIBL::Derived derived;
+        if (PBRIBL::instance().getDerived(_textures.envmap.get(), derived)) {
+            StateManager::instance().setActiveTextureUnit(TextureUnits::irradianceMap);
+            derived.irradianceMap->bind();
+            StateManager::instance().setActiveTextureUnit(TextureUnits::prefilterMap);
+            derived.prefilterMap->bind();
+            StateManager::instance().setActiveTextureUnit(TextureUnits::brdfLookup);
+            derived.brdfLookup->bind();
+        }
+    }
+    if (_textures.bumpmap) {
+        StateManager::instance().setActiveTextureUnit(TextureUnits::bumpmap);
+        _textures.bumpmap->bind();
+    }
+
+
+    if (additive) {
+        StateManager::instance().withAdditiveBlending([&mesh]() { mesh->mesh->draw(); });
+    } else {
+        mesh->mesh->draw();
+    }
 }
 
-void MeshSceneNode::setColor(glm::vec3 color) {
-    _color = color;
+bool MeshSceneNode::isLightingEnabled() const {
+    if (!isLightingEnabledByUsage(_modelSceneNode->usage())) return false;
+
+    // Lighting is disabled for lightmapped models, unless dynamic room lighting is enabled
+    if (_textures.lightmap && !isFeatureEnabled(Feature::DynamicRoomLighting)) return false;
+
+    // Lighting is disabled for self-illuminated model nodes, e.g. sky boxes
+    if (isSelfIlluminated()) return false;
+
+    // Lighting is disabled when diffuse texture is additive
+    if (_textures.diffuse && _textures.diffuse->isAdditive()) return false;
+
+    return true;
 }
 
-void MeshSceneNode::setAlpha(float alpha) {
-    _alpha = alpha;
+void MeshSceneNode::setAppliedForce(glm::vec3 force) {
+    if (_modelNode->isDanglyMesh()) {
+        // Convert force from world to object space
+        _danglymeshAnimation.force = _absoluteTransformInv * glm::vec4(force, 0.0f);
+    }
 }
 
-} // namespace graphics
+glm::vec3 MeshSceneNode::getOrigin() const {
+    return _absoluteTransform * glm::vec4(_modelNode->mesh()->mesh->aabb().center(), 1.0f);
+}
+
+void MeshSceneNode::setDiffuseTexture(const shared_ptr<Texture> &texture) {
+    _textures.diffuse = texture;
+    refreshMaterial();
+    refreshAdditionalTextures();
+}
+
+} // namespace scene
 
 } // namespace reone

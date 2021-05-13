@@ -19,26 +19,74 @@
 
 #include "scenenode.h"
 
-#include "../../graphics/mesh/mesh.h"
+#include "../../graphics/material.h"
+#include "../../graphics/model/model.h"
+#include "../../graphics/model/modelnode.h"
 
 namespace reone {
 
 namespace scene {
 
+class ModelSceneNode;
+
 class MeshSceneNode : public SceneNode {
 public:
-    MeshSceneNode(SceneGraph *sceneGraph, const std::shared_ptr<graphics::Mesh> &mesh);
+    MeshSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, graphics::ModelNode *modelNode);
 
-    void draw() override;
+    void update(float dt) override;
 
-    void setColor(glm::vec3 color);
-    void setAlpha(float alpha);
+    void drawSingle(bool shadowPass);
+
+    void setAppliedForce(glm::vec3 force);
+
+    bool shouldRender() const;
+    bool shouldCastShadows() const;
+
+    glm::vec3 getOrigin() const override;
+
+    bool isTransparent() const override;
+    bool isSelfIlluminated() const;
+
+    const ModelSceneNode *modelSceneNode() const { return _modelSceneNode; }
+    const graphics::ModelNode *modelNode() const { return _modelNode; }
+    const glm::mat4 &boneTransform() const { return _boneTransform; }
+
+    void setBoneTransform(glm::mat4 transform) { _boneTransform = std::move(transform); }
+    void setDiffuseTexture(const std::shared_ptr<graphics::Texture> &texture);
+    void setAlpha(float alpha) { _alpha = alpha; }
+    void setSelfIllumColor(glm::vec3 color) { _selfIllumColor = std::move(color); }
 
 private:
-    std::shared_ptr<graphics::Mesh> _mesh;
+    struct NodeTextures {
+        std::shared_ptr<graphics::Texture> diffuse;
+        std::shared_ptr<graphics::Texture> lightmap;
+        std::shared_ptr<graphics::Texture> envmap;
+        std::shared_ptr<graphics::Texture> bumpmap;
+    } _textures;
 
-    glm::vec3 _color { 1.0f };
+    struct DanglymeshAnimation {
+        glm::vec3 force { 0.0f }; /**< net force applied to this scene node */
+        glm::vec3 stride { 0.0f }; /**< how far have vertices traveled from the rest position? */
+    } _danglymeshAnimation;
+
+    const ModelSceneNode *_modelSceneNode;
+    const graphics::ModelNode *_modelNode;
+
+    graphics::Material _material;
+    glm::mat4 _animTransform { 1.0f };
+    glm::mat4 _boneTransform { 1.0f };
+    glm::vec2 _uvOffset { 0.0f };
+    float _bumpmapTime { 0.0f };
+    int _bumpmapFrame { 0 };
     float _alpha { 1.0f };
+    glm::vec3 _selfIllumColor { 0.0f };
+
+    void initTextures();
+
+    void refreshMaterial();
+    void refreshAdditionalTextures();
+
+    bool isLightingEnabled() const;
 };
 
 } // namespace scene
