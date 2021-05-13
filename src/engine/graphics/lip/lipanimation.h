@@ -33,7 +33,7 @@ public:
 
     LipAnimation(float length, std::vector<Keyframe> keyframes);
 
-    bool getKeyframes(float time, uint8_t &leftShape, uint8_t &rightShape, float &interpolant) const;
+    bool getKeyframes(float time, uint8_t &leftShape, uint8_t &rightShape, float &factor) const;
 
     float length() const { return _length; }
     const std::vector<Keyframe> &keyframes() const { return _keyframes; }

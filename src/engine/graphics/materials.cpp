@@ -36,30 +36,31 @@ Materials &Materials::instance() {
 }
 
 void Materials::init() {
-    if (!_inited) {
-        shared_ptr<TwoDA> materials(Resources::instance().get2DA("material", false));
-        if (materials) {
-            for (int row = 0; row < materials->getRowCount(); ++row) {
-                string tex(boost::to_lower_copy(materials->getString(row, "tex")));
-                float shininess = materials->getFloat(row, "shininess", -1.0f);
-                float metallic = materials->getFloat(row, "metallic", -1.0f);
-                float roughness = materials->getFloat(row, "roughness", -1.0f);
+    if (_inited) return;
 
-                auto material = make_shared<Material>();
-                if (shininess != -1.0f) {
-                    material->shininess = shininess;
-                }
-                if (metallic != -1.0f) {
-                    material->metallic = metallic;
-                }
-                if (roughness != -1.0f) {
-                    material->roughness = roughness;
-                }
-                _materials.insert(make_pair(tex, move(material)));
+    shared_ptr<TwoDA> materials(Resources::instance().get2DA("material", false));
+    if (materials) {
+        for (int row = 0; row < materials->getRowCount(); ++row) {
+            string tex(boost::to_lower_copy(materials->getString(row, "tex")));
+            float shininess = materials->getFloat(row, "shininess", -1.0f);
+            float metallic = materials->getFloat(row, "metallic", -1.0f);
+            float roughness = materials->getFloat(row, "roughness", -1.0f);
+
+            auto material = make_shared<Material>();
+            if (shininess != -1.0f) {
+                material->shininess = shininess;
             }
+            if (metallic != -1.0f) {
+                material->metallic = metallic;
+            }
+            if (roughness != -1.0f) {
+                material->roughness = roughness;
+            }
+            _materials.insert(make_pair(tex, move(material)));
         }
-        _inited = true;
     }
+
+    _inited = true;
 }
 
 Materials::~Materials() {

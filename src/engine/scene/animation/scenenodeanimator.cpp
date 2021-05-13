@@ -68,7 +68,7 @@ void SceneNodeAnimator::update(float dt, bool visible) {
 
     if (visible) {
         // Compute and apply node states to the managed model
-        _stateByNumber.clear();
+        _stateById.clear();
         computeSceneNodeStates(*_sceneNode->model()->rootNode());
         applySceneNodeStates(*_sceneNode->model()->rootNode());
     }
@@ -85,7 +85,7 @@ bool SceneNodeAnimator::isInTransition() const {
 }
 
 void SceneNodeAnimator::computeSceneNodeStates(ModelNode &modelNode, glm::mat4 parentTransform) {
-    if (modelNode.skin()) return;
+    if (modelNode.isSkinMesh()) return;
 
     SceneNodeState state;
     state.flags |= SceneNodeStateFlags::transform;
@@ -97,8 +97,8 @@ void SceneNodeAnimator::computeSceneNodeStates(ModelNode &modelNode, glm::mat4 p
 
         // In the Blend mode, blend animations on the first two channels (only transforms)
         SceneNodeState channel0State, channel1State;
-        bool hasChannel0State = _channels[0].getSceneNodeStateByNumber(modelNode.nodeNumber(), channel0State);
-        bool hasChannel1State = _channels[1].getSceneNodeStateByNumber(modelNode.nodeNumber(), channel1State);
+        bool hasChannel0State = _channels[0].getSceneNodeStateById(modelNode.id(), channel0State);
+        bool hasChannel1State = _channels[1].getSceneNodeStateById(modelNode.id(), channel1State);
         if (hasChannel0State && (channel0State.flags & SceneNodeStateFlags::transform) &&
             hasChannel1State && (channel1State.flags & SceneNodeStateFlags::transform)) {
 
@@ -140,7 +140,7 @@ void SceneNodeAnimator::computeSceneNodeStates(ModelNode &modelNode, glm::mat4 p
         int componentsLeft = SceneNodeStateFlags::all;
         for (int i = kChannelCount - 1; i >= 0; --i) {
             SceneNodeState channelState;
-            if (_channels[i].isActive() && _channels[i].getSceneNodeStateByNumber(modelNode.nodeNumber(), channelState)) {
+            if (_channels[i].isActive() && _channels[i].getSceneNodeStateById(modelNode.id(), channelState)) {
                 if ((channelState.flags & SceneNodeStateFlags::transform) && (componentsLeft & SceneNodeStateFlags::transform)) {
                     localTransform = move(channelState.transform);
                     componentsLeft &= ~SceneNodeStateFlags::transform;
@@ -175,7 +175,7 @@ void SceneNodeAnimator::computeSceneNodeStates(ModelNode &modelNode, glm::mat4 p
     } else {
         // Otherwise, select animation on the first channel
         SceneNodeState channelState;
-        if (_channels[0].getSceneNodeStateByNumber(modelNode.nodeNumber(), channelState)) {
+        if (_channels[0].getSceneNodeStateById(modelNode.id(), channelState)) {
             if (channelState.flags & SceneNodeStateFlags::transform) {
                 localTransform = move(channelState.transform);
             }
@@ -204,7 +204,7 @@ void SceneNodeAnimator::computeSceneNodeStates(ModelNode &modelNode, glm::mat4 p
 
     glm::mat4 absTransform(parentTransform * localTransform);
     state.transform = absTransform;
-    _stateByNumber.insert(make_pair(modelNode.nodeNumber(), move(state)));
+    _stateById.insert(make_pair(modelNode.id(), move(state)));
 
     for (auto &child : modelNode.children()) {
         computeSceneNodeStates(*child, absTransform);
@@ -213,12 +213,12 @@ void SceneNodeAnimator::computeSceneNodeStates(ModelNode &modelNode, glm::mat4 p
 
 void SceneNodeAnimator::applySceneNodeStates(ModelNode &modelNode) {
     // Do not apply transforms to skinned model nodes
-    if (modelNode.skin()) return;
+    if (modelNode.isSkinMesh()) return;
 
-    auto maybeState = _stateByNumber.find(modelNode.nodeNumber());
-    if (maybeState != _stateByNumber.end()) {
+    auto maybeState = _stateById.find(modelNode.id());
+    if (maybeState != _stateById.end()) {
         const SceneNodeState &state = maybeState->second;
-        ModelNodeSceneNode *sceneNode = _sceneNode->getModelNodeByIndex(modelNode.index());
+        ModelNodeSceneNode *sceneNode = _sceneNode->getModelNodeById(modelNode.id());
         if (state.flags & SceneNodeStateFlags::transform) {
             sceneNode->setLocalTransform(state.transform);
             sceneNode->setBoneTransform(state.transform * modelNode.absoluteTransformInverse());
@@ -229,7 +229,7 @@ void SceneNodeAnimator::applySceneNodeStates(ModelNode &modelNode) {
         if (state.flags & SceneNodeStateFlags::selfIllum) {
             sceneNode->setSelfIllumColor(state.selfIllumColor);
         }
-        LightSceneNode *light = _sceneNode->getLightNodeByNumber(modelNode.nodeNumber());
+        LightSceneNode *light = _sceneNode->getLightNodeById(modelNode.id());
         if (light) {
             if (state.flags & SceneNodeStateFlags::lightColor) {
                 light->setColor(state.lightColor);

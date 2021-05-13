@@ -42,21 +42,21 @@ Particle::Particle(glm::vec3 position, float velocity, EmitterSceneNode *emitter
 }
 
 void Particle::init() {
-    shared_ptr<Emitter> emitter(_emitter->emitter());
+    shared_ptr<ModelNode::Emitter> emitter(_emitter->emitter());
 
-    if (emitter->fps() > 0) {
-        _animLength = (emitter->frameEnd() - emitter->frameStart() + 1) / static_cast<float>(emitter->fps());
+    if (emitter->fps > 0) {
+        _animLength = (emitter->frameEnd - emitter->frameStart + 1) / static_cast<float>(emitter->fps);
     }
 
-    _renderOrder = emitter->renderOrder();
-    _frame = emitter->frameStart();
+    _renderOrder = emitter->renderOrder;
+    _frame = emitter->frameStart;
 }
 
 void Particle::update(float dt) {
-    shared_ptr<Emitter> emitter(_emitter->emitter());
+    shared_ptr<ModelNode::Emitter> emitter(_emitter->emitter());
 
-    if (emitter->lifeExpectancy() != -1) {
-        _lifetime = glm::min(_lifetime + dt, static_cast<float>(emitter->lifeExpectancy()));
+    if (emitter->lifeExpectancy != -1) {
+        _lifetime = glm::min(_lifetime + dt, static_cast<float>(emitter->lifeExpectancy));
     } else if (_lifetime == _animLength) {
         _lifetime = 0.0f;
     } else {
@@ -70,7 +70,7 @@ void Particle::update(float dt) {
 }
 
 template <class T>
-static T interpolateConstraints(const Emitter::Constraints<T> &constraints, float t) {
+static T interpolateConstraints(const ModelNode::Emitter::Constraints<T> &constraints, float t) {
     T result;
     if (t < 0.5f) {
         float tt = 2.0f * t;
@@ -83,26 +83,26 @@ static T interpolateConstraints(const Emitter::Constraints<T> &constraints, floa
 }
 
 void Particle::updateAnimation(float dt) {
-    shared_ptr<Emitter> emitter(_emitter->emitter());
+    shared_ptr<ModelNode::Emitter> emitter(_emitter->emitter());
 
     float maturity;
-    if (emitter->lifeExpectancy() != -1) {
-        maturity = _lifetime / static_cast<float>(emitter->lifeExpectancy());
+    if (emitter->lifeExpectancy != -1) {
+        maturity = _lifetime / static_cast<float>(emitter->lifeExpectancy);
     } else if (_animLength > 0.0f) {
         maturity = _lifetime / _animLength;
     } else {
         maturity = 0.0f;
     }
 
-    _frame = static_cast<int>(glm::ceil(emitter->frameStart() + maturity * (emitter->frameEnd() - emitter->frameStart())));
-    _size = interpolateConstraints(emitter->particleSize(), maturity);
-    _color = interpolateConstraints(emitter->color(), maturity);
-    _alpha = interpolateConstraints(emitter->alpha(), maturity);
+    _frame = static_cast<int>(glm::ceil(emitter->frameStart + maturity * (emitter->frameEnd - emitter->frameStart)));
+    _size = interpolateConstraints(emitter->particleSize, maturity);
+    _color = interpolateConstraints(emitter->color, maturity);
+    _alpha = interpolateConstraints(emitter->alpha, maturity);
 }
 
 bool Particle::isExpired() const {
-    shared_ptr<Emitter> emitter(_emitter->emitter());
-    return emitter->lifeExpectancy() != -1 && _lifetime >= emitter->lifeExpectancy();
+    shared_ptr<ModelNode::Emitter> emitter(_emitter->emitter());
+    return emitter->lifeExpectancy != -1 && _lifetime >= emitter->lifeExpectancy;
 }
 
 } // namespace scene

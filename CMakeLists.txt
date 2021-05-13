@@ -172,11 +172,8 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/mesh/mesh.h
     src/engine/graphics/mesh/meshes.h
     src/engine/graphics/mesh/vertexattributes.h
-    src/engine/graphics/model/aabbnode.h
     src/engine/graphics/model/animatedproperty.h
     src/engine/graphics/model/animation.h
-    src/engine/graphics/model/emitter.h
-    src/engine/graphics/model/lensflare.h
     src/engine/graphics/model/mdlreader.h
     src/engine/graphics/model/model.h
     src/engine/graphics/model/modelnode.h
@@ -217,6 +214,7 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/mesh/meshes.cpp
     src/engine/graphics/model/animation.cpp
     src/engine/graphics/model/mdlreader.cpp
+    src/engine/graphics/model/mdlreader_controllers.cpp
     src/engine/graphics/model/model.cpp
     src/engine/graphics/model/modelnode.cpp
     src/engine/graphics/model/models.cpp

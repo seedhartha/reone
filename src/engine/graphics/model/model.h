@@ -32,11 +32,10 @@ namespace reone {
 namespace graphics {
 
 /**
- * Tree-like data structure, representing a 3D model. Contains model nodes
- * and animations. Models are cached and reused between model scene nodes.
+ * 3D model, a tree-like data structure. Contains model nodes and animations.
  *
- * @see reone::graphics::ModelNode
- * @see reone::graphics::Animation
+ * @see ModelNode
+ * @see Animation
  */
 class Model : boost::noncopyable {
 public:
@@ -54,20 +53,20 @@ public:
     Model(
         std::string name,
         Classification classification,
-        float animationScale,
+        std::shared_ptr<Model> superModel,
         std::shared_ptr<ModelNode> rootNode,
-        std::vector<std::shared_ptr<Animation>> animations,
-        std::shared_ptr<Model> superModel = nullptr);
+        float animationScale);
 
     void init();
+
+    void addAnimation(std::shared_ptr<Animation> animation);
 
     bool isAffectedByFog() const { return _affectedByFog; }
 
     std::vector<std::string> getAnimationNames() const;
     std::shared_ptr<Animation> getAnimation(const std::string &name) const;
-    std::shared_ptr<ModelNode> findNodeByNumber(uint16_t number) const;
-    std::shared_ptr<ModelNode> findNodeByName(const std::string &name) const;
-    std::shared_ptr<ModelNode> findAABBNode() const;
+    std::shared_ptr<ModelNode> getNodeByName(const std::string &name) const;
+    std::shared_ptr<ModelNode> getAABBNode() const;
 
     const std::string &name() const { return _name; }
     Classification classification() const { return _classification; }
@@ -81,19 +80,20 @@ public:
 private:
     std::string _name;
     Classification _classification;
-    float _animationScale;
+    std::shared_ptr<Model> _superModel;
     std::shared_ptr<ModelNode> _rootNode;
     std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
-    std::shared_ptr<Model> _superModel;
+    float _animationScale;
+    bool _affectedByFog;
 
-    std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeByNumber;
+    std::vector<std::shared_ptr<ModelNode>> _nodes;
+    std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeById;
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
     AABB _aabb;
-    bool _affectedByFog { false };
 
-    void initInternal(const std::shared_ptr<ModelNode> &node);
-
-    friend class MdlReader;
+    void fillNodeLookups(const std::shared_ptr<ModelNode> &node);
+    void fillBoneNodeId();
+    void computeAABB();
 };
 
 } // namespace graphics

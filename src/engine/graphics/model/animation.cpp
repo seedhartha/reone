@@ -19,6 +19,8 @@
 
 #include <queue>
 
+#include "../../common/collectionutil.h"
+
 using namespace std;
 
 namespace reone {
@@ -26,22 +28,22 @@ namespace reone {
 namespace graphics {
 
 Animation::Animation(
-    const string &name,
+    string name,
     float length,
     float transitionTime,
-    vector<Event> &&events,
-    const shared_ptr<ModelNode> &rootNode
+    shared_ptr<ModelNode> rootNode,
+    vector<Event> &&events
 ) :
-    _name(name),
+    _name(move(name)),
     _length(length),
     _transitionTime(transitionTime),
-    _events(move(events)),
-    _rootNode(rootNode) {
+    _rootNode(move(rootNode)),
+    _events(move(events)) {
 
-    initNodeByName();
+    fillNodeByName();
 }
 
-void Animation::initNodeByName() {
+void Animation::fillNodeByName() {
     queue<shared_ptr<ModelNode>> nodes;
     nodes.push(_rootNode);
 
@@ -51,20 +53,14 @@ void Animation::initNodeByName() {
 
         _nodeByName.insert(make_pair(node->name(), node));
 
-        const vector<shared_ptr<ModelNode>> &children = node->children();
-        for (auto &child : children) {
+        for (auto &child : node->children()) {
             nodes.push(child);
         }
     }
 }
 
-shared_ptr<ModelNode> Animation::findNode(const string &name) const {
-    auto it = _nodeByName.find(name);
-    return it != _nodeByName.end() ? it->second : nullptr;
-}
-
-void Animation::setName(string name) {
-    _name = move(name);
+shared_ptr<ModelNode> Animation::getNodeByName(const string &name) const {
+    return getFromLookupOrNull(_nodeByName, name);
 }
 
 } // namespace graphics

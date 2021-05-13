@@ -80,7 +80,7 @@ public:
     bool isFinished() const;
 
     float getTransitionTime() const;
-    bool getSceneNodeStateByNumber(uint16_t nodeNumber, SceneNodeState &state) const;
+    bool getSceneNodeStateById(uint16_t nodeId, SceneNodeState &state) const;
     std::string getAnimationName() const;
 
     float time() const { return _time; }
@@ -97,7 +97,7 @@ private:
     float _time { 0.0f };
     bool _freeze { false };
     bool _finished { false };
-    std::unordered_map<uint16_t, SceneNodeState> _stateByNumber;
+    std::unordered_map<uint16_t, SceneNodeState> _stateById;
 
     void computeSceneNodeStates(const graphics::ModelNode &animNode);
 };

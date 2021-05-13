@@ -526,7 +526,7 @@ void Area::fill(SceneGraph &sceneGraph) {
         if (sceneNode) {
             sceneGraph.addRoot(sceneNode);
         }
-        shared_ptr<ModelNode> aabbNode(sceneNode->model()->findAABBNode());
+        shared_ptr<ModelNode> aabbNode(sceneNode->model()->getAABBNode());
         if (aabbNode && _grass.texture) {
             glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), room.second->position()));
             auto grass = make_shared<GrassSceneNode>(&sceneGraph, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap);

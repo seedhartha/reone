@@ -256,7 +256,7 @@ glm::vec3 DialogGUI::getTalkPosition(const SpatialObject &object) const {
         if (model->getNodeAbsolutePosition("talkdummy", hookPosition)) {
             return object.position() + hookPosition;
         }
-        return model->getCenterOfAABB();
+        return model->getWorldCenterAABB();
     }
 
     return object.position();

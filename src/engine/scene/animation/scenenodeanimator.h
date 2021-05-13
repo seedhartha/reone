@@ -86,7 +86,7 @@ private:
 
     CompositionMode _compositionMode { CompositionMode::Overlay };
     bool _transition { false }; /**< is there an animation transition going on? */
-    std::unordered_map<uint16_t, SceneNodeState> _stateByNumber;
+    std::unordered_map<uint16_t, SceneNodeState> _stateById;
 
     std::string _defaultAnimName;
     AnimationProperties _defaultAnimProperties;

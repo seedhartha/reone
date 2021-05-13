@@ -31,42 +31,73 @@ namespace graphics {
 Model::Model(
     string name,
     Classification classification,
-    float animationScale,
+    shared_ptr<Model> superModel,
     shared_ptr<ModelNode> rootNode,
-    vector<shared_ptr<Animation>> animations,
-    shared_ptr<Model> superModel
+    float animationScale
 ) :
     _name(move(name)),
     _classification(classification),
-    _animationScale(animationScale),
+    _superModel(move(superModel)),
     _rootNode(rootNode),
-    _superModel(move(superModel)) {
+    _animationScale(animationScale) {
 
     if (!rootNode) {
         throw invalid_argument("rootNode must not be null");
     }
-    for (auto &anim : animations) {
-        _animations.insert(make_pair(anim->name(), move(anim)));
-    }
-    initInternal(_rootNode);
+
+    fillNodeLookups(_rootNode);
+    fillBoneNodeId();
+    computeAABB();
 }
 
-void Model::initInternal(const shared_ptr<ModelNode> &node) {
-    _nodeByNumber.insert(make_pair(node->nodeNumber(), node));
+void Model::fillNodeLookups(const shared_ptr<ModelNode> &node) {
+    _nodes.push_back(node);
+    _nodeById.insert(make_pair(node->id(), node));
     _nodeByName.insert(make_pair(node->name(), node));
 
-    shared_ptr<ModelNode::Trimesh> mesh(node->mesh());
-    if (mesh) {
-        _aabb.expand(mesh->mesh->aabb() * node->absoluteTransform());
-    }
-
     for (auto &child : node->children()) {
-        initInternal(child);
+        fillNodeLookups(child);
+    }
+}
+
+void Model::fillBoneNodeId() {
+    // In MDL files, bones reference node serial numbers (DFS ordering).
+    // We want them to reference node identifiers, for simplicity.
+
+    for (auto &node : _nodes) {
+        if (!node->isSkinMesh()) continue;
+
+        shared_ptr<ModelNode::TriangleMesh> mesh(node->mesh());
+        mesh->skin->boneNodeId.resize(mesh->skin->boneNodeSerial.size());
+
+        for (size_t i = 0; i < mesh->skin->boneNodeSerial.size(); ++i) {
+            uint16_t nodeSerial = mesh->skin->boneNodeSerial[i];
+            if (nodeSerial < static_cast<int>(_nodes.size())) {
+                mesh->skin->boneNodeId[i] = _nodes[nodeSerial]->id();
+            } else {
+                mesh->skin->boneNodeId[i] = 0xffff;
+            }
+        }
+    }
+}
+
+void Model::computeAABB() {
+    _aabb.reset();
+
+    for (auto &node : _nodeById) {
+        shared_ptr<ModelNode::TriangleMesh> mesh(node.second->mesh());
+        if (mesh) {
+            _aabb.expand(mesh->mesh->aabb() * node.second->absoluteTransform());
+        }
     }
 }
 
 void Model::init() {
     _rootNode->init();
+}
+
+void Model::addAnimation(shared_ptr<Animation> animation) {
+    _animations.insert(make_pair(animation->name(), move(animation)));
 }
 
 vector<string> Model::getAnimationNames() const {
@@ -100,17 +131,13 @@ shared_ptr<Animation> Model::getAnimation(const string &name) const {
     return move(anim);
 }
 
-shared_ptr<ModelNode> Model::findNodeByNumber(uint16_t number) const {
-    return getFromLookupOrNull(_nodeByNumber, number);
-}
-
-shared_ptr<ModelNode> Model::findNodeByName(const string &name) const {
+shared_ptr<ModelNode> Model::getNodeByName(const string &name) const {
     return getFromLookupOrNull(_nodeByName, name);
 }
 
-shared_ptr<ModelNode> Model::findAABBNode() const {
-    for (auto &node : _nodeByNumber) {
-        if (node.second->isAABB()) return node.second;
+shared_ptr<ModelNode> Model::getAABBNode() const {
+    for (auto &node : _nodeById) {
+        if (node.second->isAABBMesh()) return node.second;
     }
     return nullptr;
 }

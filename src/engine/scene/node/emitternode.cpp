@@ -43,7 +43,7 @@ namespace scene {
 
 static constexpr float kMotionBlurStrength = 0.25f;
 
-EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *modelSceneNode, const shared_ptr<Emitter> &emitter, SceneGraph *sceneGraph) :
+EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *modelSceneNode, const shared_ptr<ModelNode::Emitter> &emitter, SceneGraph *sceneGraph) :
     SceneNode(SceneNodeType::Emitter, sceneGraph),
     _modelSceneNode(modelSceneNode),
     _emitter(emitter) {
@@ -59,8 +59,8 @@ EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *modelSceneNode, const s
 }
 
 void EmitterSceneNode::init() {
-    if (_emitter->birthrate() != 0) {
-        _birthInterval = 1.0f / static_cast<float>(_emitter->birthrate());
+    if (_emitter->birthrate != 0) {
+        _birthInterval = 1.0f / static_cast<float>(_emitter->birthrate);
     }
 }
 
@@ -88,9 +88,9 @@ void EmitterSceneNode::removeExpiredParticles(float dt) {
 }
 
 void EmitterSceneNode::spawnParticles(float dt) {
-    switch (_emitter->updateMode()) {
-        case Emitter::UpdateMode::Fountain:
-            if (_emitter->birthrate() != 0.0f) {
+    switch (_emitter->updateMode) {
+        case ModelNode::Emitter::UpdateMode::Fountain:
+            if (_emitter->birthrate != 0.0f) {
                 if (_birthTimer.advance(dt)) {
                     if (_particles.size() < kMaxParticles) {
                         doSpawnParticle();
@@ -99,8 +99,8 @@ void EmitterSceneNode::spawnParticles(float dt) {
                 }
             }
             break;
-        case Emitter::UpdateMode::Single:
-            if (!_spawned || (_particles.empty() && _emitter->loop())) {
+        case ModelNode::Emitter::UpdateMode::Single:
+            if (!_spawned || (_particles.empty() && _emitter->loop)) {
                 doSpawnParticle();
                 _spawned = true;
             }
@@ -111,17 +111,17 @@ void EmitterSceneNode::spawnParticles(float dt) {
 }
 
 void EmitterSceneNode::doSpawnParticle() {
-    float halfW = 0.005f * _emitter->size().x;
-    float halfH = 0.005f * _emitter->size().y;
+    float halfW = 0.005f * _emitter->size.x;
+    float halfH = 0.005f * _emitter->size.y;
     glm::vec3 position(random(-halfW, halfW), random(-halfH, halfH), 0.0f);
 
     float sign;
-    if (_emitter->spread() > glm::pi<float>() && random(0, 1) != 0) {
+    if (_emitter->spread > glm::pi<float>() && random(0, 1) != 0) {
         sign = -1.0f;
     } else {
         sign = 1.0f;
     }
-    float velocity = sign * (_emitter->velocity() + random(0.0f, _emitter->randomVelocity()));
+    float velocity = sign * (_emitter->velocity + random(0.0f, _emitter->randomVelocity));
 
     auto particle = make_shared<Particle>(position, velocity, this);
     _particles.push_back(particle);
@@ -130,20 +130,20 @@ void EmitterSceneNode::doSpawnParticle() {
 void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
     if (particles.empty()) return;
 
-    shared_ptr<Texture> texture(_emitter->texture());
+    shared_ptr<Texture> texture(_emitter->texture);
     if (!texture) return;
 
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
     uniforms.combined.featureMask |= UniformFeatureFlags::particles;
-    uniforms.particles->gridSize = glm::vec2(_emitter->gridWidth(), _emitter->gridHeight());
-    uniforms.particles->render = static_cast<int>(_emitter->renderMode());
+    uniforms.particles->gridSize = glm::vec2(_emitter->gridWidth, _emitter->gridHeight);
+    uniforms.particles->render = static_cast<int>(_emitter->renderMode);
 
     for (size_t i = 0; i < particles.size(); ++i) {
         const Particle &particle = *particles[i];
 
         glm::mat4 transform(_absoluteTransform);
         transform = glm::translate(transform, particles[i]->position());
-        if (_emitter->renderMode() == Emitter::RenderMode::MotionBlur) {
+        if (_emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
             transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * _modelSceneNode->projectileSpeed()) * particle.size(), particle.size(), particle.size()));
         } else {
             transform = glm::scale(transform, glm::vec3(particle.size()));
@@ -161,7 +161,7 @@ void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
     StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
     texture->bind();
 
-    bool lighten = _emitter->blendMode() == Emitter::BlendMode::Lighten;
+    bool lighten = _emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
     if (lighten) {
         StateManager::instance().withLightenBlending([&particles]() {
             Meshes::instance().getBillboard()->drawInstanced(static_cast<int>(particles.size()));

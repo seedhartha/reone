@@ -235,7 +235,7 @@ vec3 getNormalFromBumpmap(vec2 uv) {
         if (uBumpmaps.swizzled) {
             result = vec3(bumpmapSample.a, bumpmapSample.g, 1.0);
         } else {
-            result = vec3(bumpmapSample.r, bumpmapSample.g, bumpmapSample.b);
+            result = bumpmapSample.rgb;
         }
         result = normalize(result * 2.0 - 1.0);
     }

@@ -84,7 +84,7 @@ void AnimationChannel::update(float dt, bool visible) {
     }
 
     if (visible) {
-        _stateByNumber.clear();
+        _stateById.clear();
         computeSceneNodeStates(*_animation->rootNode());
     }
 
@@ -108,42 +108,42 @@ void AnimationChannel::computeSceneNodeStates(const ModelNode &animNode) {
             const ModelNode *modelNode = modelNodeSceneNode->modelNode();
             bool transformChanged = false;
             float scale = 1.0f;
-            glm::vec3 position(modelNode->position());
-            glm::quat orientation(modelNode->orientation());
+            glm::vec3 position(modelNode->restPosition());
+            glm::quat orientation(modelNode->restOrientation());
 
             if (_properties.flags & AnimationFlags::syncLipAnim) {
                 uint8_t leftFrameIdx, rightFrameIdx;
-                float interpolant;
-                if (_lipAnimation->getKeyframes(_time, leftFrameIdx, rightFrameIdx, interpolant)) {
+                float factor;
+                if (_lipAnimation->getKeyframes(_time, leftFrameIdx, rightFrameIdx, factor)) {
                     float animScale;
-                    if (animNode.getScale(leftFrameIdx, rightFrameIdx, interpolant, animScale)) {
+                    if (animNode.getScale(leftFrameIdx, rightFrameIdx, factor, animScale)) {
                         scale = animScale;
                         transformChanged = true;
                     }
                     glm::vec3 animPosiiton;
-                    if (animNode.getPosition(leftFrameIdx, rightFrameIdx, interpolant, animPosiiton)) {
+                    if (animNode.getPosition(leftFrameIdx, rightFrameIdx, factor, animPosiiton)) {
                         position += _properties.scale * animPosiiton;
                         transformChanged = true;
                     }
                     glm::quat animOrientation;
-                    if (animNode.getOrientation(leftFrameIdx, rightFrameIdx, interpolant, animOrientation)) {
+                    if (animNode.getOrientation(leftFrameIdx, rightFrameIdx, factor, animOrientation)) {
                         orientation = move(animOrientation);
                         transformChanged = true;
                     }
                 }
             } else {
                 float animScale;
-                if (animNode.scales().getByTime(_time, animScale)) {
+                if (animNode.scale().getByTime(_time, animScale)) {
                     scale = animScale;
                     transformChanged = true;
                 }
                 glm::vec3 animPosition;
-                if (animNode.positions().getByTime(_time, animPosition)) {
+                if (animNode.position().getByTime(_time, animPosition)) {
                     position += _properties.scale * animPosition;
                     transformChanged = true;
                 }
                 glm::quat animOrientation;
-                if (animNode.orientations().getByTime(_time, animOrientation)) {
+                if (animNode.orientation().getByTime(_time, animOrientation)) {
                     orientation = move(animOrientation);
                     transformChanged = true;
                 }
@@ -151,27 +151,27 @@ void AnimationChannel::computeSceneNodeStates(const ModelNode &animNode) {
 
             SceneNodeState state;
             float alpha;
-            if (animNode.alphas().getByTime(_time, alpha)) {
+            if (animNode.alpha().getByTime(_time, alpha)) {
                 state.flags |= SceneNodeStateFlags::alpha;
                 state.alpha = alpha;
             }
             glm::vec3 selfIllumColor;
-            if (animNode.selfIllumColors().getByTime(_time, selfIllumColor)) {
+            if (animNode.selfIllumColor().getByTime(_time, selfIllumColor)) {
                 state.flags |= SceneNodeStateFlags::selfIllum;
                 state.selfIllumColor = move(selfIllumColor);
             }
             glm::vec3 lightColor;
-            if (animNode.lightColors().getByTime(_time, lightColor)) {
+            if (animNode.color().getByTime(_time, lightColor)) {
                 state.flags |= SceneNodeStateFlags::lightColor;
                 state.lightColor = move(lightColor);
             }
             float lightMultiplier;
-            if (animNode.lightMultipliers().getByTime(_time, lightMultiplier)) {
+            if (animNode.multiplier().getByTime(_time, lightMultiplier)) {
                 state.flags |= SceneNodeStateFlags::lightMultiplier;
                 state.lightMultiplier = lightMultiplier;
             }
             float lightRadius;
-            if (animNode.lightRadii().getByTime(_time, lightRadius)) {
+            if (animNode.radius().getByTime(_time, lightRadius)) {
                 state.flags |= SceneNodeStateFlags::lightRadius;
                 state.lightRadius = lightRadius;
             }
@@ -183,7 +183,7 @@ void AnimationChannel::computeSceneNodeStates(const ModelNode &animNode) {
                 state.flags |= SceneNodeStateFlags::transform;
                 state.transform = move(transform);
             }
-            _stateByNumber.insert(make_pair(modelNode->nodeNumber(), move(state)));
+            _stateById.insert(make_pair(modelNode->id(), move(state)));
         }
     }
 
@@ -216,9 +216,9 @@ float AnimationChannel::getTransitionTime() const {
     return _animation ? _animation->transitionTime() : 0.0f;
 }
 
-bool AnimationChannel::getSceneNodeStateByNumber(uint16_t nodeNumber, SceneNodeState &state) const {
-    auto maybeState = _stateByNumber.find(nodeNumber);
-    if (maybeState != _stateByNumber.end()) {
+bool AnimationChannel::getSceneNodeStateById(uint16_t nodeId, SceneNodeState &state) const {
+    auto maybeState = _stateById.find(nodeId);
+    if (maybeState != _stateById.end()) {
         state = maybeState->second;
         return true;
     }
