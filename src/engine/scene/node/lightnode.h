@@ -17,58 +17,38 @@
 
 #pragma once
 
-#include "../types.h"
-
 #include "../../graphics/model/modelnode.h"
 
-#include "scenenode.h"
+#include "modelnodescenenode.h"
 
 namespace reone {
 
 namespace scene {
 
-class LightSceneNode : public SceneNode {
+class ModelSceneNode;
+
+class LightSceneNode : public ModelNodeSceneNode {
 public:
-    LightSceneNode(int priority, SceneGraph *sceneGraph);
+    LightSceneNode(const ModelSceneNode *model, std::shared_ptr<graphics::ModelNode> modelNode, SceneGraph *sceneGraph);
 
     void drawLensFlares(const graphics::ModelNode::LensFlare &flare);
 
-    bool isShadow() const { return _shadow; }
-    bool isAmbientOnly() const { return _ambientOnly; }
-    bool isDirectional() const { return _directional; }
+    bool isDirectional() const;
 
-    const glm::vec3 &color() const { return _color; }
-    int priority() const { return _priority; }
-    float multiplier() const { return _multiplier; }
     float radius() const { return _radius; }
-    float flareRadius() const { return _flareRadius; }
-    const std::vector<graphics::ModelNode::LensFlare> &flares() const { return _flares; }
+    float multiplier() const { return _multiplier; }
+    const glm::vec3 &color() const { return _color; }
 
-    void setColor(glm::vec3 color) { _color = std::move(color); }
-    void setMultiplier(float multiplier) { _multiplier = multiplier; }
     void setRadius(float radius) { _radius = radius; }
-    void setShadow(bool shadow) { _shadow = shadow; }
-    void setAmbientOnly(bool ambientOnly) { _ambientOnly = ambientOnly; }
-    void setDirectional(bool directional) { _directional = directional; }
-    void setFlareRadius(float radius) { _flareRadius = radius; }
-    void setFlares(std::vector<graphics::ModelNode::LensFlare> flares) { _flares = std::move(flares); }
+    void setMultiplier(float multiplier) { _multiplier = multiplier; }
+    void setColor(glm::vec3 color) { _color = std::move(color); }
 
 private:
-    int _priority;
+    const ModelSceneNode *_model;
 
-    glm::vec3 _color { 1.0f };
-    float _multiplier { 1.0f };
-    float _radius { 1.0f };
-    bool _shadow { false };
-    bool _ambientOnly { false };
-    bool _directional { false };
-
-    // Light flares
-
-    float _flareRadius { 0.0f };
-    std::vector<graphics::ModelNode::LensFlare> _flares;
-
-    // END Light flares
+    float _radius { 0.0f };
+    float _multiplier { 0.0f };
+    glm::vec3 _color { 0.0f };
 };
 
 } // namespace scene

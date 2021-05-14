@@ -17,17 +17,28 @@
 
 #pragma once
 
-#include "glm/vec2.hpp"
-#include "glm/vec3.hpp"
+#include "../../graphics/model/modelnode.h"
+
+#include "scenenode.h"
 
 namespace reone {
 
 namespace scene {
 
-struct GrassCluster {
-    glm::vec3 position { 0.0f };
-    glm::vec2 lightmapUV { 0.0f };
-    int variant { 0 };
+class ModelNodeSceneNode : public SceneNode {
+public:
+    std::shared_ptr<graphics::ModelNode> modelNode() const { return _modelNode; }
+    const glm::mat4 &boneTransform() const { return _boneTransform; }
+
+    void setBoneTransform(glm::mat4 transform) { _boneTransform = std::move(transform); }
+
+protected:
+    std::shared_ptr<graphics::ModelNode> _modelNode;
+
+    ModelNodeSceneNode(std::shared_ptr<graphics::ModelNode> modelNode, SceneNodeType type, SceneGraph *sceneGraph);
+
+private:
+    glm::mat4 _boneTransform { 1.0f }; /**< model space transform relative to the rest pose */
 };
 
 } // namespace scene

@@ -21,8 +21,10 @@
 
 #include <boost/format.hpp>
 
+#include "../../graphics/types.h"
 #include "../../graphics/model/models.h"
 #include "../../resource/resources.h"
+#include "../../scene/node/cameranode.h"
 
 using namespace std;
 
@@ -33,14 +35,14 @@ namespace reone {
 
 namespace game {
 
-AnimatedCamera::AnimatedCamera(SceneGraph *sceneGraph, float aspect) : _sceneGraph(sceneGraph), _aspect(aspect) {
+AnimatedCamera::AnimatedCamera(float aspect, SceneGraph *sceneGraph) : _sceneGraph(sceneGraph), _aspect(aspect) {
     _sceneGraph = sceneGraph;
-    _sceneNode = make_shared<CameraSceneNode>(_sceneGraph, glm::mat4(1.0f), _aspect, _zNear, _zFar);
+    _sceneNode = make_shared<CameraSceneNode>("", glm::mat4(1.0f), _sceneGraph);
     updateProjection();
 }
 
 void AnimatedCamera::updateProjection() {
-    glm::mat4 projection(glm::perspective(glm::radians(_fovy), _aspect, _zNear, _zFar));
+    glm::mat4 projection(glm::perspective(glm::radians(_fovy), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
     _sceneNode->setProjection(projection);
 }
 
@@ -64,12 +66,12 @@ static const string &getAnimationName(int animNumber) {
 
 void AnimatedCamera::playAnimation(int animNumber) {
     if (_model) {
-        _model->animator().playAnimation(getAnimationName(animNumber));
+        _model->playAnimation(getAnimationName(animNumber));
     }
 }
 
 bool AnimatedCamera::isAnimationFinished() const {
-    return _model ? _model->animator().isAnimationFinished() : false;
+    return _model ? _model->isAnimationFinished() : false;
 }
 
 void AnimatedCamera::setModel(const shared_ptr<Model> &model) {
@@ -77,7 +79,7 @@ void AnimatedCamera::setModel(const shared_ptr<Model> &model) {
         (!_model && !model)) return;
 
     if (model) {
-        _model = make_unique<ModelSceneNode>(ModelUsage::Other, model, _sceneGraph);
+        _model = make_unique<ModelSceneNode>(model, ModelUsage::Camera, _sceneGraph);
         _model->attach("camerahook", _sceneNode);
     } else {
         _model.reset();

@@ -17,11 +17,7 @@
 
 #include "scenenode.h"
 
-#include <algorithm>
-
 #include "glm/gtx/norm.hpp"
-
-#include "../scenegraph.h"
 
 using namespace std;
 
@@ -29,22 +25,42 @@ namespace reone {
 
 namespace scene {
 
-SceneNode::SceneNode(SceneNodeType type, SceneGraph *sceneGraph) : _type(type), _sceneGraph(sceneGraph) {
+SceneNode::SceneNode(string name, SceneNodeType type, SceneGraph *sceneGraph) :
+    _name(move(name)),
+    _type(type),
+    _sceneGraph(sceneGraph) {
 }
 
-void SceneNode::addChild(const shared_ptr<SceneNode> &node) {
-    node->setParent(this);
+void SceneNode::addChild(shared_ptr<SceneNode> node) {
+    node->_parent = this;
+    node->computeAbsoluteTransforms();
     _children.push_back(node);
+}
+
+void SceneNode::computeAbsoluteTransforms() {
+    if (_parent) {
+        _absTransform = _parent->_absTransform * _localTransform;
+    } else {
+        _absTransform = _localTransform;
+    }
+    _absTransformInv = glm::inverse(_absTransform);
+
+    for (auto &child : _children) {
+        child->computeAbsoluteTransforms();
+    }
+
+    onAbsoluteTransformChanged();
 }
 
 void SceneNode::removeChild(SceneNode &node) {
     auto maybeChild = find_if(
         _children.begin(),
         _children.end(),
-        [&node](const shared_ptr<SceneNode> &n) { return n.get() == &node; });
+        [&node](auto &n) { return n.get() == &node; });
 
     if (maybeChild != _children.end()) {
-        node.setParent(nullptr);
+        node._parent = nullptr;
+        node.computeAbsoluteTransforms();
         _children.erase(maybeChild);
     }
 }
@@ -62,7 +78,7 @@ void SceneNode::draw() {
 }
 
 glm::vec3 SceneNode::getOrigin() const {
-    return glm::vec3(_absoluteTransform[3]);
+    return glm::vec3(_absTransform[3]);
 }
 
 float SceneNode::getDistanceTo(const glm::vec3 &point) const {
@@ -81,36 +97,13 @@ float SceneNode::getDistanceTo2(const SceneNode &other) const {
     return glm::distance2(getOrigin(), other.getOrigin());
 }
 
-void SceneNode::setParent(const SceneNode *parent) {
-    _parent = parent;
-    updateAbsoluteTransform();
+glm::vec3 SceneNode::getWorldCenterOfAABB() const {
+    return _absTransform * glm::vec4(_aabb.center(), 1.0f);
 }
 
-void SceneNode::updateAbsoluteTransform() {
-    _absoluteTransform = _parent ? _parent->_absoluteTransform : glm::mat4(1.0f);
-    _absoluteTransform *= _localTransform;
-    _absoluteTransformInv = glm::inverse(_absoluteTransform);
-
-    for (auto &child : _children) {
-        child->updateAbsoluteTransform();
-    }
-}
-
-void SceneNode::setLocalTransform(const glm::mat4 &transform) {
-    _localTransform = transform;
-    updateAbsoluteTransform();
-}
-
-void SceneNode::setPosition(glm::vec3 position) {
-    setLocalTransform(glm::translate(glm::mat4(1.0f), position));
-}
-
-void SceneNode::setVisible(bool visible) {
-    _visible = visible;
-}
-
-void SceneNode::setTransparent(bool transparent) {
-    _transparent = transparent;
+void SceneNode::setLocalTransform(glm::mat4 transform) {
+    _localTransform = move(transform);
+    computeAbsoluteTransforms();
 }
 
 } // namespace scene

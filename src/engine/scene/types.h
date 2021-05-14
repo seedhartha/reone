@@ -22,10 +22,10 @@ namespace reone {
 namespace scene {
 
 enum class SceneNodeType {
-    Mesh,
-    Model,
-    ModelNode,
+    Dummy,
     Camera,
+    Model,
+    Mesh,
     Light,
     Emitter,
     Grass
@@ -39,15 +39,14 @@ enum class ModelUsage {
     Door,
     Equipment,
     Projectile,
-    Other
+    Camera
 };
 
 struct AnimationFlags {
     static constexpr int loop = 1;
     static constexpr int blend = 2; /**< blend previous animation into the next one */
     static constexpr int overlay = 4; /**< overlay next animation on top of the previous one */
-    static constexpr int propagateHead = 8; /**< propagate animation to the head model, if any */
-    static constexpr int syncLipAnim = 0x10; /**< animation must be synchronized with the lip animation */
+    static constexpr int propagate = 8; /**< propagate animation to attached models */
 
     static constexpr int loopOverlay = loop | overlay;
     static constexpr int loopBlend = loop | blend;

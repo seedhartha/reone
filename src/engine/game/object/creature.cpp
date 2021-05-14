@@ -56,7 +56,6 @@ namespace game {
 
 static constexpr int kStrRefRemains = 38151;
 
-static string g_headHookNode("headhook");
 static string g_talkDummyNode("talkdummy");
 
 Creature::Creature(
@@ -117,7 +116,6 @@ void Creature::updateModel() {
     if (model) {
         model->setCullable(true);
         model->setDrawDistance(32.0f);
-        _headModel = model->getAttachedModel(g_headHookNode);
         if (!_stunt) {
             model->setLocalTransform(_transform);
         }
@@ -158,11 +156,11 @@ void Creature::update(float dt) {
 }
 
 void Creature::updateModelAnimation() {
-    shared_ptr<ModelSceneNode> model(getModelSceneNode());
+    auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
     if (!model) return;
 
     if (_animFireForget) {
-        if (!model->animator().isAnimationFinished()) return;
+        if (!model->isAnimationFinished()) return;
 
         _animFireForget = false;
         _animDirty = true;
@@ -197,20 +195,10 @@ void Creature::updateModelAnimation() {
     }
 
     if (talkAnim) {
-        int addFlags = _lipAnimation ? AnimationFlags::syncLipAnim : 0;
-        if (_headModel) {
-            model->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loop));
-            _headModel->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loop));
-            _headModel->animator().playAnimation(talkAnim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay | addFlags), _lipAnimation);
-        } else {
-            model->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loop));
-            model->animator().playAnimation(talkAnim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay | addFlags), _lipAnimation);
-        }
+        model->playAnimation(anim, nullptr, AnimationProperties::fromFlags(AnimationFlags::loopOverlay | AnimationFlags::propagate));
+        model->playAnimation(talkAnim, _lipAnimation, AnimationProperties::fromFlags(AnimationFlags::loopOverlay | AnimationFlags::propagate));
     } else {
-        model->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopBlend));
-        if (_headModel) {
-            _headModel->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopBlend));
-        }
+        model->playAnimation(anim, nullptr, AnimationProperties::fromFlags(AnimationFlags::loopBlend | AnimationFlags::propagate));
     }
 
     _animDirty = false;
@@ -255,20 +243,12 @@ void Creature::playAnimation(const string &name, AnimationProperties properties,
     bool fireForget = !(properties.flags & AnimationFlags::loop);
 
     doPlayAnimation(fireForget, [&]() {
-        shared_ptr<ModelSceneNode> model(getModelSceneNode());
+        auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
         if (!model) return;
 
         _animAction = actionToComplete;
 
-        // Extract "propagate to head model" flag
-        bool propagateHead = properties.flags & AnimationFlags::propagateHead;
-        properties.flags &= ~AnimationFlags::propagateHead;
-
-        model->animator().playAnimation(name, properties);
-        
-        if (propagateHead && _headModel) {
-            _headModel->animator().playAnimation(name, move(properties));
-        }
+        model->playAnimation(name, properties);
     });
 }
 
@@ -286,18 +266,10 @@ void Creature::playAnimation(const shared_ptr<Animation> &anim, AnimationPropert
     bool fireForget = !(properties.flags & AnimationFlags::loop);
 
     doPlayAnimation(fireForget, [&]() {
-        shared_ptr<ModelSceneNode> model(getModelSceneNode());
+        auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
         if (!model) return;
 
-        // Extract propagate to head model flag
-        bool propagateHead = properties.flags & AnimationFlags::propagateHead;
-        properties.flags &= ~AnimationFlags::propagateHead;
-
-        model->animator().playAnimation(anim, properties);
-
-        if (propagateHead && _headModel) {
-            _headModel->animator().playAnimation(anim, move(properties));
-        }
+        model->playAnimation(anim, nullptr, properties);
     });
 }
 
@@ -332,13 +304,12 @@ bool Creature::equip(int slot, const shared_ptr<Item> &item) {
     if (_sceneNode) {
         updateModel();
 
-        shared_ptr<ModelSceneNode> model(getModelSceneNode());
+        auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
         if (model) {
             if (slot == InventorySlot::rightWeapon) {
-                shared_ptr<ModelSceneNode> weapon(model->getAttachedModel("rhand"));
+                auto weapon = static_pointer_cast<ModelSceneNode>(model->getAttachment("rhand"));
                 if (weapon && weapon->model()->classification() == Model::Classification::Lightsaber) {
-                    weapon->animator().setDefaultAnimation("powered", AnimationProperties::fromFlags(AnimationFlags::loop));
-                    weapon->animator().playAnimation("powerup");
+                    weapon->playAnimation("powerup");
                 }
             }
         }
@@ -415,18 +386,15 @@ void Creature::clearPath() {
 }
 
 glm::vec3 Creature::getSelectablePosition() const {
-    shared_ptr<ModelSceneNode> model(getModelSceneNode());
+    auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
     if (!model) return _position;
+    if (_dead) return model->getWorldCenterOfAABB();
 
-    if (_dead) return model->getWorldCenterAABB();
+    shared_ptr<ModelNode> talkDummy(model->model()->getNodeByName(g_talkDummyNode));
 
-    glm::vec3 position;
-
-    if (model->getNodeAbsolutePosition(g_talkDummyNode, position)) {
-        return model->absoluteTransform() * glm::vec4(position, 1.0f);
-    }
-
-    return model->getWorldCenterAABB();
+    return talkDummy ?
+        (_transform * talkDummy->absoluteTransform())[3] :
+        model->getWorldCenterOfAABB();
 }
 
 float Creature::getAttackRange() const {

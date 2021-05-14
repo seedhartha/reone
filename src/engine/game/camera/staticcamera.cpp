@@ -23,22 +23,19 @@
 
 using namespace std;
 
+using namespace reone::graphics;
 using namespace reone::scene;
 
 namespace reone {
 
 namespace game {
 
-static constexpr float kNearPlane = 0.1f;
-static constexpr float kFarPlane = 10000.0f;
-
-StaticCamera::StaticCamera(SceneGraph *sceneGraph, float aspect) : _aspect(aspect) {
-    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, glm::mat4(1.0f), aspect, kNearPlane, kFarPlane);
+StaticCamera::StaticCamera(float aspect, SceneGraph *sceneGraph) : _aspect(aspect) {
+    _sceneNode = make_unique<CameraSceneNode>("", glm::mat4(1.0f), sceneGraph);
 }
 
 void StaticCamera::setObject(const PlaceableCamera &object) {
-    glm::mat4 projection(glm::perspective(glm::radians(object.fieldOfView()), _aspect, kNearPlane, kFarPlane));
-
+    glm::mat4 projection(glm::perspective(glm::radians(object.fieldOfView()), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
     _sceneNode->setLocalTransform(object.transform());
     _sceneNode->setProjection(projection);
 }

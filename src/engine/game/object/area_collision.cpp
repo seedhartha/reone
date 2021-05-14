@@ -39,7 +39,7 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
 
     // Test non-walkable faces of object walkmeshes
     for (auto &o : _objects) {
-        shared_ptr<ModelSceneNode> model(o->getModelSceneNode());
+        auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
         shared_ptr<Walkmesh> walkmesh(o->getWalkmesh());
         if (!model || !walkmesh) continue;
 
@@ -94,7 +94,7 @@ shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
         // Skip non-selectable objects and party leader
         if (!o->isSelectable() || o == partyLeader) continue;
 
-        shared_ptr<ModelSceneNode> model(o->getModelSceneNode());
+        auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
         if (!model) continue;
 
         // Distance to object must not exceed maximum collision distance
@@ -124,7 +124,7 @@ bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::
     for (auto &o : _objects) {
         if (o->type() != ObjectType::Door) continue;
 
-        shared_ptr<ModelSceneNode> model(o->getModelSceneNode());
+        auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
         if (!model) continue;
 
         // Distance to object must not exceed maximum collision distance
@@ -202,7 +202,7 @@ bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target)
     for (auto &o : _objects) {
         if (o->type() != ObjectType::Door) continue;
 
-        shared_ptr<ModelSceneNode> model(o->getModelSceneNode());
+        auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
         if (!model) continue;
 
         // Distance to object must not exceed maximum collision distance

@@ -180,8 +180,8 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) 
     character->loadAppearance();
     character->updateModelAnimation();
 
-    auto sceneModel = make_shared<ModelSceneNode>(ModelUsage::GUI, Models::instance().get("charmain_light"), &sceneGraph);
-    sceneModel->attach("charmain_light", character->getModelSceneNode());
+    auto sceneModel = make_shared<ModelSceneNode>(Models::instance().get("charmain_light"), ModelUsage::GUI, &sceneGraph);
+    sceneModel->attach("charmain_light", character->sceneNode());
 
     return move(sceneModel);
 }

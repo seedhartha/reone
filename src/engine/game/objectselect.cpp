@@ -90,7 +90,7 @@ vector<shared_ptr<SpatialObject>> ObjectSelector::getSelectableObjects() const {
     for (auto &object : _area->objects()) {
         if (!object->isSelectable() || object.get() == partyLeader.get()) continue;
 
-        shared_ptr<ModelSceneNode> model(object->getModelSceneNode());
+        auto model = static_pointer_cast<ModelSceneNode>(object->sceneNode());
         if (!model || !model->isVisible()) continue;
 
         float dist2 = object->getDistanceTo2(origin);

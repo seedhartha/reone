@@ -24,6 +24,10 @@ namespace reone {
 namespace graphics {
 
 constexpr int kNumCubeFaces = 6;
+
+constexpr float kDefaultClipPlaneNear = 0.1f;
+constexpr float kDefaultClipPlaneFar = 10000.0f;
+
 constexpr int kMaxBones = 128;
 constexpr int kMaxLights = 8;
 constexpr int kMaxParticles = 32;
@@ -39,10 +43,7 @@ enum class PixelFormat {
     BGRA,
     DXT1,
     DXT5,
-    Depth,
-
-    RG16F,
-    RGB16F
+    Depth
 };
 
 /**

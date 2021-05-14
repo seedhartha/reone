@@ -28,9 +28,9 @@ namespace reone {
 
 namespace game {
 
-DialogCamera::DialogCamera(SceneGraph *sceneGraph, const CameraStyle &style, float aspect, float zNear, float zFar) {
-    glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, zNear, zFar));
-    _sceneNode = make_shared<CameraSceneNode>(sceneGraph, projection, aspect, zNear, zFar);
+DialogCamera::DialogCamera(float aspect, const CameraStyle &style, SceneGraph *sceneGraph) {
+    glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
+    _sceneNode = make_shared<CameraSceneNode>("", move(projection), sceneGraph);
 }
 
 void DialogCamera::setSpeakerPosition(const glm::vec3 &position) {

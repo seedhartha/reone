@@ -380,7 +380,6 @@ void ActionExecutor::executeJumpToLocation(const shared_ptr<Object> &actor, Loca
 
 void ActionExecutor::executePlayAnimation(const shared_ptr<Object> &actor, const shared_ptr<PlayAnimationAction> &action, float dt) {
     AnimationProperties properties;
-    properties.flags = AnimationFlags::propagateHead;
     properties.speed = action->speed();
 
     auto spatial = static_pointer_cast<SpatialObject>(actor);

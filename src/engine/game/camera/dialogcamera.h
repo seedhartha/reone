@@ -40,7 +40,7 @@ public:
         ListenerFar
     };
 
-    DialogCamera(scene::SceneGraph *sceneGraph, const CameraStyle &style, float aspect, float zNear = 0.1f, float zFar = 10000.0f);
+    DialogCamera(float aspect, const CameraStyle &style, scene::SceneGraph *sceneGraph);
 
     void setSpeakerPosition(const glm::vec3 &position);
     void setListenerPosition(const glm::vec3 &position);

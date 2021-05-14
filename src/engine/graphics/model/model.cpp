@@ -100,6 +100,33 @@ void Model::addAnimation(shared_ptr<Animation> animation) {
     _animations.insert(make_pair(animation->name(), move(animation)));
 }
 
+shared_ptr<ModelNode> Model::getNodeById(uint16_t nodeId) const {
+    return getFromLookupOrNull(_nodeById, nodeId);
+}
+
+shared_ptr<ModelNode> Model::getNodeByName(const string &name) const {
+    return getFromLookupOrNull(_nodeByName, name);
+}
+
+shared_ptr<ModelNode> Model::getAABBNode() const {
+    for (auto &node : _nodeById) {
+        if (node.second->isAABBMesh()) return node.second;
+    }
+    return nullptr;
+}
+
+shared_ptr<Animation> Model::getAnimation(const string &name) const {
+    auto maybeAnim = _animations.find(name);
+    if (maybeAnim != _animations.end()) return maybeAnim->second;
+
+    shared_ptr<Animation> anim;
+    if (_superModel) {
+        anim = _superModel->getAnimation(name);
+    }
+
+    return move(anim);
+}
+
 vector<string> Model::getAnimationNames() const {
     vector<string> result;
 
@@ -116,30 +143,17 @@ vector<string> Model::getAnimationNames() const {
     return move(result);
 }
 
-shared_ptr<Animation> Model::getAnimation(const string &name) const {
-    auto maybeAnim = _animations.find(name);
-    if (maybeAnim != _animations.end()) return maybeAnim->second;
+set<uint16_t> Model::getAncestorNodes(uint16_t parentId) const {
+    set<uint16_t> result;
 
-    shared_ptr<Animation> anim;
-    if (_superModel) {
-        anim = _superModel->getAnimation(name);
-    }
-    if (!anim) {
-        debug(boost::format("Model animation not found: '%s' '%s'") % name % _name, 2);
+    auto maybeParent = _nodeById.find(parentId);
+    if (maybeParent != _nodeById.end()) {
+        for (const ModelNode *node = maybeParent->second->parent(); node; node = node->parent()) {
+            result.insert(node->id());
+        }
     }
 
-    return move(anim);
-}
-
-shared_ptr<ModelNode> Model::getNodeByName(const string &name) const {
-    return getFromLookupOrNull(_nodeByName, name);
-}
-
-shared_ptr<ModelNode> Model::getAABBNode() const {
-    for (auto &node : _nodeById) {
-        if (node.second->isAABBMesh()) return node.second;
-    }
-    return nullptr;
+    return move(result);
 }
 
 } // namespace graphics

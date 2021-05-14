@@ -40,7 +40,7 @@ static constexpr int kMdlDataOffset = 12;
 static constexpr uint32_t kFunctionPtrTslPC = 4285200;
 static constexpr uint32_t kFunctionPtrTslXbox = 4285872;
 
-// Classificaiton
+// Classification
 
 static unordered_map<uint8_t, Model::Classification> g_classifications {
     { 0, Model::Classification::Other },
@@ -712,7 +712,12 @@ unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
         sort(events.begin(), events.end(), [](auto &left, auto &right) { return left.time < right.time; });
     }
 
-    return make_unique<Animation>(move(name), length, transitionTime, move(rootNode), move(events));
+    return make_unique<Animation>(
+        move(name),
+        length,
+        transitionTime,
+        move(rootNode),
+        move(events));
 }
 
 } // namespace graphics

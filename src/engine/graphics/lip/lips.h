@@ -21,7 +21,7 @@
 
 #include "../../common/cache.h"
 
-#include "lipanimation.h"
+#include "animation.h"
 
 namespace reone {
 

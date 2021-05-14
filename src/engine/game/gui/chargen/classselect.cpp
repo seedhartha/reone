@@ -148,11 +148,11 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, Sce
     character->setAppearance(appearance);
     character->equip("g_a_clothes01");
     character->loadAppearance();
-    character->getModelSceneNode()->setCullable(false);
+    character->sceneNode()->setCullable(false);
     character->updateModelAnimation();
 
-    auto model = make_shared<ModelSceneNode>(ModelUsage::GUI, Models::instance().get("cgbody_light"), &sceneGraph);
-    model->attach("cgbody_light", character->getModelSceneNode());
+    auto model = make_shared<ModelSceneNode>(Models::instance().get("cgbody_light"), ModelUsage::GUI, &sceneGraph);
+    model->attach("cgbody_light", character->sceneNode());
 
     return move(model);
 }

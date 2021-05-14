@@ -22,6 +22,7 @@
 #include "combat.h"
 
 #include "glm/gtx/euler_angles.hpp"
+#include "glm/gtx/transform.hpp"
 
 #include "../game.h"
 
@@ -38,38 +39,42 @@ static constexpr char kModelEventDetonate[] = "detonate";
 static constexpr float kProjectileSpeed = 16.0f;
 
 void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, Round &round) {
+    auto attackerModel = static_pointer_cast<ModelSceneNode>(attacker->sceneNode());
+    auto targetModel = static_pointer_cast<ModelSceneNode>(target->sceneNode());
+    if (!attackerModel || !targetModel) return;
+
     shared_ptr<Item> weapon(attacker->getEquippedItem(InventorySlot::rightWeapon));
     if (!weapon) return;
 
     shared_ptr<Item::AmmunitionType> ammunitionType(weapon->ammunitionType());
     if (!ammunitionType) return;
 
-    shared_ptr<ModelSceneNode> weaponModel(attacker->getModelSceneNode()->getAttachedModel("rhand"));
+    auto weaponModel = static_pointer_cast<ModelSceneNode>(attackerModel->getAttachment("rhand"));
     if (!weaponModel) return;
 
     // Determine projectile position
-    glm::vec3 projectilePos, bulletHookPos;
-    if (weaponModel->getNodeAbsolutePosition("bullethook", bulletHookPos)) {
-        projectilePos = weaponModel->absoluteTransform() * glm::vec4(bulletHookPos, 1.0f);
+    glm::vec3 projectilePos;
+    shared_ptr<ModelNode> bulletHook(weaponModel->model()->getNodeByName("bullethook"));
+    if (bulletHook) {
+        projectilePos = weaponModel->absoluteTransform() * glm::vec4(bulletHook->restPosition(), 1.0f);
     } else {
-        projectilePos = weaponModel->absoluteTransform()[3];
+        projectilePos = weaponModel->getOrigin();
     }
 
     // Determine projectile direction
-    shared_ptr<ModelSceneNode> targetModel(target->getModelSceneNode());
-    glm::vec3 projectileTarget, impactPos;
-    if (targetModel->getNodeAbsolutePosition("impact", impactPos)) {
-        projectileTarget = targetModel->absoluteTransform() * glm::vec4(impactPos, 1.0f);
+    glm::vec3 projectileTarget;
+    shared_ptr<ModelNode> impact(targetModel->model()->getNodeByName("impact"));
+    if (impact) {
+        projectileTarget = targetModel->absoluteTransform() * glm::vec4(impact->restPosition(), 1.0f);
     } else {
-        projectileTarget = targetModel->absoluteTransform()[3];
+        projectileTarget = targetModel->getOrigin();
     }
     round.projectileDir = glm::normalize(projectileTarget - projectilePos);
 
     // Create and add a projectile to the scene graph
-    round.projectile = make_shared<ModelSceneNode>(ModelUsage::Projectile, ammunitionType->model, &_game->sceneGraph());
+    round.projectile = make_shared<ModelSceneNode>(ammunitionType->model, ModelUsage::Projectile, &_game->sceneGraph());
     round.projectile->signalEvent(kModelEventDetonate);
-    round.projectile->setPosition(projectilePos);
-    round.projectile->setProjectileSpeed(kProjectileSpeed);
+    round.projectile->setLocalTransform(glm::translate(projectilePos));
     _game->sceneGraph().addRoot(round.projectile);
 
     // Play shot sound, if any

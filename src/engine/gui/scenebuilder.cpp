@@ -51,13 +51,16 @@ unique_ptr<SceneGraph> SceneBuilder::build() {
         _modelScale + _modelOffset.y,
         _zNear, _zFar));
 
-    auto camera = make_shared<CameraSceneNode>(scene.get(), projection, _aspect, _zNear, _zFar);
+    auto camera = make_shared<CameraSceneNode>("", projection, scene.get());
     if (_cameraNodeName.empty()) {
         camera->setLocalTransform(_cameraTransform);
     } else {
-        MeshSceneNode *modelNode = model->getModelNode(_cameraNodeName);
-        if (modelNode) {
-            camera->setLocalTransform(modelNode->absoluteTransform() * _cameraTransform);
+        shared_ptr<ModelNode> refModelNode(model->model()->getNodeByName(_cameraNodeName));
+        if (refModelNode) {
+            shared_ptr<ModelNodeSceneNode> refSceneNode(model->getNodeById(refModelNode->id()));
+            if (refSceneNode) {
+                camera->setLocalTransform(refModelNode->absoluteTransform() * _cameraTransform);
+            }
         }
     }
 

@@ -49,23 +49,16 @@ static constexpr float kUvAnimationSpeed = 250.0f;
 
 static bool g_debugWalkmesh = false;
 
-MeshSceneNode::MeshSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, ModelNode *modelNode) :
-    SceneNode(SceneNodeType::ModelNode, sceneGraph),
-    _modelSceneNode(modelSceneNode),
-    _modelNode(modelNode) {
+MeshSceneNode::MeshSceneNode(const ModelSceneNode *model, shared_ptr<ModelNode> modelNode, SceneGraph *sceneGraph) :
+    ModelNodeSceneNode(modelNode, SceneNodeType::Mesh, sceneGraph),
+    _model(model) {
 
-    if (!modelSceneNode) {
-        throw invalid_argument("modelSceneNode must not be null");
+    if (!model) {
+        throw invalid_argument("model must not be null");
     }
-    if (!modelNode) {
-        throw invalid_argument("modelNode must not be null");
-    }
-    if (_modelNode->alpha().getNumFrames() > 0) {
-        _alpha = _modelNode->alpha().getByFrame(0);
-    }
-    if (_modelNode->selfIllumColor().getNumFrames() > 0) {
-        _selfIllumColor = _modelNode->selfIllumColor().getByFrame(0);
-    }
+    _alpha = _modelNode->alpha().getByFrameOrElse(0, 1.0f);
+    _selfIllumColor = _modelNode->selfIllumColor().getByFrameOrElse(0, glm::vec3(0.0f));
+
     initTextures();
 }
 
@@ -82,15 +75,20 @@ void MeshSceneNode::initTextures() {
 }
 
 void MeshSceneNode::refreshMaterial() {
-    if (!_textures.diffuse) return;
+    _material = Material();
 
-    shared_ptr<Material> material(Materials::instance().get(_textures.diffuse->name()));
-    if (material) {
-        _material = *material;
+    if (_textures.diffuse) {
+        shared_ptr<Material> material(Materials::instance().get(_textures.diffuse->name()));
+        if (material) {
+            _material = *material;
+        }
     }
 }
 
 void MeshSceneNode::refreshAdditionalTextures() {
+    _textures.envmap.reset();
+    _textures.bumpmap.reset();
+
     if (!_textures.diffuse) return;
 
     const Texture::Features &features = _textures.diffuse->features();
@@ -105,58 +103,65 @@ void MeshSceneNode::refreshAdditionalTextures() {
 }
 
 void MeshSceneNode::update(float dt) {
+    SceneNode::update(dt);
+
     shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
     if (mesh) {
-        // UV animation
-        if (mesh->uvAnimation.dir.x != 0.0f || mesh->uvAnimation.dir.y != 0.0f) {
-            _uvOffset += kUvAnimationSpeed * mesh->uvAnimation.dir * dt;
-            _uvOffset -= glm::floor(_uvOffset);
-        }
+        updateUVAnimation(dt, *mesh);
+        updateBumpmapAnimation(dt, *mesh);
+        updateDanglyMeshAnimation(dt, *mesh);
+    }
+}
 
-        // Bumpmap UV animation
-        if (_textures.bumpmap) {
-            const Texture::Features &features = _textures.bumpmap->features();
-            if (features.procedureType == Texture::ProcedureType::Cycle) {
-                int frameCount = features.numX * features.numY;
-                float length = frameCount / static_cast<float>(features.fps);
-                _bumpmapTime = glm::min(_bumpmapTime + dt, length);
-                _bumpmapFrame = static_cast<int>(glm::round((frameCount - 1) * (_bumpmapTime / length)));
-                if (_bumpmapTime == length) {
-                    _bumpmapTime = 0.0f;
-                }
+void MeshSceneNode::updateUVAnimation(float dt, const ModelNode::TriangleMesh &mesh) {
+    if (mesh.uvAnimation.dir.x != 0.0f || mesh.uvAnimation.dir.y != 0.0f) {
+        _uvOffset += kUvAnimationSpeed * mesh.uvAnimation.dir * dt;
+        _uvOffset -= glm::floor(_uvOffset);
+    }
+}
+
+void MeshSceneNode::updateBumpmapAnimation(float dt, const ModelNode::TriangleMesh &mesh) {
+    if (!_textures.bumpmap) return;
+
+    const Texture::Features &features = _textures.bumpmap->features();
+    if (features.procedureType == Texture::ProcedureType::Cycle) {
+        int frameCount = features.numX * features.numY;
+        float length = frameCount / static_cast<float>(features.fps);
+        _bumpmapTime = glm::min(_bumpmapTime + dt, length);
+        _bumpmapFrame = static_cast<int>(glm::round((frameCount - 1) * (_bumpmapTime / length)));
+        if (_bumpmapTime == length) {
+            _bumpmapTime = 0.0f;
+        }
+    }
+}
+
+void MeshSceneNode::updateDanglyMeshAnimation(float dt, const ModelNode::TriangleMesh &mesh) {
+    shared_ptr<ModelNode::DanglyMesh> danglyMesh(mesh.danglyMesh);
+    if (!danglyMesh) return;
+
+    bool forceApplied = glm::length2(_danglymeshAnimation.force) > 0.0f;
+    if (forceApplied) {
+        // When force is applied, stride in the opposite direction from the applied force
+        glm::vec3 strideDir(-_danglymeshAnimation.force);
+        glm::vec3 maxStride(danglyMesh->displacement);
+        _danglymeshAnimation.stride = glm::clamp(_danglymeshAnimation.stride + danglyMesh->period * strideDir * dt, -maxStride, maxStride);
+    } else {
+        // When force is not applied, gradually nullify stride
+        float strideMag2 = glm::length2(_danglymeshAnimation.stride);
+        if (strideMag2 > 0.0f) {
+            glm::vec3 strideDir(-_danglymeshAnimation.stride);
+            _danglymeshAnimation.stride += danglyMesh->period * strideDir * dt;
+            if ((strideDir.x > 0.0f && _danglymeshAnimation.stride.x > 0.0f) || (strideDir.x < 0.0f && _danglymeshAnimation.stride.x < 0.0f)) {
+                _danglymeshAnimation.stride.x = 0.0f;
             }
-        }
-
-        // Danglymesh animation
-        shared_ptr<ModelNode::DanglyMesh> danglyMesh(mesh->danglyMesh);
-        if (danglyMesh) {
-            bool forceApplied = glm::length2(_danglymeshAnimation.force) > 0.0f;
-            if (forceApplied) {
-                // When force is applied, stride in the opposite direction from the applied force
-                glm::vec3 strideDir(-_danglymeshAnimation.force);
-                glm::vec3 maxStride(danglyMesh->displacement);
-                _danglymeshAnimation.stride = glm::clamp(_danglymeshAnimation.stride + danglyMesh->period * strideDir * dt, -maxStride, maxStride);
-            } else {
-                // When force is not applied, gradually nullify stride
-                float strideMag2 = glm::length2(_danglymeshAnimation.stride);
-                if (strideMag2 > 0.0f) {
-                    glm::vec3 strideDir(-_danglymeshAnimation.stride);
-                    _danglymeshAnimation.stride += danglyMesh->period * strideDir * dt;
-                    if ((strideDir.x > 0.0f && _danglymeshAnimation.stride.x > 0.0f) || (strideDir.x < 0.0f && _danglymeshAnimation.stride.x < 0.0f)) {
-                        _danglymeshAnimation.stride.x = 0.0f;
-                    }
-                    if ((strideDir.y > 0.0f && _danglymeshAnimation.stride.y > 0.0f) || (strideDir.y < 0.0f && _danglymeshAnimation.stride.y < 0.0f)) {
-                        _danglymeshAnimation.stride.y = 0.0f;
-                    }
-                    if ((strideDir.z > 0.0f && _danglymeshAnimation.stride.z > 0.0f) || (strideDir.z < 0.0f && _danglymeshAnimation.stride.z < 0.0f)) {
-                        _danglymeshAnimation.stride.z = 0.0f;
-                    }
-                }
+            if ((strideDir.y > 0.0f && _danglymeshAnimation.stride.y > 0.0f) || (strideDir.y < 0.0f && _danglymeshAnimation.stride.y < 0.0f)) {
+                _danglymeshAnimation.stride.y = 0.0f;
+            }
+            if ((strideDir.z > 0.0f && _danglymeshAnimation.stride.z > 0.0f) || (strideDir.z < 0.0f && _danglymeshAnimation.stride.z < 0.0f)) {
+                _danglymeshAnimation.stride.z = 0.0f;
             }
         }
     }
-
-    SceneNode::update(dt);
 }
 
 bool MeshSceneNode::shouldRender() const {
@@ -184,7 +189,7 @@ bool MeshSceneNode::isTransparent() const {
     if (!mesh) return false; // Meshless nodes are opaque
 
     // Character models are opaque
-    if (_modelSceneNode->model()->classification() == Model::Classification::Character) return false;
+    if (_model->model()->classification() == Model::Classification::Character) return false;
 
     // Model nodes with alpha less than 1.0 are transparent
     if (_alpha < 1.0f) return true;
@@ -233,8 +238,8 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     if (isFeatureEnabled(Feature::HDR)) {
         uniforms.combined.featureMask |= UniformFeatureFlags::hdr;
     }
-    uniforms.combined.general.model = _absoluteTransform;
-    uniforms.combined.general.alpha = _modelSceneNode->alpha() * _alpha;
+    uniforms.combined.general.model = _absTransform;
+    uniforms.combined.general.alpha = _alpha;
     uniforms.combined.general.ambientColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);
 
     ShaderProgram program;
@@ -278,7 +283,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
             uniforms.combined.bumpmaps.frame = _bumpmapFrame;
         }
 
-        bool receivesShadows = isReceivingShadows(*_modelSceneNode, *this);
+        bool receivesShadows = isReceivingShadows(*_model, *this);
         if (receivesShadows) {
             uniforms.combined.featureMask |= UniformFeatureFlags::shadows;
         }
@@ -290,8 +295,8 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
                 if (i < static_cast<int>(mesh->skin->boneNodeId.size())) {
                     uint16_t nodeId = mesh->skin->boneNodeId[i];
                     if (nodeId != 0xffff) {
-                        MeshSceneNode *bone = _modelSceneNode->getModelNodeById(nodeId);
-                        if (bone) {
+                        shared_ptr<ModelNodeSceneNode> bone(_model->getNodeById(nodeId));
+                        if (bone && bone->type() == SceneNodeType::Mesh) {
                             uniforms.skeletal->bones[i] = _modelNode->absoluteTransformInverse() * bone->boneTransform() * _modelNode->absoluteTransform();
                         }
                     }
@@ -338,7 +343,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
             }
         }
 
-        if (_sceneGraph->isFogEnabled() && _modelSceneNode->model()->isAffectedByFog()) {
+        if (_sceneGraph->isFogEnabled() && _model->model()->isAffectedByFog()) {
             uniforms.combined.featureMask |= UniformFeatureFlags::fog;
             uniforms.combined.general.fogNear = _sceneGraph->fogNear();
             uniforms.combined.general.fogFar = _sceneGraph->fogFar();
@@ -401,7 +406,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
 }
 
 bool MeshSceneNode::isLightingEnabled() const {
-    if (!isLightingEnabledByUsage(_modelSceneNode->usage())) return false;
+    if (!isLightingEnabledByUsage(_model->usage())) return false;
 
     // Lighting is disabled for lightmapped models, unless dynamic room lighting is enabled
     if (_textures.lightmap && !isFeatureEnabled(Feature::DynamicRoomLighting)) return false;
@@ -418,12 +423,8 @@ bool MeshSceneNode::isLightingEnabled() const {
 void MeshSceneNode::setAppliedForce(glm::vec3 force) {
     if (_modelNode->isDanglyMesh()) {
         // Convert force from world to object space
-        _danglymeshAnimation.force = _absoluteTransformInv * glm::vec4(force, 0.0f);
+        _danglymeshAnimation.force = _absTransformInv * glm::vec4(force, 0.0f);
     }
-}
-
-glm::vec3 MeshSceneNode::getOrigin() const {
-    return _absoluteTransform * glm::vec4(_modelNode->mesh()->mesh->aabb().center(), 1.0f);
 }
 
 void MeshSceneNode::setDiffuseTexture(const shared_ptr<Texture> &texture) {

@@ -62,7 +62,7 @@ void Placeable::loadFromBlueprint(const string &resRef) {
     shared_ptr<TwoDA> placeables(Resources::instance().get2DA("placeables"));
     string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
-    auto model = make_shared<ModelSceneNode>(ModelUsage::Placeable, Models::instance().get(modelName), _sceneGraph);
+    auto model = make_shared<ModelSceneNode>(Models::instance().get(modelName), ModelUsage::Placeable, _sceneGraph);
     model->setCullable(true);
     model->setDrawDistance(64.0f);
     _sceneNode = move(model);

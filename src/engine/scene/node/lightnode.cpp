@@ -17,6 +17,8 @@
 
 #include "lightnode.h"
 
+#include <stdexcept>
+
 #include "glm/ext.hpp"
 
 #include "../../graphics/mesh/meshes.h"
@@ -36,9 +38,18 @@ namespace reone {
 
 namespace scene {
 
-LightSceneNode::LightSceneNode(int priority, SceneGraph *sceneGraph) :
-    SceneNode(SceneNodeType::Light, sceneGraph),
-    _priority(priority) {
+static constexpr float kMinDirectionalLightRadius = 1000.0f;
+
+LightSceneNode::LightSceneNode(const ModelSceneNode *model, shared_ptr<ModelNode> modelNode, SceneGraph *sceneGraph) :
+    ModelNodeSceneNode(modelNode, SceneNodeType::Light, sceneGraph),
+    _model(model) {
+
+    if (!model) {
+        throw invalid_argument("model must not be null");
+    }
+    _radius = modelNode->radius().getByFrameOrElse(0, 1.0f);
+    _multiplier = modelNode->multiplier().getByFrameOrElse(0, 1.0f);
+    _color = modelNode->color().getByFrameOrElse(0, glm::vec3(1.0f));
 }
 
 void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
@@ -48,7 +59,7 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
     flare.texture->bind();
 
-    glm::vec4 lightPos(_absoluteTransform[3]);
+    glm::vec4 lightPos(_absTransform[3]);
     glm::vec4 lightPosNdc(camera->projection() * camera->view() * lightPos);
 
     float w = _sceneGraph->options().width;
@@ -77,6 +88,10 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     StateManager::instance().withAdditiveBlending([]() {
         Meshes::instance().getBillboard()->draw();
     });
+}
+
+bool LightSceneNode::isDirectional() const {
+    return _radius >= kMinDirectionalLightRadius;
 }
 
 } // namespace scene

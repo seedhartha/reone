@@ -19,7 +19,7 @@
 
 #include "../../audio/soundhandle.h"
 #include "../../common/timer.h"
-#include "../../graphics/lip/lipanimation.h"
+#include "../../graphics/lip/animation.h"
 #include "../../graphics/model/model.h"
 
 #include "../dialog.h"

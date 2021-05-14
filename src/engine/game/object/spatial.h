@@ -23,11 +23,13 @@
 
 #include "object.h"
 
+#include "glm/gtc/quaternion.hpp"
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
 #include "../../graphics/walkmesh/walkmesh.h"
-#include "../../scene/node/modelnode.h"
+#include "../../scene/animproperties.h"
+#include "../../scene/node/scenenode.h"
 
 #include "../action/playanimation.h"
 #include "../enginetype/effect.h"
@@ -66,7 +68,6 @@ public:
     virtual glm::vec3 getSelectablePosition() const;
     float getFacing() const { return glm::eulerAngles(_orientation).z; }
 
-    std::shared_ptr<scene::ModelSceneNode> getModelSceneNode() const;
     virtual std::shared_ptr<graphics::Walkmesh> getWalkmesh() const;
 
     ObjectFactory &objectFactory() { return *_objectFactory; }

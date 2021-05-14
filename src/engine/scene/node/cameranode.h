@@ -27,7 +27,7 @@ namespace scene {
 
 class CameraSceneNode : public SceneNode {
 public:
-    CameraSceneNode(SceneGraph *sceneGraph, glm::mat4 projection, float aspect, float nearPlane, float farPlane);
+    CameraSceneNode(std::string name, glm::mat4 projection, SceneGraph *sceneGraph);
 
     bool isInFrustum(const glm::vec3 &point) const;
     bool isInFrustum(const graphics::AABB &aabb) const;
@@ -35,18 +35,12 @@ public:
 
     const glm::mat4 &projection() const { return _projection; }
     const glm::mat4 &view() const { return _view; }
-    float aspect() const { return _aspect; }
-    float nearPlane() const { return _nearPlane; }
-    float farPlane() const { return _farPlane; }
 
-    void setProjection(const glm::mat4 &projection);
+    void setProjection(glm::mat4 projection);
 
 private:
     glm::mat4 _projection { 1.0f };
     glm::mat4 _view { 1.0f };
-    float _aspect { 1.0f };
-    float _nearPlane { 0.0f };
-    float _farPlane { 0.0f };
 
     // Frustum planes
 
@@ -59,10 +53,10 @@ private:
 
     // END Frustum planes
 
-    void updateAbsoluteTransform() override;
+    void computeView();
+    void computeFrustumPlanes();
 
-    void updateView();
-    void updateFrustum();
+    void onAbsoluteTransformChanged() override;
 };
 
 } // namespace scene

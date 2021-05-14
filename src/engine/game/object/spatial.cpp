@@ -118,10 +118,9 @@ float SpatialObject::getDistanceTo2(const SpatialObject &other) const {
 }
 
 bool SpatialObject::contains(const glm::vec3 &point) const {
-    auto model = getModelSceneNode();
-    if (!model) return false;
+    if (!_sceneNode) return false;
 
-    const AABB &aabb = model->model()->aabb();
+    const AABB &aabb = _sceneNode->aabb();
 
     return (aabb * _transform).contains(point);
 }
@@ -133,13 +132,15 @@ void SpatialObject::face(const SpatialObject &other) {
 }
 
 void SpatialObject::face(const glm::vec3 &point) {
+    if (point == _position) return;
+
     glm::vec2 dir(glm::normalize(point - _position));
     _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(dir.x, dir.y)));
     updateTransform();
 }
 
 void SpatialObject::faceAwayFrom(const SpatialObject &other) {
-    if (_id == other._id) return;
+    if (_id == other._id || _position == other.position()) return;
 
     glm::vec2 dir(glm::normalize(_position - other.position()));
     _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(dir.x, dir.y)));
@@ -214,19 +215,13 @@ bool SpatialObject::isSelectable() const {
     return false;
 }
 
-shared_ptr<ModelSceneNode> SpatialObject::getModelSceneNode() const {
-    if (!_sceneNode || _sceneNode->type() != SceneNodeType::Model) return nullptr;
-
-    return static_pointer_cast<ModelSceneNode>(_sceneNode);
-}
-
 shared_ptr<Walkmesh> SpatialObject::getWalkmesh() const {
     return nullptr;
 }
 
 glm::vec3 SpatialObject::getSelectablePosition() const {
-    auto model = getModelSceneNode();
-    return model ? model->getWorldCenterAABB() : _position;
+    auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
+    return model ? model->getWorldCenterOfAABB() : _position;
 }
 
 void SpatialObject::setRoom(Room *room) {

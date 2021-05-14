@@ -155,36 +155,14 @@ public:
             Lighten
         };
 
-        template <class T>
-        struct Constraints {
-            T start;
-            T mid;
-            T end;
-        };
-
         UpdateMode updateMode { UpdateMode::Invalid };
         RenderMode renderMode { RenderMode::Invalid };
         BlendMode blendMode { BlendMode::Invalid };
-        int renderOrder { 0 };
-
         std::shared_ptr<Texture> texture;
         int gridWidth { 0 };
         int gridHeight { 0 };
-        int frameStart { 0 };
-        int frameEnd { 0 };
-
-        glm::vec2 size { 0.0f };
-        float birthrate { 0.0f }; /**< rate of particle birth per second */
-        float lifeExpectancy { 0.0f }; /**< life of each particle in seconds */
-        float velocity { 0.0f };
-        float randomVelocity { 0.0f };
-        float spread { 0.0f };
+        int renderOrder { 0 };
         bool loop { false };
-        float fps { 0.0f };
-
-        Constraints<float> particleSize;
-        Constraints<glm::vec3> color;
-        Constraints<float> alpha;
     };
 
     struct Reference {
@@ -225,6 +203,10 @@ public:
 
     // Specialization
 
+    bool isMesh() const { return static_cast<bool>(_mesh); }
+    bool isLight() const { return static_cast<bool>(_light); }
+    bool isEmitter() const { return static_cast<bool>(_emitter); }
+    bool isReference() const { return static_cast<bool>(_reference); }
     bool isSkinMesh() const { return _mesh && _mesh->skin; }
     bool isDanglyMesh() const { return _mesh && _mesh->danglyMesh; }
     bool isAABBMesh() const { return _mesh && _mesh->aabbTree; }
