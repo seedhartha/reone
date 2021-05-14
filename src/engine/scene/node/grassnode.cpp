@@ -33,8 +33,8 @@ namespace reone {
 
 namespace scene {
 
-GrassSceneNode::GrassSceneNode(SceneGraph *graph, glm::vec2 quadSize, shared_ptr<Texture> texture, shared_ptr<Texture> lightmap) :
-    SceneNode(SceneNodeType::Grass, graph),
+GrassSceneNode::GrassSceneNode(string name, glm::vec2 quadSize, shared_ptr<Texture> texture, shared_ptr<Texture> lightmap, SceneGraph *graph) :
+    SceneNode(move(name), SceneNodeType::Grass, graph),
     _quadSize(move(quadSize)),
     _texture(texture),
     _lightmap(move(lightmap)) {
@@ -42,18 +42,17 @@ GrassSceneNode::GrassSceneNode(SceneGraph *graph, glm::vec2 quadSize, shared_ptr
     if (!texture) {
         throw invalid_argument("texture must not be null");
     }
-    _transparent = true;
 }
 
 void GrassSceneNode::clear() {
     _clusters.clear();
 }
 
-void GrassSceneNode::addCluster(GrassCluster cluster) {
+void GrassSceneNode::addCluster(Cluster cluster) {
     _clusters.push_back(move(cluster));
 }
 
-void GrassSceneNode::drawClusters(const vector<GrassCluster> &clusters) {
+void GrassSceneNode::drawClusters(const vector<Cluster> &clusters) {
     StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
     _texture->bind();
 

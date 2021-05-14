@@ -15,327 +15,173 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <stack>
 #include <stdexcept>
 
 #include "../../common/collectionutil.h"
 #include "../../common/log.h"
-#include "../../graphics/featureutil.h"
-#include "../../graphics/mesh/meshes.h"
-#include "../../resource/resources.h"
 
 #include "../scenegraph.h"
 #include "../types.h"
 
-#include "cameranode.h"
 #include "emitternode.h"
 #include "lightnode.h"
 #include "meshnode.h"
 #include "modelnode.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::graphics;
-using namespace reone::resource;
 
 namespace reone {
 
 namespace scene {
 
-const float kMinDirectionalLightRadius = 1000.0f;
-
-static bool g_debugAABB = false;
-
 ModelSceneNode::ModelSceneNode(
+    shared_ptr<Model> model,
     ModelUsage usage,
-    const shared_ptr<Model> &model,
     SceneGraph *sceneGraph,
-    set<string> ignoreNodes,
     IAnimationEventListener *animEventListener
 ) :
-    SceneNode(SceneNodeType::Model, sceneGraph),
-    _animEventListener(animEventListener),
-    _usage(usage),
+    SceneNode(model->name(), SceneNodeType::Model, sceneGraph),
     _model(model),
-    _animator(this, ignoreNodes) {
+    _usage(usage),
+    _animEventListener(animEventListener) {
 
-    initModelNodes();
-
+    if (!model) {
+        throw invalid_argument("model must not be null");
+    }
     _volumetric = true;
-}
 
-static bool validateEmitter(const ModelNode::Emitter &emitter) {
-    switch (emitter.updateMode) {
-        case ModelNode::Emitter::UpdateMode::Fountain:
-        case ModelNode::Emitter::UpdateMode::Single:
-        case ModelNode::Emitter::UpdateMode::Explosion:
-            break;
-        default:
-            warn("validateEmitter: unsupported update mode: " + to_string(static_cast<int>(emitter.updateMode)));
-            return false;
-    }
-
-    switch (emitter.renderMode) {
-        case ModelNode::Emitter::RenderMode::Normal:
-        case ModelNode::Emitter::RenderMode::BillboardToWorldZ:
-        case ModelNode::Emitter::RenderMode::MotionBlur:
-        case ModelNode::Emitter::RenderMode::BillboardToLocalZ:
-        case ModelNode::Emitter::RenderMode::AlignedToParticleDir:
-            break;
-        default:
-            warn("validateEmitter: unsupported render mode: " + to_string(static_cast<int>(emitter.renderMode)));
-            return false;
-    }
-
-    switch (emitter.blendMode) {
-        case ModelNode::Emitter::BlendMode::Normal:
-        case ModelNode::Emitter::BlendMode::Lighten:
-            break;
-        default:
-            warn("validateEmitter: unsupported blend mode: " + to_string(static_cast<int>(emitter.blendMode)));
-            return false;
-    }
-
-    return true;
-}
-
-void ModelSceneNode::initModelNodes() {
-    shared_ptr<MeshSceneNode> rootNode(getModelNodeSceneNode(*_model->rootNode()));
-    addChild(rootNode);
-
-    stack<MeshSceneNode *> nodes;
-    nodes.push(rootNode.get());
-
-    while (!nodes.empty()) {
-        MeshSceneNode *sceneNode = nodes.top();
-        nodes.pop();
-
-        const ModelNode *modelNode = sceneNode->modelNode();
-        _modelNodeById.insert(make_pair(modelNode->id(), sceneNode));
-
-        for (auto &child : modelNode->children()) {
-            shared_ptr<MeshSceneNode> childNode(getModelNodeSceneNode(*child));
-            addChild(childNode);
-            nodes.push(childNode.get());
-
-            shared_ptr<ModelNode::Light> light(child->light());
-            if (light) {
-                // Light is considered directional if its radius exceeds a certain threshold
-                float radius = child->radius().getByFrameOrElse(0, 1.0f);
-                bool directional = radius >= kMinDirectionalLightRadius;
-
-                auto lightNode = make_shared<LightSceneNode>(light->priority, _sceneGraph);
-                lightNode->setColor(child->color().getByFrameOrElse(0, glm::vec3(1.0f)));
-                lightNode->setMultiplier(child->multiplier().getByFrameOrElse(0, 1.0f));
-                lightNode->setRadius(radius);
-                lightNode->setShadow(light->shadow);
-                lightNode->setAmbientOnly(light->ambientOnly);
-                lightNode->setDirectional(directional);
-                lightNode->setFlareRadius(light->flareRadius);
-                lightNode->setFlares(light->flares);
-
-                childNode->addChild(lightNode);
-                _lightNodeById.insert(make_pair(modelNode->id(), lightNode.get()));
-            }
-
-            shared_ptr<ModelNode::Emitter> emitter(child->emitter());
-            if (emitter && validateEmitter(*emitter)) {
-                auto emitterNode = make_shared<EmitterSceneNode>(this, emitter, _sceneGraph);
-                childNode->addChild(emitterNode);
-                _emitters.push_back(emitterNode);
-            }
-
-            // If model node is a reference, attach the model it contains to the model nodes scene node
-            shared_ptr<ModelNode::Reference> reference(child->reference());
-            if (reference) {
-                attach(*childNode, reference->model, _usage);
-            }
-        }
-    }
-
+    buildNodeTree(_model->rootNode(), this);
     computeAABB();
 }
 
-unique_ptr<MeshSceneNode> ModelSceneNode::getModelNodeSceneNode(ModelNode &node) const {
-    auto sceneNode = make_unique<MeshSceneNode>(_sceneGraph, this, &node);
-    sceneNode->setLocalTransform(node.absoluteTransform());
-    return move(sceneNode);
+void ModelSceneNode::buildNodeTree(shared_ptr<ModelNode> node, SceneNode *parent) {
+    // Convert model node to scene node
+    shared_ptr<ModelNodeSceneNode> sceneNode;
+    if (node->isMesh()) {
+        sceneNode = newMeshSceneNode(node);
+    } else if (node->isLight()) {
+        sceneNode = newLightSceneNode(node);
+    } else if (node->isEmitter()) {
+        sceneNode = newEmitterSceneNode(node);
+    } else {
+        sceneNode = newDummySceneNode(node);
+    }
+
+    if (node->isSkinMesh()) {
+        // Reparent skin meshes to prevent animation being applied twice
+        glm::mat4 transform(node->parent()->absoluteTransform() * node->localTransform());
+        sceneNode->setLocalTransform(move(transform));
+        addChild(sceneNode);
+    } else {
+        sceneNode->setLocalTransform(node->localTransform());
+        parent->addChild(sceneNode);
+    }
+    _nodeById.insert(make_pair(node->id(), sceneNode));
+
+    if (node->isReference()) {
+        auto model = make_shared<ModelSceneNode>(node->reference()->model, _usage, _sceneGraph, _animEventListener);
+        attach(node->id(), move(model));
+    }
+    for (auto &child : node->children()) {
+        buildNodeTree(child, sceneNode.get());
+    }
 }
 
 void ModelSceneNode::update(float dt) {
-    _animator.update(dt, !_culled);
+    // Optimization: skip invisible models
+    if (!_visible) return;
+
     SceneNode::update(dt);
-}
-
-void ModelSceneNode::draw() {
-    if (g_debugAABB) {
-        glm::mat4 transform(_absoluteTransform * _aabb.transform());
-
-        ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
-        uniforms.combined.general.model = move(transform);
-
-        Shaders::instance().activate(ShaderProgram::ModelColor, uniforms);
-        Meshes::instance().getAABB()->draw();
-    }
-}
-
-shared_ptr<ModelSceneNode> ModelSceneNode::attach(const string &parent, const shared_ptr<Model> &model, ModelUsage usage) {
-    MeshSceneNode *parentNode = getModelNode(parent);
-    return parentNode ? attach(*parentNode, model, usage) : nullptr;
-}
-
-shared_ptr<ModelSceneNode> ModelSceneNode::attach(MeshSceneNode &parent, const shared_ptr<Model> &model, ModelUsage usage) {
-    const ModelNode *parentModelNode = parent.modelNode();
-    uint16_t parentId = parentModelNode->id();
-
-    auto maybeAttached = _attachedModels.find(parentId);
-    if (maybeAttached != _attachedModels.end()) {
-        parent.removeChild(*maybeAttached->second);
-        _attachedModels.erase(maybeAttached);
-    }
-    if (model) {
-        set<string> ignoreNodes;
-        for (const ModelNode *node = parentModelNode; node; node = node->parent()) {
-            ignoreNodes.insert(node->name());
-        }
-        auto modelNode = make_shared<ModelSceneNode>(usage, model, _sceneGraph, ignoreNodes);
-        parent.addChild(modelNode);
-
-        return _attachedModels.insert(make_pair(parentId, move(modelNode))).first->second;
-    }
-
-    return nullptr;
-
-}
-
-MeshSceneNode *ModelSceneNode::getModelNode(const string &name) const {
-    shared_ptr<ModelNode> modelNode(_model->getNodeByName(name));
-    if (!modelNode) return nullptr;
-
-    return getFromLookupOrNull(_modelNodeById, modelNode->id());
-}
-
-MeshSceneNode *ModelSceneNode::getModelNodeById(uint16_t nodeId) const {
-    return getFromLookupOrNull(_modelNodeById, nodeId);
-}
-
-LightSceneNode *ModelSceneNode::getLightNodeById(uint16_t nodeId) const {
-    return getFromLookupOrNull(_lightNodeById, nodeId);
-}
-
-shared_ptr<ModelSceneNode> ModelSceneNode::getAttachedModel(const string &parent) const {
-    shared_ptr<ModelNode> parentModelNode(_model->getNodeByName(parent));
-    if (!parentModelNode) return nullptr;
-
-    return getFromLookupOrNull(_attachedModels, parentModelNode->id());
-}
-
-void ModelSceneNode::attach(const string &parent, const shared_ptr<SceneNode> &node) {
-    shared_ptr<ModelNode> parentModelNode(_model->getNodeByName(parent));
-    if (!parentModelNode) {
-        warn(boost::format("Scene node %s: model node not found: %s") % _model->name() % parent);
-        return;
-    }
-    uint16_t parentId = parentModelNode->id();
-
-    auto maybeNode = _modelNodeById.find(parentId);
-    if (maybeNode != _modelNodeById.end()) {
-        maybeNode->second->addChild(node);
-    }
-}
-
-bool ModelSceneNode::getNodeAbsolutePosition(const string &name, glm::vec3 &position) const {
-    shared_ptr<ModelNode> node(_model->getNodeByName(name));
-    if (!node) {
-        shared_ptr<Model> superModel(_model->superModel());
-        if (superModel) {
-            node = superModel->getNodeByName(name);
-        }
-    }
-    if (!node) return false;
-
-    position = node->absoluteTransform()[3];
-
-    return true;
-}
-
-glm::vec3 ModelSceneNode::getWorldCenterAABB() const {
-    return _absoluteTransform * glm::vec4(_aabb.center(), 1.0f);
-}
-
-const string &ModelSceneNode::getName() const {
-    return _model->name();
-}
-
-void ModelSceneNode::setDiffuseTexture(const shared_ptr<Texture> &texture) {
-    for (auto &child : _children) {
-        if (child->type() == SceneNodeType::ModelNode) {
-            static_pointer_cast<MeshSceneNode>(child)->setDiffuseTexture(texture);
-        }
-    }
-}
-
-void ModelSceneNode::setVisible(bool visible) {
-    if (_visible == visible) return;
-
-    _visible = visible;
-
-    for (auto &attached : _attachedModels) {
-        attached.second->setVisible(visible);
-    }
-}
-
-void ModelSceneNode::setAlpha(float alpha) {
-    _alpha = alpha;
-
-    for (auto &attached : _attachedModels) {
-        attached.second->setAlpha(alpha);
-    }
+    updateAnimations(dt);
 }
 
 void ModelSceneNode::computeAABB() {
     _aabb.reset();
 
-    stack<SceneNode *> nodes;
-    nodes.push(this);
-
-    while (!nodes.empty()) {
-        SceneNode *node = nodes.top();
-        nodes.pop();
-
-        if (node->type() == SceneNodeType::ModelNode) {
-            auto modelNode = static_cast<MeshSceneNode *>(node);
-            shared_ptr<ModelNode::TriangleMesh> mesh(modelNode->modelNode()->mesh());
-            if (mesh) {
-                _aabb.expand(mesh->mesh->aabb() * node->localTransform());
-            }
-        }
-
-        for (auto &child : node->children()) {
-            nodes.push(child.get());
+    for (auto &node : _nodeById) {
+        if (node.second->type() == SceneNodeType::Mesh) {
+            shared_ptr<ModelNode> modelNode(node.second->modelNode());
+            AABB modelSpaceAABB(modelNode->mesh()->mesh->aabb() * modelNode->absoluteTransform());
+            _aabb.expand(modelSpaceAABB);
         }
     }
 }
 
+unique_ptr<DummySceneNode> ModelSceneNode::newDummySceneNode(shared_ptr<ModelNode> node) const {
+    return make_unique<DummySceneNode>(node, _sceneGraph);
+}
+
+unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(shared_ptr<ModelNode> node) const {
+    return make_unique<MeshSceneNode>(this, node, _sceneGraph);
+}
+
+unique_ptr<LightSceneNode> ModelSceneNode::newLightSceneNode(shared_ptr<ModelNode> node) const {
+    return make_unique<LightSceneNode>(this, node, _sceneGraph);
+}
+
+unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(shared_ptr<ModelNode> node) const {
+    return make_unique<EmitterSceneNode>(this, node, _sceneGraph);
+}
+
 void ModelSceneNode::signalEvent(const string &name) {
-    debug(boost::format("Animation event signalled: %s %s") % _model->name() % name, 3);
+    debug(boost::format("Model '%s': event '%s' signalled") % _model->name() % name, 3);
 
     if (name == "detonate") {
-        for (auto &emitter : _emitters) {
-            emitter->detonate();
+        for (auto &node : _nodeById) {
+            if (node.second->type() == SceneNodeType::Emitter) {
+                static_pointer_cast<EmitterSceneNode>(node.second)->detonate();
+            }
         }
     } else if (_animEventListener) {
         _animEventListener->onEventSignalled(name);
     }
 }
 
-void ModelSceneNode::setAppliedForce(glm::vec3 force) {
-    for (auto &nodePair : _modelNodeById) {
-        nodePair.second->setAppliedForce(force);
+void ModelSceneNode::attach(uint16_t parentId, shared_ptr<SceneNode> node) {
+    auto maybeParent = _nodeById.find(parentId);
+    if (maybeParent == _nodeById.end()) return;
+
+    shared_ptr<ModelNodeSceneNode> parent(maybeParent->second);
+    parent->addChild(node);
+    _attachmentByNodeId.insert(make_pair(parentId, node));
+}
+
+void ModelSceneNode::attach(const string &parentName, shared_ptr<SceneNode> node) {
+    auto parent = _model->getNodeByName(parentName);
+    if (parent) {
+        attach(parent->id(), node);
     }
-    for (auto &attached : _attachedModels) {
-        attached.second->setAppliedForce(force);
+}
+
+shared_ptr<ModelNodeSceneNode> ModelSceneNode::getNodeById(uint16_t nodeId) const {
+    return getFromLookupOrNull(_nodeById, nodeId);
+}
+
+shared_ptr<SceneNode> ModelSceneNode::getAttachment(const string &parentName) const {
+    auto parent = _model->getNodeByName(parentName);
+    return parent ? getFromLookupOrNull(_attachmentByNodeId, parent->id()) : nullptr;
+}
+
+void ModelSceneNode::setDiffuseTexture(shared_ptr<Texture> texture) {
+    for (auto &child : _children) {
+        if (child->type() == SceneNodeType::Mesh) {
+            static_pointer_cast<MeshSceneNode>(child)->setDiffuseTexture(texture);
+        }
+    }
+}
+
+void ModelSceneNode::setAppliedForce(glm::vec3 force) {
+    for (auto &node : _nodeById) {
+        if (node.second->type() == SceneNodeType::Mesh) {
+            static_pointer_cast<MeshSceneNode>(node.second)->setAppliedForce(force);
+        }
+    }
+    for (auto &attachment : _attachmentByNodeId) {
+        if (attachment.second->type() == SceneNodeType::Model) {
+            static_pointer_cast<ModelSceneNode>(attachment.second)->setAppliedForce(force);
+        }
     }
 }
 

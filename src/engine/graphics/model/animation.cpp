@@ -17,7 +17,7 @@
 
 #include "animation.h"
 
-#include <queue>
+#include <stack>
 
 #include "../../common/collectionutil.h"
 
@@ -32,7 +32,7 @@ Animation::Animation(
     float length,
     float transitionTime,
     shared_ptr<ModelNode> rootNode,
-    vector<Event> &&events
+    vector<Event> events
 ) :
     _name(move(name)),
     _length(length),
@@ -44,19 +44,24 @@ Animation::Animation(
 }
 
 void Animation::fillNodeByName() {
-    queue<shared_ptr<ModelNode>> nodes;
+    stack<shared_ptr<ModelNode>> nodes;
     nodes.push(_rootNode);
 
     while (!nodes.empty()) {
-        shared_ptr<ModelNode> node(nodes.front());
+        shared_ptr<ModelNode> node(nodes.top());
         nodes.pop();
 
+        _nodeById.insert(make_pair(node->id(), node));
         _nodeByName.insert(make_pair(node->name(), node));
 
         for (auto &child : node->children()) {
             nodes.push(child);
         }
     }
+}
+
+shared_ptr<ModelNode> Animation::getNodeById(uint16_t nodeId) const {
+    return getFromLookupOrNull(_nodeById, nodeId);
 }
 
 shared_ptr<ModelNode> Animation::getNodeByName(const string &name) const {

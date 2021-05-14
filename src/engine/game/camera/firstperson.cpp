@@ -19,8 +19,11 @@
 
 #include "glm/ext.hpp"
 
+#include "../../graphics/types.h"
+
 using namespace std;
 
+using namespace reone::graphics;
 using namespace reone::scene;
 
 namespace reone {
@@ -30,9 +33,9 @@ namespace game {
 static constexpr float kMovementSpeed = 4.0f;
 static constexpr float kMouseMultiplier = glm::pi<float>() / 4000.0f;
 
-FirstPersonCamera::FirstPersonCamera(SceneGraph *sceneGraph, float aspect, float fovy, float zNear, float zFar) {
-    glm::mat4 projection(glm::perspective(fovy, aspect, zNear, zFar));
-    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, projection, aspect, zNear, zFar);
+FirstPersonCamera::FirstPersonCamera(float aspect, float fovy, SceneGraph *sceneGraph) {
+    glm::mat4 projection(glm::perspective(fovy, aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
+    _sceneNode = make_unique<CameraSceneNode>("", move(projection), sceneGraph);
 }
 
 bool FirstPersonCamera::handle(const SDL_Event &event) {

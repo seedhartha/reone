@@ -250,16 +250,15 @@ void DialogGUI::updateCamera() {
 }
 
 glm::vec3 DialogGUI::getTalkPosition(const SpatialObject &object) const {
-    shared_ptr<ModelSceneNode> model(object.getModelSceneNode());
-    if (model) {
-        glm::vec3 hookPosition(0.0f);
-        if (model->getNodeAbsolutePosition("talkdummy", hookPosition)) {
-            return object.position() + hookPosition;
-        }
-        return model->getWorldCenterAABB();
-    }
+    auto model = static_pointer_cast<ModelSceneNode>(object.sceneNode());
+    if (!model) return object.position();
 
-    return object.position();
+
+    shared_ptr<ModelNode> talkDummy(model->model()->getNodeByName("talkdummy"));
+
+    return talkDummy ?
+        (object.transform() * talkDummy->absoluteTransform())[3] :
+        model->getWorldCenterOfAABB();
 }
 
 DialogCamera::Variant DialogGUI::getRandomCameraVariant() const {
@@ -287,7 +286,6 @@ void DialogGUI::updateParticipantAnimations() {
             shared_ptr<Animation> animation(participant.model->getAnimation(animName));
             if (animation) {
                 AnimationProperties properties;
-                properties.flags = AnimationFlags::propagateHead;
                 properties.scale = 1.0f;
                 participant.creature->playAnimation(animation, move(properties));
             }
@@ -304,7 +302,7 @@ void DialogGUI::updateParticipantAnimations() {
             }
             AnimationType animType = getStuntAnimationType(anim.animation);
             if (animType != AnimationType::Invalid) {
-                participant->playAnimation(animType, AnimationProperties::fromFlags(AnimationFlags::propagateHead));
+                participant->playAnimation(animType);
             }
         }
     }

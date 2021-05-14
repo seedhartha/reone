@@ -17,26 +17,16 @@
 
 #pragma once
 
-#include "glm/mat4x4.hpp"
-#include "glm/vec3.hpp"
-
-#include "../types.h"
+#include "modelnodescenenode.h"
 
 namespace reone {
 
 namespace scene {
 
-/**
- * @see SceneNodeStateFlags
- */
-struct SceneNodeState {
-    int flags { 0 };
-    glm::mat4 transform { 1.0f };
-    float alpha { 1.0f };
-    glm::vec3 selfIllumColor { 0.0f };
-    glm::vec3 lightColor { 1.0f };
-    float lightMultiplier { 1.0f };
-    float lightRadius { 1.0f };
+class DummySceneNode : public ModelNodeSceneNode {
+public:
+    DummySceneNode(std::shared_ptr<graphics::ModelNode> modelNode, SceneGraph *sceneGraph) : ModelNodeSceneNode(std::move(modelNode), SceneNodeType::Dummy, sceneGraph) {
+    }
 };
 
 } // namespace scene

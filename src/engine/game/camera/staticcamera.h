@@ -27,7 +27,7 @@ class PlaceableCamera;
 
 class StaticCamera : public Camera {
 public:
-    StaticCamera(scene::SceneGraph *sceneGraph, float aspect);
+    StaticCamera(float aspect, scene::SceneGraph *sceneGraph);
 
     void setObject(const PlaceableCamera &object);
 

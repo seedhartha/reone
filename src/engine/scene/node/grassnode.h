@@ -19,32 +19,34 @@
 
 #include "../../graphics/texture/texture.h"
 
-#include "../grasscluster.h"
-
 #include "scenenode.h"
 
 namespace reone {
 
 namespace scene {
 
-class CameraSceneNode;
-
 class GrassSceneNode : public SceneNode {
 public:
-    GrassSceneNode(SceneGraph *graph, glm::vec2 quadSize, std::shared_ptr<graphics::Texture> texture, std::shared_ptr<graphics::Texture> lightmap = nullptr);
+    struct Cluster {
+        glm::vec3 position { 0.0f };
+        glm::vec2 lightmapUV { 0.0f };
+        int variant { 0 };
+    };
+
+    GrassSceneNode(std::string name, glm::vec2 quadSize, std::shared_ptr<graphics::Texture> texture, std::shared_ptr<graphics::Texture> lightmap, SceneGraph *graph);
 
     void clear();
-    void addCluster(GrassCluster cluster);
+    void addCluster(Cluster cluster);
 
-    void drawClusters(const std::vector<GrassCluster> &clusters);
+    void drawClusters(const std::vector<Cluster> &clusters);
 
-    const std::vector<GrassCluster> &clusters() const { return _clusters; }
+    const std::vector<Cluster> &clusters() const { return _clusters; }
 
 private:
     glm::vec2 _quadSize { 0.0f };
     std::shared_ptr<graphics::Texture> _texture;
     std::shared_ptr<graphics::Texture> _lightmap;
-    std::vector<GrassCluster> _clusters;
+    std::vector<Cluster> _clusters;
 };
 
 } // namespace scene

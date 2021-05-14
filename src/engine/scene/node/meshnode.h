@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "scenenode.h"
+#include "modelnodescenenode.h"
 
 #include "../../graphics/material.h"
 #include "../../graphics/model/model.h"
@@ -29,32 +29,25 @@ namespace scene {
 
 class ModelSceneNode;
 
-class MeshSceneNode : public SceneNode {
+class MeshSceneNode : public ModelNodeSceneNode {
 public:
-    MeshSceneNode(SceneGraph *sceneGraph, const ModelSceneNode *modelSceneNode, graphics::ModelNode *modelNode);
+    MeshSceneNode(const ModelSceneNode *model, std::shared_ptr<graphics::ModelNode> modelNode, SceneGraph *sceneGraph);
 
     void update(float dt) override;
-
     void drawSingle(bool shadowPass);
-
-    void setAppliedForce(glm::vec3 force);
 
     bool shouldRender() const;
     bool shouldCastShadows() const;
 
-    glm::vec3 getOrigin() const override;
-
-    bool isTransparent() const override;
+    bool isTransparent() const;
     bool isSelfIlluminated() const;
 
-    const ModelSceneNode *modelSceneNode() const { return _modelSceneNode; }
-    const graphics::ModelNode *modelNode() const { return _modelNode; }
-    const glm::mat4 &boneTransform() const { return _boneTransform; }
+    const ModelSceneNode *model() const { return _model; }
 
-    void setBoneTransform(glm::mat4 transform) { _boneTransform = std::move(transform); }
     void setDiffuseTexture(const std::shared_ptr<graphics::Texture> &texture);
     void setAlpha(float alpha) { _alpha = alpha; }
     void setSelfIllumColor(glm::vec3 color) { _selfIllumColor = std::move(color); }
+    void setAppliedForce(glm::vec3 force);
 
 private:
     struct NodeTextures {
@@ -69,17 +62,15 @@ private:
         glm::vec3 stride { 0.0f }; /**< how far have vertices traveled from the rest position? */
     } _danglymeshAnimation;
 
-    const ModelSceneNode *_modelSceneNode;
-    const graphics::ModelNode *_modelNode;
+    const ModelSceneNode *_model;
 
     graphics::Material _material;
-    glm::mat4 _animTransform { 1.0f };
-    glm::mat4 _boneTransform { 1.0f };
     glm::vec2 _uvOffset { 0.0f };
     float _bumpmapTime { 0.0f };
     int _bumpmapFrame { 0 };
     float _alpha { 1.0f };
     glm::vec3 _selfIllumColor { 0.0f };
+    bool _transparent { false };
 
     void initTextures();
 
@@ -87,6 +78,14 @@ private:
     void refreshAdditionalTextures();
 
     bool isLightingEnabled() const;
+
+    // Animation
+
+    void updateUVAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
+    void updateBumpmapAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
+    void updateDanglyMeshAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
+
+    // END Animation
 };
 
 } // namespace scene

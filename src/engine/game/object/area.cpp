@@ -117,16 +117,16 @@ void Area::loadLYT() {
         if (!model) continue;
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
-        shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Wok));
 
-        auto sceneNode = make_shared<ModelSceneNode>(ModelUsage::Room, model, &_game->sceneGraph());
-        sceneNode->setWalkmesh(walkmesh);
+        auto sceneNode = make_shared<ModelSceneNode>(model, ModelUsage::Room, &_game->sceneGraph());
         sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {
-                sceneNode->animator().playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
+                sceneNode->playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
             }
         }
+
+        shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Wok));
 
         auto room = make_unique<Room>(lytRoom.name, position, sceneNode, walkmesh);
         _rooms.insert(make_pair(room->name(), move(room)));
@@ -181,20 +181,20 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
 
     SceneGraph *sceneGraph = &_game->sceneGraph();
 
-    _firstPersonCamera = make_unique<FirstPersonCamera>(sceneGraph, _cameraAspect, glm::radians(kDefaultFieldOfView));
+    _firstPersonCamera = make_unique<FirstPersonCamera>(_cameraAspect, glm::radians(kDefaultFieldOfView), sceneGraph);
     _firstPersonCamera->setPosition(position);
     _firstPersonCamera->setFacing(entryFacing);
 
-    _thirdPersonCamera = make_unique<ThirdPersonCamera>(_game, sceneGraph, _cameraAspect, _camStyleDefault);
+    _thirdPersonCamera = make_unique<ThirdPersonCamera>(_cameraAspect, _camStyleDefault, _game, sceneGraph);
     _thirdPersonCamera->setFindObstacle(bind(&Area::getCameraObstacle, this, _1, _2, _3));
     _thirdPersonCamera->setTargetPosition(position);
     _thirdPersonCamera->setFacing(entryFacing);
 
-    _dialogCamera = make_unique<DialogCamera>(sceneGraph, _camStyleDefault, _cameraAspect);
+    _dialogCamera = make_unique<DialogCamera>(_cameraAspect, _camStyleDefault, sceneGraph);
     _dialogCamera->setFindObstacle(bind(&Area::getCameraObstacle, this, _1, _2, _3));
 
-    _animatedCamera = make_unique<AnimatedCamera>(sceneGraph, _cameraAspect);
-    _staticCamera = make_unique<StaticCamera>(sceneGraph, _cameraAspect);
+    _animatedCamera = make_unique<AnimatedCamera>(_cameraAspect, sceneGraph);
+    _staticCamera = make_unique<StaticCamera>(_cameraAspect, sceneGraph);
 }
 
 void Area::add(const shared_ptr<SpatialObject> &object) {
@@ -232,7 +232,7 @@ void Area::doDestroyObject(uint32_t objectId) {
         }
     }
     {
-        shared_ptr<ModelSceneNode> sceneNode(object->getModelSceneNode());
+        auto sceneNode = object->sceneNode();
         if (sceneNode) {
             _game->sceneGraph().removeRoot(sceneNode);
         }
@@ -358,10 +358,12 @@ bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
 }
 
 void Area::printDebugInfo(const SpatialObject &object) {
+    auto model = static_pointer_cast<ModelSceneNode>(object.sceneNode());
+
     ostringstream ss;
     ss << boost::format("tag='%s'") % object.tag();
     ss << boost::format(",pos=[%0.2f,%0.2f,%0.2f]") % object.position().x % object.position().y % object.position().z;
-    ss << boost::format(",model='%s'") % object.getModelSceneNode()->getName();
+    ss << boost::format(",model='%s'") % model->model()->name();
 
     debug("Selected object: " + ss.str());
 }
@@ -528,7 +530,7 @@ void Area::fill(SceneGraph &sceneGraph) {
         shared_ptr<ModelNode> aabbNode(sceneNode->model()->getAABBNode());
         if (aabbNode && _grass.texture) {
             glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), room.second->position()));
-            auto grass = make_shared<GrassSceneNode>(&sceneGraph, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap);
+            auto grass = make_shared<GrassSceneNode>(room.first, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap, &sceneGraph);
             for (auto &material : Surfaces::instance().getGrassSurfaceIndices()) {
                 for (auto &face : aabbNode->getFacesByMaterial(material)) {
                     vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getTriangleCoords(face));
@@ -537,7 +539,7 @@ void Area::fill(SceneGraph &sceneGraph) {
                         glm::vec3 baryPosition(getRandomBarycentric());
                         glm::vec3 position(aabbTransform * glm::vec4(barycentricToCartesian(vertices[0], vertices[1], vertices[2], baryPosition), 1.0f));
                         glm::vec2 lightmapUV(aabbNode->mesh()->mesh->getTriangleTexCoords2(face, baryPosition));
-                        GrassCluster cluster;
+                        GrassSceneNode::Cluster cluster;
                         cluster.position = move(position);
                         cluster.variant = getRandomGrassVariant();
                         cluster.lightmapUV = move(lightmapUV);
@@ -644,13 +646,14 @@ void Area::update3rdPersonCameraTarget() {
     shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
     if (!partyLeader) return;
 
-    glm::vec3 position;
+    glm::vec3 position(partyLeader->position());
 
-    if (partyLeader->getModelSceneNode()->getNodeAbsolutePosition("camerahook", position)) {
-        position += partyLeader->position();
-    } else {
-        position = partyLeader->position();
+    auto model = static_pointer_cast<ModelSceneNode>(partyLeader->sceneNode());
+    shared_ptr<ModelNode> cameraHook(model->model()->getNodeByName("camerahook"));
+    if (cameraHook) {
+        position += cameraHook->restPosition();
     }
+
     _thirdPersonCamera->setTargetPosition(position);
 }
 
@@ -832,7 +835,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
     auto spatial = dynamic_pointer_cast<SpatialObject>(object);
     if (spatial) {
         add(spatial);
-        auto model = spatial->getModelSceneNode();
+        auto model = spatial->sceneNode();
         if (model) {
             _game->sceneGraph().addRoot(model);
         }

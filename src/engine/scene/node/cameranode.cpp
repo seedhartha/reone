@@ -27,27 +27,21 @@ namespace reone {
 
 namespace scene {
 
-CameraSceneNode::CameraSceneNode(SceneGraph *sceneGraph, glm::mat4 projection, float aspect, float nearPlane, float farPlane) :
-    SceneNode(SceneNodeType::Camera, sceneGraph),
-    _projection(projection),
-    _aspect(aspect),
-    _nearPlane(nearPlane),
-    _farPlane(farPlane) {
-
-    updateFrustum();
+CameraSceneNode::CameraSceneNode(string name, glm::mat4 projection, SceneGraph *sceneGraph) :
+    SceneNode(move(name), SceneNodeType::Camera, sceneGraph),
+    _projection(projection) {
 }
 
-void CameraSceneNode::updateAbsoluteTransform() {
-    SceneNode::updateAbsoluteTransform();
-    updateView();
-    updateFrustum();
+void CameraSceneNode::onAbsoluteTransformChanged() {
+    computeView();
+    computeFrustumPlanes();
 }
 
-void CameraSceneNode::updateView() {
-    _view = glm::inverse(_absoluteTransform);
+void CameraSceneNode::computeView() {
+    _view = _absTransformInv;
 }
 
-void CameraSceneNode::updateFrustum() {
+void CameraSceneNode::computeFrustumPlanes() {
     // Implementation of http://www.cs.otago.ac.nz/postgrads/alexis/planeExtraction.pdf
 
     glm::mat4 vp(_projection * _view);
@@ -111,9 +105,9 @@ bool CameraSceneNode::isInFrustum(const SceneNode &other) const {
         isInFrustum(other.absoluteTransform()[3]);
 }
 
-void CameraSceneNode::setProjection(const glm::mat4 &projection) {
-    _projection = projection;
-    updateFrustum();
+void CameraSceneNode::setProjection(glm::mat4 projection) {
+    _projection = move(projection);
+    computeFrustumPlanes();
 }
 
 } // namespace scene

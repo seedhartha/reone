@@ -29,19 +29,15 @@
 #include "../graphics/shader/shaders.h"
 #include "../graphics/types.h"
 
-#include "grasscluster.h"
+#include "node/cameranode.h"
+#include "node/emitternode.h"
+#include "node/grassnode.h"
+#include "node/lightnode.h"
+#include "node/meshnode.h"
 
 namespace reone {
 
 namespace scene {
-
-class CameraSceneNode;
-class EmitterSceneNode;
-class GrassSceneNode;
-class LightSceneNode;
-class MeshSceneNode;
-class Particle;
-class SceneNode;
 
 /**
  * Responsible for managing drawable objects and their relations.
@@ -125,8 +121,8 @@ private:
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
     std::vector<GrassSceneNode *> _grass;
-    std::vector<std::pair<EmitterSceneNode *, std::vector<Particle *>>> _particles;
-    std::vector<std::pair<GrassSceneNode *, std::vector<GrassCluster>>> _grassClusters;
+    std::vector<std::pair<EmitterSceneNode *, std::vector<EmitterSceneNode::Particle *>>> _particles;
+    std::vector<std::pair<GrassSceneNode *, std::vector<GrassSceneNode::Cluster>>> _grassClusters;
 
     uint32_t _textureId { 0 };
     bool _updateRoots { true };
@@ -164,7 +160,7 @@ private:
     void prepareParticles();
     void prepareGrass();
 
-    inline void flushEmitterParticles(EmitterSceneNode *emitter, std::vector<Particle *> &particles);
+    inline void flushEmitterParticles(EmitterSceneNode *emitter, std::vector<EmitterSceneNode::Particle *> &particles);
 };
 
 } // namespace scene

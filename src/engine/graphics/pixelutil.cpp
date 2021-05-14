@@ -45,10 +45,6 @@ uint32_t getInternalPixelFormatGL(PixelFormat format) {
             return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
         case PixelFormat::Depth:
             return GL_DEPTH_COMPONENT;
-        case PixelFormat::RG16F:
-            return GL_RG16F;
-        case PixelFormat::RGB16F:
-            return GL_RGB16F;
         default:
             throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(format)));
     }

@@ -163,7 +163,7 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/font.h
     src/engine/graphics/fonts.h
     src/engine/graphics/framebuffer.h
-    src/engine/graphics/lip/lipanimation.h
+    src/engine/graphics/lip/animation.h
     src/engine/graphics/lip/lipreader.h
     src/engine/graphics/lip/lips.h
     src/engine/graphics/lip/lipwriter.h
@@ -205,7 +205,7 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/font.cpp
     src/engine/graphics/fonts.cpp
     src/engine/graphics/framebuffer.cpp
-    src/engine/graphics/lip/lipanimation.cpp
+    src/engine/graphics/lip/animation.cpp
     src/engine/graphics/lip/lipreader.cpp
     src/engine/graphics/lip/lips.cpp
     src/engine/graphics/lip/lipwriter.cpp
@@ -289,36 +289,33 @@ set_target_properties(libvideo PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINAR
 ## libscene static library
 
 set(SCENE_HEADERS
-    src/engine/scene/animation/eventlistener.h
-    src/engine/scene/animation/channel.h
-    src/engine/scene/animation/properties.h
-    src/engine/scene/animation/scenenodeanimator.h
-    src/engine/scene/animation/scenenodestate.h
-    src/engine/scene/grasscluster.h
+    src/engine/scene/animeventlistener.h
+    src/engine/scene/animproperties.h
     src/engine/scene/node/cameranode.h
+    src/engine/scene/node/dummynode.h
     src/engine/scene/node/emitternode.h
     src/engine/scene/node/grassnode.h
     src/engine/scene/node/lightnode.h
     src/engine/scene/node/meshnode.h
     src/engine/scene/node/modelnode.h
+    src/engine/scene/node/modelnodescenenode.h
     src/engine/scene/node/scenenode.h
-    src/engine/scene/particle.h
     src/engine/scene/pipeline/control.h
     src/engine/scene/pipeline/world.h
     src/engine/scene/scenegraph.h
     src/engine/scene/types.h)
 
 set(SCENE_SOURCES
-    src/engine/scene/animation/channel.cpp
-    src/engine/scene/animation/scenenodeanimator.cpp
     src/engine/scene/node/cameranode.cpp
     src/engine/scene/node/emitternode.cpp
+    src/engine/scene/node/emitternode_particle.cpp
     src/engine/scene/node/grassnode.cpp
     src/engine/scene/node/lightnode.cpp
     src/engine/scene/node/meshnode.cpp
     src/engine/scene/node/modelnode.cpp
+    src/engine/scene/node/modelnode_animation.cpp
+    src/engine/scene/node/modelnodescenenode.cpp
     src/engine/scene/node/scenenode.cpp
-    src/engine/scene/particle.cpp
     src/engine/scene/pipeline/control.cpp
     src/engine/scene/pipeline/world.cpp
     src/engine/scene/scenegraph.cpp)

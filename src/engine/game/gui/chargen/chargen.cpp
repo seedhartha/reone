@@ -377,11 +377,11 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
     creature->setAppearance(_character.appearance);
     creature->equip("g_a_clothes01");
     creature->loadAppearance();
-    creature->getModelSceneNode()->setCullable(false);
+    creature->sceneNode()->setCullable(false);
     creature->updateModelAnimation();
 
-    auto model = make_shared<ModelSceneNode>(ModelUsage::GUI, Models::instance().get("cgbody_light"), &sceneGraph);
-    model->attach("cgbody_light", creature->getModelSceneNode());
+    auto model = make_shared<ModelSceneNode>(Models::instance().get("cgbody_light"), ModelUsage::GUI, &sceneGraph);
+    model->attach("cgbody_light", creature->sceneNode());
 
     return move(model);
 }

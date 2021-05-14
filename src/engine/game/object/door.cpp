@@ -68,7 +68,7 @@ void Door::loadFromBlueprint(const string &resRef) {
     shared_ptr<TwoDA> doors(Resources::instance().get2DA("genericdoors"));
     string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
-    auto model = make_unique<ModelSceneNode>(ModelUsage::Door, Models::instance().get(modelName), _sceneGraph);
+    auto model = make_unique<ModelSceneNode>(Models::instance().get(modelName), ModelUsage::Door, _sceneGraph);
     model->setCullable(true);
     model->setDrawDistance(FLT_MAX);
     _sceneNode = move(model);
@@ -93,19 +93,19 @@ bool Door::isSelectable() const {
 }
 
 void Door::open(const shared_ptr<Object> &triggerrer) {
-    shared_ptr<ModelSceneNode> model(getModelSceneNode());
+    auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
     if (model) {
-        model->animator().setDefaultAnimation("opened1", AnimationProperties::fromFlags(AnimationFlags::loop));
-        model->animator().playAnimation("opening1");
+        //model->setDefaultAnimation("opened1", AnimationProperties::fromFlags(AnimationFlags::loop));
+        model->playAnimation("opening1");
     }
     _open = true;
 }
 
 void Door::close(const shared_ptr<Object> &triggerrer) {
-    shared_ptr<ModelSceneNode> model(getModelSceneNode());
+    auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
     if (model) {
-        model->animator().setDefaultAnimation("closed", AnimationProperties::fromFlags(AnimationFlags::loop));
-        model->animator().playAnimation("closing1");
+        //model->setDefaultAnimation("closed", AnimationProperties::fromFlags(AnimationFlags::loop));
+        model->playAnimation("closing1");
     }
     _open = false;
 }

@@ -17,91 +17,148 @@
 
 #pragma once
 
+#include <cstdint>
 #include <set>
 #include <unordered_map>
 
+#include "../../graphics/lip/animation.h"
 #include "../../graphics/model/model.h"
-#include "../../graphics/shader/shaders.h"
-#include "../../graphics/walkmesh/walkmesh.h"
 
-#include "../animation/eventlistener.h"
-#include "../animation/scenenodeanimator.h"
+#include "../animeventlistener.h"
+#include "../animproperties.h"
 #include "../types.h"
 
-#include "scenenode.h"
+#include "dummynode.h"
+#include "emitternode.h"
+#include "lightnode.h"
+#include "meshnode.h"
 
 namespace reone {
 
 namespace scene {
 
-class EmitterSceneNode;
-class LightSceneNode;
-class MeshSceneNode;
+constexpr float kDefaultDrawDistance = 1024.0f;
+constexpr int kNumAnimationChannels = 8;
 
 class ModelSceneNode : public SceneNode {
 public:
     ModelSceneNode(
+        std::shared_ptr<graphics::Model> model,
         ModelUsage usage,
-        const std::shared_ptr<graphics::Model> &model,
         SceneGraph *sceneGraph,
-        std::set<std::string> ignoreNodes = std::set<std::string>(),
         IAnimationEventListener *animEventListener = nullptr);
 
     void update(float dt) override;
-    void draw() override;
 
     void computeAABB();
     void signalEvent(const std::string &name);
+
+    std::shared_ptr<ModelNodeSceneNode> getNodeById(uint16_t nodeId) const;
+
+    std::shared_ptr<graphics::Model> model() const { return _model; }
+    ModelUsage usage() const { return _usage; }
+    float drawDistance() const { return _drawDistance; }
+
+    void setDrawDistance(float distance) { _drawDistance = distance; }
+    void setDiffuseTexture(std::shared_ptr<graphics::Texture> texture);
     void setAppliedForce(glm::vec3 force);
 
-    MeshSceneNode *getModelNode(const std::string &name) const;
-    MeshSceneNode *getModelNodeById(uint16_t nodeId) const;
-    LightSceneNode *getLightNodeById(uint16_t nodeId) const;
-    std::shared_ptr<ModelSceneNode> getAttachedModel(const std::string &parent) const;
-    bool getNodeAbsolutePosition(const std::string &name, glm::vec3 &position) const;
-    glm::vec3 getWorldCenterAABB() const;
-    const std::string &getName() const;
+    // Animation
 
-    ModelUsage usage() const { return _usage; }
-    std::shared_ptr<graphics::Model> model() const { return _model; }
-    std::shared_ptr<graphics::Walkmesh> walkmesh() const { return _walkmesh; }
-    float alpha() const { return _alpha; }
-    float projectileSpeed() const { return _projectileSpeed; }
-    SceneNodeAnimator &animator() { return _animator; }
+    void playAnimation(const std::string &name, AnimationProperties properties = AnimationProperties());
+    void playAnimation(std::shared_ptr<graphics::Animation> anim, std::shared_ptr<graphics::LipAnimation> lipAnim = nullptr, AnimationProperties properties = AnimationProperties());
 
-    void setVisible(bool visible) override;
-    void setDiffuseTexture(const std::shared_ptr<graphics::Texture> &texture);
-    void setAlpha(float alpha);
-    void setProjectileSpeed(float speed) { _projectileSpeed = speed; }
-    void setWalkmesh(std::shared_ptr<graphics::Walkmesh> walkmesh) { _walkmesh = std::move(walkmesh); }
+    bool isAnimationFinished() const;
+
+    void setInanimateNodes(std::set<uint16_t> nodes) { _inanimateNodes = std::move(nodes); }
+
+    // END Animation
 
     // Attachments
 
-    std::shared_ptr<ModelSceneNode> attach(const std::string &parent, const std::shared_ptr<graphics::Model> &model, ModelUsage usage);
-    std::shared_ptr<ModelSceneNode> attach(MeshSceneNode &parent, const std::shared_ptr<graphics::Model> &model, ModelUsage usage);
-    void attach(const std::string &parent, const std::shared_ptr<SceneNode> &node);
+    void attach(uint16_t parentId, std::shared_ptr<SceneNode> node);
+    void attach(const std::string &parentName, std::shared_ptr<SceneNode> node);
+
+    std::shared_ptr<SceneNode> getAttachment(const std::string &parentName) const;
 
     // END Attachments
 
 private:
+    enum class AnimationBlendMode {
+        Single,
+        Blend,
+        Overlay
+    };
+
+    struct AnimationStateFlags {
+        static constexpr int transform = 1;
+        static constexpr int alpha = 2;
+        static constexpr int selfIllumColor = 4;
+    };
+
+    struct AnimationState {
+        int flags { 0 };
+        glm::mat4 transform { 1.0f };
+        float alpha { 0.0f };
+        glm::vec3 selfIllumColor { 0.0f };
+    };
+
+    struct AnimationChannel {
+        std::shared_ptr<graphics::Animation> anim;
+        std::shared_ptr<graphics::LipAnimation> lipAnim;
+        AnimationProperties properties;
+        float time { 0.0f };
+        std::unordered_map<uint16_t, AnimationState> stateById;
+
+        // Flags
+
+        bool finished { false }; /**< channel contains a fire-and-forget animation that has finished playing */
+        bool transition { false }; /**< when computing states, use animation transition time as channel time */
+        bool freeze { false }; /**< channel time is not to be updated */
+
+        // END Flags
+    };
+
+    std::shared_ptr<graphics::Model> _model;
+    ModelUsage _usage;
     IAnimationEventListener *_animEventListener;
 
-    ModelUsage _usage;
-    std::shared_ptr<graphics::Model> _model;
-    std::shared_ptr<graphics::Walkmesh> _walkmesh;
-    SceneNodeAnimator _animator;
+    float _drawDistance { kDefaultDrawDistance };
 
-    std::unordered_map<uint16_t, MeshSceneNode *> _modelNodeById;
-    std::unordered_map<uint16_t, LightSceneNode *> _lightNodeById;
-    std::vector<std::shared_ptr<EmitterSceneNode>> _emitters;
-    std::unordered_map<uint16_t, std::shared_ptr<ModelSceneNode>> _attachedModels;
-    bool _visible { true };
-    float _alpha { 1.0f };
-    float _projectileSpeed { 0.0f };
+    // Lookups
 
-    void initModelNodes();
+    std::unordered_map<uint16_t, std::shared_ptr<ModelNodeSceneNode>> _nodeById;
+    std::unordered_map<uint16_t, std::shared_ptr<SceneNode>> _attachmentByNodeId;
 
-    std::unique_ptr<MeshSceneNode> getModelNodeSceneNode(graphics::ModelNode &node) const;
+    // END Lookups
+
+    // Animation
+
+    AnimationChannel _animChannels[kNumAnimationChannels];
+    AnimationBlendMode _animBlendMode { AnimationBlendMode::Single };
+    std::set<uint16_t> _inanimateNodes; /**< node identifiers that are not to be animated */
+
+    // END Animation
+
+    void buildNodeTree(std::shared_ptr<graphics::ModelNode> node, SceneNode *parent);
+
+    std::unique_ptr<DummySceneNode> newDummySceneNode(std::shared_ptr<graphics::ModelNode> node) const;
+    std::unique_ptr<MeshSceneNode> newMeshSceneNode(std::shared_ptr<graphics::ModelNode> node) const;
+    std::unique_ptr<LightSceneNode> newLightSceneNode(std::shared_ptr<graphics::ModelNode> node) const;
+    std::unique_ptr<EmitterSceneNode> newEmitterSceneNode(std::shared_ptr<graphics::ModelNode> node) const;
+
+    // Animation
+
+    void resetAnimationChannel(AnimationChannel &channel, std::shared_ptr<graphics::Animation> anim = nullptr, std::shared_ptr<graphics::LipAnimation> lipAnim = nullptr, AnimationProperties properties = AnimationProperties());
+    void updateAnimations(float dt);
+    void updateAnimationChannel(AnimationChannel &channel, float dt);
+    void computeAnimationStates(AnimationChannel &channel, float time, const graphics::ModelNode &modelNode);
+    void applyAnimationStates(const graphics::ModelNode &modelNode);
+    void computeBoneTransforms();
+
+    static AnimationBlendMode getAnimationBlendMode(int flags);
+
+    // END Animation
 };
 
 } // namespace scene

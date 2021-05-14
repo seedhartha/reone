@@ -106,17 +106,17 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
     creature->setAppearance(getAppearanceFromCurrentPortrait());
     creature->equip("g_a_clothes01");
     creature->loadAppearance();
-    creature->getModelSceneNode()->setCullable(false);
+    creature->sceneNode()->setCullable(false);
     creature->updateModelAnimation();
 
     // Attach creature model to the root scene node
 
-    shared_ptr<ModelSceneNode> creatureModel(creature->getModelSceneNode());
-    glm::vec3 headPosition;
-    if (creatureModel->getNodeAbsolutePosition("camerahook", headPosition)) {
-        creature->setPosition(glm::vec3(0.0f, 0.0f, -headPosition.z));
+    auto creatureModel = static_pointer_cast<ModelSceneNode>(creature->sceneNode());
+    shared_ptr<ModelNode> cameraHook(creatureModel->model()->getNodeByName("camerahook"));
+    if (cameraHook) {
+        creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->restPosition().z));
     }
-    auto model = make_shared<ModelSceneNode>(ModelUsage::GUI, Models::instance().get("cghead_light"), &sceneGraph);
+    auto model = make_shared<ModelSceneNode>(Models::instance().get("cghead_light"), ModelUsage::GUI, &sceneGraph);
     model->attach("cghead_light", creatureModel);
 
 

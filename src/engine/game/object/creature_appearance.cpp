@@ -42,15 +42,17 @@ namespace game {
 
 static const string g_headHookNode("headhook");
 static const string g_maskHookNode("gogglehook");
+static const string g_rightHandNode("rhand");
+static const string g_leftHandNode("lhand");
 
 shared_ptr<ModelSceneNode> Creature::buildModel() {
-    string modelName(getBodyModelName());
-    if (modelName.empty()) return nullptr;
+    string bodyModelName(getBodyModelName());
+    if (bodyModelName.empty()) return nullptr;
 
-    shared_ptr<Model> model(Models::instance().get(modelName));
-    if (!model) return nullptr;
+    shared_ptr<Model> bodyModel(Models::instance().get(bodyModelName));
+    if (!bodyModel) return nullptr;
 
-    auto modelSceneNode = make_unique<ModelSceneNode>(ModelUsage::Creature, model, _sceneGraph, set<string>(), this);
+    auto bodySceneNode = make_unique<ModelSceneNode>(bodyModel, ModelUsage::Creature, _sceneGraph, this);
 
     // Body texture
 
@@ -58,7 +60,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!bodyTextureName.empty()) {
         shared_ptr<Texture> texture(Textures::instance().get(bodyTextureName, TextureUsage::Diffuse));
         if (texture) {
-            modelSceneNode->setDiffuseTexture(texture);
+            bodySceneNode->setDiffuseTexture(texture);
         }
     }
 
@@ -76,20 +78,16 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!headModelName.empty()) {
         shared_ptr<Model> headModel(Models::instance().get(headModelName));
         if (headModel) {
-            shared_ptr<ModelSceneNode> headSceneNode(modelSceneNode->attach(g_headHookNode, headModel, ModelUsage::Creature));
-            if (headSceneNode && maskModel) {
-                headSceneNode->attach(g_maskHookNode, maskModel, ModelUsage::Equipment);
+            shared_ptr<ModelNode> headHook(bodyModel->getNodeByName(g_headHookNode));
+            if (headHook) {
+                auto headSceneNode = make_shared<ModelSceneNode>(headModel, ModelUsage::Creature, _sceneGraph, this);
+                headSceneNode->setInanimateNodes(bodyModel->getAncestorNodes(headHook->id()));
+                bodySceneNode->attach(headHook->id(), headSceneNode);
+                if (maskModel) {
+                    auto maskSceneNode = make_shared<ModelSceneNode>(maskModel, ModelUsage::Equipment, _sceneGraph, this);
+                    headSceneNode->attach(g_maskHookNode, maskSceneNode);
+                }
             }
-        }
-    }
-
-    // Left weapon
-
-    string leftWeaponModelName(getWeaponModelName(InventorySlot::leftWeapon));
-    if (!leftWeaponModelName.empty()) {
-        shared_ptr<Model> leftWeaponModel(Models::instance().get(leftWeaponModelName));
-        if (leftWeaponModel) {
-            modelSceneNode->attach("lhand", leftWeaponModel, ModelUsage::Equipment);
         }
     }
 
@@ -97,13 +95,25 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
 
     string rightWeaponModelName(getWeaponModelName(InventorySlot::rightWeapon));
     if (!rightWeaponModelName.empty()) {
-        shared_ptr<Model> rightWeaponModel(Models::instance().get(rightWeaponModelName));
-        if (rightWeaponModel) {
-            modelSceneNode->attach("rhand", rightWeaponModel, ModelUsage::Equipment);
+        shared_ptr<Model> weaponModel(Models::instance().get(rightWeaponModelName));
+        if (weaponModel) {
+            auto weaponSceneNode = make_shared<ModelSceneNode>(weaponModel, ModelUsage::Equipment, _sceneGraph, this);
+            bodySceneNode->attach(g_rightHandNode, move(weaponSceneNode));
         }
     }
 
-    return move(modelSceneNode);
+    // Left weapon
+
+    string leftWeaponModelName(getWeaponModelName(InventorySlot::leftWeapon));
+    if (!leftWeaponModelName.empty()) {
+        shared_ptr<Model> weaponModel(Models::instance().get(leftWeaponModelName));
+        if (weaponModel) {
+            auto weaponSceneNode = make_shared<ModelSceneNode>(weaponModel, ModelUsage::Equipment, _sceneGraph, this);
+            bodySceneNode->attach(g_leftHandNode, move(weaponSceneNode));
+        }
+    }
+
+    return move(bodySceneNode);
 }
 
 string Creature::getBodyModelName() const {

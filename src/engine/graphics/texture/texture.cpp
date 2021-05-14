@@ -181,8 +181,6 @@ void Texture::fillTarget(uint32_t target, int level, int width, int height, cons
         case PixelFormat::BGR:
         case PixelFormat::BGRA:
         case PixelFormat::Depth:
-        case PixelFormat::RG16F:
-        case PixelFormat::RGB16F:
             glTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, getPixelFormatGL(), getPixelTypeGL(), pixels);
             break;
         default:
@@ -195,7 +193,6 @@ uint32_t Texture::getPixelFormatGL() const {
         case PixelFormat::Grayscale:
             return GL_RED;
         case PixelFormat::RGB:
-        case PixelFormat::RGB16F:
             return GL_RGB;
         case PixelFormat::RGBA:
         case PixelFormat::DXT1:
@@ -207,8 +204,6 @@ uint32_t Texture::getPixelFormatGL() const {
             return GL_BGRA;
         case PixelFormat::Depth:
             return GL_DEPTH_COMPONENT;
-        case PixelFormat::RG16F:
-            return GL_RG;
         default:
             throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
     }
@@ -223,8 +218,6 @@ uint32_t Texture::getPixelTypeGL() const {
         case PixelFormat::BGRA:
             return GL_UNSIGNED_BYTE;
         case PixelFormat::Depth:
-        case PixelFormat::RG16F:
-        case PixelFormat::RGB16F:
             return GL_FLOAT;
         default:
             throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));

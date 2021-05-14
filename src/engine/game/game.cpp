@@ -729,7 +729,7 @@ void Game::updateSceneGraph(float dt) {
     shared_ptr<SceneNode> lightingRefNode;
     shared_ptr<Creature> partyLeader(_party.getLeader());
     if (partyLeader && _cameraType == CameraType::ThirdPerson) {
-        lightingRefNode = partyLeader->getModelSceneNode();
+        lightingRefNode = partyLeader->sceneNode();
     } else {
         lightingRefNode = camera->sceneNode();
     }

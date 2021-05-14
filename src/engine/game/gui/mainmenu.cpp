@@ -127,9 +127,8 @@ void MainMenu::setup3DView() {
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
-    auto model = make_shared<ModelSceneNode>(ModelUsage::GUI, Models::instance().get("mainmenu"), &sceneGraph);
-    model->animator().playAnimation("default", AnimationProperties::fromFlags(AnimationFlags::loop));
-
+    auto model = make_shared<ModelSceneNode>(Models::instance().get("mainmenu"), ModelUsage::GUI, &sceneGraph);
+    model->playAnimation("default", AnimationProperties::fromFlags(AnimationFlags::loop));
     return move(model);
 }
 

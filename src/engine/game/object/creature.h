@@ -22,11 +22,12 @@
 #include <set>
 
 #include "../../audio/stream.h"
-#include "../../graphics/lip/lipanimation.h"
+#include "../../graphics/lip/animation.h"
 #include "../../resource/format/2dareader.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/types.h"
-#include "../../scene/animation/eventlistener.h"
+#include "../../scene/animeventlistener.h"
+#include "../../scene/node/modelnode.h"
 #include "../../script/types.h"
 
 #include "../d20/attributes.h"
@@ -226,7 +227,6 @@ private:
     Gender _gender { Gender::Male };
     int _appearance { 0 };
     ModelType _modelType { ModelType::Creature };
-    std::shared_ptr<scene::ModelSceneNode> _headModel;
     std::shared_ptr<graphics::Texture> _portrait;
     std::map<int, std::shared_ptr<Item>> _equipment;
     std::shared_ptr<Path> _path;

@@ -15,28 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "modelnodescenenode.h"
 
-#include <memory>
+#include <stdexcept>
 
-#include <boost/filesystem/path.hpp>
+using namespace std;
 
-#include "animation.h"
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace graphics {
+namespace scene {
 
-class LipWriter {
-public:
-    LipWriter(LipAnimation &&animation);
+ModelNodeSceneNode::ModelNodeSceneNode(shared_ptr<ModelNode> modelNode, SceneNodeType type, SceneGraph *sceneGraph) :
+    SceneNode(modelNode->name(), type, sceneGraph),
+    _modelNode(modelNode) {
 
-    void save(const boost::filesystem::path &path);
+    if (!modelNode) {
+        throw invalid_argument("modelNode must not be null");
+    }
+}
 
-private:
-    LipAnimation _animation;
-};
-
-} // namespace graphics
+} // namespace scene
 
 } // namespace reone

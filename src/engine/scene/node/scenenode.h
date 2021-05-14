@@ -18,11 +18,13 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <boost/noncopyable.hpp>
 
 #include "glm/mat4x4.hpp"
+#include "glm/vec3.hpp"
 
 #include "../../graphics/aabb.h"
 
@@ -32,96 +34,96 @@ namespace reone {
 
 namespace scene {
 
-constexpr float kDefaultDrawDistance = 1024.0f;
-
 class SceneGraph;
 
 class SceneNode : boost::noncopyable {
 public:
-    void addChild(const std::shared_ptr<SceneNode> &node);
+    void addChild(std::shared_ptr<SceneNode> node);
     void removeChild(SceneNode &node);
 
     virtual void update(float dt);
-
     virtual void draw();
 
     bool isVisible() const { return _visible; }
-    virtual bool isTransparent() const { return _transparent; }
-    bool isVolumetric() const { return _volumetric; }
     bool isCullable() const { return _cullable; }
     bool isCulled() const { return _culled; }
+    bool isVolumetric() const { return _volumetric; }
 
-    virtual glm::vec3 getOrigin() const;
+    glm::vec3 getOrigin() const;
 
     /**
-     * @return distance from the origin of this node to the point
+     * @return distance from the origin of this node to the specified point
      */
     float getDistanceTo(const glm::vec3 &point) const;
 
     /**
-     * @return squared distance from the origin of this node to the point
+     * @return squared distance from the origin of this node to the specified point
      */
     float getDistanceTo2(const glm::vec3 &point) const;
 
     /**
-     * @return shortest distance from the origin of this node to the other node
+     * @return distance between origins of this and the specified node
      */
     float getDistanceTo(const SceneNode &other) const;
 
     /**
-     * @return shortest distance (squared) from the origin of this node to the other node
+     * @return squared distance between origins of this and the specified node
      */
     float getDistanceTo2(const SceneNode &other) const;
 
+    glm::vec3 getWorldCenterOfAABB() const;
+
+    const std::string &name() const { return _name; }
     SceneNodeType type() const { return _type; }
     const SceneNode *parent() const { return _parent; }
-    const glm::mat4 &localTransform() const { return _localTransform; }
-    const glm::mat4 &absoluteTransform() const { return _absoluteTransform; }
-    const glm::mat4 &absoluteTransformInverse() const { return _absoluteTransformInv; }
-    const graphics::AABB &aabb() const { return _aabb; }
     const std::vector<std::shared_ptr<SceneNode>> &children() const { return _children; }
-    float drawDistance() const { return _drawDistance; }
+    const graphics::AABB &aabb() const { return _aabb; }
 
-    void setParent(const SceneNode *parent);
-    virtual void setLocalTransform(const glm::mat4 &transform);
-    void setPosition(glm::vec3 position);
-    virtual void setVisible(bool visible);
-    void setTransparent(bool transparent);
-    void setDrawDistance(float distance) { _drawDistance = distance; }
+    void setVisible(bool visible) { _visible = visible; }
     void setCullable(bool cullable) { _cullable = cullable; }
     void setCulled(bool culled) { _culled = culled; }
 
+    // Transformations
+
+    const glm::mat4 &localTransform() const { return _localTransform; }
+    const glm::mat4 &absoluteTransform() const { return _absTransform; }
+    const glm::mat4 &absoluteTransformInverse() const { return _absTransformInv; }
+
+    void setLocalTransform(glm::mat4 transform);
+
+    // END Transformations
+
 protected:
+    std::string _name;
     SceneNodeType _type;
     SceneGraph *_sceneGraph;
 
     graphics::AABB _aabb;
-    float _drawDistance { kDefaultDrawDistance };
-
-    bool _visible { true };
-    bool _transparent { false };
-    bool _volumetric { false }; /**< does this model have a bounding box, or is it a point? */
-    bool _cullable { false }; /**< can this model be frustum- or distance-culled? */
-    bool _culled { false }; /**< has this model been frustum- or distance-culled? */
-
-    // Relations
-
     const SceneNode *_parent { nullptr };
     std::vector<std::shared_ptr<SceneNode>> _children;
 
-    // END Relations
-
-    // Transformation matrices
+    // Transformations
 
     glm::mat4 _localTransform { 1.0f };
-    glm::mat4 _absoluteTransform { 1.0f };
-    glm::mat4 _absoluteTransformInv { 1.0f };
+    glm::mat4 _absTransform { 1.0f };
+    glm::mat4 _absTransformInv { 1.0f };
 
-    // END Transformation matrices
+    // END Transformations
 
-    SceneNode(SceneNodeType type, SceneGraph *sceneGraph);
+    // Flags
 
-    virtual void updateAbsoluteTransform();
+    bool _visible { true };
+    bool _cullable { false }; /**< can this scene node be frustum- or distance-culled? */
+    bool _culled { false }; /**< has this scene node been frustum- or distance-culled? */
+    bool _volumetric { false }; /**< does this scene node have a bounding box? */
+
+    // END Flags
+
+    SceneNode(std::string name, SceneNodeType type, SceneGraph *sceneGraph);
+
+    void computeAbsoluteTransforms();
+
+    virtual void onAbsoluteTransformChanged() { }
 };
 
 } // namespace scene

@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "scenenode.h"
-
 #include <vector>
 
 #include "glm/vec3.hpp"
@@ -26,7 +24,7 @@
 #include "../../common/timer.h"
 #include "../../graphics/model/modelnode.h"
 
-#include "../particle.h"
+#include "modelnodescenenode.h"
 
 namespace reone {
 
@@ -34,9 +32,28 @@ namespace scene {
 
 class ModelSceneNode;
 
-class EmitterSceneNode : public SceneNode {
+class EmitterSceneNode : public ModelNodeSceneNode {
 public:
-    EmitterSceneNode(const ModelSceneNode *modelSceneNode, const std::shared_ptr<graphics::ModelNode::Emitter> &emitter, SceneGraph *sceneGraph);
+    struct Particle {
+        glm::vec3 position { 0.0f };
+        float velocity { 0.0f };
+        EmitterSceneNode *emitter { nullptr };
+        float animLength { 0.0f };
+        float lifetime { 0.0f };
+        int frame { 0 };
+        float size { 1.0f };
+        glm::vec3 color { 1.0f };
+        float alpha { 1.0f };
+    };
+
+    template <class T>
+    struct Constraints {
+        T start;
+        T mid;
+        T end;
+    };
+
+    EmitterSceneNode(const ModelSceneNode *model, std::shared_ptr<graphics::ModelNode> modelNode, SceneGraph *sceneGraph);
 
     void update(float dt) override;
 
@@ -49,23 +66,43 @@ public:
 
     void detonate();
 
-    std::shared_ptr<graphics::ModelNode::Emitter> emitter() const { return _emitter; }
     const std::vector<std::shared_ptr<Particle>> &particles() const { return _particles; }
 
 private:
-    const ModelSceneNode *_modelSceneNode;
-    std::shared_ptr<graphics::ModelNode::Emitter> _emitter;
+    const ModelSceneNode *_model;
+
+    Constraints<float> _particleSize;
+    Constraints<glm::vec3> _color;
+    Constraints<float> _alpha;
+
+    int _frameStart { 0 };
+    int _frameEnd { 0 };
+    glm::vec2 _size { 0.0f };
+    float _birthrate { 0.0f }; /**< rate of particle birth per second */
+    float _lifeExpectancy { 0.0f }; /**< life of each particle in seconds */
+    float _velocity { 0.0f };
+    float _randomVelocity { 0.0f };
+    float _spread { 0.0f };
+    float _fps { 0.0f };
 
     float _birthInterval { 0.0f };
     Timer _birthTimer;
     std::vector<std::shared_ptr<Particle>> _particles;
     bool _spawned { false };
 
-    void init();
-
     void spawnParticles(float dt);
     void removeExpiredParticles(float dt);
     void doSpawnParticle();
+
+    // Particles
+
+    void initParticle(Particle &particle);
+    void updateParticle(Particle &particle, float dt);
+    void updateParticleAnimation(Particle &particle, float dt);
+
+    bool isParticleExpired(Particle &particle) const;
+
+    // END Particles
 };
 
 } // namespace scene

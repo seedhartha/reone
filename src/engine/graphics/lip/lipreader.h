@@ -19,7 +19,7 @@
 
 #include "../../resource/format/binreader.h"
 
-#include "lipanimation.h"
+#include "animation.h"
 
 namespace reone {
 

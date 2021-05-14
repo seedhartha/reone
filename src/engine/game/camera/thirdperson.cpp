@@ -23,6 +23,7 @@
 
 using namespace std;
 
+using namespace reone::graphics;
 using namespace reone::scene;
 
 namespace reone {
@@ -34,9 +35,9 @@ static constexpr float kMaxRotationSpeed = 2.5f;
 static constexpr float kRotationAcceleration = 1.0f;
 static constexpr float kMouseRotationSpeed = 0.001f;
 
-ThirdPersonCamera::ThirdPersonCamera(Game *game, SceneGraph *sceneGraph, float aspect, const CameraStyle &style, float zNear, float zFar) : _game(game) {
-    glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, zNear, zFar));
-    _sceneNode = make_unique<CameraSceneNode>(sceneGraph, projection, aspect, zNear, zFar);
+ThirdPersonCamera::ThirdPersonCamera(float aspect, const CameraStyle &style, Game *game, SceneGraph *sceneGraph) : _game(game) {
+    glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
+    _sceneNode = make_unique<CameraSceneNode>("", move(projection), sceneGraph);
     _style = style;
 }
 

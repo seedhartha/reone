@@ -76,12 +76,16 @@ void SceneGraph::update(float dt) {
 
 void SceneGraph::cullRoots() {
     for (auto &root : _roots) {
-        bool culled =
-            !root->isVisible() ||
-            root->getDistanceTo2(*_activeCamera) > root->drawDistance() * root->drawDistance() ||
-            (root->isCullable() && !_activeCamera->isInFrustum(*root));
+        if (root->type() != SceneNodeType::Model) continue;
 
-        root->setCulled(culled);
+        auto modelRoot = static_pointer_cast<ModelSceneNode>(root);
+
+        bool culled =
+            !modelRoot->isVisible() ||
+            modelRoot->getDistanceTo2(*_activeCamera) > modelRoot->drawDistance() * modelRoot->drawDistance() ||
+            (modelRoot->isCullable() && !_activeCamera->isInFrustum(*root));
+
+        modelRoot->setCulled(culled);
     }
 }
 
@@ -89,7 +93,7 @@ void SceneGraph::updateLighting() {
     _closestLights.clear();
 
     if (_lightingRefNode) {
-        getLightsAt(*_lightingRefNode, _closestLights, kMaxLights, [](auto &light) { return !light.isAmbientOnly(); });
+        getLightsAt(*_lightingRefNode, _closestLights, kMaxLights, [](auto &light) { return !light.modelNode()->light()->ambientOnly; });
     }
 }
 
@@ -127,7 +131,7 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
             }
             break;
         }
-        case SceneNodeType::ModelNode: {
+        case SceneNodeType::Mesh: {
             // For model nodes, determine whether they should be rendered and cast shadows
             auto modelNode = static_pointer_cast<MeshSceneNode>(node);
             if (modelNode->shouldRender()) {
@@ -168,7 +172,7 @@ void SceneGraph::refreshShadowLight() {
 
     if (_lightingRefNode) {
         vector<LightSceneNode *> lights;
-        getLightsAt(*_lightingRefNode, lights, 1, [](auto &light) { return light.isShadow(); });
+        getLightsAt(*_lightingRefNode, lights, 1, [](auto &light) { return light.modelNode()->light()->shadow; });
 
         if (!lights.empty()) {
             nextShadowLight = lights.front();
@@ -221,11 +225,11 @@ void SceneGraph::prepareParticles() {
     static glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
 
     // Extract particles from all emitters, sort them by depth
-    vector<pair<Particle *, float>> particlesZ;
+    vector<pair<EmitterSceneNode::Particle *, float>> particlesZ;
     for (auto &emitter : _emitters) {
         glm::mat4 modelView(_activeCamera->view() * emitter->absoluteTransform());
         for (auto &particle : emitter->particles()) {
-            glm::vec3 screen(glm::project(particle->position(), modelView, _activeCamera->projection(), viewport));
+            glm::vec3 screen(glm::project(particle->position, modelView, _activeCamera->projection(), viewport));
             if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
                 particlesZ.push_back(make_pair(particle.get(), screen.z));
             }
@@ -238,18 +242,18 @@ void SceneGraph::prepareParticles() {
     // Map (particle, Z) pairs to (emitter, particles)
     _particles.clear();
     EmitterSceneNode *emitter = nullptr;
-    vector<Particle *> emitterParticles;
+    vector<EmitterSceneNode::Particle *> emitterParticles;
     for (auto &pair : particlesZ) {
-        if (pair.first->emitter() != emitter) {
+        if (pair.first->emitter != emitter) {
             flushEmitterParticles(emitter, emitterParticles);
-            emitter = pair.first->emitter();
+            emitter = pair.first->emitter;
         }
         emitterParticles.push_back(pair.first);
     }
     flushEmitterParticles(emitter, emitterParticles);
 }
 
-void SceneGraph::flushEmitterParticles(EmitterSceneNode *emitter, vector<Particle *> &particles) {
+void SceneGraph::flushEmitterParticles(EmitterSceneNode *emitter, vector<EmitterSceneNode::Particle *> &particles) {
     if (emitter && !particles.empty()) {
         _particles.push_back(make_pair(emitter, particles));
         particles.clear();
@@ -266,8 +270,8 @@ void SceneGraph::prepareGrass() {
         float grassDistance2 = kMaxGrassDistance * kMaxGrassDistance;
 
         for (auto &node : _grass) {
-            vector<GrassCluster> clusters;
-            vector<pair<GrassCluster, float>> clustersZ;
+            vector<GrassSceneNode::Cluster> clusters;
+            vector<pair<GrassSceneNode::Cluster, float>> clustersZ;
             for (auto &cluster : node->clusters()) {
                 float distance2 = glm::distance2(cameraPos, cluster.position);
                 if (distance2 <= grassDistance2) {
@@ -303,23 +307,9 @@ void SceneGraph::draw(bool shadowPass) {
         return;
     }
 
-    // Render opaque roots
-    for (auto &root : _roots) {
-        if (!root->isTransparent()) {
-            root->draw();
-        }
-    }
-
     // Render opaque meshes
     for (auto &mesh : _opaqueMeshes) {
         mesh->drawSingle(false);
-    }
-
-    // Render transparent roots
-    for (auto &root : _roots) {
-        if (root->isTransparent()) {
-            root->draw();
-        }
     }
 
     // Render transparent meshes
@@ -340,10 +330,11 @@ void SceneGraph::draw(bool shadowPass) {
     // Render lens flares
     for (auto &light : _lights) {
         // Ignore lights that are too far away or outside of camera frustum
-        if (_activeCamera->getDistanceTo2(*light) > light->flareRadius() * light->flareRadius() ||
+        float flareRadius = light->modelNode()->light()->flareRadius;
+        if (_activeCamera->getDistanceTo2(*light) > flareRadius * flareRadius ||
             !_activeCamera->isInFrustum(light->absoluteTransform()[3])) continue;
 
-        for (auto &flare : light->flares()) {
+        for (auto &flare : light->modelNode()->light()->flares) {
             light->drawLensFlares(flare);
         }
     }
@@ -372,8 +363,11 @@ void SceneGraph::getLightsAt(
 
     // Sort lights by priority and radius
     sort(lights.begin(), lights.end(), [&distances](LightSceneNode *left, LightSceneNode *right) {
-        if (left->priority() < right->priority()) return true;
-        if (left->priority() > right->priority()) return false;
+        int leftPriority = left->modelNode()->light()->priority;
+        int rightPriority = right->modelNode()->light()->priority;
+
+        if (leftPriority < rightPriority) return true;
+        if (leftPriority > rightPriority) return false;
 
         float leftDistance = distances.find(left)->second;
         float rightDistance = distances.find(right)->second;
