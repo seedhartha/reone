@@ -43,6 +43,10 @@ void ModelSceneNode::playAnimation(shared_ptr<Animation> anim, shared_ptr<LipAni
     if (properties.scale == 0.0f) {
         properties.scale = _model->animationScale();
     }
+
+    // Return if same animation is already playing
+    if (!_animChannels.empty() && _animChannels[0].anim == anim && _animChannels[0].lipAnim == lipAnim && _animChannels[0].properties == properties) return;
+
     AnimationBlendMode blendMode = getAnimationBlendMode(properties.flags);
 
     switch (blendMode) {
