@@ -285,6 +285,7 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     if (offMdxTanSpace != -1) {
         attributes.offBitangents = offMdxTanSpace + 0 * sizeof(float);
         attributes.offTangents = offMdxTanSpace + 3 * sizeof(float);
+        attributes.offTanSpaceNormals = offMdxTanSpace + 6 * sizeof(float);
     }
 
     if (flags & NodeFlags::skin) {
