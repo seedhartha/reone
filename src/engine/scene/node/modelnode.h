@@ -54,6 +54,7 @@ public:
     void signalEvent(const std::string &name);
 
     std::shared_ptr<ModelNodeSceneNode> getNodeById(uint16_t nodeId) const;
+    std::shared_ptr<ModelNodeSceneNode> getNodeByName(const std::string &name) const;
 
     std::shared_ptr<graphics::Model> model() const { return _model; }
     ModelUsage usage() const { return _usage; }
@@ -128,6 +129,8 @@ private:
     // Lookups
 
     std::unordered_map<uint16_t, std::shared_ptr<ModelNodeSceneNode>> _nodeById;
+    std::unordered_map<std::string, std::shared_ptr<ModelNodeSceneNode>> _nodeByName;
+
     std::unordered_map<uint16_t, std::shared_ptr<SceneNode>> _attachmentByNodeId;
 
     // END Lookups

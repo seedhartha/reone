@@ -253,12 +253,10 @@ glm::vec3 DialogGUI::getTalkPosition(const SpatialObject &object) const {
     auto model = static_pointer_cast<ModelSceneNode>(object.sceneNode());
     if (!model) return object.position();
 
+    shared_ptr<ModelNode> talkDummy(model->model()->getNodeByNameRecursive("talkdummy"));
+    if (!talkDummy) return model->getWorldCenterOfAABB();
 
-    shared_ptr<ModelNode> talkDummy(model->model()->getNodeByName("talkdummy"));
-
-    return talkDummy ?
-        (object.transform() * talkDummy->absoluteTransform())[3] :
-        model->getWorldCenterOfAABB();
+    return (model->absoluteTransform() * talkDummy->absoluteTransform())[3];
 }
 
 DialogCamera::Variant DialogGUI::getRandomCameraVariant() const {
