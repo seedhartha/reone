@@ -239,7 +239,7 @@ vec3 getNormalFromBumpmap(vec2 uv) {
         result = normalize(result * 2.0 - 1.0);
     }
 
-    result = normalize(fragTanSpace * result);
+    result = normalize(result * fragTanSpace);
     return result;
 }
 
@@ -351,8 +351,9 @@ layout(location = 2) in vec2 aTexCoords;
 layout(location = 3) in vec2 aLightmapCoords;
 layout(location = 4) in vec3 aTangent;
 layout(location = 5) in vec3 aBitangent;
-layout(location = 6) in vec4 aBoneIndices;
-layout(location = 7) in vec4 aBoneWeights;
+layout(location = 6) in vec3 aTanSpaceNormal;
+layout(location = 7) in vec4 aBoneIndices;
+layout(location = 8) in vec4 aBoneWeights;
 
 out vec3 fragPosition;
 out vec3 fragNormal;
@@ -362,8 +363,8 @@ out vec4 fragPosLightSpace;
 out mat3 fragTanSpace;
 
 void main() {
-    vec4 P = vec4(aPosition, 1.0);
-    vec4 N = vec4(aNormal, 0.0);
+    vec4 position = vec4(aPosition, 1.0);
+    vec4 normal = vec4(aNormal, 0.0);
 
     if (isFeatureEnabled(FEATURE_SKELETAL)) {
         int i1 = int(aBoneIndices[0]);
@@ -376,43 +377,43 @@ void main() {
         float w3 = aBoneWeights[2];
         float w4 = aBoneWeights[3];
 
-        P =
-            (uBones[i1] * P) * w1 +
-            (uBones[i2] * P) * w2 +
-            (uBones[i3] * P) * w3 +
-            (uBones[i4] * P) * w4;
+        position =
+            (uBones[i1] * position) * w1 +
+            (uBones[i2] * position) * w2 +
+            (uBones[i3] * position) * w3 +
+            (uBones[i4] * position) * w4;
 
-        N =
-            (uBones[i1] * N) * w1 +
-            (uBones[i2] * N) * w2 +
-            (uBones[i3] * N) * w3 +
-            (uBones[i4] * N) * w4;
+        normal =
+            (uBones[i1] * normal) * w1 +
+            (uBones[i2] * normal) * w2 +
+            (uBones[i3] * normal) * w3 +
+            (uBones[i4] * normal) * w4;
 
     } else if (isFeatureEnabled(FEATURE_DANGLYMESH)) {
         vec3 maxStride = vec3(uDanglymeshDisplacement * uDanglymeshConstraints[gl_VertexID / 4][gl_VertexID % 4]);
         vec3 stride = clamp(uDanglymeshStride.xyz, -maxStride, maxStride);
-        P += vec4(stride, 0.0);
+        position += vec4(stride, 0.0);
     }
 
     mat3 normalMatrix = transpose(inverse(mat3(uGeneral.model)));
-    N = vec4(normalize(normalMatrix * N.xyz), 0.0);
 
-    fragPosition = vec3(uGeneral.model * P);
-    fragNormal = N.xyz;
+    fragPosition = vec3(uGeneral.model * position);
+    fragNormal = normalize(normalMatrix * normal.xyz);
     fragTexCoords = aTexCoords;
     fragLightmapCoords = aLightmapCoords;
+
+    if (isFeatureEnabled(FEATURE_BUMPMAPS)) {
+        vec3 T = normalize(normalMatrix * aTangent);
+        vec3 B = normalize(normalMatrix * aBitangent);
+        vec3 N = normalize(normalMatrix * aTanSpaceNormal);
+        fragTanSpace = transpose(mat3(T, B, N));
+    }
 
     // Compute light space fragment position for directional lights
     if (uShadows.lightPresent && uShadows.lightPosition.w == 0.0) {
         fragPosLightSpace = uShadows.lightSpaceMatrices[0] * vec4(fragPosition, 1.0);
     } else {
         fragPosLightSpace = vec4(0.0);
-    }
-
-    if (isFeatureEnabled(FEATURE_BUMPMAPS)) {
-        vec3 T = normalize(normalMatrix * aTangent);
-        vec3 B = normalize(normalMatrix * aBitangent);
-        fragTanSpace = transpose(mat3(T, B, N));
     }
 
     gl_Position = uGeneral.projection * uGeneral.view * vec4(fragPosition, 1.0);

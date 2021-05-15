@@ -200,7 +200,7 @@ static const vector<uint16_t> g_aabbIndices = {
     6, 0, 0, 3, 3, 5, 5, 6
 };
 
-static const VertexAttributes g_aabbAttributes = { 3 * sizeof(float), 0, -1, -1, -1, -1, -1, -1, -1 };
+static const VertexAttributes g_aabbAttributes = { 3 * sizeof(float), 0 };
 
 // END AABB
 

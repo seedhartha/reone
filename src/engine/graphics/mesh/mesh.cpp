@@ -95,13 +95,17 @@ void Mesh::init() {
         glEnableVertexAttribArray(5);
         glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offBitangents));
     }
-    if (_attributes.offBoneIndices != -1) {
+    if (_attributes.offTanSpaceNormals != -1) {
         glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offBoneIndices));
+        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offTanSpaceNormals));
+    }
+    if (_attributes.offBoneIndices != -1) {
+        glEnableVertexAttribArray(7);
+        glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offBoneIndices));
     }
     if (_attributes.offBoneWeights != -1) {
-        glEnableVertexAttribArray(7);
-        glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offBoneWeights));
+        glEnableVertexAttribArray(8);
+        glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offBoneWeights));
     }
 
     glBindVertexArray(0);
