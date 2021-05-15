@@ -19,6 +19,8 @@
 
 #include <algorithm>
 
+#include "glm/gtx/transform.hpp"
+
 #include "../graphics/mesh/meshes.h"
 
 #include "node/cameranode.h"
@@ -37,6 +39,8 @@ namespace reone {
 namespace scene {
 
 static constexpr float kMaxGrassDistance = 16.0f;
+
+static const bool g_debugAABB = false;
 
 SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
 }
@@ -310,6 +314,19 @@ void SceneGraph::draw(bool shadowPass) {
     // Render opaque meshes
     for (auto &mesh : _opaqueMeshes) {
         mesh->drawSingle(false);
+    }
+
+    if (g_debugAABB) {
+        for (auto &root : _roots) {
+            glm::mat4 transform(root->absoluteTransform());
+            transform *= glm::scale(root->aabb().getSize());
+
+            ShaderUniforms uniforms(_uniformsPrototype);
+            uniforms.combined.general.model = move(transform);
+
+            Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
+            Meshes::instance().getAABB()->draw();
+        }
     }
 
     // Render transparent meshes
