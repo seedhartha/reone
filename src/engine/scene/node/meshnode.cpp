@@ -291,17 +291,15 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         if (mesh->skin) {
             uniforms.combined.featureMask |= UniformFeatureFlags::skeletal;
 
-            for (int i = 0; i < kMaxBones; ++i) {
-                if (i < static_cast<int>(mesh->skin->boneNodeId.size())) {
-                    uint16_t nodeId = mesh->skin->boneNodeId[i];
-                    if (nodeId != 0xffff) {
-                        shared_ptr<ModelNodeSceneNode> bone(_model->getNodeById(nodeId));
-                        if (bone && bone->type() == SceneNodeType::Mesh) {
-                            uniforms.skeletal->bones[i] = _modelNode->absoluteTransformInverse() * bone->boneTransform() * _modelNode->absoluteTransform();
-                        }
+            // Offset bone matrices by 1 to account for negative bone indices
+            uniforms.skeletal->bones[0] = glm::mat4(1.0f);
+            for (size_t i = 1; i < 1 + mesh->skin->boneNodeId.size() && i < kMaxBones; ++i) {
+                uint16_t nodeId = mesh->skin->boneNodeId[i - 1];
+                if (nodeId != 0xffff) {
+                    shared_ptr<ModelNodeSceneNode> bone(_model->getNodeById(nodeId));
+                    if (bone && bone->type() == SceneNodeType::Mesh) {
+                        uniforms.skeletal->bones[i] = _modelNode->absoluteTransformInverse() * bone->boneTransform() * _modelNode->absoluteTransform();
                     }
-                } else {
-                    uniforms.skeletal->bones[i] = glm::mat4(1.0f);
                 }
             }
         }

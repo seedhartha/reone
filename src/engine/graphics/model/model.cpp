@@ -31,14 +31,14 @@ namespace graphics {
 Model::Model(
     string name,
     Classification classification,
-    shared_ptr<Model> superModel,
     shared_ptr<ModelNode> rootNode,
+    shared_ptr<Model> superModel,
     float animationScale
 ) :
     _name(move(name)),
     _classification(classification),
-    _superModel(move(superModel)),
     _rootNode(rootNode),
+    _superModel(move(superModel)),
     _animationScale(animationScale) {
 
     if (!rootNode) {
