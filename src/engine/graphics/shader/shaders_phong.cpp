@@ -74,6 +74,8 @@ void main() {
         vec3 indirect = getLightingIndirect(N);
         vec3 direct = getLightingDirect(N);
         lighting = min(vec3(1.0), indirect + (1.0 - shadow) * direct);
+    } else if (isFeatureEnabled(FEATURE_SELFILLUM)) {
+        lighting = uGeneral.selfIllumColor.rgb;
     } else {
         lighting = vec3(1.0);
     }
