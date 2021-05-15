@@ -51,18 +51,19 @@ EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *model, shared_ptr<Model
     if (!model) {
         throw invalid_argument("model must not be null");
     }
-    _particleSize.start = modelNode->sizeStart().getByFrameOrElse(0, 1.0f);
-    _particleSize.end = modelNode->sizeEnd().getByFrameOrElse(0, 1.0f);
-    _color.start = modelNode->colorStart().getByFrameOrElse(0, glm::vec3(1.0f));
-    _color.mid = modelNode->colorMid().getByFrameOrElse(0, glm::vec3(1.0f));
-    _color.end = modelNode->colorEnd().getByFrameOrElse(0, glm::vec3(1.0f));
-    _alpha.start = modelNode->alphaStart().getByFrameOrElse(0, 1.0f);
-    _alpha.mid = modelNode->alphaMid().getByFrameOrElse(0, 1.0f);
-    _alpha.end = modelNode->alphaEnd().getByFrameOrElse(0, 1.0f);
-    _frameStart = modelNode->frameStart().getByFrameOrElse(0, 0.0f);
-    _frameEnd = modelNode->frameEnd().getByFrameOrElse(0, 0.0f);
-    _size.x = modelNode->xSize().getByFrameOrElse(0, 1.0f);
-    _size.y = modelNode->ySize().getByFrameOrElse(0, 1.0f);
+    _particleSize.start = modelNode->sizeStart().getByFrameOrElse(0, 0.0f);
+    _particleSize.mid = modelNode->sizeMid().getByFrameOrElse(0, 0.0f);
+    _particleSize.end = modelNode->sizeEnd().getByFrameOrElse(0, 0.0f);
+    _color.start = modelNode->colorStart().getByFrameOrElse(0, glm::vec3(0.0f));
+    _color.mid = modelNode->colorMid().getByFrameOrElse(0, glm::vec3(0.0f));
+    _color.end = modelNode->colorEnd().getByFrameOrElse(0, glm::vec3(0.0f));
+    _alpha.start = modelNode->alphaStart().getByFrameOrElse(0, 0.0f);
+    _alpha.mid = modelNode->alphaMid().getByFrameOrElse(0, 0.0f);
+    _alpha.end = modelNode->alphaEnd().getByFrameOrElse(0, 0.0f);
+    _frameStart = static_cast<int>(modelNode->frameStart().getByFrameOrElse(0, 0.0f));
+    _frameEnd = static_cast<int>(modelNode->frameEnd().getByFrameOrElse(0, 0.0f));
+    _size.x = modelNode->xSize().getByFrameOrElse(0, 0.0f);
+    _size.y = modelNode->ySize().getByFrameOrElse(0, 0.0f);
     _birthrate = modelNode->birthrate().getByFrameOrElse(0, 0.0f);
     _lifeExpectancy = modelNode->lifeExp().getByFrameOrElse(0, 0.0f);
     _velocity = modelNode->velocity().getByFrameOrElse(0, 0.0f);
