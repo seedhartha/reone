@@ -181,14 +181,14 @@ static const VertexAttributes g_cubemapAttributes { 8 * sizeof(float), 0, 3 * si
 // AABB
 
 static const vector<float> g_aabbVertices = {
-    -0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f,  0.5f
+    -0.5f, -0.5f, 0.0f,
+    -0.5f, -0.5f, 1.0f,
+    -0.5f,  0.5f, 1.0f,
+    -0.5f,  0.5f, 0.0f,
+     0.5f,  0.5f, 1.0f,
+     0.5f,  0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
+     0.5f, -0.5f, 1.0f
 };
 
 static const vector<uint16_t> g_aabbIndices = {
