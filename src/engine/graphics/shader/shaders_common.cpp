@@ -61,7 +61,6 @@ const float SHADOW_FAR_PLANE = 10000.0;
 
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
 const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
-const vec3 LUMINANCE = vec3(0.2126, 0.7152, 0.0722);
 
 struct General {
     mat4 projection;
@@ -363,43 +362,43 @@ out vec4 fragPosLightSpace;
 out mat3 fragTanSpace;
 
 void main() {
-    vec4 P = vec4(0.0);
+    vec4 P = vec4(aPosition, 1.0);
+    vec4 N = vec4(aNormal, 0.0);
 
     if (isFeatureEnabled(FEATURE_SKELETAL)) {
-        int index1 = int(aBoneIndices.x);
-        int index2 = int(aBoneIndices.y);
-        int index3 = int(aBoneIndices.z);
-        int index4 = int(aBoneIndices.w);
+        int i1 = int(aBoneIndices[0]);
+        int i2 = int(aBoneIndices[1]);
+        int i3 = int(aBoneIndices[2]);
+        int i4 = int(aBoneIndices[3]);
 
-        float weight1 = aBoneWeights.x;
-        float weight2 = aBoneWeights.y;
-        float weight3 = aBoneWeights.z;
-        float weight4 = aBoneWeights.w;
+        float w1 = aBoneWeights[0];
+        float w2 = aBoneWeights[1];
+        float w3 = aBoneWeights[2];
+        float w4 = aBoneWeights[3];
 
-        vec4 position = vec4(aPosition, 1.0);
+        P =
+            (uBones[i1] * P) * w1 +
+            (uBones[i2] * P) * w2 +
+            (uBones[i3] * P) * w3 +
+            (uBones[i4] * P) * w4;
 
-        P += weight1 * uBones[index1] * position;
-        P += weight2 * uBones[index2] * position;
-        P += weight3 * uBones[index3] * position;
-        P += weight4 * uBones[index4] * position;
+        N =
+            (uBones[i1] * N) * w1 +
+            (uBones[i2] * N) * w2 +
+            (uBones[i3] * N) * w3 +
+            (uBones[i4] * N) * w4;
 
-        P = vec4(P.xyz, 1.0);
-
-    } else {
-        P = vec4(aPosition, 1.0);
-
-        if (isFeatureEnabled(FEATURE_DANGLYMESH)) {
-            vec3 maxStride = vec3(uDanglymeshDisplacement * uDanglymeshConstraints[gl_VertexID / 4][gl_VertexID % 4]);
-            vec3 stride = clamp(uDanglymeshStride.xyz, -maxStride, maxStride);
-            P += vec4(stride, 0.0);
-        }
+    } else if (isFeatureEnabled(FEATURE_DANGLYMESH)) {
+        vec3 maxStride = vec3(uDanglymeshDisplacement * uDanglymeshConstraints[gl_VertexID / 4][gl_VertexID % 4]);
+        vec3 stride = clamp(uDanglymeshStride.xyz, -maxStride, maxStride);
+        P += vec4(stride, 0.0);
     }
 
     mat3 normalMatrix = transpose(inverse(mat3(uGeneral.model)));
-    vec3 N = normalize(normalMatrix * aNormal);
+    N = vec4(normalize(normalMatrix * N.xyz), 0.0);
 
     fragPosition = vec3(uGeneral.model * P);
-    fragNormal = N;
+    fragNormal = N.xyz;
     fragTexCoords = aTexCoords;
     fragLightmapCoords = aLightmapCoords;
 
