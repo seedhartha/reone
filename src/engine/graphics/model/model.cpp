@@ -52,7 +52,6 @@ Model::Model(
 
 void Model::fillNodeLookups(const shared_ptr<ModelNode> &node) {
     _nodes.push_back(node);
-    _nodeById.insert(make_pair(node->id(), node));
     _nodeByName.insert(make_pair(node->name(), node));
 
     for (auto &child : node->children()) {
@@ -62,20 +61,20 @@ void Model::fillNodeLookups(const shared_ptr<ModelNode> &node) {
 
 void Model::fillBoneNodeId() {
     // In MDL files, bones reference node serial numbers (DFS ordering).
-    // We want them to reference node identifiers, for simplicity.
+    // We want them to reference node names instead.
 
     for (auto &node : _nodes) {
         if (!node->isSkinMesh()) continue;
 
         shared_ptr<ModelNode::TriangleMesh> mesh(node->mesh());
-        mesh->skin->boneNodeId.resize(mesh->skin->boneNodeSerial.size());
+        mesh->skin->boneNodeName.resize(mesh->skin->boneNodeSerial.size());
 
         for (size_t i = 0; i < mesh->skin->boneNodeSerial.size(); ++i) {
             uint16_t nodeSerial = mesh->skin->boneNodeSerial[i];
             if (nodeSerial < static_cast<int>(_nodes.size())) {
-                mesh->skin->boneNodeId[i] = _nodes[nodeSerial]->id();
+                mesh->skin->boneNodeName[i] = _nodes[nodeSerial]->name();
             } else {
-                mesh->skin->boneNodeId[i] = 0xffff;
+                mesh->skin->boneNodeName[i].clear();
             }
         }
     }
@@ -84,7 +83,7 @@ void Model::fillBoneNodeId() {
 void Model::computeAABB() {
     _aabb.reset();
 
-    for (auto &node : _nodeById) {
+    for (auto &node : _nodeByName) {
         shared_ptr<ModelNode::TriangleMesh> mesh(node.second->mesh());
         if (mesh) {
             _aabb.expand(mesh->mesh->aabb() * node.second->absoluteTransform());
@@ -100,10 +99,6 @@ void Model::addAnimation(shared_ptr<Animation> animation) {
     _animations.insert(make_pair(animation->name(), move(animation)));
 }
 
-shared_ptr<ModelNode> Model::getNodeById(uint16_t nodeId) const {
-    return getFromLookupOrNull(_nodeById, nodeId);
-}
-
 shared_ptr<ModelNode> Model::getNodeByName(const string &name) const {
     return getFromLookupOrNull(_nodeByName, name);
 }
@@ -117,7 +112,7 @@ shared_ptr<ModelNode> Model::getNodeByNameRecursive(const string &name) const {
 }
 
 shared_ptr<ModelNode> Model::getAABBNode() const {
-    for (auto &node : _nodeById) {
+    for (auto &node : _nodeByName) {
         if (node.second->isAABBMesh()) return node.second;
     }
     return nullptr;
@@ -151,13 +146,13 @@ vector<string> Model::getAnimationNames() const {
     return move(result);
 }
 
-set<uint16_t> Model::getAncestorNodes(uint16_t parentId) const {
-    set<uint16_t> result;
+set<string> Model::getAncestorNodes(const string &parentName) const {
+    set<string> result;
 
-    auto maybeParent = _nodeById.find(parentId);
-    if (maybeParent != _nodeById.end()) {
+    auto maybeParent = _nodeByName.find(parentName);
+    if (maybeParent != _nodeByName.end()) {
         for (const ModelNode *node = maybeParent->second->parent(); node; node = node->parent()) {
-            result.insert(node->id());
+            result.insert(node->name());
         }
     }
 

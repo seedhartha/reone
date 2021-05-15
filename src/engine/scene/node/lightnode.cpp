@@ -47,9 +47,9 @@ LightSceneNode::LightSceneNode(const ModelSceneNode *model, shared_ptr<ModelNode
     if (!model) {
         throw invalid_argument("model must not be null");
     }
-    _radius = modelNode->radius().getByFrameOrElse(0, 1.0f);
-    _multiplier = modelNode->multiplier().getByFrameOrElse(0, 1.0f);
-    _color = modelNode->color().getByFrameOrElse(0, glm::vec3(1.0f));
+    _radius = modelNode->radius().getByFrameOrElse(0, 0.0f);
+    _multiplier = modelNode->multiplier().getByFrameOrElse(0, 0.0f);
+    _color = modelNode->color().getByFrameOrElse(0, glm::vec3(0.0f));
 }
 
 void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {

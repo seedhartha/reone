@@ -64,13 +64,12 @@ public:
 
     bool isAffectedByFog() const { return _affectedByFog; }
 
-    std::shared_ptr<ModelNode> getNodeById(uint16_t nodeId) const;
     std::shared_ptr<ModelNode> getNodeByName(const std::string &name) const;
     std::shared_ptr<ModelNode> getNodeByNameRecursive(const std::string &name) const;
     std::shared_ptr<ModelNode> getAABBNode() const;
     std::shared_ptr<Animation> getAnimation(const std::string &name) const;
     std::vector<std::string> getAnimationNames() const;
-    std::set<uint16_t> getAncestorNodes(uint16_t parentId) const;
+    std::set<std::string> getAncestorNodes(const std::string &parentName) const;
 
     const std::string &name() const { return _name; }
     Classification classification() const { return _classification; }
@@ -91,7 +90,6 @@ private:
     bool _affectedByFog;
 
     std::vector<std::shared_ptr<ModelNode>> _nodes;
-    std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeById;
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
     AABB _aabb;
 

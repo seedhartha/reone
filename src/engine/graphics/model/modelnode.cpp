@@ -28,13 +28,11 @@ namespace reone {
 namespace graphics {
 
 ModelNode::ModelNode(
-    uint16_t id,
     string name,
     glm::vec3 restPosition,
     glm::quat restOrientation,
     const ModelNode *parent
 ) :
-    _id(id),
     _name(move(name)),
     _restPosition(move(restPosition)),
     _restOrientation(move(restOrientation)),

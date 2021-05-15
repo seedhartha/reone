@@ -45,8 +45,8 @@ class Model;
 class ModelNode : boost::noncopyable {
 public:
     struct Skin {
-        std::vector<uint16_t> boneNodeSerial; /**< temporary, used to fill boneNodeId below */
-        std::vector<uint16_t> boneNodeId; /**< used in skeletal animation */
+        std::vector<std::string> boneNodeName;
+        std::vector<uint16_t> boneNodeSerial; /**< temporary, used to fill boneNodeName above */
     };
 
     struct UVAnimation {
@@ -171,7 +171,6 @@ public:
     };
 
     ModelNode(
-        uint16_t id,
         std::string name,
         glm::vec3 restPosition,
         glm::quat restOrientation,
@@ -183,7 +182,6 @@ public:
 
     std::vector<uint32_t> getFacesByMaterial(uint32_t material) const;
 
-    uint16_t id() const { return _id; }
     const std::string &name() const { return _name; }
     uint16_t flags() const { return _flags; }
     const ModelNode *parent() const { return _parent; }
@@ -297,7 +295,6 @@ public:
     // END Keyframes
 
 private:
-    uint16_t _id; /**< node identifier, matches id within supermodel */
     std::string _name;
     const ModelNode *_parent;
 
