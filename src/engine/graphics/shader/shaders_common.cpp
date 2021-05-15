@@ -367,10 +367,10 @@ void main() {
     vec4 normal = vec4(aNormal, 0.0);
 
     if (isFeatureEnabled(FEATURE_SKELETAL)) {
-        int i1 = int(aBoneIndices[0]);
-        int i2 = int(aBoneIndices[1]);
-        int i3 = int(aBoneIndices[2]);
-        int i4 = int(aBoneIndices[3]);
+        int i1 = 1 + int(aBoneIndices[0]);
+        int i2 = 1 + int(aBoneIndices[1]);
+        int i3 = 1 + int(aBoneIndices[2]);
+        int i4 = 1 + int(aBoneIndices[3]);
 
         float w1 = aBoneWeights[0];
         float w2 = aBoneWeights[1];
@@ -382,6 +382,8 @@ void main() {
             (uBones[i2] * position) * w2 +
             (uBones[i3] * position) * w3 +
             (uBones[i4] * position) * w4;
+
+        position.w = 1.0;
 
         normal =
             (uBones[i1] * normal) * w1 +

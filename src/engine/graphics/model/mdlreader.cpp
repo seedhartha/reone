@@ -129,8 +129,8 @@ void MdlReader::doLoad() {
     _model = make_unique<Model>(
         name,
         getClassification(classification),
-        move(superModel),
         move(rootNode),
+        move(superModel),
         animationScale);
 
     _model->setAffectedByFog(affectedByFog != 0);

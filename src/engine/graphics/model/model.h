@@ -54,8 +54,8 @@ public:
     Model(
         std::string name,
         Classification classification,
-        std::shared_ptr<Model> superModel,
         std::shared_ptr<ModelNode> rootNode,
+        std::shared_ptr<Model> superModel,
         float animationScale);
 
     void init();
@@ -83,8 +83,8 @@ public:
 private:
     std::string _name;
     Classification _classification;
-    std::shared_ptr<Model> _superModel;
     std::shared_ptr<ModelNode> _rootNode;
+    std::shared_ptr<Model> _superModel;
     std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
     float _animationScale;
     bool _affectedByFog;
