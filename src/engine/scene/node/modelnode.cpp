@@ -107,6 +107,12 @@ void ModelSceneNode::computeAABB() {
             _aabb.expand(modelSpaceAABB);
         }
     }
+    for (auto &attachment : _attachmentByNodeId) {
+        if (attachment.second->type() == SceneNodeType::Model) {
+            AABB modelSpaceAABB(attachment.second->aabb() * attachment.second->absoluteTransform() * _absTransformInv);
+            _aabb.expand(modelSpaceAABB);
+        }
+    }
 }
 
 unique_ptr<DummySceneNode> ModelSceneNode::newDummySceneNode(shared_ptr<ModelNode> node) const {
@@ -145,7 +151,10 @@ void ModelSceneNode::attach(uint16_t parentId, shared_ptr<SceneNode> node) {
 
     shared_ptr<ModelNodeSceneNode> parent(maybeParent->second);
     parent->addChild(node);
+
     _attachmentByNodeId.insert(make_pair(parentId, node));
+
+    computeAABB();
 }
 
 void ModelSceneNode::attach(const string &parentName, shared_ptr<SceneNode> node) {
