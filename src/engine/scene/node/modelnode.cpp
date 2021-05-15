@@ -79,6 +79,7 @@ void ModelSceneNode::buildNodeTree(shared_ptr<ModelNode> node, SceneNode *parent
         parent->addChild(sceneNode);
     }
     _nodeById.insert(make_pair(node->id(), sceneNode));
+    _nodeByName.insert(make_pair(node->name(), sceneNode));
 
     if (node->isReference()) {
         auto model = make_shared<ModelSceneNode>(node->reference()->model, _usage, _sceneGraph, _animEventListener);
@@ -166,6 +167,10 @@ void ModelSceneNode::attach(const string &parentName, shared_ptr<SceneNode> node
 
 shared_ptr<ModelNodeSceneNode> ModelSceneNode::getNodeById(uint16_t nodeId) const {
     return getFromLookupOrNull(_nodeById, nodeId);
+}
+
+shared_ptr<ModelNodeSceneNode> ModelSceneNode::getNodeByName(const string &name) const {
+    return getFromLookupOrNull(_nodeByName, name);
 }
 
 shared_ptr<SceneNode> ModelSceneNode::getAttachment(const string &parentName) const {

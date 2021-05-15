@@ -108,6 +108,14 @@ shared_ptr<ModelNode> Model::getNodeByName(const string &name) const {
     return getFromLookupOrNull(_nodeByName, name);
 }
 
+shared_ptr<ModelNode> Model::getNodeByNameRecursive(const string &name) const {
+    auto result = getFromLookupOrNull(_nodeByName, name);
+    if (!result && _superModel) {
+        result = _superModel->getNodeByNameRecursive(name);
+    }
+    return move(result);
+}
+
 shared_ptr<ModelNode> Model::getAABBNode() const {
     for (auto &node : _nodeById) {
         if (node.second->isAABBMesh()) return node.second;

@@ -66,6 +66,7 @@ public:
 
     std::shared_ptr<ModelNode> getNodeById(uint16_t nodeId) const;
     std::shared_ptr<ModelNode> getNodeByName(const std::string &name) const;
+    std::shared_ptr<ModelNode> getNodeByNameRecursive(const std::string &name) const;
     std::shared_ptr<ModelNode> getAABBNode() const;
     std::shared_ptr<Animation> getAnimation(const std::string &name) const;
     std::vector<std::string> getAnimationNames() const;

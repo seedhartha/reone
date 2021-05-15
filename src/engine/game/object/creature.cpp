@@ -388,13 +388,11 @@ void Creature::clearPath() {
 glm::vec3 Creature::getSelectablePosition() const {
     auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
     if (!model) return _position;
-    if (_dead) return model->getWorldCenterOfAABB();
 
-    shared_ptr<ModelNode> talkDummy(model->model()->getNodeByName(g_talkDummyNode));
+    shared_ptr<ModelNode> talkDummy(model->model()->getNodeByNameRecursive(g_talkDummyNode));
+    if (!talkDummy || _dead) return model->getWorldCenterOfAABB();
 
-    return talkDummy ?
-        (_transform * talkDummy->absoluteTransform())[3] :
-        model->getWorldCenterOfAABB();
+    return (model->absoluteTransform() * talkDummy->absoluteTransform())[3];
 }
 
 float Creature::getAttackRange() const {
