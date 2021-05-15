@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cstdint>
+#include <deque>
 #include <set>
 #include <unordered_map>
 
@@ -38,7 +39,6 @@ namespace reone {
 namespace scene {
 
 constexpr float kDefaultDrawDistance = 1024.0f;
-constexpr int kNumAnimationChannels = 8;
 
 class ModelSceneNode : public SceneNode {
 public:
@@ -108,14 +108,15 @@ private:
         AnimationProperties properties;
         float time { 0.0f };
         std::unordered_map<std::string, AnimationState> stateByName;
-
-        // Flags
-
-        bool finished { false }; /**< channel contains a fire-and-forget animation that has finished playing */
-        bool transition { false }; /**< when computing states, use animation transition time as channel time */
         bool freeze { false }; /**< channel time is not to be updated */
+        bool transition { false }; /**< when computing states, use animation transition time as channel time */
+        bool finished { false }; /**< finished channels will be erased from the queue */
 
-        // END Flags
+        AnimationChannel(std::shared_ptr<graphics::Animation> anim, std::shared_ptr<graphics::LipAnimation> lipAnim, AnimationProperties properties) :
+            anim(std::move(anim)),
+            lipAnim(std::move(lipAnim)),
+            properties(std::move(properties)) {
+        }
     };
 
     std::shared_ptr<graphics::Model> _model;
@@ -133,7 +134,7 @@ private:
 
     // Animation
 
-    AnimationChannel _animChannels[kNumAnimationChannels];
+    std::deque<AnimationChannel> _animChannels;
     AnimationBlendMode _animBlendMode { AnimationBlendMode::Single };
     std::set<std::string> _inanimateNodes; /**< names of nodes that are not to be animated */
 
@@ -148,7 +149,6 @@ private:
 
     // Animation
 
-    void resetAnimationChannel(AnimationChannel &channel, std::shared_ptr<graphics::Animation> anim = nullptr, std::shared_ptr<graphics::LipAnimation> lipAnim = nullptr, AnimationProperties properties = AnimationProperties());
     void updateAnimations(float dt);
     void updateAnimationChannel(AnimationChannel &channel, float dt);
     void computeAnimationStates(AnimationChannel &channel, float time, const graphics::ModelNode &modelNode);
