@@ -301,6 +301,20 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         vector<uint16_t> boneNodeSerial(readUint16Array(16));
         ignore(4); // padding
 
+        // boneNodeSerial above is a more compact representation of the bone
+        // map, but it is limited to 16 bones, which is not enough for certain
+        // models
+        vector<float> boneMap(readFloatArray(kMdlDataOffset + offBones, numBones));
+        for (size_t i = 0; i < boneMap.size(); ++i) {
+            auto boneId = static_cast<uint16_t>(boneMap[i]);
+            if (boneId != 0xffff) {
+                if (boneId >= boneNodeSerial.size()) {
+                    boneNodeSerial.resize(boneId + 1);
+                }
+                boneNodeSerial[boneId] = static_cast<uint16_t>(i);
+            }
+        }
+
         skin = make_shared<ModelNode::Skin>();
         skin->boneNodeSerial = move(boneNodeSerial);
         attributes.offBoneIndices = offMdxBoneIndices;
