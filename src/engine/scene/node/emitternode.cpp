@@ -62,7 +62,7 @@ EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *model, shared_ptr<Model
     _frameStart = modelNode->frameStart().getByFrameOrElse(0, 0.0f);
     _frameEnd = modelNode->frameEnd().getByFrameOrElse(0, 0.0f);
     _size.x = modelNode->xSize().getByFrameOrElse(0, 1.0f);
-    _size.y = modelNode->xSize().getByFrameOrElse(0, 1.0f);
+    _size.y = modelNode->ySize().getByFrameOrElse(0, 1.0f);
     _birthrate = modelNode->birthrate().getByFrameOrElse(0, 0.0f);
     _lifeExpectancy = modelNode->lifeExp().getByFrameOrElse(0, 0.0f);
     _velocity = modelNode->velocity().getByFrameOrElse(0, 0.0f);
