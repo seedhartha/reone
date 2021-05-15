@@ -40,10 +40,10 @@ Animation::Animation(
     _rootNode(move(rootNode)),
     _events(move(events)) {
 
-    fillNodeByName();
+    fillNodeLookups();
 }
 
-void Animation::fillNodeByName() {
+void Animation::fillNodeLookups() {
     stack<shared_ptr<ModelNode>> nodes;
     nodes.push(_rootNode);
 
@@ -51,17 +51,12 @@ void Animation::fillNodeByName() {
         shared_ptr<ModelNode> node(nodes.top());
         nodes.pop();
 
-        _nodeById.insert(make_pair(node->id(), node));
         _nodeByName.insert(make_pair(node->name(), node));
 
         for (auto &child : node->children()) {
             nodes.push(child);
         }
     }
-}
-
-shared_ptr<ModelNode> Animation::getNodeById(uint16_t nodeId) const {
-    return getFromLookupOrNull(_nodeById, nodeId);
 }
 
 shared_ptr<ModelNode> Animation::getNodeByName(const string &name) const {

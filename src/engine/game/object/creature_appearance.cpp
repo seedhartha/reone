@@ -78,15 +78,12 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!headModelName.empty()) {
         shared_ptr<Model> headModel(Models::instance().get(headModelName));
         if (headModel) {
-            shared_ptr<ModelNode> headHook(bodyModel->getNodeByName(g_headHookNode));
-            if (headHook) {
-                auto headSceneNode = make_shared<ModelSceneNode>(headModel, ModelUsage::Creature, _sceneGraph, this);
-                headSceneNode->setInanimateNodes(bodyModel->getAncestorNodes(headHook->id()));
-                bodySceneNode->attach(headHook->id(), headSceneNode);
-                if (maskModel) {
-                    auto maskSceneNode = make_shared<ModelSceneNode>(maskModel, ModelUsage::Equipment, _sceneGraph, this);
-                    headSceneNode->attach(g_maskHookNode, maskSceneNode);
-                }
+            auto headSceneNode = make_shared<ModelSceneNode>(headModel, ModelUsage::Creature, _sceneGraph, this);
+            headSceneNode->setInanimateNodes(bodyModel->getAncestorNodes(g_headHookNode));
+            bodySceneNode->attach(g_headHookNode, headSceneNode);
+            if (maskModel) {
+                auto maskSceneNode = make_shared<ModelSceneNode>(maskModel, ModelUsage::Equipment, _sceneGraph, this);
+                headSceneNode->attach(g_maskHookNode, maskSceneNode);
             }
         }
     }

@@ -41,7 +41,6 @@ public:
         std::shared_ptr<ModelNode> rootNode,
         std::vector<Event> events);
 
-    std::shared_ptr<ModelNode> getNodeById(uint16_t nodeId) const;
     std::shared_ptr<ModelNode> getNodeByName(const std::string &name) const;
 
     const std::string &name() const { return _name; }
@@ -57,10 +56,9 @@ private:
     std::shared_ptr<ModelNode> _rootNode;
     std::vector<Event> _events;
 
-    std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeById;
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
 
-    void fillNodeByName();
+    void fillNodeLookups();
 };
 
 } // namespace graphics

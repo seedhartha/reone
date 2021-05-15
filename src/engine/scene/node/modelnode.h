@@ -53,7 +53,6 @@ public:
     void computeAABB();
     void signalEvent(const std::string &name);
 
-    std::shared_ptr<ModelNodeSceneNode> getNodeById(uint16_t nodeId) const;
     std::shared_ptr<ModelNodeSceneNode> getNodeByName(const std::string &name) const;
 
     std::shared_ptr<graphics::Model> model() const { return _model; }
@@ -71,13 +70,12 @@ public:
 
     bool isAnimationFinished() const;
 
-    void setInanimateNodes(std::set<uint16_t> nodes) { _inanimateNodes = std::move(nodes); }
+    void setInanimateNodes(std::set<std::string> nodes) { _inanimateNodes = std::move(nodes); }
 
     // END Animation
 
     // Attachments
 
-    void attach(uint16_t parentId, std::shared_ptr<SceneNode> node);
     void attach(const std::string &parentName, std::shared_ptr<SceneNode> node);
 
     std::shared_ptr<SceneNode> getAttachment(const std::string &parentName) const;
@@ -109,7 +107,7 @@ private:
         std::shared_ptr<graphics::LipAnimation> lipAnim;
         AnimationProperties properties;
         float time { 0.0f };
-        std::unordered_map<uint16_t, AnimationState> stateById;
+        std::unordered_map<std::string, AnimationState> stateByName;
 
         // Flags
 
@@ -128,10 +126,8 @@ private:
 
     // Lookups
 
-    std::unordered_map<uint16_t, std::shared_ptr<ModelNodeSceneNode>> _nodeById;
     std::unordered_map<std::string, std::shared_ptr<ModelNodeSceneNode>> _nodeByName;
-
-    std::unordered_map<uint16_t, std::shared_ptr<SceneNode>> _attachmentByNodeId;
+    std::unordered_map<std::string, std::shared_ptr<SceneNode>> _attachments;
 
     // END Lookups
 
@@ -139,7 +135,7 @@ private:
 
     AnimationChannel _animChannels[kNumAnimationChannels];
     AnimationBlendMode _animBlendMode { AnimationBlendMode::Single };
-    std::set<uint16_t> _inanimateNodes; /**< node identifiers that are not to be animated */
+    std::set<std::string> _inanimateNodes; /**< names of nodes that are not to be animated */
 
     // END Animation
 

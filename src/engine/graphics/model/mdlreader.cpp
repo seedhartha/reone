@@ -179,15 +179,14 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *pare
     if (flags & 0xf408) {
         throw runtime_error("Unsupported MDL node flags: " + to_string(flags));
     }
-    if (!anim) {
-        _nodeFlags.insert(make_pair(nodeId, flags));
-    }
     string name(_nodeNames[nameIndex]);
+    if (!anim) {
+        _nodeFlags.insert(make_pair(name, flags));
+    }
     glm::vec3 restPosition(glm::make_vec3(&positionValues[0]));
     glm::quat restOrientation(orientationValues[0], orientationValues[1], orientationValues[2], orientationValues[3]);
 
     auto node = make_unique<ModelNode>(
-        nodeId,
         move(name),
         move(restPosition),
         move(restOrientation),
@@ -649,7 +648,7 @@ shared_ptr<ModelNode::Reference> MdlReader::readReference() {
 void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const vector<float> &data, bool anim, ModelNode &node) {
     uint16_t nodeFlags;
     if (anim) {
-        nodeFlags = _nodeFlags.find(node.id())->second;
+        nodeFlags = _nodeFlags.find(node.name())->second;
     } else {
         nodeFlags = node.flags();
     }

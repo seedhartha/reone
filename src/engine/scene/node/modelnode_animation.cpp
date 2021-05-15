@@ -87,7 +87,7 @@ void ModelSceneNode::playAnimation(shared_ptr<Animation> anim, shared_ptr<LipAni
 
     // Optionally propagate animation to attachments
     if (properties.flags & AnimationFlags::propagate) {
-        for (auto &attachment : _attachmentByNodeId) {
+        for (auto &attachment : _attachments) {
             if (attachment.second->type() == SceneNodeType::Model) {
                 static_pointer_cast<ModelSceneNode>(attachment.second)->playAnimation(anim, lipAnim, properties);
             }
@@ -106,7 +106,7 @@ void ModelSceneNode::resetAnimationChannel(AnimationChannel &channel, shared_ptr
     channel.lipAnim = move(lipAnim);
     channel.properties = move(properties);
     channel.time = 0.0f;
-    channel.stateById.clear();
+    channel.stateByName.clear();
     channel.finished = false;
     channel.transition = false;
     channel.freeze = false;
@@ -160,14 +160,14 @@ void ModelSceneNode::updateAnimationChannel(AnimationChannel &channel, float dt)
     // Compute animation states only when this model is not culled
     if (!_culled) {
         float time = channel.transition ? channel.anim->transitionTime() : channel.time;
-        channel.stateById.clear();
+        channel.stateByName.clear();
         computeAnimationStates(channel, time, *_model->rootNode());
     }
 }
 
 void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float time, const ModelNode &modelNode) {
-    shared_ptr<ModelNode> animNode(channel.anim->getNodeById(modelNode.id()));
-    if (animNode && _inanimateNodes.count(modelNode.id()) == 0) {
+    shared_ptr<ModelNode> animNode(channel.anim->getNodeByName(modelNode.name()));
+    if (animNode && _inanimateNodes.count(modelNode.name()) == 0) {
         AnimationState state;
         state.flags = 0;
 
@@ -231,7 +231,7 @@ void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float tim
             state.selfIllumColor = move(animSelfIllum);
         }
 
-        channel.stateById.insert(make_pair(modelNode.id(), move(state)));
+        channel.stateByName.insert(make_pair(modelNode.name(), move(state)));
     }
 
     for (auto &child : modelNode.children()) {
@@ -240,8 +240,8 @@ void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float tim
 }
 
 void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
-    auto maybeSceneNode = _nodeById.find(modelNode.id());
-    if (maybeSceneNode != _nodeById.end()) {
+    auto maybeSceneNode = _nodeByName.find(modelNode.name());
+    if (maybeSceneNode != _nodeByName.end()) {
         shared_ptr<SceneNode> sceneNode(maybeSceneNode->second);
         AnimationState combined;
 
@@ -249,8 +249,8 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
             case AnimationBlendMode::Single:
             case AnimationBlendMode::Blend: {
                 bool blend = _animBlendMode == AnimationBlendMode::Blend && _animChannels[0].transition;
-                auto state1 = _animChannels[0].stateById.count(modelNode.id()) > 0 ? _animChannels[0].stateById[modelNode.id()] : AnimationState();
-                auto state2 = _animChannels[1].stateById.count(modelNode.id()) > 0 ? _animChannels[1].stateById[modelNode.id()] : AnimationState();
+                auto state1 = _animChannels[0].stateByName.count(modelNode.name()) > 0 ? _animChannels[0].stateByName[modelNode.name()] : AnimationState();
+                auto state2 = _animChannels[1].stateByName.count(modelNode.name()) > 0 ? _animChannels[1].stateByName[modelNode.name()] : AnimationState();
                 if (blend && state1.flags & AnimationStateFlags::transform && state2.flags & AnimationStateFlags::transform) {
                     float factor = glm::min(1.0f, _animChannels[0].time / _animChannels[0].anim->transitionTime());
                     glm::vec3 scale1, scale2, translation1, translation2, skew;
@@ -278,8 +278,8 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
             }
             case AnimationBlendMode::Overlay:
                 for (int i = 0; i < kNumAnimationChannels; ++i) {
-                    auto maybeState = _animChannels[i].stateById.find(modelNode.id());
-                    if (maybeState != _animChannels[i].stateById.end()) {
+                    auto maybeState = _animChannels[i].stateByName.find(modelNode.name());
+                    if (maybeState != _animChannels[i].stateByName.end()) {
                         const AnimationState &state = maybeState->second;
                         if ((state.flags & AnimationStateFlags::transform) && !(combined.flags & AnimationStateFlags::transform)) {
                             combined.flags |= AnimationStateFlags::transform;
@@ -302,8 +302,6 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
 
         if (combined.flags & AnimationStateFlags::transform) {
             sceneNode->setLocalTransform(combined.transform);
-        } else if (!modelNode.isSkinMesh()) {
-            sceneNode->setLocalTransform(modelNode.localTransform());
         }
         if (combined.flags & AnimationStateFlags::alpha) {
             static_pointer_cast<MeshSceneNode>(sceneNode)->setAlpha(combined.alpha);
@@ -319,7 +317,7 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
 }
 
 void ModelSceneNode::computeBoneTransforms() {
-    for (auto &node : _nodeById) {
+    for (auto &node : _nodeByName) {
         glm::mat4 transform(1.0f);
         transform = node.second->absoluteTransform() * node.second->modelNode()->absoluteTransformInverse(); // make relative to the rest pose (world space)
         transform = _absTransformInv * transform; // world space to model space

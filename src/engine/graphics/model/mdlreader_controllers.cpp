@@ -124,19 +124,31 @@ static inline void ensureNumColumnsEquals(int type, int expected, int actual) {
     }
 }
 
-void MdlReader::readPositionController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
+void MdlReader::readFloatController(const ControllerKey &key, const vector<float> &data, AnimatedProperty<float> &prop) {
+    ensureNumColumnsEquals(key.type, 1, key.numColumns);
+    for (uint16_t i = 0; i < key.numRows; ++i) {
+        float time = data[key.timeIndex + i];
+        float value = data[key.dataIndex + i];
+        prop.addFrame(time, value);
+    }
+    prop.update();
+}
+
+void MdlReader::readVectorController(const ControllerKey &key, const vector<float> &data, AnimatedProperty<glm::vec3> &prop) {
     bool bezier = key.numColumns & kFlagBezier;
     int numColumns = key.numColumns & ~kFlagBezier;
     ensureNumColumnsEquals(key.type, 3, numColumns);
 
     for (uint16_t i = 0; i < key.numRows; ++i) {
-        int rowTimeIdx = key.timeIndex + i;
-        int rowDataIdx = key.dataIndex + (bezier ? 9 : 3) * i;
-        float time = data[rowTimeIdx];
-        glm::vec3 position(glm::make_vec3(&data[rowDataIdx]));
-        node.position().addFrame(time, move(position));
+        float time = data[key.timeIndex + i];
+        glm::vec3 value(glm::make_vec3(&data[key.dataIndex + (bezier ? 9 : 3) * i]));
+        prop.addFrame(time, value);
     }
-    node.position().update();
+    prop.update();
+}
+
+void MdlReader::readPositionController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
+    readVectorController(key, data, node.position());
 }
 
 void MdlReader::readOrientationController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
@@ -189,29 +201,6 @@ void MdlReader::readOrientationController(const ControllerKey &key, const vector
     }
 
     node.orientation().update();
-}
-
-void MdlReader::readFloatController(const ControllerKey &key, const vector<float> &data, AnimatedProperty<float> &prop) {
-    ensureNumColumnsEquals(key.type, 1, key.numColumns);
-    for (uint16_t i = 0; i < key.numRows; ++i) {
-        float time = data[key.timeIndex + i];
-        float value = data[key.dataIndex + i];
-        prop.addFrame(time, value);
-    }
-    prop.update();
-}
-
-void MdlReader::readVectorController(const ControllerKey &key, const vector<float> &data, AnimatedProperty<glm::vec3> &prop) {
-    bool bezier = key.numColumns & kFlagBezier;
-    int numColumns = key.numColumns & ~kFlagBezier;
-    ensureNumColumnsEquals(key.type, 3, numColumns);
-
-    for (uint16_t i = 0; i < key.numRows; ++i) {
-        float time = data[key.timeIndex + i];
-        glm::vec3 value(glm::make_vec3(&data[key.dataIndex + (bezier ? 9 : 3) * i]));
-        prop.addFrame(time, value);
-    }
-    prop.update();
 }
 
 void MdlReader::readScaleController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {

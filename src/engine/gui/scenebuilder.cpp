@@ -57,10 +57,7 @@ unique_ptr<SceneGraph> SceneBuilder::build() {
     } else {
         shared_ptr<ModelNode> refModelNode(model->model()->getNodeByName(_cameraNodeName));
         if (refModelNode) {
-            shared_ptr<ModelNodeSceneNode> refSceneNode(model->getNodeById(refModelNode->id()));
-            if (refSceneNode) {
-                camera->setLocalTransform(refModelNode->absoluteTransform() * _cameraTransform);
-            }
+            camera->setLocalTransform(refModelNode->absoluteTransform() * _cameraTransform);
         }
     }
 
