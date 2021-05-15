@@ -330,6 +330,9 @@ void main() {
     } else {
         objectColor = albedo * ao;
 
+        if (isFeatureEnabled(FEATURE_SELFILLUM)) {
+            objectColor *= uGeneral.selfIllumColor.rgb;
+        }
         if (isFeatureEnabled(FEATURE_ENVMAP)) {
             vec3 R = reflect(-V, N);
             vec4 envmapSample = texture(uEnvmap, R);
