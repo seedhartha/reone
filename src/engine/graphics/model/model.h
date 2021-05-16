@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <memory>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -94,16 +95,13 @@ private:
     std::shared_ptr<ModelNode> _rootNode;
     std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
     std::shared_ptr<Model> _superModel;
-    float _animationScale;
+    float _animationScale; /**< scales supermodel animations */
 
-    bool _affectedByFog;
     AABB _aabb;
-
-    std::vector<std::shared_ptr<ModelNode>> _nodes;
+    bool _affectedByFog;
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
 
-    void fillNodeLookups(const std::shared_ptr<ModelNode> &node);
-    void fillBoneNodeId();
+    void fillNodeByName(const std::shared_ptr<ModelNode> &node);
     void computeAABB();
 };
 
