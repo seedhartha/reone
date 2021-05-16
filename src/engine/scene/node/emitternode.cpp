@@ -77,9 +77,6 @@ EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *model, shared_ptr<Model
 }
 
 void EmitterSceneNode::update(float dt) {
-    shared_ptr<CameraSceneNode> camera(_sceneGraph->activeCamera());
-    if (!camera) return;
-
     removeExpiredParticles(dt);
     spawnParticles(dt);
 
@@ -89,19 +86,16 @@ void EmitterSceneNode::update(float dt) {
 }
 
 void EmitterSceneNode::removeExpiredParticles(float dt) {
-    for (auto it = _particles.begin(); it != _particles.end(); ) {
-        auto &particle = (*it);
-        if (isParticleExpired(*particle)) {
-            it = _particles.erase(it);
-        } else {
-            ++it;
-        }
-    }
+    auto expiredParticles = find_if(_particles.begin(), _particles.end(), [this](auto &particle) { return isParticleExpired(*particle); });
+    _particles.erase(expiredParticles, _particles.end());
+}
+
+bool EmitterSceneNode::isParticleExpired(Particle &particle) const {
+    return _lifeExpectancy != -1.0f && particle.lifetime >= _lifeExpectancy;
 }
 
 void EmitterSceneNode::spawnParticles(float dt) {
     shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
-
     switch (emitter->updateMode) {
         case ModelNode::Emitter::UpdateMode::Fountain:
             if (_birthrate != 0.0f) {
@@ -192,6 +186,61 @@ void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
 
 void EmitterSceneNode::detonate() {
     doSpawnParticle();
+}
+
+void EmitterSceneNode::initParticle(Particle &particle) {
+    if (_fps > 0.0f) {
+        particle.animLength = (_frameEnd - _frameStart + 1) / _fps;
+    }
+    particle.frame = _frameStart;
+}
+
+void EmitterSceneNode::updateParticle(Particle &particle, float dt) {
+    shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
+
+    if (_lifeExpectancy != -1.0f) {
+        particle.lifetime = glm::min(particle.lifetime + dt, _lifeExpectancy);
+    } else if (particle.lifetime == particle.animLength) {
+        particle.lifetime = 0.0f;
+    } else {
+        particle.lifetime = glm::min(particle.lifetime + dt, particle.animLength);
+    }
+
+    if (!isParticleExpired(particle)) {
+        particle.position.z += particle.velocity * dt;
+        updateParticleAnimation(particle, dt);
+    }
+}
+
+template <class T>
+static T interpolateConstraints(const EmitterSceneNode::Constraints<T> &constraints, float t) {
+    T result;
+    if (t < 0.5f) {
+        float tt = 2.0f * t;
+        result = (1.0f - tt) * constraints.start + tt * constraints.mid;
+    } else {
+        float tt = 2.0f * (t - 0.5f);
+        result = (1.0f - tt) * constraints.mid + tt * constraints.end;
+    }
+    return result;
+}
+
+void EmitterSceneNode::updateParticleAnimation(Particle &particle, float dt) {
+    shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
+
+    float maturity;
+    if (_lifeExpectancy != -1.0f) {
+        maturity = particle.lifetime / static_cast<float>(_lifeExpectancy);
+    } else if (particle.animLength > 0.0f) {
+        maturity = particle.lifetime / particle.animLength;
+    } else {
+        maturity = 0.0f;
+    }
+
+    particle.frame = static_cast<int>(glm::ceil(_frameStart + maturity * (_frameEnd - _frameStart)));
+    particle.size = interpolateConstraints(_particleSize, maturity);
+    particle.color = interpolateConstraints(_color, maturity);
+    particle.alpha = interpolateConstraints(_alpha, maturity);
 }
 
 } // namespace scene

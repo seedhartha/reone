@@ -136,11 +136,8 @@ void WorldRenderPipeline::render() {
 
     computeLightSpaceMatrices();
 
-    StateManager::instance().withBackFaceCulling([this]() {
-        drawShadows();
-        drawGeometry();
-    });
-
+    drawShadows();
+    drawGeometry();
     applyHorizontalBlur();
     applyVerticalBlur();
     drawResult();

@@ -64,13 +64,13 @@ void StateManager::withDepthTest(const function<void()> &block) {
 }
 
 void StateManager::setDepthTestEnabled(bool enabled) {
-    if (_depthTestEnabled != enabled) {
+    if (_depthTest != enabled) {
         if (enabled) {
             glEnable(GL_DEPTH_TEST);
         } else {
             glDisable(GL_DEPTH_TEST);
         }
-        _depthTestEnabled = enabled;
+        _depthTest = enabled;
     }
 }
 
@@ -107,9 +107,20 @@ void StateManager::withLightenBlending(const function<void()> &block) {
 }
 
 void StateManager::withBackFaceCulling(const function<void()> &block) {
-    glEnable(GL_CULL_FACE);
+    setBackFaceCullingEnabled(true);
     block();
-    glDisable(GL_CULL_FACE);
+    setBackFaceCullingEnabled(false);
+}
+
+void StateManager::setBackFaceCullingEnabled(bool enabled) {
+    if (_backFaceCulling != enabled) {
+        if (enabled) {
+            glEnable(GL_CULL_FACE);
+        } else {
+            glDisable(GL_CULL_FACE);
+        }
+        _backFaceCulling = enabled;
+    }
 }
 
 void StateManager::setActiveTextureUnit(int n) {

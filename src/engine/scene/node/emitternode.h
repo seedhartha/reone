@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <vector>
-
-#include "glm/vec3.hpp"
-
 #include "../../common/timer.h"
 #include "../../graphics/model/modelnode.h"
 
@@ -56,12 +52,6 @@ public:
     EmitterSceneNode(const ModelSceneNode *model, std::shared_ptr<graphics::ModelNode> modelNode, SceneGraph *sceneGraph);
 
     void update(float dt) override;
-
-    /**
-     * Renders the specified particles.
-     *
-     * @param particles subset of this emitters particles
-     */
     void drawParticles(const std::vector<Particle *> &particles);
 
     void detonate();
@@ -94,15 +84,11 @@ private:
     void removeExpiredParticles(float dt);
     void doSpawnParticle();
 
-    // Particles
-
     void initParticle(Particle &particle);
     void updateParticle(Particle &particle, float dt);
     void updateParticleAnimation(Particle &particle, float dt);
 
     bool isParticleExpired(Particle &particle) const;
-
-    // END Particles
 };
 
 } // namespace scene
