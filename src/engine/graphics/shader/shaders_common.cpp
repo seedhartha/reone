@@ -101,7 +101,6 @@ struct Bumpmap {
     float scaling;
     vec2 gridSize;
     int frame;
-    bool swizzled;
 };
 
 struct Blur {
@@ -231,12 +230,7 @@ vec3 getNormalFromBumpmap(vec2 uv) {
         result = vec3(-dBx * uBumpmaps.scaling, -dBy * uBumpmaps.scaling, 1.0);
     } else {
         vec4 bumpmapSample = texture(uBumpmap, uv);
-        if (uBumpmaps.swizzled) {
-            result = vec3(bumpmapSample.a, bumpmapSample.g, 1.0);
-        } else {
-            result = bumpmapSample.rgb;
-        }
-        result = normalize(result * 2.0 - 1.0);
+        result = normalize(bumpmapSample.rgb * 2.0 - 1.0);
     }
 
     result = normalize(result * fragTanSpace);
