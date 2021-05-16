@@ -125,10 +125,13 @@ static inline void ensureNumColumnsEquals(int type, int expected, int actual) {
 }
 
 void MdlReader::readFloatController(const ControllerKey &key, const vector<float> &data, AnimatedProperty<float> &prop) {
-    ensureNumColumnsEquals(key.type, 1, key.numColumns);
+    bool bezier = key.numColumns & kFlagBezier;
+    int numColumns = key.numColumns & ~kFlagBezier;
+    ensureNumColumnsEquals(key.type, 1, numColumns);
+
     for (uint16_t i = 0; i < key.numRows; ++i) {
         float time = data[key.timeIndex + i];
-        float value = data[key.dataIndex + i];
+        float value = data[key.dataIndex + (bezier ? 3 : 1) * i];
         prop.addFrame(time, value);
     }
     prop.update();
