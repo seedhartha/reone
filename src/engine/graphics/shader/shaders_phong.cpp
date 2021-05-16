@@ -57,7 +57,7 @@ vec3 getLightingDirect(vec3 N) {
 
 char g_shaderFragmentBlinnPhong[] = R"END(
 void main() {
-    vec2 uv = getUV();
+    vec2 uv = getTexCoords();
     vec3 N = getNormal(uv);
     float shadow = getShadow();
     vec4 diffuseSample = texture(sDiffuseMap, uv);
