@@ -40,10 +40,10 @@ Animation::Animation(
     _rootNode(move(rootNode)),
     _events(move(events)) {
 
-    fillNodeLookups();
+    fillNodeByName();
 }
 
-void Animation::fillNodeLookups() {
+void Animation::fillNodeByName() {
     stack<shared_ptr<ModelNode>> nodes;
     nodes.push(_rootNode);
 

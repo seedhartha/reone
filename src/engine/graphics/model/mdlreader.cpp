@@ -130,14 +130,11 @@ void MdlReader::doLoad() {
         name,
         getClassification(classification),
         move(rootNode),
+        move(animations),
         move(superModel),
         animationScale);
 
     _model->setAffectedByFog(affectedByFog != 0);
-
-    for (auto &anim : animations) {
-        _model->addAnimation(anim);
-    }
 }
 
 MdlReader::ArrayDefinition MdlReader::readArrayDefinition() {

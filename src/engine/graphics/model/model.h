@@ -55,43 +55,52 @@ public:
         std::string name,
         Classification classification,
         std::shared_ptr<ModelNode> rootNode,
+        std::vector<std::shared_ptr<Animation>> animations,
         std::shared_ptr<Model> superModel,
         float animationScale);
 
     void init();
 
-    void addAnimation(std::shared_ptr<Animation> animation);
-
     bool isAffectedByFog() const { return _affectedByFog; }
+
+    const std::string &name() const { return _name; }
+    Classification classification() const { return _classification; }
+    std::shared_ptr<ModelNode> rootNode() const { return _rootNode; }
+    std::shared_ptr<Model> superModel() const { return _superModel; }
+    float animationScale() const { return _animationScale; }
+    const AABB &aabb() const { return _aabb; }
+
+    void setAffectedByFog(bool affected) { _affectedByFog = affected; }
+
+    // Nodes
 
     std::shared_ptr<ModelNode> getNodeByName(const std::string &name) const;
     std::shared_ptr<ModelNode> getNodeByNameRecursive(const std::string &name) const;
     std::shared_ptr<ModelNode> getAABBNode() const;
-    std::shared_ptr<Animation> getAnimation(const std::string &name) const;
-    std::vector<std::string> getAnimationNames() const;
     std::set<std::string> getAncestorNodes(const std::string &parentName) const;
 
-    const std::string &name() const { return _name; }
-    Classification classification() const { return _classification; }
-    float animationScale() const { return _animationScale; }
-    std::shared_ptr<ModelNode> rootNode() const { return _rootNode; }
-    std::shared_ptr<Model> superModel() const { return _superModel; }
-    const AABB &aabb() const { return _aabb; }
+    // END Nodes
 
-    void setAffectedByFog(bool affected) { _affectedByFog = affected; }
+    // Animations
+
+    std::vector<std::string> getAnimationNames() const;
+    std::shared_ptr<Animation> getAnimation(const std::string &name) const;
+
+    // END Animations
 
 private:
     std::string _name;
     Classification _classification;
     std::shared_ptr<ModelNode> _rootNode;
-    std::shared_ptr<Model> _superModel;
     std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
+    std::shared_ptr<Model> _superModel;
     float _animationScale;
+
     bool _affectedByFog;
+    AABB _aabb;
 
     std::vector<std::shared_ptr<ModelNode>> _nodes;
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
-    AABB _aabb;
 
     void fillNodeLookups(const std::shared_ptr<ModelNode> &node);
     void fillBoneNodeId();
