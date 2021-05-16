@@ -114,7 +114,8 @@ void MdlReader::doLoad() {
     readNodeNames(nameOffsets);
 
     // Read nodes
-    unique_ptr<ModelNode> rootNode(readNode(offRootNode, nullptr));
+    shared_ptr<ModelNode> rootNode(readNode(offRootNode, nullptr));
+    prepareSkinMeshes();
 
     // Load supermodel
     shared_ptr<Model> superModel;
@@ -158,7 +159,7 @@ void MdlReader::readNodeNames(const vector<uint32_t> &offsets) {
     }
 }
 
-unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *parent, bool anim) {
+shared_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *parent, bool anim) {
     seek(kMdlDataOffset + offset);
 
     uint16_t flags = readUint16();
@@ -177,13 +178,10 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *pare
         throw runtime_error("Unsupported MDL node flags: " + to_string(flags));
     }
     string name(_nodeNames[nameIndex]);
-    if (!anim) {
-        _nodeFlags.insert(make_pair(name, flags));
-    }
     glm::vec3 restPosition(glm::make_vec3(&positionValues[0]));
     glm::quat restOrientation(orientationValues[0], orientationValues[1], orientationValues[2], orientationValues[3]);
 
-    auto node = make_unique<ModelNode>(
+    auto node = make_shared<ModelNode>(
         move(name),
         move(restPosition),
         move(restOrientation),
@@ -202,6 +200,10 @@ unique_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *pare
     }
     if (flags & NodeFlags::reference) {
         node->setReference(readReference());
+    }
+    if (!anim) {
+        _nodes.push_back(node);
+        _nodeFlags.insert(make_pair(name, flags));
     }
 
     vector<float> controllerData(readFloatArray(kMdlDataOffset + controllerDataArrayDef.offset, controllerDataArrayDef.count));
@@ -297,22 +299,10 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         vector<uint16_t> boneNodeSerial(readUint16Array(16));
         ignore(4); // padding
 
-        // boneNodeSerial above is a more compact representation of the bone
-        // map, but it is limited to 16 bones, which is not enough for certain
-        // models
         vector<float> boneMap(readFloatArray(kMdlDataOffset + offBones, numBones));
-        for (size_t i = 0; i < boneMap.size(); ++i) {
-            auto boneId = static_cast<uint16_t>(boneMap[i]);
-            if (boneId != 0xffff) {
-                if (boneId >= boneNodeSerial.size()) {
-                    boneNodeSerial.resize(boneId + 1);
-                }
-                boneNodeSerial[boneId] = static_cast<uint16_t>(i);
-            }
-        }
 
         skin = make_shared<ModelNode::Skin>();
-        skin->boneNodeSerial = move(boneNodeSerial);
+        skin->boneMap = move(boneMap);
         attributes.offBoneIndices = offMdxBoneIndices;
         attributes.offBoneWeights = offMdxBoneWeights;
 
@@ -676,6 +666,24 @@ void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const vec
     }
 }
 
+void MdlReader::prepareSkinMeshes() {
+    for (auto &node : _nodes) {
+        if (!node->isSkinMesh()) continue;
+
+        shared_ptr<ModelNode::Skin> skin(node->mesh()->skin);
+        for (size_t i = 0; i < skin->boneMap.size(); ++i) {
+            auto boneIdx = static_cast<uint16_t>(skin->boneMap[i]);
+            if (boneIdx >= skin->boneNodeName.size()) {
+                skin->boneNodeName.resize(boneIdx + 1);
+            }
+            if (boneIdx != 0xffff) {
+                shared_ptr<ModelNode> boneNode(_nodes[i]);
+                skin->boneNodeName[boneIdx] = boneNode->name();
+            }
+        }
+    }
+}
+
 vector<shared_ptr<Animation>> MdlReader::readAnimations(const vector<uint32_t> &offsets) {
     vector<shared_ptr<Animation>> anims;
     anims.reserve(offsets.size());
@@ -708,7 +716,7 @@ unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
     ArrayDefinition eventArrayDef(readArrayDefinition());
     ignore(4); // unknown
 
-    unique_ptr<ModelNode> rootNode(readNode(offRootNode, nullptr, true));
+    shared_ptr<ModelNode> rootNode(readNode(offRootNode, nullptr, true));
 
     // Events
     vector<Animation::Event> events;

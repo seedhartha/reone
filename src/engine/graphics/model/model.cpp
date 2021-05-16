@@ -46,8 +46,7 @@ Model::Model(
         throw invalid_argument("rootNode must not be null");
     }
 
-    fillNodeLookups(_rootNode);
-    fillBoneNodeId();
+    fillNodeByName(_rootNode);
     computeAABB();
 
     for (auto &anim : animations) {
@@ -55,33 +54,11 @@ Model::Model(
     }
 }
 
-void Model::fillNodeLookups(const shared_ptr<ModelNode> &node) {
-    _nodes.push_back(node);
+void Model::fillNodeByName(const shared_ptr<ModelNode> &node) {
     _nodeByName.insert(make_pair(node->name(), node));
 
     for (auto &child : node->children()) {
-        fillNodeLookups(child);
-    }
-}
-
-void Model::fillBoneNodeId() {
-    // In MDL files, bones reference node serial numbers (DFS ordering).
-    // We want them to reference node names instead.
-
-    for (auto &node : _nodes) {
-        if (!node->isSkinMesh()) continue;
-
-        shared_ptr<ModelNode::TriangleMesh> mesh(node->mesh());
-        mesh->skin->boneNodeName.resize(mesh->skin->boneNodeSerial.size());
-
-        for (size_t i = 0; i < mesh->skin->boneNodeSerial.size(); ++i) {
-            uint16_t nodeSerial = mesh->skin->boneNodeSerial[i];
-            if (nodeSerial < static_cast<int>(_nodes.size())) {
-                mesh->skin->boneNodeName[i] = _nodes[nodeSerial]->name();
-            } else {
-                mesh->skin->boneNodeName[i].clear();
-            }
-        }
+        fillNodeByName(child);
     }
 }
 

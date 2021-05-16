@@ -77,6 +77,7 @@ private:
     std::unique_ptr<StreamReader> _mdxReader;
     bool _tsl { false }; /**< is this a TSL model? */
     std::vector<std::string> _nodeNames;
+    std::vector<std::shared_ptr<ModelNode>> _nodes; /**< loaded model nodes (DFS ordering) */
     std::map<std::string, uint16_t> _nodeFlags;
     std::shared_ptr<graphics::Model> _model;
 
@@ -84,7 +85,7 @@ private:
 
     ArrayDefinition readArrayDefinition();
     void readNodeNames(const std::vector<uint32_t> &offsets);
-    std::unique_ptr<graphics::ModelNode> readNode(uint32_t offset, const ModelNode *parent, bool anim = false);
+    std::shared_ptr<graphics::ModelNode> readNode(uint32_t offset, const ModelNode *parent, bool anim = false);
     std::vector<std::shared_ptr<graphics::Animation>> readAnimations(const std::vector<uint32_t> &offsets);
     std::unique_ptr<graphics::Animation> readAnimation(uint32_t offset);
     void readControllers(uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, bool anim, graphics::ModelNode &node);
@@ -95,6 +96,8 @@ private:
     std::shared_ptr<ModelNode::TriangleMesh> readMesh(int flags);
 
     std::shared_ptr<ModelNode::AABBTree> readAABBTree(uint32_t offset);
+
+    void prepareSkinMeshes();
 
     // Controllers
 

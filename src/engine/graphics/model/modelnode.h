@@ -40,13 +40,14 @@ namespace graphics {
 class Model;
 
 /**
- * Model or animation node. Can be specialized to represent a triangle mesh, a light, an emitter and etc.
+ * Model or animation node. Can be specialized to represent a triangle mesh, a
+ * light, an emitter and etc.
  */
 class ModelNode : boost::noncopyable {
 public:
     struct Skin {
-        std::vector<std::string> boneNodeName;
-        std::vector<uint16_t> boneNodeSerial; /**< temporary, used to fill boneNodeName above */
+        std::vector<std::string> boneNodeName; /**< node name per bone, used for skeletal animation */
+        std::vector<float> boneMap; /**< bone index per node (DFS ordering) */
     };
 
     struct UVAnimation {
