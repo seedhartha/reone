@@ -54,7 +54,7 @@ public:
     void drawTrianglesInstanced(int startFace, int numFaces, int count);
 
     /**
-     * @param faceIdx faceIdx
+     * @param faceIdx face index
      * @return coordinates of three triangle vertices
      */
     std::vector<glm::vec3> getTriangleCoords(int faceIdx) const;
@@ -98,11 +98,13 @@ private:
 
     void computeAABB();
 
-    glm::vec3 getVertexCoords(uint16_t vertexIdx) const;
-    glm::vec2 getVertexTexCoords1(uint16_t vertexIdx) const;
-    glm::vec2 getVertexTexCoords2(uint16_t vertexIdx) const;
-
     inline void ensureTriangles() const;
+
+    template <class T>
+    std::vector<T> getTriangleAttributes(int faceIdx, int offset) const;
+
+    template <class T>
+    inline T getVertexAttribute(uint16_t vertexIdx, int offset) const;
 };
 
 } // namespace graphics
