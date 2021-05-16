@@ -197,11 +197,31 @@ in mat3 fragTanSpace;
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
-vec2 getUV() {
+vec2 getTexCoords() {
     return fragTexCoords + uGeneral.uvOffset;
 }
 
-vec2 packUV(vec2 uv, vec4 bounds) {
+float getAttenuationQuadratic(int light) {
+    if (uLights[light].position.w == 0.0) return 1.0;
+
+    float D = uLights[light].radius;
+    D *= D;
+
+    float r = length(uLights[light].position.xyz - fragPosition);
+    r *= r;
+
+    return D / (D + r);
+}
+
+vec3 applyFog(vec3 objectColor) {
+    float distance = length(uGeneral.cameraPosition.xyz - fragPosition);
+    float fogAmount = clamp(distance - uGeneral.fogNear, 0.0, uGeneral.fogFar - uGeneral.fogNear) / (uGeneral.fogFar - uGeneral.fogNear);
+    return mix(objectColor, uGeneral.fogColor.rgb, fogAmount);
+}
+)END";
+
+char g_shaderBaseNormals[] = R"END(
+vec2 packTexCoords(vec2 uv, vec4 bounds) {
     return bounds.xy + bounds.zw * clamp(fract(uv), 0.001, 0.999);
 }
 
@@ -216,9 +236,9 @@ vec3 getNormalFromBumpMap(vec2 uv) {
 
     vec2 du = dFdx(uv);
     vec2 dv = dFdy(uv);
-    vec2 packedUv = packUV(uv, frameBounds);
-    vec2 packedUvDu = packUV(uv + du, frameBounds);
-    vec2 packedUvDv = packUV(uv + dv, frameBounds);
+    vec2 packedUv = packTexCoords(uv, frameBounds);
+    vec2 packedUvDu = packTexCoords(uv + du, frameBounds);
+    vec2 packedUvDv = packTexCoords(uv + dv, frameBounds);
     vec4 bumpmapSample = texture(sBumpMap, packedUv);
     vec4 bumpmapSampleDu = texture(sBumpMap, packedUvDu);
     vec4 bumpmapSampleDv = texture(sBumpMap, packedUvDv);
@@ -248,7 +268,9 @@ vec3 getNormal(vec2 uv) {
 
     return result;
 }
+)END";
 
+char g_shaderBaseShadows[] = R"END(
 float getShadow() {
     if (!isFeatureEnabled(FEATURE_SHADOWS) || !uShadows.lightPresent) return 0.0;
 
@@ -302,24 +324,6 @@ float getShadow() {
 
     result *= uShadows.strength;
     return result;
-}
-
-float getAttenuationQuadratic(int light) {
-    if (uLights[light].position.w == 0.0) return 1.0;
-
-    float D = uLights[light].radius;
-    D *= D;
-
-    float r = length(uLights[light].position.xyz - fragPosition);
-    r *= r;
-
-    return D / (D + r);
-}
-
-vec3 applyFog(vec3 objectColor) {
-    float distance = length(uGeneral.cameraPosition.xyz - fragPosition);
-    float fogAmount = clamp(distance - uGeneral.fogNear, 0.0, uGeneral.fogFar - uGeneral.fogNear) / (uGeneral.fogFar - uGeneral.fogNear);
-    return mix(objectColor, uGeneral.fogColor.rgb, fogAmount);
 }
 )END";
 
