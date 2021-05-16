@@ -182,7 +182,7 @@ shared_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *pare
     glm::quat restOrientation(orientationValues[0], orientationValues[1], orientationValues[2], orientationValues[3]);
 
     auto node = make_shared<ModelNode>(
-        move(name),
+        name,
         move(restPosition),
         move(restOrientation),
         parent);
