@@ -34,7 +34,7 @@ public:
         EmitterSceneNode *emitter { nullptr };
         glm::vec3 position { 0.0f };
         glm::vec3 color { 1.0f };
-        float velocity { 0.0f };
+        glm::vec3 velocity { 0.0f };
         float animLength { 0.0f };
         float lifetime { 0.0f };
         int frame { 0 };
@@ -65,15 +65,16 @@ private:
     Constraints<glm::vec3> _color;
     Constraints<float> _alpha;
 
-    int _frameStart { 0 };
-    int _frameEnd { 0 };
-    glm::vec2 _size { 0.0f };
     float _birthrate { 0.0f }; /**< rate of particle birth per second */
     float _lifeExpectancy { 0.0f }; /**< life of each particle in seconds */
+    glm::vec2 _size { 0.0f };
+    int _frameStart { 0 };
+    int _frameEnd { 0 };
+    float _fps { 0.0f };
+    float _spread { 0.0f };
     float _velocity { 0.0f };
     float _randomVelocity { 0.0f };
-    float _spread { 0.0f };
-    float _fps { 0.0f };
+    float _mass { 0.0f };
 
     float _birthInterval { 0.0f };
     Timer _birthTimer;
