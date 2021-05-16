@@ -85,7 +85,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconFrame) {
-        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
         iconFrame->bind();
 
         glm::mat4 transform(1.0f);
@@ -102,7 +102,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconTexture) {
-        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
         iconTexture->bind();
 
         glm::mat4 transform(1.0f);

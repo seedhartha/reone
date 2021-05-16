@@ -180,12 +180,12 @@ bool isFeatureEnabled(int flag) {
 char g_shaderBaseModel[] = R"END(
 const float SELFILLUM_THRESHOLD = 0.85;
 
-uniform sampler2D uDiffuse;
-uniform sampler2D uLightmap;
-uniform sampler2D uBumpmap;
-uniform sampler2D uShadowMap;
-uniform samplerCube uEnvmap;
-uniform samplerCube uCubeShadowMap;
+uniform sampler2D sDiffuseMap;
+uniform sampler2D sLightmap;
+uniform sampler2D sBumpMap;
+uniform sampler2D sShadowMap;
+uniform samplerCube sEnvironmentMap;
+uniform samplerCube sShadowMapCube;
 
 in vec3 fragPosition;
 in vec3 fragNormal;
@@ -219,9 +219,9 @@ vec3 getNormalFromBumpMap(vec2 uv) {
     vec2 packedUv = packUV(uv, frameBounds);
     vec2 packedUvDu = packUV(uv + du, frameBounds);
     vec2 packedUvDv = packUV(uv + dv, frameBounds);
-    vec4 bumpmapSample = texture(uBumpmap, packedUv);
-    vec4 bumpmapSampleDu = texture(uBumpmap, packedUvDu);
-    vec4 bumpmapSampleDv = texture(uBumpmap, packedUvDv);
+    vec4 bumpmapSample = texture(sBumpMap, packedUv);
+    vec4 bumpmapSampleDu = texture(sBumpMap, packedUvDu);
+    vec4 bumpmapSampleDv = texture(sBumpMap, packedUvDv);
     float dBx = bumpmapSampleDu.r - bumpmapSample.r;
     float dBy = bumpmapSampleDv.r - bumpmapSample.r;
     vec3 normal = vec3(-dBx * uBumpmaps.scaling, -dBy * uBumpmaps.scaling, 1.0);
@@ -230,7 +230,7 @@ vec3 getNormalFromBumpMap(vec2 uv) {
 }
 
 vec3 getNormalFromNormalMap(vec2 uv) {
-    vec4 bumpmapSample = texture(uBumpmap, uv);
+    vec4 bumpmapSample = texture(sBumpMap, uv);
     vec3 normal = bumpmapSample.rgb * 2.0 - 1.0;
     return normalize(normal * fragTanSpace);
 }
@@ -259,13 +259,13 @@ float getShadow() {
 
         vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
         projCoords = projCoords * 0.5 + 0.5;
-        float closestDepth = texture(uShadowMap, projCoords.xy).r;
+        float closestDepth = texture(sShadowMap, projCoords.xy).r;
         float currentDepth = projCoords.z;
 
-        vec2 texelSize = 1.0 / textureSize(uShadowMap, 0);
+        vec2 texelSize = 1.0 / textureSize(sShadowMap, 0);
         for (int x = -1; x <= 1; ++x) {
             for (int y = -1; y <= 1; ++y) {
-                float pcfDepth = texture(uShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+                float pcfDepth = texture(sShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
                 result += currentDepth > pcfDepth  ? 1.0 : 0.0;
             }
         }
@@ -287,7 +287,7 @@ float getShadow() {
         for (float x = -offset; x < offset; x += offset / (samples * 0.5)) {
             for (float y = -offset; y < offset; y += offset / (samples * 0.5)) {
                 for (float z = -offset; z < offset; z += offset / (samples * 0.5)) {
-                    float closestDepth = texture(uCubeShadowMap, fragToLight + vec3(x, y, z)).r;
+                    float closestDepth = texture(sShadowMapCube, fragToLight + vec3(x, y, z)).r;
                     closestDepth *= SHADOW_FAR_PLANE;
 
                     if (currentDepth - bias > closestDepth) {
@@ -575,7 +575,7 @@ void main() {
 )END";
 
 char g_shaderFragmentGUI[] = R"END(
-uniform sampler2D uDiffuse;
+uniform sampler2D sDiffuseMap;
 
 in vec2 fragTexCoords;
 
@@ -583,7 +583,7 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
 void main() {
-    vec4 diffuseSample = texture(uDiffuse, fragTexCoords);
+    vec4 diffuseSample = texture(sDiffuseMap, fragTexCoords);
     vec3 objectColor = uGeneral.color.rgb * diffuseSample.rgb;
 
     if (isFeatureEnabled(FEATURE_DISCARD) && length(uGeneral.discardColor.rgb - objectColor) < 0.01) discard;
@@ -594,7 +594,7 @@ void main() {
 )END";
 
 char g_shaderFragmentText[] = R"END(
-uniform sampler2D uDiffuse;
+uniform sampler2D sDiffuseMap;
 
 in vec2 fragTexCoords;
 flat in int fragInstanceID;
@@ -603,14 +603,14 @@ out vec4 fragColor;
 
 void main() {
     vec2 uv = fragTexCoords * uChars[fragInstanceID].uv.zw + uChars[fragInstanceID].uv.xy;
-    vec4 diffuseSample = texture(uDiffuse, uv);
+    vec4 diffuseSample = texture(sDiffuseMap, uv);
     vec3 objectColor = uGeneral.color.rgb * diffuseSample.rgb;
     fragColor = vec4(objectColor, diffuseSample.a);
 }
 )END";
 
 char g_shaderFragmentParticle[] = R"END(
-uniform sampler2D uDiffuse;
+uniform sampler2D sDiffuseMap;
 
 in vec2 fragTexCoords;
 flat in int fragInstanceID;
@@ -631,7 +631,7 @@ void main() {
         texCoords.x += oneOverGridX * (uParticles[fragInstanceID].frame % int(uParticleGridSize.x));
     }
 
-    vec4 diffuseSample = texture(uDiffuse, texCoords);
+    vec4 diffuseSample = texture(sDiffuseMap, texCoords);
 
     fragColor = vec4(uParticles[fragInstanceID].color.rgb * diffuseSample.rgb, uParticles[fragInstanceID].alpha * diffuseSample.a);
     fragColorBright = vec4(vec3(0.0), 0.0);
@@ -639,8 +639,8 @@ void main() {
 )END";
 
 char g_shaderFragmentGrass[] = R"END(
-uniform sampler2D uDiffuse;
-uniform sampler2D uLightmap;
+uniform sampler2D sDiffuseMap;
+uniform sampler2D sLightmap;
 
 in vec2 fragTexCoords;
 flat in int fragInstanceID;
@@ -653,11 +653,11 @@ void main() {
     uv.y += 0.5 * (int(uGrassClusters[fragInstanceID].positionVariant[3]) / 2);
     uv.x += 0.5 * (int(uGrassClusters[fragInstanceID].positionVariant[3]) % 2);
 
-    vec4 diffuseSample = texture(uDiffuse, uv);
+    vec4 diffuseSample = texture(sDiffuseMap, uv);
     vec3 objectColor = diffuseSample.rgb;
 
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
-        vec4 lightmapSample = texture(uLightmap, uGrassClusters[fragInstanceID].lightmapUV);
+        vec4 lightmapSample = texture(sLightmap, uGrassClusters[fragInstanceID].lightmapUV);
         objectColor *= lightmapSample.rgb;
     }
 
@@ -667,7 +667,7 @@ void main() {
 )END";
 
 char g_shaderFragmentBlur[] = R"END(
-uniform sampler2D uDiffuse;
+uniform sampler2D sDiffuseMap;
 
 out vec4 fragColor;
 
@@ -676,27 +676,27 @@ void main() {
     vec4 color = vec4(0.0);
     vec2 off1 = vec2(1.3846153846) * uBlur.direction;
     vec2 off2 = vec2(3.2307692308) * uBlur.direction;
-    color += texture(uDiffuse, uv) * 0.2270270270;
-    color += texture(uDiffuse, uv + (off1 / uBlur.resolution)) * 0.3162162162;
-    color += texture(uDiffuse, uv - (off1 / uBlur.resolution)) * 0.3162162162;
-    color += texture(uDiffuse, uv + (off2 / uBlur.resolution)) * 0.0702702703;
-    color += texture(uDiffuse, uv - (off2 / uBlur.resolution)) * 0.0702702703;
+    color += texture(sDiffuseMap, uv) * 0.2270270270;
+    color += texture(sDiffuseMap, uv + (off1 / uBlur.resolution)) * 0.3162162162;
+    color += texture(sDiffuseMap, uv - (off1 / uBlur.resolution)) * 0.3162162162;
+    color += texture(sDiffuseMap, uv + (off2 / uBlur.resolution)) * 0.0702702703;
+    color += texture(sDiffuseMap, uv - (off2 / uBlur.resolution)) * 0.0702702703;
 
     fragColor = color;
 }
 )END";
 
 char g_shaderFragmentPresentWorld[] = R"END(
-uniform sampler2D uDiffuse;
-uniform sampler2D uBloom;
+uniform sampler2D sDiffuseMap;
+uniform sampler2D sBloom;
 
 in vec2 fragTexCoords;
 
 out vec4 fragColor;
 
 void main() {
-    vec4 diffuseSample = texture(uDiffuse, fragTexCoords);
-    vec4 bloomSample = texture(uBloom, fragTexCoords);
+    vec4 diffuseSample = texture(sDiffuseMap, fragTexCoords);
+    vec4 bloomSample = texture(sBloom, fragTexCoords);
     vec3 color = diffuseSample.rgb + bloomSample.rgb;
 
     fragColor = vec4(color, 1.0);

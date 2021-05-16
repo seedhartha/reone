@@ -255,7 +255,7 @@ void WorldRenderPipeline::drawGeometry() {
             StateManager::instance().setActiveTextureUnit(TextureUnits::shadowMap);
             _shadowsDepth->bind();
         } else {
-            StateManager::instance().setActiveTextureUnit(TextureUnits::cubeShadowMap);
+            StateManager::instance().setActiveTextureUnit(TextureUnits::shadowMapCube);
             _cubeShadowsDepth->bind();
         }
     }
@@ -279,7 +279,7 @@ void WorldRenderPipeline::applyHorizontalBlur() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor2->bind();
 
     ShaderUniforms uniforms;
@@ -302,7 +302,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
     _horizontalBlurColor->bind();
 
     ShaderUniforms uniforms;
@@ -320,7 +320,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
 }
 
 void WorldRenderPipeline::drawResult() {
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor1->bind();
 
     StateManager::instance().setActiveTextureUnit(TextureUnits::bloom);

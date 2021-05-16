@@ -371,7 +371,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     // Setup textures
 
     if (_textures.diffuse) {
-        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
         _textures.diffuse->bind();
         additive = _textures.diffuse->isAdditive();
     }
@@ -380,7 +380,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         _textures.lightmap->bind();
     }
     if (_textures.envmap) {
-        StateManager::instance().setActiveTextureUnit(TextureUnits::envmap);
+        StateManager::instance().setActiveTextureUnit(TextureUnits::environmentMap);
         _textures.envmap->bind();
 
         PBRIBL::Derived derived;
@@ -394,7 +394,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         }
     }
     if (_textures.bumpmap) {
-        StateManager::instance().setActiveTextureUnit(TextureUnits::bumpmap);
+        StateManager::instance().setActiveTextureUnit(TextureUnits::bumpMap);
         _textures.bumpmap->bind();
     }
 

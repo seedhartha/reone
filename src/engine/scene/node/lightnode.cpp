@@ -56,7 +56,7 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     shared_ptr<CameraSceneNode> camera(_sceneGraph->activeCamera());
     if (!camera) return;
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
     flare.texture->bind();
 
     glm::vec4 lightPos(_absTransform[3]);

@@ -111,7 +111,7 @@ shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
 
     _irradianceFB.bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::envmap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::environmentMap);
     envmap->bind();
 
     StateManager::instance().withViewport(viewport, [&]() {
@@ -148,7 +148,7 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
     _prefilterFB.bind();
     _prefilterFB.attachDepth(*prefilterDepth);
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::envmap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::environmentMap);
     envmap->bind();
 
     for (int mip = 0; mip < kNumPrefilterMipMaps; ++mip) {

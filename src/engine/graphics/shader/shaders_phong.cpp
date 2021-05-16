@@ -60,12 +60,12 @@ void main() {
     vec2 uv = getUV();
     vec3 N = getNormal(uv);
     float shadow = getShadow();
-    vec4 diffuseSample = texture(uDiffuse, uv);
+    vec4 diffuseSample = texture(sDiffuseMap, uv);
     bool opaque = isFeatureEnabled(FEATURE_ENVMAP) || isFeatureEnabled(FEATURE_BUMPMAP) || isFeatureEnabled(FEATURE_NORMALMAP);
 
     vec3 lighting;
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
-        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+        vec4 lightmapSample = texture(sLightmap, fragLightmapCoords);
         lighting = (1.0 - 0.5 * shadow) * lightmapSample.rgb;
         if (isFeatureEnabled(FEATURE_WATER)) {
             lighting = mix(vec3(1.0), lighting, 0.2);
@@ -86,7 +86,7 @@ void main() {
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
         vec3 V = normalize(uGeneral.cameraPosition.xyz - fragPosition);
         vec3 R = reflect(-V, N);
-        vec4 envmapSample = texture(uEnvmap, R);
+        vec4 envmapSample = texture(sEnvironmentMap, R);
         objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
     }
     if (isFeatureEnabled(FEATURE_WATER)) {
@@ -116,7 +116,7 @@ void main() {
 
     vec3 lighting;
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
-        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+        vec4 lightmapSample = texture(sLightmap, fragLightmapCoords);
         lighting = (1.0 - 0.5 * shadow) * lightmapSample.rgb;
     } else if (isFeatureEnabled(FEATURE_LIGHTING)) {
         vec3 indirect = getLightingIndirect(N);

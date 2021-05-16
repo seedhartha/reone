@@ -53,7 +53,7 @@ void GrassSceneNode::addCluster(Cluster cluster) {
 }
 
 void GrassSceneNode::drawClusters(const vector<Cluster> &clusters) {
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
 
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());

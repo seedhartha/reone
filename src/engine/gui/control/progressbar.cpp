@@ -47,7 +47,7 @@ void ProgressBar::load(const GffStruct &gffs) {
 void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
     if (_value == 0 || !_progress.fill) return;
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
     _progress.fill->bind();
 
     float w = _extent.width * _value / 100.0f;

@@ -85,7 +85,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
 
     // Render control
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor->bind();
 
     int viewport[4];

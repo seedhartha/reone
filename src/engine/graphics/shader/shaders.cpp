@@ -215,16 +215,16 @@ void Shaders::initUBO(const string &block, int bindingPoint, uint32_t ubo, const
 }
 
 void Shaders::initTextureUniforms() {
-    setUniform("uDiffuse", TextureUnits::diffuse);
-    setUniform("uLightmap", TextureUnits::lightmap);
-    setUniform("uEnvmap", TextureUnits::envmap);
-    setUniform("uBumpmap", TextureUnits::bumpmap);
-    setUniform("uBloom", TextureUnits::bloom);
-    setUniform("uIrradianceMap", TextureUnits::irradianceMap);
-    setUniform("uPrefilterMap", TextureUnits::prefilterMap);
-    setUniform("uBRDFLookup", TextureUnits::brdfLookup);
-    setUniform("uShadowMap", TextureUnits::shadowMap);
-    setUniform("uCubeShadowMap", TextureUnits::cubeShadowMap);
+    setUniform("sDiffuseMap", TextureUnits::diffuseMap);
+    setUniform("sLightmap", TextureUnits::lightmap);
+    setUniform("sEnvironmentMap", TextureUnits::environmentMap);
+    setUniform("sBumpMap", TextureUnits::bumpMap);
+    setUniform("sBloom", TextureUnits::bloom);
+    setUniform("sIrradianceMap", TextureUnits::irradianceMap);
+    setUniform("sPrefilterMap", TextureUnits::prefilterMap);
+    setUniform("sBRDFLookup", TextureUnits::brdfLookup);
+    setUniform("sShadowMap", TextureUnits::shadowMap);
+    setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
 }
 
 Shaders::~Shaders() {
