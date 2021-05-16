@@ -74,7 +74,7 @@ void Video::updateFrame(float dt) {
 void Video::updateFrameTexture() {
     if (!_frame) return;
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
     _texture->setPixels(_width, _height, PixelFormat::RGB, _frame->pixels);
 }
@@ -82,7 +82,7 @@ void Video::updateFrameTexture() {
 void Video::draw() {
     if (!_inited) return;
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
 
     ShaderUniforms uniforms;

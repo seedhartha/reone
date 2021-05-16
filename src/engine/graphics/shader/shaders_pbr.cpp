@@ -131,7 +131,7 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
 )END";
 
 char g_shaderFragmentIrradiance[] = R"END(
-uniform samplerCube uEnvmap;
+uniform samplerCube sEnvironmentMap;
 
 in vec3 fragPosition;
 
@@ -152,7 +152,7 @@ void main() {
             vec3 tangentSample = vec3(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
             vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * N;
 
-            irradiance += texture(uEnvmap, sampleVec).rgb * cos(theta) * sin(theta);
+            irradiance += texture(sEnvironmentMap, sampleVec).rgb * cos(theta) * sin(theta);
             ++numSamples;
         }
     }
@@ -163,7 +163,7 @@ void main() {
 )END";
 
 char g_shaderFragmentPrefilter[] = R"END(
-uniform samplerCube uEnvmap;
+uniform samplerCube sEnvironmentMap;
 
 in vec3 fragPosition;
 
@@ -200,7 +200,7 @@ void main() {
 
             float mipLevel = uGeneral.roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
 
-            prefilteredColor += textureLod(uEnvmap, L, mipLevel).rgb * NdotL;
+            prefilteredColor += textureLod(sEnvironmentMap, L, mipLevel).rgb * NdotL;
             totalWeight += NdotL;
         }
     }
@@ -223,9 +223,9 @@ void main() {
 )END";
 
 char g_shaderFragmentPBR[] = R"END(
-uniform sampler2D uBRDFLookup;
-uniform samplerCube uIrradianceMap;
-uniform samplerCube uPrefilterMap;
+uniform sampler2D sBRDFLookup;
+uniform samplerCube sIrradianceMap;
+uniform samplerCube sPrefilterMap;
 
 void main() {
     vec2 uv = getUV();
@@ -236,7 +236,7 @@ void main() {
     vec3 N = getNormal(uv);
     vec3 R = reflect(-V, N);
 
-    vec4 diffuseSample = texture(uDiffuse, uv);
+    vec4 diffuseSample = texture(sDiffuseMap, uv);
     if (isFeatureEnabled(FEATURE_HDR)) {
         diffuseSample.rgb = pow(diffuseSample.rgb, vec3(GAMMA));
     }
@@ -247,7 +247,7 @@ void main() {
 
     vec3 objectColor;
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
-        vec4 lightmapSample = texture(uLightmap, fragLightmapCoords);
+        vec4 lightmapSample = texture(sLightmap, fragLightmapCoords);
         if (isFeatureEnabled(FEATURE_HDR)) {
             lightmapSample.rgb = pow(lightmapSample.rgb, vec3(GAMMA));
         }
@@ -259,7 +259,7 @@ void main() {
 
         if (isFeatureEnabled(FEATURE_ENVMAP)) {
             vec3 R = reflect(-V, N);
-            vec4 envmapSample = texture(uEnvmap, R);
+            vec4 envmapSample = texture(sEnvironmentMap, R);
             if (isFeatureEnabled(FEATURE_HDR)) {
                 envmapSample.rgb = pow(envmapSample.rgb, vec3(GAMMA));
             }
@@ -280,15 +280,15 @@ void main() {
             vec3 kD = 1.0 - kS;
             kD *= 1.0 - metallic;
 
-            vec3 irradiance = texture(uIrradianceMap, N).rgb;
+            vec3 irradiance = texture(sIrradianceMap, N).rgb;
             vec3 diffuse = irradiance * albedo;
 
             const float MAX_REFLECTION_LOD = 4.0;
-            vec3 prefilteredColor = textureLod(uPrefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+            vec3 prefilteredColor = textureLod(sPrefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
             if (isFeatureEnabled(FEATURE_HDR)) {
                 prefilteredColor = pow(prefilteredColor, vec3(GAMMA));
             }
-            vec2 brdf = texture(uBRDFLookup, vec2(max(dot(N, V), 0.0), roughness)).rg;
+            vec2 brdf = texture(sBRDFLookup, vec2(max(dot(N, V), 0.0), roughness)).rg;
             vec3 specular = (1.0 - diffuseSample.a) * prefilteredColor * (F * brdf.x + brdf.y);
 
             ambient += (kD * diffuse + specular) * ao;
@@ -335,7 +335,7 @@ void main() {
         }
         if (isFeatureEnabled(FEATURE_ENVMAP)) {
             vec3 R = reflect(-V, N);
-            vec4 envmapSample = texture(uEnvmap, R);
+            vec4 envmapSample = texture(sEnvironmentMap, R);
             if (isFeatureEnabled(FEATURE_HDR)) {
                 envmapSample.rgb = pow(envmapSample.rgb, vec3(GAMMA));
             }

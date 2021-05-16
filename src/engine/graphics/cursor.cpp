@@ -45,7 +45,7 @@ Cursor::Cursor(const shared_ptr<Texture> &up, const shared_ptr<Texture> &down) :
 
 void Cursor::draw() {
     shared_ptr<Texture> texture(_pressed ? _down : _up);
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
 
     glm::mat4 transform(1.0f);

@@ -64,16 +64,16 @@ void Textures::invalidateCache() {
 }
 
 void Textures::bindDefaults() {
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
     _default->bind();
 
     StateManager::instance().setActiveTextureUnit(TextureUnits::lightmap);
     _default->bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::envmap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::environmentMap);
     _defaultCubemap->bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::bumpmap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::bumpMap);
     _default->bind();
 
     StateManager::instance().setActiveTextureUnit(TextureUnits::bloom);
@@ -91,7 +91,7 @@ void Textures::bindDefaults() {
     StateManager::instance().setActiveTextureUnit(TextureUnits::shadowMap);
     _default->bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::cubeShadowMap);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::shadowMapCube);
     _defaultCubemap->bind();
 }
 

@@ -250,7 +250,7 @@ void GUI::draw3D() {
 }
 
 void GUI::drawBackground() {
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
     _background->bind();
 
     glm::mat4 transform(1.0f);

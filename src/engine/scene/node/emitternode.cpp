@@ -177,7 +177,7 @@ void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
 
     Shaders::instance().activate(ShaderProgram::ParticleParticle, uniforms);
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuse);
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
 
     bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
