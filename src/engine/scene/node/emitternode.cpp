@@ -51,6 +51,19 @@ EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *model, shared_ptr<Model
     if (!model) {
         throw invalid_argument("model must not be null");
     }
+
+    _birthrate = modelNode->birthrate().getByFrameOrElse(0, 0.0f);
+    _lifeExpectancy = modelNode->lifeExp().getByFrameOrElse(0, 0.0f);
+    _size.x = modelNode->xSize().getByFrameOrElse(0, 0.0f);
+    _size.y = modelNode->ySize().getByFrameOrElse(0, 0.0f);
+    _frameStart = static_cast<int>(modelNode->frameStart().getByFrameOrElse(0, 0.0f));
+    _frameEnd = static_cast<int>(modelNode->frameEnd().getByFrameOrElse(0, 0.0f));
+    _fps = modelNode->fps().getByFrameOrElse(0, 0.0f);
+    _spread = modelNode->spread().getByFrameOrElse(0, 0.0f);
+    _velocity = modelNode->velocity().getByFrameOrElse(0, 0.0f);
+    _randomVelocity = modelNode->randVel().getByFrameOrElse(0, 0.0f);
+    _mass = modelNode->mass().getByFrameOrElse(0, 0.0f);
+
     _particleSize.start = modelNode->sizeStart().getByFrameOrElse(0, 0.0f);
     _particleSize.mid = modelNode->sizeMid().getByFrameOrElse(0, 0.0f);
     _particleSize.end = modelNode->sizeEnd().getByFrameOrElse(0, 0.0f);
@@ -60,16 +73,6 @@ EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *model, shared_ptr<Model
     _alpha.start = modelNode->alphaStart().getByFrameOrElse(0, 0.0f);
     _alpha.mid = modelNode->alphaMid().getByFrameOrElse(0, 0.0f);
     _alpha.end = modelNode->alphaEnd().getByFrameOrElse(0, 0.0f);
-    _frameStart = static_cast<int>(modelNode->frameStart().getByFrameOrElse(0, 0.0f));
-    _frameEnd = static_cast<int>(modelNode->frameEnd().getByFrameOrElse(0, 0.0f));
-    _size.x = modelNode->xSize().getByFrameOrElse(0, 0.0f);
-    _size.y = modelNode->ySize().getByFrameOrElse(0, 0.0f);
-    _birthrate = modelNode->birthrate().getByFrameOrElse(0, 0.0f);
-    _lifeExpectancy = modelNode->lifeExp().getByFrameOrElse(0, 0.0f);
-    _velocity = modelNode->velocity().getByFrameOrElse(0, 0.0f);
-    _randomVelocity = modelNode->randVel().getByFrameOrElse(0, 0.0f);
-    _spread = modelNode->spread().getByFrameOrElse(0, 0.0f);
-    _fps = modelNode->fps().getByFrameOrElse(0, 0.0f);
 
     if (_birthrate != 0.0f) {
         _birthInterval = 1.0f / static_cast<float>(_birthrate);
@@ -119,33 +122,30 @@ void EmitterSceneNode::spawnParticles(float dt) {
 }
 
 void EmitterSceneNode::doSpawnParticle() {
-    shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
     float halfW = 0.005f * _size.x;
     float halfH = 0.005f * _size.y;
     glm::vec3 position(random(-halfW, halfW), random(-halfH, halfH), 0.0f);
 
-    float sign;
-    if (_spread > glm::pi<float>() && random(0, 1) != 0) {
-        sign = -1.0f;
-    } else {
-        sign = 1.0f;
-    }
-    float velocity = sign * (_velocity + random(0.0f, _randomVelocity));
+    float halfSpread = 0.5f * _spread;
+    float angle1 = random(-halfSpread, halfSpread);
+    float angle2 = random(-halfSpread, halfSpread);
+    glm::vec3 dir(glm::sin(angle1), glm::sin(angle2), glm::cos(angle1) * glm::cos(angle2));
+
+    glm::vec3 velocity((_velocity + random(0.0f, _randomVelocity)) * dir);
 
     auto particle = make_shared<Particle>();
     particle->emitter = this;
     particle->position = move(position);
-    particle->velocity = velocity;
+    particle->velocity = move(velocity);
     particle->frame = _frameStart;
     if (_fps > 0.0f) {
         particle->animLength = (_frameEnd - _frameStart + 1) / _fps;
     }
+
     _particles.push_back(particle);
 }
 
 void EmitterSceneNode::updateParticle(Particle &particle, float dt) {
-    shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
-
     if (_lifeExpectancy != -1.0f) {
         particle.lifetime = glm::min(particle.lifetime + dt, _lifeExpectancy);
     } else if (particle.lifetime == particle.animLength) {
@@ -155,7 +155,7 @@ void EmitterSceneNode::updateParticle(Particle &particle, float dt) {
     }
 
     if (!isParticleExpired(particle)) {
-        particle.position.z += particle.velocity * dt;
+        particle.position += particle.velocity * dt;
         updateParticleAnimation(particle, dt);
     }
 }
@@ -174,8 +174,6 @@ static T interpolateConstraints(const EmitterSceneNode::Constraints<T> &constrai
 }
 
 void EmitterSceneNode::updateParticleAnimation(Particle &particle, float dt) {
-    shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
-
     float maturity;
     if (_lifeExpectancy != -1.0f) {
         maturity = particle.lifetime / static_cast<float>(_lifeExpectancy);
