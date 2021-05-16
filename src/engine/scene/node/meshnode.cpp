@@ -276,11 +276,14 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         }
 
         if (_textures.bumpmap) {
-            uniforms.combined.featureMask |= UniformFeatureFlags::bumpmaps;
-            uniforms.combined.bumpmaps.grayscale = _textures.bumpmap->isGrayscale();
-            uniforms.combined.bumpmaps.scaling = _textures.bumpmap->features().bumpMapScaling;
-            uniforms.combined.bumpmaps.gridSize = glm::vec2(_textures.bumpmap->features().numX, _textures.bumpmap->features().numY);
-            uniforms.combined.bumpmaps.frame = _bumpmapFrame;
+            if (_textures.bumpmap->isGrayscale()) {
+                uniforms.combined.featureMask |= UniformFeatureFlags::bumpmap;
+                uniforms.combined.bumpmaps.gridSize = glm::vec2(_textures.bumpmap->features().numX, _textures.bumpmap->features().numY);
+                uniforms.combined.bumpmaps.scaling = _textures.bumpmap->features().bumpMapScaling;
+                uniforms.combined.bumpmaps.frame = _bumpmapFrame;
+            } else {
+                uniforms.combined.featureMask |= UniformFeatureFlags::normalmap;
+            }
         }
 
         bool receivesShadows = isReceivingShadows(*_model, *this);

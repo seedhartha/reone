@@ -59,7 +59,7 @@ struct UniformFeatureFlags {
     static constexpr int lightmap = 2;
     static constexpr int envmap = 4;
     static constexpr int pbrIbl = 8;
-    static constexpr int bumpmaps = 0x10;
+    static constexpr int bumpmap = 0x10;
     static constexpr int skeletal = 0x20;
     static constexpr int lighting = 0x40;
     static constexpr int selfIllum = 0x80;
@@ -68,6 +68,7 @@ struct UniformFeatureFlags {
     static constexpr int particles = 0x400;
     static constexpr int water = 0x800;
     static constexpr int hdr = 0x1000;
+    static constexpr int normalmap = 0x2000;
     static constexpr int blur = 0x4000;
     static constexpr int text = 0x8000;
     static constexpr int grass = 0x10000;
@@ -112,11 +113,9 @@ struct ShaderShadows {
 };
 
 struct ShaderBumpmaps {
-    int grayscale { 0 };
-    float scaling { 0.0f };
     glm::vec2 gridSize { 1.0f };
+    float scaling { 0.0f };
     int frame { 0 };
-    char padding[12];
 };
 
 struct ShaderBlur {

@@ -230,7 +230,7 @@ uniform samplerCube uPrefilterMap;
 void main() {
     vec2 uv = getUV();
     float shadow = getShadow();
-    bool opaque = isFeatureEnabled(FEATURE_ENVMAP) || isFeatureEnabled(FEATURE_BUMPMAPS);
+    bool opaque = isFeatureEnabled(FEATURE_ENVMAP) || isFeatureEnabled(FEATURE_BUMPMAP) || isFeatureEnabled(FEATURE_NORMALMAP);
 
     vec3 V = normalize(uGeneral.cameraPosition.xyz - fragPosition);
     vec3 N = getNormal(uv);
