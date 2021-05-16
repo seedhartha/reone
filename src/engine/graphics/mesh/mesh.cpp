@@ -169,56 +169,48 @@ void Mesh::drawTrianglesInstanced(int startFace, int numFaces, int count) {
 }
 
 vector<glm::vec3> Mesh::getTriangleCoords(int faceIdx) const {
-    ensureTriangles();
-    if (faceIdx < 0 || faceIdx >= static_cast<int>(_indices.size()) / 3) {
-        throw out_of_range("faceIdx out of range");
-    }
-
-    glm::vec3 a(getVertexCoords(_indices[3 * faceIdx + 0]));
-    glm::vec3 b(getVertexCoords(_indices[3 * faceIdx + 1]));
-    glm::vec3 c(getVertexCoords(_indices[3 * faceIdx + 2]));
-
-    return vector<glm::vec3> { a, b, c };
-}
-
-glm::vec3 Mesh::getVertexCoords(uint16_t vertexIdx) const {
-    return glm::make_vec3(&_vertices[(vertexIdx * _attributes.stride + _attributes.offCoords) / sizeof(float)]);
+    return getTriangleAttributes<glm::vec3>(faceIdx, _attributes.offCoords);
 }
 
 glm::vec2 Mesh::getTriangleTexCoords1(int faceIdx, const glm::vec3 &baryPosition) const {
-    ensureTriangles();
-    if (faceIdx < 0 || faceIdx >= static_cast<int>(_indices.size()) / 3) {
-        throw out_of_range("faceIdx out of range");
-    }
-    if (_attributes.offTexCoords1 == -1) return glm::vec2(0.0f);
+    auto points = getTriangleAttributes<glm::vec2>(faceIdx, _attributes.offTexCoords1);
 
-    glm::vec2 a(getVertexTexCoords1(_indices[3 * faceIdx + 0]));
-    glm::vec2 b(getVertexTexCoords1(_indices[3 * faceIdx + 1]));
-    glm::vec2 c(getVertexTexCoords1(_indices[3 * faceIdx + 2]));
-
-    return barycentricToCartesian(a, b, c, baryPosition);
-}
-
-glm::vec2 Mesh::getVertexTexCoords1(uint16_t vertexIdx) const {
-    return glm::make_vec2(&_vertices[(vertexIdx * _attributes.stride + _attributes.offTexCoords1) / sizeof(float)]);
+    return !points.empty() ?
+        barycentricToCartesian(points[0], points[1], points[2], baryPosition) :
+        glm::vec2(0.0f);
 }
 
 glm::vec2 Mesh::getTriangleTexCoords2(int faceIdx, const glm::vec3 &baryPosition) const {
+    auto points = getTriangleAttributes<glm::vec2>(faceIdx, _attributes.offTexCoords2);
+
+    return !points.empty() ?
+        barycentricToCartesian(points[0], points[1], points[2], baryPosition) :
+        glm::vec2(0.0f);
+}
+
+template <class T>
+vector<T> Mesh::getTriangleAttributes(int faceIdx, int offset) const {
     ensureTriangles();
     if (faceIdx < 0 || faceIdx >= static_cast<int>(_indices.size()) / 3) {
         throw out_of_range("faceIdx out of range");
     }
-    if (_attributes.offTexCoords2 == -1) return glm::vec2(0.0f);
+    if (offset == -1) return vector<T>();
 
-    glm::vec2 a(getVertexTexCoords2(_indices[3 * faceIdx + 0]));
-    glm::vec2 b(getVertexTexCoords2(_indices[3 * faceIdx + 1]));
-    glm::vec2 c(getVertexTexCoords2(_indices[3 * faceIdx + 2]));
+    auto a = getVertexAttribute<T>(_indices[3 * faceIdx + 0], offset);
+    auto b = getVertexAttribute<T>(_indices[3 * faceIdx + 1], offset);
+    auto c = getVertexAttribute<T>(_indices[3 * faceIdx + 2], offset);
 
-    return barycentricToCartesian(a, b, c, baryPosition);
+    return vector<T> { a, b, c };
 }
 
-glm::vec2 Mesh::getVertexTexCoords2(uint16_t vertexIdx) const {
-    return glm::make_vec2(&_vertices[(vertexIdx * _attributes.stride + _attributes.offTexCoords2) / sizeof(float)]);
+template <>
+glm::vec2 Mesh::getVertexAttribute(uint16_t vertexIdx, int offset) const {
+    return glm::make_vec2(&_vertices[(vertexIdx * _attributes.stride + offset) / sizeof(float)]);
+}
+
+template <>
+glm::vec3 Mesh::getVertexAttribute(uint16_t vertexIdx, int offset) const {
+    return glm::make_vec3(&_vertices[(vertexIdx * _attributes.stride + offset) / sizeof(float)]);
 }
 
 } // namespace graphics
