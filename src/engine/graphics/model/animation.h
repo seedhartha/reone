@@ -17,7 +17,10 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #include <boost/noncopyable.hpp>
 
@@ -52,13 +55,13 @@ public:
 private:
     std::string _name;
     float _length { 0.0f };
-    float _transitionTime { 0.0f };
+    float _transitionTime { 0.0f }; /**< time in seconds where this animation overlaps with other animations */
     std::shared_ptr<ModelNode> _rootNode;
     std::vector<Event> _events;
 
     std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
 
-    void fillNodeLookups();
+    void fillNodeByName();
 };
 
 } // namespace graphics

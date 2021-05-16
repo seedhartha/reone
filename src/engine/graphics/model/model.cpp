@@ -32,6 +32,7 @@ Model::Model(
     string name,
     Classification classification,
     shared_ptr<ModelNode> rootNode,
+    vector<shared_ptr<Animation>> animations,
     shared_ptr<Model> superModel,
     float animationScale
 ) :
@@ -48,6 +49,10 @@ Model::Model(
     fillNodeLookups(_rootNode);
     fillBoneNodeId();
     computeAABB();
+
+    for (auto &anim : animations) {
+        _animations.insert(make_pair(anim->name(), anim));
+    }
 }
 
 void Model::fillNodeLookups(const shared_ptr<ModelNode> &node) {
@@ -95,10 +100,6 @@ void Model::init() {
     _rootNode->init();
 }
 
-void Model::addAnimation(shared_ptr<Animation> animation) {
-    _animations.insert(make_pair(animation->name(), move(animation)));
-}
-
 shared_ptr<ModelNode> Model::getNodeByName(const string &name) const {
     return getFromLookupOrNull(_nodeByName, name);
 }
@@ -118,16 +119,17 @@ shared_ptr<ModelNode> Model::getAABBNode() const {
     return nullptr;
 }
 
-shared_ptr<Animation> Model::getAnimation(const string &name) const {
-    auto maybeAnim = _animations.find(name);
-    if (maybeAnim != _animations.end()) return maybeAnim->second;
+set<string> Model::getAncestorNodes(const string &parentName) const {
+    set<string> result;
 
-    shared_ptr<Animation> anim;
-    if (_superModel) {
-        anim = _superModel->getAnimation(name);
+    auto maybeParent = _nodeByName.find(parentName);
+    if (maybeParent != _nodeByName.end()) {
+        for (const ModelNode *node = maybeParent->second->parent(); node; node = node->parent()) {
+            result.insert(node->name());
+        }
     }
 
-    return move(anim);
+    return move(result);
 }
 
 vector<string> Model::getAnimationNames() const {
@@ -146,17 +148,16 @@ vector<string> Model::getAnimationNames() const {
     return move(result);
 }
 
-set<string> Model::getAncestorNodes(const string &parentName) const {
-    set<string> result;
+shared_ptr<Animation> Model::getAnimation(const string &name) const {
+    auto maybeAnim = _animations.find(name);
+    if (maybeAnim != _animations.end()) return maybeAnim->second;
 
-    auto maybeParent = _nodeByName.find(parentName);
-    if (maybeParent != _nodeByName.end()) {
-        for (const ModelNode *node = maybeParent->second->parent(); node; node = node->parent()) {
-            result.insert(node->name());
-        }
+    shared_ptr<Animation> anim;
+    if (_superModel) {
+        anim = _superModel->getAnimation(name);
     }
 
-    return move(result);
+    return move(anim);
 }
 
 } // namespace graphics
