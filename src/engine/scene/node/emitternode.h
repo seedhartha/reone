@@ -31,14 +31,14 @@ class ModelSceneNode;
 class EmitterSceneNode : public ModelNodeSceneNode {
 public:
     struct Particle {
-        glm::vec3 position { 0.0f };
-        float velocity { 0.0f };
         EmitterSceneNode *emitter { nullptr };
+        glm::vec3 position { 0.0f };
+        glm::vec3 color { 1.0f };
+        float velocity { 0.0f };
         float animLength { 0.0f };
         float lifetime { 0.0f };
         int frame { 0 };
         float size { 1.0f };
-        glm::vec3 color { 1.0f };
         float alpha { 1.0f };
     };
 

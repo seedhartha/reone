@@ -133,66 +133,14 @@ void EmitterSceneNode::doSpawnParticle() {
     float velocity = sign * (_velocity + random(0.0f, _randomVelocity));
 
     auto particle = make_shared<Particle>();
+    particle->emitter = this;
     particle->position = move(position);
     particle->velocity = velocity;
-    particle->emitter = this;
-    _particles.push_back(particle);
-}
-
-void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
-    if (particles.empty()) return;
-
-    shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
-    shared_ptr<Texture> texture(emitter->texture);
-    if (!texture) return;
-
-    ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
-    uniforms.combined.featureMask |= UniformFeatureFlags::particles;
-    uniforms.particles->gridSize = glm::vec2(emitter->gridWidth, emitter->gridHeight);
-    uniforms.particles->render = static_cast<int>(emitter->renderMode);
-
-    for (size_t i = 0; i < particles.size(); ++i) {
-        const Particle &particle = *particles[i];
-
-        glm::mat4 transform(_absTransform);
-        transform = glm::translate(transform, particles[i]->position);
-        if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
-            transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * kProjectileSpeed) * particle.size, particle.size, particle.size));
-        } else {
-            transform = glm::scale(transform, glm::vec3(particle.size));
-        }
-
-        uniforms.particles->particles[i].transform = move(transform);
-        uniforms.particles->particles[i].color = glm::vec4(particle.color, 1.0f);
-        uniforms.particles->particles[i].size = glm::vec2(particle.size);
-        uniforms.particles->particles[i].alpha = particle.alpha;
-        uniforms.particles->particles[i].frame = particle.frame;
-    }
-
-    Shaders::instance().activate(ShaderProgram::ParticleParticle, uniforms);
-
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
-    texture->bind();
-
-    bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
-    if (lighten) {
-        StateManager::instance().withLightenBlending([&particles]() {
-            Meshes::instance().getBillboard()->drawInstanced(static_cast<int>(particles.size()));
-        });
-    } else {
-        Meshes::instance().getBillboard()->drawInstanced(static_cast<int>(particles.size()));
-    }
-}
-
-void EmitterSceneNode::detonate() {
-    doSpawnParticle();
-}
-
-void EmitterSceneNode::initParticle(Particle &particle) {
+    particle->frame = _frameStart;
     if (_fps > 0.0f) {
-        particle.animLength = (_frameEnd - _frameStart + 1) / _fps;
+        particle->animLength = (_frameEnd - _frameStart + 1) / _fps;
     }
-    particle.frame = _frameStart;
+    _particles.push_back(particle);
 }
 
 void EmitterSceneNode::updateParticle(Particle &particle, float dt) {
@@ -241,6 +189,55 @@ void EmitterSceneNode::updateParticleAnimation(Particle &particle, float dt) {
     particle.size = interpolateConstraints(_particleSize, maturity);
     particle.color = interpolateConstraints(_color, maturity);
     particle.alpha = interpolateConstraints(_alpha, maturity);
+}
+
+void EmitterSceneNode::detonate() {
+    doSpawnParticle();
+}
+
+void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
+    if (particles.empty()) return;
+
+    shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
+    shared_ptr<Texture> texture(emitter->texture);
+    if (!texture) return;
+
+    ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
+    uniforms.combined.featureMask |= UniformFeatureFlags::particles;
+    uniforms.particles->gridSize = glm::vec2(emitter->gridWidth, emitter->gridHeight);
+    uniforms.particles->render = static_cast<int>(emitter->renderMode);
+
+    for (size_t i = 0; i < particles.size(); ++i) {
+        const Particle &particle = *particles[i];
+
+        glm::mat4 transform(_absTransform);
+        transform = glm::translate(transform, particles[i]->position);
+        if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
+            transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * kProjectileSpeed) * particle.size, particle.size, particle.size));
+        } else {
+            transform = glm::scale(transform, glm::vec3(particle.size));
+        }
+
+        uniforms.particles->particles[i].transform = move(transform);
+        uniforms.particles->particles[i].color = glm::vec4(particle.color, 1.0f);
+        uniforms.particles->particles[i].size = glm::vec2(particle.size);
+        uniforms.particles->particles[i].alpha = particle.alpha;
+        uniforms.particles->particles[i].frame = particle.frame;
+    }
+
+    Shaders::instance().activate(ShaderProgram::ParticleParticle, uniforms);
+
+    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+    texture->bind();
+
+    bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
+    if (lighten) {
+        StateManager::instance().withLightenBlending([&particles]() {
+            Meshes::instance().getBillboard()->drawInstanced(static_cast<int>(particles.size()));
+        });
+    } else {
+        Meshes::instance().getBillboard()->drawInstanced(static_cast<int>(particles.size()));
+    }
 }
 
 } // namespace scene
