@@ -68,6 +68,9 @@ void ModelSceneNode::playAnimation(shared_ptr<Animation> anim, shared_ptr<LipAni
             // Add animation on top
             _animChannels.push_front(AnimationChannel(anim, lipAnim, properties));
             _animChannels[0].transition = transition;
+            while (_animChannels.size() > 2ll) {
+                _animChannels.pop_back();
+            }
             break;
         }
 
@@ -106,7 +109,9 @@ void ModelSceneNode::updateAnimations(float dt) {
     if (_animChannels.empty()) return;
 
     for (auto &channel : _animChannels) {
-        updateAnimationChannel(channel, dt);
+        if (!channel.freeze) {
+            updateAnimationChannel(channel, dt);
+        }
     }
 
     // Apply states and compute bone transforms only when this model is not culled
@@ -241,7 +246,7 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
             case AnimationBlendMode::Single:
             case AnimationBlendMode::Blend: {
                 auto state1 = getFromLookupOrElse(_animChannels[0].stateByName, modelNode.name(), AnimationState());
-                bool blend = _animBlendMode == AnimationBlendMode::Blend && _animChannels[0].transition;
+                bool blend = _animBlendMode == AnimationBlendMode::Blend && _animChannels[0].transition && _animChannels.size() > 1ll;
                 if (blend) {
                     auto state2 = getFromLookupOrElse(_animChannels[1].stateByName, modelNode.name(), AnimationState());
                     if (state1.flags & AnimationStateFlags::transform && state2.flags & AnimationStateFlags::transform) {
@@ -258,6 +263,9 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
                     } else if (state1.flags & AnimationStateFlags::transform) {
                         combined.flags |= AnimationStateFlags::transform;
                         combined.transform = state1.transform;
+                    } else if (state2.flags & AnimationStateFlags::transform) {
+                        combined.flags |= AnimationStateFlags::transform;
+                        combined.transform = state2.transform;
                     }
                 } else if (state1.flags & AnimationStateFlags::transform) {
                     combined.flags |= AnimationStateFlags::transform;
