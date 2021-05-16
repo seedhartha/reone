@@ -32,7 +32,7 @@ const int FEATURE_DIFFUSE = 1;
 const int FEATURE_LIGHTMAP = 2;
 const int FEATURE_ENVMAP = 4;
 const int FEATURE_PBRIBL = 8;
-const int FEATURE_BUMPMAPS = 0x10;
+const int FEATURE_BUMPMAP = 0x10;
 const int FEATURE_SKELETAL = 0x20;
 const int FEATURE_LIGHTING = 0x40;
 const int FEATURE_SELFILLUM = 0x80;
@@ -41,6 +41,7 @@ const int FEATURE_SHADOWS = 0x200;
 const int FEATURE_PARTICLES = 0x400;
 const int FEATURE_WATER = 0x800;
 const int FEATURE_HDR = 0x1000;
+const int FEATURE_NORMALMAP = 0x2000;
 const int FEATURE_BLUR = 0x4000;
 const int FEATURE_TEXT = 0x8000;
 const int FEATURE_GRASS = 0x10000;
@@ -97,9 +98,8 @@ struct Shadows {
 };
 
 struct Bumpmap {
-    bool grayscale;
-    float scaling;
     vec2 gridSize;
+    float scaling;
     int frame;
 };
 
@@ -205,43 +205,43 @@ vec2 packUV(vec2 uv, vec4 bounds) {
     return bounds.xy + bounds.zw * clamp(fract(uv), 0.001, 0.999);
 }
 
-vec3 getNormalFromBumpmap(vec2 uv) {
-    vec3 result;
+vec3 getNormalFromBumpMap(vec2 uv) {
+    vec2 oneOverGridSize = 1.0 / uBumpmaps.gridSize;
 
-    if (uBumpmaps.grayscale) {
-        vec2 oneOverGridSize = 1.0 / uBumpmaps.gridSize;
+    vec4 frameBounds;
+    frameBounds[0] = oneOverGridSize.x * (uBumpmaps.frame % int(uBumpmaps.gridSize.x));
+    frameBounds[1] = oneOverGridSize.y * (uBumpmaps.frame / int(uBumpmaps.gridSize.y));
+    frameBounds[2] = oneOverGridSize.x;
+    frameBounds[3] = oneOverGridSize.y;
 
-        vec4 frameBounds;
-        frameBounds[0] = oneOverGridSize.x * (uBumpmaps.frame % int(uBumpmaps.gridSize.x));
-        frameBounds[1] = oneOverGridSize.y * (uBumpmaps.frame / int(uBumpmaps.gridSize.y));
-        frameBounds[2] = oneOverGridSize.x;
-        frameBounds[3] = oneOverGridSize.y;
+    vec2 du = dFdx(uv);
+    vec2 dv = dFdy(uv);
+    vec2 packedUv = packUV(uv, frameBounds);
+    vec2 packedUvDu = packUV(uv + du, frameBounds);
+    vec2 packedUvDv = packUV(uv + dv, frameBounds);
+    vec4 bumpmapSample = texture(uBumpmap, packedUv);
+    vec4 bumpmapSampleDu = texture(uBumpmap, packedUvDu);
+    vec4 bumpmapSampleDv = texture(uBumpmap, packedUvDv);
+    float dBx = bumpmapSampleDu.r - bumpmapSample.r;
+    float dBy = bumpmapSampleDv.r - bumpmapSample.r;
+    vec3 normal = vec3(-dBx * uBumpmaps.scaling, -dBy * uBumpmaps.scaling, 1.0);
 
-        vec2 du = dFdx(uv);
-        vec2 dv = dFdy(uv);
-        vec2 packedUv = packUV(uv, frameBounds);
-        vec2 packedUvDu = packUV(uv + du, frameBounds);
-        vec2 packedUvDv = packUV(uv + dv, frameBounds);
-        vec4 bumpmapSample = texture(uBumpmap, packedUv);
-        vec4 bumpmapSampleDu = texture(uBumpmap, packedUvDu);
-        vec4 bumpmapSampleDv = texture(uBumpmap, packedUvDv);
-        float dBx = bumpmapSampleDu.r - bumpmapSample.r;
-        float dBy = bumpmapSampleDv.r - bumpmapSample.r;
-        result = vec3(-dBx * uBumpmaps.scaling, -dBy * uBumpmaps.scaling, 1.0);
-    } else {
-        vec4 bumpmapSample = texture(uBumpmap, uv);
-        result = normalize(bumpmapSample.rgb * 2.0 - 1.0);
-    }
+    return normalize(normal * fragTanSpace);
+}
 
-    result = normalize(result * fragTanSpace);
-    return result;
+vec3 getNormalFromNormalMap(vec2 uv) {
+    vec4 bumpmapSample = texture(uBumpmap, uv);
+    vec3 normal = bumpmapSample.rgb * 2.0 - 1.0;
+    return normalize(normal * fragTanSpace);
 }
 
 vec3 getNormal(vec2 uv) {
     vec3 result;
 
-    if (isFeatureEnabled(FEATURE_BUMPMAPS)) {
-        result = getNormalFromBumpmap(uv);
+    if (isFeatureEnabled(FEATURE_BUMPMAP)) {
+        result = getNormalFromBumpMap(uv);
+    } else if (isFeatureEnabled(FEATURE_NORMALMAP)) {
+        result = getNormalFromNormalMap(uv);
     } else {
         result = normalize(fragNormal);
     }
@@ -398,7 +398,7 @@ void main() {
     fragTexCoords = aTexCoords;
     fragLightmapCoords = aLightmapCoords;
 
-    if (isFeatureEnabled(FEATURE_BUMPMAPS)) {
+    if (isFeatureEnabled(FEATURE_BUMPMAP) || isFeatureEnabled(FEATURE_NORMALMAP)) {
         vec3 T = normalize(normalMatrix * aTangent);
         vec3 B = normalize(normalMatrix * aBitangent);
         vec3 N = normalize(normalMatrix * aTanSpaceNormal);
