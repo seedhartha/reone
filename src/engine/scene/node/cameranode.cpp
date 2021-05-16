@@ -76,11 +76,12 @@ bool CameraSceneNode::isInFrustum(const glm::vec3 &point) const {
 }
 
 bool CameraSceneNode::isInFrustum(const AABB &aabb) const {
-    // AABB is inside frustum if at least one of its corners is inside
+    // AABB is inside frustum if its center or at least one of its corners is inside
 
     glm::vec3 center(aabb.center());
-    glm::vec3 halfSize(aabb.getSize() * 0.5f);
+    if (isInFrustum(center)) return true;
 
+    glm::vec3 halfSize(aabb.getSize() * 0.5f);
     vector<glm::vec3> corners {
         glm::vec3(center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z),
         glm::vec3(center.x + halfSize.x, center.y - halfSize.y, center.z - halfSize.z),
@@ -91,7 +92,6 @@ bool CameraSceneNode::isInFrustum(const AABB &aabb) const {
         glm::vec3(center.x - halfSize.x, center.y + halfSize.y, center.z + halfSize.z),
         glm::vec3(center.x + halfSize.x, center.y + halfSize.y, center.z + halfSize.z)
     };
-
     for (auto &corner : corners) {
         if (isInFrustum(corner)) return true;
     }
