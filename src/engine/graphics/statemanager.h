@@ -39,14 +39,15 @@ public:
     void withLightenBlending(const std::function<void()> &block);
     void withBackFaceCulling(const std::function<void()> &block);
 
+    void setDepthTestEnabled(bool enabled);
+    void setBackFaceCullingEnabled(bool enabled);
     void setActiveTextureUnit(int n);
 
 private:
+    bool _depthTest { false };
+    bool _backFaceCulling { false };
     int _textureUnit { 0 };
-    bool _depthTestEnabled { false };
     uint32_t _polygonMode { 0 };
-
-    void setDepthTestEnabled(bool enabled);
 };
 
 

@@ -22,6 +22,7 @@
 #include "glm/gtx/transform.hpp"
 
 #include "../graphics/mesh/meshes.h"
+#include "../graphics/statemanager.h"
 
 #include "node/cameranode.h"
 #include "node/emitternode.h"
@@ -311,6 +312,8 @@ void SceneGraph::draw(bool shadowPass) {
         return;
     }
 
+    StateManager::instance().setBackFaceCullingEnabled(true);
+
     // Render opaque meshes
     for (auto &mesh : _opaqueMeshes) {
         mesh->drawSingle(false);
@@ -333,6 +336,8 @@ void SceneGraph::draw(bool shadowPass) {
     for (auto &mesh : _transparentMeshes) {
         mesh->drawSingle(false);
     }
+
+    StateManager::instance().setBackFaceCullingEnabled(false);
 
     // Render grass
     for (auto &grass : _grassClusters) {

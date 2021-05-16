@@ -308,7 +308,6 @@ set(SCENE_HEADERS
 set(SCENE_SOURCES
     src/engine/scene/node/cameranode.cpp
     src/engine/scene/node/emitternode.cpp
-    src/engine/scene/node/emitternode_particle.cpp
     src/engine/scene/node/grassnode.cpp
     src/engine/scene/node/lightnode.cpp
     src/engine/scene/node/meshnode.cpp
