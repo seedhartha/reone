@@ -276,7 +276,7 @@ void Creature::playAnimation(const shared_ptr<Animation> &anim, AnimationPropert
 void Creature::playAnimation(CombatAnimation anim, CreatureWieldType wield, int variant) {
     string animName(getAnimationName(anim, wield, variant));
     if (!animName.empty()) {
-        playAnimation(animName);
+        playAnimation(animName, AnimationProperties::fromFlags(AnimationFlags::blend));
     }
 }
 
