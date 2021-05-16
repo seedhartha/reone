@@ -116,8 +116,7 @@ struct ShaderBumpmaps {
     float scaling { 0.0f };
     glm::vec2 gridSize { 1.0f };
     int frame { 0 };
-    int swizzled { 0 };
-    char padding[8];
+    char padding[12];
 };
 
 struct ShaderBlur {
