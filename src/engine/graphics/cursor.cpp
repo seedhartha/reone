@@ -24,7 +24,7 @@
 
 #include "mesh/meshes.h"
 #include "shader/shaders.h"
-#include "statemanager.h"
+#include "stateutil.h"
 #include "texture/texture.h"
 #include "window.h"
 
@@ -45,7 +45,7 @@ Cursor::Cursor(const shared_ptr<Texture> &up, const shared_ptr<Texture> &down) :
 
 void Cursor::draw() {
     shared_ptr<Texture> texture(_pressed ? _down : _up);
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+    setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
 
     glm::mat4 transform(1.0f);

@@ -26,7 +26,7 @@
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/pbribl.h"
 #include "../../graphics/shader/shaders.h"
-#include "../../graphics/statemanager.h"
+#include "../../graphics/stateutil.h"
 #include "../../graphics/texture/textures.h"
 #include "../../graphics/texture/textureutil.h"
 #include "../../graphics/window.h"
@@ -190,7 +190,7 @@ void WorldRenderPipeline::drawShadows() {
     const LightSceneNode *shadowLight = _scene->shadowLight();
     if (!shadowLight) return;
 
-    StateManager::instance().withViewport(glm::ivec4(0, 0, 1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution), [&]() {
+    withViewport(glm::ivec4(0, 0, 1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution), [&]() {
         _shadows.bind();
         if (shadowLight->isDirectional()) {
             _shadows.attachDepth(*_shadowsDepth);
@@ -214,7 +214,7 @@ void WorldRenderPipeline::drawShadows() {
         _scene->setUniformsPrototype(move(uniforms));
 
         glClear(GL_DEPTH_BUFFER_BIT);
-        StateManager::instance().withDepthTest([this]() { _scene->draw(true); });
+        withDepthTest([this]() { _scene->draw(true); });
     });
 }
 
@@ -249,10 +249,10 @@ void WorldRenderPipeline::drawGeometry() {
 
     if (shadowLight) {
         if (shadowLight->isDirectional()) {
-            StateManager::instance().setActiveTextureUnit(TextureUnits::shadowMap);
+            setActiveTextureUnit(TextureUnits::shadowMap);
             _shadowsDepth->bind();
         } else {
-            StateManager::instance().setActiveTextureUnit(TextureUnits::shadowMapCube);
+            setActiveTextureUnit(TextureUnits::shadowMapCube);
             _cubeShadowsDepth->bind();
         }
     }
@@ -260,11 +260,11 @@ void WorldRenderPipeline::drawGeometry() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (g_wireframesEnabled) {
-        StateManager::instance().withWireframes([this]() {
-            StateManager::instance().withDepthTest([this]() { _scene->draw(); });
+        withWireframes([this]() {
+            withDepthTest([this]() { _scene->draw(); });
         });
     } else {
-        StateManager::instance().withDepthTest([this]() { _scene->draw(); });
+        withDepthTest([this]() { _scene->draw(); });
     }
 }
 
@@ -276,7 +276,7 @@ void WorldRenderPipeline::applyHorizontalBlur() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+    setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor2->bind();
 
     ShaderUniforms uniforms;
@@ -286,7 +286,7 @@ void WorldRenderPipeline::applyHorizontalBlur() {
 
     Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
 
-    StateManager::instance().withDepthTest([]() {
+    withDepthTest([]() {
         Meshes::instance().getQuadNDC()->draw();
     });
 }
@@ -299,7 +299,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+    setActiveTextureUnit(TextureUnits::diffuseMap);
     _horizontalBlurColor->bind();
 
     ShaderUniforms uniforms;
@@ -309,7 +309,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
 
     Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
 
-    StateManager::instance().withDepthTest([]() {
+    withDepthTest([]() {
         Meshes::instance().getQuadNDC()->draw();
     });
 
@@ -317,10 +317,10 @@ void WorldRenderPipeline::applyVerticalBlur() {
 }
 
 void WorldRenderPipeline::drawResult() {
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+    setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor1->bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::bloom);
+    setActiveTextureUnit(TextureUnits::bloom);
     _verticalBlurColor->bind();
 
     ShaderUniforms uniforms;

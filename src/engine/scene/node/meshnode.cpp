@@ -28,7 +28,7 @@
 #include "../../graphics/materials.h"
 #include "../../graphics/pbribl.h"
 #include "../../graphics/shader/shaders.h"
-#include "../../graphics/statemanager.h"
+#include "../../graphics/stateutil.h"
 #include "../../graphics/texture/textures.h"
 
 #include "../scenegraph.h"
@@ -371,36 +371,36 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     // Setup textures
 
     if (_textures.diffuse) {
-        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+        setActiveTextureUnit(TextureUnits::diffuseMap);
         _textures.diffuse->bind();
         additive = _textures.diffuse->isAdditive();
     }
     if (_textures.lightmap) {
-        StateManager::instance().setActiveTextureUnit(TextureUnits::lightmap);
+        setActiveTextureUnit(TextureUnits::lightmap);
         _textures.lightmap->bind();
     }
     if (_textures.envmap) {
-        StateManager::instance().setActiveTextureUnit(TextureUnits::environmentMap);
+        setActiveTextureUnit(TextureUnits::environmentMap);
         _textures.envmap->bind();
 
         PBRIBL::Derived derived;
         if (PBRIBL::instance().getDerived(_textures.envmap.get(), derived)) {
-            StateManager::instance().setActiveTextureUnit(TextureUnits::irradianceMap);
+            setActiveTextureUnit(TextureUnits::irradianceMap);
             derived.irradianceMap->bind();
-            StateManager::instance().setActiveTextureUnit(TextureUnits::prefilterMap);
+            setActiveTextureUnit(TextureUnits::prefilterMap);
             derived.prefilterMap->bind();
-            StateManager::instance().setActiveTextureUnit(TextureUnits::brdfLookup);
+            setActiveTextureUnit(TextureUnits::brdfLookup);
             derived.brdfLookup->bind();
         }
     }
     if (_textures.bumpmap) {
-        StateManager::instance().setActiveTextureUnit(TextureUnits::bumpMap);
+        setActiveTextureUnit(TextureUnits::bumpMap);
         _textures.bumpmap->bind();
     }
 
 
     if (additive) {
-        StateManager::instance().withAdditiveBlending([&mesh]() { mesh->mesh->draw(); });
+        withAdditiveBlending([&mesh]() { mesh->mesh->draw(); });
     } else {
         mesh->mesh->draw();
     }

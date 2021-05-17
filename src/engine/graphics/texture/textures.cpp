@@ -23,7 +23,7 @@
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
 
-#include "../statemanager.h"
+#include "../stateutil.h"
 #include "../types.h"
 
 #include "curreader.h"
@@ -64,34 +64,34 @@ void Textures::invalidateCache() {
 }
 
 void Textures::bindDefaults() {
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+    setActiveTextureUnit(TextureUnits::diffuseMap);
     _default->bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::lightmap);
+    setActiveTextureUnit(TextureUnits::lightmap);
     _default->bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::environmentMap);
+    setActiveTextureUnit(TextureUnits::environmentMap);
     _defaultCubemap->bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::bumpMap);
+    setActiveTextureUnit(TextureUnits::bumpMap);
     _default->bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::bloom);
+    setActiveTextureUnit(TextureUnits::bloom);
     _default->bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::irradianceMap);
+    setActiveTextureUnit(TextureUnits::irradianceMap);
     _defaultCubemap->bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::prefilterMap);
+    setActiveTextureUnit(TextureUnits::prefilterMap);
     _defaultCubemap->bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::brdfLookup);
+    setActiveTextureUnit(TextureUnits::brdfLookup);
     _default->bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::shadowMap);
+    setActiveTextureUnit(TextureUnits::shadowMap);
     _default->bind();
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::shadowMapCube);
+    setActiveTextureUnit(TextureUnits::shadowMapCube);
     _defaultCubemap->bind();
 }
 
