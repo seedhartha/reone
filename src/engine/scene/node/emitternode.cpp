@@ -26,7 +26,7 @@
 #include "../../common/random.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
-#include "../../graphics/statemanager.h"
+#include "../../graphics/stateutil.h"
 
 #include "../scenegraph.h"
 
@@ -225,12 +225,12 @@ void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
 
     Shaders::instance().activate(ShaderProgram::ParticleParticle, uniforms);
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+    setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
 
     bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
     if (lighten) {
-        StateManager::instance().withLightenBlending([&particles]() {
+        withLightenBlending([&particles]() {
             Meshes::instance().getBillboard()->drawInstanced(static_cast<int>(particles.size()));
         });
     } else {

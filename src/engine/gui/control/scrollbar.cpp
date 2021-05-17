@@ -19,7 +19,7 @@
 
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
-#include "../../graphics/statemanager.h"
+#include "../../graphics/stateutil.h"
 #include "../../graphics/texture/textures.h"
 #include "../../graphics/window.h"
 #include "../../resource/resources.h"
@@ -60,7 +60,7 @@ void ScrollBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
 void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     if (!_thumb.image || _state.numVisible >= _state.count) return;
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+    setActiveTextureUnit(TextureUnits::diffuseMap);
     _thumb.image->bind();
 
     ShaderUniforms uniforms;
@@ -107,7 +107,7 @@ void ScrollBar::drawArrows(const glm::ivec2 &offset) {
     bool canScrollDown = _state.count - _state.offset > _state.numVisible;
     if (!canScrollUp && !canScrollDown) return;
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+    setActiveTextureUnit(TextureUnits::diffuseMap);
     _dir.image->bind();
 
     if (canScrollUp) {

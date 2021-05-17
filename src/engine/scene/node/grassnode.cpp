@@ -21,7 +21,7 @@
 
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
-#include "../../graphics/statemanager.h"
+#include "../../graphics/stateutil.h"
 
 #include "../scenegraph.h"
 
@@ -53,14 +53,14 @@ void GrassSceneNode::addCluster(Cluster cluster) {
 }
 
 void GrassSceneNode::drawClusters(const vector<Cluster> &clusters) {
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+    setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
 
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
     uniforms.combined.featureMask |= UniformFeatureFlags::grass;
 
     if (_lightmap) {
-        StateManager::instance().setActiveTextureUnit(TextureUnits::lightmap);
+        setActiveTextureUnit(TextureUnits::lightmap);
         _lightmap->bind();
 
         uniforms.combined.featureMask |= UniformFeatureFlags::lightmap;

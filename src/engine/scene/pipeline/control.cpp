@@ -23,7 +23,7 @@
 
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
-#include "../../graphics/statemanager.h"
+#include "../../graphics/stateutil.h"
 #include "../../graphics/texture/textures.h"
 #include "../../graphics/texture/textureutil.h"
 
@@ -67,7 +67,7 @@ void ControlRenderPipeline::init() {
 void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     // Render to framebuffer
 
-    StateManager::instance().withViewport(glm::ivec4(0, 0, _extent[2], _extent[3]), [this]() {
+    withViewport(glm::ivec4(0, 0, _extent[2], _extent[3]), [this]() {
         _geometry.bind();
 
         ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
@@ -77,7 +77,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
         _scene->setUniformsPrototype(move(uniforms));
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        StateManager::instance().withDepthTest([this]() { _scene->draw(); });
+        withDepthTest([this]() { _scene->draw(); });
 
         _geometry.unbind();
     });
@@ -85,7 +85,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
 
     // Render control
 
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+    setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor->bind();
 
     int viewport[4];

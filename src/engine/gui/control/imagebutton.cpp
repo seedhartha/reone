@@ -19,7 +19,7 @@
 
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh/meshes.h"
-#include "../../graphics/statemanager.h"
+#include "../../graphics/stateutil.h"
 #include "../../graphics/window.h"
 
 using namespace std;
@@ -85,7 +85,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconFrame) {
-        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+        setActiveTextureUnit(TextureUnits::diffuseMap);
         iconFrame->bind();
 
         glm::mat4 transform(1.0f);
@@ -102,7 +102,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconTexture) {
-        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+        setActiveTextureUnit(TextureUnits::diffuseMap);
         iconTexture->bind();
 
         glm::mat4 transform(1.0f);

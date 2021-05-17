@@ -23,7 +23,7 @@
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
-#include "../../graphics/statemanager.h"
+#include "../../graphics/stateutil.h"
 #include "../../graphics/texture/texture.h"
 #include "../../graphics/texture/textures.h"
 #include "../../graphics/window.h"
@@ -198,7 +198,7 @@ void SelectionOverlay::draw() {
 }
 
 void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords) {
-    StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+    setActiveTextureUnit(TextureUnits::diffuseMap);
     texture.bind();
 
     const GraphicsOptions &opts = _game->options().graphics;
@@ -287,7 +287,7 @@ void SelectionOverlay::drawActionBar() {
         } else {
             frameTexture = _friendlyScroll;
         }
-        StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+        setActiveTextureUnit(TextureUnits::diffuseMap);
         frameTexture->bind();
 
         float frameX, frameY;
@@ -309,7 +309,7 @@ void SelectionOverlay::drawActionBar() {
 
             shared_ptr<Texture> texture(_textureByAction.find(action)->second);
             if (texture) {
-                StateManager::instance().setActiveTextureUnit(TextureUnits::diffuseMap);
+                setActiveTextureUnit(TextureUnits::diffuseMap);
                 texture->bind();
 
                 float y = opts.height * (1.0f - _selectedScreenCoords.y) - (_reticleHeight + kActionHeight + kActionWidth) / 2.0f - kOffsetToReticle - kActionBarMargin;

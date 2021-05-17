@@ -182,7 +182,7 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/pixelutil.h
     src/engine/graphics/renderbuffer.h
     src/engine/graphics/shader/shaders.h
-    src/engine/graphics/statemanager.h
+    src/engine/graphics/stateutil.h
     src/engine/graphics/texture/curreader.h
     src/engine/graphics/texture/texture.h
     src/engine/graphics/texture/textures.h
@@ -225,7 +225,7 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/shader/shaders_common.cpp
     src/engine/graphics/shader/shaders_pbr.cpp
     src/engine/graphics/shader/shaders_phong.cpp
-    src/engine/graphics/statemanager.cpp
+    src/engine/graphics/stateutil.cpp
     src/engine/graphics/texture/curreader.cpp
     src/engine/graphics/texture/texture.cpp
     src/engine/graphics/texture/textures.cpp
