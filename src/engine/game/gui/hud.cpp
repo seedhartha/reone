@@ -38,7 +38,6 @@ namespace game {
 HUD::HUD(Game *game) :
     GameGUI(game->gameId(), game->options().graphics),
     _game(game),
-    _debug(game->options().graphics),
     _select(game) {
 
     _resRef = getResRef("mipc28x6");
@@ -59,7 +58,6 @@ HUD::HUD(Game *game) :
 void HUD::load() {
     GUI::load();
 
-    _debug.load();
     _select.load();
 
     _barkBubble = make_unique<BarkBubble>(_game);
@@ -210,7 +208,6 @@ void HUD::draw() {
 
     _barkBubble->draw();
     _select.draw();
-    _debug.draw();
 }
 
 void HUD::drawMinimap() {
