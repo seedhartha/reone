@@ -194,7 +194,7 @@ Variable Routines::getHasSkill(const VariablesList &args, ExecutionContext &ctx)
     auto skill = getEnum<Skill>(args, 0);
 
     if (creature) {
-        result = creature->attributes().skills().contains(skill);
+        result = creature->attributes().hasSkill(skill);
     } else {
         debug("Script: getHasSkill: creature is invalid", 1, DebugChannels::script);
     }
@@ -272,7 +272,7 @@ Variable Routines::getAbilityScore(const VariablesList &args, ExecutionContext &
     auto type = getEnum<Ability>(args, 1);
 
     if (creature) {
-        result = creature->attributes().abilities().getScore(type);
+        result = creature->attributes().getAbilityScore(type);
     } else {
         debug("Script: getAbilityScore: creature is invalid", 1, DebugChannels::script);
     }
@@ -300,7 +300,7 @@ Variable Routines::getSkillRank(const VariablesList &args, ExecutionContext &ctx
     auto skill = getEnum<Skill>(args, 0);
 
     if (object) {
-        result = object->attributes().skills().getRank(skill);
+        result = object->attributes().getSkillRank(skill);
     } else {
         debug("Script: getSkillRank: object is invalid", 1, DebugChannels::script);
     }

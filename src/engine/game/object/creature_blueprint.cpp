@@ -144,14 +144,12 @@ void Creature::loadBodyBagFromUTC(const GffStruct &utc) {
 
 void Creature::loadAttributesFromUTC(const GffStruct &utc) {
     CreatureAttributes &attributes = _attributes;
-    CreatureAbilities &abilities = attributes.abilities();
-
-    abilities.setScore(Ability::Strength, utc.getInt("Str"));
-    abilities.setScore(Ability::Dexterity, utc.getInt("Dex"));
-    abilities.setScore(Ability::Constitution, utc.getInt("Con"));
-    abilities.setScore(Ability::Intelligence, utc.getInt("Int"));
-    abilities.setScore(Ability::Wisdom, utc.getInt("Wis"));
-    abilities.setScore(Ability::Charisma, utc.getInt("Cha"));
+    attributes.setAbilityScore(Ability::Strength, utc.getInt("Str"));
+    attributes.setAbilityScore(Ability::Dexterity, utc.getInt("Dex"));
+    attributes.setAbilityScore(Ability::Constitution, utc.getInt("Con"));
+    attributes.setAbilityScore(Ability::Intelligence, utc.getInt("Int"));
+    attributes.setAbilityScore(Ability::Wisdom, utc.getInt("Wis"));
+    attributes.setAbilityScore(Ability::Charisma, utc.getInt("Cha"));
 
     for (auto &classGff : utc.getList("ClassList")) {
         int clazz = classGff->getInt("Class");
@@ -162,7 +160,7 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
     vector<shared_ptr<GffStruct>> skillsUtc(utc.getList("SkillList"));
     for (int i = 0; i < static_cast<int>(skillsUtc.size()); ++i) {
         Skill skill = static_cast<Skill>(i);
-        attributes.skills().setRank(skill, skillsUtc[i]->getInt("Rank"));
+        attributes.setSkillRank(skill, skillsUtc[i]->getInt("Rank"));
     }
 }
 

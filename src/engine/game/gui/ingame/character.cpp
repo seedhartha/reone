@@ -105,18 +105,18 @@ void CharacterMenu::refreshControls() {
     setControlText("LBL_DEFENSE_STAT", to_string(attributes.getDefense()));
     setControlText("LBL_FORCE_STAT", "");
 
-    setControlText("LBL_STR", to_string(attributes.abilities().strength()));
-    setControlText("LBL_STR_MOD", describeAbilityModifier(attributes.abilities().getModifier(Ability::Strength)));
-    setControlText("LBL_DEX", to_string(attributes.abilities().dexterity()));
-    setControlText("LBL_DEX_MOD", describeAbilityModifier(attributes.abilities().getModifier(Ability::Dexterity)));
-    setControlText("LBL_CON", to_string(attributes.abilities().constitution()));
-    setControlText("LBL_CON_MOD", describeAbilityModifier(attributes.abilities().getModifier(Ability::Constitution)));
-    setControlText("LBL_INT", to_string(attributes.abilities().intelligence()));
-    setControlText("LBL_INT_MOD", describeAbilityModifier(attributes.abilities().getModifier(Ability::Intelligence)));
-    setControlText("LBL_WIS", to_string(attributes.abilities().wisdom()));
-    setControlText("LBL_WIS_MOD", describeAbilityModifier(attributes.abilities().getModifier(Ability::Wisdom)));
-    setControlText("LBL_CHA", to_string(attributes.abilities().charisma()));
-    setControlText("LBL_CHA_MOD", describeAbilityModifier(attributes.abilities().getModifier(Ability::Charisma)));
+    setControlText("LBL_STR", to_string(attributes.strength()));
+    setControlText("LBL_STR_MOD", describeAbilityModifier(attributes.getAbilityModifier(Ability::Strength)));
+    setControlText("LBL_DEX", to_string(attributes.dexterity()));
+    setControlText("LBL_DEX_MOD", describeAbilityModifier(attributes.getAbilityModifier(Ability::Dexterity)));
+    setControlText("LBL_CON", to_string(attributes.constitution()));
+    setControlText("LBL_CON_MOD", describeAbilityModifier(attributes.getAbilityModifier(Ability::Constitution)));
+    setControlText("LBL_INT", to_string(attributes.intelligence()));
+    setControlText("LBL_INT_MOD", describeAbilityModifier(attributes.getAbilityModifier(Ability::Intelligence)));
+    setControlText("LBL_WIS", to_string(attributes.wisdom()));
+    setControlText("LBL_WIS_MOD", describeAbilityModifier(attributes.getAbilityModifier(Ability::Wisdom)));
+    setControlText("LBL_CHA", to_string(attributes.charisma()));
+    setControlText("LBL_CHA_MOD", describeAbilityModifier(attributes.getAbilityModifier(Ability::Charisma)));
 
     SavingThrows savingThrows(attributes.getAggregateSavingThrows());
     setControlText("LBL_FORTITUDE_STAT", to_string(savingThrows.fortitude));
