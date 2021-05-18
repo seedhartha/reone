@@ -443,7 +443,6 @@ set(GAME_HEADERS
     src/engine/game/gui/container.h
     src/engine/game/gui/conversation.h
     src/engine/game/gui/computer.h
-    src/engine/game/gui/debugoverlay.h
     src/engine/game/gui/dialog.h
     src/engine/game/gui/gui.h
     src/engine/game/gui/hud.h
@@ -551,7 +550,6 @@ set(GAME_SOURCES
     src/engine/game/gui/computer.cpp
     src/engine/game/gui/container.cpp
     src/engine/game/gui/conversation.cpp
-    src/engine/game/gui/debugoverlay.cpp
     src/engine/game/gui/dialog.cpp
     src/engine/game/gui/gui.cpp
     src/engine/game/gui/hud.cpp

@@ -20,7 +20,6 @@
 #include "../../resource/types.h"
 
 #include "barkbubble.h"
-#include "debugoverlay.h"
 #include "gui.h"
 #include "selectoverlay.h"
 
@@ -47,7 +46,6 @@ public:
 private:
     Game *_game { nullptr };
     SelectionOverlay _select;
-    DebugOverlay _debug;
     std::unique_ptr<BarkBubble> _barkBubble;
 
     void showCombatHud();
