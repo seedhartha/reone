@@ -64,6 +64,10 @@ EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *model, shared_ptr<Model
     _randomVelocity = modelNode->randVel().getByFrameOrElse(0, 0.0f);
     _mass = modelNode->mass().getByFrameOrElse(0, 0.0f);
     _grav = modelNode->grav().getByFrameOrElse(0, 0.0f);
+    _lightningDelay = modelNode->lightingDelay().getByFrameOrElse(0, 0.0f);
+    _lightningRadius = modelNode->lightingRadius().getByFrameOrElse(0, 0.0f);
+    _lightningScale = modelNode->lightingScale().getByFrameOrElse(0, 0.0f);
+    _lightningSubDiv = static_cast<int>(modelNode->lightingSubDiv().getByFrameOrElse(0, 0.0f));
 
     _particleSize.setStart(modelNode->sizeStart().getByFrameOrElse(0, 0.0f));
     _particleSize.setMid(modelNode->sizeMid().getByFrameOrElse(0, 0.0f));
@@ -116,6 +120,12 @@ void EmitterSceneNode::spawnParticles(float dt) {
                 _spawned = true;
             }
             break;
+        case ModelNode::Emitter::UpdateMode::Lightning:
+            if (_birthTimer.advance(dt)) {
+                spawnLightningParticles();
+                _birthTimer.reset(_lightningDelay);
+            }
+            break;
         default:
             break;
     }
@@ -148,7 +158,50 @@ void EmitterSceneNode::doSpawnParticle() {
     _particles.push_back(particle);
 }
 
+void EmitterSceneNode::spawnLightningParticles() {
+    // Ensure there is a reference node directly under this emitter
+    auto ref = find_if(_children.begin(), _children.end(), [](auto &child) { return child->type() == SceneNodeType::Dummy; });
+    if (ref == _children.end()) return;
+
+    float halfW = 0.005f * _size.x;
+    float halfH = 0.005f * _size.y;
+    glm::vec3 origin(random(-halfW, halfW), random(-halfH, halfH), 0.0f);
+    glm::vec3 emitterSpaceRefPos(_absTransformInv * (*ref)->absoluteTransform()[3]);
+    glm::vec3 refToOrigin(emitterSpaceRefPos - origin);
+    float distance = glm::abs(refToOrigin.z);
+    float segmentLength = distance / static_cast<float>(_lightningSubDiv + 1);
+    float halfRadius = 0.5f * _lightningRadius;
+
+    vector<pair<glm::vec3, glm::vec3>> segments;
+    segments.resize(_lightningSubDiv + 1);
+    segments[0].first = origin;
+    for (int i = 1; i < _lightningSubDiv + 1; ++i) {
+        glm::vec3 dir(glm::normalize(emitterSpaceRefPos - segments[i - 1].first));
+        glm::vec3 offset(
+            random(-halfRadius, halfRadius),
+            random(-halfRadius, halfRadius),
+            0.0f);
+        segments[i - 1].second = segments[i - 1].first + segmentLength * dir + offset;
+        segments[i].first = segments[i - 1].second;
+    }
+    segments[_lightningSubDiv].second = emitterSpaceRefPos;
+
+    _particles.clear();
+    for (auto &segment : segments) {
+        glm::vec3 endToStart(segment.second - segment.first);
+        glm::vec3 center(0.5f * (segment.first + segment.second));
+        auto particle = make_shared<Particle>();
+        particle->emitter = this;
+        particle->position = move(center);
+        particle->size = glm::vec2(_lightningScale, glm::abs(endToStart.z));
+        _particles.push_back(move(particle));
+    }
+}
+
 void EmitterSceneNode::updateParticle(Particle &particle, float dt) {
+    // Lightning emitters are updated elsewhere
+    if (_modelNode->emitter()->updateMode == ModelNode::Emitter::UpdateMode::Lightning) return;
+
     if (_lifeExpectancy != -1.0f) {
         particle.lifetime = glm::min(particle.lifetime + dt, _lifeExpectancy);
     } else if (particle.lifetime == particle.animLength) {
@@ -185,7 +238,7 @@ void EmitterSceneNode::updateParticleAnimation(Particle &particle, float dt) {
     }
 
     particle.frame = static_cast<int>(glm::ceil(_frameStart + factor * (_frameEnd - _frameStart)));
-    particle.size = _particleSize.get(factor);
+    particle.size = glm::vec2(_particleSize.get(factor));
     particle.color = _color.get(factor);
     particle.alpha = _alpha.get(factor);
 }
@@ -212,9 +265,9 @@ void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
         glm::mat4 transform(_absTransform);
         transform = glm::translate(transform, particles[i]->position);
         if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
-            transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * kProjectileSpeed) * particle.size, particle.size, particle.size));
+            transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * kProjectileSpeed) * particle.size.x, particle.size.y, 1.0f));
         } else {
-            transform = glm::scale(transform, glm::vec3(particle.size));
+            transform = glm::scale(transform, glm::vec3(particle.size, 1.0f));
         }
 
         uniforms.particles->particles[i].transform = move(transform);

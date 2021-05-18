@@ -38,10 +38,10 @@ public:
         glm::vec3 position { 0.0f };
         glm::vec3 color { 1.0f };
         glm::vec3 velocity { 0.0f };
+        glm::vec2 size { 1.0f };
         float animLength { 0.0f };
         float lifetime { 0.0f };
         int frame { 0 };
-        float size { 1.0f };
         float alpha { 1.0f };
     };
 
@@ -72,6 +72,10 @@ private:
     float _randomVelocity { 0.0f };
     float _mass { 0.0f };
     float _grav { 0.0f };
+    float _lightningDelay { 0.0f };
+    float _lightningRadius { 0.0f };
+    float _lightningScale { 0.0f };
+    int _lightningSubDiv { 0 };
 
     float _birthInterval { 0.0f };
     Timer _birthTimer;
@@ -81,6 +85,7 @@ private:
     void spawnParticles(float dt);
     void removeExpiredParticles(float dt);
     void doSpawnParticle();
+    void spawnLightningParticles();
 
     void updateParticle(Particle &particle, float dt);
     void updateParticleAnimation(Particle &particle, float dt);
