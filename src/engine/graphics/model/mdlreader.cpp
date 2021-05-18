@@ -564,8 +564,8 @@ static ModelNode::Emitter::UpdateMode parseEmitterUpdate(const string &str) {
         result = ModelNode::Emitter::UpdateMode::Single;
     } else if (str == "explosion") {
         result = ModelNode::Emitter::UpdateMode::Explosion;
-    } else {
-        warn("parseEmitterUpdate: unsupported value: " + str);
+    } else if (str == "lightning") {
+        result = ModelNode::Emitter::UpdateMode::Lightning;
     }
     return result;
 }
@@ -574,16 +574,18 @@ static ModelNode::Emitter::RenderMode parseEmitterRender(const string &str) {
     auto result = ModelNode::Emitter::RenderMode::Invalid;
     if (str == "normal") {
         result = ModelNode::Emitter::RenderMode::Normal;
-    } else if (str == "billboard_to_world_z") {
-        result = ModelNode::Emitter::RenderMode::BillboardToWorldZ;
-    } else if (str == "motion_blur") {
-        result = ModelNode::Emitter::RenderMode::MotionBlur;
+    } else if (str == "linked") {
+        result = ModelNode::Emitter::RenderMode::Linked;
     } else if (str == "billboard_to_local_z") {
         result = ModelNode::Emitter::RenderMode::BillboardToLocalZ;
+    } else if (str == "billboard_to_world_z") {
+        result = ModelNode::Emitter::RenderMode::BillboardToWorldZ;
+    } else if (str == "aligned_to_world_z") {
+        result = ModelNode::Emitter::RenderMode::AlignedToWorldZ;
     } else if (str == "aligned_to_particle_dir") {
         result = ModelNode::Emitter::RenderMode::AlignedToParticleDir;
-    } else {
-        warn("parseEmitterRender: unsupported value: " + str);
+    } else if (str == "motion_blur") {
+        result = ModelNode::Emitter::RenderMode::MotionBlur;
     }
     return result;
 }
@@ -596,8 +598,6 @@ static ModelNode::Emitter::BlendMode parseEmitterBlend(const string &str) {
         result = ModelNode::Emitter::BlendMode::Punch;
     } else if (str == "lighten") {
         result = ModelNode::Emitter::BlendMode::Lighten;
-    } else {
-        warn("parseEmitterBlend: unsupported value: " + str);
     }
     return result;
 }
