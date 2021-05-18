@@ -161,7 +161,7 @@ struct ShaderParticle {
 };
 
 struct ParticlesUniforms {
-    glm::vec2 gridSize { 0.0f };
+    glm::ivec2 gridSize { 0 };
     int render { 0 };
     char padding[4];
     ShaderParticle particles[kMaxParticles];

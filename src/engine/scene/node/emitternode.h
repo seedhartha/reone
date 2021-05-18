@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <deque>
+
 #include "../../common/timer.h"
 #include "../../graphics/beziercurve.h"
 #include "../../graphics/model/modelnode.h"
@@ -50,7 +52,7 @@ public:
 
     void detonate();
 
-    const std::vector<std::shared_ptr<Particle>> &particles() const { return _particles; }
+    const std::deque<std::shared_ptr<Particle>> &particles() const { return _particles; }
 
 private:
     const ModelSceneNode *_model;
@@ -69,10 +71,11 @@ private:
     float _velocity { 0.0f };
     float _randomVelocity { 0.0f };
     float _mass { 0.0f };
+    float _grav { 0.0f };
 
     float _birthInterval { 0.0f };
     Timer _birthTimer;
-    std::vector<std::shared_ptr<Particle>> _particles;
+    std::deque<std::shared_ptr<Particle>> _particles;
     bool _spawned { false };
 
     void spawnParticles(float dt);

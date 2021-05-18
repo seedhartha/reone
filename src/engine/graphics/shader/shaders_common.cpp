@@ -51,7 +51,7 @@ const int FEATURE_DANGLYMESH = 0x40000;
 const int NUM_CUBE_FACES = 6;
 const int MAX_BONES = 128;
 const int MAX_LIGHTS = 8;
-const int MAX_PARTICLES = 32;
+const int MAX_PARTICLES = 64;
 const int MAX_CHARS = 128;
 const int MAX_GRASS_CLUSTERS = 256;
 const int MAX_DANGLYMESH_CONSTRAINTS = 512;
@@ -151,7 +151,7 @@ struct Particle {
 };
 
 layout(std140) uniform Particles {
-    vec2 uParticleGridSize;
+    ivec2 uParticleGridSize;
     int uParticleRender;
     Particle uParticles[MAX_PARTICLES];
 };
@@ -631,8 +631,8 @@ void main() {
     texCoords.y *= oneOverGridY;
 
     if (uParticles[fragInstanceID].frame > 0) {
-        texCoords.y += oneOverGridY * (uParticles[fragInstanceID].frame / int(uParticleGridSize.x));
-        texCoords.x += oneOverGridX * (uParticles[fragInstanceID].frame % int(uParticleGridSize.x));
+        texCoords.y += oneOverGridY * (uParticles[fragInstanceID].frame / uParticleGridSize.x);
+        texCoords.x += oneOverGridX * (uParticles[fragInstanceID].frame % uParticleGridSize.x);
     }
 
     vec4 diffuseSample = texture(sDiffuseMap, texCoords);
