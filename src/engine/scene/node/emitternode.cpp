@@ -193,7 +193,8 @@ void EmitterSceneNode::spawnLightningParticles() {
         auto particle = make_shared<Particle>();
         particle->emitter = this;
         particle->position = move(center);
-        particle->size = glm::vec2(_lightningScale, glm::abs(endToStart.z));
+        particle->dir = _absTransform * glm::vec4(glm::normalize(endToStart), 0.0f);
+        particle->size = glm::vec2(_lightningScale, glm::length(endToStart));
         _particles.push_back(move(particle));
     }
 }
@@ -271,9 +272,9 @@ void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
         }
 
         uniforms.particles->particles[i].transform = move(transform);
-        uniforms.particles->particles[i].color = glm::vec4(particle.color, 1.0f);
+        uniforms.particles->particles[i].dir = glm::vec4(particle.dir, 1.0f);
+        uniforms.particles->particles[i].color = glm::vec4(particle.color, particle.alpha);
         uniforms.particles->particles[i].size = glm::vec2(particle.size);
-        uniforms.particles->particles[i].alpha = particle.alpha;
         uniforms.particles->particles[i].frame = particle.frame;
     }
 

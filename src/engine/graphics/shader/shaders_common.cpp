@@ -144,9 +144,9 @@ layout(std140) uniform Skeletal {
 
 struct Particle {
     mat4 transform;
+    vec4 dir;
     vec4 color;
     vec2 size;
-    float alpha;
     int frame;
 };
 
@@ -421,13 +421,13 @@ void main() {
 )END";
 
 char g_shaderVertexParticle[] = R"END(
-const int BILLBOARD_RENDER_NORMAL = 1;
-const int BILLBOARD_RENDER_LINKED = 2;
-const int BILLBOARD_RENDER_TO_LOCAL_Z = 3;
-const int BILLBOARD_RENDER_TO_WORLD_Z = 4;
-const int BILLBOARD_RENDER_ALIGNED_TO_WORLD_Z = 5;
-const int BILLBOARD_RENDER_ALIGNED_TO_PARTICLE_DIR = 6;
-const int BILLBOARD_RENDER_MOTION_BLUR = 7;
+const int RENDER_NORMAL = 1;
+const int RENDER_LINKED = 2;
+const int RENDER_BILLBOARD_TO_LOCAL_Z = 3;
+const int RENDER_BILLBOARD_TO_WORLD_Z = 4;
+const int RENDER_ALIGNED_TO_WORLD_Z = 5;
+const int RENDER_ALIGNED_TO_PARTICLE_DIR = 6;
+const int RENDER_MOTION_BLUR = 7;
 
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
@@ -438,7 +438,7 @@ flat out int fragInstanceID;
 void main() {
     vec4 P;
 
-    if (uParticleRender == BILLBOARD_RENDER_TO_WORLD_Z) {
+    if (uParticleRender == RENDER_BILLBOARD_TO_WORLD_Z) {
         vec3 particlePos = vec3(uParticles[gl_InstanceID].transform[3]);
         P = vec4(
             particlePos +
@@ -446,11 +446,22 @@ void main() {
                 FORWARD * aPosition.y * uParticles[gl_InstanceID].size.y,
             1.0);
 
-    } else if (uParticleRender == BILLBOARD_RENDER_MOTION_BLUR || uParticleRender == BILLBOARD_RENDER_TO_LOCAL_Z) {
+    } else if (uParticleRender == RENDER_MOTION_BLUR || uParticleRender == RENDER_BILLBOARD_TO_LOCAL_Z) {
         P = uParticles[gl_InstanceID].transform * vec4(aPosition.y, aPosition.x, aPosition.z, 1.0);
 
-    } else if (uParticleRender == BILLBOARD_RENDER_ALIGNED_TO_PARTICLE_DIR) {
+    } else if (uParticleRender == RENDER_ALIGNED_TO_PARTICLE_DIR) {
         P = uParticles[gl_InstanceID].transform * vec4(aPosition.x, aPosition.z, aPosition.y, 1.0);
+
+    } else if (uParticleRender == RENDER_LINKED) {
+        vec3 particlePos = vec3(uParticles[gl_InstanceID].transform[3]);
+        vec3 cameraRight = vec3(uGeneral.view[0][0], uGeneral.view[1][0], uGeneral.view[2][0]);
+        vec3 up = uParticles[gl_InstanceID].dir.xyz;
+
+        P = vec4(
+            particlePos +
+                cameraRight * aPosition.x * uParticles[gl_InstanceID].size.x +
+                up * aPosition.y * uParticles[gl_InstanceID].size.y,
+            1.0);
 
     } else {
         vec3 particlePos = vec3(uParticles[gl_InstanceID].transform[3]);
@@ -639,7 +650,7 @@ void main() {
 
     vec4 diffuseSample = texture(sDiffuseMap, texCoords);
 
-    fragColor = vec4(uParticles[fragInstanceID].color.rgb * diffuseSample.rgb, uParticles[fragInstanceID].alpha * diffuseSample.a);
+    fragColor = vec4(uParticles[fragInstanceID].color.rgb * diffuseSample.rgb, uParticles[fragInstanceID].color.a * diffuseSample.a);
     fragColorBright = vec4(vec3(0.0), 0.0);
 }
 )END";
