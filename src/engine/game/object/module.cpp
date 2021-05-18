@@ -216,21 +216,20 @@ void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
     debug(boost::format("Module: click: creature '%s', faction %d") % creature->tag() % static_cast<int>(creature->faction()));
 
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
-    ActionQueue &actions = partyLeader->actionQueue();
 
     if (creature->isDead()) {
         if (!creature->items().empty()) {
-            actions.clear();
-            actions.add(make_unique<ObjectAction>(ActionType::OpenContainer, creature));
+            partyLeader->clearAllActions();
+            partyLeader->addAction(make_unique<ObjectAction>(ActionType::OpenContainer, creature));
         }
     } else {
         bool isEnemy = Reputes::instance().getIsEnemy(*partyLeader, *creature);
         if (isEnemy) {
-            actions.clear();
-            actions.add(make_unique<AttackAction>(creature));
+            partyLeader->clearAllActions();
+            partyLeader->addAction(make_unique<AttackAction>(creature));
         } else if (!creature->conversation().empty()) {
-            actions.clear();
-            actions.add(make_unique<StartConversationAction>(creature, creature->conversation()));
+            partyLeader->clearAllActions();
+            partyLeader->addAction(make_unique<StartConversationAction>(creature, creature->conversation()));
         }
     }
 }
@@ -242,22 +241,20 @@ void Module::onDoorClick(const shared_ptr<Door> &door) {
     }
     if (!door->isOpen()) {
         shared_ptr<Creature> partyLeader(_game->party().getLeader());
-        ActionQueue &actions = partyLeader->actionQueue();
-        actions.clear();
-        actions.add(make_unique<ObjectAction>(ActionType::OpenDoor, door));
+        partyLeader->clearAllActions();
+        partyLeader->addAction(make_unique<ObjectAction>(ActionType::OpenDoor, door));
     }
 }
 
 void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
-    ActionQueue &actions = partyLeader->actionQueue();
 
     if (placeable->hasInventory()) {
-        actions.clear();
-        actions.add(make_unique<ObjectAction>(ActionType::OpenContainer, placeable));
+        partyLeader->clearAllActions();
+        partyLeader->addAction(make_unique<ObjectAction>(ActionType::OpenContainer, placeable));
     } else if (!placeable->conversation().empty()) {
-        actions.clear();
-        actions.add(make_unique<StartConversationAction>(placeable, placeable->conversation()));
+        partyLeader->clearAllActions();
+        partyLeader->addAction(make_unique<StartConversationAction>(placeable, placeable->conversation()));
     } else {
         placeable->runOnUsed(move(partyLeader));
     }

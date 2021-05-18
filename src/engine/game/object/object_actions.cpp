@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "actionqueue.h"
+#include "object.h"
 
 #include <algorithm>
 
@@ -25,33 +25,33 @@ namespace reone {
 
 namespace game {
 
-void ActionQueue::clear() {
+void Object::clearAllActions() {
     while (!_actions.empty()) {
         _actions.pop_front();
     }
 }
 
-void ActionQueue::add(unique_ptr<Action> action) {
+void Object::addAction(unique_ptr<Action> action) {
     _actions.push_back(move(action));
 }
 
-void ActionQueue::addToTop(unique_ptr<Action> action) {
+void Object::addActionOnTop(unique_ptr<Action> action) {
     _actions.push_front(move(action));
 }
 
-void ActionQueue::delay(unique_ptr<Action> action, float seconds) {
+void Object::delayAction(unique_ptr<Action> action, float seconds) {
     DelayedAction delayed;
     delayed.action = move(action);
     delayed.timer.reset(seconds);
     _delayed.push_back(move(delayed));
 }
 
-void ActionQueue::update(float dt) {
+void Object::updateActions(float dt) {
     removeCompletedActions();
     updateDelayedActions(dt);
 }
 
-void ActionQueue::removeCompletedActions() {
+void Object::removeCompletedActions() {
     while (true) {
         shared_ptr<Action> action(getCurrentAction());
         if (!action || !action->isCompleted()) return;
@@ -60,7 +60,7 @@ void ActionQueue::removeCompletedActions() {
     }
 }
 
-void ActionQueue::updateDelayedActions(float dt) {
+void Object::updateDelayedActions(float dt) {
     for (auto &delayed : _delayed) {
         if (delayed.timer.advance(dt)) {
             _actions.push_back(move(delayed.action));
@@ -74,23 +74,14 @@ void ActionQueue::updateDelayedActions(float dt) {
     _delayed.erase(delayedToRemove, _delayed.end());
 }
 
-bool ActionQueue::isEmpty() const {
-    return _actions.empty();
-}
-
-bool ActionQueue::containsUserActions() const {
+bool Object::hasUserActionsPending() const {
     for (auto &action : _actions) {
         if (action->isUserAction()) return true;
     }
-
     return false;
 }
 
-int ActionQueue::getSize() const {
-    return static_cast<int>(_actions.size());
-}
-
-shared_ptr<Action> ActionQueue::getCurrentAction() const {
+shared_ptr<Action> Object::getCurrentAction() const {
     return _actions.empty() ? nullptr : _actions.front();
 }
 

@@ -125,7 +125,7 @@ void Party::onLeaderChanged() {
     _members[0].creature->playSound(entry, false);
 
     for (auto &member : _members) {
-        member.creature->actionQueue().clear();
+        member.creature->clearAllActions();
     }
 
     _game->module()->area()->onPartyLeaderMoved(true);

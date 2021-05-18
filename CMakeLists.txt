@@ -403,8 +403,6 @@ set(GAME_HEADERS
     src/engine/game/action/playanimation.h
     src/engine/game/action/startconversation.h
     src/engine/game/action/waitaction.h
-    src/engine/game/actionexecutor.h
-    src/engine/game/actionqueue.h
     src/engine/game/animationutil.h
     src/engine/game/camera/animatedcamera.h
     src/engine/game/camera/camera.h
@@ -501,7 +499,6 @@ set(GAME_HEADERS
 
 set(GAME_SOURCES
     src/engine/game/actionexecutor.cpp
-    src/engine/game/actionqueue.cpp
     src/engine/game/animationutil.cpp
     src/engine/game/camera/animatedcamera.cpp
     src/engine/game/camera/camera.cpp
@@ -585,6 +582,7 @@ set(GAME_SOURCES
     src/engine/game/object/item_blueprint.cpp
     src/engine/game/object/module.cpp
     src/engine/game/object/object.cpp
+    src/engine/game/object/object_actions.cpp
     src/engine/game/object/objectfactory.cpp
     src/engine/game/object/placeable.cpp
     src/engine/game/object/placeable_blueprint.cpp

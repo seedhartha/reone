@@ -288,7 +288,7 @@ void HUD::hideCombatHud() {
 }
 
 void HUD::refreshActionQueueItems() const {
-    auto &actions = _game->party().getLeader()->actionQueue().actions();
+    auto &actions = _game->party().getLeader()->actions();
 
     for (int i = 0; i < 4; ++i) {
         bool attack = i < static_cast<int>(actions.size()) && actions[i]->type() == ActionType::AttackObject;
@@ -317,9 +317,9 @@ void HUD::onClick(const string &control) {
     } else if (control == "BTN_OPT") {
         _game->openInGameMenu(InGameMenu::Tab::Options);
     } else if (control == "BTN_CLEARALL") {
-        _game->party().getLeader()->actionQueue().clear();
+        _game->party().getLeader()->clearAllActions();
     } else if (control == "BTN_CLEARONE" || control == "BTN_CLEARONE2") {
-        for (auto &action : _game->party().getLeader()->actionQueue().actions()) {
+        for (auto &action : _game->party().getLeader()->actions()) {
             if (action->type() == ActionType::AttackObject) {
                 action->complete();
                 break;
