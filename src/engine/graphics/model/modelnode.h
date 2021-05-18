@@ -137,16 +137,19 @@ public:
             Invalid,
             Fountain,
             Single,
-            Explosion
+            Explosion,
+            Lightning
         };
 
         enum class RenderMode {
             Invalid = 0,
             Normal = 1,
-            BillboardToWorldZ = 2,
-            MotionBlur = 3,
-            BillboardToLocalZ = 4,
-            AlignedToParticleDir = 5
+            Linked = 2,
+            BillboardToLocalZ = 3,
+            BillboardToWorldZ = 4,
+            AlignedToWorldZ = 5,
+            AlignedToParticleDir = 6,
+            MotionBlur = 7
         };
 
         enum class BlendMode {

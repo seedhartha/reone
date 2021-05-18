@@ -422,10 +422,12 @@ void main() {
 
 char g_shaderVertexParticle[] = R"END(
 const int BILLBOARD_RENDER_NORMAL = 1;
-const int BILLBOARD_RENDER_TO_WORLD_Z = 2;
-const int BILLBOARD_RENDER_MOTION_BLUR = 3;
-const int BILLBOARD_RENDER_TO_LOCAL_Z = 4;
-const int BILLBOARD_RENDER_ALIGNED_TO_PARTICLE_DIR = 5;
+const int BILLBOARD_RENDER_LINKED = 2;
+const int BILLBOARD_RENDER_TO_LOCAL_Z = 3;
+const int BILLBOARD_RENDER_TO_WORLD_Z = 4;
+const int BILLBOARD_RENDER_ALIGNED_TO_WORLD_Z = 5;
+const int BILLBOARD_RENDER_ALIGNED_TO_PARTICLE_DIR = 6;
+const int BILLBOARD_RENDER_MOTION_BLUR = 7;
 
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
