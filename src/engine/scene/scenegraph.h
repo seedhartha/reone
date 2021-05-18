@@ -121,8 +121,7 @@ private:
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
     std::vector<GrassSceneNode *> _grass;
-    std::vector<std::pair<EmitterSceneNode *, std::vector<EmitterSceneNode::Particle *>>> _particles;
-    std::vector<std::pair<GrassSceneNode *, std::vector<GrassSceneNode::Cluster>>> _grassClusters;
+    std::vector<std::pair<SceneNode *, std::vector<std::shared_ptr<SceneLeaf>>>> _leafs;
 
     uint32_t _textureId { 0 };
     bool _updateRoots { true };
@@ -157,10 +156,7 @@ private:
     void refreshShadowLight();
 
     void prepareTransparentMeshes();
-    void prepareParticles();
-    void prepareGrass();
-
-    inline void flushEmitterParticles(EmitterSceneNode *emitter, std::vector<EmitterSceneNode::Particle *> &particles);
+    void prepareLeafs();
 };
 
 } // namespace scene

@@ -144,7 +144,7 @@ void EmitterSceneNode::doSpawnParticle() {
     glm::vec3 velocity((_velocity + random(0.0f, _randomVelocity)) * dir);
 
     auto particle = make_shared<Particle>();
-    particle->emitter = this;
+    particle->parent = this;
     particle->position = move(position);
     particle->velocity = move(velocity);
     particle->frame = _frameStart;
@@ -191,7 +191,7 @@ void EmitterSceneNode::spawnLightningParticles() {
         glm::vec3 endToStart(segment.second - segment.first);
         glm::vec3 center(0.5f * (segment.first + segment.second));
         auto particle = make_shared<Particle>();
-        particle->emitter = this;
+        particle->parent = this;
         particle->position = move(center);
         particle->dir = _absTransform * glm::vec4(glm::normalize(endToStart), 0.0f);
         particle->size = glm::vec2(_lightningScale, glm::length(endToStart));
@@ -248,8 +248,11 @@ void EmitterSceneNode::detonate() {
     doSpawnParticle();
 }
 
-void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
-    if (particles.empty()) return;
+void EmitterSceneNode::drawLeafs(const vector<shared_ptr<SceneLeaf>> &leafs, int count) {
+    if (leafs.empty()) return;
+    if (count == -1) {
+        count = static_cast<int>(leafs.size());
+    }
 
     shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
     shared_ptr<Texture> texture(emitter->texture);
@@ -260,22 +263,22 @@ void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
     uniforms.particles->gridSize = emitter->gridSize;
     uniforms.particles->render = static_cast<int>(emitter->renderMode);
 
-    for (size_t i = 0; i < particles.size(); ++i) {
-        const Particle &particle = *particles[i];
+    for (int i = 0; i < count; ++i) {
+        auto particle = static_pointer_cast<Particle>(leafs[i]);
 
         glm::mat4 transform(_absTransform);
-        transform = glm::translate(transform, particles[i]->position);
+        transform = glm::translate(transform, particle->position);
         if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
-            transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * kProjectileSpeed) * particle.size.x, particle.size.y, 1.0f));
+            transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * kProjectileSpeed) * particle->size.x, particle->size.y, 1.0f));
         } else {
-            transform = glm::scale(transform, glm::vec3(particle.size, 1.0f));
+            transform = glm::scale(transform, glm::vec3(particle->size, 1.0f));
         }
 
         uniforms.particles->particles[i].transform = move(transform);
-        uniforms.particles->particles[i].dir = glm::vec4(particle.dir, 1.0f);
-        uniforms.particles->particles[i].color = glm::vec4(particle.color, particle.alpha);
-        uniforms.particles->particles[i].size = glm::vec2(particle.size);
-        uniforms.particles->particles[i].frame = particle.frame;
+        uniforms.particles->particles[i].dir = glm::vec4(particle->dir, 1.0f);
+        uniforms.particles->particles[i].color = glm::vec4(particle->color, particle->alpha);
+        uniforms.particles->particles[i].size = glm::vec2(particle->size);
+        uniforms.particles->particles[i].frame = particle->frame;
     }
 
     Shaders::instance().activate(ShaderProgram::ParticleParticle, uniforms);
@@ -285,11 +288,11 @@ void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
 
     bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
     if (lighten) {
-        withLightenBlending([&particles]() {
-            Meshes::instance().getBillboard()->drawInstanced(static_cast<int>(particles.size()));
+        withLightenBlending([&count]() {
+            Meshes::instance().getBillboard()->drawInstanced(count);
         });
     } else {
-        Meshes::instance().getBillboard()->drawInstanced(static_cast<int>(particles.size()));
+        Meshes::instance().getBillboard()->drawInstanced(count);
     }
 }
 
