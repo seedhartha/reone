@@ -19,7 +19,7 @@
 
 #include "../gui.h"
 
-#include "../../d20/skills.h"
+#include "../../d20/attributes.h"
 
 namespace reone {
 
@@ -37,7 +37,7 @@ public:
 
 private:
     CharacterGeneration *_charGen;
-    CreatureSkills _skills;
+    CreatureAttributes _attributes;
     int _points { 0 };
 
     void onClick(const std::string &control) override;

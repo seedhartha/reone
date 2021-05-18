@@ -17,13 +17,12 @@
 
 #pragma once
 
+#include <map>
 #include <vector>
 
 #include "../types.h"
 
-#include "abilities.h"
 #include "savingthrows.h"
-#include "skills.h"
 
 namespace reone {
 
@@ -35,6 +34,10 @@ namespace game {
  */
 class CreatureAttributes {
 public:
+    int getDefense() const;
+
+    // Class Levels
+
     void addClassLevels(ClassType clazz, int levels);
 
     /**
@@ -57,25 +60,54 @@ public:
      */
     int getAggregateHitDie() const;
 
-    SavingThrows getAggregateSavingThrows() const;
-    int getAggregateAttackBonus() const;
-    int getDefense() const;
-
     ClassType getEffectiveClass() const;
     int getClassLevel(ClassType clazz) const;
+    int getAggregateAttackBonus() const;
+    SavingThrows getAggregateSavingThrows() const;
 
-    CreatureAbilities &abilities() { return _abilities; }
-    const CreatureAbilities &abilities() const { return _abilities; }
-    CreatureSkills &skills() { return _skills; }
-    const CreatureSkills &skills() const { return _skills; }
+    // END Class Levels
 
-    void setAbilities(CreatureAbilities abilities);
-    void setSkills(CreatureSkills skills);
+    // Abilities
+
+    int getAbilityScore(Ability ability) const;
+    int getAbilityModifier(Ability ability) const;
+
+    const std::map<Ability, int> &abilityScores() const { return _abilityScores; }
+    int strength() const;
+    int dexterity() const;
+    int constitution() const;
+    int intelligence() const;
+    int wisdom() const;
+    int charisma() const;
+
+    void setAbilityScore(Ability ability, int score);
+
+    // END Abilities
+
+    // Skills
+
+    bool hasSkill(Skill skill) const;
+
+    int getSkillRank(Skill skill) const;
+
+    const std::map<Skill, int> &skillRanks() const { return _skillRanks; }
+    int computerUse() const;
+    int demolitions() const;
+    int stealth() const;
+    int awareness() const;
+    int persuade() const;
+    int repair() const;
+    int security() const;
+    int treatInjury() const;
+
+    void setSkillRank(Skill skill, int rank);
+
+    // END Skills
 
 private:
     std::vector<std::pair<ClassType, int>> _classLevels;
-    CreatureAbilities _abilities;
-    CreatureSkills _skills;
+    std::map<Ability, int> _abilityScores;
+    std::map<Skill, int> _skillRanks;
 };
 
 } // namespace game

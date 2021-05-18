@@ -148,9 +148,9 @@ void AbilitiesMenu::onListBoxItemClick(const string &control, const string &item
         auto maybeSkillInfo = _skills.find(skill);
         if (maybeSkillInfo != _skills.end()) {
             shared_ptr<Creature> partyLeader(_game->party().getLeader());
-            setControlText("LBL_RANKVAL", to_string(partyLeader->attributes().skills().getRank(skill)));
+            setControlText("LBL_RANKVAL", to_string(partyLeader->attributes().getSkillRank(skill)));
             setControlText("LBL_BONUSVAL", "0");
-            setControlText("LBL_TOTALVAL", to_string(partyLeader->attributes().skills().getRank(skill)));
+            setControlText("LBL_TOTALVAL", to_string(partyLeader->attributes().getSkillRank(skill)));
 
             auto &lbName = getControl("LBL_NAME");
             lbName.setTextMessage(maybeSkillInfo->second.name);

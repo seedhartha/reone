@@ -390,20 +390,18 @@ void CharacterGeneration::updateAttributes() {
     shared_ptr<CreatureClass> clazz(Classes::instance().get(_character.attributes.getEffectiveClass()));
     setControlText("LBL_CLASS", clazz->name());
 
-    const CreatureAbilities &abilities =  _character.attributes.abilities();
-
-    int vitality = clazz->hitdie() + abilities.getModifier(Ability::Constitution);
+    int vitality = clazz->hitdie() + _character.attributes.getAbilityModifier(Ability::Constitution);
     setControlText("LBL_VIT", to_string(vitality));
 
     int defense = _character.attributes.getDefense();
     setControlText("LBL_DEF", to_string(defense));
 
-    setControlText("STR_AB_LBL", to_string(abilities.strength()));
-    setControlText("DEX_AB_LBL", to_string(abilities.dexterity()));
-    setControlText("CON_AB_LBL", to_string(abilities.constitution()));
-    setControlText("INT_AB_LBL", to_string(abilities.intelligence()));
-    setControlText("WIS_AB_LBL", to_string(abilities.wisdom()));
-    setControlText("CHA_AB_LBL", to_string(abilities.charisma()));
+    setControlText("STR_AB_LBL", to_string(_character.attributes.strength()));
+    setControlText("DEX_AB_LBL", to_string(_character.attributes.dexterity()));
+    setControlText("CON_AB_LBL", to_string(_character.attributes.constitution()));
+    setControlText("INT_AB_LBL", to_string(_character.attributes.intelligence()));
+    setControlText("WIS_AB_LBL", to_string(_character.attributes.wisdom()));
+    setControlText("CHA_AB_LBL", to_string(_character.attributes.charisma()));
 
     const SavingThrows &throws = clazz->getSavingThrows(1);
 

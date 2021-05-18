@@ -490,12 +490,10 @@ set(GAME_HEADERS
     src/engine/game/portraits.h
     src/engine/game/reputes.h
     src/engine/game/room.h
-    src/engine/game/d20/abilities.h
     src/engine/game/d20/attributes.h
     src/engine/game/d20/class.h
     src/engine/game/d20/classes.h
     src/engine/game/d20/savingthrows.h
-    src/engine/game/d20/skills.h
     src/engine/game/savedgame.h
     src/engine/game/script/objectutil.h
     src/engine/game/script/routines.h
@@ -524,11 +522,12 @@ set(GAME_SOURCES
     src/engine/game/console.cpp
     src/engine/game/creaturefinder.cpp
     src/engine/game/cursors.cpp
-    src/engine/game/d20/abilities.cpp
     src/engine/game/d20/attributes.cpp
+    src/engine/game/d20/attributes_abilities.cpp
+    src/engine/game/d20/attributes_classes.cpp
+    src/engine/game/d20/attributes_skills.cpp
     src/engine/game/d20/class.cpp
     src/engine/game/d20/classes.cpp
-    src/engine/game/d20/skills.cpp
     src/engine/game/dialog.cpp
     src/engine/game/footstepsounds.cpp
     src/engine/game/game.cpp

@@ -567,9 +567,9 @@ int Creature::getAttackBonus() const {
 
     auto rightWeapon = getEquippedItem(InventorySlot::rightWeapon);
     if (rightWeapon && rightWeapon->isRanged()) {
-        modifier = _attributes.abilities().getModifier(Ability::Dexterity);
+        modifier = _attributes.getAbilityModifier(Ability::Dexterity);
     } else {
-        modifier = _attributes.abilities().getModifier(Ability::Strength);
+        modifier = _attributes.getAbilityModifier(Ability::Strength);
     }
 
     return _attributes.getAggregateAttackBonus() + modifier;
@@ -596,9 +596,9 @@ void Creature::getWeaponDamage(int slot, int &min, int &max) const {
 
     int modifier;
     if (weapon && weapon->isRanged()) {
-        modifier = _attributes.abilities().getModifier(Ability::Dexterity);
+        modifier = _attributes.getAbilityModifier(Ability::Dexterity);
     } else {
-        modifier = _attributes.abilities().getModifier(Ability::Strength);
+        modifier = _attributes.getAbilityModifier(Ability::Strength);
     }
     min += modifier;
     max += modifier;

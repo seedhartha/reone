@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../d20/abilities.h"
+#include "../../d20/attributes.h"
 
 #include "../gui.h"
 
@@ -37,7 +37,7 @@ public:
 
 private:
     CharacterGeneration *_charGen;
-    CreatureAbilities _abilities;
+    CreatureAttributes _attributes;
     int _points { 0 };
 
     void onClick(const std::string &control) override;

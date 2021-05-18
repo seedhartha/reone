@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "abilities.h"
+#include "attributes.h"
 
 #include "../../common/collectionutil.h"
 
@@ -25,41 +25,41 @@ namespace game {
 
 static constexpr int kDefaultAbilityScore = 8;
 
-int CreatureAbilities::getScore(Ability ability) const {
-    return getFromLookupOrElse(_scores, ability, kDefaultAbilityScore);
+int CreatureAttributes::getAbilityScore(Ability ability) const {
+    return getFromLookupOrElse(_abilityScores, ability, kDefaultAbilityScore);
 }
 
-int CreatureAbilities::getModifier(Ability ability) const {
-    int score = getScore(ability);
+int CreatureAttributes::getAbilityModifier(Ability ability) const {
+    int score = getAbilityScore(ability);
     return (score - 10) / 2;
 }
 
-int CreatureAbilities::strength() const {
-    return getScore(Ability::Strength);
+int CreatureAttributes::strength() const {
+    return getAbilityScore(Ability::Strength);
 }
 
-int CreatureAbilities::dexterity() const {
-    return getScore(Ability::Dexterity);
+int CreatureAttributes::dexterity() const {
+    return getAbilityScore(Ability::Dexterity);
 }
 
-int CreatureAbilities::constitution() const {
-    return getScore(Ability::Constitution);
+int CreatureAttributes::constitution() const {
+    return getAbilityScore(Ability::Constitution);
 }
 
-int CreatureAbilities::intelligence() const {
-    return getScore(Ability::Intelligence);
+int CreatureAttributes::intelligence() const {
+    return getAbilityScore(Ability::Intelligence);
 }
 
-int CreatureAbilities::wisdom() const {
-    return getScore(Ability::Wisdom);
+int CreatureAttributes::wisdom() const {
+    return getAbilityScore(Ability::Wisdom);
 }
 
-int CreatureAbilities::charisma() const {
-    return getScore(Ability::Charisma);
+int CreatureAttributes::charisma() const {
+    return getAbilityScore(Ability::Charisma);
 }
 
-void CreatureAbilities::setScore(Ability ability, int score) {
-    _scores[ability] = score;
+void CreatureAttributes::setAbilityScore(Ability ability, int score) {
+    _abilityScores[ability] = score;
 }
 
 } // namespace game

@@ -42,13 +42,12 @@ void CreatureClass::load(const TwoDA &twoDa, int row) {
     _hitdie = twoDa.getInt(row, "hitdie");
     _skillPointBase = twoDa.getInt(row, "skillpointbase");
 
-    CreatureAbilities &abilities = _defaultAttributes.abilities();
-    abilities.setScore(Ability::Strength, twoDa.getInt(row, "str"));
-    abilities.setScore(Ability::Dexterity, twoDa.getInt(row, "dex"));
-    abilities.setScore(Ability::Constitution, twoDa.getInt(row, "con"));
-    abilities.setScore(Ability::Intelligence, twoDa.getInt(row, "int"));
-    abilities.setScore(Ability::Wisdom, twoDa.getInt(row, "wis"));
-    abilities.setScore(Ability::Charisma, twoDa.getInt(row, "cha"));
+    _defaultAttributes.setAbilityScore(Ability::Strength, twoDa.getInt(row, "str"));
+    _defaultAttributes.setAbilityScore(Ability::Dexterity, twoDa.getInt(row, "dex"));
+    _defaultAttributes.setAbilityScore(Ability::Constitution, twoDa.getInt(row, "con"));
+    _defaultAttributes.setAbilityScore(Ability::Intelligence, twoDa.getInt(row, "int"));
+    _defaultAttributes.setAbilityScore(Ability::Wisdom, twoDa.getInt(row, "wis"));
+    _defaultAttributes.setAbilityScore(Ability::Charisma, twoDa.getInt(row, "cha"));
 
     string skillsTable(boost::to_lower_copy(twoDa.getString(row, "skillstable")));
     loadClassSkills(skillsTable);
