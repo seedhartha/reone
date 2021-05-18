@@ -183,9 +183,22 @@ void Party::setPartyLeader(int npc) {
     }
     if (memberIdx == 0) return;
 
+    setPartyLeaderByIndex(memberIdx);
+}
+
+void Party::setPartyLeaderByIndex(int index) {
+    if (index == 0) {
+        warn("Party: attempted to switch leader to current party member: " + to_string(index));
+        return;
+    }
+    if (index >= _members.size()) {
+        warn("Party: index out of range: " + to_string(index));
+        return;
+    }
+
     Member tmp(_members[0]);
-    _members[0] = _members[memberIdx];
-    _members[memberIdx] = tmp;
+    _members[0] = _members[index];
+    _members[index] = tmp;
 
     onLeaderChanged();
 }

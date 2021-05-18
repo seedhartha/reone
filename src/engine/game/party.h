@@ -53,6 +53,7 @@ public:
     std::shared_ptr<Creature> player() const { return _player; }
 
     void setPartyLeader(int npc);
+    void setPartyLeaderByIndex(int index);
     void setPlayer(const std::shared_ptr<Creature> &player);
     void setSoloMode(bool value) { _solo = value; }
 

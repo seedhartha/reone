@@ -328,6 +328,11 @@ void HUD::onClick(const string &control) {
                 break;
             }
         }
+    } else if (control == "BTN_CHAR1") {
+        _game->openInGameMenu(InGameMenu::Tab::Equipment);
+    } else if (control == "BTN_CHAR2" || control == "BTN_CHAR3") {
+        int memberIdx = 4 - stoi(&control[8]);
+        _game->party().setPartyLeaderByIndex(memberIdx);
     }
 }
 
