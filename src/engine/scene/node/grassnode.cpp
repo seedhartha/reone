@@ -48,11 +48,16 @@ void GrassSceneNode::clear() {
     _clusters.clear();
 }
 
-void GrassSceneNode::addCluster(Cluster cluster) {
+void GrassSceneNode::addCluster(shared_ptr<Cluster> cluster) {
     _clusters.push_back(move(cluster));
 }
 
-void GrassSceneNode::drawClusters(const vector<Cluster> &clusters) {
+void GrassSceneNode::drawLeafs(const vector<shared_ptr<SceneLeaf>> &leafs, int count) {
+    if (leafs.empty()) return;
+    if (count == -1) {
+        count = static_cast<int>(leafs.size());
+    }
+
     setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
 
@@ -66,15 +71,15 @@ void GrassSceneNode::drawClusters(const vector<Cluster> &clusters) {
         uniforms.combined.featureMask |= UniformFeatureFlags::lightmap;
     }
 
-    int numClusters = static_cast<int>(clusters.size());
-    for (int i = 0; i < numClusters; ++i) {
+    for (int i = 0; i < count; ++i) {
+        auto cluster = static_pointer_cast<GrassSceneNode::Cluster>(leafs[i]);
         uniforms.grass->quadSize = _quadSize;
-        uniforms.grass->clusters[i].positionVariant = glm::vec4(clusters[i].position, static_cast<float>(clusters[i].variant));
-        uniforms.grass->clusters[i].lightmapUV = clusters[i].lightmapUV;
+        uniforms.grass->clusters[i].positionVariant = glm::vec4(cluster->position, static_cast<float>(cluster->variant));
+        uniforms.grass->clusters[i].lightmapUV = cluster->lightmapUV;
     }
 
     Shaders::instance().activate(ShaderProgram::GrassGrass, uniforms);
-    Meshes::instance().getGrass()->drawInstanced(numClusters);
+    Meshes::instance().getGrass()->drawInstanced(count);
 }
 
 } // namespace scene

@@ -533,10 +533,11 @@ void Area::fill(SceneGraph &sceneGraph) {
                         glm::vec3 baryPosition(getRandomBarycentric());
                         glm::vec3 position(aabbTransform * glm::vec4(barycentricToCartesian(vertices[0], vertices[1], vertices[2], baryPosition), 1.0f));
                         glm::vec2 lightmapUV(aabbNode->mesh()->mesh->getTriangleTexCoords2(face, baryPosition));
-                        GrassSceneNode::Cluster cluster;
-                        cluster.position = move(position);
-                        cluster.variant = getRandomGrassVariant();
-                        cluster.lightmapUV = move(lightmapUV);
+                        auto cluster = make_shared<GrassSceneNode::Cluster>();
+                        cluster->parent = grass.get();
+                        cluster->position = move(position);
+                        cluster->variant = getRandomGrassVariant();
+                        cluster->lightmapUV = move(lightmapUV);
                         grass->addCluster(move(cluster));
                     }
                 }

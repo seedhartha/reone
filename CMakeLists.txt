@@ -304,6 +304,7 @@ set(SCENE_HEADERS
     src/engine/scene/pipeline/control.h
     src/engine/scene/pipeline/world.h
     src/engine/scene/scenegraph.h
+    src/engine/scene/sceneleaf.h
     src/engine/scene/types.h)
 
 set(SCENE_SOURCES

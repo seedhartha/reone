@@ -23,6 +23,8 @@
 #include "../../graphics/beziercurve.h"
 #include "../../graphics/model/modelnode.h"
 
+#include "../sceneleaf.h"
+
 #include "modelnodescenenode.h"
 
 namespace reone {
@@ -33,8 +35,7 @@ class ModelSceneNode;
 
 class EmitterSceneNode : public ModelNodeSceneNode {
 public:
-    struct Particle {
-        EmitterSceneNode *emitter { nullptr };
+    struct Particle : public SceneLeaf {
         glm::vec3 position { 0.0f };
         glm::vec3 dir { 0.0f }; // used in Linked render mode
         glm::vec3 color { 1.0f };
@@ -49,7 +50,7 @@ public:
     EmitterSceneNode(const ModelSceneNode *model, std::shared_ptr<graphics::ModelNode> modelNode, SceneGraph *sceneGraph);
 
     void update(float dt) override;
-    void drawParticles(const std::vector<Particle *> &particles);
+    void drawLeafs(const std::vector<std::shared_ptr<SceneLeaf>> &leafs, int count) override;
 
     void detonate();
 

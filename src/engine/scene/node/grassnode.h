@@ -19,6 +19,8 @@
 
 #include "../../graphics/texture/texture.h"
 
+#include "../sceneleaf.h"
+
 #include "scenenode.h"
 
 namespace reone {
@@ -27,7 +29,7 @@ namespace scene {
 
 class GrassSceneNode : public SceneNode {
 public:
-    struct Cluster {
+    struct Cluster : public SceneLeaf {
         glm::vec3 position { 0.0f };
         glm::vec2 lightmapUV { 0.0f };
         int variant { 0 };
@@ -36,17 +38,17 @@ public:
     GrassSceneNode(std::string name, glm::vec2 quadSize, std::shared_ptr<graphics::Texture> texture, std::shared_ptr<graphics::Texture> lightmap, SceneGraph *graph);
 
     void clear();
-    void addCluster(Cluster cluster);
+    void addCluster(std::shared_ptr<Cluster> cluster);
 
-    void drawClusters(const std::vector<Cluster> &clusters);
+    void drawLeafs(const std::vector<std::shared_ptr<SceneLeaf>> &leafs, int count) override;
 
-    const std::vector<Cluster> &clusters() const { return _clusters; }
+    const std::vector<std::shared_ptr<Cluster>> &clusters() const { return _clusters; }
 
 private:
     glm::vec2 _quadSize { 0.0f };
     std::shared_ptr<graphics::Texture> _texture;
     std::shared_ptr<graphics::Texture> _lightmap;
-    std::vector<Cluster> _clusters;
+    std::vector<std::shared_ptr<Cluster>> _clusters;
 };
 
 } // namespace scene
