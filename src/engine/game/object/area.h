@@ -28,6 +28,7 @@
 #include "../../graphics/types.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/types.h"
+#include "../../scene/scenegraph.h"
 
 #include "../actionexecutor.h"
 #include "../camera/animatedcamera.h"
@@ -35,23 +36,14 @@
 #include "../camera/firstperson.h"
 #include "../camera/staticcamera.h"
 #include "../camera/thirdperson.h"
-#include "../creaturefinder.h"
 #include "../map.h"
-#include "../objectselect.h"
 #include "../pathfinder.h"
-#include "../perception.h"
 #include "../script/runutil.h"
 #include "../types.h"
 
 #include "object.h"
 
 namespace reone {
-
-namespace scene {
-
-class SceneGraph;
-
-}
 
 namespace game {
 
@@ -64,6 +56,8 @@ class Game;
 
 class Area : public Object {
 public:
+    typedef std::vector<std::pair<CreatureType, int>> SearchCriteriaList;
+
     Area(uint32_t id, Game *game);
 
     void load(const std::string &name, const resource::GffStruct &are, const resource::GffStruct &git);
@@ -93,12 +87,10 @@ public:
     const CameraStyle &camStyleDefault() const { return _camStyleDefault; }
     const std::string &music() const { return _music; }
     const ObjectList &objects() const { return _objects; }
-    ObjectSelector &objectSelector() { return _objectSelector; }
     const Pathfinder &pathfinder() const { return _pathfinder; }
     const std::string &localizedName() const { return _localizedName; }
     const RoomMap &rooms() const { return _rooms; }
     Map &map() { return _map; }
-    CreatureFinder &creatureFinder() { return _creatureFinder; }
 
     void setUnescapable(bool value);
 
@@ -111,14 +103,30 @@ public:
     ObjectList &getObjectsByType(ObjectType type);
     std::shared_ptr<SpatialObject> getObjectByTag(const std::string &tag, int nth = 0) const;
 
+    // END Objects
+
+    // Object Search
+
     /**
      * Find the nth nearest object for which the specified predicate returns true.
-     * 
+     *
      * @param nth a 0-based object index
      */
     std::shared_ptr<SpatialObject> getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<SpatialObject> &)> &predicate);
 
-    // END Objects
+    /**
+     * @param nth 0-based index of the creature
+     * @return nth nearest creature to the target object, that matches the specified criterias
+     */
+    std::shared_ptr<Creature> getNearestCreature(const std::shared_ptr<SpatialObject> &target, const SearchCriteriaList &criterias, int nth = 0);
+
+    /**
+     * @param nth 0-based index of the creature
+     * @return nth nearest creature to the location, that matches the specified criterias
+     */
+    std::shared_ptr<Creature> getNearestCreatureToLocation(const Location &location, const SearchCriteriaList &criterias, int nth = 0);
+
+    // END Object Search
 
     // Cameras
 
@@ -141,6 +149,26 @@ public:
     void reloadParty();
 
     // END Party
+
+    // Perception
+
+    void updatePerception(float dt);
+
+    // END Perception
+
+    // Object Selection
+
+    void selectNextObject(bool reverse = false);
+    void selectNearestObject();
+    void hilightObject(std::shared_ptr<SpatialObject> object);
+    void selectObject(std::shared_ptr<SpatialObject> object);
+
+    std::vector<std::shared_ptr<SpatialObject>> getSelectableObjects() const;
+
+    std::shared_ptr<SpatialObject> hilightedObject() const { return _hilightedObject; }
+    std::shared_ptr<SpatialObject> selectedObject() const { return _selectedObject; }
+
+    // END Object Selection
 
     // Stealth
 
@@ -177,7 +205,6 @@ private:
 
     Game *_game;
 
-    ObjectSelector _objectSelector;
     ActionExecutor _actionExecutor;
     Pathfinder _pathfinder;
     std::string _localizedName;
@@ -189,10 +216,11 @@ private:
     Timer _heartbeatTimer;
     Map _map;
     bool _unescapable { false };
-    CreatureFinder _creatureFinder;
     Grass _grass;
-    Perception _perception;
     glm::vec3 _ambientColor { 0.0f };
+    Timer _perceptionTimer;
+    std::shared_ptr<SpatialObject> _hilightedObject;
+    std::shared_ptr<SpatialObject> _selectedObject;
 
     // Scripts
 
@@ -338,6 +366,24 @@ private:
     bool getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::vec3 &normal) const;
 
     // END Collision detection
+
+    // Creature Search
+
+    bool matchesCriterias(const Creature &creature, const SearchCriteriaList &criterias, std::shared_ptr<SpatialObject> target = nullptr) const;
+
+    // END Creature Search
+
+    // Perception
+
+    void doUpdatePerception();
+
+    // END Perception
+
+    // Object Selection
+
+    void updateObjectSelection();
+
+    // END Object Selection
 };
 
 } // namespace game

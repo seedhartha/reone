@@ -77,8 +77,7 @@ void Console::cmdClear(vector<string> tokens) {
 }
 
 void Console::cmdDescribe(vector<string> tokens) {
-    ObjectSelector &selector = _game->module()->area()->objectSelector();
-    auto object = selector.selectedObject();
+    auto object = _game->module()->area()->selectedObject();
     if (!object) {
         print("describe: no object selected");
         return;
@@ -106,9 +105,8 @@ void Console::cmdDescribe(vector<string> tokens) {
     print(ss.str());
 }
 
-void Console::cmdListAnim(vector<string> tokens) {
-    ObjectSelector &selector = _game->module()->area()->objectSelector();
-    auto object = selector.selectedObject();
+void Console::cmdListAnim(vector<string> tokens) {;
+    auto object = _game->module()->area()->selectedObject();
     if (!object) {
         object = _game->party().getLeader();
         if (!object) {
@@ -138,8 +136,7 @@ void Console::cmdPlayAnim(vector<string> tokens) {
         print("Usage: playanim anim_name");
         return;
     }
-    ObjectSelector &selector = _game->module()->area()->objectSelector();
-    auto object = selector.selectedObject();
+    auto object = _game->module()->area()->selectedObject();
     if (!object) {
         object = _game->party().getLeader();
         if (!object) {
@@ -152,8 +149,7 @@ void Console::cmdPlayAnim(vector<string> tokens) {
 }
 
 void Console::cmdKill(vector<string> tokens) {
-    ObjectSelector &selector = _game->module()->area()->objectSelector();
-    auto object = selector.selectedObject();
+    auto object = _game->module()->area()->selectedObject();
     if (!object) {
         print("kill: no object selected");
         return;
@@ -167,8 +163,7 @@ void Console::cmdAddItem(vector<string> tokens) {
         print("Usage: additem item_tpl [size]");
         return;
     }
-    ObjectSelector &selector = _game->module()->area()->objectSelector();
-    auto object = selector.selectedObject();
+    auto object = _game->module()->area()->selectedObject();
     if (!object) {
         object = _game->party().getLeader();
         if (!object) {
@@ -186,9 +181,7 @@ void Console::cmdGiveXP(vector<string> tokens) {
         return;
     }
 
-    ObjectSelector &selector = _game->module()->area()->objectSelector();
-    auto object = selector.selectedObject();
-
+    auto object = _game->module()->area()->selectedObject();
     if (!object) {
         object = _game->party().getLeader();
     }

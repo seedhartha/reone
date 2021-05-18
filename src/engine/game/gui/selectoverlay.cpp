@@ -112,9 +112,8 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
         _selectedActionIdx == -1 || _selectedActionIdx >= _actions.size()) return false;
 
     shared_ptr<Area> area(_game->module()->area());
-    ObjectSelector &selector = area->objectSelector();
 
-    auto selectedObject = selector.selectedObject();
+    auto selectedObject = area->selectedObject();
     if (!selectedObject) return false;
 
     switch (_actions[_selectedActionIdx]) {
@@ -147,13 +146,12 @@ void SelectionOverlay::update() {
 
     shared_ptr<Module> module(_game->module());
     shared_ptr<Area> area(module->area());
-    ObjectSelector &selector = area->objectSelector();
 
     Camera *camera = _game->getActiveCamera();
     glm::mat4 projection(camera->sceneNode()->projection());
     glm::mat4 view(camera->sceneNode()->view());
 
-    auto hilightedObject = selector.hilightedObject();
+    auto hilightedObject = area->hilightedObject();
     if (hilightedObject) {
         _hilightedScreenCoords = area->getSelectableScreenCoords(hilightedObject, projection, view);
 
@@ -167,7 +165,7 @@ void SelectionOverlay::update() {
         }
     }
 
-    auto selectedObject = selector.selectedObject();
+    auto selectedObject = area->selectedObject();
     if (selectedObject) {
         _selectedScreenCoords = area->getSelectableScreenCoords(selectedObject, projection, view);
 

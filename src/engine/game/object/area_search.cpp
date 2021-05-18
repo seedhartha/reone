@@ -15,12 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "creaturefinder.h"
+#include "area.h"
 
-#include <stdexcept>
-
-#include "object/area.h"
-#include "reputes.h"
+#include "../../common/log.h"
+#include "../enginetype/location.h"
+#include "../reputes.h"
 
 using namespace std;
 
@@ -28,16 +27,29 @@ namespace reone {
 
 namespace game {
 
-CreatureFinder::CreatureFinder(Area *area) : _area(area) {
-    if (!area) {
-        throw invalid_argument("area must not be null");
+shared_ptr<SpatialObject> Area::getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<SpatialObject> &)> &predicate) {
+    vector<pair<shared_ptr<SpatialObject>, float>> candidates;
+
+    for (auto &object : _objects) {
+        if (predicate(object)) {
+            candidates.push_back(make_pair(object, object->getDistanceTo2(origin)));
+        }
     }
+    sort(candidates.begin(), candidates.end(), [](auto &left, auto &right) { return left.second < right.second; });
+
+    int candidateCount = static_cast<int>(candidates.size());
+    if (nth >= candidateCount) {
+        debug(boost::format("Area: getNearestObject: nth is out of bounds: %d/%d") % nth % candidateCount, 2);
+        return nullptr;
+    }
+
+    return candidates[nth].first;
 }
 
-shared_ptr<Creature> CreatureFinder::getNearestCreature(const std::shared_ptr<SpatialObject> &target, const CreatureFinder::CriteriaList &criterias, int nth) {
+shared_ptr<Creature> Area::getNearestCreature(const std::shared_ptr<SpatialObject> &target, const SearchCriteriaList &criterias, int nth) {
     vector<pair<shared_ptr<Creature>, float>> candidates;
 
-    for (auto &object : _area->getObjectsByType(ObjectType::Creature)) {
+    for (auto &object : getObjectsByType(ObjectType::Creature)) {
         auto creature = static_pointer_cast<Creature>(object);
         if (matchesCriterias(*creature, criterias, target)) {
             float distance2 = creature->getDistanceTo2(*target);
@@ -52,7 +64,7 @@ shared_ptr<Creature> CreatureFinder::getNearestCreature(const std::shared_ptr<Sp
     return nth < candidates.size() ? candidates[nth].first : nullptr;
 }
 
-bool CreatureFinder::matchesCriterias(const Creature &creature, const CriteriaList &criterias, std::shared_ptr<SpatialObject> target) const {
+bool Area::matchesCriterias(const Creature &creature, const SearchCriteriaList &criterias, std::shared_ptr<SpatialObject> target) const {
     for (auto &criteria : criterias) {
         switch (criteria.first) {
             case CreatureType::Reputation: {
@@ -119,10 +131,10 @@ bool CreatureFinder::matchesCriterias(const Creature &creature, const CriteriaLi
     return true;
 }
 
-shared_ptr<Creature> CreatureFinder::getNearestCreatureToLocation(const Location &location, const CreatureFinder::CriteriaList &criterias, int nth) {
+shared_ptr<Creature> Area::getNearestCreatureToLocation(const Location &location, const SearchCriteriaList &criterias, int nth) {
     vector<pair<shared_ptr<Creature>, float>> candidates;
 
-    for (auto &object : _area->getObjectsByType(ObjectType::Creature)) {
+    for (auto &object : getObjectsByType(ObjectType::Creature)) {
         auto creature = static_pointer_cast<Creature>(object);
         if (matchesCriterias(*creature, criterias)) {
             float distance2 = creature->getDistanceTo2(location.position());
