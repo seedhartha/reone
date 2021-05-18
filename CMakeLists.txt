@@ -158,6 +158,7 @@ set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BI
 set(GRAPHICS_HEADERS
     src/engine/graphics/aabb.h
     src/engine/graphics/baryutil.h
+    src/engine/graphics/beziercurve.h
     src/engine/graphics/cursor.h
     src/engine/graphics/featureutil.h
     src/engine/graphics/font.h
