@@ -118,15 +118,14 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
 
     switch (_actions[_selectedActionIdx]) {
         case ContextualAction::Unlock: {
-            ActionQueue &actions = _game->party().getLeader()->actionQueue();
-            actions.add(make_unique<ObjectAction>(ActionType::OpenLock, selectedObject));
+            shared_ptr<Creature> partyLeader(_game->party().getLeader());
+            partyLeader->addAction(make_unique<ObjectAction>(ActionType::OpenLock, selectedObject));
             break;
         }
 
         case ContextualAction::Attack: {
             shared_ptr<Creature> partyLeader(_game->party().getLeader());
-            ActionQueue &actions = partyLeader->actionQueue();
-            actions.add(make_unique<AttackAction>(static_pointer_cast<Creature>(selectedObject), partyLeader->getAttackRange(), true));
+            partyLeader->addAction(make_unique<AttackAction>(static_pointer_cast<Creature>(selectedObject), partyLeader->getAttackRange(), true));
             break;
         }
 

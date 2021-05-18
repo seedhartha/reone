@@ -17,13 +17,17 @@
 
 #pragma once
 
+#include <deque>
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include <boost/noncopyable.hpp>
 
-#include "../actionqueue.h"
+#include "../../common/timer.h"
+
+#include "../action/action.h"
 #include "../types.h"
 
 namespace reone {
@@ -47,12 +51,11 @@ public:
     const std::string &blueprintResRef() const { return _blueprintResRef; }
     const std::string &name() const { return _name; }
     const std::string &conversation() const { return _conversation; }
-    ActionQueue &actionQueue() { return _actionQueue; }
     bool plotFlag() const { return _plot; }
 
-    void setTag(std::string tag);
-    void setPlotFlag(bool plot);
-    void setCommandable(bool value);
+    void setTag(std::string tag) { _tag = std::move(tag); }
+    void setPlotFlag(bool plot) { _plot = plot; }
+    void setCommandable(bool commandable) { _commandable = commandable; }
 
     // Hit Points
 
@@ -65,10 +68,24 @@ public:
     // Current hit points, not counting any bonuses.
     int currentHitPoints() const { return _currentHitPoints; }
 
-    void setMinOneHP(bool minOneHP);
-    void setMaxHitPoints(int maxHitPoints);
+    void setMinOneHP(bool minOneHP) { _minOneHP = minOneHP; }
+    void setMaxHitPoints(int maxHitPoints) { _maxHitPoints = maxHitPoints; }
 
     // END Hit Points
+
+    // Actions
+
+    void addAction(std::unique_ptr<Action> action);
+    void addActionOnTop(std::unique_ptr<Action> action);
+    void delayAction(std::unique_ptr<Action> action, float seconds);
+
+    bool hasUserActionsPending() const;
+
+    std::shared_ptr<Action> getCurrentAction() const;
+
+    const std::deque<std::shared_ptr<Action>> &actions() const { return _actions; }
+
+    // END Actions
 
     // Local variables
 
@@ -88,13 +105,17 @@ public:
     // END Scripts
 
 protected:
+    struct DelayedAction {
+        std::unique_ptr<Action> action;
+        Timer timer;
+    };
+
     uint32_t _id { 0 };
     std::string _tag;
     ObjectType _type { ObjectType::Invalid };
     std::string _blueprintResRef;
     std::string _name;
     std::string _conversation;
-    ActionQueue _actionQueue;
     bool _minOneHP { false };
     int _hitPoints { 0 };
     int _maxHitPoints { 0 };
@@ -104,6 +125,13 @@ protected:
     bool _commandable { true };
     bool _autoRemoveKey { false };
     bool _interruptable { false };
+
+    // Actions
+
+    std::deque<std::shared_ptr<Action>> _actions;
+    std::vector<DelayedAction> _delayed;
+
+    // END Actions
 
     // Local variables
 
@@ -121,6 +149,15 @@ protected:
     // END Scripts
 
     Object(uint32_t id, ObjectType type);
+
+    // Actions
+
+    void updateActions(float dt);
+
+    void removeCompletedActions();
+    void updateDelayedActions(float dt);
+
+    // END Actions
 };
 
 } // namespace game

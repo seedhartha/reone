@@ -552,11 +552,9 @@ void Creature::deactivateCombat(float delay) {
 shared_ptr<SpatialObject> Creature::getAttemptedAttackTarget() const {
     shared_ptr<SpatialObject> result;
 
-    if (!_actionQueue.isEmpty()) {
-        auto attackAction = dynamic_pointer_cast<AttackAction>(_actionQueue.actions().front());
-        if (attackAction) {
-            result = attackAction->target();
-        }
+    auto attackAction = dynamic_pointer_cast<AttackAction>(getCurrentAction());
+    if (attackAction) {
+        result = attackAction->target();
     }
 
     return move(result);

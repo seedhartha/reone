@@ -171,7 +171,7 @@ Variable Routines::getUserActionsPending(const VariablesList &args, ExecutionCon
 
     auto caller = getCallerAsCreature(ctx);
     if (caller) {
-        result = caller->actionQueue().containsUserActions();
+        result = caller->hasUserActionsPending();
     } else {
         debug("Script: getUserActionsPending: caller is invalid", 1, DebugChannels::script);
     }

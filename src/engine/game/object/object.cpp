@@ -18,11 +18,8 @@
 #include "object.h"
 
 #include "../../common/collectionutil.h"
-#include "../../script/types.h"
 
 using namespace std;
-
-using namespace reone::script;
 
 namespace reone {
 
@@ -32,31 +29,7 @@ Object::Object(uint32_t id, ObjectType type) : _id(id), _type(type) {
 }
 
 void Object::update(float dt) {
-    _actionQueue.update(dt);
-}
-
-void Object::clearAllActions() {
-    _actionQueue.clear();
-}
-
-void Object::setTag(string tag) {
-    _tag = move(tag);
-}
-
-void Object::setMinOneHP(bool minOneHP) {
-    _minOneHP = minOneHP;
-}
-
-void Object::setMaxHitPoints(int maxHitPoints) {
-    _maxHitPoints = maxHitPoints;
-}
-
-void Object::setPlotFlag(bool plot) {
-    _plot = plot;
-}
-
-void Object::setCommandable(bool value) {
-    _commandable = value;
+    updateActions(dt);
 }
 
 bool Object::getLocalBoolean(int index) const {
