@@ -154,10 +154,11 @@ struct SkeletalUniforms {
 
 struct ShaderParticle {
     glm::mat4 transform { 1.0f };
+    glm::vec4 dir { 0.0f };
     glm::vec4 color { 1.0f };
     glm::vec2 size { 0.0f };
-    float alpha { 1.0f };
     int frame { 0 };
+    char padding[4];
 };
 
 struct ParticlesUniforms {

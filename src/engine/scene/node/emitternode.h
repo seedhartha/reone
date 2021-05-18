@@ -36,13 +36,14 @@ public:
     struct Particle {
         EmitterSceneNode *emitter { nullptr };
         glm::vec3 position { 0.0f };
+        glm::vec3 dir { 0.0f }; // used in Linked render mode
         glm::vec3 color { 1.0f };
         glm::vec3 velocity { 0.0f };
         glm::vec2 size { 1.0f };
         float animLength { 0.0f };
         float lifetime { 0.0f };
-        int frame { 0 };
         float alpha { 1.0f };
+        int frame { 0 };
     };
 
     EmitterSceneNode(const ModelSceneNode *model, std::shared_ptr<graphics::ModelNode> modelNode, SceneGraph *sceneGraph);
