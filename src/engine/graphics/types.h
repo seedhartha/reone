@@ -30,7 +30,7 @@ constexpr float kDefaultClipPlaneFar = 10000.0f;
 
 constexpr int kMaxBones = 128;
 constexpr int kMaxLights = 8;
-constexpr int kMaxParticles = 32;
+constexpr int kMaxParticles = 64;
 constexpr int kMaxCharacters = 128;
 constexpr int kMaxGrassClusters = 256;
 constexpr int kMaxDanglymeshConstraints = 512;

@@ -63,6 +63,7 @@ EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *model, shared_ptr<Model
     _velocity = modelNode->velocity().getByFrameOrElse(0, 0.0f);
     _randomVelocity = modelNode->randVel().getByFrameOrElse(0, 0.0f);
     _mass = modelNode->mass().getByFrameOrElse(0, 0.0f);
+    _grav = modelNode->grav().getByFrameOrElse(0, 0.0f);
 
     _particleSize.setStart(modelNode->sizeStart().getByFrameOrElse(0, 0.0f));
     _particleSize.setMid(modelNode->sizeMid().getByFrameOrElse(0, 0.0f));
@@ -75,7 +76,7 @@ EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *model, shared_ptr<Model
     _alpha.setEnd(modelNode->alphaEnd().getByFrameOrElse(0, 0.0f));
 
     if (_birthrate != 0.0f) {
-        _birthInterval = 1.0f / static_cast<float>(_birthrate);
+        _birthInterval = 1.0f / _birthrate;
     }
 }
 
@@ -89,8 +90,9 @@ void EmitterSceneNode::update(float dt) {
 }
 
 void EmitterSceneNode::removeExpiredParticles(float dt) {
-    auto expiredParticles = find_if(_particles.begin(), _particles.end(), [this](auto &particle) { return isParticleExpired(*particle); });
-    _particles.erase(expiredParticles, _particles.end());
+    while (!_particles.empty() && isParticleExpired(*_particles[0])) {
+        _particles.pop_front();
+    }
 }
 
 bool EmitterSceneNode::isParticleExpired(Particle &particle) const {
@@ -103,9 +105,7 @@ void EmitterSceneNode::spawnParticles(float dt) {
         case ModelNode::Emitter::UpdateMode::Fountain:
             if (_birthrate != 0.0f) {
                 if (_birthTimer.advance(dt)) {
-                    if (_particles.size() < kMaxParticles) {
-                        doSpawnParticle();
-                    }
+                    doSpawnParticle();
                     _birthTimer.reset(_birthInterval);
                 }
             }
@@ -142,6 +142,9 @@ void EmitterSceneNode::doSpawnParticle() {
         particle->animLength = (_frameEnd - _frameStart + 1) / _fps;
     }
 
+    while (_particles.size() >= kMaxParticles) {
+        _particles.pop_front();
+    }
     _particles.push_back(particle);
 }
 
@@ -156,6 +159,17 @@ void EmitterSceneNode::updateParticle(Particle &particle, float dt) {
 
     if (!isParticleExpired(particle)) {
         particle.position += particle.velocity * dt;
+
+        // Gravity-type P2P emitter
+        if (_modelNode->emitter()->p2p && !_modelNode->emitter()->p2pBezier) {
+            auto ref = find_if(_children.begin(), _children.end(), [](auto &child) { return child->type() == SceneNodeType::Dummy; });
+            if (ref != _children.end()) {
+                glm::vec3 emitterSpaceRefPos(_absTransformInv * (*ref)->absoluteTransform()[3]);
+                glm::vec3 pullDir(glm::normalize(emitterSpaceRefPos - particle.position));
+                particle.velocity += _grav * pullDir * dt;
+            }
+        }
+
         updateParticleAnimation(particle, dt);
     }
 }
@@ -189,7 +203,7 @@ void EmitterSceneNode::drawParticles(const vector<Particle *> &particles) {
 
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
     uniforms.combined.featureMask |= UniformFeatureFlags::particles;
-    uniforms.particles->gridSize = glm::vec2(emitter->gridWidth, emitter->gridHeight);
+    uniforms.particles->gridSize = emitter->gridSize;
     uniforms.particles->render = static_cast<int>(emitter->renderMode);
 
     for (size_t i = 0; i < particles.size(); ++i) {

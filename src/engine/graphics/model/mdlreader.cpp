@@ -40,6 +40,22 @@ static constexpr int kMdlDataOffset = 12;
 static constexpr uint32_t kFunctionPtrTslPC = 4285200;
 static constexpr uint32_t kFunctionPtrTslXbox = 4285872;
 
+struct EmitterFlags {
+    static constexpr int p2p = 1;
+    static constexpr int p2pBezier = 2;
+    static constexpr int affectedByWind = 4;
+    static constexpr int tinted = 8;
+    static constexpr int bounce = 0x10;
+    static constexpr int random = 0x20;
+    static constexpr int inherit = 0x40;
+    static constexpr int inheritVelocity = 0x80;
+    static constexpr int inheritLocal = 0x100;
+    static constexpr int splat = 0x200;
+    static constexpr int inheritParticle = 0x400;
+    static constexpr int depthTexture = 0x800;
+    static constexpr int flag13 = 0x1000;
+};
+
 // Classification
 
 static unordered_map<uint8_t, Model::Classification> g_classifications {
@@ -609,14 +625,15 @@ shared_ptr<ModelNode::Emitter> MdlReader::readEmitter() {
     uint32_t flags = readUint32();
 
     auto emitter = make_shared<ModelNode::Emitter>();
-    emitter->gridWidth = glm::max(xGrid, 1u);
-    emitter->gridHeight = glm::max(yGrid, 1u);
     emitter->updateMode = parseEmitterUpdate(update);
     emitter->renderMode = parseEmitterRender(render);
     emitter->blendMode = parseEmitterBlend(blend);
     emitter->texture = Textures::instance().get(texture, TextureUsage::Diffuse);
-    emitter->loop = static_cast<bool>(loop);
+    emitter->gridSize = glm::ivec2(glm::max(xGrid, 1u), glm::max(yGrid, 1u));
     emitter->renderOrder = renderOrder;
+    emitter->loop = static_cast<bool>(loop);
+    emitter->p2p = flags & EmitterFlags::p2p;
+    emitter->p2pBezier = flags & EmitterFlags::p2pBezier;
 
     return move(emitter);
 }

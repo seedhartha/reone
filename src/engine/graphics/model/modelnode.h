@@ -160,10 +160,11 @@ public:
         RenderMode renderMode { RenderMode::Invalid };
         BlendMode blendMode { BlendMode::Invalid };
         std::shared_ptr<Texture> texture;
-        int gridWidth { 0 };
-        int gridHeight { 0 };
+        glm::ivec2 gridSize { 0 };
         int renderOrder { 0 };
         bool loop { false };
+        bool p2p { false };
+        bool p2pBezier { false };
     };
 
     struct Reference {
