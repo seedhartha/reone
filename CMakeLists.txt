@@ -417,7 +417,6 @@ set(GAME_HEADERS
     src/engine/game/characterutil.h
     src/engine/game/console.h
     src/engine/game/combat/combat.h
-    src/engine/game/creaturefinder.h
     src/engine/game/cursors.h
     src/engine/game/dialog.h
     src/engine/game/enginetype/effect.h
@@ -478,12 +477,10 @@ set(GAME_HEADERS
     src/engine/game/object/trigger.h
     src/engine/game/object/waypoint.h
     src/engine/game/objectconverter.h
-    src/engine/game/objectselect.h
     src/engine/game/options.h
     src/engine/game/party.h
     src/engine/game/path.h
     src/engine/game/pathfinder.h
-    src/engine/game/perception.h
     src/engine/game/player.h
     src/engine/game/portrait.h
     src/engine/game/portraits.h
@@ -519,7 +516,6 @@ set(GAME_SOURCES
     src/engine/game/combat/combat_damage.cpp
     src/engine/game/combat/combat_projectiles.cpp
     src/engine/game/console.cpp
-    src/engine/game/creaturefinder.cpp
     src/engine/game/cursors.cpp
     src/engine/game/d20/attributes.cpp
     src/engine/game/d20/attributes_abilities.cpp
@@ -574,6 +570,9 @@ set(GAME_SOURCES
     src/engine/game/object/area_are.cpp
     src/engine/game/object/area_collision.cpp
     src/engine/game/object/area_git.cpp
+    src/engine/game/object/area_perception.cpp
+    src/engine/game/object/area_search.cpp
+    src/engine/game/object/area_selection.cpp
     src/engine/game/object/creature.cpp
     src/engine/game/object/creature_animations.cpp
     src/engine/game/object/creature_appearance.cpp
@@ -597,11 +596,9 @@ set(GAME_SOURCES
     src/engine/game/object/trigger_blueprint.cpp
     src/engine/game/object/waypoint.cpp
     src/engine/game/object/waypoint_blueprint.cpp
-    src/engine/game/objectselect.cpp
     src/engine/game/party.cpp
     src/engine/game/path.cpp
     src/engine/game/pathfinder.cpp
-    src/engine/game/perception.cpp
     src/engine/game/player.cpp
     src/engine/game/portraits.cpp
     src/engine/game/reputes.cpp

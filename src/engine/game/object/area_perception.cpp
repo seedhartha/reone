@@ -15,14 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "perception.h"
+#include "area.h"
 
 #include <set>
 #include <stdexcept>
 
-#include "../common/log.h"
-
-#include "object/area.h"
+#include "../../common/log.h"
 
 using namespace std;
 
@@ -30,24 +28,18 @@ namespace reone {
 
 namespace game {
 
-static constexpr float kUpdateInterval = 1.0f; // seconds
+static constexpr float kUpdatePerceptionInterval = 1.0f; // seconds
 
-Perception::Perception(Area *area) : _area(area) {
-    if (!area) {
-        throw invalid_argument("area must not be null");
+void Area::updatePerception(float dt) {
+    if (_perceptionTimer.advance(dt)) {
+        doUpdatePerception();
+        _perceptionTimer.reset(kUpdatePerceptionInterval);
     }
 }
 
-void Perception::update(float dt) {
-    if (_updateTimer.advance(dt)) {
-        doUpdate();
-        _updateTimer.reset(kUpdateInterval);
-    }
-}
-
-void Perception::doUpdate() {
+void Area::doUpdatePerception() {
     // For each creature, determine a list of creatures it sees
-    ObjectList &creatures = _area->getObjectsByType(ObjectType::Creature);
+    ObjectList &creatures = getObjectsByType(ObjectType::Creature);
     for (auto &object : creatures) {
         // Skip dead creatures
         if (object->isDead()) continue;
@@ -68,7 +60,7 @@ void Perception::doUpdate() {
                 heard = true;
             }
             if (distance2 <= sightRange2) {
-                seen = _area->isInLineOfSight(*creature, *other);
+                seen = isInLineOfSight(*creature, *other);
             }
 
             // Hearing

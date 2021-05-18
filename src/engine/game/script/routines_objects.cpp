@@ -480,7 +480,7 @@ Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContex
     int thirdCriteriaType = getInt(args, 6, -1);
     int thirdCriteriaValue = getInt(args, 7, -1);
 
-    CreatureFinder::CriteriaList criterias;
+    Area::SearchCriteriaList criterias;
     criterias.push_back(make_pair(static_cast<CreatureType>(firstCriteriaType), firstCriteriaValue));
     if (secondCriteriaType != -1) {
         criterias.push_back(make_pair(static_cast<CreatureType>(secondCriteriaType), secondCriteriaValue));
@@ -489,7 +489,7 @@ Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContex
         criterias.push_back(make_pair(static_cast<CreatureType>(thirdCriteriaType), thirdCriteriaValue));
     }
 
-    shared_ptr<Creature> creature(_game->module()->area()->creatureFinder().getNearestCreature(target, criterias, nth - 1));
+    shared_ptr<Creature> creature(_game->module()->area()->getNearestCreature(target, criterias, nth - 1));
 
     return Variable::ofObject(getObjectIdOrInvalid(creature));
 }
@@ -504,7 +504,7 @@ Variable Routines::getNearestCreatureToLocation(const VariablesList &args, Execu
     int thirdCriteriaType = getInt(args, 6, -1);
     int thirdCriteriaValue = getInt(args, 7, -1);
 
-    CreatureFinder::CriteriaList criterias;
+    Area::SearchCriteriaList criterias;
     criterias.push_back(make_pair(static_cast<CreatureType>(firstCriteriaType), firstCriteriaValue));
     if (secondCriteriaType != -1) {
         criterias.push_back(make_pair(static_cast<CreatureType>(secondCriteriaType), secondCriteriaValue));
@@ -513,7 +513,7 @@ Variable Routines::getNearestCreatureToLocation(const VariablesList &args, Execu
         criterias.push_back(make_pair(static_cast<CreatureType>(thirdCriteriaType), thirdCriteriaValue));
     }
 
-    shared_ptr<Creature> creature(_game->module()->area()->creatureFinder().getNearestCreatureToLocation(*location, criterias, nth - 1));
+    shared_ptr<Creature> creature(_game->module()->area()->getNearestCreatureToLocation(*location, criterias, nth - 1));
 
     return Variable::ofObject(getObjectIdOrInvalid(creature));
 }

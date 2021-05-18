@@ -72,12 +72,9 @@ static bool g_debugPath = false;
 Area::Area(uint32_t id, Game *game) :
     Object(id, ObjectType::Area),
     _game(game),
-    _objectSelector(this, &game->party()),
     _actionExecutor(game),
     _map(game),
-    _heartbeatTimer(kHeartbeatInterval),
-    _creatureFinder(this),
-    _perception(this) {
+    _heartbeatTimer(kHeartbeatInterval) {
 
     init();
 }
@@ -337,17 +334,16 @@ bool Area::handle(const SDL_Event &event) {
 bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
         case SDL_SCANCODE_Q:
-            _objectSelector.selectNext(true);
+            selectNextObject(true);
             return true;
 
         case SDL_SCANCODE_E:
-            _objectSelector.selectNext();
+            selectNextObject();
             return true;
 
         case SDL_SCANCODE_SLASH: {
-            auto object = _objectSelector.selectedObject();
-            if (object) {
-                printDebugInfo(*object);
+            if (_selectedObject) {
+                printDebugInfo(*_selectedObject);
             }
             return true;
         }
@@ -372,8 +368,7 @@ void Area::update(float dt) {
     doDestroyObjects();
     updateVisibility();
     updateSounds();
-
-    _objectSelector.update();
+    updateObjectSelection();
 
     if (!_game->isPaused()) {
         Object::update(dt);
@@ -392,8 +387,7 @@ void Area::update(float dt) {
             }
         }
 
-        _perception.update(dt);
-
+        updatePerception(dt);
         updateHeartbeat(dt);
     }
 }
@@ -609,7 +603,7 @@ void Area::onPartyLeaderMoved(bool roomChanged) {
         updateRoomVisibility();
     }
     update3rdPersonCameraTarget();
-    _objectSelector.selectNearest();
+    selectNearestObject();
 }
 
 void Area::updateRoomVisibility() {
@@ -846,25 +840,6 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
     }
 
     return move(object);
-}
-
-shared_ptr<SpatialObject> Area::getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<SpatialObject> &)> &predicate) {
-    vector<pair<shared_ptr<SpatialObject>, float>> candidates;
-
-    for (auto &object : _objects) {
-        if (predicate(object)) {
-            candidates.push_back(make_pair(object, object->getDistanceTo2(origin)));
-        }
-    }
-    sort(candidates.begin(), candidates.end(), [](auto &left, auto &right) { return left.second < right.second; });
-
-    int candidateCount = static_cast<int>(candidates.size());
-    if (nth >= candidateCount) {
-        debug(boost::format("Area: getNearestObject: nth is out of bounds: %d/%d") % nth % candidateCount, 2);
-        return nullptr;
-    }
-
-    return candidates[nth].first;
 }
 
 } // namespace game

@@ -15,36 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "objectselect.h"
-
-#include <stdexcept>
+#include "area.h"
 
 #include "glm/vec3.hpp"
 
-#include "object/area.h"
-#include "party.h"
+#include "../game.h"
 
 using namespace std;
 
-using namespace reone::graphics;
 using namespace reone::scene;
 
 namespace reone {
 
 namespace game {
 
-ObjectSelector::ObjectSelector(const Area *area, const Party *party) :
-    _area(area), _party(party) {
-
-    if (!area) {
-        throw invalid_argument("area must not be null");
-    }
-    if (!party) {
-        throw invalid_argument("party must not be null");
-    }
-}
-
-void ObjectSelector::update() {
+void Area::updateObjectSelection() {
     if (_hilightedObject && !_hilightedObject->isSelectable()) {
         _hilightedObject.reset();
     }
@@ -53,7 +38,7 @@ void ObjectSelector::update() {
     }
 }
 
-void ObjectSelector::selectNext(bool reverse) {
+void Area::selectNextObject(bool reverse) {
     vector<shared_ptr<SpatialObject>> selectables(getSelectableObjects());
 
     if (selectables.empty()) {
@@ -80,14 +65,14 @@ void ObjectSelector::selectNext(bool reverse) {
     }
 }
 
-vector<shared_ptr<SpatialObject>> ObjectSelector::getSelectableObjects() const {
+vector<shared_ptr<SpatialObject>> Area::getSelectableObjects() const {
     vector<shared_ptr<SpatialObject>> result;
     vector<pair<shared_ptr<SpatialObject>, float>> distances;
 
-    shared_ptr<SpatialObject> partyLeader(_party->getLeader());
+    shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
     glm::vec3 origin(partyLeader->position());
 
-    for (auto &object : _area->objects()) {
+    for (auto &object : objects()) {
         if (!object->isSelectable() || object.get() == partyLeader.get()) continue;
 
         auto model = static_pointer_cast<ModelSceneNode>(object->sceneNode());
@@ -109,17 +94,17 @@ vector<shared_ptr<SpatialObject>> ObjectSelector::getSelectableObjects() const {
     return move(result);
 }
 
-void ObjectSelector::selectNearest() {
+void Area::selectNearestObject() {
     _selectedObject.reset();
-    selectNext();
+    selectNextObject();
 }
 
-void ObjectSelector::hilight(const shared_ptr<SpatialObject> &object) {
-    _hilightedObject = object;
+void Area::hilightObject(shared_ptr<SpatialObject> object) {
+    _hilightedObject = move(object);
 }
 
-void ObjectSelector::select(const shared_ptr<SpatialObject> &object) {
-    _selectedObject = object;
+void Area::selectObject(shared_ptr<SpatialObject> object) {
+    _selectedObject = move(object);
 }
 
 } // namespace game
