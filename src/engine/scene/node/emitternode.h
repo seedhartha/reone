@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../../common/timer.h"
+#include "../../graphics/beziercurve.h"
 #include "../../graphics/model/modelnode.h"
 
 #include "modelnodescenenode.h"
@@ -42,13 +43,6 @@ public:
         float alpha { 1.0f };
     };
 
-    template <class T>
-    struct Constraints {
-        T start;
-        T mid;
-        T end;
-    };
-
     EmitterSceneNode(const ModelSceneNode *model, std::shared_ptr<graphics::ModelNode> modelNode, SceneGraph *sceneGraph);
 
     void update(float dt) override;
@@ -61,9 +55,9 @@ public:
 private:
     const ModelSceneNode *_model;
 
-    Constraints<float> _particleSize;
-    Constraints<glm::vec3> _color;
-    Constraints<float> _alpha;
+    graphics::BezierCurve<float> _particleSize;
+    graphics::BezierCurve<glm::vec3> _color;
+    graphics::BezierCurve<float> _alpha;
 
     float _birthrate { 0.0f }; /**< rate of particle birth per second */
     float _lifeExpectancy { 0.0f }; /**< life of each particle in seconds */
@@ -85,7 +79,6 @@ private:
     void removeExpiredParticles(float dt);
     void doSpawnParticle();
 
-    void initParticle(Particle &particle);
     void updateParticle(Particle &particle, float dt);
     void updateParticleAnimation(Particle &particle, float dt);
 

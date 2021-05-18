@@ -64,15 +64,15 @@ EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *model, shared_ptr<Model
     _randomVelocity = modelNode->randVel().getByFrameOrElse(0, 0.0f);
     _mass = modelNode->mass().getByFrameOrElse(0, 0.0f);
 
-    _particleSize.start = modelNode->sizeStart().getByFrameOrElse(0, 0.0f);
-    _particleSize.mid = modelNode->sizeMid().getByFrameOrElse(0, 0.0f);
-    _particleSize.end = modelNode->sizeEnd().getByFrameOrElse(0, 0.0f);
-    _color.start = modelNode->colorStart().getByFrameOrElse(0, glm::vec3(0.0f));
-    _color.mid = modelNode->colorMid().getByFrameOrElse(0, glm::vec3(0.0f));
-    _color.end = modelNode->colorEnd().getByFrameOrElse(0, glm::vec3(0.0f));
-    _alpha.start = modelNode->alphaStart().getByFrameOrElse(0, 0.0f);
-    _alpha.mid = modelNode->alphaMid().getByFrameOrElse(0, 0.0f);
-    _alpha.end = modelNode->alphaEnd().getByFrameOrElse(0, 0.0f);
+    _particleSize.setStart(modelNode->sizeStart().getByFrameOrElse(0, 0.0f));
+    _particleSize.setMid(modelNode->sizeMid().getByFrameOrElse(0, 0.0f));
+    _particleSize.setEnd(modelNode->sizeEnd().getByFrameOrElse(0, 0.0f));
+    _color.setStart(modelNode->colorStart().getByFrameOrElse(0, glm::vec3(0.0f)));
+    _color.setMid(modelNode->colorMid().getByFrameOrElse(0, glm::vec3(0.0f)));
+    _color.setEnd(modelNode->colorEnd().getByFrameOrElse(0, glm::vec3(0.0f)));
+    _alpha.setStart(modelNode->alphaStart().getByFrameOrElse(0, 0.0f));
+    _alpha.setMid(modelNode->alphaMid().getByFrameOrElse(0, 0.0f));
+    _alpha.setEnd(modelNode->alphaEnd().getByFrameOrElse(0, 0.0f));
 
     if (_birthrate != 0.0f) {
         _birthInterval = 1.0f / static_cast<float>(_birthrate);
@@ -160,33 +160,20 @@ void EmitterSceneNode::updateParticle(Particle &particle, float dt) {
     }
 }
 
-template <class T>
-static T interpolateConstraints(const EmitterSceneNode::Constraints<T> &constraints, float t) {
-    T result;
-    if (t < 0.5f) {
-        float tt = 2.0f * t;
-        result = (1.0f - tt) * constraints.start + tt * constraints.mid;
-    } else {
-        float tt = 2.0f * (t - 0.5f);
-        result = (1.0f - tt) * constraints.mid + tt * constraints.end;
-    }
-    return result;
-}
-
 void EmitterSceneNode::updateParticleAnimation(Particle &particle, float dt) {
-    float maturity;
+    float factor;
     if (_lifeExpectancy != -1.0f) {
-        maturity = particle.lifetime / static_cast<float>(_lifeExpectancy);
+        factor = particle.lifetime / static_cast<float>(_lifeExpectancy);
     } else if (particle.animLength > 0.0f) {
-        maturity = particle.lifetime / particle.animLength;
+        factor = particle.lifetime / particle.animLength;
     } else {
-        maturity = 0.0f;
+        factor = 0.0f;
     }
 
-    particle.frame = static_cast<int>(glm::ceil(_frameStart + maturity * (_frameEnd - _frameStart)));
-    particle.size = interpolateConstraints(_particleSize, maturity);
-    particle.color = interpolateConstraints(_color, maturity);
-    particle.alpha = interpolateConstraints(_alpha, maturity);
+    particle.frame = static_cast<int>(glm::ceil(_frameStart + factor * (_frameEnd - _frameStart)));
+    particle.size = _particleSize.get(factor);
+    particle.color = _color.get(factor);
+    particle.alpha = _alpha.get(factor);
 }
 
 void EmitterSceneNode::detonate() {
