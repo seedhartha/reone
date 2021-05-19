@@ -44,6 +44,7 @@
 
 #include "cursors.h"
 #include "d20/feats.h"
+#include "d20/spells.h"
 #include "gameidutil.h"
 #include "gui/sounds.h"
 #include "portraits.h"
@@ -123,6 +124,7 @@ void Game::initSubsystems() {
     Portraits::instance().init();
     Walkmeshes::instance().init(Surfaces::instance().getWalkableSurfaceIndices());
     Feats::instance().init();
+    Spells::instance().init();
 
     Cursors::instance().init(_gameId);
     setCursorType(CursorType::Default);
