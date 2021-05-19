@@ -18,6 +18,7 @@
 #pragma once
 
 #include <memory>
+#include <set>
 
 #include "glm/vec3.hpp"
 
@@ -74,7 +75,7 @@ public:
     bool handle(const SDL_Event &event);
     void update(float dt);
 
-    std::vector<ContextualAction> getContextualActions(const std::shared_ptr<Object> &object) const;
+    std::set<ContextualAction> getContextualActions(const std::shared_ptr<Object> &object) const;
 
     const std::string &name() const { return _name; }
     const ModuleInfo &info() const { return _info; }
