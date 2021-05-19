@@ -43,6 +43,7 @@
 #include "../video/video.h"
 
 #include "cursors.h"
+#include "d20/feats.h"
 #include "gameidutil.h"
 #include "gui/sounds.h"
 #include "portraits.h"
@@ -121,6 +122,7 @@ void Game::initSubsystems() {
     Surfaces::instance().init();
     Portraits::instance().init();
     Walkmeshes::instance().init(Surfaces::instance().getWalkableSurfaceIndices());
+    Feats::instance().init();
 
     Cursors::instance().init(_gameId);
     setCursorType(CursorType::Default);

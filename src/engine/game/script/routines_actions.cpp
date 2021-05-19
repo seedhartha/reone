@@ -470,7 +470,7 @@ Variable Routines::actionSpeakStringByStrRef(const VariablesList &args, Executio
 
 Variable Routines::actionUseFeat(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto feat = getEnum<Feat>(args, 0);
+    auto feat = getEnum<FeatType>(args, 0);
     auto target = getObject(args, 1, ctx);
 
     if (target) {
