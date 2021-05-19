@@ -34,11 +34,6 @@ namespace reone {
 
 namespace game {
 
-Spells &Spells::instance() {
-    static Spells instance;
-    return instance;
-}
-
 void Spells::init() {
     shared_ptr<TwoDA> spells(Resources::instance().get2DA("spells"));
     if (!spells) return;

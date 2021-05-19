@@ -27,7 +27,7 @@ namespace game {
 
 class Reputes : boost::noncopyable {
 public:
-    static Reputes &instance();
+    Reputes() = default;
 
     void init();
 

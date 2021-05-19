@@ -469,7 +469,7 @@ void Area::runOnEnterScript() {
     auto player = _game->party().player();
     if (!player) return;
 
-    runScript(_onEnter, _id, player->id());
+    _game->scriptRunner().run(_onEnter, _id, player->id());
 }
 
 void Area::runOnExitScript() {
@@ -478,7 +478,7 @@ void Area::runOnExitScript() {
     auto player = _game->party().player();
     if (!player) return;
 
-    runScript(_onExit, _id, player->id());
+    _game->scriptRunner().run(_onExit, _id, player->id());
 }
 
 void Area::destroyObject(const SpatialObject &object) {
@@ -525,7 +525,7 @@ void Area::fill(SceneGraph &sceneGraph) {
         if (aabbNode && _grass.texture) {
             glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), room.second->position()));
             auto grass = make_shared<GrassSceneNode>(room.first, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap, &sceneGraph);
-            for (auto &material : Surfaces::instance().getGrassSurfaceIndices()) {
+            for (auto &material : _game->surfaces().getGrassSurfaceIndices()) {
                 for (auto &face : aabbNode->getFacesByMaterial(material)) {
                     vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getTriangleCoords(face));
                     float area = calculateTriangleArea(vertices);
@@ -716,7 +716,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
             return;
         }
         if (!trigger->getOnEnter().empty()) {
-            runScript(trigger->getOnEnter(), trigger->id(), triggerrer->id());
+            _game->scriptRunner().run(trigger->getOnEnter(), trigger->id(), triggerrer->id());
         }
     }
 }
@@ -724,12 +724,12 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
 void Area::updateHeartbeat(float dt) {
     if (_heartbeatTimer.advance(dt)) {
         if (!_onHeartbeat.empty()) {
-            runScript(_onHeartbeat, _id);
+            _game->scriptRunner().run(_onHeartbeat, _id);
         }
         for (auto &object : _objects) {
             string heartbeat(object->getOnHeartbeat());
             if (!heartbeat.empty()) {
-                runScript(heartbeat, object->id());
+                _game->scriptRunner().run(heartbeat, object->id());
             }
         }
         _heartbeatTimer.reset(kHeartbeatInterval);

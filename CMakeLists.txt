@@ -413,7 +413,6 @@ set(GAME_HEADERS
     src/engine/game/camera/staticcamera.h
     src/engine/game/camera/thirdperson.h
     src/engine/game/character.h
-    src/engine/game/characterutil.h
     src/engine/game/console.h
     src/engine/game/combat/combat.h
     src/engine/game/cursors.h
@@ -496,7 +495,7 @@ set(GAME_HEADERS
     src/engine/game/savedgame.h
     src/engine/game/script/objectutil.h
     src/engine/game/script/routines.h
-    src/engine/game/script/runutil.h
+    src/engine/game/script/runner.h
     src/engine/game/soundsets.h
     src/engine/game/surface.h
     src/engine/game/surfaces.h
@@ -512,7 +511,6 @@ set(GAME_SOURCES
     src/engine/game/camera/firstperson.cpp
     src/engine/game/camera/staticcamera.cpp
     src/engine/game/camera/thirdperson.cpp
-    src/engine/game/characterutil.cpp
     src/engine/game/combat/combat.cpp
     src/engine/game/combat/combat_attack.cpp
     src/engine/game/combat/combat_damage.cpp
@@ -628,7 +626,7 @@ set(GAME_SOURCES
     src/engine/game/script/routines_time.cpp
     src/engine/game/script/routines_tsl.cpp
     src/engine/game/script/routines_vars.cpp
-    src/engine/game/script/runutil.cpp
+    src/engine/game/script/runner.cpp
     src/engine/game/soundsets.cpp
     src/engine/game/surfaces.cpp)
 

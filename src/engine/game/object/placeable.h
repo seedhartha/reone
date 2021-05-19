@@ -27,12 +27,14 @@ namespace reone {
 
 namespace game {
 
+class Game;
 class ObjectFactory;
 
 class Placeable : public SpatialObject {
 public:
     Placeable(
         uint32_t id,
+        Game *game,
         ObjectFactory *objectFactory,
         scene::SceneGraph *sceneGraph);
 
@@ -55,6 +57,8 @@ public:
     // END Scripts
 
 private:
+    Game *_game;
+
     int  _appearance { 0 };
     bool _hasInventory { false };
     bool _usable { false };

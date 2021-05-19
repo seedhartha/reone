@@ -33,11 +33,6 @@ namespace reone {
 
 namespace game {
 
-Portraits &Portraits::instance() {
-    static Portraits instance;
-    return instance;
-}
-
 void Portraits::init() {
     shared_ptr<TwoDA> portraits(Resources::instance().get2DA("portraits"));
 

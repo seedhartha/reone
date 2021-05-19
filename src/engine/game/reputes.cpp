@@ -36,11 +36,6 @@ static constexpr int kDefaultRepute = 50;
 static vector<string> g_factionLabels;
 static vector<vector<int>> g_factionValues;
 
-Reputes &Reputes::instance() {
-    static Reputes instance;
-    return instance;
-}
-
 void Reputes::init() {
     shared_ptr<TwoDA> repute(Resources::instance().get2DA("repute"));
 

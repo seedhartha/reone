@@ -363,7 +363,7 @@ void CharacterGeneration::reloadCharacterModel() {
     lblModel.setScene(move(scene));
 
     Control &lblPortrait = getControl("PORTRAIT_LBL");
-    lblPortrait.setBorderFill(Portraits::instance().getTextureByAppearance(_character.appearance));
+    lblPortrait.setBorderFill(_game->portraits().getTextureByAppearance(_character.appearance));
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {

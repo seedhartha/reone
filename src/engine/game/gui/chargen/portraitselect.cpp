@@ -136,7 +136,7 @@ int PortraitSelection::getAppearanceFromCurrentPortrait() const {
 void PortraitSelection::updatePortraits() {
     _portraits.clear();
     int sex = _charGen->character().gender == Gender::Female ? 1 : 0;
-    for (auto &portrait : Portraits::instance().portraits()) {
+    for (auto &portrait : _game->portraits().portraits()) {
         if (portrait.forPC && portrait.sex == sex) {
             _portraits.push_back(move(portrait));
         }

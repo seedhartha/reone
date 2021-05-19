@@ -22,6 +22,7 @@
 #include <set>
 
 #include "../../audio/stream.h"
+#include "../../common/timer.h"
 #include "../../graphics/lip/animation.h"
 #include "../../resource/format/2dareader.h"
 #include "../../resource/format/gffreader.h"
@@ -37,11 +38,11 @@
 
 namespace reone {
 
-class Timer;
-
 namespace game {
 
 constexpr float kDefaultAttackRange = 2.0f;
+
+class Game;
 
 class Creature : public SpatialObject, public scene::IAnimationEventListener {
 public:
@@ -88,6 +89,7 @@ public:
 
     Creature(
         uint32_t id,
+        Game *game,
         ObjectFactory *objectFactory,
         scene::SceneGraph *sceneGraph);
 
@@ -224,6 +226,8 @@ public:
     // END IAnimationEventListener
 
 private:
+    Game *_game;
+
     Gender _gender { Gender::Male };
     int _appearance { 0 };
     ModelType _modelType { ModelType::Creature };

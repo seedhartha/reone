@@ -18,8 +18,9 @@
 #include "area.h"
 
 #include "../../common/log.h"
+
 #include "../enginetype/location.h"
-#include "../reputes.h"
+#include "../game.h"
 
 using namespace std;
 
@@ -71,13 +72,13 @@ bool Area::matchesCriterias(const Creature &creature, const SearchCriteriaList &
                 auto reputation = static_cast<ReputationType>(criteria.second);
                 switch (reputation) {
                     case ReputationType::Friend:
-                        if (!target || !Reputes::instance().getIsFriend(creature, *static_pointer_cast<Creature>(target))) return false;
+                        if (!target || !_game->reputes().getIsFriend(creature, *static_pointer_cast<Creature>(target))) return false;
                         break;
                     case ReputationType::Enemy:
-                        if (!target || !Reputes::instance().getIsEnemy(creature, *static_pointer_cast<Creature>(target))) return false;
+                        if (!target || !_game->reputes().getIsEnemy(creature, *static_pointer_cast<Creature>(target))) return false;
                         break;
                     case ReputationType::Neutral:
-                        if (!target || !Reputes::instance().getIsNeutral(creature, *static_pointer_cast<Creature>(target))) return false;
+                        if (!target || !_game->reputes().getIsNeutral(creature, *static_pointer_cast<Creature>(target))) return false;
                         break;
                     default:
                         break;

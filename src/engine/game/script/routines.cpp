@@ -38,15 +38,14 @@ namespace reone {
 
 namespace game {
 
-Routines &Routines::instance() {
-    static Routines instance;
-    return instance;
+Routines::Routines(Game *game) : _game(game) {
+    if (!game) {
+        throw invalid_argument("game must not be null");
+    }
 }
 
-void Routines::init(Game *game) {
-    _game = game;
-
-    if (isTSL(game->gameId())) {
+void Routines::init() {
+    if (isTSL(_game->gameId())) {
         addTslRoutines();
     } else {
         addKotorRoutines();

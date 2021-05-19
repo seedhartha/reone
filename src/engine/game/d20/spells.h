@@ -31,15 +31,13 @@ namespace game {
 
 class Spells : boost::noncopyable {
 public:
-    static Spells &instance();
+    Spells() = default;
 
     void init();
 
     std::shared_ptr<Spell> get(ForcePower type) const;
 
 private:
-    Spells() = default;
-
     std::unordered_map<ForcePower, std::shared_ptr<Spell>> _spells;
 };
 

@@ -47,11 +47,11 @@ shared_ptr<Area> ObjectFactory::newArea() {
 }
 
 shared_ptr<Creature> ObjectFactory::newCreature() {
-    return newObject<Creature>(this, _sceneGraph);
+    return newObject<Creature>(_game, this, _sceneGraph);
 }
 
 shared_ptr<Placeable> ObjectFactory::newPlaceable() {
-    return newObject<Placeable>(this, _sceneGraph);
+    return newObject<Placeable>(_game, this, _sceneGraph);
 }
 
 shared_ptr<Door> ObjectFactory::newDoor() {
@@ -63,7 +63,7 @@ shared_ptr<Waypoint> ObjectFactory::newWaypoint() {
 }
 
 shared_ptr<Trigger> ObjectFactory::newTrigger() {
-    return newObject<Trigger>(this, _sceneGraph);
+    return newObject<Trigger>(_game, this, _sceneGraph);
 }
 
 shared_ptr<Item> ObjectFactory::newItem() {

@@ -31,11 +31,6 @@ namespace reone {
 
 namespace game {
 
-Surfaces &Surfaces::instance() {
-    static Surfaces instance;
-    return instance;
-}
-
 void Surfaces::init() {
     shared_ptr<TwoDA> surfacemat(Resources::instance().get2DA("surfacemat"));
     for (int row = 0; row < surfacemat->getRowCount(); ++row) {

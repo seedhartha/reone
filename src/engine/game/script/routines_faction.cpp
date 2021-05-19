@@ -23,7 +23,7 @@
 
 #include "../../common/log.h"
 
-#include "../reputes.h"
+#include "../game.h"
 
 using namespace std;
 
@@ -96,7 +96,7 @@ Variable Routines::getIsEnemy(const VariablesList &args, ExecutionContext &ctx) 
     auto source = getCreatureOrCaller(args, 1, ctx);
 
     if (target && source) {
-        result = Reputes::instance().getIsEnemy(*target, *source);
+        result = _game->reputes().getIsEnemy(*target, *source);
     } else if (!target) {
         debug("Script: getIsEnemy: target is invalid", 1, DebugChannels::script);
     } else if (!source) {
@@ -112,7 +112,7 @@ Variable Routines::getIsFriend(const VariablesList &args, ExecutionContext &ctx)
     auto source = getCreatureOrCaller(args, 1, ctx);
 
     if (target && source) {
-        result = Reputes::instance().getIsFriend(*target, *source);
+        result = _game->reputes().getIsFriend(*target, *source);
     } else if (!target) {
         debug("Script: getIsFriend: target is invalid", 1, DebugChannels::script);
     } else if (!source) {
@@ -128,7 +128,7 @@ Variable Routines::getIsNeutral(const VariablesList &args, ExecutionContext &ctx
     auto source = getCreatureOrCaller(args, 1, ctx);
 
     if (target && source) {
-        result = Reputes::instance().getIsNeutral(*target, *source);
+        result = _game->reputes().getIsNeutral(*target, *source);
     } else if (!target) {
         debug("Script: getIsNeutral: target is invalid", 1, DebugChannels::script);
     } else if (!source) {

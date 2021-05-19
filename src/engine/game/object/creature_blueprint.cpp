@@ -27,8 +27,7 @@
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
-#include "../portraits.h"
-#include "../soundsets.h"
+#include "../game.h"
 
 using namespace std;
 
@@ -129,7 +128,7 @@ void Creature::loadSoundSetFromUTC(const GffStruct &utc) {
         shared_ptr<TwoDA> soundSetTable(Resources::instance().get2DA("soundset"));
         string soundSetResRef(soundSetTable->getString(soundSetIdx, "resref"));
         if (!soundSetResRef.empty()) {
-            _soundSet = SoundSets::instance().get(soundSetResRef);
+            _soundSet = _game->soundSets().get(soundSetResRef);
         }
     }
 }

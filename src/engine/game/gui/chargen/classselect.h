@@ -20,6 +20,7 @@
 #include "../../../resource/types.h"
 
 #include "../../character.h"
+#include "../../portrait.h"
 #include "../../types.h"
 
 #include "../gui.h"
@@ -48,8 +49,11 @@ private:
     void setupClassButtons();
     void setupClassButton(int index, Gender gender, ClassType clazz);
 
+
     int getClassButtonIndexByTag(const std::string &tag) const;
     std::shared_ptr<scene::ModelSceneNode> getCharacterModel(int appearance, scene::SceneGraph &sceneGraph);
+    int getRandomCharacterAppearance(Gender gender, ClassType clazz);
+    std::vector<Portrait> getPCPortraitsByGender(Gender gender);
 
     void setButtonColors(gui::Control &control);
     void setClassButtonEnlarged(int index, bool enlarged);

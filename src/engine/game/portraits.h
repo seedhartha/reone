@@ -33,7 +33,7 @@ namespace game {
 
 class Portraits : boost::noncopyable {
 public:
-    static Portraits &instance();
+    Portraits() = default;
 
     void init();
 

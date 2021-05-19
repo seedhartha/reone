@@ -31,15 +31,13 @@ namespace game {
 
 class Feats : boost::noncopyable {
 public:
-    static Feats &instance();
+    Feats() = default;
 
     void init();
 
     std::shared_ptr<Feat> get(FeatType type) const;
 
 private:
-    Feats() = default;
-
     std::unordered_map<FeatType, std::shared_ptr<Feat>> _feats;
 };
 

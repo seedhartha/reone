@@ -75,18 +75,22 @@ static constexpr char kModulesDirectoryName[] = "modules";
 static bool g_conversationsEnabled = true;
 
 Game::Game(const fs::path &path, const Options &opts) :
-    _path(path),
-    _options(opts),
-    _sceneGraph(opts.graphics),
-    _worldPipeline(&_sceneGraph, opts.graphics),
-    _console(this),
-    _party(this),
-    _profileOverlay(&_window),
-    _combat(this),
-    _objectFactory(this, &_sceneGraph),
-    _window(opts.graphics, this),
     _gameId(determineGameID(path)),
-    _cursors(_gameId, &_window) {
+
+    _combat(this),
+    _console(this),
+    _options(opts),
+    _party(this),
+    _path(path),
+    _routines(this),
+    _scriptRunner(this),
+
+    _window(opts.graphics, this),
+    _cursors(_gameId, &_window),
+    _sceneGraph(opts.graphics),
+    _objectFactory(this, &_sceneGraph),
+    _profileOverlay(&_window),
+    _worldPipeline(&_sceneGraph, opts.graphics) {
 }
 
 int Game::run() {
@@ -111,7 +115,6 @@ void Game::initSubsystems() {
     loadModuleNames();
 
     _window.init();
-
     Strings::instance().init(_path);
     Meshes::instance().init();
     Textures::instance().init();
@@ -120,20 +123,19 @@ void Game::initSubsystems() {
     PBRIBL::instance().init();
     Shaders::instance().init();
     AudioPlayer::instance().init(_options.audio);
-    GUISounds::instance().init();
-    Routines::instance().init(this);
-    Reputes::instance().init();
-    Surfaces::instance().init();
-    Portraits::instance().init();
-    Walkmeshes::instance().init(Surfaces::instance().getWalkableSurfaceIndices());
-    Feats::instance().init();
-    Spells::instance().init();
-
-    setCursorType(CursorType::Default);
-
+    _guiSounds.init();
+    _routines.init();
+    _reputes.init();
+    _surfaces.init();
+    _portraits.init();
+    Walkmeshes::instance().init(_surfaces.getWalkableSurfaceIndices());
+    _feats.init();
+    _spells.init();
     _worldPipeline.init();
     _console.load();
     _profileOverlay.init();
+
+    setCursorType(CursorType::Default);
 }
 
 void Game::initResourceProviders() {
@@ -256,7 +258,7 @@ void Game::loadModule(const string &name, string entry) {
         Textures::instance().invalidateCache();
         AudioFiles::instance().invalidate();
         Scripts::instance().invalidate();
-        SoundSets::instance().invalidate();
+        _soundSets.invalidate();
         Lips::instance().invalidate();
 
         loadModuleResources(name);

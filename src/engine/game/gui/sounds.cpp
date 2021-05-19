@@ -30,11 +30,6 @@ namespace reone {
 
 namespace game {
 
-GUISounds &GUISounds::instance() {
-    static GUISounds instance;
-    return instance;
-}
-
 static void loadSound(const TwoDA &twoDa, const string &label, shared_ptr<AudioStream> &sound) {
     int row = twoDa.indexByCellValue("label", label);
     if (row != -1) {

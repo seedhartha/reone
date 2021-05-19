@@ -29,8 +29,7 @@ namespace game {
 
 class GUISounds : boost::noncopyable {
 public:
-    static GUISounds &instance();
-
+    GUISounds() = default;
     ~GUISounds();
 
     void init();

@@ -34,11 +34,6 @@ namespace reone {
 
 namespace game {
 
-Feats &Feats::instance() {
-    static Feats instance;
-    return instance;
-}
-
 void Feats::init() {
     shared_ptr<TwoDA> feats(Resources::instance().get2DA("feat"));
     if (!feats) return;

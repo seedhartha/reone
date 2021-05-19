@@ -29,11 +29,9 @@ namespace game {
 
 class SoundSets : public MemoryCache<std::string, SoundSet> {
 public:
-    static SoundSets &instance();
-
-private:
     SoundSets();
 
+private:
     std::shared_ptr<SoundSet> doGet(std::string resRef);
 };
 
