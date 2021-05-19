@@ -510,7 +510,8 @@ enum class Skill {
     TreatInjury = 7
 };
 
-enum class Feat {
+enum class FeatType {
+    Invalid = 0,
     AdvancedJediDefense = 1,
     AdvancedGuardStance = 2,
     Ambidexterity = 3,
