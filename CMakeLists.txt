@@ -491,6 +491,8 @@ set(GAME_HEADERS
     src/engine/game/d20/feat.h
     src/engine/game/d20/feats.h
     src/engine/game/d20/savingthrows.h
+    src/engine/game/d20/spell.h
+    src/engine/game/d20/spells.h
     src/engine/game/savedgame.h
     src/engine/game/script/objectutil.h
     src/engine/game/script/routines.h
@@ -524,6 +526,7 @@ set(GAME_SOURCES
     src/engine/game/d20/class.cpp
     src/engine/game/d20/classes.cpp
     src/engine/game/d20/feats.cpp
+    src/engine/game/d20/spells.cpp
     src/engine/game/dialog.cpp
     src/engine/game/footstepsounds.cpp
     src/engine/game/game.cpp
