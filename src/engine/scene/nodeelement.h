@@ -26,7 +26,7 @@ class SceneNode;
 /**
  * Base class for emitter particles and grass clusters.
  */
-struct SceneLeaf {
+struct SceneNodeElement {
     SceneNode *parent { nullptr };
 };
 

@@ -228,19 +228,19 @@ void SceneGraph::prepareTransparentMeshes() {
 void SceneGraph::prepareLeafs() {
     static glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
 
-    vector<pair<shared_ptr<SceneLeaf>, float>> leafs;
+    vector<pair<shared_ptr<SceneNodeElement>, float>> elements;
     glm::vec3 cameraPos(_activeCamera->absoluteTransform()[3]);
 
     // Add grass clusters
     for (auto &grass : _grass) {
         float grassDistance2 = kMaxGrassDistance * kMaxGrassDistance;
-        size_t numLeafs = leafs.size();
+        size_t numLeafs = elements.size();
         for (auto &cluster : grass->clusters()) {
             float distance2 = glm::distance2(cameraPos, cluster->position);
             if (distance2 <= grassDistance2) {
                 glm::vec3 screen(glm::project(cluster->position, _activeCamera->view(), _activeCamera->projection(), viewport));
                 if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
-                    leafs.push_back(make_pair(cluster, screen.z));
+                    elements.push_back(make_pair(cluster, screen.z));
                 }
             }
         }
@@ -252,26 +252,26 @@ void SceneGraph::prepareLeafs() {
         for (auto &particle : emitter->particles()) {
             glm::vec3 screen(glm::project(particle->position, modelView, _activeCamera->projection(), viewport));
             if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
-                leafs.push_back(make_pair(particle, screen.z));
+                elements.push_back(make_pair(particle, screen.z));
             }
         }
     }
 
-    // Sort leafs back to front
-    sort(leafs.begin(), leafs.end(), [](auto &left, auto &right) { return left.second > right.second; });
+    // Sort elements back to front
+    sort(elements.begin(), elements.end(), [](auto &left, auto &right) { return left.second > right.second; });
 
-    // Group leafs into buckets
-    _leafs.clear();
-    vector<shared_ptr<SceneLeaf>> nodeLeafs;
-    for (auto &leafDepth : leafs) {
-        if (!nodeLeafs.empty()) {
-            _leafs.push_back(make_pair(nodeLeafs[0]->parent, nodeLeafs));
-            nodeLeafs.clear();
+    // Group elements into buckets
+    _elements.clear();
+    vector<shared_ptr<SceneNodeElement>> nodeElements;
+    for (auto &elementDepth : elements) {
+        if (!nodeElements.empty()) {
+            _elements.push_back(make_pair(nodeElements[0]->parent, nodeElements));
+            nodeElements.clear();
         }
-        nodeLeafs.push_back(leafDepth.first);
+        nodeElements.push_back(elementDepth.first);
     }
-    if (!nodeLeafs.empty()) {
-        _leafs.push_back(make_pair(nodeLeafs[0]->parent, nodeLeafs));
+    if (!nodeElements.empty()) {
+        _elements.push_back(make_pair(nodeElements[0]->parent, nodeElements));
     }
 }
 
@@ -314,11 +314,11 @@ void SceneGraph::draw(bool shadowPass) {
     setBackFaceCullingEnabled(false);
 
     // Render particles and grass clusters
-    for (auto &nodeLeaf : _leafs) {
+    for (auto &nodeLeaf : _elements) {
         int count = nodeLeaf.first->type() == SceneNodeType::Grass && nodeLeaf.second.size() > kMaxGrassClusters ?
             kMaxGrassClusters :
             -1;
-        nodeLeaf.first->drawLeafs(nodeLeaf.second, count);
+        nodeLeaf.first->drawElements(nodeLeaf.second, count);
     }
 
     // Render lens flares
