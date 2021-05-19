@@ -34,8 +34,8 @@ namespace reone {
 
 namespace game {
 
-NameEntry::NameEntry(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
-    GameGUI(gameId, opts),
+NameEntry::NameEntry(CharacterGeneration *charGen, Game *game) :
+    GameGUI(game),
     _charGen(charGen),
     _input(TextInputFlags::lettersWhitespace) {
 

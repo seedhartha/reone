@@ -23,8 +23,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class InventoryMenu : public GameGUI {
 public:
     InventoryMenu(Game *game);
@@ -34,8 +32,6 @@ public:
     void refreshPortraits();
 
 private:
-    Game *_game { nullptr };
-
     void onClick(const std::string &control) override;
 };
 

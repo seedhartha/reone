@@ -34,12 +34,17 @@ namespace reone {
 
 namespace graphics {
 
-Cursor::Cursor(const shared_ptr<Texture> &up, const shared_ptr<Texture> &down) : _up(up), _down(down) {
+Cursor::Cursor(shared_ptr<Texture> up, shared_ptr<Texture> down, Window *window) :
+    _up(up), _down(down), _window(window) {
+
     if (!up) {
         throw invalid_argument("up must not be null");
     }
     if (!down) {
         throw invalid_argument("down must not be null");
+    }
+    if (!window) {
+        throw invalid_argument("window must not be null");
     }
 }
 
@@ -53,7 +58,7 @@ void Cursor::draw() {
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+    uniforms.combined.general.projection = _window->getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);

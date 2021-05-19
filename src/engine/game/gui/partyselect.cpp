@@ -52,11 +52,8 @@ static int g_strRefRemove = 38456;
 static glm::vec3 g_kotorColorOn = { 0.984314f, 1.0f, 0 };
 static glm::vec3 g_kotorColorAdded = { 0, 0.831373f, 0.090196f };
 
-PartySelection::PartySelection(Game *game) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game) {
-
-    if (isTSL(_gameId)) {
+PartySelection::PartySelection(Game *game) : GameGUI(game) {
+    if (isTSL(game->gameId())) {
         _resRef = "partyselect_p";
     } else {
         _resRef = "partyselection";

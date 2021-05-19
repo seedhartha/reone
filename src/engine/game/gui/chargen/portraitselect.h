@@ -23,17 +23,15 @@
 
 #include "../gui.h"
 
-
 namespace reone {
 
 namespace game {
 
-class Game;
 class CharacterGeneration;
 
 class PortraitSelection : public GameGUI {
 public:
-    PortraitSelection(Game *game, CharacterGeneration *charGen);
+    PortraitSelection(CharacterGeneration *charGen, Game *game);
 
     void load() override;
 
@@ -41,7 +39,6 @@ public:
     void resetCurrentPortrait();
 
 private:
-    Game *_game;
     CharacterGeneration *_charGen;
 
     std::vector<Portrait> _portraits;

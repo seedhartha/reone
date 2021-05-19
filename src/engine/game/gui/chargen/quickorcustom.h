@@ -27,7 +27,7 @@ class CharacterGeneration;
 
 class QuickOrCustom : public GameGUI {
 public:
-    QuickOrCustom(CharacterGeneration *charGen, GameID gameId, const graphics::GraphicsOptions &opts);
+    QuickOrCustom(CharacterGeneration *charGen, Game *game);
 
     void load() override;
 

@@ -32,8 +32,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class InGameMenu : public GameGUI {
 public:
     enum class Tab {
@@ -68,7 +66,6 @@ public:
     void openOptions();
 
 private:
-    Game *_game { nullptr };
     Tab _tab { Tab::None };
 
     std::unique_ptr<CharacterMenu> _character;

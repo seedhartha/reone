@@ -73,10 +73,7 @@ static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
     { Equipment::Slot::WeapR2, 31379 }
 };
 
-Equipment::Equipment(Game *game) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game) {
-
+Equipment::Equipment(Game *game) : GameGUI(game) {
     _resRef = getResRef("equip");
 
     initForGame();
@@ -102,8 +99,8 @@ void Equipment::configureItemsListBox() {
     lbItems.setPadding(5);
 
     ImageButton &protoItem = static_cast<ImageButton &>(lbItems.protoItem());
-    protoItem.setBorderColor(getBaseColor(_gameId));
-    protoItem.setHilightColor(getHilightColor(_gameId));
+    protoItem.setBorderColor(getBaseColor(_game->gameId()));
+    protoItem.setHilightColor(getHilightColor(_game->gameId()));
 }
 
 static int getInventorySlot(Equipment::Slot slot) {
@@ -209,7 +206,7 @@ void Equipment::update() {
 }
 
 void Equipment::updatePortraits() {
-    if (_gameId != GameID::KotOR) return;
+    if (_game->gameId() != GameID::KotOR) return;
 
     Party &party = _game->party();
     shared_ptr<Creature> partyLeader(party.getLeader());
@@ -263,7 +260,7 @@ void Equipment::selectSlot(Slot slot) {
     setControlVisible("LB_DESC", !noneSelected);
     setControlVisible("LBL_SLOTNAME", noneSelected);
 
-    if (_gameId == GameID::KotOR) {
+    if (_game->gameId() == GameID::KotOR) {
         setControlVisible("LBL_PORT_BORD", noneSelected);
         setControlVisible("LBL_PORTRAIT", noneSelected);
         setControlVisible("LBL_TXTBAR", noneSelected);
@@ -394,7 +391,7 @@ void Equipment::updateItems() {
 
 shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
     string resRef;
-    if (isTSL(_gameId)) {
+    if (isTSL(_game->gameId())) {
         resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";

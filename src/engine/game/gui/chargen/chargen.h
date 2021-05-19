@@ -52,8 +52,6 @@ enum class CharGenScreen {
     LevelUp
 };
 
-class Game;
-
 class CharacterGeneration : public GameGUI {
 public:
     enum class Type {
@@ -96,7 +94,6 @@ public:
     void setCharacter(Character character);
 
 private:
-    Game *_game { nullptr };
     CharGenScreen _screen { CharGenScreen::ClassSelection };
     Type _type  { Type::Quick };
     Character _character;

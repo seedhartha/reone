@@ -23,18 +23,14 @@
 
 #include <boost/noncopyable.hpp>
 
+#include "../graphics/cursor.h"
+#include "../graphics/texture/texture.h"
+#include "../graphics/window.h"
 #include "../resource/types.h"
 
 #include "types.h"
 
 namespace reone {
-
-namespace graphics {
-
-class Cursor;
-class Texture;
-
-}
 
 namespace game {
 
@@ -44,13 +40,14 @@ public:
 
     ~Cursors();
 
-    void init(GameID gameId);
+    void init(GameID gameId, graphics::Window *window);
     void deinit();
 
     std::shared_ptr<graphics::Cursor> get(CursorType type);
 
 private:
     GameID _gameId { GameID::KotOR };
+    graphics::Window *_window { nullptr };
     std::unordered_map<CursorType, std::shared_ptr<graphics::Cursor>> _cache;
 
     const std::pair<uint32_t, uint32_t> &getCursorNames(CursorType type);

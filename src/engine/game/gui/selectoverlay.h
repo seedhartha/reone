@@ -58,7 +58,8 @@ private:
         uint32_t indexSelected { 0 };
     };
 
-    Game *_game { nullptr };
+    Game *_game;
+
     std::shared_ptr<graphics::Font> _font;
     std::shared_ptr<graphics::Texture> _friendlyReticle;
     std::shared_ptr<graphics::Texture> _friendlyReticle2;

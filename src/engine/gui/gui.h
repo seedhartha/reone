@@ -26,6 +26,7 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec2.hpp"
 
+#include "../graphics/window.h"
 #include "../resource/format/gffreader.h"
 #include "../resource/types.h"
 
@@ -55,8 +56,7 @@ public:
     void resetFocus();
     void showControl(const std::string &tag);
 
-    virtual void onClick(const std::string &control);
-    virtual void onListBoxItemClick(const std::string &control, const std::string &item);
+    graphics::Window &window() { return *_window; }
 
     void setControlDisabled(const std::string &tag, bool disabled);
     void setControlFocus(const std::string &tag, bool focus);
@@ -64,6 +64,9 @@ public:
     void setControlText(const std::string &tag, const std::string &text);
     void setControlVisible(const std::string &tag, bool visible);
     void setControlDiscardColor(const std::string &tag, glm::vec3 color);
+
+    virtual void onClick(const std::string &control);
+    virtual void onListBoxItemClick(const std::string &control, const std::string &item);
 
 protected:
     enum class ScalingMode {
@@ -73,6 +76,8 @@ protected:
     };
 
     graphics::GraphicsOptions _gfxOpts;
+    graphics::Window *_window;
+
     std::string _resRef;
     int _resolutionX { kDefaultResolutionX };
     int _resolutionY { kDefaultResolutionY };
@@ -90,7 +95,7 @@ protected:
     glm::vec3 _defaultHilightColor { 0.0f };
     std::unordered_map<std::string, ScalingMode> _scalingByControlTag;
 
-    GUI(const graphics::GraphicsOptions &opts);
+    GUI(graphics::GraphicsOptions gfxOpts, graphics::Window *window);
 
     void loadControl(const resource::GffStruct &gffs);
     virtual void onFocusChanged(const std::string &control, bool focus);

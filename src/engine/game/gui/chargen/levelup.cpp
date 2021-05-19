@@ -31,8 +31,8 @@ namespace reone {
 
 namespace game {
 
-LevelUpMenu::LevelUpMenu(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &options) :
-    GameGUI(gameId, options),
+LevelUpMenu::LevelUpMenu(CharacterGeneration *charGen, Game *game) :
+    GameGUI(game),
     _charGen(charGen) {
 
     _resRef = getResRef("leveluppnl");
@@ -44,7 +44,7 @@ void LevelUpMenu::load() {
     GUI::load();
     doSetStep(0);
 
-    if (_gameId == GameID::KotOR) {
+    if (_game->gameId() == GameID::KotOR) {
         setControlDiscardColor("LBL_DECORATION", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }

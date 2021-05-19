@@ -20,6 +20,8 @@
 #include "../../../gui/control/listbox.h"
 #include "../../../resource/strings.h"
 
+#include "../../game.h"
+
 #include "../colorutil.h"
 
 #include "chargen.h"
@@ -37,8 +39,8 @@ namespace game {
 static constexpr int kStrRefQuickHelpText = 241;
 static constexpr int kStrRefCustomHelpText = 242;
 
-QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
-    GameGUI(gameId, opts),
+QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, Game *game) :
+    GameGUI(game),
     _charGen(charGen) {
 
     _resRef = getResRef("qorcpnl");
@@ -49,7 +51,7 @@ QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, GameID gameId, const 
 void QuickOrCustom::load() {
     GUI::load();
 
-    if (_gameId == GameID::KotOR) {
+    if (_game->gameId() == GameID::KotOR) {
         setControlDiscardColor("LBL_RBG", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 

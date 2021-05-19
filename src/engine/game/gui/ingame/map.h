@@ -23,7 +23,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
 class Map;
 class Waypoint;
 
@@ -37,8 +36,6 @@ public:
     void refreshControls();
 
 private:
-    Game *_game;
-
     std::vector<std::shared_ptr<Waypoint>> _notes;
     int _selectedNoteIdx { 0 };
 

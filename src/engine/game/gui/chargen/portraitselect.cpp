@@ -47,16 +47,15 @@ namespace game {
 
 static constexpr float kModelScale = 0.2f;
 
-PortraitSelection::PortraitSelection(Game *game, CharacterGeneration *charGen) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game),
+PortraitSelection::PortraitSelection(CharacterGeneration *charGen, Game *game) :
+    GameGUI(game),
     _charGen(charGen) {
 
     _resRef = getResRef("portcust");
 
     initForGame();
 
-    if (_gameId == GameID::KotOR) {
+    if (game->gameId() == GameID::KotOR) {
         loadBackground(BackgroundType::Menu);
     }
 }
@@ -72,11 +71,11 @@ void PortraitSelection::setButtonColors(const string &tag) {
     Control &control = getControl(tag);
 
     Control::Text text(control.text());
-    text.color = getBaseColor(_gameId);
+    text.color = getBaseColor(_game->gameId());
     control.setText(move(text));
 
     Control::Border hilight(control.hilight());
-    hilight.color = getHilightColor(_gameId);
+    hilight.color = getHilightColor(_game->gameId());
     control.setHilight(move(hilight));
 }
 

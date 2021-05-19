@@ -27,8 +27,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class SaveLoad : public GameGUI {
 public:
     enum class Mode {
@@ -52,7 +50,6 @@ private:
         boost::filesystem::path path;
     };
 
-    Game *_game { nullptr };
     Mode _mode { Mode::Save };
     std::vector<SavedGameDescriptor> _saves;
 

@@ -137,7 +137,7 @@ void DialogGUI::addFrame(string tag, int top, int height) {
 void DialogGUI::configureMessage() {
     auto &message = getControl(kControlTagMessage);
     message.setExtentTop(-_rootControl->extent().top);
-    message.setTextColor(getBaseColor(_gameId));
+    message.setTextColor(getBaseColor(_game->gameId()));
 }
 
 void DialogGUI::configureReplies() {
@@ -145,8 +145,8 @@ void DialogGUI::configureReplies() {
     replies.setProtoMatchContent(true);
 
     Control &protoItem = replies.protoItem();
-    protoItem.setHilightColor(getHilightColor(_gameId));
-    protoItem.setTextColor(getBaseColor(_gameId));
+    protoItem.setHilightColor(getHilightColor(_game->gameId()));
+    protoItem.setTextColor(getBaseColor(_game->gameId()));
 }
 
 void DialogGUI::onStart() {

@@ -43,10 +43,7 @@ static constexpr int kSwitchToResRef = 47884;
 static constexpr int kGiveItemResRef = 47885;
 static constexpr int kInventoryResRef = 393;
 
-Container::Container(Game *game) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game) {
-
+Container::Container(Game *game) : GameGUI(game) {
     _resRef = getResRef("container");
 
     initForGame();
@@ -100,7 +97,7 @@ void Container::open(const shared_ptr<SpatialObject> &container) {
 
 shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
     string resRef;
-    if (isTSL(_gameId)) {
+    if (isTSL(_game->gameId())) {
         resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";

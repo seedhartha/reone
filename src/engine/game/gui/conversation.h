@@ -32,8 +32,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 /**
  * Base GUI for conversations.
  *
@@ -69,7 +67,6 @@ public:
     void resume();
 
 protected:
-    Game *_game;
     std::string _repliesControlTag;
 
     std::shared_ptr<Dialog> _dialog;

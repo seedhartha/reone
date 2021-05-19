@@ -51,10 +51,7 @@ static const vector<string> g_attributesTags {
     "OLD_FORT_LBL", "OLD_REFL_LBL", "OLD_WILL_LBL"
 };
 
-CharacterGeneration::CharacterGeneration(Game *game) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game) {
-
+CharacterGeneration::CharacterGeneration(Game *game) : GameGUI(game) {
     _resRef = getResRef("maincg");
 
     initForGame();
@@ -94,47 +91,47 @@ void CharacterGeneration::loadClassSelection() {
 }
 
 void CharacterGeneration::loadQuickOrCustom() {
-    _quickOrCustom = make_unique<QuickOrCustom>(this, _gameId, _gfxOpts);
+    _quickOrCustom = make_unique<QuickOrCustom>(this, _game);
     _quickOrCustom->load();
 }
 
 void CharacterGeneration::loadQuick() {
-    _quick = make_unique<QuickCharacterGeneration>(this, _gameId, _gfxOpts);
+    _quick = make_unique<QuickCharacterGeneration>(this, _game);
     _quick->load();
 }
 
 void CharacterGeneration::loadCustom() {
-    _custom = make_unique<CustomCharacterGeneration>(this, _gameId, _gfxOpts);
+    _custom = make_unique<CustomCharacterGeneration>(this, _game);
     _custom->load();
 }
 
 void CharacterGeneration::loadPortraitSelection() {
-    _portraitSelection = make_unique<PortraitSelection>(_game, this);
+    _portraitSelection = make_unique<PortraitSelection>(this, _game);
     _portraitSelection->load();
 }
 
 void CharacterGeneration::loadAbilities() {
-    _abilities = make_unique<CharGenAbilities>(this, _gameId, _gfxOpts);
+    _abilities = make_unique<CharGenAbilities>(this, _game);
     _abilities->load();
 }
 
 void CharacterGeneration::loadSkills() {
-    _skills = make_unique<CharGenSkills>(this, _gameId, _gfxOpts);
+    _skills = make_unique<CharGenSkills>(this, _game);
     _skills->load();
 }
 
 void CharacterGeneration::loadFeats() {
-    _feats = make_unique<CharGenFeats>(this, _gameId, _gfxOpts);
+    _feats = make_unique<CharGenFeats>(this, _game);
     _feats->load();
 }
 
 void CharacterGeneration::loadNameEntry() {
-    _nameEntry = make_unique<NameEntry>(this, _gameId, _gfxOpts);
+    _nameEntry = make_unique<NameEntry>(this, _game);
     _nameEntry->load();
 }
 
 void CharacterGeneration::loadLevelUp() {
-    _levelUp = make_unique<LevelUpMenu>(this, _gameId, _gfxOpts);
+    _levelUp = make_unique<LevelUpMenu>(this, _game);
     _levelUp->load();
 }
 
@@ -330,7 +327,7 @@ void CharacterGeneration::finish() {
         party.addMember(kNpcPlayer, player);
         party.setPlayer(player);
 
-        string moduleName(_gameId == GameID::KotOR ? "end_m01aa" : "001ebo");
+        string moduleName(_game->gameId() == GameID::KotOR ? "end_m01aa" : "001ebo");
         _game->loadModule(moduleName);
     }
 }
@@ -405,7 +402,7 @@ void CharacterGeneration::updateAttributes() {
 
     const SavingThrows &throws = clazz->getSavingThrows(1);
 
-    if (isTSL(_gameId)) {
+    if (isTSL(_game->gameId())) {
         setControlText("NEW_FORT_LBL", to_string(throws.fortitude));
         setControlText("NEW_REFL_LBL", to_string(throws.reflex));
         setControlText("NEW_WILL_LBL", to_string(throws.will));

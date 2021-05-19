@@ -27,7 +27,7 @@ class CharacterGeneration;
 
 class LevelUpMenu : public GameGUI {
 public:
-    LevelUpMenu(CharacterGeneration *charGen, GameID gameId, const graphics::GraphicsOptions &options);
+    LevelUpMenu(CharacterGeneration *charGen, Game *game);
 
     void load() override;
 

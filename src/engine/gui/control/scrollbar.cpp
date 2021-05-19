@@ -21,8 +21,9 @@
 #include "../../graphics/shader/shaders.h"
 #include "../../graphics/stateutil.h"
 #include "../../graphics/texture/textures.h"
-#include "../../graphics/window.h"
 #include "../../resource/resources.h"
+
+#include "../gui.h"
 
 using namespace std;
 
@@ -64,7 +65,7 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     _thumb.image->bind();
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+    uniforms.combined.general.projection = _gui->window().getOrthoProjection();
 
     // Top edge
     uniforms.combined.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
@@ -124,7 +125,7 @@ void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+    uniforms.combined.general.projection = _gui->window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
@@ -138,7 +139,7 @@ void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
     transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+    uniforms.combined.general.projection = _gui->window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);

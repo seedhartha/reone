@@ -28,6 +28,7 @@
 #include "SDL2/SDL_events.h"
 
 #include "../audio/soundhandle.h"
+#include "../graphics/window.h"
 #include "../scene/pipeline/world.h"
 #include "../scene/scenegraph.h"
 #include "../video/video.h"
@@ -111,6 +112,7 @@ public:
     Conversation &conversation() { return *_conversation; }
     const std::set<std::string> &moduleNames() const { return _moduleNames; }
     Combat &combat() { return _combat; }
+    graphics::Window &window() { return _window; }
 
     void setCursorType(CursorType type);
     void setLoadFromSaveGame(bool load);
@@ -204,6 +206,7 @@ private:
     Combat _combat;
     GameID _gameId { GameID::KotOR };
     ObjectFactory _objectFactory;
+    graphics::Window _window;
 
     GameScreen _screen { GameScreen::MainMenu };
     uint32_t _ticks { 0 };

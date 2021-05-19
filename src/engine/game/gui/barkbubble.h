@@ -25,8 +25,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class BarkBubble : public GameGUI {
 public:
     BarkBubble(Game *game);

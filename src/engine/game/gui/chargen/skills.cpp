@@ -25,6 +25,7 @@
 #include "../../../resource/strings.h"
 
 #include "../../d20/classes.h"
+#include "../../game.h"
 
 #include "../colorutil.h"
 
@@ -73,8 +74,8 @@ static const unordered_map<Skill, int> g_descStrRefBySkill {
     { Skill::TreatInjury, 258 }
 };
 
-CharGenSkills::CharGenSkills(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
-    GameGUI(gameId, opts),
+CharGenSkills::CharGenSkills(CharacterGeneration *charGen, Game *game) :
+    GameGUI(game),
     _charGen(charGen) {
 
     _resRef = getResRef("skchrgen");
@@ -88,7 +89,7 @@ void CharGenSkills::load() {
     for (auto &skill : g_skillByLabelTag) {
         configureControl(skill.first, [this](Control &control) {
             control.setFocusable(true);
-            control.setHilightColor(getBaseColor(_gameId));
+            control.setHilightColor(getBaseColor(_game->gameId()));
         });
     }
 

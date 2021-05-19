@@ -27,6 +27,7 @@
 #include "../common/log.h"
 #include "../common/pathutil.h"
 #include "../graphics/featureutil.h"
+#include "../graphics/fonts.h"
 #include "../graphics/lip/lips.h"
 #include "../graphics/materials.h"
 #include "../graphics/mesh/meshes.h"
@@ -81,9 +82,10 @@ Game::Game(const fs::path &path, const Options &opts) :
     _worldPipeline(&_sceneGraph, opts.graphics),
     _console(this),
     _party(this),
-    _profileOverlay(opts.graphics),
+    _profileOverlay(&_window),
     _combat(this),
-    _objectFactory(this, &_sceneGraph) {
+    _objectFactory(this, &_sceneGraph),
+    _window(opts.graphics, this) {
 
     _gameId = determineGameID(path);
 }
@@ -97,7 +99,7 @@ int Game::run() {
     } else {
         playVideo("legal");
     }
-    Window::instance().show();
+    _window.show();
 
     runMainLoop();
     deinitSubsystems();
@@ -109,10 +111,12 @@ void Game::initSubsystems() {
     initResourceProviders();
     loadModuleNames();
 
-    Window::instance().init(_options.graphics, this);
+    _window.init();
+
     Strings::instance().init(_path);
     Meshes::instance().init();
     Textures::instance().init();
+    Fonts::instance().init(&_window);
     Materials::instance().init();
     PBRIBL::instance().init();
     Shaders::instance().init();
@@ -126,7 +130,7 @@ void Game::initSubsystems() {
     Feats::instance().init();
     Spells::instance().init();
 
-    Cursors::instance().init(_gameId);
+    Cursors::instance().init(_gameId, &_window);
     setCursorType(CursorType::Default);
 
     _worldPipeline.init();
@@ -158,9 +162,9 @@ void Game::loadModuleNames() {
 void Game::setCursorType(CursorType type) {
     if (_cursorType != type) {
         if (type == CursorType::None) {
-            Window::instance().setCursor(nullptr);
+            _window.setCursor(nullptr);
         } else {
-            Window::instance().setCursor(Cursors::instance().get(type));
+            _window.setCursor(Cursors::instance().get(type));
         }
         _cursorType = type;
     }
@@ -330,19 +334,19 @@ void Game::drawAll() {
     // Compute derived PBR IBL textures from queued environment maps
     PBRIBL::instance().refresh();
 
-    Window::instance().clear();
+    _window.clear();
 
     if (_video) {
         _video->draw();
     } else {
         drawWorld();
         drawGUI();
-        Window::instance().drawCursor();
+        _window.drawCursor();
     }
 
     _profileOverlay.draw();
 
-    Window::instance().swapBuffers();
+    _window.swapBuffers();
 }
 
 void Game::drawWorld() {
@@ -482,9 +486,9 @@ void Game::runMainLoop() {
     _ticks = SDL_GetTicks();
 
     while (!_quit) {
-        Window::instance().processEvents(_quit);
+        _window.processEvents(_quit);
 
-        if (Window::instance().isInFocus()) {
+        if (_window.isInFocus()) {
             update();
             drawAll();
         }
@@ -568,7 +572,7 @@ void Game::loadCharacterGeneration() {
 
 void Game::deinitSubsystems() {
     AudioPlayer::instance().deinit();
-    Window::instance().deinit();
+    _window.deinit();
 }
 
 void Game::startCharacterGeneration() {
@@ -889,7 +893,7 @@ void Game::setPaused(bool paused) {
 }
 
 void Game::setRelativeMouseMode(bool relative) {
-    Window::instance().setRelativeMouseMode(relative);
+    _window.setRelativeMouseMode(relative);
 }
 
 } // namespace game

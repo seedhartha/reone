@@ -25,8 +25,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class Container : public GameGUI {
 public:
     Container(Game *game);
@@ -37,7 +35,6 @@ public:
     SpatialObject &container() const { return *_container; }
 
 private:
-    Game *_game { nullptr };
     std::shared_ptr<SpatialObject> _container;
 
     void configureItemsListBox();

@@ -26,6 +26,7 @@
 #include "../../common/timer.h"
 #include "../../graphics/font.h"
 #include "../../graphics/types.h"
+#include "../../graphics/window.h"
 
 namespace reone {
 
@@ -33,7 +34,7 @@ namespace game {
 
 class ProfileOverlay {
 public:
-    ProfileOverlay(graphics::GraphicsOptions options);
+    ProfileOverlay(graphics::Window *window);
 
     void init();
     bool handle(const SDL_Event &event);
@@ -46,7 +47,7 @@ private:
         int onePerLow { 0 }; /**< 1% Low */
     };
 
-    graphics::GraphicsOptions _options;
+    graphics::Window *_window;
 
     uint64_t _frequency { 0 };
     uint64_t _counter { 0 };

@@ -24,7 +24,6 @@ namespace reone {
 namespace game {
 
 class Creature;
-class Game;
 
 class Equipment : public GameGUI {
 public:
@@ -50,7 +49,6 @@ public:
     void update();
 
 private:
-    Game *_game { nullptr };
     Slot _selectedSlot { Slot::None };
     int _selectedItemIdx { -1 };
 

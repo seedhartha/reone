@@ -30,7 +30,7 @@ class CharacterGeneration;
 
 class NameEntry : public GameGUI {
 public:
-    NameEntry(CharacterGeneration *charGen, GameID gameId, const graphics::GraphicsOptions &opts);
+    NameEntry(CharacterGeneration *charGen, Game *game);
 
     void load() override;
     bool handle(const SDL_Event &event) override;

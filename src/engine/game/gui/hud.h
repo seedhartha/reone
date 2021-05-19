@@ -27,8 +27,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class HUD : public GameGUI {
 public:
     HUD(Game *game);
@@ -44,7 +42,6 @@ public:
     BarkBubble &barkBubble() const { return *_barkBubble; }
 
 private:
-    Game *_game { nullptr };
     SelectionOverlay _select;
     std::unique_ptr<BarkBubble> _barkBubble;
 

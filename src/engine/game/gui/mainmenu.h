@@ -29,8 +29,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class MainMenu : public GameGUI {
 public:
     MainMenu(Game *game);
@@ -41,8 +39,6 @@ public:
     void onModuleSelected(const std::string &name);
 
 private:
-    Game *_game { nullptr };
-
     void onListBoxItemClick(const std::string &control, const std::string &item) override;
 
     void configureButtons();

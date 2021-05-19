@@ -19,6 +19,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../game.h"
+
 #include "../colorutil.h"
 
 #include "chargen.h"
@@ -33,8 +35,8 @@ namespace reone {
 
 namespace game {
 
-QuickCharacterGeneration::QuickCharacterGeneration(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
-    GameGUI(gameId, opts),
+QuickCharacterGeneration::QuickCharacterGeneration(CharacterGeneration *charGen, Game *game) :
+    GameGUI(game),
     _charGen(charGen) {
 
     _resRef = getResRef("quickpnl");
@@ -46,7 +48,7 @@ void QuickCharacterGeneration::load() {
     GUI::load();
     doSetStep(0);
 
-    if (_gameId == GameID::KotOR) {
+    if (_game->gameId() == GameID::KotOR) {
         setControlDiscardColor("LBL_DECORATION", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }
