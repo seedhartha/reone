@@ -347,6 +347,8 @@ void SelectionOverlay::drawHealthBar() {
 }
 
 void SelectionOverlay::drawActionBar() {
+    if (!_hasActions) return;
+
     for (int i = 0; i < kNumActionSlots; ++i) {
         drawActionFrame(i);
         drawActionIcon(i);
