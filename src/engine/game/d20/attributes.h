@@ -114,11 +114,21 @@ public:
 
     // END Feats
 
+    // Force Powers
+
+    bool hasSpell(ForcePower type) const { return _spells.count(type) > 0; }
+
+    void addSpell(ForcePower type) { _spells.insert(type); }
+    void removeSpell(ForcePower type) { _spells.erase(type); }
+
+    // END Force Powers
+
 private:
     std::vector<std::pair<ClassType, int>> _classLevels;
     std::map<Ability, int> _abilityScores;
     std::map<Skill, int> _skillRanks;
     std::set<FeatType> _feats;
+    std::set<ForcePower> _spells;
 };
 
 } // namespace game

@@ -100,10 +100,6 @@ void Creature::loadUTC(const GffStruct &utc) {
         bool dropable = itemGffs->getBool("Dropable");
         addItem(resRef, 1, dropable);
     }
-    for (auto &featGffs : utc.getList("FeatList")) {
-        auto feat = static_cast<FeatType>(featGffs->getUint("Feat"));
-        _attributes.addFeat(feat);
-    }
 
     // Unused fields:
     //
@@ -155,16 +151,25 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
     attributes.setAbilityScore(Ability::Wisdom, utc.getInt("Wis"));
     attributes.setAbilityScore(Ability::Charisma, utc.getInt("Cha"));
 
-    for (auto &classGff : utc.getList("ClassList")) {
-        int clazz = classGff->getInt("Class");
-        int level = classGff->getInt("ClassLevel");
+    for (auto &classGffs : utc.getList("ClassList")) {
+        int clazz = classGffs->getInt("Class");
+        int level = classGffs->getInt("ClassLevel");
         attributes.addClassLevels(static_cast<ClassType>(clazz), level);
+        for (auto &spellGffs : classGffs->getList("KnownList0")) {
+            auto spell = static_cast<ForcePower>(spellGffs->getUint("Spell"));
+            attributes.addSpell(spell);
+        }
     }
 
     vector<shared_ptr<GffStruct>> skillsUtc(utc.getList("SkillList"));
     for (int i = 0; i < static_cast<int>(skillsUtc.size()); ++i) {
         Skill skill = static_cast<Skill>(i);
         attributes.setSkillRank(skill, skillsUtc[i]->getInt("Rank"));
+    }
+
+    for (auto &featGffs : utc.getList("FeatList")) {
+        auto feat = static_cast<FeatType>(featGffs->getUint("Feat"));
+        _attributes.addFeat(feat);
     }
 }
 
