@@ -68,25 +68,29 @@ bool Player::handle(const SDL_Event &event) {
 
 bool Player::handleKeyDown(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
-        case SDL_SCANCODE_W:
+        case SDL_SCANCODE_W: {
             _moveForward = true;
             return true;
-
-        case SDL_SCANCODE_Z:
+        }
+        case SDL_SCANCODE_Z: {
             _moveLeft = true;
             return true;
-
-        case SDL_SCANCODE_S:
+        }
+        case SDL_SCANCODE_S: {
             _moveBackward = true;
             return true;
-
-        case SDL_SCANCODE_C:
+        }
+        case SDL_SCANCODE_C: {
             _moveRight = true;
             return true;
-
+        }
         case SDL_SCANCODE_X: {
             shared_ptr<Creature> partyLeader(_party->getLeader());
             partyLeader->playAnimation(CombatAnimation::Draw, partyLeader->getWieldType());
+            return true;
+        }
+        case SDL_SCANCODE_B: {
+            _walk = true;
             return true;
         }
         default:
@@ -110,6 +114,10 @@ bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
 
         case SDL_SCANCODE_C:
             _moveRight = false;
+            return true;
+
+        case SDL_SCANCODE_B:
+            _walk = false;
             return true;
 
         default:
@@ -159,8 +167,8 @@ void Player::update(float dt) {
     if (movement) {
         partyLeader->clearAllActions();
         glm::vec2 dir(glm::normalize(glm::vec2(-glm::sin(facing), glm::cos(facing))));
-        if (_area->moveCreature(partyLeader, dir, true, dt)) {
-            partyLeader->setMovementType(Creature::MovementType::Run);
+        if (_area->moveCreature(partyLeader, dir, !_walk, dt)) {
+            partyLeader->setMovementType(_walk ? Creature::MovementType::Walk : Creature::MovementType::Run);
             partyLeader->setAppliedForce(glm::vec3(dir, 0.0f));
         }
     } else if (partyLeader->actions().empty()) {
