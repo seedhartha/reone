@@ -35,6 +35,7 @@
 
 #include "console.h"
 #include "combat/combat.h"
+#include "cursors.h"
 #include "gui/chargen/chargen.h"
 #include "gui/container.h"
 #include "gui/computer.h"
@@ -207,6 +208,7 @@ private:
     GameID _gameId { GameID::KotOR };
     ObjectFactory _objectFactory;
     graphics::Window _window;
+    Cursors _cursors;
 
     GameScreen _screen { GameScreen::MainMenu };
     uint32_t _ticks { 0 };
