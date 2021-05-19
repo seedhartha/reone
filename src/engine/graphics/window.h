@@ -34,11 +34,10 @@ namespace graphics {
 
 class Window : boost::noncopyable {
 public:
-    static Window &instance();
-
+    Window(GraphicsOptions options, IEventHandler *eventHandler = nullptr);
     ~Window();
 
-    void init(GraphicsOptions options, IEventHandler *eventHandler = nullptr);
+    void init();
     void deinit();
 
     void processEvents(bool &quit);
@@ -64,8 +63,6 @@ private:
     bool _relativeMouseMode { false };
     std::shared_ptr<Cursor> _cursor;
     bool _focus { true };
-
-    Window() = default;
 
     void initSDL();
     void initGL();

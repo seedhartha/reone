@@ -258,7 +258,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
             ShaderUniforms uniforms;
             uniforms.combined.featureMask |= _discardEnabled ? UniformFeatureFlags::discard : 0;
-            uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+            uniforms.combined.general.projection = _gui->window().getOrthoProjection();
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.discardColor = glm::vec4(_discardColor, 1.0f);
             Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
@@ -294,7 +294,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
 
                 ShaderUniforms uniforms;
-                uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+                uniforms.combined.general.projection = _gui->window().getOrthoProjection();
                 uniforms.combined.general.model = move(transform);
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
@@ -309,7 +309,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
 
                 ShaderUniforms uniforms;
-                uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+                uniforms.combined.general.projection = _gui->window().getOrthoProjection();
                 uniforms.combined.general.model = move(transform);
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
@@ -329,7 +329,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
                 ShaderUniforms uniforms;
-                uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+                uniforms.combined.general.projection = _gui->window().getOrthoProjection();
                 uniforms.combined.general.model = move(transform);
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
@@ -344,7 +344,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
                 ShaderUniforms uniforms;
-                uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+                uniforms.combined.general.projection = _gui->window().getOrthoProjection();
                 uniforms.combined.general.model = move(transform);
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
@@ -367,7 +367,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             ShaderUniforms uniforms;
-            uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+            uniforms.combined.general.projection = _gui->window().getOrthoProjection();
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
@@ -382,7 +382,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             ShaderUniforms uniforms;
-            uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+            uniforms.combined.general.projection = _gui->window().getOrthoProjection();
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
@@ -397,7 +397,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             ShaderUniforms uniforms;
-            uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+            uniforms.combined.general.projection = _gui->window().getOrthoProjection();
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
@@ -412,7 +412,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             ShaderUniforms uniforms;
-            uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+            uniforms.combined.general.projection = _gui->window().getOrthoProjection();
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 

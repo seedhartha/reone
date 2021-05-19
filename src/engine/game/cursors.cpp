@@ -20,7 +20,6 @@
 #include <stdexcept>
 
 #include "../common/streamutil.h"
-#include "../graphics/cursor.h"
 #include "../graphics/texture/curreader.h"
 #include "../resource/resources.h"
 
@@ -62,8 +61,12 @@ Cursors::~Cursors() {
     deinit();
 }
 
-void Cursors::init(GameID gameId) {
+void Cursors::init(GameID gameId, Window *window) {
+    if (!window) {
+        throw invalid_argument("window must not be null");
+    }
     _gameId = gameId;
+    _window = window;
 }
 
 void Cursors::deinit() {
@@ -79,7 +82,7 @@ shared_ptr<Cursor> Cursors::get(CursorType type) {
     shared_ptr<Texture> up(newTexture(names.first));
     shared_ptr<Texture> down(newTexture(names.second));
 
-    auto cursor = make_shared<Cursor>(up, down);
+    auto cursor = make_shared<Cursor>(up, down, _window);
     auto inserted = _cache.insert(make_pair(type, cursor));
 
     return inserted.first->second;

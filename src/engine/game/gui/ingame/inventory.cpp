@@ -31,10 +31,7 @@ namespace reone {
 
 namespace game {
 
-InventoryMenu::InventoryMenu(Game *game) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game) {
-
+InventoryMenu::InventoryMenu(Game *game) : GameGUI(game) {
     _resRef = getResRef("inventory");
 
     initForGame();
@@ -58,7 +55,7 @@ void InventoryMenu::load() {
 }
 
 void InventoryMenu::refreshPortraits() {
-    if (_gameId != GameID::KotOR) return;
+    if (_game->gameId() != GameID::KotOR) return;
 
     Party &party = _game->party();
     shared_ptr<Creature> partyLeader(party.getLeader());

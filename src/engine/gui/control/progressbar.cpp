@@ -20,7 +20,8 @@
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/stateutil.h"
 #include "../../graphics/texture/textures.h"
-#include "../../graphics/window.h"
+
+#include "../gui.h"
 
 using namespace std;
 
@@ -57,7 +58,7 @@ void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
     transform = glm::scale(transform, glm::vec3(w, _extent.height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+    uniforms.combined.general.projection = _gui->window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);

@@ -28,8 +28,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class ClassSelection : public GameGUI {
 public:
     ClassSelection(Game *game);
@@ -43,7 +41,6 @@ private:
         Character character;
     };
 
-    Game *_game { nullptr };
     glm::ivec2 _defaultButtonSize { 0 };
     glm::ivec2 _enlargedButtonSize { 0 };
     std::vector<ClassButton> _classButtons;

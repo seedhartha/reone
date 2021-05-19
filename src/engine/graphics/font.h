@@ -39,11 +39,13 @@ enum class TextGravity {
     RightTop
 };
 
+class Window;
+
 class Font {
 public:
-    Font() = default;
+    Font(Window *window);
 
-    void load(const std::shared_ptr<Texture> &texture);
+    void load(std::shared_ptr<Texture> texture);
 
     void draw(
         const std::string &text,
@@ -61,6 +63,8 @@ private:
         glm::vec2 lr { 0.0f };
         glm::vec2 size { 0.0f };
     };
+
+    Window *_window;
 
     std::shared_ptr<Texture> _texture;
     float _height { 0.0f };

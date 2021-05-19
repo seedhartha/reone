@@ -30,10 +30,7 @@ namespace reone {
 
 namespace game {
 
-JournalMenu::JournalMenu(Game *game) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game) {
-
+JournalMenu::JournalMenu(Game *game) : GameGUI(game) {
     _resRef = getResRef("journal");
 
     initForGame();

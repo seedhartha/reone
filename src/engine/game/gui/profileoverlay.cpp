@@ -42,9 +42,13 @@ static constexpr int kFrameWidth = 125;
 static constexpr char kFontResRef[] = "fnt_console";
 static constexpr float kRefreshInterval = 1.0f; // seconds
 
-ProfileOverlay::ProfileOverlay(graphics::GraphicsOptions options) :
-    _options(move(options)),
+ProfileOverlay::ProfileOverlay(Window *window) :
+    _window(window),
     _refreshTimer(kRefreshInterval) {
+
+    if (!window) {
+        throw invalid_argument("window must not be null");
+    }
 }
 
 void ProfileOverlay::init() {
@@ -114,7 +118,7 @@ void ProfileOverlay::drawBackground() {
     transform = glm::scale(transform, glm::vec3(kFrameWidth, 2.0f * _font->height(), 1.0f));
 
     ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
-    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+    uniforms.combined.general.projection = _window->getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     uniforms.combined.general.alpha = 0.5f;

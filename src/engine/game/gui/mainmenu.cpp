@@ -52,10 +52,7 @@ static const char kBlueprintResRefBastila[] = "p_bastilla";
 static const char kBlueprintResRefAtton[] = "p_atton";
 static const char kBlueprintResRefKreia[] = "p_kreia";
 
-MainMenu::MainMenu(Game *game) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game) {
-
+MainMenu::MainMenu(Game *game) : GameGUI(game) {
     if (isTSL(game->gameId())) {
         _resRef = "mainmenu8x6_p";
     } else {
@@ -96,19 +93,19 @@ void MainMenu::configureButtons() {
     setButtonColors("BTN_NEWGAME");
     setButtonColors("BTN_OPTIONS");
 
-    if (isTSL(_gameId)) {
+    if (isTSL(_game->gameId())) {
         setButtonColors("BTN_MUSIC");
     }
 }
 
 void MainMenu::setButtonColors(const string &tag) {
     Control &control = getControl(tag);
-    control.setTextColor(getBaseColor(_gameId));
-    control.setHilightColor(getHilightColor(_gameId));
+    control.setTextColor(getBaseColor(_game->gameId()));
+    control.setHilightColor(getHilightColor(_game->gameId()));
 }
 
 void MainMenu::setup3DView() {
-    if (_gameId != GameID::KotOR) return;
+    if (_game->gameId() != GameID::KotOR) return;
 
     Control &control = getControl("LBL_3DVIEW");
     const Control::Extent &extent = control.extent();
@@ -183,7 +180,7 @@ void MainMenu::onModuleSelected(const string &name) {
     string member2Blueprint;
     string member3Blueprint;
 
-    if (isTSL(_gameId)) {
+    if (isTSL(_game->gameId())) {
         member1Blueprint = kBlueprintResRefAtton;
         member2Blueprint = kBlueprintResRefKreia;
     } else {
@@ -193,7 +190,7 @@ void MainMenu::onModuleSelected(const string &name) {
     shared_ptr<TwoDA> defaultParty(Resources::instance().get2DA("defaultparty"));
     if (defaultParty) {
         for (int row = 0; row < defaultParty->getRowCount(); ++row) {
-            if (defaultParty->getBool(row, "tsl") == isTSL(_gameId)) {
+            if (defaultParty->getBool(row, "tsl") == isTSL(_game->gameId())) {
                 member1Blueprint = defaultParty->getString(row, "partymember0");
                 member2Blueprint = defaultParty->getString(row, "partymember1");
                 member3Blueprint = defaultParty->getString(row, "partymember2");

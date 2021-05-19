@@ -36,7 +36,13 @@ namespace reone {
 
 namespace graphics {
 
-void Font::load(const shared_ptr<Texture> &texture) {
+Font::Font(Window *window) : _window(window) {
+    if (!window) {
+        throw invalid_argument("window must not be null");
+    }
+}
+
+void Font::load(shared_ptr<Texture> texture) {
     if (!texture) {
         throw invalid_argument("texture must not be null");
     }
@@ -72,7 +78,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
 
     ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
     uniforms.combined.featureMask |= UniformFeatureFlags::text;
-    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+    uniforms.combined.general.projection = _window->getOrthoProjection();
     uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
     int numBlocks = static_cast<int>(text.size()) / kMaxCharacters;

@@ -114,7 +114,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         transform = glm::scale(transform, glm::vec3(_areaTexture->width(), _areaTexture->height(), 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+        uniforms.combined.general.projection = _game->window().getOrthoProjection();
         uniforms.combined.general.model = transform;
         Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
 
@@ -131,7 +131,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         transform = glm::scale(transform, glm::vec3(bounds[2], bounds[3], 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+        uniforms.combined.general.projection = _game->window().getOrthoProjection();
         uniforms.combined.general.model = move(transform);
 
         Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
@@ -165,7 +165,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         transform = glm::scale(transform, glm::vec3(noteSize, noteSize, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+        uniforms.combined.general.projection = _game->window().getOrthoProjection();
         uniforms.combined.general.model = transform;
         uniforms.combined.general.color = glm::vec4(selected ? getHilightColor(_game->gameId()) : getBaseColor(_game->gameId()), 1.0f);
 
@@ -247,7 +247,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     transform = glm::scale(transform, glm::vec3(kArrowSize, kArrowSize, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+    uniforms.combined.general.projection = _game->window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);

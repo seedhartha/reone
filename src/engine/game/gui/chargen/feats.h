@@ -27,7 +27,7 @@ class CharacterGeneration;
 
 class CharGenFeats : public GameGUI {
 public:
-    CharGenFeats(CharacterGeneration *charGen, GameID gameId, const graphics::GraphicsOptions &opts);
+    CharGenFeats(CharacterGeneration *charGen, Game *game);
 
     void load() override;
 

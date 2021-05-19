@@ -28,10 +28,11 @@ namespace reone {
 namespace graphics {
 
 class Texture;
+class Window;
 
 class Cursor : boost::noncopyable {
 public:
-    Cursor(const std::shared_ptr<Texture> &up, const std::shared_ptr<Texture> &down);
+    Cursor(std::shared_ptr<Texture> up, std::shared_ptr<Texture> down, Window *window);
 
     void draw();
 
@@ -39,10 +40,12 @@ public:
     void setPressed(bool pressed);
 
 private:
-    glm::ivec2 _position { 0 };
-    bool _pressed { false };
     std::shared_ptr<Texture> _up;
     std::shared_ptr<Texture> _down;
+    Window *_window;
+
+    glm::ivec2 _position { 0 };
+    bool _pressed { false };
 };
 
 } // namespace graphics

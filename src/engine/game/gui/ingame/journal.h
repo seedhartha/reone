@@ -23,8 +23,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class JournalMenu : public GameGUI {
 public:
     JournalMenu(Game *game);
@@ -32,8 +30,6 @@ public:
     void load() override;
 
 private:
-    Game *_game { nullptr };
-
     void onClick(const std::string &control) override;
 };
 

@@ -299,7 +299,7 @@ void Console::drawBackground() {
     transform = glm::scale(transform, glm::vec3(_opts.width, height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+    uniforms.combined.general.projection = _game->window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     uniforms.combined.general.alpha = 0.5f;

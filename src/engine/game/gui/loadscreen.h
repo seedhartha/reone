@@ -23,8 +23,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class LoadingScreen : public GameGUI {
 public:
     LoadingScreen(Game *game);
@@ -33,9 +31,6 @@ public:
 
     void setImage(const std::string &resRef);
     void setProgress(int progress);
-
-private:
-    Game *_game;
 };
 
 } // namespace game

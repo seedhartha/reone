@@ -30,10 +30,7 @@ namespace reone {
 
 namespace game {
 
-OptionsMenu::OptionsMenu(Game *game) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game) {
-
+OptionsMenu::OptionsMenu(Game *game) : GameGUI(game) {
     _resRef = getResRef("optionsingame");
 
     initForGame();

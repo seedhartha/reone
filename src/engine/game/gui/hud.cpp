@@ -35,11 +35,7 @@ namespace reone {
 
 namespace game {
 
-HUD::HUD(Game *game) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game),
-    _select(game) {
-
+HUD::HUD(Game *game) : GameGUI(game), _select(game) {
     _resRef = getResRef("mipc28x6");
     _resolutionX = 800;
     _resolutionY = 600;
@@ -225,7 +221,7 @@ void HUD::drawMinimap() {
 }
 
 void HUD::drawHealth(int memberIndex) {
-    if (isTSL(_gameId)) return;
+    if (isTSL(_game->gameId())) return;
 
     Party &party = _game->party();
     shared_ptr<Creature> member(party.getMember(memberIndex));
@@ -242,7 +238,7 @@ void HUD::drawHealth(int memberIndex) {
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+    uniforms.combined.general.projection = _game->window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 

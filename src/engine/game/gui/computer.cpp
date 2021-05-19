@@ -19,6 +19,7 @@
 
 #include "../../gui/control/listbox.h"
 
+#include "../game.h"
 #include "../gameidutil.h"
 
 #include "colorutil.h"
@@ -40,7 +41,7 @@ ComputerGUI::ComputerGUI(Game *game) : Conversation(game) {
     _scaling = ScalingMode::Stretch;
     _repliesControlTag = kControlTagReplies;
 
-    if (isTSL(_gameId)) {
+    if (isTSL(game->gameId())) {
         _resolutionX = 800;
         _resolutionY = 600;
     }
@@ -58,8 +59,8 @@ void ComputerGUI::configureMessage() {
     message.setProtoMatchContent(true);
 
     Control &protoItem = message.protoItem();
-    protoItem.setHilightColor(getHilightColor(_gameId));
-    protoItem.setTextColor(getBaseColor(_gameId));
+    protoItem.setHilightColor(getHilightColor(_game->gameId()));
+    protoItem.setTextColor(getBaseColor(_game->gameId()));
 }
 
 void ComputerGUI::configureReplies() {
@@ -67,8 +68,8 @@ void ComputerGUI::configureReplies() {
     replies.setProtoMatchContent(true);
 
     Control &protoItem = replies.protoItem();
-    protoItem.setHilightColor(getHilightColor(_gameId));
-    protoItem.setTextColor(getBaseColor(_gameId));
+    protoItem.setHilightColor(getHilightColor(_game->gameId()));
+    protoItem.setTextColor(getBaseColor(_game->gameId()));
 }
 
 void ComputerGUI::setMessage(string message) {

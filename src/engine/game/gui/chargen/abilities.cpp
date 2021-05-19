@@ -27,6 +27,7 @@
 #include "../../../resource/strings.h"
 
 #include "../../d20/classes.h"
+#include "../../game.h"
 
 #include "../colorutil.h"
 
@@ -64,8 +65,8 @@ static const unordered_map<Ability, int> g_descStrRefByAbility {
     { Ability::Charisma, 227 }
 };
 
-CharGenAbilities::CharGenAbilities(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
-    GameGUI(gameId, opts),
+CharGenAbilities::CharGenAbilities(CharacterGeneration *charGen, Game *game) :
+    GameGUI(game),
     _charGen(charGen) {
 
     _resRef = getResRef("abchrgen");
@@ -80,7 +81,7 @@ void CharGenAbilities::load() {
     for (auto &label : labels) {
         configureControl(label, [this](Control &control) {
             control.setFocusable(true);
-            control.setHilightColor(getBaseColor(_gameId));
+            control.setHilightColor(getBaseColor(_game->gameId()));
         });
     }
 

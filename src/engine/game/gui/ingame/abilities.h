@@ -25,8 +25,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class AbilitiesMenu : public GameGUI {
 public:
     AbilitiesMenu(Game *game);
@@ -42,8 +40,6 @@ private:
         std::string description;
         std::shared_ptr<graphics::Texture> icon;
     };
-
-    Game *_game;
 
     std::unordered_map<Skill, SkillInfo> _skills;
 

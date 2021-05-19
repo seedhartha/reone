@@ -25,12 +25,14 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 /**
  * Encapsulates game-specific GUI configuration.
  */
 class GameGUI : public gui::GUI {
 protected:
-    GameGUI(GameID gameId, const graphics::GraphicsOptions &options);
+    GameGUI(Game *game);
 
     void onClick(const std::string &control) override;
     void onFocusChanged(const std::string &control, bool focus) override;
@@ -40,7 +42,7 @@ protected:
     std::string getResRef(const std::string &base) const;
 
 protected:
-    GameID _gameId;
+    Game *_game;
 
     void loadBackground(BackgroundType type);
 };

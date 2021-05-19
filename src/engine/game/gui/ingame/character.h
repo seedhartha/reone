@@ -25,8 +25,6 @@ namespace reone {
 
 namespace game {
 
-class Game;
-
 class CharacterMenu : public GameGUI {
 public:
     CharacterMenu(Game *game);
@@ -37,8 +35,6 @@ public:
     void refreshControls();
 
 private:
-    Game *_game { nullptr };
-
     void refreshPortraits();
     void refresh3D();
 

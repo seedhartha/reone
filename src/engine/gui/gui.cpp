@@ -24,7 +24,6 @@
 #include "../graphics/shader/shaders.h"
 #include "../graphics/stateutil.h"
 #include "../graphics/texture/textures.h"
-#include "../graphics/window.h"
 #include "../resource/resources.h"
 
 using namespace std;
@@ -37,7 +36,10 @@ namespace reone {
 
 namespace gui {
 
-GUI::GUI(const GraphicsOptions &opts) : _gfxOpts(opts) {
+GUI::GUI(GraphicsOptions gfxOpts, Window *window) : _gfxOpts(gfxOpts), _window(window) {
+    if (!window) {
+        throw invalid_argument("window must not be null");
+    }
     _aspect = _gfxOpts.width / static_cast<float>(_gfxOpts.height);
     _screenCenter.x = _gfxOpts.width / 2;
     _screenCenter.y = _gfxOpts.height / 2;
@@ -258,7 +260,7 @@ void GUI::drawBackground() {
     transform = glm::scale(transform, glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+    uniforms.combined.general.projection = _window->getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
     Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);

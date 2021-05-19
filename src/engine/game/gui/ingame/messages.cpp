@@ -30,10 +30,7 @@ namespace reone {
 
 namespace game {
 
-MessagesMenu::MessagesMenu(Game *game) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game) {
-
+MessagesMenu::MessagesMenu(Game *game) : GameGUI(game) {
     _resRef = getResRef("messages");
 
     initForGame();

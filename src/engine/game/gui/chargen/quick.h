@@ -27,7 +27,7 @@ class CharacterGeneration;
 
 class QuickCharacterGeneration : public GameGUI {
 public:
-    QuickCharacterGeneration(CharacterGeneration *charGen, GameID gameId, const graphics::GraphicsOptions &opts);
+    QuickCharacterGeneration(CharacterGeneration *charGen, Game *game);
 
     void load() override;
 

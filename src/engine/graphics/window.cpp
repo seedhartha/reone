@@ -34,20 +34,14 @@ namespace reone {
 
 namespace graphics {
 
-Window &Window::instance() {
-    static Window instance;
-    return instance;
-}
-
-void Window::init(GraphicsOptions options, IEventHandler *eventHandler) {
+Window::Window(GraphicsOptions options, IEventHandler *eventHandler) : _options(move(options)), _eventHandler(eventHandler) {
     if (!eventHandler) {
         throw invalid_argument("eventHandler must not be null");
     }
+}
 
+void Window::init() {
     if (_inited) return;
-
-    _options = move(options);
-    _eventHandler = eventHandler;
 
     initSDL();
     initGL();

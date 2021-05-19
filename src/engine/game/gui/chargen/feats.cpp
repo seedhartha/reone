@@ -30,8 +30,8 @@ namespace reone {
 
 namespace game {
 
-CharGenFeats::CharGenFeats(CharacterGeneration *charGen, GameID gameId, const GraphicsOptions &opts) :
-    GameGUI(gameId, opts),
+CharGenFeats::CharGenFeats(CharacterGeneration *charGen, Game *game) :
+    GameGUI(game),
     _charGen(charGen) {
 
     _resRef = getResRef("ftchrgen");

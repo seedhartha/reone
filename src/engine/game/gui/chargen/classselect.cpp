@@ -58,13 +58,10 @@ static map<ClassType, int> g_classDescStrRefs {
     { ClassType::JediGuardian, 48033 }
 };
 
-ClassSelection::ClassSelection(Game *game) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game) {
-
+ClassSelection::ClassSelection(Game *game) : GameGUI(game) {
     _resRef = getResRef("classsel");
 
-    if (_gameId == GameID::KotOR) {
+    if (game->gameId() == GameID::KotOR) {
         loadBackground(BackgroundType::Menu);
     }
 
@@ -85,12 +82,12 @@ void ClassSelection::setupClassButtons() {
     _enlargedButtonSize = glm::vec2(button1.extent().width, button1.extent().height);
     _defaultButtonSize = glm::vec2(button2.extent().width, button2.extent().height);
 
-    setupClassButton(0, Gender::Male, _gameId == GameID::KotOR ? ClassType::Scoundrel : ClassType::JediConsular);
-    setupClassButton(1, Gender::Male, _gameId == GameID::KotOR ? ClassType::Scout : ClassType::JediSentinel);
-    setupClassButton(2, Gender::Male, _gameId == GameID::KotOR ? ClassType::Soldier : ClassType::JediGuardian);
-    setupClassButton(3, Gender::Female, _gameId == GameID::KotOR ? ClassType::Soldier : ClassType::JediGuardian);
-    setupClassButton(4, Gender::Female, _gameId == GameID::KotOR ? ClassType::Scout : ClassType::JediSentinel);
-    setupClassButton(5, Gender::Female, _gameId == GameID::KotOR ? ClassType::Scoundrel : ClassType::JediConsular);
+    setupClassButton(0, Gender::Male, _game->gameId() == GameID::KotOR ? ClassType::Scoundrel : ClassType::JediConsular);
+    setupClassButton(1, Gender::Male, _game->gameId() == GameID::KotOR ? ClassType::Scout : ClassType::JediSentinel);
+    setupClassButton(2, Gender::Male, _game->gameId() == GameID::KotOR ? ClassType::Soldier : ClassType::JediGuardian);
+    setupClassButton(3, Gender::Female, _game->gameId() == GameID::KotOR ? ClassType::Soldier : ClassType::JediGuardian);
+    setupClassButton(4, Gender::Female, _game->gameId() == GameID::KotOR ? ClassType::Scout : ClassType::JediSentinel);
+    setupClassButton(5, Gender::Female, _game->gameId() == GameID::KotOR ? ClassType::Scoundrel : ClassType::JediConsular);
 
     setClassButtonEnlarged(0, false);
 }
@@ -158,8 +155,8 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, Sce
 }
 
 void ClassSelection::setButtonColors(Control &control) {
-    control.setBorderColor(getBaseColor(_gameId));
-    control.setHilightColor(getHilightColor(_gameId));
+    control.setBorderColor(getBaseColor(_game->gameId()));
+    control.setHilightColor(getHilightColor(_game->gameId()));
 }
 
 void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {

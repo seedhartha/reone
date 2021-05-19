@@ -31,8 +31,6 @@ namespace game {
 
 constexpr int kNpcCount = 9;
 
-class Game;
-
 class PartySelection : public GameGUI {
 public:
     struct Context {
@@ -48,7 +46,6 @@ public:
     void prepare(const Context &ctx);
 
 private:
-    Game *_game { nullptr };
     Context _context;
     int _selectedNpc { -1 };
     bool _added[kNpcCount] { false };

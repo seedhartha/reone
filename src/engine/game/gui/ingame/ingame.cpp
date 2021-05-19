@@ -43,13 +43,10 @@ static unordered_map<InGameMenu::Tab, string> g_tabTags {
     { InGameMenu::Tab::Options, "LBLH_OPT" }
 };
 
-InGameMenu::InGameMenu(Game *game) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game) {
-
+InGameMenu::InGameMenu(Game *game) : GameGUI(game) {
     _resRef = getResRef("top");
 
-    if (isTSL(_gameId)) {
+    if (isTSL(game->gameId())) {
         _resolutionX = 800;
         _resolutionY = 600;
     }

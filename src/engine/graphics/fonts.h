@@ -29,11 +29,17 @@ namespace reone {
 
 namespace graphics {
 
+class Window;
+
 class Fonts : public MemoryCache<std::string, Font> {
 public:
     static Fonts &instance();
 
+    void init(Window *window);
+
 private:
+    Window *_window { nullptr };
+
     Fonts();
 
     std::shared_ptr<Font> doGet(std::string resRef);

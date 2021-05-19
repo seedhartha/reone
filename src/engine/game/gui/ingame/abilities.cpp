@@ -41,10 +41,7 @@ static constexpr int kStrRefSkillRank = 1579;
 static constexpr int kStrRefBonus = 32129;
 static constexpr int kStrRefTotalRank = 41904;
 
-AbilitiesMenu::AbilitiesMenu(Game *game) :
-    GameGUI(game->gameId(), game->options().graphics),
-    _game(game) {
-
+AbilitiesMenu::AbilitiesMenu(Game *game) : GameGUI(game) {
     _resRef = getResRef("abilities");
 
     initForGame();
@@ -107,7 +104,7 @@ void AbilitiesMenu::loadSkills() {
         ListBox::Item item;
         item.tag = to_string(static_cast<int>(skill.second.skill));
         item.text = skill.second.name;
-        item.iconFrame = getFrameTexture(_gameId);
+        item.iconFrame = getFrameTexture(_game->gameId());
         item.iconTexture = skill.second.icon;
         lbAbility.addItem(move(item));
     }
@@ -118,7 +115,7 @@ void AbilitiesMenu::refreshControls() {
 }
 
 void AbilitiesMenu::refreshPortraits() {
-    if (_gameId != GameID::KotOR) return;
+    if (_game->gameId() != GameID::KotOR) return;
 
     Party &party = _game->party();
     shared_ptr<Creature> partyLeader(party.getLeader());

@@ -17,6 +17,8 @@
 
 #include "fonts.h"
 
+#include <stdexcept>
+
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
@@ -44,6 +46,13 @@ Fonts &Fonts::instance() {
 Fonts::Fonts() : MemoryCache(bind(&Fonts::doGet, this, _1)) {
 }
 
+void Fonts::init(Window *window) {
+    if (!window) {
+        throw invalid_argument("window must not be null");
+    }
+    _window = window;
+}
+
 shared_ptr<Font> Fonts::doGet(string resRef) {
     auto maybeOverride = g_fontOverride.find(resRef);
     if (maybeOverride != g_fontOverride.end()) {
@@ -52,7 +61,7 @@ shared_ptr<Font> Fonts::doGet(string resRef) {
     shared_ptr<Texture> texture(Textures::instance().get(resRef, TextureUsage::GUI));
     if (!texture) return nullptr;
 
-    auto font = make_shared<Font>();
+    auto font = make_shared<Font>(_window);
     font->load(texture);
 
     return move(font);

@@ -22,6 +22,7 @@
 #include "../../audio/player.h"
 #include "../../graphics/texture/textures.h"
 
+#include "../game.h"
 #include "../gameidutil.h"
 
 #include "colorutil.h"
@@ -38,7 +39,9 @@ namespace reone {
 
 namespace game {
 
-GameGUI::GameGUI(GameID gameId, const GraphicsOptions &options) : GUI(options), _gameId(gameId) {
+GameGUI::GameGUI(Game *game) :
+    GUI(game->options().graphics, &game->window()),
+    _game(game) {
 }
 
 void GameGUI::onClick(const string &control) {
@@ -52,23 +55,23 @@ void GameGUI::onFocusChanged(const string &control, bool focus) {
 }
 
 void GameGUI::initForGame() {
-    if (isTSL(_gameId)) {
+    if (isTSL(_game->gameId())) {
         _resolutionX = 800;
         _resolutionY = 600;
     } else {
         _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_gameId);
+        _defaultHilightColor = getHilightColor(_game->gameId());
     }
 }
 
 string GameGUI::getResRef(const std::string &base) const {
-    return isTSL(_gameId) ? base + "_p" : base;
+    return isTSL(_game->gameId()) ? base + "_p" : base;
 }
 
 void GameGUI::loadBackground(BackgroundType type) {
     string resRef;
 
-    if (isTSL(_gameId)) {
+    if (isTSL(_game->gameId())) {
         switch (type) {
             case BackgroundType::Computer0:
             case BackgroundType::Computer1:
