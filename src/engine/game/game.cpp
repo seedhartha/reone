@@ -43,7 +43,6 @@
 #include "../video/bikreader.h"
 #include "../video/video.h"
 
-#include "cursors.h"
 #include "d20/feats.h"
 #include "d20/spells.h"
 #include "gameidutil.h"
@@ -85,9 +84,9 @@ Game::Game(const fs::path &path, const Options &opts) :
     _profileOverlay(&_window),
     _combat(this),
     _objectFactory(this, &_sceneGraph),
-    _window(opts.graphics, this) {
-
-    _gameId = determineGameID(path);
+    _window(opts.graphics, this),
+    _gameId(determineGameID(path)),
+    _cursors(_gameId, &_window) {
 }
 
 int Game::run() {
@@ -130,7 +129,6 @@ void Game::initSubsystems() {
     Feats::instance().init();
     Spells::instance().init();
 
-    Cursors::instance().init(_gameId, &_window);
     setCursorType(CursorType::Default);
 
     _worldPipeline.init();
@@ -164,7 +162,7 @@ void Game::setCursorType(CursorType type) {
         if (type == CursorType::None) {
             _window.setCursor(nullptr);
         } else {
-            _window.setCursor(Cursors::instance().get(type));
+            _window.setCursor(_cursors.get(type));
         }
         _cursorType = type;
     }

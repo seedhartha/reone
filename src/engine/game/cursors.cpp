@@ -52,21 +52,14 @@ static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_namesByResRefSteamT
     { CursorType::Attack, { 53, 54 } }
 };
 
-Cursors &Cursors::instance() {
-    static Cursors instance;
-    return instance;
+Cursors::Cursors(GameID gameId, Window *window) : _gameId(gameId), _window(window) {
+    if (!window) {
+        throw invalid_argument("window must not be null");
+    }
 }
 
 Cursors::~Cursors() {
     deinit();
-}
-
-void Cursors::init(GameID gameId, Window *window) {
-    if (!window) {
-        throw invalid_argument("window must not be null");
-    }
-    _gameId = gameId;
-    _window = window;
 }
 
 void Cursors::deinit() {

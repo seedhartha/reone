@@ -36,18 +36,17 @@ namespace game {
 
 class Cursors : boost::noncopyable {
 public:
-    static Cursors &instance();
-
+    Cursors(GameID gameId, graphics::Window *window);
     ~Cursors();
 
-    void init(GameID gameId, graphics::Window *window);
     void deinit();
 
     std::shared_ptr<graphics::Cursor> get(CursorType type);
 
 private:
-    GameID _gameId { GameID::KotOR };
-    graphics::Window *_window { nullptr };
+    GameID _gameId;
+    graphics::Window *_window;
+
     std::unordered_map<CursorType, std::shared_ptr<graphics::Cursor>> _cache;
 
     const std::pair<uint32_t, uint32_t> &getCursorNames(CursorType type);
