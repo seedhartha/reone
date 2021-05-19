@@ -25,7 +25,7 @@
 #include "../../scene/node/modelnode.h"
 #include "../../script/types.h"
 
-#include "../script/runutil.h"
+#include "../game.h"
 
 using namespace std;
 
@@ -40,10 +40,16 @@ namespace game {
 
 Placeable::Placeable(
     uint32_t id,
+    Game *game,
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph
 ) :
-    SpatialObject(id, ObjectType::Placeable, objectFactory, sceneGraph) {
+    SpatialObject(id, ObjectType::Placeable, objectFactory, sceneGraph),
+    _game(game) {
+
+    if (!game) {
+        throw invalid_argument("game must not be null");
+    }
 }
 
 void Placeable::loadFromGIT(const GffStruct &gffs) {
@@ -90,13 +96,13 @@ shared_ptr<Walkmesh> Placeable::getWalkmesh() const {
 
 void Placeable::runOnUsed(shared_ptr<SpatialObject> usedBy) {
     if (!_onUsed.empty()) {
-        runScript(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
+        _game->scriptRunner().run(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
     }
 }
 
 void Placeable::runOnInvDisturbed(shared_ptr<SpatialObject> triggerrer) {
     if (!_onInvDisturbed.empty()) {
-        runScript(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
+        _game->scriptRunner().run(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
     }
 }
 

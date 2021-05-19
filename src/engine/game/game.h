@@ -36,6 +36,9 @@
 #include "console.h"
 #include "combat/combat.h"
 #include "cursors.h"
+#include "d20/feats.h"
+#include "d20/spells.h"
+#include "footstepsounds.h"
 #include "gui/chargen/chargen.h"
 #include "gui/container.h"
 #include "gui/computer.h"
@@ -47,13 +50,19 @@
 #include "gui/partyselect.h"
 #include "gui/profileoverlay.h"
 #include "gui/saveload.h"
+#include "gui/sounds.h"
 #include "object/module.h"
 #include "object/objectfactory.h"
 #include "object/spatial.h"
 #include "options.h"
 #include "party.h"
+#include "portraits.h"
+#include "reputes.h"
 #include "savedgame.h"
-#include "script/runutil.h"
+#include "script/routines.h"
+#include "script/runner.h"
+#include "soundsets.h"
+#include "surfaces.h"
 #include "types.h"
 
 namespace reone {
@@ -103,22 +112,41 @@ public:
 
     GameID gameId() const { return _gameId; }
     const Options &options() const { return _options; }
-    scene::SceneGraph &sceneGraph() { return _sceneGraph; }
-    ObjectFactory &objectFactory() { return _objectFactory; }
     std::shared_ptr<Module> module() const { return _module; }
     HUD &hud() const { return *_hud; }
-    Party &party() { return _party; }
     CharacterGeneration &characterGeneration() { return *_charGen; }
     CameraType cameraType() const { return _cameraType; }
     Conversation &conversation() { return *_conversation; }
     const std::set<std::string> &moduleNames() const { return _moduleNames; }
-    Combat &combat() { return _combat; }
-    graphics::Window &window() { return _window; }
 
     void setCursorType(CursorType type);
     void setLoadFromSaveGame(bool load);
     void setPaused(bool paused);
     void setRelativeMouseMode(bool relative);
+
+    // Services
+
+    Combat &combat() { return _combat; }
+    Console &console() { return _console; }
+    Cursors &cursors() { return _cursors; }
+    Feats &feats() { return _feats; }
+    FootstepSounds &footstepSounds() { return _footstepSounds; }
+    graphics::Window &window() { return _window; }
+    GUISounds &guiSounds() { return _guiSounds; }
+    ObjectFactory &objectFactory() { return _objectFactory; }
+    Party &party() { return _party; }
+    Portraits &portraits() { return _portraits; }
+    ProfileOverlay &profileOverlay() { return _profileOverlay; }
+    Reputes &reputes() { return _reputes; }
+    Routines &routines() { return _routines; }
+    scene::SceneGraph &sceneGraph() { return _sceneGraph; }
+    scene::WorldRenderPipeline &worldPipeline() { return _worldPipeline; }
+    ScriptRunner &scriptRunner() { return _scriptRunner; }
+    SoundSets &soundSets() { return _soundSets; }
+    Spells &spells() { return _spells; }
+    Surfaces &surfaces() { return _surfaces; }
+
+    // END Services
 
     // Module loading
 
@@ -199,17 +227,7 @@ private:
     boost::filesystem::path _path;
     Options _options;
 
-    scene::SceneGraph _sceneGraph;
-    scene::WorldRenderPipeline _worldPipeline;
-    Console _console;
-    Party _party;
-    ProfileOverlay _profileOverlay;
-    Combat _combat;
     GameID _gameId { GameID::KotOR };
-    ObjectFactory _objectFactory;
-    graphics::Window _window;
-    Cursors _cursors;
-
     GameScreen _screen { GameScreen::MainMenu };
     uint32_t _ticks { 0 };
     bool _quit { false };
@@ -221,6 +239,30 @@ private:
     bool _paused { false };
     Conversation *_conversation { nullptr }; /**< pointer to either DialogGUI or ComputerGUI  */
     std::set<std::string> _moduleNames;
+
+    // Services
+
+    Combat _combat;
+    Console _console;
+    Cursors _cursors;
+    Feats _feats;
+    FootstepSounds _footstepSounds;
+    graphics::Window _window;
+    GUISounds _guiSounds;
+    ObjectFactory _objectFactory;
+    Party _party;
+    Portraits _portraits;
+    ProfileOverlay _profileOverlay;
+    Reputes _reputes;
+    Routines _routines;
+    scene::SceneGraph _sceneGraph;
+    scene::WorldRenderPipeline _worldPipeline;
+    ScriptRunner _scriptRunner;
+    SoundSets _soundSets;
+    Spells _spells;
+    Surfaces _surfaces;
+
+    // END Services
 
     // Modules
 

@@ -35,11 +35,6 @@ namespace reone {
 
 namespace game {
 
-SoundSets &SoundSets::instance() {
-    static SoundSets instance;
-    return instance;
-}
-
 SoundSets::SoundSets() : MemoryCache(bind(&SoundSets::doGet, this, _1)) {
 }
 

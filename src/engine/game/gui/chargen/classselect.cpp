@@ -17,11 +17,11 @@
 
 #include "classselect.h"
 
+#include "../../../common/random.h"
 #include "../../../gui/scenebuilder.h"
 #include "../../../graphics/model/models.h"
 #include "../../../resource/strings.h"
 
-#include "../../characterutil.h"
 #include "../../d20/classes.h"
 #include "../../game.h"
 #include "../../gameidutil.h"
@@ -95,7 +95,6 @@ void ClassSelection::setupClassButtons() {
 void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz) {
     int appearance = getRandomCharacterAppearance(gender, clazz);
 
-
     // Button control
 
     Control &controlButton = getControl("BTN_SEL" + to_string(index + 1));
@@ -110,7 +109,6 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     extent.width = _defaultButtonSize.x;
     extent.height = _defaultButtonSize.y;
     controlButton.setExtent(move(extent));
-
 
     // 3D control
 
@@ -127,7 +125,6 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     Control &control3d = getControl("3D_MODEL" + to_string(index + 1));
     control3d.setScene(move(scene));
 
-
     ClassButton classButton;
     classButton.control = &controlButton;
     classButton.center = center;
@@ -135,6 +132,40 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     classButton.character.appearance = appearance;
     classButton.character.attributes = Classes::instance().get(clazz)->defaultAttributes();
     _classButtons.push_back(move(classButton));
+}
+
+vector<Portrait> ClassSelection::getPCPortraitsByGender(Gender gender) {
+    vector<Portrait> result;
+    int sex = gender == Gender::Female ? 1 : 0;
+    for (auto &portrait : _game->portraits().portraits()) {
+        if (portrait.forPC && portrait.sex == sex) {
+            result.push_back(portrait);
+        }
+    }
+    return move(result);
+}
+
+int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz) {
+    int result = 0;
+    vector<Portrait> portraits(getPCPortraitsByGender(gender));
+    int portraitIdx = random(0, static_cast<int>(portraits.size()) - 1);
+    const Portrait &portrait = portraits[portraitIdx];
+
+    switch (clazz) {
+        case ClassType::Scoundrel:
+        case ClassType::JediConsular:
+            result = portrait.appearanceS;
+            break;
+        case ClassType::Soldier:
+        case ClassType::JediGuardian:
+            result = portrait.appearanceL;
+            break;
+        default:
+            result = portrait.appearanceNumber;
+            break;
+    }
+
+    return result;
 }
 
 shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, SceneGraph &sceneGraph) {

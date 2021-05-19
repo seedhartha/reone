@@ -40,9 +40,6 @@ struct FootstepTypeSounds {
 
 class FootstepSounds : public MemoryCache<uint32_t, FootstepTypeSounds> {
 public:
-    static FootstepSounds &instance();
-
-private:
     FootstepSounds();
 
     std::shared_ptr<FootstepTypeSounds> doGet(uint32_t type);

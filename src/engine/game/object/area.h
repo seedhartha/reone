@@ -38,7 +38,6 @@
 #include "../camera/thirdperson.h"
 #include "../map.h"
 #include "../pathfinder.h"
-#include "../script/runutil.h"
 #include "../types.h"
 
 #include "object.h"

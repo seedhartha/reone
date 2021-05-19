@@ -45,12 +45,12 @@ GameGUI::GameGUI(Game *game) :
 }
 
 void GameGUI::onClick(const string &control) {
-    AudioPlayer::instance().play(GUISounds::instance().getOnClick(), AudioType::Sound);
+    AudioPlayer::instance().play(_game->guiSounds().getOnClick(), AudioType::Sound);
 }
 
 void GameGUI::onFocusChanged(const string &control, bool focus) {
     if (focus) {
-        AudioPlayer::instance().play(GUISounds::instance().getOnEnter(), AudioType::Sound);
+        AudioPlayer::instance().play(_game->guiSounds().getOnEnter(), AudioType::Sound);
     }
 }
 

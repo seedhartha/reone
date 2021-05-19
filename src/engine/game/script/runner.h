@@ -26,12 +26,22 @@ namespace reone {
 
 namespace game {
 
-int runScript(
-    const std::string &resRef,
-    uint32_t callerId = script::kObjectInvalid,
-    uint32_t triggerrerId = script::kObjectInvalid,
-    int userDefinedEventNumber = -1,
-    int scriptVar = -1);
+class Game;
+
+class ScriptRunner {
+public:
+    ScriptRunner(Game *game);
+
+    int run(
+        const std::string &resRef,
+        uint32_t callerId = script::kObjectInvalid,
+        uint32_t triggerrerId = script::kObjectInvalid,
+        int userDefinedEventNumber = -1,
+        int scriptVar = -1);
+
+private:
+    Game *_game;
+};
 
 } // namespace game
 

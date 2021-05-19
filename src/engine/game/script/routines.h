@@ -50,9 +50,10 @@ class Talent;
 
 class Routines : public script::IRoutineProvider, boost::noncopyable {
 public:
-    static Routines &instance();
+    Routines(Game *game);
+    ~Routines();
 
-    void init(Game *game);
+    void init();
     void deinit();
 
     const script::Routine &get(int index) override;
@@ -63,8 +64,6 @@ private:
 
     Game *_game { nullptr };
     std::vector<script::Routine> _routines;
-
-    ~Routines();
 
     void add(const std::string &name, script::VariableType retType, const VariableTypesList &argTypes);
 

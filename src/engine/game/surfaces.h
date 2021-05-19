@@ -32,7 +32,7 @@ namespace game {
 
 class Surfaces : boost::noncopyable {
 public:
-    static Surfaces &instance();
+    Surfaces() = default;
 
     void init();
 

@@ -37,6 +37,7 @@
 #include "../action/attack.h"
 #include "../animationutil.h"
 #include "../footstepsounds.h"
+#include "../game.h"
 #include "../portraits.h"
 #include "../surfaces.h"
 
@@ -60,10 +61,16 @@ static string g_talkDummyNode("talkdummy");
 
 Creature::Creature(
     uint32_t id,
+    Game *game,
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph
 ) :
-    SpatialObject(id, ObjectType::Creature, objectFactory, sceneGraph) {
+    SpatialObject(id, ObjectType::Creature, objectFactory, sceneGraph),
+    _game(game) {
+
+    if (!game) {
+        throw invalid_argument("game must not be null");
+    }
 }
 
 void Creature::loadFromGIT(const GffStruct &gffs) {
@@ -88,9 +95,9 @@ void Creature::loadAppearance() {
     _footstepType = appearances->getInt(_appearance, "footsteptype", -1);
 
     if (_portraitId > 0) {
-        _portrait = Portraits::instance().getTextureByIndex(_portraitId);
+        _portrait = _game->portraits().getTextureByIndex(_portraitId);
     } else {
-        _portrait = Portraits::instance().getTextureByAppearance(_appearance);
+        _portrait = _game->portraits().getTextureByAppearance(_appearance);
     }
 
     updateModel();
@@ -417,13 +424,13 @@ int Creature::getNeededXP() const {
 
 void Creature::runSpawnScript() {
     if (!_onSpawn.empty()) {
-        runScript(_onSpawn, _id, kObjectInvalid);
+        _game->scriptRunner().run(_onSpawn, _id, kObjectInvalid);
     }
 }
 
 void Creature::runEndRoundScript() {
     if (!_onEndRound.empty()) {
-        runScript(_onEndRound, _id, kObjectInvalid);
+        _game->scriptRunner().run(_onEndRound, _id, kObjectInvalid);
     }
 }
 
@@ -455,7 +462,7 @@ void Creature::die() {
 
 void Creature::runDeathScript() {
     if (!_onDeath.empty()) {
-        runScript(_onDeath, _id, kObjectInvalid);
+        _game->scriptRunner().run(_onDeath, _id, kObjectInvalid);
     }
 }
 
@@ -511,7 +518,7 @@ void Creature::onObjectSeen(const shared_ptr<SpatialObject> &object) {
 
 void Creature::runOnNoticeScript() {
     if (!_onNotice.empty()) {
-        runScript(_onNotice, _id, _perception.lastPerceived->id());
+        _game->scriptRunner().run(_onNotice, _id, _perception.lastPerceived->id());
     }
 }
 
@@ -614,9 +621,9 @@ void Creature::setAppliedForce(glm::vec3 force) {
 
 void Creature::onEventSignalled(const string &name) {
     if (name == "snd_footstep" && _footstepType != -1 && _walkmeshMaterial != -1) {
-        shared_ptr<FootstepTypeSounds> sounds(FootstepSounds::instance().get(_footstepType));
+        shared_ptr<FootstepTypeSounds> sounds(_game->footstepSounds().get(_footstepType));
         if (sounds) {
-            const Surface &surface = Surfaces::instance().getSurface(_walkmeshMaterial);
+            const Surface &surface = _game->surfaces().getSurface(_walkmeshMaterial);
             vector<shared_ptr<AudioStream>> materialSounds;
             if (surface.sound == "DT") {
                 materialSounds = sounds->dirt;

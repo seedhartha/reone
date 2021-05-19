@@ -77,12 +77,12 @@ void SelectionOverlay::load() {
     addTextureByAction(ContextualAction::Attack, "i_attack");
 
     // TODO: different icons per feat level
-    _textureByAction.insert(make_pair(ContextualAction::PowerAttack, Feats::instance().get(FeatType::PowerAttack)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::CriticalStrike, Feats::instance().get(FeatType::CriticalStrike)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::Flurry, Feats::instance().get(FeatType::Flurry)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::PowerShot, Feats::instance().get(FeatType::PowerBlast)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::SniperShot, Feats::instance().get(FeatType::SniperShot)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::RapidShot, Feats::instance().get(FeatType::RapidShot)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::PowerAttack, _game->feats().get(FeatType::PowerAttack)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::CriticalStrike, _game->feats().get(FeatType::CriticalStrike)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::Flurry, _game->feats().get(FeatType::Flurry)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::PowerShot, _game->feats().get(FeatType::PowerBlast)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::SniperShot, _game->feats().get(FeatType::SniperShot)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::RapidShot, _game->feats().get(FeatType::RapidShot)->icon));
 }
 
 void SelectionOverlay::addTextureByAction(ContextualAction action, const string &resRef) {
@@ -199,7 +199,7 @@ void SelectionOverlay::update() {
 
             auto hilightedCreature = ObjectConverter::toCreature(hilightedObject);
             if (hilightedCreature) {
-                _hilightedHostile = !hilightedCreature->isDead() && Reputes::instance().getIsEnemy(*(_game->party().getLeader()), *hilightedCreature);
+                _hilightedHostile = !hilightedCreature->isDead() && _game->reputes().getIsEnemy(*(_game->party().getLeader()), *hilightedCreature);
             }
         }
     }
@@ -250,7 +250,7 @@ void SelectionOverlay::update() {
 
             auto selectedCreature = ObjectConverter::toCreature(selectedObject);
             if (selectedCreature) {
-                _selectedHostile = !selectedCreature->isDead() && Reputes::instance().getIsEnemy(*(_game->party().getLeader()), *selectedCreature);
+                _selectedHostile = !selectedCreature->isDead() && _game->reputes().getIsEnemy(*_game->party().getLeader(), *selectedCreature);
             }
         }
     }

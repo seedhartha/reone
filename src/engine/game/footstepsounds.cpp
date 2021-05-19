@@ -32,11 +32,6 @@ namespace reone {
 
 namespace game {
 
-FootstepSounds &FootstepSounds::instance() {
-    static FootstepSounds instance;
-    return instance;
-}
-
 FootstepSounds::FootstepSounds() : MemoryCache(bind(&FootstepSounds::doGet, this, _1)) {
 }
 

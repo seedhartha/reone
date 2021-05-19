@@ -159,7 +159,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
                     cursor = CursorType::Pickup;
                 } else {
                     auto creature = static_pointer_cast<Creature>(object);
-                    bool isEnemy = Reputes::instance().getIsEnemy(*creature, *_game->party().getLeader());
+                    bool isEnemy = _game->reputes().getIsEnemy(*creature, *_game->party().getLeader());
                     cursor = isEnemy ? CursorType::Attack : CursorType::Talk;
                 }
                 break;
@@ -223,7 +223,7 @@ void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
             partyLeader->addAction(make_unique<ObjectAction>(ActionType::OpenContainer, creature));
         }
     } else {
-        bool isEnemy = Reputes::instance().getIsEnemy(*partyLeader, *creature);
+        bool isEnemy = _game->reputes().getIsEnemy(*partyLeader, *creature);
         if (isEnemy) {
             partyLeader->clearAllActions();
             partyLeader->addAction(make_unique<AttackAction>(creature));
@@ -274,7 +274,7 @@ set<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &obj
         case ObjectType::Creature: {
             auto leader = _game->party().getLeader();
             auto creature = static_pointer_cast<Creature>(object);
-            if (!creature->isDead() && Reputes::instance().getIsEnemy(*leader, *creature)) {
+            if (!creature->isDead() && _game->reputes().getIsEnemy(*leader, *creature)) {
                 actions.insert(ContextualAction::Attack);
                 auto weapon = leader->getEquippedItem(InventorySlot::rightWeapon);
                 if (weapon && weapon->isRanged()) {

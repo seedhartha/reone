@@ -291,14 +291,14 @@ void ActionExecutor::executeOpenDoor(const shared_ptr<Object> &actor, ObjectActi
         if (!isObjectSelf && door->isLocked()) {
             string onFailToOpen(door->getOnFailToOpen());
             if (!onFailToOpen.empty()) {
-                runScript(onFailToOpen, door->id(), actor->id());
+                _game->scriptRunner().run(onFailToOpen, door->id(), actor->id());
             }
         } else {
             door->open(actor);
             if (!isObjectSelf) {
                 string onOpen(door->getOnOpen());
                 if (!onOpen.empty()) {
-                    runScript(onOpen, door->id(), actor->id(), -1);
+                    _game->scriptRunner().run(onOpen, door->id(), actor->id(), -1);
                 }
             }
         }
@@ -350,7 +350,7 @@ void ActionExecutor::executeOpenLock(const shared_ptr<Object> &actor, ObjectActi
 
             string onOpen(door->getOnOpen());
             if (!onOpen.empty()) {
-                runScript(onOpen, door->id(), actor->id());
+                _game->scriptRunner().run(onOpen, door->id(), actor->id());
             }
         }
 

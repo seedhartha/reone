@@ -27,10 +27,13 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 class Trigger : public SpatialObject {
 public:
     Trigger(
         uint32_t id,
+        Game *game,
         ObjectFactory *objectFactory,
         scene::SceneGraph *sceneGraph);
 
@@ -51,6 +54,8 @@ public:
     const std::string &linkedTo() const { return _linkedTo; }
 
 private:
+    Game *_game;
+
     std::string _transitionDestin;
     std::string _linkedToModule;
     std::string _linkedTo;

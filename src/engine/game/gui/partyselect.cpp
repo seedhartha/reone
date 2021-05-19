@@ -101,10 +101,10 @@ void PartySelection::prepare(const Context &ctx) {
             shared_ptr<Texture> portrait;
             int portraitId = utc->getInt("PortraitId", 0);
             if (portraitId > 0) {
-                portrait = Portraits::instance().getTextureByIndex(portraitId);
+                portrait = _game->portraits().getTextureByIndex(portraitId);
             } else {
                 int appearance = utc->getInt("Appearance_Type");
-                portrait = Portraits::instance().getTextureByAppearance(appearance);
+                portrait = _game->portraits().getTextureByAppearance(appearance);
             }
             btnNpc.setDisabled(false);
             lblChar.setBorderFill(move(portrait));
@@ -143,7 +143,7 @@ void PartySelection::onClick(const string &control) {
         _game->openInGame();
 
         if (!_context.exitScript.empty()) {
-            runScript(_context.exitScript);
+            _game->scriptRunner().run(_context.exitScript);
         }
     } else if (boost::starts_with(control, "BTN_NPC")) {
         onNpcButtonClick(control);

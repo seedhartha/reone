@@ -102,7 +102,7 @@ int Conversation::indexOfFirstActive(const vector<Dialog::EntryReplyLink> &links
 }
 
 bool Conversation::evaluateCondition(const string &scriptResRef) {
-    return runScript(scriptResRef, _owner->id()) != 0;
+    return _game->scriptRunner().run(scriptResRef, _owner->id()) != 0;
 }
 
 void Conversation::finish() {
@@ -112,7 +112,7 @@ void Conversation::finish() {
 
     // Run EndConversation script
     if (!_dialog->endScript().empty()) {
-        runScript(_dialog->endScript(), _owner->id());
+        _game->scriptRunner().run(_dialog->endScript(), _owner->id());
     }
 }
 
@@ -144,7 +144,7 @@ void Conversation::loadEntry(int index, bool start) {
 
     // Run entry script
     if (!_currentEntry->script.empty()) {
-        runScript(_currentEntry->script, _owner->id());
+        _game->scriptRunner().run(_currentEntry->script, _owner->id());
     }
 }
 
@@ -242,7 +242,7 @@ void Conversation::pickReply(int index) {
 
     // Run reply script
     if (!reply.script.empty()) {
-        runScript(reply.script, _owner->id());
+        _game->scriptRunner().run(reply.script, _owner->id());
     }
 
     int entryIdx = indexOfFirstActive(reply.entries);
