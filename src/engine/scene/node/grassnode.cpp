@@ -52,10 +52,10 @@ void GrassSceneNode::addCluster(shared_ptr<Cluster> cluster) {
     _clusters.push_back(move(cluster));
 }
 
-void GrassSceneNode::drawLeafs(const vector<shared_ptr<SceneLeaf>> &leafs, int count) {
-    if (leafs.empty()) return;
+void GrassSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &elements, int count) {
+    if (elements.empty()) return;
     if (count == -1) {
-        count = static_cast<int>(leafs.size());
+        count = static_cast<int>(elements.size());
     }
 
     setActiveTextureUnit(TextureUnits::diffuseMap);
@@ -72,7 +72,7 @@ void GrassSceneNode::drawLeafs(const vector<shared_ptr<SceneLeaf>> &leafs, int c
     }
 
     for (int i = 0; i < count; ++i) {
-        auto cluster = static_pointer_cast<GrassSceneNode::Cluster>(leafs[i]);
+        auto cluster = static_pointer_cast<GrassSceneNode::Cluster>(elements[i]);
         uniforms.grass->quadSize = _quadSize;
         uniforms.grass->clusters[i].positionVariant = glm::vec4(cluster->position, static_cast<float>(cluster->variant));
         uniforms.grass->clusters[i].lightmapUV = cluster->lightmapUV;

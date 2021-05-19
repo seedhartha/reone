@@ -248,10 +248,10 @@ void EmitterSceneNode::detonate() {
     doSpawnParticle();
 }
 
-void EmitterSceneNode::drawLeafs(const vector<shared_ptr<SceneLeaf>> &leafs, int count) {
-    if (leafs.empty()) return;
+void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &elements, int count) {
+    if (elements.empty()) return;
     if (count == -1) {
-        count = static_cast<int>(leafs.size());
+        count = static_cast<int>(elements.size());
     }
 
     shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
@@ -264,7 +264,7 @@ void EmitterSceneNode::drawLeafs(const vector<shared_ptr<SceneLeaf>> &leafs, int
     uniforms.particles->render = static_cast<int>(emitter->renderMode);
 
     for (int i = 0; i < count; ++i) {
-        auto particle = static_pointer_cast<Particle>(leafs[i]);
+        auto particle = static_pointer_cast<Particle>(elements[i]);
 
         glm::mat4 transform(_absTransform);
         transform = glm::translate(transform, particle->position);

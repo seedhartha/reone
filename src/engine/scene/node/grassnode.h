@@ -19,7 +19,7 @@
 
 #include "../../graphics/texture/texture.h"
 
-#include "../sceneleaf.h"
+#include "../nodeelement.h"
 
 #include "scenenode.h"
 
@@ -29,7 +29,7 @@ namespace scene {
 
 class GrassSceneNode : public SceneNode {
 public:
-    struct Cluster : public SceneLeaf {
+    struct Cluster : public SceneNodeElement {
         glm::vec3 position { 0.0f };
         glm::vec2 lightmapUV { 0.0f };
         int variant { 0 };
@@ -40,7 +40,7 @@ public:
     void clear();
     void addCluster(std::shared_ptr<Cluster> cluster);
 
-    void drawLeafs(const std::vector<std::shared_ptr<SceneLeaf>> &leafs, int count) override;
+    void drawElements(const std::vector<std::shared_ptr<SceneNodeElement>> &elements, int count) override;
 
     const std::vector<std::shared_ptr<Cluster>> &clusters() const { return _clusters; }
 

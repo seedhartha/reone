@@ -28,7 +28,7 @@
 
 #include "../../graphics/aabb.h"
 
-#include "../sceneleaf.h"
+#include "../nodeelement.h"
 #include "../types.h"
 
 namespace reone {
@@ -45,7 +45,7 @@ public:
     virtual void update(float dt);
     virtual void draw();
 
-    virtual void drawLeafs(const std::vector<std::shared_ptr<SceneLeaf>> &leafs, int count = -1) {}
+    virtual void drawElements(const std::vector<std::shared_ptr<SceneNodeElement>> &elements, int count = -1) {}
 
     bool isVisible() const { return _visible; }
     bool isCullable() const { return _cullable; }
