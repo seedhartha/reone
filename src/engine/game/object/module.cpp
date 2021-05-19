@@ -267,21 +267,40 @@ void Module::update(float dt) {
     _area->update(dt);
 }
 
-vector<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &object) const {
-    vector<ContextualAction> actions;
+set<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &object) const {
+    set<ContextualAction> actions;
 
     switch (object->type()) {
         case ObjectType::Creature: {
+            auto leader = _game->party().getLeader();
             auto creature = static_pointer_cast<Creature>(object);
-            if (!creature->isDead() && Reputes::instance().getIsEnemy(*(_game->party().getLeader()), *creature)) {
-                actions.push_back(ContextualAction::Attack);
+            if (!creature->isDead() && Reputes::instance().getIsEnemy(*leader, *creature)) {
+                actions.insert(ContextualAction::Attack);
+                auto weapon = leader->getEquippedItem(InventorySlot::rightWeapon);
+                if (weapon && weapon->isRanged()) {
+                    if (leader->attributes().hasFeat(FeatType::PowerBlast)) {
+                        actions.insert(ContextualAction::PowerShot);
+                    } else if (leader->attributes().hasFeat(FeatType::SniperShot)) {
+                        actions.insert(ContextualAction::SniperShot);
+                    } else if (leader->attributes().hasFeat(FeatType::RapidShot)) {
+                        actions.insert(ContextualAction::RapidShot);
+                    }
+                } else {
+                    if (leader->attributes().hasFeat(FeatType::PowerAttack)) {
+                        actions.insert(ContextualAction::PowerAttack);
+                    } else if (leader->attributes().hasFeat(FeatType::CriticalStrike)) {
+                        actions.insert(ContextualAction::CriticalStrike);
+                    } else if (leader->attributes().hasFeat(FeatType::Flurry)) {
+                        actions.insert(ContextualAction::Flurry);
+                    }
+                }
             }
             break;
         }
         case ObjectType::Door: {
             auto door = static_pointer_cast<Door>(object);
             if (door->isLocked() && !door->isKeyRequired() && _game->party().getLeader()->attributes().hasSkill(Skill::Security)) {
-                actions.push_back(ContextualAction::Unlock);
+                actions.insert(ContextualAction::Unlock);
             }
             break;
         }

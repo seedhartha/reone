@@ -53,6 +53,11 @@ public:
     void draw();
 
 private:
+    struct ActionSlot {
+        std::vector<ContextualAction> actions;
+        uint32_t indexSelected { 0 };
+    };
+
     Game *_game { nullptr };
     std::shared_ptr<graphics::Font> _font;
     std::shared_ptr<graphics::Texture> _friendlyReticle;
@@ -65,23 +70,28 @@ private:
     std::unordered_map<ContextualAction, std::shared_ptr<graphics::Texture>> _textureByAction;
     std::shared_ptr<SpatialObject> _hilightedObject;
     std::shared_ptr<SpatialObject> _selectedObject;
-    std::vector<ContextualAction> _actions;
+    std::vector<ActionSlot> _actionSlots;
     glm::vec3 _hilightedScreenCoords { 0.0f };
     glm::vec3 _selectedScreenCoords { 0.0f };
     int _reticleHeight { 0 };
-    int _selectedActionIdx { -1 };
+    int _selectedActionSlot { -1 };
     bool _hilightedHostile { false };
     bool _selectedHostile { false };
+    bool _hasActions { false };
 
     void addTextureByAction(ContextualAction action, const std::string &resRef);
 
     bool handleMouseMotion(const SDL_MouseMotionEvent &event);
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
+    bool handleMouseWheel(const SDL_MouseWheelEvent &event);
 
     void drawReticle(graphics::Texture &texture, const glm::vec3 &screenCoords);
     void drawTitleBar();
     void drawHealthBar();
     void drawActionBar();
+
+    void drawActionFrame(int index);
+    void drawActionIcon(int index);
 
     bool getActionScreenCoords(int index, float &x, float &y) const;
     glm::vec3 getColorFromSelectedObject() const;

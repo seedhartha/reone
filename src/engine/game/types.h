@@ -61,7 +61,13 @@ enum class CursorType {
 enum class ContextualAction {
     None,
     Unlock,
-    Attack
+    Attack,
+    PowerAttack,
+    CriticalStrike,
+    Flurry,
+    PowerShot,
+    SniperShot,
+    RapidShot
 };
 
 enum class WeaponType {

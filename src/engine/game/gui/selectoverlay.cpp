@@ -29,6 +29,7 @@
 #include "../../graphics/window.h"
 #include "../../resource/resources.h"
 
+#include "../d20/feats.h"
 #include "../game.h"
 #include "../objectconverter.h"
 #include "../reputes.h"
@@ -48,7 +49,7 @@ static constexpr int kOffsetToReticle = 8;
 static constexpr int kTitleBarWidth = 250;
 static constexpr int kTitleBarPadding = 6;
 static constexpr int kHealthBarHeight = 6;
-static constexpr int kActionCount = 3;
+static constexpr int kNumActionSlots = 3;
 static constexpr int kActionBarMargin = 3;
 static constexpr int kActionBarPadding = 3;
 static constexpr int kActionWidth = 35;
@@ -58,6 +59,7 @@ SelectionOverlay::SelectionOverlay(Game *game) : _game(game) {
     if (!game) {
         throw invalid_argument("game must not be null");
     }
+    _actionSlots.resize(kNumActionSlots);
 }
 
 void SelectionOverlay::load() {
@@ -73,6 +75,14 @@ void SelectionOverlay::load() {
 
     addTextureByAction(ContextualAction::Unlock, "isk_security");
     addTextureByAction(ContextualAction::Attack, "i_attack");
+
+    // TODO: different icons per feat level
+    _textureByAction.insert(make_pair(ContextualAction::PowerAttack, Feats::instance().get(FeatType::PowerAttack)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::CriticalStrike, Feats::instance().get(FeatType::CriticalStrike)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::Flurry, Feats::instance().get(FeatType::Flurry)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::PowerShot, Feats::instance().get(FeatType::PowerBlast)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::SniperShot, Feats::instance().get(FeatType::SniperShot)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::RapidShot, Feats::instance().get(FeatType::RapidShot)->icon));
 }
 
 void SelectionOverlay::addTextureByAction(ContextualAction action, const string &resRef) {
@@ -85,21 +95,23 @@ bool SelectionOverlay::handle(const SDL_Event &event) {
             return handleMouseMotion(event.motion);
         case SDL_MOUSEBUTTONDOWN:
             return handleMouseButtonDown(event.button);
+        case SDL_MOUSEWHEEL:
+            return handleMouseWheel(event.wheel);
         default:
             return false;
     }
 }
 
 bool SelectionOverlay::handleMouseMotion(const SDL_MouseMotionEvent &event) {
-    _selectedActionIdx = -1;
+    _selectedActionSlot = -1;
 
     if (!_selectedObject) return false;
 
-    for (int i = 0; i < kActionCount; ++i) {
+    for (int i = 0; i < kNumActionSlots; ++i) {
         float x, y;
         getActionScreenCoords(i, x, y);
         if (event.x >= x && event.y >= y && event.x < x + kActionWidth && event.y < y + kActionHeight) {
-            _selectedActionIdx = i;
+            _selectedActionSlot = i;
             return true;
         }
     }
@@ -108,27 +120,34 @@ bool SelectionOverlay::handleMouseMotion(const SDL_MouseMotionEvent &event) {
 }
 
 bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    if (event.button != SDL_BUTTON_LEFT ||
-        _selectedActionIdx == -1 || _selectedActionIdx >= _actions.size()) return false;
+    if (event.button != SDL_BUTTON_LEFT) return false;
+    if (_selectedActionSlot == -1 || _selectedActionSlot >= _actionSlots.size()) return false;
+
+    shared_ptr<Creature> leader(_game->party().getLeader());
+    if (!leader) return false;
 
     shared_ptr<Area> area(_game->module()->area());
-
     auto selectedObject = area->selectedObject();
     if (!selectedObject) return false;
 
-    switch (_actions[_selectedActionIdx]) {
+    const ActionSlot &slot = _actionSlots[_selectedActionSlot];
+    if (slot.indexSelected >= slot.actions.size()) return false;
+
+    switch (slot.actions[slot.indexSelected]) {
         case ContextualAction::Unlock: {
-            shared_ptr<Creature> partyLeader(_game->party().getLeader());
-            partyLeader->addAction(make_unique<ObjectAction>(ActionType::OpenLock, selectedObject));
+            leader->addAction(make_unique<ObjectAction>(ActionType::OpenLock, selectedObject));
             break;
         }
-
-        case ContextualAction::Attack: {
-            shared_ptr<Creature> partyLeader(_game->party().getLeader());
-            partyLeader->addAction(make_unique<AttackAction>(static_pointer_cast<Creature>(selectedObject), partyLeader->getAttackRange(), true));
+        case ContextualAction::Attack:
+        case ContextualAction::PowerAttack:
+        case ContextualAction::CriticalStrike:
+        case ContextualAction::Flurry:
+        case ContextualAction::PowerShot:
+        case ContextualAction::SniperShot:
+        case ContextualAction::RapidShot: {
+            leader->addAction(make_unique<AttackAction>(static_pointer_cast<Creature>(selectedObject), leader->getAttackRange(), true));
             break;
         }
-
         default:
             break;
     }
@@ -136,7 +155,28 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     return true;
 }
 
+bool SelectionOverlay::handleMouseWheel(const SDL_MouseWheelEvent &event) {
+    if (_selectedActionSlot == -1 || _selectedActionSlot >= _actionSlots.size()) return false;
+
+    ActionSlot &slot = _actionSlots[_selectedActionSlot];
+    size_t numSlotActions = slot.actions.size();
+
+    if (event.y > 0) {
+        if (slot.indexSelected-- == 0) {
+            slot.indexSelected = numSlotActions - 1;
+        }
+    } else {
+        if (++slot.indexSelected == numSlotActions) {
+            slot.indexSelected = 0;
+        }
+    }
+
+    return true;
+}
+
 void SelectionOverlay::update() {
+    // TODO: update on selection change only
+
     _hilightedObject.reset();
     _hilightedHostile = false;
 
@@ -170,7 +210,43 @@ void SelectionOverlay::update() {
 
         if (_selectedScreenCoords.z < 1.0f) {
             _selectedObject = selectedObject;
-            _actions = module->getContextualActions(selectedObject);
+
+            for (int i = 0; i < kNumActionSlots; ++i) {
+                _actionSlots[i].actions.clear();
+            }
+            set<ContextualAction> actions(module->getContextualActions(selectedObject));
+            _hasActions = !actions.empty();
+            if (_hasActions) {
+                if (actions.count(ContextualAction::Attack) > 0) {
+                    _actionSlots[0].actions.push_back(ContextualAction::Attack);
+                }
+                if (actions.count(ContextualAction::PowerAttack) > 0) {
+                    _actionSlots[0].actions.push_back(ContextualAction::PowerAttack);
+                }
+                if (actions.count(ContextualAction::CriticalStrike) > 0) {
+                    _actionSlots[0].actions.push_back(ContextualAction::CriticalStrike);
+                }
+                if (actions.count(ContextualAction::Flurry) > 0) {
+                    _actionSlots[0].actions.push_back(ContextualAction::Flurry);
+                }
+                if (actions.count(ContextualAction::PowerShot) > 0) {
+                    _actionSlots[0].actions.push_back(ContextualAction::PowerShot);
+                }
+                if (actions.count(ContextualAction::SniperShot) > 0) {
+                    _actionSlots[0].actions.push_back(ContextualAction::SniperShot);
+                }
+                if (actions.count(ContextualAction::RapidShot) > 0) {
+                    _actionSlots[0].actions.push_back(ContextualAction::RapidShot);
+                }
+                if (actions.count(ContextualAction::Unlock) > 0) {
+                    _actionSlots[1].actions.push_back(ContextualAction::Unlock);
+                }
+            }
+            for (int i = 0; i < kNumActionSlots; ++i) {
+                if (_actionSlots[i].indexSelected >= _actionSlots[i].actions.size()) {
+                    _actionSlots[i].indexSelected = 0;
+                }
+            }
 
             auto selectedCreature = ObjectConverter::toCreature(selectedObject);
             if (selectedCreature) {
@@ -186,9 +262,7 @@ void SelectionOverlay::draw() {
     }
     if (_selectedObject) {
         drawReticle(_selectedHostile ? *_hostileReticle2 : *_friendlyReticle2, _selectedScreenCoords);
-        if (!_actions.empty()) {
-            drawActionBar();
-        }
+        drawActionBar();
         drawTitleBar();
         drawHealthBar();
     }
@@ -223,7 +297,7 @@ void SelectionOverlay::drawTitleBar() {
         float x = opts.width * _selectedScreenCoords.x - kTitleBarWidth / 2;
         float y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2 - barHeight - kOffsetToReticle - kHealthBarHeight - 1.0f;
 
-        if (!_actions.empty()) {
+        if (_hasActions) {
             y -= kActionHeight + 2 * kActionBarMargin;
         }
         glm::mat4 transform(1.0f);
@@ -242,7 +316,7 @@ void SelectionOverlay::drawTitleBar() {
     {
         float x = opts.width * _selectedScreenCoords.x;
         float y = opts.height * (1.0f - _selectedScreenCoords.y) - (_reticleHeight + barHeight) / 2 - kOffsetToReticle - kHealthBarHeight - 1.0f;
-        if (!_actions.empty()) {
+        if (_hasActions) {
             y -= kActionHeight + 2 * kActionBarMargin;
         }
         glm::vec3 position(x, y, 0.0f);
@@ -256,7 +330,7 @@ void SelectionOverlay::drawHealthBar() {
     float y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2 - kHealthBarHeight - kOffsetToReticle;
     float w = glm::clamp(_selectedObject->currentHitPoints() / static_cast<float>(_selectedObject->hitPoints()), 0.0f, 1.0f) * kTitleBarWidth;
 
-    if (!_actions.empty()) {
+    if (_hasActions) {
         y -= kActionHeight + 2 * kActionBarMargin;
     }
     glm::mat4 transform(1.0f);
@@ -273,57 +347,37 @@ void SelectionOverlay::drawHealthBar() {
 }
 
 void SelectionOverlay::drawActionBar() {
-    const GraphicsOptions &opts = _game->options().graphics;
-
-    for (int i = 0; i < kActionCount; ++i) {
-        shared_ptr<Texture> frameTexture;
-        if (i == _selectedActionIdx) {
-            frameTexture = _hilightedScroll;
-        } else if (_selectedHostile) {
-            frameTexture = _hostileScroll;
-        } else {
-            frameTexture = _friendlyScroll;
-        }
-        setActiveTextureUnit(TextureUnits::diffuseMap);
-        frameTexture->bind();
-
-        float frameX, frameY;
-        getActionScreenCoords(i, frameX, frameY);
-
-        glm::mat4 transform(1.0f);
-        transform = glm::translate(transform, glm::vec3(frameX, frameY, 0.0f));
-        transform = glm::scale(transform, glm::vec3(kActionWidth, kActionHeight, 1.0f));
-
-        ShaderUniforms uniforms;
-        uniforms.combined.general.projection = Window::instance().getOrthoProjection();
-        uniforms.combined.general.model = move(transform);
-
-        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-        Meshes::instance().getQuad()->draw();
-
-        if (i < static_cast<int>(_actions.size())) {
-            ContextualAction action = _actions[i];
-
-            shared_ptr<Texture> texture(_textureByAction.find(action)->second);
-            if (texture) {
-                setActiveTextureUnit(TextureUnits::diffuseMap);
-                texture->bind();
-
-                float y = opts.height * (1.0f - _selectedScreenCoords.y) - (_reticleHeight + kActionHeight + kActionWidth) / 2.0f - kOffsetToReticle - kActionBarMargin;
-
-                transform = glm::mat4(1.0f);
-                transform = glm::translate(transform, glm::vec3(frameX, y, 0.0f));
-                transform = glm::scale(transform, glm::vec3(kActionWidth, kActionWidth, 1.0f));
-
-                ShaderUniforms uniforms;
-                uniforms.combined.general.projection = Window::instance().getOrthoProjection();
-                uniforms.combined.general.model = move(transform);
-
-                Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-                Meshes::instance().getQuad()->draw();
-            }
-        }
+    for (int i = 0; i < kNumActionSlots; ++i) {
+        drawActionFrame(i);
+        drawActionIcon(i);
     }
+}
+
+void SelectionOverlay::drawActionFrame(int index) {
+    shared_ptr<Texture> frameTexture;
+    if (index == _selectedActionSlot) {
+        frameTexture = _hilightedScroll;
+    } else if (_selectedHostile) {
+        frameTexture = _hostileScroll;
+    } else {
+        frameTexture = _friendlyScroll;
+    }
+    setActiveTextureUnit(TextureUnits::diffuseMap);
+    frameTexture->bind();
+
+    float frameX, frameY;
+    getActionScreenCoords(index, frameX, frameY);
+
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(frameX, frameY, 0.0f));
+    transform = glm::scale(transform, glm::vec3(kActionWidth, kActionHeight, 1.0f));
+
+    ShaderUniforms uniforms;
+    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+    uniforms.combined.general.model = move(transform);
+
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+    Meshes::instance().getQuad()->draw();
 }
 
 bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) const {
@@ -336,14 +390,41 @@ bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) cons
     return true;
 }
 
+void SelectionOverlay::drawActionIcon(int index) {
+    const ActionSlot &slot = _actionSlots[index];
+    if (slot.indexSelected >= slot.actions.size()) return;
+
+    ContextualAction action = slot.actions[slot.indexSelected];
+    shared_ptr<Texture> texture(_textureByAction.find(action)->second);
+    if (!texture) return;
+
+    setActiveTextureUnit(TextureUnits::diffuseMap);
+    texture->bind();
+
+    float frameX, frameY;
+    getActionScreenCoords(index, frameX, frameY);
+
+    const GraphicsOptions &opts = _game->options().graphics;
+    float y = opts.height * (1.0f - _selectedScreenCoords.y) - (_reticleHeight + kActionHeight + kActionWidth) / 2.0f - kOffsetToReticle - kActionBarMargin;
+
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(frameX, y, 0.0f));
+    transform = glm::scale(transform, glm::vec3(kActionWidth, kActionWidth, 1.0f));
+
+    ShaderUniforms uniforms;
+    uniforms.combined.general.projection = Window::instance().getOrthoProjection();
+    uniforms.combined.general.model = move(transform);
+
+    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+    Meshes::instance().getQuad()->draw();
+}
+
 glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {
     static glm::vec3 red(1.0f, 0.0f, 0.0f);
 
-    if (_selectedObject && _selectedHostile) {
-        return red;
-    }
-
-    return getBaseColor(_game->gameId());
+    return (_selectedObject && _selectedHostile) ?
+        red :
+        getBaseColor(_game->gameId());
 }
 
 } // namespace game
