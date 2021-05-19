@@ -60,6 +60,7 @@ private:
     bool _moveRight { false };
     bool _leftPressedInMouseLook { false };
     bool _restrictMode { false };
+    bool _walk { false };
 
     bool handleKeyDown(const SDL_KeyboardEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);
