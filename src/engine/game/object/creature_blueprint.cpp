@@ -100,6 +100,10 @@ void Creature::loadUTC(const GffStruct &utc) {
         bool dropable = itemGffs->getBool("Dropable");
         addItem(resRef, 1, dropable);
     }
+    for (auto &featGffs : utc.getList("FeatList")) {
+        auto feat = static_cast<FeatType>(featGffs->getUint("Feat"));
+        _attributes.addFeat(feat);
+    }
 
     // Unused fields:
     //

@@ -328,6 +328,7 @@ private:
     REO_DECL_ROUTINE(getGlobalLocation)
     REO_DECL_ROUTINE(getGlobalNumber)
     REO_DECL_ROUTINE(getGlobalString)
+    REO_DECL_ROUTINE(getHasFeat)
     REO_DECL_ROUTINE(getHasSkill)
     REO_DECL_ROUTINE(getHasSpell)
     REO_DECL_ROUTINE(getHitDice)

@@ -18,6 +18,7 @@
 #pragma once
 
 #include <map>
+#include <set>
 #include <vector>
 
 #include "../types.h"
@@ -104,10 +105,20 @@ public:
 
     // END Skills
 
+    // Feats
+
+    bool hasFeat(FeatType type) const { return _feats.count(type) > 0; }
+
+    void addFeat(FeatType type) { _feats.insert(type); }
+    void removeFeat(FeatType type) { _feats.erase(type); }
+
+    // END Feats
+
 private:
     std::vector<std::pair<ClassType, int>> _classLevels;
     std::map<Ability, int> _abilityScores;
     std::map<Skill, int> _skillRanks;
+    std::set<FeatType> _feats;
 };
 
 } // namespace game
