@@ -327,7 +327,7 @@ void Routines::addKotorRoutines() {
     add("GetModuleItemAcquired", Object, { });
     add("GetModuleItemAcquiredFrom", Object, { });
     add("SetCustomToken", Void, { Int, String });
-    add("GetHasFeat", Int, { Int, Object });
+    add("GetHasFeat", Int, { Int, Object }, &Routines::getHasFeat);
     add("GetHasSkill", Int, { Int, Object }, &Routines::getHasSkill);
     add("ActionUseFeat", Void, { Int, Object }, &Routines::actionUseFeat);
     add("ActionUseSkill", Void, { Int, Object, Int, Object }, &Routines::actionUseSkill);

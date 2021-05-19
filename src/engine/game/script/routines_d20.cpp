@@ -188,6 +188,20 @@ Variable Routines::getLevelByClass(const VariablesList &args, ExecutionContext &
     return Variable::ofInt(result);
 }
 
+Variable Routines::getHasFeat(const VariablesList &args, ExecutionContext &ctx) {
+    bool result = false;
+    auto feat = getEnum<FeatType>(args, 0);
+    auto creature = getCreatureOrCaller(args, 1, ctx);
+
+    if (creature) {
+        result = creature->attributes().hasFeat(feat);
+    } else {
+        debug("Script: getHasFeat: creature is invalid", 1, DebugChannels::script);
+    }
+
+    return Variable::ofInt(static_cast<int>(result));
+}
+
 Variable Routines::getHasSkill(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
     auto creature = getCreatureOrCaller(args, 1, ctx);
