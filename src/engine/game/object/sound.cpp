@@ -25,6 +25,8 @@
 #include "../../audio/player.h"
 #include "../../resource/resources.h"
 
+#include "../game.h"
+
 using namespace std;
 
 using namespace reone::audio;
@@ -37,14 +39,16 @@ namespace game {
 
 Sound::Sound(
     uint32_t id,
+    Game *game,
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph
 ) :
-    SpatialObject(
-        id,
-        ObjectType::Sound,
-        objectFactory,
-        sceneGraph) {
+    SpatialObject(id, ObjectType::Sound, objectFactory, sceneGraph),
+    _game(game) {
+
+    if (!game) {
+        throw invalid_argument("game must not be null");
+    }
 }
 
 void Sound::loadFromGIT(const GffStruct &gffs) {
@@ -107,7 +111,7 @@ void Sound::update(float dt) {
 
 void Sound::playSound(const string &resRef, bool loop) {
     float gain = _volume / 127.0f;
-    _sound = AudioPlayer::instance().play(resRef, AudioType::Sound, loop, gain, _positional, getPosition());
+    _sound = _game->audioPlayer().play(resRef, AudioType::Sound, loop, gain, _positional, getPosition());
 }
 
 void Sound::play() {

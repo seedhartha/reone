@@ -168,7 +168,7 @@ void Conversation::loadVoiceOver() {
         voiceResRef = _currentEntry->voResRef;
     }
     if (!voiceResRef.empty()) {
-        _currentVoice = AudioPlayer::instance().play(voiceResRef, AudioType::Voice);
+        _currentVoice = _game->audioPlayer().play(voiceResRef, AudioType::Voice);
         _lipAnimation = Lips::instance().get(voiceResRef);
     }
 }

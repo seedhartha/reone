@@ -31,6 +31,7 @@
 
 #include "glm/vec3.hpp"
 
+#include "files.h"
 #include "soundinstance.h"
 
 namespace reone {
@@ -41,9 +42,10 @@ class SoundHandle;
 
 class AudioPlayer : boost::noncopyable {
 public:
-    static AudioPlayer &instance();
+    AudioPlayer(AudioOptions opts, AudioFiles *files);
+    ~AudioPlayer();
 
-    void init(const AudioOptions &opts);
+    void init();
     void deinit();
 
     std::shared_ptr<SoundHandle> play(const std::string &resRef, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f));
@@ -53,6 +55,8 @@ public:
 
 private:
     AudioOptions _opts;
+    AudioFiles *_files;
+
     ALCdevice *_device { nullptr };
     ALCcontext *_context { nullptr };
     std::thread _thread;
@@ -61,8 +65,6 @@ private:
     std::recursive_mutex _soundsMutex;
     std::atomic<glm::vec3> _listenerPosition;
     std::atomic_bool _listenerPositionDirty { false };
-
-    ~AudioPlayer();
 
     void threadStart();
 

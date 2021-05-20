@@ -20,6 +20,7 @@
 #include <string>
 
 #include "../common/cache.h"
+#include "../audio/files.h"
 
 #include "types.h"
 
@@ -29,9 +30,11 @@ namespace game {
 
 class SoundSets : public MemoryCache<std::string, SoundSet> {
 public:
-    SoundSets();
+    SoundSets(audio::AudioFiles *audioFiles);
 
 private:
+    audio::AudioFiles *_audioFiles;
+
     std::shared_ptr<SoundSet> doGet(std::string resRef);
 };
 

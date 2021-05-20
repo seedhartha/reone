@@ -20,6 +20,7 @@
 #include <memory>
 #include <vector>
 
+#include "../audio/files.h"
 #include "../audio/stream.h"
 #include "../common/cache.h"
 
@@ -40,9 +41,12 @@ struct FootstepTypeSounds {
 
 class FootstepSounds : public MemoryCache<uint32_t, FootstepTypeSounds> {
 public:
-    FootstepSounds();
+    FootstepSounds(audio::AudioFiles *audioFiles);
 
     std::shared_ptr<FootstepTypeSounds> doGet(uint32_t type);
+
+private:
+    audio::AudioFiles *_audioFiles;
 };
 
 } // namespace game

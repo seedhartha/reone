@@ -32,11 +32,6 @@ namespace reone {
 
 namespace audio {
 
-AudioFiles &AudioFiles::instance() {
-    static AudioFiles instance;
-    return instance;
-}
-
 AudioFiles::AudioFiles() : MemoryCache(bind(&AudioFiles::doGet, this, _1)) {
 }
 

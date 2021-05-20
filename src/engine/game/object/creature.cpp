@@ -444,7 +444,7 @@ void Creature::playSound(SoundSetEntry entry, bool positional) {
     auto maybeSound = _soundSet->find(entry);
     if (maybeSound != _soundSet->end()) {
         glm::vec3 position(_position + 1.7f);
-        AudioPlayer::instance().play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
+        _game->audioPlayer().play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
     }
 }
 
@@ -646,7 +646,7 @@ void Creature::onEventSignalled(const string &name) {
             if (index < static_cast<int>(materialSounds.size())) {
                 shared_ptr<AudioStream> sound(materialSounds[index]);
                 if (sound) {
-                    AudioPlayer::instance().play(sound, AudioType::Sound, false, 1.0f, true, _position);
+                    _game->audioPlayer().play(sound, AudioType::Sound, false, 1.0f, true, _position);
                 }
             }
         }

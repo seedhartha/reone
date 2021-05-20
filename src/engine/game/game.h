@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -27,6 +28,8 @@
 
 #include "SDL2/SDL_events.h"
 
+#include "../audio/files.h"
+#include "../audio/player.h"
 #include "../audio/soundhandle.h"
 #include "../graphics/window.h"
 #include "../scene/pipeline/world.h"
@@ -126,6 +129,8 @@ public:
 
     // Services
 
+    audio::AudioFiles &audioFiles() { return _audioFiles; }
+    audio::AudioPlayer &audioPlayer() { return _audioPlayer; }
     Combat &combat() { return _combat; }
     Console &console() { return _console; }
     Cursors &cursors() { return _cursors; }
@@ -242,6 +247,8 @@ private:
 
     // Services
 
+    audio::AudioFiles _audioFiles;
+    audio::AudioPlayer _audioPlayer;
     Combat _combat;
     Console _console;
     Cursors _cursors;

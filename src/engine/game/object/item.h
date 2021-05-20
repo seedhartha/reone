@@ -32,6 +32,8 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 class Item : public Object {
 public:
     struct AmmunitionType {
@@ -42,7 +44,7 @@ public:
         std::shared_ptr<audio::AudioStream> impactSound2;
     };
 
-    Item(uint32_t id);
+    Item(uint32_t id, Game *game);
 
     void loadFromBlueprint(const std::string &resRef);
 
@@ -82,6 +84,8 @@ public:
     void setEquipped(bool equipped);
 
 private:
+    Game *_game;
+
     std::string _localizedName;
     std::string _baseBodyVariation;
     int _bodyVariation { 0 };

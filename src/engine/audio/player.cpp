@@ -39,18 +39,13 @@ namespace audio {
 static constexpr float kMaxPositionalSoundDistance = 16.0f;
 static constexpr float kMaxPositionalSoundDistance2 = kMaxPositionalSoundDistance * kMaxPositionalSoundDistance;
 
-AudioPlayer &AudioPlayer::instance() {
-    static AudioPlayer instance;
-    return instance;
+AudioPlayer::AudioPlayer(AudioOptions opts, AudioFiles *files) : _opts(move(opts)), _files(files) {
+    if (!files) {
+        throw invalid_argument("files must not be null");
+    }
 }
 
-void AudioPlayer::init(const AudioOptions &opts) {
-    _opts = opts;
-
-    if (_opts.musicVolume == 0 && _opts.voiceVolume == 0 && _opts.soundVolume == 0 && _opts.movieVolume == 0) {
-        info("AudioPlayer: audio is disabled");
-        return;
-    }
+void AudioPlayer::init() {
     _thread = thread(bind(&AudioPlayer::threadStart, this));
 }
 
@@ -122,7 +117,7 @@ void AudioPlayer::deinit() {
 }
 
 shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
-    shared_ptr<AudioStream> stream(AudioFiles::instance().get(resRef));
+    shared_ptr<AudioStream> stream(_files->get(resRef));
     if (!stream) {
         warn("AudioPlayer: file not found: " + resRef);
         return nullptr;

@@ -67,11 +67,11 @@ shared_ptr<Trigger> ObjectFactory::newTrigger() {
 }
 
 shared_ptr<Item> ObjectFactory::newItem() {
-    return newObject<Item>();
+    return newObject<Item>(_game);
 }
 
 shared_ptr<Sound> ObjectFactory::newSound() {
-    return newObject<Sound>(this, _sceneGraph);
+    return newObject<Sound>(_game, this, _sceneGraph);
 }
 
 shared_ptr<PlaceableCamera> ObjectFactory::newCamera() {
