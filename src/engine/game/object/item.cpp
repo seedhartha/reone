@@ -22,6 +22,8 @@
 #include "../../audio/player.h"
 #include "../../resource/resources.h"
 
+#include "../game.h"
+
 using namespace std;
 
 using namespace reone::audio;
@@ -32,7 +34,13 @@ namespace reone {
 
 namespace game {
 
-Item::Item(uint32_t id) : Object(id, ObjectType::Item) {
+Item::Item(uint32_t id, Game *game) :
+    Object(id, ObjectType::Item),
+    _game(game) {
+
+    if (!game) {
+        throw invalid_argument("game must not be null");
+    }
 }
 
 void Item::loadFromBlueprint(const string &resRef) {
@@ -46,7 +54,7 @@ void Item::playShotSound(int variant, glm::vec3 position) {
     if (_ammunitionType) {
         shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1);
         if (sound) {
-            AudioPlayer::instance().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
+            _game->audioPlayer().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
         }
     }
 }
@@ -54,7 +62,7 @@ void Item::playShotSound(int variant, glm::vec3 position) {
 void Item::playImpactSound(int variant, glm::vec3 position) {
     if (_ammunitionType) {
         shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1);
-        AudioPlayer::instance().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
+        _game->audioPlayer().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
     }
 }
 

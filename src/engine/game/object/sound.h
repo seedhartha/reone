@@ -26,10 +26,13 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 class Sound : public SpatialObject {
 public:
     Sound(
         uint32_t id,
+        Game *game,
         ObjectFactory *objectFactory,
         scene::SceneGraph *sceneGraph);
 
@@ -56,6 +59,8 @@ public:
     void setAudible(bool audible);
 
 private:
+    Game *_game;
+
     bool _active { false };
     int _priority { 0 };
     int _soundIdx { -1 };

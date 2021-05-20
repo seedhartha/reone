@@ -77,20 +77,25 @@ static bool g_conversationsEnabled = true;
 Game::Game(const fs::path &path, const Options &opts) :
     _gameId(determineGameID(path)),
 
+    _audioPlayer(opts.audio, &_audioFiles),
     _combat(this),
     _console(this),
+    _footstepSounds(&_audioFiles),
+    _guiSounds(&_audioFiles),
     _options(opts),
     _party(this),
     _path(path),
-    _routines(this),
-    _scriptRunner(this),
+    _soundSets(&_audioFiles),
 
     _window(opts.graphics, this),
     _cursors(_gameId, &_window),
     _sceneGraph(opts.graphics),
     _objectFactory(this, &_sceneGraph),
     _profileOverlay(&_window),
-    _worldPipeline(&_sceneGraph, opts.graphics) {
+    _worldPipeline(&_sceneGraph, opts.graphics),
+
+    _routines(this),
+    _scriptRunner(this) {
 }
 
 int Game::run() {
@@ -122,7 +127,7 @@ void Game::initSubsystems() {
     Materials::instance().init();
     PBRIBL::instance().init();
     Shaders::instance().init();
-    AudioPlayer::instance().init(_options.audio);
+    _audioPlayer.init();
     _guiSounds.init();
     _routines.init();
     _reputes.init();
@@ -185,7 +190,7 @@ void Game::playVideo(const string &name) {
     }
     shared_ptr<AudioStream> audio(_video->audio());
     if (audio) {
-        _movieAudio = AudioPlayer::instance().play(audio, AudioType::Movie);
+        _movieAudio = _audioPlayer.play(audio, AudioType::Movie);
     }
 }
 
@@ -256,7 +261,7 @@ void Game::loadModule(const string &name, string entry) {
         Models::instance().invalidateCache();
         Walkmeshes::instance().invalidateCache();
         Textures::instance().invalidateCache();
-        AudioFiles::instance().invalidate();
+        _audioFiles.invalidate();
         Scripts::instance().invalidate();
         _soundSets.invalidate();
         Lips::instance().invalidate();
@@ -541,7 +546,7 @@ void Game::updateMusic() {
     if (_musicResRef.empty()) return;
 
     if (!_music || _music->isStopped()) {
-        _music = AudioPlayer::instance().play(_musicResRef, AudioType::Music);
+        _music = _audioPlayer.play(_musicResRef, AudioType::Music);
     }
 }
 
@@ -571,7 +576,7 @@ void Game::loadCharacterGeneration() {
 }
 
 void Game::deinitSubsystems() {
-    AudioPlayer::instance().deinit();
+    _audioPlayer.deinit();
     _window.deinit();
 }
 
@@ -725,7 +730,7 @@ void Game::updateCamera(float dt) {
         } else {
             listenerPosition = camera->sceneNode()->absoluteTransform()[3];
         }
-        AudioPlayer::instance().setListenerPosition(listenerPosition);
+        _audioPlayer.setListenerPosition(listenerPosition);
     }
 }
 

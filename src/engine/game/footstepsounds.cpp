@@ -32,7 +32,9 @@ namespace reone {
 
 namespace game {
 
-FootstepSounds::FootstepSounds() : MemoryCache(bind(&FootstepSounds::doGet, this, _1)) {
+FootstepSounds::FootstepSounds(AudioFiles *audioFiles) :
+    MemoryCache(bind(&FootstepSounds::doGet, this, _1)),
+    _audioFiles(audioFiles) {
 }
 
 shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
@@ -55,7 +57,7 @@ shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
             for (int i = 0; i < 3; ++i) {
                 string key(str(boost::format("%s%d") % pair.first % i));
                 string resRef(twoDa->getString(static_cast<int>(type), key));
-                shared_ptr<AudioStream> audio(AudioFiles::instance().get(resRef));
+                shared_ptr<AudioStream> audio(_audioFiles->get(resRef));
                 pair.second.push_back(move(audio));
             }
         }

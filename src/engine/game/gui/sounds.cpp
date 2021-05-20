@@ -17,7 +17,6 @@
 
 #include "sounds.h"
 
-#include "../../audio/files.h"
 #include "../../resource/resources.h"
 #include "../../resource/format/2dareader.h"
 
@@ -30,17 +29,20 @@ namespace reone {
 
 namespace game {
 
-static void loadSound(const TwoDA &twoDa, const string &label, shared_ptr<AudioStream> &sound) {
-    int row = twoDa.indexByCellValue("label", label);
-    if (row != -1) {
-        sound = AudioFiles::instance().get(twoDa.getString(row, "soundresref"));
-    }
+GUISounds::GUISounds(AudioFiles *audioFiles) : _audioFiles(audioFiles) {
 }
 
 void GUISounds::init() {
     shared_ptr<TwoDA> sounds(Resources::instance().get2DA("guisounds"));
     loadSound(*sounds, "Clicked_Default", _onClick);
     loadSound(*sounds, "Entered_Default", _onEnter);
+}
+
+void GUISounds::loadSound(const TwoDA &twoDa, const string &label, shared_ptr<AudioStream> &sound) {
+    int row = twoDa.indexByCellValue("label", label);
+    if (row != -1) {
+        sound = _audioFiles->get(twoDa.getString(row, "soundresref"));
+    }
 }
 
 GUISounds::~GUISounds() {

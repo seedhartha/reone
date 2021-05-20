@@ -21,7 +21,9 @@
 
 #include <boost/noncopyable.hpp>
 
+#include "../../audio/files.h"
 #include "../../audio/stream.h"
+#include "../../resource/2da.h"
 
 namespace reone {
 
@@ -29,7 +31,7 @@ namespace game {
 
 class GUISounds : boost::noncopyable {
 public:
-    GUISounds() = default;
+    GUISounds(audio::AudioFiles *audioFiles);
     ~GUISounds();
 
     void init();
@@ -39,8 +41,12 @@ public:
     std::shared_ptr<audio::AudioStream> getOnEnter() const { return _onEnter; }
 
 private:
+    audio::AudioFiles *_audioFiles;
+
     std::shared_ptr<audio::AudioStream> _onClick;
     std::shared_ptr<audio::AudioStream> _onEnter;
+
+    void loadSound(const resource::TwoDA &twoDa, const std::string &label, std::shared_ptr<audio::AudioStream> &sound);
 };
 
 } // namespace game

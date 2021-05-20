@@ -30,11 +30,9 @@ namespace audio {
 
 class AudioFiles : public MemoryCache<std::string, AudioStream> {
 public:
-    static AudioFiles &instance();
-
-private:
     AudioFiles();
 
+private:
     std::shared_ptr<AudioStream> doGet(std::string resRef);
 };
 

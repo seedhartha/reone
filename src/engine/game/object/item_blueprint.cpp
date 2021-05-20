@@ -30,6 +30,8 @@
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
+#include "../game.h"
+
 using namespace std;
 
 using namespace reone::audio;
@@ -99,10 +101,10 @@ void Item::loadAmmunitionType() {
         shared_ptr<TwoDA> twoDa(Resources::instance().get2DA("ammunitiontypes"));
         _ammunitionType = make_shared<Item::AmmunitionType>();
         _ammunitionType->model = Models::instance().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "model")));
-        _ammunitionType->shotSound1 = AudioFiles::instance().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));
-        _ammunitionType->shotSound2 = AudioFiles::instance().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound1")));
-        _ammunitionType->impactSound1 = AudioFiles::instance().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound0")));
-        _ammunitionType->impactSound2 = AudioFiles::instance().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound1")));
+        _ammunitionType->shotSound1 = _game->audioFiles().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));
+        _ammunitionType->shotSound2 = _game->audioFiles().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound1")));
+        _ammunitionType->impactSound1 = _game->audioFiles().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound0")));
+        _ammunitionType->impactSound2 = _game->audioFiles().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound1")));
     }
 }
 

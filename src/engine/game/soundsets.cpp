@@ -35,7 +35,13 @@ namespace reone {
 
 namespace game {
 
-SoundSets::SoundSets() : MemoryCache(bind(&SoundSets::doGet, this, _1)) {
+SoundSets::SoundSets(AudioFiles *audioFiles) :
+    MemoryCache(bind(&SoundSets::doGet, this, _1)),
+    _audioFiles(audioFiles) {
+
+    if (!audioFiles) {
+        throw invalid_argument("audioFiles must not be null");
+    }
 }
 
 shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
@@ -50,7 +56,7 @@ shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
     vector<uint32_t> sounds(ssf.soundSet());
     for (size_t i = 0; i < sounds.size(); ++i) {
         string soundResRef(boost::to_lower_copy(Strings::instance().getSound(sounds[i])));
-        shared_ptr<AudioStream> sound(AudioFiles::instance().get(soundResRef));
+        shared_ptr<AudioStream> sound(_audioFiles->get(soundResRef));
         if (sound) {
             result->insert(make_pair(static_cast<SoundSetEntry>(i), sound));
         }
