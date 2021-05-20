@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 
+#include "../common/guardutil.h"
 #include "../scene/node/cameranode.h"
 #include "../scene/node/meshnode.h"
 #include "../scene/scenegraph.h"
@@ -47,21 +48,11 @@ SceneBuilder::SceneBuilder(
     _materials(materials),
     _pbrIbl(pbrIbl) {
 
-    if (!shaders) {
-        throw invalid_argument("shaders must not be null");
-    }
-    if (!meshes) {
-        throw invalid_argument("meshes must not be null");
-    }
-    if (!textures) {
-        throw invalid_argument("textuers must not be null");
-    }
-    if (!materials) {
-        throw invalid_argument("materials must not be null");
-    }
-    if (!pbrIbl) {
-        throw invalid_argument("pbrIbl must not be null");
-    }
+    ensureNotNull(shaders, "shaders");
+    ensureNotNull(meshes, "meshes");
+    ensureNotNull(textures, "textures");
+    ensureNotNull(materials, "materials");
+    ensureNotNull(pbrIbl, "pbrIbl");
 
     _aspect = opts.width / static_cast<float>(opts.height);
 }

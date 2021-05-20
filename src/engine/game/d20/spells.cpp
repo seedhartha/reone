@@ -21,6 +21,7 @@
 #include <string>
 
 #include "../../common/collectionutil.h"
+#include "../../common/guardutil.h"
 #include "../../graphics/texture/textures.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
@@ -35,15 +36,9 @@ namespace reone {
 namespace game {
 
 Spells::Spells(Textures *textures, Resources *resources, Strings *strings) : _textures(textures), _resources(resources), _strings(strings) {
-    if (!textures) {
-        throw invalid_argument("textures must not be null");
-    }
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
-    if (!strings) {
-        throw invalid_argument("strings must not be null");
-    }
+    ensureNotNull(textures, "textures");
+    ensureNotNull(resources, "resources");
+    ensureNotNull(strings, "strings");
 }
 
 void Spells::init() {

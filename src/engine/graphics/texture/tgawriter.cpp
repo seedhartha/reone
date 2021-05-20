@@ -25,6 +25,8 @@
 
 #include <boost/filesystem.hpp>
 
+#include "../../common/guardutil.h"
+
 #include "s3tc.h"
 
 using namespace std;
@@ -38,9 +40,7 @@ namespace graphics {
 static constexpr int kHeaderSize = 18;
 
 TgaWriter::TgaWriter(shared_ptr<Texture> texture) : _texture(texture) {
-    if (!texture) {
-        throw invalid_argument("texture must not be null");
-    }
+    ensureNotNull(texture, "texture");
 }
 
 void TgaWriter::save(ostream &out, bool compress) {

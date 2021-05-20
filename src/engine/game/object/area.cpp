@@ -26,6 +26,7 @@
 
 #include "glm/gtx/norm.hpp"
 
+#include "../../common/guardutil.h"
 #include "../../common/log.h"
 #include "../../common/random.h"
 #include "../../common/streamutil.h"
@@ -794,9 +795,8 @@ void Area::setUnescapable(bool value) {
 }
 
 shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintResRef, const shared_ptr<Location> &location) {
-    if (!location) {
-        throw invalid_argument("location must not be null");
-    }
+    ensureNotNull(location, "location");
+
     shared_ptr<Object> object;
 
     switch (type) {

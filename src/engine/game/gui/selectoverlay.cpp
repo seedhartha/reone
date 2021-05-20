@@ -19,6 +19,7 @@
 
 #include <unordered_map>
 
+#include "../../common/guardutil.h"
 #include "../../graphics/font.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh/meshes.h"
@@ -56,9 +57,8 @@ static constexpr int kActionWidth = 35;
 static constexpr int kActionHeight = 59;
 
 SelectionOverlay::SelectionOverlay(Game *game) : _game(game) {
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+    ensureNotNull(game, "game");
+
     _actionSlots.resize(kNumActionSlots);
 }
 

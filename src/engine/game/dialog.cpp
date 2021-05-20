@@ -21,6 +21,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../common/guardutil.h"
 #include "../resource/strings.h"
 
 using namespace std;
@@ -32,9 +33,7 @@ namespace reone {
 namespace game {
 
 Dialog::Dialog(string resRef, Strings *strings) : _resRef(move(resRef)), _strings(strings) {
-    if (!strings) {
-        throw invalid_argument("strings must not be null");
-    }
+    ensureNotNull(strings, "strings");
 }
 
 void Dialog::load(const GffStruct &dlg) {

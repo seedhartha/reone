@@ -17,6 +17,7 @@
 
 #include "walkmeshes.h"
 
+#include "../../common/guardutil.h"
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
 
@@ -31,9 +32,7 @@ namespace reone {
 namespace graphics {
 
 Walkmeshes::Walkmeshes(Resources *resources) : _resources(resources) {
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
+    ensureNotNull(resources, "resources");
 }
 
 void Walkmeshes::init(set<uint32_t> walkableSurfaces) {

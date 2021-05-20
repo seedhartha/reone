@@ -19,6 +19,7 @@
 
 #include "../../common/collectionutil.h"
 #include "../../common/log.h"
+#include "../../common/guardutil.h"
 
 #include "../scenegraph.h"
 #include "../types.h"
@@ -47,9 +48,8 @@ ModelSceneNode::ModelSceneNode(
     _usage(usage),
     _animEventListener(animEventListener) {
 
-    if (!model) {
-        throw invalid_argument("model must not be null");
-    }
+    ensureNotNull(model, "model");
+
     _volumetric = true;
 
     buildNodeTree(_model->rootNode(), this);

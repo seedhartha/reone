@@ -20,6 +20,7 @@
 #include <stdexcept>
 
 #include "../../common/collectionutil.h"
+#include "../../common/guardutil.h"
 
 using namespace std;
 
@@ -28,9 +29,7 @@ namespace reone {
 namespace game {
 
 Object::Object(uint32_t id, ObjectType type, Game *game) : _id(id), _type(type), _game(game) {
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+    ensureNotNull(game, "game");
 }
 
 void Object::update(float dt) {

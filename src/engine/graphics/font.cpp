@@ -24,6 +24,7 @@
 
 #include "glm/ext.hpp"
 
+#include "../common/guardutil.h"
 #include "../graphics/mesh/meshes.h"
 #include "../graphics/window.h"
 
@@ -41,21 +42,13 @@ Font::Font(Window *window, Shaders *shaders, Meshes *meshes) :
     _shaders(shaders),
     _meshes(meshes) {
 
-    if (!window) {
-        throw invalid_argument("window must not be null");
-    }
-    if (!shaders) {
-        throw invalid_argument("shaders must not be null");
-    }
-    if (!meshes) {
-        throw invalid_argument("meshes must not be null");
-    }
+    ensureNotNull(shaders, "shaders");
+    ensureNotNull(meshes, "meshes");
 }
 
 void Font::load(shared_ptr<Texture> texture) {
-    if (!texture) {
-        throw invalid_argument("texture must not be null");
-    }
+    ensureNotNull(texture, "texture");
+
     _texture = texture;
 
     const Texture::Features &features = texture->features();

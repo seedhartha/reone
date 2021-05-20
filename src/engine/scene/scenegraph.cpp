@@ -22,6 +22,7 @@
 
 #include "glm/gtx/transform.hpp"
 
+#include "../common/guardutil.h"
 #include "../graphics/mesh/meshes.h"
 #include "../graphics/stateutil.h"
 
@@ -52,21 +53,11 @@ SceneGraph::SceneGraph(GraphicsOptions opts, Shaders *shaders, Meshes *meshes, T
     _materials(materials),
     _pbrIbl(pbrIbl) {
 
-    if (!shaders) {
-        throw invalid_argument("shaders must not be null");
-    }
-    if (!meshes) {
-        throw invalid_argument("meshes must not be null");
-    }
-    if (!textures) {
-        throw invalid_argument("textures must not be null");
-    }
-    if (!materials) {
-        throw invalid_argument("materials must not be null");
-    }
-    if (!pbrIbl) {
-        throw invalid_argument("pbrIbl must not be null");
-    }
+    ensureNotNull(shaders, "shaders");
+    ensureNotNull(meshes, "meshes");
+    ensureNotNull(textures, "textures");
+    ensureNotNull(materials, "materials");
+    ensureNotNull(pbrIbl, "pbrIbl");
 }
 
 void SceneGraph::clearRoots() {

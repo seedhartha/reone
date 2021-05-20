@@ -18,6 +18,7 @@
 #include "combat.h"
 
 #include "../../common/log.h"
+#include "../../common/guardutil.h"
 #include "../../common/random.h"
 
 #include "../game.h"
@@ -36,9 +37,7 @@ static constexpr float kProjectileDelay = 0.5f;
 static constexpr float kDeactivateDelay = 8.0f;
 
 Combat::Combat(Game *game) : _game(game) {
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+    ensureNotNull(game, "game");
 }
 
 static unique_ptr<Combat::Attack> makeAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, shared_ptr<Action> action, AttackResultType resultType, int damage) {

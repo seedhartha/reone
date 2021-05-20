@@ -22,6 +22,8 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
+#include "../common/guardutil.h"
+
 #include "stateutil.h"
 #include "window.h"
 
@@ -34,21 +36,9 @@ namespace graphics {
 Cursor::Cursor(shared_ptr<Texture> up, shared_ptr<Texture> down, Window *window, Shaders *shaders, Meshes *meshes) :
     _up(up), _down(down), _window(window), _shaders(shaders), _meshes(meshes) {
 
-    if (!up) {
-        throw invalid_argument("up must not be null");
-    }
-    if (!down) {
-        throw invalid_argument("down must not be null");
-    }
-    if (!window) {
-        throw invalid_argument("window must not be null");
-    }
-    if (!shaders) {
-        throw invalid_argument("shaders must not be null");
-    }
-    if (!meshes) {
-        throw invalid_argument("meshes must not be null");
-    }
+    ensureNotNull(window, "window");
+    ensureNotNull(shaders, "shaders");
+    ensureNotNull(meshes, "meshes");
 }
 
 void Cursor::draw() {

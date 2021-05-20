@@ -24,6 +24,7 @@
 
 #include "glm/ext.hpp"
 
+#include "../common/guardutil.h"
 #include "../graphics/mesh/meshes.h"
 #include "../graphics/shader/shaders.h"
 #include "../graphics/stateutil.h"
@@ -39,12 +40,8 @@ namespace reone {
 namespace video {
 
 Video::Video(Shaders *shaders, Meshes *meshes) : _shaders(shaders), _meshes(meshes) {
-    if (!shaders) {
-        throw invalid_argument("shaders must not be null");
-    }
-    if (!meshes) {
-        throw invalid_argument("meshes must not be null");
-    }
+    ensureNotNull(shaders, "shaders");
+    ensureNotNull(meshes, "meshes");
 }
 
 void Video::init() {

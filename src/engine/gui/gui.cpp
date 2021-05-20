@@ -20,6 +20,7 @@
 #include <stdexcept>
 
 #include "../common/log.h"
+#include "../common/guardutil.h"
 #include "../graphics/mesh/meshes.h"
 #include "../graphics/shader/shaders.h"
 #include "../graphics/stateutil.h"
@@ -55,27 +56,13 @@ GUI::GUI(
     _resources(resources),
     _strings(strings) {
 
-    if (!window) {
-        throw invalid_argument("window must not be null");
-    }
-    if (!fonts) {
-        throw invalid_argument("fonts must not be null");
-    }
-    if (!shaders) {
-        throw invalid_argument("shaders must not be null");
-    }
-    if (!meshes) {
-        throw invalid_argument("meshes must not be null");
-    }
-    if (!textures) {
-        throw invalid_argument("textures must not be null");
-    }
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
-    if (!strings) {
-        throw invalid_argument("strings must not be null");
-    }
+    ensureNotNull(window, "window");
+    ensureNotNull(fonts, "fonts");
+    ensureNotNull(shaders, "shaders");
+    ensureNotNull(meshes, "meshes");
+    ensureNotNull(textures, "textures");
+    ensureNotNull(resources, "resources");
+    ensureNotNull(strings, "strings");
 
     _aspect = _gfxOpts.width / static_cast<float>(_gfxOpts.height);
     _screenCenter.x = _gfxOpts.width / 2;
@@ -83,9 +70,8 @@ GUI::GUI(
 }
 
 void GUI::load() {
-    if (_resRef.empty()) {
-        throw logic_error("resRef must not be empty");
-    }
+    ensureNotEmpty(_resRef, "resRef");
+
     debug("GUI: load " + _resRef, 1, DebugChannels::gui);
 
     shared_ptr<GffStruct> gui(_resources->getGFF(_resRef, ResourceType::Gui));

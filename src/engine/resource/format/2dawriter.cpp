@@ -21,6 +21,8 @@
 
 #include <boost/filesystem/fstream.hpp>
 
+#include "../../common/guardutil.h"
+
 using namespace std;
 
 namespace fs = boost::filesystem;
@@ -32,9 +34,7 @@ namespace resource {
 static const char kSignature[] = "2DA V2.b";
 
 TwoDaWriter::TwoDaWriter(const shared_ptr<TwoDA> &twoDa) : _twoDa(twoDa) {
-    if (!twoDa) {
-        throw invalid_argument("twoDa must not be null");
-    }
+    ensureNotNull(twoDa, "twoDa");
 }
 
 void TwoDaWriter::save(const fs::path &path) {

@@ -26,6 +26,7 @@
 #include "AL/al.h"
 
 #include "../common/log.h"
+#include "../common/guardutil.h"
 
 #include "files.h"
 #include "options.h"
@@ -41,9 +42,7 @@ static constexpr float kMaxPositionalSoundDistance = 16.0f;
 static constexpr float kMaxPositionalSoundDistance2 = kMaxPositionalSoundDistance * kMaxPositionalSoundDistance;
 
 AudioPlayer::AudioPlayer(AudioOptions opts, AudioFiles *files) : _opts(move(opts)), _files(files) {
-    if (!files) {
-        throw invalid_argument("files must not be null");
-    }
+    ensureNotNull(files, "files");
 }
 
 void AudioPlayer::init() {

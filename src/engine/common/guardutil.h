@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -16,41 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "lips.h"
+#pragma once
 
 #include <stdexcept>
-
-#include "../../common/guardutil.h"
-#include "../../common/streamutil.h"
-
-#include "lipreader.h"
-
-using namespace std;
-using namespace std::placeholders;
-
-using namespace reone::resource;
+#include <string>
 
 namespace reone {
 
-namespace graphics {
-
-Lips::Lips(Resources *resources) :
-    MemoryCache(bind(&Lips::doGet, this, _1)),
-    _resources(resources) {
-
-    ensureNotNull(resources, "resources");
+template <class T>
+inline void ensureNotNull(T obj, const std::string &name) {
+    if (!obj) {
+        throw std::invalid_argument(name + " must not be null");
+    }
 }
 
-shared_ptr<LipAnimation> Lips::doGet(string resRef) {
-    shared_ptr<ByteArray> lipData(_resources->getRaw(resRef, ResourceType::Lip));
-    if (!lipData) return nullptr;
-
-    LipReader lip;
-    lip.load(wrap(lipData));
-
-    return lip.animation();
+template <class T>
+inline void ensureNotEmpty(T obj, const std::string &name) {
+    if (obj.empty()) {
+        throw std::invalid_argument(name + " must not be empty");
+    }
 }
-
-} // namespace graphics
 
 } // namespace reone

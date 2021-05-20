@@ -17,6 +17,8 @@
 
 #include "routines.h"
 
+#include "../../common/guardutil.h"
+
 #include "../enginetype/effect.h"
 #include "../enginetype/event.h"
 #include "../enginetype/location.h"
@@ -39,9 +41,7 @@ namespace reone {
 namespace game {
 
 Routines::Routines(Game *game) : _game(game) {
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+    ensureNotNull(game, "game");
 }
 
 void Routines::init() {

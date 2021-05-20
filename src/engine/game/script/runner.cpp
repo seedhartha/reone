@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 
+#include "../../common/guardutil.h"
 #include "../../script/execution.h"
 #include "../../script/scripts.h"
 
@@ -35,9 +36,7 @@ namespace reone {
 namespace game {
 
 ScriptRunner::ScriptRunner(Game *game) : _game(game) {
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+    ensureNotNull(game, "game");
 }
 
 int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerrerId, int userDefinedEventNumber, int scriptVar) {

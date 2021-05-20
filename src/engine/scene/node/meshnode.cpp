@@ -23,6 +23,7 @@
 #include "SDL2/SDL_opengl.h"
 
 #include "../../common/log.h"
+#include "../../common/guardutil.h"
 #include "../../common/random.h"
 #include "../../graphics/featureutil.h"
 #include "../../graphics/pbribl.h"
@@ -54,9 +55,7 @@ MeshSceneNode::MeshSceneNode(
     ModelNodeSceneNode(modelNode, SceneNodeType::Mesh, sceneGraph),
     _model(model) {
 
-    if (!model) {
-        throw invalid_argument("model must not be null");
-    }
+    ensureNotNull(model, "model");
 
     _alpha = _modelNode->alpha().getByFrameOrElse(0, 1.0f);
     _selfIllumColor = _modelNode->selfIllumColor().getByFrameOrElse(0, glm::vec3(0.0f));

@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 
+#include "../../common/guardutil.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
 #include "../../graphics/stateutil.h"
@@ -39,9 +40,7 @@ GrassSceneNode::GrassSceneNode(string name, glm::vec2 quadSize, shared_ptr<Textu
     _texture(texture),
     _lightmap(move(lightmap)) {
 
-    if (!texture) {
-        throw invalid_argument("texture must not be null");
-    }
+    ensureNotNull(texture, "texture");
 }
 
 void GrassSceneNode::clear() {

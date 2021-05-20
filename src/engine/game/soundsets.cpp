@@ -20,6 +20,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../audio/files.h"
+#include "../common/guardutil.h"
 #include "../common/streamutil.h"
 #include "../resource/format/ssfreader.h"
 #include "../resource/resources.h"
@@ -41,15 +42,9 @@ SoundSets::SoundSets(AudioFiles *audioFiles, Resources *resources, Strings *stri
     _resources(resources),
     _strings(strings) {
 
-    if (!audioFiles) {
-        throw invalid_argument("audioFiles must not be null");
-    }
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
-    if (!strings) {
-        throw invalid_argument("strings must not be null");
-    }
+    ensureNotNull(audioFiles, "audioFiles");
+    ensureNotNull(resources, "resources");
+    ensureNotNull(strings, "strings");
 }
 
 shared_ptr<SoundSet> SoundSets::doGet(string resRef) {

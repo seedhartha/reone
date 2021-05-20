@@ -20,6 +20,8 @@
 #include <memory>
 #include <stdexcept>
 
+#include "../../common/guardutil.h"
+
 #include "action.h"
 
 namespace reone {
@@ -32,7 +34,7 @@ class ObjectAction : public Action {
 public:
     ObjectAction(ActionType type, std::shared_ptr<Object> object) : Action(type), _object(std::move(object)) {
         if (!_object) {
-            throw std::invalid_argument("object must not be null");
+            ensureNotNull(object, "object");
         }
     }
 

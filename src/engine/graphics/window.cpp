@@ -26,6 +26,8 @@
 
 #include "glm/ext.hpp"
 
+#include "../common/guardutil.h"
+
 #include "cursor.h"
 #include "eventhandler.h"
 
@@ -36,9 +38,7 @@ namespace reone {
 namespace graphics {
 
 Window::Window(GraphicsOptions options, IEventHandler *eventHandler) : _options(move(options)), _eventHandler(eventHandler) {
-    if (!eventHandler) {
-        throw invalid_argument("eventHandler must not be null");
-    }
+    ensureNotNull(eventHandler, "eventHandler");
 }
 
 void Window::init() {
