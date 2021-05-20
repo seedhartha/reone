@@ -262,7 +262,7 @@ void Game::loadModule(const string &name, string entry) {
         Walkmeshes::instance().invalidateCache();
         Textures::instance().invalidateCache();
         _audioFiles.invalidate();
-        Scripts::instance().invalidate();
+        _scripts.invalidate();
         _soundSets.invalidate();
         Lips::instance().invalidate();
 

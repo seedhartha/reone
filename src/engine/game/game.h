@@ -34,6 +34,7 @@
 #include "../graphics/window.h"
 #include "../scene/pipeline/world.h"
 #include "../scene/scenegraph.h"
+#include "../script/scripts.h"
 #include "../video/video.h"
 
 #include "console.h"
@@ -146,6 +147,7 @@ public:
     Routines &routines() { return _routines; }
     scene::SceneGraph &sceneGraph() { return _sceneGraph; }
     scene::WorldRenderPipeline &worldPipeline() { return _worldPipeline; }
+    script::Scripts &scripts() { return _scripts; }
     ScriptRunner &scriptRunner() { return _scriptRunner; }
     SoundSets &soundSets() { return _soundSets; }
     Spells &spells() { return _spells; }
@@ -264,6 +266,7 @@ private:
     Routines _routines;
     scene::SceneGraph _sceneGraph;
     scene::WorldRenderPipeline _worldPipeline;
+    script::Scripts _scripts;
     ScriptRunner _scriptRunner;
     SoundSets _soundSets;
     Spells _spells;
