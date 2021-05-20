@@ -55,11 +55,11 @@ shared_ptr<Placeable> ObjectFactory::newPlaceable() {
 }
 
 shared_ptr<Door> ObjectFactory::newDoor() {
-    return newObject<Door>(this, _sceneGraph);
+    return newObject<Door>(_game, this, _sceneGraph);
 }
 
 shared_ptr<Waypoint> ObjectFactory::newWaypoint() {
-    return newObject<Waypoint>(this, _sceneGraph);
+    return newObject<Waypoint>(_game, this, _sceneGraph);
 }
 
 shared_ptr<Trigger> ObjectFactory::newTrigger() {
@@ -75,11 +75,11 @@ shared_ptr<Sound> ObjectFactory::newSound() {
 }
 
 shared_ptr<PlaceableCamera> ObjectFactory::newCamera() {
-    return newObject<PlaceableCamera>(this, _sceneGraph);
+    return newObject<PlaceableCamera>(_game, this, _sceneGraph);
 }
 
 shared_ptr<Encounter> ObjectFactory::newEncounter() {
-    return newObject<Encounter>(this, _sceneGraph);
+    return newObject<Encounter>(_game, this, _sceneGraph);
 }
 
 shared_ptr<Object> ObjectFactory::getObjectById(uint32_t id) const {

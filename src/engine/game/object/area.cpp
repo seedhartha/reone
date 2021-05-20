@@ -70,8 +70,7 @@ static constexpr float kGrassDensityFactor = 0.25f;
 static bool g_debugPath = false;
 
 Area::Area(uint32_t id, Game *game) :
-    Object(id, ObjectType::Area),
-    _game(game),
+    Object(id, ObjectType::Area, game),
     _actionExecutor(game),
     _map(game),
     _heartbeatTimer(kHeartbeatInterval) {
@@ -107,10 +106,10 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
 
 void Area::loadLYT() {
     LytReader lyt;
-    lyt.load(wrap(Resources::instance().getRaw(_name, ResourceType::Lyt)));
+    lyt.load(wrap(_game->resources().getRaw(_name, ResourceType::Lyt)));
 
     for (auto &lytRoom : lyt.rooms()) {
-        shared_ptr<Model> model(Models::instance().get(lytRoom.name));
+        shared_ptr<Model> model(_game->models().get(lytRoom.name));
         if (!model) continue;
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
@@ -123,7 +122,7 @@ void Area::loadLYT() {
             }
         }
 
-        shared_ptr<Walkmesh> walkmesh(Walkmeshes::instance().get(lytRoom.name, ResourceType::Wok));
+        shared_ptr<Walkmesh> walkmesh(_game->walkmeshes().get(lytRoom.name, ResourceType::Wok));
 
         auto room = make_unique<Room>(lytRoom.name, position, sceneNode, walkmesh);
         _rooms.insert(make_pair(room->name(), move(room)));
@@ -132,7 +131,7 @@ void Area::loadLYT() {
 
 void Area::loadVIS() {
     VisReader vis;
-    vis.load(wrap(Resources::instance().getRaw(_name, ResourceType::Vis)));
+    vis.load(wrap(_game->resources().getRaw(_name, ResourceType::Vis)));
 
     _visibility = fixVisibility(vis.visibility());
 }
@@ -147,7 +146,7 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
 }
 
 void Area::loadPTH() {
-    shared_ptr<GffStruct> pth(Resources::instance().getGFF(_name, ResourceType::Pth));
+    shared_ptr<GffStruct> pth(_game->resources().getGFF(_name, ResourceType::Pth));
     if (!pth) return;
 
     Path path;

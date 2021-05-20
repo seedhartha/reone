@@ -31,7 +31,18 @@
 #include "../audio/files.h"
 #include "../audio/player.h"
 #include "../audio/soundhandle.h"
+#include "../graphics/eventhandler.h"
+#include "../graphics/fonts.h"
+#include "../graphics/lip/lips.h"
+#include "../graphics/mesh/meshes.h"
+#include "../graphics/model/models.h"
+#include "../graphics/pbribl.h"
+#include "../graphics/shader/shaders.h"
+#include "../graphics/texture/textures.h"
+#include "../graphics/walkmesh/walkmeshes.h"
 #include "../graphics/window.h"
+#include "../resource/resources.h"
+#include "../resource/strings.h"
 #include "../scene/pipeline/world.h"
 #include "../scene/scenegraph.h"
 #include "../script/scripts.h"
@@ -40,6 +51,7 @@
 #include "console.h"
 #include "combat/combat.h"
 #include "cursors.h"
+#include "d20/classes.h"
 #include "d20/feats.h"
 #include "d20/spells.h"
 #include "footstepsounds.h"
@@ -132,11 +144,21 @@ public:
 
     audio::AudioFiles &audioFiles() { return _audioFiles; }
     audio::AudioPlayer &audioPlayer() { return _audioPlayer; }
+    Classes &classes() { return _classes; }
     Combat &combat() { return _combat; }
     Console &console() { return _console; }
     Cursors &cursors() { return _cursors; }
     Feats &feats() { return _feats; }
     FootstepSounds &footstepSounds() { return _footstepSounds; }
+    graphics::Fonts &fonts() { return _fonts; }
+    graphics::Lips &lips() { return _lips; }
+    graphics::Materials &materials() { return _materials; }
+    graphics::Meshes &meshes() { return _meshes; }
+    graphics::Models &models() { return _models; }
+    graphics::PBRIBL &pbrIbl() { return _pbrIbl; }
+    graphics::Shaders &shaders() { return _shaders; }
+    graphics::Textures &textures() { return _textures; }
+    graphics::Walkmeshes &walkmeshes() { return _walkmeshes; }
     graphics::Window &window() { return _window; }
     GUISounds &guiSounds() { return _guiSounds; }
     ObjectFactory &objectFactory() { return _objectFactory; }
@@ -144,6 +166,8 @@ public:
     Portraits &portraits() { return _portraits; }
     ProfileOverlay &profileOverlay() { return _profileOverlay; }
     Reputes &reputes() { return _reputes; }
+    resource::Resources &resources() { return _resources; }
+    resource::Strings &strings() { return _strings; }
     Routines &routines() { return _routines; }
     scene::SceneGraph &sceneGraph() { return _sceneGraph; }
     scene::WorldRenderPipeline &worldPipeline() { return _worldPipeline; }
@@ -252,10 +276,20 @@ private:
     audio::AudioFiles _audioFiles;
     audio::AudioPlayer _audioPlayer;
     Combat _combat;
+    Classes _classes;
     Console _console;
     Cursors _cursors;
     Feats _feats;
     FootstepSounds _footstepSounds;
+    graphics::Fonts _fonts;
+    graphics::Lips _lips;
+    graphics::Materials _materials;
+    graphics::Meshes _meshes;
+    graphics::Models _models;
+    graphics::PBRIBL _pbrIbl;
+    graphics::Shaders _shaders;
+    graphics::Textures _textures;
+    graphics::Walkmeshes _walkmeshes;
     graphics::Window _window;
     GUISounds _guiSounds;
     ObjectFactory _objectFactory;
@@ -263,6 +297,8 @@ private:
     Portraits _portraits;
     ProfileOverlay _profileOverlay;
     Reputes _reputes;
+    resource::Resources _resources;
+    resource::Strings _strings;
     Routines _routines;
     scene::SceneGraph _sceneGraph;
     scene::WorldRenderPipeline _worldPipeline;

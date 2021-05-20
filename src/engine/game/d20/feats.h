@@ -21,6 +21,10 @@
 
 #include <boost/noncopyable.hpp>
 
+#include "../../graphics/texture/textures.h"
+#include "../../resource/resources.h"
+#include "../../resource/strings.h"
+
 #include "../types.h"
 
 #include "feat.h"
@@ -31,13 +35,17 @@ namespace game {
 
 class Feats : boost::noncopyable {
 public:
-    Feats() = default;
+    Feats(graphics::Textures *textures, resource::Resources *resources, resource::Strings *strings);
 
     void init();
 
     std::shared_ptr<Feat> get(FeatType type) const;
 
 private:
+    graphics::Textures *_textures;
+    resource::Resources *_resources;
+    resource::Strings *_strings;
+
     std::unordered_map<FeatType, std::shared_ptr<Feat>> _feats;
 };
 

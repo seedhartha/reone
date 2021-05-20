@@ -202,8 +202,6 @@ private:
         float probabilities[4];
     };
 
-    Game *_game;
-
     ActionExecutor _actionExecutor;
     Pathfinder _pathfinder;
     std::string _localizedName;

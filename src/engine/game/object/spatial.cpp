@@ -36,10 +36,11 @@ namespace game {
 SpatialObject::SpatialObject(
     uint32_t id,
     ObjectType type,
+    Game *game,
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph
 ) :
-    Object(id, type),
+    Object(id, type, game),
     _objectFactory(objectFactory),
     _sceneGraph(sceneGraph) {
 }

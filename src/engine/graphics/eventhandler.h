@@ -17,24 +17,17 @@
 
 #pragma once
 
+#include "SDL2/SDL_events.h"
+
 namespace reone {
 
-namespace audio {
+namespace graphics {
 
-enum class AudioFormat {
-    Mono8,
-    Mono16,
-    Stereo8,
-    Stereo16
+class IEventHandler {
+public:
+    virtual bool handle(const SDL_Event &event) = 0;
 };
 
-enum class AudioType {
-    Music,
-    Voice,
-    Sound,
-    Movie
-};
-
-} // namespace audio
+} // namespace graphics
 
 } // namespace reone

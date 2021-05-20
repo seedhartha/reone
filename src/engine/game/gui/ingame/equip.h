@@ -64,6 +64,7 @@ private:
     void selectSlot(Slot slot);
 
     std::shared_ptr<graphics::Texture> getItemFrameTexture(int stackSize) const;
+    std::shared_ptr<graphics::Texture> getEmptySlotIcon(Slot slot) const;
 };
 
 } // namespace game

@@ -31,6 +31,7 @@ class PlaceableCamera : public SpatialObject, public Camera {
 public:
     PlaceableCamera(
         uint32_t id,
+        Game *game,
         ObjectFactory *objectFactory,
         scene::SceneGraph *sceneGraph);
 

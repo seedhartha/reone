@@ -20,6 +20,7 @@
 #include <string>
 
 #include "../common/cache.h"
+#include "../resource/resources.h"
 #include "../resource/types.h"
 
 #include "stream.h"
@@ -30,9 +31,11 @@ namespace audio {
 
 class AudioFiles : public MemoryCache<std::string, AudioStream> {
 public:
-    AudioFiles();
+    AudioFiles(resource::Resources *resources);
 
 private:
+    resource::Resources *_resources;
+
     std::shared_ptr<AudioStream> doGet(std::string resRef);
 };
 

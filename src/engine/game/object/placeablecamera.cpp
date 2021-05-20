@@ -30,12 +30,14 @@ namespace game {
 
 PlaceableCamera::PlaceableCamera(
     uint32_t id,
+    Game *game,
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph
 ) :
     SpatialObject(
         id,
         ObjectType::Camera,
+        game,
         objectFactory,
         sceneGraph) {
 }

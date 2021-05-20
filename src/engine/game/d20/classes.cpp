@@ -17,6 +17,8 @@
 
 #include "classes.h"
 
+#include <stdexcept>
+
 #include "../../resource/resources.h"
 
 using namespace std;
@@ -30,18 +32,23 @@ namespace game {
 
 static const char kClassesTableResRef[] = "classes";
 
-Classes &Classes::instance() {
-    static Classes classes;
-    return classes;
-}
+Classes::Classes(Resources *resources, Strings *strings) :
+    MemoryCache(bind(&Classes::doGet, this, _1)),
+    _resources(resources),
+    _strings(strings) {
 
-Classes::Classes() : MemoryCache(bind(&Classes::doGet, this, _1)) {
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
+    }
+    if (!strings) {
+        throw invalid_argument("strings must not be null");
+    }
 }
 
 shared_ptr<CreatureClass> Classes::doGet(ClassType type) {
-    shared_ptr<TwoDA> classes(Resources::instance().get2DA(kClassesTableResRef));
+    shared_ptr<TwoDA> classes(_resources->get2DA(kClassesTableResRef));
 
-    auto clazz = make_shared<CreatureClass>(type);
+    auto clazz = make_shared<CreatureClass>(type, this, _resources, _strings);
     clazz->load(*classes, static_cast<int>(type));
 
     return move(clazz);

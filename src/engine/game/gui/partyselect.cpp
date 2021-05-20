@@ -97,7 +97,7 @@ void PartySelection::prepare(const Context &ctx) {
 
         if (party.isMemberAvailable(i)) {
             string blueprintResRef(party.getAvailableMember(i));
-            shared_ptr<GffStruct> utc(Resources::instance().getGFF(blueprintResRef, ResourceType::Utc));
+            shared_ptr<GffStruct> utc(_resources->getGFF(blueprintResRef, ResourceType::Utc));
             shared_ptr<Texture> portrait;
             int portraitId = utc->getInt("PortraitId", 0);
             if (portraitId > 0) {
@@ -170,7 +170,7 @@ void PartySelection::refreshAvailableCount() {
 }
 
 void PartySelection::refreshAcceptButton() {
-    string text(Strings::instance().get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
+    string text(_strings->get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
     Button &btnAccept = getControl<Button>("BTN_ACCEPT");
     btnAccept.setTextMessage(text);
 }

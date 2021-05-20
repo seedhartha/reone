@@ -21,37 +21,15 @@
 
 #include "SDL2/SDL_timer.h"
 
-#include "../audio/files.h"
-#include "../audio/player.h"
 #include "../audio/soundhandle.h"
 #include "../common/log.h"
 #include "../common/pathutil.h"
 #include "../graphics/featureutil.h"
-#include "../graphics/fonts.h"
-#include "../graphics/lip/lips.h"
-#include "../graphics/materials.h"
-#include "../graphics/mesh/meshes.h"
 #include "../graphics/model/mdlreader.h"
-#include "../graphics/model/models.h"
-#include "../graphics/pbribl.h"
-#include "../graphics/texture/textures.h"
-#include "../graphics/walkmesh/walkmeshes.h"
-#include "../graphics/window.h"
-#include "../resource/resources.h"
-#include "../resource/strings.h"
-#include "../script/scripts.h"
 #include "../video/bikreader.h"
 #include "../video/video.h"
 
-#include "d20/feats.h"
-#include "d20/spells.h"
 #include "gameidutil.h"
-#include "gui/sounds.h"
-#include "portraits.h"
-#include "reputes.h"
-#include "script/routines.h"
-#include "soundsets.h"
-#include "surfaces.h"
 
 using namespace std;
 
@@ -77,23 +55,41 @@ static bool g_conversationsEnabled = true;
 Game::Game(const fs::path &path, const Options &opts) :
     _gameId(determineGameID(path)),
 
-    _audioPlayer(opts.audio, &_audioFiles),
     _combat(this),
     _console(this),
-    _footstepSounds(&_audioFiles),
-    _guiSounds(&_audioFiles),
     _options(opts),
     _party(this),
     _path(path),
-    _soundSets(&_audioFiles),
 
+    // Audio
+    _audioFiles(&_resources),
+    _audioPlayer(opts.audio, &_audioFiles),
+    _footstepSounds(&_audioFiles, &_resources),
+    _guiSounds(&_audioFiles, &_resources),
+    _soundSets(&_audioFiles, &_resources, &_strings),
+
+    // Graphics
     _window(opts.graphics, this),
-    _cursors(_gameId, &_window),
-    _sceneGraph(opts.graphics),
+    _textures(&_resources),
+    _materials(&_resources),
+    _models(&_textures, &_resources),
+    _lips(&_resources),
+    _sceneGraph(opts.graphics, &_shaders, &_meshes, &_textures, &_materials, &_pbrIbl),
+    _worldPipeline(opts.graphics, &_sceneGraph),
     _objectFactory(this, &_sceneGraph),
-    _profileOverlay(&_window),
-    _worldPipeline(&_sceneGraph, opts.graphics),
+    _cursors(_gameId, &_window, &_shaders, &_meshes, &_resources),
+    _fonts(&_window, &_shaders, &_meshes, &_textures),
+    _profileOverlay(&_window, &_fonts, &_shaders, &_meshes),
+    _pbrIbl(&_shaders, &_meshes),
+    _walkmeshes(&_resources),
 
+    _classes(&_resources, &_strings),
+    _portraits(&_textures, &_resources),
+    _feats(&_textures, &_resources, &_strings),
+    _reputes(&_resources),
+    _surfaces(&_resources),
+    _spells(&_textures, &_resources, &_strings),
+    _scripts(&_resources),
     _routines(this),
     _scriptRunner(this) {
 }
@@ -120,20 +116,19 @@ void Game::initSubsystems() {
     loadModuleNames();
 
     _window.init();
-    Strings::instance().init(_path);
-    Meshes::instance().init();
-    Textures::instance().init();
-    Fonts::instance().init(&_window);
-    Materials::instance().init();
-    PBRIBL::instance().init();
-    Shaders::instance().init();
+    _strings.init(_path);
+    _meshes.init();
+    _textures.init();
+    _materials.init();
+    _pbrIbl.init();
+    _shaders.init();
     _audioPlayer.init();
     _guiSounds.init();
     _routines.init();
     _reputes.init();
     _surfaces.init();
     _portraits.init();
-    Walkmeshes::instance().init(_surfaces.getWalkableSurfaceIndices());
+    _walkmeshes.init(_surfaces.getWalkableSurfaceIndices());
     _feats.init();
     _spells.init();
     _worldPipeline.init();
@@ -149,7 +144,7 @@ void Game::initResourceProviders() {
     } else {
         initResourceProvidersForKotOR();
     }
-    Resources::instance().indexDirectory(getPathIgnoreCase(fs::current_path(), kDataDirectoryName));
+    _resources.indexDirectory(getPathIgnoreCase(fs::current_path(), kDataDirectoryName));
 }
 
 void Game::loadModuleNames() {
@@ -179,7 +174,7 @@ void Game::playVideo(const string &name) {
     fs::path path(getPathIgnoreCase(_path, "movies/" + name + ".bik"));
     if (path.empty()) return;
 
-    BikReader bik(path);
+    BikReader bik(path, &_shaders, &_meshes);
     bik.load();
 
     _video = bik.video();
@@ -258,13 +253,13 @@ void Game::loadModule(const string &name, string entry) {
             loadCharacterGeneration();
         }
 
-        Models::instance().invalidateCache();
-        Walkmeshes::instance().invalidateCache();
-        Textures::instance().invalidateCache();
+        _models.invalidateCache();
+        _walkmeshes.invalidateCache();
+        _textures.invalidateCache();
         _audioFiles.invalidate();
         _scripts.invalidate();
         _soundSets.invalidate();
-        Lips::instance().invalidate();
+        _lips.invalidate();
 
         loadModuleResources(name);
 
@@ -280,7 +275,7 @@ void Game::loadModule(const string &name, string entry) {
         if (maybeModule != _loadedModules.end()) {
             _module = maybeModule->second;
         } else {
-            shared_ptr<GffStruct> ifo(Resources::instance().getGFF("module", ResourceType::Ifo));
+            shared_ptr<GffStruct> ifo(_resources.getGFF("module", ResourceType::Ifo));
 
             _module = _objectFactory.newModule();
             _module->load(name, *ifo);
@@ -315,29 +310,29 @@ void Game::withLoadingScreen(const string &imageResRef, const function<void()> &
 }
 
 void Game::loadModuleResources(const string &moduleName) {
-    Resources::instance().invalidateCache();
-    Resources::instance().clearTransientProviders();
+    _resources.invalidateCache();
+    _resources.clearTransientProviders();
 
     fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));
     fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod"));
     if (fs::exists(modPath)) {
-        Resources::instance().indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false), true);
+        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false), true);
     } else {
-        Resources::instance().indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"), true);
-        Resources::instance().indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
+        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"), true);
+        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
     }
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-    Resources::instance().indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
+    _resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
 
     if (isTSL(_gameId)) {
-        Resources::instance().indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"), true);
+        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"), true);
     }
 }
 
 void Game::drawAll() {
     // Compute derived PBR IBL textures from queued environment maps
-    PBRIBL::instance().refresh();
+    _pbrIbl.refresh();
 
     _window.clear();
 
@@ -641,7 +636,7 @@ void Game::openInGameMenu(InGameMenu::Tab tab) {
 void Game::startDialog(const shared_ptr<SpatialObject> &owner, const string &resRef) {
     if (!g_conversationsEnabled) return;
 
-    shared_ptr<GffStruct> dlg(Resources::instance().getGFF(resRef, ResourceType::Dlg));
+    shared_ptr<GffStruct> dlg(_resources.getGFF(resRef, ResourceType::Dlg));
     if (!dlg) {
         warn("Game: conversation not found: " + resRef);
         return;
@@ -652,7 +647,7 @@ void Game::startDialog(const shared_ptr<SpatialObject> &owner, const string &res
     setCursorType(CursorType::Default);
     changeScreen(GameScreen::Conversation);
 
-    auto dialog = make_shared<Dialog>(resRef);
+    auto dialog = make_shared<Dialog>(resRef, &_strings);
     dialog->load(*dlg);
 
     bool computerConversation = dialog->conversationType() == ConversationType::Computer;

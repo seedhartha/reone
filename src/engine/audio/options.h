@@ -21,18 +21,11 @@ namespace reone {
 
 namespace audio {
 
-enum class AudioFormat {
-    Mono8,
-    Mono16,
-    Stereo8,
-    Stereo16
-};
-
-enum class AudioType {
-    Music,
-    Voice,
-    Sound,
-    Movie
+struct AudioOptions {
+    int musicVolume { 85 };
+    int voiceVolume { 85 };
+    int soundVolume { 85 };
+    int movieVolume { 85 };
 };
 
 } // namespace audio

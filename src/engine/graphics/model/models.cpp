@@ -31,9 +31,13 @@ namespace reone {
 
 namespace graphics {
 
-Models &Models::instance() {
-    static Models instance;
-    return instance;
+Models::Models(Textures *textures, Resources *resources) : _textures(textures), _resources(resources) {
+    if (!textures) {
+        throw invalid_argument("textures must not be null");
+    }
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
+    }
 }
 
 void Models::invalidateCache() {
@@ -53,12 +57,12 @@ shared_ptr<Model> Models::get(const string &resRef) {
 shared_ptr<Model> Models::doGet(const string &resRef) {
     debug("Load model " + resRef);
 
-    shared_ptr<ByteArray> mdlData(Resources::instance().getRaw(resRef, ResourceType::Mdl));
-    shared_ptr<ByteArray> mdxData(Resources::instance().getRaw(resRef, ResourceType::Mdx));
+    shared_ptr<ByteArray> mdlData(_resources->getRaw(resRef, ResourceType::Mdl));
+    shared_ptr<ByteArray> mdxData(_resources->getRaw(resRef, ResourceType::Mdx));
     shared_ptr<Model> model;
 
     if (mdlData && mdxData) {
-        MdlReader mdl;
+        MdlReader mdl(this, _textures);
         mdl.load(wrap(mdlData), wrap(mdxData));
         model = mdl.model();
         if (model) {

@@ -23,6 +23,8 @@
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
+#include "mesh/meshes.h"
+#include "shader/shaders.h"
 #include "texture/texture.h"
 
 namespace reone {
@@ -43,7 +45,7 @@ class Window;
 
 class Font {
 public:
-    Font(Window *window);
+    Font(Window *window, Shaders *shaders, Meshes *meshes);
 
     void load(std::shared_ptr<Texture> texture);
 
@@ -65,6 +67,8 @@ private:
     };
 
     Window *_window;
+    Shaders *_shaders;
+    Meshes *_meshes;
 
     std::shared_ptr<Texture> _texture;
     float _height { 0.0f };

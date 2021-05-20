@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "SDL2/SDL_events.h"
-
 namespace reone {
 
 namespace graphics {
@@ -81,13 +79,6 @@ enum class TGADataType : uint8_t {
     RGBA_RLE = 10
 };
 
-struct GraphicsOptions {
-    int width { 0 };
-    int height { 0 };
-    bool fullscreen { false };
-    int shadowResolution { 0 };
-};
-
 struct TextureUnits {
     static constexpr int diffuseMap { 0 };
     static constexpr int lightmap { 1 };
@@ -99,11 +90,6 @@ struct TextureUnits {
     static constexpr int brdfLookup { 7 };
     static constexpr int shadowMap { 8 };
     static constexpr int shadowMapCube { 9 };
-};
-
-class IEventHandler {
-public:
-    virtual bool handle(const SDL_Event &event) = 0;
 };
 
 } // namespace graphics

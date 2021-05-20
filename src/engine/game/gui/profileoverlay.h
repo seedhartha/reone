@@ -24,7 +24,8 @@
 #include "SDL2/SDL_events.h"
 
 #include "../../common/timer.h"
-#include "../../graphics/font.h"
+#include "../../graphics/fonts.h"
+#include "../../graphics/shader/shaders.h"
 #include "../../graphics/types.h"
 #include "../../graphics/window.h"
 
@@ -34,7 +35,7 @@ namespace game {
 
 class ProfileOverlay {
 public:
-    ProfileOverlay(graphics::Window *window);
+    ProfileOverlay(graphics::Window *window, graphics::Fonts *fonts, graphics::Shaders *shaders, graphics::Meshes *meshes);
 
     void init();
     bool handle(const SDL_Event &event);
@@ -48,6 +49,9 @@ private:
     };
 
     graphics::Window *_window;
+    graphics::Fonts *_fonts;
+    graphics::Shaders *_shaders;
+    graphics::Meshes *_meshes;
 
     uint64_t _frequency { 0 };
     uint64_t _counter { 0 };

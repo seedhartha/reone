@@ -34,17 +34,11 @@ namespace reone {
 
 namespace game {
 
-Item::Item(uint32_t id, Game *game) :
-    Object(id, ObjectType::Item),
-    _game(game) {
-
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+Item::Item(uint32_t id, Game *game) : Object(id, ObjectType::Item, game) {
 }
 
 void Item::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> uti(Resources::instance().getGFF(resRef, ResourceType::Uti));
+    shared_ptr<GffStruct> uti(_game->resources().getGFF(resRef, ResourceType::Uti));
     if (uti) {
         loadUTI(*uti);
     }

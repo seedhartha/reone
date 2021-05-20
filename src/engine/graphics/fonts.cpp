@@ -38,19 +38,25 @@ static unordered_map<string, string> g_fontOverride = {
     { "fnt_d16x16", "fnt_d16x16b" }
 };
 
-Fonts &Fonts::instance() {
-    static Fonts instance;
-    return instance;
-}
+Fonts::Fonts(Window *window, Shaders *shaders, Meshes *meshes, Textures *textures) :
+    MemoryCache(bind(&Fonts::doGet, this, _1)),
+    _window(window),
+    _shaders(shaders),
+    _meshes(meshes),
+    _textures(textures) {
 
-Fonts::Fonts() : MemoryCache(bind(&Fonts::doGet, this, _1)) {
-}
-
-void Fonts::init(Window *window) {
     if (!window) {
         throw invalid_argument("window must not be null");
     }
-    _window = window;
+    if (!shaders) {
+        throw invalid_argument("shaders must not be null");
+    }
+    if (!meshes) {
+        throw invalid_argument("meshes must not be null");
+    }
+    if (!textures) {
+        throw invalid_argument("textures must not be null");
+    }
 }
 
 shared_ptr<Font> Fonts::doGet(string resRef) {
@@ -58,10 +64,10 @@ shared_ptr<Font> Fonts::doGet(string resRef) {
     if (maybeOverride != g_fontOverride.end()) {
         resRef = maybeOverride->second;
     }
-    shared_ptr<Texture> texture(Textures::instance().get(resRef, TextureUsage::GUI));
+    shared_ptr<Texture> texture(_textures->get(resRef, TextureUsage::GUI));
     if (!texture) return nullptr;
 
-    auto font = make_shared<Font>(_window);
+    auto font = make_shared<Font>(_window, _shaders, _meshes);
     font->load(texture);
 
     return move(font);

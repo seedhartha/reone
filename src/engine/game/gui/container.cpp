@@ -52,12 +52,12 @@ Container::Container(Game *game) : GameGUI(game) {
 void Container::load() {
     GUI::load();
 
-    string btnMessage(Strings::instance().get(kSwitchToResRef) + " " + Strings::instance().get(kGiveItemResRef));
+    string btnMessage(_strings->get(kSwitchToResRef) + " " + _strings->get(kGiveItemResRef));
 
     Control &btnGiveItems = getControl("BTN_GIVEITEMS");
     btnGiveItems.setTextMessage(btnMessage);
 
-    string lblMessage(Strings::instance().get(kInventoryResRef));
+    string lblMessage(_strings->get(kInventoryResRef));
     getControl("LBL_MESSAGE").setTextMessage(lblMessage);
 
     configureItemsListBox();
@@ -102,7 +102,7 @@ shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return Textures::instance().get(resRef, TextureUsage::GUI);
+    return _textures->get(resRef, TextureUsage::GUI);
 }
 
 void Container::onClick(const string &control) {

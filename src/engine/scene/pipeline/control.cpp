@@ -38,8 +38,13 @@ namespace reone {
 
 namespace scene {
 
-ControlRenderPipeline::ControlRenderPipeline(SceneGraph *scene, glm::ivec4 extent) :
-    _scene(scene), _extent(move(extent)) {
+ControlRenderPipeline::ControlRenderPipeline(glm::ivec4 extent, SceneGraph *sceneGraph) :
+    _extent(move(extent)),
+    _sceneGraph(sceneGraph) {
+
+    if (!sceneGraph) {
+        throw invalid_argument("sceneGraph must not be null");
+    }
 }
 
 void ControlRenderPipeline::init() {
@@ -57,7 +62,7 @@ void ControlRenderPipeline::init() {
 
     _geometry.init();
     _geometry.bind();
-    Textures::instance().bindDefaults();
+    _sceneGraph->textures().bindDefaults();
     _geometry.attachColor(*_geometryColor);
     _geometry.attachDepth(*_geometryDepth);
     _geometry.checkCompleteness();
@@ -70,14 +75,14 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     withViewport(glm::ivec4(0, 0, _extent[2], _extent[3]), [this]() {
         _geometry.bind();
 
-        ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
-        uniforms.combined.general.projection = _scene->activeCamera()->projection();
-        uniforms.combined.general.view = _scene->activeCamera()->view();
-        uniforms.combined.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
-        _scene->setUniformsPrototype(move(uniforms));
+        ShaderUniforms uniforms(_sceneGraph->shaders().defaultUniforms());
+        uniforms.combined.general.projection = _sceneGraph->activeCamera()->projection();
+        uniforms.combined.general.view = _sceneGraph->activeCamera()->view();
+        uniforms.combined.general.cameraPosition = _sceneGraph->activeCamera()->absoluteTransform()[3];
+        _sceneGraph->setUniformsPrototype(move(uniforms));
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        withDepthTest([this]() { _scene->draw(); });
+        withDepthTest([this]() { _sceneGraph->draw(); });
 
         _geometry.unbind();
     });
@@ -105,8 +110,8 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     uniforms.combined.general.projection = move(projection);
     uniforms.combined.general.model = move(transform);
 
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->draw();
+    _sceneGraph->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _sceneGraph->meshes().getQuad()->draw();
 }
 
 } // namespace scene

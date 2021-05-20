@@ -42,19 +42,31 @@ static constexpr int kFrameWidth = 125;
 static constexpr char kFontResRef[] = "fnt_console";
 static constexpr float kRefreshInterval = 1.0f; // seconds
 
-ProfileOverlay::ProfileOverlay(Window *window) :
+ProfileOverlay::ProfileOverlay(Window *window, Fonts *fonts, Shaders *shaders, Meshes *meshes) :
     _window(window),
+    _fonts(fonts),
+    _shaders(shaders),
+    _meshes(meshes),
     _refreshTimer(kRefreshInterval) {
 
     if (!window) {
         throw invalid_argument("window must not be null");
+    }
+    if (!fonts) {
+        throw invalid_argument("fonts must not be null");
+    }
+    if (!shaders) {
+        throw invalid_argument("shaders must not be null");
+    }
+    if (!meshes) {
+        throw invalid_argument("meshes must not be null");
     }
 }
 
 void ProfileOverlay::init() {
     _frequency = SDL_GetPerformanceFrequency();
     _counter = SDL_GetPerformanceCounter();
-    _font = Fonts::instance().get(kFontResRef);
+    _font = _fonts->get(kFontResRef);
 }
 
 bool ProfileOverlay::handle(const SDL_Event &event) {
@@ -117,14 +129,14 @@ void ProfileOverlay::drawBackground() {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(kFrameWidth, 2.0f * _font->height(), 1.0f));
 
-    ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
+    ShaderUniforms uniforms(_shaders->defaultUniforms());
     uniforms.combined.general.projection = _window->getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     uniforms.combined.general.alpha = 0.5f;
 
-    Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
-    Meshes::instance().getQuad()->draw();
+    _shaders->activate(ShaderProgram::SimpleColor, uniforms);
+    _meshes->getQuad()->draw();
 }
 
 void ProfileOverlay::drawText() {

@@ -63,14 +63,14 @@ SelectionOverlay::SelectionOverlay(Game *game) : _game(game) {
 }
 
 void SelectionOverlay::load() {
-    _font = Fonts::instance().get("dialogfont16x16");
-    _friendlyReticle = Textures::instance().get("friendlyreticle", TextureUsage::GUI);
-    _friendlyReticle2 = Textures::instance().get("friendlyreticle2", TextureUsage::GUI);
-    _hostileReticle = Textures::instance().get("hostilereticle", TextureUsage::GUI);
-    _hostileReticle2 = Textures::instance().get("hostilereticle2", TextureUsage::GUI);
-    _friendlyScroll = Textures::instance().get("lbl_miscroll_f", TextureUsage::GUI);
-    _hostileScroll = Textures::instance().get("lbl_miscroll_h", TextureUsage::GUI);
-    _hilightedScroll = Textures::instance().get("lbl_miscroll_hi", TextureUsage::GUI);
+    _font = _game->fonts().get("dialogfont16x16");
+    _friendlyReticle = _game->textures().get("friendlyreticle", TextureUsage::GUI);
+    _friendlyReticle2 = _game->textures().get("friendlyreticle2", TextureUsage::GUI);
+    _hostileReticle = _game->textures().get("hostilereticle", TextureUsage::GUI);
+    _hostileReticle2 = _game->textures().get("hostilereticle2", TextureUsage::GUI);
+    _friendlyScroll = _game->textures().get("lbl_miscroll_f", TextureUsage::GUI);
+    _hostileScroll = _game->textures().get("lbl_miscroll_h", TextureUsage::GUI);
+    _hilightedScroll = _game->textures().get("lbl_miscroll_hi", TextureUsage::GUI);
     _reticleHeight = _friendlyReticle2->height();
 
     addTextureByAction(ContextualAction::Unlock, "isk_security");
@@ -86,7 +86,7 @@ void SelectionOverlay::load() {
 }
 
 void SelectionOverlay::addTextureByAction(ContextualAction action, const string &resRef) {
-    _textureByAction.insert(make_pair(action, Textures::instance().get(resRef, TextureUsage::GUI)));
+    _textureByAction.insert(make_pair(action, _game->textures().get(resRef, TextureUsage::GUI)));
 }
 
 bool SelectionOverlay::handle(const SDL_Event &event) {
@@ -284,8 +284,8 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     uniforms.combined.general.projection = _game->window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->draw();
+    _game->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _game->meshes().getQuad()->draw();
 }
 
 void SelectionOverlay::drawTitleBar() {
@@ -310,8 +310,8 @@ void SelectionOverlay::drawTitleBar() {
         uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         uniforms.combined.general.alpha = 0.5f;
 
-        Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
-        Meshes::instance().getQuad()->draw();
+        _game->shaders().activate(ShaderProgram::SimpleColor, uniforms);
+        _game->meshes().getQuad()->draw();
     }
     {
         float x = opts.width * _selectedScreenCoords.x;
@@ -342,8 +342,8 @@ void SelectionOverlay::drawHealthBar() {
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
 
-    Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
-    Meshes::instance().getQuad()->draw();
+    _game->shaders().activate(ShaderProgram::SimpleColor, uniforms);
+    _game->meshes().getQuad()->draw();
 }
 
 void SelectionOverlay::drawActionBar() {
@@ -378,8 +378,8 @@ void SelectionOverlay::drawActionFrame(int index) {
     uniforms.combined.general.projection = _game->window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->draw();
+    _game->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _game->meshes().getQuad()->draw();
 }
 
 bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) const {
@@ -417,8 +417,8 @@ void SelectionOverlay::drawActionIcon(int index) {
     uniforms.combined.general.projection = _game->window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->draw();
+    _game->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _game->meshes().getQuad()->draw();
 }
 
 glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {

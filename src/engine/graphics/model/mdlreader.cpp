@@ -75,7 +75,18 @@ static Model::Classification getClassification(uint8_t ordinal) {
 
 // END Classification
 
-MdlReader::MdlReader() : BinaryReader(4, "\000\000\000\000") {
+MdlReader::MdlReader(Models *models, Textures *textures) :
+    BinaryReader(4, "\000\000\000\000"),
+    _models(models),
+    _textures(textures) {
+
+    if (!models) {
+        throw invalid_argument("models must not be null");
+    }
+    if (!textures) {
+        throw invalid_argument("textures must not be null");
+    }
+
     initControllerFn();
 }
 
@@ -136,7 +147,7 @@ void MdlReader::doLoad() {
     // Load supermodel
     shared_ptr<Model> superModel;
     if (!superModelName.empty() && superModelName != "null") {
-        superModel = Models::instance().get(superModelName);
+        superModel = _models->get(superModelName);
     }
 
     // Read animations
@@ -449,11 +460,11 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     }
     shared_ptr<Texture> diffuseMap;
     if (!texture1.empty() && texture1 != "null") {
-        diffuseMap = Textures::instance().get(texture1, TextureUsage::Diffuse);
+        diffuseMap = _textures->get(texture1, TextureUsage::Diffuse);
     }
     shared_ptr<Texture> lightmap;
     if (!texture2.empty()) {
-        lightmap = Textures::instance().get(texture2, TextureUsage::Lightmap);
+        lightmap = _textures->get(texture2, TextureUsage::Lightmap);
     }
 
     auto nodeMesh = make_unique<ModelNode::TriangleMesh>();
@@ -539,7 +550,7 @@ shared_ptr<ModelNode::Light> MdlReader::readLight() {
         for (int i = 0; i < numFlares; ++i) {
             seek(kMdlDataOffset + texNameOffsets[i]);
             string textureName(boost::to_lower_copy(readCString(12)));
-            shared_ptr<Texture> texture(Textures::instance().get(textureName));
+            shared_ptr<Texture> texture(_textures->get(textureName));
             flareTextures.push_back(move(texture));
         }
 
@@ -628,7 +639,7 @@ shared_ptr<ModelNode::Emitter> MdlReader::readEmitter() {
     emitter->updateMode = parseEmitterUpdate(update);
     emitter->renderMode = parseEmitterRender(render);
     emitter->blendMode = parseEmitterBlend(blend);
-    emitter->texture = Textures::instance().get(texture, TextureUsage::Diffuse);
+    emitter->texture = _textures->get(texture, TextureUsage::Diffuse);
     emitter->gridSize = glm::ivec2(glm::max(xGrid, 1u), glm::max(yGrid, 1u));
     emitter->renderOrder = renderOrder;
     emitter->loop = static_cast<bool>(loop);
@@ -643,7 +654,7 @@ shared_ptr<ModelNode::Reference> MdlReader::readReference() {
     uint32_t reattachable = readUint32();
 
     auto reference = make_shared<ModelNode::Reference>();
-    reference->model = Models::instance().get(modelResRef);
+    reference->model = _models->get(modelResRef);
     reference->reattachable = static_cast<bool>(reattachable);
 
     return move(reference);

@@ -27,11 +27,6 @@ namespace reone {
 
 namespace resource {
 
-Strings &Strings::instance() {
-    static Strings instance;
-    return instance;
-}
-
 void Strings::init(const fs::path &gameDir) {
     fs::path tlkPath(getPathIgnoreCase(gameDir, "dialog.tlk"));
     _tlk.load(tlkPath);

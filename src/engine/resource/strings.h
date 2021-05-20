@@ -31,7 +31,7 @@ namespace resource {
 
 class Strings {
 public:
-    static Strings &instance();
+    Strings() = default;
 
     void init(const boost::filesystem::path &gameDir);
 

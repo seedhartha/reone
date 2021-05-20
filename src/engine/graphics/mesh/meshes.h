@@ -32,8 +32,7 @@ namespace graphics {
  */
 class Meshes : boost::noncopyable {
 public:
-    static Meshes &instance();
-
+    Meshes() = default;
     ~Meshes();
 
     void init();

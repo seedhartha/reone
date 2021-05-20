@@ -59,8 +59,6 @@ public:
     void setAudible(bool audible);
 
 private:
-    Game *_game;
-
     bool _active { false };
     int _priority { 0 };
     int _soundIdx { -1 };

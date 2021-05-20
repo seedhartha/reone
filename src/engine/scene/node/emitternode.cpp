@@ -281,18 +281,18 @@ void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &
         uniforms.particles->particles[i].frame = particle->frame;
     }
 
-    Shaders::instance().activate(ShaderProgram::ParticleParticle, uniforms);
+    _sceneGraph->shaders().activate(ShaderProgram::ParticleParticle, uniforms);
 
     setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
 
     bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
     if (lighten) {
-        withLightenBlending([&count]() {
-            Meshes::instance().getBillboard()->drawInstanced(count);
+        withLightenBlending([&]() {
+            _sceneGraph->meshes().getBillboard()->drawInstanced(count);
         });
     } else {
-        Meshes::instance().getBillboard()->drawInstanced(count);
+        _sceneGraph->meshes().getBillboard()->drawInstanced(count);
     }
 }
 

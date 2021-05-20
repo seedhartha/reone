@@ -30,9 +30,10 @@ namespace reone {
 
 namespace graphics {
 
-Walkmeshes &Walkmeshes::instance() {
-    static Walkmeshes instance;
-    return instance;
+Walkmeshes::Walkmeshes(Resources *resources) : _resources(resources) {
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
+    }
 }
 
 void Walkmeshes::init(set<uint32_t> walkableSurfaces) {
@@ -54,7 +55,7 @@ shared_ptr<Walkmesh> Walkmeshes::get(const string &resRef, ResourceType type) {
 }
 
 shared_ptr<Walkmesh> Walkmeshes::doGet(const string &resRef, ResourceType type) {
-    shared_ptr<ByteArray> data(Resources::instance().getRaw(resRef, type));
+    shared_ptr<ByteArray> data(_resources->getRaw(resRef, type));
     shared_ptr<Walkmesh> walkmesh;
 
     if (data) {

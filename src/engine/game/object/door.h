@@ -29,6 +29,7 @@ class Door : public SpatialObject {
 public:
     Door(
         uint32_t id,
+        Game *game,
         ObjectFactory *objectFactory,
         scene::SceneGraph *sceneGraph);
 

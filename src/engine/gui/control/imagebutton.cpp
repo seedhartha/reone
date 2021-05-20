@@ -40,7 +40,7 @@ ImageButton::ImageButton(GUI *gui) : Control(gui, ControlType::ImageButton) {
 
 void ImageButton::load(const GffStruct &gffs) {
     Control::load(gffs);
-    _iconFont = Fonts::instance().get(kIconFontResRef);
+    _iconFont = _gui->fonts().get(kIconFontResRef);
 }
 
 void ImageButton::draw(
@@ -98,8 +98,8 @@ void ImageButton::drawIcon(
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-        Meshes::instance().getQuad()->draw();
+        _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+        _gui->meshes().getQuad()->draw();
     }
 
     if (iconTexture) {
@@ -115,8 +115,8 @@ void ImageButton::drawIcon(
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(1.0f);
 
-        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-        Meshes::instance().getQuad()->draw();
+        _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+        _gui->meshes().getQuad()->draw();
     }
 
     if (!iconText.empty()) {

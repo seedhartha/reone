@@ -34,14 +34,26 @@ namespace reone {
 
 namespace game {
 
+Spells::Spells(Textures *textures, Resources *resources, Strings *strings) : _textures(textures), _resources(resources), _strings(strings) {
+    if (!textures) {
+        throw invalid_argument("textures must not be null");
+    }
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
+    }
+    if (!strings) {
+        throw invalid_argument("strings must not be null");
+    }
+}
+
 void Spells::init() {
-    shared_ptr<TwoDA> spells(Resources::instance().get2DA("spells"));
+    shared_ptr<TwoDA> spells(_resources->get2DA("spells"));
     if (!spells) return;
 
     for (int row = 0; row < spells->getRowCount(); ++row) {
-        string name(Strings::instance().get(spells->getInt(row, "name", -1)));
-        string description(Strings::instance().get(spells->getInt(row, "spelldesc", -1)));
-        shared_ptr<Texture> icon(Textures::instance().get(spells->getString(row, "iconresref"), TextureUsage::GUI));
+        string name(_strings->get(spells->getInt(row, "name", -1)));
+        string description(_strings->get(spells->getInt(row, "spelldesc", -1)));
+        shared_ptr<Texture> icon(_textures->get(spells->getString(row, "iconresref"), TextureUsage::GUI));
         uint32_t pips = spells->getUint(row, "pips");
 
         auto spell = make_shared<Spell>();

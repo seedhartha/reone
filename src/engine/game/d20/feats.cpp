@@ -17,13 +17,10 @@
 
 #include "feats.h"
 
-#include <functional>
+#include <stdexcept>
 #include <string>
 
 #include "../../common/collectionutil.h"
-#include "../../graphics/texture/textures.h"
-#include "../../resource/resources.h"
-#include "../../resource/strings.h"
 
 using namespace std;
 
@@ -34,14 +31,30 @@ namespace reone {
 
 namespace game {
 
+Feats::Feats(Textures *textures, Resources *resources, Strings *strings) :
+    _textures(textures),
+    _resources(resources),
+    _strings(strings) {
+
+    if (!textures) {
+        throw invalid_argument("textures must not be null");
+    }
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
+    }
+    if (!strings) {
+        throw invalid_argument("strings must not be null");
+    }
+}
+
 void Feats::init() {
-    shared_ptr<TwoDA> feats(Resources::instance().get2DA("feat"));
+    shared_ptr<TwoDA> feats(_resources->get2DA("feat"));
     if (!feats) return;
 
     for (int row = 0; row < feats->getRowCount(); ++row) {
-        string name(Strings::instance().get(feats->getInt(row, "name", -1)));
-        string description(Strings::instance().get(feats->getInt(row, "description", -1)));
-        shared_ptr<Texture> icon(Textures::instance().get(feats->getString(row, "icon"), TextureUsage::GUI));
+        string name(_strings->get(feats->getInt(row, "name", -1)));
+        string description(_strings->get(feats->getInt(row, "description", -1)));
+        shared_ptr<Texture> icon(_textures->get(feats->getString(row, "icon"), TextureUsage::GUI));
         uint32_t minCharLevel = feats->getUint(row, "mincharlevel");
         auto preReqFeat1 = static_cast<FeatType>(feats->getUint(row, "prereqfeat1"));
         auto preReqFeat2 = static_cast<FeatType>(feats->getUint(row, "prereqfeat2"));

@@ -21,6 +21,8 @@
 
 #include "../../resource/resources.h"
 
+#include "../game.h"
+
 using namespace std;
 
 using namespace reone::resource;
@@ -32,10 +34,11 @@ namespace game {
 
 Encounter::Encounter(
     uint32_t id,
+    Game *game,
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph
 ) :
-    SpatialObject(id, ObjectType::Encounter, objectFactory, sceneGraph) {
+    SpatialObject(id, ObjectType::Encounter, game, objectFactory, sceneGraph) {
 }
 
 void Encounter::loadFromGIT(const GffStruct &gffs) {
@@ -47,7 +50,7 @@ void Encounter::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Encounter::loadFromBlueprint(const string &blueprintResRef) {
-    shared_ptr<GffStruct> ute(Resources::instance().getGFF(blueprintResRef, ResourceType::Ute));
+    shared_ptr<GffStruct> ute(_game->resources().getGFF(blueprintResRef, ResourceType::Ute));
     if (ute) {
         loadUTE(*ute);
     }

@@ -26,8 +26,14 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec2.hpp"
 
+#include "../graphics/fonts.h"
+#include "../graphics/mesh/meshes.h"
+#include "../graphics/shader/shaders.h"
+#include "../graphics/texture/textures.h"
 #include "../graphics/window.h"
 #include "../resource/format/gffreader.h"
+#include "../resource/resources.h"
+#include "../resource/strings.h"
 #include "../resource/types.h"
 
 #include "control/control.h"
@@ -56,8 +62,6 @@ public:
     void resetFocus();
     void showControl(const std::string &tag);
 
-    graphics::Window &window() { return *_window; }
-
     void setControlDisabled(const std::string &tag, bool disabled);
     void setControlFocus(const std::string &tag, bool focus);
     void setControlFocusable(const std::string &tag, bool focusable);
@@ -68,6 +72,18 @@ public:
     virtual void onClick(const std::string &control);
     virtual void onListBoxItemClick(const std::string &control, const std::string &item);
 
+    // Services
+
+    graphics::Window &window() { return *_window; }
+    graphics::Fonts &fonts() { return *_fonts; }
+    graphics::Shaders &shaders() { return *_shaders; }
+    graphics::Meshes &meshes() { return *_meshes; }
+    graphics::Textures &textures() { return *_textures; }
+    resource::Resources &resources() { return *_resources; }
+    resource::Strings &strings() { return *_strings; }
+
+    // END Services
+
 protected:
     enum class ScalingMode {
         Center,
@@ -76,7 +92,6 @@ protected:
     };
 
     graphics::GraphicsOptions _gfxOpts;
-    graphics::Window *_window;
 
     std::string _resRef;
     int _resolutionX { kDefaultResolutionX };
@@ -95,7 +110,15 @@ protected:
     glm::vec3 _defaultHilightColor { 0.0f };
     std::unordered_map<std::string, ScalingMode> _scalingByControlTag;
 
-    GUI(graphics::GraphicsOptions gfxOpts, graphics::Window *window);
+    GUI(
+        graphics::GraphicsOptions gfxOpts,
+        graphics::Window *window,
+        graphics::Fonts *fonts,
+        graphics::Shaders *shaders,
+        graphics::Meshes *meshes,
+        graphics::Textures *textures,
+        resource::Resources *resources,
+        resource::Strings *strings);
 
     void loadControl(const resource::GffStruct &gffs);
     virtual void onFocusChanged(const std::string &control, bool focus);
@@ -108,6 +131,18 @@ protected:
         Control &ctrl = getControl(tag);
         return static_cast<T &>(ctrl);
     }
+
+    // Services
+
+    graphics::Window *_window;
+    graphics::Fonts *_fonts;
+    graphics::Shaders *_shaders;
+    graphics::Meshes *_meshes;
+    graphics::Textures *_textures;
+    resource::Resources *_resources;
+    resource::Strings *_strings;
+
+    // END Services
 
     // User input
 

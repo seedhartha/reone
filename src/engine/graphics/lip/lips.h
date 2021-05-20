@@ -20,6 +20,7 @@
 #include <string>
 
 #include "../../common/cache.h"
+#include "../../resource/resources.h"
 
 #include "animation.h"
 
@@ -29,10 +30,10 @@ namespace graphics {
 
 class Lips : public MemoryCache<std::string, LipAnimation> {
 public:
-    static Lips &instance();
+    Lips(resource::Resources *resources);
 
 private:
-    Lips();
+    resource::Resources *_resources;
 
     std::shared_ptr<LipAnimation> doGet(std::string resRef);
 };

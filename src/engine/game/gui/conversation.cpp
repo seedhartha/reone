@@ -76,7 +76,7 @@ void Conversation::loadConversationBackground() {
 
 void Conversation::loadCameraModel() {
     string modelResRef(_dialog->cameraModel());
-    _cameraModel = modelResRef.empty() ? nullptr : Models::instance().get(modelResRef);
+    _cameraModel = modelResRef.empty() ? nullptr : _game->models().get(modelResRef);
 }
 
 void Conversation::onStart() {
@@ -169,7 +169,7 @@ void Conversation::loadVoiceOver() {
     }
     if (!voiceResRef.empty()) {
         _currentVoice = _game->audioPlayer().play(voiceResRef, AudioType::Voice);
-        _lipAnimation = Lips::instance().get(voiceResRef);
+        _lipAnimation = _game->lips().get(voiceResRef);
     }
 }
 

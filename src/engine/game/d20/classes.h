@@ -18,6 +18,8 @@
 #pragma once
 
 #include "../../common/cache.h"
+#include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 #include "../types.h"
 
@@ -29,10 +31,11 @@ namespace game {
 
 class Classes : public MemoryCache<ClassType, CreatureClass> {
 public:
-    static Classes &instance();
+    Classes(resource::Resources *resources, resource::Strings *strings);
 
 private:
-    Classes();
+    resource::Resources *_resources;
+    resource::Strings *_strings;
 
     std::shared_ptr<CreatureClass> doGet(ClassType type);
 };

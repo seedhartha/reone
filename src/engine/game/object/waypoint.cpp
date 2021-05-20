@@ -24,6 +24,8 @@
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
+#include "../game.h"
+
 using namespace std;
 
 using namespace reone::graphics;
@@ -36,12 +38,14 @@ namespace game {
 
 Waypoint::Waypoint(
     uint32_t id,
+    Game *game,
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph
 ) :
     SpatialObject(
         id,
         ObjectType::Waypoint,
+        game,
         objectFactory,
         sceneGraph) {
 }
@@ -52,7 +56,7 @@ void Waypoint::loadFromGIT(const GffStruct &gffs) {
 
     _tag = gffs.getString("Tag");
     _hasMapNote = gffs.getBool("HasMapNote");
-    _mapNote = Strings::instance().get(gffs.getInt("MapNote"));
+    _mapNote = _game->strings().get(gffs.getInt("MapNote"));
     _mapNoteEnabled = gffs.getBool("MapNoteEnabled");
     _tag = boost::to_lower_copy(gffs.getString("Tag"));
 
@@ -60,7 +64,7 @@ void Waypoint::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Waypoint::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utw(Resources::instance().getGFF(resRef, ResourceType::Utw));
+    shared_ptr<GffStruct> utw(_game->resources().getGFF(resRef, ResourceType::Utw));
     if (utw) {
         loadUTW(*utw);
     }

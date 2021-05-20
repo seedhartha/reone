@@ -204,11 +204,6 @@ static const VertexAttributes g_aabbAttributes = { 3 * sizeof(float), 0 };
 
 // END AABB
 
-Meshes &Meshes::instance() {
-    static Meshes instance;
-    return instance;
-}
-
 static unique_ptr<Mesh> getMesh(
     const vector<float> &vertices,
     const vector<uint16_t> &indices,

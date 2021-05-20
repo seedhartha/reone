@@ -34,6 +34,8 @@ namespace reone {
 
 namespace game {
 
+class Game;
+
 class Object : public boost::noncopyable {
 public:
     virtual ~Object() = default;
@@ -110,6 +112,8 @@ protected:
         Timer timer;
     };
 
+    Game *_game;
+
     uint32_t _id { 0 };
     std::string _tag;
     ObjectType _type { ObjectType::Invalid };
@@ -148,7 +152,7 @@ protected:
 
     // END Scripts
 
-    Object(uint32_t id, ObjectType type);
+    Object(uint32_t id, ObjectType type, Game *game);
 
     // Actions
 

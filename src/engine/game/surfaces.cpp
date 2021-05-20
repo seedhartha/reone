@@ -31,8 +31,14 @@ namespace reone {
 
 namespace game {
 
+Surfaces::Surfaces(Resources *resources) : _resources(resources) {
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
+    }
+}
+
 void Surfaces::init() {
-    shared_ptr<TwoDA> surfacemat(Resources::instance().get2DA("surfacemat"));
+    shared_ptr<TwoDA> surfacemat(_resources->get2DA("surfacemat"));
     for (int row = 0; row < surfacemat->getRowCount(); ++row) {
         Surface surface;
         surface.label = surfacemat->getString(row, "label");

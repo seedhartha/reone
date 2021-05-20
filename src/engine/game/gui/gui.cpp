@@ -40,7 +40,16 @@ namespace reone {
 namespace game {
 
 GameGUI::GameGUI(Game *game) :
-    GUI(game->options().graphics, &game->window()),
+    GUI(
+        game->options().graphics,
+        &game->window(),
+        &game->fonts(),
+        &game->shaders(),
+        &game->meshes(),
+        &game->textures(),
+        &game->resources(),
+        &game->strings()
+    ),
     _game(game) {
 }
 
@@ -108,7 +117,7 @@ void GameGUI::loadBackground(BackgroundType type) {
         }
     }
 
-    _background = Textures::instance().get(resRef, TextureUsage::Diffuse);
+    _background = _textures->get(resRef, TextureUsage::Diffuse);
 }
 
 } // namespace game

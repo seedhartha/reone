@@ -29,6 +29,7 @@ class Encounter : public SpatialObject {
 public:
     Encounter(
         uint32_t id,
+        Game *game,
         ObjectFactory *objectFactory,
         scene::SceneGraph *sceneGraph);
 

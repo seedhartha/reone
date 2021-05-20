@@ -27,6 +27,7 @@
 #include "glm/ext.hpp"
 
 #include "cursor.h"
+#include "eventhandler.h"
 
 using namespace std;
 

@@ -19,8 +19,8 @@
 
 #include <string>
 
-#include "../audio/types.h"
-#include "../graphics/types.h"
+#include "../audio/options.h"
+#include "../graphics/options.h"
 
 namespace reone {
 

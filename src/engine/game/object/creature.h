@@ -42,8 +42,6 @@ namespace game {
 
 constexpr float kDefaultAttackRange = 2.0f;
 
-class Game;
-
 class Creature : public SpatialObject, public scene::IAnimationEventListener {
 public:
     enum class ModelType {
@@ -226,8 +224,6 @@ public:
     // END IAnimationEventListener
 
 private:
-    Game *_game;
-
     Gender _gender { Gender::Male };
     int _appearance { 0 };
     ModelType _modelType { ModelType::Creature };

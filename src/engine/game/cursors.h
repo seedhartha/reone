@@ -36,7 +36,7 @@ namespace game {
 
 class Cursors : boost::noncopyable {
 public:
-    Cursors(GameID gameId, graphics::Window *window);
+    Cursors(GameID gameId, graphics::Window *window, graphics::Shaders *shaders, graphics::Meshes *meshes, resource::Resources *resources);
     ~Cursors();
 
     void deinit();
@@ -46,6 +46,9 @@ public:
 private:
     GameID _gameId;
     graphics::Window *_window;
+    graphics::Shaders *_shaders;
+    graphics::Meshes *_meshes;
+    resource::Resources *_resources;
 
     std::unordered_map<CursorType, std::shared_ptr<graphics::Cursor>> _cache;
 

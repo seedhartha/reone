@@ -70,18 +70,18 @@ void Map::loadProperties(const GffStruct &gffs) {
 
 void Map::loadTextures(const string &area) {
     string resRef("lbl_map" + area);
-    _areaTexture = Textures::instance().get(resRef, TextureUsage::GUI);
+    _areaTexture = _game->textures().get(resRef, TextureUsage::GUI);
 
     if (!_arrowTexture) {
         string resRef("mm_barrow");
         if (isTSL(_game->gameId())) {
             resRef += "_p";
         }
-        _arrowTexture = Textures::instance().get(resRef, TextureUsage::GUI);
+        _arrowTexture = _game->textures().get(resRef, TextureUsage::GUI);
     }
 
     if (!_noteTexture) {
-        _noteTexture = Textures::instance().get("whitetarget", TextureUsage::GUI);
+        _noteTexture = _game->textures().get("whitetarget", TextureUsage::GUI);
     }
 }
 
@@ -116,11 +116,11 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         ShaderUniforms uniforms;
         uniforms.combined.general.projection = _game->window().getOrthoProjection();
         uniforms.combined.general.model = transform;
-        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+        _game->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
 
         int height = _game->options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
-        withScissorTest(scissorBounds, []() { Meshes::instance().getQuad()->draw(); });
+        withScissorTest(scissorBounds, [&]() { _game->meshes().getQuad()->draw(); });
 
     } else {
         setActiveTextureUnit(TextureUnits::diffuseMap);
@@ -134,8 +134,8 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         uniforms.combined.general.projection = _game->window().getOrthoProjection();
         uniforms.combined.general.model = move(transform);
 
-        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-        Meshes::instance().getQuad()->draw();
+        _game->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+        _game->meshes().getQuad()->draw();
     }
 }
 
@@ -169,8 +169,8 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         uniforms.combined.general.model = transform;
         uniforms.combined.general.color = glm::vec4(selected ? getHilightColor(_game->gameId()) : getBaseColor(_game->gameId()), 1.0f);
 
-        Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-        Meshes::instance().getQuad()->draw();
+        _game->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+        _game->meshes().getQuad()->draw();
     }
 }
 
@@ -250,8 +250,8 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     uniforms.combined.general.projection = _game->window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->draw();
+    _game->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _game->meshes().getQuad()->draw();
 }
 
 void Map::setSelectedNote(const shared_ptr<Waypoint> &waypoint) {

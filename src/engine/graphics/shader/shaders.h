@@ -209,7 +209,8 @@ struct ShaderUniforms {
 
 class Shaders : boost::noncopyable {
 public:
-    static Shaders &instance();
+    Shaders() = default;
+    ~Shaders();
 
     void init();
     void deinit();
@@ -267,8 +268,6 @@ private:
     uint32_t _uboDanglymesh { 0 };
 
     // END UBO
-
-    ~Shaders();
 
     void initShader(ShaderName name, unsigned int type, std::vector<const char *> sources);
     void initProgram(ShaderProgram program, std::vector<ShaderName> shaders);

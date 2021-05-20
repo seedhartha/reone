@@ -32,15 +32,23 @@ namespace reone {
 
 namespace game {
 
-FootstepSounds::FootstepSounds(AudioFiles *audioFiles) :
+FootstepSounds::FootstepSounds(AudioFiles *audioFiles, Resources *resources) :
     MemoryCache(bind(&FootstepSounds::doGet, this, _1)),
-    _audioFiles(audioFiles) {
+    _audioFiles(audioFiles),
+    _resources(resources) {
+
+    if (!audioFiles) {
+        throw invalid_argument("auidoFiles must not be null");
+    }
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
+    }
 }
 
 shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
     shared_ptr<FootstepTypeSounds> result;
 
-    shared_ptr<TwoDA> twoDa(Resources::instance().get2DA("footstepsounds"));
+    shared_ptr<TwoDA> twoDa(_resources->get2DA("footstepsounds"));
     if (twoDa) {
         result = make_shared<FootstepTypeSounds>();
         map<string, vector<shared_ptr<AudioStream>> &> dict {

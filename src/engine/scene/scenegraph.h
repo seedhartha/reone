@@ -26,8 +26,12 @@
 
 #include "glm/vec3.hpp"
 
+#include "../graphics/materials.h"
+#include "../graphics/mesh/meshes.h"
+#include "../graphics/options.h"
+#include "../graphics/pbribl.h"
 #include "../graphics/shader/shaders.h"
-#include "../graphics/types.h"
+#include "../graphics/texture/textures.h"
 
 #include "node/cameranode.h"
 #include "node/emitternode.h"
@@ -46,7 +50,13 @@ namespace scene {
  */
 class SceneGraph : boost::noncopyable {
 public:
-    SceneGraph(const graphics::GraphicsOptions &opts);
+    SceneGraph(
+        graphics::GraphicsOptions opts,
+        graphics::Shaders *shaders,
+        graphics::Meshes *meshes,
+        graphics::Textures *textures,
+        graphics::Materials *materials,
+        graphics::PBRIBL *pbrIbl);
 
     /**
      * Recursively update the state of this scene graph. Called prior to rendering a frame.
@@ -63,6 +73,16 @@ public:
     void setUpdateRoots(bool update) { _updateRoots = update; }
     void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
     void setUniformsPrototype(graphics::ShaderUniforms &&uniforms) { _uniformsPrototype = uniforms; }
+
+    // Services
+
+    graphics::Shaders &shaders() { return *_shaders; }
+    graphics::Meshes &meshes() { return *_meshes; }
+    graphics::Textures &textures() { return *_textures; }
+    graphics::Materials &materials() { return *_materials; }
+    graphics::PBRIBL &pbrIbl() { return *_pbrIbl; }
+
+    // END Services
 
     // Roots
 
@@ -126,6 +146,16 @@ private:
     uint32_t _textureId { 0 };
     bool _updateRoots { true };
     graphics::ShaderUniforms _uniformsPrototype;
+
+    // Services
+
+    graphics::Shaders *_shaders;
+    graphics::Meshes *_meshes;
+    graphics::Textures *_textures;
+    graphics::Materials *_materials;
+    graphics::PBRIBL *_pbrIbl;
+
+    // END Services
 
     // Lighting and shadows
 

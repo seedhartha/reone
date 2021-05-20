@@ -23,24 +23,23 @@
 #include "../resource/types.h"
 
 #include "font.h"
+#include "texture/textures.h"
 #include "types.h"
+#include "window.h"
 
 namespace reone {
 
 namespace graphics {
 
-class Window;
-
 class Fonts : public MemoryCache<std::string, Font> {
 public:
-    static Fonts &instance();
-
-    void init(Window *window);
+    Fonts(Window *window, Shaders *shaders, Meshes *meshes, Textures *textures);
 
 private:
-    Window *_window { nullptr };
-
-    Fonts();
+    Window *_window;
+    Shaders *_shaders;
+    Meshes *_meshes;
+    Textures *_textures;
 
     std::shared_ptr<Font> doGet(std::string resRef);
 };

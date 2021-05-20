@@ -40,11 +40,6 @@ namespace reone {
 
 namespace resource {
 
-Resources &Resources::instance() {
-    static Resources instance;
-    return instance;
-}
-
 void Resources::indexKeyFile(const fs::path &path) {
     if (!fs::exists(path)) return;
 

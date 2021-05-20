@@ -150,13 +150,13 @@ void Control::loadBorder(const GffStruct &gffs) {
     _border = make_shared<Border>();
 
     if (!corner.empty() && corner != "0") {
-        _border->corner = Textures::instance().get(corner, TextureUsage::GUI);
+        _border->corner = _gui->textures().get(corner, TextureUsage::GUI);
     }
     if (!edge.empty() && edge != "0") {
-        _border->edge = Textures::instance().get(edge, TextureUsage::GUI);
+        _border->edge = _gui->textures().get(edge, TextureUsage::GUI);
     }
     if (!fill.empty() && fill != "0") {
-        _border->fill = Textures::instance().get(fill, TextureUsage::GUI);
+        _border->fill = _gui->textures().get(fill, TextureUsage::GUI);
     }
 
     _border->dimension = gffs.getInt("DIMENSION", 0);
@@ -164,10 +164,10 @@ void Control::loadBorder(const GffStruct &gffs) {
 }
 
 void Control::loadText(const GffStruct &gffs) {
-    _text.font = Fonts::instance().get(gffs.getString("FONT"));
+    _text.font = _gui->fonts().get(gffs.getString("FONT"));
 
     int strRef = gffs.getInt("STRREF");
-    _text.text = strRef == -1 ? gffs.getString("TEXT") : Strings::instance().get(strRef);
+    _text.text = strRef == -1 ? gffs.getString("TEXT") : _gui->strings().get(strRef);
 
     _text.color = gffs.getVector("COLOR");
     _text.align = static_cast<TextAlign>(gffs.getInt("ALIGNMENT", static_cast<int>(TextAlign::CenterCenter)));
@@ -190,13 +190,13 @@ void Control::loadHilight(const GffStruct &gffs) {
     _hilight = make_shared<Border>();
 
     if (!corner.empty() && corner != "0") {
-        _hilight->corner = Textures::instance().get(corner, TextureUsage::GUI);
+        _hilight->corner = _gui->textures().get(corner, TextureUsage::GUI);
     }
     if (!edge.empty() && edge != "0") {
-        _hilight->edge = Textures::instance().get(edge, TextureUsage::GUI);
+        _hilight->edge = _gui->textures().get(edge, TextureUsage::GUI);
     }
     if (!fill.empty() && fill != "0") {
-        _hilight->fill = Textures::instance().get(fill, TextureUsage::GUI);
+        _hilight->fill = _gui->textures().get(fill, TextureUsage::GUI);
     }
 
     _hilight->dimension = gffs.getInt("DIMENSION", 0);
@@ -261,7 +261,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.combined.general.projection = _gui->window().getOrthoProjection();
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.discardColor = glm::vec4(_discardColor, 1.0f);
-            Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+            _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
         }
 
         setActiveTextureUnit(TextureUnits::diffuseMap);
@@ -269,11 +269,11 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
 
         bool additive = border.fill->isAdditive();
         if (additive) {
-            withAdditiveBlending([]() {
-                Meshes::instance().getQuad()->draw();
+            withAdditiveBlending([&]() {
+                _gui->meshes().getQuad()->draw();
             });
         } else {
-            Meshes::instance().getQuad()->draw();
+            _gui->meshes().getQuad()->draw();
         }
     }
     if (border.edge) {
@@ -298,8 +298,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.combined.general.model = move(transform);
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-                Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-                Meshes::instance().getQuadSwapFlipX()->draw();
+                _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+                _gui->meshes().getQuadSwapFlipX()->draw();
             }
 
             // Right edge
@@ -313,8 +313,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.combined.general.model = move(transform);
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-                Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-                Meshes::instance().getQuadSwap()->draw();
+                _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+                _gui->meshes().getQuadSwap()->draw();
             }
         }
 
@@ -333,8 +333,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.combined.general.model = move(transform);
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-                Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-                Meshes::instance().getQuad()->draw();
+                _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+                _gui->meshes().getQuad()->draw();
             }
 
             // Bottom edge
@@ -348,8 +348,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.combined.general.model = move(transform);
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-                Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-                Meshes::instance().getQuadFlipY()->draw();
+                _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+                _gui->meshes().getQuadFlipY()->draw();
             }
         }
     }
@@ -371,8 +371,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-            Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-            Meshes::instance().getQuad()->draw();
+            _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+            _gui->meshes().getQuad()->draw();
         }
 
         // Bottom left corner
@@ -386,8 +386,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-            Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-            Meshes::instance().getQuadFlipY()->draw();
+            _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+            _gui->meshes().getQuadFlipY()->draw();
         }
 
         // Top right corner
@@ -401,8 +401,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-            Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-            Meshes::instance().getQuadFlipX()->draw();
+            _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+            _gui->meshes().getQuadFlipX()->draw();
         }
 
         // Bottom right corner
@@ -416,8 +416,8 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-            Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-            Meshes::instance().getQuadFlipXY()->draw();
+            _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+            _gui->meshes().getQuadFlipXY()->draw();
         }
     }
 }
@@ -572,7 +572,7 @@ void Control::setBorder(const Border &border) {
 void Control::setBorderFill(const string &resRef) {
     shared_ptr<Texture> texture;
     if (!resRef.empty()) {
-        texture = Textures::instance().get(resRef, TextureUsage::GUI);
+        texture = _gui->textures().get(resRef, TextureUsage::GUI);
     }
     setBorderFill(texture);
 }
@@ -616,7 +616,7 @@ void Control::setHilightColor(const glm::vec3 &color) {
 void Control::setHilightFill(const string &resRef) {
     shared_ptr<Texture> texture;
     if (!resRef.empty()) {
-        texture = Textures::instance().get(resRef, TextureUsage::GUI);
+        texture = _gui->textures().get(resRef, TextureUsage::GUI);
     }
     setHilightFill(texture);
 }
@@ -658,7 +658,7 @@ void Control::setScene(unique_ptr<SceneGraph> scene) {
 
     if (_scene) {
         glm::ivec4 extent(_extent.left, _extent.top, _extent.width, _extent.height);
-        _pipeline = make_unique<ControlRenderPipeline>(_scene.get(), extent);
+        _pipeline = make_unique<ControlRenderPipeline>(extent, _scene.get());
         _pipeline->init();
     }
 }

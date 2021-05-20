@@ -22,6 +22,8 @@
 #include <vector>
 
 #include "../../resource/format/2dareader.h"
+#include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 #include "../types.h"
 
@@ -32,9 +34,11 @@ namespace reone {
 
 namespace game {
 
+class Classes;
+
 class CreatureClass {
 public:
-    CreatureClass(ClassType type);
+    CreatureClass(ClassType type, Classes *classes, resource::Resources *resources, resource::Strings *strings);
 
     void load(const resource::TwoDA &twoDa, int row);
 
@@ -50,6 +54,7 @@ public:
      */
     int getAttackBonus(int level) const;
 
+    ClassType type() const { return _type; }
     const std::string &name() const { return _name; }
     const std::string &description() const { return _description; }
     int hitdie() const { return _hitdie; }
@@ -57,6 +62,10 @@ public:
     int skillPointBase() const { return _skillPointBase; }
 
 private:
+    Classes *_classes;
+    resource::Resources *_resources;
+    resource::Strings *_strings;
+
     ClassType _type;
     std::string _name;
     std::string _description;

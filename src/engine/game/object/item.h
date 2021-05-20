@@ -84,8 +84,6 @@ public:
     void setEquipped(bool equipped);
 
 private:
-    Game *_game;
-
     std::string _localizedName;
     std::string _baseBodyVariation;
     int _bodyVariation { 0 };

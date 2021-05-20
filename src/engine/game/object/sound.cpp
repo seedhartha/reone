@@ -43,12 +43,7 @@ Sound::Sound(
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph
 ) :
-    SpatialObject(id, ObjectType::Sound, objectFactory, sceneGraph),
-    _game(game) {
-
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+    SpatialObject(id, ObjectType::Sound, game, objectFactory, sceneGraph) {
 }
 
 void Sound::loadFromGIT(const GffStruct &gffs) {
@@ -59,7 +54,7 @@ void Sound::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Sound::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> uts(Resources::instance().getGFF(resRef, ResourceType::Uts));
+    shared_ptr<GffStruct> uts(_game->resources().getGFF(resRef, ResourceType::Uts));
     if (uts) {
         loadUTS(*uts);
     }

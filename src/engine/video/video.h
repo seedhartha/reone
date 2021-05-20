@@ -23,6 +23,8 @@
 #include "../audio/stream.h"
 #include "../common/mediastream.h"
 #include "../common/types.h"
+#include "../graphics/mesh/meshes.h"
+#include "../graphics/shader/shaders.h"
 #include "../graphics/texture/texture.h"
 
 namespace reone {
@@ -36,6 +38,8 @@ public:
     struct Frame {
         std::shared_ptr<ByteArray> pixels;
     };
+
+    Video(graphics::Shaders *shaders, graphics::Meshes *meshes);
 
     void init();
     void deinit();
@@ -52,6 +56,9 @@ public:
     void setMediaStream(const std::shared_ptr<MediaStream<Frame>> &stream);
 
 private:
+    graphics::Shaders *_shaders;
+    graphics::Meshes *_meshes;
+
     int _width { 0 };
     int _height { 0 };
     float _fps { 0.0f };

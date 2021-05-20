@@ -32,12 +32,42 @@ namespace reone {
 
 namespace gui {
 
-SceneBuilder::SceneBuilder(const GraphicsOptions &opts) : _opts(opts) {
+SceneBuilder::SceneBuilder(
+    GraphicsOptions opts,
+    Shaders *shaders,
+    Meshes *meshes,
+    Textures *textures,
+    Materials *materials,
+    PBRIBL *pbrIbl
+) :
+    _opts(opts),
+    _shaders(shaders),
+    _meshes(meshes),
+    _textures(textures),
+    _materials(materials),
+    _pbrIbl(pbrIbl) {
+
+    if (!shaders) {
+        throw invalid_argument("shaders must not be null");
+    }
+    if (!meshes) {
+        throw invalid_argument("meshes must not be null");
+    }
+    if (!textures) {
+        throw invalid_argument("textuers must not be null");
+    }
+    if (!materials) {
+        throw invalid_argument("materials must not be null");
+    }
+    if (!pbrIbl) {
+        throw invalid_argument("pbrIbl must not be null");
+    }
+
     _aspect = opts.width / static_cast<float>(opts.height);
 }
 
 unique_ptr<SceneGraph> SceneBuilder::build() {
-    auto scene = make_unique<SceneGraph>(_opts);
+    auto scene = make_unique<SceneGraph>(_opts, _shaders, _meshes, _textures, _materials, _pbrIbl);
 
     shared_ptr<ModelSceneNode> model(_modelSupplier(*scene));
     if (!model) {

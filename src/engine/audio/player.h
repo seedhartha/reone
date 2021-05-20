@@ -32,6 +32,7 @@
 #include "glm/vec3.hpp"
 
 #include "files.h"
+#include "options.h"
 #include "soundinstance.h"
 
 namespace reone {

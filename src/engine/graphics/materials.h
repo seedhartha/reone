@@ -23,6 +23,8 @@
 
 #include <boost/noncopyable.hpp>
 
+#include "../resource/resources.h"
+
 #include "material.h"
 
 namespace reone {
@@ -31,8 +33,7 @@ namespace graphics {
 
 class Materials : boost::noncopyable {
 public:
-    static Materials &instance();
-
+    Materials(resource::Resources *resources);
     ~Materials();
 
     void init();
@@ -44,6 +45,8 @@ public:
     std::shared_ptr<Material> get(const std::string &texResRef) const;
 
 private:
+    resource::Resources *_resources;
+
     bool _inited { false };
     std::unordered_map<std::string, std::shared_ptr<Material>> _materials;
 };

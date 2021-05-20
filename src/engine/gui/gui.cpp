@@ -36,10 +36,47 @@ namespace reone {
 
 namespace gui {
 
-GUI::GUI(GraphicsOptions gfxOpts, Window *window) : _gfxOpts(gfxOpts), _window(window) {
+GUI::GUI(
+    GraphicsOptions gfxOpts,
+    Window *window,
+    Fonts *fonts,
+    Shaders *shaders,
+    Meshes *meshes,
+    Textures *textures,
+    Resources *resources,
+    Strings *strings
+) :
+    _gfxOpts(gfxOpts),
+    _window(window),
+    _fonts(fonts),
+    _shaders(shaders),
+    _meshes(meshes),
+    _textures(textures),
+    _resources(resources),
+    _strings(strings) {
+
     if (!window) {
         throw invalid_argument("window must not be null");
     }
+    if (!fonts) {
+        throw invalid_argument("fonts must not be null");
+    }
+    if (!shaders) {
+        throw invalid_argument("shaders must not be null");
+    }
+    if (!meshes) {
+        throw invalid_argument("meshes must not be null");
+    }
+    if (!textures) {
+        throw invalid_argument("textures must not be null");
+    }
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
+    }
+    if (!strings) {
+        throw invalid_argument("strings must not be null");
+    }
+
     _aspect = _gfxOpts.width / static_cast<float>(_gfxOpts.height);
     _screenCenter.x = _gfxOpts.width / 2;
     _screenCenter.y = _gfxOpts.height / 2;
@@ -51,7 +88,7 @@ void GUI::load() {
     }
     debug("GUI: load " + _resRef, 1, DebugChannels::gui);
 
-    shared_ptr<GffStruct> gui(Resources::instance().getGFF(_resRef, ResourceType::Gui));
+    shared_ptr<GffStruct> gui(_resources->getGFF(_resRef, ResourceType::Gui));
     ControlType type = Control::getType(*gui);
     string tag(Control::getTag(*gui));
 
@@ -263,8 +300,8 @@ void GUI::drawBackground() {
     uniforms.combined.general.projection = _window->getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->draw();
+    _shaders->activate(ShaderProgram::SimpleGUI, uniforms);
+    _meshes->getQuad()->draw();
 }
 
 void GUI::resetFocus() {

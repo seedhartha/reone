@@ -31,11 +31,13 @@ namespace reone {
 
 namespace script {
 
-Scripts::Scripts() : MemoryCache(bind(&Scripts::doGet, this, _1)) {
+Scripts::Scripts(Resources *resources) :
+    MemoryCache(bind(&Scripts::doGet, this, _1)),
+    _resources(resources) {
 }
 
 shared_ptr<ScriptProgram> Scripts::doGet(string resRef) {
-    shared_ptr<ByteArray> data(Resources::instance().getRaw(resRef, ResourceType::Ncs));
+    shared_ptr<ByteArray> data(_resources->getRaw(resRef, ResourceType::Ncs));
     if (!data) return nullptr;
 
     NcsReader ncs(resRef);

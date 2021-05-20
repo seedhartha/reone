@@ -34,14 +34,15 @@ namespace scene {
 
 class WorldRenderPipeline : boost::noncopyable {
 public:
-    WorldRenderPipeline(SceneGraph *scene, const graphics::GraphicsOptions &opts);
+    WorldRenderPipeline(graphics::GraphicsOptions opts, SceneGraph *sceneGraph);
 
     void init();
     void render();
 
 private:
-    SceneGraph *_scene { nullptr };
     graphics::GraphicsOptions _opts;
+    SceneGraph *_sceneGraph;
+
     glm::mat4 _lightSpaceMatrices[graphics::kNumCubeFaces];
 
     // Framebuffers

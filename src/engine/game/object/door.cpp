@@ -28,6 +28,8 @@
 #include "../../scene/types.h"
 #include "../../script/scripts.h"
 
+#include "../game.h"
+
 using namespace std;
 
 using namespace reone::graphics;
@@ -41,10 +43,11 @@ namespace game {
 
 Door::Door(
     uint32_t id,
+    Game *game,
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph
 ) :
-    SpatialObject(id, ObjectType::Door, objectFactory, sceneGraph) {
+    SpatialObject(id, ObjectType::Door, game, objectFactory, sceneGraph) {
 }
 
 void Door::loadFromGIT(const GffStruct &gffs) {
@@ -54,28 +57,28 @@ void Door::loadFromGIT(const GffStruct &gffs) {
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
     _linkedToFlags = gffs.getInt("LinkedToFlags");
-    _transitionDestin = Strings::instance().get(gffs.getInt("TransitionDestin"));
+    _transitionDestin = _game->strings().get(gffs.getInt("TransitionDestin"));
 
     loadTransformFromGIT(gffs);
 }
 
 void Door::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utd(Resources::instance().getGFF(resRef, ResourceType::Utd));
+    shared_ptr<GffStruct> utd(_game->resources().getGFF(resRef, ResourceType::Utd));
     if (!utd) return;
 
     loadUTD(*utd);
 
-    shared_ptr<TwoDA> doors(Resources::instance().get2DA("genericdoors"));
+    shared_ptr<TwoDA> doors(_game->resources().get2DA("genericdoors"));
     string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
-    auto model = make_unique<ModelSceneNode>(Models::instance().get(modelName), ModelUsage::Door, _sceneGraph);
+    auto model = make_unique<ModelSceneNode>(_game->models().get(modelName), ModelUsage::Door, _sceneGraph);
     model->setCullable(true);
     model->setDrawDistance(FLT_MAX);
     _sceneNode = move(model);
 
-    _closedWalkmesh = Walkmeshes::instance().get(modelName + "0", ResourceType::Dwk);
-    _open1Walkmesh = Walkmeshes::instance().get(modelName + "1", ResourceType::Dwk);
-    _open2Walkmesh = Walkmeshes::instance().get(modelName + "2", ResourceType::Dwk);
+    _closedWalkmesh = _game->walkmeshes().get(modelName + "0", ResourceType::Dwk);
+    _open1Walkmesh = _game->walkmeshes().get(modelName + "1", ResourceType::Dwk);
+    _open2Walkmesh = _game->walkmeshes().get(modelName + "2", ResourceType::Dwk);
 }
 
 void Door::loadTransformFromGIT(const GffStruct &gffs) {

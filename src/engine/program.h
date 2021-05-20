@@ -35,7 +35,7 @@ public:
     Program(int argc, char **argv);
 
     /**
-     * Process command line arguments and start an appropriate Game instance.
+     * Process command line arguments and start a Game instance.
      *
      * @return the exit code
      */

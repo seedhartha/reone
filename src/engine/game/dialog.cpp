@@ -31,7 +31,10 @@ namespace reone {
 
 namespace game {
 
-Dialog::Dialog(const string &resRef) : _resRef(resRef) {
+Dialog::Dialog(string resRef, Strings *strings) : _resRef(move(resRef)), _strings(strings) {
+    if (!strings) {
+        throw invalid_argument("strings must not be null");
+    }
 }
 
 void Dialog::load(const GffStruct &dlg) {
@@ -69,7 +72,7 @@ Dialog::EntryReply Dialog::getEntryReply(const GffStruct &gffs) const {
 
     EntryReply entry;
     entry.speaker = gffs.getString("Speaker");
-    entry.text = strRef == -1 ? "" : Strings::instance().get(strRef);
+    entry.text = strRef == -1 ? "" : _strings->get(strRef);
     entry.voResRef = gffs.getString("VO_ResRef");
     entry.script = gffs.getString("Script");
     entry.sound = gffs.getString("Sound");

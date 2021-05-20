@@ -23,7 +23,8 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "../graphics/texture/texture.h"
+#include "../graphics/texture/textures.h"
+#include "../resource/resources.h"
 
 #include "portrait.h"
 
@@ -33,7 +34,7 @@ namespace game {
 
 class Portraits : boost::noncopyable {
 public:
-    Portraits() = default;
+    Portraits(graphics::Textures *textures, resource::Resources *resources);
 
     void init();
 
@@ -43,7 +44,12 @@ public:
     const std::vector<Portrait> &portraits() const { return _portraits; }
 
 private:
+    graphics::Textures *_textures;
+    resource::Resources *_resources;
+
     std::vector<Portrait> _portraits;
+
+    std::shared_ptr<graphics::Texture> getPortraitTexture(const Portrait &portrait) const;
 };
 
 } // namespace game

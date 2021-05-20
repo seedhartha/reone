@@ -184,7 +184,7 @@ void Equipment::onFocusChanged(const string &control, bool focus) {
 
         auto maybeStrRef = g_slotStrRefs.find(name.first);
         if (maybeStrRef != g_slotStrRefs.end()) {
-            slotDesc = Strings::instance().get(maybeStrRef->second);
+            slotDesc = _strings->get(maybeStrRef->second);
         }
         break;
     }
@@ -270,60 +270,13 @@ void Equipment::selectSlot(Slot slot) {
     updateItems();
 }
 
-static shared_ptr<Texture> getEmptySlotIcon(Equipment::Slot slot) {
-    static unordered_map<Equipment::Slot, shared_ptr<Texture>> icons;
-
-    auto icon = icons.find(slot);
-    if (icon != icons.end()) return icon->second;
-
-    string resRef;
-    switch (slot) {
-        case Equipment::Slot::Implant:
-            resRef = "iimplant";
-            break;
-        case Equipment::Slot::Head:
-            resRef = "ihead";
-            break;
-        case Equipment::Slot::Hands:
-            resRef = "ihands";
-            break;
-        case Equipment::Slot::ArmL:
-            resRef = "iforearm_l";
-            break;
-        case Equipment::Slot::Body:
-            resRef = "iarmor";
-            break;
-        case Equipment::Slot::ArmR:
-            resRef = "iforearm_r";
-            break;
-        case Equipment::Slot::WeapL:
-        case Equipment::Slot::WeapL2:
-            resRef = "iweap_l";
-            break;
-        case Equipment::Slot::Belt:
-            resRef = "ibelt";
-            break;
-        case Equipment::Slot::WeapR:
-        case Equipment::Slot::WeapR2:
-            resRef = "iweap_r";
-            break;
-        default:
-            return nullptr;
-    }
-
-    shared_ptr<Texture> texture(Textures::instance().get(resRef, TextureUsage::GUI));
-    auto pair = icons.insert(make_pair(slot, texture));
-
-    return pair.first->second;
-}
-
 void Equipment::updateEquipment() {
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
     auto &equipment = partyLeader->equipment();
 
     for (auto &name : g_slotNames) {
         string tag("LBL_INV_" + name.second);
-        configureControl(tag, [&name, &equipment](Control &control) {
+        configureControl(tag, [&](Control &control) {
             int slot = getInventorySlot(name.first);
             shared_ptr<Texture> fill;
 
@@ -354,6 +307,53 @@ void Equipment::updateEquipment() {
     setControlText("LBL_TOHITR", attackBonusString);
 }
 
+shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) const {
+    static unordered_map<Slot, shared_ptr<Texture>> icons;
+
+    auto icon = icons.find(slot);
+    if (icon != icons.end()) return icon->second;
+
+    string resRef;
+    switch (slot) {
+        case Slot::Implant:
+            resRef = "iimplant";
+            break;
+        case Slot::Head:
+            resRef = "ihead";
+            break;
+        case Slot::Hands:
+            resRef = "ihands";
+            break;
+        case Slot::ArmL:
+            resRef = "iforearm_l";
+            break;
+        case Slot::Body:
+            resRef = "iarmor";
+            break;
+        case Slot::ArmR:
+            resRef = "iforearm_r";
+            break;
+        case Slot::WeapL:
+        case Slot::WeapL2:
+            resRef = "iweap_l";
+            break;
+        case Slot::Belt:
+            resRef = "ibelt";
+            break;
+        case Slot::WeapR:
+        case Slot::WeapR2:
+            resRef = "iweap_r";
+            break;
+        default:
+            return nullptr;
+    }
+
+    shared_ptr<Texture> texture(_textures->get(resRef, TextureUsage::GUI));
+    auto pair = icons.insert(make_pair(slot, texture));
+
+    return pair.first->second;
+}
+
 void Equipment::updateItems() {
     ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
     lbItems.clearItems();
@@ -361,8 +361,8 @@ void Equipment::updateItems() {
     if (_selectedSlot != Slot::None) {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
-        lbItem.text = Strings::instance().get(kStrRefNone);
-        lbItem.iconTexture = Textures::instance().get("inone", TextureUsage::GUI);
+        lbItem.text = _strings->get(kStrRefNone);
+        lbItem.iconTexture = _textures->get("inone", TextureUsage::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 
         lbItems.addItem(move(lbItem));
@@ -396,7 +396,7 @@ shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return Textures::instance().get(resRef, TextureUsage::GUI);
+    return _textures->get(resRef, TextureUsage::GUI);
 }
 
 } // namespace game

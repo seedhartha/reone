@@ -25,6 +25,8 @@
 
 #include "../../resource/strings.h"
 
+#include "../game.h"
+
 using namespace reone::resource;
 
 namespace reone {
@@ -35,9 +37,9 @@ void Waypoint::loadUTW(const GffStruct &utw) {
     _appearance = utw.getInt("Appearance");
     _blueprintResRef = boost::to_lower_copy(utw.getString("TemplateResRef"));
     _tag = boost::to_lower_copy(utw.getString("Tag"));
-    _name = Strings::instance().get(utw.getInt("LocalizedName"));
+    _name = _game->strings().get(utw.getInt("LocalizedName"));
     _hasMapNote = utw.getBool("HasMapNote");
-    _mapNote = Strings::instance().get(utw.getInt("MapNote"));
+    _mapNote = _game->strings().get(utw.getInt("MapNote"));
     _mapNoteEnabled = utw.getInt("MapNoteEnabled");
 
     // Unused fields:

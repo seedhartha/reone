@@ -29,6 +29,8 @@ namespace reone {
 
 namespace game {
 
+class CreatureClass;
+
 /**
  * Aggregate for creature role-playing attributes: classes, abilities, skills,
  * feats and Force Powers.
@@ -39,7 +41,7 @@ public:
 
     // Class Levels
 
-    void addClassLevels(ClassType clazz, int levels);
+    void addClassLevels(CreatureClass *clazz, int levels);
 
     /**
      * @return class type at the specified position (1-based)
@@ -124,7 +126,7 @@ public:
     // END Force Powers
 
 private:
-    std::vector<std::pair<ClassType, int>> _classLevels;
+    std::vector<std::pair<CreatureClass *, int>> _classLevels;
     std::map<Ability, int> _abilityScores;
     std::map<Skill, int> _skillRanks;
     std::set<FeatType> _feats;

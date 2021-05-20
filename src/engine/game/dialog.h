@@ -23,6 +23,7 @@
 #include <boost/noncopyable.hpp>
 
 #include "../resource/format/gffreader.h"
+#include "../resource/strings.h"
 
 #include "types.h"
 
@@ -69,7 +70,7 @@ public:
         std::vector<ParticipantAnimation> animations;
     };
 
-    Dialog(const std::string &resRef);
+    Dialog(std::string resRef, resource::Strings *strings);
 
     void load(const resource::GffStruct &dlg);
 
@@ -89,6 +90,8 @@ public:
 
 private:
     std::string _resRef;
+    resource::Strings *_strings;
+
     bool _skippable { false };
     std::string _cameraModel;
     std::vector<EntryReplyLink> _startEntries;

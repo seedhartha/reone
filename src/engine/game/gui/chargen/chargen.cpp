@@ -308,7 +308,9 @@ void CharacterGeneration::cancel() {
 
 void CharacterGeneration::finish() {
     if (_type == Type::LevelUp) {
-        _character.attributes.addClassLevels(_character.attributes.getEffectiveClass(), 1);
+        ClassType classType = _character.attributes.getEffectiveClass();
+        shared_ptr<CreatureClass> clazz(_game->classes().get(classType));
+        _character.attributes.addClassLevels(clazz.get(), 1);
         shared_ptr<Creature> partyLeader(_game->party().getLeader());
         partyLeader->attributes() = _character.attributes;
         _game->openInGame();
@@ -351,7 +353,7 @@ void CharacterGeneration::reloadCharacterModel() {
     const Control::Extent &extent = lblModel.extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 
-    unique_ptr<SceneGraph> scene(SceneBuilder(_gfxOpts)
+    unique_ptr<SceneGraph> scene(SceneBuilder(_gfxOpts, _shaders, _meshes, _textures, &_game->materials(), &_game->pbrIbl())
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, _1))
@@ -377,14 +379,14 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
     creature->sceneNode()->setCullable(false);
     creature->updateModelAnimation();
 
-    auto model = make_shared<ModelSceneNode>(Models::instance().get("cgbody_light"), ModelUsage::GUI, &sceneGraph);
+    auto model = make_shared<ModelSceneNode>(_game->models().get("cgbody_light"), ModelUsage::GUI, &sceneGraph);
     model->attach("cgbody_light", creature->sceneNode());
 
     return move(model);
 }
 
 void CharacterGeneration::updateAttributes() {
-    shared_ptr<CreatureClass> clazz(Classes::instance().get(_character.attributes.getEffectiveClass()));
+    shared_ptr<CreatureClass> clazz(_game->classes().get(_character.attributes.getEffectiveClass()));
     setControlText("LBL_CLASS", clazz->name());
 
     int vitality = clazz->hitdie() + _character.attributes.getAbilityModifier(Ability::Constitution);

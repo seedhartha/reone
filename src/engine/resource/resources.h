@@ -43,7 +43,7 @@ namespace resource {
  */
 class Resources : boost::noncopyable {
 public:
-    static Resources &instance();
+    Resources() = default;
 
     void indexKeyFile(const boost::filesystem::path &path);
     void indexErfFile(const boost::filesystem::path &path, bool transient = false);

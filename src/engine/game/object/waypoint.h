@@ -29,6 +29,7 @@ class Waypoint : public SpatialObject {
 public:
     Waypoint(
         uint32_t id,
+        Game *game,
         ObjectFactory *objectFactory,
         scene::SceneGraph *sceneGraph);
 

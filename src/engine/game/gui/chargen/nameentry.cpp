@@ -56,7 +56,7 @@ void NameEntry::load() {
 }
 
 void NameEntry::loadLtrFile(const string &resRef, LtrReader &ltr) {
-    shared_ptr<ByteArray> data(Resources::instance().getRaw(resRef, ResourceType::Ltr));
+    shared_ptr<ByteArray> data(_resources->getRaw(resRef, ResourceType::Ltr));
     ltr.load(wrap(data));
 }
 

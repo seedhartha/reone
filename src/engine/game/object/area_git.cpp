@@ -49,7 +49,7 @@ void Area::loadProperties(const GffStruct &git) {
     shared_ptr<GffStruct> props(git.getStruct("AreaProperties"));
     int musicIdx = props->getInt("MusicDay");
     if (musicIdx) {
-        shared_ptr<TwoDA> musicTable(Resources::instance().get2DA("ambientmusic"));
+        shared_ptr<TwoDA> musicTable(_game->resources().get2DA("ambientmusic"));
         _music = musicTable->getString(musicIdx, "resource");
     }
 }

@@ -150,6 +150,7 @@ protected:
     SpatialObject(
         uint32_t id,
         ObjectType type,
+        Game *game,
         ObjectFactory *objectFactory,
         scene::SceneGraph *sceneGraph);
 

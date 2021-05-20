@@ -20,8 +20,12 @@
 #include "modelnodescenenode.h"
 
 #include "../../graphics/material.h"
+#include "../../graphics/materials.h"
 #include "../../graphics/model/model.h"
 #include "../../graphics/model/modelnode.h"
+#include "../../graphics/pbribl.h"
+#include "../../graphics/shader/shaders.h"
+#include "../../graphics/texture/textures.h"
 
 namespace reone {
 
@@ -31,7 +35,10 @@ class ModelSceneNode;
 
 class MeshSceneNode : public ModelNodeSceneNode {
 public:
-    MeshSceneNode(const ModelSceneNode *model, std::shared_ptr<graphics::ModelNode> modelNode, SceneGraph *sceneGraph);
+    MeshSceneNode(
+        const ModelSceneNode *model,
+        std::shared_ptr<graphics::ModelNode> modelNode,
+        SceneGraph *sceneGraph);
 
     void update(float dt) override;
     void drawSingle(bool shadowPass);
@@ -55,7 +62,7 @@ private:
         std::shared_ptr<graphics::Texture> lightmap;
         std::shared_ptr<graphics::Texture> envmap;
         std::shared_ptr<graphics::Texture> bumpmap;
-    } _textures;
+    } _nodeTextures;
 
     struct DanglymeshAnimation {
         glm::vec3 force { 0.0f }; /**< net force applied to this scene node */
