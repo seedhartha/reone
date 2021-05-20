@@ -113,8 +113,8 @@ void Creature::loadUTC(const GffStruct &utc) {
 }
 
 void Creature::loadNameFromUTC(const GffStruct &utc) {
-    string firstName(Strings::instance().get(utc.getInt("FirstName")));
-    string lastName(Strings::instance().get(utc.getInt("LastName")));
+    string firstName(_game->strings().get(utc.getInt("FirstName")));
+    string lastName(_game->strings().get(utc.getInt("LastName")));
     if (!firstName.empty() && !lastName.empty()) {
         _name = firstName + " " + lastName;
     } else if (!firstName.empty()) {
@@ -125,7 +125,7 @@ void Creature::loadNameFromUTC(const GffStruct &utc) {
 void Creature::loadSoundSetFromUTC(const GffStruct &utc) {
     uint32_t soundSetIdx = utc.getUint("SoundSetFile");
     if (soundSetIdx != 0xffff) {
-        shared_ptr<TwoDA> soundSetTable(Resources::instance().get2DA("soundset"));
+        shared_ptr<TwoDA> soundSetTable(_game->resources().get2DA("soundset"));
         string soundSetResRef(soundSetTable->getString(soundSetIdx, "resref"));
         if (!soundSetResRef.empty()) {
             _soundSet = _game->soundSets().get(soundSetResRef);
@@ -135,8 +135,8 @@ void Creature::loadSoundSetFromUTC(const GffStruct &utc) {
 
 void Creature::loadBodyBagFromUTC(const GffStruct &utc) {
     int bodyBag = utc.getInt("BodyBag");
-    shared_ptr<TwoDA> bodyBags(Resources::instance().get2DA("bodybag"));
-    _bodyBag.name = Strings::instance().get(bodyBags->getInt(bodyBag, "name"));
+    shared_ptr<TwoDA> bodyBags(_game->resources().get2DA("bodybag"));
+    _bodyBag.name = _game->strings().get(bodyBags->getInt(bodyBag, "name"));
     _bodyBag.appearance = bodyBags->getInt(bodyBag, "appearance");
     _bodyBag.corpse = bodyBags->getBool(bodyBag, "corpse");
 }
@@ -153,7 +153,7 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
     for (auto &classGffs : utc.getList("ClassList")) {
         int clazz = classGffs->getInt("Class");
         int level = classGffs->getInt("ClassLevel");
-        attributes.addClassLevels(static_cast<ClassType>(clazz), level);
+        attributes.addClassLevels(_game->classes().get(static_cast<ClassType>(clazz)).get(), level);
         for (auto &spellGffs : classGffs->getList("KnownList0")) {
             auto spell = static_cast<ForcePower>(spellGffs->getUint("Spell"));
             attributes.addSpell(spell);
@@ -174,7 +174,7 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
 
 void Creature::loadPerceptionRangeFromUTC(const GffStruct &utc) {
     int rangeIdx = utc.getInt("PerceptionRange");
-    shared_ptr<TwoDA> ranges(Resources::instance().get2DA("ranges"));
+    shared_ptr<TwoDA> ranges(_game->resources().get2DA("ranges"));
     _perception.sightRange = ranges->getFloat(rangeIdx, "primaryrange");
     _perception.hearingRange = ranges->getFloat(rangeIdx, "secondaryrange");
 }

@@ -19,22 +19,15 @@
 
 namespace reone {
 
-namespace audio {
+namespace graphics {
 
-enum class AudioFormat {
-    Mono8,
-    Mono16,
-    Stereo8,
-    Stereo16
+struct GraphicsOptions {
+    int width { 0 };
+    int height { 0 };
+    bool fullscreen { false };
+    int shadowResolution { 0 };
 };
 
-enum class AudioType {
-    Music,
-    Voice,
-    Sound,
-    Movie
-};
-
-} // namespace audio
+} // namespace graphics
 
 } // namespace reone

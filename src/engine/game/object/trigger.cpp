@@ -43,12 +43,7 @@ Trigger::Trigger(
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph
 ) :
-    SpatialObject(id, ObjectType::Trigger, objectFactory, sceneGraph),
-    _game(game) {
-
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+    SpatialObject(id, ObjectType::Trigger, game, objectFactory, sceneGraph) {
 }
 
 void Trigger::loadFromGIT(const GffStruct &gffs) {
@@ -56,7 +51,7 @@ void Trigger::loadFromGIT(const GffStruct &gffs) {
     loadFromBlueprint(templateResRef);
 
     _tag = boost::to_lower_copy(gffs.getString("Tag"));
-    _transitionDestin = Strings::instance().get(gffs.getInt("TransitionDestin"));
+    _transitionDestin = _game->strings().get(gffs.getInt("TransitionDestin"));
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
     _linkedToFlags = gffs.getInt("LinkedToFlags");
@@ -85,7 +80,7 @@ void Trigger::loadGeometryFromGIT(const GffStruct &gffs) {
 }
 
 void Trigger::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utt(Resources::instance().getGFF(resRef, ResourceType::Utt));
+    shared_ptr<GffStruct> utt(_game->resources().getGFF(resRef, ResourceType::Utt));
     if (utt) {
         loadUTT(*utt);
     }

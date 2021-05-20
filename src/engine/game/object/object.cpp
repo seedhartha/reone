@@ -17,6 +17,8 @@
 
 #include "object.h"
 
+#include <stdexcept>
+
 #include "../../common/collectionutil.h"
 
 using namespace std;
@@ -25,7 +27,10 @@ namespace reone {
 
 namespace game {
 
-Object::Object(uint32_t id, ObjectType type) : _id(id), _type(type) {
+Object::Object(uint32_t id, ObjectType type, Game *game) : _id(id), _type(type), _game(game) {
+    if (!game) {
+        throw invalid_argument("game must not be null");
+    }
 }
 
 void Object::update(float dt) {

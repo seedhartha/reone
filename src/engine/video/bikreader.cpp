@@ -41,6 +41,7 @@ namespace fs = boost::filesystem;
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::graphics;
 
 namespace reone {
 
@@ -50,7 +51,17 @@ static const char kSignature[] = "BIKi";
 
 class BinkVideoDecoder : public MediaStream<Video::Frame> {
 public:
-    BinkVideoDecoder(const fs::path &path) : _path(path) {
+    BinkVideoDecoder(fs::path path, Shaders *shaders, Meshes *meshes) :
+        _path(std::move(path)),
+        _shaders(shaders),
+        _meshes(meshes) {
+
+        if (!shaders) {
+            throw invalid_argument("shaders must not be null");
+        }
+        if (!meshes) {
+            throw invalid_argument("meshes must not be null");
+        }
     }
 
     ~BinkVideoDecoder() {
@@ -118,6 +129,9 @@ public:
 
 private:
     fs::path _path;
+    Shaders *_shaders;
+    Meshes *_meshes;
+
     AVFormatContext *_formatCtx { nullptr };
     int _videoStreamIdx { -1 };
     int _audioStreamIdx { -1 };
@@ -224,7 +238,7 @@ private:
     void initVideo() {
         AVRational &frameRate = _formatCtx->streams[_videoStreamIdx]->r_frame_rate;
 
-        _video = make_shared<Video>();
+        _video = make_shared<Video>(_shaders, _meshes);
         _video->_width = _videoCodecCtx->width;
         _video->_height = _videoCodecCtx->height;
         _video->_fps = frameRate.num / static_cast<float>(frameRate.den);
@@ -315,7 +329,17 @@ private:
     }
 };
 
-BikReader::BikReader(const fs::path &path) : _path(path) {
+BikReader::BikReader(fs::path path, Shaders *shaders, Meshes *meshes) :
+    _path(move(path)),
+    _shaders(shaders),
+    _meshes(meshes) {
+
+    if (!shaders) {
+        throw invalid_argument("shaders must not be null");
+    }
+    if (!meshes) {
+        throw invalid_argument("meshes must not be null");
+    }
 }
 
 void BikReader::load() {
@@ -323,7 +347,7 @@ void BikReader::load() {
         throw runtime_error("BIK: file not found: " + _path.string());
     }
 
-    auto decoder = make_shared<BinkVideoDecoder>(_path);
+    auto decoder = make_shared<BinkVideoDecoder>(_path, _shaders, _meshes);
     decoder->load();
 
     _video = decoder->video();

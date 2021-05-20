@@ -49,8 +49,9 @@ const float kOrthographicScale = 10.0f;
 
 static bool g_wireframesEnabled = false;
 
-WorldRenderPipeline::WorldRenderPipeline(SceneGraph *scene, const GraphicsOptions &opts) :
-    _scene(scene), _opts(opts) {
+WorldRenderPipeline::WorldRenderPipeline(GraphicsOptions opts, SceneGraph *sceneGraph) :
+    _opts(move(opts)),
+    _sceneGraph(sceneGraph) {
 
     for (int i = 0; i < kNumCubeFaces; ++i) {
         _lightSpaceMatrices[i] = glm::mat4(1.0f);
@@ -80,7 +81,7 @@ void WorldRenderPipeline::init() {
 
     _geometry.init();
     _geometry.bind();
-    Textures::instance().bindDefaults();
+    _sceneGraph->textures().bindDefaults();
     _geometry.attachColor(*_geometryColor1, 0);
     _geometry.attachColor(*_geometryColor2, 1);
     _geometry.attachDepth(*_depthRenderbuffer);
@@ -131,7 +132,7 @@ void WorldRenderPipeline::init() {
 }
 
 void WorldRenderPipeline::render() {
-    shared_ptr<CameraSceneNode> camera(_scene->activeCamera());
+    shared_ptr<CameraSceneNode> camera(_sceneGraph->activeCamera());
     if (!camera) return;
 
     computeLightSpaceMatrices();
@@ -165,11 +166,11 @@ static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) 
 void WorldRenderPipeline::computeLightSpaceMatrices() {
     static glm::vec3 up(0.0f, 0.0f, 1.0f);
 
-    const LightSceneNode *shadowLight = _scene->shadowLight();
+    const LightSceneNode *shadowLight = _sceneGraph->shadowLight();
     if (!shadowLight) return;
 
     glm::vec3 lightPosition(shadowLight->absoluteTransform()[3]);
-    glm::vec3 cameraPosition(_scene->activeCamera()->absoluteTransform()[3]);
+    glm::vec3 cameraPosition(_sceneGraph->activeCamera()->absoluteTransform()[3]);
 
     if (shadowLight->isDirectional()) {
         glm::mat4 projection(glm::ortho(-kOrthographicScale, kOrthographicScale, -kOrthographicScale, kOrthographicScale, kShadowNearPlane, kShadowFarPlane));
@@ -187,7 +188,7 @@ void WorldRenderPipeline::computeLightSpaceMatrices() {
 void WorldRenderPipeline::drawShadows() {
     if (_opts.shadowResolution < 1) return;
 
-    const LightSceneNode *shadowLight = _scene->shadowLight();
+    const LightSceneNode *shadowLight = _sceneGraph->shadowLight();
     if (!shadowLight) return;
 
     withViewport(glm::ivec4(0, 0, 1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution), [&]() {
@@ -205,16 +206,16 @@ void WorldRenderPipeline::drawShadows() {
             glm::vec3(shadowLight->absoluteTransform()[3]),
             shadowLight->isDirectional() ? 0.0f : 1.0f);
 
-        ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
+        ShaderUniforms uniforms(_sceneGraph->shaders().defaultUniforms());
         uniforms.combined.featureMask |= UniformFeatureFlags::shadows;
         uniforms.combined.shadows.lightPosition = move(lightPosition);
         for (int i = 0; i < kNumCubeFaces; ++i) {
             uniforms.combined.shadows.lightSpaceMatrices[i] = _lightSpaceMatrices[i];
         }
-        _scene->setUniformsPrototype(move(uniforms));
+        _sceneGraph->setUniformsPrototype(move(uniforms));
 
         glClear(GL_DEPTH_BUFFER_BIT);
-        withDepthTest([this]() { _scene->draw(true); });
+        withDepthTest([this]() { _sceneGraph->draw(true); });
     });
 }
 
@@ -224,12 +225,12 @@ void WorldRenderPipeline::drawGeometry() {
     static constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     glDrawBuffers(2, buffers);
 
-    const LightSceneNode *shadowLight = _scene->shadowLight();
+    const LightSceneNode *shadowLight = _sceneGraph->shadowLight();
 
-    ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
-    uniforms.combined.general.projection = _scene->activeCamera()->projection();
-    uniforms.combined.general.view = _scene->activeCamera()->view();
-    uniforms.combined.general.cameraPosition = _scene->activeCamera()->absoluteTransform()[3];
+    ShaderUniforms uniforms(_sceneGraph->shaders().defaultUniforms());
+    uniforms.combined.general.projection = _sceneGraph->activeCamera()->projection();
+    uniforms.combined.general.view = _sceneGraph->activeCamera()->view();
+    uniforms.combined.general.cameraPosition = _sceneGraph->activeCamera()->absoluteTransform()[3];
     uniforms.combined.shadows.lightPresent = static_cast<bool>(shadowLight);
 
     if (shadowLight) {
@@ -238,14 +239,14 @@ void WorldRenderPipeline::drawGeometry() {
             shadowLight->isDirectional() ? 0.0f : 1.0f);
 
         uniforms.combined.shadows.lightPosition = move(lightPosition);
-        uniforms.combined.shadows.strength = _scene->shadowStrength();
+        uniforms.combined.shadows.strength = _sceneGraph->shadowStrength();
 
         for (int i = 0; i < kNumCubeFaces; ++i) {
             uniforms.combined.shadows.lightSpaceMatrices[i] = _lightSpaceMatrices[i];
         }
     }
 
-    _scene->setUniformsPrototype(move(uniforms));
+    _sceneGraph->setUniformsPrototype(move(uniforms));
 
     if (shadowLight) {
         if (shadowLight->isDirectional()) {
@@ -261,10 +262,10 @@ void WorldRenderPipeline::drawGeometry() {
 
     if (g_wireframesEnabled) {
         withWireframes([this]() {
-            withDepthTest([this]() { _scene->draw(); });
+            withDepthTest([this]() { _sceneGraph->draw(); });
         });
     } else {
-        withDepthTest([this]() { _scene->draw(); });
+        withDepthTest([this]() { _sceneGraph->draw(); });
     }
 }
 
@@ -284,10 +285,10 @@ void WorldRenderPipeline::applyHorizontalBlur() {
     uniforms.combined.blur.resolution = glm::vec2(w, h);
     uniforms.combined.blur.direction = glm::vec2(1.0f, 0.0f);
 
-    Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
+    _sceneGraph->shaders().activate(ShaderProgram::SimpleBlur, uniforms);
 
-    withDepthTest([]() {
-        Meshes::instance().getQuadNDC()->draw();
+    withDepthTest([&]() {
+        _sceneGraph->meshes().getQuadNDC()->draw();
     });
 }
 
@@ -307,10 +308,10 @@ void WorldRenderPipeline::applyVerticalBlur() {
     uniforms.combined.blur.resolution = glm::vec2(w, h);
     uniforms.combined.blur.direction = glm::vec2(0.0f, 1.0f);
 
-    Shaders::instance().activate(ShaderProgram::SimpleBlur, uniforms);
+    _sceneGraph->shaders().activate(ShaderProgram::SimpleBlur, uniforms);
 
-    withDepthTest([]() {
-        Meshes::instance().getQuadNDC()->draw();
+    withDepthTest([&]() {
+        _sceneGraph->meshes().getQuadNDC()->draw();
     });
 
     _verticalBlur.unbind();
@@ -324,8 +325,8 @@ void WorldRenderPipeline::drawResult() {
     _verticalBlurColor->bind();
 
     ShaderUniforms uniforms;
-    Shaders::instance().activate(ShaderProgram::SimplePresentWorld, uniforms);
-    Meshes::instance().getQuadNDC()->draw();
+    _sceneGraph->shaders().activate(ShaderProgram::SimplePresentWorld, uniforms);
+    _sceneGraph->meshes().getQuadNDC()->draw();
 }
 
 } // namespace scene

@@ -107,7 +107,7 @@ void MapMenu::refreshSelectedNote() {
     if (!_notes.empty()) {
         note = _notes[_selectedNoteIdx];
 
-        string text(Strings::instance().get(kStrRefMapNote));
+        string text(_strings->get(kStrRefMapNote));
         text += ": ";
         text += note->mapNote();
 

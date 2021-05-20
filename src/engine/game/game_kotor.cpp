@@ -43,24 +43,24 @@ static constexpr char kExeFilename[] = "swkotor.exe";
 static vector<string> g_nonTransientLipFiles { "global.mod", "localization.mod" };
 
 void Game::initResourceProvidersForKotOR() {
-    Resources::instance().indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
-    Resources::instance().indexErfFile(getPathIgnoreCase(_path, kPatchFilename));
+    _resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
+    _resources.indexErfFile(getPathIgnoreCase(_path, kPatchFilename));
 
     fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
-    Resources::instance().indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
-    Resources::instance().indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
+    _resources.indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
+    _resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
 
-    Resources::instance().indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
-    Resources::instance().indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
-    Resources::instance().indexDirectory(getPathIgnoreCase(_path, kWavesDirectoryName));
+    _resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
+    _resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
+    _resources.indexDirectory(getPathIgnoreCase(_path, kWavesDirectoryName));
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
     for (auto &filename : g_nonTransientLipFiles) {
-        Resources::instance().indexErfFile(getPathIgnoreCase(lipsPath, filename));
+        _resources.indexErfFile(getPathIgnoreCase(lipsPath, filename));
     }
 
-    Resources::instance().indexExeFile(getPathIgnoreCase(_path, kExeFilename));
-    Resources::instance().indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
+    _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
+    _resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
 }
 
 } // namespace game

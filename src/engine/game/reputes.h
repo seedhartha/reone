@@ -19,6 +19,8 @@
 
 #include <boost/noncopyable.hpp>
 
+#include "../resource/resources.h"
+
 #include "object/creature.h"
 
 namespace reone {
@@ -27,7 +29,7 @@ namespace game {
 
 class Reputes : boost::noncopyable {
 public:
-    Reputes() = default;
+    Reputes(resource::Resources *resources);
 
     void init();
 
@@ -36,6 +38,8 @@ public:
     bool getIsNeutral(const Creature &left, const Creature &right);
 
 private:
+    resource::Resources *_resources;
+
     int getRepute(const Creature &left, const Creature &right) const;
 };
 

@@ -17,6 +17,8 @@
 
 #include "pbribl.h"
 
+#include <stdexcept>
+
 #include "GL/glew.h"
 #include "SDL2/SDL_opengl.h"
 
@@ -48,9 +50,13 @@ static const glm::mat4 g_captureViews[] {
     glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
 };
 
-PBRIBL &PBRIBL::instance() {
-    static PBRIBL instance;
-    return instance;
+PBRIBL::PBRIBL(Shaders *shaders, Meshes *meshes) : _shaders(shaders), _meshes(meshes) {
+    if (!shaders) {
+        throw invalid_argument("shaders must not be null");
+    }
+    if (!meshes) {
+        throw invalid_argument("meshes must not be null");
+    }
 }
 
 void PBRIBL::init() {
@@ -125,8 +131,8 @@ shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
             uniforms.combined.general.view = g_captureViews[i];
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            Shaders::instance().activate(ShaderProgram::SimpleIrradiance, uniforms);
-            Meshes::instance().getCubemap()->draw();
+            _shaders->activate(ShaderProgram::SimpleIrradiance, uniforms);
+            _meshes->getCubemap()->draw();
         }
     });
 
@@ -164,15 +170,15 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
                 _prefilterFB.attachCubeMapFaceAsColor(*prefilterColor, static_cast<CubeMapFace>(face), 0, mip);
                 _prefilterFB.checkCompleteness();
 
-                ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
+                ShaderUniforms uniforms(_shaders->defaultUniforms());
                 uniforms.combined.general.projection = g_captureProjection;
                 uniforms.combined.general.view = g_captureViews[face];
                 uniforms.combined.general.roughness = roughness;
                 uniforms.combined.general.envmapResolution = static_cast<float>(envmap->width());
-                Shaders::instance().activate(ShaderProgram::SimplePrefilter, uniforms);
+                _shaders->activate(ShaderProgram::SimplePrefilter, uniforms);
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                Meshes::instance().getCubemap()->draw();
+                _meshes->getCubemap()->draw();
             }
         });
     }
@@ -202,8 +208,8 @@ shared_ptr<Texture> PBRIBL::computeBRDFLookup(const Texture *envmap) {
 
     withViewport(viewport, [&]() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Shaders::instance().activate(ShaderProgram::SimpleBRDF, Shaders::instance().defaultUniforms());
-        Meshes::instance().getQuadNDC()->draw();
+        _shaders->activate(ShaderProgram::SimpleBRDF, _shaders->defaultUniforms());
+        _meshes->getQuadNDC()->draw();
     });
 
     _brdfLookupFB.unbind();

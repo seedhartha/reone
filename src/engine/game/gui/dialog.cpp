@@ -177,7 +177,7 @@ void DialogGUI::loadStuntParticipants() {
         participant.creature = creature;
 
         if (_dialog->isAnimatedCutscene()) {
-            shared_ptr<Model> model(Models::instance().get(stunt.stuntModel));
+            shared_ptr<Model> model(_game->models().get(stunt.stuntModel));
             if (!model) {
                 warn("Dialog: stunt model not found: " + stunt.stuntModel);
                 continue;
@@ -311,7 +311,7 @@ string DialogGUI::getStuntAnimationName(int ordinal) const {
 }
 
 AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
-    shared_ptr<TwoDA> animations(Resources::instance().get2DA("dialoganimations"));
+    shared_ptr<TwoDA> animations(_resources->get2DA("dialoganimations"));
     int index = ordinal - 10000;
 
     if (index < 0 || index >= animations->getRowCount()) {

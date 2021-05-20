@@ -160,6 +160,7 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/baryutil.h
     src/engine/graphics/beziercurve.h
     src/engine/graphics/cursor.h
+    src/engine/graphics/eventhandler.h
     src/engine/graphics/featureutil.h
     src/engine/graphics/font.h
     src/engine/graphics/fonts.h
@@ -179,6 +180,7 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/model/model.h
     src/engine/graphics/model/modelnode.h
     src/engine/graphics/model/models.h
+    src/engine/graphics/options.h
     src/engine/graphics/pbribl.h
     src/engine/graphics/pixelutil.h
     src/engine/graphics/renderbuffer.h
@@ -252,6 +254,7 @@ set(AUDIO_HEADERS
     src/engine/audio/files.h
     src/engine/audio/format/mp3reader.h
     src/engine/audio/format/wavreader.h
+    src/engine/audio/options.h
     src/engine/audio/player.h
     src/engine/audio/soundhandle.h
     src/engine/audio/soundinstance.h

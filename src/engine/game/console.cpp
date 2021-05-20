@@ -206,7 +206,7 @@ void Console::trimOutput() {
 }
 
 void Console::load() {
-    _font = Fonts::instance().get("fnt_console");
+    _font = _game->fonts().get("fnt_console");
 }
 
 bool Console::handle(const SDL_Event &event) {
@@ -304,8 +304,8 @@ void Console::drawBackground() {
     uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     uniforms.combined.general.alpha = 0.5f;
 
-    Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
-    Meshes::instance().getQuad()->draw();
+    _game->shaders().activate(ShaderProgram::SimpleColor, uniforms);
+    _game->meshes().getQuad()->draw();
 }
 
 void Console::drawLines() {

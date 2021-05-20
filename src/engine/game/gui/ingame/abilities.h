@@ -49,6 +49,8 @@ private:
     void loadSkills();
 
     void refreshPortraits();
+
+    std::shared_ptr<graphics::Texture> getFrameTexture(GameID gameId) const;
 };
 
 } // namespace game

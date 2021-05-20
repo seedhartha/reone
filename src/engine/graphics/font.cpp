@@ -36,9 +36,19 @@ namespace reone {
 
 namespace graphics {
 
-Font::Font(Window *window) : _window(window) {
+Font::Font(Window *window, Shaders *shaders, Meshes *meshes) :
+    _window(window),
+    _shaders(shaders),
+    _meshes(meshes) {
+
     if (!window) {
         throw invalid_argument("window must not be null");
+    }
+    if (!shaders) {
+        throw invalid_argument("shaders must not be null");
+    }
+    if (!meshes) {
+        throw invalid_argument("meshes must not be null");
     }
 }
 
@@ -76,7 +86,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
 
     glm::vec3 textOffset(getTextOffset(text, gravity), 0.0f);
 
-    ShaderUniforms uniforms(Shaders::instance().defaultUniforms());
+    ShaderUniforms uniforms(_shaders->defaultUniforms());
     uniforms.combined.featureMask |= UniformFeatureFlags::text;
     uniforms.combined.general.projection = _window->getOrthoProjection();
     uniforms.combined.general.color = glm::vec4(color, 1.0f);
@@ -101,8 +111,8 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
 
             textOffset.x += glyph.size.x;
         }
-        Shaders::instance().activate(ShaderProgram::TextText, uniforms);
-        Meshes::instance().getQuad()->drawInstanced(numChars);
+        _shaders->activate(ShaderProgram::TextText, uniforms);
+        _meshes->getQuad()->drawInstanced(numChars);
     }
 }
 

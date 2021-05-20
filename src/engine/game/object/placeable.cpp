@@ -44,12 +44,7 @@ Placeable::Placeable(
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph
 ) :
-    SpatialObject(id, ObjectType::Placeable, objectFactory, sceneGraph),
-    _game(game) {
-
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+    SpatialObject(id, ObjectType::Placeable, game, objectFactory, sceneGraph) {
 }
 
 void Placeable::loadFromGIT(const GffStruct &gffs) {
@@ -60,20 +55,20 @@ void Placeable::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Placeable::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utp(Resources::instance().getGFF(resRef, ResourceType::Utp));
+    shared_ptr<GffStruct> utp(_game->resources().getGFF(resRef, ResourceType::Utp));
     if (!utp) return;
 
     loadUTP(*utp);
 
-    shared_ptr<TwoDA> placeables(Resources::instance().get2DA("placeables"));
+    shared_ptr<TwoDA> placeables(_game->resources().get2DA("placeables"));
     string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
-    auto model = make_shared<ModelSceneNode>(Models::instance().get(modelName), ModelUsage::Placeable, _sceneGraph);
+    auto model = make_shared<ModelSceneNode>(_game->models().get(modelName), ModelUsage::Placeable, _sceneGraph);
     model->setCullable(true);
     model->setDrawDistance(64.0f);
     _sceneNode = move(model);
 
-    _walkmesh = Walkmeshes::instance().get(modelName, ResourceType::Pwk);
+    _walkmesh = _game->walkmeshes().get(modelName, ResourceType::Pwk);
 }
 
 void Placeable::loadTransformFromGIT(const GffStruct &gffs) {

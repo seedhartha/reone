@@ -38,6 +38,15 @@ namespace reone {
 
 namespace video {
 
+Video::Video(Shaders *shaders, Meshes *meshes) : _shaders(shaders), _meshes(meshes) {
+    if (!shaders) {
+        throw invalid_argument("shaders must not be null");
+    }
+    if (!meshes) {
+        throw invalid_argument("meshes must not be null");
+    }
+}
+
 void Video::init() {
     if (!_inited) {
         _texture = make_shared<Texture>("video", getTextureProperties(TextureUsage::Video));
@@ -86,8 +95,8 @@ void Video::draw() {
     _texture->bind();
 
     ShaderUniforms uniforms;
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuadNDCFlipY()->draw();
+    _shaders->activate(ShaderProgram::SimpleGUI, uniforms);
+    _meshes->getQuadNDCFlipY()->draw();
 }
 
 void Video::finish() {

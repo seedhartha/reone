@@ -113,7 +113,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     // 3D control
 
     float aspect = extent.width / static_cast<float>(extent.height);
-    unique_ptr<SceneGraph> scene(SceneBuilder(_gfxOpts)
+    unique_ptr<SceneGraph> scene(SceneBuilder(_gfxOpts, _shaders, _meshes, _textures, &_game->materials(), &_game->pbrIbl())
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier([&](SceneGraph &sceneGraph) { return getCharacterModel(appearance, sceneGraph); })
@@ -130,7 +130,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     classButton.center = center;
     classButton.character.gender = gender;
     classButton.character.appearance = appearance;
-    classButton.character.attributes = Classes::instance().get(clazz)->defaultAttributes();
+    classButton.character.attributes = _game->classes().get(clazz)->defaultAttributes();
     _classButtons.push_back(move(classButton));
 }
 
@@ -179,7 +179,7 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, Sce
     character->sceneNode()->setCullable(false);
     character->updateModelAnimation();
 
-    auto model = make_shared<ModelSceneNode>(Models::instance().get("cgbody_light"), ModelUsage::GUI, &sceneGraph);
+    auto model = make_shared<ModelSceneNode>(_game->models().get("cgbody_light"), ModelUsage::GUI, &sceneGraph);
     model->attach("cgbody_light", character->sceneNode());
 
     return move(model);
@@ -218,10 +218,10 @@ void ClassSelection::onFocusChanged(const string &control, bool focus) {
     ClassButton &button = _classButtons[idx];
     ClassType clazz = button.character.attributes.getEffectiveClass();
 
-    string classText(Strings::instance().get(g_genderStrRefs[button.character.gender]));
-    classText += " " + Classes::instance().get(clazz)->name();
+    string classText(_strings->get(g_genderStrRefs[button.character.gender]));
+    classText += " " + _game->classes().get(clazz)->name();
 
-    string descText(Strings::instance().get(g_classDescStrRefs[clazz]));
+    string descText(_strings->get(g_classDescStrRefs[clazz]));
 
     getControl("LBL_CLASS").setTextMessage(classText);
     getControl("LBL_DESC").setTextMessage(descText);

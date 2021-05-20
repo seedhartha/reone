@@ -18,6 +18,7 @@
 #include "scenegraph.h"
 
 #include <algorithm>
+#include <stdexcept>
 
 #include "glm/gtx/transform.hpp"
 
@@ -43,7 +44,29 @@ static constexpr float kMaxGrassDistance = 16.0f;
 
 static const bool g_debugAABB = false;
 
-SceneGraph::SceneGraph(const GraphicsOptions &opts) : _opts(opts) {
+SceneGraph::SceneGraph(GraphicsOptions opts, Shaders *shaders, Meshes *meshes, Textures *textures, Materials *materials, PBRIBL *pbrIbl) :
+    _opts(move(opts)),
+    _shaders(shaders),
+    _meshes(meshes),
+    _textures(textures),
+    _materials(materials),
+    _pbrIbl(pbrIbl) {
+
+    if (!shaders) {
+        throw invalid_argument("shaders must not be null");
+    }
+    if (!meshes) {
+        throw invalid_argument("meshes must not be null");
+    }
+    if (!textures) {
+        throw invalid_argument("textures must not be null");
+    }
+    if (!materials) {
+        throw invalid_argument("materials must not be null");
+    }
+    if (!pbrIbl) {
+        throw invalid_argument("pbrIbl must not be null");
+    }
 }
 
 void SceneGraph::clearRoots() {
@@ -301,8 +324,8 @@ void SceneGraph::draw(bool shadowPass) {
             ShaderUniforms uniforms(_uniformsPrototype);
             uniforms.combined.general.model = move(transform);
 
-            Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
-            Meshes::instance().getAABB()->draw();
+            _shaders->activate(ShaderProgram::SimpleColor, uniforms);
+            _meshes->getAABB()->draw();
         }
     }
 

@@ -25,6 +25,8 @@
 #include <boost/noncopyable.hpp>
 
 #include "framebuffer.h"
+#include "mesh/meshes.h"
+#include "shader/shaders.h"
 #include "texture/texture.h"
 
 namespace reone {
@@ -43,8 +45,7 @@ public:
         std::shared_ptr<Texture> brdfLookup;
     };
 
-    static PBRIBL &instance();
-
+    PBRIBL(Shaders *shaders, Meshes *meshes);
     ~PBRIBL();
 
     void init();
@@ -65,6 +66,9 @@ public:
     bool getDerived(const Texture *envmap, Derived &derived);
 
 private:
+    Shaders *_shaders;
+    Meshes *_meshes;
+
     bool _inited { false };
     std::set<const Texture *> _envmapQueue;
     std::unordered_map<const Texture *, Derived> _derivedByEnvmap;

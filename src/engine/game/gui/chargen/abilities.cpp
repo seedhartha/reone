@@ -161,7 +161,7 @@ void CharGenAbilities::onClick(const string &control) {
 
     } else if (control == "BTN_RECOMMENDED") {
         ClassType classType = _charGen->character().attributes.getEffectiveClass();
-        shared_ptr<CreatureClass> clazz(Classes::instance().get(classType));
+        shared_ptr<CreatureClass> clazz(_game->classes().get(classType));
         _attributes = clazz->defaultAttributes();
         _points = 0;
         refreshControls();
@@ -195,7 +195,7 @@ void CharGenAbilities::onFocusChanged(const string &control, bool focus) {
         if (maybeAbility != g_abilityByAlias.end()) {
             auto maybeDescription = g_descStrRefByAbility.find(maybeAbility->second);
             if (maybeDescription != g_descStrRefByAbility.end()) {
-                string description(Strings::instance().get(maybeDescription->second));
+                string description(_strings->get(maybeDescription->second));
                 ListBox &listBox = getControl<ListBox>("LB_DESC");
                 listBox.clearItems();
                 listBox.addTextLinesAsItems(description);

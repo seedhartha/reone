@@ -242,8 +242,8 @@ void HUD::drawHealth(int memberIndex) {
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 
-    Shaders::instance().activate(ShaderProgram::SimpleColor, uniforms);
-    Meshes::instance().getQuad()->draw();
+    _shaders->activate(ShaderProgram::SimpleColor, uniforms);
+    _meshes->getQuad()->draw();
 }
 
 void HUD::showCombatHud() {

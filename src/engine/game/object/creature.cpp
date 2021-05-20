@@ -65,12 +65,7 @@ Creature::Creature(
     ObjectFactory *objectFactory,
     SceneGraph *sceneGraph
 ) :
-    SpatialObject(id, ObjectType::Creature, objectFactory, sceneGraph),
-    _game(game) {
-
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+    SpatialObject(id, ObjectType::Creature, game, objectFactory, sceneGraph) {
 }
 
 void Creature::loadFromGIT(const GffStruct &gffs) {
@@ -80,7 +75,7 @@ void Creature::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Creature::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utc(Resources::instance().getGFF(resRef, ResourceType::Utc));
+    shared_ptr<GffStruct> utc(_game->resources().getGFF(resRef, ResourceType::Utc));
     if (utc) {
         loadUTC(*utc);
         loadAppearance();
@@ -88,7 +83,7 @@ void Creature::loadFromBlueprint(const string &resRef) {
 }
 
 void Creature::loadAppearance() {
-    shared_ptr<TwoDA> appearances(Resources::instance().get2DA("appearance"));
+    shared_ptr<TwoDA> appearances(_game->resources().get2DA("appearance"));
     _modelType = parseModelType(appearances->getString(_appearance, "modeltype"));
     _walkSpeed = appearances->getFloat(_appearance, "walkdist");
     _runSpeed = appearances->getFloat(_appearance, "rundist");
@@ -451,7 +446,7 @@ void Creature::playSound(SoundSetEntry entry, bool positional) {
 void Creature::die() {
     _currentHitPoints = 0;
     _dead = true;
-    _name = Strings::instance().get(kStrRefRemains);
+    _name = _game->strings().get(kStrRefRemains);
 
     debug(boost::format("Creature %s is dead") % _tag, 2);
 

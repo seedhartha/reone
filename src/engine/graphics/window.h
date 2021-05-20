@@ -25,6 +25,8 @@
 #include "glm/mat4x4.hpp"
 
 #include "cursor.h"
+#include "eventhandler.h"
+#include "options.h"
 #include "texture/texture.h"
 #include "types.h"
 

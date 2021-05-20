@@ -58,9 +58,9 @@ void AbilitiesMenu::load() {
     disableControl("BTN_POWERS");
     disableControl("BTN_FEATS");
 
-    setControlText("LBL_SKILLRANK", Strings::instance().get(kStrRefSkillRank));
-    setControlText("LBL_BONUS", Strings::instance().get(kStrRefBonus));
-    setControlText("LBL_TOTAL", Strings::instance().get(kStrRefTotalRank));
+    setControlText("LBL_SKILLRANK", _strings->get(kStrRefSkillRank));
+    setControlText("LBL_BONUS", _strings->get(kStrRefBonus));
+    setControlText("LBL_TOTAL", _strings->get(kStrRefTotalRank));
 
     setControlText("LBL_RANKVAL", "");
     setControlText("LBL_BONUSVAL", "");
@@ -74,26 +74,16 @@ void AbilitiesMenu::load() {
     loadSkills();
 }
 
-static shared_ptr<Texture> getFrameTexture(GameID gameId) {
-    string resRef;
-    if (isTSL(gameId)) {
-        resRef = "uibit_eqp_itm1";
-    } else {
-        resRef = "lbl_hex_3";
-    }
-    return Textures::instance().get(resRef, TextureUsage::GUI);
-}
-
 void AbilitiesMenu::loadSkills() {
-    shared_ptr<TwoDA> skills(Resources::instance().get2DA("skills"));
+    shared_ptr<TwoDA> skills(_resources->get2DA("skills"));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         auto skill = static_cast<Skill>(row);
 
         SkillInfo skillInfo;
         skillInfo.skill = skill;
-        skillInfo.name = Strings::instance().get(skills->getInt(row, "name"));
-        skillInfo.description = Strings::instance().get(skills->getInt(row, "description"));
-        skillInfo.icon = Textures::instance().get(skills->getString(row, "icon"), TextureUsage::GUI);
+        skillInfo.name = _strings->get(skills->getInt(row, "name"));
+        skillInfo.description = _strings->get(skills->getInt(row, "description"));
+        skillInfo.icon = _textures->get(skills->getString(row, "icon"), TextureUsage::GUI);
 
         _skills.insert(make_pair(skill, move(skillInfo)));
     }
@@ -108,6 +98,16 @@ void AbilitiesMenu::loadSkills() {
         item.iconTexture = skill.second.icon;
         lbAbility.addItem(move(item));
     }
+}
+
+shared_ptr<Texture> AbilitiesMenu::getFrameTexture(GameID gameId) const {
+    string resRef;
+    if (isTSL(gameId)) {
+        resRef = "uibit_eqp_itm1";
+    } else {
+        resRef = "lbl_hex_3";
+    }
+    return _textures->get(resRef, TextureUsage::GUI);
 }
 
 void AbilitiesMenu::refreshControls() {

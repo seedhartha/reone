@@ -27,7 +27,7 @@ namespace reone {
 
 namespace game {
 
-void CreatureAttributes::addClassLevels(ClassType clazz, int levels) {
+void CreatureAttributes::addClassLevels(CreatureClass *clazz, int levels) {
     for (int i = 0; i < static_cast<int>(_classLevels.size()); ++i) {
         if (_classLevels[i].first == clazz) {
             _classLevels[i].second += levels;
@@ -39,12 +39,12 @@ void CreatureAttributes::addClassLevels(ClassType clazz, int levels) {
 
 ClassType CreatureAttributes::getClassByPosition(int position) const {
     return position > 0 && (position - 1) < static_cast<int>(_classLevels.size()) ?
-        _classLevels[static_cast<size_t>(position) - 1].first :
+        _classLevels[static_cast<size_t>(position) - 1].first->type() :
         ClassType::Invalid;
 }
 
 ClassType CreatureAttributes::getEffectiveClass() const {
-    return _classLevels.empty() ? ClassType::Invalid : _classLevels.back().first;
+    return _classLevels.empty() ? ClassType::Invalid : _classLevels.back().first->type();
 }
 
 int CreatureAttributes::getLevelByPosition(int position) const {
@@ -56,7 +56,7 @@ int CreatureAttributes::getLevelByPosition(int position) const {
 int CreatureAttributes::getClassLevel(ClassType clazz) const {
     auto maybeClassLevel = find_if(
         _classLevels.begin(), _classLevels.end(),
-        [&clazz](auto &classLevel) { return classLevel.first == clazz; });
+        [&clazz](auto &classLevel) { return classLevel.first->type() == clazz; });
 
     return maybeClassLevel != _classLevels.end() ? maybeClassLevel->second : 0;
 }
@@ -64,7 +64,7 @@ int CreatureAttributes::getClassLevel(ClassType clazz) const {
 int CreatureAttributes::getAggregateHitDie() const {
     int result = 0;
     for (auto &pair : _classLevels) {
-        result += pair.second * Classes::instance().get(pair.first)->hitdie();
+        result += pair.second * pair.first->hitdie();
     }
     return result;
 }
@@ -80,8 +80,7 @@ int CreatureAttributes::getAggregateLevel() const {
 int CreatureAttributes::getAggregateAttackBonus() const {
     int result = 0;
     for (auto &pair : _classLevels) {
-        auto clazz = Classes::instance().get(pair.first);
-        result += clazz->getAttackBonus(pair.second);
+        result += pair.first->getAttackBonus(pair.second);
     }
     return result;
 }
@@ -92,7 +91,7 @@ SavingThrows CreatureAttributes::getAggregateSavingThrows() const {
     result.reflex = 1;
     result.will = 1;
     for (auto &pair : _classLevels) {
-        auto classThrows = Classes::instance().get(pair.first)->getSavingThrows(pair.second);
+        auto classThrows = pair.first->getSavingThrows(pair.second);
         result.fortitude += classThrows.fortitude;
         result.reflex += classThrows.reflex;
         result.will += classThrows.will;

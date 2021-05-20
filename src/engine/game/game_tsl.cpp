@@ -41,21 +41,21 @@ static constexpr char kLocalizationLipFilename[] = "localization";
 static constexpr char kExeFilename[] = "swkotor2.exe";
 
 void Game::initResourceProvidersForTSL() {
-    Resources::instance().indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
+    _resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
 
     fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
-    Resources::instance().indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
-    Resources::instance().indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
+    _resources.indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
+    _resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
 
-    Resources::instance().indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
-    Resources::instance().indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
-    Resources::instance().indexDirectory(getPathIgnoreCase(_path, kVoiceDirectoryName));
+    _resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
+    _resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
+    _resources.indexDirectory(getPathIgnoreCase(_path, kVoiceDirectoryName));
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-    Resources::instance().indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
+    _resources.indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
 
-    Resources::instance().indexExeFile(getPathIgnoreCase(_path, kExeFilename));
-    Resources::instance().indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
+    _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
+    _resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
 }
 
 } // namespace game

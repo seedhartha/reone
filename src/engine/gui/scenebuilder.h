@@ -36,7 +36,7 @@ namespace gui {
  */
 class SceneBuilder {
 public:
-    SceneBuilder(const graphics::GraphicsOptions &opts);
+    SceneBuilder(graphics::GraphicsOptions opts, graphics::Shaders *shaders, graphics::Meshes *meshes, graphics::Textures *textures, graphics::Materials *materials, graphics::PBRIBL *pbrIbl);
 
     std::unique_ptr<scene::SceneGraph> build();
 
@@ -51,6 +51,11 @@ public:
 
 private:
     graphics::GraphicsOptions _opts;
+    graphics::Shaders *_shaders;
+    graphics::Meshes *_meshes;
+    graphics::Textures *_textures;
+    graphics::Materials *_materials;
+    graphics::PBRIBL *_pbrIbl;
 
     float _aspect { 1.0f };
     float _zNear { 0.1f };

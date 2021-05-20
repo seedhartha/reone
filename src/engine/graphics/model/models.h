@@ -23,6 +23,9 @@
 
 #include <boost/noncopyable.hpp>
 
+#include "../../resource/resources.h"
+
+#include "../texture/textures.h"
 #include "../types.h"
 
 namespace reone {
@@ -33,13 +36,16 @@ class Model;
 
 class Models : boost::noncopyable {
 public:
-    static Models &instance();
+    Models(Textures *textures,resource::Resources *resources);
 
     void invalidateCache();
 
     std::shared_ptr<Model> get(const std::string &resRef);
 
 private:
+    Textures *_textures;
+    resource::Resources *_resources;
+
     std::unordered_map<std::string, std::shared_ptr<Model>> _cache;
 
     std::shared_ptr<Model> doGet(const std::string &resRef);

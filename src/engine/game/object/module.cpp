@@ -40,13 +40,7 @@ static constexpr int kMaxSecond = 60;
 static constexpr int kMaxMinute = 60;
 static constexpr int kMaxHour = 24;
 
-Module::Module(uint32_t id, Game *game) :
-    Object(id, ObjectType::Module),
-    _game(game) {
-
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+Module::Module(uint32_t id, Game *game) : Object(id, ObjectType::Module, game) {
 }
 
 void Module::load(const string &name, const GffStruct &ifo) {
@@ -90,8 +84,8 @@ void Module::loadInfo(const GffStruct &ifo) {
 void Module::loadArea(const GffStruct &ifo) {
     reone::info("Load area " + _info.entryArea);
 
-    shared_ptr<GffStruct> are(Resources::instance().getGFF(_info.entryArea, ResourceType::Are));
-    shared_ptr<GffStruct> git(Resources::instance().getGFF(_info.entryArea, ResourceType::Git));
+    shared_ptr<GffStruct> are(_game->resources().getGFF(_info.entryArea, ResourceType::Are));
+    shared_ptr<GffStruct> git(_game->resources().getGFF(_info.entryArea, ResourceType::Git));
 
     _area = _game->objectFactory().newArea();
     _area->load(_info.entryArea, *are, *git);

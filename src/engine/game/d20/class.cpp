@@ -17,10 +17,11 @@
 
 #include "class.h"
 
+#include <stdexcept>
+
 #include <boost/algorithm/string.hpp>
 
-#include "../../resource/resources.h"
-#include "../../resource/strings.h"
+#include "classes.h"
 
 using namespace std;
 
@@ -32,16 +33,30 @@ namespace game {
 
 static const char kSkillsTwoDaResRef[] = "skills";
 
-CreatureClass::CreatureClass(ClassType type) : _type(type) {
-    _defaultAttributes.addClassLevels(type, 1);
+CreatureClass::CreatureClass(ClassType type, Classes *classes, Resources *resources, Strings *strings) :
+    _type(type),
+    _classes(classes),
+    _resources(resources),
+    _strings(strings) {
+
+    if (!classes) {
+        throw invalid_argument("classes must not be null");
+    }
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
+    }
+    if (!strings) {
+        throw invalid_argument("strings must not be null");
+    }
 }
 
 void CreatureClass::load(const TwoDA &twoDa, int row) {
-    _name = Strings::instance().get(twoDa.getInt(row, "name"));
-    _description = Strings::instance().get(twoDa.getInt(row, "description"));
+    _name = _strings->get(twoDa.getInt(row, "name"));
+    _description = _strings->get(twoDa.getInt(row, "description"));
     _hitdie = twoDa.getInt(row, "hitdie");
     _skillPointBase = twoDa.getInt(row, "skillpointbase");
 
+    _defaultAttributes.addClassLevels(this, 1);
     _defaultAttributes.setAbilityScore(Ability::Strength, twoDa.getInt(row, "str"));
     _defaultAttributes.setAbilityScore(Ability::Dexterity, twoDa.getInt(row, "dex"));
     _defaultAttributes.setAbilityScore(Ability::Constitution, twoDa.getInt(row, "con"));
@@ -60,7 +75,7 @@ void CreatureClass::load(const TwoDA &twoDa, int row) {
 }
 
 void CreatureClass::loadClassSkills(const string &skillsTable) {
-    shared_ptr<TwoDA> skills(Resources::instance().get2DA(kSkillsTwoDaResRef));
+    shared_ptr<TwoDA> skills(_resources->get2DA(kSkillsTwoDaResRef));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         if (skills->getInt(row, skillsTable + "_class") == 1) {
             _classSkills.insert(static_cast<Skill>(row));
@@ -69,7 +84,7 @@ void CreatureClass::loadClassSkills(const string &skillsTable) {
 }
 
 void CreatureClass::loadSavingThrows(const string &savingThrowTable) {
-    shared_ptr<TwoDA> twoDa(Resources::instance().get2DA(savingThrowTable));
+    shared_ptr<TwoDA> twoDa(_resources->get2DA(savingThrowTable));
     for (int row = 0; row < twoDa->getRowCount(); ++row) {
         int level = twoDa->getInt(row, "level");
 
@@ -83,7 +98,7 @@ void CreatureClass::loadSavingThrows(const string &savingThrowTable) {
 }
 
 void CreatureClass::loadAttackBonuses(const string &attackBonusTable) {
-    shared_ptr<TwoDA> twoDa(Resources::instance().get2DA(attackBonusTable));
+    shared_ptr<TwoDA> twoDa(_resources->get2DA(attackBonusTable));
     for (int row = 0; row < twoDa->getRowCount(); ++row) {
         _attackBonuses.push_back(twoDa->getInt(row, "bab"));
     }

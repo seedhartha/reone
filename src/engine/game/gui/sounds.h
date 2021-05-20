@@ -24,6 +24,7 @@
 #include "../../audio/files.h"
 #include "../../audio/stream.h"
 #include "../../resource/2da.h"
+#include "../../resource/resources.h"
 
 namespace reone {
 
@@ -31,7 +32,7 @@ namespace game {
 
 class GUISounds : boost::noncopyable {
 public:
-    GUISounds(audio::AudioFiles *audioFiles);
+    GUISounds(audio::AudioFiles *audioFiles, resource::Resources *resources);
     ~GUISounds();
 
     void init();
@@ -42,6 +43,7 @@ public:
 
 private:
     audio::AudioFiles *_audioFiles;
+    resource::Resources *_resources;
 
     std::shared_ptr<audio::AudioStream> _onClick;
     std::shared_ptr<audio::AudioStream> _onEnter;

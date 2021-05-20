@@ -75,12 +75,6 @@ void CharacterMenu::update(float dt) {
     GUI::update(dt);
 }
 
-static string describeClass(ClassType clazz) {
-    if (clazz == ClassType::Invalid) return "";
-
-    return Classes::instance().get(clazz)->name();
-}
-
 static string toStringOrEmptyIfZero(int value) {
     return value != 0 ? to_string(value) : "";
 }
@@ -127,6 +121,12 @@ void CharacterMenu::refreshControls() {
     refresh3D();
 }
 
+string CharacterMenu::describeClass(ClassType clazz) const {
+    if (clazz == ClassType::Invalid) return "";
+
+    return _game->classes().get(clazz)->name();
+}
+
 void CharacterMenu::refreshPortraits() {
     if (_game->gameId() != GameID::KotOR) return;
 
@@ -147,7 +147,7 @@ void CharacterMenu::refresh3D() {
     Control &control3d = getControl("LBL_3DCHAR");
     float aspect = control3d.extent().width / static_cast<float>(control3d.extent().height);
 
-    auto scene = SceneBuilder(_gfxOpts)
+    auto scene = SceneBuilder(_gfxOpts, _shaders, _meshes, _textures, &_game->materials(), &_game->pbrIbl())
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier(bind(&CharacterMenu::getSceneModel, this, _1))
@@ -177,7 +177,7 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) 
     character->loadAppearance();
     character->updateModelAnimation();
 
-    auto sceneModel = make_shared<ModelSceneNode>(Models::instance().get("charmain_light"), ModelUsage::GUI, &sceneGraph);
+    auto sceneModel = make_shared<ModelSceneNode>(_game->models().get("charmain_light"), ModelUsage::GUI, &sceneGraph);
     sceneModel->attach("charmain_light", character->sceneNode());
 
     return move(sceneModel);

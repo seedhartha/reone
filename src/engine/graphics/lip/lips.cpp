@@ -18,8 +18,9 @@
 
 #include "lips.h"
 
+#include <stdexcept>
+
 #include "../../common/streamutil.h"
-#include "../../resource/resources.h"
 
 #include "lipreader.h"
 
@@ -32,16 +33,17 @@ namespace reone {
 
 namespace graphics {
 
-Lips &Lips::instance() {
-    static Lips instance;
-    return instance;
-}
+Lips::Lips(Resources *resources) :
+    MemoryCache(bind(&Lips::doGet, this, _1)),
+    _resources(resources) {
 
-Lips::Lips() : MemoryCache(bind(&Lips::doGet, this, _1)) {
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
+    }
 }
 
 shared_ptr<LipAnimation> Lips::doGet(string resRef) {
-    shared_ptr<ByteArray> lipData(Resources::instance().getRaw(resRef, ResourceType::Lip));
+    shared_ptr<ByteArray> lipData(_resources->getRaw(resRef, ResourceType::Lip));
     if (!lipData) return nullptr;
 
     LipReader lip;

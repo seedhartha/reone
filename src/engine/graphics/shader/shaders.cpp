@@ -72,11 +72,6 @@ static constexpr int kBindingPointIndexParticles = 5;
 static constexpr int kBindingPointIndexGrass = 6;
 static constexpr int kBindingPointIndexDanglymesh = 7;
 
-Shaders &Shaders::instance() {
-    static Shaders instance;
-    return instance;
-}
-
 void Shaders::init() {
     if (_inited) return;
 

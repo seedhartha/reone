@@ -78,8 +78,8 @@ void GrassSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &el
         uniforms.grass->clusters[i].lightmapUV = cluster->lightmapUV;
     }
 
-    Shaders::instance().activate(ShaderProgram::GrassGrass, uniforms);
-    Meshes::instance().getGrass()->drawInstanced(count);
+    _sceneGraph->shaders().activate(ShaderProgram::GrassGrass, uniforms);
+    _sceneGraph->meshes().getGrass()->drawInstanced(count);
 }
 
 } // namespace scene

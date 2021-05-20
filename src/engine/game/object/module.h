@@ -86,7 +86,6 @@ public:
     void setTime(int hour, int minute, int second, int millisecond);
 
 private:
-    Game *_game { nullptr };
     std::string _name;
     ModuleInfo _info;
     std::shared_ptr<Area> _area;

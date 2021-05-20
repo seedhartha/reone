@@ -54,8 +54,6 @@ public:
     const std::string &linkedTo() const { return _linkedTo; }
 
 private:
-    Game *_game;
-
     std::string _transitionDestin;
     std::string _linkedToModule;
     std::string _linkedTo;

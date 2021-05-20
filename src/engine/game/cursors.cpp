@@ -52,9 +52,24 @@ static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_namesByResRefSteamT
     { CursorType::Attack, { 53, 54 } }
 };
 
-Cursors::Cursors(GameID gameId, Window *window) : _gameId(gameId), _window(window) {
+Cursors::Cursors(GameID gameId, Window *window, Shaders *shaders, Meshes *meshes, Resources *resources) :
+    _gameId(gameId),
+    _window(window),
+    _shaders(shaders),
+    _meshes(meshes),
+    _resources(resources) {
+
     if (!window) {
         throw invalid_argument("window must not be null");
+    }
+    if (!shaders) {
+        throw invalid_argument("shaders must not be null");
+    }
+    if (!meshes) {
+        throw invalid_argument("meshes must not be null");
+    }
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
     }
 }
 
@@ -75,7 +90,7 @@ shared_ptr<Cursor> Cursors::get(CursorType type) {
     shared_ptr<Texture> up(newTexture(names.first));
     shared_ptr<Texture> down(newTexture(names.second));
 
-    auto cursor = make_shared<Cursor>(up, down, _window);
+    auto cursor = make_shared<Cursor>(up, down, _window, _shaders, _meshes);
     auto inserted = _cache.insert(make_pair(type, cursor));
 
     return inserted.first->second;
@@ -95,7 +110,7 @@ const pair<uint32_t, uint32_t> &Cursors::getCursorNames(CursorType type, const u
 }
 
 shared_ptr<Texture> Cursors::newTexture(uint32_t name) {
-    shared_ptr<ByteArray> data(Resources::instance().getFromExe(name, PEResourceType::Cursor));
+    shared_ptr<ByteArray> data(_resources->getFromExe(name, PEResourceType::Cursor));
 
     CurReader curFile;
     curFile.load(wrap(data));

@@ -125,7 +125,7 @@ Variable Routines::getLoadFromSaveGame(const VariablesList &args, ExecutionConte
 
 Variable Routines::getStringByStrRef(const VariablesList &args, ExecutionContext &ctx) {
     int strRef = getInt(args, 0);
-    return Variable::ofString(Strings::instance().get(strRef));
+    return Variable::ofString(_game->strings().get(strRef));
 }
 
 Variable Routines::startNewModule(const VariablesList &args, ExecutionContext &ctx) {

@@ -57,8 +57,6 @@ public:
     // END Scripts
 
 private:
-    Game *_game;
-
     int  _appearance { 0 };
     bool _hasInventory { false };
     bool _usable { false };

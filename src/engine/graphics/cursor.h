@@ -23,16 +23,24 @@
 
 #include "glm/vec2.hpp"
 
+#include "mesh/meshes.h"
+#include "shader/shaders.h"
+#include "texture/textures.h"
+
 namespace reone {
 
 namespace graphics {
 
-class Texture;
 class Window;
 
 class Cursor : boost::noncopyable {
 public:
-    Cursor(std::shared_ptr<Texture> up, std::shared_ptr<Texture> down, Window *window);
+    Cursor(
+        std::shared_ptr<Texture> up,
+        std::shared_ptr<Texture> down,
+        Window *window,
+        Shaders *shaders,
+        Meshes *meshes);
 
     void draw();
 
@@ -43,6 +51,8 @@ private:
     std::shared_ptr<Texture> _up;
     std::shared_ptr<Texture> _down;
     Window *_window;
+    Shaders *_shaders;
+    Meshes *_meshes;
 
     glm::ivec2 _position { 0 };
     bool _pressed { false };

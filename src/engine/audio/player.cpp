@@ -28,6 +28,7 @@
 #include "../common/log.h"
 
 #include "files.h"
+#include "options.h"
 #include "soundhandle.h"
 
 using namespace std;

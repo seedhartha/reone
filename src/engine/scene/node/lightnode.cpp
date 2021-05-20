@@ -83,10 +83,10 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     uniforms.combined.general.alpha = 0.5f;
     //uniforms.combined.general.color = glm::vec4(flare.colorShift, 1.0f);
 
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
+    _sceneGraph->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    withAdditiveBlending([]() {
-        Meshes::instance().getBillboard()->draw();
+    withAdditiveBlending([&]() {
+        _sceneGraph->meshes().getBillboard()->draw();
     });
 }
 

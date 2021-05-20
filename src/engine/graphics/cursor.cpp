@@ -22,10 +22,7 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
-#include "mesh/meshes.h"
-#include "shader/shaders.h"
 #include "stateutil.h"
-#include "texture/texture.h"
 #include "window.h"
 
 using namespace std;
@@ -34,8 +31,8 @@ namespace reone {
 
 namespace graphics {
 
-Cursor::Cursor(shared_ptr<Texture> up, shared_ptr<Texture> down, Window *window) :
-    _up(up), _down(down), _window(window) {
+Cursor::Cursor(shared_ptr<Texture> up, shared_ptr<Texture> down, Window *window, Shaders *shaders, Meshes *meshes) :
+    _up(up), _down(down), _window(window), _shaders(shaders), _meshes(meshes) {
 
     if (!up) {
         throw invalid_argument("up must not be null");
@@ -45,6 +42,12 @@ Cursor::Cursor(shared_ptr<Texture> up, shared_ptr<Texture> down, Window *window)
     }
     if (!window) {
         throw invalid_argument("window must not be null");
+    }
+    if (!shaders) {
+        throw invalid_argument("shaders must not be null");
+    }
+    if (!meshes) {
+        throw invalid_argument("meshes must not be null");
     }
 }
 
@@ -61,8 +64,8 @@ void Cursor::draw() {
     uniforms.combined.general.projection = _window->getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->draw();
+    _shaders->activate(ShaderProgram::SimpleGUI, uniforms);
+    _meshes->getQuad()->draw();
 }
 
 void Cursor::setPosition(const glm::ivec2 &position) {

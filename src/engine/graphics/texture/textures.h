@@ -23,6 +23,7 @@
 
 #include <boost/noncopyable.hpp>
 
+#include "../../resource/resources.h"
 #include "../../resource/types.h"
 
 #include "../types.h"
@@ -35,7 +36,7 @@ class Texture;
 
 class Textures : boost::noncopyable {
 public:
-    static Textures &instance();
+    Textures(resource::Resources *resources);
 
     void init();
     void invalidateCache();
@@ -48,6 +49,8 @@ public:
     std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
 
 private:
+    resource::Resources *_resources;
+
     std::shared_ptr<graphics::Texture> _default;
     std::shared_ptr<graphics::Texture> _defaultCubemap;
     std::unordered_map<std::string, std::shared_ptr<Texture>> _cache;

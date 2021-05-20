@@ -80,10 +80,10 @@ void SaveLoad::load() {
 void SaveLoad::refresh() {
     setControlDisabled("BTN_DELETE", _mode != Mode::Save);
 
-    string panelName(Strings::instance().get(_mode == Mode::Save ? kStrRefSaveGame : kStrRefLoadGame));
+    string panelName(_strings->get(_mode == Mode::Save ? kStrRefSaveGame : kStrRefLoadGame));
     setControlText("LBL_PANELNAME", panelName);
 
-    string actionName(Strings::instance().get(_mode == Mode::Save ? kStrRefSave : kStrRefLoad));
+    string actionName(_strings->get(_mode == Mode::Save ? kStrRefSave : kStrRefLoad));
     setControlText("BTN_SAVELOAD", actionName);
 
     refreshSavedGames();

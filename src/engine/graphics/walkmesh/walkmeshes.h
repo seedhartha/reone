@@ -24,6 +24,7 @@
 
 #include <boost/noncopyable.hpp>
 
+#include "../../resource/resources.h"
 #include "../../resource/types.h"
 
 #include "../types.h"
@@ -36,7 +37,7 @@ class Walkmesh;
 
 class Walkmeshes : boost::noncopyable {
 public:
-    static Walkmeshes &instance();
+    Walkmeshes(resource::Resources *resources);
 
     void init(std::set<uint32_t> walkableSurfaces);
 
@@ -45,6 +46,8 @@ public:
     std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResourceType type);
 
 private:
+    resource::Resources *_resources;
+
     std::set<uint32_t> _walkableSurfaces;
 
     std::unordered_map<std::string, std::shared_ptr<Walkmesh>> _cache;

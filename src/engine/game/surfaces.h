@@ -24,6 +24,8 @@
 
 #include <boost/noncopyable.hpp>
 
+#include "../resource/resources.h"
+
 #include "surface.h"
 
 namespace reone {
@@ -32,7 +34,7 @@ namespace game {
 
 class Surfaces : boost::noncopyable {
 public:
-    Surfaces() = default;
+    Surfaces(resource::Resources *resources);
 
     void init();
 
@@ -43,6 +45,8 @@ public:
     std::set<uint32_t> getGrassSurfaceIndices() const;
 
 private:
+    resource::Resources *_resources;
+
     std::vector<Surface> _surfaces;
 
     inline std::set<uint32_t> getSurfaceIndices(const std::function<bool(const Surface &)> &pred) const;

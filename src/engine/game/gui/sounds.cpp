@@ -29,11 +29,17 @@ namespace reone {
 
 namespace game {
 
-GUISounds::GUISounds(AudioFiles *audioFiles) : _audioFiles(audioFiles) {
+GUISounds::GUISounds(AudioFiles *audioFiles, Resources *resources) : _audioFiles(audioFiles), _resources(resources) {
+    if (!audioFiles) {
+        throw invalid_argument("audioFiles must not be null");
+    }
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
+    }
 }
 
 void GUISounds::init() {
-    shared_ptr<TwoDA> sounds(Resources::instance().get2DA("guisounds"));
+    shared_ptr<TwoDA> sounds(_resources->get2DA("guisounds"));
     loadSound(*sounds, "Clicked_Default", _onClick);
     loadSound(*sounds, "Entered_Default", _onEnter);
 }

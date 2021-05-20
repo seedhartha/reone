@@ -41,7 +41,7 @@ void ProgressBar::load(const GffStruct &gffs) {
     shared_ptr<GffStruct> dir(gffs.getStruct("PROGRESS"));
     if (dir) {
         string fill(dir->getString("FILL"));
-        _progress.fill = Textures::instance().get(fill, TextureUsage::GUI);
+        _progress.fill = _gui->textures().get(fill, TextureUsage::GUI);
     }
 }
 
@@ -61,8 +61,8 @@ void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
     uniforms.combined.general.projection = _gui->window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    Shaders::instance().activate(ShaderProgram::SimpleGUI, uniforms);
-    Meshes::instance().getQuad()->draw();
+    _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _gui->meshes().getQuad()->draw();
 }
 
 void ProgressBar::setValue(int value) {

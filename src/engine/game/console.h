@@ -30,6 +30,7 @@
 
 #include "../gui/textinput.h"
 #include "../graphics/font.h"
+#include "../graphics/options.h"
 #include "../graphics/types.h"
 
 namespace reone {

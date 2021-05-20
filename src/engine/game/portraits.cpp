@@ -33,8 +33,17 @@ namespace reone {
 
 namespace game {
 
+Portraits::Portraits(Textures *textures, Resources *resources) : _textures(textures), _resources(resources) {
+    if (!textures) {
+        throw invalid_argument("textures must not be null");
+    }
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
+    }
+}
+
 void Portraits::init() {
-    shared_ptr<TwoDA> portraits(Resources::instance().get2DA("portraits"));
+    shared_ptr<TwoDA> portraits(_resources->get2DA("portraits"));
 
     for (int row = 0; row < portraits->getRowCount(); ++row) {
         string resRef(boost::to_lower_copy(portraits->getString(row, "baseresref")));
@@ -51,16 +60,16 @@ void Portraits::init() {
     }
 }
 
-static inline shared_ptr<Texture> getPortraitTexture(const Portrait &portrait) {
-    return Textures::instance().get(portrait.resRef, TextureUsage::GUI);
-}
-
 shared_ptr<Texture> Portraits::getTextureByIndex(int index) {
     shared_ptr<Texture> result;
     if (index >= 0 && index < static_cast<int>(_portraits.size())) {
         result = getPortraitTexture(_portraits[index]);
     }
     return move(result);
+}
+
+shared_ptr<Texture> Portraits::getPortraitTexture(const Portrait &portrait) const {
+    return _textures->get(portrait.resRef, TextureUsage::GUI);
 }
 
 shared_ptr<Texture> Portraits::getTextureByAppearance(int appearance) {

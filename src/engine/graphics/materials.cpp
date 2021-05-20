@@ -17,10 +17,11 @@
 
 #include "materials.h"
 
+#include <stdexcept>
+
 #include <boost/algorithm/string.hpp>
 
 #include "../common/collectionutil.h"
-#include "../resource/resources.h"
 
 using namespace std;
 
@@ -30,15 +31,16 @@ namespace reone {
 
 namespace graphics {
 
-Materials &Materials::instance() {
-    static Materials instance;
-    return instance;
+Materials::Materials(Resources *resources) : _resources(resources) {
+    if (!resources) {
+        throw invalid_argument("resources must not be null");
+    }
 }
 
 void Materials::init() {
     if (_inited) return;
 
-    shared_ptr<TwoDA> materials(Resources::instance().get2DA("material", false));
+    shared_ptr<TwoDA> materials(_resources->get2DA("material", false));
     if (materials) {
         for (int row = 0; row < materials->getRowCount(); ++row) {
             string tex(boost::to_lower_copy(materials->getString(row, "tex")));
