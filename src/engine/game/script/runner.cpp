@@ -48,7 +48,7 @@ int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerr
         throw invalid_argument("Invalid triggerrerId");
     }
 
-    auto program = Scripts::instance().get(resRef);
+    auto program = _game->scripts().get(resRef);
     if (!program) return -1;
 
     auto ctx = make_unique<ExecutionContext>();

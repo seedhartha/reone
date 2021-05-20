@@ -31,11 +31,6 @@ namespace reone {
 
 namespace script {
 
-Scripts &Scripts::instance() {
-    static Scripts instance;
-    return instance;
-}
-
 Scripts::Scripts() : MemoryCache(bind(&Scripts::doGet, this, _1)) {
 }
 

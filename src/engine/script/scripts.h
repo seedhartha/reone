@@ -30,11 +30,9 @@ namespace script {
 
 class Scripts : public MemoryCache<std::string, ScriptProgram> {
 public:
-    static Scripts &instance();
-
-private:
     Scripts();
 
+private:
     std::shared_ptr<ScriptProgram> doGet(std::string resRef);
 };
 
