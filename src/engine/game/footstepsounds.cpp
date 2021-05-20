@@ -20,6 +20,7 @@
 #include <boost/format.hpp>
 
 #include "../audio/files.h"
+#include "../common/guardutil.h"
 #include "../resource/resources.h"
 
 using namespace std;
@@ -37,12 +38,8 @@ FootstepSounds::FootstepSounds(AudioFiles *audioFiles, Resources *resources) :
     _audioFiles(audioFiles),
     _resources(resources) {
 
-    if (!audioFiles) {
-        throw invalid_argument("auidoFiles must not be null");
-    }
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
+    ensureNotNull(audioFiles, "audioFiles");
+    ensureNotNull(resources, "resources");
 }
 
 shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {

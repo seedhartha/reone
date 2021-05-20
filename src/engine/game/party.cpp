@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 
+#include "../common/guardutil.h"
 #include "../common/log.h"
 #include "../common/random.h"
 
@@ -35,9 +36,7 @@ namespace game {
 static constexpr int kMaxMemberCount = 3;
 
 Party::Party(Game *game) : _game(game) {
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+    ensureNotNull(game, "game");
 }
 
 bool Party::handle(const SDL_Event &event) {

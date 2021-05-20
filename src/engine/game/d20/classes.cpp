@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 
+#include "../../common/guardutil.h"
 #include "../../resource/resources.h"
 
 using namespace std;
@@ -37,12 +38,8 @@ Classes::Classes(Resources *resources, Strings *strings) :
     _resources(resources),
     _strings(strings) {
 
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
-    if (!strings) {
-        throw invalid_argument("strings must not be null");
-    }
+    ensureNotNull(resources, "resources");
+    ensureNotNull(strings, "strings");
 }
 
 shared_ptr<CreatureClass> Classes::doGet(ClassType type) {

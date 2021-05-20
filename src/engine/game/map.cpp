@@ -26,6 +26,7 @@
 #include "SDL2/SDL_opengl.h"
 
 #include "../common/log.h"
+#include "../common/guardutil.h"
 #include "../graphics/mesh/meshes.h"
 #include "../graphics/stateutil.h"
 #include "../graphics/texture/textures.h"
@@ -50,9 +51,7 @@ static constexpr int kMapNoteSize = 16;
 static constexpr float kSelectedMapNoteScale = 1.5f;
 
 Map::Map(Game *game) : _game(game) {
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+    ensureNotNull(game, "game");
 }
 
 void Map::load(const string &area, const GffStruct &gffs) {

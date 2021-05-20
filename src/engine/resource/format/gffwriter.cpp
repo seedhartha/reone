@@ -23,6 +23,8 @@
 
 #include <boost/filesystem/fstream.hpp>
 
+#include "../../common/guardutil.h"
+
 using namespace std;
 
 namespace fs = boost::filesystem;
@@ -59,9 +61,7 @@ static const unordered_map<ResourceType, string> g_signatures {
 };
 
 GffWriter::GffWriter(ResourceType resType, const shared_ptr<GffStruct> &root) : _resType(resType), _root(root) {
-    if (!root) {
-        throw invalid_argument("root must not be null");
-    }
+    ensureNotNull(root, "root");
 }
 
 void GffWriter::save(const fs::path &path) {

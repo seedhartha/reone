@@ -22,6 +22,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../common/collectionutil.h"
+#include "../common/guardutil.h"
 
 using namespace std;
 
@@ -32,9 +33,7 @@ namespace reone {
 namespace graphics {
 
 Materials::Materials(Resources *resources) : _resources(resources) {
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
+    ensureNotNull(resources, "resources");
 }
 
 void Materials::init() {

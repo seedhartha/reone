@@ -23,6 +23,7 @@
 
 #include "../audio/stream.h"
 #include "../common/log.h"
+#include "../common/guardutil.h"
 #include "../common/streamreader.h"
 
 #include "video.h"
@@ -56,12 +57,8 @@ public:
         _shaders(shaders),
         _meshes(meshes) {
 
-        if (!shaders) {
-            throw invalid_argument("shaders must not be null");
-        }
-        if (!meshes) {
-            throw invalid_argument("meshes must not be null");
-        }
+        ensureNotNull(shaders, "shaders");
+        ensureNotNull(meshes, "meshes");
     }
 
     ~BinkVideoDecoder() {
@@ -334,12 +331,8 @@ BikReader::BikReader(fs::path path, Shaders *shaders, Meshes *meshes) :
     _shaders(shaders),
     _meshes(meshes) {
 
-    if (!shaders) {
-        throw invalid_argument("shaders must not be null");
-    }
-    if (!meshes) {
-        throw invalid_argument("meshes must not be null");
-    }
+    ensureNotNull(shaders, "shaders");
+    ensureNotNull(meshes, "meshes");
 }
 
 void BikReader::load() {

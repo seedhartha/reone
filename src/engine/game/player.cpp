@@ -19,6 +19,8 @@
 
 #include <stdexcept>
 
+#include "../common/guardutil.h"
+
 #include "camera/camera.h"
 #include "object/area.h"
 #include "object/creature.h"
@@ -34,18 +36,10 @@ namespace game {
 Player::Player(Module *module, Area *area, Camera *camera, const Party *party) :
     _module(module), _area(area), _camera(camera), _party(party) {
 
-    if (!module) {
-        throw invalid_argument("module must not be null");
-    }
-    if (!area) {
-        throw invalid_argument("area must not be null");
-    }
-    if (!camera) {
-        throw invalid_argument("camera must not be null");
-    }
-    if (!party) {
-        throw invalid_argument("party must not be null");
-    }
+    ensureNotNull(module, "module");
+    ensureNotNull(area, "area");
+    ensureNotNull(camera, "camera");
+    ensureNotNull(party, "party");
 }
 
 bool Player::handle(const SDL_Event &event) {

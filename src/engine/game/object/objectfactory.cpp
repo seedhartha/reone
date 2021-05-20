@@ -18,6 +18,7 @@
 #include "objectfactory.h"
 
 #include "../../common/collectionutil.h"
+#include "../../common/guardutil.h"
 
 using namespace std;
 
@@ -30,12 +31,8 @@ namespace game {
 ObjectFactory::ObjectFactory(Game *game, SceneGraph *sceneGraph) :
     _game(game), _sceneGraph(sceneGraph) {
 
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
-    if (!sceneGraph) {
-        throw invalid_argument("sceneGraph must not be null");
-    }
+    ensureNotNull(game, "game");
+    ensureNotNull(sceneGraph, "sceneGraph");
 }
 
 shared_ptr<Module> ObjectFactory::newModule() {

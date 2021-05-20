@@ -22,6 +22,7 @@
 #include "glm/ext.hpp"
 
 #include "../../common/collectionutil.h"
+#include "../../common/guardutil.h"
 #include "../../common/log.h"
 
 #include "../texture/textures.h"
@@ -80,12 +81,8 @@ MdlReader::MdlReader(Models *models, Textures *textures) :
     _models(models),
     _textures(textures) {
 
-    if (!models) {
-        throw invalid_argument("models must not be null");
-    }
-    if (!textures) {
-        throw invalid_argument("textures must not be null");
-    }
+    ensureNotNull(models, "models");
+    ensureNotNull(textures, "textures");
 
     initControllerFn();
 }

@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 
+#include "../common/guardutil.h"
 #include "../common/streamutil.h"
 #include "../graphics/texture/curreader.h"
 #include "../resource/resources.h"
@@ -59,18 +60,10 @@ Cursors::Cursors(GameID gameId, Window *window, Shaders *shaders, Meshes *meshes
     _meshes(meshes),
     _resources(resources) {
 
-    if (!window) {
-        throw invalid_argument("window must not be null");
-    }
-    if (!shaders) {
-        throw invalid_argument("shaders must not be null");
-    }
-    if (!meshes) {
-        throw invalid_argument("meshes must not be null");
-    }
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
+    ensureNotNull(window, "window");
+    ensureNotNull(shaders, "shaders");
+    ensureNotNull(meshes, "meshes");
+    ensureNotNull(resources, "resources");
 }
 
 Cursors::~Cursors() {

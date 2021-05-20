@@ -22,6 +22,7 @@
 #include "SDL2/SDL_timer.h"
 
 #include "../common/log.h"
+#include "../common/guardutil.h"
 #include "../scene/types.h"
 #include "../script/execution.h"
 
@@ -49,9 +50,7 @@ static constexpr float kMaxConversationDistance = 4.0f;
 static constexpr float kDistanceWalk = 4.0f;
 
 ActionExecutor::ActionExecutor(Game *game) : _game(game) {
-    if (!game) {
-        throw invalid_argument("game must not be null");
-    }
+    ensureNotNull(game, "game");
 }
 
 void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) {

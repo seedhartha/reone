@@ -21,6 +21,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../common/guardutil.h"
 #include "../graphics/texture/textures.h"
 #include "../resource/resources.h"
 
@@ -34,12 +35,8 @@ namespace reone {
 namespace game {
 
 Portraits::Portraits(Textures *textures, Resources *resources) : _textures(textures), _resources(resources) {
-    if (!textures) {
-        throw invalid_argument("textures must not be null");
-    }
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
+    ensureNotNull(textures, "textures");
+    ensureNotNull(resources, "resources");
 }
 
 void Portraits::init() {

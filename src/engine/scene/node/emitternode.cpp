@@ -23,6 +23,7 @@
 
 #include "glm/gtc/constants.hpp"
 
+#include "../../common/guardutil.h"
 #include "../../common/random.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
@@ -48,9 +49,7 @@ EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *model, shared_ptr<Model
     ModelNodeSceneNode(modelNode, SceneNodeType::Emitter, sceneGraph),
     _model(model) {
 
-    if (!model) {
-        throw invalid_argument("model must not be null");
-    }
+    ensureNotNull(model, "model");
 
     _birthrate = modelNode->birthrate().getByFrameOrElse(0, 0.0f);
     _lifeExpectancy = modelNode->lifeExp().getByFrameOrElse(0, 0.0f);

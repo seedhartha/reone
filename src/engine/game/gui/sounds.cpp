@@ -17,6 +17,7 @@
 
 #include "sounds.h"
 
+#include "../../common/guardutil.h"
 #include "../../resource/resources.h"
 #include "../../resource/format/2dareader.h"
 
@@ -30,12 +31,8 @@ namespace reone {
 namespace game {
 
 GUISounds::GUISounds(AudioFiles *audioFiles, Resources *resources) : _audioFiles(audioFiles), _resources(resources) {
-    if (!audioFiles) {
-        throw invalid_argument("audioFiles must not be null");
-    }
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
+    ensureNotNull(audioFiles, "audioFiles");
+    ensureNotNull(resources, "resources");
 }
 
 void GUISounds::init() {

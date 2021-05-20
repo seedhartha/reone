@@ -19,6 +19,8 @@
 
 #include <stdexcept>
 
+#include "guardutil.h"
+
 using namespace std;
 
 namespace reone {
@@ -27,9 +29,7 @@ StreamWriter::StreamWriter(const shared_ptr<ostream> &stream, boost::endian::ord
     _stream(stream),
     _endianess(endianess) {
 
-    if (!stream) {
-        throw invalid_argument("stream must not be null");
-    }
+    ensureNotNull(stream, "stream");
 }
 
 void StreamWriter::putByte(uint8_t val) {

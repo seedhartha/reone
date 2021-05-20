@@ -17,6 +17,7 @@
 
 #include "models.h"
 
+#include "../../common/guardutil.h"
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
@@ -32,12 +33,8 @@ namespace reone {
 namespace graphics {
 
 Models::Models(Textures *textures, Resources *resources) : _textures(textures), _resources(resources) {
-    if (!textures) {
-        throw invalid_argument("textures must not be null");
-    }
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
+    ensureNotNull(textures, "textures");
+    ensureNotNull(resources, "resources");
 }
 
 void Models::invalidateCache() {

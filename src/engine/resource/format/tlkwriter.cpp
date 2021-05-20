@@ -21,6 +21,7 @@
 
 #include <boost/filesystem.hpp>
 
+#include "../../common/guardutil.h"
 #include "../../common/streamwriter.h"
 
 using namespace std;
@@ -38,9 +39,7 @@ struct StringFlags {
 };
 
 TlkWriter::TlkWriter(shared_ptr<TalkTable> talkTable) : _talkTable(talkTable) {
-    if (!talkTable) {
-        throw invalid_argument("talkTable must not be null");
-    }
+    ensureNotNull(talkTable, "talkTable");
 }
 
 void TlkWriter::save(const fs::path &path) {

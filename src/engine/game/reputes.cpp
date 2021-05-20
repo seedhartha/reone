@@ -22,6 +22,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../common/guardutil.h"
 #include "../resource/resources.h"
 
 using namespace std;
@@ -38,9 +39,7 @@ static vector<string> g_factionLabels;
 static vector<vector<int>> g_factionValues;
 
 Reputes::Reputes(Resources *resources) : _resources(resources) {
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
+    ensureNotNull(resources, "resources");
 }
 
 void Reputes::init() {

@@ -21,6 +21,7 @@
 
 #include "glm/ext.hpp"
 
+#include "../../common/guardutil.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
 #include "../../graphics/stateutil.h"
@@ -44,9 +45,8 @@ LightSceneNode::LightSceneNode(const ModelSceneNode *model, shared_ptr<ModelNode
     ModelNodeSceneNode(modelNode, SceneNodeType::Light, sceneGraph),
     _model(model) {
 
-    if (!model) {
-        throw invalid_argument("model must not be null");
-    }
+    ensureNotNull(model, "model");
+
     _radius = modelNode->radius().getByFrameOrElse(0, 0.0f);
     _multiplier = modelNode->multiplier().getByFrameOrElse(0, 0.0f);
     _color = modelNode->color().getByFrameOrElse(0, glm::vec3(0.0f));

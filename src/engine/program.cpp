@@ -24,6 +24,7 @@
 #include <boost/program_options.hpp>
 
 #include "common/log.h"
+#include "common/guardutil.h"
 #include "common/types.h"
 #include "game/game.h"
 #include "graphics/featureutil.h"
@@ -47,9 +48,7 @@ static constexpr int kDefaultSoundVolume = 85;
 static constexpr int kDefaultMovieVolume = 85;
 
 Program::Program(int argc, char **argv) : _argc(argc), _argv(argv) {
-    if (!argv) {
-        throw invalid_argument("argv must not be null");
-    }
+    ensureNotNull(argv, "argv");
 }
 
 int Program::run() {

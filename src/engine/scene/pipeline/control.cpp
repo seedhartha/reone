@@ -21,6 +21,7 @@
 
 #include "glm/ext.hpp"
 
+#include "../../common/guardutil.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
 #include "../../graphics/stateutil.h"
@@ -42,9 +43,7 @@ ControlRenderPipeline::ControlRenderPipeline(glm::ivec4 extent, SceneGraph *scen
     _extent(move(extent)),
     _sceneGraph(sceneGraph) {
 
-    if (!sceneGraph) {
-        throw invalid_argument("sceneGraph must not be null");
-    }
+    ensureNotNull(sceneGraph, "sceneGraph");
 }
 
 void ControlRenderPipeline::init() {

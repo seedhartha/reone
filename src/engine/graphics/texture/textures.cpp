@@ -19,6 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../common/guardutil.h"
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
@@ -41,9 +42,7 @@ namespace reone {
 namespace graphics {
 
 Textures::Textures(Resources *resources) : _resources(resources) {
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
+    ensureNotNull(resources, "resources");
 }
 
 void Textures::init() {

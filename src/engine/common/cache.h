@@ -24,6 +24,8 @@
 
 #include <boost/noncopyable.hpp>
 
+#include "guardutil.h"
+
 namespace reone {
 
 /**
@@ -33,9 +35,7 @@ template <class K, class V>
 class MemoryCache : boost::noncopyable {
 public:
     MemoryCache(std::function<std::shared_ptr<V>(K)> compute) : _compute(compute) {
-        if (!compute) {
-            throw std::invalid_argument("compute must not be empty");
-        }
+        ensureNotNull(compute, "compute");
     }
 
     void invalidate() {

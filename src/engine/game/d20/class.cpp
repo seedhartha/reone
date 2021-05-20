@@ -21,6 +21,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "../../common/guardutil.h"
+
 #include "classes.h"
 
 using namespace std;
@@ -39,15 +41,9 @@ CreatureClass::CreatureClass(ClassType type, Classes *classes, Resources *resour
     _resources(resources),
     _strings(strings) {
 
-    if (!classes) {
-        throw invalid_argument("classes must not be null");
-    }
-    if (!resources) {
-        throw invalid_argument("resources must not be null");
-    }
-    if (!strings) {
-        throw invalid_argument("strings must not be null");
-    }
+    ensureNotNull(classes, "classes");
+    ensureNotNull(resources, "resources");
+    ensureNotNull(strings, "strings");
 }
 
 void CreatureClass::load(const TwoDA &twoDa, int row) {

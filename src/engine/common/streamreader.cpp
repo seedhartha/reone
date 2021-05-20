@@ -20,6 +20,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "guardutil.h"
+
 using namespace std;
 
 namespace endian = boost::endian;
@@ -30,9 +32,7 @@ StreamReader::StreamReader(const shared_ptr<istream> &stream, endian::order endi
     _stream(stream),
     _endianess(endianess) {
 
-    if (!stream) {
-        throw invalid_argument("stream must not be null");
-    }
+    ensureNotNull(stream, "stream");
 }
 
 size_t StreamReader::tell() {

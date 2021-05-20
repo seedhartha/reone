@@ -20,6 +20,7 @@
 #include <stdexcept>
 
 #include "../../common/collectionutil.h"
+#include "../../common/guardutil.h"
 #include "../../common/log.h"
 
 using namespace std;
@@ -42,9 +43,7 @@ Model::Model(
     _superModel(move(superModel)),
     _animationScale(animationScale) {
 
-    if (!rootNode) {
-        throw invalid_argument("rootNode must not be null");
-    }
+    ensureNotNull(rootNode, "rootNode");
 
     fillNodeByName(_rootNode);
     computeAABB();

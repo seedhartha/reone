@@ -19,6 +19,8 @@
 
 #include <stdexcept>
 
+#include "../../common/guardutil.h"
+
 using namespace std;
 
 using namespace reone::graphics;
@@ -31,9 +33,7 @@ ModelNodeSceneNode::ModelNodeSceneNode(shared_ptr<ModelNode> modelNode, SceneNod
     SceneNode(modelNode->name(), type, sceneGraph),
     _modelNode(modelNode) {
 
-    if (!modelNode) {
-        throw invalid_argument("modelNode must not be null");
-    }
+    ensureNotNull(modelNode, "modelNode");
 }
 
 } // namespace scene

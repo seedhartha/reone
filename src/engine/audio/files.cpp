@@ -17,6 +17,7 @@
 
 #include "files.h"
 
+#include "../common/guardutil.h"
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
@@ -36,9 +37,7 @@ AudioFiles::AudioFiles(Resources *resources) :
     MemoryCache(bind(&AudioFiles::doGet, this, _1)),
     _resources(resources) {
 
-    if (!_resources) {
-        throw invalid_argument("resources must not be null");
-    }
+    ensureNotNull(resources, "resources");
 }
 
 shared_ptr<AudioStream> AudioFiles::doGet(string resRef) {

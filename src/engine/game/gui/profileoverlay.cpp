@@ -24,6 +24,7 @@
 
 #include "glm/ext.hpp"
 
+#include "../../common/guardutil.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
@@ -49,18 +50,10 @@ ProfileOverlay::ProfileOverlay(Window *window, Fonts *fonts, Shaders *shaders, M
     _meshes(meshes),
     _refreshTimer(kRefreshInterval) {
 
-    if (!window) {
-        throw invalid_argument("window must not be null");
-    }
-    if (!fonts) {
-        throw invalid_argument("fonts must not be null");
-    }
-    if (!shaders) {
-        throw invalid_argument("shaders must not be null");
-    }
-    if (!meshes) {
-        throw invalid_argument("meshes must not be null");
-    }
+    ensureNotNull(window, "window");
+    ensureNotNull(fonts, "fonts");
+    ensureNotNull(shaders, "shaders");
+    ensureNotNull(meshes, "meshes");
 }
 
 void ProfileOverlay::init() {
