@@ -116,6 +116,7 @@ set(RESOURCE_HEADERS
     src/engine/resource/keybifprovider.h
     src/engine/resource/resourceprovider.h
     src/engine/resource/resources.h
+    src/engine/resource/services.h
     src/engine/resource/strings.h
     src/engine/resource/talktable.h
     src/engine/resource/types.h
@@ -185,6 +186,7 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/pbribl.h
     src/engine/graphics/pixelutil.h
     src/engine/graphics/renderbuffer.h
+    src/engine/graphics/services.h
     src/engine/graphics/shader/shaders.h
     src/engine/graphics/stateutil.h
     src/engine/graphics/texture/curreader.h
@@ -257,6 +259,7 @@ set(AUDIO_HEADERS
     src/engine/audio/format/wavreader.h
     src/engine/audio/options.h
     src/engine/audio/player.h
+    src/engine/audio/services.h
     src/engine/audio/soundhandle.h
     src/engine/audio/soundinstance.h
     src/engine/audio/stream.h
@@ -308,6 +311,7 @@ set(SCENE_HEADERS
     src/engine/scene/nodeelement.h
     src/engine/scene/pipeline/control.h
     src/engine/scene/pipeline/world.h
+    src/engine/scene/services.h
     src/engine/scene/scenegraph.h
     src/engine/scene/types.h)
 
@@ -420,6 +424,14 @@ set(GAME_HEADERS
     src/engine/game/console.h
     src/engine/game/combat/combat.h
     src/engine/game/cursors.h
+    src/engine/game/d20/attributes.h
+    src/engine/game/d20/class.h
+    src/engine/game/d20/classes.h
+    src/engine/game/d20/feat.h
+    src/engine/game/d20/feats.h
+    src/engine/game/d20/savingthrows.h
+    src/engine/game/d20/spell.h
+    src/engine/game/d20/spells.h
     src/engine/game/dialog.h
     src/engine/game/enginetype/effect.h
     src/engine/game/enginetype/event.h
@@ -488,15 +500,8 @@ set(GAME_HEADERS
     src/engine/game/portraits.h
     src/engine/game/reputes.h
     src/engine/game/room.h
-    src/engine/game/d20/attributes.h
-    src/engine/game/d20/class.h
-    src/engine/game/d20/classes.h
-    src/engine/game/d20/feat.h
-    src/engine/game/d20/feats.h
-    src/engine/game/d20/savingthrows.h
-    src/engine/game/d20/spell.h
-    src/engine/game/d20/spells.h
     src/engine/game/savedgame.h
+    src/engine/game/services.h
     src/engine/game/script/objectutil.h
     src/engine/game/script/routines.h
     src/engine/game/script/runner.h
