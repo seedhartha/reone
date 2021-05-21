@@ -677,6 +677,8 @@ endif()
 
 ## END reone executable
 
+list(APPEND InstallTargets reone)
+
 ## reone-tools executable
 
 if(BUILD_TOOLS)
@@ -714,6 +716,7 @@ if(BUILD_TOOLS)
     else()
         target_link_libraries(reone PRIVATE ${SDL2_LIBRARIES})
     endif()
+    list(APPEND InstallTargets reone-tools)
 endif()
 
 ## END reone-tools executable
@@ -741,6 +744,7 @@ if(BUILD_LAUNCHER)
         target_link_libraries(reone-launcher ${wxWidgets_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
         set_target_properties(reone-launcher PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+        list(APPEND InstallTargets reone-launcher)
     else()
         message(WARNING "wxWidgets not found - launcher cannot be built")
     endif()
@@ -770,3 +774,10 @@ if(BUILD_TESTS)
 endif()
 
 ## END Unit tests
+
+if(UNIX AND NOT APPLE)
+    include(GNUInstallDirs)
+endif()
+
+install(TARGETS ${InstallTargets} DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS libcommon libresource libgraphics libaudio libvideo libscript libgame DESTINATION ${CMAKE_INSTALL_LIBDIR})
