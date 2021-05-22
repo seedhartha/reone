@@ -19,12 +19,10 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../common/guardutil.h"
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
-#include "../../resource/resources.h"
 
-#include "../stateutil.h"
+#include "../services.h"
 #include "../types.h"
 
 #include "curreader.h"
@@ -41,8 +39,7 @@ namespace reone {
 
 namespace graphics {
 
-Textures::Textures(Resources *resources) : _resources(resources) {
-    ensureNotNull(resources, "resources");
+Textures::Textures(GraphicsServices &graphics, ResourceServices &resource) : _graphics(graphics), _resource(resource) {
 }
 
 void Textures::init() {
@@ -64,34 +61,34 @@ void Textures::invalidateCache() {
 }
 
 void Textures::bindDefaults() {
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _default->bind();
 
-    setActiveTextureUnit(TextureUnits::lightmap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::lightmap);
     _default->bind();
 
-    setActiveTextureUnit(TextureUnits::environmentMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::environmentMap);
     _defaultCubemap->bind();
 
-    setActiveTextureUnit(TextureUnits::bumpMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::bumpMap);
     _default->bind();
 
-    setActiveTextureUnit(TextureUnits::bloom);
+    _graphics.context().setActiveTextureUnit(TextureUnits::bloom);
     _default->bind();
 
-    setActiveTextureUnit(TextureUnits::irradianceMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::irradianceMap);
     _defaultCubemap->bind();
 
-    setActiveTextureUnit(TextureUnits::prefilterMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::prefilterMap);
     _defaultCubemap->bind();
 
-    setActiveTextureUnit(TextureUnits::brdfLookup);
+    _graphics.context().setActiveTextureUnit(TextureUnits::brdfLookup);
     _default->bind();
 
-    setActiveTextureUnit(TextureUnits::shadowMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::shadowMap);
     _default->bind();
 
-    setActiveTextureUnit(TextureUnits::shadowMapCube);
+    _graphics.context().setActiveTextureUnit(TextureUnits::shadowMapCube);
     _defaultCubemap->bind();
 }
 
@@ -111,14 +108,14 @@ shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {
 shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     shared_ptr<Texture> texture;
 
-    shared_ptr<ByteArray> tgaData(_resources->getRaw(resRef, ResourceType::Tga, false));
+    shared_ptr<ByteArray> tgaData(_resource.resources().getRaw(resRef, ResourceType::Tga, false));
     if (tgaData) {
         TgaReader tga(resRef, usage);
         tga.load(wrap(tgaData));
         texture = tga.texture();
 
         if (texture) {
-            shared_ptr<ByteArray> txiData(_resources->getRaw(resRef, ResourceType::Txi, false));
+            shared_ptr<ByteArray> txiData(_resource.resources().getRaw(resRef, ResourceType::Txi, false));
             if (txiData) {
                 TxiReader txi;
                 txi.load(wrap(txiData));
@@ -128,7 +125,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     }
 
     if (!texture) {
-        shared_ptr<ByteArray> tpcData(_resources->getRaw(resRef, ResourceType::Tpc, false));
+        shared_ptr<ByteArray> tpcData(_resource.resources().getRaw(resRef, ResourceType::Tpc, false));
         if (tpcData) {
             TpcReader tpc(resRef, usage);
             tpc.load(wrap(tpcData));

@@ -18,7 +18,6 @@
 #include "progressbar.h"
 
 #include "../../graphics/mesh/meshes.h"
-#include "../../graphics/stateutil.h"
 #include "../../graphics/texture/textures.h"
 
 #include "../gui.h"
@@ -48,7 +47,7 @@ void ProgressBar::load(const GffStruct &gffs) {
 void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
     if (_value == 0 || !_progress.fill) return;
 
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _gui->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _progress.fill->bind();
 
     float w = _extent.width * _value / 100.0f;

@@ -23,10 +23,8 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "../graphics/cursor.h"
-#include "../graphics/texture/texture.h"
-#include "../graphics/window.h"
-#include "../resource/types.h"
+#include "../graphics/services.h"
+#include "../resource/services.h"
 
 #include "types.h"
 
@@ -36,7 +34,7 @@ namespace game {
 
 class Cursors : boost::noncopyable {
 public:
-    Cursors(GameID gameId, graphics::Window *window, graphics::Shaders *shaders, graphics::Meshes *meshes, resource::Resources *resources);
+    Cursors(GameID gameId, graphics::GraphicsServices &graphics, resource::ResourceServices &resources);
     ~Cursors();
 
     void deinit();
@@ -45,10 +43,8 @@ public:
 
 private:
     GameID _gameId;
-    graphics::Window *_window;
-    graphics::Shaders *_shaders;
-    graphics::Meshes *_meshes;
-    resource::Resources *_resources;
+    graphics::GraphicsServices &_graphics;
+    resource::ResourceServices &_resource;
 
     std::unordered_map<CursorType, std::shared_ptr<graphics::Cursor>> _cache;
 

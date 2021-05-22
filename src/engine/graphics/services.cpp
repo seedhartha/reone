@@ -34,10 +34,12 @@ void GraphicsServices::init() {
     _window = make_unique<Window>(_options);
     _window->init();
 
+    _context = make_unique<Context>();
+
     _meshes = make_unique<Meshes>();
     _meshes->init();
 
-    _textures = make_unique<Textures>(&_resource.resources());
+    _textures = make_unique<Textures>(*this, _resource);
     _textures->init();
 
     _materials = make_unique<Materials>(&_resource.resources());
@@ -50,10 +52,10 @@ void GraphicsServices::init() {
     _shaders = make_unique<Shaders>();
     _shaders->init();
 
-    _pbrIbl = make_unique<PBRIBL>(_shaders.get(), _meshes.get());
+    _pbrIbl = make_unique<PBRIBL>(*this);
     _pbrIbl->init();
 
-    _fonts = make_unique<Fonts>(_window.get(), _shaders.get(), _meshes.get(), _textures.get());
+    _fonts = make_unique<Fonts>(*this);
 }
 
 } // namespace graphics

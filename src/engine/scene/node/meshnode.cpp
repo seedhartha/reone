@@ -27,7 +27,6 @@
 #include "../../common/random.h"
 #include "../../graphics/featureutil.h"
 #include "../../graphics/pbribl.h"
-#include "../../graphics/stateutil.h"
 
 #include "../scenegraph.h"
 
@@ -372,36 +371,36 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     // Setup textures
 
     if (_nodeTextures.diffuse) {
-        setActiveTextureUnit(TextureUnits::diffuseMap);
+        _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
         _nodeTextures.diffuse->bind();
         additive = _nodeTextures.diffuse->isAdditive();
     }
     if (_nodeTextures.lightmap) {
-        setActiveTextureUnit(TextureUnits::lightmap);
+        _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::lightmap);
         _nodeTextures.lightmap->bind();
     }
     if (_nodeTextures.envmap) {
-        setActiveTextureUnit(TextureUnits::environmentMap);
+        _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::environmentMap);
         _nodeTextures.envmap->bind();
 
         PBRIBL::Derived derived;
         if (_sceneGraph->graphics().pbrIbl().getDerived(_nodeTextures.envmap.get(), derived)) {
-            setActiveTextureUnit(TextureUnits::irradianceMap);
+            _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::irradianceMap);
             derived.irradianceMap->bind();
-            setActiveTextureUnit(TextureUnits::prefilterMap);
+            _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::prefilterMap);
             derived.prefilterMap->bind();
-            setActiveTextureUnit(TextureUnits::brdfLookup);
+            _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::brdfLookup);
             derived.brdfLookup->bind();
         }
     }
     if (_nodeTextures.bumpmap) {
-        setActiveTextureUnit(TextureUnits::bumpMap);
+        _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::bumpMap);
         _nodeTextures.bumpmap->bind();
     }
 
 
     if (additive) {
-        withAdditiveBlending([&mesh]() { mesh->mesh->draw(); });
+        _sceneGraph->graphics().context().withAdditiveBlending([&mesh]() { mesh->mesh->draw(); });
     } else {
         mesh->mesh->draw();
     }

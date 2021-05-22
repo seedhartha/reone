@@ -22,7 +22,6 @@
 #include "../../common/guardutil.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
-#include "../../graphics/stateutil.h"
 
 #include "../scenegraph.h"
 
@@ -57,14 +56,14 @@ void GrassSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &el
         count = static_cast<int>(elements.size());
     }
 
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
 
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
     uniforms.combined.featureMask |= UniformFeatureFlags::grass;
 
     if (_lightmap) {
-        setActiveTextureUnit(TextureUnits::lightmap);
+        _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::lightmap);
         _lightmap->bind();
 
         uniforms.combined.featureMask |= UniformFeatureFlags::lightmap;

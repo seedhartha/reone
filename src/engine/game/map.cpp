@@ -27,8 +27,8 @@
 
 #include "../common/log.h"
 #include "../common/guardutil.h"
+#include "../graphics/context.h"
 #include "../graphics/mesh/meshes.h"
-#include "../graphics/stateutil.h"
 #include "../graphics/texture/textures.h"
 #include "../graphics/window.h"
 #include "../resource/types.h"
@@ -98,7 +98,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
         if (!partyLeader) return;
 
-        setActiveTextureUnit(TextureUnits::diffuseMap);
+        _game->services().graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
         _areaTexture->bind();
 
         glm::vec2 worldPos(partyLeader->position());
@@ -119,10 +119,10 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
 
         int height = _game->options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
-        withScissorTest(scissorBounds, [&]() { _game->services().graphics().meshes().quad().draw(); });
+        _game->services().graphics().context().withScissorTest(scissorBounds, [&]() { _game->services().graphics().meshes().quad().draw(); });
 
     } else {
-        setActiveTextureUnit(TextureUnits::diffuseMap);
+        _game->services().graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
         _areaTexture->bind();
 
         glm::mat4 transform(1.0f);
@@ -141,7 +141,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
 void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
     if (mode != Mode::Default) return;
 
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _game->services().graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _noteTexture->bind();
 
     for (auto &object : _game->module()->area()->getObjectsByType(ObjectType::Waypoint)) {
@@ -204,7 +204,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
     if (!partyLeader) return;
 
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _game->services().graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _arrowTexture->bind();
 
     glm::vec3 arrowPos(0.0f);

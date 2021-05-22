@@ -52,13 +52,9 @@ static const char kSignature[] = "BIKi";
 
 class BinkVideoDecoder : public MediaStream<Video::Frame> {
 public:
-    BinkVideoDecoder(fs::path path, Shaders *shaders, Meshes *meshes) :
-        _path(std::move(path)),
-        _shaders(shaders),
-        _meshes(meshes) {
-
-        ensureNotNull(shaders, "shaders");
-        ensureNotNull(meshes, "meshes");
+    BinkVideoDecoder(fs::path path, GraphicsServices &graphics) :
+        _path(move(path)),
+        _graphics(graphics) {
     }
 
     ~BinkVideoDecoder() {
@@ -126,8 +122,7 @@ public:
 
 private:
     fs::path _path;
-    Shaders *_shaders;
-    Meshes *_meshes;
+    graphics::GraphicsServices &_graphics;
 
     AVFormatContext *_formatCtx { nullptr };
     int _videoStreamIdx { -1 };
@@ -235,7 +230,7 @@ private:
     void initVideo() {
         AVRational &frameRate = _formatCtx->streams[_videoStreamIdx]->r_frame_rate;
 
-        _video = make_shared<Video>(_shaders, _meshes);
+        _video = make_shared<Video>(_graphics);
         _video->_width = _videoCodecCtx->width;
         _video->_height = _videoCodecCtx->height;
         _video->_fps = frameRate.num / static_cast<float>(frameRate.den);
@@ -326,13 +321,9 @@ private:
     }
 };
 
-BikReader::BikReader(fs::path path, Shaders *shaders, Meshes *meshes) :
+BikReader::BikReader(fs::path path, GraphicsServices &graphics) :
     _path(move(path)),
-    _shaders(shaders),
-    _meshes(meshes) {
-
-    ensureNotNull(shaders, "shaders");
-    ensureNotNull(meshes, "meshes");
+    _graphics(graphics) {
 }
 
 void BikReader::load() {
@@ -340,7 +331,7 @@ void BikReader::load() {
         throw runtime_error("BIK: file not found: " + _path.string());
     }
 
-    auto decoder = make_shared<BinkVideoDecoder>(_path, _shaders, _meshes);
+    auto decoder = make_shared<BinkVideoDecoder>(_path, _graphics);
     decoder->load();
 
     _video = decoder->video();

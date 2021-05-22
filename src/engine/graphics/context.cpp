@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "stateutil.h"
+#include "context.h"
 
 #include "GL/glew.h"
 #include "SDL2/SDL_opengl.h"
@@ -26,18 +26,13 @@ namespace reone {
 
 namespace graphics {
 
-static bool g_depthTest { false };
-static bool g_backFaceCulling { false };
-static int g_textureUnit { 0 };
-static uint32_t g_polygonMode { 0 };
-
-void withWireframes(const function<void()> &block) {
+void Context::withWireframes(const function<void()> &block) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     block();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void withViewport(const glm::ivec4 &viewport, const function<void()> &block) {
+void Context::withViewport(const glm::ivec4 &viewport, const function<void()> &block) {
     int oldViewport[4];
     glGetIntegerv(GL_VIEWPORT, &oldViewport[0]);
     glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
@@ -47,7 +42,7 @@ void withViewport(const glm::ivec4 &viewport, const function<void()> &block) {
     glViewport(oldViewport[0], oldViewport[1], oldViewport[2], oldViewport[3]);
 }
 
-void withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
+void Context::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
     glEnable(GL_SCISSOR_TEST);
     glScissor(bounds[0], bounds[1], bounds[2], bounds[3]);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -57,20 +52,20 @@ void withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
     glDisable(GL_SCISSOR_TEST);
 }
 
-void withDepthTest(const function<void()> &block) {
+void Context::withDepthTest(const function<void()> &block) {
     setDepthTestEnabled(true);
     block();
     setDepthTestEnabled(false);
 }
 
-void setDepthTestEnabled(bool enabled) {
-    if (g_depthTest != enabled) {
+void Context::setDepthTestEnabled(bool enabled) {
+    if (_depthTest != enabled) {
         if (enabled) {
             glEnable(GL_DEPTH_TEST);
         } else {
             glDisable(GL_DEPTH_TEST);
         }
-        g_depthTest = enabled;
+        _depthTest = enabled;
     }
 }
 
@@ -87,7 +82,7 @@ static void withBlendFunc(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAl
     glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
 }
 
-void withAdditiveBlending(const function<void()> &block) {
+void Context::withAdditiveBlending(const function<void()> &block) {
     withBlendFunc(GL_SRC_ALPHA, GL_ONE, GL_SRC_ALPHA, GL_ONE, block);
 }
 
@@ -102,31 +97,31 @@ static void withBlendEquation(GLenum modeRGB, GLenum modeAlpha, const function<v
     glBlendEquationSeparate(startModeRGB, startModeAlpha);
 }
 
-void withLightenBlending(const function<void()> &block) {
+void Context::withLightenBlending(const function<void()> &block) {
     withBlendEquation(GL_MAX, GL_FUNC_ADD, block);
 }
 
-void withBackFaceCulling(const function<void()> &block) {
+void Context::withBackFaceCulling(const function<void()> &block) {
     setBackFaceCullingEnabled(true);
     block();
     setBackFaceCullingEnabled(false);
 }
 
-void setBackFaceCullingEnabled(bool enabled) {
-    if (g_backFaceCulling != enabled) {
+void Context::setBackFaceCullingEnabled(bool enabled) {
+    if (_backFaceCulling != enabled) {
         if (enabled) {
             glEnable(GL_CULL_FACE);
         } else {
             glDisable(GL_CULL_FACE);
         }
-        g_backFaceCulling = enabled;
+        _backFaceCulling = enabled;
     }
 }
 
-void setActiveTextureUnit(int n) {
-    if (g_textureUnit != n) {
+void Context::setActiveTextureUnit(int n) {
+    if (_textureUnit != n) {
         glActiveTexture(GL_TEXTURE0 + n);
-        g_textureUnit = n;
+        _textureUnit = n;
     }
 }
 

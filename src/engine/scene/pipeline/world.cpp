@@ -26,7 +26,6 @@
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/pbribl.h"
 #include "../../graphics/shader/shaders.h"
-#include "../../graphics/stateutil.h"
 #include "../../graphics/texture/textures.h"
 #include "../../graphics/texture/textureutil.h"
 #include "../../graphics/window.h"
@@ -191,7 +190,7 @@ void WorldRenderPipeline::drawShadows() {
     const LightSceneNode *shadowLight = _sceneGraph->shadowLight();
     if (!shadowLight) return;
 
-    withViewport(glm::ivec4(0, 0, 1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution), [&]() {
+    _sceneGraph->graphics().context().withViewport(glm::ivec4(0, 0, 1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution), [&]() {
         _shadows.bind();
         if (shadowLight->isDirectional()) {
             _shadows.attachDepth(*_shadowsDepth);
@@ -215,7 +214,7 @@ void WorldRenderPipeline::drawShadows() {
         _sceneGraph->setUniformsPrototype(move(uniforms));
 
         glClear(GL_DEPTH_BUFFER_BIT);
-        withDepthTest([this]() { _sceneGraph->draw(true); });
+        _sceneGraph->graphics().context().withDepthTest([this]() { _sceneGraph->draw(true); });
     });
 }
 
@@ -250,10 +249,10 @@ void WorldRenderPipeline::drawGeometry() {
 
     if (shadowLight) {
         if (shadowLight->isDirectional()) {
-            setActiveTextureUnit(TextureUnits::shadowMap);
+            _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::shadowMap);
             _shadowsDepth->bind();
         } else {
-            setActiveTextureUnit(TextureUnits::shadowMapCube);
+            _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::shadowMapCube);
             _cubeShadowsDepth->bind();
         }
     }
@@ -261,11 +260,11 @@ void WorldRenderPipeline::drawGeometry() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (g_wireframesEnabled) {
-        withWireframes([this]() {
-            withDepthTest([this]() { _sceneGraph->draw(); });
+        _sceneGraph->graphics().context().withWireframes([this]() {
+            _sceneGraph->graphics().context().withDepthTest([this]() { _sceneGraph->draw(); });
         });
     } else {
-        withDepthTest([this]() { _sceneGraph->draw(); });
+        _sceneGraph->graphics().context().withDepthTest([this]() { _sceneGraph->draw(); });
     }
 }
 
@@ -277,7 +276,7 @@ void WorldRenderPipeline::applyHorizontalBlur() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor2->bind();
 
     ShaderUniforms uniforms;
@@ -287,7 +286,7 @@ void WorldRenderPipeline::applyHorizontalBlur() {
 
     _sceneGraph->graphics().shaders().activate(ShaderProgram::SimpleBlur, uniforms);
 
-    withDepthTest([&]() {
+    _sceneGraph->graphics().context().withDepthTest([&]() {
         _sceneGraph->graphics().meshes().quadNDC().draw();
     });
 }
@@ -300,7 +299,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _horizontalBlurColor->bind();
 
     ShaderUniforms uniforms;
@@ -310,7 +309,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
 
     _sceneGraph->graphics().shaders().activate(ShaderProgram::SimpleBlur, uniforms);
 
-    withDepthTest([&]() {
+    _sceneGraph->graphics().context().withDepthTest([&]() {
         _sceneGraph->graphics().meshes().quadNDC().draw();
     });
 
@@ -318,10 +317,10 @@ void WorldRenderPipeline::applyVerticalBlur() {
 }
 
 void WorldRenderPipeline::drawResult() {
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor1->bind();
 
-    setActiveTextureUnit(TextureUnits::bloom);
+    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::bloom);
     _verticalBlurColor->bind();
 
     ShaderUniforms uniforms;

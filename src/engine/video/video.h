@@ -23,9 +23,7 @@
 #include "../audio/stream.h"
 #include "../common/mediastream.h"
 #include "../common/types.h"
-#include "../graphics/mesh/meshes.h"
-#include "../graphics/shader/shaders.h"
-#include "../graphics/texture/texture.h"
+#include "../graphics/services.h"
 
 namespace reone {
 
@@ -39,7 +37,7 @@ public:
         std::shared_ptr<ByteArray> pixels;
     };
 
-    Video(graphics::Shaders *shaders, graphics::Meshes *meshes);
+    Video(graphics::GraphicsServices &graphics);
 
     void init();
     void deinit();
@@ -47,17 +45,16 @@ public:
     void update(float dt);
     void draw();
 
-    void finish();
+    void finish() { _finished = true; }
 
     bool isFinished() const { return _finished; }
 
     std::shared_ptr<audio::AudioStream> audio() const { return _audio; }
 
-    void setMediaStream(const std::shared_ptr<MediaStream<Frame>> &stream);
+    void setMediaStream(std::shared_ptr<MediaStream<Frame>> stream) { _stream = std::move(stream); }
 
 private:
-    graphics::Shaders *_shaders;
-    graphics::Meshes *_meshes;
+    graphics::GraphicsServices &_graphics;
 
     int _width { 0 };
     int _height { 0 };

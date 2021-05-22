@@ -27,7 +27,6 @@
 #include "../../common/random.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
-#include "../../graphics/stateutil.h"
 
 #include "../scenegraph.h"
 
@@ -282,12 +281,12 @@ void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &
 
     _sceneGraph->graphics().shaders().activate(ShaderProgram::ParticleParticle, uniforms);
 
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
 
     bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
     if (lighten) {
-        withLightenBlending([&]() {
+        _sceneGraph->graphics().context().withLightenBlending([&]() {
             _sceneGraph->graphics().meshes().billboard().drawInstanced(count);
         });
     } else {

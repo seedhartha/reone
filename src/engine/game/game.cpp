@@ -95,7 +95,10 @@ void Game::init() {
     _graphics.walkmeshes().setWalkableSurfaces(_game->surfaces().getWalkableSurfaceIndices());
 
     _console = make_unique<Console>(this);
+    _console->init();
+
     _profileOverlay = make_unique<ProfileOverlay>(_graphics);
+    _profileOverlay->init();
 
     loadModuleNames();
     setCursorType(CursorType::Default);
@@ -137,7 +140,7 @@ void Game::playVideo(const string &name) {
     fs::path path(getPathIgnoreCase(_path, "movies/" + name + ".bik"));
     if (path.empty()) return;
 
-    BikReader bik(path, &_graphics.shaders(), &_graphics.meshes());
+    BikReader bik(path, _graphics);
     bik.load();
 
     _video = bik.video();

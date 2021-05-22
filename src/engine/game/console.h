@@ -44,7 +44,7 @@ class Console : boost::noncopyable {
 public:
     Console(Game *game);
 
-    void load();
+    void init();
     bool handle(const SDL_Event &event);
     void draw();
 

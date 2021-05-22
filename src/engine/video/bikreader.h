@@ -20,8 +20,7 @@
 #include <boost/filesystem/path.hpp>
 
 #include "../audio/types.h"
-#include "../graphics/mesh/meshes.h"
-#include "../graphics/shader/shaders.h"
+#include "../graphics/services.h"
 
 namespace reone {
 
@@ -36,7 +35,7 @@ class Video;
  */
 class BikReader {
 public:
-    BikReader(boost::filesystem::path path, graphics::Shaders *shaders, graphics::Meshes *meshes);
+    BikReader(boost::filesystem::path path, graphics::GraphicsServices &graphics);
 
     void load();
 
@@ -44,8 +43,7 @@ public:
 
 private:
     boost::filesystem::path _path;
-    graphics::Shaders *_shaders;
-    graphics::Meshes *_meshes;
+    graphics::GraphicsServices &_graphics;
 
     std::shared_ptr<Video> _video;
 };

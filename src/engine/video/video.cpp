@@ -27,7 +27,6 @@
 #include "../common/guardutil.h"
 #include "../graphics/mesh/meshes.h"
 #include "../graphics/shader/shaders.h"
-#include "../graphics/stateutil.h"
 #include "../graphics/texture/textureutil.h"
 
 using namespace std;
@@ -39,9 +38,7 @@ namespace reone {
 
 namespace video {
 
-Video::Video(Shaders *shaders, Meshes *meshes) : _shaders(shaders), _meshes(meshes) {
-    ensureNotNull(shaders, "shaders");
-    ensureNotNull(meshes, "meshes");
+Video::Video(GraphicsServices &graphics) : _graphics(graphics) {
 }
 
 void Video::init() {
@@ -80,7 +77,7 @@ void Video::updateFrame(float dt) {
 void Video::updateFrameTexture() {
     if (!_frame) return;
 
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
     _texture->setPixels(_width, _height, PixelFormat::RGB, _frame->pixels);
 }
@@ -88,20 +85,12 @@ void Video::updateFrameTexture() {
 void Video::draw() {
     if (!_inited) return;
 
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
 
     ShaderUniforms uniforms;
-    _shaders->activate(ShaderProgram::SimpleGUI, uniforms);
-    _meshes->quadNDCFlipY().draw();
-}
-
-void Video::finish() {
-    _finished = true;
-}
-
-void Video::setMediaStream(const shared_ptr<MediaStream<Frame>> &stream) {
-    _stream = stream;
+    _graphics.shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _graphics.meshes().quadNDCFlipY().draw();
 }
 
 } // namespace video
