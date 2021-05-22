@@ -67,7 +67,6 @@ struct UniformFeatureFlags {
     static constexpr int shadows = 0x200;
     static constexpr int particles = 0x400;
     static constexpr int water = 0x800;
-    static constexpr int hdr = 0x1000;
     static constexpr int normalmap = 0x2000;
     static constexpr int blur = 0x4000;
     static constexpr int text = 0x8000;

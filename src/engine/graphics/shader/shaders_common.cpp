@@ -40,7 +40,6 @@ const int FEATURE_DISCARD = 0x100;
 const int FEATURE_SHADOWS = 0x200;
 const int FEATURE_PARTICLES = 0x400;
 const int FEATURE_WATER = 0x800;
-const int FEATURE_HDR = 0x1000;
 const int FEATURE_NORMALMAP = 0x2000;
 const int FEATURE_BLUR = 0x4000;
 const int FEATURE_TEXT = 0x8000;

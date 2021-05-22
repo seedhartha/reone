@@ -31,7 +31,6 @@ Features::Features(GraphicsOptions options) : _options(move(options)) {
 void Features::init() {
     if (_options.pbr) {
         _enabled.insert(Feature::PBR);
-        _enabled.insert(Feature::HDR);
     }
 }
 

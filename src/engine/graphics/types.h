@@ -35,7 +35,6 @@ constexpr int kMaxDanglymeshConstraints = 512;
 
 enum class Feature {
     PBR,
-    HDR,
     DynamicRoomLighting
 };
 
