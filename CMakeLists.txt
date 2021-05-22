@@ -146,6 +146,7 @@ set(RESOURCE_SOURCES
     src/engine/resource/format/visreader.cpp
     src/engine/resource/keybifprovider.cpp
     src/engine/resource/resources.cpp
+    src/engine/resource/services.cpp
     src/engine/resource/strings.cpp
     src/engine/resource/talktable.cpp
     src/engine/resource/typeutil.cpp)
@@ -227,6 +228,7 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/pbribl.cpp
     src/engine/graphics/pixelutil.cpp
     src/engine/graphics/renderbuffer.cpp
+    src/engine/graphics/services.cpp
     src/engine/graphics/shader/shaders.cpp
     src/engine/graphics/shader/shaders_common.cpp
     src/engine/graphics/shader/shaders_pbr.cpp
@@ -270,6 +272,7 @@ set(AUDIO_SOURCES
     src/engine/audio/format/mp3reader.cpp
     src/engine/audio/format/wavreader.cpp
     src/engine/audio/player.cpp
+    src/engine/audio/services.cpp
     src/engine/audio/soundhandle.cpp
     src/engine/audio/soundinstance.cpp
     src/engine/audio/stream.cpp)
@@ -327,6 +330,7 @@ set(SCENE_SOURCES
     src/engine/scene/node/scenenode.cpp
     src/engine/scene/pipeline/control.cpp
     src/engine/scene/pipeline/world.cpp
+    src/engine/scene/services.cpp
     src/engine/scene/scenegraph.cpp)
 
 add_library(libscene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES})
@@ -379,6 +383,7 @@ set(SCRIPT_HEADERS
     src/engine/script/ncsreader.h
     src/engine/script/program.h
     src/engine/script/routine.h
+    src/engine/script/services.h
     src/engine/script/scripts.h
     src/engine/script/types.h
     src/engine/script/variable.h)
@@ -389,6 +394,7 @@ set(SCRIPT_SOURCES
     src/engine/script/ncsreader.cpp
     src/engine/script/program.cpp
     src/engine/script/routine.cpp
+    src/engine/script/services.cpp
     src/engine/script/scripts.cpp
     src/engine/script/variable.cpp)
 
@@ -615,6 +621,7 @@ set(GAME_SOURCES
     src/engine/game/portraits.cpp
     src/engine/game/reputes.cpp
     src/engine/game/room.cpp
+    src/engine/game/services.cpp
     src/engine/game/script/routines.cpp
     src/engine/game/script/routines_actions.cpp
     src/engine/game/script/routines_combat.cpp
@@ -647,9 +654,11 @@ set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY
 ## reone executable
 
 set(REONE_HEADERS
+    src/engine/engine.h
     src/engine/program.h)
 
 set(REONE_SOURCES
+    src/engine/engine.cpp
     src/engine/main.cpp
     src/engine/program.cpp)
 

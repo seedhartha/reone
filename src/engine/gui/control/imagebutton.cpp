@@ -40,7 +40,7 @@ ImageButton::ImageButton(GUI *gui) : Control(gui, ControlType::ImageButton) {
 
 void ImageButton::load(const GffStruct &gffs) {
     Control::load(gffs);
-    _iconFont = _gui->fonts().get(kIconFontResRef);
+    _iconFont = _gui->graphics().fonts().get(kIconFontResRef);
 }
 
 void ImageButton::draw(
@@ -94,12 +94,12 @@ void ImageButton::drawIcon(
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = _gui->window().getOrthoProjection();
+        uniforms.combined.general.projection = _gui->graphics().window().getOrthoProjection();
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-        _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-        _gui->meshes().getQuad()->draw();
+        _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+        _gui->graphics().meshes().getQuad()->draw();
     }
 
     if (iconTexture) {
@@ -111,12 +111,12 @@ void ImageButton::drawIcon(
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = _gui->window().getOrthoProjection();
+        uniforms.combined.general.projection = _gui->graphics().window().getOrthoProjection();
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(1.0f);
 
-        _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-        _gui->meshes().getQuad()->draw();
+        _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+        _gui->graphics().meshes().getQuad()->draw();
     }
 
     if (!iconText.empty()) {

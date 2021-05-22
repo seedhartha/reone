@@ -15,35 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "services.h"
 
-#include <cstdint>
-#include <string>
+using namespace std;
 
-#include "../../script/scripts.h"
-
-#include "routines.h"
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace game {
+namespace scene {
 
-class ScriptRunner {
-public:
-    ScriptRunner(Routines &routines, script::Scripts &scripts);
+SceneServices::SceneServices(GraphicsOptions options, GraphicsServices &graphics) :
+    _options(move(options)),
+    _graphics(graphics) {
+}
 
-    int run(
-        const std::string &resRef,
-        uint32_t callerId = script::kObjectInvalid,
-        uint32_t triggerrerId = script::kObjectInvalid,
-        int userDefinedEventNumber = -1,
-        int scriptVar = -1);
+void SceneServices::init() {
+    _graph = make_unique<SceneGraph>(_options, _graphics);
 
-private:
-    Routines &_routines;
-    script::Scripts &_scripts;
-};
+    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, _graph.get());
+    _worldRenderPipeline->init();
+}
 
-} // namespace game
+} // namespace scene
 
 } // namespace reone

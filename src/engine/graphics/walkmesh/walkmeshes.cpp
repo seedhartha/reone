@@ -35,10 +35,6 @@ Walkmeshes::Walkmeshes(Resources *resources) : _resources(resources) {
     ensureNotNull(resources, "resources");
 }
 
-void Walkmeshes::init(set<uint32_t> walkableSurfaces) {
-    _walkableSurfaces = move(walkableSurfaces);
-}
-
 void Walkmeshes::invalidateCache() {
     _cache.clear();
 }

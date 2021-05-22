@@ -58,9 +58,9 @@ void AbilitiesMenu::load() {
     disableControl("BTN_POWERS");
     disableControl("BTN_FEATS");
 
-    setControlText("LBL_SKILLRANK", _strings->get(kStrRefSkillRank));
-    setControlText("LBL_BONUS", _strings->get(kStrRefBonus));
-    setControlText("LBL_TOTAL", _strings->get(kStrRefTotalRank));
+    setControlText("LBL_SKILLRANK", _game->services().resource().strings().get(kStrRefSkillRank));
+    setControlText("LBL_BONUS", _game->services().resource().strings().get(kStrRefBonus));
+    setControlText("LBL_TOTAL", _game->services().resource().strings().get(kStrRefTotalRank));
 
     setControlText("LBL_RANKVAL", "");
     setControlText("LBL_BONUSVAL", "");
@@ -75,15 +75,15 @@ void AbilitiesMenu::load() {
 }
 
 void AbilitiesMenu::loadSkills() {
-    shared_ptr<TwoDA> skills(_resources->get2DA("skills"));
+    shared_ptr<TwoDA> skills(_game->services().resource().resources().get2DA("skills"));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         auto skill = static_cast<Skill>(row);
 
         SkillInfo skillInfo;
         skillInfo.skill = skill;
-        skillInfo.name = _strings->get(skills->getInt(row, "name"));
-        skillInfo.description = _strings->get(skills->getInt(row, "description"));
-        skillInfo.icon = _textures->get(skills->getString(row, "icon"), TextureUsage::GUI);
+        skillInfo.name = _game->services().resource().strings().get(skills->getInt(row, "name"));
+        skillInfo.description = _game->services().resource().strings().get(skills->getInt(row, "description"));
+        skillInfo.icon = _game->services().graphics().textures().get(skills->getString(row, "icon"), TextureUsage::GUI);
 
         _skills.insert(make_pair(skill, move(skillInfo)));
     }
@@ -107,7 +107,7 @@ shared_ptr<Texture> AbilitiesMenu::getFrameTexture(GameID gameId) const {
     } else {
         resRef = "lbl_hex_3";
     }
-    return _textures->get(resRef, TextureUsage::GUI);
+    return _game->services().graphics().textures().get(resRef, TextureUsage::GUI);
 }
 
 void AbilitiesMenu::refreshControls() {
@@ -117,7 +117,7 @@ void AbilitiesMenu::refreshControls() {
 void AbilitiesMenu::refreshPortraits() {
     if (_game->gameId() != GameID::KotOR) return;
 
-    Party &party = _game->party();
+    Party &party = _game->services().party();
     shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
@@ -144,7 +144,7 @@ void AbilitiesMenu::onListBoxItemClick(const string &control, const string &item
         auto skill = static_cast<Skill>(stoi(item));
         auto maybeSkillInfo = _skills.find(skill);
         if (maybeSkillInfo != _skills.end()) {
-            shared_ptr<Creature> partyLeader(_game->party().getLeader());
+            shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
             setControlText("LBL_RANKVAL", to_string(partyLeader->attributes().getSkillRank(skill)));
             setControlText("LBL_BONUSVAL", "0");
             setControlText("LBL_TOTALVAL", to_string(partyLeader->attributes().getSkillRank(skill)));

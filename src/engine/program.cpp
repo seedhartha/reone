@@ -23,10 +23,10 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
-#include "common/log.h"
 #include "common/guardutil.h"
+#include "common/log.h"
 #include "common/types.h"
-#include "game/game.h"
+#include "engine.h"
 #include "graphics/featureutil.h"
 
 using namespace std;
@@ -60,7 +60,7 @@ int Program::run() {
         return 0;
     }
 
-    return runGame();
+    return runEngine();
 }
 
 void Program::initOptions() {
@@ -122,8 +122,8 @@ void Program::loadOptions() {
     }
 }
 
-int Program::runGame() {
-    return Game(_gamePath, _options).run();
+int Program::runEngine() {
+    return Engine(_gamePath, _options).run();
 }
 
 } // namespace reone

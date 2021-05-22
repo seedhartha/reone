@@ -17,98 +17,95 @@
 
 #pragma once
 
+#include <memory>
+
 #include <boost/noncopyable.hpp>
+
+#include "../audio/services.h"
+#include "../graphics/services.h"
+#include "../resource/services.h"
+#include "../scene/services.h"
+#include "../script/services.h"
+
+#include "combat/combat.h"
+#include "cursors.h"
+#include "d20/classes.h"
+#include "d20/feats.h"
+#include "d20/spells.h"
+#include "footstepsounds.h"
+#include "gui/sounds.h"
+#include "object/objectfactory.h"
+#include "party.h"
+#include "portraits.h"
+#include "reputes.h"
+#include "script/routines.h"
+#include "script/runner.h"
+#include "soundsets.h"
+#include "surfaces.h"
 
 namespace reone {
 
 namespace game {
 
-class Surfaces;
-class Cursors;
-class SoundSets;
-class FootstepSounds;
-class GUISounds;
-class Routines;
-class ScriptRunner;
-class Reputes;
-class Feats;
-class Spells;
-class Classes;
-class Portraits;
-class ObjectFactory;
-class Party;
-class Combat;
+class Game;
 
 class GameServices : boost::noncopyable {
 public:
     GameServices(
-        Surfaces &surfaces,
-        Cursors &cursors,
-        SoundSets &soundSets,
-        FootstepSounds &footstepSounds,
-        GUISounds &guiSounds,
-        Routines &routines,
-        ScriptRunner &scriptRunner,
-        Reputes &reputes,
-        Feats &feats,
-        Spells &spells,
-        Classes &classes,
-        Portraits &portraits,
-        ObjectFactory &objectFactory,
-        Party &party,
-        Combat &combat
-    ) :
-        _surfaces(surfaces),
-        _cursors(cursors),
-        _soundSets(soundSets),
-        _footstepSounds(footstepSounds),
-        _guiSounds(guiSounds),
-        _routines(routines),
-        _scriptRunner(scriptRunner),
-        _reputes(reputes),
-        _feats(feats),
-        _spells(spells),
-        _classes(classes),
-        _portraits(portraits),
-        _objectFactory(objectFactory),
-        _party(party),
-        _combat(combat) {
-    }
+        Game *game,
+        resource::ResourceServices &resource,
+        graphics::GraphicsServices &graphics,
+        audio::AudioServices &audio,
+        scene::SceneServices &scene,
+        script::ScriptServices &script);
 
-    Surfaces &surfaces() { return _surfaces; }
-    Cursors &cursors() { return _cursors; }
-    SoundSets &soundSets() { return _soundSets; }
-    FootstepSounds &footstepSounds() { return _footstepSounds; }
-    SoundSets &soundSets() { return _soundSets; }
-    FootstepSounds &footstepSounds() { return _footstepSounds; }
-    GUISounds &guiSounds() { return _guiSounds; }
-    Routines &routines() { return _routines; }
-    ScriptRunner &scriptRunner() { return _scriptRunner; }
-    Reputes &reputes() { return _reputes; }
-    Feats &feats() { return _feats; }
-    Spells &spells() { return _spells; }
-    Classes &classes() { return _classes; }
-    Portraits &portraits() { return _portraits; }
-    ObjectFactory &objectFactory() { return _objectFactory; }
-    Party &party() { return _party; }
-    Combat &combat() { return _combat; }
+    void init();
+
+    resource::ResourceServices &resource() { return _resource; }
+    graphics::GraphicsServices &graphics() { return _graphics; }
+    audio::AudioServices &audio() { return _audio; }
+    scene::SceneServices &scene() { return _scene; }
+    script::ScriptServices &script() { return _script; }
+
+    Classes &classes() { return *_classes; }
+    Combat &combat() { return *_combat; }
+    Cursors &cursors() { return *_cursors; }
+    Feats &feats() { return *_feats; }
+    FootstepSounds &footstepSounds() { return *_footstepSounds; }
+    GUISounds &guiSounds() { return *_guiSounds; }
+    ObjectFactory &objectFactory() { return *_objectFactory; }
+    Party &party() { return *_party; }
+    Portraits &portraits() { return *_portraits; }
+    Reputes &reputes() { return *_reputes; }
+    Routines &routines() { return *_routines; }
+    ScriptRunner &scriptRunner() { return *_scriptRunner; }
+    SoundSets &soundSets() { return *_soundSets; }
+    Spells &spells() { return *_spells; }
+    Surfaces &surfaces() { return *_surfaces; }
 
 private:
-    Surfaces &_surfaces;
-    Cursors &_cursors;
-    SoundSets &_soundSets;
-    FootstepSounds &_footstepSounds;
-    GUISounds &_guiSounds;
-    Routines &_routines;
-    ScriptRunner &_scriptRunner;
-    Reputes &_reputes;
-    Feats &_feats;
-    Spells &_spells;
-    Classes &_classes;
-    Portraits &_portraits;
-    ObjectFactory &_objectFactory;
-    Party &_party;
-    Combat &_combat;
+    Game *_game;
+    resource::ResourceServices &_resource;
+    graphics::GraphicsServices &_graphics;
+    audio::AudioServices &_audio;
+    scene::SceneServices &_scene;
+    script::ScriptServices &_script;
+
+    std::unique_ptr<Classes> _classes;
+    std::unique_ptr<Combat> _combat;
+    std::unique_ptr<Cursors> _cursors;
+    std::unique_ptr<Feats> _feats;
+    std::unique_ptr<FootstepSounds> _footstepSounds;
+    std::unique_ptr<GUISounds> _guiSounds;
+    std::unique_ptr<ObjectFactory> _objectFactory;
+    std::unique_ptr<Party> _party;
+    std::unique_ptr<Portraits> _portraits;
+    std::unique_ptr<Reputes> _reputes;
+    std::unique_ptr<Routines> _routines;
+    std::unique_ptr<ScriptRunner> _scriptRunner;
+    std::unique_ptr<SoundSets> _soundSets;
+    std::unique_ptr<Spells> _spells;
+    std::unique_ptr<Surfaces> _surfaces;
 };
 
 } // namespace game

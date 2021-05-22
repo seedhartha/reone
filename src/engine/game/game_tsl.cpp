@@ -23,9 +23,6 @@
 
 #include "../common/pathutil.h"
 
-#include "../resource/keybifprovider.h"
-#include "../resource/resources.h"
-
 using namespace std;
 
 using namespace reone::resource;
@@ -41,21 +38,21 @@ static constexpr char kLocalizationLipFilename[] = "localization";
 static constexpr char kExeFilename[] = "swkotor2.exe";
 
 void Game::initResourceProvidersForTSL() {
-    _resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
+    _resource.resources().indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
 
     fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
-    _resources.indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
-    _resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
+    _resource.resources().indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
+    _resource.resources().indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
 
-    _resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
-    _resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
-    _resources.indexDirectory(getPathIgnoreCase(_path, kVoiceDirectoryName));
+    _resource.resources().indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
+    _resource.resources().indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
+    _resource.resources().indexDirectory(getPathIgnoreCase(_path, kVoiceDirectoryName));
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-    _resources.indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
+    _resource.resources().indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
 
-    _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
-    _resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
+    _resource.resources().indexExeFile(getPathIgnoreCase(_path, kExeFilename));
+    _resource.resources().indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
 }
 
 } // namespace game

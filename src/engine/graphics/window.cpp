@@ -37,8 +37,7 @@ namespace reone {
 
 namespace graphics {
 
-Window::Window(GraphicsOptions options, IEventHandler *eventHandler) : _options(move(options)), _eventHandler(eventHandler) {
-    ensureNotNull(eventHandler, "eventHandler");
+Window::Window(GraphicsOptions options) : _options(move(options)) {
 }
 
 void Window::init() {
@@ -78,7 +77,7 @@ void Window::initSDL() {
 }
 
 int Window::getWindowFlags() const {
-    int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN;
+    int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
     if (_options.fullscreen) {
         flags |= SDL_WINDOW_FULLSCREEN;
     }
@@ -105,10 +104,6 @@ void Window::deinit() {
         SDL_Quit();
         _inited = false;
     }
-}
-
-void Window::show() {
-    SDL_ShowWindow(_window);
 }
 
 void Window::processEvents(bool &quit) {

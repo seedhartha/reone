@@ -43,6 +43,9 @@ SpatialObject::SpatialObject(
     Object(id, type, game),
     _objectFactory(objectFactory),
     _sceneGraph(sceneGraph) {
+
+    ensureNotNull(objectFactory, "objectFactory");
+    ensureNotNull(sceneGraph, "sceneGraph");
 }
 
 shared_ptr<Item> SpatialObject::addItem(const string &resRef, int stackSize, bool dropable) {

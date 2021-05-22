@@ -36,7 +36,7 @@ class Model;
 
 class Models : boost::noncopyable {
 public:
-    Models(Textures *textures,resource::Resources *resources);
+    Models(Textures *textures, resource::Resources *resources);
 
     void invalidateCache();
 

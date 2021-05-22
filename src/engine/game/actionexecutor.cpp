@@ -176,7 +176,7 @@ void ActionExecutor::executeStartConversation(const shared_ptr<Object> &actor, S
         navigateCreature(creatureActor, object->position(), true, kMaxConversationDistance, dt);
 
     if (reached) {
-        bool isActorLeader = _game->party().getLeader() == actor;
+        bool isActorLeader = _game->services().party().getLeader() == actor;
         _game->module()->area()->startDialog(isActorLeader ? object : static_pointer_cast<SpatialObject>(actor), action.dialogResRef());
         action.complete();
     }
@@ -194,7 +194,7 @@ void ActionExecutor::executeAttack(const shared_ptr<Object> &actor, shared_ptr<A
 
     // Make the actor follow its target. When reached, register an attack
     if (navigateCreature(creature, target->position(), true, action->range(), dt)) {
-        _game->combat().addAttack(move(creature), move(target), action);
+        _game->services().combat().addAttack(move(creature), move(target), action);
     }
 }
 
@@ -290,14 +290,14 @@ void ActionExecutor::executeOpenDoor(const shared_ptr<Object> &actor, ObjectActi
         if (!isObjectSelf && door->isLocked()) {
             string onFailToOpen(door->getOnFailToOpen());
             if (!onFailToOpen.empty()) {
-                _game->scriptRunner().run(onFailToOpen, door->id(), actor->id());
+                _game->services().scriptRunner().run(onFailToOpen, door->id(), actor->id());
             }
         } else {
             door->open(actor);
             if (!isObjectSelf) {
                 string onOpen(door->getOnOpen());
                 if (!onOpen.empty()) {
-                    _game->scriptRunner().run(onOpen, door->id(), actor->id(), -1);
+                    _game->services().scriptRunner().run(onOpen, door->id(), actor->id(), -1);
                 }
             }
         }
@@ -349,7 +349,7 @@ void ActionExecutor::executeOpenLock(const shared_ptr<Object> &actor, ObjectActi
 
             string onOpen(door->getOnOpen());
             if (!onOpen.empty()) {
-                _game->scriptRunner().run(onOpen, door->id(), actor->id());
+                _game->services().scriptRunner().run(onOpen, door->id(), actor->id());
             }
         }
 
@@ -385,7 +385,7 @@ void ActionExecutor::executePlayAnimation(const shared_ptr<Object> &actor, const
 
 void ActionExecutor::executeFollowLeader(const shared_ptr<Object> &actor, Action &action, float dt) {
     auto creatureActor = static_pointer_cast<Creature>(actor);
-    glm::vec3 destination(_game->party().getLeader()->position());
+    glm::vec3 destination(_game->services().party().getLeader()->position());
     float distance2 = creatureActor->getDistanceTo2(glm::vec2(destination));
     bool run = distance2 > kDistanceWalk;
 

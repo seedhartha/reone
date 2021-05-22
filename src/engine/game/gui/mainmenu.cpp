@@ -111,7 +111,7 @@ void MainMenu::setup3DView() {
     const Control::Extent &extent = control.extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 
-    unique_ptr<SceneGraph> scene(SceneBuilder(_gfxOpts, _shaders, _meshes, _textures, &_game->materials(), &_game->pbrIbl())
+    unique_ptr<SceneGraph> scene(SceneBuilder(_options, _game->services().graphics())
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
@@ -124,7 +124,7 @@ void MainMenu::setup3DView() {
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
-    auto model = make_shared<ModelSceneNode>(_game->models().get("mainmenu"), ModelUsage::GUI, &sceneGraph);
+    auto model = make_shared<ModelSceneNode>(_game->services().graphics().models().get("mainmenu"), ModelUsage::GUI, &sceneGraph);
     model->playAnimation("default", AnimationProperties::fromFlags(AnimationFlags::loop));
     return move(model);
 }
@@ -187,7 +187,7 @@ void MainMenu::onModuleSelected(const string &name) {
         member1Blueprint = kBlueprintResRefCarth;
         member2Blueprint = kBlueprintResRefBastila;
     }
-    shared_ptr<TwoDA> defaultParty(_resources->get2DA("defaultparty"));
+    shared_ptr<TwoDA> defaultParty(_game->services().resource().resources().get2DA("defaultparty"));
     if (defaultParty) {
         for (int row = 0; row < defaultParty->getRowCount(); ++row) {
             if (defaultParty->getBool(row, "tsl") == isTSL(_game->gameId())) {
@@ -199,9 +199,9 @@ void MainMenu::onModuleSelected(const string &name) {
         }
     }
 
-    Party &party = _game->party();
+    Party &party = _game->services().party();
     if (!member1Blueprint.empty()) {
-        shared_ptr<Creature> player(_game->objectFactory().newCreature());
+        shared_ptr<Creature> player(_game->services().objectFactory().newCreature());
         player->loadFromBlueprint(member1Blueprint);
         player->setTag(kObjectTagPlayer);
         player->setImmortal(true);
@@ -209,13 +209,13 @@ void MainMenu::onModuleSelected(const string &name) {
         party.setPlayer(player);
     }
     if (!member2Blueprint.empty()) {
-        shared_ptr<Creature> companion(_game->objectFactory().newCreature());
+        shared_ptr<Creature> companion(_game->services().objectFactory().newCreature());
         companion->loadFromBlueprint(member2Blueprint);
         companion->setImmortal(true);
         party.addMember(0, companion);
     }
     if (!member3Blueprint.empty()) {
-        shared_ptr<Creature> companion(_game->objectFactory().newCreature());
+        shared_ptr<Creature> companion(_game->services().objectFactory().newCreature());
         companion->loadFromBlueprint(member3Blueprint);
         companion->setImmortal(true);
         party.addMember(1, companion);

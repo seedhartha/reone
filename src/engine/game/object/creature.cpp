@@ -75,7 +75,7 @@ void Creature::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Creature::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utc(_game->resources().getGFF(resRef, ResourceType::Utc));
+    shared_ptr<GffStruct> utc(_game->services().resource().resources().getGFF(resRef, ResourceType::Utc));
     if (utc) {
         loadUTC(*utc);
         loadAppearance();
@@ -83,16 +83,16 @@ void Creature::loadFromBlueprint(const string &resRef) {
 }
 
 void Creature::loadAppearance() {
-    shared_ptr<TwoDA> appearances(_game->resources().get2DA("appearance"));
+    shared_ptr<TwoDA> appearances(_game->services().resource().resources().get2DA("appearance"));
     _modelType = parseModelType(appearances->getString(_appearance, "modeltype"));
     _walkSpeed = appearances->getFloat(_appearance, "walkdist");
     _runSpeed = appearances->getFloat(_appearance, "rundist");
     _footstepType = appearances->getInt(_appearance, "footsteptype", -1);
 
     if (_portraitId > 0) {
-        _portrait = _game->portraits().getTextureByIndex(_portraitId);
+        _portrait = _game->services().portraits().getTextureByIndex(_portraitId);
     } else {
-        _portrait = _game->portraits().getTextureByAppearance(_appearance);
+        _portrait = _game->services().portraits().getTextureByAppearance(_appearance);
     }
 
     updateModel();
@@ -419,13 +419,13 @@ int Creature::getNeededXP() const {
 
 void Creature::runSpawnScript() {
     if (!_onSpawn.empty()) {
-        _game->scriptRunner().run(_onSpawn, _id, kObjectInvalid);
+        _game->services().scriptRunner().run(_onSpawn, _id, kObjectInvalid);
     }
 }
 
 void Creature::runEndRoundScript() {
     if (!_onEndRound.empty()) {
-        _game->scriptRunner().run(_onEndRound, _id, kObjectInvalid);
+        _game->services().scriptRunner().run(_onEndRound, _id, kObjectInvalid);
     }
 }
 
@@ -439,14 +439,14 @@ void Creature::playSound(SoundSetEntry entry, bool positional) {
     auto maybeSound = _soundSet->find(entry);
     if (maybeSound != _soundSet->end()) {
         glm::vec3 position(_position + 1.7f);
-        _game->audioPlayer().play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
+        _game->services().audio().player().play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
     }
 }
 
 void Creature::die() {
     _currentHitPoints = 0;
     _dead = true;
-    _name = _game->strings().get(kStrRefRemains);
+    _name = _game->services().resource().strings().get(kStrRefRemains);
 
     debug(boost::format("Creature %s is dead") % _tag, 2);
 
@@ -457,7 +457,7 @@ void Creature::die() {
 
 void Creature::runDeathScript() {
     if (!_onDeath.empty()) {
-        _game->scriptRunner().run(_onDeath, _id, kObjectInvalid);
+        _game->services().scriptRunner().run(_onDeath, _id, kObjectInvalid);
     }
 }
 
@@ -513,7 +513,7 @@ void Creature::onObjectSeen(const shared_ptr<SpatialObject> &object) {
 
 void Creature::runOnNoticeScript() {
     if (!_onNotice.empty()) {
-        _game->scriptRunner().run(_onNotice, _id, _perception.lastPerceived->id());
+        _game->services().scriptRunner().run(_onNotice, _id, _perception.lastPerceived->id());
     }
 }
 
@@ -616,9 +616,9 @@ void Creature::setAppliedForce(glm::vec3 force) {
 
 void Creature::onEventSignalled(const string &name) {
     if (name == "snd_footstep" && _footstepType != -1 && _walkmeshMaterial != -1) {
-        shared_ptr<FootstepTypeSounds> sounds(_game->footstepSounds().get(_footstepType));
+        shared_ptr<FootstepTypeSounds> sounds(_game->services().footstepSounds().get(_footstepType));
         if (sounds) {
-            const Surface &surface = _game->surfaces().getSurface(_walkmeshMaterial);
+            const Surface &surface = _game->services().surfaces().getSurface(_walkmeshMaterial);
             vector<shared_ptr<AudioStream>> materialSounds;
             if (surface.sound == "DT") {
                 materialSounds = sounds->dirt;
@@ -641,7 +641,7 @@ void Creature::onEventSignalled(const string &name) {
             if (index < static_cast<int>(materialSounds.size())) {
                 shared_ptr<AudioStream> sound(materialSounds[index]);
                 if (sound) {
-                    _game->audioPlayer().play(sound, AudioType::Sound, false, 1.0f, true, _position);
+                    _game->services().audio().player().play(sound, AudioType::Sound, false, 1.0f, true, _position);
                 }
             }
         }

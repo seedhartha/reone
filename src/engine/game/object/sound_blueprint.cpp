@@ -38,7 +38,7 @@ namespace game {
 
 void Sound::loadUTS(const GffStruct &uts) {
     _tag = boost::to_lower_copy(uts.getString("Tag"));
-    _name = _game->strings().get(uts.getInt("LocName"));
+    _name = _game->services().resource().strings().get(uts.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(uts.getString("TemplateResRef"));
     _active = uts.getBool("Active");
     _continuous = uts.getBool("Continuous");
@@ -72,7 +72,7 @@ void Sound::loadUTS(const GffStruct &uts) {
 }
 
 void Sound::loadPriorityFromUTS(const GffStruct &uts) {
-    shared_ptr<TwoDA> priorityGroups(_game->resources().get2DA("prioritygroups"));
+    shared_ptr<TwoDA> priorityGroups(_game->services().resource().resources().get2DA("prioritygroups"));
     int priorityIdx = uts.getInt("Priority");
     _priority = priorityGroups->getInt(priorityIdx, "priority");
 }

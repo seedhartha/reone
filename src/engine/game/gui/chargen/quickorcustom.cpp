@@ -77,9 +77,9 @@ void QuickOrCustom::onFocusChanged(const string &control, bool focus) {
     if (focus) {
         string text;
         if (control == "QUICK_CHAR_BTN") {
-            text = _strings->get(kStrRefQuickHelpText);
+            text = _game->services().resource().strings().get(kStrRefQuickHelpText);
         } else if (control == "CUST_CHAR_BTN") {
-            text = _strings->get(kStrRefCustomHelpText);
+            text = _game->services().resource().strings().get(kStrRefCustomHelpText);
         }
         auto &lbDesc = getControl<ListBox>("LB_DESC");
         lbDesc.clearItems();

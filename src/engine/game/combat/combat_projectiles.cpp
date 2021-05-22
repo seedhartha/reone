@@ -72,10 +72,10 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
     round.projectileDir = glm::normalize(projectileTarget - projectilePos);
 
     // Create and add a projectile to the scene graph
-    round.projectile = make_shared<ModelSceneNode>(ammunitionType->model, ModelUsage::Projectile, &_game->sceneGraph());
+    round.projectile = make_shared<ModelSceneNode>(ammunitionType->model, ModelUsage::Projectile, &_scene.graph());
     round.projectile->signalEvent(kModelEventDetonate);
     round.projectile->setLocalTransform(glm::translate(projectilePos));
-    _game->sceneGraph().addRoot(round.projectile);
+    _scene.graph().addRoot(round.projectile);
 
     // Play shot sound, if any
     weapon->playShotSound(0, projectilePos);
@@ -96,7 +96,7 @@ void Combat::updateProjectile(Round &round, float dt) {
 
 void Combat::resetProjectile(Round &round) {
     if (round.projectile) {
-        _game->sceneGraph().removeRoot(round.projectile);
+        _scene.graph().removeRoot(round.projectile);
         round.projectile.reset();
     }
 }

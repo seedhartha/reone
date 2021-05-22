@@ -22,7 +22,6 @@
 
 #include "glm/gtx/transform.hpp"
 
-#include "../common/guardutil.h"
 #include "../graphics/mesh/meshes.h"
 #include "../graphics/stateutil.h"
 
@@ -45,19 +44,9 @@ static constexpr float kMaxGrassDistance = 16.0f;
 
 static const bool g_debugAABB = false;
 
-SceneGraph::SceneGraph(GraphicsOptions opts, Shaders *shaders, Meshes *meshes, Textures *textures, Materials *materials, PBRIBL *pbrIbl) :
-    _opts(move(opts)),
-    _shaders(shaders),
-    _meshes(meshes),
-    _textures(textures),
-    _materials(materials),
-    _pbrIbl(pbrIbl) {
-
-    ensureNotNull(shaders, "shaders");
-    ensureNotNull(meshes, "meshes");
-    ensureNotNull(textures, "textures");
-    ensureNotNull(materials, "materials");
-    ensureNotNull(pbrIbl, "pbrIbl");
+SceneGraph::SceneGraph(GraphicsOptions options, GraphicsServices &graphicsServices) :
+    _options(move(options)),
+    _graphics(graphicsServices) {
 }
 
 void SceneGraph::clearRoots() {
@@ -315,8 +304,8 @@ void SceneGraph::draw(bool shadowPass) {
             ShaderUniforms uniforms(_uniformsPrototype);
             uniforms.combined.general.model = move(transform);
 
-            _shaders->activate(ShaderProgram::SimpleColor, uniforms);
-            _meshes->getAABB()->draw();
+            _graphics.shaders().activate(ShaderProgram::SimpleColor, uniforms);
+            _graphics.meshes().getAABB()->draw();
         }
     }
 

@@ -17,33 +17,32 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
+#include <memory>
 
-#include "../../script/scripts.h"
+#include <boost/noncopyable.hpp>
 
-#include "routines.h"
+#include "../resource/services.h"
+
+#include "scripts.h"
 
 namespace reone {
 
-namespace game {
+namespace script {
 
-class ScriptRunner {
+class ScriptServices : boost::noncopyable {
 public:
-    ScriptRunner(Routines &routines, script::Scripts &scripts);
+    ScriptServices(resource::ResourceServices &resource);
 
-    int run(
-        const std::string &resRef,
-        uint32_t callerId = script::kObjectInvalid,
-        uint32_t triggerrerId = script::kObjectInvalid,
-        int userDefinedEventNumber = -1,
-        int scriptVar = -1);
+    void init();
+
+    Scripts &scripts() { return *_scripts; }
 
 private:
-    Routines &_routines;
-    script::Scripts &_scripts;
+    resource::ResourceServices &_resource;
+
+    std::unique_ptr<Scripts> _scripts;
 };
 
-} // namespace game
+} // namespace script
 
 } // namespace reone

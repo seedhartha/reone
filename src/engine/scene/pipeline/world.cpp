@@ -81,7 +81,7 @@ void WorldRenderPipeline::init() {
 
     _geometry.init();
     _geometry.bind();
-    _sceneGraph->textures().bindDefaults();
+    _sceneGraph->graphics().textures().bindDefaults();
     _geometry.attachColor(*_geometryColor1, 0);
     _geometry.attachColor(*_geometryColor2, 1);
     _geometry.attachDepth(*_depthRenderbuffer);
@@ -206,7 +206,7 @@ void WorldRenderPipeline::drawShadows() {
             glm::vec3(shadowLight->absoluteTransform()[3]),
             shadowLight->isDirectional() ? 0.0f : 1.0f);
 
-        ShaderUniforms uniforms(_sceneGraph->shaders().defaultUniforms());
+        ShaderUniforms uniforms(_sceneGraph->graphics().shaders().defaultUniforms());
         uniforms.combined.featureMask |= UniformFeatureFlags::shadows;
         uniforms.combined.shadows.lightPosition = move(lightPosition);
         for (int i = 0; i < kNumCubeFaces; ++i) {
@@ -227,7 +227,7 @@ void WorldRenderPipeline::drawGeometry() {
 
     const LightSceneNode *shadowLight = _sceneGraph->shadowLight();
 
-    ShaderUniforms uniforms(_sceneGraph->shaders().defaultUniforms());
+    ShaderUniforms uniforms(_sceneGraph->graphics().shaders().defaultUniforms());
     uniforms.combined.general.projection = _sceneGraph->activeCamera()->projection();
     uniforms.combined.general.view = _sceneGraph->activeCamera()->view();
     uniforms.combined.general.cameraPosition = _sceneGraph->activeCamera()->absoluteTransform()[3];
@@ -285,10 +285,10 @@ void WorldRenderPipeline::applyHorizontalBlur() {
     uniforms.combined.blur.resolution = glm::vec2(w, h);
     uniforms.combined.blur.direction = glm::vec2(1.0f, 0.0f);
 
-    _sceneGraph->shaders().activate(ShaderProgram::SimpleBlur, uniforms);
+    _sceneGraph->graphics().shaders().activate(ShaderProgram::SimpleBlur, uniforms);
 
     withDepthTest([&]() {
-        _sceneGraph->meshes().getQuadNDC()->draw();
+        _sceneGraph->graphics().meshes().getQuadNDC()->draw();
     });
 }
 
@@ -308,10 +308,10 @@ void WorldRenderPipeline::applyVerticalBlur() {
     uniforms.combined.blur.resolution = glm::vec2(w, h);
     uniforms.combined.blur.direction = glm::vec2(0.0f, 1.0f);
 
-    _sceneGraph->shaders().activate(ShaderProgram::SimpleBlur, uniforms);
+    _sceneGraph->graphics().shaders().activate(ShaderProgram::SimpleBlur, uniforms);
 
     withDepthTest([&]() {
-        _sceneGraph->meshes().getQuadNDC()->draw();
+        _sceneGraph->graphics().meshes().getQuadNDC()->draw();
     });
 
     _verticalBlur.unbind();
@@ -325,8 +325,8 @@ void WorldRenderPipeline::drawResult() {
     _verticalBlurColor->bind();
 
     ShaderUniforms uniforms;
-    _sceneGraph->shaders().activate(ShaderProgram::SimplePresentWorld, uniforms);
-    _sceneGraph->meshes().getQuadNDC()->draw();
+    _sceneGraph->graphics().shaders().activate(ShaderProgram::SimplePresentWorld, uniforms);
+    _sceneGraph->graphics().meshes().getQuadNDC()->draw();
 }
 
 } // namespace scene

@@ -52,12 +52,12 @@ Container::Container(Game *game) : GameGUI(game) {
 void Container::load() {
     GUI::load();
 
-    string btnMessage(_strings->get(kSwitchToResRef) + " " + _strings->get(kGiveItemResRef));
+    string btnMessage(_game->services().resource().strings().get(kSwitchToResRef) + " " + _game->services().resource().strings().get(kGiveItemResRef));
 
     Control &btnGiveItems = getControl("BTN_GIVEITEMS");
     btnGiveItems.setTextMessage(btnMessage);
 
-    string lblMessage(_strings->get(kInventoryResRef));
+    string lblMessage(_game->services().resource().strings().get(kInventoryResRef));
     getControl("LBL_MESSAGE").setTextMessage(lblMessage);
 
     configureItemsListBox();
@@ -102,7 +102,7 @@ shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return _textures->get(resRef, TextureUsage::GUI);
+    return _game->services().graphics().textures().get(resRef, TextureUsage::GUI);
 }
 
 void Container::onClick(const string &control) {
@@ -117,7 +117,7 @@ void Container::onClick(const string &control) {
 }
 
 void Container::transferItemsToPlayer() {
-    shared_ptr<Creature> player(_game->party().player());
+    shared_ptr<Creature> player(_game->services().party().player());
     _container->moveDropableItemsTo(*player);
 
     auto placeable = ObjectConverter::toPlaceable(_container);

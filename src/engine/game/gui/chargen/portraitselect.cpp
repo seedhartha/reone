@@ -83,7 +83,7 @@ void PortraitSelection::loadHeadModel() {
     Control &control = getControl("LBL_HEAD");
     float aspect = control.extent().width / static_cast<float>(control.extent().height);
 
-    unique_ptr<SceneGraph> scene(SceneBuilder(_gfxOpts, _shaders, _meshes, _textures, &_game->materials(), &_game->pbrIbl())
+    unique_ptr<SceneGraph> scene(SceneBuilder(_options, _game->services().graphics())
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier(bind(&PortraitSelection::getCharacterModel, this, _1))
@@ -115,7 +115,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
     if (cameraHook) {
         creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->restPosition().z));
     }
-    auto model = make_shared<ModelSceneNode>(_game->models().get("cghead_light"), ModelUsage::GUI, &sceneGraph);
+    auto model = make_shared<ModelSceneNode>(_game->services().graphics().models().get("cghead_light"), ModelUsage::GUI, &sceneGraph);
     model->attach("cghead_light", creatureModel);
 
 
@@ -136,7 +136,7 @@ int PortraitSelection::getAppearanceFromCurrentPortrait() const {
 void PortraitSelection::updatePortraits() {
     _portraits.clear();
     int sex = _charGen->character().gender == Gender::Female ? 1 : 0;
-    for (auto &portrait : _game->portraits().portraits()) {
+    for (auto &portrait : _game->services().portraits().portraits()) {
         if (portrait.forPC && portrait.sex == sex) {
             _portraits.push_back(move(portrait));
         }
@@ -163,7 +163,7 @@ void PortraitSelection::resetCurrentPortrait() {
 
 void PortraitSelection::loadCurrentPortrait() {
     Control &control = getControl("LBL_PORTRAIT");
-    control.setBorderFill(_textures->get(_portraits[_currentPortrait].resRef, TextureUsage::GUI));
+    control.setBorderFill(_game->services().graphics().textures().get(_portraits[_currentPortrait].resRef, TextureUsage::GUI));
 }
 
 void PortraitSelection::onClick(const string &control) {

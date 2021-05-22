@@ -51,7 +51,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     string bodyModelName(getBodyModelName());
     if (bodyModelName.empty()) return nullptr;
 
-    shared_ptr<Model> bodyModel(_game->models().get(bodyModelName));
+    shared_ptr<Model> bodyModel(_game->services().graphics().models().get(bodyModelName));
     if (!bodyModel) return nullptr;
 
     auto bodySceneNode = make_unique<ModelSceneNode>(bodyModel, ModelUsage::Creature, _sceneGraph, this);
@@ -60,7 +60,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
 
     string bodyTextureName(getBodyTextureName());
     if (!bodyTextureName.empty()) {
-        shared_ptr<Texture> texture(_game->textures().get(bodyTextureName, TextureUsage::Diffuse));
+        shared_ptr<Texture> texture(_game->services().graphics().textures().get(bodyTextureName, TextureUsage::Diffuse));
         if (texture) {
             bodySceneNode->setDiffuseTexture(texture);
         }
@@ -71,14 +71,14 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     shared_ptr<Model> maskModel;
     string maskModelName(getMaskModelName());
     if (!maskModelName.empty()) {
-        maskModel = _game->models().get(maskModelName);
+        maskModel = _game->services().graphics().models().get(maskModelName);
     }
 
     // Head
 
     string headModelName(getHeadModelName());
     if (!headModelName.empty()) {
-        shared_ptr<Model> headModel(_game->models().get(headModelName));
+        shared_ptr<Model> headModel(_game->services().graphics().models().get(headModelName));
         if (headModel) {
             auto headSceneNode = make_shared<ModelSceneNode>(headModel, ModelUsage::Creature, _sceneGraph, this);
             headSceneNode->setInanimateNodes(bodyModel->getAncestorNodes(g_headHookNode));
@@ -94,7 +94,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
 
     string rightWeaponModelName(getWeaponModelName(InventorySlot::rightWeapon));
     if (!rightWeaponModelName.empty()) {
-        shared_ptr<Model> weaponModel(_game->models().get(rightWeaponModelName));
+        shared_ptr<Model> weaponModel(_game->services().graphics().models().get(rightWeaponModelName));
         if (weaponModel) {
             auto weaponSceneNode = make_shared<ModelSceneNode>(weaponModel, ModelUsage::Equipment, _sceneGraph, this);
             bodySceneNode->attach(g_rightHandNode, move(weaponSceneNode));
@@ -105,7 +105,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
 
     string leftWeaponModelName(getWeaponModelName(InventorySlot::leftWeapon));
     if (!leftWeaponModelName.empty()) {
-        shared_ptr<Model> weaponModel(_game->models().get(leftWeaponModelName));
+        shared_ptr<Model> weaponModel(_game->services().graphics().models().get(leftWeaponModelName));
         if (weaponModel) {
             auto weaponSceneNode = make_shared<ModelSceneNode>(weaponModel, ModelUsage::Equipment, _sceneGraph, this);
             bodySceneNode->attach(g_leftHandNode, move(weaponSceneNode));
@@ -133,7 +133,7 @@ string Creature::getBodyModelName() const {
         column = "race";
     }
 
-    shared_ptr<TwoDA> appearance(_game->resources().get2DA("appearance"));
+    shared_ptr<TwoDA> appearance(_game->services().resource().resources().get2DA("appearance"));
 
     string modelName(appearance->getString(_appearance, column));
     boost::to_lower(modelName);
@@ -158,7 +158,7 @@ string Creature::getBodyTextureName() const {
         column = "racetex";
     }
 
-    shared_ptr<TwoDA> appearance(_game->resources().get2DA("appearance"));
+    shared_ptr<TwoDA> appearance(_game->services().resource().resources().get2DA("appearance"));
 
     string texName(boost::to_lower_copy(appearance->getString(_appearance, column)));
     if (texName.empty()) return "";
@@ -167,7 +167,7 @@ string Creature::getBodyTextureName() const {
         bool texFound = false;
         if (bodyItem) {
             string tmp(str(boost::format("%s%02d") % texName % bodyItem->textureVariation()));
-            shared_ptr<Texture> texture(_game->textures().get(tmp, TextureUsage::Diffuse));
+            shared_ptr<Texture> texture(_game->services().graphics().textures().get(tmp, TextureUsage::Diffuse));
             if (texture) {
                 texName = move(tmp);
                 texFound = true;
@@ -184,12 +184,12 @@ string Creature::getBodyTextureName() const {
 string Creature::getHeadModelName() const {
     if (_modelType != Creature::ModelType::Character) return "";
 
-    shared_ptr<TwoDA> appearance(_game->resources().get2DA("appearance"));
+    shared_ptr<TwoDA> appearance(_game->services().resource().resources().get2DA("appearance"));
 
     int headIdx = appearance->getInt(_appearance, "normalhead", -1);
     if (headIdx == -1) return "";
 
-    shared_ptr<TwoDA> heads(_game->resources().get2DA("heads"));
+    shared_ptr<TwoDA> heads(_game->services().resource().resources().get2DA("heads"));
 
     string modelName(heads->getString(headIdx, "head"));
     boost::to_lower(modelName);

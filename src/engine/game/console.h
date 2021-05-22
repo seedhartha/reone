@@ -31,6 +31,7 @@
 #include "../gui/textinput.h"
 #include "../graphics/font.h"
 #include "../graphics/options.h"
+#include "../graphics/services.h"
 #include "../graphics/types.h"
 
 namespace reone {
@@ -53,6 +54,7 @@ private:
     typedef std::function<void(std::vector<std::string>)> CommandHandler;
 
     Game *_game;
+
     graphics::GraphicsOptions _opts;
     std::shared_ptr<graphics::Font> _font;
     bool _open { false };

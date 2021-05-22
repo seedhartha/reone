@@ -56,7 +56,7 @@ void Waypoint::loadFromGIT(const GffStruct &gffs) {
 
     _tag = gffs.getString("Tag");
     _hasMapNote = gffs.getBool("HasMapNote");
-    _mapNote = _game->strings().get(gffs.getInt("MapNote"));
+    _mapNote = _game->services().resource().strings().get(gffs.getInt("MapNote"));
     _mapNoteEnabled = gffs.getBool("MapNoteEnabled");
     _tag = boost::to_lower_copy(gffs.getString("Tag"));
 
@@ -64,7 +64,7 @@ void Waypoint::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Waypoint::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utw(_game->resources().getGFF(resRef, ResourceType::Utw));
+    shared_ptr<GffStruct> utw(_game->services().resource().resources().getGFF(resRef, ResourceType::Utw));
     if (utw) {
         loadUTW(*utw);
     }

@@ -61,7 +61,7 @@ void ControlRenderPipeline::init() {
 
     _geometry.init();
     _geometry.bind();
-    _sceneGraph->textures().bindDefaults();
+    _sceneGraph->graphics().textures().bindDefaults();
     _geometry.attachColor(*_geometryColor);
     _geometry.attachDepth(*_geometryDepth);
     _geometry.checkCompleteness();
@@ -74,7 +74,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     withViewport(glm::ivec4(0, 0, _extent[2], _extent[3]), [this]() {
         _geometry.bind();
 
-        ShaderUniforms uniforms(_sceneGraph->shaders().defaultUniforms());
+        ShaderUniforms uniforms(_sceneGraph->graphics().shaders().defaultUniforms());
         uniforms.combined.general.projection = _sceneGraph->activeCamera()->projection();
         uniforms.combined.general.view = _sceneGraph->activeCamera()->view();
         uniforms.combined.general.cameraPosition = _sceneGraph->activeCamera()->absoluteTransform()[3];
@@ -109,8 +109,8 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     uniforms.combined.general.projection = move(projection);
     uniforms.combined.general.model = move(transform);
 
-    _sceneGraph->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _sceneGraph->meshes().getQuad()->draw();
+    _sceneGraph->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _sceneGraph->graphics().meshes().getQuad()->draw();
 }
 
 } // namespace scene

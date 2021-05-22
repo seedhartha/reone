@@ -63,30 +63,30 @@ SelectionOverlay::SelectionOverlay(Game *game) : _game(game) {
 }
 
 void SelectionOverlay::load() {
-    _font = _game->fonts().get("dialogfont16x16");
-    _friendlyReticle = _game->textures().get("friendlyreticle", TextureUsage::GUI);
-    _friendlyReticle2 = _game->textures().get("friendlyreticle2", TextureUsage::GUI);
-    _hostileReticle = _game->textures().get("hostilereticle", TextureUsage::GUI);
-    _hostileReticle2 = _game->textures().get("hostilereticle2", TextureUsage::GUI);
-    _friendlyScroll = _game->textures().get("lbl_miscroll_f", TextureUsage::GUI);
-    _hostileScroll = _game->textures().get("lbl_miscroll_h", TextureUsage::GUI);
-    _hilightedScroll = _game->textures().get("lbl_miscroll_hi", TextureUsage::GUI);
+    _font = _game->services().graphics().fonts().get("dialogfont16x16");
+    _friendlyReticle = _game->services().graphics().textures().get("friendlyreticle", TextureUsage::GUI);
+    _friendlyReticle2 = _game->services().graphics().textures().get("friendlyreticle2", TextureUsage::GUI);
+    _hostileReticle = _game->services().graphics().textures().get("hostilereticle", TextureUsage::GUI);
+    _hostileReticle2 = _game->services().graphics().textures().get("hostilereticle2", TextureUsage::GUI);
+    _friendlyScroll = _game->services().graphics().textures().get("lbl_miscroll_f", TextureUsage::GUI);
+    _hostileScroll = _game->services().graphics().textures().get("lbl_miscroll_h", TextureUsage::GUI);
+    _hilightedScroll = _game->services().graphics().textures().get("lbl_miscroll_hi", TextureUsage::GUI);
     _reticleHeight = _friendlyReticle2->height();
 
     addTextureByAction(ContextualAction::Unlock, "isk_security");
     addTextureByAction(ContextualAction::Attack, "i_attack");
 
     // TODO: different icons per feat level
-    _textureByAction.insert(make_pair(ContextualAction::PowerAttack, _game->feats().get(FeatType::PowerAttack)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::CriticalStrike, _game->feats().get(FeatType::CriticalStrike)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::Flurry, _game->feats().get(FeatType::Flurry)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::PowerShot, _game->feats().get(FeatType::PowerBlast)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::SniperShot, _game->feats().get(FeatType::SniperShot)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::RapidShot, _game->feats().get(FeatType::RapidShot)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::PowerAttack, _game->services().feats().get(FeatType::PowerAttack)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::CriticalStrike, _game->services().feats().get(FeatType::CriticalStrike)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::Flurry, _game->services().feats().get(FeatType::Flurry)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::PowerShot, _game->services().feats().get(FeatType::PowerBlast)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::SniperShot, _game->services().feats().get(FeatType::SniperShot)->icon));
+    _textureByAction.insert(make_pair(ContextualAction::RapidShot, _game->services().feats().get(FeatType::RapidShot)->icon));
 }
 
 void SelectionOverlay::addTextureByAction(ContextualAction action, const string &resRef) {
-    _textureByAction.insert(make_pair(action, _game->textures().get(resRef, TextureUsage::GUI)));
+    _textureByAction.insert(make_pair(action, _game->services().graphics().textures().get(resRef, TextureUsage::GUI)));
 }
 
 bool SelectionOverlay::handle(const SDL_Event &event) {
@@ -123,7 +123,7 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     if (event.button != SDL_BUTTON_LEFT) return false;
     if (_selectedActionSlot == -1 || _selectedActionSlot >= _actionSlots.size()) return false;
 
-    shared_ptr<Creature> leader(_game->party().getLeader());
+    shared_ptr<Creature> leader(_game->services().party().getLeader());
     if (!leader) return false;
 
     shared_ptr<Area> area(_game->module()->area());
@@ -199,7 +199,7 @@ void SelectionOverlay::update() {
 
             auto hilightedCreature = ObjectConverter::toCreature(hilightedObject);
             if (hilightedCreature) {
-                _hilightedHostile = !hilightedCreature->isDead() && _game->reputes().getIsEnemy(*(_game->party().getLeader()), *hilightedCreature);
+                _hilightedHostile = !hilightedCreature->isDead() && _game->services().reputes().getIsEnemy(*(_game->services().party().getLeader()), *hilightedCreature);
             }
         }
     }
@@ -250,7 +250,7 @@ void SelectionOverlay::update() {
 
             auto selectedCreature = ObjectConverter::toCreature(selectedObject);
             if (selectedCreature) {
-                _selectedHostile = !selectedCreature->isDead() && _game->reputes().getIsEnemy(*_game->party().getLeader(), *selectedCreature);
+                _selectedHostile = !selectedCreature->isDead() && _game->services().reputes().getIsEnemy(*_game->services().party().getLeader(), *selectedCreature);
             }
         }
     }
@@ -281,11 +281,11 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _game->window().getOrthoProjection();
+    uniforms.combined.general.projection = _game->services().graphics().window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _game->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _game->meshes().getQuad()->draw();
+    _game->services().graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _game->services().graphics().meshes().getQuad()->draw();
 }
 
 void SelectionOverlay::drawTitleBar() {
@@ -305,13 +305,13 @@ void SelectionOverlay::drawTitleBar() {
         transform = glm::scale(transform, glm::vec3(kTitleBarWidth, barHeight, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = _game->window().getOrthoProjection();
+        uniforms.combined.general.projection = _game->services().graphics().window().getOrthoProjection();
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         uniforms.combined.general.alpha = 0.5f;
 
-        _game->shaders().activate(ShaderProgram::SimpleColor, uniforms);
-        _game->meshes().getQuad()->draw();
+        _game->services().graphics().shaders().activate(ShaderProgram::SimpleColor, uniforms);
+        _game->services().graphics().meshes().getQuad()->draw();
     }
     {
         float x = opts.width * _selectedScreenCoords.x;
@@ -338,12 +338,12 @@ void SelectionOverlay::drawHealthBar() {
     transform = glm::scale(transform, glm::vec3(w, kHealthBarHeight, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _game->window().getOrthoProjection();
+    uniforms.combined.general.projection = _game->services().graphics().window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
 
-    _game->shaders().activate(ShaderProgram::SimpleColor, uniforms);
-    _game->meshes().getQuad()->draw();
+    _game->services().graphics().shaders().activate(ShaderProgram::SimpleColor, uniforms);
+    _game->services().graphics().meshes().getQuad()->draw();
 }
 
 void SelectionOverlay::drawActionBar() {
@@ -375,11 +375,11 @@ void SelectionOverlay::drawActionFrame(int index) {
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionHeight, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _game->window().getOrthoProjection();
+    uniforms.combined.general.projection = _game->services().graphics().window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _game->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _game->meshes().getQuad()->draw();
+    _game->services().graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _game->services().graphics().meshes().getQuad()->draw();
 }
 
 bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) const {
@@ -414,11 +414,11 @@ void SelectionOverlay::drawActionIcon(int index) {
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionWidth, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _game->window().getOrthoProjection();
+    uniforms.combined.general.projection = _game->services().graphics().window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _game->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _game->meshes().getQuad()->draw();
+    _game->services().graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _game->services().graphics().meshes().getQuad()->draw();
 }
 
 glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {

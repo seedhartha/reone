@@ -76,7 +76,7 @@ void Conversation::loadConversationBackground() {
 
 void Conversation::loadCameraModel() {
     string modelResRef(_dialog->cameraModel());
-    _cameraModel = modelResRef.empty() ? nullptr : _game->models().get(modelResRef);
+    _cameraModel = modelResRef.empty() ? nullptr : _game->services().graphics().models().get(modelResRef);
 }
 
 void Conversation::onStart() {
@@ -102,7 +102,7 @@ int Conversation::indexOfFirstActive(const vector<Dialog::EntryReplyLink> &links
 }
 
 bool Conversation::evaluateCondition(const string &scriptResRef) {
-    return _game->scriptRunner().run(scriptResRef, _owner->id()) != 0;
+    return _game->services().scriptRunner().run(scriptResRef, _owner->id()) != 0;
 }
 
 void Conversation::finish() {
@@ -112,7 +112,7 @@ void Conversation::finish() {
 
     // Run EndConversation script
     if (!_dialog->endScript().empty()) {
-        _game->scriptRunner().run(_dialog->endScript(), _owner->id());
+        _game->services().scriptRunner().run(_dialog->endScript(), _owner->id());
     }
 }
 
@@ -144,7 +144,7 @@ void Conversation::loadEntry(int index, bool start) {
 
     // Run entry script
     if (!_currentEntry->script.empty()) {
-        _game->scriptRunner().run(_currentEntry->script, _owner->id());
+        _game->services().scriptRunner().run(_currentEntry->script, _owner->id());
     }
 }
 
@@ -168,8 +168,8 @@ void Conversation::loadVoiceOver() {
         voiceResRef = _currentEntry->voResRef;
     }
     if (!voiceResRef.empty()) {
-        _currentVoice = _game->audioPlayer().play(voiceResRef, AudioType::Voice);
-        _lipAnimation = _game->lips().get(voiceResRef);
+        _currentVoice = _game->services().audio().player().play(voiceResRef, AudioType::Voice);
+        _lipAnimation = _game->services().graphics().lips().get(voiceResRef);
     }
 }
 
@@ -242,7 +242,7 @@ void Conversation::pickReply(int index) {
 
     // Run reply script
     if (!reply.script.empty()) {
-        _game->scriptRunner().run(reply.script, _owner->id());
+        _game->services().scriptRunner().run(reply.script, _owner->id());
     }
 
     int entryIdx = indexOfFirstActive(reply.entries);

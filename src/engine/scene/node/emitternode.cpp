@@ -280,7 +280,7 @@ void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &
         uniforms.particles->particles[i].frame = particle->frame;
     }
 
-    _sceneGraph->shaders().activate(ShaderProgram::ParticleParticle, uniforms);
+    _sceneGraph->graphics().shaders().activate(ShaderProgram::ParticleParticle, uniforms);
 
     setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
@@ -288,10 +288,10 @@ void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &
     bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
     if (lighten) {
         withLightenBlending([&]() {
-            _sceneGraph->meshes().getBillboard()->drawInstanced(count);
+            _sceneGraph->graphics().meshes().getBillboard()->drawInstanced(count);
         });
     } else {
-        _sceneGraph->meshes().getBillboard()->drawInstanced(count);
+        _sceneGraph->graphics().meshes().getBillboard()->drawInstanced(count);
     }
 }
 

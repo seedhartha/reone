@@ -39,27 +39,18 @@ namespace reone {
 
 namespace game {
 
-GameGUI::GameGUI(Game *game) :
-    GUI(
-        game->options().graphics,
-        &game->window(),
-        &game->fonts(),
-        &game->shaders(),
-        &game->meshes(),
-        &game->textures(),
-        &game->resources(),
-        &game->strings()
-    ),
+GameGUI::GameGUI(Game *game
+) : GUI(game->options().graphics, game->services().graphics(), game->services().audio(), game->services().resource()),
     _game(game) {
 }
 
 void GameGUI::onClick(const string &control) {
-    _game->audioPlayer().play(_game->guiSounds().getOnClick(), AudioType::Sound);
+    _audio.player().play(_game->services().guiSounds().getOnClick(), AudioType::Sound);
 }
 
 void GameGUI::onFocusChanged(const string &control, bool focus) {
     if (focus) {
-        _game->audioPlayer().play(_game->guiSounds().getOnEnter(), AudioType::Sound);
+        _audio.player().play(_game->services().guiSounds().getOnEnter(), AudioType::Sound);
     }
 }
 
@@ -90,12 +81,12 @@ void GameGUI::loadBackground(BackgroundType type) {
                 break;
         }
     } else {
-        if ((_gfxOpts.width == 1600 && _gfxOpts.height == 1200) ||
-            (_gfxOpts.width == 1280 && _gfxOpts.height == 960) ||
-            (_gfxOpts.width == 1024 && _gfxOpts.height == 768) ||
-            (_gfxOpts.width == 800 && _gfxOpts.height == 600)) {
+        if ((_options.width == 1600 && _options.height == 1200) ||
+            (_options.width == 1280 && _options.height == 960) ||
+            (_options.width == 1024 && _options.height == 768) ||
+            (_options.width == 800 && _options.height == 600)) {
 
-            resRef = str(boost::format("%dx%d") % _gfxOpts.width % _gfxOpts.height);
+            resRef = str(boost::format("%dx%d") % _options.width % _options.height);
         } else {
             resRef = "1600x1200";
         }
@@ -117,7 +108,7 @@ void GameGUI::loadBackground(BackgroundType type) {
         }
     }
 
-    _background = _textures->get(resRef, TextureUsage::Diffuse);
+    _background = _graphics.textures().get(resRef, TextureUsage::Diffuse);
 }
 
 } // namespace game

@@ -24,10 +24,8 @@
 #include "SDL2/SDL_events.h"
 
 #include "../../common/timer.h"
-#include "../../graphics/fonts.h"
-#include "../../graphics/shader/shaders.h"
-#include "../../graphics/types.h"
-#include "../../graphics/window.h"
+#include "../../graphics/font.h"
+#include "../../graphics/services.h"
 
 namespace reone {
 
@@ -35,7 +33,7 @@ namespace game {
 
 class ProfileOverlay {
 public:
-    ProfileOverlay(graphics::Window *window, graphics::Fonts *fonts, graphics::Shaders *shaders, graphics::Meshes *meshes);
+    ProfileOverlay(graphics::GraphicsServices &graphics);
 
     void init();
     bool handle(const SDL_Event &event);
@@ -48,10 +46,7 @@ private:
         int onePerLow { 0 }; /**< 1% Low */
     };
 
-    graphics::Window *_window;
-    graphics::Fonts *_fonts;
-    graphics::Shaders *_shaders;
-    graphics::Meshes *_meshes;
+    graphics::GraphicsServices &_graphics;
 
     uint64_t _frequency { 0 };
     uint64_t _counter { 0 };

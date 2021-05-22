@@ -15,35 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "services.h"
 
-#include <cstdint>
-#include <string>
+using namespace std;
 
-#include "../../script/scripts.h"
-
-#include "routines.h"
+using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace audio {
 
-class ScriptRunner {
-public:
-    ScriptRunner(Routines &routines, script::Scripts &scripts);
+AudioServices::AudioServices(AudioOptions options, ResourceServices &resource) :
+    _options(move(options)),
+    _resource(resource) {
+}
 
-    int run(
-        const std::string &resRef,
-        uint32_t callerId = script::kObjectInvalid,
-        uint32_t triggerrerId = script::kObjectInvalid,
-        int userDefinedEventNumber = -1,
-        int scriptVar = -1);
+void AudioServices::init() {
+    _files = make_unique<AudioFiles>(&_resource.resources());
 
-private:
-    Routines &_routines;
-    script::Scripts &_scripts;
-};
+    _player = make_unique<AudioPlayer>(_options, _files.get());
+    _player->init();
+}
 
-} // namespace game
+} // namespace audio
 
 } // namespace reone

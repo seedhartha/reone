@@ -36,7 +36,7 @@ namespace game {
 void Trigger::loadUTT(const GffStruct &utt) {
     _tag = boost::to_lower_copy(utt.getString("Tag"));
     _blueprintResRef = boost::to_lower_copy(utt.getString("TemplateResRef"));
-    _name = _game->strings().get(utt.getInt("LocalizedName"));
+    _name = _game->services().resource().strings().get(utt.getInt("LocalizedName"));
     _autoRemoveKey = utt.getBool("AutoRemoveKey"); // always 0, but could be useful
     _faction = utt.getEnum("Faction", Faction::Invalid);
     _keyName = utt.getString("KeyName");

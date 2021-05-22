@@ -37,7 +37,7 @@ namespace game {
 
 void Placeable::loadUTP(const GffStruct &utp) {
     _tag = boost::to_lower_copy(utp.getString("Tag"));
-    _name = _game->strings().get(utp.getInt("LocName"));
+    _name = _game->services().resource().strings().get(utp.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utp.getString("TemplateResRef"));
     _conversation = boost::to_lower_copy(utp.getString("Conversation"));
     _interruptable = utp.getBool("Interruptable");

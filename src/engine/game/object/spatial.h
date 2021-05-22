@@ -21,8 +21,6 @@
 #include <queue>
 #include <vector>
 
-#include "object.h"
-
 #include "glm/gtc/quaternion.hpp"
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
@@ -30,10 +28,13 @@
 #include "../../graphics/walkmesh/walkmesh.h"
 #include "../../scene/animproperties.h"
 #include "../../scene/node/scenenode.h"
+#include "../../scene/scenegraph.h"
 
 #include "../action/playanimation.h"
 #include "../enginetype/effect.h"
 #include "../types.h"
+
+#include "object.h"
 
 namespace reone {
 
@@ -70,8 +71,6 @@ public:
 
     virtual std::shared_ptr<graphics::Walkmesh> getWalkmesh() const;
 
-    ObjectFactory &objectFactory() { return *_objectFactory; }
-    scene::SceneGraph &sceneGraph() { return *_sceneGraph; }
     Room *room() const { return _room; }
     const glm::vec3 &position() const { return _position; }
     const glm::mat4 &transform() const { return _transform; }
@@ -136,6 +135,7 @@ protected:
 
     ObjectFactory *_objectFactory;
     scene::SceneGraph *_sceneGraph;
+
     glm::vec3 _position { 0.0f };
     glm::quat _orientation { 1.0f, 0.0f, 0.0f, 0.0f };
     glm::mat4 _transform { 1.0f };

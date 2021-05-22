@@ -21,13 +21,10 @@
 
 #include "SDL2/SDL_timer.h"
 
-#include "../audio/soundhandle.h"
 #include "../common/log.h"
 #include "../common/pathutil.h"
 #include "../graphics/featureutil.h"
-#include "../graphics/model/mdlreader.h"
 #include "../video/bikreader.h"
-#include "../video/video.h"
 
 #include "gameidutil.h"
 
@@ -52,50 +49,26 @@ static constexpr char kModulesDirectoryName[] = "modules";
 
 static bool g_conversationsEnabled = true;
 
-Game::Game(const fs::path &path, const Options &opts) :
-    _gameId(determineGameID(path)),
-
-    _combat(this),
-    _console(this),
-    _options(opts),
-    _party(this),
-    _path(path),
-
-    // Audio
-    _audioFiles(&_resources),
-    _audioPlayer(opts.audio, &_audioFiles),
-    _footstepSounds(&_audioFiles, &_resources),
-    _guiSounds(&_audioFiles, &_resources),
-    _soundSets(&_audioFiles, &_resources, &_strings),
-
-    // Graphics
-    _window(opts.graphics, this),
-    _textures(&_resources),
-    _materials(&_resources),
-    _models(&_textures, &_resources),
-    _lips(&_resources),
-    _sceneGraph(opts.graphics, &_shaders, &_meshes, &_textures, &_materials, &_pbrIbl),
-    _worldPipeline(opts.graphics, &_sceneGraph),
-    _objectFactory(this, &_sceneGraph),
-    _cursors(_gameId, &_window, &_shaders, &_meshes, &_resources),
-    _fonts(&_window, &_shaders, &_meshes, &_textures),
-    _profileOverlay(&_window, &_fonts, &_shaders, &_meshes),
-    _pbrIbl(&_shaders, &_meshes),
-    _walkmeshes(&_resources),
-
-    _classes(&_resources, &_strings),
-    _portraits(&_textures, &_resources),
-    _feats(&_textures, &_resources, &_strings),
-    _reputes(&_resources),
-    _surfaces(&_resources),
-    _spells(&_textures, &_resources, &_strings),
-    _scripts(&_resources),
-    _routines(this),
-    _scriptRunner(this) {
+Game::Game(
+    fs::path path,
+    Options options,
+    ResourceServices &resource,
+    GraphicsServices &graphics,
+    AudioServices &audio,
+    SceneServices &scene,
+    ScriptServices &script
+) :
+    _path(move(path)),
+    _options(move(options)),
+    _resource(resource),
+    _graphics(graphics),
+    _audio(audio),
+    _scene(scene),
+    _script(script) {
 }
 
 int Game::run() {
-    initSubsystems();
+    init();
     openMainMenu();
 
     if (!_options.module.empty()) {
@@ -103,38 +76,28 @@ int Game::run() {
     } else {
         playVideo("legal");
     }
-    _window.show();
 
     runMainLoop();
-    deinitSubsystems();
+    deinit();
 
     return 0;
 }
 
-void Game::initSubsystems() {
+void Game::init() {
+    _gameId = determineGameID(_path);
+
     initResourceProviders();
+
+    _game = make_unique<GameServices>(this, _resource, _graphics, _audio, _scene, _script);
+    _game->init();
+
+    _graphics.window().setEventHandler(this);
+    _graphics.walkmeshes().setWalkableSurfaces(_game->surfaces().getWalkableSurfaceIndices());
+
+    _console = make_unique<Console>(this);
+    _profileOverlay = make_unique<ProfileOverlay>(_graphics);
+
     loadModuleNames();
-
-    _window.init();
-    _strings.init(_path);
-    _meshes.init();
-    _textures.init();
-    _materials.init();
-    _pbrIbl.init();
-    _shaders.init();
-    _audioPlayer.init();
-    _guiSounds.init();
-    _routines.init();
-    _reputes.init();
-    _surfaces.init();
-    _portraits.init();
-    _walkmeshes.init(_surfaces.getWalkableSurfaceIndices());
-    _feats.init();
-    _spells.init();
-    _worldPipeline.init();
-    _console.load();
-    _profileOverlay.init();
-
     setCursorType(CursorType::Default);
 }
 
@@ -144,7 +107,7 @@ void Game::initResourceProviders() {
     } else {
         initResourceProvidersForKotOR();
     }
-    _resources.indexDirectory(getPathIgnoreCase(fs::current_path(), kDataDirectoryName));
+    _resource.resources().indexDirectory(getPathIgnoreCase(fs::current_path(), kDataDirectoryName));
 }
 
 void Game::loadModuleNames() {
@@ -162,9 +125,9 @@ void Game::loadModuleNames() {
 void Game::setCursorType(CursorType type) {
     if (_cursorType != type) {
         if (type == CursorType::None) {
-            _window.setCursor(nullptr);
+            _graphics.window().setCursor(nullptr);
         } else {
-            _window.setCursor(_cursors.get(type));
+            _graphics.window().setCursor(_game->cursors().get(type));
         }
         _cursorType = type;
     }
@@ -174,7 +137,7 @@ void Game::playVideo(const string &name) {
     fs::path path(getPathIgnoreCase(_path, "movies/" + name + ".bik"));
     if (path.empty()) return;
 
-    BikReader bik(path, &_shaders, &_meshes);
+    BikReader bik(path, &_graphics.shaders(), &_graphics.meshes());
     bik.load();
 
     _video = bik.video();
@@ -185,7 +148,7 @@ void Game::playVideo(const string &name) {
     }
     shared_ptr<AudioStream> audio(_video->audio());
     if (audio) {
-        _movieAudio = _audioPlayer.play(audio, AudioType::Movie);
+        _movieAudio = _audio.player().play(audio, AudioType::Movie);
     }
 }
 
@@ -253,13 +216,13 @@ void Game::loadModule(const string &name, string entry) {
             loadCharacterGeneration();
         }
 
-        _models.invalidateCache();
-        _walkmeshes.invalidateCache();
-        _textures.invalidateCache();
-        _audioFiles.invalidate();
-        _scripts.invalidate();
-        _soundSets.invalidate();
-        _lips.invalidate();
+        _game->soundSets().invalidate();
+        _graphics.textures().invalidateCache();
+        _graphics.models().invalidateCache();
+        _graphics.walkmeshes().invalidateCache();
+        _graphics.lips().invalidate();
+        _audio.files().invalidate();
+        _script.scripts().invalidate();
 
         loadModuleResources(name);
 
@@ -275,16 +238,16 @@ void Game::loadModule(const string &name, string entry) {
         if (maybeModule != _loadedModules.end()) {
             _module = maybeModule->second;
         } else {
-            shared_ptr<GffStruct> ifo(_resources.getGFF("module", ResourceType::Ifo));
+            shared_ptr<GffStruct> ifo(_resource.resources().getGFF("module", ResourceType::Ifo));
 
-            _module = _objectFactory.newModule();
+            _module = _game->objectFactory().newModule();
             _module->load(name, *ifo);
 
             _loadedModules.insert(make_pair(name, _module));
         }
 
         _module->loadParty(entry);
-        _module->area()->fill(_sceneGraph);
+        _module->area()->fill(_scene.graph());
 
         _loadScreen->setProgress(100);
         drawAll();
@@ -310,53 +273,52 @@ void Game::withLoadingScreen(const string &imageResRef, const function<void()> &
 }
 
 void Game::loadModuleResources(const string &moduleName) {
-    _resources.invalidateCache();
-    _resources.clearTransientProviders();
+    _resource.resources().invalidateCache();
+    _resource.resources().clearTransientProviders();
 
     fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));
     fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod"));
     if (fs::exists(modPath)) {
-        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false), true);
+        _resource.resources().indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false), true);
     } else {
-        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"), true);
-        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
+        _resource.resources().indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"), true);
+        _resource.resources().indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
     }
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-    _resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
+    _resource.resources().indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
 
     if (isTSL(_gameId)) {
-        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"), true);
+        _resource.resources().indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"), true);
     }
 }
 
 void Game::drawAll() {
     // Compute derived PBR IBL textures from queued environment maps
-    _pbrIbl.refresh();
+    _graphics.pbrIbl().refresh();
 
-    _window.clear();
+    _graphics.window().clear();
 
     if (_video) {
         _video->draw();
     } else {
         drawWorld();
         drawGUI();
-        _window.drawCursor();
+        _graphics.window().drawCursor();
     }
 
-    _profileOverlay.draw();
-
-    _window.swapBuffers();
+    _profileOverlay->draw();
+    _graphics.window().swapBuffers();
 }
 
 void Game::drawWorld() {
-    _worldPipeline.render();
+    _scene.worldRenderPipeline().render();
 }
 
 void Game::toggleInGameCameraType() {
     switch (_cameraType) {
         case CameraType::FirstPerson:
-            if (_party.getLeader()) {
+            if (_game->party().getLeader()) {
                 _cameraType = CameraType::ThirdPerson;
             }
             break;
@@ -388,7 +350,7 @@ shared_ptr<Object> Game::getObjectById(uint32_t id) const {
         case kObjectInvalid:
             return nullptr;
         default:
-            return _objectFactory.getObjectById(id);
+            return _game->objectFactory().getObjectById(id);
     }
 }
 
@@ -398,8 +360,8 @@ void Game::drawGUI() {
             if (_cameraType == CameraType::ThirdPerson) {
                 _hud->draw();
             }
-            if (_console.isOpen()) {
-                _console.draw();
+            if (_console->isOpen()) {
+                _console->draw();
             }
             break;
 
@@ -486,9 +448,9 @@ void Game::runMainLoop() {
     _ticks = SDL_GetTicks();
 
     while (!_quit) {
-        _window.processEvents(_quit);
+        _graphics.window().processEvents(_quit);
 
-        if (_window.isInFocus()) {
+        if (_graphics.window().isInFocus()) {
             update();
             drawAll();
         }
@@ -513,7 +475,7 @@ void Game::update() {
     bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
     if (updModule && !_paused) {
         _module->update(dt);
-        _combat.update(dt);
+        _game->combat().update(dt);
     }
 
     GUI *gui = getScreenGUI();
@@ -522,7 +484,7 @@ void Game::update() {
     }
     updateSceneGraph(dt);
 
-    _profileOverlay.update(dt);
+    _profileOverlay->update(dt);
 }
 
 void Game::updateVideo(float dt) {
@@ -541,7 +503,7 @@ void Game::updateMusic() {
     if (_musicResRef.empty()) return;
 
     if (!_music || _music->isStopped()) {
-        _music = _audioPlayer.play(_musicResRef, AudioType::Music);
+        _music = _audio.player().play(_musicResRef, AudioType::Music);
     }
 }
 
@@ -570,9 +532,9 @@ void Game::loadCharacterGeneration() {
     _charGen->load();
 }
 
-void Game::deinitSubsystems() {
-    _audioPlayer.deinit();
-    _window.deinit();
+void Game::deinit() {
+    _audio.player().deinit();
+    _graphics.window().deinit();
 }
 
 void Game::startCharacterGeneration() {
@@ -636,7 +598,7 @@ void Game::openInGameMenu(InGameMenu::Tab tab) {
 void Game::startDialog(const shared_ptr<SpatialObject> &owner, const string &resRef) {
     if (!g_conversationsEnabled) return;
 
-    shared_ptr<GffStruct> dlg(_resources.getGFF(resRef, ResourceType::Dlg));
+    shared_ptr<GffStruct> dlg(_resource.resources().getGFF(resRef, ResourceType::Dlg));
     if (!dlg) {
         warn("Game: conversation not found: " + resRef);
         return;
@@ -647,7 +609,7 @@ void Game::startDialog(const shared_ptr<SpatialObject> &owner, const string &res
     setCursorType(CursorType::Default);
     changeScreen(GameScreen::Conversation);
 
-    auto dialog = make_shared<Dialog>(resRef, &_strings);
+    auto dialog = make_shared<Dialog>(resRef, &_resource.strings());
     dialog->load(*dlg);
 
     bool computerConversation = dialog->conversationType() == ConversationType::Computer;
@@ -721,11 +683,11 @@ void Game::updateCamera(float dt) {
 
         glm::vec3 listenerPosition;
         if (_cameraType == CameraType::ThirdPerson) {
-            listenerPosition = _party.getLeader()->position() + 1.7f; // TODO: height based on appearance
+            listenerPosition = _game->party().getLeader()->position() + 1.7f; // TODO: height based on appearance
         } else {
             listenerPosition = camera->sceneNode()->absoluteTransform()[3];
         }
-        _audioPlayer.setListenerPosition(listenerPosition);
+        _audio.player().setListenerPosition(listenerPosition);
     }
 }
 
@@ -735,21 +697,21 @@ void Game::updateSceneGraph(float dt) {
 
     // Select a reference node for dynamic lighting
     shared_ptr<SceneNode> lightingRefNode;
-    shared_ptr<Creature> partyLeader(_party.getLeader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     if (partyLeader && _cameraType == CameraType::ThirdPerson) {
         lightingRefNode = partyLeader->sceneNode();
     } else {
         lightingRefNode = camera->sceneNode();
     }
 
-    _sceneGraph.setActiveCamera(camera->sceneNode());
-    _sceneGraph.setLightingRefNode(lightingRefNode);
-    _sceneGraph.setUpdateRoots(!_paused);
-    _sceneGraph.update(dt);
+    _scene.graph().setActiveCamera(camera->sceneNode());
+    _scene.graph().setLightingRefNode(lightingRefNode);
+    _scene.graph().setUpdateRoots(!_paused);
+    _scene.graph().update(dt);
 }
 
 bool Game::handle(const SDL_Event &event) {
-    if (_profileOverlay.handle(event)) return true;
+    if (_profileOverlay->handle(event)) return true;
 
     if (!_video) {
         GUI *gui = getScreenGUI();
@@ -758,10 +720,10 @@ bool Game::handle(const SDL_Event &event) {
         }
         switch (_screen) {
             case GameScreen::InGame: {
-                if (_console.handle(event)) {
+                if (_console->handle(event)) {
                     return true;
                 }
-                if (_party.handle(event)) {
+                if (_game->party().handle(event)) {
                     return true;
                 }
                 Camera *camera = getActiveCamera();
@@ -893,7 +855,7 @@ void Game::setPaused(bool paused) {
 }
 
 void Game::setRelativeMouseMode(bool relative) {
-    _window.setRelativeMouseMode(relative);
+    _graphics.window().setRelativeMouseMode(relative);
 }
 
 } // namespace game

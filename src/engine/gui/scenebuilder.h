@@ -24,6 +24,9 @@
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
+#include "../graphics/options.h"
+#include "../graphics/services.h"
+
 #include "../scene/node/modelnode.h"
 #include "../scene/scenegraph.h"
 
@@ -36,7 +39,7 @@ namespace gui {
  */
 class SceneBuilder {
 public:
-    SceneBuilder(graphics::GraphicsOptions opts, graphics::Shaders *shaders, graphics::Meshes *meshes, graphics::Textures *textures, graphics::Materials *materials, graphics::PBRIBL *pbrIbl);
+    SceneBuilder(graphics::GraphicsOptions options, graphics::GraphicsServices &graphics);
 
     std::unique_ptr<scene::SceneGraph> build();
 
@@ -50,12 +53,8 @@ public:
     SceneBuilder &ambientLightColor(const glm::vec3 &color);
 
 private:
-    graphics::GraphicsOptions _opts;
-    graphics::Shaders *_shaders;
-    graphics::Meshes *_meshes;
-    graphics::Textures *_textures;
-    graphics::Materials *_materials;
-    graphics::PBRIBL *_pbrIbl;
+    graphics::GraphicsOptions _options;
+    graphics::GraphicsServices &_graphics;
 
     float _aspect { 1.0f };
     float _zNear { 0.1f };

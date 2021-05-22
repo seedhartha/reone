@@ -38,7 +38,7 @@ Item::Item(uint32_t id, Game *game) : Object(id, ObjectType::Item, game) {
 }
 
 void Item::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> uti(_game->resources().getGFF(resRef, ResourceType::Uti));
+    shared_ptr<GffStruct> uti(_game->services().resource().resources().getGFF(resRef, ResourceType::Uti));
     if (uti) {
         loadUTI(*uti);
     }
@@ -48,7 +48,7 @@ void Item::playShotSound(int variant, glm::vec3 position) {
     if (_ammunitionType) {
         shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1);
         if (sound) {
-            _game->audioPlayer().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
+            _game->services().audio().player().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
         }
     }
 }
@@ -56,7 +56,7 @@ void Item::playShotSound(int variant, glm::vec3 position) {
 void Item::playImpactSound(int variant, glm::vec3 position) {
     if (_ammunitionType) {
         shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1);
-        _game->audioPlayer().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
+        _game->services().audio().player().play(sound, AudioType::Sound, false, 1.0f, true, move(position));
     }
 }
 
