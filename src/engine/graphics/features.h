@@ -17,21 +17,34 @@
 
 #pragma once
 
+#include <set>
+
+#include <boost/noncopyable.hpp>
+
+#include "options.h"
+#include "types.h"
+
 namespace reone {
 
 namespace graphics {
 
-enum class Feature {
-    PBR,
-    HDR,
-    DynamicRoomLighting
+class Features : boost::noncopyable {
+public:
+    Features(GraphicsOptions options);
+
+    void init();
+
+    void toggle(Feature feature);
+
+    bool isEnabled(Feature feature);
+
+    void setEnabled(Feature feature, bool enabled);
+
+private:
+    GraphicsOptions _options;
+
+    std::set<Feature> _enabled;
 };
-
-bool isFeatureEnabled(Feature feature);
-int getFeatureParameter(Feature feature);
-
-void setFeatureEnabled(Feature feature, bool enabled);
-void setFeatureParameter(Feature feature, int value);
 
 } // namespace graphics
 

@@ -23,7 +23,6 @@
 
 #include "../common/log.h"
 #include "../common/pathutil.h"
-#include "../graphics/featureutil.h"
 #include "../video/bikreader.h"
 
 #include "gameidutil.h"
@@ -794,21 +793,21 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
 
         case SDLK_F1:
             if (_options.developer) {
-                setFeatureEnabled(Feature::PBR, !isFeatureEnabled(Feature::PBR));
+                _graphics.features().toggle(Feature::PBR);
                 return true;
             }
             break;
 
         case SDLK_F2:
             if (_options.developer) {
-                setFeatureEnabled(Feature::HDR, !isFeatureEnabled(Feature::HDR));
+                _graphics.features().toggle(Feature::HDR);
                 return true;
             }
             break;
 
         case SDLK_F3:
             if (_options.developer) {
-                setFeatureEnabled(Feature::DynamicRoomLighting, !isFeatureEnabled(Feature::DynamicRoomLighting));
+                _graphics.features().toggle(Feature::DynamicRoomLighting);
                 return true;
             }
             break;

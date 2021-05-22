@@ -165,7 +165,7 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/context.h
     src/engine/graphics/cursor.h
     src/engine/graphics/eventhandler.h
-    src/engine/graphics/featureutil.h
+    src/engine/graphics/features.h
     src/engine/graphics/font.h
     src/engine/graphics/fonts.h
     src/engine/graphics/framebuffer.h
@@ -209,7 +209,7 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/aabb.cpp
     src/engine/graphics/context.cpp
     src/engine/graphics/cursor.cpp
-    src/engine/graphics/featureutil.cpp
+    src/engine/graphics/features.cpp
     src/engine/graphics/font.cpp
     src/engine/graphics/fonts.cpp
     src/engine/graphics/framebuffer.cpp

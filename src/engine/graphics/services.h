@@ -24,6 +24,7 @@
 #include "../resource/services.h"
 
 #include "context.h"
+#include "features.h"
 #include "fonts.h"
 #include "lip/lips.h"
 #include "materials.h"
@@ -47,6 +48,7 @@ public:
     void init();
 
     Context &context() { return *_context; }
+    Features &features() { return *_features; }
     Fonts &fonts() { return *_fonts; }
     Lips &lips() { return *_lips; }
     Materials &materials() { return *_materials; }
@@ -63,6 +65,7 @@ private:
     resource::ResourceServices &_resource;
 
     std::unique_ptr<Context> _context;
+    std::unique_ptr<Features> _features;
     std::unique_ptr<Fonts> _fonts;
     std::unique_ptr<Lips> _lips;
     std::unique_ptr<Materials> _materials;

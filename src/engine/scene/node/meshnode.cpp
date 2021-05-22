@@ -25,7 +25,6 @@
 #include "../../common/log.h"
 #include "../../common/guardutil.h"
 #include "../../common/random.h"
-#include "../../graphics/featureutil.h"
 #include "../../graphics/pbribl.h"
 
 #include "../scenegraph.h"
@@ -235,7 +234,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     // Setup shaders
 
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
-    if (isFeatureEnabled(Feature::HDR)) {
+    if (_sceneGraph->graphics().features().isEnabled(Feature::HDR)) {
         uniforms.combined.featureMask |= UniformFeatureFlags::hdr;
     }
     uniforms.combined.general.model = _absTransform;
@@ -250,7 +249,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     } else {
         if (!_nodeTextures.diffuse) {
             program = ShaderProgram::ModelBlinnPhongDiffuseless;
-        } else if (isFeatureEnabled(Feature::PBR)) {
+        } else if (_sceneGraph->graphics().features().isEnabled(Feature::PBR)) {
             program = ShaderProgram::ModelPBR;
         } else {
             program = ShaderProgram::ModelBlinnPhong;
@@ -263,7 +262,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         if (_nodeTextures.envmap) {
             uniforms.combined.featureMask |= UniformFeatureFlags::envmap;
 
-            if (isFeatureEnabled(Feature::PBR)) {
+            if (_sceneGraph->graphics().features().isEnabled(Feature::PBR)) {
                 bool derived = _sceneGraph->graphics().pbrIbl().contains(_nodeTextures.envmap.get());
                 if (derived) {
                     uniforms.combined.featureMask |= UniformFeatureFlags::pbrIbl;
@@ -271,7 +270,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
             }
         }
 
-        if (_nodeTextures.lightmap && !isFeatureEnabled(Feature::DynamicRoomLighting)) {
+        if (_nodeTextures.lightmap && !_sceneGraph->graphics().features().isEnabled(Feature::DynamicRoomLighting)) {
             uniforms.combined.featureMask |= UniformFeatureFlags::lightmap;
         }
 
@@ -410,7 +409,7 @@ bool MeshSceneNode::isLightingEnabled() const {
     if (!isLightingEnabledByUsage(_model->usage())) return false;
 
     // Lighting is disabled for lightmapped models, unless dynamic room lighting is enabled
-    if (_nodeTextures.lightmap && !isFeatureEnabled(Feature::DynamicRoomLighting)) return false;
+    if (_nodeTextures.lightmap && !_sceneGraph->graphics().features().isEnabled(Feature::DynamicRoomLighting)) return false;
 
     // Lighting is disabled for self-illuminated model nodes, e.g. sky boxes
     if (isSelfIlluminated()) return false;

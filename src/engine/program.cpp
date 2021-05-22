@@ -27,7 +27,6 @@
 #include "common/log.h"
 #include "common/types.h"
 #include "engine.h"
-#include "graphics/featureutil.h"
 
 using namespace std;
 
@@ -103,8 +102,9 @@ void Program::loadOptions() {
     _options.module = vars.count("module") > 0 ? vars["module"].as<string>() : "";
     _options.graphics.width = vars["width"].as<int>();
     _options.graphics.height = vars["height"].as<int>();
-    _options.graphics.fullscreen = vars["fullscreen"].as<bool>();
     _options.graphics.shadowResolution = vars["shadowres"].as<int>();
+    _options.graphics.fullscreen = vars["fullscreen"].as<bool>();
+    _options.graphics.pbr = vars["pbr"].as<bool>();
     _options.audio.musicVolume = vars["musicvol"].as<int>();
     _options.audio.voiceVolume = vars["voicevol"].as<int>();
     _options.audio.soundVolume = vars["soundvol"].as<int>();
@@ -115,10 +115,6 @@ void Program::loadOptions() {
 
     if (vars.count("debugch") > 0) {
         setDebugChannels(vars["debugch"].as<int>());
-    }
-    if (vars["pbr"].as<bool>()) {
-        setFeatureEnabled(Feature::PBR, true);
-        setFeatureEnabled(Feature::HDR, true);
     }
 }
 
