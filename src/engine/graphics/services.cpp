@@ -31,6 +31,9 @@ GraphicsServices::GraphicsServices(GraphicsOptions options, ResourceServices &re
 }
 
 void GraphicsServices::init() {
+    _features = make_unique<Features>(_options);
+    _features->init();
+
     _window = make_unique<Window>(_options);
     _window->init();
 

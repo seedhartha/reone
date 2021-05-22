@@ -15,9 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "featureutil.h"
-
-#include <unordered_map>
+#include "features.h"
 
 #include "../common/collectionutil.h"
 
@@ -27,26 +25,34 @@ namespace reone {
 
 namespace graphics {
 
-static unordered_map<Feature, int> g_features {
-    { Feature::PBR, 0 },
-    { Feature::HDR, 0 },
-    { Feature::DynamicRoomLighting, 0 }
-};
-
-bool isFeatureEnabled(Feature feature) {
-    return getFeatureParameter(feature) != 0;
+Features::Features(GraphicsOptions options) : _options(move(options)) {
 }
 
-int getFeatureParameter(Feature feature) {
-    return getFromLookupOrElse(g_features, feature, 0);
+void Features::init() {
+    if (_options.pbr) {
+        _enabled.insert(Feature::PBR);
+        _enabled.insert(Feature::HDR);
+    }
 }
 
-void setFeatureEnabled(Feature feature, bool enabled) {
-    setFeatureParameter(feature, enabled ? 1 : 0);
+bool Features::isEnabled(Feature feature) {
+    return _enabled.count(feature) > 0;
 }
 
-void setFeatureParameter(Feature feature, int value) {
-    g_features[feature] = value;
+void Features::toggle(Feature feature) {
+    if (_enabled.count(feature) > 0) {
+        _enabled.erase(feature);
+    } else {
+        _enabled.insert(feature);
+    }
+}
+
+void Features::setEnabled(Feature feature, bool enabled) {
+    if (enabled) {
+        _enabled.insert(feature);
+    } else {
+        _enabled.erase(feature);
+    }
 }
 
 } // namespace graphics

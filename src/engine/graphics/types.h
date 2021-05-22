@@ -33,6 +33,12 @@ constexpr int kMaxCharacters = 128;
 constexpr int kMaxGrassClusters = 256;
 constexpr int kMaxDanglymeshConstraints = 512;
 
+enum class Feature {
+    PBR,
+    HDR,
+    DynamicRoomLighting
+};
+
 enum class PixelFormat {
     Grayscale,
     RGB,
@@ -73,7 +79,7 @@ enum class CubeMapFace {
     NegativeZ = 5
 };
 
-enum class TGADataType : uint8_t {
+enum class TGADataType {
     RGBA = 2,
     Grayscale = 3,
     RGBA_RLE = 10
