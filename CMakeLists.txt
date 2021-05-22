@@ -675,9 +675,9 @@ else()
     target_link_libraries(reone PRIVATE ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads -latomic)
 endif()
 
-## END reone executable
-
 list(APPEND InstallTargets reone)
+
+## END reone executable
 
 ## reone-tools executable
 
@@ -775,9 +775,13 @@ endif()
 
 ## END Unit tests
 
+## Installation
+
 if(UNIX AND NOT APPLE)
     include(GNUInstallDirs)
 endif()
 
 install(TARGETS ${InstallTargets} DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(TARGETS libcommon libresource libgraphics libaudio libvideo libscript libgame DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+## END Installation
