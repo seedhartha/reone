@@ -234,9 +234,6 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     // Setup shaders
 
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
-    if (_sceneGraph->graphics().features().isEnabled(Feature::HDR)) {
-        uniforms.combined.featureMask |= UniformFeatureFlags::hdr;
-    }
     uniforms.combined.general.model = _absTransform;
     uniforms.combined.general.alpha = _alpha;
     uniforms.combined.general.ambientColor = glm::vec4(_sceneGraph->ambientLightColor(), 1.0f);

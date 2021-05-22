@@ -798,13 +798,6 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
             }
             break;
 
-        case SDLK_F2:
-            if (_options.developer) {
-                _graphics.features().toggle(Feature::HDR);
-                return true;
-            }
-            break;
-
         case SDLK_F3:
             if (_options.developer) {
                 _graphics.features().toggle(Feature::DynamicRoomLighting);
