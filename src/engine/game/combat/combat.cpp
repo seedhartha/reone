@@ -36,7 +36,7 @@ static constexpr float kRoundDuration = 3.0f;
 static constexpr float kProjectileDelay = 0.5f;
 static constexpr float kDeactivateDelay = 8.0f;
 
-Combat::Combat(Game *game) : _game(game) {
+Combat::Combat(Game *game, SceneServices &scene) : _game(game), _scene(scene) {
     ensureNotNull(game, "game");
 }
 

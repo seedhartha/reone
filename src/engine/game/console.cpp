@@ -108,7 +108,7 @@ void Console::cmdDescribe(vector<string> tokens) {
 void Console::cmdListAnim(vector<string> tokens) {;
     auto object = _game->module()->area()->selectedObject();
     if (!object) {
-        object = _game->party().getLeader();
+        object = _game->services().party().getLeader();
         if (!object) {
             print("listanim: no object selected");
             return;
@@ -138,7 +138,7 @@ void Console::cmdPlayAnim(vector<string> tokens) {
     }
     auto object = _game->module()->area()->selectedObject();
     if (!object) {
-        object = _game->party().getLeader();
+        object = _game->services().party().getLeader();
         if (!object) {
             print("playanim: no object selected");
             return;
@@ -165,7 +165,7 @@ void Console::cmdAddItem(vector<string> tokens) {
     }
     auto object = _game->module()->area()->selectedObject();
     if (!object) {
-        object = _game->party().getLeader();
+        object = _game->services().party().getLeader();
         if (!object) {
             print("additem: no object selected");
             return;
@@ -183,7 +183,7 @@ void Console::cmdGiveXP(vector<string> tokens) {
 
     auto object = _game->module()->area()->selectedObject();
     if (!object) {
-        object = _game->party().getLeader();
+        object = _game->services().party().getLeader();
     }
     if (!object || object->type() != ObjectType::Creature) {
         print("givexp: no creature selected");
@@ -206,7 +206,7 @@ void Console::trimOutput() {
 }
 
 void Console::load() {
-    _font = _game->fonts().get("fnt_console");
+    _font = _game->services().graphics().fonts().get("fnt_console");
 }
 
 bool Console::handle(const SDL_Event &event) {
@@ -299,13 +299,13 @@ void Console::drawBackground() {
     transform = glm::scale(transform, glm::vec3(_opts.width, height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _game->window().getOrthoProjection();
+    uniforms.combined.general.projection = _game->services().graphics().window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     uniforms.combined.general.alpha = 0.5f;
 
-    _game->shaders().activate(ShaderProgram::SimpleColor, uniforms);
-    _game->meshes().getQuad()->draw();
+    _game->services().graphics().shaders().activate(ShaderProgram::SimpleColor, uniforms);
+    _game->services().graphics().meshes().getQuad()->draw();
 }
 
 void Console::drawLines() {

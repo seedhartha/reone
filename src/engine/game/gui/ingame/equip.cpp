@@ -135,7 +135,7 @@ static int getInventorySlot(Equipment::Slot slot) {
 void Equipment::onListBoxItemClick(const string &control, const string &item) {
     if (control != "LB_ITEMS" || _selectedSlot == Slot::None) return;
 
-    shared_ptr<Creature> player(_game->party().player());
+    shared_ptr<Creature> player(_game->services().party().player());
     shared_ptr<Item> itemObj;
     if (item != "[none]") {
         for (auto &playerItem : player->items()) {
@@ -146,7 +146,7 @@ void Equipment::onListBoxItemClick(const string &control, const string &item) {
         }
     }
     int slot = getInventorySlot(_selectedSlot);
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
     shared_ptr<Item> equipped(partyLeader->getEquippedItem(slot));
 
     if (equipped != itemObj) {
@@ -160,7 +160,7 @@ void Equipment::onListBoxItemClick(const string &control, const string &item) {
                 if (last) {
                     partyLeader->equip(slot, itemObj);
                 } else {
-                    shared_ptr<Item> clonedItem(_game->objectFactory().newItem());
+                    shared_ptr<Item> clonedItem(_game->services().objectFactory().newItem());
                     clonedItem->loadFromBlueprint(itemObj->blueprintResRef());
                     partyLeader->equip(slot, clonedItem);
                 }
@@ -184,7 +184,7 @@ void Equipment::onFocusChanged(const string &control, bool focus) {
 
         auto maybeStrRef = g_slotStrRefs.find(name.first);
         if (maybeStrRef != g_slotStrRefs.end()) {
-            slotDesc = _strings->get(maybeStrRef->second);
+            slotDesc = _game->services().resource().strings().get(maybeStrRef->second);
         }
         break;
     }
@@ -197,7 +197,7 @@ void Equipment::update() {
     updateEquipment();
     selectSlot(Slot::None);
 
-    auto partyLeader(_game->party().getLeader());
+    auto partyLeader(_game->services().party().getLeader());
 
     string vitalityString(str(boost::format("%d/\n%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
     setControlText("LBL_VITALITY", vitalityString);
@@ -208,7 +208,7 @@ void Equipment::update() {
 void Equipment::updatePortraits() {
     if (_game->gameId() != GameID::KotOR) return;
 
-    Party &party = _game->party();
+    Party &party = _game->services().party();
     shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
@@ -271,7 +271,7 @@ void Equipment::selectSlot(Slot slot) {
 }
 
 void Equipment::updateEquipment() {
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
     auto &equipment = partyLeader->equipment();
 
     for (auto &name : g_slotNames) {
@@ -348,7 +348,7 @@ shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) const {
             return nullptr;
     }
 
-    shared_ptr<Texture> texture(_textures->get(resRef, TextureUsage::GUI));
+    shared_ptr<Texture> texture(_game->services().graphics().textures().get(resRef, TextureUsage::GUI));
     auto pair = icons.insert(make_pair(slot, texture));
 
     return pair.first->second;
@@ -361,13 +361,13 @@ void Equipment::updateItems() {
     if (_selectedSlot != Slot::None) {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
-        lbItem.text = _strings->get(kStrRefNone);
-        lbItem.iconTexture = _textures->get("inone", TextureUsage::GUI);
+        lbItem.text = _game->services().resource().strings().get(kStrRefNone);
+        lbItem.iconTexture = _game->services().graphics().textures().get("inone", TextureUsage::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 
         lbItems.addItem(move(lbItem));
     }
-    shared_ptr<Creature> player(_game->party().player());
+    shared_ptr<Creature> player(_game->services().party().player());
 
     for (auto &item : player->items()) {
         if (_selectedSlot == Slot::None) {
@@ -396,7 +396,7 @@ shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return _textures->get(resRef, TextureUsage::GUI);
+    return _game->services().graphics().textures().get(resRef, TextureUsage::GUI);
 }
 
 } // namespace game

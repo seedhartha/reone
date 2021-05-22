@@ -17,26 +17,32 @@
 
 #pragma once
 
+#include <memory>
+
+#include <boost/filesystem/path.hpp>
 #include <boost/noncopyable.hpp>
+
+#include "resources.h"
+#include "strings.h"
 
 namespace reone {
 
 namespace resource {
 
-class Resources;
-class Strings;
-
 class ResourceServices : boost::noncopyable {
 public:
-    ResourceServices(Resources &resources, Strings &strings) : _resources(resources), _strings(strings) {
-    }
+    ResourceServices(boost::filesystem::path gamePath);
 
-    Resources &resources() { return _resources; }
-    Strings &strings() { return _strings; }
+    void init();
+
+    Resources &resources() { return *_resources; }
+    Strings &strings() { return *_strings; }
 
 private:
-    Resources &_resources;
-    Strings &_strings;
+    boost::filesystem::path _gamePath;
+
+    std::unique_ptr<Resources> _resources;
+    std::unique_ptr<Strings> _strings;
 };
 
 } // namespace resource

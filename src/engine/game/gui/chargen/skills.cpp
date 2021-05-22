@@ -112,7 +112,7 @@ void CharGenSkills::load() {
 
 void CharGenSkills::reset(bool newGame) {
     const CreatureAttributes &attributes = _charGen->character().attributes;
-    shared_ptr<CreatureClass> clazz(_game->classes().get(attributes.getEffectiveClass()));
+    shared_ptr<CreatureClass> clazz(_game->services().classes().get(attributes.getEffectiveClass()));
 
     _points = glm::max(1, (clazz->skillPointBase() + attributes.getAbilityModifier(Ability::Intelligence)) / 2);
 
@@ -168,7 +168,7 @@ void CharGenSkills::refreshControls() {
 bool CharGenSkills::canIncreaseSkill(Skill skill) const {
     ClassType clazz = _charGen->character().attributes.getEffectiveClass();
 
-    shared_ptr<CreatureClass> creatureClass(_game->classes().get(clazz));
+    shared_ptr<CreatureClass> creatureClass(_game->services().classes().get(clazz));
     int maxSkillRank = creatureClass->isClassSkill(skill) ? 4 : 2;
     int pointCost = creatureClass->isClassSkill(skill) ? 1 : 2;
 
@@ -218,7 +218,7 @@ void CharGenSkills::updateCharacter() {
 
 int CharGenSkills::getPointCost(Skill skill) const {
     ClassType clazz = _charGen->character().attributes.getEffectiveClass();
-    shared_ptr<CreatureClass> creatureClass(_game->classes().get(clazz));
+    shared_ptr<CreatureClass> creatureClass(_game->services().classes().get(clazz));
     return creatureClass->isClassSkill(skill) ? 1 : 2;
 }
 
@@ -227,7 +227,7 @@ void CharGenSkills::onFocusChanged(const string &control, bool focus) {
     if (maybeSkill != g_skillByLabelTag.end() && focus) {
         auto maybeDescription = g_descStrRefBySkill.find(maybeSkill->second);
         if (maybeDescription != g_descStrRefBySkill.end()) {
-            string description(_strings->get(maybeDescription->second));
+            string description(_game->services().resource().strings().get(maybeDescription->second));
             ListBox &listBox = getControl<ListBox>("LB_DESC");
             listBox.clearItems();
             listBox.addTextLinesAsItems(description);

@@ -17,26 +17,35 @@
 
 #pragma once
 
+#include <memory>
+
 #include <boost/noncopyable.hpp>
+
+#include "../resource/services.h"
+
+#include "files.h"
+#include "options.h"
+#include "player.h"
 
 namespace reone {
 
 namespace audio {
 
-class AudioFiles;
-class AudioPlayer;
-
 class AudioServices : boost::noncopyable {
 public:
-    AudioServices(AudioFiles &files, AudioPlayer &player) : _files(files), _player(player) {
-    }
+    AudioServices(AudioOptions options, resource::ResourceServices &resource);
 
-    AudioFiles &files() { return _files; }
-    AudioPlayer &player() { return _player; }
+    void init();
+
+    AudioFiles &files() { return *_files; }
+    AudioPlayer &player() { return *_player; }
 
 private:
-    AudioFiles &_files;
-    AudioPlayer &_player;
+    AudioOptions _options;
+    resource::ResourceServices &_resource;
+
+    std::unique_ptr<AudioFiles> _files;
+    std::unique_ptr<AudioPlayer> _player;
 };
 
 } // namespace audio

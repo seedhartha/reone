@@ -19,7 +19,6 @@
 
 #include <stdexcept>
 
-#include "../common/guardutil.h"
 #include "../scene/node/cameranode.h"
 #include "../scene/node/meshnode.h"
 #include "../scene/scenegraph.h"
@@ -33,32 +32,15 @@ namespace reone {
 
 namespace gui {
 
-SceneBuilder::SceneBuilder(
-    GraphicsOptions opts,
-    Shaders *shaders,
-    Meshes *meshes,
-    Textures *textures,
-    Materials *materials,
-    PBRIBL *pbrIbl
-) :
-    _opts(opts),
-    _shaders(shaders),
-    _meshes(meshes),
-    _textures(textures),
-    _materials(materials),
-    _pbrIbl(pbrIbl) {
+SceneBuilder::SceneBuilder(GraphicsOptions options, GraphicsServices &graphics) :
+    _options(options),
+    _graphics(graphics) {
 
-    ensureNotNull(shaders, "shaders");
-    ensureNotNull(meshes, "meshes");
-    ensureNotNull(textures, "textures");
-    ensureNotNull(materials, "materials");
-    ensureNotNull(pbrIbl, "pbrIbl");
-
-    _aspect = opts.width / static_cast<float>(opts.height);
+    _aspect = options.width / static_cast<float>(options.height);
 }
 
 unique_ptr<SceneGraph> SceneBuilder::build() {
-    auto scene = make_unique<SceneGraph>(_opts, _shaders, _meshes, _textures, _materials, _pbrIbl);
+    auto scene = make_unique<SceneGraph>(_options, _graphics);
 
     shared_ptr<ModelSceneNode> model(_modelSupplier(*scene));
     if (!model) {

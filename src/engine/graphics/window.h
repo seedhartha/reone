@@ -36,7 +36,7 @@ namespace graphics {
 
 class Window : boost::noncopyable {
 public:
-    Window(GraphicsOptions options, IEventHandler *eventHandler = nullptr);
+    Window(GraphicsOptions options);
     ~Window();
 
     void init();
@@ -44,7 +44,6 @@ public:
 
     void processEvents(bool &quit);
 
-    void show();
     void clear() const;
     void drawCursor() const;
     void swapBuffers() const;
@@ -53,13 +52,15 @@ public:
 
     glm::mat4 getOrthoProjection(float near = 0.0f, float far = 100.0f) const;
 
+    void setEventHandler(IEventHandler *eventHandler) { _eventHandler = eventHandler; }
     void setRelativeMouseMode(bool enabled);
     void setCursor(const std::shared_ptr<Cursor> &cursor);
 
 private:
-    bool _inited { false };
     GraphicsOptions _options;
+
     IEventHandler *_eventHandler { nullptr };
+    bool _inited { false };
     SDL_Window *_window { nullptr };
     SDL_GLContext _context { nullptr };
     bool _relativeMouseMode { false };

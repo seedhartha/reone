@@ -107,15 +107,15 @@ void Area::load(const string &name, const GffStruct &are, const GffStruct &git) 
 
 void Area::loadLYT() {
     LytReader lyt;
-    lyt.load(wrap(_game->resources().getRaw(_name, ResourceType::Lyt)));
+    lyt.load(wrap(_game->services().resource().resources().getRaw(_name, ResourceType::Lyt)));
 
     for (auto &lytRoom : lyt.rooms()) {
-        shared_ptr<Model> model(_game->models().get(lytRoom.name));
+        shared_ptr<Model> model(_game->services().graphics().models().get(lytRoom.name));
         if (!model) continue;
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
 
-        auto sceneNode = make_shared<ModelSceneNode>(model, ModelUsage::Room, &_game->sceneGraph());
+        auto sceneNode = make_shared<ModelSceneNode>(model, ModelUsage::Room, &_game->services().scene().graph());
         sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {
@@ -123,7 +123,7 @@ void Area::loadLYT() {
             }
         }
 
-        shared_ptr<Walkmesh> walkmesh(_game->walkmeshes().get(lytRoom.name, ResourceType::Wok));
+        shared_ptr<Walkmesh> walkmesh(_game->services().graphics().walkmeshes().get(lytRoom.name, ResourceType::Wok));
 
         auto room = make_unique<Room>(lytRoom.name, position, sceneNode, walkmesh);
         _rooms.insert(make_pair(room->name(), move(room)));
@@ -132,7 +132,7 @@ void Area::loadLYT() {
 
 void Area::loadVIS() {
     VisReader vis;
-    vis.load(wrap(_game->resources().getRaw(_name, ResourceType::Vis)));
+    vis.load(wrap(_game->services().resource().resources().getRaw(_name, ResourceType::Vis)));
 
     _visibility = fixVisibility(vis.visibility());
 }
@@ -147,7 +147,7 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
 }
 
 void Area::loadPTH() {
-    shared_ptr<GffStruct> pth(_game->resources().getGFF(_name, ResourceType::Pth));
+    shared_ptr<GffStruct> pth(_game->services().resource().resources().getGFF(_name, ResourceType::Pth));
     if (!pth) return;
 
     Path path;
@@ -176,7 +176,7 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     glm::vec3 position(entryPosition);
     position.z += 1.7f;
 
-    SceneGraph *sceneGraph = &_game->sceneGraph();
+    SceneGraph *sceneGraph = &_game->services().scene().graph();
 
     _firstPersonCamera = make_unique<FirstPersonCamera>(_cameraAspect, glm::radians(kDefaultFieldOfView), sceneGraph);
     _firstPersonCamera->setPosition(position);
@@ -220,7 +220,7 @@ void Area::doDestroyObjects() {
 }
 
 void Area::doDestroyObject(uint32_t objectId) {
-    shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(_game->objectFactory().getObjectById(objectId)));
+    shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(_game->services().objectFactory().getObjectById(objectId)));
     if (!object) return;
     {
         Room *room = object->room();
@@ -231,7 +231,7 @@ void Area::doDestroyObject(uint32_t objectId) {
     {
         auto sceneNode = object->sceneNode();
         if (sceneNode) {
-            _game->sceneGraph().removeRoot(sceneNode);
+            _game->services().scene().graph().removeRoot(sceneNode);
         }
     }
     {
@@ -295,7 +295,7 @@ void Area::landObject(SpatialObject &object) {
 }
 
 void Area::loadParty(const glm::vec3 &position, float facing) {
-    Party &party = _game->party();
+    Party &party = _game->services().party();
 
     for (int i = 0; i < party.getSize(); ++i) {
         shared_ptr<Creature> member(party.getMember(i));
@@ -308,7 +308,7 @@ void Area::loadParty(const glm::vec3 &position, float facing) {
 }
 
 void Area::unloadParty() {
-    Party &party = _game->party();
+    Party &party = _game->services().party();
 
     for (int i = 0; i < party.getSize(); ++i) {
         doDestroyObject(party.getMember(i)->id());
@@ -316,10 +316,10 @@ void Area::unloadParty() {
 }
 
 void Area::reloadParty() {
-    shared_ptr<Creature> player(_game->party().player());
+    shared_ptr<Creature> player(_game->services().party().player());
     loadParty(player->position(), player->getFacing());
 
-    fill(_game->sceneGraph());
+    fill(_game->services().scene().graph());
 }
 
 bool Area::handle(const SDL_Event &event) {
@@ -439,7 +439,7 @@ bool Area::doMoveCreature(const shared_ptr<Creature> &creature, const glm::vec3 
         creature->setPosition(glm::vec3(dest.x, dest.y, z));
         creature->setWalkmeshMaterial(material);
 
-        if (creature == _game->party().getLeader()) {
+        if (creature == _game->services().party().getLeader()) {
             onPartyLeaderMoved(room != oldRoom);
         }
 
@@ -466,19 +466,19 @@ void Area::runSpawnScripts() {
 void Area::runOnEnterScript() {
     if (_onEnter.empty()) return;
 
-    auto player = _game->party().player();
+    auto player = _game->services().party().player();
     if (!player) return;
 
-    _game->scriptRunner().run(_onEnter, _id, player->id());
+    _game->services().scriptRunner().run(_onEnter, _id, player->id());
 }
 
 void Area::runOnExitScript() {
     if (_onExit.empty()) return;
 
-    auto player = _game->party().player();
+    auto player = _game->services().party().player();
     if (!player) return;
 
-    _game->scriptRunner().run(_onExit, _id, player->id());
+    _game->services().scriptRunner().run(_onExit, _id, player->id());
 }
 
 void Area::destroyObject(const SpatialObject &object) {
@@ -525,7 +525,7 @@ void Area::fill(SceneGraph &sceneGraph) {
         if (aabbNode && _grass.texture) {
             glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), room.second->position()));
             auto grass = make_shared<GrassSceneNode>(room.first, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap, &sceneGraph);
-            for (auto &material : _game->surfaces().getGrassSurfaceIndices()) {
+            for (auto &material : _game->services().surfaces().getGrassSurfaceIndices()) {
                 for (auto &face : aabbNode->getFacesByMaterial(material)) {
                     vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getTriangleCoords(face));
                     float area = calculateTriangleArea(vertices);
@@ -582,7 +582,7 @@ glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &objec
 }
 
 void Area::update3rdPersonCameraFacing() {
-    shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
+    shared_ptr<SpatialObject> partyLeader(_game->services().party().getLeader());
     if (!partyLeader) return;
 
     _thirdPersonCamera->setFacing(partyLeader->getFacing());
@@ -597,7 +597,7 @@ void Area::startDialog(const shared_ptr<SpatialObject> &object, const string &re
 }
 
 void Area::onPartyLeaderMoved(bool roomChanged) {
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
     if (!partyLeader) return;
 
     if (roomChanged) {
@@ -608,7 +608,7 @@ void Area::onPartyLeaderMoved(bool roomChanged) {
 }
 
 void Area::updateRoomVisibility() {
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
     Room *leaderRoom = partyLeader ? partyLeader->room() : nullptr;
     bool allVisible = _game->cameraType() != CameraType::ThirdPerson || !leaderRoom;
 
@@ -638,7 +638,7 @@ void Area::updateRoomVisibility() {
 }
 
 void Area::update3rdPersonCameraTarget() {
-    shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
+    shared_ptr<SpatialObject> partyLeader(_game->services().party().getLeader());
     if (!partyLeader) return;
 
     glm::vec3 position(partyLeader->position());
@@ -661,7 +661,7 @@ void Area::updateVisibility() {
 void Area::updateSounds() {
     glm::vec3 refPosition;
     if (_game->cameraType() == CameraType::ThirdPerson) {
-        refPosition = _game->party().getLeader()->position();
+        refPosition = _game->services().party().getLeader()->position();
     } else {
         refPosition = _game->getActiveCamera()->sceneNode()->absoluteTransform()[3];
     }
@@ -716,7 +716,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
             return;
         }
         if (!trigger->getOnEnter().empty()) {
-            _game->scriptRunner().run(trigger->getOnEnter(), trigger->id(), triggerrer->id());
+            _game->services().scriptRunner().run(trigger->getOnEnter(), trigger->id(), triggerrer->id());
         }
     }
 }
@@ -724,12 +724,12 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
 void Area::updateHeartbeat(float dt) {
     if (_heartbeatTimer.advance(dt)) {
         if (!_onHeartbeat.empty()) {
-            _game->scriptRunner().run(_onHeartbeat, _id);
+            _game->services().scriptRunner().run(_onHeartbeat, _id);
         }
         for (auto &object : _objects) {
             string heartbeat(object->getOnHeartbeat());
             if (!heartbeat.empty()) {
-                _game->scriptRunner().run(heartbeat, object->id());
+                _game->services().scriptRunner().run(heartbeat, object->id());
             }
         }
         _heartbeatTimer.reset(kHeartbeatInterval);
@@ -801,13 +801,13 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
 
     switch (type) {
         case ObjectType::Item: {
-            auto item = _game->objectFactory().newItem();
+            auto item = _game->services().objectFactory().newItem();
             item->loadFromBlueprint(blueprintResRef);
             object = move(item);
             break;
         }
         case ObjectType::Creature: {
-            auto creature = _game->objectFactory().newCreature();
+            auto creature = _game->services().objectFactory().newCreature();
             creature->loadFromBlueprint(blueprintResRef);
             creature->setPosition(location->position());
             creature->setFacing(location->facing());
@@ -815,7 +815,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
             break;
         }
         case ObjectType::Placeable: {
-            auto placeable = _game->objectFactory().newPlaceable();
+            auto placeable = _game->services().objectFactory().newPlaceable();
             placeable->loadFromBlueprint(blueprintResRef);
             object = move(placeable);
             break;
@@ -831,7 +831,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
         add(spatial);
         auto model = spatial->sceneNode();
         if (model) {
-            _game->sceneGraph().addRoot(model);
+            _game->services().scene().graph().addRoot(model);
         }
         auto creature = ObjectConverter::toCreature(spatial);
         if (creature) {

@@ -19,6 +19,7 @@
 
 #include "../../gui/gui.h"
 
+#include "../services.h"
 #include "../types.h"
 
 namespace reone {

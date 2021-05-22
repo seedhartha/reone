@@ -88,7 +88,7 @@ void PartySelection::prepare(const Context &ctx) {
     if (ctx.forceNpc2 >= 0) {
         addNpc(ctx.forceNpc2);
     }
-    Party &party = _game->party();
+    Party &party = _game->services().party();
 
     for (int i = 0; i < kNpcCount; ++i) {
         ToggleButton &btnNpc = getNpcButton(i);
@@ -97,14 +97,14 @@ void PartySelection::prepare(const Context &ctx) {
 
         if (party.isMemberAvailable(i)) {
             string blueprintResRef(party.getAvailableMember(i));
-            shared_ptr<GffStruct> utc(_resources->getGFF(blueprintResRef, ResourceType::Utc));
+            shared_ptr<GffStruct> utc(_game->services().resource().resources().getGFF(blueprintResRef, ResourceType::Utc));
             shared_ptr<Texture> portrait;
             int portraitId = utc->getInt("PortraitId", 0);
             if (portraitId > 0) {
-                portrait = _game->portraits().getTextureByIndex(portraitId);
+                portrait = _game->services().portraits().getTextureByIndex(portraitId);
             } else {
                 int appearance = utc->getInt("Appearance_Type");
-                portrait = _game->portraits().getTextureByAppearance(appearance);
+                portrait = _game->services().portraits().getTextureByAppearance(appearance);
             }
             btnNpc.setDisabled(false);
             lblChar.setBorderFill(move(portrait));
@@ -143,7 +143,7 @@ void PartySelection::onClick(const string &control) {
         _game->openInGame();
 
         if (!_context.exitScript.empty()) {
-            _game->scriptRunner().run(_context.exitScript);
+            _game->services().scriptRunner().run(_context.exitScript);
         }
     } else if (boost::starts_with(control, "BTN_NPC")) {
         onNpcButtonClick(control);
@@ -170,7 +170,7 @@ void PartySelection::refreshAvailableCount() {
 }
 
 void PartySelection::refreshAcceptButton() {
-    string text(_strings->get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
+    string text(_game->services().resource().strings().get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
     Button &btnAccept = getControl<Button>("BTN_ACCEPT");
     btnAccept.setTextMessage(text);
 }
@@ -205,18 +205,18 @@ void PartySelection::changeParty() {
     shared_ptr<Area> area(_game->module()->area());
     area->unloadParty();
 
-    Party &party = _game->party();
+    Party &party = _game->services().party();
     party.clear();
     party.addMember(kNpcPlayer, party.player());
 
-    shared_ptr<Creature> player(_game->party().player());
+    shared_ptr<Creature> player(_game->services().party().player());
 
     for (int i = 0; i < kNpcCount; ++i) {
         if (!_added[i]) continue;
 
         string blueprintResRef(party.getAvailableMember(i));
 
-        shared_ptr<Creature> creature(_game->objectFactory().newCreature());
+        shared_ptr<Creature> creature(_game->services().objectFactory().newCreature());
         creature->loadFromBlueprint(blueprintResRef);
         creature->setFaction(Faction::Friendly1);
         creature->setImmortal(true);

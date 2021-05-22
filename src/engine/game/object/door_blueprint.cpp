@@ -37,7 +37,7 @@ namespace game {
 
 void Door::loadUTD(const GffStruct &utd) {
     _tag = boost::to_lower_copy(utd.getString("Tag"));
-    _name = _game->strings().get(utd.getInt("LocName"));
+    _name = _game->services().resource().strings().get(utd.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utd.getString("TemplateResRef"));
     _autoRemoveKey = utd.getBool("AutoRemoveKey");
     _conversation = boost::to_lower_copy(utd.getString("Conversation"));

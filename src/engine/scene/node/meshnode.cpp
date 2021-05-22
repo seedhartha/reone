@@ -79,7 +79,7 @@ void MeshSceneNode::refreshMaterial() {
     _material = Material();
 
     if (_nodeTextures.diffuse) {
-        shared_ptr<Material> material(_sceneGraph->materials().get(_nodeTextures.diffuse->name()));
+        shared_ptr<Material> material(_sceneGraph->graphics().materials().get(_nodeTextures.diffuse->name()));
         if (material) {
             _material = *material;
         }
@@ -94,12 +94,12 @@ void MeshSceneNode::refreshAdditionalTextures() {
 
     const Texture::Features &features = _nodeTextures.diffuse->features();
     if (!features.envmapTexture.empty()) {
-        _nodeTextures.envmap = _sceneGraph->textures().get(features.envmapTexture, TextureUsage::EnvironmentMap);
+        _nodeTextures.envmap = _sceneGraph->graphics().textures().get(features.envmapTexture, TextureUsage::EnvironmentMap);
     } else if (!features.bumpyShinyTexture.empty()) {
-        _nodeTextures.envmap = _sceneGraph->textures().get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap);
+        _nodeTextures.envmap = _sceneGraph->graphics().textures().get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap);
     }
     if (!features.bumpmapTexture.empty()) {
-        _nodeTextures.bumpmap = _sceneGraph->textures().get(features.bumpmapTexture, TextureUsage::Bumpmap);
+        _nodeTextures.bumpmap = _sceneGraph->graphics().textures().get(features.bumpmapTexture, TextureUsage::Bumpmap);
     }
 }
 
@@ -265,7 +265,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
             uniforms.combined.featureMask |= UniformFeatureFlags::envmap;
 
             if (isFeatureEnabled(Feature::PBR)) {
-                bool derived = _sceneGraph->pbrIbl().contains(_nodeTextures.envmap.get());
+                bool derived = _sceneGraph->graphics().pbrIbl().contains(_nodeTextures.envmap.get());
                 if (derived) {
                     uniforms.combined.featureMask |= UniformFeatureFlags::pbrIbl;
                 }
@@ -364,7 +364,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         }
     }
 
-    _sceneGraph->shaders().activate(program, uniforms);
+    _sceneGraph->graphics().shaders().activate(program, uniforms);
 
 
     bool additive = false;
@@ -385,7 +385,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         _nodeTextures.envmap->bind();
 
         PBRIBL::Derived derived;
-        if (_sceneGraph->pbrIbl().getDerived(_nodeTextures.envmap.get(), derived)) {
+        if (_sceneGraph->graphics().pbrIbl().getDerived(_nodeTextures.envmap.get(), derived)) {
             setActiveTextureUnit(TextureUnits::irradianceMap);
             derived.irradianceMap->bind();
             setActiveTextureUnit(TextureUnits::prefilterMap);

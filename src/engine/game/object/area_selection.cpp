@@ -69,7 +69,7 @@ vector<shared_ptr<SpatialObject>> Area::getSelectableObjects() const {
     vector<shared_ptr<SpatialObject>> result;
     vector<pair<shared_ptr<SpatialObject>, float>> distances;
 
-    shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
+    shared_ptr<SpatialObject> partyLeader(_game->services().party().getLeader());
     glm::vec3 origin(partyLeader->position());
 
     for (auto &object : objects()) {

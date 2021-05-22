@@ -19,45 +19,26 @@
 #pragma once
 
 #include <cstdint>
-#include <functional>
-#include <map>
+#include <memory>
 #include <set>
+#include <string>
 
 #include <boost/filesystem/path.hpp>
-#include <boost/noncopyable.hpp>
 
-#include "SDL2/SDL_events.h"
-
-#include "../audio/files.h"
-#include "../audio/player.h"
-#include "../audio/soundhandle.h"
+#include "../audio/services.h"
 #include "../graphics/eventhandler.h"
-#include "../graphics/fonts.h"
-#include "../graphics/lip/lips.h"
-#include "../graphics/mesh/meshes.h"
-#include "../graphics/model/models.h"
-#include "../graphics/pbribl.h"
-#include "../graphics/shader/shaders.h"
-#include "../graphics/texture/textures.h"
-#include "../graphics/walkmesh/walkmeshes.h"
-#include "../graphics/window.h"
-#include "../resource/resources.h"
-#include "../resource/strings.h"
-#include "../scene/pipeline/world.h"
-#include "../scene/scenegraph.h"
-#include "../script/scripts.h"
+#include "../graphics/services.h"
+#include "../resource/services.h"
+#include "../scene/services.h"
+#include "../script/services.h"
 #include "../video/video.h"
 
+#include "camera/camera.h"
 #include "console.h"
-#include "combat/combat.h"
-#include "cursors.h"
-#include "d20/classes.h"
-#include "d20/feats.h"
-#include "d20/spells.h"
-#include "footstepsounds.h"
 #include "gui/chargen/chargen.h"
-#include "gui/container.h"
 #include "gui/computer.h"
+#include "gui/container.h"
+#include "gui/conversation.h"
 #include "gui/dialog.h"
 #include "gui/hud.h"
 #include "gui/ingame/ingame.h"
@@ -66,20 +47,9 @@
 #include "gui/partyselect.h"
 #include "gui/profileoverlay.h"
 #include "gui/saveload.h"
-#include "gui/sounds.h"
 #include "object/module.h"
-#include "object/objectfactory.h"
-#include "object/spatial.h"
 #include "options.h"
-#include "party.h"
-#include "portraits.h"
-#include "reputes.h"
-#include "savedgame.h"
-#include "script/routines.h"
-#include "script/runner.h"
-#include "soundsets.h"
-#include "surfaces.h"
-#include "types.h"
+#include "services.h"
 
 namespace reone {
 
@@ -103,7 +73,14 @@ constexpr char kOverrideDirectoryName[] = "override";
  */
 class Game : public graphics::IEventHandler, boost::noncopyable {
 public:
-    Game(const boost::filesystem::path &path, const Options &opts);
+    Game(
+        boost::filesystem::path path,
+        Options options,
+        resource::ResourceServices &resource,
+        graphics::GraphicsServices &graphics,
+        audio::AudioServices &audio,
+        scene::SceneServices &scene,
+        script::ScriptServices &script);
 
     /**
      * Initialize the engine, run the main game loop and clean up on exit.
@@ -128,6 +105,7 @@ public:
 
     GameID gameId() const { return _gameId; }
     const Options &options() const { return _options; }
+    GameServices &services() { return *_game; }
     std::shared_ptr<Module> module() const { return _module; }
     HUD &hud() const { return *_hud; }
     CharacterGeneration &characterGeneration() { return *_charGen; }
@@ -139,45 +117,6 @@ public:
     void setLoadFromSaveGame(bool load);
     void setPaused(bool paused);
     void setRelativeMouseMode(bool relative);
-
-    // Services
-
-    audio::AudioFiles &audioFiles() { return _audioFiles; }
-    audio::AudioPlayer &audioPlayer() { return _audioPlayer; }
-    Classes &classes() { return _classes; }
-    Combat &combat() { return _combat; }
-    Console &console() { return _console; }
-    Cursors &cursors() { return _cursors; }
-    Feats &feats() { return _feats; }
-    FootstepSounds &footstepSounds() { return _footstepSounds; }
-    graphics::Fonts &fonts() { return _fonts; }
-    graphics::Lips &lips() { return _lips; }
-    graphics::Materials &materials() { return _materials; }
-    graphics::Meshes &meshes() { return _meshes; }
-    graphics::Models &models() { return _models; }
-    graphics::PBRIBL &pbrIbl() { return _pbrIbl; }
-    graphics::Shaders &shaders() { return _shaders; }
-    graphics::Textures &textures() { return _textures; }
-    graphics::Walkmeshes &walkmeshes() { return _walkmeshes; }
-    graphics::Window &window() { return _window; }
-    GUISounds &guiSounds() { return _guiSounds; }
-    ObjectFactory &objectFactory() { return _objectFactory; }
-    Party &party() { return _party; }
-    Portraits &portraits() { return _portraits; }
-    ProfileOverlay &profileOverlay() { return _profileOverlay; }
-    Reputes &reputes() { return _reputes; }
-    resource::Resources &resources() { return _resources; }
-    resource::Strings &strings() { return _strings; }
-    Routines &routines() { return _routines; }
-    scene::SceneGraph &sceneGraph() { return _sceneGraph; }
-    scene::WorldRenderPipeline &worldPipeline() { return _worldPipeline; }
-    script::Scripts &scripts() { return _scripts; }
-    ScriptRunner &scriptRunner() { return _scriptRunner; }
-    SoundSets &soundSets() { return _soundSets; }
-    Spells &spells() { return _spells; }
-    Surfaces &surfaces() { return _surfaces; }
-
-    // END Services
 
     // Module loading
 
@@ -273,40 +212,13 @@ private:
 
     // Services
 
-    audio::AudioFiles _audioFiles;
-    audio::AudioPlayer _audioPlayer;
-    Combat _combat;
-    Classes _classes;
-    Console _console;
-    Cursors _cursors;
-    Feats _feats;
-    FootstepSounds _footstepSounds;
-    graphics::Fonts _fonts;
-    graphics::Lips _lips;
-    graphics::Materials _materials;
-    graphics::Meshes _meshes;
-    graphics::Models _models;
-    graphics::PBRIBL _pbrIbl;
-    graphics::Shaders _shaders;
-    graphics::Textures _textures;
-    graphics::Walkmeshes _walkmeshes;
-    graphics::Window _window;
-    GUISounds _guiSounds;
-    ObjectFactory _objectFactory;
-    Party _party;
-    Portraits _portraits;
-    ProfileOverlay _profileOverlay;
-    Reputes _reputes;
-    resource::Resources _resources;
-    resource::Strings _strings;
-    Routines _routines;
-    scene::SceneGraph _sceneGraph;
-    scene::WorldRenderPipeline _worldPipeline;
-    script::Scripts _scripts;
-    ScriptRunner _scriptRunner;
-    SoundSets _soundSets;
-    Spells _spells;
-    Surfaces _surfaces;
+    resource::ResourceServices &_resource;
+    graphics::GraphicsServices &_graphics;
+    audio::AudioServices &_audio;
+    scene::SceneServices &_scene;
+    script::ScriptServices &_script;
+
+    std::unique_ptr<GameServices> _game;
 
     // END Services
 
@@ -332,6 +244,9 @@ private:
     std::unique_ptr<PartySelection> _partySelect;
     std::unique_ptr<SaveLoad> _saveLoad;
 
+    std::unique_ptr<Console> _console;
+    std::unique_ptr<ProfileOverlay> _profileOverlay;
+
     // END GUI
 
     // Audio
@@ -351,8 +266,8 @@ private:
 
     // END Globals/locals
 
-    void initSubsystems();
-    void deinitSubsystems();
+    void init();
+    void deinit();
 
     void update();
 

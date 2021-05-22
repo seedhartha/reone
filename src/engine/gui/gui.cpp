@@ -20,7 +20,6 @@
 #include <stdexcept>
 
 #include "../common/log.h"
-#include "../common/guardutil.h"
 #include "../graphics/mesh/meshes.h"
 #include "../graphics/shader/shaders.h"
 #include "../graphics/stateutil.h"
@@ -30,6 +29,7 @@
 using namespace std;
 using namespace std::placeholders;
 
+using namespace reone::audio;
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -38,35 +38,19 @@ namespace reone {
 namespace gui {
 
 GUI::GUI(
-    GraphicsOptions gfxOpts,
-    Window *window,
-    Fonts *fonts,
-    Shaders *shaders,
-    Meshes *meshes,
-    Textures *textures,
-    Resources *resources,
-    Strings *strings
+    GraphicsOptions options,
+    GraphicsServices &graphics,
+    AudioServices &audio,
+    ResourceServices &resources
 ) :
-    _gfxOpts(gfxOpts),
-    _window(window),
-    _fonts(fonts),
-    _shaders(shaders),
-    _meshes(meshes),
-    _textures(textures),
-    _resources(resources),
-    _strings(strings) {
+    _options(options),
+    _graphics(graphics),
+    _audio(audio),
+    _resources(resources) {
 
-    ensureNotNull(window, "window");
-    ensureNotNull(fonts, "fonts");
-    ensureNotNull(shaders, "shaders");
-    ensureNotNull(meshes, "meshes");
-    ensureNotNull(textures, "textures");
-    ensureNotNull(resources, "resources");
-    ensureNotNull(strings, "strings");
-
-    _aspect = _gfxOpts.width / static_cast<float>(_gfxOpts.height);
-    _screenCenter.x = _gfxOpts.width / 2;
-    _screenCenter.y = _gfxOpts.height / 2;
+    _aspect = options.width / static_cast<float>(options.height);
+    _screenCenter.x = options.width / 2;
+    _screenCenter.y = options.height / 2;
 }
 
 void GUI::load() {
@@ -74,7 +58,7 @@ void GUI::load() {
 
     debug("GUI: load " + _resRef, 1, DebugChannels::gui);
 
-    shared_ptr<GffStruct> gui(_resources->getGFF(_resRef, ResourceType::Gui));
+    shared_ptr<GffStruct> gui(_resources.resources().getGFF(_resRef, ResourceType::Gui));
     ControlType type = Control::getType(*gui);
     string tag(Control::getTag(*gui));
 
@@ -103,8 +87,8 @@ void GUI::load() {
 }
 
 void GUI::stretchControl(Control &control) {
-    float aspectX = _gfxOpts.width / static_cast<float>(_resolutionX);
-    float aspectY = _gfxOpts.height / static_cast<float>(_resolutionY);
+    float aspectX = _options.width / static_cast<float>(_resolutionX);
+    float aspectY = _options.height / static_cast<float>(_resolutionY);
     control.stretch(aspectX, aspectY);
 }
 
@@ -159,10 +143,10 @@ void GUI::configureControl(const string &tag, const function<void(Control &)> &f
 void GUI::positionRelativeToCenter(Control &control) {
     Control::Extent extent(control.extent());
     if (extent.left >= 0.5f * _resolutionX) {
-        extent.left = extent.left - _resolutionX + _gfxOpts.width;
+        extent.left = extent.left - _resolutionX + _options.width;
     }
     if (extent.top >= 0.5f * _resolutionY) {
-        extent.top = extent.top - _resolutionY + _gfxOpts.height;
+        extent.top = extent.top - _resolutionY + _options.height;
     }
     control.setExtent(move(extent));
 }
@@ -280,14 +264,14 @@ void GUI::drawBackground() {
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0));
-    transform = glm::scale(transform, glm::vec3(_gfxOpts.width, _gfxOpts.height, 1.0f));
+    transform = glm::scale(transform, glm::vec3(_options.width, _options.height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _window->getOrthoProjection();
+    uniforms.combined.general.projection = _graphics.window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _shaders->activate(ShaderProgram::SimpleGUI, uniforms);
-    _meshes->getQuad()->draw();
+    _graphics.shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _graphics.meshes().getQuad()->draw();
 }
 
 void GUI::resetFocus() {

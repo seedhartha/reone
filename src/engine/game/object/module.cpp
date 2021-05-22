@@ -84,15 +84,15 @@ void Module::loadInfo(const GffStruct &ifo) {
 void Module::loadArea(const GffStruct &ifo) {
     reone::info("Load area " + _info.entryArea);
 
-    shared_ptr<GffStruct> are(_game->resources().getGFF(_info.entryArea, ResourceType::Are));
-    shared_ptr<GffStruct> git(_game->resources().getGFF(_info.entryArea, ResourceType::Git));
+    shared_ptr<GffStruct> are(_game->services().resource().resources().getGFF(_info.entryArea, ResourceType::Are));
+    shared_ptr<GffStruct> git(_game->services().resource().resources().getGFF(_info.entryArea, ResourceType::Git));
 
-    _area = _game->objectFactory().newArea();
+    _area = _game->services().objectFactory().newArea();
     _area->load(_info.entryArea, *are, *git);
 }
 
 void Module::loadPlayer() {
-    _player = make_unique<Player>(this, _area.get(), &_area->getCamera(CameraType::ThirdPerson), &_game->party());
+    _player = make_unique<Player>(this, _area.get(), &_area->getCamera(CameraType::ThirdPerson), &_game->services().party());
 }
 
 void Module::loadParty(const string &entry) {
@@ -153,7 +153,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
                     cursor = CursorType::Pickup;
                 } else {
                     auto creature = static_pointer_cast<Creature>(object);
-                    bool isEnemy = _game->reputes().getIsEnemy(*creature, *_game->party().getLeader());
+                    bool isEnemy = _game->services().reputes().getIsEnemy(*creature, *_game->services().party().getLeader());
                     cursor = isEnemy ? CursorType::Attack : CursorType::Talk;
                 }
                 break;
@@ -209,7 +209,7 @@ void Module::onObjectClick(const shared_ptr<SpatialObject> &object) {
 void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
     debug(boost::format("Module: click: creature '%s', faction %d") % creature->tag() % static_cast<int>(creature->faction()));
 
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
 
     if (creature->isDead()) {
         if (!creature->items().empty()) {
@@ -217,7 +217,7 @@ void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
             partyLeader->addAction(make_unique<ObjectAction>(ActionType::OpenContainer, creature));
         }
     } else {
-        bool isEnemy = _game->reputes().getIsEnemy(*partyLeader, *creature);
+        bool isEnemy = _game->services().reputes().getIsEnemy(*partyLeader, *creature);
         if (isEnemy) {
             partyLeader->clearAllActions();
             partyLeader->addAction(make_unique<AttackAction>(creature));
@@ -234,14 +234,14 @@ void Module::onDoorClick(const shared_ptr<Door> &door) {
         return;
     }
     if (!door->isOpen()) {
-        shared_ptr<Creature> partyLeader(_game->party().getLeader());
+        shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
         partyLeader->clearAllActions();
         partyLeader->addAction(make_unique<ObjectAction>(ActionType::OpenDoor, door));
     }
 }
 
 void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
 
     if (placeable->hasInventory()) {
         partyLeader->clearAllActions();
@@ -266,9 +266,9 @@ set<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &obj
 
     switch (object->type()) {
         case ObjectType::Creature: {
-            auto leader = _game->party().getLeader();
+            auto leader = _game->services().party().getLeader();
             auto creature = static_pointer_cast<Creature>(object);
-            if (!creature->isDead() && _game->reputes().getIsEnemy(*leader, *creature)) {
+            if (!creature->isDead() && _game->services().reputes().getIsEnemy(*leader, *creature)) {
                 actions.insert(ContextualAction::Attack);
                 auto weapon = leader->getEquippedItem(InventorySlot::rightWeapon);
                 if (weapon && weapon->isRanged()) {
@@ -293,7 +293,7 @@ set<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &obj
         }
         case ObjectType::Door: {
             auto door = static_pointer_cast<Door>(object);
-            if (door->isLocked() && !door->isKeyRequired() && _game->party().getLeader()->attributes().hasSkill(Skill::Security)) {
+            if (door->isLocked() && !door->isKeyRequired() && _game->services().party().getLeader()->attributes().hasSkill(Skill::Security)) {
                 actions.insert(ContextualAction::Unlock);
             }
             break;

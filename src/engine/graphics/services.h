@@ -17,71 +17,59 @@
 
 #pragma once
 
+#include <memory>
+
 #include <boost/noncopyable.hpp>
+
+#include "../resource/services.h"
+
+#include "fonts.h"
+#include "lip/lips.h"
+#include "materials.h"
+#include "mesh/meshes.h"
+#include "model/models.h"
+#include "options.h"
+#include "pbribl.h"
+#include "shader/shaders.h"
+#include "texture/textures.h"
+#include "walkmesh/walkmeshes.h"
+#include "window.h"
 
 namespace reone {
 
 namespace graphics {
 
-class Meshes;
-class Textures;
-class Materials;
-class Models;
-class Walkmeshes;
-class Lips;
-class Fonts;
-class Shaders;
-class PBRIBL;
-class Window;
-
 class GraphicsServices : boost::noncopyable {
 public:
-    GraphicsServices(
-        Meshes &meshes,
-        Textures &textures,
-        Materials &materials,
-        Models &models,
-        Walkmeshes &walkmeshes,
-        Lips &lips,
-        Fonts &fonts,
-        Shaders &shaders,
-        PBRIBL &pbrIbl,
-        Window &window
-    ) :
-        _meshes(meshes),
-        _textures(textures),
-        _materials(materials),
-        _models(models),
-        _walkmeshes(walkmeshes),
-        _lips(lips),
-        _fonts(fonts),
-        _shaders(shaders),
-        _pbrIbl(pbrIbl),
-        _window(window) {
-    }
+    GraphicsServices(GraphicsOptions options, resource::ResourceServices &resource);
 
-    Meshes &meshes() { return _meshes; }
-    Textures &textures() { return _textures; }
-    Materials &materials() { return _materials; }
-    Models &models() { return _models; }
-    Walkmeshes &walkmeshes() { return _walkmeshes; }
-    Lips &lips() { return _lips; }
-    Fonts &fonts() { return _fonts; }
-    Shaders &shaders() { return _shaders; }
-    PBRIBL &pbrIbl() { return _pbrIbl; }
-    Window &window() { return _window; }
+    void init();
+
+    Fonts &fonts() { return *_fonts; }
+    Lips &lips() { return *_lips; }
+    Materials &materials() { return *_materials; }
+    Meshes &meshes() { return *_meshes; }
+    Models &models() { return *_models; }
+    PBRIBL &pbrIbl() { return *_pbrIbl; }
+    Shaders &shaders() { return *_shaders; }
+    Textures &textures() { return *_textures; }
+    Walkmeshes &walkmeshes() { return *_walkmeshes; }
+    Window &window() { return *_window; }
 
 private:
-    Meshes &_meshes;
-    Textures &_textures;
-    Materials &_materials;
-    Models &_models;
-    Walkmeshes &_walkmeshes;
-    Lips &_lips;
-    Fonts &_fonts;
-    Shaders &_shaders;
-    PBRIBL &_pbrIbl;
-    Window &_window;
+    GraphicsOptions _options;
+    resource::ResourceServices &_resource;
+
+    std::unique_ptr<Fonts> _fonts;
+    std::unique_ptr<Lips> _lips;
+    std::unique_ptr<Materials> _materials;
+    std::unique_ptr<Meshes> _meshes;
+    std::unique_ptr<Models> _models;
+    std::unique_ptr<PBRIBL> _pbrIbl;
+    std::unique_ptr<Shaders> _shaders;
+    std::unique_ptr<Textures> _textures;
+    std::unique_ptr<Walkmeshes> _walkmeshes;
+    std::unique_ptr<Window> _window;
 };
 
 } // namespace graphics

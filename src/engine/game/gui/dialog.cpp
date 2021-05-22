@@ -115,7 +115,7 @@ void DialogGUI::loadFrames() {
     int messageHeight = getControl(kControlTagMessage).extent().height;
 
     addFrame(kControlTagTopFrame, -rootTop, messageHeight);
-    addFrame(kControlTagBottomFrame, 0, _gfxOpts.height - rootTop);
+    addFrame(kControlTagBottomFrame, 0, _options.height - rootTop);
 }
 
 void DialogGUI::addFrame(string tag, int top, int height) {
@@ -124,7 +124,7 @@ void DialogGUI::addFrame(string tag, int top, int height) {
     Control::Extent extent;
     extent.left = -_rootControl->extent().left;
     extent.top = top;
-    extent.width = _gfxOpts.width;
+    extent.width = _options.width;
     extent.height = height;
 
     frame->setExtent(move(extent));
@@ -177,7 +177,7 @@ void DialogGUI::loadStuntParticipants() {
         participant.creature = creature;
 
         if (_dialog->isAnimatedCutscene()) {
-            shared_ptr<Model> model(_game->models().get(stunt.stuntModel));
+            shared_ptr<Model> model(_game->services().graphics().models().get(stunt.stuntModel));
             if (!model) {
                 warn("Dialog: stunt model not found: " + stunt.stuntModel);
                 continue;
@@ -220,7 +220,7 @@ void DialogGUI::loadCurrentSpeaker() {
 
     // Make current speaker face the player, and vice versa
     if (_currentSpeaker) {
-        shared_ptr<Creature> player(_game->party().player());
+        shared_ptr<Creature> player(_game->services().party().player());
         player->face(*_currentSpeaker);
 
         auto speakerCreature = ObjectConverter::toCreature(_currentSpeaker);
@@ -235,7 +235,7 @@ void DialogGUI::updateCamera() {
     shared_ptr<Area> area(_game->module()->area());
 
     if (_dialog->cameraModel().empty()) {
-        shared_ptr<Creature> player(_game->party().player());
+        shared_ptr<Creature> player(_game->services().party().player());
         glm::vec3 listenerPosition(player ? getTalkPosition(*player) : glm::vec3(0.0f));
         glm::vec3 speakerPosition(_currentSpeaker ? getTalkPosition(*_currentSpeaker) : glm::vec3(0.0f));
         auto &camera = area->getCamera<DialogCamera>(CameraType::Dialog);
@@ -311,7 +311,7 @@ string DialogGUI::getStuntAnimationName(int ordinal) const {
 }
 
 AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
-    shared_ptr<TwoDA> animations(_resources->get2DA("dialoganimations"));
+    shared_ptr<TwoDA> animations(_game->services().resource().resources().get2DA("dialoganimations"));
     int index = ordinal - 10000;
 
     if (index < 0 || index >= animations->getRowCount()) {

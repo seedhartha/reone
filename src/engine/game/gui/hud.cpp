@@ -156,7 +156,7 @@ bool HUD::handle(const SDL_Event &event) {
 void HUD::update(float dt) {
     GUI::update(dt);
 
-    Party &party = _game->party();
+    Party &party = _game->services().party();
 
     for (int i = 0; i < 3; ++i) {
         int charIdx = (i == 0) ? 1 : (4 - i);
@@ -197,7 +197,7 @@ void HUD::draw() {
 
     drawMinimap();
 
-    Party &party = _game->party();
+    Party &party = _game->services().party();
     for (int i = 0; i < party.getSize(); ++i) {
         drawHealth(i);
     }
@@ -223,7 +223,7 @@ void HUD::drawMinimap() {
 void HUD::drawHealth(int memberIndex) {
     if (isTSL(_game->gameId())) return;
 
-    Party &party = _game->party();
+    Party &party = _game->services().party();
     shared_ptr<Creature> member(party.getMember(memberIndex));
 
     int charIdx = (memberIndex == 0) ? 1 : (4 - memberIndex);
@@ -238,12 +238,12 @@ void HUD::drawHealth(int memberIndex) {
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _game->window().getOrthoProjection();
+    uniforms.combined.general.projection = _game->services().graphics().window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 
-    _shaders->activate(ShaderProgram::SimpleColor, uniforms);
-    _meshes->getQuad()->draw();
+    _game->services().graphics().shaders().activate(ShaderProgram::SimpleColor, uniforms);
+    _game->services().graphics().meshes().getQuad()->draw();
 }
 
 void HUD::showCombatHud() {
@@ -284,7 +284,7 @@ void HUD::hideCombatHud() {
 }
 
 void HUD::refreshActionQueueItems() const {
-    auto &actions = _game->party().getLeader()->actions();
+    auto &actions = _game->services().party().getLeader()->actions();
 
     for (int i = 0; i < 4; ++i) {
         bool attack = i < static_cast<int>(actions.size()) && actions[i]->type() == ActionType::AttackObject;
@@ -313,9 +313,9 @@ void HUD::onClick(const string &control) {
     } else if (control == "BTN_OPT") {
         _game->openInGameMenu(InGameMenu::Tab::Options);
     } else if (control == "BTN_CLEARALL") {
-        _game->party().getLeader()->clearAllActions();
+        _game->services().party().getLeader()->clearAllActions();
     } else if (control == "BTN_CLEARONE" || control == "BTN_CLEARONE2") {
-        for (auto &action : _game->party().getLeader()->actions()) {
+        for (auto &action : _game->services().party().getLeader()->actions()) {
             if (action->type() == ActionType::AttackObject) {
                 action->complete();
                 break;
@@ -325,7 +325,7 @@ void HUD::onClick(const string &control) {
         _game->openInGameMenu(InGameMenu::Tab::Equipment);
     } else if (control == "BTN_CHAR2" || control == "BTN_CHAR3") {
         int memberIdx = 4 - stoi(&control[8]);
-        _game->party().setPartyLeaderByIndex(memberIdx);
+        _game->services().party().setPartyLeaderByIndex(memberIdx);
     }
 }
 

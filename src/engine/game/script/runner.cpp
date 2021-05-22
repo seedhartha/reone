@@ -19,13 +19,9 @@
 
 #include <stdexcept>
 
-#include "../../common/guardutil.h"
 #include "../../script/execution.h"
-#include "../../script/scripts.h"
 
 #include "../game.h"
-
-#include "routines.h"
 
 using namespace std;
 
@@ -35,8 +31,7 @@ namespace reone {
 
 namespace game {
 
-ScriptRunner::ScriptRunner(Game *game) : _game(game) {
-    ensureNotNull(game, "game");
+ScriptRunner::ScriptRunner(Routines &routines, Scripts &scripts) : _routines(routines), _scripts(scripts) {
 }
 
 int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerrerId, int userDefinedEventNumber, int scriptVar) {
@@ -47,11 +42,11 @@ int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerr
         throw invalid_argument("Invalid triggerrerId");
     }
 
-    auto program = _game->scripts().get(resRef);
+    auto program = _scripts.get(resRef);
     if (!program) return -1;
 
     auto ctx = make_unique<ExecutionContext>();
-    ctx->routines = &_game->routines();
+    ctx->routines = &_routines;
     ctx->callerId = callerId;
     ctx->triggererId = triggerrerId;
     ctx->userDefinedEventNumber = userDefinedEventNumber;

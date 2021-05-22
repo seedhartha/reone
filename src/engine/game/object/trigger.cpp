@@ -51,7 +51,7 @@ void Trigger::loadFromGIT(const GffStruct &gffs) {
     loadFromBlueprint(templateResRef);
 
     _tag = boost::to_lower_copy(gffs.getString("Tag"));
-    _transitionDestin = _game->strings().get(gffs.getInt("TransitionDestin"));
+    _transitionDestin = _game->services().resource().strings().get(gffs.getInt("TransitionDestin"));
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
     _linkedToFlags = gffs.getInt("LinkedToFlags");
@@ -80,7 +80,7 @@ void Trigger::loadGeometryFromGIT(const GffStruct &gffs) {
 }
 
 void Trigger::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utt(_game->resources().getGFF(resRef, ResourceType::Utt));
+    shared_ptr<GffStruct> utt(_game->services().resource().resources().getGFF(resRef, ResourceType::Utt));
     if (utt) {
         loadUTT(*utt);
     }
@@ -98,7 +98,7 @@ void Trigger::update(float dt) {
     for (auto &tenant : tenantsToRemove) {
         _tenants.erase(tenant);
         if (!_onExit.empty()) {
-            _game->scriptRunner().run(_onExit, _id, tenant->id());
+            _game->services().scriptRunner().run(_onExit, _id, tenant->id());
         }
     }
 }

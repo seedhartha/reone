@@ -45,9 +45,9 @@ namespace game {
 void Item::loadUTI(const GffStruct &uti) {
     _blueprintResRef = boost::to_lower_copy(uti.getString("TemplateResRef"));
     _baseItem = uti.getInt("BaseItem"); // index into baseitems.2da
-    _localizedName = _game->strings().get(uti.getInt("LocalizedName"));
-    _description = _game->strings().get(uti.getInt("Description"));
-    _descIdentified = _game->strings().get(uti.getInt("DescIdentified"));
+    _localizedName = _game->services().resource().strings().get(uti.getInt("LocalizedName"));
+    _description = _game->services().resource().strings().get(uti.getInt("Description"));
+    _descIdentified = _game->services().resource().strings().get(uti.getInt("DescIdentified"));
     _tag = boost::to_lower_copy(uti.getString("Tag"));
     _charges = uti.getInt("Charges");
     _cost = uti.getInt("Cost");
@@ -60,7 +60,7 @@ void Item::loadUTI(const GffStruct &uti) {
     _textureVariation = uti.getInt("TextureVar", 1);
     _bodyVariation = uti.getInt("BodyVariation", 1);
 
-    shared_ptr<TwoDA> baseItems(_game->resources().get2DA("baseitems"));
+    shared_ptr<TwoDA> baseItems(_game->services().resource().resources().get2DA("baseitems"));
     _attackRange = baseItems->getInt(_baseItem, "maxattackrange");
     _criticalHitMultiplier = baseItems->getInt(_baseItem, "crithitmult");
     _criticalThreat = baseItems->getInt(_baseItem, "critthreat");
@@ -81,7 +81,7 @@ void Item::loadUTI(const GffStruct &uti) {
     } else {
         iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
     }
-    _icon = _game->textures().get(iconResRef, TextureUsage::GUI);
+    _icon = _game->services().graphics().textures().get(iconResRef, TextureUsage::GUI);
 
     loadAmmunitionType();
 
@@ -94,17 +94,17 @@ void Item::loadUTI(const GffStruct &uti) {
 }
 
 void Item::loadAmmunitionType() {
-    shared_ptr<TwoDA> baseItems(_game->resources().get2DA("baseitems"));
+    shared_ptr<TwoDA> baseItems(_game->services().resource().resources().get2DA("baseitems"));
 
     int ammunitionIdx = baseItems->getInt(_baseItem, "ammunitiontype", -1);
     if (ammunitionIdx != -1) {
-        shared_ptr<TwoDA> twoDa(_game->resources().get2DA("ammunitiontypes"));
+        shared_ptr<TwoDA> twoDa(_game->services().resource().resources().get2DA("ammunitiontypes"));
         _ammunitionType = make_shared<Item::AmmunitionType>();
-        _ammunitionType->model = _game->models().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "model")));
-        _ammunitionType->shotSound1 = _game->audioFiles().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));
-        _ammunitionType->shotSound2 = _game->audioFiles().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound1")));
-        _ammunitionType->impactSound1 = _game->audioFiles().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound0")));
-        _ammunitionType->impactSound2 = _game->audioFiles().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound1")));
+        _ammunitionType->model = _game->services().graphics().models().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "model")));
+        _ammunitionType->shotSound1 = _game->services().audio().files().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));
+        _ammunitionType->shotSound2 = _game->services().audio().files().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound1")));
+        _ammunitionType->impactSound1 = _game->services().audio().files().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound0")));
+        _ammunitionType->impactSound2 = _game->services().audio().files().get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound1")));
     }
 }
 

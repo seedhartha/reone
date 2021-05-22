@@ -17,26 +17,35 @@
 
 #pragma once
 
+#include <memory>
+
 #include <boost/noncopyable.hpp>
+
+#include "../graphics/options.h"
+#include "../graphics/services.h"
+
+#include "pipeline/world.h"
+#include "scenegraph.h"
 
 namespace reone {
 
 namespace scene {
 
-class SceneGraph;
-class WorldRenderPipeline;
-
 class SceneServices : boost::noncopyable {
 public:
-    SceneServices(SceneGraph &sceneGraph, WorldRenderPipeline &worldRenderPipeline) : _sceneGraph(sceneGraph), _worldRenderPipeline(worldRenderPipeline) {
-    }
+    SceneServices(graphics::GraphicsOptions options, graphics::GraphicsServices &graphics);
 
-    SceneGraph &sceneGraph() { return _sceneGraph; }
-    WorldRenderPipeline &worldRenderPipeline() { return _worldRenderPipeline; }
+    void init();
+
+    SceneGraph &graph() { return *_graph; }
+    WorldRenderPipeline &worldRenderPipeline() { return *_worldRenderPipeline; }
 
 private:
-    SceneGraph &_sceneGraph;
-    WorldRenderPipeline &_worldRenderPipeline;
+    graphics::GraphicsOptions _options;
+    graphics::GraphicsServices &_graphics;
+
+    std::unique_ptr<SceneGraph> _graph;
+    std::unique_ptr<WorldRenderPipeline> _worldRenderPipeline;
 };
 
 } // namespace scene

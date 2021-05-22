@@ -72,13 +72,13 @@ bool Area::matchesCriterias(const Creature &creature, const SearchCriteriaList &
                 auto reputation = static_cast<ReputationType>(criteria.second);
                 switch (reputation) {
                     case ReputationType::Friend:
-                        if (!target || !_game->reputes().getIsFriend(creature, *static_pointer_cast<Creature>(target))) return false;
+                        if (!target || !_game->services().reputes().getIsFriend(creature, *static_pointer_cast<Creature>(target))) return false;
                         break;
                     case ReputationType::Enemy:
-                        if (!target || !_game->reputes().getIsEnemy(creature, *static_pointer_cast<Creature>(target))) return false;
+                        if (!target || !_game->services().reputes().getIsEnemy(creature, *static_pointer_cast<Creature>(target))) return false;
                         break;
                     case ReputationType::Neutral:
-                        if (!target || !_game->reputes().getIsNeutral(creature, *static_pointer_cast<Creature>(target))) return false;
+                        if (!target || !_game->services().reputes().getIsNeutral(creature, *static_pointer_cast<Creature>(target))) return false;
                         break;
                     default:
                         break;

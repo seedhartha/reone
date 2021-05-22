@@ -17,33 +17,22 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
+#include <boost/filesystem/path.hpp>
+#include <boost/noncopyable.hpp>
 
-#include "../../script/scripts.h"
-
-#include "routines.h"
+#include "game/options.h"
 
 namespace reone {
 
-namespace game {
-
-class ScriptRunner {
+class Engine : boost::noncopyable {
 public:
-    ScriptRunner(Routines &routines, script::Scripts &scripts);
+    Engine(boost::filesystem::path gamePath, game::Options options);
 
-    int run(
-        const std::string &resRef,
-        uint32_t callerId = script::kObjectInvalid,
-        uint32_t triggerrerId = script::kObjectInvalid,
-        int userDefinedEventNumber = -1,
-        int scriptVar = -1);
+    int run();
 
 private:
-    Routines &_routines;
-    script::Scripts &_scripts;
+    boost::filesystem::path _gamePath;
+    game::Options _options;
 };
-
-} // namespace game
 
 } // namespace reone

@@ -50,7 +50,7 @@ void Encounter::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Encounter::loadFromBlueprint(const string &blueprintResRef) {
-    shared_ptr<GffStruct> ute(_game->resources().getGFF(blueprintResRef, ResourceType::Ute));
+    shared_ptr<GffStruct> ute(_game->services().resource().resources().getGFF(blueprintResRef, ResourceType::Ute));
     if (ute) {
         loadUTE(*ute);
     }

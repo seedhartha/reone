@@ -15,35 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "services.h"
 
-#include <cstdint>
-#include <string>
+using namespace std;
 
-#include "../../script/scripts.h"
-
-#include "routines.h"
+namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-class ScriptRunner {
-public:
-    ScriptRunner(Routines &routines, script::Scripts &scripts);
+ResourceServices::ResourceServices(fs::path gamePath) : _gamePath(move(gamePath)) {
+}
 
-    int run(
-        const std::string &resRef,
-        uint32_t callerId = script::kObjectInvalid,
-        uint32_t triggerrerId = script::kObjectInvalid,
-        int userDefinedEventNumber = -1,
-        int scriptVar = -1);
+void ResourceServices::init() {
+    _resources = make_unique<Resources>();
 
-private:
-    Routines &_routines;
-    script::Scripts &_scripts;
-};
+    _strings = make_unique<Strings>();
+    _strings->init(_gamePath);
+}
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

@@ -68,7 +68,7 @@ Variable Routines::getObjectByTag(const VariablesList &args, ExecutionContext &c
         object = _game->module()->area()->getObjectByTag(tag, nth);
     } else {
         // Apparently, empty tag in this context stands for the player
-        object = _game->party().player();
+        object = _game->services().party().player();
     }
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
@@ -449,7 +449,7 @@ Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &c
     int damage = getInt(args, 3);
 
     if (caller && target) {
-        _game->combat().addAttack(caller, target, nullptr, attackResult, damage);
+        _game->services().combat().addAttack(caller, target, nullptr, attackResult, damage);
     } else if (!caller) {
         debug("Script: cutsceneAttack: caller is invalid", 1, DebugChannels::script);
     } else if (!target) {

@@ -20,6 +20,8 @@
 #include "../../../common/streamutil.h"
 #include "../../../resource/resources.h"
 
+#include "../../game.h"
+
 #include "../colorutil.h"
 
 #include "chargen.h"
@@ -56,7 +58,7 @@ void NameEntry::load() {
 }
 
 void NameEntry::loadLtrFile(const string &resRef, LtrReader &ltr) {
-    shared_ptr<ByteArray> data(_resources->getRaw(resRef, ResourceType::Ltr));
+    shared_ptr<ByteArray> data(_game->services().resource().resources().getRaw(resRef, ResourceType::Ltr));
     ltr.load(wrap(data));
 }
 

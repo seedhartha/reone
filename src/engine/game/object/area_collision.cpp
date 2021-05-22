@@ -78,8 +78,8 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
 }
 
 shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
-    shared_ptr<CameraSceneNode> camera(_game->sceneGraph().activeCamera());
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<CameraSceneNode> camera(_game->services().scene().graph().activeCamera());
+    shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
     if (!camera || !partyLeader) return nullptr;
 
     const GraphicsOptions &opts = _game->options().graphics;

@@ -15,35 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "services.h"
 
-#include <cstdint>
-#include <string>
+using namespace std;
 
-#include "../../script/scripts.h"
-
-#include "routines.h"
+using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace script {
 
-class ScriptRunner {
-public:
-    ScriptRunner(Routines &routines, script::Scripts &scripts);
+ScriptServices::ScriptServices(ResourceServices &resource) : _resource(resource) {
+}
 
-    int run(
-        const std::string &resRef,
-        uint32_t callerId = script::kObjectInvalid,
-        uint32_t triggerrerId = script::kObjectInvalid,
-        int userDefinedEventNumber = -1,
-        int scriptVar = -1);
+void ScriptServices::init() {
+    _scripts = make_unique<Scripts>(&_resource.resources());
+}
 
-private:
-    Routines &_routines;
-    script::Scripts &_scripts;
-};
-
-} // namespace game
+} // namespace script
 
 } // namespace reone

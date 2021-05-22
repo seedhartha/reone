@@ -54,7 +54,7 @@ void Sound::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Sound::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> uts(_game->resources().getGFF(resRef, ResourceType::Uts));
+    shared_ptr<GffStruct> uts(_game->services().resource().resources().getGFF(resRef, ResourceType::Uts));
     if (uts) {
         loadUTS(*uts);
     }
@@ -106,7 +106,7 @@ void Sound::update(float dt) {
 
 void Sound::playSound(const string &resRef, bool loop) {
     float gain = _volume / 127.0f;
-    _sound = _game->audioPlayer().play(resRef, AudioType::Sound, loop, gain, _positional, getPosition());
+    _sound = _game->services().audio().player().play(resRef, AudioType::Sound, loop, gain, _positional, getPosition());
 }
 
 void Sound::play() {

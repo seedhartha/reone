@@ -26,12 +26,8 @@
 
 #include "glm/vec3.hpp"
 
-#include "../graphics/materials.h"
-#include "../graphics/mesh/meshes.h"
 #include "../graphics/options.h"
-#include "../graphics/pbribl.h"
-#include "../graphics/shader/shaders.h"
-#include "../graphics/texture/textures.h"
+#include "../graphics/services.h"
 
 #include "node/cameranode.h"
 #include "node/emitternode.h"
@@ -51,12 +47,8 @@ namespace scene {
 class SceneGraph : boost::noncopyable {
 public:
     SceneGraph(
-        graphics::GraphicsOptions opts,
-        graphics::Shaders *shaders,
-        graphics::Meshes *meshes,
-        graphics::Textures *textures,
-        graphics::Materials *materials,
-        graphics::PBRIBL *pbrIbl);
+        graphics::GraphicsOptions options,
+        graphics::GraphicsServices &graphicsServices);
 
     /**
      * Recursively update the state of this scene graph. Called prior to rendering a frame.
@@ -66,23 +58,14 @@ public:
 
     void draw(bool shadowPass = false);
 
-    const graphics::GraphicsOptions &options() const { return _opts; }
+    const graphics::GraphicsOptions &options() const { return _options; }
+    graphics::GraphicsServices &graphics() { return _graphics; }
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
     graphics::ShaderUniforms uniformsPrototype() const { return _uniformsPrototype; }
 
     void setUpdateRoots(bool update) { _updateRoots = update; }
     void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
     void setUniformsPrototype(graphics::ShaderUniforms &&uniforms) { _uniformsPrototype = uniforms; }
-
-    // Services
-
-    graphics::Shaders &shaders() { return *_shaders; }
-    graphics::Meshes &meshes() { return *_meshes; }
-    graphics::Textures &textures() { return *_textures; }
-    graphics::Materials &materials() { return *_materials; }
-    graphics::PBRIBL &pbrIbl() { return *_pbrIbl; }
-
-    // END Services
 
     // Roots
 
@@ -130,7 +113,8 @@ public:
     // END Fog
 
 private:
-    graphics::GraphicsOptions _opts;
+    graphics::GraphicsOptions _options;
+    graphics::GraphicsServices &_graphics;
 
     std::vector<std::shared_ptr<SceneNode>> _roots;
     std::shared_ptr<CameraSceneNode> _activeCamera;
@@ -146,16 +130,6 @@ private:
     uint32_t _textureId { 0 };
     bool _updateRoots { true };
     graphics::ShaderUniforms _uniformsPrototype;
-
-    // Services
-
-    graphics::Shaders *_shaders;
-    graphics::Meshes *_meshes;
-    graphics::Textures *_textures;
-    graphics::Materials *_materials;
-    graphics::PBRIBL *_pbrIbl;
-
-    // END Services
 
     // Lighting and shadows
 

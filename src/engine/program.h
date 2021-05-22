@@ -26,16 +26,16 @@
 namespace reone {
 
 /**
- * Encapsulates option management. Starts a Game instance.
+ * Encapsulates option management. Starts an Engine instance.
  *
- * @see game::Game
+ * @see Engine
  */
 class Program : boost::noncopyable {
 public:
     Program(int argc, char **argv);
 
     /**
-     * Process command line arguments and start a Game instance.
+     * Process command line arguments and start an Engine instance.
      *
      * @return the exit code
      */
@@ -54,7 +54,7 @@ private:
 
     void initOptions();
     void loadOptions();
-    int runGame();
+    int runEngine();
 };
 
 } // namespace reone

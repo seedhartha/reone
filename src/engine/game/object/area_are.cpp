@@ -37,7 +37,7 @@ namespace reone {
 namespace game {
 
 void Area::loadARE(const GffStruct &are) {
-    _localizedName = _game->strings().get(are.getInt("Name"));
+    _localizedName = _game->services().resource().strings().get(are.getInt("Name"));
 
     loadCameraStyle(are);
     loadAmbientColor(are);
@@ -49,7 +49,7 @@ void Area::loadARE(const GffStruct &are) {
 }
 
 void Area::loadCameraStyle(const GffStruct &are) {
-    shared_ptr<TwoDA> cameraStyles(_game->resources().get2DA("camerastyle"));
+    shared_ptr<TwoDA> cameraStyles(_game->services().resource().resources().get2DA("camerastyle"));
 
     int areaStyleIdx = are.getInt("CameraStyle");
     _camStyleDefault.load(*cameraStyles, areaStyleIdx);
@@ -84,7 +84,7 @@ void Area::loadStealthXP(const GffStruct &are) {
 void Area::loadGrass(const GffStruct &are) {
     string texName(boost::to_lower_copy(are.getString("Grass_TexName")));
     if (!texName.empty()) {
-        _grass.texture = _game->textures().get(texName, TextureUsage::Diffuse);
+        _grass.texture = _game->services().graphics().textures().get(texName, TextureUsage::Diffuse);
     }
     _grass.density = are.getFloat("Grass_Density");
     _grass.quadSize = are.getFloat("Grass_QuadSize");
