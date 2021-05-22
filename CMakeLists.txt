@@ -162,6 +162,7 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/aabb.h
     src/engine/graphics/baryutil.h
     src/engine/graphics/beziercurve.h
+    src/engine/graphics/context.h
     src/engine/graphics/cursor.h
     src/engine/graphics/eventhandler.h
     src/engine/graphics/featureutil.h
@@ -189,7 +190,6 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/renderbuffer.h
     src/engine/graphics/services.h
     src/engine/graphics/shader/shaders.h
-    src/engine/graphics/stateutil.h
     src/engine/graphics/texture/curreader.h
     src/engine/graphics/texture/texture.h
     src/engine/graphics/texture/textures.h
@@ -207,6 +207,7 @@ set(GRAPHICS_HEADERS
 
 set(GRAPHICS_SOURCES
     src/engine/graphics/aabb.cpp
+    src/engine/graphics/context.cpp
     src/engine/graphics/cursor.cpp
     src/engine/graphics/featureutil.cpp
     src/engine/graphics/font.cpp
@@ -233,7 +234,6 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/shader/shaders_common.cpp
     src/engine/graphics/shader/shaders_pbr.cpp
     src/engine/graphics/shader/shaders_phong.cpp
-    src/engine/graphics/stateutil.cpp
     src/engine/graphics/texture/curreader.cpp
     src/engine/graphics/texture/texture.cpp
     src/engine/graphics/texture/textures.cpp

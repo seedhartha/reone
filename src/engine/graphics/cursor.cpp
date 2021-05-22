@@ -24,8 +24,7 @@
 
 #include "../common/guardutil.h"
 
-#include "stateutil.h"
-#include "window.h"
+#include "services.h"
 
 using namespace std;
 
@@ -33,17 +32,18 @@ namespace reone {
 
 namespace graphics {
 
-Cursor::Cursor(shared_ptr<Texture> up, shared_ptr<Texture> down, Window *window, Shaders *shaders, Meshes *meshes) :
-    _up(up), _down(down), _window(window), _shaders(shaders), _meshes(meshes) {
+Cursor::Cursor(shared_ptr<Texture> up, shared_ptr<Texture> down, GraphicsServices &graphics) :
+    _up(up),
+    _down(down),
+    _graphics(graphics) {
 
-    ensureNotNull(window, "window");
-    ensureNotNull(shaders, "shaders");
-    ensureNotNull(meshes, "meshes");
+    ensureNotNull(up, "up");
+    ensureNotNull(down, "down");
 }
 
 void Cursor::draw() {
     shared_ptr<Texture> texture(_pressed ? _down : _up);
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
 
     glm::mat4 transform(1.0f);
@@ -51,19 +51,11 @@ void Cursor::draw() {
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _window->getOrthoProjection();
+    uniforms.combined.general.projection = _graphics.window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _shaders->activate(ShaderProgram::SimpleGUI, uniforms);
-    _meshes->quad().draw();
-}
-
-void Cursor::setPosition(const glm::ivec2 &position) {
-    _position = position;
-}
-
-void Cursor::setPressed(bool pressed) {
-    _pressed = pressed;
+    _graphics.shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _graphics.meshes().quad().draw();
 }
 
 } // namespace graphics

@@ -22,7 +22,6 @@
 #include "../common/log.h"
 #include "../graphics/mesh/meshes.h"
 #include "../graphics/shader/shaders.h"
-#include "../graphics/stateutil.h"
 #include "../graphics/texture/textures.h"
 #include "../resource/resources.h"
 
@@ -259,7 +258,7 @@ void GUI::draw3D() {
 }
 
 void GUI::drawBackground() {
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _background->bind();
 
     glm::mat4 transform(1.0f);

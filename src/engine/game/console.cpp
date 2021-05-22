@@ -205,7 +205,7 @@ void Console::trimOutput() {
     }
 }
 
-void Console::load() {
+void Console::init() {
     _font = _game->services().graphics().fonts().get("fnt_console");
 }
 

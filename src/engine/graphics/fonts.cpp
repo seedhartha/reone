@@ -17,14 +17,7 @@
 
 #include "fonts.h"
 
-#include <stdexcept>
-
-#include "../common/guardutil.h"
-#include "../common/streamutil.h"
-#include "../resource/resources.h"
-
-#include "font.h"
-#include "texture/textures.h"
+#include "services.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -39,17 +32,9 @@ static unordered_map<string, string> g_fontOverride = {
     { "fnt_d16x16", "fnt_d16x16b" }
 };
 
-Fonts::Fonts(Window *window, Shaders *shaders, Meshes *meshes, Textures *textures) :
+Fonts::Fonts(GraphicsServices &graphics) :
     MemoryCache(bind(&Fonts::doGet, this, _1)),
-    _window(window),
-    _shaders(shaders),
-    _meshes(meshes),
-    _textures(textures) {
-
-    ensureNotNull(window, "window");
-    ensureNotNull(shaders, "shaders");
-    ensureNotNull(meshes, "meshes");
-    ensureNotNull(textures, "textures");
+    _graphics(graphics) {
 }
 
 shared_ptr<Font> Fonts::doGet(string resRef) {
@@ -57,10 +42,10 @@ shared_ptr<Font> Fonts::doGet(string resRef) {
     if (maybeOverride != g_fontOverride.end()) {
         resRef = maybeOverride->second;
     }
-    shared_ptr<Texture> texture(_textures->get(resRef, TextureUsage::GUI));
+    shared_ptr<Texture> texture(_graphics.textures().get(resRef, TextureUsage::GUI));
     if (!texture) return nullptr;
 
-    auto font = make_shared<Font>(_window, _shaders, _meshes);
+    auto font = make_shared<Font>(_graphics);
     font->load(texture);
 
     return move(font);

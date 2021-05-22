@@ -20,11 +20,11 @@
 #include <unordered_map>
 
 #include "../../common/guardutil.h"
+#include "../../graphics/context.h"
 #include "../../graphics/font.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
-#include "../../graphics/stateutil.h"
 #include "../../graphics/texture/texture.h"
 #include "../../graphics/texture/textures.h"
 #include "../../graphics/window.h"
@@ -269,7 +269,7 @@ void SelectionOverlay::draw() {
 }
 
 void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords) {
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _game->services().graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
     texture.bind();
 
     const GraphicsOptions &opts = _game->options().graphics;
@@ -364,7 +364,7 @@ void SelectionOverlay::drawActionFrame(int index) {
     } else {
         frameTexture = _friendlyScroll;
     }
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _game->services().graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
     frameTexture->bind();
 
     float frameX, frameY;
@@ -400,7 +400,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     shared_ptr<Texture> texture(_textureByAction.find(action)->second);
     if (!texture) return;
 
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _game->services().graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
 
     float frameX, frameY;

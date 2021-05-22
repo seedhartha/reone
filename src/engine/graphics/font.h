@@ -23,8 +23,6 @@
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
-#include "mesh/meshes.h"
-#include "shader/shaders.h"
 #include "texture/texture.h"
 
 namespace reone {
@@ -41,11 +39,11 @@ enum class TextGravity {
     RightTop
 };
 
-class Window;
+class GraphicsServices;
 
 class Font {
 public:
-    Font(Window *window, Shaders *shaders, Meshes *meshes);
+    Font(GraphicsServices &services);
 
     void load(std::shared_ptr<Texture> texture);
 
@@ -66,9 +64,7 @@ private:
         glm::vec2 size { 0.0f };
     };
 
-    Window *_window;
-    Shaders *_shaders;
-    Meshes *_meshes;
+    GraphicsServices &_graphics;
 
     std::shared_ptr<Texture> _texture;
     float _height { 0.0f };

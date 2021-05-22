@@ -19,7 +19,6 @@
 
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh/meshes.h"
-#include "../../graphics/stateutil.h"
 
 #include "../gui.h"
 
@@ -86,7 +85,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconFrame) {
-        setActiveTextureUnit(TextureUnits::diffuseMap);
+        _gui->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
         iconFrame->bind();
 
         glm::mat4 transform(1.0f);
@@ -103,7 +102,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconTexture) {
-        setActiveTextureUnit(TextureUnits::diffuseMap);
+        _gui->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
         iconTexture->bind();
 
         glm::mat4 transform(1.0f);

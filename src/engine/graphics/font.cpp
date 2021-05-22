@@ -24,12 +24,7 @@
 
 #include "glm/ext.hpp"
 
-#include "../common/guardutil.h"
-#include "../graphics/mesh/meshes.h"
-#include "../graphics/window.h"
-
-#include "shader/shaders.h"
-#include "stateutil.h"
+#include "services.h"
 
 using namespace std;
 
@@ -37,13 +32,7 @@ namespace reone {
 
 namespace graphics {
 
-Font::Font(Window *window, Shaders *shaders, Meshes *meshes) :
-    _window(window),
-    _shaders(shaders),
-    _meshes(meshes) {
-
-    ensureNotNull(shaders, "shaders");
-    ensureNotNull(meshes, "meshes");
+Font::Font(GraphicsServices &graphics) : _graphics(graphics) {
 }
 
 void Font::load(shared_ptr<Texture> texture) {
@@ -74,14 +63,14 @@ void Font::load(shared_ptr<Texture> texture) {
 void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &color, TextGravity gravity) {
     if (text.empty()) return;
 
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
 
     glm::vec3 textOffset(getTextOffset(text, gravity), 0.0f);
 
-    ShaderUniforms uniforms(_shaders->defaultUniforms());
+    ShaderUniforms uniforms(_graphics.shaders().defaultUniforms());
     uniforms.combined.featureMask |= UniformFeatureFlags::text;
-    uniforms.combined.general.projection = _window->getOrthoProjection();
+    uniforms.combined.general.projection = _graphics.window().getOrthoProjection();
     uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
     int numBlocks = static_cast<int>(text.size()) / kMaxCharacters;
@@ -104,8 +93,8 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
 
             textOffset.x += glyph.size.x;
         }
-        _shaders->activate(ShaderProgram::TextText, uniforms);
-        _meshes->quad().drawInstanced(numChars);
+        _graphics.shaders().activate(ShaderProgram::TextText, uniforms);
+        _graphics.meshes().quad().drawInstanced(numChars);
     }
 }
 

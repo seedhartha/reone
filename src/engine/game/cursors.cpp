@@ -19,10 +19,8 @@
 
 #include <stdexcept>
 
-#include "../common/guardutil.h"
 #include "../common/streamutil.h"
 #include "../graphics/texture/curreader.h"
-#include "../resource/resources.h"
 
 using namespace std;
 
@@ -53,17 +51,10 @@ static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_namesByResRefSteamT
     { CursorType::Attack, { 53, 54 } }
 };
 
-Cursors::Cursors(GameID gameId, Window *window, Shaders *shaders, Meshes *meshes, Resources *resources) :
+Cursors::Cursors(GameID gameId, GraphicsServices &graphics, ResourceServices &resource) :
     _gameId(gameId),
-    _window(window),
-    _shaders(shaders),
-    _meshes(meshes),
-    _resources(resources) {
-
-    ensureNotNull(window, "window");
-    ensureNotNull(shaders, "shaders");
-    ensureNotNull(meshes, "meshes");
-    ensureNotNull(resources, "resources");
+    _graphics(graphics),
+    _resource(resource) {
 }
 
 Cursors::~Cursors() {
@@ -83,7 +74,7 @@ shared_ptr<Cursor> Cursors::get(CursorType type) {
     shared_ptr<Texture> up(newTexture(names.first));
     shared_ptr<Texture> down(newTexture(names.second));
 
-    auto cursor = make_shared<Cursor>(up, down, _window, _shaders, _meshes);
+    auto cursor = make_shared<Cursor>(up, down, _graphics);
     auto inserted = _cache.insert(make_pair(type, cursor));
 
     return inserted.first->second;
@@ -103,7 +94,7 @@ const pair<uint32_t, uint32_t> &Cursors::getCursorNames(CursorType type, const u
 }
 
 shared_ptr<Texture> Cursors::newTexture(uint32_t name) {
-    shared_ptr<ByteArray> data(_resources->getFromExe(name, PEResourceType::Cursor));
+    shared_ptr<ByteArray> data(_resource.resources().getFromExe(name, PEResourceType::Cursor));
 
     CurReader curFile;
     curFile.load(wrap(data));

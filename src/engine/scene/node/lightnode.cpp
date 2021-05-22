@@ -24,7 +24,6 @@
 #include "../../common/guardutil.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
-#include "../../graphics/stateutil.h"
 #include "../../graphics/window.h"
 
 #include "../scenegraph.h"
@@ -56,7 +55,7 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     shared_ptr<CameraSceneNode> camera(_sceneGraph->activeCamera());
     if (!camera) return;
 
-    setActiveTextureUnit(TextureUnits::diffuseMap);
+    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
     flare.texture->bind();
 
     glm::vec4 lightPos(_absTransform[3]);
@@ -85,7 +84,7 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
 
     _sceneGraph->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    withAdditiveBlending([&]() {
+    _sceneGraph->graphics().context().withAdditiveBlending([&]() {
         _sceneGraph->graphics().meshes().billboard().draw();
     });
 }

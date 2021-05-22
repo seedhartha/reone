@@ -17,39 +17,36 @@
 
 #pragma once
 
-#include <memory>
+#include <cstdint>
+#include <functional>
 
 #include <boost/noncopyable.hpp>
 
-#include "glm/vec2.hpp"
-
-#include "texture/texture.h"
+#include "glm/vec4.hpp"
 
 namespace reone {
 
 namespace graphics {
 
-class GraphicsServices;
-
-class Cursor : boost::noncopyable {
+class Context : boost::noncopyable {
 public:
-    Cursor(
-        std::shared_ptr<Texture> up,
-        std::shared_ptr<Texture> down,
-        GraphicsServices &graphics);
+    void withWireframes(const std::function<void()> &block);
+    void withViewport(const glm::ivec4 &viewport, const std::function<void()> &block);
+    void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
+    void withDepthTest(const std::function<void()> &block);
+    void withAdditiveBlending(const std::function<void()> &block);
+    void withLightenBlending(const std::function<void()> &block);
+    void withBackFaceCulling(const std::function<void()> &block);
 
-    void draw();
-
-    void setPosition(glm::ivec2 position) { _position = std::move(position); }
-    void setPressed(bool pressed) { _pressed = pressed; }
+    void setDepthTestEnabled(bool enabled);
+    void setBackFaceCullingEnabled(bool enabled);
+    void setActiveTextureUnit(int n);
 
 private:
-    std::shared_ptr<Texture> _up;
-    std::shared_ptr<Texture> _down;
-    GraphicsServices &_graphics;
-
-    glm::ivec2 _position { 0 };
-    bool _pressed { false };
+    bool _depthTest { false };
+    bool _backFaceCulling { false };
+    int _textureUnit { 0 };
+    uint32_t _polygonMode { 0 };
 };
 
 } // namespace graphics
