@@ -55,7 +55,7 @@ void Cursor::draw() {
     uniforms.combined.general.model = move(transform);
 
     _shaders->activate(ShaderProgram::SimpleGUI, uniforms);
-    _meshes->getQuad()->draw();
+    _meshes->quad().draw();
 }
 
 void Cursor::setPosition(const glm::ivec2 &position) {

@@ -288,10 +288,10 @@ void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &
     bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
     if (lighten) {
         withLightenBlending([&]() {
-            _sceneGraph->graphics().meshes().getBillboard()->drawInstanced(count);
+            _sceneGraph->graphics().meshes().billboard().drawInstanced(count);
         });
     } else {
-        _sceneGraph->graphics().meshes().getBillboard()->drawInstanced(count);
+        _sceneGraph->graphics().meshes().billboard().drawInstanced(count);
     }
 }
 

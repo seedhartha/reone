@@ -121,7 +121,7 @@ void ProfileOverlay::drawBackground() {
     uniforms.combined.general.alpha = 0.5f;
 
     _graphics.shaders().activate(ShaderProgram::SimpleColor, uniforms);
-    _graphics.meshes().getQuad()->draw();
+    _graphics.meshes().quad().draw();
 }
 
 void ProfileOverlay::drawText() {

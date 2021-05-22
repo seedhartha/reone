@@ -86,7 +86,7 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     _sceneGraph->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
 
     withAdditiveBlending([&]() {
-        _sceneGraph->graphics().meshes().getBillboard()->draw();
+        _sceneGraph->graphics().meshes().billboard().draw();
     });
 }
 

@@ -119,7 +119,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
 
         int height = _game->options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
-        withScissorTest(scissorBounds, [&]() { _game->services().graphics().meshes().getQuad()->draw(); });
+        withScissorTest(scissorBounds, [&]() { _game->services().graphics().meshes().quad().draw(); });
 
     } else {
         setActiveTextureUnit(TextureUnits::diffuseMap);
@@ -134,7 +134,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         uniforms.combined.general.model = move(transform);
 
         _game->services().graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-        _game->services().graphics().meshes().getQuad()->draw();
+        _game->services().graphics().meshes().quad().draw();
     }
 }
 
@@ -169,7 +169,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         uniforms.combined.general.color = glm::vec4(selected ? getHilightColor(_game->gameId()) : getBaseColor(_game->gameId()), 1.0f);
 
         _game->services().graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-        _game->services().graphics().meshes().getQuad()->draw();
+        _game->services().graphics().meshes().quad().draw();
     }
 }
 
@@ -250,7 +250,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     uniforms.combined.general.model = move(transform);
 
     _game->services().graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _game->services().graphics().meshes().getQuad()->draw();
+    _game->services().graphics().meshes().quad().draw();
 }
 
 void Map::setSelectedNote(const shared_ptr<Waypoint> &waypoint) {

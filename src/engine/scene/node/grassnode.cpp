@@ -78,7 +78,7 @@ void GrassSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &el
     }
 
     _sceneGraph->graphics().shaders().activate(ShaderProgram::GrassGrass, uniforms);
-    _sceneGraph->graphics().meshes().getGrass()->drawInstanced(count);
+    _sceneGraph->graphics().meshes().grass().drawInstanced(count);
 }
 
 } // namespace scene

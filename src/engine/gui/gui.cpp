@@ -271,7 +271,7 @@ void GUI::drawBackground() {
     uniforms.combined.general.model = move(transform);
 
     _graphics.shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _graphics.meshes().getQuad()->draw();
+    _graphics.meshes().quad().draw();
 }
 
 void GUI::resetFocus() {
