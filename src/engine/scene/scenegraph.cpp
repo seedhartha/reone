@@ -305,7 +305,7 @@ void SceneGraph::draw(bool shadowPass) {
             uniforms.combined.general.model = move(transform);
 
             _graphics.shaders().activate(ShaderProgram::SimpleColor, uniforms);
-            _graphics.meshes().getAABB()->draw();
+            _graphics.meshes().aabb().draw();
         }
     }
 

@@ -130,7 +130,7 @@ shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             _shaders->activate(ShaderProgram::SimpleIrradiance, uniforms);
-            _meshes->getCubemap()->draw();
+            _meshes->cubemap().draw();
         }
     });
 
@@ -176,7 +176,7 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
                 _shaders->activate(ShaderProgram::SimplePrefilter, uniforms);
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                _meshes->getCubemap()->draw();
+                _meshes->cubemap().draw();
             }
         });
     }
@@ -207,7 +207,7 @@ shared_ptr<Texture> PBRIBL::computeBRDFLookup(const Texture *envmap) {
     withViewport(viewport, [&]() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         _shaders->activate(ShaderProgram::SimpleBRDF, _shaders->defaultUniforms());
-        _meshes->getQuadNDC()->draw();
+        _meshes->quadNDC().draw();
     });
 
     _brdfLookupFB.unbind();

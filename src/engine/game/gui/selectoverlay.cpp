@@ -285,7 +285,7 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     uniforms.combined.general.model = move(transform);
 
     _game->services().graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _game->services().graphics().meshes().getQuad()->draw();
+    _game->services().graphics().meshes().quad().draw();
 }
 
 void SelectionOverlay::drawTitleBar() {
@@ -311,7 +311,7 @@ void SelectionOverlay::drawTitleBar() {
         uniforms.combined.general.alpha = 0.5f;
 
         _game->services().graphics().shaders().activate(ShaderProgram::SimpleColor, uniforms);
-        _game->services().graphics().meshes().getQuad()->draw();
+        _game->services().graphics().meshes().quad().draw();
     }
     {
         float x = opts.width * _selectedScreenCoords.x;
@@ -343,7 +343,7 @@ void SelectionOverlay::drawHealthBar() {
     uniforms.combined.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
 
     _game->services().graphics().shaders().activate(ShaderProgram::SimpleColor, uniforms);
-    _game->services().graphics().meshes().getQuad()->draw();
+    _game->services().graphics().meshes().quad().draw();
 }
 
 void SelectionOverlay::drawActionBar() {
@@ -379,7 +379,7 @@ void SelectionOverlay::drawActionFrame(int index) {
     uniforms.combined.general.model = move(transform);
 
     _game->services().graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _game->services().graphics().meshes().getQuad()->draw();
+    _game->services().graphics().meshes().quad().draw();
 }
 
 bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) const {
@@ -418,7 +418,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     uniforms.combined.general.model = move(transform);
 
     _game->services().graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _game->services().graphics().meshes().getQuad()->draw();
+    _game->services().graphics().meshes().quad().draw();
 }
 
 glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {

@@ -105,7 +105,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
             textOffset.x += glyph.size.x;
         }
         _shaders->activate(ShaderProgram::TextText, uniforms);
-        _meshes->getQuad()->drawInstanced(numChars);
+        _meshes->quad().drawInstanced(numChars);
     }
 }
 

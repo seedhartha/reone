@@ -305,7 +305,7 @@ void Console::drawBackground() {
     uniforms.combined.general.alpha = 0.5f;
 
     _game->services().graphics().shaders().activate(ShaderProgram::SimpleColor, uniforms);
-    _game->services().graphics().meshes().getQuad()->draw();
+    _game->services().graphics().meshes().quad().draw();
 }
 
 void Console::drawLines() {

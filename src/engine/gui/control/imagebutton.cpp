@@ -99,7 +99,7 @@ void ImageButton::drawIcon(
         uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
         _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-        _gui->graphics().meshes().getQuad()->draw();
+        _gui->graphics().meshes().quad().draw();
     }
 
     if (iconTexture) {
@@ -116,7 +116,7 @@ void ImageButton::drawIcon(
         uniforms.combined.general.color = glm::vec4(1.0f);
 
         _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-        _gui->graphics().meshes().getQuad()->draw();
+        _gui->graphics().meshes().quad().draw();
     }
 
     if (!iconText.empty()) {

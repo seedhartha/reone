@@ -270,10 +270,10 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         bool additive = border.fill->isAdditive();
         if (additive) {
             withAdditiveBlending([&]() {
-                _gui->graphics().meshes().getQuad()->draw();
+                _gui->graphics().meshes().quad().draw();
             });
         } else {
-            _gui->graphics().meshes().getQuad()->draw();
+            _gui->graphics().meshes().quad().draw();
         }
     }
     if (border.edge) {
@@ -299,7 +299,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
                 _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-                _gui->graphics().meshes().getQuadSwapFlipX()->draw();
+                _gui->graphics().meshes().quadSwapFlipX().draw();
             }
 
             // Right edge
@@ -314,7 +314,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
                 _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-                _gui->graphics().meshes().getQuadSwap()->draw();
+                _gui->graphics().meshes().quadSwap().draw();
             }
         }
 
@@ -334,7 +334,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
                 _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-                _gui->graphics().meshes().getQuad()->draw();
+                _gui->graphics().meshes().quad().draw();
             }
 
             // Bottom edge
@@ -349,7 +349,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
                 _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-                _gui->graphics().meshes().getQuadFlipY()->draw();
+                _gui->graphics().meshes().quadFlipY().draw();
             }
         }
     }
@@ -372,7 +372,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
             _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-            _gui->graphics().meshes().getQuad()->draw();
+            _gui->graphics().meshes().quad().draw();
         }
 
         // Bottom left corner
@@ -387,7 +387,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
             _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-            _gui->graphics().meshes().getQuadFlipY()->draw();
+            _gui->graphics().meshes().quadFlipY().draw();
         }
 
         // Top right corner
@@ -402,7 +402,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
             _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-            _gui->graphics().meshes().getQuadFlipX()->draw();
+            _gui->graphics().meshes().quadFlipX().draw();
         }
 
         // Bottom right corner
@@ -417,7 +417,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
             _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-            _gui->graphics().meshes().getQuadFlipXY()->draw();
+            _gui->graphics().meshes().quadFlipXY().draw();
         }
     }
 }

@@ -288,7 +288,7 @@ void WorldRenderPipeline::applyHorizontalBlur() {
     _sceneGraph->graphics().shaders().activate(ShaderProgram::SimpleBlur, uniforms);
 
     withDepthTest([&]() {
-        _sceneGraph->graphics().meshes().getQuadNDC()->draw();
+        _sceneGraph->graphics().meshes().quadNDC().draw();
     });
 }
 
@@ -311,7 +311,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
     _sceneGraph->graphics().shaders().activate(ShaderProgram::SimpleBlur, uniforms);
 
     withDepthTest([&]() {
-        _sceneGraph->graphics().meshes().getQuadNDC()->draw();
+        _sceneGraph->graphics().meshes().quadNDC().draw();
     });
 
     _verticalBlur.unbind();
@@ -326,7 +326,7 @@ void WorldRenderPipeline::drawResult() {
 
     ShaderUniforms uniforms;
     _sceneGraph->graphics().shaders().activate(ShaderProgram::SimplePresentWorld, uniforms);
-    _sceneGraph->graphics().meshes().getQuadNDC()->draw();
+    _sceneGraph->graphics().meshes().quadNDC().draw();
 }
 
 } // namespace scene

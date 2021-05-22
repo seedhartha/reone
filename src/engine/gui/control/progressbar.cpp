@@ -62,7 +62,7 @@ void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
     uniforms.combined.general.model = move(transform);
 
     _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _gui->graphics().meshes().getQuad()->draw();
+    _gui->graphics().meshes().quad().draw();
 }
 
 void ProgressBar::setValue(int value) {

@@ -93,7 +93,7 @@ void Video::draw() {
 
     ShaderUniforms uniforms;
     _shaders->activate(ShaderProgram::SimpleGUI, uniforms);
-    _meshes->getQuadNDCFlipY()->draw();
+    _meshes->quadNDCFlipY().draw();
 }
 
 void Video::finish() {
