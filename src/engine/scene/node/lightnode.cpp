@@ -38,6 +38,7 @@ namespace reone {
 
 namespace scene {
 
+static constexpr float kFadeSpeed = 1.0f;
 static constexpr float kMinDirectionalLightRadius = 1000.0f;
 
 LightSceneNode::LightSceneNode(const ModelSceneNode *model, shared_ptr<ModelNode> modelNode, SceneGraph *sceneGraph) :
@@ -46,9 +47,21 @@ LightSceneNode::LightSceneNode(const ModelSceneNode *model, shared_ptr<ModelNode
 
     ensureNotNull(model, "model");
 
+    _color = modelNode->color().getByFrameOrElse(0, glm::vec3(0.0f));
     _radius = modelNode->radius().getByFrameOrElse(0, 0.0f);
     _multiplier = modelNode->multiplier().getByFrameOrElse(0, 0.0f);
-    _color = modelNode->color().getByFrameOrElse(0, glm::vec3(0.0f));
+}
+
+void LightSceneNode::update(float dt) {
+    SceneNode::update(dt);
+
+    if (_active) {
+        // Fade out
+        _fadeFactor = glm::max(0.0f, _fadeFactor - kFadeSpeed * dt);
+    } else {
+        // Fade in
+        _fadeFactor = glm::min(1.0f, _fadeFactor + kFadeSpeed * dt);
+    }
 }
 
 void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
