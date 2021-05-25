@@ -265,12 +265,12 @@ void main() {
 
         // Indirect lighting
 
-        vec3 ambient = uGeneral.ambientColor.rgb * albedo * ao;
+        vec3 ambient = uGeneral.ambientColor.rgb * uMaterial.ambient.rgb * albedo * ao;
 
         for (int i = 0; i < uLightCount; ++i) {
             if (!uLights[i].ambientOnly) continue;
             float attenuation = getAttenuationQuadratic(i);
-            ambient += attenuation * uLights[i].multiplier * uLights[i].color.rgb * albedo * ao;
+            ambient += attenuation * uLights[i].multiplier * uLights[i].color.rgb * uMaterial.ambient.rgb * albedo * ao;
         }
 
         if (isFeatureEnabled(FEATURE_PBRIBL)) {
@@ -281,6 +281,7 @@ void main() {
             kD *= 1.0 - metallic;
 
             vec3 irradiance = texture(sIrradianceMap, N).rgb;
+            irradiance = pow(irradiance, vec3(GAMMA));
             vec3 diffuse = irradiance * albedo;
 
             const float MAX_REFLECTION_LOD = 4.0;
@@ -289,7 +290,7 @@ void main() {
             vec2 brdf = texture(sBRDFLookup, vec2(max(dot(N, V), 0.0), roughness)).rg;
             vec3 specular = (1.0 - diffuseSample.a) * prefilteredColor * (F * brdf.x + brdf.y);
 
-            ambient += (kD * diffuse + specular) * ao;
+            ambient += (kD * diffuse + specular) * uMaterial.ambient.rgb * ao;
         }
 
         // END Indirect lighting
@@ -305,7 +306,7 @@ void main() {
             vec3 H = normalize(V + L);
 
             float attenuation = getAttenuationQuadratic(i);
-            vec3 radiance = uLights[i].multiplier * uLights[i].color.rgb * attenuation;
+            vec3 radiance = attenuation * uLights[i].multiplier * uLights[i].color.rgb * uMaterial.diffuse.rgb;
 
             float NDF = DistributionGGX(N, H, roughness);
             float G = GeometrySmith(N, V, L, roughness);
