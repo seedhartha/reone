@@ -153,7 +153,7 @@ void CharacterMenu::refresh3D() {
         .modelSupplier(bind(&CharacterMenu::getSceneModel, this, _1))
         .modelOffset(glm::vec2(0.0f, 1.7f))
         .cameraFromModelNode("camerahook")
-        .ambientLightColor(glm::vec3(0.2f))
+        .lightingRefFromModelNode("charmain_light")
         .build();
 
     control3d.setScene(move(scene));

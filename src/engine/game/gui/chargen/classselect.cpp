@@ -120,7 +120,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
         .modelSupplier([&](SceneGraph &sceneGraph) { return getCharacterModel(appearance, sceneGraph); })
         .modelScale(kModelScale)
         .cameraFromModelNode("camerahook")
-        .ambientLightColor(glm::vec3(0.2f))
+        .lightingRefFromModelNode("cgbody_light")
         .build());
 
     Control &control3d = getControl("3D_MODEL" + to_string(index + 1));

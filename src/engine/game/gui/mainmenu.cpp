@@ -117,7 +117,7 @@ void MainMenu::setup3DView() {
         .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
         .modelScale(kKotorModelSize)
         .cameraFromModelNode("camerahook")
-        .ambientLightColor(glm::vec3(0.1f))
+        .lightingRefFromModelNode("rootdummy")
         .build());
 
     control.setScene(move(scene));

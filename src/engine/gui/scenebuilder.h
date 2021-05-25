@@ -48,9 +48,10 @@ public:
     SceneBuilder &modelSupplier(const std::function<std::shared_ptr<scene::ModelSceneNode>(scene::SceneGraph &)> &supplier);
     SceneBuilder &modelScale(float scale);
     SceneBuilder &modelOffset(glm::vec2 offset);
-    SceneBuilder &cameraTransform(const glm::mat4 &transform);
-    SceneBuilder &cameraFromModelNode(const std::string &nodeName);
-    SceneBuilder &ambientLightColor(const glm::vec3 &color);
+    SceneBuilder &cameraTransform(glm::mat4 transform);
+    SceneBuilder &cameraFromModelNode(std::string nodeName);
+    SceneBuilder &ambientLightColor(glm::vec3 color);
+    SceneBuilder &lightingRefFromModelNode(std::string nodeName);
 
 private:
     graphics::GraphicsOptions _options;
@@ -65,6 +66,7 @@ private:
     glm::mat4 _cameraTransform { 1.0f };
     std::string _cameraNodeName;
     glm::vec3 _ambientLightColor { 0.0f };
+    std::string _lightingRefNodeName;
 };
 
 } // namespace gui

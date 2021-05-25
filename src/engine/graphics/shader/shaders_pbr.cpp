@@ -267,6 +267,12 @@ void main() {
 
         vec3 ambient = uGeneral.ambientColor.rgb * albedo * ao;
 
+        for (int i = 0; i < uLightCount; ++i) {
+            if (!uLights[i].ambientOnly) continue;
+            float attenuation = getAttenuationQuadratic(i);
+            ambient += attenuation * uLights[i].multiplier * uLights[i].color.rgb * albedo * ao;
+        }
+
         if (isFeatureEnabled(FEATURE_PBRIBL)) {
             vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 
@@ -293,6 +299,8 @@ void main() {
         vec3 Lo = vec3(0.0);
 
         for (int i = 0; i < uLightCount; ++i) {
+            if (uLights[i].ambientOnly) continue;
+
             vec3 L = normalize(uLights[i].position.xyz - fragPosition);
             vec3 H = normalize(V + L);
 

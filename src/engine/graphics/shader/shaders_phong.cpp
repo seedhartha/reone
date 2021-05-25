@@ -27,7 +27,20 @@ namespace graphics {
 
 char g_shaderBaseBlinnPhong[] = R"END(
 vec3 getLightingIndirect(vec3 N) {
-    return uGeneral.ambientColor.rgb * uMaterial.ambient.rgb;
+    vec3 result = uGeneral.ambientColor.rgb * uMaterial.ambient.rgb;
+
+    for (int i = 0; i < uLightCount; ++i) {
+        if (!uLights[i].ambientOnly) continue;
+
+        vec3 ambient = uLights[i].multiplier * uLights[i].color.rgb * uMaterial.ambient.rgb;
+
+        float attenuation = getAttenuationQuadratic(i);
+        ambient *= attenuation;
+
+        result += ambient;
+    }
+
+    return result;
 }
 
 vec3 getLightingDirect(vec3 N) {
@@ -35,6 +48,8 @@ vec3 getLightingDirect(vec3 N) {
     vec3 V = normalize(uGeneral.cameraPosition.xyz - fragPosition);
 
     for (int i = 0; i < uLightCount; ++i) {
+        if (uLights[i].ambientOnly) continue;
+
         vec3 L = normalize(uLights[i].position.xyz - fragPosition);
         vec3 H = normalize(V + L);
 
@@ -51,7 +66,7 @@ vec3 getLightingDirect(vec3 N) {
         result += diffuse + specular;
     }
 
-    return result;
+    return min(vec3(1.0), result);
 }
 )END";
 
@@ -73,7 +88,7 @@ void main() {
     } else if (isFeatureEnabled(FEATURE_LIGHTING)) {
         vec3 indirect = getLightingIndirect(N);
         vec3 direct = getLightingDirect(N);
-        lighting = min(vec3(1.0), indirect + (1.0 - shadow) * direct);
+        lighting = indirect + (1.0 - shadow) * direct;
     } else if (isFeatureEnabled(FEATURE_SELFILLUM)) {
         lighting = uGeneral.selfIllumColor.rgb;
     } else {

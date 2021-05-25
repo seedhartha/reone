@@ -130,6 +130,7 @@ struct Light {
     vec4 color;
     float multiplier;
     float radius;
+    bool ambientOnly;
 };
 
 layout(std140) uniform Lighting {
