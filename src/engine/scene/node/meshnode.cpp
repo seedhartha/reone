@@ -318,14 +318,14 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
             uniforms.combined.material.roughness = _material.roughness;
             uniforms.lighting->lightCount = static_cast<int>(lights.size());
 
-            for (int i = 0; i < uniforms.lighting->lightCount; ++i) {
+            for (size_t i = 0; i < lights.size(); ++i) {
                 glm::vec4 position(lights[i]->absoluteTransform()[3]);
                 position.w = lights[i]->isDirectional() ? 0.0f : 1.0f;
 
                 ShaderLight &shaderLight = uniforms.lighting->lights[i];
                 shaderLight.position = move(position);
                 shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
-                shaderLight.multiplier = lights[i]->multiplier();
+                shaderLight.multiplier = lights[i]->multiplier() * (1.0f - lights[i]->fadeFactor());
                 shaderLight.radius = lights[i]->radius();
                 shaderLight.ambientOnly = static_cast<int>(lights[i]->modelNode()->light()->ambientOnly);
             }

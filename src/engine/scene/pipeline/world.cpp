@@ -238,7 +238,7 @@ void WorldRenderPipeline::drawGeometry() {
             shadowLight->isDirectional() ? 0.0f : 1.0f);
 
         uniforms.combined.shadows.lightPosition = move(lightPosition);
-        uniforms.combined.shadows.strength = _sceneGraph->shadowStrength();
+        uniforms.combined.shadows.strength = 1.0f - shadowLight->fadeFactor();
 
         for (int i = 0; i < kNumCubeFaces; ++i) {
             uniforms.combined.shadows.lightSpaceMatrices[i] = _lightSpaceMatrices[i];

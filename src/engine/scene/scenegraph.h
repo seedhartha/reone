@@ -78,19 +78,15 @@ public:
     // Lighting and shadows
 
     /**
-     * Fill lights vector with up to count lights, sorted by priority and
-     * proximity to the reference node.
+     * Get up to count lights, sorted by priority and proximity to the reference node.
      */
-    void getLightsAt(
-        const SceneNode &reference,
-        std::vector<LightSceneNode *> &lights,
+    std::vector<LightSceneNode *> getLightsAt(
         int count = graphics::kMaxLights,
         std::function<bool(const LightSceneNode &)> predicate = [](auto &light) { return true; }) const;
 
     const glm::vec3 &ambientLightColor() const { return _ambientLightColor; }
     const std::vector<LightSceneNode *> closestLights() const { return _closestLights; }
     const LightSceneNode *shadowLight() const { return _shadowLight; }
-    float shadowStrength() const { return _shadowStrength; }
 
     void setAmbientLightColor(glm::vec3 color) { _ambientLightColor = std::move(color); }
     void setLightingRefNode(std::shared_ptr<SceneNode> node) { _lightingRefNode = std::move(node); }
@@ -137,8 +133,6 @@ private:
     std::shared_ptr<SceneNode> _lightingRefNode; /**< reference node to use when selecting closest light sources */
     std::vector<LightSceneNode *> _closestLights;
     const LightSceneNode *_shadowLight { nullptr };
-    float _shadowStrength { 1.0f };
-    bool _shadowFading { false };
 
     // END Lighting and shadows
 
@@ -153,11 +147,9 @@ private:
 
     void cullRoots();
     void updateLighting();
-    void updateShadows(float dt);
 
     void refreshNodeLists();
     void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);
-    void refreshShadowLight();
 
     void prepareTransparentMeshes();
     void prepareLeafs();

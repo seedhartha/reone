@@ -72,9 +72,7 @@ void SceneGraph::update(float dt) {
     if (_activeCamera) {
         cullRoots();
         refreshNodeLists();
-        refreshShadowLight();
         updateLighting();
-        updateShadows(dt);
         prepareTransparentMeshes();
         prepareLeafs();
     }
@@ -96,19 +94,46 @@ void SceneGraph::cullRoots() {
 }
 
 void SceneGraph::updateLighting() {
-    _closestLights.clear();
+    if (!_lightingRefNode) return;
 
-    if (_lightingRefNode) {
-        getLightsAt(*_lightingRefNode, _closestLights, kMaxLights);
+    // Find next closest lights and create a lookup
+    vector<LightSceneNode *> lights(getLightsAt(kMaxLights));
+    set<LightSceneNode *> lookup;
+    for (auto &light : lights) {
+        lookup.insert(light);
     }
-}
-
-void SceneGraph::updateShadows(float dt) {
-    // Gradually fade the shadow in and out
-    if (_shadowFading) {
-        _shadowStrength = glm::max(0.0f, _shadowStrength - dt);
-    } else {
-        _shadowStrength = glm::min(_shadowStrength + dt, 1.0f);
+    // Mark current closest lights as inactive, unless found in a lookup. Lookup will contain new lights.
+    for (auto &light : _closestLights) {
+        if (lookup.count(light) == 0) {
+            light->setActive(false);
+        } else {
+            lookup.erase(light);
+        }
+    }
+    // Erase current closest lights that are inactive and completely faded
+    for (auto it = _closestLights.begin(); it != _closestLights.end(); ) {
+        LightSceneNode *light = *it;
+        if (!light->isActive() && light->fadeFactor() == 1.0f) {
+            it = _closestLights.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    // Add next closest lights to current
+    for (size_t i = 0; i < lights.size() && _closestLights.size() < kMaxLights; ++i) {
+        if (lookup.count(lights[i]) > 0) {
+            lights[i]->setActive(true);
+            lights[i]->setFadeFactor(1.0f);
+            _closestLights.push_back(lights[i]);
+        }
+    }
+    // Update shadow light
+    _shadowLight = nullptr;
+    for (auto &light : _closestLights) {
+        if (light->modelNode()->light()->shadow) {
+            _shadowLight = light;
+            break;
+        }
     }
 }
 
@@ -170,39 +195,6 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
         for (auto &child : node->children()) {
             refreshFromSceneNode(child);
         }
-    }
-}
-
-void SceneGraph::refreshShadowLight() {
-    const LightSceneNode *nextShadowLight = nullptr;
-
-    if (_lightingRefNode) {
-        vector<LightSceneNode *> lights;
-        getLightsAt(*_lightingRefNode, lights, 1, [](auto &light) { return light.modelNode()->light()->shadow; });
-
-        if (!lights.empty()) {
-            nextShadowLight = lights.front();
-        }
-    }
-
-    if (!nextShadowLight) {
-        _shadowLight = nullptr;
-        return;
-    }
-
-    if (!_shadowLight) {
-        _shadowLight = nextShadowLight;
-        _shadowFading = false;
-        return;
-    }
-
-    if (_shadowLight == nextShadowLight) return;
-
-    if (_shadowFading && _shadowStrength == 0.0f) {
-        _shadowLight = nextShadowLight;
-        _shadowFading = false;
-    } else {
-        _shadowFading = true;
     }
 }
 
@@ -336,44 +328,54 @@ void SceneGraph::draw(bool shadowPass) {
     }
 }
 
-void SceneGraph::getLightsAt(
-    const SceneNode &node,
-    vector<LightSceneNode *> &lights,
+vector<LightSceneNode *> SceneGraph::getLightsAt(
     int count,
     function<bool(const LightSceneNode &)> predicate) const {
 
-    unordered_map<LightSceneNode *, float> distances;
-    lights.clear();
+    if (!_lightingRefNode) return vector<LightSceneNode *>();
+
+    // Compute distances between each light and the reference node
+    vector<pair<LightSceneNode *, float>> distances;
 
     for (auto &light : _lights) {
         if (!predicate(*light)) continue;
 
         // Only account for lights whose distance to the reference node is
         // within range of the light.
-        float distance = light->getDistanceTo2(node);
+        float distance = light->getDistanceTo2(*_lightingRefNode);
         if (distance > light->radius() * light->radius()) continue;
 
-        lights.push_back(light);
-        distances.insert(make_pair(light, distance));
+        distances.push_back(make_pair(light, distance));
     }
 
     // Sort lights by priority and radius
-    sort(lights.begin(), lights.end(), [&distances](LightSceneNode *left, LightSceneNode *right) {
-        int leftPriority = left->modelNode()->light()->priority;
-        int rightPriority = right->modelNode()->light()->priority;
+    sort(distances.begin(), distances.end(), [](auto &left, auto &right) {
+        LightSceneNode *leftLight = left.first;
+        LightSceneNode *rightLight = right.first;
+
+        int leftPriority = leftLight->modelNode()->light()->priority;
+        int rightPriority = rightLight->modelNode()->light()->priority;
 
         if (leftPriority < rightPriority) return true;
         if (leftPriority > rightPriority) return false;
 
-        float leftDistance = distances.find(left)->second;
-        float rightDistance = distances.find(right)->second;
+        float leftDistance = left.second;
+        float rightDistance = right.second;
 
         return leftDistance < rightDistance;
     });
 
-    if (lights.size() > count) {
-        lights.erase(lights.begin() + count, lights.end());
+    // Keep first count lights only
+    if (distances.size() > count) {
+        distances.erase(distances.begin() + count, distances.end());
     }
+
+    vector<LightSceneNode *> result;
+    for (auto &light : distances) {
+        result.push_back(light.first);
+    }
+
+    return move(result);
 }
 
 } // namespace scene
