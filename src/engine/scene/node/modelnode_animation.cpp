@@ -32,6 +32,8 @@ namespace reone {
 
 namespace scene {
 
+static constexpr float kTransitionLength = 0.25f;
+
 void ModelSceneNode::playAnimation(const string &name, AnimationProperties properties) {
     shared_ptr<Animation> anim(_model->getAnimation(name));
     if (anim) {
@@ -67,7 +69,10 @@ void ModelSceneNode::playAnimation(shared_ptr<Animation> anim, shared_ptr<LipAni
             }
             // Add animation on top
             _animChannels.push_front(AnimationChannel(anim, lipAnim, properties));
-            _animChannels[0].transition = transition;
+            if (transition) {
+                _animChannels[0].transition = true;
+                _animChannels[0].time = glm::max(0.0f, _animChannels[0].anim->transitionTime() - kTransitionLength);
+            }
             while (_animChannels.size() > 2ll) {
                 _animChannels.pop_back();
             }
