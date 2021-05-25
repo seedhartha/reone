@@ -327,6 +327,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
                 shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
                 shaderLight.multiplier = lights[i]->multiplier();
                 shaderLight.radius = lights[i]->radius();
+                shaderLight.ambientOnly = static_cast<int>(lights[i]->modelNode()->light()->ambientOnly);
             }
         }
 

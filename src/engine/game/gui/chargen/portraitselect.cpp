@@ -89,7 +89,7 @@ void PortraitSelection::loadHeadModel() {
         .modelSupplier(bind(&PortraitSelection::getCharacterModel, this, _1))
         .modelScale(kModelScale)
         .cameraFromModelNode(_charGen->character().gender == Gender::Male ? "camerahookm" : "camerahookf")
-        .ambientLightColor(glm::vec3(0.2f))
+        .lightingRefFromModelNode("cghead_light")
         .build());
 
     control.setScene(move(scene));
@@ -117,7 +117,6 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
     }
     auto model = make_shared<ModelSceneNode>(_game->services().graphics().models().get("cghead_light"), ModelUsage::GUI, &sceneGraph);
     model->attach("cghead_light", creatureModel);
-
 
     return move(model);
 }

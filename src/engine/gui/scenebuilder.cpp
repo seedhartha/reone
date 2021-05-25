@@ -54,19 +54,28 @@ unique_ptr<SceneGraph> SceneBuilder::build() {
         _modelScale + _modelOffset.y,
         _zNear, _zFar));
 
-    auto camera = make_shared<CameraSceneNode>("", projection, scene.get());
+    scene->addRoot(model);
+    scene->setAmbientLightColor(_ambientLightColor);
+
+    auto cameraNode = make_shared<CameraSceneNode>("", projection, scene.get());
     if (_cameraNodeName.empty()) {
-        camera->setLocalTransform(_cameraTransform);
+        cameraNode->setLocalTransform(_cameraTransform);
     } else {
-        shared_ptr<ModelNode> refModelNode(model->model()->getNodeByName(_cameraNodeName));
-        if (refModelNode) {
-            camera->setLocalTransform(refModelNode->absoluteTransform() * _cameraTransform);
+        shared_ptr<ModelNode> modelNode(model->model()->getNodeByName(_cameraNodeName));
+        if (modelNode) {
+            cameraNode->setLocalTransform(modelNode->absoluteTransform() * _cameraTransform);
         }
     }
+    scene->setActiveCamera(move(cameraNode));
 
-    scene->addRoot(move(model));
-    scene->setAmbientLightColor(_ambientLightColor);
-    scene->setActiveCamera(camera);
+    if (!_lightingRefNodeName.empty()) {
+        shared_ptr<ModelNode> modelNode(model->model()->getNodeByName(_lightingRefNodeName));
+        if (modelNode) {
+            auto lightingRefNode = make_shared<DummySceneNode>(modelNode, scene.get());
+            lightingRefNode->setLocalTransform(modelNode->absoluteTransform());
+            scene->setLightingRefNode(move(lightingRefNode));
+        }
+    }
 
     return move(scene);
 }
@@ -97,18 +106,23 @@ SceneBuilder &SceneBuilder::modelOffset(glm::vec2 offset) {
     return *this;
 }
 
-SceneBuilder &SceneBuilder::cameraTransform(const glm::mat4 &transform) {
-    _cameraTransform = transform;
+SceneBuilder &SceneBuilder::cameraTransform(glm::mat4 transform) {
+    _cameraTransform = move(transform);
     return *this;
 }
 
-SceneBuilder &SceneBuilder::cameraFromModelNode(const std::string &nodeName) {
-    _cameraNodeName = nodeName;
+SceneBuilder &SceneBuilder::cameraFromModelNode(string nodeName) {
+    _cameraNodeName = move(nodeName);
     return *this;
 }
 
-SceneBuilder &SceneBuilder::ambientLightColor(const glm::vec3 &color) {
-    _ambientLightColor = color;
+SceneBuilder &SceneBuilder::ambientLightColor(glm::vec3 color) {
+    _ambientLightColor = move(color);
+    return *this;
+}
+
+SceneBuilder &SceneBuilder::lightingRefFromModelNode(string nodeName) {
+    _lightingRefNodeName = move(nodeName);
     return *this;
 }
 

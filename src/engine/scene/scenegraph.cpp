@@ -99,7 +99,7 @@ void SceneGraph::updateLighting() {
     _closestLights.clear();
 
     if (_lightingRefNode) {
-        getLightsAt(*_lightingRefNode, _closestLights, kMaxLights, [](auto &light) { return !light.modelNode()->light()->ambientOnly; });
+        getLightsAt(*_lightingRefNode, _closestLights, kMaxLights);
     }
 }
 
