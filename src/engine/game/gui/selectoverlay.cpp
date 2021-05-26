@@ -30,6 +30,7 @@
 #include "../../graphics/window.h"
 #include "../../resource/resources.h"
 
+#include "../action/usefeat.h"
 #include "../d20/feats.h"
 #include "../game.h"
 #include "../objectconverter.h"
@@ -56,6 +57,9 @@ static constexpr int kActionBarPadding = 3;
 static constexpr int kActionWidth = 35;
 static constexpr int kActionHeight = 59;
 
+static string g_attackIcon("i_attack");
+static string g_securityIcon("isk_security");
+
 SelectionOverlay::SelectionOverlay(Game *game) : _game(game) {
     ensureNotNull(game, "game");
 
@@ -72,21 +76,6 @@ void SelectionOverlay::load() {
     _hostileScroll = _game->services().graphics().textures().get("lbl_miscroll_h", TextureUsage::GUI);
     _hilightedScroll = _game->services().graphics().textures().get("lbl_miscroll_hi", TextureUsage::GUI);
     _reticleHeight = _friendlyReticle2->height();
-
-    addTextureByAction(ContextualAction::Unlock, "isk_security");
-    addTextureByAction(ContextualAction::Attack, "i_attack");
-
-    // TODO: different icons per feat level
-    _textureByAction.insert(make_pair(ContextualAction::PowerAttack, _game->services().feats().get(FeatType::PowerAttack)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::CriticalStrike, _game->services().feats().get(FeatType::CriticalStrike)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::Flurry, _game->services().feats().get(FeatType::Flurry)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::PowerShot, _game->services().feats().get(FeatType::PowerBlast)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::SniperShot, _game->services().feats().get(FeatType::SniperShot)->icon));
-    _textureByAction.insert(make_pair(ContextualAction::RapidShot, _game->services().feats().get(FeatType::RapidShot)->icon));
-}
-
-void SelectionOverlay::addTextureByAction(ContextualAction action, const string &resRef) {
-    _textureByAction.insert(make_pair(action, _game->services().graphics().textures().get(resRef, TextureUsage::GUI)));
 }
 
 bool SelectionOverlay::handle(const SDL_Event &event) {
@@ -133,21 +122,16 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     const ActionSlot &slot = _actionSlots[_selectedActionSlot];
     if (slot.indexSelected >= slot.actions.size()) return false;
 
-    switch (slot.actions[slot.indexSelected]) {
-        case ContextualAction::Unlock: {
+    switch (slot.actions[slot.indexSelected].type) {
+        case ActionType::AttackObject:
+            leader->addAction(make_unique<AttackAction>(selectedObject, leader->getAttackRange(), true));
+            break;
+        case ActionType::UseFeat:
+            leader->addAction(make_unique<UseFeatAction>(selectedObject, slot.actions[slot.indexSelected].feat));
+            break;
+        case ActionType::OpenLock:
             leader->addAction(make_unique<ObjectAction>(ActionType::OpenLock, selectedObject));
             break;
-        }
-        case ContextualAction::Attack:
-        case ContextualAction::PowerAttack:
-        case ContextualAction::CriticalStrike:
-        case ContextualAction::Flurry:
-        case ContextualAction::PowerShot:
-        case ContextualAction::SniperShot:
-        case ContextualAction::RapidShot: {
-            leader->addAction(make_unique<AttackAction>(static_pointer_cast<Creature>(selectedObject), leader->getAttackRange(), true));
-            break;
-        }
         default:
             break;
     }
@@ -214,32 +198,21 @@ void SelectionOverlay::update() {
             for (int i = 0; i < kNumActionSlots; ++i) {
                 _actionSlots[i].actions.clear();
             }
-            set<ContextualAction> actions(module->getContextualActions(selectedObject));
+            vector<ContextAction> actions(module->getContextActions(selectedObject));
             _hasActions = !actions.empty();
             if (_hasActions) {
-                if (actions.count(ContextualAction::Attack) > 0) {
-                    _actionSlots[0].actions.push_back(ContextualAction::Attack);
-                }
-                if (actions.count(ContextualAction::PowerAttack) > 0) {
-                    _actionSlots[0].actions.push_back(ContextualAction::PowerAttack);
-                }
-                if (actions.count(ContextualAction::CriticalStrike) > 0) {
-                    _actionSlots[0].actions.push_back(ContextualAction::CriticalStrike);
-                }
-                if (actions.count(ContextualAction::Flurry) > 0) {
-                    _actionSlots[0].actions.push_back(ContextualAction::Flurry);
-                }
-                if (actions.count(ContextualAction::PowerShot) > 0) {
-                    _actionSlots[0].actions.push_back(ContextualAction::PowerShot);
-                }
-                if (actions.count(ContextualAction::SniperShot) > 0) {
-                    _actionSlots[0].actions.push_back(ContextualAction::SniperShot);
-                }
-                if (actions.count(ContextualAction::RapidShot) > 0) {
-                    _actionSlots[0].actions.push_back(ContextualAction::RapidShot);
-                }
-                if (actions.count(ContextualAction::Unlock) > 0) {
-                    _actionSlots[1].actions.push_back(ContextualAction::Unlock);
+                for (auto &action : actions) {
+                    switch (action.type) {
+                        case ActionType::AttackObject:
+                        case ActionType::UseFeat:
+                            _actionSlots[0].actions.push_back(action);
+                            break;
+                        case ActionType::OpenLock:
+                            _actionSlots[1].actions.push_back(action);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
             for (int i = 0; i < kNumActionSlots; ++i) {
@@ -396,8 +369,25 @@ void SelectionOverlay::drawActionIcon(int index) {
     const ActionSlot &slot = _actionSlots[index];
     if (slot.indexSelected >= slot.actions.size()) return;
 
-    ContextualAction action = slot.actions[slot.indexSelected];
-    shared_ptr<Texture> texture(_textureByAction.find(action)->second);
+    shared_ptr<Texture> texture;
+    const ContextAction &action = slot.actions[slot.indexSelected];
+    switch (action.type) {
+        case ActionType::AttackObject:
+            texture = _game->services().graphics().textures().get(g_attackIcon, TextureUsage::GUI);
+            break;
+        case ActionType::OpenLock:
+            texture = _game->services().graphics().textures().get(g_securityIcon, TextureUsage::GUI);
+            break;
+        case ActionType::UseFeat: {
+            shared_ptr<Feat> feat(_game->services().feats().get(action.feat));
+            if (feat) {
+                texture = feat->icon;
+            }
+            break;
+        }
+        default:
+            break;
+    }
     if (!texture) return;
 
     _game->services().graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);

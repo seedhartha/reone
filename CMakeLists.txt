@@ -417,6 +417,8 @@ set(GAME_HEADERS
     src/engine/game/action/objectaction.h
     src/engine/game/action/playanimation.h
     src/engine/game/action/startconversation.h
+    src/engine/game/action/usefeat.h
+    src/engine/game/action/useskill.h
     src/engine/game/action/waitaction.h
     src/engine/game/animationutil.h
     src/engine/game/camera/animatedcamera.h
@@ -428,6 +430,7 @@ set(GAME_HEADERS
     src/engine/game/camera/thirdperson.h
     src/engine/game/character.h
     src/engine/game/console.h
+    src/engine/game/contextaction.h
     src/engine/game/combat/combat.h
     src/engine/game/cursors.h
     src/engine/game/d20/attributes.h

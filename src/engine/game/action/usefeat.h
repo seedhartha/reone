@@ -17,29 +17,23 @@
 
 #pragma once
 
-#include <memory>
-#include <stdexcept>
-
-#include "../../common/guardutil.h"
-
-#include "action.h"
+#include "objectaction.h"
 
 namespace reone {
 
 namespace game {
 
-class Object;
-
-class ObjectAction : public Action {
+class UseFeatAction : public ObjectAction {
 public:
-    ObjectAction(ActionType type, std::shared_ptr<Object> object) : Action(type), _object(object) {
-        ensureNotNull(object, "object");
+    UseFeatAction(std::shared_ptr<Object> object, FeatType feat) :
+        ObjectAction(ActionType::UseFeat, move(object)),
+        _feat(feat) {
     }
 
-    std::shared_ptr<Object> object() const { return _object; }
+    FeatType feat() const { return _feat; }
 
-protected:
-    std::shared_ptr<Object> _object;
+private:
+    FeatType _feat;
 };
 
 } // namespace game
