@@ -237,7 +237,6 @@ void main() {
     vec3 R = reflect(-V, N);
 
     vec4 diffuseSample = texture(sDiffuseMap, uv);
-    diffuseSample.rgb = pow(diffuseSample.rgb, vec3(GAMMA));
     vec3 albedo = diffuseSample.rgb;
     float ao = 1.0;
     float metallic = uMaterial.metallic;
@@ -246,7 +245,6 @@ void main() {
     vec3 objectColor;
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(sLightmap, fragLightmapCoords);
-        lightmapSample.rgb = pow(lightmapSample.rgb, vec3(GAMMA));
         vec3 lightmap = (1.0 - 0.5 * shadow) * lightmapSample.rgb;
         if (isFeatureEnabled(FEATURE_WATER)) {
             lightmap = mix(vec3(1.0), lightmap, 0.2);
@@ -256,7 +254,6 @@ void main() {
         if (isFeatureEnabled(FEATURE_ENVMAP)) {
             vec3 R = reflect(-V, N);
             vec4 envmapSample = texture(sEnvironmentMap, R);
-            envmapSample.rgb = pow(envmapSample.rgb, vec3(GAMMA));
             objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
         }
     } else if (isFeatureEnabled(FEATURE_LIGHTING)) {
@@ -281,12 +278,10 @@ void main() {
             kD *= 1.0 - metallic;
 
             vec3 irradiance = texture(sIrradianceMap, N).rgb;
-            irradiance = pow(irradiance, vec3(GAMMA));
             vec3 diffuse = irradiance * albedo;
 
             const float MAX_REFLECTION_LOD = 4.0;
             vec3 prefilteredColor = textureLod(sPrefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
-            prefilteredColor = pow(prefilteredColor, vec3(GAMMA));
             vec2 brdf = texture(sBRDFLookup, vec2(max(dot(N, V), 0.0), roughness)).rg;
             vec3 specular = (1.0 - diffuseSample.a) * prefilteredColor * (F * brdf.x + brdf.y);
 
@@ -337,7 +332,6 @@ void main() {
         if (isFeatureEnabled(FEATURE_ENVMAP)) {
             vec3 R = reflect(-V, N);
             vec4 envmapSample = texture(sEnvironmentMap, R);
-            envmapSample.rgb = pow(envmapSample.rgb, vec3(GAMMA));
             objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
         }
     }
@@ -348,10 +342,6 @@ void main() {
         objectColor *= uGeneral.waterAlpha;
         objectAlpha *= uGeneral.waterAlpha;
     }
-
-    objectColor = objectColor / (objectColor + vec3(1.0));
-    objectColor = pow(objectColor, vec3(1.0 / GAMMA));
-
     if (isFeatureEnabled(FEATURE_FOG)) {
         objectColor = applyFog(objectColor);
     }
