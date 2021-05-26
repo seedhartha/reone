@@ -261,31 +261,59 @@ void Module::update(float dt) {
     _area->update(dt);
 }
 
-set<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &object) const {
-    set<ContextualAction> actions;
+vector<ContextAction> Module::getContextActions(const shared_ptr<Object> &object) const {
+    vector<ContextAction> actions;
 
     switch (object->type()) {
         case ObjectType::Creature: {
             auto leader = _game->services().party().getLeader();
             auto creature = static_pointer_cast<Creature>(object);
             if (!creature->isDead() && _game->services().reputes().getIsEnemy(*leader, *creature)) {
-                actions.insert(ContextualAction::Attack);
+                actions.push_back(ContextAction(ActionType::AttackObject));
                 auto weapon = leader->getEquippedItem(InventorySlot::rightWeapon);
                 if (weapon && weapon->isRanged()) {
-                    if (leader->attributes().hasFeat(FeatType::PowerBlast)) {
-                        actions.insert(ContextualAction::PowerShot);
+                    if (leader->attributes().hasFeat(FeatType::MasterPowerBlast)) {
+                        actions.push_back(ContextAction(FeatType::MasterPowerBlast));
+                    } else if (leader->attributes().hasFeat(FeatType::ImprovedPowerBlast)) {
+                        actions.push_back(ContextAction(FeatType::ImprovedPowerBlast));
+                    } else if (leader->attributes().hasFeat(FeatType::PowerBlast)) {
+                        actions.push_back(ContextAction(FeatType::PowerBlast));
+                    }
+                    if (leader->attributes().hasFeat(FeatType::MasterSniperShot)) {
+                        actions.push_back(ContextAction(FeatType::MasterSniperShot));
+                    } else if (leader->attributes().hasFeat(FeatType::ImprovedSniperShot)) {
+                        actions.push_back(ContextAction(FeatType::ImprovedSniperShot));
                     } else if (leader->attributes().hasFeat(FeatType::SniperShot)) {
-                        actions.insert(ContextualAction::SniperShot);
+                        actions.push_back(ContextAction(FeatType::SniperShot));
+                    }
+                    if (leader->attributes().hasFeat(FeatType::MultiShot)) {
+                        actions.push_back(ContextAction(FeatType::MultiShot));
+                    } else if (leader->attributes().hasFeat(FeatType::ImprovedRapidShot)) {
+                        actions.push_back(ContextAction(FeatType::ImprovedRapidShot));
                     } else if (leader->attributes().hasFeat(FeatType::RapidShot)) {
-                        actions.insert(ContextualAction::RapidShot);
+                        actions.push_back(ContextAction(FeatType::RapidShot));
                     }
                 } else {
-                    if (leader->attributes().hasFeat(FeatType::PowerAttack)) {
-                        actions.insert(ContextualAction::PowerAttack);
+                    if (leader->attributes().hasFeat(FeatType::MasterPowerAttack)) {
+                        actions.push_back(ContextAction(FeatType::MasterPowerAttack));
+                    } else if (leader->attributes().hasFeat(FeatType::ImprovedPowerAttack)) {
+                        actions.push_back(ContextAction(FeatType::ImprovedPowerAttack));
+                    } else if (leader->attributes().hasFeat(FeatType::PowerAttack)) {
+                        actions.push_back(ContextAction(FeatType::PowerAttack));
+                    }
+                    if (leader->attributes().hasFeat(FeatType::MasterCriticalStrike)) {
+                        actions.push_back(ContextAction(FeatType::MasterCriticalStrike));
+                    } else if (leader->attributes().hasFeat(FeatType::ImprovedCriticalStrike)) {
+                        actions.push_back(ContextAction(FeatType::ImprovedCriticalStrike));
                     } else if (leader->attributes().hasFeat(FeatType::CriticalStrike)) {
-                        actions.insert(ContextualAction::CriticalStrike);
+                        actions.push_back(ContextAction(FeatType::CriticalStrike));
+                    }
+                    if (leader->attributes().hasFeat(FeatType::WhirlwindAttack)) {
+                        actions.push_back(ContextAction(FeatType::WhirlwindAttack));
+                    } else if (leader->attributes().hasFeat(FeatType::ImprovedFlurry)) {
+                        actions.push_back(ContextAction(FeatType::ImprovedFlurry));
                     } else if (leader->attributes().hasFeat(FeatType::Flurry)) {
-                        actions.insert(ContextualAction::Flurry);
+                        actions.push_back(ContextAction(FeatType::Flurry));
                     }
                 }
             }
@@ -294,7 +322,7 @@ set<ContextualAction> Module::getContextualActions(const shared_ptr<Object> &obj
         case ObjectType::Door: {
             auto door = static_pointer_cast<Door>(object);
             if (door->isLocked() && !door->isKeyRequired() && _game->services().party().getLeader()->attributes().hasSkill(Skill::Security)) {
-                actions.insert(ContextualAction::Unlock);
+                actions.push_back(ContextAction(ActionType::OpenLock));
             }
             break;
         }

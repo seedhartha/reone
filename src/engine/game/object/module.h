@@ -18,7 +18,6 @@
 #pragma once
 
 #include <memory>
-#include <set>
 
 #include "glm/vec3.hpp"
 
@@ -28,6 +27,7 @@
 #include "../../resource/format/gffreader.h"
 #include "../../resource/types.h"
 
+#include "../contextaction.h"
 #include "../player.h"
 
 #include "area.h"
@@ -75,7 +75,7 @@ public:
     bool handle(const SDL_Event &event);
     void update(float dt);
 
-    std::set<ContextualAction> getContextualActions(const std::shared_ptr<Object> &object) const;
+    std::vector<ContextAction> getContextActions(const std::shared_ptr<Object> &object) const;
 
     const std::string &name() const { return _name; }
     const ModuleInfo &info() const { return _info; }

@@ -58,18 +58,6 @@ enum class CursorType {
     RecoverMine
 };
 
-enum class ContextualAction {
-    None,
-    Unlock,
-    Attack,
-    PowerAttack,
-    CriticalStrike,
-    Flurry,
-    PowerShot,
-    SniperShot,
-    RapidShot
-};
-
 enum class WeaponType {
     None = 0,
     Melee = 1,
@@ -506,6 +494,7 @@ enum class Ability {
 };
 
 enum class Skill {
+    Invalid = -1,
     ComputerUse = 0,
     Demolitions = 1,
     Stealth = 2,
@@ -952,8 +941,6 @@ enum class ActionType {
     EquipMostDamagingMelee = 0x101c,
     EquipMostDamagingRanged = 0x101d,
     EquipMostEffectiveArmor = 0x101e,
-    UnlockObject = 0x101f,
-    LockObject = 0x1020,
     CastFakeSpellAtObject = 0x1021,
     CastFakeSpellAtLocation = 0x1022,
     BarkString = 0x1023,

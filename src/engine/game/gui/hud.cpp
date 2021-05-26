@@ -22,6 +22,7 @@
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/window.h"
 
+#include "../action/usefeat.h"
 #include "../game.h"
 #include "../gameidutil.h"
 
@@ -34,6 +35,8 @@ using namespace reone::resource;
 namespace reone {
 
 namespace game {
+
+static string g_attackIcon("i_attack");
 
 HUD::HUD(Game *game) : GameGUI(game), _select(game) {
     _resRef = getResRef("mipc28x6");
@@ -287,9 +290,26 @@ void HUD::refreshActionQueueItems() const {
     auto &actions = _game->services().party().getLeader()->actions();
 
     for (int i = 0; i < 4; ++i) {
-        bool attack = i < static_cast<int>(actions.size()) && actions[i]->type() == ActionType::AttackObject;
         Control &item = getControl("LBL_QUEUE" + to_string(i));
-        item.setBorderFill(attack ? "i_attack" : "");
+        if (i < static_cast<int>(actions.size())) {
+            switch (actions[i]->type()) {
+                case ActionType::AttackObject:
+                    item.setBorderFill(g_attackIcon);
+                    break;
+                case ActionType::UseFeat: {
+                    auto featAction = static_pointer_cast<UseFeatAction>(actions[i]);
+                    shared_ptr<Feat> feat(_game->services().feats().get(featAction->feat()));
+                    if (feat) {
+                        item.setBorderFill(feat->icon);
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        } else {
+            item.setBorderFill("");
+        }
     }
 }
 

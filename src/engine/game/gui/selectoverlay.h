@@ -26,16 +26,12 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
-#include "../types.h"
+#include "../../graphics/font.h"
+#include "../../graphics/texture/texture.h"
+
+#include "../contextaction.h"
 
 namespace reone {
-
-namespace graphics {
-
-class Font;
-class Texture;
-
-}
 
 namespace game {
 
@@ -54,7 +50,7 @@ public:
 
 private:
     struct ActionSlot {
-        std::vector<ContextualAction> actions;
+        std::vector<ContextAction> actions;
         uint32_t indexSelected { 0 };
     };
 
@@ -68,7 +64,6 @@ private:
     std::shared_ptr<graphics::Texture> _friendlyScroll;
     std::shared_ptr<graphics::Texture> _hostileScroll;
     std::shared_ptr<graphics::Texture> _hilightedScroll;
-    std::unordered_map<ContextualAction, std::shared_ptr<graphics::Texture>> _textureByAction;
     std::shared_ptr<SpatialObject> _hilightedObject;
     std::shared_ptr<SpatialObject> _selectedObject;
     std::vector<ActionSlot> _actionSlots;
@@ -79,8 +74,6 @@ private:
     bool _hilightedHostile { false };
     bool _selectedHostile { false };
     bool _hasActions { false };
-
-    void addTextureByAction(ContextualAction action, const std::string &resRef);
 
     bool handleMouseMotion(const SDL_MouseMotionEvent &event);
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);

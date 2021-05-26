@@ -574,14 +574,14 @@ Variable Routines::actionEquipMostEffectiveArmor(const VariablesList &args, Exec
 
 Variable Routines::actionUnlockObject(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: extract and pass all arguments to an action
-    auto action = make_unique<Action>(ActionType::UnlockObject);
+    auto action = make_unique<Action>(ActionType::OpenLock);
     getCaller(ctx)->addAction(move(action));
     return Variable();
 }
 
 Variable Routines::actionLockObject(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: extract and pass all arguments to an action
-    auto action = make_unique<Action>(ActionType::LockObject);
+    auto action = make_unique<Action>(ActionType::Lock);
     getCaller(ctx)->addAction(move(action));
     return Variable();
 }
