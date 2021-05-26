@@ -56,7 +56,6 @@ const int MAX_GRASS_CLUSTERS = 256;
 const int MAX_DANGLYMESH_CONSTRAINTS = 512;
 
 const float PI = 3.14159265359;
-const float GAMMA = 2.2;
 const float SHADOW_FAR_PLANE = 10000.0;
 
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
