@@ -33,7 +33,7 @@ SceneServices::SceneServices(GraphicsOptions options, GraphicsServices &graphics
 void SceneServices::init() {
     _graph = make_unique<SceneGraph>(_options, _graphics);
 
-    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, _graph.get());
+    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, _graphics, *_graph);
     _worldRenderPipeline->init();
 }
 

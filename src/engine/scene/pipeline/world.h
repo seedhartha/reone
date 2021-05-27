@@ -23,6 +23,7 @@
 
 #include "../../graphics/framebuffer.h"
 #include "../../graphics/renderbuffer.h"
+#include "../../graphics/services.h"
 #include "../../graphics/texture/texture.h"
 #include "../../graphics/types.h"
 
@@ -34,14 +35,15 @@ namespace scene {
 
 class WorldRenderPipeline : boost::noncopyable {
 public:
-    WorldRenderPipeline(graphics::GraphicsOptions opts, SceneGraph *sceneGraph);
+    WorldRenderPipeline(graphics::GraphicsOptions options, graphics::GraphicsServices &graphics, SceneGraph &sceneGraph);
 
     void init();
     void render();
 
 private:
-    graphics::GraphicsOptions _opts;
-    SceneGraph *_sceneGraph;
+    graphics::GraphicsOptions _options;
+    graphics::GraphicsServices &_graphics;
+    SceneGraph &_sceneGraph;
 
     glm::mat4 _lightSpaceMatrices[graphics::kNumCubeFaces];
 

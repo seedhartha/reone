@@ -17,11 +17,6 @@
 
 #include "classes.h"
 
-#include <stdexcept>
-
-#include "../../common/guardutil.h"
-#include "../../resource/resources.h"
-
 using namespace std;
 using namespace std::placeholders;
 
@@ -33,19 +28,15 @@ namespace game {
 
 static const char kClassesTableResRef[] = "classes";
 
-Classes::Classes(Resources *resources, Strings *strings) :
+Classes::Classes(ResourceServices &resource) :
     MemoryCache(bind(&Classes::doGet, this, _1)),
-    _resources(resources),
-    _strings(strings) {
-
-    ensureNotNull(resources, "resources");
-    ensureNotNull(strings, "strings");
+    _resource(resource) {
 }
 
 shared_ptr<CreatureClass> Classes::doGet(ClassType type) {
-    shared_ptr<TwoDA> classes(_resources->get2DA(kClassesTableResRef));
+    shared_ptr<TwoDA> classes(_resource.resources().get2DA(kClassesTableResRef));
 
-    auto clazz = make_shared<CreatureClass>(type, this, _resources, _strings);
+    auto clazz = make_shared<CreatureClass>(type, *this, _resource);
     clazz->load(*classes, static_cast<int>(type));
 
     return move(clazz);

@@ -22,8 +22,7 @@
 #include <vector>
 
 #include "../../resource/format/2dareader.h"
-#include "../../resource/resources.h"
-#include "../../resource/strings.h"
+#include "../../resource/services.h"
 
 #include "../types.h"
 
@@ -38,7 +37,7 @@ class Classes;
 
 class CreatureClass {
 public:
-    CreatureClass(ClassType type, Classes *classes, resource::Resources *resources, resource::Strings *strings);
+    CreatureClass(ClassType type, Classes &classes, resource::ResourceServices &resource);
 
     void load(const resource::TwoDA &twoDa, int row);
 
@@ -62,9 +61,8 @@ public:
     int skillPointBase() const { return _skillPointBase; }
 
 private:
-    Classes *_classes;
-    resource::Resources *_resources;
-    resource::Strings *_strings;
+    Classes &_classes;
+    resource::ResourceServices &_resource;
 
     ClassType _type;
     std::string _name;

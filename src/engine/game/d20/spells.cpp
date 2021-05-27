@@ -18,7 +18,6 @@
 #include "spells.h"
 
 #include "../../common/collectionutil.h"
-#include "../../common/guardutil.h"
 
 using namespace std;
 
@@ -29,20 +28,19 @@ namespace reone {
 
 namespace game {
 
-Spells::Spells(Textures *textures, Resources *resources, Strings *strings) : _textures(textures), _resources(resources), _strings(strings) {
-    ensureNotNull(textures, "textures");
-    ensureNotNull(resources, "resources");
-    ensureNotNull(strings, "strings");
+Spells::Spells(Textures &textures, ResourceServices &resource) :
+    _textures(textures),
+    _resource(resource) {
 }
 
 void Spells::init() {
-    shared_ptr<TwoDA> spells(_resources->get2DA("spells"));
+    shared_ptr<TwoDA> spells(_resource.resources().get2DA("spells"));
     if (!spells) return;
 
     for (int row = 0; row < spells->getRowCount(); ++row) {
-        string name(_strings->get(spells->getInt(row, "name", -1)));
-        string description(_strings->get(spells->getInt(row, "spelldesc", -1)));
-        shared_ptr<Texture> icon(_textures->get(spells->getString(row, "iconresref"), TextureUsage::GUI));
+        string name(_resource.strings().get(spells->getInt(row, "name", -1)));
+        string description(_resource.strings().get(spells->getInt(row, "spelldesc", -1)));
+        shared_ptr<Texture> icon(_textures.get(spells->getString(row, "iconresref"), TextureUsage::GUI));
         uint32_t pips = spells->getUint(row, "pips");
 
         auto spell = make_shared<Spell>();

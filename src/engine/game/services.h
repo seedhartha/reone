@@ -53,7 +53,7 @@ class Game;
 class GameServices : boost::noncopyable {
 public:
     GameServices(
-        Game *game,
+        Game &game,
         resource::ResourceServices &resource,
         graphics::GraphicsServices &graphics,
         audio::AudioServices &audio,
@@ -86,7 +86,7 @@ public:
     Surfaces &surfaces() { return *_surfaces; }
 
 private:
-    Game *_game;
+    Game &_game;
     resource::ResourceServices &_resource;
     graphics::GraphicsServices &_graphics;
     audio::AudioServices &_audio;

@@ -21,8 +21,6 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../../common/guardutil.h"
-
 #include "classes.h"
 
 using namespace std;
@@ -35,20 +33,15 @@ namespace game {
 
 static const char kSkillsTwoDaResRef[] = "skills";
 
-CreatureClass::CreatureClass(ClassType type, Classes *classes, Resources *resources, Strings *strings) :
+CreatureClass::CreatureClass(ClassType type, Classes &classes, ResourceServices &resource) :
     _type(type),
     _classes(classes),
-    _resources(resources),
-    _strings(strings) {
-
-    ensureNotNull(classes, "classes");
-    ensureNotNull(resources, "resources");
-    ensureNotNull(strings, "strings");
+    _resource(resource) {
 }
 
 void CreatureClass::load(const TwoDA &twoDa, int row) {
-    _name = _strings->get(twoDa.getInt(row, "name"));
-    _description = _strings->get(twoDa.getInt(row, "description"));
+    _name = _resource.strings().get(twoDa.getInt(row, "name"));
+    _description = _resource.strings().get(twoDa.getInt(row, "description"));
     _hitdie = twoDa.getInt(row, "hitdie");
     _skillPointBase = twoDa.getInt(row, "skillpointbase");
 
@@ -71,7 +64,7 @@ void CreatureClass::load(const TwoDA &twoDa, int row) {
 }
 
 void CreatureClass::loadClassSkills(const string &skillsTable) {
-    shared_ptr<TwoDA> skills(_resources->get2DA(kSkillsTwoDaResRef));
+    shared_ptr<TwoDA> skills(_resource.resources().get2DA(kSkillsTwoDaResRef));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         if (skills->getInt(row, skillsTable + "_class") == 1) {
             _classSkills.insert(static_cast<SkillType>(row));
@@ -80,7 +73,7 @@ void CreatureClass::loadClassSkills(const string &skillsTable) {
 }
 
 void CreatureClass::loadSavingThrows(const string &savingThrowTable) {
-    shared_ptr<TwoDA> twoDa(_resources->get2DA(savingThrowTable));
+    shared_ptr<TwoDA> twoDa(_resource.resources().get2DA(savingThrowTable));
     for (int row = 0; row < twoDa->getRowCount(); ++row) {
         int level = twoDa->getInt(row, "level");
 
@@ -94,7 +87,7 @@ void CreatureClass::loadSavingThrows(const string &savingThrowTable) {
 }
 
 void CreatureClass::loadAttackBonuses(const string &attackBonusTable) {
-    shared_ptr<TwoDA> twoDa(_resources->get2DA(attackBonusTable));
+    shared_ptr<TwoDA> twoDa(_resource.resources().get2DA(attackBonusTable));
     for (int row = 0; row < twoDa->getRowCount(); ++row) {
         _attackBonuses.push_back(twoDa->getInt(row, "bab"));
     }

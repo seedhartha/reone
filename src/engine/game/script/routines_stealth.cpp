@@ -32,43 +32,43 @@ namespace reone {
 namespace game {
 
 Variable Routines::getMaxStealthXP(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game->module()->area()->maxStealthXP());
+    return Variable::ofInt(_game.module()->area()->maxStealthXP());
 }
 
 Variable Routines::setMaxStealthXP(const VariablesList &args, ExecutionContext &ctx) {
     int max = getInt(args, 0);
-    _game->module()->area()->setMaxStealthXP(max);
+    _game.module()->area()->setMaxStealthXP(max);
     return Variable();
 }
 
 Variable Routines::getCurrentStealthXP(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game->module()->area()->currentStealthXP());
+    return Variable::ofInt(_game.module()->area()->currentStealthXP());
 }
 
 Variable Routines::setCurrentStealthXP(const VariablesList &args, ExecutionContext &ctx) {
     int current = getInt(args, 0);
-    _game->module()->area()->setCurrentStealthXP(current);
+    _game.module()->area()->setCurrentStealthXP(current);
     return Variable();
 }
 
 Variable Routines::getStealthXPEnabled(const VariablesList &args, ExecutionContext &ctx) {
-    bool result = _game->module()->area()->isStealthXPEnabled();
+    bool result = _game.module()->area()->isStealthXPEnabled();
     return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable Routines::setStealthXPEnabled(const VariablesList &args, ExecutionContext &ctx) {
     bool enabled = getBool(args, 0);
-    _game->module()->area()->setStealthXPEnabled(enabled);
+    _game.module()->area()->setStealthXPEnabled(enabled);
     return Variable();
 }
 
 Variable Routines::getStealthXPDecrement(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game->module()->area()->stealthXPDecrement());
+    return Variable::ofInt(_game.module()->area()->stealthXPDecrement());
 }
 
 Variable Routines::setStealthXPDecrement(const VariablesList &args, ExecutionContext &ctx) {
     int decrement = getInt(args, 0);
-    _game->module()->area()->setStealthXPDecrement(decrement);
+    _game.module()->area()->setStealthXPDecrement(decrement);
     return Variable();
 }
 

@@ -25,6 +25,7 @@
 #include "../action/usefeat.h"
 #include "../game.h"
 #include "../gameidutil.h"
+#include "../party.h"
 
 using namespace std;
 

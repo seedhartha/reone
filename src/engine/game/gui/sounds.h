@@ -32,7 +32,7 @@ namespace game {
 
 class GUISounds : boost::noncopyable {
 public:
-    GUISounds(audio::AudioFiles *audioFiles, resource::Resources *resources);
+    GUISounds(audio::AudioFiles &audioFiles, resource::Resources &resources);
     ~GUISounds();
 
     void init();
@@ -42,8 +42,8 @@ public:
     std::shared_ptr<audio::AudioStream> getOnEnter() const { return _onEnter; }
 
 private:
-    audio::AudioFiles *_audioFiles;
-    resource::Resources *_resources;
+    audio::AudioFiles &_audioFiles;
+    resource::Resources &_resources;
 
     std::shared_ptr<audio::AudioStream> _onClick;
     std::shared_ptr<audio::AudioStream> _onEnter;

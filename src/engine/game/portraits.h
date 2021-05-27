@@ -34,7 +34,7 @@ namespace game {
 
 class Portraits : boost::noncopyable {
 public:
-    Portraits(graphics::Textures *textures, resource::Resources *resources);
+    Portraits(graphics::Textures &textures, resource::Resources &resources);
 
     void init();
 
@@ -44,8 +44,8 @@ public:
     const std::vector<Portrait> &portraits() const { return _portraits; }
 
 private:
-    graphics::Textures *_textures;
-    resource::Resources *_resources;
+    graphics::Textures &_textures;
+    resource::Resources &_resources;
 
     std::vector<Portrait> _portraits;
 

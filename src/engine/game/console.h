@@ -42,7 +42,7 @@ class Game;
 
 class Console : boost::noncopyable {
 public:
-    Console(Game *game);
+    Console(Game &game);
 
     void init();
     bool handle(const SDL_Event &event);
@@ -53,7 +53,7 @@ public:
 private:
     typedef std::function<void(std::vector<std::string>)> CommandHandler;
 
-    Game *_game;
+    Game &_game;
 
     graphics::GraphicsOptions _opts;
     std::shared_ptr<graphics::Font> _font;

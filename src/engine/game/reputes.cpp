@@ -22,9 +22,6 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../common/guardutil.h"
-#include "../resource/resources.h"
-
 using namespace std;
 
 using namespace reone::resource;
@@ -38,12 +35,11 @@ static constexpr int kDefaultRepute = 50;
 static vector<string> g_factionLabels;
 static vector<vector<int>> g_factionValues;
 
-Reputes::Reputes(Resources *resources) : _resources(resources) {
-    ensureNotNull(resources, "resources");
+Reputes::Reputes(Resources &resources) : _resources(resources) {
 }
 
 void Reputes::init() {
-    shared_ptr<TwoDA> repute(_resources->get2DA("repute"));
+    shared_ptr<TwoDA> repute(_resources.get2DA("repute"));
 
     for (int row = 0; row < repute->getRowCount(); ++row) {
         g_factionLabels.push_back(boost::to_lower_copy(repute->getString(row, "label")));

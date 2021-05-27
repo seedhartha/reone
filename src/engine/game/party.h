@@ -37,7 +37,7 @@ class Object;
  */
 class Party {
 public:
-    Party(Game *game);
+    Party(Game &game);
 
     bool handle(const SDL_Event &event);
 
@@ -90,7 +90,8 @@ private:
         std::shared_ptr<Creature> creature;
     };
 
-    Game *_game { nullptr };
+    Game &_game;
+
     std::shared_ptr<Creature> _player;
     std::map<int, std::string> _availableMembers;
     std::vector<Member> _members;

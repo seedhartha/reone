@@ -29,7 +29,7 @@ ScriptServices::ScriptServices(ResourceServices &resource) : _resource(resource)
 }
 
 void ScriptServices::init() {
-    _scripts = make_unique<Scripts>(&_resource.resources());
+    _scripts = make_unique<Scripts>(_resource.resources());
 }
 
 } // namespace script

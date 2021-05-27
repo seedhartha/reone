@@ -50,7 +50,7 @@ class Talent;
 
 class Routines : public script::IRoutineProvider, boost::noncopyable {
 public:
-    Routines(Game *game);
+    Routines(Game &game);
     ~Routines();
 
     void init();
@@ -62,7 +62,8 @@ private:
     typedef std::vector<script::VariableType> VariableTypesList;
     typedef std::vector<script::Variable> VariablesList;
 
-    Game *_game { nullptr };
+    Game &_game;
+
     std::vector<script::Routine> _routines;
 
     void add(const std::string &name, script::VariableType retType, const VariableTypesList &argTypes);

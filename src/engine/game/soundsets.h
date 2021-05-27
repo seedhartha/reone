@@ -21,8 +21,7 @@
 
 #include "../audio/files.h"
 #include "../common/cache.h"
-#include "../resource/resources.h"
-#include "../resource/strings.h"
+#include "../resource/services.h"
 
 #include "types.h"
 
@@ -32,12 +31,11 @@ namespace game {
 
 class SoundSets : public MemoryCache<std::string, SoundSet> {
 public:
-    SoundSets(audio::AudioFiles *audioFiles, resource::Resources *resources, resource::Strings *strings);
+    SoundSets(audio::AudioFiles &audioFiles, resource::ResourceServices &resource);
 
 private:
-    audio::AudioFiles *_audioFiles;
-    resource::Resources *_resources;
-    resource::Strings *_strings;
+    audio::AudioFiles &_audioFiles;
+    resource::ResourceServices &_resource;
 
     std::shared_ptr<SoundSet> doGet(std::string resRef);
 };

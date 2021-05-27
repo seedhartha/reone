@@ -17,8 +17,6 @@
 
 #include "fonts.h"
 
-#include "services.h"
-
 using namespace std;
 using namespace std::placeholders;
 
@@ -32,9 +30,13 @@ static unordered_map<string, string> g_fontOverride = {
     { "fnt_d16x16", "fnt_d16x16b" }
 };
 
-Fonts::Fonts(GraphicsServices &graphics) :
+Fonts::Fonts(Window &window, Context &context, Meshes &meshes, Textures &textures, Shaders &shaders) :
     MemoryCache(bind(&Fonts::doGet, this, _1)),
-    _graphics(graphics) {
+    _window(window),
+    _context(context),
+    _meshes(meshes),
+    _textures(textures),
+    _shaders(shaders) {
 }
 
 shared_ptr<Font> Fonts::doGet(string resRef) {
@@ -42,10 +44,10 @@ shared_ptr<Font> Fonts::doGet(string resRef) {
     if (maybeOverride != g_fontOverride.end()) {
         resRef = maybeOverride->second;
     }
-    shared_ptr<Texture> texture(_graphics.textures().get(resRef, TextureUsage::GUI));
+    shared_ptr<Texture> texture(_textures.get(resRef, TextureUsage::GUI));
     if (!texture) return nullptr;
 
-    auto font = make_shared<Font>(_graphics);
+    auto font = make_shared<Font>(_window, _context, _meshes, _shaders);
     font->load(texture);
 
     return move(font);

@@ -21,7 +21,6 @@
 #include <string>
 
 #include "../../common/collectionutil.h"
-#include "../../common/guardutil.h"
 
 using namespace std;
 
@@ -32,24 +31,19 @@ namespace reone {
 
 namespace game {
 
-Feats::Feats(Textures *textures, Resources *resources, Strings *strings) :
+Feats::Feats(Textures &textures, ResourceServices &resource) :
     _textures(textures),
-    _resources(resources),
-    _strings(strings) {
-
-    ensureNotNull(textures, "textures");
-    ensureNotNull(resources, "resources");
-    ensureNotNull(strings, "strings");
+    _resource(resource) {
 }
 
 void Feats::init() {
-    shared_ptr<TwoDA> feats(_resources->get2DA("feat"));
+    shared_ptr<TwoDA> feats(_resource.resources().get2DA("feat"));
     if (!feats) return;
 
     for (int row = 0; row < feats->getRowCount(); ++row) {
-        string name(_strings->get(feats->getInt(row, "name", -1)));
-        string description(_strings->get(feats->getInt(row, "description", -1)));
-        shared_ptr<Texture> icon(_textures->get(feats->getString(row, "icon"), TextureUsage::GUI));
+        string name(_resource.strings().get(feats->getInt(row, "name", -1)));
+        string description(_resource.strings().get(feats->getInt(row, "description", -1)));
+        shared_ptr<Texture> icon(_textures.get(feats->getString(row, "icon"), TextureUsage::GUI));
         uint32_t minCharLevel = feats->getUint(row, "mincharlevel");
         auto preReqFeat1 = static_cast<FeatType>(feats->getUint(row, "prereqfeat1"));
         auto preReqFeat2 = static_cast<FeatType>(feats->getUint(row, "prereqfeat2"));

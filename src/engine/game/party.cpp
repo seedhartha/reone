@@ -19,7 +19,6 @@
 
 #include <stdexcept>
 
-#include "../common/guardutil.h"
 #include "../common/log.h"
 #include "../common/random.h"
 
@@ -35,8 +34,7 @@ namespace game {
 
 static constexpr int kMaxMemberCount = 3;
 
-Party::Party(Game *game) : _game(game) {
-    ensureNotNull(game, "game");
+Party::Party(Game &game) : _game(game) {
 }
 
 bool Party::handle(const SDL_Event &event) {
@@ -127,7 +125,7 @@ void Party::onLeaderChanged() {
         member.creature->clearAllActions();
     }
 
-    _game->module()->area()->onPartyLeaderMoved(true);
+    _game.module()->area()->onPartyLeaderMoved(true);
 }
 
 const string &Party::getAvailableMember(int npc) const {

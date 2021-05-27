@@ -22,8 +22,7 @@
 #include <boost/noncopyable.hpp>
 
 #include "../../graphics/texture/textures.h"
-#include "../../resource/resources.h"
-#include "../../resource/strings.h"
+#include "../../resource/services.h"
 
 #include "../types.h"
 
@@ -35,16 +34,15 @@ namespace game {
 
 class Spells : boost::noncopyable {
 public:
-    Spells(graphics::Textures *textures, resource::Resources *resources, resource::Strings *strings);
+    Spells(graphics::Textures &textures, resource::ResourceServices &resource);
 
     void init();
 
     std::shared_ptr<Spell> get(ForcePower type) const;
 
 private:
-    graphics::Textures *_textures;
-    resource::Resources *_resources;
-    resource::Strings *_strings;
+    graphics::Textures &_textures;
+    resource::ResourceServices &_resource;
 
     std::unordered_map<ForcePower, std::shared_ptr<Spell>> _spells;
 };

@@ -21,20 +21,27 @@
 
 #include "../common/cache.h"
 
+#include "context.h"
 #include "font.h"
+#include "mesh/meshes.h"
+#include "shader/shaders.h"
+#include "texture/textures.h"
+#include "window.h"
 
 namespace reone {
 
 namespace graphics {
 
-class GraphicsServices;
-
 class Fonts : public MemoryCache<std::string, Font> {
 public:
-    Fonts(GraphicsServices &graphics);
+    Fonts(Window &window, Context &context, Meshes &meshes, Textures &textures, Shaders &shaders);
 
 private:
-    GraphicsServices &_graphics;
+    Window &_window;
+    Context &_context;
+    Meshes &_meshes;
+    Textures &_textures;
+    Shaders &_shaders;
 
     std::shared_ptr<Font> doGet(std::string resRef);
 };

@@ -87,13 +87,13 @@ void Game::init() {
 
     initResourceProviders();
 
-    _game = make_unique<GameServices>(this, _resource, _graphics, _audio, _scene, _script);
+    _game = make_unique<GameServices>(*this, _resource, _graphics, _audio, _scene, _script);
     _game->init();
 
     _graphics.window().setEventHandler(this);
     _graphics.walkmeshes().setWalkableSurfaces(_game->surfaces().getWalkableSurfaceIndices());
 
-    _console = make_unique<Console>(this);
+    _console = make_unique<Console>(*this);
     _console->init();
 
     _profileOverlay = make_unique<ProfileOverlay>(_graphics);

@@ -18,7 +18,6 @@
 #include "objectfactory.h"
 
 #include "../../common/collectionutil.h"
-#include "../../common/guardutil.h"
 
 using namespace std;
 
@@ -28,55 +27,53 @@ namespace reone {
 
 namespace game {
 
-ObjectFactory::ObjectFactory(Game *game, SceneGraph *sceneGraph) :
-    _game(game), _sceneGraph(sceneGraph) {
-
-    ensureNotNull(game, "game");
-    ensureNotNull(sceneGraph, "sceneGraph");
+ObjectFactory::ObjectFactory(Game &game, SceneGraph &sceneGraph) :
+    _game(game),
+    _sceneGraph(sceneGraph) {
 }
 
 shared_ptr<Module> ObjectFactory::newModule() {
-    return newObject<Module>(_game);
+    return newObject<Module>(&_game);
 }
 
 shared_ptr<Area> ObjectFactory::newArea() {
-    return newObject<Area>(_game);
+    return newObject<Area>(&_game);
 }
 
 shared_ptr<Creature> ObjectFactory::newCreature() {
-    return newObject<Creature>(_game, this, _sceneGraph);
+    return newObject<Creature>(&_game, this, &_sceneGraph);
 }
 
 shared_ptr<Placeable> ObjectFactory::newPlaceable() {
-    return newObject<Placeable>(_game, this, _sceneGraph);
+    return newObject<Placeable>(&_game, this, &_sceneGraph);
 }
 
 shared_ptr<Door> ObjectFactory::newDoor() {
-    return newObject<Door>(_game, this, _sceneGraph);
+    return newObject<Door>(&_game, this, &_sceneGraph);
 }
 
 shared_ptr<Waypoint> ObjectFactory::newWaypoint() {
-    return newObject<Waypoint>(_game, this, _sceneGraph);
+    return newObject<Waypoint>(&_game, this, &_sceneGraph);
 }
 
 shared_ptr<Trigger> ObjectFactory::newTrigger() {
-    return newObject<Trigger>(_game, this, _sceneGraph);
+    return newObject<Trigger>(&_game, this, &_sceneGraph);
 }
 
 shared_ptr<Item> ObjectFactory::newItem() {
-    return newObject<Item>(_game);
+    return newObject<Item>(&_game);
 }
 
 shared_ptr<Sound> ObjectFactory::newSound() {
-    return newObject<Sound>(_game, this, _sceneGraph);
+    return newObject<Sound>(&_game, this, &_sceneGraph);
 }
 
 shared_ptr<PlaceableCamera> ObjectFactory::newCamera() {
-    return newObject<PlaceableCamera>(_game, this, _sceneGraph);
+    return newObject<PlaceableCamera>(&_game, this, &_sceneGraph);
 }
 
 shared_ptr<Encounter> ObjectFactory::newEncounter() {
-    return newObject<Encounter>(_game, this, _sceneGraph);
+    return newObject<Encounter>(&_game, this, &_sceneGraph);
 }
 
 shared_ptr<Object> ObjectFactory::getObjectById(uint32_t id) const {

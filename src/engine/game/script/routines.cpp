@@ -17,8 +17,6 @@
 
 #include "routines.h"
 
-#include "../../common/guardutil.h"
-
 #include "../enginetype/effect.h"
 #include "../enginetype/event.h"
 #include "../enginetype/location.h"
@@ -40,12 +38,11 @@ namespace reone {
 
 namespace game {
 
-Routines::Routines(Game *game) : _game(game) {
-    ensureNotNull(game, "game");
+Routines::Routines(Game &game) : _game(game) {
 }
 
 void Routines::init() {
-    if (isTSL(_game->gameId())) {
+    if (isTSL(_game.gameId())) {
         addTslRoutines();
     } else {
         addKotorRoutines();
@@ -91,7 +88,7 @@ glm::vec3 Routines::getVector(const VariablesList &args, int index, glm::vec3 de
 }
 
 shared_ptr<Object> Routines::getCaller(ExecutionContext &ctx) const {
-    return _game->getObjectById(ctx.callerId);
+    return _game.getObjectById(ctx.callerId);
 }
 
 shared_ptr<SpatialObject> Routines::getCallerAsSpatial(ExecutionContext &ctx) const {
@@ -103,7 +100,7 @@ shared_ptr<Creature> Routines::getCallerAsCreature(ExecutionContext &ctx) const 
 }
 
 shared_ptr<Object> Routines::getTriggerrer(ExecutionContext &ctx) const {
-    return _game->getObjectById(ctx.triggererId);
+    return _game.getObjectById(ctx.triggererId);
 }
 
 shared_ptr<Object> Routines::getObject(const VariablesList &args, int index, ExecutionContext &ctx) const {
@@ -111,7 +108,7 @@ shared_ptr<Object> Routines::getObject(const VariablesList &args, int index, Exe
     if (objectId == kObjectSelf) {
         objectId = ctx.callerId;
     }
-    return _game->getObjectById(objectId);
+    return _game.getObjectById(objectId);
 }
 
 shared_ptr<Object> Routines::getObjectOrCaller(const VariablesList &args, int index, ExecutionContext &ctx) const {
@@ -119,7 +116,7 @@ shared_ptr<Object> Routines::getObjectOrCaller(const VariablesList &args, int in
     if (objectId == kObjectSelf) {
         objectId = ctx.callerId;
     }
-    return _game->getObjectById(objectId);
+    return _game.getObjectById(objectId);
 }
 
 shared_ptr<SpatialObject> Routines::getSpatialObject(const VariablesList &args, int index, ExecutionContext &ctx) const {

@@ -24,8 +24,6 @@
 #include "glm/gtx/euler_angles.hpp"
 #include "glm/gtx/transform.hpp"
 
-#include "../game.h"
-
 using namespace std;
 
 using namespace reone::graphics;

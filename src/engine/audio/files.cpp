@@ -17,9 +17,7 @@
 
 #include "files.h"
 
-#include "../common/guardutil.h"
 #include "../common/streamutil.h"
-#include "../resource/resources.h"
 
 #include "format/mp3reader.h"
 #include "format/wavreader.h"
@@ -33,24 +31,22 @@ namespace reone {
 
 namespace audio {
 
-AudioFiles::AudioFiles(Resources *resources) :
+AudioFiles::AudioFiles(Resources &resources) :
     MemoryCache(bind(&AudioFiles::doGet, this, _1)),
     _resources(resources) {
-
-    ensureNotNull(resources, "resources");
 }
 
 shared_ptr<AudioStream> AudioFiles::doGet(string resRef) {
     shared_ptr<AudioStream> result;
 
-    shared_ptr<ByteArray> mp3Data(_resources->getRaw(resRef, ResourceType::Mp3, false));
+    shared_ptr<ByteArray> mp3Data(_resources.getRaw(resRef, ResourceType::Mp3, false));
     if (mp3Data) {
         Mp3Reader mp3;
         mp3.load(wrap(mp3Data));
         result = mp3.stream();
     }
     if (!result) {
-        shared_ptr<ByteArray> wavData(_resources->getRaw(resRef, ResourceType::Wav));
+        shared_ptr<ByteArray> wavData(_resources.getRaw(resRef, ResourceType::Wav));
         if (wavData) {
             WavReader wav;
             wav.load(wrap(wavData));

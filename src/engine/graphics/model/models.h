@@ -36,15 +36,15 @@ class Model;
 
 class Models : boost::noncopyable {
 public:
-    Models(Textures *textures, resource::Resources *resources);
+    Models(Textures &textures, resource::Resources &resources);
 
     void invalidateCache();
 
     std::shared_ptr<Model> get(const std::string &resRef);
 
 private:
-    Textures *_textures;
-    resource::Resources *_resources;
+    Textures &_textures;
+    resource::Resources &_resources;
 
     std::unordered_map<std::string, std::shared_ptr<Model>> _cache;
 

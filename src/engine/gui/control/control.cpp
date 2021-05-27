@@ -657,7 +657,7 @@ void Control::setScene(unique_ptr<SceneGraph> scene) {
 
     if (_scene) {
         glm::ivec4 extent(_extent.left, _extent.top, _extent.width, _extent.height);
-        _pipeline = make_unique<ControlRenderPipeline>(extent, _scene.get());
+        _pipeline = make_unique<ControlRenderPipeline>(extent, _gui->graphics(), *_scene);
         _pipeline->init();
     }
 }

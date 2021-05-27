@@ -29,7 +29,7 @@ namespace game {
 
 class Reputes : boost::noncopyable {
 public:
-    Reputes(resource::Resources *resources);
+    Reputes(resource::Resources &resources);
 
     void init();
 
@@ -38,7 +38,7 @@ public:
     bool getIsNeutral(const Creature &left, const Creature &right);
 
 private:
-    resource::Resources *_resources;
+    resource::Resources &_resources;
 
     int getRepute(const Creature &left, const Creature &right) const;
 };

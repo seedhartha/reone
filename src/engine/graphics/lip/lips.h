@@ -30,10 +30,10 @@ namespace graphics {
 
 class Lips : public MemoryCache<std::string, LipAnimation> {
 public:
-    Lips(resource::Resources *resources);
+    Lips(resource::Resources &resources);
 
 private:
-    resource::Resources *_resources;
+    resource::Resources &_resources;
 
     std::shared_ptr<LipAnimation> doGet(std::string resRef);
 };

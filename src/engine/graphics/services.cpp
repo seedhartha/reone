@@ -42,23 +42,24 @@ void GraphicsServices::init() {
     _meshes = make_unique<Meshes>();
     _meshes->init();
 
-    _textures = make_unique<Textures>(*this, _resource);
+    _textures = make_unique<Textures>(*_context, _resource.resources());
     _textures->init();
+    _textures->bindDefaults();
 
-    _materials = make_unique<Materials>(&_resource.resources());
+    _materials = make_unique<Materials>(_resource.resources());
     _materials->init();
 
-    _models = make_unique<Models>(_textures.get(), &_resource.resources());
-    _walkmeshes = make_unique<Walkmeshes>(&_resource.resources());
-    _lips = make_unique<Lips>(&_resource.resources());
+    _models = make_unique<Models>(*_textures, _resource.resources());
+    _walkmeshes = make_unique<Walkmeshes>(_resource.resources());
+    _lips = make_unique<Lips>(_resource.resources());
 
     _shaders = make_unique<Shaders>();
     _shaders->init();
 
-    _pbrIbl = make_unique<PBRIBL>(*this);
+    _pbrIbl = make_unique<PBRIBL>(*_context, *_meshes, *_shaders);
     _pbrIbl->init();
 
-    _fonts = make_unique<Fonts>(*this);
+    _fonts = make_unique<Fonts>(*_window, *_context, *_meshes, *_textures, *_shaders);
 }
 
 } // namespace graphics

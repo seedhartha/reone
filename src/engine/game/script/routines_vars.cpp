@@ -36,42 +36,42 @@ namespace game {
 
 Variable Routines::getGlobalBoolean(const VariablesList &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
-    return Variable::ofInt(static_cast<int>(_game->getGlobalBoolean(id)));
+    return Variable::ofInt(static_cast<int>(_game.getGlobalBoolean(id)));
 }
 
 Variable Routines::setGlobalBoolean(const VariablesList &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
     bool value = getBool(args, 1);
 
-    _game->setGlobalBoolean(id, value);
+    _game.setGlobalBoolean(id, value);
 
     return Variable();
 }
 
 Variable Routines::getGlobalNumber(const VariablesList &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
-    return Variable::ofInt(_game->getGlobalNumber(id));
+    return Variable::ofInt(_game.getGlobalNumber(id));
 }
 
 Variable Routines::setGlobalNumber(const VariablesList &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
     int value = getInt(args, 1);
 
-    _game->setGlobalNumber(id, value);
+    _game.setGlobalNumber(id, value);
 
     return Variable();
 }
 
 Variable Routines::getGlobalString(const VariablesList &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
-    return Variable::ofString(_game->getGlobalString(id));
+    return Variable::ofString(_game.getGlobalString(id));
 }
 
 Variable Routines::setGlobalString(const VariablesList &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
     string value(getString(args, 1));
 
-    _game->setGlobalString(id, value);
+    _game.setGlobalString(id, value);
 
     return Variable();
 }
@@ -134,7 +134,7 @@ Variable Routines::setLocalNumber(const VariablesList &args, ExecutionContext &c
 
 Variable Routines::getGlobalLocation(const VariablesList &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
-    return Variable::ofLocation(_game->getGlobalLocation(id));
+    return Variable::ofLocation(_game.getGlobalLocation(id));
 }
 
 Variable Routines::setGlobalLocation(const VariablesList &args, ExecutionContext &ctx) {
@@ -142,7 +142,7 @@ Variable Routines::setGlobalLocation(const VariablesList &args, ExecutionContext
     auto value = getLocationEngineType(args, 1);
 
     if (value) {
-        _game->setGlobalLocation(id, value);
+        _game.setGlobalLocation(id, value);
     } else {
         debug("Script: setGlobalLocation: value is invalid", 1, DebugChannels::script);
     }

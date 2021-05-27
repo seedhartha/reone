@@ -22,7 +22,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../common/guardutil.h"
-#include "../resource/resources.h"
 
 using namespace std;
 
@@ -32,12 +31,11 @@ namespace reone {
 
 namespace game {
 
-Surfaces::Surfaces(Resources *resources) : _resources(resources) {
-    ensureNotNull(resources, "resources");
+Surfaces::Surfaces(Resources &resources) : _resources(resources) {
 }
 
 void Surfaces::init() {
-    shared_ptr<TwoDA> surfacemat(_resources->get2DA("surfacemat"));
+    shared_ptr<TwoDA> surfacemat(_resources.get2DA("surfacemat"));
     for (int row = 0; row < surfacemat->getRowCount(); ++row) {
         Surface surface;
         surface.label = surfacemat->getString(row, "label");

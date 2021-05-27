@@ -49,9 +49,9 @@ namespace game {
 static constexpr int kMaxOutputLineCount = 100;
 static constexpr int kVisibleLineCount = 15;
 
-Console::Console(Game *game) :
+Console::Console(Game &game) :
     _game(game),
-    _opts(game->options().graphics),
+    _opts(game.options().graphics),
     _input(TextInputFlags::console) {
 
     initCommands();
@@ -77,7 +77,7 @@ void Console::cmdClear(vector<string> tokens) {
 }
 
 void Console::cmdDescribe(vector<string> tokens) {
-    auto object = _game->module()->area()->selectedObject();
+    auto object = _game.module()->area()->selectedObject();
     if (!object) {
         print("describe: no object selected");
         return;
@@ -106,9 +106,9 @@ void Console::cmdDescribe(vector<string> tokens) {
 }
 
 void Console::cmdListAnim(vector<string> tokens) {;
-    auto object = _game->module()->area()->selectedObject();
+    auto object = _game.module()->area()->selectedObject();
     if (!object) {
-        object = _game->services().party().getLeader();
+        object = _game.services().party().getLeader();
         if (!object) {
             print("listanim: no object selected");
             return;
@@ -136,9 +136,9 @@ void Console::cmdPlayAnim(vector<string> tokens) {
         print("Usage: playanim anim_name");
         return;
     }
-    auto object = _game->module()->area()->selectedObject();
+    auto object = _game.module()->area()->selectedObject();
     if (!object) {
-        object = _game->services().party().getLeader();
+        object = _game.services().party().getLeader();
         if (!object) {
             print("playanim: no object selected");
             return;
@@ -149,7 +149,7 @@ void Console::cmdPlayAnim(vector<string> tokens) {
 }
 
 void Console::cmdKill(vector<string> tokens) {
-    auto object = _game->module()->area()->selectedObject();
+    auto object = _game.module()->area()->selectedObject();
     if (!object) {
         print("kill: no object selected");
         return;
@@ -163,9 +163,9 @@ void Console::cmdAddItem(vector<string> tokens) {
         print("Usage: additem item_tpl [size]");
         return;
     }
-    auto object = _game->module()->area()->selectedObject();
+    auto object = _game.module()->area()->selectedObject();
     if (!object) {
-        object = _game->services().party().getLeader();
+        object = _game.services().party().getLeader();
         if (!object) {
             print("additem: no object selected");
             return;
@@ -181,9 +181,9 @@ void Console::cmdGiveXP(vector<string> tokens) {
         return;
     }
 
-    auto object = _game->module()->area()->selectedObject();
+    auto object = _game.module()->area()->selectedObject();
     if (!object) {
-        object = _game->services().party().getLeader();
+        object = _game.services().party().getLeader();
     }
     if (!object || object->type() != ObjectType::Creature) {
         print("givexp: no creature selected");
@@ -206,7 +206,7 @@ void Console::trimOutput() {
 }
 
 void Console::init() {
-    _font = _game->services().graphics().fonts().get("fnt_console");
+    _font = _game.services().graphics().fonts().get("fnt_console");
 }
 
 bool Console::handle(const SDL_Event &event) {
@@ -299,13 +299,13 @@ void Console::drawBackground() {
     transform = glm::scale(transform, glm::vec3(_opts.width, height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _game->services().graphics().window().getOrthoProjection();
+    uniforms.combined.general.projection = _game.services().graphics().window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     uniforms.combined.general.alpha = 0.5f;
 
-    _game->services().graphics().shaders().activate(ShaderProgram::SimpleColor, uniforms);
-    _game->services().graphics().meshes().quad().draw();
+    _game.services().graphics().shaders().activate(ShaderProgram::SimpleColor, uniforms);
+    _game.services().graphics().meshes().quad().draw();
 }
 
 void Console::drawLines() {
