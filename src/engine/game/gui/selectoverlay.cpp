@@ -125,7 +125,7 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     const ContextAction &action = slot.actions[slot.indexSelected];
     switch (action.type) {
         case ActionType::AttackObject:
-            leader->addAction(make_unique<AttackAction>(selectedObject, leader->getAttackRange(), true));
+            leader->addAction(make_unique<ObjectAction>(ActionType::AttackObject, selectedObject, leader->getAttackRange(), true));
             break;
         case ActionType::UseFeat:
             leader->addAction(make_unique<UseFeatAction>(selectedObject, action.feat));

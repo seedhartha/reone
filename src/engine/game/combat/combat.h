@@ -26,6 +26,7 @@
 #include "../../common/timer.h"
 #include "../../scene/services.h"
 
+#include "../action/objectaction.h"
 #include "../enginetype/effect.h"
 #include "../object/creature.h"
 #include "../types.h"
@@ -43,7 +44,7 @@ public:
     struct Attack {
         std::shared_ptr<Creature> attacker;
         std::shared_ptr<SpatialObject> target;
-        std::shared_ptr<Action> action; /**< action to complete on round end */
+        std::shared_ptr<ObjectAction> action; /**< action to complete on round end */
         AttackResultType resultType { AttackResultType::Invalid };
         int damage { -1 };
     };
@@ -60,7 +61,7 @@ public:
     void addAttack(
         std::shared_ptr<Creature> attacker,
         std::shared_ptr<SpatialObject> target,
-        std::shared_ptr<Action> action,
+        std::shared_ptr<ObjectAction> action,
         AttackResultType resultType = AttackResultType::Invalid,
         int damage = -1);
 

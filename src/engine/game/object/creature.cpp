@@ -34,7 +34,6 @@
 #include "../../scene/types.h"
 #include "../../script/types.h"
 
-#include "../action/attack.h"
 #include "../animationutil.h"
 #include "../footstepsounds.h"
 #include "../game.h"
@@ -554,9 +553,9 @@ void Creature::deactivateCombat(float delay) {
 shared_ptr<SpatialObject> Creature::getAttemptedAttackTarget() const {
     shared_ptr<SpatialObject> result;
 
-    auto attackAction = dynamic_pointer_cast<AttackAction>(getCurrentAction());
+    auto attackAction = dynamic_pointer_cast<ObjectAction>(getCurrentAction());
     if (attackAction) {
-        result = attackAction->target();
+        result = static_pointer_cast<SpatialObject>(attackAction->object());
     }
 
     return move(result);

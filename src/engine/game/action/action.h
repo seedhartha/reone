@@ -27,7 +27,9 @@ namespace game {
 
 class Action : boost::noncopyable {
 public:
-    Action(ActionType type) : _type(type) {
+    Action(ActionType type, bool userAction = false) :
+        _type(type),
+        _userAction(userAction) {
     }
 
     virtual ~Action() = default;
@@ -38,8 +40,6 @@ public:
     bool isUserAction() const { return _userAction; }
 
     ActionType type() const { return _type; }
-
-    void setUserAction(bool value) { _userAction = value; }
 
 protected:
     ActionType _type { ActionType::QueueEmpty };
