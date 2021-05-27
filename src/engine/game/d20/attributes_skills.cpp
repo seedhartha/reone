@@ -25,47 +25,47 @@ namespace game {
 
 static constexpr int kDefaultSkillRank = 0;
 
-bool CreatureAttributes::hasSkill(Skill skill) const {
+bool CreatureAttributes::hasSkill(SkillType skill) const {
     return getSkillRank(skill) > 0;
 }
 
-int CreatureAttributes::getSkillRank(Skill skill) const {
+int CreatureAttributes::getSkillRank(SkillType skill) const {
     return getFromLookupOrElse(_skillRanks, skill, kDefaultSkillRank);
 }
 
 int CreatureAttributes::computerUse() const {
-    return getSkillRank(Skill::ComputerUse);
+    return getSkillRank(SkillType::ComputerUse);
 }
 
 int CreatureAttributes::demolitions() const {
-    return getSkillRank(Skill::Demolitions);
+    return getSkillRank(SkillType::Demolitions);
 }
 
 int CreatureAttributes::stealth() const {
-    return getSkillRank(Skill::Stealth);
+    return getSkillRank(SkillType::Stealth);
 }
 
 int CreatureAttributes::awareness() const {
-    return getSkillRank(Skill::Awareness);
+    return getSkillRank(SkillType::Awareness);
 }
 
 int CreatureAttributes::persuade() const {
-    return getSkillRank(Skill::Persuade);
+    return getSkillRank(SkillType::Persuade);
 }
 
 int CreatureAttributes::repair() const {
-    return getSkillRank(Skill::Repair);
+    return getSkillRank(SkillType::Repair);
 }
 
 int CreatureAttributes::security() const {
-    return getSkillRank(Skill::Security);
+    return getSkillRank(SkillType::Security);
 }
 
 int CreatureAttributes::treatInjury() const {
-    return getSkillRank(Skill::TreatInjury);
+    return getSkillRank(SkillType::TreatInjury);
 }
 
-void CreatureAttributes::setSkillRank(Skill skill, int rank) {
+void CreatureAttributes::setSkillRank(SkillType skill, int rank) {
     _skillRanks[skill] = rank;
 }
 

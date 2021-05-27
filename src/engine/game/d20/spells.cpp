@@ -17,14 +17,8 @@
 
 #include "spells.h"
 
-#include <functional>
-#include <string>
-
 #include "../../common/collectionutil.h"
 #include "../../common/guardutil.h"
-#include "../../graphics/texture/textures.h"
-#include "../../resource/resources.h"
-#include "../../resource/strings.h"
 
 using namespace std;
 

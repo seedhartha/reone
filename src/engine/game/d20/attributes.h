@@ -89,11 +89,11 @@ public:
 
     // Skills
 
-    bool hasSkill(Skill skill) const;
+    bool hasSkill(SkillType skill) const;
 
-    int getSkillRank(Skill skill) const;
+    int getSkillRank(SkillType skill) const;
 
-    const std::map<Skill, int> &skillRanks() const { return _skillRanks; }
+    const std::map<SkillType, int> &skillRanks() const { return _skillRanks; }
     int computerUse() const;
     int demolitions() const;
     int stealth() const;
@@ -103,7 +103,7 @@ public:
     int security() const;
     int treatInjury() const;
 
-    void setSkillRank(Skill skill, int rank);
+    void setSkillRank(SkillType skill, int rank);
 
     // END Skills
 
@@ -128,7 +128,7 @@ public:
 private:
     std::vector<std::pair<CreatureClass *, int>> _classLevels;
     std::map<Ability, int> _abilityScores;
-    std::map<Skill, int> _skillRanks;
+    std::map<SkillType, int> _skillRanks;
     std::set<FeatType> _feats;
     std::set<ForcePower> _spells;
 };

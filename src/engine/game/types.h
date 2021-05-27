@@ -493,7 +493,7 @@ enum class Ability {
     Charisma = 5
 };
 
-enum class Skill {
+enum class SkillType {
     Invalid = -1,
     ComputerUse = 0,
     Demolitions = 1,

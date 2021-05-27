@@ -42,7 +42,7 @@ public:
 
     void load(const resource::TwoDA &twoDa, int row);
 
-    bool isClassSkill(Skill skill) const;
+    bool isClassSkill(SkillType skill) const;
 
     /**
      * @return class saving throws at the specified creature level
@@ -72,7 +72,7 @@ private:
     int _hitdie { 0 };
     CreatureAttributes _defaultAttributes;
     int _skillPointBase { 0 };
-    std::unordered_set<Skill> _classSkills;
+    std::unordered_set<SkillType> _classSkills;
     std::unordered_map<int, SavingThrows> _savingThrowsByLevel;
     std::vector<int> _attackBonuses;
 

@@ -70,6 +70,9 @@ void GameServices::init() {
     _reputes = make_unique<Reputes>(&_resource.resources());
     _reputes->init();
 
+    _skills = make_unique<Skills>(_graphics, _resource);
+    _skills->init();
+
     _feats = make_unique<Feats>(&_graphics.textures(), &_resource.resources(), &_resource.strings());
     _feats->init();
 

@@ -25,15 +25,15 @@ namespace game {
 
 class UseSkillAction : public ObjectAction {
 public:
-    UseSkillAction(std::shared_ptr<Object> object, Skill skill) :
+    UseSkillAction(std::shared_ptr<Object> object, SkillType skill) :
         ObjectAction(ActionType::UseSkill, move(object)),
         _skill(skill) {
     }
 
-    Skill skill() const { return _skill; }
+    SkillType skill() const { return _skill; }
 
 private:
-    Skill _skill;
+    SkillType _skill;
 };
 
 } // namespace game
