@@ -38,7 +38,7 @@ static constexpr float kDeactivateDelay = 8.0f;
 Combat::Combat(Game &game, SceneServices &scene) : _game(game), _scene(scene) {
 }
 
-static unique_ptr<Combat::Attack> makeAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, shared_ptr<Action> action, AttackResultType resultType, int damage) {
+static unique_ptr<Combat::Attack> makeAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, shared_ptr<ObjectAction> action, AttackResultType resultType, int damage) {
     auto attack = make_unique<Combat::Attack>();
     attack->attacker = move(attacker);
     attack->target = move(target);
@@ -52,7 +52,7 @@ static bool isRoundPastFirstAttack(float time) {
     return time >= 0.5f * kRoundDuration;
 }
 
-void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, shared_ptr<Action> action, AttackResultType resultType, int damage) {
+void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, shared_ptr<ObjectAction> action, AttackResultType resultType, int damage) {
     RoundMap::iterator maybeRound;
 
     // If attacker has already started a combat round, do nothing

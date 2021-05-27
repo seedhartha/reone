@@ -21,7 +21,6 @@
 
 #include "glm/vec3.hpp"
 
-#include "action/attack.h"
 #include "action/commandaction.h"
 #include "action/follow.h"
 #include "action/locationaction.h"
@@ -59,7 +58,7 @@ private:
     void executeFollow(const std::shared_ptr<Object> &actor, FollowAction &action, float dt);
     void executeDoCommand(const std::shared_ptr<Object> &actor, CommandAction &command, float dt);
     void executeStartConversation(const std::shared_ptr<Object> &actor, StartConversationAction &action, float dt);
-    void executeAttack(const std::shared_ptr<Object> &actor, std::shared_ptr<AttackAction> action, float dt);
+    void executeAttack(const std::shared_ptr<Object> &actor, std::shared_ptr<ObjectAction> action, float dt);
     void executeOpenDoor(const std::shared_ptr<Object> &actor, ObjectAction &action, float dt);
     void executeCloseDoor(const std::shared_ptr<Object> &actor, ObjectAction &action, float dt);
     void executeOpenContainer(const std::shared_ptr<Object> &actor, ObjectAction &action, float dt);

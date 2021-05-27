@@ -331,7 +331,7 @@ Variable Routines::actionAttack(const VariablesList &args, ExecutionContext &ctx
     bool passive = getBool(args, 1, false);
 
     if (caller && attackee) {
-        auto action = make_unique<AttackAction>(attackee, caller->getAttackRange());
+        auto action = make_unique<ObjectAction>(ActionType::AttackObject, attackee, caller->getAttackRange());
         caller->addAction(move(action));
     } else if (!caller) {
         debug("Script: actionAttack: caller is invalid", 1, DebugChannels::script);

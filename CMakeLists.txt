@@ -407,7 +407,6 @@ set_target_properties(libscript PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINA
 
 set(GAME_HEADERS
     src/engine/game/action/action.h
-    src/engine/game/action/attack.h
     src/engine/game/action/commandaction.h
     src/engine/game/action/follow.h
     src/engine/game/action/locationaction.h

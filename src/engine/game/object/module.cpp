@@ -220,7 +220,7 @@ void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
         bool isEnemy = _game->services().reputes().getIsEnemy(*partyLeader, *creature);
         if (isEnemy) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(make_unique<AttackAction>(creature));
+            partyLeader->addAction(make_unique<ObjectAction>(ActionType::AttackObject, creature));
         } else if (!creature->conversation().empty()) {
             partyLeader->clearAllActions();
             partyLeader->addAction(make_unique<StartConversationAction>(creature, creature->conversation()));

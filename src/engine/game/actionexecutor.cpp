@@ -26,6 +26,7 @@
 #include "../scene/types.h"
 #include "../script/execution.h"
 
+#include "action/usefeat.h"
 #include "action/useskill.h"
 #include "action/waitaction.h"
 #include "enginetype/location.h"
@@ -76,7 +77,7 @@ void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) 
             executeStartConversation(object, *static_pointer_cast<StartConversationAction>(action), dt);
             break;
         case ActionType::AttackObject:
-            executeAttack(object, static_pointer_cast<AttackAction>(action), dt);
+            executeAttack(object, static_pointer_cast<ObjectAction>(action), dt);
             break;
         case ActionType::OpenDoor:
             executeOpenDoor(object, *static_pointer_cast<ObjectAction>(action), dt);
@@ -121,10 +122,17 @@ void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) 
             executeMoveToLocation(object, *static_pointer_cast<MoveToLocationAction>(action), dt);
             break;
         case ActionType::UseSkill: {
-            auto useAction = static_pointer_cast<UseSkillAction>(action);
-            if (useAction->skill() == SkillType::Security) {
-                executeOpenLock(object, *useAction, dt);
+            auto useSkillAction = static_pointer_cast<UseSkillAction>(action);
+            if (useSkillAction->skill() == SkillType::Security) {
+                executeOpenLock(object, *useSkillAction, dt);
+            } else {
+                action->complete();
             }
+            break;
+        }
+        case ActionType::UseFeat: {
+            auto useFeatAction = static_pointer_cast<UseFeatAction>(action);
+            executeAttack(object, move(useFeatAction), dt);
             break;
         }
         default:
@@ -190,9 +198,9 @@ void ActionExecutor::executeStartConversation(const shared_ptr<Object> &actor, S
     }
 }
 
-void ActionExecutor::executeAttack(const shared_ptr<Object> &actor, shared_ptr<AttackAction> action, float dt) {
+void ActionExecutor::executeAttack(const shared_ptr<Object> &actor, shared_ptr<ObjectAction> action, float dt) {
     // If target is dead, complete the action
-    shared_ptr<SpatialObject> target(action->target());
+    shared_ptr<SpatialObject> target(static_pointer_cast<SpatialObject>(action->object()));
     if (target->isDead()) {
         action->complete();
         return;
