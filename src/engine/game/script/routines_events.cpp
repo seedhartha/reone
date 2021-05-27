@@ -46,7 +46,7 @@ Variable Routines::signalEvent(const VariablesList &args, ExecutionContext &ctx)
 
     if (object && toRun) {
         debug(boost::format("Event signalled: %s %s") % object->tag() % toRun->number(), 2);
-        _game->services().scriptRunner().run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
+        _game.services().scriptRunner().run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
     } else if (!object) {
         debug("Script: signalEvent: object is invalid", 1, DebugChannels::script);
     } else if (!toRun) {

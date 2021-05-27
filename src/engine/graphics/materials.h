@@ -33,7 +33,7 @@ namespace graphics {
 
 class Materials : boost::noncopyable {
 public:
-    Materials(resource::Resources *resources);
+    Materials(resource::Resources &resources);
     ~Materials();
 
     void init();
@@ -45,7 +45,7 @@ public:
     std::shared_ptr<Material> get(const std::string &texResRef) const;
 
 private:
-    resource::Resources *_resources;
+    resource::Resources &_resources;
 
     bool _inited { false };
     std::unordered_map<std::string, std::shared_ptr<Material>> _materials;

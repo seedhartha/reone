@@ -17,13 +17,7 @@
 
 #include "portraits.h"
 
-#include <stdexcept>
-
 #include <boost/algorithm/string.hpp>
-
-#include "../common/guardutil.h"
-#include "../graphics/texture/textures.h"
-#include "../resource/resources.h"
 
 using namespace std;
 
@@ -34,13 +28,11 @@ namespace reone {
 
 namespace game {
 
-Portraits::Portraits(Textures *textures, Resources *resources) : _textures(textures), _resources(resources) {
-    ensureNotNull(textures, "textures");
-    ensureNotNull(resources, "resources");
+Portraits::Portraits(Textures &textures, Resources &resources) : _textures(textures), _resources(resources) {
 }
 
 void Portraits::init() {
-    shared_ptr<TwoDA> portraits(_resources->get2DA("portraits"));
+    shared_ptr<TwoDA> portraits(_resources.get2DA("portraits"));
 
     for (int row = 0; row < portraits->getRowCount(); ++row) {
         string resRef(boost::to_lower_copy(portraits->getString(row, "baseresref")));
@@ -66,7 +58,7 @@ shared_ptr<Texture> Portraits::getTextureByIndex(int index) {
 }
 
 shared_ptr<Texture> Portraits::getPortraitTexture(const Portrait &portrait) const {
-    return _textures->get(portrait.resRef, TextureUsage::GUI);
+    return _textures.get(portrait.resRef, TextureUsage::GUI);
 }
 
 shared_ptr<Texture> Portraits::getTextureByAppearance(int appearance) {

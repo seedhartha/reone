@@ -22,7 +22,6 @@
 #include "../../common/log.h"
 #include "../../common/random.h"
 
-#include "../game.h"
 #include "../objectconverter.h"
 
 using namespace std;

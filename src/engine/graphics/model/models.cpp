@@ -17,10 +17,8 @@
 
 #include "models.h"
 
-#include "../../common/guardutil.h"
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
-#include "../../resource/resources.h"
 
 #include "../model/mdlreader.h"
 
@@ -32,9 +30,7 @@ namespace reone {
 
 namespace graphics {
 
-Models::Models(Textures *textures, Resources *resources) : _textures(textures), _resources(resources) {
-    ensureNotNull(textures, "textures");
-    ensureNotNull(resources, "resources");
+Models::Models(Textures &textures, Resources &resources) : _textures(textures), _resources(resources) {
 }
 
 void Models::invalidateCache() {
@@ -54,12 +50,12 @@ shared_ptr<Model> Models::get(const string &resRef) {
 shared_ptr<Model> Models::doGet(const string &resRef) {
     debug("Load model " + resRef);
 
-    shared_ptr<ByteArray> mdlData(_resources->getRaw(resRef, ResourceType::Mdl));
-    shared_ptr<ByteArray> mdxData(_resources->getRaw(resRef, ResourceType::Mdx));
+    shared_ptr<ByteArray> mdlData(_resources.getRaw(resRef, ResourceType::Mdl));
+    shared_ptr<ByteArray> mdxData(_resources.getRaw(resRef, ResourceType::Mdx));
     shared_ptr<Model> model;
 
     if (mdlData && mdxData) {
-        MdlReader mdl(this, _textures);
+        MdlReader mdl(this, &_textures);
         mdl.load(wrap(mdlData), wrap(mdxData));
         model = mdl.model();
         if (model) {

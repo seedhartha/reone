@@ -24,14 +24,15 @@
 
 #include <boost/noncopyable.hpp>
 
+#include "context.h"
 #include "framebuffer.h"
+#include "mesh/meshes.h"
+#include "shader/shaders.h"
 #include "texture/texture.h"
 
 namespace reone {
 
 namespace graphics {
-
-class GraphicsServices;
 
 /**
  * Computes and caches PBR IBL textures, i.e. irradiance maps, prefiltered
@@ -45,7 +46,7 @@ public:
         std::shared_ptr<Texture> brdfLookup;
     };
 
-    PBRIBL(GraphicsServices &graphics);
+    PBRIBL(Context &context, Meshes &meshes, Shaders &shaders);
     ~PBRIBL();
 
     void init();
@@ -66,7 +67,9 @@ public:
     bool getDerived(const Texture *envmap, Derived &derived);
 
 private:
-    GraphicsServices &_graphics;
+    Context &_context;
+    Meshes &_meshes;
+    Shaders &_shaders;
 
     bool _inited { false };
     std::set<const Texture *> _envmapQueue;

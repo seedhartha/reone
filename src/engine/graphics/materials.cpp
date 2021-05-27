@@ -22,7 +22,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include "../common/collectionutil.h"
-#include "../common/guardutil.h"
 
 using namespace std;
 
@@ -32,14 +31,13 @@ namespace reone {
 
 namespace graphics {
 
-Materials::Materials(Resources *resources) : _resources(resources) {
-    ensureNotNull(resources, "resources");
+Materials::Materials(Resources &resources) : _resources(resources) {
 }
 
 void Materials::init() {
     if (_inited) return;
 
-    shared_ptr<TwoDA> materials(_resources->get2DA("material", false));
+    shared_ptr<TwoDA> materials(_resources.get2DA("material", false));
     if (materials) {
         for (int row = 0; row < materials->getRowCount(); ++row) {
             string tex(boost::to_lower_copy(materials->getString(row, "tex")));

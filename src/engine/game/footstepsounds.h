@@ -42,13 +42,13 @@ struct FootstepTypeSounds {
 
 class FootstepSounds : public MemoryCache<uint32_t, FootstepTypeSounds> {
 public:
-    FootstepSounds(audio::AudioFiles *audioFiles, resource::Resources *resources);
+    FootstepSounds(audio::AudioFiles &audioFiles, resource::Resources &resources);
 
     std::shared_ptr<FootstepTypeSounds> doGet(uint32_t type);
 
 private:
-    audio::AudioFiles *_audioFiles;
-    resource::Resources *_resources;
+    audio::AudioFiles &_audioFiles;
+    resource::Resources &_resources;
 };
 
 } // namespace game

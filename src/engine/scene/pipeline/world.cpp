@@ -48,8 +48,9 @@ const float kOrthographicScale = 10.0f;
 
 static bool g_wireframesEnabled = false;
 
-WorldRenderPipeline::WorldRenderPipeline(GraphicsOptions opts, SceneGraph *sceneGraph) :
-    _opts(move(opts)),
+WorldRenderPipeline::WorldRenderPipeline(GraphicsOptions options, GraphicsServices &graphics, SceneGraph &sceneGraph) :
+    _options(move(options)),
+    _graphics(graphics),
     _sceneGraph(sceneGraph) {
 
     for (int i = 0; i < kNumCubeFaces; ++i) {
@@ -63,7 +64,7 @@ void WorldRenderPipeline::init() {
     _depthRenderbuffer = make_unique<Renderbuffer>();
     _depthRenderbuffer->init();
     _depthRenderbuffer->bind();
-    _depthRenderbuffer->configure(_opts.width, _opts.height, PixelFormat::Depth);
+    _depthRenderbuffer->configure(_options.width, _options.height, PixelFormat::Depth);
     _depthRenderbuffer->unbind();
 
     // Geometry framebuffer
@@ -71,16 +72,15 @@ void WorldRenderPipeline::init() {
     _geometryColor1 = make_unique<Texture>("geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
     _geometryColor1->init();
     _geometryColor1->bind();
-    _geometryColor1->clearPixels(_opts.width, _opts.height, PixelFormat::RGB);
+    _geometryColor1->clearPixels(_options.width, _options.height, PixelFormat::RGB);
 
     _geometryColor2 = make_unique<Texture>("geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
     _geometryColor2->init();
     _geometryColor2->bind();
-    _geometryColor2->clearPixels(_opts.width, _opts.height, PixelFormat::RGB);
+    _geometryColor2->clearPixels(_options.width, _options.height, PixelFormat::RGB);
 
     _geometry.init();
     _geometry.bind();
-    _sceneGraph->graphics().textures().bindDefaults();
     _geometry.attachColor(*_geometryColor1, 0);
     _geometry.attachColor(*_geometryColor2, 1);
     _geometry.attachDepth(*_depthRenderbuffer);
@@ -92,7 +92,7 @@ void WorldRenderPipeline::init() {
     _verticalBlurColor = make_unique<Texture>("verticalblur_color", getTextureProperties(TextureUsage::ColorBuffer));
     _verticalBlurColor->init();
     _verticalBlurColor->bind();
-    _verticalBlurColor->clearPixels(_opts.width, _opts.height, PixelFormat::RGB);
+    _verticalBlurColor->clearPixels(_options.width, _options.height, PixelFormat::RGB);
 
     _verticalBlur.init();
     _verticalBlur.bind();
@@ -106,7 +106,7 @@ void WorldRenderPipeline::init() {
     _horizontalBlurColor = make_unique<Texture>("horizontalblur_color", getTextureProperties(TextureUsage::ColorBuffer));
     _horizontalBlurColor->init();
     _horizontalBlurColor->bind();
-    _horizontalBlurColor->clearPixels(_opts.width, _opts.height, PixelFormat::RGB);
+    _horizontalBlurColor->clearPixels(_options.width, _options.height, PixelFormat::RGB);
 
     _horizontalBlur.init();
     _horizontalBlur.bind();
@@ -120,18 +120,18 @@ void WorldRenderPipeline::init() {
     _shadowsDepth = make_unique<Texture>("shadows_depth", getTextureProperties(TextureUsage::DepthBuffer));
     _shadowsDepth->init();
     _shadowsDepth->bind();
-    _shadowsDepth->clearPixels(1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution, PixelFormat::Depth);
+    _shadowsDepth->clearPixels(1024 * _options.shadowResolution, 1024 * _options.shadowResolution, PixelFormat::Depth);
 
     _cubeShadowsDepth = make_unique<Texture>("cubeshadows_depth", getTextureProperties(TextureUsage::CubeMapDepthBuffer));
     _cubeShadowsDepth->init();
     _cubeShadowsDepth->bind();
-    _cubeShadowsDepth->clearPixels(1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution, PixelFormat::Depth);
+    _cubeShadowsDepth->clearPixels(1024 * _options.shadowResolution, 1024 * _options.shadowResolution, PixelFormat::Depth);
 
     _shadows.init();
 }
 
 void WorldRenderPipeline::render() {
-    shared_ptr<CameraSceneNode> camera(_sceneGraph->activeCamera());
+    shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
     if (!camera) return;
 
     computeLightSpaceMatrices();
@@ -165,11 +165,11 @@ static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) 
 void WorldRenderPipeline::computeLightSpaceMatrices() {
     static glm::vec3 up(0.0f, 0.0f, 1.0f);
 
-    const LightSceneNode *shadowLight = _sceneGraph->shadowLight();
+    const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
     if (!shadowLight) return;
 
     glm::vec3 lightPosition(shadowLight->absoluteTransform()[3]);
-    glm::vec3 cameraPosition(_sceneGraph->activeCamera()->absoluteTransform()[3]);
+    glm::vec3 cameraPosition(_sceneGraph.activeCamera()->absoluteTransform()[3]);
 
     if (shadowLight->isDirectional()) {
         glm::mat4 projection(glm::ortho(-kOrthographicScale, kOrthographicScale, -kOrthographicScale, kOrthographicScale, kShadowNearPlane, kShadowFarPlane));
@@ -185,12 +185,12 @@ void WorldRenderPipeline::computeLightSpaceMatrices() {
 }
 
 void WorldRenderPipeline::drawShadows() {
-    if (_opts.shadowResolution < 1) return;
+    if (_options.shadowResolution < 1) return;
 
-    const LightSceneNode *shadowLight = _sceneGraph->shadowLight();
+    const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
     if (!shadowLight) return;
 
-    _sceneGraph->graphics().context().withViewport(glm::ivec4(0, 0, 1024 * _opts.shadowResolution, 1024 * _opts.shadowResolution), [&]() {
+    _graphics.context().withViewport(glm::ivec4(0, 0, 1024 * _options.shadowResolution, 1024 * _options.shadowResolution), [&]() {
         _shadows.bind();
         if (shadowLight->isDirectional()) {
             _shadows.attachDepth(*_shadowsDepth);
@@ -205,16 +205,16 @@ void WorldRenderPipeline::drawShadows() {
             glm::vec3(shadowLight->absoluteTransform()[3]),
             shadowLight->isDirectional() ? 0.0f : 1.0f);
 
-        ShaderUniforms uniforms(_sceneGraph->graphics().shaders().defaultUniforms());
+        ShaderUniforms uniforms(_graphics.shaders().defaultUniforms());
         uniforms.combined.featureMask |= UniformFeatureFlags::shadows;
         uniforms.combined.shadows.lightPosition = move(lightPosition);
         for (int i = 0; i < kNumCubeFaces; ++i) {
             uniforms.combined.shadows.lightSpaceMatrices[i] = _lightSpaceMatrices[i];
         }
-        _sceneGraph->setUniformsPrototype(move(uniforms));
+        _sceneGraph.setUniformsPrototype(move(uniforms));
 
         glClear(GL_DEPTH_BUFFER_BIT);
-        _sceneGraph->graphics().context().withDepthTest([this]() { _sceneGraph->draw(true); });
+        _graphics.context().withDepthTest([this]() { _sceneGraph.draw(true); });
     });
 }
 
@@ -224,12 +224,13 @@ void WorldRenderPipeline::drawGeometry() {
     static constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     glDrawBuffers(2, buffers);
 
-    const LightSceneNode *shadowLight = _sceneGraph->shadowLight();
+    shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
+    const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
 
-    ShaderUniforms uniforms(_sceneGraph->graphics().shaders().defaultUniforms());
-    uniforms.combined.general.projection = _sceneGraph->activeCamera()->projection();
-    uniforms.combined.general.view = _sceneGraph->activeCamera()->view();
-    uniforms.combined.general.cameraPosition = _sceneGraph->activeCamera()->absoluteTransform()[3];
+    ShaderUniforms uniforms(_graphics.shaders().defaultUniforms());
+    uniforms.combined.general.projection = camera->projection();
+    uniforms.combined.general.view = camera->view();
+    uniforms.combined.general.cameraPosition = camera->absoluteTransform()[3];
     uniforms.combined.shadows.lightPresent = static_cast<bool>(shadowLight);
 
     if (shadowLight) {
@@ -245,14 +246,14 @@ void WorldRenderPipeline::drawGeometry() {
         }
     }
 
-    _sceneGraph->setUniformsPrototype(move(uniforms));
+    _sceneGraph.setUniformsPrototype(move(uniforms));
 
     if (shadowLight) {
         if (shadowLight->isDirectional()) {
-            _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::shadowMap);
+            _graphics.context().setActiveTextureUnit(TextureUnits::shadowMap);
             _shadowsDepth->bind();
         } else {
-            _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::shadowMapCube);
+            _graphics.context().setActiveTextureUnit(TextureUnits::shadowMapCube);
             _cubeShadowsDepth->bind();
         }
     }
@@ -260,23 +261,23 @@ void WorldRenderPipeline::drawGeometry() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (g_wireframesEnabled) {
-        _sceneGraph->graphics().context().withWireframes([this]() {
-            _sceneGraph->graphics().context().withDepthTest([this]() { _sceneGraph->draw(); });
+        _graphics.context().withWireframes([this]() {
+            _graphics.context().withDepthTest([this]() { _sceneGraph.draw(); });
         });
     } else {
-        _sceneGraph->graphics().context().withDepthTest([this]() { _sceneGraph->draw(); });
+        _graphics.context().withDepthTest([this]() { _sceneGraph.draw(); });
     }
 }
 
 void WorldRenderPipeline::applyHorizontalBlur() {
-    float w = static_cast<float>(_opts.width);
-    float h = static_cast<float>(_opts.height);
+    float w = static_cast<float>(_options.width);
+    float h = static_cast<float>(_options.height);
 
     _horizontalBlur.bind();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor2->bind();
 
     ShaderUniforms uniforms;
@@ -284,22 +285,22 @@ void WorldRenderPipeline::applyHorizontalBlur() {
     uniforms.combined.blur.resolution = glm::vec2(w, h);
     uniforms.combined.blur.direction = glm::vec2(1.0f, 0.0f);
 
-    _sceneGraph->graphics().shaders().activate(ShaderProgram::SimpleBlur, uniforms);
+    _graphics.shaders().activate(ShaderProgram::SimpleBlur, uniforms);
 
-    _sceneGraph->graphics().context().withDepthTest([&]() {
-        _sceneGraph->graphics().meshes().quadNDC().draw();
+    _graphics.context().withDepthTest([&]() {
+        _graphics.meshes().quadNDC().draw();
     });
 }
 
 void WorldRenderPipeline::applyVerticalBlur() {
-    float w = static_cast<float>(_opts.width);
-    float h = static_cast<float>(_opts.height);
+    float w = static_cast<float>(_options.width);
+    float h = static_cast<float>(_options.height);
 
     _verticalBlur.bind();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _horizontalBlurColor->bind();
 
     ShaderUniforms uniforms;
@@ -307,25 +308,25 @@ void WorldRenderPipeline::applyVerticalBlur() {
     uniforms.combined.blur.resolution = glm::vec2(w, h);
     uniforms.combined.blur.direction = glm::vec2(0.0f, 1.0f);
 
-    _sceneGraph->graphics().shaders().activate(ShaderProgram::SimpleBlur, uniforms);
+    _graphics.shaders().activate(ShaderProgram::SimpleBlur, uniforms);
 
-    _sceneGraph->graphics().context().withDepthTest([&]() {
-        _sceneGraph->graphics().meshes().quadNDC().draw();
+    _graphics.context().withDepthTest([&]() {
+        _graphics.meshes().quadNDC().draw();
     });
 
     _verticalBlur.unbind();
 }
 
 void WorldRenderPipeline::drawResult() {
-    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor1->bind();
 
-    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::bloom);
+    _graphics.context().setActiveTextureUnit(TextureUnits::bloom);
     _verticalBlurColor->bind();
 
     ShaderUniforms uniforms;
-    _sceneGraph->graphics().shaders().activate(ShaderProgram::SimplePresentWorld, uniforms);
-    _sceneGraph->graphics().meshes().quadNDC().draw();
+    _graphics.shaders().activate(ShaderProgram::SimplePresentWorld, uniforms);
+    _graphics.meshes().quadNDC().draw();
 }
 
 } // namespace scene

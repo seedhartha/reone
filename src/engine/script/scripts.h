@@ -21,7 +21,6 @@
 
 #include "../common/cache.h"
 #include "../resource/resources.h"
-#include "../resource/types.h"
 
 #include "program.h"
 
@@ -31,10 +30,10 @@ namespace script {
 
 class Scripts : public MemoryCache<std::string, ScriptProgram> {
 public:
-    Scripts(resource::Resources *resources);
+    Scripts(resource::Resources &resources);
 
 private:
-    resource::Resources *_resources;
+    resource::Resources &_resources;
 
     std::shared_ptr<ScriptProgram> doGet(std::string resRef);
 };

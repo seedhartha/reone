@@ -18,7 +18,6 @@
 #include "combat.h"
 
 #include "../../common/log.h"
-#include "../../common/guardutil.h"
 #include "../../common/random.h"
 
 #include "../game.h"
@@ -36,8 +35,7 @@ static constexpr float kRoundDuration = 3.0f;
 static constexpr float kProjectileDelay = 0.5f;
 static constexpr float kDeactivateDelay = 8.0f;
 
-Combat::Combat(Game *game, SceneServices &scene) : _game(game), _scene(scene) {
-    ensureNotNull(game, "game");
+Combat::Combat(Game &game, SceneServices &scene) : _game(game), _scene(scene) {
 }
 
 static unique_ptr<Combat::Attack> makeAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, shared_ptr<Action> action, AttackResultType resultType, int damage) {

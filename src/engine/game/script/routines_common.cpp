@@ -107,7 +107,7 @@ Variable Routines::executeScript(const VariablesList &args, ExecutionContext &ct
     int scriptVar = getInt(args, 2, -1);
 
     if (target) {
-        _game->services().scriptRunner().run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
+        _game.services().scriptRunner().run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
     } else {
         debug("Script: executeScript: target is invalid", 1, DebugChannels::script);
     }
@@ -120,26 +120,26 @@ Variable Routines::getRunScriptVar(const VariablesList &args, ExecutionContext &
 }
 
 Variable Routines::getLoadFromSaveGame(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<int>(_game->isLoadFromSaveGame()));
+    return Variable::ofInt(static_cast<int>(_game.isLoadFromSaveGame()));
 }
 
 Variable Routines::getStringByStrRef(const VariablesList &args, ExecutionContext &ctx) {
     int strRef = getInt(args, 0);
-    return Variable::ofString(_game->services().resource().strings().get(strRef));
+    return Variable::ofString(_game.services().resource().strings().get(strRef));
 }
 
 Variable Routines::startNewModule(const VariablesList &args, ExecutionContext &ctx) {
     string moduleName(boost::to_lower_copy(getString(args, 0)));
     string waypoint(boost::to_lower_copy(getString(args, 1, "")));
 
-    _game->scheduleModuleTransition(moduleName, waypoint);
+    _game.scheduleModuleTransition(moduleName, waypoint);
 
     return Variable();
 }
 
 Variable Routines::playMovie(const VariablesList &args, ExecutionContext &ctx) {
     string movie(boost::to_lower_copy(getString(args, 0)));
-    _game->playVideo(movie);
+    _game.playVideo(movie);
     return Variable();
 }
 

@@ -24,6 +24,7 @@
 
 #include "../../graphics/framebuffer.h"
 #include "../../graphics/renderbuffer.h"
+#include "../../graphics/services.h"
 #include "../../graphics/texture/texture.h"
 
 #include "../scenegraph.h"
@@ -34,14 +35,15 @@ namespace scene {
 
 class ControlRenderPipeline : boost::noncopyable {
 public:
-    ControlRenderPipeline(glm::ivec4 extent, SceneGraph *scene);
+    ControlRenderPipeline(glm::ivec4 extent, graphics::GraphicsServices &graphics, SceneGraph &scene);
 
     void init();
     void render(const glm::ivec2 &offset);
 
 private:
-    SceneGraph *_sceneGraph;
     glm::vec4 _extent;
+    SceneGraph &_sceneGraph;
+    graphics::GraphicsServices &_graphics;
 
     graphics::Framebuffer _geometry;
     std::unique_ptr<graphics::Texture> _geometryColor;

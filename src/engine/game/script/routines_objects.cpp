@@ -42,7 +42,7 @@ namespace game {
 Variable Routines::destroyObject(const VariablesList &args, ExecutionContext &ctx) {
     auto destroy = getSpatialObject(args, 0, ctx);
     if (destroy) {
-        _game->module()->area()->destroyObject(*destroy);
+        _game.module()->area()->destroyObject(*destroy);
     } else {
         debug("Script: destroyObject: destroy is invalid", 1, DebugChannels::script);
     }
@@ -65,10 +65,10 @@ Variable Routines::getObjectByTag(const VariablesList &args, ExecutionContext &c
     int nth = getInt(args, 1, 0);
 
     if (!tag.empty()) {
-        object = _game->module()->area()->getObjectByTag(tag, nth);
+        object = _game.module()->area()->getObjectByTag(tag, nth);
     } else {
         // Apparently, empty tag in this context stands for the player
-        object = _game->services().party().player();
+        object = _game.services().party().player();
     }
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
@@ -78,7 +78,7 @@ Variable Routines::getWaypointByTag(const VariablesList &args, ExecutionContext 
     shared_ptr<SpatialObject> object;
     string tag(boost::to_lower_copy(getString(args, 0)));
 
-    for (auto &waypoint : _game->module()->area()->getObjectsByType(ObjectType::Waypoint)) {
+    for (auto &waypoint : _game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         if (waypoint->tag() == tag) {
             object = waypoint;
             break;
@@ -89,7 +89,7 @@ Variable Routines::getWaypointByTag(const VariablesList &args, ExecutionContext 
 }
 
 Variable Routines::getArea(const VariablesList &args, ExecutionContext &ctx) {
-    auto area = _game->module()->area();
+    auto area = _game.module()->area();
     return Variable::ofObject(getObjectIdOrInvalid(area));
 }
 
@@ -120,7 +120,7 @@ Variable Routines::getLocked(const VariablesList &args, ExecutionContext &ctx) {
 }
 
 Variable Routines::getModule(const VariablesList &args, ExecutionContext &ctx) {
-    auto module = _game->module();
+    auto module = _game.module();
     return Variable::ofObject(getObjectIdOrInvalid(module));
 }
 
@@ -432,12 +432,12 @@ Variable Routines::getLastOpenedBy(const VariablesList &args, ExecutionContext &
 }
 
 Variable Routines::getAreaUnescapable(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<int>(_game->module()->area()->isUnescapable()));
+    return Variable::ofInt(static_cast<int>(_game.module()->area()->isUnescapable()));
 }
 
 Variable Routines::setAreaUnescapable(const VariablesList &args, ExecutionContext &ctx) {
     bool unescapable = getBool(args, 0);
-    _game->module()->area()->setUnescapable(unescapable);
+    _game.module()->area()->setUnescapable(unescapable);
     return Variable();
 }
 
@@ -449,7 +449,7 @@ Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &c
     int damage = getInt(args, 3);
 
     if (caller && target) {
-        _game->services().combat().addAttack(caller, target, nullptr, attackResult, damage);
+        _game.services().combat().addAttack(caller, target, nullptr, attackResult, damage);
     } else if (!caller) {
         debug("Script: cutsceneAttack: caller is invalid", 1, DebugChannels::script);
     } else if (!target) {
@@ -465,7 +465,7 @@ Variable Routines::createObject(const VariablesList &args, ExecutionContext &ctx
     auto location = getLocationEngineType(args, 2);
     bool useAppearAnimation = getBool(args, 3, false);
 
-    auto object = _game->module()->area()->createObject(objectType, blueprintResRef, location);
+    auto object = _game.module()->area()->createObject(objectType, blueprintResRef, location);
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
@@ -489,7 +489,7 @@ Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContex
         criterias.push_back(make_pair(static_cast<CreatureType>(thirdCriteriaType), thirdCriteriaValue));
     }
 
-    shared_ptr<Creature> creature(_game->module()->area()->getNearestCreature(target, criterias, nth - 1));
+    shared_ptr<Creature> creature(_game.module()->area()->getNearestCreature(target, criterias, nth - 1));
 
     return Variable::ofObject(getObjectIdOrInvalid(creature));
 }
@@ -513,7 +513,7 @@ Variable Routines::getNearestCreatureToLocation(const VariablesList &args, Execu
         criterias.push_back(make_pair(static_cast<CreatureType>(thirdCriteriaType), thirdCriteriaValue));
     }
 
-    shared_ptr<Creature> creature(_game->module()->area()->getNearestCreatureToLocation(*location, criterias, nth - 1));
+    shared_ptr<Creature> creature(_game.module()->area()->getNearestCreatureToLocation(*location, criterias, nth - 1));
 
     return Variable::ofObject(getObjectIdOrInvalid(creature));
 }
@@ -523,7 +523,7 @@ Variable Routines::getNearestObject(const VariablesList &args, ExecutionContext 
     auto target = getSpatialObjectOrCaller(args, 1, ctx);
     int nth = getInt(args, 2, 1);
 
-    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(target->position(), nth - 1, [&objectType](auto &object) {
+    shared_ptr<SpatialObject> object(_game.module()->area()->getNearestObject(target->position(), nth - 1, [&objectType](auto &object) {
         return object->type() == objectType;
     }));
 
@@ -535,7 +535,7 @@ Variable Routines::getNearestObjectToLocation(const VariablesList &args, Executi
     auto location = getLocationEngineType(args, 1);
     int nth = getInt(args, 2, 1);
 
-    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(location->position(), nth - 1, [&objectType](auto &object) {
+    shared_ptr<SpatialObject> object(_game.module()->area()->getNearestObject(location->position(), nth - 1, [&objectType](auto &object) {
         return object->type() == objectType;
     }));
 
@@ -547,7 +547,7 @@ Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionCon
     auto target = getSpatialObjectOrCaller(args, 1, ctx);
     int nth = getInt(args, 2, 1);
 
-    shared_ptr<SpatialObject> object(_game->module()->area()->getNearestObject(target->position(), nth - 1, [&tag](auto &object) {
+    shared_ptr<SpatialObject> object(_game.module()->area()->getNearestObject(target->position(), nth - 1, [&tag](auto &object) {
         return object->tag() == tag;
     }));
 

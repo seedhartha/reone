@@ -118,7 +118,7 @@ Variable Routines::getDistanceBetweenLocations2D(const VariablesList &args, Exec
 }
 
 Variable Routines::getStartingLocation(const VariablesList &args, ExecutionContext &ctx) {
-    const ModuleInfo &info = _game->module()->info();
+    const ModuleInfo &info = _game.module()->info();
     auto location = make_shared<Location>(info.entryPosition, info.entryFacing);
     return Variable::ofLocation(move(location));
 }

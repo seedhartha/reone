@@ -31,7 +31,7 @@ AudioServices::AudioServices(AudioOptions options, ResourceServices &resource) :
 }
 
 void AudioServices::init() {
-    _files = make_unique<AudioFiles>(&_resource.resources());
+    _files = make_unique<AudioFiles>(_resource.resources());
 
     _player = make_unique<AudioPlayer>(_options, _files.get());
     _player->init();

@@ -48,7 +48,7 @@ public:
         int damage { -1 };
     };
 
-    Combat(Game *game, scene::SceneServices &scene);
+    Combat(Game &game, scene::SceneServices &scene);
 
     /**
      * Appends the attack to an existing combat round, or starts a new round,
@@ -99,7 +99,7 @@ private:
 
     typedef std::map<uint32_t, std::unique_ptr<Round>> RoundMap;
 
-    Game *_game;
+    Game &_game;
     scene::SceneServices &_scene;
 
     RoundMap _roundByAttacker;

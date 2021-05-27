@@ -48,7 +48,7 @@ class Game;
 
 class ObjectFactory {
 public:
-    ObjectFactory(Game *game, scene::SceneGraph *sceneGraph);
+    ObjectFactory(Game &game, scene::SceneGraph &sceneGraph);
 
     std::shared_ptr<Module> newModule();
     std::shared_ptr<Area> newArea();
@@ -65,8 +65,8 @@ public:
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
 private:
-    Game *_game;
-    scene::SceneGraph *_sceneGraph;
+    Game &_game;
+    scene::SceneGraph &_sceneGraph;
 
     uint32_t _counter { 2 }; // ids 0 and 1 are reserved
     std::unordered_map<uint32_t, std::shared_ptr<Object>> _objectById;

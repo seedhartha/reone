@@ -20,7 +20,6 @@
 
 #include <stdexcept>
 
-#include "../../common/guardutil.h"
 #include "../../common/streamutil.h"
 
 #include "lipreader.h"
@@ -34,15 +33,13 @@ namespace reone {
 
 namespace graphics {
 
-Lips::Lips(Resources *resources) :
+Lips::Lips(Resources &resources) :
     MemoryCache(bind(&Lips::doGet, this, _1)),
     _resources(resources) {
-
-    ensureNotNull(resources, "resources");
 }
 
 shared_ptr<LipAnimation> Lips::doGet(string resRef) {
-    shared_ptr<ByteArray> lipData(_resources->getRaw(resRef, ResourceType::Lip));
+    shared_ptr<ByteArray> lipData(_resources.getRaw(resRef, ResourceType::Lip));
     if (!lipData) return nullptr;
 
     LipReader lip;

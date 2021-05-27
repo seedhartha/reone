@@ -23,8 +23,9 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "../../resource/services.h"
+#include "../../resource/resources.h"
 
+#include "../context.h"
 #include "../types.h"
 
 #include "texture.h"
@@ -33,11 +34,9 @@ namespace reone {
 
 namespace graphics {
 
-class GraphicsServices;
-
 class Textures : boost::noncopyable {
 public:
-    Textures(GraphicsServices &graphics, resource::ResourceServices &resources);
+    Textures(Context &context, resource::Resources &resources);
 
     void init();
     void invalidateCache();
@@ -50,8 +49,8 @@ public:
     std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
 
 private:
-    GraphicsServices &_graphics;
-    resource::ResourceServices &_resource;
+    Context &_context;
+    resource::Resources &_resources;
 
     std::shared_ptr<graphics::Texture> _default;
     std::shared_ptr<graphics::Texture> _defaultCubemap;

@@ -17,9 +17,7 @@
 
 #include "walkmeshes.h"
 
-#include "../../common/guardutil.h"
 #include "../../common/streamutil.h"
-#include "../../resource/resources.h"
 
 #include "bwmreader.h"
 
@@ -31,8 +29,7 @@ namespace reone {
 
 namespace graphics {
 
-Walkmeshes::Walkmeshes(Resources *resources) : _resources(resources) {
-    ensureNotNull(resources, "resources");
+Walkmeshes::Walkmeshes(Resources &resources) : _resources(resources) {
 }
 
 void Walkmeshes::invalidateCache() {
@@ -50,7 +47,7 @@ shared_ptr<Walkmesh> Walkmeshes::get(const string &resRef, ResourceType type) {
 }
 
 shared_ptr<Walkmesh> Walkmeshes::doGet(const string &resRef, ResourceType type) {
-    shared_ptr<ByteArray> data(_resources->getRaw(resRef, type));
+    shared_ptr<ByteArray> data(_resources.getRaw(resRef, type));
     shared_ptr<Walkmesh> walkmesh;
 
     if (data) {

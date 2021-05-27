@@ -18,7 +18,6 @@
 #include "scripts.h"
 
 #include "../common/streamutil.h"
-#include "../resource/resources.h"
 
 #include "ncsreader.h"
 
@@ -31,13 +30,13 @@ namespace reone {
 
 namespace script {
 
-Scripts::Scripts(Resources *resources) :
+Scripts::Scripts(Resources &resources) :
     MemoryCache(bind(&Scripts::doGet, this, _1)),
     _resources(resources) {
 }
 
 shared_ptr<ScriptProgram> Scripts::doGet(string resRef) {
-    shared_ptr<ByteArray> data(_resources->getRaw(resRef, ResourceType::Ncs));
+    shared_ptr<ByteArray> data(_resources.getRaw(resRef, ResourceType::Ncs));
     if (!data) return nullptr;
 
     NcsReader ncs(resRef);

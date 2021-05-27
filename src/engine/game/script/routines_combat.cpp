@@ -157,12 +157,12 @@ Variable Routines::getLastAttackAction(const VariablesList &args, ExecutionConte
 Variable Routines::getPlayerRestrictMode(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: why is this object necessary?
     auto object = getCreatureOrCaller(args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(_game->module()->player().isRestrictMode()));
+    return Variable::ofInt(static_cast<int>(_game.module()->player().isRestrictMode()));
 }
 
 Variable Routines::setPlayerRestrictMode(const VariablesList &args, ExecutionContext &ctx) {
     bool restrict = getBool(args, 0);
-    _game->module()->player().setRestrictMode(restrict);
+    _game.module()->player().setRestrictMode(restrict);
     return Variable();
 }
 
