@@ -41,37 +41,37 @@ namespace reone {
 
 namespace game {
 
-static const unordered_map<string, Skill> g_skillByAlias {
-    { "COM", Skill::ComputerUse },
-    { "DEM", Skill::Demolitions },
-    { "STE", Skill::Stealth },
-    { "AWA", Skill::Awareness },
-    { "PER", Skill::Persuade },
-    { "REP", Skill::Repair },
-    { "SEC", Skill::Security },
-    { "TRE", Skill::TreatInjury }
+static const unordered_map<string, SkillType> g_skillByAlias {
+    { "COM", SkillType::ComputerUse },
+    { "DEM", SkillType::Demolitions },
+    { "STE", SkillType::Stealth },
+    { "AWA", SkillType::Awareness },
+    { "PER", SkillType::Persuade },
+    { "REP", SkillType::Repair },
+    { "SEC", SkillType::Security },
+    { "TRE", SkillType::TreatInjury }
 };
 
-static const unordered_map<string, Skill> g_skillByLabelTag {
-    { "COMPUTER_USE_LBL", Skill::ComputerUse },
-    { "DEMOLITIONS_LBL", Skill::Demolitions },
-    { "STEALTH_LBL", Skill::Stealth },
-    { "AWARENESS_LBL", Skill::Awareness },
-    { "PERSUADE_LBL", Skill::Persuade },
-    { "REPAIR_LBL", Skill::Repair },
-    { "SECURITY_LBL", Skill::Security },
-    { "TREAT_INJURY_LBL", Skill::TreatInjury }
+static const unordered_map<string, SkillType> g_skillByLabelTag {
+    { "COMPUTER_USE_LBL", SkillType::ComputerUse },
+    { "DEMOLITIONS_LBL", SkillType::Demolitions },
+    { "STEALTH_LBL", SkillType::Stealth },
+    { "AWARENESS_LBL", SkillType::Awareness },
+    { "PERSUADE_LBL", SkillType::Persuade },
+    { "REPAIR_LBL", SkillType::Repair },
+    { "SECURITY_LBL", SkillType::Security },
+    { "TREAT_INJURY_LBL", SkillType::TreatInjury }
 };
 
-static const unordered_map<Skill, int> g_descStrRefBySkill {
-    { Skill::ComputerUse, 244 },
-    { Skill::Demolitions, 246 },
-    { Skill::Stealth, 248  },
-    { Skill::Awareness, 250 },
-    { Skill::Persuade, 252 },
-    { Skill::Repair, 254 },
-    { Skill::Security, 256  },
-    { Skill::TreatInjury, 258 }
+static const unordered_map<SkillType, int> g_descStrRefBySkill {
+    { SkillType::ComputerUse, 244 },
+    { SkillType::Demolitions, 246 },
+    { SkillType::Stealth, 248  },
+    { SkillType::Awareness, 250 },
+    { SkillType::Persuade, 252 },
+    { SkillType::Repair, 254 },
+    { SkillType::Security, 256  },
+    { SkillType::TreatInjury, 258 }
 };
 
 CharGenSkills::CharGenSkills(CharacterGeneration *charGen, Game *game) :
@@ -119,14 +119,14 @@ void CharGenSkills::reset(bool newGame) {
     if (newGame) {
         _points *= 4;
 
-        _attributes.setSkillRank(Skill::ComputerUse, 0);
-        _attributes.setSkillRank(Skill::Demolitions, 0);
-        _attributes.setSkillRank(Skill::Stealth, 0);
-        _attributes.setSkillRank(Skill::Awareness, 0);
-        _attributes.setSkillRank(Skill::Persuade, 0);
-        _attributes.setSkillRank(Skill::Repair, 0);
-        _attributes.setSkillRank(Skill::Security, 0);
-        _attributes.setSkillRank(Skill::TreatInjury, 0);
+        _attributes.setSkillRank(SkillType::ComputerUse, 0);
+        _attributes.setSkillRank(SkillType::Demolitions, 0);
+        _attributes.setSkillRank(SkillType::Stealth, 0);
+        _attributes.setSkillRank(SkillType::Awareness, 0);
+        _attributes.setSkillRank(SkillType::Persuade, 0);
+        _attributes.setSkillRank(SkillType::Repair, 0);
+        _attributes.setSkillRank(SkillType::Security, 0);
+        _attributes.setSkillRank(SkillType::TreatInjury, 0);
     } else {
         _attributes = attributes;
     }
@@ -137,35 +137,35 @@ void CharGenSkills::reset(bool newGame) {
 void CharGenSkills::refreshControls() {
     setControlText("REMAINING_SELECTIONS_LBL", to_string(_points));
 
-    setControlText("COMPUTER_USE_POINTS_BTN", to_string(_attributes.getSkillRank(Skill::ComputerUse)));
-    setControlText("DEMOLITIONS_POINTS_BTN", to_string(_attributes.getSkillRank(Skill::Demolitions)));
-    setControlText("STEALTH_POINTS_BTN", to_string(_attributes.getSkillRank(Skill::Stealth)));
-    setControlText("AWARENESS_POINTS_BTN", to_string(_attributes.getSkillRank(Skill::Awareness)));
-    setControlText("PERSUADE_POINTS_BTN", to_string(_attributes.getSkillRank(Skill::Persuade)));
-    setControlText("REPAIR_POINTS_BTN", to_string(_attributes.getSkillRank(Skill::Repair)));
-    setControlText("SECURITY_POINTS_BTN", to_string(_attributes.getSkillRank(Skill::Security)));
-    setControlText("TREAT_INJURY_POINTS_BTN", to_string(_attributes.getSkillRank(Skill::TreatInjury)));
+    setControlText("COMPUTER_USE_POINTS_BTN", to_string(_attributes.getSkillRank(SkillType::ComputerUse)));
+    setControlText("DEMOLITIONS_POINTS_BTN", to_string(_attributes.getSkillRank(SkillType::Demolitions)));
+    setControlText("STEALTH_POINTS_BTN", to_string(_attributes.getSkillRank(SkillType::Stealth)));
+    setControlText("AWARENESS_POINTS_BTN", to_string(_attributes.getSkillRank(SkillType::Awareness)));
+    setControlText("PERSUADE_POINTS_BTN", to_string(_attributes.getSkillRank(SkillType::Persuade)));
+    setControlText("REPAIR_POINTS_BTN", to_string(_attributes.getSkillRank(SkillType::Repair)));
+    setControlText("SECURITY_POINTS_BTN", to_string(_attributes.getSkillRank(SkillType::Security)));
+    setControlText("TREAT_INJURY_POINTS_BTN", to_string(_attributes.getSkillRank(SkillType::TreatInjury)));
 
-    setControlVisible("COM_MINUS_BTN", _attributes.getSkillRank(Skill::ComputerUse) > 0);
-    setControlVisible("DEM_MINUS_BTN", _attributes.getSkillRank(Skill::Demolitions) > 0);
-    setControlVisible("STE_MINUS_BTN", _attributes.getSkillRank(Skill::Stealth) > 0);
-    setControlVisible("AWA_MINUS_BTN", _attributes.getSkillRank(Skill::Awareness) > 0);
-    setControlVisible("PER_MINUS_BTN", _attributes.getSkillRank(Skill::Persuade) > 0);
-    setControlVisible("REP_MINUS_BTN", _attributes.getSkillRank(Skill::Repair) > 0);
-    setControlVisible("SEC_MINUS_BTN", _attributes.getSkillRank(Skill::Security) > 0);
-    setControlVisible("TRE_MINUS_BTN", _attributes.getSkillRank(Skill::TreatInjury) > 0);
+    setControlVisible("COM_MINUS_BTN", _attributes.getSkillRank(SkillType::ComputerUse) > 0);
+    setControlVisible("DEM_MINUS_BTN", _attributes.getSkillRank(SkillType::Demolitions) > 0);
+    setControlVisible("STE_MINUS_BTN", _attributes.getSkillRank(SkillType::Stealth) > 0);
+    setControlVisible("AWA_MINUS_BTN", _attributes.getSkillRank(SkillType::Awareness) > 0);
+    setControlVisible("PER_MINUS_BTN", _attributes.getSkillRank(SkillType::Persuade) > 0);
+    setControlVisible("REP_MINUS_BTN", _attributes.getSkillRank(SkillType::Repair) > 0);
+    setControlVisible("SEC_MINUS_BTN", _attributes.getSkillRank(SkillType::Security) > 0);
+    setControlVisible("TRE_MINUS_BTN", _attributes.getSkillRank(SkillType::TreatInjury) > 0);
 
-    setControlVisible("COM_PLUS_BTN", canIncreaseSkill(Skill::ComputerUse));
-    setControlVisible("DEM_PLUS_BTN", canIncreaseSkill(Skill::Demolitions));
-    setControlVisible("STE_PLUS_BTN", canIncreaseSkill(Skill::Stealth));
-    setControlVisible("AWA_PLUS_BTN", canIncreaseSkill(Skill::Awareness));
-    setControlVisible("PER_PLUS_BTN", canIncreaseSkill(Skill::Persuade));
-    setControlVisible("REP_PLUS_BTN", canIncreaseSkill(Skill::Repair));
-    setControlVisible("SEC_PLUS_BTN", canIncreaseSkill(Skill::Security));
-    setControlVisible("TRE_PLUS_BTN", canIncreaseSkill(Skill::TreatInjury));
+    setControlVisible("COM_PLUS_BTN", canIncreaseSkill(SkillType::ComputerUse));
+    setControlVisible("DEM_PLUS_BTN", canIncreaseSkill(SkillType::Demolitions));
+    setControlVisible("STE_PLUS_BTN", canIncreaseSkill(SkillType::Stealth));
+    setControlVisible("AWA_PLUS_BTN", canIncreaseSkill(SkillType::Awareness));
+    setControlVisible("PER_PLUS_BTN", canIncreaseSkill(SkillType::Persuade));
+    setControlVisible("REP_PLUS_BTN", canIncreaseSkill(SkillType::Repair));
+    setControlVisible("SEC_PLUS_BTN", canIncreaseSkill(SkillType::Security));
+    setControlVisible("TRE_PLUS_BTN", canIncreaseSkill(SkillType::TreatInjury));
 }
 
-bool CharGenSkills::canIncreaseSkill(Skill skill) const {
+bool CharGenSkills::canIncreaseSkill(SkillType skill) const {
     ClassType clazz = _charGen->character().attributes.getEffectiveClass();
 
     shared_ptr<CreatureClass> creatureClass(_game->services().classes().get(clazz));
@@ -175,7 +175,7 @@ bool CharGenSkills::canIncreaseSkill(Skill skill) const {
     return _points >= pointCost && _attributes.getSkillRank(skill) < maxSkillRank;
 }
 
-static Skill getSkillByAlias(const string &alias) {
+static SkillType getSkillByAlias(const string &alias) {
     return g_skillByAlias.find(alias)->second;
 }
 
@@ -195,13 +195,13 @@ void CharGenSkills::onClick(const string &control) {
         _charGen->openSteps();
 
     } else if (boost::ends_with(control, "_MINUS_BTN")) {
-        Skill skill = getSkillByAlias(control.substr(0, 3));
+        SkillType skill = getSkillByAlias(control.substr(0, 3));
         _attributes.setSkillRank(skill, _attributes.getSkillRank(skill) - 1);
         _points += getPointCost(skill);
         refreshControls();
 
     } else if (boost::ends_with(control, "_PLUS_BTN")) {
-        Skill skill = getSkillByAlias(control.substr(0, 3));
+        SkillType skill = getSkillByAlias(control.substr(0, 3));
         _points -= getPointCost(skill);
         _attributes.setSkillRank(skill, _attributes.getSkillRank(skill) + 1);
         refreshControls();
@@ -216,7 +216,7 @@ void CharGenSkills::updateCharacter() {
     _charGen->setCharacter(move(character));
 }
 
-int CharGenSkills::getPointCost(Skill skill) const {
+int CharGenSkills::getPointCost(SkillType skill) const {
     ClassType clazz = _charGen->character().attributes.getEffectiveClass();
     shared_ptr<CreatureClass> creatureClass(_game->services().classes().get(clazz));
     return creatureClass->isClassSkill(skill) ? 1 : 2;

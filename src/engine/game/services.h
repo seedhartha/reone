@@ -31,6 +31,7 @@
 #include "cursors.h"
 #include "d20/classes.h"
 #include "d20/feats.h"
+#include "d20/skills.h"
 #include "d20/spells.h"
 #include "footstepsounds.h"
 #include "gui/sounds.h"
@@ -80,6 +81,7 @@ public:
     Routines &routines() { return *_routines; }
     ScriptRunner &scriptRunner() { return *_scriptRunner; }
     SoundSets &soundSets() { return *_soundSets; }
+    Skills &skills() { return *_skills; }
     Spells &spells() { return *_spells; }
     Surfaces &surfaces() { return *_surfaces; }
 
@@ -104,6 +106,7 @@ private:
     std::unique_ptr<Routines> _routines;
     std::unique_ptr<ScriptRunner> _scriptRunner;
     std::unique_ptr<SoundSets> _soundSets;
+    std::unique_ptr<Skills> _skills;
     std::unique_ptr<Spells> _spells;
     std::unique_ptr<Surfaces> _surfaces;
 };

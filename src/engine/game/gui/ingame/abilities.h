@@ -35,13 +35,13 @@ public:
 
 private:
     struct SkillInfo {
-        Skill skill;
+        SkillType skill;
         std::string name;
         std::string description;
         std::shared_ptr<graphics::Texture> icon;
     };
 
-    std::unordered_map<Skill, SkillInfo> _skills;
+    std::unordered_map<SkillType, SkillInfo> _skills;
 
     void onClick(const std::string &control) override;
     void onListBoxItemClick(const std::string &control, const std::string &item) override;

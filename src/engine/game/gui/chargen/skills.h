@@ -46,9 +46,9 @@ private:
     void refreshControls();
     void updateCharacter();
 
-    bool canIncreaseSkill(Skill skill) const;
+    bool canIncreaseSkill(SkillType skill) const;
 
-    int getPointCost(Skill skill) const;
+    int getPointCost(SkillType skill) const;
 };
 
 } // namespace game

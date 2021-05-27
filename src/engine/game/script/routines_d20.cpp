@@ -205,7 +205,7 @@ Variable Routines::getHasFeat(const VariablesList &args, ExecutionContext &ctx) 
 Variable Routines::getHasSkill(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
     auto creature = getCreatureOrCaller(args, 1, ctx);
-    auto skill = getEnum<Skill>(args, 0);
+    auto skill = getEnum<SkillType>(args, 0);
 
     if (creature) {
         result = creature->attributes().hasSkill(skill);
@@ -311,7 +311,7 @@ Variable Routines::getLevelByPosition(const VariablesList &args, ExecutionContex
 Variable Routines::getSkillRank(const VariablesList &args, ExecutionContext &ctx) {
     int result = 0;
     auto object = getCreatureOrCaller(args, 1, ctx);
-    auto skill = getEnum<Skill>(args, 0);
+    auto skill = getEnum<SkillType>(args, 0);
 
     if (object) {
         result = object->attributes().getSkillRank(skill);

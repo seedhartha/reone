@@ -74,7 +74,7 @@ void CreatureClass::loadClassSkills(const string &skillsTable) {
     shared_ptr<TwoDA> skills(_resources->get2DA(kSkillsTwoDaResRef));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         if (skills->getInt(row, skillsTable + "_class") == 1) {
-            _classSkills.insert(static_cast<Skill>(row));
+            _classSkills.insert(static_cast<SkillType>(row));
         }
     }
 }
@@ -100,7 +100,7 @@ void CreatureClass::loadAttackBonuses(const string &attackBonusTable) {
     }
 }
 
-bool CreatureClass::isClassSkill(Skill skill) const {
+bool CreatureClass::isClassSkill(SkillType skill) const {
     return _classSkills.count(skill) > 0;
 }
 

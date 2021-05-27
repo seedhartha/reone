@@ -17,20 +17,19 @@
 
 #pragma once
 
-#include "types.h"
+#include <memory>
+#include <string>
+
+#include "../../graphics/texture/texture.h"
 
 namespace reone {
 
 namespace game {
 
-struct ContextAction {
-    ActionType type { ActionType::Invalid };
-    FeatType feat { FeatType::Invalid };
-    SkillType skill { SkillType::Invalid };
-
-    ContextAction(ActionType type) : type(type) {}
-    ContextAction(FeatType feat) : type(ActionType::UseFeat), feat(feat) {}
-    ContextAction(SkillType skill) : type(ActionType::UseSkill), skill(skill) {}
+struct Skill {
+    std::string name;
+    std::string description;
+    std::shared_ptr<graphics::Texture> icon;
 };
 
 } // namespace game

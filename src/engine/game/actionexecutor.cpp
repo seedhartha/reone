@@ -26,6 +26,7 @@
 #include "../scene/types.h"
 #include "../script/execution.h"
 
+#include "action/useskill.h"
 #include "action/waitaction.h"
 #include "enginetype/location.h"
 #include "game.h"
@@ -119,6 +120,13 @@ void ActionExecutor::executeActions(const shared_ptr<Object> &object, float dt) 
         case ActionType::MoveToLocation:
             executeMoveToLocation(object, *static_pointer_cast<MoveToLocationAction>(action), dt);
             break;
+        case ActionType::UseSkill: {
+            auto useAction = static_pointer_cast<UseSkillAction>(action);
+            if (useAction->skill() == SkillType::Security) {
+                executeOpenLock(object, *useAction, dt);
+            }
+            break;
+        }
         default:
             debug("ActionExecutor: action not implemented: " + to_string(static_cast<int>(type)), 2);
             action->complete();

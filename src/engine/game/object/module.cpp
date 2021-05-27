@@ -321,8 +321,8 @@ vector<ContextAction> Module::getContextActions(const shared_ptr<Object> &object
         }
         case ObjectType::Door: {
             auto door = static_pointer_cast<Door>(object);
-            if (door->isLocked() && !door->isKeyRequired() && _game->services().party().getLeader()->attributes().hasSkill(Skill::Security)) {
-                actions.push_back(ContextAction(ActionType::OpenLock));
+            if (door->isLocked() && !door->isKeyRequired() && _game->services().party().getLeader()->attributes().hasSkill(SkillType::Security)) {
+                actions.push_back(ContextAction(SkillType::Security));
             }
             break;
         }

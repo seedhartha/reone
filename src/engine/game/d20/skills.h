@@ -17,20 +17,34 @@
 
 #pragma once
 
-#include "types.h"
+#include <unordered_map>
+
+#include <boost/noncopyable.hpp>
+
+#include "../../graphics/services.h"
+#include "../../resource/services.h"
+
+#include "../types.h"
+
+#include "skill.h"
 
 namespace reone {
 
 namespace game {
 
-struct ContextAction {
-    ActionType type { ActionType::Invalid };
-    FeatType feat { FeatType::Invalid };
-    SkillType skill { SkillType::Invalid };
+class Skills : boost::noncopyable {
+public:
+    Skills(graphics::GraphicsServices &graphics, resource::ResourceServices &resource);
 
-    ContextAction(ActionType type) : type(type) {}
-    ContextAction(FeatType feat) : type(ActionType::UseFeat), feat(feat) {}
-    ContextAction(SkillType skill) : type(ActionType::UseSkill), skill(skill) {}
+    void init();
+
+    std::shared_ptr<Skill> get(SkillType type) const;
+
+private:
+    graphics::GraphicsServices &_graphics;
+    resource::ResourceServices &_resource;
+
+    std::unordered_map<SkillType, std::shared_ptr<Skill>> _skills;
 };
 
 } // namespace game

@@ -485,7 +485,7 @@ Variable Routines::actionUseFeat(const VariablesList &args, ExecutionContext &ct
 
 Variable Routines::actionUseSkill(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto skill = getEnum<Skill>(args, 0);
+    auto skill = getEnum<SkillType>(args, 0);
     auto target = getObject(args, 1, ctx);
     int subSkill = getInt(args, 2, 0);
     auto itemUsed = getObject(args, 3, ctx);

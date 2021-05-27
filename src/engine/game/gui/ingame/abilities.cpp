@@ -77,7 +77,7 @@ void AbilitiesMenu::load() {
 void AbilitiesMenu::loadSkills() {
     shared_ptr<TwoDA> skills(_game->services().resource().resources().get2DA("skills"));
     for (int row = 0; row < skills->getRowCount(); ++row) {
-        auto skill = static_cast<Skill>(row);
+        auto skill = static_cast<SkillType>(row);
 
         SkillInfo skillInfo;
         skillInfo.skill = skill;
@@ -141,7 +141,7 @@ void AbilitiesMenu::onClick(const string &control) {
 
 void AbilitiesMenu::onListBoxItemClick(const string &control, const string &item) {
     if (control == "LB_ABILITY") {
-        auto skill = static_cast<Skill>(stoi(item));
+        auto skill = static_cast<SkillType>(stoi(item));
         auto maybeSkillInfo = _skills.find(skill);
         if (maybeSkillInfo != _skills.end()) {
             shared_ptr<Creature> partyLeader(_game->services().party().getLeader());

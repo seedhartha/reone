@@ -31,6 +31,7 @@
 #include "../../resource/resources.h"
 
 #include "../action/usefeat.h"
+#include "../action/useskill.h"
 #include "../d20/feats.h"
 #include "../game.h"
 #include "../objectconverter.h"
@@ -58,7 +59,6 @@ static constexpr int kActionWidth = 35;
 static constexpr int kActionHeight = 59;
 
 static string g_attackIcon("i_attack");
-static string g_securityIcon("isk_security");
 
 SelectionOverlay::SelectionOverlay(Game *game) : _game(game) {
     ensureNotNull(game, "game");
@@ -122,15 +122,16 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     const ActionSlot &slot = _actionSlots[_selectedActionSlot];
     if (slot.indexSelected >= slot.actions.size()) return false;
 
-    switch (slot.actions[slot.indexSelected].type) {
+    const ContextAction &action = slot.actions[slot.indexSelected];
+    switch (action.type) {
         case ActionType::AttackObject:
             leader->addAction(make_unique<AttackAction>(selectedObject, leader->getAttackRange(), true));
             break;
         case ActionType::UseFeat:
-            leader->addAction(make_unique<UseFeatAction>(selectedObject, slot.actions[slot.indexSelected].feat));
+            leader->addAction(make_unique<UseFeatAction>(selectedObject, action.feat));
             break;
-        case ActionType::OpenLock:
-            leader->addAction(make_unique<ObjectAction>(ActionType::OpenLock, selectedObject));
+        case ActionType::UseSkill:
+            leader->addAction(make_unique<UseSkillAction>(selectedObject, action.skill));
             break;
         default:
             break;
@@ -207,7 +208,7 @@ void SelectionOverlay::update() {
                         case ActionType::UseFeat:
                             _actionSlots[0].actions.push_back(action);
                             break;
-                        case ActionType::OpenLock:
+                        case ActionType::UseSkill:
                             _actionSlots[1].actions.push_back(action);
                             break;
                         default:
@@ -375,13 +376,17 @@ void SelectionOverlay::drawActionIcon(int index) {
         case ActionType::AttackObject:
             texture = _game->services().graphics().textures().get(g_attackIcon, TextureUsage::GUI);
             break;
-        case ActionType::OpenLock:
-            texture = _game->services().graphics().textures().get(g_securityIcon, TextureUsage::GUI);
-            break;
         case ActionType::UseFeat: {
             shared_ptr<Feat> feat(_game->services().feats().get(action.feat));
             if (feat) {
                 texture = feat->icon;
+            }
+            break;
+        }
+        case ActionType::UseSkill: {
+            shared_ptr<Skill> skill(_game->services().skills().get(action.skill));
+            if (skill) {
+                texture = skill->icon;
             }
             break;
         }

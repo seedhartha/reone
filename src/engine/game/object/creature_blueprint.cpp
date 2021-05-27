@@ -162,7 +162,7 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
 
     vector<shared_ptr<GffStruct>> skillsUtc(utc.getList("SkillList"));
     for (int i = 0; i < static_cast<int>(skillsUtc.size()); ++i) {
-        Skill skill = static_cast<Skill>(i);
+        SkillType skill = static_cast<SkillType>(i);
         attributes.setSkillRank(skill, skillsUtc[i]->getInt("Rank"));
     }
 
