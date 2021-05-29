@@ -18,6 +18,12 @@
 #pragma once
 
 #include "../gui.h"
+#include "../../../gui/control/button.h"
+#include "../../../gui/control/imagebutton.h"
+#include "../../../gui/control/label.h"
+#include "../../../gui/control/listbox.h"
+
+using namespace reone::gui;
 
 namespace reone {
 
@@ -65,6 +71,53 @@ private:
 
     std::shared_ptr<graphics::Texture> getItemFrameTexture(int stackSize) const;
     std::shared_ptr<graphics::Texture> getEmptySlotIcon(Slot slot) const;
+
+    struct Binding {
+        Label *lblCantEquip { nullptr };
+        Label *lblAttackInfo { nullptr };
+        Label *lblToHitR { nullptr };
+        Label *lblPortBord { nullptr };
+        Label *lblPortrait { nullptr };
+        ListBox *lbItems { nullptr };
+        Label *lblDefInfo { nullptr };
+        unordered_map<Equipment::Slot, Label *> lblInv;
+        unordered_map<Equipment::Slot, Button *> btnInv;
+        Label *lblAtkL { nullptr };
+        Label *lblAtkR { nullptr };
+        Label *lblDef { nullptr };
+        Label *lblTitle { nullptr };
+        Label *lblDamage { nullptr };
+        Label *lblToHitL { nullptr };
+        Label *lblToHit { nullptr };
+        Label *lblSlotName { nullptr };
+        Button *btnBack { nullptr };
+        Button *btnEquip{ nullptr };
+        ListBox *lbDesc { nullptr };
+
+        // KOTOR only
+        Label *lblVitality { nullptr };
+        Label *lblTxtBar { nullptr };
+        Button *btnCharLeft { nullptr };
+        Button *btnCharRight { nullptr };
+        Label *lblSelectTitle { nullptr };
+        Button *btnChange1 { nullptr };
+        Button *btnChange2 { nullptr };
+        // End KOTOR only
+
+        // TSL only
+        Label *lblBack1 { nullptr };
+        Label *lblDefBack { nullptr };
+        Label *lblBar[5];
+        Label *lblAttackMod { nullptr };
+        Label *lblDamText { nullptr };
+        Button *btnSwapWeapons { nullptr };
+        Button *btnPrevNpc { nullptr };
+        Button *btnNextNpc { nullptr };
+        Label *lblDefText { nullptr };
+        // End TSL only
+    };
+    Binding binding;
+    void bindControls();
 };
 
 } // namespace game
