@@ -78,7 +78,7 @@ Equipment::Equipment(Game *game) : GameGUI(game) {
     loadBackground(BackgroundType::Menu);
 }
 
-void Equipment::bindControls() {
+void Equipment::bindControls(EquipmentBindingHelper *bindingHelper) {
     _binding.lblCantEquip = getControlPtr<Label>("LBL_CANTEQUIP");
     if (!isTSL(_game->gameId())) {
         _binding.lblAttackInfo = getControlPtr<Label>("LBL_ATTACK_INFO");
@@ -104,6 +104,8 @@ void Equipment::bindControls() {
         _binding.btnPrevNpc = getControlPtr<Button>("BTN_PREVNPC");
         _binding.btnNextNpc = getControlPtr<Button>("BTN_NEXTNPC");
         _binding.lblDefText = getControlPtr<Label>("LBL_DEF_TEXT");
+        _binding.btnChange1 = bindingHelper->getBtnChange2();
+        _binding.btnChange2 = bindingHelper->getBtnChange3();
         _binding.btnCharLeft = getControlPtr<Button>("BTN_PREVNPC");
         _binding.btnCharRight = getControlPtr<Button>("BTN_NEXTNPC");
     }
@@ -128,9 +130,15 @@ void Equipment::bindControls() {
 }
 
 void Equipment::load() {
-    GUI::load();
-    bindControls();
+    Equipment::load(nullptr);
+}
 
+void Equipment::load(EquipmentBindingHelper *bindingHelper) {
+    GUI::load();
+    bindControls(bindingHelper);
+
+    _binding.btnChange1->setFocusable(false);
+    _binding.btnChange2->setFocusable(false);
     _binding.btnCharLeft->setVisible(false);
     _binding.btnCharRight->setVisible(false);
     _binding.lbDesc->setVisible(false);
@@ -251,13 +259,7 @@ void Equipment::update() {
 }
 
 void Equipment::updatePortraits() {
-    // if (_game->gameId() != GameID::KotOR) return;
-    if (!_binding.btnChange1) {
-        _binding.btnChange1 = getControlPtr<Button>("BTN_CHANGE2");
-        _binding.btnChange2 = getControlPtr<Button>("BTN_CHANGE3");
-    }
-    _binding.btnChange1->setFocusable(false);
-    _binding.btnChange2->setFocusable(false);
+    if (_game->gameId() != GameID::KotOR) return;
 
     Party &party = _game->services().party();
     shared_ptr<Creature> partyLeader(party.getLeader());

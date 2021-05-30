@@ -27,12 +27,13 @@
 #include "map.h"
 #include "messages.h"
 #include "options.h"
+#include <memory>
 
 namespace reone {
 
 namespace game {
 
-class InGameMenu : public GameGUI {
+class InGameMenu : public GameGUI, public EquipmentBindingHelper {
 public:
     enum class Tab {
         None,
@@ -65,6 +66,8 @@ public:
     void openMap();
     void openOptions();
 
+    std::shared_ptr<gui::Button> getBtnChange2() override;
+    std::shared_ptr<gui::Button> getBtnChange3() override;
 private:
     Tab _tab { Tab::None };
 
