@@ -79,52 +79,52 @@ Equipment::Equipment(Game *game) : GameGUI(game) {
 }
 
 void Equipment::bindControls() {
-    _binding.lblCantEquip = &getControl<Label>("LBL_CANTEQUIP");
+    _binding.lblCantEquip = getControlPtr<Label>("LBL_CANTEQUIP");
     if (!isTSL(_game->gameId())) {
-        _binding.lblAttackInfo = &getControl<Label>("LBL_ATTACK_INFO");
-        _binding.lblPortBord = &getControl<Label>("LBL_PORT_BORD");
-        _binding.lblPortrait = &getControl<Label>("LBL_PORTRAIT");
-        _binding.lblDefInfo = &getControl<Label>("LBL_DEF_INFO");
-        _binding.lblTxtBar = &getControl<Label>("LBL_TXTBAR");
-        _binding.lblVitality = &getControl<Label>("LBL_VITALITY");
-        _binding.lblSelectTitle = &getControl<Label>("LBL_SELECTTITLE");
-        _binding.btnChange1 = &getControl<Button>("BTN_CHANGE1");
-        _binding.btnChange2 = &getControl<Button>("BTN_CHANGE2");
-        _binding.btnCharLeft = &getControl<Button>("BTN_CHARLEFT");
-        _binding.btnCharRight = &getControl<Button>("BTN_CHARRIGHT");
+        _binding.lblAttackInfo = getControlPtr<Label>("LBL_ATTACK_INFO");
+        _binding.lblPortBord = getControlPtr<Label>("LBL_PORT_BORD");
+        _binding.lblPortrait = getControlPtr<Label>("LBL_PORTRAIT");
+        _binding.lblDefInfo = getControlPtr<Label>("LBL_DEF_INFO");
+        _binding.lblTxtBar = getControlPtr<Label>("LBL_TXTBAR");
+        _binding.lblVitality = getControlPtr<Label>("LBL_VITALITY");
+        _binding.lblSelectTitle = getControlPtr<Label>("LBL_SELECTTITLE");
+        _binding.btnChange1 = getControlPtr<Button>("BTN_CHANGE1");
+        _binding.btnChange2 = getControlPtr<Button>("BTN_CHANGE2");
+        _binding.btnCharLeft = getControlPtr<Button>("BTN_CHARLEFT");
+        _binding.btnCharRight = getControlPtr<Button>("BTN_CHARRIGHT");
      } else {
-        _binding.lblBack1 = &getControl<Label>("LBL_BACK1");
-        _binding.lblDefBack = &getControl<Label>("LBL_DEF_BACK");
+        _binding.lblBack1 = getControlPtr<Label>("LBL_BACK1");
+        _binding.lblDefBack = getControlPtr<Label>("LBL_DEF_BACK");
         for (int i = 0; i < 5; ++i) {
-            _binding.lblBar[i] = &getControl<Label>("LBL_BAR" + to_string(i + 1));
+            _binding.lblBar[i] = getControlPtr<Label>("LBL_BAR" + to_string(i + 1));
         }
-        _binding.lblAttackMod = &getControl<Label>("LBL_ATTACKMOD");
-        _binding.lblDamText = &getControl<Label>("LBL_DAMTEXT");
-        _binding.btnSwapWeapons = &getControl<Button>("BTN_SWAPWEAPONS");
-        _binding.btnPrevNpc = &getControl<Button>("BTN_PREVNPC");
-        _binding.btnNextNpc = &getControl<Button>("BTN_NEXTNPC");
-        _binding.lblDefText = &getControl<Label>("LBL_DEF_TEXT");
-        _binding.btnCharLeft = &getControl<Button>("BTN_PREVNPC");
-        _binding.btnCharRight = &getControl<Button>("BTN_NEXTNPC");
+        _binding.lblAttackMod = getControlPtr<Label>("LBL_ATTACKMOD");
+        _binding.lblDamText = getControlPtr<Label>("LBL_DAMTEXT");
+        _binding.btnSwapWeapons = getControlPtr<Button>("BTN_SWAPWEAPONS");
+        _binding.btnPrevNpc = getControlPtr<Button>("BTN_PREVNPC");
+        _binding.btnNextNpc = getControlPtr<Button>("BTN_NEXTNPC");
+        _binding.lblDefText = getControlPtr<Label>("LBL_DEF_TEXT");
+        _binding.btnCharLeft = getControlPtr<Button>("BTN_PREVNPC");
+        _binding.btnCharRight = getControlPtr<Button>("BTN_NEXTNPC");
     }
-    _binding.lblToHitR = &getControl<Label>("LBL_TOHITR");
-    _binding.lbItems = &getControl<ListBox>("LB_ITEMS");
+    _binding.lblToHitR = getControlPtr<Label>("LBL_TOHITR");
+    _binding.lbItems = getControlPtr<ListBox>("LB_ITEMS");
     for (auto &slotName : g_slotNames) {
         if ((slotName.first == Slot::WeapL2 || slotName.first == Slot::WeapR2) && !isTSL(_game->gameId())) continue;
-        _binding.lblInv[slotName.first] = &getControl<Label>("LBL_INV_" + slotName.second);
-        _binding.btnInv[slotName.first] = &getControl<Button>("BTN_INV_" + slotName.second);
+        _binding.lblInv[slotName.first] = getControlPtr<Label>("LBL_INV_" + slotName.second);
+        _binding.btnInv[slotName.first] = getControlPtr<Button>("BTN_INV_" + slotName.second);
     }
-    _binding.lblAtkL = &getControl<Label>("LBL_ATKL");
-    _binding.lblAtkR = &getControl<Label>("LBL_ATKR");
-    _binding.lblDef = &getControl<Label>("LBL_DEF");
-    _binding.lblTitle = &getControl<Label>("LBL_TITLE");
-    _binding.lblDamage = &getControl<Label>("LBL_DAMAGE");
-    _binding.lblToHitL = &getControl<Label>("LBL_TOHITL");
-    _binding.lblToHit = &getControl<Label>("LBL_TOHIT");
-    _binding.lblSlotName = &getControl<Label>("LBL_SLOTNAME");
-    _binding.btnBack = &getControl<Button>("BTN_BACK");
-    _binding.btnEquip = &getControl<Button>("BTN_EQUIP");
-    _binding.lbDesc = &getControl<ListBox>("LB_DESC");
+    _binding.lblAtkL = getControlPtr<Label>("LBL_ATKL");
+    _binding.lblAtkR = getControlPtr<Label>("LBL_ATKR");
+    _binding.lblDef = getControlPtr<Label>("LBL_DEF");
+    _binding.lblTitle = getControlPtr<Label>("LBL_TITLE");
+    _binding.lblDamage = getControlPtr<Label>("LBL_DAMAGE");
+    _binding.lblToHitL = getControlPtr<Label>("LBL_TOHITL");
+    _binding.lblToHit = getControlPtr<Label>("LBL_TOHIT");
+    _binding.lblSlotName = getControlPtr<Label>("LBL_SLOTNAME");
+    _binding.btnBack = getControlPtr<Button>("BTN_BACK");
+    _binding.btnEquip = getControlPtr<Button>("BTN_EQUIP");
+    _binding.lbDesc = getControlPtr<ListBox>("LB_DESC");
 }
 
 void Equipment::load() {
@@ -253,8 +253,8 @@ void Equipment::update() {
 void Equipment::updatePortraits() {
     // if (_game->gameId() != GameID::KotOR) return;
     if (!_binding.btnChange1) {
-        _binding.btnChange1 = &getControl<Button>("BTN_CHANGE2");
-        _binding.btnChange2 = &getControl<Button>("BTN_CHANGE3");
+        _binding.btnChange1 = getControlPtr<Button>("BTN_CHANGE2");
+        _binding.btnChange2 = getControlPtr<Button>("BTN_CHANGE3");
     }
     _binding.btnChange1->setFocusable(false);
     _binding.btnChange2->setFocusable(false);
