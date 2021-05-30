@@ -123,11 +123,18 @@ protected:
     virtual void preloadControl(Control &control);
 
     Control &getControl(const std::string &tag) const;
+    Control *getControlPtr(const std::string &tag) const;
 
     template <class T>
     T &getControl(const std::string &tag) const {
         Control &ctrl = getControl(tag);
         return static_cast<T &>(ctrl);
+    }
+
+    template <class T>
+    T *getControlPtr(const std::string &tag) const {
+        Control *ctrl = getControlPtr(tag);
+        return static_cast<T *>(ctrl);
     }
 
     // User input

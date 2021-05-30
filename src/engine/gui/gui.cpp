@@ -334,6 +334,17 @@ Control &GUI::getControl(const string &tag) const {
     throw runtime_error("Control not found: " + tag);
 }
 
+Control *GUI::getControlPtr(const string &tag) const {
+    auto it = find_if(
+        _controls.begin(),
+        _controls.end(),
+        [&tag](auto &ctrl) { return ctrl->tag() == tag; });
+
+    if (it != _controls.end()) return (*it).get();
+
+    throw runtime_error("Control not found: " + tag);
+}
+
 void GUI::onClick(const string &control) {
 }
 
