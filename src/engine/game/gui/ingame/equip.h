@@ -54,47 +54,47 @@ public:
 
 private:
     struct Binding {
-        gui::Label *lblCantEquip { nullptr };
-        gui::Label *lblAttackInfo { nullptr };
-        gui::Label *lblToHitR { nullptr };
-        gui::Label *lblPortBord { nullptr };
-        gui::Label *lblPortrait { nullptr };
-        gui::ListBox *lbItems { nullptr };
-        gui::Label *lblDefInfo { nullptr };
-        std::unordered_map<Equipment::Slot, gui::Label *> lblInv;
-        std::unordered_map<Equipment::Slot, gui::Button *> btnInv;
-        gui::Label *lblAtkL { nullptr };
-        gui::Label *lblAtkR { nullptr };
-        gui::Label *lblDef { nullptr };
-        gui::Label *lblTitle { nullptr };
-        gui::Label *lblDamage { nullptr };
-        gui::Label *lblToHitL { nullptr };
-        gui::Label *lblToHit { nullptr };
-        gui::Label *lblSlotName { nullptr };
-        gui::Button *btnBack { nullptr };
-        gui::Button *btnEquip{ nullptr };
-        gui::ListBox *lbDesc { nullptr };
+        std::shared_ptr<gui::Label> lblCantEquip { nullptr };
+        std::shared_ptr<gui::Label> lblAttackInfo { nullptr };
+        std::shared_ptr<gui::Label> lblToHitR { nullptr };
+        std::shared_ptr<gui::Label> lblPortBord { nullptr };
+        std::shared_ptr<gui::Label> lblPortrait { nullptr };
+        std::shared_ptr<gui::ListBox> lbItems { nullptr };
+        std::shared_ptr<gui::Label> lblDefInfo { nullptr };
+        std::unordered_map<Equipment::Slot, std::shared_ptr<gui::Label>> lblInv;
+        std::unordered_map<Equipment::Slot, std::shared_ptr<gui::Button>> btnInv;
+        std::shared_ptr<gui::Label> lblAtkL { nullptr };
+        std::shared_ptr<gui::Label> lblAtkR { nullptr };
+        std::shared_ptr<gui::Label> lblDef { nullptr };
+        std::shared_ptr<gui::Label> lblTitle { nullptr };
+        std::shared_ptr<gui::Label> lblDamage { nullptr };
+        std::shared_ptr<gui::Label> lblToHitL { nullptr };
+        std::shared_ptr<gui::Label> lblToHit { nullptr };
+        std::shared_ptr<gui::Label> lblSlotName { nullptr };
+        std::shared_ptr<gui::Button> btnBack { nullptr };
+        std::shared_ptr<gui::Button> btnEquip{ nullptr };
+        std::shared_ptr<gui::ListBox> lbDesc { nullptr };
 
         // KOTOR only
-        gui::Label *lblVitality { nullptr };
-        gui::Label *lblTxtBar { nullptr };
-        gui::Button *btnCharLeft { nullptr };
-        gui::Button *btnCharRight { nullptr };
-        gui::Label *lblSelectTitle { nullptr };
-        gui::Button *btnChange1 { nullptr };
-        gui::Button *btnChange2 { nullptr };
+        std::shared_ptr<gui::Label> lblVitality { nullptr };
+        std::shared_ptr<gui::Label> lblTxtBar { nullptr };
+        std::shared_ptr<gui::Button> btnCharLeft { nullptr };
+        std::shared_ptr<gui::Button> btnCharRight { nullptr };
+        std::shared_ptr<gui::Label> lblSelectTitle { nullptr };
+        std::shared_ptr<gui::Button> btnChange1 { nullptr };
+        std::shared_ptr<gui::Button> btnChange2 { nullptr };
         // End KOTOR only
 
         // TSL only
-        gui::Label *lblBack1 { nullptr };
-        gui::Label *lblDefBack { nullptr };
-        gui::Label *lblBar[5];
-        gui::Label *lblAttackMod { nullptr };
-        gui::Label *lblDamText { nullptr };
-        gui::Button *btnSwapWeapons { nullptr };
-        gui::Button *btnPrevNpc { nullptr };
-        gui::Button *btnNextNpc { nullptr };
-        gui::Label *lblDefText { nullptr };
+        std::shared_ptr<gui::Label> lblBack1 { nullptr };
+        std::shared_ptr<gui::Label> lblDefBack { nullptr };
+        std::shared_ptr<gui::Label> lblBar[5];
+        std::shared_ptr<gui::Label> lblAttackMod { nullptr };
+        std::shared_ptr<gui::Label> lblDamText { nullptr };
+        std::shared_ptr<gui::Button> btnSwapWeapons { nullptr };
+        std::shared_ptr<gui::Button> btnPrevNpc { nullptr };
+        std::shared_ptr<gui::Button> btnNextNpc { nullptr };
+        std::shared_ptr<gui::Label> lblDefText { nullptr };
         // End TSL only
     } _binding;
     Slot _selectedSlot { Slot::None };
