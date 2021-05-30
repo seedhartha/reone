@@ -96,7 +96,7 @@ void GUI::loadControl(const GffStruct &gffs) {
     string tag(Control::getTag(gffs));
     string parent(Control::getParent(gffs));
 
-    unique_ptr<Control> control(Control::of(this, type, tag));
+    shared_ptr<Control> control(Control::of(this, type, tag));
     if (!control) return;
 
     preloadControl(*control);
@@ -334,13 +334,13 @@ Control &GUI::getControl(const string &tag) const {
     throw runtime_error("Control not found: " + tag);
 }
 
-Control *GUI::getControlPtr(const string &tag) const {
+shared_ptr<Control> GUI::getControlPtr(const string &tag) const {
     auto it = find_if(
         _controls.begin(),
         _controls.end(),
         [&tag](auto &ctrl) { return ctrl->tag() == tag; });
 
-    if (it != _controls.end()) return (*it).get();
+    if (it != _controls.end()) return *it;
 
     throw runtime_error("Control not found: " + tag);
 }
