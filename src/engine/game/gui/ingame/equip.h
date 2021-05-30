@@ -23,8 +23,6 @@
 #include "../../../gui/control/label.h"
 #include "../../../gui/control/listbox.h"
 
-using namespace reone::gui;
-
 namespace reone {
 
 namespace game {
@@ -73,47 +71,47 @@ private:
     std::shared_ptr<graphics::Texture> getEmptySlotIcon(Slot slot) const;
 
     struct Binding {
-        Label *lblCantEquip { nullptr };
-        Label *lblAttackInfo { nullptr };
-        Label *lblToHitR { nullptr };
-        Label *lblPortBord { nullptr };
-        Label *lblPortrait { nullptr };
-        ListBox *lbItems { nullptr };
-        Label *lblDefInfo { nullptr };
-        unordered_map<Equipment::Slot, Label *> lblInv;
-        unordered_map<Equipment::Slot, Button *> btnInv;
-        Label *lblAtkL { nullptr };
-        Label *lblAtkR { nullptr };
-        Label *lblDef { nullptr };
-        Label *lblTitle { nullptr };
-        Label *lblDamage { nullptr };
-        Label *lblToHitL { nullptr };
-        Label *lblToHit { nullptr };
-        Label *lblSlotName { nullptr };
-        Button *btnBack { nullptr };
-        Button *btnEquip{ nullptr };
-        ListBox *lbDesc { nullptr };
+        gui::Label *lblCantEquip { nullptr };
+        gui::Label *lblAttackInfo { nullptr };
+        gui::Label *lblToHitR { nullptr };
+        gui::Label *lblPortBord { nullptr };
+        gui::Label *lblPortrait { nullptr };
+        gui::ListBox *lbItems { nullptr };
+        gui::Label *lblDefInfo { nullptr };
+        std::unordered_map<Equipment::Slot, gui::Label *> lblInv;
+        std::unordered_map<Equipment::Slot, gui::Button *> btnInv;
+        gui::Label *lblAtkL { nullptr };
+        gui::Label *lblAtkR { nullptr };
+        gui::Label *lblDef { nullptr };
+        gui::Label *lblTitle { nullptr };
+        gui::Label *lblDamage { nullptr };
+        gui::Label *lblToHitL { nullptr };
+        gui::Label *lblToHit { nullptr };
+        gui::Label *lblSlotName { nullptr };
+        gui::Button *btnBack { nullptr };
+        gui::Button *btnEquip{ nullptr };
+        gui::ListBox *lbDesc { nullptr };
 
         // KOTOR only
-        Label *lblVitality { nullptr };
-        Label *lblTxtBar { nullptr };
-        Button *btnCharLeft { nullptr };
-        Button *btnCharRight { nullptr };
-        Label *lblSelectTitle { nullptr };
-        Button *btnChange1 { nullptr };
-        Button *btnChange2 { nullptr };
+        gui::Label *lblVitality { nullptr };
+        gui::Label *lblTxtBar { nullptr };
+        gui::Button *btnCharLeft { nullptr };
+        gui::Button *btnCharRight { nullptr };
+        gui::Label *lblSelectTitle { nullptr };
+        gui::Button *btnChange1 { nullptr };
+        gui::Button *btnChange2 { nullptr };
         // End KOTOR only
 
         // TSL only
-        Label *lblBack1 { nullptr };
-        Label *lblDefBack { nullptr };
-        Label *lblBar[5];
-        Label *lblAttackMod { nullptr };
-        Label *lblDamText { nullptr };
-        Button *btnSwapWeapons { nullptr };
-        Button *btnPrevNpc { nullptr };
-        Button *btnNextNpc { nullptr };
-        Label *lblDefText { nullptr };
+        gui::Label *lblBack1 { nullptr };
+        gui::Label *lblDefBack { nullptr };
+        gui::Label *lblBar[5];
+        gui::Label *lblAttackMod { nullptr };
+        gui::Label *lblDamText { nullptr };
+        gui::Button *btnSwapWeapons { nullptr };
+        gui::Button *btnPrevNpc { nullptr };
+        gui::Button *btnNextNpc { nullptr };
+        gui::Label *lblDefText { nullptr };
         // End TSL only
     };
     Binding binding;
