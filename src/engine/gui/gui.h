@@ -105,7 +105,7 @@ protected:
     glm::ivec2 _controlOffset { 0 };
     std::shared_ptr<graphics::Texture> _background;
     std::unique_ptr<Control> _rootControl;
-    std::vector<std::unique_ptr<Control>> _controls;
+    std::vector<std::shared_ptr<Control>> _controls;
     std::unordered_map<std::string, Control *> _controlByTag;
     Control *_focus { nullptr };
     bool _hasDefaultHilightColor { false };
@@ -123,7 +123,7 @@ protected:
     virtual void preloadControl(Control &control);
 
     Control &getControl(const std::string &tag) const;
-    Control *getControlPtr(const std::string &tag) const;
+    std::shared_ptr<Control> getControlPtr(const std::string &tag) const;
 
     template <class T>
     T &getControl(const std::string &tag) const {
@@ -132,9 +132,9 @@ protected:
     }
 
     template <class T>
-    T *getControlPtr(const std::string &tag) const {
-        Control *ctrl = getControlPtr(tag);
-        return static_cast<T *>(ctrl);
+    std::shared_ptr<T> getControlPtr(const std::string &tag) const {
+        auto ctrl = getControlPtr(tag);
+        return std::static_pointer_cast<T>(ctrl);
     }
 
     // User input
