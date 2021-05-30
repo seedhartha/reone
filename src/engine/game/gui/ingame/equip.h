@@ -53,23 +53,6 @@ public:
     void update();
 
 private:
-    Slot _selectedSlot { Slot::None };
-    int _selectedItemIdx { -1 };
-
-    void onClick(const std::string &control) override;
-    void onFocusChanged(const std::string &control, bool focus) override;
-    void onListBoxItemClick(const std::string &control, const std::string &item) override;
-    void preloadControl(gui::Control &control) override;
-
-    void configureItemsListBox();
-    void updateEquipment();
-    void updateItems();
-    void updatePortraits();
-    void selectSlot(Slot slot);
-
-    std::shared_ptr<graphics::Texture> getItemFrameTexture(int stackSize) const;
-    std::shared_ptr<graphics::Texture> getEmptySlotIcon(Slot slot) const;
-
     struct Binding {
         gui::Label *lblCantEquip { nullptr };
         gui::Label *lblAttackInfo { nullptr };
@@ -113,8 +96,24 @@ private:
         gui::Button *btnNextNpc { nullptr };
         gui::Label *lblDefText { nullptr };
         // End TSL only
-    };
-    Binding binding;
+    } _binding;
+    Slot _selectedSlot { Slot::None };
+    int _selectedItemIdx { -1 };
+
+    void onClick(const std::string &control) override;
+    void onFocusChanged(const std::string &control, bool focus) override;
+    void onListBoxItemClick(const std::string &control, const std::string &item) override;
+    void preloadControl(gui::Control &control) override;
+
+    void configureItemsListBox();
+    void updateEquipment();
+    void updateItems();
+    void updatePortraits();
+    void selectSlot(Slot slot);
+
+    std::shared_ptr<graphics::Texture> getItemFrameTexture(int stackSize) const;
+    std::shared_ptr<graphics::Texture> getEmptySlotIcon(Slot slot) const;
+
     void bindControls();
 };
 
