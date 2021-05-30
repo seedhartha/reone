@@ -80,7 +80,7 @@ void InGameMenu::load() {
 
 void InGameMenu::loadEquipment() {
     _equip = make_unique<Equipment>(_game);
-    _equip->load();
+    _equip->load(this);
 }
 
 void InGameMenu::loadInventory() {
@@ -247,6 +247,20 @@ void InGameMenu::onClick(const string &control) {
     } else if (control == "LBLH_OPT") {
         openOptions();
     }
+}
+
+shared_ptr<Button> InGameMenu::getBtnChange2() {
+    if (!isTSL(_game->gameId())) {
+        return nullptr;
+    }
+    return getControlPtr<Button>("BTN_CHANGE2");
+}
+
+shared_ptr<Button> InGameMenu::getBtnChange3() {
+    if (!isTSL(_game->gameId())) {
+        return nullptr;
+    }
+    return getControlPtr<Button>("BTN_CHANGE3");
 }
 
 } // namespace game

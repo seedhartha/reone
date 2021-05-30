@@ -29,6 +29,12 @@ namespace game {
 
 class Creature;
 
+class EquipmentBindingHelper {
+public:
+    virtual shared_ptr<gui::Button> getBtnChange2() = 0;
+    virtual shared_ptr<gui::Button> getBtnChange3() = 0;
+};
+
 class Equipment : public GameGUI {
 public:
     enum class Slot {
@@ -49,6 +55,7 @@ public:
     Equipment(Game *game);
 
     void load() override;
+    void load(EquipmentBindingHelper *bindingHelper);
 
     void update();
 
@@ -114,7 +121,7 @@ private:
     std::shared_ptr<graphics::Texture> getItemFrameTexture(int stackSize) const;
     std::shared_ptr<graphics::Texture> getEmptySlotIcon(Slot slot) const;
 
-    void bindControls();
+    void bindControls(EquipmentBindingHelper *bindingHelper);
 };
 
 } // namespace game
