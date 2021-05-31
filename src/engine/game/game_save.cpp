@@ -24,6 +24,7 @@
 #include <boost/iostreams/stream.hpp>
 
 #include "../common/streamutil.h"
+#include "../graphics/texture/tgawriter.h"
 #include "../resource/format/erfreader.h"
 #include "../resource/format/erfwriter.h"
 #include "../resource/format/gffwriter.h"
@@ -33,6 +34,7 @@ namespace io = boost::iostreams;
 
 using namespace std;
 
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {
@@ -40,8 +42,11 @@ namespace reone {
 namespace game {
 
 static constexpr int kNfoBufferSize = 1024;
+static constexpr int kScreenBufferSize = 262144;
 
 void Game::saveToFile(const fs::path &path) {
+    // Prepare savenfo RES
+
     GffStruct::Field nfoLastModuleFld(GffStruct::FieldType::CExoString, "LastModule");
     nfoLastModuleFld.strValue = _module->name();
 
@@ -65,8 +70,28 @@ void Game::saveToFile(const fs::path &path) {
     nfoRes.resType = ResourceType::Res;
     nfoRes.data = move(nfoResData);
 
+    // Prepare screen TGA
+
+    ByteArray screenBuffer;
+    screenBuffer.resize(kScreenBufferSize);
+    io::array_sink screenSink(&screenBuffer[0], kScreenBufferSize);
+    auto screenStream = make_shared<io::stream<io::array_sink>>(screenSink);
+
+    shared_ptr<Texture> screenshot(_scene.worldRenderPipeline().screenshot());
+    TgaWriter tga(screenshot);
+    tga.save(*screenStream);
+    screenBuffer.resize(screenStream->tellp());
+
+    ErfWriter::Resource screenRes;
+    screenRes.resRef = "screen";
+    screenRes.resType = ResourceType::Tga;
+    screenRes.data = move(screenBuffer);
+
+    // Save ERF
+
     ErfWriter erf;
     erf.add(move(nfoRes));
+    erf.add(move(screenRes));
     erf.save(ErfWriter::FileType::ERF, path);
 }
 

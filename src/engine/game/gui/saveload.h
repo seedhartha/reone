@@ -57,6 +57,7 @@ private:
     void indexSavedGame(boost::filesystem::path path);
 
     void onClick(const std::string &control) override;
+    void onListBoxItemClick(const std::string &control, const std::string &item) override;
 
     void saveGame(int number);
     void loadGame(int number);

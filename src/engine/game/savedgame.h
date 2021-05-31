@@ -19,11 +19,14 @@
 
 #include <string>
 
+#include "../graphics/texture/texture.h"
+
 namespace reone {
 
 namespace game {
 
 struct SavedGame {
+    std::shared_ptr<graphics::Texture> screen;
     std::string lastModule;
 };
 

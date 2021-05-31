@@ -439,9 +439,6 @@ void WorldRenderPipeline::drawResult() {
 void WorldRenderPipeline::saveScreenshot() {
     _screenshotColor->bind();
     _screenshotColor->flushGPUToCPU();
-
-    TgaWriter tga(_screenshotColor);
-    tga.save("screen.tga");
 }
 
 } // namespace scene

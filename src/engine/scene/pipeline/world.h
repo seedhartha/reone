@@ -40,6 +40,8 @@ public:
     void init();
     void render();
 
+    std::shared_ptr<graphics::Texture> screenshot() { return _screenshotColor; }
+
     void setTakeScreenshot(bool take) { _takeScreenshot = take; }
 
 private:
