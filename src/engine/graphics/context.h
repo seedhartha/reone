@@ -41,16 +41,16 @@ public:
 
     const glm::ivec4 &viewport() const { return _viewport; }
     PolygonMode polygonMode() const { return _polygonMode; }
+    BlendMode blendMode() const { return _blendMode; }
 
     void setViewport(glm::ivec4 viewport);
     void setDepthTestEnabled(bool enabled);
     void setBackFaceCullingEnabled(bool enabled);
     void setPolygonMode(PolygonMode mode);
     void setActiveTextureUnit(int n);
+    void setBlendMode(BlendMode mode);
 
     void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
-    void withAdditiveBlending(const std::function<void()> &block);
-    void withLightenBlending(const std::function<void()> &block);
 
 private:
     glm::ivec4 _viewport { 0 };
@@ -58,6 +58,7 @@ private:
     bool _backFaceCulling { false };
     int _textureUnit { 0 };
     PolygonMode _polygonMode { PolygonMode::Fill };
+    BlendMode _blendMode { BlendMode::None };
 };
 
 } // namespace graphics

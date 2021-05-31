@@ -97,9 +97,10 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
 
     _sceneGraph->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    _sceneGraph->graphics().context().withAdditiveBlending([&]() {
-        _sceneGraph->graphics().meshes().billboard().draw();
-    });
+    BlendMode oldBlendMode = _sceneGraph->graphics().context().blendMode();
+    _sceneGraph->graphics().context().setBlendMode(BlendMode::Add);
+    _sceneGraph->graphics().meshes().billboard().draw();
+    _sceneGraph->graphics().context().setBlendMode(oldBlendMode);
 }
 
 bool LightSceneNode::isDirectional() const {

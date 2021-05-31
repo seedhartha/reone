@@ -284,14 +284,13 @@ void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &
     _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
 
+    BlendMode oldBlendMode(_sceneGraph->graphics().context().blendMode());
     bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
     if (lighten) {
-        _sceneGraph->graphics().context().withLightenBlending([&]() {
-            _sceneGraph->graphics().meshes().billboard().drawInstanced(count);
-        });
-    } else {
-        _sceneGraph->graphics().meshes().billboard().drawInstanced(count);
+        _sceneGraph->graphics().context().setBlendMode(BlendMode::Lighten);
     }
+    _sceneGraph->graphics().meshes().billboard().drawInstanced(count);
+    _sceneGraph->graphics().context().setBlendMode(oldBlendMode);
 }
 
 } // namespace scene
