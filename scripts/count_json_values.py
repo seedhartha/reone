@@ -21,10 +21,14 @@ import re
 import sys
 from functools import partial
 
-extract_dir = r"D:\OpenKotOR\Extract\KotOR"
+from reo_shared import *
 
-if not os.path.exists(extract_dir):
-    raise RuntimeError("Extraction directory does not exist")
+extract_dir = r"D:\OpenKotOR\Extract\KotORx"
+
+if not is_valid_extract_dir(extract_dir):
+    extract_dir = choose_directory("Choose an extraction directory")
+    if not is_valid_extract_dir(extract_dir):
+        exit(1)
 
 
 def get_unique_json_values(extract_dir, path_pattern, extract_values):

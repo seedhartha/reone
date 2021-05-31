@@ -20,9 +20,9 @@ TODO: support case sensitive paths (Unix)
 
 import glob
 import os
-import platform
 import shutil
-import subprocess
+
+from reo_shared import *
 
 game_dir = r"D:\Games\Star Wars - KotOR"
 tools_dir = r"D:\Source\reone\build\bin\RelWithDebInfo"
@@ -41,28 +41,6 @@ steps = [
     ["convert_to_tga", "Convert TPC to TGA/TXI (y/n)?", None],
     ["convert_to_ascii_pth", "Convert binary PTH to ASCII PTH (y/n)?", None],
     ["disassemble_scripts", "Disassemble NCS scripts (y/n)?", None] ]
-
-if not os.path.exists(game_dir):
-    raise RuntimeError("Game directory does not exist")
-
-if not os.path.exists(tools_dir):
-    raise RuntimeError("Tools directory does not exist")
-
-if not os.path.exists(extract_dir):
-    raise RuntimeError("Extraction directory does not exist")
-
-
-def append_dir_to_path(dir):
-    if os.path.exists(dir) and (not dir in os.environ["PATH"]):
-        separator = ":" if platform.system() == "Linux" else ";"
-        os.environ["PATH"] = separator.join([os.environ["PATH"], dir])
-
-
-def run_subprocess(args, silent=True, check_retcode=True):
-    stdout = subprocess.DEVNULL if silent else None
-    process = subprocess.run(args, stdout=stdout)
-    if check_retcode:
-        process.check_returncode()
 
 
 def extract_bifs(game_dir, extract_dir):
@@ -223,8 +201,21 @@ def disassemble_scripts(extract_dir):
             run_subprocess(["nwnnsscomp", "-d", f, "-o", pcode_path])
 
 
-append_dir_to_path(tools_dir)
-append_dir_to_path(nwnnsscomp_dir)
+if not is_valid_game_dir(game_dir):
+    game_dir = choose_directory("Choose a game directory")
+    if not is_valid_game_dir(game_dir):
+        exit(1)
+
+if not is_valid_tools_dir(tools_dir):
+    tools_dir = choose_directory("Choose a tools directory")
+    if not is_valid_tools_dir(tools_dir):
+        exit(1)
+    append_dir_to_path(tools_dir)
+
+if not is_valid_extract_dir(extract_dir):
+    extract_dir = choose_directory("Choose an extraction directory")
+    if not is_valid_extract_dir(extract_dir):
+        exit(1)
 
 for step in steps:
     if step[2] is None:
@@ -265,4 +256,10 @@ for step in steps:
             convert_to_ascii_pth(extract_dir)
 
         if step[0] == "disassemble_scripts":
+            if not is_valid_script_compiler_dir(nwnnsscomp_dir):
+                nwnnsscomp_dir = choose_directory("Choose a script compiler directory")
+                if not is_valid_script_compiler_dir(nwnnsscomp_dir):
+                    exit(1)
+                append_dir_to_path(nwnnsscomp_dir)
+
             disassemble_scripts(extract_dir)
