@@ -40,7 +40,6 @@ public:
     void deinit();
 
     void bind() const;
-    void unbind() const;
 
     /**
      * Attaches a texture as a color buffer of this framebuffer. Framebuffer must be bound.

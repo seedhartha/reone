@@ -266,6 +266,23 @@ void Texture::unbind() const {
     glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, 0);
 }
 
+void Texture::flushGPUToCPU() {
+    if (_properties.cubemap) throw logic_error("Cubemaps are not supported");
+
+    Layer layer;
+    layer.mipMaps.resize(1);
+
+    MipMap &mipMap = layer.mipMaps[0];
+    mipMap.width = _width;
+    mipMap.height = _height;
+    mipMap.pixels = make_shared<ByteArray>();
+    mipMap.pixels->resize(3 * _width * _height);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, &(*mipMap.pixels)[0]);
+
+    _layers.clear();
+    _layers.push_back(move(layer));
+}
+
 bool Texture::isAdditive() const {
     return _features.blending == Blending::Additive;
 }

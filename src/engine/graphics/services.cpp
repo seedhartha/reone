@@ -38,6 +38,7 @@ void GraphicsServices::init() {
     _window->init();
 
     _context = make_unique<Context>();
+    _context->init();
 
     _meshes = make_unique<Meshes>();
     _meshes->init();

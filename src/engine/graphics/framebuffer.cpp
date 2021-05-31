@@ -50,10 +50,6 @@ void Framebuffer::bind() const {
     glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
 }
 
-void Framebuffer::unbind() const {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
 void Framebuffer::attachColor(const Texture &texture, int index, int mip) const {
     if (texture.isCubeMap()) {
         glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, texture.textureId(), mip);

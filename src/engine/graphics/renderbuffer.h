@@ -39,7 +39,6 @@ public:
     void deinit();
 
     void bind() const;
-    void unbind() const;
 
     /**
      * Configures this renderbuffers size and internal format. Renderbuffer must be bound.

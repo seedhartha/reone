@@ -111,14 +111,16 @@ public:
     void bind() const;
     void unbind() const;
 
+    void flushGPUToCPU();
+
     /**
      * Clears this texture pixels. Texture must be bound, unless it is headless.
      */
     void clearPixels(int w, int h, PixelFormat format);
 
     /**
-    * @return true if this is a cube map texture, false otherwise
-    */
+     * @return true if this is a cube map texture, false otherwise
+     */
     bool isCubeMap() const;
 
     bool isAdditive() const;
@@ -133,13 +135,13 @@ public:
     PixelFormat pixelFormat() const { return _pixelFormat; }
 
     /**
-    * Sets this texture pixels from a single image. Texture must be bound, unless it is headless.
-    */
+     * Sets this texture pixels from a single image. Texture must be bound, unless it is headless.
+     */
     void setPixels(int w, int h, PixelFormat format, std::shared_ptr<ByteArray> pixels);
 
     /**
-    * Sets this texture pixels from multiple images. Texture must be bound, unless it is headless.
-    */
+     * Sets this texture pixels from multiple images. Texture must be bound, unless it is headless.
+     */
     void setPixels(int w, int h, PixelFormat format, std::vector<Layer> layers);
 
     void setFeatures(Features features);

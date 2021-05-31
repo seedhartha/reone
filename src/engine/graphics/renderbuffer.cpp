@@ -48,10 +48,6 @@ void Renderbuffer::bind() const {
     glBindRenderbuffer(GL_RENDERBUFFER, _id);
 }
 
-void Renderbuffer::unbind() const {
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-}
-
 void Renderbuffer::configure(int w, int h, PixelFormat format) {
     glRenderbufferStorage(GL_RENDERBUFFER, getInternalPixelFormatGL(format), w, h);
 }

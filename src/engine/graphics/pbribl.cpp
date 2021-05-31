@@ -94,7 +94,14 @@ bool PBRIBL::getDerived(const Texture *envmap, Derived &derived) {
 }
 
 shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
-    static glm::ivec4 viewport(0, 0, 32, 32);
+    static glm::ivec4 irradianceViewport(0, 0, 32, 32);
+
+    // Set viewport
+
+    glm::ivec4 oldViewport(_context.viewport());
+    _context.setViewport(irradianceViewport);
+
+    // Bind irradiance framebuffer
 
     auto irradianceColor = make_shared<Texture>(envmap->name() + "_irradiance_color", getTextureProperties(TextureUsage::IrradianceMap));
     irradianceColor->init();
@@ -107,32 +114,39 @@ shared_ptr<Texture> PBRIBL::computeIrradianceMap(const Texture *envmap) {
     irradianceDepth->configure(32, 32, PixelFormat::Depth);
 
     _irradianceFB.bind();
+    _irradianceFB.attachDepth(*irradianceDepth);
+
+    // Bind environment map
 
     _context.setActiveTextureUnit(TextureUnits::environmentMap);
     envmap->bind();
 
-    _context.withViewport(viewport, [&]() {
-        for (int i = 0; i < kNumCubeFaces; ++i) {
-            _irradianceFB.attachCubeMapFaceAsColor(*irradianceColor, static_cast<CubeMapFace>(i));
-            _irradianceFB.attachDepth(*irradianceDepth);
-            _irradianceFB.checkCompleteness();
+    // Draw cube sides
 
-            ShaderUniforms uniforms;
-            uniforms.combined.general.projection = g_captureProjection;
-            uniforms.combined.general.view = g_captureViews[i];
+    for (int i = 0; i < kNumCubeFaces; ++i) {
+        _irradianceFB.attachCubeMapFaceAsColor(*irradianceColor, static_cast<CubeMapFace>(i));
+        _irradianceFB.checkCompleteness();
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            _shaders.activate(ShaderProgram::SimpleIrradiance, uniforms);
-            _meshes.cubemap().draw();
-        }
-    });
+        ShaderUniforms uniforms;
+        uniforms.combined.general.projection = g_captureProjection;
+        uniforms.combined.general.view = g_captureViews[i];
 
-    _irradianceFB.unbind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        _shaders.activate(ShaderProgram::SimpleIrradiance, uniforms);
+        _meshes.cubemap().draw();
+    }
+
+    // Restore context
+
+    _context.unbindFramebuffer();
+    _context.setViewport(move(oldViewport));
 
     return move(irradianceColor);
 }
 
 shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
+    // Bind prefiltered map framebuffer
+
     auto prefilterColor = make_shared<Texture>(envmap->name() + "_prefilter_color", getTextureProperties(TextureUsage::PrefilterMap));
     prefilterColor->init();
     prefilterColor->bind();
@@ -145,42 +159,59 @@ shared_ptr<Texture> PBRIBL::computePrefilterMap(const Texture *envmap) {
     _prefilterFB.bind();
     _prefilterFB.attachDepth(*prefilterDepth);
 
+    // Bind environment map
+
     _context.setActiveTextureUnit(TextureUnits::environmentMap);
     envmap->bind();
+
+    // Draw cube sides
+
+    glm::ivec4 oldViewport(_context.viewport());
 
     for (int mip = 0; mip < kNumPrefilterMipMaps; ++mip) {
         int mipWidth = static_cast<int>(128 * glm::pow(0.5f, mip));
         int mipHeight = static_cast<int>(128 * glm::pow(0.5f, mip));
         prefilterDepth->configure(mipWidth, mipHeight, PixelFormat::Depth);
-        glm::ivec4 viewport(0, 0, mipWidth, mipHeight);
+
+        glm::ivec4 prefilterViewport(0, 0, mipWidth, mipHeight);
+        _context.setViewport(move(prefilterViewport));
+
 
         float roughness = mip / static_cast<float>(kNumPrefilterMipMaps - 1);
 
-        _context.withViewport(viewport, [&]() {
-            for (int face = 0; face < kNumCubeFaces; ++face) {
-                _prefilterFB.attachCubeMapFaceAsColor(*prefilterColor, static_cast<CubeMapFace>(face), 0, mip);
-                _prefilterFB.checkCompleteness();
+        for (int face = 0; face < kNumCubeFaces; ++face) {
+            _prefilterFB.attachCubeMapFaceAsColor(*prefilterColor, static_cast<CubeMapFace>(face), 0, mip);
+            _prefilterFB.checkCompleteness();
 
-                ShaderUniforms uniforms(_shaders.defaultUniforms());
-                uniforms.combined.general.projection = g_captureProjection;
-                uniforms.combined.general.view = g_captureViews[face];
-                uniforms.combined.general.roughness = roughness;
-                uniforms.combined.general.envmapResolution = static_cast<float>(envmap->width());
-                _shaders.activate(ShaderProgram::SimplePrefilter, uniforms);
+            ShaderUniforms uniforms(_shaders.defaultUniforms());
+            uniforms.combined.general.projection = g_captureProjection;
+            uniforms.combined.general.view = g_captureViews[face];
+            uniforms.combined.general.roughness = roughness;
+            uniforms.combined.general.envmapResolution = static_cast<float>(envmap->width());
+            _shaders.activate(ShaderProgram::SimplePrefilter, uniforms);
 
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                _meshes.cubemap().draw();
-            }
-        });
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            _meshes.cubemap().draw();
+        }
     }
 
-    _prefilterFB.unbind();
+    // Restore context
+
+    _context.unbindFramebuffer();
+    _context.setViewport(move(oldViewport));
 
     return move(prefilterColor);
 }
 
 shared_ptr<Texture> PBRIBL::computeBRDFLookup(const Texture *envmap) {
-    static glm::ivec4 viewport(0, 0, 512, 512);
+    static glm::ivec4 brdfViewport(0, 0, 512, 512);
+
+    // Set viewport
+
+    glm::ivec4 oldViewport(_context.viewport());
+    _context.setViewport(brdfViewport);
+
+    // Bind BRDF lookup framebuffer
 
     auto brdfLookupColor = make_shared<Texture>(envmap->name() + "_brdf_color", getTextureProperties(TextureUsage::BRDFLookup));
     brdfLookupColor->init();
@@ -197,13 +228,16 @@ shared_ptr<Texture> PBRIBL::computeBRDFLookup(const Texture *envmap) {
     _brdfLookupFB.attachDepth(*brdfLookupDepth);
     _brdfLookupFB.checkCompleteness();
 
-    _context.withViewport(viewport, [&]() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        _shaders.activate(ShaderProgram::SimpleBRDF, _shaders.defaultUniforms());
-        _meshes.quadNDC().draw();
-    });
+    // Draw a quad
 
-    _brdfLookupFB.unbind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _shaders.activate(ShaderProgram::SimpleBRDF, _shaders.defaultUniforms());
+    _meshes.quadNDC().draw();
+
+    // Restore context
+
+    _context.unbindFramebuffer();
+    _context.setViewport(move(oldViewport));
 
     return move(brdfLookupColor);
 }

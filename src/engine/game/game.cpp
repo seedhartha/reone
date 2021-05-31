@@ -805,6 +805,10 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
             }
             break;
 
+        case SDLK_p:
+            _scene.worldRenderPipeline().setTakeScreenshot(true);
+            return true;
+
         default:
             break;
     }
