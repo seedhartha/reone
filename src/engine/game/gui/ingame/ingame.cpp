@@ -250,17 +250,11 @@ void InGameMenu::onClick(const string &control) {
 }
 
 shared_ptr<Button> InGameMenu::getBtnChange2() {
-    if (!isTSL(_game->gameId())) {
-        return nullptr;
-    }
-    return getControlPtr<Button>("BTN_CHANGE2");
+    return isTSL(_game->gameId()) ? getControlPtr<Button>("BTN_CHANGE2") : nullptr;
 }
 
 shared_ptr<Button> InGameMenu::getBtnChange3() {
-    if (!isTSL(_game->gameId())) {
-        return nullptr;
-    }
-    return getControlPtr<Button>("BTN_CHANGE3");
+    return isTSL(_game->gameId()) ? getControlPtr<Button>("BTN_CHANGE3") : nullptr;
 }
 
 } // namespace game
