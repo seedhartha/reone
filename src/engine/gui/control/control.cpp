@@ -266,14 +266,12 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         _gui->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
         border.fill->bind();
 
-        bool additive = border.fill->isAdditive();
-        if (additive) {
-            _gui->graphics().context().withAdditiveBlending([&]() {
-                _gui->graphics().meshes().quad().draw();
-            });
-        } else {
-            _gui->graphics().meshes().quad().draw();
+        BlendMode oldBlendMode = _gui->graphics().context().blendMode();
+        if (border.fill->isAdditive()) {
+            _gui->graphics().context().setBlendMode(BlendMode::Add);
         }
+        _gui->graphics().meshes().quad().draw();
+        _gui->graphics().context().setBlendMode(oldBlendMode);
     }
     if (border.edge) {
         int width = size.x - 2 * border.dimension;

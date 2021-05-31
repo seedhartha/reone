@@ -28,6 +28,7 @@ namespace graphics {
 
 void Context::init() {
     glGetIntegerv(GL_VIEWPORT, &_viewport[0]);
+    setBlendMode(BlendMode::Default);
 }
 
 void Context::unbindFramebuffer() {
@@ -91,6 +92,32 @@ void Context::setActiveTextureUnit(int n) {
     _textureUnit = n;
 }
 
+void Context::setBlendMode(BlendMode mode) {
+    if (_blendMode == mode) return;
+
+    switch (mode) {
+        case BlendMode::None:
+            glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+            glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_ZERO);
+            break;
+        case BlendMode::Add:
+            glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_SRC_ALPHA, GL_ONE);
+            break;
+        case BlendMode::Lighten:
+            glBlendEquationSeparate(GL_MAX, GL_FUNC_ADD);
+            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE);
+            break;
+        case BlendMode::Default:
+        default:
+            glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE);
+            break;
+    }
+
+    _blendMode = mode;
+}
+
 void Context::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
     glEnable(GL_SCISSOR_TEST);
     glScissor(bounds[0], bounds[1], bounds[2], bounds[3]);
@@ -99,38 +126,6 @@ void Context::withScissorTest(const glm::ivec4 &bounds, const function<void()> &
     block();
 
     glDisable(GL_SCISSOR_TEST);
-}
-
-static void withBlendFunc(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha, const function<void()> &block) {
-    GLint blendSrcRgb, blendSrcAlpha, blendDstRgb, blendDstAlpha;
-    glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcRgb);
-    glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcAlpha);
-    glGetIntegerv(GL_BLEND_DST_RGB, &blendDstRgb);
-    glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstAlpha);
-    glBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
-
-    block();
-
-    glBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
-}
-
-void Context::withAdditiveBlending(const function<void()> &block) {
-    withBlendFunc(GL_SRC_ALPHA, GL_ONE, GL_SRC_ALPHA, GL_ONE, block);
-}
-
-static void withBlendEquation(GLenum modeRGB, GLenum modeAlpha, const function<void()> &block) {
-    GLint startModeRGB, startModeAlpha;
-    glGetIntegerv(GL_BLEND_EQUATION_RGB, &startModeRGB);
-    glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &startModeAlpha);
-    glBlendEquationSeparate(modeRGB, modeAlpha);
-
-    block();
-
-    glBlendEquationSeparate(startModeRGB, startModeAlpha);
-}
-
-void Context::withLightenBlending(const function<void()> &block) {
-    withBlendEquation(GL_MAX, GL_FUNC_ADD, block);
 }
 
 } // namespace graphics

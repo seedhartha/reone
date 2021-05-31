@@ -86,10 +86,7 @@ int Window::getWindowFlags() const {
 
 void Window::initGL() {
     glewInit();
-
     glEnable(GL_BLEND);
-    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE);
-
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
 

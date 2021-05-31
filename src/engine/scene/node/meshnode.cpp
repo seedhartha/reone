@@ -396,11 +396,12 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     }
 
 
+    BlendMode oldBlendMode(_sceneGraph->graphics().context().blendMode());
     if (additive) {
-        _sceneGraph->graphics().context().withAdditiveBlending([&mesh]() { mesh->mesh->draw(); });
-    } else {
-        mesh->mesh->draw();
+        _sceneGraph->graphics().context().setBlendMode(BlendMode::Add);
     }
+    mesh->mesh->draw();
+    _sceneGraph->graphics().context().setBlendMode(oldBlendMode);
 }
 
 bool MeshSceneNode::isLightingEnabled() const {
