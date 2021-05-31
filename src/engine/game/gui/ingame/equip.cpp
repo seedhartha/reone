@@ -23,13 +23,14 @@
 #include "../../../graphics/texture/textures.h"
 #include "../../../resource/strings.h"
 
-#include "ingame.h"
 #include "../../game.h"
 #include "../../gameidutil.h"
 #include "../../object/creature.h"
 #include "../../object/item.h"
 
 #include "../colorutil.h"
+
+#include "ingame.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -72,7 +73,7 @@ static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
     { Equipment::Slot::WeapR2, 31379 }
 };
 
-Equipment::Equipment(Game *game, InGameMenu *inGameMenu) : GameGUI(game), _inGameMenu(inGameMenu) {
+Equipment::Equipment(Game *game, InGameMenu &inGameMenu) : GameGUI(game), _inGameMenu(inGameMenu) {
     _resRef = getResRef("equip");
 
     initForGame();
@@ -105,8 +106,8 @@ void Equipment::bindControls() {
         _binding.btnPrevNpc = getControlPtr<Button>("BTN_PREVNPC");
         _binding.btnNextNpc = getControlPtr<Button>("BTN_NEXTNPC");
         _binding.lblDefText = getControlPtr<Label>("LBL_DEF_TEXT");
-        _binding.btnChange1 = _inGameMenu->getBtnChange2();
-        _binding.btnChange2 = _inGameMenu->getBtnChange3();
+        _binding.btnChange1 = _inGameMenu.getBtnChange2();
+        _binding.btnChange2 = _inGameMenu.getBtnChange3();
         _binding.btnCharLeft = getControlPtr<Button>("BTN_PREVNPC");
         _binding.btnCharRight = getControlPtr<Button>("BTN_NEXTNPC");
     }
