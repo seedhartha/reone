@@ -28,12 +28,7 @@ namespace reone {
 namespace game {
 
 class Creature;
-
-class EquipmentBindingHelper {
-public:
-    virtual shared_ptr<gui::Button> getBtnChange2() = 0;
-    virtual shared_ptr<gui::Button> getBtnChange3() = 0;
-};
+class InGameMenu;
 
 class Equipment : public GameGUI {
 public:
@@ -55,7 +50,7 @@ public:
     Equipment(Game *game);
 
     void load() override;
-    void load(EquipmentBindingHelper *bindingHelper);
+    void load(InGameMenu *menu);
 
     void update();
 
@@ -121,7 +116,7 @@ private:
     std::shared_ptr<graphics::Texture> getItemFrameTexture(int stackSize) const;
     std::shared_ptr<graphics::Texture> getEmptySlotIcon(Slot slot) const;
 
-    void bindControls(EquipmentBindingHelper *bindingHelper);
+    void bindControls(InGameMenu *menu);
 };
 
 } // namespace game
