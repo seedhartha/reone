@@ -17,11 +17,12 @@
 
 #pragma once
 
-#include "../gui.h"
 #include "../../../gui/control/button.h"
 #include "../../../gui/control/imagebutton.h"
 #include "../../../gui/control/label.h"
 #include "../../../gui/control/listbox.h"
+
+#include "../gui.h"
 
 namespace reone {
 
@@ -47,7 +48,7 @@ public:
         WeapR2
     };
 
-    Equipment(Game *game, InGameMenu *inGameMenu);
+    Equipment(Game *game, InGameMenu &inGameMenu);
 
     void load() override;
 
@@ -98,9 +99,11 @@ private:
         std::shared_ptr<gui::Label> lblDefText { nullptr };
         // End TSL only
     } _binding;
+
+    InGameMenu &_inGameMenu;
+
     Slot _selectedSlot { Slot::None };
     int _selectedItemIdx { -1 };
-    InGameMenu *_inGameMenu;
 
     void onClick(const std::string &control) override;
     void onFocusChanged(const std::string &control, bool focus) override;
