@@ -30,8 +30,8 @@ constexpr int kDefaultSlotCount = 6;
 class ListBox : public Control {
 public:
     enum class SelectionMode {
-        Hilight,
-        Propagate
+        OnHover,
+        OnClick
     };
 
     struct Item {
@@ -71,17 +71,17 @@ public:
 
     Control &protoItem() const { return *_protoItem; }
     Control &scrollBar() const { return *_scrollBar; }
-    int hilightedIndex() const { return _hilightedIndex; }
+    int selectedItemIndex() const { return _selectedItemIndex; }
 
 private:
-    SelectionMode _mode { SelectionMode::Propagate };
+    SelectionMode _selectionMode { SelectionMode::OnHover };
     ControlType _protoItemType { ControlType::Invalid };
     std::shared_ptr<Control> _protoItem;
     std::shared_ptr<Control> _scrollBar;
     std::vector<Item> _items;
     int _slotCount { 0 };
     int _itemOffset { 0 };
-    int _hilightedIndex { -1 };
+    int _selectedItemIndex { -1 };
     int _itemMargin { 0 };
     bool _protoMatchContent { false }; /**< proto item height must match its content */
 

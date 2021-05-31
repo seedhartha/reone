@@ -47,7 +47,7 @@ ListBox::ListBox(GUI *gui) : Control(gui, ControlType::ListBox) {
 void ListBox::clearItems() {
     _items.clear();
     _itemOffset = 0;
-    _hilightedIndex = -1;
+    _selectedItemIndex = -1;
 }
 
 void ListBox::addItem(Item &&item) {
@@ -74,7 +74,7 @@ void ListBox::addTextLinesAsItems(const string &text) {
 }
 
 void ListBox::clearSelection() {
-    _hilightedIndex = -1;
+    _selectedItemIndex = -1;
 }
 
 void ListBox::load(const GffStruct &gffs) {
@@ -94,8 +94,8 @@ void ListBox::load(const GffStruct &gffs) {
 }
 
 bool ListBox::handleMouseMotion(int x, int y) {
-    if (_mode == SelectionMode::Propagate) {
-        _hilightedIndex = getItemIndex(y);
+    if (_selectionMode == SelectionMode::OnHover) {
+        _selectedItemIndex = getItemIndex(y);
     }
     return false;
 }
@@ -168,14 +168,10 @@ bool ListBox::handleClick(int x, int y) {
     int itemIdx = getItemIndex(y);
     if (itemIdx == -1) return false;
 
-    switch (_mode) {
-        case SelectionMode::Hilight:
-            _hilightedIndex = itemIdx;
-            break;
-        case SelectionMode::Propagate:
-            _gui->onListBoxItemClick(_tag, _items[itemIdx].tag);
-            break;
+    if (_selectionMode == SelectionMode::OnClick) {
+        _selectedItemIndex = itemIdx;
     }
+    _gui->onListBoxItemClick(_tag, _items[itemIdx].tag);
 
     return true;
 }
@@ -197,7 +193,7 @@ void ListBox::draw(const glm::ivec2 &offset, const vector<string> &text) {
         if (_protoMatchContent) {
             _protoItem->setHeight(static_cast<int>(item._textLines.size() * (_protoItem->text().font->height() + _padding)));
         }
-        _protoItem->setFocus(_hilightedIndex == itemIdx);
+        _protoItem->setFocus(_selectedItemIndex == itemIdx);
 
         auto imageButton = dynamic_pointer_cast<ImageButton>(_protoItem);
         if (imageButton) {
@@ -239,8 +235,8 @@ void ListBox::stretch(float x, float y, int mask) {
 
 void ListBox::setFocus(bool focus) {
     Control::setFocus(focus);
-    if (!focus && _mode == SelectionMode::Propagate) {
-        _hilightedIndex = -1;
+    if (!focus && _selectionMode == SelectionMode::OnHover) {
+        _selectedItemIndex = -1;
     }
 }
 
@@ -259,7 +255,7 @@ void ListBox::setProtoItemType(ControlType type) {
 }
 
 void ListBox::setSelectionMode(SelectionMode mode) {
-    _mode = mode;
+    _selectionMode = mode;
 }
 
 void ListBox::setProtoMatchContent(bool match) {

@@ -565,6 +565,11 @@ void Game::openInGame() {
 }
 
 void Game::openInGameMenu(InGameMenu::Tab tab) {
+    // Take a screenshot to be used in SaveLoad menu
+    _graphics.window().clear();
+    _scene.worldRenderPipeline().setTakeScreenshot(true);
+    _scene.worldRenderPipeline().render();
+
     setCursorType(CursorType::Default);
     switch (tab) {
         case InGameMenu::Tab::Equipment:
@@ -804,10 +809,6 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
                 return true;
             }
             break;
-
-        case SDLK_p:
-            _scene.worldRenderPipeline().setTakeScreenshot(true);
-            return true;
 
         default:
             break;

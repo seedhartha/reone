@@ -24,6 +24,7 @@
 
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
+#include "../../graphics/texture/tgareader.h"
 #include "../../gui/control/listbox.h"
 #include "../../resource/format/erfreader.h"
 #include "../../resource/format/gffreader.h"
@@ -37,6 +38,7 @@ namespace fs = boost::filesystem;
 
 using namespace std;
 
+using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
@@ -68,7 +70,7 @@ void SaveLoad::load() {
     hideControl("LBL_AREANAME");
 
     ListBox &lbGames = getControl<ListBox>("LB_GAMES");
-    lbGames.setSelectionMode(ListBox::SelectionMode::Hilight);
+    lbGames.setSelectionMode(ListBox::SelectionMode::OnClick);
     lbGames.setPadding(3);
 
     Control &protoItem = lbGames.protoItem();
@@ -124,11 +126,19 @@ static SavedGame peekSavedGame(const fs::path &path) {
     erf.load(path);
 
     shared_ptr<ByteArray> nfoData(erf.find("savenfo", ResourceType::Res));
-
     GffReader nfo;
     nfo.load(wrap(nfoData));
 
+    shared_ptr<Texture> screen;
+    shared_ptr<ByteArray> screenData(erf.find("screen", ResourceType::Tga));
+    if (screenData) {
+        TgaReader tga("screen", TextureUsage::GUI);
+        tga.load(wrap(screenData));
+        screen = tga.texture();
+    }
+
     SavedGame result;
+    result.screen = move(screen);
     result.lastModule = nfo.root()->getString("LastModule");
 
     return move(result);
@@ -199,7 +209,7 @@ void SaveLoad::onClick(const string &control) {
 int SaveLoad::getSelectedSaveNumber() const {
     ListBox &lbGames = getControl<ListBox>("LB_GAMES");
 
-    int hilightedIdx = lbGames.hilightedIndex();
+    int hilightedIdx = lbGames.selectedItemIndex();
     if (hilightedIdx == -1) return -1;
 
     string tag(lbGames.getItemAt(hilightedIdx).tag);
@@ -240,6 +250,36 @@ void SaveLoad::deleteGame(int number) {
         fs::remove(maybeSave->path);
         refresh();
     }
+}
+
+void SaveLoad::onListBoxItemClick(const string &control, const string &item) {
+    if (control != "LB_GAMES") return;
+
+    // Get save number by item tag
+    int selectedSaveNumber = -1;
+    auto &lbGames = getControl<ListBox>("LB_GAMES");
+    for (int i = 0; i < lbGames.getItemCount(); ++i) {
+        auto &lbItem = lbGames.getItemAt(i);
+        if (lbItem.tag == item) {
+            selectedSaveNumber = stoi(lbItem.tag);
+            break;
+        }
+    }
+
+    // Get save screenshot by save number
+    shared_ptr<Texture> screenshot;
+    if (selectedSaveNumber != -1) {
+        for (auto &save : _saves) {
+            if (save.number == selectedSaveNumber) {
+                screenshot = save.save.screen;
+                break;
+            }
+        }
+    }
+
+    // Set screenshot
+    Label &lblScreenshot = getControl<Label>("LBL_SCREENSHOT");
+    lblScreenshot.setBorderFill(move(screenshot));
 }
 
 } // namespace game
