@@ -66,7 +66,7 @@ private:
 
     struct DanglymeshAnimation {
         glm::vec3 force { 0.0f }; /**< net force applied to this scene node */
-        glm::vec3 stride { 0.0f }; /**< how far have vertices traveled from the rest position? */
+        glm::vec3 stride { 0.0f }; /**< how far have vertices traveled from the rest position in object space */
     } _danglymeshAnimation;
 
     const ModelSceneNode *_model;

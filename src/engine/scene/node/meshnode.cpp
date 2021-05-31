@@ -353,8 +353,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
             uniforms.combined.featureMask |= UniformFeatureFlags::danglymesh;
             uniforms.danglymesh->stride = glm::vec4(_danglymeshAnimation.stride, 0.0f);
             uniforms.danglymesh->displacement = danglyMesh->displacement;
-            size_t i = 0;
-            for (i = 0; i < danglyMesh->constraints.size(); ++i) {
+            for (size_t i = 0; i < danglyMesh->constraints.size(); ++i) {
                 uniforms.danglymesh->constraints[i / 4][i % 4] = danglyMesh->constraints[i].multiplier;
             }
         }

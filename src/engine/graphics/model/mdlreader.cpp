@@ -336,21 +336,23 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         float displacement = readFloat();
         float tightness = readFloat();
         float period = readFloat();
-        ignore(4); // unknown
+        uint32_t offDanglyVertices = readUint32();
 
         danglyMesh = make_shared<ModelNode::DanglyMesh>();
         danglyMesh->displacement = 0.5f * displacement;  // displacement is allegedly 1/2 meters per unit
         danglyMesh->tightness = tightness;
         danglyMesh->period = period;
 
+        danglyMesh->constraints.resize(constraintArrayDef.count);
         seek(kMdlDataOffset + constraintArrayDef.offset);
         for (uint32_t i = 0; i < constraintArrayDef.count; ++i) {
             float multiplier = readFloat();
+            danglyMesh->constraints[i].multiplier = glm::clamp(multiplier / 255.0f, 0.0f, 1.0f);
+        }
+        seek(kMdlDataOffset + offDanglyVertices);
+        for (uint32_t i = 0; i < constraintArrayDef.count; ++i) {
             vector<float> positionValues(readFloatArray(3));
-            ModelNode::DanglyMeshConstraint constraint;
-            constraint.multiplier = glm::clamp(multiplier / 255.0f, 0.0f, 1.0f);
-            constraint.position = glm::make_vec3(&positionValues[0]);
-            danglyMesh->constraints.push_back(move(constraint));
+            danglyMesh->constraints[i].position = glm::make_vec3(&positionValues[0]);
         }
 
     } else if (flags & NodeFlags::aabb) {

@@ -389,7 +389,8 @@ void main() {
             (uBones[i4] * normal) * w4;
 
     } else if (isFeatureEnabled(FEATURE_DANGLYMESH)) {
-        vec3 maxStride = vec3(uDanglymeshDisplacement * uDanglymeshConstraints[gl_VertexID / 4][gl_VertexID % 4]);
+        float multiplier = uDanglymeshConstraints[gl_VertexID / 4][gl_VertexID % 4];
+        vec3 maxStride = vec3(multiplier * uDanglymeshDisplacement);
         vec3 stride = clamp(uDanglymeshStride.xyz, -maxStride, maxStride);
         position += vec4(stride, 0.0);
     }
