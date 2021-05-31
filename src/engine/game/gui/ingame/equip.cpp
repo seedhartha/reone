@@ -23,6 +23,7 @@
 #include "../../../graphics/texture/textures.h"
 #include "../../../resource/strings.h"
 
+#include "ingame.h"
 #include "../../game.h"
 #include "../../gameidutil.h"
 #include "../../object/creature.h"
@@ -78,7 +79,7 @@ Equipment::Equipment(Game *game) : GameGUI(game) {
     loadBackground(BackgroundType::Menu);
 }
 
-void Equipment::bindControls(EquipmentBindingHelper *bindingHelper) {
+void Equipment::bindControls(InGameMenu *menu) {
     _binding.lblCantEquip = getControlPtr<Label>("LBL_CANTEQUIP");
     if (!isTSL(_game->gameId())) {
         _binding.lblAttackInfo = getControlPtr<Label>("LBL_ATTACK_INFO");
@@ -104,8 +105,8 @@ void Equipment::bindControls(EquipmentBindingHelper *bindingHelper) {
         _binding.btnPrevNpc = getControlPtr<Button>("BTN_PREVNPC");
         _binding.btnNextNpc = getControlPtr<Button>("BTN_NEXTNPC");
         _binding.lblDefText = getControlPtr<Label>("LBL_DEF_TEXT");
-        _binding.btnChange1 = bindingHelper->getBtnChange2();
-        _binding.btnChange2 = bindingHelper->getBtnChange3();
+        _binding.btnChange1 = menu->getBtnChange2();
+        _binding.btnChange2 = menu->getBtnChange3();
         _binding.btnCharLeft = getControlPtr<Button>("BTN_PREVNPC");
         _binding.btnCharRight = getControlPtr<Button>("BTN_NEXTNPC");
     }
@@ -133,9 +134,9 @@ void Equipment::load() {
     Equipment::load(nullptr);
 }
 
-void Equipment::load(EquipmentBindingHelper *bindingHelper) {
+void Equipment::load(InGameMenu *menu) {
     GUI::load();
-    bindControls(bindingHelper);
+    bindControls(menu);
 
     _binding.btnChange1->setFocusable(false);
     _binding.btnChange2->setFocusable(false);
