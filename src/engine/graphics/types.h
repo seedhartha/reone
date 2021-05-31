@@ -38,17 +38,6 @@ enum class Feature {
     DynamicRoomLighting
 };
 
-enum class PixelFormat {
-    Grayscale,
-    RGB,
-    RGBA,
-    BGR,
-    BGRA,
-    DXT1,
-    DXT5,
-    Depth
-};
-
 /**
  * This is a hint to the engine when configuring texture properties.
  */
@@ -69,6 +58,28 @@ enum class TextureUsage {
     Video
 };
 
+enum class TGADataType {
+    RGBA = 2,
+    Grayscale = 3,
+    RGBA_RLE = 10
+};
+
+enum class PolygonMode {
+    Fill,
+    Line
+};
+
+enum class PixelFormat {
+    Grayscale,
+    RGB,
+    RGBA,
+    BGR,
+    BGRA,
+    DXT1,
+    DXT5,
+    Depth
+};
+
 enum class CubeMapFace {
     PositiveX = 0,
     NegativeX = 1,
@@ -76,12 +87,6 @@ enum class CubeMapFace {
     NegativeY = 3,
     PositiveZ = 4,
     NegativeZ = 5
-};
-
-enum class TGADataType {
-    RGBA = 2,
-    Grayscale = 3,
-    RGBA_RLE = 10
 };
 
 struct TextureUnits {

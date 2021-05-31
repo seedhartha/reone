@@ -28,6 +28,7 @@
 #include "../../graphics/shader/shaders.h"
 #include "../../graphics/texture/textures.h"
 #include "../../graphics/texture/textureutil.h"
+#include "../../graphics/texture/tgawriter.h"
 #include "../../graphics/window.h"
 
 #include "../node/cameranode.h"
@@ -42,9 +43,10 @@ namespace reone {
 
 namespace scene {
 
-const float kShadowNearPlane = 0.0f;
-const float kShadowFarPlane = 10000.0f;
-const float kOrthographicScale = 10.0f;
+static constexpr float kShadowNearPlane = 0.0f;
+static constexpr float kShadowFarPlane = 10000.0f;
+static constexpr float kOrthographicScale = 10.0f;
+static constexpr int kScreenshotResolution = 256;
 
 static bool g_wireframesEnabled = false;
 
@@ -65,7 +67,7 @@ void WorldRenderPipeline::init() {
     _depthRenderbuffer->init();
     _depthRenderbuffer->bind();
     _depthRenderbuffer->configure(_options.width, _options.height, PixelFormat::Depth);
-    _depthRenderbuffer->unbind();
+    _graphics.context().unbindRenderbuffer();
 
     // Geometry framebuffer
 
@@ -85,7 +87,7 @@ void WorldRenderPipeline::init() {
     _geometry.attachColor(*_geometryColor2, 1);
     _geometry.attachDepth(*_depthRenderbuffer);
     _geometry.checkCompleteness();
-    _geometry.unbind();
+    _graphics.context().unbindFramebuffer();
 
     // Vertical blur framebuffer
 
@@ -99,7 +101,7 @@ void WorldRenderPipeline::init() {
     _verticalBlur.attachColor(*_verticalBlurColor);
     _verticalBlur.attachDepth(*_depthRenderbuffer);
     _verticalBlur.checkCompleteness();
-    _verticalBlur.unbind();
+    _graphics.context().unbindFramebuffer();
 
     // Horizontal blur framebuffer
 
@@ -113,7 +115,7 @@ void WorldRenderPipeline::init() {
     _horizontalBlur.attachColor(*_horizontalBlurColor);
     _horizontalBlur.attachDepth(*_depthRenderbuffer);
     _horizontalBlur.checkCompleteness();
-    _horizontalBlur.unbind();
+    _graphics.context().unbindFramebuffer();
 
     // Shadows framebuffer
 
@@ -128,6 +130,21 @@ void WorldRenderPipeline::init() {
     _cubeShadowsDepth->clearPixels(1024 * _options.shadowResolution, 1024 * _options.shadowResolution, PixelFormat::Depth);
 
     _shadows.init();
+
+    // Screenshot framebuffer
+
+    _screenshotColor = make_unique<Texture>("result_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _screenshotColor->init();
+    _screenshotColor->bind();
+    _screenshotColor->clearPixels(kScreenshotResolution, kScreenshotResolution, PixelFormat::RGB);
+    _screenshotColor->unbind();
+
+    _screenshot.init();
+    _screenshot.bind();
+    _screenshot.attachColor(*_screenshotColor);
+    _screenshot.attachDepth(*_depthRenderbuffer);
+    _screenshot.checkCompleteness();
+    _graphics.context().unbindFramebuffer();
 }
 
 void WorldRenderPipeline::render() {
@@ -187,42 +204,57 @@ void WorldRenderPipeline::computeLightSpaceMatrices() {
 void WorldRenderPipeline::drawShadows() {
     if (_options.shadowResolution < 1) return;
 
+    // Set uniforms prototype
+
     const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
     if (!shadowLight) return;
 
-    _graphics.context().withViewport(glm::ivec4(0, 0, 1024 * _options.shadowResolution, 1024 * _options.shadowResolution), [&]() {
-        _shadows.bind();
-        if (shadowLight->isDirectional()) {
-            _shadows.attachDepth(*_shadowsDepth);
-        } else {
-            _shadows.attachDepth(*_cubeShadowsDepth);
-        }
+    glm::vec4 lightPosition(
+        glm::vec3(shadowLight->absoluteTransform()[3]),
+        shadowLight->isDirectional() ? 0.0f : 1.0f);
 
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
+    ShaderUniforms uniforms(_graphics.shaders().defaultUniforms());
+    uniforms.combined.featureMask |= UniformFeatureFlags::shadows;
+    uniforms.combined.shadows.lightPosition = move(lightPosition);
+    for (int i = 0; i < kNumCubeFaces; ++i) {
+        uniforms.combined.shadows.lightSpaceMatrices[i] = _lightSpaceMatrices[i];
+    }
+    _sceneGraph.setUniformsPrototype(move(uniforms));
 
-        glm::vec4 lightPosition(
-            glm::vec3(shadowLight->absoluteTransform()[3]),
-            shadowLight->isDirectional() ? 0.0f : 1.0f);
+    // Set viewport
 
-        ShaderUniforms uniforms(_graphics.shaders().defaultUniforms());
-        uniforms.combined.featureMask |= UniformFeatureFlags::shadows;
-        uniforms.combined.shadows.lightPosition = move(lightPosition);
-        for (int i = 0; i < kNumCubeFaces; ++i) {
-            uniforms.combined.shadows.lightSpaceMatrices[i] = _lightSpaceMatrices[i];
-        }
-        _sceneGraph.setUniformsPrototype(move(uniforms));
+    glm::ivec4 oldViewport(_graphics.context().viewport());
+    _graphics.context().setViewport(glm::ivec4(0, 0, 1024 * _options.shadowResolution, 1024 * _options.shadowResolution));
 
-        glClear(GL_DEPTH_BUFFER_BIT);
-        _graphics.context().withDepthTest([this]() { _sceneGraph.draw(true); });
-    });
+    // Enable depth testing
+
+    bool oldDepthTest = _graphics.context().isDepthTestEnabled();
+    _graphics.context().setDepthTestEnabled(true);
+
+    // Bind shadows framebuffer
+
+    _shadows.bind();
+    if (shadowLight->isDirectional()) {
+        _shadows.attachDepth(*_shadowsDepth);
+    } else {
+        _shadows.attachDepth(*_cubeShadowsDepth);
+    }
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    // Draw the scene
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+    _sceneGraph.draw(true);
+
+    // Restore context
+
+    _graphics.context().setDepthTestEnabled(oldDepthTest);
+    _graphics.context().setViewport(move(oldViewport));
 }
 
 void WorldRenderPipeline::drawGeometry() {
-    _geometry.bind();
-
-    static constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-    glDrawBuffers(2, buffers);
+    // Set uniforms prototype
 
     shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
     const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
@@ -248,6 +280,25 @@ void WorldRenderPipeline::drawGeometry() {
 
     _sceneGraph.setUniformsPrototype(move(uniforms));
 
+    // Enable wireframe mode
+
+    PolygonMode oldPolygonMode = _graphics.context().polygonMode();
+    if (g_wireframesEnabled) {
+        _graphics.context().setPolygonMode(PolygonMode::Line);
+    }
+
+    // Enable depth testing
+
+    bool oldDepthTest = _graphics.context().isDepthTestEnabled();
+    _graphics.context().setDepthTestEnabled(true);
+
+    // Bind geometry framebuffer
+
+    _geometry.bind();
+
+    static constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    glDrawBuffers(2, buffers);
+
     if (shadowLight) {
         if (shadowLight->isDirectional()) {
             _graphics.context().setActiveTextureUnit(TextureUnits::shadowMap);
@@ -258,27 +309,37 @@ void WorldRenderPipeline::drawGeometry() {
         }
     }
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Draw the scene
 
-    if (g_wireframesEnabled) {
-        _graphics.context().withWireframes([this]() {
-            _graphics.context().withDepthTest([this]() { _sceneGraph.draw(); });
-        });
-    } else {
-        _graphics.context().withDepthTest([this]() { _sceneGraph.draw(); });
-    }
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _sceneGraph.draw();
+
+    // Restore context
+
+    _graphics.context().unbindFramebuffer();
+    _graphics.context().setPolygonMode(oldPolygonMode);
+    _graphics.context().setDepthTestEnabled(oldDepthTest);
 }
 
 void WorldRenderPipeline::applyHorizontalBlur() {
-    float w = static_cast<float>(_options.width);
-    float h = static_cast<float>(_options.height);
+    // Enable depth testing
+
+    bool oldDepthTest = _graphics.context().isDepthTestEnabled();
+    _graphics.context().setDepthTestEnabled(true);
+
+    // Bind horizontal blur framebuffer
 
     _horizontalBlur.bind();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Bind bright geometry texture
 
     _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor2->bind();
+
+    // Set shader uniforms
+
+    float w = static_cast<float>(_options.width);
+    float h = static_cast<float>(_options.height);
 
     ShaderUniforms uniforms;
     uniforms.combined.featureMask |= UniformFeatureFlags::blur;
@@ -287,21 +348,36 @@ void WorldRenderPipeline::applyHorizontalBlur() {
 
     _graphics.shaders().activate(ShaderProgram::SimpleBlur, uniforms);
 
-    _graphics.context().withDepthTest([&]() {
-        _graphics.meshes().quadNDC().draw();
-    });
+    // Draw a quad
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _graphics.meshes().quadNDC().draw();
+
+    // Restore context
+
+    _graphics.context().unbindFramebuffer();
+    _graphics.context().setDepthTestEnabled(oldDepthTest);
 }
 
 void WorldRenderPipeline::applyVerticalBlur() {
-    float w = static_cast<float>(_options.width);
-    float h = static_cast<float>(_options.height);
+    // Enable depth testing
+
+    bool oldDepthTest = _graphics.context().isDepthTestEnabled();
+    _graphics.context().setDepthTestEnabled(true);
+
+    // Bind vertical blur framebuffer
 
     _verticalBlur.bind();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Bind diffuse map
 
     _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _horizontalBlurColor->bind();
+
+    // Set shader uniforms
+
+    float w = static_cast<float>(_options.width);
+    float h = static_cast<float>(_options.height);
 
     ShaderUniforms uniforms;
     uniforms.combined.featureMask |= UniformFeatureFlags::blur;
@@ -310,23 +386,62 @@ void WorldRenderPipeline::applyVerticalBlur() {
 
     _graphics.shaders().activate(ShaderProgram::SimpleBlur, uniforms);
 
-    _graphics.context().withDepthTest([&]() {
-        _graphics.meshes().quadNDC().draw();
-    });
+    // Draw a quad
 
-    _verticalBlur.unbind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _graphics.meshes().quadNDC().draw();
+
+    // Restore context
+
+    _graphics.context().unbindFramebuffer();
+    _graphics.context().setDepthTestEnabled(oldDepthTest);
 }
 
 void WorldRenderPipeline::drawResult() {
+    // Set viewport
+
+    glm::ivec4 oldViewport;
+    if (_takeScreenshot) {
+        oldViewport = _graphics.context().viewport();
+        _graphics.context().setViewport(glm::ivec4(0, 0, kScreenshotResolution, kScreenshotResolution));
+        _screenshot.bind();
+    }
+
+    // Bind geometry texture
+
     _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor1->bind();
+
+    // Bind blur texture
 
     _graphics.context().setActiveTextureUnit(TextureUnits::bloom);
     _verticalBlurColor->bind();
 
+    // Set shader uniforms
+
     ShaderUniforms uniforms;
     _graphics.shaders().activate(ShaderProgram::SimplePresentWorld, uniforms);
+
+    // Draw a quad
+
     _graphics.meshes().quadNDC().draw();
+
+    // Restore context
+
+    if (_takeScreenshot) {
+        saveScreenshot();
+        _graphics.context().unbindFramebuffer();
+        _graphics.context().setViewport(move(oldViewport));
+        _takeScreenshot = false; // finished taking a screenshot
+    }
+}
+
+void WorldRenderPipeline::saveScreenshot() {
+    _screenshotColor->bind();
+    _screenshotColor->flushGPUToCPU();
+
+    TgaWriter tga(_screenshotColor);
+    tga.save("screen.tga");
 }
 
 } // namespace scene

@@ -24,29 +24,40 @@
 
 #include "glm/vec4.hpp"
 
+#include "types.h"
+
 namespace reone {
 
 namespace graphics {
 
 class Context : boost::noncopyable {
 public:
-    void withWireframes(const std::function<void()> &block);
-    void withViewport(const glm::ivec4 &viewport, const std::function<void()> &block);
-    void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
-    void withDepthTest(const std::function<void()> &block);
-    void withAdditiveBlending(const std::function<void()> &block);
-    void withLightenBlending(const std::function<void()> &block);
-    void withBackFaceCulling(const std::function<void()> &block);
+    void init();
 
+    void unbindFramebuffer();
+    void unbindRenderbuffer();
+
+    bool isDepthTestEnabled() const { return _depthTest; }
+
+    const glm::ivec4 &viewport() const { return _viewport; }
+    PolygonMode polygonMode() const { return _polygonMode; }
+
+    void setViewport(glm::ivec4 viewport);
     void setDepthTestEnabled(bool enabled);
     void setBackFaceCullingEnabled(bool enabled);
+    void setPolygonMode(PolygonMode mode);
     void setActiveTextureUnit(int n);
 
+    void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
+    void withAdditiveBlending(const std::function<void()> &block);
+    void withLightenBlending(const std::function<void()> &block);
+
 private:
+    glm::ivec4 _viewport { 0 };
     bool _depthTest { false };
     bool _backFaceCulling { false };
     int _textureUnit { 0 };
-    uint32_t _polygonMode { 0 };
+    PolygonMode _polygonMode { PolygonMode::Fill };
 };
 
 } // namespace graphics

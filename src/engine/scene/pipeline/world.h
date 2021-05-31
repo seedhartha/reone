@@ -40,12 +40,15 @@ public:
     void init();
     void render();
 
+    void setTakeScreenshot(bool take) { _takeScreenshot = take; }
+
 private:
     graphics::GraphicsOptions _options;
     graphics::GraphicsServices &_graphics;
     SceneGraph &_sceneGraph;
 
     glm::mat4 _lightSpaceMatrices[graphics::kNumCubeFaces];
+    bool _takeScreenshot { false }; /**< render next frame into texture */
 
     // Framebuffers
 
@@ -53,6 +56,7 @@ private:
     graphics::Framebuffer _verticalBlur;
     graphics::Framebuffer _horizontalBlur;
     graphics::Framebuffer _shadows;
+    graphics::Framebuffer _screenshot;
 
     // END Framebuffers
 
@@ -65,6 +69,7 @@ private:
     std::unique_ptr<graphics::Texture> _horizontalBlurColor;
     std::unique_ptr<graphics::Texture> _shadowsDepth;
     std::unique_ptr<graphics::Texture> _cubeShadowsDepth;
+    std::shared_ptr<graphics::Texture> _screenshotColor;
 
     // END Framebuffers targets
 
@@ -74,6 +79,7 @@ private:
     void applyHorizontalBlur();
     void applyVerticalBlur();
     void drawResult();
+    void saveScreenshot();
 };
 
 } // namespace scene

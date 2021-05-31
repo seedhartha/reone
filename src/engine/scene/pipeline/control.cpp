@@ -54,56 +54,60 @@ void ControlRenderPipeline::init() {
     _geometryDepth->init();
     _geometryDepth->bind();
     _geometryDepth->configure(static_cast<int>(_extent[2]), static_cast<int>(_extent[3]), PixelFormat::Depth);
-    _geometryDepth->unbind();
+    _graphics.context().unbindRenderbuffer();
 
     _geometry.init();
     _geometry.bind();
     _geometry.attachColor(*_geometryColor);
     _geometry.attachDepth(*_geometryDepth);
     _geometry.checkCompleteness();
-    _geometry.unbind();
+    _graphics.context().unbindFramebuffer();
 }
 
 void ControlRenderPipeline::render(const glm::ivec2 &offset) {
-    // Render to framebuffer
+    // Set uniforms prototype
 
-    _graphics.context().withViewport(glm::ivec4(0, 0, _extent[2], _extent[3]), [this]() {
-        _geometry.bind();
+    shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
 
-        shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
+    ShaderUniforms uniforms(_graphics.shaders().defaultUniforms());
+    uniforms.combined.general.projection = camera->projection();
+    uniforms.combined.general.view = camera->view();
+    uniforms.combined.general.cameraPosition = camera->absoluteTransform()[3];
 
-        ShaderUniforms uniforms(_graphics.shaders().defaultUniforms());
-        uniforms.combined.general.projection = camera->projection();
-        uniforms.combined.general.view = camera->view();
-        uniforms.combined.general.cameraPosition = camera->absoluteTransform()[3];
-        _sceneGraph.setUniformsPrototype(move(uniforms));
+    _sceneGraph.setUniformsPrototype(move(uniforms));
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        _graphics.context().withDepthTest([this]() { _sceneGraph.draw(); });
+    // Draw to framebuffer
 
-        _geometry.unbind();
-    });
+    glm::ivec4 oldViewport(_graphics.context().viewport());
+    _graphics.context().setViewport(glm::ivec4(0, 0, _extent[2], _extent[3]));
 
+    bool oldDepthTest = _graphics.context().isDepthTestEnabled();
+    _graphics.context().setDepthTestEnabled(true);
 
-    // Render control
+    _geometry.bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _sceneGraph.draw();
+
+    _graphics.context().unbindFramebuffer();
+    _graphics.context().setDepthTestEnabled(oldDepthTest);
+    _graphics.context().setViewport(oldViewport);
+
+    // Draw control
 
     _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor->bind();
 
-    int viewport[4];
-    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
-
     glm::mat4 projection(glm::ortho(
         0.0f,
-        static_cast<float>(viewport[2]),
-        static_cast<float>(viewport[3]),
+        static_cast<float>(oldViewport[2]),
+        static_cast<float>(oldViewport[3]),
         0.0f));
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(_extent[0] + offset.x, _extent[1] + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent[2], _extent[3], 1.0f));
 
-    ShaderUniforms uniforms;
+    uniforms = ShaderUniforms();
     uniforms.combined.general.projection = move(projection);
     uniforms.combined.general.model = move(transform);
 
