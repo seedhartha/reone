@@ -72,14 +72,14 @@ static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
     { Equipment::Slot::WeapR2, 31379 }
 };
 
-Equipment::Equipment(Game *game) : GameGUI(game) {
+Equipment::Equipment(Game *game, InGameMenu *inGameMenu) : GameGUI(game), _inGameMenu(inGameMenu) {
     _resRef = getResRef("equip");
 
     initForGame();
     loadBackground(BackgroundType::Menu);
 }
 
-void Equipment::bindControls(InGameMenu *menu) {
+void Equipment::bindControls() {
     _binding.lblCantEquip = getControlPtr<Label>("LBL_CANTEQUIP");
     if (!isTSL(_game->gameId())) {
         _binding.lblAttackInfo = getControlPtr<Label>("LBL_ATTACK_INFO");
@@ -105,8 +105,8 @@ void Equipment::bindControls(InGameMenu *menu) {
         _binding.btnPrevNpc = getControlPtr<Button>("BTN_PREVNPC");
         _binding.btnNextNpc = getControlPtr<Button>("BTN_NEXTNPC");
         _binding.lblDefText = getControlPtr<Label>("LBL_DEF_TEXT");
-        _binding.btnChange1 = menu->getBtnChange2();
-        _binding.btnChange2 = menu->getBtnChange3();
+        _binding.btnChange1 = _inGameMenu->getBtnChange2();
+        _binding.btnChange2 = _inGameMenu->getBtnChange3();
         _binding.btnCharLeft = getControlPtr<Button>("BTN_PREVNPC");
         _binding.btnCharRight = getControlPtr<Button>("BTN_NEXTNPC");
     }
@@ -131,12 +131,8 @@ void Equipment::bindControls(InGameMenu *menu) {
 }
 
 void Equipment::load() {
-    Equipment::load(nullptr);
-}
-
-void Equipment::load(InGameMenu *menu) {
     GUI::load();
-    bindControls(menu);
+    bindControls();
 
     _binding.btnChange1->setFocusable(false);
     _binding.btnChange2->setFocusable(false);

@@ -79,8 +79,8 @@ void InGameMenu::load() {
 }
 
 void InGameMenu::loadEquipment() {
-    _equip = make_unique<Equipment>(_game);
-    _equip->load(this);
+    _equip = make_unique<Equipment>(_game, this);
+    _equip->load();
 }
 
 void InGameMenu::loadInventory() {
