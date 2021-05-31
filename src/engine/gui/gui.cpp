@@ -324,24 +324,16 @@ void GUI::setControlDiscardColor(const string &tag, glm::vec3 color) {
 }
 
 Control &GUI::getControl(const string &tag) const {
-    auto it = find_if(
-        _controls.begin(),
-        _controls.end(),
-        [&tag](auto &ctrl) { return ctrl->tag() == tag; });
-
-    if (it != _controls.end()) return **it;
-
+    for (auto &control : _controls) {
+        if (control->tag() == tag) return *control;
+    }
     throw runtime_error("Control not found: " + tag);
 }
 
 shared_ptr<Control> GUI::getControlPtr(const string &tag) const {
-    auto it = find_if(
-        _controls.begin(),
-        _controls.end(),
-        [&tag](auto &ctrl) { return ctrl->tag() == tag; });
-
-    if (it != _controls.end()) return *it;
-
+    for (auto &control : _controls) {
+        if (control->tag() == tag) return control;
+    }
     throw runtime_error("Control not found: " + tag);
 }
 
