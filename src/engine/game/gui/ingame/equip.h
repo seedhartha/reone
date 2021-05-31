@@ -47,10 +47,9 @@ public:
         WeapR2
     };
 
-    Equipment(Game *game);
+    Equipment(Game *game, InGameMenu *inGameMenu);
 
     void load() override;
-    void load(InGameMenu *menu);
 
     void update();
 
@@ -101,6 +100,7 @@ private:
     } _binding;
     Slot _selectedSlot { Slot::None };
     int _selectedItemIdx { -1 };
+    InGameMenu *_inGameMenu;
 
     void onClick(const std::string &control) override;
     void onFocusChanged(const std::string &control, bool focus) override;
@@ -116,7 +116,7 @@ private:
     std::shared_ptr<graphics::Texture> getItemFrameTexture(int stackSize) const;
     std::shared_ptr<graphics::Texture> getEmptySlotIcon(Slot slot) const;
 
-    void bindControls(InGameMenu *menu);
+    void bindControls();
 };
 
 } // namespace game
