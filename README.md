@@ -12,7 +12,7 @@ The project is in the early stages of development at this point: resource manage
 
 ## Contributing
 
-reone is open to potential contributors. Contact me at <vkremianskii@gmail.com> if you're interested in taking a particular task from the [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap).
+reone is open to potential contributors. Contact us on [this](https://discord.gg/6sqSyfn8Jp) Discord server if you're interested in taking a particular task from the [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap).
 
 Developer resources:
 
