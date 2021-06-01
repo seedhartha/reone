@@ -16,54 +16,32 @@
 """Script to automate audio file unwrapping based on Flowtron filelists."""
 
 import os
-import platform
 import shutil
-import subprocess
 import sys
 
-wav_dir = r"D:\OpenKotOR\Extract\TSL\voices"
+sys.path.append("..")
+
+from reo_shared import *
+
 tools_dir = r"D:\Source\reone\build\bin\RelWithDebInfo"
 
-if not os.path.exists(wav_dir):
-    raise RuntimeError("WAV directory does not exist")
-
-if not os.path.exists(tools_dir):
-    raise RuntimeError("Tools directory does not exist")
-
-
-def append_dir_to_path(dir):
-    if os.path.exists(dir) and (not dir in os.environ["PATH"]):
-        separator = ":" if platform.system() == "Linux" else ";"
-        os.environ["PATH"] = separator.join([os.environ["PATH"], dir])
-
-
-def run_subprocess(args, silent=True, check_retcode=True):
-    stdout = subprocess.DEVNULL if silent else None
-    process = subprocess.run(args, stdout=stdout)
-    if check_retcode:
-        process.check_returncode()
-
-
 def unwrap_from_filelist(filelist):
-    if os.path.exists(filelist):
-        unwrap_dir = os.path.join(wav_dir, "unwrap")
-        if not os.path.exists(unwrap_dir):
-            os.mkdir(unwrap_dir)
-
-        with open(filelist, "r") as fp:
-            entries = [line.split("|")[0] for line in fp.readlines()]
-            for f in entries:
-                filename, ext = os.path.splitext(f)
-                mp3_path = os.path.join(wav_dir, filename + ".mp3")
-                if not os.path.exists(mp3_path):
-                    print("Unwrapping {}...".format(f))
-                    run_subprocess(["reone-tools", "--unwrap", f])
-                    try:
-                        shutil.move(mp3_path, unwrap_dir)
-                    except PermissionError:
-                        pass
+    if not os.path.exists(filelist):
+        return
+    with open(filelist, "r") as fp:
+        entries = [line.split("|")[0] for line in fp.readlines()]
+        for f in entries:
+            filename, _ = os.path.splitext(f)
+            mp3_path = filename + ".mp3"
+            if not os.path.exists(mp3_path):
+                print("Unwrapping {}...".format(f))
+                run_subprocess(["reone-tools", "--unwrap", f])
 
 
+if not is_valid_tools_dir(tools_dir):
+    tools_dir = choose_directory("Choose a tools directory")
+    if not is_valid_tools_dir(tools_dir):
+        exit(1)
 append_dir_to_path(tools_dir)
 
 if len(sys.argv) > 1:
