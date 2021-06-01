@@ -16,6 +16,7 @@
 import os
 import platform
 import subprocess
+import tkinter
 import tkinter.filedialog
 
 
@@ -51,6 +52,11 @@ def is_valid_script_compiler_dir(dir):
 
 def is_valid_extract_dir(dir):
     return dir and os.path.isdir(dir)
+
+
+def init_window():
+    root = tkinter.Tk()
+    root.withdraw()
 
 
 def choose_directory(title):
