@@ -212,7 +212,7 @@ if not is_valid_tools_dir(tools_dir):
     tools_dir = choose_directory("Choose a tools directory")
     if not is_valid_tools_dir(tools_dir):
         exit(1)
-    append_dir_to_path(tools_dir)
+append_dir_to_path(tools_dir)
 
 if not is_valid_extract_dir(extract_dir):
     extract_dir = choose_directory("Choose an extraction directory")

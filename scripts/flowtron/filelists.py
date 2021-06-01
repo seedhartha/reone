@@ -21,10 +21,11 @@ import os
 import random
 import sys
 
-extract_dir = r"D:\OpenKotOR\Extract\KotOR"
+sys.path.append("..")
 
-if not os.path.exists(extract_dir):
-    raise RuntimeError("Extraction directory does not exist")
+from reo_shared import *
+
+extract_dir = r"D:\OpenKotOR\Extract\KotOR"
 
 
 def index_or_negative_one(string, substr, beg=0):
@@ -66,7 +67,7 @@ def match_entry(entry_speaker, entry_voresref, speaker, voresref):
     return voresref in entry_voresref if voresref else False
 
 
-def get_lines_from_dlg(obj, speaker, voresref, tlk_strings, uniq_sounds):
+def get_lines_from_dlg(obj, dlg_speaker, dlg_voresref, tlk_strings, uniq_sounds, speaker_id):
     global extract_dir
 
     wav_dir = os.path.join(extract_dir, "voices")
@@ -80,18 +81,18 @@ def get_lines_from_dlg(obj, speaker, voresref, tlk_strings, uniq_sounds):
                 textstrref = int(entry["Text"].split("|")[0])
                 entry_speaker = entry["Speaker"].lower()
                 entry_voresref = entry["VO_ResRef"].lower()
-                if textstrref != -1 and match_entry(entry_speaker, entry_voresref, speaker, voresref) and not entry_voresref in uniq_sounds:
+                if textstrref != -1 and match_entry(entry_speaker, entry_voresref, dlg_speaker, dlg_voresref) and not entry_voresref in uniq_sounds:
                     text = clear_text(tlk_strings[textstrref])
                     if text:
                         wav_filename = os.path.join(wav_dir, entry_voresref + ".wav")
                         if os.path.exists(wav_filename):
-                            lines.append("{}|{}|0\n".format(wav_filename, text))
+                            lines.append("{}|{}|{}\n".format(wav_filename, text, speaker_id))
                             uniq_sounds.add(entry_voresref)
 
     return lines
 
 
-def generate_filelist(speaker, voresref):
+def generate_filelist(dlg_speaker, dlg_voresref, speaker_id):
     """
     :param speaker: substring to search for in Speaker field of dialog entries
     :param voresref: substring to search for in VO_ResRef field of dialog entries
@@ -118,7 +119,7 @@ def generate_filelist(speaker, voresref):
         if f.endswith(".dlg.json"):
             with open(f, "r") as fp:
                 obj = json.load(fp)
-                lines.extend(get_lines_from_dlg(obj, speaker, voresref, tlk_strings, uniq_sounds))
+                lines.extend(get_lines_from_dlg(obj, dlg_speaker, dlg_voresref, tlk_strings, uniq_sounds, speaker_id))
 
     # Split lines into training and validation filelists
     random.shuffle(lines)
@@ -126,16 +127,23 @@ def generate_filelist(speaker, voresref):
     lines_train = lines[num_val:]
     lines_val = lines[:num_val]
 
-    with open(speaker + "_train_filelist.txt", "w") as fp:
+    with open(dlg_speaker + "_train_filelist.txt", "w") as fp:
         fp.writelines(lines_train)
-    with open(speaker + "_val_filelist.txt", "w") as fp:
+    with open(dlg_speaker + "_val_filelist.txt", "w") as fp:
         fp.writelines(lines_val)
 
 
+init_window()
+
+if not is_valid_extract_dir(extract_dir):
+    extract_dir = choose_directory("Choose an extraction directory")
+    if not is_valid_extract_dir(extract_dir):
+        exit(1)
+
 if len(sys.argv) > 1:
-    # Interpet first argument as Speaker substring, and second argument as VO_ResRef substring
-    speaker = sys.argv[1]
-    voresref = sys.argv[2] if len(sys.argv) > 2 else None
-    generate_filelist(speaker, voresref)
+    dlg_speaker = sys.argv[1] # DLG Speaker substring
+    dlg_voresref = sys.argv[2] if len(sys.argv) > 2 else None # DLG VO_ResRef substring
+    speaker_id = sys.argv[3] if len(sys.argv) > 3 else None # Flowtron Speaker ID
+    generate_filelist(dlg_speaker, dlg_voresref, speaker_id)
 else:
-    print("Usage: python filelist.py SPEAKER [VORESREF]")
+    print("Usage: python filelist.py DLG_SPEAKER [DLG_VORESREF] [SPEAKER_ID]")
