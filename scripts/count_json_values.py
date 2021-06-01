@@ -23,12 +23,7 @@ from functools import partial
 
 from reo_shared import *
 
-extract_dir = r"D:\OpenKotOR\Extract\KotORx"
-
-if not is_valid_extract_dir(extract_dir):
-    extract_dir = choose_directory("Choose an extraction directory")
-    if not is_valid_extract_dir(extract_dir):
-        exit(1)
+extract_dir = r"D:\OpenKotOR\Extract\KotOR"
 
 
 def get_unique_json_values(extract_dir, path_pattern, extract_values):
@@ -61,6 +56,13 @@ def count_unique_json_values(extract_dir, path_pattern, extract_values):
 def extract_values_simple(key, obj):
     return [obj[key]] if key in obj else []
 
+
+init_window()
+
+if not is_valid_extract_dir(extract_dir):
+    extract_dir = choose_directory("Choose an extraction directory")
+    if not is_valid_extract_dir(extract_dir):
+        exit(1)
 
 if len(sys.argv) > 2:
     # If at least two command line arguments were passed, interpret them as

@@ -201,6 +201,8 @@ def disassemble_scripts(extract_dir):
             run_subprocess(["nwnnsscomp", "-d", f, "-o", pcode_path])
 
 
+init_window()
+
 if not is_valid_game_dir(game_dir):
     game_dir = choose_directory("Choose a game directory")
     if not is_valid_game_dir(game_dir):
