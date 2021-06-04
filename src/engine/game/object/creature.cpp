@@ -550,6 +550,10 @@ void Creature::deactivateCombat(float delay) {
     }
 }
 
+bool Creature::isTwoWeaponFighting() const {
+    return static_cast<bool>(getEquippedItem(InventorySlot::leftWeapon));
+}
+
 shared_ptr<SpatialObject> Creature::getAttemptedAttackTarget() const {
     shared_ptr<SpatialObject> result;
 
@@ -561,17 +565,27 @@ shared_ptr<SpatialObject> Creature::getAttemptedAttackTarget() const {
     return move(result);
 }
 
-int Creature::getAttackBonus() const {
-    int modifier;
+int Creature::getAttackBonus(bool offHand) const {
+    auto rightWeapon(getEquippedItem(InventorySlot::rightWeapon));
+    auto leftWeapon(getEquippedItem(InventorySlot::leftWeapon));
+    auto weapon = offHand ? leftWeapon : rightWeapon;
 
-    auto rightWeapon = getEquippedItem(InventorySlot::rightWeapon);
-    if (rightWeapon && rightWeapon->isRanged()) {
+    int modifier;
+    if (weapon && weapon->isRanged()) {
         modifier = _attributes.getAbilityModifier(Ability::Dexterity);
     } else {
         modifier = _attributes.getAbilityModifier(Ability::Strength);
     }
 
-    return _attributes.getAggregateAttackBonus() + modifier;
+    int penalty;
+    if (rightWeapon && leftWeapon) {
+        // TODO: support Dueling and Two-Weapon Fighting feats
+        penalty = offHand ? 10 : 6;
+    } else {
+        penalty = 0;
+    }
+
+    return _attributes.getAggregateAttackBonus() + modifier - penalty;
 }
 
 int Creature::getDefense() const {

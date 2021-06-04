@@ -112,15 +112,15 @@ private:
 
     // Attack
 
-    AttackResultType determineAttackResult(const Attack &attack) const;
+    AttackResultType determineAttackResult(const Attack &attack, bool offHand = false) const;
     AttackAnimation determineAttackAnimation(const Attack &attack, bool duel) const;
-    void applyAttackResult(const Attack &attack);
+    void applyAttackResult(const Attack &attack, bool offHand = false);
 
     // END Attack
 
     // Damage
 
-    std::vector<std::shared_ptr<DamageEffect>> getDamageEffects(std::shared_ptr<Creature> damager, float multiplier = 1.0f) const;
+    std::vector<std::shared_ptr<DamageEffect>> getDamageEffects(std::shared_ptr<Creature> damager, bool offHand = false, float multiplier = 1.0f) const;
 
     // END Damage
 

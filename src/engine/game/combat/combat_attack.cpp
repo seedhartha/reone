@@ -41,7 +41,7 @@ static bool isAttackSuccessful(AttackResultType result) {
     }
 }
 
-AttackResultType Combat::determineAttackResult(const Attack &attack) const {
+AttackResultType Combat::determineAttackResult(const Attack &attack, bool offHand) const {
     auto result = AttackResultType::Miss;
 
     // Determine defense of a target
@@ -56,16 +56,16 @@ AttackResultType Combat::determineAttackResult(const Attack &attack) const {
     int roll = random(1, 20);
     if (roll == 20) {
         result = AttackResultType::AutomaticHit;
-    } else if (roll > 1 && roll + attack.attacker->getAttackBonus() >= defense) { // 1 is automatic miss
+    } else if (roll > 1 && roll + attack.attacker->getAttackBonus(offHand) >= defense) { // 1 is automatic miss
         result = AttackResultType::HitSuccessful;
     }
 
     // Critical threat
     if (isAttackSuccessful(result)) {
         int criticalThreat;
-        shared_ptr<Item> rightWeapon(attack.attacker->getEquippedItem(InventorySlot::rightWeapon));
-        if (rightWeapon) {
-            criticalThreat = rightWeapon->criticalThreat();
+        shared_ptr<Item> weapon(attack.attacker->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
+        if (weapon) {
+            criticalThreat = weapon->criticalThreat();
         } else {
             criticalThreat = 1;
         }
@@ -150,12 +150,12 @@ Combat::AttackAnimation Combat::determineAttackAnimation(const Attack &attack, b
     return move(result);
 }
 
-void Combat::applyAttackResult(const Attack &attack) {
+void Combat::applyAttackResult(const Attack &attack, bool offHand) {
     // Determine critical hit multiplier
     int criticalHitMultiplier = 2;
-    shared_ptr<Item> rightWeapon(attack.attacker->getEquippedItem(InventorySlot::rightWeapon));
-    if (rightWeapon) {
-        criticalHitMultiplier = rightWeapon->criticalHitMultiplier();
+    shared_ptr<Item> weapon(attack.attacker->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
+    if (weapon) {
+        criticalHitMultiplier = weapon->criticalHitMultiplier();
     }
 
     switch (attack.resultType) {
@@ -170,7 +170,7 @@ void Combat::applyAttackResult(const Attack &attack) {
         case AttackResultType::AutomaticHit: {
             debug(boost::format("Combat: attack hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), 2, DebugChannels::combat);
             if (attack.damage == -1) {
-                auto effects = getDamageEffects(attack.attacker);
+                auto effects = getDamageEffects(attack.attacker, offHand);
                 for (auto &effect : effects) {
                     attack.target->applyEffect(effect, DurationType::Instant);
                 }
@@ -182,7 +182,7 @@ void Combat::applyAttackResult(const Attack &attack) {
         case AttackResultType::CriticalHit: {
             debug(boost::format("Combat: attack critical hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), 2, DebugChannels::combat);
             if (attack.damage == -1) {
-                auto effects = getDamageEffects(attack.attacker, criticalHitMultiplier);
+                auto effects = getDamageEffects(attack.attacker, offHand, criticalHitMultiplier);
                 for (auto &effect : effects) {
                     attack.target->applyEffect(effect, DurationType::Instant);
                 }
