@@ -25,10 +25,10 @@ namespace reone {
 
 namespace resource {
 
-GffStruct::Field::Field(FieldType type, string label) : type(type), label(move(label)) {
+GffStruct::GffStruct(uint32_t type) : _type(type) {
 }
 
-GffStruct::GffStruct(uint32_t type) : _type(type) {
+GffStruct::GffStruct(uint32_t type, vector<Field> fields) : _type(type), _fields(move(fields)) {
 }
 
 void GffStruct::add(Field &&field) {

@@ -59,7 +59,7 @@ public:
 
     Area(uint32_t id, Game *game);
 
-    void load(const std::string &name, const resource::GffStruct &are, const resource::GffStruct &git);
+    void load(std::string name, const resource::GffStruct &are, const resource::GffStruct &git, bool fromSave = false);
 
     bool handle(const SDL_Event &event);
     void update(float dt);
@@ -143,7 +143,7 @@ public:
 
     // Party
 
-    void loadParty(const glm::vec3 &position, float facing);
+    void loadParty(const glm::vec3 &position, float facing, bool fromSave = false);
     void unloadParty();
     void reloadParty();
 

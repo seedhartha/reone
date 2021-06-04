@@ -240,15 +240,15 @@ void Game::loadModule(const string &name, string entry) {
         if (maybeModule != _loadedModules.end()) {
             _module = maybeModule->second;
         } else {
-            shared_ptr<GffStruct> ifo(_resource.resources().getGFF("module", ResourceType::Ifo));
-
             _module = _game->objectFactory().newModule();
-            _module->load(name, *ifo);
+
+            shared_ptr<GffStruct> ifo(_resource.resources().getGFF("module", ResourceType::Ifo));
+            _module->load(name, *ifo, _loadFromSaveGame);
 
             _loadedModules.insert(make_pair(name, _module));
         }
 
-        _module->loadParty(entry);
+        _module->loadParty(entry, _loadFromSaveGame);
         _module->area()->fill(_scene.graph());
 
         _loadScreen->setProgress(100);

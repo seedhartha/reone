@@ -125,6 +125,7 @@ set(RESOURCE_HEADERS
 set(RESOURCE_SOURCES
     src/engine/resource/2da.cpp
     src/engine/resource/gffstruct.cpp
+    src/engine/resource/gffstruct_field.cpp
     src/engine/resource/folder.cpp
     src/engine/resource/format/2dareader.cpp
     src/engine/resource/format/2dawriter.cpp

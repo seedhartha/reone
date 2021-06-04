@@ -43,16 +43,19 @@ static constexpr int kMaxHour = 24;
 Module::Module(uint32_t id, Game *game) : Object(id, ObjectType::Module, game) {
 }
 
-void Module::load(const string &name, const GffStruct &ifo) {
-    _name = name;
+void Module::load(string name, const GffStruct &ifo, bool fromSave) {
+    _name = move(name);
 
     loadInfo(ifo);
     loadArea(ifo);
 
     _area->initCameras(_info.entryPosition, _info.entryFacing);
-    _area->runSpawnScripts();
 
     loadPlayer();
+
+    if (!fromSave) {
+        _area->runSpawnScripts();
+    }
 }
 
 void Module::loadInfo(const GffStruct &ifo) {
@@ -68,8 +71,6 @@ void Module::loadInfo(const GffStruct &ifo) {
     float dirY = ifo.getFloat("Mod_Entry_Dir_Y");
     _info.entryFacing = -glm::atan(dirX, dirY);
 
-    // END Entry location
-
     // Time
 
     _info.dawnHour = ifo.getInt("Mod_DawnHour");
@@ -77,33 +78,34 @@ void Module::loadInfo(const GffStruct &ifo) {
     _info.minPerHour = ifo.getInt("Mod_MinPerHour");
 
     _time.hour = ifo.getInt("Mod_StartHour");
-
-    // END Time
 }
 
-void Module::loadArea(const GffStruct &ifo) {
+void Module::loadArea(const GffStruct &ifo, bool fromSave) {
     reone::info("Load area " + _info.entryArea);
+
+    _area = _game->services().objectFactory().newArea();
 
     shared_ptr<GffStruct> are(_game->services().resource().resources().getGFF(_info.entryArea, ResourceType::Are));
     shared_ptr<GffStruct> git(_game->services().resource().resources().getGFF(_info.entryArea, ResourceType::Git));
-
-    _area = _game->services().objectFactory().newArea();
-    _area->load(_info.entryArea, *are, *git);
+    _area->load(_info.entryArea, *are, *git, fromSave);
 }
 
 void Module::loadPlayer() {
     _player = make_unique<Player>(this, _area.get(), &_area->getCamera(CameraType::ThirdPerson), &_game->services().party());
 }
 
-void Module::loadParty(const string &entry) {
+void Module::loadParty(const string &entry, bool fromSave) {
     glm::vec3 position(0.0f);
     float facing = 0.0f;
     getEntryPoint(entry, position, facing);
 
-    _area->loadParty(position, facing);
+    _area->loadParty(position, facing, fromSave);
     _area->onPartyLeaderMoved();
     _area->update3rdPersonCameraFacing();
-    _area->runOnEnterScript();
+
+    if (!fromSave) {
+        _area->runOnEnterScript();
+    }
 }
 
 void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &facing) const {

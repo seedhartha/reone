@@ -66,19 +66,40 @@ public:
         std::vector<std::shared_ptr<GffStruct>> children;
 
         union {
-            int32_t intValue { 0 }; /**< covers Char, Short, Int and StrRef */
+            int32_t intValue; /**< covers Char, Short, Int and StrRef */
             uint32_t uintValue; /**< covers Byte, Word and Dword */
             int64_t int64Value;
-            uint64_t uint64Value;
+            uint64_t uint64Value { 0 };
             float floatValue;
             double doubleValue;
         };
 
         Field() = default;
         Field(FieldType type, std::string label);
+
+        static Field newByte(std::string label, uint32_t val);
+        static Field newChar(std::string label, int32_t val);
+        static Field newWord(std::string label, uint32_t val);
+        static Field newShort(std::string label, int32_t val);
+        static Field newDword(std::string label, uint32_t val);
+        static Field newInt(std::string label, int32_t val);
+        static Field newDword64(std::string label, uint64_t val);
+        static Field newInt64(std::string label, int64_t val);
+        static Field newFloat(std::string label, float val);
+        static Field newDouble(std::string label, double val);
+        static Field newCExoString(std::string label, std::string val);
+        static Field newResRef(std::string label, std::string val);
+        static Field newCExoLocString(std::string label, int32_t strRef, std::string val);
+        static Field newVoid(std::string label, ByteArray val);
+        static Field newStruct(std::string label, std::shared_ptr<GffStruct> val);
+        static Field newList(std::string label, std::vector<std::shared_ptr<GffStruct>> val);
+        static Field newOrientation(std::string label, glm::quat val);
+        static Field newVector(std::string label, glm::vec3 val);
+        static Field newStrRef(std::string label, int32_t val);
     };
 
     GffStruct(uint32_t type);
+    GffStruct(uint32_t, std::vector<Field> fields);
 
     void add(Field &&field);
 
