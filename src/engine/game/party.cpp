@@ -77,7 +77,7 @@ bool Party::removeAvailableMember(int npc) {
     return false;
 }
 
-bool Party::addMember(int npc, const shared_ptr<Creature> &creature) {
+bool Party::addMember(int npc, shared_ptr<Creature> creature) {
     if (_members.size() == kMaxMemberCount) {
         warn("Party: cannot add another member");
         return false;
@@ -134,6 +134,10 @@ const string &Party::getAvailableMember(int npc) const {
 
 shared_ptr<Creature> Party::getMember(int index) const {
     return _members.size() > index ? _members[index].creature : nullptr;
+}
+
+int Party::getNPCByMemberIndex(int index) const {
+    return _members.size() > index ? _members[index].npc : -1;
 }
 
 bool Party::isEmpty() const {

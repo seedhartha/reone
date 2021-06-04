@@ -62,7 +62,7 @@ public:
     /**
      * @param npc NPC number or kNpcPlayer for the player character
      */
-    bool addMember(int npc, const std::shared_ptr<Creature> &creature);
+    bool addMember(int npc, std::shared_ptr<Creature> creature);
 
     bool removeMember(int npc);
 
@@ -70,6 +70,7 @@ public:
     bool isMember(const Object &object) const;
 
     std::shared_ptr<Creature> getMember(int index) const;
+    int getNPCByMemberIndex(int index) const;
 
     // END Members
 

@@ -69,8 +69,8 @@ public:
 
     Module(uint32_t id, Game *game);
 
-    void load(const std::string &name, const resource::GffStruct &ifo);
-    void loadParty(const std::string &entry = "");
+    void load(std::string name, const resource::GffStruct &ifo, bool fromSave = false);
+    void loadParty(const std::string &entry = "", bool fromSave = false);
 
     bool handle(const SDL_Event &event);
     void update(float dt);
@@ -102,7 +102,7 @@ private:
     // Loading
 
     void loadInfo(const resource::GffStruct &ifo);
-    void loadArea(const resource::GffStruct &ifo);
+    void loadArea(const resource::GffStruct &ifo, bool fromSave = false);
     void loadPlayer();
 
     // END Loading

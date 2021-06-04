@@ -323,6 +323,12 @@ private:
 
     // END Rendering
 
+    // Save games
+
+    std::shared_ptr<resource::GffStruct> getPartyMemberNFOStruct(int index) const;
+
+    // END Save games
+
     // Helper methods
 
     void withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block);

@@ -95,8 +95,8 @@ void Area::init() {
     _objectsByType.insert(make_pair(ObjectType::Sound, ObjectList()));
 }
 
-void Area::load(const string &name, const GffStruct &are, const GffStruct &git) {
-    _name = name;
+void Area::load(string name, const GffStruct &are, const GffStruct &git, bool fromSave) {
+    _name = move(name);
 
     loadLYT();
     loadVIS();
@@ -294,14 +294,15 @@ void Area::landObject(SpatialObject &object) {
     }
 }
 
-void Area::loadParty(const glm::vec3 &position, float facing) {
+void Area::loadParty(const glm::vec3 &position, float facing, bool fromSave) {
     Party &party = _game->services().party();
 
     for (int i = 0; i < party.getSize(); ++i) {
         shared_ptr<Creature> member(party.getMember(i));
-        member->setPosition(position);
-        member->setFacing(facing);
-
+        if (!fromSave) {
+            member->setPosition(position);
+            member->setFacing(facing);
+        }
         landObject(*member);
         add(member);
     }
