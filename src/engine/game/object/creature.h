@@ -192,10 +192,11 @@ public:
 
     bool isInCombat() const { return _combat.active; }
     bool isDebilitated() const { return _combat.debilitated; }
+    bool isTwoWeaponFighting() const;
 
     std::shared_ptr<SpatialObject> getAttemptedAttackTarget() const;
     std::shared_ptr<SpatialObject> getAttackTarget() const { return _combat.attackTarget; }
-    int getAttackBonus() const;
+    int getAttackBonus(bool offHand = false) const;
     int getDefense() const;
     void getMainHandDamage(int &min, int &max) const;
     void getOffhandDamage(int &min, int &max) const;

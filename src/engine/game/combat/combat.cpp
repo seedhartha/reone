@@ -99,6 +99,9 @@ void Combat::updateRound(Round &round, float dt) {
 
     switch (round.state) {
         case RoundState::Started: {
+            if (round.attack1->resultType == AttackResultType::Invalid) {
+                round.attack1->resultType = determineAttackResult(*round.attack1);
+            }
             startAttack(*round.attack1, round.duel);
             round.state = RoundState::FirstAttack;
             break;
@@ -107,7 +110,18 @@ void Combat::updateRound(Round &round, float dt) {
             if (isRoundPastFirstAttack(round.time)) {
                 resetProjectile(round);
                 applyAttackResult(*round.attack1);
+
+                // Off-hand attack
+                if (round.attack1->attacker->isTwoWeaponFighting()) {
+                    round.attack1->resultType = determineAttackResult(*round.attack1, true);
+                    applyAttackResult(*round.attack1, true);
+                }
+                // TODO: additional attacks from Feats and Force Powers
+
                 if (round.attack2) {
+                    if (round.attack2->resultType == AttackResultType::Invalid) {
+                        round.attack2->resultType = determineAttackResult(*round.attack2);
+                    }
                     startAttack(*round.attack2, round.duel);
                 }
                 round.state = RoundState::SecondAttack;
@@ -125,6 +139,13 @@ void Combat::updateRound(Round &round, float dt) {
                 resetProjectile(round);
                 if (round.attack2) {
                     applyAttackResult(*round.attack2);
+
+                    // Off-hand attack
+                    if (round.attack2->attacker->isTwoWeaponFighting()) {
+                        round.attack2->resultType = determineAttackResult(*round.attack2, true);
+                        applyAttackResult(*round.attack2, true);
+                    }
+                    // TODO: additional attacks from Feats and Force Powers
                 }
                 finishRound(round);
                 round.state = RoundState::Finished;
@@ -143,9 +164,6 @@ void Combat::updateRound(Round &round, float dt) {
 }
 
 void Combat::startAttack(Attack &attack, bool duel) {
-    if (attack.resultType == AttackResultType::Invalid) {
-        attack.resultType = determineAttackResult(attack);
-    }
     AttackAnimation animation = determineAttackAnimation(attack, duel);
 
     attack.attacker->face(*attack.target);
