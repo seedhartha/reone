@@ -120,7 +120,7 @@ private:
 
     // Damage
 
-    std::vector<std::shared_ptr<DamageEffect>> getDamageEffects(std::shared_ptr<Creature> damager) const;
+    std::vector<std::shared_ptr<DamageEffect>> getDamageEffects(std::shared_ptr<Creature> damager, float multiplier = 1.0f) const;
 
     // END Damage
 
