@@ -30,28 +30,6 @@ namespace reone {
 
 namespace game {
 
-AttackResultType Combat::determineAttackResult(const Attack &attack) const {
-    auto result = AttackResultType::Invalid;
-    int roll = random(1, 20);
-
-    int defense;
-    if (attack.target->type() == ObjectType::Creature) {
-        defense = static_pointer_cast<Creature>(attack.target)->getDefense();
-    } else {
-        defense = 10;
-    }
-
-    if (roll == 20) {
-        result = AttackResultType::AutomaticHit;
-    } else if (roll + attack.attacker->getAttackBonus() >= defense) {
-        result = AttackResultType::HitSuccessful;
-    } else {
-        result = AttackResultType::Miss;
-    }
-
-    return result;
-}
-
 static bool isAttackSuccessful(AttackResultType result) {
     switch (result) {
         case AttackResultType::HitSuccessful:
@@ -61,6 +39,46 @@ static bool isAttackSuccessful(AttackResultType result) {
         default:
             return false;
     }
+}
+
+AttackResultType Combat::determineAttackResult(const Attack &attack) const {
+    auto result = AttackResultType::Miss;
+
+    // Determine defense of a target
+    int defense;
+    if (attack.target->type() == ObjectType::Creature) {
+        defense = static_pointer_cast<Creature>(attack.target)->getDefense();
+    } else {
+        defense = 10;
+    }
+
+    // Attack roll
+    int roll = random(1, 20);
+    if (roll == 20) {
+        result = AttackResultType::AutomaticHit;
+    } else if (roll > 1 && roll + attack.attacker->getAttackBonus() >= defense) { // 1 is automatic miss
+        result = AttackResultType::HitSuccessful;
+    }
+
+    // Critical threat
+    if (isAttackSuccessful(result)) {
+        int criticalThreat;
+        shared_ptr<Item> rightWeapon(attack.attacker->getEquippedItem(InventorySlot::rightWeapon));
+        if (rightWeapon) {
+            criticalThreat = rightWeapon->criticalThreat();
+        } else {
+            criticalThreat = 1;
+        }
+        if (roll > 20 - criticalThreat) {
+            // Critical hit roll
+            int criticalRoll = random(1, 20);
+            if (criticalRoll + attack.attacker->getAttackBonus() >= defense) {
+                result = AttackResultType::CriticalHit;
+            }
+        }
+    }
+
+    return result;
 }
 
 static bool isMeleeWieldType(CreatureWieldType type) {
@@ -133,6 +151,13 @@ Combat::AttackAnimation Combat::determineAttackAnimation(const Attack &attack, b
 }
 
 void Combat::applyAttackResult(const Attack &attack) {
+    // Determine critical hit multiplier
+    int criticalHitMultiplier = 2;
+    shared_ptr<Item> rightWeapon(attack.attacker->getEquippedItem(InventorySlot::rightWeapon));
+    if (rightWeapon) {
+        criticalHitMultiplier = rightWeapon->criticalHitMultiplier();
+    }
+
     switch (attack.resultType) {
         case AttackResultType::Miss:
         case AttackResultType::AttackResisted:
@@ -142,7 +167,6 @@ void Combat::applyAttackResult(const Attack &attack) {
             debug(boost::format("Combat: attack missed: %s -> %s") % attack.attacker->tag() % attack.target->tag(), 2, DebugChannels::combat);
             break;
         case AttackResultType::HitSuccessful:
-        case AttackResultType::CriticalHit:
         case AttackResultType::AutomaticHit: {
             debug(boost::format("Combat: attack hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), 2, DebugChannels::combat);
             if (attack.damage == -1) {
@@ -152,6 +176,18 @@ void Combat::applyAttackResult(const Attack &attack) {
                 }
             } else {
                 attack.target->applyEffect(make_shared<DamageEffect>(attack.damage, DamageType::Universal, attack.attacker), DurationType::Instant);
+            }
+            break;
+        }
+        case AttackResultType::CriticalHit: {
+            debug(boost::format("Combat: attack critical hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), 2, DebugChannels::combat);
+            if (attack.damage == -1) {
+                auto effects = getDamageEffects(attack.attacker, criticalHitMultiplier);
+                for (auto &effect : effects) {
+                    attack.target->applyEffect(effect, DurationType::Instant);
+                }
+            } else {
+                attack.target->applyEffect(make_shared<DamageEffect>(criticalHitMultiplier * attack.damage, DamageType::Universal, attack.attacker), DurationType::Instant);
             }
             break;
         }

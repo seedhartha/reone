@@ -29,10 +29,10 @@ namespace reone {
 
 namespace game {
 
-vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> damager) const {
+vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> damager, float multiplier) const {
     shared_ptr<Item> item(damager->getEquippedItem(InventorySlot::rightWeapon));
     int amount = 0;
-    DamageType type = DamageType::Bludgeoning;
+    auto type = DamageType::Bludgeoning;
 
     if (item) {
         for (int i = 0; i < item->numDice(); ++i) {
@@ -41,7 +41,7 @@ vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> d
         type = static_cast<DamageType>(item->damageFlags());
     }
     amount = glm::max(1, amount);
-    shared_ptr<DamageEffect> effect(make_shared<DamageEffect>(amount, type, move(damager)));
+    auto effect = make_shared<DamageEffect>(multiplier * amount, type, move(damager));
 
     return vector<shared_ptr<DamageEffect>> { effect };
 }
