@@ -47,7 +47,8 @@ void ModelSceneNode::playAnimation(shared_ptr<Animation> anim, shared_ptr<LipAni
     }
 
     // Return if same animation is already playing
-    if (!_animChannels.empty() && _animChannels[0].anim == anim && _animChannels[0].lipAnim == lipAnim && _animChannels[0].properties == properties) return;
+    if (!_animChannels.empty() &&
+        _animChannels[0].anim == anim && _animChannels[0].lipAnim == lipAnim && _animChannels[0].properties == properties) return;
 
     AnimationBlendMode blendMode = getAnimationBlendMode(properties.flags);
 
@@ -126,8 +127,24 @@ void ModelSceneNode::updateAnimations(float dt) {
     }
 
     // Erase finished channels
-    auto channelsToErase = remove_if(_animChannels.begin(), _animChannels.end(), [](auto &channel) { return channel.finished; });
-    _animChannels.erase(channelsToErase, _animChannels.end());
+    switch (_animBlendMode) {
+        case AnimationBlendMode::Single:
+        case AnimationBlendMode::Overlay: {
+            auto channelsToErase = remove_if(_animChannels.begin(), _animChannels.end(), [](auto &channel) { return channel.finished; });
+            _animChannels.erase(channelsToErase, _animChannels.end());
+            break;
+        }
+        case AnimationBlendMode::Blend:
+            if (_animChannels.size() > 1ll && !_animChannels[0].transition) {
+                _animChannels.pop_back();
+            }
+            if (!_animChannels.empty() && _animChannels[0].finished) {
+                _animChannels.pop_front();
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 void ModelSceneNode::updateAnimationChannel(AnimationChannel &channel, float dt) {
