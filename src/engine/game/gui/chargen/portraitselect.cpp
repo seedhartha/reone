@@ -113,7 +113,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
     auto creatureModel = static_pointer_cast<ModelSceneNode>(creature->sceneNode());
     shared_ptr<ModelNode> cameraHook(creatureModel->model()->getNodeByName("camerahook"));
     if (cameraHook) {
-        creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->restPosition().z));
+        creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->absoluteTransform()[3].z));
     }
     auto model = make_shared<ModelSceneNode>(_game->services().graphics().models().get("cghead_light"), ModelUsage::GUI, &sceneGraph);
     model->attach("cghead_light", creatureModel);

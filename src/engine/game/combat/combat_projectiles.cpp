@@ -54,7 +54,7 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
     glm::vec3 projectilePos;
     shared_ptr<ModelNode> bulletHook(weaponModel->model()->getNodeByName("bullethook"));
     if (bulletHook) {
-        projectilePos = weaponModel->absoluteTransform() * glm::vec4(bulletHook->restPosition(), 1.0f);
+        projectilePos = weaponModel->absoluteTransform() * bulletHook->absoluteTransform()[3];
     } else {
         projectilePos = weaponModel->getOrigin();
     }
@@ -63,7 +63,7 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
     glm::vec3 projectileTarget;
     shared_ptr<ModelNode> impact(targetModel->model()->getNodeByName("impact"));
     if (impact) {
-        projectileTarget = targetModel->absoluteTransform() * glm::vec4(impact->restPosition(), 1.0f);
+        projectileTarget = targetModel->absoluteTransform() * impact->absoluteTransform()[3];
     } else {
         projectileTarget = targetModel->getOrigin();
     }
