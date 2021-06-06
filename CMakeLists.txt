@@ -643,6 +643,7 @@ set(GAME_SOURCES
     src/engine/game/script/routines_objects.cpp
     src/engine/game/script/routines_party.cpp
     src/engine/game/script/routines_perception.cpp
+    src/engine/game/script/routines_placeholders.cpp
     src/engine/game/script/routines_stealth.cpp
     src/engine/game/script/routines_strings.cpp
     src/engine/game/script/routines_time.cpp

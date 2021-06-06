@@ -170,6 +170,12 @@ Variable Variable::ofAction(shared_ptr<ExecutionContext> context) {
     return move(result);
 }
 
+Variable Variable::notImplemented() {
+    Variable result;
+    result.type = VariableType::NotImplemented;
+    return move(result);
+}
+
 bool Variable::operator==(const Variable &other) const {
     if (type != other.type) return false;
 

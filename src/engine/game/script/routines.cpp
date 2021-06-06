@@ -57,8 +57,8 @@ void Routines::deinit() {
     _routines.clear();
 }
 
-void Routines::add(const string &name, VariableType retType, const VariableTypesList &argTypes) {
-    _routines.emplace_back(name, retType, argTypes);
+void Routines::add(string name, VariableType retType, VariableTypesList argTypes) {
+    _routines.emplace_back(move(name), retType, move(argTypes));
 }
 
 const Routine &Routines::get(int index) {
