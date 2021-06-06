@@ -25,31 +25,36 @@ namespace reone {
 
 namespace script {
 
-Routine::Routine(const string &name, VariableType retType, const vector<VariableType> &argTypes) :
-    _name(name), _returnType(retType), _argumentTypes(argTypes) {
+Routine::Routine(string name, VariableType retType, vector<VariableType> argTypes) :
+    _name(move(name)),
+    _returnType(retType),
+    _argumentTypes(move(argTypes)) {
 }
 
 Routine::Routine(
-    const string &name,
+    string name,
     VariableType retType,
-    const vector<VariableType> &argTypes,
+    vector<VariableType> argTypes,
     const function<Variable(const vector<Variable> &, ExecutionContext &ctx)> &fn
 ) :
-    _name(name), _returnType(retType), _argumentTypes(argTypes), _func(fn) {
+    _name(move(name)),
+    _returnType(retType),
+    _argumentTypes(move(argTypes)),
+    _func(fn) {
 }
 
 Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) const {
+    auto result = Variable::notImplemented();
     if (_func) {
-        return _func(args, ctx);
+        result = _func(args, ctx);
     }
-    debug("Routine not implemented: " + _name, 2, DebugChannels::script);
-
-    Variable result;
-    result.type = _returnType;
-    if (_returnType == VariableType::Object) {
-        result.objectId = kObjectInvalid;
+    if (result.type == VariableType::NotImplemented) {
+        debug("Routine not implemented: " + _name, 2, DebugChannels::script);
+        result.type = _returnType;
+        if (_returnType == VariableType::Object) {
+            result.objectId = kObjectInvalid;
+        }
     }
-
     return move(result);
 }
 
