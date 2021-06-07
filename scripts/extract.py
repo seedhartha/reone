@@ -21,6 +21,7 @@ TODO: support case sensitive paths (Unix)
 import glob
 import os
 import shutil
+import sys
 
 from reo_shared import *
 
@@ -219,10 +220,15 @@ if not is_valid_extract_dir(extract_dir):
     if not is_valid_extract_dir(extract_dir):
         exit(1)
 
+assume_yes = False
+if len(sys.argv) > 1 and sys.argv[1] == '-y':
+    assume_yes = True
+
 for step in steps:
     if step[2] is None:
-        choice = input(step[1] + " ")
-        run = choice.lower()[0] == 'y'
+        if not assume_yes:
+            choice = input(step[1] + " ")
+        run = assume_yes or choice.lower()[0] == 'y'
     else:
         run = step[2]
 
