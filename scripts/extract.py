@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright (c) 2020-2021 The reone project contributors
 
 # This program is free software: you can redistribute it and/or modify
