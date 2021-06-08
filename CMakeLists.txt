@@ -350,6 +350,7 @@ set(GUI_HEADERS
     src/engine/gui/control/panel.h
     src/engine/gui/control/progressbar.h
     src/engine/gui/control/scrollbar.h
+    src/engine/gui/control/slider.h
     src/engine/gui/control/togglebutton.h
     src/engine/gui/gui.h
     src/engine/gui/scenebuilder.h
@@ -364,6 +365,7 @@ set(GUI_SOURCES
     src/engine/gui/control/listbox.cpp
     src/engine/gui/control/panel.cpp
     src/engine/gui/control/progressbar.cpp
+    src/engine/gui/control/slider.cpp
     src/engine/gui/control/scrollbar.cpp
     src/engine/gui/control/togglebutton.cpp
     src/engine/gui/gui.cpp

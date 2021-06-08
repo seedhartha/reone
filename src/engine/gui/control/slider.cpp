@@ -15,24 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "slider.h"
 
 namespace reone {
 
 namespace gui {
 
-enum class ControlType {
-    Invalid = -1,
-    Panel = 2,
-    Label = 4,
-    ImageButton = 5,
-    Button = 6,
-    ToggleButton = 7,
-    Slider = 8,
-    ScrollBar = 9,
-    ProgressBar = 10,
-    ListBox = 11
-};
+Slider::Slider(GUI *gui) : Control(gui, ControlType::Slider) {
+}
 
 } // namespace gui
 
