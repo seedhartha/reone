@@ -26,23 +26,24 @@ import sys
 
 from reo_shared import *
 
-game_dir = os.getenv("REONE_GAME_DIR", r"D:\Games\Star Wars - KotOR")
-tools_dir = os.getenv("REONE_TOOLS_DIR", r"D:\Source\reone\build\bin\RelWithDebInfo")
-extract_dir = os.getenv("REONE_EXTRACT_DIR", r"D:\OpenKotOR\Extract\KotOR")
-nwnnsscomp_dir = os.getenv("REONE_NWNNSSCOMP_DIR", r"D:\OpenKotOR\Tools\DeNCS")
+game_dir = os.getenv("REONE_GAME_DIR")
+tools_dir = os.getenv("REONE_TOOLS_DIR")
+extract_dir = os.getenv("REONE_EXTRACT_DIR")
+nwnnsscomp_dir = os.getenv("REONE_NWNNSSCOMP_DIR")
 
 steps = [
-    ["extract_bifs", "Extract BIF files (y/n)?", None],
-    ["extract_patch", "Extract patch.erf (y/n)?", None],
-    ["extract_modules", "Extract modules (y/n)?", None],
-    ["extract_dialog", "Extract dialog.tlk (y/n)?", None],
-    ["extract_textures", "Extract texture packs (y/n)?", None],
-    ["extract_voices", "Extract streamwaves/streamvoices (y/n)?", None],
-    ["extract_lips", "Extract LIP files (y/n)?", None],
-    ["convert_to_json", "Convert 2DA, GFF, TLK and LIP to JSON (y/n)?", None],
-    ["convert_to_tga", "Convert TPC to TGA/TXI (y/n)?", None],
-    ["convert_to_ascii_pth", "Convert binary PTH to ASCII PTH (y/n)?", None],
-    ["disassemble_scripts", "Disassemble NCS scripts (y/n)?", None] ]
+    ["extract_bifs", "Extract BIF files (y/n)?"],
+    ["extract_patch", "Extract patch.erf (y/n)?"],
+    ["extract_modules", "Extract modules (y/n)?"],
+    ["extract_dialog", "Extract dialog.tlk (y/n)?"],
+    ["extract_textures", "Extract texture packs (y/n)?"],
+    ["extract_voices", "Extract streamwaves/streamvoices (y/n)?"],
+    ["extract_lips", "Extract LIP files (y/n)?"],
+    ["convert_to_json", "Convert 2DA, GFF, TLK and LIP to JSON (y/n)?"],
+    ["convert_to_tga", "Convert TPC to TGA/TXI (y/n)?"],
+    ["convert_to_ascii_pth", "Convert binary PTH to ASCII PTH (y/n)?"],
+    ["disassemble_scripts", "Disassemble NCS scripts (y/n)?"]
+    ]
 
 
 def extract_bifs(game_dir, extract_dir):
@@ -221,17 +222,10 @@ if not is_valid_extract_dir(extract_dir):
     if not is_valid_extract_dir(extract_dir):
         exit(1)
 
-assume_yes = False
-if len(sys.argv) > 1 and sys.argv[1] == '-y':
-    assume_yes = True
+assume_yes = len(sys.argv) > 1 and sys.argv[1] == '-y'
 
 for step in steps:
-    if step[2] is None:
-        if not assume_yes:
-            choice = input(step[1] + " ")
-        run = assume_yes or choice.lower()[0] == 'y'
-    else:
-        run = step[2]
+    run = assume_yes or input(step[1] + " ").lower()[0] == 'y'
 
     if run:
         if step[0] == "extract_bifs":
