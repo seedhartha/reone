@@ -39,6 +39,7 @@
 #include "panel.h"
 #include "progressbar.h"
 #include "scrollbar.h"
+#include "slider.h"
 #include "togglebutton.h"
 
 using namespace std;
@@ -80,6 +81,9 @@ unique_ptr<Control> Control::of(GUI *gui, ControlType type, const string &tag) {
             break;
         case ControlType::ToggleButton:
             control = make_unique<ToggleButton>(gui);
+            break;
+        case ControlType::Slider:
+            control = make_unique<Slider>(gui);
             break;
         case ControlType::ScrollBar:
             control = make_unique<ScrollBar>(gui);
