@@ -25,10 +25,10 @@ import sys
 
 from reo_shared import *
 
-game_dir = r"D:\Games\Star Wars - KotOR"
-tools_dir = r"D:\Source\reone\build\bin\RelWithDebInfo"
-extract_dir = r"D:\OpenKotOR\Extract\KotOR"
-nwnnsscomp_dir = r"D:\OpenKotOR\Tools\DeNCS"
+game_dir = os.getenv("REONE_GAME_DIR", r"D:\Games\Star Wars - KotOR")
+tools_dir = os.getenv("REONE_TOOLS_DIR", r"D:\Source\reone\build\bin\RelWithDebInfo")
+extract_dir = os.getenv("REONE_EXTRACT_DIR", r"D:\OpenKotOR\Extract\KotOR")
+nwnnsscomp_dir = os.getenv("REONE_NWNNSSCOMP_DIR", r"D:\OpenKotOR\Tools\DeNCS")
 
 steps = [
     ["extract_bifs", "Extract BIF files (y/n)?", None],
