@@ -89,7 +89,7 @@ void InGameMenu::loadInventory() {
 }
 
 void InGameMenu::loadCharacter() {
-    _character = make_unique<CharacterMenu>(_game);
+    _character = make_unique<CharacterMenu>(_game, *this);
     _character->load();
 }
 
