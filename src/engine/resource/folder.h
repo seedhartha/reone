@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <set>
-
-#include <boost/filesystem.hpp>
-#include <boost/noncopyable.hpp>
-
 #include "../common/types.h"
 
 #include "resourceprovider.h"

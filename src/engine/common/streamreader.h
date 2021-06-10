@@ -17,15 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <istream>
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <boost/endian/conversion.hpp>
-#include <boost/noncopyable.hpp>
-
 #include "types.h"
 
 namespace reone {

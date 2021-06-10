@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <functional>
-#include <map>
-#include <unordered_map>
-#include <vector>
-
 namespace reone {
 
 template <class T>

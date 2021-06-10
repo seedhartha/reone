@@ -17,11 +17,6 @@
 
 #include "log.h"
 
-#include <iostream>
-#include <memory>
-
-#include <boost/filesystem.hpp>
-
 namespace fs = boost::filesystem;
 
 using namespace std;

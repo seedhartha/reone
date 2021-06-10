@@ -17,15 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-#include <boost/filesystem/path.hpp>
-#include <boost/noncopyable.hpp>
-
 #include "2da.h"
 #include "format/pereader.h"
 #include "gffstruct.h"

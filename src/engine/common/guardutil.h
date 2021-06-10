@@ -17,9 +17,6 @@
 
 #pragma once
 
-#include <stdexcept>
-#include <string>
-
 namespace reone {
 
 template <class T>

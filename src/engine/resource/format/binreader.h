@@ -17,15 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <boost/endian/conversion.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/noncopyable.hpp>
-
 #include "../../common/streamreader.h"
 #include "../../common/types.h"
 

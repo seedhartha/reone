@@ -15,25 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "timer.h"
+#pragma once
 
-namespace reone {
+#include <cstdint>
+#include <functional>
+#include <istream>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-Timer::Timer(float timeout) {
-    reset(timeout);
-}
+#include <boost/endian/conversion.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/format.hpp>
+#include <boost/noncopyable.hpp>
 
-void Timer::reset(float timeout) {
-    _time = timeout;
-}
-
-bool Timer::advance(float secs) {
-    _time = glm::max(0.0f, _time - secs);
-    return isTimedOut();
-}
-
-void Timer::cancel() {
-    _time = 0.0f;
-}
-
-} // namespace reone
+#include "glm/gtc/quaternion.hpp"
+#include "glm/vec3.hpp"

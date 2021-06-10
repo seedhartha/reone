@@ -17,15 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
-#include <memory>
-
-#include <boost/noncopyable.hpp>
-
-#include "glm/gtc/quaternion.hpp"
-#include "glm/vec3.hpp"
-
 #include "../common/types.h"
 
 namespace reone {

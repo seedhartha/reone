@@ -66,6 +66,7 @@ set(COMMON_HEADERS
     src/engine/common/log.h
     src/engine/common/mediastream.h
     src/engine/common/pathutil.h
+    src/engine/common/pch.h
     src/engine/common/random.h
     src/engine/common/stopwatch.h
     src/engine/common/streamreader.h
@@ -86,6 +87,7 @@ set(COMMON_SOURCES
 
 add_library(libcommon STATIC ${COMMON_HEADERS} ${COMMON_SOURCES})
 set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libcommon PRIVATE src/engine/common/pch.h)
 
 ## END libcommon static library
 
@@ -114,6 +116,7 @@ set(RESOURCE_HEADERS
     src/engine/resource/format/tlkwriter.h
     src/engine/resource/format/visreader.h
     src/engine/resource/keybifprovider.h
+    src/engine/resource/pch.h
     src/engine/resource/resourceprovider.h
     src/engine/resource/resources.h
     src/engine/resource/services.h
@@ -154,6 +157,7 @@ set(RESOURCE_SOURCES
 
 add_library(libresource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES})
 set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libresource PRIVATE src/engine/resource/pch.h)
 
 ## END libresource static library
 

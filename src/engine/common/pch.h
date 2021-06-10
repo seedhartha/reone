@@ -15,25 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "timer.h"
+#pragma once
 
-namespace reone {
+#include <cstdint>
+#include <cstring>
+#include <ctime>
+#include <functional>
+#include <iostream>
+#include <istream>
+#include <map>
+#include <memory>
+#include <ostream>
+#include <random>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
-Timer::Timer(float timeout) {
-    reset(timeout);
-}
+#include <boost/algorithm/string.hpp>
+#include <boost/endian/conversion.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/format.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/noncopyable.hpp>
 
-void Timer::reset(float timeout) {
-    _time = timeout;
-}
+#include "SDL2/SDL_timer.h"
 
-bool Timer::advance(float secs) {
-    _time = glm::max(0.0f, _time - secs);
-    return isTimedOut();
-}
-
-void Timer::cancel() {
-    _time = 0.0f;
-}
-
-} // namespace reone
+#include "glm/common.hpp"
