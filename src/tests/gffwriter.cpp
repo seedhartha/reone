@@ -17,8 +17,6 @@
 
 #define BOOST_TEST_MODULE gffwriter
 
-#include <sstream>
-
 #include <boost/test/included/unit_test.hpp>
 
 #include "../engine/resource/format/gffreader.h"

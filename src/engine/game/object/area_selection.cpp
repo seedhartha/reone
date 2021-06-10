@@ -17,8 +17,6 @@
 
 #include "area.h"
 
-#include "glm/vec3.hpp"
-
 #include "../game.h"
 
 using namespace std;

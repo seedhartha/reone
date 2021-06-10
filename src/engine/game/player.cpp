@@ -17,8 +17,6 @@
 
 #include "player.h"
 
-#include <stdexcept>
-
 #include "../common/guardutil.h"
 
 #include "camera/camera.h"

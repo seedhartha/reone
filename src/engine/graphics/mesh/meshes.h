@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
-#include <boost/noncopyable.hpp>
-
 #include "mesh.h"
 
 namespace reone {

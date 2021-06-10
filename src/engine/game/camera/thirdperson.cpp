@@ -17,8 +17,6 @@
 
 #include "thirdperson.h"
 
-#include "glm/ext.hpp"
-
 #include "../game.h"
 
 using namespace std;

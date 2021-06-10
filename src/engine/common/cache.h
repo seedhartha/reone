@@ -17,13 +17,6 @@
 
 #pragma once
 
-#include <functional>
-#include <memory>
-#include <stdexcept>
-#include <unordered_map>
-
-#include <boost/noncopyable.hpp>
-
 #include "guardutil.h"
 
 namespace reone {

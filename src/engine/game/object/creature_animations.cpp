@@ -21,8 +21,6 @@
 
 #include "creature.h"
 
-#include <boost/format.hpp>
-
 #include "../../common/log.h"
 
 using namespace std;

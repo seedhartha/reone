@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <set>
-
 #include "../../resource/format/binreader.h"
 
 #include "walkmesh.h"

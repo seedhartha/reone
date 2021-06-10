@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <memory>
-
-#include <boost/filesystem/path.hpp>
-#include <boost/noncopyable.hpp>
-
 #include "../talktable.h"
 
 namespace reone {

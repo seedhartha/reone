@@ -17,11 +17,6 @@
 
 #include "framebuffer.h"
 
-#include <stdexcept>
-
-#include "GL/glew.h"
-#include "SDL2/SDL_opengl.h"
-
 using namespace std;
 
 namespace reone {

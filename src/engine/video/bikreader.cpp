@@ -17,10 +17,6 @@
 
 #include "bikreader.h"
 
-#include <stdexcept>
-
-#include <boost/filesystem.hpp>
-
 #include "../audio/stream.h"
 #include "../common/log.h"
 #include "../common/guardutil.h"

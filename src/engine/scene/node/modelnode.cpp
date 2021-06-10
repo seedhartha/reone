@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <stdexcept>
-
 #include "../../common/collectionutil.h"
 #include "../../common/log.h"
 #include "../../common/guardutil.h"

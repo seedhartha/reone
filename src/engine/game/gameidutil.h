@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <boost/filesystem/path.hpp>
-
 #include "types.h"
 
 namespace reone {

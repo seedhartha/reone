@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
 #include "../aabb.h"
 
 #include "vertexattributes.h"

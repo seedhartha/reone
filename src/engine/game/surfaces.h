@@ -17,13 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <functional>
-#include <set>
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
 #include "../resource/resources.h"
 
 #include "surface.h"

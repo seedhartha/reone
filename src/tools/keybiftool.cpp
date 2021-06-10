@@ -17,12 +17,6 @@
 
 #include "tools.h"
 
-#include <algorithm>
-#include <iostream>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
-
 #include "../engine/common/pathutil.h"
 #include "../engine/resource/typeutil.h"
 

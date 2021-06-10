@@ -17,11 +17,6 @@
 
 #include "scenegraph.h"
 
-#include <algorithm>
-#include <stdexcept>
-
-#include "glm/gtx/transform.hpp"
-
 #include "../graphics/mesh/meshes.h"
 
 #include "node/cameranode.h"

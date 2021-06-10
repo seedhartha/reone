@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
-#include "glm/common.hpp"
-
 #include "../../script/enginetype.h"
 
 #include "../types.h"

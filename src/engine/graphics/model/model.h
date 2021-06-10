@@ -17,14 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <set>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
 #include "../aabb.h"
 
 #include "animation.h"

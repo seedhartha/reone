@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <boost/noncopyable.hpp>
-
-#include "glm/vec2.hpp"
-#include "glm/vec4.hpp"
-
 #include "../../graphics/framebuffer.h"
 #include "../../graphics/renderbuffer.h"
 #include "../../graphics/services.h"

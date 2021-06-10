@@ -21,9 +21,6 @@
 
 #include "routines.h"
 
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-
 #include "../../common/log.h"
 
 #include "../game.h"

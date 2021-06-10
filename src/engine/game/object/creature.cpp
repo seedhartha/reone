@@ -17,11 +17,6 @@
 
 #include "creature.h"
 
-#include <climits>
-#include <stdexcept>
-
-#include <boost/algorithm/string.hpp>
-
 #include "../../audio/player.h"
 #include "../../common/log.h"
 #include "../../common/random.h"

@@ -17,8 +17,6 @@
 
 #include "character.h"
 
-#include <boost/format.hpp>
-
 #include "../../../graphics/model/models.h"
 #include "../../../gui/scenebuilder.h"
 

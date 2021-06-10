@@ -19,8 +19,6 @@
 
 #include "../../common/log.h"
 
-#include "glm/gtx/transform.hpp"
-
 using namespace std;
 
 namespace reone {

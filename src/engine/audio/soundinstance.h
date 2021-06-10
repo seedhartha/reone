@@ -17,13 +17,6 @@
 
 #pragma once
 
-#include <string>
-#include <memory>
-
-#include <boost/noncopyable.hpp>
-
-#include "glm/vec3.hpp"
-
 #include "stream.h"
 
 namespace reone {

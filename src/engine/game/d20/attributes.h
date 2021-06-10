@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <map>
-#include <set>
-#include <vector>
-
 #include "../types.h"
 
 #include "savingthrows.h"

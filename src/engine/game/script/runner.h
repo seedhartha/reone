@@ -17,9 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <string>
-
 #include "../../script/scripts.h"
 
 #include "routines.h"

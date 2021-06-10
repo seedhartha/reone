@@ -17,8 +17,6 @@
 
 #include "animation.h"
 
-#include <stack>
-
 #include "../../common/collectionutil.h"
 
 using namespace std;

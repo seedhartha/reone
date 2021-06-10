@@ -17,10 +17,6 @@
 
 #include "class.h"
 
-#include <stdexcept>
-
-#include <boost/algorithm/string.hpp>
-
 #include "classes.h"
 
 using namespace std;

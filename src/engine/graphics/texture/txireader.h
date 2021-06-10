@@ -17,9 +17,6 @@
 
 #pragma once
 
-#include <istream>
-#include <memory>
-
 #include "texture.h"
 
 namespace reone {

@@ -17,10 +17,6 @@
 
 #include "game.h"
 
-#include <boost/algorithm/string.hpp>
-
-#include "SDL2/SDL_timer.h"
-
 #include "../common/log.h"
 #include "../common/pathutil.h"
 #include "../video/bikreader.h"

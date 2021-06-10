@@ -17,15 +17,6 @@
 
 #pragma once
 
-#include <functional>
-#include <memory>
-#include <set>
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
-#include "glm/vec3.hpp"
-
 #include "../graphics/options.h"
 #include "../graphics/services.h"
 

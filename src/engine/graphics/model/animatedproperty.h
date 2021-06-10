@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include <algorithm>
-#include <vector>
-
-#include "glm/common.hpp"
-#include "glm/gtc/quaternion.hpp"
-
 namespace reone {
 
 namespace graphics {

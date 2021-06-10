@@ -17,10 +17,6 @@
 
 #include "surfaces.h"
 
-#include <stdexcept>
-
-#include <boost/algorithm/string.hpp>
-
 #include "../common/guardutil.h"
 
 using namespace std;

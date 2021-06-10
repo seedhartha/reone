@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <boost/filesystem/path.hpp>
-
 #include "../engine/resource/format/2dareader.h"
 #include "../engine/resource/format/bifreader.h"
 #include "../engine/resource/format/erfreader.h"

@@ -17,8 +17,6 @@
 
 #include "gui.h"
 
-#include <stdexcept>
-
 #include "../common/log.h"
 #include "../graphics/mesh/meshes.h"
 #include "../graphics/shader/shaders.h"

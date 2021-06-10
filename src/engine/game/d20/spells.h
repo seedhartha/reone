@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <unordered_map>
-
-#include <boost/noncopyable.hpp>
-
 #include "../../graphics/texture/textures.h"
 #include "../../resource/services.h"
 

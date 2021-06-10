@@ -17,8 +17,6 @@
 
 #include "gui.h"
 
-#include <boost/format.hpp>
-
 #include "../../audio/player.h"
 #include "../../graphics/texture/textures.h"
 

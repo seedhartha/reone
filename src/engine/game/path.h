@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
-#include <glm/vec2.hpp>
-
 #include "../resource/format/gffreader.h"
 
 namespace reone {

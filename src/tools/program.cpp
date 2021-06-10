@@ -17,11 +17,6 @@
 
 #include "program.h"
 
-#include <algorithm>
-#include <iostream>
-#include <unordered_map>
-
-#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
 #include "../engine/common/pathutil.h"

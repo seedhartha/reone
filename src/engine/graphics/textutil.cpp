@@ -17,10 +17,6 @@
 
 #include "textutil.h"
 
-#include <sstream>
-
-#include <boost/algorithm/string.hpp>
-
 #include "font.h"
 
 using namespace std;

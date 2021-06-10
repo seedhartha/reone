@@ -17,10 +17,6 @@
 
 #include "sound.h"
 
-#include <boost/algorithm/string.hpp>
-
-#include "glm/glm.hpp"
-
 #include "../../audio/files.h"
 #include "../../audio/player.h"
 #include "../../resource/resources.h"

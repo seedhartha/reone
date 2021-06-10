@@ -17,10 +17,6 @@
 
 #include "variable.h"
 
-#include <stdexcept>
-
-#include <boost/format.hpp>
-
 #include "enginetype.h"
 
 using namespace std;

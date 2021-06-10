@@ -21,9 +21,6 @@
 
 #include "item.h"
 
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-
 #include "../../audio/files.h"
 #include "../../graphics/model/models.h"
 #include "../../graphics/texture/textures.h"

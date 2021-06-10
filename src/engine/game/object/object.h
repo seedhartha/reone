@@ -17,14 +17,6 @@
 
 #pragma once
 
-#include <deque>
-#include <map>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
 #include "../../common/timer.h"
 
 #include "../action/action.h"

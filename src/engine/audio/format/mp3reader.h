@@ -17,14 +17,9 @@
 
 #pragma once
 
-#include <istream>
-#include <memory>
-
-#include <boost/noncopyable.hpp>
+#include "../stream.h"
 
 #include "mad.h"
-
-#include "../stream.h"
 
 namespace reone {
 

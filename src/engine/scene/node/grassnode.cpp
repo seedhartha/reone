@@ -17,8 +17,6 @@
 
 #include "grassnode.h"
 
-#include <stdexcept>
-
 #include "../../common/guardutil.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"

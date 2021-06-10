@@ -17,11 +17,6 @@
 
 #include "meshnode.h"
 
-#include <stdexcept>
-
-#include "GL/glew.h"
-#include "SDL2/SDL_opengl.h"
-
 #include "../../common/log.h"
 #include "../../common/guardutil.h"
 #include "../../common/random.h"

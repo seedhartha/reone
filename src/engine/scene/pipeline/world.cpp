@@ -17,12 +17,6 @@
 
 #include "world.h"
 
-#include <stdexcept>
-
-#include "glm/ext.hpp"
-
-#include "GL/glew.h"
-
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/pbribl.h"
 #include "../../graphics/shader/shaders.h"

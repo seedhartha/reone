@@ -17,9 +17,6 @@
 
 #include "random.h"
 
-#include <ctime>
-#include <random>
-
 using namespace std;
 
 namespace reone {

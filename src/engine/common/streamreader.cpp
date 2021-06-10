@@ -17,9 +17,6 @@
 
 #include "streamreader.h"
 
-#include <sstream>
-#include <stdexcept>
-
 #include "guardutil.h"
 
 using namespace std;

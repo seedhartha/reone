@@ -17,8 +17,6 @@
 
 #include "selectoverlay.h"
 
-#include <unordered_map>
-
 #include "../../common/guardutil.h"
 #include "../../graphics/context.h"
 #include "../../graphics/font.h"

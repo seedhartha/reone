@@ -17,11 +17,6 @@
 
 #include "cursor.h"
 
-#include <stdexcept>
-
-#include "glm/glm.hpp"
-#include "glm/ext.hpp"
-
 #include "../common/guardutil.h"
 
 #include "services.h"

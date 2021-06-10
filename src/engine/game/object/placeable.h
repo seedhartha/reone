@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include "../../resource/format/gffreader.h"
 
 #include "spatial.h"

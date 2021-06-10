@@ -17,8 +17,6 @@
 
 #include "object.h"
 
-#include <stdexcept>
-
 #include "../../common/collectionutil.h"
 #include "../../common/guardutil.h"
 

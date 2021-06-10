@@ -17,8 +17,6 @@
 
 #include "timer.h"
 
-#include "glm/common.hpp"
-
 namespace reone {
 
 Timer::Timer(float timeout) {

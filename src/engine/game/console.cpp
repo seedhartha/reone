@@ -17,13 +17,6 @@
 
 #include "console.h"
 
-#include <iomanip>
-#include <sstream>
-
-#include <boost/algorithm/string.hpp>
-
-#include "glm/ext.hpp"
-
 #include "../common/log.h"
 #include "../graphics/font.h"
 #include "../graphics/fonts.h"

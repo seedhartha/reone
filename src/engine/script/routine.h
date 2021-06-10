@@ -17,9 +17,6 @@
 
 #pragma once
 
-#include <functional>
-#include <string>
-
 #include "variable.h"
 
 namespace reone {

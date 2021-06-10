@@ -17,8 +17,6 @@
 
 #include "door.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "../../common/streamutil.h"
 #include "../../graphics/model/models.h"
 #include "../../graphics/walkmesh/walkmeshes.h"

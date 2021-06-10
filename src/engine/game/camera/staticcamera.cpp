@@ -17,8 +17,6 @@
 
 #include "staticcamera.h"
 
-#include "glm/ext.hpp"
-
 #include "../object/placeablecamera.h"
 
 using namespace std;

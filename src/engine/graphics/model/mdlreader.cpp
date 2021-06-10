@@ -17,10 +17,6 @@
 
 #include "mdlreader.h"
 
-#include <boost/algorithm/string.hpp>
-
-#include "glm/ext.hpp"
-
 #include "../../common/collectionutil.h"
 #include "../../common/guardutil.h"
 #include "../../common/log.h"

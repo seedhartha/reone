@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <vector>
-
-#include "SDL2/SDL_events.h"
-
 #include "../../common/timer.h"
 #include "../../graphics/font.h"
 #include "../../graphics/services.h"

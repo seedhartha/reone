@@ -17,12 +17,6 @@
 
 #include "emitternode.h"
 
-#include <algorithm>
-#include <stdexcept>
-#include <unordered_map>
-
-#include "glm/gtc/constants.hpp"
-
 #include "../../common/guardutil.h"
 #include "../../common/random.h"
 #include "../../graphics/mesh/meshes.h"

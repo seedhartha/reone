@@ -17,8 +17,6 @@
 
 #include "stopwatch.h"
 
-#include "SDL2/SDL_timer.h"
-
 namespace reone {
 
 Stopwatch::Stopwatch() :

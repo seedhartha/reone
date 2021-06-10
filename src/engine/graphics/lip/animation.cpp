@@ -17,8 +17,6 @@
 
 #include "animation.h"
 
-#include <stdexcept>
-
 using namespace std;
 
 namespace reone {

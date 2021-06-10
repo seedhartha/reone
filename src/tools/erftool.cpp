@@ -17,8 +17,6 @@
 
 #include "tools.h"
 
-#include <iostream>
-
 #include "../engine/resource/format/erfwriter.h"
 #include "../engine/resource/typeutil.h"
 

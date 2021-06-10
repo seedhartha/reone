@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
-#include "glm/vec2.hpp"
-#include "glm/vec4.hpp"
-
 #include "../graphics/texture/texture.h"
 #include "../resource/format/gffreader.h"
 

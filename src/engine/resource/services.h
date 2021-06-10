@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
-#include <boost/filesystem/path.hpp>
-#include <boost/noncopyable.hpp>
-
 #include "resources.h"
 #include "strings.h"
 

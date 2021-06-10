@@ -17,13 +17,6 @@
 
 #pragma once
 
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
-
-#include "SDL2/SDL_events.h"
-
 namespace reone {
 
 namespace game {

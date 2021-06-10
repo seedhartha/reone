@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <string>
-
 #include "format/tlkreader.h"
 
 #include "types.h"

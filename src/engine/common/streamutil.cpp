@@ -17,8 +17,6 @@
 
 #include "streamutil.h"
 
-#include <boost/iostreams/stream.hpp>
-
 using namespace std;
 
 namespace io = boost::iostreams;

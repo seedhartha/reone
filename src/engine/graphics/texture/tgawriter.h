@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <ostream>
-
-#include <boost/filesystem/path.hpp>
-
 #include "texture.h"
 
 namespace reone {

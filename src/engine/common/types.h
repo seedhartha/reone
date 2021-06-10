@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <vector>
-
 namespace reone {
 
 struct DebugChannels {

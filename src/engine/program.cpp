@@ -17,10 +17,6 @@
 
 #include "program.h"
 
-#include <iostream>
-#include <stdexcept>
-
-#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
 #include "common/guardutil.h"

@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <set>
-
-#include <boost/noncopyable.hpp>
-
 #include "options.h"
 #include "types.h"
 

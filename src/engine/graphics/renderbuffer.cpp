@@ -17,9 +17,6 @@
 
 #include "renderbuffer.h"
 
-#include "GL/glew.h"
-#include "SDL2/SDL_opengl.h"
-
 #include "pixelutil.h"
 
 namespace reone {

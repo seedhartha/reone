@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <boost/noncopyable.hpp>
-
 #include "../types.h"
 
 namespace reone {

@@ -17,8 +17,6 @@
 
 #include "tools.h"
 
-#include <iostream>
-
 #include "../engine/resource/format/rimwriter.h"
 #include "../engine/resource/typeutil.h"
 

@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <functional>
-#include <map>
-#include <unordered_map>
-
 #include "../../graphics/model/models.h"
 #include "../../graphics/texture/textures.h"
 #include "../../resource/format/binreader.h"

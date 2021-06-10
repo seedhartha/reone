@@ -21,8 +21,6 @@
 
 #include "waypoint.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "../../resource/strings.h"
 
 #include "../game.h"

@@ -17,10 +17,6 @@
 
 #include "waypoint.h"
 
-#include <boost/algorithm/string.hpp>
-
-#include "glm/glm.hpp"
-
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 

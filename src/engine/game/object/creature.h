@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <atomic>
-#include <functional>
-#include <set>
-
 #include "../../audio/stream.h"
 #include "../../common/timer.h"
 #include "../../graphics/lip/animation.h"

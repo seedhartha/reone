@@ -17,10 +17,6 @@
 
 #include "actionexecutor.h"
 
-#include <stdexcept>
-
-#include "SDL2/SDL_timer.h"
-
 #include "../common/log.h"
 #include "../common/guardutil.h"
 #include "../scene/types.h"

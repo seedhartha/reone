@@ -17,8 +17,6 @@
 
 #define BOOST_TEST_MODULE streamreader
 
-#include <sstream>
-
 #include <boost/test/included/unit_test.hpp>
 
 #include "../engine/common/streamreader.h"

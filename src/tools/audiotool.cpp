@@ -17,8 +17,6 @@
 
 #include "tools.h"
 
-#include <stdexcept>
-
 #include "../engine/common/streamreader.h"
 
 using namespace std;

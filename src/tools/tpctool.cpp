@@ -17,8 +17,6 @@
 
 #include "tools.h"
 
-#include <stdexcept>
-
 #include "s3tc.h"
 
 #include "../engine/common/log.h"

@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <set>
-
 #include "../../resource/format/gffreader.h"
 
 #include "spatial.h"

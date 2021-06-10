@@ -17,8 +17,6 @@
 
 #include "map.h"
 
-#include <stdexcept>
-
 #include "../../../resource/strings.h"
 
 #include "../../game.h"

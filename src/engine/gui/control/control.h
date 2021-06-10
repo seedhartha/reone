@@ -17,15 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <functional>
-#include <memory>
-
-#include <boost/noncopyable.hpp>
-
-#include "glm/vec2.hpp"
-#include "glm/vec3.hpp"
-
 #include "../../graphics/font.h"
 #include "../../graphics/framebuffer.h"
 #include "../../graphics/texture/texture.h"

@@ -17,8 +17,6 @@
 
 #include "model.h"
 
-#include <stdexcept>
-
 #include "../../common/collectionutil.h"
 #include "../../common/guardutil.h"
 #include "../../common/log.h"

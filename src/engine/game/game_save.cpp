@@ -21,8 +21,6 @@
 
 #include "game.h"
 
-#include <boost/iostreams/stream.hpp>
-
 #include "../common/streamutil.h"
 #include "../graphics/texture/tgawriter.h"
 #include "../resource/format/erfreader.h"

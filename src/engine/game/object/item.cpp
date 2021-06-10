@@ -17,8 +17,6 @@
 
 #include "item.h"
 
-#include <stdexcept>
-
 #include "../../audio/player.h"
 #include "../../resource/resources.h"
 

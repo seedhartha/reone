@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <boost/filesystem/path.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/program_options/options_description.hpp>
 
 #include "game/options.h"

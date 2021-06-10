@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
-#include "glm/vec3.hpp"
-
 #include "types.h"
 
 namespace reone {

@@ -21,8 +21,6 @@
 
 #include "routines.h"
 
-#include "glm/trigonometric.hpp"
-
 #include "../../common/log.h"
 
 #include "../enginetype/location.h"

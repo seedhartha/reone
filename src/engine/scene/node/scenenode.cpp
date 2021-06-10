@@ -17,10 +17,6 @@
 
 #include "scenenode.h"
 
-#include <algorithm>
-
-#include "glm/gtx/norm.hpp"
-
 using namespace std;
 
 namespace reone {

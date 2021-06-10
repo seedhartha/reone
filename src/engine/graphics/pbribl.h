@@ -17,13 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <set>
-#include <string>
-#include <unordered_map>
-
-#include <boost/noncopyable.hpp>
-
 #include "context.h"
 #include "framebuffer.h"
 #include "mesh/meshes.h"

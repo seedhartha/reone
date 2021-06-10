@@ -17,10 +17,6 @@
 
 #include "instrutil.h"
 
-#include <map>
-
-#include <boost/format.hpp>
-
 #include "program.h"
 
 using namespace std;

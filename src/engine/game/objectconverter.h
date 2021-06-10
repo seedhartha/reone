@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "object/creature.h"
 #include "object/door.h"
 #include "object/object.h"

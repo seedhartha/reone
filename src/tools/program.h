@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <string>
-#include <memory>
-
-#include <boost/filesystem/path.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/program_options/options_description.hpp>
 
 #include "../engine/resource/types.h"

@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <deque>
-
 #include "../../common/timer.h"
 #include "../../graphics/beziercurve.h"
 #include "../../graphics/model/modelnode.h"

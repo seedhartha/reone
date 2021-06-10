@@ -17,8 +17,6 @@
 
 #include "soundsets.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "../audio/files.h"
 #include "../common/streamutil.h"
 #include "../resource/format/ssfreader.h"

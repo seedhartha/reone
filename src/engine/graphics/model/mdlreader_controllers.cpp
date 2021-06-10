@@ -17,11 +17,6 @@
 
 #include "mdlreader.h"
 
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-
-#include "glm/ext.hpp"
-
 #include "../../common/collectionutil.h"
 
 using namespace std;

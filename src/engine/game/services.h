@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
-#include <boost/noncopyable.hpp>
-
 #include "../audio/services.h"
 #include "../graphics/services.h"
 #include "../resource/services.h"

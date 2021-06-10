@@ -17,8 +17,6 @@
 
 #include "placeable.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "../../graphics/model/models.h"
 #include "../../graphics/walkmesh/walkmeshes.h"
 #include "../../resource/resources.h"

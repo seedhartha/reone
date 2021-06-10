@@ -17,8 +17,6 @@
 
 #include "dialogcamera.h"
 
-#include "glm/ext.hpp"
-
 using namespace std;
 
 using namespace reone::graphics;

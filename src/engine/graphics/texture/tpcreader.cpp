@@ -17,8 +17,6 @@
 
 #include "tpcreader.h"
 
-#include "glm/glm.hpp"
-
 #include "../../common/streamutil.h"
 
 #include "textureutil.h"

@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <functional>
-
 #include "../types.h"
 
 #include "camera.h"
