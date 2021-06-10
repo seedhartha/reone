@@ -52,7 +52,7 @@ void CharacterMenu::load() {
     bindControls();
 
     _binding.btnAuto->setDisabled(true);
-    if (!isTSL(_game->gameId())) {
+    if (isKotOR(_game->gameId())) {
         _binding.btnCharLeft->setVisible(false);
         _binding.btnCharRight->setVisible(false);
 
@@ -110,7 +110,7 @@ void CharacterMenu::bindControls() {
     _binding.btnExit = getControlPtr<Button>("BTN_EXIT");
     _binding.btnAuto = getControlPtr<Button>("BTN_AUTO");
     _binding.btnLevelup = getControlPtr<Button>("BTN_LEVELUP");
-    if (!isTSL(_game->gameId())) {
+    if (isKotOR(_game->gameId())) {
         _binding.lblAdorn = getControlPtr<Label>("LBL_ADORN");
         _binding.btnScripts = getControlPtr<Button>("BTN_SCRIPTS");
         _binding.lblClass = getControlPtr<Label>("LBL_CLASS");
@@ -161,7 +161,7 @@ void CharacterMenu::refreshControls() {
     shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
     CreatureAttributes &attributes = partyLeader->attributes();
 
-    if (!isTSL(_game->gameId())) {
+    if (isKotOR(_game->gameId())) {
         _binding.lblClass1->setTextMessage(describeClass(attributes.getClassByPosition(1)));
         _binding.lblClass2->setTextMessage(describeClass(attributes.getClassByPosition(2)));
         _binding.lblLevel1->setTextMessage(toStringOrEmptyIfZero(attributes.getLevelByPosition(1)));
