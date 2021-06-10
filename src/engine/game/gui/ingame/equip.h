@@ -55,7 +55,9 @@ public:
     void update();
 
 private:
-    struct Binding {
+      static constexpr int kNumControlsBar = 5;
+
+      struct Binding {
         std::shared_ptr<gui::Label> lblCantEquip;
         std::shared_ptr<gui::Label> lblAttackInfo;
         std::shared_ptr<gui::Label> lblToHitR;
@@ -90,7 +92,7 @@ private:
         // TSL only
         std::shared_ptr<gui::Label> lblBack1;
         std::shared_ptr<gui::Label> lblDefBack;
-        std::shared_ptr<gui::Label> lblBar[5];
+        std::shared_ptr<gui::Label> lblBar[kNumControlsBar];
         std::shared_ptr<gui::Label> lblAttackMod;
         std::shared_ptr<gui::Label> lblDamText;
         std::shared_ptr<gui::Button> btnSwapWeapons;
