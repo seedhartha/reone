@@ -17,9 +17,7 @@
 
 #pragma once
 
-#include <istream>
-#include <memory>
-
+#include "pch.h"
 #include "types.h"
 
 namespace reone {

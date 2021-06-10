@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "pch.h"
 #include "format/bifreader.h"
 #include "format/keyreader.h"
 #include "resourceprovider.h"

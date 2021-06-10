@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../pch.h"
+
 namespace reone {
 
 namespace resource {

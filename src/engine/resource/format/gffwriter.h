@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../pch.h"
 #include  "../../common/streamwriter.h"
 
 #include "../gffstruct.h"

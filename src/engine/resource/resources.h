@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "pch.h"
 #include "2da.h"
 #include "format/pereader.h"
 #include "gffstruct.h"

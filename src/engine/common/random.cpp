@@ -16,6 +16,7 @@
  */
 
 #include "random.h"
+#include "pch.h"
 
 using namespace std;
 

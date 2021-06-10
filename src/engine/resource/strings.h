@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "pch.h"
 #include "format/tlkreader.h"
 
 #include "types.h"
