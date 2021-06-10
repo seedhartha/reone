@@ -23,7 +23,11 @@
 
 #include "glm/gtx/norm.hpp"
 
+#if __APPLE__
+#include "OpenAL/al.h"
+#else
 #include "AL/al.h"
+#endif
 
 #include "../common/log.h"
 #include "../common/guardutil.h"

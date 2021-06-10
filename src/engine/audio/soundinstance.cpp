@@ -20,7 +20,11 @@
 #include <stdexcept>
 #include <utility>
 
+#if __APPLE__
+#include "OpenAL/al.h"
+#else
 #include "AL/al.h"
+#endif
 
 #include "../common/log.h"
 

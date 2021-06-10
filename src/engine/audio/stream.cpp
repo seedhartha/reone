@@ -20,7 +20,11 @@
 #include <stdexcept>
 #include <string>
 
+#if __APPLE__
+#include "OpenAL/al.h"
+#else
 #include "AL/al.h"
+#endif
 
 using namespace std;
 

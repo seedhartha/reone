@@ -27,7 +27,11 @@
 
 #include <boost/noncopyable.hpp>
 
+#if __APPLE__
+#include "OpenAL/alc.h"
+#else
 #include "AL/alc.h"
+#endif
 
 #include "glm/vec3.hpp"
 
