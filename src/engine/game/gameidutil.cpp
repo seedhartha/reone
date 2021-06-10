@@ -37,6 +37,10 @@ GameID determineGameID(const fs::path &gameDir) {
     return GameID::TSL;
 }
 
+bool isKotOR(GameID gameId) {
+    return gameId == GameID::KotOR;
+}
+
 bool isTSL(GameID gameId) {
     switch (gameId) {
         case GameID::TSL:

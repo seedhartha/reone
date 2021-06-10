@@ -30,6 +30,8 @@ namespace game {
  */
 GameID determineGameID(const boost::filesystem::path &gameDir);
 
+bool isKotOR(GameID gameId);
+
 bool isTSL(GameID gameId);
 
 } // namespace game
