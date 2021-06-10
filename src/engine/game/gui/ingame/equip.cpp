@@ -97,7 +97,7 @@ void Equipment::bindControls() {
      } else {
         _binding.lblBack1 = getControlPtr<Label>("LBL_BACK1");
         _binding.lblDefBack = getControlPtr<Label>("LBL_DEF_BACK");
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < kNumControlsBar; ++i) {
             _binding.lblBar[i] = getControlPtr<Label>("LBL_BAR" + to_string(i + 1));
         }
         _binding.lblAttackMod = getControlPtr<Label>("LBL_ATTACKMOD");

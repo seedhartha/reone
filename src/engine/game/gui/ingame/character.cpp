@@ -116,7 +116,7 @@ void CharacterMenu::bindControls() {
         _binding.lblClass = getControlPtr<Label>("LBL_CLASS");
         _binding.lblClass1 = getControlPtr<Label>("LBL_CLASS1");
         _binding.lblClass2 = getControlPtr<Label>("LBL_CLASS2");
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < kNumControlsGood; ++i) {
             _binding.lblGood[i] = getControlPtr<Label>("LBL_GOOD" + to_string(i + 1));
         }
         _binding.lblLevel = getControlPtr<Label>("LBL_LEVEL");
@@ -134,7 +134,7 @@ void CharacterMenu::bindControls() {
          _binding.lblStatsBorder = getControlPtr<Label>("LBL_STATSBORDER");
          _binding.lblTitle = getControlPtr<Label>("LBL_TITLE");
          _binding.lblXpBack = getControlPtr<Label>("LBL_XP_BACK");
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < kNumControlsBar; ++i) {
             _binding.lblBar[i] = getControlPtr<Label>("LBL_BAR" + to_string(i + 1));
         }
         _binding.btnChange1 = _inGameMenu.getBtnChange2();

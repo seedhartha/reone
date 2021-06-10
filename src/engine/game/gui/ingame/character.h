@@ -40,6 +40,9 @@ public:
     void refreshControls();
 
 private:
+    static constexpr int kNumControlsGood = 10;
+    static constexpr int kNumControlsBar = 6;
+
     struct Binding {
         std::shared_ptr<gui::Label> lbl3dChar;
         std::shared_ptr<gui::Button> btn3dChar;
@@ -94,7 +97,7 @@ private:
         std::shared_ptr<gui::Label> lblClass;
         std::shared_ptr<gui::Label> lblClass1;
         std::shared_ptr<gui::Label> lblClass2;
-        std::shared_ptr<gui::Label> lblGood[10];
+        std::shared_ptr<gui::Label> lblGood[kNumControlsGood];
         std::shared_ptr<gui::Label> lblLevel;
         std::shared_ptr<gui::Label> lblLevel1;
         std::shared_ptr<gui::Label> lblLevel2;
@@ -110,7 +113,7 @@ private:
         std::shared_ptr<gui::Label> lblStatsBorder;
         std::shared_ptr<gui::Label> lblTitle;
         std::shared_ptr<gui::Label> lblXpBack;
-        std::shared_ptr<gui::Label> lblBar[6];
+        std::shared_ptr<gui::Label> lblBar[kNumControlsBar];
         // End TSL only
     } _binding;
 
