@@ -250,7 +250,7 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) 
     character->loadAppearance();
     character->updateModelAnimation();
 
-    auto sceneModel = make_shared<ModelSceneNode>( _game->services().graphics().models().get("charmain_light"), ModelUsage::GUI, &sceneGraph);
+    auto sceneModel = make_shared<ModelSceneNode>(_game->services().graphics().models().get("charmain_light"), ModelUsage::GUI, &sceneGraph);
     sceneModel->attach("charmain_light", character->sceneNode());
 
     return move(sceneModel);
