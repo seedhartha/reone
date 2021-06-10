@@ -56,47 +56,47 @@ public:
 
 private:
     struct Binding {
-        std::shared_ptr<gui::Label> lblCantEquip { nullptr };
-        std::shared_ptr<gui::Label> lblAttackInfo { nullptr };
-        std::shared_ptr<gui::Label> lblToHitR { nullptr };
-        std::shared_ptr<gui::Label> lblPortBord { nullptr };
-        std::shared_ptr<gui::Label> lblPortrait { nullptr };
-        std::shared_ptr<gui::ListBox> lbItems { nullptr };
-        std::shared_ptr<gui::Label> lblDefInfo { nullptr };
+        std::shared_ptr<gui::Label> lblCantEquip;
+        std::shared_ptr<gui::Label> lblAttackInfo;
+        std::shared_ptr<gui::Label> lblToHitR;
+        std::shared_ptr<gui::Label> lblPortBord;
+        std::shared_ptr<gui::Label> lblPortrait;
+        std::shared_ptr<gui::ListBox> lbItems;
+        std::shared_ptr<gui::Label> lblDefInfo;
         std::unordered_map<Equipment::Slot, std::shared_ptr<gui::Label>> lblInv;
         std::unordered_map<Equipment::Slot, std::shared_ptr<gui::Button>> btnInv;
-        std::shared_ptr<gui::Label> lblAtkL { nullptr };
-        std::shared_ptr<gui::Label> lblAtkR { nullptr };
-        std::shared_ptr<gui::Label> lblDef { nullptr };
-        std::shared_ptr<gui::Label> lblTitle { nullptr };
-        std::shared_ptr<gui::Label> lblDamage { nullptr };
-        std::shared_ptr<gui::Label> lblToHitL { nullptr };
-        std::shared_ptr<gui::Label> lblToHit { nullptr };
-        std::shared_ptr<gui::Label> lblSlotName { nullptr };
-        std::shared_ptr<gui::Button> btnBack { nullptr };
-        std::shared_ptr<gui::Button> btnEquip{ nullptr };
-        std::shared_ptr<gui::ListBox> lbDesc { nullptr };
+        std::shared_ptr<gui::Label> lblAtkL;
+        std::shared_ptr<gui::Label> lblAtkR;
+        std::shared_ptr<gui::Label> lblDef;
+        std::shared_ptr<gui::Label> lblTitle;
+        std::shared_ptr<gui::Label> lblDamage;
+        std::shared_ptr<gui::Label> lblToHitL;
+        std::shared_ptr<gui::Label> lblToHit;
+        std::shared_ptr<gui::Label> lblSlotName;
+        std::shared_ptr<gui::Button> btnBack;
+        std::shared_ptr<gui::Button> btnEquip;
+        std::shared_ptr<gui::ListBox> lbDesc;
 
         // KOTOR only
-        std::shared_ptr<gui::Label> lblVitality { nullptr };
-        std::shared_ptr<gui::Label> lblTxtBar { nullptr };
-        std::shared_ptr<gui::Button> btnCharLeft { nullptr };
-        std::shared_ptr<gui::Button> btnCharRight { nullptr };
-        std::shared_ptr<gui::Label> lblSelectTitle { nullptr };
-        std::shared_ptr<gui::Button> btnChange1 { nullptr };
-        std::shared_ptr<gui::Button> btnChange2 { nullptr };
+        std::shared_ptr<gui::Label> lblVitality;
+        std::shared_ptr<gui::Label> lblTxtBar;
+        std::shared_ptr<gui::Button> btnCharLeft;
+        std::shared_ptr<gui::Button> btnCharRight;
+        std::shared_ptr<gui::Label> lblSelectTitle;
+        std::shared_ptr<gui::Button> btnChange1;
+        std::shared_ptr<gui::Button> btnChange2;
         // End KOTOR only
 
         // TSL only
-        std::shared_ptr<gui::Label> lblBack1 { nullptr };
-        std::shared_ptr<gui::Label> lblDefBack { nullptr };
+        std::shared_ptr<gui::Label> lblBack1;
+        std::shared_ptr<gui::Label> lblDefBack;
         std::shared_ptr<gui::Label> lblBar[5];
-        std::shared_ptr<gui::Label> lblAttackMod { nullptr };
-        std::shared_ptr<gui::Label> lblDamText { nullptr };
-        std::shared_ptr<gui::Button> btnSwapWeapons { nullptr };
-        std::shared_ptr<gui::Button> btnPrevNpc { nullptr };
-        std::shared_ptr<gui::Button> btnNextNpc { nullptr };
-        std::shared_ptr<gui::Label> lblDefText { nullptr };
+        std::shared_ptr<gui::Label> lblAttackMod;
+        std::shared_ptr<gui::Label> lblDamText;
+        std::shared_ptr<gui::Button> btnSwapWeapons;
+        std::shared_ptr<gui::Button> btnPrevNpc;
+        std::shared_ptr<gui::Button> btnNextNpc;
+        std::shared_ptr<gui::Label> lblDefText;
         // End TSL only
     } _binding;
 
