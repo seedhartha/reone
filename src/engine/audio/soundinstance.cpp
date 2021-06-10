@@ -17,11 +17,6 @@
 
 #include "soundinstance.h"
 
-#include <stdexcept>
-#include <utility>
-
-#include "AL/al.h"
-
 #include "../common/log.h"
 
 #include "soundhandle.h"

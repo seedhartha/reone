@@ -17,15 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <unordered_map>
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
-#include "glm/mat4x4.hpp"
-#include "glm/vec2.hpp"
-
 #include "../audio/services.h"
 #include "../graphics/fonts.h"
 #include "../graphics/mesh/meshes.h"

@@ -21,10 +21,6 @@
 
 #include "tgawriter.h"
 
-#include <stdexcept>
-
-#include <boost/filesystem.hpp>
-
 #include "../../common/guardutil.h"
 
 #include "s3tc.h"

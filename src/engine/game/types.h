@@ -17,9 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <unordered_map>
-
 #include "../audio/stream.h"
 
 namespace reone {

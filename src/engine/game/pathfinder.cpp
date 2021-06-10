@@ -17,8 +17,6 @@
 
 #include "pathfinder.h"
 
-#include "glm/gtx/norm.hpp"
-
 using namespace std;
 
 using namespace reone::resource;

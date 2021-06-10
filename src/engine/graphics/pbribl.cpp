@@ -17,11 +17,6 @@
 
 #include "pbribl.h"
 
-#include "GL/glew.h"
-#include "SDL2/SDL_opengl.h"
-
-#include "glm/ext.hpp"
-
 #include "renderbuffer.h"
 #include "texture/textureutil.h"
 

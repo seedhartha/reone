@@ -27,7 +27,6 @@
 #include "map.h"
 #include "messages.h"
 #include "options.h"
-#include <memory>
 
 namespace reone {
 

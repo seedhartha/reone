@@ -17,8 +17,6 @@
 
 #include "firstperson.h"
 
-#include "glm/ext.hpp"
-
 #include "../../graphics/types.h"
 
 using namespace std;

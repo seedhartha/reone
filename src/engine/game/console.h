@@ -17,17 +17,6 @@
 
 #pragma once
 
-#include <functional>
-#include <memory>
-#include <stack>
-#include <string>
-#include <queue>
-#include <unordered_map>
-
-#include <boost/noncopyable.hpp>
-
-#include "SDL2/SDL_events.h"
-
 #include "../gui/textinput.h"
 #include "../graphics/font.h"
 #include "../graphics/options.h"

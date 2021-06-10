@@ -17,9 +17,6 @@
 
 #include "area.h"
 
-#include <set>
-#include <stdexcept>
-
 #include "../../common/log.h"
 
 using namespace std;

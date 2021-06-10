@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 namespace reone {
 
 namespace graphics {

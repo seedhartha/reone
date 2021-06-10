@@ -17,9 +17,6 @@
 
 #include "equip.h"
 
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-
 #include "../../../graphics/texture/textures.h"
 #include "../../../resource/strings.h"
 

@@ -17,8 +17,6 @@
 
 #include "encounter.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "../../resource/resources.h"
 
 #include "../game.h"

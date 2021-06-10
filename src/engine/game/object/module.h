@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
-#include "glm/vec3.hpp"
-
-#include "SDL2/SDL_events.h"
-
 #include "../../graphics/types.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/types.h"

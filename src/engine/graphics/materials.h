@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-#include <unordered_map>
-
-#include <boost/noncopyable.hpp>
-
 #include "../resource/resources.h"
 
 #include "material.h"

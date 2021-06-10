@@ -17,11 +17,6 @@
 
 #include "reputes.h"
 
-#include <stdexcept>
-#include <unordered_map>
-
-#include <boost/algorithm/string.hpp>
-
 using namespace std;
 
 using namespace reone::resource;

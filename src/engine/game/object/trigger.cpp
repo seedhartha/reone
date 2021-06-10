@@ -17,10 +17,6 @@
 
 #include "trigger.h"
 
-#include <boost/algorithm/string.hpp>
-
-#include "glm/gtx/intersect.hpp"
-
 #include "../../common/log.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"

@@ -17,13 +17,6 @@
 
 #pragma once
 
-#include <functional>
-#include <stdexcept>
-#include <string>
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
 #include "../../common/collectionutil.h"
 #include "../../resource/types.h"
 #include "../../script/routine.h"

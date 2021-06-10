@@ -17,13 +17,6 @@
 
 #pragma once
 
-#include <functional>
-#include <memory>
-
-#include <boost/noncopyable.hpp>
-
-#include "glm/mat4x4.hpp"
-
 #include "cursor.h"
 #include "eventhandler.h"
 #include "options.h"

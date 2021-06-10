@@ -17,11 +17,6 @@
 
 #include "frame.h"
 
-#include <cstdlib>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
 #include <wx/display.h>

@@ -17,14 +17,6 @@
 
 #include "mesh.h"
 
-#include <stdexcept>
-#include <string>
-
-#include "GL/glew.h"
-#include "SDL2/SDL_opengl.h"
-
-#include "glm/ext.hpp"
-
 #include "../baryutil.h"
 
 using namespace std;

@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <string>
-
 #include "../../scene/node/modelnode.h"
 #include "../../scene/scenegraph.h"
 

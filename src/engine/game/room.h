@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <set>
-
-#include "glm/vec3.hpp"
-
 #include "../graphics/walkmesh/walkmesh.h"
 #include "../scene/node/modelnode.h"
 

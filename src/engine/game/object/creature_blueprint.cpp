@@ -21,8 +21,6 @@
 
 #include "creature.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "../../graphics/texture/textures.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"

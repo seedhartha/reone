@@ -17,14 +17,7 @@
 
 #include "window.h"
 
-#include <stdexcept>
-
-#include <boost/format.hpp>
-
-#include "GL/glew.h"
 #include "SDL2/SDL.h"
-
-#include "glm/ext.hpp"
 
 #include "../common/guardutil.h"
 

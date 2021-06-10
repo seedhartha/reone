@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
-#include <boost/filesystem/path.hpp>
-
 #include "animation.h"
 
 namespace reone {

@@ -17,13 +17,6 @@
 
 #pragma once
 
-#include <functional>
-#include <memory>
-#include <vector>
-#include <unordered_map>
-
-#include <boost/noncopyable.hpp>
-
 #include "program.h"
 #include "types.h"
 #include "variable.h"

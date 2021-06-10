@@ -17,8 +17,6 @@
 
 #include "modelnodescenenode.h"
 
-#include <stdexcept>
-
 #include "../../common/guardutil.h"
 
 using namespace std;

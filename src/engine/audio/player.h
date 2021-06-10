@@ -17,20 +17,6 @@
 
 #pragma once
 
-#include <atomic>
-#include <cstdint>
-#include <map>
-#include <mutex>
-#include <string>
-#include <thread>
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
-#include "AL/alc.h"
-
-#include "glm/vec3.hpp"
-
 #include "files.h"
 #include "options.h"
 #include "soundinstance.h"

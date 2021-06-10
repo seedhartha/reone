@@ -17,9 +17,6 @@
 
 #pragma once
 
-#include <boost/filesystem/path.hpp>
-#include <boost/noncopyable.hpp>
-
 #include "game/options.h"
 
 namespace reone {

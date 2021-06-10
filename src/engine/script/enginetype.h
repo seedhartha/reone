@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <boost/noncopyable.hpp>
-
 namespace reone {
 
 namespace script {

@@ -17,14 +17,6 @@
 
 #include "map.h"
 
-#include <stdexcept>
-
-#include "glm/mat4x4.hpp"
-
-#include "GL/glew.h"
-
-#include "SDL2/SDL_opengl.h"
-
 #include "../common/log.h"
 #include "../common/guardutil.h"
 #include "../graphics/context.h"

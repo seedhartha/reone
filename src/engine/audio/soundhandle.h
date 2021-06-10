@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include <atomic>
-
-#include <boost/noncopyable.hpp>
-
-#include "glm/vec3.hpp"
-
 namespace reone {
 
 namespace audio {

@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
-#include <boost/noncopyable.hpp>
-
-#include "glm/vec2.hpp"
-
 #include "texture/texture.h"
 
 namespace reone {

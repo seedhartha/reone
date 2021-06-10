@@ -17,10 +17,6 @@
 
 #include "txireader.h"
 
-#include <vector>
-
-#include <boost/algorithm/string.hpp>
-
 #include "../../common/log.h"
 
 using namespace std;

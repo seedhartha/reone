@@ -17,8 +17,6 @@
 
 #include "cursors.h"
 
-#include <stdexcept>
-
 #include "../common/streamutil.h"
 #include "../graphics/texture/curreader.h"
 

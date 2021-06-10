@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <boost/noncopyable.hpp>
-
-#include "glm/mat4x4.hpp"
-
 #include "../../graphics/framebuffer.h"
 #include "../../graphics/renderbuffer.h"
 #include "../../graphics/services.h"

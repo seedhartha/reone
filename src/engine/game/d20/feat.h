@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <string>
-
 #include "../../graphics/texture/texture.h"
 
 #include "../types.h"

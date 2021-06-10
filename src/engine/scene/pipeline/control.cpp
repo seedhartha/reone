@@ -17,10 +17,6 @@
 
 #include "control.h"
 
-#include "GL/glew.h"
-
-#include "glm/ext.hpp"
-
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
 #include "../../graphics/texture/textures.h"

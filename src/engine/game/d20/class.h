@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <string>
-#include <unordered_set>
-#include <vector>
-
 #include "../../resource/format/2dareader.h"
 #include "../../resource/services.h"
 

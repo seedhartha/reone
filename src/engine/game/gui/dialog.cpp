@@ -17,13 +17,6 @@
 
 #include "dialog.h"
 
-#include <unordered_map>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-
-#include "SDL2/SDL_timer.h"
-
 #include "../../audio/files.h"
 #include "../../audio/player.h"
 #include "../../audio/soundhandle.h"

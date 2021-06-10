@@ -17,10 +17,6 @@
 
 #include "materials.h"
 
-#include <stdexcept>
-
-#include <boost/algorithm/string.hpp>
-
 #include "../common/collectionutil.h"
 
 using namespace std;

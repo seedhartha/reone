@@ -17,11 +17,6 @@
 
 #include "aabb.h"
 
-#include <utility>
-
-#include "glm/ext.hpp"
-#include "glm/gtx/norm.hpp"
-
 using namespace std;
 
 namespace reone {

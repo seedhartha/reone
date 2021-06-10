@@ -21,9 +21,6 @@
 
 #include "creature.h"
 
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-
 #include "../../common/streamutil.h"
 #include "../../graphics/model/models.h"
 #include "../../graphics/texture/textures.h"

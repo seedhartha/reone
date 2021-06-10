@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "../../resource/format/binreader.h"
 
 #include "../types.h"

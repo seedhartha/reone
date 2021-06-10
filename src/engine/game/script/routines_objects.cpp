@@ -21,8 +21,6 @@
 
 #include "routines.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "../../common/log.h"
 
 #include "../enginetype/location.h"

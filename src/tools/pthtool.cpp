@@ -17,14 +17,6 @@
 
 #include "tools.h"
 
-#include <map>
-#include <vector>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-
-#include "glm/vec3.hpp"
-
 #include "../engine/common/streamutil.h"
 #include "../engine/resource/format/gffreader.h"
 #include "../engine/resource/format/gffwriter.h"

@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
-#include "SDL2/SDL_events.h"
-
-#include "glm/vec3.hpp"
-
 #include "../../scene/node/cameranode.h"
 
 namespace reone {

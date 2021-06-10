@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
-#include <boost/noncopyable.hpp>
-
 #include "../../audio/files.h"
 #include "../../audio/stream.h"
 #include "../../resource/2da.h"

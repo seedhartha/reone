@@ -17,10 +17,6 @@
 
 #include "animatedcamera.h"
 
-#include <unordered_map>
-
-#include <boost/format.hpp>
-
 #include "../../graphics/types.h"
 #include "../../graphics/model/models.h"
 #include "../../resource/resources.h"

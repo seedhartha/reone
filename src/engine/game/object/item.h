@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "../../audio/stream.h"
 #include "../../graphics/model/model.h"
 #include "../../graphics/texture/texture.h"

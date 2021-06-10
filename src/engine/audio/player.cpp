@@ -17,14 +17,6 @@
 
 #include "player.h"
 
-#include <algorithm>
-#include <functional>
-#include <stdexcept>
-
-#include "glm/gtx/norm.hpp"
-
-#include "AL/al.h"
-
 #include "../common/log.h"
 #include "../common/guardutil.h"
 

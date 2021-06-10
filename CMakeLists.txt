@@ -86,6 +86,7 @@ set(COMMON_SOURCES
 
 add_library(libcommon STATIC ${COMMON_HEADERS} ${COMMON_SOURCES})
 set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libcommon PRIVATE src/engine/pch.h)
 
 ## END libcommon static library
 
@@ -154,6 +155,7 @@ set(RESOURCE_SOURCES
 
 add_library(libresource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES})
 set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libresource PRIVATE src/engine/pch.h)
 
 ## END libresource static library
 
@@ -251,6 +253,7 @@ set(GRAPHICS_SOURCES
 
 add_library(libgraphics STATIC ${GRAPHICS_HEADERS} ${GRAPHICS_SOURCES})
 set_target_properties(libgraphics PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libgraphics PRIVATE src/engine/pch.h)
 
 ## END libgraphics static library
 
@@ -280,6 +283,7 @@ set(AUDIO_SOURCES
 
 add_library(libaudio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES})
 set_target_properties(libaudio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libaudio PRIVATE src/engine/pch.h)
 
 ## END libaudio static library
 
@@ -295,6 +299,7 @@ set(VIDEO_SOURCES
 
 add_library(libvideo STATIC ${VIDEO_HEADERS} ${VIDEO_SOURCES})
 set_target_properties(libvideo PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libvideo PRIVATE src/engine/pch.h)
 
 ## END libvideo static library
 
@@ -336,6 +341,7 @@ set(SCENE_SOURCES
 
 add_library(libscene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES})
 set_target_properties(libscene PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libscene PRIVATE src/engine/pch.h)
 
 ## END libscene static library
 
@@ -374,6 +380,7 @@ set(GUI_SOURCES
 
 add_library(libgui STATIC ${GUI_HEADERS} ${GUI_SOURCES})
 set_target_properties(libgui PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libgui PRIVATE src/engine/pch.h)
 
 ## END libgui static library
 
@@ -403,6 +410,7 @@ set(SCRIPT_SOURCES
 
 add_library(libscript STATIC ${SCRIPT_HEADERS} ${SCRIPT_SOURCES})
 set_target_properties(libscript PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libscript PRIVATE src/engine/pch.h)
 
 ## END libscript static library
 
@@ -657,6 +665,7 @@ set(GAME_SOURCES
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libgame PRIVATE src/engine/pch.h)
 
 ## END libgame static library
 
@@ -664,6 +673,7 @@ set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY
 
 set(REONE_HEADERS
     src/engine/engine.h
+    src/engine/pch.h
     src/engine/program.h)
 
 set(REONE_SOURCES
@@ -677,6 +687,7 @@ endif()
 
 add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+target_precompile_headers(reone PRIVATE src/engine/pch.h)
 
 target_link_libraries(reone PRIVATE
     libgame libscript libgui libscene libvideo libaudio libgraphics libresource libcommon
@@ -721,6 +732,7 @@ if(BUILD_TOOLS)
 
     add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
     set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+    target_precompile_headers(reone-tools PRIVATE src/engine/pch.h)
 
     target_link_libraries(reone-tools PRIVATE
         libgraphics libresource libcommon
@@ -762,6 +774,7 @@ if(BUILD_LAUNCHER)
         target_link_libraries(reone-launcher ${wxWidgets_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
         set_target_properties(reone-launcher PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+        target_precompile_headers(reone-launcher PRIVATE src/engine/pch.h)
         list(APPEND InstallTargets reone-launcher)
     else()
         message(WARNING "wxWidgets not found - launcher cannot be built")
@@ -788,6 +801,7 @@ if(BUILD_TESTS)
         endif()
 
         add_test(${TEST_NAME} test_${TEST_NAME})
+        target_precompile_headers(test_${TEST_NAME} PRIVATE src/engine/pch.h)
     endforeach()
 endif()
 

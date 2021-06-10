@@ -17,8 +17,6 @@
 
 #include "bwmreader.h"
 
-#include "glm/ext.hpp"
-
 using namespace std;
 
 namespace reone {

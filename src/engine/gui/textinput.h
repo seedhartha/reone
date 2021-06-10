@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <string>
-
-#include "SDL2/SDL_events.h"
-
 namespace reone {
 
 namespace gui {

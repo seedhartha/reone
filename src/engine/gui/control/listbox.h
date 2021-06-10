@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include "control.h"
 
 namespace reone {

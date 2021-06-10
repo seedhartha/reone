@@ -17,8 +17,6 @@
 
 #include "combat.h"
 
-#include <stdexcept>
-
 #include "../../common/log.h"
 #include "../../common/random.h"
 

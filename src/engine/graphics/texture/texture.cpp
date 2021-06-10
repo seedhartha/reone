@@ -17,12 +17,6 @@
 
 #include "texture.h"
 
-#include <stdexcept>
-#include <string>
-
-#include "GL/glew.h"
-#include "SDL2/SDL_opengl.h"
-
 #include "../pixelutil.h"
 
 #include "textureutil.h"

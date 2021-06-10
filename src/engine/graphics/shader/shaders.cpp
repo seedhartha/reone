@@ -17,16 +17,6 @@
 
 #include "shaders.h"
 
-#include <cstdarg>
-#include <stdexcept>
-
-#include <boost/format.hpp>
-
-#include "GL/glew.h"
-#include "SDL2/SDL_opengl.h"
-
-#include "glm/ext.hpp"
-
 #include "../texture/texture.h"
 #include "../texture/textures.h"
 

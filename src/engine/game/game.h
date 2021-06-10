@@ -18,13 +18,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <set>
-#include <string>
-
-#include <boost/filesystem/path.hpp>
-
 #include "../audio/services.h"
 #include "../graphics/eventhandler.h"
 #include "../graphics/services.h"

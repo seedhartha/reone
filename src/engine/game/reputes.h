@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <boost/noncopyable.hpp>
-
 #include "../resource/resources.h"
 
 #include "object/creature.h"

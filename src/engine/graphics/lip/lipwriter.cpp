@@ -17,8 +17,6 @@
 
 #include "lipwriter.h"
 
-#include <boost/filesystem.hpp>
-
 #include "../../common/streamwriter.h"
 
 namespace fs = boost::filesystem;

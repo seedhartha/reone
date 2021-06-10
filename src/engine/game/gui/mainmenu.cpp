@@ -17,8 +17,6 @@
 
 #include "mainmenu.h"
 
-#include "glm/glm.hpp"
-
 #include "../../audio/player.h"
 #include "../../common/log.h"
 #include "../../gui/control/listbox.h"

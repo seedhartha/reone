@@ -21,8 +21,6 @@
 
 #include "routines.h"
 
-#include "glm/glm.hpp"
-
 using namespace std;
 
 using namespace reone::script;

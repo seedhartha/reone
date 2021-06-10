@@ -17,8 +17,6 @@
 
 #include "runner.h"
 
-#include <stdexcept>
-
 #include "../../script/execution.h"
 
 #include "../game.h"

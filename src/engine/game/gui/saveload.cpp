@@ -17,11 +17,6 @@
 
 #include "saveload.h"
 
-#include <algorithm>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
-
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
 #include "../../graphics/texture/tgareader.h"

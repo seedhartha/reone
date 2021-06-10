@@ -17,8 +17,6 @@
 
 #include "placeablecamera.h"
 
-#include "glm/gtx/euler_angles.hpp"
-
 using namespace std;
 
 using namespace reone::resource;

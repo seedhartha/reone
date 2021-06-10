@@ -17,9 +17,6 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
 namespace reone {
 
 namespace graphics {

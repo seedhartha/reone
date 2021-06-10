@@ -17,14 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <queue>
-#include <vector>
-
-#include "glm/gtc/quaternion.hpp"
-#include "glm/mat4x4.hpp"
-#include "glm/vec3.hpp"
-
 #include "../../graphics/walkmesh/walkmesh.h"
 #include "../../scene/animproperties.h"
 #include "../../scene/node/scenenode.h"

@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <string>
-#include <unordered_map>
-
-#include <boost/noncopyable.hpp>
-
 namespace reone {
 
 namespace script {

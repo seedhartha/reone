@@ -17,11 +17,6 @@
 
 #include "textureutil.h"
 
-#include <stdexcept>
-#include <string>
-
-#include "glm/vec4.hpp"
-
 #include "s3tc.h"
 
 using namespace std;

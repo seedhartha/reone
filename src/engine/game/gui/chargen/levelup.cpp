@@ -17,8 +17,6 @@
 
 #include "levelup.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "../../game.h"
 
 #include "../colorutil.h"

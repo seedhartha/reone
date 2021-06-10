@@ -17,8 +17,6 @@
 
 #include "ingame.h"
 
-#include <unordered_map>
-
 #include "../../game.h"
 #include "../../gameidutil.h"
 

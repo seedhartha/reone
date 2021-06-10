@@ -17,8 +17,6 @@
 
 #include "scenebuilder.h"
 
-#include <stdexcept>
-
 #include "../scene/node/cameranode.h"
 #include "../scene/node/meshnode.h"
 #include "../scene/scenegraph.h"

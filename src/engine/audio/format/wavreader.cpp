@@ -17,8 +17,6 @@
 
 #include "wavreader.h"
 
-#include <utility>
-
 #include "../../common/streamutil.h"
 
 #include "mp3reader.h"

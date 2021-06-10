@@ -17,15 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
-#include "glm/mat4x4.hpp"
-#include "glm/vec3.hpp"
-
 #include "../../graphics/aabb.h"
 
 #include "../nodeelement.h"

@@ -17,12 +17,6 @@
 
 #include "abilities.h"
 
-#include <unordered_map>
-
-#include <boost/algorithm/string.hpp>
-
-#include "glm/common.hpp"
-
 #include "../../../gui/control/listbox.h"
 #include "../../../resource/strings.h"
 

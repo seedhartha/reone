@@ -17,8 +17,6 @@
 
 #include "streamwriter.h"
 
-#include <stdexcept>
-
 #include "guardutil.h"
 
 using namespace std;

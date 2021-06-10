@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "action.h"
 
 namespace reone {

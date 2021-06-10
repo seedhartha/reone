@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <boost/filesystem.hpp>
-#include <boost/noncopyable.hpp>
-
-#include "glm/vec3.hpp"
-
 namespace reone {
 
 namespace resource {

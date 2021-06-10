@@ -17,10 +17,6 @@
 
 #define BOOST_TEST_MODULE pathfinder
 
-#include <stdexcept>
-#include <unordered_map>
-#include <vector>
-
 #include <boost/test/included/unit_test.hpp>
 
 #include "../engine/game/path.h"

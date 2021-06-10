@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "glm/vec3.hpp"
-
 #include "action.h"
 
 namespace reone {

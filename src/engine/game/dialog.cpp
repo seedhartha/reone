@@ -17,10 +17,6 @@
 
 #include "dialog.h"
 
-#include <stdexcept>
-
-#include <boost/algorithm/string.hpp>
-
 #include "../common/guardutil.h"
 #include "../resource/strings.h"
 

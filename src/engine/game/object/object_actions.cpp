@@ -17,8 +17,6 @@
 
 #include "object.h"
 
-#include <algorithm>
-
 using namespace std;
 
 namespace reone {

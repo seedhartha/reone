@@ -17,11 +17,6 @@
 
 #include "font.h"
 
-#include "GL/glew.h"
-#include "SDL2/SDL_opengl.h"
-
-#include "glm/ext.hpp"
-
 #include "../common/guardutil.h"
 
 using namespace std;

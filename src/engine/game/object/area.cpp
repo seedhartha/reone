@@ -17,15 +17,6 @@
 
 #include "area.h"
 
-#include <algorithm>
-#include <stdexcept>
-#include <sstream>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-
-#include "glm/gtx/norm.hpp"
-
 #include "../../common/guardutil.h"
 #include "../../common/log.h"
 #include "../../common/random.h"

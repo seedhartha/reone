@@ -17,11 +17,6 @@
 
 #include "modelnode.h"
 
-#include <algorithm>
-
-#include "glm/gtx/matrix_decompose.hpp"
-#include "glm/gtx/transform.hpp"
-
 #include "../../common/collectionutil.h"
 
 using namespace std;

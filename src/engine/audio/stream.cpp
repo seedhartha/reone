@@ -17,11 +17,6 @@
 
 #include "stream.h"
 
-#include <stdexcept>
-#include <string>
-
-#include "AL/al.h"
-
 using namespace std;
 
 namespace reone {

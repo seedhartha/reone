@@ -17,13 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <unordered_map>
-
-#include <boost/noncopyable.hpp>
-
-#include "glm/gtx/quaternion.hpp"
-
 #include "../mesh/mesh.h"
 #include "../texture/texture.h"
 

@@ -17,13 +17,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
-#include <boost/noncopyable.hpp>
-
-#include "glm/vec3.hpp"
-
 #include "../../common/types.h"
 
 #include "../types.h"

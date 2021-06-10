@@ -17,10 +17,6 @@
 
 #include "control.h"
 
-#include <boost/algorithm/string.hpp>
-
-#include "glm/ext.hpp"
-
 #include "../../common/log.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh/meshes.h"

@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include <functional>
-#include <string>
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
 namespace reone {
 
 namespace resource {

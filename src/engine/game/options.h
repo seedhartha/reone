@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <string>
-
 #include "../audio/options.h"
 #include "../graphics/options.h"
 

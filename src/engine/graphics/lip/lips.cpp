@@ -18,8 +18,6 @@
 
 #include "lips.h"
 
-#include <stdexcept>
-
 #include "../../common/streamutil.h"
 
 #include "lipreader.h"

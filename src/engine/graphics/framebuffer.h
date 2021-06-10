@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include <boost/noncopyable.hpp>
-
 #include "renderbuffer.h"
 #include "texture/texture.h"
 

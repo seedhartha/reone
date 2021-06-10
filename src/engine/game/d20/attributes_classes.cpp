@@ -17,8 +17,6 @@
 
 #include "attributes.h"
 
-#include <algorithm>
-
 #include "classes.h"
 
 using namespace std;

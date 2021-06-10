@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include <memory>
-
-#include "glm/mat4x4.hpp"
-#include "glm/vec2.hpp"
-#include "glm/vec3.hpp"
-
 #include "context.h"
 #include "mesh/meshes.h"
 #include "shader/shaders.h"

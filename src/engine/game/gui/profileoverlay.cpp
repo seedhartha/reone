@@ -17,13 +17,6 @@
 
 #include "profileoverlay.h"
 
-#include <algorithm>
-#include <sstream>
-
-#include "SDL2/SDL_timer.h"
-
-#include "glm/ext.hpp"
-
 #include "../../common/guardutil.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh/meshes.h"

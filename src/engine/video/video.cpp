@@ -17,13 +17,6 @@
 
 #include "video.h"
 
-#include <utility>
-
-#include "GL/glew.h"
-#include "SDL2/SDL_opengl.h"
-
-#include "glm/ext.hpp"
-
 #include "../common/guardutil.h"
 #include "../graphics/mesh/meshes.h"
 #include "../graphics/shader/shaders.h"

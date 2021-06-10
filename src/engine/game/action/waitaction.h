@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "glm/common.hpp"
-
 #include "../../common/timer.h"
 
 #include "action.h"

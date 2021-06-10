@@ -17,8 +17,6 @@
 
 #include "custom.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "../../game.h"
 
 #include "../colorutil.h"

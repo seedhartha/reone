@@ -17,17 +17,6 @@
 
 #pragma once
 
-#include <map>
-#include <memory>
-#include <set>
-#include <queue>
-#include <unordered_map>
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
-#include "glm/vec3.hpp"
-
 #include "path.h"
 
 namespace reone {

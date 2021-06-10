@@ -17,8 +17,6 @@
 
 #include "tgareader.h"
 
-#include "glm/common.hpp"
-
 #include "../../common/log.h"
 
 #include "textureutil.h"

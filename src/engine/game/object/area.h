@@ -17,13 +17,6 @@
 
 #pragma once
 
-#include <set>
-#include <vector>
-
-#include "glm/vec3.hpp"
-
-#include "SDL2/SDL_events.h"
-
 #include "../../common/timer.h"
 #include "../../graphics/types.h"
 #include "../../resource/format/gffreader.h"

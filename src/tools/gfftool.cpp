@@ -17,10 +17,6 @@
 
 #include "tools.h"
 
-#include <iostream>
-#include <stdexcept>
-
-#include <boost/algorithm/string.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
 #include "../engine/resource/format/gffreader.h"

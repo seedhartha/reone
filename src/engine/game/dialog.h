@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
-#include <boost/noncopyable.hpp>
-
 #include "../resource/format/gffreader.h"
 #include "../resource/strings.h"
 

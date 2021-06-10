@@ -17,10 +17,6 @@
 
 #include "skills.h"
 
-#include <unordered_map>
-
-#include <boost/algorithm/string.hpp>
-
 #include "../../../gui/control/listbox.h"
 #include "../../../resource/strings.h"
 

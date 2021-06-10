@@ -17,9 +17,6 @@
 
 #include "feats.h"
 
-#include <stdexcept>
-#include <string>
-
 #include "../../common/collectionutil.h"
 
 using namespace std;

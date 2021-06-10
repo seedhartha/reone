@@ -17,12 +17,13 @@
 
 #pragma once
 
-#include "../gui.h"
 #include "../../../gui/control/button.h"
 #include "../../../gui/control/label.h"
 #include "../../../gui/control/listbox.h"
 #include "../../../gui/control/slider.h"
 #include "../../../scene/node/modelnode.h"
+
+#include "../gui.h"
 
 namespace reone {
 

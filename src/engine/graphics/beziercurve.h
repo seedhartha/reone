@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <utility>
-
 namespace reone {
 
 namespace graphics {

@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <unordered_map>
-
 #include "format/bifreader.h"
 #include "format/keyreader.h"
 #include "resourceprovider.h"

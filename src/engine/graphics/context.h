@@ -17,13 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <functional>
-
-#include <boost/noncopyable.hpp>
-
-#include "glm/vec4.hpp"
-
 #include "types.h"
 
 namespace reone {

@@ -17,8 +17,6 @@
 
 #include "partyselect.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "../../gui/control/label.h"
 #include "../../gui/control/togglebutton.h"
 #include "../../graphics/texture/textures.h"

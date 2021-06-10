@@ -17,9 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <memory>
-
 #include "../audio/stream.h"
 #include "../common/mediastream.h"
 #include "../common/types.h"

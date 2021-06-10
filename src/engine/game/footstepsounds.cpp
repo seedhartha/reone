@@ -17,8 +17,6 @@
 
 #include "footstepsounds.h"
 
-#include <boost/format.hpp>
-
 #include "../common/guardutil.h"
 
 using namespace std;

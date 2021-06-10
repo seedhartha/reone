@@ -21,8 +21,6 @@
 
 #include "sound.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
