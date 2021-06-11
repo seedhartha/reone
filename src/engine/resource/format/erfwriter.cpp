@@ -17,10 +17,6 @@
 
 #include "erfwriter.h"
 
-#include <memory>
-
-#include <boost/filesystem.hpp>
-
 #include "../../common/streamwriter.h"
 
 using namespace std;

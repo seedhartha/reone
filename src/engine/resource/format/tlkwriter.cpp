@@ -17,10 +17,6 @@
 
 #include "tlkwriter.h"
 
-#include <stdexcept>
-
-#include <boost/filesystem.hpp>
-
 #include "../../common/guardutil.h"
 #include "../../common/streamwriter.h"
 

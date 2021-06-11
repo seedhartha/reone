@@ -17,11 +17,6 @@
 
 #include "visreader.h"
 
-#include <stdexcept>
-#include <vector>
-
-#include <boost/algorithm/string.hpp>
-
 using namespace std;
 
 namespace reone {

@@ -17,8 +17,6 @@
 
 #include "resources.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "../common/log.h"
 #include "../common/pathutil.h"
 #include "../common/streamutil.h"

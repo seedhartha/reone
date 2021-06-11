@@ -17,8 +17,6 @@
 
 #include "2da.h"
 
-#include <stdexcept>
-
 #include "../common/collectionutil.h"
 #include "../common/log.h"
 
