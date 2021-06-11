@@ -70,7 +70,8 @@
 
 #if __APPLE__
 #include "OpenAL/al.h"
+#include "OpenAL/alc.h"
 #else
 #include "AL/al.h"
-#endif
 #include "AL/alc.h"
+#endif
