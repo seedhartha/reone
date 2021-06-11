@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include <boost/noncopyable.hpp>
-
 #include "../common/types.h"
 
 #include "types.h"

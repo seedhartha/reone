@@ -17,9 +17,6 @@
 
 #include "walkmesh.h"
 
-#include "glm/gtx/intersect.hpp"
-#include "glm/gtx/norm.hpp"
-
 using namespace std;
 
 namespace reone {

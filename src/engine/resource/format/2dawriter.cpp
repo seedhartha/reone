@@ -17,10 +17,6 @@
 
 #include "2dawriter.h"
 
-#include <stdexcept>
-
-#include <boost/filesystem/fstream.hpp>
-
 #include "../../common/guardutil.h"
 
 using namespace std;

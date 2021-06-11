@@ -17,11 +17,6 @@
 
 #include "ltrreader.h"
 
-#include <cctype>
-#include <stdexcept>
-
-#include <boost/algorithm/string.hpp>
-
 #include "../../common/random.h"
 
 using namespace std;

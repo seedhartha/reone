@@ -17,8 +17,6 @@
 
 #include "talktable.h"
 
-#include <stdexcept>
-
 using namespace std;
 
 namespace reone {

@@ -17,8 +17,6 @@
 
 #include "binreader.h"
 
-#include <boost/format.hpp>
-
 using namespace std;
 
 namespace fs = boost::filesystem;

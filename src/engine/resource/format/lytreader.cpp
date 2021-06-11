@@ -17,8 +17,6 @@
 
 #include "lytreader.h"
 
-#include <boost/algorithm/string.hpp>
-
 using namespace std;
 
 namespace fs = boost::filesystem;

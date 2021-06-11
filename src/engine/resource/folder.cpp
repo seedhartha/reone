@@ -17,8 +17,6 @@
 
 #include "folder.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include "typeutil.h"
 
 using namespace std;

@@ -17,12 +17,6 @@
 
 #include "gffwriter.h"
 
-#include <stdexcept>
-#include <unordered_map>
-#include <queue>
-
-#include <boost/filesystem/fstream.hpp>
-
 #include "../../common/guardutil.h"
 
 using namespace std;

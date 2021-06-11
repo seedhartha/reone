@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <unordered_map>
-
-#include <stdexcept>
-
 #include "../common/log.h"
 
 #include "types.h"

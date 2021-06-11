@@ -17,10 +17,6 @@
 
 #include "gffreader.h"
 
-#include <boost/format.hpp>
-
-#include "glm/gtc/type_ptr.hpp"
-
 #include "../../common/log.h"
 
 using namespace std;

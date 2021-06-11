@@ -17,11 +17,6 @@
 
 #include "keybifprovider.h"
 
-#include <stdexcept>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-
 #include "../common/pathutil.h"
 
 using namespace std;
