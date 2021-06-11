@@ -59,8 +59,6 @@
 #include "SDL2/SDL_events.h"
 #include "SDL2/SDL_opengl.h"
 #include "SDL2/SDL_timer.h"
-#include "AL/al.h"
-#include "AL/alc.h"
 
 #include "glm/ext.hpp"
 #include "glm/glm.hpp"
@@ -69,3 +67,10 @@
 #include "glm/gtx/matrix_decompose.hpp"
 #include "glm/gtx/norm.hpp"
 #include "glm/gtx/transform.hpp"
+
+#if __APPLE__
+#include "OpenAL/al.h"
+#else
+#include "AL/al.h"
+#endif
+#include "AL/alc.h"

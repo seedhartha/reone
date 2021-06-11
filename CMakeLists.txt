@@ -16,6 +16,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(reone)
 
+set(CMAKE_CXX_STANDARD 14)
+
 add_subdirectory(src/external/s3tc)
 
 option(BUILD_TOOLS "build tools executable" ON)
