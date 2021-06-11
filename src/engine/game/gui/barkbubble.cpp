@@ -17,8 +17,6 @@
 
 #include "barkbubble.h"
 
-#include "../../gui/control/label.h"
-
 #include "../game.h"
 
 using namespace std;
@@ -29,8 +27,6 @@ namespace reone {
 
 namespace game {
 
-static const char kBarkTextTag[] = "LBL_BARKTEXT";
-
 BarkBubble::BarkBubble(Game *game) : GameGUI(game) {
     _resRef = getResRef("barkbubble");
     _scaling = ScalingMode::PositionRelativeToCenter;
@@ -38,8 +34,14 @@ BarkBubble::BarkBubble(Game *game) : GameGUI(game) {
 
 void BarkBubble::load() {
     GUI::load();
+    bindControls();
+
     _rootControl->setVisible(false);
-    hideControl(kBarkTextTag);
+    _binding.lblBarkText->setVisible(false);
+}
+
+void BarkBubble::bindControls() {
+    _binding.lblBarkText = getControlPtr<Label>("LBL_BARKTEXT");
 }
 
 void BarkBubble::update(float dt) {
@@ -51,25 +53,22 @@ void BarkBubble::update(float dt) {
 }
 
 void BarkBubble::setBarkText(const string &text, float duration) {
-    Label &lblBarkText = getControl<Label>(kBarkTextTag);
-
     if (text.empty()) {
         _rootControl->setVisible(false);
-        lblBarkText.setVisible(false);
-
+        _binding.lblBarkText->setVisible(false);
     } else {
-        float textWidth = lblBarkText.text().font->measure(text);
-        int lineCount = textWidth / static_cast<float>(lblBarkText.extent().width) + 1;
-        int padding = lblBarkText.extent().left;
-        float rootHeight = lineCount * lblBarkText.text().font->height() + 2 * padding;
-        float labelHeight = lineCount * lblBarkText.text().font->height();
+        float textWidth = _binding.lblBarkText->text().font->measure(text);
+        int lineCount = textWidth / static_cast<float>(_binding.lblBarkText->extent().width) + 1;
+        int padding = _binding.lblBarkText->extent().left;
+        float rootHeight = lineCount * _binding.lblBarkText->text().font->height() + 2 * padding;
+        float labelHeight = lineCount * _binding.lblBarkText->text().font->height();
 
         _rootControl->setVisible(true);
         _rootControl->setExtentHeight(static_cast<int>(rootHeight));
 
-        lblBarkText.setExtentHeight(static_cast<int>(labelHeight));
-        lblBarkText.setTextMessage(text);
-        lblBarkText.setVisible(true);
+        _binding.lblBarkText->setExtentHeight(static_cast<int>(labelHeight));
+        _binding.lblBarkText->setTextMessage(text);
+        _binding.lblBarkText->setVisible(true);
     }
 
     if (duration > 0.0f) {
