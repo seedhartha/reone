@@ -20,6 +20,7 @@
 #include "gui.h"
 
 #include "../../common/timer.h"
+#include "../../gui/control/label.h"
 
 namespace reone {
 
@@ -35,8 +36,14 @@ public:
     void setBarkText(const std::string &text, float duration);
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::Label> lblBarkText;
+    } _binding;
+
     std::string _barkText;
     Timer _timer;
+
+    void bindControls();
 };
 
 } // namespace game

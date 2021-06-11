@@ -17,9 +17,8 @@
 
 #include "container.h"
 
-#include "../../gui/control/imagebutton.h"
-#include "../../gui/control/listbox.h"
 #include "../../graphics/texture/textures.h"
+#include "../../gui/control/imagebutton.h"
 #include "../../resource/strings.h"
 
 #include "../game.h"
@@ -51,21 +50,27 @@ Container::Container(Game *game) : GameGUI(game) {
 
 void Container::load() {
     GUI::load();
+    bindControls();
 
     string btnMessage(_game->services().resource().strings().get(kSwitchToResRef) + " " + _game->services().resource().strings().get(kGiveItemResRef));
-
-    Control &btnGiveItems = getControl("BTN_GIVEITEMS");
-    btnGiveItems.setTextMessage(btnMessage);
+    _binding.btnGiveItems->setTextMessage(btnMessage);
 
     string lblMessage(_game->services().resource().strings().get(kInventoryResRef));
-    getControl("LBL_MESSAGE").setTextMessage(lblMessage);
+    _binding.lblMessage->setTextMessage(lblMessage);
 
     configureItemsListBox();
 }
 
+void Container::bindControls() {
+    _binding.lblMessage = getControlPtr<Label>("LBL_MESSAGE");
+    _binding.lbItems = getControlPtr<ListBox>("LB_ITEMS");
+    _binding.btnOk = getControlPtr<Button>("BTN_OK");
+    _binding.btnGiveItems = getControlPtr<Button>("BTN_GIVEITEMS");
+    _binding.btnCancel = getControlPtr<Button>("BTN_CANCEL");
+}
+
 void Container::configureItemsListBox() {
-    ListBox &listBox = static_cast<ListBox &>(getControl("LB_ITEMS"));
-    ImageButton &protoItem = static_cast<ImageButton &>(listBox.protoItem());
+    ImageButton &protoItem = static_cast<ImageButton &>(_binding.lbItems->protoItem());
 
     Control::Text text(protoItem.text());
     text.align = Control::TextAlign::LeftTop;
@@ -73,11 +78,8 @@ void Container::configureItemsListBox() {
     protoItem.setText(text);
 }
 
-void Container::open(const shared_ptr<SpatialObject> &container) {
-    _container = container;
-
-    ListBox &lbItems = static_cast<ListBox &>(getControl("LB_ITEMS"));
-    lbItems.clearItems();
+void Container::open(shared_ptr<SpatialObject> container) {
+    _binding.lbItems->clearItems();
 
     for (auto &item : container->items()) {
         if (!item->isDropable()) continue;
@@ -91,8 +93,10 @@ void Container::open(const shared_ptr<SpatialObject> &container) {
         if (item->stackSize() > 1) {
             lbItem.iconText = to_string(item->stackSize());
         }
-        lbItems.addItem(move(lbItem));
+        _binding.lbItems->addItem(move(lbItem));
     }
+
+    _container = move(container);
 }
 
 shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {

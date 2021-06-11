@@ -19,6 +19,10 @@
 
 #include "gui.h"
 
+#include "../../gui/control/button.h"
+#include "../../gui/control/label.h"
+#include "../../gui/control/listbox.h"
+
 #include "../object/spatial.h"
 
 namespace reone {
@@ -30,13 +34,22 @@ public:
     Container(Game *game);
 
     void load() override;
-    void open(const std::shared_ptr<SpatialObject> &contanier);
+    void open(std::shared_ptr<SpatialObject> contanier);
 
     SpatialObject &container() const { return *_container; }
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::Label> lblMessage;
+        std::shared_ptr<gui::ListBox> lbItems;
+        std::shared_ptr<gui::Button> btnOk;
+        std::shared_ptr<gui::Button> btnGiveItems;
+        std::shared_ptr<gui::Button> btnCancel;
+    } _binding;
+
     std::shared_ptr<SpatialObject> _container;
 
+    void bindControls();
     void configureItemsListBox();
     void transferItemsToPlayer();
 
