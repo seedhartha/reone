@@ -17,8 +17,6 @@
 
 #include "partyselect.h"
 
-#include "../../gui/control/label.h"
-#include "../../gui/control/togglebutton.h"
 #include "../../graphics/texture/textures.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
@@ -63,12 +61,69 @@ PartySelection::PartySelection(Game *game) : GameGUI(game) {
 
 void PartySelection::load() {
     GUI::load();
+    bindControls();
 
     for (int i = 0; i < kNpcCount; ++i) {
         ToggleButton &button = getNpcButton(i);
         button.setOnColor(g_kotorColorOn);
         button.setBorderColorOverride(g_kotorColorAdded);
         button.setUseBorderColorOverride(false);
+    }
+}
+
+void PartySelection::bindControls() {
+    _binding.btnAccept = getControlPtr<Button>("BTN_ACCEPT");
+    _binding.btnBack = getControlPtr<Button>("BTN_BACK");
+    _binding.btnDone = getControlPtr<Button>("BTN_DONE");
+    _binding.btnNpc0 = getControlPtr<ToggleButton>("BTN_NPC0");
+    _binding.btnNpc1 = getControlPtr<ToggleButton>("BTN_NPC1");
+    _binding.btnNpc2 = getControlPtr<ToggleButton>("BTN_NPC2");
+    _binding.btnNpc3 = getControlPtr<ToggleButton>("BTN_NPC3");
+    _binding.btnNpc4 = getControlPtr<ToggleButton>("BTN_NPC4");
+    _binding.btnNpc5 = getControlPtr<ToggleButton>("BTN_NPC5");
+    _binding.btnNpc6 = getControlPtr<ToggleButton>("BTN_NPC6");
+    _binding.btnNpc7 = getControlPtr<ToggleButton>("BTN_NPC7");
+    _binding.btnNpc8 = getControlPtr<ToggleButton>("BTN_NPC8");
+    _binding.lbl3d = getControlPtr<Label>("LBL_3D");
+    _binding.lblBevelL = getControlPtr<Label>("LBL_BEVEL_L");
+    _binding.lblBevelM = getControlPtr<Label>("LBL_BEVEL_M");
+    _binding.lblChar0 = getControlPtr<Label>("LBL_CHAR0");
+    _binding.lblChar1 = getControlPtr<Label>("LBL_CHAR1");
+    _binding.lblChar2 = getControlPtr<Label>("LBL_CHAR2");
+    _binding.lblChar3 = getControlPtr<Label>("LBL_CHAR3");
+    _binding.lblChar4 = getControlPtr<Label>("LBL_CHAR4");
+    _binding.lblChar5 = getControlPtr<Label>("LBL_CHAR5");
+    _binding.lblChar6 = getControlPtr<Label>("LBL_CHAR6");
+    _binding.lblChar7 = getControlPtr<Label>("LBL_CHAR7");
+    _binding.lblChar8 = getControlPtr<Label>("LBL_CHAR8");
+    _binding.lblCount = getControlPtr<Label>("LBL_COUNT");
+    _binding.lblNa0 = getControlPtr<Label>("LBL_NA0");
+    _binding.lblNa1 = getControlPtr<Label>("LBL_NA1");
+    _binding.lblNa2 = getControlPtr<Label>("LBL_NA2");
+    _binding.lblNa3 = getControlPtr<Label>("LBL_NA3");
+    _binding.lblNa4 = getControlPtr<Label>("LBL_NA4");
+    _binding.lblNa5 = getControlPtr<Label>("LBL_NA5");
+    _binding.lblNa6 = getControlPtr<Label>("LBL_NA6");
+    _binding.lblNa7 = getControlPtr<Label>("LBL_NA7");
+    _binding.lblNa8 = getControlPtr<Label>("LBL_NA8");
+    _binding.lblNpcLevel = getControlPtr<Label>("LBL_NPC_LEVEL");
+    _binding.lblNpcName = getControlPtr<Label>("LBL_NPC_NAME");
+    _binding.lblTitle = getControlPtr<Label>("LBL_TITLE");
+
+    if (isTSL(_game->gameId())) {
+        _binding.btnNpc9 = getControlPtr<ToggleButton>("BTN_NPC9");
+        _binding.btnNpc10 = getControlPtr<ToggleButton>("BTN_NPC10");
+        _binding.btnNpc11 = getControlPtr<ToggleButton>("BTN_NPC11");
+        _binding.lblChar9 = getControlPtr<Label>("LBL_CHAR9");
+        _binding.lblChar10 = getControlPtr<Label>("LBL_CHAR10");
+        _binding.lblChar11 = getControlPtr<Label>("LBL_CHAR11");
+        _binding.lblNa9 = getControlPtr<Label>("LBL_NA9");
+        _binding.lblNa10 = getControlPtr<Label>("LBL_NA10");
+        _binding.lblNa11 = getControlPtr<Label>("LBL_NA11");
+        _binding.lblNameBack = getControlPtr<Label>("LBL_NAMEBACK");
+    } else {
+        _binding.lblAvailable = getControlPtr<Label>("LBL_AVAILABLE");
+        _binding.lblBevelR = getControlPtr<Label>("LBL_BEVEL_R");
     }
 }
 
@@ -163,14 +218,12 @@ void PartySelection::onAcceptButtonClick() {
 }
 
 void PartySelection::refreshAvailableCount() {
-    Label &label = getControl<Label>("LBL_COUNT");
-    label.setTextMessage(to_string(_availableCount));
+    _binding.lblCount->setTextMessage(to_string(_availableCount));
 }
 
 void PartySelection::refreshAcceptButton() {
     string text(_game->services().resource().strings().get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
-    Button &btnAccept = getControl<Button>("BTN_ACCEPT");
-    btnAccept.setTextMessage(text);
+    _binding.btnAccept->setTextMessage(text);
 }
 
 void PartySelection::removeNpc(int npc) {

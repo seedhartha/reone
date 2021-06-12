@@ -17,15 +17,13 @@
 
 #pragma once
 
+#include "../../gui/control/button.h"
+#include "../../gui/control/label.h"
+#include "../../gui/control/togglebutton.h"
+
 #include "gui.h"
 
 namespace reone {
-
-namespace gui {
-
-class ToggleButton;
-
-}
 
 namespace game {
 
@@ -46,23 +44,82 @@ public:
     void prepare(const Context &ctx);
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::Button> btnAccept;
+        std::shared_ptr<gui::Button> btnBack;
+        std::shared_ptr<gui::Button> btnDone;
+        std::shared_ptr<gui::ToggleButton> btnNpc0;
+        std::shared_ptr<gui::ToggleButton> btnNpc1;
+        std::shared_ptr<gui::ToggleButton> btnNpc2;
+        std::shared_ptr<gui::ToggleButton> btnNpc3;
+        std::shared_ptr<gui::ToggleButton> btnNpc4;
+        std::shared_ptr<gui::ToggleButton> btnNpc5;
+        std::shared_ptr<gui::ToggleButton> btnNpc6;
+        std::shared_ptr<gui::ToggleButton> btnNpc7;
+        std::shared_ptr<gui::ToggleButton> btnNpc8;
+        std::shared_ptr<gui::Label> lbl3d;
+        std::shared_ptr<gui::Label> lblBevelL;
+        std::shared_ptr<gui::Label> lblBevelM;
+        std::shared_ptr<gui::Label> lblChar0;
+        std::shared_ptr<gui::Label> lblChar1;
+        std::shared_ptr<gui::Label> lblChar2;
+        std::shared_ptr<gui::Label> lblChar3;
+        std::shared_ptr<gui::Label> lblChar4;
+        std::shared_ptr<gui::Label> lblChar5;
+        std::shared_ptr<gui::Label> lblChar6;
+        std::shared_ptr<gui::Label> lblChar7;
+        std::shared_ptr<gui::Label> lblChar8;
+        std::shared_ptr<gui::Label> lblCount;
+        std::shared_ptr<gui::Label> lblNa0;
+        std::shared_ptr<gui::Label> lblNa1;
+        std::shared_ptr<gui::Label> lblNa2;
+        std::shared_ptr<gui::Label> lblNa3;
+        std::shared_ptr<gui::Label> lblNa4;
+        std::shared_ptr<gui::Label> lblNa5;
+        std::shared_ptr<gui::Label> lblNa6;
+        std::shared_ptr<gui::Label> lblNa7;
+        std::shared_ptr<gui::Label> lblNa8;
+        std::shared_ptr<gui::Label> lblNpcLevel;
+        std::shared_ptr<gui::Label> lblNpcName;
+        std::shared_ptr<gui::Label> lblTitle;
+
+        // KotOR only
+        std::shared_ptr<gui::Label> lblAvailable;
+        std::shared_ptr<gui::Label> lblBevelR;
+        // END KotOR only
+
+        // TSL only
+        std::shared_ptr<gui::ToggleButton> btnNpc9;
+        std::shared_ptr<gui::ToggleButton> btnNpc10;
+        std::shared_ptr<gui::ToggleButton> btnNpc11;
+        std::shared_ptr<gui::Label> lblChar9;
+        std::shared_ptr<gui::Label> lblChar10;
+        std::shared_ptr<gui::Label> lblChar11;
+        std::shared_ptr<gui::Label> lblNa9;
+        std::shared_ptr<gui::Label> lblNa10;
+        std::shared_ptr<gui::Label> lblNa11;
+        std::shared_ptr<gui::Label> lblNameBack;
+        // END TSL only
+    } _binding;
+
     Context _context;
     int _selectedNpc { -1 };
     bool _added[kNpcCount] { false };
     int _availableCount { 0 };
 
-    void onClick(const std::string &control) override;
-
+    void bindControls();
     void addNpc(int npc);
     void changeParty();
-    void onAcceptButtonClick();
-    void onNpcButtonClick(const std::string &control);
     void refreshAcceptButton();
     void refreshAvailableCount();
     void refreshNpcButtons();
     void removeNpc(int npc);
 
     gui::ToggleButton &getNpcButton(int npc);
+
+    void onClick(const std::string &control) override;
+    void onAcceptButtonClick();
+    void onNpcButtonClick(const std::string &control);
 };
 
 } // namespace game

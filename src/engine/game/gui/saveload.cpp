@@ -20,12 +20,12 @@
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
 #include "../../graphics/texture/tgareader.h"
-#include "../../gui/control/listbox.h"
 #include "../../resource/format/erfreader.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/strings.h"
 
 #include "../game.h"
+#include "../gameidutil.h"
 
 #include "colorutil.h"
 
@@ -60,28 +60,51 @@ SaveLoad::SaveLoad(Game *game) : GameGUI(game) {
 
 void SaveLoad::load() {
     GUI::load();
+    bindControls();
 
-    hideControl("LBL_PLANETNAME");
-    hideControl("LBL_AREANAME");
+    _binding.lblPlanetName->setVisible(false);
+    _binding.lblAreaName->setVisible(false);
 
-    ListBox &lbGames = getControl<ListBox>("LB_GAMES");
-    lbGames.setSelectionMode(ListBox::SelectionMode::OnClick);
-    lbGames.setPadding(3);
+    _binding.lbGames->setSelectionMode(ListBox::SelectionMode::OnClick);
+    _binding.lbGames->setPadding(3);
 
-    Control &protoItem = lbGames.protoItem();
-    protoItem.setUseBorderColorOverride(true);
-    protoItem.setBorderColorOverride(getBaseColor(_game->gameId()));
-    protoItem.setHilightColor(_defaultHilightColor);
+    _binding.lbGames->protoItem().setUseBorderColorOverride(true);
+    _binding.lbGames->protoItem().setBorderColorOverride(getBaseColor(_game->gameId()));
+    _binding.lbGames->protoItem().setHilightColor(_defaultHilightColor);
+}
+
+void SaveLoad::bindControls() {
+    _binding.btnBack = getControlPtr<Button>("BTN_BACK");
+    _binding.btnDelete = getControlPtr<Button>("BTN_DELETE");
+    _binding.btnSaveLoad = getControlPtr<Button>("BTN_SAVELOAD");
+    _binding.lblAreaName = getControlPtr<Label>("LBL_AREANAME");
+    _binding.lblPanelName = getControlPtr<Label>("LBL_PANELNAME");
+    _binding.lblPlanetName = getControlPtr<Label>("LBL_PLANETNAME");
+    _binding.lblPm1 = getControlPtr<Label>("LBL_PM1");
+    _binding.lblPm2 = getControlPtr<Label>("LBL_PM2");
+    _binding.lblPm3 = getControlPtr<Label>("LBL_PM3");
+    _binding.lblScreenshot = getControlPtr<Label>("LBL_SCREENSHOT");
+    _binding.lbGames = getControlPtr<ListBox>("LB_GAMES");
+
+    if (isTSL(_game->gameId())) {
+        _binding.btnFilter = getControlPtr<Button>("BTN_FILTER");
+        _binding.lblBar1 = getControlPtr<Label>("LBL_BAR1");
+        _binding.lblBar2 = getControlPtr<Label>("LBL_BAR2");
+        _binding.lblBar3 = getControlPtr<Label>("LBL_BAR3");
+        _binding.lblBar4 = getControlPtr<Label>("LBL_BAR4");
+        _binding.lblPcName = getControlPtr<Label>("LBL_PCNAME");
+        _binding.lblTimePlayed = getControlPtr<Label>("LBL_TIMEPLAYED");
+    }
 }
 
 void SaveLoad::refresh() {
-    setControlDisabled("BTN_DELETE", _mode != Mode::Save);
+    _binding.btnDelete->setDisabled(_mode != Mode::Save);
 
     string panelName(_game->services().resource().strings().get(_mode == Mode::Save ? kStrRefSaveGame : kStrRefLoadGame));
-    setControlText("LBL_PANELNAME", panelName);
+    _binding.lblPanelName->setTextMessage(move(panelName));
 
     string actionName(_game->services().resource().strings().get(_mode == Mode::Save ? kStrRefSave : kStrRefLoad));
-    setControlText("BTN_SAVELOAD", actionName);
+    _binding.btnSaveLoad->setTextMessage(move(actionName));
 
     refreshSavedGames();
 }
@@ -105,14 +128,13 @@ void SaveLoad::refreshSavedGames() {
         }
     }
 
-    auto &lbGames = getControl<ListBox>("LB_GAMES");
-    lbGames.clearItems();
+    _binding.lbGames->clearItems();
     for (size_t i = 0; i < _saves.size(); ++i) {
         string name(str(boost::format("%06d") % _saves[i].number));
         ListBox::Item item;
         item.tag = name;
         item.text = name;
-        lbGames.addItem(move(item));
+        _binding.lbGames->addItem(move(item));
     }
 }
 
@@ -186,8 +208,7 @@ void SaveLoad::onClick(const string &control) {
             refresh();
         }
     } else if (control == "BTN_BACK") {
-        ListBox &lbGames = getControl<ListBox>("LB_GAMES");
-        lbGames.clearSelection();
+        _binding.lbGames->clearSelection();
 
         switch (_mode) {
             case Mode::Save:
@@ -202,12 +223,10 @@ void SaveLoad::onClick(const string &control) {
 }
 
 int SaveLoad::getSelectedSaveNumber() const {
-    ListBox &lbGames = getControl<ListBox>("LB_GAMES");
-
-    int hilightedIdx = lbGames.selectedItemIndex();
+    int hilightedIdx = _binding.lbGames->selectedItemIndex();
     if (hilightedIdx == -1) return -1;
 
-    string tag(lbGames.getItemAt(hilightedIdx).tag);
+    string tag(_binding.lbGames->getItemAt(hilightedIdx).tag);
 
     return stoi(tag);
 }
@@ -252,9 +271,8 @@ void SaveLoad::onListBoxItemClick(const string &control, const string &item) {
 
     // Get save number by item tag
     int selectedSaveNumber = -1;
-    auto &lbGames = getControl<ListBox>("LB_GAMES");
-    for (int i = 0; i < lbGames.getItemCount(); ++i) {
-        auto &lbItem = lbGames.getItemAt(i);
+    for (int i = 0; i < _binding.lbGames->getItemCount(); ++i) {
+        auto &lbItem = _binding.lbGames->getItemAt(i);
         if (lbItem.tag == item) {
             selectedSaveNumber = stoi(lbItem.tag);
             break;
@@ -273,8 +291,7 @@ void SaveLoad::onListBoxItemClick(const string &control, const string &item) {
     }
 
     // Set screenshot
-    Label &lblScreenshot = getControl<Label>("LBL_SCREENSHOT");
-    lblScreenshot.setBorderFill(move(screenshot));
+    _binding.lblScreenshot->setBorderFill(move(screenshot));
 }
 
 } // namespace game
