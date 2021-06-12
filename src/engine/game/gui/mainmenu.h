@@ -17,9 +17,12 @@
 
 #pragma once
 
+#include "../../gui/control/button.h"
+#include "../../gui/control/label.h"
+#include "../../gui/control/listbox.h"
+#include "../../resource/types.h"
 #include "../../scene/node/modelnode.h"
 #include "../../scene/scenegraph.h"
-#include "../../resource/types.h"
 
 #include "../types.h"
 
@@ -34,20 +37,41 @@ public:
     MainMenu(Game *game);
 
     void load() override;
-    void onClick(const std::string &control) override;
 
+    void onClick(const std::string &control) override;
     void onModuleSelected(const std::string &name);
 
 private:
-    void onListBoxItemClick(const std::string &control, const std::string &item) override;
+    struct Binding {
+        std::shared_ptr<gui::ListBox> lbModules;
+        std::shared_ptr<gui::Label> lbl3dView;
+        std::shared_ptr<gui::Label> lblGameLogo;
+        std::shared_ptr<gui::Label> lblBw;
+        std::shared_ptr<gui::Label> lblLucas;
+        std::shared_ptr<gui::Label> lblMenuBg;
+        std::shared_ptr<gui::Button> btnLoadGame;
+        std::shared_ptr<gui::Button> btnNewGame;
+        std::shared_ptr<gui::Button> btnMovies;
+        std::shared_ptr<gui::Button> btnOptions;
+        std::shared_ptr<gui::Label> lblNewContent;
+        std::shared_ptr<gui::Button> btnExit;
+        std::shared_ptr<gui::Button> btnWarp;
 
+        // TSL only
+        std::shared_ptr<gui::Button> btnMusic;
+        // END TSL only
+    } _binding;
+
+    void bindControls();
     void configureButtons();
     void setup3DView();
-    void setButtonColors(const std::string &tag);
+    void setButtonColors(gui::Control &control);
     void startModuleSelection();
     void loadModuleNames();
 
     std::shared_ptr<scene::ModelSceneNode> getKotorModel(scene::SceneGraph &sceneGraph);
+
+    void onListBoxItemClick(const std::string &control, const std::string &item) override;
 };
 
 } // namespace game
