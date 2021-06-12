@@ -17,6 +17,8 @@
 
 #include "thirdperson.h"
 
+#include "../../scene/node/cameranode.h"
+
 #include "../game.h"
 
 using namespace std;
@@ -173,8 +175,8 @@ void ThirdPersonCamera::stopMovement() {
     _mouseLookMode = false;
 }
 
-void ThirdPersonCamera::setTargetPosition(const glm::vec3 &position) {
-    _targetPosition = position;
+void ThirdPersonCamera::setTargetPosition(glm::vec3 position) {
+    _targetPosition = move(position);
     updateSceneNode();
 }
 
@@ -187,8 +189,8 @@ void ThirdPersonCamera::setFindObstacle(const function<bool(const glm::vec3 &, c
     _findObstacle = fn;
 }
 
-void ThirdPersonCamera::setStyle(const CameraStyle &style) {
-    _style = style;
+void ThirdPersonCamera::setStyle(CameraStyle style) {
+    _style = move(style);
     updateSceneNode();
 }
 

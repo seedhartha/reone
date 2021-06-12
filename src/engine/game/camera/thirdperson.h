@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "../types.h"
-
 #include "camera.h"
 #include "camerastyle.h"
 
@@ -36,10 +34,10 @@ public:
     void update(float dt) override;
     void stopMovement() override;
 
-    void setTargetPosition(const glm::vec3 &position);
+    void setTargetPosition(glm::vec3 position);
     void setFacing(float facing);
     void setFindObstacle(const std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> &fn);
-    void setStyle(const CameraStyle& style);
+    void setStyle(CameraStyle style);
 
 private:
     Game *_game;

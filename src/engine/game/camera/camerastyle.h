@@ -17,9 +17,13 @@
 
 #pragma once
 
-#include "../../resource/2da.h"
-
 namespace reone {
+
+namespace resource {
+
+class TwoDA;
+
+}
 
 namespace game {
 

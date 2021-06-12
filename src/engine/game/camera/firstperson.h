@@ -44,9 +44,10 @@ private:
     bool _moveRight { false };
 
     bool handleMouseMotion(const SDL_MouseMotionEvent &event);
-    void updateSceneNode();
     bool handleKeyDown(const SDL_KeyboardEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);
+
+    void updateSceneNode();
 };
 
 } // namespace game

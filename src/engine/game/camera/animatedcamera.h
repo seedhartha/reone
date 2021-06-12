@@ -17,14 +17,21 @@
 
 #pragma once
 
-#include "../../scene/node/modelnode.h"
-#include "../../scene/scenegraph.h"
-
-#include "../types.h"
-
 #include "camera.h"
 
 namespace reone {
+
+namespace graphics {
+
+class Model;
+
+}
+
+namespace scene {
+
+class ModelSceneNode;
+
+}
 
 namespace game {
 
@@ -40,7 +47,7 @@ public:
 
     bool isAnimationFinished() const;
 
-    void setModel(const std::shared_ptr<graphics::Model> &model);
+    void setModel(std::shared_ptr<graphics::Model> model);
     void setFieldOfView(float fovy);
 
 private:
