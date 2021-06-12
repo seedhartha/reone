@@ -64,40 +64,57 @@ MainMenu::MainMenu(Game *game) : GameGUI(game) {
 
 void MainMenu::load() {
     GUI::load();
+    bindControls();
 
-    hideControl("BTN_MOREGAMES");
-    hideControl("BTN_TSLRCM");
-    hideControl("LB_MODULES");
-    hideControl("LBL_NEWCONTENT");
-    hideControl("LBL_BW");
-    hideControl("LBL_LUCAS");
-
-    setControlDisabled("BTN_MOVIES", true);
-    setControlDisabled("BTN_OPTIONS", true);
+    _binding.lbModules->setVisible(false);
+    _binding.lblNewContent->setVisible(false);
+    _binding.lblBw->setVisible(false);
+    _binding.lblLucas->setVisible(false);
+    _binding.btnMovies->setDisabled(true);
+    _binding.btnOptions->setDisabled(true);
 
     // Hide warp button in developer mode
     if (!_game->options().developer) {
-        hideControl("BTN_WARP");
+        _binding.btnWarp->setVisible(false);
     }
 
     setup3DView();
     configureButtons();
 }
 
-void MainMenu::configureButtons() {
-    setButtonColors("BTN_EXIT");
-    setButtonColors("BTN_LOADGAME");
-    setButtonColors("BTN_MOVIES");
-    setButtonColors("BTN_NEWGAME");
-    setButtonColors("BTN_OPTIONS");
+void MainMenu::bindControls() {
+    _binding.lbModules = getControlPtr<ListBox>("LB_MODULES");
+    _binding.lbl3dView = getControlPtr<Label>("LBL_3DVIEW");
+    _binding.lblGameLogo = getControlPtr<Label>("LBL_GAMELOGO");
+    _binding.lblBw = getControlPtr<Label>("LBL_BW");
+    _binding.lblLucas = getControlPtr<Label>("LBL_LUCAS");
+    _binding.lblMenuBg = getControlPtr<Label>("LBL_MENUBG");
+    _binding.btnLoadGame = getControlPtr<Button>("BTN_LOADGAME");
+    _binding.btnNewGame = getControlPtr<Button>("BTN_NEWGAME");
+    _binding.btnMovies = getControlPtr<Button>("BTN_MOVIES");
+    _binding.btnOptions = getControlPtr<Button>("BTN_OPTIONS");
+    _binding.lblNewContent = getControlPtr<Label>("LBL_NEWCONTENT");
+    _binding.btnExit = getControlPtr<Button>("BTN_EXIT");
+    _binding.btnWarp = getControlPtr<Button>("BTN_WARP");
 
     if (isTSL(_game->gameId())) {
-        setButtonColors("BTN_MUSIC");
+        _binding.btnMusic = getControlPtr<Button>("BTN_MUSIC");
     }
 }
 
-void MainMenu::setButtonColors(const string &tag) {
-    Control &control = getControl(tag);
+void MainMenu::configureButtons() {
+    setButtonColors(*_binding.btnExit);
+    setButtonColors(*_binding.btnLoadGame);
+    setButtonColors(*_binding.btnMovies);
+    setButtonColors(*_binding.btnNewGame);
+    setButtonColors(*_binding.btnOptions);
+
+    if (isTSL(_game->gameId())) {
+        setButtonColors(*_binding.btnMusic);
+    }
+}
+
+void MainMenu::setButtonColors(Control &control) {
     control.setTextColor(getBaseColor(_game->gameId()));
     control.setHilightColor(getHilightColor(_game->gameId()));
 }
@@ -105,8 +122,7 @@ void MainMenu::setButtonColors(const string &tag) {
 void MainMenu::setup3DView() {
     if (_game->gameId() != GameID::KotOR) return;
 
-    Control &control = getControl("LBL_3DVIEW");
-    const Control::Extent &extent = control.extent();
+    const Control::Extent &extent = _binding.lbl3dView->extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 
     unique_ptr<SceneGraph> scene(SceneBuilder(_options, _game->services().graphics())
@@ -118,7 +134,7 @@ void MainMenu::setup3DView() {
         .lightingRefFromModelNode("rootdummy")
         .build());
 
-    control.setScene(move(scene));
+    _binding.lbl3dView->setScene(move(scene));
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
@@ -142,28 +158,30 @@ void MainMenu::onClick(const string &control) {
 }
 
 void MainMenu::startModuleSelection() {
-    showControl("LB_MODULES");
-    hideControl("BTN_EXIT");
-    hideControl("BTN_LOADGAME");
-    hideControl("BTN_MOVIES");
-    hideControl("BTN_MUSIC");
-    hideControl("BTN_NEWGAME");
-    hideControl("BTN_OPTIONS");
-    hideControl("BTN_WARP");
-    hideControl("LBL_3DVIEW");
-    hideControl("LBL_GAMELOGO");
-    hideControl("LBL_MENUBG");
+    _binding.lbModules->setVisible(true);
+    _binding.btnExit->setVisible(false);
+    _binding.btnLoadGame->setVisible(false);
+    _binding.btnMovies->setVisible(false);
+    _binding.btnNewGame->setVisible(false);
+    _binding.btnOptions->setVisible(false);
+    _binding.btnWarp->setVisible(false);
+    _binding.lbl3dView->setVisible(false);
+    _binding.lblGameLogo->setVisible(false);
+    _binding.lblMenuBg->setVisible(false);
 
     loadModuleNames();
+
+    if (isTSL(_game->gameId())) {
+        _binding.btnMusic->setVisible(false);
+    }
 }
 
 void MainMenu::loadModuleNames() {
-    auto &modules = getControl<ListBox>("LB_MODULES");
     for (auto &module : _game->moduleNames()) {
         ListBox::Item item;
         item.tag = module;
         item.text = module;
-        modules.addItem(move(item));
+        _binding.lbModules->addItem(move(item));
     }
 }
 
