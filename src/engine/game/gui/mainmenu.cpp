@@ -19,7 +19,6 @@
 
 #include "../../audio/player.h"
 #include "../../common/log.h"
-#include "../../gui/control/listbox.h"
 #include "../../gui/scenebuilder.h"
 #include "../../graphics/model/models.h"
 #include "../../resource/resources.h"
@@ -88,7 +87,6 @@ void MainMenu::bindControls() {
     _binding.lblGameLogo = getControlPtr<Label>("LBL_GAMELOGO");
     _binding.lblBw = getControlPtr<Label>("LBL_BW");
     _binding.lblLucas = getControlPtr<Label>("LBL_LUCAS");
-    _binding.lblMenuBg = getControlPtr<Label>("LBL_MENUBG");
     _binding.btnLoadGame = getControlPtr<Button>("BTN_LOADGAME");
     _binding.btnNewGame = getControlPtr<Button>("BTN_NEWGAME");
     _binding.btnMovies = getControlPtr<Button>("BTN_MOVIES");
@@ -99,6 +97,8 @@ void MainMenu::bindControls() {
 
     if (isTSL(_game->gameId())) {
         _binding.btnMusic = getControlPtr<Button>("BTN_MUSIC");
+    } else {
+        _binding.lblMenuBg = getControlPtr<Label>("LBL_MENUBG");
     }
 }
 
@@ -158,6 +158,8 @@ void MainMenu::onClick(const string &control) {
 }
 
 void MainMenu::startModuleSelection() {
+    loadModuleNames();
+
     _binding.lbModules->setVisible(true);
     _binding.btnExit->setVisible(false);
     _binding.btnLoadGame->setVisible(false);
@@ -167,12 +169,11 @@ void MainMenu::startModuleSelection() {
     _binding.btnWarp->setVisible(false);
     _binding.lbl3dView->setVisible(false);
     _binding.lblGameLogo->setVisible(false);
-    _binding.lblMenuBg->setVisible(false);
-
-    loadModuleNames();
 
     if (isTSL(_game->gameId())) {
         _binding.btnMusic->setVisible(false);
+    } else {
+        _binding.lblMenuBg->setVisible(false);
     }
 }
 

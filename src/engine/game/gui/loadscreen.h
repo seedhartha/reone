@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include "../../gui/control/label.h"
+#include "../../gui/control/progressbar.h"
+
 #include "gui.h"
 
 namespace reone {
@@ -31,6 +34,16 @@ public:
 
     void setImage(const std::string &resRef);
     void setProgress(int progress);
+
+private:
+    struct Binding {
+        std::shared_ptr<gui::ProgressBar> pbProgress;
+        std::shared_ptr<gui::Label> lblHint;
+        std::shared_ptr<gui::Label> lblLogo;
+        std::shared_ptr<gui::Label> lblLoading;
+    } _binding;
+
+    void bindControls();
 };
 
 } // namespace game

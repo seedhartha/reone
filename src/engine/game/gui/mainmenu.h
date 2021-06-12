@@ -48,7 +48,6 @@ private:
         std::shared_ptr<gui::Label> lblGameLogo;
         std::shared_ptr<gui::Label> lblBw;
         std::shared_ptr<gui::Label> lblLucas;
-        std::shared_ptr<gui::Label> lblMenuBg;
         std::shared_ptr<gui::Button> btnLoadGame;
         std::shared_ptr<gui::Button> btnNewGame;
         std::shared_ptr<gui::Button> btnMovies;
@@ -58,6 +57,7 @@ private:
         std::shared_ptr<gui::Button> btnWarp;
 
         // TSL only
+        std::shared_ptr<gui::Label> lblMenuBg;
         std::shared_ptr<gui::Button> btnMusic;
         // END TSL only
     } _binding;
