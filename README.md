@@ -10,6 +10,14 @@ reone is a free and open source game engine, capable of running Star Wars: Knigh
 
 The project is at a mid-stage of development: most engine subsystems have already been implemented, while game mechanics are actively being worked on. See project [gallery](https://github.com/seedhartha/reone/wiki/Gallery) and [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) in the Wiki.
 
+## Legal Stance
+
+reone adheres to clean-room design principles. We do not condone the use of copyrighted materials - instead, we rely on publicly available information (e.g., file format specification released by BioWare) and our own observations of the game.
+
+We do not distribute copyrighted materials - instead, we require our users and developers to obtain a legal copy of the game.
+
+Lastly, reone is explicitly a non-commercial project: we seek to gain no profit from donation or otherwise.
+
 ## Contributing
 
 reone is open to potential contributors. Contact us on [this](https://discord.gg/6sqSyfn8Jp) Discord server if you're interested in taking a particular task from the [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap).
