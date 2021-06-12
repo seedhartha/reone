@@ -57,98 +57,210 @@ HUD::HUD(Game *game) : GameGUI(game), _select(game) {
 
 void HUD::load() {
     GUI::load();
+    bindControls();
+
+    _binding.btnClearAll->setVisible(false);
+    _binding.btnTarget0->setVisible(false);
+    _binding.btnTarget1->setVisible(false);
+    _binding.btnTarget2->setVisible(false);
+    _binding.btnTargetDown0->setVisible(false);
+    _binding.btnTargetDown1->setVisible(false);
+    _binding.btnTargetDown2->setVisible(false);
+    _binding.btnTargetUp0->setVisible(false);
+    _binding.btnTargetUp1->setVisible(false);
+    _binding.btnTargetUp2->setVisible(false);
+    _binding.lblActionDescBg->setVisible(false);
+    _binding.lblActionDesc->setVisible(false);
+    _binding.lblArrowMargin->setVisible(false);
+    _binding.lblCash->setVisible(false);
+    _binding.lblCmbtEfctInc1->setVisible(false);
+    _binding.lblCmbtEfctInc2->setVisible(false);
+    _binding.lblCmbtEfctInc3->setVisible(false);
+    _binding.lblCmbtEfctRed1->setVisible(false);
+    _binding.lblCmbtEfctRed2->setVisible(false);
+    _binding.lblCmbtEfctRed3->setVisible(false);
+    _binding.lblCmbtModeMsg->setVisible(false);
+    _binding.lblCmbtMsgBg->setVisible(false);
+    _binding.lblCombatBg3->setVisible(false);
+    _binding.lblDarkShift->setVisible(false);
+    _binding.lblDebilatated1->setVisible(false);
+    _binding.lblDebilatated2->setVisible(false);
+    _binding.lblDebilatated3->setVisible(false);
+    _binding.lblDisable1->setVisible(false);
+    _binding.lblDisable2->setVisible(false);
+    _binding.lblDisable3->setVisible(false);
+    _binding.lblJournal->setVisible(false);
+    _binding.lblHealthBg->setVisible(false);
+    _binding.lblItemRcvd->setVisible(false);
+    _binding.lblItemLost->setVisible(false);
+    _binding.lblLightShift->setVisible(false);
+    _binding.lblMap->setVisible(false);
+    _binding.lblMoulding1->setVisible(false);
+    _binding.lblMoulding3->setVisible(false);
+    _binding.lblName->setVisible(false);
+    _binding.lblNameBg->setVisible(false);
+    _binding.lblPlotXp->setVisible(false);
+    _binding.lblStealthXp->setVisible(false);
+    _binding.btnAction0->setVisible(false);
+    _binding.btnAction1->setVisible(false);
+    _binding.btnAction2->setVisible(false);
+    _binding.btnAction3->setVisible(false);
+    _binding.btnActionDown0->setVisible(false);
+    _binding.btnActionDown1->setVisible(false);
+    _binding.btnActionDown2->setVisible(false);
+    _binding.btnActionDown3->setVisible(false);
+    _binding.btnActionUp0->setVisible(false);
+    _binding.btnActionUp1->setVisible(false);
+    _binding.btnActionUp2->setVisible(false);
+    _binding.btnActionUp3->setVisible(false);
+    _binding.lblArrow->setVisible(false);
+    _binding.btnTarget0->setVisible(false);
+    _binding.tbPause->setVisible(false);
+    _binding.tbSolo->setVisible(false);
+    _binding.tbStealth->setVisible(false);
+
+    if (isTSL(_game->gameId())) {
+        _binding.btnSwapWeapons->setVisible(false);
+        _binding.btnAction4->setVisible(false);
+        _binding.btnAction5->setVisible(false);
+        _binding.btnActionDown4->setVisible(false);
+        _binding.btnActionDown5->setVisible(false);
+        _binding.btnActionUp4->setVisible(false);
+        _binding.btnActionUp5->setVisible(false);
+    } else {
+        _binding.lblCombatBg1->setVisible(false);
+        _binding.lblCombatBg2->setVisible(false);
+        _binding.lblMoulding2->setVisible(false);
+    }
 
     _select.load();
 
     _barkBubble = make_unique<BarkBubble>(_game);
     _barkBubble->load();
+}
 
-    hideControl("BTN_CLEARALL");
-    hideControl("BTN_SWAPWEAPONS");
-    hideControl("BTN_TARGET0");
-    hideControl("BTN_TARGET1");
-    hideControl("BTN_TARGET2");
-    hideControl("BTN_TARGETDOWN0");
-    hideControl("BTN_TARGETDOWN1");
-    hideControl("BTN_TARGETDOWN2");
-    hideControl("BTN_TARGETUP0");
-    hideControl("BTN_TARGETUP1");
-    hideControl("BTN_TARGETUP2");
-    hideControl("LBL_ACTIONDESCBG");
-    hideControl("LBL_ACTIONTYPE0");
-    hideControl("LBL_ACTIONTYPE1");
-    hideControl("LBL_ACTIONTYPE2");
-    hideControl("LBL_ACTIONTYPE3");
-    hideControl("LBL_ACTIONTYPE4");
-    hideControl("LBL_ACTIONTYPE5");
-    hideControl("LBL_ACTIONDESC");
-    hideControl("LBL_ARROW_MARGIN");
-    hideControl("LBL_CASH");
-    hideControl("LBL_CMBTEFCTINC1");
-    hideControl("LBL_CMBTEFCTINC2");
-    hideControl("LBL_CMBTEFCTINC3");
-    hideControl("LBL_CMBTEFCTRED1");
-    hideControl("LBL_CMBTEFCTRED2");
-    hideControl("LBL_CMBTEFCTRED3");
-    hideControl("LBL_CMBTMODEMSG");
-    hideControl("LBL_CMBTMSGBG");
-    hideControl("LBL_COMBATBG1");
-    hideControl("LBL_COMBATBG2");
-    hideControl("LBL_COMBATBG3");
-    hideControl("LBL_DARKSHIFT");
-    hideControl("LBL_DEBILATATED1");
-    hideControl("LBL_DEBILATATED2");
-    hideControl("LBL_DEBILATATED3");
-    hideControl("LBL_DISABLE1");
-    hideControl("LBL_DISABLE2");
-    hideControl("LBL_DISABLE3");
-    hideControl("LBL_JOURNAL");
-    hideControl("LBL_HEALTHBG");
-    hideControl("LBL_INDICATE");
-    hideControl("LBL_INDICATEBG");
-    hideControl("LBL_ITEMRCVD");
-    hideControl("LBL_ITEMLOST");
-    hideControl("LBL_LIGHTSHIFT");
-    hideControl("LBL_MAP");
-    hideControl("LBL_MOULDING1");
-    hideControl("LBL_MOULDING2");
-    hideControl("LBL_MOULDING3");
-    hideControl("LBL_MOULDING4");
-    hideControl("LBL_NAME");
-    hideControl("LBL_NAMEBG");
-    hideControl("LBL_PLOTXP");
-    hideControl("LBL_STEALTHXP");
+void HUD::bindControls() {
+    _binding.btnAbi = getControlPtr<Button>("BTN_ABI");
+    _binding.btnAction0 = getControlPtr<Button>("BTN_ACTION0");
+    _binding.btnAction1 = getControlPtr<Button>("BTN_ACTION1");
+    _binding.btnAction2 = getControlPtr<Button>("BTN_ACTION2");
+    _binding.btnAction3 = getControlPtr<Button>("BTN_ACTION3");
+    _binding.btnActionDown0 = getControlPtr<Button>("BTN_ACTIONDOWN0");
+    _binding.btnActionDown1 = getControlPtr<Button>("BTN_ACTIONDOWN1");
+    _binding.btnActionDown2 = getControlPtr<Button>("BTN_ACTIONDOWN2");
+    _binding.btnActionDown3 = getControlPtr<Button>("BTN_ACTIONDOWN3");
+    _binding.btnActionUp0 = getControlPtr<Button>("BTN_ACTIONUP0");
+    _binding.btnActionUp1 = getControlPtr<Button>("BTN_ACTIONUP1");
+    _binding.btnActionUp2 = getControlPtr<Button>("BTN_ACTIONUP2");
+    _binding.btnActionUp3 = getControlPtr<Button>("BTN_ACTIONUP3");
+    _binding.btnChar = getControlPtr<Button>("BTN_CHAR");
+    _binding.btnChar1 = getControlPtr<Button>("BTN_CHAR1");
+    _binding.btnChar2 = getControlPtr<Button>("BTN_CHAR2");
+    _binding.btnChar3 = getControlPtr<Button>("BTN_CHAR3");
+    _binding.btnClearAll = getControlPtr<Button>("BTN_CLEARALL");
+    _binding.btnClearOne = getControlPtr<Button>("BTN_CLEARONE");
+    _binding.btnClearOne2 = getControlPtr<Button>("BTN_CLEARONE2");
+    _binding.btnEqu = getControlPtr<Button>("BTN_EQU");
+    _binding.btnInv = getControlPtr<Button>("BTN_INV");
+    _binding.btnJou = getControlPtr<Button>("BTN_JOU");
+    _binding.btnMap = getControlPtr<Button>("BTN_MAP");
+    _binding.btnMinimap = getControlPtr<Button>("BTN_MINIMAP");
+    _binding.btnMsg = getControlPtr<Button>("BTN_MSG");
+    _binding.btnOpt = getControlPtr<Button>("BTN_OPT");
+    _binding.btnTarget0 = getControlPtr<Button>("BTN_TARGET0");
+    _binding.btnTarget1 = getControlPtr<Button>("BTN_TARGET1");
+    _binding.btnTarget2 = getControlPtr<Button>("BTN_TARGET2");
+    _binding.btnTargetDown0 = getControlPtr<Button>("BTN_TARGETDOWN0");
+    _binding.btnTargetDown1 = getControlPtr<Button>("BTN_TARGETDOWN1");
+    _binding.btnTargetDown2 = getControlPtr<Button>("BTN_TARGETDOWN2");
+    _binding.btnTargetUp0 = getControlPtr<Button>("BTN_TARGETUP0");
+    _binding.btnTargetUp1 = getControlPtr<Button>("BTN_TARGETUP1");
+    _binding.btnTargetUp2 = getControlPtr<Button>("BTN_TARGETUP2");
+    _binding.lblAction0 = getControlPtr<Label>("LBL_ACTION0");
+    _binding.lblAction1 = getControlPtr<Label>("LBL_ACTION1");
+    _binding.lblAction2 = getControlPtr<Label>("LBL_ACTION2");
+    _binding.lblAction3 = getControlPtr<Label>("LBL_ACTION3");
+    _binding.lblActionDesc = getControlPtr<Label>("LBL_ACTIONDESC");
+    _binding.lblActionDescBg = getControlPtr<Label>("LBL_ACTIONDESCBG");
+    _binding.lblArrow = getControlPtr<Label>("LBL_ARROW");
+    _binding.lblArrowMargin = getControlPtr<Label>("LBL_ARROW_MARGIN");
+    _binding.lblBack1 = getControlPtr<Label>("LBL_BACK1");
+    _binding.lblBack2 = getControlPtr<Label>("LBL_BACK2");
+    _binding.lblBack3 = getControlPtr<Label>("LBL_BACK3");
+    _binding.lblCash = getControlPtr<Label>("LBL_CASH");
+    _binding.lblChar1 = getControlPtr<Label>("LBL_CHAR1");
+    _binding.lblChar2 = getControlPtr<Label>("LBL_CHAR2");
+    _binding.lblChar3 = getControlPtr<Label>("LBL_CHAR3");
+    _binding.lblCmbtEfctInc1 = getControlPtr<Label>("LBL_CMBTEFCTINC1");
+    _binding.lblCmbtEfctInc2 = getControlPtr<Label>("LBL_CMBTEFCTINC2");
+    _binding.lblCmbtEfctInc3 = getControlPtr<Label>("LBL_CMBTEFCTINC3");
+    _binding.lblCmbtEfctRed1 = getControlPtr<Label>("LBL_CMBTEFCTRED1");
+    _binding.lblCmbtEfctRed2 = getControlPtr<Label>("LBL_CMBTEFCTRED2");
+    _binding.lblCmbtEfctRed3 = getControlPtr<Label>("LBL_CMBTEFCTRED3");
+    _binding.lblCmbtModeMsg = getControlPtr<Label>("LBL_CMBTMODEMSG");
+    _binding.lblCmbtMsgBg = getControlPtr<Label>("LBL_CMBTMSGBG");
+    _binding.lblCombatBg3 = getControlPtr<Label>("LBL_COMBATBG3");
+    _binding.lblDarkShift = getControlPtr<Label>("LBL_DARKSHIFT");
+    _binding.lblDebilatated1 = getControlPtr<Label>("LBL_DEBILATATED1");
+    _binding.lblDebilatated2 = getControlPtr<Label>("LBL_DEBILATATED2");
+    _binding.lblDebilatated3 = getControlPtr<Label>("LBL_DEBILATATED3");
+    _binding.lblDisable1 = getControlPtr<Label>("LBL_DISABLE1");
+    _binding.lblDisable2 = getControlPtr<Label>("LBL_DISABLE2");
+    _binding.lblDisable3 = getControlPtr<Label>("LBL_DISABLE3");
+    _binding.lblHealthBg = getControlPtr<Label>("LBL_HEALTHBG");
+    _binding.lblItemLost = getControlPtr<Label>("LBL_ITEMLOST");
+    _binding.lblItemRcvd = getControlPtr<Label>("LBL_ITEMRCVD");
+    _binding.lblJournal = getControlPtr<Label>("LBL_JOURNAL");
+    _binding.lblLevelUp1 = getControlPtr<Label>("LBL_LEVELUP1");
+    _binding.lblLevelUp2 = getControlPtr<Label>("LBL_LEVELUP2");
+    _binding.lblLevelUp3 = getControlPtr<Label>("LBL_LEVELUP3");
+    _binding.lblLightShift = getControlPtr<Label>("LBL_LIGHTSHIFT");
+    _binding.lblMap = getControlPtr<Label>("LBL_MAP");
+    _binding.lblMapBorder = getControlPtr<Label>("LBL_MAPBORDER");
+    _binding.lblMapView = getControlPtr<Label>("LBL_MAPVIEW");
+    _binding.lblMenuBg = getControlPtr<Label>("LBL_MENUBG");
+    _binding.lblMoulding1 = getControlPtr<Label>("LBL_MOULDING1");
+    _binding.lblMoulding3 = getControlPtr<Label>("LBL_MOULDING3");
+    _binding.lblName = getControlPtr<Label>("LBL_NAME");
+    _binding.lblNameBg = getControlPtr<Label>("LBL_NAMEBG");
+    _binding.lblPlotXp = getControlPtr<Label>("LBL_PLOTXP");
+    _binding.lblQueue0 = getControlPtr<Label>("LBL_QUEUE0");
+    _binding.lblQueue1 = getControlPtr<Label>("LBL_QUEUE1");
+    _binding.lblQueue2 = getControlPtr<Label>("LBL_QUEUE2");
+    _binding.lblQueue3 = getControlPtr<Label>("LBL_QUEUE3");
+    _binding.lblStealthXp = getControlPtr<Label>("LBL_STEALTHXP");
+    _binding.lblTarget0 = getControlPtr<Label>("LBL_TARGET0");
+    _binding.lblTarget1 = getControlPtr<Label>("LBL_TARGET1");
+    _binding.lblTarget2 = getControlPtr<Label>("LBL_TARGET2");
+    _binding.pbForce1 = getControlPtr<ProgressBar>("PB_FORCE1");
+    _binding.pbForce2 = getControlPtr<ProgressBar>("PB_FORCE2");
+    _binding.pbForce3 = getControlPtr<ProgressBar>("PB_FORCE3");
+    _binding.pbHealth = getControlPtr<ProgressBar>("PB_HEALTH");
+    _binding.pbVit1 = getControlPtr<ProgressBar>("PB_VIT1");
+    _binding.pbVit2 = getControlPtr<ProgressBar>("PB_VIT2");
+    _binding.pbVit3 = getControlPtr<ProgressBar>("PB_VIT3");
+    _binding.tbPause = getControlPtr<ToggleButton>("TB_PAUSE");
+    _binding.tbSolo = getControlPtr<ToggleButton>("TB_SOLO");
+    _binding.tbStealth = getControlPtr<ToggleButton>("TB_STEALTH");
 
-    hideControl("BTN_ACTION0");
-    hideControl("BTN_ACTION1");
-    hideControl("BTN_ACTION2");
-    hideControl("BTN_ACTION3");
-    hideControl("BTN_ACTION4");
-    hideControl("BTN_ACTION5");
-    hideControl("BTN_ACTIONDOWN0");
-    hideControl("BTN_ACTIONDOWN1");
-    hideControl("BTN_ACTIONDOWN2");
-    hideControl("BTN_ACTIONDOWN3");
-    hideControl("BTN_ACTIONDOWN4");
-    hideControl("BTN_ACTIONDOWN5");
-    hideControl("BTN_ACTIONUP0");
-    hideControl("BTN_ACTIONUP1");
-    hideControl("BTN_ACTIONUP2");
-    hideControl("BTN_ACTIONUP3");
-    hideControl("BTN_ACTIONUP4");
-    hideControl("BTN_ACTIONUP5");
-    hideControl("BTN_MINIMAP");
-    hideControl("LBL_ACTION0");
-    hideControl("LBL_ACTION1");
-    hideControl("LBL_ACTION2");
-    hideControl("LBL_ACTION3");
-    hideControl("LBL_ACTION4");
-    hideControl("LBL_ACTION5");
-    hideControl("LBL_ARROW");
-    hideControl("LBL_TARGET0");
-    hideControl("TB_PAUSE");
-    hideControl("TB_SOLO");
-    hideControl("TB_STEALTH");
+    if (isTSL(_game->gameId())) {
+        _binding.btnAction4 = getControlPtr<Button>("BTN_ACTION4");
+        _binding.btnAction5 = getControlPtr<Button>("BTN_ACTION5");
+        _binding.btnActionDown4 = getControlPtr<Button>("BTN_ACTIONDOWN4");
+        _binding.btnActionDown5 = getControlPtr<Button>("BTN_ACTIONDOWN5");
+        _binding.btnActionUp4 = getControlPtr<Button>("BTN_ACTIONUP4");
+        _binding.btnActionUp5 = getControlPtr<Button>("BTN_ACTIONUP5");
+        _binding.btnSwapWeapons = getControlPtr<Button>("BTN_SWAPWEAPONS");
+        _binding.lblAction4 = getControlPtr<Label>("LBL_ACTION4");
+        _binding.lblAction5 = getControlPtr<Label>("LBL_ACTION5");
+    } else {
+        _binding.lblCombatBg1 = getControlPtr<Label>("LBL_COMBATBG1");
+        _binding.lblCombatBg2 = getControlPtr<Label>("LBL_COMBATBG2");
+        _binding.lblLvlUpBg1 = getControlPtr<Label>("LBL_LVLUPBG1");
+        _binding.lblLvlUpBg2 = getControlPtr<Label>("LBL_LVLUPBG2");
+        _binding.lblLvlUpBg3 = getControlPtr<Label>("LBL_LVLUPBG3");
+        _binding.lblMoulding2 = getControlPtr<Label>("LBL_MOULDING2");
+    }
 }
 
 bool HUD::handle(const SDL_Event &event) {
@@ -183,17 +295,17 @@ void HUD::update(float dt) {
     }
 
     if (party.getLeader()->isInCombat()) {
-        showCombatHud();
+        toggleCombat(true);
         refreshActionQueueItems();
     } else {
-        hideCombatHud();
+        toggleCombat(false);
     }
 
     _select.update();
     _barkBubble->update(dt);
 
     // Hide minimap when there is no image to display
-    setControlVisible("LBL_MAPBORDER", _game->module()->area()->map().isLoaded());
+    _binding.lblMapBorder->setVisible(_game->module()->area()->map().isLoaded());
 }
 
 void HUD::draw() {
@@ -211,8 +323,7 @@ void HUD::draw() {
 }
 
 void HUD::drawMinimap() {
-    Control &label = getControl("LBL_MAPVIEW");
-    const Control::Extent &extent = label.extent();
+    const Control::Extent &extent = _binding.lblMapView->extent();
 
     glm::vec4 bounds;
     bounds[0] = static_cast<float>(_controlOffset.x + extent.left);
@@ -250,41 +361,22 @@ void HUD::drawHealth(int memberIndex) {
     _game->services().graphics().meshes().quad().draw();
 }
 
-void HUD::showCombatHud() {
-    // TODO: make those class members?
-    showControl("BTN_CLEARALL");
-    showControl("BTN_CLEARONE");
-    showControl("BTN_CLEARONE2");
+void HUD::toggleCombat(bool enabled) {
+    _binding.btnClearAll->setVisible(enabled);
+    _binding.btnClearOne->setVisible(enabled);
+    _binding.btnClearOne2->setVisible(enabled);
+    _binding.lblCmbtModeMsg->setVisible(enabled);
+    _binding.lblCmbtMsgBg->setVisible(enabled);
+    _binding.lblQueue0->setVisible(enabled);
+    _binding.lblQueue1->setVisible(enabled);
+    _binding.lblQueue2->setVisible(enabled);
+    _binding.lblQueue3->setVisible(enabled);
 
-    showControl("LBL_CMBTMODEMSG");
-    showControl("LBL_CMBTMSGBG");
-
-    showControl("LBL_COMBATBG1");
-    showControl("LBL_COMBATBG2");
-    showControl("LBL_COMBATBG3");
-
-    showControl("LBL_QUEUE0");
-    showControl("LBL_QUEUE1");
-    showControl("LBL_QUEUE2");
-    showControl("LBL_QUEUE3");
-}
-
-void HUD::hideCombatHud() {
-    hideControl("BTN_CLEARALL");
-    hideControl("BTN_CLEARONE");
-    showControl("BTN_CLEARONE2");
-
-    hideControl("LBL_CMBTMODEMSG");
-    hideControl("LBL_CMBTMSGBG");
-
-    hideControl("LBL_COMBATBG1");
-    hideControl("LBL_COMBATBG2");
-    hideControl("LBL_COMBATBG3");
-
-    hideControl("LBL_QUEUE0");
-    hideControl("LBL_QUEUE1");
-    hideControl("LBL_QUEUE2");
-    hideControl("LBL_QUEUE3");
+    if (isKotOR(_game->gameId())) {
+        _binding.lblCombatBg1->setVisible(enabled);
+        _binding.lblCombatBg2->setVisible(enabled);
+        _binding.lblCombatBg3->setVisible(enabled);
+    }
 }
 
 void HUD::refreshActionQueueItems() const {

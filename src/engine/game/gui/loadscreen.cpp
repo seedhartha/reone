@@ -17,7 +17,6 @@
 
 #include "loadscreen.h"
 
-#include "../../gui/control/progressbar.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"
@@ -45,16 +44,24 @@ LoadingScreen::LoadingScreen(Game *game) : GameGUI(game) {
 
 void LoadingScreen::load() {
     GUI::load();
-    setControlText("LBL_HINT", "");
+    bindControls();
+
+    _binding.lblHint->setTextMessage("");
+}
+
+void LoadingScreen::bindControls() {
+    _binding.pbProgress = getControlPtr<ProgressBar>("PB_PROGRESS");
+    _binding.lblHint = getControlPtr<Label>("LBL_HINT");
+    _binding.lblLogo = getControlPtr<Label>("LBL_LOGO");
+    _binding.lblLoading = getControlPtr<Label>("LBL_LOADING");
 }
 
 void LoadingScreen::setImage(const string &resRef) {
-    configureRootContol([&resRef](Control &ctrl) { ctrl.setBorderFill(resRef); });
+    _rootControl->setBorderFill(resRef);
 }
 
 void LoadingScreen::setProgress(int progress) {
-    auto &progressBar = getControl<ProgressBar>("PB_PROGRESS");
-    progressBar.setValue(progress);
+    _binding.pbProgress->setValue(progress);
 }
 
 } // namespace game
