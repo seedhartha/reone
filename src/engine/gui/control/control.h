@@ -110,29 +110,29 @@ public:
     const Text &text() const { return _text; }
     const std::vector<std::string> &textLines() const { return _textLines; }
 
-    void setBorder(const Border &border);
-    void setBorderFill(const std::string &resRef);
-    void setBorderFill(const std::shared_ptr<graphics::Texture> &texture);
-    void setBorderColor(const glm::vec3 &color);
-    void setBorderColorOverride(const glm::vec3 &color);
+    void setBorder(Border border);
+    void setBorderFill(std::string resRef);
+    void setBorderFill(std::shared_ptr<graphics::Texture> texture);
+    void setBorderColor(glm::vec3 color);
+    void setBorderColorOverride(glm::vec3 color);
     void setDisabled(bool disabled);
-    void setDiscardColor(const glm::vec3 &color);
-    virtual void setExtent(const Extent &extent);
+    void setDiscardColor(glm::vec3 color);
+    virtual void setExtent(Extent extent);
     virtual void setExtentHeight(int height);
     void setExtentTop(int top);
     virtual void setFocus(bool focus);
     void setFocusable(bool focusable);
     void setHeight(int height);
-    void setHilight(const Border &hilight);
-    void setHilightColor(const glm::vec3 &color);
-    void setHilightFill(const std::string &resRef);
-    void setHilightFill(const std::shared_ptr<graphics::Texture> &texture);
+    void setHilight(Border hilight);
+    void setHilightColor(glm::vec3 color);
+    void setHilightFill(std::string resRef);
+    void setHilightFill(std::shared_ptr<graphics::Texture> texture);
     void setPadding(int padding);
     void setScene(std::unique_ptr<scene::SceneGraph> scene);
-    void setText(const Text &text);
-    void setTextColor(const glm::vec3 & color);
-    void setTextMessage(const std::string &text);
-    void setTextFont(const std::shared_ptr<graphics::Font> &font);
+    void setText(Text text);
+    void setTextColor(glm::vec3 color);
+    void setTextMessage(std::string text);
+    void setTextFont(std::shared_ptr<graphics::Font> font);
     void setUseBorderColorOverride(bool use);
     void setVisible(bool visible);
 

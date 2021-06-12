@@ -546,8 +546,8 @@ void Control::setFocus(bool focus) {
     _focus = focus;
 }
 
-void Control::setExtent(const Extent &extent) {
-    _extent = extent;
+void Control::setExtent(Extent extent) {
+    _extent = move(extent);
     updateTransform();
     updateTextLines();
 }
@@ -562,19 +562,19 @@ void Control::setExtentTop(int top) {
     updateTransform();
 }
 
-void Control::setBorder(const Border &border) {
-    _border = make_shared<Border>(border);
+void Control::setBorder(Border border) {
+    _border = make_shared<Border>(move(border));
 }
 
-void Control::setBorderFill(const string &resRef) {
+void Control::setBorderFill(string resRef) {
     shared_ptr<Texture> texture;
     if (!resRef.empty()) {
         texture = _gui->graphics().textures().get(resRef, TextureUsage::GUI);
     }
-    setBorderFill(texture);
+    setBorderFill(move(texture));
 }
 
-void Control::setBorderFill(const shared_ptr<Texture> &texture) {
+void Control::setBorderFill(shared_ptr<Texture> texture) {
     if (!texture && _border) {
         _border->fill.reset();
         return;
@@ -583,34 +583,34 @@ void Control::setBorderFill(const shared_ptr<Texture> &texture) {
         if (!_border) {
             _border = make_shared<Border>();
         }
-        _border->fill = texture;
+        _border->fill = move(texture);
     }
 }
 
-void Control::setBorderColor(const glm::vec3 &color) {
-    _border->color = color;
+void Control::setBorderColor(glm::vec3 color) {
+    _border->color = move(color);
 }
 
-void Control::setBorderColorOverride(const glm::vec3 &color) {
-    _borderColorOverride = color;
+void Control::setBorderColorOverride(glm::vec3 color) {
+    _borderColorOverride = move(color);
 }
 
 void Control::setUseBorderColorOverride(bool use) {
     _useBorderColorOverride = use;
 }
 
-void Control::setHilight(const Border &hilight) {
+void Control::setHilight(Border hilight) {
     _hilight = make_shared<Border>(hilight);
 }
 
-void Control::setHilightColor(const glm::vec3 &color) {
+void Control::setHilightColor(glm::vec3 color) {
     if (!_hilight) {
         _hilight = make_shared<Border>();
     }
-    _hilight->color = color;
+    _hilight->color = move(color);
 }
 
-void Control::setHilightFill(const string &resRef) {
+void Control::setHilightFill(string resRef) {
     shared_ptr<Texture> texture;
     if (!resRef.empty()) {
         texture = _gui->graphics().textures().get(resRef, TextureUsage::GUI);
@@ -618,7 +618,7 @@ void Control::setHilightFill(const string &resRef) {
     setHilightFill(texture);
 }
 
-void Control::setHilightFill(const shared_ptr<Texture> &texture) {
+void Control::setHilightFill(shared_ptr<Texture> texture) {
     if (!texture && _hilight) {
         _hilight->fill.reset();
         return;
@@ -627,27 +627,27 @@ void Control::setHilightFill(const shared_ptr<Texture> &texture) {
         if (!_hilight) {
             _hilight = make_shared<Border>();
         }
-        _hilight->fill = texture;
+        _hilight->fill = move(texture);
     }
 }
 
-void Control::setText(const Text &text) {
-    _text = text;
+void Control::setText(Text text) {
+    _text = move(text);
     updateTextLines();
 }
 
-void Control::setTextMessage(const string &text) {
-    _text.text = text;
+void Control::setTextMessage(string text) {
+    _text.text = move(text);
     updateTextLines();
 }
 
-void Control::setTextFont(const shared_ptr<Font> &font) {
-    _text.font = font;
+void Control::setTextFont(shared_ptr<Font> font) {
+    _text.font = move(font);
     updateTextLines();
 }
 
-void Control::setTextColor(const glm::vec3 &color) {
-    _text.color = color;
+void Control::setTextColor(glm::vec3 color) {
+    _text.color = move(color);
 }
 
 void Control::setScene(unique_ptr<SceneGraph> scene) {
@@ -664,7 +664,7 @@ void Control::setPadding(int padding) {
     _padding = padding;
 }
 
-void Control::setDiscardColor(const glm::vec3 &color) {
+void Control::setDiscardColor(glm::vec3 color) {
     _discardEnabled = true;
     _discardColor = color;
 }

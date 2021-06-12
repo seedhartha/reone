@@ -240,7 +240,7 @@ void ListBox::setFocus(bool focus) {
     }
 }
 
-void ListBox::setExtent(const Extent &extent) {
+void ListBox::setExtent(Extent extent) {
     Control::setExtent(extent);
     updateItemSlots();
 }

@@ -17,6 +17,10 @@
 
 #pragma once
 
+#include "../../gui/control/button.h"
+#include "../../gui/control/label.h"
+#include "../../gui/control/listbox.h"
+
 #include "../savedgame.h"
 
 #include "gui.h"
@@ -48,14 +52,36 @@ private:
         boost::filesystem::path path;
     };
 
+    struct Binding {
+        std::shared_ptr<gui::Button> btnBack;
+        std::shared_ptr<gui::Button> btnDelete;
+        std::shared_ptr<gui::Button> btnSaveLoad;
+        std::shared_ptr<gui::Label> lblAreaName;
+        std::shared_ptr<gui::Label> lblPanelName;
+        std::shared_ptr<gui::Label> lblPlanetName;
+        std::shared_ptr<gui::Label> lblPm1;
+        std::shared_ptr<gui::Label> lblPm2;
+        std::shared_ptr<gui::Label> lblPm3;
+        std::shared_ptr<gui::Label> lblScreenshot;
+        std::shared_ptr<gui::ListBox> lbGames;
+
+        // TSL only
+        std::shared_ptr<gui::Button> btnFilter;
+        std::shared_ptr<gui::Label> lblBar1;
+        std::shared_ptr<gui::Label> lblBar2;
+        std::shared_ptr<gui::Label> lblBar3;
+        std::shared_ptr<gui::Label> lblBar4;
+        std::shared_ptr<gui::Label> lblPcName;
+        std::shared_ptr<gui::Label> lblTimePlayed;
+        // END TSL only
+    } _binding;
+
     Mode _mode { Mode::Save };
     std::vector<SavedGameDescriptor> _saves;
 
+    void bindControls();
     void refreshSavedGames();
     void indexSavedGame(boost::filesystem::path path);
-
-    void onClick(const std::string &control) override;
-    void onListBoxItemClick(const std::string &control, const std::string &item) override;
 
     void saveGame(int number);
     void loadGame(int number);
@@ -63,6 +89,9 @@ private:
 
     int getSelectedSaveNumber() const;
     int getNewSaveNumber() const;
+
+    void onClick(const std::string &control) override;
+    void onListBoxItemClick(const std::string &control, const std::string &item) override;
 };
 
 } // namespace game

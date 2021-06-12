@@ -58,7 +58,7 @@ public:
     void stretch(float x, float y, int mask) override;
 
     void setFocus(bool focus) override;
-    void setExtent(const Extent &extent) override;
+    void setExtent(Extent extent) override;
     void setExtentHeight(int height) override;
     void setProtoItemType(ControlType type);
     void setSelectionMode(SelectionMode mode);
