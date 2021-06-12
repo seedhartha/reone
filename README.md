@@ -8,7 +8,7 @@ reone is a free and open source game engine, capable of running Star Wars: Knigh
 - Play KotOR and TSL from beginning to end
 - Create mods that drastically change the gameplay or improve the visuals
 
-The project is in the early stages of development at this point: resource management, scene management, rendering, audio, GUI and scripting subsystems are already implemented, while game mechanics are actively being worked on. See project [gallery](https://github.com/seedhartha/reone/wiki/Gallery) and [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) in the Wiki.
+The project is at a mid-stage of development: most engine subsystems have already been implemented, while game mechanics are actively being worked on. See project [gallery](https://github.com/seedhartha/reone/wiki/Gallery) and [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) in the Wiki.
 
 ## Contributing
 
@@ -32,15 +32,15 @@ Install [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.
 
 ## Usage
 
-Launch reone either using the launcher application, or from the command line:
+Launch reone using the launcher application or from the command line:
 
 `reone --game C:\swkotor`
 
 ## Configuration
 
-reone can be configured from either the launcher, the configuration file, or the command line.
+reone can be configured via the launcher, the configuration file or the command line.
 
-Configuration file, named "reone.cfg", must be located in the current directory. See a complete list of program options [here](https://github.com/seedhartha/reone/wiki/Program-options).
+Configuration file, named "reone.cfg", must be located in the current directory. See complete list of program options [here](https://github.com/seedhartha/reone/wiki/Program-options).
 
 ## Similar Projects
 
