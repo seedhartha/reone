@@ -12,11 +12,11 @@ The project is at a mid-stage of development: most engine subsystems have alread
 
 ## Legal Stance
 
-reone adheres to clean-room design principles. We do not condone the use of copyrighted materials - instead, we rely on publicly available information (e.g., file format specification released by BioWare) and our own observations of the game.
+reone adheres to clean-room design principles. We do not condone the use of decompilation - instead, we rely on publicly available information (e.g., file format specification released by BioWare) and our own observations of the game and its resources.
 
 We do not distribute copyrighted materials - instead, we require our users and developers to obtain a legal copy of the game.
 
-Lastly, reone is explicitly a non-commercial project: we seek to gain no profit from donation or otherwise.
+Lastly, reone is explicitly a non-commercial project: we seek to gain no profit through donations and other means.
 
 ## Contributing
 
