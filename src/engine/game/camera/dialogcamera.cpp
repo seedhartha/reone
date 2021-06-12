@@ -17,6 +17,9 @@
 
 #include "dialogcamera.h"
 
+#include "../../graphics/types.h"
+#include "../../scene/node/cameranode.h"
+
 using namespace std;
 
 using namespace reone::graphics;
@@ -31,16 +34,16 @@ DialogCamera::DialogCamera(float aspect, const CameraStyle &style, SceneGraph *s
     _sceneNode = make_shared<CameraSceneNode>("", move(projection), sceneGraph);
 }
 
-void DialogCamera::setSpeakerPosition(const glm::vec3 &position) {
+void DialogCamera::setSpeakerPosition(glm::vec3 position) {
     if (_speakerPosition != position) {
-        _speakerPosition = position;
+        _speakerPosition = move(position);
         updateSceneNode();
     }
 }
 
-void DialogCamera::setListenerPosition(const glm::vec3 &position) {
+void DialogCamera::setListenerPosition(glm::vec3 position) {
     if (_listenerPosition != position) {
-        _listenerPosition = position;
+        _listenerPosition = move(position);
         updateSceneNode();
     }
 }
@@ -52,8 +55,8 @@ void DialogCamera::setVariant(Variant variant) {
     }
 }
 
-void DialogCamera::setFindObstacle(const function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> &fn) {
-    _findObstacle = fn;
+void DialogCamera::setFindObstacle(function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> fn) {
+    _findObstacle = move(fn);
 }
 
 void DialogCamera::updateSceneNode() {

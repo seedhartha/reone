@@ -18,6 +18,7 @@
 #include "firstperson.h"
 
 #include "../../graphics/types.h"
+#include "../../scene/node/cameranode.h"
 
 using namespace std;
 

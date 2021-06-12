@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "../../scene/scenegraph.h"
-
 #include "../types.h"
 
 #include "camera.h"
@@ -40,10 +38,10 @@ public:
 
     DialogCamera(float aspect, const CameraStyle &style, scene::SceneGraph *sceneGraph);
 
-    void setSpeakerPosition(const glm::vec3 &position);
-    void setListenerPosition(const glm::vec3 &position);
+    void setSpeakerPosition(glm::vec3 position);
+    void setListenerPosition(glm::vec3 position);
     void setVariant(Variant variant);
-    void setFindObstacle(const std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> &fn);
+    void setFindObstacle(std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> fn);
 
 private:
     glm::vec3 _speakerPosition { 0.0f };

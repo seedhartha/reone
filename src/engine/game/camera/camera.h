@@ -17,9 +17,14 @@
 
 #pragma once
 
-#include "../../scene/node/cameranode.h"
-
 namespace reone {
+
+namespace scene {
+
+class CameraSceneNode;
+class SceneGraph;
+
+}
 
 namespace game {
 

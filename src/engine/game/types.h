@@ -17,9 +17,13 @@
 
 #pragma once
 
-#include "../audio/stream.h"
-
 namespace reone {
+
+namespace audio {
+
+class AudioStream;
+
+}
 
 namespace game {
 

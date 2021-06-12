@@ -18,9 +18,8 @@
 #include "animatedcamera.h"
 
 #include "../../graphics/types.h"
-#include "../../graphics/model/models.h"
-#include "../../resource/resources.h"
 #include "../../scene/node/cameranode.h"
+#include "../../scene/node/modelnode.h"
 
 using namespace std;
 
@@ -70,12 +69,12 @@ bool AnimatedCamera::isAnimationFinished() const {
     return _model ? _model->isAnimationFinished() : false;
 }
 
-void AnimatedCamera::setModel(const shared_ptr<Model> &model) {
+void AnimatedCamera::setModel(shared_ptr<Model> model) {
     if ((_model && _model->model() == model) ||
         (!_model && !model)) return;
 
     if (model) {
-        _model = make_unique<ModelSceneNode>(model, ModelUsage::Camera, _sceneGraph);
+        _model = make_unique<ModelSceneNode>(move(model), ModelUsage::Camera, _sceneGraph);
         _model->attach("camerahook", _sceneNode);
     } else {
         _model.reset();
