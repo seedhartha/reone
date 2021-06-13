@@ -69,7 +69,6 @@ set(COMMON_HEADERS
     src/engine/common/mediastream.h
     src/engine/common/pathutil.h
     src/engine/common/random.h
-    src/engine/common/stopwatch.h
     src/engine/common/streamreader.h
     src/engine/common/streamutil.h
     src/engine/common/streamwriter.h
@@ -80,7 +79,6 @@ set(COMMON_SOURCES
     src/engine/common/log.cpp
     src/engine/common/pathutil.cpp
     src/engine/common/random.cpp
-    src/engine/common/stopwatch.cpp
     src/engine/common/streamreader.cpp
     src/engine/common/streamutil.cpp
     src/engine/common/streamwriter.cpp
