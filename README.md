@@ -1,7 +1,6 @@
 # reone
 
 [![Build Status](https://github.com/seedhartha/reone/actions/workflows/cmake.yml/badge.svg)](https://github.com/seedhartha/reone/actions/workflows/cmake.yml)
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/21827/badge.svg)](https://scan.coverity.com/projects/seedhartha-reone)
 
 reone is a free and open source game engine, capable of running Star Wars: Knights of the Old Republic and its sequel, The Sith Lords. We aim to provide an engine that is flexible and modern, and can be used to:
 
@@ -12,7 +11,7 @@ The project is at a mid-stage of development: most engine subsystems have alread
 
 ## Legal Stance
 
-reone adheres to clean-room design principles. We do not condone the use of decompilation - instead, we rely on publicly available information (e.g., file format specification released by BioWare) and our own observations of the game and its resources.
+reone adheres to clean-room design principles. We do not condone the use of decompilation - instead, we rely on publicly available information (e.g., file format specification provided by BioWare) and our own observations of the game and its resources.
 
 We do not distribute copyrighted materials - instead, we require our users and developers to obtain a legal copy of the game.
 
