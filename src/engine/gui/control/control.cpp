@@ -435,8 +435,8 @@ void Control::drawText(const vector<string> &lines, const glm::ivec2 &offset, co
     glm::vec3 color((_focus && _hilight) ? _hilight->color : _text.color);
 
     for (auto &line : lines) {
-        linePosition.x = position.x + offset.x;
-        linePosition.y = position.y + offset.y;
+        linePosition.x = static_cast<float>(position.x + offset.x);
+        linePosition.y = static_cast<float>(position.y + offset.y);
         _text.font->draw(line, linePosition, color, gravity);
         position.y += static_cast<int>(_text.font->height());
     }

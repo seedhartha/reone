@@ -29,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> damager, bool offHand, float multiplier) const {
+vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> damager, bool offHand, int multiplier) const {
     shared_ptr<Item> weapon(damager->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
     int amount = 0;
     auto type = DamageType::Bludgeoning;

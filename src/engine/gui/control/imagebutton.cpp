@@ -120,8 +120,8 @@ void ImageButton::drawIcon(
 
     if (!iconText.empty()) {
         glm::vec3 position(0.0f);
-        position.x = offset.x + _extent.left + _extent.height;
-        position.y = offset.y + _extent.top + _extent.height - 0.5f * _iconFont->height();
+        position.x = static_cast<float>(offset.x + _extent.left + _extent.height);
+        position.y = static_cast<float>(offset.y + _extent.top + _extent.height - 0.5f * _iconFont->height());
         _iconFont->draw(iconText, position, color, TextGravity::LeftCenter);
     }
 }

@@ -34,7 +34,7 @@ Mesh::Mesh(vector<float> vertices, vector<uint16_t> indices, VertexAttributes at
     if (attributes.stride == 0) {
         throw invalid_argument("stride in attributes must not be zero");
     }
-    _vertexCount = _vertices.size() / (attributes.stride / sizeof(float));
+    _vertexCount = static_cast<int>(_vertices.size()) / (attributes.stride / sizeof(float));
 
     computeAABB();
 }
@@ -65,39 +65,39 @@ void Mesh::init() {
 
     if (_attributes.offCoords != -1) {
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offCoords));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offCoords)));
     }
     if (_attributes.offNormals != -1) {
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offNormals));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offNormals)));
     }
     if (_attributes.offTexCoords1 != -1) {
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offTexCoords1));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offTexCoords1)));
     }
     if (_attributes.offTexCoords2 != -1) {
         glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offTexCoords2));
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offTexCoords2)));
     }
     if (_attributes.offTangents != -1) {
         glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offTangents));
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offTangents)));
     }
     if (_attributes.offBitangents != -1) {
         glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offBitangents));
+        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offBitangents)));
     }
     if (_attributes.offTanSpaceNormals != -1) {
         glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offTanSpaceNormals));
+        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offTanSpaceNormals)));
     }
     if (_attributes.offBoneIndices != -1) {
         glEnableVertexAttribArray(7);
-        glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offBoneIndices));
+        glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offBoneIndices)));
     }
     if (_attributes.offBoneWeights != -1) {
         glEnableVertexAttribArray(8);
-        glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(_attributes.offBoneWeights));
+        glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offBoneWeights)));
     }
 
     glBindVertexArray(0);
@@ -151,13 +151,13 @@ void Mesh::ensureTriangles() const {
 void Mesh::drawTriangles(int startFace, int numFaces) {
     ensureTriangles();
     glBindVertexArray(_vaoId);
-    glDrawElements(GL_TRIANGLES, 3 * numFaces, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(3 * startFace * sizeof(uint16_t)));
+    glDrawElements(GL_TRIANGLES, 3 * numFaces, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(3ll * startFace * sizeof(uint16_t)));
 }
 
 void Mesh::drawTrianglesInstanced(int startFace, int numFaces, int count) {
     ensureTriangles();
     glBindVertexArray(_vaoId);
-    glDrawElementsInstanced(GL_TRIANGLES, 3 * numFaces, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(3 * startFace * sizeof(uint16_t)), count);
+    glDrawElementsInstanced(GL_TRIANGLES, 3 * numFaces, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(3ll * startFace * sizeof(uint16_t)), count);
 }
 
 vector<glm::vec3> Mesh::getTriangleCoords(int faceIdx) const {
@@ -188,21 +188,21 @@ vector<T> Mesh::getTriangleAttributes(int faceIdx, int offset) const {
     }
     if (offset == -1) return vector<T>();
 
-    auto a = getVertexAttribute<T>(_indices[3 * faceIdx + 0], offset);
-    auto b = getVertexAttribute<T>(_indices[3 * faceIdx + 1], offset);
-    auto c = getVertexAttribute<T>(_indices[3 * faceIdx + 2], offset);
+    auto a = getVertexAttribute<T>(_indices[3ll * faceIdx + 0], offset);
+    auto b = getVertexAttribute<T>(_indices[3ll * faceIdx + 1], offset);
+    auto c = getVertexAttribute<T>(_indices[3ll * faceIdx + 2], offset);
 
     return vector<T> { a, b, c };
 }
 
 template <>
 glm::vec2 Mesh::getVertexAttribute(uint16_t vertexIdx, int offset) const {
-    return glm::make_vec2(&_vertices[(vertexIdx * _attributes.stride + offset) / sizeof(float)]);
+    return glm::make_vec2(&_vertices[(static_cast<size_t>(vertexIdx) * _attributes.stride + offset) / sizeof(float)]);
 }
 
 template <>
 glm::vec3 Mesh::getVertexAttribute(uint16_t vertexIdx, int offset) const {
-    return glm::make_vec3(&_vertices[(vertexIdx * _attributes.stride + offset) / sizeof(float)]);
+    return glm::make_vec3(&_vertices[(static_cast<size_t>(vertexIdx) * _attributes.stride + offset) / sizeof(float)]);
 }
 
 } // namespace graphics

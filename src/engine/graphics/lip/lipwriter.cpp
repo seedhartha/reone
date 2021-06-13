@@ -36,7 +36,7 @@ void LipWriter::save(const fs::path &path) {
     StreamWriter writer(lip);
     writer.putString("LIP V1.0");
     writer.putFloat(_animation.length());
-    writer.putUint32(_animation.keyframes().size());
+    writer.putUint32(static_cast<uint32_t>(_animation.keyframes().size()));
     for (auto &keyframe : _animation.keyframes()) {
         writer.putFloat(keyframe.time);
         writer.putByte(keyframe.shape);
