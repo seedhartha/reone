@@ -22,7 +22,6 @@
 #include "../../audio/soundhandle.h"
 #include "../../common/log.h"
 #include "../../common/random.h"
-#include "../../gui/control/listbox.h"
 #include "../../gui/control/panel.h"
 #include "../../graphics/model/models.h"
 #include "../../resource/resources.h"
@@ -50,9 +49,6 @@ namespace game {
 
 static const char kControlTagTopFrame[] = "TOP";
 static const char kControlTagBottomFrame[] = "BOTTOM";
-static const char kControlTagMessage[] = "LBL_MESSAGE";
-static const char kControlTagReplies[] = "LB_REPLIES";
-
 static const char kObjectTagOwner[] = "owner";
 
 static const unordered_map<string, AnimationType> g_animTypeByName {
@@ -92,20 +88,24 @@ static const unordered_map<string, AnimationType> g_animTypeByName {
 DialogGUI::DialogGUI(Game *game) : Conversation(game) {
     _resRef = getResRef("dialog");
     _scaling = ScalingMode::Stretch;
-    _repliesControlTag = kControlTagReplies;
 }
 
 void DialogGUI::load() {
     Conversation::load();
-
+    bindControls();
     configureMessage();
     configureReplies();
     loadFrames();
 }
 
+void DialogGUI::bindControls() {
+    _binding.lblMessage = getControlPtr<Label>("LBL_MESSAGE");
+    _binding.lbReplies = getControlPtr<ListBox>("LB_REPLIES");
+}
+
 void DialogGUI::loadFrames() {
     int rootTop = _rootControl->extent().top;
-    int messageHeight = getControl(kControlTagMessage).extent().height;
+    int messageHeight = _binding.lblMessage->extent().height;
 
     addFrame(kControlTagTopFrame, -rootTop, messageHeight);
     addFrame(kControlTagBottomFrame, 0, _options.height - rootTop);
@@ -128,18 +128,14 @@ void DialogGUI::addFrame(string tag, int top, int height) {
 }
 
 void DialogGUI::configureMessage() {
-    auto &message = getControl(kControlTagMessage);
-    message.setExtentTop(-_rootControl->extent().top);
-    message.setTextColor(getBaseColor(_game->gameId()));
+    _binding.lblMessage->setExtentTop(-_rootControl->extent().top);
+    _binding.lblMessage->setTextColor(getBaseColor(_game->gameId()));
 }
 
 void DialogGUI::configureReplies() {
-    auto &replies = getControl<ListBox>(kControlTagReplies);
-    replies.setProtoMatchContent(true);
-
-    Control &protoItem = replies.protoItem();
-    protoItem.setHilightColor(getHilightColor(_game->gameId()));
-    protoItem.setTextColor(getBaseColor(_game->gameId()));
+    _binding.lbReplies->setProtoMatchContent(true);
+    _binding.lbReplies->protoItem().setHilightColor(getHilightColor(_game->gameId()));
+    _binding.lbReplies->protoItem().setTextColor(getBaseColor(_game->gameId()));
 }
 
 void DialogGUI::onStart() {
@@ -188,7 +184,8 @@ void DialogGUI::onLoadEntry() {
     updateCamera();
     updateParticipantAnimations();
     repositionMessage();
-    hideControl(kControlTagReplies);
+
+    _binding.lbReplies->setVisible(false);
 }
 
 void DialogGUI::loadCurrentSpeaker() {
@@ -319,8 +316,7 @@ AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
 }
 
 void DialogGUI::repositionMessage() {
-    Control &message = getControl(kControlTagMessage);
-    Control::Text text(message.text());
+    Control::Text text(_binding.lblMessage->text());
     int top;
 
     if (_entryEnded) {
@@ -328,11 +324,11 @@ void DialogGUI::repositionMessage() {
         top = -_rootControl->extent().top;
     } else {
         text.align = Control::TextAlign::CenterTop;
-        top = getControl(kControlTagReplies).extent().top;
+        top = _binding.lbReplies->extent().top;
     }
 
-    message.setText(move(text));
-    message.setExtentTop(top);
+    _binding.lblMessage->setText(move(text));
+    _binding.lblMessage->setExtentTop(top);
 }
 
 void DialogGUI::onFinish() {
@@ -354,13 +350,25 @@ void DialogGUI::releaseStuntParticipants() {
 }
 
 void DialogGUI::onEntryEnded() {
-    showControl(kControlTagReplies);
+    _binding.lbReplies->setVisible(true);
+
     updateCamera();
     repositionMessage();
 }
 
 void DialogGUI::setMessage(string message) {
-    setControlText(kControlTagMessage, message);
+    _binding.lblMessage->setTextMessage(message);
+}
+
+void DialogGUI::setReplyLines(vector<string> lines) {
+    _binding.lbReplies->clearItems();
+
+    for (size_t i = 0; i < lines.size(); ++i) {
+        ListBox::Item item;
+        item.tag = to_string(i);
+        item.text = lines[i];
+        _binding.lbReplies->addItem(move(item));
+    }
 }
 
 void DialogGUI::update(float dt) {
@@ -370,6 +378,13 @@ void DialogGUI::update(float dt) {
     if (_currentSpeaker && _game->cameraType() == CameraType::Dialog) {
         auto &camera = _game->module()->area()->getCamera<DialogCamera>(CameraType::Dialog);
         camera.setSpeakerPosition(getTalkPosition(*_currentSpeaker));
+    }
+}
+
+void DialogGUI::onListBoxItemClick(const string &control, const string &item) {
+    if (control == "LB_REPLIES") {
+        int replyIdx = stoi(item);
+        pickReply(replyIdx);
     }
 }
 

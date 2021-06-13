@@ -67,8 +67,6 @@ public:
     void resume();
 
 protected:
-    std::string _repliesControlTag;
-
     std::shared_ptr<Dialog> _dialog;
     std::shared_ptr<SpatialObject> _owner;
     std::shared_ptr<graphics::Model> _cameraModel;
@@ -77,16 +75,20 @@ protected:
     bool _entryEnded { false };
     bool _paused { false };
 
+    /**
+     * @param index index of the entry in the DLG file
+     * @param start true if this is a starting entry, false otherwise
+     */
+    virtual void loadEntry(int index, bool start = false);
+
+    void pickReply(int index);
+
+    virtual void setReplyLines(std::vector<std::string> lines) = 0;
+
     virtual void onStart();
     virtual void onFinish();
     virtual void onLoadEntry();
     virtual void onEntryEnded();
-
-    /**
-    * @param index index of the entry in the DLG file
-    * @param start true if this is a starting entry, false otherwise
-    */
-    virtual void loadEntry(int index, bool start = false);
 
 private:
     std::shared_ptr<audio::SoundHandle> _currentVoice;
@@ -94,8 +96,6 @@ private:
     float _entryDuration { 0.0f };
     std::vector<const Dialog::EntryReply *> _replies;
     bool _autoPickFirstReply { false };
-
-    void onListBoxItemClick(const std::string &control, const std::string &item) override;
 
     void loadConversationBackground();
     void loadCameraModel();
@@ -107,18 +107,12 @@ private:
     bool isSkippableEntry() const;
 
     /**
-     * Replaces text in the message control.
-     */
-    virtual void setMessage(std::string message) = 0;
-
-    /**
      * Recreates items in the replies list box.
      */
     void refreshReplies();
 
     void finish();
     void endCurrentEntry();
-    void pickReply(int index);
 
     /**
      * @return index of the first active entry/reply from the specified list, -1 otherwise
@@ -131,6 +125,11 @@ private:
      * @return true if the script returns -1 or 1, false otherwise
      */
     bool evaluateCondition(const std::string &scriptResRef);
+
+    /**
+     * Replaces text in the message control.
+     */
+    virtual void setMessage(std::string message) = 0;
 
     // Event handlers
 

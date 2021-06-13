@@ -216,24 +216,13 @@ static string getReplyText(const Dialog::EntryReply &reply, int index) {
 }
 
 void Conversation::refreshReplies() {
-    ListBox &listBox = getControl<ListBox>(_repliesControlTag);
-    listBox.clearItems();
-
-    if (_autoPickFirstReply) return;
-
-    for (size_t i = 0; i < _replies.size(); ++i) {
-        ListBox::Item item;
-        item.tag = to_string(i);
-        item.text = getReplyText(*_replies[i], static_cast<int>(i));
-        listBox.addItem(move(item));
+    vector<string> lines;
+    if (!_autoPickFirstReply) {
+        for (size_t i = 0; i < _replies.size(); ++i) {
+            lines.push_back(getReplyText(*_replies[i], static_cast<int>(i)));
+        }
     }
-}
-
-void Conversation::onListBoxItemClick(const string &control, const string &item) {
-    if (control == _repliesControlTag) {
-        int replyIdx = stoi(item);
-        pickReply(replyIdx);
-    }
+    setReplyLines(move(lines));
 }
 
 void Conversation::pickReply(int index) {

@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include "../../gui/control/label.h"
+#include "../../gui/control/listbox.h"
+
 #include "conversation.h"
 
 namespace reone {
@@ -30,10 +33,48 @@ public:
     void load() override;
 
 private:
-    void setMessage(std::string message) override;
+    struct Binding {
+        std::shared_ptr<gui::Label> lblCompSkill;
+        std::shared_ptr<gui::Label> lblCompSkillVal;
+        std::shared_ptr<gui::Label> lblCompSpikes;
+        std::shared_ptr<gui::Label> lblCompSpikesVal;
+        std::shared_ptr<gui::Label> lblRepSkill;
+        std::shared_ptr<gui::Label> lblRepSkillVal;
+        std::shared_ptr<gui::Label> lblRepUnits;
+        std::shared_ptr<gui::Label> lblRepUnitsVal;
+        std::shared_ptr<gui::ListBox> lbMessage;
+        std::shared_ptr<gui::ListBox> lbReplies;
 
+        // KotOR only
+        std::shared_ptr<gui::Label> lblCompSkillIcon;
+        std::shared_ptr<gui::Label> lblCompSpikesIcon;
+        std::shared_ptr<gui::Label> lblRepSkillIcon;
+        std::shared_ptr<gui::Label> lblRepUnitsIcon;
+        std::shared_ptr<gui::Label> lblStatic1;
+        std::shared_ptr<gui::Label> lblStatic2;
+        std::shared_ptr<gui::Label> lblStatic3;
+        std::shared_ptr<gui::Label> lblStatic4;
+        std::shared_ptr<gui::Label> lblObscure;
+        // END KotOR only
+
+        // TSL only
+        std::shared_ptr<gui::Label> lblBar1;
+        std::shared_ptr<gui::Label> lblBar2;
+        std::shared_ptr<gui::Label> lblBar3;
+        std::shared_ptr<gui::Label> lblBar4;
+        std::shared_ptr<gui::Label> lblBar5;
+        std::shared_ptr<gui::Label> lblBar6;
+        // END TSL only
+    } _binding;
+
+    void bindControls();
     void configureMessage();
     void configureReplies();
+
+    void setMessage(std::string message) override;
+    void setReplyLines(std::vector<std::string> lines) override;
+
+    void onListBoxItemClick(const std::string &control, const std::string &item) override;
 };
 
 } // namespace game

@@ -17,8 +17,6 @@
 
 #include "computer.h"
 
-#include "../../gui/control/listbox.h"
-
 #include "../game.h"
 #include "../gameidutil.h"
 
@@ -33,13 +31,9 @@ namespace reone {
 
 namespace game {
 
-static const char kControlTagMessage[] = "LB_MESSAGE";
-static const char kControlTagReplies[] = "LB_REPLIES";
-
 ComputerGUI::ComputerGUI(Game *game) : Conversation(game) {
     _resRef = getResRef("computer");
     _scaling = ScalingMode::Stretch;
-    _repliesControlTag = kControlTagReplies;
 
     if (isTSL(game->gameId())) {
         _resolutionX = 800;
@@ -49,36 +43,79 @@ ComputerGUI::ComputerGUI(Game *game) : Conversation(game) {
 
 void ComputerGUI::load() {
     Conversation::load();
-
+    bindControls();
     configureMessage();
     configureReplies();
 }
 
-void ComputerGUI::configureMessage() {
-    auto &message = getControl<ListBox>(kControlTagMessage);
-    message.setProtoMatchContent(true);
+void ComputerGUI::bindControls() {
+    _binding.lblCompSkill = getControlPtr<Label>("LBL_COMP_SKILL");
+    _binding.lblCompSkillVal = getControlPtr<Label>("LBL_COMP_SKILL_VAL");
+    _binding.lblCompSpikes = getControlPtr<Label>("LBL_COMP_SPIKES");
+    _binding.lblCompSpikesVal = getControlPtr<Label>("LBL_COMP_SPIKES_VAL");
+    _binding.lblRepSkill = getControlPtr<Label>("LBL_REP_SKILL");
+    _binding.lblRepSkillVal = getControlPtr<Label>("LBL_REP_SKILL_VAL");
+    _binding.lblRepUnits = getControlPtr<Label>("LBL_REP_UNITS");
+    _binding.lblRepUnitsVal = getControlPtr<Label>("LBL_REP_UNITS_VAL");
+    _binding.lbMessage = getControlPtr<ListBox>("LB_MESSAGE");
+    _binding.lbReplies = getControlPtr<ListBox>("LB_REPLIES");
 
-    Control &protoItem = message.protoItem();
-    protoItem.setHilightColor(getHilightColor(_game->gameId()));
-    protoItem.setTextColor(getBaseColor(_game->gameId()));
+    if (isTSL(_game->gameId())) {
+        _binding.lblBar1 = getControlPtr<Label>("LBL_BAR1");
+        _binding.lblBar2 = getControlPtr<Label>("LBL_BAR2");
+        _binding.lblBar3 = getControlPtr<Label>("LBL_BAR3");
+        _binding.lblBar4 = getControlPtr<Label>("LBL_BAR4");
+        _binding.lblBar5 = getControlPtr<Label>("LBL_BAR5");
+        _binding.lblBar6 = getControlPtr<Label>("LBL_BAR6");
+    } else {
+        _binding.lblCompSkillIcon = getControlPtr<Label>("LBL_COMP_SKILL_ICON");
+        _binding.lblCompSpikesIcon = getControlPtr<Label>("LBL_COMP_SPIKES_ICON");
+        _binding.lblRepSkillIcon = getControlPtr<Label>("LBL_REP_SKILL_ICON");
+        _binding.lblRepUnitsIcon = getControlPtr<Label>("LBL_REP_UNITS_ICON");
+        _binding.lblStatic1 = getControlPtr<Label>("LBL_STATIC1");
+        _binding.lblStatic2 = getControlPtr<Label>("LBL_STATIC2");
+        _binding.lblStatic3 = getControlPtr<Label>("LBL_STATIC3");
+        _binding.lblStatic4 = getControlPtr<Label>("LBL_STATIC4");
+        _binding.lblObscure = getControlPtr<Label>("LBL_OBSCURE");
+    }
+}
+
+void ComputerGUI::configureMessage() {
+    _binding.lbMessage->setProtoMatchContent(true);
+    _binding.lbMessage->protoItem().setHilightColor(getHilightColor(_game->gameId()));
+    _binding.lbMessage->protoItem().setTextColor(getBaseColor(_game->gameId()));
 }
 
 void ComputerGUI::configureReplies() {
-    auto &replies = getControl<ListBox>(kControlTagReplies);
-    replies.setProtoMatchContent(true);
-
-    Control &protoItem = replies.protoItem();
-    protoItem.setHilightColor(getHilightColor(_game->gameId()));
-    protoItem.setTextColor(getBaseColor(_game->gameId()));
+    _binding.lbReplies->setProtoMatchContent(true);
+    _binding.lbReplies->protoItem().setHilightColor(getHilightColor(_game->gameId()));
+    _binding.lbReplies->protoItem().setTextColor(getBaseColor(_game->gameId()));
 }
 
 void ComputerGUI::setMessage(string message) {
     ListBox::Item item;
-    item.text = message;
+    item.text = move(message);
 
-    ListBox &listBox = getControl<ListBox>(kControlTagMessage);
-    listBox.clearItems();
-    listBox.addItem(move(item));
+    _binding.lbMessage->clearItems();
+    _binding.lbMessage->addItem(move(item));
+}
+
+void ComputerGUI::setReplyLines(vector<string> lines) {
+    _binding.lbReplies->clearItems();
+
+    for (size_t i = 0; i < lines.size(); ++i) {
+        ListBox::Item item;
+        item.tag = to_string(i);
+        item.text = lines[i];
+        _binding.lbReplies->addItem(move(item));
+    }
+}
+
+void ComputerGUI::onListBoxItemClick(const string &control, const string &item) {
+    if (control == "LB_REPLIES") {
+        int replyIdx = stoi(item);
+        pickReply(replyIdx);
+    }
 }
 
 } // namespace game
