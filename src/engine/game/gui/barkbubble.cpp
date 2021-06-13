@@ -58,7 +58,7 @@ void BarkBubble::setBarkText(const string &text, float duration) {
         _binding.lblBarkText->setVisible(false);
     } else {
         float textWidth = _binding.lblBarkText->text().font->measure(text);
-        int lineCount = textWidth / static_cast<float>(_binding.lblBarkText->extent().width) + 1;
+        int lineCount = static_cast<int>(textWidth / static_cast<float>(_binding.lblBarkText->extent().width)) + 1;
         int padding = _binding.lblBarkText->extent().left;
         float rootHeight = lineCount * _binding.lblBarkText->text().font->height() + 2 * padding;
         float labelHeight = lineCount * _binding.lblBarkText->text().font->height();

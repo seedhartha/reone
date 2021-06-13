@@ -114,7 +114,7 @@ private:
 
     // Damage
 
-    std::vector<std::shared_ptr<DamageEffect>> getDamageEffects(std::shared_ptr<Creature> damager, bool offHand = false, float multiplier = 1.0f) const;
+    std::vector<std::shared_ptr<DamageEffect>> getDamageEffects(std::shared_ptr<Creature> damager, bool offHand = false, int multiplier = 1) const;
 
     // END Damage
 

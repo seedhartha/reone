@@ -146,7 +146,7 @@ bool SelectionOverlay::handleMouseWheel(const SDL_MouseWheelEvent &event) {
 
     if (event.y > 0) {
         if (slot.indexSelected-- == 0) {
-            slot.indexSelected = numSlotActions - 1;
+            slot.indexSelected = static_cast<uint32_t>(numSlotActions - 1);
         }
     } else {
         if (++slot.indexSelected == numSlotActions) {
@@ -267,7 +267,7 @@ void SelectionOverlay::drawTitleBar() {
     float barHeight = _font->height() + kTitleBarPadding;
     {
         float x = opts.width * _selectedScreenCoords.x - kTitleBarWidth / 2;
-        float y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2 - barHeight - kOffsetToReticle - kHealthBarHeight - 1.0f;
+        float y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2.0f - barHeight - kOffsetToReticle - kHealthBarHeight - 1.0f;
 
         if (_hasActions) {
             y -= kActionHeight + 2 * kActionBarMargin;
@@ -299,7 +299,7 @@ void SelectionOverlay::drawTitleBar() {
 void SelectionOverlay::drawHealthBar() {
     const GraphicsOptions &opts = _game->options().graphics;
     float x = opts.width * _selectedScreenCoords.x - kTitleBarWidth / 2;
-    float y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2 - kHealthBarHeight - kOffsetToReticle;
+    float y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2.0f - kHealthBarHeight - kOffsetToReticle;
     float w = glm::clamp(_selectedObject->currentHitPoints() / static_cast<float>(_selectedObject->hitPoints()), 0.0f, 1.0f) * kTitleBarWidth;
 
     if (_hasActions) {
@@ -359,7 +359,7 @@ bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) cons
 
     const GraphicsOptions &opts = _game->options().graphics;
     x = opts.width * _selectedScreenCoords.x + (static_cast<float>(index - 1) - 0.5f) * kActionWidth + (index - 1) * kActionBarMargin;
-    y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2 - kActionHeight - kOffsetToReticle - kActionBarMargin;
+    y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2.0f - kActionHeight - kOffsetToReticle - kActionBarMargin;
 
     return true;
 }

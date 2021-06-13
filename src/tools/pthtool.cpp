@@ -98,7 +98,7 @@ void PthTool::toPTH(const fs::path &path, const fs::path &destPath) {
     // Write binary PTH
 
     string filename(path.filename().string());
-    int lastDotIdx = filename.find_last_of('.');
+    size_t lastDotIdx = filename.find_last_of('.');
     if (lastDotIdx != -1) {
         filename = filename.substr(0, lastDotIdx);
     }
@@ -165,7 +165,7 @@ void PthTool::toASCII(const fs::path &path, const fs::path &destPath) {
     // Write ASCII PTH
 
     string filename(path.filename().string());
-    int lastDotIdx = filename.find_last_of('.');
+    size_t lastDotIdx = filename.find_last_of('.');
     if (lastDotIdx != -1) {
         filename = filename.substr(0, lastDotIdx);
     }

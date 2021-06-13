@@ -70,8 +70,8 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     glm::vec4 lightPos(_absTransform[3]);
     glm::vec4 lightPosNdc(camera->projection() * camera->view() * lightPos);
 
-    float w = _sceneGraph->options().width;
-    float h = _sceneGraph->options().height;
+    float w = static_cast<float>(_sceneGraph->options().width);
+    float h = static_cast<float>(_sceneGraph->options().height);
 
     glm::vec3 lightPosScreen(glm::vec3(lightPosNdc) / lightPosNdc.w);
     lightPosScreen *= 0.5f;
