@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include "../../gui/control/label.h"
+#include "../../gui/control/listbox.h"
+
 #include "../camera/dialogcamera.h"
 #include "../object/creature.h"
 
@@ -39,16 +42,15 @@ private:
         std::shared_ptr<Creature> creature;
     };
 
+    struct Binding {
+        std::shared_ptr<gui::Label> lblMessage;
+        std::shared_ptr<gui::ListBox> lbReplies;
+    } _binding;
+
     std::shared_ptr<SpatialObject> _currentSpeaker;
     std::map<std::string, Participant> _participantByTag;
 
-    void onStart() override;
-    void onFinish() override;
-    void onLoadEntry() override;
-    void onEntryEnded() override;
-
-    void setMessage(std::string message) override;
-
+    void bindControls();
     void addFrame(std::string tag, int top, int height);
     void configureMessage();
     void configureReplies();
@@ -61,6 +63,16 @@ private:
     DialogCamera::Variant getRandomCameraVariant() const;
     std::string getStuntAnimationName(int ordinal) const;
     AnimationType getStuntAnimationType(int ordinal) const;
+
+    void setMessage(std::string message) override;
+    void setReplyLines(std::vector<std::string> lines) override;
+
+    void onStart() override;
+    void onFinish() override;
+    void onLoadEntry() override;
+    void onEntryEnded() override;
+
+    void onListBoxItemClick(const std::string &control, const std::string &item) override;
 
     // Loading
 
