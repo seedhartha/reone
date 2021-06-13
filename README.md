@@ -16,7 +16,7 @@ reone adheres to clean-room design principles. We do not condone the use of deco
 
 We do not distribute copyrighted materials - instead, we require our users and developers to obtain a legal copy of the game.
 
-Lastly, reone is explicitly a non-commercial project: we seek to gain no profit through donations and other means.
+Lastly, reone is explicitly a non-commercial project: we do not seek to gain profit, neither through donations nor other means.
 
 ## Contributing
 
