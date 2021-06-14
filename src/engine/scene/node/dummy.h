@@ -17,28 +17,16 @@
 
 #pragma once
 
-#include "../../graphics/model/modelnode.h"
-
-#include "scenenode.h"
+#include "modelnode.h"
 
 namespace reone {
 
 namespace scene {
 
-class ModelNodeSceneNode : public SceneNode {
+class DummySceneNode : public ModelNodeSceneNode {
 public:
-    std::shared_ptr<graphics::ModelNode> modelNode() const { return _modelNode; }
-    const glm::mat4 &boneTransform() const { return _boneTransform; }
-
-    void setBoneTransform(glm::mat4 transform) { _boneTransform = std::move(transform); }
-
-protected:
-    std::shared_ptr<graphics::ModelNode> _modelNode;
-
-    ModelNodeSceneNode(std::shared_ptr<graphics::ModelNode> modelNode, SceneNodeType type, SceneGraph *sceneGraph);
-
-private:
-    glm::mat4 _boneTransform { 1.0f }; /**< model space transform relative to the rest pose */
+    DummySceneNode(std::shared_ptr<graphics::ModelNode> modelNode, SceneGraph *sceneGraph) : ModelNodeSceneNode(std::move(modelNode), SceneNodeType::Dummy, sceneGraph) {
+    }
 };
 
 } // namespace scene

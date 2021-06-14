@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "cameranode.h"
+#include "camera.h"
 
 using namespace std;
 

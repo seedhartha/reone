@@ -23,7 +23,7 @@
 #include "../../../graphics/model/models.h"
 #include "../../../graphics/texture/textures.h"
 #include "../../../resource/resources.h"
-#include "../../../scene/node/modelnode.h"
+#include "../../../scene/node/model.h"
 
 #include "../../game.h"
 #include "../../portrait.h"

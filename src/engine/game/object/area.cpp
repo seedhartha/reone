@@ -30,7 +30,7 @@
 #include "../../resource/format/visreader.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
-#include "../../scene/node/grassnode.h"
+#include "../../scene/node/grass.h"
 #include "../../scene/types.h"
 
 #include "../enginetype/location.h"

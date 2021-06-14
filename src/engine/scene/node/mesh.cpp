@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "meshnode.h"
+#include "mesh.h"
 
 #include "../../common/log.h"
 #include "../../common/guardutil.h"
@@ -24,9 +24,9 @@
 
 #include "../scenegraph.h"
 
-#include "cameranode.h"
-#include "lightnode.h"
-#include "modelnode.h"
+#include "camera.h"
+#include "light.h"
+#include "model.h"
 
 using namespace std;
 

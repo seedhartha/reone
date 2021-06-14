@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "grassnode.h"
+#include "grass.h"
 
 #include "../../common/guardutil.h"
 #include "../../graphics/mesh/meshes.h"

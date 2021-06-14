@@ -25,8 +25,8 @@
 #include "../../graphics/texture/tgawriter.h"
 #include "../../graphics/window.h"
 
-#include "../node/cameranode.h"
-#include "../node/lightnode.h"
+#include "../node/camera.h"
+#include "../node/light.h"
 #include "../scenegraph.h"
 
 using namespace std;

@@ -17,7 +17,7 @@
 
 #include "thirdperson.h"
 
-#include "../../scene/node/cameranode.h"
+#include "../../scene/node/camera.h"
 
 #include "../game.h"
 

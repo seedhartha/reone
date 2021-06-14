@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "emitternode.h"
+#include "emitter.h"
 
 #include "../../common/guardutil.h"
 #include "../../common/random.h"
@@ -24,8 +24,7 @@
 
 #include "../scenegraph.h"
 
-#include "cameranode.h"
-#include "modelnode.h"
+#include "camera.h"
 
 using namespace std;
 

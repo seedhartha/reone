@@ -20,11 +20,11 @@
 #include "../graphics/options.h"
 #include "../graphics/services.h"
 
-#include "node/cameranode.h"
-#include "node/emitternode.h"
-#include "node/grassnode.h"
-#include "node/lightnode.h"
-#include "node/meshnode.h"
+#include "node/camera.h"
+#include "node/emitter.h"
+#include "node/grass.h"
+#include "node/light.h"
+#include "node/mesh.h"
 
 namespace reone {
 
