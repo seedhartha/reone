@@ -20,7 +20,7 @@
 #include "../../gui/control/label.h"
 #include "../../gui/control/listbox.h"
 
-#include "../camera/dialogcamera.h"
+#include "../camera/dialog.h"
 #include "../object/creature.h"
 
 #include "conversation.h"

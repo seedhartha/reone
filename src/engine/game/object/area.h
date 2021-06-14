@@ -24,10 +24,10 @@
 #include "../../scene/scenegraph.h"
 
 #include "../actionexecutor.h"
-#include "../camera/animatedcamera.h"
-#include "../camera/dialogcamera.h"
+#include "../camera/animated.h"
+#include "../camera/dialog.h"
 #include "../camera/firstperson.h"
-#include "../camera/staticcamera.h"
+#include "../camera/static.h"
 #include "../camera/thirdperson.h"
 #include "../map.h"
 #include "../pathfinder.h"

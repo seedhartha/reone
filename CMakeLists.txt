@@ -431,12 +431,12 @@ set(GAME_HEADERS
     src/engine/game/action/useskill.h
     src/engine/game/action/wait.h
     src/engine/game/animationutil.h
-    src/engine/game/camera/animatedcamera.h
+    src/engine/game/camera/animated.h
     src/engine/game/camera/camera.h
     src/engine/game/camera/camerastyle.h
-    src/engine/game/camera/dialogcamera.h
+    src/engine/game/camera/dialog.h
     src/engine/game/camera/firstperson.h
-    src/engine/game/camera/staticcamera.h
+    src/engine/game/camera/static.h
     src/engine/game/camera/thirdperson.h
     src/engine/game/character.h
     src/engine/game/console.h
@@ -534,12 +534,12 @@ set(GAME_HEADERS
 set(GAME_SOURCES
     src/engine/game/actionexecutor.cpp
     src/engine/game/animationutil.cpp
-    src/engine/game/camera/animatedcamera.cpp
+    src/engine/game/camera/animated.cpp
     src/engine/game/camera/camera.cpp
     src/engine/game/camera/camerastyle.cpp
-    src/engine/game/camera/dialogcamera.cpp
+    src/engine/game/camera/dialog.cpp
     src/engine/game/camera/firstperson.cpp
-    src/engine/game/camera/staticcamera.cpp
+    src/engine/game/camera/static.cpp
     src/engine/game/camera/thirdperson.cpp
     src/engine/game/combat/combat.cpp
     src/engine/game/combat/combat_attack.cpp

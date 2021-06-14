@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "animatedcamera.h"
+#include "animated.h"
 
 #include "../../graphics/types.h"
 #include "../../scene/node/cameranode.h"

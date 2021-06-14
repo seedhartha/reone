@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "dialogcamera.h"
+#include "dialog.h"
 
 #include "../../graphics/types.h"
 #include "../../scene/node/cameranode.h"
