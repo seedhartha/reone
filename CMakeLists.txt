@@ -418,7 +418,7 @@ target_precompile_headers(libscript PRIVATE src/engine/pch.h)
 
 set(GAME_HEADERS
     src/engine/game/action/action.h
-    src/engine/game/action/commandaction.h
+    src/engine/game/action/docommand.h
     src/engine/game/action/follow.h
     src/engine/game/action/locationaction.h
     src/engine/game/action/movetolocation.h
@@ -429,7 +429,7 @@ set(GAME_HEADERS
     src/engine/game/action/startconversation.h
     src/engine/game/action/usefeat.h
     src/engine/game/action/useskill.h
-    src/engine/game/action/waitaction.h
+    src/engine/game/action/wait.h
     src/engine/game/animationutil.h
     src/engine/game/camera/animatedcamera.h
     src/engine/game/camera/camera.h

@@ -23,13 +23,13 @@
 
 #include "../../common/log.h"
 
-#include "../action/commandaction.h"
+#include "../action/docommand.h"
 #include "../action/locationaction.h"
 #include "../action/movetolocation.h"
 #include "../action/movetoobject.h"
 #include "../action/playanimation.h"
 #include "../action/startconversation.h"
-#include "../action/waitaction.h"
+#include "../action/wait.h"
 #include "../enginetype/location.h"
 #include "../game.h"
 

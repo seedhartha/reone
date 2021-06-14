@@ -21,7 +21,7 @@
 
 #include "glm/vec3.hpp"
 
-#include "action/commandaction.h"
+#include "action/docommand.h"
 #include "action/follow.h"
 #include "action/locationaction.h"
 #include "action/movetolocation.h"
