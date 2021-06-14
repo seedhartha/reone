@@ -19,12 +19,12 @@
 
 #include "../graphics/mesh/meshes.h"
 
-#include "node/cameranode.h"
-#include "node/emitternode.h"
-#include "node/grassnode.h"
-#include "node/lightnode.h"
-#include "node/meshnode.h"
-#include "node/modelnode.h"
+#include "node/camera.h"
+#include "node/emitter.h"
+#include "node/grass.h"
+#include "node/light.h"
+#include "node/mesh.h"
+#include "node/model.h"
 
 using namespace std;
 

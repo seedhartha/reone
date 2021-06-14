@@ -20,7 +20,7 @@
 #include "../graphics/options.h"
 #include "../graphics/services.h"
 
-#include "../scene/node/modelnode.h"
+#include "../scene/node/model.h"
 #include "../scene/scenegraph.h"
 
 namespace reone {

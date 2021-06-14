@@ -18,8 +18,8 @@
 #include "animated.h"
 
 #include "../../graphics/types.h"
-#include "../../scene/node/cameranode.h"
-#include "../../scene/node/modelnode.h"
+#include "../../scene/node/camera.h"
+#include "../../scene/node/model.h"
 
 using namespace std;
 

@@ -19,7 +19,7 @@
 
 #include "../../graphics/model/modelnode.h"
 
-#include "modelnodescenenode.h"
+#include "modelnode.h"
 
 namespace reone {
 

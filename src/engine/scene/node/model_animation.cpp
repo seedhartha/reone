@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "modelnode.h"
+#include "model.h"
 
 #include "../../common/collectionutil.h"
 

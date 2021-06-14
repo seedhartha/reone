@@ -24,7 +24,7 @@
 #include "../../resource/format/gffreader.h"
 #include "../../resource/types.h"
 #include "../../scene/animeventlistener.h"
-#include "../../scene/node/modelnode.h"
+#include "../../scene/node/model.h"
 #include "../../script/types.h"
 
 #include "../d20/attributes.h"

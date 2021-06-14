@@ -22,7 +22,7 @@
 #include "../../graphics/walkmesh/walkmeshes.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
-#include "../../scene/node/modelnode.h"
+#include "../../scene/node/model.h"
 #include "../../scene/types.h"
 #include "../../script/scripts.h"
 

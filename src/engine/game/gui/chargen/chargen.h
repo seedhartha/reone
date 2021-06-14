@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../../scene/node/modelnode.h"
+#include "../../../scene/node/model.h"
 #include "../../../scene/scenegraph.h"
 
 #include "../../character.h"

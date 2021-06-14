@@ -17,142 +17,28 @@
 
 #pragma once
 
-#include "../../graphics/lip/animation.h"
-#include "../../graphics/model/model.h"
+#include "../../graphics/model/modelnode.h"
 
-#include "../animeventlistener.h"
-#include "../animproperties.h"
-#include "../types.h"
-
-#include "dummynode.h"
-#include "emitternode.h"
-#include "lightnode.h"
-#include "meshnode.h"
+#include "scenenode.h"
 
 namespace reone {
 
 namespace scene {
 
-constexpr float kDefaultDrawDistance = 1024.0f;
-
-class ModelSceneNode : public SceneNode {
+class ModelNodeSceneNode : public SceneNode {
 public:
-    ModelSceneNode(
-        std::shared_ptr<graphics::Model> model,
-        ModelUsage usage,
-        SceneGraph *sceneGraph,
-        IAnimationEventListener *animEventListener = nullptr);
+    std::shared_ptr<graphics::ModelNode> modelNode() const { return _modelNode; }
+    const glm::mat4 &boneTransform() const { return _boneTransform; }
 
-    void update(float dt) override;
+    void setBoneTransform(glm::mat4 transform) { _boneTransform = std::move(transform); }
 
-    void computeAABB();
-    void signalEvent(const std::string &name);
+protected:
+    std::shared_ptr<graphics::ModelNode> _modelNode;
 
-    std::shared_ptr<ModelNodeSceneNode> getNodeByName(const std::string &name) const;
-
-    std::shared_ptr<graphics::Model> model() const { return _model; }
-    ModelUsage usage() const { return _usage; }
-    float drawDistance() const { return _drawDistance; }
-
-    void setDrawDistance(float distance) { _drawDistance = distance; }
-    void setDiffuseTexture(std::shared_ptr<graphics::Texture> texture);
-    void setAppliedForce(glm::vec3 force);
-
-    // Animation
-
-    void playAnimation(const std::string &name, AnimationProperties properties = AnimationProperties());
-    void playAnimation(std::shared_ptr<graphics::Animation> anim, std::shared_ptr<graphics::LipAnimation> lipAnim = nullptr, AnimationProperties properties = AnimationProperties());
-
-    bool isAnimationFinished() const;
-
-    void setInanimateNodes(std::set<std::string> nodes) { _inanimateNodes = std::move(nodes); }
-
-    // END Animation
-
-    // Attachments
-
-    void attach(const std::string &parentName, std::shared_ptr<SceneNode> node);
-
-    std::shared_ptr<SceneNode> getAttachment(const std::string &parentName) const;
-
-    // END Attachments
+    ModelNodeSceneNode(std::shared_ptr<graphics::ModelNode> modelNode, SceneNodeType type, SceneGraph *sceneGraph);
 
 private:
-    enum class AnimationBlendMode {
-        Single,
-        Blend,
-        Overlay
-    };
-
-    struct AnimationStateFlags {
-        static constexpr int transform = 1;
-        static constexpr int alpha = 2;
-        static constexpr int selfIllumColor = 4;
-    };
-
-    struct AnimationState {
-        int flags { 0 };
-        glm::mat4 transform { 1.0f };
-        float alpha { 0.0f };
-        glm::vec3 selfIllumColor { 0.0f };
-    };
-
-    struct AnimationChannel {
-        std::shared_ptr<graphics::Animation> anim;
-        std::shared_ptr<graphics::LipAnimation> lipAnim;
-        AnimationProperties properties;
-        float time { 0.0f };
-        std::unordered_map<std::string, AnimationState> stateByName;
-        bool freeze { false }; /**< channel time is not to be updated */
-        bool transition { false }; /**< when computing states, use animation transition time as channel time */
-        bool finished { false }; /**< finished channels will be erased from the queue */
-
-        AnimationChannel(std::shared_ptr<graphics::Animation> anim, std::shared_ptr<graphics::LipAnimation> lipAnim, AnimationProperties properties) :
-            anim(std::move(anim)),
-            lipAnim(std::move(lipAnim)),
-            properties(std::move(properties)) {
-        }
-    };
-
-    std::shared_ptr<graphics::Model> _model;
-    ModelUsage _usage;
-    IAnimationEventListener *_animEventListener;
-
-    float _drawDistance { kDefaultDrawDistance };
-
-    // Lookups
-
-    std::unordered_map<std::string, std::shared_ptr<ModelNodeSceneNode>> _nodeByName;
-    std::unordered_map<std::string, std::shared_ptr<SceneNode>> _attachments;
-
-    // END Lookups
-
-    // Animation
-
-    std::deque<AnimationChannel> _animChannels;
-    AnimationBlendMode _animBlendMode { AnimationBlendMode::Single };
-    std::set<std::string> _inanimateNodes; /**< names of nodes that are not to be animated */
-
-    // END Animation
-
-    void buildNodeTree(std::shared_ptr<graphics::ModelNode> node, SceneNode *parent);
-
-    std::unique_ptr<DummySceneNode> newDummySceneNode(std::shared_ptr<graphics::ModelNode> node) const;
-    std::unique_ptr<MeshSceneNode> newMeshSceneNode(std::shared_ptr<graphics::ModelNode> node) const;
-    std::unique_ptr<LightSceneNode> newLightSceneNode(std::shared_ptr<graphics::ModelNode> node) const;
-    std::unique_ptr<EmitterSceneNode> newEmitterSceneNode(std::shared_ptr<graphics::ModelNode> node) const;
-
-    // Animation
-
-    void updateAnimations(float dt);
-    void updateAnimationChannel(AnimationChannel &channel, float dt);
-    void computeAnimationStates(AnimationChannel &channel, float time, const graphics::ModelNode &modelNode);
-    void applyAnimationStates(const graphics::ModelNode &modelNode);
-    void computeBoneTransforms();
-
-    static AnimationBlendMode getAnimationBlendMode(int flags);
-
-    // END Animation
+    glm::mat4 _boneTransform { 1.0f }; /**< model space transform relative to the rest pose */
 };
 
 } // namespace scene

@@ -17,8 +17,8 @@
 
 #include "scenebuilder.h"
 
-#include "../scene/node/cameranode.h"
-#include "../scene/node/meshnode.h"
+#include "../scene/node/camera.h"
+#include "../scene/node/mesh.h"
 #include "../scene/scenegraph.h"
 
 using namespace std;

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "modelnodescenenode.h"
+#include "modelnode.h"
 
 #include "../../graphics/material.h"
 #include "../../graphics/materials.h"

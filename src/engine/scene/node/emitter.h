@@ -23,7 +23,7 @@
 
 #include "../nodeelement.h"
 
-#include "modelnodescenenode.h"
+#include "modelnode.h"
 
 namespace reone {
 

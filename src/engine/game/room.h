@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../graphics/walkmesh/walkmesh.h"
-#include "../scene/node/modelnode.h"
+#include "../scene/node/model.h"
 
 namespace reone {
 

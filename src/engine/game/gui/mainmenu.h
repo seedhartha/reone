@@ -21,7 +21,7 @@
 #include "../../gui/control/label.h"
 #include "../../gui/control/listbox.h"
 #include "../../resource/types.h"
-#include "../../scene/node/modelnode.h"
+#include "../../scene/node/model.h"
 #include "../../scene/scenegraph.h"
 
 #include "../types.h"
