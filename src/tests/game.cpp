@@ -15,7 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#define BOOST_TEST_MODULE pathfinder
+/** @file
+ *  Tests for libgame classes.
+ */
+
+#define BOOST_TEST_MODULE game
 
 #include <boost/test/included/unit_test.hpp>
 
@@ -27,7 +31,9 @@ using namespace std;
 using namespace reone::game;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_CASE(test_find_path) {
+// Pathfinder
+
+BOOST_AUTO_TEST_CASE(PathFinder_FindPath) {
     vector<Path::Point> points = {
         { 1.0f, 1.0f, { 1, 2 } },
         { 1.0f, 2.0f, { 0, 2 } },
@@ -55,7 +61,7 @@ BOOST_AUTO_TEST_CASE(test_find_path) {
     BOOST_TEST(found);
 }
 
-BOOST_AUTO_TEST_CASE(find_path_when_no_points_then_from_to_returned) {
+BOOST_AUTO_TEST_CASE(PathFinder_FindPath_NoPoints) {
     Pathfinder pathfinder;
     pathfinder.load({}, {});
 
@@ -70,3 +76,5 @@ BOOST_AUTO_TEST_CASE(find_path_when_no_points_then_from_to_returned) {
 
     BOOST_TEST(found);
 }
+
+// END Pathfinder

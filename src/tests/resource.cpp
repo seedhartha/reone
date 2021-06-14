@@ -15,7 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#define BOOST_TEST_MODULE gffwriter
+/** @file
+ *  Tests for libresource classes.
+ */
+
+#define BOOST_TEST_MODULE resource
 
 #include <boost/test/included/unit_test.hpp>
 
@@ -26,9 +30,12 @@ using namespace std;
 
 using namespace reone::resource;
 
+namespace endian = boost::endian;
 namespace fs = boost::filesystem;
 
-BOOST_AUTO_TEST_CASE(test_save_load) {
+// GffStruct
+
+BOOST_AUTO_TEST_CASE(GffStruct_SaveLoad) {
     auto struct1 = make_shared<GffStruct>(0);
     GffStruct::Field struct1Field(GffStruct::FieldType::Byte, "MyByte"); struct1Field.uintValue = 1;
     struct1->add(move(struct1Field));
@@ -69,3 +76,5 @@ BOOST_AUTO_TEST_CASE(test_save_load) {
     BOOST_TEST((readRoot->fields()[1].children[0]->fields()[0].uintValue == 2));
     BOOST_TEST((readRoot->fields()[1].children[1]->fields()[0].uintValue == 3));
 }
+
+// END GffStruct
