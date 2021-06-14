@@ -24,7 +24,7 @@
 
 #include "action/usefeat.h"
 #include "action/useskill.h"
-#include "action/waitaction.h"
+#include "action/wait.h"
 #include "enginetype/location.h"
 #include "game.h"
 #include "object/area.h"

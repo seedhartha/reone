@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "action.h"
-
 #include "../../script/types.h"
+
+#include "action.h"
 
 namespace reone {
 
