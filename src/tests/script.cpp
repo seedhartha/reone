@@ -15,7 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#define BOOST_TEST_MODULE scriptexecution
+/** @file
+ *  Tests for libscript classes.
+ */
+
+#define BOOST_TEST_MODULE script
 
 #include <boost/test/included/unit_test.hpp>
 
@@ -25,7 +29,9 @@ using namespace std;
 
 using namespace reone::script;
 
-BOOST_AUTO_TEST_CASE(test_destruct) {
+// ScriptExecution
+
+BOOST_AUTO_TEST_CASE(ScriptExecution_Destruct) {
     Instruction instr;
     auto program = make_shared<ScriptProgram>("");
 
@@ -69,7 +75,7 @@ BOOST_AUTO_TEST_CASE(test_destruct) {
     BOOST_TEST((execution.getStackVariable(0).intValue == 1));
 }
 
-BOOST_AUTO_TEST_CASE(test_cptopbp) {
+BOOST_AUTO_TEST_CASE(ScriptExecution_CopyTopBp) {
     Instruction instr;
     auto program = make_shared<ScriptProgram>("");
 
@@ -113,3 +119,5 @@ BOOST_AUTO_TEST_CASE(test_cptopbp) {
     BOOST_TEST((execution.getStackVariable(4).intValue == 1));
     BOOST_TEST((execution.getStackVariable(5).intValue == 2));
 }
+
+// END ScriptExecution
