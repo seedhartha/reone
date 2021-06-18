@@ -22,8 +22,6 @@
 #include "../../game.h"
 #include "../../map.h"
 
-#include "../colorutil.h"
-
 using namespace std;
 
 using namespace reone::gui;

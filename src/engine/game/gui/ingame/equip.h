@@ -87,7 +87,7 @@ private:
         std::shared_ptr<gui::Label> lblSelectTitle;
         std::shared_ptr<gui::Button> btnChange1;
         std::shared_ptr<gui::Button> btnChange2;
-        // End KOTOR only
+        // END KOTOR only
 
         // TSL only
         std::shared_ptr<gui::Label> lblBack1;
@@ -99,7 +99,7 @@ private:
         std::shared_ptr<gui::Button> btnPrevNpc;
         std::shared_ptr<gui::Button> btnNextNpc;
         std::shared_ptr<gui::Label> lblDefText;
-        // End TSL only
+        // END TSL only
     } _binding;
 
     InGameMenu &_inGameMenu;

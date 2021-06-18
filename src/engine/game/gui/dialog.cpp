@@ -32,8 +32,6 @@
 #include "../objectconverter.h"
 #include "../script/routines.h"
 
-#include "colorutil.h"
-
 using namespace std;
 
 using namespace reone::audio;
@@ -129,13 +127,13 @@ void DialogGUI::addFrame(string tag, int top, int height) {
 
 void DialogGUI::configureMessage() {
     _binding.lblMessage->setExtentTop(-_rootControl->extent().top);
-    _binding.lblMessage->setTextColor(getBaseColor(_game->gameId()));
+    _binding.lblMessage->setTextColor(_game->getGUIColorBase());
 }
 
 void DialogGUI::configureReplies() {
     _binding.lbReplies->setProtoMatchContent(true);
-    _binding.lbReplies->protoItem().setHilightColor(getHilightColor(_game->gameId()));
-    _binding.lbReplies->protoItem().setTextColor(getBaseColor(_game->gameId()));
+    _binding.lbReplies->protoItem().setHilightColor(_game->getGUIColorHilight());
+    _binding.lbReplies->protoItem().setTextColor(_game->getGUIColorBase());
 }
 
 void DialogGUI::onStart() {

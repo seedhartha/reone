@@ -21,9 +21,7 @@
 #include "../../graphics/texture/textures.h"
 
 #include "../game.h"
-#include "../gameidutil.h"
 
-#include "colorutil.h"
 #include "sounds.h"
 
 using namespace std;
@@ -53,23 +51,23 @@ void GameGUI::onFocusChanged(const string &control, bool focus) {
 }
 
 void GameGUI::initForGame() {
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         _resolutionX = 800;
         _resolutionY = 600;
     } else {
         _hasDefaultHilightColor = true;
-        _defaultHilightColor = getHilightColor(_game->gameId());
+        _defaultHilightColor = _game->getGUIColorHilight();
     }
 }
 
 string GameGUI::getResRef(const std::string &base) const {
-    return isTSL(_game->gameId()) ? base + "_p" : base;
+    return _game->isTSL() ? base + "_p" : base;
 }
 
 void GameGUI::loadBackground(BackgroundType type) {
     string resRef;
 
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         switch (type) {
             case BackgroundType::Computer0:
             case BackgroundType::Computer1:

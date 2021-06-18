@@ -460,7 +460,6 @@ set(GAME_HEADERS
     src/engine/game/enginetype/talent.h
     src/engine/game/footstepsounds.h
     src/engine/game/game.h
-    src/engine/game/gameidutil.h
     src/engine/game/gui/barkbubble.h
     src/engine/game/gui/chargen/abilities.h
     src/engine/game/gui/chargen/chargen.h
@@ -473,7 +472,6 @@ set(GAME_HEADERS
     src/engine/game/gui/chargen/quick.h
     src/engine/game/gui/chargen/quickorcustom.h
     src/engine/game/gui/chargen/skills.h
-    src/engine/game/gui/colorutil.h
     src/engine/game/gui/container.h
     src/engine/game/gui/conversation.h
     src/engine/game/gui/computer.h
@@ -559,10 +557,10 @@ set(GAME_SOURCES
     src/engine/game/dialog.cpp
     src/engine/game/footstepsounds.cpp
     src/engine/game/game.cpp
+    src/engine/game/game_id.cpp
     src/engine/game/game_kotor.cpp
     src/engine/game/game_save.cpp
     src/engine/game/game_tsl.cpp
-    src/engine/game/gameidutil.cpp
     src/engine/game/gui/barkbubble.cpp
     src/engine/game/gui/chargen/abilities.cpp
     src/engine/game/gui/chargen/chargen.cpp
@@ -575,7 +573,6 @@ set(GAME_SOURCES
     src/engine/game/gui/chargen/quick.cpp
     src/engine/game/gui/chargen/quickorcustom.cpp
     src/engine/game/gui/chargen/skills.cpp
-    src/engine/game/gui/colorutil.cpp
     src/engine/game/gui/computer.cpp
     src/engine/game/gui/container.cpp
     src/engine/game/gui/conversation.cpp

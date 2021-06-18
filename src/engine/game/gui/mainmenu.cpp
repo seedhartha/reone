@@ -25,9 +25,6 @@
 #include "../../scene/types.h"
 
 #include "../game.h"
-#include "../gameidutil.h"
-
-#include "colorutil.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -50,7 +47,7 @@ static const char kBlueprintResRefAtton[] = "p_atton";
 static const char kBlueprintResRefKreia[] = "p_kreia";
 
 MainMenu::MainMenu(Game *game) : GameGUI(game) {
-    if (isTSL(game->gameId())) {
+    if (game->isTSL()) {
         _resRef = "mainmenu8x6_p";
     } else {
         _resRef = "mainmenu16x12";
@@ -95,7 +92,7 @@ void MainMenu::bindControls() {
     _binding.btnExit = getControlPtr<Button>("BTN_EXIT");
     _binding.btnWarp = getControlPtr<Button>("BTN_WARP");
 
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         _binding.btnMusic = getControlPtr<Button>("BTN_MUSIC");
     } else {
         _binding.lblMenuBg = getControlPtr<Label>("LBL_MENUBG");
@@ -109,18 +106,18 @@ void MainMenu::configureButtons() {
     setButtonColors(*_binding.btnNewGame);
     setButtonColors(*_binding.btnOptions);
 
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         setButtonColors(*_binding.btnMusic);
     }
 }
 
 void MainMenu::setButtonColors(Control &control) {
-    control.setTextColor(getBaseColor(_game->gameId()));
-    control.setHilightColor(getHilightColor(_game->gameId()));
+    control.setTextColor(_game->getGUIColorBase());
+    control.setHilightColor(_game->getGUIColorHilight());
 }
 
 void MainMenu::setup3DView() {
-    if (_game->gameId() != GameID::KotOR) return;
+    if (_game->id() != GameID::KotOR) return;
 
     const Control::Extent &extent = _binding.lbl3dView->extent();
     float aspect = extent.width / static_cast<float>(extent.height);
@@ -170,7 +167,7 @@ void MainMenu::startModuleSelection() {
     _binding.lbl3dView->setVisible(false);
     _binding.lblGameLogo->setVisible(false);
 
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         _binding.btnMusic->setVisible(false);
     } else {
         _binding.lblMenuBg->setVisible(false);
@@ -197,7 +194,7 @@ void MainMenu::onModuleSelected(const string &name) {
     string member2Blueprint;
     string member3Blueprint;
 
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         member1Blueprint = kBlueprintResRefAtton;
         member2Blueprint = kBlueprintResRefKreia;
     } else {
@@ -207,7 +204,7 @@ void MainMenu::onModuleSelected(const string &name) {
     shared_ptr<TwoDA> defaultParty(_game->services().resource().resources().get2DA("defaultparty"));
     if (defaultParty) {
         for (int row = 0; row < defaultParty->getRowCount(); ++row) {
-            if (defaultParty->getBool(row, "tsl") == isTSL(_game->gameId())) {
+            if (defaultParty->getBool(row, "tsl") == _game->isTSL()) {
                 member1Blueprint = defaultParty->getString(row, "partymember0");
                 member2Blueprint = defaultParty->getString(row, "partymember1");
                 member3Blueprint = defaultParty->getString(row, "partymember2");

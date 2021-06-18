@@ -23,11 +23,8 @@
 #include "../../script/types.h"
 
 #include "../game.h"
-#include "../gameidutil.h"
 #include "../portrait.h"
 #include "../portraits.h"
-
-#include "colorutil.h"
 
 using namespace std;
 
@@ -49,7 +46,7 @@ static glm::vec3 g_kotorColorOn = { 0.984314f, 1.0f, 0 };
 static glm::vec3 g_kotorColorAdded = { 0, 0.831373f, 0.090196f };
 
 PartySelection::PartySelection(Game *game) : GameGUI(game) {
-    if (isTSL(game->gameId())) {
+    if (game->isTSL()) {
         _resRef = "partyselect_p";
     } else {
         _resRef = "partyselection";
@@ -110,7 +107,7 @@ void PartySelection::bindControls() {
     _binding.lblNpcName = getControlPtr<Label>("LBL_NPC_NAME");
     _binding.lblTitle = getControlPtr<Label>("LBL_TITLE");
 
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         _binding.btnNpc9 = getControlPtr<ToggleButton>("BTN_NPC9");
         _binding.btnNpc10 = getControlPtr<ToggleButton>("BTN_NPC10");
         _binding.btnNpc11 = getControlPtr<ToggleButton>("BTN_NPC11");

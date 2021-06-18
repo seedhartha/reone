@@ -22,8 +22,6 @@
 
 #include "../../game.h"
 
-#include "../colorutil.h"
-
 #include "chargen.h"
 
 using namespace std;

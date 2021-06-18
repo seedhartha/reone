@@ -50,7 +50,7 @@ private:
 
     void refreshPortraits();
 
-    std::shared_ptr<graphics::Texture> getFrameTexture(GameID gameId) const;
+    std::shared_ptr<graphics::Texture> getFrameTexture() const;
 };
 
 } // namespace game

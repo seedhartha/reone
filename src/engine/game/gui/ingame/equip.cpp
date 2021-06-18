@@ -21,11 +21,8 @@
 #include "../../../resource/strings.h"
 
 #include "../../game.h"
-#include "../../gameidutil.h"
 #include "../../object/creature.h"
 #include "../../object/item.h"
-
-#include "../colorutil.h"
 
 #include "ingame.h"
 
@@ -79,7 +76,7 @@ Equipment::Equipment(Game *game, InGameMenu &inGameMenu) : GameGUI(game), _inGam
 
 void Equipment::bindControls() {
     _binding.lblCantEquip = getControlPtr<Label>("LBL_CANTEQUIP");
-    if (isKotOR(_game->gameId())) {
+    if (_game->isKotOR()) {
         _binding.lblAttackInfo = getControlPtr<Label>("LBL_ATTACK_INFO");
         _binding.lblPortBord = getControlPtr<Label>("LBL_PORT_BORD");
         _binding.lblPortrait = getControlPtr<Label>("LBL_PORTRAIT");
@@ -111,7 +108,7 @@ void Equipment::bindControls() {
     _binding.lblToHitR = getControlPtr<Label>("LBL_TOHITR");
     _binding.lbItems = getControlPtr<ListBox>("LB_ITEMS");
     for (auto &slotName : g_slotNames) {
-        if ((slotName.first == Slot::WeapL2 || slotName.first == Slot::WeapR2) && isKotOR(_game->gameId())) continue;
+        if ((slotName.first == Slot::WeapL2 || slotName.first == Slot::WeapR2) && _game->isKotOR()) continue;
         _binding.lblInv[slotName.first] = getControlPtr<Label>("LBL_INV_" + slotName.second);
         _binding.btnInv[slotName.first] = getControlPtr<Button>("BTN_INV_" + slotName.second);
     }
@@ -146,8 +143,8 @@ void Equipment::configureItemsListBox() {
     _binding.lbItems->setPadding(5);
 
     ImageButton &protoItem = static_cast<ImageButton &>(_binding.lbItems->protoItem());
-    protoItem.setBorderColor(getBaseColor(_game->gameId()));
-    protoItem.setHilightColor(getHilightColor(_game->gameId()));
+    protoItem.setBorderColor(_game->getGUIColorBase());
+    protoItem.setHilightColor(_game->getGUIColorHilight());
 }
 
 static int getInventorySlot(Equipment::Slot slot) {
@@ -246,7 +243,7 @@ void Equipment::update() {
 
     auto partyLeader(_game->services().party().getLeader());
 
-    if (isKotOR(_game->gameId())) {
+    if (_game->isKotOR()) {
         string vitalityString(str(boost::format("%d/\n%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
         _binding.lblVitality->setTextMessage(vitalityString);
     }
@@ -254,7 +251,7 @@ void Equipment::update() {
 }
 
 void Equipment::updatePortraits() {
-    if (_game->gameId() != GameID::KotOR) return;
+    if (_game->id() != GameID::KotOR) return;
 
     Party &party = _game->services().party();
     shared_ptr<Creature> partyLeader(party.getLeader());
@@ -303,7 +300,7 @@ void Equipment::selectSlot(Slot slot) {
     _binding.lbDesc->setVisible(!noneSelected);
     _binding.lblSlotName->setVisible(noneSelected);
 
-    if (_game->gameId() == GameID::KotOR) {
+    if (_game->id() == GameID::KotOR) {
         _binding.lblPortBord->setVisible(noneSelected);
         _binding.lblPortrait->setVisible(noneSelected);
         _binding.lblTxtBar->setVisible(noneSelected);
@@ -430,7 +427,7 @@ void Equipment::updateItems() {
 
 shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
     string resRef;
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";

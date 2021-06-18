@@ -19,8 +19,6 @@
 
 #include "../../game.h"
 
-#include "../colorutil.h"
-
 #include "chargen.h"
 
 using namespace std;
@@ -46,7 +44,7 @@ void CustomCharacterGeneration::load() {
     GUI::load();
     doSetStep(0);
 
-    if (_game->gameId() == GameID::KotOR) {
+    if (_game->id() == GameID::KotOR) {
         setControlDiscardColor("LBL_BG", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }

@@ -24,7 +24,6 @@
 
 #include "../action/usefeat.h"
 #include "../game.h"
-#include "../gameidutil.h"
 #include "../party.h"
 
 using namespace std;
@@ -119,7 +118,7 @@ void HUD::load() {
     _binding.tbSolo->setVisible(false);
     _binding.tbStealth->setVisible(false);
 
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         _binding.btnSwapWeapons->setVisible(false);
         _binding.btnAction4->setVisible(false);
         _binding.btnAction5->setVisible(false);
@@ -243,7 +242,7 @@ void HUD::bindControls() {
     _binding.tbSolo = getControlPtr<ToggleButton>("TB_SOLO");
     _binding.tbStealth = getControlPtr<ToggleButton>("TB_STEALTH");
 
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         _binding.btnAction4 = getControlPtr<Button>("BTN_ACTION4");
         _binding.btnAction5 = getControlPtr<Button>("BTN_ACTION5");
         _binding.btnActionDown4 = getControlPtr<Button>("BTN_ACTIONDOWN4");
@@ -336,7 +335,7 @@ void HUD::drawMinimap() {
 }
 
 void HUD::drawHealth(int memberIndex) {
-    if (isTSL(_game->gameId())) return;
+    if (_game->isTSL()) return;
 
     Party &party = _game->services().party();
     shared_ptr<Creature> member(party.getMember(memberIndex));
@@ -372,7 +371,7 @@ void HUD::toggleCombat(bool enabled) {
     _binding.lblQueue2->setVisible(enabled);
     _binding.lblQueue3->setVisible(enabled);
 
-    if (isKotOR(_game->gameId())) {
+    if (_game->isKotOR()) {
         _binding.lblCombatBg1->setVisible(enabled);
         _binding.lblCombatBg2->setVisible(enabled);
         _binding.lblCombatBg3->setVisible(enabled);

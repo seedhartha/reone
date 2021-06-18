@@ -29,8 +29,6 @@
 #include "../../portrait.h"
 #include "../../portraits.h"
 
-#include "../colorutil.h"
-
 #include "chargen.h"
 
 using namespace std;
@@ -55,7 +53,7 @@ PortraitSelection::PortraitSelection(CharacterGeneration *charGen, Game *game) :
 
     initForGame();
 
-    if (game->gameId() == GameID::KotOR) {
+    if (game->id() == GameID::KotOR) {
         loadBackground(BackgroundType::Menu);
     }
 }
@@ -71,11 +69,11 @@ void PortraitSelection::setButtonColors(const string &tag) {
     Control &control = getControl(tag);
 
     Control::Text text(control.text());
-    text.color = getBaseColor(_game->gameId());
+    text.color = _game->getGUIColorBase();
     control.setText(move(text));
 
     Control::Border hilight(control.hilight());
-    hilight.color = getHilightColor(_game->gameId());
+    hilight.color = _game->getGUIColorHilight();
     control.setHilight(move(hilight));
 }
 

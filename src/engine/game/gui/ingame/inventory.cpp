@@ -18,9 +18,6 @@
 #include "inventory.h"
 
 #include "../../game.h"
-#include "../../gameidutil.h"
-
-#include "../colorutil.h"
 
 using namespace std;
 
@@ -47,7 +44,7 @@ void InventoryMenu::load() {
     _binding.btnUseItem->setDisabled(true);
     _binding.btnQuestItems->setDisabled(true);
 
-    if (isKotOR(_game->gameId())) {
+    if (_game->isKotOR()) {
         _binding.lblVit->setVisible(false);
         _binding.lblDef->setVisible(false);
         _binding.btnChange1->setFocusable(false);
@@ -65,7 +62,7 @@ void InventoryMenu::bindControls() {
     _binding.lbDescription = getControlPtr<ListBox>("LB_DESCRIPTION");
     _binding.lbItems = getControlPtr<ListBox>("LB_ITEMS");
 
-    if (isKotOR(_game->gameId())) {
+    if (_game->isKotOR()) {
         _binding.btnChange1 = getControlPtr<Button>("BTN_CHANGE1");
         _binding.btnChange2 = getControlPtr<Button>("BTN_CHANGE2");
         _binding.lblBgPort = getControlPtr<Label>("LBL_BGPORT");
@@ -92,7 +89,7 @@ void InventoryMenu::bindControls() {
 }
 
 void InventoryMenu::refreshPortraits() {
-    if (_game->gameId() != GameID::KotOR) return;
+    if (_game->id() != GameID::KotOR) return;
 
     Party &party = _game->services().party();
     shared_ptr<Creature> partyLeader(party.getLeader());
@@ -101,7 +98,7 @@ void InventoryMenu::refreshPortraits() {
 
     _binding.lblPort->setBorderFill(partyLeader->portrait());
 
-    if (isKotOR(_game->gameId())) {
+    if (_game->isKotOR()) {
         _binding.btnChange1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
         _binding.btnChange1->setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
 

@@ -22,9 +22,6 @@
 
 #include "../../d20/classes.h"
 #include "../../game.h"
-#include "../../gameidutil.h"
-
-#include "../colorutil.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -50,7 +47,7 @@ void CharacterMenu::load() {
     bindControls();
 
     _binding.btnAuto->setDisabled(true);
-    if (isKotOR(_game->gameId())) {
+    if (_game->isKotOR()) {
         _binding.btnCharLeft->setVisible(false);
         _binding.btnCharRight->setVisible(false);
 
@@ -108,7 +105,7 @@ void CharacterMenu::bindControls() {
     _binding.btnExit = getControlPtr<Button>("BTN_EXIT");
     _binding.btnAuto = getControlPtr<Button>("BTN_AUTO");
     _binding.btnLevelup = getControlPtr<Button>("BTN_LEVELUP");
-    if (isKotOR(_game->gameId())) {
+    if (_game->isKotOR()) {
         _binding.lblAdorn = getControlPtr<Label>("LBL_ADORN");
         _binding.btnScripts = getControlPtr<Button>("BTN_SCRIPTS");
         _binding.lblClass = getControlPtr<Label>("LBL_CLASS");
@@ -159,7 +156,7 @@ void CharacterMenu::refreshControls() {
     shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
     CreatureAttributes &attributes = partyLeader->attributes();
 
-    if (isKotOR(_game->gameId())) {
+    if (_game->isKotOR()) {
         _binding.lblClass1->setTextMessage(describeClass(attributes.getClassByPosition(1)));
         _binding.lblClass2->setTextMessage(describeClass(attributes.getClassByPosition(2)));
         _binding.lblLevel1->setTextMessage(toStringOrEmptyIfZero(attributes.getLevelByPosition(1)));
@@ -202,7 +199,7 @@ string CharacterMenu::describeClass(ClassType clazz) const {
 }
 
 void CharacterMenu::refreshPortraits() {
-    if (_game->gameId() != GameID::KotOR) return;
+    if (_game->id() != GameID::KotOR) return;
 
     Party &party = _game->services().party();
     shared_ptr<Creature> partyMember1(party.getMember(1));

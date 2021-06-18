@@ -19,8 +19,6 @@
 
 #include "../../game.h"
 
-#include "../colorutil.h"
-
 using namespace reone::gui;
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -42,7 +40,7 @@ void LevelUpMenu::load() {
     GUI::load();
     doSetStep(0);
 
-    if (_game->gameId() == GameID::KotOR) {
+    if (_game->id() == GameID::KotOR) {
         setControlDiscardColor("LBL_DECORATION", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }

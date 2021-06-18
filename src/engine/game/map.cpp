@@ -26,8 +26,6 @@
 #include "../resource/types.h"
 
 #include "game.h"
-#include "gameidutil.h"
-#include "gui/colorutil.h"
 
 using namespace std;
 
@@ -65,7 +63,7 @@ void Map::loadTextures(const string &area) {
 
     if (!_arrowTexture) {
         string resRef("mm_barrow");
-        if (isTSL(_game->gameId())) {
+        if (_game->isTSL()) {
             resRef += "_p";
         }
         _arrowTexture = _game->services().graphics().textures().get(resRef, TextureUsage::GUI);
@@ -158,7 +156,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         ShaderUniforms uniforms;
         uniforms.combined.general.projection = _game->services().graphics().window().getOrthoProjection();
         uniforms.combined.general.model = transform;
-        uniforms.combined.general.color = glm::vec4(selected ? getHilightColor(_game->gameId()) : getBaseColor(_game->gameId()), 1.0f);
+        uniforms.combined.general.color = glm::vec4(selected ? _game->getGUIColorHilight() : _game->getGUIColorBase(), 1.0f);
 
         _game->services().graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
         _game->services().graphics().meshes().quad().draw();

@@ -18,9 +18,6 @@
 #include "computer.h"
 
 #include "../game.h"
-#include "../gameidutil.h"
-
-#include "colorutil.h"
 
 using namespace std;
 
@@ -35,7 +32,7 @@ ComputerGUI::ComputerGUI(Game *game) : Conversation(game) {
     _resRef = getResRef("computer");
     _scaling = ScalingMode::Stretch;
 
-    if (isTSL(game->gameId())) {
+    if (game->isTSL()) {
         _resolutionX = 800;
         _resolutionY = 600;
     }
@@ -60,7 +57,7 @@ void ComputerGUI::bindControls() {
     _binding.lbMessage = getControlPtr<ListBox>("LB_MESSAGE");
     _binding.lbReplies = getControlPtr<ListBox>("LB_REPLIES");
 
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         _binding.lblBar1 = getControlPtr<Label>("LBL_BAR1");
         _binding.lblBar2 = getControlPtr<Label>("LBL_BAR2");
         _binding.lblBar3 = getControlPtr<Label>("LBL_BAR3");
@@ -82,14 +79,14 @@ void ComputerGUI::bindControls() {
 
 void ComputerGUI::configureMessage() {
     _binding.lbMessage->setProtoMatchContent(true);
-    _binding.lbMessage->protoItem().setHilightColor(getHilightColor(_game->gameId()));
-    _binding.lbMessage->protoItem().setTextColor(getBaseColor(_game->gameId()));
+    _binding.lbMessage->protoItem().setHilightColor(_game->getGUIColorHilight());
+    _binding.lbMessage->protoItem().setTextColor(_game->getGUIColorBase());
 }
 
 void ComputerGUI::configureReplies() {
     _binding.lbReplies->setProtoMatchContent(true);
-    _binding.lbReplies->protoItem().setHilightColor(getHilightColor(_game->gameId()));
-    _binding.lbReplies->protoItem().setTextColor(getBaseColor(_game->gameId()));
+    _binding.lbReplies->protoItem().setHilightColor(_game->getGUIColorHilight());
+    _binding.lbReplies->protoItem().setTextColor(_game->getGUIColorBase());
 }
 
 void ComputerGUI::setMessage(string message) {

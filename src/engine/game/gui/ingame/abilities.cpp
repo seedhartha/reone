@@ -23,9 +23,6 @@
 #include "../../../resource/strings.h"
 
 #include "../../game.h"
-#include "../../gameidutil.h"
-
-#include "../colorutil.h"
 
 using namespace std;
 
@@ -94,15 +91,15 @@ void AbilitiesMenu::loadSkills() {
         ListBox::Item item;
         item.tag = to_string(static_cast<int>(skill.second.skill));
         item.text = skill.second.name;
-        item.iconFrame = getFrameTexture(_game->gameId());
+        item.iconFrame = getFrameTexture();
         item.iconTexture = skill.second.icon;
         lbAbility.addItem(move(item));
     }
 }
 
-shared_ptr<Texture> AbilitiesMenu::getFrameTexture(GameID gameId) const {
+shared_ptr<Texture> AbilitiesMenu::getFrameTexture() const {
     string resRef;
-    if (isTSL(gameId)) {
+    if (_game->isTSL()) {
         resRef = "uibit_eqp_itm1";
     } else {
         resRef = "lbl_hex_3";
@@ -115,7 +112,7 @@ void AbilitiesMenu::refreshControls() {
 }
 
 void AbilitiesMenu::refreshPortraits() {
-    if (_game->gameId() != GameID::KotOR) return;
+    if (_game->id() != GameID::KotOR) return;
 
     Party &party = _game->services().party();
     shared_ptr<Creature> partyLeader(party.getLeader());
