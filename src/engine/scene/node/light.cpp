@@ -53,10 +53,10 @@ void LightSceneNode::update(float dt) {
 
     if (_active) {
         // Fade out
-        _fadeFactor = glm::max(0.0f, _fadeFactor - kFadeSpeed * dt);
+        _fadeFactor = _modelNode->light()->fading ? glm::max(0.0f, _fadeFactor - kFadeSpeed * dt) : 0.0f;
     } else {
         // Fade in
-        _fadeFactor = glm::min(1.0f, _fadeFactor + kFadeSpeed * dt);
+        _fadeFactor = _modelNode->light()->fading ? glm::min(1.0f, _fadeFactor + kFadeSpeed * dt) : 1.0f;
     }
 }
 
