@@ -21,6 +21,14 @@
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+class Label;
+class ListBox;
+
+}
+
 namespace game {
 
 class InventoryMenu : public GameGUI {
@@ -32,6 +40,46 @@ public:
     void refreshPortraits();
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::Button> btnExit;
+        std::shared_ptr<gui::Button> btnQuestItems;
+        std::shared_ptr<gui::Button> btnUseItem;
+        std::shared_ptr<gui::Label> lblCredits;
+        std::shared_ptr<gui::Label> lblCreditsValue;
+        std::shared_ptr<gui::Label> lblInv;
+        std::shared_ptr<gui::ListBox> lbDescription;
+        std::shared_ptr<gui::ListBox> lbItems;
+
+        // KotOR only
+        std::shared_ptr<gui::Button> btnChange1;
+        std::shared_ptr<gui::Button> btnChange2;
+        std::shared_ptr<gui::Label> lblBgPort;
+        std::shared_ptr<gui::Label> lblBgStats;
+        std::shared_ptr<gui::Label> lblDef;
+        std::shared_ptr<gui::Label> lblPort;
+        std::shared_ptr<gui::Label> lblVit;
+        // END KotOR only
+
+        // TSL only
+        std::shared_ptr<gui::Button> btnAll;
+        std::shared_ptr<gui::Button> btnArmor;
+        std::shared_ptr<gui::Button> btnDatapads;
+        std::shared_ptr<gui::Button> btnMisc;
+        std::shared_ptr<gui::Button> btnQuests;
+        std::shared_ptr<gui::Button> btnUseable;
+        std::shared_ptr<gui::Button> btnWeapons;
+        std::shared_ptr<gui::Label> lblBar1;
+        std::shared_ptr<gui::Label> lblBar2;
+        std::shared_ptr<gui::Label> lblBar3;
+        std::shared_ptr<gui::Label> lblBar4;
+        std::shared_ptr<gui::Label> lblBar5;
+        std::shared_ptr<gui::Label> lblBar6;
+        std::shared_ptr<gui::Label> lblFilter;
+        // END TSL only
+    } _binding;
+
+    void bindControls();
+
     void onClick(const std::string &control) override;
 };
 
