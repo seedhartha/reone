@@ -51,7 +51,7 @@ void GameServices::init() {
     _surfaces = make_unique<Surfaces>(_resource.resources());
     _surfaces->init();
 
-    _cursors = make_unique<Cursors>(_game.gameId(), _graphics, _resource);
+    _cursors = make_unique<Cursors>(_game.id(), _graphics, _resource);
     _soundSets = make_unique<SoundSets>(_audio.files(), _resource);
     _footstepSounds = make_unique<FootstepSounds>(_audio.files(), _resource.resources());
 

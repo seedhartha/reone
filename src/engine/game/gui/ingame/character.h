@@ -106,7 +106,7 @@ private:
         std::shared_ptr<gui::Label> lblName;
         std::shared_ptr<gui::Button> btnCharLeft;
         std::shared_ptr<gui::Button> btnCharRight;
-        // End KOTOR only
+        // END KOTOR only
 
         // TSL only
         std::shared_ptr<gui::Label> lblForceMastery;
@@ -115,7 +115,7 @@ private:
         std::shared_ptr<gui::Label> lblTitle;
         std::shared_ptr<gui::Label> lblXpBack;
         std::shared_ptr<gui::Label> lblBar[kNumControlsBar];
-        // End TSL only
+        // END TSL only
     } _binding;
 
     InGameMenu &_inGameMenu;

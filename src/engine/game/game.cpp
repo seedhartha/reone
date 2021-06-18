@@ -21,8 +21,6 @@
 #include "../common/pathutil.h"
 #include "../video/bikreader.h"
 
-#include "gameidutil.h"
-
 using namespace std;
 
 using namespace reone::audio;
@@ -81,6 +79,7 @@ int Game::run() {
 void Game::init() {
     _gameId = determineGameID(_path);
 
+    initGUIColors();
     initResourceProviders();
 
     _game = make_unique<GameServices>(*this, _resource, _graphics, _audio, _scene, _script);
@@ -99,8 +98,20 @@ void Game::init() {
     setCursorType(CursorType::Default);
 }
 
+void Game::initGUIColors() {
+    if (isTSL()) {
+        _guiColorBase = glm::vec3(0.192157f, 0.768627f, 0.647059f);
+        _guiColorHilight = glm::vec3(0.768627f, 0.768627f, 0.686275f);
+        _guiColorDisabled = glm::vec3(0.513725f, 0.513725f, 0.415686f);
+    } else {
+        _guiColorBase = glm::vec3(0.0f, 0.639216f, 0.952941f);
+        _guiColorHilight = glm::vec3(0.980392f, 1.0f, 0.0f);
+        _guiColorDisabled = glm::vec3(0.0f, 0.349020f, 0.549020f);
+    }
+}
+
 void Game::initResourceProviders() {
-    if (isTSL(_gameId)) {
+    if (isTSL()) {
         initResourceProvidersForTSL();
     } else {
         initResourceProvidersForKotOR();
@@ -170,7 +181,7 @@ void Game::changeScreen(GameScreen screen) {
 }
 
 string Game::getMainMenuMusic() const {
-    return isTSL(_gameId) ? "mus_sion" : "mus_theme_cult";
+    return isTSL() ? "mus_sion" : "mus_theme_cult";
 }
 
 void Game::playMusic(const string &resRef) {
@@ -286,7 +297,7 @@ void Game::loadModuleResources(const string &moduleName) {
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
     _resource.resources().indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
 
-    if (isTSL(_gameId)) {
+    if (isTSL()) {
         _resource.resources().indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"), true);
     }
 }
@@ -536,7 +547,7 @@ void Game::deinit() {
 }
 
 void Game::startCharacterGeneration() {
-    string imageResRef(isTSL(_gameId) ? "load_default" : "load_chargen");
+    string imageResRef(isTSL() ? "load_default" : "load_chargen");
     withLoadingScreen(imageResRef, [this]() {
         if (!_charGen) {
             loadCharacterGeneration();
@@ -549,7 +560,7 @@ void Game::startCharacterGeneration() {
 }
 
 string Game::getCharacterGenerationMusic() const {
-    return isTSL(_gameId) ? "mus_main" : "mus_theme_rep";
+    return isTSL() ? "mus_main" : "mus_theme_rep";
 }
 
 void Game::quit() {

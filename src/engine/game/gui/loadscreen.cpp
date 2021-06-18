@@ -20,7 +20,6 @@
 #include "../../resource/resources.h"
 
 #include "../game.h"
-#include "../gameidutil.h"
 
 using namespace std;
 
@@ -34,7 +33,7 @@ namespace game {
 LoadingScreen::LoadingScreen(Game *game) : GameGUI(game) {
     _resRef = getResRef("loadscreen");
 
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         _resolutionX = 800;
         _resolutionY = 600;
     } else {

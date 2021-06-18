@@ -17,8 +17,6 @@
 
 #include "feats.h"
 
-#include "../colorutil.h"
-
 #include "chargen.h"
 
 using namespace std;

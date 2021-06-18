@@ -23,10 +23,7 @@
 
 #include "../../d20/classes.h"
 #include "../../game.h"
-#include "../../gameidutil.h"
 #include "../../portraits.h"
-
-#include "../colorutil.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -327,7 +324,7 @@ void CharacterGeneration::finish() {
         party.addMember(kNpcPlayer, player);
         party.setPlayer(player);
 
-        string moduleName(_game->gameId() == GameID::KotOR ? "end_m01aa" : "001ebo");
+        string moduleName(_game->id() == GameID::KotOR ? "end_m01aa" : "001ebo");
         _game->loadModule(moduleName);
     }
 }
@@ -402,7 +399,7 @@ void CharacterGeneration::updateAttributes() {
 
     const SavingThrows &throws = clazz->getSavingThrows(1);
 
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         setControlText("NEW_FORT_LBL", to_string(throws.fortitude));
         setControlText("NEW_REFL_LBL", to_string(throws.reflex));
         setControlText("NEW_WILL_LBL", to_string(throws.will));

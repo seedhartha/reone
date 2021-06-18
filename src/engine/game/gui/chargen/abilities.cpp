@@ -23,8 +23,6 @@
 #include "../../d20/classes.h"
 #include "../../game.h"
 
-#include "../colorutil.h"
-
 #include "chargen.h"
 
 using namespace std;
@@ -75,7 +73,7 @@ void CharGenAbilities::load() {
     for (auto &label : labels) {
         configureControl(label, [this](Control &control) {
             control.setFocusable(true);
-            control.setHilightColor(getBaseColor(_game->gameId()));
+            control.setHilightColor(_game->getGUIColorBase());
         });
     }
 

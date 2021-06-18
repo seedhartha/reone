@@ -35,8 +35,6 @@
 #include "../objectconverter.h"
 #include "../reputes.h"
 
-#include "colorutil.h"
-
 using namespace std;
 
 using namespace reone::graphics;
@@ -419,7 +417,7 @@ glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {
 
     return (_selectedObject && _selectedHostile) ?
         red :
-        getBaseColor(_game->gameId());
+        _game->getGUIColorBase();
 }
 
 } // namespace game

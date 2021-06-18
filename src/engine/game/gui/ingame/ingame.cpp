@@ -18,7 +18,6 @@
 #include "ingame.h"
 
 #include "../../game.h"
-#include "../../gameidutil.h"
 
 using namespace std;
 
@@ -44,7 +43,7 @@ static unordered_map<InGameMenu::Tab, string> g_tabTags {
 InGameMenu::InGameMenu(Game *game) : GameGUI(game) {
     _resRef = getResRef("top");
 
-    if (isTSL(game->gameId())) {
+    if (game->isTSL()) {
         _resolutionX = 800;
         _resolutionY = 600;
     }
@@ -248,11 +247,11 @@ void InGameMenu::onClick(const string &control) {
 }
 
 shared_ptr<Button> InGameMenu::getBtnChange2() {
-    return isTSL(_game->gameId()) ? getControlPtr<Button>("BTN_CHANGE2") : nullptr;
+    return _game->isTSL() ? getControlPtr<Button>("BTN_CHANGE2") : nullptr;
 }
 
 shared_ptr<Button> InGameMenu::getBtnChange3() {
-    return isTSL(_game->gameId()) ? getControlPtr<Button>("BTN_CHANGE3") : nullptr;
+    return _game->isTSL() ? getControlPtr<Button>("BTN_CHANGE3") : nullptr;
 }
 
 } // namespace game

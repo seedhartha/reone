@@ -22,11 +22,8 @@
 #include "../../resource/strings.h"
 
 #include "../game.h"
-#include "../gameidutil.h"
 #include "../object/item.h"
 #include "../objectconverter.h"
-
-#include "colorutil.h"
 
 using namespace std;
 
@@ -101,7 +98,7 @@ void Container::open(shared_ptr<SpatialObject> container) {
 
 shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
     string resRef;
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";

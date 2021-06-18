@@ -25,9 +25,6 @@
 #include "../../resource/strings.h"
 
 #include "../game.h"
-#include "../gameidutil.h"
-
-#include "colorutil.h"
 
 namespace fs = boost::filesystem;
 
@@ -53,7 +50,7 @@ SaveLoad::SaveLoad(Game *game) : GameGUI(game) {
 
     initForGame();
 
-    if (game->gameId() == GameID::KotOR) {
+    if (game->id() == GameID::KotOR) {
         loadBackground(BackgroundType::Menu);
     }
 }
@@ -69,7 +66,7 @@ void SaveLoad::load() {
     _binding.lbGames->setPadding(3);
 
     _binding.lbGames->protoItem().setUseBorderColorOverride(true);
-    _binding.lbGames->protoItem().setBorderColorOverride(getBaseColor(_game->gameId()));
+    _binding.lbGames->protoItem().setBorderColorOverride(_game->getGUIColorBase());
     _binding.lbGames->protoItem().setHilightColor(_defaultHilightColor);
 }
 
@@ -86,7 +83,7 @@ void SaveLoad::bindControls() {
     _binding.lblScreenshot = getControlPtr<Label>("LBL_SCREENSHOT");
     _binding.lbGames = getControlPtr<ListBox>("LB_GAMES");
 
-    if (isTSL(_game->gameId())) {
+    if (_game->isTSL()) {
         _binding.btnFilter = getControlPtr<Button>("BTN_FILTER");
         _binding.lblBar1 = getControlPtr<Label>("LBL_BAR1");
         _binding.lblBar2 = getControlPtr<Label>("LBL_BAR2");

@@ -22,8 +22,6 @@
 
 #include "../../game.h"
 
-#include "../colorutil.h"
-
 #include "chargen.h"
 
 using namespace std;
@@ -51,7 +49,7 @@ QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, Game *game) :
 void QuickOrCustom::load() {
     GUI::load();
 
-    if (_game->gameId() == GameID::KotOR) {
+    if (_game->id() == GameID::KotOR) {
         setControlDiscardColor("LBL_RBG", glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 

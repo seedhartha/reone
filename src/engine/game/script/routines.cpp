@@ -27,7 +27,6 @@
 #include "../object/sound.h"
 
 #include "../game.h"
-#include "../gameidutil.h"
 
 using namespace std;
 
@@ -42,7 +41,7 @@ Routines::Routines(Game &game) : _game(game) {
 }
 
 void Routines::init() {
-    if (isTSL(_game.gameId())) {
+    if (_game.isTSL()) {
         addTslRoutines();
     } else {
         addKotorRoutines();

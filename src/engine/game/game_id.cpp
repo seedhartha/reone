@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "gameidutil.h"
+#include "game.h"
 
 #include "../common/pathutil.h"
 
@@ -25,7 +25,7 @@ namespace reone {
 
 namespace game {
 
-GameID determineGameID(const fs::path &gameDir) {
+GameID Game::determineGameID(const fs::path &gameDir) const {
     // If there is no swkotor2 executable, then this is KotOR
     fs::path exePath(getPathIgnoreCase(gameDir, "swkotor2.exe", false));
     if (exePath.empty()) return GameID::KotOR;
@@ -37,12 +37,12 @@ GameID determineGameID(const fs::path &gameDir) {
     return GameID::TSL;
 }
 
-bool isKotOR(GameID gameId) {
-    return gameId == GameID::KotOR;
+bool Game::isKotOR() const {
+    return _gameId == GameID::KotOR;
 }
 
-bool isTSL(GameID gameId) {
-    switch (gameId) {
+bool Game::isTSL() const {
+    switch (_gameId) {
         case GameID::TSL:
         case GameID::TSL_Steam:
             return true;

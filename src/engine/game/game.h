@@ -96,7 +96,7 @@ public:
     Camera *getActiveCamera() const;
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
-    GameID gameId() const { return _gameId; }
+    GameID id() const { return _gameId; }
     const Options &options() const { return _options; }
     GameServices &services() { return *_game; }
     std::shared_ptr<Module> module() const { return _module; }
@@ -110,6 +110,13 @@ public:
     void setLoadFromSaveGame(bool load);
     void setPaused(bool paused);
     void setRelativeMouseMode(bool relative);
+
+    // Game ID
+
+    bool isKotOR() const;
+    bool isTSL() const;
+
+    // END Game ID
 
     // Module loading
 
@@ -166,6 +173,14 @@ public:
     void loadFromFile(const boost::filesystem::path &path);
 
     // END Saved games
+
+    // GUI colors
+
+    const glm::vec3 &getGUIColorBase() const { return _guiColorBase; }
+    const glm::vec3 &getGUIColorHilight() const { return _guiColorHilight; }
+    const glm::vec3 &getGUIColorDisabled() const { return _guiColorDisabled; }
+
+    // END GUI colors
 
     // IEventHandler
 
@@ -240,6 +255,10 @@ private:
     std::unique_ptr<Console> _console;
     std::unique_ptr<ProfileOverlay> _profileOverlay;
 
+    glm::vec3 _guiColorBase { 0.0f };
+    glm::vec3 _guiColorHilight { 0.0f };
+    glm::vec3 _guiColorDisabled { 0.0f };
+
     // END GUI
 
     // Audio
@@ -264,16 +283,22 @@ private:
 
     void update();
 
-    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
     void loadNextModule();
     float measureFrameTime();
     void playMusic(const std::string &resRef);
     void runMainLoop();
     void toggleInGameCameraType();
-    void updateCamera(float dt);
     void stopMovement();
     void changeScreen(GameScreen screen);
+
+    GameID determineGameID(const boost::filesystem::path &path) const;
+
+    void initGUIColors();
+
+    bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
+    bool handleKeyDown(const SDL_KeyboardEvent &event);
+
+    void updateCamera(float dt);
     void updateVideo(float dt);
     void updateMusic();
     void updateSceneGraph(float dt);
