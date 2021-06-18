@@ -207,6 +207,15 @@ public:
 
     // END Physics
 
+    // Gold
+
+    void giveGold(int amount);
+    void takeGold(int amount);
+
+    int gold() const { return _gold; }
+
+    // END Gold
+
     // Scripts
 
     void runSpawnScript();
@@ -263,6 +272,7 @@ private:
     bool _disarmable { false };
     uint32_t _footstepType { 0 };
     int _walkmeshMaterial { -1 };
+    int _gold { 0 }; /**< aka credits */
 
     // Animation
 

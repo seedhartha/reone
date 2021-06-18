@@ -565,6 +565,48 @@ Variable Routines::objectToString(const VariablesList &args, ExecutionContext &c
     return Variable::ofString(move(result));
 }
 
+Variable Routines::getGold(const VariablesList &args, ExecutionContext &ctx) {
+    int result = 0;
+    auto target = getCreatureOrCaller(args, 0, ctx);
+    if (target) {
+        result = target->gold();
+    } else {
+        debug("Script: getGold: target is invalid", 1, DebugChannels::script);
+    }
+    return Variable::ofInt(result);
+}
+
+Variable Routines::giveGoldToCreature(const VariablesList &args, ExecutionContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
+    auto gp = getInt(args, 1);
+    if (creature) {
+        creature->giveGold(gp);
+    } else {
+        debug("Script: giveGoldToCreature: creature is invalid", 1, DebugChannels::script);
+    }
+    return Variable();
+}
+
+Variable Routines::takeGoldFromCreature(const VariablesList &args, ExecutionContext &ctx) {
+    auto amount = getInt(args, 0);
+    auto creatureToTakeFrom = getCreature(args, 1, ctx);
+    auto destroy = getBool(args, 2);
+    if (creatureToTakeFrom) {
+        creatureToTakeFrom->takeGold(amount);
+    } else {
+        debug("Script: takeGoldFromCreature: creatureToTakeFrom is invalid", 1, DebugChannels::script);
+    }
+    if (!destroy) {
+        auto caller = getCallerAsCreature(ctx);
+        if (caller) {
+            caller->giveGold(amount);
+        } else {
+            debug("Script: takeGoldFromCreature: caller is invalid", 1, DebugChannels::script);
+        }
+    }
+    return Variable();
+}
+
 } // namespace game
 
 } // namespace reone
