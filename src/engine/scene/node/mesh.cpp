@@ -287,14 +287,18 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
 
             // Offset bone matrices by 1 to account for negative bone indices
             uniforms.skeletal->bones[0] = glm::mat4(1.0f);
-            for (size_t i = 1; i < 1 + mesh->skin->boneNodeName.size() && i < kMaxBones; ++i) {
-                string nodeName = mesh->skin->boneNodeName[i - 1];
-                if (!nodeName.empty()) {
-                    shared_ptr<ModelNodeSceneNode> bone(_model->getNodeByName(nodeName));
-                    if (bone && bone->type() == SceneNodeType::Mesh) {
-                        uniforms.skeletal->bones[i] = _modelNode->absoluteTransformInverse() * bone->boneTransform() * _modelNode->absoluteTransform();
+            for (size_t i = 1; i < kMaxBones; ++i) {
+                glm::mat4 tmp(1.0f);
+                if (i < 1 + mesh->skin->boneNodeName.size()) {
+                    string nodeName = mesh->skin->boneNodeName[i - 1];
+                    if (!nodeName.empty()) {
+                        shared_ptr<ModelNodeSceneNode> bone(_model->getNodeByName(nodeName));
+                        if (bone && bone->type() == SceneNodeType::Mesh) {
+                            tmp = _modelNode->absoluteTransformInverse() * bone->boneTransform() * _modelNode->absoluteTransform();
+                        }
                     }
                 }
+                uniforms.skeletal->bones[i] = move(tmp);
             }
         }
 
