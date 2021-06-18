@@ -48,7 +48,7 @@ const int FEATURE_FOG = 0x20000;
 const int FEATURE_DANGLYMESH = 0x40000;
 
 const int NUM_CUBE_FACES = 6;
-const int MAX_BONES = 128;
+const int MAX_BONES = 24;
 const int MAX_LIGHTS = 8;
 const int MAX_PARTICLES = 64;
 const int MAX_CHARS = 128;

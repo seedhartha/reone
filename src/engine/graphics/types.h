@@ -26,7 +26,7 @@ constexpr int kNumCubeFaces = 6;
 constexpr float kDefaultClipPlaneNear = 0.1f;
 constexpr float kDefaultClipPlaneFar = 10000.0f;
 
-constexpr int kMaxBones = 128;
+constexpr int kMaxBones = 24;
 constexpr int kMaxLights = 8;
 constexpr int kMaxParticles = 64;
 constexpr int kMaxCharacters = 128;
