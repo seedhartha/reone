@@ -18,6 +18,7 @@
 #include "inventory.h"
 
 #include "../../game.h"
+#include "../../gameidutil.h"
 
 #include "../colorutil.h"
 
@@ -40,18 +41,54 @@ InventoryMenu::InventoryMenu(Game *game) : GameGUI(game) {
 
 void InventoryMenu::load() {
     GUI::load();
+    bindControls();
 
-    hideControl("BTN_CHARLEFT");
-    hideControl("BTN_CHARRIGHT");
-    hideControl("LBL_CREDITS_VALUE");
-    hideControl("LBL_VIT");
-    hideControl("LBL_DEF");
+    _binding.lblCreditsValue->setVisible(false);
+    _binding.btnUseItem->setDisabled(true);
+    _binding.btnQuestItems->setDisabled(true);
 
-    disableControl("BTN_USEITEM");
-    disableControl("BTN_QUESTITEMS");
+    if (isKotOR(_game->gameId())) {
+        _binding.lblVit->setVisible(false);
+        _binding.lblDef->setVisible(false);
+        _binding.btnChange1->setFocusable(false);
+        _binding.btnChange2->setFocusable(false);
+    }
+}
 
-    setControlFocusable("BTN_CHANGE1", false);
-    setControlFocusable("BTN_CHANGE2", false);
+void InventoryMenu::bindControls() {
+    _binding.btnExit = getControlPtr<Button>("BTN_EXIT");
+    _binding.btnQuestItems = getControlPtr<Button>("BTN_QUESTITEMS");
+    _binding.btnUseItem = getControlPtr<Button>("BTN_USEITEM");
+    _binding.lblCredits = getControlPtr<Label>("LBL_CREDITS");
+    _binding.lblCreditsValue = getControlPtr<Label>("LBL_CREDITS_VALUE");
+    _binding.lblInv = getControlPtr<Label>("LBL_INV");
+    _binding.lbDescription = getControlPtr<ListBox>("LB_DESCRIPTION");
+    _binding.lbItems = getControlPtr<ListBox>("LB_ITEMS");
+
+    if (isKotOR(_game->gameId())) {
+        _binding.btnChange1 = getControlPtr<Button>("BTN_CHANGE1");
+        _binding.btnChange2 = getControlPtr<Button>("BTN_CHANGE2");
+        _binding.lblBgPort = getControlPtr<Label>("LBL_BGPORT");
+        _binding.lblBgStats = getControlPtr<Label>("LBL_BGSTATS");
+        _binding.lblDef = getControlPtr<Label>("LBL_DEF");
+        _binding.lblPort = getControlPtr<Label>("LBL_PORT");
+        _binding.lblVit = getControlPtr<Label>("LBL_VIT");
+    } else {
+        _binding.btnAll = getControlPtr<Button>("BTN_ALL");
+        _binding.btnArmor = getControlPtr<Button>("BTN_ARMOR");
+        _binding.btnDatapads = getControlPtr<Button>("BTN_DATAPADS");
+        _binding.btnMisc = getControlPtr<Button>("BTN_MISC");
+        _binding.btnQuests = getControlPtr<Button>("BTN_QUESTS");
+        _binding.btnUseable = getControlPtr<Button>("BTN_USEABLE");
+        _binding.btnWeapons = getControlPtr<Button>("BTN_WEAPONS");
+        _binding.lblBar1 = getControlPtr<Label>("LBL_BAR1");
+        _binding.lblBar2 = getControlPtr<Label>("LBL_BAR2");
+        _binding.lblBar3 = getControlPtr<Label>("LBL_BAR3");
+        _binding.lblBar4 = getControlPtr<Label>("LBL_BAR4");
+        _binding.lblBar5 = getControlPtr<Label>("LBL_BAR5");
+        _binding.lblBar6 = getControlPtr<Label>("LBL_BAR6");
+        _binding.lblFilter = getControlPtr<Label>("LBL_FILTER");
+    }
 }
 
 void InventoryMenu::refreshPortraits() {
@@ -62,16 +99,15 @@ void InventoryMenu::refreshPortraits() {
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
 
-    Control &lblPortrait = getControl("LBL_PORT");
-    lblPortrait.setBorderFill(partyLeader->portrait());
+    _binding.lblPort->setBorderFill(partyLeader->portrait());
 
-    Control &btnChange1 = getControl("BTN_CHANGE1");
-    btnChange1.setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
-    btnChange1.setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
+    if (isKotOR(_game->gameId())) {
+        _binding.btnChange1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
+        _binding.btnChange1->setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
 
-    Control &btnChange2 = getControl("BTN_CHANGE2");
-    btnChange2.setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
-    btnChange2.setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
+        _binding.btnChange2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
+        _binding.btnChange2->setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
+    }
 }
 
 void InventoryMenu::onClick(const string &control) {
