@@ -527,6 +527,7 @@ shared_ptr<ModelNode::Light> MdlReader::readLight() {
     light->affectDynamic = static_cast<bool>(affectDynamic);
     light->shadow = static_cast<bool>(shadow);
     light->flareRadius = flareRadius;
+    light->fading = static_cast<bool>(fading);
 
     int numFlares = static_cast<int>(flareTexturesArrayDef.count);
     if (numFlares > 0) {

@@ -121,6 +121,7 @@ public:
         bool ambientOnly { false };
         bool affectDynamic { false };
         bool shadow { false };
+        bool fading { false };
         float flareRadius { 0.0f };
         std::vector<LensFlare> flares;
     };
