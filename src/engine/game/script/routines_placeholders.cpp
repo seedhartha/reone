@@ -152,7 +152,6 @@ Variable Routines::getFortitudeSavingThrow(const VariablesList &args, ExecutionC
 Variable Routines::getFoundEnemyCreature(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::getGameDifficulty(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::getGoingToBeAttackedBy(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
-Variable Routines::getGold(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::getGoldPieceValue(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::getGoodEvilValue(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::getHasFeatEffect(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
@@ -293,7 +292,6 @@ Variable Routines::getTypeFromTalent(const VariablesList &args, ExecutionContext
 Variable Routines::getWasForcePowerSuccessful(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::getWeaponRanged(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::getWillSavingThrow(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
-Variable Routines::giveGoldToCreature(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::giveItem(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::givePlotXP(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::grantFeat(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
@@ -434,7 +432,6 @@ Variable Routines::surrenderByFaction(const VariablesList &args, ExecutionContex
 Variable Routines::surrenderRetainBuffs(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::surrenderToEnemies(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::switchPlayerCharacter(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
-Variable Routines::takeGoldFromCreature(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::talentFeat(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::talentSkill(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }
 Variable Routines::talentSpell(const VariablesList &args, ExecutionContext &ctx) { return Variable::notImplemented(); }

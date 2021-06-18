@@ -656,6 +656,14 @@ void Creature::onEventSignalled(const string &name) {
     }
 }
 
+void Creature::giveGold(int amount) {
+    _gold += amount;
+}
+
+void Creature::takeGold(int amount) {
+    _gold -= amount;
+}
+
 } // namespace game
 
 } // namespace reone
