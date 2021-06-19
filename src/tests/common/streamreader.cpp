@@ -16,23 +16,18 @@
  */
 
 /** @file
- *  Tests for libcommon classes.
+ *  Tests for StreamReader class.
  */
 
-#define BOOST_TEST_MODULE common
+#include <boost/test/unit_test.hpp>
 
-#include <boost/test/included/unit_test.hpp>
-
-#include "../engine/common/streamreader.h"
-#include "../engine/common/timer.h"
+#include "../../engine/common/streamreader.h"
 
 using namespace std;
 
 using namespace reone;
 
 namespace endian = boost::endian;
-
-// StreamReader
 
 BOOST_AUTO_TEST_CASE(StreamReader_GetLE) {
     auto stream = make_shared<istringstream>(string("\x01" "\xe8\x03" "\xa0\x86\x01\x00" "\x00\xe4\x0b\x54\x02\x00\x00\x00" "\x60\x79\xfe\xff" "\x00\x00\x80\x3f" "abc\0defgh", 32));
@@ -56,21 +51,3 @@ BOOST_AUTO_TEST_CASE(StreamReader_GetBE) {
     BOOST_TEST((reader.getInt32() == -100000));
     BOOST_TEST((reader.getFloat() == 1.0f));
 }
-
-// END StreamReader
-
-// Timer
-
-BOOST_AUTO_TEST_CASE(Timer_TimesOut) {
-    Timer timer(1.0f);
-
-    timer.advance(0.5f);
-
-    BOOST_TEST(!timer.isTimedOut());
-
-    timer.advance(0.6f);
-
-    BOOST_TEST(timer.isTimedOut());
-}
-
-// END Timer

@@ -27,7 +27,7 @@ option(BUILD_TESTS "build unit tests" OFF)
 option(USE_EXTERNAL_GLM "use GLM library from external subdirectory" ON)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-find_package(Boost REQUIRED COMPONENTS filesystem program_options system)
+find_package(Boost REQUIRED COMPONENTS filesystem program_options system OPTIONAL_COMPONENTS unit_test_framework)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(MAD REQUIRED)
@@ -784,22 +784,25 @@ endif()
 ## Unit tests
 
 if(BUILD_TESTS)
+    set(TEST_SOURCES
+        src/tests/common/streamreader.cpp
+        src/tests/common/timer.cpp
+        src/tests/game/pathfinder.cpp
+        src/tests/main.cpp
+        src/tests/resource/gffstruct.cpp
+        src/tests/script/execution.cpp)
+
+    add_executable(reone-tests ${TEST_SOURCES})
+    target_link_libraries(reone-tests PRIVATE libgame libscript libresource libcommon ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+    if(WIN32)
+        target_link_libraries(reone-tests PRIVATE SDL2::SDL2)
+    else()
+        target_link_libraries(reone-tests PRIVATE ${SDL2_LIBRARIES})
+    endif()
+    target_precompile_headers(reone-tests PRIVATE src/engine/pch.h)
+
     enable_testing()
-    file(GLOB TEST_FILES "src/tests/*.cpp")
-    foreach(TEST_FILE ${TEST_FILES})
-        get_filename_component(TEST_NAME "${TEST_FILE}" NAME_WE)
-        add_executable(test_${TEST_NAME} ${TEST_FILE})
-        target_link_libraries(test_${TEST_NAME} PRIVATE libgame libscript libresource libcommon ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-
-        if(WIN32)
-            target_link_libraries(test_${TEST_NAME} PRIVATE SDL2::SDL2)
-        else()
-            target_link_libraries(test_${TEST_NAME} PRIVATE ${SDL2_LIBRARIES})
-        endif()
-
-        add_test(${TEST_NAME} test_${TEST_NAME})
-        target_precompile_headers(test_${TEST_NAME} PRIVATE src/engine/pch.h)
-    endforeach()
+    add_test(reone-tests reone-tests)
 endif()
 
 ## END Unit tests

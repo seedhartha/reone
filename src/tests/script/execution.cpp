@@ -16,20 +16,16 @@
  */
 
 /** @file
- *  Tests for libscript classes.
+ *  Tests for ScriptExecution class.
  */
 
-#define BOOST_TEST_MODULE script
+#include <boost/test/unit_test.hpp>
 
-#include <boost/test/included/unit_test.hpp>
-
-#include "../engine/script/execution.h"
+#include "../../engine/script/execution.h"
 
 using namespace std;
 
 using namespace reone::script;
-
-// ScriptExecution
 
 BOOST_AUTO_TEST_CASE(ScriptExecution_Destruct) {
     Instruction instr;
@@ -119,5 +115,3 @@ BOOST_AUTO_TEST_CASE(ScriptExecution_CopyTopBp) {
     BOOST_TEST((execution.getStackVariable(4).intValue == 1));
     BOOST_TEST((execution.getStackVariable(5).intValue == 2));
 }
-
-// END ScriptExecution
