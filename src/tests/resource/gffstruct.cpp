@@ -16,15 +16,13 @@
  */
 
 /** @file
- *  Tests for libresource classes.
+ *  Tests for GffStruct class.
  */
 
-#define BOOST_TEST_MODULE resource
+#include <boost/test/unit_test.hpp>
 
-#include <boost/test/included/unit_test.hpp>
-
-#include "../engine/resource/format/gffreader.h"
-#include "../engine/resource/format/gffwriter.h"
+#include "../../engine/resource/format/gffreader.h"
+#include "../../engine/resource/format/gffwriter.h"
 
 using namespace std;
 
@@ -32,8 +30,6 @@ using namespace reone::resource;
 
 namespace endian = boost::endian;
 namespace fs = boost::filesystem;
-
-// GffStruct
 
 BOOST_AUTO_TEST_CASE(GffStruct_SaveLoad) {
     auto struct1 = make_shared<GffStruct>(0);
@@ -76,5 +72,3 @@ BOOST_AUTO_TEST_CASE(GffStruct_SaveLoad) {
     BOOST_TEST((readRoot->fields()[1].children[0]->fields()[0].uintValue == 2));
     BOOST_TEST((readRoot->fields()[1].children[1]->fields()[0].uintValue == 3));
 }
-
-// END GffStruct
