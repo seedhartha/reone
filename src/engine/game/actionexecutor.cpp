@@ -21,6 +21,7 @@
 #include "../common/guardutil.h"
 #include "../scene/types.h"
 #include "../script/execution.h"
+#include "../script/executioncontext.h"
 
 #include "action/usefeat.h"
 #include "action/useskill.h"

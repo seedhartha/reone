@@ -22,6 +22,7 @@
 #include "routines.h"
 
 #include "../../common/log.h"
+#include "../../script/executioncontext.h"
 
 #include "../enginetype/event.h"
 #include "../game.h"

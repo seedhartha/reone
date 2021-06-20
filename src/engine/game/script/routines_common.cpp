@@ -24,6 +24,7 @@
 #include "../../common/log.h"
 #include "../../common/random.h"
 #include "../../resource/strings.h"
+#include "../../script/executioncontext.h"
 
 #include "../game.h"
 

@@ -17,11 +17,14 @@
 
 #pragma once
 
-#include "variable.h"
+#include "types.h"
 
 namespace reone {
 
 namespace script {
+
+struct ExecutionContext;
+struct Variable;
 
 class Routine {
 public:

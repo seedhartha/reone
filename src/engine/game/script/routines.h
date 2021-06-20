@@ -20,6 +20,7 @@
 #include "../../common/collectionutil.h"
 #include "../../resource/types.h"
 #include "../../script/routine.h"
+#include "../../script/routineprovider.h"
 #include "../../script/types.h"
 #include "../../script/variable.h"
 

@@ -389,10 +389,13 @@ target_precompile_headers(libgui PRIVATE src/engine/pch.h)
 set(SCRIPT_HEADERS
     src/engine/script/enginetype.h
     src/engine/script/execution.h
+    src/engine/script/executioncontext.h
+    src/engine/script/executionstate.h
     src/engine/script/instrutil.h
     src/engine/script/ncsreader.h
     src/engine/script/program.h
     src/engine/script/routine.h
+    src/engine/script/routineprovider.h
     src/engine/script/services.h
     src/engine/script/scripts.h
     src/engine/script/types.h

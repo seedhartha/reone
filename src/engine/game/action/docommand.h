@@ -17,11 +17,15 @@
 
 #pragma once
 
-#include "../../script/types.h"
-
 #include "action.h"
 
 namespace reone {
+
+namespace script {
+
+struct ExecutionContext;
+
+}
 
 namespace game {
 
