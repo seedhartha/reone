@@ -17,10 +17,13 @@
 
 #pragma once
 
-#include "../audio/types.h"
-#include "../graphics/services.h"
-
 namespace reone {
+
+namespace graphics {
+
+class GraphicsServices;
+
+}
 
 namespace video {
 
