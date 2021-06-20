@@ -17,15 +17,15 @@
 
 #pragma once
 
-#include "cursor.h"
-#include "eventhandler.h"
 #include "options.h"
-#include "texture/texture.h"
 #include "types.h"
 
 namespace reone {
 
 namespace graphics {
+
+class Cursor;
+class IEventHandler;
 
 class Window : boost::noncopyable {
 public:

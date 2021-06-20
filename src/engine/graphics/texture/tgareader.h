@@ -21,11 +21,11 @@
 
 #include "../types.h"
 
-#include "texture.h"
-
 namespace reone {
 
 namespace graphics {
+
+class Texture;
 
 class TgaReader : public resource::BinaryReader {
 public:

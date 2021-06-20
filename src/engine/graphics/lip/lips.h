@@ -18,11 +18,16 @@
 #pragma once
 
 #include "../../common/cache.h"
-#include "../../resource/resources.h"
 
 #include "animation.h"
 
 namespace reone {
+
+namespace resource {
+
+class Resources;
+
+}
 
 namespace graphics {
 

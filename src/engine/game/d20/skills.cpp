@@ -18,7 +18,9 @@
 #include "skills.h"
 
 #include "../../common/collectionutil.h"
+#include "../../graphics/texture/textures.h"
 #include "../../resource/2da.h"
+#include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
 using namespace std;

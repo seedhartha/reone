@@ -17,20 +17,21 @@
 
 #pragma once
 
-#include "../mesh/mesh.h"
-#include "../texture/texture.h"
+#include "../aabb.h"
 
 #include "animatedproperty.h"
-
-namespace reone {
-
-namespace graphics {
 
 #define REO_DECL_ANIMPROP(a, b, c) \
     const AnimatedProperty<a> &b() const { return c; }; \
     AnimatedProperty<a> &b() { return c; };
 
+namespace reone {
+
+namespace graphics {
+
+class Mesh;
 class Model;
+class Texture;
 
 /**
  * Model or animation node. Can be specialized to represent a triangle mesh, a

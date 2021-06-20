@@ -19,8 +19,12 @@
 
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
+#include "../../resource/resources.h"
 
-#include "../model/mdlreader.h"
+#include "../texture/textures.h"
+
+#include "mdlreader.h"
+#include "model.h"
 
 using namespace std;
 
@@ -55,7 +59,7 @@ shared_ptr<Model> Models::doGet(const string &resRef) {
     shared_ptr<Model> model;
 
     if (mdlData && mdxData) {
-        MdlReader mdl(this, &_textures);
+        MdlReader mdl(*this, _textures);
         mdl.load(wrap(mdlData), wrap(mdxData));
         model = mdl.model();
         if (model) {

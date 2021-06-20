@@ -17,12 +17,14 @@
 
 #pragma once
 
-#include "renderbuffer.h"
-#include "texture/texture.h"
+#include "types.h"
 
 namespace reone {
 
 namespace graphics {
+
+class Renderbuffer;
+class Texture;
 
 /**
  * Abstraction over the OpenGL framebuffer used for off-screen rendering.

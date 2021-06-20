@@ -17,11 +17,13 @@
 
 #pragma once
 
-#include "texture.h"
+#include "../types.h"
 
 namespace reone {
 
 namespace graphics {
+
+class Texture;
 
 class TgaWriter {
 public:

@@ -19,11 +19,12 @@
 
 #include "../aabb.h"
 
-#include "animation.h"
-
 namespace reone {
 
 namespace graphics {
+
+class Animation;
+class ModelNode;
 
 /**
  * 3D model, a tree-like data structure. Contains model nodes and animations.

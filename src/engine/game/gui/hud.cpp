@@ -19,6 +19,7 @@
 
 #include "../../common/log.h"
 #include "../../gui/control/label.h"
+#include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/window.h"
 

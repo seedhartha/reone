@@ -19,16 +19,16 @@
 
 #include "../common/cache.h"
 
-#include "context.h"
 #include "font.h"
-#include "mesh/meshes.h"
-#include "shader/shaders.h"
-#include "texture/textures.h"
-#include "window.h"
 
 namespace reone {
 
 namespace graphics {
+
+class Context;
+class Meshes;
+class Shaders;
+class Textures;
 
 class Fonts : public MemoryCache<std::string, Font> {
 public:

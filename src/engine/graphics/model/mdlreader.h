@@ -17,19 +17,22 @@
 
 #pragma once
 
-#include "../../graphics/model/models.h"
-#include "../../graphics/texture/textures.h"
 #include "../../resource/format/binreader.h"
 
-#include "model.h"
+#include "modelnode.h"
 
 namespace reone {
 
 namespace graphics {
 
+class Animation;
+class Model;
+class Models;
+class Textures;
+
 class MdlReader : public resource::BinaryReader {
 public:
-    MdlReader(Models *models, Textures *textures);
+    MdlReader(Models &models, Textures &textures);
 
     void load(const std::shared_ptr<std::istream> &mdl, const std::shared_ptr<std::istream> &mdx);
 
@@ -67,8 +70,8 @@ private:
     typedef std::unordered_map<uint32_t, std::vector<uint32_t>> MaterialMap;
     typedef std::function<void(const ControllerKey &, const std::vector<float> &, ModelNode &)> ControllerFn;
 
-    Models *_models;
-    Textures *_textures;
+    Models &_models;
+    Textures &_textures;
 
     std::unordered_map<uint32_t, ControllerFn> _genericControllers;
     std::unordered_map<uint32_t, ControllerFn> _meshControllers;

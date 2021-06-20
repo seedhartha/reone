@@ -17,6 +17,8 @@
 
 #include "lipreader.h"
 
+#include "animation.h"
+
 using namespace std;
 
 namespace reone {

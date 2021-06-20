@@ -20,6 +20,9 @@
 #include "../../common/log.h"
 #include "../../common/guardutil.h"
 #include "../../common/random.h"
+#include "../../graphics/context.h"
+#include "../../graphics/features.h"
+#include "../../graphics/mesh/mesh.h"
 #include "../../graphics/pbribl.h"
 
 #include "../scenegraph.h"

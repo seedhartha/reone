@@ -19,11 +19,11 @@
 
 #include "../../resource/format/binreader.h"
 
-#include "animation.h"
-
 namespace reone {
 
 namespace graphics {
+
+class LipAnimation;
 
 class LipReader : public resource::BinaryReader {
 public:

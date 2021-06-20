@@ -17,6 +17,23 @@
 
 #include "services.h"
 
+#include "../resource/services.h"
+
+#include "context.h"
+#include "features.h"
+#include "fonts.h"
+#include "lip/lips.h"
+#include "materials.h"
+#include "mesh/mesh.h"
+#include "mesh/meshes.h"
+#include "model/models.h"
+#include "options.h"
+#include "pbribl.h"
+#include "shader/shaders.h"
+#include "texture/textures.h"
+#include "walkmesh/walkmeshes.h"
+#include "window.h"
+
 using namespace std;
 
 using namespace reone::resource;

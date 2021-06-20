@@ -19,6 +19,7 @@
 
 #include "../../common/log.h"
 
+#include "texture.h"
 #include "textureutil.h"
 
 using namespace std;

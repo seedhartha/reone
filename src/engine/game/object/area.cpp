@@ -22,6 +22,7 @@
 #include "../../common/random.h"
 #include "../../common/streamutil.h"
 #include "../../graphics/baryutil.h"
+#include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/model/models.h"
 #include "../../graphics/texture/textures.h"

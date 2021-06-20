@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "modelnode.h"
-
 namespace reone {
 
 namespace graphics {
+
+class ModelNode;
 
 class Animation : boost::noncopyable {
 public:

@@ -19,6 +19,8 @@
 
 #include "../../common/collectionutil.h"
 
+#include "modelnode.h"
+
 using namespace std;
 
 namespace reone {

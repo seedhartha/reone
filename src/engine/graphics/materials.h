@@ -17,13 +17,17 @@
 
 #pragma once
 
-#include "../resource/resources.h"
-
-#include "material.h"
-
 namespace reone {
 
+namespace resource {
+
+class Resources;
+
+}
+
 namespace graphics {
+
+struct Material;
 
 class Materials : boost::noncopyable {
 public:

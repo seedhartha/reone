@@ -18,6 +18,7 @@
 #include "../../common/collectionutil.h"
 #include "../../common/log.h"
 #include "../../common/guardutil.h"
+#include "../../graphics/mesh/mesh.h"
 
 #include "../scenegraph.h"
 #include "../types.h"

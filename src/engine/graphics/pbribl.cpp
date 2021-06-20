@@ -17,7 +17,12 @@
 
 #include "pbribl.h"
 
+#include "context.h"
+#include "mesh/mesh.h"
+#include "mesh/meshes.h"
 #include "renderbuffer.h"
+#include "shader/shaders.h"
+#include "texture/texture.h"
 #include "texture/textureutil.h"
 
 using namespace std;

@@ -17,13 +17,12 @@
 
 #pragma once
 
-#include "texture/texture.h"
-
 namespace reone {
 
 namespace graphics {
 
 class GraphicsServices;
+class Texture;
 
 class Cursor : boost::noncopyable {
 public:

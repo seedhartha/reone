@@ -17,12 +17,6 @@
 
 #pragma once
 
-#include "context.h"
-#include "mesh/meshes.h"
-#include "shader/shaders.h"
-#include "texture/texture.h"
-#include "window.h"
-
 namespace reone {
 
 namespace graphics {
@@ -36,6 +30,12 @@ enum class TextGravity {
     RightCenter,
     RightTop
 };
+
+class Context;
+class Meshes;
+class Shaders;
+class Texture;
+class Window;
 
 class Font {
 public:

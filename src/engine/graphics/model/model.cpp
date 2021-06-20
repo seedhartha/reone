@@ -21,6 +21,11 @@
 #include "../../common/guardutil.h"
 #include "../../common/log.h"
 
+#include "../mesh/mesh.h"
+
+#include "animation.h"
+#include "modelnode.h"
+
 using namespace std;
 
 namespace reone {

@@ -21,9 +21,11 @@
 
 #include "tgawriter.h"
 
+#include "s3tc.h"
+
 #include "../../common/guardutil.h"
 
-#include "s3tc.h"
+#include "texture.h"
 
 using namespace std;
 

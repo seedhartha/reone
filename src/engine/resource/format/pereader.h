@@ -17,20 +17,15 @@
 
 #pragma once
 
+#include "../../common/types.h"
+
+#include "../types.h"
+
 #include "binreader.h"
 
 namespace reone {
 
 namespace resource {
-
-enum class PEResourceType {
-    Cursor = 1,
-    Icon = 3,
-    CursorGroup = 12,
-    IconGroup = 14,
-    Version = 16,
-    Manifest = 24
-};
 
 class PEReader : public BinaryReader {
 public:
@@ -39,7 +34,6 @@ public:
     std::shared_ptr<ByteArray> find(uint32_t name, PEResourceType type);
 
 private:
-
     struct Section {
         std::string name;
         uint32_t virtualAddress { 0 };

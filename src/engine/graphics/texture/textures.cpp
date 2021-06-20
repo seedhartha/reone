@@ -19,11 +19,14 @@
 
 #include "../../common/log.h"
 #include "../../common/streamutil.h"
+#include "../../resource/resources.h"
 
+#include "../context.h"
 #include "../services.h"
 #include "../types.h"
 
 #include "curreader.h"
+#include "texture.h"
 #include "textureutil.h"
 #include "tgareader.h"
 #include "tpcreader.h"
