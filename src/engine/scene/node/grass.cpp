@@ -22,6 +22,7 @@
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
+#include "../../graphics/texture/texture.h"
 
 #include "../scenegraph.h"
 

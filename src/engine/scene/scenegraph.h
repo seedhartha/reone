@@ -19,6 +19,7 @@
 
 #include "../graphics/options.h"
 #include "../graphics/services.h"
+#include "../graphics/shader/shaders.h"
 
 #include "node/camera.h"
 #include "node/emitter.h"

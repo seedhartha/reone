@@ -17,11 +17,15 @@
 
 #pragma once
 
-#include "../../graphics/model/modelnode.h"
-
 #include "scenenode.h"
 
 namespace reone {
+
+namespace graphics {
+
+class ModelNode;
+
+}
 
 namespace scene {
 
