@@ -18,6 +18,7 @@
 #include "footstepsounds.h"
 
 #include "../common/guardutil.h"
+#include "../resource/2da.h"
 
 using namespace std;
 using namespace std::placeholders;

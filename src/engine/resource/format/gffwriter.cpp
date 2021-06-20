@@ -18,6 +18,9 @@
 #include "gffwriter.h"
 
 #include "../../common/guardutil.h"
+#include "../../common/streamwriter.h"
+
+#include "../gffstruct.h"
 
 using namespace std;
 
@@ -54,7 +57,7 @@ static const unordered_map<ResourceType, string> g_signatures {
     { ResourceType::Pth, "PTH" }
 };
 
-GffWriter::GffWriter(ResourceType resType, const shared_ptr<GffStruct> &root) : _resType(resType), _root(root) {
+GffWriter::GffWriter(ResourceType resType, shared_ptr<GffStruct> root) : _resType(resType), _root(root) {
     ensureNotNull(root, "root");
 }
 

@@ -21,6 +21,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "../../engine/common/streamwriter.h"
 #include "../../engine/resource/format/gffreader.h"
 #include "../../engine/resource/format/gffwriter.h"
 

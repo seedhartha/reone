@@ -31,8 +31,8 @@ namespace resource {
  */
 class BinaryReader : boost::noncopyable {
 public:
-    void load(const std::shared_ptr<std::istream> &in);
-    void load(const boost::filesystem::path &path);
+    void load(std::shared_ptr<std::istream> in);
+    void load(boost::filesystem::path path);
 
 protected:
     boost::endian::order _endianess { boost::endian::order::little };

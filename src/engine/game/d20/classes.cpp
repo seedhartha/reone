@@ -17,6 +17,8 @@
 
 #include "classes.h"
 
+#include "../../resource/resources.h"
+
 using namespace std;
 using namespace std::placeholders;
 

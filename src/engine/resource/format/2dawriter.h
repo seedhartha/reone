@@ -17,17 +17,17 @@
 
 #pragma once
 
-#include "../../common/streamwriter.h"
-
-#include "../2da.h"
-
 namespace reone {
+
+class StreamWriter;
 
 namespace resource {
 
+class TwoDA;
+
 class TwoDaWriter {
 public:
-    TwoDaWriter(const std::shared_ptr<TwoDA> &twoDa);
+    TwoDaWriter(std::shared_ptr<TwoDA> twoDa);
 
     void save(const boost::filesystem::path &path);
 

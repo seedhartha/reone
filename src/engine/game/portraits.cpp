@@ -17,6 +17,8 @@
 
 #include "portraits.h"
 
+#include "../resource/2da.h"
+
 using namespace std;
 
 using namespace reone::graphics;

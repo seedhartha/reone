@@ -22,6 +22,7 @@
 #include "game.h"
 
 #include "../common/streamutil.h"
+#include "../common/streamwriter.h"
 #include "../graphics/texture/tgawriter.h"
 #include "../resource/format/erfreader.h"
 #include "../resource/format/erfwriter.h"

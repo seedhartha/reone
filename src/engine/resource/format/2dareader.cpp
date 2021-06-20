@@ -17,6 +17,8 @@
 
 #include "2dareader.h"
 
+#include "../2da.h"
+
 using namespace std;
 
 namespace fs = boost::filesystem;

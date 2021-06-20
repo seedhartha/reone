@@ -18,6 +18,7 @@
 #include "tools.h"
 
 #include "../engine/common/streamutil.h"
+#include "../engine/common/streamwriter.h"
 #include "../engine/resource/format/gffreader.h"
 #include "../engine/resource/format/gffwriter.h"
 

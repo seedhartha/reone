@@ -21,6 +21,8 @@
 #include "../common/pathutil.h"
 #include "../common/streamutil.h"
 
+#include "2da.h"
+#include "gffstruct.h"
 #include "format/2dareader.h"
 #include "format/bifreader.h"
 #include "format/erfreader.h"
@@ -28,6 +30,7 @@
 #include "format/rimreader.h"
 #include "folder.h"
 #include "keybifprovider.h"
+#include "resourceprovider.h"
 #include "typeutil.h"
 
 using namespace std;

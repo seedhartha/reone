@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "../talktable.h"
-
 namespace reone {
 
 namespace resource {
+
+class TalkTable;
 
 class TlkWriter : boost::noncopyable {
 public:

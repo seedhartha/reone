@@ -18,6 +18,7 @@
 #include "strings.h"
 
 #include "../common/pathutil.h"
+#include "../resource/talktable.h"
 
 using namespace std;
 

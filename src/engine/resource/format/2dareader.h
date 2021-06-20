@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "../2da.h"
-
 #include "binreader.h"
 
 namespace reone {
 
 namespace resource {
+
+class TwoDA;
 
 class TwoDaReader : public BinaryReader {
 public:

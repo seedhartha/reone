@@ -17,6 +17,7 @@
 
 #include "camerastyle.h"
 
+#include "../../resource/2da.h"
 #include "../../resource/resources.h"
 
 namespace reone {

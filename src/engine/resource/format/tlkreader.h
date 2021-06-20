@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "../talktable.h"
-
 #include "binreader.h"
 
 namespace reone {
 
 namespace resource {
+
+class TalkTable;
 
 class TlkReader : public BinaryReader {
 public:
