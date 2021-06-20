@@ -17,6 +17,8 @@
 
 #include "tlkreader.h"
 
+#include "../talktable.h"
+
 using namespace std;
 
 namespace reone {

@@ -17,18 +17,21 @@
 
 #pragma once
 
-#include  "../../common/streamwriter.h"
+#include "../../common/types.h"
 
-#include "../gffstruct.h"
 #include "../types.h"
 
 namespace reone {
 
+class StreamWriter;
+
 namespace resource {
+
+class GffStruct;
 
 class GffWriter {
 public:
-    GffWriter(ResourceType resType, const std::shared_ptr<GffStruct> &root);
+    GffWriter(ResourceType resType, std::shared_ptr<GffStruct> root);
 
     void save(const boost::filesystem::path &path);
     void save(const std::shared_ptr<std::ostream> &out);

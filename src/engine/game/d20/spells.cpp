@@ -18,6 +18,9 @@
 #include "spells.h"
 
 #include "../../common/collectionutil.h"
+#include "../../resource/2da.h"
+#include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 using namespace std;
 

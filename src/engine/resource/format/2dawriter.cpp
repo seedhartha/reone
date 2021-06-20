@@ -18,6 +18,9 @@
 #include "2dawriter.h"
 
 #include "../../common/guardutil.h"
+#include "../../common/streamwriter.h"
+
+#include "../2da.h"
 
 using namespace std;
 
@@ -29,7 +32,7 @@ namespace resource {
 
 static const char kSignature[] = "2DA V2.b";
 
-TwoDaWriter::TwoDaWriter(const shared_ptr<TwoDA> &twoDa) : _twoDa(twoDa) {
+TwoDaWriter::TwoDaWriter(shared_ptr<TwoDA> twoDa) : _twoDa(twoDa) {
     ensureNotNull(twoDa, "twoDa");
 }
 

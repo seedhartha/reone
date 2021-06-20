@@ -20,6 +20,7 @@
 #include "audio/services.h"
 #include "game/game.h"
 #include "graphics/services.h"
+#include "resource/resourceprovider.h"
 #include "resource/services.h"
 #include "scene/services.h"
 #include "script/services.h"

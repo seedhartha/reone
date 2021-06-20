@@ -17,13 +17,14 @@
 
 #pragma once
 
-#include "format/bifreader.h"
 #include "format/keyreader.h"
 #include "resourceprovider.h"
 
 namespace reone {
 
 namespace resource {
+
+class BifReader;
 
 class KeyBifResourceProvider : public IResourceProvider {
 public:

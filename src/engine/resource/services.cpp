@@ -17,6 +17,10 @@
 
 #include "services.h"
 
+#include "resourceprovider.h"
+#include "resources.h"
+#include "strings.h"
+
 using namespace std;
 
 namespace fs = boost::filesystem;

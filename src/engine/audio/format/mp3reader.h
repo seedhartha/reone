@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../stream.h"
-
 #include "mad.h"
+
+#include "../stream.h"
 
 namespace reone {
 

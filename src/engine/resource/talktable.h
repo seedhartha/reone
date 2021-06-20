@@ -26,7 +26,7 @@ struct TalkTableString {
     std::string soundResRef;
 };
 
-struct TalkTable : boost::noncopyable {
+class TalkTable : boost::noncopyable {
 public:
     void addString(TalkTableString &&string);
 

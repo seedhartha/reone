@@ -17,6 +17,10 @@
 
 #include "class.h"
 
+#include "../../resource/2da.h"
+#include "../../resource/resources.h"
+#include "../../resource/strings.h"
+
 #include "classes.h"
 
 using namespace std;

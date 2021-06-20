@@ -18,6 +18,8 @@
 #include "skills.h"
 
 #include "../../common/collectionutil.h"
+#include "../../resource/2da.h"
+#include "../../resource/strings.h"
 
 using namespace std;
 

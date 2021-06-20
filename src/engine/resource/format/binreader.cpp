@@ -17,6 +17,9 @@
 
 #include "binreader.h"
 
+#include "../../common/guardutil.h"
+#include "../../common/streamreader.h"
+
 using namespace std;
 
 namespace fs = boost::filesystem;
@@ -32,10 +35,9 @@ BinaryReader::BinaryReader(int signSize, const char *sign) : _signSize(signSize)
     memcpy(&_sign[0], sign, _signSize);
 }
 
-void BinaryReader::load(const shared_ptr<istream> &in) {
-    if (!in) {
-        throw invalid_argument("Invalid input stream");
-    }
+void BinaryReader::load(shared_ptr<istream> in) {
+    ensureNotNull(in, "in");
+
     _in = in;
     _reader = make_unique<StreamReader>(in, _endianess);
 
@@ -65,7 +67,7 @@ void BinaryReader::checkSignature() {
     }
 }
 
-void BinaryReader::load(const fs::path &path) {
+void BinaryReader::load(fs::path path) {
     if (!fs::exists(path)) {
         throw runtime_error("File not found: " + path.string());
     }

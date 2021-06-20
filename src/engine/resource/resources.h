@@ -17,15 +17,18 @@
 
 #pragma once
 
-#include "2da.h"
+#include "../common/types.h"
+
 #include "format/pereader.h"
-#include "gffstruct.h"
-#include "resourceprovider.h"
 #include "types.h"
 
 namespace reone {
 
 namespace resource {
+
+class GffStruct;
+class IResourceProvider;
+class TwoDA;
 
 /**
  * Encapsulates game resource management. Contains a prioritized list of

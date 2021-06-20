@@ -20,6 +20,8 @@
 #include "../../common/guardutil.h"
 #include "../../common/streamwriter.h"
 
+#include "../talktable.h"
+
 using namespace std;
 
 namespace fs = boost::filesystem;

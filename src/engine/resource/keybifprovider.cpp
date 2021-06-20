@@ -19,6 +19,8 @@
 
 #include "../common/pathutil.h"
 
+#include "format/bifreader.h"
+
 using namespace std;
 
 namespace fs = boost::filesystem;
