@@ -17,6 +17,8 @@
 
 #include "slider.h"
 
+#include "../../graphics/renderbuffer.h"
+
 namespace reone {
 
 namespace gui {

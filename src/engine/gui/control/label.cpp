@@ -17,6 +17,8 @@
 
 #include "label.h"
 
+#include "../../graphics/renderbuffer.h"
+
 namespace reone {
 
 namespace gui {

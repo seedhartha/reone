@@ -17,17 +17,18 @@
 
 #pragma once
 
+#include "../../graphics/material.h"
+#include "../../graphics/model/modelnode.h"
+
 #include "modelnode.h"
 
-#include "../../graphics/material.h"
-#include "../../graphics/materials.h"
-#include "../../graphics/model/model.h"
-#include "../../graphics/model/modelnode.h"
-#include "../../graphics/pbribl.h"
-#include "../../graphics/shader/shaders.h"
-#include "../../graphics/texture/textures.h"
-
 namespace reone {
+
+namespace graphics {
+
+class Texture;
+
+}
 
 namespace scene {
 

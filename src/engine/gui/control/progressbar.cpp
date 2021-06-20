@@ -20,6 +20,7 @@
 #include "../../graphics/context.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
+#include "../../graphics/renderbuffer.h"
 #include "../../graphics/texture/textures.h"
 
 #include "../gui.h"

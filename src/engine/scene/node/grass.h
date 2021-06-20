@@ -17,13 +17,17 @@
 
 #pragma once
 
-#include "../../graphics/texture/texture.h"
-
 #include "../nodeelement.h"
 
 #include "scenenode.h"
 
 namespace reone {
+
+namespace graphics {
+
+class Texture;
+
+}
 
 namespace scene {
 

@@ -17,6 +17,8 @@
 
 #include "button.h"
 
+#include "../../graphics/renderbuffer.h"
+
 namespace reone {
 
 namespace gui {

@@ -23,7 +23,10 @@
 #include "../graphics/features.h"
 #include "../graphics/lip/lips.h"
 #include "../graphics/model/models.h"
+#include "../graphics/pbribl.h"
+#include "../graphics/renderbuffer.h"
 #include "../graphics/walkmesh/walkmeshes.h"
+#include "../scene/pipeline/world.h"
 #include "../video/bikreader.h"
 
 using namespace std;

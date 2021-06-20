@@ -17,6 +17,12 @@
 
 #include "services.h"
 
+#include "../graphics/renderbuffer.h"
+#include "../graphics/texture/texture.h"
+
+#include "pipeline/world.h"
+#include "scenegraph.h"
+
 using namespace std;
 
 using namespace reone::graphics;

@@ -23,12 +23,16 @@
 #include "graphics/context.h"
 #include "graphics/features.h"
 #include "graphics/lip/lips.h"
+#include "graphics/materials.h"
 #include "graphics/model/models.h"
+#include "graphics/pbribl.h"
+#include "graphics/renderbuffer.h"
 #include "graphics/services.h"
 #include "graphics/walkmesh/walkmeshes.h"
 #include "resource/resourceprovider.h"
 #include "resource/services.h"
 #include "scene/services.h"
+#include "scene/pipeline/world.h"
 #include "script/services.h"
 
 using namespace std;

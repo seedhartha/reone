@@ -18,6 +18,7 @@
 #include "modelnode.h"
 
 #include "../../common/guardutil.h"
+#include "../../graphics/model/modelnode.h"
 
 using namespace std;
 

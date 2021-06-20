@@ -27,6 +27,7 @@
 #include "../resource/format/erfreader.h"
 #include "../resource/format/erfwriter.h"
 #include "../resource/format/gffwriter.h"
+#include "../scene/pipeline/world.h"
 
 #include "enginetype/location.h"
 #include "party.h"

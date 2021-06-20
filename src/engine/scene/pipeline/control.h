@@ -19,14 +19,19 @@
 
 #include "../../graphics/framebuffer.h"
 #include "../../graphics/renderbuffer.h"
-#include "../../graphics/services.h"
-#include "../../graphics/texture/texture.h"
-
-#include "../scenegraph.h"
 
 namespace reone {
 
+namespace graphics {
+
+class GraphicsServices;
+class Texture;
+
+}
+
 namespace scene {
+
+class SceneGraph;
 
 class ControlRenderPipeline : boost::noncopyable {
 public:

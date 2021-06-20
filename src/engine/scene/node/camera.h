@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "scenenode.h"
-
 #include "../../graphics/aabb.h"
+
+#include "scenenode.h"
 
 namespace reone {
 

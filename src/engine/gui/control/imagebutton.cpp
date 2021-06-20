@@ -21,6 +21,7 @@
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
+#include "../../graphics/renderbuffer.h"
 
 #include "../gui.h"
 

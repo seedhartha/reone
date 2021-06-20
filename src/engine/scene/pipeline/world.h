@@ -18,16 +18,22 @@
 #pragma once
 
 #include "../../graphics/framebuffer.h"
-#include "../../graphics/renderbuffer.h"
-#include "../../graphics/services.h"
-#include "../../graphics/texture/texture.h"
+#include "../../graphics/options.h"
 #include "../../graphics/types.h"
-
-#include "../scenegraph.h"
 
 namespace reone {
 
+namespace graphics {
+
+class GraphicsServices;
+class Renderbuffer;
+class Texture;
+
+}
+
 namespace scene {
+
+class SceneGraph;
 
 class WorldRenderPipeline : boost::noncopyable {
 public:

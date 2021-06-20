@@ -19,7 +19,6 @@
 
 #include "../../common/timer.h"
 #include "../../graphics/beziercurve.h"
-#include "../../graphics/model/modelnode.h"
 
 #include "../nodeelement.h"
 
