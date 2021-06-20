@@ -19,6 +19,8 @@
 
 #include "../common/log.h"
 
+#include "variable.h"
+
 using namespace std;
 
 namespace reone {

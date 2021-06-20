@@ -17,17 +17,22 @@
 
 #pragma once
 
-#include "program.h"
+#include "executionstate.h"
 #include "types.h"
-#include "variable.h"
 
 namespace reone {
 
 namespace script {
 
+struct ExecutionContext;
+struct Instruction;
+struct Variable;
+
+class ScriptProgram;
+
 class ScriptExecution : boost::noncopyable {
 public:
-    ScriptExecution(const std::shared_ptr<ScriptProgram> &program, std::unique_ptr<ExecutionContext> context);
+    ScriptExecution(std::shared_ptr<ScriptProgram> program, std::unique_ptr<ExecutionContext> context);
 
     int run();
 

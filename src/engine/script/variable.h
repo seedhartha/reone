@@ -23,21 +23,7 @@ namespace reone {
 
 namespace script {
 
-enum class VariableType {
-    Void,
-    Int,
-    Float,
-    String,
-    Vector,
-    Object,
-    Effect,
-    Event,
-    Location,
-    Talent,
-    Action,
-
-    NotImplemented // used to return default values from placeholder routines
-};
+struct ExecutionContext;
 
 class EngineType;
 class ScriptObject;

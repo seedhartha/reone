@@ -17,10 +17,15 @@
 
 #include "execution.h"
 
+#include "../common/guardutil.h"
 #include "../common/log.h"
 
+#include "executioncontext.h"
 #include "instrutil.h"
+#include "program.h"
 #include "routine.h"
+#include "routineprovider.h"
+#include "variable.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -31,7 +36,9 @@ namespace script {
 
 static constexpr int kStartInstructionOffset = 13;
 
-ScriptExecution::ScriptExecution(const shared_ptr<ScriptProgram> &program, unique_ptr<ExecutionContext> context) : _context(move(context)), _program(program) {
+ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<ExecutionContext> context) : _context(move(context)), _program(program) {
+    ensureNotNull(program, "program");
+
     static unordered_map<ByteCode, function<void(ScriptExecution *, const Instruction &)>> handlers {
         { ByteCode::CopyDownSP, &ScriptExecution::executeCopyDownSP },
         { ByteCode::Reserve, &ScriptExecution::executeReserve },

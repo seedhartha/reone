@@ -17,6 +17,8 @@
 
 #include "routines.h"
 
+#include "../../script/executioncontext.h"
+
 #include "../enginetype/effect.h"
 #include "../enginetype/event.h"
 #include "../enginetype/location.h"

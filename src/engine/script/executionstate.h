@@ -17,34 +17,21 @@
 
 #pragma once
 
-#include "../resource/format/binreader.h"
-
 namespace reone {
 
 namespace script {
 
+struct Variable;
+
 class ScriptProgram;
 
-/**
- * Parses compiled script program.
- *
- * http://www.nynaeve.net/Skywing/nwn2/Documentation/ncs.html
- */
-class NcsReader : public resource::BinaryReader {
-public:
-    NcsReader(const std::string &resRef);
-
-    void doLoad() override;
-
-    std::shared_ptr<ScriptProgram> program() const { return _program; }
-
-private:
-    std::string _resRef;
-    std::shared_ptr<ScriptProgram> _program;
-
-    void readInstruction(size_t &offset);
+struct ExecutionState {
+    std::shared_ptr<ScriptProgram> program;
+    std::vector<Variable> globals;
+    std::vector<Variable> locals;
+    uint32_t insOffset { 0 };
 };
 
 } // namespace script
 
-} // namespace reone
+} // namespae reone
