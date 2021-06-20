@@ -19,7 +19,7 @@
 
 #include "../../resource/format/binreader.h"
 
-#include "../stream.h"
+#include "../types.h"
 
 namespace reone {
 
@@ -29,6 +29,8 @@ enum class WavAudioFormat {
     PCM = 1,
     IMAADPCM = 0x11
 };
+
+class AudioStream;
 
 class WavReader : public resource::BinaryReader {
 public:

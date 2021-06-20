@@ -20,6 +20,7 @@
 #include "../audio/files.h"
 #include "../common/streamutil.h"
 #include "../resource/format/ssfreader.h"
+#include "../resource/resources.h"
 #include "../resource/strings.h"
 
 using namespace std;

@@ -17,6 +17,8 @@
 
 #include "mp3reader.h"
 
+#include "../stream.h"
+
 using namespace std;
 
 namespace reone {

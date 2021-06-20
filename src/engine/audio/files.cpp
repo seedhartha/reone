@@ -18,9 +18,11 @@
 #include "files.h"
 
 #include "../common/streamutil.h"
+#include "../resource/resources.h"
 
 #include "format/mp3reader.h"
 #include "format/wavreader.h"
+#include "stream.h"
 
 using namespace std;
 using namespace std::placeholders;

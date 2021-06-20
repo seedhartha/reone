@@ -19,11 +19,13 @@
 
 #include "mad.h"
 
-#include "../stream.h"
+#include "../../common/types.h"
 
 namespace reone {
 
 namespace audio {
+
+class AudioStream;
 
 class Mp3Reader : boost::noncopyable {
 public:

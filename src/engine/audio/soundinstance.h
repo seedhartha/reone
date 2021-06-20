@@ -17,17 +17,16 @@
 
 #pragma once
 
-#include "stream.h"
-
 namespace reone {
 
 namespace audio {
 
+class AudioStream;
 class SoundHandle;
 
 class SoundInstance {
 public:
-    SoundInstance(const std::shared_ptr<AudioStream> &stream, bool loop, float gain, bool positional, glm::vec3 position);
+    SoundInstance(std::shared_ptr<AudioStream> stream, bool loop, float gain, bool positional, glm::vec3 position);
     SoundInstance(SoundInstance &&) = default;
     ~SoundInstance();
 

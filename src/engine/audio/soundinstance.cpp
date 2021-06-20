@@ -17,9 +17,11 @@
 
 #include "soundinstance.h"
 
+#include "../common/guardutil.h"
 #include "../common/log.h"
 
 #include "soundhandle.h"
+#include "stream.h"
 
 using namespace std;
 
@@ -29,12 +31,14 @@ namespace audio {
 
 static constexpr int kMaxBufferCount = 8;
 
-SoundInstance::SoundInstance(const shared_ptr<AudioStream> &stream, bool loop, float gain, bool positional, glm::vec3 position) :
+SoundInstance::SoundInstance(shared_ptr<AudioStream> stream, bool loop, float gain, bool positional, glm::vec3 position) :
     _stream(stream),
     _loop(loop),
     _gain(gain),
     _positional(positional),
     _handle(make_shared<SoundHandle>(stream->duration(), move(position))) {
+
+    ensureNotNull(stream, "stream");
 }
 
 void SoundInstance::init() {
