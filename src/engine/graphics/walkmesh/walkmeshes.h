@@ -17,12 +17,17 @@
 
 #pragma once
 
-#include "../../resource/resources.h"
 #include "../../resource/types.h"
 
 #include "../types.h"
 
 namespace reone {
+
+namespace resource {
+
+class Resources;
+
+}
 
 namespace graphics {
 

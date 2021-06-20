@@ -19,6 +19,9 @@
 
 #include "../common/collectionutil.h"
 #include "../resource/2da.h"
+#include "../resource/resources.h"
+
+#include "material.h"
 
 using namespace std;
 

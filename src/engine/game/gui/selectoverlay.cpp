@@ -21,6 +21,7 @@
 #include "../../graphics/context.h"
 #include "../../graphics/font.h"
 #include "../../graphics/fonts.h"
+#include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
 #include "../../graphics/texture/texture.h"

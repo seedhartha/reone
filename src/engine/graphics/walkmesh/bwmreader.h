@@ -19,11 +19,11 @@
 
 #include "../../resource/format/binreader.h"
 
-#include "walkmesh.h"
-
 namespace reone {
 
 namespace graphics {
+
+class Walkmesh;
 
 class BwmReader : public resource::BinaryReader {
 public:

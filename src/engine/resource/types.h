@@ -83,6 +83,15 @@ enum class ResourceType : uint16_t {
     Invalid = 0xffff
 };
 
+enum class PEResourceType {
+    Cursor = 1,
+    Icon = 3,
+    CursorGroup = 12,
+    IconGroup = 14,
+    Version = 16,
+    Manifest = 24
+};
+
 typedef std::multimap<std::string, std::string> Visibility;
 
 } // namespace resource

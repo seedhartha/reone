@@ -18,6 +18,7 @@
 #include "model.h"
 
 #include "../../common/collectionutil.h"
+#include "../../graphics/model/animation.h"
 
 using namespace std;
 

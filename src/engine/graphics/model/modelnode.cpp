@@ -19,6 +19,9 @@
 
 #include "../../common/log.h"
 
+#include "../mesh/mesh.h"
+#include "../texture/texture.h"
+
 using namespace std;
 
 namespace reone {

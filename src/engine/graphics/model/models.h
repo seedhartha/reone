@@ -17,16 +17,20 @@
 
 #pragma once
 
-#include "../../resource/resources.h"
-
-#include "../texture/textures.h"
 #include "../types.h"
 
 namespace reone {
 
+namespace resource {
+
+class Resources;
+
+}
+
 namespace graphics {
 
 class Model;
+class Textures;
 
 class Models : boost::noncopyable {
 public:

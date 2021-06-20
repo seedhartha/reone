@@ -17,6 +17,8 @@
 
 #include "bwmreader.h"
 
+#include "walkmesh.h"
+
 using namespace std;
 
 namespace reone {

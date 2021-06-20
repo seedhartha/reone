@@ -19,6 +19,7 @@
 #include "lips.h"
 
 #include "../../common/streamutil.h"
+#include "../../resource/resources.h"
 
 #include "lipreader.h"
 

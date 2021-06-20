@@ -17,9 +17,13 @@
 
 #include "game.h"
 
+#include "../audio/player.h"
 #include "../common/log.h"
 #include "../common/pathutil.h"
-#include "../audio/player.h"
+#include "../graphics/features.h"
+#include "../graphics/lip/lips.h"
+#include "../graphics/model/models.h"
+#include "../graphics/walkmesh/walkmeshes.h"
 #include "../video/bikreader.h"
 
 using namespace std;

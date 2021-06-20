@@ -17,7 +17,9 @@
 
 #include "imagebutton.h"
 
+#include "../../graphics/context.h"
 #include "../../graphics/fonts.h"
+#include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
 
 #include "../gui.h"

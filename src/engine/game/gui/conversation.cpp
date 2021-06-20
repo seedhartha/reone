@@ -22,6 +22,7 @@
 #include "../../common/log.h"
 #include "../../gui/control/listbox.h"
 #include "../../graphics/lip/lips.h"
+#include "../../graphics/model/animation.h"
 #include "../../graphics/model/models.h"
 #include "../../resource/resources.h"
 

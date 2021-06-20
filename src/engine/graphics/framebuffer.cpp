@@ -17,6 +17,9 @@
 
 #include "framebuffer.h"
 
+#include "renderbuffer.h"
+#include "texture/texture.h"
+
 using namespace std;
 
 namespace reone {

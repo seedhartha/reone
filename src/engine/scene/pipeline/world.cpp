@@ -17,6 +17,8 @@
 
 #include "world.h"
 
+#include "../../graphics/context.h"
+#include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/pbribl.h"
 #include "../../graphics/shader/shaders.h"

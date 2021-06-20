@@ -17,15 +17,16 @@
 
 #pragma once
 
-#include "context.h"
 #include "framebuffer.h"
-#include "mesh/meshes.h"
-#include "shader/shaders.h"
-#include "texture/texture.h"
 
 namespace reone {
 
 namespace graphics {
+
+class Context;
+class Meshes;
+class Shaders;
+class Texture;
 
 /**
  * Computes and caches PBR IBL textures, i.e. irradiance maps, prefiltered

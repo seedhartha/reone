@@ -19,6 +19,8 @@
 
 #include "../../common/guardutil.h"
 #include "../../common/random.h"
+#include "../../graphics/context.h"
+#include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/shader/shaders.h"
 

@@ -19,11 +19,11 @@
 
 #include "../../resource/format/binreader.h"
 
-#include "texture.h"
-
 namespace reone {
 
 namespace graphics {
+
+class Texture;
 
 class CurReader : public resource::BinaryReader {
 public:

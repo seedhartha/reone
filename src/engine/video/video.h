@@ -24,6 +24,12 @@
 
 namespace reone {
 
+namespace graphics {
+
+class Texture;
+
+}
+
 namespace video {
 
 class BikReader;

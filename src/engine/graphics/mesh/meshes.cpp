@@ -18,6 +18,8 @@
 
 #include "meshes.h"
 
+#include "mesh.h"
+
 using namespace std;
 
 namespace reone {

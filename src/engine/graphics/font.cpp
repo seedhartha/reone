@@ -19,6 +19,13 @@
 
 #include "../common/guardutil.h"
 
+#include "context.h"
+#include "mesh/mesh.h"
+#include "mesh/meshes.h"
+#include "shader/shaders.h"
+#include "texture/texture.h"
+#include "window.h"
+
 using namespace std;
 
 namespace reone {
