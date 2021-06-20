@@ -17,15 +17,20 @@
 
 #pragma once
 
-#include "../resource/services.h"
-
-#include "files.h"
 #include "options.h"
-#include "player.h"
 
 namespace reone {
 
+namespace resource {
+
+class ResourceServices;
+
+}
+
 namespace audio {
+
+class AudioFiles;
+class AudioPlayer;
 
 class AudioServices : boost::noncopyable {
 public:

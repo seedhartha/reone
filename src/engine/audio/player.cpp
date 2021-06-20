@@ -18,11 +18,11 @@
 #include "player.h"
 
 #include "../common/log.h"
-#include "../common/guardutil.h"
 
 #include "files.h"
-#include "options.h"
 #include "soundhandle.h"
+#include "soundinstance.h"
+#include "stream.h"
 
 using namespace std;
 
@@ -33,8 +33,7 @@ namespace audio {
 static constexpr float kMaxPositionalSoundDistance = 16.0f;
 static constexpr float kMaxPositionalSoundDistance2 = kMaxPositionalSoundDistance * kMaxPositionalSoundDistance;
 
-AudioPlayer::AudioPlayer(AudioOptions opts, AudioFiles *files) : _opts(move(opts)), _files(files) {
-    ensureNotNull(files, "files");
+AudioPlayer::AudioPlayer(AudioOptions opts, AudioFiles &files) : _opts(move(opts)), _files(files) {
 }
 
 void AudioPlayer::init() {
@@ -109,7 +108,7 @@ void AudioPlayer::deinit() {
 }
 
 shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
-    shared_ptr<AudioStream> stream(_files->get(resRef));
+    shared_ptr<AudioStream> stream(_files.get(resRef));
     if (!stream) {
         warn("AudioPlayer: file not found: " + resRef);
         return nullptr;

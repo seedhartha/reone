@@ -17,6 +17,7 @@
 
 #include "engine.h"
 
+#include "audio/player.h"
 #include "audio/services.h"
 #include "game/game.h"
 #include "graphics/services.h"

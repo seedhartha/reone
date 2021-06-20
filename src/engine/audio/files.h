@@ -18,13 +18,18 @@
 #pragma once
 
 #include "../common/cache.h"
-#include "../resource/resources.h"
-
-#include "stream.h"
 
 namespace reone {
 
+namespace resource {
+
+class Resources;
+
+}
+
 namespace audio {
+
+class AudioStream;
 
 class AudioFiles : public MemoryCache<std::string, AudioStream> {
 public:

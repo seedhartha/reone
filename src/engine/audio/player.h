@@ -17,19 +17,21 @@
 
 #pragma once
 
-#include "files.h"
 #include "options.h"
-#include "soundinstance.h"
+#include "types.h"
 
 namespace reone {
 
 namespace audio {
 
+class AudioFiles;
+class AudioStream;
 class SoundHandle;
+class SoundInstance;
 
 class AudioPlayer : boost::noncopyable {
 public:
-    AudioPlayer(AudioOptions opts, AudioFiles *files);
+    AudioPlayer(AudioOptions opts, AudioFiles &files);
     ~AudioPlayer();
 
     void init();
@@ -42,7 +44,7 @@ public:
 
 private:
     AudioOptions _opts;
-    AudioFiles *_files;
+    AudioFiles &_files;
 
     ALCdevice *_device { nullptr };
     ALCcontext *_context { nullptr };

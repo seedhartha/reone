@@ -17,6 +17,11 @@
 
 #include "services.h"
 
+#include "../resource/services.h"
+
+#include "files.h"
+#include "player.h"
+
 using namespace std;
 
 using namespace reone::resource;
@@ -33,7 +38,7 @@ AudioServices::AudioServices(AudioOptions options, ResourceServices &resource) :
 void AudioServices::init() {
     _files = make_unique<AudioFiles>(_resource.resources());
 
-    _player = make_unique<AudioPlayer>(_options, _files.get());
+    _player = make_unique<AudioPlayer>(_options, *_files);
     _player->init();
 }
 

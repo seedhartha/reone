@@ -19,6 +19,7 @@
 
 #include "../common/log.h"
 #include "../common/pathutil.h"
+#include "../audio/player.h"
 #include "../video/bikreader.h"
 
 using namespace std;
