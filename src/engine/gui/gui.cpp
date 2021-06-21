@@ -17,13 +17,19 @@
 
 #include "gui.h"
 
+#include "../common/guardutil.h"
 #include "../common/log.h"
 #include "../graphics/context.h"
 #include "../graphics/mesh/mesh.h"
 #include "../graphics/mesh/meshes.h"
+#include "../graphics/services.h"
 #include "../graphics/shader/shaders.h"
+#include "../graphics/texture/texture.h"
 #include "../graphics/texture/textures.h"
+#include "../graphics/window.h"
+#include "../resource/gffstruct.h"
 #include "../resource/resources.h"
+#include "../resource/services.h"
 
 using namespace std;
 using namespace std::placeholders;

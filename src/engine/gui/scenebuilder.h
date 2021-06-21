@@ -18,12 +18,21 @@
 #pragma once
 
 #include "../graphics/options.h"
-#include "../graphics/services.h"
-
-#include "../scene/node/model.h"
-#include "../scene/scenegraph.h"
 
 namespace reone {
+
+namespace graphics {
+
+class GraphicsServices;
+
+}
+
+namespace scene {
+
+class ModelSceneNode;
+class SceneGraph;
+
+}
 
 namespace gui {
 

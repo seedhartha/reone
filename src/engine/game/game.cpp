@@ -26,6 +26,7 @@
 #include "../graphics/pbribl.h"
 #include "../graphics/renderbuffer.h"
 #include "../graphics/walkmesh/walkmeshes.h"
+#include "../graphics/window.h"
 #include "../scene/pipeline/world.h"
 #include "../video/bikreader.h"
 

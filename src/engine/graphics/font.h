@@ -17,19 +17,11 @@
 
 #pragma once
 
+#include "types.h"
+
 namespace reone {
 
 namespace graphics {
-
-enum class TextGravity {
-    LeftCenter,
-    CenterBottom,
-    CenterCenter,
-    CenterTop,
-    RightBottom,
-    RightCenter,
-    RightTop
-};
 
 class Context;
 class Meshes;

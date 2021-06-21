@@ -96,6 +96,16 @@ enum class BlendMode {
     Lighten
 };
 
+enum class TextGravity {
+    LeftCenter,
+    CenterBottom,
+    CenterCenter,
+    CenterTop,
+    RightBottom,
+    RightCenter,
+    RightTop
+};
+
 struct TextureUnits {
     static constexpr int diffuseMap { 0 };
     static constexpr int lightmap { 1 };

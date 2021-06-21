@@ -17,18 +17,30 @@
 
 #pragma once
 
-#include "../../graphics/font.h"
-#include "../../graphics/framebuffer.h"
 #include "../../graphics/texture/texture.h"
-#include "../../resource/format/gffreader.h"
-#include "../../scene/node/model.h"
+#include "../../graphics/types.h"
 #include "../../scene/pipeline/control.h"
 #include "../../scene/scenegraph.h"
+
 #include "../types.h"
 
 namespace reone {
 
+namespace resource {
+
+class GffStruct;
+
+}
+
+namespace graphics {
+
+class Font;
+class Texture;
+
+}
+
 namespace gui {
+
 class GUI;
 
 /**
