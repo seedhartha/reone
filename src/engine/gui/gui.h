@@ -17,22 +17,31 @@
 
 #pragma once
 
-#include "../audio/services.h"
-#include "../graphics/fonts.h"
-#include "../graphics/mesh/meshes.h"
-#include "../graphics/services.h"
-#include "../graphics/shader/shaders.h"
-#include "../graphics/texture/textures.h"
-#include "../graphics/window.h"
-#include "../resource/format/gffreader.h"
-#include "../resource/resources.h"
-#include "../resource/services.h"
-#include "../resource/strings.h"
-#include "../resource/types.h"
+#include "../graphics/options.h"
 
 #include "control/control.h"
 
 namespace reone {
+
+namespace resource {
+
+class GffStruct;
+class ResourceServices;
+
+}
+
+namespace audio {
+
+class AudioServices;
+
+}
+
+namespace graphics {
+
+class GraphicsServices;
+class Texture;
+
+}
 
 namespace gui {
 
