@@ -263,6 +263,6 @@ for step in steps:
                 nwnnsscomp_dir = choose_directory("Choose a script compiler directory")
                 if not is_valid_script_compiler_dir(nwnnsscomp_dir):
                     exit(1)
-                append_dir_to_path(nwnnsscomp_dir)
+            append_dir_to_path(nwnnsscomp_dir)
 
             disassemble_scripts(extract_dir)
