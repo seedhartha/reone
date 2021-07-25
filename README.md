@@ -7,7 +7,7 @@ reone is a free and open source game engine, capable of running Star Wars: Knigh
 - Play KotOR and TSL from beginning to end
 - Create mods that drastically change the gameplay or improve the visuals
 
-The project is at a mid-stage of development: most engine subsystems have already been implemented, while game mechanics are actively being worked on. See project [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) on the Wiki.
+The project is at a mid-stage of development: most engine subsystems have already been implemented, while game mechanics are actively being worked on. See project [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap) and [Kanban board](https://github.com/seedhartha/reone/projects/3) for our long-term and short-term goals respectively.
 
 ## Legal
 
@@ -53,13 +53,13 @@ Configuration file, named "reone.cfg", must be located in the current directory.
 
 reone is not the only project aiming to reimplement the Odyssey engine - there are at least four alternatives:
 
-- [xoreos](https://github.com/xoreos/xoreos) - a reimplementation of BioWare's Aurora engine and its derivatives.
-- [KotOR.js](https://github.com/KobaltBlu/KotOR.js) - a remake of the Odyssey engine written in JavaScript.
-- [The Northern Lights](https://github.com/lachjames/NorthernLights) - a Unity-based reimplementation and a level editor.
-- [KotOR-Unity](https://github.com/rwc4301/KotOR-Unity) - another Unity-based reimplementation.
+- [xoreos](https://github.com/xoreos/xoreos) - a reimplementation of BioWare's Aurora engine and its derivatives
+- [KotOR.js](https://github.com/KobaltBlu/KotOR.js) - a remake of the Odyssey engine written in JavaScript
+- [The Northern Lights](https://github.com/lachjames/NorthernLights) - a Unity-based reimplementation and a level editor
+- [KotOR-Unity](https://github.com/rwc4301/KotOR-Unity) - another Unity-based reimplementation
 
 In contrast, this is what reone offers:
 
-- KotOR and TSL only, unlike xoreos, which aims to reimplement all of Aurora engine games - codebase is lighter and development is more focused.
-- Written in C++ - industry standard language, faster than the JavaScript implementation.
-- Custom game engine based on SDL 2 and OpenGL 3.3 - does not depend on Unity, which is a proprietary software with a learning curve of itself.
+- KotOR and TSL only, unlike xoreos, which aims to reimplement all of Aurora engine games - codebase is lighter and development is more focused
+- Written in C++ - industry standard language, faster than the JavaScript implementation
+- Custom game engine based on SDL 2 and OpenGL 3.3 - does not depend on Unity, which is a proprietary software with a learning curve of itself
