@@ -535,13 +535,13 @@ void Creature::onObjectInaudible(const shared_ptr<SpatialObject> &object) {
 void Creature::activateCombat() {
     _combat.active = true;
     if (_combat.deactivationTimer.isSet()) {
-        _combat.deactivationTimer.reset();
+        _combat.deactivationTimer.cancel();
     }
 }
 
 void Creature::deactivateCombat(float delay) {
     if (_combat.active && !_combat.deactivationTimer.isSet()) {
-        _combat.deactivationTimer.reset(delay);
+        _combat.deactivationTimer.setTimeout(delay);
     }
 }
 

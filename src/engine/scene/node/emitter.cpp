@@ -104,7 +104,7 @@ void EmitterSceneNode::spawnParticles(float dt) {
             if (_birthrate != 0.0f) {
                 if (_birthTimer.advance(dt)) {
                     doSpawnParticle();
-                    _birthTimer.reset(_birthInterval);
+                    _birthTimer.setTimeout(_birthInterval);
                 }
             }
             break;
@@ -117,7 +117,7 @@ void EmitterSceneNode::spawnParticles(float dt) {
         case ModelNode::Emitter::UpdateMode::Lightning:
             if (_birthTimer.advance(dt)) {
                 spawnLightningParticles();
-                _birthTimer.reset(_lightningDelay);
+                _birthTimer.setTimeout(_lightningDelay);
             }
             break;
         default:

@@ -15,35 +15,40 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+/** @file
+ *  Tests for MemoryCache class.
+ */
 
-#include "../../common/timer.h"
+#include <boost/test/unit_test.hpp>
 
-#include "action.h"
+#include "../../engine/common/cache.h"
 
-namespace reone {
+using namespace std;
+using namespace std::placeholders;
 
-namespace game {
+using namespace reone;
 
-class WaitAction : public Action {
+class TestCache : public MemoryCache<int, int> {
 public:
-    WaitAction(float seconds) : Action(ActionType::Wait) {
-        _timer.setTimeout(seconds);
-    }
-
-    /**
-     * Advances an internal timer.
-     *
-     * @return `true` if timer times out, `false` otherwise
-     */
-    bool advance(float dt) {
-        return _timer.advance(dt);
+    TestCache() : MemoryCache(bind(&TestCache::compute, this, _1)) {
     }
 
 private:
-    Timer _timer;
+    int _counter { 0 };
+
+    shared_ptr<int> compute(int key) {
+        return make_shared<int>(_counter++);
+    }
 };
 
-} // namespace game
+BOOST_AUTO_TEST_CASE(MemoryCache_ValueIsComputedAndCached) {
+    TestCache cache;
 
-} // namespace reone
+    auto result1 = cache.get(0);
+    auto result2 = cache.get(1);
+    auto result3 = cache.get(0);
+
+    BOOST_TEST((*result1 == 0));
+    BOOST_TEST((*result2 == 1));
+    BOOST_TEST((*result3 == 0));
+}

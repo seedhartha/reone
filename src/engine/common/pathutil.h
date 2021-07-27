@@ -19,6 +19,14 @@
 
 namespace reone {
 
-boost::filesystem::path getPathIgnoreCase(const boost::filesystem::path &basePath, const std::string &relPath, bool logNotFound = true);
+/**
+ * @param basePath parent directory path
+ * @param relPath relative path to a file or a directory (case-insensitive)
+ * @return absolute path to a file or a directory, or empty string if not found
+ */
+boost::filesystem::path getPathIgnoreCase(
+    const boost::filesystem::path &basePath,
+    const std::string &relPath,
+    bool logNotFound = true);
 
 } // namespace reone

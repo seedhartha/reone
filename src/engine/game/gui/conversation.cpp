@@ -195,7 +195,7 @@ void Conversation::scheduleEndOfEntry() {
 
     _entryEnded = false;
     _entryDuration = duration;
-    _endEntryTimer.reset(duration);
+    _endEntryTimer.setTimeout(duration);
 }
 
 void Conversation::loadReplies() {

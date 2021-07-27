@@ -19,33 +19,34 @@
 
 namespace reone {
 
-/**
- * Utility class to handle timed events.
- */
 class Timer {
 public:
-    Timer() = default;
-    Timer(float timeout);
-
-    void reset(float timeout = 0.0f);
-
     /**
-     * Advances this timer by the specified amount of seconds.
+     * Advances this timer by a given amount of seconds.
      *
-     * @return true if timer times out, false otherwise
+     * @return `true` if timer times out, `false` otherwise
      */
-    bool advance(float secs);
+    bool advance(float secs) {
+        _timeout = std::max(0.0f, _timeout - secs);
+        return isTimedOut();
+    }
 
     /**
-     * Cancels this timer, putting it the timed out state.
+     * Cancels this timer, putting it in timed out state.
      */
-    void cancel();
+    void cancel() {
+        _timeout = 0.0f;
+    }
 
-    bool isSet() const { return _time > 0.0f; }
-    bool isTimedOut() const { return _time == 0.0f; }
+    bool isSet() const { return _timeout > 0.0f; }
+    bool isTimedOut() const { return _timeout == 0.0f; }
+
+    void setTimeout(float timeout) {
+        _timeout = timeout;
+    }
 
 private:
-    float _time { 0.0f };
+    float _timeout { 0.0f };
 };
 
 } // namespace reone

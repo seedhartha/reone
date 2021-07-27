@@ -21,12 +21,21 @@
 
 namespace reone {
 
+/**
+ * Wraps byte array in a standard input stream.
+ */
 std::unique_ptr<std::istream> wrap(const ByteArray &arr);
 
+/**
+ * Wraps byte array in a standard input stream.
+ */
 inline std::unique_ptr<std::istream> wrap(const std::shared_ptr<ByteArray> &arr) {
     return wrap(*arr.get());
 }
 
+/**
+ * Unwrap standard output stream into a byte array.
+ */
 ByteArray unwrap(std::ostream);
 
 } // namespace reone

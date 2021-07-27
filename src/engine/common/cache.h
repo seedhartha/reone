@@ -22,11 +22,14 @@
 namespace reone {
 
 /**
- * Utility class for caching objects. Takes a function which computes an object by key.
+ * Generic in-memory cache.
  */
 template <class K, class V>
 class MemoryCache : boost::noncopyable {
 public:
+    /**
+     * @param compute function used to lazily compute a value given a key
+     */
     MemoryCache(std::function<std::shared_ptr<V>(K)> compute) : _compute(compute) {
         ensureNotNull(compute, "compute");
     }
@@ -35,6 +38,10 @@ public:
         _objects.clear();
     }
 
+    /**
+     * @return cached value
+     * @note if given key is not found in this cache, then value will be computed
+     */
     std::shared_ptr<V> get(K key) {
         auto maybeObject = _objects.find(key);
         if (maybeObject != _objects.end()) return maybeObject->second;

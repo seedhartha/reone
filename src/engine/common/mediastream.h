@@ -19,6 +19,9 @@
 
 namespace reone {
 
+/**
+ * Generic media stream.
+ */
 template <class Frame>
 class MediaStream : boost::noncopyable {
 public:
@@ -27,10 +30,14 @@ public:
     virtual ~MediaStream() {
     }
 
+    /**
+     * @return frame of given index
+     * @note uses a buffer internally, advances it on-demand
+     */
     std::shared_ptr<Frame> get(int frame) {
         int relFrame = frame - _frameOffset;
         if (relFrame < 0) {
-            throw std::logic_error("frame was unloaded: " + std::to_string(frame));
+            throw std::logic_error("frame has been unloaded: " + std::to_string(frame));
         }
         if (relFrame < static_cast<int>(_frames.size())) {
             return _frames[relFrame];
@@ -38,16 +45,17 @@ public:
         if (_ended) {
             return nullptr;
         }
+
+        ignoreFrames(std::max(0, frame - _frameOffset - static_cast<int>(_frames.size())));
         _frames.clear();
-
-        int nextFrame = _frameOffset + kBufferSize;
-        int framesToIgnore = std::max(0, frame - nextFrame);
-        ignoreFrames(framesToIgnore);
         fetchFrames(kBufferSize);
-
         _frameOffset = frame;
 
-        return get(frame);
+        if (_frames.empty()) {
+            return nullptr;
+        }
+
+        return _frames.front();
     }
 
 protected:

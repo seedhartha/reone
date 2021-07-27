@@ -19,6 +19,9 @@
 
 namespace reone {
 
+/**
+ * Bit flags corresponding to different debug output channels.
+ */
 struct DebugChannels {
     static constexpr int general = 1;
     static constexpr int gui = 2;

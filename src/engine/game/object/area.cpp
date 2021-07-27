@@ -65,10 +65,11 @@ static bool g_debugPath = false;
 Area::Area(uint32_t id, Game *game) :
     Object(id, ObjectType::Area, game),
     _actionExecutor(game),
-    _map(game),
-    _heartbeatTimer(kHeartbeatInterval) {
+    _map(game) {
 
     init();
+
+    _heartbeatTimer.setTimeout(kHeartbeatInterval);
 }
 
 void Area::init() {
@@ -725,7 +726,7 @@ void Area::updateHeartbeat(float dt) {
                 _game->services().scriptRunner().run(heartbeat, object->id());
             }
         }
-        _heartbeatTimer.reset(kHeartbeatInterval);
+        _heartbeatTimer.setTimeout(kHeartbeatInterval);
     }
 }
 
