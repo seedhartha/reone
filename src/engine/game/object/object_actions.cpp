@@ -40,7 +40,7 @@ void Object::addActionOnTop(unique_ptr<Action> action) {
 void Object::delayAction(unique_ptr<Action> action, float seconds) {
     DelayedAction delayed;
     delayed.action = move(action);
-    delayed.timer.reset(seconds);
+    delayed.timer.setTimeout(seconds);
     _delayed.push_back(move(delayed));
 }
 
@@ -60,7 +60,8 @@ void Object::removeCompletedActions() {
 
 void Object::updateDelayedActions(float dt) {
     for (auto &delayed : _delayed) {
-        if (delayed.timer.advance(dt)) {
+        delayed.timer.advance(dt);
+        if (delayed.timer.isTimedOut()) {
             _actions.push_back(move(delayed.action));
         }
     }

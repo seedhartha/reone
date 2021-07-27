@@ -30,7 +30,7 @@ static constexpr float kUpdatePerceptionInterval = 1.0f; // seconds
 void Area::updatePerception(float dt) {
     if (_perceptionTimer.advance(dt)) {
         doUpdatePerception();
-        _perceptionTimer.reset(kUpdatePerceptionInterval);
+        _perceptionTimer.setTimeout(kUpdatePerceptionInterval);
     }
 }
 

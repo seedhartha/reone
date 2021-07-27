@@ -37,9 +37,8 @@ static constexpr int kFrameWidth = 125;
 static constexpr char kFontResRef[] = "fnt_console";
 static constexpr float kRefreshInterval = 1.0f; // seconds
 
-ProfileOverlay::ProfileOverlay(GraphicsServices &graphics) :
-    _graphics(graphics),
-    _refreshTimer(kRefreshInterval) {
+ProfileOverlay::ProfileOverlay(GraphicsServices &graphics) : _graphics(graphics) {
+    _refreshTimer.setTimeout(kRefreshInterval);
 }
 
 void ProfileOverlay::init() {
@@ -66,7 +65,7 @@ void ProfileOverlay::update(float dt) {
     if (_refreshTimer.advance(dt)) {
         calculateFPS();
         _frametimes.clear();
-        _refreshTimer.reset(kRefreshInterval);
+        _refreshTimer.setTimeout(kRefreshInterval);
     }
 
     _counter = counter;

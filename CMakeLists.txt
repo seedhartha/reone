@@ -81,8 +81,7 @@ set(COMMON_SOURCES
     src/engine/common/random.cpp
     src/engine/common/streamreader.cpp
     src/engine/common/streamutil.cpp
-    src/engine/common/streamwriter.cpp
-    src/engine/common/timer.cpp)
+    src/engine/common/streamwriter.cpp)
 
 add_library(libcommon STATIC ${COMMON_HEADERS} ${COMMON_SOURCES})
 set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -788,6 +787,8 @@ endif()
 
 if(BUILD_TESTS)
     set(TEST_SOURCES
+        src/tests/common/cache.cpp
+        src/tests/common/mediastream.cpp
         src/tests/common/streamreader.cpp
         src/tests/common/timer.cpp
         src/tests/game/pathfinder.cpp

@@ -26,8 +26,8 @@
 using namespace reone;
 
 BOOST_AUTO_TEST_CASE(Timer_TimesOut) {
-    Timer timer(1.0f);
-
+    Timer timer;
+    timer.setTimeout(1.0f);
     timer.advance(0.5f);
 
     BOOST_TEST(!timer.isTimedOut());

@@ -72,7 +72,7 @@ void BarkBubble::setBarkText(const string &text, float duration) {
     }
 
     if (duration > 0.0f) {
-        _timer.reset(duration);
+        _timer.setTimeout(duration);
     }
 }
 

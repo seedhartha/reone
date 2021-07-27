@@ -21,6 +21,9 @@
 
 namespace reone {
 
+/**
+ * Abstraction over writing primitive data types to a standard output stream.
+ */
 class StreamWriter : boost::noncopyable {
 public:
     StreamWriter(const std::shared_ptr<std::ostream> &stream, boost::endian::order endianess = boost::endian::order::little);
