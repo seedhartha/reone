@@ -47,28 +47,56 @@ AbilitiesMenu::AbilitiesMenu(Game *game) : GameGUI(game) {
 
 void AbilitiesMenu::load() {
     GUI::load();
+    bindControls();
 
-    hideControl("BTN_CHARLEFT");
-    hideControl("BTN_CHARRIGHT");
+    _binding.btnSkills->setDisabled(true);
+    _binding.btnPowers->setDisabled(true);
+    _binding.btnFeats->setDisabled(true);
 
-    disableControl("BTN_SKILLS");
-    disableControl("BTN_POWERS");
-    disableControl("BTN_FEATS");
+    _binding.lblSkillRank->setTextMessage(_game->services().resource().strings().get(kStrRefSkillRank));
+    _binding.lblBonus->setTextMessage(_game->services().resource().strings().get(kStrRefBonus));
+    _binding.lblTotal->setTextMessage(_game->services().resource().strings().get(kStrRefTotalRank));
+    _binding.lblRankVal->setTextMessage("");
+    _binding.lblBonusVal->setTextMessage("");
+    _binding.lblTotalVal->setTextMessage("");
+    _binding.lblName->setTextMessage("");
 
-    setControlText("LBL_SKILLRANK", _game->services().resource().strings().get(kStrRefSkillRank));
-    setControlText("LBL_BONUS", _game->services().resource().strings().get(kStrRefBonus));
-    setControlText("LBL_TOTAL", _game->services().resource().strings().get(kStrRefTotalRank));
-
-    setControlText("LBL_RANKVAL", "");
-    setControlText("LBL_BONUSVAL", "");
-    setControlText("LBL_TOTALVAL", "");
-
-    setControlText("LBL_NAME", "");
-
-    auto &lbDesc = getControl<ListBox>("LB_DESC");
-    lbDesc.setProtoMatchContent(true);
+    _binding.lbDesc->setProtoMatchContent(true);
 
     loadSkills();
+}
+
+void AbilitiesMenu::bindControls() {
+    _binding.btnExit = getControlPtr<Button>("BTN_EXIT");
+    _binding.btnFeats = getControlPtr<Button>("BTN_FEATS");
+    _binding.btnPowers = getControlPtr<Button>("BTN_POWERS");
+    _binding.btnSkills = getControlPtr<Label>("BTN_SKILLS");
+    _binding.lblBonus = getControlPtr<Label>("LBL_BONUS");
+    _binding.lblBonusVal = getControlPtr<Label>("LBL_BONUSVAL");
+    _binding.lblInfoBg = getControlPtr<Label>("LBL_INFOBG");
+    _binding.lblName = getControlPtr<Label>("LBL_NAME");
+    _binding.lblRankVal = getControlPtr<Label>("LBL_RANKVAL");
+    _binding.lblSkillRank = getControlPtr<Label>("LBL_SKILLRANK");
+    _binding.lblTotal = getControlPtr<Label>("LBL_TOTAL");
+    _binding.lblTotalVal = getControlPtr<Label>("LBL_TOTALVAL");
+    _binding.lbAbility = getControlPtr<ListBox>("LB_ABILITY");
+    _binding.lbDesc = getControlPtr<ListBox>("LB_DESC");
+
+    if (_game->isKotOR()) {
+        _binding.btnChange1 = getControlPtr<Button>("BTN_CHANGE1");
+        _binding.btnChange2 = getControlPtr<Button>("BTN_CHANGE2");
+        _binding.lblPortrait = getControlPtr<Label>("LBL_PORTRAIT");
+    } else {
+        _binding.lblAbilities = getControlPtr<Label>("LBL_ABILITIES");
+        _binding.lblBar1 = getControlPtr<Label>("LBL_BAR1");
+        _binding.lblBar2 = getControlPtr<Label>("LBL_BAR2");
+        _binding.lblBar3 = getControlPtr<Label>("LBL_BAR3");
+        _binding.lblBar4 = getControlPtr<Label>("LBL_BAR4");
+        _binding.lblBar5 = getControlPtr<Label>("LBL_BAR5");
+        _binding.lblBar6 = getControlPtr<Label>("LBL_BAR6");
+        _binding.lblFilter = getControlPtr<Label>("LBL_FILTER");
+        _binding.lbDescFeats = getControlPtr<ListBox>("LB_DESC_FEATS");
+    }
 }
 
 void AbilitiesMenu::loadSkills() {
@@ -85,15 +113,14 @@ void AbilitiesMenu::loadSkills() {
         _skills.insert(make_pair(skill, move(skillInfo)));
     }
 
-    ListBox &lbAbility = getControl<ListBox>("LB_ABILITY");
-    lbAbility.clearItems();
+    _binding.lbAbility->clearItems();
     for (auto &skill : _skills) {
         ListBox::Item item;
         item.tag = to_string(static_cast<int>(skill.second.skill));
         item.text = skill.second.name;
         item.iconFrame = getFrameTexture();
         item.iconTexture = skill.second.icon;
-        lbAbility.addItem(move(item));
+        _binding.lbAbility->addItem(move(item));
     }
 }
 
@@ -119,13 +146,11 @@ void AbilitiesMenu::refreshPortraits() {
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
 
-    Control &btnChange1 = getControl("BTN_CHANGE1");
-    btnChange1.setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
-    btnChange1.setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
+    _binding.btnChange1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
+    _binding.btnChange1->setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
 
-    Control &btnChange2 = getControl("BTN_CHANGE2");
-    btnChange2.setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
-    btnChange2.setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
+    _binding.btnChange2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
+    _binding.btnChange2->setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
 
 void AbilitiesMenu::onClick(const string &control) {
@@ -142,16 +167,14 @@ void AbilitiesMenu::onListBoxItemClick(const string &control, const string &item
         auto maybeSkillInfo = _skills.find(skill);
         if (maybeSkillInfo != _skills.end()) {
             shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
-            setControlText("LBL_RANKVAL", to_string(partyLeader->attributes().getSkillRank(skill)));
-            setControlText("LBL_BONUSVAL", "0");
-            setControlText("LBL_TOTALVAL", to_string(partyLeader->attributes().getSkillRank(skill)));
 
-            auto &lbName = getControl("LBL_NAME");
-            lbName.setTextMessage(maybeSkillInfo->second.name);
+            _binding.lblRankVal->setTextMessage(to_string(partyLeader->attributes().getSkillRank(skill)));
+            _binding.lblBonusVal->setTextMessage("0");
+            _binding.lblTotalVal->setTextMessage(to_string(partyLeader->attributes().getSkillRank(skill)));
+            _binding.lblName->setTextMessage(maybeSkillInfo->second.name);
 
-            auto &lbDesc = getControl<ListBox>("LB_DESC");
-            lbDesc.clearItems();
-            lbDesc.addTextLinesAsItems(maybeSkillInfo->second.description);
+            _binding.lbDesc->clearItems();
+            _binding.lbDesc->addTextLinesAsItems(maybeSkillInfo->second.description);
         }
     }
 }

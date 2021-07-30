@@ -23,6 +23,14 @@
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+class Label;
+class ListBox;
+
+}
+
 namespace game {
 
 class AbilitiesMenu : public GameGUI {
@@ -41,16 +49,55 @@ private:
         std::shared_ptr<graphics::Texture> icon;
     };
 
+    struct Binding {
+        std::shared_ptr<gui::Button> btnExit;
+        std::shared_ptr<gui::Button> btnFeats;
+        std::shared_ptr<gui::Button> btnPowers;
+        std::shared_ptr<gui::Label> btnSkills;
+        std::shared_ptr<gui::Label> lblBonus;
+        std::shared_ptr<gui::Label> lblBonusVal;
+        std::shared_ptr<gui::Label> lblInfoBg;
+        std::shared_ptr<gui::Label> lblName;
+        std::shared_ptr<gui::Label> lblRankVal;
+        std::shared_ptr<gui::Label> lblSkillRank;
+        std::shared_ptr<gui::Label> lblTotal;
+        std::shared_ptr<gui::Label> lblTotalVal;
+        std::shared_ptr<gui::ListBox> lbAbility;
+        std::shared_ptr<gui::ListBox> lbDesc;
+
+        // KotOR only
+
+        std::shared_ptr<gui::Button> btnChange1;
+        std::shared_ptr<gui::Button> btnChange2;
+        std::shared_ptr<gui::Label> lblPortrait;
+
+        // END KotOR only
+
+        // TSL only
+
+        std::shared_ptr<gui::Label> lblAbilities;
+        std::shared_ptr<gui::Label> lblBar1;
+        std::shared_ptr<gui::Label> lblBar2;
+        std::shared_ptr<gui::Label> lblBar3;
+        std::shared_ptr<gui::Label> lblBar4;
+        std::shared_ptr<gui::Label> lblBar5;
+        std::shared_ptr<gui::Label> lblBar6;
+        std::shared_ptr<gui::Label> lblFilter;
+        std::shared_ptr<gui::ListBox> lbDescFeats;
+
+        // END TSL only
+    } _binding;
+
     std::unordered_map<SkillType, SkillInfo> _skills;
 
-    void onClick(const std::string &control) override;
-    void onListBoxItemClick(const std::string &control, const std::string &item) override;
-
+    void bindControls();
     void loadSkills();
-
     void refreshPortraits();
 
     std::shared_ptr<graphics::Texture> getFrameTexture() const;
+
+    void onClick(const std::string &control) override;
+    void onListBoxItemClick(const std::string &control, const std::string &item) override;
 };
 
 } // namespace game
