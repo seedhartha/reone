@@ -67,7 +67,28 @@ public:
 
     std::shared_ptr<gui::Button> getBtnChange2();
     std::shared_ptr<gui::Button> getBtnChange3();
+
 private:
+    struct Binding {
+        std::shared_ptr<gui::Label> lblhEqu;
+        std::shared_ptr<gui::Label> lblhInv;
+        std::shared_ptr<gui::Label> lblhCha;
+        std::shared_ptr<gui::Label> lblhAbi;
+        std::shared_ptr<gui::Label> lblhMsg;
+        std::shared_ptr<gui::Label> lblhJou;
+        std::shared_ptr<gui::Label> lblhMap;
+        std::shared_ptr<gui::Label> lblhOpt;
+
+        std::shared_ptr<gui::Button> btnEqu;
+        std::shared_ptr<gui::Button> btnInv;
+        std::shared_ptr<gui::Button> btnChar;
+        std::shared_ptr<gui::Button> btnAbi;
+        std::shared_ptr<gui::Button> btnMsg;
+        std::shared_ptr<gui::Button> btnJou;
+        std::shared_ptr<gui::Button> btnMap;
+        std::shared_ptr<gui::Button> btnOpt;
+    } _binding;
+
     Tab _tab { Tab::None };
 
     std::unique_ptr<CharacterMenu> _character;
@@ -79,6 +100,7 @@ private:
     std::unique_ptr<MapMenu> _map;
     std::unique_ptr<OptionsMenu> _options;
 
+    void bindControls();
     void updateTabButtons();
     void changeTab(Tab tab);
 
@@ -92,6 +114,8 @@ private:
     void loadOptions();
 
     GUI *getActiveTabGUI() const;
+
+    void setTabLabelsFocusable(bool focusable);
 };
 
 } // namespace game
