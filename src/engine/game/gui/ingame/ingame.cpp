@@ -29,17 +29,6 @@ namespace reone {
 
 namespace game {
 
-static unordered_map<InGameMenu::Tab, string> g_tabTags {
-    { InGameMenu::Tab::Equipment, "LBLH_EQU" },
-    { InGameMenu::Tab::Inventory, "LBLH_INV" },
-    { InGameMenu::Tab::Character, "LBLH_CHA" },
-    { InGameMenu::Tab::Abilities, "LBLH_ABI" },
-    { InGameMenu::Tab::Messages, "LBLH_MSG" },
-    { InGameMenu::Tab::Journal, "LBLH_JOU" },
-    { InGameMenu::Tab::Map, "LBLH_MAP" },
-    { InGameMenu::Tab::Options, "LBLH_OPT" }
-};
-
 InGameMenu::InGameMenu(Game *game) : GameGUI(game) {
     _resRef = getResRef("top");
 
@@ -51,15 +40,18 @@ InGameMenu::InGameMenu(Game *game) : GameGUI(game) {
 
 void InGameMenu::load() {
     GUI::load();
+    bindControls();
 
-    hideControl("BTN_EQU");
-    hideControl("BTN_INV");
-    hideControl("BTN_CHAR");
-    hideControl("BTN_ABI");
-    hideControl("BTN_MSG");
-    hideControl("BTN_JOU");
-    hideControl("BTN_MAP");
-    hideControl("BTN_OPT");
+    _binding.btnEqu->setVisible(false);
+    _binding.btnInv->setVisible(false);
+    _binding.btnChar->setVisible(false);
+    _binding.btnAbi->setVisible(false);
+    _binding.btnMsg->setVisible(false);
+    _binding.btnJou->setVisible(false);
+    _binding.btnMap->setVisible(false);
+    _binding.btnOpt->setVisible(false);
+
+    setTabLabelsFocusable(false);
 
     loadEquipment();
     loadInventory();
@@ -69,10 +61,37 @@ void InGameMenu::load() {
     loadJournal();
     loadMap();
     loadOptions();
+}
 
-    for (auto &tag : g_tabTags) {
-        setControlFocusable(tag.second, false);
-    }
+void InGameMenu::bindControls() {
+    _binding.lblhEqu = getControlPtr<Label>("LBLH_EQU");
+    _binding.lblhInv = getControlPtr<Label>("LBLH_INV");
+    _binding.lblhCha = getControlPtr<Label>("LBLH_CHA");
+    _binding.lblhAbi = getControlPtr<Label>("LBLH_ABI");
+    _binding.lblhMsg = getControlPtr<Label>("LBLH_MSG");
+    _binding.lblhJou = getControlPtr<Label>("LBLH_JOU");
+    _binding.lblhMap = getControlPtr<Label>("LBLH_MAP");
+    _binding.lblhOpt = getControlPtr<Label>("LBLH_OPT");
+
+    _binding.btnEqu = getControlPtr<Button>("BTN_EQU");
+    _binding.btnInv = getControlPtr<Button>("BTN_INV");
+    _binding.btnChar = getControlPtr<Button>("BTN_CHAR");
+    _binding.btnAbi = getControlPtr<Button>("BTN_ABI");
+    _binding.btnMsg = getControlPtr<Button>("BTN_MSG");
+    _binding.btnJou = getControlPtr<Button>("BTN_JOU");
+    _binding.btnMap = getControlPtr<Button>("BTN_MAP");
+    _binding.btnOpt = getControlPtr<Button>("BTN_OPT");
+}
+
+void InGameMenu::setTabLabelsFocusable(bool focusable) {
+    _binding.lblhEqu->setFocusable(focusable);
+    _binding.lblhInv->setFocusable(focusable);
+    _binding.lblhCha->setFocusable(focusable);
+    _binding.lblhAbi->setFocusable(focusable);
+    _binding.lblhMsg->setFocusable(focusable);
+    _binding.lblhJou->setFocusable(focusable);
+    _binding.lblhMap->setFocusable(focusable);
+    _binding.lblhOpt->setFocusable(focusable);
 }
 
 void InGameMenu::loadEquipment() {
@@ -187,9 +206,14 @@ void InGameMenu::changeTab(Tab tab) {
 }
 
 void InGameMenu::updateTabButtons() {
-    for (auto &tag : g_tabTags) {
-        setControlFocus(tag.second, tag.first == _tab);
-    }
+    _binding.btnEqu->setFocus(_tab == Tab::Equipment);
+    _binding.btnInv->setFocus(_tab == Tab::Inventory);
+    _binding.btnChar->setFocus(_tab == Tab::Character);
+    _binding.btnAbi->setFocus(_tab == Tab::Abilities);
+    _binding.btnMsg->setFocus(_tab == Tab::Messages);
+    _binding.btnJou->setFocus(_tab == Tab::Journal);
+    _binding.btnMap->setFocus(_tab == Tab::Map);
+    _binding.btnOpt->setFocus(_tab == Tab::Options);
 }
 
 void InGameMenu::openInventory() {
@@ -224,6 +248,14 @@ void InGameMenu::openOptions() {
     changeTab(Tab::Options);
 }
 
+shared_ptr<Button> InGameMenu::getBtnChange2() {
+    return _game->isTSL() ? getControlPtr<Button>("BTN_CHANGE2") : nullptr;
+}
+
+shared_ptr<Button> InGameMenu::getBtnChange3() {
+    return _game->isTSL() ? getControlPtr<Button>("BTN_CHANGE3") : nullptr;
+}
+
 void InGameMenu::onClick(const string &control) {
     GameGUI::onClick(control);
 
@@ -244,14 +276,6 @@ void InGameMenu::onClick(const string &control) {
     } else if (control == "LBLH_OPT") {
         openOptions();
     }
-}
-
-shared_ptr<Button> InGameMenu::getBtnChange2() {
-    return _game->isTSL() ? getControlPtr<Button>("BTN_CHANGE2") : nullptr;
-}
-
-shared_ptr<Button> InGameMenu::getBtnChange3() {
-    return _game->isTSL() ? getControlPtr<Button>("BTN_CHANGE3") : nullptr;
 }
 
 } // namespace game
