@@ -42,15 +42,22 @@ MapMenu::MapMenu(Game *game) : GameGUI(game) {
 
 void MapMenu::load() {
     GUI::load();
+    bindControls();
 
-    disableControl("BTN_RETURN");
+    _binding.btnReturn->setDisabled(true);
+}
+
+void MapMenu::bindControls() {
+    _binding.btnReturn = getControlPtr<Button>("BTN_RETURN");
+    _binding.lblArea = getControlPtr<Label>("LBL_Area");
+    _binding.lblMap = getControlPtr<Label>("LBL_Map");
+    _binding.lblMapNote = getControlPtr<Label>("LBL_MapNote");
 }
 
 void MapMenu::draw() {
     GUI::draw();
 
-    Control &label = getControl("LBL_Map");
-    const Control::Extent &extent = label.extent();
+    const Control::Extent &extent = _binding.lblMap->extent();
 
     glm::vec4 bounds(
         _controlOffset.x + extent.left,
@@ -62,8 +69,7 @@ void MapMenu::draw() {
 }
 
 void MapMenu::refreshControls() {
-    setControlText("LBL_Area", _game->module()->area()->localizedName());
-
+    _binding.lblArea->setTextMessage(_game->module()->area()->localizedName());
     _notes.clear();
 
     for (auto &object : _game->module()->area()->getObjectsByType(ObjectType::Waypoint)) {
@@ -107,7 +113,7 @@ void MapMenu::refreshSelectedNote() {
         text += ": ";
         text += note->mapNote();
 
-        setControlText("LBL_MapNote", text);
+        _binding.lblMapNote->setTextMessage(text);
     }
 
     _game->module()->area()->map().setSelectedNote(note);

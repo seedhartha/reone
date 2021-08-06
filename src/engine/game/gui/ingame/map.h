@@ -21,6 +21,13 @@
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+class Label;
+
+}
+
 namespace game {
 
 class Map;
@@ -36,12 +43,20 @@ public:
     void refreshControls();
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::Button> btnReturn;
+        std::shared_ptr<gui::Label> lblArea;
+        std::shared_ptr<gui::Label> lblMap;
+        std::shared_ptr<gui::Label> lblMapNote;
+    } _binding;
+
     std::vector<std::shared_ptr<Waypoint>> _notes;
     int _selectedNoteIdx { 0 };
 
-    void onClick(const std::string &control) override;
-
+    void bindControls();
     void refreshSelectedNote();
+
+    void onClick(const std::string &control) override;
 };
 
 } // namespace game
