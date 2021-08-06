@@ -21,6 +21,12 @@
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+
+}
+
 namespace game {
 
 class MessagesMenu : public GameGUI {
@@ -30,6 +36,12 @@ public:
     void load() override;
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::Button> btnShow;
+    } _binding;
+
+    void bindControls();
+
     void onClick(const std::string &control) override;
 };
 

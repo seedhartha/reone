@@ -37,8 +37,13 @@ MessagesMenu::MessagesMenu(Game *game) : GameGUI(game) {
 
 void MessagesMenu::load() {
     GUI::load();
+    bindControls();
 
-    disableControl("BTN_SHOW");
+    _binding.btnShow->setDisabled(true);
+}
+
+void MessagesMenu::bindControls() {
+    _binding.btnShow = getControlPtr<Button>("BTN_SHOW");
 }
 
 void MessagesMenu::onClick(const string &control) {
