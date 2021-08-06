@@ -37,10 +37,17 @@ JournalMenu::JournalMenu(Game *game) : GameGUI(game) {
 
 void JournalMenu::load() {
     GUI::load();
+    bindControls();
 
-    disableControl("BTN_QUESTITEMS");
-    disableControl("BTN_SORT");
-    disableControl("BTN_SWAPTEXT");
+    _binding.btnQuestItems->setDisabled(true);
+    _binding.btnSort->setDisabled(true);
+    _binding.btnSwapText->setDisabled(true);
+}
+
+void JournalMenu::bindControls() {
+    _binding.btnQuestItems = getControlPtr<Button>("BTN_QUESTITEMS");
+    _binding.btnSort = getControlPtr<Button>("BTN_SORT");
+    _binding.btnSwapText = getControlPtr<Button>("BTN_SWAPTEXT");
 }
 
 void JournalMenu::onClick(const string &control) {
