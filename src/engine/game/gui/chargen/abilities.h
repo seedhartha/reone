@@ -23,6 +23,14 @@
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+class Label;
+class ListBox;
+
+}
+
 namespace game {
 
 class CharacterGeneration;
@@ -36,17 +44,53 @@ public:
     void reset(bool newGame);
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::ListBox> lbDesc;
+        std::shared_ptr<gui::Label> remainingSelectionsLbl;
+        std::shared_ptr<gui::Label> costPointsLbl;
+        std::shared_ptr<gui::Label> lblAbilityMod;
+
+        std::shared_ptr<gui::Label> strLbl;
+        std::shared_ptr<gui::Label> dexLbl;
+        std::shared_ptr<gui::Label> conLbl;
+        std::shared_ptr<gui::Label> intLbl;
+        std::shared_ptr<gui::Label> wisLbl;
+        std::shared_ptr<gui::Label> chaLbl;
+
+        std::shared_ptr<gui::Button> strPointsBtn;
+        std::shared_ptr<gui::Button> dexPointsBtn;
+        std::shared_ptr<gui::Button> conPointsBtn;
+        std::shared_ptr<gui::Button> intPointsBtn;
+        std::shared_ptr<gui::Button> wisPointsBtn;
+        std::shared_ptr<gui::Button> chaPointsBtn;
+
+        std::shared_ptr<gui::Button> strMinusBtn;
+        std::shared_ptr<gui::Button> dexMinusBtn;
+        std::shared_ptr<gui::Button> conMinusBtn;
+        std::shared_ptr<gui::Button> intMinusBtn;
+        std::shared_ptr<gui::Button> wisMinusBtn;
+        std::shared_ptr<gui::Button> chaMinusBtn;
+
+        std::shared_ptr<gui::Button> strPlusBtn;
+        std::shared_ptr<gui::Button> dexPlusBtn;
+        std::shared_ptr<gui::Button> conPlusBtn;
+        std::shared_ptr<gui::Button> intPlusBtn;
+        std::shared_ptr<gui::Button> wisPlusBtn;
+        std::shared_ptr<gui::Button> chaPlusBtn;
+    } _binding;
+
     CharacterGeneration *_charGen;
     CreatureAttributes _attributes;
     int _points { 0 };
 
-    void onClick(const std::string &control) override;
-    void onFocusChanged(const std::string &control, bool focus) override;
-
+    void bindControls();
     void refreshControls();
     void updateCharacter();
 
     int getPointCost(Ability ability) const;
+
+    void onClick(const std::string &control) override;
+    void onFocusChanged(const std::string &control, bool focus) override;
 };
 
 } // namespace game
