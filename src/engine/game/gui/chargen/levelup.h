@@ -56,7 +56,6 @@ private:
         std::shared_ptr<gui::Label> lbl3;
         std::shared_ptr<gui::Label> lbl4;
         std::shared_ptr<gui::Label> lbl5;
-        std::shared_ptr<gui::Label> lblDecoration;
         std::shared_ptr<gui::Label> lblNum1;
         std::shared_ptr<gui::Label> lblNum2;
         std::shared_ptr<gui::Label> lblNum3;

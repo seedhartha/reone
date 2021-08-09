@@ -40,10 +40,6 @@ void LevelUpMenu::load() {
     GUI::load();
     bindControls();
     doSetStep(0);
-
-    if (_game->id() == GameID::KotOR) {
-        _binding.lblDecoration->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
-    }
 }
 
 void LevelUpMenu::bindControls() {
@@ -57,7 +53,6 @@ void LevelUpMenu::bindControls() {
     _binding.lbl3 = getControlPtr<Label>("LBL_3");
     _binding.lbl4 = getControlPtr<Label>("LBL_4");
     _binding.lbl5 = getControlPtr<Label>("LBL_5");
-    _binding.lblDecoration = getControlPtr<Label>("LBL_DECORATION");
     _binding.lblNum1 = getControlPtr<Label>("LBL_NUM1");
     _binding.lblNum2 = getControlPtr<Label>("LBL_NUM2");
     _binding.lblNum3 = getControlPtr<Label>("LBL_NUM3");
