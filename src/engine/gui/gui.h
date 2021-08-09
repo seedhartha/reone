@@ -109,18 +109,11 @@ protected:
     virtual void onFocusChanged(const std::string &control, bool focus);
     virtual void preloadControl(Control &control);
 
-    Control &getControl(const std::string &tag) const;
-    std::shared_ptr<Control> getControlPtr(const std::string &tag) const;
+    std::shared_ptr<Control> getControl(const std::string &tag) const;
 
     template <class T>
-    T &getControl(const std::string &tag) const {
-        Control &ctrl = getControl(tag);
-        return static_cast<T &>(ctrl);
-    }
-
-    template <class T>
-    std::shared_ptr<T> getControlPtr(const std::string &tag) const {
-        auto ctrl = getControlPtr(tag);
+    std::shared_ptr<T> getControl(const std::string &tag) const {
+        auto ctrl = getControl(tag);
         return std::static_pointer_cast<T>(ctrl);
     }
 

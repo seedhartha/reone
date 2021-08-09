@@ -67,35 +67,35 @@ void AbilitiesMenu::load() {
 }
 
 void AbilitiesMenu::bindControls() {
-    _binding.btnExit = getControlPtr<Button>("BTN_EXIT");
-    _binding.btnFeats = getControlPtr<Button>("BTN_FEATS");
-    _binding.btnPowers = getControlPtr<Button>("BTN_POWERS");
-    _binding.btnSkills = getControlPtr<Label>("BTN_SKILLS");
-    _binding.lblBonus = getControlPtr<Label>("LBL_BONUS");
-    _binding.lblBonusVal = getControlPtr<Label>("LBL_BONUSVAL");
-    _binding.lblInfoBg = getControlPtr<Label>("LBL_INFOBG");
-    _binding.lblName = getControlPtr<Label>("LBL_NAME");
-    _binding.lblRankVal = getControlPtr<Label>("LBL_RANKVAL");
-    _binding.lblSkillRank = getControlPtr<Label>("LBL_SKILLRANK");
-    _binding.lblTotal = getControlPtr<Label>("LBL_TOTAL");
-    _binding.lblTotalVal = getControlPtr<Label>("LBL_TOTALVAL");
-    _binding.lbAbility = getControlPtr<ListBox>("LB_ABILITY");
-    _binding.lbDesc = getControlPtr<ListBox>("LB_DESC");
+    _binding.btnExit = getControl<Button>("BTN_EXIT");
+    _binding.btnFeats = getControl<Button>("BTN_FEATS");
+    _binding.btnPowers = getControl<Button>("BTN_POWERS");
+    _binding.btnSkills = getControl<Label>("BTN_SKILLS");
+    _binding.lblBonus = getControl<Label>("LBL_BONUS");
+    _binding.lblBonusVal = getControl<Label>("LBL_BONUSVAL");
+    _binding.lblInfoBg = getControl<Label>("LBL_INFOBG");
+    _binding.lblName = getControl<Label>("LBL_NAME");
+    _binding.lblRankVal = getControl<Label>("LBL_RANKVAL");
+    _binding.lblSkillRank = getControl<Label>("LBL_SKILLRANK");
+    _binding.lblTotal = getControl<Label>("LBL_TOTAL");
+    _binding.lblTotalVal = getControl<Label>("LBL_TOTALVAL");
+    _binding.lbAbility = getControl<ListBox>("LB_ABILITY");
+    _binding.lbDesc = getControl<ListBox>("LB_DESC");
 
     if (_game->isKotOR()) {
-        _binding.btnChange1 = getControlPtr<Button>("BTN_CHANGE1");
-        _binding.btnChange2 = getControlPtr<Button>("BTN_CHANGE2");
-        _binding.lblPortrait = getControlPtr<Label>("LBL_PORTRAIT");
+        _binding.btnChange1 = getControl<Button>("BTN_CHANGE1");
+        _binding.btnChange2 = getControl<Button>("BTN_CHANGE2");
+        _binding.lblPortrait = getControl<Label>("LBL_PORTRAIT");
     } else {
-        _binding.lblAbilities = getControlPtr<Label>("LBL_ABILITIES");
-        _binding.lblBar1 = getControlPtr<Label>("LBL_BAR1");
-        _binding.lblBar2 = getControlPtr<Label>("LBL_BAR2");
-        _binding.lblBar3 = getControlPtr<Label>("LBL_BAR3");
-        _binding.lblBar4 = getControlPtr<Label>("LBL_BAR4");
-        _binding.lblBar5 = getControlPtr<Label>("LBL_BAR5");
-        _binding.lblBar6 = getControlPtr<Label>("LBL_BAR6");
-        _binding.lblFilter = getControlPtr<Label>("LBL_FILTER");
-        _binding.lbDescFeats = getControlPtr<ListBox>("LB_DESC_FEATS");
+        _binding.lblAbilities = getControl<Label>("LBL_ABILITIES");
+        _binding.lblBar1 = getControl<Label>("LBL_BAR1");
+        _binding.lblBar2 = getControl<Label>("LBL_BAR2");
+        _binding.lblBar3 = getControl<Label>("LBL_BAR3");
+        _binding.lblBar4 = getControl<Label>("LBL_BAR4");
+        _binding.lblBar5 = getControl<Label>("LBL_BAR5");
+        _binding.lblBar6 = getControl<Label>("LBL_BAR6");
+        _binding.lblFilter = getControl<Label>("LBL_FILTER");
+        _binding.lbDescFeats = getControl<ListBox>("LB_DESC_FEATS");
     }
 }
 

@@ -74,21 +74,21 @@ void ClassSelection::load() {
 }
 
 void ClassSelection::bindControls() {
-    _binding.btnBack = getControlPtr<Button>("BTN_BACK");
-    _binding.btnSel1 = getControlPtr<Button>("BTN_SEL1");
-    _binding.btnSel2 = getControlPtr<Button>("BTN_SEL2");
-    _binding.btnSel3 = getControlPtr<Button>("BTN_SEL3");
-    _binding.btnSel4 = getControlPtr<Button>("BTN_SEL4");
-    _binding.btnSel5 = getControlPtr<Button>("BTN_SEL5");
-    _binding.btnSel6 = getControlPtr<Button>("BTN_SEL6");
-    _binding.lblClass = getControlPtr<Label>("LBL_CLASS");
-    _binding.lblDesc = getControlPtr<Label>("LBL_DESC");
-    _binding.threeDModel1 = getControlPtr<Label>("3D_MODEL1");
-    _binding.threeDModel2 = getControlPtr<Label>("3D_MODEL2");
-    _binding.threeDModel3 = getControlPtr<Label>("3D_MODEL3");
-    _binding.threeDModel4 = getControlPtr<Label>("3D_MODEL4");
-    _binding.threeDModel5 = getControlPtr<Label>("3D_MODEL5");
-    _binding.threeDModel6 = getControlPtr<Label>("3D_MODEL6");
+    _binding.btnBack = getControl<Button>("BTN_BACK");
+    _binding.btnSel1 = getControl<Button>("BTN_SEL1");
+    _binding.btnSel2 = getControl<Button>("BTN_SEL2");
+    _binding.btnSel3 = getControl<Button>("BTN_SEL3");
+    _binding.btnSel4 = getControl<Button>("BTN_SEL4");
+    _binding.btnSel5 = getControl<Button>("BTN_SEL5");
+    _binding.btnSel6 = getControl<Button>("BTN_SEL6");
+    _binding.lblClass = getControl<Label>("LBL_CLASS");
+    _binding.lblDesc = getControl<Label>("LBL_DESC");
+    _binding.threeDModel1 = getControl<Label>("3D_MODEL1");
+    _binding.threeDModel2 = getControl<Label>("3D_MODEL2");
+    _binding.threeDModel3 = getControl<Label>("3D_MODEL3");
+    _binding.threeDModel4 = getControl<Label>("3D_MODEL4");
+    _binding.threeDModel5 = getControl<Label>("3D_MODEL5");
+    _binding.threeDModel6 = getControl<Label>("3D_MODEL6");
 }
 
 void ClassSelection::setupClassButtons() {

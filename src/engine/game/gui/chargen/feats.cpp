@@ -49,8 +49,8 @@ void CharGenFeats::load() {
 }
 
 void CharGenFeats::bindControls() {
-    _binding.btnSelect = getControlPtr<Button>("BTN_SELECT");
-    _binding.btnRecommended = getControlPtr<Button>("BTN_RECOMMENDED");
+    _binding.btnSelect = getControl<Button>("BTN_SELECT");
+    _binding.btnRecommended = getControl<Button>("BTN_RECOMMENDED");
 }
 
 void CharGenFeats::onClick(const string &control) {

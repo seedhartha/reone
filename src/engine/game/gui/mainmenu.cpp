@@ -79,23 +79,23 @@ void MainMenu::load() {
 }
 
 void MainMenu::bindControls() {
-    _binding.lbModules = getControlPtr<ListBox>("LB_MODULES");
-    _binding.lbl3dView = getControlPtr<Label>("LBL_3DVIEW");
-    _binding.lblGameLogo = getControlPtr<Label>("LBL_GAMELOGO");
-    _binding.lblBw = getControlPtr<Label>("LBL_BW");
-    _binding.lblLucas = getControlPtr<Label>("LBL_LUCAS");
-    _binding.btnLoadGame = getControlPtr<Button>("BTN_LOADGAME");
-    _binding.btnNewGame = getControlPtr<Button>("BTN_NEWGAME");
-    _binding.btnMovies = getControlPtr<Button>("BTN_MOVIES");
-    _binding.btnOptions = getControlPtr<Button>("BTN_OPTIONS");
-    _binding.lblNewContent = getControlPtr<Label>("LBL_NEWCONTENT");
-    _binding.btnExit = getControlPtr<Button>("BTN_EXIT");
-    _binding.btnWarp = getControlPtr<Button>("BTN_WARP");
+    _binding.lbModules = getControl<ListBox>("LB_MODULES");
+    _binding.lbl3dView = getControl<Label>("LBL_3DVIEW");
+    _binding.lblGameLogo = getControl<Label>("LBL_GAMELOGO");
+    _binding.lblBw = getControl<Label>("LBL_BW");
+    _binding.lblLucas = getControl<Label>("LBL_LUCAS");
+    _binding.btnLoadGame = getControl<Button>("BTN_LOADGAME");
+    _binding.btnNewGame = getControl<Button>("BTN_NEWGAME");
+    _binding.btnMovies = getControl<Button>("BTN_MOVIES");
+    _binding.btnOptions = getControl<Button>("BTN_OPTIONS");
+    _binding.lblNewContent = getControl<Label>("LBL_NEWCONTENT");
+    _binding.btnExit = getControl<Button>("BTN_EXIT");
+    _binding.btnWarp = getControl<Button>("BTN_WARP");
 
     if (_game->isTSL()) {
-        _binding.btnMusic = getControlPtr<Button>("BTN_MUSIC");
+        _binding.btnMusic = getControl<Button>("BTN_MUSIC");
     } else {
-        _binding.lblMenuBg = getControlPtr<Label>("LBL_MENUBG");
+        _binding.lblMenuBg = getControl<Label>("LBL_MENUBG");
     }
 }
 

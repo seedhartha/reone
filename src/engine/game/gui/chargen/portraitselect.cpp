@@ -67,10 +67,10 @@ void PortraitSelection::load() {
 }
 
 void PortraitSelection::bindControls() {
-    _binding.lblHead = getControlPtr<Label>("LBL_HEAD");
-    _binding.lblPortrait = getControlPtr<Label>("LBL_PORTRAIT");
-    _binding.btnAccept = getControlPtr<Button>("BTN_ACCEPT");
-    _binding.btnBack = getControlPtr<Button>("BTN_BACK");
+    _binding.lblHead = getControl<Label>("LBL_HEAD");
+    _binding.lblPortrait = getControl<Label>("LBL_PORTRAIT");
+    _binding.btnAccept = getControl<Button>("BTN_ACCEPT");
+    _binding.btnBack = getControl<Button>("BTN_BACK");
 }
 
 void PortraitSelection::setButtonColors(Control &control) {

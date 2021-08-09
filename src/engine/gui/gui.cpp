@@ -278,14 +278,7 @@ void GUI::resetFocus() {
     }
 }
 
-Control &GUI::getControl(const string &tag) const {
-    for (auto &control : _controls) {
-        if (control->tag() == tag) return *control;
-    }
-    throw runtime_error("Control not found: " + tag);
-}
-
-shared_ptr<Control> GUI::getControlPtr(const string &tag) const {
+shared_ptr<Control> GUI::getControl(const string &tag) const {
     for (auto &control : _controls) {
         if (control->tag() == tag) return control;
     }

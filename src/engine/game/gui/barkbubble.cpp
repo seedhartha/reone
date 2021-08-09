@@ -41,7 +41,7 @@ void BarkBubble::load() {
 }
 
 void BarkBubble::bindControls() {
-    _binding.lblBarkText = getControlPtr<Label>("LBL_BARKTEXT");
+    _binding.lblBarkText = getControl<Label>("LBL_BARKTEXT");
 }
 
 void BarkBubble::update(float dt) {

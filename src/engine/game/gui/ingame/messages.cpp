@@ -43,7 +43,7 @@ void MessagesMenu::load() {
 }
 
 void MessagesMenu::bindControls() {
-    _binding.btnShow = getControlPtr<Button>("BTN_SHOW");
+    _binding.btnShow = getControl<Button>("BTN_SHOW");
 }
 
 void MessagesMenu::onClick(const string &control) {

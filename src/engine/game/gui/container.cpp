@@ -59,11 +59,11 @@ void Container::load() {
 }
 
 void Container::bindControls() {
-    _binding.lblMessage = getControlPtr<Label>("LBL_MESSAGE");
-    _binding.lbItems = getControlPtr<ListBox>("LB_ITEMS");
-    _binding.btnOk = getControlPtr<Button>("BTN_OK");
-    _binding.btnGiveItems = getControlPtr<Button>("BTN_GIVEITEMS");
-    _binding.btnCancel = getControlPtr<Button>("BTN_CANCEL");
+    _binding.lblMessage = getControl<Label>("LBL_MESSAGE");
+    _binding.lbItems = getControl<ListBox>("LB_ITEMS");
+    _binding.btnOk = getControl<Button>("BTN_OK");
+    _binding.btnGiveItems = getControl<Button>("BTN_GIVEITEMS");
+    _binding.btnCancel = getControl<Button>("BTN_CANCEL");
 }
 
 void Container::configureItemsListBox() {
