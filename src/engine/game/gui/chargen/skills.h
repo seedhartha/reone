@@ -23,6 +23,14 @@
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+class Label;
+class ListBox;
+
+}
+
 namespace game {
 
 class CharacterGeneration;
@@ -36,19 +44,51 @@ public:
     void reset(bool newGame);
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::Button> awaMinusBtn;
+        std::shared_ptr<gui::Button> awaPlusBtn;
+        std::shared_ptr<gui::Button> awarenessPointsBtn;
+        std::shared_ptr<gui::Button> btnRecommended;
+        std::shared_ptr<gui::Button> comMinusBtn;
+        std::shared_ptr<gui::Button> comPlusBtn;
+        std::shared_ptr<gui::Button> computerUsePointsBtn;
+        std::shared_ptr<gui::Button> demMinusBtn;
+        std::shared_ptr<gui::Button> demolitionsPointsBtn;
+        std::shared_ptr<gui::Button> demPlusBtn;
+        std::shared_ptr<gui::Button> perMinusBtn;
+        std::shared_ptr<gui::Button> perPlusBtn;
+        std::shared_ptr<gui::Button> persuadePointsBtn;
+        std::shared_ptr<gui::Button> repairPointsBtn;
+        std::shared_ptr<gui::Button> repMinusBtn;
+        std::shared_ptr<gui::Button> repPlusBtn;
+        std::shared_ptr<gui::Button> secMinusBtn;
+        std::shared_ptr<gui::Button> secPlusBtn;
+        std::shared_ptr<gui::Button> securityPointsBtn;
+        std::shared_ptr<gui::Button> stealthPointsBtn;
+        std::shared_ptr<gui::Button> steMinusBtn;
+        std::shared_ptr<gui::Button> stePlusBtn;
+        std::shared_ptr<gui::Button> treatInjuryPointsBtn;
+        std::shared_ptr<gui::Button> treMinusBtn;
+        std::shared_ptr<gui::Button> trePlusBtn;
+        std::shared_ptr<gui::Label> costPointsLbl;
+        std::shared_ptr<gui::Label> remainingSelectionsLbl;
+        std::shared_ptr<gui::ListBox> lbDesc;
+    } _binding;
+
     CharacterGeneration *_charGen;
     CreatureAttributes _attributes;
     int _points { 0 };
 
-    void onClick(const std::string &control) override;
-    void onFocusChanged(const std::string &control, bool focus) override;
-
+    void bindControls();
     void refreshControls();
     void updateCharacter();
 
     bool canIncreaseSkill(SkillType skill) const;
 
     int getPointCost(SkillType skill) const;
+
+    void onClick(const std::string &control) override;
+    void onFocusChanged(const std::string &control, bool focus) override;
 };
 
 } // namespace game
