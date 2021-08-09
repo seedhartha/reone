@@ -45,12 +45,44 @@ void CustomCharacterGeneration::load() {
     bindControls();
     doSetStep(0);
 
-    if (_game->id() == GameID::KotOR) {
+    _binding.btnCancel->setOnClick([this]() {
+        setStep(0);
+        _charGen->openQuickOrCustom();
+    });
+    _binding.btnBack->setOnClick([this]() {
+        if (_step == 0) {
+            _charGen->openQuickOrCustom();
+        } else {
+            setStep(_step - 1);
+        }
+    });
+    _binding.btnStepName1->setOnClick([this]() {
+        _charGen->openPortraitSelection();
+    });
+    _binding.btnStepName2->setOnClick([this]() {
+        _charGen->openAbilities();
+    });
+    _binding.btnStepName3->setOnClick([this]() {
+        _charGen->openSkills();
+    });
+    _binding.btnStepName4->setOnClick([this]() {
+        _charGen->openFeats();
+    });
+    _binding.btnStepName5->setOnClick([this]() {
+        _charGen->openNameEntry();
+    });
+    _binding.btnStepName6->setOnClick([this]() {
+        _charGen->finish();
+    });
+
+    if (_game->isKotOR()) {
         _binding.lblBg->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }
 
 void CustomCharacterGeneration::bindControls() {
+    _binding.btnCancel = getControl<Button>("BTN_CANCEL");
+    _binding.btnBack = getControl<Button>("BTN_BACK");
     _binding.btnStepName1 = getControl<Button>("BTN_STEPNAME1");
     _binding.btnStepName2 = getControl<Button>("BTN_STEPNAME2");
     _binding.btnStepName3 = getControl<Button>("BTN_STEPNAME3");
@@ -130,44 +162,6 @@ void CustomCharacterGeneration::doSetStep(int step) {
 void CustomCharacterGeneration::goToNextStep() {
     if (_step < 6) {
         doSetStep(_step + 1);
-    }
-}
-
-void CustomCharacterGeneration::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_CANCEL") {
-        setStep(0);
-        _charGen->openQuickOrCustom();
-
-    } else if (control == "BTN_BACK") {
-        if (_step == 0) {
-            _charGen->openQuickOrCustom();
-        } else {
-            setStep(_step - 1);
-        }
-    } else if (boost::starts_with(control, "BTN_STEPNAME")) {
-        int step = control[12] - '0';
-        switch (step) {
-            case 1:
-                _charGen->openPortraitSelection();
-                break;
-            case 2:
-                _charGen->openAbilities();
-                break;
-            case 3:
-                _charGen->openSkills();
-                break;
-            case 4:
-                _charGen->openFeats();
-                break;
-            case 5:
-                _charGen->openNameEntry();
-                break;
-            default:
-                _charGen->finish();
-                break;
-        }
     }
 }
 

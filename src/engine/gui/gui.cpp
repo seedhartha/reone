@@ -173,6 +173,7 @@ bool GUI::handle(const SDL_Event &event) {
                 Control *control = getControlAt(ctrlCoords.x, ctrlCoords.y, [](const Control &ctrl) { return ctrl.isClickable(); });
                 if (control) {
                     debug("GUI: click " + control->tag(), 2, DebugChannels::gui);
+                    onClick(control->tag());
                     return control->handleClick(ctrlCoords.x, ctrlCoords.y);
                 }
             }
@@ -201,8 +202,8 @@ void GUI::updateFocus(int x, int y) {
     if (_focus) {
         if (_focus->isFocusable()) {
             _focus->setFocus(false);
+            onFocusChanged(_focus->tag(), false);
         }
-        onFocusChanged(_focus->tag(), false);
     }
     _focus = control;
 
@@ -223,12 +224,6 @@ Control *GUI::getControlAt(int x, int y, const function<bool(const Control &)> &
     }
 
     return nullptr;
-}
-
-void GUI::onFocusChanged(const string &control, bool focus) {
-}
-
-void GUI::onListBoxItemClick(const string &control, const std::string &item) {
 }
 
 void GUI::update(float dt) {
@@ -283,9 +278,6 @@ shared_ptr<Control> GUI::getControl(const string &tag) const {
         if (control->tag() == tag) return control;
     }
     throw runtime_error("Control not found: " + tag);
-}
-
-void GUI::onClick(const string &control) {
 }
 
 } // namespace gui

@@ -35,28 +35,6 @@ namespace reone {
 
 namespace game {
 
-static const unordered_map<string, SkillType> g_skillByAlias {
-    { "COM", SkillType::ComputerUse },
-    { "DEM", SkillType::Demolitions },
-    { "STE", SkillType::Stealth },
-    { "AWA", SkillType::Awareness },
-    { "PER", SkillType::Persuade },
-    { "REP", SkillType::Repair },
-    { "SEC", SkillType::Security },
-    { "TRE", SkillType::TreatInjury }
-};
-
-static const unordered_map<string, SkillType> g_skillByLabelTag {
-    { "COMPUTER_USE_LBL", SkillType::ComputerUse },
-    { "DEMOLITIONS_LBL", SkillType::Demolitions },
-    { "STEALTH_LBL", SkillType::Stealth },
-    { "AWARENESS_LBL", SkillType::Awareness },
-    { "PERSUADE_LBL", SkillType::Persuade },
-    { "REPAIR_LBL", SkillType::Repair },
-    { "SECURITY_LBL", SkillType::Security },
-    { "TREAT_INJURY_LBL", SkillType::TreatInjury }
-};
-
 static const unordered_map<SkillType, int> g_descStrRefBySkill {
     { SkillType::ComputerUse, 244 },
     { SkillType::Demolitions, 246 },
@@ -109,9 +87,98 @@ void CharGenSkills::load() {
 
     _binding.btnRecommended->setDisabled(true);
     _binding.costPointsLbl->setTextMessage("");
+
+    _binding.btnAccept->setOnClick([this]() {
+        if (_points > 0) {
+            updateCharacter();
+        }
+        _charGen->goToNextStep();
+        _charGen->openSteps();
+    });
+    _binding.btnBack->setOnClick([this]() {
+        _charGen->openSteps();
+    });
+
+    _binding.computerUseLbl->setOnFocusChanged([this](bool focus) {
+        onSkillLabelFocusChanged(SkillType::ComputerUse, focus);
+    });
+    _binding.demolitionsLbl->setOnFocusChanged([this](bool focus) {
+        onSkillLabelFocusChanged(SkillType::Demolitions, focus);
+    });
+    _binding.stealthLbl->setOnFocusChanged([this](bool focus) {
+        onSkillLabelFocusChanged(SkillType::Stealth, focus);
+    });
+    _binding.awarenessLbl->setOnFocusChanged([this](bool focus) {
+        onSkillLabelFocusChanged(SkillType::Awareness, focus);
+    });
+    _binding.persuadeLbl->setOnFocusChanged([this](bool focus) {
+        onSkillLabelFocusChanged(SkillType::Persuade, focus);
+    });
+    _binding.repairLbl->setOnFocusChanged([this](bool focus) {
+        onSkillLabelFocusChanged(SkillType::Repair, focus);
+    });
+    _binding.securityLbl->setOnFocusChanged([this](bool focus) {
+        onSkillLabelFocusChanged(SkillType::Security, focus);
+    });
+    _binding.treatInjuryLbl->setOnFocusChanged([this](bool focus) {
+        onSkillLabelFocusChanged(SkillType::TreatInjury, focus);
+    });
+
+    _binding.comMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(SkillType::ComputerUse);
+    });
+    _binding.demMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(SkillType::Demolitions);
+    });
+    _binding.steMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(SkillType::Stealth);
+    });
+    _binding.awaMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(SkillType::Awareness);
+    });
+    _binding.perMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(SkillType::Persuade);
+    });
+    _binding.repMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(SkillType::Repair);
+    });
+    _binding.secMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(SkillType::Security);
+    });
+    _binding.treMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(SkillType::TreatInjury);
+    });
+
+    _binding.comPlusBtn->setOnClick([this]() {
+        onPlusButtonClick(SkillType::ComputerUse);
+    });
+    _binding.demPlusBtn->setOnClick([this]() {
+        onPlusButtonClick(SkillType::Demolitions);
+    });
+    _binding.stePlusBtn->setOnClick([this]() {
+        onPlusButtonClick(SkillType::Stealth);
+    });
+    _binding.awaPlusBtn->setOnClick([this]() {
+        onPlusButtonClick(SkillType::Awareness);
+    });
+    _binding.perPlusBtn->setOnClick([this]() {
+        onPlusButtonClick(SkillType::Persuade);
+    });
+    _binding.repPlusBtn->setOnClick([this]() {
+        onPlusButtonClick(SkillType::Repair);
+    });
+    _binding.secPlusBtn->setOnClick([this]() {
+        onPlusButtonClick(SkillType::Security);
+    });
+    _binding.trePlusBtn->setOnClick([this]() {
+        onPlusButtonClick(SkillType::TreatInjury);
+    });
 }
 
 void CharGenSkills::bindControls() {
+    _binding.btnAccept = getControl<Button>("BTN_ACCEPT");
+    _binding.btnBack = getControl<Button>("BTN_BACK");
+
     _binding.awaMinusBtn = getControl<Button>("AWA_MINUS_BTN");
     _binding.awaPlusBtn = getControl<Button>("AWA_PLUS_BTN");
     _binding.awarenessPointsBtn = getControl<Button>("AWARENESS_POINTS_BTN");
@@ -215,39 +282,6 @@ bool CharGenSkills::canIncreaseSkill(SkillType skill) const {
     return _points >= pointCost && _attributes.getSkillRank(skill) < maxSkillRank;
 }
 
-static SkillType getSkillByAlias(const string &alias) {
-    return g_skillByAlias.find(alias)->second;
-}
-
-void CharGenSkills::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_ACCEPT") {
-        if (_points == 0) {
-            updateCharacter();
-            _charGen->goToNextStep();
-            _charGen->openSteps();
-        }
-        _charGen->goToNextStep();
-        _charGen->openSteps();
-
-    } else if (control == "BTN_BACK") {
-        _charGen->openSteps();
-
-    } else if (boost::ends_with(control, "_MINUS_BTN")) {
-        SkillType skill = getSkillByAlias(control.substr(0, 3));
-        _attributes.setSkillRank(skill, _attributes.getSkillRank(skill) - 1);
-        _points += getPointCost(skill);
-        refreshControls();
-
-    } else if (boost::ends_with(control, "_PLUS_BTN")) {
-        SkillType skill = getSkillByAlias(control.substr(0, 3));
-        _points -= getPointCost(skill);
-        _attributes.setSkillRank(skill, _attributes.getSkillRank(skill) + 1);
-        refreshControls();
-    }
-}
-
 void CharGenSkills::updateCharacter() {
     Character character(_charGen->character());
     for (auto &skillRank : _attributes.skillRanks()) {
@@ -262,16 +296,27 @@ int CharGenSkills::getPointCost(SkillType skill) const {
     return creatureClass->isClassSkill(skill) ? 1 : 2;
 }
 
-void CharGenSkills::onFocusChanged(const string &control, bool focus) {
-    auto maybeSkill = g_skillByLabelTag.find(control);
-    if (maybeSkill != g_skillByLabelTag.end() && focus) {
-        auto maybeDescription = g_descStrRefBySkill.find(maybeSkill->second);
-        if (maybeDescription != g_descStrRefBySkill.end()) {
-            string description(_game->services().resource().strings().get(maybeDescription->second));
-            _binding.lbDesc->clearItems();
-            _binding.lbDesc->addTextLinesAsItems(description);
-        }
-    }
+void CharGenSkills::onMinusButtonClick(SkillType skill) {
+    _attributes.setSkillRank(skill, _attributes.getSkillRank(skill) - 1);
+    _points += getPointCost(skill);
+    refreshControls();
+}
+
+void CharGenSkills::onPlusButtonClick(SkillType skill) {
+    _points -= getPointCost(skill);
+    _attributes.setSkillRank(skill, _attributes.getSkillRank(skill) + 1);
+    refreshControls();
+}
+
+void CharGenSkills::onSkillLabelFocusChanged(SkillType skill, bool focus) {
+    if (!focus) return;
+
+    auto maybeDescription = g_descStrRefBySkill.find(skill);
+    if (maybeDescription == g_descStrRefBySkill.end()) return;
+
+    string description(_game->services().resource().strings().get(maybeDescription->second));
+    _binding.lbDesc->clearItems();
+    _binding.lbDesc->addTextLinesAsItems(description);
 }
 
 } // namespace game

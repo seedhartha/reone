@@ -40,9 +40,23 @@ void LevelUpMenu::load() {
     GUI::load();
     bindControls();
     doSetStep(0);
+
+    _binding.btnBack->setOnClick([this]() {
+        _charGen->cancel();
+    });
+    _binding.btnStepName1->setOnClick([this]() {
+        _charGen->openAbilities();
+    });
+    _binding.btnStepName2->setOnClick([this]() {
+        _charGen->openSkills();
+    });
+    _binding.btnStepName5->setOnClick([this]() {
+        _charGen->finish();
+    });
 }
 
 void LevelUpMenu::bindControls() {
+    _binding.btnBack = getControl<Button>("BTN_BACK");
     _binding.btnStepName1 = getControl<Button>("BTN_STEPNAME1");
     _binding.btnStepName2 = getControl<Button>("BTN_STEPNAME2");
     _binding.btnStepName3 = getControl<Button>("BTN_STEPNAME3");
@@ -136,27 +150,6 @@ void LevelUpMenu::doSetStep(int step) {
     _binding.btnStepName3->setFocus(_step == 2);
     _binding.btnStepName4->setFocus(_step == 3);
     _binding.btnStepName5->setFocus(_step == 4);
-}
-
-void LevelUpMenu::onClick(const std::string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_BACK") {
-        _charGen->cancel();
-    } else if (boost::starts_with(control, "BTN_STEPNAME")) {
-        int step = control[12] - '0';
-        switch (step) {
-            case 1:
-                _charGen->openAbilities();
-                break;
-            case 2:
-                _charGen->openSkills();
-                break;
-            default:
-                _charGen->finish();
-                break;
-        }
-    }
 }
 
 } // namespace game

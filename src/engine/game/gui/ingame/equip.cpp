@@ -74,6 +74,53 @@ Equipment::Equipment(Game *game, InGameMenu &inGameMenu) : GameGUI(game), _inGam
     loadBackground(BackgroundType::Menu);
 }
 
+void Equipment::load() {
+    GUI::load();
+    bindControls();
+
+    _binding.btnChange1->setFocusable(false);
+    _binding.btnChange2->setFocusable(false);
+    _binding.btnCharLeft->setVisible(false);
+    _binding.btnCharRight->setVisible(false);
+    _binding.lbDesc->setVisible(false);
+    _binding.lblCantEquip->setVisible(false);
+
+    configureItemsListBox();
+
+    _binding.btnEquip->setOnClick([this]() {
+        if (_selectedSlot == Slot::None) {
+            _game->openInGame();
+        } else {
+            selectSlot(Slot::None);
+        }
+    });
+    _binding.btnBack->setOnClick([this]() {
+        if (_selectedSlot == Slot::None) {
+            _game->openInGame();
+        } else {
+            selectSlot(Slot::None);
+        }
+    });
+
+    for (auto &slotButton : _binding.btnInv) {
+        slotButton.second->setOnClick([&]() {
+            selectSlot(slotButton.first);
+        });
+        slotButton.second->setOnFocusChanged([&](bool focus) {
+            if (!focus) return;
+
+            string slotDesc;
+
+            auto maybeStrRef = g_slotStrRefs.find(slotButton.first);
+            if (maybeStrRef != g_slotStrRefs.end()) {
+                slotDesc = _game->services().resource().strings().get(maybeStrRef->second);
+            }
+
+            _binding.lblSlotName->setTextMessage(slotDesc);
+        });
+    }
+}
+
 void Equipment::bindControls() {
     _binding.lblCantEquip = getControl<Label>("LBL_CANTEQUIP");
     if (_game->isKotOR()) {
@@ -125,22 +172,11 @@ void Equipment::bindControls() {
     _binding.lbDesc = getControl<ListBox>("LB_DESC");
 }
 
-void Equipment::load() {
-    GUI::load();
-    bindControls();
-
-    _binding.btnChange1->setFocusable(false);
-    _binding.btnChange2->setFocusable(false);
-    _binding.btnCharLeft->setVisible(false);
-    _binding.btnCharRight->setVisible(false);
-    _binding.lbDesc->setVisible(false);
-    _binding.lblCantEquip->setVisible(false);
-
-    configureItemsListBox();
-}
-
 void Equipment::configureItemsListBox() {
     _binding.lbItems->setPadding(5);
+    _binding.lbItems->setOnItemClick([this](const string &item) {
+        onItemsListBoxItemClick(item);
+    });
 
     ImageButton &protoItem = static_cast<ImageButton &>(_binding.lbItems->protoItem());
     protoItem.setBorderColor(_game->getGUIColorBase());
@@ -176,8 +212,8 @@ static int getInventorySlot(Equipment::Slot slot) {
     }
 }
 
-void Equipment::onListBoxItemClick(const string &control, const string &item) {
-    if (control != "LB_ITEMS" || _selectedSlot == Slot::None) return;
+void Equipment::onItemsListBoxItemClick(const string &item) {
+    if (_selectedSlot == Slot::None) return;
 
     shared_ptr<Creature> player(_game->services().party().player());
     shared_ptr<Item> itemObj;
@@ -215,27 +251,6 @@ void Equipment::onListBoxItemClick(const string &control, const string &item) {
     }
 }
 
-void Equipment::onFocusChanged(const string &control, bool focus) {
-    GUI::onFocusChanged(control, focus);
-
-    if (!focus || !boost::starts_with(control, "BTN_INV_")) return;
-
-    string slotDesc;
-
-    string slotName(control.substr(8));
-    for (auto &name : g_slotNames) {
-        if (name.second != slotName)  continue;
-
-        auto maybeStrRef = g_slotStrRefs.find(name.first);
-        if (maybeStrRef != g_slotStrRefs.end()) {
-            slotDesc = _game->services().resource().strings().get(maybeStrRef->second);
-        }
-        break;
-    }
-
-    _binding.lblSlotName->setTextMessage(slotDesc);
-}
-
 void Equipment::update() {
     updatePortraits();
     updateEquipment();
@@ -266,26 +281,6 @@ void Equipment::updatePortraits() {
 void Equipment::preloadControl(Control &control) {
     if (control.tag() == "LB_ITEMS") {
         static_cast<ListBox &>(control).setProtoItemType(ControlType::ImageButton);
-    }
-}
-
-void Equipment::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_EQUIP" || control == "BTN_BACK") {
-        if (_selectedSlot == Slot::None) {
-            _game->openInGame();
-        } else {
-            selectSlot(Slot::None);
-        }
-    } else if (boost::starts_with(control, "BTN_INV_")) {
-        string slotName(control.substr(8));
-        for (auto &name : g_slotNames) {
-            if (name.second == slotName) {
-                selectSlot(name.first);
-                break;
-            }
-        }
     }
 }
 

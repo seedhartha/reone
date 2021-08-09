@@ -91,13 +91,90 @@ void CharGenAbilities::load() {
     _binding.intPointsBtn->setDisabled(true);
     _binding.wisPointsBtn->setDisabled(true);
     _binding.chaPointsBtn->setDisabled(true);
+
+    _binding.btnAccept->setOnClick([this]() {
+        if (_points > 0) return;
+        updateCharacter();
+        _charGen->goToNextStep();
+        _charGen->openSteps();
+    });
+    _binding.btnBack->setOnClick([this]() {
+        _charGen->openSteps();
+    });
+    _binding.btnRecommended->setOnClick([this]() {
+        ClassType classType = _charGen->character().attributes.getEffectiveClass();
+        shared_ptr<CreatureClass> clazz(_game->services().classes().get(classType));
+        _attributes = clazz->defaultAttributes();
+        _points = 0;
+        refreshControls();
+    });
+
+    _binding.strLbl->setOnFocusChanged([this](bool focus) {
+        onAbilityLabelFocusChanged(Ability::Strength, focus);
+    });
+    _binding.dexLbl->setOnFocusChanged([this](bool focus) {
+        onAbilityLabelFocusChanged(Ability::Dexterity, focus);
+    });
+    _binding.conLbl->setOnFocusChanged([this](bool focus) {
+        onAbilityLabelFocusChanged(Ability::Constitution, focus);
+    });
+    _binding.intLbl->setOnFocusChanged([this](bool focus) {
+        onAbilityLabelFocusChanged(Ability::Intelligence, focus);
+    });
+    _binding.wisLbl->setOnFocusChanged([this](bool focus) {
+        onAbilityLabelFocusChanged(Ability::Wisdom, focus);
+    });
+    _binding.chaLbl->setOnFocusChanged([this](bool focus) {
+        onAbilityLabelFocusChanged(Ability::Charisma, focus);
+    });
+
+    _binding.strMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(Ability::Strength);
+    });
+    _binding.dexMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(Ability::Dexterity);
+    });
+    _binding.conMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(Ability::Constitution);
+    });
+    _binding.intMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(Ability::Intelligence);
+    });
+    _binding.wisMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(Ability::Wisdom);
+    });
+    _binding.chaMinusBtn->setOnClick([this]() {
+        onMinusButtonClick(Ability::Charisma);
+    });
+
+    _binding.strPlusBtn->setOnClick([this]() {
+        onPlusButtonClick(Ability::Strength);
+    });
+    _binding.dexPlusBtn->setOnClick([this]() {
+        onPlusButtonClick(Ability::Dexterity);
+    });
+    _binding.conPlusBtn->setOnClick([this]() {
+        onPlusButtonClick(Ability::Constitution);
+    });
+    _binding.intPlusBtn->setOnClick([this]() {
+        onPlusButtonClick(Ability::Intelligence);
+    });
+    _binding.wisPlusBtn->setOnClick([this]() {
+        onPlusButtonClick(Ability::Wisdom);
+    });
+    _binding.chaPlusBtn->setOnClick([this]() {
+        onPlusButtonClick(Ability::Charisma);
+    });
 }
 
 void CharGenAbilities::bindControls() {
-    _binding.lbDesc = getControl<ListBox>("LB_DESC");
-    _binding.remainingSelectionsLbl = getControl<Label>("REMAINING_SELECTIONS_LBL");
+    _binding.btnAccept = getControl<Button>("BTN_ACCEPT");
+    _binding.btnBack = getControl<Button>("BTN_BACK");
+    _binding.btnRecommended = getControl<Button>("BTN_RECOMMENDED");
     _binding.costPointsLbl = getControl<Label>("COST_POINTS_LBL");
+    _binding.lbDesc = getControl<ListBox>("LB_DESC");
     _binding.lblAbilityMod = getControl<Label>("LBL_ABILITY_MOD");
+    _binding.remainingSelectionsLbl = getControl<Label>("REMAINING_SELECTIONS_LBL");
 
     _binding.strLbl = getControl<Label>("STR_LBL");
     _binding.dexLbl = getControl<Label>("DEX_LBL");
@@ -179,39 +256,6 @@ static Ability getAbilityByAlias(const string &alias) {
     return g_abilityByAlias.find(alias)->second;
 }
 
-void CharGenAbilities::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_ACCEPT") {
-        if (_points == 0) {
-            updateCharacter();
-            _charGen->goToNextStep();
-            _charGen->openSteps();
-        }
-    } else if (control == "BTN_BACK") {
-        _charGen->openSteps();
-
-    } else if (control == "BTN_RECOMMENDED") {
-        ClassType classType = _charGen->character().attributes.getEffectiveClass();
-        shared_ptr<CreatureClass> clazz(_game->services().classes().get(classType));
-        _attributes = clazz->defaultAttributes();
-        _points = 0;
-        refreshControls();
-
-    } else if (boost::ends_with(control, "_MINUS_BTN")) {
-        Ability ability = getAbilityByAlias(control.substr(0, 3));
-        _attributes.setAbilityScore(ability, _attributes.getAbilityScore(ability) - 1);
-        _points += getPointCost(ability);
-        refreshControls();
-
-    } else if (boost::ends_with(control, "_PLUS_BTN")) {
-        Ability ability = getAbilityByAlias(control.substr(0, 3));
-        _points -= getPointCost(ability);
-        _attributes.setAbilityScore(ability, _attributes.getAbilityScore(ability) + 1);
-        refreshControls();
-    }
-}
-
 void CharGenAbilities::updateCharacter() {
     Character character(_charGen->character());
     for (auto &abilityScore : _attributes.abilityScores()) {
@@ -220,19 +264,27 @@ void CharGenAbilities::updateCharacter() {
     _charGen->setCharacter(move(character));
 }
 
-void CharGenAbilities::onFocusChanged(const string &control, bool focus) {
-    if (focus && control.size() == 7ll && boost::ends_with(control, "_LBL")) {
-        string alias(control.substr(0, 3));
-        auto maybeAbility = g_abilityByAlias.find(alias);
-        if (maybeAbility != g_abilityByAlias.end()) {
-            auto maybeDescription = g_descStrRefByAbility.find(maybeAbility->second);
-            if (maybeDescription != g_descStrRefByAbility.end()) {
-                string description(_game->services().resource().strings().get(maybeDescription->second));
-                _binding.lbDesc->clearItems();
-                _binding.lbDesc->addTextLinesAsItems(description);
-            }
-        }
-    }
+void CharGenAbilities::onAbilityLabelFocusChanged(Ability ability, bool focus) {
+    if (!focus) return;
+
+    auto maybeDescription = g_descStrRefByAbility.find(ability);
+    if (maybeDescription == g_descStrRefByAbility.end()) return;
+
+    string description(_game->services().resource().strings().get(maybeDescription->second));
+    _binding.lbDesc->clearItems();
+    _binding.lbDesc->addTextLinesAsItems(description);
+}
+
+void CharGenAbilities::onMinusButtonClick(Ability ability) {
+    _attributes.setAbilityScore(ability, _attributes.getAbilityScore(ability) - 1);
+    _points += getPointCost(ability);
+    refreshControls();
+}
+
+void CharGenAbilities::onPlusButtonClick(Ability ability) {
+    _points -= getPointCost(ability);
+    _attributes.setAbilityScore(ability, _attributes.getAbilityScore(ability) + 1);
+    refreshControls();
 }
 
 } // namespace game

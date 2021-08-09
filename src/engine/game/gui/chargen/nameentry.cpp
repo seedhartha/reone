@@ -53,9 +53,23 @@ void NameEntry::load() {
     loadLtrFile("humanl", _lastNameLtr);
 
     _binding.nameBoxEdit->setTextMessage("");
+
+    _binding.btnRandom->setOnClick([this]() {
+        loadRandomName();
+    });
+    _binding.endBtn->setOnClick([this]() {
+        _charGen->goToNextStep();
+        _charGen->openSteps();
+    });
+    _binding.btnBack->setOnClick([this]() {
+        _charGen->openSteps();
+    });
 }
 
 void NameEntry::bindControls() {
+    _binding.btnBack = getControl<Button>("BTN_BACK");
+    _binding.btnRandom = getControl<Button>("BTN_RANDOM");
+    _binding.endBtn = getControl<Button>("END_BTN");
     _binding.nameBoxEdit = getControl<Control>("NAME_BOX_EDIT");
 }
 
@@ -70,21 +84,6 @@ bool NameEntry::handle(const SDL_Event &event) {
         return true;
     }
     return GUI::handle(event);
-}
-
-void NameEntry::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_RANDOM") {
-        loadRandomName();
-
-    } else if (control == "END_BTN") {
-        _charGen->goToNextStep();
-        _charGen->openSteps();
-
-    } else if (control == "BTN_BACK") {
-        _charGen->openSteps();
-    }
 }
 
 void NameEntry::loadRandomName() {

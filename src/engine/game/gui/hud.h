@@ -43,8 +43,6 @@ public:
 
     BarkBubble &barkBubble() const { return *_barkBubble; }
 
-    void onClick(const std::string &control) override;
-
 private:
     struct Binding {
         std::shared_ptr<gui::Button> btnAbi;

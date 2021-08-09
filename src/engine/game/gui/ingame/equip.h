@@ -107,11 +107,9 @@ private:
     Slot _selectedSlot { Slot::None };
     int _selectedItemIdx { -1 };
 
-    void onClick(const std::string &control) override;
-    void onFocusChanged(const std::string &control, bool focus) override;
-    void onListBoxItemClick(const std::string &control, const std::string &item) override;
     void preloadControl(gui::Control &control) override;
 
+    void bindControls();
     void configureItemsListBox();
     void updateEquipment();
     void updateItems();
@@ -121,7 +119,7 @@ private:
     std::shared_ptr<graphics::Texture> getItemFrameTexture(int stackSize) const;
     std::shared_ptr<graphics::Texture> getEmptySlotIcon(Slot slot) const;
 
-    void bindControls();
+    void onItemsListBoxItemClick(const std::string &item);
 };
 
 } // namespace game

@@ -71,6 +71,12 @@ public:
     Control &scrollBar() const { return *_scrollBar; }
     int selectedItemIndex() const { return _selectedItemIndex; }
 
+    // Event listeners
+
+    void setOnItemClick(std::function<void(const std::string &)> fn) { _onItemClick = std::move(fn); }
+
+    // END Event listeners
+
 private:
     SelectionMode _selectionMode { SelectionMode::OnHover };
     ControlType _protoItemType { ControlType::Invalid };
@@ -82,6 +88,12 @@ private:
     int _selectedItemIndex { -1 };
     int _itemMargin { 0 };
     bool _protoMatchContent { false }; /**< proto item height must match its content */
+
+    // Event listeners
+
+    std::function<void(const std::string &)> _onItemClick;
+
+    // END Event listeners
 
     void updateItemSlots();
 

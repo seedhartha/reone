@@ -44,24 +44,22 @@ void CharGenFeats::load() {
     GUI::load();
     bindControls();
 
+    _binding.btnAccept->setOnClick([this]() {
+        _charGen->goToNextStep();
+        _charGen->openSteps();
+    });
+    _binding.btnBack->setOnClick([this]() {
+        _charGen->openSteps();
+    });
     _binding.btnSelect->setDisabled(true);
     _binding.btnRecommended->setDisabled(true);
 }
 
 void CharGenFeats::bindControls() {
+    _binding.btnAccept = getControl<Button>("BTN_ACCEPT");
+    _binding.btnBack = getControl<Button>("BTN_BACK");
     _binding.btnSelect = getControl<Button>("BTN_SELECT");
     _binding.btnRecommended = getControl<Button>("BTN_RECOMMENDED");
-}
-
-void CharGenFeats::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_ACCEPT") {
-        _charGen->goToNextStep();
-        _charGen->openSteps();
-    } else if (control == "BTN_BACK") {
-        _charGen->openSteps();
-    }
 }
 
 } // namespace game

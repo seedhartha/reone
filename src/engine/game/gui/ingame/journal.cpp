@@ -39,23 +39,19 @@ void JournalMenu::load() {
     GUI::load();
     bindControls();
 
+    _binding.btnExit->setOnClick([this]() {
+        _game->openInGame();
+    });
     _binding.btnQuestItems->setDisabled(true);
     _binding.btnSort->setDisabled(true);
     _binding.btnSwapText->setDisabled(true);
 }
 
 void JournalMenu::bindControls() {
+    _binding.btnExit = getControl<Button>("BTN_EXIT");
     _binding.btnQuestItems = getControl<Button>("BTN_QUESTITEMS");
     _binding.btnSort = getControl<Button>("BTN_SORT");
     _binding.btnSwapText = getControl<Button>("BTN_SWAPTEXT");
-}
-
-void JournalMenu::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_EXIT") {
-        _game->openInGame();
-    }
 }
 
 } // namespace game

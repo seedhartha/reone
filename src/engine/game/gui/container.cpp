@@ -55,6 +55,14 @@ void Container::load() {
     string lblMessage(_game->services().resource().strings().get(kInventoryResRef));
     _binding.lblMessage->setTextMessage(lblMessage);
 
+    _binding.btnOk->setOnClick([this]() {
+        transferItemsToPlayer();
+        _game->openInGame();
+    });
+    _binding.btnCancel->setOnClick([this]() {
+        _game->openInGame();
+    });
+
     configureItemsListBox();
 }
 
@@ -104,17 +112,6 @@ shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
     return _game->services().graphics().textures().get(resRef, TextureUsage::GUI);
-}
-
-void Container::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_OK") {
-        transferItemsToPlayer();
-        _game->openInGame();
-    } else if (control == "BTN_CANCEL") {
-        _game->openInGame();
-    }
 }
 
 void Container::transferItemsToPlayer() {

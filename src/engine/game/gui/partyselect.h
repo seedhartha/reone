@@ -117,9 +117,8 @@ private:
 
     gui::ToggleButton &getNpcButton(int npc);
 
-    void onClick(const std::string &control) override;
     void onAcceptButtonClick();
-    void onNpcButtonClick(const std::string &control);
+    void onNpcButtonClick(int npc);
 };
 
 } // namespace game

@@ -75,7 +75,6 @@ private:
     void setupClassButtons();
     void setupClassButton(int index, Gender gender, ClassType clazz);
 
-    int getClassButtonIndexByTag(const std::string &tag) const;
     std::shared_ptr<scene::ModelSceneNode> getCharacterModel(int appearance, scene::SceneGraph &sceneGraph);
     int getRandomCharacterAppearance(Gender gender, ClassType clazz);
     std::vector<Portrait> getPCPortraitsByGender(Gender gender);
@@ -83,8 +82,8 @@ private:
     void setButtonColors(gui::Control &control);
     void setClassButtonEnlarged(int index, bool enlarged);
 
-    void onFocusChanged(const std::string &control, bool focus) override;
-    void onClick(const std::string &control) override;
+    void onClassButtonFocusChanged(int index, bool focus);
+    void onClassButtonClick(int index);
 };
 
 } // namespace game

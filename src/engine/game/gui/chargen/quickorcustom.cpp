@@ -55,38 +55,38 @@ void QuickOrCustom::load() {
     }
 
     _binding.lbDesc->setProtoMatchContent(true);
+
+    _binding.btnBack->setOnClick([this]() {
+        _charGen->openClassSelection();
+    });
+
+    _binding.quickCharBtn->setOnFocusChanged([this](bool focus) {
+        if (!focus) return;
+        string text(_game->services().resource().strings().get(kStrRefQuickHelpText));
+        _binding.lbDesc->clearItems();
+        _binding.lbDesc->addTextLinesAsItems(text);
+    });
+    _binding.quickCharBtn->setOnClick([this]() {
+        _charGen->startQuick();
+    });
+
+    _binding.custCharBtn->setOnFocusChanged([this](bool focus) {
+        if (!focus) return;
+        string text(_game->services().resource().strings().get(kStrRefCustomHelpText));
+        _binding.lbDesc->clearItems();
+        _binding.lbDesc->addTextLinesAsItems(text);
+    });
+    _binding.custCharBtn->setOnClick([this]() {
+        _charGen->startCustom();
+    });
 }
 
 void QuickOrCustom::bindControls() {
+    _binding.btnBack = getControl<Button>("BTN_BACK");
+    _binding.custCharBtn = getControl<Button>("CUST_CHAR_BTN");
+    _binding.quickCharBtn = getControl<Button>("QUICK_CHAR_BTN");
     _binding.lblRbg = getControl<Label>("LBL_RBG");
     _binding.lbDesc = getControl<ListBox>("LB_DESC");
-}
-
-void QuickOrCustom::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "QUICK_CHAR_BTN") {
-        _charGen->startQuick();
-    } else if (control == "CUST_CHAR_BTN") {
-        _charGen->startCustom();
-    } else if (control == "BTN_BACK") {
-        _charGen->openClassSelection();
-    }
-}
-
-void QuickOrCustom::onFocusChanged(const string &control, bool focus) {
-    GameGUI::onFocusChanged(control, focus);
-
-    if (focus) {
-        string text;
-        if (control == "QUICK_CHAR_BTN") {
-            text = _game->services().resource().strings().get(kStrRefQuickHelpText);
-        } else if (control == "CUST_CHAR_BTN") {
-            text = _game->services().resource().strings().get(kStrRefCustomHelpText);
-        }
-        _binding.lbDesc->clearItems();
-        _binding.lbDesc->addTextLinesAsItems(text);
-    }
 }
 
 } // namespace game

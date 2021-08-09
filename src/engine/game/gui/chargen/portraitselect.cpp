@@ -53,7 +53,7 @@ PortraitSelection::PortraitSelection(CharacterGeneration *charGen, Game *game) :
 
     initForGame();
 
-    if (game->id() == GameID::KotOR) {
+    if (game->isKotOR()) {
         loadBackground(BackgroundType::Menu);
     }
 }
@@ -64,11 +64,38 @@ void PortraitSelection::load() {
 
     setButtonColors(*_binding.btnAccept);
     setButtonColors(*_binding.btnBack);
+
+    _binding.btnArrL->setOnClick([this]() {
+        _currentPortrait--;
+        if (_currentPortrait == -1) {
+            _currentPortrait = static_cast<int>(_portraits.size()) - 1;
+        }
+        loadCurrentPortrait();
+        loadHeadModel();
+    });
+    _binding.btnArrR->setOnClick([this]() {
+        _currentPortrait = (_currentPortrait + 1) % static_cast<int>(_portraits.size());
+        loadCurrentPortrait();
+        loadHeadModel();
+    });
+    _binding.btnAccept->setOnClick([this]() {
+        Character character(_charGen->character());
+        character.appearance = getAppearanceFromCurrentPortrait();
+        _charGen->setCharacter(move(character));
+        _charGen->goToNextStep();
+        _charGen->openSteps();
+    });
+    _binding.btnBack->setOnClick([this]() {
+        resetCurrentPortrait();
+        _charGen->openSteps();
+    });
 }
 
 void PortraitSelection::bindControls() {
     _binding.lblHead = getControl<Label>("LBL_HEAD");
     _binding.lblPortrait = getControl<Label>("LBL_PORTRAIT");
+    _binding.btnArrL = getControl<Button>("BTN_ARRL");
+    _binding.btnArrR = getControl<Button>("BTN_ARRR");
     _binding.btnAccept = getControl<Button>("BTN_ACCEPT");
     _binding.btnBack = getControl<Button>("BTN_BACK");
 }
@@ -167,37 +194,6 @@ void PortraitSelection::loadCurrentPortrait() {
     string resRef(_portraits[_currentPortrait].resRef);
     shared_ptr<Texture> portrait(_game->services().graphics().textures().get(resRef, TextureUsage::GUI));
     _binding.lblPortrait->setBorderFill(portrait);
-}
-
-void PortraitSelection::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    int portraitCount = static_cast<int>(_portraits.size());
-
-    if (control == "BTN_ARRL") {
-        _currentPortrait--;
-        if (_currentPortrait == -1) {
-            _currentPortrait = portraitCount - 1;
-        }
-        loadCurrentPortrait();
-        loadHeadModel();
-
-    } else if (control == "BTN_ARRR") {
-        _currentPortrait = (_currentPortrait + 1) % portraitCount;
-        loadCurrentPortrait();
-        loadHeadModel();
-
-    } else if (control == "BTN_ACCEPT") {
-        Character character(_charGen->character());
-        character.appearance = getAppearanceFromCurrentPortrait();
-        _charGen->setCharacter(move(character));
-        _charGen->goToNextStep();
-        _charGen->openSteps();
-
-    } else if (control == "BTN_BACK") {
-        resetCurrentPortrait();
-        _charGen->openSteps();
-    }
 }
 
 } // namespace game

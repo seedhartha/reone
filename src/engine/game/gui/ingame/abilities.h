@@ -95,9 +95,6 @@ private:
     void refreshPortraits();
 
     std::shared_ptr<graphics::Texture> getFrameTexture() const;
-
-    void onClick(const std::string &control) override;
-    void onListBoxItemClick(const std::string &control, const std::string &item) override;
 };
 
 } // namespace game

@@ -38,7 +38,6 @@ public:
 
     void load() override;
 
-    void onClick(const std::string &control) override;
     void onModuleSelected(const std::string &name);
 
 private:
@@ -70,8 +69,6 @@ private:
     void loadModuleNames();
 
     std::shared_ptr<scene::ModelSceneNode> getKotorModel(scene::SceneGraph &sceneGraph);
-
-    void onListBoxItemClick(const std::string &control, const std::string &item) override;
 };
 
 } // namespace game

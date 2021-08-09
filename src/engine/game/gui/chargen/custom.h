@@ -46,6 +46,8 @@ public:
 
 private:
     struct Binding {
+        std::shared_ptr<gui::Button> btnBack;
+        std::shared_ptr<gui::Button> btnCancel;
         std::shared_ptr<gui::Button> btnStepName1;
         std::shared_ptr<gui::Button> btnStepName2;
         std::shared_ptr<gui::Button> btnStepName3;
@@ -72,8 +74,6 @@ private:
 
     void bindControls();
     void doSetStep(int step);
-
-    void onClick(const std::string &control) override;
 };
 
 } // namespace game

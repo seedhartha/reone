@@ -45,10 +45,13 @@ public:
 
 private:
     struct Binding {
-        std::shared_ptr<gui::ListBox> lbDesc;
-        std::shared_ptr<gui::Label> remainingSelectionsLbl;
+        std::shared_ptr<gui::Button> btnAccept;
+        std::shared_ptr<gui::Button> btnBack;
+        std::shared_ptr<gui::Button> btnRecommended;
         std::shared_ptr<gui::Label> costPointsLbl;
         std::shared_ptr<gui::Label> lblAbilityMod;
+        std::shared_ptr<gui::Label> remainingSelectionsLbl;
+        std::shared_ptr<gui::ListBox> lbDesc;
 
         std::shared_ptr<gui::Label> strLbl;
         std::shared_ptr<gui::Label> dexLbl;
@@ -89,8 +92,9 @@ private:
 
     int getPointCost(Ability ability) const;
 
-    void onClick(const std::string &control) override;
-    void onFocusChanged(const std::string &control, bool focus) override;
+    void onAbilityLabelFocusChanged(Ability ability, bool focus);
+    void onMinusButtonClick(Ability ability);
+    void onPlusButtonClick(Ability ability);
 };
 
 } // namespace game

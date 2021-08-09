@@ -174,7 +174,9 @@ bool ListBox::handleClick(int x, int y) {
     if (_selectionMode == SelectionMode::OnClick) {
         _selectedItemIndex = itemIdx;
     }
-    _gui->onListBoxItemClick(_tag, _items[itemIdx].tag);
+    if (_onItemClick) {
+        _onItemClick(_items[itemIdx].tag);
+    }
 
     return true;
 }

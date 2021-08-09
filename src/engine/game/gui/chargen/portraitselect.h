@@ -49,6 +49,8 @@ private:
     struct Binding {
         std::shared_ptr<gui::Label> lblHead;
         std::shared_ptr<gui::Label> lblPortrait;
+        std::shared_ptr<gui::Button> btnArrL;
+        std::shared_ptr<gui::Button> btnArrR;
         std::shared_ptr<gui::Button> btnAccept;
         std::shared_ptr<gui::Button> btnBack;
     } _binding;
@@ -66,8 +68,6 @@ private:
     std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::SceneGraph &sceneGraph);
 
     void setButtonColors(gui::Control &control);
-
-    void onClick(const std::string &control) override;
 };
 
 } // namespace game

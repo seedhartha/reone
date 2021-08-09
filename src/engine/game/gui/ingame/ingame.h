@@ -54,8 +54,6 @@ public:
     void draw() override;
     void draw3D() override;
 
-    void onClick(const std::string &control) override;
-
     void openEquipment();
     void openInventory();
     void openCharacter();

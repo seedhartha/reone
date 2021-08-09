@@ -45,6 +45,9 @@ public:
 
 private:
     struct Binding {
+        std::shared_ptr<gui::Button> btnAccept;
+        std::shared_ptr<gui::Button> btnBack;
+
         std::shared_ptr<gui::Button> awaMinusBtn;
         std::shared_ptr<gui::Button> awaPlusBtn;
         std::shared_ptr<gui::Button> awarenessPointsBtn;
@@ -95,8 +98,9 @@ private:
 
     int getPointCost(SkillType skill) const;
 
-    void onClick(const std::string &control) override;
-    void onFocusChanged(const std::string &control, bool focus) override;
+    void onMinusButtonClick(SkillType skill);
+    void onPlusButtonClick(SkillType skill);
+    void onSkillLabelFocusChanged(SkillType skill, bool focus);
 };
 
 } // namespace game

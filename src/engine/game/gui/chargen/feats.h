@@ -39,6 +39,8 @@ public:
 
 private:
     struct Binding {
+        std::shared_ptr<gui::Button> btnAccept;
+        std::shared_ptr<gui::Button> btnBack;
         std::shared_ptr<gui::Button> btnSelect;
         std::shared_ptr<gui::Button> btnRecommended;
     } _binding;
@@ -46,8 +48,6 @@ private:
     CharacterGeneration *_charGen;
 
     void bindControls();
-
-    void onClick(const std::string &control) override;
 };
 
 } // namespace game
