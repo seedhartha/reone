@@ -27,6 +27,13 @@
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+class Label;
+
+}
+
 namespace game {
 
 class ClassSelection : public GameGUI {
@@ -42,13 +49,31 @@ private:
         Character character;
     };
 
+    struct Binding {
+        std::shared_ptr<gui::Button> btnBack;
+        std::shared_ptr<gui::Button> btnSel1;
+        std::shared_ptr<gui::Button> btnSel2;
+        std::shared_ptr<gui::Button> btnSel3;
+        std::shared_ptr<gui::Button> btnSel4;
+        std::shared_ptr<gui::Button> btnSel5;
+        std::shared_ptr<gui::Button> btnSel6;
+        std::shared_ptr<gui::Label> lblClass;
+        std::shared_ptr<gui::Label> lblDesc;
+        std::shared_ptr<gui::Label> threeDModel1;
+        std::shared_ptr<gui::Label> threeDModel2;
+        std::shared_ptr<gui::Label> threeDModel3;
+        std::shared_ptr<gui::Label> threeDModel4;
+        std::shared_ptr<gui::Label> threeDModel5;
+        std::shared_ptr<gui::Label> threeDModel6;
+    } _binding;
+
     glm::ivec2 _defaultButtonSize { 0 };
     glm::ivec2 _enlargedButtonSize { 0 };
     std::vector<ClassButton> _classButtons;
 
+    void bindControls();
     void setupClassButtons();
     void setupClassButton(int index, Gender gender, ClassType clazz);
-
 
     int getClassButtonIndexByTag(const std::string &tag) const;
     std::shared_ptr<scene::ModelSceneNode> getCharacterModel(int appearance, scene::SceneGraph &sceneGraph);
