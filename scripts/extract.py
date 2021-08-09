@@ -21,10 +21,13 @@ TODO: support case sensitive paths (Unix)
 
 import glob
 import os
+import platform
 import shutil
+import subprocess
 import sys
+import tkinter
+import tkinter.filedialog
 
-from reo_shared import *
 
 game_dir = os.getenv("REONE_GAME_DIR")
 tools_dir = os.getenv("REONE_TOOLS_DIR")
@@ -44,6 +47,62 @@ steps = [
     ["convert_to_ascii_pth", "Convert binary PTH to ASCII PTH (y/n)?"],
     ["disassemble_scripts", "Disassemble NCS scripts (y/n)?"]
     ]
+
+
+def init_window():
+    root = tkinter.Tk()
+    root.withdraw()
+
+
+def is_valid_game_dir(dir):
+    if not dir or not os.path.isdir(dir):
+        return False
+    for f in os.listdir(dir):
+        if f == "chitin.key":
+            return True
+    print("Game directory does not contain a keyfile")
+    return False
+
+
+def is_valid_tools_dir(dir):
+    if not dir or not os.path.isdir(dir):
+        return False
+    for f in os.listdir(dir):
+        if os.path.splitext(f)[0] == "reone-tools":
+            return True
+    print("Tools directory does not contain a tools executable")
+    return False
+
+
+def is_valid_script_compiler_dir(dir):
+    if not dir or not os.path.isdir(dir):
+        return False
+    for f in os.listdir(dir):
+        if os.path.splitext(f)[0] == "nwnnsscomp":
+            return True
+    print("Script compiler directory does not contain a compiler executable")
+    return False
+
+
+def is_valid_extract_dir(dir):
+    return dir and os.path.isdir(dir)
+
+
+def choose_directory(title):
+    return tkinter.filedialog.askdirectory(title=title, mustexist=True)
+
+
+def append_dir_to_path(dir):
+    if os.path.exists(dir) and (not dir in os.environ["PATH"]):
+        separator = ":" if platform.system() == "Linux" else ";"
+        os.environ["PATH"] = separator.join([os.environ["PATH"], dir])
+
+
+def run_subprocess(args, silent=True, check_retcode=True):
+    stdout = subprocess.DEVNULL if silent else None
+    process = subprocess.run(args, stdout=stdout)
+    if check_retcode:
+        process.check_returncode()
 
 
 def extract_bifs(game_dir, extract_dir):
@@ -168,7 +227,8 @@ def convert_to_json(extract_dir):
         ".utc", ".utd", ".ute", ".uti", ".utp", ".uts", ".utt", ".utw",
         ".dlg",
         ".tlk",
-        ".lip"]
+        ".lip"
+        ]
 
     for f in glob.glob("{}/**".format(extract_dir), recursive=True):
         _, extension = os.path.splitext(f)
