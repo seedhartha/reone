@@ -42,11 +42,25 @@ QuickCharacterGeneration::QuickCharacterGeneration(CharacterGeneration *charGen,
 
 void QuickCharacterGeneration::load() {
     GUI::load();
+    bindControls();
     doSetStep(0);
 
     if (_game->id() == GameID::KotOR) {
-        setControlDiscardColor("LBL_DECORATION", glm::vec3(0.0f, 0.0f, 0.082353f));
+        _binding.lblDecoration->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
     }
+}
+
+void QuickCharacterGeneration::bindControls() {
+    _binding.btnStepName1 = getControlPtr<Button>("BTN_STEPNAME1");
+    _binding.btnStepName2 = getControlPtr<Button>("BTN_STEPNAME2");
+    _binding.btnStepName3 = getControlPtr<Button>("BTN_STEPNAME3");
+    _binding.lbl1 = getControlPtr<Label>("LBL_1");
+    _binding.lbl2 = getControlPtr<Label>("LBL_2");
+    _binding.lbl3 = getControlPtr<Label>("LBL_3");
+    _binding.lblDecoration = getControlPtr<Label>("LBL_DECORATION");
+    _binding.lblNum1 = getControlPtr<Label>("LBL_NUM1");
+    _binding.lblNum2 = getControlPtr<Label>("LBL_NUM2");
+    _binding.lblNum3 = getControlPtr<Label>("LBL_NUM3");
 }
 
 void QuickCharacterGeneration::setStep(int step) {
@@ -58,29 +72,29 @@ void QuickCharacterGeneration::setStep(int step) {
 void QuickCharacterGeneration::doSetStep(int step) {
     _step = step;
 
-    setControlFocusable("LBL_1", false);
-    setControlFocusable("LBL_2", false);
-    setControlFocusable("LBL_3", false);
-    setControlFocusable("BTN_STEPNAME1", false);
-    setControlFocusable("BTN_STEPNAME2", false);
-    setControlFocusable("BTN_STEPNAME3", false);
+    _binding.lbl1->setFocusable(false);
+    _binding.lbl2->setFocusable(false);
+    _binding.lbl3->setFocusable(false);
+    _binding.btnStepName1->setFocusable(false);
+    _binding.btnStepName2->setFocusable(false);
+    _binding.btnStepName3->setFocusable(false);
 
-    setControlDisabled("LBL_1", _step != 0);
-    setControlDisabled("LBL_2", _step != 1);
-    setControlDisabled("LBL_3", _step != 2);
-    setControlDisabled("BTN_STEPNAME1", _step != 0);
-    setControlDisabled("BTN_STEPNAME2", _step != 1);
-    setControlDisabled("BTN_STEPNAME3", _step != 2);
+    _binding.lbl1->setDisabled(_step != 0);
+    _binding.lbl2->setDisabled(_step != 1);
+    _binding.lbl3->setDisabled(_step != 2);
+    _binding.btnStepName1->setDisabled(_step != 0);
+    _binding.btnStepName2->setDisabled(_step != 1);
+    _binding.btnStepName3->setDisabled(_step != 2);
 
-    setControlFocus("LBL_1", _step == 0);
-    setControlFocus("LBL_2", _step == 1);
-    setControlFocus("LBL_3", _step == 2);
-    setControlFocus("LBL_NUM1", _step == 0);
-    setControlFocus("LBL_NUM2", _step == 1);
-    setControlFocus("LBL_NUM3", _step == 2);
-    setControlFocus("BTN_STEPNAME1", _step == 0);
-    setControlFocus("BTN_STEPNAME2", _step == 1);
-    setControlFocus("BTN_STEPNAME3", _step == 2);
+    _binding.lbl1->setFocus(_step == 0);
+    _binding.lbl2->setFocus(_step == 1);
+    _binding.lbl3->setFocus(_step == 2);
+    _binding.lblNum1->setFocus(_step == 0);
+    _binding.lblNum2->setFocus(_step == 1);
+    _binding.lblNum3->setFocus(_step == 2);
+    _binding.btnStepName1->setFocus(_step == 0);
+    _binding.btnStepName2->setFocus(_step == 1);
+    _binding.btnStepName3->setFocus(_step == 2);
 }
 
 void QuickCharacterGeneration::goToNextStep() {
