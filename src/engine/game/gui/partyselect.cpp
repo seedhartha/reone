@@ -69,58 +69,58 @@ void PartySelection::load() {
 }
 
 void PartySelection::bindControls() {
-    _binding.btnAccept = getControlPtr<Button>("BTN_ACCEPT");
-    _binding.btnBack = getControlPtr<Button>("BTN_BACK");
-    _binding.btnDone = getControlPtr<Button>("BTN_DONE");
-    _binding.btnNpc0 = getControlPtr<ToggleButton>("BTN_NPC0");
-    _binding.btnNpc1 = getControlPtr<ToggleButton>("BTN_NPC1");
-    _binding.btnNpc2 = getControlPtr<ToggleButton>("BTN_NPC2");
-    _binding.btnNpc3 = getControlPtr<ToggleButton>("BTN_NPC3");
-    _binding.btnNpc4 = getControlPtr<ToggleButton>("BTN_NPC4");
-    _binding.btnNpc5 = getControlPtr<ToggleButton>("BTN_NPC5");
-    _binding.btnNpc6 = getControlPtr<ToggleButton>("BTN_NPC6");
-    _binding.btnNpc7 = getControlPtr<ToggleButton>("BTN_NPC7");
-    _binding.btnNpc8 = getControlPtr<ToggleButton>("BTN_NPC8");
-    _binding.lbl3d = getControlPtr<Label>("LBL_3D");
-    _binding.lblBevelL = getControlPtr<Label>("LBL_BEVEL_L");
-    _binding.lblBevelM = getControlPtr<Label>("LBL_BEVEL_M");
-    _binding.lblChar0 = getControlPtr<Label>("LBL_CHAR0");
-    _binding.lblChar1 = getControlPtr<Label>("LBL_CHAR1");
-    _binding.lblChar2 = getControlPtr<Label>("LBL_CHAR2");
-    _binding.lblChar3 = getControlPtr<Label>("LBL_CHAR3");
-    _binding.lblChar4 = getControlPtr<Label>("LBL_CHAR4");
-    _binding.lblChar5 = getControlPtr<Label>("LBL_CHAR5");
-    _binding.lblChar6 = getControlPtr<Label>("LBL_CHAR6");
-    _binding.lblChar7 = getControlPtr<Label>("LBL_CHAR7");
-    _binding.lblChar8 = getControlPtr<Label>("LBL_CHAR8");
-    _binding.lblCount = getControlPtr<Label>("LBL_COUNT");
-    _binding.lblNa0 = getControlPtr<Label>("LBL_NA0");
-    _binding.lblNa1 = getControlPtr<Label>("LBL_NA1");
-    _binding.lblNa2 = getControlPtr<Label>("LBL_NA2");
-    _binding.lblNa3 = getControlPtr<Label>("LBL_NA3");
-    _binding.lblNa4 = getControlPtr<Label>("LBL_NA4");
-    _binding.lblNa5 = getControlPtr<Label>("LBL_NA5");
-    _binding.lblNa6 = getControlPtr<Label>("LBL_NA6");
-    _binding.lblNa7 = getControlPtr<Label>("LBL_NA7");
-    _binding.lblNa8 = getControlPtr<Label>("LBL_NA8");
-    _binding.lblNpcLevel = getControlPtr<Label>("LBL_NPC_LEVEL");
-    _binding.lblNpcName = getControlPtr<Label>("LBL_NPC_NAME");
-    _binding.lblTitle = getControlPtr<Label>("LBL_TITLE");
+    _binding.btnAccept = getControl<Button>("BTN_ACCEPT");
+    _binding.btnBack = getControl<Button>("BTN_BACK");
+    _binding.btnDone = getControl<Button>("BTN_DONE");
+    _binding.btnNpc0 = getControl<ToggleButton>("BTN_NPC0");
+    _binding.btnNpc1 = getControl<ToggleButton>("BTN_NPC1");
+    _binding.btnNpc2 = getControl<ToggleButton>("BTN_NPC2");
+    _binding.btnNpc3 = getControl<ToggleButton>("BTN_NPC3");
+    _binding.btnNpc4 = getControl<ToggleButton>("BTN_NPC4");
+    _binding.btnNpc5 = getControl<ToggleButton>("BTN_NPC5");
+    _binding.btnNpc6 = getControl<ToggleButton>("BTN_NPC6");
+    _binding.btnNpc7 = getControl<ToggleButton>("BTN_NPC7");
+    _binding.btnNpc8 = getControl<ToggleButton>("BTN_NPC8");
+    _binding.lbl3d = getControl<Label>("LBL_3D");
+    _binding.lblBevelL = getControl<Label>("LBL_BEVEL_L");
+    _binding.lblBevelM = getControl<Label>("LBL_BEVEL_M");
+    _binding.lblChar0 = getControl<Label>("LBL_CHAR0");
+    _binding.lblChar1 = getControl<Label>("LBL_CHAR1");
+    _binding.lblChar2 = getControl<Label>("LBL_CHAR2");
+    _binding.lblChar3 = getControl<Label>("LBL_CHAR3");
+    _binding.lblChar4 = getControl<Label>("LBL_CHAR4");
+    _binding.lblChar5 = getControl<Label>("LBL_CHAR5");
+    _binding.lblChar6 = getControl<Label>("LBL_CHAR6");
+    _binding.lblChar7 = getControl<Label>("LBL_CHAR7");
+    _binding.lblChar8 = getControl<Label>("LBL_CHAR8");
+    _binding.lblCount = getControl<Label>("LBL_COUNT");
+    _binding.lblNa0 = getControl<Label>("LBL_NA0");
+    _binding.lblNa1 = getControl<Label>("LBL_NA1");
+    _binding.lblNa2 = getControl<Label>("LBL_NA2");
+    _binding.lblNa3 = getControl<Label>("LBL_NA3");
+    _binding.lblNa4 = getControl<Label>("LBL_NA4");
+    _binding.lblNa5 = getControl<Label>("LBL_NA5");
+    _binding.lblNa6 = getControl<Label>("LBL_NA6");
+    _binding.lblNa7 = getControl<Label>("LBL_NA7");
+    _binding.lblNa8 = getControl<Label>("LBL_NA8");
+    _binding.lblNpcLevel = getControl<Label>("LBL_NPC_LEVEL");
+    _binding.lblNpcName = getControl<Label>("LBL_NPC_NAME");
+    _binding.lblTitle = getControl<Label>("LBL_TITLE");
 
     if (_game->isTSL()) {
-        _binding.btnNpc9 = getControlPtr<ToggleButton>("BTN_NPC9");
-        _binding.btnNpc10 = getControlPtr<ToggleButton>("BTN_NPC10");
-        _binding.btnNpc11 = getControlPtr<ToggleButton>("BTN_NPC11");
-        _binding.lblChar9 = getControlPtr<Label>("LBL_CHAR9");
-        _binding.lblChar10 = getControlPtr<Label>("LBL_CHAR10");
-        _binding.lblChar11 = getControlPtr<Label>("LBL_CHAR11");
-        _binding.lblNa9 = getControlPtr<Label>("LBL_NA9");
-        _binding.lblNa10 = getControlPtr<Label>("LBL_NA10");
-        _binding.lblNa11 = getControlPtr<Label>("LBL_NA11");
-        _binding.lblNameBack = getControlPtr<Label>("LBL_NAMEBACK");
+        _binding.btnNpc9 = getControl<ToggleButton>("BTN_NPC9");
+        _binding.btnNpc10 = getControl<ToggleButton>("BTN_NPC10");
+        _binding.btnNpc11 = getControl<ToggleButton>("BTN_NPC11");
+        _binding.lblChar9 = getControl<Label>("LBL_CHAR9");
+        _binding.lblChar10 = getControl<Label>("LBL_CHAR10");
+        _binding.lblChar11 = getControl<Label>("LBL_CHAR11");
+        _binding.lblNa9 = getControl<Label>("LBL_NA9");
+        _binding.lblNa10 = getControl<Label>("LBL_NA10");
+        _binding.lblNa11 = getControl<Label>("LBL_NA11");
+        _binding.lblNameBack = getControl<Label>("LBL_NAMEBACK");
     } else {
-        _binding.lblAvailable = getControlPtr<Label>("LBL_AVAILABLE");
-        _binding.lblBevelR = getControlPtr<Label>("LBL_BEVEL_R");
+        _binding.lblAvailable = getControl<Label>("LBL_AVAILABLE");
+        _binding.lblBevelR = getControl<Label>("LBL_BEVEL_R");
     }
 }
 
@@ -139,11 +139,39 @@ void PartySelection::prepare(const Context &ctx) {
         addNpc(ctx.forceNpc2);
     }
     Party &party = _game->services().party();
+    vector<Label *> charLabels {
+        _binding.lblChar0.get(),
+        _binding.lblChar1.get(),
+        _binding.lblChar2.get(),
+        _binding.lblChar3.get(),
+        _binding.lblChar4.get(),
+        _binding.lblChar5.get(),
+        _binding.lblChar6.get(),
+        _binding.lblChar7.get(),
+        _binding.lblChar8.get(),
+        _binding.lblChar9.get(),
+        _binding.lblChar10.get(),
+        _binding.lblChar11.get()
+    };
+    vector<Label *> naLabels {
+        _binding.lblNa0.get(),
+        _binding.lblNa1.get(),
+        _binding.lblNa2.get(),
+        _binding.lblNa3.get(),
+        _binding.lblNa4.get(),
+        _binding.lblNa5.get(),
+        _binding.lblNa6.get(),
+        _binding.lblNa7.get(),
+        _binding.lblNa8.get(),
+        _binding.lblNa9.get(),
+        _binding.lblNa10.get(),
+        _binding.lblNa11.get()
+    };
 
     for (int i = 0; i < kNpcCount; ++i) {
         ToggleButton &btnNpc = getNpcButton(i);
-        Label &lblChar = getControl<Label>("LBL_CHAR" + to_string(i));
-        Label &lblNa = getControl<Label>("LBL_NA" + to_string(i));
+        Label &lblChar = *charLabels[i];
+        Label &lblNa = *naLabels[i];
 
         if (party.isMemberAvailable(i)) {
             string blueprintResRef(party.getAvailableMember(i));
@@ -176,8 +204,21 @@ void PartySelection::addNpc(int npc) {
 }
 
 ToggleButton &PartySelection::getNpcButton(int npc) {
-    string tag("BTN_NPC" + to_string(npc));
-    return getControl<ToggleButton>(tag);
+    vector<ToggleButton *> npcButtons {
+        _binding.btnNpc0.get(),
+        _binding.btnNpc1.get(),
+        _binding.btnNpc2.get(),
+        _binding.btnNpc3.get(),
+        _binding.btnNpc4.get(),
+        _binding.btnNpc5.get(),
+        _binding.btnNpc6.get(),
+        _binding.btnNpc7.get(),
+        _binding.btnNpc8.get(),
+        _binding.btnNpc9.get(),
+        _binding.btnNpc10.get(),
+        _binding.btnNpc11.get()
+    };
+    return *npcButtons[npc];
 }
 
 void PartySelection::onClick(const string &control) {

@@ -140,126 +140,126 @@ void HUD::load() {
 }
 
 void HUD::bindControls() {
-    _binding.btnAbi = getControlPtr<Button>("BTN_ABI");
-    _binding.btnAction0 = getControlPtr<Button>("BTN_ACTION0");
-    _binding.btnAction1 = getControlPtr<Button>("BTN_ACTION1");
-    _binding.btnAction2 = getControlPtr<Button>("BTN_ACTION2");
-    _binding.btnAction3 = getControlPtr<Button>("BTN_ACTION3");
-    _binding.btnActionDown0 = getControlPtr<Button>("BTN_ACTIONDOWN0");
-    _binding.btnActionDown1 = getControlPtr<Button>("BTN_ACTIONDOWN1");
-    _binding.btnActionDown2 = getControlPtr<Button>("BTN_ACTIONDOWN2");
-    _binding.btnActionDown3 = getControlPtr<Button>("BTN_ACTIONDOWN3");
-    _binding.btnActionUp0 = getControlPtr<Button>("BTN_ACTIONUP0");
-    _binding.btnActionUp1 = getControlPtr<Button>("BTN_ACTIONUP1");
-    _binding.btnActionUp2 = getControlPtr<Button>("BTN_ACTIONUP2");
-    _binding.btnActionUp3 = getControlPtr<Button>("BTN_ACTIONUP3");
-    _binding.btnChar = getControlPtr<Button>("BTN_CHAR");
-    _binding.btnChar1 = getControlPtr<Button>("BTN_CHAR1");
-    _binding.btnChar2 = getControlPtr<Button>("BTN_CHAR2");
-    _binding.btnChar3 = getControlPtr<Button>("BTN_CHAR3");
-    _binding.btnClearAll = getControlPtr<Button>("BTN_CLEARALL");
-    _binding.btnClearOne = getControlPtr<Button>("BTN_CLEARONE");
-    _binding.btnClearOne2 = getControlPtr<Button>("BTN_CLEARONE2");
-    _binding.btnEqu = getControlPtr<Button>("BTN_EQU");
-    _binding.btnInv = getControlPtr<Button>("BTN_INV");
-    _binding.btnJou = getControlPtr<Button>("BTN_JOU");
-    _binding.btnMap = getControlPtr<Button>("BTN_MAP");
-    _binding.btnMinimap = getControlPtr<Button>("BTN_MINIMAP");
-    _binding.btnMsg = getControlPtr<Button>("BTN_MSG");
-    _binding.btnOpt = getControlPtr<Button>("BTN_OPT");
-    _binding.btnTarget0 = getControlPtr<Button>("BTN_TARGET0");
-    _binding.btnTarget1 = getControlPtr<Button>("BTN_TARGET1");
-    _binding.btnTarget2 = getControlPtr<Button>("BTN_TARGET2");
-    _binding.btnTargetDown0 = getControlPtr<Button>("BTN_TARGETDOWN0");
-    _binding.btnTargetDown1 = getControlPtr<Button>("BTN_TARGETDOWN1");
-    _binding.btnTargetDown2 = getControlPtr<Button>("BTN_TARGETDOWN2");
-    _binding.btnTargetUp0 = getControlPtr<Button>("BTN_TARGETUP0");
-    _binding.btnTargetUp1 = getControlPtr<Button>("BTN_TARGETUP1");
-    _binding.btnTargetUp2 = getControlPtr<Button>("BTN_TARGETUP2");
-    _binding.lblAction0 = getControlPtr<Label>("LBL_ACTION0");
-    _binding.lblAction1 = getControlPtr<Label>("LBL_ACTION1");
-    _binding.lblAction2 = getControlPtr<Label>("LBL_ACTION2");
-    _binding.lblAction3 = getControlPtr<Label>("LBL_ACTION3");
-    _binding.lblActionDesc = getControlPtr<Label>("LBL_ACTIONDESC");
-    _binding.lblActionDescBg = getControlPtr<Label>("LBL_ACTIONDESCBG");
-    _binding.lblArrow = getControlPtr<Label>("LBL_ARROW");
-    _binding.lblArrowMargin = getControlPtr<Label>("LBL_ARROW_MARGIN");
-    _binding.lblBack1 = getControlPtr<Label>("LBL_BACK1");
-    _binding.lblBack2 = getControlPtr<Label>("LBL_BACK2");
-    _binding.lblBack3 = getControlPtr<Label>("LBL_BACK3");
-    _binding.lblCash = getControlPtr<Label>("LBL_CASH");
-    _binding.lblChar1 = getControlPtr<Label>("LBL_CHAR1");
-    _binding.lblChar2 = getControlPtr<Label>("LBL_CHAR2");
-    _binding.lblChar3 = getControlPtr<Label>("LBL_CHAR3");
-    _binding.lblCmbtEfctInc1 = getControlPtr<Label>("LBL_CMBTEFCTINC1");
-    _binding.lblCmbtEfctInc2 = getControlPtr<Label>("LBL_CMBTEFCTINC2");
-    _binding.lblCmbtEfctInc3 = getControlPtr<Label>("LBL_CMBTEFCTINC3");
-    _binding.lblCmbtEfctRed1 = getControlPtr<Label>("LBL_CMBTEFCTRED1");
-    _binding.lblCmbtEfctRed2 = getControlPtr<Label>("LBL_CMBTEFCTRED2");
-    _binding.lblCmbtEfctRed3 = getControlPtr<Label>("LBL_CMBTEFCTRED3");
-    _binding.lblCmbtModeMsg = getControlPtr<Label>("LBL_CMBTMODEMSG");
-    _binding.lblCmbtMsgBg = getControlPtr<Label>("LBL_CMBTMSGBG");
-    _binding.lblCombatBg3 = getControlPtr<Label>("LBL_COMBATBG3");
-    _binding.lblDarkShift = getControlPtr<Label>("LBL_DARKSHIFT");
-    _binding.lblDebilatated1 = getControlPtr<Label>("LBL_DEBILATATED1");
-    _binding.lblDebilatated2 = getControlPtr<Label>("LBL_DEBILATATED2");
-    _binding.lblDebilatated3 = getControlPtr<Label>("LBL_DEBILATATED3");
-    _binding.lblDisable1 = getControlPtr<Label>("LBL_DISABLE1");
-    _binding.lblDisable2 = getControlPtr<Label>("LBL_DISABLE2");
-    _binding.lblDisable3 = getControlPtr<Label>("LBL_DISABLE3");
-    _binding.lblHealthBg = getControlPtr<Label>("LBL_HEALTHBG");
-    _binding.lblItemLost = getControlPtr<Label>("LBL_ITEMLOST");
-    _binding.lblItemRcvd = getControlPtr<Label>("LBL_ITEMRCVD");
-    _binding.lblJournal = getControlPtr<Label>("LBL_JOURNAL");
-    _binding.lblLevelUp1 = getControlPtr<Label>("LBL_LEVELUP1");
-    _binding.lblLevelUp2 = getControlPtr<Label>("LBL_LEVELUP2");
-    _binding.lblLevelUp3 = getControlPtr<Label>("LBL_LEVELUP3");
-    _binding.lblLightShift = getControlPtr<Label>("LBL_LIGHTSHIFT");
-    _binding.lblMap = getControlPtr<Label>("LBL_MAP");
-    _binding.lblMapBorder = getControlPtr<Label>("LBL_MAPBORDER");
-    _binding.lblMapView = getControlPtr<Label>("LBL_MAPVIEW");
-    _binding.lblMenuBg = getControlPtr<Label>("LBL_MENUBG");
-    _binding.lblMoulding1 = getControlPtr<Label>("LBL_MOULDING1");
-    _binding.lblMoulding3 = getControlPtr<Label>("LBL_MOULDING3");
-    _binding.lblName = getControlPtr<Label>("LBL_NAME");
-    _binding.lblNameBg = getControlPtr<Label>("LBL_NAMEBG");
-    _binding.lblPlotXp = getControlPtr<Label>("LBL_PLOTXP");
-    _binding.lblQueue0 = getControlPtr<Label>("LBL_QUEUE0");
-    _binding.lblQueue1 = getControlPtr<Label>("LBL_QUEUE1");
-    _binding.lblQueue2 = getControlPtr<Label>("LBL_QUEUE2");
-    _binding.lblQueue3 = getControlPtr<Label>("LBL_QUEUE3");
-    _binding.lblStealthXp = getControlPtr<Label>("LBL_STEALTHXP");
-    _binding.lblTarget0 = getControlPtr<Label>("LBL_TARGET0");
-    _binding.lblTarget1 = getControlPtr<Label>("LBL_TARGET1");
-    _binding.lblTarget2 = getControlPtr<Label>("LBL_TARGET2");
-    _binding.pbForce1 = getControlPtr<ProgressBar>("PB_FORCE1");
-    _binding.pbForce2 = getControlPtr<ProgressBar>("PB_FORCE2");
-    _binding.pbForce3 = getControlPtr<ProgressBar>("PB_FORCE3");
-    _binding.pbHealth = getControlPtr<ProgressBar>("PB_HEALTH");
-    _binding.pbVit1 = getControlPtr<ProgressBar>("PB_VIT1");
-    _binding.pbVit2 = getControlPtr<ProgressBar>("PB_VIT2");
-    _binding.pbVit3 = getControlPtr<ProgressBar>("PB_VIT3");
-    _binding.tbPause = getControlPtr<ToggleButton>("TB_PAUSE");
-    _binding.tbSolo = getControlPtr<ToggleButton>("TB_SOLO");
-    _binding.tbStealth = getControlPtr<ToggleButton>("TB_STEALTH");
+    _binding.btnAbi = getControl<Button>("BTN_ABI");
+    _binding.btnAction0 = getControl<Button>("BTN_ACTION0");
+    _binding.btnAction1 = getControl<Button>("BTN_ACTION1");
+    _binding.btnAction2 = getControl<Button>("BTN_ACTION2");
+    _binding.btnAction3 = getControl<Button>("BTN_ACTION3");
+    _binding.btnActionDown0 = getControl<Button>("BTN_ACTIONDOWN0");
+    _binding.btnActionDown1 = getControl<Button>("BTN_ACTIONDOWN1");
+    _binding.btnActionDown2 = getControl<Button>("BTN_ACTIONDOWN2");
+    _binding.btnActionDown3 = getControl<Button>("BTN_ACTIONDOWN3");
+    _binding.btnActionUp0 = getControl<Button>("BTN_ACTIONUP0");
+    _binding.btnActionUp1 = getControl<Button>("BTN_ACTIONUP1");
+    _binding.btnActionUp2 = getControl<Button>("BTN_ACTIONUP2");
+    _binding.btnActionUp3 = getControl<Button>("BTN_ACTIONUP3");
+    _binding.btnChar = getControl<Button>("BTN_CHAR");
+    _binding.btnChar1 = getControl<Button>("BTN_CHAR1");
+    _binding.btnChar2 = getControl<Button>("BTN_CHAR2");
+    _binding.btnChar3 = getControl<Button>("BTN_CHAR3");
+    _binding.btnClearAll = getControl<Button>("BTN_CLEARALL");
+    _binding.btnClearOne = getControl<Button>("BTN_CLEARONE");
+    _binding.btnClearOne2 = getControl<Button>("BTN_CLEARONE2");
+    _binding.btnEqu = getControl<Button>("BTN_EQU");
+    _binding.btnInv = getControl<Button>("BTN_INV");
+    _binding.btnJou = getControl<Button>("BTN_JOU");
+    _binding.btnMap = getControl<Button>("BTN_MAP");
+    _binding.btnMinimap = getControl<Button>("BTN_MINIMAP");
+    _binding.btnMsg = getControl<Button>("BTN_MSG");
+    _binding.btnOpt = getControl<Button>("BTN_OPT");
+    _binding.btnTarget0 = getControl<Button>("BTN_TARGET0");
+    _binding.btnTarget1 = getControl<Button>("BTN_TARGET1");
+    _binding.btnTarget2 = getControl<Button>("BTN_TARGET2");
+    _binding.btnTargetDown0 = getControl<Button>("BTN_TARGETDOWN0");
+    _binding.btnTargetDown1 = getControl<Button>("BTN_TARGETDOWN1");
+    _binding.btnTargetDown2 = getControl<Button>("BTN_TARGETDOWN2");
+    _binding.btnTargetUp0 = getControl<Button>("BTN_TARGETUP0");
+    _binding.btnTargetUp1 = getControl<Button>("BTN_TARGETUP1");
+    _binding.btnTargetUp2 = getControl<Button>("BTN_TARGETUP2");
+    _binding.lblAction0 = getControl<Label>("LBL_ACTION0");
+    _binding.lblAction1 = getControl<Label>("LBL_ACTION1");
+    _binding.lblAction2 = getControl<Label>("LBL_ACTION2");
+    _binding.lblAction3 = getControl<Label>("LBL_ACTION3");
+    _binding.lblActionDesc = getControl<Label>("LBL_ACTIONDESC");
+    _binding.lblActionDescBg = getControl<Label>("LBL_ACTIONDESCBG");
+    _binding.lblArrow = getControl<Label>("LBL_ARROW");
+    _binding.lblArrowMargin = getControl<Label>("LBL_ARROW_MARGIN");
+    _binding.lblBack1 = getControl<Label>("LBL_BACK1");
+    _binding.lblBack2 = getControl<Label>("LBL_BACK2");
+    _binding.lblBack3 = getControl<Label>("LBL_BACK3");
+    _binding.lblCash = getControl<Label>("LBL_CASH");
+    _binding.lblChar1 = getControl<Label>("LBL_CHAR1");
+    _binding.lblChar2 = getControl<Label>("LBL_CHAR2");
+    _binding.lblChar3 = getControl<Label>("LBL_CHAR3");
+    _binding.lblCmbtEfctInc1 = getControl<Label>("LBL_CMBTEFCTINC1");
+    _binding.lblCmbtEfctInc2 = getControl<Label>("LBL_CMBTEFCTINC2");
+    _binding.lblCmbtEfctInc3 = getControl<Label>("LBL_CMBTEFCTINC3");
+    _binding.lblCmbtEfctRed1 = getControl<Label>("LBL_CMBTEFCTRED1");
+    _binding.lblCmbtEfctRed2 = getControl<Label>("LBL_CMBTEFCTRED2");
+    _binding.lblCmbtEfctRed3 = getControl<Label>("LBL_CMBTEFCTRED3");
+    _binding.lblCmbtModeMsg = getControl<Label>("LBL_CMBTMODEMSG");
+    _binding.lblCmbtMsgBg = getControl<Label>("LBL_CMBTMSGBG");
+    _binding.lblCombatBg3 = getControl<Label>("LBL_COMBATBG3");
+    _binding.lblDarkShift = getControl<Label>("LBL_DARKSHIFT");
+    _binding.lblDebilatated1 = getControl<Label>("LBL_DEBILATATED1");
+    _binding.lblDebilatated2 = getControl<Label>("LBL_DEBILATATED2");
+    _binding.lblDebilatated3 = getControl<Label>("LBL_DEBILATATED3");
+    _binding.lblDisable1 = getControl<Label>("LBL_DISABLE1");
+    _binding.lblDisable2 = getControl<Label>("LBL_DISABLE2");
+    _binding.lblDisable3 = getControl<Label>("LBL_DISABLE3");
+    _binding.lblHealthBg = getControl<Label>("LBL_HEALTHBG");
+    _binding.lblItemLost = getControl<Label>("LBL_ITEMLOST");
+    _binding.lblItemRcvd = getControl<Label>("LBL_ITEMRCVD");
+    _binding.lblJournal = getControl<Label>("LBL_JOURNAL");
+    _binding.lblLevelUp1 = getControl<Label>("LBL_LEVELUP1");
+    _binding.lblLevelUp2 = getControl<Label>("LBL_LEVELUP2");
+    _binding.lblLevelUp3 = getControl<Label>("LBL_LEVELUP3");
+    _binding.lblLightShift = getControl<Label>("LBL_LIGHTSHIFT");
+    _binding.lblMap = getControl<Label>("LBL_MAP");
+    _binding.lblMapBorder = getControl<Label>("LBL_MAPBORDER");
+    _binding.lblMapView = getControl<Label>("LBL_MAPVIEW");
+    _binding.lblMenuBg = getControl<Label>("LBL_MENUBG");
+    _binding.lblMoulding1 = getControl<Label>("LBL_MOULDING1");
+    _binding.lblMoulding3 = getControl<Label>("LBL_MOULDING3");
+    _binding.lblName = getControl<Label>("LBL_NAME");
+    _binding.lblNameBg = getControl<Label>("LBL_NAMEBG");
+    _binding.lblPlotXp = getControl<Label>("LBL_PLOTXP");
+    _binding.lblQueue0 = getControl<Label>("LBL_QUEUE0");
+    _binding.lblQueue1 = getControl<Label>("LBL_QUEUE1");
+    _binding.lblQueue2 = getControl<Label>("LBL_QUEUE2");
+    _binding.lblQueue3 = getControl<Label>("LBL_QUEUE3");
+    _binding.lblStealthXp = getControl<Label>("LBL_STEALTHXP");
+    _binding.lblTarget0 = getControl<Label>("LBL_TARGET0");
+    _binding.lblTarget1 = getControl<Label>("LBL_TARGET1");
+    _binding.lblTarget2 = getControl<Label>("LBL_TARGET2");
+    _binding.pbForce1 = getControl<ProgressBar>("PB_FORCE1");
+    _binding.pbForce2 = getControl<ProgressBar>("PB_FORCE2");
+    _binding.pbForce3 = getControl<ProgressBar>("PB_FORCE3");
+    _binding.pbHealth = getControl<ProgressBar>("PB_HEALTH");
+    _binding.pbVit1 = getControl<ProgressBar>("PB_VIT1");
+    _binding.pbVit2 = getControl<ProgressBar>("PB_VIT2");
+    _binding.pbVit3 = getControl<ProgressBar>("PB_VIT3");
+    _binding.tbPause = getControl<ToggleButton>("TB_PAUSE");
+    _binding.tbSolo = getControl<ToggleButton>("TB_SOLO");
+    _binding.tbStealth = getControl<ToggleButton>("TB_STEALTH");
 
     if (_game->isTSL()) {
-        _binding.btnAction4 = getControlPtr<Button>("BTN_ACTION4");
-        _binding.btnAction5 = getControlPtr<Button>("BTN_ACTION5");
-        _binding.btnActionDown4 = getControlPtr<Button>("BTN_ACTIONDOWN4");
-        _binding.btnActionDown5 = getControlPtr<Button>("BTN_ACTIONDOWN5");
-        _binding.btnActionUp4 = getControlPtr<Button>("BTN_ACTIONUP4");
-        _binding.btnActionUp5 = getControlPtr<Button>("BTN_ACTIONUP5");
-        _binding.btnSwapWeapons = getControlPtr<Button>("BTN_SWAPWEAPONS");
-        _binding.lblAction4 = getControlPtr<Label>("LBL_ACTION4");
-        _binding.lblAction5 = getControlPtr<Label>("LBL_ACTION5");
+        _binding.btnAction4 = getControl<Button>("BTN_ACTION4");
+        _binding.btnAction5 = getControl<Button>("BTN_ACTION5");
+        _binding.btnActionDown4 = getControl<Button>("BTN_ACTIONDOWN4");
+        _binding.btnActionDown5 = getControl<Button>("BTN_ACTIONDOWN5");
+        _binding.btnActionUp4 = getControl<Button>("BTN_ACTIONUP4");
+        _binding.btnActionUp5 = getControl<Button>("BTN_ACTIONUP5");
+        _binding.btnSwapWeapons = getControl<Button>("BTN_SWAPWEAPONS");
+        _binding.lblAction4 = getControl<Label>("LBL_ACTION4");
+        _binding.lblAction5 = getControl<Label>("LBL_ACTION5");
     } else {
-        _binding.lblCombatBg1 = getControlPtr<Label>("LBL_COMBATBG1");
-        _binding.lblCombatBg2 = getControlPtr<Label>("LBL_COMBATBG2");
-        _binding.lblLvlUpBg1 = getControlPtr<Label>("LBL_LVLUPBG1");
-        _binding.lblLvlUpBg2 = getControlPtr<Label>("LBL_LVLUPBG2");
-        _binding.lblLvlUpBg3 = getControlPtr<Label>("LBL_LVLUPBG3");
-        _binding.lblMoulding2 = getControlPtr<Label>("LBL_MOULDING2");
+        _binding.lblCombatBg1 = getControl<Label>("LBL_COMBATBG1");
+        _binding.lblCombatBg2 = getControl<Label>("LBL_COMBATBG2");
+        _binding.lblLvlUpBg1 = getControl<Label>("LBL_LVLUPBG1");
+        _binding.lblLvlUpBg2 = getControl<Label>("LBL_LVLUPBG2");
+        _binding.lblLvlUpBg3 = getControl<Label>("LBL_LVLUPBG3");
+        _binding.lblMoulding2 = getControl<Label>("LBL_MOULDING2");
     }
 }
 
@@ -361,9 +361,13 @@ void HUD::drawHealth(int memberIndex) {
 
     Party &party = _game->services().party();
     shared_ptr<Creature> member(party.getMember(memberIndex));
+    vector<Label *> backLabels {
+        _binding.lblBack1.get(),
+        _binding.lblBack2.get(),
+        _binding.lblBack3.get()
+    };
 
-    int charIdx = (memberIndex == 0) ? 1 : (4 - memberIndex);
-    Control &lblChar = getControl("LBL_BACK" + to_string(charIdx));
+    Label &lblChar = *backLabels[memberIndex];
     const Control::Extent &extent = lblChar.extent();
 
     float w = 5.0f;
@@ -402,9 +406,15 @@ void HUD::toggleCombat(bool enabled) {
 
 void HUD::refreshActionQueueItems() const {
     auto &actions = _game->services().party().getLeader()->actions();
+    vector<Label *> queueLabels {
+        _binding.lblQueue0.get(),
+        _binding.lblQueue1.get(),
+        _binding.lblQueue2.get(),
+        _binding.lblQueue3.get()
+    };
 
     for (int i = 0; i < 4; ++i) {
-        Control &item = getControl("LBL_QUEUE" + to_string(i));
+        Label &item = *queueLabels[i];
         if (i < static_cast<int>(actions.size())) {
             switch (actions[i]->type()) {
                 case ActionType::AttackObject:

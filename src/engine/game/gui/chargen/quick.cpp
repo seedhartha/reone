@@ -51,16 +51,16 @@ void QuickCharacterGeneration::load() {
 }
 
 void QuickCharacterGeneration::bindControls() {
-    _binding.btnStepName1 = getControlPtr<Button>("BTN_STEPNAME1");
-    _binding.btnStepName2 = getControlPtr<Button>("BTN_STEPNAME2");
-    _binding.btnStepName3 = getControlPtr<Button>("BTN_STEPNAME3");
-    _binding.lbl1 = getControlPtr<Label>("LBL_1");
-    _binding.lbl2 = getControlPtr<Label>("LBL_2");
-    _binding.lbl3 = getControlPtr<Label>("LBL_3");
-    _binding.lblDecoration = getControlPtr<Label>("LBL_DECORATION");
-    _binding.lblNum1 = getControlPtr<Label>("LBL_NUM1");
-    _binding.lblNum2 = getControlPtr<Label>("LBL_NUM2");
-    _binding.lblNum3 = getControlPtr<Label>("LBL_NUM3");
+    _binding.btnStepName1 = getControl<Button>("BTN_STEPNAME1");
+    _binding.btnStepName2 = getControl<Button>("BTN_STEPNAME2");
+    _binding.btnStepName3 = getControl<Button>("BTN_STEPNAME3");
+    _binding.lbl1 = getControl<Label>("LBL_1");
+    _binding.lbl2 = getControl<Label>("LBL_2");
+    _binding.lbl3 = getControl<Label>("LBL_3");
+    _binding.lblDecoration = getControl<Label>("LBL_DECORATION");
+    _binding.lblNum1 = getControl<Label>("LBL_NUM1");
+    _binding.lblNum2 = getControl<Label>("LBL_NUM2");
+    _binding.lblNum3 = getControl<Label>("LBL_NUM3");
 }
 
 void QuickCharacterGeneration::setStep(int step) {

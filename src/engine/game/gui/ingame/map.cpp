@@ -48,10 +48,10 @@ void MapMenu::load() {
 }
 
 void MapMenu::bindControls() {
-    _binding.btnReturn = getControlPtr<Button>("BTN_RETURN");
-    _binding.lblArea = getControlPtr<Label>("LBL_Area");
-    _binding.lblMap = getControlPtr<Label>("LBL_Map");
-    _binding.lblMapNote = getControlPtr<Label>("LBL_MapNote");
+    _binding.btnReturn = getControl<Button>("BTN_RETURN");
+    _binding.lblArea = getControl<Label>("LBL_Area");
+    _binding.lblMap = getControl<Label>("LBL_Map");
+    _binding.lblMapNote = getControl<Label>("LBL_MapNote");
 }
 
 void MapMenu::draw() {

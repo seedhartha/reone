@@ -58,8 +58,8 @@ void QuickOrCustom::load() {
 }
 
 void QuickOrCustom::bindControls() {
-    _binding.lblRbg = getControlPtr<Label>("LBL_RBG");
-    _binding.lbDesc = getControlPtr<ListBox>("LB_DESC");
+    _binding.lblRbg = getControl<Label>("LBL_RBG");
+    _binding.lbDesc = getControl<ListBox>("LB_DESC");
 }
 
 void QuickOrCustom::onClick(const string &control) {

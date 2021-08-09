@@ -49,10 +49,10 @@ void LoadingScreen::load() {
 }
 
 void LoadingScreen::bindControls() {
-    _binding.pbProgress = getControlPtr<ProgressBar>("PB_PROGRESS");
-    _binding.lblHint = getControlPtr<Label>("LBL_HINT");
-    _binding.lblLogo = getControlPtr<Label>("LBL_LOGO");
-    _binding.lblLoading = getControlPtr<Label>("LBL_LOADING");
+    _binding.pbProgress = getControl<ProgressBar>("PB_PROGRESS");
+    _binding.lblHint = getControl<Label>("LBL_HINT");
+    _binding.lblLogo = getControl<Label>("LBL_LOGO");
+    _binding.lblLoading = getControl<Label>("LBL_LOADING");
 }
 
 void LoadingScreen::setImage(const string &resRef) {

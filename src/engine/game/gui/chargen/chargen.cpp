@@ -75,37 +75,37 @@ void CharacterGeneration::load() {
 }
 
 void CharacterGeneration::bindControls() {
-    _binding.defArrowLbl = getControlPtr<Label>("DEF_ARROW_LBL");
-    _binding.fortArrowLbl = getControlPtr<Label>("FORT_ARROW_LBL");
-    _binding.lblClass = getControlPtr<Label>("LBL_CLASS");
-    _binding.lblDef = getControlPtr<Label>("LBL_DEF");
-    _binding.lblLevel = getControlPtr<Label>("LBL_LEVEL");
-    _binding.lblLevelVal = getControlPtr<Label>("LBL_LEVEL_VAL");
-    _binding.lblName = getControlPtr<Label>("LBL_NAME");
-    _binding.lblVit = getControlPtr<Label>("LBL_VIT");
-    _binding.modelLbl = getControlPtr<Label>("MODEL_LBL");
-    _binding.newLbl = getControlPtr<Label>("NEW_LBL");
-    _binding.oldLbl = getControlPtr<Label>("OLD_LBL");
-    _binding.portraitLbl = getControlPtr<Label>("PORTRAIT_LBL");
-    _binding.reflArrowLbl = getControlPtr<Label>("REFL_ARROW_LBL");
-    _binding.vitArrowLbl = getControlPtr<Label>("VIT_ARROW_LBL");
-    _binding.willArrowLbl = getControlPtr<Label>("WILL_ARROW_LBL");
+    _binding.defArrowLbl = getControl<Label>("DEF_ARROW_LBL");
+    _binding.fortArrowLbl = getControl<Label>("FORT_ARROW_LBL");
+    _binding.lblClass = getControl<Label>("LBL_CLASS");
+    _binding.lblDef = getControl<Label>("LBL_DEF");
+    _binding.lblLevel = getControl<Label>("LBL_LEVEL");
+    _binding.lblLevelVal = getControl<Label>("LBL_LEVEL_VAL");
+    _binding.lblName = getControl<Label>("LBL_NAME");
+    _binding.lblVit = getControl<Label>("LBL_VIT");
+    _binding.modelLbl = getControl<Label>("MODEL_LBL");
+    _binding.newLbl = getControl<Label>("NEW_LBL");
+    _binding.oldLbl = getControl<Label>("OLD_LBL");
+    _binding.portraitLbl = getControl<Label>("PORTRAIT_LBL");
+    _binding.reflArrowLbl = getControl<Label>("REFL_ARROW_LBL");
+    _binding.vitArrowLbl = getControl<Label>("VIT_ARROW_LBL");
+    _binding.willArrowLbl = getControl<Label>("WILL_ARROW_LBL");
 
-    _binding.strAbLbl = getControlPtr<Label>("STR_AB_LBL");
-    _binding.dexAbLbl = getControlPtr<Label>("DEX_AB_LBL");
-    _binding.conAbLbl = getControlPtr<Label>("CON_AB_LBL");
-    _binding.intAbLbl = getControlPtr<Label>("INT_AB_LBL");
-    _binding.wisAbLbl = getControlPtr<Label>("WIS_AB_LBL");
-    _binding.chaAbLbl = getControlPtr<Label>("CHA_AB_LBL");
+    _binding.strAbLbl = getControl<Label>("STR_AB_LBL");
+    _binding.dexAbLbl = getControl<Label>("DEX_AB_LBL");
+    _binding.conAbLbl = getControl<Label>("CON_AB_LBL");
+    _binding.intAbLbl = getControl<Label>("INT_AB_LBL");
+    _binding.wisAbLbl = getControl<Label>("WIS_AB_LBL");
+    _binding.chaAbLbl = getControl<Label>("CHA_AB_LBL");
 
     if (_game->isKotOR()) {
-        _binding.oldFortLbl = getControlPtr<Label>("OLD_FORT_LBL");
-        _binding.oldReflLbl = getControlPtr<Label>("OLD_REFL_LBL");
-        _binding.oldWillLbl = getControlPtr<Label>("OLD_WILL_LBL");
+        _binding.oldFortLbl = getControl<Label>("OLD_FORT_LBL");
+        _binding.oldReflLbl = getControl<Label>("OLD_REFL_LBL");
+        _binding.oldWillLbl = getControl<Label>("OLD_WILL_LBL");
     } else {
-        _binding.newFortLbl = getControlPtr<Label>("NEW_FORT_LBL");
-        _binding.newReflLbl = getControlPtr<Label>("NEW_REFL_LBL");
-        _binding.newWillLbl = getControlPtr<Label>("NEW_WILL_LBL");
+        _binding.newFortLbl = getControl<Label>("NEW_FORT_LBL");
+        _binding.newReflLbl = getControl<Label>("NEW_REFL_LBL");
+        _binding.newWillLbl = getControl<Label>("NEW_WILL_LBL");
     }
 }
 

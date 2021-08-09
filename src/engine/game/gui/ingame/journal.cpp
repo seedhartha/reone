@@ -45,9 +45,9 @@ void JournalMenu::load() {
 }
 
 void JournalMenu::bindControls() {
-    _binding.btnQuestItems = getControlPtr<Button>("BTN_QUESTITEMS");
-    _binding.btnSort = getControlPtr<Button>("BTN_SORT");
-    _binding.btnSwapText = getControlPtr<Button>("BTN_SWAPTEXT");
+    _binding.btnQuestItems = getControl<Button>("BTN_QUESTITEMS");
+    _binding.btnSort = getControl<Button>("BTN_SORT");
+    _binding.btnSwapText = getControl<Button>("BTN_SWAPTEXT");
 }
 
 void JournalMenu::onClick(const string &control) {

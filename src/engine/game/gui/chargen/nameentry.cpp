@@ -56,7 +56,7 @@ void NameEntry::load() {
 }
 
 void NameEntry::bindControls() {
-    _binding.nameBoxEdit = getControlPtr<Control>("NAME_BOX_EDIT");
+    _binding.nameBoxEdit = getControl<Control>("NAME_BOX_EDIT");
 }
 
 void NameEntry::loadLtrFile(const string &resRef, LtrReader &ltr) {

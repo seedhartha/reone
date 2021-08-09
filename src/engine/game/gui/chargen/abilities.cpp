@@ -94,38 +94,38 @@ void CharGenAbilities::load() {
 }
 
 void CharGenAbilities::bindControls() {
-    _binding.lbDesc = getControlPtr<ListBox>("LB_DESC");
-    _binding.remainingSelectionsLbl = getControlPtr<Label>("REMAINING_SELECTIONS_LBL");
-    _binding.costPointsLbl = getControlPtr<Label>("COST_POINTS_LBL");
-    _binding.lblAbilityMod = getControlPtr<Label>("LBL_ABILITY_MOD");
+    _binding.lbDesc = getControl<ListBox>("LB_DESC");
+    _binding.remainingSelectionsLbl = getControl<Label>("REMAINING_SELECTIONS_LBL");
+    _binding.costPointsLbl = getControl<Label>("COST_POINTS_LBL");
+    _binding.lblAbilityMod = getControl<Label>("LBL_ABILITY_MOD");
 
-    _binding.strLbl = getControlPtr<Label>("STR_LBL");
-    _binding.dexLbl = getControlPtr<Label>("DEX_LBL");
-    _binding.conLbl = getControlPtr<Label>("CON_LBL");
-    _binding.intLbl = getControlPtr<Label>("INT_LBL");
-    _binding.wisLbl = getControlPtr<Label>("WIS_LBL");
-    _binding.chaLbl = getControlPtr<Label>("CHA_LBL");
+    _binding.strLbl = getControl<Label>("STR_LBL");
+    _binding.dexLbl = getControl<Label>("DEX_LBL");
+    _binding.conLbl = getControl<Label>("CON_LBL");
+    _binding.intLbl = getControl<Label>("INT_LBL");
+    _binding.wisLbl = getControl<Label>("WIS_LBL");
+    _binding.chaLbl = getControl<Label>("CHA_LBL");
 
-    _binding.strPointsBtn = getControlPtr<Button>("STR_POINTS_BTN");
-    _binding.dexPointsBtn = getControlPtr<Button>("DEX_POINTS_BTN");
-    _binding.conPointsBtn = getControlPtr<Button>("CON_POINTS_BTN");
-    _binding.intPointsBtn = getControlPtr<Button>("INT_POINTS_BTN");
-    _binding.wisPointsBtn = getControlPtr<Button>("WIS_POINTS_BTN");
-    _binding.chaPointsBtn = getControlPtr<Button>("CHA_POINTS_BTN");
+    _binding.strPointsBtn = getControl<Button>("STR_POINTS_BTN");
+    _binding.dexPointsBtn = getControl<Button>("DEX_POINTS_BTN");
+    _binding.conPointsBtn = getControl<Button>("CON_POINTS_BTN");
+    _binding.intPointsBtn = getControl<Button>("INT_POINTS_BTN");
+    _binding.wisPointsBtn = getControl<Button>("WIS_POINTS_BTN");
+    _binding.chaPointsBtn = getControl<Button>("CHA_POINTS_BTN");
 
-    _binding.strMinusBtn = getControlPtr<Button>("STR_MINUS_BTN");
-    _binding.dexMinusBtn = getControlPtr<Button>("DEX_MINUS_BTN");
-    _binding.conMinusBtn = getControlPtr<Button>("CON_MINUS_BTN");
-    _binding.intMinusBtn = getControlPtr<Button>("INT_MINUS_BTN");
-    _binding.wisMinusBtn = getControlPtr<Button>("WIS_MINUS_BTN");
-    _binding.chaMinusBtn = getControlPtr<Button>("CHA_MINUS_BTN");
+    _binding.strMinusBtn = getControl<Button>("STR_MINUS_BTN");
+    _binding.dexMinusBtn = getControl<Button>("DEX_MINUS_BTN");
+    _binding.conMinusBtn = getControl<Button>("CON_MINUS_BTN");
+    _binding.intMinusBtn = getControl<Button>("INT_MINUS_BTN");
+    _binding.wisMinusBtn = getControl<Button>("WIS_MINUS_BTN");
+    _binding.chaMinusBtn = getControl<Button>("CHA_MINUS_BTN");
 
-    _binding.strPlusBtn = getControlPtr<Button>("STR_PLUS_BTN");
-    _binding.dexPlusBtn = getControlPtr<Button>("DEX_PLUS_BTN");
-    _binding.conPlusBtn = getControlPtr<Button>("CON_PLUS_BTN");
-    _binding.intPlusBtn = getControlPtr<Button>("INT_PLUS_BTN");
-    _binding.wisPlusBtn = getControlPtr<Button>("WIS_PLUS_BTN");
-    _binding.chaPlusBtn = getControlPtr<Button>("CHA_PLUS_BTN");
+    _binding.strPlusBtn = getControl<Button>("STR_PLUS_BTN");
+    _binding.dexPlusBtn = getControl<Button>("DEX_PLUS_BTN");
+    _binding.conPlusBtn = getControl<Button>("CON_PLUS_BTN");
+    _binding.intPlusBtn = getControl<Button>("INT_PLUS_BTN");
+    _binding.wisPlusBtn = getControl<Button>("WIS_PLUS_BTN");
+    _binding.chaPlusBtn = getControl<Button>("CHA_PLUS_BTN");
 }
 
 void CharGenAbilities::reset(bool newGame) {
