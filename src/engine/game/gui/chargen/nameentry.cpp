@@ -46,13 +46,17 @@ NameEntry::NameEntry(CharacterGeneration *charGen, Game *game) :
 
 void NameEntry::load() {
     GUI::load();
+    bindControls();
 
     loadLtrFile("humanm", _maleLtr);
     loadLtrFile("humanf", _femaleLtr);
     loadLtrFile("humanl", _lastNameLtr);
 
-    _nameBoxEdit = &getControl("NAME_BOX_EDIT");
-    _nameBoxEdit->setTextMessage("");
+    _binding.nameBoxEdit->setTextMessage("");
+}
+
+void NameEntry::bindControls() {
+    _binding.nameBoxEdit = getControlPtr<Control>("NAME_BOX_EDIT");
 }
 
 void NameEntry::loadLtrFile(const string &resRef, LtrReader &ltr) {
@@ -62,7 +66,7 @@ void NameEntry::loadLtrFile(const string &resRef, LtrReader &ltr) {
 
 bool NameEntry::handle(const SDL_Event &event) {
     if (event.type == SDL_KEYDOWN && _input.handle(event)) {
-        _nameBoxEdit->setTextMessage(_input.text());
+        _binding.nameBoxEdit->setTextMessage(_input.text());
         return true;
     }
     return GUI::handle(event);
@@ -84,7 +88,7 @@ void NameEntry::onClick(const string &control) {
 }
 
 void NameEntry::loadRandomName() {
-    _nameBoxEdit->setTextMessage(getRandomName());
+    _binding.nameBoxEdit->setTextMessage(getRandomName());
 }
 
 string NameEntry::getRandomName() const {
