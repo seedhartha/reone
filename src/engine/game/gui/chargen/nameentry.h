@@ -38,18 +38,22 @@ public:
     void loadRandomName();
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::Control> nameBoxEdit;
+    } _binding;
+
     CharacterGeneration *_charGen { nullptr };
     gui::TextInput _input;
-    gui::Control *_nameBoxEdit { nullptr };
     resource::LtrReader _maleLtr;
     resource::LtrReader _femaleLtr;
     resource::LtrReader _lastNameLtr;
 
-    void onClick(const std::string &control) override;
-
+    void bindControls();
     void loadLtrFile(const std::string &resRef, resource::LtrReader &ltr);
 
     std::string getRandomName() const;
+
+    void onClick(const std::string &control) override;
 };
 
 } // namespace game
