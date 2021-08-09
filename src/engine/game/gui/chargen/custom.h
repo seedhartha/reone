@@ -21,6 +21,13 @@
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+class Label;
+
+}
+
 namespace game {
 
 class CharacterGeneration;
@@ -38,12 +45,35 @@ public:
     void setStep(int step);
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::Button> btnStepName1;
+        std::shared_ptr<gui::Button> btnStepName2;
+        std::shared_ptr<gui::Button> btnStepName3;
+        std::shared_ptr<gui::Button> btnStepName4;
+        std::shared_ptr<gui::Button> btnStepName5;
+        std::shared_ptr<gui::Button> btnStepName6;
+        std::shared_ptr<gui::Label> lbl1;
+        std::shared_ptr<gui::Label> lbl2;
+        std::shared_ptr<gui::Label> lbl3;
+        std::shared_ptr<gui::Label> lbl4;
+        std::shared_ptr<gui::Label> lbl5;
+        std::shared_ptr<gui::Label> lbl6;
+        std::shared_ptr<gui::Label> lblBg;
+        std::shared_ptr<gui::Label> lblNum1;
+        std::shared_ptr<gui::Label> lblNum2;
+        std::shared_ptr<gui::Label> lblNum3;
+        std::shared_ptr<gui::Label> lblNum4;
+        std::shared_ptr<gui::Label> lblNum5;
+        std::shared_ptr<gui::Label> lblNum6;
+    } _binding;
+
     CharacterGeneration *_charGen { nullptr };
     int _step { 0 };
 
-    void onClick(const std::string &control) override;
-
+    void bindControls();
     void doSetStep(int step);
+
+    void onClick(const std::string &control) override;
 };
 
 } // namespace game

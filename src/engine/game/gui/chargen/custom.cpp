@@ -42,11 +42,34 @@ CustomCharacterGeneration::CustomCharacterGeneration(CharacterGeneration *charGe
 
 void CustomCharacterGeneration::load() {
     GUI::load();
+    bindControls();
     doSetStep(0);
 
     if (_game->id() == GameID::KotOR) {
-        setControlDiscardColor("LBL_BG", glm::vec3(0.0f, 0.0f, 0.082353f));
+        _binding.lblBg->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
     }
+}
+
+void CustomCharacterGeneration::bindControls() {
+    _binding.btnStepName1 = getControlPtr<Button>("BTN_STEPNAME1");
+    _binding.btnStepName2 = getControlPtr<Button>("BTN_STEPNAME2");
+    _binding.btnStepName3 = getControlPtr<Button>("BTN_STEPNAME3");
+    _binding.btnStepName4 = getControlPtr<Button>("BTN_STEPNAME4");
+    _binding.btnStepName5 = getControlPtr<Button>("BTN_STEPNAME5");
+    _binding.btnStepName6 = getControlPtr<Button>("BTN_STEPNAME6");
+    _binding.lbl1 = getControlPtr<Label>("LBL_1");
+    _binding.lbl2 = getControlPtr<Label>("LBL_2");
+    _binding.lbl3 = getControlPtr<Label>("LBL_3");
+    _binding.lbl4 = getControlPtr<Label>("LBL_4");
+    _binding.lbl5 = getControlPtr<Label>("LBL_5");
+    _binding.lbl6 = getControlPtr<Label>("LBL_6");
+    _binding.lblBg = getControlPtr<Label>("LBL_BG");
+    _binding.lblNum1 = getControlPtr<Label>("LBL_NUM1");
+    _binding.lblNum2 = getControlPtr<Label>("LBL_NUM2");
+    _binding.lblNum3 = getControlPtr<Label>("LBL_NUM3");
+    _binding.lblNum4 = getControlPtr<Label>("LBL_NUM4");
+    _binding.lblNum5 = getControlPtr<Label>("LBL_NUM5");
+    _binding.lblNum6 = getControlPtr<Label>("LBL_NUM6");
 }
 
 void CustomCharacterGeneration::setStep(int step) {
@@ -58,50 +81,50 @@ void CustomCharacterGeneration::setStep(int step) {
 void CustomCharacterGeneration::doSetStep(int step) {
     _step = step;
 
-    setControlFocusable("LBL_1", false);
-    setControlFocusable("LBL_2", false);
-    setControlFocusable("LBL_3", false);
-    setControlFocusable("LBL_4", false);
-    setControlFocusable("LBL_5", false);
-    setControlFocusable("LBL_6", false);
-    setControlFocusable("BTN_STEPNAME1", false);
-    setControlFocusable("BTN_STEPNAME2", false);
-    setControlFocusable("BTN_STEPNAME3", false);
-    setControlFocusable("BTN_STEPNAME4", false);
-    setControlFocusable("BTN_STEPNAME5", false);
-    setControlFocusable("BTN_STEPNAME6", false);
+    _binding.lbl1->setFocusable(false);
+    _binding.lbl2->setFocusable(false);
+    _binding.lbl3->setFocusable(false);
+    _binding.lbl4->setFocusable(false);
+    _binding.lbl5->setFocusable(false);
+    _binding.lbl6->setFocusable(false);
+    _binding.btnStepName1->setFocusable(false);
+    _binding.btnStepName2->setFocusable(false);
+    _binding.btnStepName3->setFocusable(false);
+    _binding.btnStepName4->setFocusable(false);
+    _binding.btnStepName5->setFocusable(false);
+    _binding.btnStepName6->setFocusable(false);
 
-    setControlDisabled("LBL_1", _step != 0);
-    setControlDisabled("LBL_2", _step != 1);
-    setControlDisabled("LBL_3", _step != 2);
-    setControlDisabled("LBL_4", _step != 3);
-    setControlDisabled("LBL_5", _step != 4);
-    setControlDisabled("LBL_6", _step != 5);
-    setControlDisabled("BTN_STEPNAME1", _step != 0);
-    setControlDisabled("BTN_STEPNAME2", _step != 1);
-    setControlDisabled("BTN_STEPNAME3", _step != 2);
-    setControlDisabled("BTN_STEPNAME4", _step != 3);
-    setControlDisabled("BTN_STEPNAME5", _step != 4);
-    setControlDisabled("BTN_STEPNAME6", _step != 5);
+    _binding.lbl1->setDisabled(_step != 0);
+    _binding.lbl2->setDisabled(_step != 1);
+    _binding.lbl3->setDisabled(_step != 2);
+    _binding.lbl4->setDisabled(_step != 3);
+    _binding.lbl5->setDisabled(_step != 4);
+    _binding.lbl6->setDisabled(_step != 5);
+    _binding.btnStepName1->setDisabled(_step != 0);
+    _binding.btnStepName2->setDisabled(_step != 1);
+    _binding.btnStepName3->setDisabled(_step != 2);
+    _binding.btnStepName4->setDisabled(_step != 3);
+    _binding.btnStepName5->setDisabled(_step != 4);
+    _binding.btnStepName6->setDisabled(_step != 5);
 
-    setControlFocus("LBL_1", _step == 0);
-    setControlFocus("LBL_2", _step == 1);
-    setControlFocus("LBL_3", _step == 2);
-    setControlFocus("LBL_4", _step == 3);
-    setControlFocus("LBL_5", _step == 4);
-    setControlFocus("LBL_6", _step == 5);
-    setControlFocus("LBL_NUM1", _step == 0);
-    setControlFocus("LBL_NUM2", _step == 1);
-    setControlFocus("LBL_NUM3", _step == 2);
-    setControlFocus("LBL_NUM4", _step == 3);
-    setControlFocus("LBL_NUM5", _step == 4);
-    setControlFocus("LBL_NUM6", _step == 5);
-    setControlFocus("BTN_STEPNAME1", _step == 0);
-    setControlFocus("BTN_STEPNAME2", _step == 1);
-    setControlFocus("BTN_STEPNAME3", _step == 2);
-    setControlFocus("BTN_STEPNAME4", _step == 3);
-    setControlFocus("BTN_STEPNAME5", _step == 4);
-    setControlFocus("BTN_STEPNAME6", _step == 5);
+    _binding.lbl1->setFocus(_step == 0);
+    _binding.lbl2->setFocus(_step == 1);
+    _binding.lbl3->setFocus(_step == 2);
+    _binding.lbl4->setFocus(_step == 3);
+    _binding.lbl5->setFocus(_step == 4);
+    _binding.lbl6->setFocus(_step == 5);
+    _binding.lblNum1->setFocus(_step == 0);
+    _binding.lblNum2->setFocus(_step == 1);
+    _binding.lblNum3->setFocus(_step == 2);
+    _binding.lblNum4->setFocus(_step == 3);
+    _binding.lblNum5->setFocus(_step == 4);
+    _binding.lblNum6->setFocus(_step == 5);
+    _binding.btnStepName1->setFocus(_step == 0);
+    _binding.btnStepName2->setFocus(_step == 1);
+    _binding.btnStepName3->setFocus(_step == 2);
+    _binding.btnStepName4->setFocus(_step == 3);
+    _binding.btnStepName5->setFocus(_step == 4);
+    _binding.btnStepName6->setFocus(_step == 5);
 }
 
 void CustomCharacterGeneration::goToNextStep() {
