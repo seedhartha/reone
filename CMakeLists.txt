@@ -787,14 +787,14 @@ endif()
 
 if(BUILD_TESTS)
     set(TEST_SOURCES
-        src/tests/common/cache.cpp
-        src/tests/common/mediastream.cpp
-        src/tests/common/streamreader.cpp
-        src/tests/common/timer.cpp
-        src/tests/game/pathfinder.cpp
-        src/tests/main.cpp
-        src/tests/resource/gffstruct.cpp
-        src/tests/script/execution.cpp)
+        tests/common/cache.cpp
+        tests/common/mediastream.cpp
+        tests/common/streamreader.cpp
+        tests/common/timer.cpp
+        tests/game/pathfinder.cpp
+        tests/main.cpp
+        tests/resource/gffstruct.cpp
+        tests/script/execution.cpp)
 
     add_executable(reone-tests ${TEST_SOURCES})
     target_link_libraries(reone-tests PRIVATE libgame libscript libresource libcommon ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})

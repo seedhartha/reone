@@ -21,8 +21,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../engine/game/path.h"
-#include "../../engine/game/pathfinder.h"
+#include "../../src/engine/game/path.h"
+#include "../../src/engine/game/pathfinder.h"
 
 using namespace std;
 

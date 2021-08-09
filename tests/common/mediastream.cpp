@@ -21,7 +21,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../engine/common/mediastream.h"
+#include "../../src/engine/common/mediastream.h"
 
 using namespace std;
 
