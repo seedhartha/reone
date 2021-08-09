@@ -47,6 +47,13 @@ void CharacterMenu::load() {
     bindControls();
 
     _binding.btnAuto->setDisabled(true);
+    _binding.btnExit->setOnClick([this]() {
+        _game->openInGame();
+    });
+    _binding.btnLevelup->setOnClick([this]() {
+        _game->openLevelUp();
+    });
+
     if (_game->isKotOR()) {
         _binding.btnCharLeft->setVisible(false);
         _binding.btnCharRight->setVisible(false);
@@ -249,16 +256,6 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) 
     sceneModel->attach("charmain_light", character->sceneNode());
 
     return move(sceneModel);
-}
-
-void CharacterMenu::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_EXIT") {
-        _game->openInGame();
-    } else if (control == "BTN_LEVELUP") {
-        _game->openLevelUp();
-    }
 }
 
 } // namespace game

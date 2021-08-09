@@ -45,9 +45,31 @@ void MapMenu::load() {
     bindControls();
 
     _binding.btnReturn->setDisabled(true);
+    _binding.btnExit->setOnClick([this]() {
+        _game->openInGame();
+    });
+    _binding.btnUp->setOnClick([this]() {
+        if (--_selectedNoteIdx == -1) {
+            _selectedNoteIdx = static_cast<int>(_notes.size() - 1);
+        }
+        refreshSelectedNote();
+    });
+    _binding.btnDown->setOnClick([this]() {
+        if (++_selectedNoteIdx == static_cast<int>(_notes.size())) {
+            _selectedNoteIdx = 0;
+        }
+        refreshSelectedNote();
+    });
+    _binding.btnPrtySlct->setOnClick([this]() {
+        _game->openPartySelection(PartySelection::Context());
+    });
 }
 
 void MapMenu::bindControls() {
+    _binding.btnExit = getControl<Button>("BTN_EXIT");
+    _binding.btnUp = getControl<Button>("BTN_UP");
+    _binding.btnDown = getControl<Button>("BTN_DOWN");
+    _binding.btnPrtySlct = getControl<Button>("BTN_PRTYSLCT");
     _binding.btnReturn = getControl<Button>("BTN_RETURN");
     _binding.lblArea = getControl<Label>("LBL_Area");
     _binding.lblMap = getControl<Label>("LBL_Map");
@@ -81,26 +103,6 @@ void MapMenu::refreshControls() {
 
     _selectedNoteIdx = 0;
     refreshSelectedNote();
-}
-
-void MapMenu::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_EXIT") {
-        _game->openInGame();
-    } else if (control == "BTN_UP") {
-        if (--_selectedNoteIdx == -1) {
-            _selectedNoteIdx = static_cast<int>(_notes.size() - 1);
-        }
-        refreshSelectedNote();
-    } else if (control == "BTN_DOWN") {
-        if (++_selectedNoteIdx == static_cast<int>(_notes.size())) {
-            _selectedNoteIdx = 0;
-        }
-        refreshSelectedNote();
-    } else if (control == "BTN_PRTYSLCT") {
-        _game->openPartySelection(PartySelection::Context());
-    }
 }
 
 void MapMenu::refreshSelectedNote() {

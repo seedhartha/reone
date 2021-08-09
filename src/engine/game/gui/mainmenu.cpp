@@ -74,6 +74,22 @@ void MainMenu::load() {
         _binding.btnWarp->setVisible(false);
     }
 
+    _binding.btnNewGame->setOnClick([this]() {
+        _game->startCharacterGeneration();
+    });
+    _binding.btnLoadGame->setOnClick([this]() {
+        _game->openSaveLoad(SaveLoad::Mode::LoadFromMainMenu);
+    });
+    _binding.btnExit->setOnClick([this]() {
+        _game->quit();
+    });
+    _binding.btnWarp->setOnClick([this]() {
+        startModuleSelection();
+    });
+    _binding.lbModules->setOnItemClick([this](const string &item) {
+        onModuleSelected(item);
+    });
+
     setup3DView();
     configureButtons();
 }
@@ -140,20 +156,6 @@ shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
     return move(model);
 }
 
-void MainMenu::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_NEWGAME") {
-        _game->startCharacterGeneration();
-    } else if (control == "BTN_LOADGAME") {
-        _game->openSaveLoad(SaveLoad::Mode::LoadFromMainMenu);
-    } else if (control == "BTN_EXIT") {
-        _game->quit();
-    } else if (control == "BTN_WARP") {
-        startModuleSelection();
-    }
-}
-
 void MainMenu::startModuleSelection() {
     loadModuleNames();
 
@@ -180,12 +182,6 @@ void MainMenu::loadModuleNames() {
         item.tag = module;
         item.text = module;
         _binding.lbModules->addItem(move(item));
-    }
-}
-
-void MainMenu::onListBoxItemClick(const string &control, const string &item) {
-    if (control == "LB_MODULES") {
-        onModuleSelected(item);
     }
 }
 

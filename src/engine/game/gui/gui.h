@@ -35,9 +35,6 @@ class GameGUI : public gui::GUI {
 protected:
     GameGUI(Game *game);
 
-    void onClick(const std::string &control) override;
-    void onFocusChanged(const std::string &control, bool focus) override;
-
     void initForGame();
 
     std::string getResRef(const std::string &base) const;
@@ -46,6 +43,10 @@ protected:
     Game *_game;
 
     void loadBackground(BackgroundType type);
+
+private:
+    void onClick(const std::string &control) override;
+    void onFocusChanged(const std::string &control, bool focus) override;
 };
 
 } // namespace game

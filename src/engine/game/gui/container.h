@@ -54,12 +54,6 @@ private:
     void transferItemsToPlayer();
 
     std::shared_ptr<graphics::Texture> getItemFrameTexture(int stackSize) const;
-
-    // Event handlers
-
-    void onClick(const std::string &control) override;
-
-    // END Event handlers
 };
 
 } // namespace game

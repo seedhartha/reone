@@ -59,9 +59,6 @@ public:
 
     void resetFocus();
 
-    virtual void onClick(const std::string &control);
-    virtual void onListBoxItemClick(const std::string &control, const std::string &item);
-
     // Services
 
     graphics::GraphicsServices &graphics() { return _graphics; }
@@ -106,7 +103,6 @@ protected:
         resource::ResourceServices &resources);
 
     void loadControl(const resource::GffStruct &gffs);
-    virtual void onFocusChanged(const std::string &control, bool focus);
     virtual void preloadControl(Control &control);
 
     std::shared_ptr<Control> getControl(const std::string &tag) const;
@@ -123,6 +119,9 @@ protected:
     virtual bool handleKeyUp(SDL_Scancode key);
 
     // END User input
+
+    virtual void onClick(const std::string &control) { }
+    virtual void onFocusChanged(const std::string &control, bool focus) { }
 
 private:
     bool _leftMouseDown { false };

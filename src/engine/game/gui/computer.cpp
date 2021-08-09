@@ -87,6 +87,10 @@ void ComputerGUI::configureReplies() {
     _binding.lbReplies->setProtoMatchContent(true);
     _binding.lbReplies->protoItem().setHilightColor(_game->getGUIColorHilight());
     _binding.lbReplies->protoItem().setTextColor(_game->getGUIColorBase());
+    _binding.lbReplies->setOnItemClick([this](auto &item) {
+        int replyIdx = stoi(item);
+        pickReply(replyIdx);
+    });
 }
 
 void ComputerGUI::setMessage(string message) {
@@ -105,13 +109,6 @@ void ComputerGUI::setReplyLines(vector<string> lines) {
         item.tag = to_string(i);
         item.text = lines[i];
         _binding.lbReplies->addItem(move(item));
-    }
-}
-
-void ComputerGUI::onListBoxItemClick(const string &control, const string &item) {
-    if (control == "LB_REPLIES") {
-        int replyIdx = stoi(item);
-        pickReply(replyIdx);
     }
 }
 

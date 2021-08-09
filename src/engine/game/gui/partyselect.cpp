@@ -66,6 +66,62 @@ void PartySelection::load() {
         button.setBorderColorOverride(g_kotorColorAdded);
         button.setUseBorderColorOverride(false);
     }
+
+    _binding.btnAccept->setOnClick([this]() {
+        onAcceptButtonClick();
+    });
+    _binding.btnDone->setOnClick([this]() {
+        changeParty();
+        _game->openInGame();
+        if (!_context.exitScript.empty()) {
+            _game->services().scriptRunner().run(_context.exitScript);
+        }
+    });
+    _binding.btnBack->setOnClick([this]() {
+        _game->openInGame();
+        if (!_context.exitScript.empty()) {
+            _game->services().scriptRunner().run(_context.exitScript);
+        }
+    });
+    _binding.btnNpc0->setOnClick([this]() {
+        onNpcButtonClick(0);
+    });
+    _binding.btnNpc1->setOnClick([this]() {
+        onNpcButtonClick(1);
+    });
+    _binding.btnNpc2->setOnClick([this]() {
+        onNpcButtonClick(2);
+    });
+    _binding.btnNpc3->setOnClick([this]() {
+        onNpcButtonClick(3);
+    });
+    _binding.btnNpc4->setOnClick([this]() {
+        onNpcButtonClick(4);
+    });
+    _binding.btnNpc5->setOnClick([this]() {
+        onNpcButtonClick(5);
+    });
+    _binding.btnNpc6->setOnClick([this]() {
+        onNpcButtonClick(6);
+    });
+    _binding.btnNpc7->setOnClick([this]() {
+        onNpcButtonClick(7);
+    });
+    _binding.btnNpc8->setOnClick([this]() {
+        onNpcButtonClick(8);
+    });
+
+    if (_game->isTSL()) {
+        _binding.btnNpc9->setOnClick([this]() {
+            onNpcButtonClick(9);
+        });
+        _binding.btnNpc10->setOnClick([this]() {
+            onNpcButtonClick(10);
+        });
+        _binding.btnNpc11->setOnClick([this]() {
+            onNpcButtonClick(11);
+        });
+    }
 }
 
 void PartySelection::bindControls() {
@@ -149,9 +205,6 @@ void PartySelection::prepare(const Context &ctx) {
         _binding.lblChar6.get(),
         _binding.lblChar7.get(),
         _binding.lblChar8.get(),
-        _binding.lblChar9.get(),
-        _binding.lblChar10.get(),
-        _binding.lblChar11.get()
     };
     vector<Label *> naLabels {
         _binding.lblNa0.get(),
@@ -162,11 +215,16 @@ void PartySelection::prepare(const Context &ctx) {
         _binding.lblNa5.get(),
         _binding.lblNa6.get(),
         _binding.lblNa7.get(),
-        _binding.lblNa8.get(),
-        _binding.lblNa9.get(),
-        _binding.lblNa10.get(),
-        _binding.lblNa11.get()
+        _binding.lblNa8.get()
     };
+    if (_game->isTSL()) {
+        charLabels.push_back(_binding.lblChar9.get());
+        charLabels.push_back(_binding.lblChar10.get());
+        charLabels.push_back(_binding.lblChar11.get());
+        naLabels.push_back(_binding.lblNa9.get());
+        naLabels.push_back(_binding.lblNa10.get());
+        naLabels.push_back(_binding.lblNa11.get());
+    }
 
     for (int i = 0; i < kNpcCount; ++i) {
         ToggleButton &btnNpc = getNpcButton(i);
@@ -214,31 +272,13 @@ ToggleButton &PartySelection::getNpcButton(int npc) {
         _binding.btnNpc6.get(),
         _binding.btnNpc7.get(),
         _binding.btnNpc8.get(),
-        _binding.btnNpc9.get(),
-        _binding.btnNpc10.get(),
-        _binding.btnNpc11.get()
+        _binding.btnNpc9.get()
     };
-    return *npcButtons[npc];
-}
-
-void PartySelection::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_ACCEPT") {
-        onAcceptButtonClick();
-
-    } else if (control == "BTN_DONE" || control == "BTN_BACK") {
-        if (control == "BTN_DONE") {
-            changeParty();
-        }
-        _game->openInGame();
-
-        if (!_context.exitScript.empty()) {
-            _game->services().scriptRunner().run(_context.exitScript);
-        }
-    } else if (boost::starts_with(control, "BTN_NPC")) {
-        onNpcButtonClick(control);
+    if (_game->isTSL()) {
+        npcButtons.push_back(_binding.btnNpc10.get());
+        npcButtons.push_back(_binding.btnNpc11.get());
     }
+    return *npcButtons[npc];
 }
 
 void PartySelection::onAcceptButtonClick() {
@@ -271,8 +311,7 @@ void PartySelection::removeNpc(int npc) {
     refreshAvailableCount();
 }
 
-void PartySelection::onNpcButtonClick(const string &control) {
-    int npc = control.substr(7, 1)[0] - '0';
+void PartySelection::onNpcButtonClick(int npc) {
     _selectedNpc = npc;
     refreshNpcButtons();
     refreshAcceptButton();

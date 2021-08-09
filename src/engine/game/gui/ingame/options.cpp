@@ -37,18 +37,23 @@ OptionsMenu::OptionsMenu(Game *game) : GameGUI(game) {
 
 void OptionsMenu::load() {
     GUI::load();
+    bindControls();
+
+    _binding.btnLoadGame->setOnClick([this]() {
+        _game->openSaveLoad(SaveLoad::Mode::LoadFromInGame);
+    });
+    _binding.btnSaveGame->setOnClick([this]() {
+        _game->openSaveLoad(SaveLoad::Mode::Save);
+    });
+    _binding.btnExit->setOnClick([this]() {
+        _game->openInGame();
+    });
 }
 
-void OptionsMenu::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_LOADGAME") {
-        _game->openSaveLoad(SaveLoad::Mode::LoadFromInGame);
-    } else if (control == "BTN_SAVEGAME") {
-        _game->openSaveLoad(SaveLoad::Mode::Save);
-    } else if (control == "BTN_EXIT") {
-        _game->openInGame();
-    }
+void OptionsMenu::bindControls() {
+    _binding.btnLoadGame = getControl<Button>("BTN_LOADGAME");
+    _binding.btnSaveGame = getControl<Button>("BTN_SAVEGAME");
+    _binding.btnExit = getControl<Button>("BTN_EXIT");
 }
 
 } // namespace game

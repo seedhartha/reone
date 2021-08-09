@@ -94,6 +94,11 @@ void DialogGUI::load() {
     configureMessage();
     configureReplies();
     loadFrames();
+
+    _binding.lbReplies->setOnItemClick([this](const string &item) {
+        int replyIdx = stoi(item);
+        pickReply(replyIdx);
+    });
 }
 
 void DialogGUI::bindControls() {
@@ -376,13 +381,6 @@ void DialogGUI::update(float dt) {
     if (_currentSpeaker && _game->cameraType() == CameraType::Dialog) {
         auto &camera = _game->module()->area()->getCamera<DialogCamera>(CameraType::Dialog);
         camera.setSpeakerPosition(getTalkPosition(*_currentSpeaker));
-    }
-}
-
-void DialogGUI::onListBoxItemClick(const string &control, const string &item) {
-    if (control == "LB_REPLIES") {
-        int replyIdx = stoi(item);
-        pickReply(replyIdx);
     }
 }
 

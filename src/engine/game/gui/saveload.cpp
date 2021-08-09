@@ -64,10 +64,71 @@ void SaveLoad::load() {
 
     _binding.lbGames->setSelectionMode(ListBox::SelectionMode::OnClick);
     _binding.lbGames->setPadding(3);
-
     _binding.lbGames->protoItem().setUseBorderColorOverride(true);
     _binding.lbGames->protoItem().setBorderColorOverride(_game->getGUIColorBase());
     _binding.lbGames->protoItem().setHilightColor(_defaultHilightColor);
+    _binding.lbGames->setOnItemClick([this](const string &item) {
+        // Get save number by item tag
+        int selectedSaveNumber = -1;
+        for (int i = 0; i < _binding.lbGames->getItemCount(); ++i) {
+            auto &lbItem = _binding.lbGames->getItemAt(i);
+            if (lbItem.tag == item) {
+                selectedSaveNumber = stoi(lbItem.tag);
+                break;
+            }
+        }
+
+        // Get save screenshot by save number
+        shared_ptr<Texture> screenshot;
+        if (selectedSaveNumber != -1) {
+            for (auto &save : _saves) {
+                if (save.number == selectedSaveNumber) {
+                    screenshot = save.save.screen;
+                    break;
+                }
+            }
+        }
+
+        // Set screenshot
+        _binding.lblScreenshot->setBorderFill(move(screenshot));
+    });
+
+    _binding.btnSaveLoad->setOnClick([this]() {
+        int number = getSelectedSaveNumber();
+        switch (_mode) {
+            case Mode::Save:
+                if (number == -1) {
+                    number = getNewSaveNumber();
+                }
+                saveGame(number);
+                refresh();
+                break;
+            default:
+                if (number != -1) {
+                    loadGame(number);
+                }
+                break;
+        }
+    });
+    _binding.btnDelete->setOnClick([this]() {
+        int number = getSelectedSaveNumber();
+        if (number != -1) {
+            deleteGame(number);
+            refresh();
+        }
+    });
+    _binding.btnBack->setOnClick([this]() {
+        _binding.lbGames->clearSelection();
+        switch (_mode) {
+            case Mode::Save:
+            case Mode::LoadFromInGame:
+                _game->openInGame();
+                break;
+            default:
+                _game->openMainMenu();
+                break;
+        }
+    });
 }
 
 void SaveLoad::bindControls() {
@@ -179,46 +240,6 @@ void SaveLoad::setMode(Mode mode) {
     _mode = mode;
 }
 
-void SaveLoad::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_SAVELOAD") {
-        int number = getSelectedSaveNumber();
-        switch (_mode) {
-            case Mode::Save:
-                if (number == -1) {
-                    number = getNewSaveNumber();
-                }
-                saveGame(number);
-                refresh();
-                break;
-            default:
-                if (number != -1) {
-                    loadGame(number);
-                }
-                break;
-        }
-    } else if (control == "BTN_DELETE") {
-        int number = getSelectedSaveNumber();
-        if (number != -1) {
-            deleteGame(number);
-            refresh();
-        }
-    } else if (control == "BTN_BACK") {
-        _binding.lbGames->clearSelection();
-
-        switch (_mode) {
-            case Mode::Save:
-            case Mode::LoadFromInGame:
-                _game->openInGame();
-                break;
-            default:
-                _game->openMainMenu();
-                break;
-        }
-    }
-}
-
 int SaveLoad::getSelectedSaveNumber() const {
     int hilightedIdx = _binding.lbGames->selectedItemIndex();
     if (hilightedIdx == -1) return -1;
@@ -261,34 +282,6 @@ void SaveLoad::deleteGame(int number) {
         fs::remove(maybeSave->path);
         refresh();
     }
-}
-
-void SaveLoad::onListBoxItemClick(const string &control, const string &item) {
-    if (control != "LB_GAMES") return;
-
-    // Get save number by item tag
-    int selectedSaveNumber = -1;
-    for (int i = 0; i < _binding.lbGames->getItemCount(); ++i) {
-        auto &lbItem = _binding.lbGames->getItemAt(i);
-        if (lbItem.tag == item) {
-            selectedSaveNumber = stoi(lbItem.tag);
-            break;
-        }
-    }
-
-    // Get save screenshot by save number
-    shared_ptr<Texture> screenshot;
-    if (selectedSaveNumber != -1) {
-        for (auto &save : _saves) {
-            if (save.number == selectedSaveNumber) {
-                screenshot = save.save.screen;
-                break;
-            }
-        }
-    }
-
-    // Set screenshot
-    _binding.lblScreenshot->setBorderFill(move(screenshot));
 }
 
 } // namespace game

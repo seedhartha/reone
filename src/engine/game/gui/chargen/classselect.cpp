@@ -59,7 +59,7 @@ static map<ClassType, int> g_classDescStrRefs {
 ClassSelection::ClassSelection(Game *game) : GameGUI(game) {
     _resRef = getResRef("classsel");
 
-    if (game->id() == GameID::KotOR) {
+    if (game->isKotOR()) {
         loadBackground(BackgroundType::Menu);
     }
 
@@ -71,6 +71,10 @@ void ClassSelection::load() {
     bindControls();
     setupClassButtons();
     setButtonColors(*_binding.btnBack);
+
+    _binding.btnBack->setOnClick([this]() {
+        _game->characterGeneration().cancel();
+    });
 }
 
 void ClassSelection::bindControls() {
@@ -95,18 +99,23 @@ void ClassSelection::setupClassButtons() {
     _enlargedButtonSize = glm::vec2(_binding.btnSel1->extent().width, _binding.btnSel1->extent().height);
     _defaultButtonSize = glm::vec2(_binding.btnSel2->extent().width, _binding.btnSel2->extent().height);
 
-    setupClassButton(0, Gender::Male, _game->id() == GameID::KotOR ? ClassType::Scoundrel : ClassType::JediConsular);
-    setupClassButton(1, Gender::Male, _game->id() == GameID::KotOR ? ClassType::Scout : ClassType::JediSentinel);
-    setupClassButton(2, Gender::Male, _game->id() == GameID::KotOR ? ClassType::Soldier : ClassType::JediGuardian);
-    setupClassButton(3, Gender::Female, _game->id() == GameID::KotOR ? ClassType::Soldier : ClassType::JediGuardian);
-    setupClassButton(4, Gender::Female, _game->id() == GameID::KotOR ? ClassType::Scout : ClassType::JediSentinel);
-    setupClassButton(5, Gender::Female, _game->id() == GameID::KotOR ? ClassType::Scoundrel : ClassType::JediConsular);
+    setupClassButton(0, Gender::Male, _game->isKotOR() ? ClassType::Scoundrel : ClassType::JediConsular);
+    setupClassButton(1, Gender::Male, _game->isKotOR() ? ClassType::Scout : ClassType::JediSentinel);
+    setupClassButton(2, Gender::Male, _game->isKotOR() ? ClassType::Soldier : ClassType::JediGuardian);
+    setupClassButton(3, Gender::Female, _game->isKotOR() ? ClassType::Soldier : ClassType::JediGuardian);
+    setupClassButton(4, Gender::Female, _game->isKotOR() ? ClassType::Scout : ClassType::JediSentinel);
+    setupClassButton(5, Gender::Female, _game->isKotOR() ? ClassType::Scoundrel : ClassType::JediConsular);
 
     setClassButtonEnlarged(0, false);
 }
 
 void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz) {
     int appearance = getRandomCharacterAppearance(gender, clazz);
+
+    Character character;
+    character.gender = gender;
+    character.appearance = appearance;
+    character.attributes = _game->services().classes().get(clazz)->defaultAttributes();
 
     // Button control
 
@@ -130,6 +139,13 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     extent.width = _defaultButtonSize.x;
     extent.height = _defaultButtonSize.y;
     selButton.setExtent(move(extent));
+    selButton.setOnClick([this, character]() {
+        _game->characterGeneration().setCharacter(character);
+        _game->characterGeneration().openQuickOrCustom();
+    });
+    selButton.setOnFocusChanged([this, index](bool focus) {
+        onClassButtonFocusChanged(index, focus);
+    });
 
     // 3D control
 
@@ -156,9 +172,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     ClassButton classButton;
     classButton.control = &selButton;
     classButton.center = center;
-    classButton.character.gender = gender;
-    classButton.character.appearance = appearance;
-    classButton.character.attributes = _game->services().classes().get(clazz)->defaultAttributes();
+    classButton.character = character;
     _classButtons.push_back(move(classButton));
 }
 
@@ -231,19 +245,14 @@ void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {
     control.setExtent(move(extent));
 }
 
-void ClassSelection::onFocusChanged(const string &control, bool focus) {
-    GameGUI::onFocusChanged(control, focus);
-
-    int idx = getClassButtonIndexByTag(control);
-    if (idx == -1) return;
-
+void ClassSelection::onClassButtonFocusChanged(int index, bool focus) {
     if (focus) {
-        setClassButtonEnlarged(idx, true);
+        setClassButtonEnlarged(index, true);
     } else {
-        setClassButtonEnlarged(idx, false);
+        setClassButtonEnlarged(index, false);
     }
 
-    ClassButton &button = _classButtons[idx];
+    ClassButton &button = _classButtons[index];
     ClassType clazz = button.character.attributes.getEffectiveClass();
 
     string classText(_game->services().resource().strings().get(g_genderStrRefs[button.character.gender]));
@@ -252,31 +261,6 @@ void ClassSelection::onFocusChanged(const string &control, bool focus) {
 
     string descText(_game->services().resource().strings().get(g_classDescStrRefs[clazz]));
     _binding.lblDesc->setTextMessage(descText);
-}
-
-int ClassSelection::getClassButtonIndexByTag(const string &tag) const {
-    for (int i = 0; i < _classButtons.size(); ++i) {
-        if (_classButtons[i].control->tag() == tag) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
-void ClassSelection::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    CharacterGeneration &charGen = _game->characterGeneration();
-    int idx = getClassButtonIndexByTag(control);
-    if (idx != -1) {
-        charGen.setCharacter(_classButtons[idx].character);
-        charGen.openQuickOrCustom();
-        return;
-    }
-    if (control == "BTN_BACK") {
-        charGen.cancel();
-    }
 }
 
 } // namespace game

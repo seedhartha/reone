@@ -163,6 +163,13 @@ public:
 
     // END Rendering
 
+    // Event listeners
+
+    void setOnClick(std::function<void()> fn) { _onClick = std::move(fn); }
+    void setOnFocusChanged(std::function<void(bool)> fn) { _onFocusChanged = std::move(fn); }
+
+    // END Event listeners
+
 protected:
     GUI *_gui { nullptr };
     ControlType _type { ControlType::Invalid };
@@ -185,6 +192,13 @@ protected:
     glm::vec3 _borderColorOverride { 1.0f };
     bool _useBorderColorOverride { false };
     std::vector<std::string> _textLines;
+
+    // Event listeners
+
+    std::function<void()> _onClick;
+    std::function<void(bool)> _onFocusChanged;
+
+    // END Event listeners
 
     Control(GUI *, ControlType type);
 

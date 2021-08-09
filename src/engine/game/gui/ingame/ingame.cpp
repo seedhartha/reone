@@ -51,6 +51,31 @@ void InGameMenu::load() {
     _binding.btnMap->setVisible(false);
     _binding.btnOpt->setVisible(false);
 
+    _binding.lblhEqu->setOnClick([this]() {
+        openEquipment();
+    });
+    _binding.lblhInv->setOnClick([this]() {
+        openInventory();
+    });
+    _binding.lblhCha->setOnClick([this]() {
+        openCharacter();
+    });
+    _binding.lblhAbi->setOnClick([this]() {
+        openAbilities();
+    });
+    _binding.lblhMsg->setOnClick([this]() {
+        openMessages();
+    });
+    _binding.lblhJou->setOnClick([this]() {
+        openJournal();
+    });
+    _binding.lblhMap->setOnClick([this]() {
+        openMap();
+    });
+    _binding.lblhOpt->setOnClick([this]() {
+        openOptions();
+    });
+
     setTabLabelsFocusable(false);
 
     loadEquipment();
@@ -254,28 +279,6 @@ shared_ptr<Button> InGameMenu::getBtnChange2() {
 
 shared_ptr<Button> InGameMenu::getBtnChange3() {
     return _game->isTSL() ? getControl<Button>("BTN_CHANGE3") : nullptr;
-}
-
-void InGameMenu::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "LBLH_EQU") {
-        openEquipment();
-    } else if (control == "LBLH_INV") {
-        openInventory();
-    } else if (control == "LBLH_CHA") {
-        openCharacter();
-    } else if (control == "LBLH_ABI") {
-        openAbilities();
-    } else if (control == "LBLH_MSG") {
-        openMessages();
-    } else if (control == "LBLH_JOU") {
-        openJournal();
-    } else if (control == "LBLH_MAP") {
-        openMap();
-    } else if (control == "LBLH_OPT") {
-        openOptions();
-    }
 }
 
 } // namespace game

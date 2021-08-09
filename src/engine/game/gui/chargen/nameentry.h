@@ -24,6 +24,12 @@
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+
+}
+
 namespace game {
 
 class CharacterGeneration;
@@ -39,6 +45,9 @@ public:
 
 private:
     struct Binding {
+        std::shared_ptr<gui::Button> btnBack;
+        std::shared_ptr<gui::Button> btnRandom;
+        std::shared_ptr<gui::Button> endBtn;
         std::shared_ptr<gui::Control> nameBoxEdit;
     } _binding;
 
@@ -52,8 +61,6 @@ private:
     void loadLtrFile(const std::string &resRef, resource::LtrReader &ltr);
 
     std::string getRandomName() const;
-
-    void onClick(const std::string &control) override;
 };
 
 } // namespace game

@@ -23,6 +23,7 @@ namespace reone {
 
 namespace gui {
 
+class Button;
 class Label;
 class ListBox;
 
@@ -40,6 +41,9 @@ public:
 
 private:
     struct Binding {
+        std::shared_ptr<gui::Button> btnBack;
+        std::shared_ptr<gui::Button> custCharBtn;
+        std::shared_ptr<gui::Button> quickCharBtn;
         std::shared_ptr<gui::Label> lblRbg;
         std::shared_ptr<gui::ListBox> lbDesc;
     } _binding;
@@ -47,9 +51,6 @@ private:
     CharacterGeneration *_charGen { nullptr };
 
     void bindControls();
-
-    void onClick(const std::string &control) override;
-    void onFocusChanged(const std::string &control, bool focus) override;
 };
 
 } // namespace game

@@ -133,6 +133,59 @@ void HUD::load() {
         _binding.lblMoulding2->setVisible(false);
     }
 
+    _binding.btnEqu->setOnClick([this]() {
+        _game->openInGameMenu(InGameMenu::Tab::Equipment);
+    });
+    _binding.btnInv->setOnClick([this]() {
+        _game->openInGameMenu(InGameMenu::Tab::Inventory);
+    });
+    _binding.btnChar->setOnClick([this]() {
+        _game->openInGameMenu(InGameMenu::Tab::Character);
+    });
+    _binding.btnAbi->setOnClick([this]() {
+        _game->openInGameMenu(InGameMenu::Tab::Abilities);
+    });
+    _binding.btnMsg->setOnClick([this]() {
+        _game->openInGameMenu(InGameMenu::Tab::Messages);
+    });
+    _binding.btnJou->setOnClick([this]() {
+        _game->openInGameMenu(InGameMenu::Tab::Journal);
+    });
+    _binding.btnMap->setOnClick([this]() {
+        _game->openInGameMenu(InGameMenu::Tab::Map);
+    });
+    _binding.btnOpt->setOnClick([this]() {
+        _game->openInGameMenu(InGameMenu::Tab::Options);
+    });
+    _binding.btnClearAll->setOnClick([this]() {
+        _game->services().party().getLeader()->clearAllActions();
+    });
+    _binding.btnClearOne->setOnClick([this]() {
+        for (auto &action : _game->services().party().getLeader()->actions()) {
+            if (action->type() == ActionType::AttackObject) {
+                action->complete();
+                break;
+            }
+        }
+    });
+    _binding.btnClearOne2->setOnClick([this]() {
+        for (auto &action : _game->services().party().getLeader()->actions()) {
+            if (action->type() == ActionType::AttackObject) {
+                action->complete();
+                break;
+            }
+        }
+    });
+    _binding.btnChar1->setOnClick([this]() {
+        _game->openInGameMenu(InGameMenu::Tab::Equipment);
+    });
+    _binding.btnChar2->setOnClick([this]() {
+        _game->services().party().setPartyLeaderByIndex(1);
+    });
+    _binding.btnChar3->setOnClick([this]() {
+        _game->services().party().setPartyLeaderByIndex(2);
+    });
+
     _select.load();
 
     _barkBubble = make_unique<BarkBubble>(_game);
@@ -434,42 +487,6 @@ void HUD::refreshActionQueueItems() const {
         } else {
             item.setBorderFill("");
         }
-    }
-}
-
-void HUD::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_EQU") {
-        _game->openInGameMenu(InGameMenu::Tab::Equipment);
-    } else if (control == "BTN_INV") {
-        _game->openInGameMenu(InGameMenu::Tab::Inventory);
-    } else if (control == "BTN_CHAR") {
-        _game->openInGameMenu(InGameMenu::Tab::Character);
-    } else if (control == "BTN_ABI") {
-        _game->openInGameMenu(InGameMenu::Tab::Abilities);
-    } else if (control == "BTN_MSG") {
-        _game->openInGameMenu(InGameMenu::Tab::Messages);
-    } else if (control == "BTN_JOU") {
-        _game->openInGameMenu(InGameMenu::Tab::Journal);
-    } else if (control == "BTN_MAP") {
-        _game->openInGameMenu(InGameMenu::Tab::Map);
-    } else if (control == "BTN_OPT") {
-        _game->openInGameMenu(InGameMenu::Tab::Options);
-    } else if (control == "BTN_CLEARALL") {
-        _game->services().party().getLeader()->clearAllActions();
-    } else if (control == "BTN_CLEARONE" || control == "BTN_CLEARONE2") {
-        for (auto &action : _game->services().party().getLeader()->actions()) {
-            if (action->type() == ActionType::AttackObject) {
-                action->complete();
-                break;
-            }
-        }
-    } else if (control == "BTN_CHAR1") {
-        _game->openInGameMenu(InGameMenu::Tab::Equipment);
-    } else if (control == "BTN_CHAR2" || control == "BTN_CHAR3") {
-        int memberIdx = 4 - stoi(&control[8]);
-        _game->services().party().setPartyLeaderByIndex(memberIdx);
     }
 }
 

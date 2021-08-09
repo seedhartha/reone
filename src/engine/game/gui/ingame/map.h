@@ -44,6 +44,10 @@ public:
 
 private:
     struct Binding {
+        std::shared_ptr<gui::Button> btnExit;
+        std::shared_ptr<gui::Button> btnUp;
+        std::shared_ptr<gui::Button> btnDown;
+        std::shared_ptr<gui::Button> btnPrtySlct;
         std::shared_ptr<gui::Button> btnReturn;
         std::shared_ptr<gui::Label> lblArea;
         std::shared_ptr<gui::Label> lblMap;
@@ -55,8 +59,6 @@ private:
 
     void bindControls();
     void refreshSelectedNote();
-
-    void onClick(const std::string &control) override;
 };
 
 } // namespace game

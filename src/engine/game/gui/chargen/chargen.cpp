@@ -372,7 +372,7 @@ void CharacterGeneration::finish() {
         party.addMember(kNpcPlayer, player);
         party.setPlayer(player);
 
-        string moduleName(_game->id() == GameID::KotOR ? "end_m01aa" : "001ebo");
+        string moduleName(_game->isKotOR() ? "end_m01aa" : "001ebo");
         _game->loadModule(moduleName);
     }
 }

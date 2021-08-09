@@ -72,8 +72,6 @@ private:
     void onLoadEntry() override;
     void onEntryEnded() override;
 
-    void onListBoxItemClick(const std::string &control, const std::string &item) override;
-
     // Loading
 
     void loadFrames();

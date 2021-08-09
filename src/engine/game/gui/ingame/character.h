@@ -126,8 +126,6 @@ private:
 
     std::shared_ptr<scene::ModelSceneNode> getSceneModel(scene::SceneGraph &sceneGraph) const;
     std::string describeClass(ClassType clazz) const;
-
-    void onClick(const std::string &control) override;
 };
 
 } // namespace game

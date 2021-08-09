@@ -62,6 +62,24 @@ void AbilitiesMenu::load() {
     _binding.lblName->setTextMessage("");
 
     _binding.lbDesc->setProtoMatchContent(true);
+    _binding.lbAbility->setOnItemClick([this](const string &item) {
+        auto skill = static_cast<SkillType>(stoi(item));
+        auto maybeSkillInfo = _skills.find(skill);
+        if (maybeSkillInfo == _skills.end()) return;
+
+        shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
+
+        _binding.lblRankVal->setTextMessage(to_string(partyLeader->attributes().getSkillRank(skill)));
+        _binding.lblBonusVal->setTextMessage("0");
+        _binding.lblTotalVal->setTextMessage(to_string(partyLeader->attributes().getSkillRank(skill)));
+        _binding.lblName->setTextMessage(maybeSkillInfo->second.name);
+
+        _binding.lbDesc->clearItems();
+        _binding.lbDesc->addTextLinesAsItems(maybeSkillInfo->second.description);
+    });
+    _binding.btnExit->setOnClick([this]() {
+        _game->openInGame();
+    });
 
     loadSkills();
 }
@@ -151,32 +169,6 @@ void AbilitiesMenu::refreshPortraits() {
 
     _binding.btnChange2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
     _binding.btnChange2->setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
-}
-
-void AbilitiesMenu::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_EXIT") {
-        _game->openInGame();
-    }
-}
-
-void AbilitiesMenu::onListBoxItemClick(const string &control, const string &item) {
-    if (control == "LB_ABILITY") {
-        auto skill = static_cast<SkillType>(stoi(item));
-        auto maybeSkillInfo = _skills.find(skill);
-        if (maybeSkillInfo != _skills.end()) {
-            shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
-
-            _binding.lblRankVal->setTextMessage(to_string(partyLeader->attributes().getSkillRank(skill)));
-            _binding.lblBonusVal->setTextMessage("0");
-            _binding.lblTotalVal->setTextMessage(to_string(partyLeader->attributes().getSkillRank(skill)));
-            _binding.lblName->setTextMessage(maybeSkillInfo->second.name);
-
-            _binding.lbDesc->clearItems();
-            _binding.lbDesc->addTextLinesAsItems(maybeSkillInfo->second.description);
-        }
-    }
 }
 
 } // namespace game

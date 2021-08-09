@@ -37,12 +37,11 @@ public:
 
 private:
     struct Binding {
+        std::shared_ptr<gui::Button> btnExit;
         std::shared_ptr<gui::Button> btnShow;
     } _binding;
 
     void bindControls();
-
-    void onClick(const std::string &control) override;
 };
 
 } // namespace game

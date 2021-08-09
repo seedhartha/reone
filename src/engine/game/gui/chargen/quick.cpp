@@ -48,9 +48,32 @@ void QuickCharacterGeneration::load() {
     if (_game->id() == GameID::KotOR) {
         _binding.lblDecoration->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
     }
+
+    _binding.btnCancel->setOnClick([this]() {
+        setStep(0);
+        _charGen->openQuickOrCustom();
+    });
+    _binding.btnBack->setOnClick([this]() {
+        if (_step == 0) {
+            _charGen->openQuickOrCustom();
+        } else {
+            setStep(_step - 1);
+        }
+    });
+    _binding.btnStepName1->setOnClick([this]() {
+        _charGen->openPortraitSelection();
+    });
+    _binding.btnStepName2->setOnClick([this]() {
+        _charGen->openNameEntry();
+    });
+    _binding.btnStepName3->setOnClick([this]() {
+        _charGen->finish();
+    });
 }
 
 void QuickCharacterGeneration::bindControls() {
+    _binding.btnBack = getControl<Button>("BTN_BACK");
+    _binding.btnCancel = getControl<Button>("BTN_CANCEL");
     _binding.btnStepName1 = getControl<Button>("BTN_STEPNAME1");
     _binding.btnStepName2 = getControl<Button>("BTN_STEPNAME2");
     _binding.btnStepName3 = getControl<Button>("BTN_STEPNAME3");
@@ -100,35 +123,6 @@ void QuickCharacterGeneration::doSetStep(int step) {
 void QuickCharacterGeneration::goToNextStep() {
     if (_step < 3) {
         doSetStep(_step + 1);
-    }
-}
-
-void QuickCharacterGeneration::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_CANCEL") {
-        setStep(0);
-        _charGen->openQuickOrCustom();
-
-    } else if (control == "BTN_BACK") {
-        if (_step == 0) {
-            _charGen->openQuickOrCustom();
-        } else {
-            setStep(_step - 1);
-        }
-    } else if (boost::starts_with(control, "BTN_STEPNAME")) {
-        int step = control[12] - '0';
-        switch (step) {
-            case 1:
-                _charGen->openPortraitSelection();
-                break;
-            case 2:
-                _charGen->openNameEntry();
-                break;
-            default:
-                _charGen->finish();
-                break;
-        }
     }
 }
 

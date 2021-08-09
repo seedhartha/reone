@@ -79,8 +79,6 @@ private:
     } _binding;
 
     void bindControls();
-
-    void onClick(const std::string &control) override;
 };
 
 } // namespace game

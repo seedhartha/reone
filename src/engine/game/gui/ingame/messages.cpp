@@ -39,19 +39,15 @@ void MessagesMenu::load() {
     GUI::load();
     bindControls();
 
+    _binding.btnExit->setOnClick([this]() {
+        _game->openInGame();
+    });
     _binding.btnShow->setDisabled(true);
 }
 
 void MessagesMenu::bindControls() {
+    _binding.btnExit = getControl<Button>("BTN_EXIT");
     _binding.btnShow = getControl<Button>("BTN_SHOW");
-}
-
-void MessagesMenu::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_EXIT") {
-        _game->openInGame();
-    }
 }
 
 } // namespace game

@@ -222,7 +222,9 @@ bool Control::handleMouseWheel(int x, int y) {
 }
 
 bool Control::handleClick(int x, int y) {
-    _gui->onClick(_tag);
+    if (_onClick) {
+        _onClick();
+    }
     return true;
 }
 
@@ -549,7 +551,13 @@ void Control::setDisabled(bool disabled) {
 }
 
 void Control::setFocus(bool focus) {
+    if (_focus == focus) return;
+
     _focus = focus;
+
+    if (_onFocusChanged) {
+        _onFocusChanged(focus);
+    }
 }
 
 void Control::setExtent(Extent extent) {

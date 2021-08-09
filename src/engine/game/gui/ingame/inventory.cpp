@@ -43,6 +43,9 @@ void InventoryMenu::load() {
     _binding.lblCreditsValue->setVisible(false);
     _binding.btnUseItem->setDisabled(true);
     _binding.btnQuestItems->setDisabled(true);
+    _binding.btnExit->setOnClick([this]() {
+        _game->openInGame();
+    });
 
     if (_game->isKotOR()) {
         _binding.lblVit->setVisible(false);
@@ -104,14 +107,6 @@ void InventoryMenu::refreshPortraits() {
 
         _binding.btnChange2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
         _binding.btnChange2->setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
-    }
-}
-
-void InventoryMenu::onClick(const string &control) {
-    GameGUI::onClick(control);
-
-    if (control == "BTN_EXIT") {
-        _game->openInGame();
     }
 }
 

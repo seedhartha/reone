@@ -73,8 +73,6 @@ private:
 
     void setMessage(std::string message) override;
     void setReplyLines(std::vector<std::string> lines) override;
-
-    void onListBoxItemClick(const std::string &control, const std::string &item) override;
 };
 
 } // namespace game
