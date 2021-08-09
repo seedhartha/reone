@@ -68,17 +68,32 @@ ClassSelection::ClassSelection(Game *game) : GameGUI(game) {
 
 void ClassSelection::load() {
     GUI::load();
+    bindControls();
     setupClassButtons();
+    setButtonColors(*_binding.btnBack);
+}
 
-    Control &backButton = getControl("BTN_BACK");
-    setButtonColors(backButton);
+void ClassSelection::bindControls() {
+    _binding.btnBack = getControlPtr<Button>("BTN_BACK");
+    _binding.btnSel1 = getControlPtr<Button>("BTN_SEL1");
+    _binding.btnSel2 = getControlPtr<Button>("BTN_SEL2");
+    _binding.btnSel3 = getControlPtr<Button>("BTN_SEL3");
+    _binding.btnSel4 = getControlPtr<Button>("BTN_SEL4");
+    _binding.btnSel5 = getControlPtr<Button>("BTN_SEL5");
+    _binding.btnSel6 = getControlPtr<Button>("BTN_SEL6");
+    _binding.lblClass = getControlPtr<Label>("LBL_CLASS");
+    _binding.lblDesc = getControlPtr<Label>("LBL_DESC");
+    _binding.threeDModel1 = getControlPtr<Label>("3D_MODEL1");
+    _binding.threeDModel2 = getControlPtr<Label>("3D_MODEL2");
+    _binding.threeDModel3 = getControlPtr<Label>("3D_MODEL3");
+    _binding.threeDModel4 = getControlPtr<Label>("3D_MODEL4");
+    _binding.threeDModel5 = getControlPtr<Label>("3D_MODEL5");
+    _binding.threeDModel6 = getControlPtr<Label>("3D_MODEL6");
 }
 
 void ClassSelection::setupClassButtons() {
-    Control &button1 = getControl("BTN_SEL1");
-    Control &button2 = getControl("BTN_SEL2");
-    _enlargedButtonSize = glm::vec2(button1.extent().width, button1.extent().height);
-    _defaultButtonSize = glm::vec2(button2.extent().width, button2.extent().height);
+    _enlargedButtonSize = glm::vec2(_binding.btnSel1->extent().width, _binding.btnSel1->extent().height);
+    _defaultButtonSize = glm::vec2(_binding.btnSel2->extent().width, _binding.btnSel2->extent().height);
 
     setupClassButton(0, Gender::Male, _game->id() == GameID::KotOR ? ClassType::Scoundrel : ClassType::JediConsular);
     setupClassButton(1, Gender::Male, _game->id() == GameID::KotOR ? ClassType::Scout : ClassType::JediSentinel);
@@ -95,18 +110,26 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
 
     // Button control
 
-    Control &controlButton = getControl("BTN_SEL" + to_string(index + 1));
-    setButtonColors(controlButton);
+    vector<Button *> selButtons {
+        _binding.btnSel1.get(),
+        _binding.btnSel2.get(),
+        _binding.btnSel3.get(),
+        _binding.btnSel4.get(),
+        _binding.btnSel5.get(),
+        _binding.btnSel6.get(),
+    };
+    Button &selButton = *selButtons[index];
+    setButtonColors(selButton);
 
     glm::ivec2 center;
-    controlButton.extent().getCenter(center.x, center.y);
+    selButton.extent().getCenter(center.x, center.y);
 
     Control::Extent extent;
     extent.left = center.x - _defaultButtonSize.x / 2;
     extent.top = center.y - _defaultButtonSize.y / 2;
     extent.width = _defaultButtonSize.x;
     extent.height = _defaultButtonSize.y;
-    controlButton.setExtent(move(extent));
+    selButton.setExtent(move(extent));
 
     // 3D control
 
@@ -120,11 +143,18 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
         .lightingRefFromModelNode("cgbody_light")
         .build());
 
-    Control &control3d = getControl("3D_MODEL" + to_string(index + 1));
-    control3d.setScene(move(scene));
+    vector<Label *> threeDModels {
+        _binding.threeDModel1.get(),
+        _binding.threeDModel2.get(),
+        _binding.threeDModel3.get(),
+        _binding.threeDModel4.get(),
+        _binding.threeDModel5.get(),
+        _binding.threeDModel6.get(),
+    };
+    threeDModels[index]->setScene(move(scene));
 
     ClassButton classButton;
-    classButton.control = &controlButton;
+    classButton.control = &selButton;
     classButton.center = center;
     classButton.character.gender = gender;
     classButton.character.appearance = appearance;
@@ -218,11 +248,10 @@ void ClassSelection::onFocusChanged(const string &control, bool focus) {
 
     string classText(_game->services().resource().strings().get(g_genderStrRefs[button.character.gender]));
     classText += " " + _game->services().classes().get(clazz)->name();
+    _binding.lblClass->setTextMessage(classText);
 
     string descText(_game->services().resource().strings().get(g_classDescStrRefs[clazz]));
-
-    getControl("LBL_CLASS").setTextMessage(classText);
-    getControl("LBL_DESC").setTextMessage(descText);
+    _binding.lblDesc->setTextMessage(descText);
 }
 
 int ClassSelection::getClassButtonIndexByTag(const string &tag) const {
