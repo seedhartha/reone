@@ -81,11 +81,19 @@ void CharGenSkills::load() {
     GUI::load();
     bindControls();
 
-    for (auto &skill : g_skillByLabelTag) {
-        configureControl(skill.first, [this](Control &control) {
-            control.setFocusable(true);
-            control.setHilightColor(_game->getGUIColorBase());
-        });
+    vector<Label *> skillLabels {
+        _binding.computerUseLbl.get(),
+        _binding.demolitionsLbl.get(),
+        _binding.stealthLbl.get(),
+        _binding.awarenessLbl.get(),
+        _binding.persuadeLbl.get(),
+        _binding.repairLbl.get(),
+        _binding.securityLbl.get(),
+        _binding.treatInjuryLbl.get()
+    };
+    for (auto &label : skillLabels) {
+        label->setFocusable(true);
+        label->setHilightColor(_game->getGUIColorBase());
     }
 
     _binding.lbDesc->setProtoMatchContent(true);
@@ -107,26 +115,34 @@ void CharGenSkills::bindControls() {
     _binding.awaMinusBtn = getControlPtr<Button>("AWA_MINUS_BTN");
     _binding.awaPlusBtn = getControlPtr<Button>("AWA_PLUS_BTN");
     _binding.awarenessPointsBtn = getControlPtr<Button>("AWARENESS_POINTS_BTN");
+    _binding.awarenessLbl = getControlPtr<Label>("AWARENESS_LBL");
     _binding.btnRecommended = getControlPtr<Button>("BTN_RECOMMENDED");
     _binding.comMinusBtn = getControlPtr<Button>("COM_MINUS_BTN");
     _binding.comPlusBtn = getControlPtr<Button>("COM_PLUS_BTN");
     _binding.computerUsePointsBtn = getControlPtr<Button>("COMPUTER_USE_POINTS_BTN");
+    _binding.computerUseLbl = getControlPtr<Label>("COMPUTER_USE_LBL");
     _binding.demMinusBtn = getControlPtr<Button>("DEM_MINUS_BTN");
     _binding.demolitionsPointsBtn = getControlPtr<Button>("DEMOLITIONS_POINTS_BTN");
+    _binding.demolitionsLbl = getControlPtr<Label>("DEMOLITIONS_LBL");
     _binding.demPlusBtn = getControlPtr<Button>("DEM_PLUS_BTN");
     _binding.perMinusBtn = getControlPtr<Button>("PER_MINUS_BTN");
     _binding.perPlusBtn = getControlPtr<Button>("PER_PLUS_BTN");
     _binding.persuadePointsBtn = getControlPtr<Button>("PERSUADE_POINTS_BTN");
+    _binding.persuadeLbl = getControlPtr<Label>("PERSUADE_LBL");
     _binding.repairPointsBtn = getControlPtr<Button>("REPAIR_POINTS_BTN");
+    _binding.repairLbl = getControlPtr<Label>("REPAIR_LBL");
     _binding.repMinusBtn = getControlPtr<Button>("REP_MINUS_BTN");
     _binding.repPlusBtn = getControlPtr<Button>("REP_PLUS_BTN");
     _binding.secMinusBtn = getControlPtr<Button>("SEC_MINUS_BTN");
     _binding.secPlusBtn = getControlPtr<Button>("SEC_PLUS_BTN");
     _binding.securityPointsBtn = getControlPtr<Button>("SECURITY_POINTS_BTN");
+    _binding.securityLbl = getControlPtr<Label>("SECURITY_LBL");
     _binding.stealthPointsBtn = getControlPtr<Button>("STEALTH_POINTS_BTN");
+    _binding.stealthLbl = getControlPtr<Label>("STEALTH_LBL");
     _binding.steMinusBtn = getControlPtr<Button>("STE_MINUS_BTN");
     _binding.stePlusBtn = getControlPtr<Button>("STE_PLUS_BTN");
     _binding.treatInjuryPointsBtn = getControlPtr<Button>("TREAT_INJURY_POINTS_BTN");
+    _binding.treatInjuryLbl = getControlPtr<Label>("TREAT_INJURY_LBL");
     _binding.treMinusBtn = getControlPtr<Button>("TRE_MINUS_BTN");
     _binding.trePlusBtn = getControlPtr<Button>("TRE_PLUS_BTN");
     _binding.costPointsLbl = getControlPtr<Label>("COST_POINTS_LBL");

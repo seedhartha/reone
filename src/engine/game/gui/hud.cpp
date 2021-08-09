@@ -273,24 +273,45 @@ void HUD::update(float dt) {
     GUI::update(dt);
 
     Party &party = _game->services().party();
+    vector<Label *> charLabels {
+        _binding.lblChar1.get(),
+        _binding.lblChar2.get(),
+        _binding.lblChar3.get()
+    };
+    vector<Label *> backLabels {
+        _binding.lblBack1.get(),
+        _binding.lblBack2.get(),
+        _binding.lblBack3.get()
+    };
+    vector<Label *> lvlUpBgLabels {
+        _binding.lblLvlUpBg1.get(),
+        _binding.lblLvlUpBg2.get(),
+        _binding.lblLvlUpBg3.get()
+    };
+    vector<Label *> levevlUpLabels {
+        _binding.lblLevelUp1.get(),
+        _binding.lblLevelUp2.get(),
+        _binding.lblLevelUp3.get()
+    };
 
     for (int i = 0; i < 3; ++i) {
-        int charIdx = (i == 0) ? 1 : (4 - i);
-        Control &lblChar = getControl("LBL_CHAR" + to_string(charIdx));
-        Control &lblBack = getControl("LBL_BACK" + to_string(charIdx));
+        Label &lblChar = *charLabels[i];
+        Label &lblBack = *backLabels[i];
+        Label &lblLvlUpBg = *lvlUpBgLabels[i];
+        Label &lblLevelUp = *levevlUpLabels[i];
 
         shared_ptr<Creature> member(party.getMember(i));
         if (member) {
             lblChar.setVisible(true);
             lblChar.setBorderFill(member->portrait());
             lblBack.setVisible(true);
-            setControlVisible("LBL_LVLUPBG" + to_string(charIdx), member->isLevelUpPending());
-            setControlVisible("LBL_LEVELUP" + to_string(charIdx), member->isLevelUpPending());
+            lblLvlUpBg.setVisible(member->isLevelUpPending());
+            lblLevelUp.setVisible(member->isLevelUpPending());
         } else {
             lblChar.setVisible(false);
             lblBack.setVisible(false);
-            hideControl("LBL_LVLUPBG" + to_string(charIdx));
-            hideControl("LBL_LEVELUP" + to_string(charIdx));
+            lblLvlUpBg.setVisible(false);
+            lblLevelUp.setVisible(false);
         }
     }
 

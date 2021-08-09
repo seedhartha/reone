@@ -57,20 +57,7 @@ public:
     virtual void draw();
     virtual void draw3D();
 
-    void configureRootContol(const std::function<void(Control &)> &fn);
-    void configureControl(const std::string &tag, const std::function<void(Control &)> &fn);
-    void disableControl(const std::string &tag);
-    void enableControl(const std::string &tag);
-    void hideControl(const std::string &tag);
     void resetFocus();
-    void showControl(const std::string &tag);
-
-    void setControlDisabled(const std::string &tag, bool disabled);
-    void setControlFocus(const std::string &tag, bool focus);
-    void setControlFocusable(const std::string &tag, bool focusable);
-    void setControlText(const std::string &tag, const std::string &text);
-    void setControlVisible(const std::string &tag, bool visible);
-    void setControlDiscardColor(const std::string &tag, glm::vec3 color);
 
     virtual void onClick(const std::string &control);
     virtual void onListBoxItemClick(const std::string &control, const std::string &item);
