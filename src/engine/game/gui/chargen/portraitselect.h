@@ -25,6 +25,13 @@
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+class Label;
+
+}
+
 namespace game {
 
 class CharacterGeneration;
@@ -39,20 +46,28 @@ public:
     void resetCurrentPortrait();
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::Label> lblHead;
+        std::shared_ptr<gui::Label> lblPortrait;
+        std::shared_ptr<gui::Button> btnAccept;
+        std::shared_ptr<gui::Button> btnBack;
+    } _binding;
+
     CharacterGeneration *_charGen;
 
     std::vector<Portrait> _portraits;
     int _currentPortrait { 0 };
 
-    void onClick(const std::string &control) override;
-
+    void bindControls();
     void loadCurrentPortrait();
     void loadHeadModel();
 
     int getAppearanceFromCurrentPortrait() const;
     std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::SceneGraph &sceneGraph);
 
-    void setButtonColors(const std::string &tag);
+    void setButtonColors(gui::Control &control);
+
+    void onClick(const std::string &control) override;
 };
 
 } // namespace game

@@ -60,14 +60,20 @@ PortraitSelection::PortraitSelection(CharacterGeneration *charGen, Game *game) :
 
 void PortraitSelection::load() {
     GUI::load();
+    bindControls();
 
-    setButtonColors("BTN_ACCEPT");
-    setButtonColors("BTN_BACK");
+    setButtonColors(*_binding.btnAccept);
+    setButtonColors(*_binding.btnBack);
 }
 
-void PortraitSelection::setButtonColors(const string &tag) {
-    Control &control = getControl(tag);
+void PortraitSelection::bindControls() {
+    _binding.lblHead = getControlPtr<Label>("LBL_HEAD");
+    _binding.lblPortrait = getControlPtr<Label>("LBL_PORTRAIT");
+    _binding.btnAccept = getControlPtr<Button>("BTN_ACCEPT");
+    _binding.btnBack = getControlPtr<Button>("BTN_BACK");
+}
 
+void PortraitSelection::setButtonColors(Control &control) {
     Control::Text text(control.text());
     text.color = _game->getGUIColorBase();
     control.setText(move(text));
@@ -78,8 +84,7 @@ void PortraitSelection::setButtonColors(const string &tag) {
 }
 
 void PortraitSelection::loadHeadModel() {
-    Control &control = getControl("LBL_HEAD");
-    float aspect = control.extent().width / static_cast<float>(control.extent().height);
+    float aspect = _binding.lblHead->extent().width / static_cast<float>(_binding.lblHead->extent().height);
 
     unique_ptr<SceneGraph> scene(SceneBuilder(_options, _game->services().graphics())
         .aspect(aspect)
@@ -90,7 +95,7 @@ void PortraitSelection::loadHeadModel() {
         .lightingRefFromModelNode("cghead_light")
         .build());
 
-    control.setScene(move(scene));
+    _binding.lblHead->setScene(move(scene));
 }
 
 shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &sceneGraph) {
@@ -159,8 +164,9 @@ void PortraitSelection::resetCurrentPortrait() {
 }
 
 void PortraitSelection::loadCurrentPortrait() {
-    Control &control = getControl("LBL_PORTRAIT");
-    control.setBorderFill(_game->services().graphics().textures().get(_portraits[_currentPortrait].resRef, TextureUsage::GUI));
+    string resRef(_portraits[_currentPortrait].resRef);
+    shared_ptr<Texture> portrait(_game->services().graphics().textures().get(resRef, TextureUsage::GUI));
+    _binding.lblPortrait->setBorderFill(portrait);
 }
 
 void PortraitSelection::onClick(const string &control) {
