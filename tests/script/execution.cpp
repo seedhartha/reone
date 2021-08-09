@@ -21,10 +21,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../engine/script/execution.h"
-#include "../../engine/script/executioncontext.h"
-#include "../../engine/script/program.h"
-#include "../../engine/script/variable.h"
+#include "../../src/engine/script/execution.h"
+#include "../../src/engine/script/executioncontext.h"
+#include "../../src/engine/script/program.h"
+#include "../../src/engine/script/variable.h"
 
 using namespace std;
 

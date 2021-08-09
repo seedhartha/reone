@@ -21,7 +21,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../engine/common/streamreader.h"
+#include "../../src/engine/common/streamreader.h"
 
 using namespace std;
 

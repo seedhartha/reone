@@ -16,39 +16,23 @@
  */
 
 /** @file
- *  Tests for MemoryCache class.
+ *  Tests for Timer class.
  */
 
 #include <boost/test/unit_test.hpp>
 
-#include "../../engine/common/cache.h"
-
-using namespace std;
-using namespace std::placeholders;
+#include "../../src/engine/common/timer.h"
 
 using namespace reone;
 
-class TestCache : public MemoryCache<int, int> {
-public:
-    TestCache() : MemoryCache(bind(&TestCache::compute, this, _1)) {
-    }
+BOOST_AUTO_TEST_CASE(Timer_TimesOut) {
+    Timer timer;
+    timer.setTimeout(1.0f);
+    timer.advance(0.5f);
 
-private:
-    int _counter { 0 };
+    BOOST_TEST(!timer.isTimedOut());
 
-    shared_ptr<int> compute(int key) {
-        return make_shared<int>(_counter++);
-    }
-};
+    timer.advance(0.6f);
 
-BOOST_AUTO_TEST_CASE(MemoryCache_ValueIsComputedAndCached) {
-    TestCache cache;
-
-    auto result1 = cache.get(0);
-    auto result2 = cache.get(1);
-    auto result3 = cache.get(0);
-
-    BOOST_TEST((*result1 == 0));
-    BOOST_TEST((*result2 == 1));
-    BOOST_TEST((*result3 == 0));
+    BOOST_TEST(timer.isTimedOut());
 }
