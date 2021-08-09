@@ -70,8 +70,16 @@ private:
         std::shared_ptr<gui::Button> treatInjuryPointsBtn;
         std::shared_ptr<gui::Button> treMinusBtn;
         std::shared_ptr<gui::Button> trePlusBtn;
+        std::shared_ptr<gui::Label> awarenessLbl;
+        std::shared_ptr<gui::Label> computerUseLbl;
         std::shared_ptr<gui::Label> costPointsLbl;
+        std::shared_ptr<gui::Label> demolitionsLbl;
+        std::shared_ptr<gui::Label> persuadeLbl;
         std::shared_ptr<gui::Label> remainingSelectionsLbl;
+        std::shared_ptr<gui::Label> repairLbl;
+        std::shared_ptr<gui::Label> securityLbl;
+        std::shared_ptr<gui::Label> stealthLbl;
+        std::shared_ptr<gui::Label> treatInjuryLbl;
         std::shared_ptr<gui::ListBox> lbDesc;
     } _binding;
 

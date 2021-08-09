@@ -112,6 +112,20 @@ void CharGenAbilities::bindControls() {
     _binding.intPointsBtn = getControlPtr<Button>("INT_POINTS_BTN");
     _binding.wisPointsBtn = getControlPtr<Button>("WIS_POINTS_BTN");
     _binding.chaPointsBtn = getControlPtr<Button>("CHA_POINTS_BTN");
+
+    _binding.strMinusBtn = getControlPtr<Button>("STR_MINUS_BTN");
+    _binding.dexMinusBtn = getControlPtr<Button>("DEX_MINUS_BTN");
+    _binding.conMinusBtn = getControlPtr<Button>("CON_MINUS_BTN");
+    _binding.intMinusBtn = getControlPtr<Button>("INT_MINUS_BTN");
+    _binding.wisMinusBtn = getControlPtr<Button>("WIS_MINUS_BTN");
+    _binding.chaMinusBtn = getControlPtr<Button>("CHA_MINUS_BTN");
+
+    _binding.strPlusBtn = getControlPtr<Button>("STR_PLUS_BTN");
+    _binding.dexPlusBtn = getControlPtr<Button>("DEX_PLUS_BTN");
+    _binding.conPlusBtn = getControlPtr<Button>("CON_PLUS_BTN");
+    _binding.intPlusBtn = getControlPtr<Button>("INT_PLUS_BTN");
+    _binding.wisPlusBtn = getControlPtr<Button>("WIS_PLUS_BTN");
+    _binding.chaPlusBtn = getControlPtr<Button>("CHA_PLUS_BTN");
 }
 
 void CharGenAbilities::reset(bool newGame) {

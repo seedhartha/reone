@@ -134,17 +134,6 @@ void GUI::loadControl(const GffStruct &gffs) {
 void GUI::preloadControl(Control &control) {
 }
 
-void GUI::configureRootContol(const function<void(Control &)> &fn) {
-    fn(*_rootControl);
-}
-
-void GUI::configureControl(const string &tag, const function<void(Control &)> &fn) {
-    auto maybeControl = _controlByTag.find(tag);
-    if (maybeControl != _controlByTag.end()) {
-        fn(*maybeControl->second);
-    }
-}
-
 void GUI::positionRelativeToCenter(Control &control) {
     Control::Extent extent(control.extent());
     if (extent.left >= 0.5f * _resolutionX) {
@@ -287,46 +276,6 @@ void GUI::resetFocus() {
         onFocusChanged(_focus->tag(), false);
         _focus = nullptr;
     }
-}
-
-void GUI::showControl(const string &tag) {
-    configureControl(tag, [](Control &ctrl) { ctrl.setVisible(true); });
-}
-
-void GUI::hideControl(const string &tag) {
-    configureControl(tag, [](Control &ctrl) { ctrl.setVisible(false); });
-}
-
-void GUI::enableControl(const string &tag) {
-    configureControl(tag, [](Control &ctrl) { ctrl.setDisabled(false); });
-}
-
-void GUI::disableControl(const string &tag) {
-    configureControl(tag, [](Control &ctrl) { ctrl.setDisabled(true); });
-}
-
-void GUI::setControlFocusable(const string &tag, bool focusable) {
-    configureControl(tag, [&focusable](Control &ctrl) { ctrl.setFocusable(focusable); });
-}
-
-void GUI::setControlDisabled(const string &tag, bool disabled) {
-    configureControl(tag, [&disabled](Control &ctrl) { ctrl.setDisabled(disabled); });
-}
-
-void GUI::setControlText(const string &tag, const string &text) {
-    configureControl(tag, [&text](Control &ctrl) { ctrl.setTextMessage(text); });
-}
-
-void GUI::setControlFocus(const string &tag, bool focus) {
-    configureControl(tag, [&focus](Control &ctrl) { ctrl.setFocus(focus); });
-}
-
-void GUI::setControlVisible(const string &tag, bool visible) {
-    configureControl(tag, [&visible](Control &ctrl) { ctrl.setVisible(visible); });
-}
-
-void GUI::setControlDiscardColor(const string &tag, glm::vec3 color) {
-    configureControl(tag, [&color](Control & ctrl) { ctrl.setDiscardColor(color); });
 }
 
 Control &GUI::getControl(const string &tag) const {
