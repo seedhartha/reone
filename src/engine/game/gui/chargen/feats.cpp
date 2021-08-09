@@ -17,10 +17,13 @@
 
 #include "feats.h"
 
+#include "../../../gui/control/button.h"
+
 #include "chargen.h"
 
 using namespace std;
 
+using namespace reone::gui;
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -39,9 +42,15 @@ CharGenFeats::CharGenFeats(CharacterGeneration *charGen, Game *game) :
 
 void CharGenFeats::load() {
     GUI::load();
+    bindControls();
 
-    disableControl("BTN_SELECT");
-    disableControl("BTN_RECOMMENDED");
+    _binding.btnSelect->setDisabled(true);
+    _binding.btnRecommended->setDisabled(true);
+}
+
+void CharGenFeats::bindControls() {
+    _binding.btnSelect = getControlPtr<Button>("BTN_SELECT");
+    _binding.btnRecommended = getControlPtr<Button>("BTN_RECOMMENDED");
 }
 
 void CharGenFeats::onClick(const string &control) {

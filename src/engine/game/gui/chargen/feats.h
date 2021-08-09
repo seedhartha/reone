@@ -21,6 +21,12 @@
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+
+}
+
 namespace game {
 
 class CharacterGeneration;
@@ -32,7 +38,14 @@ public:
     void load() override;
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::Button> btnSelect;
+        std::shared_ptr<gui::Button> btnRecommended;
+    } _binding;
+
     CharacterGeneration *_charGen;
+
+    void bindControls();
 
     void onClick(const std::string &control) override;
 };
