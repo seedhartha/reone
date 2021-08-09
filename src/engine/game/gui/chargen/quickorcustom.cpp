@@ -48,13 +48,18 @@ QuickOrCustom::QuickOrCustom(CharacterGeneration *charGen, Game *game) :
 
 void QuickOrCustom::load() {
     GUI::load();
+    bindControls();
 
     if (_game->id() == GameID::KotOR) {
-        setControlDiscardColor("LBL_RBG", glm::vec3(0.0f, 0.0f, 0.082353f));
+        _binding.lblRbg->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 
-    auto &lbDesc = getControl<ListBox>("LB_DESC");
-    lbDesc.setProtoMatchContent(true);
+    _binding.lbDesc->setProtoMatchContent(true);
+}
+
+void QuickOrCustom::bindControls() {
+    _binding.lblRbg = getControlPtr<Label>("LBL_RBG");
+    _binding.lbDesc = getControlPtr<ListBox>("LB_DESC");
 }
 
 void QuickOrCustom::onClick(const string &control) {
@@ -79,9 +84,8 @@ void QuickOrCustom::onFocusChanged(const string &control, bool focus) {
         } else if (control == "CUST_CHAR_BTN") {
             text = _game->services().resource().strings().get(kStrRefCustomHelpText);
         }
-        auto &lbDesc = getControl<ListBox>("LB_DESC");
-        lbDesc.clearItems();
-        lbDesc.addTextLinesAsItems(text);
+        _binding.lbDesc->clearItems();
+        _binding.lbDesc->addTextLinesAsItems(text);
     }
 }
 

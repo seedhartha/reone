@@ -21,6 +21,13 @@
 
 namespace reone {
 
+namespace gui {
+
+class Label;
+class ListBox;
+
+}
+
 namespace game {
 
 class CharacterGeneration;
@@ -32,7 +39,14 @@ public:
     void load() override;
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::Label> lblRbg;
+        std::shared_ptr<gui::ListBox> lbDesc;
+    } _binding;
+
     CharacterGeneration *_charGen { nullptr };
+
+    void bindControls();
 
     void onClick(const std::string &control) override;
     void onFocusChanged(const std::string &control, bool focus) override;
