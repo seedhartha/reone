@@ -37,6 +37,12 @@
 
 namespace reone {
 
+namespace gui {
+
+class Label;
+
+}
+
 namespace game {
 
 enum class CharGenScreen {
@@ -94,6 +100,47 @@ public:
     void setCharacter(Character character);
 
 private:
+    struct Binding {
+        std::shared_ptr<gui::Label> defArrowLbl;
+        std::shared_ptr<gui::Label> fortArrowLbl;
+        std::shared_ptr<gui::Label> lblClass;
+        std::shared_ptr<gui::Label> lblDef;
+        std::shared_ptr<gui::Label> lblLevel;
+        std::shared_ptr<gui::Label> lblLevelVal;
+        std::shared_ptr<gui::Label> lblName;
+        std::shared_ptr<gui::Label> lblVit;
+        std::shared_ptr<gui::Label> modelLbl;
+        std::shared_ptr<gui::Label> newLbl;
+        std::shared_ptr<gui::Label> oldLbl;
+        std::shared_ptr<gui::Label> portraitLbl;
+        std::shared_ptr<gui::Label> reflArrowLbl;
+        std::shared_ptr<gui::Label> vitArrowLbl;
+        std::shared_ptr<gui::Label> willArrowLbl;
+
+        std::shared_ptr<gui::Label> strAbLbl;
+        std::shared_ptr<gui::Label> dexAbLbl;
+        std::shared_ptr<gui::Label> conAbLbl;
+        std::shared_ptr<gui::Label> intAbLbl;
+        std::shared_ptr<gui::Label> wisAbLbl;
+        std::shared_ptr<gui::Label> chaAbLbl;
+
+        // KotOR only
+
+        std::shared_ptr<gui::Label> oldFortLbl;
+        std::shared_ptr<gui::Label> oldReflLbl;
+        std::shared_ptr<gui::Label> oldWillLbl;
+
+        // END KotOR only
+
+        // TSL only
+
+        std::shared_ptr<gui::Label> newFortLbl;
+        std::shared_ptr<gui::Label> newReflLbl;
+        std::shared_ptr<gui::Label> newWillLbl;
+
+        // END TSL only
+    } _binding;
+
     CharGenScreen _screen { CharGenScreen::ClassSelection };
     Type _type  { Type::Quick };
     Character _character;
@@ -113,6 +160,7 @@ private:
 
     // END Sub GUI
 
+    void bindControls();
     void reloadCharacterModel();
     void updateAttributes();
     void changeScreen(CharGenScreen screen);
