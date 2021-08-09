@@ -236,14 +236,17 @@ void CharacterGeneration::setAttributesVisible(bool visible) {
         _binding.conAbLbl.get(),
         _binding.intAbLbl.get(),
         _binding.wisAbLbl.get(),
-        _binding.chaAbLbl.get(),
-        _binding.newFortLbl.get(),
-        _binding.newReflLbl.get(),
-        _binding.newWillLbl.get(),
-        _binding.oldFortLbl.get(),
-        _binding.oldReflLbl.get(),
-        _binding.oldWillLbl.get()
+        _binding.chaAbLbl.get()
     };
+    if (_game->isKotOR()) {
+        attributesLabels.push_back(_binding.oldFortLbl.get());
+        attributesLabels.push_back(_binding.oldReflLbl.get());
+        attributesLabels.push_back(_binding.oldWillLbl.get());
+    } else {
+        attributesLabels.push_back(_binding.newFortLbl.get());
+        attributesLabels.push_back(_binding.newReflLbl.get());
+        attributesLabels.push_back(_binding.newWillLbl.get());
+    }
     for (auto &label : attributesLabels) {
         label->setVisible(visible);
     }
