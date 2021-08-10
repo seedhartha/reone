@@ -812,7 +812,7 @@ bool Game::isKotOR() const {
 
 bool Game::isTSL() const {
     switch (_gameId) {
-        case GameID::TSL_GOG:
+        case GameID::TSL:
         case GameID::TSL_Steam:
             return true;
         default:

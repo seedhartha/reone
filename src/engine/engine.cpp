@@ -88,7 +88,7 @@ private:
         switch (gameId) {
             case GameID::KotOR:
                 return make_unique<KotOR>(gameId, _gamePath, _options, resource, graphics, audio, scene, script);
-            case GameID::TSL_GOG:
+            case GameID::TSL:
                 return make_unique<TSL>(gameId, _gamePath, _options, resource, graphics, audio, scene, script);
             case GameID::TSL_Steam:
                 return make_unique<TSL>(gameId, _gamePath, _options, resource, graphics, audio, scene, script);
@@ -104,7 +104,7 @@ private:
         fs::path dllPath(getPathIgnoreCase(_gamePath, "steam_api.dll", false));
         if (!dllPath.empty()) return GameID::TSL_Steam;
 
-        return GameID::TSL_GOG;
+        return GameID::TSL;
     }
 };
 
