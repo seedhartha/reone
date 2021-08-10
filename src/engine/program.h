@@ -17,42 +17,15 @@
 
 #pragma once
 
-#include <boost/program_options/options_description.hpp>
-
-#include "game/options.h"
-
 namespace reone {
 
 /**
- * Encapsulates option management. Starts an Engine instance.
+ * Creates and runs an instance of Program.
  *
- * @see Engine
+ * @param argc number of command line arguments
+ * @param argv array of command line arguments
+ * @return exit code
  */
-class Program : boost::noncopyable {
-public:
-    Program(int argc, char **argv);
-
-    /**
-     * Process command line arguments and start an Engine instance.
-     *
-     * @return the exit code
-     */
-    int run();
-
-private:
-    int _argc;
-    char **_argv;
-
-    boost::program_options::options_description _optsCommon;
-    boost::program_options::options_description _optsCmdLine { "Usage" };
-
-    bool _showHelp { false };
-    boost::filesystem::path _gamePath;
-    game::Options _options;
-
-    void initOptions();
-    void loadOptions();
-    int runEngine();
-};
+int runProgram(int argc, char **argv);
 
 } // namespace reone

@@ -51,31 +51,48 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-Engine::Engine(fs::path gamePath, Options options) : _gamePath(move(gamePath)), _options(move(options)) {
-}
+/**
+ * Encapsulates service initialization.
+ */
+class Engine : boost::noncopyable {
+public:
+    Engine(fs::path gamePath, Options options) : _gamePath(move(gamePath)), _options(move(options)) {
+    }
 
-int Engine::run() {
-    ResourceServices resource(_gamePath);
-    resource.init();
+    /**
+     * Initializes services and starts an instance of Game.
+     *
+     * @return exit code
+     */
+    int run() {
+        ResourceServices resource(_gamePath);
+        resource.init();
 
-    GraphicsServices graphics(_options.graphics, resource);
-    graphics.init();
+        GraphicsServices graphics(_options.graphics, resource);
+        graphics.init();
 
-    AudioServices audio(_options.audio, resource);
-    audio.init();
+        AudioServices audio(_options.audio, resource);
+        audio.init();
 
-    SceneServices scene(_options.graphics, graphics);
-    scene.init();
+        SceneServices scene(_options.graphics, graphics);
+        scene.init();
 
-    ScriptServices script(resource);
-    script.init();
+        ScriptServices script(resource);
+        script.init();
 
-    Game game(
-        _gamePath,
-        _options,
-        resource, graphics, audio, scene, script);
+        return Game(
+            _gamePath,
+            _options,
+            resource, graphics, audio, scene, script).run();
+    }
 
-    return game.run();
+private:
+    fs::path _gamePath;
+    Options _options;
+};
+
+int runEngine(fs::path gamePath, Options options) {
+    return Engine(gamePath, options).run();
 }
 
 } // namespace reone
