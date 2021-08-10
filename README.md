@@ -33,7 +33,7 @@ Developer resources:
 
 Those wishing to test reone, can either download a prebuilt executable from the [releases](https://github.com/seedhartha/reone/releases) page, or build it from source. Building it requires a modern C++ compiler and a set of free and open source libraries. See detailed instructions for your operating system [here](https://github.com/seedhartha/reone/wiki/Installation).
 
-reone must only be used to run a legal copy of the game - both KotOR and TSL can be obtained from Steam or GOG.com. Keep in mind that mod compatibility is not being tested and thus cannot be guaranteed.
+reone is being developed and tested against the unmodded Steam version of both KotOR and TSL. Compatibility with any other version is not guaranteed, although GOG and retail versions should work with no or minor modification.
 
 Install [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) to run prebuilt Windows executables.
 
