@@ -21,15 +21,13 @@
 
 namespace reone {
 
-class Engine : boost::noncopyable {
-public:
-    Engine(boost::filesystem::path gamePath, game::Options options);
-
-    int run();
-
-private:
-    boost::filesystem::path _gamePath;
-    game::Options _options;
-};
+/**
+ * Creates and runs an instance of Engine.
+ *
+ * @param gamePath path to the game directory
+ * @param options game options
+ * @return exit code
+ */
+int runEngine(boost::filesystem::path gamePath, game::Options options);
 
 } // namespace reone

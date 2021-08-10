@@ -24,7 +24,7 @@ using namespace reone;
 
 int main(int argc, char **argv) {
     try {
-        return Program(argc, argv).run();
+        return runProgram(argc, argv);
     }
     catch (const exception &ex) {
         try {
