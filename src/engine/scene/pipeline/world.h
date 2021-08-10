@@ -19,15 +19,15 @@
 
 #include "../../graphics/framebuffer.h"
 #include "../../graphics/options.h"
+#include "../../graphics/renderbuffer.h"
 #include "../../graphics/types.h"
+#include "../../graphics/texture/texture.h"
 
 namespace reone {
 
 namespace graphics {
 
 class GraphicsServices;
-class Renderbuffer;
-class Texture;
 
 }
 

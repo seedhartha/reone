@@ -17,9 +17,6 @@
 
 #include "services.h"
 
-#include "../graphics/renderbuffer.h"
-#include "../graphics/texture/texture.h"
-
 #include "pipeline/world.h"
 #include "scenegraph.h"
 

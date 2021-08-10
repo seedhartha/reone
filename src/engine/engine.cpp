@@ -69,7 +69,9 @@ public:
         return Game(
             _gamePath,
             _options,
-            resource, graphics, audio, scene, script).run();
+            resource, graphics, audio, scene, script
+        )
+            .run();
     }
 
 private:
