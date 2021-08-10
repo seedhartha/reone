@@ -19,6 +19,9 @@
 
 #include "options.h"
 
+#include "files.h"
+#include "player.h"
+
 namespace reone {
 
 namespace resource {
@@ -28,9 +31,6 @@ class ResourceServices;
 }
 
 namespace audio {
-
-class AudioFiles;
-class AudioPlayer;
 
 class AudioServices : boost::noncopyable {
 public:

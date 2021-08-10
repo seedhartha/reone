@@ -19,6 +19,19 @@
 
 #include "options.h"
 
+#include "context.h"
+#include "features.h"
+#include "fonts.h"
+#include "lip/lips.h"
+#include "materials.h"
+#include "mesh/meshes.h"
+#include "model/models.h"
+#include "pbribl.h"
+#include "shader/shaders.h"
+#include "texture/textures.h"
+#include "walkmesh/walkmeshes.h"
+#include "window.h"
+
 namespace reone {
 
 namespace resource {
@@ -28,19 +41,6 @@ class ResourceServices;
 }
 
 namespace graphics {
-
-class Context;
-class Features;
-class Fonts;
-class Lips;
-class Materials;
-class Meshes;
-class Models;
-class PBRIBL;
-class Shaders;
-class Textures;
-class Walkmeshes;
-class Window;
 
 class GraphicsServices : boost::noncopyable {
 public:
