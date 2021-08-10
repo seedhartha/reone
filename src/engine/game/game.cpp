@@ -529,20 +529,15 @@ void Game::deinit() {
 }
 
 void Game::startCharacterGeneration() {
-    string imageResRef(isTSL() ? "load_default" : "load_chargen");
-    withLoadingScreen(imageResRef, [this]() {
+    withLoadingScreen(_charGenLoadScreenResRef, [this]() {
         if (!_charGen) {
             loadCharacterGeneration();
         }
         _loadScreen->setProgress(100);
         drawAll();
-        playMusic(getCharacterGenerationMusic());
+        playMusic(_charGenMusicResRef);
         changeScreen(GameScreen::CharacterGeneration);
     });
-}
-
-string Game::getCharacterGenerationMusic() const {
-    return isTSL() ? "mus_main" : "mus_theme_rep";
 }
 
 void Game::quit() {

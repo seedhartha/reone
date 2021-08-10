@@ -33,7 +33,6 @@ namespace reone {
 
 namespace game {
 
-static constexpr char kMainMenuMusicResRef[] = "mus_sion";
 static constexpr char kVoiceDirectoryName[] = "streamvoice";
 static constexpr char kLocalizationLipFilename[] = "localization";
 static constexpr char kExeFilename[] = "swkotor2.exe";
@@ -53,7 +52,9 @@ TSL::TSL(
     move(options),
     resource, graphics, audio, scene, script
 ) {
-    _mainMenuMusicResRef = kMainMenuMusicResRef;
+    _mainMenuMusicResRef = "mus_sion";
+    _charGenMusicResRef = "mus_main";
+    _charGenLoadScreenResRef = "load_default";
 
     _guiColorBase = glm::vec3(0.192157f, 0.768627f, 0.647059f);
     _guiColorHilight = glm::vec3(0.768627f, 0.768627f, 0.686275f);
