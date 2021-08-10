@@ -17,12 +17,12 @@
 
 #pragma once
 
+#include "resources.h"
+#include "strings.h"
+
 namespace reone {
 
 namespace resource {
-
-class Resources;
-class Strings;
 
 class ResourceServices : boost::noncopyable {
 public:

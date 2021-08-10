@@ -20,6 +20,7 @@
 #include "../common/types.h"
 
 #include "format/pereader.h"
+#include "resourceprovider.h"
 #include "types.h"
 
 namespace reone {
@@ -27,7 +28,6 @@ namespace reone {
 namespace resource {
 
 class GffStruct;
-class IResourceProvider;
 class TwoDA;
 
 /**

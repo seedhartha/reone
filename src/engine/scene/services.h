@@ -19,6 +19,9 @@
 
 #include "../graphics/options.h"
 
+#include "pipeline/world.h"
+#include "scenegraph.h"
+
 namespace reone {
 
 namespace graphics {
@@ -28,9 +31,6 @@ class GraphicsServices;
 }
 
 namespace scene {
-
-class SceneGraph;
-class WorldRenderPipeline;
 
 class SceneServices : boost::noncopyable {
 public:
