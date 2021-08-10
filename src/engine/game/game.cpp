@@ -46,12 +46,12 @@ namespace reone {
 
 namespace game {
 
-static constexpr char kDataDirectoryName[] = "data";
 static constexpr char kModulesDirectoryName[] = "modules";
 
 static bool g_conversationsEnabled = true;
 
 Game::Game(
+    GameID gameId,
     fs::path path,
     Options options,
     ResourceServices &resource,
@@ -60,6 +60,7 @@ Game::Game(
     SceneServices &scene,
     ScriptServices &script
 ) :
+    _gameId(gameId),
     _path(move(path)),
     _options(move(options)),
     _resource(resource),
@@ -86,9 +87,6 @@ int Game::run() {
 }
 
 void Game::init() {
-    _gameId = determineGameID(_path);
-
-    initGUIColors();
     initResourceProviders();
 
     _game = make_unique<GameServices>(*this, _resource, _graphics, _audio, _scene, _script);
@@ -105,27 +103,6 @@ void Game::init() {
 
     loadModuleNames();
     setCursorType(CursorType::Default);
-}
-
-void Game::initGUIColors() {
-    if (isTSL()) {
-        _guiColorBase = glm::vec3(0.192157f, 0.768627f, 0.647059f);
-        _guiColorHilight = glm::vec3(0.768627f, 0.768627f, 0.686275f);
-        _guiColorDisabled = glm::vec3(0.513725f, 0.513725f, 0.415686f);
-    } else {
-        _guiColorBase = glm::vec3(0.0f, 0.639216f, 0.952941f);
-        _guiColorHilight = glm::vec3(0.980392f, 1.0f, 0.0f);
-        _guiColorDisabled = glm::vec3(0.0f, 0.349020f, 0.549020f);
-    }
-}
-
-void Game::initResourceProviders() {
-    if (isTSL()) {
-        initResourceProvidersForTSL();
-    } else {
-        initResourceProvidersForKotOR();
-    }
-    _resource.resources().indexDirectory(getPathIgnoreCase(fs::current_path(), kDataDirectoryName));
 }
 
 void Game::loadModuleNames() {
@@ -177,7 +154,7 @@ void Game::openMainMenu() {
     if (!_saveLoad) {
         loadSaveLoad();
     }
-    playMusic(getMainMenuMusic());
+    playMusic(_mainMenuMusicResRef);
     changeScreen(GameScreen::MainMenu);
 }
 
@@ -187,10 +164,6 @@ void Game::changeScreen(GameScreen screen) {
         gui->resetFocus();
     }
     _screen = screen;
-}
-
-string Game::getMainMenuMusic() const {
-    return isTSL() ? "mus_sion" : "mus_theme_cult";
 }
 
 void Game::playMusic(const string &resRef) {
@@ -831,6 +804,20 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
     }
 
     return false;
+}
+
+bool Game::isKotOR() const {
+    return _gameId == GameID::KotOR;
+}
+
+bool Game::isTSL() const {
+    switch (_gameId) {
+        case GameID::TSL_GOG:
+        case GameID::TSL_Steam:
+            return true;
+        default:
+            return false;
+    }
 }
 
 bool Game::getGlobalBoolean(const string &name) const {

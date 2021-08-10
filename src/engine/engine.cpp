@@ -18,7 +18,9 @@
 #include "engine.h"
 
 #include "audio/services.h"
-#include "game/game.h"
+#include "common/pathutil.h"
+#include "game/kotor.h"
+#include "game/tsl.h"
 #include "graphics/services.h"
 #include "resource/services.h"
 #include "scene/services.h"
@@ -66,17 +68,44 @@ public:
         ScriptServices script(resource);
         script.init();
 
-        return Game(
-            _gamePath,
-            _options,
-            resource, graphics, audio, scene, script
-        )
-            .run();
+        unique_ptr<Game> game(newGame(resource, graphics, audio, scene, script));
+
+        return game->run();
     }
 
 private:
     fs::path _gamePath;
     Options _options;
+
+    unique_ptr<Game> newGame(
+        ResourceServices &resource,
+        GraphicsServices &graphics,
+        AudioServices &audio,
+        SceneServices &scene,
+        ScriptServices &script
+    ) {
+        GameID gameId = determineGameID();
+        switch (gameId) {
+            case GameID::KotOR:
+                return make_unique<KotOR>(gameId, _gamePath, _options, resource, graphics, audio, scene, script);
+            case GameID::TSL_GOG:
+                return make_unique<TSL>(gameId, _gamePath, _options, resource, graphics, audio, scene, script);
+            case GameID::TSL_Steam:
+                return make_unique<TSL>(gameId, _gamePath, _options, resource, graphics, audio, scene, script);
+        }
+    }
+
+    GameID determineGameID() const {
+        // If there is no swkotor2 executable, then this is KotOR
+        fs::path exePath(getPathIgnoreCase(_gamePath, "swkotor2.exe", false));
+        if (exePath.empty()) return GameID::KotOR;
+
+        // If there is a "steam_api.dll" file, then this is a Steam version of TSL
+        fs::path dllPath(getPathIgnoreCase(_gamePath, "steam_api.dll", false));
+        if (!dllPath.empty()) return GameID::TSL_Steam;
+
+        return GameID::TSL_GOG;
+    }
 };
 
 int runEngine(fs::path gamePath, Options options) {

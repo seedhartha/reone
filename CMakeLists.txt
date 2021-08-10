@@ -496,6 +496,7 @@ set(GAME_HEADERS
     src/engine/game/gui/saveload.h
     src/engine/game/gui/selectoverlay.h
     src/engine/game/gui/sounds.h
+    src/engine/game/kotor.h
     src/engine/game/map.h
     src/engine/game/object/area.h
     src/engine/game/object/creature.h
@@ -529,6 +530,7 @@ set(GAME_HEADERS
     src/engine/game/soundsets.h
     src/engine/game/surface.h
     src/engine/game/surfaces.h
+    src/engine/game/tsl.h
     src/engine/game/types.h)
 
 set(GAME_SOURCES
@@ -559,10 +561,7 @@ set(GAME_SOURCES
     src/engine/game/dialog.cpp
     src/engine/game/footstepsounds.cpp
     src/engine/game/game.cpp
-    src/engine/game/game_id.cpp
-    src/engine/game/game_kotor.cpp
     src/engine/game/game_save.cpp
-    src/engine/game/game_tsl.cpp
     src/engine/game/gui/barkbubble.cpp
     src/engine/game/gui/chargen/abilities.cpp
     src/engine/game/gui/chargen/chargen.cpp
@@ -597,6 +596,7 @@ set(GAME_SOURCES
     src/engine/game/gui/saveload.cpp
     src/engine/game/gui/selectoverlay.cpp
     src/engine/game/gui/sounds.cpp
+    src/engine/game/kotor.cpp
     src/engine/game/map.cpp
     src/engine/game/object/area.cpp
     src/engine/game/object/area_are.cpp
@@ -660,7 +660,8 @@ set(GAME_SOURCES
     src/engine/game/script/routines_vars.cpp
     src/engine/game/script/runner.cpp
     src/engine/game/soundsets.cpp
-    src/engine/game/surfaces.cpp)
+    src/engine/game/surfaces.cpp
+    src/engine/game/tsl.cpp)
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
