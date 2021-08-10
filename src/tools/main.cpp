@@ -25,15 +25,14 @@ using namespace reone;
 
 int main(int argc, char **argv) {
     try {
-        return tools::Program(argc, argv).run();
+        return runProgram(argc, argv);
     }
     catch (const exception &ex) {
         try {
-            error(ex.what());
+            error("Program terminated exceptionally: " + string(ex.what()));
         }
         catch (...) {
         }
-
         return 1;
     }
 }

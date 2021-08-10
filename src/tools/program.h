@@ -17,42 +17,8 @@
 
 #pragma once
 
-#include <boost/program_options/options_description.hpp>
-
-#include "../engine/resource/types.h"
-
-#include "tools.h"
-#include "types.h"
-
 namespace reone {
 
-namespace tools {
-
-class Program : boost::noncopyable {
-public:
-    Program(int argc, char **argv);
-
-    int run();
-
-private:
-    int _argc;
-    char **_argv;
-
-    boost::program_options::options_description _optsCmdLine { "Usage" };
-
-    boost::filesystem::path _gamePath;
-    boost::filesystem::path _destPath;
-    std::string _target;
-    Operation _operation { Operation::None };
-    std::vector<std::shared_ptr<ITool>> _tools;
-
-    void initOptions();
-    void loadOptions();
-    void loadTools();
-
-    std::shared_ptr<ITool> getTool() const;
-};
-
-} // namespace tools
+int runProgram(int argc, char **argv);
 
 } // namespace reone
