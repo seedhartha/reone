@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
- /** @file
-  *  Game functions specific to TSL.
-  */
-
-#include "game.h"
+#include "kotor.h"
 
 #include "../common/pathutil.h"
 
 using namespace std;
 
+using namespace reone::audio;
+using namespace reone::graphics;
 using namespace reone::resource;
+using namespace reone::scene;
+using namespace reone::script;
 
 namespace fs = boost::filesystem;
 
@@ -33,12 +33,38 @@ namespace reone {
 
 namespace game {
 
-static constexpr char kVoiceDirectoryName[] = "streamvoice";
-static constexpr char kLocalizationLipFilename[] = "localization";
-static constexpr char kExeFilename[] = "swkotor2.exe";
+static constexpr char kMainMenuMusicResRef[] = "mus_theme_cult";
+static constexpr char kPatchFilename[] = "patch.erf";
+static constexpr char kWavesDirectoryName[] = "streamwaves";
+static constexpr char kExeFilename[] = "swkotor.exe";
 
-void Game::initResourceProvidersForTSL() {
+static vector<string> g_nonTransientLipFiles { "global.mod", "localization.mod" };
+
+KotOR::KotOR(
+    GameID gameId,
+    fs::path path,
+    Options options,
+    ResourceServices &resource,
+    GraphicsServices &graphics,
+    AudioServices &audio,
+    SceneServices &scene,
+    ScriptServices &script
+) : Game(
+    gameId,
+    move(path),
+    move(options),
+    resource, graphics, audio, scene, script
+) {
+    _mainMenuMusicResRef = kMainMenuMusicResRef;
+
+    _guiColorBase = glm::vec3(0.0f, 0.639216f, 0.952941f);
+    _guiColorHilight = glm::vec3(0.980392f, 1.0f, 0.0f);
+    _guiColorDisabled = glm::vec3(0.0f, 0.349020f, 0.549020f);
+}
+
+void KotOR::initResourceProviders() {
     _resource.resources().indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
+    _resource.resources().indexErfFile(getPathIgnoreCase(_path, kPatchFilename));
 
     fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
     _resource.resources().indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
@@ -46,13 +72,16 @@ void Game::initResourceProvidersForTSL() {
 
     _resource.resources().indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
     _resource.resources().indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
-    _resource.resources().indexDirectory(getPathIgnoreCase(_path, kVoiceDirectoryName));
+    _resource.resources().indexDirectory(getPathIgnoreCase(_path, kWavesDirectoryName));
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-    _resource.resources().indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
+    for (auto &filename : g_nonTransientLipFiles) {
+        _resource.resources().indexErfFile(getPathIgnoreCase(lipsPath, filename));
+    }
 
     _resource.resources().indexExeFile(getPathIgnoreCase(_path, kExeFilename));
     _resource.resources().indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
+    _resource.resources().indexDirectory(getPathIgnoreCase(fs::current_path(), kDataDirectoryName));
 }
 
 } // namespace game

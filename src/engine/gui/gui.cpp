@@ -277,7 +277,8 @@ shared_ptr<Control> GUI::getControl(const string &tag) const {
     for (auto &control : _controls) {
         if (control->tag() == tag) return control;
     }
-    throw runtime_error("Control not found: " + tag);
+    warn(boost::format("Control '%s' not found in GUI '%s'") % tag % _resRef);
+    return shared_ptr<Control>();
 }
 
 } // namespace gui

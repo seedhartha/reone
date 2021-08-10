@@ -35,9 +35,9 @@ constexpr float kDefaultRaycastDistance = 8.0f;
 constexpr float kSelectionDistance = 8.0f;
 
 enum class GameID {
-    KotOR,
-    TSL,
-    TSL_Steam
+    KotOR, /**< both GOG and Steam versions of KotOR */
+    TSL_GOG, /**< GOG version of TSL */
+    TSL_Steam /**< Steam version of TSL */
 };
 
 enum class BackgroundType {

@@ -58,15 +58,12 @@ constexpr char kLipsDirectoryName[] = "lips";
 constexpr char kOverrideDirectoryName[] = "override";
 
 /**
- * Entry point for the game logic: contains the main game loop and delegates
- * work to the instances of Module and GUI. Serves as a Service Locator.
- *
- * @see game::Module
- * @see gui::GUI
+ * Abstract game.
  */
 class Game : public graphics::IEventHandler, boost::noncopyable {
 public:
     Game(
+        GameID gameId,
         boost::filesystem::path path,
         Options options,
         resource::ResourceServices &resource,
@@ -76,14 +73,14 @@ public:
         script::ScriptServices &script);
 
     /**
-     * Initialize the engine, run the main game loop and clean up on exit.
+     * Initializes the engine, run the main game loop and clean up on exit.
      *
      * @return the exit code
      */
     int run();
 
     /**
-     * Request termination of the main game loop.
+     * Requests termination of the main game loop.
      */
     void quit();
 
@@ -121,7 +118,7 @@ public:
     // Module loading
 
     /**
-     * Load a module with the specified name and entry point.
+     * Loads a module with the specified name and entry point.
      *
      * @param name name of the module to load
      * @param entry tag of the waypoint to spawn at, or empty string to use the default entry point
@@ -129,7 +126,7 @@ public:
     void loadModule(const std::string &name, std::string entry = "");
 
     /**
-     * Schedule transition to the specified module with the specified entry point.
+     * Schedules transition to the specified module with the specified entry point.
      *
      * @param name name of the module to load
      * @param entry tag of the waypoint to spawn at
@@ -188,6 +185,24 @@ public:
 
     // END IEventHandler
 
+protected:
+    static constexpr char kDataDirectoryName[] = "data";
+
+    GameID _gameId;
+    boost::filesystem::path _path;
+    resource::ResourceServices &_resource;
+    std::string _mainMenuMusicResRef;
+
+    // GUI colors
+
+    glm::vec3 _guiColorBase { 0.0f };
+    glm::vec3 _guiColorHilight { 0.0f };
+    glm::vec3 _guiColorDisabled { 0.0f };
+
+    // END GUI colors
+
+    virtual void initResourceProviders() = 0;
+
 private:
     enum class GameScreen {
         None,
@@ -202,10 +217,8 @@ private:
         SaveLoad
     };
 
-    boost::filesystem::path _path;
     Options _options;
 
-    GameID _gameId { GameID::KotOR };
     GameScreen _screen { GameScreen::MainMenu };
     uint32_t _ticks { 0 };
     bool _quit { false };
@@ -220,7 +233,6 @@ private:
 
     // Services
 
-    resource::ResourceServices &_resource;
     graphics::GraphicsServices &_graphics;
     audio::AudioServices &_audio;
     scene::SceneServices &_scene;
@@ -255,10 +267,6 @@ private:
     std::unique_ptr<Console> _console;
     std::unique_ptr<ProfileOverlay> _profileOverlay;
 
-    glm::vec3 _guiColorBase { 0.0f };
-    glm::vec3 _guiColorHilight { 0.0f };
-    glm::vec3 _guiColorDisabled { 0.0f };
-
     // END GUI
 
     // Audio
@@ -291,10 +299,6 @@ private:
     void stopMovement();
     void changeScreen(GameScreen screen);
 
-    GameID determineGameID(const boost::filesystem::path &path) const;
-
-    void initGUIColors();
-
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 
@@ -303,15 +307,10 @@ private:
     void updateMusic();
     void updateSceneGraph(float dt);
 
-    std::string getMainMenuMusic() const;
     std::string getCharacterGenerationMusic() const;
     gui::GUI *getScreenGUI() const;
 
     // Resource management
-
-    void initResourceProviders();
-    void initResourceProvidersForKotOR();
-    void initResourceProvidersForTSL();
 
     void loadModuleNames();
     void loadModuleResources(const std::string &moduleName);
