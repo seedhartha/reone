@@ -192,6 +192,8 @@ protected:
     boost::filesystem::path _path;
     resource::ResourceServices &_resource;
     std::string _mainMenuMusicResRef;
+    std::string _charGenMusicResRef;
+    std::string _charGenLoadScreenResRef;
 
     // GUI colors
 
@@ -307,7 +309,6 @@ private:
     void updateMusic();
     void updateSceneGraph(float dt);
 
-    std::string getCharacterGenerationMusic() const;
     gui::GUI *getScreenGUI() const;
 
     // Resource management

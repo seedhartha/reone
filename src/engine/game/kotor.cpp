@@ -33,7 +33,6 @@ namespace reone {
 
 namespace game {
 
-static constexpr char kMainMenuMusicResRef[] = "mus_theme_cult";
 static constexpr char kPatchFilename[] = "patch.erf";
 static constexpr char kWavesDirectoryName[] = "streamwaves";
 static constexpr char kExeFilename[] = "swkotor.exe";
@@ -55,7 +54,9 @@ KotOR::KotOR(
     move(options),
     resource, graphics, audio, scene, script
 ) {
-    _mainMenuMusicResRef = kMainMenuMusicResRef;
+    _mainMenuMusicResRef = "mus_theme_cult";
+    _charGenMusicResRef = "mus_theme_rep";
+    _charGenLoadScreenResRef = "load_chargen";
 
     _guiColorBase = glm::vec3(0.0f, 0.639216f, 0.952941f);
     _guiColorHilight = glm::vec3(0.980392f, 1.0f, 0.0f);
