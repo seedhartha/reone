@@ -60,20 +60,26 @@ void MapMenu::load() {
         }
         refreshSelectedNote();
     });
-    _binding.btnPrtySlct->setOnClick([this]() {
-        _game->openPartySelection(PartySelection::Context());
-    });
+
+    if (_game->isKotOR()) {
+        _binding.btnPrtySlct->setOnClick([this]() {
+            _game->openPartySelection(PartySelection::Context());
+        });
+    }
 }
 
 void MapMenu::bindControls() {
     _binding.btnExit = getControl<Button>("BTN_EXIT");
     _binding.btnUp = getControl<Button>("BTN_UP");
     _binding.btnDown = getControl<Button>("BTN_DOWN");
-    _binding.btnPrtySlct = getControl<Button>("BTN_PRTYSLCT");
     _binding.btnReturn = getControl<Button>("BTN_RETURN");
     _binding.lblArea = getControl<Label>("LBL_Area");
     _binding.lblMap = getControl<Label>("LBL_Map");
     _binding.lblMapNote = getControl<Label>("LBL_MapNote");
+
+    if (_game->isKotOR()) {
+        _binding.btnPrtySlct = getControl<Button>("BTN_PRTYSLCT");
+    }
 }
 
 void MapMenu::draw() {

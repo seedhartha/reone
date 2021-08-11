@@ -42,7 +42,6 @@ void InventoryMenu::load() {
 
     _binding.lblCreditsValue->setVisible(false);
     _binding.btnUseItem->setDisabled(true);
-    _binding.btnQuestItems->setDisabled(true);
     _binding.btnExit->setOnClick([this]() {
         _game->openInGame();
     });
@@ -52,12 +51,12 @@ void InventoryMenu::load() {
         _binding.lblDef->setVisible(false);
         _binding.btnChange1->setFocusable(false);
         _binding.btnChange2->setFocusable(false);
+        _binding.btnQuestItems->setDisabled(true);
     }
 }
 
 void InventoryMenu::bindControls() {
     _binding.btnExit = getControl<Button>("BTN_EXIT");
-    _binding.btnQuestItems = getControl<Button>("BTN_QUESTITEMS");
     _binding.btnUseItem = getControl<Button>("BTN_USEITEM");
     _binding.lblCredits = getControl<Label>("LBL_CREDITS");
     _binding.lblCreditsValue = getControl<Label>("LBL_CREDITS_VALUE");
@@ -68,6 +67,7 @@ void InventoryMenu::bindControls() {
     if (_game->isKotOR()) {
         _binding.btnChange1 = getControl<Button>("BTN_CHANGE1");
         _binding.btnChange2 = getControl<Button>("BTN_CHANGE2");
+        _binding.btnQuestItems = getControl<Button>("BTN_QUESTITEMS");
         _binding.lblBgPort = getControl<Label>("LBL_BGPORT");
         _binding.lblBgStats = getControl<Label>("LBL_BGSTATS");
         _binding.lblDef = getControl<Label>("LBL_DEF");
@@ -92,7 +92,7 @@ void InventoryMenu::bindControls() {
 }
 
 void InventoryMenu::refreshPortraits() {
-    if (_game->id() != GameID::KotOR) return;
+    if (!_game->isKotOR()) return;
 
     Party &party = _game->services().party();
     shared_ptr<Creature> partyLeader(party.getLeader());
@@ -101,13 +101,11 @@ void InventoryMenu::refreshPortraits() {
 
     _binding.lblPort->setBorderFill(partyLeader->portrait());
 
-    if (_game->isKotOR()) {
-        _binding.btnChange1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
-        _binding.btnChange1->setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
+    _binding.btnChange1->setBorderFill(partyMember1 ? partyMember1->portrait() : nullptr);
+    _binding.btnChange1->setHilightFill(partyMember1 ? partyMember1->portrait() : nullptr);
 
-        _binding.btnChange2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
-        _binding.btnChange2->setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
-    }
+    _binding.btnChange2->setBorderFill(partyMember2 ? partyMember2->portrait() : nullptr);
+    _binding.btnChange2->setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
 
 } // namespace game

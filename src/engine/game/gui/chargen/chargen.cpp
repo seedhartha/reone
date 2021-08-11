@@ -50,17 +50,19 @@ void CharacterGeneration::load() {
     GUI::load();
     bindControls();
 
-    _binding.lblLevel->setVisible(false);
     _binding.lblLevelVal->setVisible(false);
-    _binding.vitArrowLbl->setVisible(false);
-    _binding.defArrowLbl->setVisible(false);
-    _binding.fortArrowLbl->setVisible(false);
-    _binding.reflArrowLbl->setVisible(false);
-    _binding.willArrowLbl->setVisible(false);
-    _binding.oldLbl->setVisible(false);
-    _binding.newLbl->setVisible(false);
-
     _binding.lblName->setTextMessage("");
+
+    if (_game->isKotOR()) {
+        _binding.lblLevel->setVisible(false);
+        _binding.vitArrowLbl->setVisible(false);
+        _binding.defArrowLbl->setVisible(false);
+        _binding.fortArrowLbl->setVisible(false);
+        _binding.reflArrowLbl->setVisible(false);
+        _binding.willArrowLbl->setVisible(false);
+        _binding.oldLbl->setVisible(false);
+        _binding.newLbl->setVisible(false);
+    }
 
     loadClassSelection();
     loadQuickOrCustom();
@@ -75,21 +77,13 @@ void CharacterGeneration::load() {
 }
 
 void CharacterGeneration::bindControls() {
-    _binding.defArrowLbl = getControl<Label>("DEF_ARROW_LBL");
-    _binding.fortArrowLbl = getControl<Label>("FORT_ARROW_LBL");
     _binding.lblClass = getControl<Label>("LBL_CLASS");
     _binding.lblDef = getControl<Label>("LBL_DEF");
-    _binding.lblLevel = getControl<Label>("LBL_LEVEL");
     _binding.lblLevelVal = getControl<Label>("LBL_LEVEL_VAL");
     _binding.lblName = getControl<Label>("LBL_NAME");
     _binding.lblVit = getControl<Label>("LBL_VIT");
     _binding.modelLbl = getControl<Label>("MODEL_LBL");
-    _binding.newLbl = getControl<Label>("NEW_LBL");
-    _binding.oldLbl = getControl<Label>("OLD_LBL");
     _binding.portraitLbl = getControl<Label>("PORTRAIT_LBL");
-    _binding.reflArrowLbl = getControl<Label>("REFL_ARROW_LBL");
-    _binding.vitArrowLbl = getControl<Label>("VIT_ARROW_LBL");
-    _binding.willArrowLbl = getControl<Label>("WILL_ARROW_LBL");
 
     _binding.strAbLbl = getControl<Label>("STR_AB_LBL");
     _binding.dexAbLbl = getControl<Label>("DEX_AB_LBL");
@@ -99,9 +93,17 @@ void CharacterGeneration::bindControls() {
     _binding.chaAbLbl = getControl<Label>("CHA_AB_LBL");
 
     if (_game->isKotOR()) {
+        _binding.newLbl = getControl<Label>("NEW_LBL");
+        _binding.oldLbl = getControl<Label>("OLD_LBL");
+        _binding.lblLevel = getControl<Label>("LBL_LEVEL");
         _binding.oldFortLbl = getControl<Label>("OLD_FORT_LBL");
         _binding.oldReflLbl = getControl<Label>("OLD_REFL_LBL");
         _binding.oldWillLbl = getControl<Label>("OLD_WILL_LBL");
+        _binding.vitArrowLbl = getControl<Label>("VIT_ARROW_LBL");
+        _binding.defArrowLbl = getControl<Label>("DEF_ARROW_LBL");
+        _binding.fortArrowLbl = getControl<Label>("FORT_ARROW_LBL");
+        _binding.reflArrowLbl = getControl<Label>("REFL_ARROW_LBL");
+        _binding.willArrowLbl = getControl<Label>("WILL_ARROW_LBL");
     } else {
         _binding.newFortLbl = getControl<Label>("NEW_FORT_LBL");
         _binding.newReflLbl = getControl<Label>("NEW_REFL_LBL");

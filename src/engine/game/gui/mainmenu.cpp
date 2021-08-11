@@ -69,6 +69,11 @@ void MainMenu::load() {
     _binding.btnMovies->setDisabled(true);
     _binding.btnOptions->setDisabled(true);
 
+    if (_game->isTSL()) {
+        _binding.btnMoreGames->setVisible(false);
+        _binding.btnTslrcm->setVisible(false);
+    }
+
     // Hide warp button in developer mode
     if (!_game->options().developer) {
         _binding.btnWarp->setVisible(false);
@@ -110,6 +115,8 @@ void MainMenu::bindControls() {
 
     if (_game->isTSL()) {
         _binding.btnMusic = getControl<Button>("BTN_MUSIC");
+        _binding.btnMoreGames = getControl<Button>("BTN_MOREGAMES");
+        _binding.btnTslrcm = getControl<Button>("BTN_TSLRCM");
     } else {
         _binding.lblMenuBg = getControl<Label>("LBL_MENUBG");
     }

@@ -350,21 +350,29 @@ void HUD::update(float dt) {
     for (int i = 0; i < 3; ++i) {
         Label &lblChar = *charLabels[i];
         Label &lblBack = *backLabels[i];
-        Label &lblLvlUpBg = *lvlUpBgLabels[i];
         Label &lblLevelUp = *levevlUpLabels[i];
+
+        Label *lblLvlUpBg;
+        if (_game->isKotOR()) {
+            lblLvlUpBg = lvlUpBgLabels[i];
+        }
 
         shared_ptr<Creature> member(party.getMember(i));
         if (member) {
             lblChar.setVisible(true);
             lblChar.setBorderFill(member->portrait());
             lblBack.setVisible(true);
-            lblLvlUpBg.setVisible(member->isLevelUpPending());
             lblLevelUp.setVisible(member->isLevelUpPending());
+            if (_game->isKotOR()) {
+                lblLvlUpBg->setVisible(member->isLevelUpPending());
+            }
         } else {
             lblChar.setVisible(false);
             lblBack.setVisible(false);
-            lblLvlUpBg.setVisible(false);
             lblLevelUp.setVisible(false);
+            if (_game->isKotOR()) {
+                lblLvlUpBg->setVisible(false);
+            }
         }
     }
 

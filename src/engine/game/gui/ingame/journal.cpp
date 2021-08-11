@@ -42,16 +42,22 @@ void JournalMenu::load() {
     _binding.btnExit->setOnClick([this]() {
         _game->openInGame();
     });
-    _binding.btnQuestItems->setDisabled(true);
-    _binding.btnSort->setDisabled(true);
     _binding.btnSwapText->setDisabled(true);
+
+    if (_game->isKotOR()) {
+        _binding.btnQuestItems->setDisabled(true);
+        _binding.btnSort->setDisabled(true);
+    }
 }
 
 void JournalMenu::bindControls() {
     _binding.btnExit = getControl<Button>("BTN_EXIT");
-    _binding.btnQuestItems = getControl<Button>("BTN_QUESTITEMS");
-    _binding.btnSort = getControl<Button>("BTN_SORT");
     _binding.btnSwapText = getControl<Button>("BTN_SWAPTEXT");
+
+    if (_game->isKotOR()) {
+        _binding.btnQuestItems = getControl<Button>("BTN_QUESTITEMS");
+        _binding.btnSort = getControl<Button>("BTN_SORT");
+    }
 }
 
 } // namespace game

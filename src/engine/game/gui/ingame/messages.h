@@ -38,7 +38,10 @@ public:
 private:
     struct Binding {
         std::shared_ptr<gui::Button> btnExit;
+
+        // KotOR only
         std::shared_ptr<gui::Button> btnShow;
+        // END KotOR only
     } _binding;
 
     void bindControls();

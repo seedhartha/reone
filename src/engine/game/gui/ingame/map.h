@@ -47,11 +47,14 @@ private:
         std::shared_ptr<gui::Button> btnExit;
         std::shared_ptr<gui::Button> btnUp;
         std::shared_ptr<gui::Button> btnDown;
-        std::shared_ptr<gui::Button> btnPrtySlct;
         std::shared_ptr<gui::Button> btnReturn;
         std::shared_ptr<gui::Label> lblArea;
         std::shared_ptr<gui::Label> lblMap;
         std::shared_ptr<gui::Label> lblMapNote;
+
+        // KotOR only
+        std::shared_ptr<gui::Button> btnPrtySlct;
+        // END KotOR only
     } _binding;
 
     std::vector<std::shared_ptr<Waypoint>> _notes;
