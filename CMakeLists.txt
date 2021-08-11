@@ -73,7 +73,8 @@ set(COMMON_HEADERS
     src/engine/common/streamutil.h
     src/engine/common/streamwriter.h
     src/engine/common/timer.h
-    src/engine/common/types.h)
+    src/engine/common/types.h
+    src/engine/common/unicode.h)
 
 set(COMMON_SOURCES
     src/engine/common/log.cpp
@@ -81,7 +82,8 @@ set(COMMON_SOURCES
     src/engine/common/random.cpp
     src/engine/common/streamreader.cpp
     src/engine/common/streamutil.cpp
-    src/engine/common/streamwriter.cpp)
+    src/engine/common/streamwriter.cpp
+    src/engine/common/unicode.cpp)
 
 add_library(libcommon STATIC ${COMMON_HEADERS} ${COMMON_SOURCES})
 set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -792,6 +794,7 @@ if(BUILD_TESTS)
         tests/common/mediastream.cpp
         tests/common/streamreader.cpp
         tests/common/timer.cpp
+        tests/common/unicode.cpp
         tests/game/pathfinder.cpp
         tests/main.cpp
         tests/resource/gffstruct.cpp
