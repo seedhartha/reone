@@ -43,6 +43,7 @@ public:
     double getDouble();
     std::string getCString();
     std::string getString(int len);
+    std::u16string getNullTerminatedUTF16String();
     ByteArray getBytes(int count);
 
     bool eof() const;
