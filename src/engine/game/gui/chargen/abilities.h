@@ -49,7 +49,6 @@ private:
         std::shared_ptr<gui::Button> btnBack;
         std::shared_ptr<gui::Button> btnRecommended;
         std::shared_ptr<gui::Label> costPointsLbl;
-        std::shared_ptr<gui::Label> lblAbilityMod;
         std::shared_ptr<gui::Label> remainingSelectionsLbl;
         std::shared_ptr<gui::ListBox> lbDesc;
 
@@ -80,6 +79,10 @@ private:
         std::shared_ptr<gui::Button> intPlusBtn;
         std::shared_ptr<gui::Button> wisPlusBtn;
         std::shared_ptr<gui::Button> chaPlusBtn;
+
+        // KotOR only
+        std::shared_ptr<gui::Label> lblAbilityMod;
+        // END KotOR only
     } _binding;
 
     CharacterGeneration *_charGen;

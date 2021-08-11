@@ -173,7 +173,6 @@ void CharGenAbilities::bindControls() {
     _binding.btnRecommended = getControl<Button>("BTN_RECOMMENDED");
     _binding.costPointsLbl = getControl<Label>("COST_POINTS_LBL");
     _binding.lbDesc = getControl<ListBox>("LB_DESC");
-    _binding.lblAbilityMod = getControl<Label>("LBL_ABILITY_MOD");
     _binding.remainingSelectionsLbl = getControl<Label>("REMAINING_SELECTIONS_LBL");
 
     _binding.strLbl = getControl<Label>("STR_LBL");
@@ -203,6 +202,10 @@ void CharGenAbilities::bindControls() {
     _binding.intPlusBtn = getControl<Button>("INT_PLUS_BTN");
     _binding.wisPlusBtn = getControl<Button>("WIS_PLUS_BTN");
     _binding.chaPlusBtn = getControl<Button>("CHA_PLUS_BTN");
+
+    if (_game->isKotOR()) {
+        _binding.lblAbilityMod = getControl<Label>("LBL_ABILITY_MOD");
+    }
 }
 
 void CharGenAbilities::reset(bool newGame) {
@@ -224,7 +227,9 @@ void CharGenAbilities::reset(bool newGame) {
 void CharGenAbilities::refreshControls() {
     _binding.remainingSelectionsLbl->setTextMessage(to_string(_points));
     _binding.costPointsLbl->setTextMessage("");
-    _binding.lblAbilityMod->setTextMessage("");
+    if (_game->isKotOR()) {
+        _binding.lblAbilityMod->setTextMessage("");
+    }
 
     _binding.strPointsBtn->setTextMessage(to_string(_attributes.strength()));
     _binding.dexPointsBtn->setTextMessage(to_string(_attributes.dexterity()));

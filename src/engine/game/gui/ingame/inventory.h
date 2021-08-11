@@ -42,7 +42,6 @@ public:
 private:
     struct Binding {
         std::shared_ptr<gui::Button> btnExit;
-        std::shared_ptr<gui::Button> btnQuestItems;
         std::shared_ptr<gui::Button> btnUseItem;
         std::shared_ptr<gui::Label> lblCredits;
         std::shared_ptr<gui::Label> lblCreditsValue;
@@ -53,6 +52,7 @@ private:
         // KotOR only
         std::shared_ptr<gui::Button> btnChange1;
         std::shared_ptr<gui::Button> btnChange2;
+        std::shared_ptr<gui::Button> btnQuestItems;
         std::shared_ptr<gui::Label> lblBgPort;
         std::shared_ptr<gui::Label> lblBgStats;
         std::shared_ptr<gui::Label> lblDef;

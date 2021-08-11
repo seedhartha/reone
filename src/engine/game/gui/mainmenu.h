@@ -58,6 +58,8 @@ private:
         // TSL only
         std::shared_ptr<gui::Label> lblMenuBg;
         std::shared_ptr<gui::Button> btnMusic;
+        std::shared_ptr<gui::Button> btnMoreGames;
+        std::shared_ptr<gui::Button> btnTslrcm;
         // END TSL only
     } _binding;
 

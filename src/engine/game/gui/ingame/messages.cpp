@@ -42,12 +42,18 @@ void MessagesMenu::load() {
     _binding.btnExit->setOnClick([this]() {
         _game->openInGame();
     });
-    _binding.btnShow->setDisabled(true);
+
+    if (_game->isKotOR()) {
+        _binding.btnShow->setDisabled(true);
+    }
 }
 
 void MessagesMenu::bindControls() {
     _binding.btnExit = getControl<Button>("BTN_EXIT");
-    _binding.btnShow = getControl<Button>("BTN_SHOW");
+
+    if (_game->isKotOR()) {
+        _binding.btnShow = getControl<Button>("BTN_SHOW");
+    }
 }
 
 } // namespace game
