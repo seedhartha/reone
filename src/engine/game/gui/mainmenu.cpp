@@ -69,8 +69,10 @@ void MainMenu::load() {
     _binding.btnMovies->setDisabled(true);
     _binding.btnOptions->setDisabled(true);
 
-    if (_game->isTSL()) {
+    if (_binding.btnMoreGames) {
         _binding.btnMoreGames->setVisible(false);
+    }
+    if (_binding.btnTslrcm) {
         _binding.btnTslrcm->setVisible(false);
     }
 
