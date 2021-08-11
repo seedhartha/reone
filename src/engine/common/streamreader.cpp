@@ -114,23 +114,19 @@ string StreamReader::getCString() {
     return ss.str();
 }
 
-u16string StreamReader::getNullTerminatedUTF16String() {
-    basic_stringstream<char16_t> ss;
-    while (true) {
-        char buf[2] { '\x00\x00' };
-        _stream->read(buf, 2);
-        char16_t ch = buf[0] | (buf[1] << 8);
-        if (!ch) break;
-        ss.put(ch);
-    }
-    return ss.str();
-}
-
 string StreamReader::getString(int len) {
     string val;
     val.resize(len);
     _stream->read(&val[0], len);
     return move(val);
+}
+
+u16string StreamReader::getNullTerminatedUTF16String() {
+    basic_stringstream<char16_t> ss;
+    for (char16_t ch = getUint16(); ch; ch = getUint16()) {
+        ss.put(ch);
+    }
+    return ss.str();
 }
 
 ByteArray StreamReader::getBytes(int count) {
