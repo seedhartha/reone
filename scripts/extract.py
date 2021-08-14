@@ -30,6 +30,7 @@ import tkinter.filedialog
 
 
 game_dir = os.getenv("REONE_GAME_DIR")
+game_tsl = None
 tools_dir = os.getenv("REONE_TOOLS_DIR")
 extract_dir = os.getenv("REONE_EXTRACT_DIR")
 nwnnsscomp_dir = os.getenv("REONE_NWNNSSCOMP_DIR")
@@ -64,11 +65,13 @@ def choose_directory(title):
 
 
 def configure_game_dir():
-    global game_dir
+    global game_dir, game_tsl
     if not is_valid_game_dir(game_dir):
         game_dir = choose_directory("Choose a game directory")
         if not is_valid_game_dir(game_dir):
             exit(1)
+    tsl_exe_path = os.path.join(game_dir, "swkotor2.exe")
+    game_tsl = os.path.isfile(tsl_exe_path)
 
 
 def is_valid_tools_dir(dir):
@@ -305,14 +308,19 @@ def convert_to_ascii_pth():
 
 
 def disassemble_scripts():
-    global extract_dir
+    global game_tsl, extract_dir
 
     for f in glob.glob("{}/**/*.ncs".format(extract_dir), recursive=True):
         filename, _ = os.path.splitext(f)
         pcode_path = os.path.join(os.path.dirname(f), filename + ".pcode")
         if not os.path.exists(pcode_path):
             print("Disassembling {}...".format(f))
-            run_subprocess(["nwnnsscomp", "-d", f, "-o", pcode_path], silent=False)
+
+            args = ["nwnnsscomp", "-d", f, "-o", pcode_path]
+            if game_tsl:
+                args.append("-g 2")
+
+            run_subprocess(args, silent=False)
 
 
 root = tkinter.Tk()
@@ -374,5 +382,6 @@ for step in steps:
             convert_to_ascii_pth()
 
         if step[0] == "disassemble_scripts":
+            configure_game_dir()
             configure_script_compiler_dir()
             disassemble_scripts()
