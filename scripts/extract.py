@@ -49,11 +49,6 @@ steps = [
     ]
 
 
-def init_window():
-    root = tkinter.Tk()
-    root.withdraw()
-
-
 def is_valid_game_dir(dir):
     if not dir or not os.path.isdir(dir):
         return False
@@ -62,6 +57,18 @@ def is_valid_game_dir(dir):
             return True
     print("Game directory does not contain a keyfile")
     return False
+
+
+def choose_directory(title):
+    return tkinter.filedialog.askdirectory(title=title, mustexist=True)
+
+
+def configure_game_dir():
+    global game_dir
+    if not is_valid_game_dir(game_dir):
+        game_dir = choose_directory("Choose a game directory")
+        if not is_valid_game_dir(game_dir):
+            exit(1)
 
 
 def is_valid_tools_dir(dir):
@@ -74,6 +81,33 @@ def is_valid_tools_dir(dir):
     return False
 
 
+def append_dir_to_path(dir):
+    if os.path.exists(dir) and (not dir in os.environ["PATH"]):
+        separator = ":" if platform.system() == "Linux" else ";"
+        os.environ["PATH"] = separator.join([os.environ["PATH"], dir])
+
+
+def configure_tools_dir():
+    global tools_dir
+    if not is_valid_tools_dir(tools_dir):
+        tools_dir = choose_directory("Choose a tools directory")
+        if not is_valid_tools_dir(tools_dir):
+            exit(1)
+    append_dir_to_path(tools_dir)
+
+
+def is_valid_extract_dir(dir):
+    return dir and os.path.isdir(dir)
+
+
+def configure_extract_dir():
+    global extract_dir
+    if not is_valid_extract_dir(extract_dir):
+        extract_dir = choose_directory("Choose an extraction directory")
+        if not is_valid_extract_dir(extract_dir):
+            exit(1)
+
+
 def is_valid_script_compiler_dir(dir):
     if not dir or not os.path.isdir(dir):
         return False
@@ -84,18 +118,13 @@ def is_valid_script_compiler_dir(dir):
     return False
 
 
-def is_valid_extract_dir(dir):
-    return dir and os.path.isdir(dir)
-
-
-def choose_directory(title):
-    return tkinter.filedialog.askdirectory(title=title, mustexist=True)
-
-
-def append_dir_to_path(dir):
-    if os.path.exists(dir) and (not dir in os.environ["PATH"]):
-        separator = ":" if platform.system() == "Linux" else ";"
-        os.environ["PATH"] = separator.join([os.environ["PATH"], dir])
+def configure_script_compiler_dir():
+    global nwnnsscomp_dir
+    if not is_valid_script_compiler_dir(nwnnsscomp_dir):
+        nwnnsscomp_dir = choose_directory("Choose a script compiler directory")
+        if not is_valid_script_compiler_dir(nwnnsscomp_dir):
+            exit(1)
+    append_dir_to_path(nwnnsscomp_dir)
 
 
 def run_subprocess(args, silent=True, check_retcode=True):
@@ -105,7 +134,9 @@ def run_subprocess(args, silent=True, check_retcode=True):
         process.check_returncode()
 
 
-def extract_bifs(game_dir, extract_dir):
+def extract_bifs():
+    global game_dir, extract_dir
+
     # Create destination directory if it does not exist
     dest_dir = os.path.join(extract_dir, "data")
     if not os.path.exists(dest_dir):
@@ -121,7 +152,9 @@ def extract_bifs(game_dir, extract_dir):
                 run_subprocess(["reone-tools", "--game", game_dir, "--extract", bif_path, "--dest", dest_dir])
 
 
-def extract_patch(game_dir, extract_dir):
+def extract_patch():
+    global game_dir, extract_dir
+
     # Create destination directory if it does not exist
     dest_dir = os.path.join(extract_dir, "patch")
     if not os.path.exists(dest_dir):
@@ -134,7 +167,9 @@ def extract_patch(game_dir, extract_dir):
         run_subprocess(["reone-tools", "--extract", patch_path, "--dest", dest_dir])
 
 
-def extract_modules(game_dir, extract_dir):
+def extract_modules():
+    global game_dir, extract_dir
+
     # Create destination directory if it does not exist
     dest_dir_base = os.path.join(extract_dir, "modules")
     if not os.path.exists(dest_dir_base):
@@ -153,7 +188,9 @@ def extract_modules(game_dir, extract_dir):
                 run_subprocess(["reone-tools", "--extract", rim_path, "--dest", dest_dir])
 
 
-def extract_textures(game_dir, extract_dir):
+def extract_textures():
+    global game_dir, extract_dir
+
     TEXTURE_PACKS = ["swpc_tex_gui.erf", "swpc_tex_tpa.erf"]
 
     # Create destination directory if it does not exist
@@ -171,7 +208,9 @@ def extract_textures(game_dir, extract_dir):
                 run_subprocess(["reone-tools", "--extract", texture_pack_dir, "--dest", dest_dir])
 
 
-def extract_dialog(game_dir, extract_dir):
+def extract_dialog():
+    global game_dir, extract_dir
+
     tlk_path = os.path.join(game_dir, "dialog.tlk")
     if os.path.exists(tlk_path):
         print("Copying {}...".format(tlk_path))
@@ -181,7 +220,9 @@ def extract_dialog(game_dir, extract_dir):
             pass
 
 
-def extract_voices(game_dir, extract_dir):
+def extract_voices():
+    global game_dir, extract_dir
+
     # Create destination directory if it does not exist
     dest_dir = os.path.join(extract_dir, "voices")
     if not os.path.exists(dest_dir):
@@ -202,7 +243,9 @@ def extract_voices(game_dir, extract_dir):
                     pass
 
 
-def extract_lips(game_dir, extract_dir):
+def extract_lips():
+    global game_dir, extract_dir
+
     # Create destination directory if it does not exist
     dest_dir = os.path.join(extract_dir, "lips")
     if not os.path.exists(dest_dir):
@@ -219,7 +262,9 @@ def extract_lips(game_dir, extract_dir):
                 run_subprocess(["reone-tools", "--extract", mod_path, "--dest", dest_dir])
 
 
-def convert_to_json(extract_dir):
+def convert_to_json():
+    global extract_dir
+
     CONVERTIBLE_EXT = [
         ".2da",
         ".gui",
@@ -239,7 +284,9 @@ def convert_to_json(extract_dir):
                 run_subprocess(["reone-tools", "--to-json", f])
 
 
-def convert_to_tga(extract_dir):
+def convert_to_tga():
+    global extract_dir
+
     for f in glob.glob("{}/**/*.tpc".format(extract_dir), recursive=True):
         filename, _ = os.path.splitext(f)
         tga_path = os.path.join(os.path.dirname(f), filename + ".tga")
@@ -248,39 +295,30 @@ def convert_to_tga(extract_dir):
             run_subprocess(["reone-tools", "--to-tga", f], check_retcode=False)
 
 
-def convert_to_ascii_pth(extract_dir):
+def convert_to_ascii_pth():
+    global extract_dir
+
     for f in glob.glob("{}/**/*.pth".format(extract_dir), recursive=True):
         if not f.endswith("-ascii.pth"):
             print("Converting {} to ASCII PTH...".format(f))
             run_subprocess(["reone-tools", "--to-ascii", f])
 
 
-def disassemble_scripts(extract_dir):
+def disassemble_scripts():
+    global extract_dir
+
     for f in glob.glob("{}/**/*.ncs".format(extract_dir), recursive=True):
         filename, _ = os.path.splitext(f)
         pcode_path = os.path.join(os.path.dirname(f), filename + ".pcode")
         if not os.path.exists(pcode_path):
             print("Disassembling {}...".format(f))
-            run_subprocess(["nwnnsscomp", "-d", f, "-o", pcode_path])
+            run_subprocess(["nwnnsscomp", "-d", f, "-o", pcode_path], silent=False)
 
 
-init_window()
+root = tkinter.Tk()
+root.withdraw()
 
-if not is_valid_game_dir(game_dir):
-    game_dir = choose_directory("Choose a game directory")
-    if not is_valid_game_dir(game_dir):
-        exit(1)
-
-if not is_valid_tools_dir(tools_dir):
-    tools_dir = choose_directory("Choose a tools directory")
-    if not is_valid_tools_dir(tools_dir):
-        exit(1)
-append_dir_to_path(tools_dir)
-
-if not is_valid_extract_dir(extract_dir):
-    extract_dir = choose_directory("Choose an extraction directory")
-    if not is_valid_extract_dir(extract_dir):
-        exit(1)
+configure_extract_dir()
 
 assume_yes = len(sys.argv) > 1 and sys.argv[1] == '-y'
 
@@ -289,40 +327,52 @@ for step in steps:
 
     if run:
         if step[0] == "extract_bifs":
-            extract_bifs(game_dir, extract_dir)
+            configure_game_dir()
+            configure_tools_dir()
+            extract_bifs()
 
         if step[0] == "extract_patch":
-            extract_patch(game_dir, extract_dir)
+            configure_game_dir()
+            configure_tools_dir()
+            extract_patch()
 
         if step[0] == "extract_modules":
-            extract_modules(game_dir, extract_dir)
+            configure_game_dir()
+            configure_tools_dir()
+            extract_modules()
 
         if step[0] == "extract_textures":
-            extract_textures(game_dir, extract_dir)
+            configure_game_dir()
+            configure_tools_dir()
+            extract_textures()
 
         if step[0] == "extract_dialog":
-            extract_dialog(game_dir, extract_dir)
+            configure_game_dir()
+            configure_tools_dir()
+            extract_dialog()
 
         if step[0] == "extract_voices":
-            extract_voices(game_dir, extract_dir)
+            configure_game_dir()
+            configure_tools_dir()
+            extract_voices()
 
         if step[0] == "extract_lips":
-            extract_lips(game_dir, extract_dir)
+            configure_game_dir()
+            configure_tools_dir()
+            extract_lips()
 
         if step[0] == "convert_to_json":
-            convert_to_json(extract_dir)
+            configure_tools_dir()
+            convert_to_json()
 
         if step[0] == "convert_to_tga":
-            convert_to_tga(extract_dir)
+            configure_tools_dir()
+            convert_to_tga()
 
         if step[0] == "convert_to_ascii_pth":
-            convert_to_ascii_pth(extract_dir)
+            configure_tools_dir()
+            convert_to_ascii_pth()
 
         if step[0] == "disassemble_scripts":
-            if not is_valid_script_compiler_dir(nwnnsscomp_dir):
-                nwnnsscomp_dir = choose_directory("Choose a script compiler directory")
-                if not is_valid_script_compiler_dir(nwnnsscomp_dir):
-                    exit(1)
-            append_dir_to_path(nwnnsscomp_dir)
-
-            disassemble_scripts(extract_dir)
+            configure_script_compiler_dir()
+            disassemble_scripts()
