@@ -123,9 +123,15 @@ string StreamReader::getString(int len) {
 
 u16string StreamReader::getNullTerminatedUTF16String() {
     basic_stringstream<char16_t> ss;
-    for (char16_t ch = getUint16(); ch; ch = getUint16()) {
-        ss.put(ch);
-    }
+
+    char16_t ch;
+    do {
+        ch = getUint16();
+        if (ch) {
+            ss.put(ch);
+        }
+    } while (ch);
+
     return ss.str();
 }
 
