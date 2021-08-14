@@ -98,14 +98,9 @@ void PthTool::toPTH(const fs::path &path, const fs::path &destPath) {
 
     // Write binary PTH
 
-    string filename(path.filename().string());
-    size_t lastDotIdx = filename.find_last_of('.');
-    if (lastDotIdx != -1) {
-        filename = filename.substr(0, lastDotIdx);
-    }
-
     fs::path pthPath(destPath);
-    pthPath.append(filename + "-bin.pth");
+    string filename(path.filename().string());
+    pthPath.append(filename.substr(0, filename.length() - 6));
 
     int numConnections = 0;
     GffStruct::Field pathPoints(GffStruct::FieldType::List, "Path_Points");
@@ -165,14 +160,9 @@ void PthTool::toASCII(const fs::path &path, const fs::path &destPath) {
 
     // Write ASCII PTH
 
-    string filename(path.filename().string());
-    size_t lastDotIdx = filename.find_last_of('.');
-    if (lastDotIdx != -1) {
-        filename = filename.substr(0, lastDotIdx);
-    }
-
     fs::path asciiPath(destPath);
-    asciiPath.append(filename + "-ascii.pth");
+    string filename(path.filename().string());
+    asciiPath.append(filename + ".ascii");
 
     auto ascii = make_shared<fs::ofstream>(asciiPath);
     int pointIdx = 0;
@@ -194,10 +184,11 @@ void PthTool::toASCII(const fs::path &path, const fs::path &destPath) {
 }
 
 bool PthTool::supports(Operation operation, const fs::path &target) const {
+    if (fs::is_directory(target)) return false;
+
     return
-        !fs::is_directory(target) &&
-        target.extension() == ".pth" &&
-        (operation == Operation::ToPTH || operation == Operation::ToASCII);
+        (target.extension() == ".pth" && operation == Operation::ToASCII) ||
+        (target.extension() == ".ascii" && operation == Operation::ToPTH);
 }
 
 } // namespace tools
