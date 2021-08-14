@@ -239,9 +239,9 @@ def extract_voices():
         for f in glob.glob("{}/**".format(voices_dir), recursive=True):
             _, extension = os.path.splitext(f)
             if extension == ".wav":
-                unwrapped_path = os.path.join(dest_dir, os.path.basename(f))
+                dest_path = os.path.join(dest_dir, os.path.basename(f))
                 try:
-                    shutil.copyfile(f, unwrapped_path)
+                    shutil.copyfile(f, dest_path)
                 except PermissionError:
                     pass
 
@@ -265,9 +265,7 @@ def extract_lips():
                 run_subprocess(["reone-tools", "--extract", mod_path, "--dest", dest_dir])
 
 
-def convert_to_json():
-    global extract_dir
-
+def is_convertible_to_json(path):
     CONVERTIBLE_EXT = [
         ".2da",
         ".gui",
@@ -275,12 +273,19 @@ def convert_to_json():
         ".utc", ".utd", ".ute", ".uti", ".utp", ".uts", ".utt", ".utw",
         ".dlg",
         ".tlk",
-        ".lip"
+        ".lip",
+        ".pth"
         ]
 
+    _, extension = os.path.splitext(path)
+    return extension in CONVERTIBLE_EXT
+
+
+def convert_to_json():
+    global extract_dir
+
     for f in glob.glob("{}/**".format(extract_dir), recursive=True):
-        _, extension = os.path.splitext(f)
-        if extension in CONVERTIBLE_EXT:
+        if is_convertible_to_json(f):
             json_path = f + ".json"
             if not os.path.exists(json_path):
                 print("Converting {} to JSON...".format(f))
@@ -302,9 +307,8 @@ def convert_to_ascii_pth():
     global extract_dir
 
     for f in glob.glob("{}/**/*.pth".format(extract_dir), recursive=True):
-        if not f.endswith("-ascii.pth"):
-            print("Converting {} to ASCII PTH...".format(f))
-            run_subprocess(["reone-tools", "--to-ascii", f])
+        print("Converting {} to ASCII PTH...".format(f))
+        run_subprocess(["reone-tools", "--to-ascii", f])
 
 
 def disassemble_scripts():
