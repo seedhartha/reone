@@ -23,33 +23,36 @@ namespace reone {
 
 namespace game {
 
+/**
+ * A* pathfinding.
+ */
 class Pathfinder : boost::noncopyable {
 public:
     void load(const std::vector<Path::Point> &points, const std::unordered_map<int, float> &pointZ);
 
     const std::vector<glm::vec3> findPath(const glm::vec3 &from, const glm::vec3 &to) const;
 
-    const std::vector<glm::vec3> &vertices() const { return _vertices; }
-
 private:
-    struct Edge {
-        uint16_t toIndex { 0 };
-        float length { 0 };
-
-        Edge(uint16_t toIndex, float length);
+    struct ContextVertex {
+        uint16_t index { 0 };
+        uint16_t parentIndex { 0xffff };
+        float distance { 0.0f };
+        float heuristic { 0.0f };
+        float totalCost { 0.0f };
     };
 
-    struct FindPathContext {
-        std::map<uint16_t, std::pair<uint16_t, float>> fromToDistance;
-        std::set<uint16_t> visited;
-        std::queue<uint16_t> queue;
+    struct Context {
+        std::unordered_map<uint16_t, ContextVertex> vertices;
+        std::set<uint16_t> open;
+        std::set<uint16_t> closed;
+
+        const ContextVertex &getVertexWithLeastTotalCostFromOpen() const;
     };
 
     std::vector<glm::vec3> _vertices;
-    std::unordered_map<uint16_t, std::vector<Edge>> _edges;
+    std::unordered_map<uint16_t, std::vector<uint16_t>> _adjacentVertices;
 
     uint16_t getNearestVertex(const glm::vec3 &point) const;
-    void visit(uint16_t index, FindPathContext &ctx) const;
 };
 
 } // namespace game

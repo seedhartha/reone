@@ -30,12 +30,20 @@ using namespace reone::game;
 using namespace reone::resource;
 
 BOOST_AUTO_TEST_CASE(PathFinder_FindPath) {
+    // Points:
+    //
+    // S 2 3
+    // 0 - 4
+    // 1 - 5
+    // - F -
+
     vector<Path::Point> points = {
-        { 1.0f, 1.0f, { 1, 2 } },
-        { 1.0f, 2.0f, { 0, 2 } },
-        { 2.0f, 2.0f, { 1, 3, 4 } },
-        { 3.0f, 2.0f, { 2, 4 } },
-        { 3.0f, 3.0f, { 2, 3 } }
+        { 0.0f, 1.0f, { 1 } }, // 0
+        { 0.0f, 2.0f, { 0 } }, // 1
+        { 1.0f, 0.0f, { 3 } }, // 2
+        { 2.0f, 0.0f, { 2, 4 } }, // 3
+        { 2.0f, 1.0f, { 3, 5 } }, // 4
+        { 2.0f, 2.0f, { 4 } } // 5
     };
     unordered_map<int, float> pointZ;
     for (int i = 0; i < points.size(); ++i) {
@@ -44,15 +52,14 @@ BOOST_AUTO_TEST_CASE(PathFinder_FindPath) {
     Pathfinder pathfinder;
     pathfinder.load(points, pointZ);
 
-    glm::vec3 from(glm::vec3(1.0f, 1.0f, 0.0f));
-    glm::vec3 to(glm::vec3(3.0f, 3.0f, 0.0f));
+    glm::vec3 from(glm::vec3(0.0f, 0.0f, 0.0f));
+    glm::vec3 to(glm::vec3(1.0f, 3.0f, 0.0f));
     vector<glm::vec3> path(pathfinder.findPath(from, to));
 
     bool found =
-        path.size() == 3 &&
-        path[0] == glm::vec3(1.0f, 1.0f, 0.0f) &&
-        path[1] == glm::vec3(2.0f, 2.0f, 0.0f) &&
-        path[2] == glm::vec3(3.0f, 3.0f, 0.0f);
+        path.size() == 2 &&
+        path[0] == glm::vec3(0.0f, 1.0f, 0.0f) &&
+        path[1] == glm::vec3(0.0f, 2.0f, 0.0f);
 
     BOOST_TEST(found);
 }
@@ -61,14 +68,14 @@ BOOST_AUTO_TEST_CASE(PathFinder_FindPath_NoPoints) {
     Pathfinder pathfinder;
     pathfinder.load({}, {});
 
-    glm::vec3 from(glm::vec3(1.0f, 1.0f, 0.0f));
-    glm::vec3 to(glm::vec3(3.0f, 3.0f, 0.0f));
+    glm::vec3 from(glm::vec3(0.0f, 0.0f, 0.0f));
+    glm::vec3 to(glm::vec3(1.0f, 1.0f, 0.0f));
     vector<glm::vec3> path(pathfinder.findPath(from, to));
 
     bool found =
         path.size() == 2 &&
-        path[0] == glm::vec3(1.0f, 1.0f, 0.0f) &&
-        path[1] == glm::vec3(3.0f, 3.0f, 0.0f);
+        path[0] == glm::vec3(0.0f, 0.0f, 0.0f) &&
+        path[1] == glm::vec3(1.0f, 1.0f, 0.0f);
 
     BOOST_TEST(found);
 }

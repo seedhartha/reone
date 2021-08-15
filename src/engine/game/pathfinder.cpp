@@ -25,7 +25,19 @@ namespace reone {
 
 namespace game {
 
-Pathfinder::Edge::Edge(uint16_t toIndex, float length) : toIndex(toIndex), length(length) {
+const Pathfinder::ContextVertex &Pathfinder::Context::getVertexWithLeastTotalCostFromOpen() const {
+    uint16_t bestIdx = 0xffff;
+    float bestTotalCost = numeric_limits<float>().max();
+
+    for (uint16_t idx : open) {
+        const ContextVertex &vert = vertices.find(idx)->second;
+        if (bestIdx == 0xffff || vert.totalCost < bestTotalCost) {
+            bestIdx = idx;
+            bestTotalCost = vert.totalCost;
+        }
+    }
+
+    return vertices.find(bestIdx)->second;
 }
 
 void Pathfinder::load(const vector<Path::Point> &points, const unordered_map<int, float> &pointZ) {
@@ -37,48 +49,85 @@ void Pathfinder::load(const vector<Path::Point> &points, const unordered_map<int
         glm::vec3 adjPointVec;
         for (auto &adjPointIdx : point.adjPoints) {
             const Path::Point &adjPoint = points[adjPointIdx];
-            adjPointVec = glm::vec3(adjPoint.x, adjPoint.y, pointZ.find(adjPointIdx)->second);
-            float distance = glm::distance2(pointVec, adjPointVec);
-            _edges[i].push_back({ static_cast<uint16_t>(adjPointIdx), distance });
+            _adjacentVertices[i].push_back(static_cast<uint16_t>(adjPointIdx));
         }
     }
 }
 
 const vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::vec3 &to) const {
+    // When there are no vertices, return a path of start and end points
     if (_vertices.empty()) {
         return vector<glm::vec3> { from, to };
     }
+
+    // Find vertices nearest to start and end points
     uint16_t fromIdx = getNearestVertex(from);
     uint16_t toIdx = getNearestVertex(to);
 
+    // When start and end point have a common nearest vertex, return a path of start and end point
     if (fromIdx == toIdx) {
         return vector<glm::vec3> { from, to };
     }
-    FindPathContext ctx;
-    ctx.fromToDistance = { { fromIdx, make_pair(fromIdx, 0.0f) } };
-    ctx.queue.push(fromIdx);
 
-    while (!ctx.queue.empty()) {
-        uint16_t idx = ctx.queue.front();
-        ctx.queue.pop();
-        visit(idx, ctx);
+    Context ctx;
+
+    // Add vertex, nearest to start point, to open list
+    ContextVertex fromVert;
+    fromVert.index = fromIdx;
+    ctx.vertices.insert(make_pair(fromIdx, fromVert));
+    ctx.open.insert(fromIdx);
+
+    while (!ctx.open.empty()) {
+        // Extract vertex with least total cost from open list
+        const ContextVertex &current = ctx.getVertexWithLeastTotalCostFromOpen();
+        ctx.open.erase(current.index);
+
+        // Add current vertex to closed list
+        ctx.closed.insert(current.index);
+
+        // Reconstruct path if current vertex is nearest to end point
+        if (current.index == toIdx) {
+            vector<glm::vec3> path;
+            uint16_t idx = current.index;
+            do {
+                const ContextVertex &vert = ctx.vertices.find(idx)->second;
+                path.push_back(_vertices[vert.index]);
+                idx = vert.parentIndex;
+            } while (idx != 0xffff);
+            reverse(path.begin(), path.end());
+            return move(path);
+        }
+
+        // Skip current vertex if it has no adjacent vertices
+        auto maybeAdjVerts = _adjacentVertices.find(current.index);
+        if (maybeAdjVerts == _adjacentVertices.end()) continue;
+
+        for (auto &adjVertIdx : maybeAdjVerts->second) {
+            // Skip adjacent vertex if it is present in closed list
+            if (ctx.closed.count(adjVertIdx) > 0) continue;
+
+            ContextVertex child;
+            child.index = adjVertIdx;
+            child.parentIndex = current.index;
+            child.distance = current.distance + glm::distance2(_vertices[current.index], _vertices[adjVertIdx]);
+            child.heuristic = glm::distance2(_vertices[child.index], _vertices[toIdx]);
+            child.totalCost = child.distance + child.heuristic;
+
+            // Do nothing if adjacent vertex is present in open list and computed distance is greater
+            auto maybeOpenAdjVert = ctx.open.find(adjVertIdx);
+            if (maybeOpenAdjVert != ctx.open.end()) {
+                const ContextVertex &openAdjVert = ctx.vertices.find(*maybeOpenAdjVert)->second;
+                if (child.distance > openAdjVert.distance) continue;
+            }
+
+            // Insert or update adjacent vertex in open list
+            ctx.vertices.insert(make_pair(adjVertIdx, child));
+            ctx.open.insert(adjVertIdx);
+        }
     }
-    if (ctx.fromToDistance.find(toIdx) == ctx.fromToDistance.end()) {
-        return vector<glm::vec3> { from, to };
-    }
 
-    uint16_t idx = toIdx;
-    vector<glm::vec3> path;
-
-    while (true) {
-        path.insert(path.begin(), _vertices[idx]);
-        if (idx == fromIdx) break;
-
-        auto &pair = ctx.fromToDistance[idx];
-        idx = pair.first;
-    }
-
-    return move(path);
+    // Return a path of start and end points by default
+    return vector<glm::vec3> { from, to };
 }
 
 uint16_t Pathfinder::getNearestVertex(const glm::vec3 &point) const {
@@ -95,27 +144,6 @@ uint16_t Pathfinder::getNearestVertex(const glm::vec3 &point) const {
     }
 
     return index;
-}
-
-void Pathfinder::visit(uint16_t index, FindPathContext &ctx) const {
-    if (ctx.visited.find(index) != ctx.visited.end()) return;
-
-    float dist = ctx.fromToDistance[index].second;
-
-    auto edges = _edges.find(index);
-    if (edges != _edges.end()) {
-        for (auto &edge : edges->second) {
-            auto it = ctx.fromToDistance.find(edge.toIndex);
-            if (it == ctx.fromToDistance.end() || it->second.second > dist + edge.length) {
-                ctx.fromToDistance[edge.toIndex] = make_pair(index, dist + edge.length);
-            }
-            if (ctx.visited.find(edge.toIndex) == ctx.visited.end()) {
-                ctx.queue.push(edge.toIndex);
-            }
-        }
-    }
-
-    ctx.visited.insert(index);
 }
 
 } // namespace game
