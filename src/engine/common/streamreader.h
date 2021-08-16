@@ -41,9 +41,9 @@ public:
     int64_t getInt64();
     float getFloat();
     double getDouble();
-    std::string getCString();
     std::string getString(int len);
-    std::u16string getNullTerminatedUTF16String();
+    std::string getNullTerminatedString();
+    std::u16string getNullTerminatedStringUTF16();
     ByteArray getBytes(int count);
 
     bool eof() const;

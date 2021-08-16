@@ -806,13 +806,7 @@ bool Game::isKotOR() const {
 }
 
 bool Game::isTSL() const {
-    switch (_gameId) {
-        case GameID::TSL:
-        case GameID::TSL_Steam:
-            return true;
-        default:
-            return false;
-    }
+    return _gameId == GameID::TSL;
 }
 
 bool Game::getGlobalBoolean(const string &name) const {

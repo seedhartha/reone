@@ -56,12 +56,16 @@ private:
     std::vector<Resource> _resources;
 
     void doLoad() override;
+
     void loadHeader();
     void loadOptionalHeader();
     void loadSection();
     void loadResourceDir(const Section &section, int level = 0);
     void loadResourceDirEntry(const Section &section, int level = 0);
     void loadResourceDataEntry(const Section &section);
+
+    std::shared_ptr<ByteArray> findInternal(std::function<bool(const Resource &)> pred);
+
     std::shared_ptr<ByteArray> getResourceData(const Resource &res);
 };
 

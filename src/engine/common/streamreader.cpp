@@ -107,13 +107,6 @@ double StreamReader::getDouble() {
     return *reinterpret_cast<double *>(&val);
 }
 
-string StreamReader::getCString() {
-    stringbuf ss;
-    _stream->get(ss, '\0');
-    _stream->seekg(1, ios::cur);
-    return ss.str();
-}
-
 string StreamReader::getString(int len) {
     string val;
     val.resize(len);
@@ -121,7 +114,14 @@ string StreamReader::getString(int len) {
     return move(val);
 }
 
-u16string StreamReader::getNullTerminatedUTF16String() {
+string StreamReader::getNullTerminatedString() {
+    stringbuf ss;
+    _stream->get(ss, '\0');
+    _stream->seekg(1, ios::cur);
+    return ss.str();
+}
+
+u16string StreamReader::getNullTerminatedStringUTF16() {
     basic_stringstream<char16_t> ss;
 
     char16_t ch;

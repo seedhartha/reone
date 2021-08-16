@@ -138,7 +138,7 @@ string BinaryReader::readCStringAt(size_t off) {
     size_t pos = _reader->tell();
     _reader->seek(off);
 
-    string result(_reader->getCString());
+    string result(_reader->getNullTerminatedString());
     _reader->seek(pos);
 
     return move(result);

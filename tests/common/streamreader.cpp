@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(StreamReader_GetLE) {
     BOOST_TEST((reader.getUint64() == 10000000000u));
     BOOST_TEST((reader.getInt32() == -100000));
     BOOST_TEST((reader.getFloat() == 1.0f));
-    BOOST_TEST((reader.getCString() == "abc"));
+    BOOST_TEST((reader.getNullTerminatedString() == "abc"));
     BOOST_TEST((reader.getString(3) == "def"));
 }
 
@@ -52,8 +52,8 @@ BOOST_AUTO_TEST_CASE(StreamReader_GetBE) {
     BOOST_TEST((reader.getFloat() == 1.0f));
 }
 
-BOOST_AUTO_TEST_CASE(StreamReader_GetNullTerminatedUTF16String) {
+BOOST_AUTO_TEST_CASE(StreamReader_GetNullTerminatedStringUTF16) {
     auto stream = make_shared<istringstream>(string("\x56\x00\x53\x00\x5f\x00\x56\x00\x45\x00\x52\x00\x53\x00\x49\x00\x4f\x00\x4e\x00\x5f\x00\x49\x00\x4e\x00\x46\x00\x4f\x00\x00\x00", 32));
     StreamReader reader(stream);
-    BOOST_TEST((reader.getNullTerminatedUTF16String() == u"VS_VERSION_INFO"));
+    BOOST_TEST((reader.getNullTerminatedStringUTF16() == u"VS_VERSION_INFO"));
 }
