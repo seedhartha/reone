@@ -90,21 +90,21 @@ private:
                 return make_unique<KotOR>(gameId, _gamePath, _options, resource, graphics, audio, scene, script);
             case GameID::TSL:
                 return make_unique<TSL>(gameId, _gamePath, _options, resource, graphics, audio, scene, script);
-            case GameID::TSL_Steam:
-                return make_unique<TSL>(gameId, _gamePath, _options, resource, graphics, audio, scene, script);
+            default:
+                throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(gameId)));
         }
     }
 
     GameID determineGameID() const {
-        // If there is no swkotor2 executable, then this is KotOR
-        fs::path exePath(getPathIgnoreCase(_gamePath, "swkotor2.exe", false));
-        if (exePath.empty()) return GameID::KotOR;
+        // If there is a KotOR executable then game is KotOR
+        fs::path exePathK1(getPathIgnoreCase(_gamePath, "swkotor.exe", false));
+        if (!exePathK1.empty()) return GameID::KotOR;
 
-        // If there is a "steam_api.dll" file, then this is a Steam version of TSL
-        fs::path dllPath(getPathIgnoreCase(_gamePath, "steam_api.dll", false));
-        if (!dllPath.empty()) return GameID::TSL_Steam;
+        // If there is a TSL executable then game is TSL
+        fs::path exePathK2(getPathIgnoreCase(_gamePath, "swkotor2.exe", false));
+        if (!exePathK2.empty()) return GameID::TSL;
 
-        return GameID::TSL;
+        throw logic_error("Unable to determine game ID: " + _gamePath.string());
     }
 };
 

@@ -32,14 +32,16 @@ PEReader::PEReader() : BinaryReader(2, "MZ") {
 }
 
 shared_ptr<ByteArray> PEReader::find(uint32_t name, PEResourceType type) {
-    auto resource = find_if(
-        _resources.begin(),
-        _resources.end(),
-        [&name, &type](const Resource &res) { return res.type == type && res.name == name; });
+    return findInternal([&name, &type](const Resource &res) {
+        return res.type == type && res.name == name;
+    });
+}
 
-    if (resource == _resources.end()) return nullptr;
+shared_ptr<ByteArray> PEReader::findInternal(function<bool(const Resource &)> pred) {
+    auto maybeResource = find_if(_resources.begin(), _resources.end(), pred);
+    if (maybeResource == _resources.end()) return nullptr;
 
-    return getResourceData(*resource);
+    return getResourceData(*maybeResource);
 }
 
 shared_ptr<ByteArray> PEReader::getResourceData(const Resource &res) {

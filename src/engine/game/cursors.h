@@ -53,9 +53,10 @@ private:
 
     std::unordered_map<CursorType, std::shared_ptr<graphics::Cursor>> _cache;
 
-    const std::pair<uint32_t, uint32_t> &getCursorNames(CursorType type);
-    const std::pair<uint32_t, uint32_t> &getCursorNames(CursorType type, const std::unordered_map<CursorType, std::pair<uint32_t, uint32_t>> &nameByResRef);
-    std::shared_ptr<graphics::Texture> newTexture(uint32_t name);
+    std::shared_ptr<graphics::Texture> newTextureFromCursor(uint32_t name);
+
+    const std::pair<uint32_t, uint32_t> &getCursorGroupNames(CursorType type);
+    std::vector<uint32_t> getCursorNamesFromCursorGroup(uint32_t name);
 };
 
 } // namespace game

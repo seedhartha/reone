@@ -33,24 +33,14 @@ namespace reone {
 
 namespace game {
 
-static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_namesByResRefKotorTsl = {
-    { CursorType::Default, { 4, 5 } },
-    { CursorType::Talk, { 14, 15 } },
-    { CursorType::Door, { 26, 27 } },
-    { CursorType::Pickup, { 28, 29 } },
-    { CursorType::DisableMine, { 36, 37 } },
-    { CursorType::RecoverMine, { 40, 41 } },
-    { CursorType::Attack, { 54, 55 } }
-};
-
-static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_namesByResRefSteamTsl = {
-    { CursorType::Default, { 3, 4 } },
-    { CursorType::Talk, { 13, 14 } },
-    { CursorType::Door, { 25, 26 } },
-    { CursorType::Pickup, { 27, 28 } },
-    { CursorType::DisableMine, { 35, 36 } },
-    { CursorType::RecoverMine, { 39, 40 } },
-    { CursorType::Attack, { 53, 54 } }
+static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_groupNamesByType {
+    { CursorType::Default, { 1, 2 } },
+    { CursorType::Talk, { 11, 12 } },
+    { CursorType::Door, { 23, 24 } },
+    { CursorType::Pickup, { 25, 26 } },
+    { CursorType::DisableMine, { 33, 34 } },
+    { CursorType::RecoverMine, { 37, 38 } },
+    { CursorType::Attack, { 51, 52 } }
 };
 
 Cursors::Cursors(GameID gameId, GraphicsServices &graphics, ResourceServices &resource) :
@@ -69,39 +59,51 @@ void Cursors::deinit() {
 
 shared_ptr<Cursor> Cursors::get(CursorType type) {
     auto maybeCursor = _cache.find(type);
-    if (maybeCursor != _cache.end()) {
-        return maybeCursor->second;
-    }
-    const pair<uint32_t, uint32_t> &names = getCursorNames(type);
-    shared_ptr<Texture> up(newTexture(names.first));
-    shared_ptr<Texture> down(newTexture(names.second));
+    if (maybeCursor != _cache.end()) return maybeCursor->second;
 
-    auto cursor = make_shared<Cursor>(up, down, _graphics);
+    const pair<uint32_t, uint32_t> &groupNames = getCursorGroupNames(type);
+    vector<uint32_t> cursorNamesUp(getCursorNamesFromCursorGroup(groupNames.first));
+    vector<uint32_t> cursorNamesDown(getCursorNamesFromCursorGroup(groupNames.second));
+    shared_ptr<Texture> textureUp(newTextureFromCursor(cursorNamesUp.back()));
+    shared_ptr<Texture> textureDown(newTextureFromCursor(cursorNamesDown.back()));
+
+    auto cursor = make_shared<Cursor>(textureUp, textureDown, _graphics);
     auto inserted = _cache.insert(make_pair(type, cursor));
 
     return inserted.first->second;
 }
 
-const pair<uint32_t, uint32_t> &Cursors::getCursorNames(CursorType type) {
-    auto &nameByResRef = (_gameId == GameID::TSL_Steam) ? g_namesByResRefSteamTsl : g_namesByResRefKotorTsl;
-    return getCursorNames(type, nameByResRef);
-}
-
-const pair<uint32_t, uint32_t> &Cursors::getCursorNames(CursorType type, const unordered_map<CursorType, pair<uint32_t, uint32_t>> &nameByResRef) {
-    auto maybeName = nameByResRef.find(type);
-    if (maybeName == nameByResRef.end()) {
-        throw logic_error("Cursor names not found by type " + to_string(static_cast<int>(type)));
+const pair<uint32_t, uint32_t> &Cursors::getCursorGroupNames(CursorType type) {
+    auto maybeGroupNames = g_groupNamesByType.find(type);
+    if (maybeGroupNames == g_groupNamesByType.end()) {
+        throw logic_error("Cursor groups not found by type " + to_string(static_cast<int>(type)));
     }
-    return maybeName->second;
+    return maybeGroupNames->second;
 }
 
-shared_ptr<Texture> Cursors::newTexture(uint32_t name) {
-    shared_ptr<ByteArray> data(_resource.resources().getFromExe(name, PEResourceType::Cursor));
+vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
+    shared_ptr<ByteArray> bytes(_resource.resources().getFromExe(name, PEResourceType::CursorGroup));
+    StreamReader reader(wrap(bytes));
+    reader.ignore(4); // Reserved, ResType
+    uint16_t resCount = reader.getUint16();
 
-    CurReader curFile;
-    curFile.load(wrap(data));
+    vector<uint32_t> cursorNames;
+    for (uint16_t i = 0; i < resCount; ++i) {
+        reader.ignore(12); // Cursor, Planes, BitCount, BytesInRes
+        uint16_t cursorId = reader.getUint16();
+        cursorNames.push_back(static_cast<uint32_t>(cursorId));
+    }
 
-    return curFile.texture();
+    return move(cursorNames);
+}
+
+shared_ptr<Texture> Cursors::newTextureFromCursor(uint32_t name) {
+    shared_ptr<ByteArray> bytes(_resource.resources().getFromExe(name, PEResourceType::Cursor));
+
+    CurReader cur;
+    cur.load(wrap(bytes));
+
+    return cur.texture();
 }
 
 } // namespace game
