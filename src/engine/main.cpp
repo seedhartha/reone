@@ -16,7 +16,7 @@
  */
 
 #include "common/log.h"
-#include "program.h"
+#include "engine.h"
 
 using namespace std;
 
@@ -24,7 +24,7 @@ using namespace reone;
 
 int main(int argc, char **argv) {
     try {
-        return runProgram(argc, argv);
+        return runEngine(argc, argv);
     }
     catch (const exception &ex) {
         try {

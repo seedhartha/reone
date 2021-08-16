@@ -30,7 +30,6 @@ namespace game {
 class KotOR : public Game {
 public:
     KotOR(
-        GameID gameId,
         boost::filesystem::path path,
         Options options,
         resource::ResourceServices &resource,

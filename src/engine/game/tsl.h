@@ -30,7 +30,6 @@ namespace game {
 class TSL : public Game {
 public:
     TSL(
-        GameID gameId,
         boost::filesystem::path path,
         Options options,
         resource::ResourceServices &resource,

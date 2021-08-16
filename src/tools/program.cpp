@@ -71,6 +71,7 @@ public:
 
     int run() {
         initOptions();
+        parseOptions();
         loadOptions();
         loadTools();
 
@@ -96,13 +97,14 @@ private:
     int _argc;
     char **_argv;
 
-    boost::program_options::options_description _optsCmdLine { "Usage" };
+    po::options_description _optsCmdLine { "Usage" };
+    po::variables_map _variables;
 
-    boost::filesystem::path _gamePath;
-    boost::filesystem::path _destPath;
+    fs::path _gamePath;
+    fs::path _destPath;
     std::string _target;
     Operation _operation { Operation::None };
-    std::vector<std::shared_ptr<ITool>> _tools;
+    vector<shared_ptr<ITool>> _tools;
 
     void initOptions() {
         _optsCmdLine.add_options()
@@ -125,7 +127,7 @@ private:
             ("target", po::value<string>(), "target name or path to input file");
     }
 
-    void loadOptions() {
+    void parseOptions() {
         po::positional_options_description positional;
         positional.add("target", 1);
 
@@ -134,17 +136,18 @@ private:
             .positional(positional)
             .run();
 
-        po::variables_map vars;
-        po::store(parsedCmdLineOpts, vars);
-        po::notify(vars);
+        po::store(parsedCmdLineOpts, _variables);
+        po::notify(_variables);
+    }
 
-        _gamePath = vars.count("game") > 0 ? vars["game"].as<string>() : fs::current_path();
-        _destPath = getDestination(vars);
-        _target = vars.count("target") > 0 ? vars["target"].as<string>() : "";
+    void loadOptions() {
+        _gamePath = _variables.count("game") > 0 ? _variables["game"].as<string>() : fs::current_path();
+        _destPath = getDestination(_variables);
+        _target = _variables.count("target") > 0 ? _variables["target"].as<string>() : "";
 
         // Determine operation from program options
         for (auto &operation : g_operations) {
-            if (vars.count(operation.first)) {
+            if (_variables.count(operation.first)) {
                 _operation = operation.second;
                 break;
             }
@@ -168,7 +171,7 @@ private:
         _tools.push_back(make_shared<AudioTool>());
     }
 
-    std::shared_ptr<ITool> getTool() const {
+    shared_ptr<ITool> getTool() const {
         for (auto &tool : _tools) {
             if (tool->supports(_operation, _target)) return tool;
         }

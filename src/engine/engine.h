@@ -17,17 +17,15 @@
 
 #pragma once
 
-#include "game/options.h"
-
 namespace reone {
 
 /**
  * Creates and runs an instance of Engine.
  *
- * @param gamePath path to the game directory
- * @param options game options
+ * @param argc number of command line arguments
+ * @param argv array of command line arguments
  * @return exit code
  */
-int runEngine(boost::filesystem::path gamePath, game::Options options);
+int runEngine(int argc, char **argv);
 
 } // namespace reone
