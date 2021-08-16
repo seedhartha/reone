@@ -675,13 +675,11 @@ target_precompile_headers(libgame PRIVATE src/engine/pch.h)
 
 set(REONE_HEADERS
     src/engine/engine.h
-    src/engine/pch.h
-    src/engine/program.h)
+    src/engine/pch.h)
 
 set(REONE_SOURCES
     src/engine/engine.cpp
-    src/engine/main.cpp
-    src/engine/program.cpp)
+    src/engine/main.cpp)
 
 if(WIN32)
     list(APPEND REONE_SOURCES res/reone.rc)

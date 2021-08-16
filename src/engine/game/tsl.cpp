@@ -38,7 +38,6 @@ static constexpr char kLocalizationLipFilename[] = "localization";
 static constexpr char kExeFilename[] = "swkotor2.exe";
 
 TSL::TSL(
-    GameID gameId,
     fs::path path,
     Options options,
     ResourceServices &resource,
@@ -47,7 +46,7 @@ TSL::TSL(
     SceneServices &scene,
     ScriptServices &script
 ) : Game(
-    gameId,
+    GameID::TSL,
     move(path),
     move(options),
     resource, graphics, audio, scene, script

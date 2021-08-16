@@ -40,7 +40,6 @@ static constexpr char kExeFilename[] = "swkotor.exe";
 static vector<string> g_nonTransientLipFiles { "global.mod", "localization.mod" };
 
 KotOR::KotOR(
-    GameID gameId,
     fs::path path,
     Options options,
     ResourceServices &resource,
@@ -49,7 +48,7 @@ KotOR::KotOR(
     SceneServices &scene,
     ScriptServices &script
 ) : Game(
-    gameId,
+    GameID::KotOR,
     move(path),
     move(options),
     resource, graphics, audio, scene, script
