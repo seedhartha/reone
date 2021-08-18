@@ -84,6 +84,7 @@ void GameServices::init() {
 
     _party = make_unique<Party>(_game);
     _combat = make_unique<Combat>(_game, _scene);
+    _actionFactory = make_unique<ActionFactory>(_game);
 }
 
 } // namespace game

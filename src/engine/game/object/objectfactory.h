@@ -58,6 +58,11 @@ public:
 
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
+    template <class T>
+    std::shared_ptr<T> getObjectById(uint32_t id) const {
+        return std::dynamic_pointer_cast<T>(getObjectById(id));
+    }
+
 private:
     Game &_game;
     scene::SceneGraph &_sceneGraph;

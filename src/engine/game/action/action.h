@@ -23,15 +23,15 @@ namespace reone {
 
 namespace game {
 
+class Creature;
+class Game;
+class Object;
+
 class Action : boost::noncopyable {
 public:
-    Action(ActionType type, bool userAction = false) :
-        _type(type),
-        _userAction(userAction) {
-    }
-
     virtual ~Action() = default;
 
+    virtual void execute(Object &actor, float dt);
     void complete() { _completed = true; }
 
     bool isCompleted() const { return _completed; }
@@ -40,9 +40,20 @@ public:
     ActionType type() const { return _type; }
 
 protected:
-    ActionType _type { ActionType::QueueEmpty };
+    const float kDefaultMaxObjectDistance = 2.0f;
+    const float kDistanceWalk = 4.0f;
+
+    Game &_game;
+    ActionType _type;
+    bool _userAction;
+    
     bool _completed { false };
-    bool _userAction { false };
+
+    Action(Game &game, ActionType type, bool userAction = false) :
+        _game(game),
+        _type(type),
+        _userAction(userAction) {
+    }
 };
 
 } // namespace game

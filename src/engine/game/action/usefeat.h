@@ -25,10 +25,12 @@ namespace game {
 
 class UseFeatAction : public ObjectAction {
 public:
-    UseFeatAction(std::shared_ptr<Object> object, FeatType feat) :
-        ObjectAction(ActionType::UseFeat, move(object)),
+    UseFeatAction(Game &game, std::shared_ptr<Object> object, FeatType feat) :
+        ObjectAction(game, ActionType::UseFeat, std::move(object)),
         _feat(feat) {
     }
+
+    void execute(Object &actor, float dt) override;
 
     FeatType feat() const { return _feat; }
 

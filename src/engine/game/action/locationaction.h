@@ -27,15 +27,15 @@ class Location;
 
 class LocationAction : public Action {
 public:
-    LocationAction(ActionType type, const std::shared_ptr<Location> &location) :
-        Action(type),
-        _location(location) {
-    }
-
     std::shared_ptr<Location> location() const { return _location; }
 
-private:
+protected:
     std::shared_ptr<Location> _location;
+
+    LocationAction(Game &game, ActionType type, const std::shared_ptr<Location> &location) :
+        Action(game, type),
+        _location(location) {
+    }
 };
 
 } // namespace game

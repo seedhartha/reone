@@ -25,10 +25,12 @@ namespace game {
 
 class MoveToPointAction : public Action {
 public:
-    MoveToPointAction(glm::vec3 point) :
-        Action(ActionType::MoveToPoint),
+    MoveToPointAction(Game &game, glm::vec3 point) :
+        Action(game, ActionType::MoveToPoint),
         _point(std::move(point)) {
     }
+
+    void execute(Object &actor, float dt) override;
 
     const glm::vec3 &point() const { return _point; }
 

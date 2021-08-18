@@ -29,20 +29,20 @@ class Object;
 
 class ObjectAction : public Action {
 public:
-    ObjectAction(ActionType type, std::shared_ptr<Object> object, float range = 1.0f, bool userAction = false) :
-        Action(type, userAction),
-        _object(object),
-        _range(range) {
-
-        ensureNotNull(object, "object");
-    }
-
     std::shared_ptr<Object> object() const { return _object; }
     float range() const { return _range; }
 
 protected:
     std::shared_ptr<Object> _object;
     float _range;
+
+    ObjectAction(Game &game, ActionType type, std::shared_ptr<Object> object, float range = 1.0f, bool userAction = false) :
+        Action(game, type, userAction),
+        _object(object),
+        _range(range) {
+
+        ensureNotNull(object, "object");
+    }
 };
 
 } // namespace game

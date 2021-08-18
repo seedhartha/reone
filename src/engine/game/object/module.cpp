@@ -20,6 +20,10 @@
 #include "../../common/log.h"
 #include "../../resource/resources.h"
 
+#include "../action/attack.h"
+#include "../action/opencontainer.h"
+#include "../action/opendoor.h"
+#include "../action/startconversation.h"
 #include "../game.h"
 #include "../reputes.h"
 
@@ -216,16 +220,16 @@ void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
     if (creature->isDead()) {
         if (!creature->items().empty()) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(make_unique<ObjectAction>(ActionType::OpenContainer, creature));
+            partyLeader->addAction(_game->services().actionFactory().newOpenContainer(creature));
         }
     } else {
         bool isEnemy = _game->services().reputes().getIsEnemy(*partyLeader, *creature);
         if (isEnemy) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(make_unique<ObjectAction>(ActionType::AttackObject, creature));
+            partyLeader->addAction(_game->services().actionFactory().newAttack(creature));
         } else if (!creature->conversation().empty()) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(make_unique<StartConversationAction>(creature, creature->conversation()));
+            partyLeader->addAction(_game->services().actionFactory().newStartConversation(creature, creature->conversation()));
         }
     }
 }
@@ -238,7 +242,7 @@ void Module::onDoorClick(const shared_ptr<Door> &door) {
     if (!door->isOpen()) {
         shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
         partyLeader->clearAllActions();
-        partyLeader->addAction(make_unique<ObjectAction>(ActionType::OpenDoor, door));
+        partyLeader->addAction(_game->services().actionFactory().newOpenDoor(door));
     }
 }
 
@@ -247,10 +251,10 @@ void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
 
     if (placeable->hasInventory()) {
         partyLeader->clearAllActions();
-        partyLeader->addAction(make_unique<ObjectAction>(ActionType::OpenContainer, placeable));
+        partyLeader->addAction(_game->services().actionFactory().newOpenContainer(placeable));
     } else if (!placeable->conversation().empty()) {
         partyLeader->clearAllActions();
-        partyLeader->addAction(make_unique<StartConversationAction>(placeable, placeable->conversation()));
+        partyLeader->addAction(_game->services().actionFactory().newStartConversation(placeable, placeable->conversation()));
     } else {
         placeable->runOnUsed(move(partyLeader));
     }

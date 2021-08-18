@@ -50,8 +50,16 @@ namespace reone {
 namespace game {
 
 static constexpr int kStrRefRemains = 38151;
+static constexpr float kKeepPathDuration = 1000.0f;
 
 static string g_talkDummyNode("talkdummy");
+
+void Creature::Path::selectNextPoint() {
+    size_t pointCount = points.size();
+    if (pointIdx < pointCount) {
+        pointIdx++;
+    }
+}
 
 Creature::Creature(
     uint32_t id,
@@ -165,7 +173,7 @@ void Creature::updateModelAnimation() {
 
     if (_animAction) {
         _animAction->complete();
-        _animAction.reset();
+        _animAction = nullptr;
     }
 
     shared_ptr<Animation> anim;
@@ -218,7 +226,7 @@ void Creature::clearAllActions() {
     setMovementType(MovementType::None);
 }
 
-void Creature::playAnimation(AnimationType type, AnimationProperties properties, shared_ptr<PlayAnimationAction> actionToComplete) {
+void Creature::playAnimation(AnimationType type, AnimationProperties properties, PlayAnimationAction *actionToComplete) {
     // If animation is looping by type and action duration is -1.0, set flags accordingly
     bool looping = isAnimationLooping(type) && (!actionToComplete || actionToComplete->duration() == -1.0f);
     if (looping) {
@@ -232,10 +240,10 @@ void Creature::playAnimation(AnimationType type, AnimationProperties properties,
     }
     if (animName.empty()) return;
 
-    playAnimation(animName, move(properties), move(actionToComplete));
+    playAnimation(animName, move(properties), actionToComplete);
 }
 
-void Creature::playAnimation(const string &name, AnimationProperties properties, shared_ptr<Action> actionToComplete) {
+void Creature::playAnimation(const string &name, AnimationProperties properties, Action *actionToComplete) {
     bool fireForget = !(properties.flags & AnimationFlags::loop);
 
     doPlayAnimation(fireForget, [&]() {
@@ -662,6 +670,77 @@ void Creature::giveGold(int amount) {
 
 void Creature::takeGold(int amount) {
     _gold -= amount;
+}
+
+bool Creature::navigateTo(const glm::vec3 &dest, bool run, float distance, float dt) {
+    if (_movementRestricted) return false;
+
+    float distToDest2 = getDistanceTo2(glm::vec2(dest));
+    if (distToDest2 <= distance * distance) {
+        setMovementType(Creature::MovementType::None);
+        clearPath();
+        return true;
+    }
+
+    bool updPath = true;
+    if (_path) {
+        uint32_t now = SDL_GetTicks();
+        if (_path->destination == dest || now - _path->timeFound <= kKeepPathDuration) {
+            advanceOnPath(run, dt);
+            updPath = false;
+        }
+    }
+    if (updPath) {
+        updatePath(dest);
+    }
+
+    return false;
+}
+
+void Creature::advanceOnPath(bool run, float dt) {
+    const glm::vec3 &origin = _position;
+    size_t pointCount = _path->points.size();
+    glm::vec3 dest;
+    float distToDest;
+
+    if (_path->pointIdx == pointCount) {
+        dest = _path->destination;
+        distToDest = glm::distance2(origin, dest);
+
+    } else {
+        const glm::vec3 &nextPoint = _path->points[_path->pointIdx];
+        float distToNextPoint = glm::distance2(origin, nextPoint);
+        float distToPathDest = glm::distance2(origin, _path->destination);
+
+        if (distToPathDest < distToNextPoint) {
+            dest = _path->destination;
+            distToDest = distToPathDest;
+            _path->pointIdx = static_cast<int>(pointCount);
+
+        } else {
+            dest = nextPoint;
+            distToDest = distToNextPoint;
+        }
+    }
+
+    if (distToDest <= 1.0f) {
+        _path->selectNextPoint();
+    } else {
+        shared_ptr<Creature> creature(_game->services().objectFactory().getObjectById<Creature>(_id));
+        if (_game->module()->area()->moveCreatureTowards(creature, dest, run, dt)) {
+            setMovementType(run ? Creature::MovementType::Run : Creature::MovementType::Walk);
+            setAppliedForce(glm::vec3(glm::normalize(glm::vec2(dest - origin)), 0.0f));
+        } else {
+            setMovementType(Creature::MovementType::None);
+            setAppliedForce(glm::vec3(0.0f));
+        }
+    }
+}
+
+void Creature::updatePath(const glm::vec3 &dest) {
+    vector<glm::vec3> points(_game->module()->area()->pathfinder().findPath(_position, dest));
+    uint32_t now = SDL_GetTicks();
+    setPath(dest, move(points), now);
 }
 
 } // namespace game

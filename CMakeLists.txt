@@ -422,14 +422,25 @@ target_precompile_headers(libscript PRIVATE src/engine/pch.h)
 
 set(GAME_HEADERS
     src/engine/game/action/action.h
+    src/engine/game/action/actionfactory.h
+    src/engine/game/action/attack.h
+    src/engine/game/action/closedoor.h
     src/engine/game/action/docommand.h
     src/engine/game/action/follow.h
+    src/engine/game/action/followleader.h
+    src/engine/game/action/jumptoobject.h
+    src/engine/game/action/jumptolocation.h
     src/engine/game/action/locationaction.h
     src/engine/game/action/movetolocation.h
     src/engine/game/action/movetoobject.h
     src/engine/game/action/movetopoint.h
     src/engine/game/action/objectaction.h
+    src/engine/game/action/opencontainer.h
+    src/engine/game/action/opendoor.h
+    src/engine/game/action/openlock.h
+    src/engine/game/action/pauseconversation.h
     src/engine/game/action/playanimation.h
+    src/engine/game/action/resumeconversation.h
     src/engine/game/action/startconversation.h
     src/engine/game/action/usefeat.h
     src/engine/game/action/useskill.h
@@ -536,7 +547,27 @@ set(GAME_HEADERS
     src/engine/game/types.h)
 
 set(GAME_SOURCES
-    src/engine/game/actionexecutor.cpp
+    src/engine/game/action/action.cpp
+    src/engine/game/action/attack.cpp
+    src/engine/game/action/closedoor.cpp
+    src/engine/game/action/docommand.cpp
+    src/engine/game/action/follow.cpp
+    src/engine/game/action/followleader.cpp
+    src/engine/game/action/jumptoobject.cpp
+    src/engine/game/action/jumptolocation.cpp
+    src/engine/game/action/movetolocation.cpp
+    src/engine/game/action/movetoobject.cpp
+    src/engine/game/action/movetopoint.cpp
+    src/engine/game/action/opencontainer.cpp
+    src/engine/game/action/opendoor.cpp
+    src/engine/game/action/openlock.cpp
+    src/engine/game/action/pauseconversation.cpp
+    src/engine/game/action/playanimation.cpp
+    src/engine/game/action/resumeconversation.cpp
+    src/engine/game/action/startconversation.cpp
+    src/engine/game/action/useskill.cpp
+    src/engine/game/action/usefeat.cpp
+    src/engine/game/action/wait.cpp
     src/engine/game/animationutil.cpp
     src/engine/game/camera/animated.cpp
     src/engine/game/camera/camera.cpp
