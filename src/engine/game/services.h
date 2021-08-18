@@ -23,6 +23,7 @@
 #include "../scene/services.h"
 #include "../script/services.h"
 
+#include "action/actionfactory.h"
 #include "combat/combat.h"
 #include "cursors.h"
 #include "d20/classes.h"
@@ -64,6 +65,7 @@ public:
     scene::SceneServices &scene() { return _scene; }
     script::ScriptServices &script() { return _script; }
 
+    ActionFactory &actionFactory() { return *_actionFactory; }
     Classes &classes() { return *_classes; }
     Combat &combat() { return *_combat; }
     Cursors &cursors() { return *_cursors; }
@@ -88,7 +90,8 @@ private:
     audio::AudioServices &_audio;
     scene::SceneServices &_scene;
     script::ScriptServices &_script;
-
+    
+    std::unique_ptr<ActionFactory> _actionFactory;
     std::unique_ptr<Classes> _classes;
     std::unique_ptr<Combat> _combat;
     std::unique_ptr<Cursors> _cursors;

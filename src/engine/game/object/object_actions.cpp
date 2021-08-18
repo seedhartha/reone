@@ -73,6 +73,13 @@ void Object::updateDelayedActions(float dt) {
     _delayed.erase(delayedToRemove, _delayed.end());
 }
 
+void Object::executeActions(float dt) {
+    if (_actions.empty()) return;
+
+    shared_ptr<Action> action(_actions.front());
+    action->execute(*this, dt);
+}
+
 bool Object::hasUserActionsPending() const {
     for (auto &action : _actions) {
         if (action->isUserAction()) return true;

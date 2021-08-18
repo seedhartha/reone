@@ -149,9 +149,10 @@ protected:
     // Actions
 
     void updateActions(float dt);
-
     void removeCompletedActions();
     void updateDelayedActions(float dt);
+
+    void executeActions(float dt);
 
     // END Actions
 };

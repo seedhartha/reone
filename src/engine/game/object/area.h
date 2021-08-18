@@ -23,7 +23,6 @@
 #include "../../resource/types.h"
 #include "../../scene/scenegraph.h"
 
-#include "../actionexecutor.h"
 #include "../camera/animated.h"
 #include "../camera/dialog.h"
 #include "../camera/firstperson.h"
@@ -41,10 +40,14 @@ namespace game {
 
 const float kHeartbeatInterval = 6.0f;
 
+class Creature;
+class Game;
+class Location;
+class Room;
+class SpatialObject;
+
 typedef std::unordered_map<std::string, std::shared_ptr<Room>> RoomMap;
 typedef std::vector<std::shared_ptr<SpatialObject>> ObjectList;
-
-class Game;
 
 class Area : public Object {
 public:
@@ -195,7 +198,6 @@ private:
         float probabilities[4];
     };
 
-    ActionExecutor _actionExecutor;
     Pathfinder _pathfinder;
     std::string _localizedName;
     RoomMap _rooms;

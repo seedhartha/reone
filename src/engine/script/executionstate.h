@@ -17,11 +17,11 @@
 
 #pragma once
 
+#include "variable.h"
+
 namespace reone {
 
 namespace script {
-
-struct Variable;
 
 class ScriptProgram;
 

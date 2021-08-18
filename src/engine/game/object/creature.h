@@ -57,6 +57,8 @@ public:
         std::vector<glm::vec3> points;
         uint32_t timeFound { 0 };
         int pointIdx { 0 };
+
+        void selectNextPoint();
     };
 
     struct BodyBag {
@@ -136,10 +138,10 @@ public:
 
     // Animation
 
-    void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties(), std::shared_ptr<PlayAnimationAction> actionToComplete = nullptr) override;
+    void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties(), PlayAnimationAction *actionToComplete = nullptr) override;
 
     void playAnimation(CombatAnimation anim, CreatureWieldType wield, int variant = 1);
-    void playAnimation(const std::string &name, scene::AnimationProperties properties = scene::AnimationProperties(), std::shared_ptr<Action> actionToComplete = nullptr);
+    void playAnimation(const std::string &name, scene::AnimationProperties properties = scene::AnimationProperties(), Action *actionToComplete = nullptr);
     void playAnimation(const std::shared_ptr<graphics::Animation> &anim, scene::AnimationProperties properties = scene::AnimationProperties());
 
     void updateModelAnimation();
@@ -163,8 +165,12 @@ public:
 
     // Pathfinding
 
-    void setPath(const glm::vec3 &dest, std::vector<glm::vec3> &&points, uint32_t timeFound);
+    bool navigateTo(const glm::vec3 &dest, bool run, float distance, float dt);
+    void advanceOnPath(bool run, float dt);
+    void updatePath(const glm::vec3 &dest);
+
     void clearPath();
+    void setPath(const glm::vec3 &dest, std::vector<glm::vec3> &&points, uint32_t timeFound);
 
     std::shared_ptr<Path> &path() { return _path; }
 
@@ -278,7 +284,7 @@ private:
 
     bool _animDirty { true };
     bool _animFireForget { false };
-    std::shared_ptr<Action> _animAction; /**< action to complete when animation is finished */
+    Action *_animAction { nullptr }; /**< action to complete when animation is finished */
     std::shared_ptr<graphics::LipAnimation> _lipAnimation;
 
     // END Animation

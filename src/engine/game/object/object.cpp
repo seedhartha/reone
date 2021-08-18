@@ -26,12 +26,21 @@ namespace reone {
 
 namespace game {
 
+static constexpr float kKeepPathDuration = 1000.0f;
+static constexpr float kDefaultMaxObjectDistance = 2.0f;
+static constexpr float kMaxConversationDistance = 4.0f;
+static constexpr float kDistanceWalk = 4.0f;
+
 Object::Object(uint32_t id, ObjectType type, Game *game) : _id(id), _type(type), _game(game) {
     ensureNotNull(game, "game");
 }
 
 void Object::update(float dt) {
     updateActions(dt);
+
+    if (!_dead) {
+        executeActions(dt);
+    }
 }
 
 bool Object::getLocalBoolean(int index) const {

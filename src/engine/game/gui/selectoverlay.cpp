@@ -29,6 +29,7 @@
 #include "../../graphics/window.h"
 #include "../../resource/resources.h"
 
+#include "../action/attack.h"
 #include "../action/usefeat.h"
 #include "../action/useskill.h"
 #include "../d20/feats.h"
@@ -122,13 +123,13 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     const ContextAction &action = slot.actions[slot.indexSelected];
     switch (action.type) {
         case ActionType::AttackObject:
-            leader->addAction(make_unique<ObjectAction>(ActionType::AttackObject, selectedObject, leader->getAttackRange(), true));
+            leader->addAction(_game->services().actionFactory().newAttack(selectedObject, leader->getAttackRange(), true));
             break;
         case ActionType::UseFeat:
-            leader->addAction(make_unique<UseFeatAction>(selectedObject, action.feat));
+            leader->addAction(_game->services().actionFactory().newUseFeat(selectedObject, action.feat));
             break;
         case ActionType::UseSkill:
-            leader->addAction(make_unique<UseSkillAction>(selectedObject, action.skill));
+            leader->addAction(_game->services().actionFactory().newUseSkill(selectedObject, action.skill));
             break;
         default:
             break;

@@ -19,6 +19,8 @@
 
 #include "../../common/log.h"
 
+#include "creature.h"
+
 using namespace std;
 
 namespace reone {

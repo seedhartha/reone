@@ -64,7 +64,6 @@ static bool g_debugPath = false;
 
 Area::Area(uint32_t id, Game *game) :
     Object(id, ObjectType::Area, game),
-    _actionExecutor(game),
     _map(game) {
 
     init();
@@ -367,18 +366,11 @@ void Area::update(float dt) {
     if (!_game->isPaused()) {
         Object::update(dt);
 
-        _actionExecutor.executeActions(_game->module()->area(), dt);
-
         for (auto &room : _rooms) {
             room.second->update(dt);
         }
-
         for (auto &object : _objects) {
             object->update(dt);
-
-            if (!object->isDead()) {
-                _actionExecutor.executeActions(object, dt);
-            }
         }
 
         updatePerception(dt);

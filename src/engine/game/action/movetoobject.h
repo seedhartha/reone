@@ -25,11 +25,13 @@ namespace game {
 
 class MoveToObjectAction : public ObjectAction {
 public:
-    MoveToObjectAction(std::shared_ptr<Object> object, bool run, float distance) :
-        ObjectAction(ActionType::MoveToObject, std::move(object)),
+    MoveToObjectAction(Game &game, std::shared_ptr<Object> object, bool run, float distance) :
+        ObjectAction(game, ActionType::MoveToObject, std::move(object)),
         _run(run),
         _distance(distance) {
     }
+
+    void execute(Object &actor, float dt) override;
 
     bool isRun() const { return _run; }
 

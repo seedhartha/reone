@@ -76,7 +76,7 @@ public:
 
     // Animation
 
-    virtual void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties(), std::shared_ptr<PlayAnimationAction> actionToComplete = nullptr);
+    virtual void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties(), PlayAnimationAction *actionToComplete = nullptr);
 
     // END Animation
 
