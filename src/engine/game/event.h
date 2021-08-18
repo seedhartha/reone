@@ -17,25 +17,21 @@
 
 #pragma once
 
-#include "../../script/enginetype.h"
+#include "../script/enginetype.h"
 
 namespace reone {
 
 namespace game {
 
-class Location : public script::EngineType  {
+class Event : public script::EngineType  {
 public:
-    Location(glm::vec3 position, float facing) :
-        _position(std::move(position)),
-        _facing(facing) {
+    Event(int number) : _number(number) {
     }
 
-    const glm::vec3 &position() const { return _position; }
-    float facing() const { return _facing; }
+    int number() const { return _number; }
 
 private:
-    glm::vec3 _position;
-    float _facing;
+    int _number;
 };
 
 } // namespace game

@@ -19,8 +19,8 @@
 
 #include "../../common/log.h"
 
-#include "../enginetype/location.h"
 #include "../game.h"
+#include "../location.h"
 
 using namespace std;
 

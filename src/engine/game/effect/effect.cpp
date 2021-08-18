@@ -15,21 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "jumptolocation.h"
+#include "effect.h"
 
-#include "../location.h"
-#include "../object/spatial.h"
+#include "../../common/log.h"
+
+using namespace std;
 
 namespace reone {
 
 namespace game {
 
-void JumpToLocationAction::execute(Object &actor, float dt) {
-    auto spatialActor = static_cast<SpatialObject *>(&actor);
-    spatialActor->setPosition(_location->position());
-    spatialActor->setFacing(_location->facing());
-
-    complete();
+void Effect::applyTo(SpatialObject &object) {
+    debug("Unsupported effect type: " + to_string(static_cast<int>(_type)), 2);
 }
 
 } // namespace game

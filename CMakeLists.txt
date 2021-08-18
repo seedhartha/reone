@@ -469,10 +469,11 @@ set(GAME_HEADERS
     src/engine/game/d20/spell.h
     src/engine/game/d20/spells.h
     src/engine/game/dialog.h
-    src/engine/game/enginetype/effect.h
-    src/engine/game/enginetype/event.h
-    src/engine/game/enginetype/location.h
-    src/engine/game/enginetype/talent.h
+    src/engine/game/effect/damage.h
+    src/engine/game/effect/death.h
+    src/engine/game/effect/effect.h
+    src/engine/game/effect/effectfactory.h
+    src/engine/game/event.h
     src/engine/game/footstepsounds.h
     src/engine/game/game.h
     src/engine/game/gui/barkbubble.h
@@ -510,6 +511,7 @@ set(GAME_HEADERS
     src/engine/game/gui/selectoverlay.h
     src/engine/game/gui/sounds.h
     src/engine/game/kotor.h
+    src/engine/game/location.h
     src/engine/game/map.h
     src/engine/game/object/area.h
     src/engine/game/object/creature.h
@@ -543,6 +545,7 @@ set(GAME_HEADERS
     src/engine/game/soundsets.h
     src/engine/game/surface.h
     src/engine/game/surfaces.h
+    src/engine/game/talent.h
     src/engine/game/tsl.h
     src/engine/game/types.h)
 
@@ -592,6 +595,9 @@ set(GAME_SOURCES
     src/engine/game/d20/skills.cpp
     src/engine/game/d20/spells.cpp
     src/engine/game/dialog.cpp
+    src/engine/game/effect/damage.cpp
+    src/engine/game/effect/death.cpp
+    src/engine/game/effect/effect.cpp
     src/engine/game/footstepsounds.cpp
     src/engine/game/game.cpp
     src/engine/game/game_save.cpp

@@ -29,7 +29,7 @@
 #include "../resource/format/gffwriter.h"
 #include "../scene/pipeline/world.h"
 
-#include "enginetype/location.h"
+#include "location.h"
 #include "party.h"
 
 namespace fs = boost::filesystem;

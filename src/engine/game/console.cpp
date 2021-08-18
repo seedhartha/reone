@@ -148,7 +148,7 @@ void Console::cmdKill(vector<string> tokens) {
         print("kill: no object selected");
         return;
     }
-    auto effect = make_unique<DamageEffect>(100000, DamageType::Universal, nullptr);
+    auto effect = _game.services().effectFactory().newDamage(100000, DamageType::Universal, nullptr);
     object->applyEffect(move(effect), DurationType::Instant);
 }
 

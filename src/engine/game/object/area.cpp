@@ -34,8 +34,8 @@
 #include "../../scene/node/grass.h"
 #include "../../scene/types.h"
 
-#include "../enginetype/location.h"
 #include "../game.h"
+#include "../location.h"
 #include "../objectconverter.h"
 #include "../room.h"
 #include "../surfaces.h"

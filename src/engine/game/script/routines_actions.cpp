@@ -24,8 +24,8 @@
 #include "../../common/log.h"
 
 #include "../action/actionfactory.h"
-#include "../enginetype/location.h"
 #include "../game.h"
+#include "../location.h"
 
 using namespace std;
 

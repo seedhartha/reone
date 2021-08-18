@@ -23,7 +23,7 @@
 #include "../../scene/scenegraph.h"
 
 #include "../action/playanimation.h"
-#include "../enginetype/effect.h"
+#include "../effect/effect.h"
 #include "../types.h"
 
 #include "object.h"

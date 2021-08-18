@@ -15,24 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "damage.h"
 
-#include "../../script/enginetype.h"
+#include "../../common/log.h"
+
+#include "../object/spatial.h"
 
 namespace reone {
 
 namespace game {
 
-class Event : public script::EngineType  {
-public:
-    Event(int number) : _number(number) {
-    }
-
-    int number() const { return _number; }
-
-private:
-    int _number;
-};
+void DamageEffect::applyTo(SpatialObject &object) {
+    debug(boost::format("Damage taken: %s %d") % object.tag() % _amount, 2);
+    object.setCurrentHitPoints(glm::max(object.isMinOneHP() ? 1 : 0, object.currentHitPoints() - _amount));
+}
 
 } // namespace game
 

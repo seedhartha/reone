@@ -175,20 +175,7 @@ void SpatialObject::applyEffect(const shared_ptr<Effect> &effect, DurationType d
 }
 
 void SpatialObject::applyInstantEffect(Effect &effect) {
-    switch (effect.type()) {
-        case EffectType::Damage: {
-            auto &damageEffect = static_cast<DamageEffect &>(effect);
-            debug(boost::format("Damage taken: %s %d") % _tag % damageEffect.amount(), 2);
-            _currentHitPoints = glm::max(_minOneHP ? 1 : 0, _currentHitPoints - damageEffect.amount());
-            break;
-        }
-        case EffectType::Death:
-            die();
-            break;
-        default:
-            debug("Unsupported effect type: " + to_string(static_cast<int>(effect.type())), 2);
-            break;
-    }
+    effect.applyTo(*this);
 }
 
 void SpatialObject::update(float dt) {

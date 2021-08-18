@@ -23,6 +23,8 @@
 
 #include "../../common/random.h"
 
+#include "../game.h"
+
 using namespace std;
 
 namespace reone {
@@ -41,9 +43,9 @@ vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> d
         type = static_cast<DamageType>(weapon->damageFlags());
     }
     amount = glm::max(1, amount);
-    auto effect = make_shared<DamageEffect>(multiplier * amount, type, move(damager));
+    shared_ptr<DamageEffect> effect(_game.services().effectFactory().newDamage(multiplier * amount, type, move(damager)));
 
-    return vector<shared_ptr<DamageEffect>> { effect };
+    return vector<shared_ptr<DamageEffect>> { move(effect) };
 }
 
 } // namespace game

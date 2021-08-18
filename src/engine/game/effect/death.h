@@ -15,22 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "jumptolocation.h"
+#pragma once
 
-#include "../location.h"
-#include "../object/spatial.h"
+#include "effect.h"
 
 namespace reone {
 
 namespace game {
 
-void JumpToLocationAction::execute(Object &actor, float dt) {
-    auto spatialActor = static_cast<SpatialObject *>(&actor);
-    spatialActor->setPosition(_location->position());
-    spatialActor->setFacing(_location->facing());
+class DeathEffect : public Effect {
+public:
+    DeathEffect() : Effect(EffectType::Death) {
+    }
 
-    complete();
-}
+    void applyTo(SpatialObject &object) override;
+};
 
 } // namespace game
 
