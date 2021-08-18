@@ -21,7 +21,7 @@
 #include "../../scene/services.h"
 
 #include "../action/objectaction.h"
-#include "../enginetype/effect.h"
+#include "../effect/damage.h"
 #include "../object/creature.h"
 #include "../types.h"
 

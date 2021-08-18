@@ -19,14 +19,14 @@
 
 #include "../../script/executioncontext.h"
 
-#include "../enginetype/effect.h"
-#include "../enginetype/event.h"
-#include "../enginetype/location.h"
-#include "../enginetype/talent.h"
+#include "../effect/effect.h"
+#include "../event.h"
+#include "../location.h"
 #include "../object/creature.h"
 #include "../object/door.h"
 #include "../object/item.h"
 #include "../object/sound.h"
+#include "../talent.h"
 
 #include "../game.h"
 

@@ -17,8 +17,8 @@
 
 #include "movetolocation.h"
 
-#include "../enginetype/location.h"
 #include "../game.h"
+#include "../location.h"
 
 namespace reone {
 

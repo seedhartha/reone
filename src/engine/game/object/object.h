@@ -64,6 +64,7 @@ public:
 
     void setMinOneHP(bool minOneHP) { _minOneHP = minOneHP; }
     void setMaxHitPoints(int maxHitPoints) { _maxHitPoints = maxHitPoints; }
+    void setCurrentHitPoints(int hitPoints) { _currentHitPoints = hitPoints; }
 
     // END Hit Points
 

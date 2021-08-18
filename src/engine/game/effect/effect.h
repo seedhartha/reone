@@ -15,22 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "jumptolocation.h"
+#pragma once
 
-#include "../location.h"
-#include "../object/spatial.h"
+#include "../../script/enginetype.h"
+
+#include "../types.h"
 
 namespace reone {
 
 namespace game {
 
-void JumpToLocationAction::execute(Object &actor, float dt) {
-    auto spatialActor = static_cast<SpatialObject *>(&actor);
-    spatialActor->setPosition(_location->position());
-    spatialActor->setFacing(_location->facing());
+class SpatialObject;
 
-    complete();
-}
+class Effect : public script::EngineType {
+public:
+    Effect(EffectType type) : _type(type) {
+    }
+
+    virtual void applyTo(SpatialObject &object);
+
+    EffectType type() const { return _type; }
+
+protected:
+    EffectType _type;
+};
 
 } // namespace game
 

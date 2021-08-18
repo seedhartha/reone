@@ -30,6 +30,7 @@
 #include "d20/feats.h"
 #include "d20/skills.h"
 #include "d20/spells.h"
+#include "effect/effectfactory.h"
 #include "footstepsounds.h"
 #include "gui/sounds.h"
 #include "object/objectfactory.h"
@@ -69,6 +70,7 @@ public:
     Classes &classes() { return *_classes; }
     Combat &combat() { return *_combat; }
     Cursors &cursors() { return *_cursors; }
+    EffectFactory &effectFactory() { return *_effectFactory; }
     Feats &feats() { return *_feats; }
     FootstepSounds &footstepSounds() { return *_footstepSounds; }
     GUISounds &guiSounds() { return *_guiSounds; }
@@ -95,6 +97,7 @@ private:
     std::unique_ptr<Classes> _classes;
     std::unique_ptr<Combat> _combat;
     std::unique_ptr<Cursors> _cursors;
+    std::unique_ptr<EffectFactory> _effectFactory;
     std::unique_ptr<Feats> _feats;
     std::unique_ptr<FootstepSounds> _footstepSounds;
     std::unique_ptr<GUISounds> _guiSounds;

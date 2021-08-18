@@ -23,7 +23,8 @@
 
 #include "../../common/log.h"
 
-#include "../enginetype/effect.h"
+#include "../effect/effect.h"
+#include "../game.h"
 #include "../object/spatial.h"
 
 using namespace std;
@@ -45,8 +46,8 @@ Variable Routines::effectHeal(const VariablesList &args, ExecutionContext &ctx) 
 }
 
 Variable Routines::effectDamage(const VariablesList &args, ExecutionContext &ctx) {
-    auto effect = make_shared<Effect>(EffectType::Damage);
-    return Variable::ofEffect(effect);
+    auto effect = _game.services().effectFactory().newDamage(0, DamageType::Universal, nullptr);
+    return Variable::ofEffect(std::move(effect));
 }
 
 Variable Routines::effectAbilityIncrease(const VariablesList &args, ExecutionContext &ctx) {
@@ -95,8 +96,8 @@ Variable Routines::effectEntangle(const VariablesList &args, ExecutionContext &c
 }
 
 Variable Routines::effectDeath(const VariablesList &args, ExecutionContext &ctx) {
-    auto effect = make_shared<Effect>(EffectType::Death);
-    return Variable::ofEffect(effect);
+    auto effect = _game.services().effectFactory().newDeath();
+    return Variable::ofEffect(std::move(effect));
 }
 
 Variable Routines::effectKnockdown(const VariablesList &args, ExecutionContext &ctx) {

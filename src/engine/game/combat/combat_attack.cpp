@@ -20,6 +20,7 @@
 #include "../../common/log.h"
 #include "../../common/random.h"
 
+#include "../game.h"
 #include "../objectconverter.h"
 
 using namespace std;
@@ -173,7 +174,8 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
                     attack.target->applyEffect(effect, DurationType::Instant);
                 }
             } else {
-                attack.target->applyEffect(make_shared<DamageEffect>(attack.damage, DamageType::Universal, attack.attacker), DurationType::Instant);
+                shared_ptr<DamageEffect> effect(_game.services().effectFactory().newDamage(attack.damage, DamageType::Universal, attack.attacker));
+                attack.target->applyEffect(move(effect), DurationType::Instant);
             }
             break;
         }
@@ -185,7 +187,8 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
                     attack.target->applyEffect(effect, DurationType::Instant);
                 }
             } else {
-                attack.target->applyEffect(make_shared<DamageEffect>(criticalHitMultiplier * attack.damage, DamageType::Universal, attack.attacker), DurationType::Instant);
+                shared_ptr<DamageEffect> effect(_game.services().effectFactory().newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, attack.attacker));
+                attack.target->applyEffect(move(effect), DurationType::Instant);
             }
             break;
         }

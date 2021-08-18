@@ -15,22 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "jumptolocation.h"
+#pragma once
 
-#include "../location.h"
-#include "../object/spatial.h"
+#include "effect.h"
 
 namespace reone {
 
 namespace game {
 
-void JumpToLocationAction::execute(Object &actor, float dt) {
-    auto spatialActor = static_cast<SpatialObject *>(&actor);
-    spatialActor->setPosition(_location->position());
-    spatialActor->setFacing(_location->facing());
+class Creature;
 
-    complete();
-}
+class DamageEffect : public Effect {
+public:
+    DamageEffect(int amount, DamageType type, std::shared_ptr<Creature> damager) :
+        Effect(EffectType::Damage),
+        _amount(amount),
+        _type(type),
+        _damager(std::move(damager)) {
+    }
+
+    void applyTo(SpatialObject &object) override;
+
+    int amount() const { return _amount; }
+    DamageType type() const { return _type; }
+    std::shared_ptr<Creature> damager() const { return _damager; }
+
+private:
+    int _amount;
+    DamageType _type;
+    std::shared_ptr<Creature> _damager;
+};
 
 } // namespace game
 

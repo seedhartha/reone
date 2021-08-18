@@ -17,44 +17,25 @@
 
 #pragma once
 
-#include "../../script/enginetype.h"
-
-#include "../types.h"
+#include "../script/enginetype.h"
 
 namespace reone {
 
 namespace game {
 
-class Creature;
-
-class Effect : public script::EngineType {
+class Location : public script::EngineType  {
 public:
-    Effect(EffectType type) : _type(type) {
+    Location(glm::vec3 position, float facing) :
+        _position(std::move(position)),
+        _facing(facing) {
     }
 
-    EffectType type() const { return _type; }
-
-protected:
-    EffectType _type;
-};
-
-class DamageEffect : public Effect {
-public:
-    DamageEffect(int amount, DamageType type, const std::shared_ptr<Creature> &damager) :
-        Effect(EffectType::Damage),
-        _amount(amount),
-        _type(type),
-        _damager(damager) {
-    }
-
-    int amount() const { return _amount; }
-    DamageType type() const { return _type; }
-    std::shared_ptr<Creature> damager() const { return _damager; }
+    const glm::vec3 &position() const { return _position; }
+    float facing() const { return _facing; }
 
 private:
-    int _amount;
-    DamageType _type;
-    std::shared_ptr<Creature> _damager;
+    glm::vec3 _position;
+    float _facing;
 };
 
 } // namespace game
