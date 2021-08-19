@@ -21,7 +21,6 @@
 #include "../../common/random.h"
 
 #include "../game.h"
-#include "../objectconverter.h"
 
 using namespace std;
 
@@ -111,7 +110,7 @@ Combat::AttackAnimation Combat::determineAttackAnimation(const Attack &attack, b
     result.attackerWieldType = attack.attacker->getWieldType();
 
     auto targetWield = CreatureWieldType::None;
-    auto target = ObjectConverter::toCreature(attack.target);
+    auto target = dynamic_pointer_cast<Creature>(attack.target);
     if (target) {
         targetWield = target->getWieldType();
     }

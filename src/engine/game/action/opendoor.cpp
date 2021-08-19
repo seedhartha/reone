@@ -18,7 +18,6 @@
 #include "opendoor.h"
 
 #include "../game.h"
-#include "../objectconverter.h"
 
 namespace reone {
 
@@ -26,8 +25,8 @@ namespace game {
 
 void OpenDoorAction::execute(Object &actor, float dt) {
     shared_ptr<Object> actorPtr(_game.services().objectFactory().getObjectById(actor.id()));
-    auto creatureActor = ObjectConverter::toCreature(actorPtr);
-    auto door = ObjectConverter::toDoor(_object);
+    auto creatureActor = dynamic_pointer_cast<Creature>(actorPtr);
+    auto door = dynamic_pointer_cast<Door>(_object);
 
     bool reached = !creatureActor || creatureActor->navigateTo(door->position(), true, kDefaultMaxObjectDistance, dt);
     if (reached) {

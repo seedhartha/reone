@@ -527,7 +527,6 @@ set(GAME_HEADERS
     src/engine/game/object/spatial.h
     src/engine/game/object/trigger.h
     src/engine/game/object/waypoint.h
-    src/engine/game/objectconverter.h
     src/engine/game/options.h
     src/engine/game/party.h
     src/engine/game/path.h

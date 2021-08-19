@@ -23,7 +23,6 @@
 
 #include "../game.h"
 #include "../object/item.h"
-#include "../objectconverter.h"
 
 using namespace std;
 
@@ -118,7 +117,7 @@ void Container::transferItemsToPlayer() {
     shared_ptr<Creature> player(_game->services().party().player());
     _container->moveDropableItemsTo(*player);
 
-    auto placeable = ObjectConverter::toPlaceable(_container);
+    auto placeable = dynamic_pointer_cast<Placeable>(_container);
     if (placeable) {
         placeable->runOnInvDisturbed(player);
     }
