@@ -45,10 +45,8 @@ void BarkBubble::bindControls() {
 }
 
 void BarkBubble::update(float dt) {
-    static string empty;
-
     if (_timer.advance(dt)) {
-        setBarkText(empty, 0.0f);
+        setBarkText("", 0.0f);
     }
 }
 

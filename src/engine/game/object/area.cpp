@@ -36,7 +36,6 @@
 
 #include "../game.h"
 #include "../location.h"
-#include "../objectconverter.h"
 #include "../room.h"
 #include "../surfaces.h"
 
@@ -819,7 +818,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
         if (model) {
             _game->services().scene().graph().addRoot(model);
         }
-        auto creature = ObjectConverter::toCreature(spatial);
+        auto creature = dynamic_pointer_cast<Creature>(spatial);
         if (creature) {
             creature->runSpawnScript();
         }

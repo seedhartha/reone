@@ -245,8 +245,6 @@ bool Variable::operator>=(const Variable &other) const {
 }
 
 const string Variable::toString() const {
-    static string empty;
-
     switch (type) {
         case VariableType::Void:
             return "void";

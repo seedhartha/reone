@@ -29,7 +29,6 @@
 #include "../../script/execution.h"
 
 #include "../game.h"
-#include "../objectconverter.h"
 #include "../script/routines.h"
 
 using namespace std;
@@ -157,9 +156,9 @@ void DialogGUI::loadStuntParticipants() {
     for (auto &stunt : _dialog->stunts()) {
         shared_ptr<Creature> creature;
         if (stunt.participant == kObjectTagOwner) {
-            creature = ObjectConverter::toCreature(_owner);
+            creature = dynamic_pointer_cast<Creature>(_owner);
         } else {
-            creature = ObjectConverter::toCreature(_game->module()->area()->getObjectByTag(stunt.participant));
+            creature = dynamic_pointer_cast<Creature>(_game->module()->area()->getObjectByTag(stunt.participant));
         }
         if (!creature) {
             warn("Dialog: participant creature not found by tag: " + stunt.participant);
@@ -204,7 +203,7 @@ void DialogGUI::loadCurrentSpeaker() {
 
     // Make previous speaker stop talking, if any
     if (_currentSpeaker && _currentSpeaker != speaker) {
-        auto speakerCreature = ObjectConverter::toCreature(_currentSpeaker);
+        auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
         if (speakerCreature) {
             speakerCreature->stopTalking();
         }
@@ -216,7 +215,7 @@ void DialogGUI::loadCurrentSpeaker() {
         shared_ptr<Creature> player(_game->services().party().player());
         player->face(*_currentSpeaker);
 
-        auto speakerCreature = ObjectConverter::toCreature(_currentSpeaker);
+        auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
         if (speakerCreature) {
             speakerCreature->startTalking(_lipAnimation);
             speakerCreature->face(*player);
@@ -283,9 +282,9 @@ void DialogGUI::updateParticipantAnimations() {
         } else {
             shared_ptr<Creature> participant;
             if (anim.participant == "owner") {
-                participant = ObjectConverter::toCreature(_owner);
+                participant = dynamic_pointer_cast<Creature>(_owner);
             } else {
-                participant = ObjectConverter::toCreature(_game->module()->area()->getObjectByTag(anim.participant));
+                participant = dynamic_pointer_cast<Creature>(_game->module()->area()->getObjectByTag(anim.participant));
             }
             if (!participant) {
                 warn("Dialog: participant creature not found by tag: " + anim.participant);
@@ -340,7 +339,7 @@ void DialogGUI::onFinish() {
     }
 
     // Make current speaker stop talking, if any
-    auto speakerCreature = ObjectConverter::toCreature(_currentSpeaker);
+    auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
     if (speakerCreature) {
         speakerCreature->stopTalking();
     }

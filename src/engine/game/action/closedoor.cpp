@@ -18,7 +18,6 @@
 #include "closedoor.h"
 
 #include "../game.h"
-#include "../objectconverter.h"
 
 namespace reone {
 
@@ -26,7 +25,7 @@ namespace game {
 
 void CloseDoorAction::execute(Object &actor, float dt) {
     auto creatureActor = _game.services().objectFactory().getObjectById<Creature>(actor.id());
-    auto door = ObjectConverter::toDoor(_object);
+    auto door = dynamic_pointer_cast<Door>(_object);
 
     bool reached = !creatureActor || creatureActor->navigateTo(door->position(), true, kDefaultMaxObjectDistance, dt);
     if (reached) {

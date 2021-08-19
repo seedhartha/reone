@@ -34,7 +34,6 @@
 #include "../action/useskill.h"
 #include "../d20/feats.h"
 #include "../game.h"
-#include "../objectconverter.h"
 #include "../reputes.h"
 
 using namespace std;
@@ -180,7 +179,7 @@ void SelectionOverlay::update() {
         if (_hilightedScreenCoords.z < 1.0f) {
             _hilightedObject = hilightedObject;
 
-            auto hilightedCreature = ObjectConverter::toCreature(hilightedObject);
+            auto hilightedCreature = dynamic_pointer_cast<Creature>(hilightedObject);
             if (hilightedCreature) {
                 _hilightedHostile = !hilightedCreature->isDead() && _game->services().reputes().getIsEnemy(*(_game->services().party().getLeader()), *hilightedCreature);
             }
@@ -220,7 +219,7 @@ void SelectionOverlay::update() {
                 }
             }
 
-            auto selectedCreature = ObjectConverter::toCreature(selectedObject);
+            auto selectedCreature = dynamic_pointer_cast<Creature>(selectedObject);
             if (selectedCreature) {
                 _selectedHostile = !selectedCreature->isDead() && _game->services().reputes().getIsEnemy(*_game->services().party().getLeader(), *selectedCreature);
             }
