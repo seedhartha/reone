@@ -16,16 +16,14 @@
  */
 
 /** @file
- *  Implementation of routines related to the Effect object type.
+ *  Implementation of effect-related routines.
  */
 
-#include "routines.h"
+#include "../../routines.h"
 
-#include "../../common/log.h"
-
-#include "../effect/effect.h"
-#include "../game.h"
-#include "../object/spatial.h"
+#include "../../../game.h"
+#include "../../../effect/effect.h"
+#include "../../../types.h"
 
 using namespace std;
 
@@ -63,6 +61,34 @@ Variable Routines::effectDamageResistance(const VariablesList &args, ExecutionCo
 Variable Routines::effectResurrection(const VariablesList &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Resurrection);
     return Variable::ofEffect(effect);
+}
+
+Variable Routines::getIsEffectValid(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
+Variable Routines::getEffectDurationType(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
+Variable Routines::getEffectSubType(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
+Variable Routines::getEffectCreator(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
+Variable Routines::magicalEffect(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
+Variable Routines::supernaturalEffect(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
+Variable Routines::extraordinaryEffect(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
 }
 
 Variable Routines::effectACIncrease(const VariablesList &args, ExecutionContext &ctx) {
@@ -160,6 +186,10 @@ Variable Routines::effectMovementSpeedIncrease(const VariablesList &args, Execut
     return Variable::ofEffect(effect);
 }
 
+Variable Routines::getEffectType(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
 Variable Routines::effectAreaOfEffect(const VariablesList &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::AreaOfEffect);
     return Variable::ofEffect(effect);
@@ -215,6 +245,10 @@ Variable Routines::effectImmunity(const VariablesList &args, ExecutionContext &c
     return Variable::ofEffect(effect);
 }
 
+Variable Routines::getEffectSpellId(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
 Variable Routines::effectDamageImmunityIncrease(const VariablesList &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DamageImmunityIncrease);
     return Variable::ofEffect(effect);
@@ -228,6 +262,18 @@ Variable Routines::effectTemporaryHitpoints(const VariablesList &args, Execution
 Variable Routines::effectSkillIncrease(const VariablesList &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::SkillIncrease);
     return Variable::ofEffect(effect);
+}
+
+Variable Routines::versusAlignmentEffect(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
+Variable Routines::versusRacialTypeEffect(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
+Variable Routines::versusTrapEffect(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
 }
 
 Variable Routines::effectDamageForcePoints(const VariablesList &args, ExecutionContext &ctx) {
@@ -390,6 +436,10 @@ Variable Routines::effectDamageShield(const VariablesList &args, ExecutionContex
     return Variable::ofEffect(effect);
 }
 
+Variable Routines::setEffectIcon(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
 Variable Routines::effectForceDrain(const VariablesList &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ForceDrain);
     return Variable::ofEffect(effect);
@@ -478,31 +528,6 @@ Variable Routines::effectFactionModifier(const VariablesList &args, ExecutionCon
 Variable Routines::effectDroidScramble(const VariablesList &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DroidScramble);
     return Variable::ofEffect(effect);
-}
-
-Variable Routines::clearAllEffects(const VariablesList &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsSpatial(ctx);
-    if (caller) {
-        caller->clearAllEffects();
-    } else {
-        debug("Script: clearAllEffects: caller is invalid", 1, DebugChannels::script);
-    }
-    return Variable();
-}
-
-Variable Routines::applyEffectToObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto durationType = getEnum<DurationType>(args, 0);
-    auto effect = getEffect(args, 1);
-    auto target = getSpatialObject(args, 2, ctx);
-    float duration = getFloat(args, 3, 0.0f);
-
-    if (target) {
-        target->applyEffect(effect, durationType, duration);
-    } else {
-        debug("Script: applyEffectToObject: target is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable();
 }
 
 } // namespace game

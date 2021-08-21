@@ -16,15 +16,14 @@
  */
 
 /** @file
- *  Implementation of routines related to creature perception.
+ *  Implementation of routines related to perception.
  */
 
-#include "routines.h"
+#include "../../routines.h"
 
-#include "../../common/log.h"
+#include "../../../../common/log.h"
 
-#include "../object/creature.h"
-#include "../types.h"
+#include "../../../object/creature.h"
 
 #include "objectutil.h"
 
@@ -49,32 +48,6 @@ Variable Routines::getLastPerceived(const VariablesList &args, ExecutionContext 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable Routines::getLastPerceptionSeen(const VariablesList &args, ExecutionContext &ctx) {
-    bool result = false;
-
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        result = caller->perception().lastPerception == PerceptionType::Seen;
-    } else {
-        debug("Script: getLastPerceptionSeen: caller is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
-}
-
-Variable Routines::getLastPerceptionVanished(const VariablesList &args, ExecutionContext &ctx) {
-    bool result = false;
-
-    auto caller = getCallerAsCreature(ctx);
-    if (caller) {
-        result = caller->perception().lastPerception == PerceptionType::NotSeen;
-    } else {
-        debug("Script: getLastPerceptionVanished: caller is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
-}
-
 Variable Routines::getLastPerceptionHeard(const VariablesList &args, ExecutionContext &ctx) {
     bool result = false;
 
@@ -96,6 +69,32 @@ Variable Routines::getLastPerceptionInaudible(const VariablesList &args, Executi
         result = caller->perception().lastPerception == PerceptionType::NotHeard;
     } else {
         debug("Script: getLastPerceptionInaudible: caller is invalid", 1, DebugChannels::script);
+    }
+
+    return Variable::ofInt(static_cast<int>(result));
+}
+
+Variable Routines::getLastPerceptionSeen(const VariablesList &args, ExecutionContext &ctx) {
+    bool result = false;
+
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        result = caller->perception().lastPerception == PerceptionType::Seen;
+    } else {
+        debug("Script: getLastPerceptionSeen: caller is invalid", 1, DebugChannels::script);
+    }
+
+    return Variable::ofInt(static_cast<int>(result));
+}
+
+Variable Routines::getLastPerceptionVanished(const VariablesList &args, ExecutionContext &ctx) {
+    bool result = false;
+
+    auto caller = getCallerAsCreature(ctx);
+    if (caller) {
+        result = caller->perception().lastPerception == PerceptionType::NotSeen;
+    } else {
+        debug("Script: getLastPerceptionVanished: caller is invalid", 1, DebugChannels::script);
     }
 
     return Variable::ofInt(static_cast<int>(result));

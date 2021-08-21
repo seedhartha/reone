@@ -19,7 +19,7 @@
  *  Implementation of math-related routines.
  */
 
-#include "routines.h"
+#include "../../routines.h"
 
 using namespace std;
 
@@ -103,21 +103,6 @@ Variable Routines::sqrt(const VariablesList &args, ExecutionContext &ctx) {
 Variable Routines::abs(const VariablesList &args, ExecutionContext &ctx) {
     int value = getInt(args, 0);
     return Variable::ofInt(glm::abs(value));
-}
-
-Variable Routines::vectorCreate(const VariablesList &args, ExecutionContext &ctx) {
-    float x = getFloat(args, 0);
-    float y = getFloat(args, 1);
-    float z = getFloat(args, 2);
-    return Variable::ofVector(glm::vec3(x, y, z));
-}
-
-Variable Routines::vectorNormalize(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofVector(glm::normalize(getVector(args, 0)));
-}
-
-Variable Routines::vectorMagnitude(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofFloat(glm::length(getVector(args, 0)));
 }
 
 } // namespace game
