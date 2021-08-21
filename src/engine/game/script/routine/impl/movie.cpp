@@ -19,9 +19,13 @@
  *  Implementation of movie-related routines.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
+
+#include "../../../../script/types.h"
 
 #include "../../../game.h"
+
+#include "argutil.h"
 
 using namespace std;
 
@@ -31,23 +35,27 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::playMovie(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable playMovie(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string movie(boost::to_lower_copy(getString(args, 0)));
-    _game.playVideo(movie);
+    game.playVideo(movie);
     return Variable();
 }
 
-Variable Routines::isMoviePlaying(const VariablesList &args, ExecutionContext &ctx) {
+Variable isMoviePlaying(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::queueMovie(const VariablesList &args, ExecutionContext &ctx) {
+Variable queueMovie(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::playMovieQueue(const VariablesList &args, ExecutionContext &ctx) {
+Variable playMovieQueue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
+
+} // namespace routine
 
 } // namespace game
 

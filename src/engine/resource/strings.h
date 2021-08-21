@@ -21,8 +21,6 @@
 
 #include "types.h"
 
-using namespace std;
-
 namespace reone {
 
 namespace resource {

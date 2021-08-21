@@ -22,10 +22,13 @@
 #include "area.h"
 
 #include "../../graphics/texture/textures.h"
+#include "../../resource/2da.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
 #include "../game.h"
+
+using namespace std;
 
 using namespace reone::graphics;
 using namespace reone::resource;

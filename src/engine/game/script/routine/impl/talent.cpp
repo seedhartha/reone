@@ -19,7 +19,9 @@
  *  Implementation of talent-related routines.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
+
+#include "../../../../script/types.h"
 
 using namespace std;
 
@@ -29,33 +31,37 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::talentSpell(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable talentSpell(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::talentFeat(const VariablesList &args, ExecutionContext &ctx) {
+Variable talentFeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::talentSkill(const VariablesList &args, ExecutionContext &ctx) {
+Variable talentSkill(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsTalentValid(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsTalentValid(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getTypeFromTalent(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTypeFromTalent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIdFromTalent(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIdFromTalent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getCategoryFromTalent(const VariablesList &args, ExecutionContext &ctx) {
+Variable getCategoryFromTalent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
+
+} // namespace routine
 
 } // namespace game
 

@@ -22,6 +22,8 @@
 #include "../game.h"
 #include "../object/creature.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {

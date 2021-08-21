@@ -19,7 +19,11 @@
  *  Implementation of string-related routines.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
+
+#include "../../../../script/types.h"
+
+#include "argutil.h"
 
 using namespace std;
 
@@ -29,21 +33,23 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::getStringLength(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable getStringLength(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::ofInt(static_cast<int>(getString(args, 0).length()));
 }
 
-Variable Routines::getStringUpperCase(const VariablesList &args, ExecutionContext &ctx) {
+Variable getStringUpperCase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string result(boost::to_upper_copy(getString(args, 0)));
     return Variable::ofString(move(result));
 }
 
-Variable Routines::getStringLowerCase(const VariablesList &args, ExecutionContext &ctx) {
+Variable getStringLowerCase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string result(boost::to_lower_copy(getString(args, 0)));
     return Variable::ofString(move(result));
 }
 
-Variable Routines::getStringRight(const VariablesList &args, ExecutionContext &ctx) {
+Variable getStringRight(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string result;
     string str(getString(args, 0));
     int count = getInt(args, 1);
@@ -55,7 +61,7 @@ Variable Routines::getStringRight(const VariablesList &args, ExecutionContext &c
     return Variable::ofString(move(result));
 }
 
-Variable Routines::getStringLeft(const VariablesList &args, ExecutionContext &ctx) {
+Variable getStringLeft(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string result;
     string str(getString(args, 0));
     int count = getInt(args, 1);
@@ -67,38 +73,40 @@ Variable Routines::getStringLeft(const VariablesList &args, ExecutionContext &ct
     return Variable::ofString(move(result));
 }
 
-Variable Routines::insertString(const VariablesList &args, ExecutionContext &ctx) {
+Variable insertString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string dest(getString(args, 0));
     string str(getString(args, 1));
     int pos = getInt(args, 2);
     return Variable::ofString(dest.insert(pos, str));
 }
 
-Variable Routines::getSubString(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSubString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string str(getString(args, 0));
     int start = getInt(args, 1);
     int count = getInt(args, 2);
     return Variable::ofString(str.substr(start, count));
 }
 
-Variable Routines::findSubString(const VariablesList &args, ExecutionContext &ctx) {
+Variable findSubString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string str(getString(args, 0));
     string substr(getString(args, 1));
     size_t pos = str.find(substr);
     return Variable::ofInt(pos != string::npos ? static_cast<int>(pos) : -1);
 }
 
-Variable Routines::testStringAgainstPattern(const VariablesList &args, ExecutionContext &ctx) {
+Variable testStringAgainstPattern(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getMatchedSubstring(const VariablesList &args, ExecutionContext &ctx) {
+Variable getMatchedSubstring(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getMatchedSubstringsCount(const VariablesList &args, ExecutionContext &ctx) {
+Variable getMatchedSubstringsCount(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
+
+} // namespace routine
 
 } // namespace game
 

@@ -19,9 +19,13 @@
  *  Implementation of stealth-related routines.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
+
+#include "../../../../script/types.h"
 
 #include "../../../game.h"
+
+#include "argutil.h"
 
 using namespace std;
 
@@ -31,50 +35,54 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::getMaxStealthXP(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game.module()->area()->maxStealthXP());
+namespace routine {
+
+Variable getMaxStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable::ofInt(game.module()->area()->maxStealthXP());
 }
 
-Variable Routines::setMaxStealthXP(const VariablesList &args, ExecutionContext &ctx) {
+Variable setMaxStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int max = getInt(args, 0);
-    _game.module()->area()->setMaxStealthXP(max);
+    game.module()->area()->setMaxStealthXP(max);
     return Variable();
 }
 
-Variable Routines::getCurrentStealthXP(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game.module()->area()->currentStealthXP());
+Variable getCurrentStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable::ofInt(game.module()->area()->currentStealthXP());
 }
 
-Variable Routines::setCurrentStealthXP(const VariablesList &args, ExecutionContext &ctx) {
+Variable setCurrentStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int current = getInt(args, 0);
-    _game.module()->area()->setCurrentStealthXP(current);
+    game.module()->area()->setCurrentStealthXP(current);
     return Variable();
 }
 
-Variable Routines::awardStealthXP(const VariablesList &args, ExecutionContext &ctx) {
+Variable awardStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getStealthXPEnabled(const VariablesList &args, ExecutionContext &ctx) {
-    bool result = _game.module()->area()->isStealthXPEnabled();
+Variable getStealthXPEnabled(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    bool result = game.module()->area()->isStealthXPEnabled();
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::setStealthXPEnabled(const VariablesList &args, ExecutionContext &ctx) {
+Variable setStealthXPEnabled(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool enabled = getBool(args, 0);
-    _game.module()->area()->setStealthXPEnabled(enabled);
+    game.module()->area()->setStealthXPEnabled(enabled);
     return Variable();
 }
 
-Variable Routines::getStealthXPDecrement(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game.module()->area()->stealthXPDecrement());
+Variable getStealthXPDecrement(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable::ofInt(game.module()->area()->stealthXPDecrement());
 }
 
-Variable Routines::setStealthXPDecrement(const VariablesList &args, ExecutionContext &ctx) {
+Variable setStealthXPDecrement(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int decrement = getInt(args, 0);
-    _game.module()->area()->setStealthXPDecrement(decrement);
+    game.module()->area()->setStealthXPDecrement(decrement);
     return Variable();
 }
+
+} // namespace routine
 
 } // namespace game
 

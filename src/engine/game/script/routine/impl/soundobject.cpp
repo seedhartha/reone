@@ -19,11 +19,14 @@
  *  Implementation of routines related to sound objects.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
 
 #include "../../../../common/log.h"
+#include "../../../../script/types.h"
 
 #include "../../../object/sound.h"
+
+#include "argutil.h"
 
 using namespace std;
 
@@ -33,16 +36,18 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::soundObjectSetFixedVariance(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable soundObjectSetFixedVariance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::soundObjectGetFixedVariance(const VariablesList &args, ExecutionContext &ctx) {
+Variable soundObjectGetFixedVariance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::soundObjectPlay(const VariablesList &args, ExecutionContext &ctx) {
-    auto sound = getSound(args, 0, ctx);
+Variable soundObjectPlay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto sound = getSound(game, args, 0, ctx);
     if (sound) {
         sound->play();
     } else {
@@ -51,8 +56,8 @@ Variable Routines::soundObjectPlay(const VariablesList &args, ExecutionContext &
     return Variable();
 }
 
-Variable Routines::soundObjectStop(const VariablesList &args, ExecutionContext &ctx) {
-    auto sound = getSound(args, 0, ctx);
+Variable soundObjectStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto sound = getSound(game, args, 0, ctx);
     if (sound) {
         sound->stop();
     } else {
@@ -61,29 +66,31 @@ Variable Routines::soundObjectStop(const VariablesList &args, ExecutionContext &
     return Variable();
 }
 
-Variable Routines::soundObjectSetVolume(const VariablesList &args, ExecutionContext &ctx) {
+Variable soundObjectSetVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::soundObjectSetPosition(const VariablesList &args, ExecutionContext &ctx) {
+Variable soundObjectSetPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::soundObjectGetPitchVariance(const VariablesList &args, ExecutionContext &ctx) {
+Variable soundObjectGetPitchVariance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::soundObjectSetPitchVariance(const VariablesList &args, ExecutionContext &ctx) {
+Variable soundObjectSetPitchVariance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::soundObjectGetVolume(const VariablesList &args, ExecutionContext &ctx) {
+Variable soundObjectGetVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::soundObjectFadeAndStop(const VariablesList &args, ExecutionContext &ctx) {
+Variable soundObjectFadeAndStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
+
+} // namespace routine
 
 } // namespace game
 

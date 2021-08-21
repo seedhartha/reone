@@ -19,7 +19,7 @@
  *  Implementation of effect-related routines.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
 
 #include "../../../game.h"
 #include "../../../effect/effect.h"
@@ -33,502 +33,506 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::effectAssuredHit(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable effectAssuredHit(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::AssuredHit);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectHeal(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectHeal(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Heal);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDamage(const VariablesList &args, ExecutionContext &ctx) {
-    auto effect = _game.services().effectFactory().newDamage(0, DamageType::Universal, nullptr);
+Variable effectDamage(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto effect = game.services().effectFactory().newDamage(0, DamageType::Universal, nullptr);
     return Variable::ofEffect(std::move(effect));
 }
 
-Variable Routines::effectAbilityIncrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectAbilityIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::AbilityIncrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDamageResistance(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDamageResistance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DamageResistance);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectResurrection(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectResurrection(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Resurrection);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::getIsEffectValid(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsEffectValid(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getEffectDurationType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getEffectDurationType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getEffectSubType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getEffectSubType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getEffectCreator(const VariablesList &args, ExecutionContext &ctx) {
+Variable getEffectCreator(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::magicalEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable magicalEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::supernaturalEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable supernaturalEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::extraordinaryEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable extraordinaryEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::effectACIncrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectACIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ACIncrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectSavingThrowIncrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectSavingThrowIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::SavingThrowIncrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectAttackIncrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectAttackIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::AttackIncrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDamageReduction(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDamageReduction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DamageReduction);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDamageIncrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDamageIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DamageIncrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectEntangle(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectEntangle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Entangle);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDeath(const VariablesList &args, ExecutionContext &ctx) {
-    auto effect = _game.services().effectFactory().newDeath();
+Variable effectDeath(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto effect = game.services().effectFactory().newDeath();
     return Variable::ofEffect(std::move(effect));
 }
 
-Variable Routines::effectKnockdown(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectKnockdown(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Knockdown);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectParalyze(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectParalyze(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Paralyze);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectSpellImmunity(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectSpellImmunity(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::SpellImmunity);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectForceJump(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectForceJump(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ForceJump);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectSleep(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectSleep(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Sleep);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectTemporaryForcePoints(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectTemporaryForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::TemporaryHitpoints);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectConfused(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectConfused(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Confused);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectFrightened(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectFrightened(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Frightened);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectChoke(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectChoke(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Choke);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectStunned(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectStunned(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Stunned);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectRegenerate(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectRegenerate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Regenerate);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectMovementSpeedIncrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectMovementSpeedIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::MovementSpeedIncrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::getEffectType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getEffectType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::effectAreaOfEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectAreaOfEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::AreaOfEffect);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectVisualEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectVisualEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Visual);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectLinkEffects(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectLinkEffects(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::LinkEffects);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectBeam(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectBeam(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Beam);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectForceResistanceIncrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectForceResistanceIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ForceResistanceIncrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectBodyFuel(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectBodyFuel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::BodyFuel);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectPoison(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectPoison(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Poison);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectAssuredDeflection(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectAssuredDeflection(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::AssuredDeflection);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectForcePushTargeted(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectForcePushTargeted(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ForcePushTargeted);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectHaste(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectHaste(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Haste);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectImmunity(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectImmunity(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Immunity);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::getEffectSpellId(const VariablesList &args, ExecutionContext &ctx) {
+Variable getEffectSpellId(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::effectDamageImmunityIncrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDamageImmunityIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DamageImmunityIncrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectTemporaryHitpoints(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectTemporaryHitpoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::TemporaryHitpoints);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectSkillIncrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectSkillIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::SkillIncrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::versusAlignmentEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable versusAlignmentEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::versusRacialTypeEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable versusRacialTypeEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::versusTrapEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable versusTrapEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::effectDamageForcePoints(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDamageForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DamageForcePoints);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectHealForcePoints(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectHealForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::HealForcePoints);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectHitPointChangeWhenDying(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectHitPointChangeWhenDying(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::HitPointsChangeWhenDying);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDroidStun(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDroidStun(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DroidStun);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectForcePushed(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectForcePushed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ForcePushed);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectForceResisted(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectForceResisted(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ForceResisted);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectForceFizzle(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectForceFizzle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ForceFizzle);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectAbilityDecrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectAbilityDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::AbilityDecrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectAttackDecrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectAttackDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::AttackDecrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDamageDecrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDamageDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DamageDecrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDamageImmunityDecrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDamageImmunityDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DamageImmunityDecrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectACDecrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectACDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ACDecrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectMovementSpeedDecrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectMovementSpeedDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::MovementSpeedDecrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectSavingThrowDecrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectSavingThrowDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::SavingThrowDecrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectSkillDecrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectSkillDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::SkillDecrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectForceResistanceDecrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectForceResistanceDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ForceResistanceDecrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectInvisibility(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectInvisibility(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Invisibility);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectConcealment(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectConcealment(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Concealment);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectForceShield(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectForceShield(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ForceShield);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDispelMagicAll(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDispelMagicAll(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DispelMagicAll);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDisguise(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDisguise(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Disguise);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectTrueSeeing(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectTrueSeeing(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::TrueSeeing);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectSeeInvisible(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectSeeInvisible(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::SeeInvisible);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectTimeStop(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectTimeStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::TimeStop);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectBlasterDeflectionIncrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectBlasterDeflectionIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::BlasterDeflectionIncrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectBlasterDeflectionDecrease(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectBlasterDeflectionDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::BlasterDeflectionDecrease);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectHorrified(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectHorrified(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Horrified);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectSpellLevelAbsorption(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectSpellLevelAbsorption(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::SpellLevelAbsorption);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDispelMagicBest(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDispelMagicBest(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DispelMagicBest);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectMissChance(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectMissChance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::MissChance);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectModifyAttacks(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectModifyAttacks(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ModifyAttacks);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDamageShield(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDamageShield(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DamageShield);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::setEffectIcon(const VariablesList &args, ExecutionContext &ctx) {
+Variable setEffectIcon(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::effectForceDrain(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectForceDrain(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ForceDrain);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectPsychicStatic(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectPsychicStatic(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::PsychicStatic);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectLightsaberThrow(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectLightsaberThrow(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::LightsaberThrow);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectWhirlWind(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectWhirlWind(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::WhirlWind);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectCutSceneHorrified(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectCutSceneHorrified(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::CutSceneHorrified);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectCutSceneParalyze(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectCutSceneParalyze(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::CutSceneParalyze);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectCutSceneStunned(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectCutSceneStunned(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::CutSceneStunned);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectForceBody(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectForceBody(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ForceBody);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectFury(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectFury(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Fury);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectBlind(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectBlind(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Blindness);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectFPRegenModifier(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectFPRegenModifier(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::FPRegenModifier);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectVPRegenModifier(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectVPRegenModifier(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::VPRegenModifier);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectCrush(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectCrush(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::Crush);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDroidConfused(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDroidConfused(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DroidConfused);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectForceSight(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectForceSight(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::ForceSight);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectMindTrick(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectMindTrick(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::MindTrick);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectFactionModifier(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectFactionModifier(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::FactionModifier);
     return Variable::ofEffect(effect);
 }
 
-Variable Routines::effectDroidScramble(const VariablesList &args, ExecutionContext &ctx) {
+Variable effectDroidScramble(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto effect = make_shared<Effect>(EffectType::DroidScramble);
     return Variable::ofEffect(effect);
 }
+
+} // namespace routine
 
 } // namespace game
 

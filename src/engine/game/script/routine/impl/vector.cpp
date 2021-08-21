@@ -19,7 +19,11 @@
  *  Implementation of vector-related routines.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
+
+#include "../../../../script/types.h"
+
+#include "argutil.h"
 
 using namespace std;
 
@@ -29,28 +33,32 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::vectorMagnitude(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable vectorMagnitude(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::ofFloat(glm::length(getVector(args, 0)));
 }
 
-Variable Routines::vectorNormalize(const VariablesList &args, ExecutionContext &ctx) {
+Variable vectorNormalize(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::ofVector(glm::normalize(getVector(args, 0)));
 }
 
-Variable Routines::vectorCreate(const VariablesList &args, ExecutionContext &ctx) {
+Variable vectorCreate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float x = getFloat(args, 0);
     float y = getFloat(args, 1);
     float z = getFloat(args, 2);
     return Variable::ofVector(glm::vec3(x, y, z));
 }
 
-Variable Routines::angleToVector(const VariablesList &args, ExecutionContext &ctx) {
+Variable angleToVector(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::vectorToAngle(const VariablesList &args, ExecutionContext &ctx) {
+Variable vectorToAngle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
+
+} // namespace routine
 
 } // namespace game
 

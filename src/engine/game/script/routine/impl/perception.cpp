@@ -19,12 +19,14 @@
  *  Implementation of routines related to perception.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
 
 #include "../../../../common/log.h"
+#include "../../../../script/types.h"
 
 #include "../../../object/creature.h"
 
+#include "argutil.h"
 #include "objectutil.h"
 
 using namespace std;
@@ -35,10 +37,12 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::getLastPerceived(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable getLastPerceived(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<SpatialObject> object;
 
-    auto caller = getCallerAsCreature(ctx);
+    auto caller = getCallerAsCreature(game, ctx);
     if (caller) {
         object = caller->perception().lastPerceived;
     } else {
@@ -48,10 +52,10 @@ Variable Routines::getLastPerceived(const VariablesList &args, ExecutionContext 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable Routines::getLastPerceptionHeard(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastPerceptionHeard(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto caller = getCallerAsCreature(ctx);
+    auto caller = getCallerAsCreature(game, ctx);
     if (caller) {
         result = caller->perception().lastPerception == PerceptionType::Heard;
     } else {
@@ -61,10 +65,10 @@ Variable Routines::getLastPerceptionHeard(const VariablesList &args, ExecutionCo
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getLastPerceptionInaudible(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastPerceptionInaudible(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto caller = getCallerAsCreature(ctx);
+    auto caller = getCallerAsCreature(game, ctx);
     if (caller) {
         result = caller->perception().lastPerception == PerceptionType::NotHeard;
     } else {
@@ -74,10 +78,10 @@ Variable Routines::getLastPerceptionInaudible(const VariablesList &args, Executi
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getLastPerceptionSeen(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastPerceptionSeen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto caller = getCallerAsCreature(ctx);
+    auto caller = getCallerAsCreature(game, ctx);
     if (caller) {
         result = caller->perception().lastPerception == PerceptionType::Seen;
     } else {
@@ -87,10 +91,10 @@ Variable Routines::getLastPerceptionSeen(const VariablesList &args, ExecutionCon
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getLastPerceptionVanished(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastPerceptionVanished(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto caller = getCallerAsCreature(ctx);
+    auto caller = getCallerAsCreature(game, ctx);
     if (caller) {
         result = caller->perception().lastPerception == PerceptionType::NotSeen;
     } else {
@@ -100,10 +104,10 @@ Variable Routines::getLastPerceptionVanished(const VariablesList &args, Executio
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getObjectSeen(const VariablesList &args, ExecutionContext &ctx) {
+Variable getObjectSeen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
-    auto target = getCreature(args, 0, ctx);
-    auto source = getCreatureOrCaller(args, 1, ctx);
+    auto target = getCreature(game, args, 0, ctx);
+    auto source = getCreatureOrCaller(game, args, 1, ctx);
 
     if (target && source) {
         result = source->perception().seen.count(target) > 0;
@@ -116,10 +120,10 @@ Variable Routines::getObjectSeen(const VariablesList &args, ExecutionContext &ct
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getObjectHeard(const VariablesList &args, ExecutionContext &ctx) {
+Variable getObjectHeard(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
-    auto target = getCreature(args, 0, ctx);
-    auto source = getCreatureOrCaller(args, 1, ctx);
+    auto target = getCreature(game, args, 0, ctx);
+    auto source = getCreatureOrCaller(game, args, 1, ctx);
 
     if (target && source) {
         result = source->perception().heard.count(target) > 0;
@@ -131,6 +135,8 @@ Variable Routines::getObjectHeard(const VariablesList &args, ExecutionContext &c
 
     return Variable::ofInt(static_cast<int>(move(result)));
 }
+
+} // namespace routine
 
 } // namespace game
 

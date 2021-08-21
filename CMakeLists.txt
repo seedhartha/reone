@@ -538,6 +538,8 @@ set(GAME_HEADERS
     src/engine/game/room.h
     src/engine/game/savedgame.h
     src/engine/game/services.h
+    src/engine/game/script/routine/impl/argutil.h
+    src/engine/game/script/routine/impl/declarations.h
     src/engine/game/script/routine/impl/objectutil.h
     src/engine/game/script/routines.h
     src/engine/game/script/runner.h
@@ -677,6 +679,7 @@ set(GAME_SOURCES
     src/engine/game/services.cpp
     src/engine/game/script/routine/impl/action.cpp
     src/engine/game/script/routine/impl/ambientsound.cpp
+    src/engine/game/script/routine/impl/argutil.cpp
     src/engine/game/script/routine/impl/convert.cpp
     src/engine/game/script/routine/impl/effect.cpp
     src/engine/game/script/routine/impl/encounter.cpp
