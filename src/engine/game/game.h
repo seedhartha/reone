@@ -186,7 +186,7 @@ public:
     // END IEventHandler
 
 protected:
-    static constexpr char kDataDirectoryName[] = "data";
+    const string kDataDirectoryName { "data" };
 
     GameID _gameId;
     boost::filesystem::path _path;
