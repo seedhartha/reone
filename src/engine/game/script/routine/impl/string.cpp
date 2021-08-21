@@ -16,13 +16,10 @@
  */
 
 /** @file
- *  Implementation of routines related to string manipulation.
+ *  Implementation of string-related routines.
  */
 
-#include "routines.h"
-
-#include "../../common/log.h"
-#include "../../resource/strings.h"
+#include "../../routines.h"
 
 using namespace std;
 
@@ -89,6 +86,18 @@ Variable Routines::findSubString(const VariablesList &args, ExecutionContext &ct
     string substr(getString(args, 1));
     size_t pos = str.find(substr);
     return Variable::ofInt(pos != string::npos ? static_cast<int>(pos) : -1);
+}
+
+Variable Routines::testStringAgainstPattern(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
+Variable Routines::getMatchedSubstring(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
+Variable Routines::getMatchedSubstringsCount(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
 }
 
 } // namespace game

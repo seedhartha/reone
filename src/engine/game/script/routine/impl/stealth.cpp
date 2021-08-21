@@ -19,9 +19,9 @@
  *  Implementation of stealth-related routines.
  */
 
-#include "routines.h"
+#include "../../routines.h"
 
-#include "../game.h"
+#include "../../../game.h"
 
 using namespace std;
 
@@ -49,6 +49,10 @@ Variable Routines::setCurrentStealthXP(const VariablesList &args, ExecutionConte
     int current = getInt(args, 0);
     _game.module()->area()->setCurrentStealthXP(current);
     return Variable();
+}
+
+Variable Routines::awardStealthXP(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
 }
 
 Variable Routines::getStealthXPEnabled(const VariablesList &args, ExecutionContext &ctx) {

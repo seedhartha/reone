@@ -16,16 +16,14 @@
  */
 
 /** @file
- *  Implementation of routines related to object actions.
+ *  Implementation of action-related routines.
  */
 
-#include "routines.h"
+#include "../../routines.h"
 
-#include "../../common/log.h"
+#include "../../../../common/log.h"
 
-#include "../action/actionfactory.h"
-#include "../game.h"
-#include "../location.h"
+#include "../../../game.h"
 
 using namespace std;
 
@@ -34,198 +32,6 @@ using namespace reone::script;
 namespace reone {
 
 namespace game {
-
-Variable Routines::delayCommand(const VariablesList &args, ExecutionContext &ctx) {
-    float seconds = getFloat(args, 0);
-    auto action = getAction(args, 1);
-
-    auto objectAction = _game.services().actionFactory().newDoCommand(move(action));
-    getCaller(ctx)->delayAction(move(objectAction), seconds);
-
-    return Variable();
-}
-
-Variable Routines::assignCommand(const VariablesList &args, ExecutionContext &ctx) {
-    auto subject = getObject(args, 0, ctx);
-    auto action = getAction(args, 1);
-
-    if (subject) {
-        auto objectAction = _game.services().actionFactory().newDoCommand(move(action));
-        subject->addAction(move(objectAction));
-    } else {
-        debug("Script: assignCommand: subject is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable();
-}
-
-Variable Routines::actionDoCommand(const VariablesList &args, ExecutionContext &ctx) {
-    auto action = getAction(args, 0);
-
-    auto commandAction = _game.services().actionFactory().newDoCommand(move(action));
-    getCaller(ctx)->addAction(move(commandAction));
-
-    return Variable();
-}
-
-Variable Routines::actionMoveToObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto moveTo = getObject(args, 0, ctx);
-    bool run = getBool(args, 1, false);
-    float range = getFloat(args, 2, 1.0f);
-
-    if (moveTo) {
-        auto action = _game.services().actionFactory().newMoveToObject(move(moveTo), run, range);
-        getCaller(ctx)->addAction(move(action));
-    } else {
-        debug("Script: actionMoveToObject: moveTo is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable();
-}
-
-Variable Routines::actionStartConversation(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: figure out all arguments
-    auto objectToConverse = getObject(args, 0, ctx);
-    string dialogResRef(getString(args, 1, ""));
-    bool ignoreStartRange = getBool(args, 4, false);
-
-    if (objectToConverse) {
-        auto caller = getCaller(ctx);
-        if (dialogResRef.empty()) {
-            dialogResRef = caller->conversation();
-        }
-        auto action = _game.services().actionFactory().newStartConversation(move(objectToConverse), move(dialogResRef), ignoreStartRange);
-        caller->addAction(move(action));
-    } else {
-        debug("Script: actionStartConversation: objectToConverse is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable();
-}
-
-Variable Routines::actionPauseConversation(const VariablesList &args, ExecutionContext &ctx) {
-    auto action = _game.services().actionFactory().newPauseConversation();
-    getCaller(ctx)->addAction(move(action));
-    return Variable();
-}
-
-Variable Routines::actionResumeConversation(const VariablesList &args, ExecutionContext &ctx) {
-    auto action = _game.services().actionFactory().newResumeConversation();
-    getCaller(ctx)->addAction(move(action));
-    return Variable();
-}
-
-Variable Routines::actionOpenDoor(const VariablesList &args, ExecutionContext &ctx) {
-    auto door = getObject(args, 0, ctx);
-    if (door) {
-        auto action = _game.services().actionFactory().newOpenDoor(door);
-        getCaller(ctx)->addAction(move(action));
-    } else {
-        debug("Script: actionOpenDoor: door is invalid", 1, DebugChannels::script);
-    }
-    return Variable();
-}
-
-Variable Routines::actionCloseDoor(const VariablesList &args, ExecutionContext &ctx) {
-    auto door = getObject(args, 0, ctx);
-    if (door) {
-        auto action = _game.services().actionFactory().newCloseDoor(door);
-        getCaller(ctx)->addAction(move(action));
-    } else {
-        debug("Script: actionCloseDoor: door is invalid", 1, DebugChannels::script);
-    }
-    return Variable();
-}
-
-Variable Routines::clearAllActions(const VariablesList &args, ExecutionContext &ctx) {
-    getCaller(ctx)->clearAllActions();
-    return Variable();
-}
-
-Variable Routines::actionJumpToObject(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: pass all arguments to an action
-    auto jumpTo = getObject(args, 0, ctx);
-    bool walkStraightLine = getBool(args, 1, true);
-
-    if (jumpTo) {
-        auto action = _game.services().actionFactory().newJumpToObject(move(jumpTo));
-        getCaller(ctx)->addAction(move(action));
-    } else {
-        debug("Script: actionJumpToObject: jumpTo is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable();
-}
-
-Variable Routines::actionJumpToLocation(const VariablesList &args, ExecutionContext &ctx) {
-    auto location = getLocationEngineType(args, 0);
-    if (location) {
-        auto action = _game.services().actionFactory().newJumpToLocation(move(location));
-        getCaller(ctx)->addAction(move(action));
-    } else {
-        debug("Script: actionJumpToLocation: location is invalid", 1, DebugChannels::script);
-    }
-    return Variable();
-}
-
-Variable Routines::actionForceMoveToObject(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: pass all arguments to an action
-    auto moveTo = getObject(args, 0, ctx);
-    bool run = getBool(args, 1, false);
-    float range = getFloat(args, 2, 1.0f);
-    float timeout = getFloat(args, 3, 30.0f);
-
-    if (moveTo) {
-        auto action = _game.services().actionFactory().newMoveToObject(move(moveTo), run, range);
-        getCaller(ctx)->addAction(move(action));
-    } else {
-        debug("Script: actionForceMoveToObject: moveTo is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable();
-}
-
-Variable Routines::actionForceMoveToLocation(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: pass all arguments to an action
-    auto destination = getLocationEngineType(args, 0);
-    bool run = getBool(args, 1, false);
-    float timeout = getFloat(args, 2, 30.0f);
-
-    if (destination) {
-        auto action = _game.services().actionFactory().newMoveToLocation(move(destination));
-        getCaller(ctx)->addAction(move(action));
-    } else {
-        debug("Script: actionForceMoveToLocation: destination is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable();
-}
-
-Variable Routines::jumpToObject(const VariablesList &args, ExecutionContext &ctx) {
-    // TODO: pass all arguments to an action
-    auto jumpTo = getObject(args, 0, ctx);
-    bool walkStraightLine = getBool(args, 1, true);
-
-    if (jumpTo) {
-        auto action = _game.services().actionFactory().newJumpToObject(move(jumpTo));
-        getCaller(ctx)->addActionOnTop(move(action));
-    } else {
-        debug("Script: jumpToObject: jumpTo is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable();
-}
-
-Variable Routines::jumpToLocation(const VariablesList &args, ExecutionContext &ctx) {
-    auto destination = getLocationEngineType(args, 0);
-    if (destination) {
-        auto action = _game.services().actionFactory().newJumpToLocation(move(destination));
-        getCaller(ctx)->addActionOnTop(move(action));
-    } else {
-        debug("Script: jumpToLocation: destination is invalid", 1, DebugChannels::script);
-    }
-    return Variable();
-}
 
 Variable Routines::actionRandomWalk(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: add action to caller
@@ -241,6 +47,21 @@ Variable Routines::actionMoveToLocation(const VariablesList &args, ExecutionCont
         getCaller(ctx)->addAction(move(action));
     } else {
         debug("Script: actionMoveToLocation: destination is invalid", 1, DebugChannels::script);
+    }
+
+    return Variable();
+}
+
+Variable Routines::actionMoveToObject(const VariablesList &args, ExecutionContext &ctx) {
+    auto moveTo = getObject(args, 0, ctx);
+    bool run = getBool(args, 1, false);
+    float range = getFloat(args, 2, 1.0f);
+
+    if (moveTo) {
+        auto action = _game.services().actionFactory().newMoveToObject(move(moveTo), run, range);
+        getCaller(ctx)->addAction(move(action));
+    } else {
+        debug("Script: actionMoveToObject: moveTo is invalid", 1, DebugChannels::script);
     }
 
     return Variable();
@@ -345,6 +166,28 @@ Variable Routines::actionPlayAnimation(const VariablesList &args, ExecutionConte
     return Variable();
 }
 
+Variable Routines::actionOpenDoor(const VariablesList &args, ExecutionContext &ctx) {
+    auto door = getObject(args, 0, ctx);
+    if (door) {
+        auto action = _game.services().actionFactory().newOpenDoor(door);
+        getCaller(ctx)->addAction(move(action));
+    } else {
+        debug("Script: actionOpenDoor: door is invalid", 1, DebugChannels::script);
+    }
+    return Variable();
+}
+
+Variable Routines::actionCloseDoor(const VariablesList &args, ExecutionContext &ctx) {
+    auto door = getObject(args, 0, ctx);
+    if (door) {
+        auto action = _game.services().actionFactory().newCloseDoor(door);
+        getCaller(ctx)->addAction(move(action));
+    } else {
+        debug("Script: actionCloseDoor: door is invalid", 1, DebugChannels::script);
+    }
+    return Variable();
+}
+
 Variable Routines::actionCastSpellAtObject(const VariablesList &args, ExecutionContext &ctx) {
     auto spell = getEnum<ForcePower>(args, 0);
     auto target = getObject(args, 1, ctx);
@@ -353,7 +196,7 @@ Variable Routines::actionCastSpellAtObject(const VariablesList &args, ExecutionC
     int domainLevel = getInt(args, 4, 0);
     auto projectilePathType = getEnum(args, 5, ProjectilePathType::Default);
     bool instantSpell = getBool(args, 6, false);
-    
+
     // TODO: add action to caller
 
     return Variable();
@@ -402,12 +245,70 @@ Variable Routines::actionForceFollowObject(const VariablesList &args, ExecutionC
     return Variable();
 }
 
+Variable Routines::actionJumpToObject(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: pass all arguments to an action
+    auto jumpTo = getObject(args, 0, ctx);
+    bool walkStraightLine = getBool(args, 1, true);
+
+    if (jumpTo) {
+        auto action = _game.services().actionFactory().newJumpToObject(move(jumpTo));
+        getCaller(ctx)->addAction(move(action));
+    } else {
+        debug("Script: actionJumpToObject: jumpTo is invalid", 1, DebugChannels::script);
+    }
+
+    return Variable();
+}
+
 Variable Routines::actionWait(const VariablesList &args, ExecutionContext &ctx) {
     float seconds = getFloat(args, 0);
 
     auto action = _game.services().actionFactory().newWait(seconds);
     getCaller(ctx)->addAction(move(action));
 
+    return Variable();
+}
+
+Variable Routines::actionStartConversation(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: figure out all arguments
+    auto objectToConverse = getObject(args, 0, ctx);
+    string dialogResRef(getString(args, 1, ""));
+    bool ignoreStartRange = getBool(args, 4, false);
+
+    if (objectToConverse) {
+        auto caller = getCaller(ctx);
+        if (dialogResRef.empty()) {
+            dialogResRef = caller->conversation();
+        }
+        auto action = _game.services().actionFactory().newStartConversation(move(objectToConverse), move(dialogResRef), ignoreStartRange);
+        caller->addAction(move(action));
+    } else {
+        debug("Script: actionStartConversation: objectToConverse is invalid", 1, DebugChannels::script);
+    }
+
+    return Variable();
+}
+
+Variable Routines::actionPauseConversation(const VariablesList &args, ExecutionContext &ctx) {
+    auto action = _game.services().actionFactory().newPauseConversation();
+    getCaller(ctx)->addAction(move(action));
+    return Variable();
+}
+
+Variable Routines::actionResumeConversation(const VariablesList &args, ExecutionContext &ctx) {
+    auto action = _game.services().actionFactory().newResumeConversation();
+    getCaller(ctx)->addAction(move(action));
+    return Variable();
+}
+
+Variable Routines::actionJumpToLocation(const VariablesList &args, ExecutionContext &ctx) {
+    auto location = getLocationEngineType(args, 0);
+    if (location) {
+        auto action = _game.services().actionFactory().newJumpToLocation(move(location));
+        getCaller(ctx)->addAction(move(action));
+    } else {
+        debug("Script: actionJumpToLocation: location is invalid", 1, DebugChannels::script);
+    }
     return Variable();
 }
 
@@ -469,6 +370,15 @@ Variable Routines::actionUseSkill(const VariablesList &args, ExecutionContext &c
     return Variable();
 }
 
+Variable Routines::actionDoCommand(const VariablesList &args, ExecutionContext &ctx) {
+    auto action = getAction(args, 0);
+
+    auto commandAction = _game.services().actionFactory().newDoCommand(move(action));
+    getCaller(ctx)->addAction(move(commandAction));
+
+    return Variable();
+}
+
 Variable Routines::actionUseTalentOnObject(const VariablesList &args, ExecutionContext &ctx) {
     auto chosenTalen = getTalent(args, 0);
     auto target = getObject(args, 1, ctx);
@@ -507,6 +417,39 @@ Variable Routines::actionMoveAwayFromLocation(const VariablesList &args, Executi
 
 Variable Routines::actionSurrenderToEnemies(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: add action to caller
+    return Variable();
+}
+
+Variable Routines::actionForceMoveToLocation(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: pass all arguments to an action
+    auto destination = getLocationEngineType(args, 0);
+    bool run = getBool(args, 1, false);
+    float timeout = getFloat(args, 2, 30.0f);
+
+    if (destination) {
+        auto action = _game.services().actionFactory().newMoveToLocation(move(destination));
+        getCaller(ctx)->addAction(move(action));
+    } else {
+        debug("Script: actionForceMoveToLocation: destination is invalid", 1, DebugChannels::script);
+    }
+
+    return Variable();
+}
+
+Variable Routines::actionForceMoveToObject(const VariablesList &args, ExecutionContext &ctx) {
+    // TODO: pass all arguments to an action
+    auto moveTo = getObject(args, 0, ctx);
+    bool run = getBool(args, 1, false);
+    float range = getFloat(args, 2, 1.0f);
+    float timeout = getFloat(args, 3, 30.0f);
+
+    if (moveTo) {
+        auto action = _game.services().actionFactory().newMoveToObject(move(moveTo), run, range);
+        getCaller(ctx)->addAction(move(action));
+    } else {
+        debug("Script: actionForceMoveToObject: moveTo is invalid", 1, DebugChannels::script);
+    }
+
     return Variable();
 }
 
@@ -566,12 +509,6 @@ Variable Routines::actionFollowOwner(const VariablesList &args, ExecutionContext
 Variable Routines::actionSwitchWeapons(const VariablesList &args, ExecutionContext &ctx) {
     // TODO: add action to caller
     return Variable();
-}
-
-Variable Routines::getCurrentAction(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObjectOrCaller(args, 0, ctx);
-    shared_ptr<Action> action(object->getCurrentAction());
-    return Variable::ofInt(static_cast<int>(action ? action->type() : ActionType::QueueEmpty));
 }
 
 } // namespace game

@@ -538,7 +538,7 @@ set(GAME_HEADERS
     src/engine/game/room.h
     src/engine/game/savedgame.h
     src/engine/game/services.h
-    src/engine/game/script/objectutil.h
+    src/engine/game/script/routine/impl/objectutil.h
     src/engine/game/script/routines.h
     src/engine/game/script/runner.h
     src/engine/game/soundsets.h
@@ -675,27 +675,30 @@ set(GAME_SOURCES
     src/engine/game/reputes.cpp
     src/engine/game/room.cpp
     src/engine/game/services.cpp
+    src/engine/game/script/routine/impl/action.cpp
+    src/engine/game/script/routine/impl/ambientsound.cpp
+    src/engine/game/script/routine/impl/convert.cpp
+    src/engine/game/script/routine/impl/effect.cpp
+    src/engine/game/script/routine/impl/encounter.cpp
+    src/engine/game/script/routine/impl/event.cpp
+    src/engine/game/script/routine/impl/log.cpp
+    src/engine/game/script/routine/impl/main.cpp
+    src/engine/game/script/routine/impl/math.cpp
+    src/engine/game/script/routine/impl/movie.cpp
+    src/engine/game/script/routine/impl/music.cpp
+    src/engine/game/script/routine/impl/party.cpp
+    src/engine/game/script/routine/impl/perception.cpp
+    src/engine/game/script/routine/impl/planet.cpp
+    src/engine/game/script/routine/impl/random.cpp
+    src/engine/game/script/routine/impl/soundobject.cpp
+    src/engine/game/script/routine/impl/stealth.cpp
+    src/engine/game/script/routine/impl/string.cpp
+    src/engine/game/script/routine/impl/talent.cpp
+    src/engine/game/script/routine/impl/time.cpp
+    src/engine/game/script/routine/impl/vector.cpp
     src/engine/game/script/routines.cpp
-    src/engine/game/script/routines_actions.cpp
-    src/engine/game/script/routines_combat.cpp
-    src/engine/game/script/routines_common.cpp
-    src/engine/game/script/routines_d20.cpp
-    src/engine/game/script/routines_effects.cpp
-    src/engine/game/script/routines_events.cpp
-    src/engine/game/script/routines_faction.cpp
-    src/engine/game/script/routines_items.cpp
     src/engine/game/script/routines_kotor.cpp
-    src/engine/game/script/routines_locations.cpp
-    src/engine/game/script/routines_math.cpp
-    src/engine/game/script/routines_objects.cpp
-    src/engine/game/script/routines_party.cpp
-    src/engine/game/script/routines_perception.cpp
-    src/engine/game/script/routines_placeholders.cpp
-    src/engine/game/script/routines_stealth.cpp
-    src/engine/game/script/routines_strings.cpp
-    src/engine/game/script/routines_time.cpp
     src/engine/game/script/routines_tsl.cpp
-    src/engine/game/script/routines_vars.cpp
     src/engine/game/script/runner.cpp
     src/engine/game/soundsets.cpp
     src/engine/game/surfaces.cpp

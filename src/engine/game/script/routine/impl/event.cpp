@@ -16,16 +16,15 @@
  */
 
 /** @file
- *  Implementation of routines related to the Event engine type.
+ *  Implementation of event-related routines.
  */
 
-#include "routines.h"
+#include "../../routines.h"
 
-#include "../../common/log.h"
-#include "../../script/executioncontext.h"
+#include "../../../../common/log.h"
 
-#include "../event.h"
-#include "../game.h"
+#include "../../../event.h"
+#include "../../../game.h"
 
 using namespace std;
 
@@ -34,12 +33,6 @@ using namespace reone::script;
 namespace reone {
 
 namespace game {
-
-Variable Routines::eventUserDefined(const VariablesList &args, ExecutionContext &ctx) {
-    int eventNumber = getInt(args, 0);
-    auto event = make_shared<Event>(eventNumber);
-    return Variable::ofEvent(event);
-}
 
 Variable Routines::signalEvent(const VariablesList &args, ExecutionContext &ctx) {
     auto object = getObject(args, 0, ctx);
@@ -57,8 +50,22 @@ Variable Routines::signalEvent(const VariablesList &args, ExecutionContext &ctx)
     return Variable();
 }
 
-Variable Routines::getUserDefinedEventNumber(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(ctx.userDefinedEventNumber);
+Variable Routines::eventUserDefined(const VariablesList &args, ExecutionContext &ctx) {
+    int eventNumber = getInt(args, 0);
+    auto event = make_shared<Event>(eventNumber);
+    return Variable::ofEvent(event);
+}
+
+Variable Routines::eventSpellCastAt(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
+Variable Routines::eventConversation(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
+}
+
+Variable Routines::eventActivateItem(const VariablesList &args, ExecutionContext &ctx) {
+    return Variable::notImplemented();
 }
 
 } // namespace game

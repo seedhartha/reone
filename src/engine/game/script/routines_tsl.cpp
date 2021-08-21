@@ -878,7 +878,7 @@ void Routines::addTslRoutines() {
     add("GetHealTarget", Object, { Object }, &Routines::getHealTarget);
     add("GetRandomDestination", TVector, { Object, Int }, &Routines::getRandomDestination);
     add("IsFormActive", Int, { Object, Int }, &Routines::isFormActive);
-    add("GetSpellFormMask", Int, { Int }, &Routines::getSpellFromMask);
+    add("GetSpellFormMask", Int, { Int }, &Routines::getSpellFormMask);
     add("GetSpellBaseForcePointCost", Int, { Int }, &Routines::getSpellBaseForcePointCost);
     add("SetKeepStealthInDialog", Void, { Int }, &Routines::setKeepStealthInDialog);
     add("HasLineOfSight", Int, { TVector, TVector, Object, Object }, &Routines::hasLineOfSight);

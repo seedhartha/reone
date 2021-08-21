@@ -627,7 +627,7 @@ private:
     REO_DECL_ROUTINE(getSpellBaseForcePointCost)
     REO_DECL_ROUTINE(getSpellCastItem)
     REO_DECL_ROUTINE(getSpellForcePointCost)
-    REO_DECL_ROUTINE(getSpellFromMask)
+    REO_DECL_ROUTINE(getSpellFormMask)
     REO_DECL_ROUTINE(getSpellId)
     REO_DECL_ROUTINE(getSpellSaveDC)
     REO_DECL_ROUTINE(getSpellTarget)
