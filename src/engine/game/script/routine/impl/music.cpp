@@ -19,9 +19,10 @@
  *  Implementation of music-related routines.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
 
 #include "../../../../common/log.h"
+#include "../../../../script/types.h"
 
 using namespace std;
 
@@ -31,53 +32,57 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::musicBackgroundPlay(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable musicBackgroundPlay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::musicBackgroundStop(const VariablesList &args, ExecutionContext &ctx) {
+Variable musicBackgroundStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::musicBackgroundSetDelay(const VariablesList &args, ExecutionContext &ctx) {
+Variable musicBackgroundSetDelay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::musicBackgroundChangeDay(const VariablesList &args, ExecutionContext &ctx) {
+Variable musicBackgroundChangeDay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::musicBackgroundChangeNight(const VariablesList &args, ExecutionContext &ctx) {
+Variable musicBackgroundChangeNight(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::musicBattlePlay(const VariablesList &args, ExecutionContext &ctx) {
+Variable musicBattlePlay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::musicBattleStop(const VariablesList &args, ExecutionContext &ctx) {
+Variable musicBattleStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::musicBattleChange(const VariablesList &args, ExecutionContext &ctx) {
+Variable musicBattleChange(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::musicBackgroundGetDayTrack(const VariablesList &args, ExecutionContext &ctx) {
+Variable musicBackgroundGetDayTrack(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::musicBackgroundGetNightTrack(const VariablesList &args, ExecutionContext &ctx) {
+Variable musicBackgroundGetNightTrack(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::musicBackgroundGetBattleTrack(const VariablesList &args, ExecutionContext &ctx) {
+Variable musicBackgroundGetBattleTrack(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setMusicVolume(const VariablesList &args, ExecutionContext &ctx) {
+Variable setMusicVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
+
+} // namespace routine
 
 } // namespace game
 

@@ -19,7 +19,7 @@
  *  Implementation of routines related to ambient sounds.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
 
 using namespace std;
 
@@ -29,29 +29,33 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::ambientSoundPlay(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable ambientSoundPlay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::ambientSoundStop(const VariablesList &args, ExecutionContext &ctx) {
+Variable ambientSoundStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::ambientSoundChangeDay(const VariablesList &args, ExecutionContext &ctx) {
+Variable ambientSoundChangeDay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::ambientSoundChangeNight(const VariablesList &args, ExecutionContext &ctx) {
+Variable ambientSoundChangeNight(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::ambientSoundSetDayVolume(const VariablesList &args, ExecutionContext &ctx) {
+Variable ambientSoundSetDayVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::ambientSoundSetNightVolume(const VariablesList &args, ExecutionContext &ctx) {
+Variable ambientSoundSetNightVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
+
+} // namespace routine
 
 } // namespace game
 

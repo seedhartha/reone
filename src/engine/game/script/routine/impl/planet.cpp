@@ -19,7 +19,9 @@
  *  Implementation of planet-related routines.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
+
+#include "../../../../script/types.h"
 
 using namespace std;
 
@@ -29,25 +31,29 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::setPlanetSelectable(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable setPlanetSelectable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getPlanetSelectable(const VariablesList &args, ExecutionContext &ctx) {
+Variable getPlanetSelectable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setPlanetAvailable(const VariablesList &args, ExecutionContext &ctx) {
+Variable setPlanetAvailable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getPlanetAvailable(const VariablesList &args, ExecutionContext &ctx) {
+Variable getPlanetAvailable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSelectedPlanet(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSelectedPlanet(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
+
+} // namespace routine
 
 } // namespace game
 

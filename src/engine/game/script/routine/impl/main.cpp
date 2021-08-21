@@ -19,14 +19,15 @@
  *  Implementation of main routines.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
 
 #include "../../../../common/log.h"
-#include "../../../../script/executioncontext.h"
 
 #include "../../../game.h"
 #include "../../../location.h"
+#include "../../../object/spatial.h"
 
+#include "argutil.h"
 #include "objectutil.h"
 
 using namespace std;
@@ -38,14 +39,16 @@ namespace reone {
 
 namespace game {
 
+namespace routine {
+
 constexpr bool g_shipBuild = true;
 
-Variable Routines::assignCommand(const VariablesList &args, ExecutionContext &ctx) {
-    auto subject = getObject(args, 0, ctx);
+Variable assignCommand(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto subject = getObject(game, args, 0, ctx);
     auto action = getAction(args, 1);
 
     if (subject) {
-        auto objectAction = _game.services().actionFactory().newDoCommand(move(action));
+        auto objectAction = game.services().actionFactory().newDoCommand(move(action));
         subject->addAction(move(objectAction));
     } else {
         debug("Script: assignCommand: subject is invalid", 1, DebugChannels::script);
@@ -54,23 +57,23 @@ Variable Routines::assignCommand(const VariablesList &args, ExecutionContext &ct
     return Variable();
 }
 
-Variable Routines::delayCommand(const VariablesList &args, ExecutionContext &ctx) {
+Variable delayCommand(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float seconds = getFloat(args, 0);
     auto action = getAction(args, 1);
 
-    auto objectAction = _game.services().actionFactory().newDoCommand(move(action));
-    getCaller(ctx)->delayAction(move(objectAction), seconds);
+    auto objectAction = game.services().actionFactory().newDoCommand(move(action));
+    getCaller(game, ctx)->delayAction(move(objectAction), seconds);
 
     return Variable();
 }
 
-Variable Routines::executeScript(const VariablesList &args, ExecutionContext &ctx) {
+Variable executeScript(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string script(getString(args, 0));
-    auto target = getObject(args, 1, ctx);
+    auto target = getObject(game, args, 1, ctx);
     int scriptVar = getInt(args, 2, -1);
 
     if (target) {
-        _game.services().scriptRunner().run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
+        game.services().scriptRunner().run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
     } else {
         debug("Script: executeScript: target is invalid", 1, DebugChannels::script);
     }
@@ -78,13 +81,13 @@ Variable Routines::executeScript(const VariablesList &args, ExecutionContext &ct
     return Variable();
 }
 
-Variable Routines::clearAllActions(const VariablesList &args, ExecutionContext &ctx) {
-    getCaller(ctx)->clearAllActions();
+Variable clearAllActions(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    getCaller(game, ctx)->clearAllActions();
     return Variable();
 }
 
-Variable Routines::setFacing(const VariablesList &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsSpatial(ctx);
+Variable setFacing(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto caller = getCallerAsSpatial(game, ctx);
     float direction = getFloat(args, 0);
 
     if (caller) {
@@ -96,39 +99,39 @@ Variable Routines::setFacing(const VariablesList &args, ExecutionContext &ctx) {
     return Variable();
 }
 
-Variable Routines::switchPlayerCharacter(const VariablesList &args, ExecutionContext &ctx) {
+Variable switchPlayerCharacter(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setAreaUnescapable(const VariablesList &args, ExecutionContext &ctx) {
+Variable setAreaUnescapable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool unescapable = getBool(args, 0);
-    _game.module()->area()->setUnescapable(unescapable);
+    game.module()->area()->setUnescapable(unescapable);
     return Variable();
 }
 
-Variable Routines::getAreaUnescapable(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<int>(_game.module()->area()->isUnescapable()));
+Variable getAreaUnescapable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable::ofInt(static_cast<int>(game.module()->area()->isUnescapable()));
 }
 
-Variable Routines::getArea(const VariablesList &args, ExecutionContext &ctx) {
-    auto area = _game.module()->area();
+Variable getArea(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto area = game.module()->area();
     return Variable::ofObject(getObjectIdOrInvalid(area));
 }
 
-Variable Routines::getEnteringObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto triggerrer = getTriggerrer(ctx);
+Variable getEnteringObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto triggerrer = getTriggerrer(game, ctx);
     return Variable::ofObject(getObjectIdOrInvalid(triggerrer));
 }
 
-Variable Routines::getExitingObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto triggerrer = getTriggerrer(ctx);
+Variable getExitingObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto triggerrer = getTriggerrer(game, ctx);
     return Variable::ofObject(getObjectIdOrInvalid(triggerrer));
 }
 
-Variable Routines::getPosition(const VariablesList &args, ExecutionContext &ctx) {
+Variable getPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     glm::vec3 result(0.0f);
 
-    auto target = getSpatialObject(args, 0, ctx);
+    auto target = getSpatialObject(game, args, 0, ctx);
     if (target) {
         result = target->position();
     } else {
@@ -139,10 +142,10 @@ Variable Routines::getPosition(const VariablesList &args, ExecutionContext &ctx)
     return Variable::ofVector(move(result));
 }
 
-Variable Routines::getFacing(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFacing(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float result = -1.0f;
 
-    auto target = getSpatialObject(args, 0, ctx);
+    auto target = getSpatialObject(game, args, 0, ctx);
     if (target) {
         result = glm::degrees(target->getFacing());
     } else {
@@ -152,13 +155,13 @@ Variable Routines::getFacing(const VariablesList &args, ExecutionContext &ctx) {
     return Variable::ofFloat(result);
 }
 
-Variable Routines::getItemPossessor(const VariablesList &args, ExecutionContext &ctx) {
+Variable getItemPossessor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getItemPossessedBy(const VariablesList &args, ExecutionContext &ctx) {
+Variable getItemPossessedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Item> item;
-    auto creature = getCreature(args, 0, ctx);
+    auto creature = getCreature(game, args, 0, ctx);
     auto itemTag = boost::to_lower_copy(getString(args, 1));
 
     if (creature && !itemTag.empty()) {
@@ -172,10 +175,10 @@ Variable Routines::getItemPossessedBy(const VariablesList &args, ExecutionContex
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
-Variable Routines::createItemOnObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable createItemOnObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Item> item;
     string itemTemplate(boost::to_lower_copy(getString(args, 0)));
-    auto target = getSpatialObjectOrCaller(args, 1, ctx);
+    auto target = getSpatialObjectOrCaller(game, args, 1, ctx);
     int stackSize = getInt(args, 2, 1);
 
     if (!itemTemplate.empty() && target) {
@@ -189,14 +192,14 @@ Variable Routines::createItemOnObject(const VariablesList &args, ExecutionContex
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
-Variable Routines::getLastAttacker(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastAttacker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNearestCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int firstCriteriaType = getInt(args, 0);
     int firstCriteriaValue = getInt(args, 1);
-    auto target = getSpatialObjectOrCaller(args, 2, ctx);
+    auto target = getSpatialObjectOrCaller(game, args, 2, ctx);
     int nth = getInt(args, 3, 1);
     int secondCriteriaType = getInt(args, 4, -1);
     int secondCriteriaValue = getInt(args, 5, -1);
@@ -212,15 +215,15 @@ Variable Routines::getNearestCreature(const VariablesList &args, ExecutionContex
         criterias.push_back(make_pair(static_cast<CreatureType>(thirdCriteriaType), thirdCriteriaValue));
     }
 
-    shared_ptr<Creature> creature(_game.module()->area()->getNearestCreature(target, criterias, nth - 1));
+    shared_ptr<Creature> creature(game.module()->area()->getNearestCreature(target, criterias, nth - 1));
 
     return Variable::ofObject(getObjectIdOrInvalid(creature));
 }
 
-Variable Routines::getDistanceToObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable getDistanceToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float result = -1.0f;
-    auto caller = getCallerAsSpatial(ctx);
-    auto object = getSpatialObject(args, 0, ctx);
+    auto caller = getCallerAsSpatial(game, ctx);
+    auto object = getSpatialObject(game, args, 0, ctx);
 
     if (caller && object) {
         result = caller->getDistanceTo(*object);
@@ -233,27 +236,27 @@ Variable Routines::getDistanceToObject(const VariablesList &args, ExecutionConte
     return Variable::ofFloat(result);
 }
 
-Variable Routines::getIsObjectValid(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0, ctx);
+Variable getIsObjectValid(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto object = getObject(game, args, 0, ctx);
     return Variable::ofInt(static_cast<int>(static_cast<bool>(object)));
 }
 
-Variable Routines::setCameraFacing(const VariablesList &args, ExecutionContext &ctx) {
+Variable setCameraFacing(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::playSound(const VariablesList &args, ExecutionContext &ctx) {
+Variable playSound(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSpellTargetObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSpellTargetObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getCurrentHitPoints(const VariablesList &args, ExecutionContext &ctx) {
+Variable getCurrentHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int result = 0;
 
-    auto object = getObjectOrCaller(args, 0, ctx);
+    auto object = getObjectOrCaller(game, args, 0, ctx);
     if (object) {
         result = object->currentHitPoints();
     } else {
@@ -263,10 +266,10 @@ Variable Routines::getCurrentHitPoints(const VariablesList &args, ExecutionConte
     return Variable::ofInt(result);
 }
 
-Variable Routines::getMaxHitPoints(const VariablesList &args, ExecutionContext &ctx) {
+Variable getMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int result = 0;
 
-    auto object = getObjectOrCaller(args, 0, ctx);
+    auto object = getObjectOrCaller(game, args, 0, ctx);
     if (object) {
         result = object->maxHitPoints();
     } else {
@@ -276,74 +279,74 @@ Variable Routines::getMaxHitPoints(const VariablesList &args, ExecutionContext &
     return Variable::ofInt(result);
 }
 
-Variable Routines::getLastItemEquipped(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastItemEquipped(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSubScreenID(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSubScreenID(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::cancelCombat(const VariablesList &args, ExecutionContext &ctx) {
+Variable cancelCombat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getCurrentForcePoints(const VariablesList &args, ExecutionContext &ctx) {
+Variable getCurrentForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getMaxForcePoints(const VariablesList &args, ExecutionContext &ctx) {
+Variable getMaxForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::pauseGame(const VariablesList &args, ExecutionContext &ctx) {
+Variable pauseGame(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setPlayerRestrictMode(const VariablesList &args, ExecutionContext &ctx) {
+Variable setPlayerRestrictMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool restrict = getBool(args, 0);
-    _game.module()->player().setRestrictMode(restrict);
+    game.module()->player().setRestrictMode(restrict);
     return Variable();
 }
 
-Variable Routines::getPlayerRestrictMode(const VariablesList &args, ExecutionContext &ctx) {
+Variable getPlayerRestrictMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: why is this object necessary?
-    auto object = getCreatureOrCaller(args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(_game.module()->player().isRestrictMode()));
+    auto object = getCreatureOrCaller(game, args, 0, ctx);
+    return Variable::ofInt(static_cast<int>(game.module()->player().isRestrictMode()));
 }
 
-Variable Routines::getCasterLevel(const VariablesList &args, ExecutionContext &ctx) {
+Variable getCasterLevel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFirstEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFirstEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getNextEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNextEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::removeEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable removeEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFirstObjectInArea(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFirstObjectInArea(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getNextObjectInArea(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNextObjectInArea(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getMetaMagicFeat(const VariablesList &args, ExecutionContext &ctx) {
+Variable getMetaMagicFeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getObjectType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getObjectType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto result = ObjectType::Invalid;
 
-    auto target = getObject(args, 0, ctx);
+    auto target = getObject(game, args, 0, ctx);
     if (target) {
         result = target->type();
     } else {
@@ -353,10 +356,10 @@ Variable Routines::getObjectType(const VariablesList &args, ExecutionContext &ct
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getRacialType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getRacialType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto result = RacialType::Invalid;
 
-    auto creature = getCreature(args, 0, ctx);
+    auto creature = getCreature(game, args, 0, ctx);
     if (creature) {
         result = creature->racialType();
     } else {
@@ -366,46 +369,46 @@ Variable Routines::getRacialType(const VariablesList &args, ExecutionContext &ct
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::fortitudeSave(const VariablesList &args, ExecutionContext &ctx) {
+Variable fortitudeSave(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::reflexSave(const VariablesList &args, ExecutionContext &ctx) {
+Variable reflexSave(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::willSave(const VariablesList &args, ExecutionContext &ctx) {
+Variable willSave(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSpellSaveDC(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSpellSaveDC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getAC(const VariablesList &args, ExecutionContext &ctx) {
+Variable getAC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getGoodEvilValue(const VariablesList &args, ExecutionContext &ctx) {
+Variable getGoodEvilValue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getAlignmentGoodEvil(const VariablesList &args, ExecutionContext &ctx) {
+Variable getAlignmentGoodEvil(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFirstObjectInShape(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFirstObjectInShape(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getNextObjectInShape(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNextObjectInShape(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getItemStackSize(const VariablesList &args, ExecutionContext &ctx) {
+Variable getItemStackSize(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int result = 0;
 
-    auto item = getItem(args, 0, ctx);
+    auto item = getItem(game, args, 0, ctx);
     if (item) {
         result = item->stackSize();
     } else {
@@ -415,9 +418,9 @@ Variable Routines::getItemStackSize(const VariablesList &args, ExecutionContext 
     return Variable::ofInt(result);
 }
 
-Variable Routines::getAbilityScore(const VariablesList &args, ExecutionContext &ctx) {
+Variable getAbilityScore(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int result = 0;
-    auto creature = getCreature(args, 0, ctx);
+    auto creature = getCreature(game, args, 0, ctx);
     auto type = getEnum<Ability>(args, 1);
 
     if (creature) {
@@ -429,10 +432,10 @@ Variable Routines::getAbilityScore(const VariablesList &args, ExecutionContext &
     return Variable::ofInt(result);
 }
 
-Variable Routines::getIsDead(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsDead(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto creature = getCreature(args, 0, ctx);
+    auto creature = getCreature(game, args, 0, ctx);
     if (creature) {
         result = creature->isDead();
     } else {
@@ -442,8 +445,8 @@ Variable Routines::getIsDead(const VariablesList &args, ExecutionContext &ctx) {
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::setFacingPoint(const VariablesList &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsSpatial(ctx);
+Variable setFacingPoint(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto caller = getCallerAsSpatial(game, ctx);
     if (caller) {
         glm::vec3 target(getVector(args, 0));
         caller->face(target);
@@ -453,16 +456,16 @@ Variable Routines::setFacingPoint(const VariablesList &args, ExecutionContext &c
     return Variable();
 }
 
-Variable Routines::touchAttackMelee(const VariablesList &args, ExecutionContext &ctx) {
+Variable touchAttackMelee(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::touchAttackRanged(const VariablesList &args, ExecutionContext &ctx) {
+Variable touchAttackRanged(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setItemStackSize(const VariablesList &args, ExecutionContext &ctx) {
-    auto item = getItem(args, 0, ctx);
+Variable setItemStackSize(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto item = getItem(game, args, 0, ctx);
     int stackSize = getInt(args, 1);
 
     if (item) {
@@ -474,10 +477,10 @@ Variable Routines::setItemStackSize(const VariablesList &args, ExecutionContext 
     return Variable();
 }
 
-Variable Routines::getDistanceBetween(const VariablesList &args, ExecutionContext &ctx) {
+Variable getDistanceBetween(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float result = 0.0f;
-    auto objectA = getSpatialObject(args, 0, ctx);
-    auto objectB = getSpatialObject(args, 1, ctx);
+    auto objectA = getSpatialObject(game, args, 0, ctx);
+    auto objectB = getSpatialObject(game, args, 1, ctx);
 
     if (objectA && objectB) {
         result = objectA->getDistanceTo(*objectB);
@@ -490,13 +493,13 @@ Variable Routines::getDistanceBetween(const VariablesList &args, ExecutionContex
     return Variable::ofFloat(result);
 }
 
-Variable Routines::setReturnStrref(const VariablesList &args, ExecutionContext &ctx) {
+Variable setReturnStrref(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getItemInSlot(const VariablesList &args, ExecutionContext &ctx) {
+Variable getItemInSlot(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Item> item;
-    auto creature = getCreatureOrCaller(args, 1, ctx);
+    auto creature = getCreatureOrCaller(game, args, 1, ctx);
     int slot = getInt(args, 0);
 
     if (creature) {
@@ -508,18 +511,18 @@ Variable Routines::getItemInSlot(const VariablesList &args, ExecutionContext &ct
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
-Variable Routines::setGlobalString(const VariablesList &args, ExecutionContext &ctx) {
+Variable setGlobalString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
     string value(getString(args, 1));
 
-    _game.setGlobalString(id, value);
+    game.setGlobalString(id, value);
 
     return Variable();
 }
 
-Variable Routines::setCommandable(const VariablesList &args, ExecutionContext &ctx) {
+Variable setCommandable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool commandable = getBool(args, 0);
-    auto target = getObjectOrCaller(args, 1, ctx);
+    auto target = getObjectOrCaller(game, args, 1, ctx);
 
     if (target) {
         target->setCommandable(commandable);
@@ -530,10 +533,10 @@ Variable Routines::setCommandable(const VariablesList &args, ExecutionContext &c
     return Variable();
 }
 
-Variable Routines::getCommandable(const VariablesList &args, ExecutionContext &ctx) {
+Variable getCommandable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto target = getObjectOrCaller(args, 0, ctx);
+    auto target = getObjectOrCaller(game, args, 0, ctx);
     if (target) {
         result = target->isCommandable();
     } else {
@@ -543,10 +546,10 @@ Variable Routines::getCommandable(const VariablesList &args, ExecutionContext &c
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getHitDice(const VariablesList &args, ExecutionContext &ctx) {
+Variable getHitDice(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int result = 0;
 
-    auto creature = getCreature(args, 0, ctx);
+    auto creature = getCreature(game, args, 0, ctx);
     if (creature) {
         result = creature->attributes().getAggregateLevel();
     } else {
@@ -556,10 +559,10 @@ Variable Routines::getHitDice(const VariablesList &args, ExecutionContext &ctx) 
     return Variable::ofInt(result);
 }
 
-Variable Routines::getTag(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string result;
 
-    auto object = getObject(args, 0, ctx);
+    auto object = getObject(game, args, 0, ctx);
     if (object) {
         result = object->tag();
     } else {
@@ -569,14 +572,14 @@ Variable Routines::getTag(const VariablesList &args, ExecutionContext &ctx) {
     return Variable::ofString(move(result));
 }
 
-Variable Routines::resistForce(const VariablesList &args, ExecutionContext &ctx) {
+Variable resistForce(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionEqual(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionEqual(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
-    auto firstObject = getCreature(args, 0, ctx);
-    auto secondObject = getCreatureOrCaller(args, 1, ctx);
+    auto firstObject = getCreature(game, args, 0, ctx);
+    auto secondObject = getCreatureOrCaller(game, args, 1, ctx);
 
     if (firstObject && secondObject) {
         result = firstObject->faction() == secondObject->faction();
@@ -589,9 +592,9 @@ Variable Routines::getFactionEqual(const VariablesList &args, ExecutionContext &
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::changeFaction(const VariablesList &args, ExecutionContext &ctx) {
-    auto objectToChangeFaction = getCreature(args, 0, ctx);
-    auto memberOfFactionToJoin = getCreature(args, 1, ctx);
+Variable changeFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto objectToChangeFaction = getCreature(game, args, 0, ctx);
+    auto memberOfFactionToJoin = getCreature(game, args, 1, ctx);
 
     if (objectToChangeFaction && memberOfFactionToJoin) {
         objectToChangeFaction->setFaction(memberOfFactionToJoin->faction());
@@ -604,81 +607,81 @@ Variable Routines::changeFaction(const VariablesList &args, ExecutionContext &ct
     return Variable();
 }
 
-Variable Routines::getIsListening(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsListening(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setListening(const VariablesList &args, ExecutionContext &ctx) {
+Variable setListening(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setListenPattern(const VariablesList &args, ExecutionContext &ctx) {
+Variable setListenPattern(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionWeakestMember(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionWeakestMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionStrongestMember(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionStrongestMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionMostDamagedMember(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionMostDamagedMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionLeastDamagedMember(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionLeastDamagedMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionGold(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionGold(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionAverageReputation(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionAverageReputation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionAverageGoodEvilAlignment(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionAverageGoodEvilAlignment(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionAverageLevel(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionAverageLevel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionAverageXP(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionAverageXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionMostFrequentClass(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionMostFrequentClass(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionWorstAC(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionWorstAC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionBestAC(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionBestAC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getGlobalString(const VariablesList &args, ExecutionContext &ctx) {
+Variable getGlobalString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
-    return Variable::ofString(_game.getGlobalString(id));
+    return Variable::ofString(game.getGlobalString(id));
 }
 
-Variable Routines::getListenPatternNumber(const VariablesList &args, ExecutionContext &ctx) {
+Variable getListenPatternNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
-    return Variable::ofString(_game.getGlobalString(id));
+    return Variable::ofString(game.getGlobalString(id));
 }
 
-Variable Routines::getWaypointByTag(const VariablesList &args, ExecutionContext &ctx) {
+Variable getWaypointByTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<SpatialObject> object;
     string tag(boost::to_lower_copy(getString(args, 0)));
 
-    for (auto &waypoint : _game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
+    for (auto &waypoint : game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         if (waypoint->tag() == tag) {
             object = waypoint;
             break;
@@ -688,53 +691,53 @@ Variable Routines::getWaypointByTag(const VariablesList &args, ExecutionContext 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable Routines::getTransitionTarget(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTransitionTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getObjectByTag(const VariablesList &args, ExecutionContext &ctx) {
+Variable getObjectByTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Object> object;
     string tag(boost::to_lower_copy(getString(args, 0)));
     int nth = getInt(args, 1, 0);
 
     if (!tag.empty()) {
-        object = _game.module()->area()->getObjectByTag(tag, nth);
+        object = game.module()->area()->getObjectByTag(tag, nth);
     } else {
         // Apparently, empty tag in this context stands for the player
-        object = _game.services().party().player();
+        object = game.services().party().player();
     }
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable Routines::adjustAlignment(const VariablesList &args, ExecutionContext &ctx) {
+Variable adjustAlignment(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setAreaTransitionBMP(const VariablesList &args, ExecutionContext &ctx) {
+Variable setAreaTransitionBMP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getReputation(const VariablesList &args, ExecutionContext &ctx) {
+Variable getReputation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::adjustReputation(const VariablesList &args, ExecutionContext &ctx) {
+Variable adjustReputation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getModuleFileName(const VariablesList &args, ExecutionContext &ctx) {
+Variable getModuleFileName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getGoingToBeAttackedBy(const VariablesList &args, ExecutionContext &ctx) {
+Variable getGoingToBeAttackedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLocation(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Location> result;
 
-    auto object = getSpatialObject(args, 0, ctx);
+    auto object = getSpatialObject(game, args, 0, ctx);
     if (object) {
         glm::vec3 position(object->position());
         float facing = object->getFacing();
@@ -746,7 +749,7 @@ Variable Routines::getLocation(const VariablesList &args, ExecutionContext &ctx)
     return Variable::ofLocation(move(result));
 }
 
-Variable Routines::location(const VariablesList &args, ExecutionContext &ctx) {
+Variable location(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     glm::vec3 position(getVector(args, 0));
     float orientation = glm::radians(getFloat(args, 1));
     auto location = make_shared<Location>(move(position), orientation);
@@ -754,7 +757,7 @@ Variable Routines::location(const VariablesList &args, ExecutionContext &ctx) {
     return Variable::ofLocation(location);
 }
 
-Variable Routines::applyEffectAtLocation(const VariablesList &args, ExecutionContext &ctx) {
+Variable applyEffectAtLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     glm::vec3 position(getVector(args, 0));
     float orientation = glm::radians(getFloat(args, 1));
     auto location = make_shared<Location>(move(position), orientation);
@@ -762,10 +765,10 @@ Variable Routines::applyEffectAtLocation(const VariablesList &args, ExecutionCon
     return Variable::ofLocation(location);
 }
 
-Variable Routines::applyEffectToObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable applyEffectToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto durationType = getEnum<DurationType>(args, 0);
     auto effect = getEffect(args, 1);
-    auto target = getSpatialObject(args, 2, ctx);
+    auto target = getSpatialObject(game, args, 2, ctx);
     float duration = getFloat(args, 3, 0.0f);
 
     if (target) {
@@ -777,12 +780,12 @@ Variable Routines::applyEffectToObject(const VariablesList &args, ExecutionConte
     return Variable();
 }
 
-Variable Routines::getIsPC(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto creature = getCreature(args, 0, ctx);
+    auto creature = getCreature(game, args, 0, ctx);
     if (creature) {
-        result = creature == _game.services().party().player();
+        result = creature == game.services().party().player();
     } else {
         debug("Script: getIsPC: creature is invalid", 1, DebugChannels::script);
     }
@@ -790,15 +793,15 @@ Variable Routines::getIsPC(const VariablesList &args, ExecutionContext &ctx) {
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::speakString(const VariablesList &args, ExecutionContext &ctx) {
+Variable speakString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSpellTargetLocation(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSpellTargetLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getPositionFromLocation(const VariablesList &args, ExecutionContext &ctx) {
+Variable getPositionFromLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     glm::vec3 result(0.0f);
 
     auto location = getLocationEngineType(args, 0);
@@ -811,7 +814,7 @@ Variable Routines::getPositionFromLocation(const VariablesList &args, ExecutionC
     return Variable::ofVector(move(result));
 }
 
-Variable Routines::getFacingFromLocation(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFacingFromLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float result = -1.0f;
 
     auto location = getLocationEngineType(args, 0);
@@ -824,7 +827,7 @@ Variable Routines::getFacingFromLocation(const VariablesList &args, ExecutionCon
     return Variable::ofFloat(result);
 }
 
-Variable Routines::getNearestCreatureToLocation(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNearestCreatureToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int firstCriteriaType = getInt(args, 0);
     int firstCriteriaValue = getInt(args, 1);
     auto location = getLocationEngineType(args, 2);
@@ -843,54 +846,54 @@ Variable Routines::getNearestCreatureToLocation(const VariablesList &args, Execu
         criterias.push_back(make_pair(static_cast<CreatureType>(thirdCriteriaType), thirdCriteriaValue));
     }
 
-    shared_ptr<Creature> creature(_game.module()->area()->getNearestCreatureToLocation(*location, criterias, nth - 1));
+    shared_ptr<Creature> creature(game.module()->area()->getNearestCreatureToLocation(*location, criterias, nth - 1));
 
     return Variable::ofObject(getObjectIdOrInvalid(creature));
 }
 
-Variable Routines::getNearestObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNearestObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto objectType = getEnum(args, 0, ObjectType::All);
-    auto target = getSpatialObjectOrCaller(args, 1, ctx);
+    auto target = getSpatialObjectOrCaller(game, args, 1, ctx);
     int nth = getInt(args, 2, 1);
 
-    shared_ptr<SpatialObject> object(_game.module()->area()->getNearestObject(target->position(), nth - 1, [&objectType](auto &object) {
+    shared_ptr<SpatialObject> object(game.module()->area()->getNearestObject(target->position(), nth - 1, [&objectType](auto &object) {
         return object->type() == objectType;
     }));
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable Routines::getNearestObjectToLocation(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNearestObjectToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto objectType = getEnum<ObjectType>(args, 0);
     auto location = getLocationEngineType(args, 1);
     int nth = getInt(args, 2, 1);
 
-    shared_ptr<SpatialObject> object(_game.module()->area()->getNearestObject(location->position(), nth - 1, [&objectType](auto &object) {
+    shared_ptr<SpatialObject> object(game.module()->area()->getNearestObject(location->position(), nth - 1, [&objectType](auto &object) {
         return object->type() == objectType;
     }));
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable Routines::getNearestObjectByTag(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNearestObjectByTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string tag(boost::to_lower_copy(getString(args, 0)));
-    auto target = getSpatialObjectOrCaller(args, 1, ctx);
+    auto target = getSpatialObjectOrCaller(game, args, 1, ctx);
     int nth = getInt(args, 2, 1);
 
-    shared_ptr<SpatialObject> object(_game.module()->area()->getNearestObject(target->position(), nth - 1, [&tag](auto &object) {
+    shared_ptr<SpatialObject> object(game.module()->area()->getNearestObject(target->position(), nth - 1, [&tag](auto &object) {
         return object->tag() == tag;
     }));
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable Routines::getIsEnemy(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsEnemy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
-    auto target = getCreature(args, 0, ctx);
-    auto source = getCreatureOrCaller(args, 1, ctx);
+    auto target = getCreature(game, args, 0, ctx);
+    auto source = getCreatureOrCaller(game, args, 1, ctx);
 
     if (target && source) {
-        result = _game.services().reputes().getIsEnemy(*target, *source);
+        result = game.services().reputes().getIsEnemy(*target, *source);
     } else if (!target) {
         debug("Script: getIsEnemy: target is invalid", 1, DebugChannels::script);
     } else if (!source) {
@@ -900,13 +903,13 @@ Variable Routines::getIsEnemy(const VariablesList &args, ExecutionContext &ctx) 
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getIsFriend(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsFriend(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
-    auto target = getCreature(args, 0, ctx);
-    auto source = getCreatureOrCaller(args, 1, ctx);
+    auto target = getCreature(game, args, 0, ctx);
+    auto source = getCreatureOrCaller(game, args, 1, ctx);
 
     if (target && source) {
-        result = _game.services().reputes().getIsFriend(*target, *source);
+        result = game.services().reputes().getIsFriend(*target, *source);
     } else if (!target) {
         debug("Script: getIsFriend: target is invalid", 1, DebugChannels::script);
     } else if (!source) {
@@ -916,13 +919,13 @@ Variable Routines::getIsFriend(const VariablesList &args, ExecutionContext &ctx)
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getIsNeutral(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsNeutral(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
-    auto target = getCreature(args, 0, ctx);
-    auto source = getCreatureOrCaller(args, 1, ctx);
+    auto target = getCreature(game, args, 0, ctx);
+    auto source = getCreatureOrCaller(game, args, 1, ctx);
 
     if (target && source) {
-        result = _game.services().reputes().getIsNeutral(*target, *source);
+        result = game.services().reputes().getIsNeutral(*target, *source);
     } else if (!target) {
         debug("Script: getIsNeutral: target is invalid", 1, DebugChannels::script);
     } else if (!source) {
@@ -932,70 +935,70 @@ Variable Routines::getIsNeutral(const VariablesList &args, ExecutionContext &ctx
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getPCSpeaker(const VariablesList &args, ExecutionContext &ctx) {
-    auto player = _game.services().party().player();
+Variable getPCSpeaker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto player = game.services().party().player();
     return Variable::ofObject(getObjectIdOrInvalid(player));
 }
 
-Variable Routines::getStringByStrRef(const VariablesList &args, ExecutionContext &ctx) {
+Variable getStringByStrRef(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int strRef = getInt(args, 0);
-    return Variable::ofString(_game.services().resource().strings().get(strRef));
+    return Variable::ofString(game.services().resource().strings().get(strRef));
 }
 
-Variable Routines::destroyObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto destroy = getSpatialObject(args, 0, ctx);
+Variable destroyObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto destroy = getSpatialObject(game, args, 0, ctx);
     if (destroy) {
-        _game.module()->area()->destroyObject(*destroy);
+        game.module()->area()->destroyObject(*destroy);
     } else {
         debug("Script: destroyObject: destroy is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
 
-Variable Routines::getModule(const VariablesList &args, ExecutionContext &ctx) {
-    auto module = _game.module();
+Variable getModule(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto module = game.module();
     return Variable::ofObject(getObjectIdOrInvalid(module));
 }
 
-Variable Routines::createObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable createObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto objectType = getEnum<ObjectType>(args, 0);
     string blueprintResRef(boost::to_lower_copy(getString(args, 1)));
     auto location = getLocationEngineType(args, 2);
     bool useAppearAnimation = getBool(args, 3, false);
 
-    auto object = _game.module()->area()->createObject(objectType, blueprintResRef, location);
+    auto object = game.module()->area()->createObject(objectType, blueprintResRef, location);
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable Routines::getLastSpellCaster(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastSpellCaster(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastSpell(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastSpell(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getUserDefinedEventNumber(const VariablesList &args, ExecutionContext &ctx) {
+Variable getUserDefinedEventNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::ofInt(ctx.userDefinedEventNumber);
 }
 
-Variable Routines::getSpellId(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSpellId(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::randomName(const VariablesList &args, ExecutionContext &ctx) {
+Variable randomName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLoadFromSaveGame(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<int>(_game.isLoadFromSaveGame()));
+Variable getLoadFromSaveGame(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable::ofInt(static_cast<int>(game.isLoadFromSaveGame()));
 }
 
-Variable Routines::getName(const VariablesList &args, ExecutionContext &ctx) {
+Variable getName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string result;
 
-    auto object = getObject(args, 0, ctx);
+    auto object = getObject(game, args, 0, ctx);
     if (object) {
         result = object->name();
     } else {
@@ -1005,52 +1008,52 @@ Variable Routines::getName(const VariablesList &args, ExecutionContext &ctx) {
     return Variable::ofString(move(result));
 }
 
-Variable Routines::getLastSpeaker(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastSpeaker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::beginConversation(const VariablesList &args, ExecutionContext &ctx) {
+Variable beginConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastClosedBy(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastClosedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFirstInPersistentObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFirstInPersistentObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getNextInPersistentObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNextInPersistentObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getAreaOfEffectCreator(const VariablesList &args, ExecutionContext &ctx) {
+Variable getAreaOfEffectCreator(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::showLevelUpGUI(const VariablesList &args, ExecutionContext &ctx) {
+Variable showLevelUpGUI(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setItemNonEquippable(const VariablesList &args, ExecutionContext &ctx) {
+Variable setItemNonEquippable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getButtonMashCheck(const VariablesList &args, ExecutionContext &ctx) {
+Variable getButtonMashCheck(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setButtonMashCheck(const VariablesList &args, ExecutionContext &ctx) {
+Variable setButtonMashCheck(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::giveItem(const VariablesList &args, ExecutionContext &ctx) {
+Variable giveItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::objectToString(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0, ctx);
+Variable objectToString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto object = getObject(game, args, 0, ctx);
     string result;
 
     if (object) {
@@ -1062,26 +1065,26 @@ Variable Routines::objectToString(const VariablesList &args, ExecutionContext &c
     return Variable::ofString(move(result));
 }
 
-Variable Routines::getIsImmune(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsImmune(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getModuleItemAcquired(const VariablesList &args, ExecutionContext &ctx) {
+Variable getModuleItemAcquired(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getModuleItemAcquiredFrom(const VariablesList &args, ExecutionContext &ctx) {
+Variable getModuleItemAcquiredFrom(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setCustomToken(const VariablesList &args, ExecutionContext &ctx) {
+Variable setCustomToken(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getHasFeat(const VariablesList &args, ExecutionContext &ctx) {
+Variable getHasFeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
     auto feat = getEnum<FeatType>(args, 0);
-    auto creature = getCreatureOrCaller(args, 1, ctx);
+    auto creature = getCreatureOrCaller(game, args, 1, ctx);
 
     if (creature) {
         result = creature->attributes().hasFeat(feat);
@@ -1092,9 +1095,9 @@ Variable Routines::getHasFeat(const VariablesList &args, ExecutionContext &ctx) 
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getHasSkill(const VariablesList &args, ExecutionContext &ctx) {
+Variable getHasSkill(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
-    auto creature = getCreatureOrCaller(args, 1, ctx);
+    auto creature = getCreatureOrCaller(game, args, 1, ctx);
     auto skill = getEnum<SkillType>(args, 0);
 
     if (creature) {
@@ -1106,19 +1109,19 @@ Variable Routines::getHasSkill(const VariablesList &args, ExecutionContext &ctx)
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getLastPlayerDied(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastPlayerDied(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getModuleItemLost(const VariablesList &args, ExecutionContext &ctx) {
+Variable getModuleItemLost(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getModuleItemLostBy(const VariablesList &args, ExecutionContext &ctx) {
+Variable getModuleItemLostBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getDistanceBetweenLocations(const VariablesList &args, ExecutionContext &ctx) {
+Variable getDistanceBetweenLocations(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float result = 0.0f;
     auto locationA = getLocationEngineType(args, 0);
     auto locationB = getLocationEngineType(args, 1);
@@ -1134,12 +1137,12 @@ Variable Routines::getDistanceBetweenLocations(const VariablesList &args, Execut
     return Variable::ofFloat(result);
 }
 
-Variable Routines::getReflexAdjustedDamage(const VariablesList &args, ExecutionContext &ctx) {
+Variable getReflexAdjustedDamage(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::playAnimation(const VariablesList &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsSpatial(ctx);
+Variable playAnimation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto caller = getCallerAsSpatial(game, ctx);
     auto animType = getEnum<AnimationType>(args, 0);
     float speed = getFloat(args, 1, 1.0f);
     float seconds = getFloat(args, 2, 0.0f); // TODO: handle duration
@@ -1155,44 +1158,44 @@ Variable Routines::playAnimation(const VariablesList &args, ExecutionContext &ct
     return Variable();
 }
 
-Variable Routines::getHasSpellEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable getHasSpellEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getCreatureHasTalent(const VariablesList &args, ExecutionContext &ctx) {
+Variable getCreatureHasTalent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getCreatureTalentRandom(const VariablesList &args, ExecutionContext &ctx) {
+Variable getCreatureTalentRandom(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getCreatureTalentBest(const VariablesList &args, ExecutionContext &ctx) {
+Variable getCreatureTalentBest(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getGoldPieceValue(const VariablesList &args, ExecutionContext &ctx) {
+Variable getGoldPieceValue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsPlayableRacialType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsPlayableRacialType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::jumpToLocation(const VariablesList &args, ExecutionContext &ctx) {
+Variable jumpToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto destination = getLocationEngineType(args, 0);
     if (destination) {
-        auto action = _game.services().actionFactory().newJumpToLocation(move(destination));
-        getCaller(ctx)->addActionOnTop(move(action));
+        auto action = game.services().actionFactory().newJumpToLocation(move(destination));
+        getCaller(game, ctx)->addActionOnTop(move(action));
     } else {
         debug("Script: jumpToLocation: destination is invalid", 1, DebugChannels::script);
     }
     return Variable();
 }
 
-Variable Routines::getSkillRank(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSkillRank(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int result = 0;
-    auto object = getCreatureOrCaller(args, 1, ctx);
+    auto object = getCreatureOrCaller(game, args, 1, ctx);
     auto skill = getEnum<SkillType>(args, 0);
 
     if (object) {
@@ -1204,10 +1207,10 @@ Variable Routines::getSkillRank(const VariablesList &args, ExecutionContext &ctx
     return Variable::ofInt(result);
 }
 
-Variable Routines::getAttackTarget(const VariablesList &args, ExecutionContext &ctx) {
+Variable getAttackTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<SpatialObject> target;
 
-    auto creature = getCreatureOrCaller(args, 0, ctx);
+    auto creature = getCreatureOrCaller(game, args, 0, ctx);
     if (creature) {
         target = creature->getAttackTarget();
     } else {
@@ -1217,18 +1220,18 @@ Variable Routines::getAttackTarget(const VariablesList &args, ExecutionContext &
     return Variable::ofObject(getObjectIdOrInvalid(target));
 }
 
-Variable Routines::getLastAttackType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastAttackType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastAttackMode(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastAttackMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionContext &ctx) {
+Variable getDistanceBetween2D(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float result = 0.0f;
-    auto objectA = getSpatialObject(args, 0, ctx);
-    auto objectB = getSpatialObject(args, 1, ctx);
+    auto objectA = getSpatialObject(game, args, 0, ctx);
+    auto objectB = getSpatialObject(game, args, 1, ctx);
 
     if (objectA && objectB) {
         result = objectA->getDistanceTo(glm::vec2(objectB->position()));
@@ -1241,10 +1244,10 @@ Variable Routines::getDistanceBetween2D(const VariablesList &args, ExecutionCont
     return Variable::ofFloat(result);
 }
 
-Variable Routines::getIsInCombat(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsInCombat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto creature = getCreatureOrCaller(args, 0, ctx);
+    auto creature = getCreatureOrCaller(game, args, 0, ctx);
     if (creature) {
         result = creature->isInCombat();
     } else {
@@ -1254,12 +1257,12 @@ Variable Routines::getIsInCombat(const VariablesList &args, ExecutionContext &ct
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getLastAssociateCommand(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastAssociateCommand(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::giveGoldToCreature(const VariablesList &args, ExecutionContext &ctx) {
-    auto creature = getCreature(args, 0, ctx);
+Variable giveGoldToCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto creature = getCreature(game, args, 0, ctx);
     auto gp = getInt(args, 1);
     if (creature) {
         creature->giveGold(gp);
@@ -1269,12 +1272,12 @@ Variable Routines::giveGoldToCreature(const VariablesList &args, ExecutionContex
     return Variable();
 }
 
-Variable Routines::setIsDestroyable(const VariablesList &args, ExecutionContext &ctx) {
+Variable setIsDestroyable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setLocked(const VariablesList &args, ExecutionContext &ctx) {
-    auto target = getDoor(args, 0, ctx);
+Variable setLocked(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto target = getDoor(game, args, 0, ctx);
     bool locked = getBool(args, 1);
 
     if (target) {
@@ -1286,10 +1289,10 @@ Variable Routines::setLocked(const VariablesList &args, ExecutionContext &ctx) {
     return Variable();
 }
 
-Variable Routines::getLocked(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLocked(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto target = getDoor(args, 0, ctx);
+    auto target = getDoor(game, args, 0, ctx);
     if (target) {
         result = target->isLocked();
     } else {
@@ -1299,30 +1302,30 @@ Variable Routines::getLocked(const VariablesList &args, ExecutionContext &ctx) {
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getClickingObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable getClickingObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setAssociateListenPatterns(const VariablesList &args, ExecutionContext &ctx) {
+Variable setAssociateListenPatterns(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastWeaponUsed(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastWeaponUsed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastUsedBy(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastUsedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getAbilityModifier(const VariablesList &args, ExecutionContext &ctx) {
+Variable getAbilityModifier(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIdentified(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIdentified(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto item = getItem(args, 0, ctx);
+    auto item = getItem(game, args, 0, ctx);
     if (item) {
         result = item->isIdentified();
     } else {
@@ -1332,8 +1335,8 @@ Variable Routines::getIdentified(const VariablesList &args, ExecutionContext &ct
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::setIdentified(const VariablesList &args, ExecutionContext &ctx) {
-    auto item = getItem(args, 0, ctx);
+Variable setIdentified(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto item = getItem(game, args, 0, ctx);
     bool identified = getBool(args, 1);
 
     if (item) {
@@ -1345,7 +1348,7 @@ Variable Routines::setIdentified(const VariablesList &args, ExecutionContext &ct
     return Variable();
 }
 
-Variable Routines::getDistanceBetweenLocations2D(const VariablesList &args, ExecutionContext &ctx) {
+Variable getDistanceBetweenLocations2D(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float result = 0.0f;
     auto locationA = getLocationEngineType(args, 0);
     auto locationB = getLocationEngineType(args, 1);
@@ -1361,10 +1364,10 @@ Variable Routines::getDistanceBetweenLocations2D(const VariablesList &args, Exec
     return Variable::ofFloat(result);
 }
 
-Variable Routines::getDistanceToObject2D(const VariablesList &args, ExecutionContext &ctx) {
+Variable getDistanceToObject2D(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float result = -1.0f;
-    auto caller = getCallerAsSpatial(ctx);
-    auto object = getSpatialObject(args, 0, ctx);
+    auto caller = getCallerAsSpatial(game, ctx);
+    auto object = getSpatialObject(game, args, 0, ctx);
 
     if (caller && object) {
         result = caller->getDistanceTo(glm::vec2(object->position()));
@@ -1377,22 +1380,22 @@ Variable Routines::getDistanceToObject2D(const VariablesList &args, ExecutionCon
     return Variable::ofFloat(result);
 }
 
-Variable Routines::getBlockingDoor(const VariablesList &args, ExecutionContext &ctx) {
+Variable getBlockingDoor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsDoorActionPossible(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsDoorActionPossible(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::doDoorAction(const VariablesList &args, ExecutionContext &ctx) {
+Variable doDoorAction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFirstItemInInventory(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFirstItemInInventory(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Item> item;
 
-    auto target = getSpatialObjectOrCaller(args, 0, ctx);
+    auto target = getSpatialObjectOrCaller(game, args, 0, ctx);
     if (target) {
         item = target->getFirstItem();
     } else {
@@ -1402,10 +1405,10 @@ Variable Routines::getFirstItemInInventory(const VariablesList &args, ExecutionC
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
-Variable Routines::getNextItemInInventory(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNextItemInInventory(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Item> item;
 
-    auto target = getSpatialObjectOrCaller(args, 0, ctx);
+    auto target = getSpatialObjectOrCaller(game, args, 0, ctx);
     if (target) {
         item = target->getNextItem();
     } else {
@@ -1415,10 +1418,10 @@ Variable Routines::getNextItemInInventory(const VariablesList &args, ExecutionCo
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
-Variable Routines::getClassByPosition(const VariablesList &args, ExecutionContext &ctx) {
+Variable getClassByPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto result = ClassType::Invalid;
     int position = getInt(args, 0);
-    auto creature = getCreatureOrCaller(args, 1, ctx);
+    auto creature = getCreatureOrCaller(game, args, 1, ctx);
 
     if (creature) {
         result = creature->attributes().getClassByPosition(position);
@@ -1429,9 +1432,9 @@ Variable Routines::getClassByPosition(const VariablesList &args, ExecutionContex
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getLevelByPosition(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLevelByPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int result = 0;
-    auto creature = getCreatureOrCaller(args, 1, ctx);
+    auto creature = getCreatureOrCaller(game, args, 1, ctx);
     int position = getInt(args, 0);
 
     if (creature) {
@@ -1443,9 +1446,9 @@ Variable Routines::getLevelByPosition(const VariablesList &args, ExecutionContex
     return Variable::ofInt(result);
 }
 
-Variable Routines::getLevelByClass(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLevelByClass(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int result = 0;
-    auto creature = getCreatureOrCaller(args, 1, ctx);
+    auto creature = getCreatureOrCaller(game, args, 1, ctx);
     auto clazz = getEnum<ClassType>(args, 0);
 
     if (creature) {
@@ -1457,50 +1460,50 @@ Variable Routines::getLevelByClass(const VariablesList &args, ExecutionContext &
     return Variable::ofInt(result);
 }
 
-Variable Routines::getDamageDealtByType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getDamageDealtByType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getTotalDamageDealt(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTotalDamageDealt(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastDamager(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastDamager(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastDisarmed(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastDisarmed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastDisturbed(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastDisturbed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastLocked(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastLocked(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastUnlocked(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastUnlocked(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getInventoryDisturbType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getInventoryDisturbType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getInventoryDisturbItem(const VariablesList &args, ExecutionContext &ctx) {
+Variable getInventoryDisturbItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::showUpgradeScreen(const VariablesList &args, ExecutionContext &ctx) {
+Variable showUpgradeScreen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getGender(const VariablesList &args, ExecutionContext &ctx) {
+Variable getGender(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto result = Gender::None;
 
-    auto creature = getCreature(args, 0, ctx);
+    auto creature = getCreature(game, args, 0, ctx);
     if (creature) {
         result = creature->gender();
     } else {
@@ -1510,10 +1513,10 @@ Variable Routines::getGender(const VariablesList &args, ExecutionContext &ctx) {
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getAttemptedAttackTarget(const VariablesList &args, ExecutionContext &ctx) {
+Variable getAttemptedAttackTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<SpatialObject> target;
 
-    auto caller = getCallerAsCreature(ctx);
+    auto caller = getCallerAsCreature(game, ctx);
     if (caller) {
         target = caller->getAttemptedAttackTarget();
     } else {
@@ -1523,46 +1526,46 @@ Variable Routines::getAttemptedAttackTarget(const VariablesList &args, Execution
     return Variable::ofObject(getObjectIdOrInvalid(target));
 }
 
-Variable Routines::playPazaak(const VariablesList &args, ExecutionContext &ctx) {
+Variable playPazaak(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastPazaakResult(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastPazaakResult(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::displayFeedBackText(const VariablesList &args, ExecutionContext &ctx) {
+Variable displayFeedBackText(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::addJournalQuestEntry(const VariablesList &args, ExecutionContext &ctx) {
+Variable addJournalQuestEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::removeJournalQuestEntry(const VariablesList &args, ExecutionContext &ctx) {
+Variable removeJournalQuestEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getJournalEntry(const VariablesList &args, ExecutionContext &ctx) {
+Variable getJournalEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::playRumblePattern(const VariablesList &args, ExecutionContext &ctx) {
+Variable playRumblePattern(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::stopRumblePattern(const VariablesList &args, ExecutionContext &ctx) {
+Variable stopRumblePattern(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::sendMessageToPC(const VariablesList &args, ExecutionContext &ctx) {
+Variable sendMessageToPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getAttemptedSpellTarget(const VariablesList &args, ExecutionContext &ctx) {
+Variable getAttemptedSpellTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<SpatialObject> target;
 
-    auto caller = getCallerAsCreature(ctx);
+    auto caller = getCallerAsCreature(game, ctx);
     if (caller) {
         // TODO: implement
     } else {
@@ -1572,14 +1575,14 @@ Variable Routines::getAttemptedSpellTarget(const VariablesList &args, ExecutionC
     return Variable::ofObject(getObjectIdOrInvalid(target));
 }
 
-Variable Routines::getLastOpenedBy(const VariablesList &args, ExecutionContext &ctx) {
-    auto triggerrer = getTriggerrer(ctx);
+Variable getLastOpenedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto triggerrer = getTriggerrer(game, ctx);
     return Variable::ofObject(getObjectIdOrInvalid(triggerrer));
 }
 
-Variable Routines::getHasSpell(const VariablesList &args, ExecutionContext &ctx) {
+Variable getHasSpell(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
-    auto creature = getCreatureOrCaller(args, 1, ctx);
+    auto creature = getCreatureOrCaller(game, args, 1, ctx);
     auto spell = getEnum<ForcePower>(args, 0);
 
     if (creature) {
@@ -1591,30 +1594,30 @@ Variable Routines::getHasSpell(const VariablesList &args, ExecutionContext &ctx)
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::openStore(const VariablesList &args, ExecutionContext &ctx) {
+Variable openStore(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFirstFactionMember(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFirstFactionMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getNextFactionMember(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNextFactionMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getJournalQuestExperience(const VariablesList &args, ExecutionContext &ctx) {
+Variable getJournalQuestExperience(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::jumpToObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable jumpToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
-    auto jumpTo = getObject(args, 0, ctx);
+    auto jumpTo = getObject(game, args, 0, ctx);
     bool walkStraightLine = getBool(args, 1, true);
 
     if (jumpTo) {
-        auto action = _game.services().actionFactory().newJumpToObject(move(jumpTo));
-        getCaller(ctx)->addActionOnTop(move(action));
+        auto action = game.services().actionFactory().newJumpToObject(move(jumpTo));
+        getCaller(game, ctx)->addActionOnTop(move(action));
     } else {
         debug("Script: jumpToObject: jumpTo is invalid", 1, DebugChannels::script);
     }
@@ -1622,24 +1625,24 @@ Variable Routines::jumpToObject(const VariablesList &args, ExecutionContext &ctx
     return Variable();
 }
 
-Variable Routines::setMapPinEnabled(const VariablesList &args, ExecutionContext &ctx) {
+Variable setMapPinEnabled(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::popUpGUIPanel(const VariablesList &args, ExecutionContext &ctx) {
+Variable popUpGUIPanel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::addMultiClass(const VariablesList &args, ExecutionContext &ctx) {
+Variable addMultiClass(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsLinkImmune(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsLinkImmune(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::giveXPToCreature(const VariablesList &args, ExecutionContext &ctx) {
-    auto creature = getCreature(args, 0, ctx);
+Variable giveXPToCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto creature = getCreature(game, args, 0, ctx);
     int xpAmount = getInt(args, 1);
 
     if (creature) {
@@ -1651,8 +1654,8 @@ Variable Routines::giveXPToCreature(const VariablesList &args, ExecutionContext 
     return Variable();
 }
 
-Variable Routines::setXP(const VariablesList &args, ExecutionContext &ctx) {
-    auto creature = getCreature(args, 0, ctx);
+Variable setXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto creature = getCreature(game, args, 0, ctx);
     int xpAmount = getInt(args, 1);
 
     if (creature) {
@@ -1664,10 +1667,10 @@ Variable Routines::setXP(const VariablesList &args, ExecutionContext &ctx) {
     return Variable();
 }
 
-Variable Routines::getXP(const VariablesList &args, ExecutionContext &ctx) {
+Variable getXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int result = 0;
 
-    auto creature = getCreature(args, 0, ctx);
+    auto creature = getCreature(game, args, 0, ctx);
     if (creature) {
         result = creature->xp();
     } else {
@@ -1677,10 +1680,10 @@ Variable Routines::getXP(const VariablesList &args, ExecutionContext &ctx) {
     return Variable::ofInt(result);
 }
 
-Variable Routines::getBaseItemType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getBaseItemType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int result = 0;
 
-    auto item = getItem(args, 0, ctx);
+    auto item = getItem(game, args, 0, ctx);
     if (item) {
         result = item->baseItemType();
     } else {
@@ -1690,34 +1693,34 @@ Variable Routines::getBaseItemType(const VariablesList &args, ExecutionContext &
     return Variable::ofInt(result);
 }
 
-Variable Routines::getItemHasItemProperty(const VariablesList &args, ExecutionContext &ctx) {
+Variable getItemHasItemProperty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getItemACValue(const VariablesList &args, ExecutionContext &ctx) {
+Variable getItemACValue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::exploreAreaForPlayer(const VariablesList &args, ExecutionContext &ctx) {
+Variable exploreAreaForPlayer(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsEncounterCreature(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsEncounterCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastPlayerDying(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastPlayerDying(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getStartingLocation(const VariablesList &args, ExecutionContext &ctx) {
-    const ModuleInfo &info = _game.module()->info();
+Variable getStartingLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    const ModuleInfo &info = game.module()->info();
     auto location = make_shared<Location>(info.entryPosition, info.entryFacing);
     return Variable::ofLocation(move(location));
 }
 
-Variable Routines::changeToStandardFaction(const VariablesList &args, ExecutionContext &ctx) {
-    auto creatureToChange = getCreature(args, 0, ctx);
+Variable changeToStandardFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto creatureToChange = getCreature(game, args, 0, ctx);
     auto faction = getEnum<Faction>(args, 1);
 
     if (creatureToChange) {
@@ -1729,13 +1732,13 @@ Variable Routines::changeToStandardFaction(const VariablesList &args, ExecutionC
     return Variable();
 }
 
-Variable Routines::speakOneLinerConversation(const VariablesList &args, ExecutionContext &ctx) {
+Variable speakOneLinerConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getGold(const VariablesList &args, ExecutionContext &ctx) {
+Variable getGold(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int result = 0;
-    auto target = getCreatureOrCaller(args, 0, ctx);
+    auto target = getCreatureOrCaller(game, args, 0, ctx);
     if (target) {
         result = target->gold();
     } else {
@@ -1744,50 +1747,50 @@ Variable Routines::getGold(const VariablesList &args, ExecutionContext &ctx) {
     return Variable::ofInt(result);
 }
 
-Variable Routines::getLastRespawnButtonPresser(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastRespawnButtonPresser(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setLightsaberPowered(const VariablesList &args, ExecutionContext &ctx) {
+Variable setLightsaberPowered(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsWeaponEffective(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsWeaponEffective(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastSpellHarmful(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastSpellHarmful(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastKiller(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastKiller(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSpellCastItem(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSpellCastItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getItemActivated(const VariablesList &args, ExecutionContext &ctx) {
+Variable getItemActivated(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getItemActivator(const VariablesList &args, ExecutionContext &ctx) {
+Variable getItemActivator(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getItemActivatedTargetLocation(const VariablesList &args, ExecutionContext &ctx) {
+Variable getItemActivatedTargetLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getItemActivatedTarget(const VariablesList &args, ExecutionContext &ctx) {
+Variable getItemActivatedTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsOpen(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsOpen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto object = getSpatialObject(args, 0, ctx);
+    auto object = getSpatialObject(game, args, 0, ctx);
     if (object) {
         result = object->isOpen();
     } else {
@@ -1797,9 +1800,9 @@ Variable Routines::getIsOpen(const VariablesList &args, ExecutionContext &ctx) {
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::takeGoldFromCreature(const VariablesList &args, ExecutionContext &ctx) {
+Variable takeGoldFromCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto amount = getInt(args, 0);
-    auto creatureToTakeFrom = getCreature(args, 1, ctx);
+    auto creatureToTakeFrom = getCreature(game, args, 1, ctx);
     auto destroy = getBool(args, 2);
     if (creatureToTakeFrom) {
         creatureToTakeFrom->takeGold(amount);
@@ -1807,7 +1810,7 @@ Variable Routines::takeGoldFromCreature(const VariablesList &args, ExecutionCont
         debug("Script: takeGoldFromCreature: creatureToTakeFrom is invalid", 1, DebugChannels::script);
     }
     if (!destroy) {
-        auto caller = getCallerAsCreature(ctx);
+        auto caller = getCallerAsCreature(game, ctx);
         if (caller) {
             caller->giveGold(amount);
         } else {
@@ -1817,14 +1820,14 @@ Variable Routines::takeGoldFromCreature(const VariablesList &args, ExecutionCont
     return Variable();
 }
 
-Variable Routines::getIsInConversation(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsInConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getPlotFlag(const VariablesList &args, ExecutionContext &ctx) {
+Variable getPlotFlag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto target = getObjectOrCaller(args, 0, ctx);
+    auto target = getObjectOrCaller(game, args, 0, ctx);
     if (target) {
         result = target->plotFlag();
     } else {
@@ -1834,8 +1837,8 @@ Variable Routines::getPlotFlag(const VariablesList &args, ExecutionContext &ctx)
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::setPlotFlag(const VariablesList &args, ExecutionContext &ctx) {
-    auto target = getObject(args, 0, ctx);
+Variable setPlotFlag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto target = getObject(game, args, 0, ctx);
     bool plotFlag = getBool(args, 1);
 
     if (target) {
@@ -1847,70 +1850,70 @@ Variable Routines::setPlotFlag(const VariablesList &args, ExecutionContext &ctx)
     return Variable();
 }
 
-Variable Routines::setDialogPlaceableCamera(const VariablesList &args, ExecutionContext &ctx) {
+Variable setDialogPlaceableCamera(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSoloMode(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<int>(_game.services().party().isSoloMode()));
+Variable getSoloMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable::ofInt(static_cast<int>(game.services().party().isSoloMode()));
 }
 
-Variable Routines::getNumStackedItems(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNumStackedItems(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::surrenderToEnemies(const VariablesList &args, ExecutionContext &ctx) {
+Variable surrenderToEnemies(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getCreatureSize(const VariablesList &args, ExecutionContext &ctx) {
+Variable getCreatureSize(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastTrapDetected(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastTrapDetected(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getNearestTrapToObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNearestTrapToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getAttemptedMovementTarget(const VariablesList &args, ExecutionContext &ctx) {
+Variable getAttemptedMovementTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getBlockingCreature(const VariablesList &args, ExecutionContext &ctx) {
+Variable getBlockingCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFortitudeSavingThrow(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFortitudeSavingThrow(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getWillSavingThrow(const VariablesList &args, ExecutionContext &ctx) {
+Variable getWillSavingThrow(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getReflexSavingThrow(const VariablesList &args, ExecutionContext &ctx) {
+Variable getReflexSavingThrow(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getChallengeRating(const VariablesList &args, ExecutionContext &ctx) {
+Variable getChallengeRating(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFoundEnemyCreature(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFoundEnemyCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getMovementRate(const VariablesList &args, ExecutionContext &ctx) {
+Variable getMovementRate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSubRace(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSubRace(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto result = Subrace::None;
 
-    auto creature = getCreature(args, 0, ctx);
+    auto creature = getCreature(game, args, 0, ctx);
     if (creature) {
         result = creature->subrace();
     } else {
@@ -1920,19 +1923,19 @@ Variable Routines::getSubRace(const VariablesList &args, ExecutionContext &ctx) 
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::duplicateHeadAppearance(const VariablesList &args, ExecutionContext &ctx) {
+Variable duplicateHeadAppearance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsCreature(ctx);
-    auto target = getSpatialObject(args, 0, ctx);
+Variable cutsceneAttack(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto caller = getCallerAsCreature(game, ctx);
+    auto target = getSpatialObject(game, args, 0, ctx);
     int animation = getInt(args, 1);
     auto attackResult = getEnum<AttackResultType>(args, 2);
     int damage = getInt(args, 3);
 
     if (caller && target) {
-        _game.services().combat().addAttack(caller, target, nullptr, attackResult, damage);
+        game.services().combat().addAttack(caller, target, nullptr, attackResult, damage);
     } else if (!caller) {
         debug("Script: cutsceneAttack: caller is invalid", 1, DebugChannels::script);
     } else if (!target) {
@@ -1942,55 +1945,55 @@ Variable Routines::cutsceneAttack(const VariablesList &args, ExecutionContext &c
     return Variable();
 }
 
-Variable Routines::setCameraMode(const VariablesList &args, ExecutionContext &ctx) {
+Variable setCameraMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setLockOrientationInDialog(const VariablesList &args, ExecutionContext &ctx) {
+Variable setLockOrientationInDialog(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setLockHeadFollowInDialog(const VariablesList &args, ExecutionContext &ctx) {
+Variable setLockHeadFollowInDialog(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::cutsceneMove(const VariablesList &args, ExecutionContext &ctx) {
+Variable cutsceneMove(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::enableVideoEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable enableVideoEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::startNewModule(const VariablesList &args, ExecutionContext &ctx) {
+Variable startNewModule(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string moduleName(boost::to_lower_copy(getString(args, 0)));
     string waypoint(boost::to_lower_copy(getString(args, 1, "")));
 
-    _game.scheduleModuleTransition(moduleName, waypoint);
+    game.scheduleModuleTransition(moduleName, waypoint);
 
     return Variable();
 }
 
-Variable Routines::disableVideoEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable disableVideoEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getWeaponRanged(const VariablesList &args, ExecutionContext &ctx) {
+Variable getWeaponRanged(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::doSinglePlayerAutoSave(const VariablesList &args, ExecutionContext &ctx) {
+Variable doSinglePlayerAutoSave(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getGameDifficulty(const VariablesList &args, ExecutionContext &ctx) {
+Variable getGameDifficulty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getUserActionsPending(const VariablesList &args, ExecutionContext &ctx) {
+Variable getUserActionsPending(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = 0;
 
-    auto caller = getCallerAsCreature(ctx);
+    auto caller = getCallerAsCreature(game, ctx);
     if (caller) {
         result = caller->hasUserActionsPending();
     } else {
@@ -2000,152 +2003,152 @@ Variable Routines::getUserActionsPending(const VariablesList &args, ExecutionCon
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::revealMap(const VariablesList &args, ExecutionContext &ctx) {
+Variable revealMap(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setTutorialWindowsEnabled(const VariablesList &args, ExecutionContext &ctx) {
+Variable setTutorialWindowsEnabled(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::showTutorialWindow(const VariablesList &args, ExecutionContext &ctx) {
+Variable showTutorialWindow(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::startCreditSequence(const VariablesList &args, ExecutionContext &ctx) {
+Variable startCreditSequence(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::isCreditSequenceInProgress(const VariablesList &args, ExecutionContext &ctx) {
+Variable isCreditSequenceInProgress(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getCurrentAction(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObjectOrCaller(args, 0, ctx);
+Variable getCurrentAction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto object = getObjectOrCaller(game, args, 0, ctx);
     shared_ptr<Action> action(object->getCurrentAction());
     return Variable::ofInt(static_cast<int>(action ? action->type() : ActionType::QueueEmpty));
 }
 
-Variable Routines::getDifficultyModifier(const VariablesList &args, ExecutionContext &ctx) {
+Variable getDifficultyModifier(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getAppearanceType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getAppearanceType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::floatingTextStrRefOnCreature(const VariablesList &args, ExecutionContext &ctx) {
+Variable floatingTextStrRefOnCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::floatingTextStringOnCreature(const VariablesList &args, ExecutionContext &ctx) {
+Variable floatingTextStringOnCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getTrapDisarmable(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTrapDisarmable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getTrapDetectable(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTrapDetectable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getTrapDetectedBy(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTrapDetectedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getTrapFlagged(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTrapFlagged(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getTrapBaseType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTrapBaseType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getTrapOneShot(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTrapOneShot(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getTrapCreator(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTrapCreator(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getTrapKeyTag(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTrapKeyTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getTrapDisarmDC(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTrapDisarmDC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getTrapDetectDC(const VariablesList &args, ExecutionContext &ctx) {
+Variable getTrapDetectDC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLockKeyRequired(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLockKeyRequired(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLockKeyTag(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLockKeyTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLockLockable(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLockLockable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLockUnlockDC(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLockUnlockDC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLockLockDC(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLockLockDC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getPCLevellingUp(const VariablesList &args, ExecutionContext &ctx) {
+Variable getPCLevellingUp(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getHasFeatEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable getHasFeatEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setPlaceableIllumination(const VariablesList &args, ExecutionContext &ctx) {
+Variable setPlaceableIllumination(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getPlaceableIllumination(const VariablesList &args, ExecutionContext &ctx) {
+Variable getPlaceableIllumination(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsPlaceableObjectActionPossible(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsPlaceableObjectActionPossible(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::doPlaceableObjectAction(const VariablesList &args, ExecutionContext &ctx) {
+Variable doPlaceableObjectAction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFirstPC(const VariablesList &args, ExecutionContext &ctx) {
-    auto player = _game.services().party().player();
+Variable getFirstPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto player = game.services().party().player();
     return Variable::ofObject(getObjectIdOrInvalid(player));
 }
 
-Variable Routines::getNextPC(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNextPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setTrapDetectedBy(const VariablesList &args, ExecutionContext &ctx) {
+Variable setTrapDetectedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsTrapped(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsTrapped(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::faceObjectAwayFromObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto facer = getSpatialObject(args, 0, ctx);
-    auto objectToFaceAwayFrom = getSpatialObject(args, 1, ctx);
+Variable faceObjectAwayFromObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto facer = getSpatialObject(game, args, 0, ctx);
+    auto objectToFaceAwayFrom = getSpatialObject(game, args, 1, ctx);
 
     if (facer && objectToFaceAwayFrom) {
         facer->faceAwayFrom(*objectToFaceAwayFrom);
@@ -2158,113 +2161,113 @@ Variable Routines::faceObjectAwayFromObject(const VariablesList &args, Execution
     return Variable();
 }
 
-Variable Routines::popUpDeathGUIPanel(const VariablesList &args, ExecutionContext &ctx) {
+Variable popUpDeathGUIPanel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setTrapDisabled(const VariablesList &args, ExecutionContext &ctx) {
+Variable setTrapDisabled(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastHostileActor(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastHostileActor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::exportAllCharacters(const VariablesList &args, ExecutionContext &ctx) {
+Variable exportAllCharacters(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getModuleName(const VariablesList &args, ExecutionContext &ctx) {
+Variable getModuleName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFactionLeader(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFactionLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::endGame(const VariablesList &args, ExecutionContext &ctx) {
+Variable endGame(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getRunScriptVar(const VariablesList &args, ExecutionContext &ctx) {
+Variable getRunScriptVar(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::ofInt(ctx.scriptVar);
 }
 
-Variable Routines::getCreatureMovmentType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getCreatureMovmentType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getHasInventory(const VariablesList &args, ExecutionContext &ctx) {
+Variable getHasInventory(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getStrRefSoundDuration(const VariablesList &args, ExecutionContext &ctx) {
+Variable getStrRefSoundDuration(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getGlobalBoolean(const VariablesList &args, ExecutionContext &ctx) {
+Variable getGlobalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
-    return Variable::ofInt(static_cast<int>(_game.getGlobalBoolean(id)));
+    return Variable::ofInt(static_cast<int>(game.getGlobalBoolean(id)));
 }
 
-Variable Routines::setGlobalBoolean(const VariablesList &args, ExecutionContext &ctx) {
+Variable setGlobalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
     bool value = getBool(args, 1);
 
-    _game.setGlobalBoolean(id, value);
+    game.setGlobalBoolean(id, value);
 
     return Variable();
 }
 
-Variable Routines::getGlobalNumber(const VariablesList &args, ExecutionContext &ctx) {
+Variable getGlobalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
-    return Variable::ofInt(_game.getGlobalNumber(id));
+    return Variable::ofInt(game.getGlobalNumber(id));
 }
 
-Variable Routines::setGlobalNumber(const VariablesList &args, ExecutionContext &ctx) {
+Variable setGlobalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
     int value = getInt(args, 1);
 
-    _game.setGlobalNumber(id, value);
+    game.setGlobalNumber(id, value);
 
     return Variable();
 }
 
-Variable Routines::addJournalWorldEntry(const VariablesList &args, ExecutionContext &ctx) {
+Variable addJournalWorldEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::addJournalWorldEntryStrref(const VariablesList &args, ExecutionContext &ctx) {
+Variable addJournalWorldEntryStrref(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::barkString(const VariablesList &args, ExecutionContext &ctx) {
+Variable barkString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::deleteJournalWorldAllEntries(const VariablesList &args, ExecutionContext &ctx) {
+Variable deleteJournalWorldAllEntries(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::deleteJournalWorldEntry(const VariablesList &args, ExecutionContext &ctx) {
+Variable deleteJournalWorldEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::deleteJournalWorldEntryStrref(const VariablesList &args, ExecutionContext &ctx) {
+Variable deleteJournalWorldEntryStrref(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::playVisualAreaEffect(const VariablesList &args, ExecutionContext &ctx) {
+Variable playVisualAreaEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setJournalQuestEntryPicture(const VariablesList &args, ExecutionContext &ctx) {
+Variable setJournalQuestEntryPicture(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLocalBoolean(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLocalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
-    auto object = getObject(args, 0, ctx);
+    auto object = getObject(game, args, 0, ctx);
     int index = getInt(args, 1);
 
     if (object) {
@@ -2276,8 +2279,8 @@ Variable Routines::getLocalBoolean(const VariablesList &args, ExecutionContext &
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::setLocalBoolean(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0, ctx);
+Variable setLocalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto object = getObject(game, args, 0, ctx);
     int index = getInt(args, 1);
     bool value = getBool(args, 2);
 
@@ -2290,9 +2293,9 @@ Variable Routines::setLocalBoolean(const VariablesList &args, ExecutionContext &
     return Variable();
 }
 
-Variable Routines::getLocalNumber(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLocalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int result = 0;
-    auto object = getObject(args, 0, ctx);
+    auto object = getObject(game, args, 0, ctx);
     int index = getInt(args, 1);
 
     if (object) {
@@ -2304,8 +2307,8 @@ Variable Routines::getLocalNumber(const VariablesList &args, ExecutionContext &c
     return Variable::ofInt(result);
 }
 
-Variable Routines::setLocalNumber(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0, ctx);
+Variable setLocalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto object = getObject(game, args, 0, ctx);
     int index = getInt(args, 1);
     int value = getInt(args, 2);
 
@@ -2318,17 +2321,17 @@ Variable Routines::setLocalNumber(const VariablesList &args, ExecutionContext &c
     return Variable();
 }
 
-Variable Routines::getGlobalLocation(const VariablesList &args, ExecutionContext &ctx) {
+Variable getGlobalLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
-    return Variable::ofLocation(_game.getGlobalLocation(id));
+    return Variable::ofLocation(game.getGlobalLocation(id));
 }
 
-Variable Routines::setGlobalLocation(const VariablesList &args, ExecutionContext &ctx) {
+Variable setGlobalLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string id(getString(args, 0));
     auto value = getLocationEngineType(args, 1);
 
     if (value) {
-        _game.setGlobalLocation(id, value);
+        game.setGlobalLocation(id, value);
     } else {
         debug("Script: setGlobalLocation: value is invalid", 1, DebugChannels::script);
     }
@@ -2336,14 +2339,14 @@ Variable Routines::setGlobalLocation(const VariablesList &args, ExecutionContext
     return Variable();
 }
 
-Variable Routines::getIsConversationActive(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsConversationActive(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getNPCAIStyle(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNPCAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto result = NPCAIStyle::DefaultAttack;
 
-    auto creature = getCreature(args, 0, ctx);
+    auto creature = getCreature(game, args, 0, ctx);
     if (creature) {
         result = creature->aiStyle();
     } else {
@@ -2353,8 +2356,8 @@ Variable Routines::getNPCAIStyle(const VariablesList &args, ExecutionContext &ct
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::setNPCAIStyle(const VariablesList &args, ExecutionContext &ctx) {
-    auto creature = getCreature(args, 0, ctx);
+Variable setNPCAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto creature = getCreature(game, args, 0, ctx);
     auto style = getEnum<NPCAIStyle>(args, 1);
 
     if (creature) {
@@ -2366,16 +2369,16 @@ Variable Routines::setNPCAIStyle(const VariablesList &args, ExecutionContext &ct
     return Variable();
 }
 
-Variable Routines::setNPCSelectability(const VariablesList &args, ExecutionContext &ctx) {
+Variable setNPCSelectability(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getNPCSelectability(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNPCSelectability(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::clearAllEffects(const VariablesList &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsSpatial(ctx);
+Variable clearAllEffects(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto caller = getCallerAsSpatial(game, ctx);
     if (caller) {
         caller->clearAllEffects();
     } else {
@@ -2384,11 +2387,11 @@ Variable Routines::clearAllEffects(const VariablesList &args, ExecutionContext &
     return Variable();
 }
 
-Variable Routines::getLastConversation(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::showPartySelectionGUI(const VariablesList &args, ExecutionContext &ctx) {
+Variable showPartySelectionGUI(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string exitScript(boost::to_lower_copy(getString(args, 0, "")));
     int forceNpc1 = getInt(args, 1);
     int forceNpc2 = getInt(args, 2);
@@ -2398,15 +2401,15 @@ Variable Routines::showPartySelectionGUI(const VariablesList &args, ExecutionCon
     partyCtx.forceNpc1 = forceNpc1;
     partyCtx.forceNpc2 = forceNpc2;
 
-    _game.openPartySelection(partyCtx);
+    game.openPartySelection(partyCtx);
 
     return Variable();
 }
 
-Variable Routines::getStandardFaction(const VariablesList &args, ExecutionContext &ctx) {
+Variable getStandardFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto result = Faction::Invalid;
 
-    auto object = getCreature(args, 0, ctx);
+    auto object = getCreature(game, args, 0, ctx);
     if (object) {
         result = object->faction();
     } else {
@@ -2416,14 +2419,14 @@ Variable Routines::getStandardFaction(const VariablesList &args, ExecutionContex
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::givePlotXP(const VariablesList &args, ExecutionContext &ctx) {
+Variable givePlotXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getMinOneHP(const VariablesList &args, ExecutionContext &ctx) {
+Variable getMinOneHP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto object = getObject(args, 0, ctx);
+    auto object = getObject(game, args, 0, ctx);
     if (object) {
         result = object->isMinOneHP();
     } else {
@@ -2433,8 +2436,8 @@ Variable Routines::getMinOneHP(const VariablesList &args, ExecutionContext &ctx)
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::setMinOneHP(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0, ctx);
+Variable setMinOneHP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto object = getObject(game, args, 0, ctx);
     bool minOneHP = getBool(args, 1);
 
     if (object) {
@@ -2446,18 +2449,18 @@ Variable Routines::setMinOneHP(const VariablesList &args, ExecutionContext &ctx)
     return Variable();
 }
 
-Variable Routines::setGlobalFadeIn(const VariablesList &args, ExecutionContext &ctx) {
+Variable setGlobalFadeIn(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setGlobalFadeOut(const VariablesList &args, ExecutionContext &ctx) {
+Variable setGlobalFadeOut(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastHostileTarget(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastHostileTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     uint32_t result = kObjectInvalid;
 
-    auto attacker = getCreatureOrCaller(args, 0, ctx);
+    auto attacker = getCreatureOrCaller(game, args, 0, ctx);
     if (attacker) {
         // TODO: implement
     } else {
@@ -2467,10 +2470,10 @@ Variable Routines::getLastHostileTarget(const VariablesList &args, ExecutionCont
     return Variable::ofObject(result);
 }
 
-Variable Routines::getLastAttackAction(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastAttackAction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto result = ActionType::QueueEmpty;
 
-    auto attacker = getCreatureOrCaller(args, 0, ctx);
+    auto attacker = getCreatureOrCaller(game, args, 0, ctx);
     if (attacker) {
         // TODO: implement
     } else {
@@ -2480,42 +2483,42 @@ Variable Routines::getLastAttackAction(const VariablesList &args, ExecutionConte
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getLastForcePowerUsed(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastForcePowerUsed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastCombatFeatUsed(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastCombatFeatUsed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastAttackResult(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastAttackResult(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getWasForcePowerSuccessful(const VariablesList &args, ExecutionContext &ctx) {
+Variable getWasForcePowerSuccessful(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFirstAttacker(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFirstAttacker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getNextAttacker(const VariablesList &args, ExecutionContext &ctx) {
+Variable getNextAttacker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setFormation(const VariablesList &args, ExecutionContext &ctx) {
+Variable setFormation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setForcePowerUnsuccessful(const VariablesList &args, ExecutionContext &ctx) {
+Variable setForcePowerUnsuccessful(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsDebilitated(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsDebilitated(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto creature = getCreatureOrCaller(args, 0, ctx);
+    auto creature = getCreatureOrCaller(game, args, 0, ctx);
     if (creature) {
         result = creature->isDebilitated();
     } else {
@@ -2525,50 +2528,50 @@ Variable Routines::getIsDebilitated(const VariablesList &args, ExecutionContext 
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::surrenderByFaction(const VariablesList &args, ExecutionContext &ctx) {
+Variable surrenderByFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::changeFactionByFaction(const VariablesList &args, ExecutionContext &ctx) {
+Variable changeFactionByFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::playRoomAnimation(const VariablesList &args, ExecutionContext &ctx) {
+Variable playRoomAnimation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::showGalaxyMap(const VariablesList &args, ExecutionContext &ctx) {
+Variable showGalaxyMap(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setAreaFogColor(const VariablesList &args, ExecutionContext &ctx) {
+Variable setAreaFogColor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::changeItemCost(const VariablesList &args, ExecutionContext &ctx) {
+Variable changeItemCost(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsLiveContentAvailable(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsLiveContentAvailable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::resetDialogState(const VariablesList &args, ExecutionContext &ctx) {
+Variable resetDialogState(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setGoodEvilValue(const VariablesList &args, ExecutionContext &ctx) {
+Variable setGoodEvilValue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsPoisoned(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsPoisoned(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSpellTarget(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSpellTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<SpatialObject> target;
 
-    auto creature = getCreatureOrCaller(args, 0, ctx);
+    auto creature = getCreatureOrCaller(game, args, 0, ctx);
     if (creature) {
         // TODO: implement
     } else {
@@ -2578,18 +2581,18 @@ Variable Routines::getSpellTarget(const VariablesList &args, ExecutionContext &c
     return Variable::ofObject(getObjectIdOrInvalid(target));
 }
 
-Variable Routines::setSoloMode(const VariablesList &args, ExecutionContext &ctx) {
+Variable setSoloMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto activate = getBool(args, 0);
-    _game.services().party().setSoloMode(activate);
+    game.services().party().setSoloMode(activate);
     return Variable();
 }
 
-Variable Routines::cancelPostDialogCharacterSwitch(const VariablesList &args, ExecutionContext &ctx) {
+Variable cancelPostDialogCharacterSwitch(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setMaxHitPoints(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0, ctx);
+Variable setMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto object = getObject(game, args, 0, ctx);
     int maxHP = getInt(args, 1);
 
     if (object) {
@@ -2600,329 +2603,331 @@ Variable Routines::setMaxHitPoints(const VariablesList &args, ExecutionContext &
     return Variable();
 }
 
-Variable Routines::noClicksFor(const VariablesList &args, ExecutionContext &ctx) {
+Variable noClicksFor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::holdWorldFadeInForDialog(const VariablesList &args, ExecutionContext &ctx) {
+Variable holdWorldFadeInForDialog(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::shipBuild(const VariablesList &args, ExecutionContext &ctx) {
+Variable shipBuild(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::ofInt(static_cast<int>(g_shipBuild));
 }
 
-Variable Routines::surrenderRetainBuffs(const VariablesList &args, ExecutionContext &ctx) {
+Variable surrenderRetainBuffs(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::suppressStatusSummaryEntry(const VariablesList &args, ExecutionContext &ctx) {
+Variable suppressStatusSummaryEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getCheatCode(const VariablesList &args, ExecutionContext &ctx) {
+Variable getCheatCode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::createItemOnFloor(const VariablesList &args, ExecutionContext &ctx) {
+Variable createItemOnFloor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getScriptParameter(const VariablesList &args, ExecutionContext &ctx) {
+Variable getScriptParameter(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setFadeUntilScript(const VariablesList &args, ExecutionContext &ctx) {
+Variable setFadeUntilScript(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getItemComponent(const VariablesList &args, ExecutionContext &ctx) {
+Variable getItemComponent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getItemComponentPieceValue(const VariablesList &args, ExecutionContext &ctx) {
+Variable getItemComponentPieceValue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::showChemicalUpgradeScreen(const VariablesList &args, ExecutionContext &ctx) {
+Variable showChemicalUpgradeScreen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getChemicals(const VariablesList &args, ExecutionContext &ctx) {
+Variable getChemicals(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getChemicalPieceValue(const VariablesList &args, ExecutionContext &ctx) {
+Variable getChemicalPieceValue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSpellForcePointCost(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSpellForcePointCost(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getFeatAcquired(const VariablesList &args, ExecutionContext &ctx) {
+Variable getFeatAcquired(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSpellAcquired(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSpellAcquired(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::showSwoopUpgradeScreen(const VariablesList &args, ExecutionContext &ctx) {
+Variable showSwoopUpgradeScreen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::grantFeat(const VariablesList &args, ExecutionContext &ctx) {
+Variable grantFeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::grantSpell(const VariablesList &args, ExecutionContext &ctx) {
+Variable grantSpell(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::spawnMine(const VariablesList &args, ExecutionContext &ctx) {
+Variable spawnMine(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setFakeCombatState(const VariablesList &args, ExecutionContext &ctx) {
+Variable setFakeCombatState(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getOwnerDemolitionsSkill(const VariablesList &args, ExecutionContext &ctx) {
+Variable getOwnerDemolitionsSkill(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setOrientOnClick(const VariablesList &args, ExecutionContext &ctx) {
+Variable setOrientOnClick(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getInfluence(const VariablesList &args, ExecutionContext &ctx) {
+Variable getInfluence(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setInfluence(const VariablesList &args, ExecutionContext &ctx) {
+Variable setInfluence(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::modifyInfluence(const VariablesList &args, ExecutionContext &ctx) {
+Variable modifyInfluence(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getRacialSubType(const VariablesList &args, ExecutionContext &ctx) {
+Variable getRacialSubType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::incrementGlobalNumber(const VariablesList &args, ExecutionContext &ctx) {
+Variable incrementGlobalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::decrementGlobalNumber(const VariablesList &args, ExecutionContext &ctx) {
+Variable decrementGlobalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setBonusForcePoints(const VariablesList &args, ExecutionContext &ctx) {
+Variable setBonusForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::addBonusForcePoints(const VariablesList &args, ExecutionContext &ctx) {
+Variable addBonusForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getBonusForcePoints(const VariablesList &args, ExecutionContext &ctx) {
+Variable getBonusForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::yavinHackCloseDoor(const VariablesList &args, ExecutionContext &ctx) {
+Variable yavinHackCloseDoor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::isStealthed(const VariablesList &args, ExecutionContext &ctx) {
+Variable isStealthed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::isMeditating(const VariablesList &args, ExecutionContext &ctx) {
+Variable isMeditating(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::isInTotalDefense(const VariablesList &args, ExecutionContext &ctx) {
+Variable isInTotalDefense(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setHealTarget(const VariablesList &args, ExecutionContext &ctx) {
+Variable setHealTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getHealTarget(const VariablesList &args, ExecutionContext &ctx) {
+Variable getHealTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getRandomDestination(const VariablesList &args, ExecutionContext &ctx) {
+Variable getRandomDestination(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::isFormActive(const VariablesList &args, ExecutionContext &ctx) {
+Variable isFormActive(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSpellFormMask(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSpellFormMask(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSpellBaseForcePointCost(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSpellBaseForcePointCost(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setKeepStealthInDialog(const VariablesList &args, ExecutionContext &ctx) {
+Variable setKeepStealthInDialog(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::hasLineOfSight(const VariablesList &args, ExecutionContext &ctx) {
+Variable hasLineOfSight(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::showDemoScreen(const VariablesList &args, ExecutionContext &ctx) {
+Variable showDemoScreen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::forceHeartbeat(const VariablesList &args, ExecutionContext &ctx) {
+Variable forceHeartbeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::isRunning(const VariablesList &args, ExecutionContext &ctx) {
+Variable isRunning(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setForfeitConditions(const VariablesList &args, ExecutionContext &ctx) {
+Variable setForfeitConditions(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getLastForfeitViolation(const VariablesList &args, ExecutionContext &ctx) {
+Variable getLastForfeitViolation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::modifyReflexSavingThrowBase(const VariablesList &args, ExecutionContext &ctx) {
+Variable modifyReflexSavingThrowBase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::modifyFortitudeSavingThrowBase(const VariablesList &args, ExecutionContext &ctx) {
+Variable modifyFortitudeSavingThrowBase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::modifyWillSavingThrowBase(const VariablesList &args, ExecutionContext &ctx) {
+Variable modifyWillSavingThrowBase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getScriptStringParameter(const VariablesList &args, ExecutionContext &ctx) {
+Variable getScriptStringParameter(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getObjectPersonalSpace(const VariablesList &args, ExecutionContext &ctx) {
+Variable getObjectPersonalSpace(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::adjustCreatureAttributes(const VariablesList &args, ExecutionContext &ctx) {
+Variable adjustCreatureAttributes(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setCreatureAILevel(const VariablesList &args, ExecutionContext &ctx) {
+Variable setCreatureAILevel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::resetCreatureAILevel(const VariablesList &args, ExecutionContext &ctx) {
+Variable resetCreatureAILevel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::creatureFlourishWeapon(const VariablesList &args, ExecutionContext &ctx) {
+Variable creatureFlourishWeapon(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::changeObjectAppearance(const VariablesList &args, ExecutionContext &ctx) {
+Variable changeObjectAppearance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsXBox(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsXBox(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::playOverlayAnimation(const VariablesList &args, ExecutionContext &ctx) {
+Variable playOverlayAnimation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::unlockAllSongs(const VariablesList &args, ExecutionContext &ctx) {
+Variable unlockAllSongs(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::disableMap(const VariablesList &args, ExecutionContext &ctx) {
+Variable disableMap(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::detonateMine(const VariablesList &args, ExecutionContext &ctx) {
+Variable detonateMine(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::disableHealthRegen(const VariablesList &args, ExecutionContext &ctx) {
+Variable disableHealthRegen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setCurrentForm(const VariablesList &args, ExecutionContext &ctx) {
+Variable setCurrentForm(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setDisableTransit(const VariablesList &args, ExecutionContext &ctx) {
+Variable setDisableTransit(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setInputClass(const VariablesList &args, ExecutionContext &ctx) {
+Variable setInputClass(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setForceAlwaysUpdate(const VariablesList &args, ExecutionContext &ctx) {
+Variable setForceAlwaysUpdate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::enableRain(const VariablesList &args, ExecutionContext &ctx) {
+Variable enableRain(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::displayMessageBox(const VariablesList &args, ExecutionContext &ctx) {
+Variable displayMessageBox(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::displayDatapad(const VariablesList &args, ExecutionContext &ctx) {
+Variable displayDatapad(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::removeHeartbeat(const VariablesList &args, ExecutionContext &ctx) {
+Variable removeHeartbeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::removeEffectByID(const VariablesList &args, ExecutionContext &ctx) {
+Variable removeEffectByID(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::removeEffectByExactMatch(const VariablesList &args, ExecutionContext &ctx) {
+Variable removeEffectByExactMatch(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::adjustCreatureSkills(const VariablesList &args, ExecutionContext &ctx) {
+Variable adjustCreatureSkills(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getSkillRankBase(const VariablesList &args, ExecutionContext &ctx) {
+Variable getSkillRankBase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::enableRendering(const VariablesList &args, ExecutionContext &ctx) {
+Variable enableRendering(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getCombatActionsPending(const VariablesList &args, ExecutionContext &ctx) {
+Variable getCombatActionsPending(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsPlayerMadeCharacter(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsPlayerMadeCharacter(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
+
+} // namespace routine
 
 } // namespace game
 

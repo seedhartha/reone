@@ -19,11 +19,13 @@
  *  Implementation of time-related routines.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
 
 #include "../../../../common/log.h"
 
 #include "../../../object/object.h"
+
+#include "argutil.h"
 
 using namespace std;
 
@@ -33,13 +35,15 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::printString(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable printString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string str(getString(args, 0));
     info(str);
     return Variable();
 }
 
-Variable Routines::printFloat(const VariablesList &args, ExecutionContext &ctx) {
+Variable printFloat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: use formatting parameters
     float value = getFloat(args, 0);
     int width = getInt(args, 1, 18);
@@ -50,31 +54,33 @@ Variable Routines::printFloat(const VariablesList &args, ExecutionContext &ctx) 
     return Variable();
 }
 
-Variable Routines::printInteger(const VariablesList &args, ExecutionContext &ctx) {
+Variable printInteger(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int value = getInt(args, 0);
     info(to_string(value));
     return Variable();
 }
 
-Variable Routines::printObject(const VariablesList &args, ExecutionContext &ctx) {
-    auto object = getObject(args, 0, ctx);
+Variable printObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto object = getObject(game, args, 0, ctx);
     info(to_string(object->id()));
     return Variable();
 }
 
-Variable Routines::printVector(const VariablesList &args, ExecutionContext &ctx) {
+Variable printVector(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     glm::vec3 value(getVector(args, 0));
     info(boost::format("%f %f %f") % value.x % value.y % value.z);
     return Variable();
 }
 
-Variable Routines::writeTimestampedLogEntry(const VariablesList &args, ExecutionContext &ctx) {
+Variable writeTimestampedLogEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::aurPostString(const VariablesList &args, ExecutionContext &ctx) {
+Variable aurPostString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
+
+} // namespace routine
 
 } // namespace game
 

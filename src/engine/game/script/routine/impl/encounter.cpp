@@ -19,7 +19,7 @@
  *  Implementation of encounter-related routines.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
 
 using namespace std;
 
@@ -29,37 +29,41 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::getEncounterActive(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable getEncounterActive(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setEncounterActive(const VariablesList &args, ExecutionContext &ctx) {
+Variable setEncounterActive(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getEncounterSpawnsMax(const VariablesList &args, ExecutionContext &ctx) {
+Variable getEncounterSpawnsMax(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setEncounterSpawnsMax(const VariablesList &args, ExecutionContext &ctx) {
+Variable setEncounterSpawnsMax(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getEncounterSpawnsCurrent(const VariablesList &args, ExecutionContext &ctx) {
+Variable getEncounterSpawnsCurrent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setEncounterSpawnsCurrent(const VariablesList &args, ExecutionContext &ctx) {
+Variable setEncounterSpawnsCurrent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setEncounterDifficulty(const VariablesList &args, ExecutionContext &ctx) {
+Variable setEncounterDifficulty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getEncounterDifficulty(const VariablesList &args, ExecutionContext &ctx) {
+Variable getEncounterDifficulty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
+
+} // namespace routine
 
 } // namespace game
 

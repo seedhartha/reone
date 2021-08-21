@@ -19,13 +19,15 @@
  *  Implementation of party-related routines.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
 
 #include "../../../../common/log.h"
 #include "../../../../common/random.h"
+#include "../../../../script/types.h"
 
 #include "../../../game.h"
 
+#include "argutil.h"
 #include "objectutil.h"
 
 using namespace std;
@@ -36,31 +38,33 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::setPartyLeader(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable setPartyLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
-    _game.services().party().setPartyLeader(npc);
+    game.services().party().setPartyLeader(npc);
     return Variable();
 }
 
-Variable Routines::getPartyMemberCount(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game.services().party().getSize());
+Variable getPartyMemberCount(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable::ofInt(game.services().party().getSize());
 }
 
-Variable Routines::addToParty(const VariablesList &args, ExecutionContext &ctx) {
+Variable addToParty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::removeFromParty(const VariablesList &args, ExecutionContext &ctx) {
+Variable removeFromParty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::addPartyMember(const VariablesList &args, ExecutionContext &ctx) {
+Variable addPartyMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
     int npc = getInt(args, 0);
-    auto creature = getCreature(args, 1, ctx);
+    auto creature = getCreature(game, args, 1, ctx);
 
     if (creature) {
-        _game.services().party().addAvailableMember(npc, creature->blueprintResRef());
+        game.services().party().addAvailableMember(npc, creature->blueprintResRef());
     } else {
         debug("Script: addPartyMember: creature is invalid", 1, DebugChannels::script);
     }
@@ -68,14 +72,14 @@ Variable Routines::addPartyMember(const VariablesList &args, ExecutionContext &c
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::removePartyMember(const VariablesList &args, ExecutionContext &ctx) {
+Variable removePartyMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
     int npc = getInt(args, 0);
 
-    if (_game.services().party().isMember(npc)) {
-        _game.services().party().removeMember(npc);
+    if (game.services().party().isMember(npc)) {
+        game.services().party().removeMember(npc);
 
-        shared_ptr<Area> area(_game.module()->area());
+        shared_ptr<Area> area(game.module()->area());
         area->unloadParty();
         area->reloadParty();
 
@@ -85,12 +89,12 @@ Variable Routines::removePartyMember(const VariablesList &args, ExecutionContext
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::isObjectPartyMember(const VariablesList &args, ExecutionContext &ctx) {
+Variable isObjectPartyMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool result = false;
 
-    auto creature = getCreature(args, 0, ctx);
+    auto creature = getCreature(game, args, 0, ctx);
     if (creature) {
-        result = _game.services().party().isMember(*creature);
+        result = game.services().party().isMember(*creature);
     } else {
         debug("Script: isObjectPartyMember: creature is invalid", 1, DebugChannels::script);
     }
@@ -98,115 +102,117 @@ Variable Routines::isObjectPartyMember(const VariablesList &args, ExecutionConte
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable Routines::getPartyMemberByIndex(const VariablesList &args, ExecutionContext &ctx) {
+Variable getPartyMemberByIndex(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int index = getInt(args, 0);
-    auto member = _game.services().party().getMember(index);
+    auto member = game.services().party().getMember(index);
     return Variable::ofObject(getObjectIdOrInvalid(member));
 }
 
-Variable Routines::addAvailableNPCByObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable addAvailableNPCByObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::removeAvailableNPC(const VariablesList &args, ExecutionContext &ctx) {
+Variable removeAvailableNPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
-    bool removed = _game.services().party().removeAvailableMember(npc);
+    bool removed = game.services().party().removeAvailableMember(npc);
     return Variable::ofInt(static_cast<int>(removed));
 }
 
-Variable Routines::isAvailableCreature(const VariablesList &args, ExecutionContext &ctx) {
+Variable isAvailableCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
-    bool isAvailable = _game.services().party().isMemberAvailable(npc);
+    bool isAvailable = game.services().party().isMemberAvailable(npc);
     return Variable::ofInt(static_cast<int>(isAvailable));
 }
 
-Variable Routines::addAvailableNPCByTemplate(const VariablesList &args, ExecutionContext &ctx) {
+Variable addAvailableNPCByTemplate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
     string blueprint(boost::to_lower_copy(getString(args, 1)));
 
-    bool added = _game.services().party().addAvailableMember(npc, blueprint);
+    bool added = game.services().party().addAvailableMember(npc, blueprint);
 
     return Variable::ofInt(static_cast<int>(added));
 }
 
-Variable Routines::spawnAvailableNPC(const VariablesList &args, ExecutionContext &ctx) {
+Variable spawnAvailableNPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::isNPCPartyMember(const VariablesList &args, ExecutionContext &ctx) {
+Variable isNPCPartyMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
-    bool isMember = _game.services().party().isMember(npc);
+    bool isMember = game.services().party().isMember(npc);
     return Variable::ofInt(static_cast<int>(isMember));
 }
 
-Variable Routines::getPartyAIStyle(const VariablesList &args, ExecutionContext &ctx) {
+Variable getPartyAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setPartyAIStyle(const VariablesList &args, ExecutionContext &ctx) {
+Variable setPartyAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::saveNPCState(const VariablesList &args, ExecutionContext &ctx) {
+Variable saveNPCState(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::setAvailableNPCId(const VariablesList &args, ExecutionContext &ctx) {
+Variable setAvailableNPCId(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::addAvailablePUPByTemplate(const VariablesList &args, ExecutionContext &ctx) {
+Variable addAvailablePUPByTemplate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::addAvailablePUPByObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable addAvailablePUPByObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::assignPUP(const VariablesList &args, ExecutionContext &ctx) {
+Variable assignPUP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::spawnAvailablePUP(const VariablesList &args, ExecutionContext &ctx) {
+Variable spawnAvailablePUP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::addPartyPuppet(const VariablesList &args, ExecutionContext &ctx) {
+Variable addPartyPuppet(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getPUPOwner(const VariablesList &args, ExecutionContext &ctx) {
+Variable getPUPOwner(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsPuppet(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsPuppet(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getIsPartyLeader(const VariablesList &args, ExecutionContext &ctx) {
+Variable getIsPartyLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::getPartyLeader(const VariablesList &args, ExecutionContext &ctx) {
-    auto player = _game.services().party().getLeader();
+Variable getPartyLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    auto player = game.services().party().getLeader();
     return Variable::ofObject(getObjectIdOrInvalid(player));
 }
 
-Variable Routines::removeNPCFromPartyToBase(const VariablesList &args, ExecutionContext &ctx) {
+Variable removeNPCFromPartyToBase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::saveNPCByObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable saveNPCByObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::savePUPByObject(const VariablesList &args, ExecutionContext &ctx) {
+Variable savePUPByObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
 
-Variable Routines::rebuildPartyTable(const VariablesList &args, ExecutionContext &ctx) {
+Variable rebuildPartyTable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::notImplemented();
 }
+
+} // namespace routine
 
 } // namespace game
 

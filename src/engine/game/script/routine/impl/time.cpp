@@ -19,9 +19,13 @@
  *  Implementation of time-related routines.
  */
 
-#include "../../routines.h"
+#include "declarations.h"
+
+#include "../../../../script/types.h"
 
 #include "../../../game.h"
+
+#include "argutil.h"
 
 using namespace std;
 
@@ -31,56 +35,60 @@ namespace reone {
 
 namespace game {
 
-Variable Routines::setTime(const VariablesList &args, ExecutionContext &ctx) {
+namespace routine {
+
+Variable setTime(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int hour = getInt(args, 0);
     int minute = getInt(args, 1);
     int second = getInt(args, 2);
     int millisecond = getInt(args, 3);
 
-    _game.module()->setTime(hour, minute, second, millisecond);
+    game.module()->setTime(hour, minute, second, millisecond);
 
     return Variable();
 }
 
-Variable Routines::getTimeHour(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game.module()->time().hour);
+Variable getTimeHour(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable::ofInt(game.module()->time().hour);
 }
 
-Variable Routines::getTimeMinute(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game.module()->time().minute);
+Variable getTimeMinute(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable::ofInt(game.module()->time().minute);
 }
 
-Variable Routines::getTimeSecond(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game.module()->time().second);
+Variable getTimeSecond(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable::ofInt(game.module()->time().second);
 }
 
-Variable Routines::getTimeMillisecond(const VariablesList &args, ExecutionContext &ctx) {
-    return Variable::ofInt(_game.module()->time().millisecond);
+Variable getTimeMillisecond(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    return Variable::ofInt(game.module()->time().millisecond);
 }
 
-Variable Routines::getIsDay(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<Module> module(_game.module());
+Variable getIsDay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Module> module(game.module());
     const Module::Time &time = module->time();
     return Variable::ofInt(static_cast<int>(time.hour > module->info().dawnHour && time.hour < module->info().duskHour));
 }
 
-Variable Routines::getIsNight(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<Module> module(_game.module());
+Variable getIsNight(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Module> module(game.module());
     const Module::Time &time = module->time();
     return Variable::ofInt(static_cast<int>(time.hour < module->info().dawnHour || time.hour > module->info().duskHour));
 }
 
-Variable Routines::getIsDawn(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<Module> module(_game.module());
+Variable getIsDawn(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Module> module(game.module());
     const Module::Time &time = module->time();
     return Variable::ofInt(static_cast<int>(time.hour == module->info().dawnHour));
 }
 
-Variable Routines::getIsDusk(const VariablesList &args, ExecutionContext &ctx) {
-    shared_ptr<Module> module(_game.module());
+Variable getIsDusk(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    shared_ptr<Module> module(game.module());
     const Module::Time &time = module->time();
     return Variable::ofInt(static_cast<int>(time.hour == module->info().duskHour));
 }
+
+} // namespace routine
 
 } // namespace game
 
