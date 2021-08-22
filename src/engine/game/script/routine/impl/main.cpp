@@ -22,7 +22,7 @@
 #include "declarations.h"
 
 #include "../../../../common/log.h"
-#include "../../../../script/exception/invfailed.h"
+#include "../../../../script/exception/argument.h"
 #include "../../../../script/exception/notimpl.h"
 
 #include "../../../game.h"
@@ -128,7 +128,7 @@ Variable getFacing(Game &game, const vector<Variable> &args, ExecutionContext &c
         auto target = getSpatialObject(game, args, 0, ctx);
         return Variable::ofFloat(glm::degrees(target->getFacing()));
     }
-    catch (const InvocationFailedException &) {
+    catch (const ArgumentException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
@@ -198,7 +198,7 @@ Variable getDistanceToObject(Game &game, const vector<Variable> &args, Execution
         auto object = getSpatialObject(game, args, 0, ctx);
         return Variable::ofFloat(caller->getDistanceTo(*object));
     }
-    catch (const InvocationFailedException &) {
+    catch (const ArgumentException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
@@ -208,7 +208,7 @@ Variable getIsObjectValid(Game &game, const vector<Variable> &args, ExecutionCon
         auto object = getObject(game, args, 0, ctx);
         return Variable::ofInt(1);
     }
-    catch (const InvocationFailedException &) {
+    catch (const ArgumentException &) {
         return Variable::ofInt(0);
     }
 }
@@ -309,7 +309,7 @@ Variable getRacialType(Game &game, const vector<Variable> &args, ExecutionContex
         auto creature = getCreature(game, args, 0, ctx);
         return Variable::ofInt(static_cast<int>(creature->racialType()));
     }
-    catch (const InvocationFailedException &) {
+    catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(RacialType::Invalid));
     }
 }
@@ -403,7 +403,13 @@ Variable getDistanceBetween(Game &game, const vector<Variable> &args, ExecutionC
 }
 
 Variable setReturnStrref(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    bool show = getBool(args, 0);
+    int strRef = getIntOrElse(args, 1, 0);
+    int returnQuerystrRef = getIntOrElse(args, 1, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getItemInSlot(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -455,6 +461,7 @@ Variable resistForce(Game &game, const vector<Variable> &args, ExecutionContext 
 Variable getFactionEqual(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto firstObject = getCreature(game, args, 0, ctx);
     auto secondObject = getCreatureOrCaller(game, args, 1, ctx);
+
     return Variable::ofInt(static_cast<int>(firstObject->faction() == secondObject->faction()));
 }
 
@@ -472,11 +479,22 @@ Variable getIsListening(Game &game, const vector<Variable> &args, ExecutionConte
 }
 
 Variable setListening(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(game, args, 0, ctx);
+    bool value = getBool(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable setListenPattern(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(game, args, 0, ctx);
+    string pattern(getString(args, 1));
+    int number = getIntOrElse(args, 2, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getFactionWeakestMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -641,7 +659,12 @@ Variable getIsPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx
 }
 
 Variable speakString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    string stringToSpeak(getString(args, 0));
+    auto talkVolume = getEnumOrElse<TalkVolume>(args, 1, TalkVolume::Talk);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getSpellTargetLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -658,7 +681,7 @@ Variable getFacingFromLocation(Game &game, const vector<Variable> &args, Executi
         auto location = getLocationEngineType(args, 0);
         return Variable::ofFloat(glm::degrees(location->facing()));
     }
-    catch (const InvocationFailedException &) {
+    catch (const ArgumentException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
@@ -688,7 +711,7 @@ Variable getNearestCreatureToLocation(Game &game, const vector<Variable> &args, 
 }
 
 Variable getNearestObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto objectType = getEnum(args, 0, ObjectType::All);
+    auto objectType = getEnumOrElse(args, 0, ObjectType::All);
     auto target = getSpatialObjectOrCaller(game, args, 1, ctx);
     int nth = getIntOrElse(args, 2, 1);
 
@@ -1078,7 +1101,7 @@ Variable getDistanceToObject2D(Game &game, const vector<Variable> &args, Executi
         auto object = getSpatialObject(game, args, 0, ctx);
         return Variable::ofFloat(caller->getDistanceTo(glm::vec2(object->position())));
     }
-    catch (const InvocationFailedException &) {
+    catch (const ArgumentException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
@@ -1117,7 +1140,7 @@ Variable getClassByPosition(Game &game, const vector<Variable> &args, ExecutionC
 
         return Variable::ofInt(static_cast<int>(clazz));
     }
-    catch (const InvocationFailedException &) {
+    catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(ClassType::Invalid));
     }
 }
@@ -1214,11 +1237,19 @@ Variable getJournalEntry(Game &game, const vector<Variable> &args, ExecutionCont
 }
 
 Variable playRumblePattern(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    int pattern = getInt(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable stopRumblePattern(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    int pattern = getInt(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable sendMessageToPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1331,7 +1362,11 @@ Variable exploreAreaForPlayer(Game &game, const vector<Variable> &args, Executio
 }
 
 Variable getIsEncounterCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getCreatureOrCaller(game, args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable getLastPlayerDying(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1506,7 +1541,7 @@ Variable getSubRace(Game &game, const vector<Variable> &args, ExecutionContext &
         auto creature = getCreature(game, args, 0, ctx);
         return Variable::ofInt(static_cast<int>(creature->subrace()));
     }
-    catch (const InvocationFailedException &) {
+    catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(Subrace::None));
     }
 }
@@ -1903,7 +1938,7 @@ Variable getNPCAIStyle(Game &game, const vector<Variable> &args, ExecutionContex
         auto creature = getCreature(game, args, 0, ctx);
         return Variable::ofInt(static_cast<int>(creature->aiStyle()));
     }
-    catch (const InvocationFailedException &) {
+    catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(NPCAIStyle::DefaultAttack));
     }
 }
@@ -1955,7 +1990,7 @@ Variable getStandardFaction(Game &game, const vector<Variable> &args, ExecutionC
         auto object = getCreature(game, args, 0, ctx);
         return Variable::ofInt(static_cast<int>(object->faction()));
     }
-    catch (const InvocationFailedException &) {
+    catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(Faction::Invalid));
     }
 }
@@ -1979,11 +2014,27 @@ Variable setMinOneHP(Game &game, const vector<Variable> &args, ExecutionContext 
 }
 
 Variable setGlobalFadeIn(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    float wait = getFloatOrElse(args, 0, 0.0f);
+    float length = getFloatOrElse(args, 0, 0.0f);
+    float r = getFloatOrElse(args, 0, 0.0f);
+    float g = getFloatOrElse(args, 0, 0.0f);
+    float b = getFloatOrElse(args, 0, 0.0f);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable setGlobalFadeOut(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    float wait = getFloatOrElse(args, 0, 0.0f);
+    float length = getFloatOrElse(args, 0, 0.0f);
+    float r = getFloatOrElse(args, 0, 0.0f);
+    float g = getFloatOrElse(args, 0, 0.0f);
+    float b = getFloatOrElse(args, 0, 0.0f);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getLastHostileTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2031,8 +2082,14 @@ Variable setForcePowerUnsuccessful(Game &game, const vector<Variable> &args, Exe
 }
 
 Variable getIsDebilitated(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreatureOrCaller(game, args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(creature->isDebilitated()));
+    try {
+        auto creature = getCreatureOrCaller(game, args, 0, ctx);
+        bool debilitated = creature->isDebilitated();
+        return Variable::ofInt(static_cast<int>(debilitated));
+    }
+    catch (const ArgumentException &ex) {
+        return Variable::ofInt(0);
+    }
 }
 
 Variable surrenderByFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
