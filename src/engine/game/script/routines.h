@@ -43,8 +43,6 @@ private:
 
     std::vector<script::Routine> _routines;
 
-    void add(std::string name, script::VariableType retType, std::vector<script::VariableType> argTypes);
-
     template <class T>
     void add(
         std::string name,

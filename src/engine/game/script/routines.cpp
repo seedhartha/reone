@@ -46,10 +46,6 @@ void Routines::deinit() {
     _routines.clear();
 }
 
-void Routines::add(string name, VariableType retType, vector<VariableType> argTypes) {
-    _routines.emplace_back(move(name), retType, move(argTypes));
-}
-
 const Routine &Routines::get(int index) {
     return _routines[index];
 }

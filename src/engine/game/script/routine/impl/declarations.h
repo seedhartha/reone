@@ -23,7 +23,7 @@ namespace reone {
 
 namespace script {
 
-class ExecutionContext;
+struct ExecutionContext;
 
 }
 
