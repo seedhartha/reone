@@ -37,17 +37,19 @@ namespace game {
 namespace routine {
 
 Variable vectorMagnitude(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofFloat(glm::length(getVectorOrElse(args, 0)));
+    glm::vec3 value(getVector(args, 0));
+    return Variable::ofFloat(glm::length(value));
 }
 
 Variable vectorNormalize(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofVector(glm::normalize(getVectorOrElse(args, 0)));
+    glm::vec3 value(getVector(args, 0));
+    return Variable::ofVector(glm::normalize(value));
 }
 
 Variable vectorCreate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float x = getFloatOrElse(args, 0);
-    float y = getFloatOrElse(args, 1);
-    float z = getFloatOrElse(args, 2);
+    float x = getFloat(args, 0);
+    float y = getFloat(args, 1);
+    float z = getFloat(args, 2);
     return Variable::ofVector(glm::vec3(x, y, z));
 }
 

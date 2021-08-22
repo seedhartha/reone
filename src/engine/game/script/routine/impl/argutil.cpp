@@ -35,6 +35,41 @@ namespace reone {
 
 namespace game {
 
+bool getBool(const vector<Variable> &args, int index) {
+    if (isOutOfRange(args, index)) {
+        throw InvocationFailedException(str(boost::format("Argument %d is out of range") % index));
+    }
+    return static_cast<bool>(args[index].intValue);
+}
+
+int getInt(const vector<Variable> &args, int index) {
+    if (isOutOfRange(args, index)) {
+        throw InvocationFailedException(str(boost::format("Argument %d is out of range") % index));
+    }
+    return args[index].intValue;
+}
+
+float getFloat(const vector<Variable> &args, int index) {
+    if (isOutOfRange(args, index)) {
+        throw InvocationFailedException(str(boost::format("Argument %d is out of range") % index));
+    }
+    return args[index].floatValue;
+}
+
+string getString(const vector<Variable> &args, int index) {
+    if (isOutOfRange(args, index)) {
+        throw InvocationFailedException(str(boost::format("Argument %d is out of range") % index));
+    }
+    return args[index].strValue;
+}
+
+glm::vec3 getVector(const vector<Variable> &args, int index) {
+    if (isOutOfRange(args, index)) {
+        throw InvocationFailedException(str(boost::format("Argument %d is out of range") % index));
+    }
+    return args[index].vecValue;
+}
+
 bool getBoolOrElse(const vector<Variable> &args, int index, bool defValue) {
     return isOutOfRange(args, index) ?
         defValue :

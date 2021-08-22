@@ -21,7 +21,10 @@ namespace reone {
 
 namespace script {
 
-class NotImplementedException : public std::exception {
+class NotImplementedException : public std::logic_error {
+public:
+    NotImplementedException() : std::logic_error("") {
+    }
 };
 
 } // namespace script

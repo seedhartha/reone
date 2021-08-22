@@ -37,7 +37,10 @@ namespace game {
 namespace routine {
 
 Variable random(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(reone::random(0, getIntOrElse(args, 0) - 1));
+    int max = getInt(args, 0);
+    int result = reone::random(0, max - 1);
+
+    return Variable::ofInt(result);
 }
 
 Variable d2(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {

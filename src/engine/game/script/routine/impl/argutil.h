@@ -42,11 +42,17 @@ class Sound;
 class SpatialObject;
 class Talent;
 
-bool getBoolOrElse(const std::vector<script::Variable> &args, int index, bool defValue = false);
-int getIntOrElse(const std::vector<script::Variable> &args, int index, int defValue = 0);
-float getFloatOrElse(const std::vector<script::Variable> &args, int index, float defValue = 0.0f);
-std::string getStringOrElse(const std::vector<script::Variable> &args, int index, std::string defValue = "");
-glm::vec3 getVectorOrElse(const std::vector<script::Variable> &args, int index, glm::vec3 defValue = glm::vec3(0.0f));
+bool getBool(const std::vector<script::Variable> &args, int index);
+int getInt(const std::vector<script::Variable> &args, int index);
+float getFloat(const std::vector<script::Variable> &args, int index);
+std::string getString(const std::vector<script::Variable> &args, int index);
+glm::vec3 getVector(const std::vector<script::Variable> &args, int index);
+
+bool getBoolOrElse(const std::vector<script::Variable> &args, int index, bool defValue);
+int getIntOrElse(const std::vector<script::Variable> &args, int index, int defValue);
+float getFloatOrElse(const std::vector<script::Variable> &args, int index, float defValue);
+std::string getStringOrElse(const std::vector<script::Variable> &args, int index, std::string defValue);
+glm::vec3 getVectorOrElse(const std::vector<script::Variable> &args, int index, glm::vec3 defValue);
 
 std::shared_ptr<Object> getCaller(Game &game, script::ExecutionContext &ctx);
 std::shared_ptr<SpatialObject> getCallerAsSpatial(Game &game, script::ExecutionContext &ctx);

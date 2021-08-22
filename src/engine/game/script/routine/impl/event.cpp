@@ -50,8 +50,9 @@ Variable signalEvent(Game &game, const vector<Variable> &args, ExecutionContext 
 }
 
 Variable eventUserDefined(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int eventNumber = getIntOrElse(args, 0);
+    int eventNumber = getInt(args, 0);
     auto event = make_shared<Event>(eventNumber);
+
     return Variable::ofEvent(event);
 }
 
