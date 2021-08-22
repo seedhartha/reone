@@ -22,7 +22,7 @@
 #include "declarations.h"
 
 #include "../../../../common/log.h"
-#include "../../../../script/exception/notimplemented.h"
+#include "../../../../script/exception/notimpl.h"
 #include "../../../../script/types.h"
 
 #include "../../../object/sound.h"
@@ -49,21 +49,13 @@ Variable soundObjectGetFixedVariance(Game &game, const vector<Variable> &args, E
 
 Variable soundObjectPlay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto sound = getSound(game, args, 0, ctx);
-    if (sound) {
-        sound->play();
-    } else {
-        debug("Script: soundObjectPlay: sound is invalid", 1, DebugChannels::script);
-    }
+    sound->play();
     return Variable::ofNull();
 }
 
 Variable soundObjectStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto sound = getSound(game, args, 0, ctx);
-    if (sound) {
-        sound->stop();
-    } else {
-        debug("Script: soundObjectStop: sound is invalid", 1, DebugChannels::script);
-    }
+    sound->stop();
     return Variable::ofNull();
 }
 

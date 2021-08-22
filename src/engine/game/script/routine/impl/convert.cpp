@@ -35,44 +35,44 @@ namespace routine {
 
 Variable floatToString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: handle optional arguments
-    return Variable::ofString(to_string(getFloat(args, 0)));
+    return Variable::ofString(to_string(getFloatOrElse(args, 0)));
 }
 
 Variable intToString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofString(to_string(getInt(args, 0)));
+    return Variable::ofString(to_string(getIntOrElse(args, 0)));
 }
 
 Variable roundsToSeconds(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofFloat(getInt(args, 0) / 6.0f);
+    return Variable::ofFloat(getIntOrElse(args, 0) / 6.0f);
 }
 
 Variable hoursToSeconds(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(getInt(args, 0) * 3600);
+    return Variable::ofInt(getIntOrElse(args, 0) * 3600);
 }
 
 Variable turnsToSeconds(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofFloat(getInt(args, 0) / 60.0f);
+    return Variable::ofFloat(getIntOrElse(args, 0) / 60.0f);
 }
 
 Variable feetToMeters(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofFloat(getFloat(args, 0) * 0.3048f);
+    return Variable::ofFloat(getFloatOrElse(args, 0) * 0.3048f);
 }
 
 Variable yardsToMeters(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofFloat(getFloat(args, 0) * 0.9144f);
+    return Variable::ofFloat(getFloatOrElse(args, 0) * 0.9144f);
 }
 
 Variable intToFloat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofFloat(static_cast<float>(getInt(args, 0)));
+    return Variable::ofFloat(static_cast<float>(getIntOrElse(args, 0)));
 }
 
 Variable floatToInt(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<int>(getFloat(args, 0)));
+    return Variable::ofInt(static_cast<int>(getFloatOrElse(args, 0)));
 }
 
 Variable stringToInt(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int result = 0;
-    string number(getString(args, 0));
+    string number(getStringOrElse(args, 0));
 
     if (!number.empty()) {
         result = stoi(number);
@@ -82,11 +82,11 @@ Variable stringToInt(Game &game, const vector<Variable> &args, ExecutionContext 
 }
 
 Variable stringToFloat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofFloat(stof(getString(args, 0)));
+    return Variable::ofFloat(stof(getStringOrElse(args, 0)));
 }
 
 Variable intToHexString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofString(str(boost::format("%08x") % getInt(args, 0)));
+    return Variable::ofString(str(boost::format("%08x") % getIntOrElse(args, 0)));
 }
 
 } // namespace routine

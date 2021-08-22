@@ -21,7 +21,7 @@
 
 #include "declarations.h"
 
-#include "../../../../script/exception/notimplemented.h"
+#include "../../../../script/exception/notimpl.h"
 
 using namespace std;
 

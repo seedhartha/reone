@@ -22,7 +22,7 @@
 #include "declarations.h"
 
 #include "../../../../common/log.h"
-#include "../../../../script/exception/notimplemented.h"
+#include "../../../../script/exception/notimpl.h"
 
 #include "../../../event.h"
 #include "../../../game.h"
@@ -43,20 +43,14 @@ Variable signalEvent(Game &game, const vector<Variable> &args, ExecutionContext 
     auto object = getObject(game, args, 0, ctx);
     auto toRun = getEvent(args, 1);
 
-    if (object && toRun) {
-        debug(boost::format("Event signalled: %s %s") % object->tag() % toRun->number(), 2);
-        game.services().scriptRunner().run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
-    } else if (!object) {
-        debug("Script: signalEvent: object is invalid", 1, DebugChannels::script);
-    } else if (!toRun) {
-        debug("Script: signalEvent: toRun is invalid", 1, DebugChannels::script);
-    }
+    debug(boost::format("Event signalled: %s %s") % object->tag() % toRun->number(), 2);
+    game.services().scriptRunner().run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
 
     return Variable::ofNull();
 }
 
 Variable eventUserDefined(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int eventNumber = getInt(args, 0);
+    int eventNumber = getIntOrElse(args, 0);
     auto event = make_shared<Event>(eventNumber);
     return Variable::ofEvent(event);
 }

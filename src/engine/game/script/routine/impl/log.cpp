@@ -22,7 +22,7 @@
 #include "declarations.h"
 
 #include "../../../../common/log.h"
-#include "../../../../script/exception/notimplemented.h"
+#include "../../../../script/exception/notimpl.h"
 
 #include "../../../object/object.h"
 
@@ -39,16 +39,16 @@ namespace game {
 namespace routine {
 
 Variable printString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string str(getString(args, 0));
+    string str(getStringOrElse(args, 0));
     info(str);
     return Variable::ofNull();
 }
 
 Variable printFloat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: use formatting parameters
-    float value = getFloat(args, 0);
-    int width = getInt(args, 1, 18);
-    int decimals = getInt(args, 2, 9);
+    float value = getFloatOrElse(args, 0);
+    int width = getIntOrElse(args, 1, 18);
+    int decimals = getIntOrElse(args, 2, 9);
 
     info(to_string(value));
 
@@ -56,7 +56,7 @@ Variable printFloat(Game &game, const vector<Variable> &args, ExecutionContext &
 }
 
 Variable printInteger(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int value = getInt(args, 0);
+    int value = getIntOrElse(args, 0);
     info(to_string(value));
     return Variable::ofNull();
 }
@@ -68,7 +68,7 @@ Variable printObject(Game &game, const vector<Variable> &args, ExecutionContext 
 }
 
 Variable printVector(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    glm::vec3 value(getVector(args, 0));
+    glm::vec3 value(getVectorOrElse(args, 0));
     info(boost::format("%f %f %f") % value.x % value.y % value.z);
     return Variable::ofNull();
 }

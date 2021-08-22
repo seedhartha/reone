@@ -18,7 +18,10 @@
 #include "routine.h"
 
 #include "../common/log.h"
-#include "../script/exception/notimplemented.h"
+#include "../script/exception/invalidarg.h"
+#include "../script/exception/invalidcaller.h"
+#include "../script/exception/invalidtriggerrer.h"
+#include "../script/exception/notimpl.h"
 
 #include "variable.h"
 
@@ -51,11 +54,19 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
         try {
             return move(_func(args, ctx));
         }
-        catch (NotImplementedException) {
+        catch (const NotImplementedException &) {
+            debug("Script: routine not implemented: " + _name, 2, DebugChannels::script);
+        }
+        catch (const InvalidArgumentException &ex) {
+            debug(boost::format("Script: routine '%s' invocation failed: %s") % _name % ex.what(), 2, DebugChannels::script);
+        }
+        catch (const InvalidCallerException &ex) {
+            debug(boost::format("Script: routine '%s' invocation failed: %s") % _name % ex.what(), 2, DebugChannels::script);
+        }
+        catch (const InvalidTriggerrerException &ex) {
+            debug(boost::format("Script: routine '%s' invocation failed: %s") % _name % ex.what(), 2, DebugChannels::script);
         }
     }
-
-    debug("Script: routine not implemented: " + _name, 2, DebugChannels::script);
 
     Variable result;
     result.type = _returnType;
