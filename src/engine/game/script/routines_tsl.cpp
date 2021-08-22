@@ -568,8 +568,8 @@ void Routines::addTslRoutines() {
     add("StartCreditSequence", VT_V, { VT_I }, routine::startCreditSequence);
     add("IsCreditSequenceInProgress", VT_I, { }, routine::isCreditSequenceInProgress);
 
-    add("SWMG_SetLateralAccelerationPerSecond", VT_V, { VT_F });
-    add("SWMG_GetLateralAccelerationPerSecond", VT_F, { });
+    add("SWMG_SetLateralAccelerationPerSecond", VT_V, { VT_F }, routine::minigame::setLateralAccelerationPerSecond);
+    add("SWMG_GetLateralAccelerationPerSecond", VT_F, { }, routine::minigame::getLateralAccelerationPerSecond);
 
     add("GetCurrentAction", VT_I, { VT_O }, routine::getCurrentAction);
     add("GetDifficultyModifier", VT_F, { }, routine::getDifficultyModifier);
@@ -613,7 +613,7 @@ void Routines::addTslRoutines() {
     add("GetModuleName", VT_S, { }, routine::getModuleName);
     add("GetFactionLeader", VT_O, { VT_O }, routine::getFactionLeader);
 
-    add("SWMG_SetSpeedBlurEffect", VT_V, { VT_I, VT_F });
+    add("SWMG_SetSpeedBlurEffect", VT_V, { VT_I, VT_F }, routine::minigame::setSpeedBlurEffect);
 
     add("EndGame", VT_V, { VT_I }, routine::endGame);
     add("GetRunScriptVar", VT_I, { }, routine::getRunScriptVar);
@@ -635,92 +635,92 @@ void Routines::addTslRoutines() {
     add("SetGlobalNumber", VT_V, { VT_S, VT_I }, routine::setGlobalNumber);
     add("AurPostString", VT_V, { VT_S, VT_I, VT_I, VT_F }, routine::aurPostString);
 
-    add("SWMG_GetLastEvent", VT_S, { });
-    add("SWMG_GetLastEventModelName", VT_S, { });
-    add("SWMG_GetObjectByName", VT_O, { VT_S });
-    add("SWMG_PlayAnimation", VT_V, { VT_O, VT_S, VT_I, VT_I, VT_I });
-    add("SWMG_GetLastBulletHitDamage", VT_I, { });
-    add("SWMG_GetLastBulletHitTarget", VT_I, { });
-    add("SWMG_GetLastBulletHitShooter", VT_O, { });
-    add("SWMG_AdjustFollowerHitPoints", VT_I, { VT_O, VT_I, VT_I });
-    add("SWMG_OnBulletHit", VT_V, { });
-    add("SWMG_OnObstacleHit", VT_V, { });
-    add("SWMG_GetLastFollowerHit", VT_O, { });
-    add("SWMG_GetLastObstacleHit", VT_O, { });
-    add("SWMG_GetLastBulletFiredDamage", VT_I, { });
-    add("SWMG_GetLastBulletFiredTarget", VT_I, { });
-    add("SWMG_GetObjectName", VT_S, { VT_O });
-    add("SWMG_OnDeath", VT_V, { });
-    add("SWMG_IsFollower", VT_I, { VT_O });
-    add("SWMG_IsPlayer", VT_I, { VT_O });
-    add("SWMG_IsEnemy", VT_I, { VT_O });
-    add("SWMG_IsTrigger", VT_I, { VT_O });
-    add("SWMG_IsObstacle", VT_I, { VT_O });
-    add("SWMG_SetFollowerHitPoints", VT_V, { VT_O, VT_I });
-    add("SWMG_OnDamage", VT_V, { });
-    add("SWMG_GetLastHPChange", VT_I, { });
-    add("SWMG_RemoveAnimation", VT_V, { VT_O, VT_S });
-    add("SWMG_GetCameraNearClip", VT_F, { });
-    add("SWMG_GetCameraFarClip", VT_F, { });
-    add("SWMG_SetCameraClip", VT_V, { VT_F, VT_F });
-    add("SWMG_GetPlayer", VT_O, { });
-    add("SWMG_GetEnemyCount", VT_I, { });
-    add("SWMG_GetEnemy", VT_O, { VT_I });
-    add("SWMG_GetObstacleCount", VT_I, { });
-    add("SWMG_GetObstacle", VT_O, { VT_I });
-    add("SWMG_GetHitPoints", VT_I, { VT_O });
-    add("SWMG_GetMaxHitPoints", VT_I, { VT_O });
-    add("SWMG_SetMaxHitPoints", VT_V, { VT_O, VT_I });
-    add("SWMG_GetSphereRadius", VT_F, { VT_O });
-    add("SWMG_SetSphereRadius", VT_V, { VT_O, VT_F });
-    add("SWMG_GetNumLoops", VT_I, { VT_O });
-    add("SWMG_SetNumLoops", VT_V, { VT_O, VT_I });
-    add("SWMG_GetPosition", VT_VECTOR, { VT_O });
-    add("SWMG_GetGunBankCount", VT_I, { VT_O });
-    add("SWMG_GetGunBankBulletModel", VT_S, { VT_O, VT_I });
-    add("SWMG_GetGunBankGunModel", VT_S, { VT_O, VT_I });
-    add("SWMG_GetGunBankDamage", VT_I, { VT_O, VT_I });
-    add("SWMG_GetGunBankTimeBetweenShots", VT_F, { VT_O, VT_I });
-    add("SWMG_GetGunBankLifespan", VT_F, { VT_O, VT_I });
-    add("SWMG_GetGunBankSpeed", VT_F, { VT_O, VT_I });
-    add("SWMG_GetGunBankTarget", VT_I, { VT_O, VT_I });
-    add("SWMG_SetGunBankBulletModel", VT_V, { VT_O, VT_I, VT_S });
-    add("SWMG_SetGunBankGunModel", VT_V, { VT_O, VT_I, VT_S });
-    add("SWMG_SetGunBankDamage", VT_V, { VT_O, VT_I, VT_I });
-    add("SWMG_SetGunBankTimeBetweenShots", VT_V, { VT_O, VT_I, VT_F });
-    add("SWMG_SetGunBankLifespan", VT_V, { VT_O, VT_I, VT_F });
-    add("SWMG_SetGunBankSpeed", VT_V, { VT_O, VT_I, VT_F });
-    add("SWMG_SetGunBankTarget", VT_V, { VT_O, VT_I, VT_I });
-    add("SWMG_GetLastBulletHitPart", VT_S, { });
-    add("SWMG_IsGunBankTargetting", VT_I, { VT_O, VT_I });
-    add("SWMG_GetPlayerOffset", VT_VECTOR, { });
-    add("SWMG_GetPlayerInvincibility", VT_F, { });
-    add("SWMG_GetPlayerSpeed", VT_F, { });
-    add("SWMG_GetPlayerMinSpeed", VT_F, { });
-    add("SWMG_GetPlayerAccelerationPerSecond", VT_F, { });
-    add("SWMG_GetPlayerTunnelPos", VT_VECTOR, { });
-    add("SWMG_SetPlayerOffset", VT_V, { VT_VECTOR });
-    add("SWMG_SetPlayerInvincibility", VT_V, { VT_F });
-    add("SWMG_SetPlayerSpeed", VT_V, { VT_F });
-    add("SWMG_SetPlayerMinSpeed", VT_V, { VT_F });
-    add("SWMG_SetPlayerAccelerationPerSecond", VT_V, { VT_F });
-    add("SWMG_SetPlayerTunnelPos", VT_V, { VT_VECTOR });
-    add("SWMG_GetPlayerTunnelNeg", VT_VECTOR, { });
-    add("SWMG_SetPlayerTunnelNeg", VT_V, { VT_VECTOR });
-    add("SWMG_GetPlayerOrigin", VT_VECTOR, { });
-    add("SWMG_SetPlayerOrigin", VT_V, { VT_VECTOR });
-    add("SWMG_GetGunBankHorizontalSpread", VT_F, { VT_O, VT_I });
-    add("SWMG_GetGunBankVerticalSpread", VT_F, { VT_O, VT_I });
-    add("SWMG_GetGunBankSensingRadius", VT_F, { VT_O, VT_I });
-    add("SWMG_GetGunBankInaccuracy", VT_F, { VT_O, VT_I });
-    add("SWMG_SetGunBankHorizontalSpread", VT_V, { VT_O, VT_I, VT_F });
-    add("SWMG_SetGunBankVerticalSpread", VT_V, { VT_O, VT_I, VT_F });
-    add("SWMG_SetGunBankSensingRadius", VT_V, { VT_O, VT_I, VT_F });
-    add("SWMG_SetGunBankInaccuracy", VT_V, { VT_O, VT_I, VT_F });
-    add("SWMG_GetIsInvulnerable", VT_I, { VT_O });
-    add("SWMG_StartInvulnerability", VT_V, { VT_O });
-    add("SWMG_GetPlayerMaxSpeed", VT_F, { });
-    add("SWMG_SetPlayerMaxSpeed", VT_V, { VT_F });
+    add("SWMG_GetLastEvent", VT_S, { }, routine::minigame::getLastEvent);
+    add("SWMG_GetLastEventModelName", VT_S, { }, routine::minigame::getLastEventModelName);
+    add("SWMG_GetObjectByName", VT_O, { VT_S }, routine::minigame::getObjectByName);
+    add("SWMG_PlayAnimation", VT_V, { VT_O, VT_S, VT_I, VT_I, VT_I }, routine::minigame::playAnimation);
+    add("SWMG_GetLastBulletHitDamage", VT_I, { }, routine::minigame::getLastBulletHitDamage);
+    add("SWMG_GetLastBulletHitTarget", VT_I, { }, routine::minigame::getLastBulletHitTarget);
+    add("SWMG_GetLastBulletHitShooter", VT_O, { }, routine::minigame::getLastBulletHitShooter);
+    add("SWMG_AdjustFollowerHitPoints", VT_I, { VT_O, VT_I, VT_I }, routine::minigame::adjustFollowerHitPoints);
+    add("SWMG_OnBulletHit", VT_V, { }, routine::minigame::onBulletHit);
+    add("SWMG_OnObstacleHit", VT_V, { }, routine::minigame::onObstacleHit);
+    add("SWMG_GetLastFollowerHit", VT_O, { }, routine::minigame::getLastFollowerHit);
+    add("SWMG_GetLastObstacleHit", VT_O, { }, routine::minigame::getLastObstacleHit);
+    add("SWMG_GetLastBulletFiredDamage", VT_I, { }, routine::minigame::getLastBulletFiredDamage);
+    add("SWMG_GetLastBulletFiredTarget", VT_I, { }, routine::minigame::getLastBulletFiredTarget);
+    add("SWMG_GetObjectName", VT_S, { VT_O }, routine::minigame::getObjectName);
+    add("SWMG_OnDeath", VT_V, { }, routine::minigame::onDeath);
+    add("SWMG_IsFollower", VT_I, { VT_O }, routine::minigame::isFollower);
+    add("SWMG_IsPlayer", VT_I, { VT_O }, routine::minigame::isPlayer);
+    add("SWMG_IsEnemy", VT_I, { VT_O }, routine::minigame::isEnemy);
+    add("SWMG_IsTrigger", VT_I, { VT_O }, routine::minigame::isTrigger);
+    add("SWMG_IsObstacle", VT_I, { VT_O }, routine::minigame::isObstacle);
+    add("SWMG_SetFollowerHitPoints", VT_V, { VT_O, VT_I }, routine::minigame::setFollowerHitPoints);
+    add("SWMG_OnDamage", VT_V, { }, routine::minigame::onDamage);
+    add("SWMG_GetLastHPChange", VT_I, { }, routine::minigame::getLastHPChange);
+    add("SWMG_RemoveAnimation", VT_V, { VT_O, VT_S }, routine::minigame::removeAnimation);
+    add("SWMG_GetCameraNearClip", VT_F, { }, routine::minigame::getCameraNearClip);
+    add("SWMG_GetCameraFarClip", VT_F, { }, routine::minigame::getCameraFarClip);
+    add("SWMG_SetCameraClip", VT_V, { VT_F, VT_F }, routine::minigame::setCameraClip);
+    add("SWMG_GetPlayer", VT_O, { }, routine::minigame::getPlayer);
+    add("SWMG_GetEnemyCount", VT_I, { }, routine::minigame::getEnemyCount);
+    add("SWMG_GetEnemy", VT_O, { VT_I }, routine::minigame::getEnemy);
+    add("SWMG_GetObstacleCount", VT_I, { }, routine::minigame::getObstacleCount);
+    add("SWMG_GetObstacle", VT_O, { VT_I }, routine::minigame::getObstacle);
+    add("SWMG_GetHitPoints", VT_I, { VT_O }, routine::minigame::getHitPoints);
+    add("SWMG_GetMaxHitPoints", VT_I, { VT_O }, routine::minigame::getMaxHitPoints);
+    add("SWMG_SetMaxHitPoints", VT_V, { VT_O, VT_I }, routine::minigame::setMaxHitPoints);
+    add("SWMG_GetSphereRadius", VT_F, { VT_O }, routine::minigame::getSphereRadius);
+    add("SWMG_SetSphereRadius", VT_V, { VT_O, VT_F }, routine::minigame::setSphereRadius);
+    add("SWMG_GetNumLoops", VT_I, { VT_O }, routine::minigame::getNumLoops);
+    add("SWMG_SetNumLoops", VT_V, { VT_O, VT_I }, routine::minigame::setNumLoops);
+    add("SWMG_GetPosition", VT_VECTOR, { VT_O }, routine::minigame::getPosition);
+    add("SWMG_GetGunBankCount", VT_I, { VT_O }, routine::minigame::getGunBankCount);
+    add("SWMG_GetGunBankBulletModel", VT_S, { VT_O, VT_I }, routine::minigame::getGunBankBulletModel);
+    add("SWMG_GetGunBankGunModel", VT_S, { VT_O, VT_I }, routine::minigame::getGunBankGunModel);
+    add("SWMG_GetGunBankDamage", VT_I, { VT_O, VT_I }, routine::minigame::getGunBankDamage);
+    add("SWMG_GetGunBankTimeBetweenShots", VT_F, { VT_O, VT_I }, routine::minigame::getGunBankTimeBetweenShots);
+    add("SWMG_GetGunBankLifespan", VT_F, { VT_O, VT_I }, routine::minigame::getGunBankLifespan);
+    add("SWMG_GetGunBankSpeed", VT_F, { VT_O, VT_I }, routine::minigame::getGunBankSpeed);
+    add("SWMG_GetGunBankTarget", VT_I, { VT_O, VT_I }, routine::minigame::getGunBankTarget);
+    add("SWMG_SetGunBankBulletModel", VT_V, { VT_O, VT_I, VT_S }, routine::minigame::setGunBankBulletModel);
+    add("SWMG_SetGunBankGunModel", VT_V, { VT_O, VT_I, VT_S }, routine::minigame::setGunBankGunModel);
+    add("SWMG_SetGunBankDamage", VT_V, { VT_O, VT_I, VT_I }, routine::minigame::setGunBankDamage);
+    add("SWMG_SetGunBankTimeBetweenShots", VT_V, { VT_O, VT_I, VT_F }, routine::minigame::setGunBankTimeBetweenShots);
+    add("SWMG_SetGunBankLifespan", VT_V, { VT_O, VT_I, VT_F }, routine::minigame::setGunBankLifespan);
+    add("SWMG_SetGunBankSpeed", VT_V, { VT_O, VT_I, VT_F }, routine::minigame::setGunBankSpeed);
+    add("SWMG_SetGunBankTarget", VT_V, { VT_O, VT_I, VT_I }, routine::minigame::setGunBankTarget);
+    add("SWMG_GetLastBulletHitPart", VT_S, { }, routine::minigame::getLastBulletHitPart);
+    add("SWMG_IsGunBankTargetting", VT_I, { VT_O, VT_I }, routine::minigame::isGunBankTargetting);
+    add("SWMG_GetPlayerOffset", VT_VECTOR, { }, routine::minigame::getPlayerOffset);
+    add("SWMG_GetPlayerInvincibility", VT_F, { }, routine::minigame::getPlayerInvincibility);
+    add("SWMG_GetPlayerSpeed", VT_F, { }, routine::minigame::getPlayerSpeed);
+    add("SWMG_GetPlayerMinSpeed", VT_F, { }, routine::minigame::getPlayerMinSpeed);
+    add("SWMG_GetPlayerAccelerationPerSecond", VT_F, { }, routine::minigame::getPlayerAccelerationPerSecond);
+    add("SWMG_GetPlayerTunnelPos", VT_VECTOR, { }, routine::minigame::getPlayerTunnelPos);
+    add("SWMG_SetPlayerOffset", VT_V, { VT_VECTOR }, routine::minigame::setPlayerOffset);
+    add("SWMG_SetPlayerInvincibility", VT_V, { VT_F }, routine::minigame::setPlayerInvincibility);
+    add("SWMG_SetPlayerSpeed", VT_V, { VT_F }, routine::minigame::setPlayerSpeed);
+    add("SWMG_SetPlayerMinSpeed", VT_V, { VT_F }, routine::minigame::setPlayerMinSpeed);
+    add("SWMG_SetPlayerAccelerationPerSecond", VT_V, { VT_F }, routine::minigame::setPlayerAccelerationPerSecond);
+    add("SWMG_SetPlayerTunnelPos", VT_V, { VT_VECTOR }, routine::minigame::setPlayerTunnelPos);
+    add("SWMG_GetPlayerTunnelNeg", VT_VECTOR, { }, routine::minigame::getPlayerTunnelNeg);
+    add("SWMG_SetPlayerTunnelNeg", VT_V, { VT_VECTOR }, routine::minigame::setPlayerTunnelNeg);
+    add("SWMG_GetPlayerOrigin", VT_VECTOR, { }, routine::minigame::getPlayerOrigin);
+    add("SWMG_SetPlayerOrigin", VT_V, { VT_VECTOR }, routine::minigame::setPlayerOrigin);
+    add("SWMG_GetGunBankHorizontalSpread", VT_F, { VT_O, VT_I }, routine::minigame::getGunBankHorizontalSpread);
+    add("SWMG_GetGunBankVerticalSpread", VT_F, { VT_O, VT_I }, routine::minigame::getGunBankVerticalSpread);
+    add("SWMG_GetGunBankSensingRadius", VT_F, { VT_O, VT_I }, routine::minigame::getGunBankSensingRadius);
+    add("SWMG_GetGunBankInaccuracy", VT_F, { VT_O, VT_I }, routine::minigame::getGunBankInaccuracy);
+    add("SWMG_SetGunBankHorizontalSpread", VT_V, { VT_O, VT_I, VT_F }, routine::minigame::setGunBankHorizontalSpread);
+    add("SWMG_SetGunBankVerticalSpread", VT_V, { VT_O, VT_I, VT_F }, routine::minigame::setGunBankVerticalSpread);
+    add("SWMG_SetGunBankSensingRadius", VT_V, { VT_O, VT_I, VT_F }, routine::minigame::setGunBankSensingRadius);
+    add("SWMG_SetGunBankInaccuracy", VT_V, { VT_O, VT_I, VT_F }, routine::minigame::setGunBankInaccuracy);
+    add("SWMG_GetIsInvulnerable", VT_I, { VT_O }, routine::minigame::getIsInvulnerable);
+    add("SWMG_StartInvulnerability", VT_V, { VT_O }, routine::minigame::startInvulnerability);
+    add("SWMG_GetPlayerMaxSpeed", VT_F, { }, routine::minigame::getPlayerMaxSpeed);
+    add("SWMG_SetPlayerMaxSpeed", VT_V, { VT_F }, routine::minigame::setPlayerMaxSpeed);
 
     add("AddJournalWorldEntry", VT_V, { VT_I, VT_S, VT_S }, routine::addJournalWorldEntry);
     add("AddJournalWorldEntryStrref", VT_V, { VT_I, VT_I }, routine::addJournalWorldEntryStrref);
@@ -737,12 +737,12 @@ void Routines::addTslRoutines() {
     add("GetLocalNumber", VT_I, { VT_O, VT_I }, routine::getLocalNumber);
     add("SetLocalNumber", VT_V, { VT_O, VT_I, VT_I }, routine::setLocalNumber);
 
-    add("SWMG_GetSoundFrequency", VT_I, { VT_O, VT_I });
-    add("SWMG_SetSoundFrequency", VT_V, { VT_O, VT_I, VT_I });
-    add("SWMG_GetSoundFrequencyIsRandom", VT_I, { VT_O, VT_I });
-    add("SWMG_SetSoundFrequencyIsRandom", VT_V, { VT_O, VT_I, VT_I });
-    add("SWMG_GetSoundVolume", VT_I, { VT_O, VT_I });
-    add("SWMG_SetSoundVolume", VT_V, { VT_O, VT_I, VT_I });
+    add("SWMG_GetSoundFrequency", VT_I, { VT_O, VT_I }, routine::minigame::getSoundFrequency);
+    add("SWMG_SetSoundFrequency", VT_V, { VT_O, VT_I, VT_I }, routine::minigame::setSoundFrequency);
+    add("SWMG_GetSoundFrequencyIsRandom", VT_I, { VT_O, VT_I }, routine::minigame::getSoundFrequencyIsRandom);
+    add("SWMG_SetSoundFrequencyIsRandom", VT_V, { VT_O, VT_I, VT_I }, routine::minigame::setSoundFrequencyIsRandom);
+    add("SWMG_GetSoundVolume", VT_I, { VT_O, VT_I }, routine::minigame::getSoundVolume);
+    add("SWMG_SetSoundVolume", VT_V, { VT_O, VT_I, VT_I }, routine::minigame::setSoundVolume);
 
     add("SoundObjectGetPitchVariance", VT_F, { VT_O }, routine::soundObjectGetPitchVariance);
     add("SoundObjectSetPitchVariance", VT_V, { VT_O, VT_F }, routine::soundObjectSetPitchVariance);
@@ -773,8 +773,8 @@ void Routines::addTslRoutines() {
     add("GetMinOneHP", VT_I, { VT_O }, routine::getMinOneHP);
     add("SetMinOneHP", VT_V, { VT_O, VT_I }, routine::setMinOneHP);
 
-    add("SWMG_GetPlayerTunnelInfinite", VT_VECTOR, { });
-    add("SWMG_SetPlayerTunnelInfinite", VT_V, { VT_VECTOR });
+    add("SWMG_GetPlayerTunnelInfinite", VT_VECTOR, { }, routine::minigame::getPlayerTunnelInfinite);
+    add("SWMG_SetPlayerTunnelInfinite", VT_V, { VT_VECTOR }, routine::minigame::setPlayerTunnelInfinite);
 
     add("SetGlobalFadeIn", VT_V, { VT_F, VT_F, VT_F, VT_F, VT_F }, routine::setGlobalFadeIn);
     add("SetGlobalFadeOut", VT_V, { VT_F, VT_F, VT_F, VT_F, VT_F }, routine::setGlobalFadeOut);
@@ -840,7 +840,7 @@ void Routines::addTslRoutines() {
     add("EffectVPRegenModifier", VT_EFFECT, { VT_I }, routine::effectVPRegenModifier);
     add("EffectCrush", VT_EFFECT, { }, routine::effectCrush);
 
-    add("SWMG_GetSwoopUpgrade", VT_I, { VT_I });
+    add("SWMG_GetSwoopUpgrade", VT_I, { VT_I }, routine::minigame::getSwoopUpgrade);
 
     add("GetFeatAcquired", VT_I, { VT_I, VT_O }, routine::getFeatAcquired);
     add("GetSpellAcquired", VT_I, { VT_I, VT_O }, routine::getSpellAcquired);
@@ -849,12 +849,12 @@ void Routines::addTslRoutines() {
     add("GrantSpell", VT_V, { VT_I, VT_O }, routine::grantSpell);
     add("SpawnMine", VT_V, { VT_I, VT_LOCATION, VT_I, VT_I, VT_O }, routine::spawnMine);
 
-    add("SWMG_GetTrackPosition", VT_VECTOR, { VT_O });
-    add("SWMG_SetFollowerPosition", VT_VECTOR, { VT_VECTOR });
+    add("SWMG_GetTrackPosition", VT_VECTOR, { VT_O }, routine::minigame::getTrackPosition);
+    add("SWMG_SetFollowerPosition", VT_VECTOR, { VT_VECTOR }, routine::minigame::setFollowerPosition);
 
     add("SetFakeCombatState", VT_V, { VT_O, VT_I }, routine::setFakeCombatState);
 
-    add("SWMG_DestroyMiniGameObject", VT_V, { VT_O });
+    add("SWMG_DestroyMiniGameObject", VT_V, { VT_O }, routine::minigame::destroyMiniGameObject);
 
     add("GetOwnerDemolitionsSkill", VT_I, { VT_O }, routine::getOwnerDemolitionsSkill);
     add("SetOrientOnClick", VT_V, { VT_O, VT_I }, routine::setOrientOnClick);
@@ -868,7 +868,7 @@ void Routines::addTslRoutines() {
     add("AddBonusForcePoints", VT_V, { VT_O, VT_I }, routine::addBonusForcePoints);
     add("GetBonusForcePoints", VT_V, { VT_O }, routine::getBonusForcePoints);
 
-    add("SWMG_SetJumpSpeed", VT_V, { VT_F });
+    add("SWMG_SetJumpSpeed", VT_V, { VT_F }, routine::minigame::setJumpSpeed);
 
     add("IsMoviePlaying", VT_I, { }, routine::isMoviePlaying);
     add("QueueMovie", VT_V, { VT_S, VT_I }, routine::queueMovie);
@@ -891,7 +891,7 @@ void Routines::addTslRoutines() {
     add("EffectForceSight", VT_EFFECT, { }, routine::effectForceSight);
     add("IsRunning", VT_I, { VT_O }, routine::isRunning);
 
-    add("SWMG_PlayerApplyForce", VT_V, { VT_VECTOR });
+    add("SWMG_PlayerApplyForce", VT_V, { VT_VECTOR }, routine::minigame::playerApplyForce);
 
     add("SetForfeitConditions", VT_V, { VT_I }, routine::setForfeitConditions);
     add("GetLastForfeitViolation", VT_I, { }, routine::getLastForfeitViolation);
