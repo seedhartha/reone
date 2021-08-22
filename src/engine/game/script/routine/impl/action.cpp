@@ -122,7 +122,7 @@ Variable actionAttack(Game &game, const vector<Variable> &args, ExecutionContext
 
 Variable actionSpeakString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string toSpeak(getString(args, 0));
-    auto talkVolume = getEnum(args, 1, TalkVolume::Talk);
+    auto talkVolume = getEnumOrElse(args, 1, TalkVolume::Talk);
     
     // TODO: add action to caller
 
@@ -164,7 +164,7 @@ Variable actionCastSpellAtObject(Game &game, const vector<Variable> &args, Execu
     int metaMagic = getIntOrElse(args, 2, 0);
     bool cheat = getBoolOrElse(args, 3, false);
     int domainLevel = getIntOrElse(args, 4, 0);
-    auto projectilePathType = getEnum(args, 5, ProjectilePathType::Default);
+    auto projectilePathType = getEnumOrElse(args, 5, ProjectilePathType::Default);
     bool instantSpell = getBoolOrElse(args, 6, false);
 
     // TODO: add action to caller
@@ -263,7 +263,7 @@ Variable actionCastSpellAtLocation(Game &game, const vector<Variable> &args, Exe
     auto targetLocation = getLocationEngineType(args, 1);
     int metaMagic = getIntOrElse(args, 2, 0);
     bool cheat = getBoolOrElse(args, 3, false);
-    auto projectilePathType = getEnum(args, 4, ProjectilePathType::Default);
+    auto projectilePathType = getEnumOrElse(args, 4, ProjectilePathType::Default);
     bool instantSpell = getBoolOrElse(args, 5, false);
 
     // TODO: add action to caller
@@ -273,7 +273,7 @@ Variable actionCastSpellAtLocation(Game &game, const vector<Variable> &args, Exe
 
 Variable actionSpeakStringByStrRef(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int strRef = getInt(args, 0);
-    auto talkVolume = getEnum(args, 1, TalkVolume::Talk);
+    auto talkVolume = getEnumOrElse(args, 1, TalkVolume::Talk);
 
     // TODO: add action to caller
 

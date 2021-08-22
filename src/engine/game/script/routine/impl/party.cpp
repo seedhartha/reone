@@ -138,7 +138,8 @@ Variable isNPCPartyMember(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable getPartyAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+    return Variable::ofInt(static_cast<int>(PartyAIStyle::Aggressive));
 }
 
 Variable setPartyAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {

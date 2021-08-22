@@ -21,11 +21,11 @@ namespace reone {
 
 namespace script {
 
-class InvocationFailedException : public std::logic_error {
+class ArgumentException : public std::logic_error {
 public:
-    InvocationFailedException() = default;
+    ArgumentException() = default;
 
-    InvocationFailedException(const std::string &message) : std::logic_error(message.c_str()) {
+    ArgumentException(const std::string &message) : std::logic_error(message.c_str()) {
     }
 };
 

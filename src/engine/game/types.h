@@ -859,6 +859,12 @@ enum class Subrace {
     Beast = 2
 };
 
+enum class PartyAIStyle {
+    Aggressive = 0,
+    Defensive = 1,
+    Passive = 2
+};
+
 enum class NPCAIStyle {
     DefaultAttack = 0,
     RangedAttack = 1,

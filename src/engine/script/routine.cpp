@@ -18,7 +18,7 @@
 #include "routine.h"
 
 #include "../common/log.h"
-#include "../script/exception/invfailed.h"
+#include "../script/exception/argument.h"
 #include "../script/exception/notimpl.h"
 
 #include "variable.h"
@@ -49,7 +49,7 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
         error("Script: routine not implemented: " + _name);
         throw ex;
     }
-    catch (const InvocationFailedException &ex) {
+    catch (const ArgumentException &ex) {
         error(boost::format("Script: routine '%s' invocation failed: %s") % _name % ex.what());
         throw ex;
     }
