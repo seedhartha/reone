@@ -55,7 +55,7 @@ Variable assignCommand(Game &game, const vector<Variable> &args, ExecutionContex
         debug("Script: assignCommand: subject is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable delayCommand(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -65,7 +65,7 @@ Variable delayCommand(Game &game, const vector<Variable> &args, ExecutionContext
     auto objectAction = game.services().actionFactory().newDoCommand(move(action));
     getCaller(game, ctx)->delayAction(move(objectAction), seconds);
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable executeScript(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -79,12 +79,12 @@ Variable executeScript(Game &game, const vector<Variable> &args, ExecutionContex
         debug("Script: executeScript: target is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable clearAllActions(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     getCaller(game, ctx)->clearAllActions();
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable setFacing(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -97,7 +97,7 @@ Variable setFacing(Game &game, const vector<Variable> &args, ExecutionContext &c
         debug("Script: setFacing: caller is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable switchPlayerCharacter(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -107,7 +107,7 @@ Variable switchPlayerCharacter(Game &game, const vector<Variable> &args, Executi
 Variable setAreaUnescapable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool unescapable = getBool(args, 0);
     game.module()->area()->setUnescapable(unescapable);
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getAreaUnescapable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -307,7 +307,7 @@ Variable pauseGame(Game &game, const vector<Variable> &args, ExecutionContext &c
 Variable setPlayerRestrictMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool restrict = getBool(args, 0);
     game.module()->player().setRestrictMode(restrict);
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getPlayerRestrictMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -454,7 +454,7 @@ Variable setFacingPoint(Game &game, const vector<Variable> &args, ExecutionConte
     } else {
         debug("Script: setFacingPoint: caller is invalid", 1, DebugChannels::script);
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable touchAttackMelee(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -475,7 +475,7 @@ Variable setItemStackSize(Game &game, const vector<Variable> &args, ExecutionCon
         debug("Script: setItemStackSize: item is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getDistanceBetween(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -518,7 +518,7 @@ Variable setGlobalString(Game &game, const vector<Variable> &args, ExecutionCont
 
     game.setGlobalString(id, value);
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable setCommandable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -531,7 +531,7 @@ Variable setCommandable(Game &game, const vector<Variable> &args, ExecutionConte
         debug("Script: setCommandable: target is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getCommandable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -605,7 +605,7 @@ Variable changeFaction(Game &game, const vector<Variable> &args, ExecutionContex
         debug("Script: changeFaction: memberOfFactionToJoin is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getIsListening(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -778,7 +778,7 @@ Variable applyEffectToObject(Game &game, const vector<Variable> &args, Execution
         debug("Script: applyEffectToObject: target is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getIsPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -953,7 +953,7 @@ Variable destroyObject(Game &game, const vector<Variable> &args, ExecutionContex
     } else {
         debug("Script: destroyObject: destroy is invalid", 1, DebugChannels::script);
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getModule(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1156,7 +1156,7 @@ Variable playAnimation(Game &game, const vector<Variable> &args, ExecutionContex
         debug("Script: playAnimation: caller is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getHasSpellEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1191,7 +1191,7 @@ Variable jumpToLocation(Game &game, const vector<Variable> &args, ExecutionConte
     } else {
         debug("Script: jumpToLocation: destination is invalid", 1, DebugChannels::script);
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getSkillRank(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1270,7 +1270,7 @@ Variable giveGoldToCreature(Game &game, const vector<Variable> &args, ExecutionC
     } else {
         debug("Script: giveGoldToCreature: creature is invalid", 1, DebugChannels::script);
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable setIsDestroyable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1287,7 +1287,7 @@ Variable setLocked(Game &game, const vector<Variable> &args, ExecutionContext &c
         debug("Script: setLocked: target is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getLocked(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1346,7 +1346,7 @@ Variable setIdentified(Game &game, const vector<Variable> &args, ExecutionContex
         debug("Script: setIdentified: item is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getDistanceBetweenLocations2D(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1623,7 +1623,7 @@ Variable jumpToObject(Game &game, const vector<Variable> &args, ExecutionContext
         debug("Script: jumpToObject: jumpTo is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable setMapPinEnabled(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1652,7 +1652,7 @@ Variable giveXPToCreature(Game &game, const vector<Variable> &args, ExecutionCon
         debug("Script: giveXPToCreature: creature is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable setXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1665,7 +1665,7 @@ Variable setXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) 
         debug("Script: setXP: creature is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1730,7 +1730,7 @@ Variable changeToStandardFaction(Game &game, const vector<Variable> &args, Execu
         debug("Script: changeToStandardFaction: creatureToChange is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable speakOneLinerConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1818,7 +1818,7 @@ Variable takeGoldFromCreature(Game &game, const vector<Variable> &args, Executio
             debug("Script: takeGoldFromCreature: caller is invalid", 1, DebugChannels::script);
         }
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getIsInConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1848,7 +1848,7 @@ Variable setPlotFlag(Game &game, const vector<Variable> &args, ExecutionContext 
         debug("Script: setPlotFlag: target is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable setDialogPlaceableCamera(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1943,7 +1943,7 @@ Variable cutsceneAttack(Game &game, const vector<Variable> &args, ExecutionConte
         debug("Script: cutsceneAttack: target is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable setCameraMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1972,7 +1972,7 @@ Variable startNewModule(Game &game, const vector<Variable> &args, ExecutionConte
 
     game.scheduleModuleTransition(moduleName, waypoint);
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable disableVideoEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2159,7 +2159,7 @@ Variable faceObjectAwayFromObject(Game &game, const vector<Variable> &args, Exec
         debug("Script: faceObjectAwayFromObject: objectToFaceAwayFrom is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable popUpDeathGUIPanel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2217,7 +2217,7 @@ Variable setGlobalBoolean(Game &game, const vector<Variable> &args, ExecutionCon
 
     game.setGlobalBoolean(id, value);
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getGlobalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2231,7 +2231,7 @@ Variable setGlobalNumber(Game &game, const vector<Variable> &args, ExecutionCont
 
     game.setGlobalNumber(id, value);
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable addJournalWorldEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2291,7 +2291,7 @@ Variable setLocalBoolean(Game &game, const vector<Variable> &args, ExecutionCont
         debug("Script: setLocalBoolean: object is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getLocalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2319,7 +2319,7 @@ Variable setLocalNumber(Game &game, const vector<Variable> &args, ExecutionConte
         debug("Script: setLocalNumber: object is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getGlobalLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2337,7 +2337,7 @@ Variable setGlobalLocation(Game &game, const vector<Variable> &args, ExecutionCo
         debug("Script: setGlobalLocation: value is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getIsConversationActive(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2367,7 +2367,7 @@ Variable setNPCAIStyle(Game &game, const vector<Variable> &args, ExecutionContex
         debug("Script: setNPCAIStyle: creature is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable setNPCSelectability(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2385,7 +2385,7 @@ Variable clearAllEffects(Game &game, const vector<Variable> &args, ExecutionCont
     } else {
         debug("Script: clearAllEffects: caller is invalid", 1, DebugChannels::script);
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getLastConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2404,7 +2404,7 @@ Variable showPartySelectionGUI(Game &game, const vector<Variable> &args, Executi
 
     game.openPartySelection(partyCtx);
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getStandardFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2447,7 +2447,7 @@ Variable setMinOneHP(Game &game, const vector<Variable> &args, ExecutionContext 
         debug("Script: setMinOneHP: object is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable setGlobalFadeIn(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2585,7 +2585,7 @@ Variable getSpellTarget(Game &game, const vector<Variable> &args, ExecutionConte
 Variable setSoloMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto activate = getBool(args, 0);
     game.services().party().setSoloMode(activate);
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable cancelPostDialogCharacterSwitch(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2601,7 +2601,7 @@ Variable setMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionCont
     } else {
         debug("Script: setMaxHitPoints: object is invalid", 1, DebugChannels::script);
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable noClicksFor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {

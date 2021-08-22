@@ -45,7 +45,7 @@ Variable setTime(Game &game, const vector<Variable> &args, ExecutionContext &ctx
 
     game.module()->setTime(hour, minute, second, millisecond);
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getTimeHour(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {

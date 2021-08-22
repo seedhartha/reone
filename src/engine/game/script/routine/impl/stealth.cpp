@@ -45,7 +45,7 @@ Variable getMaxStealthXP(Game &game, const vector<Variable> &args, ExecutionCont
 Variable setMaxStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int max = getInt(args, 0);
     game.module()->area()->setMaxStealthXP(max);
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getCurrentStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -55,7 +55,7 @@ Variable getCurrentStealthXP(Game &game, const vector<Variable> &args, Execution
 Variable setCurrentStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int current = getInt(args, 0);
     game.module()->area()->setCurrentStealthXP(current);
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable awardStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -70,7 +70,7 @@ Variable getStealthXPEnabled(Game &game, const vector<Variable> &args, Execution
 Variable setStealthXPEnabled(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool enabled = getBool(args, 0);
     game.module()->area()->setStealthXPEnabled(enabled);
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getStealthXPDecrement(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -80,7 +80,7 @@ Variable getStealthXPDecrement(Game &game, const vector<Variable> &args, Executi
 Variable setStealthXPDecrement(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int decrement = getInt(args, 0);
     game.module()->area()->setStealthXPDecrement(decrement);
-    return Variable();
+    return Variable::ofNull();
 }
 
 } // namespace routine

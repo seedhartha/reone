@@ -44,7 +44,7 @@ namespace routine {
 Variable setPartyLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
     game.services().party().setPartyLeader(npc);
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable getPartyMemberCount(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {

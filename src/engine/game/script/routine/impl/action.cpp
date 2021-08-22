@@ -39,7 +39,7 @@ namespace routine {
 
 Variable actionRandomWalk(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionMoveToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -53,7 +53,7 @@ Variable actionMoveToLocation(Game &game, const vector<Variable> &args, Executio
         debug("Script: actionMoveToLocation: destination is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionMoveToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -68,7 +68,7 @@ Variable actionMoveToObject(Game &game, const vector<Variable> &args, ExecutionC
         debug("Script: actionMoveToObject: moveTo is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionMoveAwayFromObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -82,7 +82,7 @@ Variable actionMoveAwayFromObject(Game &game, const vector<Variable> &args, Exec
         debug("Script: actionMoveAwayFromObject: fleeFrom is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionEquipItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -96,7 +96,7 @@ Variable actionEquipItem(Game &game, const vector<Variable> &args, ExecutionCont
         debug("Script: actionEquipItem: item is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionUnequipItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -109,7 +109,7 @@ Variable actionUnequipItem(Game &game, const vector<Variable> &args, ExecutionCo
         debug("Script: actionUnequipItem: item is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionPickUpItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -119,7 +119,7 @@ Variable actionPickUpItem(Game &game, const vector<Variable> &args, ExecutionCon
     } else {
         debug("Script: actionPickUpItem: item is invalid", 1, DebugChannels::script);
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionPutDownItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -129,7 +129,7 @@ Variable actionPutDownItem(Game &game, const vector<Variable> &args, ExecutionCo
     } else {
         debug("Script: actionPutDownItem: item is invalid", 1, DebugChannels::script);
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionAttack(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -147,7 +147,7 @@ Variable actionAttack(Game &game, const vector<Variable> &args, ExecutionContext
         debug("Script: actionAttack: attackee is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionSpeakString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -156,7 +156,7 @@ Variable actionSpeakString(Game &game, const vector<Variable> &args, ExecutionCo
     
     // TODO: add action to caller
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionPlayAnimation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -167,7 +167,7 @@ Variable actionPlayAnimation(Game &game, const vector<Variable> &args, Execution
     auto action = game.services().actionFactory().newPlayAnimation(animation, speed, duration);
     getCaller(game, ctx)->addAction(move(action));
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionOpenDoor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -178,7 +178,7 @@ Variable actionOpenDoor(Game &game, const vector<Variable> &args, ExecutionConte
     } else {
         debug("Script: actionOpenDoor: door is invalid", 1, DebugChannels::script);
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionCloseDoor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -189,7 +189,7 @@ Variable actionCloseDoor(Game &game, const vector<Variable> &args, ExecutionCont
     } else {
         debug("Script: actionCloseDoor: door is invalid", 1, DebugChannels::script);
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionCastSpellAtObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -203,7 +203,7 @@ Variable actionCastSpellAtObject(Game &game, const vector<Variable> &args, Execu
 
     // TODO: add action to caller
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionGiveItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -218,7 +218,7 @@ Variable actionGiveItem(Game &game, const vector<Variable> &args, ExecutionConte
         debug("Script: actionGiveItem: giveTo is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionTakeItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -233,7 +233,7 @@ Variable actionTakeItem(Game &game, const vector<Variable> &args, ExecutionConte
         debug("Script: actionTakeItem: takeFrom is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionForceFollowObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -246,7 +246,7 @@ Variable actionForceFollowObject(Game &game, const vector<Variable> &args, Execu
         debug("Script: actionForceFollowObject: follow is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionJumpToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -261,7 +261,7 @@ Variable actionJumpToObject(Game &game, const vector<Variable> &args, ExecutionC
         debug("Script: actionJumpToObject: jumpTo is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionWait(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -270,7 +270,7 @@ Variable actionWait(Game &game, const vector<Variable> &args, ExecutionContext &
     auto action = game.services().actionFactory().newWait(seconds);
     getCaller(game, ctx)->addAction(move(action));
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionStartConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -290,19 +290,19 @@ Variable actionStartConversation(Game &game, const vector<Variable> &args, Execu
         debug("Script: actionStartConversation: objectToConverse is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionPauseConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto action = game.services().actionFactory().newPauseConversation();
     getCaller(game, ctx)->addAction(move(action));
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionResumeConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto action = game.services().actionFactory().newResumeConversation();
     getCaller(game, ctx)->addAction(move(action));
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionJumpToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -313,7 +313,7 @@ Variable actionJumpToLocation(Game &game, const vector<Variable> &args, Executio
     } else {
         debug("Script: actionJumpToLocation: location is invalid", 1, DebugChannels::script);
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionCastSpellAtLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -330,7 +330,7 @@ Variable actionCastSpellAtLocation(Game &game, const vector<Variable> &args, Exe
         debug("Script: actionCastSpellAtLocation: targetLocation is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionSpeakStringByStrRef(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -339,7 +339,7 @@ Variable actionSpeakStringByStrRef(Game &game, const vector<Variable> &args, Exe
 
     // TODO: add action to caller
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionUseFeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -354,7 +354,7 @@ Variable actionUseFeat(Game &game, const vector<Variable> &args, ExecutionContex
         debug("Script: actionUseFeat: target is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionUseSkill(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -371,7 +371,7 @@ Variable actionUseSkill(Game &game, const vector<Variable> &args, ExecutionConte
         debug("Script: actionUseSkill: target is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionDoCommand(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -380,7 +380,7 @@ Variable actionDoCommand(Game &game, const vector<Variable> &args, ExecutionCont
     auto commandAction = game.services().actionFactory().newDoCommand(move(action));
     getCaller(game, ctx)->addAction(move(commandAction));
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionUseTalentOnObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -393,7 +393,7 @@ Variable actionUseTalentOnObject(Game &game, const vector<Variable> &args, Execu
         debug("Script: actionUseTalentOnObject: target is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionUseTalentAtLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -406,22 +406,22 @@ Variable actionUseTalentAtLocation(Game &game, const vector<Variable> &args, Exe
         debug("Script: actionUseTalentAtLocation: targetLocation is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionInteractObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionMoveAwayFromLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionSurrenderToEnemies(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionForceMoveToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -437,7 +437,7 @@ Variable actionForceMoveToLocation(Game &game, const vector<Variable> &args, Exe
         debug("Script: actionForceMoveToLocation: destination is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionForceMoveToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -454,65 +454,65 @@ Variable actionForceMoveToObject(Game &game, const vector<Variable> &args, Execu
         debug("Script: actionForceMoveToObject: moveTo is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionEquipMostDamagingMelee(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionEquipMostDamagingRanged(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionEquipMostEffectiveArmor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionUnlockObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionLockObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionCastFakeSpellAtObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionCastFakeSpellAtLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionBarkString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int strRef = getInt(args, 0);
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionFollowLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto action = game.services().actionFactory().newFollowLeader();
     getCaller(game, ctx)->addAction(move(action));
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionFollowOwner(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float range = getFloat(args, 0, 2.5f);
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable actionSwitchWeapons(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: add action to caller
-    return Variable();
+    return Variable::ofNull();
 }
 
 } // namespace routine

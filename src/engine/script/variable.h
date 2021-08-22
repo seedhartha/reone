@@ -29,7 +29,7 @@ class EngineType;
 class ScriptObject;
 
 struct Variable {
-    VariableType type { VariableType::Void };
+    VariableType type;
     std::string strValue;
     glm::vec3 vecValue { 0.0f };
     std::shared_ptr<EngineType> engineType;
@@ -41,8 +41,7 @@ struct Variable {
         float floatValue;
     };
 
-    Variable() = default;
-
+    static Variable ofNull();
     static Variable ofInt(int value);
     static Variable ofFloat(float value);
     static Variable ofString(std::string value);
