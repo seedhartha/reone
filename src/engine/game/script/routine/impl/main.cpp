@@ -22,7 +22,7 @@
 #include "declarations.h"
 
 #include "../../../../common/log.h"
-#include "../../../../script/exception/notimplemented.h"
+#include "../../../../script/exception/notimpl.h"
 
 #include "../../../game.h"
 #include "../../../location.h"
@@ -48,18 +48,14 @@ Variable assignCommand(Game &game, const vector<Variable> &args, ExecutionContex
     auto subject = getObject(game, args, 0, ctx);
     auto action = getAction(args, 1);
 
-    if (subject) {
-        auto objectAction = game.services().actionFactory().newDoCommand(move(action));
-        subject->addAction(move(objectAction));
-    } else {
-        debug("Script: assignCommand: subject is invalid", 1, DebugChannels::script);
-    }
+    auto objectAction = game.services().actionFactory().newDoCommand(move(action));
+    subject->addAction(move(objectAction));
 
     return Variable::ofNull();
 }
 
 Variable delayCommand(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float seconds = getFloat(args, 0);
+    float seconds = getFloatOrElse(args, 0);
     auto action = getAction(args, 1);
 
     auto objectAction = game.services().actionFactory().newDoCommand(move(action));
@@ -69,15 +65,11 @@ Variable delayCommand(Game &game, const vector<Variable> &args, ExecutionContext
 }
 
 Variable executeScript(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string script(getString(args, 0));
+    string script(getStringOrElse(args, 0));
     auto target = getObject(game, args, 1, ctx);
-    int scriptVar = getInt(args, 2, -1);
+    int scriptVar = getIntOrElse(args, 2, -1);
 
-    if (target) {
-        game.services().scriptRunner().run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
-    } else {
-        debug("Script: executeScript: target is invalid", 1, DebugChannels::script);
-    }
+    game.services().scriptRunner().run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
 
     return Variable::ofNull();
 }
@@ -89,13 +81,9 @@ Variable clearAllActions(Game &game, const vector<Variable> &args, ExecutionCont
 
 Variable setFacing(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(game, ctx);
-    float direction = getFloat(args, 0);
+    float direction = getFloatOrElse(args, 0);
 
-    if (caller) {
-        caller->setFacing(glm::radians(direction));
-    } else {
-        debug("Script: setFacing: caller is invalid", 1, DebugChannels::script);
-    }
+    caller->setFacing(glm::radians(direction));
 
     return Variable::ofNull();
 }
@@ -105,7 +93,7 @@ Variable switchPlayerCharacter(Game &game, const vector<Variable> &args, Executi
 }
 
 Variable setAreaUnescapable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool unescapable = getBool(args, 0);
+    bool unescapable = getBoolOrElse(args, 0);
     game.module()->area()->setUnescapable(unescapable);
     return Variable::ofNull();
 }
@@ -130,30 +118,18 @@ Variable getExitingObject(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable getPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    glm::vec3 result(0.0f);
-
     auto target = getSpatialObject(game, args, 0, ctx);
-    if (target) {
-        result = target->position();
-    } else {
-        debug("Script: getPosition: target is invalid", 1, DebugChannels::script);
-        return Variable::ofVector(glm::vec3(0.0f));
-    }
-
-    return Variable::ofVector(move(result));
+    return Variable::ofVector(target->position());
 }
 
 Variable getFacing(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float result = -1.0f;
-
-    auto target = getSpatialObject(game, args, 0, ctx);
-    if (target) {
-        result = glm::degrees(target->getFacing());
-    } else {
-        debug("Script: getFacing: target is invalid", 1, DebugChannels::script);
+    try {
+        auto target = getSpatialObject(game, args, 0, ctx);
+        return Variable::ofFloat(glm::degrees(target->getFacing()));
     }
-
-    return Variable::ofFloat(result);
+    catch (const logic_error &) {
+        return Variable::ofFloat(-1.0f);
+    }
 }
 
 Variable getItemPossessor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -161,34 +137,26 @@ Variable getItemPossessor(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable getItemPossessedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Item> item;
     auto creature = getCreature(game, args, 0, ctx);
-    auto itemTag = boost::to_lower_copy(getString(args, 1));
-
-    if (creature && !itemTag.empty()) {
-        item = creature->getItemByTag(itemTag);
-    } else if (!creature) {
-        debug("Script: getItemPossessedBy: creature is invalid", 1, DebugChannels::script);
-    } else if (itemTag.empty()) {
-        debug("Script: getItemPossessedBy: itemTag is invalid", 1, DebugChannels::script);
+    auto itemTag = boost::to_lower_copy(getStringOrElse(args, 1));
+    if (itemTag.empty()) {
+        return Variable::ofObject(kObjectInvalid);
     }
+
+    auto item = creature->getItemByTag(itemTag);
 
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
 Variable createItemOnObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Item> item;
-    string itemTemplate(boost::to_lower_copy(getString(args, 0)));
-    auto target = getSpatialObjectOrCaller(game, args, 1, ctx);
-    int stackSize = getInt(args, 2, 1);
-
-    if (!itemTemplate.empty() && target) {
-        item = target->addItem(itemTemplate, stackSize, true);
-    } else if (itemTemplate.empty()) {
-        debug("Script: createItemOnObject: itemTemplate is invalid", 1, DebugChannels::script);
-    } else if (!target) {
-        debug("Script: createItemOnObject: target is invalid", 1, DebugChannels::script);
+    string itemTemplate(boost::to_lower_copy(getStringOrElse(args, 0)));
+    if (itemTemplate.empty()) {
+        return Variable::ofObject(kObjectInvalid);
     }
+    auto target = getSpatialObjectOrCaller(game, args, 1, ctx);
+    int stackSize = getIntOrElse(args, 2, 1);
+
+    auto item = target->addItem(itemTemplate, stackSize, true);
 
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
@@ -198,14 +166,14 @@ Variable getLastAttacker(Game &game, const vector<Variable> &args, ExecutionCont
 }
 
 Variable getNearestCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int firstCriteriaType = getInt(args, 0);
-    int firstCriteriaValue = getInt(args, 1);
+    int firstCriteriaType = getIntOrElse(args, 0);
+    int firstCriteriaValue = getIntOrElse(args, 1);
     auto target = getSpatialObjectOrCaller(game, args, 2, ctx);
-    int nth = getInt(args, 3, 1);
-    int secondCriteriaType = getInt(args, 4, -1);
-    int secondCriteriaValue = getInt(args, 5, -1);
-    int thirdCriteriaType = getInt(args, 6, -1);
-    int thirdCriteriaValue = getInt(args, 7, -1);
+    int nth = getIntOrElse(args, 3, 1);
+    int secondCriteriaType = getIntOrElse(args, 4, -1);
+    int secondCriteriaValue = getIntOrElse(args, 5, -1);
+    int thirdCriteriaType = getIntOrElse(args, 6, -1);
+    int thirdCriteriaValue = getIntOrElse(args, 7, -1);
 
     Area::SearchCriteriaList criterias;
     criterias.push_back(make_pair(static_cast<CreatureType>(firstCriteriaType), firstCriteriaValue));
@@ -222,19 +190,14 @@ Variable getNearestCreature(Game &game, const vector<Variable> &args, ExecutionC
 }
 
 Variable getDistanceToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float result = -1.0f;
-    auto caller = getCallerAsSpatial(game, ctx);
-    auto object = getSpatialObject(game, args, 0, ctx);
-
-    if (caller && object) {
-        result = caller->getDistanceTo(*object);
-    } else if (!caller) {
-        debug("Script: getDistanceToObject: caller is invalid", 1, DebugChannels::script);
-    } else if (!object) {
-        debug("Script: getDistanceToObject: object is invalid", 1, DebugChannels::script);
+    try {
+        auto caller = getCallerAsSpatial(game, ctx);
+        auto object = getSpatialObject(game, args, 0, ctx);
+        return Variable::ofFloat(caller->getDistanceTo(*object));
     }
-
-    return Variable::ofFloat(result);
+    catch (const logic_error &) {
+        return Variable::ofFloat(-1.0f);
+    }
 }
 
 Variable getIsObjectValid(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -255,29 +218,13 @@ Variable getSpellTargetObject(Game &game, const vector<Variable> &args, Executio
 }
 
 Variable getCurrentHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int result = 0;
-
     auto object = getObjectOrCaller(game, args, 0, ctx);
-    if (object) {
-        result = object->currentHitPoints();
-    } else {
-        debug("Script: getCurrentHitPoints: object is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(result);
+    return Variable::ofInt(object->currentHitPoints());
 }
 
 Variable getMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int result = 0;
-
     auto object = getObjectOrCaller(game, args, 0, ctx);
-    if (object) {
-        result = object->maxHitPoints();
-    } else {
-        debug("Script: getMaxHitPoints: object is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(result);
+    return Variable::ofInt(object->maxHitPoints());
 }
 
 Variable getLastItemEquipped(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -305,7 +252,7 @@ Variable pauseGame(Game &game, const vector<Variable> &args, ExecutionContext &c
 }
 
 Variable setPlayerRestrictMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool restrict = getBool(args, 0);
+    bool restrict = getBoolOrElse(args, 0);
     game.module()->player().setRestrictMode(restrict);
     return Variable::ofNull();
 }
@@ -345,29 +292,18 @@ Variable getMetaMagicFeat(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable getObjectType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto result = ObjectType::Invalid;
-
     auto target = getObject(game, args, 0, ctx);
-    if (target) {
-        result = target->type();
-    } else {
-        debug("Script: getObjectType: target is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(target->type()));
 }
 
 Variable getRacialType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto result = RacialType::Invalid;
-
-    auto creature = getCreature(game, args, 0, ctx);
-    if (creature) {
-        result = creature->racialType();
-    } else {
-        debug("Script: getRacialType: creature is invalid", 1, DebugChannels::script);
+    try {
+        auto creature = getCreature(game, args, 0, ctx);
+        return Variable::ofInt(static_cast<int>(creature->racialType()));
     }
-
-    return Variable::ofInt(static_cast<int>(result));
+    catch (const logic_error &) {
+        return Variable::ofInt(static_cast<int>(RacialType::Invalid));
+    }
 }
 
 Variable fortitudeSave(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -407,53 +343,29 @@ Variable getNextObjectInShape(Game &game, const vector<Variable> &args, Executio
 }
 
 Variable getItemStackSize(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int result = 0;
-
     auto item = getItem(game, args, 0, ctx);
-    if (item) {
-        result = item->stackSize();
-    } else {
-        debug("Script: getItemStackSize: item is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(result);
+    return Variable::ofInt(item->stackSize());
 }
 
 Variable getAbilityScore(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int result = 0;
     auto creature = getCreature(game, args, 0, ctx);
     auto type = getEnum<Ability>(args, 1);
 
-    if (creature) {
-        result = creature->attributes().getAbilityScore(type);
-    } else {
-        debug("Script: getAbilityScore: creature is invalid", 1, DebugChannels::script);
-    }
+    int result = creature->attributes().getAbilityScore(type);
 
     return Variable::ofInt(result);
 }
 
 Variable getIsDead(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto creature = getCreature(game, args, 0, ctx);
-    if (creature) {
-        result = creature->isDead();
-    } else {
-        debug("Script: getIsDead: creature is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(creature->isDead()));
 }
 
 Variable setFacingPoint(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(game, ctx);
-    if (caller) {
-        glm::vec3 target(getVector(args, 0));
-        caller->face(target);
-    } else {
-        debug("Script: setFacingPoint: caller is invalid", 1, DebugChannels::script);
-    }
+    glm::vec3 target(getVectorOrElse(args, 0));
+
+    caller->face(target);
     return Variable::ofNull();
 }
 
@@ -467,31 +379,17 @@ Variable touchAttackRanged(Game &game, const vector<Variable> &args, ExecutionCo
 
 Variable setItemStackSize(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto item = getItem(game, args, 0, ctx);
-    int stackSize = getInt(args, 1);
+    int stackSize = getIntOrElse(args, 1);
 
-    if (item) {
-        item->setStackSize(stackSize);
-    } else {
-        debug("Script: setItemStackSize: item is invalid", 1, DebugChannels::script);
-    }
+    item->setStackSize(stackSize);
 
     return Variable::ofNull();
 }
 
 Variable getDistanceBetween(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float result = 0.0f;
     auto objectA = getSpatialObject(game, args, 0, ctx);
     auto objectB = getSpatialObject(game, args, 1, ctx);
-
-    if (objectA && objectB) {
-        result = objectA->getDistanceTo(*objectB);
-    } else if (!objectA) {
-        debug("Script: getDistanceBetween: objectA is invalid", 1, DebugChannels::script);
-    } else if (!objectB) {
-        debug("Script: getDistanceBetween: objectB is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofFloat(result);
+    return Variable::ofFloat(objectA->getDistanceTo(*objectB));
 }
 
 Variable setReturnStrref(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -499,22 +397,17 @@ Variable setReturnStrref(Game &game, const vector<Variable> &args, ExecutionCont
 }
 
 Variable getItemInSlot(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Item> item;
     auto creature = getCreatureOrCaller(game, args, 1, ctx);
-    int slot = getInt(args, 0);
+    int slot = getIntOrElse(args, 0);
 
-    if (creature) {
-        item = creature->getEquippedItem(slot);
-    } else {
-        debug("Script: getItemInSlot: creature is invalid", 1, DebugChannels::script);
-    }
+    auto item = creature->getEquippedItem(slot);
 
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
 Variable setGlobalString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getString(args, 0));
-    string value(getString(args, 1));
+    string id(getStringOrElse(args, 0));
+    string value(getStringOrElse(args, 1));
 
     game.setGlobalString(id, value);
 
@@ -522,55 +415,27 @@ Variable setGlobalString(Game &game, const vector<Variable> &args, ExecutionCont
 }
 
 Variable setCommandable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool commandable = getBool(args, 0);
+    bool commandable = getBoolOrElse(args, 0);
     auto target = getObjectOrCaller(game, args, 1, ctx);
 
-    if (target) {
-        target->setCommandable(commandable);
-    } else {
-        debug("Script: setCommandable: target is invalid", 1, DebugChannels::script);
-    }
+    target->setCommandable(commandable);
 
     return Variable::ofNull();
 }
 
 Variable getCommandable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto target = getObjectOrCaller(game, args, 0, ctx);
-    if (target) {
-        result = target->isCommandable();
-    } else {
-        debug("Script: getCommandable: target is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(target->isCommandable()));
 }
 
 Variable getHitDice(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int result = 0;
-
     auto creature = getCreature(game, args, 0, ctx);
-    if (creature) {
-        result = creature->attributes().getAggregateLevel();
-    } else {
-        debug("Script: getGender: creature is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(result);
+    return Variable::ofInt(creature->attributes().getAggregateLevel());
 }
 
 Variable getTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string result;
-
     auto object = getObject(game, args, 0, ctx);
-    if (object) {
-        result = object->tag();
-    } else {
-        debug("Script: getTag: object is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofString(move(result));
+    return Variable::ofString(object->tag());
 }
 
 Variable resistForce(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -578,32 +443,16 @@ Variable resistForce(Game &game, const vector<Variable> &args, ExecutionContext 
 }
 
 Variable getFactionEqual(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
     auto firstObject = getCreature(game, args, 0, ctx);
     auto secondObject = getCreatureOrCaller(game, args, 1, ctx);
-
-    if (firstObject && secondObject) {
-        result = firstObject->faction() == secondObject->faction();
-    } else if (!firstObject) {
-        debug("Script: getStandardFaction: firstObject is invalid", 1, DebugChannels::script);
-    } else if (!secondObject) {
-        debug("Script: getStandardFaction: secondObject is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(firstObject->faction() == secondObject->faction()));
 }
 
 Variable changeFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto objectToChangeFaction = getCreature(game, args, 0, ctx);
     auto memberOfFactionToJoin = getCreature(game, args, 1, ctx);
 
-    if (objectToChangeFaction && memberOfFactionToJoin) {
-        objectToChangeFaction->setFaction(memberOfFactionToJoin->faction());
-    } else if (!objectToChangeFaction) {
-        debug("Script: changeFaction: objectToChangeFaction is invalid", 1, DebugChannels::script);
-    } else if (!memberOfFactionToJoin) {
-        debug("Script: changeFaction: memberOfFactionToJoin is invalid", 1, DebugChannels::script);
-    }
+    objectToChangeFaction->setFaction(memberOfFactionToJoin->faction());
 
     return Variable::ofNull();
 }
@@ -669,18 +518,18 @@ Variable getFactionBestAC(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable getGlobalString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getString(args, 0));
+    string id(getStringOrElse(args, 0));
     return Variable::ofString(game.getGlobalString(id));
 }
 
 Variable getListenPatternNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getString(args, 0));
+    string id(getStringOrElse(args, 0));
     return Variable::ofString(game.getGlobalString(id));
 }
 
 Variable getWaypointByTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<SpatialObject> object;
-    string tag(boost::to_lower_copy(getString(args, 0)));
+    string tag(boost::to_lower_copy(getStringOrElse(args, 0)));
 
     for (auto &waypoint : game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         if (waypoint->tag() == tag) {
@@ -698,8 +547,8 @@ Variable getTransitionTarget(Game &game, const vector<Variable> &args, Execution
 
 Variable getObjectByTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Object> object;
-    string tag(boost::to_lower_copy(getString(args, 0)));
-    int nth = getInt(args, 1, 0);
+    string tag(boost::to_lower_copy(getStringOrElse(args, 0)));
+    int nth = getIntOrElse(args, 1, 0);
 
     if (!tag.empty()) {
         object = game.module()->area()->getObjectByTag(tag, nth);
@@ -736,31 +585,28 @@ Variable getGoingToBeAttackedBy(Game &game, const vector<Variable> &args, Execut
 }
 
 Variable getLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Location> result;
-
     auto object = getSpatialObject(game, args, 0, ctx);
-    if (object) {
-        glm::vec3 position(object->position());
-        float facing = object->getFacing();
-        result = make_shared<Location>(move(position), facing);
-    } else {
-        debug("Script: getLocation: object is invalid", 1, DebugChannels::script);
-    }
+
+    glm::vec3 position(object->position());
+    float facing = object->getFacing();
+    auto result = make_shared<Location>(move(position), facing);
 
     return Variable::ofLocation(move(result));
 }
 
 Variable location(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    glm::vec3 position(getVector(args, 0));
-    float orientation = glm::radians(getFloat(args, 1));
+    glm::vec3 position(getVectorOrElse(args, 0));
+    float orientation = glm::radians(getFloatOrElse(args, 1));
+
     auto location = make_shared<Location>(move(position), orientation);
 
     return Variable::ofLocation(location);
 }
 
 Variable applyEffectAtLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    glm::vec3 position(getVector(args, 0));
-    float orientation = glm::radians(getFloat(args, 1));
+    glm::vec3 position(getVectorOrElse(args, 0));
+    float orientation = glm::radians(getFloatOrElse(args, 1));
+
     auto location = make_shared<Location>(move(position), orientation);
 
     return Variable::ofLocation(location);
@@ -770,28 +616,16 @@ Variable applyEffectToObject(Game &game, const vector<Variable> &args, Execution
     auto durationType = getEnum<DurationType>(args, 0);
     auto effect = getEffect(args, 1);
     auto target = getSpatialObject(game, args, 2, ctx);
-    float duration = getFloat(args, 3, 0.0f);
+    float duration = getFloatOrElse(args, 3, 0.0f);
 
-    if (target) {
-        target->applyEffect(effect, durationType, duration);
-    } else {
-        debug("Script: applyEffectToObject: target is invalid", 1, DebugChannels::script);
-    }
+    target->applyEffect(effect, durationType, duration);
 
     return Variable::ofNull();
 }
 
 Variable getIsPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto creature = getCreature(game, args, 0, ctx);
-    if (creature) {
-        result = creature == game.services().party().player();
-    } else {
-        debug("Script: getIsPC: creature is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(creature == game.services().party().player()));
 }
 
 Variable speakString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -803,40 +637,29 @@ Variable getSpellTargetLocation(Game &game, const vector<Variable> &args, Execut
 }
 
 Variable getPositionFromLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    glm::vec3 result(0.0f);
-
     auto location = getLocationEngineType(args, 0);
-    if (location) {
-        result = location->position();
-    } else {
-        debug("Script: getPositionFromLocation: location is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofVector(move(result));
+    return Variable::ofVector(location->position());
 }
 
 Variable getFacingFromLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float result = -1.0f;
-
-    auto location = getLocationEngineType(args, 0);
-    if (location) {
-        result = glm::degrees(location->facing());
-    } else {
-        debug("Script: getFacingFromLocation: location is invalid", 1, DebugChannels::script);
+    try {
+        auto location = getLocationEngineType(args, 0);
+        return Variable::ofFloat(glm::degrees(location->facing()));
     }
-
-    return Variable::ofFloat(result);
+    catch (const logic_error &) {
+        return Variable::ofFloat(-1.0f);
+    }
 }
 
 Variable getNearestCreatureToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int firstCriteriaType = getInt(args, 0);
-    int firstCriteriaValue = getInt(args, 1);
+    int firstCriteriaType = getIntOrElse(args, 0);
+    int firstCriteriaValue = getIntOrElse(args, 1);
     auto location = getLocationEngineType(args, 2);
-    int nth = getInt(args, 3, 1);
-    int secondCriteriaType = getInt(args, 4, -1);
-    int secondCriteriaValue = getInt(args, 5, -1);
-    int thirdCriteriaType = getInt(args, 6, -1);
-    int thirdCriteriaValue = getInt(args, 7, -1);
+    int nth = getIntOrElse(args, 3, 1);
+    int secondCriteriaType = getIntOrElse(args, 4, -1);
+    int secondCriteriaValue = getIntOrElse(args, 5, -1);
+    int thirdCriteriaType = getIntOrElse(args, 6, -1);
+    int thirdCriteriaValue = getIntOrElse(args, 7, -1);
 
     Area::SearchCriteriaList criterias;
     criterias.push_back(make_pair(static_cast<CreatureType>(firstCriteriaType), firstCriteriaValue));
@@ -855,7 +678,7 @@ Variable getNearestCreatureToLocation(Game &game, const vector<Variable> &args, 
 Variable getNearestObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto objectType = getEnum(args, 0, ObjectType::All);
     auto target = getSpatialObjectOrCaller(game, args, 1, ctx);
-    int nth = getInt(args, 2, 1);
+    int nth = getIntOrElse(args, 2, 1);
 
     shared_ptr<SpatialObject> object(game.module()->area()->getNearestObject(target->position(), nth - 1, [&objectType](auto &object) {
         return object->type() == objectType;
@@ -867,7 +690,7 @@ Variable getNearestObject(Game &game, const vector<Variable> &args, ExecutionCon
 Variable getNearestObjectToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto objectType = getEnum<ObjectType>(args, 0);
     auto location = getLocationEngineType(args, 1);
-    int nth = getInt(args, 2, 1);
+    int nth = getIntOrElse(args, 2, 1);
 
     shared_ptr<SpatialObject> object(game.module()->area()->getNearestObject(location->position(), nth - 1, [&objectType](auto &object) {
         return object->type() == objectType;
@@ -877,9 +700,9 @@ Variable getNearestObjectToLocation(Game &game, const vector<Variable> &args, Ex
 }
 
 Variable getNearestObjectByTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string tag(boost::to_lower_copy(getString(args, 0)));
+    string tag(boost::to_lower_copy(getStringOrElse(args, 0)));
     auto target = getSpatialObjectOrCaller(game, args, 1, ctx);
-    int nth = getInt(args, 2, 1);
+    int nth = getIntOrElse(args, 2, 1);
 
     shared_ptr<SpatialObject> object(game.module()->area()->getNearestObject(target->position(), nth - 1, [&tag](auto &object) {
         return object->tag() == tag;
@@ -889,51 +712,24 @@ Variable getNearestObjectByTag(Game &game, const vector<Variable> &args, Executi
 }
 
 Variable getIsEnemy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
     auto target = getCreature(game, args, 0, ctx);
     auto source = getCreatureOrCaller(game, args, 1, ctx);
 
-    if (target && source) {
-        result = game.services().reputes().getIsEnemy(*target, *source);
-    } else if (!target) {
-        debug("Script: getIsEnemy: target is invalid", 1, DebugChannels::script);
-    } else if (!source) {
-        debug("Script: getIsEnemy: source is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(game.services().reputes().getIsEnemy(*target, *source)));
 }
 
 Variable getIsFriend(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
     auto target = getCreature(game, args, 0, ctx);
     auto source = getCreatureOrCaller(game, args, 1, ctx);
 
-    if (target && source) {
-        result = game.services().reputes().getIsFriend(*target, *source);
-    } else if (!target) {
-        debug("Script: getIsFriend: target is invalid", 1, DebugChannels::script);
-    } else if (!source) {
-        debug("Script: getIsFriend: source is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(game.services().reputes().getIsFriend(*target, *source)));
 }
 
 Variable getIsNeutral(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
     auto target = getCreature(game, args, 0, ctx);
     auto source = getCreatureOrCaller(game, args, 1, ctx);
 
-    if (target && source) {
-        result = game.services().reputes().getIsNeutral(*target, *source);
-    } else if (!target) {
-        debug("Script: getIsNeutral: target is invalid", 1, DebugChannels::script);
-    } else if (!source) {
-        debug("Script: getIsNeutral: source is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(game.services().reputes().getIsNeutral(*target, *source)));
 }
 
 Variable getPCSpeaker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -942,17 +738,15 @@ Variable getPCSpeaker(Game &game, const vector<Variable> &args, ExecutionContext
 }
 
 Variable getStringByStrRef(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int strRef = getInt(args, 0);
+    int strRef = getIntOrElse(args, 0);
     return Variable::ofString(game.services().resource().strings().get(strRef));
 }
 
 Variable destroyObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto destroy = getSpatialObject(game, args, 0, ctx);
-    if (destroy) {
-        game.module()->area()->destroyObject(*destroy);
-    } else {
-        debug("Script: destroyObject: destroy is invalid", 1, DebugChannels::script);
-    }
+
+    game.module()->area()->destroyObject(*destroy);
+
     return Variable::ofNull();
 }
 
@@ -963,9 +757,9 @@ Variable getModule(Game &game, const vector<Variable> &args, ExecutionContext &c
 
 Variable createObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto objectType = getEnum<ObjectType>(args, 0);
-    string blueprintResRef(boost::to_lower_copy(getString(args, 1)));
+    string blueprintResRef(boost::to_lower_copy(getStringOrElse(args, 1)));
     auto location = getLocationEngineType(args, 2);
-    bool useAppearAnimation = getBool(args, 3, false);
+    bool useAppearAnimation = getBoolOrElse(args, 3, false);
 
     auto object = game.module()->area()->createObject(objectType, blueprintResRef, location);
 
@@ -997,16 +791,8 @@ Variable getLoadFromSaveGame(Game &game, const vector<Variable> &args, Execution
 }
 
 Variable getName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string result;
-
     auto object = getObject(game, args, 0, ctx);
-    if (object) {
-        result = object->name();
-    } else {
-        debug("Script: getName: object is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofString(move(result));
+    return Variable::ofString(object->name());
 }
 
 Variable getLastSpeaker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1055,15 +841,7 @@ Variable giveItem(Game &game, const vector<Variable> &args, ExecutionContext &ct
 
 Variable objectToString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto object = getObject(game, args, 0, ctx);
-    string result;
-
-    if (object) {
-        result = str(boost::format("%x") % object->id());
-    } else {
-        debug("Script: objectToString: object is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofString(move(result));
+    return Variable::ofString(str(boost::format("%x") % object->id()));
 }
 
 Variable getIsImmune(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1083,31 +861,17 @@ Variable setCustomToken(Game &game, const vector<Variable> &args, ExecutionConte
 }
 
 Variable getHasFeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
     auto feat = getEnum<FeatType>(args, 0);
     auto creature = getCreatureOrCaller(game, args, 1, ctx);
 
-    if (creature) {
-        result = creature->attributes().hasFeat(feat);
-    } else {
-        debug("Script: getHasFeat: creature is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(creature->attributes().hasFeat(feat)));
 }
 
 Variable getHasSkill(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
     auto creature = getCreatureOrCaller(game, args, 1, ctx);
     auto skill = getEnum<SkillType>(args, 0);
 
-    if (creature) {
-        result = creature->attributes().hasSkill(skill);
-    } else {
-        debug("Script: getHasSkill: creature is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(creature->attributes().hasSkill(skill)));
 }
 
 Variable getLastPlayerDied(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1123,17 +887,10 @@ Variable getModuleItemLostBy(Game &game, const vector<Variable> &args, Execution
 }
 
 Variable getDistanceBetweenLocations(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float result = 0.0f;
     auto locationA = getLocationEngineType(args, 0);
     auto locationB = getLocationEngineType(args, 1);
 
-    if (locationA && locationB) {
-        result = glm::distance(locationA->position(), locationB->position());
-    } else if (!locationA) {
-        debug("Script: getDistanceBetweenLocations: locationA is invalid", 1, DebugChannels::script);
-    } else if (!locationB) {
-        debug("Script: getDistanceBetweenLocations: locationB is invalid", 1, DebugChannels::script);
-    }
+    float result = glm::distance(locationA->position(), locationB->position());
 
     return Variable::ofFloat(result);
 }
@@ -1145,16 +902,12 @@ Variable getReflexAdjustedDamage(Game &game, const vector<Variable> &args, Execu
 Variable playAnimation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(game, ctx);
     auto animType = getEnum<AnimationType>(args, 0);
-    float speed = getFloat(args, 1, 1.0f);
-    float seconds = getFloat(args, 2, 0.0f); // TODO: handle duration
+    float speed = getFloatOrElse(args, 1, 1.0f);
+    float seconds = getFloatOrElse(args, 2, 0.0f); // TODO: handle duration
 
-    if (caller) {
-        AnimationProperties properties;
-        properties.speed = speed;
-        caller->playAnimation(animType, move(properties));
-    } else {
-        debug("Script: playAnimation: caller is invalid", 1, DebugChannels::script);
-    }
+    AnimationProperties properties;
+    properties.speed = speed;
+    caller->playAnimation(animType, move(properties));
 
     return Variable::ofNull();
 }
@@ -1185,38 +938,23 @@ Variable getIsPlayableRacialType(Game &game, const vector<Variable> &args, Execu
 
 Variable jumpToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto destination = getLocationEngineType(args, 0);
-    if (destination) {
-        auto action = game.services().actionFactory().newJumpToLocation(move(destination));
-        getCaller(game, ctx)->addActionOnTop(move(action));
-    } else {
-        debug("Script: jumpToLocation: destination is invalid", 1, DebugChannels::script);
-    }
+
+    auto action = game.services().actionFactory().newJumpToLocation(move(destination));
+    getCaller(game, ctx)->addActionOnTop(move(action));
+
     return Variable::ofNull();
 }
 
 Variable getSkillRank(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int result = 0;
     auto object = getCreatureOrCaller(game, args, 1, ctx);
     auto skill = getEnum<SkillType>(args, 0);
 
-    if (object) {
-        result = object->attributes().getSkillRank(skill);
-    } else {
-        debug("Script: getSkillRank: object is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(result);
+    return Variable::ofInt(object->attributes().getSkillRank(skill));
 }
 
 Variable getAttackTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> target;
-
     auto creature = getCreatureOrCaller(game, args, 0, ctx);
-    if (creature) {
-        target = creature->getAttackTarget();
-    } else {
-        debug("Script: getAttackTarget: creature is invalid", 1, DebugChannels::script);
-    }
+    auto target = creature->getAttackTarget();
 
     return Variable::ofObject(getObjectIdOrInvalid(target));
 }
@@ -1230,32 +968,17 @@ Variable getLastAttackMode(Game &game, const vector<Variable> &args, ExecutionCo
 }
 
 Variable getDistanceBetween2D(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float result = 0.0f;
     auto objectA = getSpatialObject(game, args, 0, ctx);
     auto objectB = getSpatialObject(game, args, 1, ctx);
 
-    if (objectA && objectB) {
-        result = objectA->getDistanceTo(glm::vec2(objectB->position()));
-    } else if (!objectA) {
-        debug("Script: getDistanceBetween2D: objectA is invalid", 1, DebugChannels::script);
-    } else if (!objectB) {
-        debug("Script: getDistanceBetween2D: objectB is invalid", 1, DebugChannels::script);
-    }
+    float result = objectA->getDistanceTo(glm::vec2(objectB->position()));
 
     return Variable::ofFloat(result);
 }
 
 Variable getIsInCombat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto creature = getCreatureOrCaller(game, args, 0, ctx);
-    if (creature) {
-        result = creature->isInCombat();
-    } else {
-        debug("Script: getIsInCombat: creature is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(creature->isInCombat()));
 }
 
 Variable getLastAssociateCommand(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1264,12 +987,10 @@ Variable getLastAssociateCommand(Game &game, const vector<Variable> &args, Execu
 
 Variable giveGoldToCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto creature = getCreature(game, args, 0, ctx);
-    auto gp = getInt(args, 1);
-    if (creature) {
-        creature->giveGold(gp);
-    } else {
-        debug("Script: giveGoldToCreature: creature is invalid", 1, DebugChannels::script);
-    }
+    auto gp = getIntOrElse(args, 1);
+
+    creature->giveGold(gp);
+
     return Variable::ofNull();
 }
 
@@ -1279,28 +1000,16 @@ Variable setIsDestroyable(Game &game, const vector<Variable> &args, ExecutionCon
 
 Variable setLocked(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto target = getDoor(game, args, 0, ctx);
-    bool locked = getBool(args, 1);
+    bool locked = getBoolOrElse(args, 1);
 
-    if (target) {
-        target->setLocked(locked);
-    } else {
-        debug("Script: setLocked: target is invalid", 1, DebugChannels::script);
-    }
+    target->setLocked(locked);
 
     return Variable::ofNull();
 }
 
 Variable getLocked(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto target = getDoor(game, args, 0, ctx);
-    if (target) {
-        result = target->isLocked();
-    } else {
-        debug("Script: getLocked: target is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(target->isLocked()));
 }
 
 Variable getClickingObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1324,61 +1033,37 @@ Variable getAbilityModifier(Game &game, const vector<Variable> &args, ExecutionC
 }
 
 Variable getIdentified(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto item = getItem(game, args, 0, ctx);
-    if (item) {
-        result = item->isIdentified();
-    } else {
-        debug("Script: getIdentified: item is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(item->isIdentified()));
 }
 
 Variable setIdentified(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto item = getItem(game, args, 0, ctx);
-    bool identified = getBool(args, 1);
+    bool identified = getBoolOrElse(args, 1);
 
-    if (item) {
-        item->setIdentified(identified);
-    } else {
-        debug("Script: setIdentified: item is invalid", 1, DebugChannels::script);
-    }
+    item->setIdentified(identified);
 
     return Variable::ofNull();
 }
 
 Variable getDistanceBetweenLocations2D(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float result = 0.0f;
     auto locationA = getLocationEngineType(args, 0);
     auto locationB = getLocationEngineType(args, 1);
 
-    if (locationA && locationB) {
-        result = glm::distance(glm::vec2(locationA->position()), glm::vec2(locationB->position()));
-    } else if (!locationA) {
-        debug("Script: getDistanceBetweenLocations2D: locationA is invalid", 1, DebugChannels::script);
-    } else if (!locationB) {
-        debug("Script: getDistanceBetweenLocations2D: locationB is invalid", 1, DebugChannels::script);
-    }
+    float result = glm::distance(glm::vec2(locationA->position()), glm::vec2(locationB->position()));
 
     return Variable::ofFloat(result);
 }
 
 Variable getDistanceToObject2D(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float result = -1.0f;
-    auto caller = getCallerAsSpatial(game, ctx);
-    auto object = getSpatialObject(game, args, 0, ctx);
-
-    if (caller && object) {
-        result = caller->getDistanceTo(glm::vec2(object->position()));
-    } else if (!caller) {
-        debug("Script: getDistanceToObject2D: caller is invalid", 1, DebugChannels::script);
-    } else if (!object) {
-        debug("Script: getDistanceToObject2D: object is invalid", 1, DebugChannels::script);
+    try {
+        auto caller = getCallerAsSpatial(game, ctx);
+        auto object = getSpatialObject(game, args, 0, ctx);
+        return Variable::ofFloat(caller->getDistanceTo(glm::vec2(object->position())));
     }
-
-    return Variable::ofFloat(result);
+    catch (const logic_error &) {
+        return Variable::ofFloat(-1.0f);
+    }
 }
 
 Variable getBlockingDoor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1394,71 +1079,42 @@ Variable doDoorAction(Game &game, const vector<Variable> &args, ExecutionContext
 }
 
 Variable getFirstItemInInventory(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Item> item;
-
     auto target = getSpatialObjectOrCaller(game, args, 0, ctx);
-    if (target) {
-        item = target->getFirstItem();
-    } else {
-        debug("Script: getFirstItemInInventory: target is invalid", 1, DebugChannels::script);
-    }
+    auto item = target->getFirstItem();
 
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
 Variable getNextItemInInventory(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<Item> item;
-
     auto target = getSpatialObjectOrCaller(game, args, 0, ctx);
-    if (target) {
-        item = target->getNextItem();
-    } else {
-        debug("Script: getNextItemInInventory: target is invalid", 1, DebugChannels::script);
-    }
+    auto item = target->getNextItem();
 
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
 Variable getClassByPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto result = ClassType::Invalid;
-    int position = getInt(args, 0);
-    auto creature = getCreatureOrCaller(game, args, 1, ctx);
-
-    if (creature) {
-        result = creature->attributes().getClassByPosition(position);
-    } else {
-        debug("Script: getClassByPosition: creature is invalid", 1, DebugChannels::script);
+    try {
+        int position = getIntOrElse(args, 0);
+        auto creature = getCreatureOrCaller(game, args, 1, ctx);
+        return Variable::ofInt(static_cast<int>(creature->attributes().getClassByPosition(position)));
     }
-
-    return Variable::ofInt(static_cast<int>(result));
+    catch (const logic_error &) {
+        return Variable::ofInt(static_cast<int>(ClassType::Invalid));
+    }
 }
 
 Variable getLevelByPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int result = 0;
     auto creature = getCreatureOrCaller(game, args, 1, ctx);
-    int position = getInt(args, 0);
+    int position = getIntOrElse(args, 0);
 
-    if (creature) {
-        result = creature->attributes().getLevelByPosition(position);
-    } else {
-        debug("Script: getLevelByPosition: creature is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(result);
+    return Variable::ofInt(creature->attributes().getLevelByPosition(position));
 }
 
 Variable getLevelByClass(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int result = 0;
     auto creature = getCreatureOrCaller(game, args, 1, ctx);
     auto clazz = getEnum<ClassType>(args, 0);
 
-    if (creature) {
-        result = creature->attributes().getClassLevel(clazz);
-    } else {
-        debug("Script: getLevelByClass: creature is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(result);
+    return Variable::ofInt(creature->attributes().getClassLevel(clazz));
 }
 
 Variable getDamageDealtByType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1502,27 +1158,13 @@ Variable showUpgradeScreen(Game &game, const vector<Variable> &args, ExecutionCo
 }
 
 Variable getGender(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto result = Gender::None;
-
     auto creature = getCreature(game, args, 0, ctx);
-    if (creature) {
-        result = creature->gender();
-    } else {
-        debug("Script: getGender: creature is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(creature->gender()));
 }
 
 Variable getAttemptedAttackTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> target;
-
     auto caller = getCallerAsCreature(game, ctx);
-    if (caller) {
-        target = caller->getAttemptedAttackTarget();
-    } else {
-        debug("Script: getAttemptedAttackTarget: caller is invalid", 1, DebugChannels::script);
-    }
+    auto target = caller->getAttemptedAttackTarget();
 
     return Variable::ofObject(getObjectIdOrInvalid(target));
 }
@@ -1564,16 +1206,11 @@ Variable sendMessageToPC(Game &game, const vector<Variable> &args, ExecutionCont
 }
 
 Variable getAttemptedSpellTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> target;
-
     auto caller = getCallerAsCreature(game, ctx);
-    if (caller) {
-        // TODO: implement
-    } else {
-        debug("Script: getAttemptedSpellTarget: caller is invalid", 1, DebugChannels::script);
-    }
 
-    return Variable::ofObject(getObjectIdOrInvalid(target));
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getLastOpenedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1582,17 +1219,12 @@ Variable getLastOpenedBy(Game &game, const vector<Variable> &args, ExecutionCont
 }
 
 Variable getHasSpell(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
     auto creature = getCreatureOrCaller(game, args, 1, ctx);
     auto spell = getEnum<ForcePower>(args, 0);
 
-    if (creature) {
-        // TODO: Force Powers, aka spells, are not supported at the moment
-    } else {
-        debug("Script: getHasSpell: creature is invalid", 1, DebugChannels::script);
-    }
+    // TODO: Force Powers, aka spells, are not supported at the moment
 
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(false));
 }
 
 Variable openStore(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1614,14 +1246,10 @@ Variable getJournalQuestExperience(Game &game, const vector<Variable> &args, Exe
 Variable jumpToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: pass all arguments to an action
     auto jumpTo = getObject(game, args, 0, ctx);
-    bool walkStraightLine = getBool(args, 1, true);
+    bool walkStraightLine = getBoolOrElse(args, 1, true);
 
-    if (jumpTo) {
-        auto action = game.services().actionFactory().newJumpToObject(move(jumpTo));
-        getCaller(game, ctx)->addActionOnTop(move(action));
-    } else {
-        debug("Script: jumpToObject: jumpTo is invalid", 1, DebugChannels::script);
-    }
+    auto action = game.services().actionFactory().newJumpToObject(move(jumpTo));
+    getCaller(game, ctx)->addActionOnTop(move(action));
 
     return Variable::ofNull();
 }
@@ -1644,54 +1272,30 @@ Variable getIsLinkImmune(Game &game, const vector<Variable> &args, ExecutionCont
 
 Variable giveXPToCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto creature = getCreature(game, args, 0, ctx);
-    int xpAmount = getInt(args, 1);
+    int xpAmount = getIntOrElse(args, 1);
 
-    if (creature) {
-        creature->giveXP(xpAmount);
-    } else {
-        debug("Script: giveXPToCreature: creature is invalid", 1, DebugChannels::script);
-    }
+    creature->giveXP(xpAmount);
 
     return Variable::ofNull();
 }
 
 Variable setXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto creature = getCreature(game, args, 0, ctx);
-    int xpAmount = getInt(args, 1);
+    int xpAmount = getIntOrElse(args, 1);
 
-    if (creature) {
-        creature->setXP(xpAmount);
-    } else {
-        debug("Script: setXP: creature is invalid", 1, DebugChannels::script);
-    }
+    creature->setXP(xpAmount);
 
     return Variable::ofNull();
 }
 
 Variable getXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int result = 0;
-
     auto creature = getCreature(game, args, 0, ctx);
-    if (creature) {
-        result = creature->xp();
-    } else {
-        debug("Script: getXP: creature is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(result);
+    return Variable::ofInt(creature->xp());
 }
 
 Variable getBaseItemType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int result = 0;
-
     auto item = getItem(game, args, 0, ctx);
-    if (item) {
-        result = item->baseItemType();
-    } else {
-        debug("Script: getBaseItemType: item is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(result);
+    return Variable::ofInt(item->baseItemType());
 }
 
 Variable getItemHasItemProperty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1724,11 +1328,7 @@ Variable changeToStandardFaction(Game &game, const vector<Variable> &args, Execu
     auto creatureToChange = getCreature(game, args, 0, ctx);
     auto faction = getEnum<Faction>(args, 1);
 
-    if (creatureToChange) {
-        creatureToChange->setFaction(faction);
-    } else {
-        debug("Script: changeToStandardFaction: creatureToChange is invalid", 1, DebugChannels::script);
-    }
+    creatureToChange->setFaction(faction);
 
     return Variable::ofNull();
 }
@@ -1738,14 +1338,8 @@ Variable speakOneLinerConversation(Game &game, const vector<Variable> &args, Exe
 }
 
 Variable getGold(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int result = 0;
     auto target = getCreatureOrCaller(game, args, 0, ctx);
-    if (target) {
-        result = target->gold();
-    } else {
-        debug("Script: getGold: target is invalid", 1, DebugChannels::script);
-    }
-    return Variable::ofInt(result);
+    return Variable::ofInt(target->gold());
 }
 
 Variable getLastRespawnButtonPresser(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1789,35 +1383,23 @@ Variable getItemActivatedTarget(Game &game, const vector<Variable> &args, Execut
 }
 
 Variable getIsOpen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto object = getSpatialObject(game, args, 0, ctx);
-    if (object) {
-        result = object->isOpen();
-    } else {
-        debug("Script: getIsOpen: object is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(object->isOpen()));
 }
 
 Variable takeGoldFromCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto amount = getInt(args, 0);
+    auto amount = getIntOrElse(args, 0);
     auto creatureToTakeFrom = getCreature(game, args, 1, ctx);
-    auto destroy = getBool(args, 2);
+    auto destroy = getBoolOrElse(args, 2);
+
     if (creatureToTakeFrom) {
         creatureToTakeFrom->takeGold(amount);
-    } else {
-        debug("Script: takeGoldFromCreature: creatureToTakeFrom is invalid", 1, DebugChannels::script);
     }
     if (!destroy) {
         auto caller = getCallerAsCreature(game, ctx);
-        if (caller) {
-            caller->giveGold(amount);
-        } else {
-            debug("Script: takeGoldFromCreature: caller is invalid", 1, DebugChannels::script);
-        }
+        caller->giveGold(amount);
     }
+
     return Variable::ofNull();
 }
 
@@ -1826,27 +1408,15 @@ Variable getIsInConversation(Game &game, const vector<Variable> &args, Execution
 }
 
 Variable getPlotFlag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto target = getObjectOrCaller(game, args, 0, ctx);
-    if (target) {
-        result = target->plotFlag();
-    } else {
-        debug("Script: getPlotFlag: target is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(target->plotFlag()));
 }
 
 Variable setPlotFlag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto target = getObject(game, args, 0, ctx);
-    bool plotFlag = getBool(args, 1);
+    bool plotFlag = getBoolOrElse(args, 1);
 
-    if (target) {
-        target->setPlotFlag(plotFlag);
-    } else {
-        debug("Script: setPlotFlag: target is invalid", 1, DebugChannels::script);
-    }
+    target->setPlotFlag(plotFlag);
 
     return Variable::ofNull();
 }
@@ -1912,16 +1482,13 @@ Variable getMovementRate(Game &game, const vector<Variable> &args, ExecutionCont
 }
 
 Variable getSubRace(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto result = Subrace::None;
-
-    auto creature = getCreature(game, args, 0, ctx);
-    if (creature) {
-        result = creature->subrace();
-    } else {
-        debug("Script: getSubRace: creature is invalid", 1, DebugChannels::script);
+    try {
+        auto creature = getCreature(game, args, 0, ctx);
+        return Variable::ofInt(static_cast<int>(creature->subrace()));
     }
-
-    return Variable::ofInt(static_cast<int>(result));
+    catch (const logic_error &) {
+        return Variable::ofInt(static_cast<int>(Subrace::None));
+    }
 }
 
 Variable duplicateHeadAppearance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1931,17 +1498,11 @@ Variable duplicateHeadAppearance(Game &game, const vector<Variable> &args, Execu
 Variable cutsceneAttack(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto caller = getCallerAsCreature(game, ctx);
     auto target = getSpatialObject(game, args, 0, ctx);
-    int animation = getInt(args, 1);
+    int animation = getIntOrElse(args, 1);
     auto attackResult = getEnum<AttackResultType>(args, 2);
-    int damage = getInt(args, 3);
+    int damage = getIntOrElse(args, 3);
 
-    if (caller && target) {
-        game.services().combat().addAttack(caller, target, nullptr, attackResult, damage);
-    } else if (!caller) {
-        debug("Script: cutsceneAttack: caller is invalid", 1, DebugChannels::script);
-    } else if (!target) {
-        debug("Script: cutsceneAttack: target is invalid", 1, DebugChannels::script);
-    }
+    game.services().combat().addAttack(caller, target, nullptr, attackResult, damage);
 
     return Variable::ofNull();
 }
@@ -1967,8 +1528,8 @@ Variable enableVideoEffect(Game &game, const vector<Variable> &args, ExecutionCo
 }
 
 Variable startNewModule(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string moduleName(boost::to_lower_copy(getString(args, 0)));
-    string waypoint(boost::to_lower_copy(getString(args, 1, "")));
+    string moduleName(boost::to_lower_copy(getStringOrElse(args, 0)));
+    string waypoint(boost::to_lower_copy(getStringOrElse(args, 1, "")));
 
     game.scheduleModuleTransition(moduleName, waypoint);
 
@@ -1992,16 +1553,8 @@ Variable getGameDifficulty(Game &game, const vector<Variable> &args, ExecutionCo
 }
 
 Variable getUserActionsPending(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = 0;
-
     auto caller = getCallerAsCreature(game, ctx);
-    if (caller) {
-        result = caller->hasUserActionsPending();
-    } else {
-        debug("Script: getUserActionsPending: caller is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(caller->hasUserActionsPending()));
 }
 
 Variable revealMap(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2151,13 +1704,7 @@ Variable faceObjectAwayFromObject(Game &game, const vector<Variable> &args, Exec
     auto facer = getSpatialObject(game, args, 0, ctx);
     auto objectToFaceAwayFrom = getSpatialObject(game, args, 1, ctx);
 
-    if (facer && objectToFaceAwayFrom) {
-        facer->faceAwayFrom(*objectToFaceAwayFrom);
-    } else if (!facer) {
-        debug("Script: faceObjectAwayFromObject: facer is invalid", 1, DebugChannels::script);
-    } else if (!objectToFaceAwayFrom) {
-        debug("Script: faceObjectAwayFromObject: objectToFaceAwayFrom is invalid", 1, DebugChannels::script);
-    }
+    facer->faceAwayFrom(*objectToFaceAwayFrom);
 
     return Variable::ofNull();
 }
@@ -2207,13 +1754,13 @@ Variable getStrRefSoundDuration(Game &game, const vector<Variable> &args, Execut
 }
 
 Variable getGlobalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getString(args, 0));
+    string id(getStringOrElse(args, 0));
     return Variable::ofInt(static_cast<int>(game.getGlobalBoolean(id)));
 }
 
 Variable setGlobalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getString(args, 0));
-    bool value = getBool(args, 1);
+    string id(getStringOrElse(args, 0));
+    bool value = getBoolOrElse(args, 1);
 
     game.setGlobalBoolean(id, value);
 
@@ -2221,13 +1768,13 @@ Variable setGlobalBoolean(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable getGlobalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getString(args, 0));
+    string id(getStringOrElse(args, 0));
     return Variable::ofInt(game.getGlobalNumber(id));
 }
 
 Variable setGlobalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getString(args, 0));
-    int value = getInt(args, 1);
+    string id(getStringOrElse(args, 0));
+    int value = getIntOrElse(args, 1);
 
     game.setGlobalNumber(id, value);
 
@@ -2267,75 +1814,49 @@ Variable setJournalQuestEntryPicture(Game &game, const vector<Variable> &args, E
 }
 
 Variable getLocalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
     auto object = getObject(game, args, 0, ctx);
-    int index = getInt(args, 1);
+    int index = getIntOrElse(args, 1);
 
-    if (object) {
-        result = object->getLocalBoolean(index);
-    } else {
-        debug("Script: getLocalBoolean: object is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(object->getLocalBoolean(index)));
 }
 
 Variable setLocalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto object = getObject(game, args, 0, ctx);
-    int index = getInt(args, 1);
-    bool value = getBool(args, 2);
+    int index = getIntOrElse(args, 1);
+    bool value = getBoolOrElse(args, 2);
 
-    if (object) {
-        object->setLocalBoolean(index, value);
-    } else {
-        debug("Script: setLocalBoolean: object is invalid", 1, DebugChannels::script);
-    }
+    object->setLocalBoolean(index, value);
 
     return Variable::ofNull();
 }
 
 Variable getLocalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int result = 0;
     auto object = getObject(game, args, 0, ctx);
-    int index = getInt(args, 1);
+    int index = getIntOrElse(args, 1);
 
-    if (object) {
-        result = object->getLocalNumber(index);
-    } else {
-        debug("Script: getLocalNumber: object is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(result);
+    return Variable::ofInt(object->getLocalNumber(index));
 }
 
 Variable setLocalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto object = getObject(game, args, 0, ctx);
-    int index = getInt(args, 1);
-    int value = getInt(args, 2);
+    int index = getIntOrElse(args, 1);
+    int value = getIntOrElse(args, 2);
 
-    if (object) {
-        object->setLocalNumber(index, value);
-    } else {
-        debug("Script: setLocalNumber: object is invalid", 1, DebugChannels::script);
-    }
+    object->setLocalNumber(index, value);
 
     return Variable::ofNull();
 }
 
 Variable getGlobalLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getString(args, 0));
+    string id(getStringOrElse(args, 0));
     return Variable::ofLocation(game.getGlobalLocation(id));
 }
 
 Variable setGlobalLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getString(args, 0));
+    string id(getStringOrElse(args, 0));
     auto value = getLocationEngineType(args, 1);
 
-    if (value) {
-        game.setGlobalLocation(id, value);
-    } else {
-        debug("Script: setGlobalLocation: value is invalid", 1, DebugChannels::script);
-    }
+    game.setGlobalLocation(id, value);
 
     return Variable::ofNull();
 }
@@ -2345,27 +1866,20 @@ Variable getIsConversationActive(Game &game, const vector<Variable> &args, Execu
 }
 
 Variable getNPCAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto result = NPCAIStyle::DefaultAttack;
-
-    auto creature = getCreature(game, args, 0, ctx);
-    if (creature) {
-        result = creature->aiStyle();
-    } else {
-        debug("Script: getNPCAIStyle: creature is invalid", 1, DebugChannels::script);
+    try {
+        auto creature = getCreature(game, args, 0, ctx);
+        return Variable::ofInt(static_cast<int>(creature->aiStyle()));
     }
-
-    return Variable::ofInt(static_cast<int>(result));
+    catch (const logic_error &) {
+        return Variable::ofInt(static_cast<int>(NPCAIStyle::DefaultAttack));
+    }
 }
 
 Variable setNPCAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto creature = getCreature(game, args, 0, ctx);
     auto style = getEnum<NPCAIStyle>(args, 1);
 
-    if (creature) {
-        creature->setAIStyle(style);
-    } else {
-        debug("Script: setNPCAIStyle: creature is invalid", 1, DebugChannels::script);
-    }
+    creature->setAIStyle(style);
 
     return Variable::ofNull();
 }
@@ -2380,11 +1894,7 @@ Variable getNPCSelectability(Game &game, const vector<Variable> &args, Execution
 
 Variable clearAllEffects(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(game, ctx);
-    if (caller) {
-        caller->clearAllEffects();
-    } else {
-        debug("Script: clearAllEffects: caller is invalid", 1, DebugChannels::script);
-    }
+    caller->clearAllEffects();
     return Variable::ofNull();
 }
 
@@ -2393,9 +1903,9 @@ Variable getLastConversation(Game &game, const vector<Variable> &args, Execution
 }
 
 Variable showPartySelectionGUI(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string exitScript(boost::to_lower_copy(getString(args, 0, "")));
-    int forceNpc1 = getInt(args, 1);
-    int forceNpc2 = getInt(args, 2);
+    string exitScript(boost::to_lower_copy(getStringOrElse(args, 0, "")));
+    int forceNpc1 = getIntOrElse(args, 1);
+    int forceNpc2 = getIntOrElse(args, 2);
 
     PartySelection::Context partyCtx;
     partyCtx.exitScript = move(exitScript);
@@ -2408,16 +1918,13 @@ Variable showPartySelectionGUI(Game &game, const vector<Variable> &args, Executi
 }
 
 Variable getStandardFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto result = Faction::Invalid;
-
-    auto object = getCreature(game, args, 0, ctx);
-    if (object) {
-        result = object->faction();
-    } else {
-        debug("Script: getStandardFaction: object is invalid", 1, DebugChannels::script);
+    try {
+        auto object = getCreature(game, args, 0, ctx);
+        return Variable::ofInt(static_cast<int>(object->faction()));
     }
-
-    return Variable::ofInt(static_cast<int>(result));
+    catch (const logic_error &) {
+        return Variable::ofInt(static_cast<int>(Faction::Invalid));
+    }
 }
 
 Variable givePlotXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2425,27 +1932,15 @@ Variable givePlotXP(Game &game, const vector<Variable> &args, ExecutionContext &
 }
 
 Variable getMinOneHP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto object = getObject(game, args, 0, ctx);
-    if (object) {
-        result = object->isMinOneHP();
-    } else {
-        debug("Script: getMinOneHP: object is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(object->isMinOneHP()));
 }
 
 Variable setMinOneHP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto object = getObject(game, args, 0, ctx);
-    bool minOneHP = getBool(args, 1);
+    bool minOneHP = getBoolOrElse(args, 1);
 
-    if (object) {
-        object->setMinOneHP(minOneHP);
-    } else {
-        debug("Script: setMinOneHP: object is invalid", 1, DebugChannels::script);
-    }
+    object->setMinOneHP(minOneHP);
 
     return Variable::ofNull();
 }
@@ -2459,29 +1954,15 @@ Variable setGlobalFadeOut(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable getLastHostileTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    uint32_t result = kObjectInvalid;
-
     auto attacker = getCreatureOrCaller(game, args, 0, ctx);
-    if (attacker) {
-        // TODO: implement
-    } else {
-        debug("Script: getLastHostileTarget: attacker is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofObject(result);
+    // TODO: implement
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getLastAttackAction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto result = ActionType::QueueEmpty;
-
     auto attacker = getCreatureOrCaller(game, args, 0, ctx);
-    if (attacker) {
-        // TODO: implement
-    } else {
-        debug("Script: getLastAttackAction: attacker is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    // TODO: implement
+    return Variable::ofInt(static_cast<int>(ActionType::QueueEmpty));
 }
 
 Variable getLastForcePowerUsed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2517,16 +1998,8 @@ Variable setForcePowerUnsuccessful(Game &game, const vector<Variable> &args, Exe
 }
 
 Variable getIsDebilitated(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto creature = getCreatureOrCaller(game, args, 0, ctx);
-    if (creature) {
-        result = creature->isDebilitated();
-    } else {
-        debug("Script: getIsDebilitated: creature is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(creature->isDebilitated()));
 }
 
 Variable surrenderByFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2570,20 +2043,13 @@ Variable getIsPoisoned(Game &game, const vector<Variable> &args, ExecutionContex
 }
 
 Variable getSpellTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> target;
-
     auto creature = getCreatureOrCaller(game, args, 0, ctx);
-    if (creature) {
-        // TODO: implement
-    } else {
-        debug("Script: getSpellTarget: creature is invalid", 1, DebugChannels::script);
-    }
-
-    return Variable::ofObject(getObjectIdOrInvalid(target));
+    // TODO: implement
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable setSoloMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto activate = getBool(args, 0);
+    auto activate = getBoolOrElse(args, 0);
     game.services().party().setSoloMode(activate);
     return Variable::ofNull();
 }
@@ -2594,13 +2060,10 @@ Variable cancelPostDialogCharacterSwitch(Game &game, const vector<Variable> &arg
 
 Variable setMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto object = getObject(game, args, 0, ctx);
-    int maxHP = getInt(args, 1);
+    int maxHP = getIntOrElse(args, 1);
 
-    if (object) {
-        object->setMaxHitPoints(maxHP);
-    } else {
-        debug("Script: setMaxHitPoints: object is invalid", 1, DebugChannels::script);
-    }
+    object->setMaxHitPoints(maxHP);
+
     return Variable::ofNull();
 }
 

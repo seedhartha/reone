@@ -38,10 +38,10 @@ namespace game {
 namespace routine {
 
 Variable setTime(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int hour = getInt(args, 0);
-    int minute = getInt(args, 1);
-    int second = getInt(args, 2);
-    int millisecond = getInt(args, 3);
+    int hour = getIntOrElse(args, 0);
+    int minute = getIntOrElse(args, 1);
+    int second = getIntOrElse(args, 2);
+    int millisecond = getIntOrElse(args, 3);
 
     game.module()->setTime(hour, minute, second, millisecond);
 

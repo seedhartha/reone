@@ -40,100 +40,56 @@ namespace game {
 namespace routine {
 
 Variable getLastPerceived(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> object;
-
     auto caller = getCallerAsCreature(game, ctx);
-    if (caller) {
-        object = caller->perception().lastPerceived;
-    } else {
-        debug("Script: getLastPerceived: caller is invalid", 1, DebugChannels::script);
-    }
+    auto object = caller->perception().lastPerceived;
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
 Variable getLastPerceptionHeard(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto caller = getCallerAsCreature(game, ctx);
-    if (caller) {
-        result = caller->perception().lastPerception == PerceptionType::Heard;
-    } else {
-        debug("Script: getLastPerceptionHeard: caller is invalid", 1, DebugChannels::script);
-    }
+    bool heard = caller->perception().lastPerception == PerceptionType::Heard;
 
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(heard));
 }
 
 Variable getLastPerceptionInaudible(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto caller = getCallerAsCreature(game, ctx);
-    if (caller) {
-        result = caller->perception().lastPerception == PerceptionType::NotHeard;
-    } else {
-        debug("Script: getLastPerceptionInaudible: caller is invalid", 1, DebugChannels::script);
-    }
+    bool notHeard = caller->perception().lastPerception == PerceptionType::NotHeard;
 
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(notHeard));
 }
 
 Variable getLastPerceptionSeen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto caller = getCallerAsCreature(game, ctx);
-    if (caller) {
-        result = caller->perception().lastPerception == PerceptionType::Seen;
-    } else {
-        debug("Script: getLastPerceptionSeen: caller is invalid", 1, DebugChannels::script);
-    }
+    bool seen = caller->perception().lastPerception == PerceptionType::Seen;
 
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(seen));
 }
 
 Variable getLastPerceptionVanished(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
-
     auto caller = getCallerAsCreature(game, ctx);
-    if (caller) {
-        result = caller->perception().lastPerception == PerceptionType::NotSeen;
-    } else {
-        debug("Script: getLastPerceptionVanished: caller is invalid", 1, DebugChannels::script);
-    }
+    bool vanished = caller->perception().lastPerception == PerceptionType::NotSeen;
 
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(vanished));
 }
 
 Variable getObjectSeen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
     auto target = getCreature(game, args, 0, ctx);
     auto source = getCreatureOrCaller(game, args, 1, ctx);
 
-    if (target && source) {
-        result = source->perception().seen.count(target) > 0;
-    } else if (!target) {
-        debug("Script: getObjectSeen: target is invalid", 1, DebugChannels::script);
-    } else if (!source) {
-        debug("Script: getObjectSeen: source is invalid", 1, DebugChannels::script);
-    }
+    bool seen = source->perception().seen.count(target) > 0;
 
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(seen));
 }
 
 Variable getObjectHeard(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool result = false;
     auto target = getCreature(game, args, 0, ctx);
     auto source = getCreatureOrCaller(game, args, 1, ctx);
 
-    if (target && source) {
-        result = source->perception().heard.count(target) > 0;
-    } else if (!target) {
-        debug("Script: getObjectHeard: target is invalid", 1, DebugChannels::script);
-    } else if (!source) {
-        debug("Script: getObjectHeard: source is invalid", 1, DebugChannels::script);
-    }
+    bool heard = source->perception().heard.count(target) > 0;
 
-    return Variable::ofInt(static_cast<int>(move(result)));
+    return Variable::ofInt(static_cast<int>(heard));
 }
 
 } // namespace routine

@@ -37,11 +37,11 @@ namespace game {
 namespace routine {
 
 Variable random(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(reone::random(0, getInt(args, 0) - 1));
+    return Variable::ofInt(reone::random(0, getIntOrElse(args, 0) - 1));
 }
 
 Variable d2(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int numDice = glm::max(1, getInt(args, 0, 1));
+    int numDice = glm::max(1, getIntOrElse(args, 0, 1));
     int result = 0;
 
     for (int i = 0; i < numDice; ++i) {
@@ -52,7 +52,7 @@ Variable d2(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
 }
 
 Variable d3(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int numDice = glm::max(1, getInt(args, 0, 1));
+    int numDice = glm::max(1, getIntOrElse(args, 0, 1));
     int result = 0;
 
     for (int i = 0; i < numDice; ++i) {
@@ -63,7 +63,7 @@ Variable d3(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
 }
 
 Variable d4(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int numDice = glm::max(1, getInt(args, 0, 1));
+    int numDice = glm::max(1, getIntOrElse(args, 0, 1));
     int result = 0;
 
     for (int i = 0; i < numDice; ++i) {
@@ -74,7 +74,7 @@ Variable d4(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
 }
 
 Variable d6(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int numDice = glm::max(1, getInt(args, 0, 1));
+    int numDice = glm::max(1, getIntOrElse(args, 0, 1));
     int result = 0;
 
     for (int i = 0; i < numDice; ++i) {
@@ -85,7 +85,7 @@ Variable d6(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
 }
 
 Variable d8(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int numDice = glm::max(1, getInt(args, 0, 1));
+    int numDice = glm::max(1, getIntOrElse(args, 0, 1));
     int result = 0;
 
     for (int i = 0; i < numDice; ++i) {
@@ -96,7 +96,7 @@ Variable d8(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
 }
 
 Variable d10(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int numDice = glm::max(1, getInt(args, 0, 1));
+    int numDice = glm::max(1, getIntOrElse(args, 0, 1));
     int result = 0;
 
     for (int i = 0; i < numDice; ++i) {
@@ -107,7 +107,7 @@ Variable d10(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
 }
 
 Variable d12(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int numDice = glm::max(1, getInt(args, 0, 1));
+    int numDice = glm::max(1, getIntOrElse(args, 0, 1));
     int result = 0;
 
     for (int i = 0; i < numDice; ++i) {
@@ -118,7 +118,7 @@ Variable d12(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
 }
 
 Variable d20(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int numDice = glm::max(1, getInt(args, 0, 1));
+    int numDice = glm::max(1, getIntOrElse(args, 0, 1));
     int result = 0;
 
     for (int i = 0; i < numDice; ++i) {
@@ -129,7 +129,7 @@ Variable d20(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
 }
 
 Variable d100(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int numDice = glm::max(1, getInt(args, 0, 1));
+    int numDice = glm::max(1, getIntOrElse(args, 0, 1));
     int result = 0;
 
     for (int i = 0; i < numDice; ++i) {
