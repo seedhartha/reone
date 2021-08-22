@@ -31,22 +31,16 @@ namespace reone {
 
 namespace script {
 
-Routine::Routine(string name, VariableType retType, vector<VariableType> argTypes) :
-    _name(move(name)),
-    _returnType(retType),
-    _argumentTypes(move(argTypes)) {
-}
-
 Routine::Routine(
     string name,
     VariableType retType,
     vector<VariableType> argTypes,
-    const function<Variable(const vector<Variable> &, ExecutionContext &ctx)> &fn
+    function<Variable(const vector<Variable> &, ExecutionContext &ctx)> fn
 ) :
     _name(move(name)),
     _returnType(retType),
     _argumentTypes(move(argTypes)),
-    _func(fn) {
+    _func(move(fn)) {
 }
 
 Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) const {

@@ -28,9 +28,11 @@ struct Variable;
 
 class Routine {
 public:
-    Routine() = default;
-    Routine(std::string name, VariableType retType, std::vector<VariableType> argTypes);
-    Routine(std::string name, VariableType retType, std::vector<VariableType> argTypes, const std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> &fn);
+    Routine(
+        std::string name,
+        VariableType retType,
+        std::vector<VariableType> argTypes,
+        std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> fn);
 
     Variable invoke(const std::vector<Variable> &args, ExecutionContext &ctx) const;
 
