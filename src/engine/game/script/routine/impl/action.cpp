@@ -75,7 +75,7 @@ Variable actionMoveAwayFromObject(Game &game, const vector<Variable> &args, Exec
 
 Variable actionEquipItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto item = getItem(game, args, 0, ctx);
-    int inventorySlot = getIntOrElse(args, 1);
+    int inventorySlot = getInt(args, 1);
     bool instant = getBoolOrElse(args, 2, false);
 
     // TODO: add action to caller
@@ -121,7 +121,7 @@ Variable actionAttack(Game &game, const vector<Variable> &args, ExecutionContext
 }
 
 Variable actionSpeakString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string toSpeak(getStringOrElse(args, 0));
+    string toSpeak(getString(args, 0));
     auto talkVolume = getEnum(args, 1, TalkVolume::Talk);
     
     // TODO: add action to caller
@@ -211,7 +211,7 @@ Variable actionJumpToObject(Game &game, const vector<Variable> &args, ExecutionC
 }
 
 Variable actionWait(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float seconds = getFloatOrElse(args, 0);
+    float seconds = getFloat(args, 0);
 
     auto action = game.services().actionFactory().newWait(seconds);
     getCaller(game, ctx)->addAction(move(action));
@@ -272,7 +272,7 @@ Variable actionCastSpellAtLocation(Game &game, const vector<Variable> &args, Exe
 }
 
 Variable actionSpeakStringByStrRef(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int strRef = getIntOrElse(args, 0);
+    int strRef = getInt(args, 0);
     auto talkVolume = getEnum(args, 1, TalkVolume::Talk);
 
     // TODO: add action to caller
@@ -407,7 +407,7 @@ Variable actionCastFakeSpellAtLocation(Game &game, const vector<Variable> &args,
 }
 
 Variable actionBarkString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int strRef = getIntOrElse(args, 0);
+    int strRef = getInt(args, 0);
     // TODO: add action to caller
     return Variable::ofNull();
 }

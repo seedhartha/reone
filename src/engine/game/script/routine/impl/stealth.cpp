@@ -39,22 +39,26 @@ namespace game {
 namespace routine {
 
 Variable getMaxStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(game.module()->area()->maxStealthXP());
+    int result = game.module()->area()->maxStealthXP();
+    return Variable::ofInt(result);
 }
 
 Variable setMaxStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int max = getIntOrElse(args, 0);
+    int max = getInt(args, 0);
     game.module()->area()->setMaxStealthXP(max);
+
     return Variable::ofNull();
 }
 
 Variable getCurrentStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(game.module()->area()->currentStealthXP());
+    int result = game.module()->area()->currentStealthXP();
+    return Variable::ofInt(result);
 }
 
 Variable setCurrentStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int current = getIntOrElse(args, 0);
+    int current = getInt(args, 0);
     game.module()->area()->setCurrentStealthXP(current);
+
     return Variable::ofNull();
 }
 
@@ -68,18 +72,21 @@ Variable getStealthXPEnabled(Game &game, const vector<Variable> &args, Execution
 }
 
 Variable setStealthXPEnabled(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool enabled = getBoolOrElse(args, 0);
+    bool enabled = getBool(args, 0);
     game.module()->area()->setStealthXPEnabled(enabled);
+
     return Variable::ofNull();
 }
 
 Variable getStealthXPDecrement(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(game.module()->area()->stealthXPDecrement());
+    int result = game.module()->area()->stealthXPDecrement();
+    return Variable::ofInt(result);
 }
 
 Variable setStealthXPDecrement(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int decrement = getIntOrElse(args, 0);
+    int decrement = getInt(args, 0);
     game.module()->area()->setStealthXPDecrement(decrement);
+
     return Variable::ofNull();
 }
 

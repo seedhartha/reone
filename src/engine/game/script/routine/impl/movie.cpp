@@ -39,8 +39,10 @@ namespace game {
 namespace routine {
 
 Variable playMovie(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string movie(boost::to_lower_copy(getStringOrElse(args, 0)));
+    string movie(boost::to_lower_copy(getString(args, 0)));
+
     game.playVideo(movie);
+
     return Variable::ofNull();
 }
 

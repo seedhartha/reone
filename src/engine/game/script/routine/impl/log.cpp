@@ -39,14 +39,16 @@ namespace game {
 namespace routine {
 
 Variable printString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string str(getStringOrElse(args, 0));
+    string str(getString(args, 0));
+
     info(str);
+
     return Variable::ofNull();
 }
 
 Variable printFloat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     // TODO: use formatting parameters
-    float value = getFloatOrElse(args, 0);
+    float value = getFloat(args, 0);
     int width = getIntOrElse(args, 1, 18);
     int decimals = getIntOrElse(args, 2, 9);
 
@@ -56,20 +58,26 @@ Variable printFloat(Game &game, const vector<Variable> &args, ExecutionContext &
 }
 
 Variable printInteger(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int value = getIntOrElse(args, 0);
+    int value = getInt(args, 0);
+
     info(to_string(value));
+
     return Variable::ofNull();
 }
 
 Variable printObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto object = getObject(game, args, 0, ctx);
+
     info(to_string(object->id()));
+
     return Variable::ofNull();
 }
 
 Variable printVector(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    glm::vec3 value(getVectorOrElse(args, 0));
+    glm::vec3 value(getVector(args, 0));
+
     info(boost::format("%f %f %f") % value.x % value.y % value.z);
+
     return Variable::ofNull();
 }
 

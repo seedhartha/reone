@@ -90,7 +90,7 @@ ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<E
 }
 
 int ScriptExecution::run() {
-    debug(boost::format("Script: run %s as %u") % _program->name() % _context->callerId, 1, DebugChannels::script);
+    debug(boost::format("Script: run '%s' as %u") % _program->name() % _context->callerId, 1, DebugChannels::script);
     uint32_t insOff = kStartInstructionOffset;
 
     if (_context->savedState) {
@@ -109,7 +109,7 @@ int ScriptExecution::run() {
         auto handler = _handlers.find(ins.byteCode);
 
         if (handler == _handlers.end()) {
-            debug("Script: byte code not implemented: " + describeByteCode(ins.byteCode), 1, DebugChannels::script);
+            error("Script: byte code not implemented: " + describeByteCode(ins.byteCode));
             return -1;
         }
         _nextInstruction = ins.nextOffset;

@@ -37,24 +37,27 @@ namespace game {
 namespace routine {
 
 Variable getStringLength(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<int>(getStringOrElse(args, 0).length()));
+    string str(getString(args, 0));
+    int result = str.length();
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable getStringUpperCase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string result(boost::to_upper_copy(getStringOrElse(args, 0)));
+    string result(boost::to_upper_copy(getString(args, 0)));
     return Variable::ofString(move(result));
 }
 
 Variable getStringLowerCase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string result(boost::to_lower_copy(getStringOrElse(args, 0)));
+    string result(boost::to_lower_copy(getString(args, 0)));
     return Variable::ofString(move(result));
 }
 
 Variable getStringRight(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string result;
-    string str(getStringOrElse(args, 0));
-    int count = getIntOrElse(args, 1);
+    string str(getString(args, 0));
+    int count = getInt(args, 1);
 
+    string result;
     if (str.size() >= count) {
         result = str.substr(str.length() - count, count);
     }
@@ -63,10 +66,10 @@ Variable getStringRight(Game &game, const vector<Variable> &args, ExecutionConte
 }
 
 Variable getStringLeft(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string result;
-    string str(getStringOrElse(args, 0));
-    int count = getIntOrElse(args, 1);
+    string str(getString(args, 0));
+    int count = getInt(args, 1);
 
+    string result;
     if (str.size() >= count) {
         result = str.substr(0, count);
     }
@@ -75,23 +78,26 @@ Variable getStringLeft(Game &game, const vector<Variable> &args, ExecutionContex
 }
 
 Variable insertString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string dest(getStringOrElse(args, 0));
-    string str(getStringOrElse(args, 1));
-    int pos = getIntOrElse(args, 2);
+    string dest(getString(args, 0));
+    string str(getString(args, 1));
+    int pos = getInt(args, 2);
+
     return Variable::ofString(dest.insert(pos, str));
 }
 
 Variable getSubString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string str(getStringOrElse(args, 0));
-    int start = getIntOrElse(args, 1);
-    int count = getIntOrElse(args, 2);
+    string str(getString(args, 0));
+    int start = getInt(args, 1);
+    int count = getInt(args, 2);
+
     return Variable::ofString(str.substr(start, count));
 }
 
 Variable findSubString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string str(getStringOrElse(args, 0));
-    string substr(getStringOrElse(args, 1));
+    string str(getString(args, 0));
+    string substr(getString(args, 1));
     size_t pos = str.find(substr);
+
     return Variable::ofInt(pos != string::npos ? static_cast<int>(pos) : -1);
 }
 

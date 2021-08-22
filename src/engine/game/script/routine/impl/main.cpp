@@ -56,7 +56,7 @@ Variable assignCommand(Game &game, const vector<Variable> &args, ExecutionContex
 }
 
 Variable delayCommand(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float seconds = getFloatOrElse(args, 0);
+    float seconds = getFloat(args, 0);
     auto action = getAction(args, 1);
 
     auto objectAction = game.services().actionFactory().newDoCommand(move(action));
@@ -66,7 +66,7 @@ Variable delayCommand(Game &game, const vector<Variable> &args, ExecutionContext
 }
 
 Variable executeScript(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string script(getStringOrElse(args, 0));
+    string script(getString(args, 0));
     auto target = getObject(game, args, 1, ctx);
     int scriptVar = getIntOrElse(args, 2, -1);
 
@@ -82,7 +82,7 @@ Variable clearAllActions(Game &game, const vector<Variable> &args, ExecutionCont
 
 Variable setFacing(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(game, ctx);
-    float direction = getFloatOrElse(args, 0);
+    float direction = getFloat(args, 0);
 
     caller->setFacing(glm::radians(direction));
 
@@ -94,7 +94,7 @@ Variable switchPlayerCharacter(Game &game, const vector<Variable> &args, Executi
 }
 
 Variable setAreaUnescapable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool unescapable = getBoolOrElse(args, 0);
+    bool unescapable = getBool(args, 0);
     game.module()->area()->setUnescapable(unescapable);
     return Variable::ofNull();
 }
@@ -139,7 +139,7 @@ Variable getItemPossessor(Game &game, const vector<Variable> &args, ExecutionCon
 
 Variable getItemPossessedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto creature = getCreature(game, args, 0, ctx);
-    auto itemTag = boost::to_lower_copy(getStringOrElse(args, 1));
+    auto itemTag = boost::to_lower_copy(getString(args, 1));
     if (itemTag.empty()) {
         return Variable::ofObject(kObjectInvalid);
     }
@@ -150,12 +150,14 @@ Variable getItemPossessedBy(Game &game, const vector<Variable> &args, ExecutionC
 }
 
 Variable createItemOnObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string itemTemplate(boost::to_lower_copy(getStringOrElse(args, 0)));
+    string itemTemplate(boost::to_lower_copy(getString(args, 0)));
     if (itemTemplate.empty()) {
         return Variable::ofObject(kObjectInvalid);
     }
+
     auto target = getSpatialObjectOrCaller(game, args, 1, ctx);
     int stackSize = getIntOrElse(args, 2, 1);
+    int hideMessage = getIntOrElse(args, 3, 0);
 
     auto item = target->addItem(itemTemplate, stackSize, true);
 
@@ -167,8 +169,8 @@ Variable getLastAttacker(Game &game, const vector<Variable> &args, ExecutionCont
 }
 
 Variable getNearestCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int firstCriteriaType = getIntOrElse(args, 0);
-    int firstCriteriaValue = getIntOrElse(args, 1);
+    int firstCriteriaType = getInt(args, 0);
+    int firstCriteriaValue = getInt(args, 1);
     auto target = getSpatialObjectOrCaller(game, args, 2, ctx);
     int nth = getIntOrElse(args, 3, 1);
     int secondCriteriaType = getIntOrElse(args, 4, -1);
@@ -202,8 +204,13 @@ Variable getDistanceToObject(Game &game, const vector<Variable> &args, Execution
 }
 
 Variable getIsObjectValid(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(static_cast<bool>(object)));
+    try {
+        auto object = getObject(game, args, 0, ctx);
+        return Variable::ofInt(1);
+    }
+    catch (const InvocationFailedException &) {
+        return Variable::ofInt(0);
+    }
 }
 
 Variable setCameraFacing(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -253,7 +260,7 @@ Variable pauseGame(Game &game, const vector<Variable> &args, ExecutionContext &c
 }
 
 Variable setPlayerRestrictMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool restrict = getBoolOrElse(args, 0);
+    bool restrict = getBool(args, 0);
     game.module()->player().setRestrictMode(restrict);
     return Variable::ofNull();
 }
@@ -364,9 +371,10 @@ Variable getIsDead(Game &game, const vector<Variable> &args, ExecutionContext &c
 
 Variable setFacingPoint(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto caller = getCallerAsSpatial(game, ctx);
-    glm::vec3 target(getVectorOrElse(args, 0));
+    glm::vec3 target(getVector(args, 0));
 
     caller->face(target);
+
     return Variable::ofNull();
 }
 
@@ -380,7 +388,7 @@ Variable touchAttackRanged(Game &game, const vector<Variable> &args, ExecutionCo
 
 Variable setItemStackSize(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto item = getItem(game, args, 0, ctx);
-    int stackSize = getIntOrElse(args, 1);
+    int stackSize = getInt(args, 1);
 
     item->setStackSize(stackSize);
 
@@ -390,6 +398,7 @@ Variable setItemStackSize(Game &game, const vector<Variable> &args, ExecutionCon
 Variable getDistanceBetween(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto objectA = getSpatialObject(game, args, 0, ctx);
     auto objectB = getSpatialObject(game, args, 1, ctx);
+
     return Variable::ofFloat(objectA->getDistanceTo(*objectB));
 }
 
@@ -398,8 +407,8 @@ Variable setReturnStrref(Game &game, const vector<Variable> &args, ExecutionCont
 }
 
 Variable getItemInSlot(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    int slot = getInt(args, 0);
     auto creature = getCreatureOrCaller(game, args, 1, ctx);
-    int slot = getIntOrElse(args, 0);
 
     auto item = creature->getEquippedItem(slot);
 
@@ -407,8 +416,8 @@ Variable getItemInSlot(Game &game, const vector<Variable> &args, ExecutionContex
 }
 
 Variable setGlobalString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getStringOrElse(args, 0));
-    string value(getStringOrElse(args, 1));
+    string id(getString(args, 0));
+    string value(getString(args, 1));
 
     game.setGlobalString(id, value);
 
@@ -416,7 +425,7 @@ Variable setGlobalString(Game &game, const vector<Variable> &args, ExecutionCont
 }
 
 Variable setCommandable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    bool commandable = getBoolOrElse(args, 0);
+    bool commandable = getBool(args, 0);
     auto target = getObjectOrCaller(game, args, 1, ctx);
 
     target->setCommandable(commandable);
@@ -519,19 +528,19 @@ Variable getFactionBestAC(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable getGlobalString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getStringOrElse(args, 0));
+    string id(getString(args, 0));
     return Variable::ofString(game.getGlobalString(id));
 }
 
 Variable getListenPatternNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getStringOrElse(args, 0));
-    return Variable::ofString(game.getGlobalString(id));
+    // TODO: implement
+    return Variable::ofInt(-1);
 }
 
 Variable getWaypointByTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    shared_ptr<SpatialObject> object;
-    string tag(boost::to_lower_copy(getStringOrElse(args, 0)));
+    string tag(boost::to_lower_copy(getString(args, 0)));
 
+    shared_ptr<SpatialObject> object;
     for (auto &waypoint : game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         if (waypoint->tag() == tag) {
             object = waypoint;
@@ -548,7 +557,7 @@ Variable getTransitionTarget(Game &game, const vector<Variable> &args, Execution
 
 Variable getObjectByTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Object> object;
-    string tag(boost::to_lower_copy(getStringOrElse(args, 0)));
+    string tag(boost::to_lower_copy(getString(args, 0)));
     int nth = getIntOrElse(args, 1, 0);
 
     if (!tag.empty()) {
@@ -596,8 +605,8 @@ Variable getLocation(Game &game, const vector<Variable> &args, ExecutionContext 
 }
 
 Variable location(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    glm::vec3 position(getVectorOrElse(args, 0));
-    float orientation = glm::radians(getFloatOrElse(args, 1));
+    glm::vec3 position(getVector(args, 0));
+    float orientation = glm::radians(getFloat(args, 1));
 
     auto location = make_shared<Location>(move(position), orientation);
 
@@ -605,12 +614,14 @@ Variable location(Game &game, const vector<Variable> &args, ExecutionContext &ct
 }
 
 Variable applyEffectAtLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    glm::vec3 position(getVectorOrElse(args, 0));
-    float orientation = glm::radians(getFloatOrElse(args, 1));
+    auto durationType = getEnum<DurationType>(args, 0);
+    auto effect = getEffect(args, 1);
+    auto location = getLocationEngineType(args, 2);
+    float duration = getFloatOrElse(args, 3, 0.0f);
 
-    auto location = make_shared<Location>(move(position), orientation);
+    // TODO: implement
 
-    return Variable::ofLocation(location);
+    return Variable::ofNull();
 }
 
 Variable applyEffectToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -653,8 +664,8 @@ Variable getFacingFromLocation(Game &game, const vector<Variable> &args, Executi
 }
 
 Variable getNearestCreatureToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int firstCriteriaType = getIntOrElse(args, 0);
-    int firstCriteriaValue = getIntOrElse(args, 1);
+    int firstCriteriaType = getInt(args, 0);
+    int firstCriteriaValue = getInt(args, 1);
     auto location = getLocationEngineType(args, 2);
     int nth = getIntOrElse(args, 3, 1);
     int secondCriteriaType = getIntOrElse(args, 4, -1);
@@ -701,7 +712,7 @@ Variable getNearestObjectToLocation(Game &game, const vector<Variable> &args, Ex
 }
 
 Variable getNearestObjectByTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string tag(boost::to_lower_copy(getStringOrElse(args, 0)));
+    string tag(boost::to_lower_copy(getString(args, 0)));
     auto target = getSpatialObjectOrCaller(game, args, 1, ctx);
     int nth = getIntOrElse(args, 2, 1);
 
@@ -739,13 +750,14 @@ Variable getPCSpeaker(Game &game, const vector<Variable> &args, ExecutionContext
 }
 
 Variable getStringByStrRef(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int strRef = getIntOrElse(args, 0);
-    return Variable::ofString(game.services().resource().strings().get(strRef));
+    int strRef = getInt(args, 0);
+    string str(game.services().resource().strings().get(strRef));
+
+    return Variable::ofString(move(str));
 }
 
 Variable destroyObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto destroy = getSpatialObject(game, args, 0, ctx);
-
     game.module()->area()->destroyObject(*destroy);
 
     return Variable::ofNull();
@@ -758,11 +770,11 @@ Variable getModule(Game &game, const vector<Variable> &args, ExecutionContext &c
 
 Variable createObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto objectType = getEnum<ObjectType>(args, 0);
-    string blueprintResRef(boost::to_lower_copy(getStringOrElse(args, 1)));
+    string blueprint(boost::to_lower_copy(getString(args, 1)));
     auto location = getLocationEngineType(args, 2);
     bool useAppearAnimation = getBoolOrElse(args, 3, false);
 
-    auto object = game.module()->area()->createObject(objectType, blueprintResRef, location);
+    auto object = game.module()->area()->createObject(objectType, blueprint, location);
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
@@ -971,7 +983,6 @@ Variable getLastAttackMode(Game &game, const vector<Variable> &args, ExecutionCo
 Variable getDistanceBetween2D(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto objectA = getSpatialObject(game, args, 0, ctx);
     auto objectB = getSpatialObject(game, args, 1, ctx);
-
     float result = objectA->getDistanceTo(glm::vec2(objectB->position()));
 
     return Variable::ofFloat(result);
@@ -988,7 +999,7 @@ Variable getLastAssociateCommand(Game &game, const vector<Variable> &args, Execu
 
 Variable giveGoldToCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto creature = getCreature(game, args, 0, ctx);
-    auto gp = getIntOrElse(args, 1);
+    auto gp = getInt(args, 1);
 
     creature->giveGold(gp);
 
@@ -996,12 +1007,18 @@ Variable giveGoldToCreature(Game &game, const vector<Variable> &args, ExecutionC
 }
 
 Variable setIsDestroyable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    bool destroyabe = getBool(args, 0);
+    bool raiseable = getBoolOrElse(args, 1, true);
+    bool selectableWhenDead = getBoolOrElse(args, 2, false);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable setLocked(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto target = getDoor(game, args, 0, ctx);
-    bool locked = getBoolOrElse(args, 1);
+    bool locked = getBool(args, 1);
 
     target->setLocked(locked);
 
@@ -1040,7 +1057,7 @@ Variable getIdentified(Game &game, const vector<Variable> &args, ExecutionContex
 
 Variable setIdentified(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto item = getItem(game, args, 0, ctx);
-    bool identified = getBoolOrElse(args, 1);
+    bool identified = getBool(args, 1);
 
     item->setIdentified(identified);
 
@@ -1050,7 +1067,6 @@ Variable setIdentified(Game &game, const vector<Variable> &args, ExecutionContex
 Variable getDistanceBetweenLocations2D(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto locationA = getLocationEngineType(args, 0);
     auto locationB = getLocationEngineType(args, 1);
-
     float result = glm::distance(glm::vec2(locationA->position()), glm::vec2(locationB->position()));
 
     return Variable::ofFloat(result);
@@ -1095,9 +1111,11 @@ Variable getNextItemInInventory(Game &game, const vector<Variable> &args, Execut
 
 Variable getClassByPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     try {
-        int position = getIntOrElse(args, 0);
+        int position = getInt(args, 0);
         auto creature = getCreatureOrCaller(game, args, 1, ctx);
-        return Variable::ofInt(static_cast<int>(creature->attributes().getClassByPosition(position)));
+        ClassType clazz = creature->attributes().getClassByPosition(position);
+
+        return Variable::ofInt(static_cast<int>(clazz));
     }
     catch (const InvocationFailedException &) {
         return Variable::ofInt(static_cast<int>(ClassType::Invalid));
@@ -1106,9 +1124,10 @@ Variable getClassByPosition(Game &game, const vector<Variable> &args, ExecutionC
 
 Variable getLevelByPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto creature = getCreatureOrCaller(game, args, 1, ctx);
-    int position = getIntOrElse(args, 0);
+    int position = getInt(args, 0);
+    int level = creature->attributes().getLevelByPosition(position);
 
-    return Variable::ofInt(creature->attributes().getLevelByPosition(position));
+    return Variable::ofInt(level);
 }
 
 Variable getLevelByClass(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1273,7 +1292,7 @@ Variable getIsLinkImmune(Game &game, const vector<Variable> &args, ExecutionCont
 
 Variable giveXPToCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto creature = getCreature(game, args, 0, ctx);
-    int xpAmount = getIntOrElse(args, 1);
+    int xpAmount = getInt(args, 1);
 
     creature->giveXP(xpAmount);
 
@@ -1282,7 +1301,7 @@ Variable giveXPToCreature(Game &game, const vector<Variable> &args, ExecutionCon
 
 Variable setXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto creature = getCreature(game, args, 0, ctx);
-    int xpAmount = getIntOrElse(args, 1);
+    int xpAmount = getInt(args, 1);
 
     creature->setXP(xpAmount);
 
@@ -1389,9 +1408,9 @@ Variable getIsOpen(Game &game, const vector<Variable> &args, ExecutionContext &c
 }
 
 Variable takeGoldFromCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto amount = getIntOrElse(args, 0);
+    auto amount = getInt(args, 0);
     auto creatureToTakeFrom = getCreature(game, args, 1, ctx);
-    auto destroy = getBoolOrElse(args, 2);
+    auto destroy = getBoolOrElse(args, 2, false);
 
     if (creatureToTakeFrom) {
         creatureToTakeFrom->takeGold(amount);
@@ -1415,7 +1434,7 @@ Variable getPlotFlag(Game &game, const vector<Variable> &args, ExecutionContext 
 
 Variable setPlotFlag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto target = getObject(game, args, 0, ctx);
-    bool plotFlag = getBoolOrElse(args, 1);
+    bool plotFlag = getBool(args, 1);
 
     target->setPlotFlag(plotFlag);
 
@@ -1499,9 +1518,9 @@ Variable duplicateHeadAppearance(Game &game, const vector<Variable> &args, Execu
 Variable cutsceneAttack(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto caller = getCallerAsCreature(game, ctx);
     auto target = getSpatialObject(game, args, 0, ctx);
-    int animation = getIntOrElse(args, 1);
+    int animation = getInt(args, 1);
     auto attackResult = getEnum<AttackResultType>(args, 2);
-    int damage = getIntOrElse(args, 3);
+    int damage = getInt(args, 3);
 
     game.services().combat().addAttack(caller, target, nullptr, attackResult, damage);
 
@@ -1529,8 +1548,14 @@ Variable enableVideoEffect(Game &game, const vector<Variable> &args, ExecutionCo
 }
 
 Variable startNewModule(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string moduleName(boost::to_lower_copy(getStringOrElse(args, 0)));
+    string moduleName(boost::to_lower_copy(getString(args, 0)));
     string waypoint(boost::to_lower_copy(getStringOrElse(args, 1, "")));
+    string movie1(boost::to_lower_copy(getStringOrElse(args, 2, "")));
+    string movie2(boost::to_lower_copy(getStringOrElse(args, 3, "")));
+    string movie3(boost::to_lower_copy(getStringOrElse(args, 4, "")));
+    string movie4(boost::to_lower_copy(getStringOrElse(args, 5, "")));
+    string movie5(boost::to_lower_copy(getStringOrElse(args, 6, "")));
+    string movie6(boost::to_lower_copy(getStringOrElse(args, 7, "")));
 
     game.scheduleModuleTransition(moduleName, waypoint);
 
@@ -1755,13 +1780,15 @@ Variable getStrRefSoundDuration(Game &game, const vector<Variable> &args, Execut
 }
 
 Variable getGlobalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getStringOrElse(args, 0));
-    return Variable::ofInt(static_cast<int>(game.getGlobalBoolean(id)));
+    string id(getString(args, 0));
+    bool value = game.getGlobalBoolean(id);
+
+    return Variable::ofInt(static_cast<int>(value));
 }
 
 Variable setGlobalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getStringOrElse(args, 0));
-    bool value = getBoolOrElse(args, 1);
+    string id(getString(args, 0));
+    bool value = getBool(args, 1);
 
     game.setGlobalBoolean(id, value);
 
@@ -1769,13 +1796,15 @@ Variable setGlobalBoolean(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable getGlobalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getStringOrElse(args, 0));
-    return Variable::ofInt(game.getGlobalNumber(id));
+    string id(getString(args, 0));
+    int value = game.getGlobalNumber(id);
+
+    return Variable::ofInt(value);
 }
 
 Variable setGlobalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getStringOrElse(args, 0));
-    int value = getIntOrElse(args, 1);
+    string id(getString(args, 0));
+    int value = getInt(args, 1);
 
     game.setGlobalNumber(id, value);
 
@@ -1816,15 +1845,16 @@ Variable setJournalQuestEntryPicture(Game &game, const vector<Variable> &args, E
 
 Variable getLocalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto object = getObject(game, args, 0, ctx);
-    int index = getIntOrElse(args, 1);
+    int index = getInt(args, 1);
+    bool value = object->getLocalBoolean(index);
 
-    return Variable::ofInt(static_cast<int>(object->getLocalBoolean(index)));
+    return Variable::ofInt(static_cast<int>(value));
 }
 
 Variable setLocalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto object = getObject(game, args, 0, ctx);
-    int index = getIntOrElse(args, 1);
-    bool value = getBoolOrElse(args, 2);
+    int index = getInt(args, 1);
+    bool value = getBool(args, 2);
 
     object->setLocalBoolean(index, value);
 
@@ -1833,15 +1863,15 @@ Variable setLocalBoolean(Game &game, const vector<Variable> &args, ExecutionCont
 
 Variable getLocalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto object = getObject(game, args, 0, ctx);
-    int index = getIntOrElse(args, 1);
+    int index = getInt(args, 1);
 
     return Variable::ofInt(object->getLocalNumber(index));
 }
 
 Variable setLocalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto object = getObject(game, args, 0, ctx);
-    int index = getIntOrElse(args, 1);
-    int value = getIntOrElse(args, 2);
+    int index = getInt(args, 1);
+    int value = getInt(args, 2);
 
     object->setLocalNumber(index, value);
 
@@ -1849,12 +1879,14 @@ Variable setLocalNumber(Game &game, const vector<Variable> &args, ExecutionConte
 }
 
 Variable getGlobalLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getStringOrElse(args, 0));
-    return Variable::ofLocation(game.getGlobalLocation(id));
+    string id(getString(args, 0));
+    auto value = game.getGlobalLocation(id);
+
+    return Variable::ofLocation(move(value));
 }
 
 Variable setGlobalLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string id(getStringOrElse(args, 0));
+    string id(getString(args, 0));
     auto value = getLocationEngineType(args, 1);
 
     game.setGlobalLocation(id, value);
@@ -1905,8 +1937,8 @@ Variable getLastConversation(Game &game, const vector<Variable> &args, Execution
 
 Variable showPartySelectionGUI(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string exitScript(boost::to_lower_copy(getStringOrElse(args, 0, "")));
-    int forceNpc1 = getIntOrElse(args, 1);
-    int forceNpc2 = getIntOrElse(args, 2);
+    int forceNpc1 = getIntOrElse(args, 1, -1);
+    int forceNpc2 = getIntOrElse(args, 2, -1);
 
     PartySelection::Context partyCtx;
     partyCtx.exitScript = move(exitScript);
@@ -1939,7 +1971,7 @@ Variable getMinOneHP(Game &game, const vector<Variable> &args, ExecutionContext 
 
 Variable setMinOneHP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto object = getObject(game, args, 0, ctx);
-    bool minOneHP = getBoolOrElse(args, 1);
+    bool minOneHP = getBool(args, 1);
 
     object->setMinOneHP(minOneHP);
 
@@ -2050,7 +2082,7 @@ Variable getSpellTarget(Game &game, const vector<Variable> &args, ExecutionConte
 }
 
 Variable setSoloMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto activate = getBoolOrElse(args, 0);
+    auto activate = getBool(args, 0);
     game.services().party().setSoloMode(activate);
     return Variable::ofNull();
 }
@@ -2061,7 +2093,7 @@ Variable cancelPostDialogCharacterSwitch(Game &game, const vector<Variable> &arg
 
 Variable setMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto object = getObject(game, args, 0, ctx);
-    int maxHP = getIntOrElse(args, 1);
+    int maxHP = getInt(args, 1);
 
     object->setMaxHitPoints(maxHP);
 

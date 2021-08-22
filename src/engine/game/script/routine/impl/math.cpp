@@ -36,79 +36,99 @@ namespace game {
 namespace routine {
 
 Variable fabs(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float value = getFloatOrElse(args, 0);
+    float value = getFloat(args, 0);
     return Variable::ofFloat(glm::abs(value));
 }
 
 Variable cos(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float value = glm::radians(getFloatOrElse(args, 0));
+    float value = getFloat(args, 0);
+    float result = glm::radians(value);
+
     return Variable::ofFloat(glm::cos(value));
 }
 
 Variable sin(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float value = glm::radians(getFloatOrElse(args, 0));
+    float value = getFloat(args, 0);
+    float result = glm::radians(value);
+
     return Variable::ofFloat(glm::sin(value));
 }
 
 Variable tan(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float value = glm::radians(getFloatOrElse(args, 0));
+    float value = getFloat(args, 0);
+    float result = glm::radians(value);
+
     return Variable::ofFloat(glm::tan(value));
 }
 
 Variable acos(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = getFloat(args, 0);
+
     float result = 0.0f;
-    float value = getFloatOrElse(args, 0);
     if (glm::abs(value) <= 1.0f) {
         result = glm::degrees(glm::acos(value));
     }
+
     return Variable::ofFloat(result);
 }
 
 Variable asin(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = getFloat(args, 0);
+
     float result = 0.0f;
-    float value = getFloatOrElse(args, 0);
     if (glm::abs(value) <= 1.0f) {
         result = glm::degrees(glm::asin(value));
     }
+
     return Variable::ofFloat(result);
 }
 
 Variable atan(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    float value = getFloatOrElse(args, 0);
-    return Variable::ofFloat(glm::degrees(glm::atan(value)));
+    float value = getFloat(args, 0);
+    float result = glm::degrees(glm::atan(value));
+
+    return Variable::ofFloat(result);
 }
 
 Variable log(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = getFloat(args, 0);
+
     float result = 0.0f;
-    float value = getFloatOrElse(args, 0);
     if (value > 0.0f) {
         result = glm::log(value);
     }
+
     return Variable::ofFloat(result);
 }
 
 Variable pow(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = getFloat(args, 0);
+    float exponent = getFloat(args, 1);
+
     float result = 0.0f;
-    float value = getFloatOrElse(args, 0);
-    float exponent = getFloatOrElse(args, 1);
     if (value != 0.0f || exponent >= 0.0f) {
         result = glm::pow(value, exponent);
     }
+
     return Variable::ofFloat(result);
 }
 
 Variable sqrt(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+    float value = getFloat(args, 0);
+
     float result = 0.0f;
-    float value = getFloatOrElse(args, 0);
     if (value >= 0.0f) {
         result = glm::sqrt(value);
     }
+
     return Variable::ofFloat(result);
 }
 
 Variable abs(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int value = getIntOrElse(args, 0);
-    return Variable::ofInt(glm::abs(value));
+    int value = getInt(args, 0);
+    int result = glm::abs(value);
+
+    return Variable::ofInt(result);
 }
 
 } // namespace routine

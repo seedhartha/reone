@@ -38,10 +38,10 @@ namespace game {
 namespace routine {
 
 Variable setTime(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    int hour = getIntOrElse(args, 0);
-    int minute = getIntOrElse(args, 1);
-    int second = getIntOrElse(args, 2);
-    int millisecond = getIntOrElse(args, 3);
+    int hour = getInt(args, 0);
+    int minute = getInt(args, 1);
+    int second = getInt(args, 2);
+    int millisecond = getInt(args, 3);
 
     game.module()->setTime(hour, minute, second, millisecond);
 
@@ -49,43 +49,51 @@ Variable setTime(Game &game, const vector<Variable> &args, ExecutionContext &ctx
 }
 
 Variable getTimeHour(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(game.module()->time().hour);
+    int result = game.module()->time().hour;
+    return Variable::ofInt(result);
 }
 
 Variable getTimeMinute(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(game.module()->time().minute);
+    int result = game.module()->time().minute;
+    return Variable::ofInt(result);
 }
 
 Variable getTimeSecond(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(game.module()->time().second);
+    int result = game.module()->time().second;
+    return Variable::ofInt(result);
 }
 
 Variable getTimeMillisecond(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(game.module()->time().millisecond);
+    int result = game.module()->time().millisecond;
+    return Variable::ofInt(result);
 }
 
 Variable getIsDay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Module> module(game.module());
-    const Module::Time &time = module->time();
-    return Variable::ofInt(static_cast<int>(time.hour > module->info().dawnHour && time.hour < module->info().duskHour));
+    bool result = module->time().hour > module->info().dawnHour && module->time().hour < module->info().duskHour;
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable getIsNight(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Module> module(game.module());
-    const Module::Time &time = module->time();
-    return Variable::ofInt(static_cast<int>(time.hour < module->info().dawnHour || time.hour > module->info().duskHour));
+    bool result = module->time().hour < module->info().dawnHour || module->time().hour > module->info().duskHour;
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable getIsDawn(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Module> module(game.module());
-    const Module::Time &time = module->time();
-    return Variable::ofInt(static_cast<int>(time.hour == module->info().dawnHour));
+    bool result = module->time().hour == module->info().dawnHour;
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable getIsDusk(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     shared_ptr<Module> module(game.module());
-    const Module::Time &time = module->time();
-    return Variable::ofInt(static_cast<int>(time.hour == module->info().duskHour));
+    bool result = module->time().hour == module->info().duskHour;
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 } // namespace routine
