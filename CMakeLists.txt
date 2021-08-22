@@ -389,9 +389,7 @@ target_precompile_headers(libgui PRIVATE src/engine/pch.h)
 
 set(SCRIPT_HEADERS
     src/engine/script/enginetype.h
-    src/engine/script/exception/invalidarg.h
-    src/engine/script/exception/invalidcaller.h
-    src/engine/script/exception/invalidtriggerrer.h
+    src/engine/script/exception/invfailed.h
     src/engine/script/exception/notimpl.h
     src/engine/script/execution.h
     src/engine/script/executioncontext.h

@@ -17,9 +17,7 @@
 
 #include "argutil.h"
 
-#include "../../../../script/exception/invalidarg.h"
-#include "../../../../script/exception/invalidcaller.h"
-#include "../../../../script/exception/invalidtriggerrer.h"
+#include "../../../../script/exception/invfailed.h"
 #include "../../../../script/variable.h"
 
 #include "../../../effect/effect.h"
@@ -62,7 +60,7 @@ glm::vec3 getVectorOrElse(const vector<Variable> &args, int index, glm::vec3 def
 shared_ptr<Object> getCaller(Game &game, ExecutionContext &ctx) {
     shared_ptr<Object> result(game.getObjectById(ctx.callerId));
     if (!result) {
-        throw InvalidCallerException("Caller is not a valid object");
+        throw InvocationFailedException("Caller is not a valid object");
     }
     return move(result);
 }
@@ -71,7 +69,7 @@ shared_ptr<SpatialObject> getCallerAsSpatial(Game &game, ExecutionContext &ctx) 
     shared_ptr<Object> caller(getCaller(game, ctx));
     shared_ptr<SpatialObject> spatial(dynamic_pointer_cast<SpatialObject>(caller));
     if (!spatial) {
-        throw InvalidCallerException("Caller is not a valid spatial object");
+        throw InvocationFailedException("Caller is not a valid spatial object");
     }
     return move(spatial);
 }
@@ -80,7 +78,7 @@ shared_ptr<Creature> getCallerAsCreature(Game &game, ExecutionContext &ctx) {
     shared_ptr<Object> caller(getCaller(game, ctx));
     shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(caller));
     if (!creature) {
-        throw InvalidCallerException("Caller is not a valid creature");
+        throw InvocationFailedException("Caller is not a valid creature");
     }
     return move(creature);
 }
@@ -88,14 +86,14 @@ shared_ptr<Creature> getCallerAsCreature(Game &game, ExecutionContext &ctx) {
 shared_ptr<Object> getTriggerrer(Game &game, ExecutionContext &ctx) {
     shared_ptr<Object> result(game.getObjectById(ctx.triggererId));
     if (!result) {
-        throw InvalidTriggerrerException("Triggerrer is not a valid object");
+        throw InvocationFailedException("Triggerrer is not a valid object");
     }
     return move(result);
 }
 
 shared_ptr<Object> getObject(Game &game, const vector<Variable> &args, int index, ExecutionContext &ctx) {
     if (isOutOfRange(args, index)) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is out of range") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is out of range") % index));
     }
     uint32_t objectId = args[index].objectId;
     if (objectId == kObjectSelf) {
@@ -103,7 +101,7 @@ shared_ptr<Object> getObject(Game &game, const vector<Variable> &args, int index
     }
     shared_ptr<Object> result(game.getObjectById(objectId));
     if (!result) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is not a valid object") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is not a valid object") % index));
     }
     return move(result);
 }
@@ -118,7 +116,7 @@ shared_ptr<Object> getObjectOrCaller(Game &game, const vector<Variable> &args, i
     }
     shared_ptr<Object> result(game.getObjectById(objectId));
     if (!result) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is not a valid object") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is not a valid object") % index));
     }
     return move(result);
 }
@@ -127,7 +125,7 @@ shared_ptr<SpatialObject> getSpatialObject(Game &game, const vector<Variable> &a
     shared_ptr<Object> object(getObject(game, args, index, ctx));
     shared_ptr<SpatialObject> spatial(dynamic_pointer_cast<SpatialObject>(object));
     if (!spatial) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is not a valid spatial object") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is not a valid spatial object") % index));
     }
     return move(spatial);
 }
@@ -136,7 +134,7 @@ shared_ptr<SpatialObject> getSpatialObjectOrCaller(Game &game, const vector<Vari
     shared_ptr<Object> object(getObjectOrCaller(game, args, index, ctx));
     shared_ptr<SpatialObject> spatial(dynamic_pointer_cast<SpatialObject>(object));
     if (!spatial) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is not a valid spatial object") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is not a valid spatial object") % index));
     }
     return move(spatial);
 }
@@ -145,7 +143,7 @@ shared_ptr<Creature> getCreature(Game &game, const vector<Variable> &args, int i
     shared_ptr<Object> object(getObject(game, args, index, ctx));
     shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(object));
     if (!creature) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is not a valid creature") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is not a valid creature") % index));
     }
     return move(creature);
 }
@@ -154,7 +152,7 @@ shared_ptr<Creature> getCreatureOrCaller(Game &game, const vector<Variable> &arg
     shared_ptr<Object> object(getObjectOrCaller(game, args, index, ctx));
     shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(object));
     if (!creature) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is not a valid creature") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is not a valid creature") % index));
     }
     return move(creature);
 }
@@ -163,7 +161,7 @@ shared_ptr<Door> getDoor(Game &game, const vector<Variable> &args, int index, Ex
     shared_ptr<Object> object(getObject(game, args, index, ctx));
     shared_ptr<Door> door(dynamic_pointer_cast<Door>(object));
     if (!door) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is not a valid door") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is not a valid door") % index));
     }
     return move(door);
 }
@@ -172,7 +170,7 @@ shared_ptr<Item> getItem(Game &game, const vector<Variable> &args, int index, Ex
     shared_ptr<Object> object(getObject(game, args, index, ctx));
     shared_ptr<Item> item(dynamic_pointer_cast<Item>(object));
     if (!item) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is not a valid item") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is not a valid item") % index));
     }
     return move(item);
 }
@@ -181,51 +179,51 @@ shared_ptr<Sound> getSound(Game &game, const vector<Variable> &args, int index, 
     shared_ptr<Object> object(getObject(game, args, index, ctx));
     shared_ptr<Sound> sound(dynamic_pointer_cast<Sound>(object));
     if (!sound) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is not a valid sound") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is not a valid sound") % index));
     }
     return move(sound);
 }
 
 shared_ptr<Effect> getEffect(const vector<Variable> &args, int index) {
     if (isOutOfRange(args, index)) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is out of range") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is out of range") % index));
     }
     shared_ptr<Effect> result(dynamic_pointer_cast<Effect>(args[index].engineType));
     if (!result) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is not a valid effect") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is not a valid effect") % index));
     }
     return move(result);
 }
 
 shared_ptr<Event> getEvent(const vector<Variable> &args, int index) {
     if (isOutOfRange(args, index)) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is out of range") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is out of range") % index));
     }
     shared_ptr<Event> result(dynamic_pointer_cast<Event>(args[index].engineType));
     if (!result) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is not a valid event") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is not a valid event") % index));
     }
     return move(result);
 }
 
 shared_ptr<Location> getLocationEngineType(const vector<Variable> &args, int index) {
     if (isOutOfRange(args, index)) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is out of range") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is out of range") % index));
     }
     shared_ptr<Location> result(dynamic_pointer_cast<Location>(args[index].engineType));
     if (!result) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is not a valid location") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is not a valid location") % index));
     }
     return move(result);
 }
 
 shared_ptr<Talent> getTalent(const vector<Variable> &args, int index) {
     if (isOutOfRange(args, index)) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is out of range") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is out of range") % index));
     }
     shared_ptr<Talent> result(dynamic_pointer_cast<Talent>(args[index].engineType));
     if (!result) {
-        throw InvalidArgumentException(str(boost::format("Argument %d is not a valid talent") % index));
+        throw InvocationFailedException(str(boost::format("Argument %d is not a valid talent") % index));
     }
     return move(result);
 }

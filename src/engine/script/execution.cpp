@@ -117,7 +117,13 @@ int ScriptExecution::run() {
         if (getDebugLogLevel() >= 2) {
             debug(boost::format("Script: instruction: %s") % describeInstruction(ins), 3, DebugChannels::script);
         }
-        handler->second(ins);
+        try {
+            handler->second(ins);
+        }
+        catch (const exception &ex) {
+            debug(boost::format("Script: halt '%s'") % _program->name(), 1, DebugChannels::script);
+            return -1;
+        }
 
         insOff = _nextInstruction;
     }

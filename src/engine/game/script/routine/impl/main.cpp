@@ -22,6 +22,7 @@
 #include "declarations.h"
 
 #include "../../../../common/log.h"
+#include "../../../../script/exception/invfailed.h"
 #include "../../../../script/exception/notimpl.h"
 
 #include "../../../game.h"
@@ -42,7 +43,7 @@ namespace game {
 
 namespace routine {
 
-constexpr bool g_shipBuild = true;
+static constexpr bool kShipBuild = true;
 
 Variable assignCommand(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto subject = getObject(game, args, 0, ctx);
@@ -127,7 +128,7 @@ Variable getFacing(Game &game, const vector<Variable> &args, ExecutionContext &c
         auto target = getSpatialObject(game, args, 0, ctx);
         return Variable::ofFloat(glm::degrees(target->getFacing()));
     }
-    catch (const logic_error &) {
+    catch (const InvocationFailedException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
@@ -195,7 +196,7 @@ Variable getDistanceToObject(Game &game, const vector<Variable> &args, Execution
         auto object = getSpatialObject(game, args, 0, ctx);
         return Variable::ofFloat(caller->getDistanceTo(*object));
     }
-    catch (const logic_error &) {
+    catch (const InvocationFailedException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
@@ -301,7 +302,7 @@ Variable getRacialType(Game &game, const vector<Variable> &args, ExecutionContex
         auto creature = getCreature(game, args, 0, ctx);
         return Variable::ofInt(static_cast<int>(creature->racialType()));
     }
-    catch (const logic_error &) {
+    catch (const InvocationFailedException &) {
         return Variable::ofInt(static_cast<int>(RacialType::Invalid));
     }
 }
@@ -646,7 +647,7 @@ Variable getFacingFromLocation(Game &game, const vector<Variable> &args, Executi
         auto location = getLocationEngineType(args, 0);
         return Variable::ofFloat(glm::degrees(location->facing()));
     }
-    catch (const logic_error &) {
+    catch (const InvocationFailedException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
@@ -1061,7 +1062,7 @@ Variable getDistanceToObject2D(Game &game, const vector<Variable> &args, Executi
         auto object = getSpatialObject(game, args, 0, ctx);
         return Variable::ofFloat(caller->getDistanceTo(glm::vec2(object->position())));
     }
-    catch (const logic_error &) {
+    catch (const InvocationFailedException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
@@ -1098,7 +1099,7 @@ Variable getClassByPosition(Game &game, const vector<Variable> &args, ExecutionC
         auto creature = getCreatureOrCaller(game, args, 1, ctx);
         return Variable::ofInt(static_cast<int>(creature->attributes().getClassByPosition(position)));
     }
-    catch (const logic_error &) {
+    catch (const InvocationFailedException &) {
         return Variable::ofInt(static_cast<int>(ClassType::Invalid));
     }
 }
@@ -1486,7 +1487,7 @@ Variable getSubRace(Game &game, const vector<Variable> &args, ExecutionContext &
         auto creature = getCreature(game, args, 0, ctx);
         return Variable::ofInt(static_cast<int>(creature->subrace()));
     }
-    catch (const logic_error &) {
+    catch (const InvocationFailedException &) {
         return Variable::ofInt(static_cast<int>(Subrace::None));
     }
 }
@@ -1870,7 +1871,7 @@ Variable getNPCAIStyle(Game &game, const vector<Variable> &args, ExecutionContex
         auto creature = getCreature(game, args, 0, ctx);
         return Variable::ofInt(static_cast<int>(creature->aiStyle()));
     }
-    catch (const logic_error &) {
+    catch (const InvocationFailedException &) {
         return Variable::ofInt(static_cast<int>(NPCAIStyle::DefaultAttack));
     }
 }
@@ -1922,7 +1923,7 @@ Variable getStandardFaction(Game &game, const vector<Variable> &args, ExecutionC
         auto object = getCreature(game, args, 0, ctx);
         return Variable::ofInt(static_cast<int>(object->faction()));
     }
-    catch (const logic_error &) {
+    catch (const InvocationFailedException &) {
         return Variable::ofInt(static_cast<int>(Faction::Invalid));
     }
 }
@@ -2076,7 +2077,7 @@ Variable holdWorldFadeInForDialog(Game &game, const vector<Variable> &args, Exec
 }
 
 Variable shipBuild(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<int>(g_shipBuild));
+    return Variable::ofInt(static_cast<int>(kShipBuild));
 }
 
 Variable surrenderRetainBuffs(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
