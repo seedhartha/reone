@@ -691,6 +691,7 @@ set(GAME_SOURCES
     src/engine/game/script/routine/impl/log.cpp
     src/engine/game/script/routine/impl/main.cpp
     src/engine/game/script/routine/impl/math.cpp
+    src/engine/game/script/routine/impl/minigame.cpp
     src/engine/game/script/routine/impl/movie.cpp
     src/engine/game/script/routine/impl/music.cpp
     src/engine/game/script/routine/impl/party.cpp
