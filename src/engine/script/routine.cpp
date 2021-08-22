@@ -18,9 +18,7 @@
 #include "routine.h"
 
 #include "../common/log.h"
-#include "../script/exception/invalidarg.h"
-#include "../script/exception/invalidcaller.h"
-#include "../script/exception/invalidtriggerrer.h"
+#include "../script/exception/invfailed.h"
 #include "../script/exception/notimpl.h"
 
 #include "variable.h"
@@ -44,31 +42,17 @@ Routine::Routine(
 }
 
 Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) const {
-    if (_func) {
-        try {
-            return move(_func(args, ctx));
-        }
-        catch (const NotImplementedException &) {
-            debug("Script: routine not implemented: " + _name, 2, DebugChannels::script);
-        }
-        catch (const InvalidArgumentException &ex) {
-            debug(boost::format("Script: routine '%s' invocation failed: %s") % _name % ex.what(), 2, DebugChannels::script);
-        }
-        catch (const InvalidCallerException &ex) {
-            debug(boost::format("Script: routine '%s' invocation failed: %s") % _name % ex.what(), 2, DebugChannels::script);
-        }
-        catch (const InvalidTriggerrerException &ex) {
-            debug(boost::format("Script: routine '%s' invocation failed: %s") % _name % ex.what(), 2, DebugChannels::script);
-        }
+    try {
+        return _func(args, ctx);
     }
-
-    Variable result;
-    result.type = _returnType;
-    if (result.type == VariableType::Object) {
-        result.objectId = kObjectInvalid;
+    catch (const NotImplementedException &ex) {
+        error("Script: routine not implemented: " + _name);
+        throw ex;
     }
-
-    return move(result);
+    catch (const InvocationFailedException &ex) {
+        error(boost::format("Script: routine '%s' invocation failed: %s") % _name % ex.what());
+        throw ex;
+    }
 }
 
 int Routine::getArgumentCount() const {
