@@ -21,6 +21,7 @@
 
 #include "declarations.h"
 
+#include "../../../../script/exception/notimplemented.h"
 #include "../../../../script/types.h"
 
 #include "../../../game.h"
@@ -44,15 +45,15 @@ Variable playMovie(Game &game, const vector<Variable> &args, ExecutionContext &c
 }
 
 Variable isMoviePlaying(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable queueMovie(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable playMovieQueue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 } // namespace routine

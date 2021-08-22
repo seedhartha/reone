@@ -18,6 +18,7 @@
 #include "routine.h"
 
 #include "../common/log.h"
+#include "../script/exception/notimplemented.h"
 
 #include "variable.h"
 
@@ -46,17 +47,22 @@ Routine::Routine(
 }
 
 Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) const {
-    auto result = Variable::notImplemented();
+    Variable result;
+
     if (_func) {
-        result = _func(args, ctx);
-    }
-    if (result.type == VariableType::NotImplemented) {
-        debug("Routine not implemented: " + _name, 2, DebugChannels::script);
-        result.type = _returnType;
-        if (_returnType == VariableType::Object) {
-            result.objectId = kObjectInvalid;
+        try {
+            return move(_func(args, ctx));
+        }
+        catch (NotImplementedException) {
         }
     }
+
+    debug("Script: routine not implemented: " + _name, 2, DebugChannels::script);
+    result.type = _returnType;
+    if (result.type == VariableType::Object) {
+        result.objectId = kObjectInvalid;
+    }
+
     return move(result);
 }
 

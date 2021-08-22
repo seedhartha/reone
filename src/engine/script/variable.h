@@ -53,7 +53,6 @@ struct Variable {
     static Variable ofLocation(std::shared_ptr<EngineType> engineType);
     static Variable ofTalent(std::shared_ptr<EngineType> engineType);
     static Variable ofAction(std::shared_ptr<ExecutionContext> context);
-    static Variable notImplemented();
 
     Variable operator+(const Variable &other) const;
     Variable operator-(const Variable &other) const;

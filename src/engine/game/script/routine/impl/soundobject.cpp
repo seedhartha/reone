@@ -22,6 +22,7 @@
 #include "declarations.h"
 
 #include "../../../../common/log.h"
+#include "../../../../script/exception/notimplemented.h"
 #include "../../../../script/types.h"
 
 #include "../../../object/sound.h"
@@ -39,11 +40,11 @@ namespace game {
 namespace routine {
 
 Variable soundObjectSetFixedVariance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable soundObjectGetFixedVariance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable soundObjectPlay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -67,27 +68,27 @@ Variable soundObjectStop(Game &game, const vector<Variable> &args, ExecutionCont
 }
 
 Variable soundObjectSetVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable soundObjectSetPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable soundObjectGetPitchVariance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable soundObjectSetPitchVariance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable soundObjectGetVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable soundObjectFadeAndStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 } // namespace routine

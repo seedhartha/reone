@@ -21,6 +21,7 @@
 
 #include "declarations.h"
 
+#include "../../../../script/exception/notimplemented.h"
 #include "../../../../script/types.h"
 
 #include "../../../game.h"
@@ -58,7 +59,7 @@ Variable setCurrentStealthXP(Game &game, const vector<Variable> &args, Execution
 }
 
 Variable awardStealthXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable getStealthXPEnabled(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {

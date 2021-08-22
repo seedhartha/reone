@@ -21,6 +21,8 @@
 
 #include "declarations.h"
 
+#include "../../../../script/exception/notimplemented.h"
+
 using namespace std;
 
 using namespace reone::script;
@@ -32,27 +34,27 @@ namespace game {
 namespace routine {
 
 Variable ambientSoundPlay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable ambientSoundStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable ambientSoundChangeDay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable ambientSoundChangeNight(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable ambientSoundSetDayVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable ambientSoundSetNightVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 } // namespace routine

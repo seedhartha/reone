@@ -21,6 +21,7 @@
 
 #include "declarations.h"
 
+#include "../../../../script/exception/notimplemented.h"
 #include "../../../../script/types.h"
 
 #include "argutil.h"
@@ -51,11 +52,11 @@ Variable vectorCreate(Game &game, const vector<Variable> &args, ExecutionContext
 }
 
 Variable angleToVector(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable vectorToAngle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 } // namespace routine
