@@ -21,6 +21,7 @@
 
 #include "declarations.h"
 
+#include "../../../../script/exception/notimplemented.h"
 #include "../../../../script/types.h"
 
 #include "argutil.h"
@@ -95,15 +96,15 @@ Variable findSubString(Game &game, const vector<Variable> &args, ExecutionContex
 }
 
 Variable testStringAgainstPattern(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable getMatchedSubstring(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable getMatchedSubstringsCount(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 } // namespace routine

@@ -22,6 +22,7 @@
 #include "declarations.h"
 
 #include "../../../../common/log.h"
+#include "../../../../script/exception/notimplemented.h"
 
 #include "../../../event.h"
 #include "../../../game.h"
@@ -61,15 +62,15 @@ Variable eventUserDefined(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable eventSpellCastAt(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable eventConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable eventActivateItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 } // namespace routine

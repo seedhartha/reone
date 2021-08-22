@@ -22,6 +22,7 @@
 #include "declarations.h"
 
 #include "../../../../common/log.h"
+#include "../../../../script/exception/notimplemented.h"
 
 #include "../../../object/object.h"
 
@@ -73,11 +74,11 @@ Variable printVector(Game &game, const vector<Variable> &args, ExecutionContext 
 }
 
 Variable writeTimestampedLogEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable aurPostString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 } // namespace routine

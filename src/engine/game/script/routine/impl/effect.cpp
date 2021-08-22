@@ -21,6 +21,8 @@
 
 #include "declarations.h"
 
+#include "../../../../script/exception/notimplemented.h"
+
 #include "../../../game.h"
 #include "../../../effect/effect.h"
 #include "../../../types.h"
@@ -66,31 +68,31 @@ Variable effectResurrection(Game &game, const vector<Variable> &args, ExecutionC
 }
 
 Variable getIsEffectValid(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable getEffectDurationType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable getEffectSubType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable getEffectCreator(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable magicalEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable supernaturalEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable extraordinaryEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable effectACIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -189,7 +191,7 @@ Variable effectMovementSpeedIncrease(Game &game, const vector<Variable> &args, E
 }
 
 Variable getEffectType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable effectAreaOfEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -248,7 +250,7 @@ Variable effectImmunity(Game &game, const vector<Variable> &args, ExecutionConte
 }
 
 Variable getEffectSpellId(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable effectDamageImmunityIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -267,15 +269,15 @@ Variable effectSkillIncrease(Game &game, const vector<Variable> &args, Execution
 }
 
 Variable versusAlignmentEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable versusRacialTypeEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable versusTrapEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable effectDamageForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -439,7 +441,7 @@ Variable effectDamageShield(Game &game, const vector<Variable> &args, ExecutionC
 }
 
 Variable setEffectIcon(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable effectForceDrain(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {

@@ -110,9 +110,7 @@ enum class VariableType {
     Event,
     Location,
     Talent,
-    Action,
-
-    NotImplemented // used to return default values from placeholder routines
+    Action
 };
 
 } // namespace script

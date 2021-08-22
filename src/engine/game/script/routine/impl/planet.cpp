@@ -21,6 +21,7 @@
 
 #include "declarations.h"
 
+#include "../../../../script/exception/notimplemented.h"
 #include "../../../../script/types.h"
 
 using namespace std;
@@ -34,23 +35,23 @@ namespace game {
 namespace routine {
 
 Variable setPlanetSelectable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable getPlanetSelectable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable setPlanetAvailable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable getPlanetAvailable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable getSelectedPlanet(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 } // namespace routine

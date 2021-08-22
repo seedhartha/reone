@@ -23,6 +23,7 @@
 
 #include "../../../../common/log.h"
 #include "../../../../common/random.h"
+#include "../../../../script/exception/notimplemented.h"
 #include "../../../../script/types.h"
 
 #include "../../../game.h"
@@ -51,11 +52,11 @@ Variable getPartyMemberCount(Game &game, const vector<Variable> &args, Execution
 }
 
 Variable addToParty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable removeFromParty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable addPartyMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -109,7 +110,7 @@ Variable getPartyMemberByIndex(Game &game, const vector<Variable> &args, Executi
 }
 
 Variable addAvailableNPCByObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable removeAvailableNPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -134,7 +135,7 @@ Variable addAvailableNPCByTemplate(Game &game, const vector<Variable> &args, Exe
 }
 
 Variable spawnAvailableNPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable isNPCPartyMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -144,51 +145,51 @@ Variable isNPCPartyMember(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable getPartyAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable setPartyAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable saveNPCState(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable setAvailableNPCId(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable addAvailablePUPByTemplate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable addAvailablePUPByObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable assignPUP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable spawnAvailablePUP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable addPartyPuppet(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable getPUPOwner(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable getIsPuppet(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable getIsPartyLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable getPartyLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -197,19 +198,19 @@ Variable getPartyLeader(Game &game, const vector<Variable> &args, ExecutionConte
 }
 
 Variable removeNPCFromPartyToBase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable saveNPCByObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable savePUPByObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 Variable rebuildPartyTable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::notImplemented();
+    throw NotImplementedException();
 }
 
 } // namespace routine
