@@ -41,7 +41,7 @@ namespace routine {
 Variable printString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     string str(getString(args, 0));
     info(str);
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable printFloat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -52,25 +52,25 @@ Variable printFloat(Game &game, const vector<Variable> &args, ExecutionContext &
 
     info(to_string(value));
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable printInteger(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int value = getInt(args, 0);
     info(to_string(value));
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable printObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto object = getObject(game, args, 0, ctx);
     info(to_string(object->id()));
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable printVector(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     glm::vec3 value(getVector(args, 0));
     info(boost::format("%f %f %f") % value.x % value.y % value.z);
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable writeTimestampedLogEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {

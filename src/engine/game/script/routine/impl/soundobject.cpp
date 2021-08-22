@@ -54,7 +54,7 @@ Variable soundObjectPlay(Game &game, const vector<Variable> &args, ExecutionCont
     } else {
         debug("Script: soundObjectPlay: sound is invalid", 1, DebugChannels::script);
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable soundObjectStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -64,7 +64,7 @@ Variable soundObjectStop(Game &game, const vector<Variable> &args, ExecutionCont
     } else {
         debug("Script: soundObjectStop: sound is invalid", 1, DebugChannels::script);
     }
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable soundObjectSetVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {

@@ -47,8 +47,6 @@ Routine::Routine(
 }
 
 Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) const {
-    Variable result;
-
     if (_func) {
         try {
             return move(_func(args, ctx));
@@ -58,6 +56,8 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
     }
 
     debug("Script: routine not implemented: " + _name, 2, DebugChannels::script);
+
+    Variable result;
     result.type = _returnType;
     if (result.type == VariableType::Object) {
         result.objectId = kObjectInvalid;

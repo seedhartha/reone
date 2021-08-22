@@ -96,6 +96,12 @@ Variable Variable::operator/(const Variable &other) const {
     throw logic_error(str(boost::format("Unsupported variable types: %02x %02x") % static_cast<int>(type) % static_cast<int>(other.type)));
 }
 
+Variable Variable::ofNull() {
+    Variable result;
+    result.type = VariableType::Void;
+    return move(result);
+}
+
 Variable Variable::ofInt(int value) {
     Variable result;
     result.type = VariableType::Int;

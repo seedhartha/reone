@@ -52,7 +52,7 @@ Variable signalEvent(Game &game, const vector<Variable> &args, ExecutionContext 
         debug("Script: signalEvent: toRun is invalid", 1, DebugChannels::script);
     }
 
-    return Variable();
+    return Variable::ofNull();
 }
 
 Variable eventUserDefined(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
