@@ -21,8 +21,13 @@
 
 #include "declarations.h"
 
+#include "../../../../script/exception/argument.h"
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/types.h"
+
+#include "../../../talent.h"
+
+#include "argutil.h"
 
 using namespace std;
 
@@ -35,23 +40,46 @@ namespace game {
 namespace routine {
 
 Variable talentSpell(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    int spell = getInt(args, 0);
+    auto talent = make_shared<Talent>(TalentType::Spell, spell);
+
+    return Variable::ofTalent(move(talent));
 }
 
 Variable talentFeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    int feat = getInt(args, 0);
+    auto talent = make_shared<Talent>(TalentType::Feat, feat);
+
+    return Variable::ofTalent(move(talent));
 }
 
 Variable talentSkill(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    int skill = getInt(args, 0);
+    auto talent = make_shared<Talent>(TalentType::Skill, skill);
+
+    return Variable::ofTalent(move(talent));
 }
 
 Variable getIsTalentValid(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    try {
+        auto talent = getTalent(args, 0);
+        return Variable::ofInt(1);
+    }
+    catch (const ArgumentException &) {
+        return Variable::ofInt(0);
+    }
 }
 
 Variable getTypeFromTalent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    try {
+        auto talent = getTalent(args, 0);
+        auto type = talent->type();
+
+        return Variable::ofInt(static_cast<int>(type));
+    }
+    catch (const ArgumentException &) {
+        return Variable::ofInt(static_cast<int>(TalentType::Invalid));
+    }
 }
 
 Variable getIdFromTalent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
