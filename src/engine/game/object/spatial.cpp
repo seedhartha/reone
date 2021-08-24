@@ -299,6 +299,20 @@ void SpatialObject::stopStuntMode() {
     _stunt = false;
 }
 
+shared_ptr<Effect> SpatialObject::getFirstEffect() {
+    _effectIndex = 1;
+
+    if (_effects.empty()) return nullptr;
+
+    return _effects.front().effect;
+}
+
+shared_ptr<Effect> SpatialObject::getNextEffect() {
+    if (_effects.size() <= _effectIndex) return nullptr;
+
+    return _effects[_effectIndex++].effect;
+}
+
 } // namespace game
 
 } // namespace reone

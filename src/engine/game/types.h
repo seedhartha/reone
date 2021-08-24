@@ -978,6 +978,14 @@ enum class SubSkill {
     ExamineTrap = 102
 };
 
+enum class TalentType {
+    Force = 0,
+    Spell = 0,
+    Feat = 1,
+    Skill = 2,
+    Invalid = 3
+};
+
 struct InventorySlot {
     static constexpr int head = 0;
     static constexpr int body = 1;

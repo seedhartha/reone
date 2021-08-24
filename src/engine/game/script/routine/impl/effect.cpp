@@ -21,11 +21,14 @@
 
 #include "declarations.h"
 
+#include "../../../../script/exception/argument.h"
 #include "../../../../script/exception/notimpl.h"
 
 #include "../../../game.h"
 #include "../../../effect/effect.h"
 #include "../../../types.h"
+
+#include "argutil.h"
 
 using namespace std;
 
@@ -68,7 +71,13 @@ Variable effectResurrection(Game &game, const vector<Variable> &args, ExecutionC
 }
 
 Variable getIsEffectValid(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    try {
+        auto effect = getEffect(args, 0);
+        return Variable::ofInt(1);
+    }
+    catch (const ArgumentException &) {
+        return Variable::ofInt(0);
+    }
 }
 
 Variable getEffectDurationType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {

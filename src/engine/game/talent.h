@@ -19,13 +19,23 @@
 
 #include "../script/enginetype.h"
 
+#include "types.h"
+
 namespace reone {
 
 namespace game {
 
 class Talent : public script::EngineType  {
 public:
-    Talent() = default;
+    Talent(TalentType type, int value) : _type(type), _value(value) {
+    }
+
+    TalentType type() const { return _type; }
+    int value() const { return _value; }
+
+private:
+    TalentType _type;
+    int _value;
 };
 
 } // namespace game

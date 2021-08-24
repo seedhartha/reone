@@ -196,6 +196,7 @@ Variable getDistanceToObject(Game &game, const vector<Variable> &args, Execution
     try {
         auto caller = getCallerAsSpatial(game, ctx);
         auto object = getSpatialObject(game, args, 0, ctx);
+
         return Variable::ofFloat(caller->getDistanceTo(*object));
     }
     catch (const ArgumentException &) {
@@ -226,13 +227,27 @@ Variable getSpellTargetObject(Game &game, const vector<Variable> &args, Executio
 }
 
 Variable getCurrentHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObjectOrCaller(game, args, 0, ctx);
-    return Variable::ofInt(object->currentHitPoints());
+    try {
+        auto object = getObjectOrCaller(game, args, 0, ctx);
+        int hitPoints = object->currentHitPoints();
+
+        return Variable::ofInt(hitPoints);
+    }
+    catch (const ArgumentException &) {
+        return Variable::ofInt(0);
+    }
 }
 
 Variable getMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObjectOrCaller(game, args, 0, ctx);
-    return Variable::ofInt(object->maxHitPoints());
+    try {
+        auto object = getObjectOrCaller(game, args, 0, ctx);
+        int hitPoints = object->maxHitPoints();
+
+        return Variable::ofInt(hitPoints);
+    }
+    catch (const ArgumentException &) {
+        return Variable::ofInt(0);
+    }
 }
 
 Variable getLastItemEquipped(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -276,11 +291,13 @@ Variable getCasterLevel(Game &game, const vector<Variable> &args, ExecutionConte
 }
 
 Variable getFirstEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getCreature(game, args, 0, ctx);
+    return Variable::ofEffect(creature->getFirstEffect());
 }
 
 Variable getNextEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getCreature(game, args, 0, ctx);
+    return Variable::ofEffect(creature->getNextEffect());
 }
 
 Variable removeEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -365,8 +382,15 @@ Variable getAbilityScore(Game &game, const vector<Variable> &args, ExecutionCont
 }
 
 Variable getIsDead(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(creature->isDead()));
+    try {
+        auto creature = getCreature(game, args, 0, ctx);
+        bool dead = creature->isDead();
+
+        return Variable::ofInt(static_cast<int>(dead));
+    }
+    catch (const ArgumentException &) {
+        return Variable::ofInt(0);
+    }
 }
 
 Variable setFacingPoint(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -405,7 +429,7 @@ Variable getDistanceBetween(Game &game, const vector<Variable> &args, ExecutionC
 Variable setReturnStrref(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     bool show = getBool(args, 0);
     int strRef = getIntOrElse(args, 1, 0);
-    int returnQuerystrRef = getIntOrElse(args, 1, 0);
+    int returnQueryStrRef = getIntOrElse(args, 1, 0);
 
     // TODO: implement
 
@@ -747,24 +771,42 @@ Variable getNearestObjectByTag(Game &game, const vector<Variable> &args, Executi
 }
 
 Variable getIsEnemy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getCreature(game, args, 0, ctx);
-    auto source = getCreatureOrCaller(game, args, 1, ctx);
+    try {
+        auto target = getCreature(game, args, 0, ctx);
+        auto source = getCreatureOrCaller(game, args, 1, ctx);
+        bool enemy = game.services().reputes().getIsEnemy(*target, *source);
 
-    return Variable::ofInt(static_cast<int>(game.services().reputes().getIsEnemy(*target, *source)));
+        return Variable::ofInt(static_cast<int>(enemy));
+    }
+    catch (const ArgumentException &) {
+        return Variable::ofInt(0);
+    }
 }
 
 Variable getIsFriend(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getCreature(game, args, 0, ctx);
-    auto source = getCreatureOrCaller(game, args, 1, ctx);
+    try {
+        auto target = getCreature(game, args, 0, ctx);
+        auto source = getCreatureOrCaller(game, args, 1, ctx);
+        bool isFriend = game.services().reputes().getIsFriend(*target, *source);
 
-    return Variable::ofInt(static_cast<int>(game.services().reputes().getIsFriend(*target, *source)));
+        return Variable::ofInt(static_cast<int>(isFriend));
+    }
+    catch (const ArgumentException &) {
+        return Variable::ofInt(0);
+    }
 }
 
 Variable getIsNeutral(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getCreature(game, args, 0, ctx);
-    auto source = getCreatureOrCaller(game, args, 1, ctx);
+    try {
+        auto target = getCreature(game, args, 0, ctx);
+        auto source = getCreatureOrCaller(game, args, 1, ctx);
+        bool neutral = game.services().reputes().getIsNeutral(*target, *source);
 
-    return Variable::ofInt(static_cast<int>(game.services().reputes().getIsNeutral(*target, *source)));
+        return Variable::ofInt(static_cast<int>(neutral));
+    }
+    catch (const ArgumentException &) {
+        return Variable::ofInt(0);
+    }
 }
 
 Variable getPCSpeaker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -827,8 +869,13 @@ Variable getLoadFromSaveGame(Game &game, const vector<Variable> &args, Execution
 }
 
 Variable getName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
-    return Variable::ofString(object->name());
+    try {
+        auto object = getObject(game, args, 0, ctx);
+        return Variable::ofString(object->name());
+    }
+    catch (const ArgumentException &) {
+        return Variable::ofString("");
+    }
 }
 
 Variable getLastSpeaker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -876,8 +923,13 @@ Variable giveItem(Game &game, const vector<Variable> &args, ExecutionContext &ct
 }
 
 Variable objectToString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
-    return Variable::ofString(str(boost::format("%x") % object->id()));
+    try {
+        auto object = getObject(game, args, 0, ctx);
+        return Variable::ofString(str(boost::format("%x") % object->id()));
+    }
+    catch (const ArgumentException &) {
+        return Variable::ofString("");
+    }
 }
 
 Variable getIsImmune(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -953,15 +1005,40 @@ Variable getHasSpellEffect(Game &game, const vector<Variable> &args, ExecutionCo
 }
 
 Variable getCreatureHasTalent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    try {
+        auto talent = getTalent(args, 0);
+        auto creature = getCreatureOrCaller(game, args, 1, ctx);
+
+        // TODO: implement
+
+        return Variable::ofInt(0);
+    }
+    catch (const ArgumentException &) {
+        return Variable::ofInt(0);
+    }
 }
 
 Variable getCreatureTalentRandom(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    int category = getInt(args, 0);
+    auto creature = getCreatureOrCaller(game, args, 1, ctx);
+    int inclusion = getIntOrElse(args, 2, 0);
+
+    // TODO: implement
+
+    return Variable::ofTalent(nullptr);
 }
 
 Variable getCreatureTalentBest(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    throw NotImplementedException();
+    int category = getInt(args, 0);
+    int crMax = getInt(args, 1);
+    auto creature = getCreatureOrCaller(game, args, 2, ctx);
+    int inclusion = getIntOrElse(args, 3, 0);
+    int excludeType = getIntOrElse(args, 4, -1);
+    int excludeId = getIntOrElse(args, 5, -1);
+
+    // TODO: implement
+
+    return Variable::ofTalent(nullptr);
 }
 
 Variable getGoldPieceValue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -2015,10 +2092,10 @@ Variable setMinOneHP(Game &game, const vector<Variable> &args, ExecutionContext 
 
 Variable setGlobalFadeIn(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float wait = getFloatOrElse(args, 0, 0.0f);
-    float length = getFloatOrElse(args, 0, 0.0f);
-    float r = getFloatOrElse(args, 0, 0.0f);
-    float g = getFloatOrElse(args, 0, 0.0f);
-    float b = getFloatOrElse(args, 0, 0.0f);
+    float length = getFloatOrElse(args, 1, 0.0f);
+    float r = getFloatOrElse(args, 0, 2.0f);
+    float g = getFloatOrElse(args, 0, 3.0f);
+    float b = getFloatOrElse(args, 0, 4.0f);
 
     // TODO: implement
 
@@ -2027,10 +2104,10 @@ Variable setGlobalFadeIn(Game &game, const vector<Variable> &args, ExecutionCont
 
 Variable setGlobalFadeOut(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float wait = getFloatOrElse(args, 0, 0.0f);
-    float length = getFloatOrElse(args, 0, 0.0f);
-    float r = getFloatOrElse(args, 0, 0.0f);
-    float g = getFloatOrElse(args, 0, 0.0f);
-    float b = getFloatOrElse(args, 0, 0.0f);
+    float length = getFloatOrElse(args, 1, 0.0f);
+    float r = getFloatOrElse(args, 2, 0.0f);
+    float g = getFloatOrElse(args, 3, 0.0f);
+    float b = getFloatOrElse(args, 4, 0.0f);
 
     // TODO: implement
 

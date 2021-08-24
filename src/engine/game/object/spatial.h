@@ -100,6 +100,9 @@ public:
     void clearAllEffects();
     void applyEffect(const std::shared_ptr<Effect> &effect, DurationType durationType, float duration = 0.0f);
 
+    std::shared_ptr<Effect> getFirstEffect();
+    std::shared_ptr<Effect> getNextEffect();
+
     // END Effects
 
     // Stunt mode
@@ -150,6 +153,7 @@ protected:
 
 private:
     int _itemIndex { 0 };
+    int _effectIndex { 0 };
 
     void updateEffects(float dt);
     void applyInstantEffect(Effect &effect);
