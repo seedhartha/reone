@@ -71,7 +71,8 @@ Variable actionMoveAwayFromObject(Game &game, const vector<Variable> &args, Exec
     bool run = getBoolOrElse(args, 1, false);
     float range = getFloatOrElse(args, 2, 40.0f);
 
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newMoveAwayFromObject(move(fleeFrom), run, range);
+    getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
@@ -81,7 +82,8 @@ Variable actionEquipItem(Game &game, const vector<Variable> &args, ExecutionCont
     int inventorySlot = getInt(args, 1);
     bool instant = getBoolOrElse(args, 2, false);
 
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newEquipItem(move(item), inventorySlot, instant);
+    getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
@@ -90,7 +92,8 @@ Variable actionUnequipItem(Game &game, const vector<Variable> &args, ExecutionCo
     auto item = getItem(game, args, 0, ctx);
     bool instant = getBoolOrElse(args, 1, false);
 
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newUnequipItem(move(item), instant);
+    getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
@@ -98,7 +101,8 @@ Variable actionUnequipItem(Game &game, const vector<Variable> &args, ExecutionCo
 Variable actionPickUpItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto item = getItem(game, args, 0, ctx);
 
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newPickUpItem(move(item));
+    getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
@@ -106,7 +110,8 @@ Variable actionPickUpItem(Game &game, const vector<Variable> &args, ExecutionCon
 Variable actionPutDownItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto item = getItem(game, args, 0, ctx);
 
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newPutDownItem(move(item));
+    getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }

@@ -17,22 +17,29 @@
 
 #pragma once
 
+#include "action.h"
+
+#include "../../common/guardutil.h"
+
 namespace reone {
 
-template <class T>
-inline T ensureNotNull(T obj, const std::string &name) {
-    if (!obj) {
-        throw std::invalid_argument(name + " must not be null");
-    }
-    return std::move(obj);
-}
+namespace game {
 
-template <class T>
-inline T ensureNotEmpty(T obj, const std::string &name) {
-    if (obj.empty()) {
-        throw std::invalid_argument(name + " must not be empty");
+class Item;
+
+class PutDownItemAction : public Action {
+public:
+    PutDownItemAction(Game &game, std::shared_ptr<Item> item) :
+        Action(game, ActionType::PutDownItem),
+        _item(ensureNotNull(std::move(item), "item")) {
     }
-    return std::move(obj);
-}
+
+    void execute(Object &actor, float dt) override;
+
+private:
+    std::shared_ptr<Item> _item;
+};
+
+} // namespace game
 
 } // namespace reone

@@ -15,24 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "pickupitem.h"
 
 namespace reone {
 
-template <class T>
-inline T ensureNotNull(T obj, const std::string &name) {
-    if (!obj) {
-        throw std::invalid_argument(name + " must not be null");
-    }
-    return std::move(obj);
+namespace game {
+
+void PickUpItemAction::execute(Object &actor, float dt) {
+    // TODO: implement
+
+    complete();
 }
 
-template <class T>
-inline T ensureNotEmpty(T obj, const std::string &name) {
-    if (obj.empty()) {
-        throw std::invalid_argument(name + " must not be empty");
-    }
-    return std::move(obj);
-}
+} // namespace game
 
 } // namespace reone
