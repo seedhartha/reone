@@ -428,11 +428,13 @@ set(GAME_HEADERS
     src/engine/game/action/attack.h
     src/engine/game/action/closedoor.h
     src/engine/game/action/docommand.h
+    src/engine/game/action/equipitem.h
     src/engine/game/action/follow.h
     src/engine/game/action/followleader.h
     src/engine/game/action/jumptoobject.h
     src/engine/game/action/jumptolocation.h
     src/engine/game/action/locationaction.h
+    src/engine/game/action/moveawayfromobject.h
     src/engine/game/action/movetolocation.h
     src/engine/game/action/movetoobject.h
     src/engine/game/action/movetopoint.h
@@ -441,10 +443,13 @@ set(GAME_HEADERS
     src/engine/game/action/opendoor.h
     src/engine/game/action/openlock.h
     src/engine/game/action/pauseconversation.h
+    src/engine/game/action/pickupitem.h
     src/engine/game/action/playanimation.h
+    src/engine/game/action/putdownitem.h
     src/engine/game/action/randomwalk.h
     src/engine/game/action/resumeconversation.h
     src/engine/game/action/startconversation.h
+    src/engine/game/action/unequipitem.h
     src/engine/game/action/usefeat.h
     src/engine/game/action/useskill.h
     src/engine/game/action/wait.h
@@ -558,10 +563,12 @@ set(GAME_SOURCES
     src/engine/game/action/attack.cpp
     src/engine/game/action/closedoor.cpp
     src/engine/game/action/docommand.cpp
+    src/engine/game/action/equipitem.cpp
     src/engine/game/action/follow.cpp
     src/engine/game/action/followleader.cpp
     src/engine/game/action/jumptoobject.cpp
     src/engine/game/action/jumptolocation.cpp
+    src/engine/game/action/moveawayfromobject.cpp
     src/engine/game/action/movetolocation.cpp
     src/engine/game/action/movetoobject.cpp
     src/engine/game/action/movetopoint.cpp
@@ -569,10 +576,13 @@ set(GAME_SOURCES
     src/engine/game/action/opendoor.cpp
     src/engine/game/action/openlock.cpp
     src/engine/game/action/pauseconversation.cpp
+    src/engine/game/action/pickupitem.cpp
     src/engine/game/action/playanimation.cpp
+    src/engine/game/action/putdownitem.cpp
     src/engine/game/action/randomwalk.cpp
     src/engine/game/action/resumeconversation.cpp
     src/engine/game/action/startconversation.cpp
+    src/engine/game/action/unequipitem.cpp
     src/engine/game/action/useskill.cpp
     src/engine/game/action/usefeat.cpp
     src/engine/game/action/wait.cpp

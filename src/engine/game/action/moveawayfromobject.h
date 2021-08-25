@@ -17,22 +17,25 @@
 
 #pragma once
 
+#include "objectaction.h"
+
 namespace reone {
 
-template <class T>
-inline T ensureNotNull(T obj, const std::string &name) {
-    if (!obj) {
-        throw std::invalid_argument(name + " must not be null");
-    }
-    return std::move(obj);
-}
+namespace game {
 
-template <class T>
-inline T ensureNotEmpty(T obj, const std::string &name) {
-    if (obj.empty()) {
-        throw std::invalid_argument(name + " must not be empty");
+class MoveAwayFromObject : public ObjectAction {
+public:
+    MoveAwayFromObject(Game &game, std::shared_ptr<Object> fleeFrom, bool run, float range) :
+        ObjectAction(game, ActionType::MoveAwayFromObject, std::move(fleeFrom), range, false),
+        _run(run) {
     }
-    return std::move(obj);
-}
+
+    void execute(Object &actor, float dt) override;
+
+private:
+    bool _run;
+};
+
+} // namespace game
 
 } // namespace reone

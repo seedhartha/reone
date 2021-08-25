@@ -20,10 +20,12 @@
 #include "attack.h"
 #include "closedoor.h"
 #include "docommand.h"
+#include "equipitem.h"
 #include "follow.h"
 #include "followleader.h"
 #include "jumptolocation.h"
 #include "jumptoobject.h"
+#include "moveawayfromobject.h"
 #include "movetolocation.h"
 #include "movetoobject.h"
 #include "movetopoint.h"
@@ -31,10 +33,13 @@
 #include "opendoor.h"
 #include "openlock.h"
 #include "pauseconversation.h"
+#include "pickupitem.h"
 #include "playanimation.h"
+#include "putdownitem.h"
 #include "randomwalk.h"
 #include "resumeconversation.h"
 #include "startconversation.h"
+#include "unequipitem.h"
 #include "usefeat.h"
 #include "useskill.h"
 #include "wait.h"
@@ -62,6 +67,10 @@ public:
         return std::make_unique<CommandAction>(_game, std::move(context));
     }
 
+    std::unique_ptr<EquipItemAction> newEquipItem(std::shared_ptr<Item> item, int inventorySlot, bool instant) {
+        return std::make_unique<EquipItemAction>(_game, std::move(item), inventorySlot, instant);
+    }
+
     std::unique_ptr<FollowAction> newFollow(std::shared_ptr<Object> object, float distance) {
         return std::make_unique<FollowAction>(_game, std::move(object), distance);
     }
@@ -76,6 +85,10 @@ public:
 
     std::unique_ptr<JumpToObjectAction> newJumpToObject(std::shared_ptr<Object> object) {
         return std::make_unique<JumpToObjectAction>(_game, std::move(object));
+    }
+
+    std::unique_ptr<MoveAwayFromObject> newMoveAwayFromObject(std::shared_ptr<Object> fleeFrom, bool run, float range) {
+        return std::make_unique<MoveAwayFromObject>(_game, std::move(fleeFrom), run, range);
     }
 
     std::unique_ptr<MoveToLocationAction> newMoveToLocation(std::shared_ptr<Location> destination, bool run = false) {
@@ -106,8 +119,16 @@ public:
         return std::make_unique<PauseConversationAction>(_game);
     }
 
+    std::unique_ptr<PickUpItemAction> newPickUpItem(std::shared_ptr<Item> item) {
+        return std::make_unique<PickUpItemAction>(_game, std::move(item));
+    }
+
     std::unique_ptr<PlayAnimationAction> newPlayAnimation(AnimationType anim, float speed = 1.0f, float duration = 0.0f) {
         return std::make_unique<PlayAnimationAction>(_game, anim, speed, duration);
+    }
+
+    std::unique_ptr<PutDownItemAction> newPutDownItem(std::shared_ptr<Item> item) {
+        return std::make_unique<PutDownItemAction>(_game, std::move(item));
     }
 
     std::unique_ptr<RandomWalkAction> newRandomWalk() {
@@ -120,6 +141,10 @@ public:
 
     std::unique_ptr<StartConversationAction> newStartConversation(std::shared_ptr<Object> object, std::string dialogResRef, bool ignoreStartRange = false) {
         return std::make_unique<StartConversationAction>(_game, std::move(object), std::move(dialogResRef), ignoreStartRange);
+    }
+
+    std::unique_ptr<UnequipItemAction> newUnequipItem(std::shared_ptr<Item> item, bool instant) {
+        return std::make_unique<UnequipItemAction>(_game, std::move(item), instant);
     }
 
     std::unique_ptr<UseFeatAction> newUseFeat(std::shared_ptr<Object> object, FeatType feat) {

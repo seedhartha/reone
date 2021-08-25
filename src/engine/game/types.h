@@ -951,6 +951,7 @@ enum class ActionType {
     CastFakeSpellAtLocation = 0x1022,
     BarkString = 0x1023,
     SwitchWeapons = 0x1024,
+    PutDownItem = 0x1025,
 
     Invalid = 0xffff,
     QueueEmpty = 0xfffe
