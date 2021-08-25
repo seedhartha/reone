@@ -46,12 +46,45 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
         return _func(args, ctx);
     }
     catch (const NotImplementedException &ex) {
-        error("Script: routine not implemented: " + _name);
-        throw ex;
+        string msg("Script: routine not implemented: " + _name);
+        return onException(msg, ex);
     }
     catch (const ArgumentException &ex) {
-        error(boost::format("Script: routine '%s' invocation failed: %s") % _name % ex.what());
-        throw ex;
+        string msg(str(boost::format("Script: routine '%s' invocation failed: %s") % _name % ex.what()));
+        return onException(msg, ex);
+    }
+}
+
+Variable Routine::onException(const string &msg, const exception &ex) const {
+    switch (_returnType) {
+        case VariableType::Void:
+            warn(msg);
+            return Variable::ofNull();
+        case VariableType::String:
+            warn(msg);
+            return Variable::ofString("");
+        case VariableType::Vector:
+            warn(msg);
+            return Variable::ofVector(glm::vec3(0.0f));
+        case VariableType::Object:
+            warn(msg);
+            return Variable::ofObject(kObjectInvalid);
+        case VariableType::Effect:
+            warn(msg);
+            return Variable::ofEffect(nullptr);
+        case VariableType::Event:
+            warn(msg);
+            return Variable::ofEvent(nullptr);
+        case VariableType::Location:
+            warn(msg);
+            return Variable::ofLocation(nullptr);
+        case VariableType::Talent:
+            warn(msg);
+            return Variable::ofTalent(nullptr);
+        default:
+            // With Int, Float and Action return types, halt script execution
+            error(msg);
+            throw ex;
     }
 }
 

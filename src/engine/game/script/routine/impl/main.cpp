@@ -869,13 +869,8 @@ Variable getLoadFromSaveGame(Game &game, const vector<Variable> &args, Execution
 }
 
 Variable getName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    try {
-        auto object = getObject(game, args, 0, ctx);
-        return Variable::ofString(object->name());
-    }
-    catch (const ArgumentException &) {
-        return Variable::ofString("");
-    }
+    auto object = getObject(game, args, 0, ctx);
+    return Variable::ofString(object->name());
 }
 
 Variable getLastSpeaker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -923,13 +918,8 @@ Variable giveItem(Game &game, const vector<Variable> &args, ExecutionContext &ct
 }
 
 Variable objectToString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    try {
-        auto object = getObject(game, args, 0, ctx);
-        return Variable::ofString(str(boost::format("%x") % object->id()));
-    }
-    catch (const ArgumentException &) {
-        return Variable::ofString("");
-    }
+    auto object = getObject(game, args, 0, ctx);
+    return Variable::ofString(str(boost::format("%x") % object->id()));
 }
 
 Variable getIsImmune(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {

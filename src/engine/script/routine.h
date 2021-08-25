@@ -47,6 +47,8 @@ private:
     VariableType _returnType { VariableType::Void };
     std::vector<VariableType> _argumentTypes;
     std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> _func;
+
+    Variable onException(const std::string &msg, const std::exception &ex) const;
 };
 
 } // namespace script
