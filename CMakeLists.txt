@@ -442,6 +442,7 @@ set(GAME_HEADERS
     src/engine/game/action/openlock.h
     src/engine/game/action/pauseconversation.h
     src/engine/game/action/playanimation.h
+    src/engine/game/action/randomwalk.h
     src/engine/game/action/resumeconversation.h
     src/engine/game/action/startconversation.h
     src/engine/game/action/usefeat.h
@@ -569,6 +570,7 @@ set(GAME_SOURCES
     src/engine/game/action/openlock.cpp
     src/engine/game/action/pauseconversation.cpp
     src/engine/game/action/playanimation.cpp
+    src/engine/game/action/randomwalk.cpp
     src/engine/game/action/resumeconversation.cpp
     src/engine/game/action/startconversation.cpp
     src/engine/game/action/useskill.cpp

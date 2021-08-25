@@ -22,6 +22,7 @@
 #include "declarations.h"
 
 #include "../../../../common/log.h"
+#include "../../../../script/exception/argument.h"
 
 #include "../../../game.h"
 
@@ -38,7 +39,9 @@ namespace game {
 namespace routine {
 
 Variable actionRandomWalk(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newRandomWalk();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 

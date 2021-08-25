@@ -32,6 +32,7 @@
 #include "openlock.h"
 #include "pauseconversation.h"
 #include "playanimation.h"
+#include "randomwalk.h"
 #include "resumeconversation.h"
 #include "startconversation.h"
 #include "usefeat.h"
@@ -107,6 +108,10 @@ public:
 
     std::unique_ptr<PlayAnimationAction> newPlayAnimation(AnimationType anim, float speed = 1.0f, float duration = 0.0f) {
         return std::make_unique<PlayAnimationAction>(_game, anim, speed, duration);
+    }
+
+    std::unique_ptr<RandomWalkAction> newRandomWalk() {
+        return std::make_unique<RandomWalkAction>(_game);
     }
 
     std::unique_ptr<ResumeConversationAction> newResumeConversation() {
