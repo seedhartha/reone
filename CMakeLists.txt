@@ -20,7 +20,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_subdirectory(src/external/s3tc)
 
-option(BUILD_TOOLS "build tools executable" ON)
+option(BUILD_TOOLS "build tools executable" OFF)
 option(BUILD_LAUNCHER "build launcher executable" OFF)
 option(BUILD_TESTS "build unit tests" OFF)
 
