@@ -33,7 +33,7 @@ find_package(GLEW REQUIRED)
 find_package(MAD REQUIRED)
 find_package(wxWidgets COMPONENTS core base)
 
-if(WIN32)
+if(MSVC)
     find_package(OpenAL CONFIG REQUIRED)
     find_package(SDL2 CONFIG REQUIRED)
     find_package(FFMPEG REQUIRED)
@@ -55,7 +55,7 @@ endif()
 
 add_compile_definitions(BOOST_BIND_GLOBAL_PLACEHOLDERS)
 
-if(WIN32)
+if(MSVC)
     add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 endif()
 
@@ -755,7 +755,7 @@ target_link_libraries(reone PRIVATE
     ${MAD_LIBRARY}
     ${FFMPEG_LIBRARIES})
 
-if(WIN32)
+if(MSVC)
     target_link_libraries(reone PRIVATE SDL2::SDL2 OpenAL::OpenAL)
 else()
     target_link_libraries(reone PRIVATE ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads -latomic)
@@ -798,7 +798,7 @@ if(BUILD_TOOLS)
         ${OPENGL_LIBRARIES}
         ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
-    if(WIN32)
+    if(MSVC)
         target_link_libraries(reone PRIVATE SDL2::SDL2)
     else()
         target_link_libraries(reone PRIVATE ${SDL2_LIBRARIES})
@@ -857,7 +857,7 @@ if(BUILD_TESTS)
 
     add_executable(reone-tests ${TEST_SOURCES})
     target_link_libraries(reone-tests PRIVATE libgame libscript libresource libcommon ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-    if(WIN32)
+    if(MSVC)
         target_link_libraries(reone-tests PRIVATE SDL2::SDL2)
     else()
         target_link_libraries(reone-tests PRIVATE ${SDL2_LIBRARIES})
