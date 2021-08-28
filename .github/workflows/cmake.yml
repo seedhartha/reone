@@ -19,7 +19,7 @@ jobs:
       run: >
         sudo sed -i 's/azure\.//' /etc/apt/sources.list &&
         sudo apt-get update &&
-        sudo apt install libboost-all-dev libsdl2-dev libglew-dev libopenal-dev libmad0-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev
+        sudo apt install libboost-all-dev libsdl2-dev libglew-dev libopenal-dev libmad0-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev libwxgtk3.0-dev
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{github.workspace}}/build
@@ -27,7 +27,7 @@ jobs:
     - name: Configure CMake
       working-directory: ${{github.workspace}}/build
       shell: bash
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_TESTS=ON
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_TOOLS=ON -DBUILD_LAUNCHER=ON -DBUILD_TESTS=ON
 
     - name: Build
       working-directory: ${{github.workspace}}/build
