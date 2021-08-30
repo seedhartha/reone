@@ -117,22 +117,23 @@ Variable actionPutDownItem(Game &game, const vector<Variable> &args, ExecutionCo
 }
 
 Variable actionAttack(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: pass all arguments to an action
     auto caller = getCallerAsCreature(game, ctx);
     auto attackee = getSpatialObject(game, args, 0, ctx);
     bool passive = getBoolOrElse(args, 1, false);
 
-    auto action = game.services().actionFactory().newAttack(attackee, caller->getAttackRange());
+    auto action = game.services().actionFactory().newAttack(attackee, caller->getAttackRange(), false, passive);
     caller->addAction(move(action));
 
     return Variable::ofNull();
 }
 
 Variable actionSpeakString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    string toSpeak(getString(args, 0));
+    auto caller = getCallerAsCreature(game, ctx);
+    string stringToSpeak(getString(args, 0));
     auto talkVolume = getEnumOrElse(args, 1, TalkVolume::Talk);
-    
-    // TODO: add action to caller
+
+    auto action = game.services().actionFactory().newSpeakString(move(stringToSpeak), talkVolume);
+    caller->addAction(move(action));
 
     return Variable::ofNull();
 }
@@ -140,9 +141,9 @@ Variable actionSpeakString(Game &game, const vector<Variable> &args, ExecutionCo
 Variable actionPlayAnimation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto animation = getEnum<AnimationType>(args, 0);
     float speed = getFloatOrElse(args, 1, 1.0f);
-    float duration = getFloatOrElse(args, 2, 0.0f);
+    float durationSeconds = getFloatOrElse(args, 2, 0.0f);
 
-    auto action = game.services().actionFactory().newPlayAnimation(animation, speed, duration);
+    auto action = game.services().actionFactory().newPlayAnimation(animation, speed, durationSeconds);
     getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -175,7 +176,8 @@ Variable actionCastSpellAtObject(Game &game, const vector<Variable> &args, Execu
     auto projectilePathType = getEnumOrElse(args, 5, ProjectilePathType::Default);
     bool instantSpell = getBoolOrElse(args, 6, false);
 
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newCastSpellAtObject();
+    getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
@@ -184,7 +186,8 @@ Variable actionGiveItem(Game &game, const vector<Variable> &args, ExecutionConte
     auto item = getItem(game, args, 0, ctx);
     auto giveTo = getObject(game, args, 1, ctx);
 
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newGiveItem();
+    getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
@@ -193,7 +196,8 @@ Variable actionTakeItem(Game &game, const vector<Variable> &args, ExecutionConte
     auto item = getItem(game, args, 0, ctx);
     auto takeFrom = getObject(game, args, 1, ctx);
 
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newTakeItem();
+    getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
@@ -202,7 +206,8 @@ Variable actionForceFollowObject(Game &game, const vector<Variable> &args, Execu
     auto follow = getObject(game, args, 0, ctx);
     float followDistance = getFloatOrElse(args, 1, 0.0f);
 
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newForceFollowObject();
+    getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
@@ -274,7 +279,8 @@ Variable actionCastSpellAtLocation(Game &game, const vector<Variable> &args, Exe
     auto projectilePathType = getEnumOrElse(args, 4, ProjectilePathType::Default);
     bool instantSpell = getBoolOrElse(args, 5, false);
 
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newCastSpellAtLocation();
+    getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
@@ -283,7 +289,8 @@ Variable actionSpeakStringByStrRef(Game &game, const vector<Variable> &args, Exe
     int strRef = getInt(args, 0);
     auto talkVolume = getEnumOrElse(args, 1, TalkVolume::Talk);
 
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newSpeakStringByStrRef();
+    getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
@@ -325,7 +332,8 @@ Variable actionUseTalentOnObject(Game &game, const vector<Variable> &args, Execu
     auto chosenTalen = getTalent(args, 0);
     auto target = getObject(game, args, 1, ctx);
 
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newUseTalentOnObject();
+    getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
@@ -334,23 +342,36 @@ Variable actionUseTalentAtLocation(Game &game, const vector<Variable> &args, Exe
     auto chosenTalen = getTalent(args, 0);
     auto targetLocation = getLocationEngineType(args, 1);
 
-    // TODO: add action to caller
+    auto action = game.services().actionFactory().newUseTalentAtLocation();
+    getCaller(game, ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
 
 Variable actionInteractObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: add action to caller
+    // TODO: arguments
+
+    auto action = game.services().actionFactory().newInteractObject();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 
 Variable actionMoveAwayFromLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: add action to caller
+    // TODO: arguments
+
+    auto action = game.services().actionFactory().newMoveAwayFromLocation();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 
 Variable actionSurrenderToEnemies(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: add action to caller
+    // TODO: arguments
+
+    auto action = game.services().actionFactory().newSurrenderToEnemies();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 
@@ -380,43 +401,74 @@ Variable actionForceMoveToObject(Game &game, const vector<Variable> &args, Execu
 }
 
 Variable actionEquipMostDamagingMelee(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: add action to caller
+    // TODO: arguments
+
+    auto action = game.services().actionFactory().newEquipMostDamagingMelee();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 
 Variable actionEquipMostDamagingRanged(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: add action to caller
+    // TODO: arguments
+
+    auto action = game.services().actionFactory().newEquipMostDamagingRanged();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 
 Variable actionEquipMostEffectiveArmor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: add action to caller
+    // TODO: arguments
+
+    auto action = game.services().actionFactory().newEquipMostEffectiveArmor();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 
 Variable actionUnlockObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: add action to caller
+    // TODO: arguments
+
+    auto action = game.services().actionFactory().newUnlockObject();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 
 Variable actionLockObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: add action to caller
+    // TODO: arguments
+
+    auto action = game.services().actionFactory().newLockObject();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 
 Variable actionCastFakeSpellAtObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: add action to caller
+    // TODO: arguments
+
+    auto action = game.services().actionFactory().newCastFakeSpellAtObject();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 
 Variable actionCastFakeSpellAtLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: add action to caller
+    // TODO: arguments
+
+    auto action = game.services().actionFactory().newCastFakeSpellAtLocation();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 
 Variable actionBarkString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int strRef = getInt(args, 0);
-    // TODO: add action to caller
+
+    auto action = game.services().actionFactory().newBarkString();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 
@@ -429,12 +481,19 @@ Variable actionFollowLeader(Game &game, const vector<Variable> &args, ExecutionC
 
 Variable actionFollowOwner(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     float range = getFloatOrElse(args, 0, 2.5f);
-    // TODO: add action to caller
+
+    auto action = game.services().actionFactory().newFollowOwner();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 
 Variable actionSwitchWeapons(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    // TODO: add action to caller
+    // TODO: arguments
+
+    auto action = game.services().actionFactory().newSwitchWeapons();
+    getCaller(game, ctx)->addAction(move(action));
+
     return Variable::ofNull();
 }
 

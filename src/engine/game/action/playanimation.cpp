@@ -33,6 +33,8 @@ void PlayAnimationAction::execute(Object &actor, float dt) {
     AnimationProperties properties;
     properties.speed = _speed;
 
+    // TODO: handle duration
+
     auto spatial = static_cast<SpatialObject *>(&actor);
     spatial->playAnimation(_anim, move(properties), this);
 }

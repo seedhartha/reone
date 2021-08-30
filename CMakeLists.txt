@@ -426,14 +426,28 @@ set(GAME_HEADERS
     src/engine/game/action/action.h
     src/engine/game/action/actionfactory.h
     src/engine/game/action/attack.h
+    src/engine/game/action/barkstring.h
+    src/engine/game/action/castfakespellatlocation.h
+    src/engine/game/action/castfakespellatobject.h
+    src/engine/game/action/castspellatlocation.h
+    src/engine/game/action/castspellatobject.h
     src/engine/game/action/closedoor.h
     src/engine/game/action/docommand.h
     src/engine/game/action/equipitem.h
+    src/engine/game/action/equipmostdamagingmelee.h
+    src/engine/game/action/equipmostdamagingranged.h
+    src/engine/game/action/equipmosteffectivearmor.h
     src/engine/game/action/follow.h
     src/engine/game/action/followleader.h
+    src/engine/game/action/followowner.h
+    src/engine/game/action/forcefollowobject.h
+    src/engine/game/action/giveitem.h
+    src/engine/game/action/interactobject.h
     src/engine/game/action/jumptoobject.h
     src/engine/game/action/jumptolocation.h
     src/engine/game/action/locationaction.h
+    src/engine/game/action/lockobject.h
+    src/engine/game/action/moveawayfromlocation.h
     src/engine/game/action/moveawayfromobject.h
     src/engine/game/action/movetolocation.h
     src/engine/game/action/movetoobject.h
@@ -448,10 +462,18 @@ set(GAME_HEADERS
     src/engine/game/action/putdownitem.h
     src/engine/game/action/randomwalk.h
     src/engine/game/action/resumeconversation.h
+    src/engine/game/action/speakstring.h
+    src/engine/game/action/speakstringbystrref.h
     src/engine/game/action/startconversation.h
+    src/engine/game/action/surrendertoenemies.h
+    src/engine/game/action/switchweapons.h
+    src/engine/game/action/takeitem.h
     src/engine/game/action/unequipitem.h
+    src/engine/game/action/unlockobject.h
     src/engine/game/action/usefeat.h
     src/engine/game/action/useskill.h
+    src/engine/game/action/usetalentatlocation.h
+    src/engine/game/action/usetalentonobject.h
     src/engine/game/action/wait.h
     src/engine/game/animationutil.h
     src/engine/game/camera/animated.h
@@ -561,13 +583,27 @@ set(GAME_HEADERS
 set(GAME_SOURCES
     src/engine/game/action/action.cpp
     src/engine/game/action/attack.cpp
+    src/engine/game/action/barkstring.cpp
+    src/engine/game/action/castfakespellatlocation.cpp
+    src/engine/game/action/castfakespellatobject.cpp
+    src/engine/game/action/castspellatlocation.cpp
+    src/engine/game/action/castspellatobject.cpp
     src/engine/game/action/closedoor.cpp
     src/engine/game/action/docommand.cpp
     src/engine/game/action/equipitem.cpp
+    src/engine/game/action/equipmostdamagingmelee.cpp
+    src/engine/game/action/equipmostdamagingranged.cpp
+    src/engine/game/action/equipmosteffectivearmor.cpp
     src/engine/game/action/follow.cpp
     src/engine/game/action/followleader.cpp
+    src/engine/game/action/followowner.cpp
+    src/engine/game/action/forcefollowobject.cpp
+    src/engine/game/action/giveitem.cpp
+    src/engine/game/action/interactobject.cpp
     src/engine/game/action/jumptoobject.cpp
     src/engine/game/action/jumptolocation.cpp
+    src/engine/game/action/lockobject.cpp
+    src/engine/game/action/moveawayfromlocation.cpp
     src/engine/game/action/moveawayfromobject.cpp
     src/engine/game/action/movetolocation.cpp
     src/engine/game/action/movetoobject.cpp
@@ -581,10 +617,18 @@ set(GAME_SOURCES
     src/engine/game/action/putdownitem.cpp
     src/engine/game/action/randomwalk.cpp
     src/engine/game/action/resumeconversation.cpp
+    src/engine/game/action/speakstring.cpp
+    src/engine/game/action/speakstringbystrref.cpp
     src/engine/game/action/startconversation.cpp
+    src/engine/game/action/surrendertoenemies.cpp
+    src/engine/game/action/switchweapons.cpp
+    src/engine/game/action/takeitem.cpp
     src/engine/game/action/unequipitem.cpp
+    src/engine/game/action/unlockobject.cpp
     src/engine/game/action/useskill.cpp
     src/engine/game/action/usefeat.cpp
+    src/engine/game/action/usetalentatlocation.cpp
+    src/engine/game/action/usetalentonobject.cpp
     src/engine/game/action/wait.cpp
     src/engine/game/animationutil.cpp
     src/engine/game/camera/animated.cpp

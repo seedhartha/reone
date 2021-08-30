@@ -15,36 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "../types.h"
-
-#include "action.h"
+#include "lockobject.h"
 
 namespace reone {
 
 namespace game {
 
-class PlayAnimationAction : public Action {
-public:
-    PlayAnimationAction(Game &game, AnimationType anim, float speed, float durationSeconds) :
-        Action(game, ActionType::PlayAnimation),
-        _anim(anim),
-        _speed(speed),
-        _durationSeconds(durationSeconds) {
-    }
+void LockObjectAction::execute(Object &actor, float dt) {
+    // TODO: implement
 
-    void execute(Object &actor, float dt) override;
-
-    AnimationType animation() const { return _anim; }
-    float speed() const { return _speed; }
-    float durationSeconds() const { return _durationSeconds; }
-
-private:
-    AnimationType _anim;
-    float _speed;
-    float _durationSeconds;
-};
+    complete();
+}
 
 } // namespace game
 
