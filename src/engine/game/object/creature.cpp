@@ -228,7 +228,7 @@ void Creature::clearAllActions() {
 
 void Creature::playAnimation(AnimationType type, AnimationProperties properties, PlayAnimationAction *actionToComplete) {
     // If animation is looping by type and action duration is -1.0, set flags accordingly
-    bool looping = isAnimationLooping(type) && (!actionToComplete || actionToComplete->duration() == -1.0f);
+    bool looping = isAnimationLooping(type) && (!actionToComplete || actionToComplete->durationSeconds() == -1.0f);
     if (looping) {
         properties.flags |= AnimationFlags::loop;
     }
