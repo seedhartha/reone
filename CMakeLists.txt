@@ -443,8 +443,8 @@ set(GAME_HEADERS
     src/engine/game/action/forcefollowobject.h
     src/engine/game/action/giveitem.h
     src/engine/game/action/interactobject.h
-    src/engine/game/action/jumptoobject.h
     src/engine/game/action/jumptolocation.h
+    src/engine/game/action/jumptoobject.h
     src/engine/game/action/locationaction.h
     src/engine/game/action/lockobject.h
     src/engine/game/action/moveawayfromlocation.h
@@ -484,9 +484,9 @@ set(GAME_HEADERS
     src/engine/game/camera/static.h
     src/engine/game/camera/thirdperson.h
     src/engine/game/character.h
+    src/engine/game/combat/combat.h
     src/engine/game/console.h
     src/engine/game/contextaction.h
-    src/engine/game/combat/combat.h
     src/engine/game/cursors.h
     src/engine/game/d20/attributes.h
     src/engine/game/d20/class.h
@@ -499,10 +499,97 @@ set(GAME_HEADERS
     src/engine/game/d20/spell.h
     src/engine/game/d20/spells.h
     src/engine/game/dialog.h
+    src/engine/game/effect/abilitydecrease.h
+    src/engine/game/effect/abilityincrease.h
+    src/engine/game/effect/acdecrease.h
+    src/engine/game/effect/acincrease.h
+    src/engine/game/effect/areaofeffect.h
+    src/engine/game/effect/assureddeflection.h
+    src/engine/game/effect/assuredhit.h
+    src/engine/game/effect/attackdecrease.h
+    src/engine/game/effect/attackincrease.h
+    src/engine/game/effect/beam.h
+    src/engine/game/effect/blasterdeflectiondecrease.h
+    src/engine/game/effect/blasterdeflectionincrease.h
+    src/engine/game/effect/blind.h
+    src/engine/game/effect/bodyfuel.h
+    src/engine/game/effect/choke.h
+    src/engine/game/effect/concealment.h
+    src/engine/game/effect/confused.h
+    src/engine/game/effect/crush.h
+    src/engine/game/effect/cutscenehorrified.h
+    src/engine/game/effect/cutsceneparalyze.h
+    src/engine/game/effect/cutscenestunned.h
     src/engine/game/effect/damage.h
+    src/engine/game/effect/damagedecrease.h
+    src/engine/game/effect/damageforcepoints.h
+    src/engine/game/effect/damageimmunitydecrease.h
+    src/engine/game/effect/damageimmunityincrease.h
+    src/engine/game/effect/damageincrease.h
+    src/engine/game/effect/damagereduction.h
+    src/engine/game/effect/damageresistance.h
+    src/engine/game/effect/damageshield.h
     src/engine/game/effect/death.h
+    src/engine/game/effect/disguise.h
+    src/engine/game/effect/dispelmagicall.h
+    src/engine/game/effect/dispelmagicbest.h
+    src/engine/game/effect/droidconfused.h
+    src/engine/game/effect/droidscramble.h
+    src/engine/game/effect/droidstun.h
     src/engine/game/effect/effect.h
     src/engine/game/effect/effectfactory.h
+    src/engine/game/effect/entangle.h
+    src/engine/game/effect/factionmodifier.h
+    src/engine/game/effect/forcebody.h
+    src/engine/game/effect/forcedrain.h
+    src/engine/game/effect/forcefizzle.h
+    src/engine/game/effect/forcejump.h
+    src/engine/game/effect/forcepushed.h
+    src/engine/game/effect/forcepushtargeted.h
+    src/engine/game/effect/forceresistancedecrease.h
+    src/engine/game/effect/forceresistanceincrease.h
+    src/engine/game/effect/forceresisted.h
+    src/engine/game/effect/forceshield.h
+    src/engine/game/effect/forcesight.h
+    src/engine/game/effect/fpregenmodifier.h
+    src/engine/game/effect/frightened.h
+    src/engine/game/effect/fury.h
+    src/engine/game/effect/haste.h
+    src/engine/game/effect/heal.h
+    src/engine/game/effect/healforcepoints.h
+    src/engine/game/effect/hitpointschangewhendying.h
+    src/engine/game/effect/horrified.h
+    src/engine/game/effect/immunity.h
+    src/engine/game/effect/invisibility.h
+    src/engine/game/effect/knockdown.h
+    src/engine/game/effect/lightsaberthrow.h
+    src/engine/game/effect/linkeffects.h
+    src/engine/game/effect/mindtrick.h
+    src/engine/game/effect/misschance.h
+    src/engine/game/effect/modifyattacks.h
+    src/engine/game/effect/movementspeeddecrease.h
+    src/engine/game/effect/movementspeedincrease.h
+    src/engine/game/effect/paralyze.h
+    src/engine/game/effect/poison.h
+    src/engine/game/effect/psychicstatic.h
+    src/engine/game/effect/regenerate.h
+    src/engine/game/effect/resurrection.h
+    src/engine/game/effect/savingthrowdecrease.h
+    src/engine/game/effect/savingthrowincrease.h
+    src/engine/game/effect/seeinvisible.h
+    src/engine/game/effect/skilldecrease.h
+    src/engine/game/effect/skillincrease.h
+    src/engine/game/effect/sleep.h
+    src/engine/game/effect/spellimmunity.h
+    src/engine/game/effect/spelllevelabsorption.h
+    src/engine/game/effect/stunned.h
+    src/engine/game/effect/temporaryforcepoints.h
+    src/engine/game/effect/temporaryhitpoints.h
+    src/engine/game/effect/timestop.h
+    src/engine/game/effect/trueseeing.h
+    src/engine/game/effect/visual.h
+    src/engine/game/effect/vpregenmodifier.h
+    src/engine/game/effect/whirlwind.h
     src/engine/game/event.h
     src/engine/game/footstepsounds.h
     src/engine/game/game.h
@@ -518,9 +605,9 @@ set(GAME_HEADERS
     src/engine/game/gui/chargen/quick.h
     src/engine/game/gui/chargen/quickorcustom.h
     src/engine/game/gui/chargen/skills.h
+    src/engine/game/gui/computer.h
     src/engine/game/gui/container.h
     src/engine/game/gui/conversation.h
-    src/engine/game/gui/computer.h
     src/engine/game/gui/dialog.h
     src/engine/game/gui/gui.h
     src/engine/game/gui/hud.h
@@ -567,12 +654,12 @@ set(GAME_HEADERS
     src/engine/game/reputes.h
     src/engine/game/room.h
     src/engine/game/savedgame.h
-    src/engine/game/services.h
     src/engine/game/script/routine/impl/argutil.h
     src/engine/game/script/routine/impl/declarations.h
     src/engine/game/script/routine/impl/objectutil.h
     src/engine/game/script/routines.h
     src/engine/game/script/runner.h
+    src/engine/game/services.h
     src/engine/game/soundsets.h
     src/engine/game/surface.h
     src/engine/game/surfaces.h
@@ -600,8 +687,8 @@ set(GAME_SOURCES
     src/engine/game/action/forcefollowobject.cpp
     src/engine/game/action/giveitem.cpp
     src/engine/game/action/interactobject.cpp
-    src/engine/game/action/jumptoobject.cpp
     src/engine/game/action/jumptolocation.cpp
+    src/engine/game/action/jumptoobject.cpp
     src/engine/game/action/lockobject.cpp
     src/engine/game/action/moveawayfromlocation.cpp
     src/engine/game/action/moveawayfromobject.cpp
@@ -625,8 +712,8 @@ set(GAME_SOURCES
     src/engine/game/action/takeitem.cpp
     src/engine/game/action/unequipitem.cpp
     src/engine/game/action/unlockobject.cpp
-    src/engine/game/action/useskill.cpp
     src/engine/game/action/usefeat.cpp
+    src/engine/game/action/useskill.cpp
     src/engine/game/action/usetalentatlocation.cpp
     src/engine/game/action/usetalentonobject.cpp
     src/engine/game/action/wait.cpp
@@ -638,28 +725,115 @@ set(GAME_SOURCES
     src/engine/game/camera/firstperson.cpp
     src/engine/game/camera/static.cpp
     src/engine/game/camera/thirdperson.cpp
-    src/engine/game/combat/combat.cpp
     src/engine/game/combat/combat_attack.cpp
     src/engine/game/combat/combat_damage.cpp
     src/engine/game/combat/combat_projectiles.cpp
+    src/engine/game/combat/combat.cpp
     src/engine/game/console.cpp
     src/engine/game/cursors.cpp
-    src/engine/game/d20/attributes.cpp
     src/engine/game/d20/attributes_abilities.cpp
     src/engine/game/d20/attributes_classes.cpp
     src/engine/game/d20/attributes_skills.cpp
+    src/engine/game/d20/attributes.cpp
     src/engine/game/d20/class.cpp
     src/engine/game/d20/classes.cpp
     src/engine/game/d20/feats.cpp
     src/engine/game/d20/skills.cpp
     src/engine/game/d20/spells.cpp
     src/engine/game/dialog.cpp
+    src/engine/game/effect/abilitydecrease.cpp
+    src/engine/game/effect/abilityincrease.cpp
+    src/engine/game/effect/acdecrease.cpp
+    src/engine/game/effect/acincrease.cpp
+    src/engine/game/effect/areaofeffect.cpp
+    src/engine/game/effect/assureddeflection.cpp
+    src/engine/game/effect/assuredhit.cpp
+    src/engine/game/effect/attackdecrease.cpp
+    src/engine/game/effect/attackincrease.cpp
+    src/engine/game/effect/beam.cpp
+    src/engine/game/effect/blasterdeflectiondecrease.cpp
+    src/engine/game/effect/blasterdeflectionincrease.cpp
+    src/engine/game/effect/blind.cpp
+    src/engine/game/effect/bodyfuel.cpp
+    src/engine/game/effect/choke.cpp
+    src/engine/game/effect/concealment.cpp
+    src/engine/game/effect/confused.cpp
+    src/engine/game/effect/crush.cpp
+    src/engine/game/effect/cutscenehorrified.cpp
+    src/engine/game/effect/cutsceneparalyze.cpp
+    src/engine/game/effect/cutscenestunned.cpp
     src/engine/game/effect/damage.cpp
+    src/engine/game/effect/damagedecrease.cpp
+    src/engine/game/effect/damageforcepoints.cpp
+    src/engine/game/effect/damageimmunitydecrease.cpp
+    src/engine/game/effect/damageimmunityincrease.cpp
+    src/engine/game/effect/damageincrease.cpp
+    src/engine/game/effect/damagereduction.cpp
+    src/engine/game/effect/damageresistance.cpp
+    src/engine/game/effect/damageshield.cpp
     src/engine/game/effect/death.cpp
+    src/engine/game/effect/disguise.cpp
+    src/engine/game/effect/dispelmagicall.cpp
+    src/engine/game/effect/dispelmagicbest.cpp
+    src/engine/game/effect/droidconfused.cpp
+    src/engine/game/effect/droidscramble.cpp
+    src/engine/game/effect/droidstun.cpp
     src/engine/game/effect/effect.cpp
+    src/engine/game/effect/entangle.cpp
+    src/engine/game/effect/factionmodifier.cpp
+    src/engine/game/effect/forcebody.cpp
+    src/engine/game/effect/forcedrain.cpp
+    src/engine/game/effect/forcefizzle.cpp
+    src/engine/game/effect/forcejump.cpp
+    src/engine/game/effect/forcepushed.cpp
+    src/engine/game/effect/forcepushtargeted.cpp
+    src/engine/game/effect/forceresistancedecrease.cpp
+    src/engine/game/effect/forceresistanceincrease.cpp
+    src/engine/game/effect/forceresisted.cpp
+    src/engine/game/effect/forceshield.cpp
+    src/engine/game/effect/forcesight.cpp
+    src/engine/game/effect/fpregenmodifier.cpp
+    src/engine/game/effect/frightened.cpp
+    src/engine/game/effect/fury.cpp
+    src/engine/game/effect/haste.cpp
+    src/engine/game/effect/heal.cpp
+    src/engine/game/effect/healforcepoints.cpp
+    src/engine/game/effect/hitpointschangewhendying.cpp
+    src/engine/game/effect/horrified.cpp
+    src/engine/game/effect/immunity.cpp
+    src/engine/game/effect/invisibility.cpp
+    src/engine/game/effect/knockdown.cpp
+    src/engine/game/effect/lightsaberthrow.cpp
+    src/engine/game/effect/linkeffects.cpp
+    src/engine/game/effect/mindtrick.cpp
+    src/engine/game/effect/misschance.cpp
+    src/engine/game/effect/modifyattacks.cpp
+    src/engine/game/effect/movementspeeddecrease.cpp
+    src/engine/game/effect/movementspeedincrease.cpp
+    src/engine/game/effect/paralyze.cpp
+    src/engine/game/effect/poison.cpp
+    src/engine/game/effect/psychicstatic.cpp
+    src/engine/game/effect/regenerate.cpp
+    src/engine/game/effect/resurrection.cpp
+    src/engine/game/effect/savingthrowdecrease.cpp
+    src/engine/game/effect/savingthrowincrease.cpp
+    src/engine/game/effect/seeinvisible.cpp
+    src/engine/game/effect/skilldecrease.cpp
+    src/engine/game/effect/skillincrease.cpp
+    src/engine/game/effect/sleep.cpp
+    src/engine/game/effect/spellimmunity.cpp
+    src/engine/game/effect/spelllevelabsorption.cpp
+    src/engine/game/effect/stunned.cpp
+    src/engine/game/effect/temporaryforcepoints.cpp
+    src/engine/game/effect/temporaryhitpoints.cpp
+    src/engine/game/effect/timestop.cpp
+    src/engine/game/effect/trueseeing.cpp
+    src/engine/game/effect/visual.cpp
+    src/engine/game/effect/vpregenmodifier.cpp
+    src/engine/game/effect/whirlwind.cpp
     src/engine/game/footstepsounds.cpp
-    src/engine/game/game.cpp
     src/engine/game/game_save.cpp
+    src/engine/game/game.cpp
     src/engine/game/gui/barkbubble.cpp
     src/engine/game/gui/chargen/abilities.cpp
     src/engine/game/gui/chargen/chargen.cpp
@@ -696,37 +870,37 @@ set(GAME_SOURCES
     src/engine/game/gui/sounds.cpp
     src/engine/game/kotor.cpp
     src/engine/game/map.cpp
-    src/engine/game/object/area.cpp
     src/engine/game/object/area_are.cpp
     src/engine/game/object/area_collision.cpp
     src/engine/game/object/area_git.cpp
     src/engine/game/object/area_perception.cpp
     src/engine/game/object/area_search.cpp
     src/engine/game/object/area_selection.cpp
-    src/engine/game/object/creature.cpp
+    src/engine/game/object/area.cpp
     src/engine/game/object/creature_animations.cpp
     src/engine/game/object/creature_appearance.cpp
     src/engine/game/object/creature_blueprint.cpp
-    src/engine/game/object/door.cpp
+    src/engine/game/object/creature.cpp
     src/engine/game/object/door_blueprint.cpp
-    src/engine/game/object/encounter.cpp
+    src/engine/game/object/door.cpp
     src/engine/game/object/encounter_blueprint.cpp
-    src/engine/game/object/item.cpp
+    src/engine/game/object/encounter.cpp
     src/engine/game/object/item_blueprint.cpp
+    src/engine/game/object/item.cpp
     src/engine/game/object/module.cpp
-    src/engine/game/object/object.cpp
     src/engine/game/object/object_actions.cpp
+    src/engine/game/object/object.cpp
     src/engine/game/object/objectfactory.cpp
-    src/engine/game/object/placeable.cpp
     src/engine/game/object/placeable_blueprint.cpp
+    src/engine/game/object/placeable.cpp
     src/engine/game/object/placeablecamera.cpp
-    src/engine/game/object/sound.cpp
     src/engine/game/object/sound_blueprint.cpp
+    src/engine/game/object/sound.cpp
     src/engine/game/object/spatial.cpp
-    src/engine/game/object/trigger.cpp
     src/engine/game/object/trigger_blueprint.cpp
-    src/engine/game/object/waypoint.cpp
+    src/engine/game/object/trigger.cpp
     src/engine/game/object/waypoint_blueprint.cpp
+    src/engine/game/object/waypoint.cpp
     src/engine/game/party.cpp
     src/engine/game/path.cpp
     src/engine/game/pathfinder.cpp
@@ -734,7 +908,6 @@ set(GAME_SOURCES
     src/engine/game/portraits.cpp
     src/engine/game/reputes.cpp
     src/engine/game/room.cpp
-    src/engine/game/services.cpp
     src/engine/game/script/routine/impl/action.cpp
     src/engine/game/script/routine/impl/ambientsound.cpp
     src/engine/game/script/routine/impl/argutil.cpp
@@ -758,10 +931,11 @@ set(GAME_SOURCES
     src/engine/game/script/routine/impl/talent.cpp
     src/engine/game/script/routine/impl/time.cpp
     src/engine/game/script/routine/impl/vector.cpp
-    src/engine/game/script/routines.cpp
     src/engine/game/script/routines_kotor.cpp
     src/engine/game/script/routines_tsl.cpp
+    src/engine/game/script/routines.cpp
     src/engine/game/script/runner.cpp
+    src/engine/game/services.cpp
     src/engine/game/soundsets.cpp
     src/engine/game/surfaces.cpp
     src/engine/game/tsl.cpp)
