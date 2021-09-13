@@ -171,11 +171,6 @@ void Creature::updateModelAnimation() {
     }
     if (!_animDirty) return;
 
-    if (_animAction) {
-        _animAction->complete();
-        _animAction = nullptr;
-    }
-
     shared_ptr<Animation> anim;
     shared_ptr<Animation> talkAnim;
 
@@ -226,33 +221,27 @@ void Creature::clearAllActions() {
     setMovementType(MovementType::None);
 }
 
-void Creature::playAnimation(AnimationType type, AnimationProperties properties, PlayAnimationAction *actionToComplete) {
-    // If animation is looping by type and action duration is -1.0, set flags accordingly
-    bool looping = isAnimationLooping(type) && (!actionToComplete || actionToComplete->durationSeconds() == -1.0f);
+void Creature::playAnimation(AnimationType type, AnimationProperties properties) {
+    // If animation is looping by type and duration is -1.0, set flags accordingly
+    bool looping = isAnimationLooping(type) && properties.duration == -1.0f;
     if (looping) {
         properties.flags |= AnimationFlags::loop;
     }
 
-    // If animation is not supported or is looping, complete the action immediately
     string animName(getAnimationName(type));
-    if (actionToComplete && (animName.empty() || looping)) {
-        actionToComplete->complete();
-    }
     if (animName.empty()) return;
 
-    playAnimation(animName, move(properties), actionToComplete);
+    playAnimation(animName, move(properties));
 }
 
-void Creature::playAnimation(const string &name, AnimationProperties properties, Action *actionToComplete) {
+void Creature::playAnimation(const string &name, AnimationProperties properties) {
     bool fireForget = !(properties.flags & AnimationFlags::loop);
 
     doPlayAnimation(fireForget, [&]() {
         auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
-        if (!model) return;
-
-        _animAction = actionToComplete;
-
-        model->playAnimation(name, properties);
+        if (model) {
+            model->playAnimation(name, properties);
+        }
     });
 }
 
@@ -271,9 +260,9 @@ void Creature::playAnimation(const shared_ptr<Animation> &anim, AnimationPropert
 
     doPlayAnimation(fireForget, [&]() {
         auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
-        if (!model) return;
-
-        model->playAnimation(anim, nullptr, properties);
+        if (model) {
+            model->playAnimation(anim, nullptr, properties);
+        }
     });
 }
 

@@ -138,10 +138,10 @@ public:
 
     // Animation
 
-    void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties(), PlayAnimationAction *actionToComplete = nullptr) override;
+    void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties()) override;
 
     void playAnimation(CombatAnimation anim, CreatureWieldType wield, int variant = 1);
-    void playAnimation(const std::string &name, scene::AnimationProperties properties = scene::AnimationProperties(), Action *actionToComplete = nullptr);
+    void playAnimation(const std::string &name, scene::AnimationProperties properties = scene::AnimationProperties());
     void playAnimation(const std::shared_ptr<graphics::Animation> &anim, scene::AnimationProperties properties = scene::AnimationProperties());
 
     void updateModelAnimation();
@@ -284,7 +284,6 @@ private:
 
     bool _animDirty { true };
     bool _animFireForget { false };
-    Action *_animAction { nullptr }; /**< action to complete when animation is finished */
     std::shared_ptr<graphics::LipAnimation> _lipAnimation;
 
     // END Animation
@@ -332,8 +331,9 @@ private:
 
     void doPlayAnimation(bool fireForget, const std::function<void()> &callback);
 
-    std::string getAnimationName(AnimationType anim) const;
+    std::string getAnimationName(AnimationType anim) const override;
     std::string getAnimationName(CombatAnimation anim, CreatureWieldType wield, int variant) const;
+    std::string getActiveAnimationName() const override;
 
     std::string getDeadAnimation() const;
     std::string getDieAnimation() const;

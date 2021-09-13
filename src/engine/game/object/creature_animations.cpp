@@ -25,6 +25,8 @@
 
 using namespace std;
 
+using namespace reone::scene;
+
 namespace reone {
 
 namespace game {
@@ -282,6 +284,13 @@ string Creature::getAnimationName(CombatAnimation anim, CreatureWieldType wield,
         default:
             return "";
     }
+}
+
+string Creature::getActiveAnimationName() const {
+    auto model = dynamic_pointer_cast<ModelSceneNode>(_sceneNode);
+    if (!model) return "";
+
+    return model->getActiveAnimationName();
 }
 
 } // namespace game

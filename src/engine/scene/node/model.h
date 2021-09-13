@@ -65,6 +65,8 @@ public:
 
     bool isAnimationFinished() const;
 
+    std::string getActiveAnimationName() const;
+
     void setInanimateNodes(std::set<std::string> nodes) { _inanimateNodes = std::move(nodes); }
 
     // END Animation
