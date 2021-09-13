@@ -36,14 +36,12 @@ public:
 
     void execute(Object &actor, float dt) override;
 
-    AnimationType animation() const { return _anim; }
-    float speed() const { return _speed; }
-    float durationSeconds() const { return _durationSeconds; }
-
 private:
     AnimationType _anim;
     float _speed;
     float _durationSeconds;
+
+    bool _playing { false };
 };
 
 } // namespace game

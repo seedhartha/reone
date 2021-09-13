@@ -76,7 +76,10 @@ public:
 
     // Animation
 
-    virtual void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties(), PlayAnimationAction *actionToComplete = nullptr);
+    virtual void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties());
+
+    virtual std::string getAnimationName(AnimationType type) const { return ""; }
+    virtual std::string getActiveAnimationName() const { return ""; };
 
     // END Animation
 
@@ -141,6 +144,7 @@ protected:
     std::deque<AppliedEffect> _effects;
     bool _open { false };
     bool _stunt { false };
+    std::string _activeAnimName;
 
     SpatialObject(
         uint32_t id,

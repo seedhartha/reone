@@ -30,13 +30,27 @@ namespace reone {
 namespace game {
 
 void PlayAnimationAction::execute(Object &actor, float dt) {
+    auto spatial = dynamic_cast<SpatialObject *>(&actor);
+    if (!spatial) {
+        complete();
+        return;
+    }
+
+    string animName(spatial->getAnimationName(_anim));
+    if (_playing) {
+        if (spatial->getActiveAnimationName() != animName) {
+            complete();
+        }
+        return;
+    }
+
     AnimationProperties properties;
     properties.speed = _speed;
+    properties.duration = _durationSeconds;
 
-    // TODO: handle duration
+    spatial->playAnimation(_anim, move(properties));
 
-    auto spatial = static_cast<SpatialObject *>(&actor);
-    spatial->playAnimation(_anim, move(properties), this);
+    _playing = true;
 }
 
 } // namespace game

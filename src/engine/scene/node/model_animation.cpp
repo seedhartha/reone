@@ -351,6 +351,15 @@ bool ModelSceneNode::isAnimationFinished() const {
     return _animChannels.empty();
 }
 
+string ModelSceneNode::getActiveAnimationName() const {
+    if (_animChannels.empty()) return "";
+
+    const AnimationChannel &channel = _animChannels.front();
+    if (!channel.anim || channel.finished) return "";
+
+    return channel.anim->name();
+}
+
 } // namespace scene
 
 } // namespace reone
