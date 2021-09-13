@@ -146,6 +146,8 @@ private:
     }
 
     int runGame() {
+        GameID gameId = determineGameID();
+
         ResourceServices resource(_gamePath);
         resource.init();
 
@@ -161,7 +163,6 @@ private:
         ScriptServices script(resource);
         script.init();
 
-        GameID gameId = determineGameID();
         unique_ptr<Game> game(newGame(gameId, resource, graphics, audio, scene, script));
 
         return game->run();
