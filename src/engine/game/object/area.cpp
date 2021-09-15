@@ -27,6 +27,7 @@
 #include "../../graphics/model/models.h"
 #include "../../graphics/texture/textures.h"
 #include "../../graphics/walkmesh/walkmeshes.h"
+#include "../../resource/2da.h"
 #include "../../resource/format/lytreader.h"
 #include "../../resource/format/visreader.h"
 #include "../../resource/resources.h"
@@ -58,6 +59,13 @@ namespace game {
 static constexpr float kDefaultFieldOfView = 75.0f;
 static constexpr int kMaxSoundCount = 4;
 static constexpr float kGrassDensityFactor = 0.25f;
+
+static constexpr float kUpdatePerceptionInterval = 1.0f; // seconds
+
+static constexpr float kElevationTestZ = 1024.0f;
+static constexpr float kMaxCollisionDistance = 8.0f;
+static constexpr float kMaxCollisionDistance2 = kMaxCollisionDistance * kMaxCollisionDistance;
+static constexpr float kLineOfSightTestHeight = 1.7f; // TODO: make it appearance-based
 
 static bool g_debugPath = false;
 
@@ -825,6 +833,614 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
     }
 
     return move(object);
+}
+
+void Area::updateObjectSelection() {
+    if (_hilightedObject && !_hilightedObject->isSelectable()) {
+        _hilightedObject.reset();
+    }
+    if (_selectedObject && !_selectedObject->isSelectable()) {
+        _selectedObject.reset();
+    }
+}
+
+void Area::selectNextObject(bool reverse) {
+    vector<shared_ptr<SpatialObject>> selectables(getSelectableObjects());
+
+    if (selectables.empty()) {
+        _selectedObject.reset();
+        return;
+    }
+    if (!_selectedObject) {
+        _selectedObject = selectables.front();
+        return;
+    }
+    if (reverse) {
+        auto selected = std::find(selectables.rbegin(), selectables.rend(), _selectedObject);
+        if (selected != selectables.rend()) {
+            selected++;
+        }
+        _selectedObject = selected != selectables.rend() ? *selected : selectables.back();
+
+    } else {
+        auto selected = std::find(selectables.begin(), selectables.end(), _selectedObject);
+        if (selected != selectables.end()) {
+            selected++;
+        }
+        _selectedObject = selected != selectables.end() ? *selected : selectables.front();
+    }
+}
+
+vector<shared_ptr<SpatialObject>> Area::getSelectableObjects() const {
+    vector<shared_ptr<SpatialObject>> result;
+    vector<pair<shared_ptr<SpatialObject>, float>> distances;
+
+    shared_ptr<SpatialObject> partyLeader(_game->services().party().getLeader());
+    glm::vec3 origin(partyLeader->position());
+
+    for (auto &object : objects()) {
+        if (!object->isSelectable() || object.get() == partyLeader.get()) continue;
+
+        auto model = static_pointer_cast<ModelSceneNode>(object->sceneNode());
+        if (!model || !model->isVisible()) continue;
+
+        float dist2 = object->getDistanceTo2(origin);
+        if (dist2 > kSelectionDistance * kSelectionDistance) continue;
+
+        distances.push_back(make_pair(object, dist2));
+    }
+
+    sort(distances.begin(), distances.end(), [](auto &left, auto &right) {
+        return left.second < right.second;
+    });
+    for (auto &pair : distances) {
+        result.push_back(pair.first);
+    }
+
+    return move(result);
+}
+
+void Area::selectNearestObject() {
+    _selectedObject.reset();
+    selectNextObject();
+}
+
+void Area::hilightObject(shared_ptr<SpatialObject> object) {
+    _hilightedObject = move(object);
+}
+
+void Area::selectObject(shared_ptr<SpatialObject> object) {
+    _selectedObject = move(object);
+}
+
+shared_ptr<SpatialObject> Area::getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<SpatialObject> &)> &predicate) {
+    vector<pair<shared_ptr<SpatialObject>, float>> candidates;
+
+    for (auto &object : _objects) {
+        if (predicate(object)) {
+            candidates.push_back(make_pair(object, object->getDistanceTo2(origin)));
+        }
+    }
+    sort(candidates.begin(), candidates.end(), [](auto &left, auto &right) { return left.second < right.second; });
+
+    int candidateCount = static_cast<int>(candidates.size());
+    if (nth >= candidateCount) {
+        debug(boost::format("Area: getNearestObject: nth is out of bounds: %d/%d") % nth % candidateCount, 2);
+        return nullptr;
+    }
+
+    return candidates[nth].first;
+}
+
+shared_ptr<Creature> Area::getNearestCreature(const std::shared_ptr<SpatialObject> &target, const SearchCriteriaList &criterias, int nth) {
+    vector<pair<shared_ptr<Creature>, float>> candidates;
+
+    for (auto &object : getObjectsByType(ObjectType::Creature)) {
+        auto creature = static_pointer_cast<Creature>(object);
+        if (matchesCriterias(*creature, criterias, target)) {
+            float distance2 = creature->getDistanceTo2(*target);
+            candidates.push_back(make_pair(move(creature), distance2));
+        }
+    }
+
+    sort(candidates.begin(), candidates.end(), [](auto &left, auto &right) {
+        return left.second < right.second;
+    });
+
+    return nth < candidates.size() ? candidates[nth].first : nullptr;
+}
+
+bool Area::matchesCriterias(const Creature &creature, const SearchCriteriaList &criterias, std::shared_ptr<SpatialObject> target) const {
+    for (auto &criteria : criterias) {
+        switch (criteria.first) {
+            case CreatureType::Reputation: {
+                auto reputation = static_cast<ReputationType>(criteria.second);
+                switch (reputation) {
+                    case ReputationType::Friend:
+                        if (!target || !_game->services().reputes().getIsFriend(creature, *static_pointer_cast<Creature>(target))) return false;
+                        break;
+                    case ReputationType::Enemy:
+                        if (!target || !_game->services().reputes().getIsEnemy(creature, *static_pointer_cast<Creature>(target))) return false;
+                        break;
+                    case ReputationType::Neutral:
+                        if (!target || !_game->services().reputes().getIsNeutral(creature, *static_pointer_cast<Creature>(target))) return false;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            }
+            case CreatureType::Perception: {
+                if (!target) return false;
+
+                bool seen = creature.perception().seen.count(target) > 0;
+                bool heard = creature.perception().heard.count(target) > 0;
+                bool matches = false;
+                auto perception = static_cast<PerceptionType>(criteria.second);
+                switch (perception) {
+                    case PerceptionType::SeenAndHeard:
+                        matches = seen && heard;
+                        break;
+                    case PerceptionType::NotSeenAndNotHeard:
+                        matches = !seen && !heard;
+                        break;
+                    case PerceptionType::HeardAndNotSeen:
+                        matches = heard && !seen;
+                        break;
+                    case PerceptionType::SeenAndNotHeard:
+                        matches = seen && !heard;
+                        break;
+                    case PerceptionType::NotHeard:
+                        matches = !heard;
+                        break;
+                    case PerceptionType::Heard:
+                        matches = heard;
+                        break;
+                    case PerceptionType::NotSeen:
+                        matches = !seen;
+                        break;
+                    case PerceptionType::Seen:
+                        matches = seen;
+                        break;
+                    default:
+                        break;
+                }
+                if (!matches) return false;
+                break;
+            }
+            default:
+                // TODO: implement other criterias
+                break;
+        }
+    }
+
+    return true;
+}
+
+shared_ptr<Creature> Area::getNearestCreatureToLocation(const Location &location, const SearchCriteriaList &criterias, int nth) {
+    vector<pair<shared_ptr<Creature>, float>> candidates;
+
+    for (auto &object : getObjectsByType(ObjectType::Creature)) {
+        auto creature = static_pointer_cast<Creature>(object);
+        if (matchesCriterias(*creature, criterias)) {
+            float distance2 = creature->getDistanceTo2(location.position());
+            candidates.push_back(make_pair(move(creature), distance2));
+        }
+    }
+
+    sort(candidates.begin(), candidates.end(), [](auto &left, auto &right) {
+        return left.second < right.second;
+    });
+
+    return nth < candidates.size() ? candidates[nth].first : nullptr;
+}
+
+void Area::updatePerception(float dt) {
+    if (_perceptionTimer.advance(dt)) {
+        doUpdatePerception();
+        _perceptionTimer.setTimeout(kUpdatePerceptionInterval);
+    }
+}
+
+void Area::doUpdatePerception() {
+    // For each creature, determine a list of creatures it sees
+    ObjectList &creatures = getObjectsByType(ObjectType::Creature);
+    for (auto &object : creatures) {
+        // Skip dead creatures
+        if (object->isDead()) continue;
+
+        auto creature = static_pointer_cast<Creature>(object);
+        float hearingRange2 = creature->perception().hearingRange * creature->perception().hearingRange;
+        float sightRange2 = creature->perception().sightRange * creature->perception().sightRange;
+
+        for (auto &other : creatures) {
+            // Skip self
+            if (other == object) continue;
+
+            bool heard = false;
+            bool seen = false;
+
+            float distance2 = creature->getDistanceTo2(*other);
+            if (distance2 <= hearingRange2) {
+                heard = true;
+            }
+            if (distance2 <= sightRange2) {
+                seen = isInLineOfSight(*creature, *other);
+            }
+
+            // Hearing
+            bool wasHeard = creature->perception().heard.count(other) > 0;
+            if (!wasHeard && heard) {
+                debug(boost::format("Perception: %s heard by %s") % other->tag() % creature->tag(), 2);
+                creature->onObjectHeard(other);
+            } else if (wasHeard && !heard) {
+                debug(boost::format("Perception: %s inaudible to %s") % other->tag() % creature->tag(), 2);
+                creature->onObjectInaudible(other);
+            }
+
+            // Sight
+            bool wasSeen = creature->perception().seen.count(other) > 0;
+            if (!wasSeen && seen) {
+                debug(boost::format("Perception: %s seen by %s") % other->tag() % creature->tag(), 2);
+                creature->onObjectSeen(other);
+            } else if (wasSeen && !seen) {
+                debug(boost::format("Perception: %s vanished from %s") % other->tag() % creature->tag(), 2);
+                creature->onObjectVanished(other);
+            }
+        }
+    }
+}
+
+void Area::loadGIT(const GffStruct &git) {
+    loadProperties(git);
+    loadCreatures(git);
+    loadDoors(git);
+    loadPlaceables(git);
+    loadWaypoints(git);
+    loadTriggers(git);
+    loadSounds(git);
+    loadCameras(git);
+    loadEncounters(git);
+}
+
+void Area::loadProperties(const GffStruct &git) {
+    shared_ptr<GffStruct> props(git.getStruct("AreaProperties"));
+    int musicIdx = props->getInt("MusicDay");
+    if (musicIdx) {
+        shared_ptr<TwoDA> musicTable(_game->services().resource().resources().get2DA("ambientmusic"));
+        _music = musicTable->getString(musicIdx, "resource");
+    }
+}
+
+void Area::loadCreatures(const GffStruct &git) {
+    for (auto &gffs : git.getList("Creature List")) {
+        shared_ptr<Creature> creature(_game->services().objectFactory().newCreature());
+        creature->loadFromGIT(*gffs);
+        landObject(*creature);
+        add(creature);
+    }
+}
+
+void Area::loadDoors(const GffStruct &git) {
+    for (auto &gffs : git.getList("Door List")) {
+        shared_ptr<Door> door(_game->services().objectFactory().newDoor());
+        door->loadFromGIT(*gffs);
+        add(door);
+    }
+}
+
+void Area::loadPlaceables(const GffStruct &git) {
+    for (auto &gffs : git.getList("Placeable List")) {
+        shared_ptr<Placeable> placeable(_game->services().objectFactory().newPlaceable());
+        placeable->loadFromGIT(*gffs);
+        add(placeable);
+    }
+}
+
+void Area::loadWaypoints(const GffStruct &git) {
+    for (auto &gffs : git.getList("WaypointList")) {
+        shared_ptr<Waypoint> waypoint(_game->services().objectFactory().newWaypoint());
+        waypoint->loadFromGIT(*gffs);
+        add(waypoint);
+    }
+}
+
+void Area::loadTriggers(const GffStruct &git) {
+    for (auto &gffs : git.getList("TriggerList")) {
+        shared_ptr<Trigger> trigger(_game->services().objectFactory().newTrigger());
+        trigger->loadFromGIT(*gffs);
+        add(trigger);
+    }
+}
+
+void Area::loadSounds(const GffStruct &git) {
+    for (auto &gffs : git.getList("SoundList")) {
+        shared_ptr<Sound> sound(_game->services().objectFactory().newSound());
+        sound->loadFromGIT(*gffs);
+        add(sound);
+    }
+}
+
+void Area::loadCameras(const GffStruct &git) {
+    for (auto &gffs : git.getList("CameraList")) {
+        shared_ptr<PlaceableCamera> camera(_game->services().objectFactory().newCamera());
+        camera->loadFromGIT(*gffs);
+        add(camera);
+    }
+}
+
+void Area::loadEncounters(const GffStruct &git) {
+    for (auto &gffs : git.getList("Encounter List")) {
+        shared_ptr<Encounter> encounter(_game->services().objectFactory().newEncounter());
+        encounter->loadFromGIT(*gffs);
+        add(encounter);
+    }
+}
+
+bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room *&room) const {
+    static glm::vec3 down(0.0f, 0.0f, -1.0f);
+
+    // Test non-walkable faces of object walkmeshes
+    for (auto &o : _objects) {
+        auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
+        shared_ptr<Walkmesh> walkmesh(o->getWalkmesh());
+        if (!model || !walkmesh) continue;
+
+        // Distance to object must not exceed maximum collision distance
+        if (o->getDistanceTo2(point) > kMaxCollisionDistance2) continue;
+
+        // Test non-walkable faces beneath the specified point (object space)
+        glm::vec2 objSpacePos(model->absoluteTransformInverse() * glm::vec4(point, 0.0f, 1.0f));
+        float distance;
+        glm::vec3 normal;
+        if (walkmesh->raycastNonWalkableFirst(glm::vec3(objSpacePos, kElevationTestZ), down, distance, normal)) return false;
+    }
+
+    // Test walkable faces of room walkmeshes
+    for (auto &r : _rooms) {
+        shared_ptr<ModelSceneNode> model(r.second->model());
+        shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
+        if (!model || !walkmesh) continue;
+
+        // Point must be inside room AABB in 2D object space
+        glm::vec2 roomSpacePos(model->absoluteTransformInverse() * glm::vec4(point, 0.0f, 1.0f));
+        if (!model->aabb().contains(roomSpacePos)) continue;
+
+        // Test walkable faces beneath the specified point (world space)
+        float distance;
+        int tempMaterial;
+        if (walkmesh->raycastWalkableFirst(glm::vec3(point, kElevationTestZ), down, distance, tempMaterial)) {
+            z = kElevationTestZ - distance;
+            material = tempMaterial;
+            room = r.second.get();
+            return true;
+        }
+    }
+
+    return false;
+}
+
+shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
+    shared_ptr<CameraSceneNode> camera(_game->services().scene().graph().activeCamera());
+    shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
+    if (!camera || !partyLeader) return nullptr;
+
+    const GraphicsOptions &opts = _game->options().graphics;
+    glm::vec4 viewport(0.0f, 0.0f, opts.width, opts.height);
+    glm::vec3 start(glm::unProject(glm::vec3(x, opts.height - y, 0.0f), camera->view(), camera->projection(), viewport));
+    glm::vec3 end(glm::unProject(glm::vec3(x, opts.height - y, 1.0f), camera->view(), camera->projection(), viewport));
+    glm::vec3 dir(glm::normalize(end - start));
+
+    // Calculate distances to all selectable objects, return the closest object
+    vector<pair<shared_ptr<SpatialObject>, float>> distances;
+    for (auto &o : _objects) {
+        // Skip non-selectable objects and party leader
+        if (!o->isSelectable() || o == partyLeader) continue;
+
+        auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
+        if (!model) continue;
+
+        // Distance to object must not exceed maximum collision distance
+        if (o->getDistanceTo2(start) > kMaxCollisionDistance2) continue;
+
+        // Test object AABB (object space)
+        glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
+        glm::vec3 objSpaceDir(model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
+        float distance;
+        if (model->aabb().raycast(objSpaceStart, objSpaceDir, distance)) {
+            distances.push_back(make_pair(o, distance));
+        }
+    }
+    if (distances.empty()) return nullptr;
+    sort(distances.begin(), distances.end(), [](auto &left, auto &right) { return left.second < right.second; });
+
+    return distances[0].first;
+}
+
+bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::vec3 &intersection) const {
+    glm::vec3 endToStart(end - start);
+    glm::vec3 dir(glm::normalize(endToStart));
+    float minDistance = numeric_limits<float>::max();
+    float maxDistance = glm::length(endToStart);
+
+    // Test AABB of door objects
+    for (auto &o : _objects) {
+        if (o->type() != ObjectType::Door) continue;
+
+        auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
+        if (!model) continue;
+
+        // Distance to object must not exceed maximum collision distance
+        if (o->getDistanceTo2(start) > kMaxCollisionDistance2) continue;
+
+        glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
+        glm::vec3 objSpaceDir(model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
+        float distance;
+        if (model->aabb().raycast(objSpaceStart, objSpaceDir, distance) && distance < minDistance && distance < maxDistance) {
+            minDistance = distance;
+        }
+    }
+
+    // Test non-walkable faces of room walkmeshes
+    for (auto &r : _rooms) {
+        shared_ptr<ModelSceneNode> model(r.second->model());
+        shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
+        if (!model || !walkmesh) continue;
+
+        // Start of path must be inside room AABB
+        glm::vec2 roomSpacePos(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
+        if (!model->aabb().contains(roomSpacePos)) continue;
+
+        float distance;
+        glm::vec3 normal;
+        if (walkmesh->raycastNonWalkableClosest(start, dir, distance, normal) && distance < minDistance && distance < maxDistance) {
+            minDistance = distance;
+        }
+    }
+
+    if (minDistance != numeric_limits<float>::max()) {
+        intersection = start + minDistance * dir;
+        return true;
+    }
+
+    return false;
+}
+
+bool Area::getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::vec3 &normal) const {
+    glm::vec3 endToStart(end - start);
+    glm::vec3 dir(glm::normalize(endToStart));
+    float minDistance = numeric_limits<float>::max();
+    float maxDistance = glm::length(endToStart);
+
+    // Test non-walkable faces of room walkmeshes
+    for (auto &r : _rooms) {
+        shared_ptr<ModelSceneNode> model(r.second->model());
+        shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
+        if (!model || !walkmesh) continue;
+
+        // Start of path must be inside room AABB
+        glm::vec2 roomSpacePos(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
+        if (!model->aabb().contains(roomSpacePos)) continue;
+
+        float distance;
+        glm::vec3 tempNormal;
+        if (walkmesh->raycastNonWalkableClosest(start, dir, distance, tempNormal) && distance < minDistance && distance < maxDistance) {
+            minDistance = distance;
+            normal = tempNormal;
+        }
+    }
+
+    return minDistance != numeric_limits<float>::max();
+}
+
+bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target) const {
+    static glm::vec3 offsetZ { 0.0f, 0.0f, kLineOfSightTestHeight };
+
+    glm::vec3 start(subject.position() + offsetZ);
+    glm::vec3 end(target.position() + offsetZ);
+    glm::vec3 startToEnd(end - start);
+    glm::vec3 dir(glm::normalize(startToEnd));
+    float maxDistance = glm::length(startToEnd);
+
+    for (auto &o : _objects) {
+        if (o->type() != ObjectType::Door) continue;
+
+        auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
+        if (!model) continue;
+
+        // Distance to object must not exceed maximum collision distance
+        if (o->getDistanceTo2(start) > kMaxCollisionDistance2) continue;
+
+        glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
+        glm::vec3 objSpaceDir(model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
+        float distance;
+        if (model->aabb().raycast(objSpaceStart, objSpaceDir, distance) && distance < maxDistance) return false;
+    }
+
+    // Test non-walkable faces of room walkmeshes
+    for (auto &r : _rooms) {
+        shared_ptr<ModelSceneNode> model(r.second->model());
+        shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
+        if (!model || !walkmesh) continue;
+
+        // Start or end of path must be inside room AABB
+        glm::vec2 roomSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
+        glm::vec2 roomSpaceEnd(model->absoluteTransformInverse() * glm::vec4(end, 1.0f));
+        if (!model->aabb().contains(roomSpaceStart) && !model->aabb().contains(roomSpaceEnd)) continue;
+
+        float distance;
+        glm::vec3 normal;
+        if (walkmesh->raycastNonWalkableClosest(start, dir, distance, normal) && distance < maxDistance) return false;
+    }
+
+    return true;
+}
+
+void Area::loadARE(const GffStruct &are) {
+    _localizedName = _game->services().resource().strings().get(are.getInt("Name"));
+
+    loadCameraStyle(are);
+    loadAmbientColor(are);
+    loadScripts(are);
+    loadMap(are);
+    loadStealthXP(are);
+    loadGrass(are);
+    loadFog(are);
+}
+
+void Area::loadCameraStyle(const GffStruct &are) {
+    shared_ptr<TwoDA> cameraStyles(_game->services().resource().resources().get2DA("camerastyle"));
+
+    int areaStyleIdx = are.getInt("CameraStyle");
+    _camStyleDefault.load(*cameraStyles, areaStyleIdx);
+
+    int combatStyleIdx = cameraStyles->indexByCellValue("name", "Combat");
+    if (combatStyleIdx != -1) {
+        _camStyleCombat.load(*cameraStyles, combatStyleIdx);
+    }
+}
+
+void Area::loadAmbientColor(const GffStruct &are) {
+    _ambientColor = are.getColor("DynAmbientColor");
+}
+
+void Area::loadScripts(const GffStruct &are) {
+    _onEnter = are.getString("OnEnter");
+    _onExit = are.getString("OnExit");
+    _onHeartbeat = are.getString("OnHeartbeat");
+    _onUserDefined = are.getString("OnUserDefined");
+}
+
+void Area::loadMap(const GffStruct &are) {
+    _map.load(_name, *are.getStruct("Map"));
+}
+
+void Area::loadStealthXP(const GffStruct &are) {
+    _stealthXPEnabled = are.getBool("StealthXPEnabled");
+    _stealthXPDecrement = are.getInt("StealthXPLoss"); // TODO: loss = decrement?
+    _maxStealthXP = are.getInt("StealthXPMax");
+}
+
+void Area::loadGrass(const GffStruct &are) {
+    string texName(boost::to_lower_copy(are.getString("Grass_TexName")));
+    if (!texName.empty()) {
+        _grass.texture = _game->services().graphics().textures().get(texName, TextureUsage::Diffuse);
+    }
+    _grass.density = are.getFloat("Grass_Density");
+    _grass.quadSize = are.getFloat("Grass_QuadSize");
+    _grass.ambient = are.getInt("Grass_Ambient");
+    _grass.diffuse = are.getInt("Grass_Diffuse");
+    _grass.probabilities[0] = are.getFloat("Grass_Prob_UL");
+    _grass.probabilities[1] = are.getFloat("Grass_Prob_UR");
+    _grass.probabilities[2] = are.getFloat("Grass_Prob_LL");
+    _grass.probabilities[3] = are.getFloat("Grass_Prob_LR");
+}
+
+void Area::loadFog(const GffStruct &are) {
+    _fogEnabled = are.getBool("SunFogOn");
+    _fogNear = are.getFloat("SunFogNear");
+    _fogFar = are.getFloat("SunFogFar");
+    _fogColor = are.getColor("SunFogColor");
 }
 
 } // namespace game

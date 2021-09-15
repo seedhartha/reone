@@ -59,6 +59,74 @@ void Object::setLocalNumber(int index, int value) {
     _localNumbers[index] = value;
 }
 
+void Object::clearAllActions() {
+    while (!_actions.empty()) {
+        _actions.pop_front();
+    }
+}
+
+void Object::addAction(unique_ptr<Action> action) {
+    _actions.push_back(move(action));
+}
+
+void Object::addActionOnTop(unique_ptr<Action> action) {
+    _actions.push_front(move(action));
+}
+
+void Object::delayAction(unique_ptr<Action> action, float seconds) {
+    DelayedAction delayed;
+    delayed.action = move(action);
+    delayed.timer.setTimeout(seconds);
+    _delayed.push_back(move(delayed));
+}
+
+void Object::updateActions(float dt) {
+    removeCompletedActions();
+    updateDelayedActions(dt);
+}
+
+void Object::removeCompletedActions() {
+    while (true) {
+        shared_ptr<Action> action(getCurrentAction());
+        if (!action || !action->isCompleted()) return;
+
+        _actions.pop_front();
+    }
+}
+
+void Object::updateDelayedActions(float dt) {
+    for (auto &delayed : _delayed) {
+        delayed.timer.advance(dt);
+        if (delayed.timer.isTimedOut()) {
+            _actions.push_back(move(delayed.action));
+        }
+    }
+    auto delayedToRemove = remove_if(
+        _delayed.begin(),
+        _delayed.end(),
+        [](const DelayedAction &delayed) { return delayed.timer.isTimedOut(); });
+
+    _delayed.erase(delayedToRemove, _delayed.end());
+}
+
+void Object::executeActions(float dt) {
+    if (_actions.empty()) return;
+
+    shared_ptr<Action> action(_actions.front());
+    action->execute(*this, dt);
+}
+
+bool Object::hasUserActionsPending() const {
+    for (auto &action : _actions) {
+        if (action->isUserAction()) return true;
+    }
+    return false;
+}
+
+shared_ptr<Action> Object::getCurrentAction() const {
+    return _actions.empty() ? nullptr : _actions.front();
+}
+
 } // namespace game
 
 } // namespace reone

@@ -78,6 +78,23 @@ void Waypoint::loadTransformFromGIT(const GffStruct &gffs) {
     updateTransform();
 }
 
+void Waypoint::loadUTW(const GffStruct &utw) {
+    _appearance = utw.getInt("Appearance");
+    _blueprintResRef = boost::to_lower_copy(utw.getString("TemplateResRef"));
+    _tag = boost::to_lower_copy(utw.getString("Tag"));
+    _name = _game->services().resource().strings().get(utw.getInt("LocalizedName"));
+    _hasMapNote = utw.getBool("HasMapNote");
+    _mapNote = _game->services().resource().strings().get(utw.getInt("MapNote"));
+    _mapNoteEnabled = utw.getInt("MapNoteEnabled");
+
+    // Unused fields:
+    //
+    // - LinkedTo (not applicable, always empty)
+    // - Description (toolset only)
+    // - PaletteID (toolset only)
+    // - Comment (toolset only)
+}
+
 } // namespace game
 
 } // namespace reone
