@@ -226,7 +226,6 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/mesh/meshes.cpp
     src/engine/graphics/model/animation.cpp
     src/engine/graphics/model/mdlreader.cpp
-    src/engine/graphics/model/mdlreader_controllers.cpp
     src/engine/graphics/model/model.cpp
     src/engine/graphics/model/modelnode.cpp
     src/engine/graphics/model/models.cpp
@@ -332,7 +331,6 @@ set(SCENE_SOURCES
     src/engine/scene/node/light.cpp
     src/engine/scene/node/mesh.cpp
     src/engine/scene/node/model.cpp
-    src/engine/scene/node/model_animation.cpp
     src/engine/scene/node/modelnode.cpp
     src/engine/scene/node/scenenode.cpp
     src/engine/scene/pipeline/control.cpp
