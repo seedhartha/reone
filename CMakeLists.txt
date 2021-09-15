@@ -907,7 +907,11 @@ set(GAME_SOURCES
     src/engine/game/script/routine/impl/talent.cpp
     src/engine/game/script/routine/impl/time.cpp
     src/engine/game/script/routine/impl/vector.cpp
-    src/engine/game/script/routines.cpp
+    src/engine/game/script/routine/registrar/kotor.h
+    src/engine/game/script/routine/registrar/kotor.cpp
+    src/engine/game/script/routine/registrar/registrar.h
+    src/engine/game/script/routine/registrar/tsl.h
+    src/engine/game/script/routine/registrar/tsl.cpp
     src/engine/game/script/runner.cpp
     src/engine/game/services.cpp
     src/engine/game/soundsets.cpp
