@@ -34,20 +34,20 @@ namespace fs = boost::filesystem;
 
 BOOST_AUTO_TEST_CASE(GffStruct_SaveLoad) {
     auto struct1 = make_shared<GffStruct>(0);
-    GffStruct::Field struct1Field(GffStruct::FieldType::Byte, "MyByte"); struct1Field.uintValue = 1;
+    GffField struct1Field(GffFieldType::Byte, "MyByte"); struct1Field.uintValue = 1;
     struct1->add(move(struct1Field));
 
     auto struct2 = make_shared<GffStruct>(0);
-    GffStruct::Field struct2Field(GffStruct::FieldType::Byte, "MyByte"); struct2Field.uintValue = 2;
+    GffField struct2Field(GffFieldType::Byte, "MyByte"); struct2Field.uintValue = 2;
     struct2->add(move(struct2Field));
 
     auto struct3 = make_shared<GffStruct>(0);
-    GffStruct::Field struct3Field(GffStruct::FieldType::Byte, "MyByte"); struct3Field.uintValue = 3;
+    GffField struct3Field(GffFieldType::Byte, "MyByte"); struct3Field.uintValue = 3;
     struct3->add(move(struct3Field));
 
-    vector<GffStruct::Field> rootFields {
-        GffStruct::Field(GffStruct::FieldType::Struct, "MyStruct"),
-        GffStruct::Field(GffStruct::FieldType::List, "MyList")
+    vector<GffField> rootFields {
+        GffField(GffFieldType::Struct, "MyStruct"),
+        GffField(GffFieldType::List, "MyList")
     };
     rootFields[0].children.push_back(move(struct1));
     rootFields[1].children.push_back(move(struct2));

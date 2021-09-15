@@ -69,81 +69,81 @@ unique_ptr<GffStruct> GffReader::readStruct(int idx) {
     return move(gffs);
 }
 
-GffStruct::Field GffReader::readField(int idx) {
+GffField GffReader::readField(int idx) {
     seek(_fieldOffset + 12ll * idx);
 
     uint32_t type = readUint32();
     uint32_t labelIndex = readUint32();
     uint32_t dataOrDataOffset = readUint32();
 
-    GffStruct::Field field;
-    field.type = static_cast<GffStruct::FieldType>(type);
+    GffField field;
+    field.type = static_cast<GffFieldType>(type);
     field.label = readLabel(labelIndex);
 
     switch (field.type) {
-        case GffStruct::FieldType::Byte:
-        case GffStruct::FieldType::Word:
-        case GffStruct::FieldType::Dword:
+        case GffFieldType::Byte:
+        case GffFieldType::Word:
+        case GffFieldType::Dword:
             field.uintValue = dataOrDataOffset;
             break;
-        case GffStruct::FieldType::Char:
-        case GffStruct::FieldType::Short:
-        case GffStruct::FieldType::Int:
+        case GffFieldType::Char:
+        case GffFieldType::Short:
+        case GffFieldType::Int:
             field.intValue = *reinterpret_cast<int *>(&dataOrDataOffset);
             break;
-        case GffStruct::FieldType::Dword64:
+        case GffFieldType::Dword64:
             field.uint64Value = readQWordFieldData(dataOrDataOffset);
             break;
-        case GffStruct::FieldType::Int64: {
+        case GffFieldType::Int64: {
             uint64_t tmp = readQWordFieldData(dataOrDataOffset);
             field.int64Value = *reinterpret_cast<int64_t *>(&tmp);
             break;
         }
-        case GffStruct::FieldType::Float:
+        case GffFieldType::Float:
             field.floatValue = *reinterpret_cast<float *>(&dataOrDataOffset);
             break;
-        case GffStruct::FieldType::Double: {
+        case GffFieldType::Double: {
             uint64_t tmp = readQWordFieldData(dataOrDataOffset);
             field.doubleValue = *reinterpret_cast<double *>(&tmp);
             break;
         }
-        case GffStruct::FieldType::CExoString:
+        case GffFieldType::CExoString:
             field.strValue = readStringFieldData(dataOrDataOffset);
             break;
-        case GffStruct::FieldType::ResRef:
+        case GffFieldType::ResRef:
             field.strValue = readResRefFieldData(dataOrDataOffset);
             break;
-        case GffStruct::FieldType::CExoLocString: {
+        case GffFieldType::CExoLocString: {
             LocString locString(readCExoLocStringFieldData(dataOrDataOffset));
             field.intValue = locString.strRef;
             field.strValue = locString.subString;
             break;
         }
-        case GffStruct::FieldType::Void:
+        case GffFieldType::Void:
             field.data = readByteArrayFieldData(dataOrDataOffset);
             break;
-        case GffStruct::FieldType::Struct:
+        case GffFieldType::Struct:
             field.children.push_back(readStruct(dataOrDataOffset));
             break;
-        case GffStruct::FieldType::List: {
+        case GffFieldType::List: {
             vector<uint32_t> list(readList(dataOrDataOffset));
             for (auto &item : list) {
                 field.children.push_back(readStruct(item));
             }
             break;
         }
-        case GffStruct::FieldType::Orientation: {
+        case GffFieldType::Orientation: {
             ByteArray data(readByteArrayFieldData(dataOrDataOffset, 4 * sizeof(float)));
             auto floatData = reinterpret_cast<float *>(&data[0]);
             field.quatValue = glm::quat(floatData[0], floatData[1], floatData[2], floatData[3]);
             break;
         }
-        case GffStruct::FieldType::Vector: {
+        case GffFieldType::Vector: {
             ByteArray data(readByteArrayFieldData(dataOrDataOffset, 3 * sizeof(float)));
             field.vecValue = glm::make_vec3(reinterpret_cast<float *>(&data[0]));
             break;
         }
-        case GffStruct::FieldType::StrRef:
+        case GffFieldType::StrRef:
             field.intValue = readStrRefFieldData(dataOrDataOffset);
             break;
         default:
