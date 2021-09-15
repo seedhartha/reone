@@ -54,7 +54,7 @@ private:
     void doLoad() override;
 
     std::unique_ptr<GffStruct> readStruct(int idx);
-    GffStruct::Field readField(int idx);
+    GffField readField(int idx);
     std::string readLabel(int idx);
     std::vector<uint32_t> readFieldIndices(uint32_t off, int count);
     uint64_t readQWordFieldData(uint32_t off);

@@ -876,48 +876,48 @@ void Game::saveToFile(const fs::path &path) {
 
     vector<shared_ptr<GffStruct>> nfoGlobalBooleans;
     for (auto &global : _globalBooleans) {
-        auto gffs = make_shared<GffStruct>(2, vector<GffStruct::Field> {
-            GffStruct::Field::newCExoString("Name", global.first),
-            GffStruct::Field::newByte("Value", static_cast<uint32_t>(global.second))
+        auto gffs = make_shared<GffStruct>(2, vector<GffField> {
+            GffField::newCExoString("Name", global.first),
+            GffField::newByte("Value", static_cast<uint32_t>(global.second))
         });
         nfoGlobalBooleans.push_back(move(gffs));
     }
 
     vector<shared_ptr<GffStruct>> nfoGlobalNumbers;
     for (auto &global : _globalNumbers) {
-        auto gffs = make_shared<GffStruct>(2, vector<GffStruct::Field> {
-            GffStruct::Field::newCExoString("Name", global.first),
-            GffStruct::Field::newInt("Value", global.second)
+        auto gffs = make_shared<GffStruct>(2, vector<GffField> {
+            GffField::newCExoString("Name", global.first),
+            GffField::newInt("Value", global.second)
         });
         nfoGlobalNumbers.push_back(move(gffs));
     }
 
     vector<shared_ptr<GffStruct>> nfoGlobalStrings;
     for (auto &global : _globalStrings) {
-        auto gffs = make_shared<GffStruct>(2, vector<GffStruct::Field> {
-            GffStruct::Field::newCExoString("Name", global.first),
-            GffStruct::Field::newCExoString("Value", global.second)
+        auto gffs = make_shared<GffStruct>(2, vector<GffField> {
+            GffField::newCExoString("Name", global.first),
+            GffField::newCExoString("Value", global.second)
         });
         nfoGlobalStrings.push_back(move(gffs));
     }
 
     vector<shared_ptr<GffStruct>> nfoGlobalLocations;
     for (auto &global : _globalLocations) {
-        auto gffs = make_shared<GffStruct>(3, vector<GffStruct::Field> {
-            GffStruct::Field::newCExoString("Name", global.first),
-            GffStruct::Field::newVector("Position", global.second->position()),
-            GffStruct::Field::newFloat("Facing", global.second->facing())
+        auto gffs = make_shared<GffStruct>(3, vector<GffField> {
+            GffField::newCExoString("Name", global.first),
+            GffField::newVector("Position", global.second->position()),
+            GffField::newFloat("Facing", global.second->facing())
         });
         nfoGlobalLocations.push_back(move(gffs));
     }
 
     auto nfoRoot = make_shared<GffStruct>(0xffffffff);
-    nfoRoot->add(GffStruct::Field::newCExoString("LastModule", _module->name()));
-    nfoRoot->add(GffStruct::Field::newList("Party", move(nfoPartyMembers)));
-    nfoRoot->add(GffStruct::Field::newList("GlobalBooleans", move(nfoGlobalBooleans)));
-    nfoRoot->add(GffStruct::Field::newList("GlobalNumbers", move(nfoGlobalNumbers)));
-    nfoRoot->add(GffStruct::Field::newList("GlobalStrings", move(nfoGlobalStrings)));
-    nfoRoot->add(GffStruct::Field::newList("GlobalLocations", move(nfoGlobalLocations)));
+    nfoRoot->add(GffField::newCExoString("LastModule", _module->name()));
+    nfoRoot->add(GffField::newList("Party", move(nfoPartyMembers)));
+    nfoRoot->add(GffField::newList("GlobalBooleans", move(nfoGlobalBooleans)));
+    nfoRoot->add(GffField::newList("GlobalNumbers", move(nfoGlobalNumbers)));
+    nfoRoot->add(GffField::newList("GlobalStrings", move(nfoGlobalStrings)));
+    nfoRoot->add(GffField::newList("GlobalLocations", move(nfoGlobalLocations)));
 
     char nfoBuffer[kNfoBufferSize];
     io::array_sink nfoSink(nfoBuffer, kNfoBufferSize);
@@ -964,11 +964,11 @@ void Game::saveToFile(const fs::path &path) {
 shared_ptr<GffStruct> Game::getPartyMemberNFOStruct(int index) const {
     auto member = _game->party().getMember(index);
 
-    return make_shared<GffStruct>(0, vector<GffStruct::Field> {
-        GffStruct::Field::newByte("NPC", _game->party().getNPCByMemberIndex(index)),
-        GffStruct::Field::newCExoString("TemplateResRef", member->blueprintResRef()),
-        GffStruct::Field::newVector("Position", member->position()),
-        GffStruct::Field::newFloat("Facing", member->getFacing())
+    return make_shared<GffStruct>(0, vector<GffField> {
+        GffField::newByte("NPC", _game->party().getNPCByMemberIndex(index)),
+        GffField::newCExoString("TemplateResRef", member->blueprintResRef()),
+        GffField::newVector("Position", member->position()),
+        GffField::newFloat("Facing", member->getFacing())
     });
 }
 

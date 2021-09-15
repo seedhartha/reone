@@ -86,54 +86,54 @@ void GffWriter::save(const shared_ptr<ostream> &out) {
  * @param complex[out] field's data if it is of complex type
  * @return field classification
  */
-static FieldClassification getFieldData(const GffStruct::Field &field, uint32_t &simple, ByteArray &complex) {
+static FieldClassification getFieldData(const GffField &field, uint32_t &simple, ByteArray &complex) {
     switch (field.type) {
-        case GffStruct::FieldType::Byte:
-        case GffStruct::FieldType::Word:
-        case GffStruct::FieldType::Dword:
+        case GffFieldType::Byte:
+        case GffFieldType::Word:
+        case GffFieldType::Dword:
             simple = field.uintValue;
             return FieldClassification::Simple;
 
-        case GffStruct::FieldType::Char:
-        case GffStruct::FieldType::Short:
-        case GffStruct::FieldType::Int:
+        case GffFieldType::Char:
+        case GffFieldType::Short:
+        case GffFieldType::Int:
             simple = *reinterpret_cast<const uint32_t *>(&field.intValue);
             return FieldClassification::Simple;
 
-        case GffStruct::FieldType::Dword64:
+        case GffFieldType::Dword64:
             complex.resize(8);
             memcpy(&complex[0], &field.uint64Value, 8);
             return FieldClassification::Complex;
 
-        case GffStruct::FieldType::Int64:
+        case GffFieldType::Int64:
             complex.resize(8);
             memcpy(&complex[0], &field.int64Value, 8);
             return FieldClassification::Complex;
 
-        case GffStruct::FieldType::Float:
+        case GffFieldType::Float:
             simple = *reinterpret_cast<const uint32_t *>(&field.floatValue);
             return FieldClassification::Simple;
 
-        case GffStruct::FieldType::Double:
+        case GffFieldType::Double:
             complex.resize(8);
             memcpy(&complex[0], &field.doubleValue, sizeof(double));
             return FieldClassification::Complex;
 
-        case GffStruct::FieldType::CExoString: {
+        case GffFieldType::CExoString: {
             uint32_t length = static_cast<uint32_t>(field.strValue.length());
             complex.resize(4ll + length);
             memcpy(&complex[0], &length, 4);
             memcpy(&complex[4], &field.strValue[0], length);
             return FieldClassification::Complex;
         }
-        case GffStruct::FieldType::ResRef: {
+        case GffFieldType::ResRef: {
             uint32_t length = static_cast<uint32_t>(field.strValue.length());
             complex.resize(1ll + length);
             complex[0] = length;
             memcpy(&complex[1], &field.strValue[0], length);
             return FieldClassification::Complex;
         }
-        case GffStruct::FieldType::CExoLocString: {
+        case GffFieldType::CExoLocString: {
             uint32_t numSubstrings = !field.strValue.empty() ? 1 : 0;
             uint32_t totalSize = static_cast<uint32_t>(8 + (numSubstrings > 0 ? (8 + field.strValue.length()) : 0));
             complex.resize(4ll + totalSize);
@@ -149,20 +149,20 @@ static FieldClassification getFieldData(const GffStruct::Field &field, uint32_t 
             }
             return FieldClassification::Complex;
         }
-        case GffStruct::FieldType::Void: {
+        case GffFieldType::Void: {
             uint32_t dataSize = static_cast<uint32_t>(field.data.size());
             complex.resize(4ll + dataSize);
             memcpy(&complex[0], &dataSize, 4);
             memcpy(&complex[4], &field.data[0], dataSize);
             return FieldClassification::Complex;
         }
-        case GffStruct::FieldType::Struct:
+        case GffFieldType::Struct:
             return FieldClassification::Struct;
 
-        case GffStruct::FieldType::List: 
+        case GffFieldType::List: 
             return FieldClassification::List;
 
-        case GffStruct::FieldType::Orientation:
+        case GffFieldType::Orientation:
             complex.resize(16);
             memcpy(&complex[0], &field.quatValue.w, 4);
             memcpy(&complex[4], &field.quatValue.x, 4);
@@ -170,12 +170,12 @@ static FieldClassification getFieldData(const GffStruct::Field &field, uint32_t 
             memcpy(&complex[12], &field.quatValue.z, 4);
             return FieldClassification::Complex;
 
-        case GffStruct::FieldType::Vector:
+        case GffFieldType::Vector:
             complex.resize(12);
             memcpy(&complex[0], &field.vecValue[0], 12);
             return FieldClassification::Complex;
 
-        case GffStruct::FieldType::StrRef: {
+        case GffFieldType::StrRef: {
             uint32_t totalSize = 4;
             complex.resize(8);
             memcpy(&complex[0], &totalSize, 4);

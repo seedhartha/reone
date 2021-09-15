@@ -103,18 +103,18 @@ void PthTool::toPTH(const fs::path &path, const fs::path &destPath) {
     pthPath.append(filename.substr(0, filename.length() - 6));
 
     int numConnections = 0;
-    GffStruct::Field pathPoints(GffStruct::FieldType::List, "Path_Points");
+    GffField pathPoints(GffFieldType::List, "Path_Points");
     for (auto &point : points) {
-        GffStruct::Field conections(GffStruct::FieldType::Dword, "Conections");
+        GffField conections(GffFieldType::Dword, "Conections");
         conections.uintValue = static_cast<int>(point.connections.size());
 
-        GffStruct::Field firstConection(GffStruct::FieldType::Dword, "First_Conection");
+        GffField firstConection(GffFieldType::Dword, "First_Conection");
         firstConection.uintValue = numConnections;
 
-        GffStruct::Field xField(GffStruct::FieldType::Float, "X");
+        GffField xField(GffFieldType::Float, "X");
         xField.floatValue = point.position.x;
 
-        GffStruct::Field yField(GffStruct::FieldType::Float, "Y");
+        GffField yField(GffFieldType::Float, "Y");
         yField.floatValue = point.position.y;
 
         auto pointStruct = make_shared<GffStruct>(2);
@@ -127,10 +127,10 @@ void PthTool::toPTH(const fs::path &path, const fs::path &destPath) {
         numConnections += static_cast<int>(point.connections.size());
     }
 
-    GffStruct::Field pathConections(GffStruct::FieldType::List, "Path_Conections");
+    GffField pathConections(GffFieldType::List, "Path_Conections");
     for (auto &point : points) {
         for (auto &connection : point.connections) {
-            GffStruct::Field destination(GffStruct::FieldType::Dword, "Destination");
+            GffField destination(GffFieldType::Dword, "Destination");
             destination.uintValue = connection;
 
             auto conectionStruct = make_shared<GffStruct>(3);
