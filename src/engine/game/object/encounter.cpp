@@ -18,6 +18,7 @@
 #include "encounter.h"
 
 #include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 #include "../game.h"
 
@@ -82,6 +83,46 @@ void Encounter::loadSpawnPointsFromGIT(const GffStruct &gffs) {
         point.position = glm::vec3(x, y, z);
         point.orientation = glm::angleAxis(orientation, glm::vec3(0.0f, 0.0f, 1.0f)); // TODO: validate
         _spawnPoints.push_back(move(point));
+    }
+}
+
+void Encounter::loadUTE(const GffStruct &ute) {
+    _tag = boost::to_lower_copy(ute.getString("Tag"));
+    _name = _game->services().resource().strings().get(ute.getInt("LocalizedName"));
+    _blueprintResRef = boost::to_lower_copy(ute.getString("TemplateResRef"));
+    _active = ute.getBool("Active");
+    _difficultyIndex = ute.getInt("DifficultyIndex"); // index into encdifficulty.2da
+    _faction = ute.getEnum("Faction", Faction::Invalid);
+    _maxCreatures = ute.getInt("MaxCreatures");
+    _playerOnly = ute.getBool("PlayerOnly");
+    _reset = ute.getBool("Reset");
+    _resetTime = ute.getInt("ResetTime");
+    _respawns = ute.getInt("Respawns");
+
+    _onEntered = ute.getString("OnEntered");
+    _onExit = ute.getString("OnExit"); // always empty, but could be useful
+    _onExhausted = ute.getString("OnExhausted"); // always empty, but could be useful
+    _onHeartbeat = ute.getString("OnHeartbeat"); // always empty, but could be useful
+    _onUserDefined = ute.getString("OnUserDefined"); // always empty, but could be useful
+
+    loadCreaturesFromUTE(ute);
+
+    // Unused fields:
+    //
+    // - Difficulty (obsolete)
+    // - SpawnOption (always 1)
+    // - PaletteID (toolset only)
+    // - Comment (toolset only)
+}
+
+void Encounter::loadCreaturesFromUTE(const GffStruct &ute) {
+    for (auto &creatureGffs : ute.getList("CreatureList")) {
+        EncounterCreature creature;
+        creature._appearance = creatureGffs->getInt("Appearance");
+        creature._cr = creatureGffs->getFloat("CR");
+        creature._resRef = creatureGffs->getString("ResRef");
+        creature._singleSpawn = creatureGffs->getBool("SingleSpawn");
+        _creatures.push_back(move(creature));
     }
 }
 

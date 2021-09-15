@@ -725,15 +725,9 @@ set(GAME_SOURCES
     src/engine/game/camera/firstperson.cpp
     src/engine/game/camera/static.cpp
     src/engine/game/camera/thirdperson.cpp
-    src/engine/game/combat/combat_attack.cpp
-    src/engine/game/combat/combat_damage.cpp
-    src/engine/game/combat/combat_projectiles.cpp
     src/engine/game/combat/combat.cpp
     src/engine/game/console.cpp
     src/engine/game/cursors.cpp
-    src/engine/game/d20/attributes_abilities.cpp
-    src/engine/game/d20/attributes_classes.cpp
-    src/engine/game/d20/attributes_skills.cpp
     src/engine/game/d20/attributes.cpp
     src/engine/game/d20/class.cpp
     src/engine/game/d20/classes.cpp
@@ -832,7 +826,6 @@ set(GAME_SOURCES
     src/engine/game/effect/vpregenmodifier.cpp
     src/engine/game/effect/whirlwind.cpp
     src/engine/game/footstepsounds.cpp
-    src/engine/game/game_save.cpp
     src/engine/game/game.cpp
     src/engine/game/gui/barkbubble.cpp
     src/engine/game/gui/chargen/abilities.cpp
@@ -870,36 +863,19 @@ set(GAME_SOURCES
     src/engine/game/gui/sounds.cpp
     src/engine/game/kotor.cpp
     src/engine/game/map.cpp
-    src/engine/game/object/area_are.cpp
-    src/engine/game/object/area_collision.cpp
-    src/engine/game/object/area_git.cpp
-    src/engine/game/object/area_perception.cpp
-    src/engine/game/object/area_search.cpp
-    src/engine/game/object/area_selection.cpp
     src/engine/game/object/area.cpp
-    src/engine/game/object/creature_animations.cpp
-    src/engine/game/object/creature_appearance.cpp
-    src/engine/game/object/creature_blueprint.cpp
     src/engine/game/object/creature.cpp
-    src/engine/game/object/door_blueprint.cpp
     src/engine/game/object/door.cpp
-    src/engine/game/object/encounter_blueprint.cpp
     src/engine/game/object/encounter.cpp
-    src/engine/game/object/item_blueprint.cpp
     src/engine/game/object/item.cpp
     src/engine/game/object/module.cpp
-    src/engine/game/object/object_actions.cpp
     src/engine/game/object/object.cpp
     src/engine/game/object/objectfactory.cpp
-    src/engine/game/object/placeable_blueprint.cpp
     src/engine/game/object/placeable.cpp
     src/engine/game/object/placeablecamera.cpp
-    src/engine/game/object/sound_blueprint.cpp
     src/engine/game/object/sound.cpp
     src/engine/game/object/spatial.cpp
-    src/engine/game/object/trigger_blueprint.cpp
     src/engine/game/object/trigger.cpp
-    src/engine/game/object/waypoint_blueprint.cpp
     src/engine/game/object/waypoint.cpp
     src/engine/game/party.cpp
     src/engine/game/path.cpp
@@ -931,8 +907,6 @@ set(GAME_SOURCES
     src/engine/game/script/routine/impl/talent.cpp
     src/engine/game/script/routine/impl/time.cpp
     src/engine/game/script/routine/impl/vector.cpp
-    src/engine/game/script/routines_kotor.cpp
-    src/engine/game/script/routines_tsl.cpp
     src/engine/game/script/routines.cpp
     src/engine/game/script/runner.cpp
     src/engine/game/services.cpp

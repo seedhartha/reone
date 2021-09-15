@@ -133,6 +133,47 @@ void Sound::setAudible(bool audible) {
     _audible = audible;
 }
 
+void Sound::loadUTS(const GffStruct &uts) {
+    _tag = boost::to_lower_copy(uts.getString("Tag"));
+    _name = _game->services().resource().strings().get(uts.getInt("LocName"));
+    _blueprintResRef = boost::to_lower_copy(uts.getString("TemplateResRef"));
+    _active = uts.getBool("Active");
+    _continuous = uts.getBool("Continuous");
+    _looping = uts.getBool("Looping");
+    _positional = uts.getBool("Positional");
+    _randomPosition = uts.getBool("RandomPosition");
+    _random = uts.getInt("Random");
+    _elevation = uts.getFloat("Elevation");
+    _maxDistance = uts.getFloat("MaxDistance");
+    _minDistance = uts.getFloat("MinDistance");
+    _randomRangeX = uts.getFloat("RandomRangeX");
+    _randomRangeY = uts.getFloat("RandomRangeY");
+    _interval = uts.getInt("Interval");
+    _intervalVrtn = uts.getInt("IntervalVrtn");
+    _pitchVariation = uts.getFloat("PitchVariation");
+    _volume = uts.getInt("Volume");
+    _volumeVrtn = uts.getInt("VolumeVrtn");
+
+    loadPriorityFromUTS(uts);
+
+    for (auto &soundGffs : uts.getList("Sounds")) {
+        _sounds.push_back(boost::to_lower_copy(soundGffs->getString("Sound")));
+    }
+
+    // Unused fields:
+    //
+    // - Hours (always 0)
+    // - Times (always 3)
+    // - PaletteID (toolset only)
+    // - Comment (toolset only)
+}
+
+void Sound::loadPriorityFromUTS(const GffStruct &uts) {
+    shared_ptr<TwoDA> priorityGroups(_game->services().resource().resources().get2DA("prioritygroups"));
+    int priorityIdx = uts.getInt("Priority");
+    _priority = priorityGroups->getInt(priorityIdx, "priority");
+}
+
 } // namespace game
 
 } // namespace reone

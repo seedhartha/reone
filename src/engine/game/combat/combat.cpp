@@ -35,6 +35,9 @@ static constexpr float kRoundDuration = 3.0f;
 static constexpr float kProjectileDelay = 0.5f;
 static constexpr float kDeactivateDelay = 8.0f;
 
+static constexpr char kModelEventDetonate[] = "detonate";
+static constexpr float kProjectileSpeed = 16.0f;
+
 Combat::Combat(Game &game, SceneServices &scene) : _game(game), _scene(scene) {
 }
 
@@ -201,6 +204,254 @@ void Combat::finishRound(Round &round) {
     }
     round.state = RoundState::Finished;
     debug(boost::format("Combat: finish round: %s -> %s") % round.attack1->attacker->tag() % round.attack1->target->tag(), 1, DebugChannels::combat);
+}
+
+static bool isAttackSuccessful(AttackResultType result) {
+    switch (result) {
+        case AttackResultType::HitSuccessful:
+        case AttackResultType::CriticalHit:
+        case AttackResultType::AutomaticHit:
+            return true;
+        default:
+            return false;
+    }
+}
+
+AttackResultType Combat::determineAttackResult(const Attack &attack, bool offHand) const {
+    auto result = AttackResultType::Miss;
+
+    // Determine defense of a target
+    int defense;
+    if (attack.target->type() == ObjectType::Creature) {
+        defense = static_pointer_cast<Creature>(attack.target)->getDefense();
+    } else {
+        defense = 10;
+    }
+
+    // Attack roll
+    int roll = random(1, 20);
+    if (roll == 20) {
+        result = AttackResultType::AutomaticHit;
+    } else if (roll > 1 && roll + attack.attacker->getAttackBonus(offHand) >= defense) { // 1 is automatic miss
+        result = AttackResultType::HitSuccessful;
+    }
+
+    // Critical threat
+    if (isAttackSuccessful(result)) {
+        int criticalThreat;
+        shared_ptr<Item> weapon(attack.attacker->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
+        if (weapon) {
+            criticalThreat = weapon->criticalThreat();
+        } else {
+            criticalThreat = 1;
+        }
+        if (roll > 20 - criticalThreat) {
+            // Critical hit roll
+            int criticalRoll = random(1, 20);
+            if (criticalRoll + attack.attacker->getAttackBonus() >= defense) {
+                result = AttackResultType::CriticalHit;
+            }
+        }
+    }
+
+    return result;
+}
+
+static bool isMeleeWieldType(CreatureWieldType type) {
+    switch (type) {
+        case CreatureWieldType::SingleSword:
+        case CreatureWieldType::DoubleBladedSword:
+        case CreatureWieldType::DualSwords:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool isRangedWieldType(CreatureWieldType type) {
+    switch (type) {
+        case CreatureWieldType::BlasterPistol:
+        case CreatureWieldType::DualPistols:
+        case CreatureWieldType::BlasterRifle:
+        case CreatureWieldType::HeavyWeapon:
+            return true;
+        default:
+            return false;
+    }
+}
+
+Combat::AttackAnimation Combat::determineAttackAnimation(const Attack &attack, bool duel) const {
+    AttackAnimation result;
+
+    // Determine wield types
+
+    result.attackerWieldType = attack.attacker->getWieldType();
+
+    auto targetWield = CreatureWieldType::None;
+    auto target = dynamic_pointer_cast<Creature>(attack.target);
+    if (target) {
+        targetWield = target->getWieldType();
+    }
+
+
+    // Determine animation
+
+    if (duel) {
+        if (isMeleeWieldType(result.attackerWieldType) && isMeleeWieldType(targetWield)) {
+            result.attackerAnimation = CombatAnimation::CinematicMeleeAttack;
+            result.animationVariant = random(1, 5);
+            result.targetAnimation = isAttackSuccessful(attack.resultType) ? CombatAnimation::CinematicMeleeDamage : CombatAnimation::CinematicMeleeParry;
+        } else if (isMeleeWieldType(result.attackerWieldType)) {
+            result.attackerAnimation = CombatAnimation::MeleeAttack;
+            result.animationVariant = random(1, 2);
+            result.targetAnimation = isAttackSuccessful(attack.resultType) ? CombatAnimation::MeleeDamage : CombatAnimation::MeleeDodge;
+        } else if (isRangedWieldType(result.attackerWieldType)) {
+            result.attackerAnimation = CombatAnimation::BlasterAttack;
+            result.targetAnimation = isAttackSuccessful(attack.resultType) ? CombatAnimation::Damage : CombatAnimation::Dodge;
+        } else {
+            result.attackerAnimation = CombatAnimation::Attack;
+            result.animationVariant = random(1, 2);
+            result.targetAnimation = isAttackSuccessful(attack.resultType) ? CombatAnimation::Damage : CombatAnimation::Dodge;
+        }
+    } else {
+        if (isRangedWieldType(result.attackerWieldType)) {
+            result.attackerAnimation = CombatAnimation::BlasterAttack;
+        } else {
+            result.attackerAnimation = CombatAnimation::Attack;
+            result.animationVariant = random(1, 2);
+        }
+    }
+
+
+    return move(result);
+}
+
+void Combat::applyAttackResult(const Attack &attack, bool offHand) {
+    // Determine critical hit multiplier
+    int criticalHitMultiplier = 2;
+    shared_ptr<Item> weapon(attack.attacker->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
+    if (weapon) {
+        criticalHitMultiplier = weapon->criticalHitMultiplier();
+    }
+
+    switch (attack.resultType) {
+        case AttackResultType::Miss:
+        case AttackResultType::AttackResisted:
+        case AttackResultType::AttackFailed:
+        case AttackResultType::Parried:
+        case AttackResultType::Deflected:
+            debug(boost::format("Combat: attack missed: %s -> %s") % attack.attacker->tag() % attack.target->tag(), 2, DebugChannels::combat);
+            break;
+        case AttackResultType::HitSuccessful:
+        case AttackResultType::AutomaticHit: {
+            debug(boost::format("Combat: attack hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), 2, DebugChannels::combat);
+            if (attack.damage == -1) {
+                auto effects = getDamageEffects(attack.attacker, offHand);
+                for (auto &effect : effects) {
+                    attack.target->applyEffect(effect, DurationType::Instant);
+                }
+            } else {
+                shared_ptr<DamageEffect> effect(_game.services().effectFactory().newDamage(attack.damage, DamageType::Universal, attack.attacker));
+                attack.target->applyEffect(move(effect), DurationType::Instant);
+            }
+            break;
+        }
+        case AttackResultType::CriticalHit: {
+            debug(boost::format("Combat: attack critical hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), 2, DebugChannels::combat);
+            if (attack.damage == -1) {
+                auto effects = getDamageEffects(attack.attacker, offHand, criticalHitMultiplier);
+                for (auto &effect : effects) {
+                    attack.target->applyEffect(effect, DurationType::Instant);
+                }
+            } else {
+                shared_ptr<DamageEffect> effect(_game.services().effectFactory().newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, attack.attacker));
+                attack.target->applyEffect(move(effect), DurationType::Instant);
+            }
+            break;
+        }
+        default:
+            throw logic_error("Unsupported attack result");
+    }
+}
+
+vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> damager, bool offHand, int multiplier) const {
+    shared_ptr<Item> weapon(damager->getEquippedItem(offHand ? InventorySlot::leftWeapon : InventorySlot::rightWeapon));
+    int amount = 0;
+    auto type = DamageType::Bludgeoning;
+
+    if (weapon) {
+        for (int i = 0; i < weapon->numDice(); ++i) {
+            amount += random(1, weapon->dieToRoll());
+        }
+        type = static_cast<DamageType>(weapon->damageFlags());
+    }
+    amount = glm::max(1, amount);
+    shared_ptr<DamageEffect> effect(_game.services().effectFactory().newDamage(multiplier * amount, type, move(damager)));
+
+    return vector<shared_ptr<DamageEffect>> { move(effect) };
+}
+
+void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, Round &round) {
+    auto attackerModel = static_pointer_cast<ModelSceneNode>(attacker->sceneNode());
+    auto targetModel = static_pointer_cast<ModelSceneNode>(target->sceneNode());
+    if (!attackerModel || !targetModel) return;
+
+    shared_ptr<Item> weapon(attacker->getEquippedItem(InventorySlot::rightWeapon));
+    if (!weapon) return;
+
+    shared_ptr<Item::AmmunitionType> ammunitionType(weapon->ammunitionType());
+    if (!ammunitionType) return;
+
+    auto weaponModel = static_pointer_cast<ModelSceneNode>(attackerModel->getAttachment("rhand"));
+    if (!weaponModel) return;
+
+    // Determine projectile position
+    glm::vec3 projectilePos;
+    shared_ptr<ModelNode> bulletHook(weaponModel->model()->getNodeByName("bullethook"));
+    if (bulletHook) {
+        projectilePos = weaponModel->absoluteTransform() * bulletHook->absoluteTransform()[3];
+    } else {
+        projectilePos = weaponModel->getOrigin();
+    }
+
+    // Determine projectile direction
+    glm::vec3 projectileTarget;
+    shared_ptr<ModelNode> impact(targetModel->model()->getNodeByName("impact"));
+    if (impact) {
+        projectileTarget = targetModel->absoluteTransform() * impact->absoluteTransform()[3];
+    } else {
+        projectileTarget = targetModel->getOrigin();
+    }
+    round.projectileDir = glm::normalize(projectileTarget - projectilePos);
+
+    // Create and add a projectile to the scene graph
+    round.projectile = make_shared<ModelSceneNode>(ammunitionType->model, ModelUsage::Projectile, &_scene.graph());
+    round.projectile->signalEvent(kModelEventDetonate);
+    round.projectile->setLocalTransform(glm::translate(projectilePos));
+    _scene.graph().addRoot(round.projectile);
+
+    // Play shot sound, if any
+    weapon->playShotSound(0, projectilePos);
+}
+
+void Combat::updateProjectile(Round &round, float dt) {
+    glm::vec3 position(round.projectile->absoluteTransform()[3]);
+    position += kProjectileSpeed * round.projectileDir * dt;
+
+    float facing = glm::half_pi<float>() - glm::atan(round.projectileDir.x, round.projectileDir.y);
+
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, position);
+    transform *= glm::eulerAngleZ(facing);
+
+    round.projectile->setLocalTransform(transform);
+}
+
+void Combat::resetProjectile(Round &round) {
+    if (round.projectile) {
+        _scene.graph().removeRoot(round.projectile);
+        round.projectile.reset();
+    }
 }
 
 } // namespace game
