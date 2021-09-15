@@ -17,15 +17,93 @@
 
 #pragma once
 
+#include <boost/program_options.hpp>
+
+#include "game/options.h"
+#include "game/types.h"
+
 namespace reone {
 
+namespace resource {
+
+class ResourceServices;
+
+}
+
+namespace graphics {
+
+class GraphicsServices;
+
+}
+
+namespace audio {
+
+class AudioServices;
+
+}
+
+namespace scene {
+
+class SceneServices;
+
+}
+
+namespace script {
+
+class ScriptServices;
+
+}
+
+namespace game {
+
+class Game;
+
+}
+
 /**
- * Creates and runs an instance of Engine.
- *
- * @param argc number of command line arguments
- * @param argv array of command line arguments
- * @return exit code
+ * Encapsulates option loading and service initialization.
  */
-int runEngine(int argc, char **argv);
+class Engine : boost::noncopyable {
+public:
+    Engine(int argc, char **argv) : _argc(argc), _argv(argv) {
+    }
+
+    /**
+     * Loads options from command line and configuration file, initializes
+     * services and starts an instance of Game.
+     *
+     * @return exit code
+     */
+    int run();
+
+private:
+    int _argc;
+    char **_argv;
+
+    boost::program_options::options_description _optsCommon;
+    boost::program_options::options_description _optsCmdLine { "Usage" };
+    boost::program_options::variables_map _variables;
+
+    bool _showHelp { false };
+    boost::filesystem::path _gamePath;
+    game::Options _gameOptions;
+
+    void initOptions();
+    void parseOptions();
+    void loadOptions();
+
+    int runGame();
+
+    game::GameID determineGameID();
+
+    std::unique_ptr<game::Game> newGame(
+        game::GameID gameId,
+        resource::ResourceServices &resource,
+        graphics::GraphicsServices &graphics,
+        audio::AudioServices &audio,
+        scene::SceneServices &scene,
+        script::ScriptServices &script
+    );
+};
 
 } // namespace reone
