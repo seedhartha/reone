@@ -18,6 +18,9 @@
 #include "services.h"
 
 #include "game.h"
+#include "script/routine/registrar/kotor.h"
+#include "script/routine/registrar/registrar.h"
+#include "script/routine/registrar/tsl.h"
 
 using namespace std;
 
@@ -47,6 +50,17 @@ GameServices::GameServices(
     _script(script) {
 }
 
+static unique_ptr<RoutineRegistrar> newRoutineRegistrar(GameID id, Routines &routines) {
+    switch (id) {
+        case GameID::KotOR:
+            return make_unique<KotORRoutineRegistrar>(routines);
+        case GameID::TSL:
+            return make_unique<TSLRoutineRegistrar>(routines);
+        default:
+            throw invalid_argument("Game ID is not supported: " + to_string(static_cast<int>(id)));
+    }
+}
+
 void GameServices::init() {
     _surfaces = make_unique<Surfaces>(_resource.resources());
     _surfaces->init();
@@ -59,7 +73,6 @@ void GameServices::init() {
     _guiSounds->init();
 
     _routines = make_unique<Routines>(_game);
-    _routines->init();
 
     _scriptRunner = make_unique<ScriptRunner>(*_routines, _script.scripts());
 
@@ -86,6 +99,9 @@ void GameServices::init() {
     _combat = make_unique<Combat>(_game, _scene);
     _actionFactory = make_unique<ActionFactory>(_game);
     _effectFactory = make_unique<EffectFactory>();
+
+    auto registrar = newRoutineRegistrar(_game.id(), *_routines);
+    registrar->invoke();
 }
 
 } // namespace game

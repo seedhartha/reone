@@ -17,40 +17,16 @@
 
 #pragma once
 
-#include "../../script/routine.h"
-#include "../../script/routineprovider.h"
-#include "../../script/types.h"
-#include "../../script/variable.h"
-
 namespace reone {
 
 namespace game {
 
-class Game;
-
-class Routines : public script::IRoutineProvider, boost::noncopyable {
+/**
+ * Registers engine routines for use in scripts.
+ */
+class RoutineRegistrar {
 public:
-    Routines(Game &game) : _game(game) {
-    }
-
-    const script::Routine &get(int index) override {
-        return _routines[index];
-    }
-
-    template <class T>
-    void add(
-        std::string name,
-        script::VariableType retType,
-        std::vector<script::VariableType> argTypes,
-        const T &fn) {
-
-        _routines.emplace_back(std::move(name), retType, std::move(argTypes), std::bind(fn, std::ref(_game), std::placeholders::_1, std::placeholders::_2));
-    }
-
-private:
-    Game &_game;
-
-    std::vector<script::Routine> _routines;
+    virtual void invoke() = 0;
 };
 
 } // namespace game
