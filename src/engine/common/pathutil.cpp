@@ -43,7 +43,9 @@ fs::path getPathIgnoreCase(const fs::path &basePath, const string &relPath, bool
         }
     }
     if (logNotFound) {
-        debug(boost::format("Path not found: %s %s") % basePath % relPath);
+        fs::path path(basePath);
+        path.append(relPath);
+        debug(boost::format("Path not found: %s") % path.string());
     }
 
     return "";
