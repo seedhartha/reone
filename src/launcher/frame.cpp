@@ -57,22 +57,16 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     _checkBoxDev->SetValue(_config.devMode);
 
     wxArrayString resChoices;
-    set<string> uniqueRes;
-
-    wxArrayVideoModes modes(wxDisplay(wxDisplay::GetFromWindow(this)).GetModes());
-    for (size_t i = 0; i < modes.GetCount(); ++i) {
-        wxVideoMode mode = modes[i];
-        string res(str(boost::format("%dx%d") % mode.GetWidth() % mode.GetHeight()));
-        if (uniqueRes.count(res) == 0) {
-            resChoices.Add(res);
-            uniqueRes.insert(res);
-        }
-    }
+    resChoices.Add("800x600");
+    resChoices.Add("1024x768");
+    resChoices.Add("1280x1024");
+    resChoices.Add("1600x1200");
 
     string configResolution(str(boost::format("%dx%d") % _config.width % _config.height));
     int resSelection = resChoices.Index(configResolution);
     if (resSelection == wxNOT_FOUND) {
-        resSelection = 1;
+        resChoices.Add(configResolution);
+        resSelection = resChoices.GetCount() - 1;
     }
 
     _choiceResolution = new wxChoice(this, WindowID::resolution, wxDefaultPosition, wxDefaultSize, resChoices);
