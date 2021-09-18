@@ -61,7 +61,7 @@ GUI::GUI(
 void GUI::load() {
     ensureNotEmpty(_resRef, "resRef");
 
-    debug("Load " + _resRef, LogChannels::gui);
+    debug("Load: " + _resRef, LogChannels::gui);
 
     shared_ptr<GffStruct> gui(_resources.resources().getGFF(_resRef, ResourceType::Gui));
     ControlType type = Control::getType(*gui);

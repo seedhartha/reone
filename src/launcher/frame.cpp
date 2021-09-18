@@ -88,6 +88,9 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     graphicsSizer->Add(_checkBoxEnhancedGfx, 0, wxEXPAND | wxALL, 3);
 
     wxArrayString logChannelChoices;
+    logChannelChoices.Add("Resources");
+    logChannelChoices.Add("Graphics");
+    logChannelChoices.Add("Audio");
     logChannelChoices.Add("GUI");
     logChannelChoices.Add("Conversation");
     logChannelChoices.Add("Combat");
@@ -95,11 +98,14 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     logChannelChoices.Add("Script (verbose)");
 
     _checkListBoxLogChannels = new wxCheckListBox(this, WindowID::logChannels, wxDefaultPosition, wxDefaultSize, logChannelChoices);
-    _checkListBoxLogChannels->Check(0, _config.logch & LogChannels::gui);
-    _checkListBoxLogChannels->Check(1, _config.logch & LogChannels::conversation);
-    _checkListBoxLogChannels->Check(2, _config.logch & LogChannels::combat);
-    _checkListBoxLogChannels->Check(3, _config.logch & LogChannels::script);
-    _checkListBoxLogChannels->Check(4, _config.logch & LogChannels::script2);
+    _checkListBoxLogChannels->Check(0, _config.logch & LogChannels::resources);
+    _checkListBoxLogChannels->Check(1, _config.logch & LogChannels::graphics);
+    _checkListBoxLogChannels->Check(2, _config.logch & LogChannels::audio);
+    _checkListBoxLogChannels->Check(3, _config.logch & LogChannels::gui);
+    _checkListBoxLogChannels->Check(4, _config.logch & LogChannels::conversation);
+    _checkListBoxLogChannels->Check(5, _config.logch & LogChannels::combat);
+    _checkListBoxLogChannels->Check(6, _config.logch & LogChannels::script);
+    _checkListBoxLogChannels->Check(7, _config.logch & LogChannels::script2);
 
     auto logChannelsSizer = new wxBoxSizer(wxHORIZONTAL);
     logChannelsSizer->Add(new wxStaticText(this, wxID_ANY, "Log Channels", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
@@ -175,18 +181,27 @@ void LauncherFrame::SaveConfiguration() {
 
     int logch = LogChannels::general;
     if (_checkListBoxLogChannels->IsChecked(0)) {
-        logch |= LogChannels::gui;
+        logch |= LogChannels::resources;
     }
     if (_checkListBoxLogChannels->IsChecked(1)) {
-        logch |= LogChannels::conversation;
+        logch |= LogChannels::graphics;
     }
     if (_checkListBoxLogChannels->IsChecked(2)) {
-        logch |= LogChannels::combat;
+        logch |= LogChannels::audio;
     }
     if (_checkListBoxLogChannels->IsChecked(3)) {
-        logch |= LogChannels::script;
+        logch |= LogChannels::gui;
     }
     if (_checkListBoxLogChannels->IsChecked(4)) {
+        logch |= LogChannels::conversation;
+    }
+    if (_checkListBoxLogChannels->IsChecked(5)) {
+        logch |= LogChannels::combat;
+    }
+    if (_checkListBoxLogChannels->IsChecked(6)) {
+        logch |= LogChannels::script;
+    }
+    if (_checkListBoxLogChannels->IsChecked(7)) {
         logch |= LogChannels::script2;
     }
 

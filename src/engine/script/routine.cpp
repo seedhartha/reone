@@ -83,7 +83,7 @@ Variable Routine::onException(const string &msg, const exception &ex) const {
             return Variable::ofTalent(nullptr);
         default:
             // With Int, Float and Action return types, halt script execution
-            error(msg);
+            error(msg, LogChannels::script);
             throw ex;
     }
 }

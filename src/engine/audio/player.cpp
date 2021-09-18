@@ -44,7 +44,7 @@ void AudioPlayer::init() {
 void AudioPlayer::threadStart() {
     setThreadName("audio");
     initAL();
-    debug("Thread started");
+    debug("Thread started", LogChannels::audio);
 
     vector<shared_ptr<SoundInstance>> sounds;
     while (_run) {
@@ -72,7 +72,7 @@ void AudioPlayer::threadStart() {
     }
 
     deinitAL();
-    debug("Thread stopped");
+    debug("Thread stopped", LogChannels::audio);
 }
 
 void AudioPlayer::initAL() {

@@ -24,11 +24,14 @@ namespace reone {
  */
 struct LogChannels {
     static constexpr int general = 1;
-    static constexpr int gui = 2;
-    static constexpr int conversation = 4;
-    static constexpr int combat = 8;
-    static constexpr int script = 16;
-    static constexpr int script2 = 32;
+    static constexpr int resources = 2;
+    static constexpr int graphics = 4;
+    static constexpr int audio = 8;
+    static constexpr int gui = 16;
+    static constexpr int conversation = 32;
+    static constexpr int combat = 64;
+    static constexpr int script = 128;
+    static constexpr int script2 = 256;
 };
 
 typedef std::vector<char> ByteArray;

@@ -109,7 +109,7 @@ int ScriptExecution::run() {
         auto handler = _handlers.find(ins.byteCode);
 
         if (handler == _handlers.end()) {
-            error("Byte code not implemented: " + describeByteCode(ins.byteCode));
+            error("Byte code not implemented: " + describeByteCode(ins.byteCode), LogChannels::script);
             return -1;
         }
         _nextInstruction = ins.nextOffset;
