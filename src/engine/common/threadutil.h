@@ -15,25 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "common/log.h"
-#include "common/threadutil.h"
-#include "engine.h"
+#pragma once
 
-using namespace std;
+namespace reone {
 
-using namespace reone;
+std::string getThreadName();
 
-int main(int argc, char **argv) {
-    setThreadName("main");
-    try {
-        return Engine(argc, argv).run();
-    }
-    catch (const exception &ex) {
-        try {
-            error("Program terminated exceptionally: " + string(ex.what()));
-        }
-        catch (...) {
-        }
-        return 1;
-    }
-}
+void setThreadName(std::string name);
+
+} // namespace reone

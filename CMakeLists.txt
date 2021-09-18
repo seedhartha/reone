@@ -72,6 +72,7 @@ set(COMMON_HEADERS
     src/engine/common/streamreader.h
     src/engine/common/streamutil.h
     src/engine/common/streamwriter.h
+    src/engine/common/threadutil.h
     src/engine/common/timer.h
     src/engine/common/types.h
     src/engine/common/unicode.h)
@@ -83,6 +84,7 @@ set(COMMON_SOURCES
     src/engine/common/streamreader.cpp
     src/engine/common/streamutil.cpp
     src/engine/common/streamwriter.cpp
+    src/engine/common/threadutil.cpp
     src/engine/common/unicode.cpp)
 
 add_library(libcommon STATIC ${COMMON_HEADERS} ${COMMON_SOURCES})

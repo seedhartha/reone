@@ -15,25 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "common/log.h"
-#include "common/threadutil.h"
-#include "engine.h"
+#include "threadutil.h"
+
+#include "collectionutil.h"
 
 using namespace std;
 
-using namespace reone;
+namespace reone {
 
-int main(int argc, char **argv) {
-    setThreadName("main");
-    try {
-        return Engine(argc, argv).run();
-    }
-    catch (const exception &ex) {
-        try {
-            error("Program terminated exceptionally: " + string(ex.what()));
-        }
-        catch (...) {
-        }
-        return 1;
-    }
+static map<thread::id, std::string> g_threadNames;
+
+string getThreadName() {
+    thread::id id(this_thread::get_id());
+    return getFromLookupOrElse(g_threadNames, id, [&id]() {
+        stringstream ss;
+        ss << id;
+        return ss.str();
+    });
 }
+
+void setThreadName(string name) {
+    g_threadNames[this_thread::get_id()] = move(name);
+}
+
+} // namespace reone
