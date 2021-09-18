@@ -112,6 +112,7 @@ void Program::parseOptions() {
 
     po::parsed_options parsedCmdLineOpts = po::command_line_parser(_argc, _argv)
         .options(_optsCmdLine)
+        .allow_unregistered()
         .positional(positional)
         .run();
 

@@ -46,11 +46,11 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
         return _func(args, ctx);
     }
     catch (const NotImplementedException &ex) {
-        string msg("Script: routine not implemented: " + _name);
+        string msg("Routine not implemented: " + _name);
         return onException(msg, ex);
     }
     catch (const ArgumentException &ex) {
-        string msg(str(boost::format("Script: routine '%s' invocation failed: %s") % _name % ex.what()));
+        string msg(str(boost::format("Routine '%s' invocation failed: %s") % _name % ex.what()));
         return onException(msg, ex);
     }
 }

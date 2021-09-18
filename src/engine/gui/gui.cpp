@@ -61,7 +61,7 @@ GUI::GUI(
 void GUI::load() {
     ensureNotEmpty(_resRef, "resRef");
 
-    debug("GUI: load " + _resRef, 1, DebugChannels::gui);
+    debug("Load " + _resRef, LogChannels::gui);
 
     shared_ptr<GffStruct> gui(_resources.resources().getGFF(_resRef, ResourceType::Gui));
     ControlType type = Control::getType(*gui);
@@ -172,7 +172,7 @@ bool GUI::handle(const SDL_Event &event) {
                 glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
                 Control *control = getControlAt(ctrlCoords.x, ctrlCoords.y, [](const Control &ctrl) { return ctrl.isClickable(); });
                 if (control) {
-                    debug("GUI: click " + control->tag(), 2, DebugChannels::gui);
+                    debug("Click " + control->tag(), LogChannels::gui);
                     onClick(control->tag());
                     return control->handleClick(ctrlCoords.x, ctrlCoords.y);
                 }

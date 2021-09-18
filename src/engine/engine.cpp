@@ -76,8 +76,7 @@ void Engine::initOptions() {
         ("voicevol", po::value<int>()->default_value(kDefaultVoiceVolume), "voice volume in percents")
         ("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")
         ("movievol", po::value<int>()->default_value(kDefaultMovieVolume), "movie volume in percents")
-        ("debug", po::value<int>()->default_value(0), "debug log level (0-3)")
-        ("debugch", po::value<int>(), "debug channel mask")
+        ("logch", po::value<int>(), "log channel mask")
         ("logfile", po::value<bool>()->default_value(false), "log to file");
 
     _optsCmdLine.add(_optsCommon).add_options()
@@ -88,7 +87,7 @@ void Engine::parseOptions() {
     po::store(po::parse_command_line(_argc, _argv, _optsCmdLine), _variables);
 
     if (fs::exists(kConfigFilename)) {
-        po::store(po::parse_config_file<char>(kConfigFilename, _optsCommon), _variables);
+        po::store(po::parse_config_file<char>(kConfigFilename, _optsCommon, true), _variables);
     }
 
     po::notify(_variables);
@@ -109,11 +108,10 @@ void Engine::loadOptions() {
     _gameOptions.audio.soundVolume = _variables["soundvol"].as<int>();
     _gameOptions.audio.movieVolume = _variables["movievol"].as<int>();
 
-    setDebugLogLevel(_variables["debug"].as<int>());
     setLogToFile(_variables["logfile"].as<bool>());
 
-    if (_variables.count("debugch") > 0) {
-        setDebugChannels(_variables["debugch"].as<int>());
+    if (_variables.count("logch") > 0) {
+        setLogChannels(_variables["logch"].as<int>());
     }
 }
 

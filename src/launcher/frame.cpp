@@ -93,64 +93,29 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     graphicsSizer->Add(_checkBoxFullscreen, 0, wxEXPAND | wxALL, 3);
     graphicsSizer->Add(_checkBoxEnhancedGfx, 0, wxEXPAND | wxALL, 3);
 
-    wxArrayString debugChoices;
-    debugChoices.Add("0");
-    debugChoices.Add("1");
-    debugChoices.Add("2");
-    debugChoices.Add("3");
+    wxArrayString logChannelChoices;
+    logChannelChoices.Add("GUI");
+    logChannelChoices.Add("Conversation");
+    logChannelChoices.Add("Combat");
+    logChannelChoices.Add("Script");
+    logChannelChoices.Add("Script (verbose)");
 
-    int debugLevelSelection = _config.debug >= 0 && _config.debug <= 3 ? _config.debug : 0;
+    _checkListBoxLogChannels = new wxCheckListBox(this, WindowID::logChannels, wxDefaultPosition, wxDefaultSize, logChannelChoices);
+    _checkListBoxLogChannels->Check(0, _config.logch & LogChannels::gui);
+    _checkListBoxLogChannels->Check(1, _config.logch & LogChannels::conversation);
+    _checkListBoxLogChannels->Check(2, _config.logch & LogChannels::combat);
+    _checkListBoxLogChannels->Check(3, _config.logch & LogChannels::script);
+    _checkListBoxLogChannels->Check(4, _config.logch & LogChannels::script2);
 
-    _choiceDebugLevel = new wxChoice(this, WindowID::debug, wxDefaultPosition, wxDefaultSize, debugChoices);
-    _choiceDebugLevel->SetSelection(debugLevelSelection);
-
-    auto debugLevelSizer = new wxBoxSizer(wxHORIZONTAL);
-    debugLevelSizer->Add(new wxStaticText(this, wxID_ANY, "Log Level", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
-    debugLevelSizer->Add(_choiceDebugLevel, 1, wxEXPAND | wxALL, 3);
-
-    wxArrayString debugChannelsChoices;
-    debugChannelsChoices.Add("All");
-    debugChannelsChoices.Add("General");
-    debugChannelsChoices.Add("GUI");
-    debugChannelsChoices.Add("Script");
-    debugChannelsChoices.Add("Conversation");
-    debugChannelsChoices.Add("Combat");
-
-    int debugChannelsSelection;
-    switch (_config.debugch) {
-        case DebugChannels::general:
-            debugChannelsSelection = 1;
-            break;
-        case DebugChannels::gui:
-            debugChannelsSelection = 2;
-            break;
-        case DebugChannels::script:
-            debugChannelsSelection = 3;
-            break;
-        case DebugChannels::conversation:
-            debugChannelsSelection = 4;
-            break;
-        case DebugChannels::combat:
-            debugChannelsSelection = 5;
-            break;
-        default:
-            debugChannelsSelection = 0;
-            break;
-    }
-
-    _choiceDebugChannels = new wxChoice(this, WindowID::debugChannels, wxDefaultPosition, wxDefaultSize, debugChannelsChoices);
-    _choiceDebugChannels->SetSelection(debugChannelsSelection);
-
-    auto debugChannelsSizer = new wxBoxSizer(wxHORIZONTAL);
-    debugChannelsSizer->Add(new wxStaticText(this, wxID_ANY, "Channels", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
-    debugChannelsSizer->Add(_choiceDebugChannels, 1, wxEXPAND | wxALL, 3);
+    auto logChannelsSizer = new wxBoxSizer(wxHORIZONTAL);
+    logChannelsSizer->Add(new wxStaticText(this, wxID_ANY, "Log Channels", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
+    logChannelsSizer->Add(_checkListBoxLogChannels, 1, wxEXPAND | wxALL, 3);
 
     _checkBoxLogFile = new wxCheckBox(this, WindowID::logFile, "Log to File", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
     _checkBoxLogFile->SetValue(_config.logfile);
 
     auto debugSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Debug");
-    debugSizer->Add(debugLevelSizer, 0, wxEXPAND, 0);
-    debugSizer->Add(debugChannelsSizer, 0, wxEXPAND, 0);
+    debugSizer->Add(logChannelsSizer, 0, wxEXPAND, 0);
     debugSizer->Add(_checkBoxLogFile, 0, wxEXPAND, 0);
 
     auto topSizer = new wxBoxSizer(wxVERTICAL);
@@ -174,8 +139,7 @@ void LauncherFrame::LoadConfiguration() {
         ("height", po::value<int>())
         ("fullscreen", po::value<bool>())
         ("pbr", po::value<bool>())
-        ("debug", po::value<int>())
-        ("debugch", po::value<int>())
+        ("logch", po::value<int>())
         ("logfile", po::value<bool>());
 
     po::variables_map vars;
@@ -190,8 +154,7 @@ void LauncherFrame::LoadConfiguration() {
     _config.height = vars.count("height") > 0 ? vars["height"].as<int>() : 768;
     _config.fullscreen = vars.count("fullscreen") > 0 ? vars["fullscreen"].as<bool>() : false;
     _config.pbr = vars.count("pbr") > 0 ? vars["pbr"].as<bool>() : false;
-    _config.debug = vars.count("debug") > 0 ? vars["debug"].as<int>() : 0;
-    _config.debugch = vars.count("debugch") > 0 ? vars["debugch"].as<int>() : DebugChannels::all;
+    _config.logch = vars.count("logch") > 0 ? vars["logch"].as<int>() : LogChannels::general;
     _config.logfile = vars.count("logfile") > 0 ? vars["logfile"].as<bool>() : false;
 }
 
@@ -209,33 +172,28 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
 }
 
 void LauncherFrame::SaveConfiguration() {
-    static set<string> recognized { "game=", "width=", "height=", "fullscreen=", "pbr=", "dev=", "debug=", "debugch=", "logfile=" };
+    static set<string> recognized { "game=", "width=", "height=", "fullscreen=", "pbr=", "dev=", "logch=", "logfile=" };
 
     string resolution(_choiceResolution->GetStringSelection());
 
     vector<string> tokens;
     boost::split(tokens, resolution, boost::is_any_of("x"), boost::token_compress_on);
 
-    int debugch = 0;
-    switch (_choiceDebugChannels->GetSelection()) {
-        case 1:
-            debugch = DebugChannels::general;
-            break;
-        case 2:
-            debugch = DebugChannels::gui;
-            break;
-        case 3:
-            debugch = DebugChannels::script;
-            break;
-        case 4:
-            debugch = DebugChannels::conversation;
-            break;
-        case 5:
-            debugch = DebugChannels::combat;
-            break;
-        default:
-            debugch = DebugChannels::all;
-            break;
+    int logch = LogChannels::general;
+    if (_checkListBoxLogChannels->IsChecked(0)) {
+        logch |= LogChannels::gui;
+    }
+    if (_checkListBoxLogChannels->IsChecked(1)) {
+        logch |= LogChannels::conversation;
+    }
+    if (_checkListBoxLogChannels->IsChecked(2)) {
+        logch |= LogChannels::combat;
+    }
+    if (_checkListBoxLogChannels->IsChecked(3)) {
+        logch |= LogChannels::script;
+    }
+    if (_checkListBoxLogChannels->IsChecked(4)) {
+        logch |= LogChannels::script2;
     }
 
     _config.gameDir = _textCtrlGameDir->GetValue();
@@ -244,8 +202,7 @@ void LauncherFrame::SaveConfiguration() {
     _config.height = stoi(tokens[1]);
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
     _config.pbr = _checkBoxEnhancedGfx->IsChecked();
-    _config.debug = stoi(string(_choiceDebugLevel->GetStringSelection()));
-    _config.debugch = debugch;
+    _config.logch = logch;
     _config.logfile = _checkBoxLogFile->IsChecked();
 
     vector<string> lines;
@@ -271,8 +228,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "height=" << _config.height << endl;
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
     config << "pbr=" << (_config.pbr ? 1 : 0) << endl;
-    config << "debug=" << _config.debug << endl;
-    config << "debugch=" << _config.debugch << endl;
+    config << "logch=" << _config.logch << endl;
     config << "logfile=" << (_config.logfile ? 1 : 0) << endl;
     for (auto &line : lines) {
         config << line << endl;

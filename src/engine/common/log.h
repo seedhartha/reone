@@ -21,19 +21,18 @@
 
 namespace reone {
 
-void error(const std::string &s);
-void error(const boost::format &s);
-void warn(const std::string &s);
-void warn(const boost::format &s);
-void info(const std::string &s);
-void info(const boost::format &s);
-void debug(const std::string &s, uint32_t level = 1, int channel = DebugChannels::general);
-void debug(const boost::format &s, uint32_t level = 1, int channel = DebugChannels::general);
+void error(const std::string &s, int channel = LogChannels::general);
+void error(const boost::format &s, int channel = LogChannels::general);
+void warn(const std::string &s, int channel = LogChannels::general);
+void warn(const boost::format &s, int channel = LogChannels::general);
+void info(const std::string &s, int channel = LogChannels::general);
+void info(const boost::format &s, int channel = LogChannels::general);
+void debug(const std::string &s, int channel = LogChannels::general);
+void debug(const boost::format &s, int channel = LogChannels::general);
 
-uint32_t getDebugLogLevel();
+bool isLogChannelEnabled(int channel);
 
-void setDebugLogLevel(uint32_t level);
-void setDebugChannels(int mask);
+void setLogChannels(int mask);
 void setLogToFile(bool logToFile);
 
 } // namespace reone
