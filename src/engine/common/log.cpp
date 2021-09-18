@@ -17,9 +17,11 @@
 
 #include "log.h"
 
-namespace fs = boost::filesystem;
+#include "threadutil.h"
 
 using namespace std;
+
+namespace fs = boost::filesystem;
 
 namespace reone {
 
@@ -54,7 +56,7 @@ static constexpr char *describeLogLevel(LogLevel level) {
 }
 
 static void log(ostream &out, LogLevel level, const string &s) {
-    boost::format msg(boost::format("%s %s") % describeLogLevel(level) % s);
+    boost::format msg(boost::format("%s [%s] %s") % describeLogLevel(level) % getThreadName() % s);
     out << msg << endl;
 }
 

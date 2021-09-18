@@ -55,6 +55,12 @@ inline V getFromLookupOrElse(const std::map<K, V> &lookup, K key, V defaultValue
 }
 
 template <class K, class V>
+inline V getFromLookupOrElse(const std::map<K, V> &lookup, K key, std::function<std::string()> fn) {
+    auto maybeValue = lookup.find(key);
+    return maybeValue != lookup.end() ? maybeValue->second : fn();
+}
+
+template <class K, class V>
 inline V getFromLookupOrNull(const std::unordered_map<K, V> &lookup, K key) {
     auto maybeValue = lookup.find(key);
     return maybeValue != lookup.end() ? maybeValue->second : nullptr;
@@ -64,6 +70,12 @@ template <class K, class V>
 inline V getFromLookupOrElse(const std::unordered_map<K, V> &lookup, K key, V defaultValue) {
     auto maybeValue = lookup.find(key);
     return maybeValue != lookup.end() ? maybeValue->second : defaultValue;
+}
+
+template <class K, class V>
+inline V getFromLookupOrElse(const std::unordered_map<K, V> &lookup, K key, std::function<std::string()> fn) {
+    auto maybeValue = lookup.find(key);
+    return maybeValue != lookup.end() ? maybeValue->second : fn();
 }
 
 } // namespace reone

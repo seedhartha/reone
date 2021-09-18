@@ -18,6 +18,7 @@
 #include "player.h"
 
 #include "../common/log.h"
+#include "../common/threadutil.h"
 
 #include "files.h"
 #include "soundhandle.h"
@@ -41,7 +42,9 @@ void AudioPlayer::init() {
 }
 
 void AudioPlayer::threadStart() {
+    setThreadName("audio");
     initAL();
+    debug("Thread started");
 
     vector<shared_ptr<SoundInstance>> sounds;
     while (_run) {
@@ -69,6 +72,7 @@ void AudioPlayer::threadStart() {
     }
 
     deinitAL();
+    debug("Thread stopped");
 }
 
 void AudioPlayer::initAL() {
