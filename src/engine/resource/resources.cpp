@@ -49,7 +49,7 @@ void Resources::indexKeyFile(const fs::path &path) {
 
     _providers.push_back(move(keyBif));
 
-    debug("Indexed " + path.string());
+    debug("Index: " + path.string(), LogChannels::resources);
 }
 
 void Resources::indexErfFile(const fs::path &path, bool transient) {
@@ -64,7 +64,7 @@ void Resources::indexErfFile(const fs::path &path, bool transient) {
         _providers.push_back(move(erf));
     }
 
-    debug("Indexed " + path.string());
+    debug("Index: " + path.string(), LogChannels::resources);
 }
 
 void Resources::indexRimFile(const fs::path &path, bool transient) {
@@ -79,7 +79,7 @@ void Resources::indexRimFile(const fs::path &path, bool transient) {
         _providers.push_back(move(rim));
     }
 
-    debug("Indexed " + path.string());
+    debug("Index: " + path.string(), LogChannels::resources);
 }
 
 void Resources::indexDirectory(const fs::path &path) {
@@ -90,7 +90,7 @@ void Resources::indexDirectory(const fs::path &path) {
 
     _providers.push_back(move(folder));
 
-    debug("Indexed " + path.string());
+    debug("Index: " + path.string(), LogChannels::resources);
 }
 
 void Resources::indexExeFile(const fs::path &path) {
@@ -98,7 +98,7 @@ void Resources::indexExeFile(const fs::path &path) {
 
     _exeFile.load(path);
 
-    debug("Indexed " + path.string());
+    debug("Index: " + path.string(), LogChannels::resources);
 }
 
 void Resources::invalidateCache() {
@@ -132,7 +132,7 @@ shared_ptr<ByteArray> Resources::getRaw(const string &resRef, ResourceType type,
         data = doGetRaw(_providers, resRef, type);
     }
     if (!data && logNotFound) {
-        warn("Resource not found: " + cacheKey);
+        warn("Not found: " + cacheKey, LogChannels::resources);
     }
     auto pair = _rawCache.insert(make_pair(cacheKey, move(data)));
 

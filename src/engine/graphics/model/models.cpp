@@ -52,7 +52,7 @@ shared_ptr<Model> Models::get(const string &resRef) {
 }
 
 shared_ptr<Model> Models::doGet(const string &resRef) {
-    debug("Load model " + resRef);
+    debug("Load model: " + resRef, LogChannels::graphics);
 
     shared_ptr<ByteArray> mdlData(_resources.getRaw(resRef, ResourceType::Mdl));
     shared_ptr<ByteArray> mdxData(_resources.getRaw(resRef, ResourceType::Mdx));

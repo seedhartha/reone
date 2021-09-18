@@ -196,7 +196,7 @@ void Game::loadMainMenu() {
 }
 
 void Game::loadModule(const string &name, string entry) {
-    info("Load module " + name);
+    info("Load module: " + name);
 
     withLoadingScreen("load_" + name, [this, &name, &entry]() {
         if (!_hud) {

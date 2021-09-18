@@ -17,6 +17,7 @@
 
 #include "log.h"
 
+#include "collectionutil.h"
 #include "threadutil.h"
 
 using namespace std;
@@ -39,37 +40,35 @@ static bool g_logToFile = false;
 
 static std::unique_ptr<fs::ofstream> g_logFile;
 
+static const unordered_map<LogLevel, string> g_nameByLogLevel {
+    { LogLevel::Error, "ERR" },
+    { LogLevel::Warn, "WRN" },
+    { LogLevel::Info, "INF" },
+    { LogLevel::Debug, "DBG" }
+};
+
 static std::string describeLogLevel(LogLevel level) {
-    switch (level) {
-        case LogLevel::Error:
-            return "ERR";
-        case LogLevel::Warn:
-            return "WRN";
-        case LogLevel::Info:
-            return "INF";
-        case LogLevel::Debug:
-            return "DBG";
-        default:
-            throw invalid_argument("Invalid log level: " + to_string(static_cast<int>(level)));
-    }
+    return getFromLookupOrElse(g_nameByLogLevel, level, [&level]() {
+        return to_string(static_cast<int>(level));
+    });
 }
 
-static std::string describeLogChannel(int channel) {
-    switch (channel) {
-        case LogChannels::general:
-            return "General";
-        case LogChannels::gui:
-            return "GUI";
-        case LogChannels::conversation:
-            return "Conversation";
-        case LogChannels::combat:
-            return "Combat";
-        case LogChannels::script:
-        case LogChannels::script2:
-            return "Script";
-        default:
-            throw invalid_argument("Invalid log channel: " + to_string(channel));
-    }
+static const unordered_map<int, string> g_nameByLogChannel {
+    { LogChannels::resources, "Resources" },
+    { LogChannels::general, "General" },
+    { LogChannels::graphics, "Graphics" },
+    { LogChannels::audio, "Audio" },
+    { LogChannels::gui, "GUI" },
+    { LogChannels::conversation, "Conversation" },
+    { LogChannels::combat, "Combat" },
+    { LogChannels::script, "Script" },
+    { LogChannels::script2, "Script" }
+};
+
+static string describeLogChannel(int channel) {
+    return getFromLookupOrElse(g_nameByLogChannel, channel, [&channel]() {
+        return to_string(channel);
+    });
 }
 
 static void log(ostream &out, LogLevel level, const string &s, int channel) {
