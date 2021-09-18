@@ -20,16 +20,15 @@
 namespace reone {
 
 /**
- * Bit flags corresponding to different debug output channels.
+ * Bit flags corresponding to different log channels.
  */
-struct DebugChannels {
+struct LogChannels {
     static constexpr int general = 1;
     static constexpr int gui = 2;
-    static constexpr int script = 4;
-    static constexpr int conversation = 8;
-    static constexpr int combat = 16;
-
-    static constexpr int all = general | gui | script | conversation | combat;
+    static constexpr int conversation = 4;
+    static constexpr int combat = 8;
+    static constexpr int script = 16;
+    static constexpr int script2 = 32;
 };
 
 typedef std::vector<char> ByteArray;

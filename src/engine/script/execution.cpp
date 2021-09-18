@@ -90,7 +90,7 @@ ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<E
 }
 
 int ScriptExecution::run() {
-    debug(boost::format("Script: run '%s' as %u") % _program->name() % _context->callerId, 1, DebugChannels::script);
+    debug(boost::format("Run '%s' as %u") % _program->name() % _context->callerId, LogChannels::script);
     uint32_t insOff = kStartInstructionOffset;
 
     if (_context->savedState) {
@@ -109,19 +109,19 @@ int ScriptExecution::run() {
         auto handler = _handlers.find(ins.byteCode);
 
         if (handler == _handlers.end()) {
-            error("Script: byte code not implemented: " + describeByteCode(ins.byteCode));
+            error("Byte code not implemented: " + describeByteCode(ins.byteCode));
             return -1;
         }
         _nextInstruction = ins.nextOffset;
 
-        if (getDebugLogLevel() >= 2) {
-            debug(boost::format("Script: instruction: %s") % describeInstruction(ins), 3, DebugChannels::script);
+        if (isLogChannelEnabled(LogChannels::script2)) {
+            debug(boost::format("Instruction: %s") % describeInstruction(ins), LogChannels::script2);
         }
         try {
             handler->second(ins);
         }
         catch (const exception &ex) {
-            debug(boost::format("Script: halt '%s'") % _program->name(), 1, DebugChannels::script);
+            debug(boost::format("Halt '%s'") % _program->name(), LogChannels::script);
             return -1;
         }
 
@@ -205,7 +205,7 @@ void ScriptExecution::executePushConstant(const Instruction &ins) {
             _stack.push_back(Variable::ofString(ins.strValue));
             break;
         default:
-            throw invalid_argument("Script: invalid instruction type: " + to_string(static_cast<int>(ins.type)));
+            throw invalid_argument("Invalid instruction type: " + to_string(static_cast<int>(ins.type)));
     }
 }
 
@@ -213,7 +213,7 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
     const Routine &routine = _context->routines->get(ins.routine);
 
     if (ins.argCount > routine.getArgumentCount()) {
-        throw runtime_error("Script: too many routine arguments");
+        throw runtime_error("Too many routine arguments");
     }
     vector<Variable> args;
 
@@ -235,7 +235,7 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
                 Variable var(_stack.back());
 
                 if (var.type != type) {
-                    throw runtime_error("Script: invalid argument variable type");
+                    throw runtime_error("Invalid argument variable type");
                 }
                 args.push_back(move(var));
                 _stack.pop_back();
@@ -244,13 +244,13 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
     }
     Variable retValue = routine.invoke(args, *_context);
 
-    if (getDebugLogLevel() >= 2) {
+    if (isLogChannelEnabled(LogChannels::script)) {
         vector<string> argStrings;
         for (auto &arg : args) {
             argStrings.push_back(arg.toString());
         }
         string argsString(boost::join(argStrings, ", "));
-        debug(boost::format("Script: action: %04x %s(%s) -> %s") % ins.offset % routine.name() % argsString % retValue.toString(), 2, DebugChannels::script);
+        debug(boost::format("Action: %04x %s(%s) -> %s") % ins.offset % routine.name() % argsString % retValue.toString(), LogChannels::script);
     }
     switch (routine.returnType()) {
         case VariableType::Void:
@@ -278,7 +278,7 @@ Variable ScriptExecution::getFloatFromStack() {
     Variable var(_stack.back());
 
     if (var.type != VariableType::Float) {
-        throw runtime_error("Script: invalid variable type for a vector component");
+        throw runtime_error("Invalid variable type for a vector component");
     }
     _stack.pop_back();
 

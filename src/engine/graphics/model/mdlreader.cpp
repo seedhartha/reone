@@ -687,7 +687,7 @@ void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const vec
         if (fn) {
             fn(key, data, node);
         } else {
-            debug(boost::format("Unsupported MDL controller type: %d") % static_cast<int>(key.type), 3);
+            debug(boost::format("Unsupported MDL controller type: %d") % static_cast<int>(key.type));
         }
     }
 }

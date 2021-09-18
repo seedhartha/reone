@@ -444,7 +444,7 @@ void Creature::die() {
     _dead = true;
     _name = _game->services().resource().strings().get(kStrRefRemains);
 
-    debug(boost::format("Creature %s is dead") % _tag, 2);
+    debug(boost::format("Creature %s is dead") % _tag);
 
     playSound(SoundSetEntry::Dead);
     playAnimation(getDieAnimation());
@@ -855,7 +855,7 @@ string Creature::getAnimationName(AnimationType anim) const {
         case AnimationType::FireForgetDiveRoll:
         case AnimationType::FireForgetScream:
         default:
-            debug("CreatureAnimationResolver: unsupported animation type: " + to_string(static_cast<int>(anim)), 2);
+            debug("CreatureAnimationResolver: unsupported animation type: " + to_string(static_cast<int>(anim)));
             return "";
     }
 }

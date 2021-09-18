@@ -70,7 +70,7 @@ void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> 
             if (!round.attack2 && !isRoundPastFirstAttack(round.time)) {
                 round.attack2 = makeAttack(attacker, target, action, resultType, damage);
                 round.duel = true;
-                debug(boost::format("Combat: append attack: %s -> %s") % attacker->tag() % target->tag(), 1, DebugChannels::combat);
+                debug(boost::format("Append attack: %s -> %s") % attacker->tag() % target->tag(), LogChannels::combat);
             }
             return;
         }
@@ -80,7 +80,7 @@ void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> 
     auto round = make_unique<Round>();
     round->attack1 = makeAttack(attacker, target, action, resultType, damage);
     _roundByAttacker.insert(make_pair(attacker->id(), move(round)));
-    debug(boost::format("Combat: start round: %s -> %s") % attacker->tag() % target->tag(), 1, DebugChannels::combat);
+    debug(boost::format("Start round: %s -> %s") % attacker->tag() % target->tag(), LogChannels::combat);
 }
 
 void Combat::update(float dt) {
@@ -203,7 +203,7 @@ void Combat::finishRound(Round &round) {
         finishAttack(*round.attack2);
     }
     round.state = RoundState::Finished;
-    debug(boost::format("Combat: finish round: %s -> %s") % round.attack1->attacker->tag() % round.attack1->target->tag(), 1, DebugChannels::combat);
+    debug(boost::format("Finish round: %s -> %s") % round.attack1->attacker->tag() % round.attack1->target->tag(), LogChannels::combat);
 }
 
 static bool isAttackSuccessful(AttackResultType result) {
@@ -340,11 +340,11 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
         case AttackResultType::AttackFailed:
         case AttackResultType::Parried:
         case AttackResultType::Deflected:
-            debug(boost::format("Combat: attack missed: %s -> %s") % attack.attacker->tag() % attack.target->tag(), 2, DebugChannels::combat);
+            debug(boost::format("Attack missed: %s -> %s") % attack.attacker->tag() % attack.target->tag(), LogChannels::combat);
             break;
         case AttackResultType::HitSuccessful:
         case AttackResultType::AutomaticHit: {
-            debug(boost::format("Combat: attack hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), 2, DebugChannels::combat);
+            debug(boost::format("Attack hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), LogChannels::combat);
             if (attack.damage == -1) {
                 auto effects = getDamageEffects(attack.attacker, offHand);
                 for (auto &effect : effects) {
@@ -357,7 +357,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
             break;
         }
         case AttackResultType::CriticalHit: {
-            debug(boost::format("Combat: attack critical hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), 2, DebugChannels::combat);
+            debug(boost::format("Attack critical hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), LogChannels::combat);
             if (attack.damage == -1) {
                 auto effects = getDamageEffects(attack.attacker, offHand, criticalHitMultiplier);
                 for (auto &effect : effects) {

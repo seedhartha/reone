@@ -43,7 +43,7 @@ Variable signalEvent(Game &game, const vector<Variable> &args, ExecutionContext 
     auto object = getObject(game, args, 0, ctx);
     auto toRun = getEvent(args, 1);
 
-    debug(boost::format("Event signalled: %s %s") % object->tag() % toRun->number(), 2);
+    debug(boost::format("Event signalled: %s %s") % object->tag() % toRun->number());
     game.services().scriptRunner().run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
 
     return Variable::ofNull();

@@ -32,8 +32,7 @@ struct WindowID {
     static constexpr wxWindowID resolution = wxID_HIGHEST + 4;
     static constexpr wxWindowID fullscreen = wxID_HIGHEST + 5;
     static constexpr wxWindowID enhancedGfx = wxID_HIGHEST + 6;
-    static constexpr wxWindowID debug = wxID_HIGHEST + 7;
-    static constexpr wxWindowID debugChannels = wxID_HIGHEST + 8;
+    static constexpr wxWindowID logChannels = wxID_HIGHEST + 8;
     static constexpr wxWindowID logFile = wxID_HIGHEST + 9;
     static constexpr wxWindowID saveConfig = wxID_HIGHEST + 10;
 };
@@ -50,8 +49,7 @@ private:
         int height { 0 };
         bool fullscreen { false };
         bool pbr { false };
-        int debug { 0 };
-        int debugch { 0 };
+        int logch { 0 };
         bool logfile { false };
     } _config;
 
@@ -60,8 +58,7 @@ private:
     wxCheckBox *_checkBoxDev;
     wxCheckBox *_checkBoxFullscreen;
     wxCheckBox *_checkBoxEnhancedGfx;
-    wxChoice *_choiceDebugLevel;
-    wxChoice *_choiceDebugChannels;
+    wxCheckListBox *_checkListBoxLogChannels;
     wxCheckBox *_checkBoxLogFile;
 
     void OnLaunch(wxCommandEvent &event);

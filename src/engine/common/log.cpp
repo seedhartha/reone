@@ -34,13 +34,12 @@ enum class LogLevel {
     Debug
 };
 
-static uint32_t g_debugLevel = 0;
-static int g_debugChannels = DebugChannels::all;
+static int g_logChannels = LogChannels::general;
 static bool g_logToFile = false;
 
 static std::unique_ptr<fs::ofstream> g_logFile;
 
-static constexpr char *describeLogLevel(LogLevel level) {
+static std::string describeLogLevel(LogLevel level) {
     switch (level) {
         case LogLevel::Error:
             return "ERR";
@@ -55,12 +54,37 @@ static constexpr char *describeLogLevel(LogLevel level) {
     }
 }
 
-static void log(ostream &out, LogLevel level, const string &s) {
-    boost::format msg(boost::format("%s [%s] %s") % describeLogLevel(level) % getThreadName() % s);
+static std::string describeLogChannel(int channel) {
+    switch (channel) {
+        case LogChannels::general:
+            return "General";
+        case LogChannels::gui:
+            return "GUI";
+        case LogChannels::conversation:
+            return "Conversation";
+        case LogChannels::combat:
+            return "Combat";
+        case LogChannels::script:
+        case LogChannels::script2:
+            return "Script";
+        default:
+            throw invalid_argument("Invalid log channel: " + to_string(channel));
+    }
+}
+
+static void log(ostream &out, LogLevel level, const string &s, int channel) {
+    boost::format msg(boost::format("%s [%s] %s: %s") %
+        describeLogLevel(level) %
+        getThreadName() %
+        describeLogChannel(channel) %
+        s);
+
     out << msg << endl;
 }
 
-static void log(LogLevel level, const string &s) {
+static void log(LogLevel level, const string &s, int channel) {
+    if (!isLogChannelEnabled(channel)) return;
+
     if (g_logToFile && !g_logFile) {
         fs::path path(fs::current_path());
         path.append(kLogFilename);
@@ -69,53 +93,47 @@ static void log(LogLevel level, const string &s) {
     }
 
     auto &out = g_logToFile ? *g_logFile : cout;
-    log(out, level, s);
+    log(out, level, s, channel);
 }
 
-void error(const string &s) {
-    log(LogLevel::Error, s);
+void error(const string &s, int channel) {
+    log(LogLevel::Error, s, channel);
 }
 
-void error(const boost::format &s) {
-    log(LogLevel::Error, str(s));
+void error(const boost::format &s, int channel) {
+    log(LogLevel::Error, str(s), channel);
 }
 
-void warn(const string &s) {
-    log(LogLevel::Warn, s);
+void warn(const string &s, int channel) {
+    log(LogLevel::Warn, s, channel);
 }
 
-void warn(const boost::format &s) {
-    log(LogLevel::Warn, str(s));
+void warn(const boost::format &s, int channel) {
+    log(LogLevel::Warn, str(s), channel);
 }
 
-void info(const string &s) {
-    log(LogLevel::Info, s);
+void info(const string &s, int channel) {
+    log(LogLevel::Info, s, channel);
 }
 
-void info(const boost::format &s) {
-    log(LogLevel::Info, str(s));
+void info(const boost::format &s, int channel) {
+    log(LogLevel::Info, str(s), channel);
 }
 
-void debug(const string &s, uint32_t level, int channel) {
-    if (level <= getDebugLogLevel() && (g_debugChannels & channel)) {
-        log(LogLevel::Debug, s);
-    }
+void debug(const string &s, int channel) {
+    log(LogLevel::Debug, s, channel);
 }
 
-void debug(const boost::format &s, uint32_t level, int channel) {
-    return debug(str(s), level, channel);
+void debug(const boost::format &s, int channel) {
+    return debug(str(s), channel);
 }
 
-uint32_t getDebugLogLevel() {
-    return g_debugLevel;
+bool isLogChannelEnabled(int channel) {
+    return g_logChannels & channel;
 }
 
-void setDebugLogLevel(uint32_t level) {
-    g_debugLevel = level;
-}
-
-void setDebugChannels(int mask) {
-    g_debugChannels = mask;
+void setLogChannels(int mask) {
+    g_logChannels = mask;
 }
 
 void setLogToFile(bool logToFile) {

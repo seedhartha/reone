@@ -134,7 +134,7 @@ unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(shared_ptr<Mode
 }
 
 void ModelSceneNode::signalEvent(const string &name) {
-    debug(boost::format("Model '%s': event '%s' signalled") % _model->name() % name, 3);
+    debug(boost::format("Model '%s': event '%s' signalled") % _model->name() % name);
 
     if (name == "detonate") {
         for (auto &node : _nodeByName) {
