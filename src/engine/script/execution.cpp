@@ -114,8 +114,8 @@ int ScriptExecution::run() {
         }
         _nextInstruction = ins.nextOffset;
 
-        if (isLogChannelEnabled(LogChannels::script2)) {
-            debug(boost::format("Instruction: %s") % describeInstruction(ins), LogChannels::script2);
+        if (isLogChannelEnabled(LogChannels::script3)) {
+            debug(boost::format("Instruction: %s") % describeInstruction(ins), LogChannels::script3);
         }
         try {
             handler->second(ins);
@@ -244,13 +244,13 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
     }
     Variable retValue = routine.invoke(args, *_context);
 
-    if (isLogChannelEnabled(LogChannels::script)) {
+    if (isLogChannelEnabled(LogChannels::script2)) {
         vector<string> argStrings;
         for (auto &arg : args) {
             argStrings.push_back(arg.toString());
         }
         string argsString(boost::join(argStrings, ", "));
-        debug(boost::format("Action: %04x %s(%s) -> %s") % ins.offset % routine.name() % argsString % retValue.toString(), LogChannels::script);
+        debug(boost::format("Action: %04x %s(%s) -> %s") % ins.offset % routine.name() % argsString % retValue.toString(), LogChannels::script2);
     }
     switch (routine.returnType()) {
         case VariableType::Void:
