@@ -49,7 +49,7 @@ void Resources::indexKeyFile(const fs::path &path) {
 
     _providers.push_back(move(keyBif));
 
-    debug("Index: " + path.string(), LogChannels::resources);
+    debug("Index " + path.string(), LogChannels::resources);
 }
 
 void Resources::indexErfFile(const fs::path &path, bool transient) {
@@ -64,7 +64,7 @@ void Resources::indexErfFile(const fs::path &path, bool transient) {
         _providers.push_back(move(erf));
     }
 
-    debug("Index: " + path.string(), LogChannels::resources);
+    debug("Index " + path.string(), LogChannels::resources);
 }
 
 void Resources::indexRimFile(const fs::path &path, bool transient) {
@@ -79,7 +79,7 @@ void Resources::indexRimFile(const fs::path &path, bool transient) {
         _providers.push_back(move(rim));
     }
 
-    debug("Index: " + path.string(), LogChannels::resources);
+    debug("Index " + path.string(), LogChannels::resources);
 }
 
 void Resources::indexDirectory(const fs::path &path) {
@@ -90,7 +90,7 @@ void Resources::indexDirectory(const fs::path &path) {
 
     _providers.push_back(move(folder));
 
-    debug("Index: " + path.string(), LogChannels::resources);
+    debug("Index " + path.string(), LogChannels::resources);
 }
 
 void Resources::indexExeFile(const fs::path &path) {
@@ -98,7 +98,7 @@ void Resources::indexExeFile(const fs::path &path) {
 
     _exeFile.load(path);
 
-    debug("Index: " + path.string(), LogChannels::resources);
+    debug("Index " + path.string(), LogChannels::resources);
 }
 
 void Resources::invalidateCache() {

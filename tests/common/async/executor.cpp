@@ -15,28 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "services.h"
+/** @file
+ *  Tests for Executor class.
+ */
 
-using namespace std;
+#include <boost/test/unit_test.hpp>
 
-using namespace reone::graphics;
+#include "../../../src/engine/common/async/executor.h"
+#include "../../../src/engine/common/async/task.h"
 
-namespace reone {
+using namespace reone;
 
-namespace scene {
-
-SceneServices::SceneServices(GraphicsOptions options, GraphicsServices &graphics) :
-    _options(move(options)),
-    _graphics(graphics) {
+static void doNothing() {
 }
 
-void SceneServices::init() {
-    _graph = make_unique<SceneGraph>(_options, _graphics);
+BOOST_AUTO_TEST_CASE(ExecutorTest) {
+    Executor executor;
+    executor.init();
 
-    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, _graphics, *_graph);
-    _worldRenderPipeline->init();
+    auto task = executor.submit(&doNothing);
+    task->await();
 }
-
-} // namespace scene
-
-} // namespace reone

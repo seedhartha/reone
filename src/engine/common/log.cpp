@@ -37,8 +37,9 @@ enum class LogLevel {
 
 static int g_logChannels = LogChannels::general;
 static bool g_logToFile = false;
+static mutex g_logMutex;
 
-static std::unique_ptr<fs::ofstream> g_logFile;
+static unique_ptr<fs::ofstream> g_logFile;
 
 static const unordered_map<LogLevel, string> g_nameByLogLevel {
     { LogLevel::Error, "ERR" },
@@ -47,7 +48,7 @@ static const unordered_map<LogLevel, string> g_nameByLogLevel {
     { LogLevel::Debug, "DBG" }
 };
 
-static std::string describeLogLevel(LogLevel level) {
+static string describeLogLevel(LogLevel level) {
     return getFromLookupOrElse(g_nameByLogLevel, level, [&level]() {
         return to_string(static_cast<int>(level));
     });
@@ -78,6 +79,7 @@ static void log(ostream &out, LogLevel level, const string &s, int channel) {
         describeLogChannel(channel) %
         s);
 
+    lock_guard<mutex> lock(g_logMutex);
     out << msg << endl;
 }
 

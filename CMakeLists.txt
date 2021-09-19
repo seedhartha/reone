@@ -62,6 +62,9 @@ endif()
 ## libcommon static library
 
 set(COMMON_HEADERS
+    src/engine/common/async/executor.h
+    src/engine/common/async/impl/task.h
+    src/engine/common/async/task.h
     src/engine/common/cache.h
     src/engine/common/collectionutil.h
     src/engine/common/guardutil.h
@@ -69,6 +72,7 @@ set(COMMON_HEADERS
     src/engine/common/mediastream.h
     src/engine/common/pathutil.h
     src/engine/common/random.h
+    src/engine/common/services.h
     src/engine/common/streamreader.h
     src/engine/common/streamutil.h
     src/engine/common/streamwriter.h
@@ -78,9 +82,12 @@ set(COMMON_HEADERS
     src/engine/common/unicode.h)
 
 set(COMMON_SOURCES
+    src/engine/common/async/executor.cpp
+    src/engine/common/async/impl/task.cpp
     src/engine/common/log.cpp
     src/engine/common/pathutil.cpp
     src/engine/common/random.cpp
+    src/engine/common/services.cpp
     src/engine/common/streamreader.cpp
     src/engine/common/streamutil.cpp
     src/engine/common/streamwriter.cpp
@@ -1041,6 +1048,7 @@ endif()
 
 if(BUILD_TESTS)
     set(TEST_SOURCES
+        tests/common/async/executor.cpp
         tests/common/cache.cpp
         tests/common/mediastream.cpp
         tests/common/streamreader.cpp

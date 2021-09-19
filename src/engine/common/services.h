@@ -15,28 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "services.h"
+#pragma once
 
-using namespace std;
-
-using namespace reone::graphics;
+#include "async/executor.h"
 
 namespace reone {
 
-namespace scene {
+class CommonServices {
+public:
+    void init();
 
-SceneServices::SceneServices(GraphicsOptions options, GraphicsServices &graphics) :
-    _options(move(options)),
-    _graphics(graphics) {
-}
-
-void SceneServices::init() {
-    _graph = make_unique<SceneGraph>(_options, _graphics);
-
-    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, _graphics, *_graph);
-    _worldRenderPipeline->init();
-}
-
-} // namespace scene
+private:
+    std::unique_ptr<Executor> _executor;
+};
 
 } // namespace reone
