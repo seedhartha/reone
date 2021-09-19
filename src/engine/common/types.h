@@ -32,6 +32,7 @@ struct LogChannels {
     static constexpr int combat = 64;
     static constexpr int script = 128;
     static constexpr int script2 = 256;
+    static constexpr int script3 = 512;
 };
 
 typedef std::vector<char> ByteArray;

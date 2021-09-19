@@ -96,6 +96,7 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     logChannelChoices.Add("Combat");
     logChannelChoices.Add("Script");
     logChannelChoices.Add("Script (verbose)");
+    logChannelChoices.Add("Script (very verbose)");
 
     _checkListBoxLogChannels = new wxCheckListBox(this, WindowID::logChannels, wxDefaultPosition, wxDefaultSize, logChannelChoices);
     _checkListBoxLogChannels->Check(0, _config.logch & LogChannels::resources);
@@ -106,6 +107,7 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
     _checkListBoxLogChannels->Check(5, _config.logch & LogChannels::combat);
     _checkListBoxLogChannels->Check(6, _config.logch & LogChannels::script);
     _checkListBoxLogChannels->Check(7, _config.logch & LogChannels::script2);
+    _checkListBoxLogChannels->Check(8, _config.logch & LogChannels::script3);
 
     auto logChannelsSizer = new wxBoxSizer(wxHORIZONTAL);
     logChannelsSizer->Add(new wxStaticText(this, wxID_ANY, "Log Channels", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
@@ -203,6 +205,9 @@ void LauncherFrame::SaveConfiguration() {
     }
     if (_checkListBoxLogChannels->IsChecked(7)) {
         logch |= LogChannels::script2;
+    }
+    if (_checkListBoxLogChannels->IsChecked(8)) {
+        logch |= LogChannels::script3;
     }
 
     _config.gameDir = _textCtrlGameDir->GetValue();

@@ -63,7 +63,8 @@ static const unordered_map<int, string> g_nameByLogChannel {
     { LogChannels::conversation, "Conversation" },
     { LogChannels::combat, "Combat" },
     { LogChannels::script, "Script" },
-    { LogChannels::script2, "Script" }
+    { LogChannels::script2, "Script" },
+    { LogChannels::script3, "Script" }
 };
 
 static string describeLogChannel(int channel) {
