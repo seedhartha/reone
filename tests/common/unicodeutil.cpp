@@ -27,8 +27,14 @@ using namespace std;
 
 using namespace reone;
 
+BOOST_AUTO_TEST_CASE(convertUTF8ToUTF16Test) {
+    string utf8("\xd0\x9f\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82\x2c\x20\xd0\xbc\xd0\xb8\xd1\x80\x21");
+    u16string utf16(convertUTF8ToUTF16(utf8));
+    BOOST_TEST((utf16 == u"\u041f\u0440\u0438\u0432\u0435\u0442\u002c\u0020\u043c\u0438\u0440\u0021"));
+}
+
 BOOST_AUTO_TEST_CASE(convertUTF16ToUTF8Test) {
     u16string utf16(u"\u041f\u0440\u0438\u0432\u0435\u0442\u002c\u0020\u043c\u0438\u0440\u0021");
-    string utf8 = convertUTF16ToUTF8(utf16);
+    string utf8(convertUTF16ToUTF8(utf16));
     BOOST_TEST((utf8 == "\xd0\x9f\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82\x2c\x20\xd0\xbc\xd0\xb8\xd1\x80\x21"));
 }
