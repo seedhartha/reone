@@ -24,15 +24,24 @@
 #include "../../../src/engine/common/async/executor.h"
 #include "../../../src/engine/common/async/task.h"
 
+using namespace std;
+
 using namespace reone;
 
-static void doNothing() {
+static volatile bool g_finished { false };
+
+static void someFunction() {
+    this_thread::sleep_for(chrono::milliseconds(100));
+
+    g_finished = true;
 }
 
-BOOST_AUTO_TEST_CASE(ExecutorTest) {
+BOOST_AUTO_TEST_CASE(WhenSubmitAndAwait_ThenBlockUntilCompleted) {
     Executor executor;
     executor.init();
 
-    auto task = executor.submit(&doNothing);
+    auto task = executor.submit(&someFunction);
     task->await();
+
+    BOOST_TEST(g_finished);
 }

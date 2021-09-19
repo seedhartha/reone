@@ -32,7 +32,7 @@ using namespace reone::resource;
 namespace endian = boost::endian;
 namespace fs = boost::filesystem;
 
-BOOST_AUTO_TEST_CASE(GffStruct_SaveLoad) {
+BOOST_AUTO_TEST_CASE(WhenSaveAndLoad) {
     auto struct1 = make_shared<GffStruct>(0);
     GffField struct1Field(GffFieldType::Byte, "MyByte"); struct1Field.uintValue = 1;
     struct1->add(move(struct1Field));

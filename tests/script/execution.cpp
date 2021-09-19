@@ -30,7 +30,7 @@ using namespace std;
 
 using namespace reone::script;
 
-BOOST_AUTO_TEST_CASE(ScriptExecution_Destruct) {
+BOOST_AUTO_TEST_CASE(WhenDESTRUCTByteCode) {
     Instruction instr;
     auto program = make_shared<ScriptProgram>("");
 
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(ScriptExecution_Destruct) {
     BOOST_TEST((execution.getStackVariable(0).intValue == 1));
 }
 
-BOOST_AUTO_TEST_CASE(ScriptExecution_CopyTopBp) {
+BOOST_AUTO_TEST_CASE(WhenCPTOPBPByteCode) {
     Instruction instr;
     auto program = make_shared<ScriptProgram>("");
 
