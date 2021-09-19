@@ -17,7 +17,7 @@
 
 #include "ncsreader.h"
 
-#include "../common/log.h"
+#include "../common/logutil.h"
 
 #include "program.h"
 

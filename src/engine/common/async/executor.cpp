@@ -17,7 +17,7 @@
 
 #include "executor.h"
 
-#include "../log.h"
+#include "../logutil.h"
 #include "../threadutil.h"
 
 #include "impl/task.h"

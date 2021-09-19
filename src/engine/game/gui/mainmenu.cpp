@@ -18,7 +18,7 @@
 #include "mainmenu.h"
 
 #include "../../audio/player.h"
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 #include "../../gui/scenebuilder.h"
 #include "../../graphics/model/models.h"
 #include "../../resource/resources.h"

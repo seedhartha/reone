@@ -18,7 +18,7 @@
 #include "bikreader.h"
 
 #include "../audio/stream.h"
-#include "../common/log.h"
+#include "../common/logutil.h"
 #include "../common/guardutil.h"
 #include "../common/streamreader.h"
 #include "../graphics/services.h"

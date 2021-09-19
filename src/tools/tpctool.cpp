@@ -19,7 +19,7 @@
 
 #include "s3tc.h"
 
-#include "../engine/common/log.h"
+#include "../engine/common/logutil.h"
 #include "../engine/graphics/texture/tgawriter.h"
 #include "../engine/graphics/texture/tpcreader.h"
 

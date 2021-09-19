@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../engine/common/log.h"
+#include "../engine/common/logutil.h"
 
 #include "program.h"
 

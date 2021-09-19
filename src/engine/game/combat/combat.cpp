@@ -17,8 +17,8 @@
 
 #include "combat.h"
 
-#include "../../common/log.h"
-#include "../../common/random.h"
+#include "../../common/logutil.h"
+#include "../../common/randomutil.h"
 
 #include "../game.h"
 

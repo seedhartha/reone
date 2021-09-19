@@ -17,7 +17,7 @@
 
 #include "tgareader.h"
 
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 
 #include "texture.h"
 #include "textureutil.h"

@@ -17,7 +17,7 @@
 
 #include "player.h"
 
-#include "../common/log.h"
+#include "../common/logutil.h"
 #include "../common/threadutil.h"
 
 #include "files.h"

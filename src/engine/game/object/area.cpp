@@ -18,8 +18,8 @@
 #include "area.h"
 
 #include "../../common/guardutil.h"
-#include "../../common/log.h"
-#include "../../common/random.h"
+#include "../../common/logutil.h"
+#include "../../common/randomutil.h"
 #include "../../common/streamutil.h"
 #include "../../graphics/baryutil.h"
 #include "../../graphics/mesh/mesh.h"

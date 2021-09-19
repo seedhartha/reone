@@ -17,7 +17,7 @@
 
 #include "textures.h"
 
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
 

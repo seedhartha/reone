@@ -17,7 +17,7 @@
 
 #include "trigger.h"
 
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 

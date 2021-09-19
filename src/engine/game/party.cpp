@@ -17,8 +17,8 @@
 
 #include "party.h"
 
-#include "../common/log.h"
-#include "../common/random.h"
+#include "../common/logutil.h"
+#include "../common/randomutil.h"
 
 #include "action/follow.h"
 #include "game.h"

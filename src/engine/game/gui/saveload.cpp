@@ -17,7 +17,7 @@
 
 #include "saveload.h"
 
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 #include "../../common/streamutil.h"
 #include "../../graphics/texture/tgareader.h"
 #include "../../resource/format/erfreader.h"

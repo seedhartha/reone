@@ -21,7 +21,7 @@
 
 #include "declarations.h"
 
-#include "../../../../common/random.h"
+#include "../../../../common/randomutil.h"
 #include "../../../../script/types.h"
 
 #include "argutil.h"

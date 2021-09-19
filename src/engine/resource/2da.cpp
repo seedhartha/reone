@@ -18,7 +18,7 @@
 #include "2da.h"
 
 #include "../common/collectionutil.h"
-#include "../common/log.h"
+#include "../common/logutil.h"
 
 using namespace std;
 

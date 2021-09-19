@@ -18,7 +18,7 @@
 #include "execution.h"
 
 #include "../common/guardutil.h"
-#include "../common/log.h"
+#include "../common/logutil.h"
 
 #include "executioncontext.h"
 #include "instrutil.h"

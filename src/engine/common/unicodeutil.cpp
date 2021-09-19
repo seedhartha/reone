@@ -15,22 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "random.h"
+#include "unicodeutil.h"
+
+#include <codecvt>
 
 using namespace std;
 
 namespace reone {
 
-static default_random_engine g_generator(static_cast<uint32_t>(time(nullptr)));
-
-int random(int min, int max) {
-    uniform_int_distribution<int> dist(min, max);
-    return dist(g_generator);
-}
-
-float random(float min, float max) {
-    uniform_real_distribution<float> distr(min, max);
-    return distr(g_generator);
+string convertUTF16ToUTF8(u16string s) {
+    wstring_convert<codecvt_utf8_utf16<char16_t>, char16_t> conversion;
+    return conversion.to_bytes(s);
 }
 
 } // namespace reone

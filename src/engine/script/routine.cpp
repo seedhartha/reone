@@ -17,7 +17,7 @@
 
 #include "routine.h"
 
-#include "../common/log.h"
+#include "../common/logutil.h"
 #include "../script/exception/argument.h"
 #include "../script/exception/notimpl.h"
 

@@ -19,7 +19,7 @@
 
 #include "../audio/player.h"
 #include "../common/collectionutil.h"
-#include "../common/log.h"
+#include "../common/logutil.h"
 #include "../common/pathutil.h"
 #include "../common/streamutil.h"
 #include "../common/streamwriter.h"

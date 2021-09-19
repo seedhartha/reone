@@ -68,10 +68,10 @@ set(COMMON_HEADERS
     src/engine/common/cache.h
     src/engine/common/collectionutil.h
     src/engine/common/guardutil.h
-    src/engine/common/log.h
+    src/engine/common/logutil.h
     src/engine/common/mediastream.h
     src/engine/common/pathutil.h
-    src/engine/common/random.h
+    src/engine/common/randomutil.h
     src/engine/common/services.h
     src/engine/common/streamreader.h
     src/engine/common/streamutil.h
@@ -79,20 +79,20 @@ set(COMMON_HEADERS
     src/engine/common/threadutil.h
     src/engine/common/timer.h
     src/engine/common/types.h
-    src/engine/common/unicode.h)
+    src/engine/common/unicodeutil.h)
 
 set(COMMON_SOURCES
     src/engine/common/async/executor.cpp
     src/engine/common/async/impl/task.cpp
-    src/engine/common/log.cpp
+    src/engine/common/logutil.cpp
     src/engine/common/pathutil.cpp
-    src/engine/common/random.cpp
+    src/engine/common/randomutil.cpp
     src/engine/common/services.cpp
     src/engine/common/streamreader.cpp
     src/engine/common/streamutil.cpp
     src/engine/common/streamwriter.cpp
     src/engine/common/threadutil.cpp
-    src/engine/common/unicode.cpp)
+    src/engine/common/unicodeutil.cpp)
 
 add_library(libcommon STATIC ${COMMON_HEADERS} ${COMMON_SOURCES})
 set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -1053,7 +1053,7 @@ if(BUILD_TESTS)
         tests/common/mediastream.cpp
         tests/common/streamreader.cpp
         tests/common/timer.cpp
-        tests/common/unicode.cpp
+        tests/common/unicodeutil.cpp
         tests/game/pathfinder.cpp
         tests/main.cpp
         tests/resource/gffstruct.cpp

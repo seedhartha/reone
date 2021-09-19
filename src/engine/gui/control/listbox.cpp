@@ -17,7 +17,7 @@
 
 #include "listbox.h"
 
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 #include "../../graphics/font.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/renderbuffer.h"

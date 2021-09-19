@@ -17,7 +17,7 @@
 
 #include "resources.h"
 
-#include "../common/log.h"
+#include "../common/logutil.h"
 #include "../common/pathutil.h"
 #include "../common/streamutil.h"
 
