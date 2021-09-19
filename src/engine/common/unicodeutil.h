@@ -19,6 +19,7 @@
 
 namespace reone {
 
+std::u16string convertUTF8ToUTF16(std::string s);
 std::string convertUTF16ToUTF8(std::u16string s);
 
 } // namespace reone

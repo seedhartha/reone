@@ -23,6 +23,11 @@ using namespace std;
 
 namespace reone {
 
+u16string convertUTF8ToUTF16(string s) {
+    wstring_convert<codecvt_utf8_utf16<char16_t>, char16_t> conversion;
+    return conversion.from_bytes(s);
+}
+
 string convertUTF16ToUTF8(u16string s) {
     wstring_convert<codecvt_utf8_utf16<char16_t>, char16_t> conversion;
     return conversion.to_bytes(s);
