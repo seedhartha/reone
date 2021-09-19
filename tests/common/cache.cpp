@@ -41,14 +41,22 @@ private:
     }
 };
 
-BOOST_AUTO_TEST_CASE(MemoryCache_ValueIsComputedAndCached) {
+BOOST_AUTO_TEST_CASE(GivenValueIncremented_WhenGetTwiceUsingSameKey_ThenSameValueReturned) {
+    TestCache cache;
+
+    auto result1 = cache.get(0);
+    auto result2 = cache.get(0);
+
+    BOOST_TEST((*result1 == 0));
+    BOOST_TEST((*result2 == 0));
+}
+
+BOOST_AUTO_TEST_CASE(GivenValueIncremented_WhenGetTwiceUsingDifferentKeys_ThenDifferentValuesReturned) {
     TestCache cache;
 
     auto result1 = cache.get(0);
     auto result2 = cache.get(1);
-    auto result3 = cache.get(0);
 
     BOOST_TEST((*result1 == 0));
     BOOST_TEST((*result2 == 1));
-    BOOST_TEST((*result3 == 0));
 }

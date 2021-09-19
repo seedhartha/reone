@@ -29,7 +29,7 @@ using namespace std;
 using namespace reone::game;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_CASE(PathFinder_FindPath) {
+BOOST_AUTO_TEST_CASE(GivenTwoPaths_WhenFindPath_TheShortestPathReturned) {
     // Points:
     //
     // S 2 3
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(PathFinder_FindPath) {
     BOOST_TEST(found);
 }
 
-BOOST_AUTO_TEST_CASE(PathFinder_FindPath_NoPoints) {
+BOOST_AUTO_TEST_CASE(GivenNoPoints_WhenFindPath_ThenLineReturned) {
     Pathfinder pathfinder;
     pathfinder.load({}, {});
 

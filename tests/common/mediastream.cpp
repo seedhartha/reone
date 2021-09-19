@@ -59,7 +59,7 @@ private:
     }
 };
 
-BOOST_AUTO_TEST_CASE(MediaStream_GetFrameFromStart) {
+BOOST_AUTO_TEST_CASE(WhenGetFromStart_ThenIgnoredNothingAndFetchedBufferSize) {
     TestStream stream;
     for (int i = 0; i <= stream.kBufferSize; ++i) {
         stream.addSourceFrame(i);
@@ -72,20 +72,7 @@ BOOST_AUTO_TEST_CASE(MediaStream_GetFrameFromStart) {
     BOOST_TEST((stream.fetchedTotal() == stream.kBufferSize));
 }
 
-BOOST_AUTO_TEST_CASE(MediaStream_GetFrameFromMid) {
-    TestStream stream;
-    for (int i = 0; i <= stream.kBufferSize; ++i) {
-        stream.addSourceFrame(i);
-    }
-
-    auto frame = stream.get(4);
-
-    BOOST_TEST((*frame == 4));
-    BOOST_TEST((stream.ignoredTotal() == 4));
-    BOOST_TEST((stream.fetchedTotal() == stream.kBufferSize - 3));
-}
-
-BOOST_AUTO_TEST_CASE(MediaStream_GetFrameFromEnd) {
+BOOST_AUTO_TEST_CASE(WhenGetFromEnd_ThenIgnoredPreviousAndFetchedUpToLast) {
     TestStream stream;
     for (int i = 0; i <= stream.kBufferSize; ++i) {
         stream.addSourceFrame(i);

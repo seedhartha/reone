@@ -25,10 +25,10 @@
 
 using namespace reone;
 
-BOOST_AUTO_TEST_CASE(Timer_TimesOut) {
+BOOST_AUTO_TEST_CASE(GivenOneSecondTimeout_WhenAdvanceTwiceBySixHundredMillis_ThenTimedOutOnce) {
     Timer timer;
     timer.setTimeout(1.0f);
-    timer.advance(0.5f);
+    timer.advance(0.6f);
 
     BOOST_TEST(!timer.isTimedOut());
 
