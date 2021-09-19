@@ -20,6 +20,7 @@
 #include "audio/services.h"
 #include "common/log.h"
 #include "common/pathutil.h"
+#include "common/services.h"
 #include "game/kotor.h"
 #include "game/tsl.h"
 #include "graphics/services.h"
@@ -117,6 +118,9 @@ void Engine::loadOptions() {
 
 int Engine::runGame() {
     GameID gameId = determineGameID();
+
+    CommonServices common;
+    common.init();
 
     ResourceServices resource(_gamePath);
     resource.init();

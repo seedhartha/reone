@@ -19,24 +19,11 @@
 
 using namespace std;
 
-using namespace reone::graphics;
-
 namespace reone {
 
-namespace scene {
-
-SceneServices::SceneServices(GraphicsOptions options, GraphicsServices &graphics) :
-    _options(move(options)),
-    _graphics(graphics) {
+void CommonServices::init() {
+    _executor = make_unique<Executor>();
+    _executor->init();
 }
-
-void SceneServices::init() {
-    _graph = make_unique<SceneGraph>(_options, _graphics);
-
-    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, _graphics, *_graph);
-    _worldRenderPipeline->init();
-}
-
-} // namespace scene
 
 } // namespace reone

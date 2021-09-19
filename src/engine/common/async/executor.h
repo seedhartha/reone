@@ -15,28 +15,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "services.h"
-
-using namespace std;
-
-using namespace reone::graphics;
+#pragma once
 
 namespace reone {
 
-namespace scene {
+class ITask;
+class Task;
 
-SceneServices::SceneServices(GraphicsOptions options, GraphicsServices &graphics) :
-    _options(move(options)),
-    _graphics(graphics) {
-}
+class Executor {
+public:
+    ~Executor();
 
-void SceneServices::init() {
-    _graph = make_unique<SceneGraph>(_options, _graphics);
+    void init();
+    void deinit();
 
-    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, _graphics, *_graph);
-    _worldRenderPipeline->init();
-}
+    std::shared_ptr<ITask> submit(std::function<void()> fn);
 
-} // namespace scene
+    bool isRunning() const { return _running; }
+
+private:
+    volatile bool _running { false };
+    std::vector<std::unique_ptr<std::thread>> _threads;
+    std::queue<std::shared_ptr<Task>> _tasks;
+    std::mutex _tasksMutex;
+
+    void startThreads();
+    void startThreads(int count);
+
+    void poolThreadStart(int n);
+    void runSingleTask();
+
+    std::shared_ptr<Task> getTask();
+};
 
 } // namespace reone

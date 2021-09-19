@@ -15,28 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "services.h"
+#pragma once
 
-using namespace std;
-
-using namespace reone::graphics;
+#include "../task.h"
 
 namespace reone {
 
-namespace scene {
+class Task : public ITask {
+public:
+    Task(std::function<void()> fn) : _fn(std::move(fn)) {
+        _completionMutex.lock();
+    }
 
-SceneServices::SceneServices(GraphicsOptions options, GraphicsServices &graphics) :
-    _options(move(options)),
-    _graphics(graphics) {
-}
+    void run();
+    void await() override;
 
-void SceneServices::init() {
-    _graph = make_unique<SceneGraph>(_options, _graphics);
-
-    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, _graphics, *_graph);
-    _worldRenderPipeline->init();
-}
-
-} // namespace scene
+private:
+    std::function<void()> _fn;
+    std::mutex _completionMutex;
+};
 
 } // namespace reone
