@@ -18,7 +18,7 @@
 #include "soundinstance.h"
 
 #include "../common/guardutil.h"
-#include "../common/log.h"
+#include "../common/logutil.h"
 
 #include "soundhandle.h"
 #include "stream.h"

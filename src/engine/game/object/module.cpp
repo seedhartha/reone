@@ -17,7 +17,7 @@
 
 #include "module.h"
 
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 #include "../../resource/resources.h"
 
 #include "../action/attack.h"

@@ -17,7 +17,7 @@
 
 #include "openlock.h"
 
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 
 #include "../game.h"
 

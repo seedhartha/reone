@@ -19,7 +19,7 @@
 
 #include "../../audio/files.h"
 #include "../../audio/player.h"
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 #include "../../gui/control/listbox.h"
 #include "../../graphics/lip/lips.h"
 #include "../../graphics/model/animation.h"

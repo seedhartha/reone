@@ -18,7 +18,7 @@
 #include "portraitselect.h"
 
 #include "../../../common/collectionutil.h"
-#include "../../../common/random.h"
+#include "../../../common/randomutil.h"
 #include "../../../gui/scenebuilder.h"
 #include "../../../graphics/model/models.h"
 #include "../../../graphics/texture/textures.h"

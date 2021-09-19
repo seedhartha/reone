@@ -17,7 +17,7 @@
 
 #include "useskill.h"
 
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 
 #include "../game.h"
 #include "../object/creature.h"

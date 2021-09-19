@@ -17,7 +17,7 @@
 
 #include "pereader.h"
 
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 
 using namespace std;
 

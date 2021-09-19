@@ -17,7 +17,7 @@
 
 #include "damage.h"
 
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 
 #include "../object/spatial.h"
 

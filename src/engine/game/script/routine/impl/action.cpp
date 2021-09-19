@@ -21,7 +21,7 @@
 
 #include "declarations.h"
 
-#include "../../../../common/log.h"
+#include "../../../../common/logutil.h"
 #include "../../../../script/exception/argument.h"
 
 #include "../../../game.h"

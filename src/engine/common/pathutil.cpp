@@ -17,7 +17,7 @@
 
 #include "pathutil.h"
 
-#include "log.h"
+#include "logutil.h"
 
 using namespace std;
 

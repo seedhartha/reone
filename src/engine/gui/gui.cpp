@@ -18,7 +18,7 @@
 #include "gui.h"
 
 #include "../common/guardutil.h"
-#include "../common/log.h"
+#include "../common/logutil.h"
 #include "../graphics/context.h"
 #include "../graphics/mesh/mesh.h"
 #include "../graphics/mesh/meshes.h"

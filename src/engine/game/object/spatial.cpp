@@ -17,7 +17,7 @@
 
 #include "spatial.h"
 
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 
 #include "../room.h"
 

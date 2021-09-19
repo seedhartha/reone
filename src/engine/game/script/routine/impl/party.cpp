@@ -21,8 +21,8 @@
 
 #include "declarations.h"
 
-#include "../../../../common/log.h"
-#include "../../../../common/random.h"
+#include "../../../../common/logutil.h"
+#include "../../../../common/randomutil.h"
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/types.h"
 

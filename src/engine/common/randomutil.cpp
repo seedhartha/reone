@@ -15,20 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @file
- *  Tests for Unicode conversion functions.
- */
-
-#include <boost/test/unit_test.hpp>
-
-#include "../../src/engine/common/unicode.h"
+#include "randomutil.h"
 
 using namespace std;
 
-using namespace reone;
+namespace reone {
 
-BOOST_AUTO_TEST_CASE(convertUTF16ToUTF8Test) {
-    u16string utf16(u"\u041f\u0440\u0438\u0432\u0435\u0442\u002c\u0020\u043c\u0438\u0440\u0021");
-    string utf8 = convertUTF16ToUTF8(utf16);
-    BOOST_TEST((utf8 == "\xd0\x9f\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82\x2c\x20\xd0\xbc\xd0\xb8\xd1\x80\x21"));
+static default_random_engine g_generator(static_cast<uint32_t>(time(nullptr)));
+
+int random(int min, int max) {
+    uniform_int_distribution<int> dist(min, max);
+    return dist(g_generator);
 }
+
+float random(float min, float max) {
+    uniform_real_distribution<float> distr(min, max);
+    return distr(g_generator);
+}
+
+} // namespace reone

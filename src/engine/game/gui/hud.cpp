@@ -17,7 +17,7 @@
 
 #include "hud.h"
 
-#include "../../common/log.h"
+#include "../../common/logutil.h"
 #include "../../gui/control/label.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"

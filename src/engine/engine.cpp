@@ -18,7 +18,7 @@
 #include "engine.h"
 
 #include "audio/services.h"
-#include "common/log.h"
+#include "common/logutil.h"
 #include "common/pathutil.h"
 #include "common/services.h"
 #include "game/kotor.h"

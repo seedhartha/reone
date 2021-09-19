@@ -18,8 +18,8 @@
 #include "creature.h"
 
 #include "../../audio/player.h"
-#include "../../common/log.h"
-#include "../../common/random.h"
+#include "../../common/logutil.h"
+#include "../../common/randomutil.h"
 #include "../../common/streamutil.h"
 #include "../../common/timer.h"
 #include "../../graphics/model/models.h"
