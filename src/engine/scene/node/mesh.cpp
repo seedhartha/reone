@@ -20,6 +20,7 @@
 #include "../../common/logutil.h"
 #include "../../common/guardutil.h"
 #include "../../common/randomutil.h"
+#include "../../di/services/graphics.h"
 #include "../../graphics/context.h"
 #include "../../graphics/features.h"
 #include "../../graphics/materials.h"

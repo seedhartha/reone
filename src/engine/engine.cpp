@@ -17,16 +17,16 @@
 
 #include "engine.h"
 
-#include "audio/services.h"
 #include "common/logutil.h"
 #include "common/pathutil.h"
-#include "common/services.h"
+#include "di/services/audio.h"
+#include "di/services/common.h"
+#include "di/services/graphics.h"
+#include "di/services/resource.h"
+#include "di/services/scene.h"
+#include "di/services/script.h"
 #include "game/kotor.h"
 #include "game/tsl.h"
-#include "graphics/services.h"
-#include "resource/services.h"
-#include "scene/services.h"
-#include "script/services.h"
 
 using namespace std;
 

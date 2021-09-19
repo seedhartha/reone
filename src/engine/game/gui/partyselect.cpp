@@ -17,6 +17,7 @@
 
 #include "partyselect.h"
 
+#include "../../di/services/resource.h"
 #include "../../graphics/texture/textures.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"

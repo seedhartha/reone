@@ -174,7 +174,7 @@ void MdlReader::readNodeNames(const vector<uint32_t> &offsets) {
         string name(boost::to_lower_copy(readCStringAt(kMdlDataOffset + offset)));
         int numOccurances = nameOccurences[name]++;
         if (numOccurances > 0) {
-            debug("Duplicate model node name: " + name);
+            debug("Duplicate model node name: " + name, LogChannels::graphics);
             name = str(boost::format("%s_dup%d") % name % numOccurances);
         }
         _nodeNames.push_back(move(name));

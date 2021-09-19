@@ -15,33 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "services.h"
-
-#include "../resource/services.h"
-
-#include "files.h"
-#include "player.h"
+#include "scene.h"
 
 using namespace std;
 
-using namespace reone::resource;
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace audio {
+namespace scene {
 
-AudioServices::AudioServices(AudioOptions options, ResourceServices &resource) :
+SceneServices::SceneServices(GraphicsOptions options, GraphicsServices &graphics) :
     _options(move(options)),
-    _resource(resource) {
+    _graphics(graphics) {
 }
 
-void AudioServices::init() {
-    _files = make_unique<AudioFiles>(_resource.resources());
+void SceneServices::init() {
+    _graph = make_unique<SceneGraph>(_options, _graphics);
 
-    _player = make_unique<AudioPlayer>(_options, *_files);
-    _player->init();
+    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, _graphics, *_graph);
+    _worldRenderPipeline->init();
 }
 
-} // namespace audio
+} // namespace scene
 
 } // namespace reone

@@ -18,6 +18,8 @@
 #include "door.h"
 
 #include "../../common/streamutil.h"
+#include "../../di/services/graphics.h"
+#include "../../di/services/resource.h"
 #include "../../graphics/model/models.h"
 #include "../../graphics/walkmesh/walkmeshes.h"
 #include "../../resource/resources.h"

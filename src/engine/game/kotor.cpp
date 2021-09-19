@@ -18,6 +18,7 @@
 #include "kotor.h"
 
 #include "../common/pathutil.h"
+#include "../di/services/resource.h"
 
 using namespace std;
 

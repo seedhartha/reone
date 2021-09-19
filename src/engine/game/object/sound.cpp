@@ -19,6 +19,8 @@
 
 #include "../../audio/files.h"
 #include "../../audio/player.h"
+#include "../../di/services/audio.h"
+#include "../../di/services/resource.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"

@@ -17,32 +17,56 @@
 
 #pragma once
 
-#include "../audio/services.h"
-#include "../graphics/services.h"
-#include "../resource/services.h"
-#include "../scene/services.h"
-#include "../script/services.h"
-
-#include "action/actionfactory.h"
-#include "combat/combat.h"
-#include "cursors.h"
-#include "d20/classes.h"
-#include "d20/feats.h"
-#include "d20/skills.h"
-#include "d20/spells.h"
-#include "effect/effectfactory.h"
-#include "footstepsounds.h"
-#include "gui/sounds.h"
-#include "object/objectfactory.h"
-#include "party.h"
-#include "portraits.h"
-#include "reputes.h"
-#include "script/routines.h"
-#include "script/runner.h"
-#include "soundsets.h"
-#include "surfaces.h"
+#include "../../game/action/actionfactory.h"
+#include "../../game/combat/combat.h"
+#include "../../game/cursors.h"
+#include "../../game/d20/classes.h"
+#include "../../game/d20/feats.h"
+#include "../../game/d20/skills.h"
+#include "../../game/d20/spells.h"
+#include "../../game/effect/effectfactory.h"
+#include "../../game/footstepsounds.h"
+#include "../../game/gui/sounds.h"
+#include "../../game/object/objectfactory.h"
+#include "../../game/party.h"
+#include "../../game/portraits.h"
+#include "../../game/reputes.h"
+#include "../../game/script/routines.h"
+#include "../../game/script/runner.h"
+#include "../../game/soundsets.h"
+#include "../../game/surfaces.h"
 
 namespace reone {
+
+namespace resource {
+
+class ResourceServices;
+
+}
+
+namespace graphics {
+
+class GraphicsServices;
+
+}
+
+namespace audio {
+
+class AudioServices;
+
+}
+
+namespace scene {
+
+class SceneServices;
+
+}
+
+namespace script {
+
+class ScriptServices;
+
+}
 
 namespace game {
 

@@ -22,6 +22,8 @@
 #include "../../audio/soundhandle.h"
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
+#include "../../di/services/graphics.h"
+#include "../../di/services/resource.h"
 #include "../../gui/control/panel.h"
 #include "../../graphics/model/models.h"
 #include "../../resource/resources.h"

@@ -17,6 +17,7 @@
 
 #include "abilities.h"
 
+#include "../../../di/services/resource.h"
 #include "../../../gui/control/listbox.h"
 #include "../../../resource/strings.h"
 

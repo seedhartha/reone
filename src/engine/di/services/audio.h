@@ -15,30 +15,39 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "services.h"
+#pragma once
 
-#include "resourceprovider.h"
-#include "resources.h"
-#include "strings.h"
-
-using namespace std;
-
-namespace fs = boost::filesystem;
+#include "../../audio/files.h"
+#include "../../audio/options.h"
+#include "../../audio/player.h"
 
 namespace reone {
 
 namespace resource {
 
-ResourceServices::ResourceServices(fs::path gamePath) : _gamePath(move(gamePath)) {
+class ResourceServices;
+
 }
 
-void ResourceServices::init() {
-    _resources = make_unique<Resources>();
+namespace audio {
 
-    _strings = make_unique<Strings>();
-    _strings->init(_gamePath);
-}
+class AudioServices : boost::noncopyable {
+public:
+    AudioServices(AudioOptions options, resource::ResourceServices &resource);
 
-} // namespace resource
+    void init();
+
+    AudioFiles &files() { return *_files; }
+    AudioPlayer &player() { return *_player; }
+
+private:
+    AudioOptions _options;
+    resource::ResourceServices &_resource;
+
+    std::unique_ptr<AudioFiles> _files;
+    std::unique_ptr<AudioPlayer> _player;
+};
+
+} // namespace audio
 
 } // namespace reone

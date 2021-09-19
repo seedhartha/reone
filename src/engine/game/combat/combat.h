@@ -18,7 +18,6 @@
 #pragma once
 
 #include "../../common/timer.h"
-#include "../../scene/services.h"
 
 #include "../action/objectaction.h"
 #include "../effect/damage.h"
@@ -26,6 +25,12 @@
 #include "../types.h"
 
 namespace reone {
+
+namespace scene {
+
+class SceneServices;
+
+}
 
 namespace game {
 

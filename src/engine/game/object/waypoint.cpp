@@ -17,6 +17,7 @@
 
 #include "waypoint.h"
 
+#include "../../di/services/resource.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 

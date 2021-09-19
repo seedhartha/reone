@@ -17,6 +17,7 @@
 
 #include "map.h"
 
+#include "../../../di/services/resource.h"
 #include "../../../resource/strings.h"
 
 #include "../../game.h"

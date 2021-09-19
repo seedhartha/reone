@@ -15,24 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "services.h"
+#include "graphics.h"
 
-#include "../resource/services.h"
-
-#include "context.h"
-#include "features.h"
-#include "fonts.h"
-#include "lip/lips.h"
-#include "materials.h"
-#include "mesh/mesh.h"
-#include "mesh/meshes.h"
-#include "model/models.h"
-#include "options.h"
-#include "pbribl.h"
-#include "shader/shaders.h"
-#include "texture/textures.h"
-#include "walkmesh/walkmeshes.h"
-#include "window.h"
+#include "resource.h"
 
 using namespace std;
 

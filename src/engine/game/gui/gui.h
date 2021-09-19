@@ -19,7 +19,6 @@
 
 #include "../../gui/gui.h"
 
-#include "../services.h"
 #include "../types.h"
 
 namespace reone {
@@ -27,6 +26,7 @@ namespace reone {
 namespace game {
 
 class Game;
+class GameServices;
 
 /**
  * Encapsulates game-specific GUI configuration.

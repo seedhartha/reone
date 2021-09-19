@@ -20,10 +20,15 @@
 #include "../gui/textinput.h"
 #include "../graphics/font.h"
 #include "../graphics/options.h"
-#include "../graphics/services.h"
 #include "../graphics/types.h"
 
 namespace reone {
+
+namespace graphics {
+
+class GraphicsServices;
+
+}
 
 namespace game {
 

@@ -18,12 +18,12 @@
 #include "cursor.h"
 
 #include "../common/guardutil.h"
+#include "../di/services/graphics.h"
 
 #include "context.h"
 #include "mesh/mesh.h"
 #include "mesh/meshes.h"
 #include "shader/shaders.h"
-#include "services.h"
 #include "texture/texture.h"
 #include "window.h"
 

@@ -18,6 +18,8 @@
 #include "classselect.h"
 
 #include "../../../common/randomutil.h"
+#include "../../../di/services/graphics.h"
+#include "../../../di/services/resource.h"
 #include "../../../gui/scenebuilder.h"
 #include "../../../graphics/model/models.h"
 #include "../../../resource/strings.h"

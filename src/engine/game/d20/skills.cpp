@@ -18,6 +18,8 @@
 #include "skills.h"
 
 #include "../../common/collectionutil.h"
+#include "../../di/services/graphics.h"
+#include "../../di/services/resource.h"
 #include "../../graphics/texture/textures.h"
 #include "../../resource/2da.h"
 #include "../../resource/resources.h"

@@ -19,6 +19,8 @@
 
 #include "../../audio/player.h"
 #include "../../common/logutil.h"
+#include "../../di/services/graphics.h"
+#include "../../di/services/resource.h"
 #include "../../gui/scenebuilder.h"
 #include "../../graphics/model/models.h"
 #include "../../resource/resources.h"

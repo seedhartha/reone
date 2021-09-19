@@ -19,9 +19,14 @@
 
 #include "../../common/timer.h"
 #include "../../graphics/font.h"
-#include "../../graphics/services.h"
 
 namespace reone {
+
+namespace graphics {
+
+class GraphicsServices;
+
+}
 
 namespace game {
 

@@ -17,38 +17,16 @@
 
 #pragma once
 
-#include "../graphics/options.h"
-
-#include "pipeline/world.h"
-#include "scenegraph.h"
+#include "../../common/async/executor.h"
 
 namespace reone {
 
-namespace graphics {
-
-class GraphicsServices;
-
-}
-
-namespace scene {
-
-class SceneServices : boost::noncopyable {
+class CommonServices {
 public:
-    SceneServices(graphics::GraphicsOptions options, graphics::GraphicsServices &graphics);
-
     void init();
 
-    SceneGraph &graph() { return *_graph; }
-    WorldRenderPipeline &worldRenderPipeline() { return *_worldRenderPipeline; }
-
 private:
-    graphics::GraphicsOptions _options;
-    graphics::GraphicsServices &_graphics;
-
-    std::unique_ptr<SceneGraph> _graph;
-    std::unique_ptr<WorldRenderPipeline> _worldRenderPipeline;
+    std::unique_ptr<Executor> _executor;
 };
-
-} // namespace scene
 
 } // namespace reone

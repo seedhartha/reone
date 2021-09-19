@@ -19,10 +19,10 @@
 
 #include "../../common/logutil.h"
 #include "../../common/streamutil.h"
+#include "../../di/services/graphics.h"
 #include "../../resource/resources.h"
 
 #include "../context.h"
-#include "../services.h"
 #include "../types.h"
 
 #include "curreader.h"

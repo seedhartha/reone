@@ -17,11 +17,15 @@
 
 #pragma once
 
-#include "../resource/services.h"
-
-#include "scripts.h"
+#include "../../script/scripts.h"
 
 namespace reone {
+
+namespace resource {
+
+class ResourceServices;
+
+}
 
 namespace script {
 

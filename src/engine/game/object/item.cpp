@@ -19,6 +19,9 @@
 
 #include "../../audio/files.h"
 #include "../../audio/player.h"
+#include "../../di/services/audio.h"
+#include "../../di/services/graphics.h"
+#include "../../di/services/resource.h"
 #include "../../graphics/model/models.h"
 #include "../../graphics/texture/textures.h"
 #include "../../resource/resources.h"
