@@ -18,7 +18,6 @@
 #pragma once
 
 #include "../graphics/options.h"
-#include "../graphics/services.h"
 #include "../graphics/shader/shaders.h"
 
 #include "node/camera.h"
@@ -28,6 +27,12 @@
 #include "node/mesh.h"
 
 namespace reone {
+
+namespace graphics {
+
+class GraphicsServices;
+
+}
 
 namespace scene {
 

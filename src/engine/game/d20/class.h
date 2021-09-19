@@ -18,7 +18,6 @@
 #pragma once
 
 #include "../../resource/format/2dareader.h"
-#include "../../resource/services.h"
 
 #include "../types.h"
 
@@ -26,6 +25,12 @@
 #include "savingthrows.h"
 
 namespace reone {
+
+namespace resource {
+
+class ResourceServices;
+
+}
 
 namespace game {
 

@@ -15,12 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "services.h"
-
 #include "game.h"
-#include "script/routine/registrar/kotor.h"
-#include "script/routine/registrar/registrar.h"
-#include "script/routine/registrar/tsl.h"
+
+#include "../../game/game.h"
+#include "../../game/script/routine/registrar/kotor.h"
+#include "../../game/script/routine/registrar/registrar.h"
+#include "../../game/script/routine/registrar/tsl.h"
+
+#include "audio.h"
+#include "graphics.h"
+#include "resource.h"
+#include "scene.h"
+#include "script.h"
 
 using namespace std;
 

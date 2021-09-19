@@ -19,6 +19,7 @@
 
 #include "../audio/files.h"
 #include "../common/streamutil.h"
+#include "../di/services/resource.h"
 #include "../resource/format/ssfreader.h"
 #include "../resource/resources.h"
 #include "../resource/strings.h"

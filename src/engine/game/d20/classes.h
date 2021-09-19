@@ -18,13 +18,18 @@
 #pragma once
 
 #include "../../common/cache.h"
-#include "../../resource/services.h"
 
 #include "../types.h"
 
 #include "class.h"
 
 namespace reone {
+
+namespace resource {
+
+class ResourceServices;
+
+}
 
 namespace game {
 

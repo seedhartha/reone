@@ -17,6 +17,7 @@
 
 #include "character.h"
 
+#include "../../../di/services/graphics.h"
 #include "../../../graphics/model/models.h"
 #include "../../../gui/scenebuilder.h"
 

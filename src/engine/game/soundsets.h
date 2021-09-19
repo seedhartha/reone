@@ -19,11 +19,16 @@
 
 #include "../audio/files.h"
 #include "../common/cache.h"
-#include "../resource/services.h"
 
 #include "types.h"
 
 namespace reone {
+
+namespace resource {
+
+class ResourceServices;
+
+}
 
 namespace game {
 

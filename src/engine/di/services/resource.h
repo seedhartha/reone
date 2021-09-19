@@ -17,38 +17,29 @@
 
 #pragma once
 
-#include "options.h"
-
-#include "files.h"
-#include "player.h"
+#include "../../resource/resources.h"
+#include "../../resource/strings.h"
 
 namespace reone {
 
 namespace resource {
 
-class ResourceServices;
-
-}
-
-namespace audio {
-
-class AudioServices : boost::noncopyable {
+class ResourceServices : boost::noncopyable {
 public:
-    AudioServices(AudioOptions options, resource::ResourceServices &resource);
+    ResourceServices(boost::filesystem::path gamePath);
 
     void init();
 
-    AudioFiles &files() { return *_files; }
-    AudioPlayer &player() { return *_player; }
+    Resources &resources() { return *_resources; }
+    Strings &strings() { return *_strings; }
 
 private:
-    AudioOptions _options;
-    resource::ResourceServices &_resource;
+    boost::filesystem::path _gamePath;
 
-    std::unique_ptr<AudioFiles> _files;
-    std::unique_ptr<AudioPlayer> _player;
+    std::unique_ptr<Resources> _resources;
+    std::unique_ptr<Strings> _strings;
 };
 
-} // namespace audio
+} // namespace resource
 
 } // namespace reone

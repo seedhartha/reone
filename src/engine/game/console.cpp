@@ -18,6 +18,7 @@
 #include "console.h"
 
 #include "../common/logutil.h"
+#include "../di/services/graphics.h"
 #include "../graphics/font.h"
 #include "../graphics/fonts.h"
 #include "../graphics/mesh/mesh.h"

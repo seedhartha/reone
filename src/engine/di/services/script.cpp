@@ -15,7 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "services.h"
+#include "script.h"
+
+#include "resource.h"
 
 using namespace std;
 

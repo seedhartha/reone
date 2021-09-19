@@ -18,6 +18,8 @@
 #include "gui.h"
 
 #include "../../audio/player.h"
+#include "../../di/services/audio.h"
+#include "../../di/services/graphics.h"
 #include "../../graphics/texture/textures.h"
 
 #include "../game.h"

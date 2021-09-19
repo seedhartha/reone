@@ -17,6 +17,8 @@
 
 #include "container.h"
 
+#include "../../di/services/graphics.h"
+#include "../../di/services/resource.h"
 #include "../../graphics/texture/textures.h"
 #include "../../gui/control/imagebutton.h"
 #include "../../resource/strings.h"

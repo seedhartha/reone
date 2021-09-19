@@ -20,6 +20,8 @@
 #include "../../audio/files.h"
 #include "../../audio/player.h"
 #include "../../common/logutil.h"
+#include "../../di/services/audio.h"
+#include "../../di/services/graphics.h"
 #include "../../gui/control/listbox.h"
 #include "../../graphics/lip/lips.h"
 #include "../../graphics/model/animation.h"

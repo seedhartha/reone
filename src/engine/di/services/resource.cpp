@@ -15,18 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "resource.h"
 
-#include "async/executor.h"
+using namespace std;
+
+namespace fs = boost::filesystem;
 
 namespace reone {
 
-class CommonServices {
-public:
-    void init();
+namespace resource {
 
-private:
-    std::unique_ptr<Executor> _executor;
-};
+ResourceServices::ResourceServices(fs::path gamePath) : _gamePath(move(gamePath)) {
+}
+
+void ResourceServices::init() {
+    _resources = make_unique<Resources>();
+
+    _strings = make_unique<Strings>();
+    _strings->init(_gamePath);
+}
+
+} // namespace resource
 
 } // namespace reone

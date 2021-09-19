@@ -21,7 +21,7 @@
 #include "../common/logutil.h"
 #include "../common/guardutil.h"
 #include "../common/streamreader.h"
-#include "../graphics/services.h"
+#include "../di/services/graphics.h"
 
 #include "video.h"
 

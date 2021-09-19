@@ -17,6 +17,7 @@
 
 #include "chargen.h"
 
+#include "../../../di/services/graphics.h"
 #include "../../../gui/scenebuilder.h"
 #include "../../../graphics/model/models.h"
 #include "../../../resource/resources.h"

@@ -19,6 +19,7 @@
 
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
+#include "../../di/services/scene.h"
 
 #include "../game.h"
 

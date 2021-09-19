@@ -18,6 +18,7 @@
 #include "selectoverlay.h"
 
 #include "../../common/guardutil.h"
+#include "../../di/services/graphics.h"
 #include "../../graphics/context.h"
 #include "../../graphics/font.h"
 #include "../../graphics/fonts.h"

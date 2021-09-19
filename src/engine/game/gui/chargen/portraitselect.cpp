@@ -19,6 +19,7 @@
 
 #include "../../../common/collectionutil.h"
 #include "../../../common/randomutil.h"
+#include "../../../di/services/graphics.h"
 #include "../../../gui/scenebuilder.h"
 #include "../../../graphics/model/models.h"
 #include "../../../graphics/texture/textures.h"

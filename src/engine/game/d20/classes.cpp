@@ -17,6 +17,7 @@
 
 #include "classes.h"
 
+#include "../../di/services/resource.h"
 #include "../../resource/resources.h"
 
 using namespace std;

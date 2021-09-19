@@ -72,7 +72,6 @@ set(COMMON_HEADERS
     src/engine/common/mediastream.h
     src/engine/common/pathutil.h
     src/engine/common/randomutil.h
-    src/engine/common/services.h
     src/engine/common/streamreader.h
     src/engine/common/streamutil.h
     src/engine/common/streamwriter.h
@@ -87,7 +86,6 @@ set(COMMON_SOURCES
     src/engine/common/logutil.cpp
     src/engine/common/pathutil.cpp
     src/engine/common/randomutil.cpp
-    src/engine/common/services.cpp
     src/engine/common/streamreader.cpp
     src/engine/common/streamutil.cpp
     src/engine/common/streamwriter.cpp
@@ -127,7 +125,6 @@ set(RESOURCE_HEADERS
     src/engine/resource/keybifprovider.h
     src/engine/resource/resourceprovider.h
     src/engine/resource/resources.h
-    src/engine/resource/services.h
     src/engine/resource/strings.h
     src/engine/resource/talktable.h
     src/engine/resource/types.h
@@ -158,7 +155,6 @@ set(RESOURCE_SOURCES
     src/engine/resource/format/visreader.cpp
     src/engine/resource/keybifprovider.cpp
     src/engine/resource/resources.cpp
-    src/engine/resource/services.cpp
     src/engine/resource/strings.cpp
     src/engine/resource/talktable.cpp
     src/engine/resource/typeutil.cpp)
@@ -201,7 +197,6 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/pbribl.h
     src/engine/graphics/pixelutil.h
     src/engine/graphics/renderbuffer.h
-    src/engine/graphics/services.h
     src/engine/graphics/shader/shaders.h
     src/engine/graphics/texture/curreader.h
     src/engine/graphics/texture/texture.h
@@ -241,7 +236,6 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/pbribl.cpp
     src/engine/graphics/pixelutil.cpp
     src/engine/graphics/renderbuffer.cpp
-    src/engine/graphics/services.cpp
     src/engine/graphics/shader/shaders.cpp
     src/engine/graphics/shader/shaders_common.cpp
     src/engine/graphics/shader/shaders_pbr.cpp
@@ -274,7 +268,6 @@ set(AUDIO_HEADERS
     src/engine/audio/format/wavreader.h
     src/engine/audio/options.h
     src/engine/audio/player.h
-    src/engine/audio/services.h
     src/engine/audio/soundhandle.h
     src/engine/audio/soundinstance.h
     src/engine/audio/stream.h
@@ -285,7 +278,6 @@ set(AUDIO_SOURCES
     src/engine/audio/format/mp3reader.cpp
     src/engine/audio/format/wavreader.cpp
     src/engine/audio/player.cpp
-    src/engine/audio/services.cpp
     src/engine/audio/soundhandle.cpp
     src/engine/audio/soundinstance.cpp
     src/engine/audio/stream.cpp)
@@ -329,7 +321,6 @@ set(SCENE_HEADERS
     src/engine/scene/nodeelement.h
     src/engine/scene/pipeline/control.h
     src/engine/scene/pipeline/world.h
-    src/engine/scene/services.h
     src/engine/scene/scenegraph.h
     src/engine/scene/types.h)
 
@@ -344,7 +335,6 @@ set(SCENE_SOURCES
     src/engine/scene/node/scenenode.cpp
     src/engine/scene/pipeline/control.cpp
     src/engine/scene/pipeline/world.cpp
-    src/engine/scene/services.cpp
     src/engine/scene/scenegraph.cpp)
 
 add_library(libscene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES})
@@ -406,7 +396,6 @@ set(SCRIPT_HEADERS
     src/engine/script/program.h
     src/engine/script/routine.h
     src/engine/script/routineprovider.h
-    src/engine/script/services.h
     src/engine/script/scripts.h
     src/engine/script/types.h
     src/engine/script/variable.h)
@@ -417,7 +406,6 @@ set(SCRIPT_SOURCES
     src/engine/script/ncsreader.cpp
     src/engine/script/program.cpp
     src/engine/script/routine.cpp
-    src/engine/script/services.cpp
     src/engine/script/scripts.cpp
     src/engine/script/variable.cpp)
 
@@ -666,7 +654,6 @@ set(GAME_HEADERS
     src/engine/game/script/routine/impl/objectutil.h
     src/engine/game/script/routines.h
     src/engine/game/script/runner.h
-    src/engine/game/services.h
     src/engine/game/soundsets.h
     src/engine/game/surface.h
     src/engine/game/surfaces.h
@@ -920,7 +907,6 @@ set(GAME_SOURCES
     src/engine/game/script/routine/registrar/tsl.h
     src/engine/game/script/routine/registrar/tsl.cpp
     src/engine/game/script/runner.cpp
-    src/engine/game/services.cpp
     src/engine/game/soundsets.cpp
     src/engine/game/surfaces.cpp
     src/engine/game/tsl.cpp)
@@ -934,10 +920,24 @@ target_precompile_headers(libgame PRIVATE src/engine/pch.h)
 ## reone executable
 
 set(REONE_HEADERS
+    src/engine/di/services/audio.h
+    src/engine/di/services/common.h
+    src/engine/di/services/game.h
+    src/engine/di/services/graphics.h
+    src/engine/di/services/resource.h
+    src/engine/di/services/scene.h
+    src/engine/di/services/script.h
     src/engine/engine.h
     src/engine/pch.h)
 
 set(REONE_SOURCES
+    src/engine/di/services/audio.cpp
+    src/engine/di/services/common.cpp
+    src/engine/di/services/game.cpp
+    src/engine/di/services/graphics.cpp
+    src/engine/di/services/resource.cpp
+    src/engine/di/services/scene.cpp
+    src/engine/di/services/script.cpp
     src/engine/engine.cpp
     src/engine/main.cpp)
 

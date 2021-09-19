@@ -22,6 +22,7 @@
 #include "declarations.h"
 
 #include "../../../../common/logutil.h"
+#include "../../../../di/services/resource.h"
 #include "../../../../script/exception/argument.h"
 #include "../../../../script/exception/notimpl.h"
 

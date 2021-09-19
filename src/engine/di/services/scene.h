@@ -15,27 +15,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "services.h"
+#pragma once
 
-using namespace std;
-
-using namespace reone::graphics;
+#include "../../graphics/options.h"
+#include "../../scene/pipeline/world.h"
+#include "../../scene/scenegraph.h"
 
 namespace reone {
 
+namespace graphics {
+
+class GraphicsServices;
+
+}
+
 namespace scene {
 
-SceneServices::SceneServices(GraphicsOptions options, GraphicsServices &graphics) :
-    _options(move(options)),
-    _graphics(graphics) {
-}
+class SceneServices : boost::noncopyable {
+public:
+    SceneServices(graphics::GraphicsOptions options, graphics::GraphicsServices &graphics);
 
-void SceneServices::init() {
-    _graph = make_unique<SceneGraph>(_options, _graphics);
+    void init();
 
-    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, _graphics, *_graph);
-    _worldRenderPipeline->init();
-}
+    SceneGraph &graph() { return *_graph; }
+    WorldRenderPipeline &worldRenderPipeline() { return *_worldRenderPipeline; }
+
+private:
+    graphics::GraphicsOptions _options;
+    graphics::GraphicsServices &_graphics;
+
+    std::unique_ptr<SceneGraph> _graph;
+    std::unique_ptr<WorldRenderPipeline> _worldRenderPipeline;
+};
 
 } // namespace scene
 

@@ -17,14 +17,23 @@
 
 #pragma once
 
-#include "../../graphics/services.h"
-#include "../../resource/services.h"
-
 #include "../types.h"
 
 #include "skill.h"
 
 namespace reone {
+
+namespace resource {
+
+class ResourceServices;
+
+}
+
+namespace graphics {
+
+class GraphicsServices;
+
+}
 
 namespace game {
 

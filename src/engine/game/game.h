@@ -18,12 +18,8 @@
 
 #pragma once
 
-#include "../audio/services.h"
+#include "../di/services/game.h"
 #include "../graphics/eventhandler.h"
-#include "../graphics/services.h"
-#include "../resource/services.h"
-#include "../scene/services.h"
-#include "../script/services.h"
 #include "../video/video.h"
 
 #include "camera/camera.h"
@@ -42,9 +38,38 @@
 #include "gui/saveload.h"
 #include "object/module.h"
 #include "options.h"
-#include "services.h"
 
 namespace reone {
+
+namespace resource {
+
+class ResourceServices;
+
+}
+
+namespace graphics {
+
+class GraphicsServices;
+
+}
+
+namespace audio {
+
+class AudioServices;
+
+}
+
+namespace scene {
+
+class SceneServices;
+
+}
+
+namespace script {
+
+class ScriptServices;
+
+}
 
 namespace game {
 

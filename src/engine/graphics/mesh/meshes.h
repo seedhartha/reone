@@ -17,11 +17,11 @@
 
 #pragma once
 
+#include "mesh.h"
+
 namespace reone {
 
 namespace graphics {
-
-class Mesh;
 
 /**
  * Registry of common reusable meshes.

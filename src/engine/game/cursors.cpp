@@ -18,11 +18,11 @@
 #include "cursors.h"
 
 #include "../common/streamutil.h"
+#include "../di/services/graphics.h"
+#include "../di/services/resource.h"
 #include "../graphics/cursor.h"
-#include "../graphics/services.h"
 #include "../graphics/texture/curreader.h"
 #include "../resource/resources.h"
-#include "../resource/services.h"
 
 using namespace std;
 

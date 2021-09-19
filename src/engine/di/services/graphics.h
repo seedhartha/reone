@@ -17,20 +17,19 @@
 
 #pragma once
 
-#include "options.h"
-
-#include "context.h"
-#include "features.h"
-#include "fonts.h"
-#include "lip/lips.h"
-#include "materials.h"
-#include "mesh/meshes.h"
-#include "model/models.h"
-#include "pbribl.h"
-#include "shader/shaders.h"
-#include "texture/textures.h"
-#include "walkmesh/walkmeshes.h"
-#include "window.h"
+#include "../../graphics/context.h"
+#include "../../graphics/features.h"
+#include "../../graphics/fonts.h"
+#include "../../graphics/lip/lips.h"
+#include "../../graphics/materials.h"
+#include "../../graphics/mesh/meshes.h"
+#include "../../graphics/model/models.h"
+#include "../../graphics/options.h"
+#include "../../graphics/pbribl.h"
+#include "../../graphics/shader/shaders.h"
+#include "../../graphics/texture/textures.h"
+#include "../../graphics/walkmesh/walkmeshes.h"
+#include "../../graphics/window.h"
 
 namespace reone {
 
