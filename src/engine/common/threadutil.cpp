@@ -23,11 +23,13 @@ using namespace std;
 
 namespace reone {
 
-static map<thread::id, std::string> g_threadNames;
+static map<thread::id, std::string> g_names;
+static mutex g_namesMutex;
 
 string getThreadName() {
     thread::id id(this_thread::get_id());
-    return getFromLookupOrElse(g_threadNames, id, [&id]() {
+    lock_guard<mutex> lock(g_namesMutex);
+    return getFromLookupOrElse(g_names, id, [&id]() {
         stringstream ss;
         ss << id;
         return ss.str();
@@ -35,7 +37,8 @@ string getThreadName() {
 }
 
 void setThreadName(string name) {
-    g_threadNames[this_thread::get_id()] = move(name);
+    lock_guard<mutex> lock(g_namesMutex);
+    g_names[this_thread::get_id()] = move(name);
 }
 
 } // namespace reone
