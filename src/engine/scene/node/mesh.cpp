@@ -20,7 +20,6 @@
 #include "../../common/logutil.h"
 #include "../../common/guardutil.h"
 #include "../../common/randomutil.h"
-#include "../../di/services/graphics.h"
 #include "../../graphics/context.h"
 #include "../../graphics/features.h"
 #include "../../graphics/materials.h"
@@ -79,7 +78,7 @@ void MeshSceneNode::refreshMaterial() {
     _material = Material();
 
     if (_nodeTextures.diffuse) {
-        shared_ptr<Material> material(_sceneGraph->graphics().materials().get(_nodeTextures.diffuse->name()));
+        shared_ptr<Material> material(_sceneGraph->materials().get(_nodeTextures.diffuse->name()));
         if (material) {
             _material = *material;
         }
@@ -94,12 +93,12 @@ void MeshSceneNode::refreshAdditionalTextures() {
 
     const Texture::Features &features = _nodeTextures.diffuse->features();
     if (!features.envmapTexture.empty()) {
-        _nodeTextures.envmap = _sceneGraph->graphics().textures().get(features.envmapTexture, TextureUsage::EnvironmentMap);
+        _nodeTextures.envmap =_sceneGraph->textures().get(features.envmapTexture, TextureUsage::EnvironmentMap);
     } else if (!features.bumpyShinyTexture.empty()) {
-        _nodeTextures.envmap = _sceneGraph->graphics().textures().get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap);
+        _nodeTextures.envmap =_sceneGraph->textures().get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap);
     }
     if (!features.bumpmapTexture.empty()) {
-        _nodeTextures.bumpmap = _sceneGraph->graphics().textures().get(features.bumpmapTexture, TextureUsage::Bumpmap);
+        _nodeTextures.bumpmap =_sceneGraph->textures().get(features.bumpmapTexture, TextureUsage::Bumpmap);
     }
 }
 
@@ -248,7 +247,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     } else {
         if (!_nodeTextures.diffuse) {
             program = ShaderProgram::ModelBlinnPhongDiffuseless;
-        } else if (_sceneGraph->graphics().features().isEnabled(Feature::PBR)) {
+        } else if (_sceneGraph->features().isEnabled(Feature::PBR)) {
             program = ShaderProgram::ModelPBR;
         } else {
             program = ShaderProgram::ModelBlinnPhong;
@@ -261,15 +260,15 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         if (_nodeTextures.envmap) {
             uniforms.combined.featureMask |= UniformFeatureFlags::envmap;
 
-            if (_sceneGraph->graphics().features().isEnabled(Feature::PBR)) {
-                bool derived = _sceneGraph->graphics().pbrIbl().contains(_nodeTextures.envmap.get());
+            if (_sceneGraph->features().isEnabled(Feature::PBR)) {
+                bool derived =_sceneGraph->pbrIbl().contains(_nodeTextures.envmap.get());
                 if (derived) {
                     uniforms.combined.featureMask |= UniformFeatureFlags::pbrIbl;
                 }
             }
         }
 
-        if (_nodeTextures.lightmap && !_sceneGraph->graphics().features().isEnabled(Feature::DynamicRoomLighting)) {
+        if (_nodeTextures.lightmap && !_sceneGraph->features().isEnabled(Feature::DynamicRoomLighting)) {
             uniforms.combined.featureMask |= UniformFeatureFlags::lightmap;
         }
 
@@ -365,7 +364,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         }
     }
 
-    _sceneGraph->graphics().shaders().activate(program, uniforms);
+   _sceneGraph->shaders().activate(program, uniforms);
 
 
     bool additive = false;
@@ -373,47 +372,47 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     // Setup textures
 
     if (_nodeTextures.diffuse) {
-        _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
+       _sceneGraph->context().setActiveTextureUnit(TextureUnits::diffuseMap);
         _nodeTextures.diffuse->bind();
         additive = _nodeTextures.diffuse->isAdditive();
     }
     if (_nodeTextures.lightmap) {
-        _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::lightmap);
+       _sceneGraph->context().setActiveTextureUnit(TextureUnits::lightmap);
         _nodeTextures.lightmap->bind();
     }
     if (_nodeTextures.envmap) {
-        _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::environmentMap);
+       _sceneGraph->context().setActiveTextureUnit(TextureUnits::environmentMap);
         _nodeTextures.envmap->bind();
 
         PBRIBL::Derived derived;
-        if (_sceneGraph->graphics().pbrIbl().getDerived(_nodeTextures.envmap.get(), derived)) {
-            _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::irradianceMap);
+        if (_sceneGraph->pbrIbl().getDerived(_nodeTextures.envmap.get(), derived)) {
+           _sceneGraph->context().setActiveTextureUnit(TextureUnits::irradianceMap);
             derived.irradianceMap->bind();
-            _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::prefilterMap);
+           _sceneGraph->context().setActiveTextureUnit(TextureUnits::prefilterMap);
             derived.prefilterMap->bind();
-            _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::brdfLookup);
+           _sceneGraph->context().setActiveTextureUnit(TextureUnits::brdfLookup);
             derived.brdfLookup->bind();
         }
     }
     if (_nodeTextures.bumpmap) {
-        _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::bumpMap);
+       _sceneGraph->context().setActiveTextureUnit(TextureUnits::bumpMap);
         _nodeTextures.bumpmap->bind();
     }
 
 
-    BlendMode oldBlendMode(_sceneGraph->graphics().context().blendMode());
+    BlendMode oldBlendMode(_sceneGraph->context().blendMode());
     if (additive) {
-        _sceneGraph->graphics().context().setBlendMode(BlendMode::Add);
+       _sceneGraph->context().setBlendMode(BlendMode::Add);
     }
     mesh->mesh->draw();
-    _sceneGraph->graphics().context().setBlendMode(oldBlendMode);
+   _sceneGraph->context().setBlendMode(oldBlendMode);
 }
 
 bool MeshSceneNode::isLightingEnabled() const {
     if (!isLightingEnabledByUsage(_model->usage())) return false;
 
     // Lighting is disabled for lightmapped models, unless dynamic room lighting is enabled
-    if (_nodeTextures.lightmap && !_sceneGraph->graphics().features().isEnabled(Feature::DynamicRoomLighting)) return false;
+    if (_nodeTextures.lightmap && !_sceneGraph->features().isEnabled(Feature::DynamicRoomLighting)) return false;
 
     // Lighting is disabled for self-illuminated model nodes, e.g. sky boxes
     if (isSelfIlluminated()) return false;

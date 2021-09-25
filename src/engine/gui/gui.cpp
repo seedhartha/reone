@@ -19,8 +19,6 @@
 
 #include "../common/guardutil.h"
 #include "../common/logutil.h"
-#include "../di/services/graphics.h"
-#include "../di/services/resource.h"
 #include "../graphics/context.h"
 #include "../graphics/mesh/mesh.h"
 #include "../graphics/mesh/meshes.h"
@@ -34,7 +32,6 @@
 using namespace std;
 using namespace std::placeholders;
 
-using namespace reone::di;
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -44,14 +41,30 @@ namespace gui {
 
 GUI::GUI(
     GraphicsOptions options,
-    GraphicsServices &graphics,
-    AudioServices &audio,
-    ResourceServices &resources
+    Context &context,
+    Features &features,
+    Fonts &fonts,
+    Materials &materials,
+    Meshes &meshes,
+    PBRIBL &pbrIbl,
+    Shaders &shaders,
+    Textures &textures,
+    Window &window,
+    Resources &resources,
+    Strings &strings
 ) :
-    _options(options),
-    _graphics(graphics),
-    _audio(audio),
-    _resources(resources) {
+    _options(move(options)),
+    _context(context),
+    _features(features),
+    _fonts(fonts),
+    _materials(materials),
+    _meshes(meshes),
+    _pbrIbl(pbrIbl),
+    _shaders(shaders),
+    _textures(textures),
+    _window(window),
+    _resources(resources),
+    _strings(strings) {
 
     _aspect = options.width / static_cast<float>(options.height);
     _screenCenter.x = options.width / 2;
@@ -63,7 +76,7 @@ void GUI::load() {
 
     debug("Load " + _resRef, LogChannels::gui);
 
-    shared_ptr<GffStruct> gui(_resources.resources().getGFF(_resRef, ResourceType::Gui));
+    shared_ptr<GffStruct> gui(_resources.getGFF(_resRef, ResourceType::Gui));
     ControlType type = Control::getType(*gui);
     string tag(Control::getTag(*gui));
 
@@ -248,7 +261,7 @@ void GUI::draw3D() {
 }
 
 void GUI::drawBackground() {
-    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _background->bind();
 
     glm::mat4 transform(1.0f);
@@ -256,11 +269,11 @@ void GUI::drawBackground() {
     transform = glm::scale(transform, glm::vec3(_options.width, _options.height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _graphics.window().getOrthoProjection();
+    uniforms.combined.general.projection = _window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _graphics.shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _graphics.meshes().quad().draw();
+    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    _meshes.quad().draw();
 }
 
 void GUI::resetFocus() {

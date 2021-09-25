@@ -21,7 +21,6 @@
 #include "../common/logutil.h"
 #include "../common/guardutil.h"
 #include "../common/streamreader.h"
-#include "../di/services/graphics.h"
 
 #include "video.h"
 
@@ -39,7 +38,6 @@ namespace fs = boost::filesystem;
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::di;
 
 namespace reone {
 
@@ -49,9 +47,16 @@ static const char kSignature[] = "BIKi";
 
 class BinkVideoDecoder : public MediaStream<Video::Frame> {
 public:
-    BinkVideoDecoder(fs::path path, GraphicsServices &graphics) :
+    BinkVideoDecoder(
+        fs::path path,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders
+    ) :
         _path(move(path)),
-        _graphics(graphics) {
+        _context(context),
+        _meshes(meshes),
+        _shaders(shaders) {
     }
 
     ~BinkVideoDecoder() {
@@ -119,7 +124,10 @@ public:
 
 private:
     fs::path _path;
-    di::GraphicsServices &_graphics;
+
+    graphics::Context &_context;
+    graphics::Meshes &_meshes;
+    graphics::Shaders &_shaders;
 
     AVFormatContext *_formatCtx { nullptr };
     int _videoStreamIdx { -1 };
@@ -227,7 +235,7 @@ private:
     void initVideo() {
         AVRational &frameRate = _formatCtx->streams[_videoStreamIdx]->r_frame_rate;
 
-        _video = make_shared<Video>(_graphics);
+        _video = make_shared<Video>(_context, _meshes, _shaders);
         _video->_width = _videoCodecCtx->width;
         _video->_height = _videoCodecCtx->height;
         _video->_fps = frameRate.num / static_cast<float>(frameRate.den);
@@ -318,17 +326,12 @@ private:
     }
 };
 
-BikReader::BikReader(fs::path path, GraphicsServices &graphics) :
-    _path(move(path)),
-    _graphics(graphics) {
-}
-
 void BikReader::load() {
     if (!fs::exists(_path)) {
         throw runtime_error("BIK: file not found: " + _path.string());
     }
 
-    auto decoder = make_shared<BinkVideoDecoder>(_path, _graphics);
+    auto decoder = make_shared<BinkVideoDecoder>(_path, _context, _meshes, _shaders);
     decoder->load();
 
     _video = decoder->video();

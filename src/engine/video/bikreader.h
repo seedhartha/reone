@@ -19,9 +19,11 @@
 
 namespace reone {
 
-namespace di {
+namespace graphics {
 
-class GraphicsServices;
+class Context;
+class Meshes;
+class Shaders;
 
 }
 
@@ -36,7 +38,17 @@ class Video;
  */
 class BikReader {
 public:
-    BikReader(boost::filesystem::path path, di::GraphicsServices &graphics);
+    BikReader(
+        boost::filesystem::path path,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders
+    ) :
+        _path(std::move(path)),
+        _context(context),
+        _meshes(meshes),
+        _shaders(shaders) {
+    }
 
     void load();
 
@@ -44,9 +56,16 @@ public:
 
 private:
     boost::filesystem::path _path;
-    di::GraphicsServices &_graphics;
 
     std::shared_ptr<Video> _video;
+
+    // Services
+
+    graphics::Context &_context;
+    graphics::Meshes &_meshes;
+    graphics::Shaders &_shaders;
+
+    // END Services
 };
 
 } // namespace video

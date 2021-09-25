@@ -17,7 +17,6 @@
 
 #include "progressbar.h"
 
-#include "../../di/services/graphics.h"
 #include "../../graphics/context.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
@@ -48,14 +47,14 @@ void ProgressBar::load(const GffStruct &gffs) {
     shared_ptr<GffStruct> dir(gffs.getStruct("PROGRESS"));
     if (dir) {
         string fill(dir->getString("FILL"));
-        _progress.fill = _gui->graphics().textures().get(fill, TextureUsage::GUI);
+        _progress.fill = _gui->textures().get(fill, TextureUsage::GUI);
     }
 }
 
 void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
     if (_value == 0 || !_progress.fill) return;
 
-    _gui->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _gui->context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _progress.fill->bind();
 
     float w = _extent.width * _value / 100.0f;
@@ -65,11 +64,11 @@ void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
     transform = glm::scale(transform, glm::vec3(w, _extent.height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _gui->graphics().window().getOrthoProjection();
+    uniforms.combined.general.projection = _gui->window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _gui->graphics().meshes().quad().draw();
+    _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _gui->meshes().quad().draw();
 }
 
 void ProgressBar::setValue(int value) {

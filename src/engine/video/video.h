@@ -30,13 +30,10 @@ class AudioStream;
 
 namespace graphics {
 
+class Context;
+class Meshes;
+class Shaders;
 class Texture;
-
-}
-
-namespace di {
-
-class GraphicsServices;
 
 }
 
@@ -50,7 +47,15 @@ public:
         std::shared_ptr<ByteArray> pixels;
     };
 
-    Video(di::GraphicsServices &graphics);
+    Video(
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders
+    ) :
+        _context(context),
+        _meshes(meshes),
+        _shaders(shaders) {
+    }
 
     void init();
     void deinit();
@@ -67,8 +72,6 @@ public:
     void setMediaStream(std::shared_ptr<MediaStream<Frame>> stream) { _stream = std::move(stream); }
 
 private:
-    di::GraphicsServices &_graphics;
-
     int _width { 0 };
     int _height { 0 };
     float _fps { 0.0f };
@@ -81,6 +84,14 @@ private:
 
     std::shared_ptr<graphics::Texture> _texture;
     std::shared_ptr<audio::AudioStream> _audio;
+
+    // Services
+
+    graphics::Context &_context;
+    graphics::Meshes &_meshes;
+    graphics::Shaders &_shaders;
+
+    // END Services
 
     void updateFrame(float dt);
     void updateFrameTexture();

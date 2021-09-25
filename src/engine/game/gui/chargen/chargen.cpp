@@ -398,7 +398,16 @@ void CharacterGeneration::reloadCharacterModel() {
     const Control::Extent &extent = _binding.modelLbl->extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 
-    unique_ptr<SceneGraph> scene(SceneBuilder(_options, _game->services().graphics())
+    unique_ptr<SceneGraph> scene(SceneBuilder(
+        _options,
+        _context,
+        _features,
+        _materials,
+        _meshes,
+        _pbrIbl,
+        _shaders,
+        _textures
+    )
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, _1))

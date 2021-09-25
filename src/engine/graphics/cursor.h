@@ -17,24 +17,35 @@
 
 #pragma once
 
+#include "../common/guardutil.h"
+
 namespace reone {
-
-namespace di {
-
-class GraphicsServices;
-
-}
 
 namespace graphics {
 
+class Context;
+class Meshes;
+class Shaders;
 class Texture;
+class Window;
 
 class Cursor : boost::noncopyable {
 public:
     Cursor(
         std::shared_ptr<Texture> up,
         std::shared_ptr<Texture> down,
-        di::GraphicsServices &graphics);
+        Context &context,
+        Meshes &meshes,
+        Shaders &shaders,
+        Window &window
+    ) :
+        _up(ensurePresent(up, "up")),
+        _down(ensurePresent(down, "down")),
+        _context(context),
+        _meshes(meshes),
+        _shaders(shaders),
+        _window(window) {
+    }
 
     void draw();
 
@@ -44,10 +55,18 @@ public:
 private:
     std::shared_ptr<Texture> _up;
     std::shared_ptr<Texture> _down;
-    di::GraphicsServices &_graphics;
 
     glm::ivec2 _position { 0 };
     bool _pressed { false };
+
+    // Services
+
+    Context &_context;
+    Meshes &_meshes;
+    Shaders &_shaders;
+    Window &_window;
+
+    // END Services
 };
 
 } // namespace graphics

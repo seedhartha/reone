@@ -17,6 +17,8 @@
 
 #include "scene.h"
 
+#include "../../di/services/graphics.h"
+
 using namespace std;
 
 using namespace reone::graphics;
@@ -32,9 +34,17 @@ SceneServices::SceneServices(GraphicsOptions options, GraphicsServices &graphics
 }
 
 void SceneServices::init() {
-    _graph = make_unique<SceneGraph>(_options, _graphics);
+    _graph = make_unique<SceneGraph>(
+        _options,
+        _graphics.context(),
+        _graphics.features(),
+        _graphics.materials(),
+        _graphics.meshes(),
+        _graphics.pbrIbl(),
+        _graphics.shaders(),
+        _graphics.textures());
 
-    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, _graphics, *_graph);
+    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, *_graph, _graphics.context(), _graphics.meshes(), _graphics.shaders());
     _worldRenderPipeline->init();
 }
 

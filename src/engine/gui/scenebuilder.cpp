@@ -24,7 +24,6 @@
 
 using namespace std;
 
-using namespace reone::di;
 using namespace reone::graphics;
 using namespace reone::scene;
 
@@ -32,15 +31,38 @@ namespace reone {
 
 namespace gui {
 
-SceneBuilder::SceneBuilder(GraphicsOptions options, GraphicsServices &graphics) :
-    _options(options),
-    _graphics(graphics) {
+SceneBuilder::SceneBuilder(
+    GraphicsOptions options,
+    Context &context,
+    Features &features,
+    Materials &materials,
+    Meshes &meshes,
+    PBRIBL &pbrIbl,
+    Shaders &shaders,
+    Textures &textures
+) :
+    _options(move(options)),
+    _context(context),
+    _features(features),
+    _materials(materials),
+    _meshes(meshes),
+    _pbrIbl(pbrIbl),
+    _shaders(shaders),
+    _textures(textures) {
 
     _aspect = options.width / static_cast<float>(options.height);
 }
 
 unique_ptr<SceneGraph> SceneBuilder::build() {
-    auto scene = make_unique<SceneGraph>(_options, _graphics);
+    auto scene = make_unique<SceneGraph>(
+        _options,
+        _context,
+        _features,
+        _materials,
+        _meshes,
+        _pbrIbl,
+        _shaders,
+        _textures);
 
     shared_ptr<ModelSceneNode> model(_modelSupplier(*scene));
     if (!model) {

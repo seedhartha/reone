@@ -28,9 +28,15 @@
 
 namespace reone {
 
-namespace di {
+namespace graphics {
 
-class GraphicsServices;
+class Context;
+class Features;
+class Materials;
+class Meshes;
+class PBRIBL;
+class Shaders;
+class Textures;
 
 }
 
@@ -45,7 +51,23 @@ class SceneGraph : boost::noncopyable {
 public:
     SceneGraph(
         graphics::GraphicsOptions options,
-        di::GraphicsServices &graphicsServices);
+        graphics::Context &context,
+        graphics::Features &features,
+        graphics::Materials &materials,
+        graphics::Meshes &meshes,
+        graphics::PBRIBL &pbrIbl,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures
+    ) :
+        _options(std::move(options)),
+        _context(context),
+        _features(features),
+        _materials(materials),
+        _meshes(meshes),
+        _pbrIbl(pbrIbl),
+        _shaders(shaders),
+        _textures(textures) {
+    }
 
     /**
      * Recursively update the state of this scene graph. Called prior to rendering a frame.
@@ -56,13 +78,24 @@ public:
     void draw(bool shadowPass = false);
 
     const graphics::GraphicsOptions &options() const { return _options; }
-    di::GraphicsServices &graphics() { return _graphics; }
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
     graphics::ShaderUniforms uniformsPrototype() const { return _uniformsPrototype; }
 
     void setUpdateRoots(bool update) { _updateRoots = update; }
     void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
     void setUniformsPrototype(graphics::ShaderUniforms &&uniforms) { _uniformsPrototype = uniforms; }
+
+    // Services
+
+    graphics::Context &context() { return _context; }
+    graphics::Features &features() { return _features; }
+    graphics::Materials &materials() { return _materials; }
+    graphics::Meshes &meshes() { return _meshes; }
+    graphics::PBRIBL &pbrIbl() { return _pbrIbl; }
+    graphics::Shaders &shaders() { return _shaders; }
+    graphics::Textures &textures() { return _textures; }
+
+    // END Services
 
     // Roots
 
@@ -107,7 +140,6 @@ public:
 
 private:
     graphics::GraphicsOptions _options;
-    di::GraphicsServices &_graphics;
 
     std::vector<std::shared_ptr<SceneNode>> _roots;
     std::shared_ptr<CameraSceneNode> _activeCamera;
@@ -123,6 +155,18 @@ private:
     uint32_t _textureId { 0 };
     bool _updateRoots { true };
     graphics::ShaderUniforms _uniformsPrototype;
+
+    // Services
+
+    graphics::Context &_context;
+    graphics::Features &_features;
+    graphics::Materials &_materials;
+    graphics::Meshes &_meshes;
+    graphics::PBRIBL &_pbrIbl;
+    graphics::Shaders &_shaders;
+    graphics::Textures &_textures;
+
+    // END Services
 
     // Lighting and shadows
 

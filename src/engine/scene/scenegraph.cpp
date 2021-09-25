@@ -17,7 +17,6 @@
 
 #include "scenegraph.h"
 
-#include "../di/services/graphics.h"
 #include "../graphics/context.h"
 #include "../graphics/mesh/mesh.h"
 #include "../graphics/mesh/meshes.h"
@@ -31,7 +30,6 @@
 
 using namespace std;
 
-using namespace reone::di;
 using namespace reone::graphics;
 
 namespace reone {
@@ -41,11 +39,6 @@ namespace scene {
 static constexpr float kMaxGrassDistance = 16.0f;
 
 static const bool g_debugAABB = false;
-
-SceneGraph::SceneGraph(GraphicsOptions options, GraphicsServices &graphicsServices) :
-    _options(move(options)),
-    _graphics(graphicsServices) {
-}
 
 void SceneGraph::clearRoots() {
     _roots.clear();
@@ -279,7 +272,7 @@ void SceneGraph::draw(bool shadowPass) {
         return;
     }
 
-    _graphics.context().setBackFaceCullingEnabled(true);
+    _context.setBackFaceCullingEnabled(true);
 
     // Render opaque meshes
     for (auto &mesh : _opaqueMeshes) {
@@ -294,8 +287,8 @@ void SceneGraph::draw(bool shadowPass) {
             ShaderUniforms uniforms(_uniformsPrototype);
             uniforms.combined.general.model = move(transform);
 
-            _graphics.shaders().activate(ShaderProgram::SimpleColor, uniforms);
-            _graphics.meshes().aabb().draw();
+            _shaders.activate(ShaderProgram::SimpleColor, uniforms);
+            _meshes.aabb().draw();
         }
     }
 
@@ -304,7 +297,7 @@ void SceneGraph::draw(bool shadowPass) {
         mesh->drawSingle(false);
     }
 
-    _graphics.context().setBackFaceCullingEnabled(false);
+    _context.setBackFaceCullingEnabled(false);
 
     // Render particles and grass clusters
     for (auto &nodeLeaf : _elements) {

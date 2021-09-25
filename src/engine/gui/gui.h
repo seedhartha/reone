@@ -26,20 +26,22 @@ namespace reone {
 namespace resource {
 
 class GffStruct;
+class Resources;
+class Strings;
 
 }
 
 namespace graphics {
 
+class Context;
+class Features;
+class Fonts;
+class Materials;
+class Meshes;
+class PBRIBL;
+class Shaders;
 class Texture;
-
-}
-
-namespace di {
-
-class AudioServices;
-class GraphicsServices;
-class ResourceServices;
+class Window;
 
 }
 
@@ -61,9 +63,18 @@ public:
 
     // Services
 
-    di::GraphicsServices &graphics() { return _graphics; }
-    di::AudioServices &audio() { return _audio; }
-    di::ResourceServices &resources() { return _resources; }
+    graphics::Context &context() { return _context; }
+    graphics::Features &features() { return _features; }
+    graphics::Fonts &fonts() { return _fonts; }
+    graphics::Materials &materials() { return _materials; }
+    graphics::Meshes &meshes() { return _meshes; }
+    graphics::PBRIBL &pbrIbl() { return _pbrIbl; }
+    graphics::Shaders &shaders() { return _shaders; }
+    graphics::Textures &textures() { return _textures; }
+    graphics::Window &window() { return _window; }
+
+    resource::Resources &resources() { return _resources; }
+    resource::Strings &strings() { return _strings; }
 
     // END Services
 
@@ -75,9 +86,6 @@ protected:
     };
 
     graphics::GraphicsOptions _options;
-    di::GraphicsServices &_graphics;
-    di::AudioServices &_audio;
-    di::ResourceServices &_resources;
 
     std::string _resRef;
     int _resolutionX { kDefaultResolutionX };
@@ -96,11 +104,36 @@ protected:
     glm::vec3 _defaultHilightColor { 0.0f };
     std::unordered_map<std::string, ScalingMode> _scalingByControlTag;
 
+    // Services
+
+    graphics::Context &_context;
+    graphics::Features &_features;
+    graphics::Fonts &_fonts;
+    graphics::Materials &_materials;
+    graphics::Meshes &_meshes;
+    graphics::PBRIBL &_pbrIbl;
+    graphics::Shaders &_shaders;
+    graphics::Textures &_textures;
+    graphics::Window &_window;
+
+    resource::Resources &_resources;
+    resource::Strings &_strings;
+
+    // END Services
+
     GUI(
         graphics::GraphicsOptions options,
-        di::GraphicsServices &graphics,
-        di::AudioServices &audio,
-        di::ResourceServices &resources);
+        graphics::Context &context,
+        graphics::Features &features,
+        graphics::Fonts &fonts,
+        graphics::Materials &materials,
+        graphics::Meshes &meshes,
+        graphics::PBRIBL &pbrIbl,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Window &window,
+        resource::Resources &resources,
+        resource::Strings &strings);
 
     void loadControl(const resource::GffStruct &gffs);
     virtual void preloadControl(Control &control);
