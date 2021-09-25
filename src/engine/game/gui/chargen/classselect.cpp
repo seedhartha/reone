@@ -152,7 +152,16 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     // 3D control
 
     float aspect = extent.width / static_cast<float>(extent.height);
-    unique_ptr<SceneGraph> scene(SceneBuilder(_options, _graphics)
+    unique_ptr<SceneGraph> scene(SceneBuilder(
+        _options,
+        _context,
+        _features,
+        _materials,
+        _meshes,
+        _pbrIbl,
+        _shaders,
+        _textures
+    )
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier([&](SceneGraph &sceneGraph) { return getCharacterModel(appearance, sceneGraph); })

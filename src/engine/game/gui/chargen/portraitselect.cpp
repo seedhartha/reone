@@ -114,7 +114,16 @@ void PortraitSelection::setButtonColors(Control &control) {
 void PortraitSelection::loadHeadModel() {
     float aspect = _binding.lblHead->extent().width / static_cast<float>(_binding.lblHead->extent().height);
 
-    unique_ptr<SceneGraph> scene(SceneBuilder(_options, _game->services().graphics())
+    unique_ptr<SceneGraph> scene(SceneBuilder(
+        _options,
+        _context,
+        _features,
+        _materials,
+        _meshes,
+        _pbrIbl,
+        _shaders,
+        _textures
+    )
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier(bind(&PortraitSelection::getCharacterModel, this, _1))

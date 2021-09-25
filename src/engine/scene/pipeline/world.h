@@ -25,9 +25,11 @@
 
 namespace reone {
 
-namespace di {
+namespace graphics {
 
-class GraphicsServices;
+class Context;
+class Meshes;
+class Shaders;
 
 }
 
@@ -37,7 +39,12 @@ class SceneGraph;
 
 class WorldRenderPipeline : boost::noncopyable {
 public:
-    WorldRenderPipeline(graphics::GraphicsOptions options, di::GraphicsServices &graphics, SceneGraph &sceneGraph);
+    WorldRenderPipeline(
+        graphics::GraphicsOptions options,
+        SceneGraph &sceneGraph,
+        graphics::Context &contxt,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders);
 
     void init();
     void render();
@@ -48,11 +55,19 @@ public:
 
 private:
     graphics::GraphicsOptions _options;
-    di::GraphicsServices &_graphics;
-    SceneGraph &_sceneGraph;
 
     glm::mat4 _lightSpaceMatrices[graphics::kNumCubeFaces];
     bool _takeScreenshot { false }; /**< render next frame into texture */
+
+    // Services
+
+    SceneGraph &_sceneGraph;
+
+    graphics::Context &_context;
+    graphics::Meshes &_meshes;
+    graphics::Shaders &_shaders;
+
+    // END Services
 
     // Framebuffers
 

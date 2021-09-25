@@ -17,7 +17,6 @@
 
 #include "imagebutton.h"
 
-#include "../../di/services/graphics.h"
 #include "../../graphics/context.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh/mesh.h"
@@ -46,7 +45,7 @@ ImageButton::ImageButton(GUI *gui) : Control(gui, ControlType::ImageButton) {
 
 void ImageButton::load(const GffStruct &gffs) {
     Control::load(gffs);
-    _iconFont = _gui->graphics().fonts().get(kIconFontResRef);
+    _iconFont = _gui->fonts().get(kIconFontResRef);
 }
 
 void ImageButton::draw(
@@ -92,7 +91,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconFrame) {
-        _gui->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
+        _gui->context().setActiveTextureUnit(TextureUnits::diffuseMap);
         iconFrame->bind();
 
         glm::mat4 transform(1.0f);
@@ -100,16 +99,16 @@ void ImageButton::drawIcon(
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = _gui->graphics().window().getOrthoProjection();
+        uniforms.combined.general.projection = _gui->window().getOrthoProjection();
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-        _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-        _gui->graphics().meshes().quad().draw();
+        _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+        _gui->meshes().quad().draw();
     }
 
     if (iconTexture) {
-        _gui->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
+        _gui->context().setActiveTextureUnit(TextureUnits::diffuseMap);
         iconTexture->bind();
 
         glm::mat4 transform(1.0f);
@@ -117,12 +116,12 @@ void ImageButton::drawIcon(
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = _gui->graphics().window().getOrthoProjection();
+        uniforms.combined.general.projection = _gui->window().getOrthoProjection();
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(1.0f);
 
-        _gui->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-        _gui->graphics().meshes().quad().draw();
+        _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+        _gui->meshes().quad().draw();
     }
 
     if (!iconText.empty()) {

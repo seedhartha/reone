@@ -19,7 +19,6 @@
 
 #include "../../common/guardutil.h"
 #include "../../common/randomutil.h"
-#include "../../di/services/graphics.h"
 #include "../../graphics/context.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
@@ -276,18 +275,18 @@ void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &
         uniforms.particles->particles[i].frame = particle->frame;
     }
 
-    _sceneGraph->graphics().shaders().activate(ShaderProgram::ParticleParticle, uniforms);
+    _sceneGraph->shaders().activate(ShaderProgram::ParticleParticle, uniforms);
 
-    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _sceneGraph->context().setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
 
-    BlendMode oldBlendMode(_sceneGraph->graphics().context().blendMode());
+    BlendMode oldBlendMode(_sceneGraph->context().blendMode());
     bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
     if (lighten) {
-        _sceneGraph->graphics().context().setBlendMode(BlendMode::Lighten);
+        _sceneGraph->context().setBlendMode(BlendMode::Lighten);
     }
-    _sceneGraph->graphics().meshes().billboard().drawInstanced(count);
-    _sceneGraph->graphics().context().setBlendMode(oldBlendMode);
+    _sceneGraph->meshes().billboard().drawInstanced(count);
+    _sceneGraph->context().setBlendMode(oldBlendMode);
 }
 
 } // namespace scene

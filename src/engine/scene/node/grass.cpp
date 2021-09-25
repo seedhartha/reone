@@ -18,7 +18,6 @@
 #include "grass.h"
 
 #include "../../common/guardutil.h"
-#include "../../di/services/graphics.h"
 #include "../../graphics/context.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
@@ -58,14 +57,14 @@ void GrassSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &el
         count = static_cast<int>(elements.size());
     }
 
-    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _sceneGraph->context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
 
     ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
     uniforms.combined.featureMask |= UniformFeatureFlags::grass;
 
     if (_lightmap) {
-        _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::lightmap);
+        _sceneGraph->context().setActiveTextureUnit(TextureUnits::lightmap);
         _lightmap->bind();
 
         uniforms.combined.featureMask |= UniformFeatureFlags::lightmap;
@@ -78,8 +77,8 @@ void GrassSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &el
         uniforms.grass->clusters[i].lightmapUV = cluster->lightmapUV;
     }
 
-    _sceneGraph->graphics().shaders().activate(ShaderProgram::GrassGrass, uniforms);
-    _sceneGraph->graphics().meshes().grass().drawInstanced(count);
+    _sceneGraph->shaders().activate(ShaderProgram::GrassGrass, uniforms);
+    _sceneGraph->meshes().grass().drawInstanced(count);
 }
 
 } // namespace scene

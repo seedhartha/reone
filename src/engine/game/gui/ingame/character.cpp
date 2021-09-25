@@ -223,7 +223,16 @@ void CharacterMenu::refreshPortraits() {
 void CharacterMenu::refresh3D() {
     float aspect = _binding.lbl3dChar->extent().width / static_cast<float>(_binding.lbl3dChar->extent().height);
 
-    auto scene = SceneBuilder(_options, _game->services().graphics())
+    auto scene = SceneBuilder(
+        _options,
+        _context,
+        _features,
+        _materials,
+        _meshes,
+        _pbrIbl,
+        _shaders,
+        _textures
+    )
         .aspect(aspect)
         .depth(0.1f, 10.0f)
         .modelSupplier(bind(&CharacterMenu::getSceneModel, this, _1))

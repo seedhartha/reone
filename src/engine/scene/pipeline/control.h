@@ -24,13 +24,10 @@ namespace reone {
 
 namespace graphics {
 
+class Context;
+class Meshes;
+class Shaders;
 class Texture;
-
-}
-
-namespace di {
-
-class GraphicsServices;
 
 }
 
@@ -40,19 +37,39 @@ class SceneGraph;
 
 class ControlRenderPipeline : boost::noncopyable {
 public:
-    ControlRenderPipeline(glm::ivec4 extent, di::GraphicsServices &graphics, SceneGraph &scene);
+    ControlRenderPipeline(
+        glm::ivec4 extent,
+        SceneGraph &sceneGraph,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders
+    ) :
+        _extent(std::move(extent)),
+        _sceneGraph(sceneGraph),
+        _context(context),
+        _meshes(meshes),
+        _shaders(shaders) {
+    }
 
     void init();
     void render(const glm::ivec2 &offset);
 
 private:
     glm::vec4 _extent;
-    SceneGraph &_sceneGraph;
-    di::GraphicsServices &_graphics;
 
     graphics::Framebuffer _geometry;
     std::unique_ptr<graphics::Texture> _geometryColor;
     std::unique_ptr<graphics::Renderbuffer> _geometryDepth;
+
+    // Services
+
+    SceneGraph &_sceneGraph;
+
+    graphics::Context &_context;
+    graphics::Meshes &_meshes;
+    graphics::Shaders &_shaders;
+
+    // END Services
 };
 
 } // namespace scene

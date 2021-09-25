@@ -18,7 +18,6 @@
 #include "light.h"
 
 #include "../../common/guardutil.h"
-#include "../../di/services/graphics.h"
 #include "../../graphics/context.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
@@ -68,7 +67,7 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     shared_ptr<CameraSceneNode> camera(_sceneGraph->activeCamera());
     if (!camera) return;
 
-    _sceneGraph->graphics().context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _sceneGraph->context().setActiveTextureUnit(TextureUnits::diffuseMap);
     flare.texture->bind();
 
     glm::vec4 lightPos(_absTransform[3]);
@@ -95,12 +94,12 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     uniforms.combined.general.alpha = 0.5f;
     //uniforms.combined.general.color = glm::vec4(flare.colorShift, 1.0f);
 
-    _sceneGraph->graphics().shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _sceneGraph->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
 
-    BlendMode oldBlendMode = _sceneGraph->graphics().context().blendMode();
-    _sceneGraph->graphics().context().setBlendMode(BlendMode::Add);
-    _sceneGraph->graphics().meshes().billboard().draw();
-    _sceneGraph->graphics().context().setBlendMode(oldBlendMode);
+    BlendMode oldBlendMode = _sceneGraph->context().blendMode();
+    _sceneGraph->context().setBlendMode(BlendMode::Add);
+    _sceneGraph->meshes().billboard().draw();
+    _sceneGraph->context().setBlendMode(oldBlendMode);
 }
 
 bool LightSceneNode::isDirectional() const {

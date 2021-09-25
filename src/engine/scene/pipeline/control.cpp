@@ -17,7 +17,6 @@
 
 #include "control.h"
 
-#include "../../di/services/graphics.h"
 #include "../../graphics/context.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
@@ -32,18 +31,11 @@
 
 using namespace std;
 
-using namespace reone::di;
 using namespace reone::graphics;
 
 namespace reone {
 
 namespace scene {
-
-ControlRenderPipeline::ControlRenderPipeline(glm::ivec4 extent, GraphicsServices &graphics, SceneGraph &sceneGraph) :
-    _extent(move(extent)),
-    _graphics(graphics),
-    _sceneGraph(sceneGraph) {
-}
 
 void ControlRenderPipeline::init() {
     _geometryColor = make_unique<Texture>("geometry_color", getTextureProperties(TextureUsage::ColorBuffer));
@@ -56,14 +48,14 @@ void ControlRenderPipeline::init() {
     _geometryDepth->init();
     _geometryDepth->bind();
     _geometryDepth->configure(static_cast<int>(_extent[2]), static_cast<int>(_extent[3]), PixelFormat::Depth);
-    _graphics.context().unbindRenderbuffer();
+    _context.unbindRenderbuffer();
 
     _geometry.init();
     _geometry.bind();
     _geometry.attachColor(*_geometryColor);
     _geometry.attachDepth(*_geometryDepth);
     _geometry.checkCompleteness();
-    _graphics.context().unbindFramebuffer();
+    _context.unbindFramebuffer();
 }
 
 void ControlRenderPipeline::render(const glm::ivec2 &offset) {
@@ -71,7 +63,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
 
     shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
 
-    ShaderUniforms uniforms(_graphics.shaders().defaultUniforms());
+    ShaderUniforms uniforms(_shaders.defaultUniforms());
     uniforms.combined.general.projection = camera->projection();
     uniforms.combined.general.view = camera->view();
     uniforms.combined.general.cameraPosition = camera->absoluteTransform()[3];
@@ -80,23 +72,23 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
 
     // Draw to framebuffer
 
-    glm::ivec4 oldViewport(_graphics.context().viewport());
-    _graphics.context().setViewport(glm::ivec4(0, 0, _extent[2], _extent[3]));
+    glm::ivec4 oldViewport(_context.viewport());
+    _context.setViewport(glm::ivec4(0, 0, _extent[2], _extent[3]));
 
-    bool oldDepthTest = _graphics.context().isDepthTestEnabled();
-    _graphics.context().setDepthTestEnabled(true);
+    bool oldDepthTest = _context.isDepthTestEnabled();
+    _context.setDepthTestEnabled(true);
 
     _geometry.bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     _sceneGraph.draw();
 
-    _graphics.context().unbindFramebuffer();
-    _graphics.context().setDepthTestEnabled(oldDepthTest);
-    _graphics.context().setViewport(oldViewport);
+    _context.unbindFramebuffer();
+    _context.setDepthTestEnabled(oldDepthTest);
+    _context.setViewport(oldViewport);
 
     // Draw control
 
-    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor->bind();
 
     glm::mat4 projection(glm::ortho(
@@ -113,8 +105,8 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     uniforms.combined.general.projection = move(projection);
     uniforms.combined.general.model = move(transform);
 
-    _graphics.shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _graphics.meshes().quad().draw();
+    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    _meshes.quad().draw();
 }
 
 } // namespace scene

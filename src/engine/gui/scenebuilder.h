@@ -21,9 +21,15 @@
 
 namespace reone {
 
-namespace di {
+namespace graphics {
 
-class GraphicsServices;
+class Context;
+class Features;
+class Materials;
+class Meshes;
+class PBRIBL;
+class Shaders;
+class Textures;
 
 }
 
@@ -41,7 +47,15 @@ namespace gui {
  */
 class SceneBuilder {
 public:
-    SceneBuilder(graphics::GraphicsOptions options, di::GraphicsServices &graphics);
+    SceneBuilder(
+        graphics::GraphicsOptions options,
+        graphics::Context &context,
+        graphics::Features &features,
+        graphics::Materials &materials,
+        graphics::Meshes &meshes,
+        graphics::PBRIBL &pbrIbl,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures);
 
     std::unique_ptr<scene::SceneGraph> build();
 
@@ -57,7 +71,18 @@ public:
 
 private:
     graphics::GraphicsOptions _options;
-    di::GraphicsServices &_graphics;
+
+    // Services
+
+    graphics::Context &_context;
+    graphics::Features &_features;
+    graphics::Materials &_materials;
+    graphics::Meshes &_meshes;
+    graphics::PBRIBL &_pbrIbl;
+    graphics::Shaders &_shaders;
+    graphics::Textures &_textures;
+
+    // END Services
 
     float _aspect { 1.0f };
     float _zNear { 0.1f };

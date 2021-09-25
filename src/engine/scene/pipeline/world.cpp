@@ -17,7 +17,6 @@
 
 #include "world.h"
 
-#include "../../di/services/graphics.h"
 #include "../../graphics/context.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
@@ -36,7 +35,6 @@
 
 using namespace std;
 
-using namespace reone::di;
 using namespace reone::graphics;
 
 namespace reone {
@@ -50,10 +48,18 @@ static constexpr int kScreenshotResolution = 256;
 
 static bool g_wireframesEnabled = false;
 
-WorldRenderPipeline::WorldRenderPipeline(GraphicsOptions options, GraphicsServices &graphics, SceneGraph &sceneGraph) :
+WorldRenderPipeline::WorldRenderPipeline(
+    GraphicsOptions options,
+    SceneGraph &sceneGraph,
+    Context &context,
+    Meshes &meshes,
+    Shaders &shaders
+) :
     _options(move(options)),
-    _graphics(graphics),
-    _sceneGraph(sceneGraph) {
+    _sceneGraph(sceneGraph),
+    _context(context),
+    _meshes(meshes),
+    _shaders(shaders) {
 
     for (int i = 0; i < kNumCubeFaces; ++i) {
         _lightSpaceMatrices[i] = glm::mat4(1.0f);
@@ -67,7 +73,7 @@ void WorldRenderPipeline::init() {
     _depthRenderbuffer->init();
     _depthRenderbuffer->bind();
     _depthRenderbuffer->configure(_options.width, _options.height, PixelFormat::Depth);
-    _graphics.context().unbindRenderbuffer();
+    _context.unbindRenderbuffer();
 
     // Geometry framebuffer
 
@@ -87,7 +93,7 @@ void WorldRenderPipeline::init() {
     _geometry.attachColor(*_geometryColor2, 1);
     _geometry.attachDepth(*_depthRenderbuffer);
     _geometry.checkCompleteness();
-    _graphics.context().unbindFramebuffer();
+    _context.unbindFramebuffer();
 
     // Vertical blur framebuffer
 
@@ -101,7 +107,7 @@ void WorldRenderPipeline::init() {
     _verticalBlur.attachColor(*_verticalBlurColor);
     _verticalBlur.attachDepth(*_depthRenderbuffer);
     _verticalBlur.checkCompleteness();
-    _graphics.context().unbindFramebuffer();
+    _context.unbindFramebuffer();
 
     // Horizontal blur framebuffer
 
@@ -115,7 +121,7 @@ void WorldRenderPipeline::init() {
     _horizontalBlur.attachColor(*_horizontalBlurColor);
     _horizontalBlur.attachDepth(*_depthRenderbuffer);
     _horizontalBlur.checkCompleteness();
-    _graphics.context().unbindFramebuffer();
+    _context.unbindFramebuffer();
 
     // Shadows framebuffer
 
@@ -144,7 +150,7 @@ void WorldRenderPipeline::init() {
     _screenshot.attachColor(*_screenshotColor);
     _screenshot.attachDepth(*_depthRenderbuffer);
     _screenshot.checkCompleteness();
-    _graphics.context().unbindFramebuffer();
+    _context.unbindFramebuffer();
 }
 
 void WorldRenderPipeline::render() {
@@ -213,7 +219,7 @@ void WorldRenderPipeline::drawShadows() {
         glm::vec3(shadowLight->absoluteTransform()[3]),
         shadowLight->isDirectional() ? 0.0f : 1.0f);
 
-    ShaderUniforms uniforms(_graphics.shaders().defaultUniforms());
+    ShaderUniforms uniforms(_shaders.defaultUniforms());
     uniforms.combined.featureMask |= UniformFeatureFlags::shadows;
     uniforms.combined.shadows.lightPosition = move(lightPosition);
     for (int i = 0; i < kNumCubeFaces; ++i) {
@@ -223,13 +229,13 @@ void WorldRenderPipeline::drawShadows() {
 
     // Set viewport
 
-    glm::ivec4 oldViewport(_graphics.context().viewport());
-    _graphics.context().setViewport(glm::ivec4(0, 0, 1024 * _options.shadowResolution, 1024 * _options.shadowResolution));
+    glm::ivec4 oldViewport(_context.viewport());
+    _context.setViewport(glm::ivec4(0, 0, 1024 * _options.shadowResolution, 1024 * _options.shadowResolution));
 
     // Enable depth testing
 
-    bool oldDepthTest = _graphics.context().isDepthTestEnabled();
-    _graphics.context().setDepthTestEnabled(true);
+    bool oldDepthTest = _context.isDepthTestEnabled();
+    _context.setDepthTestEnabled(true);
 
     // Bind shadows framebuffer
 
@@ -249,8 +255,8 @@ void WorldRenderPipeline::drawShadows() {
 
     // Restore context
 
-    _graphics.context().setDepthTestEnabled(oldDepthTest);
-    _graphics.context().setViewport(move(oldViewport));
+    _context.setDepthTestEnabled(oldDepthTest);
+    _context.setViewport(move(oldViewport));
 }
 
 void WorldRenderPipeline::drawGeometry() {
@@ -259,7 +265,7 @@ void WorldRenderPipeline::drawGeometry() {
     shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
     const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
 
-    ShaderUniforms uniforms(_graphics.shaders().defaultUniforms());
+    ShaderUniforms uniforms(_shaders.defaultUniforms());
     uniforms.combined.general.projection = camera->projection();
     uniforms.combined.general.view = camera->view();
     uniforms.combined.general.cameraPosition = camera->absoluteTransform()[3];
@@ -282,15 +288,15 @@ void WorldRenderPipeline::drawGeometry() {
 
     // Enable wireframe mode
 
-    PolygonMode oldPolygonMode = _graphics.context().polygonMode();
+    PolygonMode oldPolygonMode = _context.polygonMode();
     if (g_wireframesEnabled) {
-        _graphics.context().setPolygonMode(PolygonMode::Line);
+        _context.setPolygonMode(PolygonMode::Line);
     }
 
     // Enable depth testing
 
-    bool oldDepthTest = _graphics.context().isDepthTestEnabled();
-    _graphics.context().setDepthTestEnabled(true);
+    bool oldDepthTest = _context.isDepthTestEnabled();
+    _context.setDepthTestEnabled(true);
 
     // Bind geometry framebuffer
 
@@ -301,10 +307,10 @@ void WorldRenderPipeline::drawGeometry() {
 
     if (shadowLight) {
         if (shadowLight->isDirectional()) {
-            _graphics.context().setActiveTextureUnit(TextureUnits::shadowMap);
+            _context.setActiveTextureUnit(TextureUnits::shadowMap);
             _shadowsDepth->bind();
         } else {
-            _graphics.context().setActiveTextureUnit(TextureUnits::shadowMapCube);
+            _context.setActiveTextureUnit(TextureUnits::shadowMapCube);
             _cubeShadowsDepth->bind();
         }
     }
@@ -316,16 +322,16 @@ void WorldRenderPipeline::drawGeometry() {
 
     // Restore context
 
-    _graphics.context().unbindFramebuffer();
-    _graphics.context().setPolygonMode(oldPolygonMode);
-    _graphics.context().setDepthTestEnabled(oldDepthTest);
+    _context.unbindFramebuffer();
+    _context.setPolygonMode(oldPolygonMode);
+    _context.setDepthTestEnabled(oldDepthTest);
 }
 
 void WorldRenderPipeline::applyHorizontalBlur() {
     // Enable depth testing
 
-    bool oldDepthTest = _graphics.context().isDepthTestEnabled();
-    _graphics.context().setDepthTestEnabled(true);
+    bool oldDepthTest = _context.isDepthTestEnabled();
+    _context.setDepthTestEnabled(true);
 
     // Bind horizontal blur framebuffer
 
@@ -333,7 +339,7 @@ void WorldRenderPipeline::applyHorizontalBlur() {
 
     // Bind bright geometry texture
 
-    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor2->bind();
 
     // Set shader uniforms
@@ -346,24 +352,24 @@ void WorldRenderPipeline::applyHorizontalBlur() {
     uniforms.combined.blur.resolution = glm::vec2(w, h);
     uniforms.combined.blur.direction = glm::vec2(1.0f, 0.0f);
 
-    _graphics.shaders().activate(ShaderProgram::SimpleBlur, uniforms);
+    _shaders.activate(ShaderProgram::SimpleBlur, uniforms);
 
     // Draw a quad
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    _graphics.meshes().quadNDC().draw();
+    _meshes.quadNDC().draw();
 
     // Restore context
 
-    _graphics.context().unbindFramebuffer();
-    _graphics.context().setDepthTestEnabled(oldDepthTest);
+    _context.unbindFramebuffer();
+    _context.setDepthTestEnabled(oldDepthTest);
 }
 
 void WorldRenderPipeline::applyVerticalBlur() {
     // Enable depth testing
 
-    bool oldDepthTest = _graphics.context().isDepthTestEnabled();
-    _graphics.context().setDepthTestEnabled(true);
+    bool oldDepthTest = _context.isDepthTestEnabled();
+    _context.setDepthTestEnabled(true);
 
     // Bind vertical blur framebuffer
 
@@ -371,7 +377,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
 
     // Bind diffuse map
 
-    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _horizontalBlurColor->bind();
 
     // Set shader uniforms
@@ -384,17 +390,17 @@ void WorldRenderPipeline::applyVerticalBlur() {
     uniforms.combined.blur.resolution = glm::vec2(w, h);
     uniforms.combined.blur.direction = glm::vec2(0.0f, 1.0f);
 
-    _graphics.shaders().activate(ShaderProgram::SimpleBlur, uniforms);
+    _shaders.activate(ShaderProgram::SimpleBlur, uniforms);
 
     // Draw a quad
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    _graphics.meshes().quadNDC().draw();
+    _meshes.quadNDC().draw();
 
     // Restore context
 
-    _graphics.context().unbindFramebuffer();
-    _graphics.context().setDepthTestEnabled(oldDepthTest);
+    _context.unbindFramebuffer();
+    _context.setDepthTestEnabled(oldDepthTest);
 }
 
 void WorldRenderPipeline::drawResult() {
@@ -402,36 +408,36 @@ void WorldRenderPipeline::drawResult() {
 
     glm::ivec4 oldViewport;
     if (_takeScreenshot) {
-        oldViewport = _graphics.context().viewport();
-        _graphics.context().setViewport(glm::ivec4(0, 0, kScreenshotResolution, kScreenshotResolution));
+        oldViewport = _context.viewport();
+        _context.setViewport(glm::ivec4(0, 0, kScreenshotResolution, kScreenshotResolution));
         _screenshot.bind();
     }
 
     // Bind geometry texture
 
-    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _geometryColor1->bind();
 
     // Bind blur texture
 
-    _graphics.context().setActiveTextureUnit(TextureUnits::bloom);
+    _context.setActiveTextureUnit(TextureUnits::bloom);
     _verticalBlurColor->bind();
 
     // Set shader uniforms
 
     ShaderUniforms uniforms;
-    _graphics.shaders().activate(ShaderProgram::SimplePresentWorld, uniforms);
+    _shaders.activate(ShaderProgram::SimplePresentWorld, uniforms);
 
     // Draw a quad
 
-    _graphics.meshes().quadNDC().draw();
+    _meshes.quadNDC().draw();
 
     // Restore context
 
     if (_takeScreenshot) {
         saveScreenshot();
-        _graphics.context().unbindFramebuffer();
-        _graphics.context().setViewport(move(oldViewport));
+        _context.unbindFramebuffer();
+        _context.setViewport(move(oldViewport));
         _takeScreenshot = false; // finished taking a screenshot
     }
 }

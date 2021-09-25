@@ -17,9 +17,6 @@
 
 #include "cursor.h"
 
-#include "../common/guardutil.h"
-#include "../di/services/graphics.h"
-
 #include "context.h"
 #include "mesh/mesh.h"
 #include "mesh/meshes.h"
@@ -29,24 +26,13 @@
 
 using namespace std;
 
-using namespace reone::di;
-
 namespace reone {
 
 namespace graphics {
 
-Cursor::Cursor(shared_ptr<Texture> up, shared_ptr<Texture> down, GraphicsServices &graphics) :
-    _up(up),
-    _down(down),
-    _graphics(graphics) {
-
-    ensurePresent(up, "up");
-    ensurePresent(down, "down");
-}
-
 void Cursor::draw() {
     shared_ptr<Texture> texture(_pressed ? _down : _up);
-    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
 
     glm::mat4 transform(1.0f);
@@ -54,11 +40,11 @@ void Cursor::draw() {
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _graphics.window().getOrthoProjection();
+    uniforms.combined.general.projection = _window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _graphics.shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _graphics.meshes().quad().draw();
+    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    _meshes.quad().draw();
 }
 
 } // namespace graphics

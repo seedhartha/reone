@@ -18,7 +18,6 @@
 #include "video.h"
 
 #include "../common/guardutil.h"
-#include "../di/services/graphics.h"
 #include "../graphics/context.h"
 #include "../graphics/mesh/mesh.h"
 #include "../graphics/mesh/meshes.h"
@@ -28,15 +27,11 @@
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::di;
 using namespace reone::graphics;
 
 namespace reone {
 
 namespace video {
-
-Video::Video(GraphicsServices &graphics) : _graphics(graphics) {
-}
 
 void Video::init() {
     if (!_inited) {
@@ -74,7 +69,7 @@ void Video::updateFrame(float dt) {
 void Video::updateFrameTexture() {
     if (!_frame) return;
 
-    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
     _texture->setPixels(_width, _height, PixelFormat::RGB, _frame->pixels);
 }
@@ -82,12 +77,12 @@ void Video::updateFrameTexture() {
 void Video::draw() {
     if (!_inited) return;
 
-    _graphics.context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
 
     ShaderUniforms uniforms;
-    _graphics.shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _graphics.meshes().quadNDCFlipY().draw();
+    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    _meshes.quadNDCFlipY().draw();
 }
 
 } // namespace video
