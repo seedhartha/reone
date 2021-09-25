@@ -34,10 +34,10 @@ namespace game {
 Player::Player(Module *module, Area *area, Camera *camera, const Party *party) :
     _module(module), _area(area), _camera(camera), _party(party) {
 
-    ensureNotNull(module, "module");
-    ensureNotNull(area, "area");
-    ensureNotNull(camera, "camera");
-    ensureNotNull(party, "party");
+    ensurePresent(module, "module");
+    ensurePresent(area, "area");
+    ensurePresent(camera, "camera");
+    ensurePresent(party, "party");
 }
 
 bool Player::handle(const SDL_Event &event) {

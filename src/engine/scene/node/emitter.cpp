@@ -45,7 +45,7 @@ EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *model, shared_ptr<Model
     ModelNodeSceneNode(modelNode, SceneNodeType::Emitter, sceneGraph),
     _model(model) {
 
-    ensureNotNull(model, "model");
+    ensurePresent(model, "model");
 
     _birthrate = modelNode->birthrate().getByFrameOrElse(0, 0.0f);
     _lifeExpectancy = modelNode->lifeExp().getByFrameOrElse(0, 0.0f);

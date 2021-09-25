@@ -31,7 +31,7 @@ class EquipItemAction : public Action {
 public:
     EquipItemAction(Game &game, std::shared_ptr<Item> item, int inventorySlot, bool instant) :
         Action(game, ActionType::EquipItem),
-        _item(ensureNotNull(std::move(item), "item")),
+        _item(ensurePresent(std::move(item), "item")),
         _inventorySlot(inventorySlot),
         _instant(instant) {
     }

@@ -40,8 +40,8 @@ Cursor::Cursor(shared_ptr<Texture> up, shared_ptr<Texture> down, GraphicsService
     _down(down),
     _graphics(graphics) {
 
-    ensureNotNull(up, "up");
-    ensureNotNull(down, "down");
+    ensurePresent(up, "up");
+    ensurePresent(down, "down");
 }
 
 void Cursor::draw() {

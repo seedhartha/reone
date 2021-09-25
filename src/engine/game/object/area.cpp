@@ -791,7 +791,7 @@ void Area::setUnescapable(bool value) {
 }
 
 shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintResRef, const shared_ptr<Location> &location) {
-    ensureNotNull(location, "location");
+    ensurePresent(location, "location");
 
     shared_ptr<Object> object;
 

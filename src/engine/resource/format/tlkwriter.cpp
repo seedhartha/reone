@@ -37,7 +37,7 @@ struct StringFlags {
 };
 
 TlkWriter::TlkWriter(shared_ptr<TalkTable> talkTable) : _talkTable(talkTable) {
-    ensureNotNull(talkTable, "talkTable");
+    ensurePresent(talkTable, "talkTable");
 }
 
 void TlkWriter::save(const fs::path &path) {

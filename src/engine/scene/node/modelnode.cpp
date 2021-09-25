@@ -32,7 +32,7 @@ ModelNodeSceneNode::ModelNodeSceneNode(shared_ptr<ModelNode> modelNode, SceneNod
     SceneNode(modelNode->name(), type, sceneGraph),
     _modelNode(modelNode) {
 
-    ensureNotNull(modelNode, "modelNode");
+    ensurePresent(modelNode, "modelNode");
 }
 
 } // namespace scene

@@ -31,7 +31,7 @@ class PutDownItemAction : public Action {
 public:
     PutDownItemAction(Game &game, std::shared_ptr<Item> item) :
         Action(game, ActionType::PutDownItem),
-        _item(ensureNotNull(std::move(item), "item")) {
+        _item(ensurePresent(std::move(item), "item")) {
     }
 
     void execute(Object &actor, float dt) override;
