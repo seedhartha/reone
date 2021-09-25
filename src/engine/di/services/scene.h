@@ -23,31 +23,27 @@
 
 namespace reone {
 
-namespace graphics {
+namespace di {
 
 class GraphicsServices;
 
-}
-
-namespace scene {
-
 class SceneServices : boost::noncopyable {
 public:
-    SceneServices(graphics::GraphicsOptions options, graphics::GraphicsServices &graphics);
+    SceneServices(graphics::GraphicsOptions options, GraphicsServices &graphics);
 
     void init();
 
-    SceneGraph &graph() { return *_graph; }
-    WorldRenderPipeline &worldRenderPipeline() { return *_worldRenderPipeline; }
+    scene::SceneGraph &graph() { return *_graph; }
+    scene::WorldRenderPipeline &worldRenderPipeline() { return *_worldRenderPipeline; }
 
 private:
     graphics::GraphicsOptions _options;
-    graphics::GraphicsServices &_graphics;
+    GraphicsServices &_graphics;
 
-    std::unique_ptr<SceneGraph> _graph;
-    std::unique_ptr<WorldRenderPipeline> _worldRenderPipeline;
+    std::unique_ptr<scene::SceneGraph> _graph;
+    std::unique_ptr<scene::WorldRenderPipeline> _worldRenderPipeline;
 };
 
-} // namespace scene
+} // namespace di
 
 } // namespace reone

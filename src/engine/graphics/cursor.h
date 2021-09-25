@@ -19,9 +19,14 @@
 
 namespace reone {
 
-namespace graphics {
+namespace di {
 
 class GraphicsServices;
+
+}
+
+namespace graphics {
+
 class Texture;
 
 class Cursor : boost::noncopyable {
@@ -29,7 +34,7 @@ public:
     Cursor(
         std::shared_ptr<Texture> up,
         std::shared_ptr<Texture> down,
-        GraphicsServices &graphics);
+        di::GraphicsServices &graphics);
 
     void draw();
 
@@ -39,7 +44,7 @@ public:
 private:
     std::shared_ptr<Texture> _up;
     std::shared_ptr<Texture> _down;
-    GraphicsServices &_graphics;
+    di::GraphicsServices &_graphics;
 
     glm::ivec2 _position { 0 };
     bool _pressed { false };

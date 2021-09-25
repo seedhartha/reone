@@ -41,32 +41,12 @@
 
 namespace reone {
 
-namespace resource {
-
-class ResourceServices;
-
-}
-
-namespace graphics {
-
-class GraphicsServices;
-
-}
-
-namespace audio {
+namespace di {
 
 class AudioServices;
-
-}
-
-namespace scene {
-
+class GraphicsServices;
+class ResourceServices;
 class SceneServices;
-
-}
-
-namespace script {
-
 class ScriptServices;
 
 }
@@ -91,11 +71,11 @@ public:
         GameID gameId,
         boost::filesystem::path path,
         Options options,
-        resource::ResourceServices &resource,
-        graphics::GraphicsServices &graphics,
-        audio::AudioServices &audio,
-        scene::SceneServices &scene,
-        script::ScriptServices &script);
+        di::ResourceServices &resource,
+        di::GraphicsServices &graphics,
+        di::AudioServices &audio,
+        di::SceneServices &scene,
+        di::ScriptServices &script);
 
     /**
      * Initializes the engine, run the main game loop and clean up on exit.
@@ -120,7 +100,7 @@ public:
 
     GameID id() const { return _gameId; }
     const Options &options() const { return _options; }
-    GameServices &services() { return *_game; }
+    di::GameServices &services() { return *_game; }
     std::shared_ptr<Module> module() const { return _module; }
     HUD &hud() const { return *_hud; }
     CharacterGeneration &characterGeneration() { return *_charGen; }
@@ -215,7 +195,7 @@ protected:
 
     GameID _gameId;
     boost::filesystem::path _path;
-    resource::ResourceServices &_resource;
+    di::ResourceServices &_resource;
     std::string _mainMenuMusicResRef;
     std::string _charGenMusicResRef;
     std::string _charGenLoadScreenResRef;
@@ -260,12 +240,12 @@ private:
 
     // Services
 
-    graphics::GraphicsServices &_graphics;
-    audio::AudioServices &_audio;
-    scene::SceneServices &_scene;
-    script::ScriptServices &_script;
+    di::GraphicsServices &_graphics;
+    di::AudioServices &_audio;
+    di::SceneServices &_scene;
+    di::ScriptServices &_script;
 
-    std::unique_ptr<GameServices> _game;
+    std::unique_ptr<di::GameServices> _game;
 
     // END Services
 

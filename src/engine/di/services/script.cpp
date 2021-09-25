@@ -22,10 +22,11 @@
 using namespace std;
 
 using namespace reone::resource;
+using namespace reone::script;
 
 namespace reone {
 
-namespace script {
+namespace di {
 
 ScriptServices::ScriptServices(ResourceServices &resource) : _resource(resource) {
 }
@@ -34,6 +35,6 @@ void ScriptServices::init() {
     _scripts = make_unique<Scripts>(_resource.resources());
 }
 
-} // namespace script
+} // namespace di
 
 } // namespace reone

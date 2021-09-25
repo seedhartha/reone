@@ -28,7 +28,7 @@
 
 namespace reone {
 
-namespace graphics {
+namespace di {
 
 class GraphicsServices;
 
@@ -45,7 +45,7 @@ class SceneGraph : boost::noncopyable {
 public:
     SceneGraph(
         graphics::GraphicsOptions options,
-        graphics::GraphicsServices &graphicsServices);
+        di::GraphicsServices &graphicsServices);
 
     /**
      * Recursively update the state of this scene graph. Called prior to rendering a frame.
@@ -56,7 +56,7 @@ public:
     void draw(bool shadowPass = false);
 
     const graphics::GraphicsOptions &options() const { return _options; }
-    graphics::GraphicsServices &graphics() { return _graphics; }
+    di::GraphicsServices &graphics() { return _graphics; }
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
     graphics::ShaderUniforms uniformsPrototype() const { return _uniformsPrototype; }
 
@@ -107,7 +107,7 @@ public:
 
 private:
     graphics::GraphicsOptions _options;
-    graphics::GraphicsServices &_graphics;
+    di::GraphicsServices &_graphics;
 
     std::vector<std::shared_ptr<SceneNode>> _roots;
     std::shared_ptr<CameraSceneNode> _activeCamera;

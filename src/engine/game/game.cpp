@@ -48,6 +48,7 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::di;
 using namespace reone::gui;
 using namespace reone::graphics;
 using namespace reone::resource;

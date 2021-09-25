@@ -21,11 +21,11 @@
 
 using namespace std;
 
-using namespace reone::resource;
+using namespace reone::audio;
 
 namespace reone {
 
-namespace audio {
+namespace di {
 
 AudioServices::AudioServices(AudioOptions options, ResourceServices &resource) :
     _options(move(options)),
@@ -39,6 +39,6 @@ void AudioServices::init() {
     _player->init();
 }
 
-} // namespace audio
+} // namespace di
 
 } // namespace reone

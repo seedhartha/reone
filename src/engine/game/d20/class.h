@@ -26,7 +26,7 @@
 
 namespace reone {
 
-namespace resource {
+namespace di {
 
 class ResourceServices;
 
@@ -38,7 +38,7 @@ class Classes;
 
 class CreatureClass {
 public:
-    CreatureClass(ClassType type, Classes &classes, resource::ResourceServices &resource);
+    CreatureClass(ClassType type, Classes &classes, di::ResourceServices &resource);
 
     void load(const resource::TwoDA &twoDa, int row);
 
@@ -63,7 +63,7 @@ public:
 
 private:
     Classes &_classes;
-    resource::ResourceServices &_resource;
+    di::ResourceServices &_resource;
 
     ClassType _type;
     std::string _name;

@@ -29,6 +29,8 @@
 
 using namespace std;
 
+using namespace reone::di;
+
 namespace reone {
 
 namespace graphics {

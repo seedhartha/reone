@@ -19,7 +19,7 @@
 
 namespace reone {
 
-namespace graphics {
+namespace di {
 
 class GraphicsServices;
 
@@ -36,7 +36,7 @@ class Video;
  */
 class BikReader {
 public:
-    BikReader(boost::filesystem::path path, graphics::GraphicsServices &graphics);
+    BikReader(boost::filesystem::path path, di::GraphicsServices &graphics);
 
     void load();
 
@@ -44,7 +44,7 @@ public:
 
 private:
     boost::filesystem::path _path;
-    graphics::GraphicsServices &_graphics;
+    di::GraphicsServices &_graphics;
 
     std::shared_ptr<Video> _video;
 };

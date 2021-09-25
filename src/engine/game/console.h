@@ -24,12 +24,6 @@
 
 namespace reone {
 
-namespace graphics {
-
-class GraphicsServices;
-
-}
-
 namespace game {
 
 class Game;

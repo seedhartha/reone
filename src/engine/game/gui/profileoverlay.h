@@ -22,7 +22,7 @@
 
 namespace reone {
 
-namespace graphics {
+namespace di {
 
 class GraphicsServices;
 
@@ -32,7 +32,7 @@ namespace game {
 
 class ProfileOverlay {
 public:
-    ProfileOverlay(graphics::GraphicsServices &graphics);
+    ProfileOverlay(di::GraphicsServices &graphics);
 
     void init();
     bool handle(const SDL_Event &event);
@@ -45,7 +45,7 @@ private:
         int onePerLow { 0 }; /**< 1% Low */
     };
 
-    graphics::GraphicsServices &_graphics;
+    di::GraphicsServices &_graphics;
 
     uint64_t _frequency { 0 };
     uint64_t _counter { 0 };

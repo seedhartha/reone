@@ -21,17 +21,17 @@
 
 namespace reone {
 
-namespace resource {
-
-class ResourceServices;
-
-}
-
 namespace graphics {
 
 class Cursor;
-class GraphicsServices;
 class Texture;
+
+}
+
+namespace di {
+
+class GraphicsServices;
+class ResourceServices;
 
 }
 
@@ -39,7 +39,7 @@ namespace game {
 
 class Cursors : boost::noncopyable {
 public:
-    Cursors(GameID gameId, graphics::GraphicsServices &graphics, resource::ResourceServices &resources);
+    Cursors(GameID gameId, di::GraphicsServices &graphics, di::ResourceServices &resources);
     ~Cursors();
 
     void deinit();
@@ -48,8 +48,8 @@ public:
 
 private:
     GameID _gameId;
-    graphics::GraphicsServices &_graphics;
-    resource::ResourceServices &_resource;
+    di::GraphicsServices &_graphics;
+    di::ResourceServices &_resource;
 
     std::unordered_map<CursorType, std::shared_ptr<graphics::Cursor>> _cache;
 

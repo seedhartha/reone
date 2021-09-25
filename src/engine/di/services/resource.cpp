@@ -19,11 +19,13 @@
 
 using namespace std;
 
+using namespace reone::resource;
+
 namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace resource {
+namespace di {
 
 ResourceServices::ResourceServices(fs::path gamePath) : _gamePath(move(gamePath)) {
 }
@@ -35,6 +37,6 @@ void ResourceServices::init() {
     _strings->init(_gamePath);
 }
 
-} // namespace resource
+} // namespace di
 
 } // namespace reone

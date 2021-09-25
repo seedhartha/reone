@@ -20,10 +20,11 @@
 using namespace std;
 
 using namespace reone::graphics;
+using namespace reone::scene;
 
 namespace reone {
 
-namespace scene {
+namespace di {
 
 SceneServices::SceneServices(GraphicsOptions options, GraphicsServices &graphics) :
     _options(move(options)),
@@ -37,6 +38,6 @@ void SceneServices::init() {
     _worldRenderPipeline->init();
 }
 
-} // namespace scene
+} // namespace di
 
 } // namespace reone

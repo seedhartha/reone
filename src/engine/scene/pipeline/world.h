@@ -25,7 +25,7 @@
 
 namespace reone {
 
-namespace graphics {
+namespace di {
 
 class GraphicsServices;
 
@@ -37,7 +37,7 @@ class SceneGraph;
 
 class WorldRenderPipeline : boost::noncopyable {
 public:
-    WorldRenderPipeline(graphics::GraphicsOptions options, graphics::GraphicsServices &graphics, SceneGraph &sceneGraph);
+    WorldRenderPipeline(graphics::GraphicsOptions options, di::GraphicsServices &graphics, SceneGraph &sceneGraph);
 
     void init();
     void render();
@@ -48,7 +48,7 @@ public:
 
 private:
     graphics::GraphicsOptions _options;
-    graphics::GraphicsServices &_graphics;
+    di::GraphicsServices &_graphics;
     SceneGraph &_sceneGraph;
 
     glm::mat4 _lightSpaceMatrices[graphics::kNumCubeFaces];

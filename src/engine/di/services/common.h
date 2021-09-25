@@ -21,6 +21,8 @@
 
 namespace reone {
 
+namespace di {
+
 class CommonServices {
 public:
     void init();
@@ -28,5 +30,7 @@ public:
 private:
     std::unique_ptr<Executor> _executor;
 };
+
+} // namespace di
 
 } // namespace reone

@@ -30,8 +30,13 @@ class AudioStream;
 
 namespace graphics {
 
-class GraphicsServices;
 class Texture;
+
+}
+
+namespace di {
+
+class GraphicsServices;
 
 }
 
@@ -45,7 +50,7 @@ public:
         std::shared_ptr<ByteArray> pixels;
     };
 
-    Video(graphics::GraphicsServices &graphics);
+    Video(di::GraphicsServices &graphics);
 
     void init();
     void deinit();
@@ -62,7 +67,7 @@ public:
     void setMediaStream(std::shared_ptr<MediaStream<Frame>> stream) { _stream = std::move(stream); }
 
 private:
-    graphics::GraphicsServices &_graphics;
+    di::GraphicsServices &_graphics;
 
     int _width { 0 };
     int _height { 0 };

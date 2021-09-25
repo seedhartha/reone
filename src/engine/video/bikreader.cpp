@@ -39,7 +39,7 @@ namespace fs = boost::filesystem;
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::graphics;
+using namespace reone::di;
 
 namespace reone {
 
@@ -119,7 +119,7 @@ public:
 
 private:
     fs::path _path;
-    graphics::GraphicsServices &_graphics;
+    di::GraphicsServices &_graphics;
 
     AVFormatContext *_formatCtx { nullptr };
     int _videoStreamIdx { -1 };

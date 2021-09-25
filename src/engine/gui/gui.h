@@ -26,20 +26,20 @@ namespace reone {
 namespace resource {
 
 class GffStruct;
-class ResourceServices;
-
-}
-
-namespace audio {
-
-class AudioServices;
 
 }
 
 namespace graphics {
 
-class GraphicsServices;
 class Texture;
+
+}
+
+namespace di {
+
+class AudioServices;
+class GraphicsServices;
+class ResourceServices;
 
 }
 
@@ -61,9 +61,9 @@ public:
 
     // Services
 
-    graphics::GraphicsServices &graphics() { return _graphics; }
-    audio::AudioServices &audio() { return _audio; }
-    resource::ResourceServices &resources() { return _resources; }
+    di::GraphicsServices &graphics() { return _graphics; }
+    di::AudioServices &audio() { return _audio; }
+    di::ResourceServices &resources() { return _resources; }
 
     // END Services
 
@@ -75,9 +75,9 @@ protected:
     };
 
     graphics::GraphicsOptions _options;
-    graphics::GraphicsServices &_graphics;
-    audio::AudioServices &_audio;
-    resource::ResourceServices &_resources;
+    di::GraphicsServices &_graphics;
+    di::AudioServices &_audio;
+    di::ResourceServices &_resources;
 
     std::string _resRef;
     int _resolutionX { kDefaultResolutionX };
@@ -98,9 +98,9 @@ protected:
 
     GUI(
         graphics::GraphicsOptions options,
-        graphics::GraphicsServices &graphics,
-        audio::AudioServices &audio,
-        resource::ResourceServices &resources);
+        di::GraphicsServices &graphics,
+        di::AudioServices &audio,
+        di::ResourceServices &resources);
 
     void loadControl(const resource::GffStruct &gffs);
     virtual void preloadControl(Control &control);

@@ -21,11 +21,12 @@
 
 using namespace std;
 
+using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace graphics {
+namespace di {
 
 GraphicsServices::GraphicsServices(GraphicsOptions options, ResourceServices &resource) :
     _options(move(options)),
@@ -65,6 +66,6 @@ void GraphicsServices::init() {
     _fonts = make_unique<Fonts>(*_window, *_context, *_meshes, *_textures, *_shaders);
 }
 
-} // namespace graphics
+} // namespace di
 
 } // namespace reone

@@ -23,6 +23,7 @@
 using namespace std;
 using namespace std::placeholders;
 
+using namespace reone::di;
 using namespace reone::resource;
 
 namespace reone {

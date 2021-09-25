@@ -21,7 +21,7 @@
 
 namespace reone {
 
-namespace graphics {
+namespace di {
 
 class GraphicsServices;
 
@@ -41,7 +41,7 @@ namespace gui {
  */
 class SceneBuilder {
 public:
-    SceneBuilder(graphics::GraphicsOptions options, graphics::GraphicsServices &graphics);
+    SceneBuilder(graphics::GraphicsOptions options, di::GraphicsServices &graphics);
 
     std::unique_ptr<scene::SceneGraph> build();
 
@@ -57,7 +57,7 @@ public:
 
 private:
     graphics::GraphicsOptions _options;
-    graphics::GraphicsServices &_graphics;
+    di::GraphicsServices &_graphics;
 
     float _aspect { 1.0f };
     float _zNear { 0.1f };
