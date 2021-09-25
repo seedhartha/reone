@@ -58,7 +58,7 @@ static const unordered_map<ResourceType, string> g_signatures {
 };
 
 GffWriter::GffWriter(ResourceType resType, shared_ptr<GffStruct> root) : _resType(resType), _root(root) {
-    ensureNotNull(root, "root");
+    ensurePresent(root, "root");
 }
 
 void GffWriter::save(const fs::path &path) {

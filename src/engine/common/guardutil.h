@@ -20,9 +20,9 @@
 namespace reone {
 
 template <class T>
-inline T ensureNotNull(T obj, const std::string &name) {
+inline T ensurePresent(T obj, const std::string &name) {
     if (!obj) {
-        throw std::invalid_argument(name + " must not be null");
+        throw std::invalid_argument(name + " must be present");
     }
     return std::move(obj);
 }

@@ -46,7 +46,7 @@ Model::Model(
     _superModel(move(superModel)),
     _animationScale(animationScale) {
 
-    ensureNotNull(rootNode, "rootNode");
+    ensurePresent(rootNode, "rootNode");
 
     fillNodeByName(_rootNode);
     computeAABB();

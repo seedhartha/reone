@@ -38,7 +38,7 @@ namespace graphics {
 static constexpr int kHeaderSize = 18;
 
 TgaWriter::TgaWriter(shared_ptr<Texture> texture) : _texture(texture) {
-    ensureNotNull(texture, "texture");
+    ensurePresent(texture, "texture");
 }
 
 void TgaWriter::save(ostream &out, bool compress) {

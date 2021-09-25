@@ -40,7 +40,7 @@ Font::Font(Window &window, Context &context, Meshes &meshes, Shaders &shaders) :
 }
 
 void Font::load(shared_ptr<Texture> texture) {
-    ensureNotNull(texture, "texture");
+    ensurePresent(texture, "texture");
 
     _texture = texture;
 

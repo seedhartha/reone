@@ -36,7 +36,7 @@ BinaryReader::BinaryReader(int signSize, const char *sign) : _signSize(signSize)
 }
 
 void BinaryReader::load(shared_ptr<istream> in) {
-    ensureNotNull(in, "in");
+    ensurePresent(in, "in");
 
     _in = in;
     _reader = make_unique<StreamReader>(in, _endianess);

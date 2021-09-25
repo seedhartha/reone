@@ -50,7 +50,7 @@ ModelSceneNode::ModelSceneNode(
     _usage(usage),
     _animEventListener(animEventListener) {
 
-    ensureNotNull(model, "model");
+    ensurePresent(model, "model");
 
     _volumetric = true;
 

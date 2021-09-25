@@ -27,7 +27,7 @@ StreamWriter::StreamWriter(const shared_ptr<ostream> &stream, boost::endian::ord
     _stream(stream),
     _endianess(endianess) {
 
-    ensureNotNull(stream, "stream");
+    ensurePresent(stream, "stream");
 }
 
 void StreamWriter::putByte(uint8_t val) {

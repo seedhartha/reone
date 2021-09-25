@@ -41,7 +41,7 @@ GrassSceneNode::GrassSceneNode(string name, glm::vec2 quadSize, shared_ptr<Textu
     _texture(texture),
     _lightmap(move(lightmap)) {
 
-    ensureNotNull(texture, "texture");
+    ensurePresent(texture, "texture");
 }
 
 void GrassSceneNode::clear() {

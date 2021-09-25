@@ -29,7 +29,7 @@ StreamReader::StreamReader(const shared_ptr<istream> &stream, endian::order endi
     _stream(stream),
     _endianess(endianess) {
 
-    ensureNotNull(stream, "stream");
+    ensurePresent(stream, "stream");
 }
 
 size_t StreamReader::tell() {

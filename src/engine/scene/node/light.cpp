@@ -45,7 +45,7 @@ LightSceneNode::LightSceneNode(const ModelSceneNode *model, shared_ptr<ModelNode
     ModelNodeSceneNode(modelNode, SceneNodeType::Light, sceneGraph),
     _model(model) {
 
-    ensureNotNull(model, "model");
+    ensurePresent(model, "model");
 
     _color = modelNode->color().getByFrameOrElse(0, glm::vec3(0.0f));
     _radius = modelNode->radius().getByFrameOrElse(0, 0.0f);

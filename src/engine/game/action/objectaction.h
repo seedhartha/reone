@@ -41,7 +41,7 @@ protected:
         _object(object),
         _range(range) {
 
-        ensureNotNull(object, "object");
+        ensurePresent(object, "object");
     }
 };
 
