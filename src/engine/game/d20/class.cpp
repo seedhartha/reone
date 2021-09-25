@@ -26,6 +26,7 @@
 
 using namespace std;
 
+using namespace reone::di;
 using namespace reone::resource;
 
 namespace reone {

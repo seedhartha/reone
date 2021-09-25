@@ -24,6 +24,7 @@
 
 using namespace std;
 
+using namespace reone::di;
 using namespace reone::graphics;
 using namespace reone::scene;
 

@@ -22,7 +22,7 @@
 
 namespace reone {
 
-namespace resource {
+namespace di {
 
 class ResourceServices : boost::noncopyable {
 public:
@@ -30,16 +30,16 @@ public:
 
     void init();
 
-    Resources &resources() { return *_resources; }
-    Strings &strings() { return *_strings; }
+    resource::Resources &resources() { return *_resources; }
+    resource::Strings &strings() { return *_strings; }
 
 private:
     boost::filesystem::path _gamePath;
 
-    std::unique_ptr<Resources> _resources;
-    std::unique_ptr<Strings> _strings;
+    std::unique_ptr<resource::Resources> _resources;
+    std::unique_ptr<resource::Strings> _strings;
 };
 
-} // namespace resource
+} // namespace di
 
 } // namespace reone

@@ -36,6 +36,7 @@
 
 using namespace std;
 
+using namespace reone::di;
 using namespace reone::graphics;
 
 namespace reone {

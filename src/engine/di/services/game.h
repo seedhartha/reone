@@ -38,105 +38,85 @@
 
 namespace reone {
 
-namespace resource {
-
-class ResourceServices;
-
-}
-
-namespace graphics {
-
-class GraphicsServices;
-
-}
-
-namespace audio {
-
-class AudioServices;
-
-}
-
-namespace scene {
-
-class SceneServices;
-
-}
-
-namespace script {
-
-class ScriptServices;
-
-}
-
 namespace game {
 
 class Game;
 
+}
+
+namespace di {
+
+class AudioServices;
+class GraphicsServices;
+class ResourceServices;
+class SceneServices;
+class ScriptServices;
+
 class GameServices : boost::noncopyable {
 public:
     GameServices(
-        Game &game,
-        resource::ResourceServices &resource,
-        graphics::GraphicsServices &graphics,
-        audio::AudioServices &audio,
-        scene::SceneServices &scene,
-        script::ScriptServices &script);
+        game::Game &game,
+        ResourceServices &resource,
+        GraphicsServices &graphics,
+        AudioServices &audio,
+        SceneServices &scene,
+        ScriptServices &script);
 
     void init();
 
-    resource::ResourceServices &resource() { return _resource; }
-    graphics::GraphicsServices &graphics() { return _graphics; }
-    audio::AudioServices &audio() { return _audio; }
-    scene::SceneServices &scene() { return _scene; }
-    script::ScriptServices &script() { return _script; }
+    ResourceServices &resource() { return _resource; }
+    GraphicsServices &graphics() { return _graphics; }
+    AudioServices &audio() { return _audio; }
+    SceneServices &scene() { return _scene; }
+    ScriptServices &script() { return _script; }
 
-    ActionFactory &actionFactory() { return *_actionFactory; }
-    Classes &classes() { return *_classes; }
-    Combat &combat() { return *_combat; }
-    Cursors &cursors() { return *_cursors; }
-    EffectFactory &effectFactory() { return *_effectFactory; }
-    Feats &feats() { return *_feats; }
-    FootstepSounds &footstepSounds() { return *_footstepSounds; }
-    GUISounds &guiSounds() { return *_guiSounds; }
-    ObjectFactory &objectFactory() { return *_objectFactory; }
-    Party &party() { return *_party; }
-    Portraits &portraits() { return *_portraits; }
-    Reputes &reputes() { return *_reputes; }
-    Routines &routines() { return *_routines; }
-    ScriptRunner &scriptRunner() { return *_scriptRunner; }
-    SoundSets &soundSets() { return *_soundSets; }
-    Skills &skills() { return *_skills; }
-    Spells &spells() { return *_spells; }
-    Surfaces &surfaces() { return *_surfaces; }
+    game::ActionFactory &actionFactory() { return *_actionFactory; }
+    game::Classes &classes() { return *_classes; }
+    game::Combat &combat() { return *_combat; }
+    game::Cursors &cursors() { return *_cursors; }
+    game::EffectFactory &effectFactory() { return *_effectFactory; }
+    game::Feats &feats() { return *_feats; }
+    game::FootstepSounds &footstepSounds() { return *_footstepSounds; }
+    game::GUISounds &guiSounds() { return *_guiSounds; }
+    game::ObjectFactory &objectFactory() { return *_objectFactory; }
+    game::Party &party() { return *_party; }
+    game::Portraits &portraits() { return *_portraits; }
+    game::Reputes &reputes() { return *_reputes; }
+    game::Routines &routines() { return *_routines; }
+    game::ScriptRunner &scriptRunner() { return *_scriptRunner; }
+    game::SoundSets &soundSets() { return *_soundSets; }
+    game::Skills &skills() { return *_skills; }
+    game::Spells &spells() { return *_spells; }
+    game::Surfaces &surfaces() { return *_surfaces; }
 
 private:
-    Game &_game;
-    resource::ResourceServices &_resource;
-    graphics::GraphicsServices &_graphics;
-    audio::AudioServices &_audio;
-    scene::SceneServices &_scene;
-    script::ScriptServices &_script;
-    
-    std::unique_ptr<ActionFactory> _actionFactory;
-    std::unique_ptr<Classes> _classes;
-    std::unique_ptr<Combat> _combat;
-    std::unique_ptr<Cursors> _cursors;
-    std::unique_ptr<EffectFactory> _effectFactory;
-    std::unique_ptr<Feats> _feats;
-    std::unique_ptr<FootstepSounds> _footstepSounds;
-    std::unique_ptr<GUISounds> _guiSounds;
-    std::unique_ptr<ObjectFactory> _objectFactory;
-    std::unique_ptr<Party> _party;
-    std::unique_ptr<Portraits> _portraits;
-    std::unique_ptr<Reputes> _reputes;
-    std::unique_ptr<Routines> _routines;
-    std::unique_ptr<ScriptRunner> _scriptRunner;
-    std::unique_ptr<SoundSets> _soundSets;
-    std::unique_ptr<Skills> _skills;
-    std::unique_ptr<Spells> _spells;
-    std::unique_ptr<Surfaces> _surfaces;
+    game::Game &_game;
+    ResourceServices &_resource;
+    GraphicsServices &_graphics;
+    AudioServices &_audio;
+    SceneServices &_scene;
+    ScriptServices &_script;
+
+    std::unique_ptr<game::ActionFactory> _actionFactory;
+    std::unique_ptr<game::Classes> _classes;
+    std::unique_ptr<game::Combat> _combat;
+    std::unique_ptr<game::Cursors> _cursors;
+    std::unique_ptr<game::EffectFactory> _effectFactory;
+    std::unique_ptr<game::Feats> _feats;
+    std::unique_ptr<game::FootstepSounds> _footstepSounds;
+    std::unique_ptr<game::GUISounds> _guiSounds;
+    std::unique_ptr<game::ObjectFactory> _objectFactory;
+    std::unique_ptr<game::Party> _party;
+    std::unique_ptr<game::Portraits> _portraits;
+    std::unique_ptr<game::Reputes> _reputes;
+    std::unique_ptr<game::Routines> _routines;
+    std::unique_ptr<game::ScriptRunner> _scriptRunner;
+    std::unique_ptr<game::SoundSets> _soundSets;
+    std::unique_ptr<game::Skills> _skills;
+    std::unique_ptr<game::Spells> _spells;
+    std::unique_ptr<game::Surfaces> _surfaces;
 };
 
-} // namespace game
+} // namespace di
 
 } // namespace reone

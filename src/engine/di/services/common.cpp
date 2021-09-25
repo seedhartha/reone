@@ -21,9 +21,13 @@ using namespace std;
 
 namespace reone {
 
+namespace di {
+
 void CommonServices::init() {
     _executor = make_unique<Executor>();
     _executor->init();
 }
+
+} // namespace di
 
 } // namespace reone

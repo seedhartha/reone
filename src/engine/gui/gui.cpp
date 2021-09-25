@@ -34,7 +34,7 @@
 using namespace std;
 using namespace std::placeholders;
 
-using namespace reone::audio;
+using namespace reone::di;
 using namespace reone::graphics;
 using namespace reone::resource;
 

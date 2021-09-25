@@ -24,39 +24,19 @@
 
 namespace reone {
 
-namespace resource {
-
-class ResourceServices;
-
-}
-
-namespace graphics {
-
-class GraphicsServices;
-
-}
-
-namespace audio {
-
-class AudioServices;
-
-}
-
-namespace scene {
-
-class SceneServices;
-
-}
-
-namespace script {
-
-class ScriptServices;
-
-}
-
 namespace game {
 
 class Game;
+
+}
+
+namespace di {
+
+class AudioServices;
+class GraphicsServices;
+class ResourceServices;
+class SceneServices;
+class ScriptServices;
 
 }
 
@@ -98,12 +78,11 @@ private:
 
     std::unique_ptr<game::Game> newGame(
         game::GameID gameId,
-        resource::ResourceServices &resource,
-        graphics::GraphicsServices &graphics,
-        audio::AudioServices &audio,
-        scene::SceneServices &scene,
-        script::ScriptServices &script
-    );
+        di::ResourceServices &resource,
+        di::GraphicsServices &graphics,
+        di::AudioServices &audio,
+        di::SceneServices &scene,
+        di::ScriptServices &script);
 };
 
 } // namespace reone

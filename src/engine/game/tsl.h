@@ -32,11 +32,11 @@ public:
     TSL(
         boost::filesystem::path path,
         Options options,
-        resource::ResourceServices &resource,
-        graphics::GraphicsServices &graphics,
-        audio::AudioServices &audio,
-        scene::SceneServices &scene,
-        script::ScriptServices &script);
+        di::ResourceServices &resource,
+        di::GraphicsServices &graphics,
+        di::AudioServices &audio,
+        di::SceneServices &scene,
+        di::ScriptServices &script);
 
     void initResourceProviders() override;
 };

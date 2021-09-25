@@ -23,15 +23,10 @@
 
 namespace reone {
 
-namespace resource {
-
-class ResourceServices;
-
-}
-
-namespace graphics {
+namespace di {
 
 class GraphicsServices;
+class ResourceServices;
 
 }
 
@@ -39,15 +34,15 @@ namespace game {
 
 class Skills : boost::noncopyable {
 public:
-    Skills(graphics::GraphicsServices &graphics, resource::ResourceServices &resource);
+    Skills(di::GraphicsServices &graphics, di::ResourceServices &resource);
 
     void init();
 
     std::shared_ptr<Skill> get(SkillType type) const;
 
 private:
-    graphics::GraphicsServices &_graphics;
-    resource::ResourceServices &_resource;
+    di::GraphicsServices &_graphics;
+    di::ResourceServices &_resource;
 
     std::unordered_map<SkillType, std::shared_ptr<Skill>> _skills;
 };

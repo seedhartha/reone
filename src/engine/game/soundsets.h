@@ -24,7 +24,7 @@
 
 namespace reone {
 
-namespace resource {
+namespace di {
 
 class ResourceServices;
 
@@ -34,11 +34,11 @@ namespace game {
 
 class SoundSets : public MemoryCache<std::string, SoundSet> {
 public:
-    SoundSets(audio::AudioFiles &audioFiles, resource::ResourceServices &resource);
+    SoundSets(audio::AudioFiles &audioFiles, di::ResourceServices &resource);
 
 private:
     audio::AudioFiles &_audioFiles;
-    resource::ResourceServices &_resource;
+    di::ResourceServices &_resource;
 
     std::shared_ptr<SoundSet> doGet(std::string resRef);
 };

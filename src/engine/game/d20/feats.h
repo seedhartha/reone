@@ -25,7 +25,7 @@
 
 namespace reone {
 
-namespace resource {
+namespace di {
 
 class ResourceServices;
 
@@ -35,7 +35,7 @@ namespace game {
 
 class Feats : boost::noncopyable {
 public:
-    Feats(graphics::Textures &textures, resource::ResourceServices &resource);
+    Feats(graphics::Textures &textures, di::ResourceServices &resource);
 
     void init();
 
@@ -43,7 +43,7 @@ public:
 
 private:
     graphics::Textures &_textures;
-    resource::ResourceServices &_resource;
+    di::ResourceServices &_resource;
 
     std::unordered_map<FeatType, std::shared_ptr<Feat>> _feats;
 };

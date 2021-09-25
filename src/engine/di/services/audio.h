@@ -23,31 +23,27 @@
 
 namespace reone {
 
-namespace resource {
+namespace di {
 
 class ResourceServices;
 
-}
-
-namespace audio {
-
 class AudioServices : boost::noncopyable {
 public:
-    AudioServices(AudioOptions options, resource::ResourceServices &resource);
+    AudioServices(audio::AudioOptions options, ResourceServices &resource);
 
     void init();
 
-    AudioFiles &files() { return *_files; }
-    AudioPlayer &player() { return *_player; }
+    audio::AudioFiles &files() { return *_files; }
+    audio::AudioPlayer &player() { return *_player; }
 
 private:
-    AudioOptions _options;
-    resource::ResourceServices &_resource;
+    audio::AudioOptions _options;
+    ResourceServices &_resource;
 
-    std::unique_ptr<AudioFiles> _files;
-    std::unique_ptr<AudioPlayer> _player;
+    std::unique_ptr<audio::AudioFiles> _files;
+    std::unique_ptr<audio::AudioPlayer> _player;
 };
 
-} // namespace audio
+} // namespace di
 
 } // namespace reone

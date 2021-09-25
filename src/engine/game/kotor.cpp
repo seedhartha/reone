@@ -23,6 +23,7 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::di;
 using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;

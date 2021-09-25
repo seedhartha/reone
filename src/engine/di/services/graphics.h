@@ -33,51 +33,47 @@
 
 namespace reone {
 
-namespace resource {
+namespace di {
 
 class ResourceServices;
 
-}
-
-namespace graphics {
-
 class GraphicsServices : boost::noncopyable {
 public:
-    GraphicsServices(GraphicsOptions options, resource::ResourceServices &resource);
+    GraphicsServices(graphics::GraphicsOptions options, ResourceServices &resource);
 
     void init();
 
-    Context &context() { return *_context; }
-    Features &features() { return *_features; }
-    Fonts &fonts() { return *_fonts; }
-    Lips &lips() { return *_lips; }
-    Materials &materials() { return *_materials; }
-    Meshes &meshes() { return *_meshes; }
-    Models &models() { return *_models; }
-    PBRIBL &pbrIbl() { return *_pbrIbl; }
-    Shaders &shaders() { return *_shaders; }
-    Textures &textures() { return *_textures; }
-    Walkmeshes &walkmeshes() { return *_walkmeshes; }
-    Window &window() { return *_window; }
+    graphics::Context &context() { return *_context; }
+    graphics::Features &features() { return *_features; }
+    graphics::Fonts &fonts() { return *_fonts; }
+    graphics::Lips &lips() { return *_lips; }
+    graphics::Materials &materials() { return *_materials; }
+    graphics::Meshes &meshes() { return *_meshes; }
+    graphics::Models &models() { return *_models; }
+    graphics::PBRIBL &pbrIbl() { return *_pbrIbl; }
+    graphics::Shaders &shaders() { return *_shaders; }
+    graphics::Textures &textures() { return *_textures; }
+    graphics::Walkmeshes &walkmeshes() { return *_walkmeshes; }
+    graphics::Window &window() { return *_window; }
 
 private:
-    GraphicsOptions _options;
-    resource::ResourceServices &_resource;
+    graphics::GraphicsOptions _options;
+    ResourceServices &_resource;
 
-    std::unique_ptr<Context> _context;
-    std::unique_ptr<Features> _features;
-    std::unique_ptr<Fonts> _fonts;
-    std::unique_ptr<Lips> _lips;
-    std::unique_ptr<Materials> _materials;
-    std::unique_ptr<Meshes> _meshes;
-    std::unique_ptr<Models> _models;
-    std::unique_ptr<PBRIBL> _pbrIbl;
-    std::unique_ptr<Shaders> _shaders;
-    std::unique_ptr<Textures> _textures;
-    std::unique_ptr<Walkmeshes> _walkmeshes;
-    std::unique_ptr<Window> _window;
+    std::unique_ptr<graphics::Context> _context;
+    std::unique_ptr<graphics::Features> _features;
+    std::unique_ptr<graphics::Fonts> _fonts;
+    std::unique_ptr<graphics::Lips> _lips;
+    std::unique_ptr<graphics::Materials> _materials;
+    std::unique_ptr<graphics::Meshes> _meshes;
+    std::unique_ptr<graphics::Models> _models;
+    std::unique_ptr<graphics::PBRIBL> _pbrIbl;
+    std::unique_ptr<graphics::Shaders> _shaders;
+    std::unique_ptr<graphics::Textures> _textures;
+    std::unique_ptr<graphics::Walkmeshes> _walkmeshes;
+    std::unique_ptr<graphics::Window> _window;
 };
 
-} // namespace graphics
+} // namespace di
 
 } // namespace reone

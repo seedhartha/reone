@@ -28,6 +28,7 @@ using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::audio;
+using namespace reone::di;
 using namespace reone::resource;
 
 namespace reone {

@@ -24,8 +24,13 @@ namespace reone {
 
 namespace graphics {
 
-class GraphicsServices;
 class Texture;
+
+}
+
+namespace di {
+
+class GraphicsServices;
 
 }
 
@@ -35,7 +40,7 @@ class SceneGraph;
 
 class ControlRenderPipeline : boost::noncopyable {
 public:
-    ControlRenderPipeline(glm::ivec4 extent, graphics::GraphicsServices &graphics, SceneGraph &scene);
+    ControlRenderPipeline(glm::ivec4 extent, di::GraphicsServices &graphics, SceneGraph &scene);
 
     void init();
     void render(const glm::ivec2 &offset);
@@ -43,7 +48,7 @@ public:
 private:
     glm::vec4 _extent;
     SceneGraph &_sceneGraph;
-    graphics::GraphicsServices &_graphics;
+    di::GraphicsServices &_graphics;
 
     graphics::Framebuffer _geometry;
     std::unique_ptr<graphics::Texture> _geometryColor;
