@@ -22,7 +22,7 @@
 
 #include "../../d20/classes.h"
 #include "../../game.h"
-#include "../../object/objectfactory.h"
+#include "../../object/factory.h"
 #include "../../party.h"
 
 using namespace std;

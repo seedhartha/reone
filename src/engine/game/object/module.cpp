@@ -20,8 +20,8 @@
 #include "../../common/logutil.h"
 #include "../../resource/resources.h"
 
-#include "../action/actionfactory.h"
 #include "../action/attack.h"
+#include "../action/factory.h"
 #include "../action/opencontainer.h"
 #include "../action/opendoor.h"
 #include "../action/startconversation.h"
@@ -29,7 +29,7 @@
 #include "../party.h"
 #include "../reputes.h"
 
-#include "objectfactory.h"
+#include "factory.h"
 
 using namespace std;
 

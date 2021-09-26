@@ -41,10 +41,10 @@
 #include "../script/scripts.h"
 #include "../video/bikreader.h"
 
-#include "combat/combat.h"
+#include "combat.h"
 #include "cursors.h"
 #include "location.h"
-#include "object/objectfactory.h"
+#include "object/factory.h"
 #include "party.h"
 #include "soundsets.h"
 #include "surfaces.h"

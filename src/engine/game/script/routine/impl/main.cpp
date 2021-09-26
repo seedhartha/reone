@@ -25,8 +25,8 @@
 #include "../../../../script/exception/argument.h"
 #include "../../../../script/exception/notimpl.h"
 
-#include "../../../action/actionfactory.h"
-#include "../../../combat/combat.h"
+#include "../../../action/factory.h"
+#include "../../../combat.h"
 #include "../../../game.h"
 #include "../../../location.h"
 #include "../../../object/door.h"

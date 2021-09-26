@@ -17,9 +17,9 @@
 
 #include "usefeat.h"
 
-#include "../combat/combat.h"
+#include "../combat.h"
 #include "../game.h"
-#include "../object/objectfactory.h"
+#include "../object/factory.h"
 #include "../object/spatial.h"
 
 using namespace std;

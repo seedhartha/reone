@@ -43,7 +43,7 @@
 #include "../script/runner.h"
 #include "../surfaces.h"
 
-#include "objectfactory.h"
+#include "factory.h"
 
 using namespace std;
 using namespace std::placeholders;

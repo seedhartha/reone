@@ -23,7 +23,7 @@
 #include "../../script/types.h"
 
 #include "../game.h"
-#include "../object/objectfactory.h"
+#include "../object/factory.h"
 #include "../party.h"
 #include "../portrait.h"
 #include "../portraits.h"

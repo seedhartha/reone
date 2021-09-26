@@ -17,18 +17,18 @@
 
 #pragma once
 
-#include "../../game/action/actionfactory.h"
-#include "../../game/combat/combat.h"
+#include "../../game/action/factory.h"
+#include "../../game/combat.h"
 #include "../../game/cursors.h"
 #include "../../game/d20/classes.h"
 #include "../../game/d20/feats.h"
 #include "../../game/d20/skills.h"
 #include "../../game/d20/spells.h"
-#include "../../game/effect/effectfactory.h"
+#include "../../game/effect/factory.h"
 #include "../../game/footstepsounds.h"
 #include "../../game/game.h"
 #include "../../game/gui/sounds.h"
-#include "../../game/object/objectfactory.h"
+#include "../../game/object/factory.h"
 #include "../../game/party.h"
 #include "../../game/portraits.h"
 #include "../../game/reputes.h"

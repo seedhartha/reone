@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include "../../common/timer.h"
+#include "../common/timer.h"
 
-#include "../action/objectaction.h"
-#include "../effect/damage.h"
-#include "../object/creature.h"
-#include "../types.h"
+#include "action/objectaction.h"
+#include "effect/damage.h"
+#include "object/creature.h"
+#include "types.h"
 
 namespace reone {
 

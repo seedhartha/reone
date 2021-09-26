@@ -40,7 +40,7 @@
 #include "../soundsets.h"
 #include "../surfaces.h"
 
-#include "objectfactory.h"
+#include "factory.h"
 
 using namespace std;
 
