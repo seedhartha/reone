@@ -28,9 +28,6 @@ namespace reone {
 
 namespace di {
 
-ScriptServices::ScriptServices(ResourceServices &resource) : _resource(resource) {
-}
-
 void ScriptServices::init() {
     _scripts = make_unique<Scripts>(_resource.resources());
 }

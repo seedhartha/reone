@@ -28,11 +28,6 @@ namespace reone {
 
 namespace di {
 
-SceneServices::SceneServices(GraphicsOptions options, GraphicsServices &graphics) :
-    _options(move(options)),
-    _graphics(graphics) {
-}
-
 void SceneServices::init() {
     _graph = make_unique<SceneGraph>(
         _options,

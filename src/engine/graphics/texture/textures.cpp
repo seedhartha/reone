@@ -54,6 +54,8 @@ void Textures::init() {
     _defaultCubemap->init();
     _defaultCubemap->bind();
     _defaultCubemap->clearPixels(1, 1, PixelFormat::RGB);
+
+    bindDefaults();
 }
 
 void Textures::invalidateCache() {

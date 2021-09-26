@@ -29,7 +29,10 @@ class GraphicsServices;
 
 class SceneServices : boost::noncopyable {
 public:
-    SceneServices(graphics::GraphicsOptions options, GraphicsServices &graphics);
+    SceneServices(graphics::GraphicsOptions options, GraphicsServices &graphics) :
+        _options(std::move(options)),
+        _graphics(graphics) {
+    }
 
     void init();
 
