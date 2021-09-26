@@ -42,11 +42,8 @@ SpatialObject::SpatialObject(
     SceneGraph *sceneGraph
 ) :
     Object(id, type, game),
-    _objectFactory(objectFactory),
-    _sceneGraph(sceneGraph) {
-
-    ensurePresent(objectFactory, "objectFactory");
-    ensurePresent(sceneGraph, "sceneGraph");
+    _objectFactory(ensurePresent(objectFactory, "objectFactory")),
+    _sceneGraph(ensurePresent(sceneGraph, "sceneGraph")) {
 }
 
 shared_ptr<Item> SpatialObject::addItem(const string &resRef, int stackSize, bool dropable) {

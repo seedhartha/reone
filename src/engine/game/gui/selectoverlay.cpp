@@ -57,9 +57,7 @@ static constexpr int kActionHeight = 59;
 
 static string g_attackIcon("i_attack");
 
-SelectionOverlay::SelectionOverlay(Game *game) : _game(game) {
-    ensurePresent(game, "game");
-
+SelectionOverlay::SelectionOverlay(Game *game) : _game(ensurePresent(game, "game")) {
     _actionSlots.resize(kNumActionSlots);
 }
 

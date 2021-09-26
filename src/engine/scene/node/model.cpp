@@ -46,11 +46,9 @@ ModelSceneNode::ModelSceneNode(
     IAnimationEventListener *animEventListener
 ) :
     SceneNode(model->name(), SceneNodeType::Model, sceneGraph),
-    _model(model),
+    _model(ensurePresent(model, "model")),
     _usage(usage),
     _animEventListener(animEventListener) {
-
-    ensurePresent(model, "model");
 
     _volumetric = true;
 

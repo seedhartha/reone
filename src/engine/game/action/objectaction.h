@@ -38,10 +38,8 @@ protected:
 
     ObjectAction(Game &game, ActionType type, std::shared_ptr<Object> object, float range = 1.0f, bool userAction = false) :
         Action(game, type, userAction),
-        _object(object),
+        _object(ensurePresent(object, "object")),
         _range(range) {
-
-        ensurePresent(object, "object");
     }
 };
 

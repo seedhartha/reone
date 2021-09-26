@@ -31,7 +31,7 @@ class PickUpItemAction : public Action {
 public:
     PickUpItemAction(Game &game, std::shared_ptr<Item> item) :
         Action(game, ActionType::PickUpItem),
-        _item(ensurePresent(std::move(item), "item")) {
+        _item(ensurePresent(item, "item")) {
     }
 
     void execute(Object &actor, float dt) override;

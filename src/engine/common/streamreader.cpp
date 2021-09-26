@@ -26,10 +26,8 @@ namespace endian = boost::endian;
 namespace reone {
 
 StreamReader::StreamReader(const shared_ptr<istream> &stream, endian::order endianess) :
-    _stream(stream),
+    _stream(ensurePresent(stream, "stream")),
     _endianess(endianess) {
-
-    ensurePresent(stream, "stream");
 }
 
 size_t StreamReader::tell() {

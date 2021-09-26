@@ -30,8 +30,7 @@ public:
     /**
      * @param compute function used to lazily compute a value given a key
      */
-    MemoryCache(std::function<std::shared_ptr<V>(K)> compute) : _compute(compute) {
-        ensurePresent(compute, "compute");
+    MemoryCache(std::function<std::shared_ptr<V>(K)> compute) : _compute(ensurePresent(compute, "compute")) {
     }
 
     void invalidate() {

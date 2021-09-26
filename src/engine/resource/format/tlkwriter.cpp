@@ -36,8 +36,8 @@ struct StringFlags {
     static constexpr int soundLengthPresent = 4;
 };
 
-TlkWriter::TlkWriter(shared_ptr<TalkTable> talkTable) : _talkTable(talkTable) {
-    ensurePresent(talkTable, "talkTable");
+TlkWriter::TlkWriter(shared_ptr<TalkTable> talkTable) :
+    _talkTable(ensurePresent(talkTable, "talkTable")) {
 }
 
 void TlkWriter::save(const fs::path &path) {

@@ -36,8 +36,9 @@ namespace script {
 
 static constexpr int kStartInstructionOffset = 13;
 
-ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<ExecutionContext> context) : _context(move(context)), _program(program) {
-    ensurePresent(program, "program");
+ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<ExecutionContext> context) :
+    _context(move(context)),
+    _program(ensurePresent(program, "program")) {
 
     static unordered_map<ByteCode, function<void(ScriptExecution *, const Instruction &)>> handlers {
         { ByteCode::CopyDownSP, &ScriptExecution::executeCopyDownSP },

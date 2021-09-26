@@ -32,8 +32,8 @@ namespace resource {
 
 static const char kSignature[] = "2DA V2.b";
 
-TwoDaWriter::TwoDaWriter(shared_ptr<TwoDA> twoDa) : _twoDa(twoDa) {
-    ensurePresent(twoDa, "twoDa");
+TwoDaWriter::TwoDaWriter(shared_ptr<TwoDA> twoDa) :
+    _twoDa(ensurePresent(twoDa, "twoDa")) {
 }
 
 void TwoDaWriter::save(const fs::path &path) {

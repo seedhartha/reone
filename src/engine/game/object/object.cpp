@@ -31,8 +31,10 @@ static constexpr float kDefaultMaxObjectDistance = 2.0f;
 static constexpr float kMaxConversationDistance = 4.0f;
 static constexpr float kDistanceWalk = 4.0f;
 
-Object::Object(uint32_t id, ObjectType type, Game *game) : _id(id), _type(type), _game(game) {
-    ensurePresent(game, "game");
+Object::Object(uint32_t id, ObjectType type, Game *game) :
+    _id(id),
+    _type(type),
+    _game(ensurePresent(game, "game")) {
 }
 
 void Object::update(float dt) {
