@@ -46,7 +46,8 @@ class ScriptServices;
 class Engine : boost::noncopyable {
 public:
     Engine(int argc, char **argv) :
-        _argc(argc), _argv(argv) {
+        _argc(argc),
+        _argv(argv) {
     }
 
     /**
@@ -61,21 +62,7 @@ private:
     int _argc;
     char **_argv;
 
-    boost::program_options::options_description _optsCommon;
-    boost::program_options::options_description _optsCmdLine {"Usage"};
-    boost::program_options::variables_map _variables;
-
-    bool _showHelp {false};
-    boost::filesystem::path _gamePath;
-    game::Options _gameOptions;
-
-    void initOptions();
-    void parseOptions();
-    void loadOptions();
-
-    int runGame();
-
-    game::GameID determineGameID();
+    game::GameID determineGameID(const boost::filesystem::path &gamePath);
 };
 
 } // namespace reone

@@ -17,23 +17,24 @@
 
 #pragma once
 
-#include "../audio/options.h"
-#include "../graphics/options.h"
+#include <boost/program_options.hpp>
+
+#include "game/options.h"
 
 namespace reone {
 
-namespace game {
+class OptionsParser {
+public:
+    OptionsParser(int argc, char **argv) :
+        _argc(argc),
+        _argv(argv) {
+    }
 
-struct Options {
-    boost::filesystem::path gamePath;
-    graphics::GraphicsOptions graphics;
-    audio::AudioOptions audio;
-    std::string module;
-    bool developer {false};
-    bool logToFile {false};
-    int logChannels {0};
+    game::Options invoke();
+
+private:
+    int _argc;
+    char **_argv;
 };
-
-} // namespace game
 
 } // namespace reone

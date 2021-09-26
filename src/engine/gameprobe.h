@@ -17,23 +17,20 @@
 
 #pragma once
 
-#include "../audio/options.h"
-#include "../graphics/options.h"
+#include "game/types.h"
 
 namespace reone {
 
-namespace game {
+class GameProbe {
+public:
+    GameProbe(boost::filesystem::path gamePath) :
+        _gamePath(std::move(gamePath)) {
+    }
 
-struct Options {
-    boost::filesystem::path gamePath;
-    graphics::GraphicsOptions graphics;
-    audio::AudioOptions audio;
-    std::string module;
-    bool developer {false};
-    bool logToFile {false};
-    int logChannels {0};
+    game::GameID invoke();
+
+private:
+    boost::filesystem::path _gamePath;
 };
-
-} // namespace game
 
 } // namespace reone
