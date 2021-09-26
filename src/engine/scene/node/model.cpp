@@ -42,12 +42,30 @@ static constexpr float kTransitionLength = 0.25f;
 ModelSceneNode::ModelSceneNode(
     shared_ptr<Model> model,
     ModelUsage usage,
-    SceneGraph *sceneGraph,
+    SceneGraph &sceneGraph,
+    Context &context,
+    Features &features,
+    Materials &materials,
+    Meshes &meshes,
+    PBRIBL &pbrIbl,
+    Shaders &shaders,
+    Textures &textures,
     IAnimationEventListener *animEventListener
 ) :
-    SceneNode(model->name(), SceneNodeType::Model, sceneGraph),
+    SceneNode(
+        model->name(),
+        SceneNodeType::Model,
+        sceneGraph,
+        context,
+        meshes,
+        shaders
+    ),
     _model(ensurePresent(model, "model")),
     _usage(usage),
+    _features(features),
+    _materials(materials),
+    _pbrIbl(pbrIbl),
+    _textures(textures),
     _animEventListener(animEventListener) {
 
     _volumetric = true;
@@ -81,7 +99,7 @@ void ModelSceneNode::buildNodeTree(shared_ptr<ModelNode> node, SceneNode *parent
     _nodeByName.insert(make_pair(node->name(), sceneNode));
 
     if (node->isReference()) {
-        auto model = make_shared<ModelSceneNode>(node->reference()->model, _usage, _sceneGraph, _animEventListener);
+        auto model = _sceneGraph.newModel(node->reference()->model, _usage, _animEventListener);
         attach(node->name(), move(model));
     }
     for (auto &child : node->children()) {
@@ -116,19 +134,19 @@ void ModelSceneNode::computeAABB() {
 }
 
 unique_ptr<DummySceneNode> ModelSceneNode::newDummySceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<DummySceneNode>(node, _sceneGraph);
+    return make_unique<DummySceneNode>(node, _sceneGraph, _context, _meshes, _shaders);
 }
 
 unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<MeshSceneNode>(this, node, _sceneGraph);
+    return make_unique<MeshSceneNode>(this, node, _sceneGraph, _context, _features, _materials, _meshes, _pbrIbl, _shaders, _textures);
 }
 
 unique_ptr<LightSceneNode> ModelSceneNode::newLightSceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<LightSceneNode>(this, node, _sceneGraph);
+    return make_unique<LightSceneNode>(this, node, _sceneGraph, _context, _meshes, _shaders);
 }
 
 unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<EmitterSceneNode>(this, node, _sceneGraph);
+    return make_unique<EmitterSceneNode>(this, node, _sceneGraph, _context, _meshes, _shaders);
 }
 
 void ModelSceneNode::signalEvent(const string &name) {

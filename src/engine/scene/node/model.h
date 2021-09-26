@@ -31,6 +31,15 @@
 
 namespace reone {
 
+namespace graphics {
+
+class Features;
+class Materials;
+class PBRIBL;
+class Textures;
+
+}
+
 namespace scene {
 
 constexpr float kDefaultDrawDistance = 1024.0f;
@@ -40,7 +49,14 @@ public:
     ModelSceneNode(
         std::shared_ptr<graphics::Model> model,
         ModelUsage usage,
-        SceneGraph *sceneGraph,
+        SceneGraph &sceneGraph,
+        graphics::Context &context,
+        graphics::Features &features,
+        graphics::Materials &materials,
+        graphics::Meshes &meshes,
+        graphics::PBRIBL &pbrIbl,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
         IAnimationEventListener *animEventListener = nullptr);
 
     void update(float dt) override;
@@ -121,6 +137,15 @@ private:
     IAnimationEventListener *_animEventListener;
 
     float _drawDistance { kDefaultDrawDistance };
+
+    // Services
+
+    graphics::Features &_features;
+    graphics::Materials &_materials;
+    graphics::PBRIBL &_pbrIbl;
+    graphics::Textures &_textures;
+
+    // END Services
 
     // Lookups
 

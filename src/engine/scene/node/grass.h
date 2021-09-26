@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../../common/guardutil.h"
+
 #include "../nodeelement.h"
 
 #include "scenenode.h"
@@ -39,7 +41,28 @@ public:
         int variant { 0 };
     };
 
-    GrassSceneNode(std::string name, glm::vec2 quadSize, std::shared_ptr<graphics::Texture> texture, std::shared_ptr<graphics::Texture> lightmap, SceneGraph *graph);
+    GrassSceneNode(
+        std::string name,
+        glm::vec2 quadSize,
+        std::shared_ptr<graphics::Texture> texture,
+        std::shared_ptr<graphics::Texture> lightmap,
+        SceneGraph &sceneGraph,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders
+    ) :
+        SceneNode(
+            std::move(name),
+            SceneNodeType::Grass,
+            sceneGraph,
+            context,
+            meshes,
+            shaders
+        ),
+        _quadSize(std::move(quadSize)),
+        _texture(ensurePresent(texture, "texture")),
+        _lightmap(lightmap) {
+    }
 
     void clear();
     void addCluster(std::shared_ptr<Cluster> cluster);

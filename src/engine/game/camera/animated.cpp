@@ -18,6 +18,7 @@
 #include "animated.h"
 
 #include "../../graphics/types.h"
+#include "../../scene/scenegraph.h"
 #include "../../scene/node/camera.h"
 #include "../../scene/node/model.h"
 
@@ -32,7 +33,7 @@ namespace game {
 
 AnimatedCamera::AnimatedCamera(float aspect, SceneGraph *sceneGraph) : _sceneGraph(sceneGraph), _aspect(aspect) {
     _sceneGraph = sceneGraph;
-    _sceneNode = make_shared<CameraSceneNode>("", glm::mat4(1.0f), _sceneGraph);
+    _sceneNode = _sceneGraph->newCamera("", glm::mat4(1.0f));
     updateProjection();
 }
 
@@ -74,7 +75,7 @@ void AnimatedCamera::setModel(shared_ptr<Model> model) {
         (!_model && !model)) return;
 
     if (model) {
-        _model = make_unique<ModelSceneNode>(move(model), ModelUsage::Camera, _sceneGraph);
+        _model = _sceneGraph->newModel(move(model), ModelUsage::Camera);
         _model->attach("camerahook", _sceneNode);
     } else {
         _model.reset();

@@ -39,7 +39,13 @@ public:
 protected:
     std::shared_ptr<graphics::ModelNode> _modelNode;
 
-    ModelNodeSceneNode(std::shared_ptr<graphics::ModelNode> modelNode, SceneNodeType type, SceneGraph *sceneGraph);
+    ModelNodeSceneNode(
+        std::shared_ptr<graphics::ModelNode> modelNode,
+        SceneNodeType type,
+        SceneGraph &sceneGraph,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders);
 
 private:
     glm::mat4 _boneTransform { 1.0f }; /**< model space transform relative to the rest pose */

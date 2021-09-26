@@ -25,7 +25,21 @@ namespace scene {
 
 class DummySceneNode : public ModelNodeSceneNode {
 public:
-    DummySceneNode(std::shared_ptr<graphics::ModelNode> modelNode, SceneGraph *sceneGraph) : ModelNodeSceneNode(std::move(modelNode), SceneNodeType::Dummy, sceneGraph) {
+    DummySceneNode(
+        std::shared_ptr<graphics::ModelNode> modelNode,
+        SceneGraph &sceneGraph,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders
+    ) :
+        ModelNodeSceneNode(
+            std::move(modelNode),
+            SceneNodeType::Dummy,
+            sceneGraph,
+            context,
+            meshes,
+            shaders
+        ) {
     }
 };
 

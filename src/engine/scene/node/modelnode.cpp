@@ -28,8 +28,22 @@ namespace reone {
 
 namespace scene {
 
-ModelNodeSceneNode::ModelNodeSceneNode(shared_ptr<ModelNode> modelNode, SceneNodeType type, SceneGraph *sceneGraph) :
-    SceneNode(modelNode->name(), type, sceneGraph),
+ModelNodeSceneNode::ModelNodeSceneNode(
+    shared_ptr<ModelNode> modelNode,
+    SceneNodeType type,
+    SceneGraph &sceneGraph,
+    Context &context,
+    Meshes &meshes,
+    Shaders &shaders
+) :
+    SceneNode(
+        modelNode->name(),
+        type,
+        sceneGraph,
+        context,
+        meshes,
+        shaders
+    ),
     _modelNode(ensurePresent(modelNode, "modelNode")) {
 }
 

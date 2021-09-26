@@ -18,6 +18,7 @@
 #include "firstperson.h"
 
 #include "../../graphics/types.h"
+#include "../../scene/scenegraph.h"
 #include "../../scene/node/camera.h"
 
 using namespace std;
@@ -34,7 +35,7 @@ static constexpr float kMouseMultiplier = glm::pi<float>() / 4000.0f;
 
 FirstPersonCamera::FirstPersonCamera(float aspect, float fovy, SceneGraph *sceneGraph) {
     glm::mat4 projection(glm::perspective(fovy, aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
-    _sceneNode = make_unique<CameraSceneNode>("", move(projection), sceneGraph);
+    _sceneNode = sceneGraph->newCamera("", move(projection));
 }
 
 bool FirstPersonCamera::handle(const SDL_Event &event) {

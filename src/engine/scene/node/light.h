@@ -29,7 +29,13 @@ class ModelSceneNode;
 
 class LightSceneNode : public ModelNodeSceneNode {
 public:
-    LightSceneNode(const ModelSceneNode *model, std::shared_ptr<graphics::ModelNode> modelNode, SceneGraph *sceneGraph);
+    LightSceneNode(
+        const ModelSceneNode *model,
+        std::shared_ptr<graphics::ModelNode> modelNode,
+        SceneGraph &sceneGraph,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders);
 
     void update(float dt) override;
     void drawLensFlares(const graphics::ModelNode::LensFlare &flare);

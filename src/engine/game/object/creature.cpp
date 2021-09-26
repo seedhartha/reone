@@ -1011,7 +1011,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     shared_ptr<Model> bodyModel(_game->models().get(bodyModelName));
     if (!bodyModel) return nullptr;
 
-    auto bodySceneNode = make_unique<ModelSceneNode>(bodyModel, ModelUsage::Creature, _sceneGraph, this);
+    auto bodySceneNode = _sceneGraph->newModel(bodyModel, ModelUsage::Creature, this);
 
     // Body texture
 
@@ -1037,12 +1037,12 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!headModelName.empty()) {
         shared_ptr<Model> headModel(_game->models().get(headModelName));
         if (headModel) {
-            auto headSceneNode = make_shared<ModelSceneNode>(headModel, ModelUsage::Creature, _sceneGraph, this);
+            auto headSceneNode = _sceneGraph->newModel(headModel, ModelUsage::Creature, this);
             headSceneNode->setInanimateNodes(bodyModel->getAncestorNodes(g_headHookNode));
-            bodySceneNode->attach(g_headHookNode, headSceneNode);
+            bodySceneNode->attach(g_headHookNode, move(headSceneNode));
             if (maskModel) {
-                auto maskSceneNode = make_shared<ModelSceneNode>(maskModel, ModelUsage::Equipment, _sceneGraph, this);
-                headSceneNode->attach(g_maskHookNode, maskSceneNode);
+                auto maskSceneNode = _sceneGraph->newModel(maskModel, ModelUsage::Equipment, this);
+                headSceneNode->attach(g_maskHookNode, move(maskSceneNode));
             }
         }
     }
@@ -1053,7 +1053,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!rightWeaponModelName.empty()) {
         shared_ptr<Model> weaponModel(_game->models().get(rightWeaponModelName));
         if (weaponModel) {
-            auto weaponSceneNode = make_shared<ModelSceneNode>(weaponModel, ModelUsage::Equipment, _sceneGraph, this);
+            auto weaponSceneNode = _sceneGraph->newModel(weaponModel, ModelUsage::Equipment, this);
             bodySceneNode->attach(g_rightHandNode, move(weaponSceneNode));
         }
     }
@@ -1064,7 +1064,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!leftWeaponModelName.empty()) {
         shared_ptr<Model> weaponModel(_game->models().get(leftWeaponModelName));
         if (weaponModel) {
-            auto weaponSceneNode = make_shared<ModelSceneNode>(weaponModel, ModelUsage::Equipment, _sceneGraph, this);
+            auto weaponSceneNode = _sceneGraph->newModel(weaponModel, ModelUsage::Equipment, this);
             bodySceneNode->attach(g_leftHandNode, move(weaponSceneNode));
         }
     }
