@@ -27,7 +27,8 @@ void Task::run() {
 }
 
 void Task::await() {
-    lock_guard<mutex> lock(_completionMutex);
+    _completionMutex.lock();
+    _completionMutex.unlock();
 }
 
 } // namespace reone
