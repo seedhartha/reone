@@ -18,12 +18,11 @@
 #include "tsl.h"
 
 #include "../common/pathutil.h"
-#include "../di/services/resource.h"
+#include "../resource/resources.h"
 
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::di;
 using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -42,23 +41,81 @@ static constexpr char kExeFilename[] = "swkotor2.exe";
 TSL::TSL(
     fs::path path,
     Options options,
-    GameServices &game,
-    ResourceServices &resource,
-    GraphicsServices &graphics,
-    AudioServices &audio,
-    SceneServices &scene,
-    ScriptServices &script
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Cursors &cursors,
+    EffectFactory &effectFactory,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    Skills &skills,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    AudioFiles &audioFiles,
+    AudioPlayer &audioPlayer,
+    Context &context,
+    Features &features,
+    Fonts &fonts,
+    Lips &lips,
+    Materials &materials,
+    Meshes &meshes,
+    Models &models,
+    PBRIBL &pbrIbl,
+    Shaders &shaders,
+    Textures &textures,
+    Walkmeshes &walkmeshes,
+    Window &window,
+    SceneGraph &sceneGraph,
+    WorldRenderPipeline &worldRenderPipeline,
+    Scripts &scripts,
+    Resources &resources,
+    Strings &strings
 ) :
     Game(
         GameID::TSL,
         move(path),
         move(options),
-        game,
-        resource,
-        graphics,
-        audio,
-        scene,
-        script
+        actionFactory,
+        classes,
+        combat,
+        cursors,
+        effectFactory,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        skills,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        sceneGraph,
+        worldRenderPipeline,
+        scripts,
+        resources,
+        strings
 ) {
     _mainMenuMusicResRef = "mus_sion";
     _charGenMusicResRef = "mus_main";
@@ -70,22 +127,22 @@ TSL::TSL(
 }
 
 void TSL::initResourceProviders() {
-    _resource.resources().indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
+    _resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
 
     fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
-    _resource.resources().indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
-    _resource.resources().indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
+    _resources.indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
+    _resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
 
-    _resource.resources().indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
-    _resource.resources().indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
-    _resource.resources().indexDirectory(getPathIgnoreCase(_path, kVoiceDirectoryName));
+    _resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
+    _resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
+    _resources.indexDirectory(getPathIgnoreCase(_path, kVoiceDirectoryName));
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-    _resource.resources().indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
+    _resources.indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
 
-    _resource.resources().indexExeFile(getPathIgnoreCase(_path, kExeFilename));
-    _resource.resources().indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
-    _resource.resources().indexDirectory(getPathIgnoreCase(fs::current_path(), kDataDirectoryName));
+    _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
+    _resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
+    _resources.indexDirectory(getPathIgnoreCase(fs::current_path(), kDataDirectoryName));
 }
 
 } // namespace game

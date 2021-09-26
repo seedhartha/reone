@@ -48,9 +48,7 @@ public:
         int damage { -1 };
     };
 
-    Combat(Game &game, scene::SceneGraph &sceneGraph) :
-        _game(game),
-        _sceneGraph(sceneGraph) {
+    Combat(scene::SceneGraph &sceneGraph) : _sceneGraph(sceneGraph) {
     }
 
     /**
@@ -68,6 +66,8 @@ public:
         int damage = -1);
 
     void update(float dt);
+
+    void setGame(Game &game) { _game = &game; }
 
 private:
     enum class RoundState {
@@ -102,8 +102,7 @@ private:
 
     typedef std::map<uint32_t, std::unique_ptr<Round>> RoundMap;
 
-    Game &_game;
-
+    Game *_game { nullptr };
     RoundMap _roundByAttacker;
 
     // Services

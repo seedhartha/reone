@@ -73,17 +73,13 @@ class AudioPlayer;
 namespace scene {
 
 class SceneGraph;
+class WorldRenderPipeline;
 
 }
 
-namespace di {
+namespace script {
 
-class AudioServices;
-class GameServices;
-class GraphicsServices;
-class ResourceServices;
-class SceneServices;
-class ScriptServices;
+class Scripts;
 
 }
 
@@ -101,6 +97,7 @@ constexpr char kOverrideDirectoryName[] = "override";
 class ActionFactory;
 class Classes;
 class Combat;
+class Cursors;
 class EffectFactory;
 class Feats;
 class FootstepSounds;
@@ -123,12 +120,41 @@ public:
         GameID gameId,
         boost::filesystem::path path,
         Options options,
-        di::GameServices &game,
-        di::ResourceServices &resource,
-        di::GraphicsServices &graphics,
-        di::AudioServices &audio,
-        di::SceneServices &scene,
-        di::ScriptServices &script);
+        ActionFactory &actionFactory,
+        Classes &classes,
+        Combat &combat,
+        Cursors &cursors,
+        EffectFactory &effectFactory,
+        Feats &feats,
+        FootstepSounds &footstepSounds,
+        GUISounds &guiSounds,
+        ObjectFactory &objectFactory,
+        Party &party,
+        Portraits &portraits,
+        Reputes &reputes,
+        ScriptRunner &scriptRunner,
+        Skills &skills,
+        SoundSets &soundSets,
+        Surfaces &surfaces,
+        audio::AudioFiles &audioFiles,
+        audio::AudioPlayer &audioPlayer,
+        graphics::Context &context,
+        graphics::Features &features,
+        graphics::Fonts &fonts,
+        graphics::Lips &lips,
+        graphics::Materials &materials,
+        graphics::Meshes &meshes,
+        graphics::Models &models,
+        graphics::PBRIBL &pbrIbl,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Walkmeshes &walkmeshes,
+        graphics::Window &window,
+        scene::SceneGraph &sceneGraph,
+        scene::WorldRenderPipeline &worldRenderPipeline,
+        script::Scripts &scripts,
+        resource::Resources &resources,
+        resource::Strings &strings);
 
     virtual void initResourceProviders() = 0;
 
@@ -171,39 +197,42 @@ public:
 
     // Services
 
-    ActionFactory &actionFactory();
-    Classes &classes();
-    Combat &combat();
-    EffectFactory &effectFactory();
-    Feats &feats();
-    FootstepSounds &footstepSounds();
-    GUISounds &guiSounds();
-    ObjectFactory &objectFactory();
-    Party &party();
-    Portraits &portraits();
-    Reputes &reputes();
-    ScriptRunner &scriptRunner();
-    Skills &skills();
-    SoundSets &soundSets();
-    Surfaces &surfaces();
+    ActionFactory &actionFactory() { return _actionFactory; }
+    Classes &classes() { return _classes; }
+    Combat &combat() { return _combat; }
+    Cursors &cursors() { return _cursors; }
+    EffectFactory &effectFactory() { return _effectFactory; }
+    Feats &feats() { return _feats; }
+    FootstepSounds &footstepSounds() { return _footstepSounds; }
+    GUISounds &guiSounds() { return _guiSounds; }
+    ObjectFactory &objectFactory() { return _objectFactory; }
+    Party &party() { return _party; }
+    Portraits &portraits() { return _portraits; }
+    Reputes &reputes() { return _reputes; }
+    ScriptRunner &scriptRunner() { return _scriptRunner; }
+    Skills &skills() { return _skills; }
+    SoundSets &soundSets() { return _soundSets; }
+    Surfaces &surfaces() { return _surfaces; }
 
-    audio::AudioFiles &audioFiles();
-    audio::AudioPlayer &audioPlayer();
-    graphics::Context &context();
-    graphics::Features &features();
-    graphics::Fonts &fonts();
-    graphics::Lips &lips();
-    graphics::Materials &materials();
-    graphics::Meshes &meshes();
-    graphics::Models &models();
-    graphics::PBRIBL &pbrIbl();
-    graphics::Shaders &shaders();
-    graphics::Textures &textures();
-    graphics::Walkmeshes &walkmeshes();
-    graphics::Window &window();
-    scene::SceneGraph &sceneGraph();
-    resource::Resources &resources();
-    resource::Strings &strings();
+    audio::AudioFiles &audioFiles() { return _audioFiles; }
+    audio::AudioPlayer &audioPlayer() { return _audioPlayer; }
+    graphics::Context &context() { return _context; }
+    graphics::Features &features() { return _features; }
+    graphics::Fonts &fonts() { return _fonts; }
+    graphics::Lips &lips() { return _lips; }
+    graphics::Materials &materials() { return _materials; }
+    graphics::Meshes &meshes() { return _meshes; }
+    graphics::Models &models() { return _models; }
+    graphics::PBRIBL &pbrIbl() { return _pbrIbl; }
+    graphics::Shaders &shaders() { return _shaders; }
+    graphics::Textures &textures() { return _textures; }
+    graphics::Walkmeshes &walkmeshes() { return _walkmeshes; }
+    graphics::Window &window() { return _window; }
+    scene::SceneGraph &sceneGraph() { return _sceneGraph; }
+    scene::WorldRenderPipeline &worldRenderPipeline() { return _worldRenderPipeline; }
+    script::Scripts &scripts() { return _scripts; }
+    resource::Resources &resources() { return _resources; }
+    resource::Strings &strings() { return _strings; }
 
     // END Services
 
@@ -289,10 +318,51 @@ protected:
 
     GameID _gameId;
     boost::filesystem::path _path;
-    di::ResourceServices &_resource;
+
     std::string _mainMenuMusicResRef;
     std::string _charGenMusicResRef;
     std::string _charGenLoadScreenResRef;
+
+    // Services
+
+    ActionFactory &_actionFactory;
+    Classes &_classes;
+    Combat &_combat;
+    Cursors &_cursors;
+    EffectFactory &_effectFactory;
+    Feats &_feats;
+    FootstepSounds &_footstepSounds;
+    GUISounds &_guiSounds;
+    ObjectFactory &_objectFactory;
+    Party &_party;
+    Portraits &_portraits;
+    Reputes &_reputes;
+    ScriptRunner &_scriptRunner;
+    Skills &_skills;
+    SoundSets &_soundSets;
+    Surfaces &_surfaces;
+
+    audio::AudioFiles &_audioFiles;
+    audio::AudioPlayer &_audioPlayer;
+    graphics::Context &_context;
+    graphics::Features &_features;
+    graphics::Fonts &_fonts;
+    graphics::Lips &_lips;
+    graphics::Materials &_materials;
+    graphics::Meshes &_meshes;
+    graphics::Models &_models;
+    graphics::PBRIBL &_pbrIbl;
+    graphics::Shaders &_shaders;
+    graphics::Textures &_textures;
+    graphics::Walkmeshes &_walkmeshes;
+    graphics::Window &_window;
+    scene::SceneGraph &_sceneGraph;
+    scene::WorldRenderPipeline &_worldRenderPipeline;
+    script::Scripts &_scripts;
+    resource::Resources &_resources;
+    resource::Strings &_strings;
+
+    // END Services
 
     // GUI colors
 
@@ -329,16 +399,6 @@ private:
     bool _paused { false };
     Conversation *_conversation { nullptr }; /**< pointer to either DialogGUI or ComputerGUI  */
     std::set<std::string> _moduleNames;
-
-    // Services
-
-    di::GraphicsServices &_graphics;
-    di::AudioServices &_audio;
-    di::SceneServices &_scene;
-    di::ScriptServices &_script;
-    di::GameServices &_game;
-
-    // END Services
 
     // Modules
 

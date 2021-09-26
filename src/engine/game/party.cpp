@@ -32,9 +32,6 @@ namespace game {
 
 static constexpr int kMaxMemberCount = 3;
 
-Party::Party(Game &game) : _game(game) {
-}
-
 bool Party::handle(const SDL_Event &event) {
     if (event.type == SDL_KEYDOWN) {
         return handleKeyDown(event.key);
@@ -123,7 +120,7 @@ void Party::onLeaderChanged() {
         member.creature->clearAllActions();
     }
 
-    _game.module()->area()->onPartyLeaderMoved(true);
+    _game->module()->area()->onPartyLeaderMoved(true);
 }
 
 const string &Party::getAvailableMember(int npc) const {

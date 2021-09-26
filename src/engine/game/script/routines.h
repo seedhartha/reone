@@ -30,12 +30,11 @@ class Game;
 
 class Routines : public script::IRoutineProvider, boost::noncopyable {
 public:
-    Routines(Game &game) : _game(game) {
-    }
-
     const script::Routine &get(int index) override {
         return _routines[index];
     }
+
+    void setGame(Game &game) { _game = &game; }
 
     template <class T>
     void add(
@@ -44,12 +43,11 @@ public:
         std::vector<script::VariableType> argTypes,
         const T &fn) {
 
-        _routines.emplace_back(std::move(name), retType, std::move(argTypes), std::bind(fn, std::ref(_game), std::placeholders::_1, std::placeholders::_2));
+        _routines.emplace_back(std::move(name), retType, std::move(argTypes), std::bind(fn, std::ref(*_game), std::placeholders::_1, std::placeholders::_2));
     }
 
 private:
-    Game &_game;
-
+    Game *_game { nullptr };
     std::vector<script::Routine> _routines;
 };
 

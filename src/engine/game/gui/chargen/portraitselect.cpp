@@ -138,7 +138,8 @@ void PortraitSelection::loadHeadModel() {
 shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &sceneGraph) {
     // Create a creature from the current portrait
 
-    auto objectFactory = make_unique<ObjectFactory>(*_game, sceneGraph);
+    auto objectFactory = make_unique<ObjectFactory>(sceneGraph);
+    objectFactory->setGame(*_game);
 
     shared_ptr<Creature> creature(objectFactory->newCreature());
     creature->setFacing(-glm::half_pi<float>());
