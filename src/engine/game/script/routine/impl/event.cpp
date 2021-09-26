@@ -26,6 +26,7 @@
 
 #include "../../../event.h"
 #include "../../../game.h"
+#include "../../../script/runner.h"
 
 #include "argutil.h"
 

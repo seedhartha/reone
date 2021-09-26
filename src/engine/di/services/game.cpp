@@ -17,10 +17,10 @@
 
 #include "game.h"
 
-#include "../../game/game.h"
+#include "../../game/kotor.h"
 #include "../../game/script/routine/registrar/kotor.h"
-#include "../../game/script/routine/registrar/registrar.h"
 #include "../../game/script/routine/registrar/tsl.h"
+#include "../../game/tsl.h"
 
 #include "audio.h"
 #include "graphics.h"
@@ -41,45 +41,23 @@ namespace reone {
 
 namespace di {
 
-GameServices::GameServices(
-    Game &game,
-    ResourceServices &resource,
-    GraphicsServices &graphics,
-    AudioServices &audio,
-    SceneServices &scene,
-    ScriptServices &script
-) :
-    _game(game),
-    _resource(resource),
-    _graphics(graphics),
-    _audio(audio),
-    _scene(scene),
-    _script(script) {
-}
-
-static unique_ptr<RoutineRegistrar> newRoutineRegistrar(GameID id, Routines &routines) {
-    switch (id) {
-        case GameID::KotOR:
-            return make_unique<KotORRoutineRegistrar>(routines);
-        case GameID::TSL:
-            return make_unique<TSLRoutineRegistrar>(routines);
-        default:
-            throw invalid_argument("Game ID is not supported: " + to_string(static_cast<int>(id)));
-    }
-}
-
 void GameServices::init() {
+    _game = newGame();
+    _game->initResourceProviders();
+
     _surfaces = make_unique<Surfaces>(_resource.resources());
     _surfaces->init();
 
-    _cursors = make_unique<Cursors>(_game.id(), _graphics.context(), _graphics.meshes(), _graphics.shaders(), _graphics.window(), _resource.resources());
+    _cursors = make_unique<Cursors>(_gameId, _graphics.context(), _graphics.meshes(), _graphics.shaders(), _graphics.window(), _resource.resources());
+
     _soundSets = make_unique<SoundSets>(_audio.files(), _resource.resources(), _resource.strings());
+
     _footstepSounds = make_unique<FootstepSounds>(_audio.files(), _resource.resources());
 
     _guiSounds = make_unique<GUISounds>(_audio.files(), _resource.resources());
     _guiSounds->init();
 
-    _routines = make_unique<Routines>(_game);
+    _routines = make_unique<Routines>(*_game);
 
     _scriptRunner = make_unique<ScriptRunner>(*_routines, _script.scripts());
 
@@ -100,15 +78,42 @@ void GameServices::init() {
     _portraits = make_unique<Portraits>(_graphics.textures(), _resource.resources());
     _portraits->init();
 
-    _objectFactory = make_unique<ObjectFactory>(_game, _scene.graph());
+    _objectFactory = make_unique<ObjectFactory>(*_game, _scene.graph());
 
-    _party = make_unique<Party>(_game);
-    _combat = make_unique<Combat>(_game, _scene.graph());
-    _actionFactory = make_unique<ActionFactory>(_game);
+    _party = make_unique<Party>(*_game);
+
+    _combat = make_unique<Combat>(*_game, _scene.graph());
+
+    _actionFactory = make_unique<ActionFactory>(*_game);
+
     _effectFactory = make_unique<EffectFactory>();
 
-    auto registrar = newRoutineRegistrar(_game.id(), *_routines);
-    registrar->invoke();
+    _routineRegistrar = newRoutineRegistrar();
+    _routineRegistrar->invoke();
+
+    _game->init();
+}
+
+unique_ptr<Game> GameServices::newGame() {
+    switch (_gameId) {
+        case GameID::KotOR:
+            return make_unique<KotOR>(_gamePath, _gameOptions, *this, _resource, _graphics, _audio, _scene, _script);
+        case GameID::TSL:
+            return make_unique<TSL>(_gamePath, _gameOptions, *this, _resource, _graphics, _audio, _scene, _script);
+        default:
+            throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
+    }
+}
+
+unique_ptr<RoutineRegistrar> GameServices::newRoutineRegistrar() {
+    switch (_gameId) {
+        case GameID::KotOR:
+            return make_unique<KotORRoutineRegistrar>(*_routines);
+        case GameID::TSL:
+            return make_unique<TSLRoutineRegistrar>(*_routines);
+        default:
+            throw invalid_argument("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
+    }
 }
 
 } // namespace di

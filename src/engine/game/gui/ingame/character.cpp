@@ -22,6 +22,8 @@
 
 #include "../../d20/classes.h"
 #include "../../game.h"
+#include "../../object/objectfactory.h"
+#include "../../party.h"
 
 using namespace std;
 using namespace std::placeholders;

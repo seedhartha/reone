@@ -24,6 +24,7 @@
 #include "../../../../common/logutil.h"
 #include "../../../../script/exception/argument.h"
 
+#include "../../../action/actionfactory.h"
 #include "../../../game.h"
 
 #include "argutil.h"

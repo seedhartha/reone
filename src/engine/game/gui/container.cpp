@@ -23,6 +23,8 @@
 
 #include "../game.h"
 #include "../object/item.h"
+#include "../object/placeable.h"
+#include "../party.h"
 
 using namespace std;
 

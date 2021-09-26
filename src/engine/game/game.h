@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "../di/services/game.h"
 #include "../graphics/eventhandler.h"
 #include "../video/video.h"
 
@@ -80,6 +79,7 @@ class SceneGraph;
 namespace di {
 
 class AudioServices;
+class GameServices;
 class GraphicsServices;
 class ResourceServices;
 class SceneServices;
@@ -98,6 +98,22 @@ constexpr char kSoundsDirectoryName[] = "streamsounds";
 constexpr char kLipsDirectoryName[] = "lips";
 constexpr char kOverrideDirectoryName[] = "override";
 
+class ActionFactory;
+class Classes;
+class Combat;
+class EffectFactory;
+class Feats;
+class FootstepSounds;
+class GUISounds;
+class ObjectFactory;
+class Party;
+class Portraits;
+class Reputes;
+class ScriptRunner;
+class Skills;
+class SoundSets;
+class Surfaces;
+
 /**
  * Abstract game.
  */
@@ -107,11 +123,16 @@ public:
         GameID gameId,
         boost::filesystem::path path,
         Options options,
+        di::GameServices &game,
         di::ResourceServices &resource,
         di::GraphicsServices &graphics,
         di::AudioServices &audio,
         di::SceneServices &scene,
         di::ScriptServices &script);
+
+    virtual void initResourceProviders() = 0;
+
+    void init();
 
     /**
      * Initializes the engine, run the main game loop and clean up on exit.
@@ -150,21 +171,21 @@ public:
 
     // Services
 
-    ActionFactory &actionFactory() { return _game->actionFactory(); }
-    Classes &classes() { return _game->classes(); }
-    Combat &combat() { return _game->combat(); }
-    EffectFactory &effectFactory() { return _game->effectFactory(); }
-    Feats &feats() { return _game->feats(); }
-    FootstepSounds &footstepSounds() { return _game->footstepSounds(); }
-    GUISounds &guiSounds() { return _game->guiSounds(); }
-    ObjectFactory &objectFactory() { return _game->objectFactory(); }
-    Party &party() { return _game->party(); }
-    Portraits &portraits() { return _game->portraits(); }
-    Reputes &reputes() { return _game->reputes(); }
-    ScriptRunner &scriptRunner() { return _game->scriptRunner(); }
-    Skills &skills() { return _game->skills(); }
-    SoundSets &soundSets() { return _game->soundSets(); }
-    Surfaces &surfaces() { return _game->surfaces(); }
+    ActionFactory &actionFactory();
+    Classes &classes();
+    Combat &combat();
+    EffectFactory &effectFactory();
+    Feats &feats();
+    FootstepSounds &footstepSounds();
+    GUISounds &guiSounds();
+    ObjectFactory &objectFactory();
+    Party &party();
+    Portraits &portraits();
+    Reputes &reputes();
+    ScriptRunner &scriptRunner();
+    Skills &skills();
+    SoundSets &soundSets();
+    Surfaces &surfaces();
 
     audio::AudioFiles &audioFiles();
     audio::AudioPlayer &audioPlayer();
@@ -281,8 +302,6 @@ protected:
 
     // END GUI colors
 
-    virtual void initResourceProviders() = 0;
-
 private:
     enum class GameScreen {
         None,
@@ -317,8 +336,7 @@ private:
     di::AudioServices &_audio;
     di::SceneServices &_scene;
     di::ScriptServices &_script;
-
-    std::unique_ptr<di::GameServices> _game;
+    di::GameServices &_game;
 
     // END Services
 
@@ -366,7 +384,6 @@ private:
 
     // END Globals/locals
 
-    void init();
     void deinit();
 
     void update();

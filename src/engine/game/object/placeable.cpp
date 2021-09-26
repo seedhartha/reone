@@ -19,11 +19,13 @@
 
 #include "../../graphics/model/models.h"
 #include "../../graphics/walkmesh/walkmeshes.h"
+#include "../../resource/2da.h"
 #include "../../resource/resources.h"
 #include "../../scene/node/model.h"
 #include "../../script/types.h"
 
 #include "../game.h"
+#include "../script/runner.h"
 
 using namespace std;
 

@@ -27,6 +27,8 @@
 #include "../resource/types.h"
 
 #include "game.h"
+#include "object/waypoint.h"
+#include "party.h"
 
 using namespace std;
 

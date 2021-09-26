@@ -24,6 +24,7 @@
 #include "../../graphics/window.h"
 
 #include "../action/usefeat.h"
+#include "../d20/feats.h"
 #include "../game.h"
 #include "../party.h"
 

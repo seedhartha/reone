@@ -21,6 +21,8 @@
 
 #include "../game.h"
 #include "../object/creature.h"
+#include "../object/objectfactory.h"
+#include "../script/runner.h"
 
 using namespace std;
 

@@ -21,12 +21,11 @@
 #include "common/pathutil.h"
 #include "di/services/audio.h"
 #include "di/services/common.h"
+#include "di/services/game.h"
 #include "di/services/graphics.h"
 #include "di/services/resource.h"
 #include "di/services/scene.h"
 #include "di/services/script.h"
-#include "game/kotor.h"
-#include "game/tsl.h"
 
 using namespace std;
 
@@ -120,27 +119,28 @@ void Engine::loadOptions() {
 int Engine::runGame() {
     GameID gameId = determineGameID();
 
-    CommonServices common;
-    common.init();
+    CommonServices commonServices;
+    commonServices.init();
 
-    ResourceServices resource(_gamePath);
-    resource.init();
+    ResourceServices resourceServices(_gamePath);
+    resourceServices.init();
 
-    GraphicsServices graphics(_gameOptions.graphics, resource);
-    graphics.init();
+    GraphicsServices graphicsServices(_gameOptions.graphics, resourceServices);
+    graphicsServices.init();
 
-    AudioServices audio(_gameOptions.audio, resource);
-    audio.init();
+    AudioServices audioServices(_gameOptions.audio, resourceServices);
+    audioServices.init();
 
-    SceneServices scene(_gameOptions.graphics, graphics);
-    scene.init();
+    SceneServices sceneServices(_gameOptions.graphics, graphicsServices);
+    sceneServices.init();
 
-    ScriptServices script(resource);
-    script.init();
+    ScriptServices scriptServices(resourceServices);
+    scriptServices.init();
 
-    unique_ptr<Game> game(newGame(gameId, resource, graphics, audio, scene, script));
+    GameServices gameServices(gameId, _gameOptions, _gamePath, resourceServices, graphicsServices, audioServices, sceneServices, scriptServices);
+    gameServices.init();
 
-    return game->run();
+    return gameServices.game().run();
 }
 
 GameID Engine::determineGameID() {
@@ -153,24 +153,6 @@ GameID Engine::determineGameID() {
     if (!exePathK2.empty()) return GameID::TSL;
 
     throw logic_error("Unable to determine game ID: " + _gamePath.string());
-}
-
-unique_ptr<Game> Engine::newGame(
-    GameID gameId,
-    ResourceServices &resource,
-    GraphicsServices &graphics,
-    AudioServices &audio,
-    SceneServices &scene,
-    ScriptServices &script
-) {
-    switch (gameId) {
-        case GameID::KotOR:
-            return make_unique<KotOR>(_gamePath, _gameOptions, resource, graphics, audio, scene, script);
-        case GameID::TSL:
-            return make_unique<TSL>(_gamePath, _gameOptions, resource, graphics, audio, scene, script);
-        default:
-            throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(gameId)));
-    }
 }
 
 } // namespace reone

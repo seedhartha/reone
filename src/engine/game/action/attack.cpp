@@ -17,8 +17,10 @@
 
 #include "attack.h"
 
+#include "../combat/combat.h"
 #include "../game.h"
 #include "../object/creature.h"
+#include "../object/objectfactory.h"
 
 using namespace std;
 

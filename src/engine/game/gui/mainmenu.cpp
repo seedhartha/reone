@@ -21,10 +21,13 @@
 #include "../../common/logutil.h"
 #include "../../gui/scenebuilder.h"
 #include "../../graphics/model/models.h"
+#include "../../resource/2da.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
 
 #include "../game.h"
+#include "../object/objectfactory.h"
+#include "../party.h"
 
 using namespace std;
 using namespace std::placeholders;

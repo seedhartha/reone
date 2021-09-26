@@ -18,6 +18,7 @@
 #include "follow.h"
 
 #include "../game.h"
+#include "../object/objectfactory.h"
 
 using namespace std;
 

@@ -18,6 +18,7 @@
 #include "movetopoint.h"
 
 #include "../game.h"
+#include "../object/objectfactory.h"
 
 namespace reone {
 

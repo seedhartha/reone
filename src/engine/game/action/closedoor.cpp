@@ -18,6 +18,8 @@
 #include "closedoor.h"
 
 #include "../game.h"
+#include "../object/door.h"
+#include "../object/objectfactory.h"
 
 using namespace std;
 

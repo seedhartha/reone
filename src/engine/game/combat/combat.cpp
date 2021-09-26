@@ -20,6 +20,7 @@
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
 
+#include "../effect/effectfactory.h"
 #include "../game.h"
 
 using namespace std;

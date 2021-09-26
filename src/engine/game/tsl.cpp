@@ -42,16 +42,23 @@ static constexpr char kExeFilename[] = "swkotor2.exe";
 TSL::TSL(
     fs::path path,
     Options options,
+    GameServices &game,
     ResourceServices &resource,
     GraphicsServices &graphics,
     AudioServices &audio,
     SceneServices &scene,
     ScriptServices &script
-) : Game(
-    GameID::TSL,
-    move(path),
-    move(options),
-    resource, graphics, audio, scene, script
+) :
+    Game(
+        GameID::TSL,
+        move(path),
+        move(options),
+        game,
+        resource,
+        graphics,
+        audio,
+        scene,
+        script
 ) {
     _mainMenuMusicResRef = "mus_sion";
     _charGenMusicResRef = "mus_main";

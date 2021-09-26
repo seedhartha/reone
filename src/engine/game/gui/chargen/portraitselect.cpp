@@ -26,6 +26,7 @@
 #include "../../../scene/node/model.h"
 
 #include "../../game.h"
+#include "../../object/objectfactory.h"
 #include "../../portrait.h"
 #include "../../portraits.h"
 

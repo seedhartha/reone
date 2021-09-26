@@ -27,7 +27,9 @@
 #include "../resource/resources.h"
 #include "../scene/types.h"
 
+#include "effect/effectfactory.h"
 #include "game.h"
+#include "party.h"
 
 using namespace std;
 using namespace std::placeholders;

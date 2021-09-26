@@ -24,6 +24,7 @@
 #include "../common/streamutil.h"
 #include "../common/streamwriter.h"
 #include "../di/services/audio.h"
+#include "../di/services/game.h"
 #include "../di/services/graphics.h"
 #include "../di/services/resource.h"
 #include "../di/services/scene.h"
@@ -74,6 +75,7 @@ Game::Game(
     GameID gameId,
     fs::path path,
     Options options,
+    GameServices &game,
     ResourceServices &resource,
     GraphicsServices &graphics,
     AudioServices &audio,
@@ -83,6 +85,7 @@ Game::Game(
     _gameId(gameId),
     _path(move(path)),
     _options(move(options)),
+    _game(game),
     _resource(resource),
     _graphics(graphics),
     _audio(audio),
@@ -107,13 +110,8 @@ int Game::run() {
 }
 
 void Game::init() {
-    initResourceProviders();
-
-    _game = make_unique<GameServices>(*this, _resource, _graphics, _audio, _scene, _script);
-    _game->init();
-
     _graphics.window().setEventHandler(this);
-    _graphics.walkmeshes().setWalkableSurfaces(_game->surfaces().getWalkableSurfaceIndices());
+    _graphics.walkmeshes().setWalkableSurfaces(_game.surfaces().getWalkableSurfaceIndices());
 
     _console = make_unique<Console>(*this);
     _console->init();
@@ -142,7 +140,7 @@ void Game::setCursorType(CursorType type) {
         if (type == CursorType::None) {
             _graphics.window().setCursor(nullptr);
         } else {
-            _graphics.window().setCursor(_game->cursors().get(type));
+            _graphics.window().setCursor(_game.cursors().get(type));
         }
         _cursorType = type;
     }
@@ -227,7 +225,7 @@ void Game::loadModule(const string &name, string entry) {
             loadCharacterGeneration();
         }
 
-        _game->soundSets().invalidate();
+        _game.soundSets().invalidate();
         _graphics.textures().invalidateCache();
         _graphics.models().invalidateCache();
         _graphics.walkmeshes().invalidateCache();
@@ -249,7 +247,7 @@ void Game::loadModule(const string &name, string entry) {
         if (maybeModule != _loadedModules.end()) {
             _module = maybeModule->second;
         } else {
-            _module = _game->objectFactory().newModule();
+            _module = _game.objectFactory().newModule();
 
             shared_ptr<GffStruct> ifo(_resource.resources().getGFF("module", ResourceType::Ifo));
             _module->load(name, *ifo, _loadFromSaveGame);
@@ -329,7 +327,7 @@ void Game::drawWorld() {
 void Game::toggleInGameCameraType() {
     switch (_cameraType) {
         case CameraType::FirstPerson:
-            if (_game->party().getLeader()) {
+            if (_game.party().getLeader()) {
                 _cameraType = CameraType::ThirdPerson;
             }
             break;
@@ -361,7 +359,7 @@ shared_ptr<Object> Game::getObjectById(uint32_t id) const {
         case kObjectInvalid:
             return nullptr;
         default:
-            return _game->objectFactory().getObjectById(id);
+            return _game.objectFactory().getObjectById(id);
     }
 }
 
@@ -486,7 +484,7 @@ void Game::update() {
     bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
     if (updModule && !_paused) {
         _module->update(dt);
-        _game->combat().update(dt);
+        _game.combat().update(dt);
     }
 
     GUI *gui = getScreenGUI();
@@ -694,7 +692,7 @@ void Game::updateCamera(float dt) {
 
         glm::vec3 listenerPosition;
         if (_cameraType == CameraType::ThirdPerson) {
-            listenerPosition = _game->party().getLeader()->position() + 1.7f; // TODO: height based on appearance
+            listenerPosition = _game.party().getLeader()->position() + 1.7f; // TODO: height based on appearance
         } else {
             listenerPosition = camera->sceneNode()->absoluteTransform()[3];
         }
@@ -708,7 +706,7 @@ void Game::updateSceneGraph(float dt) {
 
     // Select a reference node for dynamic lighting
     shared_ptr<SceneNode> lightingRefNode;
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<Creature> partyLeader(_game.party().getLeader());
     if (partyLeader && _cameraType == CameraType::ThirdPerson) {
         lightingRefNode = partyLeader->sceneNode();
     } else {
@@ -734,7 +732,7 @@ bool Game::handle(const SDL_Event &event) {
                 if (_console->handle(event)) {
                     return true;
                 }
-                if (_game->party().handle(event)) {
+                if (_game.party().handle(event)) {
                     return true;
                 }
                 Camera *camera = getActiveCamera();
@@ -875,7 +873,7 @@ void Game::saveToFile(const fs::path &path) {
 
     vector<shared_ptr<GffStruct>> nfoPartyMembers;
     for (int i = 0; i < 3; ++i) {
-        if (_game->party().getSize() > i) {
+        if (_game.party().getSize() > i) {
             nfoPartyMembers.push_back(getPartyMemberNFOStruct(i));
         }
     }
@@ -968,10 +966,10 @@ void Game::saveToFile(const fs::path &path) {
 }
 
 shared_ptr<GffStruct> Game::getPartyMemberNFOStruct(int index) const {
-    auto member = _game->party().getMember(index);
+    auto member = _game.party().getMember(index);
 
     return make_shared<GffStruct>(0, vector<GffField> {
-        GffField::newByte("NPC", _game->party().getNPCByMemberIndex(index)),
+        GffField::newByte("NPC", _game.party().getNPCByMemberIndex(index)),
         GffField::newCExoString("TemplateResRef", member->blueprintResRef()),
         GffField::newVector("Position", member->position()),
         GffField::newFloat("Facing", member->getFacing())
@@ -997,7 +995,7 @@ void Game::loadFromFile(const fs::path &path) {
 
     // Party
     vector<shared_ptr<GffStruct>> nfoParty(nfoRoot->getList("Party"));
-    _game->party().clear();
+    _game.party().clear();
     for (size_t i = 0; i < nfoParty.size(); ++i) {
         shared_ptr<GffStruct> member(nfoParty[i]);
         int npc = member->getInt("NPC");
@@ -1005,7 +1003,7 @@ void Game::loadFromFile(const fs::path &path) {
         glm::vec3 position(member->getVector("Position"));
         float facing = member->getFloat("Facing");
 
-        shared_ptr<Creature> creature(_game->objectFactory().newCreature());
+        shared_ptr<Creature> creature(_game.objectFactory().newCreature());
         if (npc == -1) {
             creature->setTag(kObjectTagPlayer);
         }
@@ -1013,9 +1011,9 @@ void Game::loadFromFile(const fs::path &path) {
         creature->setImmortal(true);
         creature->setPosition(move(position));
         creature->setFacing(facing);
-        _game->party().addMember(npc, creature);
+        _game.party().addMember(npc, creature);
         if (i == 0) {
-            _game->party().setPlayer(creature);
+            _game.party().setPlayer(creature);
         }
     }
 
@@ -1032,6 +1030,66 @@ void Game::loadFromFile(const fs::path &path) {
     for (auto &global : nfoRoot->getList("GlobalLocations")) {
         setGlobalLocation(global->getString("Name"), make_shared<Location>(global->getVector("Position"), global->getFloat("Facing")));
     }
+}
+
+ActionFactory &Game::actionFactory() {
+    return _game.actionFactory();
+}
+
+Classes &Game::classes() {
+    return _game.classes();
+}
+
+Combat &Game::combat() {
+    return _game.combat();
+}
+
+EffectFactory &Game::effectFactory() {
+    return _game.effectFactory();
+}
+
+Feats &Game::feats() {
+    return _game.feats();
+}
+
+FootstepSounds &Game::footstepSounds() {
+    return _game.footstepSounds();
+}
+
+GUISounds &Game::guiSounds() {
+    return _game.guiSounds();
+}
+
+ObjectFactory &Game::objectFactory() {
+    return _game.objectFactory();
+}
+
+Party &Game::party() {
+    return _game.party();
+}
+
+Portraits &Game::portraits() {
+    return _game.portraits();
+}
+
+Reputes &Game::reputes() {
+    return _game.reputes();
+}
+
+ScriptRunner &Game::scriptRunner() {
+    return _game.scriptRunner();
+}
+
+Skills &Game::skills() {
+    return _game.skills();
+}
+
+SoundSets &Game::soundSets() {
+    return _game.soundSets();
+}
+
+Surfaces &Game::surfaces() {
+    return _game.surfaces();
 }
 
 AudioFiles &Game::audioFiles() {
