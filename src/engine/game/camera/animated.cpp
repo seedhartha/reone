@@ -18,7 +18,7 @@
 #include "animated.h"
 
 #include "../../graphics/types.h"
-#include "../../scene/scenegraph.h"
+#include "../../scene/graph.h"
 #include "../../scene/node/camera.h"
 #include "../../scene/node/model.h"
 

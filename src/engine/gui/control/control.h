@@ -20,7 +20,7 @@
 #include "../../graphics/texture/texture.h"
 #include "../../graphics/types.h"
 #include "../../scene/pipeline/control.h"
-#include "../../scene/scenegraph.h"
+#include "../../scene/graph.h"
 
 #include "../types.h"
 

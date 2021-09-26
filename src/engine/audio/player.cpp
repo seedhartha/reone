@@ -34,9 +34,6 @@ namespace audio {
 static constexpr float kMaxPositionalSoundDistance = 16.0f;
 static constexpr float kMaxPositionalSoundDistance2 = kMaxPositionalSoundDistance * kMaxPositionalSoundDistance;
 
-AudioPlayer::AudioPlayer(AudioOptions opts, AudioFiles &files) : _opts(move(opts)), _files(files) {
-}
-
 void AudioPlayer::init() {
     _thread = thread(bind(&AudioPlayer::threadStart, this));
 }
@@ -112,7 +109,7 @@ void AudioPlayer::deinit() {
 }
 
 shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
-    shared_ptr<AudioStream> stream(_files.get(resRef));
+    shared_ptr<AudioStream> stream(_audioFiles.get(resRef));
     if (!stream) {
         warn("AudioPlayer: file not found: " + resRef);
         return nullptr;
@@ -126,16 +123,16 @@ float AudioPlayer::getGain(AudioType type, float gain) const {
     int volume;
     switch (type) {
         case AudioType::Music:
-            volume = _opts.musicVolume;
+            volume = _options.musicVolume;
             break;
         case AudioType::Voice:
-            volume = _opts.voiceVolume;
+            volume = _options.voiceVolume;
             break;
         case AudioType::Sound:
-            volume = _opts.soundVolume;
+            volume = _options.soundVolume;
             break;
         case AudioType::Movie:
-            volume = _opts.movieVolume;
+            volume = _options.movieVolume;
             break;
         default:
             return 85;

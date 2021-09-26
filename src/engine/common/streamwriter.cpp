@@ -17,16 +17,9 @@
 
 #include "streamwriter.h"
 
-#include "guardutil.h"
-
 using namespace std;
 
 namespace reone {
-
-StreamWriter::StreamWriter(const shared_ptr<ostream> &stream, boost::endian::order endianess) :
-    _stream(ensurePresent(stream, "stream")),
-    _endianess(endianess) {
-}
 
 void StreamWriter::putByte(uint8_t val) {
     _stream->put(val);

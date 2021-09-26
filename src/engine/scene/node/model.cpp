@@ -21,7 +21,7 @@
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/model/animation.h"
 
-#include "../scenegraph.h"
+#include "../graph.h"
 #include "../types.h"
 
 #include "emitter.h"

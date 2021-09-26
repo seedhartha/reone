@@ -31,7 +31,11 @@ class SoundInstance;
 
 class AudioPlayer : boost::noncopyable {
 public:
-    AudioPlayer(AudioOptions opts, AudioFiles &files);
+    AudioPlayer(AudioOptions options, AudioFiles &audioFiles) :
+        _options(std::move(options)),
+        _audioFiles(audioFiles) {
+    }
+
     ~AudioPlayer();
 
     void init();
@@ -43,8 +47,8 @@ public:
     void setListenerPosition(const glm::vec3 &position);
 
 private:
-    AudioOptions _opts;
-    AudioFiles &_files;
+    AudioOptions _options;
+    AudioFiles &_audioFiles;
 
     ALCdevice *_device { nullptr };
     ALCcontext *_context { nullptr };

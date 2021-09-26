@@ -31,7 +31,7 @@
 
 #include "../node/camera.h"
 #include "../node/light.h"
-#include "../scenegraph.h"
+#include "../graph.h"
 
 using namespace std;
 

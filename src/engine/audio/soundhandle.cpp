@@ -23,9 +23,6 @@ namespace reone {
 
 namespace audio {
 
-SoundHandle::SoundHandle(float duration, const glm::vec3 &position) : _duration(duration), _position(position) {
-}
-
 void SoundHandle::stop() {
     _state = State::Stopped;
 }

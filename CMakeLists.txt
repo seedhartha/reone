@@ -309,6 +309,7 @@ target_precompile_headers(libvideo PRIVATE src/engine/pch.h)
 set(SCENE_HEADERS
     src/engine/scene/animeventlistener.h
     src/engine/scene/animproperties.h
+    src/engine/scene/graph.h
     src/engine/scene/node/camera.h
     src/engine/scene/node/dummy.h
     src/engine/scene/node/emitter.h
@@ -321,10 +322,10 @@ set(SCENE_HEADERS
     src/engine/scene/nodeelement.h
     src/engine/scene/pipeline/control.h
     src/engine/scene/pipeline/world.h
-    src/engine/scene/scenegraph.h
     src/engine/scene/types.h)
 
 set(SCENE_SOURCES
+    src/engine/scene/graph.cpp
     src/engine/scene/node/camera.cpp
     src/engine/scene/node/emitter.cpp
     src/engine/scene/node/grass.cpp
@@ -334,8 +335,7 @@ set(SCENE_SOURCES
     src/engine/scene/node/modelnode.cpp
     src/engine/scene/node/scenenode.cpp
     src/engine/scene/pipeline/control.cpp
-    src/engine/scene/pipeline/world.cpp
-    src/engine/scene/scenegraph.cpp)
+    src/engine/scene/pipeline/world.cpp)
 
 add_library(libscene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES})
 set_target_properties(libscene PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

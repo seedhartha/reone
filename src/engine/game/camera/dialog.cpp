@@ -18,7 +18,7 @@
 #include "dialog.h"
 
 #include "../../graphics/types.h"
-#include "../../scene/scenegraph.h"
+#include "../../scene/graph.h"
 #include "../../scene/node/camera.h"
 
 using namespace std;

@@ -17,7 +17,6 @@
 
 #include "2dawriter.h"
 
-#include "../../common/guardutil.h"
 #include "../../common/streamwriter.h"
 
 #include "../2da.h"
@@ -31,10 +30,6 @@ namespace reone {
 namespace resource {
 
 static const char kSignature[] = "2DA V2.b";
-
-TwoDaWriter::TwoDaWriter(shared_ptr<TwoDA> twoDa) :
-    _twoDa(ensurePresent(twoDa, "twoDa")) {
-}
 
 void TwoDaWriter::save(const fs::path &path) {
     auto stream = make_shared<fs::ofstream>(path, ios::binary);

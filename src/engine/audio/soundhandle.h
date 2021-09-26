@@ -29,7 +29,10 @@ public:
         Stopped
     };
 
-    SoundHandle(float duration, const glm::vec3 &position);
+    SoundHandle(float duration, glm::vec3 position) :
+        _duration(duration),
+        _position(std::move(position)) {
+    }
 
     void stop();
     void resetPositionDirty();

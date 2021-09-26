@@ -28,7 +28,7 @@
 #include "../../graphics/texture/texture.h"
 #include "../../graphics/texture/textures.h"
 
-#include "../scenegraph.h"
+#include "../graph.h"
 
 #include "camera.h"
 #include "light.h"

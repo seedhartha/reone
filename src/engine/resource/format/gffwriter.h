@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../../common/guardutil.h"
 #include "../../common/types.h"
 
 #include "../types.h"
@@ -31,7 +32,13 @@ class GffStruct;
 
 class GffWriter {
 public:
-    GffWriter(ResourceType resType, std::shared_ptr<GffStruct> root);
+    GffWriter(
+        ResourceType resType,
+        std::shared_ptr<GffStruct> root
+    ) :
+        _resType(resType),
+        _root(ensurePresent(root, "root")) {
+    }
 
     void save(const boost::filesystem::path &path);
     void save(const std::shared_ptr<std::ostream> &out);

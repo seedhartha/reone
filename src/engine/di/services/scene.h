@@ -19,7 +19,7 @@
 
 #include "../../graphics/options.h"
 #include "../../scene/pipeline/world.h"
-#include "../../scene/scenegraph.h"
+#include "../../scene/graph.h"
 
 namespace reone {
 
