@@ -18,6 +18,8 @@
 #include "opencontainer.h"
 
 #include "../game.h"
+#include "../object/objectfactory.h"
+#include "../object/placeable.h"
 
 using namespace std;
 

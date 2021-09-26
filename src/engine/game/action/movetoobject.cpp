@@ -18,6 +18,7 @@
 #include "movetoobject.h"
 
 #include "../game.h"
+#include "../object/objectfactory.h"
 #include "../object/spatial.h"
 
 using namespace std;

@@ -25,6 +25,9 @@
 #include "../../d20/classes.h"
 #include "../../game.h"
 #include "../../object/creature.h"
+#include "../../object/objectfactory.h"
+#include "../../party.h"
+#include "../../portraits.h"
 
 #include "chargen.h"
 

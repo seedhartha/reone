@@ -19,10 +19,12 @@
 
 #include "../../../gui/control/listbox.h"
 #include "../../../graphics/texture/textures.h"
+#include "../../../resource/2da.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 
 #include "../../game.h"
+#include "../../party.h"
 
 using namespace std;
 

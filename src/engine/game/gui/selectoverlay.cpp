@@ -29,11 +29,14 @@
 #include "../../graphics/window.h"
 #include "../../resource/resources.h"
 
+#include "../action/actionfactory.h"
 #include "../action/attack.h"
 #include "../action/usefeat.h"
 #include "../action/useskill.h"
 #include "../d20/feats.h"
+#include "../d20/skills.h"
 #include "../game.h"
+#include "../party.h"
 #include "../reputes.h"
 
 using namespace std;

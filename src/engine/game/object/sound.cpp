@@ -19,6 +19,7 @@
 
 #include "../../audio/files.h"
 #include "../../audio/player.h"
+#include "../../resource/2da.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"

@@ -37,7 +37,10 @@
 
 #include "../game.h"
 #include "../location.h"
+#include "../party.h"
+#include "../reputes.h"
 #include "../room.h"
+#include "../script/runner.h"
 #include "../surfaces.h"
 
 #include "objectfactory.h"

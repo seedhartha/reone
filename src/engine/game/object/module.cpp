@@ -20,11 +20,13 @@
 #include "../../common/logutil.h"
 #include "../../resource/resources.h"
 
+#include "../action/actionfactory.h"
 #include "../action/attack.h"
 #include "../action/opencontainer.h"
 #include "../action/opendoor.h"
 #include "../action/startconversation.h"
 #include "../game.h"
+#include "../party.h"
 #include "../reputes.h"
 
 #include "objectfactory.h"

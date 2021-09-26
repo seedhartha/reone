@@ -27,6 +27,7 @@
 #include "../../resource/resources.h"
 
 #include "../game.h"
+#include "../script/runner.h"
 
 using namespace std;
 

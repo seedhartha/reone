@@ -32,6 +32,7 @@ public:
     TSL(
         boost::filesystem::path path,
         Options options,
+        di::GameServices &game,
         di::ResourceServices &resource,
         di::GraphicsServices &graphics,
         di::AudioServices &audio,

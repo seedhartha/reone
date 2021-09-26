@@ -24,7 +24,9 @@
 #include "../../../event.h"
 #include "../../../game.h"
 #include "../../../location.h"
+#include "../../../object/door.h"
 #include "../../../object/creature.h"
+#include "../../../object/sound.h"
 #include "../../../talent.h"
 
 using namespace std;

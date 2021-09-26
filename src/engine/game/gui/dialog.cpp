@@ -24,11 +24,13 @@
 #include "../../common/randomutil.h"
 #include "../../gui/control/panel.h"
 #include "../../graphics/model/models.h"
+#include "../../resource/2da.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
 #include "../../script/execution.h"
 
 #include "../game.h"
+#include "../party.h"
 #include "../script/routines.h"
 
 using namespace std;

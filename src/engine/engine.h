@@ -75,14 +75,6 @@ private:
     int runGame();
 
     game::GameID determineGameID();
-
-    std::unique_ptr<game::Game> newGame(
-        game::GameID gameId,
-        di::ResourceServices &resource,
-        di::GraphicsServices &graphics,
-        di::AudioServices &audio,
-        di::SceneServices &scene,
-        di::ScriptServices &script);
 };
 
 } // namespace reone

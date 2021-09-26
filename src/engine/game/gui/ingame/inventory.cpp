@@ -18,6 +18,7 @@
 #include "inventory.h"
 
 #include "../../game.h"
+#include "../../party.h"
 
 using namespace std;
 

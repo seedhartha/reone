@@ -27,6 +27,7 @@
 #include "../../../../script/types.h"
 
 #include "../../../game.h"
+#include "../../../party.h"
 
 #include "argutil.h"
 #include "objectutil.h"

@@ -44,16 +44,23 @@ static vector<string> g_nonTransientLipFiles { "global.mod", "localization.mod" 
 KotOR::KotOR(
     fs::path path,
     Options options,
+    GameServices &game,
     ResourceServices &resource,
     GraphicsServices &graphics,
     AudioServices &audio,
     SceneServices &scene,
     ScriptServices &script
-) : Game(
-    GameID::KotOR,
-    move(path),
-    move(options),
-    resource, graphics, audio, scene, script
+) :
+    Game(
+        GameID::KotOR,
+        move(path),
+        move(options),
+        game,
+        resource,
+        graphics,
+        audio,
+        scene,
+        script
 ) {
     _mainMenuMusicResRef = "mus_theme_cult";
     _charGenMusicResRef = "mus_theme_rep";

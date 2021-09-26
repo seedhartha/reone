@@ -19,6 +19,7 @@
 
 #include "../game.h"
 #include "../location.h"
+#include "../object/objectfactory.h"
 
 namespace reone {
 

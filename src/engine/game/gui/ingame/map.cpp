@@ -21,6 +21,7 @@
 
 #include "../../game.h"
 #include "../../map.h"
+#include "../../object/waypoint.h"
 
 using namespace std;
 
