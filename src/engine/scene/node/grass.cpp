@@ -34,13 +34,6 @@ namespace reone {
 
 namespace scene {
 
-GrassSceneNode::GrassSceneNode(string name, glm::vec2 quadSize, shared_ptr<Texture> texture, shared_ptr<Texture> lightmap, SceneGraph *graph) :
-    SceneNode(move(name), SceneNodeType::Grass, graph),
-    _quadSize(move(quadSize)),
-    _texture(ensurePresent(texture, "texture")),
-    _lightmap(move(lightmap)) {
-}
-
 void GrassSceneNode::clear() {
     _clusters.clear();
 }
@@ -55,14 +48,14 @@ void GrassSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &el
         count = static_cast<int>(elements.size());
     }
 
-    _sceneGraph->context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
 
-    ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
+    ShaderUniforms uniforms(_sceneGraph.uniformsPrototype());
     uniforms.combined.featureMask |= UniformFeatureFlags::grass;
 
     if (_lightmap) {
-        _sceneGraph->context().setActiveTextureUnit(TextureUnits::lightmap);
+        _context.setActiveTextureUnit(TextureUnits::lightmap);
         _lightmap->bind();
 
         uniforms.combined.featureMask |= UniformFeatureFlags::lightmap;
@@ -75,8 +68,8 @@ void GrassSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &el
         uniforms.grass->clusters[i].lightmapUV = cluster->lightmapUV;
     }
 
-    _sceneGraph->shaders().activate(ShaderProgram::GrassGrass, uniforms);
-    _sceneGraph->meshes().grass().drawInstanced(count);
+    _shaders.activate(ShaderProgram::GrassGrass, uniforms);
+    _meshes.grass().drawInstanced(count);
 }
 
 } // namespace scene

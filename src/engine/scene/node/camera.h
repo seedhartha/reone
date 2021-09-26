@@ -27,7 +27,24 @@ namespace scene {
 
 class CameraSceneNode : public SceneNode {
 public:
-    CameraSceneNode(std::string name, glm::mat4 projection, SceneGraph *sceneGraph);
+    CameraSceneNode(
+        std::string name,
+        glm::mat4 projection,
+        SceneGraph &sceneGraph,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders
+    ) :
+        SceneNode(
+            std::move(name),
+            SceneNodeType::Camera,
+            sceneGraph,
+            context,
+            meshes,
+            shaders
+        ),
+        _projection(std::move(projection)) {
+    }
 
     bool isInFrustum(const glm::vec3 &point) const;
     bool isInFrustum(const graphics::AABB &aabb) const;

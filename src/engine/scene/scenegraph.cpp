@@ -370,6 +370,31 @@ vector<LightSceneNode *> SceneGraph::getLightsAt(
     return move(result);
 }
 
+unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUsage usage, IAnimationEventListener *animEventListener) {
+    return make_unique<ModelSceneNode>(
+        move(model),
+        usage,
+        *this,
+        _context,
+        _features,
+        _materials,
+        _meshes,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        animEventListener);
+}
+
+unique_ptr<CameraSceneNode> SceneGraph::newCamera(string name, glm::mat4 projection) {
+    return make_unique<CameraSceneNode>(
+        move(name),
+        move(projection),
+        *this,
+        _context,
+        _meshes,
+        _shaders);
+}
+
 } // namespace scene
 
 } // namespace reone

@@ -24,6 +24,14 @@
 
 namespace reone {
 
+namespace graphics {
+
+class Context;
+class Meshes;
+class Shaders;
+
+}
+
 namespace scene {
 
 class SceneGraph;
@@ -90,11 +98,20 @@ public:
 protected:
     std::string _name;
     SceneNodeType _type;
-    SceneGraph *_sceneGraph;
 
     graphics::AABB _aabb;
     const SceneNode *_parent { nullptr };
     std::vector<std::shared_ptr<SceneNode>> _children;
+
+    // Services
+
+    SceneGraph &_sceneGraph;
+
+    graphics::Context &_context;
+    graphics::Meshes &_meshes;
+    graphics::Shaders &_shaders;
+
+    // END Services
 
     // Transformations
 
@@ -113,7 +130,21 @@ protected:
 
     // END Flags
 
-    SceneNode(std::string name, SceneNodeType type, SceneGraph *sceneGraph);
+    SceneNode(
+        std::string name,
+        SceneNodeType type,
+        SceneGraph &sceneGraph,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders
+    ) :
+        _name(std::move(name)),
+        _type(type),
+        _sceneGraph(sceneGraph),
+        _context(context),
+        _meshes(meshes),
+        _shaders(shaders) {
+    }
 
     void computeAbsoluteTransforms();
 

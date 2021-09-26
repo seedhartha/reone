@@ -23,12 +23,6 @@ namespace reone {
 
 namespace scene {
 
-SceneNode::SceneNode(string name, SceneNodeType type, SceneGraph *sceneGraph) :
-    _name(move(name)),
-    _type(type),
-    _sceneGraph(sceneGraph) {
-}
-
 void SceneNode::addChild(shared_ptr<SceneNode> node) {
     node->_parent = this;
     node->computeAbsoluteTransforms();

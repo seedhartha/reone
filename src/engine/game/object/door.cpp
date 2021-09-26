@@ -70,9 +70,10 @@ void Door::loadFromBlueprint(const string &resRef) {
     shared_ptr<TwoDA> doors(_game->resources().get2DA("genericdoors"));
     string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
-    auto model = make_unique<ModelSceneNode>(_game->models().get(modelName), ModelUsage::Door, _sceneGraph);
+    auto model = _sceneGraph->newModel(_game->models().get(modelName), ModelUsage::Door);
     model->setCullable(true);
     model->setDrawDistance(FLT_MAX);
+
     _sceneNode = move(model);
 
     _closedWalkmesh = _game->walkmeshes().get(modelName + "0", ResourceType::Dwk);

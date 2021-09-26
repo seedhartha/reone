@@ -40,8 +40,22 @@ namespace scene {
 static constexpr float kFadeSpeed = 1.0f;
 static constexpr float kMinDirectionalLightRadius = 1000.0f;
 
-LightSceneNode::LightSceneNode(const ModelSceneNode *model, shared_ptr<ModelNode> modelNode, SceneGraph *sceneGraph) :
-    ModelNodeSceneNode(modelNode, SceneNodeType::Light, sceneGraph),
+LightSceneNode::LightSceneNode(
+    const ModelSceneNode *model,
+    shared_ptr<ModelNode> modelNode,
+    SceneGraph &sceneGraph,
+    Context &context,
+    Meshes &meshes,
+    Shaders &shaders
+) :
+    ModelNodeSceneNode(
+        modelNode,
+        SceneNodeType::Light,
+        sceneGraph,
+        context,
+        meshes,
+        shaders
+    ),
     _model(ensurePresent(model, "model")) {
 
     _color = modelNode->color().getByFrameOrElse(0, glm::vec3(0.0f));
@@ -62,17 +76,17 @@ void LightSceneNode::update(float dt) {
 }
 
 void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
-    shared_ptr<CameraSceneNode> camera(_sceneGraph->activeCamera());
+    shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
     if (!camera) return;
 
-    _sceneGraph->context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     flare.texture->bind();
 
     glm::vec4 lightPos(_absTransform[3]);
     glm::vec4 lightPosNdc(camera->projection() * camera->view() * lightPos);
 
-    float w = static_cast<float>(_sceneGraph->options().width);
-    float h = static_cast<float>(_sceneGraph->options().height);
+    float w = static_cast<float>(_sceneGraph.options().width);
+    float h = static_cast<float>(_sceneGraph.options().height);
 
     glm::vec3 lightPosScreen(glm::vec3(lightPosNdc) / lightPosNdc.w);
     lightPosScreen *= 0.5f;
@@ -92,12 +106,12 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     uniforms.combined.general.alpha = 0.5f;
     //uniforms.combined.general.color = glm::vec4(flare.colorShift, 1.0f);
 
-    _sceneGraph->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
+    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
 
-    BlendMode oldBlendMode = _sceneGraph->context().blendMode();
-    _sceneGraph->context().setBlendMode(BlendMode::Add);
-    _sceneGraph->meshes().billboard().draw();
-    _sceneGraph->context().setBlendMode(oldBlendMode);
+    BlendMode oldBlendMode = _context.blendMode();
+    _context.setBlendMode(BlendMode::Add);
+    _meshes.billboard().draw();
+    _context.setBlendMode(oldBlendMode);
 }
 
 bool LightSceneNode::isDirectional() const {

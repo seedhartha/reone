@@ -117,7 +117,7 @@ void Area::loadLYT() {
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
 
-        auto sceneNode = make_shared<ModelSceneNode>(model, ModelUsage::Room, &_game->sceneGraph());
+        auto sceneNode = _game->sceneGraph().newModel(model, ModelUsage::Room);
         sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {
@@ -127,7 +127,7 @@ void Area::loadLYT() {
 
         shared_ptr<Walkmesh> walkmesh(_game->walkmeshes().get(lytRoom.name, ResourceType::Wok));
 
-        auto room = make_unique<Room>(lytRoom.name, position, sceneNode, walkmesh);
+        auto room = make_unique<Room>(lytRoom.name, position, move(sceneNode), walkmesh);
         _rooms.insert(make_pair(room->name(), move(room)));
     }
 }
@@ -520,7 +520,7 @@ void Area::fill(SceneGraph &sceneGraph) {
         shared_ptr<ModelNode> aabbNode(sceneNode->model()->getAABBNode());
         if (aabbNode && _grass.texture) {
             glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), room.second->position()));
-            auto grass = make_shared<GrassSceneNode>(room.first, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap, &sceneGraph);
+            auto grass = make_shared<GrassSceneNode>(room.first, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap, sceneGraph, _game->context(), _game->meshes(), _game->shaders());
             for (auto &material : _game->surfaces().getGrassSurfaceIndices()) {
                 for (auto &face : aabbNode->getFacesByMaterial(material)) {
                     vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getTriangleCoords(face));

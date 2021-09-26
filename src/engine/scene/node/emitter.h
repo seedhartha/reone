@@ -44,7 +44,13 @@ public:
         int frame { 0 };
     };
 
-    EmitterSceneNode(const ModelSceneNode *model, std::shared_ptr<graphics::ModelNode> modelNode, SceneGraph *sceneGraph);
+    EmitterSceneNode(
+        const ModelSceneNode *model,
+        std::shared_ptr<graphics::ModelNode> modelNode,
+        SceneGraph &sceneGraph,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders);
 
     void update(float dt) override;
     void drawElements(const std::vector<std::shared_ptr<SceneNodeElement>> &elements, int count) override;

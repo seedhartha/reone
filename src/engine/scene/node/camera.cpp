@@ -25,11 +25,6 @@ namespace reone {
 
 namespace scene {
 
-CameraSceneNode::CameraSceneNode(string name, glm::mat4 projection, SceneGraph *sceneGraph) :
-    SceneNode(move(name), SceneNodeType::Camera, sceneGraph),
-    _projection(projection) {
-}
-
 void CameraSceneNode::onAbsoluteTransformChanged() {
     computeView();
     computeFrustumPlanes();

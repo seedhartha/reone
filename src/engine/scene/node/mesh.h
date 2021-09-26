@@ -26,7 +26,11 @@ namespace reone {
 
 namespace graphics {
 
+class Features;
+class Materials;
+class PBRIBL;
 class Texture;
+class Textures;
 
 }
 
@@ -39,7 +43,14 @@ public:
     MeshSceneNode(
         const ModelSceneNode *model,
         std::shared_ptr<graphics::ModelNode> modelNode,
-        SceneGraph *sceneGraph);
+        SceneGraph &sceneGraph,
+        graphics::Context &context,
+        graphics::Features &features,
+        graphics::Materials &materials,
+        graphics::Meshes &meshes,
+        graphics::PBRIBL &pbrIbl,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures);
 
     void update(float dt) override;
     void drawSingle(bool shadowPass);
@@ -86,6 +97,15 @@ private:
     void refreshAdditionalTextures();
 
     bool isLightingEnabled() const;
+
+    // Services
+
+    graphics::Features &_features;
+    graphics::Materials &_materials;
+    graphics::PBRIBL &_pbrIbl;
+    graphics::Textures &_textures;
+
+    // END Services
 
     // Animation
 

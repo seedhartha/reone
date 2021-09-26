@@ -40,8 +40,22 @@ namespace scene {
 static constexpr float kMotionBlurStrength = 0.25f;
 static constexpr float kProjectileSpeed = 16.0f;
 
-EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *model, shared_ptr<ModelNode> modelNode, SceneGraph *sceneGraph) :
-    ModelNodeSceneNode(modelNode, SceneNodeType::Emitter, sceneGraph),
+EmitterSceneNode::EmitterSceneNode(
+    const ModelSceneNode *model,
+    shared_ptr<ModelNode> modelNode,
+    SceneGraph &sceneGraph,
+    Context &context,
+    Meshes &meshes,
+    Shaders &shaders
+) :
+    ModelNodeSceneNode(
+        modelNode,
+        SceneNodeType::Emitter,
+        sceneGraph,
+        context,
+        meshes,
+        shaders
+    ),
     _model(ensurePresent(model, "model")) {
 
     _birthrate = modelNode->birthrate().getByFrameOrElse(0, 0.0f);
@@ -250,7 +264,7 @@ void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &
     shared_ptr<Texture> texture(emitter->texture);
     if (!texture) return;
 
-    ShaderUniforms uniforms(_sceneGraph->uniformsPrototype());
+    ShaderUniforms uniforms(_sceneGraph.uniformsPrototype());
     uniforms.combined.featureMask |= UniformFeatureFlags::particles;
     uniforms.particles->gridSize = emitter->gridSize;
     uniforms.particles->render = static_cast<int>(emitter->renderMode);
@@ -273,18 +287,18 @@ void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &
         uniforms.particles->particles[i].frame = particle->frame;
     }
 
-    _sceneGraph->shaders().activate(ShaderProgram::ParticleParticle, uniforms);
+    _shaders.activate(ShaderProgram::ParticleParticle, uniforms);
 
-    _sceneGraph->context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
 
-    BlendMode oldBlendMode(_sceneGraph->context().blendMode());
+    BlendMode oldBlendMode(_context.blendMode());
     bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
     if (lighten) {
-        _sceneGraph->context().setBlendMode(BlendMode::Lighten);
+        _context.setBlendMode(BlendMode::Lighten);
     }
-    _sceneGraph->meshes().billboard().drawInstanced(count);
-    _sceneGraph->context().setBlendMode(oldBlendMode);
+    _meshes.billboard().drawInstanced(count);
+    _context.setBlendMode(oldBlendMode);
 }
 
 } // namespace scene

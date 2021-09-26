@@ -42,6 +42,9 @@ class Textures;
 
 namespace scene {
 
+class IAnimationEventListener;
+class ModelSceneNode;
+
 /**
  * Responsible for managing drawable objects and their relations.
  *
@@ -85,17 +88,16 @@ public:
     void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
     void setUniformsPrototype(graphics::ShaderUniforms &&uniforms) { _uniformsPrototype = uniforms; }
 
-    // Services
+    // Factory methods
 
-    graphics::Context &context() { return _context; }
-    graphics::Features &features() { return _features; }
-    graphics::Materials &materials() { return _materials; }
-    graphics::Meshes &meshes() { return _meshes; }
-    graphics::PBRIBL &pbrIbl() { return _pbrIbl; }
-    graphics::Shaders &shaders() { return _shaders; }
-    graphics::Textures &textures() { return _textures; }
+    std::unique_ptr<ModelSceneNode> newModel(
+        std::shared_ptr<graphics::Model> model,
+        ModelUsage usage,
+        IAnimationEventListener *animEventListener = nullptr);
 
-    // END Services
+    std::unique_ptr<CameraSceneNode> newCamera(std::string name, glm::mat4 projection);
+
+    // END Factory methods
 
     // Roots
 

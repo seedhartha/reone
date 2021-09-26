@@ -29,7 +29,7 @@ namespace reone {
 namespace game {
 
 StaticCamera::StaticCamera(float aspect, SceneGraph *sceneGraph) : _aspect(aspect) {
-    _sceneNode = make_unique<CameraSceneNode>("", glm::mat4(1.0f), sceneGraph);
+    _sceneNode = sceneGraph->newCamera("", glm::mat4(1.0f));
 }
 
 void StaticCamera::setObject(const PlaceableCamera &object) {

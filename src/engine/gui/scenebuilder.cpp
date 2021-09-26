@@ -79,7 +79,7 @@ unique_ptr<SceneGraph> SceneBuilder::build() {
     scene->addRoot(model);
     scene->setAmbientLightColor(_ambientLightColor);
 
-    auto cameraNode = make_shared<CameraSceneNode>("", projection, scene.get());
+    auto cameraNode = make_shared<CameraSceneNode>("", projection, *scene, _context, _meshes, _shaders);
     if (_cameraNodeName.empty()) {
         cameraNode->setLocalTransform(_cameraTransform);
     } else {
@@ -93,7 +93,7 @@ unique_ptr<SceneGraph> SceneBuilder::build() {
     if (!_lightingRefNodeName.empty()) {
         shared_ptr<ModelNode> modelNode(model->model()->getNodeByName(_lightingRefNodeName));
         if (modelNode) {
-            auto lightingRefNode = make_shared<DummySceneNode>(modelNode, scene.get());
+            auto lightingRefNode = make_shared<DummySceneNode>(modelNode, *scene, _context, _meshes, _shaders);
             lightingRefNode->setLocalTransform(modelNode->absoluteTransform());
             scene->setLightingRefNode(move(lightingRefNode));
         }
