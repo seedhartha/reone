@@ -29,7 +29,10 @@ class ResourceServices;
 
 class AudioServices : boost::noncopyable {
 public:
-    AudioServices(audio::AudioOptions options, ResourceServices &resource);
+    AudioServices(audio::AudioOptions options, ResourceServices &resource) :
+        _options(std::move(options)),
+        _resource(resource) {
+    }
 
     void init();
 

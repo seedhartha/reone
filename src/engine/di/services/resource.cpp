@@ -27,9 +27,6 @@ namespace reone {
 
 namespace di {
 
-ResourceServices::ResourceServices(fs::path gamePath) : _gamePath(move(gamePath)) {
-}
-
 void ResourceServices::init() {
     _resources = make_unique<Resources>();
 

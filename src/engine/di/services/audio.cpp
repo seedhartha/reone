@@ -27,11 +27,6 @@ namespace reone {
 
 namespace di {
 
-AudioServices::AudioServices(AudioOptions options, ResourceServices &resource) :
-    _options(move(options)),
-    _resource(resource) {
-}
-
 void AudioServices::init() {
     _files = make_unique<AudioFiles>(_resource.resources());
 

@@ -39,7 +39,10 @@ class ResourceServices;
 
 class GraphicsServices : boost::noncopyable {
 public:
-    GraphicsServices(graphics::GraphicsOptions options, ResourceServices &resource);
+    GraphicsServices(graphics::GraphicsOptions options, ResourceServices &resource) :
+        _options(std::move(options)),
+        _resource(resource) {
+    }
 
     void init();
 
