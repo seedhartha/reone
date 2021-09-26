@@ -29,7 +29,7 @@ struct Spell {
     std::string name;
     std::string description;
     std::shared_ptr<graphics::Texture> icon;
-    uint32_t pips { 1 }; // 1-3, position in a feat chain
+    uint32_t pips {1}; // 1-3, position in a feat chain
 };
 
 } // namespace game

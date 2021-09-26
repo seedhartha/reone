@@ -25,7 +25,8 @@ namespace game {
 
 class ModifyAttacksEffect : public Effect {
 public:
-    ModifyAttacksEffect() : Effect(EffectType::ModifyAttacks) {
+    ModifyAttacksEffect() :
+        Effect(EffectType::ModifyAttacks) {
     }
 
     void applyTo(SpatialObject &object) override;

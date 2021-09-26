@@ -25,7 +25,8 @@ namespace game {
 
 class BlasterDeflectionDecreaseEffect : public Effect {
 public:
-    BlasterDeflectionDecreaseEffect() : Effect(EffectType::BlasterDeflectionDecrease) {
+    BlasterDeflectionDecreaseEffect() :
+        Effect(EffectType::BlasterDeflectionDecrease) {
     }
 
     void applyTo(SpatialObject &object) override;

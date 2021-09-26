@@ -31,7 +31,8 @@ class ITool;
 
 class Program : boost::noncopyable {
 public:
-    Program(int argc, char **argv) : _argc(argc), _argv(argv) {
+    Program(int argc, char **argv) :
+        _argc(argc), _argv(argv) {
     }
 
     int run();
@@ -40,13 +41,13 @@ private:
     int _argc;
     char **_argv;
 
-    boost::program_options::options_description _optsCmdLine { "Usage" };
+    boost::program_options::options_description _optsCmdLine {"Usage"};
     boost::program_options::variables_map _variables;
 
     boost::filesystem::path _gamePath;
     boost::filesystem::path _destPath;
     std::string _target;
-    tools::Operation _operation { tools::Operation::None };
+    tools::Operation _operation {tools::Operation::None};
     std::vector<std::shared_ptr<tools::ITool>> _tools;
 
     void initOptions();

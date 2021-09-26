@@ -47,9 +47,9 @@ public:
 
 private:
     struct Glyph {
-        glm::vec2 ul { 0.0f };
-        glm::vec2 lr { 0.0f };
-        glm::vec2 size { 0.0f };
+        glm::vec2 ul {0.0f};
+        glm::vec2 lr {0.0f};
+        glm::vec2 size {0.0f};
     };
 
     Window &_window;
@@ -58,7 +58,7 @@ private:
     Shaders &_shaders;
 
     std::shared_ptr<Texture> _texture;
-    float _height { 0.0f };
+    float _height {0.0f};
     std::vector<Glyph> _glyphs;
 
     glm::vec2 getTextOffset(const std::string &text, TextGravity gravity) const;

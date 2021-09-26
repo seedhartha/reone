@@ -25,7 +25,8 @@ namespace game {
 
 class DispelMagicAllEffect : public Effect {
 public:
-    DispelMagicAllEffect() : Effect(EffectType::DispelMagicAll) {
+    DispelMagicAllEffect() :
+        Effect(EffectType::DispelMagicAll) {
     }
 
     void applyTo(SpatialObject &object) override;

@@ -39,23 +39,23 @@ private:
 
     std::set<uint32_t> _walkableSurfaces;
 
-    WalkmeshType _type { WalkmeshType::WOK };
+    WalkmeshType _type {WalkmeshType::WOK};
 
-    uint32_t _numVertices { 0 };
-    uint32_t _offsetVertices { 0 };
-    uint32_t _numFaces { 0 };
-    uint32_t _offsetIndices { 0 };
-    uint32_t _offsetMaterials { 0 };
-    uint32_t _offsetNormals { 0 };
-    uint32_t _offsetPlanarDistances { 0 };
-    uint32_t _numAabb { 0 };
-    uint32_t _offsetAabb { 0 };
-    uint32_t _numAdjacencies { 0 };
-    uint32_t _offsetAdjacencies { 0 };
-    uint32_t _numEdges { 0 };
-    uint32_t _offsetEdges { 0 };
-    uint32_t _numPerimeters { 0 };
-    uint32_t _offsetPerimeters { 0 };
+    uint32_t _numVertices {0};
+    uint32_t _offsetVertices {0};
+    uint32_t _numFaces {0};
+    uint32_t _offsetIndices {0};
+    uint32_t _offsetMaterials {0};
+    uint32_t _offsetNormals {0};
+    uint32_t _offsetPlanarDistances {0};
+    uint32_t _numAabb {0};
+    uint32_t _offsetAabb {0};
+    uint32_t _numAdjacencies {0};
+    uint32_t _offsetAdjacencies {0};
+    uint32_t _numEdges {0};
+    uint32_t _offsetEdges {0};
+    uint32_t _numPerimeters {0};
+    uint32_t _offsetPerimeters {0};
 
     std::vector<float> _vertices;
     std::vector<uint32_t> _indices;

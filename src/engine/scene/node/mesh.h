@@ -32,7 +32,7 @@ class PBRIBL;
 class Texture;
 class Textures;
 
-}
+} // namespace graphics
 
 namespace scene {
 
@@ -77,19 +77,19 @@ private:
     } _nodeTextures;
 
     struct DanglymeshAnimation {
-        glm::vec3 force { 0.0f }; /**< net force applied to this scene node */
-        glm::vec3 stride { 0.0f }; /**< how far have vertices traveled from the rest position in object space */
+        glm::vec3 force {0.0f};  /**< net force applied to this scene node */
+        glm::vec3 stride {0.0f}; /**< how far have vertices traveled from the rest position in object space */
     } _danglymeshAnimation;
 
     const ModelSceneNode *_model;
 
     graphics::Material _material;
-    glm::vec2 _uvOffset { 0.0f };
-    float _bumpmapTime { 0.0f };
-    int _bumpmapFrame { 0 };
-    float _alpha { 1.0f };
-    glm::vec3 _selfIllumColor { 0.0f };
-    bool _transparent { false };
+    glm::vec2 _uvOffset {0.0f};
+    float _bumpmapTime {0.0f};
+    int _bumpmapFrame {0};
+    float _alpha {1.0f};
+    glm::vec3 _selfIllumColor {0.0f};
+    bool _transparent {false};
 
     void initTextures();
 

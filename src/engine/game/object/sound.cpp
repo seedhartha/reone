@@ -38,8 +38,7 @@ Sound::Sound(
     uint32_t id,
     Game *game,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph
-) :
+    SceneGraph *sceneGraph) :
     SpatialObject(id, ObjectType::Sound, game, objectFactory, sceneGraph) {
 }
 
@@ -76,7 +75,8 @@ void Sound::update(float dt) {
             _sound.reset();
         }
     }
-    if (!_active || !_audible) return;
+    if (!_active || !_audible)
+        return;
 
     if (!_sound || _sound->isStopped()) {
         if (_timeout > 0.0f) {

@@ -25,9 +25,10 @@ namespace reone {
 
 namespace game {
 
-class Talent : public script::EngineType  {
+class Talent : public script::EngineType {
 public:
-    Talent(TalentType type, int value) : _type(type), _value(value) {
+    Talent(TalentType type, int value) :
+        _type(type), _value(value) {
     }
 
     TalentType type() const { return _type; }

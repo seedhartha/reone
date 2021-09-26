@@ -31,7 +31,8 @@ struct StringFlags {
     static constexpr int soundLengthPresent = 4;
 };
 
-TlkReader::TlkReader() : BinaryReader(8, "TLK V3.0") {
+TlkReader::TlkReader() :
+    BinaryReader(8, "TLK V3.0") {
 }
 
 void TlkReader::doLoad() {

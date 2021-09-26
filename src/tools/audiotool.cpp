@@ -78,10 +78,9 @@ void AudioTool::unwrap(const fs::path &path, const fs::path &destPath) {
 }
 
 bool AudioTool::supports(Operation operation, const fs::path &target) const {
-    return
-        !fs::is_directory(target) &&
-        target.extension() == ".wav" &&
-        operation == Operation::Unwrap;
+    return !fs::is_directory(target) &&
+           target.extension() == ".wav" &&
+           operation == Operation::Unwrap;
 }
 
 } // namespace tools

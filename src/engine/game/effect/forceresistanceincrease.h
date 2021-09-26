@@ -25,7 +25,8 @@ namespace game {
 
 class ForceResistanceIncreaseEffect : public Effect {
 public:
-    ForceResistanceIncreaseEffect() : Effect(EffectType::ForceResistanceIncrease) {
+    ForceResistanceIncreaseEffect() :
+        Effect(EffectType::ForceResistanceIncrease) {
     }
 
     void applyTo(SpatialObject &object) override;

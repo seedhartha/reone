@@ -113,7 +113,8 @@ void Area::loadLYT() {
 
     for (auto &lytRoom : lyt.rooms()) {
         shared_ptr<Model> model(_game->models().get(lytRoom.name));
-        if (!model) continue;
+        if (!model)
+            continue;
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
 
@@ -150,7 +151,8 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
 
 void Area::loadPTH() {
     shared_ptr<GffStruct> pth(_game->resources().getGFF(_name, ResourceType::Pth));
-    if (!pth) return;
+    if (!pth)
+        return;
 
     Path path;
     path.load(*pth);
@@ -223,7 +225,8 @@ void Area::doDestroyObjects() {
 
 void Area::doDestroyObject(uint32_t objectId) {
     shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(_game->objectFactory().getObjectById(objectId)));
-    if (!object) return;
+    if (!object)
+        return;
     {
         Room *room = object->room();
         if (room) {
@@ -270,8 +273,10 @@ ObjectList &Area::getObjectsByType(ObjectType type) {
 
 shared_ptr<SpatialObject> Area::getObjectByTag(const string &tag, int nth) const {
     auto objects = _objectsByTag.find(tag);
-    if (objects == _objectsByTag.end()) return nullptr;
-    if (nth >= objects->second.size()) return nullptr;
+    if (objects == _objectsByTag.end())
+        return nullptr;
+    if (nth >= objects->second.size())
+        return nullptr;
 
     return objects->second[nth];
 }
@@ -327,32 +332,32 @@ void Area::reloadParty() {
 
 bool Area::handle(const SDL_Event &event) {
     switch (event.type) {
-        case SDL_KEYDOWN:
-            return handleKeyDown(event.key);
-        default:
-            return false;
+    case SDL_KEYDOWN:
+        return handleKeyDown(event.key);
+    default:
+        return false;
     }
 }
 
 bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
-        case SDL_SCANCODE_Q:
-            selectNextObject(true);
-            return true;
+    case SDL_SCANCODE_Q:
+        selectNextObject(true);
+        return true;
 
-        case SDL_SCANCODE_E:
-            selectNextObject();
-            return true;
+    case SDL_SCANCODE_E:
+        selectNextObject();
+        return true;
 
-        case SDL_SCANCODE_SLASH: {
-            if (_selectedObject) {
-                printDebugInfo(*_selectedObject);
-            }
-            return true;
+    case SDL_SCANCODE_SLASH: {
+        if (_selectedObject) {
+            printDebugInfo(*_selectedObject);
         }
+        return true;
+    }
 
-        default:
-            return false;
+    default:
+        return false;
     }
 }
 
@@ -389,8 +394,8 @@ void Area::update(float dt) {
 }
 
 bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt) {
-    static glm::vec3 up { 0.0f, 0.0f, 1.0f };
-    static glm::vec3 zOffset { 0.0f, 0.0f, 0.1f };
+    static glm::vec3 up {0.0f, 0.0f, 1.0f};
+    static glm::vec3 zOffset {0.0f, 0.0f, 0.1f};
 
     float facing = -glm::atan(dir.x, dir.y);
     creature->setFacing(facing);
@@ -417,7 +422,8 @@ bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &d
         dest.y += dir2.y * speedDt;
 
         // If obstacle is found twice, abort movement
-        if (getCreatureObstacle(creature->position() + zOffset, dest + zOffset, normal)) return false;
+        if (getCreatureObstacle(creature->position() + zOffset, dest + zOffset, normal))
+            return false;
     }
 
     return doMoveCreature(creature, dest);
@@ -460,19 +466,23 @@ void Area::runSpawnScripts() {
 }
 
 void Area::runOnEnterScript() {
-    if (_onEnter.empty()) return;
+    if (_onEnter.empty())
+        return;
 
     auto player = _game->party().player();
-    if (!player) return;
+    if (!player)
+        return;
 
     _game->scriptRunner().run(_onEnter, _id, player->id());
 }
 
 void Area::runOnExitScript() {
-    if (_onExit.empty()) return;
+    if (_onExit.empty())
+        return;
 
     auto player = _game->party().player();
-    if (!player) return;
+    if (!player)
+        return;
 
     _game->scriptRunner().run(_onExit, _id, player->id());
 }
@@ -563,7 +573,8 @@ int Area::getRandomGrassVariant() const {
 
     for (int i = 0; i < 3; ++i) {
         upper += _grass.probabilities[i];
-        if (val < upper) return i;
+        if (val < upper)
+            return i;
     }
 
     return 3;
@@ -579,22 +590,26 @@ glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &objec
 
 void Area::update3rdPersonCameraFacing() {
     shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
-    if (!partyLeader) return;
+    if (!partyLeader)
+        return;
 
     _thirdPersonCamera->setFacing(partyLeader->getFacing());
 }
 
 void Area::startDialog(const shared_ptr<SpatialObject> &object, const string &resRef) {
     string finalResRef(resRef);
-    if (resRef.empty()) finalResRef = object->conversation();
-    if (resRef.empty()) return;
+    if (resRef.empty())
+        finalResRef = object->conversation();
+    if (resRef.empty())
+        return;
 
     _game->startDialog(object, finalResRef);
 }
 
 void Area::onPartyLeaderMoved(bool roomChanged) {
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
-    if (!partyLeader) return;
+    if (!partyLeader)
+        return;
 
     if (roomChanged) {
         updateRoomVisibility();
@@ -635,7 +650,8 @@ void Area::updateRoomVisibility() {
 
 void Area::update3rdPersonCameraTarget() {
     shared_ptr<SpatialObject> partyLeader(_game->party().getLeader());
-    if (!partyLeader) return;
+    if (!partyLeader)
+        return;
 
     glm::vec3 position(partyLeader->position());
 
@@ -668,13 +684,15 @@ void Area::updateSounds() {
         Sound *soundPtr = static_cast<Sound *>(sound.get());
         soundPtr->setAudible(false);
 
-        if (!soundPtr->isActive()) continue;
+        if (!soundPtr->isActive())
+            continue;
 
         float maxDist2 = soundPtr->maxDistance();
         maxDist2 *= maxDist2;
 
         float dist2 = soundPtr->getDistanceTo2(refPosition);
-        if (dist2 > maxDist2) continue;
+        if (dist2 > maxDist2)
+            continue;
 
         soundDistances.push_back(make_pair(soundPtr, dist2));
     }
@@ -683,8 +701,10 @@ void Area::updateSounds() {
         int leftPriority = left.first->priority();
         int rightPriority = right.first->priority();
 
-        if (leftPriority < rightPriority) return true;
-        if (leftPriority > rightPriority) return false;
+        if (leftPriority < rightPriority)
+            return true;
+        if (leftPriority > rightPriority)
+            return false;
 
         return left.second < right.second;
     });
@@ -701,8 +721,10 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
 
     for (auto &object : _objectsByType[ObjectType::Trigger]) {
         auto trigger = static_pointer_cast<Trigger>(object);
-        if (trigger->getDistanceTo2(position2d) > kDefaultRaycastDistance * kDefaultRaycastDistance) continue;
-        if (trigger->isTenant(triggerrer) || !trigger->isIn(position2d)) continue;
+        if (trigger->getDistanceTo2(position2d) > kDefaultRaycastDistance * kDefaultRaycastDistance)
+            continue;
+        if (trigger->isTenant(triggerrer) || !trigger->isIn(position2d))
+            continue;
 
         debug(boost::format("Area: trigger '%s' triggerred by '%s'") % trigger->tag() % triggerrer->tag());
         trigger->addTenant(triggerrer);
@@ -734,18 +756,18 @@ void Area::updateHeartbeat(float dt) {
 
 Camera &Area::getCamera(CameraType type) {
     switch (type) {
-        case CameraType::FirstPerson:
-            return *_firstPersonCamera;
-        case CameraType::ThirdPerson:
-            return *_thirdPersonCamera;
-        case CameraType::Static:
-            return *_staticCamera;
-        case CameraType::Animated:
-            return *_animatedCamera;
-        case CameraType::Dialog:
-            return *_dialogCamera;
-        default:
-            throw invalid_argument("Unsupported camera type: " + to_string(static_cast<int>(type)));
+    case CameraType::FirstPerson:
+        return *_firstPersonCamera;
+    case CameraType::ThirdPerson:
+        return *_thirdPersonCamera;
+    case CameraType::Static:
+        return *_staticCamera;
+    case CameraType::Animated:
+        return *_animatedCamera;
+    case CameraType::Dialog:
+        return *_dialogCamera;
+    default:
+        throw invalid_argument("Unsupported camera type: " + to_string(static_cast<int>(type)));
     }
 }
 
@@ -761,12 +783,12 @@ void Area::setStaticCamera(int cameraId) {
 
 void Area::setThirdPartyCameraStyle(CameraStyleType type) {
     switch (type) {
-        case CameraStyleType::Combat:
-            _thirdPersonCamera->setStyle(_camStyleCombat);
-            break;
-        default:
-            _thirdPersonCamera->setStyle(_camStyleDefault);
-            break;
+    case CameraStyleType::Combat:
+        _thirdPersonCamera->setStyle(_camStyleCombat);
+        break;
+    default:
+        _thirdPersonCamera->setStyle(_camStyleDefault);
+        break;
     }
 }
 
@@ -796,31 +818,32 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
     shared_ptr<Object> object;
 
     switch (type) {
-        case ObjectType::Item: {
-            auto item = _game->objectFactory().newItem();
-            item->loadFromBlueprint(blueprintResRef);
-            object = move(item);
-            break;
-        }
-        case ObjectType::Creature: {
-            auto creature = _game->objectFactory().newCreature();
-            creature->loadFromBlueprint(blueprintResRef);
-            creature->setPosition(location->position());
-            creature->setFacing(location->facing());
-            object = move(creature);
-            break;
-        }
-        case ObjectType::Placeable: {
-            auto placeable = _game->objectFactory().newPlaceable();
-            placeable->loadFromBlueprint(blueprintResRef);
-            object = move(placeable);
-            break;
-        }
-        default:
-            warn("Area: createObject: unsupported object type: " + to_string(static_cast<int>(type)));
-            break;
+    case ObjectType::Item: {
+        auto item = _game->objectFactory().newItem();
+        item->loadFromBlueprint(blueprintResRef);
+        object = move(item);
+        break;
     }
-    if (!object) return nullptr;
+    case ObjectType::Creature: {
+        auto creature = _game->objectFactory().newCreature();
+        creature->loadFromBlueprint(blueprintResRef);
+        creature->setPosition(location->position());
+        creature->setFacing(location->facing());
+        object = move(creature);
+        break;
+    }
+    case ObjectType::Placeable: {
+        auto placeable = _game->objectFactory().newPlaceable();
+        placeable->loadFromBlueprint(blueprintResRef);
+        object = move(placeable);
+        break;
+    }
+    default:
+        warn("Area: createObject: unsupported object type: " + to_string(static_cast<int>(type)));
+        break;
+    }
+    if (!object)
+        return nullptr;
 
     auto spatial = dynamic_pointer_cast<SpatialObject>(object);
     if (spatial) {
@@ -882,13 +905,16 @@ vector<shared_ptr<SpatialObject>> Area::getSelectableObjects() const {
     glm::vec3 origin(partyLeader->position());
 
     for (auto &object : objects()) {
-        if (!object->isSelectable() || object.get() == partyLeader.get()) continue;
+        if (!object->isSelectable() || object.get() == partyLeader.get())
+            continue;
 
         auto model = static_pointer_cast<ModelSceneNode>(object->sceneNode());
-        if (!model || !model->isVisible()) continue;
+        if (!model || !model->isVisible())
+            continue;
 
         float dist2 = object->getDistanceTo2(origin);
-        if (dist2 > kSelectionDistance * kSelectionDistance) continue;
+        if (dist2 > kSelectionDistance * kSelectionDistance)
+            continue;
 
         distances.push_back(make_pair(object, dist2));
     }
@@ -956,64 +982,69 @@ shared_ptr<Creature> Area::getNearestCreature(const std::shared_ptr<SpatialObjec
 bool Area::matchesCriterias(const Creature &creature, const SearchCriteriaList &criterias, std::shared_ptr<SpatialObject> target) const {
     for (auto &criteria : criterias) {
         switch (criteria.first) {
-            case CreatureType::Reputation: {
-                auto reputation = static_cast<ReputationType>(criteria.second);
-                switch (reputation) {
-                    case ReputationType::Friend:
-                        if (!target || !_game->reputes().getIsFriend(creature, *static_pointer_cast<Creature>(target))) return false;
-                        break;
-                    case ReputationType::Enemy:
-                        if (!target || !_game->reputes().getIsEnemy(creature, *static_pointer_cast<Creature>(target))) return false;
-                        break;
-                    case ReputationType::Neutral:
-                        if (!target || !_game->reputes().getIsNeutral(creature, *static_pointer_cast<Creature>(target))) return false;
-                        break;
-                    default:
-                        break;
-                }
+        case CreatureType::Reputation: {
+            auto reputation = static_cast<ReputationType>(criteria.second);
+            switch (reputation) {
+            case ReputationType::Friend:
+                if (!target || !_game->reputes().getIsFriend(creature, *static_pointer_cast<Creature>(target)))
+                    return false;
                 break;
-            }
-            case CreatureType::Perception: {
-                if (!target) return false;
-
-                bool seen = creature.perception().seen.count(target) > 0;
-                bool heard = creature.perception().heard.count(target) > 0;
-                bool matches = false;
-                auto perception = static_cast<PerceptionType>(criteria.second);
-                switch (perception) {
-                    case PerceptionType::SeenAndHeard:
-                        matches = seen && heard;
-                        break;
-                    case PerceptionType::NotSeenAndNotHeard:
-                        matches = !seen && !heard;
-                        break;
-                    case PerceptionType::HeardAndNotSeen:
-                        matches = heard && !seen;
-                        break;
-                    case PerceptionType::SeenAndNotHeard:
-                        matches = seen && !heard;
-                        break;
-                    case PerceptionType::NotHeard:
-                        matches = !heard;
-                        break;
-                    case PerceptionType::Heard:
-                        matches = heard;
-                        break;
-                    case PerceptionType::NotSeen:
-                        matches = !seen;
-                        break;
-                    case PerceptionType::Seen:
-                        matches = seen;
-                        break;
-                    default:
-                        break;
-                }
-                if (!matches) return false;
+            case ReputationType::Enemy:
+                if (!target || !_game->reputes().getIsEnemy(creature, *static_pointer_cast<Creature>(target)))
+                    return false;
                 break;
-            }
+            case ReputationType::Neutral:
+                if (!target || !_game->reputes().getIsNeutral(creature, *static_pointer_cast<Creature>(target)))
+                    return false;
+                break;
             default:
-                // TODO: implement other criterias
                 break;
+            }
+            break;
+        }
+        case CreatureType::Perception: {
+            if (!target)
+                return false;
+
+            bool seen = creature.perception().seen.count(target) > 0;
+            bool heard = creature.perception().heard.count(target) > 0;
+            bool matches = false;
+            auto perception = static_cast<PerceptionType>(criteria.second);
+            switch (perception) {
+            case PerceptionType::SeenAndHeard:
+                matches = seen && heard;
+                break;
+            case PerceptionType::NotSeenAndNotHeard:
+                matches = !seen && !heard;
+                break;
+            case PerceptionType::HeardAndNotSeen:
+                matches = heard && !seen;
+                break;
+            case PerceptionType::SeenAndNotHeard:
+                matches = seen && !heard;
+                break;
+            case PerceptionType::NotHeard:
+                matches = !heard;
+                break;
+            case PerceptionType::Heard:
+                matches = heard;
+                break;
+            case PerceptionType::NotSeen:
+                matches = !seen;
+                break;
+            case PerceptionType::Seen:
+                matches = seen;
+                break;
+            default:
+                break;
+            }
+            if (!matches)
+                return false;
+            break;
+        }
+        default:
+            // TODO: implement other criterias
+            break;
         }
     }
 
@@ -1050,7 +1081,8 @@ void Area::doUpdatePerception() {
     ObjectList &creatures = getObjectsByType(ObjectType::Creature);
     for (auto &object : creatures) {
         // Skip dead creatures
-        if (object->isDead()) continue;
+        if (object->isDead())
+            continue;
 
         auto creature = static_pointer_cast<Creature>(object);
         float hearingRange2 = creature->perception().hearingRange * creature->perception().hearingRange;
@@ -1058,7 +1090,8 @@ void Area::doUpdatePerception() {
 
         for (auto &other : creatures) {
             // Skip self
-            if (other == object) continue;
+            if (other == object)
+                continue;
 
             bool heard = false;
             bool seen = false;
@@ -1187,27 +1220,32 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
     for (auto &o : _objects) {
         auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
         shared_ptr<Walkmesh> walkmesh(o->getWalkmesh());
-        if (!model || !walkmesh) continue;
+        if (!model || !walkmesh)
+            continue;
 
         // Distance to object must not exceed maximum collision distance
-        if (o->getDistanceTo2(point) > kMaxCollisionDistance2) continue;
+        if (o->getDistanceTo2(point) > kMaxCollisionDistance2)
+            continue;
 
         // Test non-walkable faces beneath the specified point (object space)
         glm::vec2 objSpacePos(model->absoluteTransformInverse() * glm::vec4(point, 0.0f, 1.0f));
         float distance;
         glm::vec3 normal;
-        if (walkmesh->raycastNonWalkableFirst(glm::vec3(objSpacePos, kElevationTestZ), down, distance, normal)) return false;
+        if (walkmesh->raycastNonWalkableFirst(glm::vec3(objSpacePos, kElevationTestZ), down, distance, normal))
+            return false;
     }
 
     // Test walkable faces of room walkmeshes
     for (auto &r : _rooms) {
         shared_ptr<ModelSceneNode> model(r.second->model());
         shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
-        if (!model || !walkmesh) continue;
+        if (!model || !walkmesh)
+            continue;
 
         // Point must be inside room AABB in 2D object space
         glm::vec2 roomSpacePos(model->absoluteTransformInverse() * glm::vec4(point, 0.0f, 1.0f));
-        if (!model->aabb().contains(roomSpacePos)) continue;
+        if (!model->aabb().contains(roomSpacePos))
+            continue;
 
         // Test walkable faces beneath the specified point (world space)
         float distance;
@@ -1226,7 +1264,8 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
 shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
     shared_ptr<CameraSceneNode> camera(_game->sceneGraph().activeCamera());
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
-    if (!camera || !partyLeader) return nullptr;
+    if (!camera || !partyLeader)
+        return nullptr;
 
     const GraphicsOptions &opts = _game->options().graphics;
     glm::vec4 viewport(0.0f, 0.0f, opts.width, opts.height);
@@ -1238,13 +1277,16 @@ shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
     vector<pair<shared_ptr<SpatialObject>, float>> distances;
     for (auto &o : _objects) {
         // Skip non-selectable objects and party leader
-        if (!o->isSelectable() || o == partyLeader) continue;
+        if (!o->isSelectable() || o == partyLeader)
+            continue;
 
         auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
-        if (!model) continue;
+        if (!model)
+            continue;
 
         // Distance to object must not exceed maximum collision distance
-        if (o->getDistanceTo2(start) > kMaxCollisionDistance2) continue;
+        if (o->getDistanceTo2(start) > kMaxCollisionDistance2)
+            continue;
 
         // Test object AABB (object space)
         glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
@@ -1254,7 +1296,8 @@ shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
             distances.push_back(make_pair(o, distance));
         }
     }
-    if (distances.empty()) return nullptr;
+    if (distances.empty())
+        return nullptr;
     sort(distances.begin(), distances.end(), [](auto &left, auto &right) { return left.second < right.second; });
 
     return distances[0].first;
@@ -1268,13 +1311,16 @@ bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::
 
     // Test AABB of door objects
     for (auto &o : _objects) {
-        if (o->type() != ObjectType::Door) continue;
+        if (o->type() != ObjectType::Door)
+            continue;
 
         auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
-        if (!model) continue;
+        if (!model)
+            continue;
 
         // Distance to object must not exceed maximum collision distance
-        if (o->getDistanceTo2(start) > kMaxCollisionDistance2) continue;
+        if (o->getDistanceTo2(start) > kMaxCollisionDistance2)
+            continue;
 
         glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
         glm::vec3 objSpaceDir(model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
@@ -1288,11 +1334,13 @@ bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::
     for (auto &r : _rooms) {
         shared_ptr<ModelSceneNode> model(r.second->model());
         shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
-        if (!model || !walkmesh) continue;
+        if (!model || !walkmesh)
+            continue;
 
         // Start of path must be inside room AABB
         glm::vec2 roomSpacePos(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
-        if (!model->aabb().contains(roomSpacePos)) continue;
+        if (!model->aabb().contains(roomSpacePos))
+            continue;
 
         float distance;
         glm::vec3 normal;
@@ -1319,11 +1367,13 @@ bool Area::getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm
     for (auto &r : _rooms) {
         shared_ptr<ModelSceneNode> model(r.second->model());
         shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
-        if (!model || !walkmesh) continue;
+        if (!model || !walkmesh)
+            continue;
 
         // Start of path must be inside room AABB
         glm::vec2 roomSpacePos(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
-        if (!model->aabb().contains(roomSpacePos)) continue;
+        if (!model->aabb().contains(roomSpacePos))
+            continue;
 
         float distance;
         glm::vec3 tempNormal;
@@ -1337,7 +1387,7 @@ bool Area::getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm
 }
 
 bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target) const {
-    static glm::vec3 offsetZ { 0.0f, 0.0f, kLineOfSightTestHeight };
+    static glm::vec3 offsetZ {0.0f, 0.0f, kLineOfSightTestHeight};
 
     glm::vec3 start(subject.position() + offsetZ);
     glm::vec3 end(target.position() + offsetZ);
@@ -1346,34 +1396,41 @@ bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target)
     float maxDistance = glm::length(startToEnd);
 
     for (auto &o : _objects) {
-        if (o->type() != ObjectType::Door) continue;
+        if (o->type() != ObjectType::Door)
+            continue;
 
         auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
-        if (!model) continue;
+        if (!model)
+            continue;
 
         // Distance to object must not exceed maximum collision distance
-        if (o->getDistanceTo2(start) > kMaxCollisionDistance2) continue;
+        if (o->getDistanceTo2(start) > kMaxCollisionDistance2)
+            continue;
 
         glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
         glm::vec3 objSpaceDir(model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
         float distance;
-        if (model->aabb().raycast(objSpaceStart, objSpaceDir, distance) && distance < maxDistance) return false;
+        if (model->aabb().raycast(objSpaceStart, objSpaceDir, distance) && distance < maxDistance)
+            return false;
     }
 
     // Test non-walkable faces of room walkmeshes
     for (auto &r : _rooms) {
         shared_ptr<ModelSceneNode> model(r.second->model());
         shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
-        if (!model || !walkmesh) continue;
+        if (!model || !walkmesh)
+            continue;
 
         // Start or end of path must be inside room AABB
         glm::vec2 roomSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
         glm::vec2 roomSpaceEnd(model->absoluteTransformInverse() * glm::vec4(end, 1.0f));
-        if (!model->aabb().contains(roomSpaceStart) && !model->aabb().contains(roomSpaceEnd)) continue;
+        if (!model->aabb().contains(roomSpaceStart) && !model->aabb().contains(roomSpaceEnd))
+            continue;
 
         float distance;
         glm::vec3 normal;
-        if (walkmesh->raycastNonWalkableClosest(start, dir, distance, normal) && distance < maxDistance) return false;
+        if (walkmesh->raycastNonWalkableClosest(start, dir, distance, normal) && distance < maxDistance)
+            return false;
     }
 
     return true;

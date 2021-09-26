@@ -25,7 +25,8 @@ namespace game {
 
 class LightsaberThrowEffect : public Effect {
 public:
-    LightsaberThrowEffect() : Effect(EffectType::LightsaberThrow) {
+    LightsaberThrowEffect() :
+        Effect(EffectType::LightsaberThrow) {
     }
 
     void applyTo(SpatialObject &object) override;

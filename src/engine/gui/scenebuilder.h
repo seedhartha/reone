@@ -31,14 +31,14 @@ class PBRIBL;
 class Shaders;
 class Textures;
 
-}
+} // namespace graphics
 
 namespace scene {
 
 class ModelSceneNode;
 class SceneGraph;
 
-}
+} // namespace scene
 
 namespace gui {
 
@@ -84,15 +84,15 @@ private:
 
     // END Services
 
-    float _aspect { 1.0f };
-    float _zNear { 0.1f };
-    float _zFar { 1000.0f };
+    float _aspect {1.0f};
+    float _zNear {0.1f};
+    float _zFar {1000.0f};
     std::function<std::shared_ptr<scene::ModelSceneNode>(scene::SceneGraph &)> _modelSupplier;
-    float _modelScale { 1.0f };
-    glm::vec2 _modelOffset { 0.0f };
-    glm::mat4 _cameraTransform { 1.0f };
+    float _modelScale {1.0f};
+    glm::vec2 _modelOffset {0.0f};
+    glm::mat4 _cameraTransform {1.0f};
     std::string _cameraNodeName;
-    glm::vec3 _ambientLightColor { 0.0f };
+    glm::vec3 _ambientLightColor {0.0f};
     std::string _lightingRefNodeName;
 };
 

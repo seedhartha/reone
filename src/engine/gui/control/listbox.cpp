@@ -50,7 +50,8 @@ void ListBox::clearItems() {
 }
 
 void ListBox::addItem(Item &&item) {
-    if (!_protoItem) return;
+    if (!_protoItem)
+        return;
 
     item._textLines = breakText(item.text, *_protoItem->text().font, _protoItem->extent().width);
     _items.push_back(item);
@@ -59,13 +60,14 @@ void ListBox::addItem(Item &&item) {
 }
 
 void ListBox::addTextLinesAsItems(const string &text) {
-    if (!_protoItem) return;
+    if (!_protoItem)
+        return;
 
     vector<string> lines(breakText(text, *_protoItem->text().font, _protoItem->extent().width));
     for (auto &line : lines) {
         Item item;
         item.text = line;
-        item._textLines = vector<string> { line };
+        item._textLines = vector<string> {line};
         _items.push_back(move(item));
     }
 
@@ -100,13 +102,16 @@ bool ListBox::handleMouseMotion(int x, int y) {
 }
 
 int ListBox::getItemIndex(int y) const {
-    if (!_protoItem) return -1;
+    if (!_protoItem)
+        return -1;
 
     const Control::Extent &protoExtent = _protoItem->extent();
-    if (protoExtent.height == 0) return -1;
+    if (protoExtent.height == 0)
+        return -1;
 
     float itemy = static_cast<float>(protoExtent.top);
-    if (y < itemy) return -1;
+    if (y < itemy)
+        return -1;
 
     for (size_t i = _itemOffset; i < _items.size(); ++i) {
         const Item &item = _items[i];
@@ -116,7 +121,8 @@ int ListBox::getItemIndex(int y) const {
             itemy += protoExtent.height;
         }
         itemy += _padding;
-        if (y < itemy) return static_cast<int>(i);
+        if (y < itemy)
+            return static_cast<int>(i);
     }
 
     return -1;
@@ -153,7 +159,8 @@ void ListBox::updateItemSlots() {
         }
         y += _padding;
 
-        if (y > _extent.height) break;
+        if (y > _extent.height)
+            break;
 
         ++_slotCount;
     }
@@ -165,7 +172,8 @@ void ListBox::updateItemSlots() {
 
 bool ListBox::handleClick(int x, int y) {
     int itemIdx = getItemIndex(y);
-    if (itemIdx == -1) return false;
+    if (itemIdx == -1)
+        return false;
 
     if (_selectionMode == SelectionMode::OnClick) {
         _selectedItemIndex = itemIdx;
@@ -178,17 +186,20 @@ bool ListBox::handleClick(int x, int y) {
 }
 
 void ListBox::draw(const glm::ivec2 &offset, const vector<string> &text) {
-    if (!_visible) return;
+    if (!_visible)
+        return;
 
     Control::draw(offset, text);
 
-    if (!_protoItem) return;
+    if (!_protoItem)
+        return;
 
     glm::vec2 itemOffset(offset);
 
     for (int i = 0; i < _slotCount; ++i) {
         int itemIdx = i + _itemOffset;
-        if (itemIdx >= _items.size()) break;
+        if (itemIdx >= _items.size())
+            break;
 
         const Item &item = _items[itemIdx];
         if (_protoMatchContent) {

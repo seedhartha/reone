@@ -83,99 +83,99 @@ void GameServices::init() {
 
 unique_ptr<Game> GameServices::newGame() {
     switch (_gameId) {
-        case GameID::KotOR:
-            return make_unique<KotOR>(
-                _gamePath,
-                _gameOptions,
-                *_actionFactory,
-                *_classes,
-                *_combat,
-                *_cursors,
-                *_effectFactory,
-                *_feats,
-                *_footstepSounds,
-                *_guiSounds,
-                *_objectFactory,
-                *_party,
-                *_portraits,
-                *_reputes,
-                *_scriptRunner,
-                *_skills,
-                *_soundSets,
-                *_surfaces,
-                _audio.files(),
-                _audio.player(),
-                _graphics.context(),
-                _graphics.features(),
-                _graphics.fonts(),
-                _graphics.lips(),
-                _graphics.materials(),
-                _graphics.meshes(),
-                _graphics.models(),
-                _graphics.pbrIbl(),
-                _graphics.shaders(),
-                _graphics.textures(),
-                _graphics.walkmeshes(),
-                _graphics.window(),
-                _scene.graph(),
-                _scene.worldRenderPipeline(),
-                _script.scripts(),
-                _resource.resources(),
-                _resource.strings());
+    case GameID::KotOR:
+        return make_unique<KotOR>(
+            _gamePath,
+            _gameOptions,
+            *_actionFactory,
+            *_classes,
+            *_combat,
+            *_cursors,
+            *_effectFactory,
+            *_feats,
+            *_footstepSounds,
+            *_guiSounds,
+            *_objectFactory,
+            *_party,
+            *_portraits,
+            *_reputes,
+            *_scriptRunner,
+            *_skills,
+            *_soundSets,
+            *_surfaces,
+            _audio.files(),
+            _audio.player(),
+            _graphics.context(),
+            _graphics.features(),
+            _graphics.fonts(),
+            _graphics.lips(),
+            _graphics.materials(),
+            _graphics.meshes(),
+            _graphics.models(),
+            _graphics.pbrIbl(),
+            _graphics.shaders(),
+            _graphics.textures(),
+            _graphics.walkmeshes(),
+            _graphics.window(),
+            _scene.graph(),
+            _scene.worldRenderPipeline(),
+            _script.scripts(),
+            _resource.resources(),
+            _resource.strings());
 
-        case GameID::TSL:
-            return make_unique<TSL>(
-                _gamePath,
-                _gameOptions,
-                *_actionFactory,
-                *_classes,
-                *_combat,
-                *_cursors,
-                *_effectFactory,
-                *_feats,
-                *_footstepSounds,
-                *_guiSounds,
-                *_objectFactory,
-                *_party,
-                *_portraits,
-                *_reputes,
-                *_scriptRunner,
-                *_skills,
-                *_soundSets,
-                *_surfaces,
-                _audio.files(),
-                _audio.player(),
-                _graphics.context(),
-                _graphics.features(),
-                _graphics.fonts(),
-                _graphics.lips(),
-                _graphics.materials(),
-                _graphics.meshes(),
-                _graphics.models(),
-                _graphics.pbrIbl(),
-                _graphics.shaders(),
-                _graphics.textures(),
-                _graphics.walkmeshes(),
-                _graphics.window(),
-                _scene.graph(),
-                _scene.worldRenderPipeline(),
-                _script.scripts(),
-                _resource.resources(),
-                _resource.strings());
+    case GameID::TSL:
+        return make_unique<TSL>(
+            _gamePath,
+            _gameOptions,
+            *_actionFactory,
+            *_classes,
+            *_combat,
+            *_cursors,
+            *_effectFactory,
+            *_feats,
+            *_footstepSounds,
+            *_guiSounds,
+            *_objectFactory,
+            *_party,
+            *_portraits,
+            *_reputes,
+            *_scriptRunner,
+            *_skills,
+            *_soundSets,
+            *_surfaces,
+            _audio.files(),
+            _audio.player(),
+            _graphics.context(),
+            _graphics.features(),
+            _graphics.fonts(),
+            _graphics.lips(),
+            _graphics.materials(),
+            _graphics.meshes(),
+            _graphics.models(),
+            _graphics.pbrIbl(),
+            _graphics.shaders(),
+            _graphics.textures(),
+            _graphics.walkmeshes(),
+            _graphics.window(),
+            _scene.graph(),
+            _scene.worldRenderPipeline(),
+            _script.scripts(),
+            _resource.resources(),
+            _resource.strings());
 
-        default:
-            throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
+    default:
+        throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
     }
 }
 
 unique_ptr<RoutineRegistrar> GameServices::newRoutineRegistrar() {
     switch (_gameId) {
-        case GameID::KotOR:
-            return make_unique<KotORRoutineRegistrar>(*_routines);
-        case GameID::TSL:
-            return make_unique<TSLRoutineRegistrar>(*_routines);
-        default:
-            throw invalid_argument("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
+    case GameID::KotOR:
+        return make_unique<KotORRoutineRegistrar>(*_routines);
+    case GameID::TSL:
+        return make_unique<TSLRoutineRegistrar>(*_routines);
+    default:
+        throw invalid_argument("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
     }
 }
 

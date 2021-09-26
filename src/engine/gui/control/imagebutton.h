@@ -33,8 +33,7 @@ public:
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,
-        resource::Strings &strings
-    ) :
+        resource::Strings &strings) :
         Control(
             gui,
             ControlType::ImageButton,

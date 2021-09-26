@@ -50,9 +50,9 @@ private:
 
     std::shared_ptr<std::istream> _in;
     boost::filesystem::path _path;
-    State _state { State::None };
-    int _roomCount { 0 };
-    int _doorHookCount { 0 };
+    State _state {State::None};
+    int _roomCount {0};
+    int _doorHookCount {0};
     std::vector<Room> _rooms;
     std::vector<DoorHook> _doorHooks;
 

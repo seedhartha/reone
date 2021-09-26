@@ -26,24 +26,24 @@ namespace script {
 class NcsReader;
 
 struct Instruction {
-    uint32_t offset { 0 };
-    ByteCode byteCode { ByteCode::Invalid };
-    InstructionType type { InstructionType::None };
-    uint32_t nextOffset { 0 };
+    uint32_t offset {0};
+    ByteCode byteCode {ByteCode::Invalid};
+    InstructionType type {InstructionType::None};
+    uint32_t nextOffset {0};
     std::string strValue;
 
     union {
-        int jumpOffset { 0 };
+        int jumpOffset {0};
         int stackOffset;
     };
 
     union {
-        uint16_t size { 0 };
+        uint16_t size {0};
         int argCount;
     };
 
     union {
-        int routine { 0 };
+        int routine {0};
         int intValue;
         float floatValue;
         int objectId; // used only for CONSTO
@@ -67,7 +67,7 @@ public:
 
 private:
     std::string _name;
-    uint32_t _length { 0 };
+    uint32_t _length {0};
     std::unordered_map<uint32_t, Instruction> _instructions;
 
     friend class NcsReader;

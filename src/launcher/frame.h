@@ -44,13 +44,13 @@ public:
 private:
     struct Configuration {
         std::string gameDir;
-        bool devMode { false };
-        int width { 0 };
-        int height { 0 };
-        bool fullscreen { false };
-        bool pbr { false };
-        int logch { 0 };
-        bool logfile { false };
+        bool devMode {false};
+        int width {0};
+        int height {0};
+        bool fullscreen {false};
+        bool pbr {false};
+        int logch {0};
+        bool logfile {false};
     } _config;
 
     wxTextCtrl *_textCtrlGameDir;

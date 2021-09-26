@@ -31,7 +31,8 @@ void GffStruct::add(GffField &&field) {
 
 bool GffStruct::getBool(const string &name, bool defValue) const {
     const GffField *field = get(name);
-    if (!field) return defValue;
+    if (!field)
+        return defValue;
 
     return field->intValue != 0;
 }
@@ -47,14 +48,16 @@ const GffField *GffStruct::get(const string &name) const {
 
 int GffStruct::getInt(const string &name, int defValue) const {
     const GffField *field = get(name);
-    if (!field) return defValue;
+    if (!field)
+        return defValue;
 
     return field->intValue;
 }
 
 uint32_t GffStruct::getUint(const string &name, uint32_t defValue) const {
     const GffField *field = get(name);
-    if (!field) return defValue;
+    if (!field)
+        return defValue;
 
     return field->uintValue;
 }
@@ -72,49 +75,56 @@ static glm::vec3 colorFromUint32(uint32_t value) {
 
 glm::vec3 GffStruct::getColor(const string &name, glm::vec3 defValue) const {
     const GffField *field = get(name);
-    if (!field) return move(defValue);
+    if (!field)
+        return move(defValue);
 
     return colorFromUint32(field->uintValue);
 }
 
 float GffStruct::getFloat(const string &name, float defValue) const {
     const GffField *field = get(name);
-    if (!field) return defValue;
+    if (!field)
+        return defValue;
 
     return field->floatValue;
 }
 
 string GffStruct::getString(const string &name, string defValue) const {
     const GffField *field = get(name);
-    if (!field) return defValue;
+    if (!field)
+        return defValue;
 
     return field->strValue;
 }
 
 glm::vec3 GffStruct::getVector(const string &name, glm::vec3 defValue) const {
     const GffField *field = get(name);
-    if (!field) return move(defValue);
+    if (!field)
+        return move(defValue);
 
     return field->vecValue;
 }
 
 glm::quat GffStruct::getOrientation(const string &name, glm::quat defValue) const {
     const GffField *field = get(name);
-    if (!field) return defValue;
+    if (!field)
+        return defValue;
 
     return field->quatValue;
 }
 
 shared_ptr<GffStruct> GffStruct::getStruct(const string &name) const {
     const GffField *field = get(name);
-    if (!field) return nullptr;
+    if (!field)
+        return nullptr;
 
     return field->children[0];
 }
 
 vector<shared_ptr<GffStruct>> GffStruct::getList(const string &name) const {
     const GffField *field = get(name);
-    if (!field) return vector<shared_ptr<GffStruct>>();
+    if (!field)
+        return vector<shared_ptr<GffStruct>>();
 
     return field->children;
 }

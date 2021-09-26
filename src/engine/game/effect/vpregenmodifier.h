@@ -25,7 +25,8 @@ namespace game {
 
 class VPRegenModifierEffect : public Effect {
 public:
-    VPRegenModifierEffect() : Effect(EffectType::VPRegenModifier) {
+    VPRegenModifierEffect() :
+        Effect(EffectType::VPRegenModifier) {
     }
 
     void applyTo(SpatialObject &object) override;

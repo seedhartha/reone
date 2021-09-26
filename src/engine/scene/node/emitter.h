@@ -33,15 +33,15 @@ class ModelSceneNode;
 class EmitterSceneNode : public ModelNodeSceneNode {
 public:
     struct Particle : public SceneNodeElement {
-        glm::vec3 position { 0.0f };
-        glm::vec3 dir { 0.0f }; // used in Linked render mode
-        glm::vec3 color { 1.0f };
-        glm::vec3 velocity { 0.0f };
-        glm::vec2 size { 1.0f };
-        float animLength { 0.0f };
-        float lifetime { 0.0f };
-        float alpha { 1.0f };
-        int frame { 0 };
+        glm::vec3 position {0.0f};
+        glm::vec3 dir {0.0f}; // used in Linked render mode
+        glm::vec3 color {1.0f};
+        glm::vec3 velocity {0.0f};
+        glm::vec2 size {1.0f};
+        float animLength {0.0f};
+        float lifetime {0.0f};
+        float alpha {1.0f};
+        int frame {0};
     };
 
     EmitterSceneNode(
@@ -66,26 +66,26 @@ private:
     graphics::BezierCurve<glm::vec3> _color;
     graphics::BezierCurve<float> _alpha;
 
-    float _birthrate { 0.0f }; /**< rate of particle birth per second */
-    float _lifeExpectancy { 0.0f }; /**< life of each particle in seconds */
-    glm::vec2 _size { 0.0f };
-    int _frameStart { 0 };
-    int _frameEnd { 0 };
-    float _fps { 0.0f };
-    float _spread { 0.0f };
-    float _velocity { 0.0f };
-    float _randomVelocity { 0.0f };
-    float _mass { 0.0f };
-    float _grav { 0.0f };
-    float _lightningDelay { 0.0f };
-    float _lightningRadius { 0.0f };
-    float _lightningScale { 0.0f };
-    int _lightningSubDiv { 0 };
+    float _birthrate {0.0f};      /**< rate of particle birth per second */
+    float _lifeExpectancy {0.0f}; /**< life of each particle in seconds */
+    glm::vec2 _size {0.0f};
+    int _frameStart {0};
+    int _frameEnd {0};
+    float _fps {0.0f};
+    float _spread {0.0f};
+    float _velocity {0.0f};
+    float _randomVelocity {0.0f};
+    float _mass {0.0f};
+    float _grav {0.0f};
+    float _lightningDelay {0.0f};
+    float _lightningRadius {0.0f};
+    float _lightningScale {0.0f};
+    int _lightningSubDiv {0};
 
-    float _birthInterval { 0.0f };
+    float _birthInterval {0.0f};
     Timer _birthTimer;
     std::deque<std::shared_ptr<Particle>> _particles;
-    bool _spawned { false };
+    bool _spawned {false};
 
     void spawnParticles(float dt);
     void removeExpiredParticles(float dt);

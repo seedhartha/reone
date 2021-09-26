@@ -44,7 +44,7 @@ namespace resource {
 class Resources;
 class Strings;
 
-}
+} // namespace resource
 
 namespace graphics {
 
@@ -61,21 +61,21 @@ class Textures;
 class Walkmeshes;
 class Window;
 
-}
+} // namespace graphics
 
 namespace audio {
 
 class AudioFiles;
 class AudioPlayer;
 
-}
+} // namespace audio
 
 namespace scene {
 
 class SceneGraph;
 class WorldRenderPipeline;
 
-}
+} // namespace scene
 
 namespace script {
 
@@ -314,7 +314,7 @@ public:
     // END IEventHandler
 
 protected:
-    const std::string kDataDirectoryName { "data" };
+    const std::string kDataDirectoryName {"data"};
 
     GameID _gameId;
     boost::filesystem::path _path;
@@ -366,9 +366,9 @@ protected:
 
     // GUI colors
 
-    glm::vec3 _guiColorBase { 0.0f };
-    glm::vec3 _guiColorHilight { 0.0f };
-    glm::vec3 _guiColorDisabled { 0.0f };
+    glm::vec3 _guiColorBase {0.0f};
+    glm::vec3 _guiColorHilight {0.0f};
+    glm::vec3 _guiColorDisabled {0.0f};
 
     // END GUI colors
 
@@ -388,16 +388,16 @@ private:
 
     Options _options;
 
-    GameScreen _screen { GameScreen::MainMenu };
-    uint32_t _ticks { 0 };
-    bool _quit { false };
+    GameScreen _screen {GameScreen::MainMenu};
+    uint32_t _ticks {0};
+    bool _quit {false};
     std::shared_ptr<video::Video> _video;
-    CursorType _cursorType { CursorType::None };
-    float _gameSpeed { 1.0f };
-    bool _loadFromSaveGame { false };
-    CameraType _cameraType { CameraType::ThirdPerson };
-    bool _paused { false };
-    Conversation *_conversation { nullptr }; /**< pointer to either DialogGUI or ComputerGUI  */
+    CursorType _cursorType {CursorType::None};
+    float _gameSpeed {1.0f};
+    bool _loadFromSaveGame {false};
+    CameraType _cameraType {CameraType::ThirdPerson};
+    bool _paused {false};
+    Conversation *_conversation {nullptr}; /**< pointer to either DialogGUI or ComputerGUI  */
     std::set<std::string> _moduleNames;
 
     // Modules

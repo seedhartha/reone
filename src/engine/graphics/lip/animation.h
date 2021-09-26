@@ -24,8 +24,8 @@ namespace graphics {
 class LipAnimation {
 public:
     struct Keyframe {
-        float time { 0.0f };
-        uint8_t shape { 0 }; /**< an index into the keyframes of the "talk" animation  */
+        float time {0.0f};
+        uint8_t shape {0}; /**< an index into the keyframes of the "talk" animation  */
     };
 
     LipAnimation(float length, std::vector<Keyframe> keyframes);
@@ -36,7 +36,7 @@ public:
     const std::vector<Keyframe> &keyframes() const { return _keyframes; }
 
 private:
-    float _length { 0.0f };
+    float _length {0.0f};
     std::vector<Keyframe> _keyframes;
 };
 

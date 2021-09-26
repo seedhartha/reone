@@ -37,7 +37,8 @@ void Context::unbindRenderbuffer() {
 }
 
 void Context::setViewport(glm::ivec4 viewport) {
-    if (_viewport == viewport) return;
+    if (_viewport == viewport)
+        return;
 
     glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
@@ -45,7 +46,8 @@ void Context::setViewport(glm::ivec4 viewport) {
 }
 
 void Context::setDepthTestEnabled(bool enabled) {
-    if (_depthTest == enabled) return;
+    if (_depthTest == enabled)
+        return;
 
     if (enabled) {
         glEnable(GL_DEPTH_TEST);
@@ -56,7 +58,8 @@ void Context::setDepthTestEnabled(bool enabled) {
 }
 
 void Context::setBackFaceCullingEnabled(bool enabled) {
-    if (_backFaceCulling == enabled) return;
+    if (_backFaceCulling == enabled)
+        return;
 
     if (enabled) {
         glEnable(GL_CULL_FACE);
@@ -68,48 +71,51 @@ void Context::setBackFaceCullingEnabled(bool enabled) {
 
 static uint32_t getPolygonModeGL(PolygonMode mode) {
     switch (mode) {
-        case PolygonMode::Line:
-            return GL_LINE;
-        case PolygonMode::Fill:
-        default:
-            return GL_FILL;
+    case PolygonMode::Line:
+        return GL_LINE;
+    case PolygonMode::Fill:
+    default:
+        return GL_FILL;
     }
 }
 
 void Context::setPolygonMode(PolygonMode mode) {
-    if (_polygonMode == mode) return;
+    if (_polygonMode == mode)
+        return;
 
     glPolygonMode(GL_FRONT_AND_BACK, getPolygonModeGL(mode));
 }
 
 void Context::setActiveTextureUnit(int n) {
-    if (_textureUnit == n) return;
+    if (_textureUnit == n)
+        return;
 
     glActiveTexture(GL_TEXTURE0 + n);
     _textureUnit = n;
 }
 
 void Context::setBlendMode(BlendMode mode) {
-    if (_blendMode == mode) return;
+    if (_blendMode == mode)
+        return;
 
     switch (mode) {
-        case BlendMode::None:
-            glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
-            glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_ZERO);
-            break;
-        case BlendMode::Add:
-            glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
-            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_SRC_ALPHA, GL_ONE);
-            break;
-        case BlendMode::Lighten:
-            glBlendEquationSeparate(GL_MAX, GL_FUNC_ADD);
-            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE);
-            break;
-        case BlendMode::Default:
-        default:
-            glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
-            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE);
-            break;
+    case BlendMode::None:
+        glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+        glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_ZERO);
+        break;
+    case BlendMode::Add:
+        glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_SRC_ALPHA, GL_ONE);
+        break;
+    case BlendMode::Lighten:
+        glBlendEquationSeparate(GL_MAX, GL_FUNC_ADD);
+        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE);
+        break;
+    case BlendMode::Default:
+    default:
+        glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE);
+        break;
     }
 
     _blendMode = mode;

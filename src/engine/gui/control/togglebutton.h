@@ -33,8 +33,7 @@ public:
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,
-        resource::Strings &strings
-    ) :
+        resource::Strings &strings) :
         Button(
             gui,
             ControlType::ToggleButton,
@@ -56,8 +55,8 @@ public:
     void setOnColor(const glm::vec3 &color);
 
 private:
-    bool _on { false };
-    glm::vec3 _onColor { 1.0f };
+    bool _on {false};
+    glm::vec3 _onColor {1.0f};
 };
 
 } // namespace gui

@@ -89,9 +89,7 @@ void Executor::runSingleTask() {
 
 shared_ptr<Task> Executor::getTask() {
     lock_guard<mutex> lock(_tasksMutex);
-    return !_tasks.empty() ?
-        _tasks.front() :
-        shared_ptr<Task>();
+    return !_tasks.empty() ? _tasks.front() : shared_ptr<Task>();
 }
 
 } // namespace reone

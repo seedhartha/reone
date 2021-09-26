@@ -41,12 +41,13 @@ bool Party::handle(const SDL_Event &event) {
 }
 
 bool Party::handleKeyDown(const SDL_KeyboardEvent &event) {
-    if (event.repeat) return false;
+    if (event.repeat)
+        return false;
 
     switch (event.keysym.sym) {
-        case SDLK_TAB:
-            switchLeader();
-            return true;
+    case SDLK_TAB:
+        switchLeader();
+        return true;
     }
 
     return false;
@@ -91,22 +92,23 @@ void Party::clear() {
 
 void Party::switchLeader() {
     int count = static_cast<int>(_members.size());
-    if (count < 2) return;
+    if (count < 2)
+        return;
 
     switch (count) {
-        case 2: {
-            Member tmp(_members[0]);
-            _members[0] = _members[1];
-            _members[1] = tmp;
-            break;
-        }
-        case 3: {
-            Member tmp(_members[0]);
-            _members[0] = _members[1];
-            _members[1] = _members[2];
-            _members[2] = tmp;
-            break;
-        }
+    case 2: {
+        Member tmp(_members[0]);
+        _members[0] = _members[1];
+        _members[1] = tmp;
+        break;
+    }
+    case 3: {
+        Member tmp(_members[0]);
+        _members[0] = _members[1];
+        _members[1] = _members[2];
+        _members[2] = tmp;
+        break;
+    }
     }
 
     onLeaderChanged();
@@ -145,7 +147,8 @@ int Party::getSize() const {
 
 bool Party::isMember(int npc) const {
     for (auto &member : _members) {
-        if (member.npc == npc) return true;
+        if (member.npc == npc)
+            return true;
     }
     return false;
 }
@@ -156,7 +159,8 @@ bool Party::isMemberAvailable(int npc) const {
 
 bool Party::isMember(const Object &object) const {
     for (auto &member : _members) {
-        if (member.creature->id() == object.id()) return true;
+        if (member.creature->id() == object.id())
+            return true;
     }
     return false;
 }
@@ -177,13 +181,15 @@ void Party::setPartyLeader(int npc) {
         warn("Party: NPC not found: " + to_string(npc));
         return;
     }
-    if (memberIdx == 0) return;
+    if (memberIdx == 0)
+        return;
 
     setPartyLeaderByIndex(memberIdx);
 }
 
 void Party::setPartyLeaderByIndex(int index) {
-    if (index < 1 || index >= _members.size()) return;
+    if (index < 1 || index >= _members.size())
+        return;
 
     Member tmp(_members[0]);
     _members[0] = _members[index];

@@ -40,22 +40,20 @@ static constexpr int kMinAbilityScore = 8;
 static constexpr int kMaxAbilityScore = 18;
 
 static const unordered_map<string, Ability> g_abilityByAlias {
-    { "STR", Ability::Strength },
-    { "DEX", Ability::Dexterity },
-    { "CON", Ability::Constitution },
-    { "INT", Ability::Intelligence },
-    { "WIS", Ability::Wisdom },
-    { "CHA", Ability::Charisma }
-};
+    {"STR", Ability::Strength},
+    {"DEX", Ability::Dexterity},
+    {"CON", Ability::Constitution},
+    {"INT", Ability::Intelligence},
+    {"WIS", Ability::Wisdom},
+    {"CHA", Ability::Charisma}};
 
 static const unordered_map<Ability, int> g_descStrRefByAbility {
-    { Ability::Strength, 222 },
-    { Ability::Dexterity, 223 },
-    { Ability::Constitution, 224 },
-    { Ability::Intelligence, 226  },
-    { Ability::Wisdom, 225  },
-    { Ability::Charisma, 227 }
-};
+    {Ability::Strength, 222},
+    {Ability::Dexterity, 223},
+    {Ability::Constitution, 224},
+    {Ability::Intelligence, 226},
+    {Ability::Wisdom, 225},
+    {Ability::Charisma, 227}};
 
 CharGenAbilities::CharGenAbilities(CharacterGeneration *charGen, Game *game) :
     GameGUI(game),
@@ -78,8 +76,7 @@ void CharGenAbilities::load() {
         _binding.conLbl.get(),
         _binding.intLbl.get(),
         _binding.wisLbl.get(),
-        _binding.chaLbl.get()
-    };
+        _binding.chaLbl.get()};
     for (auto &label : labels) {
         label->setFocusable(true);
         label->setHilightColor(_game->getGUIColorBase());
@@ -93,7 +90,8 @@ void CharGenAbilities::load() {
     _binding.chaPointsBtn->setDisabled(true);
 
     _binding.btnAccept->setOnClick([this]() {
-        if (_points > 0) return;
+        if (_points > 0)
+            return;
         updateCharacter();
         _charGen->goToNextStep();
         _charGen->openSteps();
@@ -270,10 +268,12 @@ void CharGenAbilities::updateCharacter() {
 }
 
 void CharGenAbilities::onAbilityLabelFocusChanged(Ability ability, bool focus) {
-    if (!focus) return;
+    if (!focus)
+        return;
 
     auto maybeDescription = g_descStrRefByAbility.find(ability);
-    if (maybeDescription == g_descStrRefByAbility.end()) return;
+    if (maybeDescription == g_descStrRefByAbility.end())
+        return;
 
     string description(_game->strings().get(maybeDescription->second));
     _binding.lbDesc->clearItems();

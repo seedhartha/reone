@@ -35,11 +35,11 @@ public:
     void load(boost::filesystem::path path);
 
 protected:
-    boost::endian::order _endianess { boost::endian::order::little };
+    boost::endian::order _endianess {boost::endian::order::little};
     boost::filesystem::path _path;
     std::shared_ptr<std::istream> _in;
     std::unique_ptr<StreamReader> _reader;
-    size_t _size { 0 };
+    size_t _size {0};
 
     BinaryReader(int signSize, const char *sign = 0);
 
@@ -85,7 +85,7 @@ protected:
     }
 
 private:
-    int _signSize { 0 };
+    int _signSize {0};
     ByteArray _sign;
 
     void load();

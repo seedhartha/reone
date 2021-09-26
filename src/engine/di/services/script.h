@@ -27,7 +27,8 @@ class ResourceServices;
 
 class ScriptServices : boost::noncopyable {
 public:
-    ScriptServices(ResourceServices &resource) : _resource(resource) {
+    ScriptServices(ResourceServices &resource) :
+        _resource(resource) {
     }
 
     void init();

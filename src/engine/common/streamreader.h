@@ -29,8 +29,7 @@ class StreamReader : boost::noncopyable {
 public:
     StreamReader(
         std::shared_ptr<std::istream> stream,
-        boost::endian::order endianess = boost::endian::order::little
-    ) :
+        boost::endian::order endianess = boost::endian::order::little) :
         _stream(ensurePresent(stream, "stream")),
         _endianess(endianess) {
     }

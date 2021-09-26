@@ -25,7 +25,8 @@ namespace game {
 
 class AssuredDeflectionEffect : public Effect {
 public:
-    AssuredDeflectionEffect() : Effect(EffectType::AssuredDeflection) {
+    AssuredDeflectionEffect() :
+        Effect(EffectType::AssuredDeflection) {
     }
 
     void applyTo(SpatialObject &object) override;

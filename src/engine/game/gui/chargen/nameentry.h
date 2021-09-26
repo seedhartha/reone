@@ -51,7 +51,7 @@ private:
         std::shared_ptr<gui::Control> nameBoxEdit;
     } _binding;
 
-    CharacterGeneration *_charGen { nullptr };
+    CharacterGeneration *_charGen {nullptr};
     gui::TextInput _input;
     resource::LtrReader _maleLtr;
     resource::LtrReader _femaleLtr;

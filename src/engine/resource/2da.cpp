@@ -43,7 +43,8 @@ int TwoDA::indexByCellValue(const string &column, const string &value) const {
         return -1;
     }
     for (size_t i = 0; i < _rows.size(); ++i) {
-        if (_rows[i].values[columnIdx] == value) return static_cast<int>(i);
+        if (_rows[i].values[columnIdx] == value)
+            return static_cast<int>(i);
     }
 
     return -1;
@@ -51,7 +52,8 @@ int TwoDA::indexByCellValue(const string &column, const string &value) const {
 
 int TwoDA::getColumnIndex(const string &column) const {
     for (size_t i = 0; i < _columns.size(); ++i) {
-        if (_columns[i] == column) return static_cast<int>(i);
+        if (_columns[i] == column)
+            return static_cast<int>(i);
     }
     return -1;
 }
@@ -73,7 +75,8 @@ int TwoDA::indexByCellValues(const vector<pair<string, string>> &values) const {
                 break;
             }
         }
-        if (match) return static_cast<int>(i);
+        if (match)
+            return static_cast<int>(i);
     }
 
     return -1;
@@ -115,28 +118,32 @@ string TwoDA::getString(int row, const string &column, string defValue) const {
 
 int TwoDA::getInt(int row, const string &column, int defValue) const {
     const string &value = getString(row, column);
-    if (value.empty()) return defValue;
+    if (value.empty())
+        return defValue;
 
     return stoi(value);
 }
 
 uint32_t TwoDA::getUint(int row, const string &column, uint32_t defValue) const {
     const string &value = getString(row, column);
-    if (value.empty()) return defValue;
+    if (value.empty())
+        return defValue;
 
     return stoi(value, nullptr, 16);
 }
 
 float TwoDA::getFloat(int row, const string &column, float defValue) const {
     const string &value = getString(row, column);
-    if (value.empty()) return defValue;
+    if (value.empty())
+        return defValue;
 
     return stof(value);
 }
 
 bool TwoDA::getBool(int row, const string &column, bool defValue) const {
     const string &value = getString(row, column);
-    if (value.empty()) return defValue;
+    if (value.empty())
+        return defValue;
 
     return stoi(value) != 0;
 }

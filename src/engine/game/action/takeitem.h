@@ -25,7 +25,8 @@ namespace game {
 
 class TakeItemAction : public Action {
 public:
-    TakeItemAction(Game &game) : Action(game, ActionType::TakeItem) {
+    TakeItemAction(Game &game) :
+        Action(game, ActionType::TakeItem) {
     }
 
     void execute(Object &actor, float dt) override;

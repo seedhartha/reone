@@ -34,7 +34,7 @@ namespace tools {
 
 struct PathPoint {
     string name;
-    glm::vec3 position { 0.0f };
+    glm::vec3 position {0.0f};
     vector<int> connections;
 };
 
@@ -94,7 +94,6 @@ void PthTool::toPTH(const fs::path &path, const fs::path &destPath) {
             }
         }
     }
-
 
     // Write binary PTH
 
@@ -184,11 +183,11 @@ void PthTool::toASCII(const fs::path &path, const fs::path &destPath) {
 }
 
 bool PthTool::supports(Operation operation, const fs::path &target) const {
-    if (fs::is_directory(target)) return false;
+    if (fs::is_directory(target))
+        return false;
 
-    return
-        (target.extension() == ".pth" && operation == Operation::ToASCII) ||
-        (target.extension() == ".ascii" && operation == Operation::ToPTH);
+    return (target.extension() == ".pth" && operation == Operation::ToASCII) ||
+           (target.extension() == ".ascii" && operation == Operation::ToPTH);
 }
 
 } // namespace tools

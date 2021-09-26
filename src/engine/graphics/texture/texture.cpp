@@ -57,39 +57,39 @@ void Texture::configureCubeMap() {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.maxFilter));
 
     switch (_properties.wrap) {
-        case Wrapping::ClampToBorder:
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
-            glTexParameterfv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BORDER_COLOR, &_properties.borderColor[0]);
-            break;
-        case Wrapping::ClampToEdge:
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-            break;
-        case Wrapping::Repeat:
-        default:
-            // Wrap is GL_REPEAT by default in OpenGL
-            break;
+    case Wrapping::ClampToBorder:
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+        glTexParameterfv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BORDER_COLOR, &_properties.borderColor[0]);
+        break;
+    case Wrapping::ClampToEdge:
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        break;
+    case Wrapping::Repeat:
+    default:
+        // Wrap is GL_REPEAT by default in OpenGL
+        break;
     }
 }
 
 uint32_t Texture::getFilterGL(Filtering filter) const {
     switch (filter) {
-        case Filtering::Nearest:
-            return GL_NEAREST;
-        case Filtering::NearestMipmapNearest:
-            return GL_NEAREST_MIPMAP_NEAREST;
-        case Filtering::LinearMipmapNearest:
-            return GL_LINEAR_MIPMAP_NEAREST;
-        case Filtering::NearestMipmapLinear:
-            return GL_NEAREST_MIPMAP_LINEAR;
-        case Filtering::LinearMipmapLinear:
-            return GL_LINEAR_MIPMAP_LINEAR;
-        case Filtering::Linear:
-        default:
-            return GL_LINEAR;
+    case Filtering::Nearest:
+        return GL_NEAREST;
+    case Filtering::NearestMipmapNearest:
+        return GL_NEAREST_MIPMAP_NEAREST;
+    case Filtering::LinearMipmapNearest:
+        return GL_LINEAR_MIPMAP_NEAREST;
+    case Filtering::NearestMipmapLinear:
+        return GL_NEAREST_MIPMAP_LINEAR;
+    case Filtering::LinearMipmapLinear:
+        return GL_LINEAR_MIPMAP_LINEAR;
+    case Filtering::Linear:
+    default:
+        return GL_LINEAR;
     }
 }
 
@@ -98,19 +98,19 @@ void Texture::configure2D() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.maxFilter));
 
     switch (_properties.wrap) {
-        case Wrapping::ClampToBorder:
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &_properties.borderColor[0]);
-            break;
-        case Wrapping::ClampToEdge:
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            break;
-        case Wrapping::Repeat:
-        default:
-            // Wrap is GL_REPEAT by default in OpenGL
-            break;
+    case Wrapping::ClampToBorder:
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &_properties.borderColor[0]);
+        break;
+    case Wrapping::ClampToEdge:
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        break;
+    case Wrapping::Repeat:
+    default:
+        // Wrap is GL_REPEAT by default in OpenGL
+        break;
     }
 }
 
@@ -165,68 +165,68 @@ void Texture::refreshCubeMap() {
 
 void Texture::fillTarget(uint32_t target, int level, int width, int height, const void *pixels, int size) {
     switch (_pixelFormat) {
-        case PixelFormat::DXT1:
-        case PixelFormat::DXT5:
-            glCompressedTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, size, pixels);
-            break;
-        case PixelFormat::Grayscale:
-        case PixelFormat::RGB:
-        case PixelFormat::RGBA:
-        case PixelFormat::BGR:
-        case PixelFormat::BGRA:
-        case PixelFormat::Depth:
-            glTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, getPixelFormatGL(), getPixelTypeGL(), pixels);
-            break;
-        default:
-            break;
+    case PixelFormat::DXT1:
+    case PixelFormat::DXT5:
+        glCompressedTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, size, pixels);
+        break;
+    case PixelFormat::Grayscale:
+    case PixelFormat::RGB:
+    case PixelFormat::RGBA:
+    case PixelFormat::BGR:
+    case PixelFormat::BGRA:
+    case PixelFormat::Depth:
+        glTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, getPixelFormatGL(), getPixelTypeGL(), pixels);
+        break;
+    default:
+        break;
     }
 }
 
 uint32_t Texture::getPixelFormatGL() const {
     switch (_pixelFormat) {
-        case PixelFormat::Grayscale:
-            return GL_RED;
-        case PixelFormat::RGB:
-            return GL_RGB;
-        case PixelFormat::RGBA:
-        case PixelFormat::DXT1:
-        case PixelFormat::DXT5:
-            return GL_RGBA;
-        case PixelFormat::BGR:
-            return GL_BGR;
-        case PixelFormat::BGRA:
-            return GL_BGRA;
-        case PixelFormat::Depth:
-            return GL_DEPTH_COMPONENT;
-        default:
-            throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
+    case PixelFormat::Grayscale:
+        return GL_RED;
+    case PixelFormat::RGB:
+        return GL_RGB;
+    case PixelFormat::RGBA:
+    case PixelFormat::DXT1:
+    case PixelFormat::DXT5:
+        return GL_RGBA;
+    case PixelFormat::BGR:
+        return GL_BGR;
+    case PixelFormat::BGRA:
+        return GL_BGRA;
+    case PixelFormat::Depth:
+        return GL_DEPTH_COMPONENT;
+    default:
+        throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
     }
 }
 
 uint32_t Texture::getPixelTypeGL() const {
     switch (_pixelFormat) {
-        case PixelFormat::Grayscale:
-        case PixelFormat::RGB:
-        case PixelFormat::RGBA:
-        case PixelFormat::BGR:
-        case PixelFormat::BGRA:
-            return GL_UNSIGNED_BYTE;
-        case PixelFormat::Depth:
-            return GL_FLOAT;
-        default:
-            throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
+    case PixelFormat::Grayscale:
+    case PixelFormat::RGB:
+    case PixelFormat::RGBA:
+    case PixelFormat::BGR:
+    case PixelFormat::BGRA:
+        return GL_UNSIGNED_BYTE;
+    case PixelFormat::Depth:
+        return GL_FLOAT;
+    default:
+        throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
     }
 }
 
 bool Texture::isMipmapFilter(Filtering filter) const {
     switch (filter) {
-        case Filtering::NearestMipmapNearest:
-        case Filtering::LinearMipmapNearest:
-        case Filtering::NearestMipmapLinear:
-        case Filtering::LinearMipmapLinear:
-            return true;
-        default:
-            return false;
+    case Filtering::NearestMipmapNearest:
+    case Filtering::LinearMipmapNearest:
+    case Filtering::NearestMipmapLinear:
+    case Filtering::LinearMipmapLinear:
+        return true;
+    default:
+        return false;
     }
 }
 
@@ -261,7 +261,8 @@ void Texture::unbind() const {
 }
 
 void Texture::flushGPUToCPU() {
-    if (_properties.cubemap) throw logic_error("Cubemaps are not supported");
+    if (_properties.cubemap)
+        throw logic_error("Cubemaps are not supported");
 
     Layer layer;
     layer.mipMaps.resize(1);
@@ -294,7 +295,7 @@ void Texture::setPixels(int w, int h, PixelFormat format, shared_ptr<ByteArray> 
     Layer layer;
     layer.mipMaps.push_back(move(mipMap));
 
-    setPixels(w, h, format, vector<Layer> { layer });
+    setPixels(w, h, format, vector<Layer> {layer});
 }
 
 void Texture::setPixels(int w, int h, PixelFormat format, vector<Layer> layers) {

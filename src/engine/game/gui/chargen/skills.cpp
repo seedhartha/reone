@@ -36,15 +36,14 @@ namespace reone {
 namespace game {
 
 static const unordered_map<SkillType, int> g_descStrRefBySkill {
-    { SkillType::ComputerUse, 244 },
-    { SkillType::Demolitions, 246 },
-    { SkillType::Stealth, 248  },
-    { SkillType::Awareness, 250 },
-    { SkillType::Persuade, 252 },
-    { SkillType::Repair, 254 },
-    { SkillType::Security, 256  },
-    { SkillType::TreatInjury, 258 }
-};
+    {SkillType::ComputerUse, 244},
+    {SkillType::Demolitions, 246},
+    {SkillType::Stealth, 248},
+    {SkillType::Awareness, 250},
+    {SkillType::Persuade, 252},
+    {SkillType::Repair, 254},
+    {SkillType::Security, 256},
+    {SkillType::TreatInjury, 258}};
 
 CharGenSkills::CharGenSkills(CharacterGeneration *charGen, Game *game) :
     GameGUI(game),
@@ -67,8 +66,7 @@ void CharGenSkills::load() {
         _binding.persuadeLbl.get(),
         _binding.repairLbl.get(),
         _binding.securityLbl.get(),
-        _binding.treatInjuryLbl.get()
-    };
+        _binding.treatInjuryLbl.get()};
     for (auto &label : skillLabels) {
         label->setFocusable(true);
         label->setHilightColor(_game->getGUIColorBase());
@@ -309,10 +307,12 @@ void CharGenSkills::onPlusButtonClick(SkillType skill) {
 }
 
 void CharGenSkills::onSkillLabelFocusChanged(SkillType skill, bool focus) {
-    if (!focus) return;
+    if (!focus)
+        return;
 
     auto maybeDescription = g_descStrRefBySkill.find(skill);
-    if (maybeDescription == g_descStrRefBySkill.end()) return;
+    if (maybeDescription == g_descStrRefBySkill.end())
+        return;
 
     string description(_game->strings().get(maybeDescription->second));
     _binding.lbDesc->clearItems();

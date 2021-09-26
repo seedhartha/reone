@@ -25,7 +25,8 @@ namespace game {
 
 class AreaOfEffectEffect : public Effect {
 public:
-    AreaOfEffectEffect() : Effect(EffectType::AreaOfEffect) {
+    AreaOfEffectEffect() :
+        Effect(EffectType::AreaOfEffect) {
     }
 
     void applyTo(SpatialObject &object) override;

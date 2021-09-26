@@ -39,7 +39,7 @@ public:
 
 private:
     std::string _dialogResRef;
-    bool _ignoreStartRange { false };
+    bool _ignoreStartRange {false};
 };
 
 } // namespace game

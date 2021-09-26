@@ -25,7 +25,8 @@ namespace game {
 
 class ForcePushTargetedEffect : public Effect {
 public:
-    ForcePushTargetedEffect() : Effect(EffectType::ForcePushTargeted) {
+    ForcePushTargetedEffect() :
+        Effect(EffectType::ForcePushTargeted) {
     }
 
     void applyTo(SpatialObject &object) override;

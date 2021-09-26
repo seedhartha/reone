@@ -25,7 +25,8 @@ namespace game {
 
 class CrushEffect : public Effect {
 public:
-    CrushEffect() : Effect(EffectType::Crush) {
+    CrushEffect() :
+        Effect(EffectType::Crush) {
     }
 
     void applyTo(SpatialObject &object) override;

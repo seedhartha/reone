@@ -32,7 +32,7 @@ public:
     void setObject(const PlaceableCamera &object);
 
 private:
-    float _aspect { 1.0f };
+    float _aspect {1.0f};
 };
 
 } // namespace game

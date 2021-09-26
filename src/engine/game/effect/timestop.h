@@ -25,7 +25,8 @@ namespace game {
 
 class TimeStopEffect : public Effect {
 public:
-    TimeStopEffect() : Effect(EffectType::TimeStop) {
+    TimeStopEffect() :
+        Effect(EffectType::TimeStop) {
     }
 
     void applyTo(SpatialObject &object) override;

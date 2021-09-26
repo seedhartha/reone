@@ -39,7 +39,7 @@ private:
         std::vector<float> end;
     };
 
-    int _letterCount { 0 };
+    int _letterCount {0};
     LetterSet _singleLetters;
     std::vector<LetterSet> _doubleLetters;
     std::vector<std::vector<LetterSet>> _trippleLetters;

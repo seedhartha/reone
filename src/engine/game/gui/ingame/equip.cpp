@@ -22,8 +22,8 @@
 
 #include "../../game.h"
 #include "../../object/creature.h"
-#include "../../object/item.h"
 #include "../../object/factory.h"
+#include "../../object/item.h"
 #include "../../party.h"
 
 #include "ingame.h"
@@ -42,34 +42,33 @@ namespace game {
 static constexpr int kStrRefNone = 363;
 
 static unordered_map<Equipment::Slot, string> g_slotNames = {
-    { Equipment::Slot::Implant, "IMPLANT" },
-    { Equipment::Slot::Head, "HEAD" },
-    { Equipment::Slot::Hands, "HANDS" },
-    { Equipment::Slot::ArmL, "ARM_L" },
-    { Equipment::Slot::Body, "BODY" },
-    { Equipment::Slot::ArmR, "ARM_R" },
-    { Equipment::Slot::WeapL, "WEAP_L" },
-    { Equipment::Slot::Belt, "BELT" },
-    { Equipment::Slot::WeapR, "WEAP_R" },
-    { Equipment::Slot::WeapL2, "WEAP_L2" },
-    { Equipment::Slot::WeapR2, "WEAP_R2" }
-};
+    {Equipment::Slot::Implant, "IMPLANT"},
+    {Equipment::Slot::Head, "HEAD"},
+    {Equipment::Slot::Hands, "HANDS"},
+    {Equipment::Slot::ArmL, "ARM_L"},
+    {Equipment::Slot::Body, "BODY"},
+    {Equipment::Slot::ArmR, "ARM_R"},
+    {Equipment::Slot::WeapL, "WEAP_L"},
+    {Equipment::Slot::Belt, "BELT"},
+    {Equipment::Slot::WeapR, "WEAP_R"},
+    {Equipment::Slot::WeapL2, "WEAP_L2"},
+    {Equipment::Slot::WeapR2, "WEAP_R2"}};
 
 static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
-    { Equipment::Slot::Implant, 31388 },
-    { Equipment::Slot::Head, 31375 },
-    { Equipment::Slot::Hands, 31383 },
-    { Equipment::Slot::ArmL, 31376 },
-    { Equipment::Slot::Body, 31380 },
-    { Equipment::Slot::ArmR, 31377 },
-    { Equipment::Slot::WeapL, 31378 },
-    { Equipment::Slot::Belt, 31382 },
-    { Equipment::Slot::WeapR, 31379 },
-    { Equipment::Slot::WeapL2, 31378 },
-    { Equipment::Slot::WeapR2, 31379 }
-};
+    {Equipment::Slot::Implant, 31388},
+    {Equipment::Slot::Head, 31375},
+    {Equipment::Slot::Hands, 31383},
+    {Equipment::Slot::ArmL, 31376},
+    {Equipment::Slot::Body, 31380},
+    {Equipment::Slot::ArmR, 31377},
+    {Equipment::Slot::WeapL, 31378},
+    {Equipment::Slot::Belt, 31382},
+    {Equipment::Slot::WeapR, 31379},
+    {Equipment::Slot::WeapL2, 31378},
+    {Equipment::Slot::WeapR2, 31379}};
 
-Equipment::Equipment(Game *game, InGameMenu &inGameMenu) : GameGUI(game), _inGameMenu(inGameMenu) {
+Equipment::Equipment(Game *game, InGameMenu &inGameMenu) :
+    GameGUI(game), _inGameMenu(inGameMenu) {
     _resRef = getResRef("equip");
 
     initForGame();
@@ -109,7 +108,8 @@ void Equipment::load() {
             selectSlot(slotButton.first);
         });
         slotButton.second->setOnFocusChanged([&](bool focus) {
-            if (!focus) return;
+            if (!focus)
+                return;
 
             string slotDesc;
 
@@ -137,7 +137,7 @@ void Equipment::bindControls() {
         _binding.btnChange2 = getControl<Button>("BTN_CHANGE2");
         _binding.btnCharLeft = getControl<Button>("BTN_CHARLEFT");
         _binding.btnCharRight = getControl<Button>("BTN_CHARRIGHT");
-     } else {
+    } else {
         _binding.lblBack1 = getControl<Label>("LBL_BACK1");
         _binding.lblDefBack = getControl<Label>("LBL_DEF_BACK");
         for (int i = 0; i < kNumControlsBar; ++i) {
@@ -157,7 +157,8 @@ void Equipment::bindControls() {
     _binding.lblToHitR = getControl<Label>("LBL_TOHITR");
     _binding.lbItems = getControl<ListBox>("LB_ITEMS");
     for (auto &slotName : g_slotNames) {
-        if ((slotName.first == Slot::WeapL2 || slotName.first == Slot::WeapR2) && _game->isKotOR()) continue;
+        if ((slotName.first == Slot::WeapL2 || slotName.first == Slot::WeapR2) && _game->isKotOR())
+            continue;
         _binding.lblInv[slotName.first] = getControl<Label>("LBL_INV_" + slotName.second);
         _binding.btnInv[slotName.first] = getControl<Button>("BTN_INV_" + slotName.second);
     }
@@ -187,35 +188,36 @@ void Equipment::configureItemsListBox() {
 
 static int getInventorySlot(Equipment::Slot slot) {
     switch (slot) {
-        case Equipment::Slot::Implant:
-            return InventorySlot::implant;
-        case Equipment::Slot::Head:
-            return InventorySlot::head;
-        case Equipment::Slot::Hands:
-            return InventorySlot::hands;
-        case Equipment::Slot::ArmL:
-            return InventorySlot::leftArm;
-        case Equipment::Slot::Body:
-            return InventorySlot::body;
-        case Equipment::Slot::ArmR:
-            return InventorySlot::rightArm;
-        case Equipment::Slot::WeapL:
-            return InventorySlot::leftWeapon;
-        case Equipment::Slot::Belt:
-            return InventorySlot::belt;
-        case Equipment::Slot::WeapR:
-            return InventorySlot::rightWeapon;
-        case Equipment::Slot::WeapL2:
-            return InventorySlot::leftWeapon2;
-        case Equipment::Slot::WeapR2:
-            return InventorySlot::rightWeapon2;
-        default:
-            throw invalid_argument("Equipment: invalid slot: " + to_string(static_cast<int>(slot)));
+    case Equipment::Slot::Implant:
+        return InventorySlot::implant;
+    case Equipment::Slot::Head:
+        return InventorySlot::head;
+    case Equipment::Slot::Hands:
+        return InventorySlot::hands;
+    case Equipment::Slot::ArmL:
+        return InventorySlot::leftArm;
+    case Equipment::Slot::Body:
+        return InventorySlot::body;
+    case Equipment::Slot::ArmR:
+        return InventorySlot::rightArm;
+    case Equipment::Slot::WeapL:
+        return InventorySlot::leftWeapon;
+    case Equipment::Slot::Belt:
+        return InventorySlot::belt;
+    case Equipment::Slot::WeapR:
+        return InventorySlot::rightWeapon;
+    case Equipment::Slot::WeapL2:
+        return InventorySlot::leftWeapon2;
+    case Equipment::Slot::WeapR2:
+        return InventorySlot::rightWeapon2;
+    default:
+        throw invalid_argument("Equipment: invalid slot: " + to_string(static_cast<int>(slot)));
     }
 }
 
 void Equipment::onItemsListBoxItemClick(const string &item) {
-    if (_selectedSlot == Slot::None) return;
+    if (_selectedSlot == Slot::None)
+        return;
 
     shared_ptr<Creature> player(_game->party().player());
     shared_ptr<Item> itemObj;
@@ -268,7 +270,8 @@ void Equipment::update() {
 }
 
 void Equipment::updatePortraits() {
-    if (_game->id() != GameID::KotOR) return;
+    if (_game->id() != GameID::KotOR)
+        return;
 
     Party &party = _game->party();
     shared_ptr<Creature> partyLeader(party.getLeader());
@@ -345,41 +348,42 @@ shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) const {
     static unordered_map<Slot, shared_ptr<Texture>> icons;
 
     auto icon = icons.find(slot);
-    if (icon != icons.end()) return icon->second;
+    if (icon != icons.end())
+        return icon->second;
 
     string resRef;
     switch (slot) {
-        case Slot::Implant:
-            resRef = "iimplant";
-            break;
-        case Slot::Head:
-            resRef = "ihead";
-            break;
-        case Slot::Hands:
-            resRef = "ihands";
-            break;
-        case Slot::ArmL:
-            resRef = "iforearm_l";
-            break;
-        case Slot::Body:
-            resRef = "iarmor";
-            break;
-        case Slot::ArmR:
-            resRef = "iforearm_r";
-            break;
-        case Slot::WeapL:
-        case Slot::WeapL2:
-            resRef = "iweap_l";
-            break;
-        case Slot::Belt:
-            resRef = "ibelt";
-            break;
-        case Slot::WeapR:
-        case Slot::WeapR2:
-            resRef = "iweap_r";
-            break;
-        default:
-            return nullptr;
+    case Slot::Implant:
+        resRef = "iimplant";
+        break;
+    case Slot::Head:
+        resRef = "ihead";
+        break;
+    case Slot::Hands:
+        resRef = "ihands";
+        break;
+    case Slot::ArmL:
+        resRef = "iforearm_l";
+        break;
+    case Slot::Body:
+        resRef = "iarmor";
+        break;
+    case Slot::ArmR:
+        resRef = "iforearm_r";
+        break;
+    case Slot::WeapL:
+    case Slot::WeapL2:
+        resRef = "iweap_l";
+        break;
+    case Slot::Belt:
+        resRef = "ibelt";
+        break;
+    case Slot::WeapR:
+    case Slot::WeapR2:
+        resRef = "iweap_r";
+        break;
+    default:
+        return nullptr;
     }
 
     shared_ptr<Texture> texture(_game->textures().get(resRef, TextureUsage::GUI));
@@ -404,10 +408,12 @@ void Equipment::updateItems() {
 
     for (auto &item : player->items()) {
         if (_selectedSlot == Slot::None) {
-            if (!item->isEquippable()) continue;
+            if (!item->isEquippable())
+                continue;
         } else {
             int slot = getInventorySlot(_selectedSlot);
-            if (!item->isEquippable(slot)) continue;
+            if (!item->isEquippable(slot))
+                continue;
         }
         ListBox::Item lbItem;
         lbItem.tag = item->tag();

@@ -25,7 +25,8 @@ namespace game {
 
 class DisguiseEffect : public Effect {
 public:
-    DisguiseEffect() : Effect(EffectType::Disguise) {
+    DisguiseEffect() :
+        Effect(EffectType::Disguise) {
     }
 
     void applyTo(SpatialObject &object) override;

@@ -28,7 +28,8 @@ namespace reone {
 
 namespace graphics {
 
-TgaReader::TgaReader(const string &resRef, TextureUsage usage) : BinaryReader(0), _resRef(resRef), _usage(usage) {
+TgaReader::TgaReader(const string &resRef, TextureUsage usage) :
+    BinaryReader(0), _resRef(resRef), _usage(usage) {
 }
 
 void TgaReader::doLoad() {
@@ -38,13 +39,13 @@ void TgaReader::doLoad() {
 
     _dataType = static_cast<TGADataType>(readByte());
     switch (_dataType) {
-        case TGADataType::Grayscale:
-        case TGADataType::RGBA:
-        case TGADataType::RGBA_RLE:
-            break;
-        default:
-            warn("TGA: unsupported data type: " + to_string(static_cast<int>(_dataType)));
-            return;
+    case TGADataType::Grayscale:
+    case TGADataType::RGBA:
+    case TGADataType::RGBA_RLE:
+        break;
+    default:
+        warn("TGA: unsupported data type: " + to_string(static_cast<int>(_dataType)));
+        return;
     }
 
     ignore(9);
@@ -102,9 +103,7 @@ void TgaReader::loadTexture() {
         layers.push_back(move(layer));
     }
 
-    PixelFormat format = isGrayscale() ?
-        PixelFormat::Grayscale :
-        (_alpha ? PixelFormat::BGRA : PixelFormat::BGR);
+    PixelFormat format = isGrayscale() ? PixelFormat::Grayscale : (_alpha ? PixelFormat::BGRA : PixelFormat::BGR);
 
     if (cubeMap) {
         prepareCubeMap(layers, format, format);

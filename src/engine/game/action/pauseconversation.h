@@ -25,7 +25,8 @@ namespace game {
 
 class PauseConversationAction : public Action {
 public:
-    PauseConversationAction(Game &game) : Action(game, ActionType::PauseConversation) {
+    PauseConversationAction(Game &game) :
+        Action(game, ActionType::PauseConversation) {
     }
 
     void execute(Object &actor, float dt) override;

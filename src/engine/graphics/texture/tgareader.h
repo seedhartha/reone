@@ -37,10 +37,10 @@ private:
     std::string _resRef;
     TextureUsage _usage;
 
-    TGADataType _dataType { TGADataType::RGBA };
-    int _width { 0 };
-    int _height { 0 };
-    bool _alpha { false };
+    TGADataType _dataType {TGADataType::RGBA};
+    int _width {0};
+    int _height {0};
+    bool _alpha {false};
     std::shared_ptr<Texture> _texture;
 
     void doLoad() override;

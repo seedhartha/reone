@@ -47,7 +47,7 @@ public:
     }
 
 private:
-    Game *_game { nullptr };
+    Game *_game {nullptr};
     std::vector<script::Routine> _routines;
 };
 

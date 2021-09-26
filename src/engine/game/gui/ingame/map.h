@@ -26,7 +26,7 @@ namespace gui {
 class Button;
 class Label;
 
-}
+} // namespace gui
 
 namespace game {
 
@@ -58,7 +58,7 @@ private:
     } _binding;
 
     std::vector<std::shared_ptr<Waypoint>> _notes;
-    int _selectedNoteIdx { 0 };
+    int _selectedNoteIdx {0};
 
     void bindControls();
     void refreshSelectedNote();

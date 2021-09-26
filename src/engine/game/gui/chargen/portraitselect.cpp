@@ -19,9 +19,9 @@
 
 #include "../../../common/collectionutil.h"
 #include "../../../common/randomutil.h"
-#include "../../../gui/scenebuilder.h"
 #include "../../../graphics/model/models.h"
 #include "../../../graphics/texture/textures.h"
+#include "../../../gui/scenebuilder.h"
 #include "../../../resource/resources.h"
 #include "../../../scene/node/model.h"
 
@@ -115,22 +115,21 @@ void PortraitSelection::loadHeadModel() {
     float aspect = _binding.lblHead->extent().width / static_cast<float>(_binding.lblHead->extent().height);
 
     unique_ptr<SceneGraph> scene(SceneBuilder(
-        _options,
-        _context,
-        _features,
-        _materials,
-        _meshes,
-        _pbrIbl,
-        _shaders,
-        _textures
-    )
-        .aspect(aspect)
-        .depth(0.1f, 10.0f)
-        .modelSupplier(bind(&PortraitSelection::getCharacterModel, this, _1))
-        .modelScale(kModelScale)
-        .cameraFromModelNode(_charGen->character().gender == Gender::Male ? "camerahookm" : "camerahookf")
-        .lightingRefFromModelNode("cghead_light")
-        .build());
+                                     _options,
+                                     _context,
+                                     _features,
+                                     _materials,
+                                     _meshes,
+                                     _pbrIbl,
+                                     _shaders,
+                                     _textures)
+                                     .aspect(aspect)
+                                     .depth(0.1f, 10.0f)
+                                     .modelSupplier(bind(&PortraitSelection::getCharacterModel, this, _1))
+                                     .modelScale(kModelScale)
+                                     .cameraFromModelNode(_charGen->character().gender == Gender::Male ? "camerahookm" : "camerahookf")
+                                     .lightingRefFromModelNode("cghead_light")
+                                     .build());
 
     _binding.lblHead->setScene(move(scene));
 }
@@ -164,12 +163,12 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
 
 int PortraitSelection::getAppearanceFromCurrentPortrait() const {
     switch (_charGen->character().attributes.getEffectiveClass()) {
-        case ClassType::Scoundrel:
-            return _portraits[_currentPortrait].appearanceS;
-        case ClassType::Soldier:
-            return _portraits[_currentPortrait].appearanceL;
-        default:
-            return _portraits[_currentPortrait].appearanceNumber;
+    case ClassType::Scoundrel:
+        return _portraits[_currentPortrait].appearanceS;
+    case ClassType::Soldier:
+        return _portraits[_currentPortrait].appearanceL;
+    default:
+        return _portraits[_currentPortrait].appearanceNumber;
     }
 }
 
@@ -187,10 +186,9 @@ void PortraitSelection::updatePortraits() {
 void PortraitSelection::resetCurrentPortrait() {
     int appearance = _charGen->character().appearance;
     auto maybePortrait = find_if(_portraits.begin(), _portraits.end(), [&appearance](const Portrait &portrait) {
-        return
-            portrait.appearanceNumber == appearance ||
-            portrait.appearanceS == appearance ||
-            portrait.appearanceL == appearance;
+        return portrait.appearanceNumber == appearance ||
+               portrait.appearanceS == appearance ||
+               portrait.appearanceL == appearance;
     });
     if (maybePortrait != _portraits.end()) {
         _currentPortrait = static_cast<int>(distance(_portraits.begin(), maybePortrait));

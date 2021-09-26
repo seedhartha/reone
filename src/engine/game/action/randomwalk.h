@@ -25,7 +25,8 @@ namespace game {
 
 class RandomWalkAction : public Action {
 public:
-    RandomWalkAction(Game &game) : Action(game, ActionType::RandomWalk) {
+    RandomWalkAction(Game &game) :
+        Action(game, ActionType::RandomWalk) {
     }
 
     void execute(Object &actor, float dt) override;

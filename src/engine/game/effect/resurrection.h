@@ -25,7 +25,8 @@ namespace game {
 
 class ResurrectionEffect : public Effect {
 public:
-    ResurrectionEffect() : Effect(EffectType::Resurrection) {
+    ResurrectionEffect() :
+        Effect(EffectType::Resurrection) {
     }
 
     void applyTo(SpatialObject &object) override;

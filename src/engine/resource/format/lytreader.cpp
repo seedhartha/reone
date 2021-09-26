@@ -61,40 +61,40 @@ void LytReader::processLine(const string &line) {
 
     const string &first = tokens[0];
     switch (_state) {
-        case State::None:
-            if (first == "beginlayout") {
-                _state = State::Layout;
+    case State::None:
+        if (first == "beginlayout") {
+            _state = State::Layout;
+        }
+        break;
+    case State::Layout:
+        if (first == "donelayout") {
+            _state = State::None;
+        } else if (first == "roomcount") {
+            _roomCount = stoi(tokens[1]);
+            if (_roomCount > 0) {
+                _rooms.reserve(_roomCount);
+                _state = State::Rooms;
             }
-            break;
-        case State::Layout:
-            if (first == "donelayout") {
-                _state = State::None;
-            } else if (first == "roomcount") {
-                _roomCount = stoi(tokens[1]);
-                if (_roomCount > 0) {
-                    _rooms.reserve(_roomCount);
-                    _state = State::Rooms;
-                }
-            } else if (first == "doorhookcount") {
-                _doorHookCount = stoi(tokens[1]);
-                if (_doorHookCount > 0) {
-                    _doorHooks.reserve(_doorHookCount);
-                    _state = State::DoorHooks;
-                }
+        } else if (first == "doorhookcount") {
+            _doorHookCount = stoi(tokens[1]);
+            if (_doorHookCount > 0) {
+                _doorHooks.reserve(_doorHookCount);
+                _state = State::DoorHooks;
             }
-            break;
-        case State::Rooms:
-            _rooms.push_back(getRoom(tokens));
-            if (_rooms.size() == _roomCount) {
-                _state = State::Layout;
-            }
-            break;
-        case State::DoorHooks:
-            _doorHooks.push_back(getDoorHook(tokens));
-            if (_doorHooks.size() == _doorHookCount) {
-                _state = State::Layout;
-            }
-            break;
+        }
+        break;
+    case State::Rooms:
+        _rooms.push_back(getRoom(tokens));
+        if (_rooms.size() == _roomCount) {
+            _state = State::Layout;
+        }
+        break;
+    case State::DoorHooks:
+        _doorHooks.push_back(getDoorHook(tokens));
+        if (_doorHooks.size() == _doorHookCount) {
+            _state = State::Layout;
+        }
+        break;
     }
 }
 

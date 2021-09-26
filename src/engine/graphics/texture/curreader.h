@@ -32,9 +32,9 @@ public:
     std::shared_ptr<Texture> texture() { return _texture; }
 
 private:
-    uint16_t _bitCount { 0 };
-    int _width { 0 };
-    int _height { 0 };
+    uint16_t _bitCount {0};
+    int _width {0};
+    int _height {0};
     std::shared_ptr<Texture> _texture;
 
     void doLoad() override;

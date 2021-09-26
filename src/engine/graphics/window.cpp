@@ -30,11 +30,13 @@ namespace reone {
 
 namespace graphics {
 
-Window::Window(GraphicsOptions options) : _options(move(options)) {
+Window::Window(GraphicsOptions options) :
+    _options(move(options)) {
 }
 
 void Window::init() {
-    if (_inited) return;
+    if (_inited)
+        return;
 
     initSDL();
     initGL();
@@ -97,11 +99,13 @@ void Window::deinit() {
 }
 
 void Window::processEvents(bool &quit) {
-    if (!_inited) return;
+    if (!_inited)
+        return;
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        if (handleEvent(event, quit)) continue;
+        if (handleEvent(event, quit))
+            continue;
 
         _eventHandler->handle(event);
     }
@@ -109,42 +113,42 @@ void Window::processEvents(bool &quit) {
 
 bool Window::handleEvent(const SDL_Event &event, bool &quit) {
     switch (event.type) {
-        case SDL_QUIT:
-            quit = true;
-            return true;
-        case SDL_KEYDOWN:
-            return handleKeyDownEvent(event.key, quit);
-        case SDL_WINDOWEVENT:
-            return handleWindowEvent(event.window);
-        default:
-            return false;
+    case SDL_QUIT:
+        quit = true;
+        return true;
+    case SDL_KEYDOWN:
+        return handleKeyDownEvent(event.key, quit);
+    case SDL_WINDOWEVENT:
+        return handleWindowEvent(event.window);
+    default:
+        return false;
     }
 }
 
 bool Window::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit) {
     switch (event.keysym.scancode) {
-        case SDL_SCANCODE_C:
-            if (event.keysym.mod & KMOD_CTRL) {
-                quit = true;
-                return true;
-            }
-            return false;
+    case SDL_SCANCODE_C:
+        if (event.keysym.mod & KMOD_CTRL) {
+            quit = true;
+            return true;
+        }
+        return false;
 
-        default:
-            return false;
+    default:
+        return false;
     }
 }
 
 bool Window::handleWindowEvent(const SDL_WindowEvent &event) {
     switch (event.event) {
-        case SDL_WINDOWEVENT_FOCUS_GAINED:
-            _focus = true;
-            return true;
-        case SDL_WINDOWEVENT_FOCUS_LOST:
-            _focus = false;
-            return true;
-        default:
-            return false;
+    case SDL_WINDOWEVENT_FOCUS_GAINED:
+        _focus = true;
+        return true;
+    case SDL_WINDOWEVENT_FOCUS_LOST:
+        _focus = false;
+        return true;
+    default:
+        return false;
     }
 }
 
@@ -153,13 +157,14 @@ void Window::clear() const {
 }
 
 void Window::drawCursor() const {
-    if (_relativeMouseMode) return;
+    if (_relativeMouseMode)
+        return;
 
     int x, y;
     uint32_t state = SDL_GetMouseState(&x, &y);
     bool pressed = state & SDL_BUTTON(1);
 
-    _cursor->setPosition({ x, y });
+    _cursor->setPosition({x, y});
     _cursor->setPressed(pressed);
     _cursor->draw();
 }

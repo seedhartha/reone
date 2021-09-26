@@ -25,7 +25,8 @@ namespace game {
 
 class SwitchWeaponsAction : public Action {
 public:
-    SwitchWeaponsAction(Game &game) : Action(game, ActionType::SwitchWeapons) {
+    SwitchWeaponsAction(Game &game) :
+        Action(game, ActionType::SwitchWeapons) {
     }
 
     void execute(Object &actor, float dt) override;

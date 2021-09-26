@@ -28,7 +28,7 @@ using namespace std;
 
 using namespace reone;
 
-static volatile bool g_finished { false };
+static volatile bool g_finished {false};
 
 static void someFunction() {
     this_thread::sleep_for(chrono::milliseconds(100));

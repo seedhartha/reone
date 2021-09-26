@@ -47,7 +47,7 @@ public:
 
 private:
     struct SavedGameDescriptor {
-        int number { 0 };
+        int number {0};
         SavedGame save;
         boost::filesystem::path path;
     };
@@ -76,7 +76,7 @@ private:
         // END TSL only
     } _binding;
 
-    Mode _mode { Mode::Save };
+    Mode _mode {Mode::Save};
     std::vector<SavedGameDescriptor> _saves;
 
     void bindControls();

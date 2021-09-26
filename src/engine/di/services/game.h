@@ -58,8 +58,7 @@ public:
         GraphicsServices &graphics,
         AudioServices &audio,
         SceneServices &scene,
-        ScriptServices &script
-    ) :
+        ScriptServices &script) :
         _gameId(gameId),
         _gamePath(std::move(gamePath)),
         _gameOptions(std::move(gameOptions)),

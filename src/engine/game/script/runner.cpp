@@ -30,7 +30,8 @@ namespace reone {
 
 namespace game {
 
-ScriptRunner::ScriptRunner(Routines &routines, Scripts &scripts) : _routines(routines), _scripts(scripts) {
+ScriptRunner::ScriptRunner(Routines &routines, Scripts &scripts) :
+    _routines(routines), _scripts(scripts) {
 }
 
 int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerrerId, int userDefinedEventNumber, int scriptVar) {
@@ -42,7 +43,8 @@ int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerr
     }
 
     auto program = _scripts.get(resRef);
-    if (!program) return -1;
+    if (!program)
+        return -1;
 
     auto ctx = make_unique<ExecutionContext>();
     ctx->routines = &_routines;

@@ -36,22 +36,22 @@ public:
 private:
     struct Section {
         std::string name;
-        uint32_t virtualAddress { 0 };
-        uint32_t offset { 0 };
+        uint32_t virtualAddress {0};
+        uint32_t offset {0};
     };
 
     struct Resource {
-        PEResourceType type { PEResourceType::Cursor };
-        uint32_t name { 0 };
-        uint32_t langId { 0 };
-        uint32_t offset { 0 };
-        uint32_t size { 0 };
+        PEResourceType type {PEResourceType::Cursor};
+        uint32_t name {0};
+        uint32_t langId {0};
+        uint32_t offset {0};
+        uint32_t size {0};
     };
 
-    int _sectionCount { 0 };
-    PEResourceType _currentType { PEResourceType::Cursor };
-    uint32_t _currentName { 0 };
-    uint32_t _currentLangId { 0 };
+    int _sectionCount {0};
+    PEResourceType _currentType {PEResourceType::Cursor};
+    uint32_t _currentName {0};
+    uint32_t _currentLangId {0};
     std::vector<Section> _sections;
     std::vector<Resource> _resources;
 

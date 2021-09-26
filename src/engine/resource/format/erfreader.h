@@ -29,14 +29,14 @@ namespace resource {
 class ErfReader : public BinaryReader, public IResourceProvider {
 public:
     struct Key {
-        std::string resRef { 0 };
-        uint32_t resId { 0 };
-        ResourceType resType { ResourceType::Invalid };
+        std::string resRef {0};
+        uint32_t resId {0};
+        ResourceType resType {ResourceType::Invalid};
     };
 
     struct Resource {
-        uint32_t offset { 0 };
-        uint32_t size { 0 };
+        uint32_t offset {0};
+        uint32_t size {0};
     };
 
     ErfReader();
@@ -49,9 +49,9 @@ public:
     const std::vector<Key> &keys() const { return _keys; }
 
 private:
-    int _entryCount { 0 };
-    uint32_t _keysOffset { 0 };
-    uint32_t _resourcesOffset { 0 };
+    int _entryCount {0};
+    uint32_t _keysOffset {0};
+    uint32_t _resourcesOffset {0};
     std::vector<Key> _keys;
     std::vector<Resource> _resources;
 

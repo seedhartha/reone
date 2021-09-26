@@ -29,8 +29,7 @@ class StreamWriter : boost::noncopyable {
 public:
     StreamWriter(
         std::shared_ptr<std::ostream> stream,
-        boost::endian::order endianess = boost::endian::order::little
-    ) :
+        boost::endian::order endianess = boost::endian::order::little) :
         _stream(ensurePresent(stream, "stream")),
         _endianess(endianess) {
     }

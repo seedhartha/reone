@@ -30,7 +30,8 @@ namespace reone {
 
 namespace graphics {
 
-Walkmeshes::Walkmeshes(Resources &resources) : _resources(resources) {
+Walkmeshes::Walkmeshes(Resources &resources) :
+    _resources(resources) {
 }
 
 void Walkmeshes::invalidateCache() {

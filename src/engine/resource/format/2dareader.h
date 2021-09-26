@@ -32,8 +32,8 @@ public:
     const std::shared_ptr<TwoDA> &twoDa() const { return _twoDa; }
 
 private:
-    int _rowCount { 0 };
-    int _dataSize { 0 };
+    int _rowCount {0};
+    int _dataSize {0};
     std::shared_ptr<TwoDA> _twoDa;
 
     void doLoad() override;

@@ -25,10 +25,11 @@ class ArgumentException : public std::logic_error {
 public:
     ArgumentException() = default;
 
-    ArgumentException(const std::string &message) : std::logic_error(message.c_str()) {
+    ArgumentException(const std::string &message) :
+        std::logic_error(message.c_str()) {
     }
 };
 
 } // namespace script
 
-} // namespae reone
+} // namespace reone

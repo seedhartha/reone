@@ -33,7 +33,7 @@ class Game;
 
 namespace routine {
 
-#define REO_DECL_ROUTINE(x) script::Variable (x)(Game &game, const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+#define REO_DECL_ROUTINE(x) script::Variable(x)(Game & game, const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
 
 REO_DECL_ROUTINE(random)
 REO_DECL_ROUTINE(printString)

@@ -25,7 +25,8 @@ namespace game {
 
 class SavingThrowIncreaseEffect : public Effect {
 public:
-    SavingThrowIncreaseEffect() : Effect(EffectType::SavingThrowIncrease) {
+    SavingThrowIncreaseEffect() :
+        Effect(EffectType::SavingThrowIncrease) {
     }
 
     void applyTo(SpatialObject &object) override;

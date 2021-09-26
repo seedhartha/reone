@@ -22,9 +22,9 @@ namespace reone {
 namespace game {
 
 struct SavingThrows {
-    int fortitude { 0 };
-    int reflex { 0 };
-    int will { 0 };
+    int fortitude {0};
+    int reflex {0};
+    int will {0};
 };
 
 } // namespace game

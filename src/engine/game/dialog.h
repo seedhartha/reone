@@ -38,7 +38,7 @@ public:
     };
 
     struct EntryReplyLink {
-        int index { 0 };
+        int index {0};
         std::string active;
     };
 
@@ -54,12 +54,12 @@ public:
         std::string script;
         std::string sound;
         std::string listener;
-        int delay { 0 };
-        int waitFlags { 0 };
-        int cameraId { -1 };
-        int cameraAngle { 0 };
-        int cameraAnimation { 0 };
-        float camFieldOfView { 0.0f };
+        int delay {0};
+        int waitFlags {0};
+        int cameraId {-1};
+        int cameraAngle {0};
+        int cameraAnimation {0};
+        float camFieldOfView {0.0f};
         std::vector<EntryReplyLink> replies;
         std::vector<EntryReplyLink> entries;
         std::vector<ParticipantAnimation> animations;
@@ -87,17 +87,17 @@ private:
     std::string _resRef;
     resource::Strings *_strings;
 
-    bool _skippable { false };
+    bool _skippable {false};
     std::string _cameraModel;
     std::vector<EntryReplyLink> _startEntries;
     std::vector<EntryReply> _entries;
     std::vector<EntryReply> _replies;
     std::string _endScript;
-    int _entryIndex { -1 };
-    bool _animatedCutscene { false };
+    int _entryIndex {-1};
+    bool _animatedCutscene {false};
     std::vector<Stunt> _stunts;
-    ConversationType _conversationType { ConversationType::Cinematic };
-    ComputerType _computerType { ComputerType::Normal };
+    ConversationType _conversationType {ConversationType::Cinematic};
+    ComputerType _computerType {ComputerType::Normal};
 
     EntryReplyLink getEntryReplyLink(const resource::GffStruct &gffs) const;
     EntryReply getEntryReply(const resource::GffStruct &gffs) const;

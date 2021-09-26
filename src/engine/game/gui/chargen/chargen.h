@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../../../scene/node/model.h"
 #include "../../../scene/graph.h"
+#include "../../../scene/node/model.h"
 
 #include "../../character.h"
 
@@ -31,9 +31,9 @@
 #include "levelup.h"
 #include "nameentry.h"
 #include "portraitselect.h"
-#include "skills.h"
 #include "quick.h"
 #include "quickorcustom.h"
+#include "skills.h"
 
 namespace reone {
 
@@ -141,8 +141,8 @@ private:
         // END TSL only
     } _binding;
 
-    CharGenScreen _screen { CharGenScreen::ClassSelection };
-    Type _type  { Type::Quick };
+    CharGenScreen _screen {CharGenScreen::ClassSelection};
+    Type _type {Type::Quick};
     Character _character;
 
     // Sub GUI

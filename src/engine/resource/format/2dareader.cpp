@@ -30,7 +30,8 @@ namespace resource {
 static constexpr int kSignatureSize = 8;
 static const char kSignature[] = "2DA V2.b";
 
-TwoDaReader::TwoDaReader() : BinaryReader(kSignatureSize, kSignature), _twoDa(make_shared<TwoDA>()) {
+TwoDaReader::TwoDaReader() :
+    BinaryReader(kSignatureSize, kSignature), _twoDa(make_shared<TwoDA>()) {
 }
 
 void TwoDaReader::doLoad() {
@@ -104,6 +105,6 @@ void TwoDaReader::loadRows() {
     }
 }
 
-} // namespace bioware
+} // namespace resource
 
 } // namespace reone

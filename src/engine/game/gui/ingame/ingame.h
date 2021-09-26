@@ -87,7 +87,7 @@ private:
         std::shared_ptr<gui::Button> btnOpt;
     } _binding;
 
-    Tab _tab { Tab::None };
+    Tab _tab {Tab::None};
 
     std::unique_ptr<CharacterMenu> _character;
     std::unique_ptr<Equipment> _equip;

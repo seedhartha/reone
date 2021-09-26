@@ -25,7 +25,8 @@ namespace game {
 
 class DamageResistanceEffect : public Effect {
 public:
-    DamageResistanceEffect() : Effect(EffectType::DamageResistance) {
+    DamageResistanceEffect() :
+        Effect(EffectType::DamageResistance) {
     }
 
     void applyTo(SpatialObject &object) override;

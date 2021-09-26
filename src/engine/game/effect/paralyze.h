@@ -25,7 +25,8 @@ namespace game {
 
 class ParalyzeEffect : public Effect {
 public:
-    ParalyzeEffect() : Effect(EffectType::Paralyze) {
+    ParalyzeEffect() :
+        Effect(EffectType::Paralyze) {
     }
 
     void applyTo(SpatialObject &object) override;

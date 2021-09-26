@@ -43,7 +43,7 @@ public:
     void setText(std::string text);
 
 private:
-    int _mask { 0 };
+    int _mask {0};
     std::string _text;
 
     bool handleKeyDown(const SDL_KeyboardEvent &event);

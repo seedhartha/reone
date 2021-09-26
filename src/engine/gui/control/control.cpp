@@ -54,7 +54,8 @@ string Control::getParent(const GffStruct &gffs) {
     return gffs.getString("Obj_Parent");
 }
 
-Control::Extent::Extent(int left, int top, int width, int height) : left(left), top(top), width(width), height(height) {
+Control::Extent::Extent(int left, int top, int width, int height) :
+    left(left), top(top), width(width), height(height) {
 }
 
 bool Control::Extent::contains(int x, int y) const {
@@ -180,7 +181,8 @@ void Control::update(float dt) {
 }
 
 void Control::draw(const glm::ivec2 &offset, const vector<string> &text) {
-    if (!_visible) return;
+    if (!_visible)
+        return;
 
     glm::ivec2 size(_extent.width, _extent.height);
 
@@ -398,65 +400,66 @@ void Control::drawText(const vector<string> &lines, const glm::ivec2 &offset, co
 void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::ivec2 &size, TextGravity &gravity) const {
     // Gravity
     switch (_text.align) {
-        case TextAlign::LeftTop:
-            gravity = TextGravity::RightBottom;
-            break;
-        case TextAlign::CenterTop:
-            gravity = TextGravity::CenterBottom;
-            break;
-        case TextAlign::RightCenter:
-        case TextAlign::RightCenter2:
-            gravity = TextGravity::LeftCenter;
-            break;
-        case TextAlign::LeftCenter:
-            gravity = TextGravity::RightCenter;
-            break;
-        case TextAlign::CenterBottom:
-            gravity = TextGravity::CenterTop;
-            break;
-        case TextAlign::CenterCenter:
-        default:
-            gravity = TextGravity::CenterCenter;
-            break;
+    case TextAlign::LeftTop:
+        gravity = TextGravity::RightBottom;
+        break;
+    case TextAlign::CenterTop:
+        gravity = TextGravity::CenterBottom;
+        break;
+    case TextAlign::RightCenter:
+    case TextAlign::RightCenter2:
+        gravity = TextGravity::LeftCenter;
+        break;
+    case TextAlign::LeftCenter:
+        gravity = TextGravity::RightCenter;
+        break;
+    case TextAlign::CenterBottom:
+        gravity = TextGravity::CenterTop;
+        break;
+    case TextAlign::CenterCenter:
+    default:
+        gravity = TextGravity::CenterCenter;
+        break;
     }
     // Vertical alignment
     switch (_text.align) {
-        case TextAlign::LeftTop:
-        case TextAlign::CenterTop:
-            position.y = _extent.top;
-            break;
-        case TextAlign::CenterBottom:
-            position.y = _extent.top + size.y - static_cast<int>(glm::max(0, lineCount - 1) * _text.font->height());
-            break;
-        case TextAlign::RightCenter:
-        case TextAlign::LeftCenter:
-        case TextAlign::CenterCenter:
-        case TextAlign::RightCenter2:
-        default:
-            position.y = _extent.top + size.y / 2 - static_cast<int>(0.5f * (lineCount - 1) * _text.font->height());
-            break;
+    case TextAlign::LeftTop:
+    case TextAlign::CenterTop:
+        position.y = _extent.top;
+        break;
+    case TextAlign::CenterBottom:
+        position.y = _extent.top + size.y - static_cast<int>(glm::max(0, lineCount - 1) * _text.font->height());
+        break;
+    case TextAlign::RightCenter:
+    case TextAlign::LeftCenter:
+    case TextAlign::CenterCenter:
+    case TextAlign::RightCenter2:
+    default:
+        position.y = _extent.top + size.y / 2 - static_cast<int>(0.5f * (lineCount - 1) * _text.font->height());
+        break;
     }
     // Horizontal alignment
     switch (_text.align) {
-        case TextAlign::LeftTop:
-        case TextAlign::LeftCenter:
-            position.x = _extent.left;
-            break;
-        case TextAlign::RightCenter:
-        case TextAlign::RightCenter2:
-            position.x = _extent.left + _extent.width;
-            break;
-        case TextAlign::CenterTop:
-        case TextAlign::CenterCenter:
-        case TextAlign::CenterBottom:
-        default:
-            position.x = _extent.left + size.x / 2;
-            break;
+    case TextAlign::LeftTop:
+    case TextAlign::LeftCenter:
+        position.x = _extent.left;
+        break;
+    case TextAlign::RightCenter:
+    case TextAlign::RightCenter2:
+        position.x = _extent.left + _extent.width;
+        break;
+    case TextAlign::CenterTop:
+    case TextAlign::CenterCenter:
+    case TextAlign::CenterBottom:
+    default:
+        position.x = _extent.left + size.x / 2;
+        break;
     }
 }
 
 void Control::draw3D(const glm::ivec2 &offset) {
-    if (!_visible || !_scene) return;
+    if (!_visible || !_scene)
+        return;
 
     _pipeline->render(offset);
 }
@@ -496,7 +499,8 @@ void Control::setDisabled(bool disabled) {
 }
 
 void Control::setFocus(bool focus) {
-    if (_focus == focus) return;
+    if (_focus == focus)
+        return;
 
     _focus = focus;
 

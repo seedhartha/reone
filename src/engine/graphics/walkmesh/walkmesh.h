@@ -29,10 +29,10 @@ class BwmReader;
 class Walkmesh : boost::noncopyable {
 public:
     struct Face {
-        int index { 0 };
-        uint32_t material { 0 };
+        int index {0};
+        uint32_t material {0};
         std::vector<glm::vec3> vertices;
-        glm::vec3 normal { 0.0f };
+        glm::vec3 normal {0.0f};
     };
 
     bool raycastWalkableFirst(const glm::vec3 &origin, const glm::vec3 &dir, float &distance, int &material) const;

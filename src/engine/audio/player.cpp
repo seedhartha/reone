@@ -122,20 +122,20 @@ shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, 
 float AudioPlayer::getGain(AudioType type, float gain) const {
     int volume;
     switch (type) {
-        case AudioType::Music:
-            volume = _options.musicVolume;
-            break;
-        case AudioType::Voice:
-            volume = _options.voiceVolume;
-            break;
-        case AudioType::Sound:
-            volume = _options.soundVolume;
-            break;
-        case AudioType::Movie:
-            volume = _options.movieVolume;
-            break;
-        default:
-            return 85;
+    case AudioType::Music:
+        volume = _options.musicVolume;
+        break;
+    case AudioType::Voice:
+        volume = _options.voiceVolume;
+        break;
+    case AudioType::Sound:
+        volume = _options.soundVolume;
+        break;
+    case AudioType::Movie:
+        volume = _options.movieVolume;
+        break;
+    default:
+        return 85;
     }
 
     return gain * (volume / 100.0f);
@@ -147,7 +147,8 @@ void AudioPlayer::enqueue(const shared_ptr<SoundInstance> &sound) {
 }
 
 shared_ptr<SoundHandle> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
-    if (positional && glm::distance2(_listenerPosition.load(), position) > kMaxPositionalSoundDistance2) return nullptr;
+    if (positional && glm::distance2(_listenerPosition.load(), position) > kMaxPositionalSoundDistance2)
+        return nullptr;
 
     auto sound = make_shared<SoundInstance>(stream, loop, getGain(type, gain), positional, move(position));
     enqueue(sound);

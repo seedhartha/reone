@@ -24,7 +24,7 @@ namespace scene {
 class CameraSceneNode;
 class SceneGraph;
 
-}
+} // namespace scene
 
 namespace game {
 
@@ -40,9 +40,9 @@ public:
     bool isMouseLookMode() const { return _mouseLookMode; }
 
 protected:
-    float _facing { 0.0f };
+    float _facing {0.0f};
     std::shared_ptr<scene::CameraSceneNode> _sceneNode;
-    bool _mouseLookMode { false };
+    bool _mouseLookMode {false};
 
     Camera() = default;
 };

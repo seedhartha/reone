@@ -33,9 +33,10 @@ namespace reone {
 static const char kIconName[] = "reone";
 static const char kConfigFilename[] = "reone.cfg";
 
-static const wxSize g_windowSize { 400, 400 };
+static const wxSize g_windowSize {400, 400};
 
-LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX)) {
+LauncherFrame::LauncherFrame() :
+    wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX)) {
     // Configure this frame
 
 #ifdef _WIN32
@@ -134,15 +135,7 @@ LauncherFrame::LauncherFrame() : wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPo
 
 void LauncherFrame::LoadConfiguration() {
     po::options_description options;
-    options.add_options()
-        ("game", po::value<string>())
-        ("dev", po::value<bool>())
-        ("width", po::value<int>())
-        ("height", po::value<int>())
-        ("fullscreen", po::value<bool>())
-        ("pbr", po::value<bool>())
-        ("logch", po::value<int>())
-        ("logfile", po::value<bool>());
+    options.add_options()("game", po::value<string>())("dev", po::value<bool>())("width", po::value<int>())("height", po::value<int>())("fullscreen", po::value<bool>())("pbr", po::value<bool>())("logch", po::value<int>())("logfile", po::value<bool>());
 
     po::variables_map vars;
     if (fs::exists(kConfigFilename)) {
@@ -174,7 +167,7 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
 }
 
 void LauncherFrame::SaveConfiguration() {
-    static set<string> recognized { "game=", "width=", "height=", "fullscreen=", "pbr=", "dev=", "logch=", "logfile=" };
+    static set<string> recognized {"game=", "width=", "height=", "fullscreen=", "pbr=", "dev=", "logch=", "logfile="};
 
     string resolution(_choiceResolution->GetStringSelection());
 
@@ -222,7 +215,7 @@ void LauncherFrame::SaveConfiguration() {
     vector<string> lines;
 
     fs::ifstream in(kConfigFilename);
-    for (string line; getline(in, line); ) {
+    for (string line; getline(in, line);) {
         bool add = true;
         for (auto &opt : recognized) {
             if (boost::starts_with(line, opt)) {
@@ -261,8 +254,8 @@ void LauncherFrame::OnGameDirLeftDown(wxMouseEvent &event) {
 }
 
 wxBEGIN_EVENT_TABLE(LauncherFrame, wxFrame)
-EVT_BUTTON(WindowID::launch, LauncherFrame::OnLaunch)
-EVT_BUTTON(WindowID::saveConfig, LauncherFrame::OnSaveConfig)
-wxEND_EVENT_TABLE()
+    EVT_BUTTON(WindowID::launch, LauncherFrame::OnLaunch)
+        EVT_BUTTON(WindowID::saveConfig, LauncherFrame::OnSaveConfig)
+            wxEND_EVENT_TABLE()
 
 } // namespace reone

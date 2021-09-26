@@ -35,7 +35,7 @@ public:
     float distance() const { return _distance; }
 
 private:
-    float _distance { 0.0f };
+    float _distance {0.0f};
 };
 
 } // namespace game

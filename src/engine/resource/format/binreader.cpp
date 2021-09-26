@@ -28,8 +28,10 @@ namespace reone {
 
 namespace resource {
 
-BinaryReader::BinaryReader(int signSize, const char *sign) : _signSize(signSize) {
-    if (!sign) return;
+BinaryReader::BinaryReader(int signSize, const char *sign) :
+    _signSize(signSize) {
+    if (!sign)
+        return;
 
     _sign.resize(_signSize);
     memcpy(&_sign[0], sign, _signSize);

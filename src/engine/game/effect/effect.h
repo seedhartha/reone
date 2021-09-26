@@ -29,7 +29,8 @@ class SpatialObject;
 
 class Effect : public script::EngineType {
 public:
-    Effect(EffectType type) : _type(type) {
+    Effect(EffectType type) :
+        _type(type) {
     }
 
     virtual void applyTo(SpatialObject &object);

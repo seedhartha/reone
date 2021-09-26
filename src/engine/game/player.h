@@ -50,13 +50,13 @@ private:
     Camera *_camera;
     const Party *_party;
 
-    bool _moveForward { false };
-    bool _moveLeft { false };
-    bool _moveBackward { false };
-    bool _moveRight { false };
-    bool _leftPressedInMouseLook { false };
-    bool _restrictMode { false };
-    bool _walk { false };
+    bool _moveForward {false};
+    bool _moveLeft {false};
+    bool _moveBackward {false};
+    bool _moveRight {false};
+    bool _leftPressedInMouseLook {false};
+    bool _restrictMode {false};
+    bool _walk {false};
 
     bool handleKeyDown(const SDL_KeyboardEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);

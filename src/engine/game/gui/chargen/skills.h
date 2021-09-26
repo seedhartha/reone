@@ -29,7 +29,7 @@ class Button;
 class Label;
 class ListBox;
 
-}
+} // namespace gui
 
 namespace game {
 
@@ -88,7 +88,7 @@ private:
 
     CharacterGeneration *_charGen;
     CreatureAttributes _attributes;
-    int _points { 0 };
+    int _points {0};
 
     void bindControls();
     void refreshControls();

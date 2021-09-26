@@ -36,8 +36,8 @@ public:
 private:
     struct StringDataElement {
         std::string soundResRef;
-        uint32_t offString { 0 };
-        uint32_t stringSize { 0 };
+        uint32_t offString {0};
+        uint32_t stringSize {0};
     };
 
     std::shared_ptr<TalkTable> _talkTable;

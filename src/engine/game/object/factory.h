@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../../scene/graph.h"
 #include "../../graphics/types.h"
 #include "../../resource/types.h"
+#include "../../scene/graph.h"
 
 #include "../types.h"
 
@@ -42,7 +42,8 @@ class Game;
 
 class ObjectFactory {
 public:
-    ObjectFactory(scene::SceneGraph &sceneGraph) : _sceneGraph(sceneGraph) {
+    ObjectFactory(scene::SceneGraph &sceneGraph) :
+        _sceneGraph(sceneGraph) {
     }
 
     std::shared_ptr<Module> newModule();
@@ -69,11 +70,11 @@ public:
 private:
     scene::SceneGraph &_sceneGraph;
 
-    Game *_game { nullptr };
-    uint32_t _counter { 2 }; // ids 0 and 1 are reserved
+    Game *_game {nullptr};
+    uint32_t _counter {2}; // ids 0 and 1 are reserved
     std::unordered_map<uint32_t, std::shared_ptr<Object>> _objectById;
 
-    template <class T, class ...Args>
+    template <class T, class... Args>
     std::shared_ptr<T> newObject(Args &&... args) {
         uint32_t id = _counter++;
         std::shared_ptr<T> object(std::make_shared<T>(id, std::forward<Args>(args)...));

@@ -19,8 +19,8 @@
 
 #include "../../graphics/walkmesh/walkmesh.h"
 #include "../../scene/animproperties.h"
-#include "../../scene/node/scenenode.h"
 #include "../../scene/graph.h"
+#include "../../scene/node/scenenode.h"
 
 #include "../action/playanimation.h"
 #include "../effect/effect.h"
@@ -127,23 +127,23 @@ public:
 protected:
     struct AppliedEffect {
         std::shared_ptr<Effect> effect;
-        DurationType durationType { DurationType::Instant };
-        float duration { 0.0f };
+        DurationType durationType {DurationType::Instant};
+        float duration {0.0f};
     };
 
     ObjectFactory *_objectFactory;
     scene::SceneGraph *_sceneGraph;
 
-    glm::vec3 _position { 0.0f };
-    glm::quat _orientation { 1.0f, 0.0f, 0.0f, 0.0f };
-    glm::mat4 _transform { 1.0f };
-    bool _visible { true };
+    glm::vec3 _position {0.0f};
+    glm::quat _orientation {1.0f, 0.0f, 0.0f, 0.0f};
+    glm::mat4 _transform {1.0f};
+    bool _visible {true};
     std::shared_ptr<scene::SceneNode> _sceneNode;
-    Room *_room { nullptr };
+    Room *_room {nullptr};
     std::vector<std::shared_ptr<Item>> _items;
     std::deque<AppliedEffect> _effects;
-    bool _open { false };
-    bool _stunt { false };
+    bool _open {false};
+    bool _stunt {false};
     std::string _activeAnimName;
 
     SpatialObject(
@@ -156,8 +156,8 @@ protected:
     virtual void updateTransform();
 
 private:
-    int _itemIndex { 0 };
-    int _effectIndex { 0 };
+    int _itemIndex {0};
+    int _effectIndex {0};
 
     void updateEffects(float dt);
     void applyInstantEffect(Effect &effect);

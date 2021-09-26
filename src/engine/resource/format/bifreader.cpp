@@ -28,7 +28,8 @@ namespace resource {
 static constexpr int kSignatureSize = 8;
 static const char kSignature[] = "BIFFV1  ";
 
-BifReader::BifReader() : BinaryReader(kSignatureSize, kSignature) {
+BifReader::BifReader() :
+    BinaryReader(kSignatureSize, kSignature) {
 }
 
 void BifReader::doLoad() {
@@ -60,6 +61,6 @@ BifReader::ResourceEntry BifReader::readResourceEntry(int idx) {
     return move(entry);
 }
 
-} // namespace bioware
+} // namespace resource
 
 } // namespace reone

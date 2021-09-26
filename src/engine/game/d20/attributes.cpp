@@ -82,9 +82,7 @@ void CreatureAttributes::addClassLevels(CreatureClass *clazz, int levels) {
 }
 
 ClassType CreatureAttributes::getClassByPosition(int position) const {
-    return position > 0 && (position - 1) < static_cast<int>(_classLevels.size()) ?
-        _classLevels[static_cast<size_t>(position) - 1].first->type() :
-        ClassType::Invalid;
+    return position > 0 && (position - 1) < static_cast<int>(_classLevels.size()) ? _classLevels[static_cast<size_t>(position) - 1].first->type() : ClassType::Invalid;
 }
 
 ClassType CreatureAttributes::getEffectiveClass() const {
@@ -92,9 +90,7 @@ ClassType CreatureAttributes::getEffectiveClass() const {
 }
 
 int CreatureAttributes::getLevelByPosition(int position) const {
-    return position > 0 && (position - 1) < static_cast<int>(_classLevels.size()) ?
-        _classLevels[static_cast<size_t>(position) - 1].second :
-        0;
+    return position > 0 && (position - 1) < static_cast<int>(_classLevels.size()) ? _classLevels[static_cast<size_t>(position) - 1].second : 0;
 }
 
 int CreatureAttributes::getClassLevel(ClassType clazz) const {

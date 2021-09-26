@@ -46,8 +46,8 @@ protected:
     Game &_game;
     ActionType _type;
     bool _userAction;
-    
-    bool _completed { false };
+
+    bool _completed {false};
 
     Action(Game &game, ActionType type, bool userAction = false) :
         _game(game),

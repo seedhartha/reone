@@ -29,7 +29,7 @@ class Meshes;
 class Shaders;
 class Texture;
 
-}
+} // namespace graphics
 
 namespace scene {
 
@@ -42,8 +42,7 @@ public:
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders
-    ) :
+        graphics::Shaders &shaders) :
         _extent(std::move(extent)),
         _sceneGraph(sceneGraph),
         _context(context),

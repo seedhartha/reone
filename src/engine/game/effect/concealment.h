@@ -25,7 +25,8 @@ namespace game {
 
 class ConcealmentEffect : public Effect {
 public:
-    ConcealmentEffect() : Effect(EffectType::Concealment) {
+    ConcealmentEffect() :
+        Effect(EffectType::Concealment) {
     }
 
     void applyTo(SpatialObject &object) override;

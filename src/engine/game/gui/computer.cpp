@@ -28,7 +28,8 @@ namespace reone {
 
 namespace game {
 
-ComputerGUI::ComputerGUI(Game *game) : Conversation(game) {
+ComputerGUI::ComputerGUI(Game *game) :
+    Conversation(game) {
     _resRef = getResRef("computer");
     _scaling = ScalingMode::Stretch;
 

@@ -50,14 +50,14 @@ private:
     AudioOptions _options;
     AudioFiles &_audioFiles;
 
-    ALCdevice *_device { nullptr };
-    ALCcontext *_context { nullptr };
+    ALCdevice *_device {nullptr};
+    ALCcontext *_context {nullptr};
     std::thread _thread;
-    std::atomic_bool _run { true };
+    std::atomic_bool _run {true};
     std::vector<std::shared_ptr<SoundInstance>> _sounds;
     std::recursive_mutex _soundsMutex;
     std::atomic<glm::vec3> _listenerPosition;
-    std::atomic_bool _listenerPositionDirty { false };
+    std::atomic_bool _listenerPositionDirty {false};
 
     void threadStart();
 

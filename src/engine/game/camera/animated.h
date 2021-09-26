@@ -51,10 +51,10 @@ public:
     void setFieldOfView(float fovy);
 
 private:
-    scene::SceneGraph *_sceneGraph { nullptr };
-    float _aspect { 1.0f };
+    scene::SceneGraph *_sceneGraph {nullptr};
+    float _aspect {1.0f};
     std::unique_ptr<scene::ModelSceneNode> _model;
-    float _fovy { kDefaultAnimCamFOV };
+    float _fovy {kDefaultAnimCamFOV};
 
     void updateProjection();
 };

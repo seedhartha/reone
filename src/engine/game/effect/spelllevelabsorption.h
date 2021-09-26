@@ -25,7 +25,8 @@ namespace game {
 
 class SpellLevelAbsorptionEffect : public Effect {
 public:
-    SpellLevelAbsorptionEffect() : Effect(EffectType::SpellLevelAbsorption) {
+    SpellLevelAbsorptionEffect() :
+        Effect(EffectType::SpellLevelAbsorption) {
     }
 
     void applyTo(SpatialObject &object) override;

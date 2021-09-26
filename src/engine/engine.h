@@ -38,14 +38,15 @@ class ResourceServices;
 class SceneServices;
 class ScriptServices;
 
-}
+} // namespace di
 
 /**
  * Encapsulates option loading and service initialization.
  */
 class Engine : boost::noncopyable {
 public:
-    Engine(int argc, char **argv) : _argc(argc), _argv(argv) {
+    Engine(int argc, char **argv) :
+        _argc(argc), _argv(argv) {
     }
 
     /**
@@ -61,10 +62,10 @@ private:
     char **_argv;
 
     boost::program_options::options_description _optsCommon;
-    boost::program_options::options_description _optsCmdLine { "Usage" };
+    boost::program_options::options_description _optsCmdLine {"Usage"};
     boost::program_options::variables_map _variables;
 
-    bool _showHelp { false };
+    bool _showHelp {false};
     boost::filesystem::path _gamePath;
     game::Options _gameOptions;
 

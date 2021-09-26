@@ -25,7 +25,8 @@ namespace game {
 
 class InvisibilityEffect : public Effect {
 public:
-    InvisibilityEffect() : Effect(EffectType::Invisibility) {
+    InvisibilityEffect() :
+        Effect(EffectType::Invisibility) {
     }
 
     void applyTo(SpatialObject &object) override;

@@ -44,8 +44,7 @@ Door::Door(
     uint32_t id,
     Game *game,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph
-) :
+    SceneGraph *sceneGraph) :
     SpatialObject(id, ObjectType::Door, game, objectFactory, sceneGraph) {
 }
 
@@ -63,7 +62,8 @@ void Door::loadFromGIT(const GffStruct &gffs) {
 
 void Door::loadFromBlueprint(const string &resRef) {
     shared_ptr<GffStruct> utd(_game->resources().getGFF(resRef, ResourceType::Utd));
-    if (!utd) return;
+    if (!utd)
+        return;
 
     loadUTD(*utd);
 
@@ -143,15 +143,15 @@ void Door::loadUTD(const GffStruct &utd) {
     _genericType = utd.getInt("GenericType");
     _static = utd.getBool("Static");
 
-    _onClosed = utd.getString("OnClosed"); // always empty, but could be useful
+    _onClosed = utd.getString("OnClosed");   // always empty, but could be useful
     _onDamaged = utd.getString("OnDamaged"); // always empty, but could be useful
     _onDeath = utd.getString("OnDeath");
     _onHeartbeat = utd.getString("OnHeartbeat");
-    _onLock = utd.getString("OnLock"); // always empty, but could be useful
+    _onLock = utd.getString("OnLock");                   // always empty, but could be useful
     _onMeleeAttacked = utd.getString("OnMeleeAttacked"); // always empty, but could be useful
     _onOpen = utd.getString("OnOpen");
     _onSpellCastAt = utd.getString("OnSpellCastAt"); // always empty, but could be useful
-    _onUnlock = utd.getString("OnUnlock"); // always empty, but could be useful
+    _onUnlock = utd.getString("OnUnlock");           // always empty, but could be useful
     _onUserDefined = utd.getString("OnUserDefined");
     _onClick = utd.getString("OnClick");
     _onFailToOpen = utd.getString("OnFailToOpen");

@@ -133,8 +133,7 @@ Variable getFacing(Game &game, const vector<Variable> &args, ExecutionContext &c
     try {
         auto target = getSpatialObject(game, args, 0, ctx);
         return Variable::ofFloat(glm::degrees(target->getFacing()));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
@@ -204,8 +203,7 @@ Variable getDistanceToObject(Game &game, const vector<Variable> &args, Execution
         auto object = getSpatialObject(game, args, 0, ctx);
 
         return Variable::ofFloat(caller->getDistanceTo(*object));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
@@ -214,8 +212,7 @@ Variable getIsObjectValid(Game &game, const vector<Variable> &args, ExecutionCon
     try {
         auto object = getObject(game, args, 0, ctx);
         return Variable::ofInt(1);
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(0);
     }
 }
@@ -238,8 +235,7 @@ Variable getCurrentHitPoints(Game &game, const vector<Variable> &args, Execution
         int hitPoints = object->currentHitPoints();
 
         return Variable::ofInt(hitPoints);
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(0);
     }
 }
@@ -250,8 +246,7 @@ Variable getMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionCont
         int hitPoints = object->maxHitPoints();
 
         return Variable::ofInt(hitPoints);
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(0);
     }
 }
@@ -331,8 +326,7 @@ Variable getRacialType(Game &game, const vector<Variable> &args, ExecutionContex
     try {
         auto creature = getCreature(game, args, 0, ctx);
         return Variable::ofInt(static_cast<int>(creature->racialType()));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(RacialType::Invalid));
     }
 }
@@ -393,8 +387,7 @@ Variable getIsDead(Game &game, const vector<Variable> &args, ExecutionContext &c
         bool dead = creature->isDead();
 
         return Variable::ofInt(static_cast<int>(dead));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(0);
     }
 }
@@ -710,8 +703,7 @@ Variable getFacingFromLocation(Game &game, const vector<Variable> &args, Executi
     try {
         auto location = getLocationEngineType(args, 0);
         return Variable::ofFloat(glm::degrees(location->facing()));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
@@ -783,8 +775,7 @@ Variable getIsEnemy(Game &game, const vector<Variable> &args, ExecutionContext &
         bool enemy = game.reputes().getIsEnemy(*target, *source);
 
         return Variable::ofInt(static_cast<int>(enemy));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(0);
     }
 }
@@ -796,8 +787,7 @@ Variable getIsFriend(Game &game, const vector<Variable> &args, ExecutionContext 
         bool isFriend = game.reputes().getIsFriend(*target, *source);
 
         return Variable::ofInt(static_cast<int>(isFriend));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(0);
     }
 }
@@ -809,8 +799,7 @@ Variable getIsNeutral(Game &game, const vector<Variable> &args, ExecutionContext
         bool neutral = game.reputes().getIsNeutral(*target, *source);
 
         return Variable::ofInt(static_cast<int>(neutral));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(0);
     }
 }
@@ -1008,8 +997,7 @@ Variable getCreatureHasTalent(Game &game, const vector<Variable> &args, Executio
         // TODO: implement
 
         return Variable::ofInt(0);
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(0);
     }
 }
@@ -1173,8 +1161,7 @@ Variable getDistanceToObject2D(Game &game, const vector<Variable> &args, Executi
         auto caller = getCallerAsSpatial(game, ctx);
         auto object = getSpatialObject(game, args, 0, ctx);
         return Variable::ofFloat(caller->getDistanceTo(glm::vec2(object->position())));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
@@ -1212,8 +1199,7 @@ Variable getClassByPosition(Game &game, const vector<Variable> &args, ExecutionC
         ClassType clazz = creature->attributes().getClassByPosition(position);
 
         return Variable::ofInt(static_cast<int>(clazz));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(ClassType::Invalid));
     }
 }
@@ -1613,8 +1599,7 @@ Variable getSubRace(Game &game, const vector<Variable> &args, ExecutionContext &
     try {
         auto creature = getCreature(game, args, 0, ctx);
         return Variable::ofInt(static_cast<int>(creature->subrace()));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(Subrace::None));
     }
 }
@@ -2010,8 +1995,7 @@ Variable getNPCAIStyle(Game &game, const vector<Variable> &args, ExecutionContex
     try {
         auto creature = getCreature(game, args, 0, ctx);
         return Variable::ofInt(static_cast<int>(creature->aiStyle()));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(NPCAIStyle::DefaultAttack));
     }
 }
@@ -2062,8 +2046,7 @@ Variable getStandardFaction(Game &game, const vector<Variable> &args, ExecutionC
     try {
         auto object = getCreature(game, args, 0, ctx);
         return Variable::ofInt(static_cast<int>(object->faction()));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(Faction::Invalid));
     }
 }
@@ -2159,8 +2142,7 @@ Variable getIsDebilitated(Game &game, const vector<Variable> &args, ExecutionCon
         auto creature = getCreatureOrCaller(game, args, 0, ctx);
         bool debilitated = creature->isDebilitated();
         return Variable::ofInt(static_cast<int>(debilitated));
-    }
-    catch (const ArgumentException &ex) {
+    } catch (const ArgumentException &ex) {
         return Variable::ofInt(0);
     }
 }

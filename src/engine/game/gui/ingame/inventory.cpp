@@ -30,7 +30,8 @@ namespace reone {
 
 namespace game {
 
-InventoryMenu::InventoryMenu(Game *game) : GameGUI(game) {
+InventoryMenu::InventoryMenu(Game *game) :
+    GameGUI(game) {
     _resRef = getResRef("inventory");
 
     initForGame();
@@ -93,7 +94,8 @@ void InventoryMenu::bindControls() {
 }
 
 void InventoryMenu::refreshPortraits() {
-    if (!_game->isKotOR()) return;
+    if (!_game->isKotOR())
+        return;
 
     Party &party = _game->party();
     shared_ptr<Creature> partyLeader(party.getLeader());

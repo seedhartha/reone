@@ -29,9 +29,9 @@ struct ExecutionState {
     std::shared_ptr<ScriptProgram> program;
     std::vector<Variable> globals;
     std::vector<Variable> locals;
-    uint32_t insOffset { 0 };
+    uint32_t insOffset {0};
 };
 
 } // namespace script
 
-} // namespae reone
+} // namespace reone

@@ -66,10 +66,9 @@ void TpcTool::toTGA(const fs::path &path, const fs::path &destPath) {
 }
 
 bool TpcTool::supports(Operation operation, const fs::path &target) const {
-    return
-        !fs::is_directory(target) &&
-        target.extension() == ".tpc" &&
-        operation == Operation::ToTGA;
+    return !fs::is_directory(target) &&
+           target.extension() == ".tpc" &&
+           operation == Operation::ToTGA;
 }
 
 } // namespace tools

@@ -25,7 +25,8 @@ namespace game {
 
 class CastSpellAtObjectAction : public Action {
 public:
-    CastSpellAtObjectAction(Game &game) : Action(game, ActionType::CastSpellAtObject) {
+    CastSpellAtObjectAction(Game &game) :
+        Action(game, ActionType::CastSpellAtObject) {
     }
 
     void execute(Object &actor, float dt) override;

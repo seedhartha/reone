@@ -28,7 +28,8 @@ namespace reone {
 
 namespace game {
 
-OptionsMenu::OptionsMenu(Game *game) : GameGUI(game) {
+OptionsMenu::OptionsMenu(Game *game) :
+    GameGUI(game) {
     _resRef = getResRef("optionsingame");
 
     initForGame();

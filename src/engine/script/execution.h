@@ -45,8 +45,8 @@ private:
     std::unordered_map<ByteCode, std::function<void(const Instruction &)>> _handlers;
     std::vector<Variable> _stack;
     std::vector<uint32_t> _returnOffsets;
-    uint32_t _nextInstruction { 0 };
-    int _globalCount { 0 };
+    uint32_t _nextInstruction {0};
+    int _globalCount {0};
     ExecutionState _savedState;
 
     template <class T>
@@ -108,4 +108,4 @@ private:
 
 } // namespace script
 
-} // namespae reone
+} // namespace reone

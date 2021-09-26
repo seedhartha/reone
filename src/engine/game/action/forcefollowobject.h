@@ -25,7 +25,8 @@ namespace game {
 
 class ForceFollowObjectAction : public Action {
 public:
-    ForceFollowObjectAction(Game &game) : Action(game, ActionType::ForceFollowObject) {
+    ForceFollowObjectAction(Game &game) :
+        Action(game, ActionType::ForceFollowObject) {
     }
 
     void execute(Object &actor, float dt) override;

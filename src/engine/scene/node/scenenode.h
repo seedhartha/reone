@@ -30,7 +30,7 @@ class Context;
 class Meshes;
 class Shaders;
 
-}
+} // namespace graphics
 
 namespace scene {
 
@@ -100,7 +100,7 @@ protected:
     SceneNodeType _type;
 
     graphics::AABB _aabb;
-    const SceneNode *_parent { nullptr };
+    const SceneNode *_parent {nullptr};
     std::vector<std::shared_ptr<SceneNode>> _children;
 
     // Services
@@ -115,18 +115,18 @@ protected:
 
     // Transformations
 
-    glm::mat4 _localTransform { 1.0f };
-    glm::mat4 _absTransform { 1.0f };
-    glm::mat4 _absTransformInv { 1.0f };
+    glm::mat4 _localTransform {1.0f};
+    glm::mat4 _absTransform {1.0f};
+    glm::mat4 _absTransformInv {1.0f};
 
     // END Transformations
 
     // Flags
 
-    bool _visible { true };
-    bool _cullable { false }; /**< can this scene node be frustum- or distance-culled? */
-    bool _culled { false }; /**< has this scene node been frustum- or distance-culled? */
-    bool _volumetric { false }; /**< does this scene node have a bounding box? */
+    bool _visible {true};
+    bool _cullable {false};   /**< can this scene node be frustum- or distance-culled? */
+    bool _culled {false};     /**< has this scene node been frustum- or distance-culled? */
+    bool _volumetric {false}; /**< does this scene node have a bounding box? */
 
     // END Flags
 
@@ -136,8 +136,7 @@ protected:
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders
-    ) :
+        graphics::Shaders &shaders) :
         _name(std::move(name)),
         _type(type),
         _sceneGraph(sceneGraph),
@@ -148,7 +147,7 @@ protected:
 
     void computeAbsoluteTransforms();
 
-    virtual void onAbsoluteTransformChanged() { }
+    virtual void onAbsoluteTransformChanged() {}
 };
 
 } // namespace scene

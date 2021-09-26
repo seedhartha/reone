@@ -874,16 +874,16 @@ enum class NPCAIStyle {
     JediSupport = 5,
 
     // TSL
-    Healer = 6, // no fighting, just heals
-    Skirmish = 7, // this AI moves and shoots
-    Turtle = 8, // turtles then unleashes charged attack
-    PartyAggro = 9, // all out attacking party member
-    PartyDefense = 10, // attacks, but doesn't stray to far
-    PartyRanged = 11, // doesn't run around a lot, but does heal
+    Healer = 6,           // no fighting, just heals
+    Skirmish = 7,         // this AI moves and shoots
+    Turtle = 8,           // turtles then unleashes charged attack
+    PartyAggro = 9,       // all out attacking party member
+    PartyDefense = 10,    // attacks, but doesn't stray to far
+    PartyRanged = 11,     // doesn't run around a lot, but does heal
     PartyStationary = 12, // uses healing and defensive force powers
-    PartySupport = 13, // revisiting party AI stuff
-    PartyRemote = 14, // combat AI for the floating remote
-    MonsterPowers = 15 // combat AI for the Malachor Storm Beasts and other ability-using monsters
+    PartySupport = 13,    // revisiting party AI stuff
+    PartyRemote = 14,     // combat AI for the floating remote
+    MonsterPowers = 15    // combat AI for the Malachor Storm Beasts and other ability-using monsters
 };
 
 enum class ActionType {

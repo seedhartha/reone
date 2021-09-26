@@ -28,7 +28,8 @@ namespace resource {
 static constexpr int kSignatureSize = 8;
 static const char kSignature[] = "RIM V1.0";
 
-RimReader::RimReader() : BinaryReader(kSignatureSize, kSignature) {
+RimReader::RimReader() :
+    BinaryReader(kSignatureSize, kSignature) {
 }
 
 void RimReader::doLoad() {
@@ -77,7 +78,8 @@ shared_ptr<ByteArray> RimReader::find(const string &resRef, ResourceType type) {
         _resources.end(),
         [&](const Resource &res) { return res.resRef == lcResRef && res.resType == type; });
 
-    if (it == _resources.end()) return nullptr;
+    if (it == _resources.end())
+        return nullptr;
 
     return make_shared<ByteArray>(getResourceData(*it));
 }

@@ -37,7 +37,8 @@ namespace reone {
 
 namespace game {
 
-CharacterMenu::CharacterMenu(Game *game, InGameMenu &inGameMenu) : GameGUI(game), _inGameMenu(inGameMenu) {
+CharacterMenu::CharacterMenu(Game *game, InGameMenu &inGameMenu) :
+    GameGUI(game), _inGameMenu(inGameMenu) {
     _resRef = getResRef("character");
 
     initForGame();
@@ -132,12 +133,12 @@ void CharacterMenu::bindControls() {
         _binding.btnChange2 = getControl<Button>("BTN_CHANGE2");
         _binding.btnCharLeft = getControl<Button>("BTN_CHARLEFT");
         _binding.btnCharRight = getControl<Button>("BTN_CHARRIGHT");
-     } else {
-         _binding.lblForceMastery = getControl<Label>("LBL_FORCEMASTERY");
-         _binding.lblMoreBack = getControl<Label>("LBL_FORCEMASTERY");
-         _binding.lblStatsBorder = getControl<Label>("LBL_STATSBORDER");
-         _binding.lblTitle = getControl<Label>("LBL_TITLE");
-         _binding.lblXpBack = getControl<Label>("LBL_XP_BACK");
+    } else {
+        _binding.lblForceMastery = getControl<Label>("LBL_FORCEMASTERY");
+        _binding.lblMoreBack = getControl<Label>("LBL_FORCEMASTERY");
+        _binding.lblStatsBorder = getControl<Label>("LBL_STATSBORDER");
+        _binding.lblTitle = getControl<Label>("LBL_TITLE");
+        _binding.lblXpBack = getControl<Label>("LBL_XP_BACK");
         for (int i = 0; i < kNumControlsBar; ++i) {
             _binding.lblBar[i] = getControl<Label>("LBL_BAR" + to_string(i + 1));
         }
@@ -202,13 +203,15 @@ void CharacterMenu::refreshControls() {
 }
 
 string CharacterMenu::describeClass(ClassType clazz) const {
-    if (clazz == ClassType::Invalid) return "";
+    if (clazz == ClassType::Invalid)
+        return "";
 
     return _game->classes().get(clazz)->name();
 }
 
 void CharacterMenu::refreshPortraits() {
-    if (_game->id() != GameID::KotOR) return;
+    if (_game->id() != GameID::KotOR)
+        return;
 
     Party &party = _game->party();
     shared_ptr<Creature> partyMember1(party.getMember(1));
@@ -225,22 +228,21 @@ void CharacterMenu::refresh3D() {
     float aspect = _binding.lbl3dChar->extent().width / static_cast<float>(_binding.lbl3dChar->extent().height);
 
     auto scene = SceneBuilder(
-        _options,
-        _context,
-        _features,
-        _materials,
-        _meshes,
-        _pbrIbl,
-        _shaders,
-        _textures
-    )
-        .aspect(aspect)
-        .depth(0.1f, 10.0f)
-        .modelSupplier(bind(&CharacterMenu::getSceneModel, this, _1))
-        .modelOffset(glm::vec2(0.0f, 1.7f))
-        .cameraFromModelNode("camerahook")
-        .lightingRefFromModelNode("charmain_light")
-        .build();
+                     _options,
+                     _context,
+                     _features,
+                     _materials,
+                     _meshes,
+                     _pbrIbl,
+                     _shaders,
+                     _textures)
+                     .aspect(aspect)
+                     .depth(0.1f, 10.0f)
+                     .modelSupplier(bind(&CharacterMenu::getSceneModel, this, _1))
+                     .modelOffset(glm::vec2(0.0f, 1.7f))
+                     .cameraFromModelNode("camerahook")
+                     .lightingRefFromModelNode("charmain_light")
+                     .build();
 
     _binding.lbl3dChar->setScene(move(scene));
 }
@@ -257,11 +259,11 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) 
 
     for (auto &item : partyLeader->equipment()) {
         switch (item.first) {
-            case InventorySlot::body:
-                character->equip(item.first, item.second);
-                break;
-            default:
-                break;
+        case InventorySlot::body:
+            character->equip(item.first, item.second);
+            break;
+        default:
+            break;
         }
     }
 

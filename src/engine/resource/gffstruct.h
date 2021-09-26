@@ -27,10 +27,12 @@ namespace resource {
 
 class GffStruct : boost::noncopyable {
 public:
-    GffStruct(uint32_t type) : _type(type) {
+    GffStruct(uint32_t type) :
+        _type(type) {
     }
 
-    GffStruct(uint32_t type, std::vector<GffField> fields) : _type(type), _fields(std::move(fields)) {
+    GffStruct(uint32_t type, std::vector<GffField> fields) :
+        _type(type), _fields(std::move(fields)) {
     }
 
     void add(GffField &&field);
@@ -55,7 +57,7 @@ public:
     }
 
 private:
-    uint32_t _type { 0 };
+    uint32_t _type {0};
     std::vector<GffField> _fields;
 
     const GffField *get(const std::string &name) const;

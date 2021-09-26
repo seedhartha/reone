@@ -27,7 +27,8 @@ class Routines;
 
 class TSLRoutineRegistrar : public RoutineRegistrar {
 public:
-    TSLRoutineRegistrar(Routines &routines) : _routines(routines) {
+    TSLRoutineRegistrar(Routines &routines) :
+        _routines(routines) {
     }
 
     void invoke() override;

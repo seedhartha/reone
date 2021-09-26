@@ -65,54 +65,54 @@ struct UniformFeatureFlags {
 };
 
 struct ShaderGeneral {
-    glm::mat4 projection { 1.0f };
-    glm::mat4 view { 1.0f };
-    glm::mat4 model { 1.0f };
-    glm::vec4 cameraPosition { 0.0f };
-    glm::vec4 color { 1.0f };
-    glm::vec4 ambientColor { 1.0f };
-    glm::vec4 selfIllumColor { 1.0f };
-    glm::vec4 discardColor { 0.0f };
-    glm::vec4 fogColor { 0.0f };
-    glm::vec2 uvOffset { 0.0f };
-    float alpha { 1.0f };
-    float waterAlpha { 1.0f };
-    float roughness { 0.0f };
-    float fogNear { 0.0f };
-    float fogFar { 0.0f };
-    float envmapResolution { 0.0f };
+    glm::mat4 projection {1.0f};
+    glm::mat4 view {1.0f};
+    glm::mat4 model {1.0f};
+    glm::vec4 cameraPosition {0.0f};
+    glm::vec4 color {1.0f};
+    glm::vec4 ambientColor {1.0f};
+    glm::vec4 selfIllumColor {1.0f};
+    glm::vec4 discardColor {0.0f};
+    glm::vec4 fogColor {0.0f};
+    glm::vec2 uvOffset {0.0f};
+    float alpha {1.0f};
+    float waterAlpha {1.0f};
+    float roughness {0.0f};
+    float fogNear {0.0f};
+    float fogFar {0.0f};
+    float envmapResolution {0.0f};
 };
 
 struct ShaderMaterial {
-    glm::vec4 ambient { 1.0f };
-    glm::vec4 diffuse { 0.0f };
-    float shininess { 0.0f };
-    float metallic { 0.0f };
-    float roughness { 1.0f };
+    glm::vec4 ambient {1.0f};
+    glm::vec4 diffuse {0.0f};
+    float shininess {0.0f};
+    float metallic {0.0f};
+    float roughness {1.0f};
     char padding[4];
 };
 
 struct ShaderShadows {
     glm::mat4 lightSpaceMatrices[kNumCubeFaces];
-    glm::vec4 lightPosition { 0.0f }; /**< W = 0 if light is directional */
-    int lightPresent { false };
-    float strength { 1.0f };
+    glm::vec4 lightPosition {0.0f}; /**< W = 0 if light is directional */
+    int lightPresent {false};
+    float strength {1.0f};
     char padding[8];
 };
 
 struct ShaderBumpmaps {
-    glm::vec2 gridSize { 1.0f };
-    float scaling { 0.0f };
-    int frame { 0 };
+    glm::vec2 gridSize {1.0f};
+    float scaling {0.0f};
+    int frame {0};
 };
 
 struct ShaderBlur {
-    glm::vec2 resolution { 0.0f };
-    glm::vec2 direction { 0.0f };
+    glm::vec2 resolution {0.0f};
+    glm::vec2 direction {0.0f};
 };
 
 struct CombinedUniforms {
-    int featureMask { 0 }; /**< any combination of UniformFeaturesFlags */
+    int featureMask {0}; /**< any combination of UniformFeaturesFlags */
     char padding[12];
 
     ShaderGeneral general;
@@ -123,16 +123,16 @@ struct CombinedUniforms {
 };
 
 struct ShaderLight {
-    glm::vec4 position { 0.0f }; /**< W = 0 if light is directional */
-    glm::vec4 color { 1.0f };
-    float multiplier { 1.0f };
-    float radius { 1.0f };
-    int ambientOnly { 0 };
+    glm::vec4 position {0.0f}; /**< W = 0 if light is directional */
+    glm::vec4 color {1.0f};
+    float multiplier {1.0f};
+    float radius {1.0f};
+    int ambientOnly {0};
     char padding[4];
 };
 
 struct LightingUniforms {
-    int lightCount { 0 };
+    int lightCount {0};
     char padding[12];
     ShaderLight lights[kMaxLights];
 };
@@ -142,36 +142,36 @@ struct SkeletalUniforms {
 };
 
 struct ShaderParticle {
-    glm::mat4 transform { 1.0f };
-    glm::vec4 dir { 0.0f };
-    glm::vec4 color { 1.0f };
-    glm::vec2 size { 0.0f };
-    int frame { 0 };
+    glm::mat4 transform {1.0f};
+    glm::vec4 dir {0.0f};
+    glm::vec4 color {1.0f};
+    glm::vec2 size {0.0f};
+    int frame {0};
     char padding[4];
 };
 
 struct ParticlesUniforms {
-    glm::ivec2 gridSize { 0 };
-    int render { 0 };
+    glm::ivec2 gridSize {0};
+    int render {0};
     char padding[4];
     ShaderParticle particles[kMaxParticles];
 };
 
 struct ShaderGrassCluster {
-    glm::vec4 positionVariant { 0.0f }; /**< fourth component is a variant (0-3) */
-    glm::vec2 lightmapUV { 0.0f };
+    glm::vec4 positionVariant {0.0f}; /**< fourth component is a variant (0-3) */
+    glm::vec2 lightmapUV {0.0f};
     char padding[8];
 };
 
 struct GrassUniforms {
-    glm::vec2 quadSize { 0.0f };
+    glm::vec2 quadSize {0.0f};
     char padding[8];
     ShaderGrassCluster clusters[kMaxGrassClusters];
 };
 
 struct ShaderCharacter {
-    glm::vec4 posScale { 0.0f };
-    glm::vec4 uv { 0.0f };
+    glm::vec4 posScale {0.0f};
+    glm::vec4 uv {0.0f};
 };
 
 struct TextUniforms {
@@ -179,8 +179,8 @@ struct TextUniforms {
 };
 
 struct DanglymeshUniforms {
-    glm::vec4 stride { 0.0f };
-    float displacement { 0.0f };
+    glm::vec4 stride {0.0f};
+    float displacement {0.0f};
     char padding[12];
     glm::vec4 constraints[kMaxDanglymeshConstraints];
 };
@@ -239,22 +239,22 @@ private:
         FragmentPBR
     };
 
-    bool _inited { false };
+    bool _inited {false};
     std::unordered_map<ShaderName, uint32_t> _shaders;
     std::unordered_map<ShaderProgram, uint32_t> _programs;
-    ShaderProgram _activeProgram { ShaderProgram::None };
-    uint32_t _activeOrdinal { 0 };
+    ShaderProgram _activeProgram {ShaderProgram::None};
+    uint32_t _activeOrdinal {0};
     ShaderUniforms _defaultUniforms;
 
     // UBO
 
-    uint32_t _uboCombined { 0 };
-    uint32_t _uboText { 0 };
-    uint32_t _uboLighting { 0 };
-    uint32_t _uboSkeletal { 0 };
-    uint32_t _uboParticles { 0 };
-    uint32_t _uboGrass { 0 };
-    uint32_t _uboDanglymesh { 0 };
+    uint32_t _uboCombined {0};
+    uint32_t _uboText {0};
+    uint32_t _uboLighting {0};
+    uint32_t _uboSkeletal {0};
+    uint32_t _uboParticles {0};
+    uint32_t _uboGrass {0};
+    uint32_t _uboDanglymesh {0};
 
     // END UBO
 

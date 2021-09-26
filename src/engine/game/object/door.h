@@ -58,19 +58,19 @@ public:
     void setLocked(bool locked);
 
 private:
-    bool _locked { false };
-    int _genericType { 0 };
-    bool _static { false };
-    bool _keyRequired { false };
+    bool _locked {false};
+    int _genericType {0};
+    bool _static {false};
+    bool _keyRequired {false};
     std::string _linkedToModule;
     std::string _linkedTo;
-    int _linkedToFlags { 0 };
+    int _linkedToFlags {0};
     std::string _transitionDestin;
-    Faction _faction { Faction::Invalid };
-    int _openLockDC { 0 };
-    int _hardness { 0 };
-    int _fortitude { 0 };
-    bool _lockable { false };
+    Faction _faction {Faction::Invalid};
+    int _openLockDC {0};
+    int _hardness {0};
+    int _fortitude {0};
+    bool _lockable {false};
     std::string _keyName;
 
     // Scripts

@@ -38,7 +38,7 @@ class Materials;
 class PBRIBL;
 class Textures;
 
-}
+} // namespace graphics
 
 namespace scene {
 
@@ -109,21 +109,21 @@ private:
     };
 
     struct AnimationState {
-        int flags { 0 };
-        glm::mat4 transform { 1.0f };
-        float alpha { 0.0f };
-        glm::vec3 selfIllumColor { 0.0f };
+        int flags {0};
+        glm::mat4 transform {1.0f};
+        float alpha {0.0f};
+        glm::vec3 selfIllumColor {0.0f};
     };
 
     struct AnimationChannel {
         std::shared_ptr<graphics::Animation> anim;
         std::shared_ptr<graphics::LipAnimation> lipAnim;
         AnimationProperties properties;
-        float time { 0.0f };
+        float time {0.0f};
         std::unordered_map<std::string, AnimationState> stateByName;
-        bool freeze { false }; /**< channel time is not to be updated */
-        bool transition { false }; /**< when computing states, use animation transition time as channel time */
-        bool finished { false }; /**< finished channels will be erased from the queue */
+        bool freeze {false};     /**< channel time is not to be updated */
+        bool transition {false}; /**< when computing states, use animation transition time as channel time */
+        bool finished {false};   /**< finished channels will be erased from the queue */
 
         AnimationChannel(std::shared_ptr<graphics::Animation> anim, std::shared_ptr<graphics::LipAnimation> lipAnim, AnimationProperties properties) :
             anim(std::move(anim)),
@@ -136,7 +136,7 @@ private:
     ModelUsage _usage;
     IAnimationEventListener *_animEventListener;
 
-    float _drawDistance { kDefaultDrawDistance };
+    float _drawDistance {kDefaultDrawDistance};
 
     // Services
 
@@ -157,7 +157,7 @@ private:
     // Animation
 
     std::deque<AnimationChannel> _animChannels;
-    AnimationBlendMode _animBlendMode { AnimationBlendMode::Single };
+    AnimationBlendMode _animBlendMode {AnimationBlendMode::Single};
     std::set<std::string> _inanimateNodes; /**< names of nodes that are not to be animated */
 
     // END Animation

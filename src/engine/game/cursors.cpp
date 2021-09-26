@@ -32,14 +32,13 @@ namespace reone {
 namespace game {
 
 static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_groupNamesByType {
-    { CursorType::Default, { 1, 2 } },
-    { CursorType::Talk, { 11, 12 } },
-    { CursorType::Door, { 23, 24 } },
-    { CursorType::Pickup, { 25, 26 } },
-    { CursorType::DisableMine, { 33, 34 } },
-    { CursorType::RecoverMine, { 37, 38 } },
-    { CursorType::Attack, { 51, 52 } }
-};
+    {CursorType::Default, {1, 2}},
+    {CursorType::Talk, {11, 12}},
+    {CursorType::Door, {23, 24}},
+    {CursorType::Pickup, {25, 26}},
+    {CursorType::DisableMine, {33, 34}},
+    {CursorType::RecoverMine, {37, 38}},
+    {CursorType::Attack, {51, 52}}};
 
 Cursors::~Cursors() {
     deinit();
@@ -51,7 +50,8 @@ void Cursors::deinit() {
 
 shared_ptr<Cursor> Cursors::get(CursorType type) {
     auto maybeCursor = _cache.find(type);
-    if (maybeCursor != _cache.end()) return maybeCursor->second;
+    if (maybeCursor != _cache.end())
+        return maybeCursor->second;
 
     const pair<uint32_t, uint32_t> &groupNames = getCursorGroupNames(type);
     vector<uint32_t> cursorNamesUp(getCursorNamesFromCursorGroup(groupNames.first));

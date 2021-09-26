@@ -25,7 +25,8 @@ namespace game {
 
 class HealForcePointsEffect : public Effect {
 public:
-    HealForcePointsEffect() : Effect(EffectType::HealForcePoints) {
+    HealForcePointsEffect() :
+        Effect(EffectType::HealForcePoints) {
     }
 
     void applyTo(SpatialObject &object) override;

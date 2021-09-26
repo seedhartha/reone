@@ -25,7 +25,8 @@ namespace game {
 
 class BarkStringAction : public Action {
 public:
-    BarkStringAction(Game &game) : Action(game, ActionType::BarkString) {
+    BarkStringAction(Game &game) :
+        Action(game, ActionType::BarkString) {
     }
 
     void execute(Object &actor, float dt) override;

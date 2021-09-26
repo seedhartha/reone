@@ -269,7 +269,7 @@ public:
     void setGame(Game &game) { _game = &game; }
 
 private:
-    Game *_game { nullptr };
+    Game *_game {nullptr};
 };
 
 } // namespace game

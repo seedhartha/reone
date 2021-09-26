@@ -35,13 +35,13 @@ public:
     void setFacing(float facing);
 
 private:
-    glm::vec3 _position { 0.0f };
-    float _pitch { 0.0f };
-    float _multiplier { 1.0f };
-    bool _moveForward { false };
-    bool _moveLeft { false };
-    bool _moveBackward { false };
-    bool _moveRight { false };
+    glm::vec3 _position {0.0f};
+    float _pitch {0.0f};
+    float _multiplier {1.0f};
+    bool _moveForward {false};
+    bool _moveLeft {false};
+    bool _moveBackward {false};
+    bool _moveRight {false};
 
     bool handleMouseMotion(const SDL_MouseMotionEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);

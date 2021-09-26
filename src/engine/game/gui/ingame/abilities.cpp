@@ -17,8 +17,8 @@
 
 #include "abilities.h"
 
-#include "../../../gui/control/listbox.h"
 #include "../../../graphics/texture/textures.h"
+#include "../../../gui/control/listbox.h"
 #include "../../../resource/2da.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
@@ -40,7 +40,8 @@ static constexpr int kStrRefSkillRank = 1579;
 static constexpr int kStrRefBonus = 32129;
 static constexpr int kStrRefTotalRank = 41904;
 
-AbilitiesMenu::AbilitiesMenu(Game *game) : GameGUI(game) {
+AbilitiesMenu::AbilitiesMenu(Game *game) :
+    GameGUI(game) {
     _resRef = getResRef("abilities");
 
     initForGame();
@@ -67,7 +68,8 @@ void AbilitiesMenu::load() {
     _binding.lbAbility->setOnItemClick([this](const string &item) {
         auto skill = static_cast<SkillType>(stoi(item));
         auto maybeSkillInfo = _skills.find(skill);
-        if (maybeSkillInfo == _skills.end()) return;
+        if (maybeSkillInfo == _skills.end())
+            return;
 
         shared_ptr<Creature> partyLeader(_game->party().getLeader());
 
@@ -159,7 +161,8 @@ void AbilitiesMenu::refreshControls() {
 }
 
 void AbilitiesMenu::refreshPortraits() {
-    if (_game->id() != GameID::KotOR) return;
+    if (_game->id() != GameID::KotOR)
+        return;
 
     Party &party = _game->party();
     shared_ptr<Creature> partyLeader(party.getLeader());

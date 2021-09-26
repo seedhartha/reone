@@ -33,8 +33,8 @@ class PartySelection : public GameGUI {
 public:
     struct Context {
         std::string exitScript;
-        int forceNpc1 { -1 };
-        int forceNpc2 { -2 };
+        int forceNpc1 {-1};
+        int forceNpc2 {-2};
     };
 
     PartySelection(Game *game);
@@ -103,9 +103,9 @@ private:
     } _binding;
 
     Context _context;
-    int _selectedNpc { -1 };
-    bool _added[kNpcCount] { false };
-    int _availableCount { 0 };
+    int _selectedNpc {-1};
+    bool _added[kNpcCount] {false};
+    int _availableCount {0};
 
     void bindControls();
     void addNpc(int npc);

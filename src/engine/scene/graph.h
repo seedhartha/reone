@@ -38,7 +38,7 @@ class PBRIBL;
 class Shaders;
 class Textures;
 
-}
+} // namespace graphics
 
 namespace scene {
 
@@ -60,8 +60,7 @@ public:
         graphics::Meshes &meshes,
         graphics::PBRIBL &pbrIbl,
         graphics::Shaders &shaders,
-        graphics::Textures &textures
-    ) :
+        graphics::Textures &textures) :
         _options(std::move(options)),
         _context(context),
         _features(features),
@@ -154,8 +153,8 @@ private:
     std::vector<GrassSceneNode *> _grass;
     std::vector<std::pair<SceneNode *, std::vector<std::shared_ptr<SceneNodeElement>>>> _elements;
 
-    uint32_t _textureId { 0 };
-    bool _updateRoots { true };
+    uint32_t _textureId {0};
+    bool _updateRoots {true};
     graphics::ShaderUniforms _uniformsPrototype;
 
     // Services
@@ -172,19 +171,19 @@ private:
 
     // Lighting and shadows
 
-    glm::vec3 _ambientLightColor { 0.5f };
+    glm::vec3 _ambientLightColor {0.5f};
     std::shared_ptr<SceneNode> _lightingRefNode; /**< reference node to use when selecting closest light sources */
     std::vector<LightSceneNode *> _closestLights;
-    const LightSceneNode *_shadowLight { nullptr };
+    const LightSceneNode *_shadowLight {nullptr};
 
     // END Lighting and shadows
 
     // Fog
 
-    bool _fogEnabled { false };
-    float _fogNear { 0.0f };
-    float _fogFar { 0.0f };
-    glm::vec3 _fogColor { 0.0f };
+    bool _fogEnabled {false};
+    float _fogNear {0.0f};
+    float _fogFar {0.0f};
+    glm::vec3 _fogColor {0.0f};
 
     // END Fog
 

@@ -46,12 +46,12 @@ public:
     void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
 
 private:
-    glm::ivec4 _viewport { 0 };
-    bool _depthTest { false };
-    bool _backFaceCulling { false };
-    int _textureUnit { 0 };
-    PolygonMode _polygonMode { PolygonMode::Fill };
-    BlendMode _blendMode { BlendMode::None };
+    glm::ivec4 _viewport {0};
+    bool _depthTest {false};
+    bool _backFaceCulling {false};
+    int _textureUnit {0};
+    PolygonMode _polygonMode {PolygonMode::Fill};
+    BlendMode _blendMode {BlendMode::None};
 };
 
 } // namespace graphics

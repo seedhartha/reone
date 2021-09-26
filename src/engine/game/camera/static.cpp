@@ -28,7 +28,8 @@ namespace reone {
 
 namespace game {
 
-StaticCamera::StaticCamera(float aspect, SceneGraph *sceneGraph) : _aspect(aspect) {
+StaticCamera::StaticCamera(float aspect, SceneGraph *sceneGraph) :
+    _aspect(aspect) {
     _sceneNode = sceneGraph->newCamera("", glm::mat4(1.0f));
 }
 

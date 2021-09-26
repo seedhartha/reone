@@ -46,11 +46,11 @@ public:
 private:
     Game *_game;
 
-    int _northAxis { 0 };
-    glm::vec2 _worldPoint1 { 0.0f };
-    glm::vec2 _worldPoint2 { 0.0f };
-    glm::vec2 _mapPoint1 { 0.0f };
-    glm::vec2 _mapPoint2 { 0.0f };
+    int _northAxis {0};
+    glm::vec2 _worldPoint1 {0.0f};
+    glm::vec2 _worldPoint2 {0.0f};
+    glm::vec2 _mapPoint1 {0.0f};
+    glm::vec2 _mapPoint2 {0.0f};
 
     std::shared_ptr<graphics::Texture> _areaTexture;
     std::shared_ptr<graphics::Texture> _arrowTexture;

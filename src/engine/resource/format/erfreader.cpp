@@ -29,7 +29,8 @@ static constexpr int kSignatureSize = 8;
 static const char kSignatureErf[] = "ERF V1.0";
 static const char kSignatureMod[] = "MOD V1.0";
 
-ErfReader::ErfReader() : BinaryReader(0, nullptr) {
+ErfReader::ErfReader() :
+    BinaryReader(0, nullptr) {
 }
 
 void ErfReader::doLoad() {
@@ -119,7 +120,8 @@ shared_ptr<ByteArray> ErfReader::find(const string &resRef, ResourceType type) {
             break;
         }
     }
-    if (idx == -1) return nullptr;
+    if (idx == -1)
+        return nullptr;
     const Resource &res = _resources[idx];
 
     return make_shared<ByteArray>(getResourceData(res));

@@ -71,9 +71,9 @@ protected:
     std::shared_ptr<SpatialObject> _owner;
     std::shared_ptr<graphics::Model> _cameraModel;
     std::shared_ptr<graphics::LipAnimation> _lipAnimation;
-    const Dialog::EntryReply *_currentEntry { nullptr };
-    bool _entryEnded { false };
-    bool _paused { false };
+    const Dialog::EntryReply *_currentEntry {nullptr};
+    bool _entryEnded {false};
+    bool _paused {false};
 
     /**
      * @param index index of the entry in the DLG file
@@ -93,9 +93,9 @@ protected:
 private:
     std::shared_ptr<audio::SoundHandle> _currentVoice;
     Timer _endEntryTimer;
-    float _entryDuration { 0.0f };
+    float _entryDuration {0.0f};
     std::vector<const Dialog::EntryReply *> _replies;
-    bool _autoPickFirstReply { false };
+    bool _autoPickFirstReply {false};
 
     void loadConversationBackground();
     void loadCameraModel();

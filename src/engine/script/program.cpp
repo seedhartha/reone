@@ -23,7 +23,8 @@ namespace reone {
 
 namespace script {
 
-ScriptProgram::ScriptProgram(const string &name) : _name(name) {
+ScriptProgram::ScriptProgram(const string &name) :
+    _name(name) {
 }
 
 void ScriptProgram::add(Instruction instr) {

@@ -191,10 +191,10 @@ public:
 private:
     struct Grass {
         std::shared_ptr<graphics::Texture> texture;
-        float density { 0.0f };
-        float quadSize { 0.0f };
-        int ambient { 0 };
-        int diffuse { 0 };
+        float density {0.0f};
+        float quadSize {0.0f};
+        int ambient {0};
+        int diffuse {0};
         float probabilities[4];
     };
 
@@ -207,9 +207,9 @@ private:
     std::string _music;
     Timer _heartbeatTimer;
     Map _map;
-    bool _unescapable { false };
+    bool _unescapable {false};
     Grass _grass;
-    glm::vec3 _ambientColor { 0.0f };
+    glm::vec3 _ambientColor {0.0f};
     Timer _perceptionTimer;
     std::shared_ptr<SpatialObject> _hilightedObject;
     std::shared_ptr<SpatialObject> _selectedObject;
@@ -224,7 +224,7 @@ private:
 
     // Cameras
 
-    float _cameraAspect { 0.0f };
+    float _cameraAspect {0.0f};
     std::unique_ptr<FirstPersonCamera> _firstPersonCamera;
     std::unique_ptr<ThirdPersonCamera> _thirdPersonCamera;
     std::unique_ptr<DialogCamera> _dialogCamera;
@@ -244,19 +244,19 @@ private:
 
     // Stealth
 
-    bool _stealthXPEnabled { false };
-    int _maxStealthXP { 0 };
-    int _currentStealthXP { 0 };
-    int _stealthXPDecrement { 0 };
+    bool _stealthXPEnabled {false};
+    int _maxStealthXP {0};
+    int _currentStealthXP {0};
+    int _stealthXPDecrement {0};
 
     // END Stealth
 
     // Fog
 
-    bool _fogEnabled { false };
-    float _fogNear { 0.0f };
-    float _fogFar { 0.0f };
-    glm::vec3 _fogColor { 0.0f };
+    bool _fogEnabled {false};
+    float _fogNear {0.0f};
+    float _fogFar {0.0f};
+    glm::vec3 _fogColor {0.0f};
 
     // END Fog
 

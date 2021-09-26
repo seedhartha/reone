@@ -173,24 +173,25 @@ Variable Variable::ofAction(shared_ptr<ExecutionContext> context) {
 }
 
 bool Variable::operator==(const Variable &other) const {
-    if (type != other.type) return false;
+    if (type != other.type)
+        return false;
 
     switch (type) {
-        case VariableType::Int:
-            return intValue == other.intValue;
-        case VariableType::Float:
-            return floatValue == other.floatValue;
-        case VariableType::String:
-            return strValue == other.strValue;
-        case VariableType::Object:
-            return objectId == other.objectId;
-        case VariableType::Effect:
-        case VariableType::Event:
-        case VariableType::Location:
-        case VariableType::Talent:
-            return engineType == other.engineType;
-        default:
-            throw logic_error("Unsupported variable type: " + to_string(static_cast<int>(type)));
+    case VariableType::Int:
+        return intValue == other.intValue;
+    case VariableType::Float:
+        return floatValue == other.floatValue;
+    case VariableType::String:
+        return strValue == other.strValue;
+    case VariableType::Object:
+        return objectId == other.objectId;
+    case VariableType::Effect:
+    case VariableType::Event:
+    case VariableType::Location:
+    case VariableType::Talent:
+        return engineType == other.engineType;
+    default:
+        throw logic_error("Unsupported variable type: " + to_string(static_cast<int>(type)));
     }
 
     return true;
@@ -202,74 +203,74 @@ bool Variable::operator!=(const Variable &other) const {
 
 bool Variable::operator<(const Variable &other) const {
     switch (type) {
-        case VariableType::Int:
-            return intValue < other.intValue;
-        case VariableType::Float:
-            return floatValue < other.floatValue;
-        default:
-            throw logic_error(str(boost::format("Unsupported variable type: %02x") % static_cast<int>(type)));
+    case VariableType::Int:
+        return intValue < other.intValue;
+    case VariableType::Float:
+        return floatValue < other.floatValue;
+    default:
+        throw logic_error(str(boost::format("Unsupported variable type: %02x") % static_cast<int>(type)));
     }
 }
 
 bool Variable::operator<=(const Variable &other) const {
     switch (type) {
-        case VariableType::Int:
-            return intValue <= other.intValue;
-        case VariableType::Float:
-            return floatValue <= other.floatValue;
-        default:
-            throw logic_error(str(boost::format("Unsupported variable type: %02x") % static_cast<int>(type)));
+    case VariableType::Int:
+        return intValue <= other.intValue;
+    case VariableType::Float:
+        return floatValue <= other.floatValue;
+    default:
+        throw logic_error(str(boost::format("Unsupported variable type: %02x") % static_cast<int>(type)));
     }
 }
 
 bool Variable::operator>(const Variable &other) const {
     switch (type) {
-        case VariableType::Int:
-            return intValue > other.intValue;
-        case VariableType::Float:
-            return floatValue > other.floatValue;
-        default:
-            throw logic_error(str(boost::format("Unsupported variable type: %02x") % static_cast<int>(type)));
+    case VariableType::Int:
+        return intValue > other.intValue;
+    case VariableType::Float:
+        return floatValue > other.floatValue;
+    default:
+        throw logic_error(str(boost::format("Unsupported variable type: %02x") % static_cast<int>(type)));
     }
 }
 
 bool Variable::operator>=(const Variable &other) const {
     switch (type) {
-        case VariableType::Int:
-            return intValue >= other.intValue;
-        case VariableType::Float:
-            return floatValue >= other.floatValue;
-        default:
-            throw logic_error(str(boost::format("Unsupported variable type: %02x") % static_cast<int>(type)));
+    case VariableType::Int:
+        return intValue >= other.intValue;
+    case VariableType::Float:
+        return floatValue >= other.floatValue;
+    default:
+        throw logic_error(str(boost::format("Unsupported variable type: %02x") % static_cast<int>(type)));
     }
 }
 
 const string Variable::toString() const {
     switch (type) {
-        case VariableType::Void:
-            return "void";
-        case VariableType::Int:
-            return to_string(intValue);
-        case VariableType::Float:
-            return to_string(floatValue);
-        case VariableType::String:
-            return str(boost::format("\"%s\"") % strValue);
-        case VariableType::Object:
-            return to_string(objectId);
-        case VariableType::Vector:
-            return str(boost::format("[%f,%f,%f]") % vecValue.x % vecValue.y % vecValue.z);
-        case VariableType::Effect:
-            return "effect";
-        case VariableType::Event:
-            return "event";
-        case VariableType::Location:
-            return "location";
-        case VariableType::Talent:
-            return "talent";
-        case VariableType::Action:
-            return "action";
-        default:
-            throw logic_error("Unsupported variable type: " + to_string(static_cast<int>(type)));
+    case VariableType::Void:
+        return "void";
+    case VariableType::Int:
+        return to_string(intValue);
+    case VariableType::Float:
+        return to_string(floatValue);
+    case VariableType::String:
+        return str(boost::format("\"%s\"") % strValue);
+    case VariableType::Object:
+        return to_string(objectId);
+    case VariableType::Vector:
+        return str(boost::format("[%f,%f,%f]") % vecValue.x % vecValue.y % vecValue.z);
+    case VariableType::Effect:
+        return "effect";
+    case VariableType::Event:
+        return "event";
+    case VariableType::Location:
+        return "location";
+    case VariableType::Talent:
+        return "talent";
+    case VariableType::Action:
+        return "action";
+    default:
+        throw logic_error("Unsupported variable type: " + to_string(static_cast<int>(type)));
     }
 }
 

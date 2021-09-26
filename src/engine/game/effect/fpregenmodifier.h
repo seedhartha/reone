@@ -25,7 +25,8 @@ namespace game {
 
 class FPRegenModifierEffect : public Effect {
 public:
-    FPRegenModifierEffect() : Effect(EffectType::FPRegenModifier) {
+    FPRegenModifierEffect() :
+        Effect(EffectType::FPRegenModifier) {
     }
 
     void applyTo(SpatialObject &object) override;

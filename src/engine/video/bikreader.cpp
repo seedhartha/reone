@@ -18,8 +18,8 @@
 #include "bikreader.h"
 
 #include "../audio/stream.h"
-#include "../common/logutil.h"
 #include "../common/guardutil.h"
+#include "../common/logutil.h"
 #include "../common/streamreader.h"
 
 #include "video.h"
@@ -30,7 +30,6 @@ extern "C" {
 #include "libavutil/imgutils.h"
 #include "libswresample/swresample.h"
 #include "libswscale/swscale.h"
-
 }
 
 namespace fs = boost::filesystem;
@@ -51,8 +50,7 @@ public:
         fs::path path,
         graphics::Context &context,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders
-    ) :
+        graphics::Shaders &shaders) :
         _path(move(path)),
         _context(context),
         _meshes(meshes),
@@ -129,16 +127,16 @@ private:
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
 
-    AVFormatContext *_formatCtx { nullptr };
-    int _videoStreamIdx { -1 };
-    int _audioStreamIdx { -1 };
-    AVCodecContext *_videoCodecCtx { nullptr };
-    AVCodecContext *_audioCodecCtx { nullptr };
-    SwsContext *_swsContext { nullptr };
-    SwrContext *_swrContext { nullptr };
-    AVFrame *_frame { nullptr };
-    AVFrame *_frameRgb { nullptr };
-    uint8_t *_videoBuffer { nullptr };
+    AVFormatContext *_formatCtx {nullptr};
+    int _videoStreamIdx {-1};
+    int _audioStreamIdx {-1};
+    AVCodecContext *_videoCodecCtx {nullptr};
+    AVCodecContext *_audioCodecCtx {nullptr};
+    SwsContext *_swsContext {nullptr};
+    SwrContext *_swrContext {nullptr};
+    AVFrame *_frame {nullptr};
+    AVFrame *_frameRgb {nullptr};
+    uint8_t *_videoBuffer {nullptr};
     shared_ptr<Video> _video;
 
     void openInput(const fs::path &path) {
@@ -154,14 +152,14 @@ private:
         for (uint32_t i = 0; i < _formatCtx->nb_streams; ++i) {
             AVCodecParameters *codecParams = _formatCtx->streams[i]->codecpar;
             switch (codecParams->codec_type) {
-                case AVMEDIA_TYPE_VIDEO:
-                    _videoStreamIdx = i;
-                    break;
-                case AVMEDIA_TYPE_AUDIO:
-                    _audioStreamIdx = i;
-                    break;
-                default:
-                    break;
+            case AVMEDIA_TYPE_VIDEO:
+                _videoStreamIdx = i;
+                break;
+            case AVMEDIA_TYPE_AUDIO:
+                _audioStreamIdx = i;
+                break;
+            default:
+                break;
             }
         }
         if (_videoStreamIdx == -1) {
@@ -246,7 +244,8 @@ private:
     }
 
     void readVideoFrames(int count, bool ignore = false) {
-        if (count == 0 || _ended) return;
+        if (count == 0 || _ended)
+            return;
 
         AVPacket packet;
 
@@ -255,17 +254,20 @@ private:
                 _ended = true;
                 break;
             }
-            if (packet.stream_index != _videoStreamIdx) continue;
+            if (packet.stream_index != _videoStreamIdx)
+                continue;
 
             int retVal = avcodec_receive_frame(_videoCodecCtx, _frame);
             if (retVal == 0 || retVal == AVERROR(EAGAIN)) {
                 avcodec_send_packet(_videoCodecCtx, &packet);
-                if (retVal == AVERROR(EAGAIN)) continue;
+                if (retVal == AVERROR(EAGAIN))
+                    continue;
             }
 
             --count;
 
-            if (ignore) continue;
+            if (ignore)
+                continue;
 
             sws_scale(
                 _swsContext,
@@ -288,12 +290,14 @@ private:
     }
 
     void readAudioFrames() {
-        if (!hasAudio()) return;
+        if (!hasAudio())
+            return;
 
         AVPacket packet;
 
         while (av_read_frame(_formatCtx, &packet) >= 0) {
-            if (packet.stream_index != _audioStreamIdx) continue;
+            if (packet.stream_index != _audioStreamIdx)
+                continue;
 
             avcodec_send_packet(_audioCodecCtx, &packet);
             avcodec_receive_frame(_audioCodecCtx, _frame);
@@ -321,7 +325,7 @@ private:
     }
 
     void seekBeginning() {
-        int64_t pos = av_rescale_q(0ll, { 1, AV_TIME_BASE }, _formatCtx->streams[_audioStreamIdx]->time_base);
+        int64_t pos = av_rescale_q(0ll, {1, AV_TIME_BASE}, _formatCtx->streams[_audioStreamIdx]->time_base);
         av_seek_frame(_formatCtx, _audioStreamIdx, pos, AVSEEK_FLAG_ANY);
     }
 };

@@ -33,8 +33,7 @@ public:
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,
-        resource::Strings &strings
-    ) :
+        resource::Strings &strings) :
         Control(
             gui,
             ControlType::ProgressBar,
@@ -58,7 +57,7 @@ private:
     };
 
     Progress _progress;
-    int _value { 0 };
+    int _value {0};
 };
 
 } // namespace gui

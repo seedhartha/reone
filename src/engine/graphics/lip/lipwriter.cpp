@@ -27,7 +27,8 @@ namespace reone {
 
 namespace graphics {
 
-LipWriter::LipWriter(LipAnimation &&animation) : _animation(animation) {
+LipWriter::LipWriter(LipAnimation &&animation) :
+    _animation(animation) {
 }
 
 void LipWriter::save(const fs::path &path) {

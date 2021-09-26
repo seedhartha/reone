@@ -34,7 +34,8 @@ void VisReader::load(const shared_ptr<istream> &in) {
         string line(buf);
         boost::trim(line);
 
-        if (line.empty()) continue;
+        if (line.empty())
+            continue;
 
         processLine(line);
     } while (!in->eof());

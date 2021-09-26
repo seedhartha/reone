@@ -65,7 +65,8 @@ void Font::load(shared_ptr<Texture> texture) {
 }
 
 void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &color, TextGravity gravity) {
-    if (text.empty()) return;
+    if (text.empty())
+        return;
 
     _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
@@ -106,21 +107,21 @@ glm::vec2 Font::getTextOffset(const string &text, TextGravity gravity) const {
     float w = measure(text);
 
     switch (gravity) {
-        case TextGravity::LeftCenter:
-            return glm::vec2(-w, -0.5f * _height);
-        case TextGravity::CenterBottom:
-            return glm::vec2(-0.5f * w, 0.0f);
-        case TextGravity::CenterTop:
-            return glm::vec2(-0.5f * w, -_height);
-        case TextGravity::RightBottom:
-            return glm::vec2(0.0f, 0.0f);
-        case TextGravity::RightCenter:
-            return glm::vec2(0.0f, -0.5f * _height);
-        case TextGravity::RightTop:
-            return glm::vec2(0.0f, -_height);
-        case TextGravity::CenterCenter:
-        default:
-            return glm::vec2(-0.5f * w, -0.5f * _height);
+    case TextGravity::LeftCenter:
+        return glm::vec2(-w, -0.5f * _height);
+    case TextGravity::CenterBottom:
+        return glm::vec2(-0.5f * w, 0.0f);
+    case TextGravity::CenterTop:
+        return glm::vec2(-0.5f * w, -_height);
+    case TextGravity::RightBottom:
+        return glm::vec2(0.0f, 0.0f);
+    case TextGravity::RightCenter:
+        return glm::vec2(0.0f, -0.5f * _height);
+    case TextGravity::RightTop:
+        return glm::vec2(0.0f, -_height);
+    case TextGravity::CenterCenter:
+    default:
+        return glm::vec2(-0.5f * w, -0.5f * _height);
     }
 };
 

@@ -26,7 +26,7 @@ namespace gui {
 class Button;
 class Label;
 
-}
+} // namespace gui
 
 namespace game {
 
@@ -69,8 +69,8 @@ private:
         std::shared_ptr<gui::Label> lblNum6;
     } _binding;
 
-    CharacterGeneration *_charGen { nullptr };
-    int _step { 0 };
+    CharacterGeneration *_charGen {nullptr};
+    int _step {0};
 
     void bindControls();
     void doSetStep(int step);

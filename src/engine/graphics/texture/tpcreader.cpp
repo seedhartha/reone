@@ -46,7 +46,8 @@ void TpcReader::doLoad() {
     _mipMapCount = readByte();
 
     _cubeMap = _height / _width == 6;
-    if (_cubeMap) _height = _width;
+    if (_cubeMap)
+        _height = _width;
 
     if (_compressed) {
         _dataSize = dataSize;
@@ -70,21 +71,21 @@ void TpcReader::getMipMapSize(int index, int &width, int &height) const {
 int TpcReader::getMipMapDataSize(int width, int height) const {
     if (_compressed) {
         switch (_encoding) {
-            case EncodingType::RGB:
-                return glm::max(8, ((width + 3) / 4) * ((height + 3) / 4) *  8);
-            case EncodingType::RGBA:
-                return glm::max(16, ((width + 3) / 4) * ((height + 3) / 4) * 16);
-            default:
-                break;
+        case EncodingType::RGB:
+            return glm::max(8, ((width + 3) / 4) * ((height + 3) / 4) * 8);
+        case EncodingType::RGBA:
+            return glm::max(16, ((width + 3) / 4) * ((height + 3) / 4) * 16);
+        default:
+            break;
         }
     } else {
         switch (_encoding) {
-            case EncodingType::Grayscale:
-                return width * height;
-            case EncodingType::RGB:
-                return 3 * width * height;
-            case EncodingType::RGBA:
-                return 4 * width * height;
+        case EncodingType::Grayscale:
+            return width * height;
+        case EncodingType::RGB:
+            return 3 * width * height;
+        case EncodingType::RGBA:
+            return 4 * width * height;
         }
     }
 
@@ -154,23 +155,24 @@ void TpcReader::makeTexture() {
 PixelFormat TpcReader::getPixelFormat() const {
     if (!_compressed) {
         switch (_encoding) {
-            case EncodingType::Grayscale:
-                return PixelFormat::Grayscale;
-            case EncodingType::RGB:
-                return PixelFormat::RGB;
-            case EncodingType::RGBA:
-                return PixelFormat::RGBA;
-            default:
-                throw logic_error("TCP: unsupported texture encoding: " + to_string(static_cast<int>(_encoding)));
+        case EncodingType::Grayscale:
+            return PixelFormat::Grayscale;
+        case EncodingType::RGB:
+            return PixelFormat::RGB;
+        case EncodingType::RGBA:
+            return PixelFormat::RGBA;
+        default:
+            throw logic_error("TCP: unsupported texture encoding: " + to_string(static_cast<int>(_encoding)));
         }
-    } else switch (_encoding) {
+    } else
+        switch (_encoding) {
         case EncodingType::RGB:
             return PixelFormat::DXT1;
         case EncodingType::RGBA:
             return PixelFormat::DXT5;
         default:
             throw logic_error("TCP: unsupported compressed texture encoding: " + to_string(static_cast<int>(_encoding)));
-    }
+        }
 }
 
 } // namespace graphics

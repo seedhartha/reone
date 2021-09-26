@@ -32,44 +32,44 @@ vector<string> breakText(const string &text, Font &font, int maxWidth) {
 
     for (char ch : text) {
         switch (ch) {
-            case '\n': {
-                string token(tokenBuffer.str());
-                if (!token.empty()) {
-                    tokenBuffer.str("");
-                    if (!line.empty()) {
-                        line += " ";
-                    }
-                    line += token;
-                }
+        case '\n': {
+            string token(tokenBuffer.str());
+            if (!token.empty()) {
+                tokenBuffer.str("");
                 if (!line.empty()) {
+                    line += " ";
+                }
+                line += token;
+            }
+            if (!line.empty()) {
+                result.push_back(line);
+                line = "";
+            }
+            break;
+        }
+        case ' ': {
+            string token(tokenBuffer.str());
+            if (!token.empty()) {
+                tokenBuffer.str("");
+
+                string test(line);
+                if (!test.empty()) {
+                    test += " ";
+                }
+                test += token;
+
+                if (font.measure(test) <= maxWidth) {
+                    line = move(test);
+                } else {
                     result.push_back(line);
-                    line = "";
+                    line = move(token);
                 }
-                break;
             }
-            case ' ': {
-                string token(tokenBuffer.str());
-                if (!token.empty()) {
-                    tokenBuffer.str("");
-
-                    string test(line);
-                    if (!test.empty()) {
-                        test += " ";
-                    }
-                    test += token;
-
-                    if (font.measure(test) <= maxWidth) {
-                        line = move(test);
-                    } else {
-                        result.push_back(line);
-                        line = move(token);
-                    }
-                }
-                break;
-            }
-            default:
-                tokenBuffer.put(ch);
-                break;
+            break;
+        }
+        default:
+            tokenBuffer.put(ch);
+            break;
         }
     }
 

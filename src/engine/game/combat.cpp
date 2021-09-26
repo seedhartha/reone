@@ -58,7 +58,8 @@ void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> 
 
     // If attacker has already started a combat round, do nothing
     maybeRound = _roundByAttacker.find(attacker->id());
-    if (maybeRound != _roundByAttacker.end()) return;
+    if (maybeRound != _roundByAttacker.end())
+        return;
 
     // If there is an incomplete combat round where attacker and target roles are reversed, append to that round
     maybeRound = _roundByAttacker.find(target->id());
@@ -82,7 +83,7 @@ void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> 
 }
 
 void Combat::update(float dt) {
-    for (auto it = _roundByAttacker.begin(); it != _roundByAttacker.end(); ) {
+    for (auto it = _roundByAttacker.begin(); it != _roundByAttacker.end();) {
         Round &round = *it->second;
         updateRound(round, dt);
 
@@ -99,68 +100,68 @@ void Combat::updateRound(Round &round, float dt) {
     round.time = glm::min(round.time + dt, kRoundDuration);
 
     switch (round.state) {
-        case RoundState::Started: {
-            if (round.attack1->resultType == AttackResultType::Invalid) {
-                round.attack1->resultType = determineAttackResult(*round.attack1);
-            }
-            startAttack(*round.attack1, round.duel);
-            round.state = RoundState::FirstAttack;
-            break;
+    case RoundState::Started: {
+        if (round.attack1->resultType == AttackResultType::Invalid) {
+            round.attack1->resultType = determineAttackResult(*round.attack1);
         }
-        case RoundState::FirstAttack: {
-            if (isRoundPastFirstAttack(round.time)) {
-                resetProjectile(round);
-                applyAttackResult(*round.attack1);
+        startAttack(*round.attack1, round.duel);
+        round.state = RoundState::FirstAttack;
+        break;
+    }
+    case RoundState::FirstAttack: {
+        if (isRoundPastFirstAttack(round.time)) {
+            resetProjectile(round);
+            applyAttackResult(*round.attack1);
+
+            // Off-hand attack
+            if (round.attack1->attacker->isTwoWeaponFighting()) {
+                round.attack1->resultType = determineAttackResult(*round.attack1, true);
+                applyAttackResult(*round.attack1, true);
+            }
+            // TODO: additional attacks from Feats and Force Powers
+
+            if (round.attack2) {
+                if (round.attack2->resultType == AttackResultType::Invalid) {
+                    round.attack2->resultType = determineAttackResult(*round.attack2);
+                }
+                startAttack(*round.attack2, round.duel);
+            }
+            round.state = RoundState::SecondAttack;
+        } else if (round.time >= kProjectileDelay) {
+            if (round.projectile) {
+                updateProjectile(round, dt);
+            } else {
+                fireProjectile(round.attack1->attacker, round.attack1->target, round);
+            }
+        }
+        break;
+    }
+    case RoundState::SecondAttack: {
+        if (round.time == kRoundDuration) {
+            resetProjectile(round);
+            if (round.attack2) {
+                applyAttackResult(*round.attack2);
 
                 // Off-hand attack
-                if (round.attack1->attacker->isTwoWeaponFighting()) {
-                    round.attack1->resultType = determineAttackResult(*round.attack1, true);
-                    applyAttackResult(*round.attack1, true);
+                if (round.attack2->attacker->isTwoWeaponFighting()) {
+                    round.attack2->resultType = determineAttackResult(*round.attack2, true);
+                    applyAttackResult(*round.attack2, true);
                 }
                 // TODO: additional attacks from Feats and Force Powers
-
-                if (round.attack2) {
-                    if (round.attack2->resultType == AttackResultType::Invalid) {
-                        round.attack2->resultType = determineAttackResult(*round.attack2);
-                    }
-                    startAttack(*round.attack2, round.duel);
-                }
-                round.state = RoundState::SecondAttack;
-            } else if (round.time >= kProjectileDelay) {
-                if (round.projectile) {
-                    updateProjectile(round, dt);
-                } else {
-                    fireProjectile(round.attack1->attacker, round.attack1->target, round);
-                }
             }
-            break;
-        }
-        case RoundState::SecondAttack: {
-            if (round.time == kRoundDuration) {
-                resetProjectile(round);
-                if (round.attack2) {
-                    applyAttackResult(*round.attack2);
-
-                    // Off-hand attack
-                    if (round.attack2->attacker->isTwoWeaponFighting()) {
-                        round.attack2->resultType = determineAttackResult(*round.attack2, true);
-                        applyAttackResult(*round.attack2, true);
-                    }
-                    // TODO: additional attacks from Feats and Force Powers
-                }
-                finishRound(round);
-                round.state = RoundState::Finished;
-            } else if (round.attack2 && round.time >= 0.5f * kRoundDuration + kProjectileDelay) {
-                if (round.projectile) {
-                    updateProjectile(round, dt);
-                } else {
-                    fireProjectile(round.attack2->attacker, round.attack2->target, round);
-                }
+            finishRound(round);
+            round.state = RoundState::Finished;
+        } else if (round.attack2 && round.time >= 0.5f * kRoundDuration + kProjectileDelay) {
+            if (round.projectile) {
+                updateProjectile(round, dt);
+            } else {
+                fireProjectile(round.attack2->attacker, round.attack2->target, round);
             }
-            break;
         }
-        default:
-            break;
+        break;
+    }
+    default:
+        break;
     }
 }
 
@@ -206,12 +207,12 @@ void Combat::finishRound(Round &round) {
 
 static bool isAttackSuccessful(AttackResultType result) {
     switch (result) {
-        case AttackResultType::HitSuccessful:
-        case AttackResultType::CriticalHit:
-        case AttackResultType::AutomaticHit:
-            return true;
-        default:
-            return false;
+    case AttackResultType::HitSuccessful:
+    case AttackResultType::CriticalHit:
+    case AttackResultType::AutomaticHit:
+        return true;
+    default:
+        return false;
     }
 }
 
@@ -257,24 +258,24 @@ AttackResultType Combat::determineAttackResult(const Attack &attack, bool offHan
 
 static bool isMeleeWieldType(CreatureWieldType type) {
     switch (type) {
-        case CreatureWieldType::SingleSword:
-        case CreatureWieldType::DoubleBladedSword:
-        case CreatureWieldType::DualSwords:
-            return true;
-        default:
-            return false;
+    case CreatureWieldType::SingleSword:
+    case CreatureWieldType::DoubleBladedSword:
+    case CreatureWieldType::DualSwords:
+        return true;
+    default:
+        return false;
     }
 }
 
 static bool isRangedWieldType(CreatureWieldType type) {
     switch (type) {
-        case CreatureWieldType::BlasterPistol:
-        case CreatureWieldType::DualPistols:
-        case CreatureWieldType::BlasterRifle:
-        case CreatureWieldType::HeavyWeapon:
-            return true;
-        default:
-            return false;
+    case CreatureWieldType::BlasterPistol:
+    case CreatureWieldType::DualPistols:
+    case CreatureWieldType::BlasterRifle:
+    case CreatureWieldType::HeavyWeapon:
+        return true;
+    default:
+        return false;
     }
 }
 
@@ -290,7 +291,6 @@ Combat::AttackAnimation Combat::determineAttackAnimation(const Attack &attack, b
     if (target) {
         targetWield = target->getWieldType();
     }
-
 
     // Determine animation
 
@@ -320,7 +320,6 @@ Combat::AttackAnimation Combat::determineAttackAnimation(const Attack &attack, b
         }
     }
 
-
     return move(result);
 }
 
@@ -333,42 +332,42 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
     }
 
     switch (attack.resultType) {
-        case AttackResultType::Miss:
-        case AttackResultType::AttackResisted:
-        case AttackResultType::AttackFailed:
-        case AttackResultType::Parried:
-        case AttackResultType::Deflected:
-            debug(boost::format("Attack missed: %s -> %s") % attack.attacker->tag() % attack.target->tag(), LogChannels::combat);
-            break;
-        case AttackResultType::HitSuccessful:
-        case AttackResultType::AutomaticHit: {
-            debug(boost::format("Attack hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), LogChannels::combat);
-            if (attack.damage == -1) {
-                auto effects = getDamageEffects(attack.attacker, offHand);
-                for (auto &effect : effects) {
-                    attack.target->applyEffect(effect, DurationType::Instant);
-                }
-            } else {
-                shared_ptr<DamageEffect> effect(_game->effectFactory().newDamage(attack.damage, DamageType::Universal, attack.attacker));
-                attack.target->applyEffect(move(effect), DurationType::Instant);
+    case AttackResultType::Miss:
+    case AttackResultType::AttackResisted:
+    case AttackResultType::AttackFailed:
+    case AttackResultType::Parried:
+    case AttackResultType::Deflected:
+        debug(boost::format("Attack missed: %s -> %s") % attack.attacker->tag() % attack.target->tag(), LogChannels::combat);
+        break;
+    case AttackResultType::HitSuccessful:
+    case AttackResultType::AutomaticHit: {
+        debug(boost::format("Attack hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), LogChannels::combat);
+        if (attack.damage == -1) {
+            auto effects = getDamageEffects(attack.attacker, offHand);
+            for (auto &effect : effects) {
+                attack.target->applyEffect(effect, DurationType::Instant);
             }
-            break;
+        } else {
+            shared_ptr<DamageEffect> effect(_game->effectFactory().newDamage(attack.damage, DamageType::Universal, attack.attacker));
+            attack.target->applyEffect(move(effect), DurationType::Instant);
         }
-        case AttackResultType::CriticalHit: {
-            debug(boost::format("Attack critical hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), LogChannels::combat);
-            if (attack.damage == -1) {
-                auto effects = getDamageEffects(attack.attacker, offHand, criticalHitMultiplier);
-                for (auto &effect : effects) {
-                    attack.target->applyEffect(effect, DurationType::Instant);
-                }
-            } else {
-                shared_ptr<DamageEffect> effect(_game->effectFactory().newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, attack.attacker));
-                attack.target->applyEffect(move(effect), DurationType::Instant);
+        break;
+    }
+    case AttackResultType::CriticalHit: {
+        debug(boost::format("Attack critical hit: %s -> %s") % attack.attacker->tag() % attack.target->tag(), LogChannels::combat);
+        if (attack.damage == -1) {
+            auto effects = getDamageEffects(attack.attacker, offHand, criticalHitMultiplier);
+            for (auto &effect : effects) {
+                attack.target->applyEffect(effect, DurationType::Instant);
             }
-            break;
+        } else {
+            shared_ptr<DamageEffect> effect(_game->effectFactory().newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, attack.attacker));
+            attack.target->applyEffect(move(effect), DurationType::Instant);
         }
-        default:
-            throw logic_error("Unsupported attack result");
+        break;
+    }
+    default:
+        throw logic_error("Unsupported attack result");
     }
 }
 
@@ -386,22 +385,26 @@ vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> d
     amount = glm::max(1, amount);
     shared_ptr<DamageEffect> effect(_game->effectFactory().newDamage(multiplier * amount, type, move(damager)));
 
-    return vector<shared_ptr<DamageEffect>> { move(effect) };
+    return vector<shared_ptr<DamageEffect>> {move(effect)};
 }
 
 void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, Round &round) {
     auto attackerModel = static_pointer_cast<ModelSceneNode>(attacker->sceneNode());
     auto targetModel = static_pointer_cast<ModelSceneNode>(target->sceneNode());
-    if (!attackerModel || !targetModel) return;
+    if (!attackerModel || !targetModel)
+        return;
 
     shared_ptr<Item> weapon(attacker->getEquippedItem(InventorySlot::rightWeapon));
-    if (!weapon) return;
+    if (!weapon)
+        return;
 
     shared_ptr<Item::AmmunitionType> ammunitionType(weapon->ammunitionType());
-    if (!ammunitionType) return;
+    if (!ammunitionType)
+        return;
 
     auto weaponModel = static_pointer_cast<ModelSceneNode>(attackerModel->getAttachment("rhand"));
-    if (!weaponModel) return;
+    if (!weaponModel)
+        return;
 
     // Determine projectile position
     glm::vec3 projectilePos;

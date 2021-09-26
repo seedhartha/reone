@@ -63,10 +63,10 @@ protected:
     virtual void fetchFrames(int count) = 0;
 
     std::vector<std::shared_ptr<Frame>> _frames;
-    bool _ended { false };
+    bool _ended {false};
 
 private:
-    int _frameOffset { 0 };
+    int _frameOffset {0};
 };
 
 } // namespace reone

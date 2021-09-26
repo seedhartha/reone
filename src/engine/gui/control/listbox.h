@@ -50,8 +50,7 @@ public:
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,
-        resource::Strings &strings
-    ) :
+        resource::Strings &strings) :
         Control(
             gui,
             ControlType::ListBox,
@@ -100,16 +99,16 @@ public:
     // END Event listeners
 
 private:
-    SelectionMode _selectionMode { SelectionMode::OnHover };
-    ControlType _protoItemType { ControlType::Invalid };
+    SelectionMode _selectionMode {SelectionMode::OnHover};
+    ControlType _protoItemType {ControlType::Invalid};
     std::shared_ptr<Control> _protoItem;
     std::shared_ptr<Control> _scrollBar;
     std::vector<Item> _items;
-    int _slotCount { 0 };
-    int _itemOffset { 0 };
-    int _selectedItemIndex { -1 };
-    int _itemMargin { 0 };
-    bool _protoMatchContent { false }; /**< proto item height must match its content */
+    int _slotCount {0};
+    int _itemOffset {0};
+    int _selectedItemIndex {-1};
+    int _itemMargin {0};
+    bool _protoMatchContent {false}; /**< proto item height must match its content */
 
     // Event listeners
 

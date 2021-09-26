@@ -61,15 +61,14 @@ struct EmitterFlags {
 // Classification
 
 static unordered_map<uint8_t, Model::Classification> g_classifications {
-    { 0, Model::Classification::Other },
-    { 1, Model::Classification::Effect },
-    { 2, Model::Classification::Tile },
-    { 4, Model::Classification::Character },
-    { 8, Model::Classification::Door },
-    { 0x10, Model::Classification::Lightsaber },
-    { 0x20, Model::Classification::Placeable },
-    { 0x40, Model::Classification::Flyer }
-};
+    {0, Model::Classification::Other},
+    {1, Model::Classification::Effect},
+    {2, Model::Classification::Tile},
+    {4, Model::Classification::Character},
+    {8, Model::Classification::Door},
+    {0x10, Model::Classification::Lightsaber},
+    {0x20, Model::Classification::Placeable},
+    {0x40, Model::Classification::Flyer}};
 
 static Model::Classification getClassification(uint8_t ordinal) {
     return getFromLookupOrElse(g_classifications, ordinal, Model::Classification::Other);
@@ -285,7 +284,8 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     ignore(2); // unknown
     float totalArea = readFloat();
     ignore(4); // unknown
-    if (_tsl) ignore(8);
+    if (_tsl)
+        ignore(8);
     uint32_t offMdxData = readUint32();
     uint32_t offVertices = readUint32();
 
@@ -337,7 +337,7 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         uint32_t offDanglyVertices = readUint32();
 
         danglyMesh = make_shared<ModelNode::DanglyMesh>();
-        danglyMesh->displacement = 0.5f * displacement;  // displacement is allegedly 1/2 meters per unit
+        danglyMesh->displacement = 0.5f * displacement; // displacement is allegedly 1/2 meters per unit
         danglyMesh->tightness = tightness;
         danglyMesh->period = period;
 
@@ -373,7 +373,7 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         uint32_t offNormals = readUint32();
         ignore(2 * 4); // unknown
 
-        static int referenceIndices[] { 0, 1, 2, 3, 4, 5, 6, 7, 88, 89, 90, 91, 92, 93, 94, 95 };
+        static int referenceIndices[] {0, 1, 2, 3, 4, 5, 6, 7, 88, 89, 90, 91, 92, 93, 94, 95};
 
         seek(static_cast<size_t>(kMdlDataOffset) + offSaberVertices);
         vector<float> saberVertices(readFloatArray(3 * numVertices));
@@ -420,8 +420,7 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
             2, 15, 14, 2, 3, 15,
             8, 4, 5, 8, 5, 9,
             9, 5, 6, 9, 6, 10,
-            10, 6, 7, 10, 7, 11
-        };
+            10, 6, 7, 10, 7, 11};
     }
 
     // Read vertices
@@ -508,7 +507,7 @@ shared_ptr<ModelNode::AABBTree> MdlReader::readAABBTree(uint32_t offset) {
 }
 
 shared_ptr<ModelNode::Light> MdlReader::readLight() {
-    float flareRadius  = readFloat();
+    float flareRadius = readFloat();
     ignore(3 * 4); // unknown
     ArrayDefinition flareSizesArrayDef(readArrayDefinition());
     ArrayDefinition flarePositionsArrayDef(readArrayDefinition());
@@ -694,7 +693,8 @@ void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const vec
 
 void MdlReader::prepareSkinMeshes() {
     for (auto &node : _nodes) {
-        if (!node->isSkinMesh()) continue;
+        if (!node->isSkinMesh())
+            continue;
 
         shared_ptr<ModelNode::Skin> skin(node->mesh()->skin);
         for (size_t i = 0; i < skin->boneMap.size(); ++i) {
@@ -767,71 +767,67 @@ unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
 
 void MdlReader::initControllerFn() {
     _genericControllers = unordered_map<uint32_t, ControllerFn> {
-        { 8, &readPositionController },
-        { 20, &readOrientationController },
-        { 36, &readScaleController }
-    };
+        {8, &readPositionController},
+        {20, &readOrientationController},
+        {36, &readScaleController}};
     _meshControllers = unordered_map<uint32_t, ControllerFn> {
-        { 100, &readSelfIllumColorController },
-        { 132, &readAlphaController }
-    };
+        {100, &readSelfIllumColorController},
+        {132, &readAlphaController}};
     _lightControllers = unordered_map<uint32_t, ControllerFn> {
-        { 76, &readColorController },
-        { 88, &readRadiusController },
-        { 96, &readShadowRadiusController },
-        { 100, &readVerticalDisplacementController },
-        { 140, &readMultiplierController }
-    };
+        {76, &readColorController},
+        {88, &readRadiusController},
+        {96, &readShadowRadiusController},
+        {100, &readVerticalDisplacementController},
+        {140, &readMultiplierController}};
     _emitterControllers = unordered_map<uint32_t, ControllerFn> {
-        { 80, &readAlphaEndController },
-        { 84, &readAlphaStartController },
-        { 88, &readBirthrateController },
-        { 92, &readBounceCoController },
-        { 96, &readCombineTimeController },
-        { 100, &readDragController },
-        { 104, &readFPSController },
-        { 108, &readFrameEndController },
-        { 112, &readFrameStartController },
-        { 116, &readGravController },
-        { 120, &readLifeExpController },
-        { 124, &readMassController },
-        { 128, &readP2PBezier2Controller },
-        { 132, &readP2PBezier3Controller },
-        { 136, &readParticleRotController },
-        { 140, &readRandVelController },
-        { 144, &readSizeStartController },
-        { 148, &readSizeEndController },
-        { 152, &readSizeStartYController },
-        { 156, &readSizeEndYController },
-        { 160, &readSpreadController },
-        { 164, &readThresholdController },
-        { 168, &readVelocityController },
-        { 172, &readXSizeController },
-        { 176, &readYSizeController },
-        { 180, &readBlurLengthController },
-        { 184, &readLightingDelayController },
-        { 188, &readLightingRadiusController },
-        { 192, &readLightingScaleController },
-        { 196, &readLightingSubDivController },
-        { 200, &readLightingZigZagController },
-        { 216, &readAlphaMidController },
-        { 220, &readPercentStartController },
-        { 224, &readPercentMidController },
-        { 228, &readPercentEndController },
-        { 232, &readSizeMidController },
-        { 236, &readSizeMidYController },
-        { 240, &readRandomBirthRateController },
-        { 252, &readTargetSizeController },
-        { 256, &readNumControlPtsController },
-        { 260, &readControlPtRadiusController },
-        { 264, &readControlPtDelayController },
-        { 268, &readTangentSpreadController },
-        { 272, &readTangentLengthController },
-        { 284, &readColorMidController },
-        { 380, &readColorEndController },
-        { 392, &readColorStartController },
-        { 502, &readDetonateController }
-    };
+        {80, &readAlphaEndController},
+        {84, &readAlphaStartController},
+        {88, &readBirthrateController},
+        {92, &readBounceCoController},
+        {96, &readCombineTimeController},
+        {100, &readDragController},
+        {104, &readFPSController},
+        {108, &readFrameEndController},
+        {112, &readFrameStartController},
+        {116, &readGravController},
+        {120, &readLifeExpController},
+        {124, &readMassController},
+        {128, &readP2PBezier2Controller},
+        {132, &readP2PBezier3Controller},
+        {136, &readParticleRotController},
+        {140, &readRandVelController},
+        {144, &readSizeStartController},
+        {148, &readSizeEndController},
+        {152, &readSizeStartYController},
+        {156, &readSizeEndYController},
+        {160, &readSpreadController},
+        {164, &readThresholdController},
+        {168, &readVelocityController},
+        {172, &readXSizeController},
+        {176, &readYSizeController},
+        {180, &readBlurLengthController},
+        {184, &readLightingDelayController},
+        {188, &readLightingRadiusController},
+        {192, &readLightingScaleController},
+        {196, &readLightingSubDivController},
+        {200, &readLightingZigZagController},
+        {216, &readAlphaMidController},
+        {220, &readPercentStartController},
+        {224, &readPercentMidController},
+        {228, &readPercentEndController},
+        {232, &readSizeMidController},
+        {236, &readSizeMidYController},
+        {240, &readRandomBirthRateController},
+        {252, &readTargetSizeController},
+        {256, &readNumControlPtsController},
+        {260, &readControlPtRadiusController},
+        {264, &readControlPtDelayController},
+        {268, &readTangentSpreadController},
+        {272, &readTangentLengthController},
+        {284, &readColorMidController},
+        {380, &readColorEndController},
+        {392, &readColorStartController},
+        {502, &readDetonateController}};
 }
 
 MdlReader::ControllerFn MdlReader::getControllerFn(uint32_t type, int nodeFlags) {
@@ -887,51 +883,51 @@ void MdlReader::readPositionController(const ControllerKey &key, const vector<fl
 
 void MdlReader::readOrientationController(const ControllerKey &key, const vector<float> &data, ModelNode &node) {
     switch (key.numColumns) {
-        case 2:
-            for (uint16_t i = 0; i < key.numRows; ++i) {
-                int rowTimeIdx = key.timeIndex + i;
-                int rowDataIdx = key.dataIndex + i;
+    case 2:
+        for (uint16_t i = 0; i < key.numRows; ++i) {
+            int rowTimeIdx = key.timeIndex + i;
+            int rowDataIdx = key.dataIndex + i;
 
-                uint32_t temp = *reinterpret_cast<const uint32_t *>(&data[rowDataIdx]);
-                float x = 1.0f - static_cast<float>(temp & 0x7ff) / 1023.0f;
-                float y = 1.0f - static_cast<float>((temp >> 11) & 0x7ff) / 1023.0f;
-                float z = 1.0f - static_cast<float>(temp >> 22) / 511.0f;
-                float dot = x * x + y * y + z * z;
-                float w;
+            uint32_t temp = *reinterpret_cast<const uint32_t *>(&data[rowDataIdx]);
+            float x = 1.0f - static_cast<float>(temp & 0x7ff) / 1023.0f;
+            float y = 1.0f - static_cast<float>((temp >> 11) & 0x7ff) / 1023.0f;
+            float z = 1.0f - static_cast<float>(temp >> 22) / 511.0f;
+            float dot = x * x + y * y + z * z;
+            float w;
 
-                if (dot >= 1.0f) {
-                    float len = glm::sqrt(dot);
-                    x /= len;
-                    y /= len;
-                    z /= len;
-                    w = 0.0f;
-                } else {
-                    w = -glm::sqrt(1.0f - dot);
-                }
-
-                float time = data[rowTimeIdx];
-                glm::quat orientation(w, x, y, z);
-                node.orientation().addFrame(time, move(orientation));
+            if (dot >= 1.0f) {
+                float len = glm::sqrt(dot);
+                x /= len;
+                y /= len;
+                z /= len;
+                w = 0.0f;
+            } else {
+                w = -glm::sqrt(1.0f - dot);
             }
-            break;
-        case 4:
-            for (uint16_t i = 0; i < key.numRows; ++i) {
-                int rowTimeIdx = key.timeIndex + i;
-                int rowDataIdx = key.dataIndex + 4 * i;
 
-                float time = data[rowTimeIdx];
+            float time = data[rowTimeIdx];
+            glm::quat orientation(w, x, y, z);
+            node.orientation().addFrame(time, move(orientation));
+        }
+        break;
+    case 4:
+        for (uint16_t i = 0; i < key.numRows; ++i) {
+            int rowTimeIdx = key.timeIndex + i;
+            int rowDataIdx = key.dataIndex + 4 * i;
 
-                float x = data[rowDataIdx + 0];
-                float y = data[rowDataIdx + 1];
-                float z = data[rowDataIdx + 2];
-                float w = data[rowDataIdx + 3];
-                glm::quat orientation(w, x, y, z);
+            float time = data[rowTimeIdx];
 
-                node.orientation().addFrame(time, move(orientation));
-            }
-            break;
-        default:
-            throw runtime_error("Unexpected number of columns: " + to_string(key.numColumns));
+            float x = data[rowDataIdx + 0];
+            float y = data[rowDataIdx + 1];
+            float z = data[rowDataIdx + 2];
+            float w = data[rowDataIdx + 3];
+            glm::quat orientation(w, x, y, z);
+
+            node.orientation().addFrame(time, move(orientation));
+        }
+        break;
+    default:
+        throw runtime_error("Unexpected number of columns: " + to_string(key.numColumns));
     }
 
     node.orientation().update();

@@ -25,7 +25,8 @@ namespace game {
 
 class ForceFizzleEffect : public Effect {
 public:
-    ForceFizzleEffect() : Effect(EffectType::ForceFizzle) {
+    ForceFizzleEffect() :
+        Effect(EffectType::ForceFizzle) {
     }
 
     void applyTo(SpatialObject &object) override;

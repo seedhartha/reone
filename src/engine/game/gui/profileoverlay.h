@@ -29,7 +29,7 @@ class Meshes;
 class Shaders;
 class Window;
 
-}
+} // namespace graphics
 
 namespace game {
 
@@ -39,8 +39,7 @@ public:
         graphics::Fonts &fonts,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
-        graphics::Window &window
-    ) :
+        graphics::Window &window) :
         _fonts(fonts),
         _meshes(meshes),
         _shaders(shaders),
@@ -54,15 +53,15 @@ public:
 
 private:
     struct FPS {
-        int average { 0 };
-        int onePerLow { 0 }; /**< 1% Low */
+        int average {0};
+        int onePerLow {0}; /**< 1% Low */
     };
 
-    uint64_t _frequency { 0 };
-    uint64_t _counter { 0 };
+    uint64_t _frequency {0};
+    uint64_t _counter {0};
     std::shared_ptr<graphics::Font> _font;
 
-    bool _enabled { false };
+    bool _enabled {false};
 
     Timer _refreshTimer;
     std::vector<float> _frametimes;

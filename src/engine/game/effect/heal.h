@@ -25,7 +25,8 @@ namespace game {
 
 class HealEffect : public Effect {
 public:
-    HealEffect() : Effect(EffectType::Heal) {
+    HealEffect() :
+        Effect(EffectType::Heal) {
     }
 
     void applyTo(SpatialObject &object) override;

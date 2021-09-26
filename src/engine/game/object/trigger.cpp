@@ -38,8 +38,7 @@ Trigger::Trigger(
     uint32_t id,
     Game *game,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph
-) :
+    SceneGraph *sceneGraph) :
     SpatialObject(id, ObjectType::Trigger, game, objectFactory, sceneGraph) {
 }
 
@@ -88,7 +87,8 @@ void Trigger::update(float dt) {
     for (auto &tenant : _tenants) {
         if (tenant) {
             glm::vec2 position2d(tenant->position());
-            if (isIn(position2d)) continue;
+            if (isIn(position2d))
+                continue;
         }
         tenantsToRemove.insert(tenant);
     }
@@ -110,9 +110,8 @@ bool Trigger::isIn(const glm::vec2 &point) const {
     glm::vec2 intersection;
     float distance;
 
-    return
-        (_geometry.size() >= 3 && glm::intersectRayTriangle(modelSpacePoint, down, _geometry[0], _geometry[1], _geometry[2], intersection, distance)) ||
-        (_geometry.size() >= 4 && glm::intersectRayTriangle(modelSpacePoint, down, _geometry[2], _geometry[3], _geometry[0], intersection, distance));
+    return (_geometry.size() >= 3 && glm::intersectRayTriangle(modelSpacePoint, down, _geometry[0], _geometry[1], _geometry[2], intersection, distance)) ||
+           (_geometry.size() >= 4 && glm::intersectRayTriangle(modelSpacePoint, down, _geometry[2], _geometry[3], _geometry[0], intersection, distance));
 }
 
 bool Trigger::isTenant(const std::shared_ptr<SpatialObject> &object) const {
@@ -135,7 +134,7 @@ void Trigger::loadUTT(const GffStruct &utt) {
     _trapFlag = utt.getBool("TrapFlag");
     _trapType = utt.getInt("TrapType"); // index into traps.2da
 
-    _onDisarm = boost::to_lower_copy(utt.getString("OnDisarm")); // always empty, but could be useful
+    _onDisarm = boost::to_lower_copy(utt.getString("OnDisarm"));               // always empty, but could be useful
     _onTrapTriggered = boost::to_lower_copy(utt.getString("OnTrapTriggered")); // always empty, but could be useful
     _onHeartbeat = boost::to_lower_copy(utt.getString("ScriptHeartbeat"));
     _onEnter = boost::to_lower_copy(utt.getString("ScriptOnEnter"));

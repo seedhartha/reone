@@ -25,7 +25,8 @@ namespace game {
 
 class EquipMostEffectiveArmorAction : public Action {
 public:
-    EquipMostEffectiveArmorAction(Game &game) : Action(game, ActionType::EquipMostEffectiveArmor) {
+    EquipMostEffectiveArmorAction(Game &game) :
+        Action(game, ActionType::EquipMostEffectiveArmor) {
     }
 
     void execute(Object &actor, float dt) override;

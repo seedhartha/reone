@@ -25,7 +25,8 @@ namespace game {
 
 class DroidStunEffect : public Effect {
 public:
-    DroidStunEffect() : Effect(EffectType::DroidStun) {
+    DroidStunEffect() :
+        Effect(EffectType::DroidStun) {
     }
 
     void applyTo(SpatialObject &object) override;

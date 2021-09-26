@@ -36,7 +36,8 @@ void BwmReader::doLoad() {
     ignore(48 + 12); // reserved + position
 
     _numVertices = readUint32();
-    if (_numVertices == 0) return;
+    if (_numVertices == 0)
+        return;
 
     _offsetVertices = readUint32();
     _numFaces = readUint32();
@@ -138,4 +139,3 @@ void BwmReader::makeWalkmesh() {
 } // namespace graphics
 
 } // namespace reone
-

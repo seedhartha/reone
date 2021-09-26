@@ -37,9 +37,9 @@ private:
     };
 
     Texture::Features _features;
-    State _state { State::None };
-    int _upperLeftCoordCount { 0 };
-    int _lowerRightCoordCount { 0 };
+    State _state {State::None};
+    int _upperLeftCoordCount {0};
+    int _lowerRightCoordCount {0};
 
     void processLine(const std::vector<std::string> &tokens);
     Texture::Blending parseBlending(const std::string &s) const;

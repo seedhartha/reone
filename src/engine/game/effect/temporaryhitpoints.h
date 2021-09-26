@@ -25,7 +25,8 @@ namespace game {
 
 class TemporaryHitPointsEffect : public Effect {
 public:
-    TemporaryHitPointsEffect() : Effect(EffectType::TemporaryHitpoints) {
+    TemporaryHitPointsEffect() :
+        Effect(EffectType::TemporaryHitpoints) {
     }
 
     void applyTo(SpatialObject &object) override;

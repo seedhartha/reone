@@ -32,8 +32,8 @@ public:
     std::shared_ptr<TalkTable> table() const { return _table; }
 
 private:
-    uint32_t _stringCount { 0 };
-    uint32_t _stringsOffset { 0 };
+    uint32_t _stringCount {0};
+    uint32_t _stringsOffset {0};
     std::shared_ptr<TalkTable> _table;
 
     void doLoad() override;

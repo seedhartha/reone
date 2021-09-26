@@ -29,9 +29,9 @@
 #include "../../graphics/texture/tgawriter.h"
 #include "../../graphics/window.h"
 
+#include "../graph.h"
 #include "../node/camera.h"
 #include "../node/light.h"
-#include "../graph.h"
 
 using namespace std;
 
@@ -53,8 +53,7 @@ WorldRenderPipeline::WorldRenderPipeline(
     SceneGraph &sceneGraph,
     Context &context,
     Meshes &meshes,
-    Shaders &shaders
-) :
+    Shaders &shaders) :
     _options(move(options)),
     _sceneGraph(sceneGraph),
     _context(context),
@@ -155,7 +154,8 @@ void WorldRenderPipeline::init() {
 
 void WorldRenderPipeline::render() {
     shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
-    if (!camera) return;
+    if (!camera)
+        return;
 
     computeLightSpaceMatrices();
 
@@ -168,20 +168,20 @@ void WorldRenderPipeline::render() {
 
 static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) {
     switch (face) {
-        case CubeMapFace::PositiveX:
-            return glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-        case CubeMapFace::NegativeX:
-            return glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-        case CubeMapFace::PositiveY:
-            return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-        case CubeMapFace::NegativeY:
-            return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
-        case CubeMapFace::PositiveZ:
-            return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
-        case CubeMapFace::NegativeZ:
-            return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
-        default:
-            throw invalid_argument("side is invalid");
+    case CubeMapFace::PositiveX:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+    case CubeMapFace::NegativeX:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+    case CubeMapFace::PositiveY:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+    case CubeMapFace::NegativeY:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+    case CubeMapFace::PositiveZ:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+    case CubeMapFace::NegativeZ:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+    default:
+        throw invalid_argument("side is invalid");
     }
 }
 
@@ -189,7 +189,8 @@ void WorldRenderPipeline::computeLightSpaceMatrices() {
     static glm::vec3 up(0.0f, 0.0f, 1.0f);
 
     const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
-    if (!shadowLight) return;
+    if (!shadowLight)
+        return;
 
     glm::vec3 lightPosition(shadowLight->absoluteTransform()[3]);
     glm::vec3 cameraPosition(_sceneGraph.activeCamera()->absoluteTransform()[3]);
@@ -208,12 +209,14 @@ void WorldRenderPipeline::computeLightSpaceMatrices() {
 }
 
 void WorldRenderPipeline::drawShadows() {
-    if (_options.shadowResolution < 1) return;
+    if (_options.shadowResolution < 1)
+        return;
 
     // Set uniforms prototype
 
     const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
-    if (!shadowLight) return;
+    if (!shadowLight)
+        return;
 
     glm::vec4 lightPosition(
         glm::vec3(shadowLight->absoluteTransform()[3]),
@@ -302,7 +305,7 @@ void WorldRenderPipeline::drawGeometry() {
 
     _geometry.bind();
 
-    static constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    static constexpr GLenum buffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
     glDrawBuffers(2, buffers);
 
     if (shadowLight) {

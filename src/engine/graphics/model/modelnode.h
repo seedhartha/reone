@@ -21,7 +21,7 @@
 
 #include "animatedproperty.h"
 
-#define REO_DECL_ANIMPROP(a, b, c) \
+#define REO_DECL_ANIMPROP(a, b, c)                      \
     const AnimatedProperty<a> &b() const { return c; }; \
     AnimatedProperty<a> &b() { return c; };
 
@@ -41,22 +41,22 @@ class ModelNode : boost::noncopyable {
 public:
     struct Skin {
         std::vector<std::string> boneNodeName; /**< node name per bone, used for skeletal animation */
-        std::vector<float> boneMap; /**< bone index per node (DFS ordering) */
+        std::vector<float> boneMap;            /**< bone index per node (DFS ordering) */
     };
 
     struct UVAnimation {
-        glm::vec2 dir { 0.0f };
+        glm::vec2 dir {0.0f};
     };
 
     struct DanglyMeshConstraint {
-        float multiplier { 0.0f };
-        glm::vec3 position { 0.0f };
+        float multiplier {0.0f};
+        glm::vec3 position {0.0f};
     };
 
     struct DanglyMesh {
-        float displacement { 0.0f };
-        float tightness { 0.0f };
-        float period { 0.0f };
+        float displacement {0.0f};
+        float tightness {0.0f};
+        float period {0.0f};
         std::vector<DanglyMeshConstraint> constraints;
     };
 
@@ -68,8 +68,8 @@ public:
             PositiveZ = 4
         };
 
-        int faceIndex { 0 };
-        Plane mostSignificantPlane { Plane::None };
+        int faceIndex {0};
+        Plane mostSignificantPlane {Plane::None};
         AABB aabb;
         std::shared_ptr<AABBTree> left;
         std::shared_ptr<AABBTree> right;
@@ -79,15 +79,15 @@ public:
         std::shared_ptr<Mesh> mesh;
         std::unordered_map<uint32_t, std::vector<uint32_t>> materialFaces;
         UVAnimation uvAnimation;
-        glm::vec3 diffuse { 1.0f };
-        glm::vec3 ambient { 1.0f };
-        int transparency { 0 };
+        glm::vec3 diffuse {1.0f};
+        glm::vec3 ambient {1.0f};
+        int transparency {0};
 
         // Flags
 
-        bool render { false };
-        bool shadow { false };
-        bool backgroundGeometry { false };
+        bool render {false};
+        bool shadow {false};
+        bool backgroundGeometry {false};
 
         // END Flags
 
@@ -104,26 +104,26 @@ public:
         std::shared_ptr<Skin> skin;
         std::shared_ptr<DanglyMesh> danglyMesh;
         std::shared_ptr<AABBTree> aabbTree;
-        bool saber { false };
+        bool saber {false};
 
         // END Specialization
     };
 
     struct LensFlare {
         std::shared_ptr<Texture> texture;
-        glm::vec3 colorShift { 0.0f };
-        float position { 0.0f };
-        float size { 0.0f };
+        glm::vec3 colorShift {0.0f};
+        float position {0.0f};
+        float size {0.0f};
     };
 
     struct Light {
-        int priority { 0 };
-        int dynamicType { 0 };
-        bool ambientOnly { false };
-        bool affectDynamic { false };
-        bool shadow { false };
-        bool fading { false };
-        float flareRadius { 0.0f };
+        int priority {0};
+        int dynamicType {0};
+        bool ambientOnly {false};
+        bool affectDynamic {false};
+        bool shadow {false};
+        bool fading {false};
+        float flareRadius {0.0f};
         std::vector<LensFlare> flares;
     };
 
@@ -154,20 +154,20 @@ public:
             Lighten
         };
 
-        UpdateMode updateMode { UpdateMode::Invalid };
-        RenderMode renderMode { RenderMode::Invalid };
-        BlendMode blendMode { BlendMode::Invalid };
+        UpdateMode updateMode {UpdateMode::Invalid};
+        RenderMode renderMode {RenderMode::Invalid};
+        BlendMode blendMode {BlendMode::Invalid};
         std::shared_ptr<Texture> texture;
-        glm::ivec2 gridSize { 0 };
-        int renderOrder { 0 };
-        bool loop { false };
-        bool p2p { false };
-        bool p2pBezier { false };
+        glm::ivec2 gridSize {0};
+        int renderOrder {0};
+        bool loop {false};
+        bool p2p {false};
+        bool p2pBezier {false};
     };
 
     struct Reference {
         std::shared_ptr<Model> model;
-        bool reattachable { false };
+        bool reattachable {false};
     };
 
     ModelNode(
@@ -298,16 +298,16 @@ private:
     std::string _name;
     const ModelNode *_parent;
 
-    uint16_t _flags { 0 };
+    uint16_t _flags {0};
     std::vector<std::shared_ptr<ModelNode>> _children;
 
     // Transformations
 
-    glm::vec3 _restPosition { 0.0f };
-    glm::quat _restOrientation { 1.0f, 0.0f, 0.0f, 0.0f };
-    glm::mat4 _localTransform { 1.0f };
-    glm::mat4 _absTransform { 1.0f };
-    glm::mat4 _absTransformInv { 1.0f };
+    glm::vec3 _restPosition {0.0f};
+    glm::quat _restOrientation {1.0f, 0.0f, 0.0f, 0.0f};
+    glm::mat4 _localTransform {1.0f};
+    glm::mat4 _absTransform {1.0f};
+    glm::mat4 _absTransformInv {1.0f};
 
     // END Transformations
 

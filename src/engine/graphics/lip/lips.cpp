@@ -39,7 +39,8 @@ Lips::Lips(Resources &resources) :
 
 shared_ptr<LipAnimation> Lips::doGet(string resRef) {
     shared_ptr<ByteArray> lipData(_resources.getRaw(resRef, ResourceType::Lip));
-    if (!lipData) return nullptr;
+    if (!lipData)
+        return nullptr;
 
     LipReader lip;
     lip.load(wrap(lipData));

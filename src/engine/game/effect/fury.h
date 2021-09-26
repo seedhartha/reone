@@ -25,7 +25,8 @@ namespace game {
 
 class FuryEffect : public Effect {
 public:
-    FuryEffect() : Effect(EffectType::Fury) {
+    FuryEffect() :
+        Effect(EffectType::Fury) {
     }
 
     void applyTo(SpatialObject &object) override;

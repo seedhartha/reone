@@ -33,4 +33,4 @@ public:
 
 } // namespace script
 
-} // namespae reone
+} // namespace reone

@@ -25,7 +25,8 @@ namespace game {
 
 class CastFakeSpellAtObjectAction : public Action {
 public:
-    CastFakeSpellAtObjectAction(Game &game) : Action(game, ActionType::CastFakeSpellAtObject) {
+    CastFakeSpellAtObjectAction(Game &game) :
+        Action(game, ActionType::CastFakeSpellAtObject) {
     }
 
     void execute(Object &actor, float dt) override;

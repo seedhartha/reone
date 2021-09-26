@@ -48,8 +48,7 @@ GameGUI::GameGUI(Game *game) :
         game->textures(),
         game->window(),
         game->resources(),
-        game->strings()
-    ),
+        game->strings()),
     _game(game) {
 }
 
@@ -82,12 +81,12 @@ void GameGUI::loadBackground(BackgroundType type) {
 
     if (_game->isTSL()) {
         switch (type) {
-            case BackgroundType::Computer0:
-            case BackgroundType::Computer1:
-                resRef = "pnl_computer_pc";
-                break;
-            default:
-                break;
+        case BackgroundType::Computer0:
+        case BackgroundType::Computer1:
+            resRef = "pnl_computer_pc";
+            break;
+        default:
+            break;
         }
     } else {
         if ((_options.width == 1600 && _options.height == 1200) ||
@@ -100,20 +99,20 @@ void GameGUI::loadBackground(BackgroundType type) {
             resRef = "1600x1200";
         }
         switch (type) {
-            case BackgroundType::Menu:
-                resRef += "back";
-                break;
-            case BackgroundType::Load:
-                resRef += "load";
-                break;
-            case BackgroundType::Computer0:
-                resRef += "comp0";
-                break;
-            case BackgroundType::Computer1:
-                resRef += "comp1";
-                break;
-            default:
-                return;
+        case BackgroundType::Menu:
+            resRef += "back";
+            break;
+        case BackgroundType::Load:
+            resRef += "load";
+            break;
+        case BackgroundType::Computer0:
+            resRef += "comp0";
+            break;
+        case BackgroundType::Computer1:
+            resRef += "comp1";
+            break;
+        default:
+            return;
         }
     }
 

@@ -31,7 +31,7 @@ namespace resource {
 class Resources;
 class Strings;
 
-}
+} // namespace resource
 
 namespace game {
 
@@ -43,8 +43,7 @@ public:
         ClassType type,
         Classes &classes,
         resource::Resources &resources,
-        resource::Strings &strings
-    ) :
+        resource::Strings &strings) :
         _type(type),
         _classes(classes),
         _resources(resources),
@@ -76,9 +75,9 @@ private:
     ClassType _type;
     std::string _name;
     std::string _description;
-    int _hitdie { 0 };
+    int _hitdie {0};
     CreatureAttributes _defaultAttributes;
-    int _skillPointBase { 0 };
+    int _skillPointBase {0};
     std::unordered_set<SkillType> _classSkills;
     std::unordered_map<int, SavingThrows> _savingThrowsByLevel;
     std::vector<int> _attackBonuses;

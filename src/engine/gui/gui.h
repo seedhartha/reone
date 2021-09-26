@@ -29,7 +29,7 @@ class GffStruct;
 class Resources;
 class Strings;
 
-}
+} // namespace resource
 
 namespace graphics {
 
@@ -43,7 +43,7 @@ class Shaders;
 class Texture;
 class Window;
 
-}
+} // namespace graphics
 
 namespace gui {
 
@@ -73,20 +73,20 @@ protected:
     graphics::GraphicsOptions _options;
 
     std::string _resRef;
-    int _resolutionX { kDefaultResolutionX };
-    int _resolutionY { kDefaultResolutionY };
-    ScalingMode _scaling { ScalingMode::Center };
-    float _aspect { 0.0f };
-    glm::ivec2 _screenCenter { 0 };
-    glm::ivec2 _rootOffset { 0 };
-    glm::ivec2 _controlOffset { 0 };
+    int _resolutionX {kDefaultResolutionX};
+    int _resolutionY {kDefaultResolutionY};
+    ScalingMode _scaling {ScalingMode::Center};
+    float _aspect {0.0f};
+    glm::ivec2 _screenCenter {0};
+    glm::ivec2 _rootOffset {0};
+    glm::ivec2 _controlOffset {0};
     std::shared_ptr<graphics::Texture> _background;
     std::unique_ptr<Control> _rootControl;
     std::vector<std::shared_ptr<Control>> _controls;
     std::unordered_map<std::string, Control *> _controlByTag;
-    Control *_focus { nullptr };
-    bool _hasDefaultHilightColor { false };
-    glm::vec3 _defaultHilightColor { 0.0f };
+    Control *_focus {nullptr};
+    bool _hasDefaultHilightColor {false};
+    glm::vec3 _defaultHilightColor {0.0f};
     std::unordered_map<std::string, ScalingMode> _scalingByControlTag;
 
     // Services
@@ -138,11 +138,11 @@ protected:
 
     // END User input
 
-    virtual void onClick(const std::string &control) { }
-    virtual void onFocusChanged(const std::string &control, bool focus) { }
+    virtual void onClick(const std::string &control) {}
+    virtual void onFocusChanged(const std::string &control, bool focus) {}
 
 private:
-    bool _leftMouseDown { false };
+    bool _leftMouseDown {false};
 
     void positionRelativeToCenter(Control &control);
     void stretchControl(Control &control);

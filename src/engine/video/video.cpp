@@ -67,7 +67,8 @@ void Video::updateFrame(float dt) {
 }
 
 void Video::updateFrameTexture() {
-    if (!_frame) return;
+    if (!_frame)
+        return;
 
     _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
@@ -75,7 +76,8 @@ void Video::updateFrameTexture() {
 }
 
 void Video::draw() {
-    if (!_inited) return;
+    if (!_inited)
+        return;
 
     _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();

@@ -90,7 +90,8 @@ void Object::updateActions(float dt) {
 void Object::removeCompletedActions() {
     while (true) {
         shared_ptr<Action> action(getCurrentAction());
-        if (!action || !action->isCompleted()) return;
+        if (!action || !action->isCompleted())
+            return;
 
         _actions.pop_front();
     }
@@ -112,7 +113,8 @@ void Object::updateDelayedActions(float dt) {
 }
 
 void Object::executeActions(float dt) {
-    if (_actions.empty()) return;
+    if (_actions.empty())
+        return;
 
     shared_ptr<Action> action(_actions.front());
     action->execute(*this, dt);
@@ -120,7 +122,8 @@ void Object::executeActions(float dt) {
 
 bool Object::hasUserActionsPending() const {
     for (auto &action : _actions) {
-        if (action->isUserAction()) return true;
+        if (action->isUserAction())
+            return true;
     }
     return false;
 }

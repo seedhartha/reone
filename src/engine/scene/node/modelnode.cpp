@@ -34,16 +34,14 @@ ModelNodeSceneNode::ModelNodeSceneNode(
     SceneGraph &sceneGraph,
     Context &context,
     Meshes &meshes,
-    Shaders &shaders
-) :
+    Shaders &shaders) :
     SceneNode(
         modelNode->name(),
         type,
         sceneGraph,
         context,
         meshes,
-        shaders
-    ),
+        shaders),
     _modelNode(ensurePresent(modelNode, "modelNode")) {
 }
 

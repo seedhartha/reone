@@ -49,13 +49,13 @@ void ErfWriter::save(FileType type, const fs::path &path) {
     writer.putUint32(0); // language count
     writer.putUint32(0); // localized string size
     writer.putUint32(numResources);
-    writer.putUint32(0xa0); // offset to localized string
-    writer.putUint32(0xa0); // offset to key list
+    writer.putUint32(0xa0);         // offset to localized string
+    writer.putUint32(0xa0);         // offset to key list
     writer.putUint32(offResources); // offset to resource list
-    writer.putUint32(0); // build year since 1900
-    writer.putUint32(0); // build day since January 1st
-    writer.putInt32(-1); // StrRef for file description
-    writer.putBytes(116); // padding
+    writer.putUint32(0);            // build year since 1900
+    writer.putUint32(0);            // build day since January 1st
+    writer.putInt32(-1);            // StrRef for file description
+    writer.putBytes(116);           // padding
 
     uint32_t id = 0;
 

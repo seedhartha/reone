@@ -31,11 +31,13 @@ namespace reone {
 
 namespace graphics {
 
-Materials::Materials(Resources &resources) : _resources(resources) {
+Materials::Materials(Resources &resources) :
+    _resources(resources) {
 }
 
 void Materials::init() {
-    if (_inited) return;
+    if (_inited)
+        return;
 
     shared_ptr<TwoDA> materials(_resources.get2DA("material", false));
     if (materials) {

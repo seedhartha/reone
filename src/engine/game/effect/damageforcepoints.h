@@ -25,7 +25,8 @@ namespace game {
 
 class DamageForcePointsEffect : public Effect {
 public:
-    DamageForcePointsEffect() : Effect(EffectType::DamageForcePoints) {
+    DamageForcePointsEffect() :
+        Effect(EffectType::DamageForcePoints) {
     }
 
     void applyTo(SpatialObject &object) override;

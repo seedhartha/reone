@@ -33,7 +33,8 @@ namespace game {
 
 void Spells::init() {
     shared_ptr<TwoDA> spells(_resources.get2DA("spells"));
-    if (!spells) return;
+    if (!spells)
+        return;
 
     for (int row = 0; row < spells->getRowCount(); ++row) {
         string name(_strings.get(spells->getInt(row, "name", -1)));

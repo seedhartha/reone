@@ -25,7 +25,8 @@ namespace game {
 
 class SurrenderToEnemiesAction : public Action {
 public:
-    SurrenderToEnemiesAction(Game &game) : Action(game, ActionType::SurrenderToEnemies) {
+    SurrenderToEnemiesAction(Game &game) :
+        Action(game, ActionType::SurrenderToEnemies) {
     }
 
     void execute(Object &actor, float dt) override;

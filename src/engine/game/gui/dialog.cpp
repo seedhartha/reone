@@ -22,8 +22,8 @@
 #include "../../audio/soundhandle.h"
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
-#include "../../gui/control/panel.h"
 #include "../../graphics/model/models.h"
+#include "../../gui/control/panel.h"
 #include "../../resource/2da.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
@@ -51,40 +51,40 @@ static const char kControlTagBottomFrame[] = "BOTTOM";
 static const char kObjectTagOwner[] = "owner";
 
 static const unordered_map<string, AnimationType> g_animTypeByName {
-    { "dead", AnimationType::LoopingDead },
-    { "taunt", AnimationType::FireForgetTaunt },
-    { "greeting", AnimationType::FireForgetGreeting },
-    { "listen", AnimationType::LoopingListen },
-    { "worship", AnimationType::LoopingWorship },
-    { "salute", AnimationType::FireForgetSalute },
-    { "bow", AnimationType::FireForgetBow },
-    { "talk_normal", AnimationType::LoopingTalkNormal },
-    { "talk_pleading", AnimationType::LoopingTalkPleading },
-    { "talk_forceful", AnimationType::LoopingTalkForceful },
-    { "talk_laughing", AnimationType::LoopingTalkLaughing },
-    { "talk_sad", AnimationType::LoopingTalkSad },
-    { "victory", AnimationType::FireForgetVictory1 },
-    { "scratch_head", AnimationType::FireForgetPauseScratchHead },
-    { "drunk", AnimationType::LoopingPauseDrunk },
-    { "inject", AnimationType::FireForgetInject },
-    { "flirt", AnimationType::LoopingFlirt },
-    { "use_computer_lp", AnimationType::LoopingUseComputer },
-    { "horror", AnimationType::LoopingHorror },
-    { "use_computer", AnimationType::FireForgetUseComputer },
-    { "persuade", AnimationType::FireForgetPersuade },
-    { "activate", AnimationType::FireForgetActivate },
-    { "sleep", AnimationType::LoopingSleep },
-    { "prone", AnimationType::LoopingProne },
-    { "ready", AnimationType::LoopingReady },
-    { "pause", AnimationType::LoopingPause },
-    { "choked", AnimationType::LoopingChoke },
-    { "talk_injured", AnimationType::LoopingTalkInjured },
-    { "listen_injured", AnimationType::LoopingListenInjured },
-    { "kneel_talk_angry", AnimationType::LoopingKneelTalkAngry },
-    { "kneel_talk_sad", AnimationType::LoopingKneelTalkSad }
-};
+    {"dead", AnimationType::LoopingDead},
+    {"taunt", AnimationType::FireForgetTaunt},
+    {"greeting", AnimationType::FireForgetGreeting},
+    {"listen", AnimationType::LoopingListen},
+    {"worship", AnimationType::LoopingWorship},
+    {"salute", AnimationType::FireForgetSalute},
+    {"bow", AnimationType::FireForgetBow},
+    {"talk_normal", AnimationType::LoopingTalkNormal},
+    {"talk_pleading", AnimationType::LoopingTalkPleading},
+    {"talk_forceful", AnimationType::LoopingTalkForceful},
+    {"talk_laughing", AnimationType::LoopingTalkLaughing},
+    {"talk_sad", AnimationType::LoopingTalkSad},
+    {"victory", AnimationType::FireForgetVictory1},
+    {"scratch_head", AnimationType::FireForgetPauseScratchHead},
+    {"drunk", AnimationType::LoopingPauseDrunk},
+    {"inject", AnimationType::FireForgetInject},
+    {"flirt", AnimationType::LoopingFlirt},
+    {"use_computer_lp", AnimationType::LoopingUseComputer},
+    {"horror", AnimationType::LoopingHorror},
+    {"use_computer", AnimationType::FireForgetUseComputer},
+    {"persuade", AnimationType::FireForgetPersuade},
+    {"activate", AnimationType::FireForgetActivate},
+    {"sleep", AnimationType::LoopingSleep},
+    {"prone", AnimationType::LoopingProne},
+    {"ready", AnimationType::LoopingReady},
+    {"pause", AnimationType::LoopingPause},
+    {"choked", AnimationType::LoopingChoke},
+    {"talk_injured", AnimationType::LoopingTalkInjured},
+    {"listen_injured", AnimationType::LoopingListenInjured},
+    {"kneel_talk_angry", AnimationType::LoopingKneelTalkAngry},
+    {"kneel_talk_sad", AnimationType::LoopingKneelTalkSad}};
 
-DialogGUI::DialogGUI(Game *game) : Conversation(game) {
+DialogGUI::DialogGUI(Game *game) :
+    Conversation(game) {
     _resRef = getResRef("dialog");
     _scaling = ScalingMode::Stretch;
 }
@@ -151,7 +151,8 @@ void DialogGUI::onStart() {
 }
 
 void DialogGUI::loadStuntParticipants() {
-    if (!_dialog->isAnimatedCutscene()) return;
+    if (!_dialog->isAnimatedCutscene())
+        return;
 
     _participantByTag.clear();
 
@@ -245,10 +246,12 @@ void DialogGUI::updateCamera() {
 
 glm::vec3 DialogGUI::getTalkPosition(const SpatialObject &object) const {
     auto model = static_pointer_cast<ModelSceneNode>(object.sceneNode());
-    if (!model) return object.position();
+    if (!model)
+        return object.position();
 
     shared_ptr<ModelNode> talkDummy(model->model()->getNodeByNameRecursive("talkdummy"));
-    if (!talkDummy) return model->getWorldCenterOfAABB();
+    if (!talkDummy)
+        return model->getWorldCenterOfAABB();
 
     return (model->absoluteTransform() * talkDummy->absoluteTransform())[3];
 }
@@ -256,12 +259,12 @@ glm::vec3 DialogGUI::getTalkPosition(const SpatialObject &object) const {
 DialogCamera::Variant DialogGUI::getRandomCameraVariant() const {
     int r = random(0, 2);
     switch (r) {
-        case 0:
-            return _entryEnded ? DialogCamera::Variant::ListenerClose : DialogCamera::Variant::SpeakerClose;
-        case 1:
-            return _entryEnded ? DialogCamera::Variant::ListenerFar : DialogCamera::Variant::SpeakerFar;
-        default:
-            return DialogCamera::Variant::Both;
+    case 0:
+        return _entryEnded ? DialogCamera::Variant::ListenerClose : DialogCamera::Variant::SpeakerClose;
+    case 1:
+        return _entryEnded ? DialogCamera::Variant::ListenerFar : DialogCamera::Variant::SpeakerFar;
+    default:
+        return DialogCamera::Variant::Both;
     }
 }
 

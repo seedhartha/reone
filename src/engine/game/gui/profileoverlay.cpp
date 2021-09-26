@@ -53,7 +53,8 @@ bool ProfileOverlay::handle(const SDL_Event &event) {
 }
 
 void ProfileOverlay::update(float dt) {
-    if (!_enabled) return;
+    if (!_enabled)
+        return;
 
     uint64_t counter = SDL_GetPerformanceCounter();
     float frametime = static_cast<float>((counter - _counter) / static_cast<double>(_frequency));
@@ -69,7 +70,8 @@ void ProfileOverlay::update(float dt) {
 }
 
 void ProfileOverlay::calculateFPS() {
-    if (_frametimes.empty()) return;
+    if (_frametimes.empty())
+        return;
 
     vector<int> fps;
     for (size_t i = 0; i < _frametimes.size(); ++i) {
@@ -94,7 +96,8 @@ void ProfileOverlay::calculateFPS() {
 }
 
 void ProfileOverlay::draw() {
-    if (!_enabled) return;
+    if (!_enabled)
+        return;
 
     drawBackground();
     drawText();

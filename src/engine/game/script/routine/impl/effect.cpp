@@ -24,9 +24,9 @@
 #include "../../../../script/exception/argument.h"
 #include "../../../../script/exception/notimpl.h"
 
-#include "../../../game.h"
 #include "../../../effect/effect.h"
 #include "../../../effect/factory.h"
+#include "../../../game.h"
 #include "../../../types.h"
 
 #include "argutil.h"
@@ -75,8 +75,7 @@ Variable getIsEffectValid(Game &game, const vector<Variable> &args, ExecutionCon
     try {
         auto effect = getEffect(args, 0);
         return Variable::ofInt(1);
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(0);
     }
 }

@@ -25,7 +25,8 @@ namespace game {
 
 class ChokeEffect : public Effect {
 public:
-    ChokeEffect() : Effect(EffectType::Choke) {
+    ChokeEffect() :
+        Effect(EffectType::Choke) {
     }
 
     void applyTo(SpatialObject &object) override;

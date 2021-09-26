@@ -25,7 +25,8 @@ namespace game {
 
 class MovementSpeedDecreaseEffect : public Effect {
 public:
-    MovementSpeedDecreaseEffect() : Effect(EffectType::MovementSpeedDecrease) {
+    MovementSpeedDecreaseEffect() :
+        Effect(EffectType::MovementSpeedDecrease) {
     }
 
     void applyTo(SpatialObject &object) override;

@@ -18,8 +18,8 @@
 #pragma once
 
 #include "../../graphics/options.h"
-#include "../../scene/pipeline/world.h"
 #include "../../scene/graph.h"
+#include "../../scene/pipeline/world.h"
 
 namespace reone {
 

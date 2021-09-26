@@ -43,7 +43,8 @@ void GrassSceneNode::addCluster(shared_ptr<Cluster> cluster) {
 }
 
 void GrassSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &elements, int count) {
-    if (elements.empty()) return;
+    if (elements.empty())
+        return;
     if (count == -1) {
         count = static_cast<int>(elements.size());
     }

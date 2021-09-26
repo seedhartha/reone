@@ -51,7 +51,8 @@ void KeyBifTool::invoke(Operation operation, const fs::path &target, const fs::p
                 break;
             }
         }
-        if (bifIdx == -1) return;
+        if (bifIdx == -1)
+            return;
 
         BifReader bif;
         bif.load(target);
@@ -88,7 +89,8 @@ void KeyBifTool::extractBIF(const KeyReader &key, BifReader &bif, int bifIdx, co
     }
 
     for (auto &keyEntry : key.keys()) {
-        if (keyEntry.bifIdx != bifIdx) continue;
+        if (keyEntry.bifIdx != bifIdx)
+            continue;
 
         string ext(getExtByResType(keyEntry.resType));
         cout << "Extracting " + keyEntry.resRef << " " << ext << endl;
@@ -98,12 +100,13 @@ void KeyBifTool::extractBIF(const KeyReader &key, BifReader &bif, int bifIdx, co
         resPath.append(keyEntry.resRef + "." + ext);
 
         fs::ofstream out(resPath, ios::binary);
-        out.write(&(*data)[0], data->size()); 
+        out.write(&(*data)[0], data->size());
     }
 }
 
 bool KeyBifTool::supports(Operation operation, const fs::path &target) const {
-    if (fs::is_directory(target)) return false;
+    if (fs::is_directory(target))
+        return false;
 
     bool key = target.extension() == ".key";
     bool bif = target.extension() == ".bif";

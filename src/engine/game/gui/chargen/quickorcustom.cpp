@@ -61,7 +61,8 @@ void QuickOrCustom::load() {
     });
 
     _binding.quickCharBtn->setOnFocusChanged([this](bool focus) {
-        if (!focus) return;
+        if (!focus)
+            return;
         string text(_game->strings().get(kStrRefQuickHelpText));
         _binding.lbDesc->clearItems();
         _binding.lbDesc->addTextLinesAsItems(text);
@@ -71,7 +72,8 @@ void QuickOrCustom::load() {
     });
 
     _binding.custCharBtn->setOnFocusChanged([this](bool focus) {
-        if (!focus) return;
+        if (!focus)
+            return;
         string text(_game->strings().get(kStrRefCustomHelpText));
         _binding.lbDesc->clearItems();
         _binding.lbDesc->addTextLinesAsItems(text);

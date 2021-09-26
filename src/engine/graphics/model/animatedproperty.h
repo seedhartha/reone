@@ -42,7 +42,8 @@ public:
     }
 
     bool getByTime(float time, V &value) const {
-        if (_frames.empty()) return false;
+        if (_frames.empty())
+            return false;
 
         const std::pair<float, V> *frame1 = &_frames[0];
         const std::pair<float, V> *frame2 = &_frames[0];
@@ -73,9 +74,7 @@ public:
     }
 
     V getByFrameOrElse(int frame, V defaultValue) const {
-        return frame < static_cast<int>(_frames.size()) ?
-            getByFrame(frame) :
-            std::move(defaultValue);
+        return frame < static_cast<int>(_frames.size()) ? getByFrame(frame) : std::move(defaultValue);
     }
 
     void addFrame(float time, V value) {

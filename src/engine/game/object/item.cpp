@@ -37,7 +37,8 @@ namespace reone {
 
 namespace game {
 
-Item::Item(uint32_t id, Game *game) : Object(id, ObjectType::Item, game) {
+Item::Item(uint32_t id, Game *game) :
+    Object(id, ObjectType::Item, game) {
 }
 
 void Item::loadFromBlueprint(const string &resRef) {

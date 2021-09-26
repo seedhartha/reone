@@ -30,11 +30,12 @@ using namespace reone;
 
 class TestCache : public MemoryCache<int, int> {
 public:
-    TestCache() : MemoryCache(bind(&TestCache::compute, this, _1)) {
+    TestCache() :
+        MemoryCache(bind(&TestCache::compute, this, _1)) {
     }
 
 private:
-    int _counter { 0 };
+    int _counter {0};
 
     shared_ptr<int> compute(int key) {
         return make_shared<int>(_counter++);

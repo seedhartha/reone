@@ -26,7 +26,8 @@ namespace di {
 
 class ResourceServices : boost::noncopyable {
 public:
-    ResourceServices(boost::filesystem::path gamePath) : _gamePath(std::move(gamePath)) {
+    ResourceServices(boost::filesystem::path gamePath) :
+        _gamePath(std::move(gamePath)) {
     }
 
     void init();

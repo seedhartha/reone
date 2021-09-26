@@ -84,24 +84,29 @@ void Console::cmdDescribe(vector<string> tokens) {
     ss
         << setprecision(2) << fixed
         << "id=" << object->id()
-        << " " << "tag=\"" << object->tag() << "\""
-        << " " << "tpl=\"" << object->blueprintResRef() << "\""
-        << " " << "pos=[" << position.x << ", " << position.y << ", " << position.z << "]";
+        << " "
+        << "tag=\"" << object->tag() << "\""
+        << " "
+        << "tpl=\"" << object->blueprintResRef() << "\""
+        << " "
+        << "pos=[" << position.x << ", " << position.y << ", " << position.z << "]";
 
     switch (object->type()) {
-        case ObjectType::Creature: {
-            auto creature = static_pointer_cast<Creature>(object);
-            ss << " " << "fac=" << static_cast<int>(creature->faction());
-            break;
-        }
-        default:
-            break;
+    case ObjectType::Creature: {
+        auto creature = static_pointer_cast<Creature>(object);
+        ss << " "
+           << "fac=" << static_cast<int>(creature->faction());
+        break;
+    }
+    default:
+        break;
     }
 
     print(ss.str());
 }
 
-void Console::cmdListAnim(vector<string> tokens) {;
+void Console::cmdListAnim(vector<string> tokens) {
+    ;
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
         object = _game.party().getLeader();
@@ -206,15 +211,16 @@ void Console::init() {
 }
 
 bool Console::handle(const SDL_Event &event) {
-    if (_open && _input.handle(event)) return true;
+    if (_open && _input.handle(event))
+        return true;
 
     switch (event.type) {
-        case SDL_MOUSEWHEEL:
-            return handleMouseWheel(event.wheel);
-        case SDL_KEYUP:
-            return handleKeyUp(event.key);
-        default:
-            return false;
+    case SDL_MOUSEWHEEL:
+        return handleMouseWheel(event.wheel);
+    case SDL_KEYUP:
+        return handleKeyUp(event.key);
+    default:
+        return false;
     }
 }
 
@@ -235,36 +241,36 @@ bool Console::handleMouseWheel(const SDL_MouseWheelEvent &event) {
 bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
     if (_open) {
         switch (event.keysym.sym) {
-            case SDLK_BACKQUOTE:
-                _open = false;
-                return true;
+        case SDLK_BACKQUOTE:
+            _open = false;
+            return true;
 
-            case SDLK_RETURN: {
-                string text(_input.text());
-                if (!text.empty()) {
-                    executeInputText();
-                    _history.push(_input.text());
-                    _input.clear();
-                }
-                return true;
+        case SDLK_RETURN: {
+            string text(_input.text());
+            if (!text.empty()) {
+                executeInputText();
+                _history.push(_input.text());
+                _input.clear();
             }
-            case SDLK_UP:
-                if (!_history.empty()) {
-                    _input.setText(_history.top());
-                    _history.pop();
-                }
-                return true;
-            default:
-                return false;
+            return true;
+        }
+        case SDLK_UP:
+            if (!_history.empty()) {
+                _input.setText(_history.top());
+                _history.pop();
+            }
+            return true;
+        default:
+            return false;
         }
     } else {
         switch (event.keysym.sym) {
-            case SDLK_BACKQUOTE:
-                _open = true;
-                return true;
+        case SDLK_BACKQUOTE:
+            _open = true;
+            return true;
 
-            default:
-                return false;
+        default:
+            return false;
         }
     }
 }
@@ -273,7 +279,8 @@ void Console::executeInputText() {
     vector<string> tokens;
     boost::split(tokens, _input.text(), boost::is_space(), boost::token_compress_on);
 
-    if (tokens.empty()) return;
+    if (tokens.empty())
+        return;
 
     auto maybeCommand = _commands.find(tokens[0]);
     if (maybeCommand != _commands.end()) {

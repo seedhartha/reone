@@ -65,7 +65,7 @@ private:
     Meshes &_meshes;
     Shaders &_shaders;
 
-    bool _inited { false };
+    bool _inited {false};
     std::set<const Texture *> _envmapQueue;
     std::unordered_map<const Texture *, Derived> _derivedByEnvmap;
 

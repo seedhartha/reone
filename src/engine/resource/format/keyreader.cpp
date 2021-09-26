@@ -28,7 +28,8 @@ namespace resource {
 static constexpr int kSignatureSize = 8;
 static const char kSignature[] = "KEY V1  ";
 
-KeyReader::KeyReader() : BinaryReader(kSignatureSize, kSignature) {
+KeyReader::KeyReader() :
+    BinaryReader(kSignatureSize, kSignature) {
 }
 
 void KeyReader::doLoad() {
@@ -101,7 +102,8 @@ bool KeyReader::find(const string &resRef, ResourceType type, KeyEntry &key) con
         _keys.end(),
         [&](const KeyEntry &e) { return e.resRef == lcResRef && e.resType == type; });
 
-    if (it == _keys.end()) return false;
+    if (it == _keys.end())
+        return false;
 
     key = *it;
 

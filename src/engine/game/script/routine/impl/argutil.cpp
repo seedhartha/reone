@@ -24,8 +24,8 @@
 #include "../../../event.h"
 #include "../../../game.h"
 #include "../../../location.h"
-#include "../../../object/door.h"
 #include "../../../object/creature.h"
+#include "../../../object/door.h"
 #include "../../../object/sound.h"
 #include "../../../talent.h"
 
@@ -73,9 +73,7 @@ glm::vec3 getVector(const vector<Variable> &args, int index) {
 }
 
 bool getBoolOrElse(const vector<Variable> &args, int index, bool defValue) {
-    return isOutOfRange(args, index) ?
-        defValue :
-        static_cast<bool>(args[index].intValue);
+    return isOutOfRange(args, index) ? defValue : static_cast<bool>(args[index].intValue);
 }
 
 int getIntOrElse(const vector<Variable> &args, int index, int defValue) {

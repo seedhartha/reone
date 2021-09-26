@@ -25,7 +25,8 @@ namespace game {
 
 class EntangleEffect : public Effect {
 public:
-    EntangleEffect() : Effect(EffectType::Entangle) {
+    EntangleEffect() :
+        Effect(EffectType::Entangle) {
     }
 
     void applyTo(SpatialObject &object) override;

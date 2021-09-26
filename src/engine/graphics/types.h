@@ -107,16 +107,16 @@ enum class TextGravity {
 };
 
 struct TextureUnits {
-    static constexpr int diffuseMap { 0 };
-    static constexpr int lightmap { 1 };
-    static constexpr int environmentMap { 2 };
-    static constexpr int bumpMap { 3 };
-    static constexpr int bloom { 4 };
-    static constexpr int irradianceMap { 5 };
-    static constexpr int prefilterMap { 6 };
-    static constexpr int brdfLookup { 7 };
-    static constexpr int shadowMap { 8 };
-    static constexpr int shadowMapCube { 9 };
+    static constexpr int diffuseMap {0};
+    static constexpr int lightmap {1};
+    static constexpr int environmentMap {2};
+    static constexpr int bumpMap {3};
+    static constexpr int bloom {4};
+    static constexpr int irradianceMap {5};
+    static constexpr int prefilterMap {6};
+    static constexpr int brdfLookup {7};
+    static constexpr int shadowMap {8};
+    static constexpr int shadowMapCube {9};
 };
 
 } // namespace graphics

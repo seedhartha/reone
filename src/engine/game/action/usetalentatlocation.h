@@ -25,7 +25,8 @@ namespace game {
 
 class UseTalentAtLocationAction : public Action {
 public:
-    UseTalentAtLocationAction(Game &game) : Action(game, ActionType::UseTalentAtLocation) {
+    UseTalentAtLocationAction(Game &game) :
+        Action(game, ActionType::UseTalentAtLocation) {
     }
 
     void execute(Object &actor, float dt) override;

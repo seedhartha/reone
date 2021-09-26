@@ -25,7 +25,8 @@ namespace game {
 
 class MindTrickEffect : public Effect {
 public:
-    MindTrickEffect() : Effect(EffectType::MindTrick) {
+    MindTrickEffect() :
+        Effect(EffectType::MindTrick) {
     }
 
     void applyTo(SpatialObject &object) override;

@@ -41,7 +41,7 @@ private:
     float _speed;
     float _durationSeconds;
 
-    bool _playing { false };
+    bool _playing {false};
 };
 
 } // namespace game

@@ -59,28 +59,28 @@ public:
     void setAudible(bool audible);
 
 private:
-    bool _active { false };
-    int _priority { 0 };
-    int _soundIdx { -1 };
-    float _timeout { 0.0f };
-    float _maxDistance { 0.0f };
-    float _minDistance { 0.0f };
-    bool _continuous { false };
-    float _elevation { 0.0f };
-    bool _looping { false };
-    bool _positional { false };
-    int _interval { 0 };
-    int _volume { 0 };
+    bool _active {false};
+    int _priority {0};
+    int _soundIdx {-1};
+    float _timeout {0.0f};
+    float _maxDistance {0.0f};
+    float _minDistance {0.0f};
+    bool _continuous {false};
+    float _elevation {0.0f};
+    bool _looping {false};
+    bool _positional {false};
+    int _interval {0};
+    int _volume {0};
     std::vector<std::string> _sounds;
-    bool _audible { false };
+    bool _audible {false};
     std::shared_ptr<audio::SoundHandle> _sound;
-    bool _randomPosition { false };
-    int _random { 0 };
-    float _randomRangeX { 0.0f };
-    float _randomRangeY { 0.0f };
-    int _intervalVrtn { 0 };
-    float _pitchVariation { 0.0f };
-    int _volumeVrtn { 0 };
+    bool _randomPosition {false};
+    int _random {0};
+    float _randomRangeX {0.0f};
+    float _randomRangeY {0.0f};
+    int _intervalVrtn {0};
+    float _pitchVariation {0.0f};
+    int _volumeVrtn {0};
 
     void loadTransformFromGIT(const resource::GffStruct &gffs);
 

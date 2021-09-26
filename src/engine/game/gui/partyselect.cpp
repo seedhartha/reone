@@ -45,10 +45,11 @@ static constexpr int kMaxFollowerCount = 2;
 static int g_strRefAdd = 38455;
 static int g_strRefRemove = 38456;
 
-static glm::vec3 g_kotorColorOn = { 0.984314f, 1.0f, 0 };
-static glm::vec3 g_kotorColorAdded = { 0, 0.831373f, 0.090196f };
+static glm::vec3 g_kotorColorOn = {0.984314f, 1.0f, 0};
+static glm::vec3 g_kotorColorAdded = {0, 0.831373f, 0.090196f};
 
-PartySelection::PartySelection(Game *game) : GameGUI(game) {
+PartySelection::PartySelection(Game *game) :
+    GameGUI(game) {
     if (game->isTSL()) {
         _resRef = "partyselect_p";
     } else {
@@ -218,8 +219,7 @@ void PartySelection::prepare(const Context &ctx) {
         _binding.lblNa5.get(),
         _binding.lblNa6.get(),
         _binding.lblNa7.get(),
-        _binding.lblNa8.get()
-    };
+        _binding.lblNa8.get()};
     if (_game->isTSL()) {
         charLabels.push_back(_binding.lblChar9.get());
         charLabels.push_back(_binding.lblChar10.get());
@@ -275,8 +275,7 @@ ToggleButton &PartySelection::getNpcButton(int npc) {
         _binding.btnNpc6.get(),
         _binding.btnNpc7.get(),
         _binding.btnNpc8.get(),
-        _binding.btnNpc9.get()
-    };
+        _binding.btnNpc9.get()};
     if (_game->isTSL()) {
         npcButtons.push_back(_binding.btnNpc10.get());
         npcButtons.push_back(_binding.btnNpc11.get());
@@ -285,7 +284,8 @@ ToggleButton &PartySelection::getNpcButton(int npc) {
 }
 
 void PartySelection::onAcceptButtonClick() {
-    if (_selectedNpc == -1) return;
+    if (_selectedNpc == -1)
+        return;
 
     bool added = _added[_selectedNpc];
     if (added && _context.forceNpc1 != _selectedNpc && _context.forceNpc2 != _selectedNpc) {
@@ -343,7 +343,8 @@ void PartySelection::changeParty() {
     shared_ptr<Creature> player(_game->party().player());
 
     for (int i = 0; i < kNpcCount; ++i) {
-        if (!_added[i]) continue;
+        if (!_added[i])
+            continue;
 
         string blueprintResRef(party.getAvailableMember(i));
 

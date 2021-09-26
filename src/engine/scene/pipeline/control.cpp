@@ -26,8 +26,8 @@
 #include "../../graphics/texture/textures.h"
 #include "../../graphics/texture/textureutil.h"
 
-#include "../node/camera.h"
 #include "../graph.h"
+#include "../node/camera.h"
 
 using namespace std;
 

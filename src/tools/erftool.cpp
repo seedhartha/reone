@@ -32,21 +32,21 @@ namespace tools {
 
 void ErfTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     switch (operation) {
-        case Operation::List:
-        case Operation::Extract: {
-            ErfReader erf;
-            erf.load(target);
-            if (operation == Operation::Extract) {
-                extract(erf, destPath);
-            } else {
-                list(erf);
-            }
-            break;
+    case Operation::List:
+    case Operation::Extract: {
+        ErfReader erf;
+        erf.load(target);
+        if (operation == Operation::Extract) {
+            extract(erf, destPath);
+        } else {
+            list(erf);
         }
-        case Operation::ToERF:
-        case Operation::ToMOD:
-            toERF(operation, target);
-            break;
+        break;
+    }
+    case Operation::ToERF:
+    case Operation::ToMOD:
+        toERF(operation, target);
+        break;
     }
 }
 
@@ -84,13 +84,15 @@ void ErfTool::toERF(Operation operation, const fs::path &target) {
 
     for (auto &entry : fs::directory_iterator(target)) {
         fs::path path(entry);
-        if (fs::is_directory(path)) continue;
+        if (fs::is_directory(path))
+            continue;
 
         string ext(path.extension().string());
         ext.erase(0, 1);
 
         ResourceType resType = getResTypeByExt(ext, false);
-        if (resType == ResourceType::Invalid) continue;
+        if (resType == ResourceType::Invalid)
+            continue;
 
         fs::ifstream in(path, ios::binary);
         in.seekg(0, ios::end);
@@ -128,19 +130,18 @@ void ErfTool::toERF(Operation operation, const fs::path &target) {
 
 bool ErfTool::supports(Operation operation, const fs::path &target) const {
     switch (operation) {
-        case Operation::List:
-        case Operation::Extract: {
-            string ext(target.extension().string());
-            return
-                !fs::is_directory(target) &&
-                (ext == ".erf" || ext == ".mod" || ext == ".sav");
-        }
-        case Operation::ToERF:
-        case Operation::ToMOD:
-            return fs::is_directory(target);
+    case Operation::List:
+    case Operation::Extract: {
+        string ext(target.extension().string());
+        return !fs::is_directory(target) &&
+               (ext == ".erf" || ext == ".mod" || ext == ".sav");
+    }
+    case Operation::ToERF:
+    case Operation::ToMOD:
+        return fs::is_directory(target);
 
-        default:
-            return false;
+    default:
+        return false;
     }
 }
 

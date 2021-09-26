@@ -28,15 +28,15 @@ namespace resource {
 class KeyReader : public BinaryReader {
 public:
     struct FileEntry {
-        uint32_t fileSize { 0 };
+        uint32_t fileSize {0};
         std::string filename;
     };
 
     struct KeyEntry {
         std::string resRef;
-        ResourceType resType { ResourceType::Invalid };
-        int bifIdx { 0 };
-        int resIdx { 0 };
+        ResourceType resType {ResourceType::Invalid};
+        int bifIdx {0};
+        int resIdx {0};
     };
 
     KeyReader();
@@ -48,10 +48,10 @@ public:
     const std::vector<KeyEntry> &keys() const { return _keys; }
 
 private:
-    int _bifCount { 0 };
-    int _keyCount { 0 };
-    uint32_t _filesOffset { 0 };
-    uint32_t _keysOffset { 0 };
+    int _bifCount {0};
+    int _keyCount {0};
+    uint32_t _filesOffset {0};
+    uint32_t _keysOffset {0};
     std::vector<FileEntry> _files;
     std::vector<KeyEntry> _keys;
 

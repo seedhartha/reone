@@ -32,8 +32,7 @@ ModelNode::ModelNode(
     string name,
     glm::vec3 restPosition,
     glm::quat restOrientation,
-    const ModelNode *parent
-) :
+    const ModelNode *parent) :
     _name(move(name)),
     _restPosition(move(restPosition)),
     _restOrientation(move(restOrientation)),
@@ -73,7 +72,8 @@ void ModelNode::addChild(std::shared_ptr<ModelNode> child) {
 
 bool ModelNode::getPosition(int leftFrameIdx, int rightFrameIdx, float factor, glm::vec3 &position) const {
     if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_position.getNumFrames()) ||
-        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_position.getNumFrames())) return false;
+        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_position.getNumFrames()))
+        return false;
 
     if (leftFrameIdx == rightFrameIdx) {
         position = _position.getByFrame(leftFrameIdx);
@@ -89,7 +89,8 @@ bool ModelNode::getPosition(int leftFrameIdx, int rightFrameIdx, float factor, g
 
 bool ModelNode::getOrientation(int leftFrameIdx, int rightFrameIdx, float factor, glm::quat &orientation) const {
     if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_orientation.getNumFrames()) ||
-        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_orientation.getNumFrames())) return false;
+        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_orientation.getNumFrames()))
+        return false;
 
     if (leftFrameIdx == rightFrameIdx) {
         orientation = _orientation.getByFrame(leftFrameIdx);
@@ -105,7 +106,8 @@ bool ModelNode::getOrientation(int leftFrameIdx, int rightFrameIdx, float factor
 
 bool ModelNode::getScale(int leftFrameIdx, int rightFrameIdx, float factor, float &scale) const {
     if (leftFrameIdx < 0 || leftFrameIdx >= static_cast<int>(_scale.getNumFrames()) ||
-        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_scale.getNumFrames())) return false;
+        rightFrameIdx < 0 || rightFrameIdx >= static_cast<int>(_scale.getNumFrames()))
+        return false;
 
     if (leftFrameIdx == rightFrameIdx) {
         scale = _scale.getByFrame(leftFrameIdx);
@@ -120,7 +122,8 @@ bool ModelNode::getScale(int leftFrameIdx, int rightFrameIdx, float factor, floa
 }
 
 vector<uint32_t> ModelNode::getFacesByMaterial(uint32_t material) const {
-    if (!_mesh || _mesh->materialFaces.count(material) == 0) return vector<uint32_t>();
+    if (!_mesh || _mesh->materialFaces.count(material) == 0)
+        return vector<uint32_t>();
 
     return _mesh->materialFaces.find(material)->second;
 }

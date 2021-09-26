@@ -25,7 +25,8 @@ namespace game {
 
 class SpellImmunityEffect : public Effect {
 public:
-    SpellImmunityEffect() : Effect(EffectType::SpellImmunity) {
+    SpellImmunityEffect() :
+        Effect(EffectType::SpellImmunity) {
     }
 
     void applyTo(SpatialObject &object) override;

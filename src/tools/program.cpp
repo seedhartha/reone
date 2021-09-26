@@ -33,21 +33,20 @@ namespace po = boost::program_options;
 namespace reone {
 
 static const unordered_map<string, Operation> g_operations {
-    { "list", Operation::List },
-    { "extract", Operation::Extract },
-    { "unwrap", Operation::Unwrap },
-    { "to-json", Operation::ToJSON },
-    { "to-tga", Operation::ToTGA },
-    { "to-2da", Operation::To2DA },
-    { "to-gff", Operation::ToGFF },
-    { "to-rim", Operation::ToRIM },
-    { "to-erf", Operation::ToERF },
-    { "to-mod", Operation::ToMOD },
-    { "to-pth", Operation::ToPTH },
-    { "to-ascii", Operation::ToASCII },
-    { "to-tlk", Operation::ToTLK },
-    { "to-lip", Operation::ToLIP }
-};
+    {"list", Operation::List},
+    {"extract", Operation::Extract},
+    {"unwrap", Operation::Unwrap},
+    {"to-json", Operation::ToJSON},
+    {"to-tga", Operation::ToTGA},
+    {"to-2da", Operation::To2DA},
+    {"to-gff", Operation::ToGFF},
+    {"to-rim", Operation::ToRIM},
+    {"to-erf", Operation::ToERF},
+    {"to-mod", Operation::ToMOD},
+    {"to-pth", Operation::ToPTH},
+    {"to-ascii", Operation::ToASCII},
+    {"to-tlk", Operation::ToTLK},
+    {"to-lip", Operation::ToLIP}};
 
 static fs::path getDestination(const po::variables_map &vars) {
     fs::path result;
@@ -68,42 +67,25 @@ int Program::run() {
     loadTools();
 
     switch (_operation) {
-        case Operation::None:
-            cout << _optsCmdLine << endl;
-            break;
-        default: {
-            auto tool = getTool();
-            if (tool) {
-                tool->invoke(_operation, _target, _gamePath, _destPath);
-            } else {
-                cout << "Unable to choose a tool for the specified operation" << endl;
-            }
-            break;
+    case Operation::None:
+        cout << _optsCmdLine << endl;
+        break;
+    default: {
+        auto tool = getTool();
+        if (tool) {
+            tool->invoke(_operation, _target, _gamePath, _destPath);
+        } else {
+            cout << "Unable to choose a tool for the specified operation" << endl;
         }
+        break;
+    }
     }
 
     return 0;
 }
 
 void Program::initOptions() {
-    _optsCmdLine.add_options()
-        ("game", po::value<string>(), "path to game directory")
-        ("dest", po::value<string>(), "path to destination directory")
-        ("list", "list file contents")
-        ("extract", "extract file contents")
-        ("unwrap", "unwrap an audio file")
-        ("to-json", "convert 2DA, GFF or TLK file to JSON")
-        ("to-tga", "convert TPC image to TGA")
-        ("to-2da", "convert JSON to 2DA")
-        ("to-gff", "convert JSON to GFF")
-        ("to-rim", "create RIM archive from directory")
-        ("to-erf", "create ERF archive from directory")
-        ("to-mod", "create MOD archive from directory")
-        ("to-pth", "convert ASCII PTH to binary PTH")
-        ("to-ascii", "convert binary PTH to ASCII")
-        ("to-tlk", "convert JSON to TLK")
-        ("to-lip", "convert JSON to LIP")
-        ("target", po::value<string>(), "target name or path to input file");
+    _optsCmdLine.add_options()("game", po::value<string>(), "path to game directory")("dest", po::value<string>(), "path to destination directory")("list", "list file contents")("extract", "extract file contents")("unwrap", "unwrap an audio file")("to-json", "convert 2DA, GFF or TLK file to JSON")("to-tga", "convert TPC image to TGA")("to-2da", "convert JSON to 2DA")("to-gff", "convert JSON to GFF")("to-rim", "create RIM archive from directory")("to-erf", "create ERF archive from directory")("to-mod", "create MOD archive from directory")("to-pth", "convert ASCII PTH to binary PTH")("to-ascii", "convert binary PTH to ASCII")("to-tlk", "convert JSON to TLK")("to-lip", "convert JSON to LIP")("target", po::value<string>(), "target name or path to input file");
 }
 
 void Program::parseOptions() {
@@ -111,10 +93,10 @@ void Program::parseOptions() {
     positional.add("target", 1);
 
     po::parsed_options parsedCmdLineOpts = po::command_line_parser(_argc, _argv)
-        .options(_optsCmdLine)
-        .allow_unregistered()
-        .positional(positional)
-        .run();
+                                               .options(_optsCmdLine)
+                                               .allow_unregistered()
+                                               .positional(positional)
+                                               .run();
 
     po::store(parsedCmdLineOpts, _variables);
     po::notify(_variables);
@@ -153,7 +135,8 @@ void Program::loadTools() {
 
 shared_ptr<ITool> Program::getTool() const {
     for (auto &tool : _tools) {
-        if (tool->supports(_operation, _target)) return tool;
+        if (tool->supports(_operation, _target))
+            return tool;
     }
     return nullptr;
 }

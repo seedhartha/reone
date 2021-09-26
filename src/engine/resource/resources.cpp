@@ -22,13 +22,13 @@
 #include "../common/streamutil.h"
 
 #include "2da.h"
-#include "gffstruct.h"
+#include "folder.h"
 #include "format/2dareader.h"
 #include "format/bifreader.h"
 #include "format/erfreader.h"
 #include "format/gffreader.h"
 #include "format/rimreader.h"
-#include "folder.h"
+#include "gffstruct.h"
 #include "keybifprovider.h"
 #include "resourceprovider.h"
 #include "typeutil.h"
@@ -42,7 +42,8 @@ namespace reone {
 namespace resource {
 
 void Resources::indexKeyFile(const fs::path &path) {
-    if (!fs::exists(path)) return;
+    if (!fs::exists(path))
+        return;
 
     auto keyBif = make_unique<KeyBifResourceProvider>();
     keyBif->init(path);
@@ -53,7 +54,8 @@ void Resources::indexKeyFile(const fs::path &path) {
 }
 
 void Resources::indexErfFile(const fs::path &path, bool transient) {
-    if (!fs::exists(path)) return;
+    if (!fs::exists(path))
+        return;
 
     auto erf = make_unique<ErfReader>();
     erf->load(path);
@@ -68,7 +70,8 @@ void Resources::indexErfFile(const fs::path &path, bool transient) {
 }
 
 void Resources::indexRimFile(const fs::path &path, bool transient) {
-    if (!fs::exists(path)) return;
+    if (!fs::exists(path))
+        return;
 
     auto rim = make_unique<RimReader>();
     rim->load(path);
@@ -83,7 +86,8 @@ void Resources::indexRimFile(const fs::path &path, bool transient) {
 }
 
 void Resources::indexDirectory(const fs::path &path) {
-    if (!fs::exists(path)) return;
+    if (!fs::exists(path))
+        return;
 
     auto folder = make_unique<Folder>();
     folder->load(path);
@@ -94,7 +98,8 @@ void Resources::indexDirectory(const fs::path &path) {
 }
 
 void Resources::indexExeFile(const fs::path &path) {
-    if (!fs::exists(path)) return;
+    if (!fs::exists(path))
+        return;
 
     _exeFile.load(path);
 
@@ -114,18 +119,21 @@ void Resources::clearTransientProviders() {
 template <class T>
 static shared_ptr<T> getResource(const string &key, unordered_map<string, shared_ptr<T>> &cache, const function<shared_ptr<T>()> &getter) {
     auto maybeResource = cache.find(key);
-    if (maybeResource != cache.end()) return maybeResource->second;
+    if (maybeResource != cache.end())
+        return maybeResource->second;
 
     auto inserted = cache.insert(make_pair(key, getter()));
     return inserted.first->second;
 }
 
 shared_ptr<ByteArray> Resources::getRaw(const string &resRef, ResourceType type, bool logNotFound) {
-    if (resRef.empty()) return nullptr;
+    if (resRef.empty())
+        return nullptr;
 
     string cacheKey(getCacheKey(resRef, type));
     auto res = _rawCache.find(cacheKey);
-    if (res != _rawCache.end()) return res->second;
+    if (res != _rawCache.end())
+        return res->second;
 
     shared_ptr<ByteArray> data = doGetRaw(_transientProviders, resRef, type);
     if (!data) {
@@ -160,10 +168,12 @@ shared_ptr<TwoDA> Resources::get2DA(const string &resRef, bool logNotFound) {
 
 shared_ptr<ByteArray> Resources::doGetRaw(const vector<unique_ptr<IResourceProvider>> &providers, const string &resRef, ResourceType type) {
     for (auto provider = providers.rbegin(); provider != providers.rend(); ++provider) {
-        if (!(*provider)->supports(type)) continue;
+        if (!(*provider)->supports(type))
+            continue;
 
         shared_ptr<ByteArray> data((*provider)->find(resRef, type));
-        if (data) return data;
+        if (data)
+            return data;
     }
 
     return nullptr;

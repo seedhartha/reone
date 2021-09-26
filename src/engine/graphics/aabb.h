@@ -53,11 +53,11 @@ public:
     const glm::mat4 &transform() const { return _transform; }
 
 private:
-    bool _empty { true };
-    glm::vec3 _min { 0.0f };
-    glm::vec3 _max { 0.0f };
-    glm::vec3 _center { 0.0f };
-    glm::mat4 _transform { 1.0f };
+    bool _empty {true};
+    glm::vec3 _min {0.0f};
+    glm::vec3 _max {0.0f};
+    glm::vec3 _center {0.0f};
+    glm::mat4 _transform {1.0f};
 
     void updateTransform();
 };

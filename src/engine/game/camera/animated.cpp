@@ -31,7 +31,8 @@ namespace reone {
 
 namespace game {
 
-AnimatedCamera::AnimatedCamera(float aspect, SceneGraph *sceneGraph) : _sceneGraph(sceneGraph), _aspect(aspect) {
+AnimatedCamera::AnimatedCamera(float aspect, SceneGraph *sceneGraph) :
+    _sceneGraph(sceneGraph), _aspect(aspect) {
     _sceneGraph = sceneGraph;
     _sceneNode = _sceneGraph->newCamera("", glm::mat4(1.0f));
     updateProjection();
@@ -72,7 +73,8 @@ bool AnimatedCamera::isAnimationFinished() const {
 
 void AnimatedCamera::setModel(shared_ptr<Model> model) {
     if ((_model && _model->model() == model) ||
-        (!_model && !model)) return;
+        (!_model && !model))
+        return;
 
     if (model) {
         _model = _sceneGraph->newModel(move(model), ModelUsage::Camera);

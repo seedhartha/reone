@@ -27,12 +27,10 @@ int main(int argc, char **argv) {
     setThreadName("main");
     try {
         return Engine(argc, argv).run();
-    }
-    catch (const exception &ex) {
+    } catch (const exception &ex) {
         try {
             error("Program terminated exceptionally: " + string(ex.what()));
-        }
-        catch (...) {
+        } catch (...) {
         }
         return 1;
     }

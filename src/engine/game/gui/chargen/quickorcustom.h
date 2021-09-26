@@ -27,7 +27,7 @@ class Button;
 class Label;
 class ListBox;
 
-}
+} // namespace gui
 
 namespace game {
 
@@ -48,7 +48,7 @@ private:
         std::shared_ptr<gui::ListBox> lbDesc;
     } _binding;
 
-    CharacterGeneration *_charGen { nullptr };
+    CharacterGeneration *_charGen {nullptr};
 
     void bindControls();
 };

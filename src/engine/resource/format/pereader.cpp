@@ -28,7 +28,8 @@ namespace resource {
 static constexpr int kNameMaskString = 0x80000000;
 static constexpr int kSiblingMaskDir = 0x80000000;
 
-PEReader::PEReader() : BinaryReader(2, "MZ") {
+PEReader::PEReader() :
+    BinaryReader(2, "MZ") {
 }
 
 shared_ptr<ByteArray> PEReader::find(uint32_t name, PEResourceType type) {
@@ -39,7 +40,8 @@ shared_ptr<ByteArray> PEReader::find(uint32_t name, PEResourceType type) {
 
 shared_ptr<ByteArray> PEReader::findInternal(function<bool(const Resource &)> pred) {
     auto maybeResource = find_if(_resources.begin(), _resources.end(), pred);
-    if (maybeResource == _resources.end()) return nullptr;
+    if (maybeResource == _resources.end())
+        return nullptr;
 
     return getResourceData(*maybeResource);
 }
@@ -98,7 +100,7 @@ void PEReader::loadSection() {
 
     ignore(16);
 
-    _sections.push_back({ name, virtAddr, offRaw });
+    _sections.push_back({name, virtAddr, offRaw});
 }
 
 void PEReader::loadResourceDir(const Section &section, int level) {
@@ -117,17 +119,17 @@ void PEReader::loadResourceDirEntry(const Section &section, int level) {
     uint32_t name = readUint32();
 
     switch (level) {
-        case 0:
-            _currentType = static_cast<PEResourceType>(name);
-            break;
-        case 1:
-            _currentName = name;
-            break;
-        case 2:
-            _currentLangId = name;
-            break;
-        default:
-            break;
+    case 0:
+        _currentType = static_cast<PEResourceType>(name);
+        break;
+    case 1:
+        _currentName = name;
+        break;
+    case 2:
+        _currentLangId = name;
+        break;
+    default:
+        break;
     }
 
     uint32_t sibling = readUint32();
