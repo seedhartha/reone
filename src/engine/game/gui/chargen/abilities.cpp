@@ -17,7 +17,6 @@
 
 #include "abilities.h"
 
-#include "../../../di/services/resource.h"
 #include "../../../gui/control/listbox.h"
 #include "../../../resource/strings.h"
 
@@ -104,7 +103,7 @@ void CharGenAbilities::load() {
     });
     _binding.btnRecommended->setOnClick([this]() {
         ClassType classType = _charGen->character().attributes.getEffectiveClass();
-        shared_ptr<CreatureClass> clazz(_game->services().classes().get(classType));
+        shared_ptr<CreatureClass> clazz(_game->classes().get(classType));
         _attributes = clazz->defaultAttributes();
         _points = 0;
         refreshControls();
@@ -276,7 +275,7 @@ void CharGenAbilities::onAbilityLabelFocusChanged(Ability ability, bool focus) {
     auto maybeDescription = g_descStrRefByAbility.find(ability);
     if (maybeDescription == g_descStrRefByAbility.end()) return;
 
-    string description(_game->services().resource().strings().get(maybeDescription->second));
+    string description(_game->strings().get(maybeDescription->second));
     _binding.lbDesc->clearItems();
     _binding.lbDesc->addTextLinesAsItems(description);
 }

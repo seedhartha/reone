@@ -19,8 +19,6 @@
 
 #include "../../audio/player.h"
 #include "../../common/logutil.h"
-#include "../../di/services/graphics.h"
-#include "../../di/services/resource.h"
 #include "../../gui/scenebuilder.h"
 #include "../../graphics/model/models.h"
 #include "../../resource/resources.h"
@@ -171,7 +169,7 @@ void MainMenu::setup3DView() {
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
-    auto model = make_shared<ModelSceneNode>(_game->services().graphics().models().get("mainmenu"), ModelUsage::GUI, &sceneGraph);
+    auto model = make_shared<ModelSceneNode>(_game->models().get("mainmenu"), ModelUsage::GUI, &sceneGraph);
     model->playAnimation("default", AnimationProperties::fromFlags(AnimationFlags::loop));
     return move(model);
 }
@@ -217,7 +215,7 @@ void MainMenu::onModuleSelected(const string &name) {
         member1Blueprint = kBlueprintResRefCarth;
         member2Blueprint = kBlueprintResRefBastila;
     }
-    shared_ptr<TwoDA> defaultParty(_game->services().resource().resources().get2DA("defaultparty"));
+    shared_ptr<TwoDA> defaultParty(_game->resources().get2DA("defaultparty"));
     if (defaultParty) {
         for (int row = 0; row < defaultParty->getRowCount(); ++row) {
             if (defaultParty->getBool(row, "tsl") == _game->isTSL()) {
@@ -229,9 +227,9 @@ void MainMenu::onModuleSelected(const string &name) {
         }
     }
 
-    Party &party = _game->services().party();
+    Party &party = _game->party();
     if (!member1Blueprint.empty()) {
-        shared_ptr<Creature> player(_game->services().objectFactory().newCreature());
+        shared_ptr<Creature> player(_game->objectFactory().newCreature());
         player->loadFromBlueprint(member1Blueprint);
         player->setTag(kObjectTagPlayer);
         player->setImmortal(true);
@@ -239,13 +237,13 @@ void MainMenu::onModuleSelected(const string &name) {
         party.setPlayer(player);
     }
     if (!member2Blueprint.empty()) {
-        shared_ptr<Creature> companion(_game->services().objectFactory().newCreature());
+        shared_ptr<Creature> companion(_game->objectFactory().newCreature());
         companion->loadFromBlueprint(member2Blueprint);
         companion->setImmortal(true);
         party.addMember(0, companion);
     }
     if (!member3Blueprint.empty()) {
-        shared_ptr<Creature> companion(_game->services().objectFactory().newCreature());
+        shared_ptr<Creature> companion(_game->objectFactory().newCreature());
         companion->loadFromBlueprint(member3Blueprint);
         companion->setImmortal(true);
         party.addMember(1, companion);

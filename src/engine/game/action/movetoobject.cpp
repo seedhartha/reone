@@ -29,7 +29,7 @@ namespace game {
 void MoveToObjectAction::execute(Object &actor, float dt) {
     auto object = static_pointer_cast<SpatialObject>(_object);
     glm::vec3 dest(object->position());
-    auto creatureActor = _game.services().objectFactory().getObjectById<Creature>(actor.id());
+    auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
 
     bool reached = creatureActor->navigateTo(dest, _run, _distance, dt);
     if (reached) {

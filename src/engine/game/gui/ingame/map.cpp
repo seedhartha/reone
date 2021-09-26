@@ -17,7 +17,6 @@
 
 #include "map.h"
 
-#include "../../../di/services/resource.h"
 #include "../../../resource/strings.h"
 
 #include "../../game.h"
@@ -118,7 +117,7 @@ void MapMenu::refreshSelectedNote() {
     if (!_notes.empty()) {
         note = _notes[_selectedNoteIdx];
 
-        string text(_game->services().resource().strings().get(kStrRefMapNote));
+        string text(_game->strings().get(kStrRefMapNote));
         text += ": ";
         text += note->mapNote();
 

@@ -34,11 +34,11 @@ void AttackAction::execute(Object &actor, float dt) {
         return;
     }
 
-    auto creatureActor = _game.services().objectFactory().getObjectById<Creature>(actor.id());
+    auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
 
     // Make the actor follow its target. When reached, register an attack
     if (creatureActor->navigateTo(target->position(), true, _range, dt)) {
-        _game.services().combat().addAttack(move(creatureActor), move(target), this);
+        _game.combat().addAttack(move(creatureActor), move(target), this);
     }
 }
 

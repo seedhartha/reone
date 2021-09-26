@@ -25,9 +25,9 @@
 
 namespace reone {
 
-namespace di {
+namespace resource {
 
-class ResourceServices;
+class Resources;
 
 }
 
@@ -35,10 +35,19 @@ namespace game {
 
 class Classes : public MemoryCache<ClassType, CreatureClass> {
 public:
-    Classes(di::ResourceServices &resource);
+    Classes(resource::Resources &resources, resource::Strings &strings) :
+        MemoryCache(std::bind(&Classes::doGet, this, std::placeholders::_1)),
+        _resources(resources),
+        _strings(strings) {
+    }
 
 private:
-    di::ResourceServices &_resource;
+    // Services
+
+    resource::Resources &_resources;
+    resource::Strings &_strings;
+
+    // END Services
 
     std::shared_ptr<CreatureClass> doGet(ClassType type);
 };

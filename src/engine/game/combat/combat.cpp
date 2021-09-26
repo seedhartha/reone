@@ -19,13 +19,11 @@
 
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
-#include "../../di/services/scene.h"
 
 #include "../game.h"
 
 using namespace std;
 
-using namespace reone::di;
 using namespace reone::graphics;
 using namespace reone::scene;
 
@@ -39,9 +37,6 @@ static constexpr float kDeactivateDelay = 8.0f;
 
 static constexpr char kModelEventDetonate[] = "detonate";
 static constexpr float kProjectileSpeed = 16.0f;
-
-Combat::Combat(Game &game, SceneServices &scene) : _game(game), _scene(scene) {
-}
 
 static unique_ptr<Combat::Attack> makeAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, ObjectAction *action, AttackResultType resultType, int damage) {
     auto attack = make_unique<Combat::Attack>();
@@ -353,7 +348,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
                     attack.target->applyEffect(effect, DurationType::Instant);
                 }
             } else {
-                shared_ptr<DamageEffect> effect(_game.services().effectFactory().newDamage(attack.damage, DamageType::Universal, attack.attacker));
+                shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(attack.damage, DamageType::Universal, attack.attacker));
                 attack.target->applyEffect(move(effect), DurationType::Instant);
             }
             break;
@@ -366,7 +361,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
                     attack.target->applyEffect(effect, DurationType::Instant);
                 }
             } else {
-                shared_ptr<DamageEffect> effect(_game.services().effectFactory().newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, attack.attacker));
+                shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, attack.attacker));
                 attack.target->applyEffect(move(effect), DurationType::Instant);
             }
             break;
@@ -388,7 +383,7 @@ vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> d
         type = static_cast<DamageType>(weapon->damageFlags());
     }
     amount = glm::max(1, amount);
-    shared_ptr<DamageEffect> effect(_game.services().effectFactory().newDamage(multiplier * amount, type, move(damager)));
+    shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(multiplier * amount, type, move(damager)));
 
     return vector<shared_ptr<DamageEffect>> { move(effect) };
 }
@@ -427,10 +422,10 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
     round.projectileDir = glm::normalize(projectileTarget - projectilePos);
 
     // Create and add a projectile to the scene graph
-    round.projectile = make_shared<ModelSceneNode>(ammunitionType->model, ModelUsage::Projectile, &_scene.graph());
+    round.projectile = make_shared<ModelSceneNode>(ammunitionType->model, ModelUsage::Projectile, &_sceneGraph);
     round.projectile->signalEvent(kModelEventDetonate);
     round.projectile->setLocalTransform(glm::translate(projectilePos));
-    _scene.graph().addRoot(round.projectile);
+    _sceneGraph.addRoot(round.projectile);
 
     // Play shot sound, if any
     weapon->playShotSound(0, projectilePos);
@@ -451,7 +446,7 @@ void Combat::updateProjectile(Round &round, float dt) {
 
 void Combat::resetProjectile(Round &round) {
     if (round.projectile) {
-        _scene.graph().removeRoot(round.projectile);
+        _sceneGraph.removeRoot(round.projectile);
         round.projectile.reset();
     }
 }

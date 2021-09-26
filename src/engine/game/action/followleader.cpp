@@ -24,8 +24,8 @@ namespace reone {
 namespace game {
 
 void FollowLeaderAction::execute(Object &actor, float dt) {
-    auto creatureActor = _game.services().objectFactory().getObjectById<Creature>(actor.id());
-    glm::vec3 destination(_game.services().party().getLeader()->position());
+    auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
+    glm::vec3 destination(_game.party().getLeader()->position());
     float distance2 = creatureActor->getDistanceTo2(glm::vec2(destination));
     bool run = distance2 > kDistanceWalk;
 

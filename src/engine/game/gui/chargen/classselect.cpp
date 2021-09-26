@@ -18,8 +18,6 @@
 #include "classselect.h"
 
 #include "../../../common/randomutil.h"
-#include "../../../di/services/graphics.h"
-#include "../../../di/services/resource.h"
 #include "../../../gui/scenebuilder.h"
 #include "../../../graphics/model/models.h"
 #include "../../../resource/strings.h"
@@ -117,7 +115,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     Character character;
     character.gender = gender;
     character.appearance = appearance;
-    character.attributes = _game->services().classes().get(clazz)->defaultAttributes();
+    character.attributes = _game->classes().get(clazz)->defaultAttributes();
 
     // Button control
 
@@ -190,7 +188,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
 vector<Portrait> ClassSelection::getPCPortraitsByGender(Gender gender) {
     vector<Portrait> result;
     int sex = gender == Gender::Female ? 1 : 0;
-    for (auto &portrait : _game->services().portraits().portraits()) {
+    for (auto &portrait : _game->portraits().portraits()) {
         if (portrait.forPC && portrait.sex == sex) {
             result.push_back(portrait);
         }
@@ -232,7 +230,7 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, Sce
     character->sceneNode()->setCullable(false);
     character->updateModelAnimation();
 
-    auto model = make_shared<ModelSceneNode>(_game->services().graphics().models().get("cgbody_light"), ModelUsage::GUI, &sceneGraph);
+    auto model = make_shared<ModelSceneNode>(_game->models().get("cgbody_light"), ModelUsage::GUI, &sceneGraph);
     model->attach("cgbody_light", character->sceneNode());
 
     return move(model);
@@ -266,11 +264,11 @@ void ClassSelection::onClassButtonFocusChanged(int index, bool focus) {
     ClassButton &button = _classButtons[index];
     ClassType clazz = button.character.attributes.getEffectiveClass();
 
-    string classText(_game->services().resource().strings().get(g_genderStrRefs[button.character.gender]));
-    classText += " " + _game->services().classes().get(clazz)->name();
+    string classText(_game->strings().get(g_genderStrRefs[button.character.gender]));
+    classText += " " + _game->classes().get(clazz)->name();
     _binding.lblClass->setTextMessage(classText);
 
-    string descText(_game->services().resource().strings().get(g_classDescStrRefs[clazz]));
+    string descText(_game->strings().get(g_classDescStrRefs[clazz]));
     _binding.lblDesc->setTextMessage(descText);
 }
 

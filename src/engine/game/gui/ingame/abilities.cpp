@@ -17,8 +17,6 @@
 
 #include "abilities.h"
 
-#include "../../../di/services/graphics.h"
-#include "../../../di/services/resource.h"
 #include "../../../gui/control/listbox.h"
 #include "../../../graphics/texture/textures.h"
 #include "../../../resource/resources.h"
@@ -55,9 +53,9 @@ void AbilitiesMenu::load() {
     _binding.btnPowers->setDisabled(true);
     _binding.btnFeats->setDisabled(true);
 
-    _binding.lblSkillRank->setTextMessage(_game->services().resource().strings().get(kStrRefSkillRank));
-    _binding.lblBonus->setTextMessage(_game->services().resource().strings().get(kStrRefBonus));
-    _binding.lblTotal->setTextMessage(_game->services().resource().strings().get(kStrRefTotalRank));
+    _binding.lblSkillRank->setTextMessage(_game->strings().get(kStrRefSkillRank));
+    _binding.lblBonus->setTextMessage(_game->strings().get(kStrRefBonus));
+    _binding.lblTotal->setTextMessage(_game->strings().get(kStrRefTotalRank));
     _binding.lblRankVal->setTextMessage("");
     _binding.lblBonusVal->setTextMessage("");
     _binding.lblTotalVal->setTextMessage("");
@@ -69,7 +67,7 @@ void AbilitiesMenu::load() {
         auto maybeSkillInfo = _skills.find(skill);
         if (maybeSkillInfo == _skills.end()) return;
 
-        shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
+        shared_ptr<Creature> partyLeader(_game->party().getLeader());
 
         _binding.lblRankVal->setTextMessage(to_string(partyLeader->attributes().getSkillRank(skill)));
         _binding.lblBonusVal->setTextMessage("0");
@@ -120,15 +118,15 @@ void AbilitiesMenu::bindControls() {
 }
 
 void AbilitiesMenu::loadSkills() {
-    shared_ptr<TwoDA> skills(_game->services().resource().resources().get2DA("skills"));
+    shared_ptr<TwoDA> skills(_game->resources().get2DA("skills"));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         auto skill = static_cast<SkillType>(row);
 
         SkillInfo skillInfo;
         skillInfo.skill = skill;
-        skillInfo.name = _game->services().resource().strings().get(skills->getInt(row, "name"));
-        skillInfo.description = _game->services().resource().strings().get(skills->getInt(row, "description"));
-        skillInfo.icon = _game->services().graphics().textures().get(skills->getString(row, "icon"), TextureUsage::GUI);
+        skillInfo.name = _game->strings().get(skills->getInt(row, "name"));
+        skillInfo.description = _game->strings().get(skills->getInt(row, "description"));
+        skillInfo.icon = _game->textures().get(skills->getString(row, "icon"), TextureUsage::GUI);
 
         _skills.insert(make_pair(skill, move(skillInfo)));
     }
@@ -151,7 +149,7 @@ shared_ptr<Texture> AbilitiesMenu::getFrameTexture() const {
     } else {
         resRef = "lbl_hex_3";
     }
-    return _game->services().graphics().textures().get(resRef, TextureUsage::GUI);
+    return _game->textures().get(resRef, TextureUsage::GUI);
 }
 
 void AbilitiesMenu::refreshControls() {
@@ -161,7 +159,7 @@ void AbilitiesMenu::refreshControls() {
 void AbilitiesMenu::refreshPortraits() {
     if (_game->id() != GameID::KotOR) return;
 
-    Party &party = _game->services().party();
+    Party &party = _game->party();
     shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));

@@ -19,7 +19,6 @@
 
 #include "../../../common/collectionutil.h"
 #include "../../../common/randomutil.h"
-#include "../../../di/services/graphics.h"
 #include "../../../gui/scenebuilder.h"
 #include "../../../graphics/model/models.h"
 #include "../../../graphics/texture/textures.h"
@@ -155,7 +154,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
     if (cameraHook) {
         creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->absoluteTransform()[3].z));
     }
-    auto model = make_shared<ModelSceneNode>(_game->services().graphics().models().get("cghead_light"), ModelUsage::GUI, &sceneGraph);
+    auto model = make_shared<ModelSceneNode>(_game->models().get("cghead_light"), ModelUsage::GUI, &sceneGraph);
     model->attach("cghead_light", creatureModel);
 
     return move(model);
@@ -175,7 +174,7 @@ int PortraitSelection::getAppearanceFromCurrentPortrait() const {
 void PortraitSelection::updatePortraits() {
     _portraits.clear();
     int sex = _charGen->character().gender == Gender::Female ? 1 : 0;
-    for (auto &portrait : _game->services().portraits().portraits()) {
+    for (auto &portrait : _game->portraits().portraits()) {
         if (portrait.forPC && portrait.sex == sex) {
             _portraits.push_back(move(portrait));
         }
@@ -202,7 +201,7 @@ void PortraitSelection::resetCurrentPortrait() {
 
 void PortraitSelection::loadCurrentPortrait() {
     string resRef(_portraits[_currentPortrait].resRef);
-    shared_ptr<Texture> portrait(_game->services().graphics().textures().get(resRef, TextureUsage::GUI));
+    shared_ptr<Texture> portrait(_game->textures().get(resRef, TextureUsage::GUI));
     _binding.lblPortrait->setBorderFill(portrait);
 }
 

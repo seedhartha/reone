@@ -17,8 +17,6 @@
 
 #include "equip.h"
 
-#include "../../../di/services/graphics.h"
-#include "../../../di/services/resource.h"
 #include "../../../graphics/texture/textures.h"
 #include "../../../resource/strings.h"
 
@@ -115,7 +113,7 @@ void Equipment::load() {
 
             auto maybeStrRef = g_slotStrRefs.find(slotButton.first);
             if (maybeStrRef != g_slotStrRefs.end()) {
-                slotDesc = _game->services().resource().strings().get(maybeStrRef->second);
+                slotDesc = _game->strings().get(maybeStrRef->second);
             }
 
             _binding.lblSlotName->setTextMessage(slotDesc);
@@ -217,7 +215,7 @@ static int getInventorySlot(Equipment::Slot slot) {
 void Equipment::onItemsListBoxItemClick(const string &item) {
     if (_selectedSlot == Slot::None) return;
 
-    shared_ptr<Creature> player(_game->services().party().player());
+    shared_ptr<Creature> player(_game->party().player());
     shared_ptr<Item> itemObj;
     if (item != "[none]") {
         for (auto &playerItem : player->items()) {
@@ -228,7 +226,7 @@ void Equipment::onItemsListBoxItemClick(const string &item) {
         }
     }
     int slot = getInventorySlot(_selectedSlot);
-    shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     shared_ptr<Item> equipped(partyLeader->getEquippedItem(slot));
 
     if (equipped != itemObj) {
@@ -242,7 +240,7 @@ void Equipment::onItemsListBoxItemClick(const string &item) {
                 if (last) {
                     partyLeader->equip(slot, itemObj);
                 } else {
-                    shared_ptr<Item> clonedItem(_game->services().objectFactory().newItem());
+                    shared_ptr<Item> clonedItem(_game->objectFactory().newItem());
                     clonedItem->loadFromBlueprint(itemObj->blueprintResRef());
                     partyLeader->equip(slot, clonedItem);
                 }
@@ -258,7 +256,7 @@ void Equipment::update() {
     updateEquipment();
     selectSlot(Slot::None);
 
-    auto partyLeader(_game->services().party().getLeader());
+    auto partyLeader(_game->party().getLeader());
 
     if (_game->isKotOR()) {
         string vitalityString(str(boost::format("%d/\n%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
@@ -270,7 +268,7 @@ void Equipment::update() {
 void Equipment::updatePortraits() {
     if (_game->id() != GameID::KotOR) return;
 
-    Party &party = _game->services().party();
+    Party &party = _game->party();
     shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
@@ -308,7 +306,7 @@ void Equipment::selectSlot(Slot slot) {
 }
 
 void Equipment::updateEquipment() {
-    shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     auto &equipment = partyLeader->equipment();
 
     for (auto &lbl : _binding.lblInv) {
@@ -382,7 +380,7 @@ shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) const {
             return nullptr;
     }
 
-    shared_ptr<Texture> texture(_game->services().graphics().textures().get(resRef, TextureUsage::GUI));
+    shared_ptr<Texture> texture(_game->textures().get(resRef, TextureUsage::GUI));
     auto pair = icons.insert(make_pair(slot, texture));
 
     return pair.first->second;
@@ -394,13 +392,13 @@ void Equipment::updateItems() {
     if (_selectedSlot != Slot::None) {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
-        lbItem.text = _game->services().resource().strings().get(kStrRefNone);
-        lbItem.iconTexture = _game->services().graphics().textures().get("inone", TextureUsage::GUI);
+        lbItem.text = _game->strings().get(kStrRefNone);
+        lbItem.iconTexture = _game->textures().get("inone", TextureUsage::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 
         _binding.lbItems->addItem(move(lbItem));
     }
-    shared_ptr<Creature> player(_game->services().party().player());
+    shared_ptr<Creature> player(_game->party().player());
 
     for (auto &item : player->items()) {
         if (_selectedSlot == Slot::None) {
@@ -429,7 +427,7 @@ shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return _game->services().graphics().textures().get(resRef, TextureUsage::GUI);
+    return _game->textures().get(resRef, TextureUsage::GUI);
 }
 
 } // namespace game

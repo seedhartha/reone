@@ -22,7 +22,6 @@
 #include "declarations.h"
 
 #include "../../../../common/logutil.h"
-#include "../../../../di/services/resource.h"
 #include "../../../../script/exception/argument.h"
 #include "../../../../script/exception/notimpl.h"
 
@@ -50,7 +49,7 @@ Variable assignCommand(Game &game, const vector<Variable> &args, ExecutionContex
     auto subject = getObject(game, args, 0, ctx);
     auto action = getAction(args, 1);
 
-    auto objectAction = game.services().actionFactory().newDoCommand(move(action));
+    auto objectAction = game.actionFactory().newDoCommand(move(action));
     subject->addAction(move(objectAction));
 
     return Variable::ofNull();
@@ -60,7 +59,7 @@ Variable delayCommand(Game &game, const vector<Variable> &args, ExecutionContext
     float seconds = getFloat(args, 0);
     auto action = getAction(args, 1);
 
-    auto objectAction = game.services().actionFactory().newDoCommand(move(action));
+    auto objectAction = game.actionFactory().newDoCommand(move(action));
     getCaller(game, ctx)->delayAction(move(objectAction), seconds);
 
     return Variable::ofNull();
@@ -71,7 +70,7 @@ Variable executeScript(Game &game, const vector<Variable> &args, ExecutionContex
     auto target = getObject(game, args, 1, ctx);
     int scriptVar = getIntOrElse(args, 2, -1);
 
-    game.services().scriptRunner().run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
+    game.scriptRunner().run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
 
     return Variable::ofNull();
 }
@@ -607,7 +606,7 @@ Variable getObjectByTag(Game &game, const vector<Variable> &args, ExecutionConte
         object = game.module()->area()->getObjectByTag(tag, nth);
     } else {
         // Apparently, empty tag in this context stands for the player
-        object = game.services().party().player();
+        object = game.party().player();
     }
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
@@ -680,7 +679,7 @@ Variable applyEffectToObject(Game &game, const vector<Variable> &args, Execution
 
 Variable getIsPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto creature = getCreature(game, args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(creature == game.services().party().player()));
+    return Variable::ofInt(static_cast<int>(creature == game.party().player()));
 }
 
 Variable speakString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -775,7 +774,7 @@ Variable getIsEnemy(Game &game, const vector<Variable> &args, ExecutionContext &
     try {
         auto target = getCreature(game, args, 0, ctx);
         auto source = getCreatureOrCaller(game, args, 1, ctx);
-        bool enemy = game.services().reputes().getIsEnemy(*target, *source);
+        bool enemy = game.reputes().getIsEnemy(*target, *source);
 
         return Variable::ofInt(static_cast<int>(enemy));
     }
@@ -788,7 +787,7 @@ Variable getIsFriend(Game &game, const vector<Variable> &args, ExecutionContext 
     try {
         auto target = getCreature(game, args, 0, ctx);
         auto source = getCreatureOrCaller(game, args, 1, ctx);
-        bool isFriend = game.services().reputes().getIsFriend(*target, *source);
+        bool isFriend = game.reputes().getIsFriend(*target, *source);
 
         return Variable::ofInt(static_cast<int>(isFriend));
     }
@@ -801,7 +800,7 @@ Variable getIsNeutral(Game &game, const vector<Variable> &args, ExecutionContext
     try {
         auto target = getCreature(game, args, 0, ctx);
         auto source = getCreatureOrCaller(game, args, 1, ctx);
-        bool neutral = game.services().reputes().getIsNeutral(*target, *source);
+        bool neutral = game.reputes().getIsNeutral(*target, *source);
 
         return Variable::ofInt(static_cast<int>(neutral));
     }
@@ -811,13 +810,13 @@ Variable getIsNeutral(Game &game, const vector<Variable> &args, ExecutionContext
 }
 
 Variable getPCSpeaker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto player = game.services().party().player();
+    auto player = game.party().player();
     return Variable::ofObject(getObjectIdOrInvalid(player));
 }
 
 Variable getStringByStrRef(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int strRef = getInt(args, 0);
-    string str(game.services().resource().strings().get(strRef));
+    string str(game.strings().get(strRef));
 
     return Variable::ofString(move(str));
 }
@@ -1043,7 +1042,7 @@ Variable getIsPlayableRacialType(Game &game, const vector<Variable> &args, Execu
 Variable jumpToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto destination = getLocationEngineType(args, 0);
 
-    auto action = game.services().actionFactory().newJumpToLocation(move(destination));
+    auto action = game.actionFactory().newJumpToLocation(move(destination));
     getCaller(game, ctx)->addActionOnTop(move(action));
 
     return Variable::ofNull();
@@ -1367,7 +1366,7 @@ Variable jumpToObject(Game &game, const vector<Variable> &args, ExecutionContext
     auto jumpTo = getObject(game, args, 0, ctx);
     bool walkStraightLine = getBoolOrElse(args, 1, true);
 
-    auto action = game.services().actionFactory().newJumpToObject(move(jumpTo));
+    auto action = game.actionFactory().newJumpToObject(move(jumpTo));
     getCaller(game, ctx)->addActionOnTop(move(action));
 
     return Variable::ofNull();
@@ -1549,7 +1548,7 @@ Variable setDialogPlaceableCamera(Game &game, const vector<Variable> &args, Exec
 }
 
 Variable getSoloMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<int>(game.services().party().isSoloMode()));
+    return Variable::ofInt(static_cast<int>(game.party().isSoloMode()));
 }
 
 Variable getNumStackedItems(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -1625,7 +1624,7 @@ Variable cutsceneAttack(Game &game, const vector<Variable> &args, ExecutionConte
     auto attackResult = getEnum<AttackResultType>(args, 2);
     int damage = getInt(args, 3);
 
-    game.services().combat().addAttack(caller, target, nullptr, attackResult, damage);
+    game.combat().addAttack(caller, target, nullptr, attackResult, damage);
 
     return Variable::ofNull();
 }
@@ -1813,7 +1812,7 @@ Variable doPlaceableObjectAction(Game &game, const vector<Variable> &args, Execu
 }
 
 Variable getFirstPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto player = game.services().party().player();
+    auto player = game.party().player();
     return Variable::ofObject(getObjectIdOrInvalid(player));
 }
 
@@ -2208,7 +2207,7 @@ Variable getSpellTarget(Game &game, const vector<Variable> &args, ExecutionConte
 
 Variable setSoloMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto activate = getBool(args, 0);
-    game.services().party().setSoloMode(activate);
+    game.party().setSoloMode(activate);
     return Variable::ofNull();
 }
 

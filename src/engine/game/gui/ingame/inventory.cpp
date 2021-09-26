@@ -94,7 +94,7 @@ void InventoryMenu::bindControls() {
 void InventoryMenu::refreshPortraits() {
     if (!_game->isKotOR()) return;
 
-    Party &party = _game->services().party();
+    Party &party = _game->party();
     shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));

@@ -17,13 +17,10 @@
 
 #include "classes.h"
 
-#include "../../di/services/resource.h"
 #include "../../resource/resources.h"
 
 using namespace std;
-using namespace std::placeholders;
 
-using namespace reone::di;
 using namespace reone::resource;
 
 namespace reone {
@@ -32,15 +29,10 @@ namespace game {
 
 static const char kClassesTableResRef[] = "classes";
 
-Classes::Classes(ResourceServices &resource) :
-    MemoryCache(bind(&Classes::doGet, this, _1)),
-    _resource(resource) {
-}
-
 shared_ptr<CreatureClass> Classes::doGet(ClassType type) {
-    shared_ptr<TwoDA> classes(_resource.resources().get2DA(kClassesTableResRef));
+    shared_ptr<TwoDA> classes(_resources.get2DA(kClassesTableResRef));
 
-    auto clazz = make_shared<CreatureClass>(type, *this, _resource);
+    auto clazz = make_shared<CreatureClass>(type, *this, _resources, _strings);
     clazz->load(*classes, static_cast<int>(type));
 
     return move(clazz);

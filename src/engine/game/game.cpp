@@ -118,7 +118,7 @@ void Game::init() {
     _console = make_unique<Console>(*this);
     _console->init();
 
-    _profileOverlay = make_unique<ProfileOverlay>(_graphics);
+    _profileOverlay = make_unique<ProfileOverlay>(_graphics.fonts(), _graphics.meshes(), _graphics.shaders(), _graphics.window());
     _profileOverlay->init();
 
     loadModuleNames();
@@ -1032,6 +1032,74 @@ void Game::loadFromFile(const fs::path &path) {
     for (auto &global : nfoRoot->getList("GlobalLocations")) {
         setGlobalLocation(global->getString("Name"), make_shared<Location>(global->getVector("Position"), global->getFloat("Facing")));
     }
+}
+
+AudioFiles &Game::audioFiles() {
+    return _audio.files();
+}
+
+AudioPlayer &Game::audioPlayer() {
+    return _audio.player();
+}
+
+Context &Game::context() {
+    return _graphics.context();
+}
+
+Features &Game::features() {
+    return _graphics.features();
+}
+
+Fonts &Game::fonts() {
+    return _graphics.fonts();
+}
+
+Lips &Game::lips() {
+    return _graphics.lips();
+}
+
+Materials &Game::materials() {
+    return _graphics.materials();
+}
+
+Meshes &Game::meshes() {
+    return _graphics.meshes();
+}
+
+Models &Game::models() {
+    return _graphics.models();
+}
+
+PBRIBL &Game::pbrIbl() {
+    return _graphics.pbrIbl();
+}
+
+Shaders &Game::shaders() {
+    return _graphics.shaders();
+}
+
+Textures &Game::textures() {
+    return _graphics.textures();
+}
+
+Walkmeshes &Game::walkmeshes() {
+    return _graphics.walkmeshes();
+}
+
+Window &Game::window() {
+    return _graphics.window();
+}
+
+SceneGraph &Game::sceneGraph() {
+    return _scene.graph();
+}
+
+Resources &Game::resources() {
+    return _resource.resources();
+}
+
+Strings &Game::strings() {
+    return _resource.strings();
 }
 
 } // namespace game

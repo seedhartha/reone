@@ -17,17 +17,22 @@
 
 #pragma once
 
-#include "../../graphics/texture/textures.h"
-
 #include "../types.h"
 
 #include "feat.h"
 
 namespace reone {
 
-namespace di {
+namespace resource {
 
-class ResourceServices;
+class Resources;
+class Strings;
+
+}
+
+namespace graphics {
+
+class Textures;
 
 }
 
@@ -35,17 +40,30 @@ namespace game {
 
 class Feats : boost::noncopyable {
 public:
-    Feats(graphics::Textures &textures, di::ResourceServices &resource);
+    Feats(
+        graphics::Textures &textures,
+        resource::Resources &resources,
+        resource::Strings &strings
+    ) :
+        _textures(textures),
+        _resources(resources),
+        _strings(strings) {
+    }
 
     void init();
 
     std::shared_ptr<Feat> get(FeatType type) const;
 
 private:
-    graphics::Textures &_textures;
-    di::ResourceServices &_resource;
-
     std::unordered_map<FeatType, std::shared_ptr<Feat>> _feats;
+
+    // Services
+
+    graphics::Textures &_textures;
+    resource::Resources &_resources;
+    resource::Strings &_strings;
+
+    // END Services
 };
 
 } // namespace game

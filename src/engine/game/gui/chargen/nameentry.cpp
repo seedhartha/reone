@@ -18,7 +18,6 @@
 #include "nameentry.h"
 
 #include "../../../common/streamutil.h"
-#include "../../../di/services/resource.h"
 #include "../../../resource/resources.h"
 
 #include "../../game.h"
@@ -75,7 +74,7 @@ void NameEntry::bindControls() {
 }
 
 void NameEntry::loadLtrFile(const string &resRef, LtrReader &ltr) {
-    shared_ptr<ByteArray> data(_game->services().resource().resources().getRaw(resRef, ResourceType::Ltr));
+    shared_ptr<ByteArray> data(_game->resources().getRaw(resRef, ResourceType::Ltr));
     ltr.load(wrap(data));
 }
 

@@ -18,15 +18,12 @@
 #include "cursors.h"
 
 #include "../common/streamutil.h"
-#include "../di/services/graphics.h"
-#include "../di/services/resource.h"
 #include "../graphics/cursor.h"
 #include "../graphics/texture/curreader.h"
 #include "../resource/resources.h"
 
 using namespace std;
 
-using namespace reone::di;
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -43,12 +40,6 @@ static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_groupNamesByType {
     { CursorType::RecoverMine, { 37, 38 } },
     { CursorType::Attack, { 51, 52 } }
 };
-
-Cursors::Cursors(GameID gameId, GraphicsServices &graphics, ResourceServices &resource) :
-    _gameId(gameId),
-    _graphics(graphics),
-    _resource(resource) {
-}
 
 Cursors::~Cursors() {
     deinit();
@@ -68,7 +59,7 @@ shared_ptr<Cursor> Cursors::get(CursorType type) {
     shared_ptr<Texture> textureUp(newTextureFromCursor(cursorNamesUp.back()));
     shared_ptr<Texture> textureDown(newTextureFromCursor(cursorNamesDown.back()));
 
-    auto cursor = make_shared<Cursor>(textureUp, textureDown, _graphics.context(), _graphics.meshes(), _graphics.shaders(), _graphics.window());
+    auto cursor = make_shared<Cursor>(textureUp, textureDown, _context, _meshes, _shaders, _window);
     auto inserted = _cache.insert(make_pair(type, cursor));
 
     return inserted.first->second;
@@ -83,7 +74,7 @@ const pair<uint32_t, uint32_t> &Cursors::getCursorGroupNames(CursorType type) {
 }
 
 vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
-    shared_ptr<ByteArray> bytes(_resource.resources().getFromExe(name, PEResourceType::CursorGroup));
+    shared_ptr<ByteArray> bytes(_resources.getFromExe(name, PEResourceType::CursorGroup));
     StreamReader reader(wrap(bytes));
     reader.ignore(4); // Reserved, ResType
     uint16_t resCount = reader.getUint16();
@@ -99,7 +90,7 @@ vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
 }
 
 shared_ptr<Texture> Cursors::newTextureFromCursor(uint32_t name) {
-    shared_ptr<ByteArray> bytes(_resource.resources().getFromExe(name, PEResourceType::Cursor));
+    shared_ptr<ByteArray> bytes(_resources.getFromExe(name, PEResourceType::Cursor));
 
     CurReader cur;
     cur.load(wrap(bytes));

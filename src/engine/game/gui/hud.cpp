@@ -18,7 +18,6 @@
 #include "hud.h"
 
 #include "../../common/logutil.h"
-#include "../../di/services/graphics.h"
 #include "../../gui/control/label.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
@@ -159,10 +158,10 @@ void HUD::load() {
         _game->openInGameMenu(InGameMenu::Tab::Options);
     });
     _binding.btnClearAll->setOnClick([this]() {
-        _game->services().party().getLeader()->clearAllActions();
+        _game->party().getLeader()->clearAllActions();
     });
     _binding.btnClearOne->setOnClick([this]() {
-        for (auto &action : _game->services().party().getLeader()->actions()) {
+        for (auto &action : _game->party().getLeader()->actions()) {
             if (action->type() == ActionType::AttackObject) {
                 action->complete();
                 break;
@@ -170,7 +169,7 @@ void HUD::load() {
         }
     });
     _binding.btnClearOne2->setOnClick([this]() {
-        for (auto &action : _game->services().party().getLeader()->actions()) {
+        for (auto &action : _game->party().getLeader()->actions()) {
             if (action->type() == ActionType::AttackObject) {
                 action->complete();
                 break;
@@ -181,10 +180,10 @@ void HUD::load() {
         _game->openInGameMenu(InGameMenu::Tab::Equipment);
     });
     _binding.btnChar2->setOnClick([this]() {
-        _game->services().party().setPartyLeaderByIndex(1);
+        _game->party().setPartyLeaderByIndex(1);
     });
     _binding.btnChar3->setOnClick([this]() {
-        _game->services().party().setPartyLeaderByIndex(2);
+        _game->party().setPartyLeaderByIndex(2);
     });
 
     _select.load();
@@ -326,7 +325,7 @@ bool HUD::handle(const SDL_Event &event) {
 void HUD::update(float dt) {
     GUI::update(dt);
 
-    Party &party = _game->services().party();
+    Party &party = _game->party();
     vector<Label *> charLabels {
         _binding.lblChar1.get(),
         _binding.lblChar2.get(),
@@ -396,7 +395,7 @@ void HUD::draw() {
 
     drawMinimap();
 
-    Party &party = _game->services().party();
+    Party &party = _game->party();
     for (int i = 0; i < party.getSize(); ++i) {
         drawHealth(i);
     }
@@ -421,7 +420,7 @@ void HUD::drawMinimap() {
 void HUD::drawHealth(int memberIndex) {
     if (_game->isTSL()) return;
 
-    Party &party = _game->services().party();
+    Party &party = _game->party();
     shared_ptr<Creature> member(party.getMember(memberIndex));
     vector<Label *> backLabels {
         _binding.lblBack1.get(),
@@ -440,12 +439,12 @@ void HUD::drawHealth(int memberIndex) {
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _game->services().graphics().window().getOrthoProjection();
+    uniforms.combined.general.projection = _game->window().getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 
-    _game->services().graphics().shaders().activate(ShaderProgram::SimpleColor, uniforms);
-    _game->services().graphics().meshes().quad().draw();
+    _game->shaders().activate(ShaderProgram::SimpleColor, uniforms);
+    _game->meshes().quad().draw();
 }
 
 void HUD::toggleCombat(bool enabled) {
@@ -467,7 +466,7 @@ void HUD::toggleCombat(bool enabled) {
 }
 
 void HUD::refreshActionQueueItems() const {
-    auto &actions = _game->services().party().getLeader()->actions();
+    auto &actions = _game->party().getLeader()->actions();
     vector<Label *> queueLabels {
         _binding.lblQueue0.get(),
         _binding.lblQueue1.get(),
@@ -484,7 +483,7 @@ void HUD::refreshActionQueueItems() const {
                     break;
                 case ActionType::UseFeat: {
                     auto featAction = static_pointer_cast<UseFeatAction>(actions[i]);
-                    shared_ptr<Feat> feat(_game->services().feats().get(featAction->feat()));
+                    shared_ptr<Feat> feat(_game->feats().get(featAction->feat()));
                     if (feat) {
                         item.setBorderFill(feat->icon);
                     }

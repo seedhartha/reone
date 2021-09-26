@@ -18,14 +18,13 @@
 #include "feats.h"
 
 #include "../../common/collectionutil.h"
-#include "../../di/services/resource.h"
+#include "../../graphics/texture/textures.h"
 #include "../../resource/2da.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
 using namespace std;
 
-using namespace reone::di;
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -33,18 +32,13 @@ namespace reone {
 
 namespace game {
 
-Feats::Feats(Textures &textures, ResourceServices &resource) :
-    _textures(textures),
-    _resource(resource) {
-}
-
 void Feats::init() {
-    shared_ptr<TwoDA> feats(_resource.resources().get2DA("feat"));
+    shared_ptr<TwoDA> feats(_resources.get2DA("feat"));
     if (!feats) return;
 
     for (int row = 0; row < feats->getRowCount(); ++row) {
-        string name(_resource.strings().get(feats->getInt(row, "name", -1)));
-        string description(_resource.strings().get(feats->getInt(row, "description", -1)));
+        string name(_strings.get(feats->getInt(row, "name", -1)));
+        string description(_strings.get(feats->getInt(row, "description", -1)));
         shared_ptr<Texture> icon(_textures.get(feats->getString(row, "icon"), TextureUsage::GUI));
         uint32_t minCharLevel = feats->getUint(row, "mincharlevel");
         auto preReqFeat1 = static_cast<FeatType>(feats->getUint(row, "prereqfeat1"));

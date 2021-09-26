@@ -25,9 +25,10 @@
 
 namespace reone {
 
-namespace di {
+namespace resource {
 
-class ResourceServices;
+class Resources;
+class Strings;
 
 }
 
@@ -35,17 +36,30 @@ namespace game {
 
 class Spells : boost::noncopyable {
 public:
-    Spells(graphics::Textures &textures, di::ResourceServices &resource);
+    Spells(
+        graphics::Textures &textures,
+        resource::Resources &resources,
+        resource::Strings &strings
+    ) :
+        _textures(textures),
+        _resources(resources),
+        _strings(strings) {
+    }
 
     void init();
 
     std::shared_ptr<Spell> get(ForcePower type) const;
 
 private:
-    graphics::Textures &_textures;
-    di::ResourceServices &_resource;
-
     std::unordered_map<ForcePower, std::shared_ptr<Spell>> _spells;
+
+    // Services
+
+    graphics::Textures &_textures;
+    resource::Resources &_resources;
+    resource::Strings &_strings;
+
+    // END Services
 };
 
 } // namespace game

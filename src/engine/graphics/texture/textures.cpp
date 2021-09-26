@@ -19,7 +19,6 @@
 
 #include "../../common/logutil.h"
 #include "../../common/streamutil.h"
-#include "../../di/services/graphics.h"
 #include "../../resource/resources.h"
 
 #include "../context.h"

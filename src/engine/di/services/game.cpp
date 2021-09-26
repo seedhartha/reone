@@ -72,8 +72,8 @@ void GameServices::init() {
     _surfaces = make_unique<Surfaces>(_resource.resources());
     _surfaces->init();
 
-    _cursors = make_unique<Cursors>(_game.id(), _graphics, _resource);
-    _soundSets = make_unique<SoundSets>(_audio.files(), _resource);
+    _cursors = make_unique<Cursors>(_game.id(), _graphics.context(), _graphics.meshes(), _graphics.shaders(), _graphics.window(), _resource.resources());
+    _soundSets = make_unique<SoundSets>(_audio.files(), _resource.resources(), _resource.strings());
     _footstepSounds = make_unique<FootstepSounds>(_audio.files(), _resource.resources());
 
     _guiSounds = make_unique<GUISounds>(_audio.files(), _resource.resources());
@@ -86,16 +86,16 @@ void GameServices::init() {
     _reputes = make_unique<Reputes>(_resource.resources());
     _reputes->init();
 
-    _skills = make_unique<Skills>(_graphics, _resource);
+    _skills = make_unique<Skills>(_graphics.textures(), _resource.resources(), _resource.strings());
     _skills->init();
 
-    _feats = make_unique<Feats>(_graphics.textures(), _resource);
+    _feats = make_unique<Feats>(_graphics.textures(), _resource.resources(), _resource.strings());
     _feats->init();
 
-    _spells = make_unique<Spells>(_graphics.textures(), _resource);
+    _spells = make_unique<Spells>(_graphics.textures(), _resource.resources(), _resource.strings());
     _spells->init();
 
-    _classes = make_unique<Classes>(_resource);
+    _classes = make_unique<Classes>(_resource.resources(), _resource.strings());
 
     _portraits = make_unique<Portraits>(_graphics.textures(), _resource.resources());
     _portraits->init();
@@ -103,7 +103,7 @@ void GameServices::init() {
     _objectFactory = make_unique<ObjectFactory>(_game, _scene.graph());
 
     _party = make_unique<Party>(_game);
-    _combat = make_unique<Combat>(_game, _scene);
+    _combat = make_unique<Combat>(_game, _scene.graph());
     _actionFactory = make_unique<ActionFactory>(_game);
     _effectFactory = make_unique<EffectFactory>();
 

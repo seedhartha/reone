@@ -28,7 +28,7 @@ namespace game {
 static constexpr float kMaxConversationDistance = 4.0f;
 
 void StartConversationAction::execute(Object &actor, float dt) {
-    shared_ptr<Object> actorPtr(_game.services().objectFactory().getObjectById(actor.id()));
+    shared_ptr<Object> actorPtr(_game.objectFactory().getObjectById(actor.id()));
     auto creatureActor = static_pointer_cast<Creature>(actorPtr);
     auto object = static_pointer_cast<SpatialObject>(_object);
 
@@ -38,7 +38,7 @@ void StartConversationAction::execute(Object &actor, float dt) {
         creatureActor->navigateTo(object->position(), true, kMaxConversationDistance, dt);
 
     if (reached) {
-        bool isActorLeader = _game.services().party().getLeader() == actorPtr;
+        bool isActorLeader = _game.party().getLeader() == actorPtr;
         _game.module()->area()->startDialog(isActorLeader ? object : static_pointer_cast<SpatialObject>(actorPtr), _dialogResRef);
         complete();
     }

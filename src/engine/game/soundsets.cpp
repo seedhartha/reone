@@ -19,30 +19,21 @@
 
 #include "../audio/files.h"
 #include "../common/streamutil.h"
-#include "../di/services/resource.h"
 #include "../resource/format/ssfreader.h"
 #include "../resource/resources.h"
 #include "../resource/strings.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::audio;
-using namespace reone::di;
 using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
 
-SoundSets::SoundSets(AudioFiles &audioFiles, ResourceServices &resource) :
-    MemoryCache(bind(&SoundSets::doGet, this, _1)),
-    _audioFiles(audioFiles),
-    _resource(resource) {
-}
-
 shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
-    auto data = _resource.resources().getRaw(resRef, ResourceType::Ssf);
+    auto data = _resources.getRaw(resRef, ResourceType::Ssf);
     if (!data) return nullptr;
 
     auto result = make_shared<SoundSet>();
@@ -52,7 +43,7 @@ shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
 
     vector<uint32_t> sounds(ssf.soundSet());
     for (size_t i = 0; i < sounds.size(); ++i) {
-        string soundResRef(boost::to_lower_copy(_resource.strings().getSound(sounds[i])));
+        string soundResRef(boost::to_lower_copy(_strings.getSound(sounds[i])));
         shared_ptr<AudioStream> sound(_audioFiles.get(soundResRef));
         if (sound) {
             result->insert(make_pair(static_cast<SoundSetEntry>(i), sound));

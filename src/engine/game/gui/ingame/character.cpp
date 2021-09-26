@@ -17,7 +17,6 @@
 
 #include "character.h"
 
-#include "../../../di/services/graphics.h"
 #include "../../../graphics/model/models.h"
 #include "../../../gui/scenebuilder.h"
 
@@ -146,7 +145,7 @@ void CharacterMenu::bindControls() {
 }
 
 void CharacterMenu::update(float dt) {
-    shared_ptr<Creature> leader(_game->services().party().getLeader());
+    shared_ptr<Creature> leader(_game->party().getLeader());
     _binding.btnLevelup->setVisible(leader->isLevelUpPending());
     _binding.btnAuto->setVisible(leader->isLevelUpPending());
     GUI::update(dt);
@@ -161,7 +160,7 @@ static string describeAbilityModifier(int value) {
 }
 
 void CharacterMenu::refreshControls() {
-    shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
     CreatureAttributes &attributes = partyLeader->attributes();
 
     if (_game->isKotOR()) {
@@ -203,13 +202,13 @@ void CharacterMenu::refreshControls() {
 string CharacterMenu::describeClass(ClassType clazz) const {
     if (clazz == ClassType::Invalid) return "";
 
-    return _game->services().classes().get(clazz)->name();
+    return _game->classes().get(clazz)->name();
 }
 
 void CharacterMenu::refreshPortraits() {
     if (_game->id() != GameID::KotOR) return;
 
-    Party &party = _game->services().party();
+    Party &party = _game->party();
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
 
@@ -245,7 +244,7 @@ void CharacterMenu::refresh3D() {
 }
 
 shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) const {
-    auto partyLeader = _game->services().party().getLeader();
+    auto partyLeader = _game->party().getLeader();
     auto objectFactory = make_shared<ObjectFactory>(*_game, sceneGraph);
     auto character = objectFactory->newCreature();
     character->setFacing(-glm::half_pi<float>());
@@ -262,7 +261,7 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) 
     character->loadAppearance();
     character->updateModelAnimation();
 
-    auto sceneModel = make_shared<ModelSceneNode>(_game->services().graphics().models().get("charmain_light"), ModelUsage::GUI, &sceneGraph);
+    auto sceneModel = make_shared<ModelSceneNode>(_game->models().get("charmain_light"), ModelUsage::GUI, &sceneGraph);
     sceneModel->attach("charmain_light", character->sceneNode());
 
     return move(sceneModel);

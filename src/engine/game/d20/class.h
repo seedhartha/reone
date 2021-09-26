@@ -26,9 +26,10 @@
 
 namespace reone {
 
-namespace di {
+namespace resource {
 
-class ResourceServices;
+class Resources;
+class Strings;
 
 }
 
@@ -38,7 +39,17 @@ class Classes;
 
 class CreatureClass {
 public:
-    CreatureClass(ClassType type, Classes &classes, di::ResourceServices &resource);
+    CreatureClass(
+        ClassType type,
+        Classes &classes,
+        resource::Resources &resources,
+        resource::Strings &strings
+    ) :
+        _type(type),
+        _classes(classes),
+        _resources(resources),
+        _strings(strings) {
+    }
 
     void load(const resource::TwoDA &twoDa, int row);
 
@@ -62,9 +73,6 @@ public:
     int skillPointBase() const { return _skillPointBase; }
 
 private:
-    Classes &_classes;
-    di::ResourceServices &_resource;
-
     ClassType _type;
     std::string _name;
     std::string _description;
@@ -74,6 +82,15 @@ private:
     std::unordered_set<SkillType> _classSkills;
     std::unordered_map<int, SavingThrows> _savingThrowsByLevel;
     std::vector<int> _attackBonuses;
+
+    // Services
+
+    Classes &_classes;
+
+    resource::Resources &_resources;
+    resource::Strings &_strings;
+
+    // END Services
 
     void loadClassSkills(const std::string &skillsTable);
     void loadSavingThrows(const std::string &savingThrowTable);

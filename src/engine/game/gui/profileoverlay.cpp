@@ -18,7 +18,6 @@
 #include "profileoverlay.h"
 
 #include "../../common/guardutil.h"
-#include "../../di/services/graphics.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
@@ -28,7 +27,6 @@
 
 using namespace std;
 
-using namespace reone::di;
 using namespace reone::graphics;
 
 namespace reone {
@@ -39,14 +37,11 @@ static constexpr int kFrameWidth = 125;
 static constexpr char kFontResRef[] = "fnt_console";
 static constexpr float kRefreshInterval = 1.0f; // seconds
 
-ProfileOverlay::ProfileOverlay(GraphicsServices &graphics) : _graphics(graphics) {
-    _refreshTimer.setTimeout(kRefreshInterval);
-}
-
 void ProfileOverlay::init() {
+    _refreshTimer.setTimeout(kRefreshInterval);
     _frequency = SDL_GetPerformanceFrequency();
     _counter = SDL_GetPerformanceCounter();
-    _font = _graphics.fonts().get(kFontResRef);
+    _font = _fonts.get(kFontResRef);
 }
 
 bool ProfileOverlay::handle(const SDL_Event &event) {
@@ -109,14 +104,14 @@ void ProfileOverlay::drawBackground() {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(kFrameWidth, 2.0f * _font->height(), 1.0f));
 
-    ShaderUniforms uniforms(_graphics.shaders().defaultUniforms());
-    uniforms.combined.general.projection = _graphics.window().getOrthoProjection();
+    ShaderUniforms uniforms(_shaders.defaultUniforms());
+    uniforms.combined.general.projection = _window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     uniforms.combined.general.alpha = 0.5f;
 
-    _graphics.shaders().activate(ShaderProgram::SimpleColor, uniforms);
-    _graphics.meshes().quad().draw();
+    _shaders.activate(ShaderProgram::SimpleColor, uniforms);
+    _meshes.quad().draw();
 }
 
 void ProfileOverlay::drawText() {

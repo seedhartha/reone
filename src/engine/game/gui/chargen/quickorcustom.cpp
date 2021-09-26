@@ -17,7 +17,6 @@
 
 #include "quickorcustom.h"
 
-#include "../../../di/services/resource.h"
 #include "../../../gui/control/listbox.h"
 #include "../../../resource/strings.h"
 
@@ -63,7 +62,7 @@ void QuickOrCustom::load() {
 
     _binding.quickCharBtn->setOnFocusChanged([this](bool focus) {
         if (!focus) return;
-        string text(_game->services().resource().strings().get(kStrRefQuickHelpText));
+        string text(_game->strings().get(kStrRefQuickHelpText));
         _binding.lbDesc->clearItems();
         _binding.lbDesc->addTextLinesAsItems(text);
     });
@@ -73,7 +72,7 @@ void QuickOrCustom::load() {
 
     _binding.custCharBtn->setOnFocusChanged([this](bool focus) {
         if (!focus) return;
-        string text(_game->services().resource().strings().get(kStrRefCustomHelpText));
+        string text(_game->strings().get(kStrRefCustomHelpText));
         _binding.lbDesc->clearItems();
         _binding.lbDesc->addTextLinesAsItems(text);
     });

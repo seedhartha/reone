@@ -17,16 +17,22 @@
 
 #pragma once
 
-#include "../audio/files.h"
 #include "../common/cache.h"
 
 #include "types.h"
 
 namespace reone {
 
-namespace di {
+namespace audio {
 
-class ResourceServices;
+class AudioFiles;
+
+}
+
+namespace resource {
+
+class Resources;
+class Strings;
 
 }
 
@@ -34,11 +40,21 @@ namespace game {
 
 class SoundSets : public MemoryCache<std::string, SoundSet> {
 public:
-    SoundSets(audio::AudioFiles &audioFiles, di::ResourceServices &resource);
+    SoundSets(
+        audio::AudioFiles &audioFiles,
+        resource::Resources &resources,
+        resource::Strings &strings
+    ) :
+        MemoryCache(std::bind(&SoundSets::doGet, this, std::placeholders::_1)),
+        _audioFiles(audioFiles),
+        _resources(resources),
+        _strings(strings) {
+    }
 
 private:
     audio::AudioFiles &_audioFiles;
-    di::ResourceServices &_resource;
+    resource::Resources &_resources;
+    resource::Strings &_strings;
 
     std::shared_ptr<SoundSet> doGet(std::string resRef);
 };
