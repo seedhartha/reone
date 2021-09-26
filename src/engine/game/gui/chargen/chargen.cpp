@@ -422,7 +422,8 @@ void CharacterGeneration::reloadCharacterModel() {
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
-    auto objectFactory = make_unique<ObjectFactory>(*_game, sceneGraph);
+    auto objectFactory = make_unique<ObjectFactory>(sceneGraph);
+    objectFactory->setGame(*_game);
 
     shared_ptr<Creature> creature(objectFactory->newCreature());
     creature->setFacing(-glm::half_pi<float>());

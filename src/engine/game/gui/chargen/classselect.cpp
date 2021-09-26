@@ -223,7 +223,8 @@ int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz)
 }
 
 shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, SceneGraph &sceneGraph) {
-    auto objectFactory = make_unique<ObjectFactory>(*_game, sceneGraph);
+    auto objectFactory = make_unique<ObjectFactory>(sceneGraph);
+    objectFactory->setGame(*_game);
 
     shared_ptr<Creature> character(objectFactory->newCreature());
     character->setFacing(-glm::half_pi<float>());

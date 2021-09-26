@@ -42,7 +42,8 @@ class Game;
 
 class ObjectFactory {
 public:
-    ObjectFactory(Game &game, scene::SceneGraph &sceneGraph);
+    ObjectFactory(scene::SceneGraph &sceneGraph) : _sceneGraph(sceneGraph) {
+    }
 
     std::shared_ptr<Module> newModule();
     std::shared_ptr<Area> newArea();
@@ -58,15 +59,17 @@ public:
 
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
+    void setGame(Game &game) { _game = &game; }
+
     template <class T>
     std::shared_ptr<T> getObjectById(uint32_t id) const {
         return std::dynamic_pointer_cast<T>(getObjectById(id));
     }
 
 private:
-    Game &_game;
     scene::SceneGraph &_sceneGraph;
 
+    Game *_game { nullptr };
     uint32_t _counter { 2 }; // ids 0 and 1 are reserved
     std::unordered_map<uint32_t, std::shared_ptr<Object>> _objectById;
 

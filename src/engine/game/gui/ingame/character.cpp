@@ -247,10 +247,14 @@ void CharacterMenu::refresh3D() {
 
 shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) const {
     auto partyLeader = _game->party().getLeader();
-    auto objectFactory = make_shared<ObjectFactory>(*_game, sceneGraph);
+
+    auto objectFactory = make_shared<ObjectFactory>(sceneGraph);
+    objectFactory->setGame(*_game);
+
     auto character = objectFactory->newCreature();
     character->setFacing(-glm::half_pi<float>());
     character->setAppearance(partyLeader->appearance());
+
     for (auto &item : partyLeader->equipment()) {
         switch (item.first) {
             case InventorySlot::body:
@@ -260,6 +264,7 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) 
                 break;
         }
     }
+
     character->loadAppearance();
     character->updateModelAnimation();
 

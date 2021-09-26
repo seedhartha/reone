@@ -349,7 +349,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
                     attack.target->applyEffect(effect, DurationType::Instant);
                 }
             } else {
-                shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(attack.damage, DamageType::Universal, attack.attacker));
+                shared_ptr<DamageEffect> effect(_game->effectFactory().newDamage(attack.damage, DamageType::Universal, attack.attacker));
                 attack.target->applyEffect(move(effect), DurationType::Instant);
             }
             break;
@@ -362,7 +362,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
                     attack.target->applyEffect(effect, DurationType::Instant);
                 }
             } else {
-                shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, attack.attacker));
+                shared_ptr<DamageEffect> effect(_game->effectFactory().newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, attack.attacker));
                 attack.target->applyEffect(move(effect), DurationType::Instant);
             }
             break;
@@ -384,7 +384,7 @@ vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> d
         type = static_cast<DamageType>(weapon->damageFlags());
     }
     amount = glm::max(1, amount);
-    shared_ptr<DamageEffect> effect(_game.effectFactory().newDamage(multiplier * amount, type, move(damager)));
+    shared_ptr<DamageEffect> effect(_game->effectFactory().newDamage(multiplier * amount, type, move(damager)));
 
     return vector<shared_ptr<DamageEffect>> { move(effect) };
 }
