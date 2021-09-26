@@ -17,7 +17,6 @@
 
 #include "gffwriter.h"
 
-#include "../../common/guardutil.h"
 #include "../../common/streamwriter.h"
 
 #include "../gffstruct.h"
@@ -56,11 +55,6 @@ static const unordered_map<ResourceType, string> g_signatures {
     { ResourceType::Utw, "UTW" },
     { ResourceType::Pth, "PTH" }
 };
-
-GffWriter::GffWriter(ResourceType resType, shared_ptr<GffStruct> root) :
-    _resType(resType),
-    _root(ensurePresent(root, "root")) {
-}
 
 void GffWriter::save(const fs::path &path) {
     auto out = make_shared<fs::ofstream>(path, ios::binary);

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "scenegraph.h"
+#include "graph.h"
 
 #include "../graphics/context.h"
 #include "../graphics/mesh/mesh.h"

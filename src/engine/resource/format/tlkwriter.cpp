@@ -17,7 +17,6 @@
 
 #include "tlkwriter.h"
 
-#include "../../common/guardutil.h"
 #include "../../common/streamwriter.h"
 
 #include "../talktable.h"
@@ -35,10 +34,6 @@ struct StringFlags {
     static constexpr int soundPresent = 2;
     static constexpr int soundLengthPresent = 4;
 };
-
-TlkWriter::TlkWriter(shared_ptr<TalkTable> talkTable) :
-    _talkTable(ensurePresent(talkTable, "talkTable")) {
-}
 
 void TlkWriter::save(const fs::path &path) {
     vector<StringDataElement> strData;

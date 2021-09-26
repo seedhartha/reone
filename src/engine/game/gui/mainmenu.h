@@ -22,7 +22,7 @@
 #include "../../gui/control/listbox.h"
 #include "../../resource/types.h"
 #include "../../scene/node/model.h"
-#include "../../scene/scenegraph.h"
+#include "../../scene/graph.h"
 
 #include "../types.h"
 

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "guardutil.h"
 #include "types.h"
 
 namespace reone {
@@ -26,7 +27,13 @@ namespace reone {
  */
 class StreamReader : boost::noncopyable {
 public:
-    StreamReader(const std::shared_ptr<std::istream> &stream, boost::endian::order endianess = boost::endian::order::little);
+    StreamReader(
+        std::shared_ptr<std::istream> stream,
+        boost::endian::order endianess = boost::endian::order::little
+    ) :
+        _stream(ensurePresent(stream, "stream")),
+        _endianess(endianess) {
+    }
 
     size_t tell();
     void seek(size_t pos);

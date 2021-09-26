@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../../common/guardutil.h"
+
 namespace reone {
 
 namespace resource {
@@ -25,7 +27,9 @@ class TalkTable;
 
 class TlkWriter : boost::noncopyable {
 public:
-    TlkWriter(std::shared_ptr<TalkTable> talkTable);
+    TlkWriter(std::shared_ptr<TalkTable> talkTable) :
+        _talkTable(ensurePresent(talkTable, "talkTable")) {
+    }
 
     void save(const boost::filesystem::path &path);
 

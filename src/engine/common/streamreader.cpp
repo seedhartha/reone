@@ -17,18 +17,11 @@
 
 #include "streamreader.h"
 
-#include "guardutil.h"
-
 using namespace std;
 
 namespace endian = boost::endian;
 
 namespace reone {
-
-StreamReader::StreamReader(const shared_ptr<istream> &stream, endian::order endianess) :
-    _stream(ensurePresent(stream, "stream")),
-    _endianess(endianess) {
-}
 
 size_t StreamReader::tell() {
     return _stream->tellg();

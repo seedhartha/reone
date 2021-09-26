@@ -20,7 +20,7 @@
 #include "../scene/node/camera.h"
 #include "../scene/node/mesh.h"
 #include "../scene/node/model.h"
-#include "../scene/scenegraph.h"
+#include "../scene/graph.h"
 
 using namespace std;
 

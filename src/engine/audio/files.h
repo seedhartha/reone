@@ -33,7 +33,10 @@ class AudioStream;
 
 class AudioFiles : public MemoryCache<std::string, AudioStream> {
 public:
-    AudioFiles(resource::Resources &resources);
+    AudioFiles(resource::Resources &resources) :
+        MemoryCache(std::bind(&AudioFiles::doGet, this, std::placeholders::_1)),
+        _resources(resources) {
+    }
 
 private:
     resource::Resources &_resources;

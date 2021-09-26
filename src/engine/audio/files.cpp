@@ -25,18 +25,12 @@
 #include "stream.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 using namespace reone::resource;
 
 namespace reone {
 
 namespace audio {
-
-AudioFiles::AudioFiles(Resources &resources) :
-    MemoryCache(bind(&AudioFiles::doGet, this, _1)),
-    _resources(resources) {
-}
 
 shared_ptr<AudioStream> AudioFiles::doGet(string resRef) {
     shared_ptr<AudioStream> result;

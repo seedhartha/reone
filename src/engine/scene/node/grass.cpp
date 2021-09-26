@@ -24,7 +24,7 @@
 #include "../../graphics/shader/shaders.h"
 #include "../../graphics/texture/texture.h"
 
-#include "../scenegraph.h"
+#include "../graph.h"
 
 using namespace std;
 

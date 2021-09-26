@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../scene/scenegraph.h"
+#include "../../scene/graph.h"
 #include "../../graphics/types.h"
 #include "../../resource/types.h"
 

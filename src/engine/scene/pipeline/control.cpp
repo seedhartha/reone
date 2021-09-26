@@ -27,7 +27,7 @@
 #include "../../graphics/texture/textureutil.h"
 
 #include "../node/camera.h"
-#include "../scenegraph.h"
+#include "../graph.h"
 
 using namespace std;
 

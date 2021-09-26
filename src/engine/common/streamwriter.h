@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "guardutil.h"
 #include "types.h"
 
 namespace reone {
@@ -26,7 +27,13 @@ namespace reone {
  */
 class StreamWriter : boost::noncopyable {
 public:
-    StreamWriter(const std::shared_ptr<std::ostream> &stream, boost::endian::order endianess = boost::endian::order::little);
+    StreamWriter(
+        std::shared_ptr<std::ostream> stream,
+        boost::endian::order endianess = boost::endian::order::little
+    ) :
+        _stream(ensurePresent(stream, "stream")),
+        _endianess(endianess) {
+    }
 
     void putByte(uint8_t val);
     void putChar(char val);

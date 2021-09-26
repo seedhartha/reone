@@ -20,7 +20,7 @@
 #include "../../graphics/walkmesh/walkmesh.h"
 #include "../../scene/animproperties.h"
 #include "../../scene/node/scenenode.h"
-#include "../../scene/scenegraph.h"
+#include "../../scene/graph.h"
 
 #include "../action/playanimation.h"
 #include "../effect/effect.h"
