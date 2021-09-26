@@ -17,7 +17,6 @@
 
 #include "chargen.h"
 
-#include "../../../di/services/graphics.h"
 #include "../../../gui/scenebuilder.h"
 #include "../../../graphics/model/models.h"
 #include "../../../resource/resources.h"
@@ -271,7 +270,7 @@ void CharacterGeneration::startQuick() {
 void CharacterGeneration::startLevelUp() {
     _type = Type::LevelUp;
 
-    shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
+    shared_ptr<Creature> partyLeader(_game->party().getLeader());
 
     Character character;
     character.appearance = partyLeader->appearance();
@@ -355,13 +354,13 @@ void CharacterGeneration::cancel() {
 void CharacterGeneration::finish() {
     if (_type == Type::LevelUp) {
         ClassType classType = _character.attributes.getEffectiveClass();
-        shared_ptr<CreatureClass> clazz(_game->services().classes().get(classType));
+        shared_ptr<CreatureClass> clazz(_game->classes().get(classType));
         _character.attributes.addClassLevels(clazz.get(), 1);
-        shared_ptr<Creature> partyLeader(_game->services().party().getLeader());
+        shared_ptr<Creature> partyLeader(_game->party().getLeader());
         partyLeader->attributes() = _character.attributes;
         _game->openInGame();
     } else {
-        shared_ptr<Creature> player(_game->services().objectFactory().newCreature());
+        shared_ptr<Creature> player(_game->objectFactory().newCreature());
         player->setTag(kObjectTagPlayer);
         player->setGender(_character.gender);
         player->setAppearance(_character.appearance);
@@ -370,7 +369,7 @@ void CharacterGeneration::finish() {
         player->setImmortal(true);
         player->attributes() = _character.attributes;
 
-        Party &party = _game->services().party();
+        Party &party = _game->party();
         party.clear();
         party.addMember(kNpcPlayer, player);
         party.setPlayer(player);
@@ -417,7 +416,7 @@ void CharacterGeneration::reloadCharacterModel() {
         .build());
 
     _binding.modelLbl->setScene(move(scene));
-    _binding.portraitLbl->setBorderFill(_game->services().portraits().getTextureByAppearance(_character.appearance));
+    _binding.portraitLbl->setBorderFill(_game->portraits().getTextureByAppearance(_character.appearance));
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
@@ -431,14 +430,14 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
     creature->sceneNode()->setCullable(false);
     creature->updateModelAnimation();
 
-    auto model = make_shared<ModelSceneNode>(_game->services().graphics().models().get("cgbody_light"), ModelUsage::GUI, &sceneGraph);
+    auto model = make_shared<ModelSceneNode>(_game->models().get("cgbody_light"), ModelUsage::GUI, &sceneGraph);
     model->attach("cgbody_light", creature->sceneNode());
 
     return move(model);
 }
 
 void CharacterGeneration::updateAttributes() {
-    shared_ptr<CreatureClass> clazz(_game->services().classes().get(_character.attributes.getEffectiveClass()));
+    shared_ptr<CreatureClass> clazz(_game->classes().get(_character.attributes.getEffectiveClass()));
     _binding.lblClass->setTextMessage(clazz->name());
 
     int vitality = clazz->hitdie() + _character.attributes.getAbilityModifier(Ability::Constitution);

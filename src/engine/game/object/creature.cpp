@@ -22,9 +22,6 @@
 #include "../../common/randomutil.h"
 #include "../../common/streamutil.h"
 #include "../../common/timer.h"
-#include "../../di/services/audio.h"
-#include "../../di/services/graphics.h"
-#include "../../di/services/resource.h"
 #include "../../graphics/model/models.h"
 #include "../../graphics/texture/textures.h"
 #include "../../resource/resources.h"
@@ -85,7 +82,7 @@ void Creature::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Creature::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utc(_game->services().resource().resources().getGFF(resRef, ResourceType::Utc));
+    shared_ptr<GffStruct> utc(_game->resources().getGFF(resRef, ResourceType::Utc));
     if (utc) {
         loadUTC(*utc);
         loadAppearance();
@@ -93,16 +90,16 @@ void Creature::loadFromBlueprint(const string &resRef) {
 }
 
 void Creature::loadAppearance() {
-    shared_ptr<TwoDA> appearances(_game->services().resource().resources().get2DA("appearance"));
+    shared_ptr<TwoDA> appearances(_game->resources().get2DA("appearance"));
     _modelType = parseModelType(appearances->getString(_appearance, "modeltype"));
     _walkSpeed = appearances->getFloat(_appearance, "walkdist");
     _runSpeed = appearances->getFloat(_appearance, "rundist");
     _footstepType = appearances->getInt(_appearance, "footsteptype", -1);
 
     if (_portraitId > 0) {
-        _portrait = _game->services().portraits().getTextureByIndex(_portraitId);
+        _portrait = _game->portraits().getTextureByIndex(_portraitId);
     } else {
-        _portrait = _game->services().portraits().getTextureByAppearance(_appearance);
+        _portrait = _game->portraits().getTextureByAppearance(_appearance);
     }
 
     updateModel();
@@ -418,13 +415,13 @@ int Creature::getNeededXP() const {
 
 void Creature::runSpawnScript() {
     if (!_onSpawn.empty()) {
-        _game->services().scriptRunner().run(_onSpawn, _id, kObjectInvalid);
+        _game->scriptRunner().run(_onSpawn, _id, kObjectInvalid);
     }
 }
 
 void Creature::runEndRoundScript() {
     if (!_onEndRound.empty()) {
-        _game->services().scriptRunner().run(_onEndRound, _id, kObjectInvalid);
+        _game->scriptRunner().run(_onEndRound, _id, kObjectInvalid);
     }
 }
 
@@ -438,14 +435,14 @@ void Creature::playSound(SoundSetEntry entry, bool positional) {
     auto maybeSound = _soundSet->find(entry);
     if (maybeSound != _soundSet->end()) {
         glm::vec3 position(_position + 1.7f);
-        _game->services().audio().player().play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
+        _game->audioPlayer().play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
     }
 }
 
 void Creature::die() {
     _currentHitPoints = 0;
     _dead = true;
-    _name = _game->services().resource().strings().get(kStrRefRemains);
+    _name = _game->strings().get(kStrRefRemains);
 
     debug(boost::format("Creature %s is dead") % _tag);
 
@@ -456,7 +453,7 @@ void Creature::die() {
 
 void Creature::runDeathScript() {
     if (!_onDeath.empty()) {
-        _game->services().scriptRunner().run(_onDeath, _id, kObjectInvalid);
+        _game->scriptRunner().run(_onDeath, _id, kObjectInvalid);
     }
 }
 
@@ -512,7 +509,7 @@ void Creature::onObjectSeen(const shared_ptr<SpatialObject> &object) {
 
 void Creature::runOnNoticeScript() {
     if (!_onNotice.empty()) {
-        _game->services().scriptRunner().run(_onNotice, _id, _perception.lastPerceived->id());
+        _game->scriptRunner().run(_onNotice, _id, _perception.lastPerceived->id());
     }
 }
 
@@ -629,9 +626,9 @@ void Creature::setAppliedForce(glm::vec3 force) {
 
 void Creature::onEventSignalled(const string &name) {
     if (name == "snd_footstep" && _footstepType != -1 && _walkmeshMaterial != -1) {
-        shared_ptr<FootstepTypeSounds> sounds(_game->services().footstepSounds().get(_footstepType));
+        shared_ptr<FootstepTypeSounds> sounds(_game->footstepSounds().get(_footstepType));
         if (sounds) {
-            const Surface &surface = _game->services().surfaces().getSurface(_walkmeshMaterial);
+            const Surface &surface = _game->surfaces().getSurface(_walkmeshMaterial);
             vector<shared_ptr<AudioStream>> materialSounds;
             if (surface.sound == "DT") {
                 materialSounds = sounds->dirt;
@@ -654,7 +651,7 @@ void Creature::onEventSignalled(const string &name) {
             if (index < static_cast<int>(materialSounds.size())) {
                 shared_ptr<AudioStream> sound(materialSounds[index]);
                 if (sound) {
-                    _game->services().audio().player().play(sound, AudioType::Sound, false, 1.0f, true, _position);
+                    _game->audioPlayer().play(sound, AudioType::Sound, false, 1.0f, true, _position);
                 }
             }
         }
@@ -723,7 +720,7 @@ void Creature::advanceOnPath(bool run, float dt) {
     if (distToDest <= 1.0f) {
         _path->selectNextPoint();
     } else {
-        shared_ptr<Creature> creature(_game->services().objectFactory().getObjectById<Creature>(_id));
+        shared_ptr<Creature> creature(_game->objectFactory().getObjectById<Creature>(_id));
         if (_game->module()->area()->moveCreatureTowards(creature, dest, run, dt)) {
             setMovementType(run ? Creature::MovementType::Run : Creature::MovementType::Walk);
             setAppliedForce(glm::vec3(glm::normalize(glm::vec2(dest - origin)), 0.0f));
@@ -1006,7 +1003,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     string bodyModelName(getBodyModelName());
     if (bodyModelName.empty()) return nullptr;
 
-    shared_ptr<Model> bodyModel(_game->services().graphics().models().get(bodyModelName));
+    shared_ptr<Model> bodyModel(_game->models().get(bodyModelName));
     if (!bodyModel) return nullptr;
 
     auto bodySceneNode = make_unique<ModelSceneNode>(bodyModel, ModelUsage::Creature, _sceneGraph, this);
@@ -1015,7 +1012,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
 
     string bodyTextureName(getBodyTextureName());
     if (!bodyTextureName.empty()) {
-        shared_ptr<Texture> texture(_game->services().graphics().textures().get(bodyTextureName, TextureUsage::Diffuse));
+        shared_ptr<Texture> texture(_game->textures().get(bodyTextureName, TextureUsage::Diffuse));
         if (texture) {
             bodySceneNode->setDiffuseTexture(texture);
         }
@@ -1026,14 +1023,14 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     shared_ptr<Model> maskModel;
     string maskModelName(getMaskModelName());
     if (!maskModelName.empty()) {
-        maskModel = _game->services().graphics().models().get(maskModelName);
+        maskModel = _game->models().get(maskModelName);
     }
 
     // Head
 
     string headModelName(getHeadModelName());
     if (!headModelName.empty()) {
-        shared_ptr<Model> headModel(_game->services().graphics().models().get(headModelName));
+        shared_ptr<Model> headModel(_game->models().get(headModelName));
         if (headModel) {
             auto headSceneNode = make_shared<ModelSceneNode>(headModel, ModelUsage::Creature, _sceneGraph, this);
             headSceneNode->setInanimateNodes(bodyModel->getAncestorNodes(g_headHookNode));
@@ -1049,7 +1046,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
 
     string rightWeaponModelName(getWeaponModelName(InventorySlot::rightWeapon));
     if (!rightWeaponModelName.empty()) {
-        shared_ptr<Model> weaponModel(_game->services().graphics().models().get(rightWeaponModelName));
+        shared_ptr<Model> weaponModel(_game->models().get(rightWeaponModelName));
         if (weaponModel) {
             auto weaponSceneNode = make_shared<ModelSceneNode>(weaponModel, ModelUsage::Equipment, _sceneGraph, this);
             bodySceneNode->attach(g_rightHandNode, move(weaponSceneNode));
@@ -1060,7 +1057,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
 
     string leftWeaponModelName(getWeaponModelName(InventorySlot::leftWeapon));
     if (!leftWeaponModelName.empty()) {
-        shared_ptr<Model> weaponModel(_game->services().graphics().models().get(leftWeaponModelName));
+        shared_ptr<Model> weaponModel(_game->models().get(leftWeaponModelName));
         if (weaponModel) {
             auto weaponSceneNode = make_shared<ModelSceneNode>(weaponModel, ModelUsage::Equipment, _sceneGraph, this);
             bodySceneNode->attach(g_leftHandNode, move(weaponSceneNode));
@@ -1088,7 +1085,7 @@ string Creature::getBodyModelName() const {
         column = "race";
     }
 
-    shared_ptr<TwoDA> appearance(_game->services().resource().resources().get2DA("appearance"));
+    shared_ptr<TwoDA> appearance(_game->resources().get2DA("appearance"));
 
     string modelName(appearance->getString(_appearance, column));
     boost::to_lower(modelName);
@@ -1113,7 +1110,7 @@ string Creature::getBodyTextureName() const {
         column = "racetex";
     }
 
-    shared_ptr<TwoDA> appearance(_game->services().resource().resources().get2DA("appearance"));
+    shared_ptr<TwoDA> appearance(_game->resources().get2DA("appearance"));
 
     string texName(boost::to_lower_copy(appearance->getString(_appearance, column)));
     if (texName.empty()) return "";
@@ -1122,7 +1119,7 @@ string Creature::getBodyTextureName() const {
         bool texFound = false;
         if (bodyItem) {
             string tmp(str(boost::format("%s%02d") % texName % bodyItem->textureVariation()));
-            shared_ptr<Texture> texture(_game->services().graphics().textures().get(tmp, TextureUsage::Diffuse));
+            shared_ptr<Texture> texture(_game->textures().get(tmp, TextureUsage::Diffuse));
             if (texture) {
                 texName = move(tmp);
                 texFound = true;
@@ -1139,12 +1136,12 @@ string Creature::getBodyTextureName() const {
 string Creature::getHeadModelName() const {
     if (_modelType != Creature::ModelType::Character) return "";
 
-    shared_ptr<TwoDA> appearance(_game->services().resource().resources().get2DA("appearance"));
+    shared_ptr<TwoDA> appearance(_game->resources().get2DA("appearance"));
 
     int headIdx = appearance->getInt(_appearance, "normalhead", -1);
     if (headIdx == -1) return "";
 
-    shared_ptr<TwoDA> heads(_game->services().resource().resources().get2DA("heads"));
+    shared_ptr<TwoDA> heads(_game->resources().get2DA("heads"));
 
     string modelName(heads->getString(headIdx, "head"));
     boost::to_lower(modelName);
@@ -1250,8 +1247,8 @@ void Creature::loadUTC(const GffStruct &utc) {
 }
 
 void Creature::loadNameFromUTC(const GffStruct &utc) {
-    string firstName(_game->services().resource().strings().get(utc.getInt("FirstName")));
-    string lastName(_game->services().resource().strings().get(utc.getInt("LastName")));
+    string firstName(_game->strings().get(utc.getInt("FirstName")));
+    string lastName(_game->strings().get(utc.getInt("LastName")));
     if (!firstName.empty() && !lastName.empty()) {
         _name = firstName + " " + lastName;
     } else if (!firstName.empty()) {
@@ -1262,18 +1259,18 @@ void Creature::loadNameFromUTC(const GffStruct &utc) {
 void Creature::loadSoundSetFromUTC(const GffStruct &utc) {
     uint32_t soundSetIdx = utc.getUint("SoundSetFile");
     if (soundSetIdx != 0xffff) {
-        shared_ptr<TwoDA> soundSetTable(_game->services().resource().resources().get2DA("soundset"));
+        shared_ptr<TwoDA> soundSetTable(_game->resources().get2DA("soundset"));
         string soundSetResRef(soundSetTable->getString(soundSetIdx, "resref"));
         if (!soundSetResRef.empty()) {
-            _soundSet = _game->services().soundSets().get(soundSetResRef);
+            _soundSet = _game->soundSets().get(soundSetResRef);
         }
     }
 }
 
 void Creature::loadBodyBagFromUTC(const GffStruct &utc) {
     int bodyBag = utc.getInt("BodyBag");
-    shared_ptr<TwoDA> bodyBags(_game->services().resource().resources().get2DA("bodybag"));
-    _bodyBag.name = _game->services().resource().strings().get(bodyBags->getInt(bodyBag, "name"));
+    shared_ptr<TwoDA> bodyBags(_game->resources().get2DA("bodybag"));
+    _bodyBag.name = _game->strings().get(bodyBags->getInt(bodyBag, "name"));
     _bodyBag.appearance = bodyBags->getInt(bodyBag, "appearance");
     _bodyBag.corpse = bodyBags->getBool(bodyBag, "corpse");
 }
@@ -1290,7 +1287,7 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
     for (auto &classGffs : utc.getList("ClassList")) {
         int clazz = classGffs->getInt("Class");
         int level = classGffs->getInt("ClassLevel");
-        attributes.addClassLevels(_game->services().classes().get(static_cast<ClassType>(clazz)).get(), level);
+        attributes.addClassLevels(_game->classes().get(static_cast<ClassType>(clazz)).get(), level);
         for (auto &spellGffs : classGffs->getList("KnownList0")) {
             auto spell = static_cast<ForcePower>(spellGffs->getUint("Spell"));
             attributes.addSpell(spell);
@@ -1311,7 +1308,7 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
 
 void Creature::loadPerceptionRangeFromUTC(const GffStruct &utc) {
     int rangeIdx = utc.getInt("PerceptionRange");
-    shared_ptr<TwoDA> ranges(_game->services().resource().resources().get2DA("ranges"));
+    shared_ptr<TwoDA> ranges(_game->resources().get2DA("ranges"));
     _perception.sightRange = ranges->getFloat(rangeIdx, "primaryrange");
     _perception.hearingRange = ranges->getFloat(rangeIdx, "secondaryrange");
 }

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -40,6 +39,43 @@
 #include "options.h"
 
 namespace reone {
+
+namespace resource {
+
+class Resources;
+class Strings;
+
+}
+
+namespace graphics {
+
+class Context;
+class Features;
+class Fonts;
+class Lips;
+class Materials;
+class Meshes;
+class Models;
+class PBRIBL;
+class Shaders;
+class Textures;
+class Walkmeshes;
+class Window;
+
+}
+
+namespace audio {
+
+class AudioFiles;
+class AudioPlayer;
+
+}
+
+namespace scene {
+
+class SceneGraph;
+
+}
 
 namespace di {
 
@@ -100,7 +136,6 @@ public:
 
     GameID id() const { return _gameId; }
     const Options &options() const { return _options; }
-    di::GameServices &services() { return *_game; }
     std::shared_ptr<Module> module() const { return _module; }
     HUD &hud() const { return *_hud; }
     CharacterGeneration &characterGeneration() { return *_charGen; }
@@ -112,6 +147,44 @@ public:
     void setLoadFromSaveGame(bool load);
     void setPaused(bool paused);
     void setRelativeMouseMode(bool relative);
+
+    // Services
+
+    ActionFactory &actionFactory() { return _game->actionFactory(); }
+    Classes &classes() { return _game->classes(); }
+    Combat &combat() { return _game->combat(); }
+    EffectFactory &effectFactory() { return _game->effectFactory(); }
+    Feats &feats() { return _game->feats(); }
+    FootstepSounds &footstepSounds() { return _game->footstepSounds(); }
+    GUISounds &guiSounds() { return _game->guiSounds(); }
+    ObjectFactory &objectFactory() { return _game->objectFactory(); }
+    Party &party() { return _game->party(); }
+    Portraits &portraits() { return _game->portraits(); }
+    Reputes &reputes() { return _game->reputes(); }
+    ScriptRunner &scriptRunner() { return _game->scriptRunner(); }
+    Skills &skills() { return _game->skills(); }
+    SoundSets &soundSets() { return _game->soundSets(); }
+    Surfaces &surfaces() { return _game->surfaces(); }
+
+    audio::AudioFiles &audioFiles();
+    audio::AudioPlayer &audioPlayer();
+    graphics::Context &context();
+    graphics::Features &features();
+    graphics::Fonts &fonts();
+    graphics::Lips &lips();
+    graphics::Materials &materials();
+    graphics::Meshes &meshes();
+    graphics::Models &models();
+    graphics::PBRIBL &pbrIbl();
+    graphics::Shaders &shaders();
+    graphics::Textures &textures();
+    graphics::Walkmeshes &walkmeshes();
+    graphics::Window &window();
+    scene::SceneGraph &sceneGraph();
+    resource::Resources &resources();
+    resource::Strings &strings();
+
+    // END Services
 
     // Game ID
 

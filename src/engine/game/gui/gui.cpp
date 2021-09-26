@@ -18,9 +18,6 @@
 #include "gui.h"
 
 #include "../../audio/player.h"
-#include "../../di/services/audio.h"
-#include "../../di/services/graphics.h"
-#include "../../di/services/resource.h"
 #include "../../graphics/texture/textures.h"
 
 #include "../game.h"
@@ -41,28 +38,28 @@ namespace game {
 GameGUI::GameGUI(Game *game) :
     GUI(
         game->options().graphics,
-        game->services().graphics().context(),
-        game->services().graphics().features(),
-        game->services().graphics().fonts(),
-        game->services().graphics().materials(),
-        game->services().graphics().meshes(),
-        game->services().graphics().pbrIbl(),
-        game->services().graphics().shaders(),
-        game->services().graphics().textures(),
-        game->services().graphics().window(),
-        game->services().resource().resources(),
-        game->services().resource().strings()
+        game->context(),
+        game->features(),
+        game->fonts(),
+        game->materials(),
+        game->meshes(),
+        game->pbrIbl(),
+        game->shaders(),
+        game->textures(),
+        game->window(),
+        game->resources(),
+        game->strings()
     ),
     _game(game) {
 }
 
 void GameGUI::onClick(const string &control) {
-    _game->services().audio().player().play(_game->services().guiSounds().getOnClick(), AudioType::Sound);
+    _game->audioPlayer().play(_game->guiSounds().getOnClick(), AudioType::Sound);
 }
 
 void GameGUI::onFocusChanged(const string &control, bool focus) {
     if (focus) {
-        _game->services().audio().player().play(_game->services().guiSounds().getOnEnter(), AudioType::Sound);
+        _game->audioPlayer().play(_game->guiSounds().getOnEnter(), AudioType::Sound);
     }
 }
 

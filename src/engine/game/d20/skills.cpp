@@ -18,8 +18,6 @@
 #include "skills.h"
 
 #include "../../common/collectionutil.h"
-#include "../../di/services/graphics.h"
-#include "../../di/services/resource.h"
 #include "../../graphics/texture/textures.h"
 #include "../../resource/2da.h"
 #include "../../resource/resources.h"
@@ -27,7 +25,6 @@
 
 using namespace std;
 
-using namespace reone::di;
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -35,17 +32,14 @@ namespace reone {
 
 namespace game {
 
-Skills::Skills(GraphicsServices &graphics, ResourceServices &resource) : _graphics(graphics), _resource(resource) {
-}
-
 void Skills::init() {
-    shared_ptr<TwoDA> skills(_resource.resources().get2DA("skills"));
+    shared_ptr<TwoDA> skills(_resources.get2DA("skills"));
     if (!skills) return;
 
     for (int row = 0; row < skills->getRowCount(); ++row) {
-        string name(_resource.strings().get(skills->getInt(row, "name", -1)));
-        string description(_resource.strings().get(skills->getInt(row, "description", -1)));
-        shared_ptr<Texture> icon(_graphics.textures().get(skills->getString(row, "icon"), TextureUsage::GUI));
+        string name(_strings.get(skills->getInt(row, "name", -1)));
+        string description(_strings.get(skills->getInt(row, "description", -1)));
+        shared_ptr<Texture> icon(_textures.get(skills->getString(row, "icon"), TextureUsage::GUI));
 
         auto skill = make_shared<Skill>();
         skill->name = move(name);

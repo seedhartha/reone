@@ -41,32 +41,32 @@ namespace game {
 namespace routine {
 
 Variable effectAssuredHit(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newAssuredHit();
+    auto effect = game.effectFactory().newAssuredHit();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectHeal(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newHeal();
+    auto effect = game.effectFactory().newHeal();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamage(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDamage(0, DamageType::Universal, nullptr);
+    auto effect = game.effectFactory().newDamage(0, DamageType::Universal, nullptr);
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectAbilityIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newAbilityIncrease();
+    auto effect = game.effectFactory().newAbilityIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageResistance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDamageResistance();
+    auto effect = game.effectFactory().newDamageResistance();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectResurrection(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newResurrection();
+    auto effect = game.effectFactory().newResurrection();
     return Variable::ofEffect(move(effect));
 }
 
@@ -105,97 +105,97 @@ Variable extraordinaryEffect(Game &game, const vector<Variable> &args, Execution
 }
 
 Variable effectACIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newACIncrease();
+    auto effect = game.effectFactory().newACIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSavingThrowIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newSavingThrowIncrease();
+    auto effect = game.effectFactory().newSavingThrowIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectAttackIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newAttackIncrease();
+    auto effect = game.effectFactory().newAttackIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageReduction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDamageReduction();
+    auto effect = game.effectFactory().newDamageReduction();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDamageIncrease();
+    auto effect = game.effectFactory().newDamageIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectEntangle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newEntangle();
+    auto effect = game.effectFactory().newEntangle();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDeath(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDeath();
+    auto effect = game.effectFactory().newDeath();
     return Variable::ofEffect(std::move(effect));
 }
 
 Variable effectKnockdown(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newKnockdown();
+    auto effect = game.effectFactory().newKnockdown();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectParalyze(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newParalyze();
+    auto effect = game.effectFactory().newParalyze();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSpellImmunity(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newSpellImmunity();
+    auto effect = game.effectFactory().newSpellImmunity();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceJump(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newForceJump();
+    auto effect = game.effectFactory().newForceJump();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSleep(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newSleep();
+    auto effect = game.effectFactory().newSleep();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectTemporaryForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newTemporaryForcePoints();
+    auto effect = game.effectFactory().newTemporaryForcePoints();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectConfused(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newConfused();
+    auto effect = game.effectFactory().newConfused();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectFrightened(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newFrightened();
+    auto effect = game.effectFactory().newFrightened();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectChoke(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newChoke();
+    auto effect = game.effectFactory().newChoke();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectStunned(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newStunned();
+    auto effect = game.effectFactory().newStunned();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectRegenerate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newRegenerate();
+    auto effect = game.effectFactory().newRegenerate();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectMovementSpeedIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newMovementSpeedIncrease();
+    auto effect = game.effectFactory().newMovementSpeedIncrease();
     return Variable::ofEffect(move(effect));
 }
 
@@ -204,57 +204,57 @@ Variable getEffectType(Game &game, const vector<Variable> &args, ExecutionContex
 }
 
 Variable effectAreaOfEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newAreaOfEffect();
+    auto effect = game.effectFactory().newAreaOfEffect();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectVisualEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newVisual();
+    auto effect = game.effectFactory().newVisual();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectLinkEffects(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newLinkEffects();
+    auto effect = game.effectFactory().newLinkEffects();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectBeam(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newBeam();
+    auto effect = game.effectFactory().newBeam();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceResistanceIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newForceResistanceIncrease();
+    auto effect = game.effectFactory().newForceResistanceIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectBodyFuel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newBodyFuel();
+    auto effect = game.effectFactory().newBodyFuel();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectPoison(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newPoison();
+    auto effect = game.effectFactory().newPoison();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectAssuredDeflection(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newAssuredDeflection();
+    auto effect = game.effectFactory().newAssuredDeflection();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForcePushTargeted(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newForcePushTargeted();
+    auto effect = game.effectFactory().newForcePushTargeted();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectHaste(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newHaste();
+    auto effect = game.effectFactory().newHaste();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectImmunity(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newImmunity();
+    auto effect = game.effectFactory().newImmunity();
     return Variable::ofEffect(move(effect));
 }
 
@@ -263,17 +263,17 @@ Variable getEffectSpellId(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable effectDamageImmunityIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDamageImmunityIncrease();
+    auto effect = game.effectFactory().newDamageImmunityIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectTemporaryHitpoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newTemporaryHitPoints();
+    auto effect = game.effectFactory().newTemporaryHitPoints();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSkillIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newSkillIncrease();
+    auto effect = game.effectFactory().newSkillIncrease();
     return Variable::ofEffect(move(effect));
 }
 
@@ -290,162 +290,162 @@ Variable versusTrapEffect(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable effectDamageForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDamageForcePoints();
+    auto effect = game.effectFactory().newDamageForcePoints();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectHealForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newHealForcePoints();
+    auto effect = game.effectFactory().newHealForcePoints();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectHitPointChangeWhenDying(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newHitPointsChangeWhenDying();
+    auto effect = game.effectFactory().newHitPointsChangeWhenDying();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDroidStun(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDroidStun();
+    auto effect = game.effectFactory().newDroidStun();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForcePushed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newForcePushed();
+    auto effect = game.effectFactory().newForcePushed();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceResisted(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newForceResisted();
+    auto effect = game.effectFactory().newForceResisted();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceFizzle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newForceFizzle();
+    auto effect = game.effectFactory().newForceFizzle();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectAbilityDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newAbilityDecrease();
+    auto effect = game.effectFactory().newAbilityDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectAttackDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newAttackDecrease();
+    auto effect = game.effectFactory().newAttackDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDamageDecrease();
+    auto effect = game.effectFactory().newDamageDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageImmunityDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDamageImmunityDecrease();
+    auto effect = game.effectFactory().newDamageImmunityDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectACDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newACDecrease();
+    auto effect = game.effectFactory().newACDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectMovementSpeedDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newMovementSpeedDecrease();
+    auto effect = game.effectFactory().newMovementSpeedDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSavingThrowDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newSavingThrowDecrease();
+    auto effect = game.effectFactory().newSavingThrowDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSkillDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newSkillDecrease();
+    auto effect = game.effectFactory().newSkillDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceResistanceDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newForceResistanceDecrease();
+    auto effect = game.effectFactory().newForceResistanceDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectInvisibility(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newInvisibility();
+    auto effect = game.effectFactory().newInvisibility();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectConcealment(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newConcealment();
+    auto effect = game.effectFactory().newConcealment();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceShield(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newForceShield();
+    auto effect = game.effectFactory().newForceShield();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDispelMagicAll(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDispelMagicAll();
+    auto effect = game.effectFactory().newDispelMagicAll();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDisguise(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDisguise();
+    auto effect = game.effectFactory().newDisguise();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectTrueSeeing(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newTrueSeeing();
+    auto effect = game.effectFactory().newTrueSeeing();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSeeInvisible(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newSeeInvisible();
+    auto effect = game.effectFactory().newSeeInvisible();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectTimeStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newTimeStop();
+    auto effect = game.effectFactory().newTimeStop();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectBlasterDeflectionIncrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newBlasterDeflectionIncrease();
+    auto effect = game.effectFactory().newBlasterDeflectionIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectBlasterDeflectionDecrease(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newBlasterDeflectionDecrease();
+    auto effect = game.effectFactory().newBlasterDeflectionDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectHorrified(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newHorrified();
+    auto effect = game.effectFactory().newHorrified();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSpellLevelAbsorption(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newSpellLevelAbsorption();
+    auto effect = game.effectFactory().newSpellLevelAbsorption();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDispelMagicBest(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDispelMagicBest();
+    auto effect = game.effectFactory().newDispelMagicBest();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectMissChance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newMissChance();
+    auto effect = game.effectFactory().newMissChance();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectModifyAttacks(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newModifyAttacks();
+    auto effect = game.effectFactory().newModifyAttacks();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageShield(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDamageShield();
+    auto effect = game.effectFactory().newDamageShield();
     return Variable::ofEffect(move(effect));
 }
 
@@ -454,92 +454,92 @@ Variable setEffectIcon(Game &game, const vector<Variable> &args, ExecutionContex
 }
 
 Variable effectForceDrain(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newForceDrain();
+    auto effect = game.effectFactory().newForceDrain();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectPsychicStatic(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newPsychicStatic();
+    auto effect = game.effectFactory().newPsychicStatic();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectLightsaberThrow(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newLightsaberThrow();
+    auto effect = game.effectFactory().newLightsaberThrow();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectWhirlWind(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newWhirlWind();
+    auto effect = game.effectFactory().newWhirlWind();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectCutSceneHorrified(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newCutsceneHorrified();
+    auto effect = game.effectFactory().newCutsceneHorrified();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectCutSceneParalyze(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newCutsceneParalyze();
+    auto effect = game.effectFactory().newCutsceneParalyze();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectCutSceneStunned(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newCutsceneStunned();
+    auto effect = game.effectFactory().newCutsceneStunned();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceBody(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newForceBody();
+    auto effect = game.effectFactory().newForceBody();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectFury(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newFury();
+    auto effect = game.effectFactory().newFury();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectBlind(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newBlind();
+    auto effect = game.effectFactory().newBlind();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectFPRegenModifier(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newFPRegenModifier();
+    auto effect = game.effectFactory().newFPRegenModifier();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectVPRegenModifier(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newVPRegenModifier();
+    auto effect = game.effectFactory().newVPRegenModifier();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectCrush(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newCrush();
+    auto effect = game.effectFactory().newCrush();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDroidConfused(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDroidConfused();
+    auto effect = game.effectFactory().newDroidConfused();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceSight(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newForceSight();
+    auto effect = game.effectFactory().newForceSight();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectMindTrick(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newMindTrick();
+    auto effect = game.effectFactory().newMindTrick();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectFactionModifier(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newFactionModifier();
+    auto effect = game.effectFactory().newFactionModifier();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDroidScramble(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto effect = game.services().effectFactory().newDroidScramble();
+    auto effect = game.effectFactory().newDroidScramble();
     return Variable::ofEffect(move(effect));
 }
 

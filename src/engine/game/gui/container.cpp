@@ -17,8 +17,6 @@
 
 #include "container.h"
 
-#include "../../di/services/graphics.h"
-#include "../../di/services/resource.h"
 #include "../../graphics/texture/textures.h"
 #include "../../gui/control/imagebutton.h"
 #include "../../resource/strings.h"
@@ -50,10 +48,10 @@ void Container::load() {
     GUI::load();
     bindControls();
 
-    string btnMessage(_game->services().resource().strings().get(kSwitchToResRef) + " " + _game->services().resource().strings().get(kGiveItemResRef));
+    string btnMessage(_game->strings().get(kSwitchToResRef) + " " + _game->strings().get(kGiveItemResRef));
     _binding.btnGiveItems->setTextMessage(btnMessage);
 
-    string lblMessage(_game->services().resource().strings().get(kInventoryResRef));
+    string lblMessage(_game->strings().get(kInventoryResRef));
     _binding.lblMessage->setTextMessage(lblMessage);
 
     _binding.btnOk->setOnClick([this]() {
@@ -112,11 +110,11 @@ shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return _game->services().graphics().textures().get(resRef, TextureUsage::GUI);
+    return _game->textures().get(resRef, TextureUsage::GUI);
 }
 
 void Container::transferItemsToPlayer() {
-    shared_ptr<Creature> player(_game->services().party().player());
+    shared_ptr<Creature> player(_game->party().player());
     _container->moveDropableItemsTo(*player);
 
     auto placeable = dynamic_pointer_cast<Placeable>(_container);

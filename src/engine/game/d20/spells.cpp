@@ -18,14 +18,12 @@
 #include "spells.h"
 
 #include "../../common/collectionutil.h"
-#include "../../di/services/resource.h"
 #include "../../resource/2da.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
 using namespace std;
 
-using namespace reone::di;
 using namespace reone::graphics;
 using namespace reone::resource;
 
@@ -33,18 +31,13 @@ namespace reone {
 
 namespace game {
 
-Spells::Spells(Textures &textures, ResourceServices &resource) :
-    _textures(textures),
-    _resource(resource) {
-}
-
 void Spells::init() {
-    shared_ptr<TwoDA> spells(_resource.resources().get2DA("spells"));
+    shared_ptr<TwoDA> spells(_resources.get2DA("spells"));
     if (!spells) return;
 
     for (int row = 0; row < spells->getRowCount(); ++row) {
-        string name(_resource.strings().get(spells->getInt(row, "name", -1)));
-        string description(_resource.strings().get(spells->getInt(row, "spelldesc", -1)));
+        string name(_strings.get(spells->getInt(row, "name", -1)));
+        string description(_strings.get(spells->getInt(row, "spelldesc", -1)));
         shared_ptr<Texture> icon(_textures.get(spells->getString(row, "iconresref"), TextureUsage::GUI));
         uint32_t pips = spells->getUint(row, "pips");
 

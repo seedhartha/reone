@@ -19,8 +19,6 @@
 
 #include "../../audio/files.h"
 #include "../../audio/player.h"
-#include "../../di/services/audio.h"
-#include "../../di/services/resource.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"
@@ -52,7 +50,7 @@ void Sound::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Sound::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> uts(_game->services().resource().resources().getGFF(resRef, ResourceType::Uts));
+    shared_ptr<GffStruct> uts(_game->resources().getGFF(resRef, ResourceType::Uts));
     if (uts) {
         loadUTS(*uts);
     }
@@ -104,7 +102,7 @@ void Sound::update(float dt) {
 
 void Sound::playSound(const string &resRef, bool loop) {
     float gain = _volume / 127.0f;
-    _sound = _game->services().audio().player().play(resRef, AudioType::Sound, loop, gain, _positional, getPosition());
+    _sound = _game->audioPlayer().play(resRef, AudioType::Sound, loop, gain, _positional, getPosition());
 }
 
 void Sound::play() {
@@ -137,7 +135,7 @@ void Sound::setAudible(bool audible) {
 
 void Sound::loadUTS(const GffStruct &uts) {
     _tag = boost::to_lower_copy(uts.getString("Tag"));
-    _name = _game->services().resource().strings().get(uts.getInt("LocName"));
+    _name = _game->strings().get(uts.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(uts.getString("TemplateResRef"));
     _active = uts.getBool("Active");
     _continuous = uts.getBool("Continuous");
@@ -171,7 +169,7 @@ void Sound::loadUTS(const GffStruct &uts) {
 }
 
 void Sound::loadPriorityFromUTS(const GffStruct &uts) {
-    shared_ptr<TwoDA> priorityGroups(_game->services().resource().resources().get2DA("prioritygroups"));
+    shared_ptr<TwoDA> priorityGroups(_game->resources().get2DA("prioritygroups"));
     int priorityIdx = uts.getInt("Priority");
     _priority = priorityGroups->getInt(priorityIdx, "priority");
 }

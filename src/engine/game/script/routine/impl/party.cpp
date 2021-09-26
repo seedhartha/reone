@@ -44,13 +44,13 @@ namespace routine {
 Variable setPartyLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
 
-    game.services().party().setPartyLeader(npc);
+    game.party().setPartyLeader(npc);
 
     return Variable::ofNull();
 }
 
 Variable getPartyMemberCount(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(game.services().party().getSize());
+    return Variable::ofInt(game.party().getSize());
 }
 
 Variable addToParty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
@@ -65,7 +65,7 @@ Variable addPartyMember(Game &game, const vector<Variable> &args, ExecutionConte
     int npc = getInt(args, 0);
     auto creature = getCreature(game, args, 1, ctx);
 
-    bool result = game.services().party().addAvailableMember(npc, creature->blueprintResRef());
+    bool result = game.party().addAvailableMember(npc, creature->blueprintResRef());
 
     return Variable::ofInt(static_cast<int>(result));
 }
@@ -74,8 +74,8 @@ Variable removePartyMember(Game &game, const vector<Variable> &args, ExecutionCo
     bool result = false;
     int npc = getInt(args, 0);
 
-    if (game.services().party().isMember(npc)) {
-        game.services().party().removeMember(npc);
+    if (game.party().isMember(npc)) {
+        game.party().removeMember(npc);
 
         shared_ptr<Area> area(game.module()->area());
         area->unloadParty();
@@ -89,12 +89,12 @@ Variable removePartyMember(Game &game, const vector<Variable> &args, ExecutionCo
 
 Variable isObjectPartyMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     auto creature = getCreature(game, args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(game.services().party().isMember(*creature)));
+    return Variable::ofInt(static_cast<int>(game.party().isMember(*creature)));
 }
 
 Variable getPartyMemberByIndex(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int index = getInt(args, 0);
-    auto member = game.services().party().getMember(index);
+    auto member = game.party().getMember(index);
 
     return Variable::ofObject(getObjectIdOrInvalid(member));
 }
@@ -105,14 +105,14 @@ Variable addAvailableNPCByObject(Game &game, const vector<Variable> &args, Execu
 
 Variable removeAvailableNPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
-    bool removed = game.services().party().removeAvailableMember(npc);
+    bool removed = game.party().removeAvailableMember(npc);
 
     return Variable::ofInt(static_cast<int>(removed));
 }
 
 Variable isAvailableCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
-    bool isAvailable = game.services().party().isMemberAvailable(npc);
+    bool isAvailable = game.party().isMemberAvailable(npc);
 
     return Variable::ofInt(static_cast<int>(isAvailable));
 }
@@ -121,7 +121,7 @@ Variable addAvailableNPCByTemplate(Game &game, const vector<Variable> &args, Exe
     int npc = getInt(args, 0);
     string blueprint(boost::to_lower_copy(getString(args, 1)));
 
-    bool added = game.services().party().addAvailableMember(npc, blueprint);
+    bool added = game.party().addAvailableMember(npc, blueprint);
 
     return Variable::ofInt(static_cast<int>(added));
 }
@@ -132,7 +132,7 @@ Variable spawnAvailableNPC(Game &game, const vector<Variable> &args, ExecutionCo
 
 Variable isNPCPartyMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     int npc = getInt(args, 0);
-    bool isMember = game.services().party().isMember(npc);
+    bool isMember = game.party().isMember(npc);
 
     return Variable::ofInt(static_cast<int>(isMember));
 }
@@ -187,7 +187,7 @@ Variable getIsPartyLeader(Game &game, const vector<Variable> &args, ExecutionCon
 }
 
 Variable getPartyLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto player = game.services().party().getLeader();
+    auto player = game.party().getLeader();
     return Variable::ofObject(getObjectIdOrInvalid(player));
 }
 

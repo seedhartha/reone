@@ -64,12 +64,6 @@ public:
 
     void init();
 
-    ResourceServices &resource() { return _resource; }
-    GraphicsServices &graphics() { return _graphics; }
-    AudioServices &audio() { return _audio; }
-    SceneServices &scene() { return _scene; }
-    ScriptServices &script() { return _script; }
-
     game::ActionFactory &actionFactory() { return *_actionFactory; }
     game::Classes &classes() { return *_classes; }
     game::Combat &combat() { return *_combat; }

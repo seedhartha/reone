@@ -19,7 +19,6 @@
 
 #include "../../common/logutil.h"
 #include "../../common/streamutil.h"
-#include "../../di/services/resource.h"
 #include "../../graphics/texture/tgareader.h"
 #include "../../resource/format/erfreader.h"
 #include "../../resource/format/gffreader.h"
@@ -159,10 +158,10 @@ void SaveLoad::bindControls() {
 void SaveLoad::refresh() {
     _binding.btnDelete->setDisabled(_mode != Mode::Save);
 
-    string panelName(_game->services().resource().strings().get(_mode == Mode::Save ? kStrRefSaveGame : kStrRefLoadGame));
+    string panelName(_game->strings().get(_mode == Mode::Save ? kStrRefSaveGame : kStrRefLoadGame));
     _binding.lblPanelName->setTextMessage(move(panelName));
 
-    string actionName(_game->services().resource().strings().get(_mode == Mode::Save ? kStrRefSave : kStrRefLoad));
+    string actionName(_game->strings().get(_mode == Mode::Save ? kStrRefSave : kStrRefLoad));
     _binding.btnSaveLoad->setTextMessage(move(actionName));
 
     refreshSavedGames();

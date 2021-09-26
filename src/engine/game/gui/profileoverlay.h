@@ -22,9 +22,12 @@
 
 namespace reone {
 
-namespace di {
+namespace graphics {
 
-class GraphicsServices;
+class Fonts;
+class Meshes;
+class Shaders;
+class Window;
 
 }
 
@@ -32,7 +35,17 @@ namespace game {
 
 class ProfileOverlay {
 public:
-    ProfileOverlay(di::GraphicsServices &graphics);
+    ProfileOverlay(
+        graphics::Fonts &fonts,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders,
+        graphics::Window &window
+    ) :
+        _fonts(fonts),
+        _meshes(meshes),
+        _shaders(shaders),
+        _window(window) {
+    }
 
     void init();
     bool handle(const SDL_Event &event);
@@ -45,8 +58,6 @@ private:
         int onePerLow { 0 }; /**< 1% Low */
     };
 
-    di::GraphicsServices &_graphics;
-
     uint64_t _frequency { 0 };
     uint64_t _counter { 0 };
     std::shared_ptr<graphics::Font> _font;
@@ -56,6 +67,15 @@ private:
     Timer _refreshTimer;
     std::vector<float> _frametimes;
     FPS _fps;
+
+    // Services
+
+    graphics::Fonts &_fonts;
+    graphics::Meshes &_meshes;
+    graphics::Shaders &_shaders;
+    graphics::Window &_window;
+
+    // END Services
 
     void calculateFPS();
 

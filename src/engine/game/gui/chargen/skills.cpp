@@ -17,7 +17,6 @@
 
 #include "skills.h"
 
-#include "../../../di/services/resource.h"
 #include "../../../gui/control/listbox.h"
 #include "../../../resource/strings.h"
 
@@ -220,7 +219,7 @@ void CharGenSkills::bindControls() {
 
 void CharGenSkills::reset(bool newGame) {
     const CreatureAttributes &attributes = _charGen->character().attributes;
-    shared_ptr<CreatureClass> clazz(_game->services().classes().get(attributes.getEffectiveClass()));
+    shared_ptr<CreatureClass> clazz(_game->classes().get(attributes.getEffectiveClass()));
 
     _points = glm::max(1, (clazz->skillPointBase() + attributes.getAbilityModifier(Ability::Intelligence)) / 2);
 
@@ -276,7 +275,7 @@ void CharGenSkills::refreshControls() {
 bool CharGenSkills::canIncreaseSkill(SkillType skill) const {
     ClassType clazz = _charGen->character().attributes.getEffectiveClass();
 
-    shared_ptr<CreatureClass> creatureClass(_game->services().classes().get(clazz));
+    shared_ptr<CreatureClass> creatureClass(_game->classes().get(clazz));
     int maxSkillRank = creatureClass->isClassSkill(skill) ? 4 : 2;
     int pointCost = creatureClass->isClassSkill(skill) ? 1 : 2;
 
@@ -293,7 +292,7 @@ void CharGenSkills::updateCharacter() {
 
 int CharGenSkills::getPointCost(SkillType skill) const {
     ClassType clazz = _charGen->character().attributes.getEffectiveClass();
-    shared_ptr<CreatureClass> creatureClass(_game->services().classes().get(clazz));
+    shared_ptr<CreatureClass> creatureClass(_game->classes().get(clazz));
     return creatureClass->isClassSkill(skill) ? 1 : 2;
 }
 
@@ -315,7 +314,7 @@ void CharGenSkills::onSkillLabelFocusChanged(SkillType skill, bool focus) {
     auto maybeDescription = g_descStrRefBySkill.find(skill);
     if (maybeDescription == g_descStrRefBySkill.end()) return;
 
-    string description(_game->services().resource().strings().get(maybeDescription->second));
+    string description(_game->strings().get(maybeDescription->second));
     _binding.lbDesc->clearItems();
     _binding.lbDesc->addTextLinesAsItems(description);
 }
