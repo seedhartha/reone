@@ -22,10 +22,10 @@ namespace reone {
 namespace audio {
 
 struct AudioOptions {
-    int musicVolume { 85 };
-    int voiceVolume { 85 };
-    int soundVolume { 85 };
-    int movieVolume { 85 };
+    int musicVolume {85};
+    int voiceVolume {85};
+    int soundVolume {85};
+    int movieVolume {85};
 };
 
 } // namespace audio

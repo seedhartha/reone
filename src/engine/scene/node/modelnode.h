@@ -48,7 +48,7 @@ protected:
         graphics::Shaders &shaders);
 
 private:
-    glm::mat4 _boneTransform { 1.0f }; /**< model space transform relative to the rest pose */
+    glm::mat4 _boneTransform {1.0f}; /**< model space transform relative to the rest pose */
 };
 
 } // namespace scene

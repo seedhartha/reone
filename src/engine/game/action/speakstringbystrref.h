@@ -25,7 +25,8 @@ namespace game {
 
 class SpeakStringByStrRefAction : public Action {
 public:
-    SpeakStringByStrRefAction(Game &game) : Action(game, ActionType::SpeakStringByStrRef) {
+    SpeakStringByStrRefAction(Game &game) :
+        Action(game, ActionType::SpeakStringByStrRef) {
     }
 
     void execute(Object &actor, float dt) override;

@@ -35,7 +35,7 @@ class Meshes;
 class Shaders;
 class Texture;
 
-}
+} // namespace graphics
 
 namespace video {
 
@@ -50,8 +50,7 @@ public:
     Video(
         graphics::Context &context,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders
-    ) :
+        graphics::Shaders &shaders) :
         _context(context),
         _meshes(meshes),
         _shaders(shaders) {
@@ -72,15 +71,15 @@ public:
     void setMediaStream(std::shared_ptr<MediaStream<Frame>> stream) { _stream = std::move(stream); }
 
 private:
-    int _width { 0 };
-    int _height { 0 };
-    float _fps { 0.0f };
+    int _width {0};
+    int _height {0};
+    float _fps {0.0f};
     std::shared_ptr<MediaStream<Frame>> _stream;
 
-    bool _inited { false };
-    float _time { 0.0f };
+    bool _inited {false};
+    float _time {0.0f};
     std::shared_ptr<Frame> _frame;
-    bool _finished { false };
+    bool _finished {false};
 
     std::shared_ptr<graphics::Texture> _texture;
     std::shared_ptr<audio::AudioStream> _audio;

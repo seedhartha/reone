@@ -33,8 +33,7 @@ namespace reone {
 namespace graphics {
 
 static unordered_map<string, string> g_fontOverride = {
-    { "fnt_d16x16", "fnt_d16x16b" }
-};
+    {"fnt_d16x16", "fnt_d16x16b"}};
 
 Fonts::Fonts(Window &window, Context &context, Meshes &meshes, Textures &textures, Shaders &shaders) :
     MemoryCache(bind(&Fonts::doGet, this, _1)),
@@ -51,7 +50,8 @@ shared_ptr<Font> Fonts::doGet(string resRef) {
         resRef = maybeOverride->second;
     }
     shared_ptr<Texture> texture(_textures.get(resRef, TextureUsage::GUI));
-    if (!texture) return nullptr;
+    if (!texture)
+        return nullptr;
 
     auto font = make_shared<Font>(_window, _context, _meshes, _shaders);
     font->load(texture);

@@ -30,7 +30,7 @@ namespace gui {
 class Button;
 class Label;
 
-}
+} // namespace gui
 
 namespace game {
 
@@ -58,7 +58,7 @@ private:
     CharacterGeneration *_charGen;
 
     std::vector<Portrait> _portraits;
-    int _currentPortrait { 0 };
+    int _currentPortrait {0};
 
     void bindControls();
     void loadCurrentPortrait();

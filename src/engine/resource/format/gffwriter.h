@@ -34,8 +34,7 @@ class GffWriter {
 public:
     GffWriter(
         ResourceType resType,
-        std::shared_ptr<GffStruct> root
-    ) :
+        std::shared_ptr<GffStruct> root) :
         _resType(resType),
         _root(ensurePresent(root, "root")) {
     }
@@ -45,15 +44,15 @@ public:
 
 private:
     struct WriteStruct {
-        uint32_t type { 0 };
-        uint32_t dataOrDataOffset { 0 };
-        uint32_t fieldCount { 0 };
+        uint32_t type {0};
+        uint32_t dataOrDataOffset {0};
+        uint32_t fieldCount {0};
     };
 
     struct WriteField {
-        uint32_t type { 0 };
-        uint32_t labelIndex { 0 };
-        uint32_t dataOrDataOffset { 0 };
+        uint32_t type {0};
+        uint32_t labelIndex {0};
+        uint32_t dataOrDataOffset {0};
     };
 
     struct WriteContext {

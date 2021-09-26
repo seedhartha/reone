@@ -25,7 +25,8 @@ namespace game {
 
 class MissChanceEffect : public Effect {
 public:
-    MissChanceEffect() : Effect(EffectType::MissChance) {
+    MissChanceEffect() :
+        Effect(EffectType::MissChance) {
     }
 
     void applyTo(SpatialObject &object) override;

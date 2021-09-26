@@ -56,12 +56,12 @@ public:
     };
 
     struct Properties {
-        Filtering minFilter { Filtering::LinearMipmapLinear };
-        Filtering maxFilter { Filtering::Linear };
-        Wrapping wrap { Wrapping::Repeat };
-        glm::vec3 borderColor { 1.0f };
-        bool cubemap { false }; /**< is this a cube map texture? */
-        bool headless { false }; /**< must an OpenGL texture be created? */
+        Filtering minFilter {Filtering::LinearMipmapLinear};
+        Filtering maxFilter {Filtering::Linear};
+        Wrapping wrap {Wrapping::Repeat};
+        glm::vec3 borderColor {1.0f};
+        bool cubemap {false};  /**< is this a cube map texture? */
+        bool headless {false}; /**< must an OpenGL texture be created? */
     };
 
     /**
@@ -71,22 +71,22 @@ public:
         std::string envmapTexture;
         std::string bumpyShinyTexture;
         std::string bumpmapTexture;
-        float bumpMapScaling { 0.0f };
-        Blending blending { Blending::None };
-        int numChars { 0 };
-        float fontHeight { 0.0f };
+        float bumpMapScaling {0.0f};
+        Blending blending {Blending::None};
+        int numChars {0};
+        float fontHeight {0.0f};
         std::vector<glm::vec3> upperLeftCoords;
         std::vector<glm::vec3> lowerRightCoords;
-        float waterAlpha { -1.0f };
-        ProcedureType procedureType { ProcedureType::Invalid };
-        int numX { 0 };
-        int numY { 0 };
-        int fps { 0 };
+        float waterAlpha {-1.0f};
+        ProcedureType procedureType {ProcedureType::Invalid};
+        int numX {0};
+        int numY {0};
+        int fps {0};
     };
 
     struct MipMap {
-        int width { 0 };
-        int height { 0 };
+        int width {0};
+        int height {0};
         std::shared_ptr<ByteArray> pixels;
     };
 
@@ -143,12 +143,12 @@ private:
     std::string _name;
     Properties _properties;
 
-    bool _inited { false };
-    uint32_t _textureId { 0 };
+    bool _inited {false};
+    uint32_t _textureId {0};
 
-    int _width { 0 };
-    int _height { 0 };
-    PixelFormat _pixelFormat { PixelFormat::BGR };
+    int _width {0};
+    int _height {0};
+    PixelFormat _pixelFormat {PixelFormat::BGR};
     std::vector<Layer> _layers; /**< either one for 2D textures, or six for cube maps */
     Features _features;
 

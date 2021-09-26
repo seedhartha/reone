@@ -46,16 +46,14 @@ LightSceneNode::LightSceneNode(
     SceneGraph &sceneGraph,
     Context &context,
     Meshes &meshes,
-    Shaders &shaders
-) :
+    Shaders &shaders) :
     ModelNodeSceneNode(
         modelNode,
         SceneNodeType::Light,
         sceneGraph,
         context,
         meshes,
-        shaders
-    ),
+        shaders),
     _model(ensurePresent(model, "model")) {
 
     _color = modelNode->color().getByFrameOrElse(0, glm::vec3(0.0f));
@@ -77,7 +75,8 @@ void LightSceneNode::update(float dt) {
 
 void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
-    if (!camera) return;
+    if (!camera)
+        return;
 
     _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     flare.texture->bind();

@@ -25,7 +25,8 @@ namespace game {
 
 class ResumeConversationAction : public Action {
 public:
-    ResumeConversationAction(Game &game) : Action(game, ActionType::ResumeConversation) {
+    ResumeConversationAction(Game &game) :
+        Action(game, ActionType::ResumeConversation) {
     }
 
     void execute(Object &actor, float dt) override;

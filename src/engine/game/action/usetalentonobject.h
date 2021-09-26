@@ -25,7 +25,8 @@ namespace game {
 
 class UseTalentOnObjectAction : public Action {
 public:
-    UseTalentOnObjectAction(Game &game) : Action(game, ActionType::UseTalentOnObject) {
+    UseTalentOnObjectAction(Game &game) :
+        Action(game, ActionType::UseTalentOnObject) {
     }
 
     void execute(Object &actor, float dt) override;

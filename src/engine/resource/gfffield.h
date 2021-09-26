@@ -48,26 +48,27 @@ enum class GffFieldType : uint16_t {
 class GffStruct;
 
 struct GffField {
-    GffFieldType type { GffFieldType::Int };
+    GffFieldType type {GffFieldType::Int};
     std::string label;
     std::string strValue; /**< covers CExoString and ResRef */
-    glm::vec3 vecValue { 0.0f };
-    glm::quat quatValue { 1.0f, 0.0f, 0.0f, 0.0f };
+    glm::vec3 vecValue {0.0f};
+    glm::quat quatValue {1.0f, 0.0f, 0.0f, 0.0f};
     ByteArray data;
     std::vector<std::shared_ptr<GffStruct>> children;
 
     union {
-        int32_t intValue; /**< covers Char, Short, Int and StrRef */
+        int32_t intValue;   /**< covers Char, Short, Int and StrRef */
         uint32_t uintValue; /**< covers Byte, Word and Dword */
         int64_t int64Value;
-        uint64_t uint64Value { 0 };
+        uint64_t uint64Value {0};
         float floatValue;
         double doubleValue;
     };
 
     GffField() = default;
 
-    GffField(GffFieldType type, std::string label) : type(type), label(std::move(label)) {
+    GffField(GffFieldType type, std::string label) :
+        type(type), label(std::move(label)) {
     }
 
     static GffField newByte(std::string label, uint32_t val);

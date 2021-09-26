@@ -46,16 +46,14 @@ EmitterSceneNode::EmitterSceneNode(
     SceneGraph &sceneGraph,
     Context &context,
     Meshes &meshes,
-    Shaders &shaders
-) :
+    Shaders &shaders) :
     ModelNodeSceneNode(
         modelNode,
         SceneNodeType::Emitter,
         sceneGraph,
         context,
         meshes,
-        shaders
-    ),
+        shaders),
     _model(ensurePresent(model, "model")) {
 
     _birthrate = modelNode->birthrate().getByFrameOrElse(0, 0.0f);
@@ -112,28 +110,28 @@ bool EmitterSceneNode::isParticleExpired(Particle &particle) const {
 void EmitterSceneNode::spawnParticles(float dt) {
     shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
     switch (emitter->updateMode) {
-        case ModelNode::Emitter::UpdateMode::Fountain:
-            if (_birthrate != 0.0f) {
-                if (_birthTimer.advance(dt)) {
-                    doSpawnParticle();
-                    _birthTimer.setTimeout(_birthInterval);
-                }
-            }
-            break;
-        case ModelNode::Emitter::UpdateMode::Single:
-            if (!_spawned || (_particles.empty() && emitter->loop)) {
-                doSpawnParticle();
-                _spawned = true;
-            }
-            break;
-        case ModelNode::Emitter::UpdateMode::Lightning:
+    case ModelNode::Emitter::UpdateMode::Fountain:
+        if (_birthrate != 0.0f) {
             if (_birthTimer.advance(dt)) {
-                spawnLightningParticles();
-                _birthTimer.setTimeout(_lightningDelay);
+                doSpawnParticle();
+                _birthTimer.setTimeout(_birthInterval);
             }
-            break;
-        default:
-            break;
+        }
+        break;
+    case ModelNode::Emitter::UpdateMode::Single:
+        if (!_spawned || (_particles.empty() && emitter->loop)) {
+            doSpawnParticle();
+            _spawned = true;
+        }
+        break;
+    case ModelNode::Emitter::UpdateMode::Lightning:
+        if (_birthTimer.advance(dt)) {
+            spawnLightningParticles();
+            _birthTimer.setTimeout(_lightningDelay);
+        }
+        break;
+    default:
+        break;
     }
 }
 
@@ -167,7 +165,8 @@ void EmitterSceneNode::doSpawnParticle() {
 void EmitterSceneNode::spawnLightningParticles() {
     // Ensure there is a reference node directly under this emitter
     auto ref = find_if(_children.begin(), _children.end(), [](auto &child) { return child->type() == SceneNodeType::Dummy; });
-    if (ref == _children.end()) return;
+    if (ref == _children.end())
+        return;
 
     float halfW = 0.005f * _size.x;
     float halfH = 0.005f * _size.y;
@@ -207,7 +206,8 @@ void EmitterSceneNode::spawnLightningParticles() {
 
 void EmitterSceneNode::updateParticle(Particle &particle, float dt) {
     // Lightning emitters are updated elsewhere
-    if (_modelNode->emitter()->updateMode == ModelNode::Emitter::UpdateMode::Lightning) return;
+    if (_modelNode->emitter()->updateMode == ModelNode::Emitter::UpdateMode::Lightning)
+        return;
 
     if (_lifeExpectancy != -1.0f) {
         particle.lifetime = glm::min(particle.lifetime + dt, _lifeExpectancy);
@@ -255,14 +255,16 @@ void EmitterSceneNode::detonate() {
 }
 
 void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &elements, int count) {
-    if (elements.empty()) return;
+    if (elements.empty())
+        return;
     if (count == -1) {
         count = static_cast<int>(elements.size());
     }
 
     shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
     shared_ptr<Texture> texture(emitter->texture);
-    if (!texture) return;
+    if (!texture)
+        return;
 
     ShaderUniforms uniforms(_sceneGraph.uniformsPrototype());
     uniforms.combined.featureMask |= UniformFeatureFlags::particles;

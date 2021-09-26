@@ -27,7 +27,8 @@ class Routines;
 
 class KotORRoutineRegistrar : public RoutineRegistrar {
 public:
-    KotORRoutineRegistrar(Routines &routines) : _routines(routines) {
+    KotORRoutineRegistrar(Routines &routines) :
+        _routines(routines) {
     }
 
     void invoke() override;

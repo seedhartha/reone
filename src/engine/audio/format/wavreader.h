@@ -41,19 +41,19 @@ public:
 private:
     struct ChunkHeader {
         std::string id;
-        uint32_t size { 0 };
+        uint32_t size {0};
     };
 
     struct IMA {
-        int16_t lastSample { 0 };
-        int16_t stepIndex { 0 };
+        int16_t lastSample {0};
+        int16_t stepIndex {0};
     };
 
-    WavAudioFormat _audioFormat { WavAudioFormat::PCM };
-    uint16_t _channelCount { 0 };
-    uint32_t _sampleRate { 0 };
-    uint16_t _blockAlign { 0 };
-    uint16_t _bitsPerSample { 0 };
+    WavAudioFormat _audioFormat {WavAudioFormat::PCM};
+    uint16_t _channelCount {0};
+    uint32_t _sampleRate {0};
+    uint16_t _blockAlign {0};
+    uint16_t _bitsPerSample {0};
     IMA _ima[2];
     std::shared_ptr<AudioStream> _stream;
 

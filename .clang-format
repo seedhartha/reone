@@ -1,0 +1,7 @@
+BasedOnStyle: LLVM
+
+AccessModifierOffset: -4
+BreakConstructorInitializers: AfterColon
+ColumnLimit: 0
+IndentWidth: 4
+SpaceBeforeCpp11BracedList: true

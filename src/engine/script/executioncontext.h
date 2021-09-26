@@ -28,14 +28,14 @@ struct ExecutionState;
 class IRoutineProvider;
 
 struct ExecutionContext {
-    IRoutineProvider *routines { nullptr };
+    IRoutineProvider *routines {nullptr};
     std::shared_ptr<ExecutionState> savedState;
-    uint32_t callerId { kObjectInvalid };
-    uint32_t triggererId { kObjectInvalid };
-    int userDefinedEventNumber { -1 };
-    int scriptVar { -1 };
+    uint32_t callerId {kObjectInvalid};
+    uint32_t triggererId {kObjectInvalid};
+    int userDefinedEventNumber {-1};
+    int scriptVar {-1};
 };
 
 } // namespace script
 
-} // namespae reone
+} // namespace reone

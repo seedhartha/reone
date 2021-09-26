@@ -25,7 +25,8 @@ namespace game {
 
 class LinkEffectsEffect : public Effect {
 public:
-    LinkEffectsEffect() : Effect(EffectType::LinkEffects) {
+    LinkEffectsEffect() :
+        Effect(EffectType::LinkEffects) {
     }
 
     void applyTo(SpatialObject &object) override;

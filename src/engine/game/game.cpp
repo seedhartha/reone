@@ -111,8 +111,7 @@ Game::Game(
     WorldRenderPipeline &worldRenderPipeline,
     Scripts &scripts,
     Resources &resources,
-    Strings &strings
-) :
+    Strings &strings) :
     _gameId(gameId),
     _path(move(path)),
     _options(move(options)),
@@ -208,7 +207,8 @@ void Game::setCursorType(CursorType type) {
 
 void Game::playVideo(const string &name) {
     fs::path path(getPathIgnoreCase(_path, "movies/" + name + ".bik"));
-    if (path.empty()) return;
+    if (path.empty())
+        return;
 
     BikReader bik(path, _context, _meshes, _shaders);
     bik.load();
@@ -245,7 +245,8 @@ void Game::changeScreen(GameScreen screen) {
 }
 
 void Game::playMusic(const string &resRef) {
-    if (_musicResRef == resRef) return;
+    if (_musicResRef == resRef)
+        return;
 
     if (_music) {
         _music->stop();
@@ -386,23 +387,23 @@ void Game::drawWorld() {
 
 void Game::toggleInGameCameraType() {
     switch (_cameraType) {
-        case CameraType::FirstPerson:
-            if (_party.getLeader()) {
-                _cameraType = CameraType::ThirdPerson;
-            }
-            break;
-        case CameraType::ThirdPerson: {
-            _module->player().stopMovement();
-            shared_ptr<Area> area(_module->area());
-            auto &thirdPerson = area->getCamera<ThirdPersonCamera>(CameraType::ThirdPerson);
-            auto &firstPerson = area->getCamera<FirstPersonCamera>(CameraType::FirstPerson);
-            firstPerson.setPosition(thirdPerson.sceneNode()->absoluteTransform()[3]);
-            firstPerson.setFacing(thirdPerson.facing());
-            _cameraType = CameraType::FirstPerson;
-            break;
+    case CameraType::FirstPerson:
+        if (_party.getLeader()) {
+            _cameraType = CameraType::ThirdPerson;
         }
-        default:
-            break;
+        break;
+    case CameraType::ThirdPerson: {
+        _module->player().stopMovement();
+        shared_ptr<Area> area(_module->area());
+        auto &thirdPerson = area->getCamera<ThirdPersonCamera>(CameraType::ThirdPerson);
+        auto &firstPerson = area->getCamera<FirstPersonCamera>(CameraType::FirstPerson);
+        firstPerson.setPosition(thirdPerson.sceneNode()->absoluteTransform()[3]);
+        firstPerson.setFacing(thirdPerson.facing());
+        _cameraType = CameraType::FirstPerson;
+        break;
+    }
+    default:
+        break;
     }
 
     setRelativeMouseMode(_cameraType == CameraType::FirstPerson);
@@ -414,34 +415,34 @@ Camera *Game::getActiveCamera() const {
 
 shared_ptr<Object> Game::getObjectById(uint32_t id) const {
     switch (id) {
-        case kObjectSelf:
-            throw invalid_argument("id is invalid");
-        case kObjectInvalid:
-            return nullptr;
-        default:
-            return _objectFactory.getObjectById(id);
+    case kObjectSelf:
+        throw invalid_argument("id is invalid");
+    case kObjectInvalid:
+        return nullptr;
+    default:
+        return _objectFactory.getObjectById(id);
     }
 }
 
 void Game::drawGUI() {
     switch (_screen) {
-        case GameScreen::InGame:
-            if (_cameraType == CameraType::ThirdPerson) {
-                _hud->draw();
-            }
-            if (_console->isOpen()) {
-                _console->draw();
-            }
-            break;
-
-        default: {
-            GUI *gui = getScreenGUI();
-            if (gui) {
-                gui->draw();
-                gui->draw3D();
-            }
-            break;
+    case GameScreen::InGame:
+        if (_cameraType == CameraType::ThirdPerson) {
+            _hud->draw();
         }
+        if (_console->isOpen()) {
+            _console->draw();
+        }
+        break;
+
+    default: {
+        GUI *gui = getScreenGUI();
+        if (gui) {
+            gui->draw();
+            gui->draw3D();
+        }
+        break;
+    }
     }
 }
 
@@ -482,26 +483,26 @@ void Game::loadInGame() {
 
 GUI *Game::getScreenGUI() const {
     switch (_screen) {
-        case GameScreen::MainMenu:
-            return _mainMenu.get();
-        case GameScreen::Loading:
-            return _loadScreen.get();
-        case GameScreen::CharacterGeneration:
-            return _charGen.get();
-        case GameScreen::InGame:
-            return _cameraType == CameraType::ThirdPerson ? _hud.get() : nullptr;
-        case GameScreen::InGameMenu:
-            return _inGame.get();
-        case GameScreen::Conversation:
-            return _conversation;
-        case GameScreen::Container:
-            return _container.get();
-        case GameScreen::PartySelection:
-            return _partySelect.get();
-        case GameScreen::SaveLoad:
-            return _saveLoad.get();
-        default:
-            return nullptr;
+    case GameScreen::MainMenu:
+        return _mainMenu.get();
+    case GameScreen::Loading:
+        return _loadScreen.get();
+    case GameScreen::CharacterGeneration:
+        return _charGen.get();
+    case GameScreen::InGame:
+        return _cameraType == CameraType::ThirdPerson ? _hud.get() : nullptr;
+    case GameScreen::InGameMenu:
+        return _inGame.get();
+    case GameScreen::Conversation:
+        return _conversation;
+    case GameScreen::Container:
+        return _container.get();
+    case GameScreen::PartySelection:
+        return _partySelect.get();
+    case GameScreen::SaveLoad:
+        return _saveLoad.get();
+    default:
+        return nullptr;
     }
 }
 
@@ -569,7 +570,8 @@ void Game::updateVideo(float dt) {
 }
 
 void Game::updateMusic() {
-    if (_musicResRef.empty()) return;
+    if (_musicResRef.empty())
+        return;
 
     if (!_music || _music->isStopped()) {
         _music = _audioPlayer.play(_musicResRef, AudioType::Music);
@@ -634,38 +636,39 @@ void Game::openInGameMenu(InGameMenu::Tab tab) {
 
     setCursorType(CursorType::Default);
     switch (tab) {
-        case InGameMenu::Tab::Equipment:
-            _inGame->openEquipment();
-            break;
-        case InGameMenu::Tab::Inventory:
-            _inGame->openInventory();
-            break;
-        case InGameMenu::Tab::Character:
-            _inGame->openCharacter();
-            break;
-        case InGameMenu::Tab::Abilities:
-            _inGame->openAbilities();
-            break;
-        case InGameMenu::Tab::Messages:
-            _inGame->openMessages();
-            break;
-        case InGameMenu::Tab::Journal:
-            _inGame->openJournal();
-            break;
-        case InGameMenu::Tab::Map:
-            _inGame->openMap();
-            break;
-        case InGameMenu::Tab::Options:
-            _inGame->openOptions();
-            break;
-        default:
-            break;
+    case InGameMenu::Tab::Equipment:
+        _inGame->openEquipment();
+        break;
+    case InGameMenu::Tab::Inventory:
+        _inGame->openInventory();
+        break;
+    case InGameMenu::Tab::Character:
+        _inGame->openCharacter();
+        break;
+    case InGameMenu::Tab::Abilities:
+        _inGame->openAbilities();
+        break;
+    case InGameMenu::Tab::Messages:
+        _inGame->openMessages();
+        break;
+    case InGameMenu::Tab::Journal:
+        _inGame->openJournal();
+        break;
+    case InGameMenu::Tab::Map:
+        _inGame->openMap();
+        break;
+    case InGameMenu::Tab::Options:
+        _inGame->openOptions();
+        break;
+    default:
+        break;
     }
     changeScreen(GameScreen::InGameMenu);
 }
 
 void Game::startDialog(const shared_ptr<SpatialObject> &owner, const string &resRef) {
-    if (!g_conversationsEnabled) return;
+    if (!g_conversationsEnabled)
+        return;
 
     shared_ptr<GffStruct> dlg(_resources.getGFF(resRef, ResourceType::Dlg));
     if (!dlg) {
@@ -729,22 +732,22 @@ void Game::scheduleModuleTransition(const string &moduleName, const string &entr
 
 void Game::updateCamera(float dt) {
     switch (_screen) {
-        case GameScreen::Conversation: {
-            int cameraId;
-            CameraType cameraType = _conversation->getCamera(cameraId);
-            if (cameraType == CameraType::Static) {
-                _module->area()->setStaticCamera(cameraId);
-            }
-            _cameraType = cameraType;
-            break;
+    case GameScreen::Conversation: {
+        int cameraId;
+        CameraType cameraType = _conversation->getCamera(cameraId);
+        if (cameraType == CameraType::Static) {
+            _module->area()->setStaticCamera(cameraId);
         }
-        case GameScreen::InGame:
-            if (_cameraType != CameraType::FirstPerson && _cameraType != CameraType::ThirdPerson) {
-                _cameraType = CameraType::ThirdPerson;
-            }
-            break;
-        default:
-            break;
+        _cameraType = cameraType;
+        break;
+    }
+    case GameScreen::InGame:
+        if (_cameraType != CameraType::FirstPerson && _cameraType != CameraType::ThirdPerson) {
+            _cameraType = CameraType::ThirdPerson;
+        }
+        break;
+    default:
+        break;
     }
     Camera *camera = getActiveCamera();
     if (camera) {
@@ -762,7 +765,8 @@ void Game::updateCamera(float dt) {
 
 void Game::updateSceneGraph(float dt) {
     const Camera *camera = getActiveCamera();
-    if (!camera) return;
+    if (!camera)
+        return;
 
     // Select a reference node for dynamic lighting
     shared_ptr<SceneNode> lightingRefNode;
@@ -780,7 +784,8 @@ void Game::updateSceneGraph(float dt) {
 }
 
 bool Game::handle(const SDL_Event &event) {
-    if (_profileOverlay->handle(event)) return true;
+    if (_profileOverlay->handle(event))
+        return true;
 
     if (!_video) {
         GUI *gui = getScreenGUI();
@@ -788,42 +793,45 @@ bool Game::handle(const SDL_Event &event) {
             return true;
         }
         switch (_screen) {
-            case GameScreen::InGame: {
-                if (_console->handle(event)) {
-                    return true;
-                }
-                if (_party.handle(event)) {
-                    return true;
-                }
-                Camera *camera = getActiveCamera();
-                if (camera && camera->handle(event)) {
-                    return true;
-                }
-                if (_module->handle(event)) {
-                    return true;
-                }
-                break;
+        case GameScreen::InGame: {
+            if (_console->handle(event)) {
+                return true;
             }
-            default:
-                break;
+            if (_party.handle(event)) {
+                return true;
+            }
+            Camera *camera = getActiveCamera();
+            if (camera && camera->handle(event)) {
+                return true;
+            }
+            if (_module->handle(event)) {
+                return true;
+            }
+            break;
+        }
+        default:
+            break;
         }
     }
     switch (event.type) {
-        case SDL_MOUSEBUTTONDOWN:
-            if (handleMouseButtonDown(event.button)) return true;
-            break;
-        case SDL_KEYDOWN:
-            if (handleKeyDown(event.key)) return true;
-            break;
-        default:
-            break;
+    case SDL_MOUSEBUTTONDOWN:
+        if (handleMouseButtonDown(event.button))
+            return true;
+        break;
+    case SDL_KEYDOWN:
+        if (handleKeyDown(event.key))
+            return true;
+        break;
+    default:
+        break;
     }
 
     return false;
 }
 
 bool Game::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    if (event.button != SDL_BUTTON_LEFT) return false;
+    if (event.button != SDL_BUTTON_LEFT)
+        return false;
 
     if (_video) {
         _video->finish();
@@ -834,46 +842,47 @@ bool Game::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
 }
 
 bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
-    if (event.repeat) return false;
+    if (event.repeat)
+        return false;
 
     switch (event.keysym.sym) {
-        case SDLK_MINUS:
-            if (_options.developer && _gameSpeed > 1.0f) {
-                _gameSpeed = glm::max(1.0f, _gameSpeed - 1.0f);
-                return true;
-            }
-            break;
+    case SDLK_MINUS:
+        if (_options.developer && _gameSpeed > 1.0f) {
+            _gameSpeed = glm::max(1.0f, _gameSpeed - 1.0f);
+            return true;
+        }
+        break;
 
-        case SDLK_EQUALS:
-            if (_options.developer && _gameSpeed < 8.0f) {
-                _gameSpeed = glm::min(8.0f, _gameSpeed + 1.0f);
-                return true;
-            }
-            break;
+    case SDLK_EQUALS:
+        if (_options.developer && _gameSpeed < 8.0f) {
+            _gameSpeed = glm::min(8.0f, _gameSpeed + 1.0f);
+            return true;
+        }
+        break;
 
-        case SDLK_v:
-            if (_options.developer && _screen == GameScreen::InGame) {
-                toggleInGameCameraType();
-                return true;
-            }
-            break;
+    case SDLK_v:
+        if (_options.developer && _screen == GameScreen::InGame) {
+            toggleInGameCameraType();
+            return true;
+        }
+        break;
 
-        case SDLK_F1:
-            if (_options.developer) {
-                _features.toggle(Feature::PBR);
-                return true;
-            }
-            break;
+    case SDLK_F1:
+        if (_options.developer) {
+            _features.toggle(Feature::PBR);
+            return true;
+        }
+        break;
 
-        case SDLK_F3:
-            if (_options.developer) {
-                _features.toggle(Feature::DynamicRoomLighting);
-                return true;
-            }
-            break;
+    case SDLK_F3:
+        if (_options.developer) {
+            _features.toggle(Feature::DynamicRoomLighting);
+            return true;
+        }
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 
     return false;
@@ -941,37 +950,33 @@ void Game::saveToFile(const fs::path &path) {
     vector<shared_ptr<GffStruct>> nfoGlobalBooleans;
     for (auto &global : _globalBooleans) {
         auto gffs = make_shared<GffStruct>(2, vector<GffField> {
-            GffField::newCExoString("Name", global.first),
-            GffField::newByte("Value", static_cast<uint32_t>(global.second))
-        });
+                                                  GffField::newCExoString("Name", global.first),
+                                                  GffField::newByte("Value", static_cast<uint32_t>(global.second))});
         nfoGlobalBooleans.push_back(move(gffs));
     }
 
     vector<shared_ptr<GffStruct>> nfoGlobalNumbers;
     for (auto &global : _globalNumbers) {
         auto gffs = make_shared<GffStruct>(2, vector<GffField> {
-            GffField::newCExoString("Name", global.first),
-            GffField::newInt("Value", global.second)
-        });
+                                                  GffField::newCExoString("Name", global.first),
+                                                  GffField::newInt("Value", global.second)});
         nfoGlobalNumbers.push_back(move(gffs));
     }
 
     vector<shared_ptr<GffStruct>> nfoGlobalStrings;
     for (auto &global : _globalStrings) {
         auto gffs = make_shared<GffStruct>(2, vector<GffField> {
-            GffField::newCExoString("Name", global.first),
-            GffField::newCExoString("Value", global.second)
-        });
+                                                  GffField::newCExoString("Name", global.first),
+                                                  GffField::newCExoString("Value", global.second)});
         nfoGlobalStrings.push_back(move(gffs));
     }
 
     vector<shared_ptr<GffStruct>> nfoGlobalLocations;
     for (auto &global : _globalLocations) {
         auto gffs = make_shared<GffStruct>(3, vector<GffField> {
-            GffField::newCExoString("Name", global.first),
-            GffField::newVector("Position", global.second->position()),
-            GffField::newFloat("Facing", global.second->facing())
-        });
+                                                  GffField::newCExoString("Name", global.first),
+                                                  GffField::newVector("Position", global.second->position()),
+                                                  GffField::newFloat("Facing", global.second->facing())});
         nfoGlobalLocations.push_back(move(gffs));
     }
 
@@ -1029,11 +1034,10 @@ shared_ptr<GffStruct> Game::getPartyMemberNFOStruct(int index) const {
     auto member = _party.getMember(index);
 
     return make_shared<GffStruct>(0, vector<GffField> {
-        GffField::newByte("NPC", _party.getNPCByMemberIndex(index)),
-        GffField::newCExoString("TemplateResRef", member->blueprintResRef()),
-        GffField::newVector("Position", member->position()),
-        GffField::newFloat("Facing", member->getFacing())
-    });
+                                         GffField::newByte("NPC", _party.getNPCByMemberIndex(index)),
+                                         GffField::newCExoString("TemplateResRef", member->blueprintResRef()),
+                                         GffField::newVector("Position", member->position()),
+                                         GffField::newFloat("Facing", member->getFacing())});
 }
 
 void Game::loadFromFile(const fs::path &path) {

@@ -28,8 +28,8 @@ namespace audio {
 class AudioStream : boost::noncopyable {
 public:
     struct Frame {
-        AudioFormat format { AudioFormat::Mono8 };
-        int sampleRate { 0 };
+        AudioFormat format {AudioFormat::Mono8};
+        int sampleRate {0};
         ByteArray samples;
     };
 
@@ -42,7 +42,7 @@ public:
     float duration() const { return _duration; }
 
 private:
-    float _duration { 0 };
+    float _duration {0};
     std::vector<Frame> _frames;
 
     int getALAudioFormat(AudioFormat format) const;

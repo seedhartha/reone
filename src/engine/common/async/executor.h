@@ -34,7 +34,7 @@ public:
     bool isRunning() const { return _running; }
 
 private:
-    volatile bool _running { false };
+    volatile bool _running {false};
     std::vector<std::unique_ptr<std::thread>> _threads;
     std::queue<std::shared_ptr<Task>> _tasks;
     std::mutex _tasksMutex;

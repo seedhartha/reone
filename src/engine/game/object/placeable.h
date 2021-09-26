@@ -55,20 +55,20 @@ public:
     // END Scripts
 
 private:
-    int  _appearance { 0 };
-    bool _hasInventory { false };
-    bool _usable { false };
+    int _appearance {0};
+    bool _hasInventory {false};
+    bool _usable {false};
     std::shared_ptr<graphics::Walkmesh> _walkmesh;
-    Faction _faction { Faction::Invalid };
-    bool _keyRequired { false };
-    bool _lockable { false };
-    bool _locked { false };
-    int _openLockDC { 0 };
-    int _animationState { 0 };
-    int _hardness { 0 };
-    int _fortitude { 0 };
-    bool _partyInteract { false };
-    bool _static { false };
+    Faction _faction {Faction::Invalid};
+    bool _keyRequired {false};
+    bool _lockable {false};
+    bool _locked {false};
+    int _openLockDC {0};
+    int _animationState {0};
+    int _hardness {0};
+    int _fortitude {0};
+    bool _partyInteract {false};
+    bool _static {false};
 
     // Scripts
 

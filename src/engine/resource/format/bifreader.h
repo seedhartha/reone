@@ -31,12 +31,12 @@ public:
 
 private:
     struct ResourceEntry {
-        uint32_t offset { 0 };
-        uint32_t fileSize { 0 };
+        uint32_t offset {0};
+        uint32_t fileSize {0};
     };
 
-    int _resourceCount { 0 };
-    uint32_t _tableOffset { 0 };
+    int _resourceCount {0};
+    uint32_t _tableOffset {0};
 
     void doLoad() override;
     ResourceEntry readResourceEntry(int idx);

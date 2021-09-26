@@ -23,7 +23,8 @@ namespace reone {
 
 namespace gui {
 
-TextInput::TextInput(int mask) : _mask(mask) {
+TextInput::TextInput(int mask) :
+    _mask(mask) {
 }
 
 void TextInput::clear() {
@@ -32,10 +33,10 @@ void TextInput::clear() {
 
 bool TextInput::handle(const SDL_Event &event) {
     switch (event.type) {
-        case SDL_KEYDOWN:
-            return handleKeyDown(event.key);
-        default:
-            return false;
+    case SDL_KEYDOWN:
+        return handleKeyDown(event.key);
+    default:
+        return false;
     }
 }
 
@@ -52,7 +53,8 @@ static inline bool isLetterKey(const SDL_Keysym &key) {
 }
 
 bool TextInput::handleKeyDown(const SDL_KeyboardEvent &event) {
-    if (!isKeyAllowed(event.keysym)) return false;
+    if (!isKeyAllowed(event.keysym))
+        return false;
 
     bool shift = isShiftPressed(event.keysym);
     bool digit = isDigitKey(event.keysym);
@@ -84,9 +86,12 @@ bool TextInput::handleKeyDown(const SDL_KeyboardEvent &event) {
 }
 
 bool TextInput::isKeyAllowed(const SDL_Keysym &key) const {
-    if (isDigitKey(key) && !(_mask & TextInputFlags::digits)) return false;
-    if (isLetterKey(key) && !(_mask & TextInputFlags::letters)) return false;
-    if (key.sym == SDLK_SPACE && !(_mask & TextInputFlags::whitespace)) return false;
+    if (isDigitKey(key) && !(_mask & TextInputFlags::digits))
+        return false;
+    if (isLetterKey(key) && !(_mask & TextInputFlags::letters))
+        return false;
+    if (key.sym == SDLK_SPACE && !(_mask & TextInputFlags::whitespace))
+        return false;
 
     bool underscore = key.sym == SDLK_MINUS && isShiftPressed(key);
     if (underscore ||

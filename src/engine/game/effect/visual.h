@@ -25,7 +25,8 @@ namespace game {
 
 class VisualEffect : public Effect {
 public:
-    VisualEffect() : Effect(EffectType::Visual) {
+    VisualEffect() :
+        Effect(EffectType::Visual) {
     }
 
     void applyTo(SpatialObject &object) override;

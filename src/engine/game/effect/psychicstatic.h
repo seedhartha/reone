@@ -25,7 +25,8 @@ namespace game {
 
 class PsychicStaticEffect : public Effect {
 public:
-    PsychicStaticEffect() : Effect(EffectType::PsychicStatic) {
+    PsychicStaticEffect() :
+        Effect(EffectType::PsychicStatic) {
     }
 
     void applyTo(SpatialObject &object) override;

@@ -34,7 +34,8 @@ namespace reone {
 
 namespace graphics {
 
-Models::Models(Textures &textures, Resources &resources) : _textures(textures), _resources(resources) {
+Models::Models(Textures &textures, Resources &resources) :
+    _textures(textures), _resources(resources) {
 }
 
 void Models::invalidateCache() {
@@ -42,10 +43,12 @@ void Models::invalidateCache() {
 }
 
 shared_ptr<Model> Models::get(const string &resRef) {
-    if (resRef.empty()) return nullptr;
+    if (resRef.empty())
+        return nullptr;
 
     auto maybeModel = _cache.find(resRef);
-    if (maybeModel != _cache.end()) return maybeModel->second;
+    if (maybeModel != _cache.end())
+        return maybeModel->second;
 
     auto inserted = _cache.insert(make_pair(resRef, doGet(resRef)));
     return inserted.first->second;

@@ -79,15 +79,15 @@ private:
     VertexAttributes _attributes;
     DrawMode _mode;
 
-    int _vertexCount { 0 };
-    bool _inited { false };
+    int _vertexCount {0};
+    bool _inited {false};
     AABB _aabb;
 
     // OpenGL
 
-    uint32_t _vboId { 0 };
-    uint32_t _iboId { 0 };
-    uint32_t _vaoId { 0 };
+    uint32_t _vboId {0};
+    uint32_t _iboId {0};
+    uint32_t _vaoId {0};
 
     // END OpenGL
 

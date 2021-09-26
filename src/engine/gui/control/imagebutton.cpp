@@ -51,7 +51,8 @@ void ImageButton::draw(
     const shared_ptr<Texture> &iconTexture,
     const shared_ptr<Texture> &iconFrame) {
 
-    if (!_visible) return;
+    if (!_visible)
+        return;
 
     glm::ivec2 borderOffset(offset);
     borderOffset.x += _extent.height;
@@ -77,7 +78,8 @@ void ImageButton::drawIcon(
     const shared_ptr<Texture> &iconTexture,
     const shared_ptr<Texture> &iconFrame) {
 
-    if (!iconFrame && !iconTexture) return;
+    if (!iconFrame && !iconTexture)
+        return;
 
     glm::vec3 color(1.0f);
     if (_focus && _hilight) {

@@ -28,7 +28,8 @@ namespace reone {
 
 namespace game {
 
-Portraits::Portraits(Textures &textures, Resources &resources) : _textures(textures), _resources(resources) {
+Portraits::Portraits(Textures &textures, Resources &resources) :
+    _textures(textures), _resources(resources) {
 }
 
 void Portraits::init() {
@@ -65,7 +66,8 @@ shared_ptr<Texture> Portraits::getTextureByAppearance(int appearance) {
     for (auto &portrait : _portraits) {
         if (portrait.appearanceNumber == appearance ||
             portrait.appearanceS == appearance ||
-            portrait.appearanceL == appearance) return getPortraitTexture(portrait);
+            portrait.appearanceL == appearance)
+            return getPortraitTexture(portrait);
     }
     return nullptr;
 }

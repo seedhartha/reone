@@ -25,7 +25,8 @@ namespace game {
 
 class TrueSeeingEffect : public Effect {
 public:
-    TrueSeeingEffect() : Effect(EffectType::TrueSeeing) {
+    TrueSeeingEffect() :
+        Effect(EffectType::TrueSeeing) {
     }
 
     void applyTo(SpatialObject &object) override;

@@ -25,7 +25,8 @@ namespace game {
 
 class CastSpellAtLocationAction : public Action {
 public:
-    CastSpellAtLocationAction(Game &game) : Action(game, ActionType::CastSpellAtLocation) {
+    CastSpellAtLocationAction(Game &game) :
+        Action(game, ActionType::CastSpellAtLocation) {
     }
 
     void execute(Object &actor, float dt) override;

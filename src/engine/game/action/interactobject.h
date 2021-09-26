@@ -25,7 +25,8 @@ namespace game {
 
 class InteractObjectAction : public Action {
 public:
-    InteractObjectAction(Game &game) : Action(game, ActionType::InteractObject) {
+    InteractObjectAction(Game &game) :
+        Action(game, ActionType::InteractObject) {
     }
 
     void execute(Object &actor, float dt) override;

@@ -29,7 +29,8 @@ namespace reone {
 
 namespace audio {
 
-WavReader::WavReader() : BinaryReader(0) {
+WavReader::WavReader() :
+    BinaryReader(0) {
 }
 
 void WavReader::doLoad() {
@@ -59,7 +60,8 @@ void WavReader::doLoad() {
 }
 
 bool WavReader::readChunkHeader(ChunkHeader &chunk) {
-    if (_reader->eof()) return false;
+    if (_reader->eof())
+        return false;
 
     string id(readString(4));
     uint32_t size = readUint32();
@@ -106,12 +108,12 @@ void WavReader::loadData(ChunkHeader chunk) {
     }
 
     switch (_audioFormat) {
-        case WavAudioFormat::PCM:
-            loadPCM(chunk.size);
-            break;
-        case WavAudioFormat::IMAADPCM:
-            loadIMAADPCM(chunk.size);
-            break;
+    case WavAudioFormat::PCM:
+        loadPCM(chunk.size);
+        break;
+    case WavAudioFormat::IMAADPCM:
+        loadIMAADPCM(chunk.size);
+        break;
     }
 }
 
@@ -128,7 +130,7 @@ void WavReader::loadPCM(uint32_t chunkSize) {
     _stream->add(move(frame));
 }
 
-static constexpr int kIMAIndexTable[] = { -1, -1, -1, -1, 2, 4, 6, 8 };
+static constexpr int kIMAIndexTable[] = {-1, -1, -1, -1, 2, 4, 6, 8};
 
 static constexpr int kIMAStepTable[] = {
     7, 8, 9, 10, 11, 12, 13, 14, 16, 17,
@@ -139,8 +141,7 @@ static constexpr int kIMAStepTable[] = {
     876, 963, 1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066,
     2272, 2499, 2749, 3024, 3327, 3660, 4026, 4428, 4871, 5358,
     5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899,
-    15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767
-};
+    15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767};
 
 void WavReader::loadIMAADPCM(uint32_t chunkSize) {
     ByteArray chunk(_reader->getBytes(chunkSize));
@@ -187,23 +188,22 @@ void WavReader::loadIMAADPCM(uint32_t chunkSize) {
 
 AudioFormat WavReader::getAudioFormat() const {
     switch (_audioFormat) {
-        case WavAudioFormat::PCM:
-            switch (_bitsPerSample) {
-                case 16:
-                    return _channelCount == 2 ? AudioFormat::Stereo16 : AudioFormat::Mono16;
-                case 8:
-                    return _channelCount == 2 ? AudioFormat::Stereo8 : AudioFormat::Mono8;
-                default:
-                    throw logic_error("WAV: PCM: invalid bits per sample: " + to_string(_bitsPerSample));
-            }
-        case WavAudioFormat::IMAADPCM:
-            if (_bitsPerSample != 4) {
-                throw logic_error("WAV: IMA ADPCM: invalid bits per sample: " + to_string(_bitsPerSample));
-            }
+    case WavAudioFormat::PCM:
+        switch (_bitsPerSample) {
+        case 16:
             return _channelCount == 2 ? AudioFormat::Stereo16 : AudioFormat::Mono16;
+        case 8:
+            return _channelCount == 2 ? AudioFormat::Stereo8 : AudioFormat::Mono8;
         default:
-            throw logic_error("WAV: invalid audio format: " + to_string(static_cast<int>(_audioFormat)));
-
+            throw logic_error("WAV: PCM: invalid bits per sample: " + to_string(_bitsPerSample));
+        }
+    case WavAudioFormat::IMAADPCM:
+        if (_bitsPerSample != 4) {
+            throw logic_error("WAV: IMA ADPCM: invalid bits per sample: " + to_string(_bitsPerSample));
+        }
+        return _channelCount == 2 ? AudioFormat::Stereo16 : AudioFormat::Mono16;
+    default:
+        throw logic_error("WAV: invalid audio format: " + to_string(static_cast<int>(_audioFormat)));
     }
 }
 

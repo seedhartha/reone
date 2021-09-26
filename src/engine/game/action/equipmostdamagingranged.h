@@ -25,7 +25,8 @@ namespace game {
 
 class EquipMostDamagingRangedAction : public Action {
 public:
-    EquipMostDamagingRangedAction(Game &game) : Action(game, ActionType::EquipMostDamagingRanged) {
+    EquipMostDamagingRangedAction(Game &game) :
+        Action(game, ActionType::EquipMostDamagingRanged) {
     }
 
     void execute(Object &actor, float dt) override;

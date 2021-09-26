@@ -32,7 +32,7 @@ namespace gui {
 class Button;
 class Label;
 
-}
+} // namespace gui
 
 namespace game {
 
@@ -44,8 +44,8 @@ public:
 
 private:
     struct ClassButton {
-        gui::Control *control { nullptr };
-        glm::ivec2 center { 0 };
+        gui::Control *control {nullptr};
+        glm::ivec2 center {0};
         Character character;
     };
 
@@ -67,8 +67,8 @@ private:
         std::shared_ptr<gui::Label> threeDModel6;
     } _binding;
 
-    glm::ivec2 _defaultButtonSize { 0 };
-    glm::ivec2 _enlargedButtonSize { 0 };
+    glm::ivec2 _defaultButtonSize {0};
+    glm::ivec2 _enlargedButtonSize {0};
     std::vector<ClassButton> _classButtons;
 
     void bindControls();

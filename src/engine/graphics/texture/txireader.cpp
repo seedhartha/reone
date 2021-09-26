@@ -60,66 +60,66 @@ void TxiReader::processLine(const vector<string> &tokens) {
     glm::vec3 vec;
 
     switch (_state) {
-        case State::None:
-            key = boost::to_lower_copy(tokens[0]);
-            if (key == "envmaptexture") {
-                _features.envmapTexture = tokens[1];
-            } else if (key == "bumpyshinytexture") {
-                _features.bumpyShinyTexture = tokens[1];
-            } else if (key == "bumpmaptexture") {
-                _features.bumpmapTexture = tokens[1];
-            } else if (key == "bumpmapscaling") {
-                _features.bumpMapScaling = stof(tokens[1]);
-            } else if (key == "blending") {
-                _features.blending = parseBlending(tokens[1]);
-            } else if (key == "numchars") {
-                _features.numChars = stoi(tokens[1]);
-            } else if (key == "fontheight") {
-                _features.fontHeight = stof(tokens[1]);
-            } else if (key == "upperleftcoords") {
-                _upperLeftCoordCount = stoi(tokens[1]);
-                _features.upperLeftCoords.reserve(_upperLeftCoordCount);
-                _state = State::UpperLeftCoords;
-            } else if (key == "lowerrightcoords") {
-                _lowerRightCoordCount = stoi(tokens[1]);
-                _features.lowerRightCoords.reserve(_lowerRightCoordCount);
-                _state = State::LowerRightCoords;
-            } else if (key == "wateralpha") {
-                _features.waterAlpha = stof(tokens[1]);
-            } else if (key == "proceduretype") {
-                _features.procedureType = parseProcedureType(tokens[1]);
-            } else if (key == "numx") {
-                _features.numX = stoi(tokens[1]);
-            } else if (key == "numy") {
-                _features.numY = stoi(tokens[1]);
-            } else if (key == "fps") {
-                _features.fps = stoi(tokens[1]);
-            }
-            break;
+    case State::None:
+        key = boost::to_lower_copy(tokens[0]);
+        if (key == "envmaptexture") {
+            _features.envmapTexture = tokens[1];
+        } else if (key == "bumpyshinytexture") {
+            _features.bumpyShinyTexture = tokens[1];
+        } else if (key == "bumpmaptexture") {
+            _features.bumpmapTexture = tokens[1];
+        } else if (key == "bumpmapscaling") {
+            _features.bumpMapScaling = stof(tokens[1]);
+        } else if (key == "blending") {
+            _features.blending = parseBlending(tokens[1]);
+        } else if (key == "numchars") {
+            _features.numChars = stoi(tokens[1]);
+        } else if (key == "fontheight") {
+            _features.fontHeight = stof(tokens[1]);
+        } else if (key == "upperleftcoords") {
+            _upperLeftCoordCount = stoi(tokens[1]);
+            _features.upperLeftCoords.reserve(_upperLeftCoordCount);
+            _state = State::UpperLeftCoords;
+        } else if (key == "lowerrightcoords") {
+            _lowerRightCoordCount = stoi(tokens[1]);
+            _features.lowerRightCoords.reserve(_lowerRightCoordCount);
+            _state = State::LowerRightCoords;
+        } else if (key == "wateralpha") {
+            _features.waterAlpha = stof(tokens[1]);
+        } else if (key == "proceduretype") {
+            _features.procedureType = parseProcedureType(tokens[1]);
+        } else if (key == "numx") {
+            _features.numX = stoi(tokens[1]);
+        } else if (key == "numy") {
+            _features.numY = stoi(tokens[1]);
+        } else if (key == "fps") {
+            _features.fps = stoi(tokens[1]);
+        }
+        break;
 
-        case State::UpperLeftCoords:
-            vec = glm::vec3(
-                stod(tokens[0]),
-                stod(tokens[1]),
-                stod(tokens[2]));
+    case State::UpperLeftCoords:
+        vec = glm::vec3(
+            stod(tokens[0]),
+            stod(tokens[1]),
+            stod(tokens[2]));
 
-            _features.upperLeftCoords.push_back(vec);
-            if (_features.upperLeftCoords.size() == _upperLeftCoordCount) {
-                _state = State::None;
-            }
-            break;
+        _features.upperLeftCoords.push_back(vec);
+        if (_features.upperLeftCoords.size() == _upperLeftCoordCount) {
+            _state = State::None;
+        }
+        break;
 
-        case State::LowerRightCoords:
-            vec = glm::vec3(
-                stod(tokens[0]),
-                stod(tokens[1]),
-                stod(tokens[2]));
+    case State::LowerRightCoords:
+        vec = glm::vec3(
+            stod(tokens[0]),
+            stod(tokens[1]),
+            stod(tokens[2]));
 
-            _features.lowerRightCoords.push_back(vec);
-            if (_features.lowerRightCoords.size() == _lowerRightCoordCount) {
-                _state = State::None;
-            }
-            break;
+        _features.lowerRightCoords.push_back(vec);
+        if (_features.lowerRightCoords.size() == _lowerRightCoordCount) {
+            _state = State::None;
+        }
+        break;
     }
 }
 

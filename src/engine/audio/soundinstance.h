@@ -39,15 +39,15 @@ public:
 
 private:
     std::shared_ptr<AudioStream> _stream;
-    bool _loop { false };
-    float _gain { 0.0f };
-    bool _positional { false };
+    bool _loop {false};
+    float _gain {0.0f};
+    bool _positional {false};
     std::shared_ptr<SoundHandle> _handle;
     std::vector<uint32_t> _buffers;
-    bool _buffered { false };
-    uint32_t _source { 0 };
-    int _nextFrame { 0 };
-    int _nextBuffer { 0 };
+    bool _buffered {false};
+    uint32_t _source {0};
+    int _nextFrame {0};
+    int _nextBuffer {0};
 
     void deinit();
 };

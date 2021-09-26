@@ -41,10 +41,10 @@ public:
     const std::string &mapNote() const { return _mapNote; }
 
 private:
-    int _appearance { 0 };
-    bool _hasMapNote { false };
+    int _appearance {0};
+    bool _hasMapNote {false};
     std::string _mapNote;
-    bool _mapNoteEnabled { false };
+    bool _mapNoteEnabled {false};
 
     void loadTransformFromGIT(const resource::GffStruct &gffs);
 

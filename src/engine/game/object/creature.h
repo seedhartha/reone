@@ -53,32 +53,32 @@ public:
     };
 
     struct Path {
-        glm::vec3 destination { 0.0f };
+        glm::vec3 destination {0.0f};
         std::vector<glm::vec3> points;
-        uint32_t timeFound { 0 };
-        int pointIdx { 0 };
+        uint32_t timeFound {0};
+        int pointIdx {0};
 
         void selectNextPoint();
     };
 
     struct BodyBag {
         std::string name;
-        int appearance { 0 }; /**< index into placeables.2da */
-        bool corpse { false };
+        int appearance {0}; /**< index into placeables.2da */
+        bool corpse {false};
     };
 
     struct Perception {
-        float sightRange { 0.0f };
-        float hearingRange { 0.0f };
+        float sightRange {0.0f};
+        float hearingRange {0.0f};
         std::set<std::shared_ptr<SpatialObject>> seen;
         std::set<std::shared_ptr<SpatialObject>> heard;
-        PerceptionType lastPerception { PerceptionType::Seen };
+        PerceptionType lastPerception {PerceptionType::Seen};
         std::shared_ptr<SpatialObject> lastPerceived;
     };
 
     struct Combat {
-        bool active { false };
-        bool debilitated { false };
+        bool active {false};
+        bool debilitated {false};
         std::shared_ptr<SpatialObject> attackTarget;
         Timer deactivationTimer;
     };
@@ -236,54 +236,54 @@ public:
     // END IAnimationEventListener
 
 private:
-    Gender _gender { Gender::Male };
-    int _appearance { 0 };
-    ModelType _modelType { ModelType::Creature };
+    Gender _gender {Gender::Male};
+    int _appearance {0};
+    ModelType _modelType {ModelType::Creature};
     std::shared_ptr<graphics::Texture> _portrait;
     std::map<int, std::shared_ptr<Item>> _equipment;
     std::shared_ptr<Path> _path;
-    float _walkSpeed { 0.0f };
-    float _runSpeed { 0.0f };
-    MovementType _movementType { MovementType::None };
-    bool _talking { false };
+    float _walkSpeed {0.0f};
+    float _runSpeed {0.0f};
+    MovementType _movementType {MovementType::None};
+    bool _talking {false};
     CreatureAttributes _attributes;
-    Faction _faction { Faction::Invalid };
-    bool _movementRestricted { false };
+    Faction _faction {Faction::Invalid};
+    bool _movementRestricted {false};
     Combat _combat;
-    int _portraitId { 0 };
-    bool _immortal { false };
-    int _xp { 0 };
+    int _portraitId {0};
+    bool _immortal {false};
+    int _xp {0};
     std::shared_ptr<SoundSet> _soundSet;
     BodyBag _bodyBag;
     Perception _perception;
-    RacialType _race { RacialType::Unknown };
-    Subrace _subrace { Subrace::None };
-    NPCAIStyle _aiStyle { NPCAIStyle::DefaultAttack };
-    bool _isPC { false };
-    bool _noPermDeath { false };
-    bool _notReorienting { false };
-    int _bodyVariation { 0 };
-    int _textureVar { 0 };
-    bool _partyInteract { false };
-    int _walkRate { 0 };
-    int _naturalAC { 0 };
-    int _forcePoints { 0 };
-    int _currentForce { 0 };
-    int _refBonus { 0 };
-    int _willBonus { 0 };
-    int _fortBonus { 0 };
-    int _goodEvil { 0 };
-    int _lawfulChaotic { 0 };
-    int _challengeRating { 0 };
-    bool _disarmable { false };
-    uint32_t _footstepType { 0 };
-    int _walkmeshMaterial { -1 };
-    int _gold { 0 }; /**< aka credits */
+    RacialType _race {RacialType::Unknown};
+    Subrace _subrace {Subrace::None};
+    NPCAIStyle _aiStyle {NPCAIStyle::DefaultAttack};
+    bool _isPC {false};
+    bool _noPermDeath {false};
+    bool _notReorienting {false};
+    int _bodyVariation {0};
+    int _textureVar {0};
+    bool _partyInteract {false};
+    int _walkRate {0};
+    int _naturalAC {0};
+    int _forcePoints {0};
+    int _currentForce {0};
+    int _refBonus {0};
+    int _willBonus {0};
+    int _fortBonus {0};
+    int _goodEvil {0};
+    int _lawfulChaotic {0};
+    int _challengeRating {0};
+    bool _disarmable {false};
+    uint32_t _footstepType {0};
+    int _walkmeshMaterial {-1};
+    int _gold {0}; /**< aka credits */
 
     // Animation
 
-    bool _animDirty { true };
-    bool _animFireForget { false };
+    bool _animDirty {true};
+    bool _animFireForget {false};
     std::shared_ptr<graphics::LipAnimation> _lipAnimation;
 
     // END Animation

@@ -37,7 +37,8 @@ Scripts::Scripts(Resources &resources) :
 
 shared_ptr<ScriptProgram> Scripts::doGet(string resRef) {
     shared_ptr<ByteArray> data(_resources.getRaw(resRef, ResourceType::Ncs));
-    if (!data) return nullptr;
+    if (!data)
+        return nullptr;
 
     NcsReader ncs(resRef);
     ncs.load(wrap(data));

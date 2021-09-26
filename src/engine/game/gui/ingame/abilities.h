@@ -29,7 +29,7 @@ class Button;
 class Label;
 class ListBox;
 
-}
+} // namespace gui
 
 namespace game {
 

@@ -50,7 +50,7 @@ public:
     Mesh &aabb() const { return *_aabb; }
 
 private:
-    bool _inited { false };
+    bool _inited {false};
 
     std::unique_ptr<Mesh> _quad;
     std::unique_ptr<Mesh> _quadFlipX;

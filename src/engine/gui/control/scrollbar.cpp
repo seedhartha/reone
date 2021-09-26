@@ -61,7 +61,8 @@ void ScrollBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
 }
 
 void ScrollBar::drawThumb(const glm::ivec2 &offset) {
-    if (!_thumb.image || _state.numVisible >= _state.count) return;
+    if (!_thumb.image || _state.numVisible >= _state.count)
+        return;
 
     _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _thumb.image->bind();
@@ -104,11 +105,13 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
 }
 
 void ScrollBar::drawArrows(const glm::ivec2 &offset) {
-    if (!_dir.image) return;
+    if (!_dir.image)
+        return;
 
     bool canScrollUp = _state.offset > 0;
     bool canScrollDown = _state.count - _state.offset > _state.numVisible;
-    if (!canScrollUp && !canScrollDown) return;
+    if (!canScrollUp && !canScrollDown)
+        return;
 
     _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _dir.image->bind();

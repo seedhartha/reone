@@ -27,7 +27,8 @@ namespace reone {
 
 namespace script {
 
-NcsReader::NcsReader(const string &resRef) : BinaryReader(8, "NCS V1.0"), _resRef(resRef) {
+NcsReader::NcsReader(const string &resRef) :
+    BinaryReader(8, "NCS V1.0"), _resRef(resRef) {
     _endianess = boost::endian::order::big;
 }
 
@@ -56,100 +57,100 @@ void NcsReader::readInstruction(size_t &offset) {
     ins.type = static_cast<InstructionType>(type);
 
     switch (ins.byteCode) {
-        case ByteCode::CopyDownSP:
-        case ByteCode::CopyTopSP:
-        case ByteCode::CopyDownBP:
-        case ByteCode::CopyTopBP:
-            ins.stackOffset = readInt32();
-            ins.size = readUint16();
-            break;
+    case ByteCode::CopyDownSP:
+    case ByteCode::CopyTopSP:
+    case ByteCode::CopyDownBP:
+    case ByteCode::CopyTopBP:
+        ins.stackOffset = readInt32();
+        ins.size = readUint16();
+        break;
 
-        case ByteCode::PushConstant:
-            switch (ins.type) {
-                case InstructionType::Int:
-                    ins.intValue = readInt32();
-                    break;
-                case InstructionType::Float:
-                    ins.floatValue = readFloat();
-                    break;
-                case InstructionType::String: {
-                    uint16_t len = readUint16();
-                    ins.strValue = readCString(len);
-                    break;
-                }
-                case InstructionType::Object:
-                    ins.objectId = readInt32();
-                    break;
-                default:
-                    throw runtime_error(str(boost::format("NCS: unsupported instruction type: %02x %02x") % static_cast<int>(ins.byteCode) % static_cast<int>(ins.type)));
-            }
+    case ByteCode::PushConstant:
+        switch (ins.type) {
+        case InstructionType::Int:
+            ins.intValue = readInt32();
             break;
-
-        case ByteCode::CallRoutine:
-            ins.routine = readUint16();
-            ins.argCount = readByte();
+        case InstructionType::Float:
+            ins.floatValue = readFloat();
             break;
-
-        case ByteCode::AdjustSP:
-            ins.stackOffset = readInt32();
+        case InstructionType::String: {
+            uint16_t len = readUint16();
+            ins.strValue = readCString(len);
             break;
-
-        case ByteCode::Jump:
-        case ByteCode::JumpToSubroutine:
-        case ByteCode::JumpIfZero:
-        case ByteCode::JumpIfNonZero:
-            ins.jumpOffset = static_cast<uint32_t>(offset + readInt32());
+        }
+        case InstructionType::Object:
+            ins.objectId = readInt32();
             break;
-
-        case ByteCode::Destruct:
-            ins.size = readUint16();
-            ins.stackOffset = readInt16();
-            ins.sizeNoDestroy = readUint16();
-            break;
-
-        case ByteCode::DecRelToSP:
-        case ByteCode::IncRelToSP:
-        case ByteCode::DecRelToBP:
-        case ByteCode::IncRelToBP:
-            ins.stackOffset = readInt32();
-            break;
-
-        case ByteCode::StoreState:
-            ins.size = readUint32();
-            ins.sizeLocals = readUint32();
-            break;
-
-        case ByteCode::Reserve:
-        case ByteCode::LogicalAnd:
-        case ByteCode::LogicalOr:
-        case ByteCode::InclusiveBitwiseOr:
-        case ByteCode::ExclusiveBitwiseOr:
-        case ByteCode::BitwiseAnd:
-        case ByteCode::Equal:
-        case ByteCode::NotEqual:
-        case ByteCode::GreaterThanOrEqual:
-        case ByteCode::GreaterThan:
-        case ByteCode::LessThan:
-        case ByteCode::LessThanOrEqual:
-        case ByteCode::ShiftLeft:
-        case ByteCode::ShiftRight:
-        case ByteCode::UnsignedShiftRight:
-        case ByteCode::Add:
-        case ByteCode::Subtract:
-        case ByteCode::Multiply:
-        case ByteCode::Divide:
-        case ByteCode::Mod:
-        case ByteCode::Negate:
-        case ByteCode::OnesComplement:
-        case ByteCode::Return:
-        case ByteCode::SaveBP:
-        case ByteCode::RestoreBP:
-        case ByteCode::Noop:
-        case ByteCode::LogicalNot:
-            break;
-
         default:
-            throw runtime_error(str(boost::format("NCS: unsupported byte code: %02x") % static_cast<int>(ins.byteCode)));
+            throw runtime_error(str(boost::format("NCS: unsupported instruction type: %02x %02x") % static_cast<int>(ins.byteCode) % static_cast<int>(ins.type)));
+        }
+        break;
+
+    case ByteCode::CallRoutine:
+        ins.routine = readUint16();
+        ins.argCount = readByte();
+        break;
+
+    case ByteCode::AdjustSP:
+        ins.stackOffset = readInt32();
+        break;
+
+    case ByteCode::Jump:
+    case ByteCode::JumpToSubroutine:
+    case ByteCode::JumpIfZero:
+    case ByteCode::JumpIfNonZero:
+        ins.jumpOffset = static_cast<uint32_t>(offset + readInt32());
+        break;
+
+    case ByteCode::Destruct:
+        ins.size = readUint16();
+        ins.stackOffset = readInt16();
+        ins.sizeNoDestroy = readUint16();
+        break;
+
+    case ByteCode::DecRelToSP:
+    case ByteCode::IncRelToSP:
+    case ByteCode::DecRelToBP:
+    case ByteCode::IncRelToBP:
+        ins.stackOffset = readInt32();
+        break;
+
+    case ByteCode::StoreState:
+        ins.size = readUint32();
+        ins.sizeLocals = readUint32();
+        break;
+
+    case ByteCode::Reserve:
+    case ByteCode::LogicalAnd:
+    case ByteCode::LogicalOr:
+    case ByteCode::InclusiveBitwiseOr:
+    case ByteCode::ExclusiveBitwiseOr:
+    case ByteCode::BitwiseAnd:
+    case ByteCode::Equal:
+    case ByteCode::NotEqual:
+    case ByteCode::GreaterThanOrEqual:
+    case ByteCode::GreaterThan:
+    case ByteCode::LessThan:
+    case ByteCode::LessThanOrEqual:
+    case ByteCode::ShiftLeft:
+    case ByteCode::ShiftRight:
+    case ByteCode::UnsignedShiftRight:
+    case ByteCode::Add:
+    case ByteCode::Subtract:
+    case ByteCode::Multiply:
+    case ByteCode::Divide:
+    case ByteCode::Mod:
+    case ByteCode::Negate:
+    case ByteCode::OnesComplement:
+    case ByteCode::Return:
+    case ByteCode::SaveBP:
+    case ByteCode::RestoreBP:
+    case ByteCode::Noop:
+    case ByteCode::LogicalNot:
+        break;
+
+    default:
+        throw runtime_error(str(boost::format("NCS: unsupported byte code: %02x") % static_cast<int>(ins.byteCode)));
     }
 
     size_t pos = tell();

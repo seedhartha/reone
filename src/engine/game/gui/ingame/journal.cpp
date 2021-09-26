@@ -28,7 +28,8 @@ namespace reone {
 
 namespace game {
 
-JournalMenu::JournalMenu(Game *game) : GameGUI(game) {
+JournalMenu::JournalMenu(Game *game) :
+    GameGUI(game) {
     _resRef = getResRef("journal");
 
     initForGame();

@@ -64,8 +64,8 @@ public:
     void checkCompleteness();
 
 private:
-    bool _inited { false };
-    uint32_t _framebuffer { 0 };
+    bool _inited {false};
+    uint32_t _framebuffer {0};
 };
 
 } // namespace graphics

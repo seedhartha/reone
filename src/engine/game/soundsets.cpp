@@ -34,7 +34,8 @@ namespace game {
 
 shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
     auto data = _resources.getRaw(resRef, ResourceType::Ssf);
-    if (!data) return nullptr;
+    if (!data)
+        return nullptr;
 
     auto result = make_shared<SoundSet>();
 

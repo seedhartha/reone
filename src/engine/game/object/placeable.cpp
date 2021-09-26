@@ -42,8 +42,7 @@ Placeable::Placeable(
     uint32_t id,
     Game *game,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph
-) :
+    SceneGraph *sceneGraph) :
     SpatialObject(id, ObjectType::Placeable, game, objectFactory, sceneGraph) {
 }
 
@@ -56,7 +55,8 @@ void Placeable::loadFromGIT(const GffStruct &gffs) {
 
 void Placeable::loadFromBlueprint(const string &resRef) {
     shared_ptr<GffStruct> utp(_game->resources().getGFF(resRef, ResourceType::Utp));
-    if (!utp) return;
+    if (!utp)
+        return;
 
     loadUTP(*utp);
 
@@ -129,7 +129,7 @@ void Placeable::loadUTP(const GffStruct &utp) {
     _onDamaged = boost::to_lower_copy(utp.getString("OnDamaged")); // always empty, but could be useful
     _onDeath = boost::to_lower_copy(utp.getString("OnDeath"));
     _onHeartbeat = boost::to_lower_copy(utp.getString("OnHeartbeat"));
-    _onLock = boost::to_lower_copy(utp.getString("OnLock")); // always empty, but could be useful
+    _onLock = boost::to_lower_copy(utp.getString("OnLock"));                   // always empty, but could be useful
     _onMeleeAttacked = boost::to_lower_copy(utp.getString("OnMeleeAttacked")); // always empty, but could be useful
     _onOpen = boost::to_lower_copy(utp.getString("OnOpen"));
     _onSpellCastAt = boost::to_lower_copy(utp.getString("OnSpellCastAt"));

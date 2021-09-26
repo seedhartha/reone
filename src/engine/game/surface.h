@@ -23,8 +23,8 @@ namespace game {
 
 struct Surface {
     std::string label;
-    bool walkable { false };
-    bool grass { false };
+    bool walkable {false};
+    bool grass {false};
     std::string sound;
 };
 

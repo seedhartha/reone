@@ -20,8 +20,8 @@
 #include "../../graphics/framebuffer.h"
 #include "../../graphics/options.h"
 #include "../../graphics/renderbuffer.h"
-#include "../../graphics/types.h"
 #include "../../graphics/texture/texture.h"
+#include "../../graphics/types.h"
 
 namespace reone {
 
@@ -31,7 +31,7 @@ class Context;
 class Meshes;
 class Shaders;
 
-}
+} // namespace graphics
 
 namespace scene {
 
@@ -57,7 +57,7 @@ private:
     graphics::GraphicsOptions _options;
 
     glm::mat4 _lightSpaceMatrices[graphics::kNumCubeFaces];
-    bool _takeScreenshot { false }; /**< render next frame into texture */
+    bool _takeScreenshot {false}; /**< render next frame into texture */
 
     // Services
 

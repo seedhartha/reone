@@ -23,7 +23,8 @@ namespace reone {
 
 class Task : public ITask {
 public:
-    Task(std::function<void()> fn) : _fn(std::move(fn)) {
+    Task(std::function<void()> fn) :
+        _fn(std::move(fn)) {
         _completionMutex.lock();
     }
 

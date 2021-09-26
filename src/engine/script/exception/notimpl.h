@@ -23,10 +23,11 @@ namespace script {
 
 class NotImplementedException : public std::logic_error {
 public:
-    NotImplementedException() : std::logic_error("") {
+    NotImplementedException() :
+        std::logic_error("") {
     }
 };
 
 } // namespace script
 
-} // namespae reone
+} // namespace reone

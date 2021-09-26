@@ -25,7 +25,8 @@ namespace game {
 
 class ACDecreaseEffect : public Effect {
 public:
-    ACDecreaseEffect() : Effect(EffectType::ACDecrease) {
+    ACDecreaseEffect() :
+        Effect(EffectType::ACDecrease) {
     }
 
     void applyTo(SpatialObject &object) override;

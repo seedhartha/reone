@@ -24,9 +24,8 @@ namespace game {
 bool isAnimationLooping(AnimationType animation) {
     int ordinal = static_cast<int>(animation);
 
-    return
-        animation == AnimationType::LoopingChoke ||
-        (ordinal >= static_cast<int>(AnimationType::LoopingPause) && ordinal <= static_cast<int>(AnimationType::LoopingMeditateStand));
+    return animation == AnimationType::LoopingChoke ||
+           (ordinal >= static_cast<int>(AnimationType::LoopingPause) && ordinal <= static_cast<int>(AnimationType::LoopingMeditateStand));
 }
 
 } // namespace game

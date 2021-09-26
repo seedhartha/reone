@@ -36,7 +36,7 @@ class Shaders;
 class Texture;
 class Window;
 
-}
+} // namespace graphics
 
 namespace game {
 
@@ -48,8 +48,7 @@ public:
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
         graphics::Window &window,
-        resource::Resources &resources
-    ) :
+        resource::Resources &resources) :
         _gameId(gameId),
         _context(context),
         _meshes(meshes),

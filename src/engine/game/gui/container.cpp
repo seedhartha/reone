@@ -40,7 +40,8 @@ static constexpr int kSwitchToResRef = 47884;
 static constexpr int kGiveItemResRef = 47885;
 static constexpr int kInventoryResRef = 393;
 
-Container::Container(Game *game) : GameGUI(game) {
+Container::Container(Game *game) :
+    GameGUI(game) {
     _resRef = getResRef("container");
 
     initForGame();
@@ -88,7 +89,8 @@ void Container::open(shared_ptr<SpatialObject> container) {
     _binding.lbItems->clearItems();
 
     for (auto &item : container->items()) {
-        if (!item->isDropable()) continue;
+        if (!item->isDropable())
+            continue;
 
         ListBox::Item lbItem;
         lbItem.tag = item->tag();

@@ -29,11 +29,11 @@ struct Feat {
     std::string name;
     std::string description;
     std::shared_ptr<graphics::Texture> icon;
-    uint32_t minCharLevel { 0 };
-    FeatType preReqFeat1 { FeatType::Invalid };
-    FeatType preReqFeat2 { FeatType::Invalid };
-    FeatType successor { FeatType::Invalid };
-    uint32_t pips { 1 }; // 1-3, position in a feat chain
+    uint32_t minCharLevel {0};
+    FeatType preReqFeat1 {FeatType::Invalid};
+    FeatType preReqFeat2 {FeatType::Invalid};
+    FeatType successor {FeatType::Invalid};
+    uint32_t pips {1}; // 1-3, position in a feat chain
 };
 
 } // namespace game

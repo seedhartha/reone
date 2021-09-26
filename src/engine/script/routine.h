@@ -44,7 +44,7 @@ public:
 
 private:
     std::string _name;
-    VariableType _returnType { VariableType::Void };
+    VariableType _returnType {VariableType::Void};
     std::vector<VariableType> _argumentTypes;
     std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> _func;
 

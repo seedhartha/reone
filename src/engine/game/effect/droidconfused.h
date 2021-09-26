@@ -25,7 +25,8 @@ namespace game {
 
 class DroidConfusedEffect : public Effect {
 public:
-    DroidConfusedEffect() : Effect(EffectType::DroidConfused) {
+    DroidConfusedEffect() :
+        Effect(EffectType::DroidConfused) {
     }
 
     void applyTo(SpatialObject &object) override;

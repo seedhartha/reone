@@ -48,10 +48,10 @@ public:
     void setPosition(const glm::vec3 &position);
 
 private:
-    std::atomic<State> _state { State::NotInited };
-    float _duration { 0.0f };
+    std::atomic<State> _state {State::NotInited};
+    float _duration {0.0f};
     std::atomic<glm::vec3> _position;
-    std::atomic_bool _positionDirty { false };
+    std::atomic_bool _positionDirty {false};
 };
 
 } // namespace audio

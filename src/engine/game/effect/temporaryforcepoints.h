@@ -25,7 +25,8 @@ namespace game {
 
 class TemporaryForcePointsEffect : public Effect {
 public:
-    TemporaryForcePointsEffect() : Effect(EffectType::TemporaryForcePoints) {
+    TemporaryForcePointsEffect() :
+        Effect(EffectType::TemporaryForcePoints) {
     }
 
     void applyTo(SpatialObject &object) override;

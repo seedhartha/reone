@@ -30,9 +30,9 @@ class RimReader : public BinaryReader, public IResourceProvider {
 public:
     struct Resource {
         std::string resRef;
-        ResourceType resType { ResourceType::Invalid };
-        uint32_t offset { 0 };
-        uint32_t size { 0 };
+        ResourceType resType {ResourceType::Invalid};
+        uint32_t offset {0};
+        uint32_t size {0};
     };
 
     RimReader();
@@ -44,8 +44,8 @@ public:
     const std::vector<Resource> &resources() const { return _resources; }
 
 private:
-    int _resourceCount { 0 };
-    uint32_t _resourcesOffset { 0 };
+    int _resourceCount {0};
+    uint32_t _resourcesOffset {0};
     std::vector<Resource> _resources;
 
     void doLoad() override;

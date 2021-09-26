@@ -19,8 +19,8 @@
 
 #include "../../audio/player.h"
 #include "../../common/logutil.h"
-#include "../../gui/scenebuilder.h"
 #include "../../graphics/model/models.h"
+#include "../../gui/scenebuilder.h"
 #include "../../resource/2da.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
@@ -49,7 +49,8 @@ static const char kBlueprintResRefBastila[] = "p_bastilla";
 static const char kBlueprintResRefAtton[] = "p_atton";
 static const char kBlueprintResRefKreia[] = "p_kreia";
 
-MainMenu::MainMenu(Game *game) : GameGUI(game) {
+MainMenu::MainMenu(Game *game) :
+    GameGUI(game) {
     if (game->isTSL()) {
         _resRef = "mainmenu8x6_p";
     } else {
@@ -145,28 +146,28 @@ void MainMenu::setButtonColors(Control &control) {
 }
 
 void MainMenu::setup3DView() {
-    if (_game->id() != GameID::KotOR) return;
+    if (_game->id() != GameID::KotOR)
+        return;
 
     const Control::Extent &extent = _binding.lbl3dView->extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 
     unique_ptr<SceneGraph> scene(SceneBuilder(
-        _options,
-        _context,
-        _features,
-        _materials,
-        _meshes,
-        _pbrIbl,
-        _shaders,
-        _textures
-    )
-        .aspect(aspect)
-        .depth(0.1f, 10.0f)
-        .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
-        .modelScale(kKotorModelSize)
-        .cameraFromModelNode("camerahook")
-        .lightingRefFromModelNode("rootdummy")
-        .build());
+                                     _options,
+                                     _context,
+                                     _features,
+                                     _materials,
+                                     _meshes,
+                                     _pbrIbl,
+                                     _shaders,
+                                     _textures)
+                                     .aspect(aspect)
+                                     .depth(0.1f, 10.0f)
+                                     .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
+                                     .modelScale(kKotorModelSize)
+                                     .cameraFromModelNode("camerahook")
+                                     .lightingRefFromModelNode("rootdummy")
+                                     .build());
 
     _binding.lbl3dView->setScene(move(scene));
 }

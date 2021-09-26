@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "../gui/textinput.h"
 #include "../graphics/font.h"
 #include "../graphics/options.h"
 #include "../graphics/types.h"
+#include "../gui/textinput.h"
 
 namespace reone {
 
@@ -45,10 +45,10 @@ private:
 
     graphics::GraphicsOptions _opts;
     std::shared_ptr<graphics::Font> _font;
-    bool _open { false };
+    bool _open {false};
     gui::TextInput _input;
     std::deque<std::string> _output;
-    int _outputOffset { 0 };
+    int _outputOffset {0};
     std::unordered_map<std::string, CommandHandler> _commands;
     std::stack<std::string> _history;
 

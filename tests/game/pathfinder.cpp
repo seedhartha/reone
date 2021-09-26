@@ -38,12 +38,12 @@ BOOST_AUTO_TEST_CASE(GivenTwoPaths_WhenFindPath_TheShortestPathReturned) {
     // - F -
 
     vector<Path::Point> points = {
-        { 0.0f, 1.0f, { 1 } }, // 0
-        { 0.0f, 2.0f, { 0 } }, // 1
-        { 1.0f, 0.0f, { 3 } }, // 2
-        { 2.0f, 0.0f, { 2, 4 } }, // 3
-        { 2.0f, 1.0f, { 3, 5 } }, // 4
-        { 2.0f, 2.0f, { 4 } } // 5
+        {0.0f, 1.0f, {1}},    // 0
+        {0.0f, 2.0f, {0}},    // 1
+        {1.0f, 0.0f, {3}},    // 2
+        {2.0f, 0.0f, {2, 4}}, // 3
+        {2.0f, 1.0f, {3, 5}}, // 4
+        {2.0f, 2.0f, {4}}     // 5
     };
     unordered_map<int, float> pointZ;
     for (int i = 0; i < points.size(); ++i) {

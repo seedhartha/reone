@@ -25,7 +25,8 @@ namespace game {
 
 class ForceBodyEffect : public Effect {
 public:
-    ForceBodyEffect() : Effect(EffectType::ForceBody) {
+    ForceBodyEffect() :
+        Effect(EffectType::ForceBody) {
     }
 
     void applyTo(SpatialObject &object) override;

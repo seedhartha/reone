@@ -30,7 +30,8 @@ namespace reone {
 
 namespace game {
 
-LoadingScreen::LoadingScreen(Game *game) : GameGUI(game) {
+LoadingScreen::LoadingScreen(Game *game) :
+    GameGUI(game) {
     _resRef = getResRef("loadscreen");
 
     if (_game->isTSL()) {

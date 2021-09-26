@@ -79,7 +79,8 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
 
         for (auto &prop : jsonRow.second) {
             // Properties with a leading underscore are metadata
-            if (boost::starts_with(prop.first, "_")) continue;
+            if (boost::starts_with(prop.first, "_"))
+                continue;
 
             if (!columnsInited) {
                 twoDa->addColumn(prop.first);
@@ -102,9 +103,8 @@ void TwoDaTool::to2DA(const fs::path &path, const fs::path &destPath) {
 }
 
 bool TwoDaTool::supports(Operation operation, const fs::path &target) const {
-    return
-        !fs::is_directory(target) &&
-        ((target.extension() == ".2da" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::To2DA));
+    return !fs::is_directory(target) &&
+           ((target.extension() == ".2da" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::To2DA));
 }
 
 } // namespace tools

@@ -87,9 +87,8 @@ void LipTool::toLIP(const fs::path &path, const fs::path &destPath) {
 }
 
 bool LipTool::supports(Operation operation, const fs::path &target) const {
-    return
-        !fs::is_directory(target) &&
-        ((target.extension() == ".lip" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::ToLIP));
+    return !fs::is_directory(target) &&
+           ((target.extension() == ".lip" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::ToLIP));
 }
 
 } // namespace tools

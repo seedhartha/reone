@@ -32,75 +32,65 @@ static const vector<float> g_quadVertices {
     0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f, 0.0f
-};
+    0.0f, 1.0f, 0.0f, 0.0f, 0.0f};
 
 static const vector<float> g_quadFlipXVertices {
     0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
     1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 1.0f, 0.0f
-};
+    0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
 
 static const vector<float> g_quadFlipYVertices {
     0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
     1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-    0.0f, 1.0f, 0.0f, 0.0f, 1.0f
-};
+    0.0f, 1.0f, 0.0f, 0.0f, 1.0f};
 
 static const vector<float> g_quadFlipXYVertices {
     0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
     1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
     1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-    0.0f, 1.0f, 0.0f, 1.0f, 1.0f
-};
+    0.0f, 1.0f, 0.0f, 1.0f, 1.0f};
 
 static const vector<float> g_quadSwapVertices {
     0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
     1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
     1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-    0.0f, 1.0f, 0.0f, 0.0f, 0.0f
-};
+    0.0f, 1.0f, 0.0f, 0.0f, 0.0f};
 
 static const vector<float> g_quadSwapFlipXVertices {
     0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
     1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
     1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f, 1.0f
-};
+    0.0f, 1.0f, 0.0f, 0.0f, 1.0f};
 
 static const vector<float> g_quadNDCVertices {
-    -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-     1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-     1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f
-};
+    -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+    1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+    1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f};
 
 static const vector<float> g_quadNDCFlipYVertices {
-    -1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
-     1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
-     1.0f, -1.0f, 0.0f, 1.0f, 1.0f,
-    -1.0f, -1.0f, 0.0f, 0.0f, 1.0f
-};
+    -1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+    1.0f, -1.0f, 0.0f, 1.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f, 1.0f};
 
 static const vector<float> g_billboardVertices = {
     -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-     0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-     0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-    -0.5f,  0.5f, 0.0f, 0.0f, 1.0f
-};
+    0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+    0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+    -0.5f, 0.5f, 0.0f, 0.0f, 1.0f};
 
 static const vector<float> g_grassVertices = {
     -0.5f, 0.0f, 0.0f, 0.0f, 0.0f,
-     0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-     0.5f, 1.0f, 0.0f, 1.0f, 1.0f,
-    -0.5f, 1.0f, 0.0f, 0.0f, 1.0f
-};
+    0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+    0.5f, 1.0f, 0.0f, 1.0f, 1.0f,
+    -0.5f, 1.0f, 0.0f, 0.0f, 1.0f};
 
-static const vector<uint16_t> g_quadIndices = { 0, 1, 2, 2, 3, 0 };
+static const vector<uint16_t> g_quadIndices = {0, 1, 2, 2, 3, 0};
 
-static const VertexAttributes g_quadAttributes = { 5 * sizeof(float), 0, -1, 3 * sizeof(float) };
+static const VertexAttributes g_quadAttributes = {5 * sizeof(float), 0, -1, 3 * sizeof(float)};
 
 // END Quads
 
@@ -108,14 +98,13 @@ static const VertexAttributes g_quadAttributes = { 5 * sizeof(float), 0, -1, 3 *
 
 static const vector<float> g_cubeVertices = {
     -0.5f, -0.5f, -0.5f,
-    -0.5f, -0.5f,  0.5f,
-    -0.5f,  0.5f,  0.5f,
-    -0.5f,  0.5f, -0.5f,
-     0.5f,  0.5f,  0.5f,
-     0.5f,  0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f,  0.5f
-};
+    -0.5f, -0.5f, 0.5f,
+    -0.5f, 0.5f, 0.5f,
+    -0.5f, 0.5f, -0.5f,
+    0.5f, 0.5f, 0.5f,
+    0.5f, 0.5f, -0.5f,
+    0.5f, -0.5f, -0.5f,
+    0.5f, -0.5f, 0.5f};
 
 static const vector<uint16_t> g_cubeIndices = {
     0, 1, 2, 2, 3, 0,
@@ -123,10 +112,9 @@ static const vector<uint16_t> g_cubeIndices = {
     1, 7, 4, 4, 2, 1,
     0, 6, 7, 7, 1, 0,
     7, 6, 5, 5, 4, 7,
-    6, 0, 3, 3, 5, 6
-};
+    6, 0, 3, 3, 5, 6};
 
-static const VertexAttributes g_cubeAttributes = { 3 * sizeof(float), 0 };
+static const VertexAttributes g_cubeAttributes = {3 * sizeof(float), 0};
 
 // END Cube
 
@@ -134,35 +122,35 @@ static const VertexAttributes g_cubeAttributes = { 3 * sizeof(float), 0 };
 
 static const vector<float> g_cubemapVertices {
     // back face
-    -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-     1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-     1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right
-    -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
+    -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+    1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,   // top-right
+    1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,  // bottom-right
+    -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,  // top-left
     // front face
-    -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-     1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
-     1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-    -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
+    -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom-left
+    1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,  // bottom-right
+    1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,   // top-right
+    -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,  // top-left
     // left face
-    -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-    -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
-    -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-    -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-    // right face
-     1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-     1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-     1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right
-     1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left
+    -1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,   // top-right
+    -1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  // top-left
+    -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom-left
+    -1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,  // bottom-right
+                                                        // right face
+    1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,     // top-left
+    1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,   // bottom-right
+    1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,    // top-right
+    1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,    // bottom-left
     // bottom face
-    -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-     1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
-     1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-    -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+    -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, // top-right
+    1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,  // top-left
+    1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,   // bottom-left
+    -1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,  // bottom-right
     // top face
-    -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-     1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-     1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right
-    -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left
+    -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top-left
+    1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,   // bottom-right
+    1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,  // top-right
+    -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f   // bottom-left
 };
 
 static const vector<uint16_t> g_cubemapIndices {
@@ -171,10 +159,9 @@ static const vector<uint16_t> g_cubemapIndices {
     8, 9, 10, 10, 11, 8,
     12, 13, 14, 13, 12, 15,
     16, 17, 18, 18, 19, 16,
-    20, 21, 22, 21, 20, 23
-};
+    20, 21, 22, 21, 20, 23};
 
-static const VertexAttributes g_cubemapAttributes { 8 * sizeof(float), 0, 3 * sizeof(float), 6 * sizeof(float) };
+static const VertexAttributes g_cubemapAttributes {8 * sizeof(float), 0, 3 * sizeof(float), 6 * sizeof(float)};
 
 // END Cubemap
 
@@ -183,13 +170,12 @@ static const VertexAttributes g_cubemapAttributes { 8 * sizeof(float), 0, 3 * si
 static const vector<float> g_aabbVertices = {
     -0.5f, -0.5f, 0.0f,
     -0.5f, -0.5f, 1.0f,
-    -0.5f,  0.5f, 1.0f,
-    -0.5f,  0.5f, 0.0f,
-     0.5f,  0.5f, 1.0f,
-     0.5f,  0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 1.0f
-};
+    -0.5f, 0.5f, 1.0f,
+    -0.5f, 0.5f, 0.0f,
+    0.5f, 0.5f, 1.0f,
+    0.5f, 0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
+    0.5f, -0.5f, 1.0f};
 
 static const vector<uint16_t> g_aabbIndices = {
     0, 1, 1, 2, 2, 3, 3, 0,
@@ -197,10 +183,9 @@ static const vector<uint16_t> g_aabbIndices = {
     1, 7, 7, 4, 4, 2, 2, 1,
     0, 6, 6, 7, 7, 1, 1, 0,
     7, 6, 6, 5, 5, 4, 4, 7,
-    6, 0, 0, 3, 3, 5, 5, 6
-};
+    6, 0, 0, 3, 3, 5, 5, 6};
 
-static const VertexAttributes g_aabbAttributes = { 3 * sizeof(float), 0 };
+static const VertexAttributes g_aabbAttributes = {3 * sizeof(float), 0};
 
 // END AABB
 
@@ -221,7 +206,7 @@ static unique_ptr<Mesh> getSphereMesh() {
 
     vector<float> vertices;
     vector<uint16_t> indices;
-    VertexAttributes attributes { 8 * sizeof(float), 0, 3 * sizeof(float), 5 * sizeof(float) };
+    VertexAttributes attributes {8 * sizeof(float), 0, 3 * sizeof(float), 5 * sizeof(float)};
 
     for (int y = 0; y <= kNumSegmentsY; ++y) {
         for (int x = 0; x <= kNumSegmentsX; ++x) {
@@ -252,8 +237,7 @@ static unique_ptr<Mesh> getSphereMesh() {
                 indices.push_back((y + 1) * (kNumSegmentsX + 1) + x);
             }
         } else {
-            for (int x = kNumSegmentsX; x >= 0; --x)
-            {
+            for (int x = kNumSegmentsX; x >= 0; --x) {
                 indices.push_back((y + 1) * (kNumSegmentsX + 1) + x);
                 indices.push_back(y * (kNumSegmentsX + 1) + x);
             }

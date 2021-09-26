@@ -53,20 +53,20 @@ void TgaWriter::save(ostream &out, bool compress) {
 
     // Write Header
 
-    uint8_t header[kHeaderSize] { 0 };
+    uint8_t header[kHeaderSize] {0};
     header[0] = 0; // ID length
     header[1] = 0; // color map type
     header[2] = static_cast<uint8_t>(dataType);
     memset(header + 4, 0, 5);
-    header[8] = 0; // X origin (lo)
-    header[9] = 0; // X origin (hi)
-    header[10] = 0; // Y origin (lo)
-    header[11] = 0; // Y origin (hi)
-    header[12] = width % 256; // width (lo)
-    header[13] = width / 256; // width (hi)
-    header[14] = totalHeight % 256; // height (lo)
-    header[15] = totalHeight / 256; // height (hi)
-    header[16] = depth; // pixel size
+    header[8] = 0;                    // X origin (lo)
+    header[9] = 0;                    // X origin (hi)
+    header[10] = 0;                   // Y origin (lo)
+    header[11] = 0;                   // Y origin (hi)
+    header[12] = width % 256;         // width (lo)
+    header[13] = width / 256;         // width (hi)
+    header[14] = totalHeight % 256;   // height (lo)
+    header[15] = totalHeight / 256;   // height (hi)
+    header[16] = depth;               // pixel size
     header[17] = depth == 32 ? 8 : 0; // image descriptor;
     out.write(reinterpret_cast<char *>(header), kHeaderSize);
 
@@ -87,24 +87,24 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
     vector<uint8_t> result;
 
     switch (_texture->pixelFormat()) {
-        case PixelFormat::Grayscale:
-            dataType = TGADataType::Grayscale;
-            depth = 8;
-            break;
-        case PixelFormat::RGB:
-        case PixelFormat::BGR:
-        case PixelFormat::DXT1:
-            dataType = compress ? TGADataType::RGBA_RLE : TGADataType::RGBA;
-            depth = 24;
-            break;
-        case PixelFormat::RGBA:
-        case PixelFormat::BGRA:
-        case PixelFormat::DXT5:
-            dataType = compress ? TGADataType::RGBA_RLE : TGADataType::RGBA;
-            depth = 32;
-            break;
-        default:
-            throw runtime_error("Unsupported texture pixel format: " + to_string(static_cast<int>(_texture->pixelFormat())));
+    case PixelFormat::Grayscale:
+        dataType = TGADataType::Grayscale;
+        depth = 8;
+        break;
+    case PixelFormat::RGB:
+    case PixelFormat::BGR:
+    case PixelFormat::DXT1:
+        dataType = compress ? TGADataType::RGBA_RLE : TGADataType::RGBA;
+        depth = 24;
+        break;
+    case PixelFormat::RGBA:
+    case PixelFormat::BGRA:
+    case PixelFormat::DXT5:
+        dataType = compress ? TGADataType::RGBA_RLE : TGADataType::RGBA;
+        depth = 32;
+        break;
+    default:
+        throw runtime_error("Unsupported texture pixel format: " + to_string(static_cast<int>(_texture->pixelFormat())));
     }
 
     int numLayers = static_cast<int>(_texture->layers().size());
@@ -118,59 +118,59 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
         const uint8_t *mipMapPtr = reinterpret_cast<const uint8_t *>(mipMap.pixels->data());
 
         switch (_texture->pixelFormat()) {
-            case PixelFormat::Grayscale:
-                memcpy(pixels, mipMapPtr, numPixels);
-                break;
-            case PixelFormat::RGB:
-                for (int j = 0; j < numPixels; ++j) {
-                    *(pixels++) = mipMapPtr[2];
-                    *(pixels++) = mipMapPtr[1];
-                    *(pixels++) = mipMapPtr[0];
-                    mipMapPtr += 3;
-                }
-                break;
-            case PixelFormat::RGBA:
-                for (int j = 0; j < numPixels; ++j) {
-                    *(pixels++) = mipMapPtr[2];
-                    *(pixels++) = mipMapPtr[1];
-                    *(pixels++) = mipMapPtr[0];
-                    *(pixels++) = mipMapPtr[3];
-                    mipMapPtr += 4;
-                }
-                break;
-            case PixelFormat::BGR:
-                memcpy(pixels, mipMapPtr, 3ll * numPixels);
-                break;
-            case PixelFormat::BGRA:
-                memcpy(pixels, mipMapPtr, 4ll * numPixels);
-                break;
-            case PixelFormat::DXT1: {
-                vector<unsigned long> decompPixels(numPixels);
-                BlockDecompressImageDXT1(mipMap.width, mipMap.height, mipMapPtr, &decompPixels[0]);
-                unsigned long *decompPtr = &decompPixels[0];
-                for (int j = 0; j < numPixels; ++j) {
-                    unsigned long rgba = *(decompPtr++);
-                    *(pixels++) = (rgba >> 8) & 0xff;
-                    *(pixels++) = (rgba >> 16) & 0xff;
-                    *(pixels++) = (rgba >> 24) & 0xff;
-                }
-                break;
+        case PixelFormat::Grayscale:
+            memcpy(pixels, mipMapPtr, numPixels);
+            break;
+        case PixelFormat::RGB:
+            for (int j = 0; j < numPixels; ++j) {
+                *(pixels++) = mipMapPtr[2];
+                *(pixels++) = mipMapPtr[1];
+                *(pixels++) = mipMapPtr[0];
+                mipMapPtr += 3;
             }
-            case PixelFormat::DXT5: {
-                vector<unsigned long> decompPixels(numPixels);
-                BlockDecompressImageDXT5(mipMap.width, mipMap.height, mipMapPtr, &decompPixels[0]);
-                unsigned long *decompPtr = &decompPixels[0];
-                for (int j = 0; j < numPixels; ++j) {
-                    unsigned long rgba = *(decompPtr++);
-                    *(pixels++) = (rgba >> 8) & 0xff;
-                    *(pixels++) = (rgba >> 16) & 0xff;
-                    *(pixels++) = (rgba >> 24) & 0xff;
-                    *(pixels++) = rgba & 0xff;
-                }
-                break;
+            break;
+        case PixelFormat::RGBA:
+            for (int j = 0; j < numPixels; ++j) {
+                *(pixels++) = mipMapPtr[2];
+                *(pixels++) = mipMapPtr[1];
+                *(pixels++) = mipMapPtr[0];
+                *(pixels++) = mipMapPtr[3];
+                mipMapPtr += 4;
             }
-            default:
-                break;
+            break;
+        case PixelFormat::BGR:
+            memcpy(pixels, mipMapPtr, 3ll * numPixels);
+            break;
+        case PixelFormat::BGRA:
+            memcpy(pixels, mipMapPtr, 4ll * numPixels);
+            break;
+        case PixelFormat::DXT1: {
+            vector<unsigned long> decompPixels(numPixels);
+            BlockDecompressImageDXT1(mipMap.width, mipMap.height, mipMapPtr, &decompPixels[0]);
+            unsigned long *decompPtr = &decompPixels[0];
+            for (int j = 0; j < numPixels; ++j) {
+                unsigned long rgba = *(decompPtr++);
+                *(pixels++) = (rgba >> 8) & 0xff;
+                *(pixels++) = (rgba >> 16) & 0xff;
+                *(pixels++) = (rgba >> 24) & 0xff;
+            }
+            break;
+        }
+        case PixelFormat::DXT5: {
+            vector<unsigned long> decompPixels(numPixels);
+            BlockDecompressImageDXT5(mipMap.width, mipMap.height, mipMapPtr, &decompPixels[0]);
+            unsigned long *decompPtr = &decompPixels[0];
+            for (int j = 0; j < numPixels; ++j) {
+                unsigned long rgba = *(decompPtr++);
+                *(pixels++) = (rgba >> 8) & 0xff;
+                *(pixels++) = (rgba >> 16) & 0xff;
+                *(pixels++) = (rgba >> 24) & 0xff;
+                *(pixels++) = rgba & 0xff;
+            }
+            break;
+        }
+        default:
+            break;
         }
     }
 

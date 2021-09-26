@@ -22,16 +22,16 @@ namespace reone {
 namespace graphics {
 
 struct VertexAttributes {
-    uint32_t stride { 0 };
-    int offCoords { 0 };
-    int offNormals { -1 };
-    int offTexCoords1 { -1 };
-    int offTexCoords2 { -1 };
-    int offTangents { -1 };
-    int offBitangents { -1 };
-    int offTanSpaceNormals { -1 };
-    int offBoneIndices { -1 };
-    int offBoneWeights { -1 };
+    uint32_t stride {0};
+    int offCoords {0};
+    int offNormals {-1};
+    int offTexCoords1 {-1};
+    int offTexCoords2 {-1};
+    int offTangents {-1};
+    int offBitangents {-1};
+    int offTanSpaceNormals {-1};
+    int offBoneIndices {-1};
+    int offBoneWeights {-1};
 };
 
 } // namespace graphics

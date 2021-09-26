@@ -38,12 +38,13 @@ public:
 
 private:
     queue<shared_ptr<int>> _sourceFrames;
-    int _ignoredTotal { 0 };
-    int _fetchedTotal { 0 };
+    int _ignoredTotal {0};
+    int _fetchedTotal {0};
 
     void ignoreFrames(int count) {
         for (int i = 0; i < count; ++i) {
-            if (_sourceFrames.empty()) break;
+            if (_sourceFrames.empty())
+                break;
             _sourceFrames.pop();
             ++_ignoredTotal;
         }
@@ -51,7 +52,8 @@ private:
 
     void fetchFrames(int count) {
         for (int i = 0; i < count; ++i) {
-            if (_sourceFrames.empty()) break;
+            if (_sourceFrames.empty())
+                break;
             _frames.push_back(_sourceFrames.front());
             _sourceFrames.pop();
             ++_fetchedTotal;

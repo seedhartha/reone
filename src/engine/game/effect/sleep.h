@@ -25,7 +25,8 @@ namespace game {
 
 class SleepEffect : public Effect {
 public:
-    SleepEffect() : Effect(EffectType::Sleep) {
+    SleepEffect() :
+        Effect(EffectType::Sleep) {
     }
 
     void applyTo(SpatialObject &object) override;

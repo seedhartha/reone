@@ -27,7 +27,8 @@ namespace reone {
 
 namespace game {
 
-BarkBubble::BarkBubble(Game *game) : GameGUI(game) {
+BarkBubble::BarkBubble(Game *game) :
+    GameGUI(game) {
     _resRef = getResRef("barkbubble");
     _scaling = ScalingMode::PositionRelativeToCenter;
 }

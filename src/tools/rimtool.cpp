@@ -32,22 +32,22 @@ namespace tools {
 
 void RimTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     switch (operation) {
-        case Operation::List:
-        case Operation::Extract: {
-            RimReader rim;
-            rim.load(target);
-            if (operation == Operation::List) {
-                list(rim);
-            } else if (operation == Operation::Extract) {
-                extract(rim, destPath);
-            }
-            break;
+    case Operation::List:
+    case Operation::Extract: {
+        RimReader rim;
+        rim.load(target);
+        if (operation == Operation::List) {
+            list(rim);
+        } else if (operation == Operation::Extract) {
+            extract(rim, destPath);
         }
-        case Operation::ToRIM:
-            toRIM(target);
-            break;
-        default:
-            break;
+        break;
+    }
+    case Operation::ToRIM:
+        toRIM(target);
+        break;
+    default:
+        break;
     }
 }
 
@@ -85,13 +85,15 @@ void RimTool::toRIM(const fs::path &target) {
 
     for (auto &entry : fs::directory_iterator(target)) {
         fs::path path(entry);
-        if (fs::is_directory(path)) continue;
+        if (fs::is_directory(path))
+            continue;
 
         string ext(path.extension().string());
         ext.erase(0, 1);
 
         ResourceType resType = getResTypeByExt(ext, false);
-        if (resType == ResourceType::Invalid) continue;
+        if (resType == ResourceType::Invalid)
+            continue;
 
         fs::ifstream in(path, ios::binary);
         in.seekg(0, ios::end);
@@ -118,13 +120,13 @@ void RimTool::toRIM(const fs::path &target) {
 
 bool RimTool::supports(Operation operation, const fs::path &target) const {
     switch (operation) {
-        case Operation::List:
-        case Operation::Extract:
-            return !fs::is_directory(target) && target.extension() == ".rim";
-        case Operation::ToRIM:
-            return fs::is_directory(target);
-        default:
-            return false;
+    case Operation::List:
+    case Operation::Extract:
+        return !fs::is_directory(target) && target.extension() == ".rim";
+    case Operation::ToRIM:
+        return fs::is_directory(target);
+    default:
+        return false;
     }
 }
 

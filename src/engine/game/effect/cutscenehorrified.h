@@ -25,7 +25,8 @@ namespace game {
 
 class CutsceneHorrifiedEffect : public Effect {
 public:
-    CutsceneHorrifiedEffect() : Effect(EffectType::CutSceneHorrified) {
+    CutsceneHorrifiedEffect() :
+        Effect(EffectType::CutSceneHorrified) {
     }
 
     void applyTo(SpatialObject &object) override;

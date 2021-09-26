@@ -46,13 +46,13 @@ private:
     TextureUsage _usage;
     bool _headless;
 
-    uint32_t _dataSize { 0 };
-    bool _compressed { false };
-    uint16_t _width { 0 };
-    uint16_t _height { 0 };
-    EncodingType _encoding { EncodingType::Grayscale };
-    uint8_t _mipMapCount { 0 };
-    bool _cubeMap { false };
+    uint32_t _dataSize {0};
+    bool _compressed {false};
+    uint16_t _width {0};
+    uint16_t _height {0};
+    EncodingType _encoding {EncodingType::Grayscale};
+    uint8_t _mipMapCount {0};
+    bool _cubeMap {false};
     std::vector<Texture::Layer> _pixels;
     ByteArray _txiData;
     Texture::Features _features;

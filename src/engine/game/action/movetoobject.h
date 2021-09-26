@@ -38,8 +38,8 @@ public:
     float distance() const { return _distance; }
 
 private:
-    bool _run { false };
-    float _distance { 0.0f };
+    bool _run {false};
+    float _distance {0.0f};
 };
 
 } // namespace game

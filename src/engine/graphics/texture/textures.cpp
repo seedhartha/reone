@@ -39,7 +39,8 @@ namespace reone {
 
 namespace graphics {
 
-Textures::Textures(Context &context, Resources &resources) : _context(context), _resources(resources) {
+Textures::Textures(Context &context, Resources &resources) :
+    _context(context), _resources(resources) {
 }
 
 void Textures::init() {
@@ -95,7 +96,8 @@ void Textures::bindDefaults() {
 }
 
 shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {
-    if (resRef.empty()) return nullptr;
+    if (resRef.empty())
+        return nullptr;
 
     auto maybeTexture = _cache.find(resRef);
     if (maybeTexture != _cache.end()) {

@@ -30,8 +30,7 @@ PlaceableCamera::PlaceableCamera(
     uint32_t id,
     Game *game,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph
-) :
+    SceneGraph *sceneGraph) :
     SpatialObject(
         id,
         ObjectType::Camera,

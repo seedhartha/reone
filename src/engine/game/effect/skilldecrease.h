@@ -25,7 +25,8 @@ namespace game {
 
 class SkillDecreaseEffect : public Effect {
 public:
-    SkillDecreaseEffect() : Effect(EffectType::SkillDecrease) {
+    SkillDecreaseEffect() :
+        Effect(EffectType::SkillDecrease) {
     }
 
     void applyTo(SpatialObject &object) override;

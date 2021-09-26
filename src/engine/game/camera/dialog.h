@@ -44,9 +44,9 @@ public:
     void setFindObstacle(std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> fn);
 
 private:
-    glm::vec3 _speakerPosition { 0.0f };
-    glm::vec3 _listenerPosition { 0.0f };
-    Variant _variant { Variant::Both };
+    glm::vec3 _speakerPosition {0.0f};
+    glm::vec3 _listenerPosition {0.0f};
+    Variant _variant {Variant::Both};
     std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> _findObstacle;
 
     void updateSceneNode();

@@ -26,8 +26,8 @@ namespace reone {
 namespace game {
 
 struct Character {
-    Gender gender { Gender::Male };
-    int appearance { 0 };
+    Gender gender {Gender::Male};
+    int appearance {0};
     CreatureAttributes attributes;
 };
 

@@ -34,7 +34,8 @@ namespace game {
 
 static constexpr int kStrRefMapNote = 349;
 
-MapMenu::MapMenu(Game *game) : GameGUI(game) {
+MapMenu::MapMenu(Game *game) :
+    GameGUI(game) {
     _resRef = getResRef("map");
 
     initForGame();

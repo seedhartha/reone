@@ -35,7 +35,8 @@ static constexpr float kMaxRotationSpeed = 2.5f;
 static constexpr float kRotationAcceleration = 1.0f;
 static constexpr float kMouseRotationSpeed = 0.001f;
 
-ThirdPersonCamera::ThirdPersonCamera(float aspect, const CameraStyle &style, Game *game, SceneGraph *sceneGraph) : _game(game) {
+ThirdPersonCamera::ThirdPersonCamera(float aspect, const CameraStyle &style, Game *game, SceneGraph *sceneGraph) :
+    _game(game) {
     glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
     _sceneNode = sceneGraph->newCamera("", move(projection));
     _style = style;
@@ -43,41 +44,41 @@ ThirdPersonCamera::ThirdPersonCamera(float aspect, const CameraStyle &style, Gam
 
 bool ThirdPersonCamera::handle(const SDL_Event &event) {
     switch (event.type) {
-        case SDL_KEYDOWN:
-            return handleKeyDown(event.key);
-        case SDL_KEYUP:
-            return handleKeyUp(event.key);
-        case SDL_MOUSEBUTTONDOWN:
-            return handleMouseButtonDown(event.button);
-        case SDL_MOUSEBUTTONUP:
-            return handleMouseButtonUp(event.button);
-        case SDL_MOUSEMOTION:
-            return handleMouseMotion(event.motion);
-        default:
-            return false;
+    case SDL_KEYDOWN:
+        return handleKeyDown(event.key);
+    case SDL_KEYUP:
+        return handleKeyUp(event.key);
+    case SDL_MOUSEBUTTONDOWN:
+        return handleMouseButtonDown(event.button);
+    case SDL_MOUSEBUTTONUP:
+        return handleMouseButtonUp(event.button);
+    case SDL_MOUSEMOTION:
+        return handleMouseMotion(event.motion);
+    default:
+        return false;
     }
 }
 
 bool ThirdPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
-        case SDL_SCANCODE_A:
-            if (!event.repeat && !_mouseLookMode) {
-                _rotateCCW = true;
-                _rotateCW = false;
-                _rotationSpeed = kMinRotationSpeed;
-                return true;
-            }
-            break;
-        case SDL_SCANCODE_D:
-            if (!event.repeat && !_mouseLookMode) {
-                _rotateCCW = false;
-                _rotateCW = true;
-                _rotationSpeed = kMinRotationSpeed;
-                return true;
-            }
-            break;
-        default:
-            break;
+    case SDL_SCANCODE_A:
+        if (!event.repeat && !_mouseLookMode) {
+            _rotateCCW = true;
+            _rotateCW = false;
+            _rotationSpeed = kMinRotationSpeed;
+            return true;
+        }
+        break;
+    case SDL_SCANCODE_D:
+        if (!event.repeat && !_mouseLookMode) {
+            _rotateCCW = false;
+            _rotateCW = true;
+            _rotationSpeed = kMinRotationSpeed;
+            return true;
+        }
+        break;
+    default:
+        break;
     }
 
     return false;
@@ -85,20 +86,20 @@ bool ThirdPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
 
 bool ThirdPersonCamera::handleKeyUp(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
-        case SDL_SCANCODE_A:
-            if (!_mouseLookMode) {
-                _rotateCCW = false;
-                return true;
-            }
-            break;
-        case SDL_SCANCODE_D:
-            if (!_mouseLookMode) {
-                _rotateCW = false;
-                return true;
-            }
-            break;
-        default:
-            break;
+    case SDL_SCANCODE_A:
+        if (!_mouseLookMode) {
+            _rotateCCW = false;
+            return true;
+        }
+        break;
+    case SDL_SCANCODE_D:
+        if (!_mouseLookMode) {
+            _rotateCW = false;
+            return true;
+        }
+        break;
+    default:
+        break;
     }
 
     return false;
@@ -134,7 +135,8 @@ bool ThirdPersonCamera::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
 }
 
 void ThirdPersonCamera::update(float dt) {
-    if (!_rotateCW && !_rotateCCW) return;
+    if (!_rotateCW && !_rotateCCW)
+        return;
 
     _rotationSpeed += kRotationAcceleration * dt;
 

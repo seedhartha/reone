@@ -17,8 +17,8 @@
 
 #include "map.h"
 
-#include "../common/logutil.h"
 #include "../common/guardutil.h"
+#include "../common/logutil.h"
 #include "../graphics/context.h"
 #include "../graphics/mesh/mesh.h"
 #include "../graphics/mesh/meshes.h"
@@ -43,7 +43,8 @@ static constexpr int kArrowSize = 32;
 static constexpr int kMapNoteSize = 16;
 static constexpr float kSelectedMapNoteScale = 1.5f;
 
-Map::Map(Game *game) : _game(ensurePresent(game, "game")) {
+Map::Map(Game *game) :
+    _game(ensurePresent(game, "game")) {
 }
 
 void Map::load(const string &area, const GffStruct &gffs) {
@@ -76,9 +77,9 @@ void Map::loadTextures(const string &area) {
     }
 }
 
-
 void Map::draw(Mode mode, const glm::vec4 &bounds) {
-    if (!_areaTexture) return;
+    if (!_areaTexture)
+        return;
 
     drawArea(mode, bounds);
     drawNotes(mode, bounds);
@@ -88,7 +89,8 @@ void Map::draw(Mode mode, const glm::vec4 &bounds) {
 void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
     if (mode == Mode::Minimap) {
         shared_ptr<Creature> partyLeader(_game->party().getLeader());
-        if (!partyLeader) return;
+        if (!partyLeader)
+            return;
 
         _game->context().setActiveTextureUnit(TextureUnits::diffuseMap);
         _areaTexture->bind();
@@ -131,14 +133,16 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
 }
 
 void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
-    if (mode != Mode::Default) return;
+    if (mode != Mode::Default)
+        return;
 
     _game->context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _noteTexture->bind();
 
     for (auto &object : _game->module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         auto waypoint = static_pointer_cast<Waypoint>(object);
-        if (!waypoint->isMapNoteEnabled() || waypoint->mapNote().empty()) continue;
+        if (!waypoint->isMapNoteEnabled() || waypoint->mapNote().empty())
+            continue;
 
         glm::vec2 mapPos(getMapPosition(waypoint->position()));
         mapPos.x *= bounds[2] / static_cast<float>(_areaTexture->width());
@@ -170,23 +174,23 @@ glm::vec2 Map::getMapPosition(const glm::vec2 &world) const {
     glm::vec2 result(0.0f);
 
     switch (_northAxis) {
-        case 0:
-        case 1:
-            scaleX = (_mapPoint1.x - _mapPoint2.x) / (_worldPoint1.x - _worldPoint2.x);
-            scaleY = (_mapPoint1.y - _mapPoint2.y) / (_worldPoint1.y - _worldPoint2.y);
-            result.x = (world.x - _worldPoint1.x) * scaleX + _mapPoint1.x;
-            result.y = (world.y - _worldPoint1.y) * scaleY + _mapPoint1.y;
-            break;
-        case 2:
-        case 3:
-            scaleX = (_mapPoint1.y - _mapPoint2.y) / (_worldPoint1.x - _worldPoint2.x);
-            scaleY = (_mapPoint1.x - _mapPoint2.x) / (_worldPoint1.y - _worldPoint2.y);
-            result.x = (world.y - _worldPoint1.y) * scaleY + _mapPoint1.x;
-            result.y = (world.x - _worldPoint1.x) * scaleX + _mapPoint1.y;
-            break;
-        default:
-            warn("Map: invalid north axis: " + to_string(_northAxis));
-            break;
+    case 0:
+    case 1:
+        scaleX = (_mapPoint1.x - _mapPoint2.x) / (_worldPoint1.x - _worldPoint2.x);
+        scaleY = (_mapPoint1.y - _mapPoint2.y) / (_worldPoint1.y - _worldPoint2.y);
+        result.x = (world.x - _worldPoint1.x) * scaleX + _mapPoint1.x;
+        result.y = (world.y - _worldPoint1.y) * scaleY + _mapPoint1.y;
+        break;
+    case 2:
+    case 3:
+        scaleX = (_mapPoint1.y - _mapPoint2.y) / (_worldPoint1.x - _worldPoint2.x);
+        scaleY = (_mapPoint1.x - _mapPoint2.x) / (_worldPoint1.y - _worldPoint2.y);
+        result.x = (world.y - _worldPoint1.y) * scaleY + _mapPoint1.x;
+        result.y = (world.x - _worldPoint1.x) * scaleX + _mapPoint1.y;
+        break;
+    default:
+        warn("Map: invalid north axis: " + to_string(_northAxis));
+        break;
     }
 
     return move(result);
@@ -194,7 +198,8 @@ glm::vec2 Map::getMapPosition(const glm::vec2 &world) const {
 
 void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     shared_ptr<Creature> partyLeader(_game->party().getLeader());
-    if (!partyLeader) return;
+    if (!partyLeader)
+        return;
 
     _game->context().setActiveTextureUnit(TextureUnits::diffuseMap);
     _arrowTexture->bind();
@@ -218,18 +223,18 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
 
     float facing;
     switch (_northAxis) {
-        case 0:
-            facing = -partyLeader->getFacing();
-            break;
-        case 1:
-            facing = glm::pi<float>() - partyLeader->getFacing();
-            break;
-        case 2:
-            facing = glm::three_over_two_pi<float>() - partyLeader->getFacing();
-            break;
-        default:
-            facing = glm::half_pi<float>() - partyLeader->getFacing();
-            break;
+    case 0:
+        facing = -partyLeader->getFacing();
+        break;
+    case 1:
+        facing = glm::pi<float>() - partyLeader->getFacing();
+        break;
+    case 2:
+        facing = glm::three_over_two_pi<float>() - partyLeader->getFacing();
+        break;
+    default:
+        facing = glm::half_pi<float>() - partyLeader->getFacing();
+        break;
     }
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, arrowPos);

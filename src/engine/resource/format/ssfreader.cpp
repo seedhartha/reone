@@ -23,7 +23,8 @@ namespace reone {
 
 namespace resource {
 
-SsfReader::SsfReader() : BinaryReader(8, "SSF V1.1") {
+SsfReader::SsfReader() :
+    BinaryReader(8, "SSF V1.1") {
 }
 
 void SsfReader::doLoad() {

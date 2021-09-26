@@ -20,10 +20,10 @@
 #include "../../audio/files.h"
 #include "../../audio/player.h"
 #include "../../common/logutil.h"
-#include "../../gui/control/listbox.h"
 #include "../../graphics/lip/lips.h"
 #include "../../graphics/model/animation.h"
 #include "../../graphics/model/models.h"
+#include "../../gui/control/listbox.h"
 #include "../../resource/resources.h"
 
 #include "../game.h"
@@ -44,7 +44,8 @@ static constexpr float kDefaultEntryDuration = 10.0f;
 
 static bool g_allEntriesSkippable = false;
 
-Conversation::Conversation(Game *game) : GameGUI(game) {
+Conversation::Conversation(Game *game) :
+    GameGUI(game) {
 }
 
 void Conversation::start(const shared_ptr<Dialog> &dialog, const shared_ptr<SpatialObject> &owner) {
@@ -61,10 +62,10 @@ void Conversation::start(const shared_ptr<Dialog> &dialog, const shared_ptr<Spat
 
 static BackgroundType getBackgroundType(ComputerType compType) {
     switch (compType) {
-        case ComputerType::Rakatan:
-            return BackgroundType::Computer1;
-        default:
-            return BackgroundType::Computer0;
+    case ComputerType::Rakatan:
+        return BackgroundType::Computer1;
+    default:
+        return BackgroundType::Computer0;
     }
 }
 
@@ -247,14 +248,16 @@ void Conversation::pickReply(int index) {
 
 bool Conversation::handle(const SDL_Event &event) {
     switch (event.type) {
-        case SDL_MOUSEBUTTONDOWN:
-            if (handleMouseButtonDown(event.button)) return true;
-            break;
-        case SDL_KEYUP:
-            if (handleKeyUp(event.key)) return true;
-            break;
-        default:
-            break;
+    case SDL_MOUSEBUTTONDOWN:
+        if (handleMouseButtonDown(event.button))
+            return true;
+        break;
+    case SDL_KEYUP:
+        if (handleKeyUp(event.key))
+            return true;
+        break;
+    default:
+        break;
     }
 
     return GameGUI::handle(event);

@@ -32,7 +32,8 @@ static constexpr int kDefaultRepute = 50;
 static vector<string> g_factionLabels;
 static vector<vector<int>> g_factionValues;
 
-Reputes::Reputes(Resources &resources) : _resources(resources) {
+Reputes::Reputes(Resources &resources) :
+    _resources(resources) {
 }
 
 void Reputes::init() {
@@ -76,7 +77,8 @@ int Reputes::getRepute(const Creature &left, const Creature &right) const {
     int rightFaction = static_cast<int>(right.faction());
 
     if (leftFaction < 0 || leftFaction >= g_factionValues.size() ||
-        rightFaction < 0 || rightFaction >= g_factionValues[leftFaction].size()) return kDefaultRepute;
+        rightFaction < 0 || rightFaction >= g_factionValues[leftFaction].size())
+        return kDefaultRepute;
 
     return g_factionValues[leftFaction][rightFaction];
 }

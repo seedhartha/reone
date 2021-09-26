@@ -25,7 +25,8 @@ namespace game {
 
 class CutsceneParalyzeEffect : public Effect {
 public:
-    CutsceneParalyzeEffect() : Effect(EffectType::CutSceneParalyze) {
+    CutsceneParalyzeEffect() :
+        Effect(EffectType::CutSceneParalyze) {
     }
 
     void applyTo(SpatialObject &object) override;

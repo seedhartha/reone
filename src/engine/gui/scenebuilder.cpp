@@ -17,10 +17,10 @@
 
 #include "scenebuilder.h"
 
+#include "../scene/graph.h"
 #include "../scene/node/camera.h"
 #include "../scene/node/mesh.h"
 #include "../scene/node/model.h"
-#include "../scene/graph.h"
 
 using namespace std;
 
@@ -39,8 +39,7 @@ SceneBuilder::SceneBuilder(
     Meshes &meshes,
     PBRIBL &pbrIbl,
     Shaders &shaders,
-    Textures &textures
-) :
+    Textures &textures) :
     _options(move(options)),
     _context(context),
     _features(features),

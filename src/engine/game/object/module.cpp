@@ -46,7 +46,8 @@ static constexpr int kMaxSecond = 60;
 static constexpr int kMaxMinute = 60;
 static constexpr int kMaxHour = 24;
 
-Module::Module(uint32_t id, Game *game) : Object(id, ObjectType::Module, game) {
+Module::Module(uint32_t id, Game *game) :
+    Object(id, ObjectType::Module, game) {
 }
 
 void Module::load(string name, const GffStruct &ifo, bool fromSave) {
@@ -128,21 +129,26 @@ void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &f
 }
 
 bool Module::handle(const SDL_Event &event) {
-    if (_player->handle(event)) return true;
-    if (_area->handle(event)) return true;
+    if (_player->handle(event))
+        return true;
+    if (_area->handle(event))
+        return true;
 
     switch (event.type) {
-        case SDL_MOUSEMOTION:
-            if (handleMouseMotion(event.motion)) return true;
-            break;
-        case SDL_MOUSEBUTTONDOWN:
-            if (handleMouseButtonDown(event.button)) return true;
-            break;
-        case SDL_KEYDOWN:
-            if (handleKeyDown(event.key)) return true;
-            break;
-        default:
-            break;
+    case SDL_MOUSEMOTION:
+        if (handleMouseMotion(event.motion))
+            return true;
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        if (handleMouseButtonDown(event.button))
+            return true;
+        break;
+    case SDL_KEYDOWN:
+        if (handleKeyDown(event.key))
+            return true;
+        break;
+    default:
+        break;
     }
 
     return false;
@@ -156,24 +162,24 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
         _area->hilightObject(object);
 
         switch (object->type()) {
-            case ObjectType::Creature: {
-                if (object->isDead()) {
-                    cursor = CursorType::Pickup;
-                } else {
-                    auto creature = static_pointer_cast<Creature>(object);
-                    bool isEnemy = _game->reputes().getIsEnemy(*creature, *_game->party().getLeader());
-                    cursor = isEnemy ? CursorType::Attack : CursorType::Talk;
-                }
-                break;
-            }
-            case ObjectType::Door:
-                cursor = CursorType::Door;
-                break;
-            case ObjectType::Placeable:
+        case ObjectType::Creature: {
+            if (object->isDead()) {
                 cursor = CursorType::Pickup;
-                break;
-            default:
-                break;
+            } else {
+                auto creature = static_pointer_cast<Creature>(object);
+                bool isEnemy = _game->reputes().getIsEnemy(*creature, *_game->party().getLeader());
+                cursor = isEnemy ? CursorType::Attack : CursorType::Talk;
+            }
+            break;
+        }
+        case ObjectType::Door:
+            cursor = CursorType::Door;
+            break;
+        case ObjectType::Placeable:
+            cursor = CursorType::Pickup;
+            break;
+        default:
+            break;
         }
     } else {
         _area->hilightObject(nullptr);
@@ -185,10 +191,12 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
 }
 
 bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    if (event.button != SDL_BUTTON_LEFT) return false;
+    if (event.button != SDL_BUTTON_LEFT)
+        return false;
 
     shared_ptr<SpatialObject> object(_area->getObjectAt(event.x, event.y));
-    if (!object || !object->isSelectable()) return false;
+    if (!object || !object->isSelectable())
+        return false;
 
     auto selectedObject = _area->selectedObject();
     if (object != selectedObject) {
@@ -202,15 +210,15 @@ bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
 
 void Module::onObjectClick(const shared_ptr<SpatialObject> &object) {
     switch (object->type()) {
-        case ObjectType::Creature:
-            onCreatureClick(static_pointer_cast<Creature>(object));
-            break;
-        case ObjectType::Door:
-            onDoorClick(static_pointer_cast<Door>(object));
-            break;
-        case ObjectType::Placeable:
-            onPlaceableClick(static_pointer_cast<Placeable>(object));
-            break;
+    case ObjectType::Creature:
+        onCreatureClick(static_pointer_cast<Creature>(object));
+        break;
+    case ObjectType::Door:
+        onDoorClick(static_pointer_cast<Door>(object));
+        break;
+    case ObjectType::Placeable:
+        onPlaceableClick(static_pointer_cast<Placeable>(object));
+        break;
     }
 }
 
@@ -273,69 +281,69 @@ vector<ContextAction> Module::getContextActions(const shared_ptr<Object> &object
     vector<ContextAction> actions;
 
     switch (object->type()) {
-        case ObjectType::Creature: {
-            auto leader = _game->party().getLeader();
-            auto creature = static_pointer_cast<Creature>(object);
-            if (!creature->isDead() && _game->reputes().getIsEnemy(*leader, *creature)) {
-                actions.push_back(ContextAction(ActionType::AttackObject));
-                auto weapon = leader->getEquippedItem(InventorySlot::rightWeapon);
-                if (weapon && weapon->isRanged()) {
-                    if (leader->attributes().hasFeat(FeatType::MasterPowerBlast)) {
-                        actions.push_back(ContextAction(FeatType::MasterPowerBlast));
-                    } else if (leader->attributes().hasFeat(FeatType::ImprovedPowerBlast)) {
-                        actions.push_back(ContextAction(FeatType::ImprovedPowerBlast));
-                    } else if (leader->attributes().hasFeat(FeatType::PowerBlast)) {
-                        actions.push_back(ContextAction(FeatType::PowerBlast));
-                    }
-                    if (leader->attributes().hasFeat(FeatType::MasterSniperShot)) {
-                        actions.push_back(ContextAction(FeatType::MasterSniperShot));
-                    } else if (leader->attributes().hasFeat(FeatType::ImprovedSniperShot)) {
-                        actions.push_back(ContextAction(FeatType::ImprovedSniperShot));
-                    } else if (leader->attributes().hasFeat(FeatType::SniperShot)) {
-                        actions.push_back(ContextAction(FeatType::SniperShot));
-                    }
-                    if (leader->attributes().hasFeat(FeatType::MultiShot)) {
-                        actions.push_back(ContextAction(FeatType::MultiShot));
-                    } else if (leader->attributes().hasFeat(FeatType::ImprovedRapidShot)) {
-                        actions.push_back(ContextAction(FeatType::ImprovedRapidShot));
-                    } else if (leader->attributes().hasFeat(FeatType::RapidShot)) {
-                        actions.push_back(ContextAction(FeatType::RapidShot));
-                    }
-                } else {
-                    if (leader->attributes().hasFeat(FeatType::MasterPowerAttack)) {
-                        actions.push_back(ContextAction(FeatType::MasterPowerAttack));
-                    } else if (leader->attributes().hasFeat(FeatType::ImprovedPowerAttack)) {
-                        actions.push_back(ContextAction(FeatType::ImprovedPowerAttack));
-                    } else if (leader->attributes().hasFeat(FeatType::PowerAttack)) {
-                        actions.push_back(ContextAction(FeatType::PowerAttack));
-                    }
-                    if (leader->attributes().hasFeat(FeatType::MasterCriticalStrike)) {
-                        actions.push_back(ContextAction(FeatType::MasterCriticalStrike));
-                    } else if (leader->attributes().hasFeat(FeatType::ImprovedCriticalStrike)) {
-                        actions.push_back(ContextAction(FeatType::ImprovedCriticalStrike));
-                    } else if (leader->attributes().hasFeat(FeatType::CriticalStrike)) {
-                        actions.push_back(ContextAction(FeatType::CriticalStrike));
-                    }
-                    if (leader->attributes().hasFeat(FeatType::WhirlwindAttack)) {
-                        actions.push_back(ContextAction(FeatType::WhirlwindAttack));
-                    } else if (leader->attributes().hasFeat(FeatType::ImprovedFlurry)) {
-                        actions.push_back(ContextAction(FeatType::ImprovedFlurry));
-                    } else if (leader->attributes().hasFeat(FeatType::Flurry)) {
-                        actions.push_back(ContextAction(FeatType::Flurry));
-                    }
+    case ObjectType::Creature: {
+        auto leader = _game->party().getLeader();
+        auto creature = static_pointer_cast<Creature>(object);
+        if (!creature->isDead() && _game->reputes().getIsEnemy(*leader, *creature)) {
+            actions.push_back(ContextAction(ActionType::AttackObject));
+            auto weapon = leader->getEquippedItem(InventorySlot::rightWeapon);
+            if (weapon && weapon->isRanged()) {
+                if (leader->attributes().hasFeat(FeatType::MasterPowerBlast)) {
+                    actions.push_back(ContextAction(FeatType::MasterPowerBlast));
+                } else if (leader->attributes().hasFeat(FeatType::ImprovedPowerBlast)) {
+                    actions.push_back(ContextAction(FeatType::ImprovedPowerBlast));
+                } else if (leader->attributes().hasFeat(FeatType::PowerBlast)) {
+                    actions.push_back(ContextAction(FeatType::PowerBlast));
+                }
+                if (leader->attributes().hasFeat(FeatType::MasterSniperShot)) {
+                    actions.push_back(ContextAction(FeatType::MasterSniperShot));
+                } else if (leader->attributes().hasFeat(FeatType::ImprovedSniperShot)) {
+                    actions.push_back(ContextAction(FeatType::ImprovedSniperShot));
+                } else if (leader->attributes().hasFeat(FeatType::SniperShot)) {
+                    actions.push_back(ContextAction(FeatType::SniperShot));
+                }
+                if (leader->attributes().hasFeat(FeatType::MultiShot)) {
+                    actions.push_back(ContextAction(FeatType::MultiShot));
+                } else if (leader->attributes().hasFeat(FeatType::ImprovedRapidShot)) {
+                    actions.push_back(ContextAction(FeatType::ImprovedRapidShot));
+                } else if (leader->attributes().hasFeat(FeatType::RapidShot)) {
+                    actions.push_back(ContextAction(FeatType::RapidShot));
+                }
+            } else {
+                if (leader->attributes().hasFeat(FeatType::MasterPowerAttack)) {
+                    actions.push_back(ContextAction(FeatType::MasterPowerAttack));
+                } else if (leader->attributes().hasFeat(FeatType::ImprovedPowerAttack)) {
+                    actions.push_back(ContextAction(FeatType::ImprovedPowerAttack));
+                } else if (leader->attributes().hasFeat(FeatType::PowerAttack)) {
+                    actions.push_back(ContextAction(FeatType::PowerAttack));
+                }
+                if (leader->attributes().hasFeat(FeatType::MasterCriticalStrike)) {
+                    actions.push_back(ContextAction(FeatType::MasterCriticalStrike));
+                } else if (leader->attributes().hasFeat(FeatType::ImprovedCriticalStrike)) {
+                    actions.push_back(ContextAction(FeatType::ImprovedCriticalStrike));
+                } else if (leader->attributes().hasFeat(FeatType::CriticalStrike)) {
+                    actions.push_back(ContextAction(FeatType::CriticalStrike));
+                }
+                if (leader->attributes().hasFeat(FeatType::WhirlwindAttack)) {
+                    actions.push_back(ContextAction(FeatType::WhirlwindAttack));
+                } else if (leader->attributes().hasFeat(FeatType::ImprovedFlurry)) {
+                    actions.push_back(ContextAction(FeatType::ImprovedFlurry));
+                } else if (leader->attributes().hasFeat(FeatType::Flurry)) {
+                    actions.push_back(ContextAction(FeatType::Flurry));
                 }
             }
-            break;
         }
-        case ObjectType::Door: {
-            auto door = static_pointer_cast<Door>(object);
-            if (door->isLocked() && !door->isKeyRequired() && _game->party().getLeader()->attributes().hasSkill(SkillType::Security)) {
-                actions.push_back(ContextAction(SkillType::Security));
-            }
-            break;
+        break;
+    }
+    case ObjectType::Door: {
+        auto door = static_pointer_cast<Door>(object);
+        if (door->isLocked() && !door->isKeyRequired() && _game->party().getLeader()->attributes().hasSkill(SkillType::Security)) {
+            actions.push_back(ContextAction(SkillType::Security));
         }
-        default:
-            break;
+        break;
+    }
+    default:
+        break;
     }
 
     return move(actions);
@@ -343,13 +351,13 @@ vector<ContextAction> Module::getContextActions(const shared_ptr<Object> &object
 
 bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {
     switch (event.keysym.sym) {
-        case SDLK_SPACE: {
-            bool paused = !_game->isPaused();
-            _game->setPaused(paused);
-            return true;
-        }
-        default:
-            return false;
+    case SDLK_SPACE: {
+        bool paused = !_game->isPaused();
+        _game->setPaused(paused);
+        return true;
+    }
+    default:
+        return false;
     }
 }
 

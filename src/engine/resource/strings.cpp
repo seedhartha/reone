@@ -35,7 +35,8 @@ void Strings::init(const fs::path &gameDir) {
 
 string Strings::get(int strRef) {
     shared_ptr<TalkTable> table(_tlk.table());
-    if (strRef < 0 || strRef >= table->getStringCount()) return "";
+    if (strRef < 0 || strRef >= table->getStringCount())
+        return "";
 
     string text(table->getString(strRef).text);
     process(text);
@@ -45,7 +46,8 @@ string Strings::get(int strRef) {
 
 string Strings::getSound(int strRef) {
     shared_ptr<TalkTable> table(_tlk.table());
-    if (strRef < 0 || strRef >= table->getStringCount()) return "";
+    if (strRef < 0 || strRef >= table->getStringCount())
+        return "";
 
     return table->getString(strRef).soundResRef;
 }
@@ -57,10 +59,12 @@ void Strings::process(string &str) {
 void Strings::stripDeveloperNotes(string &str) {
     do {
         size_t openBracketIdx = str.find_first_of('{', 0);
-        if (openBracketIdx == -1) break;
+        if (openBracketIdx == -1)
+            break;
 
         size_t closeBracketIdx = str.find_first_of('}', static_cast<int64_t>(openBracketIdx) + 1);
-        if (closeBracketIdx == -1) break;
+        if (closeBracketIdx == -1)
+            break;
 
         int textLen = static_cast<int>(str.size());
         size_t noteLen = closeBracketIdx - openBracketIdx + 1;

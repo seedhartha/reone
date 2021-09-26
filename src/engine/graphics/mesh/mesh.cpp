@@ -51,7 +51,8 @@ void Mesh::computeAABB() {
 }
 
 void Mesh::init() {
-    if (_inited) return;
+    if (_inited)
+        return;
 
     glGenBuffers(1, &_vboId);
     glGenBuffers(1, &_iboId);
@@ -110,7 +111,8 @@ Mesh::~Mesh() {
 }
 
 void Mesh::deinit() {
-    if (!_inited) return;
+    if (!_inited)
+        return;
 
     glDeleteVertexArrays(1, &_vaoId);
     glDeleteBuffers(1, &_iboId);
@@ -121,14 +123,14 @@ void Mesh::deinit() {
 
 static inline GLenum getModeGL(Mesh::DrawMode mode) {
     switch (mode) {
-        case Mesh::DrawMode::Lines:
-            return GL_LINES;
-        case Mesh::DrawMode::Triangles:
-            return GL_TRIANGLES;
-        case Mesh::DrawMode::TriangleStrip:
-            return GL_TRIANGLE_STRIP;
-        default:
-            throw invalid_argument("Unsupported draw mode: " + to_string(static_cast<int>(mode)));
+    case Mesh::DrawMode::Lines:
+        return GL_LINES;
+    case Mesh::DrawMode::Triangles:
+        return GL_TRIANGLES;
+    case Mesh::DrawMode::TriangleStrip:
+        return GL_TRIANGLE_STRIP;
+    default:
+        throw invalid_argument("Unsupported draw mode: " + to_string(static_cast<int>(mode)));
     }
 }
 
@@ -167,17 +169,13 @@ vector<glm::vec3> Mesh::getTriangleCoords(int faceIdx) const {
 glm::vec2 Mesh::getTriangleTexCoords1(int faceIdx, const glm::vec3 &baryPosition) const {
     auto points = getTriangleAttributes<glm::vec2>(faceIdx, _attributes.offTexCoords1);
 
-    return !points.empty() ?
-        barycentricToCartesian(points[0], points[1], points[2], baryPosition) :
-        glm::vec2(0.0f);
+    return !points.empty() ? barycentricToCartesian(points[0], points[1], points[2], baryPosition) : glm::vec2(0.0f);
 }
 
 glm::vec2 Mesh::getTriangleTexCoords2(int faceIdx, const glm::vec3 &baryPosition) const {
     auto points = getTriangleAttributes<glm::vec2>(faceIdx, _attributes.offTexCoords2);
 
-    return !points.empty() ?
-        barycentricToCartesian(points[0], points[1], points[2], baryPosition) :
-        glm::vec2(0.0f);
+    return !points.empty() ? barycentricToCartesian(points[0], points[1], points[2], baryPosition) : glm::vec2(0.0f);
 }
 
 template <class T>
@@ -186,13 +184,14 @@ vector<T> Mesh::getTriangleAttributes(int faceIdx, int offset) const {
     if (faceIdx < 0 || faceIdx >= static_cast<int>(_indices.size()) / 3) {
         throw out_of_range("faceIdx out of range");
     }
-    if (offset == -1) return vector<T>();
+    if (offset == -1)
+        return vector<T>();
 
     auto a = getVertexAttribute<T>(_indices[3ll * faceIdx + 0], offset);
     auto b = getVertexAttribute<T>(_indices[3ll * faceIdx + 1], offset);
     auto c = getVertexAttribute<T>(_indices[3ll * faceIdx + 2], offset);
 
-    return vector<T> { a, b, c };
+    return vector<T> {a, b, c};
 }
 
 template <>

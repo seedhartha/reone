@@ -25,11 +25,11 @@ namespace game {
 
 struct Portrait {
     std::string resRef;
-    int appearanceNumber { 0 };
-    int appearanceS { 0 };
-    int appearanceL { 0 };
-    bool forPC { false };
-    int sex { 0 };
+    int appearanceNumber {0};
+    int appearanceS {0};
+    int appearanceL {0};
+    bool forPC {false};
+    int sex {0};
 };
 
 } // namespace game

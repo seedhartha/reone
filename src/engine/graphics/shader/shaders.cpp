@@ -63,46 +63,47 @@ static constexpr int kBindingPointIndexGrass = 6;
 static constexpr int kBindingPointIndexDanglymesh = 7;
 
 void Shaders::init() {
-    if (_inited) return;
+    if (_inited)
+        return;
 
-    initShader(ShaderName::VertexSimple, GL_VERTEX_SHADER, { g_shaderBaseHeader, g_shaderVertexSimple });
-    initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, { g_shaderBaseHeader, g_shaderVertexModel });
-    initShader(ShaderName::VertexParticle, GL_VERTEX_SHADER, { g_shaderBaseHeader, g_shaderVertexParticle });
-    initShader(ShaderName::VertexGrass, GL_VERTEX_SHADER, { g_shaderBaseHeader, g_shaderVertexGrass });
-    initShader(ShaderName::VertexText, GL_VERTEX_SHADER, { g_shaderBaseHeader, g_shaderVertexText });
-    initShader(ShaderName::VertexBillboard, GL_VERTEX_SHADER, { g_shaderBaseHeader, g_shaderVertexBillboard });
-    initShader(ShaderName::GeometryDepth, GL_GEOMETRY_SHADER, { g_shaderBaseHeader, g_shaderGeometryDepth });
-    initShader(ShaderName::FragmentColor, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentColor });
-    initShader(ShaderName::FragmentDepth, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentDepth });
-    initShader(ShaderName::FragmentGUI, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentGUI });
-    initShader(ShaderName::FragmentText, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentText });
-    initShader(ShaderName::FragmentParticle, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentParticle });
-    initShader(ShaderName::FragmentGrass, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentGrass });
-    initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentBlur });
-    initShader(ShaderName::FragmentPresentWorld, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentPresentWorld });
-    initShader(ShaderName::FragmentBlinnPhong, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseNormals, g_shaderBaseShadows, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhong });
-    initShader(ShaderName::FragmentBlinnPhongDiffuseless, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseNormals, g_shaderBaseShadows, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhongDiffuseless });
-    initShader(ShaderName::FragmentIrradiance, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderFragmentIrradiance });
-    initShader(ShaderName::FragmentPrefilter, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBasePBR, g_shaderFragmentPrefilter });
-    initShader(ShaderName::FragmentBRDF, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBasePBR, g_shaderFragmentBRDF });
-    initShader(ShaderName::FragmentPBR, GL_FRAGMENT_SHADER, { g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseNormals, g_shaderBaseShadows, g_shaderBasePBR, g_shaderFragmentPBR });
+    initShader(ShaderName::VertexSimple, GL_VERTEX_SHADER, {g_shaderBaseHeader, g_shaderVertexSimple});
+    initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, {g_shaderBaseHeader, g_shaderVertexModel});
+    initShader(ShaderName::VertexParticle, GL_VERTEX_SHADER, {g_shaderBaseHeader, g_shaderVertexParticle});
+    initShader(ShaderName::VertexGrass, GL_VERTEX_SHADER, {g_shaderBaseHeader, g_shaderVertexGrass});
+    initShader(ShaderName::VertexText, GL_VERTEX_SHADER, {g_shaderBaseHeader, g_shaderVertexText});
+    initShader(ShaderName::VertexBillboard, GL_VERTEX_SHADER, {g_shaderBaseHeader, g_shaderVertexBillboard});
+    initShader(ShaderName::GeometryDepth, GL_GEOMETRY_SHADER, {g_shaderBaseHeader, g_shaderGeometryDepth});
+    initShader(ShaderName::FragmentColor, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentColor});
+    initShader(ShaderName::FragmentDepth, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentDepth});
+    initShader(ShaderName::FragmentGUI, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentGUI});
+    initShader(ShaderName::FragmentText, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentText});
+    initShader(ShaderName::FragmentParticle, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentParticle});
+    initShader(ShaderName::FragmentGrass, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentGrass});
+    initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentBlur});
+    initShader(ShaderName::FragmentPresentWorld, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentPresentWorld});
+    initShader(ShaderName::FragmentBlinnPhong, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseNormals, g_shaderBaseShadows, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhong});
+    initShader(ShaderName::FragmentBlinnPhongDiffuseless, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseNormals, g_shaderBaseShadows, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhongDiffuseless});
+    initShader(ShaderName::FragmentIrradiance, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentIrradiance});
+    initShader(ShaderName::FragmentPrefilter, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderBasePBR, g_shaderFragmentPrefilter});
+    initShader(ShaderName::FragmentBRDF, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderBasePBR, g_shaderFragmentBRDF});
+    initShader(ShaderName::FragmentPBR, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseNormals, g_shaderBaseShadows, g_shaderBasePBR, g_shaderFragmentPBR});
 
-    initProgram(ShaderProgram::SimpleColor, { ShaderName::VertexSimple, ShaderName::FragmentColor });
-    initProgram(ShaderProgram::SimpleDepth, { ShaderName::VertexSimple, ShaderName::GeometryDepth, ShaderName::FragmentDepth });
-    initProgram(ShaderProgram::SimpleGUI, { ShaderName::VertexSimple, ShaderName::FragmentGUI });
-    initProgram(ShaderProgram::SimpleIrradiance, { ShaderName::VertexSimple, ShaderName::FragmentIrradiance });
-    initProgram(ShaderProgram::SimplePrefilter, { ShaderName::VertexSimple, ShaderName::FragmentPrefilter });
-    initProgram(ShaderProgram::SimpleBRDF, { ShaderName::VertexSimple, ShaderName::FragmentBRDF });
-    initProgram(ShaderProgram::SimpleBlur, { ShaderName::VertexSimple, ShaderName::FragmentBlur });
-    initProgram(ShaderProgram::SimplePresentWorld, { ShaderName::VertexSimple, ShaderName::FragmentPresentWorld });
-    initProgram(ShaderProgram::ModelColor, { ShaderName::VertexModel, ShaderName::FragmentColor });
-    initProgram(ShaderProgram::ModelBlinnPhong, { ShaderName::VertexModel, ShaderName::FragmentBlinnPhong });
-    initProgram(ShaderProgram::ModelBlinnPhongDiffuseless, { ShaderName::VertexModel, ShaderName::FragmentBlinnPhongDiffuseless });
-    initProgram(ShaderProgram::ModelPBR, { ShaderName::VertexModel, ShaderName::FragmentPBR });
-    initProgram(ShaderProgram::ParticleParticle, { ShaderName::VertexParticle, ShaderName::FragmentParticle });
-    initProgram(ShaderProgram::GrassGrass, { ShaderName::VertexGrass, ShaderName::FragmentGrass });
-    initProgram(ShaderProgram::TextText, { ShaderName::VertexText, ShaderName::FragmentText });
-    initProgram(ShaderProgram::BillboardGUI, { ShaderName::VertexBillboard, ShaderName::FragmentGUI });
+    initProgram(ShaderProgram::SimpleColor, {ShaderName::VertexSimple, ShaderName::FragmentColor});
+    initProgram(ShaderProgram::SimpleDepth, {ShaderName::VertexSimple, ShaderName::GeometryDepth, ShaderName::FragmentDepth});
+    initProgram(ShaderProgram::SimpleGUI, {ShaderName::VertexSimple, ShaderName::FragmentGUI});
+    initProgram(ShaderProgram::SimpleIrradiance, {ShaderName::VertexSimple, ShaderName::FragmentIrradiance});
+    initProgram(ShaderProgram::SimplePrefilter, {ShaderName::VertexSimple, ShaderName::FragmentPrefilter});
+    initProgram(ShaderProgram::SimpleBRDF, {ShaderName::VertexSimple, ShaderName::FragmentBRDF});
+    initProgram(ShaderProgram::SimpleBlur, {ShaderName::VertexSimple, ShaderName::FragmentBlur});
+    initProgram(ShaderProgram::SimplePresentWorld, {ShaderName::VertexSimple, ShaderName::FragmentPresentWorld});
+    initProgram(ShaderProgram::ModelColor, {ShaderName::VertexModel, ShaderName::FragmentColor});
+    initProgram(ShaderProgram::ModelBlinnPhong, {ShaderName::VertexModel, ShaderName::FragmentBlinnPhong});
+    initProgram(ShaderProgram::ModelBlinnPhongDiffuseless, {ShaderName::VertexModel, ShaderName::FragmentBlinnPhongDiffuseless});
+    initProgram(ShaderProgram::ModelPBR, {ShaderName::VertexModel, ShaderName::FragmentPBR});
+    initProgram(ShaderProgram::ParticleParticle, {ShaderName::VertexParticle, ShaderName::FragmentParticle});
+    initProgram(ShaderProgram::GrassGrass, {ShaderName::VertexGrass, ShaderName::FragmentGrass});
+    initProgram(ShaderProgram::TextText, {ShaderName::VertexText, ShaderName::FragmentText});
+    initProgram(ShaderProgram::BillboardGUI, {ShaderName::VertexBillboard, ShaderName::FragmentGUI});
 
     glGenBuffers(1, &_uboCombined);
     glGenBuffers(1, &_uboText);
@@ -219,7 +220,8 @@ Shaders::~Shaders() {
 }
 
 void Shaders::deinit() {
-    if (!_inited) return;
+    if (!_inited)
+        return;
 
     // Delete UBO
     if (_uboCombined) {
@@ -370,7 +372,8 @@ void Shaders::setUniform(const string &name, const vector<glm::mat4> &arr) {
 }
 
 void Shaders::deactivate() {
-    if (_activeProgram == ShaderProgram::None) return;
+    if (_activeProgram == ShaderProgram::None)
+        return;
 
     glUseProgram(0);
     _activeProgram = ShaderProgram::None;

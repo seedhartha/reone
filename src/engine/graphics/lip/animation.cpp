@@ -28,7 +28,8 @@ LipAnimation::LipAnimation(float length, vector<Keyframe> keyframes) :
 }
 
 bool LipAnimation::getKeyframes(float time, uint8_t &leftShape, uint8_t &rightShape, float &factor) const {
-    if (_keyframes.empty()) return false;
+    if (_keyframes.empty())
+        return false;
 
     const Keyframe *left = &_keyframes[0];
     const Keyframe *right = &_keyframes[0];

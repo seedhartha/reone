@@ -40,14 +40,14 @@ FirstPersonCamera::FirstPersonCamera(float aspect, float fovy, SceneGraph *scene
 
 bool FirstPersonCamera::handle(const SDL_Event &event) {
     switch (event.type) {
-        case SDL_MOUSEMOTION:
-            return handleMouseMotion(event.motion);
-        case SDL_KEYDOWN:
-            return handleKeyDown(event.key);
-        case SDL_KEYUP:
-            return handleKeyUp(event.key);
-        default:
-            return false;
+    case SDL_MOUSEMOTION:
+        return handleMouseMotion(event.motion);
+    case SDL_KEYDOWN:
+        return handleKeyDown(event.key);
+    case SDL_KEYUP:
+        return handleKeyUp(event.key);
+    default:
+        return false;
     }
 }
 
@@ -79,55 +79,55 @@ void FirstPersonCamera::updateSceneNode() {
 
 bool FirstPersonCamera::handleKeyDown(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
-        case SDL_SCANCODE_W:
-            _moveForward = true;
-            return true;
+    case SDL_SCANCODE_W:
+        _moveForward = true;
+        return true;
 
-        case SDL_SCANCODE_A:
-            _moveLeft = true;
-            return true;
+    case SDL_SCANCODE_A:
+        _moveLeft = true;
+        return true;
 
-        case SDL_SCANCODE_S:
-            _moveBackward = true;
-            return true;
+    case SDL_SCANCODE_S:
+        _moveBackward = true;
+        return true;
 
-        case SDL_SCANCODE_D:
-            _moveRight = true;
-            return true;
+    case SDL_SCANCODE_D:
+        _moveRight = true;
+        return true;
 
-        case SDL_SCANCODE_LSHIFT:
-            _multiplier = 2.0f;
-            return true;
+    case SDL_SCANCODE_LSHIFT:
+        _multiplier = 2.0f;
+        return true;
 
-        default:
-            return false;
+    default:
+        return false;
     }
 }
 
 bool FirstPersonCamera::handleKeyUp(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
-        case SDL_SCANCODE_W:
-            _moveForward = false;
-            return true;
+    case SDL_SCANCODE_W:
+        _moveForward = false;
+        return true;
 
-        case SDL_SCANCODE_A:
-            _moveLeft = false;
-            return true;
+    case SDL_SCANCODE_A:
+        _moveLeft = false;
+        return true;
 
-        case SDL_SCANCODE_S:
-            _moveBackward = false;
-            return true;
+    case SDL_SCANCODE_S:
+        _moveBackward = false;
+        return true;
 
-        case SDL_SCANCODE_D:
-            _moveRight = false;
-            return true;
+    case SDL_SCANCODE_D:
+        _moveRight = false;
+        return true;
 
-        case SDL_SCANCODE_LSHIFT:
-            _multiplier = 1.0f;
-            return true;
+    case SDL_SCANCODE_LSHIFT:
+        _multiplier = 1.0f;
+        return true;
 
-        default:
-            return false;
+    default:
+        return false;
     }
 }
 

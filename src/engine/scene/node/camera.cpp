@@ -58,12 +58,18 @@ void CameraSceneNode::computeFrustumPlanes() {
 bool CameraSceneNode::isInFrustum(const glm::vec3 &point) const {
     glm::vec4 point4(point, 1.0f);
 
-    if (glm::dot(_frustumLeft, point4) < 0.0f) return false;
-    if (glm::dot(_frustumRight, point4) < 0.0f) return false;
-    if (glm::dot(_frustumBottom, point4) < 0.0f) return false;
-    if (glm::dot(_frustumTop, point4) < 0.0f) return false;
-    if (glm::dot(_frustumNear, point4) < 0.0f) return false;
-    if (glm::dot(_frustumFar, point4) < 0.0f) return false;
+    if (glm::dot(_frustumLeft, point4) < 0.0f)
+        return false;
+    if (glm::dot(_frustumRight, point4) < 0.0f)
+        return false;
+    if (glm::dot(_frustumBottom, point4) < 0.0f)
+        return false;
+    if (glm::dot(_frustumTop, point4) < 0.0f)
+        return false;
+    if (glm::dot(_frustumNear, point4) < 0.0f)
+        return false;
+    if (glm::dot(_frustumFar, point4) < 0.0f)
+        return false;
 
     return true;
 }
@@ -72,7 +78,8 @@ bool CameraSceneNode::isInFrustum(const AABB &aabb) const {
     // AABB is inside frustum if its center or at least one of its corners is inside
 
     glm::vec3 center(aabb.center());
-    if (isInFrustum(center)) return true;
+    if (isInFrustum(center))
+        return true;
 
     glm::vec3 halfSize(aabb.getSize() * 0.5f);
     vector<glm::vec3> corners {
@@ -83,19 +90,17 @@ bool CameraSceneNode::isInFrustum(const AABB &aabb) const {
         glm::vec3(center.x + halfSize.x, center.y + halfSize.y, center.z - halfSize.z),
         glm::vec3(center.x + halfSize.x, center.y - halfSize.y, center.z + halfSize.z),
         glm::vec3(center.x - halfSize.x, center.y + halfSize.y, center.z + halfSize.z),
-        glm::vec3(center.x + halfSize.x, center.y + halfSize.y, center.z + halfSize.z)
-    };
+        glm::vec3(center.x + halfSize.x, center.y + halfSize.y, center.z + halfSize.z)};
     for (auto &corner : corners) {
-        if (isInFrustum(corner)) return true;
+        if (isInFrustum(corner))
+            return true;
     }
 
     return false;
 }
 
 bool CameraSceneNode::isInFrustum(const SceneNode &other) const {
-    return other.isVolumetric() ?
-        isInFrustum(other.aabb() * other.absoluteTransform()) :
-        isInFrustum(other.absoluteTransform()[3]);
+    return other.isVolumetric() ? isInFrustum(other.aabb() * other.absoluteTransform()) : isInFrustum(other.absoluteTransform()[3]);
 }
 
 void CameraSceneNode::setProjection(glm::mat4 projection) {

@@ -23,7 +23,7 @@ namespace reone {
 
 namespace game {
 
-class Location : public script::EngineType  {
+class Location : public script::EngineType {
 public:
     Location(glm::vec3 position, float facing) :
         _position(std::move(position)),

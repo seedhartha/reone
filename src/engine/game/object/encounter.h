@@ -37,26 +37,26 @@ public:
 
 private:
     struct SpawnPoint {
-        glm::vec3 position { 0.0f };
-        glm::quat orientation { 1.0f, 0.0f, 0.0f, 0.0f };
+        glm::vec3 position {0.0f};
+        glm::quat orientation {1.0f, 0.0f, 0.0f, 0.0f};
     };
 
     struct EncounterCreature {
-        int _appearance { 0 };
-        float _cr { 0.0f };
+        int _appearance {0};
+        float _cr {0.0f};
         std::string _resRef;
-        bool _singleSpawn { false };
+        bool _singleSpawn {false};
     };
 
-    bool _active { false };
-    int _difficultyIndex { 0 };
-    Faction _faction { Faction::Invalid };
-    int _maxCreatures { 0 };
-    bool _playerOnly { false };
-    int _recCreatures { 0 };
-    bool _reset { false };
-    int _resetTime { 0 };
-    int _respawns { 0 };
+    bool _active {false};
+    int _difficultyIndex {0};
+    Faction _faction {Faction::Invalid};
+    int _maxCreatures {0};
+    bool _playerOnly {false};
+    int _recCreatures {0};
+    bool _reset {false};
+    int _resetTime {0};
+    int _respawns {0};
     std::vector<EncounterCreature> _creatures;
     std::vector<glm::vec3> _geometry;
     std::vector<SpawnPoint> _spawnPoints;

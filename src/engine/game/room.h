@@ -49,11 +49,11 @@ public:
 
 private:
     std::string _name;
-    glm::vec3 _position { 0.0f };
+    glm::vec3 _position {0.0f};
     std::shared_ptr<scene::ModelSceneNode> _model;
     std::shared_ptr<graphics::Walkmesh> _walkmesh;
     std::set<SpatialObject *> _tenants;
-    bool _visible { true };
+    bool _visible {true};
 };
 
 } // namespace game

@@ -27,7 +27,8 @@ namespace game {
 
 class WaitAction : public Action {
 public:
-    WaitAction(Game &game, float seconds) : Action(game, ActionType::Wait) {
+    WaitAction(Game &game, float seconds) :
+        Action(game, ActionType::Wait) {
         _timer.setTimeout(seconds);
     }
 

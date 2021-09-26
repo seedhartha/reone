@@ -18,10 +18,10 @@
 #include "hud.h"
 
 #include "../../common/logutil.h"
-#include "../../gui/control/label.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"
 #include "../../graphics/window.h"
+#include "../../gui/control/label.h"
 
 #include "../action/usefeat.h"
 #include "../d20/feats.h"
@@ -40,7 +40,8 @@ namespace game {
 
 static string g_attackIcon("i_attack");
 
-HUD::HUD(Game *game) : GameGUI(game), _select(game) {
+HUD::HUD(Game *game) :
+    GameGUI(game), _select(game) {
     _resRef = getResRef("mipc28x6");
     _resolutionX = 800;
     _resolutionY = 600;
@@ -49,8 +50,7 @@ HUD::HUD(Game *game) : GameGUI(game), _select(game) {
     static string combatControlTags[] = {
         "BTN_CLEARALL", "BTN_CLEARONE", "BTN_CLEARONE2",
         "LBL_CMBTMODEMSG", "LBL_CMBTMSGBG", "LBL_COMBATBG1", "LBL_COMBATBG2", "LBL_COMBATBG3",
-        "LBL_QUEUE0", "LBL_QUEUE1", "LBL_QUEUE2", "LBL_QUEUE3"
-    };
+        "LBL_QUEUE0", "LBL_QUEUE1", "LBL_QUEUE2", "LBL_QUEUE3"};
     for (auto &tag : combatControlTags) {
         _scalingByControlTag.insert(make_pair(tag, ScalingMode::Stretch));
     }
@@ -318,7 +318,8 @@ void HUD::bindControls() {
 }
 
 bool HUD::handle(const SDL_Event &event) {
-    if (_select.handle(event)) return true;
+    if (_select.handle(event))
+        return true;
 
     return GUI::handle(event);
 }
@@ -330,23 +331,19 @@ void HUD::update(float dt) {
     vector<Label *> charLabels {
         _binding.lblChar1.get(),
         _binding.lblChar2.get(),
-        _binding.lblChar3.get()
-    };
+        _binding.lblChar3.get()};
     vector<Label *> backLabels {
         _binding.lblBack1.get(),
         _binding.lblBack2.get(),
-        _binding.lblBack3.get()
-    };
+        _binding.lblBack3.get()};
     vector<Label *> lvlUpBgLabels {
         _binding.lblLvlUpBg1.get(),
         _binding.lblLvlUpBg2.get(),
-        _binding.lblLvlUpBg3.get()
-    };
+        _binding.lblLvlUpBg3.get()};
     vector<Label *> levevlUpLabels {
         _binding.lblLevelUp1.get(),
         _binding.lblLevelUp2.get(),
-        _binding.lblLevelUp3.get()
-    };
+        _binding.lblLevelUp3.get()};
 
     for (int i = 0; i < 3; ++i) {
         Label &lblChar = *charLabels[i];
@@ -419,15 +416,15 @@ void HUD::drawMinimap() {
 }
 
 void HUD::drawHealth(int memberIndex) {
-    if (_game->isTSL()) return;
+    if (_game->isTSL())
+        return;
 
     Party &party = _game->party();
     shared_ptr<Creature> member(party.getMember(memberIndex));
     vector<Label *> backLabels {
         _binding.lblBack1.get(),
         _binding.lblBack2.get(),
-        _binding.lblBack3.get()
-    };
+        _binding.lblBack3.get()};
 
     Label &lblChar = *backLabels[memberIndex];
     const Control::Extent &extent = lblChar.extent();
@@ -472,26 +469,25 @@ void HUD::refreshActionQueueItems() const {
         _binding.lblQueue0.get(),
         _binding.lblQueue1.get(),
         _binding.lblQueue2.get(),
-        _binding.lblQueue3.get()
-    };
+        _binding.lblQueue3.get()};
 
     for (int i = 0; i < 4; ++i) {
         Label &item = *queueLabels[i];
         if (i < static_cast<int>(actions.size())) {
             switch (actions[i]->type()) {
-                case ActionType::AttackObject:
-                    item.setBorderFill(g_attackIcon);
-                    break;
-                case ActionType::UseFeat: {
-                    auto featAction = static_pointer_cast<UseFeatAction>(actions[i]);
-                    shared_ptr<Feat> feat(_game->feats().get(featAction->feat()));
-                    if (feat) {
-                        item.setBorderFill(feat->icon);
-                    }
-                    break;
+            case ActionType::AttackObject:
+                item.setBorderFill(g_attackIcon);
+                break;
+            case ActionType::UseFeat: {
+                auto featAction = static_pointer_cast<UseFeatAction>(actions[i]);
+                shared_ptr<Feat> feat(_game->feats().get(featAction->feat()));
+                if (feat) {
+                    item.setBorderFill(feat->icon);
                 }
-                default:
-                    break;
+                break;
+            }
+            default:
+                break;
             }
         } else {
             item.setBorderFill("");

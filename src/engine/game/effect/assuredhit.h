@@ -25,7 +25,8 @@ namespace game {
 
 class AssuredHitEffect : public Effect {
 public:
-    AssuredHitEffect() : Effect(EffectType::AssuredHit) {
+    AssuredHitEffect() :
+        Effect(EffectType::AssuredHit) {
     }
 
     void applyTo(SpatialObject &object) override;

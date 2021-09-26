@@ -84,9 +84,7 @@ inline T getEnum(const std::vector<script::Variable> &args, int index) {
 
 template <class T>
 inline T getEnumOrElse(const std::vector<script::Variable> &args, int index, T defValue) {
-    return isOutOfRange(args, index) ?
-        std::move(defValue) :
-        static_cast<T>(args[index].intValue);
+    return isOutOfRange(args, index) ? std::move(defValue) : static_cast<T>(args[index].intValue);
 }
 
 } // namespace game

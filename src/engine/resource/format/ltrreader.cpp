@@ -27,10 +27,10 @@ namespace resource {
 
 static const vector<char> g_letters {
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-    'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '\'', '-'
-};
+    'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '\'', '-'};
 
-LtrReader::LtrReader() : BinaryReader(8, "LTR V1.0") {
+LtrReader::LtrReader() :
+    BinaryReader(8, "LTR V1.0") {
 }
 
 void LtrReader::doLoad() {
@@ -110,7 +110,8 @@ string LtrReader::getRandomName(int maxLength) const {
 
     // END First three letters
 
-    if (maxLength < 4) return move(name);
+    if (maxLength < 4)
+        return move(name);
 
     // Middle letters
 

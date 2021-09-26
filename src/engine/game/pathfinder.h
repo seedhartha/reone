@@ -34,11 +34,11 @@ public:
 
 private:
     struct ContextVertex {
-        uint16_t index { 0 };
-        uint16_t parentIndex { 0xffff };
-        float distance { 0.0f };
-        float heuristic { 0.0f };
-        float totalCost { 0.0f };
+        uint16_t index {0};
+        uint16_t parentIndex {0xffff};
+        float distance {0.0f};
+        float heuristic {0.0f};
+        float totalCost {0.0f};
     };
 
     struct Context {

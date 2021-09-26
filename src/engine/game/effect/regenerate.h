@@ -25,7 +25,8 @@ namespace game {
 
 class RegenerateEffect : public Effect {
 public:
-    RegenerateEffect() : Effect(EffectType::Regenerate) {
+    RegenerateEffect() :
+        Effect(EffectType::Regenerate) {
     }
 
     void applyTo(SpatialObject &object) override;

@@ -24,13 +24,16 @@ namespace reone {
 namespace game {
 
 struct ContextAction {
-    ActionType type { ActionType::Invalid };
-    FeatType feat { FeatType::Invalid };
-    SkillType skill { SkillType::Invalid };
+    ActionType type {ActionType::Invalid};
+    FeatType feat {FeatType::Invalid};
+    SkillType skill {SkillType::Invalid};
 
-    ContextAction(ActionType type) : type(type) {}
-    ContextAction(FeatType feat) : type(ActionType::UseFeat), feat(feat) {}
-    ContextAction(SkillType skill) : type(ActionType::UseSkill), skill(skill) {}
+    ContextAction(ActionType type) :
+        type(type) {}
+    ContextAction(FeatType feat) :
+        type(ActionType::UseFeat), feat(feat) {}
+    ContextAction(SkillType skill) :
+        type(ActionType::UseSkill), skill(skill) {}
 };
 
 } // namespace game

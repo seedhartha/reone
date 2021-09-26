@@ -26,9 +26,9 @@ namespace gui {
 class ScrollBar : public Control {
 public:
     struct ScrollState {
-        int count { 0 }; /**< total number of list items */
-        int numVisible { 0 }; /**< number of visible list items */
-        int offset { 0 }; /**< offset into the list of items  */
+        int count {0};      /**< total number of list items */
+        int numVisible {0}; /**< number of visible list items */
+        int offset {0};     /**< offset into the list of items  */
     };
 
     ScrollBar(
@@ -39,8 +39,7 @@ public:
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,
-        resource::Strings &strings
-    ) :
+        resource::Strings &strings) :
         Control(
             gui,
             ControlType::ScrollBar,

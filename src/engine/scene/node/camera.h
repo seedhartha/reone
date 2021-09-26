@@ -33,16 +33,14 @@ public:
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders
-    ) :
+        graphics::Shaders &shaders) :
         SceneNode(
             std::move(name),
             SceneNodeType::Camera,
             sceneGraph,
             context,
             meshes,
-            shaders
-        ),
+            shaders),
         _projection(std::move(projection)) {
     }
 
@@ -56,17 +54,17 @@ public:
     void setProjection(glm::mat4 projection);
 
 private:
-    glm::mat4 _projection { 1.0f };
-    glm::mat4 _view { 1.0f };
+    glm::mat4 _projection {1.0f};
+    glm::mat4 _view {1.0f};
 
     // Frustum planes
 
-    glm::vec4 _frustumLeft { 0.0f };
-    glm::vec4 _frustumRight { 0.0f };
-    glm::vec4 _frustumBottom { 0.0f };
-    glm::vec4 _frustumTop { 0.0f };
-    glm::vec4 _frustumNear { 0.0f };
-    glm::vec4 _frustumFar { 0.0f };
+    glm::vec4 _frustumLeft {0.0f};
+    glm::vec4 _frustumRight {0.0f};
+    glm::vec4 _frustumBottom {0.0f};
+    glm::vec4 _frustumTop {0.0f};
+    glm::vec4 _frustumNear {0.0f};
+    glm::vec4 _frustumFar {0.0f};
 
     // END Frustum planes
 

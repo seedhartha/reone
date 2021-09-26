@@ -54,17 +54,17 @@ private:
     };
 
     struct ArrayDefinition {
-        uint32_t offset { 0 };
-        uint32_t count { 0 };
-        uint32_t count2 { 0 };
+        uint32_t offset {0};
+        uint32_t count {0};
+        uint32_t count2 {0};
     };
 
     struct ControllerKey {
-        uint32_t type { 0 };
-        uint16_t numRows { 0 };
-        uint16_t timeIndex { 0 };
-        uint16_t dataIndex { 0 };
-        uint8_t numColumns { 0 };
+        uint32_t type {0};
+        uint16_t numRows {0};
+        uint16_t timeIndex {0};
+        uint16_t dataIndex {0};
+        uint8_t numColumns {0};
     };
 
     typedef std::unordered_map<uint32_t, std::vector<uint32_t>> MaterialMap;
@@ -79,7 +79,7 @@ private:
     std::unordered_map<uint32_t, ControllerFn> _emitterControllers;
 
     std::unique_ptr<StreamReader> _mdxReader;
-    bool _tsl { false }; /**< is this a TSL model? */
+    bool _tsl {false}; /**< is this a TSL model? */
     std::vector<std::string> _nodeNames;
     std::vector<std::shared_ptr<ModelNode>> _nodes; /**< loaded model nodes (DFS ordering) */
     std::map<std::string, uint16_t> _nodeFlags;

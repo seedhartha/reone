@@ -25,7 +25,8 @@ namespace game {
 
 class MoveAwayFromLocationAction : public Action {
 public:
-    MoveAwayFromLocationAction(Game &game) : Action(game, ActionType::MoveAwayFromLocation) {
+    MoveAwayFromLocationAction(Game &game) :
+        Action(game, ActionType::MoveAwayFromLocation) {
     }
 
     void execute(Object &actor, float dt) override;

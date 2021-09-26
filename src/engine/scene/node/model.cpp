@@ -16,8 +16,8 @@
  */
 
 #include "../../common/collectionutil.h"
-#include "../../common/logutil.h"
 #include "../../common/guardutil.h"
+#include "../../common/logutil.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/model/animation.h"
 
@@ -50,16 +50,14 @@ ModelSceneNode::ModelSceneNode(
     PBRIBL &pbrIbl,
     Shaders &shaders,
     Textures &textures,
-    IAnimationEventListener *animEventListener
-) :
+    IAnimationEventListener *animEventListener) :
     SceneNode(
         model->name(),
         SceneNodeType::Model,
         sceneGraph,
         context,
         meshes,
-        shaders
-    ),
+        shaders),
     _model(ensurePresent(model, "model")),
     _usage(usage),
     _features(features),
@@ -109,7 +107,8 @@ void ModelSceneNode::buildNodeTree(shared_ptr<ModelNode> node, SceneNode *parent
 
 void ModelSceneNode::update(float dt) {
     // Optimization: skip invisible models
-    if (!_visible) return;
+    if (!_visible)
+        return;
 
     SceneNode::update(dt);
     updateAnimations(dt);
@@ -165,7 +164,8 @@ void ModelSceneNode::signalEvent(const string &name) {
 
 void ModelSceneNode::attach(const string &parentName, shared_ptr<SceneNode> node) {
     auto maybeParent = _nodeByName.find(parentName);
-    if (maybeParent == _nodeByName.end()) return;
+    if (maybeParent == _nodeByName.end())
+        return;
 
     shared_ptr<ModelNodeSceneNode> parent(maybeParent->second);
     parent->addChild(node);
@@ -219,49 +219,50 @@ void ModelSceneNode::playAnimation(shared_ptr<Animation> anim, shared_ptr<LipAni
 
     // Return if same animation is already playing
     if (!_animChannels.empty() &&
-        _animChannels[0].anim == anim && _animChannels[0].lipAnim == lipAnim && _animChannels[0].properties == properties) return;
+        _animChannels[0].anim == anim && _animChannels[0].lipAnim == lipAnim && _animChannels[0].properties == properties)
+        return;
 
     AnimationBlendMode blendMode = getAnimationBlendMode(properties.flags);
 
     switch (blendMode) {
-        case AnimationBlendMode::Single:
-            // In Single mode, clear channels and add animation on top
-            _animChannels.clear();
-            _animChannels.push_front(AnimationChannel(anim, lipAnim, properties));
-            break;
+    case AnimationBlendMode::Single:
+        // In Single mode, clear channels and add animation on top
+        _animChannels.clear();
+        _animChannels.push_front(AnimationChannel(anim, lipAnim, properties));
+        break;
 
-        case AnimationBlendMode::Blend: {
-            // In Blend mode, if there is an animation on top, initiate
-            // transition between old and new animations
-            bool transition = false;
-            if (!_animChannels.empty()) {
-                _animChannels[0].freeze = true;
-                _animChannels[0].transition = false;
-                transition = true;
-            }
-            // Add animation on top
-            _animChannels.push_front(AnimationChannel(anim, lipAnim, properties));
-            if (transition) {
-                _animChannels[0].transition = true;
-                _animChannels[0].time = glm::max(0.0f, _animChannels[0].anim->transitionTime() - kTransitionLength);
-            }
-            while (_animChannels.size() > 2ll) {
-                _animChannels.pop_back();
-            }
-            break;
+    case AnimationBlendMode::Blend: {
+        // In Blend mode, if there is an animation on top, initiate
+        // transition between old and new animations
+        bool transition = false;
+        if (!_animChannels.empty()) {
+            _animChannels[0].freeze = true;
+            _animChannels[0].transition = false;
+            transition = true;
         }
+        // Add animation on top
+        _animChannels.push_front(AnimationChannel(anim, lipAnim, properties));
+        if (transition) {
+            _animChannels[0].transition = true;
+            _animChannels[0].time = glm::max(0.0f, _animChannels[0].anim->transitionTime() - kTransitionLength);
+        }
+        while (_animChannels.size() > 2ll) {
+            _animChannels.pop_back();
+        }
+        break;
+    }
 
-        case AnimationBlendMode::Overlay:
-            // In Overlay mode, clear channels only if previous mode is not
-            // Overlay and add animation on top
-            if (_animBlendMode != AnimationBlendMode::Overlay) {
-                _animChannels.clear();
-            }
-            _animChannels.push_front(AnimationChannel(anim, lipAnim, properties));
-            break;
+    case AnimationBlendMode::Overlay:
+        // In Overlay mode, clear channels only if previous mode is not
+        // Overlay and add animation on top
+        if (_animBlendMode != AnimationBlendMode::Overlay) {
+            _animChannels.clear();
+        }
+        _animChannels.push_front(AnimationChannel(anim, lipAnim, properties));
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 
     _animBlendMode = blendMode;
@@ -277,13 +278,12 @@ void ModelSceneNode::playAnimation(shared_ptr<Animation> anim, shared_ptr<LipAni
 }
 
 ModelSceneNode::AnimationBlendMode ModelSceneNode::getAnimationBlendMode(int flags) {
-    return (flags & AnimationFlags::blend) ?
-        AnimationBlendMode::Blend :
-        ((flags & AnimationFlags::overlay) ? AnimationBlendMode::Overlay : AnimationBlendMode::Single);
+    return (flags & AnimationFlags::blend) ? AnimationBlendMode::Blend : ((flags & AnimationFlags::overlay) ? AnimationBlendMode::Overlay : AnimationBlendMode::Single);
 }
 
 void ModelSceneNode::updateAnimations(float dt) {
-    if (_animChannels.empty()) return;
+    if (_animChannels.empty())
+        return;
 
     for (auto &channel : _animChannels) {
         if (!channel.freeze) {
@@ -299,22 +299,22 @@ void ModelSceneNode::updateAnimations(float dt) {
 
     // Erase finished channels
     switch (_animBlendMode) {
-        case AnimationBlendMode::Single:
-        case AnimationBlendMode::Overlay: {
-            auto channelsToErase = remove_if(_animChannels.begin(), _animChannels.end(), [](auto &channel) { return channel.finished; });
-            _animChannels.erase(channelsToErase, _animChannels.end());
-            break;
+    case AnimationBlendMode::Single:
+    case AnimationBlendMode::Overlay: {
+        auto channelsToErase = remove_if(_animChannels.begin(), _animChannels.end(), [](auto &channel) { return channel.finished; });
+        _animChannels.erase(channelsToErase, _animChannels.end());
+        break;
+    }
+    case AnimationBlendMode::Blend:
+        if (_animChannels.size() > 1ll && !_animChannels[0].transition) {
+            _animChannels.pop_back();
         }
-        case AnimationBlendMode::Blend:
-            if (_animChannels.size() > 1ll && !_animChannels[0].transition) {
-                _animChannels.pop_back();
-            }
-            if (!_animChannels.empty() && _animChannels[0].finished) {
-                _animChannels.pop_front();
-            }
-            break;
-        default:
-            break;
+        if (!_animChannels.empty() && _animChannels[0].finished) {
+            _animChannels.pop_front();
+        }
+        break;
+    default:
+        break;
     }
 }
 
@@ -436,65 +436,66 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
         AnimationState combined;
 
         switch (_animBlendMode) {
-            case AnimationBlendMode::Single:
-            case AnimationBlendMode::Blend: {
-                auto state1 = getFromLookupOrElse(_animChannels[0].stateByName, modelNode.name(), AnimationState());
-                bool blend = _animBlendMode == AnimationBlendMode::Blend && _animChannels[0].transition && _animChannels.size() > 1ll;
-                if (blend) {
-                    auto state2 = getFromLookupOrElse(_animChannels[1].stateByName, modelNode.name(), AnimationState());
-                    if (state1.flags & AnimationStateFlags::transform && state2.flags & AnimationStateFlags::transform) {
-                        float factor = glm::min(1.0f, _animChannels[0].time / _animChannels[0].anim->transitionTime());
-                        glm::vec3 scale1, scale2, translation1, translation2, skew;
-                        glm::quat orientation1, orientation2;
-                        glm::vec4 perspective;
-                        glm::decompose(state1.transform, scale1, orientation1, translation1, skew, perspective);
-                        glm::decompose(state2.transform, scale2, orientation2, translation2, skew, perspective);
-                        combined.flags |= AnimationStateFlags::transform;
-                        combined.transform *= glm::scale(glm::mix(scale2, scale1, factor));
-                        combined.transform *= glm::translate(glm::mix(translation2, translation1, factor));
-                        combined.transform *= glm::mat4_cast(glm::slerp(orientation2, orientation1, factor));
-                    } else if (state1.flags & AnimationStateFlags::transform) {
-                        combined.flags |= AnimationStateFlags::transform;
-                        combined.transform = state1.transform;
-                    } else if (state2.flags & AnimationStateFlags::transform) {
-                        combined.flags |= AnimationStateFlags::transform;
-                        combined.transform = state2.transform;
-                    }
+        case AnimationBlendMode::Single:
+        case AnimationBlendMode::Blend: {
+            auto state1 = getFromLookupOrElse(_animChannels[0].stateByName, modelNode.name(), AnimationState());
+            bool blend = _animBlendMode == AnimationBlendMode::Blend && _animChannels[0].transition && _animChannels.size() > 1ll;
+            if (blend) {
+                auto state2 = getFromLookupOrElse(_animChannels[1].stateByName, modelNode.name(), AnimationState());
+                if (state1.flags & AnimationStateFlags::transform && state2.flags & AnimationStateFlags::transform) {
+                    float factor = glm::min(1.0f, _animChannels[0].time / _animChannels[0].anim->transitionTime());
+                    glm::vec3 scale1, scale2, translation1, translation2, skew;
+                    glm::quat orientation1, orientation2;
+                    glm::vec4 perspective;
+                    glm::decompose(state1.transform, scale1, orientation1, translation1, skew, perspective);
+                    glm::decompose(state2.transform, scale2, orientation2, translation2, skew, perspective);
+                    combined.flags |= AnimationStateFlags::transform;
+                    combined.transform *= glm::scale(glm::mix(scale2, scale1, factor));
+                    combined.transform *= glm::translate(glm::mix(translation2, translation1, factor));
+                    combined.transform *= glm::mat4_cast(glm::slerp(orientation2, orientation1, factor));
                 } else if (state1.flags & AnimationStateFlags::transform) {
                     combined.flags |= AnimationStateFlags::transform;
                     combined.transform = state1.transform;
+                } else if (state2.flags & AnimationStateFlags::transform) {
+                    combined.flags |= AnimationStateFlags::transform;
+                    combined.transform = state2.transform;
                 }
-                if (state1.flags & AnimationStateFlags::alpha) {
-                    combined.flags |= AnimationStateFlags::alpha;
-                    combined.alpha = state1.alpha;
-                }
-                if (state1.flags & AnimationStateFlags::selfIllumColor) {
-                    combined.flags |= AnimationStateFlags::selfIllumColor;
-                    combined.selfIllumColor = state1.selfIllumColor;
-                }
-                break;
+            } else if (state1.flags & AnimationStateFlags::transform) {
+                combined.flags |= AnimationStateFlags::transform;
+                combined.transform = state1.transform;
             }
-            case AnimationBlendMode::Overlay:
-                for (auto &channel : _animChannels) {
-                    auto maybeState = channel.stateByName.find(modelNode.name());
-                    if (maybeState == channel.stateByName.end()) continue;
-                    const AnimationState &state = maybeState->second;
-                    if ((state.flags & AnimationStateFlags::transform) && !(combined.flags & AnimationStateFlags::transform)) {
-                        combined.flags |= AnimationStateFlags::transform;
-                        combined.transform = state.transform;
-                    }
-                    if ((state.flags & AnimationStateFlags::alpha) && !(combined.flags & AnimationStateFlags::alpha)) {
-                        combined.flags |= AnimationStateFlags::alpha;
-                        combined.alpha = state.alpha;
-                    }
-                    if ((state.flags & AnimationStateFlags::selfIllumColor) && !(combined.flags & AnimationStateFlags::selfIllumColor)) {
-                        combined.flags |= AnimationStateFlags::selfIllumColor;
-                        combined.selfIllumColor = state.selfIllumColor;
-                    }
+            if (state1.flags & AnimationStateFlags::alpha) {
+                combined.flags |= AnimationStateFlags::alpha;
+                combined.alpha = state1.alpha;
+            }
+            if (state1.flags & AnimationStateFlags::selfIllumColor) {
+                combined.flags |= AnimationStateFlags::selfIllumColor;
+                combined.selfIllumColor = state1.selfIllumColor;
+            }
+            break;
+        }
+        case AnimationBlendMode::Overlay:
+            for (auto &channel : _animChannels) {
+                auto maybeState = channel.stateByName.find(modelNode.name());
+                if (maybeState == channel.stateByName.end())
+                    continue;
+                const AnimationState &state = maybeState->second;
+                if ((state.flags & AnimationStateFlags::transform) && !(combined.flags & AnimationStateFlags::transform)) {
+                    combined.flags |= AnimationStateFlags::transform;
+                    combined.transform = state.transform;
                 }
-                break;
-            default:
-                break;
+                if ((state.flags & AnimationStateFlags::alpha) && !(combined.flags & AnimationStateFlags::alpha)) {
+                    combined.flags |= AnimationStateFlags::alpha;
+                    combined.alpha = state.alpha;
+                }
+                if ((state.flags & AnimationStateFlags::selfIllumColor) && !(combined.flags & AnimationStateFlags::selfIllumColor)) {
+                    combined.flags |= AnimationStateFlags::selfIllumColor;
+                    combined.selfIllumColor = state.selfIllumColor;
+                }
+            }
+            break;
+        default:
+            break;
         }
 
         if (combined.flags & AnimationStateFlags::transform) {
@@ -517,7 +518,7 @@ void ModelSceneNode::computeBoneTransforms() {
     for (auto &node : _nodeByName) {
         glm::mat4 transform(1.0f);
         transform = node.second->absoluteTransform() * node.second->modelNode()->absoluteTransformInverse(); // make relative to the rest pose (world space)
-        transform = _absTransformInv * transform; // world space to model space
+        transform = _absTransformInv * transform;                                                            // world space to model space
         node.second->setBoneTransform(move(transform));
     }
 }
@@ -527,10 +528,12 @@ bool ModelSceneNode::isAnimationFinished() const {
 }
 
 string ModelSceneNode::getActiveAnimationName() const {
-    if (_animChannels.empty()) return "";
+    if (_animChannels.empty())
+        return "";
 
     const AnimationChannel &channel = _animChannels.front();
-    if (!channel.anim || channel.finished) return "";
+    if (!channel.anim || channel.finished)
+        return "";
 
     return channel.anim->name();
 }

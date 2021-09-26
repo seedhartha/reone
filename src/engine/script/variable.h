@@ -31,12 +31,12 @@ class ScriptObject;
 struct Variable {
     VariableType type;
     std::string strValue;
-    glm::vec3 vecValue { 0.0f };
+    glm::vec3 vecValue {0.0f};
     std::shared_ptr<EngineType> engineType;
     std::shared_ptr<ExecutionContext> context;
 
     union {
-        int32_t intValue { 0 };
+        int32_t intValue {0};
         uint32_t objectId;
         float floatValue;
     };
@@ -70,4 +70,4 @@ struct Variable {
 
 } // namespace script
 
-} // namespae reone
+} // namespace reone

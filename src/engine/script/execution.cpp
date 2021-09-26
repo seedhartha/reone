@@ -41,49 +41,48 @@ ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<E
     _program(ensurePresent(program, "program")) {
 
     static unordered_map<ByteCode, function<void(ScriptExecution *, const Instruction &)>> handlers {
-        { ByteCode::CopyDownSP, &ScriptExecution::executeCopyDownSP },
-        { ByteCode::Reserve, &ScriptExecution::executeReserve },
-        { ByteCode::CopyTopSP, &ScriptExecution::executeCopyTopSP },
-        { ByteCode::PushConstant, &ScriptExecution::executePushConstant },
-        { ByteCode::CallRoutine, &ScriptExecution::executeCallRoutine },
-        { ByteCode::LogicalAnd, &ScriptExecution::executeLogicalAnd },
-        { ByteCode::LogicalOr, &ScriptExecution::executeLogicalOr },
-        { ByteCode::InclusiveBitwiseOr, &ScriptExecution::executeInclusiveBitwiseOr },
-        { ByteCode::ExclusiveBitwiseOr, &ScriptExecution::executeExclusiveBitwiseOr },
-        { ByteCode::BitwiseAnd, &ScriptExecution::executeBitwiseAnd },
-        { ByteCode::Equal, &ScriptExecution::executeEqual },
-        { ByteCode::NotEqual, &ScriptExecution::executeNotEqual },
-        { ByteCode::GreaterThanOrEqual, &ScriptExecution::executeGreaterThanOrEqual },
-        { ByteCode::GreaterThan, &ScriptExecution::executeGreaterThan },
-        { ByteCode::LessThan, &ScriptExecution::executeLessThan },
-        { ByteCode::LessThanOrEqual, &ScriptExecution::executeLessThanOrEqual },
-        { ByteCode::ShiftLeft, &ScriptExecution::executeShiftLeft },
-        { ByteCode::ShiftRight, &ScriptExecution::executeShiftRight },
-        { ByteCode::UnsignedShiftRight, &ScriptExecution::executeUnsignedShiftRight },
-        { ByteCode::Add, &ScriptExecution::executeAdd },
-        { ByteCode::Subtract, &ScriptExecution::executeSubtract },
-        { ByteCode::Multiply, &ScriptExecution::executeMultiply },
-        { ByteCode::Divide, &ScriptExecution::executeDivide },
-        { ByteCode::Mod, &ScriptExecution::executeMod },
-        { ByteCode::Negate, &ScriptExecution::executeNegate },
-        { ByteCode::AdjustSP, &ScriptExecution::executeAdjustSP },
-        { ByteCode::Jump, &ScriptExecution::executeJump },
-        { ByteCode::JumpToSubroutine, &ScriptExecution::executeJumpToSubroutine },
-        { ByteCode::JumpIfZero, &ScriptExecution::executeJumpIfZero },
-        { ByteCode::Return, &ScriptExecution::executeReturn },
-        { ByteCode::Destruct, &ScriptExecution::executeDestruct },
-        { ByteCode::LogicalNot, &ScriptExecution::executeLogicalNot },
-        { ByteCode::DecRelToSP, &ScriptExecution::executeDecRelToSP },
-        { ByteCode::IncRelToSP, &ScriptExecution::executeIncRelToSP },
-        { ByteCode::JumpIfNonZero, &ScriptExecution::executeJumpIfNonZero },
-        { ByteCode::CopyDownBP, &ScriptExecution::executeCopyDownBP },
-        { ByteCode::CopyTopBP, &ScriptExecution::executeCopyTopBP },
-        { ByteCode::DecRelToBP, &ScriptExecution::executeDecRelToBP },
-        { ByteCode::IncRelToBP, &ScriptExecution::executeIncRelToBP },
-        { ByteCode::SaveBP, &ScriptExecution::executeSaveBP },
-        { ByteCode::RestoreBP, &ScriptExecution::executeRestoreBP },
-        { ByteCode::StoreState, &ScriptExecution::executeStoreState }
-    };
+        {ByteCode::CopyDownSP, &ScriptExecution::executeCopyDownSP},
+        {ByteCode::Reserve, &ScriptExecution::executeReserve},
+        {ByteCode::CopyTopSP, &ScriptExecution::executeCopyTopSP},
+        {ByteCode::PushConstant, &ScriptExecution::executePushConstant},
+        {ByteCode::CallRoutine, &ScriptExecution::executeCallRoutine},
+        {ByteCode::LogicalAnd, &ScriptExecution::executeLogicalAnd},
+        {ByteCode::LogicalOr, &ScriptExecution::executeLogicalOr},
+        {ByteCode::InclusiveBitwiseOr, &ScriptExecution::executeInclusiveBitwiseOr},
+        {ByteCode::ExclusiveBitwiseOr, &ScriptExecution::executeExclusiveBitwiseOr},
+        {ByteCode::BitwiseAnd, &ScriptExecution::executeBitwiseAnd},
+        {ByteCode::Equal, &ScriptExecution::executeEqual},
+        {ByteCode::NotEqual, &ScriptExecution::executeNotEqual},
+        {ByteCode::GreaterThanOrEqual, &ScriptExecution::executeGreaterThanOrEqual},
+        {ByteCode::GreaterThan, &ScriptExecution::executeGreaterThan},
+        {ByteCode::LessThan, &ScriptExecution::executeLessThan},
+        {ByteCode::LessThanOrEqual, &ScriptExecution::executeLessThanOrEqual},
+        {ByteCode::ShiftLeft, &ScriptExecution::executeShiftLeft},
+        {ByteCode::ShiftRight, &ScriptExecution::executeShiftRight},
+        {ByteCode::UnsignedShiftRight, &ScriptExecution::executeUnsignedShiftRight},
+        {ByteCode::Add, &ScriptExecution::executeAdd},
+        {ByteCode::Subtract, &ScriptExecution::executeSubtract},
+        {ByteCode::Multiply, &ScriptExecution::executeMultiply},
+        {ByteCode::Divide, &ScriptExecution::executeDivide},
+        {ByteCode::Mod, &ScriptExecution::executeMod},
+        {ByteCode::Negate, &ScriptExecution::executeNegate},
+        {ByteCode::AdjustSP, &ScriptExecution::executeAdjustSP},
+        {ByteCode::Jump, &ScriptExecution::executeJump},
+        {ByteCode::JumpToSubroutine, &ScriptExecution::executeJumpToSubroutine},
+        {ByteCode::JumpIfZero, &ScriptExecution::executeJumpIfZero},
+        {ByteCode::Return, &ScriptExecution::executeReturn},
+        {ByteCode::Destruct, &ScriptExecution::executeDestruct},
+        {ByteCode::LogicalNot, &ScriptExecution::executeLogicalNot},
+        {ByteCode::DecRelToSP, &ScriptExecution::executeDecRelToSP},
+        {ByteCode::IncRelToSP, &ScriptExecution::executeIncRelToSP},
+        {ByteCode::JumpIfNonZero, &ScriptExecution::executeJumpIfNonZero},
+        {ByteCode::CopyDownBP, &ScriptExecution::executeCopyDownBP},
+        {ByteCode::CopyTopBP, &ScriptExecution::executeCopyTopBP},
+        {ByteCode::DecRelToBP, &ScriptExecution::executeDecRelToBP},
+        {ByteCode::IncRelToBP, &ScriptExecution::executeIncRelToBP},
+        {ByteCode::SaveBP, &ScriptExecution::executeSaveBP},
+        {ByteCode::RestoreBP, &ScriptExecution::executeRestoreBP},
+        {ByteCode::StoreState, &ScriptExecution::executeStoreState}};
     for (auto &pair : handlers) {
         registerHandler(pair.first, pair.second);
     }
@@ -120,8 +119,7 @@ int ScriptExecution::run() {
         }
         try {
             handler->second(ins);
-        }
-        catch (const exception &ex) {
+        } catch (const exception &ex) {
             debug(boost::format("Halt '%s'") % _program->name(), LogChannels::script);
             return -1;
         }
@@ -149,33 +147,33 @@ void ScriptExecution::executeCopyDownSP(const Instruction &ins) {
 void ScriptExecution::executeReserve(const Instruction &ins) {
     Variable result;
     switch (ins.type) {
-        case InstructionType::Int:
-            result.type = VariableType::Int;
-            break;
-        case InstructionType::Float:
-            result.type = VariableType::Float;
-            break;
-        case InstructionType::String:
-            result.type = VariableType::String;
-            break;
-        case InstructionType::Object:
-            result.type = VariableType::Object;
-            break;
-        case InstructionType::Effect:
-            result.type = VariableType::Effect;
-            break;
-        case InstructionType::Event:
-            result.type = VariableType::Event;
-            break;
-        case InstructionType::Location:
-            result.type = VariableType::Location;
-            break;
-        case InstructionType::Talent:
-            result.type = VariableType::Talent;
-            break;
-        default:
-            result.type = VariableType::Void;
-            break;
+    case InstructionType::Int:
+        result.type = VariableType::Int;
+        break;
+    case InstructionType::Float:
+        result.type = VariableType::Float;
+        break;
+    case InstructionType::String:
+        result.type = VariableType::String;
+        break;
+    case InstructionType::Object:
+        result.type = VariableType::Object;
+        break;
+    case InstructionType::Effect:
+        result.type = VariableType::Effect;
+        break;
+    case InstructionType::Event:
+        result.type = VariableType::Event;
+        break;
+    case InstructionType::Location:
+        result.type = VariableType::Location;
+        break;
+    case InstructionType::Talent:
+        result.type = VariableType::Talent;
+        break;
+    default:
+        result.type = VariableType::Void;
+        break;
     }
     _stack.push_back(move(result));
 }
@@ -191,22 +189,22 @@ void ScriptExecution::executeCopyTopSP(const Instruction &ins) {
 
 void ScriptExecution::executePushConstant(const Instruction &ins) {
     switch (ins.type) {
-        case InstructionType::Int:
-            _stack.push_back(Variable::ofInt(ins.intValue));
-            break;
-        case InstructionType::Float:
-            _stack.push_back(Variable::ofFloat(ins.floatValue));
-            break;
-        case InstructionType::Object: {
-            uint32_t objectId = ins.objectId == kObjectSelf ? _context->callerId : ins.objectId;
-            _stack.push_back(Variable::ofObject(objectId));
-            break;
-        }
-        case InstructionType::String:
-            _stack.push_back(Variable::ofString(ins.strValue));
-            break;
-        default:
-            throw invalid_argument("Invalid instruction type: " + to_string(static_cast<int>(ins.type)));
+    case InstructionType::Int:
+        _stack.push_back(Variable::ofInt(ins.intValue));
+        break;
+    case InstructionType::Float:
+        _stack.push_back(Variable::ofFloat(ins.floatValue));
+        break;
+    case InstructionType::Object: {
+        uint32_t objectId = ins.objectId == kObjectSelf ? _context->callerId : ins.objectId;
+        _stack.push_back(Variable::ofObject(objectId));
+        break;
+    }
+    case InstructionType::String:
+        _stack.push_back(Variable::ofString(ins.strValue));
+        break;
+    default:
+        throw invalid_argument("Invalid instruction type: " + to_string(static_cast<int>(ins.type)));
     }
 }
 
@@ -222,25 +220,25 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
         VariableType type = routine.getArgumentType(i);
 
         switch (type) {
-            case VariableType::Vector:
-                args.push_back(getVectorFromStack());
-                break;
+        case VariableType::Vector:
+            args.push_back(getVectorFromStack());
+            break;
 
-            case VariableType::Action: {
-                auto ctx = make_shared<ExecutionContext>(*_context);
-                ctx->savedState = make_shared<ExecutionState>(_savedState);
-                args.push_back(Variable::ofAction(move(ctx)));
-                break;
+        case VariableType::Action: {
+            auto ctx = make_shared<ExecutionContext>(*_context);
+            ctx->savedState = make_shared<ExecutionState>(_savedState);
+            args.push_back(Variable::ofAction(move(ctx)));
+            break;
+        }
+        default:
+            Variable var(_stack.back());
+
+            if (var.type != type) {
+                throw runtime_error("Invalid argument variable type");
             }
-            default:
-                Variable var(_stack.back());
-
-                if (var.type != type) {
-                    throw runtime_error("Invalid argument variable type");
-                }
-                args.push_back(move(var));
-                _stack.pop_back();
-                break;
+            args.push_back(move(var));
+            _stack.pop_back();
+            break;
         }
     }
     Variable retValue = routine.invoke(args, *_context);
@@ -254,16 +252,16 @@ void ScriptExecution::executeCallRoutine(const Instruction &ins) {
         debug(boost::format("Action: %04x %s(%s) -> %s") % ins.offset % routine.name() % argsString % retValue.toString(), LogChannels::script2);
     }
     switch (routine.returnType()) {
-        case VariableType::Void:
-            break;
-        case VariableType::Vector:
-            _stack.push_back(Variable::ofFloat(retValue.vecValue.z));
-            _stack.push_back(Variable::ofFloat(retValue.vecValue.y));
-            _stack.push_back(Variable::ofFloat(retValue.vecValue.x));
-            break;
-        default:
-            _stack.push_back(retValue);
-            break;
+    case VariableType::Void:
+        break;
+    case VariableType::Vector:
+        _stack.push_back(Variable::ofFloat(retValue.vecValue.z));
+        _stack.push_back(Variable::ofFloat(retValue.vecValue.y));
+        _stack.push_back(Variable::ofFloat(retValue.vecValue.x));
+        break;
+    default:
+        _stack.push_back(retValue);
+        break;
     }
 }
 
@@ -450,14 +448,14 @@ void ScriptExecution::executeMod(const Instruction &ins) {
 
 void ScriptExecution::executeNegate(const Instruction &ins) {
     switch (ins.type) {
-        case InstructionType::Int:
-            _stack.back().intValue *= -1;
-            break;
-        case InstructionType::Float:
-            _stack.back().floatValue *= -1.0f;
-            break;
-        default:
-            break;
+    case InstructionType::Int:
+        _stack.back().intValue *= -1;
+        break;
+    case InstructionType::Float:
+        _stack.back().floatValue *= -1.0f;
+        break;
+    default:
+        break;
     }
 }
 
@@ -602,4 +600,4 @@ const Variable &ScriptExecution::getStackVariable(int index) const {
 
 } // namespace script
 
-} // namespae reone
+} // namespace reone

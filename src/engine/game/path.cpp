@@ -52,6 +52,6 @@ void Path::load(const GffStruct &pth) {
     }
 }
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone

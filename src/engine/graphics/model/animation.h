@@ -26,7 +26,7 @@ class ModelNode;
 class Animation : boost::noncopyable {
 public:
     struct Event {
-        float time { 0.0f };
+        float time {0.0f};
         std::string name;
     };
 
@@ -47,8 +47,8 @@ public:
 
 private:
     std::string _name;
-    float _length { 0.0f };
-    float _transitionTime { 0.0f }; /**< time in seconds where this animation overlaps with other animations */
+    float _length {0.0f};
+    float _transitionTime {0.0f}; /**< time in seconds where this animation overlaps with other animations */
     std::shared_ptr<ModelNode> _rootNode;
     std::vector<Event> _events;
 

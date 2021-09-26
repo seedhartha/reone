@@ -25,7 +25,8 @@ namespace game {
 
 class HitPointsChangeWhenDyingEffect : public Effect {
 public:
-    HitPointsChangeWhenDyingEffect() : Effect(EffectType::HitPointsChangeWhenDying) {
+    HitPointsChangeWhenDyingEffect() :
+        Effect(EffectType::HitPointsChangeWhenDying) {
     }
 
     void applyTo(SpatialObject &object) override;

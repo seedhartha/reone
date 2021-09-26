@@ -65,21 +65,21 @@ Texture::Properties getTextureProperties(TextureUsage usage, bool headless) {
 
 static int getBitsPerPixel(PixelFormat format) {
     switch (format) {
-        case PixelFormat::Grayscale:
-            return 1;
-        case PixelFormat::RGB:
-        case PixelFormat::BGR:
-            return 3;
-        case PixelFormat::RGBA:
-        case PixelFormat::BGRA:
-            return 4;
-        default:
-            throw invalid_argument("Unsupported pixel format: " + to_string(static_cast<int>(format)));
+    case PixelFormat::Grayscale:
+        return 1;
+    case PixelFormat::RGB:
+    case PixelFormat::BGR:
+        return 3;
+    case PixelFormat::RGBA:
+    case PixelFormat::BGRA:
+        return 4;
+    default:
+        throw invalid_argument("Unsupported pixel format: " + to_string(static_cast<int>(format)));
     }
 }
 
 void prepareCubeMap(vector<Texture::Layer> &layers, PixelFormat srcFormat, PixelFormat &destFormat) {
-    static int rotations[] = { 1, 3, 0, 2, 2, 0 };
+    static int rotations[] = {1, 3, 0, 2, 2, 0};
 
     int layerCount = static_cast<int>(layers.size());
     if (layerCount != kNumCubeFaces) {
@@ -158,10 +158,10 @@ void rotateMipMap90(Texture::MipMap &mipMap, int bpp) {
 
     for (size_t x = 0; x < w; ++x) {
         for (size_t y = 0; y < h; ++y) {
-            const size_t d0 = ( y          * n +  x         ) * bpp;
-            const size_t d1 = ((n - 1 - x) * n +  y         ) * bpp;
+            const size_t d0 = (y * n + x) * bpp;
+            const size_t d1 = ((n - 1 - x) * n + y) * bpp;
             const size_t d2 = ((n - 1 - y) * n + (n - 1 - x)) * bpp;
-            const size_t d3 = ( x          * n + (n - 1 - y)) * bpp;
+            const size_t d3 = (x * n + (n - 1 - y)) * bpp;
 
             for (size_t p = 0; p < static_cast<size_t>(bpp); ++p) {
                 uint8_t tmp = pixels[d0 + p];

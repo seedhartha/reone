@@ -25,7 +25,8 @@ namespace game {
 
 class KnockdownEffect : public Effect {
 public:
-    KnockdownEffect() : Effect(EffectType::Knockdown) {
+    KnockdownEffect() :
+        Effect(EffectType::Knockdown) {
     }
 
     void applyTo(SpatialObject &object) override;

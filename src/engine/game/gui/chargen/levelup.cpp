@@ -76,7 +76,7 @@ void LevelUpMenu::bindControls() {
 
 void LevelUpMenu::reset() {
     int nextLevel = _charGen->character().attributes.getAggregateLevel() + 1;
-    _hasAttributes = nextLevel  % 4 == 0;
+    _hasAttributes = nextLevel % 4 == 0;
 
     // TODO: feats and Force Powers are not yet implemented
 
@@ -93,14 +93,14 @@ void LevelUpMenu::reset() {
 
 void LevelUpMenu::goToNextStep() {
     switch (_step) {
-        case 0:
-            doSetStep(1);
-            break;
-        case 1:
-            doSetStep(4);
-            break;
-        default:
-            break;
+    case 0:
+        doSetStep(1);
+        break;
+    case 1:
+        doSetStep(4);
+        break;
+    default:
+        break;
     }
 }
 

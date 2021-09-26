@@ -52,13 +52,13 @@ public:
 private:
     GraphicsOptions _options;
 
-    IEventHandler *_eventHandler { nullptr };
-    bool _inited { false };
-    SDL_Window *_window { nullptr };
-    SDL_GLContext _context { nullptr };
-    bool _relativeMouseMode { false };
+    IEventHandler *_eventHandler {nullptr};
+    bool _inited {false};
+    SDL_Window *_window {nullptr};
+    SDL_GLContext _context {nullptr};
+    bool _relativeMouseMode {false};
     std::shared_ptr<Cursor> _cursor;
-    bool _focus { true };
+    bool _focus {true};
 
     void initSDL();
     void initGL();

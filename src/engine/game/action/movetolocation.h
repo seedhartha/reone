@@ -35,7 +35,7 @@ public:
     bool isRun() const { return _run; }
 
 private:
-    bool _run { false };
+    bool _run {false};
 };
 
 } // namespace game

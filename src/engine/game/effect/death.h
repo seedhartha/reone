@@ -25,7 +25,8 @@ namespace game {
 
 class DeathEffect : public Effect {
 public:
-    DeathEffect() : Effect(EffectType::Death) {
+    DeathEffect() :
+        Effect(EffectType::Death) {
     }
 
     void applyTo(SpatialObject &object) override;

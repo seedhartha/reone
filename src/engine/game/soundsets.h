@@ -34,7 +34,7 @@ namespace resource {
 class Resources;
 class Strings;
 
-}
+} // namespace resource
 
 namespace game {
 
@@ -43,8 +43,7 @@ public:
     SoundSets(
         audio::AudioFiles &audioFiles,
         resource::Resources &resources,
-        resource::Strings &strings
-    ) :
+        resource::Strings &strings) :
         MemoryCache(std::bind(&SoundSets::doGet, this, std::placeholders::_1)),
         _audioFiles(audioFiles),
         _resources(resources),

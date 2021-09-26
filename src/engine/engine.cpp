@@ -64,24 +64,9 @@ int Engine::run() {
 }
 
 void Engine::initOptions() {
-    _optsCommon.add_options()
-        ("game", po::value<string>(), "path to game directory")
-        ("dev", po::value<bool>()->default_value(false), "enable developer mode")
-        ("module", po::value<string>(), "name of a module to load")
-        ("width", po::value<int>()->default_value(800), "window width")
-        ("height", po::value<int>()->default_value(600), "window height")
-        ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")
-        ("pbr", po::value<bool>()->default_value(false), "enable enhanced graphics mode")
-        ("shadowres", po::value<int>()->default_value(kDefaultShadowResolution), "shadow map resolution")
-        ("musicvol", po::value<int>()->default_value(kDefaultMusicVolume), "music volume in percents")
-        ("voicevol", po::value<int>()->default_value(kDefaultVoiceVolume), "voice volume in percents")
-        ("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")
-        ("movievol", po::value<int>()->default_value(kDefaultMovieVolume), "movie volume in percents")
-        ("logch", po::value<int>(), "log channel mask")
-        ("logfile", po::value<bool>()->default_value(false), "log to file");
+    _optsCommon.add_options()("game", po::value<string>(), "path to game directory")("dev", po::value<bool>()->default_value(false), "enable developer mode")("module", po::value<string>(), "name of a module to load")("width", po::value<int>()->default_value(800), "window width")("height", po::value<int>()->default_value(600), "window height")("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")("pbr", po::value<bool>()->default_value(false), "enable enhanced graphics mode")("shadowres", po::value<int>()->default_value(kDefaultShadowResolution), "shadow map resolution")("musicvol", po::value<int>()->default_value(kDefaultMusicVolume), "music volume in percents")("voicevol", po::value<int>()->default_value(kDefaultVoiceVolume), "voice volume in percents")("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")("movievol", po::value<int>()->default_value(kDefaultMovieVolume), "movie volume in percents")("logch", po::value<int>(), "log channel mask")("logfile", po::value<bool>()->default_value(false), "log to file");
 
-    _optsCmdLine.add(_optsCommon).add_options()
-        ("help", "print this message");
+    _optsCmdLine.add(_optsCommon).add_options()("help", "print this message");
 }
 
 void Engine::parseOptions() {
@@ -146,11 +131,13 @@ int Engine::runGame() {
 GameID Engine::determineGameID() {
     // If there is a KotOR executable then game is KotOR
     fs::path exePathK1(getPathIgnoreCase(_gamePath, "swkotor.exe", false));
-    if (!exePathK1.empty()) return GameID::KotOR;
+    if (!exePathK1.empty())
+        return GameID::KotOR;
 
     // If there is a TSL executable then game is TSL
     fs::path exePathK2(getPathIgnoreCase(_gamePath, "swkotor2.exe", false));
-    if (!exePathK2.empty()) return GameID::TSL;
+    if (!exePathK2.empty())
+        return GameID::TSL;
 
     throw logic_error("Unable to determine game ID: " + _gamePath.string());
 }

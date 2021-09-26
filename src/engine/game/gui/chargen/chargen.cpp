@@ -17,8 +17,8 @@
 
 #include "chargen.h"
 
-#include "../../../gui/scenebuilder.h"
 #include "../../../graphics/model/models.h"
+#include "../../../gui/scenebuilder.h"
 #include "../../../resource/resources.h"
 
 #include "../../d20/classes.h"
@@ -41,7 +41,8 @@ namespace game {
 
 static constexpr float kModelScale = 1.1f;
 
-CharacterGeneration::CharacterGeneration(Game *game) : GameGUI(game) {
+CharacterGeneration::CharacterGeneration(Game *game) :
+    GameGUI(game) {
     _resRef = getResRef("maincg");
 
     initForGame();
@@ -172,28 +173,28 @@ bool CharacterGeneration::handle(const SDL_Event &event) {
 
 GUI *CharacterGeneration::getSubGUI() const {
     switch (_screen) {
-        case CharGenScreen::ClassSelection:
-            return _classSelection.get();
-        case CharGenScreen::QuickOrCustom:
-            return _quickOrCustom.get();
-        case CharGenScreen::Quick:
-            return _quick.get();
-        case CharGenScreen::Custom:
-            return _custom.get();
-        case CharGenScreen::PortraitSelection:
-            return _portraitSelection.get();
-        case CharGenScreen::Abilities:
-            return _abilities.get();
-        case CharGenScreen::Skills:
-            return _skills.get();
-        case CharGenScreen::Feats:
-            return _feats.get();
-        case CharGenScreen::Name:
-            return _nameEntry.get();
-        case CharGenScreen::LevelUp:
-            return _levelUp.get();
-        default:
-            throw logic_error("Invalid screen: " + to_string(static_cast<int>(_screen)));
+    case CharGenScreen::ClassSelection:
+        return _classSelection.get();
+    case CharGenScreen::QuickOrCustom:
+        return _quickOrCustom.get();
+    case CharGenScreen::Quick:
+        return _quick.get();
+    case CharGenScreen::Custom:
+        return _custom.get();
+    case CharGenScreen::PortraitSelection:
+        return _portraitSelection.get();
+    case CharGenScreen::Abilities:
+        return _abilities.get();
+    case CharGenScreen::Skills:
+        return _skills.get();
+    case CharGenScreen::Feats:
+        return _feats.get();
+    case CharGenScreen::Name:
+        return _nameEntry.get();
+    case CharGenScreen::LevelUp:
+        return _levelUp.get();
+    default:
+        throw logic_error("Invalid screen: " + to_string(static_cast<int>(_screen)));
     }
 }
 
@@ -240,8 +241,7 @@ void CharacterGeneration::setAttributesVisible(bool visible) {
         _binding.conAbLbl.get(),
         _binding.intAbLbl.get(),
         _binding.wisAbLbl.get(),
-        _binding.chaAbLbl.get()
-    };
+        _binding.chaAbLbl.get()};
     if (_game->isKotOR()) {
         attributesLabels.push_back(_binding.oldFortLbl.get());
         attributesLabels.push_back(_binding.oldReflLbl.get());
@@ -289,15 +289,15 @@ void CharacterGeneration::startLevelUp() {
 
 void CharacterGeneration::openSteps() {
     switch (_type) {
-        case Type::LevelUp:
-            openLevelUp();
-            break;
-        case Type::Custom:
-            openCustom();
-            break;
-        default:
-            openQuick();
-            break;
+    case Type::LevelUp:
+        openLevelUp();
+        break;
+    case Type::Custom:
+        openCustom();
+        break;
+    default:
+        openQuick();
+        break;
     }
 }
 
@@ -400,22 +400,21 @@ void CharacterGeneration::reloadCharacterModel() {
     float aspect = extent.width / static_cast<float>(extent.height);
 
     unique_ptr<SceneGraph> scene(SceneBuilder(
-        _options,
-        _context,
-        _features,
-        _materials,
-        _meshes,
-        _pbrIbl,
-        _shaders,
-        _textures
-    )
-        .aspect(aspect)
-        .depth(0.1f, 10.0f)
-        .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, _1))
-        .modelScale(kModelScale)
-        .cameraFromModelNode("camerahook")
-        .lightingRefFromModelNode("cgbody_light")
-        .build());
+                                     _options,
+                                     _context,
+                                     _features,
+                                     _materials,
+                                     _meshes,
+                                     _pbrIbl,
+                                     _shaders,
+                                     _textures)
+                                     .aspect(aspect)
+                                     .depth(0.1f, 10.0f)
+                                     .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, _1))
+                                     .modelScale(kModelScale)
+                                     .cameraFromModelNode("camerahook")
+                                     .lightingRefFromModelNode("cgbody_light")
+                                     .build());
 
     _binding.modelLbl->setScene(move(scene));
     _binding.portraitLbl->setBorderFill(_game->portraits().getTextureByAppearance(_character.appearance));
@@ -471,15 +470,15 @@ void CharacterGeneration::updateAttributes() {
 
 void CharacterGeneration::goToNextStep() {
     switch (_type) {
-        case Type::LevelUp:
-            _levelUp->goToNextStep();
-            break;
-        case Type::Custom:
-            _custom->goToNextStep();
-            break;
-        default:
-            _quick->goToNextStep();
-            break;
+    case Type::LevelUp:
+        _levelUp->goToNextStep();
+        break;
+    case Type::Custom:
+        _custom->goToNextStep();
+        break;
+    default:
+        _quick->goToNextStep();
+        break;
     }
 }
 

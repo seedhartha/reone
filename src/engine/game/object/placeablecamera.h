@@ -41,8 +41,8 @@ public:
     float fieldOfView() const { return _fieldOfView; }
 
 private:
-    int _cameraId { 0 };
-    float _fieldOfView { 0.0f };
+    int _cameraId {0};
+    float _fieldOfView {0.0f};
 
     void loadTransformFromGIT(const resource::GffStruct &gffs);
 };

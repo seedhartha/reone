@@ -26,7 +26,7 @@ namespace gui {
 class Button;
 class Label;
 
-}
+} // namespace gui
 
 namespace game {
 
@@ -65,8 +65,8 @@ private:
     } _binding;
 
     CharacterGeneration *_charGen;
-    int _step { 0 };
-    bool _hasAttributes { false };
+    int _step {0};
+    bool _hasAttributes {false};
 
     void bindControls();
     void doSetStep(int step);

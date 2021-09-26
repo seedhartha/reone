@@ -25,7 +25,8 @@ namespace reone {
 
 namespace graphics {
 
-Features::Features(GraphicsOptions options) : _options(move(options)) {
+Features::Features(GraphicsOptions options) :
+    _options(move(options)) {
 }
 
 void Features::init() {

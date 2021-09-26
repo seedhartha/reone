@@ -23,7 +23,8 @@ namespace reone {
 
 namespace graphics {
 
-AABB::AABB(const glm::vec3 &min, const glm::vec3 &max) : _empty(false), _min(min), _max(max) {
+AABB::AABB(const glm::vec3 &min, const glm::vec3 &max) :
+    _empty(false), _min(min), _max(max) {
     updateTransform();
 }
 
@@ -65,12 +66,18 @@ void AABB::expand(const glm::vec3 &p) {
         _max = _min;
         _empty = false;
     } else {
-        if (p.x < _min.x) _min.x = p.x;
-        if (p.y < _min.y) _min.y = p.y;
-        if (p.z < _min.z) _min.z = p.z;
-        if (p.x > _max.x) _max.x = p.x;
-        if (p.y > _max.y) _max.y = p.y;
-        if (p.z > _max.z) _max.z = p.z;
+        if (p.x < _min.x)
+            _min.x = p.x;
+        if (p.y < _min.y)
+            _min.y = p.y;
+        if (p.z < _min.z)
+            _min.z = p.z;
+        if (p.x > _max.x)
+            _max.x = p.x;
+        if (p.y > _max.y)
+            _max.y = p.y;
+        if (p.z > _max.z)
+            _max.z = p.z;
     }
 
     updateTransform();
@@ -83,12 +90,18 @@ void AABB::expand(const AABB &aabb) {
         _empty = false;
 
     } else {
-        if (aabb._min.x < _min.x) _min.x = aabb._min.x;
-        if (aabb._min.y < _min.y) _min.y = aabb._min.y;
-        if (aabb._min.z < _min.z) _min.z = aabb._min.z;
-        if (aabb._max.x > _max.x) _max.x = aabb._max.x;
-        if (aabb._max.y > _max.y) _max.y = aabb._max.y;
-        if (aabb._max.z > _max.z) _max.z = aabb._max.z;
+        if (aabb._min.x < _min.x)
+            _min.x = aabb._min.x;
+        if (aabb._min.y < _min.y)
+            _min.y = aabb._min.y;
+        if (aabb._min.z < _min.z)
+            _min.z = aabb._min.z;
+        if (aabb._max.x > _max.x)
+            _max.x = aabb._max.x;
+        if (aabb._max.y > _max.y)
+            _max.y = aabb._max.y;
+        if (aabb._max.z > _max.z)
+            _max.z = aabb._max.z;
     }
     updateTransform();
 }
@@ -102,23 +115,20 @@ void AABB::updateTransform() {
 }
 
 bool AABB::contains(const glm::vec2 &p) const {
-    return
-        p.x >= _min.x && p.x <= _max.x &&
-        p.y >= _min.y && p.y <= _max.y;
+    return p.x >= _min.x && p.x <= _max.x &&
+           p.y >= _min.y && p.y <= _max.y;
 }
 
 bool AABB::contains(const glm::vec3 &p) const {
-    return
-        p.x >= _min.x && p.x <= _max.x &&
-        p.y >= _min.y && p.y <= _max.y &&
-        p.z >= _min.z && p.z <= _max.z;
+    return p.x >= _min.x && p.x <= _max.x &&
+           p.y >= _min.y && p.y <= _max.y &&
+           p.z >= _min.z && p.z <= _max.z;
 }
 
 bool AABB::intersect(const AABB &other) const {
-    return
-        (_min.x <= other._max.x && _max.x >= other._min.x) &&
-        (_min.y <= other._max.y && _max.y >= other._min.y) &&
-        (_min.z <= other._max.z && _max.z >= other._min.z);
+    return (_min.x <= other._max.x && _max.x >= other._min.x) &&
+           (_min.y <= other._max.y && _max.y >= other._min.y) &&
+           (_min.z <= other._max.z && _max.z >= other._min.z);
 }
 
 // Algorithm adapted from https://gamedev.stackexchange.com/a/18459

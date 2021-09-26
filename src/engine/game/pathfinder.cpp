@@ -57,7 +57,7 @@ void Pathfinder::load(const vector<Path::Point> &points, const unordered_map<int
 const vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::vec3 &to) const {
     // When there are no vertices, return a path of start and end points
     if (_vertices.empty()) {
-        return vector<glm::vec3> { from, to };
+        return vector<glm::vec3> {from, to};
     }
 
     // Find vertices nearest to start and end points
@@ -66,7 +66,7 @@ const vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::v
 
     // When start and end point have a common nearest vertex, return a path of start and end point
     if (fromIdx == toIdx) {
-        return vector<glm::vec3> { from, to };
+        return vector<glm::vec3> {from, to};
     }
 
     Context ctx;
@@ -100,11 +100,13 @@ const vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::v
 
         // Skip current vertex if it has no adjacent vertices
         auto maybeAdjVerts = _adjacentVertices.find(current.index);
-        if (maybeAdjVerts == _adjacentVertices.end()) continue;
+        if (maybeAdjVerts == _adjacentVertices.end())
+            continue;
 
         for (auto &adjVertIdx : maybeAdjVerts->second) {
             // Skip adjacent vertex if it is present in closed list
-            if (ctx.closed.count(adjVertIdx) > 0) continue;
+            if (ctx.closed.count(adjVertIdx) > 0)
+                continue;
 
             ContextVertex child;
             child.index = adjVertIdx;
@@ -117,7 +119,8 @@ const vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::v
             auto maybeOpenAdjVert = ctx.open.find(adjVertIdx);
             if (maybeOpenAdjVert != ctx.open.end()) {
                 const ContextVertex &openAdjVert = ctx.vertices.find(*maybeOpenAdjVert)->second;
-                if (child.distance > openAdjVert.distance) continue;
+                if (child.distance > openAdjVert.distance)
+                    continue;
             }
 
             // Insert or update adjacent vertex in open list
@@ -127,7 +130,7 @@ const vector<glm::vec3> Pathfinder::findPath(const glm::vec3 &from, const glm::v
     }
 
     // Return a path of start and end points by default
-    return vector<glm::vec3> { from, to };
+    return vector<glm::vec3> {from, to};
 }
 
 uint16_t Pathfinder::getNearestVertex(const glm::vec3 &point) const {

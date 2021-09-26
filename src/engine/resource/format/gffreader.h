@@ -33,22 +33,22 @@ public:
 
 private:
     struct LocString {
-        int32_t strRef { -1 };
+        int32_t strRef {-1};
         std::string subString;
     };
 
-    uint32_t _structOffset { 0 };
-    int _structCount { 0 };
-    uint32_t _fieldOffset { 0 };
-    int _fieldCount { 0 };
-    uint32_t _labelOffset { 0 };
-    int _labelCount { 0 };
-    uint32_t _fieldDataOffset { 0 };
-    int _fieldDataCount { 0 };
-    uint32_t _fieldIndicesOffset { 0 };
-    int _fieldIncidesCount { 0 };
-    uint32_t _listIndicesOffset { 0 };
-    int _listIndicesCount { 0 };
+    uint32_t _structOffset {0};
+    int _structCount {0};
+    uint32_t _fieldOffset {0};
+    int _fieldCount {0};
+    uint32_t _labelOffset {0};
+    int _labelCount {0};
+    uint32_t _fieldDataOffset {0};
+    int _fieldDataCount {0};
+    uint32_t _fieldIndicesOffset {0};
+    int _fieldIncidesCount {0};
+    uint32_t _listIndicesOffset {0};
+    int _listIndicesCount {0};
     std::shared_ptr<GffStruct> _root;
 
     void doLoad() override;

@@ -25,7 +25,8 @@ namespace game {
 
 class BeamEffect : public Effect {
 public:
-    BeamEffect() : Effect(EffectType::Beam) {
+    BeamEffect() :
+        Effect(EffectType::Beam) {
     }
 
     void applyTo(SpatialObject &object) override;

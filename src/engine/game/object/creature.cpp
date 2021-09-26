@@ -75,8 +75,7 @@ Creature::Creature(
     uint32_t id,
     Game *game,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph
-) :
+    SceneGraph *sceneGraph) :
     SpatialObject(id, ObjectType::Creature, game, objectFactory, sceneGraph) {
 }
 
@@ -171,36 +170,39 @@ void Creature::update(float dt) {
 
 void Creature::updateModelAnimation() {
     auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
-    if (!model) return;
+    if (!model)
+        return;
 
     if (_animFireForget) {
-        if (!model->isAnimationFinished()) return;
+        if (!model->isAnimationFinished())
+            return;
 
         _animFireForget = false;
         _animDirty = true;
     }
-    if (!_animDirty) return;
+    if (!_animDirty)
+        return;
 
     shared_ptr<Animation> anim;
     shared_ptr<Animation> talkAnim;
 
     switch (_movementType) {
-        case MovementType::Run:
-            anim = model->model()->getAnimation(getRunAnimation());
-            break;
-        case MovementType::Walk:
-            anim = model->model()->getAnimation(getWalkAnimation());
-            break;
-        default:
-            if (_dead) {
-                anim = model->model()->getAnimation(getDeadAnimation());
-            } else if (_talking) {
-                anim = model->model()->getAnimation(getTalkNormalAnimation());
-                talkAnim = model->model()->getAnimation(getHeadTalkAnimation());
-            } else {
-                anim = model->model()->getAnimation(getPauseAnimation());
-            }
-            break;
+    case MovementType::Run:
+        anim = model->model()->getAnimation(getRunAnimation());
+        break;
+    case MovementType::Walk:
+        anim = model->model()->getAnimation(getWalkAnimation());
+        break;
+    default:
+        if (_dead) {
+            anim = model->model()->getAnimation(getDeadAnimation());
+        } else if (_talking) {
+            anim = model->model()->getAnimation(getTalkNormalAnimation());
+            talkAnim = model->model()->getAnimation(getHeadTalkAnimation());
+        } else {
+            anim = model->model()->getAnimation(getPauseAnimation());
+        }
+        break;
     }
 
     if (talkAnim) {
@@ -214,7 +216,8 @@ void Creature::updateModelAnimation() {
 }
 
 void Creature::updateHealth() {
-    if (_currentHitPoints > 0 || _immortal || _dead) return;
+    if (_currentHitPoints > 0 || _immortal || _dead)
+        return;
 
     die();
 }
@@ -239,7 +242,8 @@ void Creature::playAnimation(AnimationType type, AnimationProperties properties)
     }
 
     string animName(getAnimationName(type));
-    if (animName.empty()) return;
+    if (animName.empty())
+        return;
 
     playAnimation(animName, move(properties));
 }
@@ -256,7 +260,8 @@ void Creature::playAnimation(const string &name, AnimationProperties properties)
 }
 
 void Creature::doPlayAnimation(bool fireForget, const function<void()> &callback) {
-    if (!_sceneNode || _movementType != MovementType::None) return;
+    if (!_sceneNode || _movementType != MovementType::None)
+        return;
 
     callback();
 
@@ -299,7 +304,8 @@ bool Creature::equip(const string &resRef) {
 }
 
 bool Creature::equip(int slot, const shared_ptr<Item> &item) {
-    if (!item->isEquippable(slot)) return false;
+    if (!item->isEquippable(slot))
+        return false;
 
     _equipment[slot] = item;
     item->setEquipped(true);
@@ -345,7 +351,8 @@ bool Creature::isSlotEquipped(int slot) const {
 }
 
 void Creature::setMovementType(MovementType type) {
-    if (_movementType == type) return;
+    if (_movementType == type)
+        return;
 
     _movementType = type;
     _animDirty = true;
@@ -390,10 +397,12 @@ void Creature::clearPath() {
 
 glm::vec3 Creature::getSelectablePosition() const {
     auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
-    if (!model) return _position;
+    if (!model)
+        return _position;
 
     shared_ptr<ModelNode> talkDummy(model->model()->getNodeByNameRecursive(g_talkDummyNode));
-    if (!talkDummy || _dead) return model->getWorldCenterOfAABB();
+    if (!talkDummy || _dead)
+        return model->getWorldCenterOfAABB();
 
     return (model->absoluteTransform() * talkDummy->absoluteTransform())[3];
 }
@@ -435,7 +444,8 @@ void Creature::giveXP(int amount) {
 }
 
 void Creature::playSound(SoundSetEntry entry, bool positional) {
-    if (!_soundSet) return;
+    if (!_soundSet)
+        return;
 
     auto maybeSound = _soundSet->find(entry);
     if (maybeSound != _soundSet->end()) {
@@ -470,19 +480,19 @@ CreatureWieldType Creature::getWieldType() const {
         return (rightWeapon->weaponWield() == WeaponWield::BlasterPistol) ? CreatureWieldType::DualPistols : CreatureWieldType::DualSwords;
     } else if (rightWeapon) {
         switch (rightWeapon->weaponWield()) {
-            case WeaponWield::SingleSword:
-                return CreatureWieldType::SingleSword;
-            case WeaponWield::DoubleBladedSword:
-                return CreatureWieldType::DoubleBladedSword;
-            case WeaponWield::BlasterPistol:
-                return CreatureWieldType::BlasterPistol;
-            case WeaponWield::BlasterRifle:
-                return CreatureWieldType::BlasterRifle;
-            case WeaponWield::HeavyWeapon:
-                return CreatureWieldType::HeavyWeapon;
-            case WeaponWield::StunBaton:
-            default:
-                return CreatureWieldType::StunBaton;
+        case WeaponWield::SingleSword:
+            return CreatureWieldType::SingleSword;
+        case WeaponWield::DoubleBladedSword:
+            return CreatureWieldType::DoubleBladedSword;
+        case WeaponWield::BlasterPistol:
+            return CreatureWieldType::BlasterPistol;
+        case WeaponWield::BlasterRifle:
+            return CreatureWieldType::BlasterRifle;
+        case WeaponWield::HeavyWeapon:
+            return CreatureWieldType::HeavyWeapon;
+        case WeaponWield::StunBaton:
+        default:
+            return CreatureWieldType::StunBaton;
         }
     }
 
@@ -672,7 +682,8 @@ void Creature::takeGold(int amount) {
 }
 
 bool Creature::navigateTo(const glm::vec3 &dest, bool run, float distance, float dt) {
-    if (_movementRestricted) return false;
+    if (_movementRestricted)
+        return false;
 
     float distToDest2 = getDistanceTo2(glm::vec2(dest));
     if (distToDest2 <= distance * distance) {
@@ -745,123 +756,123 @@ void Creature::updatePath(const glm::vec3 &dest) {
 string Creature::getAnimationName(AnimationType anim) const {
     string result;
     switch (anim) {
-        case AnimationType::LoopingPause:
-            return getPauseAnimation();
-        case AnimationType::LoopingPause2:
-            return getFirstIfCreatureModel("cpause2", "pause2");
-        case AnimationType::LoopingListen:
-            return "listen";
-        case AnimationType::LoopingMeditate:
-            return "meditate";
-        case AnimationType::LoopingTalkNormal:
-            return "tlknorm";
-        case AnimationType::LoopingTalkPleading:
-            return "tlkplead";
-        case AnimationType::LoopingTalkForceful:
-            return "tlkforce";
-        case AnimationType::LoopingTalkLaughing:
-            return getFirstIfCreatureModel("", "tlklaugh");
-        case AnimationType::LoopingTalkSad:
-            return "tlksad";
-        case AnimationType::LoopingPauseTired:
-            return "pausetrd";
-        case AnimationType::LoopingFlirt:
-            return "flirt";
-        case AnimationType::LoopingUseComputer:
-            return "usecomplp";
-        case AnimationType::LoopingDance:
-            return "dance";
-        case AnimationType::LoopingDance1:
-            return "dance1";
-        case AnimationType::LoopingHorror:
-            return "horror";
-        case AnimationType::LoopingDeactivate:
-            return getFirstIfCreatureModel("", "deactivate");
-        case AnimationType::LoopingSpasm:
-            return getFirstIfCreatureModel("cspasm", "spasm");
-        case AnimationType::LoopingSleep:
-            return "sleep";
-        case AnimationType::LoopingProne:
-            return "prone";
-        case AnimationType::LoopingPause3:
-            return getFirstIfCreatureModel("", "pause3");
-        case AnimationType::LoopingWeld:
-            return "weld";
-        case AnimationType::LoopingDead:
-            return getDeadAnimation();
-        case AnimationType::LoopingTalkInjured:
-            return "talkinj";
-        case AnimationType::LoopingListenInjured:
-            return "listeninj";
-        case AnimationType::LoopingTreatInjured:
-            return "treatinjlp";
-        case AnimationType::LoopingUnlockDoor:
-            return "unlockdr";
-        case AnimationType::LoopingClosed:
-            return "closed";
-        case AnimationType::LoopingStealth:
-            return "stealth";
-        case AnimationType::FireForgetHeadTurnLeft:
-            return getFirstIfCreatureModel("chturnl", "hturnl");
-        case AnimationType::FireForgetHeadTurnRight:
-            return getFirstIfCreatureModel("chturnr", "hturnr");
-        case AnimationType::FireForgetSalute:
-            return "salute";
-        case AnimationType::FireForgetBow:
-            return "bow";
-        case AnimationType::FireForgetGreeting:
-            return "greeting";
-        case AnimationType::FireForgetTaunt:
-            return getFirstIfCreatureModel("ctaunt", "taunt");
-        case AnimationType::FireForgetVictory1:
-            return getFirstIfCreatureModel("cvictory", "victory");
-        case AnimationType::FireForgetInject:
-            return "inject";
-        case AnimationType::FireForgetUseComputer:
-            return "usecomp";
-        case AnimationType::FireForgetPersuade:
-            return "persuade";
-        case AnimationType::FireForgetActivate:
-            return "activate";
-        case AnimationType::LoopingChoke:
-            return "choke";
-        case AnimationType::FireForgetTreatInjured:
-            return "treatinj";
-        case AnimationType::FireForgetOpen:
-            return "open";
-        case AnimationType::LoopingReady:
-            return getAnimationName(CombatAnimation::Ready, getWieldType(), 0);
+    case AnimationType::LoopingPause:
+        return getPauseAnimation();
+    case AnimationType::LoopingPause2:
+        return getFirstIfCreatureModel("cpause2", "pause2");
+    case AnimationType::LoopingListen:
+        return "listen";
+    case AnimationType::LoopingMeditate:
+        return "meditate";
+    case AnimationType::LoopingTalkNormal:
+        return "tlknorm";
+    case AnimationType::LoopingTalkPleading:
+        return "tlkplead";
+    case AnimationType::LoopingTalkForceful:
+        return "tlkforce";
+    case AnimationType::LoopingTalkLaughing:
+        return getFirstIfCreatureModel("", "tlklaugh");
+    case AnimationType::LoopingTalkSad:
+        return "tlksad";
+    case AnimationType::LoopingPauseTired:
+        return "pausetrd";
+    case AnimationType::LoopingFlirt:
+        return "flirt";
+    case AnimationType::LoopingUseComputer:
+        return "usecomplp";
+    case AnimationType::LoopingDance:
+        return "dance";
+    case AnimationType::LoopingDance1:
+        return "dance1";
+    case AnimationType::LoopingHorror:
+        return "horror";
+    case AnimationType::LoopingDeactivate:
+        return getFirstIfCreatureModel("", "deactivate");
+    case AnimationType::LoopingSpasm:
+        return getFirstIfCreatureModel("cspasm", "spasm");
+    case AnimationType::LoopingSleep:
+        return "sleep";
+    case AnimationType::LoopingProne:
+        return "prone";
+    case AnimationType::LoopingPause3:
+        return getFirstIfCreatureModel("", "pause3");
+    case AnimationType::LoopingWeld:
+        return "weld";
+    case AnimationType::LoopingDead:
+        return getDeadAnimation();
+    case AnimationType::LoopingTalkInjured:
+        return "talkinj";
+    case AnimationType::LoopingListenInjured:
+        return "listeninj";
+    case AnimationType::LoopingTreatInjured:
+        return "treatinjlp";
+    case AnimationType::LoopingUnlockDoor:
+        return "unlockdr";
+    case AnimationType::LoopingClosed:
+        return "closed";
+    case AnimationType::LoopingStealth:
+        return "stealth";
+    case AnimationType::FireForgetHeadTurnLeft:
+        return getFirstIfCreatureModel("chturnl", "hturnl");
+    case AnimationType::FireForgetHeadTurnRight:
+        return getFirstIfCreatureModel("chturnr", "hturnr");
+    case AnimationType::FireForgetSalute:
+        return "salute";
+    case AnimationType::FireForgetBow:
+        return "bow";
+    case AnimationType::FireForgetGreeting:
+        return "greeting";
+    case AnimationType::FireForgetTaunt:
+        return getFirstIfCreatureModel("ctaunt", "taunt");
+    case AnimationType::FireForgetVictory1:
+        return getFirstIfCreatureModel("cvictory", "victory");
+    case AnimationType::FireForgetInject:
+        return "inject";
+    case AnimationType::FireForgetUseComputer:
+        return "usecomp";
+    case AnimationType::FireForgetPersuade:
+        return "persuade";
+    case AnimationType::FireForgetActivate:
+        return "activate";
+    case AnimationType::LoopingChoke:
+        return "choke";
+    case AnimationType::FireForgetTreatInjured:
+        return "treatinj";
+    case AnimationType::FireForgetOpen:
+        return "open";
+    case AnimationType::LoopingReady:
+        return getAnimationName(CombatAnimation::Ready, getWieldType(), 0);
 
-        case AnimationType::LoopingWorship:
-        case AnimationType::LoopingGetLow:
-        case AnimationType::LoopingGetMid:
-        case AnimationType::LoopingPauseDrunk:
-        case AnimationType::LoopingDeadProne:
-        case AnimationType::LoopingKneelTalkAngry:
-        case AnimationType::LoopingKneelTalkSad:
-        case AnimationType::LoopingCheckBody:
-        case AnimationType::LoopingSitAndMeditate:
-        case AnimationType::LoopingSitChair:
-        case AnimationType::LoopingSitChairDrink:
-        case AnimationType::LoopingSitChairPazak:
-        case AnimationType::LoopingSitChairComp1:
-        case AnimationType::LoopingSitChairComp2:
-        case AnimationType::LoopingRage:
-        case AnimationType::LoopingChokeWorking:
-        case AnimationType::LoopingMeditateStand:
-        case AnimationType::FireForgetPauseScratchHead:
-        case AnimationType::FireForgetPauseBored:
-        case AnimationType::FireForgetVictory2:
-        case AnimationType::FireForgetVictory3:
-        case AnimationType::FireForgetThrowHigh:
-        case AnimationType::FireForgetThrowLow:
-        case AnimationType::FireForgetCustom01:
-        case AnimationType::FireForgetForceCast:
-        case AnimationType::FireForgetDiveRoll:
-        case AnimationType::FireForgetScream:
-        default:
-            debug("CreatureAnimationResolver: unsupported animation type: " + to_string(static_cast<int>(anim)));
-            return "";
+    case AnimationType::LoopingWorship:
+    case AnimationType::LoopingGetLow:
+    case AnimationType::LoopingGetMid:
+    case AnimationType::LoopingPauseDrunk:
+    case AnimationType::LoopingDeadProne:
+    case AnimationType::LoopingKneelTalkAngry:
+    case AnimationType::LoopingKneelTalkSad:
+    case AnimationType::LoopingCheckBody:
+    case AnimationType::LoopingSitAndMeditate:
+    case AnimationType::LoopingSitChair:
+    case AnimationType::LoopingSitChairDrink:
+    case AnimationType::LoopingSitChairPazak:
+    case AnimationType::LoopingSitChairComp1:
+    case AnimationType::LoopingSitChairComp2:
+    case AnimationType::LoopingRage:
+    case AnimationType::LoopingChokeWorking:
+    case AnimationType::LoopingMeditateStand:
+    case AnimationType::FireForgetPauseScratchHead:
+    case AnimationType::FireForgetPauseBored:
+    case AnimationType::FireForgetVictory2:
+    case AnimationType::FireForgetVictory3:
+    case AnimationType::FireForgetThrowHigh:
+    case AnimationType::FireForgetThrowLow:
+    case AnimationType::FireForgetCustom01:
+    case AnimationType::FireForgetForceCast:
+    case AnimationType::FireForgetDiveRoll:
+    case AnimationType::FireForgetScream:
+    default:
+        debug("CreatureAnimationResolver: unsupported animation type: " + to_string(static_cast<int>(anim)));
+        return "";
     }
 }
 
@@ -878,9 +889,10 @@ string Creature::getDeadAnimation() const {
 }
 
 string Creature::getPauseAnimation() const {
-    if (_modelType == Creature::ModelType::Creature) return "cpause1";
+    if (_modelType == Creature::ModelType::Creature)
+        return "cpause1";
 
-    // TODO: if (_lowHP) return "pauseinj" 
+    // TODO: if (_lowHP) return "pauseinj"
 
     if (_combat.active) {
         WeaponType type = WeaponType::None;
@@ -907,20 +919,20 @@ bool Creature::getWeaponInfo(WeaponType &type, WeaponWield &wield) const {
 
 int Creature::getWeaponWieldNumber(WeaponWield wield) const {
     switch (wield) {
-        case WeaponWield::StunBaton:
-            return 1;
-        case WeaponWield::SingleSword:
-            return isSlotEquipped(InventorySlot::leftWeapon) ? 4 : 2;
-        case WeaponWield::DoubleBladedSword:
-            return 3;
-        case WeaponWield::BlasterPistol:
-            return isSlotEquipped(InventorySlot::leftWeapon) ? 6 : 5;
-        case WeaponWield::BlasterRifle:
-            return 7;
-        case WeaponWield::HeavyWeapon:
-            return 9;
-        default:
-            return 8;
+    case WeaponWield::StunBaton:
+        return 1;
+    case WeaponWield::SingleSword:
+        return isSlotEquipped(InventorySlot::leftWeapon) ? 4 : 2;
+    case WeaponWield::DoubleBladedSword:
+        return 3;
+    case WeaponWield::BlasterPistol:
+        return isSlotEquipped(InventorySlot::leftWeapon) ? 6 : 5;
+    case WeaponWield::BlasterRifle:
+        return 7;
+    case WeaponWield::HeavyWeapon:
+        return 9;
+    default:
+        return 8;
     }
 }
 
@@ -929,9 +941,10 @@ string Creature::getWalkAnimation() const {
 }
 
 string Creature::getRunAnimation() const {
-    if (_modelType == Creature::ModelType::Creature) return "crun";
+    if (_modelType == Creature::ModelType::Creature)
+        return "crun";
 
-    // TODO: if (_lowHP) return "runinj" 
+    // TODO: if (_lowHP) return "runinj"
 
     if (_combat.active) {
         WeaponType type = WeaponType::None;
@@ -939,15 +952,15 @@ string Creature::getRunAnimation() const {
         getWeaponInfo(type, wield);
 
         switch (wield) {
-            case WeaponWield::SingleSword:
-                return isSlotEquipped(InventorySlot::leftWeapon) ? "runds" : "runss";
-            case WeaponWield::DoubleBladedSword:
-                return "runst";
-            case WeaponWield::BlasterRifle:
-            case WeaponWield::HeavyWeapon:
-                return "runrf";
-            default:
-                break;
+        case WeaponWield::SingleSword:
+            return isSlotEquipped(InventorySlot::leftWeapon) ? "runds" : "runss";
+        case WeaponWield::DoubleBladedSword:
+            return "runst";
+        case WeaponWield::BlasterRifle:
+        case WeaponWield::HeavyWeapon:
+            return "runrf";
+        default:
+            break;
         }
     }
 
@@ -968,48 +981,51 @@ static string formatCombatAnimation(const string &format, CreatureWieldType wiel
 
 string Creature::getAnimationName(CombatAnimation anim, CreatureWieldType wield, int variant) const {
     switch (anim) {
-        case CombatAnimation::Draw:
-            return getFirstIfCreatureModel("", formatCombatAnimation("g%dw%d", wield, 1));
-        case CombatAnimation::Ready:
-            return getFirstIfCreatureModel("creadyr", formatCombatAnimation("g%dr%d", wield, 1));
-        case CombatAnimation::Attack:
-            return getFirstIfCreatureModel("g0a1", formatCombatAnimation("g%da%d", wield, variant));
-        case CombatAnimation::Damage:
-            return getFirstIfCreatureModel("cdamages", formatCombatAnimation("g%dd%d", wield, variant));
-        case CombatAnimation::Dodge:
-            return getFirstIfCreatureModel("cdodgeg", formatCombatAnimation("g%dg%d", wield, variant));
-        case CombatAnimation::MeleeAttack:
-            return getFirstIfCreatureModel("m0a1", formatCombatAnimation("m%da%d", wield, variant));
-        case CombatAnimation::MeleeDamage:
-            return getFirstIfCreatureModel("cdamages", formatCombatAnimation("m%dd%d", wield, variant));
-        case CombatAnimation::MeleeDodge:
-            return getFirstIfCreatureModel("cdodgeg", formatCombatAnimation("m%dg%d", wield, variant));
-        case CombatAnimation::CinematicMeleeAttack:
-            return formatCombatAnimation("c%da%d", wield, variant);
-        case CombatAnimation::CinematicMeleeDamage:
-            return formatCombatAnimation("c%dd%d", wield, variant);
-        case CombatAnimation::CinematicMeleeParry:
-            return formatCombatAnimation("c%dp%d", wield, variant);
-        case CombatAnimation::BlasterAttack:
-            return getFirstIfCreatureModel("b0a1", formatCombatAnimation("b%da%d", wield, variant));
-        default:
-            return "";
+    case CombatAnimation::Draw:
+        return getFirstIfCreatureModel("", formatCombatAnimation("g%dw%d", wield, 1));
+    case CombatAnimation::Ready:
+        return getFirstIfCreatureModel("creadyr", formatCombatAnimation("g%dr%d", wield, 1));
+    case CombatAnimation::Attack:
+        return getFirstIfCreatureModel("g0a1", formatCombatAnimation("g%da%d", wield, variant));
+    case CombatAnimation::Damage:
+        return getFirstIfCreatureModel("cdamages", formatCombatAnimation("g%dd%d", wield, variant));
+    case CombatAnimation::Dodge:
+        return getFirstIfCreatureModel("cdodgeg", formatCombatAnimation("g%dg%d", wield, variant));
+    case CombatAnimation::MeleeAttack:
+        return getFirstIfCreatureModel("m0a1", formatCombatAnimation("m%da%d", wield, variant));
+    case CombatAnimation::MeleeDamage:
+        return getFirstIfCreatureModel("cdamages", formatCombatAnimation("m%dd%d", wield, variant));
+    case CombatAnimation::MeleeDodge:
+        return getFirstIfCreatureModel("cdodgeg", formatCombatAnimation("m%dg%d", wield, variant));
+    case CombatAnimation::CinematicMeleeAttack:
+        return formatCombatAnimation("c%da%d", wield, variant);
+    case CombatAnimation::CinematicMeleeDamage:
+        return formatCombatAnimation("c%dd%d", wield, variant);
+    case CombatAnimation::CinematicMeleeParry:
+        return formatCombatAnimation("c%dp%d", wield, variant);
+    case CombatAnimation::BlasterAttack:
+        return getFirstIfCreatureModel("b0a1", formatCombatAnimation("b%da%d", wield, variant));
+    default:
+        return "";
     }
 }
 
 string Creature::getActiveAnimationName() const {
     auto model = dynamic_pointer_cast<ModelSceneNode>(_sceneNode);
-    if (!model) return "";
+    if (!model)
+        return "";
 
     return model->getActiveAnimationName();
 }
 
 shared_ptr<ModelSceneNode> Creature::buildModel() {
     string bodyModelName(getBodyModelName());
-    if (bodyModelName.empty()) return nullptr;
+    if (bodyModelName.empty())
+        return nullptr;
 
     shared_ptr<Model> bodyModel(_game->models().get(bodyModelName));
-    if (!bodyModel) return nullptr;
+    if (!bodyModel)
+        return nullptr;
 
     auto bodySceneNode = _sceneGraph->newModel(bodyModel, ModelUsage::Creature, this);
 
@@ -1118,7 +1134,8 @@ string Creature::getBodyTextureName() const {
     shared_ptr<TwoDA> appearance(_game->resources().get2DA("appearance"));
 
     string texName(boost::to_lower_copy(appearance->getString(_appearance, column)));
-    if (texName.empty()) return "";
+    if (texName.empty())
+        return "";
 
     if (_modelType == Creature::ModelType::Character) {
         bool texFound = false;
@@ -1139,12 +1156,14 @@ string Creature::getBodyTextureName() const {
 }
 
 string Creature::getHeadModelName() const {
-    if (_modelType != Creature::ModelType::Character) return "";
+    if (_modelType != Creature::ModelType::Character)
+        return "";
 
     shared_ptr<TwoDA> appearance(_game->resources().get2DA("appearance"));
 
     int headIdx = appearance->getInt(_appearance, "normalhead", -1);
-    if (headIdx == -1) return "";
+    if (headIdx == -1)
+        return "";
 
     shared_ptr<TwoDA> heads(_game->resources().get2DA("heads"));
 
@@ -1156,18 +1175,19 @@ string Creature::getHeadModelName() const {
 
 string Creature::getMaskModelName() const {
     shared_ptr<Item> headItem(getEquippedItem(InventorySlot::head));
-    if (!headItem) return "";
+    if (!headItem)
+        return "";
 
     string modelName(boost::to_lower_copy(headItem->itemClass()));
     modelName += str(boost::format("_%03d") % headItem->modelVariation());
 
     return move(modelName);
-
 }
 
 string Creature::getWeaponModelName(int slot) const {
     shared_ptr<Item> bodyItem(getEquippedItem(slot));
-    if (!bodyItem) return "";
+    if (!bodyItem)
+        return "";
 
     string modelName(bodyItem->itemClass());
     boost::to_lower(modelName);
@@ -1179,14 +1199,14 @@ string Creature::getWeaponModelName(int slot) const {
 
 void Creature::loadUTC(const GffStruct &utc) {
     _blueprintResRef = boost::to_lower_copy(utc.getString("TemplateResRef"));
-    _race = utc.getEnum("Race", RacialType::Invalid); // index into racialtypes.2da
+    _race = utc.getEnum("Race", RacialType::Invalid);      // index into racialtypes.2da
     _subrace = utc.getEnum("SubraceIndex", Subrace::None); // index into subrace.2da
-    _appearance = utc.getInt("Appearance_Type"); // index into appearance.2da
-    _gender = utc.getEnum("Gender", Gender::None); // index into gender.2da
-    _portraitId = utc.getInt("PortraitId"); // index into portrait.2da
+    _appearance = utc.getInt("Appearance_Type");           // index into appearance.2da
+    _gender = utc.getEnum("Gender", Gender::None);         // index into gender.2da
+    _portraitId = utc.getInt("PortraitId");                // index into portrait.2da
     _tag = boost::to_lower_copy(utc.getString("Tag"));
     _conversation = boost::to_lower_copy(utc.getString("Conversation"));
-    _isPC = utc.getBool("IsPC"); // always 0
+    _isPC = utc.getBool("IsPC");                           // always 0
     _faction = utc.getEnum("FactionID", Faction::Invalid); // index into repute.2da
     _disarmable = utc.getBool("Disarmable");
     _plot = utc.getBool("Plot");

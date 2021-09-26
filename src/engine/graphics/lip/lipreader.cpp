@@ -25,7 +25,8 @@ namespace reone {
 
 namespace graphics {
 
-LipReader::LipReader() : BinaryReader(8, "LIP V1.0") {
+LipReader::LipReader() :
+    BinaryReader(8, "LIP V1.0") {
 }
 
 void LipReader::doLoad() {

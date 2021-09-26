@@ -19,8 +19,8 @@
 
 #include "../../gui/control/button.h"
 #include "../../gui/control/label.h"
-#include "../../gui/control/togglebutton.h"
 #include "../../gui/control/progressbar.h"
+#include "../../gui/control/togglebutton.h"
 #include "../../resource/types.h"
 
 #include "barkbubble.h"

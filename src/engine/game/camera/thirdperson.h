@@ -43,10 +43,10 @@ private:
     Game *_game;
 
     CameraStyle _style;
-    glm::vec3 _targetPosition { 0.0f };
-    bool _rotateCCW { false };
-    bool _rotateCW { false };
-    float _rotationSpeed { 0.0f };
+    glm::vec3 _targetPosition {0.0f};
+    bool _rotateCCW {false};
+    bool _rotateCW {false};
+    float _rotationSpeed {0.0f};
     std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> _findObstacle;
 
     void updateSceneNode();

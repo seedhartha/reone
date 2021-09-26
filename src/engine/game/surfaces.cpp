@@ -28,7 +28,8 @@ namespace reone {
 
 namespace game {
 
-Surfaces::Surfaces(Resources &resources) : _resources(resources) {
+Surfaces::Surfaces(Resources &resources) :
+    _resources(resources) {
 }
 
 void Surfaces::init() {

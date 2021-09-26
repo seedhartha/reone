@@ -25,7 +25,8 @@ namespace game {
 
 class FollowLeaderAction : public Action {
 public:
-    FollowLeaderAction(Game &game) : Action(game, ActionType::FollowLeader) {
+    FollowLeaderAction(Game &game) :
+        Action(game, ActionType::FollowLeader) {
     }
 
     void execute(Object &actor, float dt) override;

@@ -28,10 +28,10 @@ class TwoDA;
 namespace game {
 
 struct CameraStyle {
-    float distance { 0.0f };
-    float pitch { 0.0f };
-    float height { 0.0f };
-    float viewAngle { 0.0f };
+    float distance {0.0f};
+    float pitch {0.0f};
+    float height {0.0f};
+    float viewAngle {0.0f};
 
     void load(const resource::TwoDA &twoDa, int row);
 };

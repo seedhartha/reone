@@ -25,7 +25,8 @@ namespace game {
 
 class HasteEffect : public Effect {
 public:
-    HasteEffect() : Effect(EffectType::Haste) {
+    HasteEffect() :
+        Effect(EffectType::Haste) {
     }
 
     void applyTo(SpatialObject &object) override;

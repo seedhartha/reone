@@ -94,9 +94,8 @@ void TlkTool::toTLK(const fs::path &path, const fs::path &destPath) {
 }
 
 bool TlkTool::supports(Operation operation, const fs::path &target) const {
-    return
-        !fs::is_directory(target) &&
-        ((target.extension() == ".tlk" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::ToTLK));
+    return !fs::is_directory(target) &&
+           ((target.extension() == ".tlk" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::ToTLK));
 }
 
 } // namespace tools

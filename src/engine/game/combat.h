@@ -43,12 +43,13 @@ public:
     struct Attack {
         std::shared_ptr<Creature> attacker;
         std::shared_ptr<SpatialObject> target;
-        ObjectAction *action { nullptr }; /**< action to complete on round end */
-        AttackResultType resultType { AttackResultType::Invalid };
-        int damage { -1 };
+        ObjectAction *action {nullptr}; /**< action to complete on round end */
+        AttackResultType resultType {AttackResultType::Invalid};
+        int damage {-1};
     };
 
-    Combat(scene::SceneGraph &sceneGraph) : _sceneGraph(sceneGraph) {
+    Combat(scene::SceneGraph &sceneGraph) :
+        _sceneGraph(sceneGraph) {
     }
 
     /**
@@ -84,25 +85,25 @@ private:
     struct Round {
         std::unique_ptr<Attack> attack1;
         std::unique_ptr<Attack> attack2;
-        bool duel { false };
+        bool duel {false};
 
-        RoundState state { RoundState::Started };
-        float time { 0.0f };
+        RoundState state {RoundState::Started};
+        float time {0.0f};
 
         std::shared_ptr<scene::ModelSceneNode> projectile;
-        glm::vec3 projectileDir { 0.0f };
+        glm::vec3 projectileDir {0.0f};
     };
 
     struct AttackAnimation {
-        CreatureWieldType attackerWieldType { CreatureWieldType::None };
-        CombatAnimation attackerAnimation { CombatAnimation::None };
-        CombatAnimation targetAnimation { CombatAnimation::None };
-        int animationVariant { 1 };
+        CreatureWieldType attackerWieldType {CreatureWieldType::None};
+        CombatAnimation attackerAnimation {CombatAnimation::None};
+        CombatAnimation targetAnimation {CombatAnimation::None};
+        int animationVariant {1};
     };
 
     typedef std::map<uint32_t, std::unique_ptr<Round>> RoundMap;
 
-    Game *_game { nullptr };
+    Game *_game {nullptr};
     RoundMap _roundByAttacker;
 
     // Services

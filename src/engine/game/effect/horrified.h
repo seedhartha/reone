@@ -25,7 +25,8 @@ namespace game {
 
 class HorrifiedEffect : public Effect {
 public:
-    HorrifiedEffect() : Effect(EffectType::Horrified) {
+    HorrifiedEffect() :
+        Effect(EffectType::Horrified) {
     }
 
     void applyTo(SpatialObject &object) override;

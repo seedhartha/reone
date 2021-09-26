@@ -25,7 +25,8 @@ namespace game {
 
 class DroidScrambleEffect : public Effect {
 public:
-    DroidScrambleEffect() : Effect(EffectType::DroidScramble) {
+    DroidScrambleEffect() :
+        Effect(EffectType::DroidScramble) {
     }
 
     void applyTo(SpatialObject &object) override;

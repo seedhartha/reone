@@ -25,7 +25,8 @@ namespace game {
 
 class FactionModifierEffect : public Effect {
 public:
-    FactionModifierEffect() : Effect(EffectType::FactionModifier) {
+    FactionModifierEffect() :
+        Effect(EffectType::FactionModifier) {
     }
 
     void applyTo(SpatialObject &object) override;

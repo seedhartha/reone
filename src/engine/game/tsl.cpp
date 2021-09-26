@@ -75,8 +75,7 @@ TSL::TSL(
     WorldRenderPipeline &worldRenderPipeline,
     Scripts &scripts,
     Resources &resources,
-    Strings &strings
-) :
+    Strings &strings) :
     Game(
         GameID::TSL,
         move(path),
@@ -115,8 +114,7 @@ TSL::TSL(
         worldRenderPipeline,
         scripts,
         resources,
-        strings
-) {
+        strings) {
     _mainMenuMusicResRef = "mus_sion";
     _charGenMusicResRef = "mus_main";
     _charGenLoadScreenResRef = "load_default";

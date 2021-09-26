@@ -79,15 +79,15 @@ public:
 
 private:
     struct Member {
-        int npc { 0 };
+        int npc {0};
         std::shared_ptr<Creature> creature;
     };
 
-    Game *_game { nullptr };
+    Game *_game {nullptr};
     std::shared_ptr<Creature> _player;
     std::map<int, std::string> _availableMembers;
     std::vector<Member> _members;
-    bool _solo { false };
+    bool _solo {false};
 
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 

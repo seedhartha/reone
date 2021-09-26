@@ -42,7 +42,7 @@ public:
 private:
     struct ActionSlot {
         std::vector<ContextAction> actions;
-        uint32_t indexSelected { 0 };
+        uint32_t indexSelected {0};
     };
 
     Game *_game;
@@ -58,13 +58,13 @@ private:
     std::shared_ptr<SpatialObject> _hilightedObject;
     std::shared_ptr<SpatialObject> _selectedObject;
     std::vector<ActionSlot> _actionSlots;
-    glm::vec3 _hilightedScreenCoords { 0.0f };
-    glm::vec3 _selectedScreenCoords { 0.0f };
-    int _reticleHeight { 0 };
-    int _selectedActionSlot { -1 };
-    bool _hilightedHostile { false };
-    bool _selectedHostile { false };
-    bool _hasActions { false };
+    glm::vec3 _hilightedScreenCoords {0.0f};
+    glm::vec3 _selectedScreenCoords {0.0f};
+    int _reticleHeight {0};
+    int _selectedActionSlot {-1};
+    bool _hilightedHostile {false};
+    bool _selectedHostile {false};
+    bool _hasActions {false};
 
     bool handleMouseMotion(const SDL_MouseMotionEvent &event);
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);

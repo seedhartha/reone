@@ -57,14 +57,14 @@ public:
 private:
     const ModelSceneNode *_model;
 
-    glm::vec3 _color { 0.0f };
-    float _radius { 0.0f };
-    float _multiplier { 0.0f };
+    glm::vec3 _color {0.0f};
+    float _radius {0.0f};
+    float _multiplier {0.0f};
 
     // Fading
 
-    bool _active { false }; /**< fade in if true, fade out otherwise */
-    float _fadeFactor { 0.0f };
+    bool _active {false}; /**< fade in if true, fade out otherwise */
+    float _fadeFactor {0.0f};
 
     // END Fading
 };

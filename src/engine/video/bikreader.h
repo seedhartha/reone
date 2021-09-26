@@ -25,7 +25,7 @@ class Context;
 class Meshes;
 class Shaders;
 
-}
+} // namespace graphics
 
 namespace video {
 
@@ -42,8 +42,7 @@ public:
         boost::filesystem::path path,
         graphics::Context &context,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders
-    ) :
+        graphics::Shaders &shaders) :
         _path(std::move(path)),
         _context(context),
         _meshes(meshes),

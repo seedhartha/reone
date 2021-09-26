@@ -18,8 +18,8 @@
 #include "classselect.h"
 
 #include "../../../common/randomutil.h"
-#include "../../../gui/scenebuilder.h"
 #include "../../../graphics/model/models.h"
+#include "../../../gui/scenebuilder.h"
 #include "../../../resource/strings.h"
 
 #include "../../d20/classes.h"
@@ -46,20 +46,19 @@ namespace game {
 static constexpr float kModelScale = 1.1f;
 
 static map<Gender, int> g_genderStrRefs {
-    { Gender::Male, 646 },
-    { Gender::Female, 647 }
-};
+    {Gender::Male, 646},
+    {Gender::Female, 647}};
 
 static map<ClassType, int> g_classDescStrRefs {
-    { ClassType::Scoundrel, 32109 },
-    { ClassType::Scout, 32110 },
-    { ClassType::Soldier, 32111 },
-    { ClassType::JediConsular, 48031 },
-    { ClassType::JediSentinel, 48032 },
-    { ClassType::JediGuardian, 48033 }
-};
+    {ClassType::Scoundrel, 32109},
+    {ClassType::Scout, 32110},
+    {ClassType::Soldier, 32111},
+    {ClassType::JediConsular, 48031},
+    {ClassType::JediSentinel, 48032},
+    {ClassType::JediGuardian, 48033}};
 
-ClassSelection::ClassSelection(Game *game) : GameGUI(game) {
+ClassSelection::ClassSelection(Game *game) :
+    GameGUI(game) {
     _resRef = getResRef("classsel");
 
     if (game->isKotOR()) {
@@ -154,22 +153,21 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
 
     float aspect = extent.width / static_cast<float>(extent.height);
     unique_ptr<SceneGraph> scene(SceneBuilder(
-        _options,
-        _context,
-        _features,
-        _materials,
-        _meshes,
-        _pbrIbl,
-        _shaders,
-        _textures
-    )
-        .aspect(aspect)
-        .depth(0.1f, 10.0f)
-        .modelSupplier([&](SceneGraph &sceneGraph) { return getCharacterModel(appearance, sceneGraph); })
-        .modelScale(kModelScale)
-        .cameraFromModelNode("camerahook")
-        .lightingRefFromModelNode("cgbody_light")
-        .build());
+                                     _options,
+                                     _context,
+                                     _features,
+                                     _materials,
+                                     _meshes,
+                                     _pbrIbl,
+                                     _shaders,
+                                     _textures)
+                                     .aspect(aspect)
+                                     .depth(0.1f, 10.0f)
+                                     .modelSupplier([&](SceneGraph &sceneGraph) { return getCharacterModel(appearance, sceneGraph); })
+                                     .modelScale(kModelScale)
+                                     .cameraFromModelNode("camerahook")
+                                     .lightingRefFromModelNode("cgbody_light")
+                                     .build());
 
     vector<Label *> threeDModels {
         _binding.threeDModel1.get(),
@@ -206,17 +204,17 @@ int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz)
     const Portrait &portrait = portraits[portraitIdx];
 
     switch (clazz) {
-        case ClassType::Scoundrel:
-        case ClassType::JediConsular:
-            result = portrait.appearanceS;
-            break;
-        case ClassType::Soldier:
-        case ClassType::JediGuardian:
-            result = portrait.appearanceL;
-            break;
-        default:
-            result = portrait.appearanceNumber;
-            break;
+    case ClassType::Scoundrel:
+    case ClassType::JediConsular:
+        result = portrait.appearanceS;
+        break;
+    case ClassType::Soldier:
+    case ClassType::JediGuardian:
+        result = portrait.appearanceL;
+        break;
+    default:
+        result = portrait.appearanceNumber;
+        break;
     }
 
     return result;

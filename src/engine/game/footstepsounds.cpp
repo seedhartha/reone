@@ -43,15 +43,14 @@ shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
     if (twoDa) {
         result = make_shared<FootstepTypeSounds>();
         map<string, vector<shared_ptr<AudioStream>> &> dict {
-            { "dirt", result->dirt },
-            { "grass", result->grass },
-            { "stone", result->stone },
-            { "wood", result->wood },
-            { "water", result->water },
-            { "carpet", result->carpet },
-            { "metal", result->metal },
-            { "leaves", result->leaves }
-        };
+            {"dirt", result->dirt},
+            {"grass", result->grass},
+            {"stone", result->stone},
+            {"wood", result->wood},
+            {"water", result->water},
+            {"carpet", result->carpet},
+            {"metal", result->metal},
+            {"leaves", result->leaves}};
         for (auto &pair : dict) {
             for (int i = 0; i < 3; ++i) {
                 string key(str(boost::format("%s%d") % pair.first % i));

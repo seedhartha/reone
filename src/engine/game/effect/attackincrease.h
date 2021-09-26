@@ -25,7 +25,8 @@ namespace game {
 
 class AttackIncreaseEffect : public Effect {
 public:
-    AttackIncreaseEffect() : Effect(EffectType::AttackIncrease) {
+    AttackIncreaseEffect() :
+        Effect(EffectType::AttackIncrease) {
     }
 
     void applyTo(SpatialObject &object) override;

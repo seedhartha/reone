@@ -37,8 +37,7 @@ public:
         Context &context,
         Meshes &meshes,
         Shaders &shaders,
-        Window &window
-    ) :
+        Window &window) :
         _up(ensurePresent(up, "up")),
         _down(ensurePresent(down, "down")),
         _context(context),
@@ -56,8 +55,8 @@ private:
     std::shared_ptr<Texture> _up;
     std::shared_ptr<Texture> _down;
 
-    glm::ivec2 _position { 0 };
-    bool _pressed { false };
+    glm::ivec2 _position {0};
+    bool _pressed {false};
 
     // Services
 

@@ -46,7 +46,7 @@ public:
     }
 
 private:
-    float _timeout { 0.0f };
+    float _timeout {0.0f};
 };
 
 } // namespace reone

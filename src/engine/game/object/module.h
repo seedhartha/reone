@@ -39,11 +39,11 @@ namespace game {
 
 struct ModuleInfo {
     std::string entryArea;
-    glm::vec3 entryPosition { 0.0f };
-    float entryFacing { 0.0f };
-    int dawnHour { 0 };
-    int duskHour { 0 };
-    int minPerHour { 0 };
+    glm::vec3 entryPosition {0.0f};
+    float entryFacing {0.0f};
+    int dawnHour {0};
+    int duskHour {0};
+    int minPerHour {0};
 };
 
 class Door;
@@ -54,11 +54,11 @@ class Placeable;
 class Module : public Object {
 public:
     struct Time {
-        int day { 0 };
-        int hour { 0 };
-        int minute { 0 };
-        int second { 0 };
-        int millisecond { 0 };
+        int day {0};
+        int hour {0};
+        int minute {0};
+        int second {0};
+        int millisecond {0};
     };
 
     Module(uint32_t id, Game *game);

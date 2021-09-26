@@ -118,6 +118,6 @@ const Dialog::EntryReply &Dialog::getReply(int index) const {
     return _replies[index];
 }
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone

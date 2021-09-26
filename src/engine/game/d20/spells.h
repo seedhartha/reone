@@ -30,7 +30,7 @@ namespace resource {
 class Resources;
 class Strings;
 
-}
+} // namespace resource
 
 namespace game {
 
@@ -39,8 +39,7 @@ public:
     Spells(
         graphics::Textures &textures,
         resource::Resources &resources,
-        resource::Strings &strings
-    ) :
+        resource::Strings &strings) :
         _textures(textures),
         _resources(resources),
         _strings(strings) {

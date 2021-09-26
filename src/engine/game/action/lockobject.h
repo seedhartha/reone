@@ -25,7 +25,8 @@ namespace game {
 
 class LockObjectAction : public Action {
 public:
-    LockObjectAction(Game &game) : Action(game, ActionType::Lock) {
+    LockObjectAction(Game &game) :
+        Action(game, ActionType::Lock) {
     }
 
     void execute(Object &actor, float dt) override;

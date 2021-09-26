@@ -25,7 +25,8 @@ namespace game {
 
 class WhirlWindEffect : public Effect {
 public:
-    WhirlWindEffect() : Effect(EffectType::WhirlWind) {
+    WhirlWindEffect() :
+        Effect(EffectType::WhirlWind) {
     }
 
     void applyTo(SpatialObject &object) override;

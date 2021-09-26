@@ -61,8 +61,7 @@ GUI::GUI(
     Textures &textures,
     Window &window,
     Resources &resources,
-    Strings &strings
-) :
+    Strings &strings) :
     _options(move(options)),
     _context(context),
     _features(features),
@@ -95,15 +94,15 @@ void GUI::load() {
     _controlByTag[tag] = _rootControl.get();
 
     switch (_scaling) {
-        case ScalingMode::Center:
-            _rootOffset.x = _screenCenter.x - _resolutionX / 2;
-            _rootOffset.y = _screenCenter.y - _resolutionY / 2;
-            break;
-        case ScalingMode::Stretch:
-            stretchControl(*_rootControl);
-            break;
-        default:
-            break;
+    case ScalingMode::Center:
+        _rootOffset.x = _screenCenter.x - _resolutionX / 2;
+        _rootOffset.y = _screenCenter.y - _resolutionY / 2;
+        break;
+    case ScalingMode::Stretch:
+        stretchControl(*_rootControl);
+        break;
+    default:
+        break;
     }
 
     const Control::Extent &rootExtent = _rootControl->extent();
@@ -126,7 +125,8 @@ void GUI::loadControl(const GffStruct &gffs) {
     string parent(Control::getParent(gffs));
 
     shared_ptr<Control> control(newControl(type, tag));
-    if (!control) return;
+    if (!control)
+        return;
 
     preloadControl(*control);
     control->load(gffs);
@@ -140,14 +140,14 @@ void GUI::loadControl(const GffStruct &gffs) {
         scaling = maybeScaling->second;
     }
     switch (scaling) {
-        case ScalingMode::PositionRelativeToCenter:
-            positionRelativeToCenter(*control);
-            break;
-        case ScalingMode::Stretch:
-            stretchControl(*control);
-            break;
-        default:
-            break;
+    case ScalingMode::PositionRelativeToCenter:
+        positionRelativeToCenter(*control);
+        break;
+    case ScalingMode::Stretch:
+        stretchControl(*control);
+        break;
+    default:
+        break;
     }
 
     _controlByTag[tag] = control.get();
@@ -170,41 +170,42 @@ void GUI::positionRelativeToCenter(Control &control) {
 
 bool GUI::handle(const SDL_Event &event) {
     switch (event.type) {
-        case SDL_KEYDOWN:
-            return handleKeyDown(event.key.keysym.scancode);
+    case SDL_KEYDOWN:
+        return handleKeyDown(event.key.keysym.scancode);
 
-        case SDL_KEYUP:
-            return handleKeyUp(event.key.keysym.scancode);
+    case SDL_KEYUP:
+        return handleKeyUp(event.key.keysym.scancode);
 
-        case SDL_MOUSEMOTION: {
-            glm::ivec2 ctrlCoords(event.motion.x - _controlOffset.x, event.motion.y - _controlOffset.y);
-            updateFocus(ctrlCoords.x, ctrlCoords.y);
-            if (_focus) {
-                _focus->handleMouseMotion(ctrlCoords.x, ctrlCoords.y);
-            }
-            break;
+    case SDL_MOUSEMOTION: {
+        glm::ivec2 ctrlCoords(event.motion.x - _controlOffset.x, event.motion.y - _controlOffset.y);
+        updateFocus(ctrlCoords.x, ctrlCoords.y);
+        if (_focus) {
+            _focus->handleMouseMotion(ctrlCoords.x, ctrlCoords.y);
         }
-        case SDL_MOUSEBUTTONDOWN:
-            if (event.button.button == SDL_BUTTON_LEFT) {
-                _leftMouseDown = true;
+        break;
+    }
+    case SDL_MOUSEBUTTONDOWN:
+        if (event.button.button == SDL_BUTTON_LEFT) {
+            _leftMouseDown = true;
+        }
+        break;
+    case SDL_MOUSEBUTTONUP:
+        if (_leftMouseDown && event.button.button == SDL_BUTTON_LEFT) {
+            _leftMouseDown = false;
+            glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
+            Control *control = getControlAt(ctrlCoords.x, ctrlCoords.y, [](const Control &ctrl) { return ctrl.isClickable(); });
+            if (control) {
+                debug("Click " + control->tag(), LogChannels::gui);
+                onClick(control->tag());
+                return control->handleClick(ctrlCoords.x, ctrlCoords.y);
             }
-            break;
-        case SDL_MOUSEBUTTONUP:
-            if (_leftMouseDown && event.button.button == SDL_BUTTON_LEFT) {
-                _leftMouseDown = false;
-                glm::ivec2 ctrlCoords(event.button.x - _controlOffset.x, event.button.y - _controlOffset.y);
-                Control *control = getControlAt(ctrlCoords.x, ctrlCoords.y, [](const Control &ctrl) { return ctrl.isClickable(); });
-                if (control) {
-                    debug("Click " + control->tag(), LogChannels::gui);
-                    onClick(control->tag());
-                    return control->handleClick(ctrlCoords.x, ctrlCoords.y);
-                }
-            }
-            break;
+        }
+        break;
 
-        case SDL_MOUSEWHEEL:
-            if (_focus && _focus->handleMouseWheel(event.wheel.x, event.wheel.y)) return true;
-            break;
+    case SDL_MOUSEWHEEL:
+        if (_focus && _focus->handleMouseWheel(event.wheel.x, event.wheel.y))
+            return true;
+        break;
     }
 
     return false;
@@ -220,7 +221,8 @@ bool GUI::handleKeyUp(SDL_Scancode key) {
 
 void GUI::updateFocus(int x, int y) {
     Control *control = getControlAt(x, y, [](const Control &ctrl) { return ctrl.isFocusable(); });
-    if (control == _focus) return;
+    if (control == _focus)
+        return;
 
     if (_focus) {
         if (_focus->isFocusable()) {
@@ -239,7 +241,8 @@ void GUI::updateFocus(int x, int y) {
 Control *GUI::getControlAt(int x, int y, const function<bool(const Control &)> &test) const {
     for (auto it = _controls.rbegin(); it != _controls.rend(); ++it) {
         Control *ctrl = (*it).get();
-        if (!ctrl->isVisible() || ctrl->isDisabled() || !test(*ctrl)) continue;
+        if (!ctrl->isVisible() || ctrl->isDisabled() || !test(*ctrl))
+            continue;
 
         if (ctrl->extent().contains(x, y)) {
             return ctrl;
@@ -256,8 +259,10 @@ void GUI::update(float dt) {
 }
 
 void GUI::draw() {
-    if (_background) drawBackground();
-    if (_rootControl) _rootControl->draw(_rootOffset, _rootControl->textLines());
+    if (_background)
+        drawBackground();
+    if (_rootControl)
+        _rootControl->draw(_rootOffset, _rootControl->textLines());
 
     for (auto &control : _controls) {
         control->draw(_controlOffset, control->textLines());
@@ -298,7 +303,8 @@ void GUI::resetFocus() {
 
 shared_ptr<Control> GUI::getControl(const string &tag) const {
     for (auto &control : _controls) {
-        if (control->tag() == tag) return control;
+        if (control->tag() == tag)
+            return control;
     }
     warn(boost::format("Control '%s' not found in GUI '%s'") % tag % _resRef);
     return shared_ptr<Control>();
@@ -306,40 +312,39 @@ shared_ptr<Control> GUI::getControl(const string &tag) const {
 
 unique_ptr<Control> GUI::newControl(
     ControlType type,
-    string tag
-) {
+    string tag) {
     unique_ptr<Control> control;
     switch (type) {
-        case ControlType::Panel:
-            control = make_unique<Panel>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
-            break;
-        case ControlType::Label:
-            control = make_unique<Label>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
-            break;
-        case ControlType::ImageButton:
-            control = make_unique<ImageButton>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
-            break;
-        case ControlType::Button:
-            control = make_unique<Button>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
-            break;
-        case ControlType::ToggleButton:
-            control = make_unique<ToggleButton>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
-            break;
-        case ControlType::Slider:
-            control = make_unique<Slider>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
-            break;
-        case ControlType::ScrollBar:
-            control = make_unique<ScrollBar>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
-            break;
-        case ControlType::ProgressBar:
-            control = make_unique<ProgressBar>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
-            break;
-        case ControlType::ListBox:
-            control = make_unique<ListBox>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
-            break;
-        default:
-            debug("Unsupported control type: " + to_string(static_cast<int>(type)), LogChannels::gui);
-            return nullptr;
+    case ControlType::Panel:
+        control = make_unique<Panel>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        break;
+    case ControlType::Label:
+        control = make_unique<Label>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        break;
+    case ControlType::ImageButton:
+        control = make_unique<ImageButton>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        break;
+    case ControlType::Button:
+        control = make_unique<Button>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        break;
+    case ControlType::ToggleButton:
+        control = make_unique<ToggleButton>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        break;
+    case ControlType::Slider:
+        control = make_unique<Slider>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        break;
+    case ControlType::ScrollBar:
+        control = make_unique<ScrollBar>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        break;
+    case ControlType::ProgressBar:
+        control = make_unique<ProgressBar>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        break;
+    case ControlType::ListBox:
+        control = make_unique<ListBox>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        break;
+    default:
+        debug("Unsupported control type: " + to_string(static_cast<int>(type)), LogChannels::gui);
+        return nullptr;
     }
 
     control->setTag(tag);

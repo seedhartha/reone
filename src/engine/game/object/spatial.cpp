@@ -39,8 +39,7 @@ SpatialObject::SpatialObject(
     ObjectType type,
     Game *game,
     ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph
-) :
+    SceneGraph *sceneGraph) :
     Object(id, type, game),
     _objectFactory(ensurePresent(objectFactory, "objectFactory")),
     _sceneGraph(ensurePresent(sceneGraph, "sceneGraph")) {
@@ -80,7 +79,8 @@ void SpatialObject::addItem(const shared_ptr<Item> &item) {
 
 bool SpatialObject::removeItem(const shared_ptr<Item> &item, bool &last) {
     auto maybeItem = find(_items.begin(), _items.end(), item);
-    if (maybeItem == _items.end()) return false;
+    if (maybeItem == _items.end())
+        return false;
 
     last = false;
 
@@ -120,7 +120,8 @@ float SpatialObject::getDistanceTo2(const SpatialObject &other) const {
 }
 
 bool SpatialObject::contains(const glm::vec3 &point) const {
-    if (!_sceneNode) return false;
+    if (!_sceneNode)
+        return false;
 
     const AABB &aabb = _sceneNode->aabb();
 
@@ -134,7 +135,8 @@ void SpatialObject::face(const SpatialObject &other) {
 }
 
 void SpatialObject::face(const glm::vec3 &point) {
-    if (point == _position) return;
+    if (point == _position)
+        return;
 
     glm::vec2 dir(glm::normalize(point - _position));
     _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(dir.x, dir.y)));
@@ -142,7 +144,8 @@ void SpatialObject::face(const glm::vec3 &point) {
 }
 
 void SpatialObject::faceAwayFrom(const SpatialObject &other) {
-    if (_id == other._id || _position == other.position()) return;
+    if (_id == other._id || _position == other.position())
+        return;
 
     glm::vec2 dir(glm::normalize(_position - other.position()));
     _orientation = glm::quat(glm::vec3(0.0f, 0.0f, -glm::atan(dir.x, dir.y)));
@@ -150,7 +153,7 @@ void SpatialObject::faceAwayFrom(const SpatialObject &other) {
 }
 
 void SpatialObject::moveDropableItemsTo(SpatialObject &other) {
-    for (auto it = _items.begin(); it != _items.end(); ) {
+    for (auto it = _items.begin(); it != _items.end();) {
         if ((*it)->isDropable()) {
             other._items.push_back(*it);
             it = _items.erase(it);
@@ -182,7 +185,7 @@ void SpatialObject::update(float dt) {
 }
 
 void SpatialObject::updateEffects(float dt) {
-    for (auto it = _effects.begin(); it != _effects.end(); ) {
+    for (auto it = _effects.begin(); it != _effects.end();) {
         AppliedEffect &effect = *it;
         bool temporary = effect.durationType == DurationType::Temporary;
         if (temporary) {
@@ -243,7 +246,8 @@ void SpatialObject::setFacing(float facing) {
 }
 
 void SpatialObject::setVisible(bool visible) {
-    if (_visible == visible) return;
+    if (_visible == visible)
+        return;
 
     _visible = visible;
 
@@ -267,7 +271,8 @@ shared_ptr<Item> SpatialObject::getNextItem() {
 
 shared_ptr<Item> SpatialObject::getItemByTag(const string &tag) {
     for (auto &item : _items) {
-        if (item->tag() == tag) return item;
+        if (item->tag() == tag)
+            return item;
     }
     return nullptr;
 }
@@ -288,7 +293,8 @@ void SpatialObject::startStuntMode() {
 }
 
 void SpatialObject::stopStuntMode() {
-    if (!_stunt) return;
+    if (!_stunt)
+        return;
 
     if (_sceneNode) {
         _sceneNode->setLocalTransform(_transform);
@@ -300,13 +306,15 @@ void SpatialObject::stopStuntMode() {
 shared_ptr<Effect> SpatialObject::getFirstEffect() {
     _effectIndex = 1;
 
-    if (_effects.empty()) return nullptr;
+    if (_effects.empty())
+        return nullptr;
 
     return _effects.front().effect;
 }
 
 shared_ptr<Effect> SpatialObject::getNextEffect() {
-    if (_effects.size() <= _effectIndex) return nullptr;
+    if (_effects.size() <= _effectIndex)
+        return nullptr;
 
     return _effects[_effectIndex++].effect;
 }

@@ -84,32 +84,32 @@ public:
 private:
     std::string _localizedName;
     std::string _baseBodyVariation;
-    int _bodyVariation { 0 };
-    int _textureVariation { 0 };
+    int _bodyVariation {0};
+    int _textureVariation {0};
     std::string _itemClass;
-    int _modelVariation { 0 };
+    int _modelVariation {0};
     std::shared_ptr<graphics::Texture> _icon;
-    uint32_t _equipableSlots { 0 };
-    int _attackRange { 0 };
-    int _numDice { 0 };
-    int _dieToRoll { 0 };
-    int _damageFlags { 0 };
-    WeaponType _weaponType { WeaponType::None };
-    WeaponWield _weaponWield { WeaponWield::None };
-    bool _dropable { true };
-    int _stackSize { 1 };
-    bool _identified { true };
-    bool _equipped { false };
+    uint32_t _equipableSlots {0};
+    int _attackRange {0};
+    int _numDice {0};
+    int _dieToRoll {0};
+    int _damageFlags {0};
+    WeaponType _weaponType {WeaponType::None};
+    WeaponWield _weaponWield {WeaponWield::None};
+    bool _dropable {true};
+    int _stackSize {1};
+    bool _identified {true};
+    bool _equipped {false};
     std::shared_ptr<AmmunitionType> _ammunitionType;
     std::string _descIdentified;
-    int _baseItem { 0 };
-    int _criticalThreat { 0 };
-    int _criticalHitMultiplier { 0 };
-    int _charges { 0 };
-    int _cost { 0 };
-    int _addCost { 0 };
+    int _baseItem {0};
+    int _criticalThreat {0};
+    int _criticalHitMultiplier {0};
+    int _charges {0};
+    int _cost {0};
+    int _addCost {0};
     std::string _description;
-    bool _stolen { false };
+    bool _stolen {false};
 
     // Blueprint
 

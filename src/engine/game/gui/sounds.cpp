@@ -28,7 +28,8 @@ namespace reone {
 
 namespace game {
 
-GUISounds::GUISounds(AudioFiles &audioFiles, Resources &resources) : _audioFiles(audioFiles), _resources(resources) {
+GUISounds::GUISounds(AudioFiles &audioFiles, Resources &resources) :
+    _audioFiles(audioFiles), _resources(resources) {
 }
 
 void GUISounds::init() {

@@ -32,8 +32,7 @@ Animation::Animation(
     float length,
     float transitionTime,
     shared_ptr<ModelNode> rootNode,
-    vector<Event> events
-) :
+    vector<Event> events) :
     _name(move(name)),
     _length(length),
     _transitionTime(transitionTime),

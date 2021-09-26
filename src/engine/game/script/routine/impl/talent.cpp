@@ -64,8 +64,7 @@ Variable getIsTalentValid(Game &game, const vector<Variable> &args, ExecutionCon
     try {
         auto talent = getTalent(args, 0);
         return Variable::ofInt(1);
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(0);
     }
 }
@@ -76,8 +75,7 @@ Variable getTypeFromTalent(Game &game, const vector<Variable> &args, ExecutionCo
         auto type = talent->type();
 
         return Variable::ofInt(static_cast<int>(type));
-    }
-    catch (const ArgumentException &) {
+    } catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(TalentType::Invalid));
     }
 }

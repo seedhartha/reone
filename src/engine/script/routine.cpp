@@ -33,8 +33,7 @@ Routine::Routine(
     string name,
     VariableType retType,
     vector<VariableType> argTypes,
-    function<Variable(const vector<Variable> &, ExecutionContext &ctx)> fn
-) :
+    function<Variable(const vector<Variable> &, ExecutionContext &ctx)> fn) :
     _name(move(name)),
     _returnType(retType),
     _argumentTypes(move(argTypes)),
@@ -44,12 +43,10 @@ Routine::Routine(
 Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) const {
     try {
         return _func(args, ctx);
-    }
-    catch (const NotImplementedException &ex) {
+    } catch (const NotImplementedException &ex) {
         string msg("Routine not implemented: " + _name);
         return onException(msg, ex);
-    }
-    catch (const ArgumentException &ex) {
+    } catch (const ArgumentException &ex) {
         string msg(str(boost::format("Routine '%s' invocation failed: %s") % _name % ex.what()));
         return onException(msg, ex);
     }
@@ -57,34 +54,34 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
 
 Variable Routine::onException(const string &msg, const exception &ex) const {
     switch (_returnType) {
-        case VariableType::Void:
-            warn(msg);
-            return Variable::ofNull();
-        case VariableType::String:
-            warn(msg);
-            return Variable::ofString("");
-        case VariableType::Vector:
-            warn(msg);
-            return Variable::ofVector(glm::vec3(0.0f));
-        case VariableType::Object:
-            warn(msg);
-            return Variable::ofObject(kObjectInvalid);
-        case VariableType::Effect:
-            warn(msg);
-            return Variable::ofEffect(nullptr);
-        case VariableType::Event:
-            warn(msg);
-            return Variable::ofEvent(nullptr);
-        case VariableType::Location:
-            warn(msg);
-            return Variable::ofLocation(nullptr);
-        case VariableType::Talent:
-            warn(msg);
-            return Variable::ofTalent(nullptr);
-        default:
-            // With Int, Float and Action return types, halt script execution
-            error(msg, LogChannels::script);
-            throw ex;
+    case VariableType::Void:
+        warn(msg);
+        return Variable::ofNull();
+    case VariableType::String:
+        warn(msg);
+        return Variable::ofString("");
+    case VariableType::Vector:
+        warn(msg);
+        return Variable::ofVector(glm::vec3(0.0f));
+    case VariableType::Object:
+        warn(msg);
+        return Variable::ofObject(kObjectInvalid);
+    case VariableType::Effect:
+        warn(msg);
+        return Variable::ofEffect(nullptr);
+    case VariableType::Event:
+        warn(msg);
+        return Variable::ofEvent(nullptr);
+    case VariableType::Location:
+        warn(msg);
+        return Variable::ofLocation(nullptr);
+    case VariableType::Talent:
+        warn(msg);
+        return Variable::ofTalent(nullptr);
+    default:
+        // With Int, Float and Action return types, halt script execution
+        error(msg, LogChannels::script);
+        throw ex;
     }
 }
 

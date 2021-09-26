@@ -37,7 +37,7 @@ public:
 private:
     ByteArray _input;
     std::shared_ptr<AudioStream> _stream;
-    bool _done { false };
+    bool _done {false};
 
     static mad_flow inputFunc(void *playbuf, mad_stream *stream);
     static mad_flow headerFunc(void *playbuf, mad_header const *header);

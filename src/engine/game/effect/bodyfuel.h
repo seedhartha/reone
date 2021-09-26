@@ -25,7 +25,8 @@ namespace game {
 
 class BodyFuelEffect : public Effect {
 public:
-    BodyFuelEffect() : Effect(EffectType::BodyFuel) {
+    BodyFuelEffect() :
+        Effect(EffectType::BodyFuel) {
     }
 
     void applyTo(SpatialObject &object) override;

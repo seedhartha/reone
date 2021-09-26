@@ -44,7 +44,8 @@ public:
      */
     std::shared_ptr<V> get(K key) {
         auto maybeObject = _objects.find(key);
-        if (maybeObject != _objects.end()) return maybeObject->second;
+        if (maybeObject != _objects.end())
+            return maybeObject->second;
 
         auto object = _compute(key);
 

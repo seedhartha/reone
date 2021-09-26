@@ -42,11 +42,10 @@ static mutex g_logMutex;
 static unique_ptr<fs::ofstream> g_logFile;
 
 static const unordered_map<LogLevel, string> g_nameByLogLevel {
-    { LogLevel::Error, "ERR" },
-    { LogLevel::Warn, "WRN" },
-    { LogLevel::Info, "INF" },
-    { LogLevel::Debug, "DBG" }
-};
+    {LogLevel::Error, "ERR"},
+    {LogLevel::Warn, "WRN"},
+    {LogLevel::Info, "INF"},
+    {LogLevel::Debug, "DBG"}};
 
 static string describeLogLevel(LogLevel level) {
     return getFromLookupOrElse(g_nameByLogLevel, level, [&level]() {
@@ -55,17 +54,16 @@ static string describeLogLevel(LogLevel level) {
 }
 
 static const unordered_map<int, string> g_nameByLogChannel {
-    { LogChannels::resources, "Resources" },
-    { LogChannels::general, "General" },
-    { LogChannels::graphics, "Graphics" },
-    { LogChannels::audio, "Audio" },
-    { LogChannels::gui, "GUI" },
-    { LogChannels::conversation, "Conversation" },
-    { LogChannels::combat, "Combat" },
-    { LogChannels::script, "Script" },
-    { LogChannels::script2, "Script" },
-    { LogChannels::script3, "Script" }
-};
+    {LogChannels::resources, "Resources"},
+    {LogChannels::general, "General"},
+    {LogChannels::graphics, "Graphics"},
+    {LogChannels::audio, "Audio"},
+    {LogChannels::gui, "GUI"},
+    {LogChannels::conversation, "Conversation"},
+    {LogChannels::combat, "Combat"},
+    {LogChannels::script, "Script"},
+    {LogChannels::script2, "Script"},
+    {LogChannels::script3, "Script"}};
 
 static string describeLogChannel(int channel) {
     return getFromLookupOrElse(g_nameByLogChannel, channel, [&channel]() {
@@ -75,17 +73,18 @@ static string describeLogChannel(int channel) {
 
 static void log(ostream &out, LogLevel level, const string &s, int channel) {
     boost::format msg(boost::format("%s [%s] %s: %s") %
-        describeLogLevel(level) %
-        getThreadName() %
-        describeLogChannel(channel) %
-        s);
+                      describeLogLevel(level) %
+                      getThreadName() %
+                      describeLogChannel(channel) %
+                      s);
 
     lock_guard<mutex> lock(g_logMutex);
     out << msg << endl;
 }
 
 static void log(LogLevel level, const string &s, int channel) {
-    if (!isLogChannelEnabled(channel)) return;
+    if (!isLogChannelEnabled(channel))
+        return;
 
     if (g_logToFile && !g_logFile) {
         fs::path path(fs::current_path());

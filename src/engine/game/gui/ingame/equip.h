@@ -55,9 +55,9 @@ public:
     void update();
 
 private:
-      static constexpr int kNumControlsBar = 5;
+    static constexpr int kNumControlsBar = 5;
 
-      struct Binding {
+    struct Binding {
         std::shared_ptr<gui::Label> lblCantEquip;
         std::shared_ptr<gui::Label> lblAttackInfo;
         std::shared_ptr<gui::Label> lblToHitR;
@@ -104,8 +104,8 @@ private:
 
     InGameMenu &_inGameMenu;
 
-    Slot _selectedSlot { Slot::None };
-    int _selectedItemIdx { -1 };
+    Slot _selectedSlot {Slot::None};
+    int _selectedItemIdx {-1};
 
     void preloadControl(gui::Control &control) override;
 

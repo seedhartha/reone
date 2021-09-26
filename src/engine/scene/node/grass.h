@@ -36,9 +36,9 @@ namespace scene {
 class GrassSceneNode : public SceneNode {
 public:
     struct Cluster : public SceneNodeElement {
-        glm::vec3 position { 0.0f };
-        glm::vec2 lightmapUV { 0.0f };
-        int variant { 0 };
+        glm::vec3 position {0.0f};
+        glm::vec2 lightmapUV {0.0f};
+        int variant {0};
     };
 
     GrassSceneNode(
@@ -49,16 +49,14 @@ public:
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders
-    ) :
+        graphics::Shaders &shaders) :
         SceneNode(
             std::move(name),
             SceneNodeType::Grass,
             sceneGraph,
             context,
             meshes,
-            shaders
-        ),
+            shaders),
         _quadSize(std::move(quadSize)),
         _texture(ensurePresent(texture, "texture")),
         _lightmap(lightmap) {
@@ -72,7 +70,7 @@ public:
     const std::vector<std::shared_ptr<Cluster>> &clusters() const { return _clusters; }
 
 private:
-    glm::vec2 _quadSize { 0.0f };
+    glm::vec2 _quadSize {0.0f};
     std::shared_ptr<graphics::Texture> _texture;
     std::shared_ptr<graphics::Texture> _lightmap;
     std::vector<std::shared_ptr<Cluster>> _clusters;

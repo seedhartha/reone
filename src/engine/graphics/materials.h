@@ -45,7 +45,7 @@ public:
 private:
     resource::Resources &_resources;
 
-    bool _inited { false };
+    bool _inited {false};
     std::unordered_map<std::string, std::shared_ptr<Material>> _materials;
 };
 

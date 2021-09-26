@@ -25,7 +25,8 @@ namespace game {
 
 class PoisonEffect : public Effect {
 public:
-    PoisonEffect() : Effect(EffectType::Poison) {
+    PoisonEffect() :
+        Effect(EffectType::Poison) {
     }
 
     void applyTo(SpatialObject &object) override;

@@ -29,7 +29,8 @@ namespace reone {
 
 namespace game {
 
-InGameMenu::InGameMenu(Game *game) : GameGUI(game) {
+InGameMenu::InGameMenu(Game *game) :
+    GameGUI(game) {
     _resRef = getResRef("top");
 
     if (game->isTSL()) {
@@ -161,33 +162,35 @@ void InGameMenu::loadOptions() {
 
 bool InGameMenu::handle(const SDL_Event &event) {
     GUI *tabGui = getActiveTabGUI();
-    if (tabGui && tabGui->handle(event)) return true;
+    if (tabGui && tabGui->handle(event))
+        return true;
 
-    if (GUI::handle(event)) return true;
+    if (GUI::handle(event))
+        return true;
 
     return false;
 }
 
 GUI *InGameMenu::getActiveTabGUI() const {
     switch (_tab) {
-        case Tab::Equipment:
-            return _equip.get();
-        case Tab::Inventory:
-            return _inventory.get();
-        case Tab::Character:
-            return _character.get();
-        case Tab::Abilities:
-            return _abilities.get();
-        case Tab::Messages:
-            return _messages.get();
-        case Tab::Journal:
-            return _journal.get();
-        case Tab::Map:
-            return _map.get();
-        case Tab::Options:
-            return _options.get();
-        default:
-            return nullptr;
+    case Tab::Equipment:
+        return _equip.get();
+    case Tab::Inventory:
+        return _inventory.get();
+    case Tab::Character:
+        return _character.get();
+    case Tab::Abilities:
+        return _abilities.get();
+    case Tab::Messages:
+        return _messages.get();
+    case Tab::Journal:
+        return _journal.get();
+    case Tab::Map:
+        return _map.get();
+    case Tab::Options:
+        return _options.get();
+    default:
+        return nullptr;
     }
 }
 

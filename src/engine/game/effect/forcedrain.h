@@ -25,7 +25,8 @@ namespace game {
 
 class ForceDrainEffect : public Effect {
 public:
-    ForceDrainEffect() : Effect(EffectType::ForceDrain) {
+    ForceDrainEffect() :
+        Effect(EffectType::ForceDrain) {
     }
 
     void applyTo(SpatialObject &object) override;

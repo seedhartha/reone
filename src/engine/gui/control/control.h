@@ -19,8 +19,8 @@
 
 #include "../../graphics/texture/texture.h"
 #include "../../graphics/types.h"
-#include "../../scene/pipeline/control.h"
 #include "../../scene/graph.h"
+#include "../../scene/pipeline/control.h"
 
 #include "../types.h"
 
@@ -31,7 +31,7 @@ namespace resource {
 class GffStruct;
 class Strings;
 
-}
+} // namespace resource
 
 namespace graphics {
 
@@ -44,7 +44,7 @@ class Texture;
 class Textures;
 class Window;
 
-}
+} // namespace graphics
 
 namespace gui {
 
@@ -73,10 +73,10 @@ public:
     };
 
     struct Extent {
-        int left { 0 };
-        int top { 0 };
-        int width { 0 };
-        int height { 0 };
+        int left {0};
+        int top {0};
+        int width {0};
+        int height {0};
 
         Extent() = default;
         Extent(int left, int top, int width, int height);
@@ -89,15 +89,15 @@ public:
         std::shared_ptr<graphics::Texture> corner;
         std::shared_ptr<graphics::Texture> edge;
         std::shared_ptr<graphics::Texture> fill;
-        glm::vec3 color { 1.0f };
-        int dimension { 0 };
+        glm::vec3 color {1.0f};
+        int dimension {0};
     };
 
     struct Text {
         std::string text;
         std::shared_ptr<graphics::Font> font;
-        glm::vec3 color { 1.0f };
-        TextAlign align { TextAlign::CenterCenter };
+        glm::vec3 color {1.0f};
+        TextAlign align {TextAlign::CenterCenter};
     };
 
     static ControlType getType(const resource::GffStruct &gffs);
@@ -181,24 +181,24 @@ protected:
     GUI &_gui;
     ControlType _type;
 
-    int _id { -1 };
+    int _id {-1};
     std::string _tag;
     Extent _extent;
     std::shared_ptr<Border> _border;
     std::shared_ptr<Border> _hilight;
     Text _text;
     std::unique_ptr<scene::SceneGraph> _scene;
-    int _padding { 0 };
-    glm::mat4 _transform { 1.0f };
-    bool _visible { true };
-    bool _disabled { false };
-    bool _focus { false };
-    bool _focusable { true };
-    bool _clickable { false };
-    bool _discardEnabled { false };
-    glm::vec3 _discardColor { false };
-    glm::vec3 _borderColorOverride { 1.0f };
-    bool _useBorderColorOverride { false };
+    int _padding {0};
+    glm::mat4 _transform {1.0f};
+    bool _visible {true};
+    bool _disabled {false};
+    bool _focus {false};
+    bool _focusable {true};
+    bool _clickable {false};
+    bool _discardEnabled {false};
+    glm::vec3 _discardColor {false};
+    glm::vec3 _borderColorOverride {1.0f};
+    bool _useBorderColorOverride {false};
     std::vector<std::string> _textLines;
 
     // Services
@@ -229,8 +229,7 @@ protected:
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,
-        resource::Strings &strings
-    ) :
+        resource::Strings &strings) :
         _gui(gui),
         _type(type),
         _context(context),

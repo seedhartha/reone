@@ -25,7 +25,8 @@ namespace game {
 
 class ConfusedEffect : public Effect {
 public:
-    ConfusedEffect() : Effect(EffectType::Confused) {
+    ConfusedEffect() :
+        Effect(EffectType::Confused) {
     }
 
     void applyTo(SpatialObject &object) override;

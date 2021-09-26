@@ -40,78 +40,79 @@ Player::Player(Module *module, Area *area, Camera *camera, const Party *party) :
 
 bool Player::handle(const SDL_Event &event) {
     shared_ptr<Creature> partyLeader(_party->getLeader());
-    if (!partyLeader) return false;
+    if (!partyLeader)
+        return false;
 
     switch (event.type) {
-        case SDL_KEYDOWN:
-            return handleKeyDown(event.key);
-        case SDL_KEYUP:
-            return handleKeyUp(event.key);
-        case SDL_MOUSEBUTTONDOWN:
-            return handleMouseButtonDown(event.button);
-        case SDL_MOUSEBUTTONUP:
-            return handleMouseButtonUp(event.button);
-        default:
-            return false;
+    case SDL_KEYDOWN:
+        return handleKeyDown(event.key);
+    case SDL_KEYUP:
+        return handleKeyUp(event.key);
+    case SDL_MOUSEBUTTONDOWN:
+        return handleMouseButtonDown(event.button);
+    case SDL_MOUSEBUTTONUP:
+        return handleMouseButtonUp(event.button);
+    default:
+        return false;
     }
 }
 
 bool Player::handleKeyDown(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
-        case SDL_SCANCODE_W: {
-            _moveForward = true;
-            return true;
-        }
-        case SDL_SCANCODE_Z: {
-            _moveLeft = true;
-            return true;
-        }
-        case SDL_SCANCODE_S: {
-            _moveBackward = true;
-            return true;
-        }
-        case SDL_SCANCODE_C: {
-            _moveRight = true;
-            return true;
-        }
-        case SDL_SCANCODE_X: {
-            shared_ptr<Creature> partyLeader(_party->getLeader());
-            partyLeader->playAnimation(CombatAnimation::Draw, partyLeader->getWieldType());
-            return true;
-        }
-        case SDL_SCANCODE_B: {
-            _walk = true;
-            return true;
-        }
-        default:
-            return false;
+    case SDL_SCANCODE_W: {
+        _moveForward = true;
+        return true;
+    }
+    case SDL_SCANCODE_Z: {
+        _moveLeft = true;
+        return true;
+    }
+    case SDL_SCANCODE_S: {
+        _moveBackward = true;
+        return true;
+    }
+    case SDL_SCANCODE_C: {
+        _moveRight = true;
+        return true;
+    }
+    case SDL_SCANCODE_X: {
+        shared_ptr<Creature> partyLeader(_party->getLeader());
+        partyLeader->playAnimation(CombatAnimation::Draw, partyLeader->getWieldType());
+        return true;
+    }
+    case SDL_SCANCODE_B: {
+        _walk = true;
+        return true;
+    }
+    default:
+        return false;
     }
 }
 
 bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
     switch (event.keysym.scancode) {
-        case SDL_SCANCODE_W:
-            _moveForward = false;
-            return true;
+    case SDL_SCANCODE_W:
+        _moveForward = false;
+        return true;
 
-        case SDL_SCANCODE_Z:
-            _moveLeft = false;
-            return true;
+    case SDL_SCANCODE_Z:
+        _moveLeft = false;
+        return true;
 
-        case SDL_SCANCODE_S:
-            _moveBackward = false;
-            return true;
+    case SDL_SCANCODE_S:
+        _moveBackward = false;
+        return true;
 
-        case SDL_SCANCODE_C:
-            _moveRight = false;
-            return true;
+    case SDL_SCANCODE_C:
+        _moveRight = false;
+        return true;
 
-        case SDL_SCANCODE_B:
-            _walk = false;
-            return true;
+    case SDL_SCANCODE_B:
+        _walk = false;
+        return true;
 
-        default:
-            return false;
+    default:
+        return false;
     }
 }
 
@@ -137,7 +138,8 @@ bool Player::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
 
 void Player::update(float dt) {
     shared_ptr<Creature> partyLeader(_party->getLeader());
-    if (!partyLeader || partyLeader->isMovementRestricted()) return;
+    if (!partyLeader || partyLeader->isMovementRestricted())
+        return;
 
     float facing = 0.0f;
     bool movement = true;

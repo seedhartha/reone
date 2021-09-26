@@ -25,10 +25,9 @@ template <class T>
 class BezierCurve {
 public:
     T get(float fac) const {
-        return
-            (1.0f - fac) * (1.0f - fac) * _start +
-            2.0f * (1.0f - fac) * fac * _mid +
-            fac * fac * _end;
+        return (1.0f - fac) * (1.0f - fac) * _start +
+               2.0f * (1.0f - fac) * fac * _mid +
+               fac * fac * _end;
     }
 
     void setStart(T start) {

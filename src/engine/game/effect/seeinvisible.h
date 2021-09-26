@@ -25,7 +25,8 @@ namespace game {
 
 class SeeInvisibleEffect : public Effect {
 public:
-    SeeInvisibleEffect() : Effect(EffectType::SeeInvisible) {
+    SeeInvisibleEffect() :
+        Effect(EffectType::SeeInvisible) {
     }
 
     void applyTo(SpatialObject &object) override;

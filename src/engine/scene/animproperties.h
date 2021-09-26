@@ -25,16 +25,15 @@ namespace scene {
  * @see AnimationFlags
  */
 struct AnimationProperties {
-    int flags { 0 };
-    float speed { 1.0f };
-    float scale { 0.0f }; /**< animation scale; 0.0 to use the models scale */
-    float duration { -1.0f }; /**< duration in seconds; -1.0 is infinity */
+    int flags {0};
+    float speed {1.0f};
+    float scale {0.0f};     /**< animation scale; 0.0 to use the models scale */
+    float duration {-1.0f}; /**< duration in seconds; -1.0 is infinity */
 
     bool operator==(const AnimationProperties &other) const {
-        return
-            flags == other.flags &&
-            speed == other.speed &&
-            scale == other.scale;
+        return flags == other.flags &&
+               speed == other.speed &&
+               scale == other.scale;
     }
 
     static AnimationProperties fromFlags(int flags) {

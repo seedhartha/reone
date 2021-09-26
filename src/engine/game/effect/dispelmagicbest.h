@@ -25,7 +25,8 @@ namespace game {
 
 class DispelMagicBestEffect : public Effect {
 public:
-    DispelMagicBestEffect() : Effect(EffectType::DispelMagicBest) {
+    DispelMagicBestEffect() :
+        Effect(EffectType::DispelMagicBest) {
     }
 
     void applyTo(SpatialObject &object) override;

@@ -60,7 +60,8 @@ static constexpr int kActionHeight = 59;
 
 static string g_attackIcon("i_attack");
 
-SelectionOverlay::SelectionOverlay(Game *game) : _game(ensurePresent(game, "game")) {
+SelectionOverlay::SelectionOverlay(Game *game) :
+    _game(ensurePresent(game, "game")) {
     _actionSlots.resize(kNumActionSlots);
 }
 
@@ -78,21 +79,22 @@ void SelectionOverlay::load() {
 
 bool SelectionOverlay::handle(const SDL_Event &event) {
     switch (event.type) {
-        case SDL_MOUSEMOTION:
-            return handleMouseMotion(event.motion);
-        case SDL_MOUSEBUTTONDOWN:
-            return handleMouseButtonDown(event.button);
-        case SDL_MOUSEWHEEL:
-            return handleMouseWheel(event.wheel);
-        default:
-            return false;
+    case SDL_MOUSEMOTION:
+        return handleMouseMotion(event.motion);
+    case SDL_MOUSEBUTTONDOWN:
+        return handleMouseButtonDown(event.button);
+    case SDL_MOUSEWHEEL:
+        return handleMouseWheel(event.wheel);
+    default:
+        return false;
     }
 }
 
 bool SelectionOverlay::handleMouseMotion(const SDL_MouseMotionEvent &event) {
     _selectedActionSlot = -1;
 
-    if (!_selectedObject) return false;
+    if (!_selectedObject)
+        return false;
 
     for (int i = 0; i < kNumActionSlots; ++i) {
         float x, y;
@@ -107,39 +109,45 @@ bool SelectionOverlay::handleMouseMotion(const SDL_MouseMotionEvent &event) {
 }
 
 bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    if (event.button != SDL_BUTTON_LEFT) return false;
-    if (_selectedActionSlot == -1 || _selectedActionSlot >= _actionSlots.size()) return false;
+    if (event.button != SDL_BUTTON_LEFT)
+        return false;
+    if (_selectedActionSlot == -1 || _selectedActionSlot >= _actionSlots.size())
+        return false;
 
     shared_ptr<Creature> leader(_game->party().getLeader());
-    if (!leader) return false;
+    if (!leader)
+        return false;
 
     shared_ptr<Area> area(_game->module()->area());
     auto selectedObject = area->selectedObject();
-    if (!selectedObject) return false;
+    if (!selectedObject)
+        return false;
 
     const ActionSlot &slot = _actionSlots[_selectedActionSlot];
-    if (slot.indexSelected >= slot.actions.size()) return false;
+    if (slot.indexSelected >= slot.actions.size())
+        return false;
 
     const ContextAction &action = slot.actions[slot.indexSelected];
     switch (action.type) {
-        case ActionType::AttackObject:
-            leader->addAction(_game->actionFactory().newAttack(selectedObject, leader->getAttackRange(), true));
-            break;
-        case ActionType::UseFeat:
-            leader->addAction(_game->actionFactory().newUseFeat(selectedObject, action.feat));
-            break;
-        case ActionType::UseSkill:
-            leader->addAction(_game->actionFactory().newUseSkill(selectedObject, action.skill));
-            break;
-        default:
-            break;
+    case ActionType::AttackObject:
+        leader->addAction(_game->actionFactory().newAttack(selectedObject, leader->getAttackRange(), true));
+        break;
+    case ActionType::UseFeat:
+        leader->addAction(_game->actionFactory().newUseFeat(selectedObject, action.feat));
+        break;
+    case ActionType::UseSkill:
+        leader->addAction(_game->actionFactory().newUseSkill(selectedObject, action.skill));
+        break;
+    default:
+        break;
     }
 
     return true;
 }
 
 bool SelectionOverlay::handleMouseWheel(const SDL_MouseWheelEvent &event) {
-    if (_selectedActionSlot == -1 || _selectedActionSlot >= _actionSlots.size()) return false;
+    if (_selectedActionSlot == -1 || _selectedActionSlot >= _actionSlots.size())
+        return false;
 
     ActionSlot &slot = _actionSlots[_selectedActionSlot];
     size_t numSlotActions = slot.actions.size();
@@ -202,15 +210,15 @@ void SelectionOverlay::update() {
             if (_hasActions) {
                 for (auto &action : actions) {
                     switch (action.type) {
-                        case ActionType::AttackObject:
-                        case ActionType::UseFeat:
-                            _actionSlots[0].actions.push_back(action);
-                            break;
-                        case ActionType::UseSkill:
-                            _actionSlots[1].actions.push_back(action);
-                            break;
-                        default:
-                            break;
+                    case ActionType::AttackObject:
+                    case ActionType::UseFeat:
+                        _actionSlots[0].actions.push_back(action);
+                        break;
+                    case ActionType::UseSkill:
+                        _actionSlots[1].actions.push_back(action);
+                        break;
+                    default:
+                        break;
                     }
                 }
             }
@@ -261,7 +269,8 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
 }
 
 void SelectionOverlay::drawTitleBar() {
-    if (_selectedObject->name().empty()) return;
+    if (_selectedObject->name().empty())
+        return;
 
     const GraphicsOptions &opts = _game->options().graphics;
     float barHeight = _font->height() + kTitleBarPadding;
@@ -319,7 +328,8 @@ void SelectionOverlay::drawHealthBar() {
 }
 
 void SelectionOverlay::drawActionBar() {
-    if (!_hasActions) return;
+    if (!_hasActions)
+        return;
 
     for (int i = 0; i < kNumActionSlots; ++i) {
         drawActionFrame(i);
@@ -355,7 +365,8 @@ void SelectionOverlay::drawActionFrame(int index) {
 }
 
 bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) const {
-    if (!_selectedObject) return false;
+    if (!_selectedObject)
+        return false;
 
     const GraphicsOptions &opts = _game->options().graphics;
     x = opts.width * _selectedScreenCoords.x + (static_cast<float>(index - 1) - 0.5f) * kActionWidth + (index - 1) * kActionBarMargin;
@@ -366,32 +377,34 @@ bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) cons
 
 void SelectionOverlay::drawActionIcon(int index) {
     const ActionSlot &slot = _actionSlots[index];
-    if (slot.indexSelected >= slot.actions.size()) return;
+    if (slot.indexSelected >= slot.actions.size())
+        return;
 
     shared_ptr<Texture> texture;
     const ContextAction &action = slot.actions[slot.indexSelected];
     switch (action.type) {
-        case ActionType::AttackObject:
-            texture = _game->textures().get(g_attackIcon, TextureUsage::GUI);
-            break;
-        case ActionType::UseFeat: {
-            shared_ptr<Feat> feat(_game->feats().get(action.feat));
-            if (feat) {
-                texture = feat->icon;
-            }
-            break;
+    case ActionType::AttackObject:
+        texture = _game->textures().get(g_attackIcon, TextureUsage::GUI);
+        break;
+    case ActionType::UseFeat: {
+        shared_ptr<Feat> feat(_game->feats().get(action.feat));
+        if (feat) {
+            texture = feat->icon;
         }
-        case ActionType::UseSkill: {
-            shared_ptr<Skill> skill(_game->skills().get(action.skill));
-            if (skill) {
-                texture = skill->icon;
-            }
-            break;
-        }
-        default:
-            break;
+        break;
     }
-    if (!texture) return;
+    case ActionType::UseSkill: {
+        shared_ptr<Skill> skill(_game->skills().get(action.skill));
+        if (skill) {
+            texture = skill->icon;
+        }
+        break;
+    }
+    default:
+        break;
+    }
+    if (!texture)
+        return;
 
     _game->context().setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
@@ -417,9 +430,7 @@ void SelectionOverlay::drawActionIcon(int index) {
 glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {
     static glm::vec3 red(1.0f, 0.0f, 0.0f);
 
-    return (_selectedObject && _selectedHostile) ?
-        red :
-        _game->getGUIColorBase();
+    return (_selectedObject && _selectedHostile) ? red : _game->getGUIColorBase();
 }
 
 } // namespace game

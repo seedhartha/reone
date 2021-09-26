@@ -40,7 +40,7 @@ void RimWriter::save(const fs::path &path) {
     writer.putUint32(0); // reserved
     writer.putUint32(numResources);
     writer.putUint32(0x78); // offset to resource headers
-    writer.putBytes(100); // reserved
+    writer.putBytes(100);   // reserved
 
     uint32_t id = 0;
     uint32_t offset = 0x78 + numResources * 32;

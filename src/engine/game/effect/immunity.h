@@ -25,7 +25,8 @@ namespace game {
 
 class ImmunityEffect : public Effect {
 public:
-    ImmunityEffect() : Effect(EffectType::Immunity) {
+    ImmunityEffect() :
+        Effect(EffectType::Immunity) {
     }
 
     void applyTo(SpatialObject &object) override;

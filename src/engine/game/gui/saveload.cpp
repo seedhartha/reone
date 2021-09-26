@@ -45,7 +45,8 @@ static constexpr int kStrRefSave = 1587;
 static constexpr int kStrRefSaveGame = 1588;
 static constexpr int kStrRefLoad = 1589;
 
-SaveLoad::SaveLoad(Game *game) : GameGUI(game) {
+SaveLoad::SaveLoad(Game *game) :
+    GameGUI(game) {
     _resRef = getResRef("saveload");
 
     initForGame();
@@ -96,18 +97,18 @@ void SaveLoad::load() {
     _binding.btnSaveLoad->setOnClick([this]() {
         int number = getSelectedSaveNumber();
         switch (_mode) {
-            case Mode::Save:
-                if (number == -1) {
-                    number = getNewSaveNumber();
-                }
-                saveGame(number);
-                refresh();
-                break;
-            default:
-                if (number != -1) {
-                    loadGame(number);
-                }
-                break;
+        case Mode::Save:
+            if (number == -1) {
+                number = getNewSaveNumber();
+            }
+            saveGame(number);
+            refresh();
+            break;
+        default:
+            if (number != -1) {
+                loadGame(number);
+            }
+            break;
         }
     });
     _binding.btnDelete->setOnClick([this]() {
@@ -120,13 +121,13 @@ void SaveLoad::load() {
     _binding.btnBack->setOnClick([this]() {
         _binding.lbGames->clearSelection();
         switch (_mode) {
-            case Mode::Save:
-            case Mode::LoadFromInGame:
-                _game->openInGame();
-                break;
-            default:
-                _game->openMainMenu();
-                break;
+        case Mode::Save:
+        case Mode::LoadFromInGame:
+            _game->openInGame();
+            break;
+        default:
+            _game->openMainMenu();
+            break;
         }
     });
 }
@@ -230,8 +231,7 @@ void SaveLoad::indexSavedGame(fs::path path) {
         descriptor.save = peekSavedGame(path);
         descriptor.path = move(path);
         _saves.push_back(move(descriptor));
-    }
-    catch (const exception &e) {
+    } catch (const exception &e) {
         warn("Error indexing a saved game: " + string(e.what()));
     }
 }
@@ -242,7 +242,8 @@ void SaveLoad::setMode(Mode mode) {
 
 int SaveLoad::getSelectedSaveNumber() const {
     int hilightedIdx = _binding.lbGames->selectedItemIndex();
-    if (hilightedIdx == -1) return -1;
+    if (hilightedIdx == -1)
+        return -1;
 
     string tag(_binding.lbGames->getItemAt(hilightedIdx).tag);
 

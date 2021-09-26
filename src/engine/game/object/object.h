@@ -107,21 +107,21 @@ protected:
 
     Game *_game;
 
-    uint32_t _id { 0 };
+    uint32_t _id {0};
     std::string _tag;
-    ObjectType _type { ObjectType::Invalid };
+    ObjectType _type {ObjectType::Invalid};
     std::string _blueprintResRef;
     std::string _name;
     std::string _conversation;
-    bool _minOneHP { false };
-    int _hitPoints { 0 };
-    int _maxHitPoints { 0 };
-    int _currentHitPoints { 0 };
-    bool _dead { false };
-    bool _plot { false };
-    bool _commandable { true };
-    bool _autoRemoveKey { false };
-    bool _interruptable { false };
+    bool _minOneHP {false};
+    int _hitPoints {0};
+    int _maxHitPoints {0};
+    int _currentHitPoints {0};
+    bool _dead {false};
+    bool _plot {false};
+    bool _commandable {true};
+    bool _autoRemoveKey {false};
+    bool _interruptable {false};
 
     // Actions
 

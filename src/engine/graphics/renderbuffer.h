@@ -44,8 +44,8 @@ public:
     uint32_t id() const { return _id; }
 
 private:
-    bool _inited { false };
-    uint32_t _id { 0 };
+    bool _inited {false};
+    uint32_t _id {0};
 };
 
 } // namespace graphics

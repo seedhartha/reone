@@ -38,8 +38,7 @@ Model::Model(
     shared_ptr<ModelNode> rootNode,
     vector<shared_ptr<Animation>> animations,
     shared_ptr<Model> superModel,
-    float animationScale
-) :
+    float animationScale) :
     _name(move(name)),
     _classification(classification),
     _rootNode(ensurePresent(rootNode, "rootNode")),
@@ -91,7 +90,8 @@ shared_ptr<ModelNode> Model::getNodeByNameRecursive(const string &name) const {
 
 shared_ptr<ModelNode> Model::getAABBNode() const {
     for (auto &node : _nodeByName) {
-        if (node.second->isAABBMesh()) return node.second;
+        if (node.second->isAABBMesh())
+            return node.second;
     }
     return nullptr;
 }
@@ -127,7 +127,8 @@ vector<string> Model::getAnimationNames() const {
 
 shared_ptr<Animation> Model::getAnimation(const string &name) const {
     auto maybeAnim = _animations.find(name);
-    if (maybeAnim != _animations.end()) return maybeAnim->second;
+    if (maybeAnim != _animations.end())
+        return maybeAnim->second;
 
     shared_ptr<Animation> anim;
     if (_superModel) {

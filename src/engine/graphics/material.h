@@ -23,11 +23,11 @@ namespace graphics {
 
 struct Material {
     // Blinn-Phong
-    float shininess { 8.0f };
+    float shininess {8.0f};
 
     // PBR
-    float metallic { 0.0f };
-    float roughness { 0.5f };
+    float metallic {0.0f};
+    float roughness {0.5f};
 };
 
 } // namespace graphics

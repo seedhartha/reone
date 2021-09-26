@@ -38,7 +38,7 @@ static constexpr char kPatchFilename[] = "patch.erf";
 static constexpr char kWavesDirectoryName[] = "streamwaves";
 static constexpr char kExeFilename[] = "swkotor.exe";
 
-static vector<string> g_nonTransientLipFiles { "global.mod", "localization.mod" };
+static vector<string> g_nonTransientLipFiles {"global.mod", "localization.mod"};
 
 KotOR::KotOR(
     fs::path path,
@@ -77,8 +77,7 @@ KotOR::KotOR(
     WorldRenderPipeline &worldRenderPipeline,
     Scripts &scripts,
     Resources &resources,
-    Strings &strings
-) :
+    Strings &strings) :
     Game(
         GameID::KotOR,
         move(path),
@@ -117,8 +116,7 @@ KotOR::KotOR(
         worldRenderPipeline,
         scripts,
         resources,
-        strings
-) {
+        strings) {
     _mainMenuMusicResRef = "mus_theme_cult";
     _charGenMusicResRef = "mus_theme_rep";
     _charGenLoadScreenResRef = "load_chargen";

@@ -38,16 +38,16 @@ void AudioStream::fill(int frameIdx, uint32_t buffer) {
 
 int AudioStream::getALAudioFormat(AudioFormat format) const {
     switch (format) {
-        case AudioFormat::Mono8:
-            return AL_FORMAT_MONO8;
-        case AudioFormat::Mono16:
-            return AL_FORMAT_MONO16;
-        case AudioFormat::Stereo8:
-            return AL_FORMAT_STEREO8;
-        case AudioFormat::Stereo16:
-            return AL_FORMAT_STEREO16;
-        default:
-            throw logic_error("Unknown audio format: " + to_string(static_cast<int>(format)));
+    case AudioFormat::Mono8:
+        return AL_FORMAT_MONO8;
+    case AudioFormat::Mono16:
+        return AL_FORMAT_MONO16;
+    case AudioFormat::Stereo8:
+        return AL_FORMAT_STEREO8;
+    case AudioFormat::Stereo16:
+        return AL_FORMAT_STEREO16;
+    default:
+        throw logic_error("Unknown audio format: " + to_string(static_cast<int>(format)));
     }
 }
 
