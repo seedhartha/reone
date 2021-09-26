@@ -27,7 +27,7 @@
 #include "../resource/resources.h"
 #include "../scene/types.h"
 
-#include "effect/effectfactory.h"
+#include "effect/factory.h"
 #include "game.h"
 #include "party.h"
 

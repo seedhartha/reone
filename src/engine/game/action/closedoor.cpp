@@ -19,7 +19,7 @@
 
 #include "../game.h"
 #include "../object/door.h"
-#include "../object/objectfactory.h"
+#include "../object/factory.h"
 
 using namespace std;
 

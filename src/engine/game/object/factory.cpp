@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "objectfactory.h"
+#include "factory.h"
 
 #include "../../common/collectionutil.h"
 

@@ -23,7 +23,7 @@
 #include "../../game.h"
 #include "../../object/creature.h"
 #include "../../object/item.h"
-#include "../../object/objectfactory.h"
+#include "../../object/factory.h"
 #include "../../party.h"
 
 #include "ingame.h"

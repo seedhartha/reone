@@ -29,8 +29,8 @@
 #include "../../graphics/window.h"
 #include "../../resource/resources.h"
 
-#include "../action/actionfactory.h"
 #include "../action/attack.h"
+#include "../action/factory.h"
 #include "../action/usefeat.h"
 #include "../action/useskill.h"
 #include "../d20/feats.h"

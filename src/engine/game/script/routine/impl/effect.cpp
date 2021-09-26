@@ -26,7 +26,7 @@
 
 #include "../../../game.h"
 #include "../../../effect/effect.h"
-#include "../../../effect/effectfactory.h"
+#include "../../../effect/factory.h"
 #include "../../../types.h"
 
 #include "argutil.h"

@@ -22,8 +22,8 @@
 
 #include "../room.h"
 
+#include "factory.h"
 #include "item.h"
-#include "objectfactory.h"
 
 using namespace std;
 

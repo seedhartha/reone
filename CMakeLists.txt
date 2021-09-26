@@ -415,7 +415,6 @@ target_precompile_headers(libscript PRIVATE src/engine/pch.h)
 
 set(GAME_HEADERS
     src/engine/game/action/action.h
-    src/engine/game/action/actionfactory.h
     src/engine/game/action/attack.h
     src/engine/game/action/barkstring.h
     src/engine/game/action/castfakespellatlocation.h
@@ -428,6 +427,7 @@ set(GAME_HEADERS
     src/engine/game/action/equipmostdamagingmelee.h
     src/engine/game/action/equipmostdamagingranged.h
     src/engine/game/action/equipmosteffectivearmor.h
+    src/engine/game/action/factory.h
     src/engine/game/action/follow.h
     src/engine/game/action/followleader.h
     src/engine/game/action/followowner.h
@@ -475,7 +475,7 @@ set(GAME_HEADERS
     src/engine/game/camera/static.h
     src/engine/game/camera/thirdperson.h
     src/engine/game/character.h
-    src/engine/game/combat/combat.h
+    src/engine/game/combat.h
     src/engine/game/console.h
     src/engine/game/contextaction.h
     src/engine/game/cursors.h
@@ -528,9 +528,9 @@ set(GAME_HEADERS
     src/engine/game/effect/droidscramble.h
     src/engine/game/effect/droidstun.h
     src/engine/game/effect/effect.h
-    src/engine/game/effect/effectfactory.h
     src/engine/game/effect/entangle.h
     src/engine/game/effect/factionmodifier.h
+    src/engine/game/effect/factory.h
     src/engine/game/effect/forcebody.h
     src/engine/game/effect/forcedrain.h
     src/engine/game/effect/forcefizzle.h
@@ -625,10 +625,10 @@ set(GAME_HEADERS
     src/engine/game/object/creature.h
     src/engine/game/object/door.h
     src/engine/game/object/encounter.h
+    src/engine/game/object/factory.h
     src/engine/game/object/item.h
     src/engine/game/object/module.h
     src/engine/game/object/object.h
-    src/engine/game/object/objectfactory.h
     src/engine/game/object/placeable.h
     src/engine/game/object/placeablecamera.h
     src/engine/game/object/sound.h
@@ -715,7 +715,7 @@ set(GAME_SOURCES
     src/engine/game/camera/firstperson.cpp
     src/engine/game/camera/static.cpp
     src/engine/game/camera/thirdperson.cpp
-    src/engine/game/combat/combat.cpp
+    src/engine/game/combat.cpp
     src/engine/game/console.cpp
     src/engine/game/cursors.cpp
     src/engine/game/d20/attributes.cpp
@@ -857,10 +857,10 @@ set(GAME_SOURCES
     src/engine/game/object/creature.cpp
     src/engine/game/object/door.cpp
     src/engine/game/object/encounter.cpp
+    src/engine/game/object/factory.cpp
     src/engine/game/object/item.cpp
     src/engine/game/object/module.cpp
     src/engine/game/object/object.cpp
-    src/engine/game/object/objectfactory.cpp
     src/engine/game/object/placeable.cpp
     src/engine/game/object/placeablecamera.cpp
     src/engine/game/object/sound.cpp

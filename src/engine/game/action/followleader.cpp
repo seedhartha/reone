@@ -18,7 +18,7 @@
 #include "followleader.h"
 
 #include "../game.h"
-#include "../object/objectfactory.h"
+#include "../object/factory.h"
 #include "../party.h"
 
 namespace reone {
