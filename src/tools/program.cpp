@@ -85,7 +85,23 @@ int Program::run() {
 }
 
 void Program::initOptions() {
-    _optsCmdLine.add_options()("game", po::value<string>(), "path to game directory")("dest", po::value<string>(), "path to destination directory")("list", "list file contents")("extract", "extract file contents")("unwrap", "unwrap an audio file")("to-json", "convert 2DA, GFF or TLK file to JSON")("to-tga", "convert TPC image to TGA")("to-2da", "convert JSON to 2DA")("to-gff", "convert JSON to GFF")("to-rim", "create RIM archive from directory")("to-erf", "create ERF archive from directory")("to-mod", "create MOD archive from directory")("to-pth", "convert ASCII PTH to binary PTH")("to-ascii", "convert binary PTH to ASCII")("to-tlk", "convert JSON to TLK")("to-lip", "convert JSON to LIP")("target", po::value<string>(), "target name or path to input file");
+    _optsCmdLine.add_options()                                             //
+        ("game", po::value<string>(), "path to game directory")            //
+        ("dest", po::value<string>(), "path to destination directory")     //
+        ("list", "list file contents")("extract", "extract file contents") //
+        ("unwrap", "unwrap an audio file")                                 //
+        ("to-json", "convert 2DA, GFF or TLK file to JSON")                //
+        ("to-tga", "convert TPC image to TGA")                             //
+        ("to-2da", "convert JSON to 2DA")                                  //
+        ("to-gff", "convert JSON to GFF")                                  //
+        ("to-rim", "create RIM archive from directory")                    //
+        ("to-erf", "create ERF archive from directory")                    //
+        ("to-mod", "create MOD archive from directory")                    //
+        ("to-pth", "convert ASCII PTH to binary PTH")                      //
+        ("to-ascii", "convert binary PTH to ASCII")                        //
+        ("to-tlk", "convert JSON to TLK")                                  //
+        ("to-lip", "convert JSON to LIP")                                  //
+        ("target", po::value<string>(), "target name or path to input file");
 }
 
 void Program::parseOptions() {

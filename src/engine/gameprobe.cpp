@@ -15,25 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "gameprobe.h"
 
-#include "../audio/options.h"
-#include "../graphics/options.h"
+#include "common/pathutil.h"
+
+using namespace std;
+
+using namespace reone::game;
+
+namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace game {
+GameID GameProbe::invoke() {
+    // If there is a KotOR executable then game is KotOR
+    fs::path exePathK1(getPathIgnoreCase(_gamePath, "swkotor.exe", false));
+    if (!exePathK1.empty())
+        return GameID::KotOR;
 
-struct Options {
-    boost::filesystem::path gamePath;
-    graphics::GraphicsOptions graphics;
-    audio::AudioOptions audio;
-    std::string module;
-    bool developer {false};
-    bool logToFile {false};
-    int logChannels {0};
-};
+    // If there is a TSL executable then game is TSL
+    fs::path exePathK2(getPathIgnoreCase(_gamePath, "swkotor2.exe", false));
+    if (!exePathK2.empty())
+        return GameID::TSL;
 
-} // namespace game
+    throw logic_error("Unable to determine game ID: " + _gamePath.string());
+}
 
 } // namespace reone

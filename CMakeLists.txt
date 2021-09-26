@@ -916,6 +916,7 @@ target_precompile_headers(libgame PRIVATE src/engine/pch.h)
 ## reone executable
 
 set(REONE_HEADERS
+    src/engine/di/container.h
     src/engine/di/services/audio.h
     src/engine/di/services/common.h
     src/engine/di/services/game.h
@@ -924,9 +925,12 @@ set(REONE_HEADERS
     src/engine/di/services/scene.h
     src/engine/di/services/script.h
     src/engine/engine.h
+    src/engine/gameprobe.h
+    src/engine/optionsparser.h
     src/engine/pch.h)
 
 set(REONE_SOURCES
+    src/engine/di/container.cpp
     src/engine/di/services/audio.cpp
     src/engine/di/services/common.cpp
     src/engine/di/services/game.cpp
@@ -935,7 +939,9 @@ set(REONE_SOURCES
     src/engine/di/services/scene.cpp
     src/engine/di/services/script.cpp
     src/engine/engine.cpp
-    src/engine/main.cpp)
+    src/engine/gameprobe.cpp
+    src/engine/main.cpp
+    src/engine/optionsparser.cpp)
 
 if(WIN32)
     list(APPEND REONE_SOURCES res/reone.rc)
