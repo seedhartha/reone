@@ -38,23 +38,20 @@ namespace reone {
 
 namespace gui {
 
-ProgressBar::ProgressBar(GUI *gui) : Control(gui, ControlType::ScrollBar) {
-}
-
 void ProgressBar::load(const GffStruct &gffs) {
     Control::load(gffs);
 
     shared_ptr<GffStruct> dir(gffs.getStruct("PROGRESS"));
     if (dir) {
         string fill(dir->getString("FILL"));
-        _progress.fill = _gui->textures().get(fill, TextureUsage::GUI);
+        _progress.fill = _textures.get(fill, TextureUsage::GUI);
     }
 }
 
 void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
     if (_value == 0 || !_progress.fill) return;
 
-    _gui->context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _progress.fill->bind();
 
     float w = _extent.width * _value / 100.0f;
@@ -64,11 +61,11 @@ void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
     transform = glm::scale(transform, glm::vec3(w, _extent.height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _gui->window().getOrthoProjection();
+    uniforms.combined.general.projection = _window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _gui->meshes().quad().draw();
+    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    _meshes.quad().draw();
 }
 
 void ProgressBar::setValue(int value) {

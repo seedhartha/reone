@@ -43,10 +43,6 @@ namespace gui {
 
 static constexpr int kItemPadding = 3;
 
-ListBox::ListBox(GUI *gui) : Control(gui, ControlType::ListBox) {
-    _clickable = true;
-}
-
 void ListBox::clearItems() {
     _items.clear();
     _itemOffset = 0;
@@ -86,12 +82,12 @@ void ListBox::load(const GffStruct &gffs) {
     shared_ptr<GffStruct> protoItem(gffs.getStruct("PROTOITEM"));
     if (protoItem) {
         ControlType type = _protoItemType == ControlType::Invalid ? getType(*protoItem) : _protoItemType;
-        _protoItem = of(_gui, type, getTag(*protoItem));
+        _protoItem = _gui.newControl(type, getTag(*protoItem));
         _protoItem->load(*protoItem);
     }
     shared_ptr<GffStruct> scrollBar(gffs.getStruct("SCROLLBAR"));
     if (scrollBar) {
-        _scrollBar = of(_gui, getType(*scrollBar), getTag(*scrollBar));
+        _scrollBar = _gui.newControl(getType(*scrollBar), getTag(*scrollBar));
         _scrollBar->load(*scrollBar);
     }
 }

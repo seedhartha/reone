@@ -29,13 +29,20 @@ namespace reone {
 namespace resource {
 
 class GffStruct;
+class Strings;
 
 }
 
 namespace graphics {
 
+class Context;
 class Font;
+class Fonts;
+class Meshes;
+class Shaders;
 class Texture;
+class Textures;
+class Window;
 
 }
 
@@ -96,7 +103,6 @@ public:
     static ControlType getType(const resource::GffStruct &gffs);
     static std::string getTag(const resource::GffStruct &gffs);
     static std::string getParent(const resource::GffStruct &gffs);
-    static std::unique_ptr<Control> of(GUI *gui, ControlType type, const std::string &tag);
 
     virtual ~Control() = default;
 
@@ -122,6 +128,7 @@ public:
     const Text &text() const { return _text; }
     const std::vector<std::string> &textLines() const { return _textLines; }
 
+    void setTag(std::string tag) { _tag = std::move(tag); }
     void setBorder(Border border);
     void setBorderFill(std::string resRef);
     void setBorderFill(std::shared_ptr<graphics::Texture> texture);
@@ -171,8 +178,9 @@ public:
     // END Event listeners
 
 protected:
-    GUI *_gui { nullptr };
-    ControlType _type { ControlType::Invalid };
+    GUI &_gui;
+    ControlType _type;
+
     int _id { -1 };
     std::string _tag;
     Extent _extent;
@@ -193,6 +201,18 @@ protected:
     bool _useBorderColorOverride { false };
     std::vector<std::string> _textLines;
 
+    // Services
+
+    graphics::Context &_context;
+    graphics::Fonts &_fonts;
+    graphics::Meshes &_meshes;
+    graphics::Shaders &_shaders;
+    graphics::Textures &_textures;
+    graphics::Window &_window;
+    resource::Strings &_strings;
+
+    // END Services
+
     // Event listeners
 
     std::function<void()> _onClick;
@@ -200,7 +220,27 @@ protected:
 
     // END Event listeners
 
-    Control(GUI *, ControlType type);
+    Control(
+        GUI &gui,
+        ControlType type,
+        graphics::Context &context,
+        graphics::Fonts &fonts,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Window &window,
+        resource::Strings &strings
+    ) :
+        _gui(gui),
+        _type(type),
+        _context(context),
+        _fonts(fonts),
+        _meshes(meshes),
+        _shaders(shaders),
+        _textures(textures),
+        _window(window),
+        _strings(strings) {
+    }
 
     void drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size);
     void drawText(const std::vector<std::string> &lines, const glm::ivec2 &offset, const glm::ivec2 &size);

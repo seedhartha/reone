@@ -25,10 +25,53 @@ namespace gui {
 
 class Button : public Control {
 public:
-    Button(GUI *gui);
+    Button(
+        GUI &gui,
+        graphics::Context &context,
+        graphics::Fonts &fonts,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Window &window,
+        resource::Strings &strings
+    ) :
+        Button(
+            gui,
+            ControlType::Button,
+            context,
+            fonts,
+            meshes,
+            shaders,
+            textures,
+            window,
+            strings) {
+    }
 
 protected:
-    Button(GUI *gui, ControlType type);
+    Button(
+        GUI &gui,
+        ControlType type,
+        graphics::Context &context,
+        graphics::Fonts &fonts,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Window &window,
+        resource::Strings &strings
+    ) :
+        Control(
+            gui,
+            type,
+            context,
+            fonts,
+            meshes,
+            shaders,
+            textures,
+            window,
+            strings) {
+
+        _clickable = true;
+    }
 };
 
 } // namespace gui

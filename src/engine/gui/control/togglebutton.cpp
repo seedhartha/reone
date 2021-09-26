@@ -23,9 +23,6 @@ namespace reone {
 
 namespace gui {
 
-ToggleButton::ToggleButton(GUI *gui) : Button(gui, ControlType::ToggleButton) {
-}
-
 const glm::vec3 &ToggleButton::getBorderColor() const {
     return _on ? _onColor : Button::getBorderColor();
 }

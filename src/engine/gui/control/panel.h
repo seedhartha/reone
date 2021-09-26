@@ -25,7 +25,27 @@ namespace gui {
 
 class Panel : public Control {
 public:
-    Panel(GUI *gui);
+    Panel(
+        GUI &gui,
+        graphics::Context &context,
+        graphics::Fonts &fonts,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Window &window,
+        resource::Strings &strings
+    ) :
+        Control(
+            gui,
+            ControlType::Panel,
+            context,
+            fonts,
+            meshes,
+            shaders,
+            textures,
+            window,
+            strings) {
+    }
 };
 
 } // namespace gui

@@ -29,6 +29,16 @@
 #include "../resource/gffstruct.h"
 #include "../resource/resources.h"
 
+#include "control/button.h"
+#include "control/imagebutton.h"
+#include "control/label.h"
+#include "control/listbox.h"
+#include "control/panel.h"
+#include "control/progressbar.h"
+#include "control/scrollbar.h"
+#include "control/slider.h"
+#include "control/togglebutton.h"
+
 using namespace std;
 using namespace std::placeholders;
 
@@ -80,7 +90,7 @@ void GUI::load() {
     ControlType type = Control::getType(*gui);
     string tag(Control::getTag(*gui));
 
-    _rootControl = Control::of(this, type, tag);
+    _rootControl = newControl(type, tag);
     _rootControl->load(*gui);
     _controlByTag[tag] = _rootControl.get();
 
@@ -115,7 +125,7 @@ void GUI::loadControl(const GffStruct &gffs) {
     string tag(Control::getTag(gffs));
     string parent(Control::getParent(gffs));
 
-    shared_ptr<Control> control(Control::of(this, type, tag));
+    shared_ptr<Control> control(newControl(type, tag));
     if (!control) return;
 
     preloadControl(*control);
@@ -292,6 +302,49 @@ shared_ptr<Control> GUI::getControl(const string &tag) const {
     }
     warn(boost::format("Control '%s' not found in GUI '%s'") % tag % _resRef);
     return shared_ptr<Control>();
+}
+
+unique_ptr<Control> GUI::newControl(
+    ControlType type,
+    string tag
+) {
+    unique_ptr<Control> control;
+    switch (type) {
+        case ControlType::Panel:
+            control = make_unique<Panel>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+            break;
+        case ControlType::Label:
+            control = make_unique<Label>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+            break;
+        case ControlType::ImageButton:
+            control = make_unique<ImageButton>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+            break;
+        case ControlType::Button:
+            control = make_unique<Button>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+            break;
+        case ControlType::ToggleButton:
+            control = make_unique<ToggleButton>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+            break;
+        case ControlType::Slider:
+            control = make_unique<Slider>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+            break;
+        case ControlType::ScrollBar:
+            control = make_unique<ScrollBar>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+            break;
+        case ControlType::ProgressBar:
+            control = make_unique<ProgressBar>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+            break;
+        case ControlType::ListBox:
+            control = make_unique<ListBox>(*this, _context, _fonts, _meshes, _shaders, _textures, _window, _strings);
+            break;
+        default:
+            debug("Unsupported control type: " + to_string(static_cast<int>(type)), LogChannels::gui);
+            return nullptr;
+    }
+
+    control->setTag(tag);
+
+    return move(control);
 }
 
 } // namespace gui

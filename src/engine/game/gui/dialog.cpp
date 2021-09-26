@@ -116,7 +116,7 @@ void DialogGUI::loadFrames() {
 }
 
 void DialogGUI::addFrame(string tag, int top, int height) {
-    auto frame = make_unique<Panel>(this);
+    auto frame = newControl(ControlType::Panel, tag);
 
     Control::Extent extent;
     extent.left = -_rootControl->extent().left;
