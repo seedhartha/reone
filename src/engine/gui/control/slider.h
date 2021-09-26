@@ -25,7 +25,27 @@ namespace gui {
 
 class Slider : public Control {
 public:
-    Slider(GUI *gui);
+    Slider(
+        GUI &gui,
+        graphics::Context &context,
+        graphics::Fonts &fonts,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Window &window,
+        resource::Strings &strings
+    ) :
+        Control(
+            gui,
+            ControlType::Slider,
+            context,
+            fonts,
+            meshes,
+            shaders,
+            textures,
+            window,
+            strings) {
+    }
 };
 
 } // namespace gui

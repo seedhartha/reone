@@ -25,7 +25,27 @@ namespace gui {
 
 class ProgressBar : public Control {
 public:
-    ProgressBar(GUI *gui);
+    ProgressBar(
+        GUI &gui,
+        graphics::Context &context,
+        graphics::Fonts &fonts,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Window &window,
+        resource::Strings &strings
+    ) :
+        Control(
+            gui,
+            ControlType::ProgressBar,
+            context,
+            fonts,
+            meshes,
+            shaders,
+            textures,
+            window,
+            strings) {
+    }
 
     void load(const resource::GffStruct &gffs) override;
     void draw(const glm::ivec2 &offset, const std::vector<std::string> &text) override;

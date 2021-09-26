@@ -25,7 +25,29 @@ namespace gui {
 
 class ImageButton : public Control {
 public:
-    ImageButton(GUI *gui);
+    ImageButton(
+        GUI &gui,
+        graphics::Context &context,
+        graphics::Fonts &fonts,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Window &window,
+        resource::Strings &strings
+    ) :
+        Control(
+            gui,
+            ControlType::ImageButton,
+            context,
+            fonts,
+            meshes,
+            shaders,
+            textures,
+            window,
+            strings) {
+
+        _clickable = true;
+    }
 
     void load(const resource::GffStruct &gffs) override;
 

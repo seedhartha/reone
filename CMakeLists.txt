@@ -362,14 +362,10 @@ set(GUI_HEADERS
     src/engine/gui/types.h)
 
 set(GUI_SOURCES
-    src/engine/gui/control/button.cpp
     src/engine/gui/control/control.cpp
     src/engine/gui/control/imagebutton.cpp
-    src/engine/gui/control/label.cpp
     src/engine/gui/control/listbox.cpp
-    src/engine/gui/control/panel.cpp
     src/engine/gui/control/progressbar.cpp
-    src/engine/gui/control/slider.cpp
     src/engine/gui/control/scrollbar.cpp
     src/engine/gui/control/togglebutton.cpp
     src/engine/gui/gui.cpp

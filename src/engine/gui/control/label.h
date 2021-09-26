@@ -25,7 +25,29 @@ namespace gui {
 
 class Label : public Control {
 public:
-    Label(GUI *gui);
+    Label(
+        GUI &gui,
+        graphics::Context &context,
+        graphics::Fonts &fonts,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Window &window,
+        resource::Strings &strings
+    ) :
+        Control(
+            gui,
+            ControlType::Label,
+            context,
+            fonts,
+            meshes,
+            shaders,
+            textures,
+            window,
+            strings) {
+
+        _focusable = false;
+    }
 };
 
 } // namespace gui

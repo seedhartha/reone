@@ -61,22 +61,7 @@ public:
 
     void resetFocus();
 
-    // Services
-
-    graphics::Context &context() { return _context; }
-    graphics::Features &features() { return _features; }
-    graphics::Fonts &fonts() { return _fonts; }
-    graphics::Materials &materials() { return _materials; }
-    graphics::Meshes &meshes() { return _meshes; }
-    graphics::PBRIBL &pbrIbl() { return _pbrIbl; }
-    graphics::Shaders &shaders() { return _shaders; }
-    graphics::Textures &textures() { return _textures; }
-    graphics::Window &window() { return _window; }
-
-    resource::Resources &resources() { return _resources; }
-    resource::Strings &strings() { return _strings; }
-
-    // END Services
+    std::unique_ptr<Control> newControl(ControlType type, std::string tag);
 
 protected:
     enum class ScalingMode {

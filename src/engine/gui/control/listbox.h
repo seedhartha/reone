@@ -42,7 +42,29 @@ public:
         std::vector<std::string> _textLines;
     };
 
-    ListBox(GUI *gui);
+    ListBox(
+        GUI &gui,
+        graphics::Context &context,
+        graphics::Fonts &fonts,
+        graphics::Meshes &meshes,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Window &window,
+        resource::Strings &strings
+    ) :
+        Control(
+            gui,
+            ControlType::ListBox,
+            context,
+            fonts,
+            meshes,
+            shaders,
+            textures,
+            window,
+            strings) {
+
+        _clickable = true;
+    }
 
     void clearItems();
     void addItem(Item &&item);

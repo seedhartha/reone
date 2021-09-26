@@ -39,13 +39,9 @@ namespace gui {
 
 static const char kIconFontResRef[] = "dialogfont10x10a";
 
-ImageButton::ImageButton(GUI *gui) : Control(gui, ControlType::ImageButton) {
-    _clickable = true;
-}
-
 void ImageButton::load(const GffStruct &gffs) {
     Control::load(gffs);
-    _iconFont = _gui->fonts().get(kIconFontResRef);
+    _iconFont = _fonts.get(kIconFontResRef);
 }
 
 void ImageButton::draw(
@@ -91,7 +87,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconFrame) {
-        _gui->context().setActiveTextureUnit(TextureUnits::diffuseMap);
+        _context.setActiveTextureUnit(TextureUnits::diffuseMap);
         iconFrame->bind();
 
         glm::mat4 transform(1.0f);
@@ -99,16 +95,16 @@ void ImageButton::drawIcon(
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = _gui->window().getOrthoProjection();
+        uniforms.combined.general.projection = _window.getOrthoProjection();
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-        _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-        _gui->meshes().quad().draw();
+        _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+        _meshes.quad().draw();
     }
 
     if (iconTexture) {
-        _gui->context().setActiveTextureUnit(TextureUnits::diffuseMap);
+        _context.setActiveTextureUnit(TextureUnits::diffuseMap);
         iconTexture->bind();
 
         glm::mat4 transform(1.0f);
@@ -116,12 +112,12 @@ void ImageButton::drawIcon(
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = _gui->window().getOrthoProjection();
+        uniforms.combined.general.projection = _window.getOrthoProjection();
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(1.0f);
 
-        _gui->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-        _gui->meshes().quad().draw();
+        _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+        _meshes.quad().draw();
     }
 
     if (!iconText.empty()) {
