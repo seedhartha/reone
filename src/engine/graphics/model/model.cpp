@@ -42,11 +42,9 @@ Model::Model(
 ) :
     _name(move(name)),
     _classification(classification),
-    _rootNode(rootNode),
+    _rootNode(ensurePresent(rootNode, "rootNode")),
     _superModel(move(superModel)),
     _animationScale(animationScale) {
-
-    ensurePresent(rootNode, "rootNode");
 
     fillNodeByName(_rootNode);
     computeAABB();

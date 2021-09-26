@@ -37,10 +37,8 @@ namespace scene {
 GrassSceneNode::GrassSceneNode(string name, glm::vec2 quadSize, shared_ptr<Texture> texture, shared_ptr<Texture> lightmap, SceneGraph *graph) :
     SceneNode(move(name), SceneNodeType::Grass, graph),
     _quadSize(move(quadSize)),
-    _texture(texture),
+    _texture(ensurePresent(texture, "texture")),
     _lightmap(move(lightmap)) {
-
-    ensurePresent(texture, "texture");
 }
 
 void GrassSceneNode::clear() {

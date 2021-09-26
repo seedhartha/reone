@@ -42,9 +42,7 @@ static constexpr float kMinDirectionalLightRadius = 1000.0f;
 
 LightSceneNode::LightSceneNode(const ModelSceneNode *model, shared_ptr<ModelNode> modelNode, SceneGraph *sceneGraph) :
     ModelNodeSceneNode(modelNode, SceneNodeType::Light, sceneGraph),
-    _model(model) {
-
-    ensurePresent(model, "model");
+    _model(ensurePresent(model, "model")) {
 
     _color = modelNode->color().getByFrameOrElse(0, glm::vec3(0.0f));
     _radius = modelNode->radius().getByFrameOrElse(0, 0.0f);

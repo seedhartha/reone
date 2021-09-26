@@ -42,9 +42,7 @@ static constexpr float kProjectileSpeed = 16.0f;
 
 EmitterSceneNode::EmitterSceneNode(const ModelSceneNode *model, shared_ptr<ModelNode> modelNode, SceneGraph *sceneGraph) :
     ModelNodeSceneNode(modelNode, SceneNodeType::Emitter, sceneGraph),
-    _model(model) {
-
-    ensurePresent(model, "model");
+    _model(ensurePresent(model, "model")) {
 
     _birthrate = modelNode->birthrate().getByFrameOrElse(0, 0.0f);
     _lifeExpectancy = modelNode->lifeExp().getByFrameOrElse(0, 0.0f);

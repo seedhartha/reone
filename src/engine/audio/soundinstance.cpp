@@ -32,13 +32,11 @@ namespace audio {
 static constexpr int kMaxBufferCount = 8;
 
 SoundInstance::SoundInstance(shared_ptr<AudioStream> stream, bool loop, float gain, bool positional, glm::vec3 position) :
-    _stream(stream),
+    _stream(ensurePresent(stream, "stream")),
     _loop(loop),
     _gain(gain),
     _positional(positional),
     _handle(make_shared<SoundHandle>(stream->duration(), move(position))) {
-
-    ensurePresent(stream, "stream");
 }
 
 void SoundInstance::init() {

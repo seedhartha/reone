@@ -41,8 +41,7 @@ static constexpr int kArrowSize = 32;
 static constexpr int kMapNoteSize = 16;
 static constexpr float kSelectedMapNoteScale = 1.5f;
 
-Map::Map(Game *game) : _game(game) {
-    ensurePresent(game, "game");
+Map::Map(Game *game) : _game(ensurePresent(game, "game")) {
 }
 
 void Map::load(const string &area, const GffStruct &gffs) {

@@ -24,10 +24,8 @@ using namespace std;
 namespace reone {
 
 StreamWriter::StreamWriter(const shared_ptr<ostream> &stream, boost::endian::order endianess) :
-    _stream(stream),
+    _stream(ensurePresent(stream, "stream")),
     _endianess(endianess) {
-
-    ensurePresent(stream, "stream");
 }
 
 void StreamWriter::putByte(uint8_t val) {

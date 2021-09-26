@@ -30,9 +30,7 @@ namespace scene {
 
 ModelNodeSceneNode::ModelNodeSceneNode(shared_ptr<ModelNode> modelNode, SceneNodeType type, SceneGraph *sceneGraph) :
     SceneNode(modelNode->name(), type, sceneGraph),
-    _modelNode(modelNode) {
-
-    ensurePresent(modelNode, "modelNode");
+    _modelNode(ensurePresent(modelNode, "modelNode")) {
 }
 
 } // namespace scene

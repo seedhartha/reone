@@ -28,8 +28,9 @@ namespace reone {
 
 namespace game {
 
-Dialog::Dialog(string resRef, Strings *strings) : _resRef(move(resRef)), _strings(strings) {
-    ensurePresent(strings, "strings");
+Dialog::Dialog(string resRef, Strings *strings) :
+    _resRef(move(resRef)),
+    _strings(ensurePresent(strings, "strings")) {
 }
 
 void Dialog::load(const GffStruct &dlg) {
