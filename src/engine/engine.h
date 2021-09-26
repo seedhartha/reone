@@ -17,32 +17,8 @@
 
 #pragma once
 
-#include <boost/program_options.hpp>
-
-#include "game/options.h"
-#include "game/types.h"
-
 namespace reone {
 
-namespace game {
-
-class Game;
-
-}
-
-namespace di {
-
-class AudioServices;
-class GraphicsServices;
-class ResourceServices;
-class SceneServices;
-class ScriptServices;
-
-} // namespace di
-
-/**
- * Encapsulates option loading and service initialization.
- */
 class Engine : boost::noncopyable {
 public:
     Engine(int argc, char **argv) :
@@ -51,9 +27,6 @@ public:
     }
 
     /**
-     * Loads options from command line and configuration file, initializes
-     * services and starts an instance of Game.
-     *
      * @return exit code
      */
     int run();
@@ -61,8 +34,6 @@ public:
 private:
     int _argc;
     char **_argv;
-
-    game::GameID determineGameID(const boost::filesystem::path &gamePath);
 };
 
 } // namespace reone
