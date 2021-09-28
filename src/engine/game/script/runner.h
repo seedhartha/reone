@@ -19,7 +19,7 @@
 
 #include "../../script/scripts.h"
 
-#include "routines.h"
+#include "routine/routines.h"
 
 namespace reone {
 
