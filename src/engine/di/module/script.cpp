@@ -28,7 +28,7 @@ namespace reone {
 
 namespace di {
 
-void ScriptServices::init() {
+void ScriptModule::init() {
     _scripts = make_unique<Scripts>(_resource.resources());
 }
 

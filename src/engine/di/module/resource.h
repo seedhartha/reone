@@ -24,9 +24,9 @@ namespace reone {
 
 namespace di {
 
-class ResourceServices : boost::noncopyable {
+class ResourceModule : boost::noncopyable {
 public:
-    ResourceServices(boost::filesystem::path gamePath) :
+    ResourceModule(boost::filesystem::path gamePath) :
         _gamePath(std::move(gamePath)) {
     }
 

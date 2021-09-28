@@ -25,25 +25,25 @@ namespace reone {
 
 namespace di {
 
-class GraphicsServices;
+class GraphicsModule;
 
-class SceneServices : boost::noncopyable {
+class SceneModule : boost::noncopyable {
 public:
-    SceneServices(graphics::GraphicsOptions options, GraphicsServices &graphics) :
+    SceneModule(graphics::GraphicsOptions options, GraphicsModule &graphics) :
         _options(std::move(options)),
         _graphics(graphics) {
     }
 
     void init();
 
-    scene::SceneGraph &graph() { return *_graph; }
+    scene::SceneGraph &sceneGraph() { return *_sceneGraph; }
     scene::WorldRenderPipeline &worldRenderPipeline() { return *_worldRenderPipeline; }
 
 private:
     graphics::GraphicsOptions _options;
-    GraphicsServices &_graphics;
+    GraphicsModule &_graphics;
 
-    std::unique_ptr<scene::SceneGraph> _graph;
+    std::unique_ptr<scene::SceneGraph> _sceneGraph;
     std::unique_ptr<scene::WorldRenderPipeline> _worldRenderPipeline;
 };
 

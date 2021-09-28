@@ -41,12 +41,12 @@ namespace reone {
 
 namespace di {
 
-void GameServices::init() {
+void GameModule::init() {
     _surfaces = make_unique<Surfaces>(_resource.resources());
     _cursors = make_unique<Cursors>(_gameId, _graphics.context(), _graphics.meshes(), _graphics.shaders(), _graphics.window(), _resource.resources());
-    _soundSets = make_unique<SoundSets>(_audio.files(), _resource.resources(), _resource.strings());
-    _footstepSounds = make_unique<FootstepSounds>(_audio.files(), _resource.resources());
-    _guiSounds = make_unique<GUISounds>(_audio.files(), _resource.resources());
+    _soundSets = make_unique<SoundSets>(_audio.audioFiles(), _resource.resources(), _resource.strings());
+    _footstepSounds = make_unique<FootstepSounds>(_audio.audioFiles(), _resource.resources());
+    _guiSounds = make_unique<GUISounds>(_audio.audioFiles(), _resource.resources());
     _scriptRunner = make_unique<ScriptRunner>(_script.scripts());
     _reputes = make_unique<Reputes>(_resource.resources());
     _skills = make_unique<Skills>(_graphics.textures(), _resource.resources(), _resource.strings());
@@ -56,7 +56,7 @@ void GameServices::init() {
     _portraits = make_unique<Portraits>(_graphics.textures(), _resource.resources());
     _actionFactory = make_unique<ActionFactory>();
     _party = make_unique<Party>();
-    _combat = make_unique<Combat>(*_effectFactory, _scene.graph());
+    _combat = make_unique<Combat>(*_effectFactory, _scene.sceneGraph());
     _objectFactory = make_unique<ObjectFactory>(
         *_actionFactory,
         *_classes,
@@ -68,8 +68,8 @@ void GameServices::init() {
         *_scriptRunner,
         *_soundSets,
         *_surfaces,
-        _audio.files(),
-        _audio.player(),
+        _audio.audioFiles(),
+        _audio.audioPlayer(),
         _graphics.context(),
         _graphics.meshes(),
         _graphics.models(),
@@ -79,7 +79,7 @@ void GameServices::init() {
         _graphics.window(),
         _resource.resources(),
         _resource.strings(),
-        _scene.graph());
+        _scene.sceneGraph());
     _effectFactory = make_unique<EffectFactory>();
     _routines = make_unique<Routines>(*_actionFactory, *_combat, *_effectFactory, *_party, *_reputes, *_scriptRunner, _resource.strings());
     _routineRegistrar = newRoutineRegistrar();
@@ -104,7 +104,7 @@ void GameServices::init() {
     _game->init();
 }
 
-unique_ptr<Game> GameServices::newGame() {
+unique_ptr<Game> GameModule::newGame() {
     switch (_gameId) {
     case GameID::KotOR:
         return make_unique<KotOR>(
@@ -126,8 +126,8 @@ unique_ptr<Game> GameServices::newGame() {
             *_skills,
             *_soundSets,
             *_surfaces,
-            _audio.files(),
-            _audio.player(),
+            _audio.audioFiles(),
+            _audio.audioPlayer(),
             _graphics.context(),
             _graphics.features(),
             _graphics.fonts(),
@@ -140,7 +140,7 @@ unique_ptr<Game> GameServices::newGame() {
             _graphics.textures(),
             _graphics.walkmeshes(),
             _graphics.window(),
-            _scene.graph(),
+            _scene.sceneGraph(),
             _scene.worldRenderPipeline(),
             _script.scripts(),
             _resource.resources(),
@@ -166,8 +166,8 @@ unique_ptr<Game> GameServices::newGame() {
             *_skills,
             *_soundSets,
             *_surfaces,
-            _audio.files(),
-            _audio.player(),
+            _audio.audioFiles(),
+            _audio.audioPlayer(),
             _graphics.context(),
             _graphics.features(),
             _graphics.fonts(),
@@ -180,7 +180,7 @@ unique_ptr<Game> GameServices::newGame() {
             _graphics.textures(),
             _graphics.walkmeshes(),
             _graphics.window(),
-            _scene.graph(),
+            _scene.sceneGraph(),
             _scene.worldRenderPipeline(),
             _script.scripts(),
             _resource.resources(),
@@ -191,7 +191,7 @@ unique_ptr<Game> GameServices::newGame() {
     }
 }
 
-unique_ptr<RoutineRegistrar> GameServices::newRoutineRegistrar() {
+unique_ptr<RoutineRegistrar> GameModule::newRoutineRegistrar() {
     switch (_gameId) {
     case GameID::KotOR:
         return make_unique<KotORRoutineRegistrar>(*_routines);

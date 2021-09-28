@@ -27,7 +27,7 @@ namespace reone {
 
 namespace di {
 
-void ResourceServices::init() {
+void ResourceModule::init() {
     _resources = make_unique<Resources>();
 
     _strings = make_unique<Strings>();

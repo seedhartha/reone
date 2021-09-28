@@ -23,7 +23,7 @@ namespace reone {
 
 namespace di {
 
-void CommonServices::init() {
+void CommonModule::init() {
     _executor = make_unique<Executor>();
     _executor->init();
 }

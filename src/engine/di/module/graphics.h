@@ -35,11 +35,11 @@ namespace reone {
 
 namespace di {
 
-class ResourceServices;
+class ResourceModule;
 
-class GraphicsServices : boost::noncopyable {
+class GraphicsModule : boost::noncopyable {
 public:
-    GraphicsServices(graphics::GraphicsOptions options, ResourceServices &resource) :
+    GraphicsModule(graphics::GraphicsOptions options, ResourceModule &resource) :
         _options(std::move(options)),
         _resource(resource) {
     }
@@ -61,7 +61,7 @@ public:
 
 private:
     graphics::GraphicsOptions _options;
-    ResourceServices &_resource;
+    ResourceModule &_resource;
 
     std::unique_ptr<graphics::Context> _context;
     std::unique_ptr<graphics::Features> _features;

@@ -27,11 +27,11 @@ namespace reone {
 
 namespace di {
 
-void AudioServices::init() {
-    _files = make_unique<AudioFiles>(_resource.resources());
+void AudioModule::init() {
+    _audioFiles = make_unique<AudioFiles>(_resource.resources());
 
-    _player = make_unique<AudioPlayer>(_options, *_files);
-    _player->init();
+    _audioPlayer = make_unique<AudioPlayer>(_options, *_audioFiles);
+    _audioPlayer->init();
 }
 
 } // namespace di

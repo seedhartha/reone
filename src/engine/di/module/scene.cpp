@@ -28,8 +28,8 @@ namespace reone {
 
 namespace di {
 
-void SceneServices::init() {
-    _graph = make_unique<SceneGraph>(
+void SceneModule::init() {
+    _sceneGraph = make_unique<SceneGraph>(
         _options,
         _graphics.context(),
         _graphics.features(),
@@ -39,7 +39,7 @@ void SceneServices::init() {
         _graphics.shaders(),
         _graphics.textures());
 
-    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, *_graph, _graphics.context(), _graphics.meshes(), _graphics.shaders());
+    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, *_sceneGraph, _graphics.context(), _graphics.meshes(), _graphics.shaders());
     _worldRenderPipeline->init();
 }
 

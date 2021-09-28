@@ -28,7 +28,7 @@ namespace reone {
 
 namespace di {
 
-void GraphicsServices::init() {
+void GraphicsModule::init() {
     _features = make_unique<Features>(_options);
     _window = make_unique<Window>(_options);
     _context = make_unique<Context>();
