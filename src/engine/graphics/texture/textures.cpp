@@ -24,12 +24,12 @@
 #include "../context.h"
 #include "../types.h"
 
-#include "curreader.h"
+#include "format/curreader.h"
+#include "format/tgareader.h"
+#include "format/tpcreader.h"
+#include "format/txireader.h"
 #include "texture.h"
 #include "textureutil.h"
-#include "tgareader.h"
-#include "tpcreader.h"
-#include "txireader.h"
 
 using namespace std;
 

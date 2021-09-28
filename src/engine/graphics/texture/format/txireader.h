@@ -17,24 +17,32 @@
 
 #pragma once
 
-#include "../../resource/format/binreader.h"
+#include "../texture.h"
 
 namespace reone {
 
 namespace graphics {
 
-class LipAnimation;
-
-class LipReader : public resource::BinaryReader {
+class TxiReader {
 public:
-    LipReader();
+    void load(const std::shared_ptr<std::istream> &in);
 
-    std::shared_ptr<LipAnimation> animation() const { return _animation; }
+    const Texture::Features &features() const { return _features; }
 
 private:
-    std::shared_ptr<LipAnimation> _animation;
+    enum class State {
+        None,
+        UpperLeftCoords,
+        LowerRightCoords
+    };
 
-    void doLoad() override;
+    Texture::Features _features;
+    State _state {State::None};
+    int _upperLeftCoordCount {0};
+    int _lowerRightCoordCount {0};
+
+    void processLine(const std::vector<std::string> &tokens);
+    Texture::Blending parseBlending(const std::string &s) const;
 };
 
 } // namespace graphics

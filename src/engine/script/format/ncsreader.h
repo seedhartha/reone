@@ -15,37 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "lipreader.h"
+#pragma once
 
-#include "animation.h"
-
-using namespace std;
+#include "../../resource/format/binreader.h"
 
 namespace reone {
 
-namespace graphics {
+namespace script {
 
-LipReader::LipReader() :
-    BinaryReader(8, "LIP V1.0") {
-}
+class ScriptProgram;
 
-void LipReader::doLoad() {
-    // based on https://github.com/KobaltBlu/KotOR.js/blob/master/js/resource/LIPObject.js
+/**
+ * Parses compiled script program.
+ *
+ * http://www.nynaeve.net/Skywing/nwn2/Documentation/ncs.html
+ */
+class NcsReader : public resource::BinaryReader {
+public:
+    NcsReader(const std::string &resRef);
 
-    float length = readFloat();
-    uint32_t entryCount = readUint32();
+    void doLoad() override;
 
-    vector<LipAnimation::Keyframe> keyframes;
-    for (uint32_t i = 0; i < entryCount; ++i) {
-        LipAnimation::Keyframe keyframe;
-        keyframe.time = readFloat();
-        keyframe.shape = readByte();
-        keyframes.push_back(move(keyframe));
-    }
+    std::shared_ptr<ScriptProgram> program() const { return _program; }
 
-    _animation = make_shared<LipAnimation>(length, move(keyframes));
-}
+private:
+    std::string _resRef;
+    std::shared_ptr<ScriptProgram> _program;
 
-} // namespace graphics
+    void readInstruction(size_t &offset);
+};
+
+} // namespace script
 
 } // namespace reone

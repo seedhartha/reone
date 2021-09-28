@@ -17,9 +17,7 @@
 
 #pragma once
 
-#include "../../resource/format/binreader.h"
-
-#include "../types.h"
+#include "../../types.h"
 
 namespace reone {
 
@@ -27,32 +25,19 @@ namespace graphics {
 
 class Texture;
 
-class TgaReader : public resource::BinaryReader {
+class TgaWriter {
 public:
-    TgaReader(const std::string &resRef, TextureUsage usage);
+    TgaWriter(std::shared_ptr<Texture> texture);
 
-    std::shared_ptr<graphics::Texture> texture() const { return _texture; }
+    void save(std::ostream &out, bool compress = false);
+    void save(const boost::filesystem::path &path, bool compress = false);
 
 private:
-    std::string _resRef;
-    TextureUsage _usage;
-
-    TGADataType _dataType {TGADataType::RGBA};
-    int _width {0};
-    int _height {0};
-    bool _alpha {false};
     std::shared_ptr<Texture> _texture;
 
-    void doLoad() override;
+    void writeRLE(uint8_t *pixels, int depth, std::ostream &out);
 
-    void loadTexture();
-
-    ByteArray readPixels(int w, int h);
-    ByteArray readPixelsRLE(int w, int h);
-
-    bool isRGBA() const;
-    bool isGrayscale() const;
-    bool isRLE() const;
+    std::vector<uint8_t> getTexturePixels(bool compress, TGADataType &dataType, int &depth) const;
 };
 
 } // namespace graphics

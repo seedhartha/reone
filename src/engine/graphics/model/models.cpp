@@ -23,7 +23,7 @@
 
 #include "../texture/textures.h"
 
-#include "mdlreader.h"
+#include "format/mdlreader.h"
 #include "model.h"
 
 using namespace std;

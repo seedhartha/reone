@@ -17,12 +17,12 @@
 
 #include "bikreader.h"
 
-#include "../audio/stream.h"
-#include "../common/guardutil.h"
-#include "../common/logutil.h"
-#include "../common/streamreader.h"
+#include "../../audio/stream.h"
+#include "../../common/guardutil.h"
+#include "../../common/logutil.h"
+#include "../../common/streamreader.h"
 
-#include "video.h"
+#include "../video.h"
 
 extern "C" {
 

@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../../resource/format/binreader.h"
+#include "../../../resource/format/binreader.h"
 
-#include "texture.h"
+#include "../texture.h"
 
 namespace reone {
 

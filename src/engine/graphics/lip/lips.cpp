@@ -21,7 +21,7 @@
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
 
-#include "lipreader.h"
+#include "format/lipreader.h"
 
 using namespace std;
 using namespace std::placeholders;

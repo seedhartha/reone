@@ -17,10 +17,10 @@
 
 #include "tgareader.h"
 
-#include "../../common/logutil.h"
+#include "../../../common/logutil.h"
 
-#include "texture.h"
-#include "textureutil.h"
+#include "../texture.h"
+#include "../textureutil.h"
 
 using namespace std;
 

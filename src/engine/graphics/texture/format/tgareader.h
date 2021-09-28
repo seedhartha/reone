@@ -17,34 +17,44 @@
 
 #pragma once
 
-#include "../resource/format/binreader.h"
+#include "../../../resource/format/binreader.h"
+
+#include "../../types.h"
 
 namespace reone {
 
-namespace script {
+namespace graphics {
 
-class ScriptProgram;
+class Texture;
 
-/**
- * Parses compiled script program.
- *
- * http://www.nynaeve.net/Skywing/nwn2/Documentation/ncs.html
- */
-class NcsReader : public resource::BinaryReader {
+class TgaReader : public resource::BinaryReader {
 public:
-    NcsReader(const std::string &resRef);
+    TgaReader(const std::string &resRef, TextureUsage usage);
 
-    void doLoad() override;
-
-    std::shared_ptr<ScriptProgram> program() const { return _program; }
+    std::shared_ptr<graphics::Texture> texture() const { return _texture; }
 
 private:
     std::string _resRef;
-    std::shared_ptr<ScriptProgram> _program;
+    TextureUsage _usage;
 
-    void readInstruction(size_t &offset);
+    TGADataType _dataType {TGADataType::RGBA};
+    int _width {0};
+    int _height {0};
+    bool _alpha {false};
+    std::shared_ptr<Texture> _texture;
+
+    void doLoad() override;
+
+    void loadTexture();
+
+    ByteArray readPixels(int w, int h);
+    ByteArray readPixelsRLE(int w, int h);
+
+    bool isRGBA() const;
+    bool isGrayscale() const;
+    bool isRLE() const;
 };
 
-} // namespace script
+} // namespace graphics
 
 } // namespace reone

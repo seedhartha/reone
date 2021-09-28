@@ -15,32 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "lipwriter.h"
 
-#include "../../resource/format/binreader.h"
+#include "../../../common/streamwriter.h"
+
+namespace fs = boost::filesystem;
+
+using namespace std;
 
 namespace reone {
 
 namespace graphics {
 
-class Texture;
+LipWriter::LipWriter(LipAnimation &&animation) :
+    _animation(animation) {
+}
 
-class CurReader : public resource::BinaryReader {
-public:
-    CurReader();
+void LipWriter::save(const fs::path &path) {
+    auto lip = make_shared<fs::ofstream>(path, ios::binary);
 
-    std::shared_ptr<Texture> texture() { return _texture; }
-
-private:
-    uint16_t _bitCount {0};
-    int _width {0};
-    int _height {0};
-    std::shared_ptr<Texture> _texture;
-
-    void doLoad() override;
-    void loadHeader();
-    void loadData();
-};
+    StreamWriter writer(lip);
+    writer.putString("LIP V1.0");
+    writer.putFloat(_animation.length());
+    writer.putUint32(static_cast<uint32_t>(_animation.keyframes().size()));
+    for (auto &keyframe : _animation.keyframes()) {
+        writer.putFloat(keyframe.time);
+        writer.putByte(keyframe.shape);
+    }
+}
 
 } // namespace graphics
 

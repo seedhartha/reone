@@ -179,9 +179,9 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/fonts.h
     src/engine/graphics/framebuffer.h
     src/engine/graphics/lip/animation.h
-    src/engine/graphics/lip/lipreader.h
+    src/engine/graphics/lip/format/lipreader.h
+    src/engine/graphics/lip/format/lipwriter.h
     src/engine/graphics/lip/lips.h
-    src/engine/graphics/lip/lipwriter.h
     src/engine/graphics/material.h
     src/engine/graphics/materials.h
     src/engine/graphics/mesh/mesh.h
@@ -189,7 +189,7 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/mesh/vertexattributes.h
     src/engine/graphics/model/animatedproperty.h
     src/engine/graphics/model/animation.h
-    src/engine/graphics/model/mdlreader.h
+    src/engine/graphics/model/format/mdlreader.h
     src/engine/graphics/model/model.h
     src/engine/graphics/model/modelnode.h
     src/engine/graphics/model/models.h
@@ -198,17 +198,17 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/pixelutil.h
     src/engine/graphics/renderbuffer.h
     src/engine/graphics/shader/shaders.h
-    src/engine/graphics/texture/curreader.h
+    src/engine/graphics/texture/format/curreader.h
+    src/engine/graphics/texture/format/tgareader.h
+    src/engine/graphics/texture/format/tgawriter.h
+    src/engine/graphics/texture/format/tpcreader.h
+    src/engine/graphics/texture/format/txireader.h
     src/engine/graphics/texture/texture.h
     src/engine/graphics/texture/textures.h
     src/engine/graphics/texture/textureutil.h
-    src/engine/graphics/texture/tgareader.h
-    src/engine/graphics/texture/tgawriter.h
-    src/engine/graphics/texture/tpcreader.h
-    src/engine/graphics/texture/txireader.h
     src/engine/graphics/textutil.h
     src/engine/graphics/types.h
-    src/engine/graphics/walkmesh/bwmreader.h
+    src/engine/graphics/walkmesh/format/bwmreader.h
     src/engine/graphics/walkmesh/walkmesh.h
     src/engine/graphics/walkmesh/walkmeshes.h
     src/engine/graphics/window.h)
@@ -222,14 +222,14 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/fonts.cpp
     src/engine/graphics/framebuffer.cpp
     src/engine/graphics/lip/animation.cpp
-    src/engine/graphics/lip/lipreader.cpp
+    src/engine/graphics/lip/format/lipreader.cpp
+    src/engine/graphics/lip/format/lipwriter.cpp
     src/engine/graphics/lip/lips.cpp
-    src/engine/graphics/lip/lipwriter.cpp
     src/engine/graphics/materials.cpp
     src/engine/graphics/mesh/mesh.cpp
     src/engine/graphics/mesh/meshes.cpp
     src/engine/graphics/model/animation.cpp
-    src/engine/graphics/model/mdlreader.cpp
+    src/engine/graphics/model/format/mdlreader.cpp
     src/engine/graphics/model/model.cpp
     src/engine/graphics/model/modelnode.cpp
     src/engine/graphics/model/models.cpp
@@ -240,16 +240,16 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/shader/shaders_common.cpp
     src/engine/graphics/shader/shaders_pbr.cpp
     src/engine/graphics/shader/shaders_phong.cpp
-    src/engine/graphics/texture/curreader.cpp
+    src/engine/graphics/texture/format/curreader.cpp
+    src/engine/graphics/texture/format/tgareader.cpp
+    src/engine/graphics/texture/format/tgawriter.cpp
+    src/engine/graphics/texture/format/tpcreader.cpp
+    src/engine/graphics/texture/format/txireader.cpp
     src/engine/graphics/texture/texture.cpp
     src/engine/graphics/texture/textures.cpp
     src/engine/graphics/texture/textureutil.cpp
-    src/engine/graphics/texture/tgareader.cpp
-    src/engine/graphics/texture/tgawriter.cpp
-    src/engine/graphics/texture/tpcreader.cpp
-    src/engine/graphics/texture/txireader.cpp
     src/engine/graphics/textutil.cpp
-    src/engine/graphics/walkmesh/bwmreader.cpp
+    src/engine/graphics/walkmesh/format/bwmreader.cpp
     src/engine/graphics/walkmesh/walkmesh.cpp
     src/engine/graphics/walkmesh/walkmeshes.cpp
     src/engine/graphics/window.cpp)
@@ -291,11 +291,11 @@ target_precompile_headers(libaudio PRIVATE src/engine/pch.h)
 ## libvideo static library
 
 set(VIDEO_HEADERS
-    src/engine/video/bikreader.h
+    src/engine/video/format/bikreader.h
     src/engine/video/video.h)
 
 set(VIDEO_SOURCES
-    src/engine/video/bikreader.cpp
+    src/engine/video/format/bikreader.cpp
     src/engine/video/video.cpp)
 
 add_library(libvideo STATIC ${VIDEO_HEADERS} ${VIDEO_SOURCES})
@@ -387,8 +387,8 @@ set(SCRIPT_HEADERS
     src/engine/script/execution.h
     src/engine/script/executioncontext.h
     src/engine/script/executionstate.h
+    src/engine/script/format/ncsreader.h
     src/engine/script/instrutil.h
-    src/engine/script/ncsreader.h
     src/engine/script/program.h
     src/engine/script/routine.h
     src/engine/script/routineprovider.h
@@ -398,8 +398,8 @@ set(SCRIPT_HEADERS
 
 set(SCRIPT_SOURCES
     src/engine/script/execution.cpp
+    src/engine/script/format/ncsreader.cpp
     src/engine/script/instrutil.cpp
-    src/engine/script/ncsreader.cpp
     src/engine/script/program.cpp
     src/engine/script/routine.cpp
     src/engine/script/scripts.cpp

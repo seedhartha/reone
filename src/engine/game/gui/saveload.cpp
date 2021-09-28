@@ -19,7 +19,7 @@
 
 #include "../../common/logutil.h"
 #include "../../common/streamutil.h"
-#include "../../graphics/texture/tgareader.h"
+#include "../../graphics/texture/format/tgareader.h"
 #include "../../resource/format/erfreader.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/strings.h"

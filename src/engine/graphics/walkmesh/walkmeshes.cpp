@@ -20,7 +20,7 @@
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
 
-#include "bwmreader.h"
+#include "format/bwmreader.h"
 
 using namespace std;
 

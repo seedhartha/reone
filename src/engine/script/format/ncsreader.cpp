@@ -17,9 +17,9 @@
 
 #include "ncsreader.h"
 
-#include "../common/logutil.h"
+#include "../../common/logutil.h"
 
-#include "program.h"
+#include "../program.h"
 
 using namespace std;
 

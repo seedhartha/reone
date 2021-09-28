@@ -23,9 +23,9 @@
 
 #include "s3tc.h"
 
-#include "../../common/guardutil.h"
+#include "../../../common/guardutil.h"
 
-#include "texture.h"
+#include "../texture.h"
 
 using namespace std;
 

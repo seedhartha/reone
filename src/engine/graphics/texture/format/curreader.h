@@ -17,20 +17,29 @@
 
 #pragma once
 
-#include "animation.h"
+#include "../../../resource/format/binreader.h"
 
 namespace reone {
 
 namespace graphics {
 
-class LipWriter {
-public:
-    LipWriter(LipAnimation &&animation);
+class Texture;
 
-    void save(const boost::filesystem::path &path);
+class CurReader : public resource::BinaryReader {
+public:
+    CurReader();
+
+    std::shared_ptr<Texture> texture() { return _texture; }
 
 private:
-    LipAnimation _animation;
+    uint16_t _bitCount {0};
+    int _width {0};
+    int _height {0};
+    std::shared_ptr<Texture> _texture;
+
+    void doLoad() override;
+    void loadHeader();
+    void loadData();
 };
 
 } // namespace graphics
