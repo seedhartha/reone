@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "../../script/executioncontext.h"
-#include "../../script/routine.h"
-#include "../../script/routineprovider.h"
-#include "../../script/types.h"
-#include "../../script/variable.h"
+#include "../../../script/executioncontext.h"
+#include "../../../script/routine.h"
+#include "../../../script/routineprovider.h"
+#include "../../../script/types.h"
+#include "../../../script/variable.h"
 
-#include "routine/context.h"
+#include "context.h"
 
 namespace reone {
 

@@ -31,7 +31,7 @@
 
 #include "../game.h"
 #include "../party.h"
-#include "../script/routines.h"
+#include "../script/routine/routines.h"
 
 using namespace std;
 

@@ -33,7 +33,7 @@
 #include "../../game/portraits.h"
 #include "../../game/reputes.h"
 #include "../../game/script/routine/registrar/registrar.h"
-#include "../../game/script/routines.h"
+#include "../../game/script/routine/routines.h"
 #include "../../game/script/runner.h"
 #include "../../game/soundsets.h"
 #include "../../game/surfaces.h"
