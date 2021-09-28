@@ -29,9 +29,9 @@ namespace reone {
 
 namespace game {
 
-class Container : public GameGUI {
+class ContainerGUI : public GameGUI {
 public:
-    Container(
+    ContainerGUI(
         Game *game,
         ActionFactory &actionFactory,
         Classes &classes,

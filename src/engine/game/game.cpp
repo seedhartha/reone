@@ -583,7 +583,7 @@ void Game::loadComputer() {
 }
 
 void Game::loadContainer() {
-    _container = make_unique<Container>(
+    _container = make_unique<ContainerGUI>(
         this,
         _actionFactory,
         _classes,
