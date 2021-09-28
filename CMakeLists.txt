@@ -919,13 +919,13 @@ target_precompile_headers(libgame PRIVATE src/engine/pch.h)
 
 set(REONE_HEADERS
     src/engine/di/container.h
-    src/engine/di/services/audio.h
-    src/engine/di/services/common.h
-    src/engine/di/services/game.h
-    src/engine/di/services/graphics.h
-    src/engine/di/services/resource.h
-    src/engine/di/services/scene.h
-    src/engine/di/services/script.h
+    src/engine/di/module/audio.h
+    src/engine/di/module/common.h
+    src/engine/di/module/game.h
+    src/engine/di/module/graphics.h
+    src/engine/di/module/resource.h
+    src/engine/di/module/scene.h
+    src/engine/di/module/script.h
     src/engine/engine.h
     src/engine/gameprobe.h
     src/engine/optionsparser.h
@@ -933,13 +933,13 @@ set(REONE_HEADERS
 
 set(REONE_SOURCES
     src/engine/di/container.cpp
-    src/engine/di/services/audio.cpp
-    src/engine/di/services/common.cpp
-    src/engine/di/services/game.cpp
-    src/engine/di/services/graphics.cpp
-    src/engine/di/services/resource.cpp
-    src/engine/di/services/scene.cpp
-    src/engine/di/services/script.cpp
+    src/engine/di/module/audio.cpp
+    src/engine/di/module/common.cpp
+    src/engine/di/module/game.cpp
+    src/engine/di/module/graphics.cpp
+    src/engine/di/module/resource.cpp
+    src/engine/di/module/scene.cpp
+    src/engine/di/module/script.cpp
     src/engine/engine.cpp
     src/engine/gameprobe.cpp
     src/engine/main.cpp

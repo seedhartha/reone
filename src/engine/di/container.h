@@ -20,13 +20,13 @@
 #include "../game/options.h"
 #include "../game/types.h"
 
-#include "services/audio.h"
-#include "services/common.h"
-#include "services/game.h"
-#include "services/graphics.h"
-#include "services/resource.h"
-#include "services/scene.h"
-#include "services/script.h"
+#include "module/audio.h"
+#include "module/common.h"
+#include "module/game.h"
+#include "module/graphics.h"
+#include "module/resource.h"
+#include "module/scene.h"
+#include "module/script.h"
 
 namespace reone {
 
