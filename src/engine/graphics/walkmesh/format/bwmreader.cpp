@@ -17,7 +17,7 @@
 
 #include "bwmreader.h"
 
-#include "walkmesh.h"
+#include "../walkmesh.h"
 
 using namespace std;
 

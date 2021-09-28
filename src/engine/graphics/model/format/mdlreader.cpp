@@ -17,16 +17,16 @@
 
 #include "mdlreader.h"
 
-#include "../../common/collectionutil.h"
-#include "../../common/logutil.h"
+#include "../../../common/collectionutil.h"
+#include "../../../common/logutil.h"
 
-#include "../mesh/mesh.h"
-#include "../mesh/vertexattributes.h"
-#include "../texture/textures.h"
+#include "../../mesh/mesh.h"
+#include "../../mesh/vertexattributes.h"
+#include "../../texture/textures.h"
 
-#include "animation.h"
-#include "model.h"
-#include "models.h"
+#include "../animation.h"
+#include "../model.h"
+#include "../models.h"
 
 using namespace std;
 

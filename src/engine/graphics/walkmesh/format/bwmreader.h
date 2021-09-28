@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../resource/format/binreader.h"
+#include "../../../resource/format/binreader.h"
 
 namespace reone {
 

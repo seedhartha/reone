@@ -23,10 +23,10 @@
 #include "../../graphics/pbribl.h"
 #include "../../graphics/renderbuffer.h"
 #include "../../graphics/shader/shaders.h"
+#include "../../graphics/texture/format/tgawriter.h"
 #include "../../graphics/texture/texture.h"
 #include "../../graphics/texture/textures.h"
 #include "../../graphics/texture/textureutil.h"
-#include "../../graphics/texture/tgawriter.h"
 #include "../../graphics/window.h"
 
 #include "../graph.h"

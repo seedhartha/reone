@@ -15,30 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "lipreader.h"
 
-#include "../types.h"
+#include "../animation.h"
+
+using namespace std;
 
 namespace reone {
 
 namespace graphics {
 
-class Texture;
+LipReader::LipReader() :
+    BinaryReader(8, "LIP V1.0") {
+}
 
-class TgaWriter {
-public:
-    TgaWriter(std::shared_ptr<Texture> texture);
+void LipReader::doLoad() {
+    // based on https://github.com/KobaltBlu/KotOR.js/blob/master/js/resource/LIPObject.js
 
-    void save(std::ostream &out, bool compress = false);
-    void save(const boost::filesystem::path &path, bool compress = false);
+    float length = readFloat();
+    uint32_t entryCount = readUint32();
 
-private:
-    std::shared_ptr<Texture> _texture;
+    vector<LipAnimation::Keyframe> keyframes;
+    for (uint32_t i = 0; i < entryCount; ++i) {
+        LipAnimation::Keyframe keyframe;
+        keyframe.time = readFloat();
+        keyframe.shape = readByte();
+        keyframes.push_back(move(keyframe));
+    }
 
-    void writeRLE(uint8_t *pixels, int depth, std::ostream &out);
-
-    std::vector<uint8_t> getTexturePixels(bool compress, TGADataType &dataType, int &depth) const;
-};
+    _animation = make_shared<LipAnimation>(length, move(keyframes));
+}
 
 } // namespace graphics
 

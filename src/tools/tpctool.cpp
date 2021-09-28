@@ -20,8 +20,8 @@
 #include "s3tc.h"
 
 #include "../engine/common/logutil.h"
-#include "../engine/graphics/texture/tgawriter.h"
-#include "../engine/graphics/texture/tpcreader.h"
+#include "../engine/graphics/texture/format/tgawriter.h"
+#include "../engine/graphics/texture/format/tpcreader.h"
 
 using namespace std;
 

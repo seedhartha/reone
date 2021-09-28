@@ -17,32 +17,20 @@
 
 #pragma once
 
-#include "texture.h"
+#include "../animation.h"
 
 namespace reone {
 
 namespace graphics {
 
-class TxiReader {
+class LipWriter {
 public:
-    void load(const std::shared_ptr<std::istream> &in);
+    LipWriter(LipAnimation &&animation);
 
-    const Texture::Features &features() const { return _features; }
+    void save(const boost::filesystem::path &path);
 
 private:
-    enum class State {
-        None,
-        UpperLeftCoords,
-        LowerRightCoords
-    };
-
-    Texture::Features _features;
-    State _state {State::None};
-    int _upperLeftCoordCount {0};
-    int _lowerRightCoordCount {0};
-
-    void processLine(const std::vector<std::string> &tokens);
-    Texture::Blending parseBlending(const std::string &s) const;
+    LipAnimation _animation;
 };
 
 } // namespace graphics

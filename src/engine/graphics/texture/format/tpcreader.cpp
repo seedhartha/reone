@@ -17,9 +17,10 @@
 
 #include "tpcreader.h"
 
-#include "../../common/streamutil.h"
+#include "../../../common/streamutil.h"
 
-#include "textureutil.h"
+#include "../textureutil.h"
+
 #include "txireader.h"
 
 using namespace std;

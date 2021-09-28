@@ -29,8 +29,8 @@
 #include "../graphics/model/models.h"
 #include "../graphics/pbribl.h"
 #include "../graphics/renderbuffer.h"
+#include "../graphics/texture/format/tgawriter.h"
 #include "../graphics/texture/textures.h"
-#include "../graphics/texture/tgawriter.h"
 #include "../graphics/walkmesh/walkmeshes.h"
 #include "../graphics/window.h"
 #include "../resource/format/erfreader.h"
@@ -39,7 +39,7 @@
 #include "../resource/resources.h"
 #include "../scene/pipeline/world.h"
 #include "../script/scripts.h"
-#include "../video/bikreader.h"
+#include "../video/format/bikreader.h"
 
 #include "combat.h"
 #include "cursors.h"

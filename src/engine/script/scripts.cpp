@@ -19,7 +19,7 @@
 
 #include "../common/streamutil.h"
 
-#include "ncsreader.h"
+#include "format/ncsreader.h"
 
 using namespace std;
 using namespace std::placeholders;
