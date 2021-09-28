@@ -28,6 +28,8 @@
 #include "../../../game.h"
 #include "../../../script/runner.h"
 
+#include "../context.h"
+
 #include "argutil.h"
 
 using namespace std;
@@ -40,32 +42,32 @@ namespace game {
 
 namespace routine {
 
-Variable signalEvent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable signalEvent(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
     auto toRun = getEvent(args, 1);
 
     debug(boost::format("Event signalled: %s %s") % object->tag() % toRun->number());
-    game.scriptRunner().run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
+    ctx.scriptRunner.run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
 
     return Variable::ofNull();
 }
 
-Variable eventUserDefined(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable eventUserDefined(const vector<Variable> &args, const RoutineContext &ctx) {
     int eventNumber = getInt(args, 0);
     auto event = make_shared<Event>(eventNumber);
 
     return Variable::ofEvent(event);
 }
 
-Variable eventSpellCastAt(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable eventSpellCastAt(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable eventConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable eventConversation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable eventActivateItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable eventActivateItem(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

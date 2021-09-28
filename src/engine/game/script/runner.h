@@ -27,7 +27,9 @@ namespace game {
 
 class ScriptRunner {
 public:
-    ScriptRunner(Routines &routines, script::Scripts &scripts);
+    ScriptRunner(script::Scripts &scripts) :
+        _scripts(scripts) {
+    }
 
     int run(
         const std::string &resRef,
@@ -36,9 +38,12 @@ public:
         int userDefinedEventNumber = -1,
         int scriptVar = -1);
 
+    void setRoutines(Routines &routines) { _routines = &routines; }
+
 private:
-    Routines &_routines;
     script::Scripts &_scripts;
+
+    Routines *_routines {nullptr};
 };
 
 } // namespace game

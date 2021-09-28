@@ -30,7 +30,7 @@ public:
         _feat(feat) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(Object &actor, ActionContext &ctx, float dt) override;
 
     FeatType feat() const { return _feat; }
 

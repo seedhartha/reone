@@ -18,23 +18,24 @@
 #pragma once
 
 #include "../../../../common/collectionutil.h"
-#include "../../../../script/executioncontext.h"
 
 namespace reone {
 
 namespace script {
 
+struct ExecutionContext;
 struct Variable;
 
-}
+} // namespace script
 
 namespace game {
+
+struct RoutineContext;
 
 class Door;
 class Creature;
 class Effect;
 class Event;
-class Game;
 class Item;
 class Location;
 class Object;
@@ -54,20 +55,20 @@ float getFloatOrElse(const std::vector<script::Variable> &args, int index, float
 std::string getStringOrElse(const std::vector<script::Variable> &args, int index, std::string defValue);
 glm::vec3 getVectorOrElse(const std::vector<script::Variable> &args, int index, glm::vec3 defValue);
 
-std::shared_ptr<Object> getCaller(Game &game, script::ExecutionContext &ctx);
-std::shared_ptr<SpatialObject> getCallerAsSpatial(Game &game, script::ExecutionContext &ctx);
-std::shared_ptr<Creature> getCallerAsCreature(Game &game, script::ExecutionContext &ctx);
-std::shared_ptr<Object> getTriggerrer(Game &game, script::ExecutionContext &ctx);
+std::shared_ptr<Object> getCaller(const RoutineContext &ctx);
+std::shared_ptr<SpatialObject> getCallerAsSpatial(const RoutineContext &ctx);
+std::shared_ptr<Creature> getCallerAsCreature(const RoutineContext &ctx);
+std::shared_ptr<Object> getTriggerrer(const RoutineContext &ctx);
 
-std::shared_ptr<Object> getObject(Game &game, const std::vector<script::Variable> &args, int index, script::ExecutionContext &ctx);
-std::shared_ptr<Object> getObjectOrCaller(Game &game, const std::vector<script::Variable> &args, int index, script::ExecutionContext &ctx);
-std::shared_ptr<SpatialObject> getSpatialObject(Game &game, const std::vector<script::Variable> &args, int index, script::ExecutionContext &ctx);
-std::shared_ptr<SpatialObject> getSpatialObjectOrCaller(Game &game, const std::vector<script::Variable> &args, int index, script::ExecutionContext &ctx);
-std::shared_ptr<Creature> getCreature(Game &game, const std::vector<script::Variable> &args, int index, script::ExecutionContext &ctx);
-std::shared_ptr<Creature> getCreatureOrCaller(Game &game, const std::vector<script::Variable> &args, int index, script::ExecutionContext &ctx);
-std::shared_ptr<Door> getDoor(Game &game, const std::vector<script::Variable> &args, int index, script::ExecutionContext &ctx);
-std::shared_ptr<Item> getItem(Game &game, const std::vector<script::Variable> &args, int index, script::ExecutionContext &ctx);
-std::shared_ptr<Sound> getSound(Game &game, const std::vector<script::Variable> &args, int index, script::ExecutionContext &ctx);
+std::shared_ptr<Object> getObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<Object> getObjectOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<SpatialObject> getSpatialObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<SpatialObject> getSpatialObjectOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<Creature> getCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<Creature> getCreatureOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<Door> getDoor(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<Item> getItem(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<Sound> getSound(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 std::shared_ptr<Effect> getEffect(const std::vector<script::Variable> &args, int index);
 std::shared_ptr<Event> getEvent(const std::vector<script::Variable> &args, int index);
 std::shared_ptr<Location> getLocationEngineType(const std::vector<script::Variable> &args, int index);

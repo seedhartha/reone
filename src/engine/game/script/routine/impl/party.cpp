@@ -29,6 +29,8 @@
 #include "../../../game.h"
 #include "../../../party.h"
 
+#include "../context.h"
+
 #include "argutil.h"
 #include "objectutil.h"
 
@@ -42,43 +44,43 @@ namespace game {
 
 namespace routine {
 
-Variable setPartyLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPartyLeader(const vector<Variable> &args, const RoutineContext &ctx) {
     int npc = getInt(args, 0);
 
-    game.party().setPartyLeader(npc);
+    ctx.party.setPartyLeader(npc);
 
     return Variable::ofNull();
 }
 
-Variable getPartyMemberCount(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(game.party().getSize());
+Variable getPartyMemberCount(const vector<Variable> &args, const RoutineContext &ctx) {
+    return Variable::ofInt(ctx.party.getSize());
 }
 
-Variable addToParty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable addToParty(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable removeFromParty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable removeFromParty(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable addPartyMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable addPartyMember(const vector<Variable> &args, const RoutineContext &ctx) {
     int npc = getInt(args, 0);
-    auto creature = getCreature(game, args, 1, ctx);
+    auto creature = getCreature(args, 1, ctx);
 
-    bool result = game.party().addAvailableMember(npc, creature->blueprintResRef());
+    bool result = ctx.party.addAvailableMember(npc, creature->blueprintResRef());
 
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable removePartyMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable removePartyMember(const vector<Variable> &args, const RoutineContext &ctx) {
     bool result = false;
     int npc = getInt(args, 0);
 
-    if (game.party().isMember(npc)) {
-        game.party().removeMember(npc);
+    if (ctx.party.isMember(npc)) {
+        ctx.party.removeMember(npc);
 
-        shared_ptr<Area> area(game.module()->area());
+        shared_ptr<Area> area(ctx.game.module()->area());
         area->unloadParty();
         area->reloadParty();
 
@@ -88,123 +90,123 @@ Variable removePartyMember(Game &game, const vector<Variable> &args, ExecutionCo
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable isObjectPartyMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(game.party().isMember(*creature)));
+Variable isObjectPartyMember(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
+    return Variable::ofInt(static_cast<int>(ctx.party.isMember(*creature)));
 }
 
-Variable getPartyMemberByIndex(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPartyMemberByIndex(const vector<Variable> &args, const RoutineContext &ctx) {
     int index = getInt(args, 0);
-    auto member = game.party().getMember(index);
+    auto member = ctx.party.getMember(index);
 
     return Variable::ofObject(getObjectIdOrInvalid(member));
 }
 
-Variable addAvailableNPCByObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable addAvailableNPCByObject(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable removeAvailableNPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable removeAvailableNPC(const vector<Variable> &args, const RoutineContext &ctx) {
     int npc = getInt(args, 0);
-    bool removed = game.party().removeAvailableMember(npc);
+    bool removed = ctx.party.removeAvailableMember(npc);
 
     return Variable::ofInt(static_cast<int>(removed));
 }
 
-Variable isAvailableCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isAvailableCreature(const vector<Variable> &args, const RoutineContext &ctx) {
     int npc = getInt(args, 0);
-    bool isAvailable = game.party().isMemberAvailable(npc);
+    bool isAvailable = ctx.party.isMemberAvailable(npc);
 
     return Variable::ofInt(static_cast<int>(isAvailable));
 }
 
-Variable addAvailableNPCByTemplate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable addAvailableNPCByTemplate(const vector<Variable> &args, const RoutineContext &ctx) {
     int npc = getInt(args, 0);
     string blueprint(boost::to_lower_copy(getString(args, 1)));
 
-    bool added = game.party().addAvailableMember(npc, blueprint);
+    bool added = ctx.party.addAvailableMember(npc, blueprint);
 
     return Variable::ofInt(static_cast<int>(added));
 }
 
-Variable spawnAvailableNPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable spawnAvailableNPC(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable isNPCPartyMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isNPCPartyMember(const vector<Variable> &args, const RoutineContext &ctx) {
     int npc = getInt(args, 0);
-    bool isMember = game.party().isMember(npc);
+    bool isMember = ctx.party.isMember(npc);
 
     return Variable::ofInt(static_cast<int>(isMember));
 }
 
-Variable getPartyAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPartyAIStyle(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: implement
     return Variable::ofInt(static_cast<int>(PartyAIStyle::Aggressive));
 }
 
-Variable setPartyAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPartyAIStyle(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable saveNPCState(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable saveNPCState(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setAvailableNPCId(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setAvailableNPCId(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable addAvailablePUPByTemplate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable addAvailablePUPByTemplate(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable addAvailablePUPByObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable addAvailablePUPByObject(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable assignPUP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable assignPUP(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable spawnAvailablePUP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable spawnAvailablePUP(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable addPartyPuppet(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable addPartyPuppet(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPUPOwner(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPUPOwner(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsPuppet(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsPuppet(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsPartyLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsPartyLeader(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPartyLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto player = game.party().getLeader();
+Variable getPartyLeader(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto player = ctx.party.getLeader();
     return Variable::ofObject(getObjectIdOrInvalid(player));
 }
 
-Variable removeNPCFromPartyToBase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable removeNPCFromPartyToBase(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable saveNPCByObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable saveNPCByObject(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable savePUPByObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable savePUPByObject(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable rebuildPartyTable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable rebuildPartyTable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

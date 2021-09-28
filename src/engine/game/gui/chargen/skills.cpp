@@ -45,8 +45,69 @@ static const unordered_map<SkillType, int> g_descStrRefBySkill {
     {SkillType::Security, 256},
     {SkillType::TreatInjury, 258}};
 
-CharGenSkills::CharGenSkills(CharacterGeneration *charGen, Game *game) :
-    GameGUI(game),
+CharGenSkills::CharGenSkills(
+    CharacterGeneration *charGen,
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings),
     _charGen(charGen) {
 
     _resRef = getResRef("skchrgen");
@@ -217,7 +278,7 @@ void CharGenSkills::bindControls() {
 
 void CharGenSkills::reset(bool newGame) {
     const CreatureAttributes &attributes = _charGen->character().attributes;
-    shared_ptr<CreatureClass> clazz(_game->classes().get(attributes.getEffectiveClass()));
+    shared_ptr<CreatureClass> clazz(_classes.get(attributes.getEffectiveClass()));
 
     _points = glm::max(1, (clazz->skillPointBase() + attributes.getAbilityModifier(Ability::Intelligence)) / 2);
 
@@ -273,7 +334,7 @@ void CharGenSkills::refreshControls() {
 bool CharGenSkills::canIncreaseSkill(SkillType skill) const {
     ClassType clazz = _charGen->character().attributes.getEffectiveClass();
 
-    shared_ptr<CreatureClass> creatureClass(_game->classes().get(clazz));
+    shared_ptr<CreatureClass> creatureClass(_classes.get(clazz));
     int maxSkillRank = creatureClass->isClassSkill(skill) ? 4 : 2;
     int pointCost = creatureClass->isClassSkill(skill) ? 1 : 2;
 
@@ -290,7 +351,7 @@ void CharGenSkills::updateCharacter() {
 
 int CharGenSkills::getPointCost(SkillType skill) const {
     ClassType clazz = _charGen->character().attributes.getEffectiveClass();
-    shared_ptr<CreatureClass> creatureClass(_game->classes().get(clazz));
+    shared_ptr<CreatureClass> creatureClass(_classes.get(clazz));
     return creatureClass->isClassSkill(skill) ? 1 : 2;
 }
 
@@ -314,7 +375,7 @@ void CharGenSkills::onSkillLabelFocusChanged(SkillType skill, bool focus) {
     if (maybeDescription == g_descStrRefBySkill.end())
         return;
 
-    string description(_game->strings().get(maybeDescription->second));
+    string description(_strings.get(maybeDescription->second));
     _binding.lbDesc->clearItems();
     _binding.lbDesc->addTextLinesAsItems(description);
 }

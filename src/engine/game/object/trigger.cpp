@@ -34,20 +34,12 @@ namespace reone {
 
 namespace game {
 
-Trigger::Trigger(
-    uint32_t id,
-    Game *game,
-    ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph) :
-    SpatialObject(id, ObjectType::Trigger, game, objectFactory, sceneGraph) {
-}
-
 void Trigger::loadFromGIT(const GffStruct &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
 
     _tag = boost::to_lower_copy(gffs.getString("Tag"));
-    _transitionDestin = _game->strings().get(gffs.getInt("TransitionDestin"));
+    _transitionDestin = _strings.get(gffs.getInt("TransitionDestin"));
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
     _linkedToFlags = gffs.getInt("LinkedToFlags");
@@ -76,7 +68,7 @@ void Trigger::loadGeometryFromGIT(const GffStruct &gffs) {
 }
 
 void Trigger::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utt(_game->resources().getGFF(resRef, ResourceType::Utt));
+    shared_ptr<GffStruct> utt(_resources.getGFF(resRef, ResourceType::Utt));
     if (utt) {
         loadUTT(*utt);
     }
@@ -95,7 +87,7 @@ void Trigger::update(float dt) {
     for (auto &tenant : tenantsToRemove) {
         _tenants.erase(tenant);
         if (!_onExit.empty()) {
-            _game->scriptRunner().run(_onExit, _id, tenant->id());
+            _scriptRunner.run(_onExit, _id, tenant->id());
         }
     }
 }
@@ -122,7 +114,7 @@ bool Trigger::isTenant(const std::shared_ptr<SpatialObject> &object) const {
 void Trigger::loadUTT(const GffStruct &utt) {
     _tag = boost::to_lower_copy(utt.getString("Tag"));
     _blueprintResRef = boost::to_lower_copy(utt.getString("TemplateResRef"));
-    _name = _game->strings().get(utt.getInt("LocalizedName"));
+    _name = _strings.get(utt.getInt("LocalizedName"));
     _autoRemoveKey = utt.getBool("AutoRemoveKey"); // always 0, but could be useful
     _faction = utt.getEnum("Faction", Faction::Invalid);
     _keyName = utt.getString("KeyName");

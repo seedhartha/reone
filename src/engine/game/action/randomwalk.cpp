@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void RandomWalkAction::execute(Object &actor, float dt) {
+void RandomWalkAction::execute(Object &actor, ActionContext &ctx, float dt) {
     // TODO: implement
 
     complete();

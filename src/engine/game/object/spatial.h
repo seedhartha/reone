@@ -33,7 +33,6 @@ namespace reone {
 namespace game {
 
 class Item;
-class ObjectFactory;
 class Room;
 
 class SpatialObject : public Object {
@@ -131,9 +130,6 @@ protected:
         float duration {0.0f};
     };
 
-    ObjectFactory *_objectFactory;
-    scene::SceneGraph *_sceneGraph;
-
     glm::vec3 _position {0.0f};
     glm::quat _orientation {1.0f, 0.0f, 0.0f, 0.0f};
     glm::mat4 _transform {1.0f};
@@ -150,8 +146,55 @@ protected:
         uint32_t id,
         ObjectType type,
         Game *game,
-        ObjectFactory *objectFactory,
-        scene::SceneGraph *sceneGraph);
+        ActionFactory &actionFactory,
+        Classes &classes,
+        Combat &combat,
+        FootstepSounds &footstepSounds,
+        ObjectFactory &objectFactory,
+        Party &party,
+        Portraits &portraits,
+        Reputes &reputes,
+        ScriptRunner &scriptRunner,
+        SoundSets &soundSets,
+        Surfaces &surfaces,
+        audio::AudioFiles &audioFiles,
+        audio::AudioPlayer &audioPlayer,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Models &models,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Walkmeshes &walkmeshes,
+        resource::Resources &resources,
+        resource::Strings &strings,
+        scene::SceneGraph &sceneGraph) :
+        Object(
+            id,
+            type,
+            game,
+            actionFactory,
+            classes,
+            combat,
+            footstepSounds,
+            objectFactory,
+            party,
+            portraits,
+            reputes,
+            scriptRunner,
+            soundSets,
+            surfaces,
+            audioFiles,
+            audioPlayer,
+            context,
+            meshes,
+            models,
+            shaders,
+            textures,
+            walkmeshes,
+            resources,
+            strings,
+            sceneGraph) {
+    }
 
     virtual void updateTransform();
 

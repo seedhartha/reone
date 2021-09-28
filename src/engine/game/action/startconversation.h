@@ -31,7 +31,7 @@ public:
         _ignoreStartRange(ignoreStartRange) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(Object &actor, ActionContext &ctx, float dt) override;
 
     bool isStartRangeIgnored() const { return _ignoreStartRange; }
 

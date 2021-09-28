@@ -23,6 +23,8 @@ namespace reone {
 
 namespace game {
 
+struct ActionContext;
+
 class Creature;
 class Game;
 class Object;
@@ -31,7 +33,7 @@ class Action : boost::noncopyable {
 public:
     virtual ~Action() = default;
 
-    virtual void execute(Object &actor, float dt);
+    virtual void execute(Object &actor, ActionContext &ctx, float dt);
     void complete() { _completed = true; }
 
     bool isCompleted() const { return _completed; }
@@ -49,7 +51,10 @@ protected:
 
     bool _completed {false};
 
-    Action(Game &game, ActionType type, bool userAction = false) :
+    Action(
+        Game &game,
+        ActionType type,
+        bool userAction = false) :
         _game(game),
         _type(type),
         _userAction(userAction) {

@@ -26,6 +26,8 @@
 
 #include "../../../object/object.h"
 
+#include "../context.h"
+
 #include "argutil.h"
 
 using namespace std;
@@ -38,7 +40,7 @@ namespace game {
 
 namespace routine {
 
-Variable printString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable printString(const vector<Variable> &args, const RoutineContext &ctx) {
     string str(getString(args, 0));
 
     info(str);
@@ -46,7 +48,7 @@ Variable printString(Game &game, const vector<Variable> &args, ExecutionContext 
     return Variable::ofNull();
 }
 
-Variable printFloat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable printFloat(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: use formatting parameters
     float value = getFloat(args, 0);
     int width = getIntOrElse(args, 1, 18);
@@ -57,7 +59,7 @@ Variable printFloat(Game &game, const vector<Variable> &args, ExecutionContext &
     return Variable::ofNull();
 }
 
-Variable printInteger(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable printInteger(const vector<Variable> &args, const RoutineContext &ctx) {
     int value = getInt(args, 0);
 
     info(to_string(value));
@@ -65,15 +67,15 @@ Variable printInteger(Game &game, const vector<Variable> &args, ExecutionContext
     return Variable::ofNull();
 }
 
-Variable printObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable printObject(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
 
     info(to_string(object->id()));
 
     return Variable::ofNull();
 }
 
-Variable printVector(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable printVector(const vector<Variable> &args, const RoutineContext &ctx) {
     glm::vec3 value(getVector(args, 0));
 
     info(boost::format("%f %f %f") % value.x % value.y % value.z);
@@ -81,11 +83,11 @@ Variable printVector(Game &game, const vector<Variable> &args, ExecutionContext 
     return Variable::ofNull();
 }
 
-Variable writeTimestampedLogEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable writeTimestampedLogEntry(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable aurPostString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable aurPostString(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

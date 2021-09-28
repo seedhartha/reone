@@ -23,6 +23,8 @@
 
 #include "../../../../script/exception/notimpl.h"
 
+#include "../context.h"
+
 using namespace std;
 
 using namespace reone::script;
@@ -33,27 +35,27 @@ namespace game {
 
 namespace routine {
 
-Variable ambientSoundPlay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable ambientSoundPlay(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable ambientSoundStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable ambientSoundStop(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable ambientSoundChangeDay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable ambientSoundChangeDay(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable ambientSoundChangeNight(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable ambientSoundChangeNight(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable ambientSoundSetDayVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable ambientSoundSetDayVolume(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable ambientSoundSetNightVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable ambientSoundSetNightVolume(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

@@ -31,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-void CommandAction::execute(Object &actor, float dt) {
+void CommandAction::execute(Object &actor, ActionContext &ctx, float dt) {
     auto context = make_unique<ExecutionContext>(*_context);
     context->callerId = actor.id();
 

@@ -48,8 +48,68 @@ static int g_strRefRemove = 38456;
 static glm::vec3 g_kotorColorOn = {0.984314f, 1.0f, 0};
 static glm::vec3 g_kotorColorAdded = {0, 0.831373f, 0.090196f};
 
-PartySelection::PartySelection(Game *game) :
-    GameGUI(game) {
+PartySelection::PartySelection(
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings) {
     if (game->isTSL()) {
         _resRef = "partyselect_p";
     } else {
@@ -78,13 +138,13 @@ void PartySelection::load() {
         changeParty();
         _game->openInGame();
         if (!_context.exitScript.empty()) {
-            _game->scriptRunner().run(_context.exitScript);
+            _scriptRunner.run(_context.exitScript);
         }
     });
     _binding.btnBack->setOnClick([this]() {
         _game->openInGame();
         if (!_context.exitScript.empty()) {
-            _game->scriptRunner().run(_context.exitScript);
+            _scriptRunner.run(_context.exitScript);
         }
     });
     _binding.btnNpc0->setOnClick([this]() {
@@ -198,7 +258,7 @@ void PartySelection::prepare(const Context &ctx) {
     if (ctx.forceNpc2 >= 0) {
         addNpc(ctx.forceNpc2);
     }
-    Party &party = _game->party();
+    Party &party = _party;
     vector<Label *> charLabels {
         _binding.lblChar0.get(),
         _binding.lblChar1.get(),
@@ -236,14 +296,14 @@ void PartySelection::prepare(const Context &ctx) {
 
         if (party.isMemberAvailable(i)) {
             string blueprintResRef(party.getAvailableMember(i));
-            shared_ptr<GffStruct> utc(_game->resources().getGFF(blueprintResRef, ResourceType::Utc));
+            shared_ptr<GffStruct> utc(_resources.getGFF(blueprintResRef, ResourceType::Utc));
             shared_ptr<Texture> portrait;
             int portraitId = utc->getInt("PortraitId", 0);
             if (portraitId > 0) {
-                portrait = _game->portraits().getTextureByIndex(portraitId);
+                portrait = _portraits.getTextureByIndex(portraitId);
             } else {
                 int appearance = utc->getInt("Appearance_Type");
-                portrait = _game->portraits().getTextureByAppearance(appearance);
+                portrait = _portraits.getTextureByAppearance(appearance);
             }
             btnNpc.setDisabled(false);
             lblChar.setBorderFill(move(portrait));
@@ -303,7 +363,7 @@ void PartySelection::refreshAvailableCount() {
 }
 
 void PartySelection::refreshAcceptButton() {
-    string text(_game->strings().get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
+    string text(_strings.get(_added[_selectedNpc] ? g_strRefRemove : g_strRefAdd));
     _binding.btnAccept->setTextMessage(text);
 }
 
@@ -336,11 +396,11 @@ void PartySelection::changeParty() {
     shared_ptr<Area> area(_game->module()->area());
     area->unloadParty();
 
-    Party &party = _game->party();
+    Party &party = _party;
     party.clear();
     party.addMember(kNpcPlayer, party.player());
 
-    shared_ptr<Creature> player(_game->party().player());
+    shared_ptr<Creature> player(_party.player());
 
     for (int i = 0; i < kNpcCount; ++i) {
         if (!_added[i])
@@ -348,7 +408,7 @@ void PartySelection::changeParty() {
 
         string blueprintResRef(party.getAvailableMember(i));
 
-        shared_ptr<Creature> creature(_game->objectFactory().newCreature());
+        shared_ptr<Creature> creature(_objectFactory.newCreature());
         creature->loadFromBlueprint(blueprintResRef);
         creature->setFaction(Faction::Friendly1);
         creature->setImmortal(true);

@@ -40,8 +40,68 @@ static constexpr int kSwitchToResRef = 47884;
 static constexpr int kGiveItemResRef = 47885;
 static constexpr int kInventoryResRef = 393;
 
-Container::Container(Game *game) :
-    GameGUI(game) {
+Container::Container(
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings) {
     _resRef = getResRef("container");
 
     initForGame();
@@ -51,10 +111,10 @@ void Container::load() {
     GUI::load();
     bindControls();
 
-    string btnMessage(_game->strings().get(kSwitchToResRef) + " " + _game->strings().get(kGiveItemResRef));
+    string btnMessage(_strings.get(kSwitchToResRef) + " " + _strings.get(kGiveItemResRef));
     _binding.btnGiveItems->setTextMessage(btnMessage);
 
-    string lblMessage(_game->strings().get(kInventoryResRef));
+    string lblMessage(_strings.get(kInventoryResRef));
     _binding.lblMessage->setTextMessage(lblMessage);
 
     _binding.btnOk->setOnClick([this]() {
@@ -114,11 +174,11 @@ shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return _game->textures().get(resRef, TextureUsage::GUI);
+    return _textures.get(resRef, TextureUsage::GUI);
 }
 
 void Container::transferItemsToPlayer() {
-    shared_ptr<Creature> player(_game->party().player());
+    shared_ptr<Creature> player(_party.player());
     _container->moveDropableItemsTo(*player);
 
     auto placeable = dynamic_pointer_cast<Placeable>(_container);

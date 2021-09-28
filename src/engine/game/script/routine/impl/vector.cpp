@@ -24,6 +24,8 @@
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/types.h"
 
+#include "../context.h"
+
 #include "argutil.h"
 
 using namespace std;
@@ -36,28 +38,28 @@ namespace game {
 
 namespace routine {
 
-Variable vectorMagnitude(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable vectorMagnitude(const vector<Variable> &args, const RoutineContext &ctx) {
     glm::vec3 value(getVector(args, 0));
     return Variable::ofFloat(glm::length(value));
 }
 
-Variable vectorNormalize(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable vectorNormalize(const vector<Variable> &args, const RoutineContext &ctx) {
     glm::vec3 value(getVector(args, 0));
     return Variable::ofVector(glm::normalize(value));
 }
 
-Variable vectorCreate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable vectorCreate(const vector<Variable> &args, const RoutineContext &ctx) {
     float x = getFloat(args, 0);
     float y = getFloat(args, 1);
     float z = getFloat(args, 2);
     return Variable::ofVector(glm::vec3(x, y, z));
 }
 
-Variable angleToVector(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable angleToVector(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable vectorToAngle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable vectorToAngle(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

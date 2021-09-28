@@ -31,14 +31,6 @@ namespace reone {
 
 namespace game {
 
-Encounter::Encounter(
-    uint32_t id,
-    Game *game,
-    ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph) :
-    SpatialObject(id, ObjectType::Encounter, game, objectFactory, sceneGraph) {
-}
-
 void Encounter::loadFromGIT(const GffStruct &gffs) {
     string blueprintResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(blueprintResRef);
@@ -48,7 +40,7 @@ void Encounter::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Encounter::loadFromBlueprint(const string &blueprintResRef) {
-    shared_ptr<GffStruct> ute(_game->resources().getGFF(blueprintResRef, ResourceType::Ute));
+    shared_ptr<GffStruct> ute(_resources.getGFF(blueprintResRef, ResourceType::Ute));
     if (ute) {
         loadUTE(*ute);
     }
@@ -87,7 +79,7 @@ void Encounter::loadSpawnPointsFromGIT(const GffStruct &gffs) {
 
 void Encounter::loadUTE(const GffStruct &ute) {
     _tag = boost::to_lower_copy(ute.getString("Tag"));
-    _name = _game->strings().get(ute.getInt("LocalizedName"));
+    _name = _strings.get(ute.getInt("LocalizedName"));
     _blueprintResRef = boost::to_lower_copy(ute.getString("TemplateResRef"));
     _active = ute.getBool("Active");
     _difficultyIndex = ute.getInt("DifficultyIndex"); // index into encdifficulty.2da

@@ -25,6 +25,8 @@
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/types.h"
 
+#include "../context.h"
+
 using namespace std;
 
 using namespace reone::script;
@@ -35,51 +37,51 @@ namespace game {
 
 namespace routine {
 
-Variable musicBackgroundPlay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable musicBackgroundPlay(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable musicBackgroundStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable musicBackgroundStop(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable musicBackgroundSetDelay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable musicBackgroundSetDelay(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable musicBackgroundChangeDay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable musicBackgroundChangeDay(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable musicBackgroundChangeNight(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable musicBackgroundChangeNight(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable musicBattlePlay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable musicBattlePlay(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable musicBattleStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable musicBattleStop(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable musicBattleChange(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable musicBattleChange(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable musicBackgroundGetDayTrack(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable musicBackgroundGetDayTrack(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable musicBackgroundGetNightTrack(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable musicBackgroundGetNightTrack(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable musicBackgroundGetBattleTrack(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable musicBackgroundGetBattleTrack(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setMusicVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setMusicVolume(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

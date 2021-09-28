@@ -1,6 +1,7 @@
 BasedOnStyle: LLVM
 
 AccessModifierOffset: -4
+AllowShortFunctionsOnASingleLine: Inline
 BreakConstructorInitializers: AfterColon
 ColumnLimit: 0
 IndentWidth: 4

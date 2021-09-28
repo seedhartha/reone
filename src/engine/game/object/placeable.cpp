@@ -38,14 +38,6 @@ namespace reone {
 
 namespace game {
 
-Placeable::Placeable(
-    uint32_t id,
-    Game *game,
-    ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph) :
-    SpatialObject(id, ObjectType::Placeable, game, objectFactory, sceneGraph) {
-}
-
 void Placeable::loadFromGIT(const GffStruct &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
@@ -54,21 +46,21 @@ void Placeable::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Placeable::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utp(_game->resources().getGFF(resRef, ResourceType::Utp));
+    shared_ptr<GffStruct> utp(_resources.getGFF(resRef, ResourceType::Utp));
     if (!utp)
         return;
 
     loadUTP(*utp);
 
-    shared_ptr<TwoDA> placeables(_game->resources().get2DA("placeables"));
+    shared_ptr<TwoDA> placeables(_resources.get2DA("placeables"));
     string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
-    auto model = _sceneGraph->newModel(_game->models().get(modelName), ModelUsage::Placeable);
+    auto model = _sceneGraph.newModel(_models.get(modelName), ModelUsage::Placeable);
     model->setCullable(true);
     model->setDrawDistance(64.0f);
     _sceneNode = move(model);
 
-    _walkmesh = _game->walkmeshes().get(modelName, ResourceType::Pwk);
+    _walkmesh = _walkmeshes.get(modelName, ResourceType::Pwk);
 }
 
 void Placeable::loadTransformFromGIT(const GffStruct &gffs) {
@@ -91,19 +83,19 @@ shared_ptr<Walkmesh> Placeable::getWalkmesh() const {
 
 void Placeable::runOnUsed(shared_ptr<SpatialObject> usedBy) {
     if (!_onUsed.empty()) {
-        _game->scriptRunner().run(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
+        _scriptRunner.run(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
     }
 }
 
 void Placeable::runOnInvDisturbed(shared_ptr<SpatialObject> triggerrer) {
     if (!_onInvDisturbed.empty()) {
-        _game->scriptRunner().run(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
+        _scriptRunner.run(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
     }
 }
 
 void Placeable::loadUTP(const GffStruct &utp) {
     _tag = boost::to_lower_copy(utp.getString("Tag"));
-    _name = _game->strings().get(utp.getInt("LocName"));
+    _name = _strings.get(utp.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utp.getString("TemplateResRef"));
     _conversation = boost::to_lower_copy(utp.getString("Conversation"));
     _interruptable = utp.getBool("Interruptable");

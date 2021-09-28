@@ -22,13 +22,15 @@
 #include "../object/creature.h"
 #include "../object/factory.h"
 
+#include "context.h"
+
 using namespace std;
 
 namespace reone {
 
 namespace game {
 
-void AttackAction::execute(Object &actor, float dt) {
+void AttackAction::execute(Object &actor, ActionContext &ctx, float dt) {
     // If target is dead, complete the action
     shared_ptr<SpatialObject> target(static_pointer_cast<SpatialObject>(_object));
     if (target->isDead()) {
@@ -36,11 +38,11 @@ void AttackAction::execute(Object &actor, float dt) {
         return;
     }
 
-    auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
+    auto creatureActor = ctx.objectFactory.getObjectById<Creature>(actor.id());
 
     // Make the actor follow its target. When reached, register an attack
     if (creatureActor->navigateTo(target->position(), true, _range, dt)) {
-        _game.combat().addAttack(move(creatureActor), move(target), this);
+        ctx.combat.addAttack(move(creatureActor), move(target), this);
     }
 }
 

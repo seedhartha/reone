@@ -37,8 +37,70 @@ namespace reone {
 
 namespace game {
 
-CharacterMenu::CharacterMenu(Game *game, InGameMenu &inGameMenu) :
-    GameGUI(game), _inGameMenu(inGameMenu) {
+CharacterMenu::CharacterMenu(
+    Game *game,
+    InGameMenu &inGameMenu,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings),
+    _inGameMenu(inGameMenu) {
     _resRef = getResRef("character");
 
     initForGame();
@@ -148,7 +210,7 @@ void CharacterMenu::bindControls() {
 }
 
 void CharacterMenu::update(float dt) {
-    shared_ptr<Creature> leader(_game->party().getLeader());
+    shared_ptr<Creature> leader(_party.getLeader());
     _binding.btnLevelup->setVisible(leader->isLevelUpPending());
     _binding.btnAuto->setVisible(leader->isLevelUpPending());
     GUI::update(dt);
@@ -163,7 +225,7 @@ static string describeAbilityModifier(int value) {
 }
 
 void CharacterMenu::refreshControls() {
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<Creature> partyLeader(_party.getLeader());
     CreatureAttributes &attributes = partyLeader->attributes();
 
     if (_game->isKotOR()) {
@@ -206,14 +268,14 @@ string CharacterMenu::describeClass(ClassType clazz) const {
     if (clazz == ClassType::Invalid)
         return "";
 
-    return _game->classes().get(clazz)->name();
+    return _classes.get(clazz)->name();
 }
 
 void CharacterMenu::refreshPortraits() {
     if (_game->id() != GameID::KotOR)
         return;
 
-    Party &party = _game->party();
+    Party &party = _party;
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
 
@@ -248,9 +310,31 @@ void CharacterMenu::refresh3D() {
 }
 
 shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) const {
-    auto partyLeader = _game->party().getLeader();
+    auto partyLeader = _party.getLeader();
 
-    auto objectFactory = make_shared<ObjectFactory>(sceneGraph);
+    auto objectFactory = make_shared<ObjectFactory>(
+        _actionFactory,
+        _classes,
+        _combat,
+        _footstepSounds,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _meshes,
+        _models,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings,
+        sceneGraph);
     objectFactory->setGame(*_game);
 
     auto character = objectFactory->newCreature();
@@ -270,7 +354,7 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) 
     character->loadAppearance();
     character->updateModelAnimation();
 
-    auto sceneModel = sceneGraph.newModel(_game->models().get("charmain_light"), ModelUsage::GUI);
+    auto sceneModel = sceneGraph.newModel(_models.get("charmain_light"), ModelUsage::GUI);
     sceneModel->attach("charmain_light", character->sceneNode());
 
     return move(sceneModel);

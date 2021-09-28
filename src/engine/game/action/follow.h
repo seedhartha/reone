@@ -30,7 +30,7 @@ public:
         _distance(distance) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(Object &actor, ActionContext &ctx, float dt) override;
 
     float distance() const { return _distance; }
 

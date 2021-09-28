@@ -34,8 +34,68 @@ namespace game {
 
 static constexpr int kStrRefMapNote = 349;
 
-MapMenu::MapMenu(Game *game) :
-    GameGUI(game) {
+MapMenu::MapMenu(
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings) {
     _resRef = getResRef("map");
 
     initForGame();
@@ -119,7 +179,7 @@ void MapMenu::refreshSelectedNote() {
     if (!_notes.empty()) {
         note = _notes[_selectedNoteIdx];
 
-        string text(_game->strings().get(kStrRefMapNote));
+        string text(_strings.get(kStrRefMapNote));
         text += ": ";
         text += note->mapNote();
 

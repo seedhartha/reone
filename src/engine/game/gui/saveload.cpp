@@ -45,8 +45,68 @@ static constexpr int kStrRefSave = 1587;
 static constexpr int kStrRefSaveGame = 1588;
 static constexpr int kStrRefLoad = 1589;
 
-SaveLoad::SaveLoad(Game *game) :
-    GameGUI(game) {
+SaveLoad::SaveLoad(
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings) {
     _resRef = getResRef("saveload");
 
     initForGame();
@@ -159,10 +219,10 @@ void SaveLoad::bindControls() {
 void SaveLoad::refresh() {
     _binding.btnDelete->setDisabled(_mode != Mode::Save);
 
-    string panelName(_game->strings().get(_mode == Mode::Save ? kStrRefSaveGame : kStrRefLoadGame));
+    string panelName(_strings.get(_mode == Mode::Save ? kStrRefSaveGame : kStrRefLoadGame));
     _binding.lblPanelName->setTextMessage(move(panelName));
 
-    string actionName(_game->strings().get(_mode == Mode::Save ? kStrRefSave : kStrRefLoad));
+    string actionName(_strings.get(_mode == Mode::Save ? kStrRefSave : kStrRefLoad));
     _binding.btnSaveLoad->setTextMessage(move(actionName));
 
     refreshSavedGames();

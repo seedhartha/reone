@@ -17,19 +17,51 @@
 
 #pragma once
 
+#include "../../script/executioncontext.h"
 #include "../../script/routine.h"
 #include "../../script/routineprovider.h"
 #include "../../script/types.h"
 #include "../../script/variable.h"
 
+#include "routine/context.h"
+
 namespace reone {
+
+namespace resource {
+
+class Strings;
+
+}
 
 namespace game {
 
+class ActionFactory;
+class Combat;
+class EffectFactory;
 class Game;
+class Party;
+class Reputes;
+class ScriptRunner;
 
 class Routines : public script::IRoutineProvider, boost::noncopyable {
 public:
+    Routines(
+        ActionFactory &actionFactory,
+        Combat &combat,
+        EffectFactory &effectFactory,
+        Party &party,
+        Reputes &reputes,
+        ScriptRunner &scriptRunner,
+        resource::Strings &strings) :
+        _actionFactory(actionFactory),
+        _combat(combat),
+        _effectFactory(effectFactory),
+        _party(party),
+        _reputes(reputes),
+        _scriptRunner(scriptRunner),
+        _strings(strings) {
+    }
+
     const script::Routine &get(int index) override {
         return _routines[index];
     }
@@ -43,12 +75,42 @@ public:
         std::vector<script::VariableType> argTypes,
         const T &fn) {
 
-        _routines.emplace_back(std::move(name), retType, std::move(argTypes), std::bind(fn, std::ref(*_game), std::placeholders::_1, std::placeholders::_2));
+        _routines.emplace_back(
+            std::move(name),
+            retType,
+            std::move(argTypes),
+            [&](auto &args, auto &execution) {
+                RoutineContext ctx(
+                    _actionFactory,
+                    _combat,
+                    _effectFactory,
+                    *_game,
+                    _party,
+                    _reputes,
+                    _scriptRunner,
+                    _strings,
+                    execution);
+
+                return fn(args, std::move(ctx));
+            });
     }
 
 private:
-    Game *_game {nullptr};
     std::vector<script::Routine> _routines;
+
+    // Services
+
+    ActionFactory &_actionFactory;
+    Combat &_combat;
+    EffectFactory &_effectFactory;
+    Game *_game;
+    Party &_party;
+    Reputes &_reputes;
+    ScriptRunner &_scriptRunner;
+
+    resource::Strings &_strings;
+
+    // END Services
 };
 
 } // namespace game

@@ -26,6 +26,8 @@
 
 #include "../../../object/creature.h"
 
+#include "../context.h"
+
 #include "argutil.h"
 #include "objectutil.h"
 
@@ -39,53 +41,53 @@ namespace game {
 
 namespace routine {
 
-Variable getLastPerceived(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsCreature(game, ctx);
+Variable getLastPerceived(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caller = getCallerAsCreature(ctx);
     auto object = caller->perception().lastPerceived;
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable getLastPerceptionHeard(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsCreature(game, ctx);
+Variable getLastPerceptionHeard(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caller = getCallerAsCreature(ctx);
     bool heard = caller->perception().lastPerception == PerceptionType::Heard;
 
     return Variable::ofInt(static_cast<int>(heard));
 }
 
-Variable getLastPerceptionInaudible(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsCreature(game, ctx);
+Variable getLastPerceptionInaudible(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caller = getCallerAsCreature(ctx);
     bool notHeard = caller->perception().lastPerception == PerceptionType::NotHeard;
 
     return Variable::ofInt(static_cast<int>(notHeard));
 }
 
-Variable getLastPerceptionSeen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsCreature(game, ctx);
+Variable getLastPerceptionSeen(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caller = getCallerAsCreature(ctx);
     bool seen = caller->perception().lastPerception == PerceptionType::Seen;
 
     return Variable::ofInt(static_cast<int>(seen));
 }
 
-Variable getLastPerceptionVanished(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsCreature(game, ctx);
+Variable getLastPerceptionVanished(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caller = getCallerAsCreature(ctx);
     bool vanished = caller->perception().lastPerception == PerceptionType::NotSeen;
 
     return Variable::ofInt(static_cast<int>(vanished));
 }
 
-Variable getObjectSeen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getCreature(game, args, 0, ctx);
-    auto source = getCreatureOrCaller(game, args, 1, ctx);
+Variable getObjectSeen(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto target = getCreature(args, 0, ctx);
+    auto source = getCreatureOrCaller(args, 1, ctx);
 
     bool seen = source->perception().seen.count(target) > 0;
 
     return Variable::ofInt(static_cast<int>(seen));
 }
 
-Variable getObjectHeard(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getCreature(game, args, 0, ctx);
-    auto source = getCreatureOrCaller(game, args, 1, ctx);
+Variable getObjectHeard(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto target = getCreature(args, 0, ctx);
+    auto source = getCreatureOrCaller(args, 1, ctx);
 
     bool heard = source->perception().heard.count(target) > 0;
 

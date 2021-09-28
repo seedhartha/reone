@@ -23,6 +23,8 @@
 
 #include "../../../../script/exception/notimpl.h"
 
+#include "../context.h"
+
 using namespace std;
 
 using namespace reone::script;
@@ -33,35 +35,35 @@ namespace game {
 
 namespace routine {
 
-Variable getEncounterActive(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getEncounterActive(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setEncounterActive(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setEncounterActive(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getEncounterSpawnsMax(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getEncounterSpawnsMax(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setEncounterSpawnsMax(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setEncounterSpawnsMax(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getEncounterSpawnsCurrent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getEncounterSpawnsCurrent(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setEncounterSpawnsCurrent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setEncounterSpawnsCurrent(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setEncounterDifficulty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setEncounterDifficulty(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getEncounterDifficulty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getEncounterDifficulty(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

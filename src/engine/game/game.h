@@ -195,47 +195,6 @@ public:
     void setPaused(bool paused);
     void setRelativeMouseMode(bool relative);
 
-    // Services
-
-    ActionFactory &actionFactory() { return _actionFactory; }
-    Classes &classes() { return _classes; }
-    Combat &combat() { return _combat; }
-    Cursors &cursors() { return _cursors; }
-    EffectFactory &effectFactory() { return _effectFactory; }
-    Feats &feats() { return _feats; }
-    FootstepSounds &footstepSounds() { return _footstepSounds; }
-    GUISounds &guiSounds() { return _guiSounds; }
-    ObjectFactory &objectFactory() { return _objectFactory; }
-    Party &party() { return _party; }
-    Portraits &portraits() { return _portraits; }
-    Reputes &reputes() { return _reputes; }
-    ScriptRunner &scriptRunner() { return _scriptRunner; }
-    Skills &skills() { return _skills; }
-    SoundSets &soundSets() { return _soundSets; }
-    Surfaces &surfaces() { return _surfaces; }
-
-    audio::AudioFiles &audioFiles() { return _audioFiles; }
-    audio::AudioPlayer &audioPlayer() { return _audioPlayer; }
-    graphics::Context &context() { return _context; }
-    graphics::Features &features() { return _features; }
-    graphics::Fonts &fonts() { return _fonts; }
-    graphics::Lips &lips() { return _lips; }
-    graphics::Materials &materials() { return _materials; }
-    graphics::Meshes &meshes() { return _meshes; }
-    graphics::Models &models() { return _models; }
-    graphics::PBRIBL &pbrIbl() { return _pbrIbl; }
-    graphics::Shaders &shaders() { return _shaders; }
-    graphics::Textures &textures() { return _textures; }
-    graphics::Walkmeshes &walkmeshes() { return _walkmeshes; }
-    graphics::Window &window() { return _window; }
-    scene::SceneGraph &sceneGraph() { return _sceneGraph; }
-    scene::WorldRenderPipeline &worldRenderPipeline() { return _worldRenderPipeline; }
-    script::Scripts &scripts() { return _scripts; }
-    resource::Resources &resources() { return _resources; }
-    resource::Strings &strings() { return _strings; }
-
-    // END Services
-
     // Game ID
 
     bool isKotOR() const;

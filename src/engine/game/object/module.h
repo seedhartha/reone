@@ -61,7 +61,58 @@ public:
         int millisecond {0};
     };
 
-    Module(uint32_t id, Game *game);
+    Module(
+        uint32_t id,
+        Game *game,
+        ActionFactory &actionFactory,
+        Classes &classes,
+        Combat &combat,
+        FootstepSounds &footstepSounds,
+        ObjectFactory &objectFactory,
+        Party &party,
+        Portraits &portraits,
+        Reputes &reputes,
+        ScriptRunner &scriptRunner,
+        SoundSets &soundSets,
+        Surfaces &surfaces,
+        audio::AudioFiles &audioFiles,
+        audio::AudioPlayer &audioPlayer,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Models &models,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Walkmeshes &walkmeshes,
+        resource::Resources &resources,
+        resource::Strings &strings,
+        scene::SceneGraph &sceneGraph) :
+        Object(
+            id,
+            ObjectType::Module,
+            game,
+            actionFactory,
+            classes,
+            combat,
+            footstepSounds,
+            objectFactory,
+            party,
+            portraits,
+            reputes,
+            scriptRunner,
+            soundSets,
+            surfaces,
+            audioFiles,
+            audioPlayer,
+            context,
+            meshes,
+            models,
+            shaders,
+            textures,
+            walkmeshes,
+            resources,
+            strings,
+            sceneGraph) {
+    }
 
     void load(std::string name, const resource::GffStruct &ifo, bool fromSave = false);
     void loadParty(const std::string &entry = "", bool fromSave = false);

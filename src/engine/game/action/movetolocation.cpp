@@ -21,12 +21,14 @@
 #include "../location.h"
 #include "../object/factory.h"
 
+#include "context.h"
+
 namespace reone {
 
 namespace game {
 
-void MoveToLocationAction::execute(Object &actor, float dt) {
-    auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
+void MoveToLocationAction::execute(Object &actor, ActionContext &ctx, float dt) {
+    auto creatureActor = ctx.objectFactory.getObjectById<Creature>(actor.id());
     glm::vec3 destination(_location->position());
 
     bool reached = creatureActor->navigateTo(destination, _run, 1.0f, dt);

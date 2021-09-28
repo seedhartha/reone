@@ -29,7 +29,7 @@ public:
         LocationAction(game, ActionType::JumpToLocation, std::move(location)) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(Object &actor, ActionContext &ctx, float dt) override;
 };
 
 } // namespace game

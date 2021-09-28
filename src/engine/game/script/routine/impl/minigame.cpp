@@ -23,6 +23,8 @@
 
 #include "../../../../script/exception/notimpl.h"
 
+#include "../context.h"
+
 using namespace std;
 
 using namespace reone::script;
@@ -35,415 +37,415 @@ namespace routine {
 
 namespace minigame {
 
-Variable setLateralAccelerationPerSecond(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setLateralAccelerationPerSecond(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLateralAccelerationPerSecond(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLateralAccelerationPerSecond(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setSpeedBlurEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setSpeedBlurEffect(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastEvent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastEvent(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastEventModelName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastEventModelName(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getObjectByName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getObjectByName(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playAnimation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable playAnimation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastBulletHitDamage(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastBulletHitDamage(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastBulletHitTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastBulletHitTarget(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastBulletHitShooter(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastBulletHitShooter(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable adjustFollowerHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable adjustFollowerHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable onBulletHit(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable onBulletHit(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable onObstacleHit(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable onObstacleHit(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastFollowerHit(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastFollowerHit(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastObstacleHit(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastObstacleHit(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastBulletFiredDamage(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastBulletFiredDamage(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastBulletFiredTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastBulletFiredTarget(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getObjectName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getObjectName(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable onDeath(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable onDeath(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable isFollower(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isFollower(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable isPlayer(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isPlayer(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable isEnemy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isEnemy(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable isTrigger(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isTrigger(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable isObstacle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isObstacle(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setFollowerHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setFollowerHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable onDamage(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable onDamage(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastHPChange(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastHPChange(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable removeAnimation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable removeAnimation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getCameraNearClip(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getCameraNearClip(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getCameraFarClip(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getCameraFarClip(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setCameraClip(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setCameraClip(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayer(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlayer(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getEnemyCount(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getEnemyCount(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getEnemy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getEnemy(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getObstacleCount(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getObstacleCount(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getObstacle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getObstacle(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getMaxHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setMaxHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSphereRadius(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSphereRadius(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setSphereRadius(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setSphereRadius(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getNumLoops(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNumLoops(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setNumLoops(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setNumLoops(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPosition(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGunBankCount(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGunBankCount(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGunBankBulletModel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGunBankBulletModel(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGunBankGunModel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGunBankGunModel(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGunBankDamage(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGunBankDamage(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGunBankTimeBetweenShots(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGunBankTimeBetweenShots(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGunBankLifespan(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGunBankLifespan(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGunBankSpeed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGunBankSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGunBankTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGunBankTarget(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setGunBankBulletModel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGunBankBulletModel(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setGunBankGunModel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGunBankGunModel(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setGunBankDamage(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGunBankDamage(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setGunBankTimeBetweenShots(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGunBankTimeBetweenShots(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setGunBankLifespan(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGunBankLifespan(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setGunBankSpeed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGunBankSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setGunBankTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGunBankTarget(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastBulletHitPart(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastBulletHitPart(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable isGunBankTargetting(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isGunBankTargetting(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerOffset(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlayerOffset(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerInvincibility(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlayerInvincibility(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerSpeed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlayerSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerMinSpeed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlayerMinSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerAccelerationPerSecond(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlayerAccelerationPerSecond(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerTunnelPos(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlayerTunnelPos(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerOffset(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlayerOffset(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerInvincibility(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlayerInvincibility(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerSpeed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlayerSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerMinSpeed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlayerMinSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerAccelerationPerSecond(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlayerAccelerationPerSecond(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerTunnelPos(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlayerTunnelPos(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerTunnelNeg(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlayerTunnelNeg(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerTunnelNeg(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlayerTunnelNeg(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerOrigin(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlayerOrigin(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerOrigin(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlayerOrigin(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGunBankHorizontalSpread(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGunBankHorizontalSpread(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGunBankVerticalSpread(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGunBankVerticalSpread(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGunBankSensingRadius(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGunBankSensingRadius(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGunBankInaccuracy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGunBankInaccuracy(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setGunBankHorizontalSpread(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGunBankHorizontalSpread(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setGunBankVerticalSpread(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGunBankVerticalSpread(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setGunBankSensingRadius(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGunBankSensingRadius(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setGunBankInaccuracy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGunBankInaccuracy(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsInvulnerable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsInvulnerable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable startInvulnerability(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable startInvulnerability(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerMaxSpeed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlayerMaxSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerMaxSpeed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlayerMaxSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSoundFrequency(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSoundFrequency(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setSoundFrequency(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setSoundFrequency(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSoundFrequencyIsRandom(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSoundFrequencyIsRandom(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setSoundFrequencyIsRandom(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setSoundFrequencyIsRandom(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSoundVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSoundVolume(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setSoundVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setSoundVolume(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlayerTunnelInfinite(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlayerTunnelInfinite(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerTunnelInfinite(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlayerTunnelInfinite(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSwoopUpgrade(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSwoopUpgrade(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getTrackPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTrackPosition(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setFollowerPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setFollowerPosition(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable destroyMiniGameObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable destroyMiniGameObject(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setJumpSpeed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setJumpSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playerApplyForce(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable playerApplyForce(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

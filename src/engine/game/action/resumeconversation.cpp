@@ -23,7 +23,7 @@ namespace reone {
 
 namespace game {
 
-void ResumeConversationAction::execute(Object &actor, float dt) {
+void ResumeConversationAction::execute(Object &actor, ActionContext &ctx, float dt) {
     _game.conversation().resume();
     complete();
 }

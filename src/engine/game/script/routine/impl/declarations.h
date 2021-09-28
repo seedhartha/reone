@@ -30,10 +30,11 @@ struct ExecutionContext;
 namespace game {
 
 class Game;
+class RoutineContext;
 
 namespace routine {
 
-#define R_ROUTINE(x) script::Variable(x)(Game & game, const std::vector<script::Variable> &args, script::ExecutionContext &ctx);
+#define R_ROUTINE(x) script::Variable(x)(const std::vector<script::Variable> &args, const RoutineContext &ctx);
 
 R_ROUTINE(random)
 R_ROUTINE(printString)

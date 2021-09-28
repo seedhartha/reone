@@ -30,10 +30,6 @@ namespace reone {
 
 namespace game {
 
-ScriptRunner::ScriptRunner(Routines &routines, Scripts &scripts) :
-    _routines(routines), _scripts(scripts) {
-}
-
 int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerrerId, int userDefinedEventNumber, int scriptVar) {
     if (callerId == kObjectSelf) {
         throw invalid_argument("Invalid callerId");
@@ -47,7 +43,7 @@ int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerr
         return -1;
 
     auto ctx = make_unique<ExecutionContext>();
-    ctx->routines = &_routines;
+    ctx->routines = _routines;
     ctx->callerId = callerId;
     ctx->triggererId = triggerrerId;
     ctx->userDefinedEventNumber = userDefinedEventNumber;

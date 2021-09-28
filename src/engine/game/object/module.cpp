@@ -46,10 +46,6 @@ static constexpr int kMaxSecond = 60;
 static constexpr int kMaxMinute = 60;
 static constexpr int kMaxHour = 24;
 
-Module::Module(uint32_t id, Game *game) :
-    Object(id, ObjectType::Module, game) {
-}
-
 void Module::load(string name, const GffStruct &ifo, bool fromSave) {
     _name = move(name);
 
@@ -90,15 +86,15 @@ void Module::loadInfo(const GffStruct &ifo) {
 void Module::loadArea(const GffStruct &ifo, bool fromSave) {
     reone::info("Load area: " + _info.entryArea);
 
-    _area = _game->objectFactory().newArea();
+    _area = _objectFactory.newArea();
 
-    shared_ptr<GffStruct> are(_game->resources().getGFF(_info.entryArea, ResourceType::Are));
-    shared_ptr<GffStruct> git(_game->resources().getGFF(_info.entryArea, ResourceType::Git));
+    shared_ptr<GffStruct> are(_resources.getGFF(_info.entryArea, ResourceType::Are));
+    shared_ptr<GffStruct> git(_resources.getGFF(_info.entryArea, ResourceType::Git));
     _area->load(_info.entryArea, *are, *git, fromSave);
 }
 
 void Module::loadPlayer() {
-    _player = make_unique<Player>(this, _area.get(), &_area->getCamera(CameraType::ThirdPerson), &_game->party());
+    _player = make_unique<Player>(this, _area.get(), &_area->getCamera(CameraType::ThirdPerson), &_party);
 }
 
 void Module::loadParty(const string &entry, bool fromSave) {
@@ -167,7 +163,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
                 cursor = CursorType::Pickup;
             } else {
                 auto creature = static_pointer_cast<Creature>(object);
-                bool isEnemy = _game->reputes().getIsEnemy(*creature, *_game->party().getLeader());
+                bool isEnemy = _reputes.getIsEnemy(*creature, *_party.getLeader());
                 cursor = isEnemy ? CursorType::Attack : CursorType::Talk;
             }
             break;
@@ -225,21 +221,21 @@ void Module::onObjectClick(const shared_ptr<SpatialObject> &object) {
 void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
     debug(boost::format("Module: click: creature '%s', faction %d") % creature->tag() % static_cast<int>(creature->faction()));
 
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<Creature> partyLeader(_party.getLeader());
 
     if (creature->isDead()) {
         if (!creature->items().empty()) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(_game->actionFactory().newOpenContainer(creature));
+            partyLeader->addAction(_actionFactory.newOpenContainer(creature));
         }
     } else {
-        bool isEnemy = _game->reputes().getIsEnemy(*partyLeader, *creature);
+        bool isEnemy = _reputes.getIsEnemy(*partyLeader, *creature);
         if (isEnemy) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(_game->actionFactory().newAttack(creature));
+            partyLeader->addAction(_actionFactory.newAttack(creature));
         } else if (!creature->conversation().empty()) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(_game->actionFactory().newStartConversation(creature, creature->conversation()));
+            partyLeader->addAction(_actionFactory.newStartConversation(creature, creature->conversation()));
         }
     }
 }
@@ -250,21 +246,21 @@ void Module::onDoorClick(const shared_ptr<Door> &door) {
         return;
     }
     if (!door->isOpen()) {
-        shared_ptr<Creature> partyLeader(_game->party().getLeader());
+        shared_ptr<Creature> partyLeader(_party.getLeader());
         partyLeader->clearAllActions();
-        partyLeader->addAction(_game->actionFactory().newOpenDoor(door));
+        partyLeader->addAction(_actionFactory.newOpenDoor(door));
     }
 }
 
 void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<Creature> partyLeader(_party.getLeader());
 
     if (placeable->hasInventory()) {
         partyLeader->clearAllActions();
-        partyLeader->addAction(_game->actionFactory().newOpenContainer(placeable));
+        partyLeader->addAction(_actionFactory.newOpenContainer(placeable));
     } else if (!placeable->conversation().empty()) {
         partyLeader->clearAllActions();
-        partyLeader->addAction(_game->actionFactory().newStartConversation(placeable, placeable->conversation()));
+        partyLeader->addAction(_actionFactory.newStartConversation(placeable, placeable->conversation()));
     } else {
         placeable->runOnUsed(move(partyLeader));
     }
@@ -282,9 +278,9 @@ vector<ContextAction> Module::getContextActions(const shared_ptr<Object> &object
 
     switch (object->type()) {
     case ObjectType::Creature: {
-        auto leader = _game->party().getLeader();
+        auto leader = _party.getLeader();
         auto creature = static_pointer_cast<Creature>(object);
-        if (!creature->isDead() && _game->reputes().getIsEnemy(*leader, *creature)) {
+        if (!creature->isDead() && _reputes.getIsEnemy(*leader, *creature)) {
             actions.push_back(ContextAction(ActionType::AttackObject));
             auto weapon = leader->getEquippedItem(InventorySlot::rightWeapon);
             if (weapon && weapon->isRanged()) {
@@ -337,7 +333,7 @@ vector<ContextAction> Module::getContextActions(const shared_ptr<Object> &object
     }
     case ObjectType::Door: {
         auto door = static_pointer_cast<Door>(object);
-        if (door->isLocked() && !door->isKeyRequired() && _game->party().getLeader()->attributes().hasSkill(SkillType::Security)) {
+        if (door->isLocked() && !door->isKeyRequired() && _party.getLeader()->attributes().hasSkill(SkillType::Security)) {
             actions.push_back(ContextAction(SkillType::Security));
         }
         break;

@@ -27,6 +27,8 @@
 
 #include "../../../object/sound.h"
 
+#include "../context.h"
+
 #include "argutil.h"
 
 using namespace std;
@@ -39,47 +41,47 @@ namespace game {
 
 namespace routine {
 
-Variable soundObjectSetFixedVariance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable soundObjectSetFixedVariance(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable soundObjectGetFixedVariance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable soundObjectGetFixedVariance(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable soundObjectPlay(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto sound = getSound(game, args, 0, ctx);
+Variable soundObjectPlay(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto sound = getSound(args, 0, ctx);
     sound->play();
     return Variable::ofNull();
 }
 
-Variable soundObjectStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto sound = getSound(game, args, 0, ctx);
+Variable soundObjectStop(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto sound = getSound(args, 0, ctx);
     sound->stop();
     return Variable::ofNull();
 }
 
-Variable soundObjectSetVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable soundObjectSetVolume(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable soundObjectSetPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable soundObjectSetPosition(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable soundObjectGetPitchVariance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable soundObjectGetPitchVariance(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable soundObjectSetPitchVariance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable soundObjectSetPitchVariance(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable soundObjectGetVolume(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable soundObjectGetVolume(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable soundObjectFadeAndStop(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable soundObjectFadeAndStop(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
