@@ -40,8 +40,82 @@ namespace game {
 
 static string g_attackIcon("i_attack");
 
-HUD::HUD(Game *game) :
-    GameGUI(game), _select(game) {
+HUD::HUD(
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    Skills &skills,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings),
+    _select(
+        *game,
+        actionFactory,
+        _feats,
+        _party,
+        reputes,
+        skills,
+        _context,
+        _fonts,
+        _meshes,
+        _shaders,
+        _textures,
+        _window) {
     _resRef = getResRef("mipc28x6");
     _resolutionX = 800;
     _resolutionY = 600;
@@ -159,10 +233,10 @@ void HUD::load() {
         _game->openInGameMenu(InGameMenu::Tab::Options);
     });
     _binding.btnClearAll->setOnClick([this]() {
-        _game->party().getLeader()->clearAllActions();
+        _party.getLeader()->clearAllActions();
     });
     _binding.btnClearOne->setOnClick([this]() {
-        for (auto &action : _game->party().getLeader()->actions()) {
+        for (auto &action : _party.getLeader()->actions()) {
             if (action->type() == ActionType::AttackObject) {
                 action->complete();
                 break;
@@ -170,7 +244,7 @@ void HUD::load() {
         }
     });
     _binding.btnClearOne2->setOnClick([this]() {
-        for (auto &action : _game->party().getLeader()->actions()) {
+        for (auto &action : _party.getLeader()->actions()) {
             if (action->type() == ActionType::AttackObject) {
                 action->complete();
                 break;
@@ -181,15 +255,45 @@ void HUD::load() {
         _game->openInGameMenu(InGameMenu::Tab::Equipment);
     });
     _binding.btnChar2->setOnClick([this]() {
-        _game->party().setPartyLeaderByIndex(1);
+        _party.setPartyLeaderByIndex(1);
     });
     _binding.btnChar3->setOnClick([this]() {
-        _game->party().setPartyLeaderByIndex(2);
+        _party.setPartyLeaderByIndex(2);
     });
 
     _select.load();
 
-    _barkBubble = make_unique<BarkBubble>(_game);
+    _barkBubble = make_unique<BarkBubble>(
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _barkBubble->load();
 }
 
@@ -327,7 +431,7 @@ bool HUD::handle(const SDL_Event &event) {
 void HUD::update(float dt) {
     GUI::update(dt);
 
-    Party &party = _game->party();
+    Party &party = _party;
     vector<Label *> charLabels {
         _binding.lblChar1.get(),
         _binding.lblChar2.get(),
@@ -393,7 +497,7 @@ void HUD::draw() {
 
     drawMinimap();
 
-    Party &party = _game->party();
+    Party &party = _party;
     for (int i = 0; i < party.getSize(); ++i) {
         drawHealth(i);
     }
@@ -419,7 +523,7 @@ void HUD::drawHealth(int memberIndex) {
     if (_game->isTSL())
         return;
 
-    Party &party = _game->party();
+    Party &party = _party;
     shared_ptr<Creature> member(party.getMember(memberIndex));
     vector<Label *> backLabels {
         _binding.lblBack1.get(),
@@ -437,12 +541,12 @@ void HUD::drawHealth(int memberIndex) {
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _game->window().getOrthoProjection();
+    uniforms.combined.general.projection = _window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 
-    _game->shaders().activate(ShaderProgram::SimpleColor, uniforms);
-    _game->meshes().quad().draw();
+    _shaders.activate(ShaderProgram::SimpleColor, uniforms);
+    _meshes.quad().draw();
 }
 
 void HUD::toggleCombat(bool enabled) {
@@ -464,7 +568,7 @@ void HUD::toggleCombat(bool enabled) {
 }
 
 void HUD::refreshActionQueueItems() const {
-    auto &actions = _game->party().getLeader()->actions();
+    auto &actions = _party.getLeader()->actions();
     vector<Label *> queueLabels {
         _binding.lblQueue0.get(),
         _binding.lblQueue1.get(),
@@ -480,7 +584,7 @@ void HUD::refreshActionQueueItems() const {
                 break;
             case ActionType::UseFeat: {
                 auto featAction = static_pointer_cast<UseFeatAction>(actions[i]);
-                shared_ptr<Feat> feat(_game->feats().get(featAction->feat()));
+                shared_ptr<Feat> feat(_feats.get(featAction->feat()));
                 if (feat) {
                     item.setBorderFill(feat->icon);
                 }

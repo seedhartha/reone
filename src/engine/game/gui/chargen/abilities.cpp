@@ -55,10 +55,70 @@ static const unordered_map<Ability, int> g_descStrRefByAbility {
     {Ability::Wisdom, 225},
     {Ability::Charisma, 227}};
 
-CharGenAbilities::CharGenAbilities(CharacterGeneration *charGen, Game *game) :
-    GameGUI(game),
+CharGenAbilities::CharGenAbilities(
+    CharacterGeneration *charGen,
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings),
     _charGen(charGen) {
-
     _resRef = getResRef("abchrgen");
 
     initForGame();
@@ -101,7 +161,7 @@ void CharGenAbilities::load() {
     });
     _binding.btnRecommended->setOnClick([this]() {
         ClassType classType = _charGen->character().attributes.getEffectiveClass();
-        shared_ptr<CreatureClass> clazz(_game->classes().get(classType));
+        shared_ptr<CreatureClass> clazz(_classes.get(classType));
         _attributes = clazz->defaultAttributes();
         _points = 0;
         refreshControls();
@@ -275,7 +335,7 @@ void CharGenAbilities::onAbilityLabelFocusChanged(Ability ability, bool focus) {
     if (maybeDescription == g_descStrRefByAbility.end())
         return;
 
-    string description(_game->strings().get(maybeDescription->second));
+    string description(_strings.get(maybeDescription->second));
     _binding.lbDesc->clearItems();
     _binding.lbDesc->addTextLinesAsItems(description);
 }

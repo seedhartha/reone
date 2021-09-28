@@ -422,6 +422,7 @@ set(GAME_HEADERS
     src/engine/game/action/castspellatlocation.h
     src/engine/game/action/castspellatobject.h
     src/engine/game/action/closedoor.h
+    src/engine/game/action/context.h
     src/engine/game/action/docommand.h
     src/engine/game/action/equipitem.h
     src/engine/game/action/equipmostdamagingmelee.h
@@ -645,6 +646,7 @@ set(GAME_HEADERS
     src/engine/game/reputes.h
     src/engine/game/room.h
     src/engine/game/savedgame.h
+    src/engine/game/script/routine/context.h
     src/engine/game/script/routine/impl/argutil.h
     src/engine/game/script/routine/impl/declarations.h
     src/engine/game/script/routine/impl/objectutil.h

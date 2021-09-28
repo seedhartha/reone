@@ -172,7 +172,7 @@ void Game::init() {
     _window.setEventHandler(this);
     _walkmeshes.setWalkableSurfaces(_surfaces.getWalkableSurfaceIndices());
 
-    _console = make_unique<Console>(*this);
+    _console = make_unique<Console>(*this, _effectFactory, _party, _fonts, _meshes, _shaders, _window);
     _console->init();
 
     _profileOverlay = make_unique<ProfileOverlay>(_fonts, _meshes, _shaders, _window);
@@ -256,7 +256,37 @@ void Game::playMusic(const string &resRef) {
 }
 
 void Game::loadMainMenu() {
-    _mainMenu = make_unique<MainMenu>(this);
+    _mainMenu = make_unique<MainMenu>(
+        this,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _mainMenu->load();
 }
 
@@ -447,37 +477,248 @@ void Game::drawGUI() {
 }
 
 void Game::loadHUD() {
-    _hud = make_unique<HUD>(this);
+    _hud = make_unique<HUD>(
+        this,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _skills,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _hud->load();
 }
 
 void Game::loadDialog() {
-    _dialog = make_unique<DialogGUI>(this);
+    _dialog = make_unique<DialogGUI>(
+        this,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _dialog->load();
 }
 
 void Game::loadComputer() {
-    _computer = make_unique<ComputerGUI>(this);
+    _computer = make_unique<ComputerGUI>(
+        this,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _computer->load();
 }
 
 void Game::loadContainer() {
-    _container = make_unique<Container>(this);
+    _container = make_unique<Container>(
+        this,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _container->load();
 }
 
 void Game::loadPartySelection() {
-    _partySelect = make_unique<PartySelection>(this);
+    _partySelect = make_unique<PartySelection>(
+        this,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _partySelect->load();
 }
 
 void Game::loadSaveLoad() {
-    _saveLoad = make_unique<SaveLoad>(this);
+    _saveLoad = make_unique<SaveLoad>(
+        this,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _saveLoad->load();
 }
 
 void Game::loadInGame() {
-    _inGame = make_unique<InGameMenu>(this);
+    _inGame = make_unique<InGameMenu>(
+        this,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _inGame->load();
 }
 
@@ -594,12 +835,72 @@ float Game::measureFrameTime() {
 }
 
 void Game::loadLoadingScreen() {
-    _loadScreen = make_unique<LoadingScreen>(this);
+    _loadScreen = make_unique<LoadingScreen>(
+        this,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _loadScreen->load();
 }
 
 void Game::loadCharacterGeneration() {
-    _charGen = make_unique<CharacterGeneration>(this);
+    _charGen = make_unique<CharacterGeneration>(
+        this,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _charGen->load();
 }
 

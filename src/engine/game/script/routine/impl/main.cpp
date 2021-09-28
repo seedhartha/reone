@@ -24,6 +24,7 @@
 #include "../../../../common/logutil.h"
 #include "../../../../script/exception/argument.h"
 #include "../../../../script/exception/notimpl.h"
+#include "../../../../script/executioncontext.h"
 
 #include "../../../action/factory.h"
 #include "../../../combat.h"
@@ -34,6 +35,8 @@
 #include "../../../party.h"
 #include "../../../reputes.h"
 #include "../../../script/runner.h"
+
+#include "../context.h"
 
 #include "argutil.h"
 #include "objectutil.h"
@@ -51,43 +54,43 @@ namespace routine {
 
 static constexpr bool kShipBuild = true;
 
-Variable assignCommand(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto subject = getObject(game, args, 0, ctx);
+Variable assignCommand(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto subject = getObject(args, 0, ctx);
     auto action = getAction(args, 1);
 
-    auto objectAction = game.actionFactory().newDoCommand(move(action));
+    auto objectAction = ctx.actionFactory.newDoCommand(move(action));
     subject->addAction(move(objectAction));
 
     return Variable::ofNull();
 }
 
-Variable delayCommand(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable delayCommand(const vector<Variable> &args, const RoutineContext &ctx) {
     float seconds = getFloat(args, 0);
     auto action = getAction(args, 1);
 
-    auto objectAction = game.actionFactory().newDoCommand(move(action));
-    getCaller(game, ctx)->delayAction(move(objectAction), seconds);
+    auto objectAction = ctx.actionFactory.newDoCommand(move(action));
+    getCaller(ctx)->delayAction(move(objectAction), seconds);
 
     return Variable::ofNull();
 }
 
-Variable executeScript(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable executeScript(const vector<Variable> &args, const RoutineContext &ctx) {
     string script(getString(args, 0));
-    auto target = getObject(game, args, 1, ctx);
+    auto target = getObject(args, 1, ctx);
     int scriptVar = getIntOrElse(args, 2, -1);
 
-    game.scriptRunner().run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
+    ctx.scriptRunner.run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
 
     return Variable::ofNull();
 }
 
-Variable clearAllActions(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    getCaller(game, ctx)->clearAllActions();
+Variable clearAllActions(const vector<Variable> &args, const RoutineContext &ctx) {
+    getCaller(ctx)->clearAllActions();
     return Variable::ofNull();
 }
 
-Variable setFacing(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsSpatial(game, ctx);
+Variable setFacing(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caller = getCallerAsSpatial(ctx);
     float direction = getFloat(args, 0);
 
     caller->setFacing(glm::radians(direction));
@@ -95,55 +98,55 @@ Variable setFacing(Game &game, const vector<Variable> &args, ExecutionContext &c
     return Variable::ofNull();
 }
 
-Variable switchPlayerCharacter(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable switchPlayerCharacter(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setAreaUnescapable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setAreaUnescapable(const vector<Variable> &args, const RoutineContext &ctx) {
     bool unescapable = getBool(args, 0);
-    game.module()->area()->setUnescapable(unescapable);
+    ctx.game.module()->area()->setUnescapable(unescapable);
     return Variable::ofNull();
 }
 
-Variable getAreaUnescapable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<int>(game.module()->area()->isUnescapable()));
+Variable getAreaUnescapable(const vector<Variable> &args, const RoutineContext &ctx) {
+    return Variable::ofInt(static_cast<int>(ctx.game.module()->area()->isUnescapable()));
 }
 
-Variable getArea(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto area = game.module()->area();
+Variable getArea(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto area = ctx.game.module()->area();
     return Variable::ofObject(getObjectIdOrInvalid(area));
 }
 
-Variable getEnteringObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto triggerrer = getTriggerrer(game, ctx);
+Variable getEnteringObject(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto triggerrer = getTriggerrer(ctx);
     return Variable::ofObject(getObjectIdOrInvalid(triggerrer));
 }
 
-Variable getExitingObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto triggerrer = getTriggerrer(game, ctx);
+Variable getExitingObject(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto triggerrer = getTriggerrer(ctx);
     return Variable::ofObject(getObjectIdOrInvalid(triggerrer));
 }
 
-Variable getPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getSpatialObject(game, args, 0, ctx);
+Variable getPosition(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto target = getSpatialObject(args, 0, ctx);
     return Variable::ofVector(target->position());
 }
 
-Variable getFacing(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFacing(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto target = getSpatialObject(game, args, 0, ctx);
+        auto target = getSpatialObject(args, 0, ctx);
         return Variable::ofFloat(glm::degrees(target->getFacing()));
     } catch (const ArgumentException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
 
-Variable getItemPossessor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getItemPossessor(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getItemPossessedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
+Variable getItemPossessedBy(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
     auto itemTag = boost::to_lower_copy(getString(args, 1));
     if (itemTag.empty()) {
         return Variable::ofObject(kObjectInvalid);
@@ -154,13 +157,13 @@ Variable getItemPossessedBy(Game &game, const vector<Variable> &args, ExecutionC
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
-Variable createItemOnObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable createItemOnObject(const vector<Variable> &args, const RoutineContext &ctx) {
     string itemTemplate(boost::to_lower_copy(getString(args, 0)));
     if (itemTemplate.empty()) {
         return Variable::ofObject(kObjectInvalid);
     }
 
-    auto target = getSpatialObjectOrCaller(game, args, 1, ctx);
+    auto target = getSpatialObjectOrCaller(args, 1, ctx);
     int stackSize = getIntOrElse(args, 2, 1);
     int hideMessage = getIntOrElse(args, 3, 0);
 
@@ -169,14 +172,14 @@ Variable createItemOnObject(Game &game, const vector<Variable> &args, ExecutionC
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
-Variable getLastAttacker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastAttacker(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getNearestCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNearestCreature(const vector<Variable> &args, const RoutineContext &ctx) {
     int firstCriteriaType = getInt(args, 0);
     int firstCriteriaValue = getInt(args, 1);
-    auto target = getSpatialObjectOrCaller(game, args, 2, ctx);
+    auto target = getSpatialObjectOrCaller(args, 2, ctx);
     int nth = getIntOrElse(args, 3, 1);
     int secondCriteriaType = getIntOrElse(args, 4, -1);
     int secondCriteriaValue = getIntOrElse(args, 5, -1);
@@ -192,15 +195,15 @@ Variable getNearestCreature(Game &game, const vector<Variable> &args, ExecutionC
         criterias.push_back(make_pair(static_cast<CreatureType>(thirdCriteriaType), thirdCriteriaValue));
     }
 
-    shared_ptr<Creature> creature(game.module()->area()->getNearestCreature(target, criterias, nth - 1));
+    shared_ptr<Creature> creature(ctx.game.module()->area()->getNearestCreature(target, criterias, nth - 1));
 
     return Variable::ofObject(getObjectIdOrInvalid(creature));
 }
 
-Variable getDistanceToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getDistanceToObject(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto caller = getCallerAsSpatial(game, ctx);
-        auto object = getSpatialObject(game, args, 0, ctx);
+        auto caller = getCallerAsSpatial(ctx);
+        auto object = getSpatialObject(args, 0, ctx);
 
         return Variable::ofFloat(caller->getDistanceTo(*object));
     } catch (const ArgumentException &) {
@@ -208,30 +211,30 @@ Variable getDistanceToObject(Game &game, const vector<Variable> &args, Execution
     }
 }
 
-Variable getIsObjectValid(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsObjectValid(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto object = getObject(game, args, 0, ctx);
+        auto object = getObject(args, 0, ctx);
         return Variable::ofInt(1);
     } catch (const ArgumentException &) {
         return Variable::ofInt(0);
     }
 }
 
-Variable setCameraFacing(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setCameraFacing(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playSound(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable playSound(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSpellTargetObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSpellTargetObject(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getCurrentHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getCurrentHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto object = getObjectOrCaller(game, args, 0, ctx);
+        auto object = getObjectOrCaller(args, 0, ctx);
         int hitPoints = object->currentHitPoints();
 
         return Variable::ofInt(hitPoints);
@@ -240,9 +243,9 @@ Variable getCurrentHitPoints(Game &game, const vector<Variable> &args, Execution
     }
 }
 
-Variable getMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getMaxHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto object = getObjectOrCaller(game, args, 0, ctx);
+        auto object = getObjectOrCaller(args, 0, ctx);
         int hitPoints = object->maxHitPoints();
 
         return Variable::ofInt(hitPoints);
@@ -251,129 +254,129 @@ Variable getMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionCont
     }
 }
 
-Variable getLastItemEquipped(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastItemEquipped(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSubScreenID(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSubScreenID(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable cancelCombat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable cancelCombat(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getCurrentForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getCurrentForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getMaxForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getMaxForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable pauseGame(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable pauseGame(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlayerRestrictMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlayerRestrictMode(const vector<Variable> &args, const RoutineContext &ctx) {
     bool restrict = getBool(args, 0);
-    game.module()->player().setRestrictMode(restrict);
+    ctx.game.module()->player().setRestrictMode(restrict);
     return Variable::ofNull();
 }
 
-Variable getPlayerRestrictMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlayerRestrictMode(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: why is this object necessary?
-    auto object = getCreatureOrCaller(game, args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(game.module()->player().isRestrictMode()));
+    auto object = getCreatureOrCaller(args, 0, ctx);
+    return Variable::ofInt(static_cast<int>(ctx.game.module()->player().isRestrictMode()));
 }
 
-Variable getCasterLevel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getCasterLevel(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFirstEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
+Variable getFirstEffect(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
     return Variable::ofEffect(creature->getFirstEffect());
 }
 
-Variable getNextEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
+Variable getNextEffect(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
     return Variable::ofEffect(creature->getNextEffect());
 }
 
-Variable removeEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable removeEffect(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFirstObjectInArea(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFirstObjectInArea(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getNextObjectInArea(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNextObjectInArea(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getMetaMagicFeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getMetaMagicFeat(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getObjectType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getObject(game, args, 0, ctx);
+Variable getObjectType(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto target = getObject(args, 0, ctx);
     return Variable::ofInt(static_cast<int>(target->type()));
 }
 
-Variable getRacialType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getRacialType(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto creature = getCreature(game, args, 0, ctx);
+        auto creature = getCreature(args, 0, ctx);
         return Variable::ofInt(static_cast<int>(creature->racialType()));
     } catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(RacialType::Invalid));
     }
 }
 
-Variable fortitudeSave(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable fortitudeSave(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable reflexSave(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable reflexSave(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable willSave(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable willSave(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSpellSaveDC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSpellSaveDC(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getAC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getAC(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGoodEvilValue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGoodEvilValue(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getAlignmentGoodEvil(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getAlignmentGoodEvil(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFirstObjectInShape(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFirstObjectInShape(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getNextObjectInShape(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNextObjectInShape(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getItemStackSize(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto item = getItem(game, args, 0, ctx);
+Variable getItemStackSize(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto item = getItem(args, 0, ctx);
     return Variable::ofInt(item->stackSize());
 }
 
-Variable getAbilityScore(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
+Variable getAbilityScore(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
     auto type = getEnum<Ability>(args, 1);
 
     int result = creature->attributes().getAbilityScore(type);
@@ -381,9 +384,9 @@ Variable getAbilityScore(Game &game, const vector<Variable> &args, ExecutionCont
     return Variable::ofInt(result);
 }
 
-Variable getIsDead(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsDead(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto creature = getCreature(game, args, 0, ctx);
+        auto creature = getCreature(args, 0, ctx);
         bool dead = creature->isDead();
 
         return Variable::ofInt(static_cast<int>(dead));
@@ -392,8 +395,8 @@ Variable getIsDead(Game &game, const vector<Variable> &args, ExecutionContext &c
     }
 }
 
-Variable setFacingPoint(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsSpatial(game, ctx);
+Variable setFacingPoint(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caller = getCallerAsSpatial(ctx);
     glm::vec3 target(getVector(args, 0));
 
     caller->face(target);
@@ -401,16 +404,16 @@ Variable setFacingPoint(Game &game, const vector<Variable> &args, ExecutionConte
     return Variable::ofNull();
 }
 
-Variable touchAttackMelee(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable touchAttackMelee(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable touchAttackRanged(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable touchAttackRanged(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setItemStackSize(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto item = getItem(game, args, 0, ctx);
+Variable setItemStackSize(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto item = getItem(args, 0, ctx);
     int stackSize = getInt(args, 1);
 
     item->setStackSize(stackSize);
@@ -418,14 +421,14 @@ Variable setItemStackSize(Game &game, const vector<Variable> &args, ExecutionCon
     return Variable::ofNull();
 }
 
-Variable getDistanceBetween(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto objectA = getSpatialObject(game, args, 0, ctx);
-    auto objectB = getSpatialObject(game, args, 1, ctx);
+Variable getDistanceBetween(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto objectA = getSpatialObject(args, 0, ctx);
+    auto objectB = getSpatialObject(args, 1, ctx);
 
     return Variable::ofFloat(objectA->getDistanceTo(*objectB));
 }
 
-Variable setReturnStrref(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setReturnStrref(const vector<Variable> &args, const RoutineContext &ctx) {
     bool show = getBool(args, 0);
     int strRef = getIntOrElse(args, 1, 0);
     int returnQueryStrRef = getIntOrElse(args, 1, 0);
@@ -435,74 +438,74 @@ Variable setReturnStrref(Game &game, const vector<Variable> &args, ExecutionCont
     return Variable::ofNull();
 }
 
-Variable getItemInSlot(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getItemInSlot(const vector<Variable> &args, const RoutineContext &ctx) {
     int slot = getInt(args, 0);
-    auto creature = getCreatureOrCaller(game, args, 1, ctx);
+    auto creature = getCreatureOrCaller(args, 1, ctx);
 
     auto item = creature->getEquippedItem(slot);
 
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
-Variable setGlobalString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGlobalString(const vector<Variable> &args, const RoutineContext &ctx) {
     string id(getString(args, 0));
     string value(getString(args, 1));
 
-    game.setGlobalString(id, value);
+    ctx.game.setGlobalString(id, value);
 
     return Variable::ofNull();
 }
 
-Variable setCommandable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setCommandable(const vector<Variable> &args, const RoutineContext &ctx) {
     bool commandable = getBool(args, 0);
-    auto target = getObjectOrCaller(game, args, 1, ctx);
+    auto target = getObjectOrCaller(args, 1, ctx);
 
     target->setCommandable(commandable);
 
     return Variable::ofNull();
 }
 
-Variable getCommandable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getObjectOrCaller(game, args, 0, ctx);
+Variable getCommandable(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto target = getObjectOrCaller(args, 0, ctx);
     return Variable::ofInt(static_cast<int>(target->isCommandable()));
 }
 
-Variable getHitDice(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
+Variable getHitDice(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
     return Variable::ofInt(creature->attributes().getAggregateLevel());
 }
 
-Variable getTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable getTag(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
     return Variable::ofString(object->tag());
 }
 
-Variable resistForce(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable resistForce(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFactionEqual(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto firstObject = getCreature(game, args, 0, ctx);
-    auto secondObject = getCreatureOrCaller(game, args, 1, ctx);
+Variable getFactionEqual(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto firstObject = getCreature(args, 0, ctx);
+    auto secondObject = getCreatureOrCaller(args, 1, ctx);
 
     return Variable::ofInt(static_cast<int>(firstObject->faction() == secondObject->faction()));
 }
 
-Variable changeFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto objectToChangeFaction = getCreature(game, args, 0, ctx);
-    auto memberOfFactionToJoin = getCreature(game, args, 1, ctx);
+Variable changeFaction(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto objectToChangeFaction = getCreature(args, 0, ctx);
+    auto memberOfFactionToJoin = getCreature(args, 1, ctx);
 
     objectToChangeFaction->setFaction(memberOfFactionToJoin->faction());
 
     return Variable::ofNull();
 }
 
-Variable getIsListening(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsListening(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setListening(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable setListening(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
     bool value = getBool(args, 1);
 
     // TODO: implement
@@ -510,8 +513,8 @@ Variable setListening(Game &game, const vector<Variable> &args, ExecutionContext
     return Variable::ofNull();
 }
 
-Variable setListenPattern(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable setListenPattern(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
     string pattern(getString(args, 1));
     int number = getIntOrElse(args, 2, 0);
 
@@ -520,69 +523,69 @@ Variable setListenPattern(Game &game, const vector<Variable> &args, ExecutionCon
     return Variable::ofNull();
 }
 
-Variable getFactionWeakestMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFactionWeakestMember(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFactionStrongestMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFactionStrongestMember(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFactionMostDamagedMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFactionMostDamagedMember(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFactionLeastDamagedMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFactionLeastDamagedMember(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFactionGold(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFactionGold(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFactionAverageReputation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFactionAverageReputation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFactionAverageGoodEvilAlignment(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFactionAverageGoodEvilAlignment(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFactionAverageLevel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFactionAverageLevel(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFactionAverageXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFactionAverageXP(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFactionMostFrequentClass(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFactionMostFrequentClass(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFactionWorstAC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFactionWorstAC(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFactionBestAC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFactionBestAC(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGlobalString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGlobalString(const vector<Variable> &args, const RoutineContext &ctx) {
     string id(getString(args, 0));
-    return Variable::ofString(game.getGlobalString(id));
+    return Variable::ofString(ctx.game.getGlobalString(id));
 }
 
-Variable getListenPatternNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getListenPatternNumber(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: implement
     return Variable::ofInt(-1);
 }
 
-Variable getWaypointByTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getWaypointByTag(const vector<Variable> &args, const RoutineContext &ctx) {
     string tag(boost::to_lower_copy(getString(args, 0)));
 
     shared_ptr<SpatialObject> object;
-    for (auto &waypoint : game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
+    for (auto &waypoint : ctx.game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         if (waypoint->tag() == tag) {
             object = waypoint;
             break;
@@ -592,51 +595,51 @@ Variable getWaypointByTag(Game &game, const vector<Variable> &args, ExecutionCon
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable getTransitionTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTransitionTarget(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getObjectByTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getObjectByTag(const vector<Variable> &args, const RoutineContext &ctx) {
     shared_ptr<Object> object;
     string tag(boost::to_lower_copy(getString(args, 0)));
     int nth = getIntOrElse(args, 1, 0);
 
     if (!tag.empty()) {
-        object = game.module()->area()->getObjectByTag(tag, nth);
+        object = ctx.game.module()->area()->getObjectByTag(tag, nth);
     } else {
         // Apparently, empty tag in this context stands for the player
-        object = game.party().player();
+        object = ctx.party.player();
     }
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable adjustAlignment(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable adjustAlignment(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setAreaTransitionBMP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setAreaTransitionBMP(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getReputation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getReputation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable adjustReputation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable adjustReputation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getModuleFileName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getModuleFileName(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGoingToBeAttackedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGoingToBeAttackedBy(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getSpatialObject(game, args, 0, ctx);
+Variable getLocation(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getSpatialObject(args, 0, ctx);
 
     glm::vec3 position(object->position());
     float facing = object->getFacing();
@@ -645,7 +648,7 @@ Variable getLocation(Game &game, const vector<Variable> &args, ExecutionContext 
     return Variable::ofLocation(move(result));
 }
 
-Variable location(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable location(const vector<Variable> &args, const RoutineContext &ctx) {
     glm::vec3 position(getVector(args, 0));
     float orientation = glm::radians(getFloat(args, 1));
 
@@ -654,7 +657,7 @@ Variable location(Game &game, const vector<Variable> &args, ExecutionContext &ct
     return Variable::ofLocation(location);
 }
 
-Variable applyEffectAtLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable applyEffectAtLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     auto durationType = getEnum<DurationType>(args, 0);
     auto effect = getEffect(args, 1);
     auto location = getLocationEngineType(args, 2);
@@ -665,10 +668,10 @@ Variable applyEffectAtLocation(Game &game, const vector<Variable> &args, Executi
     return Variable::ofNull();
 }
 
-Variable applyEffectToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable applyEffectToObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto durationType = getEnum<DurationType>(args, 0);
     auto effect = getEffect(args, 1);
-    auto target = getSpatialObject(game, args, 2, ctx);
+    auto target = getSpatialObject(args, 2, ctx);
     float duration = getFloatOrElse(args, 3, 0.0f);
 
     target->applyEffect(effect, durationType, duration);
@@ -676,12 +679,12 @@ Variable applyEffectToObject(Game &game, const vector<Variable> &args, Execution
     return Variable::ofNull();
 }
 
-Variable getIsPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(creature == game.party().player()));
+Variable getIsPC(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
+    return Variable::ofInt(static_cast<int>(creature == ctx.party.player()));
 }
 
-Variable speakString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable speakString(const vector<Variable> &args, const RoutineContext &ctx) {
     string stringToSpeak(getString(args, 0));
     auto talkVolume = getEnumOrElse<TalkVolume>(args, 1, TalkVolume::Talk);
 
@@ -690,16 +693,16 @@ Variable speakString(Game &game, const vector<Variable> &args, ExecutionContext 
     return Variable::ofNull();
 }
 
-Variable getSpellTargetLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSpellTargetLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPositionFromLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPositionFromLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     auto location = getLocationEngineType(args, 0);
     return Variable::ofVector(location->position());
 }
 
-Variable getFacingFromLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFacingFromLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
         auto location = getLocationEngineType(args, 0);
         return Variable::ofFloat(glm::degrees(location->facing()));
@@ -708,7 +711,7 @@ Variable getFacingFromLocation(Game &game, const vector<Variable> &args, Executi
     }
 }
 
-Variable getNearestCreatureToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNearestCreatureToLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     int firstCriteriaType = getInt(args, 0);
     int firstCriteriaValue = getInt(args, 1);
     auto location = getLocationEngineType(args, 2);
@@ -727,52 +730,52 @@ Variable getNearestCreatureToLocation(Game &game, const vector<Variable> &args, 
         criterias.push_back(make_pair(static_cast<CreatureType>(thirdCriteriaType), thirdCriteriaValue));
     }
 
-    shared_ptr<Creature> creature(game.module()->area()->getNearestCreatureToLocation(*location, criterias, nth - 1));
+    shared_ptr<Creature> creature(ctx.game.module()->area()->getNearestCreatureToLocation(*location, criterias, nth - 1));
 
     return Variable::ofObject(getObjectIdOrInvalid(creature));
 }
 
-Variable getNearestObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNearestObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto objectType = getEnumOrElse(args, 0, ObjectType::All);
-    auto target = getSpatialObjectOrCaller(game, args, 1, ctx);
+    auto target = getSpatialObjectOrCaller(args, 1, ctx);
     int nth = getIntOrElse(args, 2, 1);
 
-    shared_ptr<SpatialObject> object(game.module()->area()->getNearestObject(target->position(), nth - 1, [&objectType](auto &object) {
+    shared_ptr<SpatialObject> object(ctx.game.module()->area()->getNearestObject(target->position(), nth - 1, [&objectType](auto &object) {
         return object->type() == objectType;
     }));
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable getNearestObjectToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNearestObjectToLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     auto objectType = getEnum<ObjectType>(args, 0);
     auto location = getLocationEngineType(args, 1);
     int nth = getIntOrElse(args, 2, 1);
 
-    shared_ptr<SpatialObject> object(game.module()->area()->getNearestObject(location->position(), nth - 1, [&objectType](auto &object) {
+    shared_ptr<SpatialObject> object(ctx.game.module()->area()->getNearestObject(location->position(), nth - 1, [&objectType](auto &object) {
         return object->type() == objectType;
     }));
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable getNearestObjectByTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNearestObjectByTag(const vector<Variable> &args, const RoutineContext &ctx) {
     string tag(boost::to_lower_copy(getString(args, 0)));
-    auto target = getSpatialObjectOrCaller(game, args, 1, ctx);
+    auto target = getSpatialObjectOrCaller(args, 1, ctx);
     int nth = getIntOrElse(args, 2, 1);
 
-    shared_ptr<SpatialObject> object(game.module()->area()->getNearestObject(target->position(), nth - 1, [&tag](auto &object) {
+    shared_ptr<SpatialObject> object(ctx.game.module()->area()->getNearestObject(target->position(), nth - 1, [&tag](auto &object) {
         return object->tag() == tag;
     }));
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable getIsEnemy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsEnemy(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto target = getCreature(game, args, 0, ctx);
-        auto source = getCreatureOrCaller(game, args, 1, ctx);
-        bool enemy = game.reputes().getIsEnemy(*target, *source);
+        auto target = getCreature(args, 0, ctx);
+        auto source = getCreatureOrCaller(args, 1, ctx);
+        bool enemy = ctx.reputes.getIsEnemy(*target, *source);
 
         return Variable::ofInt(static_cast<int>(enemy));
     } catch (const ArgumentException &) {
@@ -780,11 +783,11 @@ Variable getIsEnemy(Game &game, const vector<Variable> &args, ExecutionContext &
     }
 }
 
-Variable getIsFriend(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsFriend(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto target = getCreature(game, args, 0, ctx);
-        auto source = getCreatureOrCaller(game, args, 1, ctx);
-        bool isFriend = game.reputes().getIsFriend(*target, *source);
+        auto target = getCreature(args, 0, ctx);
+        auto source = getCreatureOrCaller(args, 1, ctx);
+        bool isFriend = ctx.reputes.getIsFriend(*target, *source);
 
         return Variable::ofInt(static_cast<int>(isFriend));
     } catch (const ArgumentException &) {
@@ -792,11 +795,11 @@ Variable getIsFriend(Game &game, const vector<Variable> &args, ExecutionContext 
     }
 }
 
-Variable getIsNeutral(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsNeutral(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto target = getCreature(game, args, 0, ctx);
-        auto source = getCreatureOrCaller(game, args, 1, ctx);
-        bool neutral = game.reputes().getIsNeutral(*target, *source);
+        auto target = getCreature(args, 0, ctx);
+        auto source = getCreatureOrCaller(args, 1, ctx);
+        bool neutral = ctx.reputes.getIsNeutral(*target, *source);
 
         return Variable::ofInt(static_cast<int>(neutral));
     } catch (const ArgumentException &) {
@@ -804,162 +807,162 @@ Variable getIsNeutral(Game &game, const vector<Variable> &args, ExecutionContext
     }
 }
 
-Variable getPCSpeaker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto player = game.party().player();
+Variable getPCSpeaker(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto player = ctx.party.player();
     return Variable::ofObject(getObjectIdOrInvalid(player));
 }
 
-Variable getStringByStrRef(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getStringByStrRef(const vector<Variable> &args, const RoutineContext &ctx) {
     int strRef = getInt(args, 0);
-    string str(game.strings().get(strRef));
+    string str(ctx.strings.get(strRef));
 
     return Variable::ofString(move(str));
 }
 
-Variable destroyObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto destroy = getSpatialObject(game, args, 0, ctx);
-    game.module()->area()->destroyObject(*destroy);
+Variable destroyObject(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto destroy = getSpatialObject(args, 0, ctx);
+    ctx.game.module()->area()->destroyObject(*destroy);
 
     return Variable::ofNull();
 }
 
-Variable getModule(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto module = game.module();
+Variable getModule(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto module = ctx.game.module();
     return Variable::ofObject(getObjectIdOrInvalid(module));
 }
 
-Variable createObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable createObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto objectType = getEnum<ObjectType>(args, 0);
     string blueprint(boost::to_lower_copy(getString(args, 1)));
     auto location = getLocationEngineType(args, 2);
     bool useAppearAnimation = getBoolOrElse(args, 3, false);
 
-    auto object = game.module()->area()->createObject(objectType, blueprint, location);
+    auto object = ctx.game.module()->area()->createObject(objectType, blueprint, location);
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable getLastSpellCaster(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastSpellCaster(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastSpell(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastSpell(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getUserDefinedEventNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(ctx.userDefinedEventNumber);
+Variable getUserDefinedEventNumber(const vector<Variable> &args, const RoutineContext &ctx) {
+    return Variable::ofInt(ctx.execution.userDefinedEventNumber);
 }
 
-Variable getSpellId(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSpellId(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable randomName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable randomName(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLoadFromSaveGame(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<int>(game.isLoadFromSaveGame()));
+Variable getLoadFromSaveGame(const vector<Variable> &args, const RoutineContext &ctx) {
+    return Variable::ofInt(static_cast<int>(ctx.game.isLoadFromSaveGame()));
 }
 
-Variable getName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable getName(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
     return Variable::ofString(object->name());
 }
 
-Variable getLastSpeaker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastSpeaker(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable beginConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable beginConversation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastClosedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastClosedBy(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFirstInPersistentObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFirstInPersistentObject(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getNextInPersistentObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNextInPersistentObject(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getAreaOfEffectCreator(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getAreaOfEffectCreator(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable showLevelUpGUI(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable showLevelUpGUI(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setItemNonEquippable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setItemNonEquippable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getButtonMashCheck(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getButtonMashCheck(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setButtonMashCheck(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setButtonMashCheck(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable giveItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable giveItem(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable objectToString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable objectToString(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
     return Variable::ofString(str(boost::format("%x") % object->id()));
 }
 
-Variable getIsImmune(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsImmune(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getModuleItemAcquired(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getModuleItemAcquired(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getModuleItemAcquiredFrom(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getModuleItemAcquiredFrom(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setCustomToken(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setCustomToken(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getHasFeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getHasFeat(const vector<Variable> &args, const RoutineContext &ctx) {
     auto feat = getEnum<FeatType>(args, 0);
-    auto creature = getCreatureOrCaller(game, args, 1, ctx);
+    auto creature = getCreatureOrCaller(args, 1, ctx);
 
     return Variable::ofInt(static_cast<int>(creature->attributes().hasFeat(feat)));
 }
 
-Variable getHasSkill(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreatureOrCaller(game, args, 1, ctx);
+Variable getHasSkill(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreatureOrCaller(args, 1, ctx);
     auto skill = getEnum<SkillType>(args, 0);
 
     return Variable::ofInt(static_cast<int>(creature->attributes().hasSkill(skill)));
 }
 
-Variable getLastPlayerDied(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastPlayerDied(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getModuleItemLost(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getModuleItemLost(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getModuleItemLostBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getModuleItemLostBy(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getDistanceBetweenLocations(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getDistanceBetweenLocations(const vector<Variable> &args, const RoutineContext &ctx) {
     auto locationA = getLocationEngineType(args, 0);
     auto locationB = getLocationEngineType(args, 1);
 
@@ -968,12 +971,12 @@ Variable getDistanceBetweenLocations(Game &game, const vector<Variable> &args, E
     return Variable::ofFloat(result);
 }
 
-Variable getReflexAdjustedDamage(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getReflexAdjustedDamage(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playAnimation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsSpatial(game, ctx);
+Variable playAnimation(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caller = getCallerAsSpatial(ctx);
     auto animType = getEnum<AnimationType>(args, 0);
     float speed = getFloatOrElse(args, 1, 1.0f);
     float seconds = getFloatOrElse(args, 2, 0.0f); // TODO: handle duration
@@ -985,14 +988,14 @@ Variable playAnimation(Game &game, const vector<Variable> &args, ExecutionContex
     return Variable::ofNull();
 }
 
-Variable getHasSpellEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getHasSpellEffect(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getCreatureHasTalent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getCreatureHasTalent(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
         auto talent = getTalent(args, 0);
-        auto creature = getCreatureOrCaller(game, args, 1, ctx);
+        auto creature = getCreatureOrCaller(args, 1, ctx);
 
         // TODO: implement
 
@@ -1002,9 +1005,9 @@ Variable getCreatureHasTalent(Game &game, const vector<Variable> &args, Executio
     }
 }
 
-Variable getCreatureTalentRandom(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getCreatureTalentRandom(const vector<Variable> &args, const RoutineContext &ctx) {
     int category = getInt(args, 0);
-    auto creature = getCreatureOrCaller(game, args, 1, ctx);
+    auto creature = getCreatureOrCaller(args, 1, ctx);
     int inclusion = getIntOrElse(args, 2, 0);
 
     // TODO: implement
@@ -1012,10 +1015,10 @@ Variable getCreatureTalentRandom(Game &game, const vector<Variable> &args, Execu
     return Variable::ofTalent(nullptr);
 }
 
-Variable getCreatureTalentBest(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getCreatureTalentBest(const vector<Variable> &args, const RoutineContext &ctx) {
     int category = getInt(args, 0);
     int crMax = getInt(args, 1);
-    auto creature = getCreatureOrCaller(game, args, 2, ctx);
+    auto creature = getCreatureOrCaller(args, 2, ctx);
     int inclusion = getIntOrElse(args, 3, 0);
     int excludeType = getIntOrElse(args, 4, -1);
     int excludeId = getIntOrElse(args, 5, -1);
@@ -1025,64 +1028,64 @@ Variable getCreatureTalentBest(Game &game, const vector<Variable> &args, Executi
     return Variable::ofTalent(nullptr);
 }
 
-Variable getGoldPieceValue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGoldPieceValue(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsPlayableRacialType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsPlayableRacialType(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable jumpToLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable jumpToLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     auto destination = getLocationEngineType(args, 0);
 
-    auto action = game.actionFactory().newJumpToLocation(move(destination));
-    getCaller(game, ctx)->addActionOnTop(move(action));
+    auto action = ctx.actionFactory.newJumpToLocation(move(destination));
+    getCaller(ctx)->addActionOnTop(move(action));
 
     return Variable::ofNull();
 }
 
-Variable getSkillRank(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getCreatureOrCaller(game, args, 1, ctx);
+Variable getSkillRank(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getCreatureOrCaller(args, 1, ctx);
     auto skill = getEnum<SkillType>(args, 0);
 
     return Variable::ofInt(object->attributes().getSkillRank(skill));
 }
 
-Variable getAttackTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreatureOrCaller(game, args, 0, ctx);
+Variable getAttackTarget(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreatureOrCaller(args, 0, ctx);
     auto target = creature->getAttackTarget();
 
     return Variable::ofObject(getObjectIdOrInvalid(target));
 }
 
-Variable getLastAttackType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastAttackType(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastAttackMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastAttackMode(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getDistanceBetween2D(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto objectA = getSpatialObject(game, args, 0, ctx);
-    auto objectB = getSpatialObject(game, args, 1, ctx);
+Variable getDistanceBetween2D(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto objectA = getSpatialObject(args, 0, ctx);
+    auto objectB = getSpatialObject(args, 1, ctx);
     float result = objectA->getDistanceTo(glm::vec2(objectB->position()));
 
     return Variable::ofFloat(result);
 }
 
-Variable getIsInCombat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreatureOrCaller(game, args, 0, ctx);
+Variable getIsInCombat(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreatureOrCaller(args, 0, ctx);
     return Variable::ofInt(static_cast<int>(creature->isInCombat()));
 }
 
-Variable getLastAssociateCommand(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastAssociateCommand(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable giveGoldToCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
+Variable giveGoldToCreature(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
     auto gp = getInt(args, 1);
 
     creature->giveGold(gp);
@@ -1090,7 +1093,7 @@ Variable giveGoldToCreature(Game &game, const vector<Variable> &args, ExecutionC
     return Variable::ofNull();
 }
 
-Variable setIsDestroyable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setIsDestroyable(const vector<Variable> &args, const RoutineContext &ctx) {
     bool destroyabe = getBool(args, 0);
     bool raiseable = getBoolOrElse(args, 1, true);
     bool selectableWhenDead = getBoolOrElse(args, 2, false);
@@ -1100,8 +1103,8 @@ Variable setIsDestroyable(Game &game, const vector<Variable> &args, ExecutionCon
     return Variable::ofNull();
 }
 
-Variable setLocked(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getDoor(game, args, 0, ctx);
+Variable setLocked(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto target = getDoor(args, 0, ctx);
     bool locked = getBool(args, 1);
 
     target->setLocked(locked);
@@ -1109,38 +1112,38 @@ Variable setLocked(Game &game, const vector<Variable> &args, ExecutionContext &c
     return Variable::ofNull();
 }
 
-Variable getLocked(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getDoor(game, args, 0, ctx);
+Variable getLocked(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto target = getDoor(args, 0, ctx);
     return Variable::ofInt(static_cast<int>(target->isLocked()));
 }
 
-Variable getClickingObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getClickingObject(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setAssociateListenPatterns(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setAssociateListenPatterns(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastWeaponUsed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastWeaponUsed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastUsedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastUsedBy(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getAbilityModifier(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getAbilityModifier(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIdentified(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto item = getItem(game, args, 0, ctx);
+Variable getIdentified(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto item = getItem(args, 0, ctx);
     return Variable::ofInt(static_cast<int>(item->isIdentified()));
 }
 
-Variable setIdentified(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto item = getItem(game, args, 0, ctx);
+Variable setIdentified(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto item = getItem(args, 0, ctx);
     bool identified = getBool(args, 1);
 
     item->setIdentified(identified);
@@ -1148,7 +1151,7 @@ Variable setIdentified(Game &game, const vector<Variable> &args, ExecutionContex
     return Variable::ofNull();
 }
 
-Variable getDistanceBetweenLocations2D(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getDistanceBetweenLocations2D(const vector<Variable> &args, const RoutineContext &ctx) {
     auto locationA = getLocationEngineType(args, 0);
     auto locationB = getLocationEngineType(args, 1);
     float result = glm::distance(glm::vec2(locationA->position()), glm::vec2(locationB->position()));
@@ -1156,46 +1159,46 @@ Variable getDistanceBetweenLocations2D(Game &game, const vector<Variable> &args,
     return Variable::ofFloat(result);
 }
 
-Variable getDistanceToObject2D(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getDistanceToObject2D(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto caller = getCallerAsSpatial(game, ctx);
-        auto object = getSpatialObject(game, args, 0, ctx);
+        auto caller = getCallerAsSpatial(ctx);
+        auto object = getSpatialObject(args, 0, ctx);
         return Variable::ofFloat(caller->getDistanceTo(glm::vec2(object->position())));
     } catch (const ArgumentException &) {
         return Variable::ofFloat(-1.0f);
     }
 }
 
-Variable getBlockingDoor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getBlockingDoor(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsDoorActionPossible(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsDoorActionPossible(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable doDoorAction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable doDoorAction(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFirstItemInInventory(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getSpatialObjectOrCaller(game, args, 0, ctx);
+Variable getFirstItemInInventory(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto target = getSpatialObjectOrCaller(args, 0, ctx);
     auto item = target->getFirstItem();
 
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
-Variable getNextItemInInventory(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getSpatialObjectOrCaller(game, args, 0, ctx);
+Variable getNextItemInInventory(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto target = getSpatialObjectOrCaller(args, 0, ctx);
     auto item = target->getNextItem();
 
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
-Variable getClassByPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getClassByPosition(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
         int position = getInt(args, 0);
-        auto creature = getCreatureOrCaller(game, args, 1, ctx);
+        auto creature = getCreatureOrCaller(args, 1, ctx);
         ClassType clazz = creature->attributes().getClassByPosition(position);
 
         return Variable::ofInt(static_cast<int>(clazz));
@@ -1204,98 +1207,98 @@ Variable getClassByPosition(Game &game, const vector<Variable> &args, ExecutionC
     }
 }
 
-Variable getLevelByPosition(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreatureOrCaller(game, args, 1, ctx);
+Variable getLevelByPosition(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreatureOrCaller(args, 1, ctx);
     int position = getInt(args, 0);
     int level = creature->attributes().getLevelByPosition(position);
 
     return Variable::ofInt(level);
 }
 
-Variable getLevelByClass(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreatureOrCaller(game, args, 1, ctx);
+Variable getLevelByClass(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreatureOrCaller(args, 1, ctx);
     auto clazz = getEnum<ClassType>(args, 0);
 
     return Variable::ofInt(creature->attributes().getClassLevel(clazz));
 }
 
-Variable getDamageDealtByType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getDamageDealtByType(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getTotalDamageDealt(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTotalDamageDealt(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastDamager(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastDamager(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastDisarmed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastDisarmed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastDisturbed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastDisturbed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastLocked(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastLocked(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastUnlocked(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastUnlocked(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getInventoryDisturbType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getInventoryDisturbType(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getInventoryDisturbItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getInventoryDisturbItem(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable showUpgradeScreen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable showUpgradeScreen(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGender(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
+Variable getGender(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
     return Variable::ofInt(static_cast<int>(creature->gender()));
 }
 
-Variable getAttemptedAttackTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsCreature(game, ctx);
+Variable getAttemptedAttackTarget(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caller = getCallerAsCreature(ctx);
     auto target = caller->getAttemptedAttackTarget();
 
     return Variable::ofObject(getObjectIdOrInvalid(target));
 }
 
-Variable playPazaak(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable playPazaak(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastPazaakResult(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastPazaakResult(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable displayFeedBackText(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable displayFeedBackText(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable addJournalQuestEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable addJournalQuestEntry(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable removeJournalQuestEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable removeJournalQuestEntry(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getJournalEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getJournalEntry(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playRumblePattern(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable playRumblePattern(const vector<Variable> &args, const RoutineContext &ctx) {
     int pattern = getInt(args, 0);
 
     // TODO: implement
@@ -1303,7 +1306,7 @@ Variable playRumblePattern(Game &game, const vector<Variable> &args, ExecutionCo
     return Variable::ofNull();
 }
 
-Variable stopRumblePattern(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable stopRumblePattern(const vector<Variable> &args, const RoutineContext &ctx) {
     int pattern = getInt(args, 0);
 
     // TODO: implement
@@ -1311,25 +1314,25 @@ Variable stopRumblePattern(Game &game, const vector<Variable> &args, ExecutionCo
     return Variable::ofNull();
 }
 
-Variable sendMessageToPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable sendMessageToPC(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getAttemptedSpellTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsCreature(game, ctx);
+Variable getAttemptedSpellTarget(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caller = getCallerAsCreature(ctx);
 
     // TODO: implement
 
     return Variable::ofObject(kObjectInvalid);
 }
 
-Variable getLastOpenedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto triggerrer = getTriggerrer(game, ctx);
+Variable getLastOpenedBy(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto triggerrer = getTriggerrer(ctx);
     return Variable::ofObject(getObjectIdOrInvalid(triggerrer));
 }
 
-Variable getHasSpell(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreatureOrCaller(game, args, 1, ctx);
+Variable getHasSpell(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreatureOrCaller(args, 1, ctx);
     auto spell = getEnum<ForcePower>(args, 0);
 
     // TODO: Force Powers, aka spells, are not supported at the moment
@@ -1337,51 +1340,51 @@ Variable getHasSpell(Game &game, const vector<Variable> &args, ExecutionContext 
     return Variable::ofInt(static_cast<int>(false));
 }
 
-Variable openStore(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable openStore(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFirstFactionMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFirstFactionMember(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getNextFactionMember(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNextFactionMember(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getJournalQuestExperience(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getJournalQuestExperience(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable jumpToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable jumpToObject(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: pass all arguments to an action
-    auto jumpTo = getObject(game, args, 0, ctx);
+    auto jumpTo = getObject(args, 0, ctx);
     bool walkStraightLine = getBoolOrElse(args, 1, true);
 
-    auto action = game.actionFactory().newJumpToObject(move(jumpTo));
-    getCaller(game, ctx)->addActionOnTop(move(action));
+    auto action = ctx.actionFactory.newJumpToObject(move(jumpTo));
+    getCaller(ctx)->addActionOnTop(move(action));
 
     return Variable::ofNull();
 }
 
-Variable setMapPinEnabled(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setMapPinEnabled(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable popUpGUIPanel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable popUpGUIPanel(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable addMultiClass(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable addMultiClass(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsLinkImmune(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsLinkImmune(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable giveXPToCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
+Variable giveXPToCreature(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
     int xpAmount = getInt(args, 1);
 
     creature->giveXP(xpAmount);
@@ -1389,8 +1392,8 @@ Variable giveXPToCreature(Game &game, const vector<Variable> &args, ExecutionCon
     return Variable::ofNull();
 }
 
-Variable setXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
+Variable setXP(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
     int xpAmount = getInt(args, 1);
 
     creature->setXP(xpAmount);
@@ -1398,48 +1401,48 @@ Variable setXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) 
     return Variable::ofNull();
 }
 
-Variable getXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
+Variable getXP(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
     return Variable::ofInt(creature->xp());
 }
 
-Variable getBaseItemType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto item = getItem(game, args, 0, ctx);
+Variable getBaseItemType(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto item = getItem(args, 0, ctx);
     return Variable::ofInt(item->baseItemType());
 }
 
-Variable getItemHasItemProperty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getItemHasItemProperty(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getItemACValue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getItemACValue(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable exploreAreaForPlayer(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable exploreAreaForPlayer(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsEncounterCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreatureOrCaller(game, args, 0, ctx);
+Variable getIsEncounterCreature(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreatureOrCaller(args, 0, ctx);
 
     // TODO: implement
 
     return Variable::ofInt(0);
 }
 
-Variable getLastPlayerDying(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastPlayerDying(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getStartingLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    const ModuleInfo &info = game.module()->info();
+Variable getStartingLocation(const vector<Variable> &args, const RoutineContext &ctx) {
+    const ModuleInfo &info = ctx.game.module()->info();
     auto location = make_shared<Location>(info.entryPosition, info.entryFacing);
     return Variable::ofLocation(move(location));
 }
 
-Variable changeToStandardFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creatureToChange = getCreature(game, args, 0, ctx);
+Variable changeToStandardFaction(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creatureToChange = getCreature(args, 0, ctx);
     auto faction = getEnum<Faction>(args, 1);
 
     creatureToChange->setFaction(faction);
@@ -1447,87 +1450,87 @@ Variable changeToStandardFaction(Game &game, const vector<Variable> &args, Execu
     return Variable::ofNull();
 }
 
-Variable speakOneLinerConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable speakOneLinerConversation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGold(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getCreatureOrCaller(game, args, 0, ctx);
+Variable getGold(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto target = getCreatureOrCaller(args, 0, ctx);
     return Variable::ofInt(target->gold());
 }
 
-Variable getLastRespawnButtonPresser(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastRespawnButtonPresser(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setLightsaberPowered(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setLightsaberPowered(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsWeaponEffective(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsWeaponEffective(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastSpellHarmful(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastSpellHarmful(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastKiller(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastKiller(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSpellCastItem(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSpellCastItem(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getItemActivated(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getItemActivated(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getItemActivator(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getItemActivator(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getItemActivatedTargetLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getItemActivatedTargetLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getItemActivatedTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getItemActivatedTarget(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsOpen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getSpatialObject(game, args, 0, ctx);
+Variable getIsOpen(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getSpatialObject(args, 0, ctx);
     return Variable::ofInt(static_cast<int>(object->isOpen()));
 }
 
-Variable takeGoldFromCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable takeGoldFromCreature(const vector<Variable> &args, const RoutineContext &ctx) {
     auto amount = getInt(args, 0);
-    auto creatureToTakeFrom = getCreature(game, args, 1, ctx);
+    auto creatureToTakeFrom = getCreature(args, 1, ctx);
     auto destroy = getBoolOrElse(args, 2, false);
 
     if (creatureToTakeFrom) {
         creatureToTakeFrom->takeGold(amount);
     }
     if (!destroy) {
-        auto caller = getCallerAsCreature(game, ctx);
+        auto caller = getCallerAsCreature(ctx);
         caller->giveGold(amount);
     }
 
     return Variable::ofNull();
 }
 
-Variable getIsInConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsInConversation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlotFlag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getObjectOrCaller(game, args, 0, ctx);
+Variable getPlotFlag(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto target = getObjectOrCaller(args, 0, ctx);
     return Variable::ofInt(static_cast<int>(target->plotFlag()));
 }
 
-Variable setPlotFlag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto target = getObject(game, args, 0, ctx);
+Variable setPlotFlag(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto target = getObject(args, 0, ctx);
     bool plotFlag = getBool(args, 1);
 
     target->setPlotFlag(plotFlag);
@@ -1535,112 +1538,112 @@ Variable setPlotFlag(Game &game, const vector<Variable> &args, ExecutionContext 
     return Variable::ofNull();
 }
 
-Variable setDialogPlaceableCamera(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setDialogPlaceableCamera(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSoloMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(static_cast<int>(game.party().isSoloMode()));
+Variable getSoloMode(const vector<Variable> &args, const RoutineContext &ctx) {
+    return Variable::ofInt(static_cast<int>(ctx.party.isSoloMode()));
 }
 
-Variable getNumStackedItems(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNumStackedItems(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable surrenderToEnemies(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable surrenderToEnemies(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getCreatureSize(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getCreatureSize(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastTrapDetected(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastTrapDetected(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getNearestTrapToObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNearestTrapToObject(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getAttemptedMovementTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getAttemptedMovementTarget(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getBlockingCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getBlockingCreature(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFortitudeSavingThrow(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFortitudeSavingThrow(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getWillSavingThrow(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getWillSavingThrow(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getReflexSavingThrow(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getReflexSavingThrow(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getChallengeRating(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getChallengeRating(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFoundEnemyCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFoundEnemyCreature(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getMovementRate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getMovementRate(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSubRace(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSubRace(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto creature = getCreature(game, args, 0, ctx);
+        auto creature = getCreature(args, 0, ctx);
         return Variable::ofInt(static_cast<int>(creature->subrace()));
     } catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(Subrace::None));
     }
 }
 
-Variable duplicateHeadAppearance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable duplicateHeadAppearance(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable cutsceneAttack(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsCreature(game, ctx);
-    auto target = getSpatialObject(game, args, 0, ctx);
+Variable cutsceneAttack(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caller = getCallerAsCreature(ctx);
+    auto target = getSpatialObject(args, 0, ctx);
     int animation = getInt(args, 1);
     auto attackResult = getEnum<AttackResultType>(args, 2);
     int damage = getInt(args, 3);
 
-    game.combat().addAttack(caller, target, nullptr, attackResult, damage);
+    ctx.combat.addAttack(caller, target, nullptr, attackResult, damage);
 
     return Variable::ofNull();
 }
 
-Variable setCameraMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setCameraMode(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setLockOrientationInDialog(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setLockOrientationInDialog(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setLockHeadFollowInDialog(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setLockHeadFollowInDialog(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable cutsceneMove(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable cutsceneMove(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable enableVideoEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable enableVideoEffect(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable startNewModule(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable startNewModule(const vector<Variable> &args, const RoutineContext &ctx) {
     string moduleName(boost::to_lower_copy(getString(args, 0)));
     string waypoint(boost::to_lower_copy(getStringOrElse(args, 1, "")));
     string movie1(boost::to_lower_copy(getStringOrElse(args, 2, "")));
@@ -1650,302 +1653,302 @@ Variable startNewModule(Game &game, const vector<Variable> &args, ExecutionConte
     string movie5(boost::to_lower_copy(getStringOrElse(args, 6, "")));
     string movie6(boost::to_lower_copy(getStringOrElse(args, 7, "")));
 
-    game.scheduleModuleTransition(moduleName, waypoint);
+    ctx.game.scheduleModuleTransition(moduleName, waypoint);
 
     return Variable::ofNull();
 }
 
-Variable disableVideoEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable disableVideoEffect(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getWeaponRanged(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getWeaponRanged(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable doSinglePlayerAutoSave(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable doSinglePlayerAutoSave(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGameDifficulty(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGameDifficulty(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getUserActionsPending(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsCreature(game, ctx);
+Variable getUserActionsPending(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caller = getCallerAsCreature(ctx);
     return Variable::ofInt(static_cast<int>(caller->hasUserActionsPending()));
 }
 
-Variable revealMap(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable revealMap(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setTutorialWindowsEnabled(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setTutorialWindowsEnabled(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable showTutorialWindow(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable showTutorialWindow(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable startCreditSequence(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable startCreditSequence(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable isCreditSequenceInProgress(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isCreditSequenceInProgress(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getCurrentAction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObjectOrCaller(game, args, 0, ctx);
+Variable getCurrentAction(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObjectOrCaller(args, 0, ctx);
     shared_ptr<Action> action(object->getCurrentAction());
     return Variable::ofInt(static_cast<int>(action ? action->type() : ActionType::QueueEmpty));
 }
 
-Variable getDifficultyModifier(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getDifficultyModifier(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getAppearanceType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getAppearanceType(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable floatingTextStrRefOnCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable floatingTextStrRefOnCreature(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable floatingTextStringOnCreature(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable floatingTextStringOnCreature(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getTrapDisarmable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTrapDisarmable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getTrapDetectable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTrapDetectable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getTrapDetectedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTrapDetectedBy(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getTrapFlagged(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTrapFlagged(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getTrapBaseType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTrapBaseType(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getTrapOneShot(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTrapOneShot(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getTrapCreator(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTrapCreator(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getTrapKeyTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTrapKeyTag(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getTrapDisarmDC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTrapDisarmDC(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getTrapDetectDC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTrapDetectDC(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLockKeyRequired(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLockKeyRequired(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLockKeyTag(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLockKeyTag(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLockLockable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLockLockable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLockUnlockDC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLockUnlockDC(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLockLockDC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLockLockDC(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPCLevellingUp(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPCLevellingUp(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getHasFeatEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getHasFeatEffect(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlaceableIllumination(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlaceableIllumination(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlaceableIllumination(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlaceableIllumination(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsPlaceableObjectActionPossible(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsPlaceableObjectActionPossible(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable doPlaceableObjectAction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable doPlaceableObjectAction(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFirstPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto player = game.party().player();
+Variable getFirstPC(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto player = ctx.party.player();
     return Variable::ofObject(getObjectIdOrInvalid(player));
 }
 
-Variable getNextPC(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNextPC(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setTrapDetectedBy(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setTrapDetectedBy(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsTrapped(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsTrapped(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable faceObjectAwayFromObject(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto facer = getSpatialObject(game, args, 0, ctx);
-    auto objectToFaceAwayFrom = getSpatialObject(game, args, 1, ctx);
+Variable faceObjectAwayFromObject(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto facer = getSpatialObject(args, 0, ctx);
+    auto objectToFaceAwayFrom = getSpatialObject(args, 1, ctx);
 
     facer->faceAwayFrom(*objectToFaceAwayFrom);
 
     return Variable::ofNull();
 }
 
-Variable popUpDeathGUIPanel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable popUpDeathGUIPanel(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setTrapDisabled(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setTrapDisabled(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastHostileActor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastHostileActor(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable exportAllCharacters(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable exportAllCharacters(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getModuleName(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getModuleName(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFactionLeader(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFactionLeader(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable endGame(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable endGame(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getRunScriptVar(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    return Variable::ofInt(ctx.scriptVar);
+Variable getRunScriptVar(const vector<Variable> &args, const RoutineContext &ctx) {
+    return Variable::ofInt(ctx.execution.scriptVar);
 }
 
-Variable getCreatureMovmentType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getCreatureMovmentType(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getHasInventory(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getHasInventory(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getStrRefSoundDuration(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getStrRefSoundDuration(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getGlobalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGlobalBoolean(const vector<Variable> &args, const RoutineContext &ctx) {
     string id(getString(args, 0));
-    bool value = game.getGlobalBoolean(id);
+    bool value = ctx.game.getGlobalBoolean(id);
 
     return Variable::ofInt(static_cast<int>(value));
 }
 
-Variable setGlobalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGlobalBoolean(const vector<Variable> &args, const RoutineContext &ctx) {
     string id(getString(args, 0));
     bool value = getBool(args, 1);
 
-    game.setGlobalBoolean(id, value);
+    ctx.game.setGlobalBoolean(id, value);
 
     return Variable::ofNull();
 }
 
-Variable getGlobalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGlobalNumber(const vector<Variable> &args, const RoutineContext &ctx) {
     string id(getString(args, 0));
-    int value = game.getGlobalNumber(id);
+    int value = ctx.game.getGlobalNumber(id);
 
     return Variable::ofInt(value);
 }
 
-Variable setGlobalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGlobalNumber(const vector<Variable> &args, const RoutineContext &ctx) {
     string id(getString(args, 0));
     int value = getInt(args, 1);
 
-    game.setGlobalNumber(id, value);
+    ctx.game.setGlobalNumber(id, value);
 
     return Variable::ofNull();
 }
 
-Variable addJournalWorldEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable addJournalWorldEntry(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable addJournalWorldEntryStrref(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable addJournalWorldEntryStrref(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable barkString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable barkString(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable deleteJournalWorldAllEntries(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable deleteJournalWorldAllEntries(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable deleteJournalWorldEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable deleteJournalWorldEntry(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable deleteJournalWorldEntryStrref(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable deleteJournalWorldEntryStrref(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playVisualAreaEffect(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable playVisualAreaEffect(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setJournalQuestEntryPicture(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setJournalQuestEntryPicture(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLocalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable getLocalBoolean(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
     int index = getInt(args, 1);
     bool value = object->getLocalBoolean(index);
 
     return Variable::ofInt(static_cast<int>(value));
 }
 
-Variable setLocalBoolean(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable setLocalBoolean(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
     int index = getInt(args, 1);
     bool value = getBool(args, 2);
 
@@ -1954,15 +1957,15 @@ Variable setLocalBoolean(Game &game, const vector<Variable> &args, ExecutionCont
     return Variable::ofNull();
 }
 
-Variable getLocalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable getLocalNumber(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
     int index = getInt(args, 1);
 
     return Variable::ofInt(object->getLocalNumber(index));
 }
 
-Variable setLocalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable setLocalNumber(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
     int index = getInt(args, 1);
     int value = getInt(args, 2);
 
@@ -1971,37 +1974,37 @@ Variable setLocalNumber(Game &game, const vector<Variable> &args, ExecutionConte
     return Variable::ofNull();
 }
 
-Variable getGlobalLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getGlobalLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     string id(getString(args, 0));
-    auto value = game.getGlobalLocation(id);
+    auto value = ctx.game.getGlobalLocation(id);
 
     return Variable::ofLocation(move(value));
 }
 
-Variable setGlobalLocation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGlobalLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     string id(getString(args, 0));
     auto value = getLocationEngineType(args, 1);
 
-    game.setGlobalLocation(id, value);
+    ctx.game.setGlobalLocation(id, value);
 
     return Variable::ofNull();
 }
 
-Variable getIsConversationActive(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsConversationActive(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getNPCAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNPCAIStyle(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto creature = getCreature(game, args, 0, ctx);
+        auto creature = getCreature(args, 0, ctx);
         return Variable::ofInt(static_cast<int>(creature->aiStyle()));
     } catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(NPCAIStyle::DefaultAttack));
     }
 }
 
-Variable setNPCAIStyle(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreature(game, args, 0, ctx);
+Variable setNPCAIStyle(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreature(args, 0, ctx);
     auto style = getEnum<NPCAIStyle>(args, 1);
 
     creature->setAIStyle(style);
@@ -2009,25 +2012,25 @@ Variable setNPCAIStyle(Game &game, const vector<Variable> &args, ExecutionContex
     return Variable::ofNull();
 }
 
-Variable setNPCSelectability(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setNPCSelectability(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getNPCSelectability(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNPCSelectability(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable clearAllEffects(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto caller = getCallerAsSpatial(game, ctx);
+Variable clearAllEffects(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caller = getCallerAsSpatial(ctx);
     caller->clearAllEffects();
     return Variable::ofNull();
 }
 
-Variable getLastConversation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastConversation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable showPartySelectionGUI(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable showPartySelectionGUI(const vector<Variable> &args, const RoutineContext &ctx) {
     string exitScript(boost::to_lower_copy(getStringOrElse(args, 0, "")));
     int forceNpc1 = getIntOrElse(args, 1, -1);
     int forceNpc2 = getIntOrElse(args, 2, -1);
@@ -2037,31 +2040,31 @@ Variable showPartySelectionGUI(Game &game, const vector<Variable> &args, Executi
     partyCtx.forceNpc1 = forceNpc1;
     partyCtx.forceNpc2 = forceNpc2;
 
-    game.openPartySelection(partyCtx);
+    ctx.game.openPartySelection(partyCtx);
 
     return Variable::ofNull();
 }
 
-Variable getStandardFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getStandardFaction(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto object = getCreature(game, args, 0, ctx);
+        auto object = getCreature(args, 0, ctx);
         return Variable::ofInt(static_cast<int>(object->faction()));
     } catch (const ArgumentException &) {
         return Variable::ofInt(static_cast<int>(Faction::Invalid));
     }
 }
 
-Variable givePlotXP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable givePlotXP(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getMinOneHP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable getMinOneHP(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
     return Variable::ofInt(static_cast<int>(object->isMinOneHP()));
 }
 
-Variable setMinOneHP(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable setMinOneHP(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
     bool minOneHP = getBool(args, 1);
 
     object->setMinOneHP(minOneHP);
@@ -2069,7 +2072,7 @@ Variable setMinOneHP(Game &game, const vector<Variable> &args, ExecutionContext 
     return Variable::ofNull();
 }
 
-Variable setGlobalFadeIn(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGlobalFadeIn(const vector<Variable> &args, const RoutineContext &ctx) {
     float wait = getFloatOrElse(args, 0, 0.0f);
     float length = getFloatOrElse(args, 1, 0.0f);
     float r = getFloatOrElse(args, 0, 2.0f);
@@ -2081,7 +2084,7 @@ Variable setGlobalFadeIn(Game &game, const vector<Variable> &args, ExecutionCont
     return Variable::ofNull();
 }
 
-Variable setGlobalFadeOut(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGlobalFadeOut(const vector<Variable> &args, const RoutineContext &ctx) {
     float wait = getFloatOrElse(args, 0, 0.0f);
     float length = getFloatOrElse(args, 1, 0.0f);
     float r = getFloatOrElse(args, 2, 0.0f);
@@ -2093,53 +2096,53 @@ Variable setGlobalFadeOut(Game &game, const vector<Variable> &args, ExecutionCon
     return Variable::ofNull();
 }
 
-Variable getLastHostileTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto attacker = getCreatureOrCaller(game, args, 0, ctx);
+Variable getLastHostileTarget(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto attacker = getCreatureOrCaller(args, 0, ctx);
     // TODO: implement
     return Variable::ofObject(kObjectInvalid);
 }
 
-Variable getLastAttackAction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto attacker = getCreatureOrCaller(game, args, 0, ctx);
+Variable getLastAttackAction(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto attacker = getCreatureOrCaller(args, 0, ctx);
     // TODO: implement
     return Variable::ofInt(static_cast<int>(ActionType::QueueEmpty));
 }
 
-Variable getLastForcePowerUsed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastForcePowerUsed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastCombatFeatUsed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastCombatFeatUsed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastAttackResult(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastAttackResult(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getWasForcePowerSuccessful(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getWasForcePowerSuccessful(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFirstAttacker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFirstAttacker(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getNextAttacker(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getNextAttacker(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setFormation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setFormation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setForcePowerUnsuccessful(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setForcePowerUnsuccessful(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsDebilitated(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsDebilitated(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
-        auto creature = getCreatureOrCaller(game, args, 0, ctx);
+        auto creature = getCreatureOrCaller(args, 0, ctx);
         bool debilitated = creature->isDebilitated();
         return Variable::ofInt(static_cast<int>(debilitated));
     } catch (const ArgumentException &ex) {
@@ -2147,64 +2150,64 @@ Variable getIsDebilitated(Game &game, const vector<Variable> &args, ExecutionCon
     }
 }
 
-Variable surrenderByFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable surrenderByFaction(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable changeFactionByFaction(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable changeFactionByFaction(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playRoomAnimation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable playRoomAnimation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable showGalaxyMap(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable showGalaxyMap(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setAreaFogColor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setAreaFogColor(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable changeItemCost(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable changeItemCost(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsLiveContentAvailable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsLiveContentAvailable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable resetDialogState(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable resetDialogState(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setGoodEvilValue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setGoodEvilValue(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsPoisoned(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsPoisoned(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSpellTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto creature = getCreatureOrCaller(game, args, 0, ctx);
+Variable getSpellTarget(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getCreatureOrCaller(args, 0, ctx);
     // TODO: implement
     return Variable::ofObject(kObjectInvalid);
 }
 
-Variable setSoloMode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setSoloMode(const vector<Variable> &args, const RoutineContext &ctx) {
     auto activate = getBool(args, 0);
-    game.party().setSoloMode(activate);
+    ctx.party.setSoloMode(activate);
     return Variable::ofNull();
 }
 
-Variable cancelPostDialogCharacterSwitch(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable cancelPostDialogCharacterSwitch(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
-    auto object = getObject(game, args, 0, ctx);
+Variable setMaxHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
     int maxHP = getInt(args, 1);
 
     object->setMaxHitPoints(maxHP);
@@ -2212,327 +2215,327 @@ Variable setMaxHitPoints(Game &game, const vector<Variable> &args, ExecutionCont
     return Variable::ofNull();
 }
 
-Variable noClicksFor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable noClicksFor(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable holdWorldFadeInForDialog(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable holdWorldFadeInForDialog(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable shipBuild(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable shipBuild(const vector<Variable> &args, const RoutineContext &ctx) {
     return Variable::ofInt(static_cast<int>(kShipBuild));
 }
 
-Variable surrenderRetainBuffs(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable surrenderRetainBuffs(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable suppressStatusSummaryEntry(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable suppressStatusSummaryEntry(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getCheatCode(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getCheatCode(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable createItemOnFloor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable createItemOnFloor(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getScriptParameter(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getScriptParameter(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setFadeUntilScript(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setFadeUntilScript(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getItemComponent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getItemComponent(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getItemComponentPieceValue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getItemComponentPieceValue(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable showChemicalUpgradeScreen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable showChemicalUpgradeScreen(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getChemicals(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getChemicals(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getChemicalPieceValue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getChemicalPieceValue(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSpellForcePointCost(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSpellForcePointCost(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getFeatAcquired(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getFeatAcquired(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSpellAcquired(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSpellAcquired(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable showSwoopUpgradeScreen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable showSwoopUpgradeScreen(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable grantFeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable grantFeat(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable grantSpell(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable grantSpell(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable spawnMine(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable spawnMine(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setFakeCombatState(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setFakeCombatState(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getOwnerDemolitionsSkill(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getOwnerDemolitionsSkill(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setOrientOnClick(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setOrientOnClick(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getInfluence(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getInfluence(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setInfluence(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setInfluence(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable modifyInfluence(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable modifyInfluence(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getRacialSubType(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getRacialSubType(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable incrementGlobalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable incrementGlobalNumber(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable decrementGlobalNumber(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable decrementGlobalNumber(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setBonusForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setBonusForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable addBonusForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable addBonusForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getBonusForcePoints(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getBonusForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable yavinHackCloseDoor(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable yavinHackCloseDoor(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable isStealthed(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isStealthed(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable isMeditating(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isMeditating(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable isInTotalDefense(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isInTotalDefense(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setHealTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setHealTarget(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getHealTarget(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getHealTarget(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getRandomDestination(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getRandomDestination(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable isFormActive(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isFormActive(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSpellFormMask(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSpellFormMask(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSpellBaseForcePointCost(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSpellBaseForcePointCost(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setKeepStealthInDialog(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setKeepStealthInDialog(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable hasLineOfSight(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable hasLineOfSight(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable showDemoScreen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable showDemoScreen(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable forceHeartbeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable forceHeartbeat(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable isRunning(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isRunning(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setForfeitConditions(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setForfeitConditions(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getLastForfeitViolation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getLastForfeitViolation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable modifyReflexSavingThrowBase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable modifyReflexSavingThrowBase(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable modifyFortitudeSavingThrowBase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable modifyFortitudeSavingThrowBase(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable modifyWillSavingThrowBase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable modifyWillSavingThrowBase(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getScriptStringParameter(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getScriptStringParameter(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getObjectPersonalSpace(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getObjectPersonalSpace(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable adjustCreatureAttributes(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable adjustCreatureAttributes(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setCreatureAILevel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setCreatureAILevel(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable resetCreatureAILevel(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable resetCreatureAILevel(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable creatureFlourishWeapon(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable creatureFlourishWeapon(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable changeObjectAppearance(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable changeObjectAppearance(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsXBox(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsXBox(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playOverlayAnimation(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable playOverlayAnimation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable unlockAllSongs(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable unlockAllSongs(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable disableMap(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable disableMap(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable detonateMine(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable detonateMine(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable disableHealthRegen(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable disableHealthRegen(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setCurrentForm(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setCurrentForm(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setDisableTransit(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setDisableTransit(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setInputClass(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setInputClass(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setForceAlwaysUpdate(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setForceAlwaysUpdate(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable enableRain(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable enableRain(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable displayMessageBox(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable displayMessageBox(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable displayDatapad(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable displayDatapad(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable removeHeartbeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable removeHeartbeat(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable removeEffectByID(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable removeEffectByID(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable removeEffectByExactMatch(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable removeEffectByExactMatch(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable adjustCreatureSkills(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable adjustCreatureSkills(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSkillRankBase(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSkillRankBase(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable enableRendering(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable enableRendering(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getCombatActionsPending(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getCombatActionsPending(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getIsPlayerMadeCharacter(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsPlayerMadeCharacter(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

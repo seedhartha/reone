@@ -24,6 +24,8 @@
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/types.h"
 
+#include "../context.h"
+
 using namespace std;
 
 using namespace reone::script;
@@ -34,23 +36,23 @@ namespace game {
 
 namespace routine {
 
-Variable setPlanetSelectable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlanetSelectable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlanetSelectable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlanetSelectable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlanetAvailable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable setPlanetAvailable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlanetAvailable(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getPlanetAvailable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSelectedPlanet(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getSelectedPlanet(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

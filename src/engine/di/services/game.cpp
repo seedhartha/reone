@@ -47,27 +47,50 @@ void GameServices::init() {
     _soundSets = make_unique<SoundSets>(_audio.files(), _resource.resources(), _resource.strings());
     _footstepSounds = make_unique<FootstepSounds>(_audio.files(), _resource.resources());
     _guiSounds = make_unique<GUISounds>(_audio.files(), _resource.resources());
-    _routines = make_unique<Routines>();
-    _scriptRunner = make_unique<ScriptRunner>(*_routines, _script.scripts());
+    _scriptRunner = make_unique<ScriptRunner>(_script.scripts());
     _reputes = make_unique<Reputes>(_resource.resources());
     _skills = make_unique<Skills>(_graphics.textures(), _resource.resources(), _resource.strings());
     _feats = make_unique<Feats>(_graphics.textures(), _resource.resources(), _resource.strings());
     _spells = make_unique<Spells>(_graphics.textures(), _resource.resources(), _resource.strings());
     _classes = make_unique<Classes>(_resource.resources(), _resource.strings());
     _portraits = make_unique<Portraits>(_graphics.textures(), _resource.resources());
-    _objectFactory = make_unique<ObjectFactory>(_scene.graph());
-    _party = make_unique<Party>();
-    _combat = make_unique<Combat>(_scene.graph());
     _actionFactory = make_unique<ActionFactory>();
+    _party = make_unique<Party>();
+    _combat = make_unique<Combat>(*_effectFactory, _scene.graph());
+    _objectFactory = make_unique<ObjectFactory>(
+        *_actionFactory,
+        *_classes,
+        *_combat,
+        *_footstepSounds,
+        *_party,
+        *_portraits,
+        *_reputes,
+        *_scriptRunner,
+        *_soundSets,
+        *_surfaces,
+        _audio.files(),
+        _audio.player(),
+        _graphics.context(),
+        _graphics.meshes(),
+        _graphics.models(),
+        _graphics.shaders(),
+        _graphics.textures(),
+        _graphics.walkmeshes(),
+        _graphics.window(),
+        _resource.resources(),
+        _resource.strings(),
+        _scene.graph());
     _effectFactory = make_unique<EffectFactory>();
+    _routines = make_unique<Routines>(*_actionFactory, *_combat, *_effectFactory, *_party, *_reputes, *_scriptRunner, _resource.strings());
     _routineRegistrar = newRoutineRegistrar();
     _game = newGame();
 
-    _routines->setGame(*_game);
-    _objectFactory->setGame(*_game);
+    _scriptRunner->setRoutines(*_routines);
+    _actionFactory->setGame(*_game);
     _party->setGame(*_game);
     _combat->setGame(*_game);
-    _actionFactory->setGame(*_game);
+    _objectFactory->setGame(*_game);
+    _routines->setGame(*_game);
 
     _game->initResourceProviders();
     _surfaces->init();

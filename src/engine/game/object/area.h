@@ -36,6 +36,12 @@
 
 namespace reone {
 
+namespace graphics {
+
+class Window;
+
+}
+
 namespace game {
 
 const float kHeartbeatInterval = 6.0f;
@@ -53,7 +59,32 @@ class Area : public Object {
 public:
     typedef std::vector<std::pair<CreatureType, int>> SearchCriteriaList;
 
-    Area(uint32_t id, Game *game);
+    Area(
+        uint32_t id,
+        Game *game,
+        ActionFactory &actionFactory,
+        Classes &classes,
+        Combat &combat,
+        FootstepSounds &footstepSounds,
+        ObjectFactory &objectFactory,
+        Party &party,
+        Portraits &portraits,
+        Reputes &reputes,
+        ScriptRunner &scriptRunner,
+        SoundSets &soundSets,
+        Surfaces &surfaces,
+        audio::AudioFiles &audioFiles,
+        audio::AudioPlayer &audioPlayer,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Models &models,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Walkmeshes &walkmeshes,
+        graphics::Window &window,
+        resource::Resources &resources,
+        resource::Strings &strings,
+        scene::SceneGraph &sceneGraph);
 
     void load(std::string name, const resource::GffStruct &are, const resource::GffStruct &git, bool fromSave = false);
 

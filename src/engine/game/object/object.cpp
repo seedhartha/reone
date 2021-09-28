@@ -20,6 +20,8 @@
 #include "../../common/collectionutil.h"
 #include "../../common/guardutil.h"
 
+#include "../action/context.h"
+
 using namespace std;
 
 namespace reone {
@@ -30,12 +32,6 @@ static constexpr float kKeepPathDuration = 1000.0f;
 static constexpr float kDefaultMaxObjectDistance = 2.0f;
 static constexpr float kMaxConversationDistance = 4.0f;
 static constexpr float kDistanceWalk = 4.0f;
-
-Object::Object(uint32_t id, ObjectType type, Game *game) :
-    _id(id),
-    _type(type),
-    _game(ensurePresent(game, "game")) {
-}
 
 void Object::update(float dt) {
     updateActions(dt);
@@ -116,8 +112,9 @@ void Object::executeActions(float dt) {
     if (_actions.empty())
         return;
 
+    ActionContext ctx(_combat, _objectFactory, _party, _scriptRunner);
     shared_ptr<Action> action(_actions.front());
-    action->execute(*this, dt);
+    action->execute(*this, ctx, dt);
 }
 
 bool Object::hasUserActionsPending() const {

@@ -35,30 +35,78 @@ namespace reone {
 
 namespace game {
 
-GameGUI::GameGUI(Game *game) :
+GameGUI::GameGUI(
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    Context &context,
+    Features &features,
+    Fonts &fonts,
+    Lips &lips,
+    Materials &materials,
+    Meshes &meshes,
+    Models &models,
+    PBRIBL &pbrIbl,
+    Shaders &shaders,
+    Textures &textures,
+    Walkmeshes &walkmeshes,
+    Window &window,
+    Resources &resources,
+    Strings &strings) :
     GUI(
         game->options().graphics,
-        game->context(),
-        game->features(),
-        game->fonts(),
-        game->materials(),
-        game->meshes(),
-        game->pbrIbl(),
-        game->shaders(),
-        game->textures(),
-        game->window(),
-        game->resources(),
-        game->strings()),
-    _game(game) {
+        context,
+        features,
+        fonts,
+        materials,
+        meshes,
+        pbrIbl,
+        shaders,
+        textures,
+        window,
+        resources,
+        strings),
+    _game(game),
+    _actionFactory(actionFactory),
+    _classes(classes),
+    _combat(combat),
+    _feats(feats),
+    _footstepSounds(footstepSounds),
+    _guiSounds(guiSounds),
+    _objectFactory(objectFactory),
+    _party(party),
+    _portraits(portraits),
+    _reputes(reputes),
+    _scriptRunner(scriptRunner),
+    _soundSets(soundSets),
+    _surfaces(surfaces),
+    _audioFiles(audioFiles),
+    _audioPlayer(audioPlayer),
+    _lips(lips),
+    _models(models),
+    _walkmeshes(walkmeshes) {
 }
 
 void GameGUI::onClick(const string &control) {
-    _game->audioPlayer().play(_game->guiSounds().getOnClick(), AudioType::Sound);
+    _audioPlayer.play(_guiSounds.getOnClick(), AudioType::Sound);
 }
 
 void GameGUI::onFocusChanged(const string &control, bool focus) {
     if (focus) {
-        _game->audioPlayer().play(_game->guiSounds().getOnEnter(), AudioType::Sound);
+        _audioPlayer.play(_guiSounds.getOnEnter(), AudioType::Sound);
     }
 }
 

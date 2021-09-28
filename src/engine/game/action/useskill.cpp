@@ -24,13 +24,15 @@
 #include "../object/factory.h"
 #include "../script/runner.h"
 
+#include "context.h"
+
 using namespace std;
 
 namespace reone {
 
 namespace game {
 
-void UseSkillAction::execute(Object &actor, float dt) {
+void UseSkillAction::execute(Object &actor, ActionContext &ctx, float dt) {
     if (_skill == SkillType::Security) {
         if (!_object || _object->type() != ObjectType::Door) {
             warn("ActionExecutor: unsupported OpenLock object: " + to_string(_object->id()));
@@ -39,7 +41,7 @@ void UseSkillAction::execute(Object &actor, float dt) {
         }
 
         auto door = static_pointer_cast<Door>(_object);
-        auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
+        auto creatureActor = ctx.objectFactory.getObjectById<Creature>(actor.id());
 
         bool reached = creatureActor->navigateTo(door->position(), true, kDefaultMaxObjectDistance, dt);
         if (reached) {
@@ -52,7 +54,7 @@ void UseSkillAction::execute(Object &actor, float dt) {
 
                 string onOpen(door->getOnOpen());
                 if (!onOpen.empty()) {
-                    _game.scriptRunner().run(onOpen, door->id(), actor.id());
+                    ctx.scriptRunner.run(onOpen, door->id(), actor.id());
                 }
             }
 

@@ -40,8 +40,68 @@ static constexpr int kStrRefSkillRank = 1579;
 static constexpr int kStrRefBonus = 32129;
 static constexpr int kStrRefTotalRank = 41904;
 
-AbilitiesMenu::AbilitiesMenu(Game *game) :
-    GameGUI(game) {
+AbilitiesMenu::AbilitiesMenu(
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings) {
     _resRef = getResRef("abilities");
 
     initForGame();
@@ -56,9 +116,9 @@ void AbilitiesMenu::load() {
     _binding.btnPowers->setDisabled(true);
     _binding.btnFeats->setDisabled(true);
 
-    _binding.lblSkillRank->setTextMessage(_game->strings().get(kStrRefSkillRank));
-    _binding.lblBonus->setTextMessage(_game->strings().get(kStrRefBonus));
-    _binding.lblTotal->setTextMessage(_game->strings().get(kStrRefTotalRank));
+    _binding.lblSkillRank->setTextMessage(_strings.get(kStrRefSkillRank));
+    _binding.lblBonus->setTextMessage(_strings.get(kStrRefBonus));
+    _binding.lblTotal->setTextMessage(_strings.get(kStrRefTotalRank));
     _binding.lblRankVal->setTextMessage("");
     _binding.lblBonusVal->setTextMessage("");
     _binding.lblTotalVal->setTextMessage("");
@@ -71,7 +131,7 @@ void AbilitiesMenu::load() {
         if (maybeSkillInfo == _skills.end())
             return;
 
-        shared_ptr<Creature> partyLeader(_game->party().getLeader());
+        shared_ptr<Creature> partyLeader(_party.getLeader());
 
         _binding.lblRankVal->setTextMessage(to_string(partyLeader->attributes().getSkillRank(skill)));
         _binding.lblBonusVal->setTextMessage("0");
@@ -122,15 +182,15 @@ void AbilitiesMenu::bindControls() {
 }
 
 void AbilitiesMenu::loadSkills() {
-    shared_ptr<TwoDA> skills(_game->resources().get2DA("skills"));
+    shared_ptr<TwoDA> skills(_resources.get2DA("skills"));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         auto skill = static_cast<SkillType>(row);
 
         SkillInfo skillInfo;
         skillInfo.skill = skill;
-        skillInfo.name = _game->strings().get(skills->getInt(row, "name"));
-        skillInfo.description = _game->strings().get(skills->getInt(row, "description"));
-        skillInfo.icon = _game->textures().get(skills->getString(row, "icon"), TextureUsage::GUI);
+        skillInfo.name = _strings.get(skills->getInt(row, "name"));
+        skillInfo.description = _strings.get(skills->getInt(row, "description"));
+        skillInfo.icon = _textures.get(skills->getString(row, "icon"), TextureUsage::GUI);
 
         _skills.insert(make_pair(skill, move(skillInfo)));
     }
@@ -153,7 +213,7 @@ shared_ptr<Texture> AbilitiesMenu::getFrameTexture() const {
     } else {
         resRef = "lbl_hex_3";
     }
-    return _game->textures().get(resRef, TextureUsage::GUI);
+    return _textures.get(resRef, TextureUsage::GUI);
 }
 
 void AbilitiesMenu::refreshControls() {
@@ -164,7 +224,7 @@ void AbilitiesMenu::refreshPortraits() {
     if (_game->id() != GameID::KotOR)
         return;
 
-    Party &party = _game->party();
+    Party &party = _party;
     shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));

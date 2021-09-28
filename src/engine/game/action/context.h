@@ -15,30 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "closedoor.h"
-
-#include "../game.h"
-#include "../object/door.h"
-#include "../object/factory.h"
-
-#include "context.h"
-
-using namespace std;
+#pragma once
 
 namespace reone {
 
 namespace game {
 
-void CloseDoorAction::execute(Object &actor, ActionContext &ctx, float dt) {
-    auto creatureActor = ctx.objectFactory.getObjectById<Creature>(actor.id());
-    auto door = dynamic_pointer_cast<Door>(_object);
+class Combat;
+class ObjectFactory;
+class Party;
+class ScriptRunner;
 
-    bool reached = !creatureActor || creatureActor->navigateTo(door->position(), true, kDefaultMaxObjectDistance, dt);
-    if (reached) {
-        door->close(creatureActor);
-        complete();
+struct ActionContext {
+    Combat &combat;
+    ObjectFactory &objectFactory;
+    Party &party;
+    ScriptRunner &scriptRunner;
+
+    ActionContext(
+        Combat &combat,
+        ObjectFactory &objectFactory,
+        Party &party,
+        ScriptRunner &scriptRunner) :
+        combat(combat),
+        objectFactory(objectFactory),
+        party(party),
+        scriptRunner(scriptRunner) {
     }
-}
+};
 
 } // namespace game
 

@@ -40,14 +40,6 @@ namespace reone {
 
 namespace game {
 
-Door::Door(
-    uint32_t id,
-    Game *game,
-    ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph) :
-    SpatialObject(id, ObjectType::Door, game, objectFactory, sceneGraph) {
-}
-
 void Door::loadFromGIT(const GffStruct &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
@@ -55,30 +47,30 @@ void Door::loadFromGIT(const GffStruct &gffs) {
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
     _linkedToFlags = gffs.getInt("LinkedToFlags");
-    _transitionDestin = _game->strings().get(gffs.getInt("TransitionDestin"));
+    _transitionDestin = _strings.get(gffs.getInt("TransitionDestin"));
 
     loadTransformFromGIT(gffs);
 }
 
 void Door::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utd(_game->resources().getGFF(resRef, ResourceType::Utd));
+    shared_ptr<GffStruct> utd(_resources.getGFF(resRef, ResourceType::Utd));
     if (!utd)
         return;
 
     loadUTD(*utd);
 
-    shared_ptr<TwoDA> doors(_game->resources().get2DA("genericdoors"));
+    shared_ptr<TwoDA> doors(_resources.get2DA("genericdoors"));
     string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
-    auto model = _sceneGraph->newModel(_game->models().get(modelName), ModelUsage::Door);
+    auto model = _sceneGraph.newModel(_models.get(modelName), ModelUsage::Door);
     model->setCullable(true);
     model->setDrawDistance(FLT_MAX);
 
     _sceneNode = move(model);
 
-    _closedWalkmesh = _game->walkmeshes().get(modelName + "0", ResourceType::Dwk);
-    _open1Walkmesh = _game->walkmeshes().get(modelName + "1", ResourceType::Dwk);
-    _open2Walkmesh = _game->walkmeshes().get(modelName + "2", ResourceType::Dwk);
+    _closedWalkmesh = _walkmeshes.get(modelName + "0", ResourceType::Dwk);
+    _open1Walkmesh = _walkmeshes.get(modelName + "1", ResourceType::Dwk);
+    _open2Walkmesh = _walkmeshes.get(modelName + "2", ResourceType::Dwk);
 }
 
 void Door::loadTransformFromGIT(const GffStruct &gffs) {
@@ -123,7 +115,7 @@ void Door::setLocked(bool locked) {
 
 void Door::loadUTD(const GffStruct &utd) {
     _tag = boost::to_lower_copy(utd.getString("Tag"));
-    _name = _game->strings().get(utd.getInt("LocName"));
+    _name = _strings.get(utd.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utd.getString("TemplateResRef"));
     _autoRemoveKey = utd.getBool("AutoRemoveKey");
     _conversation = boost::to_lower_copy(utd.getString("Conversation"));

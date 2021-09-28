@@ -34,17 +34,6 @@ namespace reone {
 
 namespace game {
 
-SpatialObject::SpatialObject(
-    uint32_t id,
-    ObjectType type,
-    Game *game,
-    ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph) :
-    Object(id, type, game),
-    _objectFactory(ensurePresent(objectFactory, "objectFactory")),
-    _sceneGraph(ensurePresent(sceneGraph, "sceneGraph")) {
-}
-
 shared_ptr<Item> SpatialObject::addItem(const string &resRef, int stackSize, bool dropable) {
     shared_ptr<Item> result;
 
@@ -57,7 +46,7 @@ shared_ptr<Item> SpatialObject::addItem(const string &resRef, int stackSize, boo
         result->setStackSize(prevStackSize + stackSize);
 
     } else {
-        result = _objectFactory->newItem();
+        result = _objectFactory.newItem();
         result->loadFromBlueprint(resRef);
         result->setStackSize(stackSize);
         result->setDropable(dropable);

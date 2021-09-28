@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void EquipMostDamagingRangedAction::execute(Object &actor, float dt) {
+void EquipMostDamagingRangedAction::execute(Object &actor, ActionContext &ctx, float dt) {
     // TODO: implement
 
     complete();

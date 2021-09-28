@@ -46,8 +46,69 @@ namespace game {
 
 static constexpr float kModelScale = 0.2f;
 
-PortraitSelection::PortraitSelection(CharacterGeneration *charGen, Game *game) :
-    GameGUI(game),
+PortraitSelection::PortraitSelection(
+    CharacterGeneration *charGen,
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings),
     _charGen(charGen) {
 
     _resRef = getResRef("portcust");
@@ -69,13 +130,13 @@ void PortraitSelection::load() {
     _binding.btnArrL->setOnClick([this]() {
         _currentPortrait--;
         if (_currentPortrait == -1) {
-            _currentPortrait = static_cast<int>(_portraits.size()) - 1;
+            _currentPortrait = static_cast<int>(_filteredPortraits.size()) - 1;
         }
         loadCurrentPortrait();
         loadHeadModel();
     });
     _binding.btnArrR->setOnClick([this]() {
-        _currentPortrait = (_currentPortrait + 1) % static_cast<int>(_portraits.size());
+        _currentPortrait = (_currentPortrait + 1) % static_cast<int>(_filteredPortraits.size());
         loadCurrentPortrait();
         loadHeadModel();
     });
@@ -137,7 +198,29 @@ void PortraitSelection::loadHeadModel() {
 shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &sceneGraph) {
     // Create a creature from the current portrait
 
-    auto objectFactory = make_unique<ObjectFactory>(sceneGraph);
+    auto objectFactory = make_unique<ObjectFactory>(
+        _actionFactory,
+        _classes,
+        _combat,
+        _footstepSounds,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _meshes,
+        _models,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings,
+        sceneGraph);
     objectFactory->setGame(*_game);
 
     shared_ptr<Creature> creature(objectFactory->newCreature());
@@ -155,7 +238,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
     if (cameraHook) {
         creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->absoluteTransform()[3].z));
     }
-    auto model = sceneGraph.newModel(_game->models().get("cghead_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(_models.get("cghead_light"), ModelUsage::GUI);
     model->attach("cghead_light", creatureModel);
 
     return move(model);
@@ -164,20 +247,20 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
 int PortraitSelection::getAppearanceFromCurrentPortrait() const {
     switch (_charGen->character().attributes.getEffectiveClass()) {
     case ClassType::Scoundrel:
-        return _portraits[_currentPortrait].appearanceS;
+        return _filteredPortraits[_currentPortrait].appearanceS;
     case ClassType::Soldier:
-        return _portraits[_currentPortrait].appearanceL;
+        return _filteredPortraits[_currentPortrait].appearanceL;
     default:
-        return _portraits[_currentPortrait].appearanceNumber;
+        return _filteredPortraits[_currentPortrait].appearanceNumber;
     }
 }
 
 void PortraitSelection::updatePortraits() {
-    _portraits.clear();
+    _filteredPortraits.clear();
     int sex = _charGen->character().gender == Gender::Female ? 1 : 0;
-    for (auto &portrait : _game->portraits().portraits()) {
+    for (auto &portrait : _portraits.portraits()) {
         if (portrait.forPC && portrait.sex == sex) {
-            _portraits.push_back(move(portrait));
+            _filteredPortraits.push_back(move(portrait));
         }
     }
     resetCurrentPortrait();
@@ -185,13 +268,13 @@ void PortraitSelection::updatePortraits() {
 
 void PortraitSelection::resetCurrentPortrait() {
     int appearance = _charGen->character().appearance;
-    auto maybePortrait = find_if(_portraits.begin(), _portraits.end(), [&appearance](const Portrait &portrait) {
+    auto maybePortrait = find_if(_filteredPortraits.begin(), _filteredPortraits.end(), [&appearance](const Portrait &portrait) {
         return portrait.appearanceNumber == appearance ||
                portrait.appearanceS == appearance ||
                portrait.appearanceL == appearance;
     });
-    if (maybePortrait != _portraits.end()) {
-        _currentPortrait = static_cast<int>(distance(_portraits.begin(), maybePortrait));
+    if (maybePortrait != _filteredPortraits.end()) {
+        _currentPortrait = static_cast<int>(distance(_filteredPortraits.begin(), maybePortrait));
         loadCurrentPortrait();
         loadHeadModel();
     } else {
@@ -200,8 +283,8 @@ void PortraitSelection::resetCurrentPortrait() {
 }
 
 void PortraitSelection::loadCurrentPortrait() {
-    string resRef(_portraits[_currentPortrait].resRef);
-    shared_ptr<Texture> portrait(_game->textures().get(resRef, TextureUsage::GUI));
+    string resRef(_filteredPortraits[_currentPortrait].resRef);
+    shared_ptr<Texture> portrait(_textures.get(resRef, TextureUsage::GUI));
     _binding.lblPortrait->setBorderFill(portrait);
 }
 

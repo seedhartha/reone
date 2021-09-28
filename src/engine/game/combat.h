@@ -36,6 +36,7 @@ namespace game {
 
 constexpr float kDetectionRange = 20.0f;
 
+class EffectFactory;
 class Game;
 
 class Combat {
@@ -48,7 +49,10 @@ public:
         int damage {-1};
     };
 
-    Combat(scene::SceneGraph &sceneGraph) :
+    Combat(
+        EffectFactory &effectFactory,
+        scene::SceneGraph &sceneGraph) :
+        _effectFactory(effectFactory),
         _sceneGraph(sceneGraph) {
     }
 
@@ -107,6 +111,8 @@ private:
     RoundMap _roundByAttacker;
 
     // Services
+
+    EffectFactory &_effectFactory;
 
     scene::SceneGraph &_sceneGraph;
 

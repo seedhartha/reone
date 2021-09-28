@@ -60,20 +60,43 @@ static constexpr int kActionHeight = 59;
 
 static string g_attackIcon("i_attack");
 
-SelectionOverlay::SelectionOverlay(Game *game) :
-    _game(ensurePresent(game, "game")) {
+SelectionOverlay::SelectionOverlay(
+    Game &game,
+    ActionFactory &actionFactory,
+    Feats &feats,
+    Party &party,
+    Reputes &reputes,
+    Skills &skills,
+    Context &context,
+    Fonts &fonts,
+    Meshes &meshes,
+    Shaders &shaders,
+    Textures &textures,
+    Window &window) :
+    _game(game),
+    _actionFactory(actionFactory),
+    _feats(feats),
+    _party(party),
+    _reputes(reputes),
+    _skills(skills),
+    _context(context),
+    _fonts(fonts),
+    _meshes(meshes),
+    _shaders(shaders),
+    _textures(textures),
+    _window(window) {
     _actionSlots.resize(kNumActionSlots);
 }
 
 void SelectionOverlay::load() {
-    _font = _game->fonts().get("dialogfont16x16");
-    _friendlyReticle = _game->textures().get("friendlyreticle", TextureUsage::GUI);
-    _friendlyReticle2 = _game->textures().get("friendlyreticle2", TextureUsage::GUI);
-    _hostileReticle = _game->textures().get("hostilereticle", TextureUsage::GUI);
-    _hostileReticle2 = _game->textures().get("hostilereticle2", TextureUsage::GUI);
-    _friendlyScroll = _game->textures().get("lbl_miscroll_f", TextureUsage::GUI);
-    _hostileScroll = _game->textures().get("lbl_miscroll_h", TextureUsage::GUI);
-    _hilightedScroll = _game->textures().get("lbl_miscroll_hi", TextureUsage::GUI);
+    _font = _fonts.get("dialogfont16x16");
+    _friendlyReticle = _textures.get("friendlyreticle", TextureUsage::GUI);
+    _friendlyReticle2 = _textures.get("friendlyreticle2", TextureUsage::GUI);
+    _hostileReticle = _textures.get("hostilereticle", TextureUsage::GUI);
+    _hostileReticle2 = _textures.get("hostilereticle2", TextureUsage::GUI);
+    _friendlyScroll = _textures.get("lbl_miscroll_f", TextureUsage::GUI);
+    _hostileScroll = _textures.get("lbl_miscroll_h", TextureUsage::GUI);
+    _hilightedScroll = _textures.get("lbl_miscroll_hi", TextureUsage::GUI);
     _reticleHeight = _friendlyReticle2->height();
 }
 
@@ -114,11 +137,11 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     if (_selectedActionSlot == -1 || _selectedActionSlot >= _actionSlots.size())
         return false;
 
-    shared_ptr<Creature> leader(_game->party().getLeader());
+    shared_ptr<Creature> leader(_party.getLeader());
     if (!leader)
         return false;
 
-    shared_ptr<Area> area(_game->module()->area());
+    shared_ptr<Area> area(_game.module()->area());
     auto selectedObject = area->selectedObject();
     if (!selectedObject)
         return false;
@@ -130,13 +153,13 @@ bool SelectionOverlay::handleMouseButtonDown(const SDL_MouseButtonEvent &event) 
     const ContextAction &action = slot.actions[slot.indexSelected];
     switch (action.type) {
     case ActionType::AttackObject:
-        leader->addAction(_game->actionFactory().newAttack(selectedObject, leader->getAttackRange(), true));
+        leader->addAction(_actionFactory.newAttack(selectedObject, leader->getAttackRange(), true));
         break;
     case ActionType::UseFeat:
-        leader->addAction(_game->actionFactory().newUseFeat(selectedObject, action.feat));
+        leader->addAction(_actionFactory.newUseFeat(selectedObject, action.feat));
         break;
     case ActionType::UseSkill:
-        leader->addAction(_game->actionFactory().newUseSkill(selectedObject, action.skill));
+        leader->addAction(_actionFactory.newUseSkill(selectedObject, action.skill));
         break;
     default:
         break;
@@ -174,10 +197,10 @@ void SelectionOverlay::update() {
     _selectedObject.reset();
     _selectedHostile = false;
 
-    shared_ptr<Module> module(_game->module());
+    shared_ptr<Module> module(_game.module());
     shared_ptr<Area> area(module->area());
 
-    Camera *camera = _game->getActiveCamera();
+    Camera *camera = _game.getActiveCamera();
     glm::mat4 projection(camera->sceneNode()->projection());
     glm::mat4 view(camera->sceneNode()->view());
 
@@ -190,7 +213,7 @@ void SelectionOverlay::update() {
 
             auto hilightedCreature = dynamic_pointer_cast<Creature>(hilightedObject);
             if (hilightedCreature) {
-                _hilightedHostile = !hilightedCreature->isDead() && _game->reputes().getIsEnemy(*(_game->party().getLeader()), *hilightedCreature);
+                _hilightedHostile = !hilightedCreature->isDead() && _reputes.getIsEnemy(*(_party.getLeader()), *hilightedCreature);
             }
         }
     }
@@ -230,7 +253,7 @@ void SelectionOverlay::update() {
 
             auto selectedCreature = dynamic_pointer_cast<Creature>(selectedObject);
             if (selectedCreature) {
-                _selectedHostile = !selectedCreature->isDead() && _game->reputes().getIsEnemy(*_game->party().getLeader(), *selectedCreature);
+                _selectedHostile = !selectedCreature->isDead() && _reputes.getIsEnemy(*_party.getLeader(), *selectedCreature);
             }
         }
     }
@@ -249,10 +272,10 @@ void SelectionOverlay::draw() {
 }
 
 void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords) {
-    _game->context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     texture.bind();
 
-    const GraphicsOptions &opts = _game->options().graphics;
+    const GraphicsOptions &opts = _game.options().graphics;
     int width = texture.width();
     int height = texture.height();
 
@@ -261,18 +284,18 @@ void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoor
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _game->window().getOrthoProjection();
+    uniforms.combined.general.projection = _window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _game->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _game->meshes().quad().draw();
+    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    _meshes.quad().draw();
 }
 
 void SelectionOverlay::drawTitleBar() {
     if (_selectedObject->name().empty())
         return;
 
-    const GraphicsOptions &opts = _game->options().graphics;
+    const GraphicsOptions &opts = _game.options().graphics;
     float barHeight = _font->height() + kTitleBarPadding;
     {
         float x = opts.width * _selectedScreenCoords.x - kTitleBarWidth / 2;
@@ -286,13 +309,13 @@ void SelectionOverlay::drawTitleBar() {
         transform = glm::scale(transform, glm::vec3(kTitleBarWidth, barHeight, 1.0f));
 
         ShaderUniforms uniforms;
-        uniforms.combined.general.projection = _game->window().getOrthoProjection();
+        uniforms.combined.general.projection = _window.getOrthoProjection();
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         uniforms.combined.general.alpha = 0.5f;
 
-        _game->shaders().activate(ShaderProgram::SimpleColor, uniforms);
-        _game->meshes().quad().draw();
+        _shaders.activate(ShaderProgram::SimpleColor, uniforms);
+        _meshes.quad().draw();
     }
     {
         float x = opts.width * _selectedScreenCoords.x;
@@ -306,7 +329,7 @@ void SelectionOverlay::drawTitleBar() {
 }
 
 void SelectionOverlay::drawHealthBar() {
-    const GraphicsOptions &opts = _game->options().graphics;
+    const GraphicsOptions &opts = _game.options().graphics;
     float x = opts.width * _selectedScreenCoords.x - kTitleBarWidth / 2;
     float y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2.0f - kHealthBarHeight - kOffsetToReticle;
     float w = glm::clamp(_selectedObject->currentHitPoints() / static_cast<float>(_selectedObject->hitPoints()), 0.0f, 1.0f) * kTitleBarWidth;
@@ -319,12 +342,12 @@ void SelectionOverlay::drawHealthBar() {
     transform = glm::scale(transform, glm::vec3(w, kHealthBarHeight, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _game->window().getOrthoProjection();
+    uniforms.combined.general.projection = _window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
 
-    _game->shaders().activate(ShaderProgram::SimpleColor, uniforms);
-    _game->meshes().quad().draw();
+    _shaders.activate(ShaderProgram::SimpleColor, uniforms);
+    _meshes.quad().draw();
 }
 
 void SelectionOverlay::drawActionBar() {
@@ -346,7 +369,7 @@ void SelectionOverlay::drawActionFrame(int index) {
     } else {
         frameTexture = _friendlyScroll;
     }
-    _game->context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     frameTexture->bind();
 
     float frameX, frameY;
@@ -357,18 +380,18 @@ void SelectionOverlay::drawActionFrame(int index) {
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionHeight, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _game->window().getOrthoProjection();
+    uniforms.combined.general.projection = _window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _game->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _game->meshes().quad().draw();
+    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    _meshes.quad().draw();
 }
 
 bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) const {
     if (!_selectedObject)
         return false;
 
-    const GraphicsOptions &opts = _game->options().graphics;
+    const GraphicsOptions &opts = _game.options().graphics;
     x = opts.width * _selectedScreenCoords.x + (static_cast<float>(index - 1) - 0.5f) * kActionWidth + (index - 1) * kActionBarMargin;
     y = opts.height * (1.0f - _selectedScreenCoords.y) - _reticleHeight / 2.0f - kActionHeight - kOffsetToReticle - kActionBarMargin;
 
@@ -384,17 +407,17 @@ void SelectionOverlay::drawActionIcon(int index) {
     const ContextAction &action = slot.actions[slot.indexSelected];
     switch (action.type) {
     case ActionType::AttackObject:
-        texture = _game->textures().get(g_attackIcon, TextureUsage::GUI);
+        texture = _textures.get(g_attackIcon, TextureUsage::GUI);
         break;
     case ActionType::UseFeat: {
-        shared_ptr<Feat> feat(_game->feats().get(action.feat));
+        shared_ptr<Feat> feat(_feats.get(action.feat));
         if (feat) {
             texture = feat->icon;
         }
         break;
     }
     case ActionType::UseSkill: {
-        shared_ptr<Skill> skill(_game->skills().get(action.skill));
+        shared_ptr<Skill> skill(_skills.get(action.skill));
         if (skill) {
             texture = skill->icon;
         }
@@ -406,13 +429,13 @@ void SelectionOverlay::drawActionIcon(int index) {
     if (!texture)
         return;
 
-    _game->context().setActiveTextureUnit(TextureUnits::diffuseMap);
+    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     texture->bind();
 
     float frameX, frameY;
     getActionScreenCoords(index, frameX, frameY);
 
-    const GraphicsOptions &opts = _game->options().graphics;
+    const GraphicsOptions &opts = _game.options().graphics;
     float y = opts.height * (1.0f - _selectedScreenCoords.y) - (_reticleHeight + kActionHeight + kActionWidth) / 2.0f - kOffsetToReticle - kActionBarMargin;
 
     glm::mat4 transform(1.0f);
@@ -420,17 +443,17 @@ void SelectionOverlay::drawActionIcon(int index) {
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionWidth, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _game->window().getOrthoProjection();
+    uniforms.combined.general.projection = _window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _game->shaders().activate(ShaderProgram::SimpleGUI, uniforms);
-    _game->meshes().quad().draw();
+    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    _meshes.quad().draw();
 }
 
 glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {
     static glm::vec3 red(1.0f, 0.0f, 0.0f);
 
-    return (_selectedObject && _selectedHostile) ? red : _game->getGUIColorBase();
+    return (_selectedObject && _selectedHostile) ? red : _game.getGUIColorBase();
 }
 
 } // namespace game

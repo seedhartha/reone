@@ -26,19 +26,6 @@ namespace reone {
 
 namespace game {
 
-PlaceableCamera::PlaceableCamera(
-    uint32_t id,
-    Game *game,
-    ObjectFactory *objectFactory,
-    SceneGraph *sceneGraph) :
-    SpatialObject(
-        id,
-        ObjectType::Camera,
-        game,
-        objectFactory,
-        sceneGraph) {
-}
-
 void PlaceableCamera::loadFromGIT(const GffStruct &gffs) {
     _cameraId = gffs.getInt("CameraID");
     _fieldOfView = gffs.getFloat("FieldOfView");

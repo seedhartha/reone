@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void MoveAwayFromLocationAction::execute(Object &actor, float dt) {
+void MoveAwayFromLocationAction::execute(Object &actor, ActionContext &ctx, float dt) {
     // TODO: implement
 
     complete();

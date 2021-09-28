@@ -67,8 +67,70 @@ static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
     {Equipment::Slot::WeapL2, 31378},
     {Equipment::Slot::WeapR2, 31379}};
 
-Equipment::Equipment(Game *game, InGameMenu &inGameMenu) :
-    GameGUI(game), _inGameMenu(inGameMenu) {
+Equipment::Equipment(
+    Game *game,
+    InGameMenu &inGameMenu,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings),
+    _inGameMenu(inGameMenu) {
     _resRef = getResRef("equip");
 
     initForGame();
@@ -115,7 +177,7 @@ void Equipment::load() {
 
             auto maybeStrRef = g_slotStrRefs.find(slotButton.first);
             if (maybeStrRef != g_slotStrRefs.end()) {
-                slotDesc = _game->strings().get(maybeStrRef->second);
+                slotDesc = _strings.get(maybeStrRef->second);
             }
 
             _binding.lblSlotName->setTextMessage(slotDesc);
@@ -219,7 +281,7 @@ void Equipment::onItemsListBoxItemClick(const string &item) {
     if (_selectedSlot == Slot::None)
         return;
 
-    shared_ptr<Creature> player(_game->party().player());
+    shared_ptr<Creature> player(_party.player());
     shared_ptr<Item> itemObj;
     if (item != "[none]") {
         for (auto &playerItem : player->items()) {
@@ -230,7 +292,7 @@ void Equipment::onItemsListBoxItemClick(const string &item) {
         }
     }
     int slot = getInventorySlot(_selectedSlot);
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<Creature> partyLeader(_party.getLeader());
     shared_ptr<Item> equipped(partyLeader->getEquippedItem(slot));
 
     if (equipped != itemObj) {
@@ -244,7 +306,7 @@ void Equipment::onItemsListBoxItemClick(const string &item) {
                 if (last) {
                     partyLeader->equip(slot, itemObj);
                 } else {
-                    shared_ptr<Item> clonedItem(_game->objectFactory().newItem());
+                    shared_ptr<Item> clonedItem(_objectFactory.newItem());
                     clonedItem->loadFromBlueprint(itemObj->blueprintResRef());
                     partyLeader->equip(slot, clonedItem);
                 }
@@ -260,7 +322,7 @@ void Equipment::update() {
     updateEquipment();
     selectSlot(Slot::None);
 
-    auto partyLeader(_game->party().getLeader());
+    auto partyLeader(_party.getLeader());
 
     if (_game->isKotOR()) {
         string vitalityString(str(boost::format("%d/\n%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
@@ -273,7 +335,7 @@ void Equipment::updatePortraits() {
     if (_game->id() != GameID::KotOR)
         return;
 
-    Party &party = _game->party();
+    Party &party = _party;
     shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
@@ -311,7 +373,7 @@ void Equipment::selectSlot(Slot slot) {
 }
 
 void Equipment::updateEquipment() {
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<Creature> partyLeader(_party.getLeader());
     auto &equipment = partyLeader->equipment();
 
     for (auto &lbl : _binding.lblInv) {
@@ -386,7 +448,7 @@ shared_ptr<Texture> Equipment::getEmptySlotIcon(Slot slot) const {
         return nullptr;
     }
 
-    shared_ptr<Texture> texture(_game->textures().get(resRef, TextureUsage::GUI));
+    shared_ptr<Texture> texture(_textures.get(resRef, TextureUsage::GUI));
     auto pair = icons.insert(make_pair(slot, texture));
 
     return pair.first->second;
@@ -398,13 +460,13 @@ void Equipment::updateItems() {
     if (_selectedSlot != Slot::None) {
         ListBox::Item lbItem;
         lbItem.tag = "[none]";
-        lbItem.text = _game->strings().get(kStrRefNone);
-        lbItem.iconTexture = _game->textures().get("inone", TextureUsage::GUI);
+        lbItem.text = _strings.get(kStrRefNone);
+        lbItem.iconTexture = _textures.get("inone", TextureUsage::GUI);
         lbItem.iconFrame = getItemFrameTexture(1);
 
         _binding.lbItems->addItem(move(lbItem));
     }
-    shared_ptr<Creature> player(_game->party().player());
+    shared_ptr<Creature> player(_party.player());
 
     for (auto &item : player->items()) {
         if (_selectedSlot == Slot::None) {
@@ -435,7 +497,7 @@ shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";
     }
-    return _game->textures().get(resRef, TextureUsage::GUI);
+    return _textures.get(resRef, TextureUsage::GUI);
 }
 
 } // namespace game

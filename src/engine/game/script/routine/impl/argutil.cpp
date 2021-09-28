@@ -18,6 +18,7 @@
 #include "argutil.h"
 
 #include "../../../../script/exception/argument.h"
+#include "../../../../script/executioncontext.h"
 #include "../../../../script/variable.h"
 
 #include "../../../effect/effect.h"
@@ -28,6 +29,8 @@
 #include "../../../object/door.h"
 #include "../../../object/sound.h"
 #include "../../../talent.h"
+
+#include "../context.h"
 
 using namespace std;
 
@@ -92,16 +95,16 @@ glm::vec3 getVectorOrElse(const vector<Variable> &args, int index, glm::vec3 def
     return isOutOfRange(args, index) ? move(defValue) : args[index].vecValue;
 }
 
-shared_ptr<Object> getCaller(Game &game, ExecutionContext &ctx) {
-    shared_ptr<Object> result(game.getObjectById(ctx.callerId));
+shared_ptr<Object> getCaller(const RoutineContext &ctx) {
+    shared_ptr<Object> result(ctx.game.getObjectById(ctx.execution.callerId));
     if (!result) {
-        throw ArgumentException("Caller is not a valid object: " + to_string(ctx.callerId));
+        throw ArgumentException("Caller is not a valid object: " + to_string(ctx.execution.callerId));
     }
     return move(result);
 }
 
-shared_ptr<SpatialObject> getCallerAsSpatial(Game &game, ExecutionContext &ctx) {
-    shared_ptr<Object> caller(getCaller(game, ctx));
+shared_ptr<SpatialObject> getCallerAsSpatial(const RoutineContext &ctx) {
+    shared_ptr<Object> caller(getCaller(ctx));
     shared_ptr<SpatialObject> spatial(dynamic_pointer_cast<SpatialObject>(caller));
     if (!spatial) {
         throw ArgumentException("Caller is not a valid spatial object: " + to_string(caller->id()));
@@ -109,8 +112,8 @@ shared_ptr<SpatialObject> getCallerAsSpatial(Game &game, ExecutionContext &ctx) 
     return move(spatial);
 }
 
-shared_ptr<Creature> getCallerAsCreature(Game &game, ExecutionContext &ctx) {
-    shared_ptr<Object> caller(getCaller(game, ctx));
+shared_ptr<Creature> getCallerAsCreature(const RoutineContext &ctx) {
+    shared_ptr<Object> caller(getCaller(ctx));
     shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(caller));
     if (!creature) {
         throw ArgumentException("Caller is not a valid creature: " + to_string(caller->id()));
@@ -118,38 +121,38 @@ shared_ptr<Creature> getCallerAsCreature(Game &game, ExecutionContext &ctx) {
     return move(creature);
 }
 
-shared_ptr<Object> getTriggerrer(Game &game, ExecutionContext &ctx) {
-    shared_ptr<Object> result(game.getObjectById(ctx.triggererId));
+shared_ptr<Object> getTriggerrer(const RoutineContext &ctx) {
+    shared_ptr<Object> result(ctx.game.getObjectById(ctx.execution.triggererId));
     if (!result) {
-        throw ArgumentException("Triggerrer is not a valid object: " + to_string(ctx.triggererId));
+        throw ArgumentException("Triggerrer is not a valid object: " + to_string(ctx.execution.triggererId));
     }
     return move(result);
 }
 
-shared_ptr<Object> getObject(Game &game, const vector<Variable> &args, int index, ExecutionContext &ctx) {
+shared_ptr<Object> getObject(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     if (isOutOfRange(args, index)) {
         throw ArgumentException(str(boost::format("Argument %d is out of range") % index));
     }
     uint32_t objectId = args[index].objectId;
     if (objectId == kObjectSelf) {
-        objectId = ctx.callerId;
+        objectId = ctx.execution.callerId;
     }
-    shared_ptr<Object> result(game.getObjectById(objectId));
+    shared_ptr<Object> result(ctx.game.getObjectById(objectId));
     if (!result) {
         throw ArgumentException(str(boost::format("Argument %d is not a valid object: %d") % index % objectId));
     }
     return move(result);
 }
 
-shared_ptr<Object> getObjectOrCaller(Game &game, const vector<Variable> &args, int index, ExecutionContext &ctx) {
+shared_ptr<Object> getObjectOrCaller(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     if (isOutOfRange(args, index)) {
-        return getCaller(game, ctx);
+        return getCaller(ctx);
     }
-    return getObject(game, args, index, ctx);
+    return getObject(args, index, ctx);
 }
 
-shared_ptr<SpatialObject> getSpatialObject(Game &game, const vector<Variable> &args, int index, ExecutionContext &ctx) {
-    shared_ptr<Object> object(getObject(game, args, index, ctx));
+shared_ptr<SpatialObject> getSpatialObject(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+    shared_ptr<Object> object(getObject(args, index, ctx));
     shared_ptr<SpatialObject> spatial(dynamic_pointer_cast<SpatialObject>(object));
     if (!spatial) {
         throw ArgumentException(str(boost::format("Argument %d is not a valid spatial object: %d") % index % object->id()));
@@ -157,15 +160,15 @@ shared_ptr<SpatialObject> getSpatialObject(Game &game, const vector<Variable> &a
     return move(spatial);
 }
 
-shared_ptr<SpatialObject> getSpatialObjectOrCaller(Game &game, const vector<Variable> &args, int index, ExecutionContext &ctx) {
+shared_ptr<SpatialObject> getSpatialObjectOrCaller(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     if (isOutOfRange(args, index)) {
-        return getCallerAsSpatial(game, ctx);
+        return getCallerAsSpatial(ctx);
     }
-    return getSpatialObject(game, args, index, ctx);
+    return getSpatialObject(args, index, ctx);
 }
 
-shared_ptr<Creature> getCreature(Game &game, const vector<Variable> &args, int index, ExecutionContext &ctx) {
-    shared_ptr<Object> object(getObject(game, args, index, ctx));
+shared_ptr<Creature> getCreature(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+    shared_ptr<Object> object(getObject(args, index, ctx));
     shared_ptr<Creature> creature(dynamic_pointer_cast<Creature>(object));
     if (!creature) {
         throw ArgumentException(str(boost::format("Argument %d is not a valid creature: %d") % index % object->id()));
@@ -173,15 +176,15 @@ shared_ptr<Creature> getCreature(Game &game, const vector<Variable> &args, int i
     return move(creature);
 }
 
-shared_ptr<Creature> getCreatureOrCaller(Game &game, const vector<Variable> &args, int index, ExecutionContext &ctx) {
+shared_ptr<Creature> getCreatureOrCaller(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     if (isOutOfRange(args, index)) {
-        return getCallerAsCreature(game, ctx);
+        return getCallerAsCreature(ctx);
     }
-    return getCreature(game, args, index, ctx);
+    return getCreature(args, index, ctx);
 }
 
-shared_ptr<Door> getDoor(Game &game, const vector<Variable> &args, int index, ExecutionContext &ctx) {
-    shared_ptr<Object> object(getObject(game, args, index, ctx));
+shared_ptr<Door> getDoor(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+    shared_ptr<Object> object(getObject(args, index, ctx));
     shared_ptr<Door> door(dynamic_pointer_cast<Door>(object));
     if (!door) {
         throw ArgumentException(str(boost::format("Argument %d is not a valid door: %d") % index % object->id()));
@@ -189,8 +192,8 @@ shared_ptr<Door> getDoor(Game &game, const vector<Variable> &args, int index, Ex
     return move(door);
 }
 
-shared_ptr<Item> getItem(Game &game, const vector<Variable> &args, int index, ExecutionContext &ctx) {
-    shared_ptr<Object> object(getObject(game, args, index, ctx));
+shared_ptr<Item> getItem(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+    shared_ptr<Object> object(getObject(args, index, ctx));
     shared_ptr<Item> item(dynamic_pointer_cast<Item>(object));
     if (!item) {
         throw ArgumentException(str(boost::format("Argument %d is not a valid item: %d") % index % object->id()));
@@ -198,8 +201,8 @@ shared_ptr<Item> getItem(Game &game, const vector<Variable> &args, int index, Ex
     return move(item);
 }
 
-shared_ptr<Sound> getSound(Game &game, const vector<Variable> &args, int index, ExecutionContext &ctx) {
-    shared_ptr<Object> object(getObject(game, args, index, ctx));
+shared_ptr<Sound> getSound(const vector<Variable> &args, int index, const RoutineContext &ctx) {
+    shared_ptr<Object> object(getObject(args, index, ctx));
     shared_ptr<Sound> sound(dynamic_pointer_cast<Sound>(object));
     if (!sound) {
         throw ArgumentException(str(boost::format("Argument %d is not a valid sound: %d") % index % object->id()));

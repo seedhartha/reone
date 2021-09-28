@@ -41,7 +41,7 @@ public:
         return _timer.advance(dt);
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(Object &actor, ActionContext &ctx, float dt) override;
 
 private:
     Timer _timer;

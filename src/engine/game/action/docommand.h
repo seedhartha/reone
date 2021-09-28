@@ -36,7 +36,7 @@ public:
         _context(move(context)) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(Object &actor, ActionContext &ctx, float dt) override;
 
     std::shared_ptr<script::ExecutionContext> context() const { return _context; }
 

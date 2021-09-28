@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void CastSpellAtLocationAction::execute(Object &actor, float dt) {
+void CastSpellAtLocationAction::execute(Object &actor, ActionContext &ctx, float dt) {
     // TODO: implement
 
     complete();

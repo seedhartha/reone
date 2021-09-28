@@ -29,8 +29,68 @@ namespace reone {
 
 namespace game {
 
-InGameMenu::InGameMenu(Game *game) :
-    GameGUI(game) {
+InGameMenu::InGameMenu(
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings) {
     _resRef = getResRef("top");
 
     if (game->isTSL()) {
@@ -121,42 +181,284 @@ void InGameMenu::setTabLabelsFocusable(bool focusable) {
 }
 
 void InGameMenu::loadEquipment() {
-    _equip = make_unique<Equipment>(_game, *this);
+    _equip = make_unique<Equipment>(
+        _game,
+        *this,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _equip->load();
 }
 
 void InGameMenu::loadInventory() {
-    _inventory = make_unique<InventoryMenu>(_game);
+    _inventory = make_unique<InventoryMenu>(
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _inventory->load();
 }
 
 void InGameMenu::loadCharacter() {
-    _character = make_unique<CharacterMenu>(_game, *this);
+    _character = make_unique<CharacterMenu>(
+        _game,
+        *this,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _character->load();
 }
 
 void InGameMenu::loadAbilities() {
-    _abilities = make_unique<AbilitiesMenu>(_game);
+    _abilities = make_unique<AbilitiesMenu>(
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _abilities->load();
 }
 
 void InGameMenu::loadMessages() {
-    _messages = make_unique<MessagesMenu>(_game);
+    _messages = make_unique<MessagesMenu>(
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _messages->load();
 }
 
 void InGameMenu::loadJournal() {
-    _journal = make_unique<JournalMenu>(_game);
+    _journal = make_unique<JournalMenu>(
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _journal->load();
 }
 
 void InGameMenu::loadMap() {
-    _map = make_unique<MapMenu>(_game);
+    _map = make_unique<MapMenu>(
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _map->load();
 }
 
 void InGameMenu::loadOptions() {
-    _options = make_unique<OptionsMenu>(_game);
+    _options = make_unique<OptionsMenu>(
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _options->load();
 }
 

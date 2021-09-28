@@ -83,8 +83,68 @@ static const unordered_map<string, AnimationType> g_animTypeByName {
     {"kneel_talk_angry", AnimationType::LoopingKneelTalkAngry},
     {"kneel_talk_sad", AnimationType::LoopingKneelTalkSad}};
 
-DialogGUI::DialogGUI(Game *game) :
-    Conversation(game) {
+DialogGUI::DialogGUI(
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    Conversation(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings) {
     _resRef = getResRef("dialog");
     _scaling = ScalingMode::Stretch;
 }
@@ -171,7 +231,7 @@ void DialogGUI::loadStuntParticipants() {
         participant.creature = creature;
 
         if (_dialog->isAnimatedCutscene()) {
-            shared_ptr<Model> model(_game->models().get(stunt.stuntModel));
+            shared_ptr<Model> model(_models.get(stunt.stuntModel));
             if (!model) {
                 warn("Dialog: stunt model not found: " + stunt.stuntModel);
                 continue;
@@ -215,7 +275,7 @@ void DialogGUI::loadCurrentSpeaker() {
 
     // Make current speaker face the player, and vice versa
     if (_currentSpeaker) {
-        shared_ptr<Creature> player(_game->party().player());
+        shared_ptr<Creature> player(_party.player());
         player->face(*_currentSpeaker);
 
         auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
@@ -230,7 +290,7 @@ void DialogGUI::updateCamera() {
     shared_ptr<Area> area(_game->module()->area());
 
     if (_dialog->cameraModel().empty()) {
-        shared_ptr<Creature> player(_game->party().player());
+        shared_ptr<Creature> player(_party.player());
         glm::vec3 listenerPosition(player ? getTalkPosition(*player) : glm::vec3(0.0f));
         glm::vec3 speakerPosition(_currentSpeaker ? getTalkPosition(*_currentSpeaker) : glm::vec3(0.0f));
         auto &camera = area->getCamera<DialogCamera>(CameraType::Dialog);
@@ -308,7 +368,7 @@ string DialogGUI::getStuntAnimationName(int ordinal) const {
 }
 
 AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
-    shared_ptr<TwoDA> animations(_game->resources().get2DA("dialoganimations"));
+    shared_ptr<TwoDA> animations(_resources.get2DA("dialoganimations"));
     int index = ordinal - 10000;
 
     if (index < 0 || index >= animations->getRowCount()) {

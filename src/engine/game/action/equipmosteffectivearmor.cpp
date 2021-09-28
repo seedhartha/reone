@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void EquipMostEffectiveArmorAction::execute(Object &actor, float dt) {
+void EquipMostEffectiveArmorAction::execute(Object &actor, ActionContext &ctx, float dt) {
     // TODO: implement
 
     complete();

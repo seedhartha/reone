@@ -21,6 +21,8 @@
 
 #include "declarations.h"
 
+#include "../context.h"
+
 #include "argutil.h"
 
 using namespace std;
@@ -33,7 +35,7 @@ namespace game {
 
 namespace routine {
 
-Variable floatToString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable floatToString(const vector<Variable> &args, const RoutineContext &ctx) {
     float value = getFloat(args, 0);
     int width = getIntOrElse(args, 1, 18);
     int decimals = getIntOrElse(args, 2, 9);
@@ -43,47 +45,47 @@ Variable floatToString(Game &game, const vector<Variable> &args, ExecutionContex
     return Variable::ofString(to_string(value));
 }
 
-Variable intToString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable intToString(const vector<Variable> &args, const RoutineContext &ctx) {
     int value = getInt(args, 0);
     return Variable::ofString(to_string(value));
 }
 
-Variable roundsToSeconds(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable roundsToSeconds(const vector<Variable> &args, const RoutineContext &ctx) {
     int rounds = getInt(args, 0);
     return Variable::ofFloat(rounds / 6.0f);
 }
 
-Variable hoursToSeconds(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable hoursToSeconds(const vector<Variable> &args, const RoutineContext &ctx) {
     int hours = getInt(args, 0);
     return Variable::ofInt(hours * 3600);
 }
 
-Variable turnsToSeconds(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable turnsToSeconds(const vector<Variable> &args, const RoutineContext &ctx) {
     int turns = getInt(args, 0);
     return Variable::ofFloat(turns / 60.0f);
 }
 
-Variable feetToMeters(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable feetToMeters(const vector<Variable> &args, const RoutineContext &ctx) {
     float feet = getFloat(args, 0);
     return Variable::ofFloat(feet * 0.3048f);
 }
 
-Variable yardsToMeters(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable yardsToMeters(const vector<Variable> &args, const RoutineContext &ctx) {
     float yards = getFloat(args, 0);
     return Variable::ofFloat(yards * 0.9144f);
 }
 
-Variable intToFloat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable intToFloat(const vector<Variable> &args, const RoutineContext &ctx) {
     int value = getInt(args, 0);
     return Variable::ofFloat(static_cast<float>(value));
 }
 
-Variable floatToInt(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable floatToInt(const vector<Variable> &args, const RoutineContext &ctx) {
     float value = getFloat(args, 0);
     return Variable::ofInt(static_cast<int>(value));
 }
 
-Variable stringToInt(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable stringToInt(const vector<Variable> &args, const RoutineContext &ctx) {
     string number(getString(args, 0));
 
     int result = 0;
@@ -94,7 +96,7 @@ Variable stringToInt(Game &game, const vector<Variable> &args, ExecutionContext 
     return Variable::ofInt(result);
 }
 
-Variable stringToFloat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable stringToFloat(const vector<Variable> &args, const RoutineContext &ctx) {
     string number(getString(args, 0));
 
     float result = 0;
@@ -105,7 +107,7 @@ Variable stringToFloat(Game &game, const vector<Variable> &args, ExecutionContex
     return Variable::ofFloat(result);
 }
 
-Variable intToHexString(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable intToHexString(const vector<Variable> &args, const RoutineContext &ctx) {
     int value = getInt(args, 0);
     return Variable::ofString(str(boost::format("%08x") % value));
 }

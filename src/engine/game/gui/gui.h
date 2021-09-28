@@ -23,16 +23,74 @@
 
 namespace reone {
 
+namespace graphics {
+
+class Lips;
+class Models;
+class Walkmeshes;
+
+} // namespace graphics
+
+namespace audio {
+
+class AudioFiles;
+class AudioPlayer;
+
+} // namespace audio
+
 namespace game {
 
+class ActionFactory;
+class Classes;
+class Combat;
+class Feats;
+class FootstepSounds;
 class Game;
+class GUISounds;
+class ObjectFactory;
+class Party;
+class Portraits;
+class Reputes;
+class ScriptRunner;
+class SoundSets;
+class Surfaces;
 
 /**
  * Encapsulates game-specific GUI configuration.
  */
 class GameGUI : public gui::GUI {
 protected:
-    GameGUI(Game *game);
+    GameGUI(
+        Game *game,
+        ActionFactory &actionFactory,
+        Classes &classes,
+        Combat &combat,
+        Feats &feats,
+        FootstepSounds &footstepSounds,
+        GUISounds &guiSounds,
+        ObjectFactory &objectFactory,
+        Party &party,
+        Portraits &portraits,
+        Reputes &reputes,
+        ScriptRunner &scriptRunner,
+        SoundSets &soundSets,
+        Surfaces &surfaces,
+        audio::AudioFiles &audioFiles,
+        audio::AudioPlayer &audioPlayer,
+        graphics::Context &context,
+        graphics::Features &features,
+        graphics::Fonts &fonts,
+        graphics::Lips &lips,
+        graphics::Materials &materials,
+        graphics::Meshes &meshes,
+        graphics::Models &models,
+        graphics::PBRIBL &pbrIbl,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Walkmeshes &walkmeshes,
+        graphics::Window &window,
+        resource::Resources &resources,
+        resource::Strings &strings);
 
     void initForGame();
 
@@ -40,6 +98,30 @@ protected:
 
 protected:
     Game *_game;
+
+    // Services
+
+    ActionFactory &_actionFactory;
+    Classes &_classes;
+    Combat &_combat;
+    Feats &_feats;
+    FootstepSounds &_footstepSounds;
+    GUISounds &_guiSounds;
+    ObjectFactory &_objectFactory;
+    Party &_party;
+    Portraits &_portraits;
+    Reputes &_reputes;
+    ScriptRunner &_scriptRunner;
+    SoundSets &_soundSets;
+    Surfaces &_surfaces;
+
+    audio::AudioFiles &_audioFiles;
+    audio::AudioPlayer &_audioPlayer;
+    graphics::Lips &_lips;
+    graphics::Models &_models;
+    graphics::Walkmeshes &_walkmeshes;
+
+    // END Services
 
     void loadBackground(BackgroundType type);
 

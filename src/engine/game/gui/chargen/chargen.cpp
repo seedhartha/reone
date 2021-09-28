@@ -41,8 +41,68 @@ namespace game {
 
 static constexpr float kModelScale = 1.1f;
 
-CharacterGeneration::CharacterGeneration(Game *game) :
-    GameGUI(game) {
+CharacterGeneration::CharacterGeneration(
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings) {
     _resRef = getResRef("maincg");
 
     initForGame();
@@ -115,52 +175,361 @@ void CharacterGeneration::bindControls() {
 }
 
 void CharacterGeneration::loadClassSelection() {
-    _classSelection = make_unique<ClassSelection>(_game);
+    _classSelection = make_unique<ClassSelection>(
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _classSelection->load();
 }
 
 void CharacterGeneration::loadQuickOrCustom() {
-    _quickOrCustom = make_unique<QuickOrCustom>(this, _game);
+    _quickOrCustom = make_unique<QuickOrCustom>(
+        this,
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _quickOrCustom->load();
 }
 
 void CharacterGeneration::loadQuick() {
-    _quick = make_unique<QuickCharacterGeneration>(this, _game);
+    _quick = make_unique<QuickCharacterGeneration>(
+        this,
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _quick->load();
 }
 
 void CharacterGeneration::loadCustom() {
-    _custom = make_unique<CustomCharacterGeneration>(this, _game);
+    _custom = make_unique<CustomCharacterGeneration>(
+        this,
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _custom->load();
 }
 
 void CharacterGeneration::loadPortraitSelection() {
-    _portraitSelection = make_unique<PortraitSelection>(this, _game);
+    _portraitSelection = make_unique<PortraitSelection>(
+        this,
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _portraitSelection->load();
 }
 
 void CharacterGeneration::loadAbilities() {
-    _abilities = make_unique<CharGenAbilities>(this, _game);
+    _abilities = make_unique<CharGenAbilities>(
+        this,
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _abilities->load();
 }
 
 void CharacterGeneration::loadSkills() {
-    _skills = make_unique<CharGenSkills>(this, _game);
-    _skills->load();
+    _charGenSkills = make_unique<CharGenSkills>(
+        this,
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
+    _charGenSkills->load();
 }
 
 void CharacterGeneration::loadFeats() {
-    _feats = make_unique<CharGenFeats>(this, _game);
-    _feats->load();
+    _charGenFeats = make_unique<CharGenFeats>(
+        this,
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
+    _charGenFeats->load();
 }
 
 void CharacterGeneration::loadNameEntry() {
-    _nameEntry = make_unique<NameEntry>(this, _game);
+    _nameEntry = make_unique<NameEntry>(
+        this,
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _nameEntry->load();
 }
 
 void CharacterGeneration::loadLevelUp() {
-    _levelUp = make_unique<LevelUpMenu>(this, _game);
+    _levelUp = make_unique<LevelUpMenu>(
+        this,
+        _game,
+        _actionFactory,
+        _classes,
+        _combat,
+        _feats,
+        _footstepSounds,
+        _guiSounds,
+        _objectFactory,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _features,
+        _fonts,
+        _lips,
+        _materials,
+        _meshes,
+        _models,
+        _pbrIbl,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings);
     _levelUp->load();
 }
 
@@ -186,9 +555,9 @@ GUI *CharacterGeneration::getSubGUI() const {
     case CharGenScreen::Abilities:
         return _abilities.get();
     case CharGenScreen::Skills:
-        return _skills.get();
+        return _charGenSkills.get();
     case CharGenScreen::Feats:
-        return _feats.get();
+        return _charGenFeats.get();
     case CharGenScreen::Name:
         return _nameEntry.get();
     case CharGenScreen::LevelUp:
@@ -272,7 +641,7 @@ void CharacterGeneration::startQuick() {
 void CharacterGeneration::startLevelUp() {
     _type = Type::LevelUp;
 
-    shared_ptr<Creature> partyLeader(_game->party().getLeader());
+    shared_ptr<Creature> partyLeader(_party.getLeader());
 
     Character character;
     character.appearance = partyLeader->appearance();
@@ -324,7 +693,7 @@ void CharacterGeneration::openAbilities() {
 }
 
 void CharacterGeneration::openSkills() {
-    _skills->reset(_type != Type::LevelUp);
+    _charGenSkills->reset(_type != Type::LevelUp);
     _binding.modelLbl->setVisible(false);
     changeScreen(CharGenScreen::Skills);
 }
@@ -356,13 +725,13 @@ void CharacterGeneration::cancel() {
 void CharacterGeneration::finish() {
     if (_type == Type::LevelUp) {
         ClassType classType = _character.attributes.getEffectiveClass();
-        shared_ptr<CreatureClass> clazz(_game->classes().get(classType));
+        shared_ptr<CreatureClass> clazz(_classes.get(classType));
         _character.attributes.addClassLevels(clazz.get(), 1);
-        shared_ptr<Creature> partyLeader(_game->party().getLeader());
+        shared_ptr<Creature> partyLeader(_party.getLeader());
         partyLeader->attributes() = _character.attributes;
         _game->openInGame();
     } else {
-        shared_ptr<Creature> player(_game->objectFactory().newCreature());
+        shared_ptr<Creature> player(_objectFactory.newCreature());
         player->setTag(kObjectTagPlayer);
         player->setGender(_character.gender);
         player->setAppearance(_character.appearance);
@@ -371,7 +740,7 @@ void CharacterGeneration::finish() {
         player->setImmortal(true);
         player->attributes() = _character.attributes;
 
-        Party &party = _game->party();
+        Party &party = _party;
         party.clear();
         party.addMember(kNpcPlayer, player);
         party.setPlayer(player);
@@ -417,11 +786,33 @@ void CharacterGeneration::reloadCharacterModel() {
                                      .build());
 
     _binding.modelLbl->setScene(move(scene));
-    _binding.portraitLbl->setBorderFill(_game->portraits().getTextureByAppearance(_character.appearance));
+    _binding.portraitLbl->setBorderFill(_portraits.getTextureByAppearance(_character.appearance));
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
-    auto objectFactory = make_unique<ObjectFactory>(sceneGraph);
+    auto objectFactory = make_unique<ObjectFactory>(
+        _actionFactory,
+        _classes,
+        _combat,
+        _footstepSounds,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _meshes,
+        _models,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings,
+        sceneGraph);
     objectFactory->setGame(*_game);
 
     shared_ptr<Creature> creature(objectFactory->newCreature());
@@ -432,14 +823,14 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
     creature->sceneNode()->setCullable(false);
     creature->updateModelAnimation();
 
-    auto model = sceneGraph.newModel(_game->models().get("cgbody_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(_models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", creature->sceneNode());
 
     return move(model);
 }
 
 void CharacterGeneration::updateAttributes() {
-    shared_ptr<CreatureClass> clazz(_game->classes().get(_character.attributes.getEffectiveClass()));
+    shared_ptr<CreatureClass> clazz(_classes.get(_character.attributes.getEffectiveClass()));
     _binding.lblClass->setTextMessage(clazz->name());
 
     int vitality = clazz->hitdie() + _character.attributes.getAbilityModifier(Ability::Constitution);

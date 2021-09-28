@@ -57,8 +57,68 @@ static map<ClassType, int> g_classDescStrRefs {
     {ClassType::JediSentinel, 48032},
     {ClassType::JediGuardian, 48033}};
 
-ClassSelection::ClassSelection(Game *game) :
-    GameGUI(game) {
+ClassSelection::ClassSelection(
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings) {
     _resRef = getResRef("classsel");
 
     if (game->isKotOR()) {
@@ -117,7 +177,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     Character character;
     character.gender = gender;
     character.appearance = appearance;
-    character.attributes = _game->classes().get(clazz)->defaultAttributes();
+    character.attributes = _classes.get(clazz)->defaultAttributes();
 
     // Button control
 
@@ -189,7 +249,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
 vector<Portrait> ClassSelection::getPCPortraitsByGender(Gender gender) {
     vector<Portrait> result;
     int sex = gender == Gender::Female ? 1 : 0;
-    for (auto &portrait : _game->portraits().portraits()) {
+    for (auto &portrait : _portraits.portraits()) {
         if (portrait.forPC && portrait.sex == sex) {
             result.push_back(portrait);
         }
@@ -221,7 +281,29 @@ int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz)
 }
 
 shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, SceneGraph &sceneGraph) {
-    auto objectFactory = make_unique<ObjectFactory>(sceneGraph);
+    auto objectFactory = make_unique<ObjectFactory>(
+        _actionFactory,
+        _classes,
+        _combat,
+        _footstepSounds,
+        _party,
+        _portraits,
+        _reputes,
+        _scriptRunner,
+        _soundSets,
+        _surfaces,
+        _audioFiles,
+        _audioPlayer,
+        _context,
+        _meshes,
+        _models,
+        _shaders,
+        _textures,
+        _walkmeshes,
+        _window,
+        _resources,
+        _strings,
+        sceneGraph);
     objectFactory->setGame(*_game);
 
     shared_ptr<Creature> character(objectFactory->newCreature());
@@ -232,7 +314,7 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, Sce
     character->sceneNode()->setCullable(false);
     character->updateModelAnimation();
 
-    auto model = sceneGraph.newModel(_game->models().get("cgbody_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(_models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", character->sceneNode());
 
     return move(model);
@@ -266,11 +348,11 @@ void ClassSelection::onClassButtonFocusChanged(int index, bool focus) {
     ClassButton &button = _classButtons[index];
     ClassType clazz = button.character.attributes.getEffectiveClass();
 
-    string classText(_game->strings().get(g_genderStrRefs[button.character.gender]));
-    classText += " " + _game->classes().get(clazz)->name();
+    string classText(_strings.get(g_genderStrRefs[button.character.gender]));
+    classText += " " + _classes.get(clazz)->name();
     _binding.lblClass->setTextMessage(classText);
 
-    string descText(_game->strings().get(g_classDescStrRefs[clazz]));
+    string descText(_strings.get(g_classDescStrRefs[clazz]));
     _binding.lblDesc->setTextMessage(descText);
 }
 

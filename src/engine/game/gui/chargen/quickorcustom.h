@@ -35,7 +35,38 @@ class CharacterGeneration;
 
 class QuickOrCustom : public GameGUI {
 public:
-    QuickOrCustom(CharacterGeneration *charGen, Game *game);
+    QuickOrCustom(
+        CharacterGeneration *charGen,
+        Game *game,
+        ActionFactory &actionFactory,
+        Classes &classes,
+        Combat &combat,
+        Feats &feats,
+        FootstepSounds &footstepSounds,
+        GUISounds &guiSounds,
+        ObjectFactory &objectFactory,
+        Party &party,
+        Portraits &portraits,
+        Reputes &reputes,
+        ScriptRunner &scriptRunner,
+        SoundSets &soundSets,
+        Surfaces &surfaces,
+        audio::AudioFiles &audioFiles,
+        audio::AudioPlayer &audioPlayer,
+        graphics::Context &context,
+        graphics::Features &features,
+        graphics::Fonts &fonts,
+        graphics::Lips &lips,
+        graphics::Materials &materials,
+        graphics::Meshes &meshes,
+        graphics::Models &models,
+        graphics::PBRIBL &pbrIbl,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Walkmeshes &walkmeshes,
+        graphics::Window &window,
+        resource::Resources &resources,
+        resource::Strings &strings);
 
     void load() override;
 
@@ -48,7 +79,7 @@ private:
         std::shared_ptr<gui::ListBox> lbDesc;
     } _binding;
 
-    CharacterGeneration *_charGen {nullptr};
+    CharacterGeneration *_charGen;
 
     void bindControls();
 };

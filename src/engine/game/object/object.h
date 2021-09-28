@@ -24,9 +24,51 @@
 
 namespace reone {
 
+namespace resource {
+
+class Resources;
+class Strings;
+
+} // namespace resource
+
+namespace graphics {
+
+class Context;
+class Meshes;
+class Models;
+class Shaders;
+class Textures;
+class Walkmeshes;
+
+} // namespace graphics
+
+namespace audio {
+
+class AudioFiles;
+class AudioPlayer;
+
+} // namespace audio
+
+namespace scene {
+
+class SceneGraph;
+
+}
+
 namespace game {
 
+class ActionFactory;
+class Classes;
+class Combat;
+class FootstepSounds;
 class Game;
+class ObjectFactory;
+class Party;
+class Portraits;
+class Reputes;
+class ScriptRunner;
+class SoundSets;
+class Surfaces;
 
 class Object : public boost::noncopyable {
 public:
@@ -123,6 +165,34 @@ protected:
     bool _autoRemoveKey {false};
     bool _interruptable {false};
 
+    // Services
+
+    ActionFactory &_actionFactory;
+    Classes &_classes;
+    Combat &_combat;
+    FootstepSounds &_footstepSounds;
+    ObjectFactory &_objectFactory;
+    Party &_party;
+    Portraits &_portraits;
+    Reputes &_reputes;
+    ScriptRunner &_scriptRunner;
+    SoundSets &_soundSets;
+    Surfaces &_surfaces;
+
+    audio::AudioFiles &_audioFiles;
+    audio::AudioPlayer &_audioPlayer;
+    graphics::Context &_context;
+    graphics::Meshes &_meshes;
+    graphics::Models &_models;
+    graphics::Shaders &_shaders;
+    graphics::Textures &_textures;
+    graphics::Walkmeshes &_walkmeshes;
+    resource::Resources &_resources;
+    resource::Strings &_strings;
+    scene::SceneGraph &_sceneGraph;
+
+    // END Services
+
     // Actions
 
     std::deque<std::shared_ptr<Action>> _actions;
@@ -145,7 +215,58 @@ protected:
 
     // END Scripts
 
-    Object(uint32_t id, ObjectType type, Game *game);
+    Object(
+        uint32_t id,
+        ObjectType type,
+        Game *game,
+        ActionFactory &actionFactory,
+        Classes &classes,
+        Combat &combat,
+        FootstepSounds &footstepSounds,
+        ObjectFactory &objectFactory,
+        Party &party,
+        Portraits &portraits,
+        Reputes &reputes,
+        ScriptRunner &scriptRunner,
+        SoundSets &soundSets,
+        Surfaces &surfaces,
+        audio::AudioFiles &audioFiles,
+        audio::AudioPlayer &audioPlayer,
+        graphics::Context &context,
+        graphics::Meshes &meshes,
+        graphics::Models &models,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Walkmeshes &walkmeshes,
+        resource::Resources &resources,
+        resource::Strings &strings,
+        scene::SceneGraph &sceneGraph) :
+        _id(id),
+        _type(type),
+        _game(game),
+        _actionFactory(actionFactory),
+        _classes(classes),
+        _combat(combat),
+        _footstepSounds(footstepSounds),
+        _objectFactory(objectFactory),
+        _party(party),
+        _portraits(portraits),
+        _reputes(reputes),
+        _scriptRunner(scriptRunner),
+        _soundSets(soundSets),
+        _surfaces(surfaces),
+        _audioFiles(audioFiles),
+        _audioPlayer(audioPlayer),
+        _context(context),
+        _meshes(meshes),
+        _models(models),
+        _shaders(shaders),
+        _textures(textures),
+        _walkmeshes(walkmeshes),
+        _resources(resources),
+        _strings(strings),
+        _sceneGraph(sceneGraph) {
+    }
 
     // Actions
 

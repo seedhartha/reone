@@ -29,7 +29,7 @@ public:
         ObjectAction(game, ActionType::OpenLock, std::move(object)) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(Object &actor, ActionContext &ctx, float dt) override;
 };
 
 } // namespace game

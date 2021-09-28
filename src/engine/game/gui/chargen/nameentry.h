@@ -36,7 +36,38 @@ class CharacterGeneration;
 
 class NameEntry : public GameGUI {
 public:
-    NameEntry(CharacterGeneration *charGen, Game *game);
+    NameEntry(
+        CharacterGeneration *charGen,
+        Game *game,
+        ActionFactory &actionFactory,
+        Classes &classes,
+        Combat &combat,
+        Feats &feats,
+        FootstepSounds &footstepSounds,
+        GUISounds &guiSounds,
+        ObjectFactory &objectFactory,
+        Party &party,
+        Portraits &portraits,
+        Reputes &reputes,
+        ScriptRunner &scriptRunner,
+        SoundSets &soundSets,
+        Surfaces &surfaces,
+        audio::AudioFiles &audioFiles,
+        audio::AudioPlayer &audioPlayer,
+        graphics::Context &context,
+        graphics::Features &features,
+        graphics::Fonts &fonts,
+        graphics::Lips &lips,
+        graphics::Materials &materials,
+        graphics::Meshes &meshes,
+        graphics::Models &models,
+        graphics::PBRIBL &pbrIbl,
+        graphics::Shaders &shaders,
+        graphics::Textures &textures,
+        graphics::Walkmeshes &walkmeshes,
+        graphics::Window &window,
+        resource::Resources &resources,
+        resource::Strings &strings);
 
     void load() override;
     bool handle(const SDL_Event &event) override;
@@ -51,7 +82,7 @@ private:
         std::shared_ptr<gui::Control> nameBoxEdit;
     } _binding;
 
-    CharacterGeneration *_charGen {nullptr};
+    CharacterGeneration *_charGen;
     gui::TextInput _input;
     resource::LtrReader _maleLtr;
     resource::LtrReader _femaleLtr;

@@ -26,6 +26,8 @@
 
 #include "../../../game.h"
 
+#include "../context.h"
+
 #include "argutil.h"
 
 using namespace std;
@@ -38,23 +40,23 @@ namespace game {
 
 namespace routine {
 
-Variable playMovie(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable playMovie(const vector<Variable> &args, const RoutineContext &ctx) {
     string movie(boost::to_lower_copy(getString(args, 0)));
 
-    game.playVideo(movie);
+    ctx.game.playVideo(movie);
 
     return Variable::ofNull();
 }
 
-Variable isMoviePlaying(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable isMoviePlaying(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable queueMovie(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable queueMovie(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playMovieQueue(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable playMovieQueue(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

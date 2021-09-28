@@ -23,6 +23,8 @@
 
 #include "../../../../script/types.h"
 
+#include "../context.h"
+
 #include "argutil.h"
 
 using namespace std;
@@ -35,33 +37,33 @@ namespace game {
 
 namespace routine {
 
-Variable fabs(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable fabs(const vector<Variable> &args, const RoutineContext &ctx) {
     float value = getFloat(args, 0);
     return Variable::ofFloat(glm::abs(value));
 }
 
-Variable cos(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable cos(const vector<Variable> &args, const RoutineContext &ctx) {
     float value = getFloat(args, 0);
     float result = glm::radians(value);
 
     return Variable::ofFloat(glm::cos(value));
 }
 
-Variable sin(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable sin(const vector<Variable> &args, const RoutineContext &ctx) {
     float value = getFloat(args, 0);
     float result = glm::radians(value);
 
     return Variable::ofFloat(glm::sin(value));
 }
 
-Variable tan(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable tan(const vector<Variable> &args, const RoutineContext &ctx) {
     float value = getFloat(args, 0);
     float result = glm::radians(value);
 
     return Variable::ofFloat(glm::tan(value));
 }
 
-Variable acos(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable acos(const vector<Variable> &args, const RoutineContext &ctx) {
     float value = getFloat(args, 0);
 
     float result = 0.0f;
@@ -72,7 +74,7 @@ Variable acos(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::ofFloat(result);
 }
 
-Variable asin(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable asin(const vector<Variable> &args, const RoutineContext &ctx) {
     float value = getFloat(args, 0);
 
     float result = 0.0f;
@@ -83,14 +85,14 @@ Variable asin(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::ofFloat(result);
 }
 
-Variable atan(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable atan(const vector<Variable> &args, const RoutineContext &ctx) {
     float value = getFloat(args, 0);
     float result = glm::degrees(glm::atan(value));
 
     return Variable::ofFloat(result);
 }
 
-Variable log(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable log(const vector<Variable> &args, const RoutineContext &ctx) {
     float value = getFloat(args, 0);
 
     float result = 0.0f;
@@ -101,7 +103,7 @@ Variable log(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::ofFloat(result);
 }
 
-Variable pow(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable pow(const vector<Variable> &args, const RoutineContext &ctx) {
     float value = getFloat(args, 0);
     float exponent = getFloat(args, 1);
 
@@ -113,7 +115,7 @@ Variable pow(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::ofFloat(result);
 }
 
-Variable sqrt(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable sqrt(const vector<Variable> &args, const RoutineContext &ctx) {
     float value = getFloat(args, 0);
 
     float result = 0.0f;
@@ -124,7 +126,7 @@ Variable sqrt(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
     return Variable::ofFloat(result);
 }
 
-Variable abs(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable abs(const vector<Variable> &args, const RoutineContext &ctx) {
     int value = getInt(args, 0);
     int result = glm::abs(value);
 

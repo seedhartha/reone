@@ -58,7 +58,7 @@ Options OptionsParser::invoke() {
     po::options_description descCmdLine {"Usage"};
     descCmdLine.add(descCommon);
 
-    // Parse configuration file
+    // Parse command line and configuration file
 
     po::variables_map vars;
     po::store(po::parse_command_line(_argc, _argv, descCmdLine), vars);

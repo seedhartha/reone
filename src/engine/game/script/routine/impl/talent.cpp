@@ -27,6 +27,8 @@
 
 #include "../../../talent.h"
 
+#include "../context.h"
+
 #include "argutil.h"
 
 using namespace std;
@@ -39,28 +41,28 @@ namespace game {
 
 namespace routine {
 
-Variable talentSpell(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable talentSpell(const vector<Variable> &args, const RoutineContext &ctx) {
     int spell = getInt(args, 0);
     auto talent = make_shared<Talent>(TalentType::Spell, spell);
 
     return Variable::ofTalent(move(talent));
 }
 
-Variable talentFeat(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable talentFeat(const vector<Variable> &args, const RoutineContext &ctx) {
     int feat = getInt(args, 0);
     auto talent = make_shared<Talent>(TalentType::Feat, feat);
 
     return Variable::ofTalent(move(talent));
 }
 
-Variable talentSkill(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable talentSkill(const vector<Variable> &args, const RoutineContext &ctx) {
     int skill = getInt(args, 0);
     auto talent = make_shared<Talent>(TalentType::Skill, skill);
 
     return Variable::ofTalent(move(talent));
 }
 
-Variable getIsTalentValid(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIsTalentValid(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
         auto talent = getTalent(args, 0);
         return Variable::ofInt(1);
@@ -69,7 +71,7 @@ Variable getIsTalentValid(Game &game, const vector<Variable> &args, ExecutionCon
     }
 }
 
-Variable getTypeFromTalent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getTypeFromTalent(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
         auto talent = getTalent(args, 0);
         auto type = talent->type();
@@ -80,11 +82,11 @@ Variable getTypeFromTalent(Game &game, const vector<Variable> &args, ExecutionCo
     }
 }
 
-Variable getIdFromTalent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getIdFromTalent(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getCategoryFromTalent(Game &game, const vector<Variable> &args, ExecutionContext &ctx) {
+Variable getCategoryFromTalent(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

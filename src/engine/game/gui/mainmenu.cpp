@@ -49,8 +49,68 @@ static const char kBlueprintResRefBastila[] = "p_bastilla";
 static const char kBlueprintResRefAtton[] = "p_atton";
 static const char kBlueprintResRefKreia[] = "p_kreia";
 
-MainMenu::MainMenu(Game *game) :
-    GameGUI(game) {
+MainMenu::MainMenu(
+    Game *game,
+    ActionFactory &actionFactory,
+    Classes &classes,
+    Combat &combat,
+    Feats &feats,
+    FootstepSounds &footstepSounds,
+    GUISounds &guiSounds,
+    ObjectFactory &objectFactory,
+    Party &party,
+    Portraits &portraits,
+    Reputes &reputes,
+    ScriptRunner &scriptRunner,
+    SoundSets &soundSets,
+    Surfaces &surfaces,
+    audio::AudioFiles &audioFiles,
+    audio::AudioPlayer &audioPlayer,
+    graphics::Context &context,
+    graphics::Features &features,
+    graphics::Fonts &fonts,
+    graphics::Lips &lips,
+    graphics::Materials &materials,
+    graphics::Meshes &meshes,
+    graphics::Models &models,
+    graphics::PBRIBL &pbrIbl,
+    graphics::Shaders &shaders,
+    graphics::Textures &textures,
+    graphics::Walkmeshes &walkmeshes,
+    graphics::Window &window,
+    resource::Resources &resources,
+    resource::Strings &strings) :
+    GameGUI(
+        game,
+        actionFactory,
+        classes,
+        combat,
+        feats,
+        footstepSounds,
+        guiSounds,
+        objectFactory,
+        party,
+        portraits,
+        reputes,
+        scriptRunner,
+        soundSets,
+        surfaces,
+        audioFiles,
+        audioPlayer,
+        context,
+        features,
+        fonts,
+        lips,
+        materials,
+        meshes,
+        models,
+        pbrIbl,
+        shaders,
+        textures,
+        walkmeshes,
+        window,
+        resources,
+        strings) {
     if (game->isTSL()) {
         _resRef = "mainmenu8x6_p";
     } else {
@@ -173,7 +233,7 @@ void MainMenu::setup3DView() {
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
-    auto model = sceneGraph.newModel(_game->models().get("mainmenu"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(_models.get("mainmenu"), ModelUsage::GUI);
     model->playAnimation("default", AnimationProperties::fromFlags(AnimationFlags::loop));
     return move(model);
 }
@@ -219,7 +279,7 @@ void MainMenu::onModuleSelected(const string &name) {
         member1Blueprint = kBlueprintResRefCarth;
         member2Blueprint = kBlueprintResRefBastila;
     }
-    shared_ptr<TwoDA> defaultParty(_game->resources().get2DA("defaultparty"));
+    shared_ptr<TwoDA> defaultParty(_resources.get2DA("defaultparty"));
     if (defaultParty) {
         for (int row = 0; row < defaultParty->getRowCount(); ++row) {
             if (defaultParty->getBool(row, "tsl") == _game->isTSL()) {
@@ -231,9 +291,9 @@ void MainMenu::onModuleSelected(const string &name) {
         }
     }
 
-    Party &party = _game->party();
+    Party &party = _party;
     if (!member1Blueprint.empty()) {
-        shared_ptr<Creature> player(_game->objectFactory().newCreature());
+        shared_ptr<Creature> player(_objectFactory.newCreature());
         player->loadFromBlueprint(member1Blueprint);
         player->setTag(kObjectTagPlayer);
         player->setImmortal(true);
@@ -241,13 +301,13 @@ void MainMenu::onModuleSelected(const string &name) {
         party.setPlayer(player);
     }
     if (!member2Blueprint.empty()) {
-        shared_ptr<Creature> companion(_game->objectFactory().newCreature());
+        shared_ptr<Creature> companion(_objectFactory.newCreature());
         companion->loadFromBlueprint(member2Blueprint);
         companion->setImmortal(true);
         party.addMember(0, companion);
     }
     if (!member3Blueprint.empty()) {
-        shared_ptr<Creature> companion(_game->objectFactory().newCreature());
+        shared_ptr<Creature> companion(_objectFactory.newCreature());
         companion->loadFromBlueprint(member3Blueprint);
         companion->setImmortal(true);
         party.addMember(1, companion);

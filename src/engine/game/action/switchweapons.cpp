@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void SwitchWeaponsAction::execute(Object &actor, float dt) {
+void SwitchWeaponsAction::execute(Object &actor, ActionContext &ctx, float dt) {
     // TODO: implement
 
     complete();
