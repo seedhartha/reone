@@ -23,11 +23,11 @@ namespace reone {
 
 namespace di {
 
-class ResourceServices;
+class ResourceModule;
 
-class ScriptServices : boost::noncopyable {
+class ScriptModule : boost::noncopyable {
 public:
-    ScriptServices(ResourceServices &resource) :
+    ScriptModule(ResourceModule &resource) :
         _resource(resource) {
     }
 
@@ -36,7 +36,7 @@ public:
     script::Scripts &scripts() { return *_scripts; }
 
 private:
-    ResourceServices &_resource;
+    ResourceModule &_resource;
 
     std::unique_ptr<script::Scripts> _scripts;
 };

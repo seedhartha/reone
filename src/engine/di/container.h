@@ -47,13 +47,13 @@ private:
     game::GameID _gameId;
     game::Options _gameOptions;
 
-    std::unique_ptr<CommonServices> _commonServices;
-    std::unique_ptr<ResourceServices> _resourceServices;
-    std::unique_ptr<GraphicsServices> _graphicsServices;
-    std::unique_ptr<AudioServices> _audioServices;
-    std::unique_ptr<SceneServices> _sceneServices;
-    std::unique_ptr<ScriptServices> _scriptServices;
-    std::unique_ptr<GameServices> _gameServices;
+    std::unique_ptr<CommonModule> _common;
+    std::unique_ptr<ResourceModule> _resource;
+    std::unique_ptr<GraphicsModule> _graphics;
+    std::unique_ptr<AudioModule> _audio;
+    std::unique_ptr<SceneModule> _scene;
+    std::unique_ptr<ScriptModule> _script;
+    std::unique_ptr<GameModule> _game;
 };
 
 } // namespace di

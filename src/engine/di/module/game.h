@@ -42,23 +42,23 @@ namespace reone {
 
 namespace di {
 
-class AudioServices;
-class GraphicsServices;
-class ResourceServices;
-class SceneServices;
-class ScriptServices;
+class AudioModule;
+class GraphicsModule;
+class ResourceModule;
+class SceneModule;
+class ScriptModule;
 
-class GameServices : boost::noncopyable {
+class GameModule : boost::noncopyable {
 public:
-    GameServices(
+    GameModule(
         game::GameID gameId,
         game::Options gameOptions,
         boost::filesystem::path gamePath,
-        ResourceServices &resource,
-        GraphicsServices &graphics,
-        AudioServices &audio,
-        SceneServices &scene,
-        ScriptServices &script) :
+        ResourceModule &resource,
+        GraphicsModule &graphics,
+        AudioModule &audio,
+        SceneModule &scene,
+        ScriptModule &script) :
         _gameId(gameId),
         _gamePath(std::move(gamePath)),
         _gameOptions(std::move(gameOptions)),
@@ -97,11 +97,11 @@ private:
     game::Options _gameOptions;
     boost::filesystem::path _gamePath;
 
-    ResourceServices &_resource;
-    GraphicsServices &_graphics;
-    AudioServices &_audio;
-    SceneServices &_scene;
-    ScriptServices &_script;
+    ResourceModule &_resource;
+    GraphicsModule &_graphics;
+    AudioModule &_audio;
+    SceneModule &_scene;
+    ScriptModule &_script;
 
     std::unique_ptr<game::ActionFactory> _actionFactory;
     std::unique_ptr<game::Classes> _classes;

@@ -26,25 +26,25 @@ namespace reone {
 namespace di {
 
 void Container::init() {
-    _commonServices = make_unique<CommonServices>();
-    _resourceServices = make_unique<ResourceServices>(_gameOptions.gamePath);
-    _graphicsServices = make_unique<GraphicsServices>(_gameOptions.graphics, *_resourceServices);
-    _audioServices = make_unique<AudioServices>(_gameOptions.audio, *_resourceServices);
-    _sceneServices = make_unique<SceneServices>(_gameOptions.graphics, *_graphicsServices);
-    _scriptServices = make_unique<ScriptServices>(*_resourceServices);
-    _gameServices = make_unique<GameServices>(_gameId, _gameOptions, _gameOptions.gamePath, *_resourceServices, *_graphicsServices, *_audioServices, *_sceneServices, *_scriptServices);
+    _common = make_unique<CommonModule>();
+    _resource = make_unique<ResourceModule>(_gameOptions.gamePath);
+    _graphics = make_unique<GraphicsModule>(_gameOptions.graphics, *_resource);
+    _audio = make_unique<AudioModule>(_gameOptions.audio, *_resource);
+    _scene = make_unique<SceneModule>(_gameOptions.graphics, *_graphics);
+    _script = make_unique<ScriptModule>(*_resource);
+    _game = make_unique<GameModule>(_gameId, _gameOptions, _gameOptions.gamePath, *_resource, *_graphics, *_audio, *_scene, *_script);
 
-    _commonServices->init();
-    _resourceServices->init();
-    _graphicsServices->init();
-    _audioServices->init();
-    _sceneServices->init();
-    _scriptServices->init();
-    _gameServices->init();
+    _common->init();
+    _resource->init();
+    _graphics->init();
+    _audio->init();
+    _scene->init();
+    _script->init();
+    _game->init();
 }
 
 Game &Container::getGame() {
-    return _gameServices->game();
+    return _game->game();
 }
 
 } // namespace di

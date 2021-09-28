@@ -23,7 +23,7 @@ namespace reone {
 
 namespace di {
 
-class CommonServices {
+class CommonModule {
 public:
     void init();
 
