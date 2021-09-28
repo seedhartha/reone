@@ -40,7 +40,7 @@ static constexpr int kSwitchToResRef = 47884;
 static constexpr int kGiveItemResRef = 47885;
 static constexpr int kInventoryResRef = 393;
 
-Container::Container(
+ContainerGUI::ContainerGUI(
     Game *game,
     ActionFactory &actionFactory,
     Classes &classes,
@@ -107,7 +107,7 @@ Container::Container(
     initForGame();
 }
 
-void Container::load() {
+void ContainerGUI::load() {
     GUI::load();
     bindControls();
 
@@ -128,7 +128,7 @@ void Container::load() {
     configureItemsListBox();
 }
 
-void Container::bindControls() {
+void ContainerGUI::bindControls() {
     _binding.lblMessage = getControl<Label>("LBL_MESSAGE");
     _binding.lbItems = getControl<ListBox>("LB_ITEMS");
     _binding.btnOk = getControl<Button>("BTN_OK");
@@ -136,7 +136,7 @@ void Container::bindControls() {
     _binding.btnCancel = getControl<Button>("BTN_CANCEL");
 }
 
-void Container::configureItemsListBox() {
+void ContainerGUI::configureItemsListBox() {
     ImageButton &protoItem = static_cast<ImageButton &>(_binding.lbItems->protoItem());
 
     Control::Text text(protoItem.text());
@@ -145,7 +145,7 @@ void Container::configureItemsListBox() {
     protoItem.setText(text);
 }
 
-void Container::open(shared_ptr<SpatialObject> container) {
+void ContainerGUI::open(shared_ptr<SpatialObject> container) {
     _binding.lbItems->clearItems();
 
     for (auto &item : container->items()) {
@@ -167,7 +167,7 @@ void Container::open(shared_ptr<SpatialObject> container) {
     _container = move(container);
 }
 
-shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
+shared_ptr<Texture> ContainerGUI::getItemFrameTexture(int stackSize) const {
     string resRef;
     if (_game->isTSL()) {
         resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
@@ -177,7 +177,7 @@ shared_ptr<Texture> Container::getItemFrameTexture(int stackSize) const {
     return _textures.get(resRef, TextureUsage::GUI);
 }
 
-void Container::transferItemsToPlayer() {
+void ContainerGUI::transferItemsToPlayer() {
     shared_ptr<Creature> player(_party.player());
     _container->moveDropableItemsTo(*player);
 

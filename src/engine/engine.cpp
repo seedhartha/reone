@@ -23,6 +23,7 @@
 #include "gameprobe.h"
 #include "optionsparser.h"
 
+using namespace reone::di;
 using namespace reone::game;
 
 namespace reone {
@@ -37,7 +38,7 @@ int Engine::run() {
     GameProbe gameProbe(gameOptions.gamePath);
     GameID gameId = gameProbe.invoke();
 
-    di::Container container(gameId, gameOptions);
+    Container container(gameId, gameOptions);
     container.init();
 
     return container.getGame().run();
