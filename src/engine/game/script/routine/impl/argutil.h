@@ -18,13 +18,13 @@
 #pragma once
 
 #include "../../../../common/collectionutil.h"
+#include "../../../../script/variable.h"
 
 namespace reone {
 
 namespace script {
 
 struct ExecutionContext;
-struct Variable;
 
 } // namespace script
 

@@ -54,8 +54,8 @@ static string describeLogLevel(LogLevel level) {
 }
 
 static const unordered_map<int, string> g_nameByLogChannel {
-    {LogChannels::resources, "Resources"},
     {LogChannels::general, "General"},
+    {LogChannels::resources, "Resources"},
     {LogChannels::graphics, "Graphics"},
     {LogChannels::audio, "Audio"},
     {LogChannels::gui, "GUI"},
