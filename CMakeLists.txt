@@ -16,7 +16,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(reone)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(src/external/s3tc)
 
@@ -1064,12 +1064,16 @@ if(BUILD_TESTS)
         tests/script/execution.cpp)
 
     add_executable(reone-tests ${TEST_SOURCES})
-    target_link_libraries(reone-tests PRIVATE libgame libscript libresource libcommon ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+    target_link_libraries(reone-tests PRIVATE
+        libgame libscript libresource libcommon
+        ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+
     if(MSVC)
         target_link_libraries(reone-tests PRIVATE SDL2::SDL2)
     else()
         target_link_libraries(reone-tests PRIVATE ${SDL2_LIBRARIES})
     endif()
+
     target_precompile_headers(reone-tests PRIVATE src/engine/pch.h)
 
     enable_testing()

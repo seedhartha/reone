@@ -19,7 +19,6 @@
 
 #include "../../../../script/exception/argument.h"
 #include "../../../../script/executioncontext.h"
-#include "../../../../script/variable.h"
 
 #include "../../../effect/effect.h"
 #include "../../../event.h"
