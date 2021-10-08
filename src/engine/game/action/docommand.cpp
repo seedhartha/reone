@@ -32,11 +32,11 @@ namespace reone {
 namespace game {
 
 void CommandAction::execute(Object &actor, ActionContext &ctx, float dt) {
-    auto context = make_unique<ExecutionContext>(*_context);
-    context->callerId = actor.id();
+    auto executionCtx = make_unique<ExecutionContext>(*_context);
+    executionCtx->callerId = actor.id();
 
     shared_ptr<ScriptProgram> program(_context->savedState->program);
-    ScriptExecution(program, move(context)).run();
+    ScriptExecution(program, move(executionCtx)).run();
     complete();
 }
 

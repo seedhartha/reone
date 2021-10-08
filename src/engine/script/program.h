@@ -27,8 +27,7 @@ class NcsReader;
 
 struct Instruction {
     uint32_t offset {0};
-    ByteCode byteCode {ByteCode::Invalid};
-    InstructionType type {InstructionType::None};
+    InstructionType type {InstructionType::NOP};
     uint32_t nextOffset {0};
     std::string strValue;
 
@@ -54,7 +53,9 @@ struct Instruction {
 
 class ScriptProgram : boost::noncopyable {
 public:
-    ScriptProgram(const std::string &name);
+    ScriptProgram(std::string name) :
+        _name(std::move(name)) {
+    }
 
     void add(Instruction instr);
 
@@ -62,8 +63,9 @@ public:
 
     const std::string &name() const { return _name; }
     uint32_t length() const { return _length; }
+    const std::unordered_map<uint32_t, Instruction> instructions() const { return _instructions; }
 
-    void setLength(uint32_t length);
+    void setLength(uint32_t length) { _length = length; }
 
 private:
     std::string _name;

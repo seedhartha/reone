@@ -1004,6 +1004,7 @@ if(BUILD_TOOLS)
         src/tools/keybiftool.cpp
         src/tools/liptool.cpp
         src/tools/main.cpp
+        src/tools/ncstool.cpp
         src/tools/program.cpp
         src/tools/pthtool.cpp
         src/tools/rimtool.cpp
@@ -1015,17 +1016,23 @@ if(BUILD_TOOLS)
     target_precompile_headers(reone-tools PRIVATE src/engine/pch.h)
 
     target_link_libraries(reone-tools PRIVATE
-        libgraphics libresource libcommon
+        libgame libscript libgui libscene libvideo libaudio libgraphics libresource libcommon
         libs3tc
+        ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
         GLEW::GLEW
         ${OPENGL_LIBRARIES}
-        ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+        ${MAD_LIBRARY})
 
     if(MSVC)
-        target_link_libraries(reone PRIVATE SDL2::SDL2)
+        target_link_libraries(reone-tools PRIVATE SDL2::SDL2 OpenAL::OpenAL)
     else()
-        target_link_libraries(reone PRIVATE ${SDL2_LIBRARIES})
+        target_link_libraries(reone-tools PRIVATE ${SDL2_LIBRARIES} ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads -latomic)
     endif()
+
+    if(ENABLE_VIDEO)
+        target_link_libraries(reone-tools PRIVATE ${FFMPEG_LIBRARIES})
+    endif()
+
     list(APPEND InstallTargets reone-tools)
 endif()
 

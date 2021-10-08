@@ -189,6 +189,26 @@ private:
     void toLIP(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 
+class NcsTool : public ITool {
+public:
+    NcsTool(bool tsl) :
+        _tsl(tsl) {
+    }
+
+    void invoke(
+        Operation operation,
+        const boost::filesystem::path &target,
+        const boost::filesystem::path &gamePath,
+        const boost::filesystem::path &destPath) override;
+
+    bool supports(Operation operation, const boost::filesystem::path &target) const override;
+
+private:
+    bool _tsl;
+
+    void toPCODE(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+};
+
 } // namespace tools
 
 } // namespace reone

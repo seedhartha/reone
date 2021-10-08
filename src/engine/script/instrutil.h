@@ -21,12 +21,11 @@ namespace reone {
 
 namespace script {
 
-enum class ByteCode;
+class IRoutineProvider;
 
 struct Instruction;
 
-std::string describeInstruction(const Instruction &ins);
-const std::string &describeByteCode(ByteCode code);
+std::string describeInstruction(const Instruction &ins, const IRoutineProvider &routines);
 
 } // namespace script
 

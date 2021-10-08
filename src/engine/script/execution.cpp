@@ -40,57 +40,105 @@ ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<E
     _context(move(context)),
     _program(ensurePresent(program, "program")) {
 
-    static unordered_map<ByteCode, function<void(ScriptExecution *, const Instruction &)>> handlers {
-        {ByteCode::CopyDownSP, &ScriptExecution::executeCopyDownSP},
-        {ByteCode::Reserve, &ScriptExecution::executeReserve},
-        {ByteCode::CopyTopSP, &ScriptExecution::executeCopyTopSP},
-        {ByteCode::PushConstant, &ScriptExecution::executePushConstant},
-        {ByteCode::CallRoutine, &ScriptExecution::executeCallRoutine},
-        {ByteCode::LogicalAnd, &ScriptExecution::executeLogicalAnd},
-        {ByteCode::LogicalOr, &ScriptExecution::executeLogicalOr},
-        {ByteCode::InclusiveBitwiseOr, &ScriptExecution::executeInclusiveBitwiseOr},
-        {ByteCode::ExclusiveBitwiseOr, &ScriptExecution::executeExclusiveBitwiseOr},
-        {ByteCode::BitwiseAnd, &ScriptExecution::executeBitwiseAnd},
-        {ByteCode::Equal, &ScriptExecution::executeEqual},
-        {ByteCode::NotEqual, &ScriptExecution::executeNotEqual},
-        {ByteCode::GreaterThanOrEqual, &ScriptExecution::executeGreaterThanOrEqual},
-        {ByteCode::GreaterThan, &ScriptExecution::executeGreaterThan},
-        {ByteCode::LessThan, &ScriptExecution::executeLessThan},
-        {ByteCode::LessThanOrEqual, &ScriptExecution::executeLessThanOrEqual},
-        {ByteCode::ShiftLeft, &ScriptExecution::executeShiftLeft},
-        {ByteCode::ShiftRight, &ScriptExecution::executeShiftRight},
-        {ByteCode::UnsignedShiftRight, &ScriptExecution::executeUnsignedShiftRight},
-        {ByteCode::Add, &ScriptExecution::executeAdd},
-        {ByteCode::Subtract, &ScriptExecution::executeSubtract},
-        {ByteCode::Multiply, &ScriptExecution::executeMultiply},
-        {ByteCode::Divide, &ScriptExecution::executeDivide},
-        {ByteCode::Mod, &ScriptExecution::executeMod},
-        {ByteCode::Negate, &ScriptExecution::executeNegate},
-        {ByteCode::AdjustSP, &ScriptExecution::executeAdjustSP},
-        {ByteCode::Jump, &ScriptExecution::executeJump},
-        {ByteCode::JumpToSubroutine, &ScriptExecution::executeJumpToSubroutine},
-        {ByteCode::JumpIfZero, &ScriptExecution::executeJumpIfZero},
-        {ByteCode::Return, &ScriptExecution::executeReturn},
-        {ByteCode::Destruct, &ScriptExecution::executeDestruct},
-        {ByteCode::LogicalNot, &ScriptExecution::executeLogicalNot},
-        {ByteCode::DecRelToSP, &ScriptExecution::executeDecRelToSP},
-        {ByteCode::IncRelToSP, &ScriptExecution::executeIncRelToSP},
-        {ByteCode::JumpIfNonZero, &ScriptExecution::executeJumpIfNonZero},
-        {ByteCode::CopyDownBP, &ScriptExecution::executeCopyDownBP},
-        {ByteCode::CopyTopBP, &ScriptExecution::executeCopyTopBP},
-        {ByteCode::DecRelToBP, &ScriptExecution::executeDecRelToBP},
-        {ByteCode::IncRelToBP, &ScriptExecution::executeIncRelToBP},
-        {ByteCode::SaveBP, &ScriptExecution::executeSaveBP},
-        {ByteCode::RestoreBP, &ScriptExecution::executeRestoreBP},
-        {ByteCode::StoreState, &ScriptExecution::executeStoreState}};
-    for (auto &pair : handlers) {
+    static unordered_map<InstructionType, function<void(ScriptExecution *, const Instruction &)>> g_handlers {
+        {InstructionType::CPDOWNSP, &ScriptExecution::executeCPDOWNSP},
+        {InstructionType::RSADDI, &ScriptExecution::executeRSADDI},
+        {InstructionType::RSADDF, &ScriptExecution::executeRSADDF},
+        {InstructionType::RSADDS, &ScriptExecution::executeRSADDS},
+        {InstructionType::RSADDO, &ScriptExecution::executeRSADDO},
+        {InstructionType::RSADDEFF, &ScriptExecution::executeRSADDEFF},
+        {InstructionType::RSADDEVT, &ScriptExecution::executeRSADDEVT},
+        {InstructionType::RSADDLOC, &ScriptExecution::executeRSADDLOC},
+        {InstructionType::RSADDTAL, &ScriptExecution::executeRSADDTAL},
+        {InstructionType::CPTOPSP, &ScriptExecution::executeCPTOPSP},
+        {InstructionType::CONSTI, &ScriptExecution::executeCONSTI},
+        {InstructionType::CONSTF, &ScriptExecution::executeCONSTF},
+        {InstructionType::CONSTS, &ScriptExecution::executeCONSTS},
+        {InstructionType::CONSTO, &ScriptExecution::executeCONSTO},
+        {InstructionType::ACTION, &ScriptExecution::executeACTION},
+        {InstructionType::LOGANDII, &ScriptExecution::executeLOGANDII},
+        {InstructionType::LOGORII, &ScriptExecution::executeLOGORII},
+        {InstructionType::INCORII, &ScriptExecution::executeINCORII},
+        {InstructionType::EXCORII, &ScriptExecution::executeEXCORII},
+        {InstructionType::BOOLANDII, &ScriptExecution::executeBOOLANDII},
+        {InstructionType::EQUALII, &ScriptExecution::executeEQUALxx},
+        {InstructionType::EQUALFF, &ScriptExecution::executeEQUALxx},
+        {InstructionType::EQUALSS, &ScriptExecution::executeEQUALxx},
+        {InstructionType::EQUALOO, &ScriptExecution::executeEQUALxx},
+        {InstructionType::EQUALEFFEFF, &ScriptExecution::executeEQUALxx},
+        {InstructionType::EQUALEVTEVT, &ScriptExecution::executeEQUALxx},
+        {InstructionType::EQUALLOCLOC, &ScriptExecution::executeEQUALxx},
+        {InstructionType::EQUALTALTAL, &ScriptExecution::executeEQUALxx},
+        {InstructionType::NEQUALII, &ScriptExecution::executeNEQUALxx},
+        {InstructionType::NEQUALFF, &ScriptExecution::executeNEQUALxx},
+        {InstructionType::NEQUALSS, &ScriptExecution::executeNEQUALxx},
+        {InstructionType::NEQUALOO, &ScriptExecution::executeNEQUALxx},
+        {InstructionType::NEQUALEFFEFF, &ScriptExecution::executeNEQUALxx},
+        {InstructionType::NEQUALEVTEVT, &ScriptExecution::executeNEQUALxx},
+        {InstructionType::NEQUALLOCLOC, &ScriptExecution::executeNEQUALxx},
+        {InstructionType::NEQUALTALTAL, &ScriptExecution::executeNEQUALxx},
+        {InstructionType::GEQII, &ScriptExecution::executeGEQxx},
+        {InstructionType::GEQFF, &ScriptExecution::executeGEQxx},
+        {InstructionType::GTII, &ScriptExecution::executeGTxx},
+        {InstructionType::GTFF, &ScriptExecution::executeGTxx},
+        {InstructionType::LTII, &ScriptExecution::executeLTxx},
+        {InstructionType::LTFF, &ScriptExecution::executeLTxx},
+        {InstructionType::LEQII, &ScriptExecution::executeLEQxx},
+        {InstructionType::LEQFF, &ScriptExecution::executeLEQxx},
+        {InstructionType::SHLEFTII, &ScriptExecution::executeSHLEFTII},
+        {InstructionType::SHRIGHTII, &ScriptExecution::executeSHRIGHTII},
+        {InstructionType::USHRIGHTII, &ScriptExecution::executeUSHRIGHTII},
+        {InstructionType::ADDII, &ScriptExecution::executeADDxx},
+        {InstructionType::ADDIF, &ScriptExecution::executeADDxx},
+        {InstructionType::ADDFI, &ScriptExecution::executeADDxx},
+        {InstructionType::ADDFF, &ScriptExecution::executeADDxx},
+        {InstructionType::ADDSS, &ScriptExecution::executeADDxx},
+        {InstructionType::ADDVV, &ScriptExecution::executeADDxx},
+        {InstructionType::SUBII, &ScriptExecution::executeSUBxx},
+        {InstructionType::SUBIF, &ScriptExecution::executeSUBxx},
+        {InstructionType::SUBFI, &ScriptExecution::executeSUBxx},
+        {InstructionType::SUBFF, &ScriptExecution::executeSUBxx},
+        {InstructionType::SUBVV, &ScriptExecution::executeSUBxx},
+        {InstructionType::MULII, &ScriptExecution::executeMULxx},
+        {InstructionType::MULIF, &ScriptExecution::executeMULxx},
+        {InstructionType::MULFI, &ScriptExecution::executeMULxx},
+        {InstructionType::MULFF, &ScriptExecution::executeMULxx},
+        {InstructionType::MULVF, &ScriptExecution::executeMULxx},
+        {InstructionType::MULFV, &ScriptExecution::executeMULxx},
+        {InstructionType::DIVII, &ScriptExecution::executeDIVxx},
+        {InstructionType::DIVIF, &ScriptExecution::executeDIVxx},
+        {InstructionType::DIVFI, &ScriptExecution::executeDIVxx},
+        {InstructionType::DIVFF, &ScriptExecution::executeDIVxx},
+        {InstructionType::DIVVF, &ScriptExecution::executeDIVxx},
+        {InstructionType::DIVFV, &ScriptExecution::executeDIVxx},
+        {InstructionType::MODII, &ScriptExecution::executeMODII},
+        {InstructionType::NEGI, &ScriptExecution::executeNEGI},
+        {InstructionType::NEGF, &ScriptExecution::executeNEGF},
+        {InstructionType::MOVSP, &ScriptExecution::executeMOVSP},
+        {InstructionType::JMP, &ScriptExecution::executeJMP},
+        {InstructionType::JSR, &ScriptExecution::executeJSR},
+        {InstructionType::JZ, &ScriptExecution::executeJZ},
+        {InstructionType::RETN, &ScriptExecution::executeRETN},
+        {InstructionType::DESTRUCT, &ScriptExecution::executeDESTRUCT},
+        {InstructionType::NOTI, &ScriptExecution::executeNOTI},
+        {InstructionType::DECISP, &ScriptExecution::executeDECISP},
+        {InstructionType::INCISP, &ScriptExecution::executeINCISP},
+        {InstructionType::JNZ, &ScriptExecution::executeJNZ},
+        {InstructionType::CPDOWNBP, &ScriptExecution::executeCPDOWNBP},
+        {InstructionType::CPTOPBP, &ScriptExecution::executeCPTOPBP},
+        {InstructionType::DECIBP, &ScriptExecution::executeDECIBP},
+        {InstructionType::INCIBP, &ScriptExecution::executeINCIBP},
+        {InstructionType::SAVEBP, &ScriptExecution::executeSAVEBP},
+        {InstructionType::RESTOREBP, &ScriptExecution::executeRESTOREBP},
+        {InstructionType::STORE_STATE, &ScriptExecution::executeSTORE_STATE}};
+    for (auto &pair : g_handlers) {
         registerHandler(pair.first, pair.second);
     }
-    _handlers.insert(make_pair(ByteCode::Noop, [](const Instruction &) {}));
+    _handlers.insert(make_pair(InstructionType::NOP, [](auto &) {}));
+    _handlers.insert(make_pair(InstructionType::NOP2, [](auto &) {}));
 }
 
 int ScriptExecution::run() {
-    debug(boost::format("Run '%s' as %u") % _program->name() % _context->callerId, LogChannels::script);
     uint32_t insOff = kStartInstructionOffset;
 
     if (_context->savedState) {
@@ -104,18 +152,25 @@ int ScriptExecution::run() {
         insOff = _context->savedState->insOffset;
     }
 
+    debug(boost::format("Run '%s': offset=%04x, caller=%u, triggerrer=%u") %
+              _program->name() %
+              insOff %
+              _context->callerId %
+              _context->triggererId,
+          LogChannels::script);
+
     while (insOff < _program->length()) {
         const Instruction &ins = _program->getInstruction(insOff);
-        auto handler = _handlers.find(ins.byteCode);
+        auto handler = _handlers.find(ins.type);
 
         if (handler == _handlers.end()) {
-            error("Byte code not implemented: " + describeByteCode(ins.byteCode), LogChannels::script);
+            error(boost::format("Instruction not implemented: %04x") % static_cast<int>(ins.type), LogChannels::script);
             return -1;
         }
         _nextInstruction = ins.nextOffset;
 
         if (isLogChannelEnabled(LogChannels::script3)) {
-            debug(boost::format("Instruction: %s") % describeInstruction(ins), LogChannels::script3);
+            debug(boost::format("Instruction: %s") % describeInstruction(ins, *_context->routines), LogChannels::script3);
         }
         try {
             handler->second(ins);
@@ -134,7 +189,7 @@ int ScriptExecution::run() {
     return -1;
 }
 
-void ScriptExecution::executeCopyDownSP(const Instruction &ins) {
+void ScriptExecution::executeCPDOWNSP(const Instruction &ins) {
     int count = ins.size / 4;
     int srcIdx = static_cast<int>(_stack.size()) - count;
     int dstIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
@@ -144,41 +199,39 @@ void ScriptExecution::executeCopyDownSP(const Instruction &ins) {
     }
 }
 
-void ScriptExecution::executeReserve(const Instruction &ins) {
-    Variable result;
-    switch (ins.type) {
-    case InstructionType::Int:
-        result.type = VariableType::Int;
-        break;
-    case InstructionType::Float:
-        result.type = VariableType::Float;
-        break;
-    case InstructionType::String:
-        result.type = VariableType::String;
-        break;
-    case InstructionType::Object:
-        result.type = VariableType::Object;
-        break;
-    case InstructionType::Effect:
-        result.type = VariableType::Effect;
-        break;
-    case InstructionType::Event:
-        result.type = VariableType::Event;
-        break;
-    case InstructionType::Location:
-        result.type = VariableType::Location;
-        break;
-    case InstructionType::Talent:
-        result.type = VariableType::Talent;
-        break;
-    default:
-        result.type = VariableType::Void;
-        break;
-    }
-    _stack.push_back(move(result));
+void ScriptExecution::executeRSADDI(const Instruction &ins) {
+    _stack.push_back(Variable::ofInt(0));
 }
 
-void ScriptExecution::executeCopyTopSP(const Instruction &ins) {
+void ScriptExecution::executeRSADDF(const Instruction &ins) {
+    _stack.push_back(Variable::ofFloat(0.0f));
+}
+
+void ScriptExecution::executeRSADDS(const Instruction &ins) {
+    _stack.push_back(Variable::ofString(""));
+}
+
+void ScriptExecution::executeRSADDO(const Instruction &ins) {
+    _stack.push_back(Variable::ofObject(kObjectInvalid));
+}
+
+void ScriptExecution::executeRSADDEFF(const Instruction &ins) {
+    _stack.push_back(Variable::ofEffect(nullptr));
+}
+
+void ScriptExecution::executeRSADDEVT(const Instruction &ins) {
+    _stack.push_back(Variable::ofEvent(nullptr));
+}
+
+void ScriptExecution::executeRSADDLOC(const Instruction &ins) {
+    _stack.push_back(Variable::ofLocation(nullptr));
+}
+
+void ScriptExecution::executeRSADDTAL(const Instruction &ins) {
+    _stack.push_back(Variable::ofTalent(nullptr));
+}
+
+void ScriptExecution::executeCPTOPSP(const Instruction &ins) {
     int count = ins.size / 4;
     int srcIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
 
@@ -187,28 +240,24 @@ void ScriptExecution::executeCopyTopSP(const Instruction &ins) {
     }
 }
 
-void ScriptExecution::executePushConstant(const Instruction &ins) {
-    switch (ins.type) {
-    case InstructionType::Int:
-        _stack.push_back(Variable::ofInt(ins.intValue));
-        break;
-    case InstructionType::Float:
-        _stack.push_back(Variable::ofFloat(ins.floatValue));
-        break;
-    case InstructionType::Object: {
-        uint32_t objectId = ins.objectId == kObjectSelf ? _context->callerId : ins.objectId;
-        _stack.push_back(Variable::ofObject(objectId));
-        break;
-    }
-    case InstructionType::String:
-        _stack.push_back(Variable::ofString(ins.strValue));
-        break;
-    default:
-        throw invalid_argument("Invalid instruction type: " + to_string(static_cast<int>(ins.type)));
-    }
+void ScriptExecution::executeCONSTI(const Instruction &ins) {
+    _stack.push_back(Variable::ofInt(ins.intValue));
 }
 
-void ScriptExecution::executeCallRoutine(const Instruction &ins) {
+void ScriptExecution::executeCONSTF(const Instruction &ins) {
+    _stack.push_back(Variable::ofFloat(ins.floatValue));
+}
+
+void ScriptExecution::executeCONSTS(const Instruction &ins) {
+    _stack.push_back(Variable::ofString(ins.strValue));
+}
+
+void ScriptExecution::executeCONSTO(const Instruction &ins) {
+    uint32_t objectId = ins.objectId == kObjectSelf ? _context->callerId : ins.objectId;
+    _stack.push_back(Variable::ofObject(objectId));
+}
+
+void ScriptExecution::executeACTION(const Instruction &ins) {
     const Routine &routine = _context->routines->get(ins.routine);
 
     if (ins.argCount > routine.getArgumentCount()) {
@@ -284,7 +333,7 @@ Variable ScriptExecution::getFloatFromStack() {
     return move(var);
 }
 
-void ScriptExecution::executeLogicalAnd(const Instruction &ins) {
+void ScriptExecution::executeLOGANDII(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
@@ -299,35 +348,35 @@ void ScriptExecution::getTwoIntegersFromStack(Variable &left, Variable &right) {
     _stack.pop_back();
 }
 
-void ScriptExecution::executeLogicalOr(const Instruction &ins) {
+void ScriptExecution::executeLOGORII(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
     _stack.push_back(Variable::ofInt(static_cast<int>(left.intValue || right.intValue)));
 }
 
-void ScriptExecution::executeInclusiveBitwiseOr(const Instruction &ins) {
+void ScriptExecution::executeINCORII(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
     _stack.push_back(Variable::ofInt(left.intValue | right.intValue));
 }
 
-void ScriptExecution::executeExclusiveBitwiseOr(const Instruction &ins) {
+void ScriptExecution::executeEXCORII(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
     _stack.push_back(Variable::ofInt(left.intValue ^ right.intValue));
 }
 
-void ScriptExecution::executeBitwiseAnd(const Instruction &ins) {
+void ScriptExecution::executeBOOLANDII(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
     _stack.push_back(Variable::ofInt(left.intValue & right.intValue));
 }
 
-void ScriptExecution::executeEqual(const Instruction &ins) {
+void ScriptExecution::executeEQUALxx(const Instruction &ins) {
     size_t stackSize = _stack.size();
     bool equal = _stack[stackSize - 2] == _stack[stackSize - 1];
 
@@ -336,7 +385,7 @@ void ScriptExecution::executeEqual(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(static_cast<int>(equal)));
 }
 
-void ScriptExecution::executeNotEqual(const Instruction &ins) {
+void ScriptExecution::executeNEQUALxx(const Instruction &ins) {
     size_t stackSize = _stack.size();
     bool notEqual = _stack[stackSize - 2] != _stack[stackSize - 1];
 
@@ -345,7 +394,7 @@ void ScriptExecution::executeNotEqual(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(static_cast<int>(notEqual)));
 }
 
-void ScriptExecution::executeGreaterThanOrEqual(const Instruction &ins) {
+void ScriptExecution::executeGEQxx(const Instruction &ins) {
     size_t stackSize = _stack.size();
     bool ge = _stack[stackSize - 2] >= _stack[stackSize - 1];
 
@@ -354,7 +403,7 @@ void ScriptExecution::executeGreaterThanOrEqual(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(static_cast<int>(ge)));
 }
 
-void ScriptExecution::executeGreaterThan(const Instruction &ins) {
+void ScriptExecution::executeGTxx(const Instruction &ins) {
     size_t stackSize = _stack.size();
     bool greater = _stack[stackSize - 2] > _stack[stackSize - 1];
 
@@ -363,7 +412,7 @@ void ScriptExecution::executeGreaterThan(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(static_cast<int>(greater)));
 }
 
-void ScriptExecution::executeLessThan(const Instruction &ins) {
+void ScriptExecution::executeLTxx(const Instruction &ins) {
     size_t stackSize = _stack.size();
     bool less = _stack[stackSize - 2] < _stack[stackSize - 1];
 
@@ -372,7 +421,7 @@ void ScriptExecution::executeLessThan(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(static_cast<int>(less)));
 }
 
-void ScriptExecution::executeLessThanOrEqual(const Instruction &ins) {
+void ScriptExecution::executeLEQxx(const Instruction &ins) {
     size_t stackSize = _stack.size();
     bool le = _stack[stackSize - 2] <= _stack[stackSize - 1];
 
@@ -381,21 +430,21 @@ void ScriptExecution::executeLessThanOrEqual(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(static_cast<int>(le)));
 }
 
-void ScriptExecution::executeShiftLeft(const Instruction &ins) {
+void ScriptExecution::executeSHLEFTII(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
     _stack.push_back(Variable::ofInt(left.intValue << right.intValue));
 }
 
-void ScriptExecution::executeShiftRight(const Instruction &ins) {
+void ScriptExecution::executeSHRIGHTII(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
     _stack.push_back(Variable::ofInt(left.intValue >> right.intValue));
 }
 
-void ScriptExecution::executeUnsignedShiftRight(const Instruction &ins) {
+void ScriptExecution::executeUSHRIGHTII(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
@@ -403,7 +452,7 @@ void ScriptExecution::executeUnsignedShiftRight(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(left.intValue >> right.intValue));
 }
 
-void ScriptExecution::executeAdd(const Instruction &ins) {
+void ScriptExecution::executeADDxx(const Instruction &ins) {
     size_t stackSize = _stack.size();
     Variable result(_stack[stackSize - 2] + _stack[stackSize - 1]);
 
@@ -412,7 +461,7 @@ void ScriptExecution::executeAdd(const Instruction &ins) {
     _stack.push_back(move(result));
 }
 
-void ScriptExecution::executeSubtract(const Instruction &ins) {
+void ScriptExecution::executeSUBxx(const Instruction &ins) {
     size_t stackSize = _stack.size();
     Variable result(_stack[stackSize - 2] - _stack[stackSize - 1]);
 
@@ -421,7 +470,7 @@ void ScriptExecution::executeSubtract(const Instruction &ins) {
     _stack.push_back(move(result));
 }
 
-void ScriptExecution::executeMultiply(const Instruction &ins) {
+void ScriptExecution::executeMULxx(const Instruction &ins) {
     size_t stackSize = _stack.size();
     Variable result(_stack[stackSize - 2] * _stack[stackSize - 1]);
 
@@ -430,7 +479,7 @@ void ScriptExecution::executeMultiply(const Instruction &ins) {
     _stack.push_back(move(result));
 }
 
-void ScriptExecution::executeDivide(const Instruction &ins) {
+void ScriptExecution::executeDIVxx(const Instruction &ins) {
     size_t stackSize = _stack.size();
     Variable result(_stack[stackSize - 2] / _stack[stackSize - 1]);
 
@@ -439,43 +488,38 @@ void ScriptExecution::executeDivide(const Instruction &ins) {
     _stack.push_back(move(result));
 }
 
-void ScriptExecution::executeMod(const Instruction &ins) {
+void ScriptExecution::executeMODII(const Instruction &ins) {
     Variable left, right;
     getTwoIntegersFromStack(left, right);
 
     _stack.push_back(Variable::ofInt(left.intValue % right.intValue));
 }
 
-void ScriptExecution::executeNegate(const Instruction &ins) {
-    switch (ins.type) {
-    case InstructionType::Int:
-        _stack.back().intValue *= -1;
-        break;
-    case InstructionType::Float:
-        _stack.back().floatValue *= -1.0f;
-        break;
-    default:
-        break;
-    }
+void ScriptExecution::executeNEGI(const Instruction &ins) {
+    _stack.back().intValue *= -1;
 }
 
-void ScriptExecution::executeAdjustSP(const Instruction &ins) {
+void ScriptExecution::executeNEGF(const Instruction &ins) {
+    _stack.back().floatValue *= -1.0f;
+}
+
+void ScriptExecution::executeMOVSP(const Instruction &ins) {
     int count = -ins.stackOffset / 4;
     for (int i = 0; i < count; ++i) {
         _stack.pop_back();
     }
 }
 
-void ScriptExecution::executeJump(const Instruction &ins) {
+void ScriptExecution::executeJMP(const Instruction &ins) {
     _nextInstruction = ins.jumpOffset;
 }
 
-void ScriptExecution::executeJumpToSubroutine(const Instruction &ins) {
+void ScriptExecution::executeJSR(const Instruction &ins) {
     _returnOffsets.push_back(ins.nextOffset);
     _nextInstruction = ins.jumpOffset;
 }
 
-void ScriptExecution::executeJumpIfZero(const Instruction &ins) {
+void ScriptExecution::executeJZ(const Instruction &ins) {
     bool zero = _stack.back().intValue == 0;
     _stack.pop_back();
 
@@ -484,7 +528,7 @@ void ScriptExecution::executeJumpIfZero(const Instruction &ins) {
     }
 }
 
-void ScriptExecution::executeReturn(const Instruction &ins) {
+void ScriptExecution::executeRETN(const Instruction &ins) {
     if (_returnOffsets.empty()) {
         _nextInstruction = _program->length();
     } else {
@@ -493,7 +537,7 @@ void ScriptExecution::executeReturn(const Instruction &ins) {
     }
 }
 
-void ScriptExecution::executeDestruct(const Instruction &ins) {
+void ScriptExecution::executeDESTRUCT(const Instruction &ins) {
     int startIdx = static_cast<int>(_stack.size()) - ins.size / 4;
     int startIdxNoDestroy = startIdx + ins.stackOffset / 4;
     int countNoDestroy = ins.sizeNoDestroy / 4;
@@ -504,24 +548,24 @@ void ScriptExecution::executeDestruct(const Instruction &ins) {
     _stack.resize(startIdx + countNoDestroy);
 }
 
-void ScriptExecution::executeDecRelToSP(const Instruction &ins) {
+void ScriptExecution::executeDECISP(const Instruction &ins) {
     int dstIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
     _stack[dstIdx].intValue--;
 }
 
-void ScriptExecution::executeIncRelToSP(const Instruction &ins) {
+void ScriptExecution::executeINCISP(const Instruction &ins) {
     int dstIdx = static_cast<int>(_stack.size()) + ins.stackOffset / 4;
     _stack[dstIdx].intValue++;
 }
 
-void ScriptExecution::executeLogicalNot(const Instruction &ins) {
+void ScriptExecution::executeNOTI(const Instruction &ins) {
     bool zero = _stack.back().intValue == 0;
     _stack.pop_back();
 
     _stack.push_back(Variable::ofInt(static_cast<int>(zero)));
 }
 
-void ScriptExecution::executeJumpIfNonZero(const Instruction &ins) {
+void ScriptExecution::executeJNZ(const Instruction &ins) {
     bool zero = _stack.back().intValue == 0;
     _stack.pop_back();
 
@@ -530,7 +574,7 @@ void ScriptExecution::executeJumpIfNonZero(const Instruction &ins) {
     }
 }
 
-void ScriptExecution::executeCopyDownBP(const Instruction &ins) {
+void ScriptExecution::executeCPDOWNBP(const Instruction &ins) {
     int count = ins.size / 4;
     int srcIdx = static_cast<int>(_stack.size()) - count;
     int dstIdx = _globalCount + ins.stackOffset / 4;
@@ -540,7 +584,7 @@ void ScriptExecution::executeCopyDownBP(const Instruction &ins) {
     }
 }
 
-void ScriptExecution::executeCopyTopBP(const Instruction &ins) {
+void ScriptExecution::executeCPTOPBP(const Instruction &ins) {
     int count = ins.size / 4;
     int srcIdx = _globalCount + ins.stackOffset / 4;
 
@@ -549,27 +593,27 @@ void ScriptExecution::executeCopyTopBP(const Instruction &ins) {
     }
 }
 
-void ScriptExecution::executeDecRelToBP(const Instruction &ins) {
+void ScriptExecution::executeDECIBP(const Instruction &ins) {
     int dstIdx = _globalCount + ins.stackOffset / 4;
     _stack[dstIdx].intValue--;
 }
 
-void ScriptExecution::executeIncRelToBP(const Instruction &ins) {
+void ScriptExecution::executeINCIBP(const Instruction &ins) {
     int dstIdx = _globalCount + ins.stackOffset / 4;
     _stack[dstIdx].intValue++;
 }
 
-void ScriptExecution::executeSaveBP(const Instruction &ins) {
+void ScriptExecution::executeSAVEBP(const Instruction &ins) {
     _globalCount = static_cast<int>(_stack.size());
     _stack.push_back(Variable::ofInt(_globalCount));
 }
 
-void ScriptExecution::executeRestoreBP(const Instruction &ins) {
+void ScriptExecution::executeRESTOREBP(const Instruction &ins) {
     _globalCount = _stack.back().intValue;
     _stack.pop_back();
 }
 
-void ScriptExecution::executeStoreState(const Instruction &ins) {
+void ScriptExecution::executeSTORE_STATE(const Instruction &ins) {
     int count = ins.size / 4;
     int srcIdx = _globalCount - count;
 
@@ -587,7 +631,7 @@ void ScriptExecution::executeStoreState(const Instruction &ins) {
     }
 
     _savedState.program = _program;
-    _savedState.insOffset = ins.offset + static_cast<int>(ins.type);
+    _savedState.insOffset = ins.offset + 0x10;
 }
 
 int ScriptExecution::getStackSize() const {

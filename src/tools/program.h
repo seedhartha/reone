@@ -47,6 +47,7 @@ private:
     boost::filesystem::path _gamePath;
     boost::filesystem::path _destPath;
     std::string _target;
+    bool _tsl {false};
     tools::Operation _operation {tools::Operation::None};
     std::vector<std::shared_ptr<tools::ITool>> _tools;
 
