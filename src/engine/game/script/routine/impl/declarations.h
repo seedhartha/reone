@@ -21,16 +21,11 @@
 
 namespace reone {
 
-namespace script {
-
-struct ExecutionContext;
-
-}
-
 namespace game {
 
+struct RoutineContext;
+
 class Game;
-class RoutineContext;
 
 namespace routine {
 
