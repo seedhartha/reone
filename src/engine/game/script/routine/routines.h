@@ -62,7 +62,7 @@ public:
         _strings(strings) {
     }
 
-    const script::Routine &get(int index) override {
+    const script::Routine &get(int index) const override {
         return _routines[index];
     }
 

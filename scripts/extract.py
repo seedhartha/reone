@@ -33,8 +33,6 @@ game_tsl = None
 tools_dir = os.getenv("REONE_TOOLS_DIR")
 tools_exe = None
 extract_dir = os.getenv("REONE_EXTRACT_DIR")
-nwnnsscomp_dir = os.getenv("REONE_NWNNSSCOMP_DIR")
-nwnnsscomp_exe = None
 
 steps = [
     ["extract_bifs", "Extract BIF files (y/n)?"],
@@ -112,24 +110,6 @@ def configure_extract_dir():
         extract_dir = choose_directory("Choose an extraction directory")
         if not is_valid_extract_dir(extract_dir):
             exit(1)
-
-
-def is_valid_script_compiler_dir(dir):
-    if not dir or not os.path.isdir(dir):
-        return False
-    if find_path_ignore_case(dir, "nwnnsscomp.exe") is not None:
-        return True
-    print("Script compiler directory does not contain a compiler executable")
-    return False
-
-
-def configure_script_compiler_dir():
-    global nwnnsscomp_dir, nwnnsscomp_exe
-    if not is_valid_script_compiler_dir(nwnnsscomp_dir):
-        nwnnsscomp_dir = choose_directory("Choose a script compiler directory")
-        if not is_valid_script_compiler_dir(nwnnsscomp_dir):
-            exit(1)
-    nwnnsscomp_exe = find_path_ignore_case(nwnnsscomp_dir, "nwnnsscomp.exe")
 
 
 def get_or_create_dir(parent, name):
@@ -317,18 +297,18 @@ def convert_to_ascii_pth():
 
 
 def disassemble_scripts():
-    global game_tsl, extract_dir, nwnnsscomp_exe
+    global game_tsl, extract_dir, tools_exe
 
     for f in glob.glob("{}/**/*.ncs".format(extract_dir), recursive=True):
         filename, _ = os.path.splitext(f)
-        pcode_path = os.path.join(os.path.dirname(f), filename + ".pcode")
+        pcode_path = f + ".pcode"
         if os.path.exists(pcode_path):
             continue
         print("Disassembling {}...".format(f))
 
-        args = [nwnnsscomp_exe, "-d", f, "-o", pcode_path]
+        args = [tools_exe, "--to-pcode", f]
         if game_tsl:
-            args.append("-g 2")
+            args.append("--tsl=1")
 
         run_subprocess(args, silent=False)
 
@@ -393,5 +373,5 @@ for step in steps:
 
         if step[0] == "disassemble_scripts":
             configure_game_dir()
-            configure_script_compiler_dir()
+            configure_tools_dir()
             disassemble_scripts()

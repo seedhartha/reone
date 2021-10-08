@@ -217,7 +217,7 @@ void Area::loadPTH() {
         int material = 0;
 
         if (!testElevationAt(glm::vec2(point.x, point.y), z, material, room)) {
-            warn(boost::format("Area: point %d elevation not found") % i);
+            warn(boost::format("Point %d elevation not found") % i);
             continue;
         }
         pointZ.insert(make_pair(i, z));
@@ -776,7 +776,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
         if (trigger->isTenant(triggerrer) || !trigger->isIn(position2d))
             continue;
 
-        debug(boost::format("Area: trigger '%s' triggerred by '%s'") % trigger->tag() % triggerrer->tag());
+        debug(boost::format("Trigger '%s' triggerred by '%s'") % trigger->tag() % triggerrer->tag());
         trigger->addTenant(triggerrer);
 
         if (!trigger->linkedToModule().empty()) {
@@ -784,7 +784,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
             return;
         }
         if (!trigger->getOnEnter().empty()) {
-            _scriptRunner.run(trigger->getOnEnter(), triggerrer->id());
+            _scriptRunner.run(trigger->getOnEnter(), trigger->id(), triggerrer->id());
         }
     }
 }
@@ -889,7 +889,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
         break;
     }
     default:
-        warn("Area: createObject: unsupported object type: " + to_string(static_cast<int>(type)));
+        warn("Unsupported object type: " + to_string(static_cast<int>(type)));
         break;
     }
     if (!object)
@@ -1004,7 +1004,7 @@ shared_ptr<SpatialObject> Area::getNearestObject(const glm::vec3 &origin, int nt
 
     int candidateCount = static_cast<int>(candidates.size());
     if (nth >= candidateCount) {
-        debug(boost::format("Area: getNearestObject: nth is out of bounds: %d/%d") % nth % candidateCount);
+        debug(boost::format("getNearestObject: nth is out of bounds: %d/%d") % nth % candidateCount);
         return nullptr;
     }
 

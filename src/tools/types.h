@@ -36,7 +36,8 @@ enum class Operation {
     ToPTH,
     ToASCII,
     ToTLK,
-    ToLIP
+    ToLIP,
+    ToPCODE
 };
 
 } // namespace tools

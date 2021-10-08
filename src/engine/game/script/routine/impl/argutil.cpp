@@ -254,7 +254,7 @@ shared_ptr<Talent> getTalent(const vector<Variable> &args, int index) {
 }
 
 shared_ptr<ExecutionContext> getAction(const vector<Variable> &args, int index) {
-    return args[index].context;
+    return ensurePresent(args[index].context, "context");
 }
 
 } // namespace game

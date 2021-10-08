@@ -24,6 +24,8 @@ namespace reone {
 
 namespace script {
 
+#define R_INSTR_HANDLER(a) void execute##a(const Instruction &);
+
 struct ExecutionContext;
 struct Instruction;
 struct Variable;
@@ -42,16 +44,15 @@ public:
 private:
     std::shared_ptr<ScriptProgram> _program;
     std::unique_ptr<ExecutionContext> _context;
-    std::unordered_map<ByteCode, std::function<void(const Instruction &)>> _handlers;
+    std::unordered_map<InstructionType, std::function<void(const Instruction &)>> _handlers;
     std::vector<Variable> _stack;
     std::vector<uint32_t> _returnOffsets;
     uint32_t _nextInstruction {0};
     int _globalCount {0};
     ExecutionState _savedState;
 
-    template <class T>
-    void registerHandler(ByteCode code, T handler) {
-        _handlers.insert(std::make_pair(code, std::bind(handler, this, std::placeholders::_1)));
+    void registerHandler(InstructionType type, std::function<void(ScriptExecution *, const Instruction &)> handler) {
+        _handlers.insert(std::make_pair(type, std::bind(handler, this, std::placeholders::_1)));
     }
 
     Variable getVectorFromStack();
@@ -60,48 +61,59 @@ private:
 
     // Handlers
 
-    void executeCopyDownSP(const Instruction &ins);
-    void executeReserve(const Instruction &ins);
-    void executeCopyTopSP(const Instruction &ins);
-    void executePushConstant(const Instruction &ins);
-    void executeCallRoutine(const Instruction &ins);
-    void executeLogicalAnd(const Instruction &ins);
-    void executeLogicalOr(const Instruction &ins);
-    void executeInclusiveBitwiseOr(const Instruction &ins);
-    void executeExclusiveBitwiseOr(const Instruction &ins);
-    void executeBitwiseAnd(const Instruction &ins);
-    void executeEqual(const Instruction &ins);
-    void executeNotEqual(const Instruction &ins);
-    void executeGreaterThanOrEqual(const Instruction &ins);
-    void executeGreaterThan(const Instruction &ins);
-    void executeLessThan(const Instruction &ins);
-    void executeLessThanOrEqual(const Instruction &ins);
-    void executeShiftLeft(const Instruction &ins);
-    void executeShiftRight(const Instruction &ins);
-    void executeUnsignedShiftRight(const Instruction &ins);
-    void executeAdd(const Instruction &ins);
-    void executeSubtract(const Instruction &ins);
-    void executeMultiply(const Instruction &ins);
-    void executeDivide(const Instruction &ins);
-    void executeMod(const Instruction &ins);
-    void executeNegate(const Instruction &ins);
-    void executeAdjustSP(const Instruction &ins);
-    void executeJump(const Instruction &ins);
-    void executeJumpToSubroutine(const Instruction &ins);
-    void executeJumpIfZero(const Instruction &ins);
-    void executeReturn(const Instruction &ins);
-    void executeDestruct(const Instruction &ins);
-    void executeDecRelToSP(const Instruction &ins);
-    void executeIncRelToSP(const Instruction &ins);
-    void executeLogicalNot(const Instruction &ins);
-    void executeJumpIfNonZero(const Instruction &ins);
-    void executeCopyDownBP(const Instruction &ins);
-    void executeCopyTopBP(const Instruction &ins);
-    void executeDecRelToBP(const Instruction &ins);
-    void executeIncRelToBP(const Instruction &ins);
-    void executeSaveBP(const Instruction &ins);
-    void executeRestoreBP(const Instruction &ins);
-    void executeStoreState(const Instruction &ins);
+    R_INSTR_HANDLER(CPDOWNSP)
+    R_INSTR_HANDLER(RSADDI)
+    R_INSTR_HANDLER(RSADDF)
+    R_INSTR_HANDLER(RSADDS)
+    R_INSTR_HANDLER(RSADDO)
+    R_INSTR_HANDLER(RSADDEFF)
+    R_INSTR_HANDLER(RSADDEVT)
+    R_INSTR_HANDLER(RSADDLOC)
+    R_INSTR_HANDLER(RSADDTAL)
+    R_INSTR_HANDLER(CPTOPSP)
+    R_INSTR_HANDLER(CONSTI)
+    R_INSTR_HANDLER(CONSTF)
+    R_INSTR_HANDLER(CONSTS)
+    R_INSTR_HANDLER(CONSTO)
+    R_INSTR_HANDLER(ACTION)
+    R_INSTR_HANDLER(LOGANDII)
+    R_INSTR_HANDLER(LOGORII)
+    R_INSTR_HANDLER(INCORII)
+    R_INSTR_HANDLER(EXCORII)
+    R_INSTR_HANDLER(BOOLANDII)
+    R_INSTR_HANDLER(EQUALxx)
+    R_INSTR_HANDLER(NEQUALxx)
+    R_INSTR_HANDLER(GEQxx)
+    R_INSTR_HANDLER(GTxx)
+    R_INSTR_HANDLER(LTxx)
+    R_INSTR_HANDLER(LEQxx)
+    R_INSTR_HANDLER(SHLEFTII)
+    R_INSTR_HANDLER(SHRIGHTII)
+    R_INSTR_HANDLER(USHRIGHTII)
+    R_INSTR_HANDLER(ADDxx)
+    R_INSTR_HANDLER(SUBxx)
+    R_INSTR_HANDLER(MULxx)
+    R_INSTR_HANDLER(DIVxx)
+    R_INSTR_HANDLER(MODII)
+    R_INSTR_HANDLER(NEGI)
+    R_INSTR_HANDLER(NEGF)
+    R_INSTR_HANDLER(MOVSP)
+    R_INSTR_HANDLER(JMP)
+    R_INSTR_HANDLER(JSR)
+    R_INSTR_HANDLER(JZ)
+    R_INSTR_HANDLER(RETN)
+    R_INSTR_HANDLER(DESTRUCT)
+    R_INSTR_HANDLER(DECISP)
+    R_INSTR_HANDLER(INCISP)
+    R_INSTR_HANDLER(NOTI)
+    R_INSTR_HANDLER(JNZ)
+    R_INSTR_HANDLER(CPDOWNBP)
+    R_INSTR_HANDLER(CPTOPBP)
+    R_INSTR_HANDLER(DECIBP)
+    R_INSTR_HANDLER(INCIBP)
+    R_INSTR_HANDLER(SAVEBP)
+    R_INSTR_HANDLER(RESTOREBP)
+    R_INSTR_HANDLER(STORE_STATE)
 
     // END Handlers
 };

@@ -46,7 +46,8 @@ static const unordered_map<string, Operation> g_operations {
     {"to-pth", Operation::ToPTH},
     {"to-ascii", Operation::ToASCII},
     {"to-tlk", Operation::ToTLK},
-    {"to-lip", Operation::ToLIP}};
+    {"to-lip", Operation::ToLIP},
+    {"to-pcode", Operation::ToPCODE}};
 
 static fs::path getDestination(const po::variables_map &vars) {
     fs::path result;
@@ -85,22 +86,24 @@ int Program::run() {
 }
 
 void Program::initOptions() {
-    _optsCmdLine.add_options()                                             //
-        ("game", po::value<string>(), "path to game directory")            //
-        ("dest", po::value<string>(), "path to destination directory")     //
-        ("list", "list file contents")("extract", "extract file contents") //
-        ("unwrap", "unwrap an audio file")                                 //
-        ("to-json", "convert 2DA, GFF or TLK file to JSON")                //
-        ("to-tga", "convert TPC image to TGA")                             //
-        ("to-2da", "convert JSON to 2DA")                                  //
-        ("to-gff", "convert JSON to GFF")                                  //
-        ("to-rim", "create RIM archive from directory")                    //
-        ("to-erf", "create ERF archive from directory")                    //
-        ("to-mod", "create MOD archive from directory")                    //
-        ("to-pth", "convert ASCII PTH to binary PTH")                      //
-        ("to-ascii", "convert binary PTH to ASCII")                        //
-        ("to-tlk", "convert JSON to TLK")                                  //
-        ("to-lip", "convert JSON to LIP")                                  //
+    _optsCmdLine.add_options()                                                               //
+        ("game", po::value<string>(), "path to game directory")                              //
+        ("dest", po::value<string>(), "path to destination directory")                       //
+        ("tsl", po::value<bool>()->default_value(false), "is disassembled script from TSL?") //
+        ("list", "list file contents")("extract", "extract file contents")                   //
+        ("unwrap", "unwrap an audio file")                                                   //
+        ("to-json", "convert 2DA, GFF or TLK file to JSON")                                  //
+        ("to-tga", "convert TPC image to TGA")                                               //
+        ("to-2da", "convert JSON to 2DA")                                                    //
+        ("to-gff", "convert JSON to GFF")                                                    //
+        ("to-rim", "create RIM archive from directory")                                      //
+        ("to-erf", "create ERF archive from directory")                                      //
+        ("to-mod", "create MOD archive from directory")                                      //
+        ("to-pth", "convert ASCII PTH to binary PTH")                                        //
+        ("to-ascii", "convert binary PTH to ASCII")                                          //
+        ("to-tlk", "convert JSON to TLK")                                                    //
+        ("to-lip", "convert JSON to LIP")                                                    //
+        ("to-pcode", "convert NCS to PCODE")                                                 //
         ("target", po::value<string>(), "target name or path to input file");
 }
 
@@ -122,6 +125,7 @@ void Program::loadOptions() {
     _gamePath = _variables.count("game") > 0 ? _variables["game"].as<string>() : fs::current_path();
     _destPath = getDestination(_variables);
     _target = _variables.count("target") > 0 ? _variables["target"].as<string>() : "";
+    _tsl = _variables["tsl"].as<bool>();
 
     // Determine operation from program options
     for (auto &operation : g_operations) {
@@ -147,6 +151,7 @@ void Program::loadTools() {
     _tools.push_back(make_shared<TpcTool>());
     _tools.push_back(make_shared<PthTool>());
     _tools.push_back(make_shared<AudioTool>());
+    _tools.push_back(make_shared<NcsTool>(_tsl));
 }
 
 shared_ptr<ITool> Program::getTool() const {

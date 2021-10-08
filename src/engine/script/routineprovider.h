@@ -28,7 +28,7 @@ public:
     virtual ~IRoutineProvider() {
     }
 
-    virtual const Routine &get(int index) = 0;
+    virtual const Routine &get(int index) const = 0;
 };
 
 } // namespace script

@@ -36,8 +36,7 @@ BOOST_AUTO_TEST_CASE(WhenDESTRUCTByteCode) {
     auto program = make_shared<ScriptProgram>("");
 
     instr.offset = 13;
-    instr.byteCode = ByteCode::PushConstant;
-    instr.type = InstructionType::Int;
+    instr.type = InstructionType::CONSTI;
     instr.intValue = 0;
     instr.nextOffset = instr.offset + 6;
     program->add(instr);
@@ -58,7 +57,7 @@ BOOST_AUTO_TEST_CASE(WhenDESTRUCTByteCode) {
     program->add(instr);
 
     instr.offset = instr.nextOffset;
-    instr.byteCode = ByteCode::Destruct;
+    instr.type = InstructionType::DESTRUCT;
     instr.size = 16;
     instr.stackOffset = 4;
     instr.sizeNoDestroy = 4;
@@ -80,8 +79,7 @@ BOOST_AUTO_TEST_CASE(WhenCPTOPBPByteCode) {
     auto program = make_shared<ScriptProgram>("");
 
     instr.offset = 13;
-    instr.byteCode = ByteCode::PushConstant;
-    instr.type = InstructionType::Int;
+    instr.type = InstructionType::CONSTI;
     instr.intValue = 0;
     instr.nextOffset = instr.offset + 6;
     program->add(instr);
@@ -97,13 +95,12 @@ BOOST_AUTO_TEST_CASE(WhenCPTOPBPByteCode) {
     program->add(instr);
 
     instr.offset = instr.nextOffset;
-    instr.byteCode = ByteCode::SaveBP;
-    instr.type = InstructionType::None;
+    instr.type = InstructionType::SAVEBP;
     instr.nextOffset = instr.offset + 2;
     program->add(instr);
 
     instr.offset = instr.nextOffset;
-    instr.byteCode = ByteCode::CopyTopBP;
+    instr.type = InstructionType::CPTOPBP;
     instr.stackOffset = -8;
     instr.size = 8;
     instr.nextOffset = instr.offset + 8;
