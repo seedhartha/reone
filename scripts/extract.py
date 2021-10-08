@@ -16,7 +16,6 @@
 
 """
 Script to automate resource extraction and conversion.
-TODO: support case sensitive paths (Unix)
 """
 
 import glob
@@ -32,8 +31,10 @@ import tkinter.filedialog
 game_dir = os.getenv("REONE_GAME_DIR")
 game_tsl = None
 tools_dir = os.getenv("REONE_TOOLS_DIR")
+tools_exe = None
 extract_dir = os.getenv("REONE_EXTRACT_DIR")
 nwnnsscomp_dir = os.getenv("REONE_NWNNSSCOMP_DIR")
+nwnnsscomp_exe = None
 
 steps = [
     ["extract_bifs", "Extract BIF files (y/n)?"],
@@ -50,12 +51,18 @@ steps = [
     ]
 
 
+def find_path_ignore_case(dir, name):
+    for f in os.listdir(dir):
+        if f.lower() == name.lower():
+            return os.path.join(dir, f)
+    return None
+
+
 def is_valid_game_dir(dir):
     if not dir or not os.path.isdir(dir):
         return False
-    for f in os.listdir(dir):
-        if f == "chitin.key":
-            return True
+    if find_path_ignore_case(dir, "chitin.key") is not None:
+        return True
     print("Game directory does not contain a keyfile")
     return False
 
@@ -70,33 +77,29 @@ def configure_game_dir():
         game_dir = choose_directory("Choose a game directory")
         if not is_valid_game_dir(game_dir):
             exit(1)
-    tsl_exe_path = os.path.join(game_dir, "swkotor2.exe")
-    game_tsl = os.path.isfile(tsl_exe_path)
+    game_tsl = find_path_ignore_case(game_dir, "swkotor2.exe") is not None
 
 
 def is_valid_tools_dir(dir):
     if not dir or not os.path.isdir(dir):
         return False
-    for f in os.listdir(dir):
-        if os.path.splitext(f)[0] == "reone-tools":
-            return True
+    if find_path_ignore_case(dir, "reone-tools") is not None:
+        return True
+    if find_path_ignore_case(dir, "reone-tools.exe") is not None:
+        return True
     print("Tools directory does not contain a tools executable")
     return False
 
 
-def append_dir_to_path(dir):
-    if os.path.exists(dir) and (not dir in os.environ["PATH"]):
-        separator = ":" if platform.system() == "Linux" else ";"
-        os.environ["PATH"] = separator.join([os.environ["PATH"], dir])
-
-
 def configure_tools_dir():
-    global tools_dir
+    global tools_dir, tools_exe
     if not is_valid_tools_dir(tools_dir):
         tools_dir = choose_directory("Choose a tools directory")
         if not is_valid_tools_dir(tools_dir):
             exit(1)
-    append_dir_to_path(tools_dir)
+    tools_exe = find_path_ignore_case(tools_dir, "reone-tools")
+    if tools_exe is None:
+        tools_exe = find_path_ignore_case(tools_dir, "reone-tools.exe")
 
 
 def is_valid_extract_dir(dir):
@@ -114,20 +117,26 @@ def configure_extract_dir():
 def is_valid_script_compiler_dir(dir):
     if not dir or not os.path.isdir(dir):
         return False
-    for f in os.listdir(dir):
-        if os.path.splitext(f)[0] == "nwnnsscomp":
-            return True
+    if find_path_ignore_case(dir, "nwnnsscomp.exe") is not None:
+        return True
     print("Script compiler directory does not contain a compiler executable")
     return False
 
 
 def configure_script_compiler_dir():
-    global nwnnsscomp_dir
+    global nwnnsscomp_dir, nwnnsscomp_exe
     if not is_valid_script_compiler_dir(nwnnsscomp_dir):
         nwnnsscomp_dir = choose_directory("Choose a script compiler directory")
         if not is_valid_script_compiler_dir(nwnnsscomp_dir):
             exit(1)
-    append_dir_to_path(nwnnsscomp_dir)
+    nwnnsscomp_exe = find_path_ignore_case(nwnnsscomp_dir, "nwnnsscomp.exe")
+
+
+def get_or_create_dir(parent, name):
+    path = os.path.join(parent, name)
+    if not os.path.exists(path):
+        os.mkdir(path)
+    return path
 
 
 def run_subprocess(args, silent=True, check_retcode=True):
@@ -138,131 +147,125 @@ def run_subprocess(args, silent=True, check_retcode=True):
 
 
 def extract_bifs():
-    global game_dir, extract_dir
+    global game_dir, extract_dir, tools_exe
 
     # Create destination directory if it does not exist
-    dest_dir = os.path.join(extract_dir, "data")
-    if not os.path.exists(dest_dir):
-        os.mkdir(dest_dir)
+    dest_dir = get_or_create_dir(extract_dir, "data")
 
     # Extract all BIF files
-    data_dir = os.path.join(game_dir, "data")
-    if os.path.exists(data_dir):
-        for f in os.listdir(data_dir):
-            if f.lower().endswith(".bif"):
-                print("Extracting {}...".format(f))
-                bif_path = os.path.join(data_dir, f)
-                run_subprocess(["reone-tools", "--game", game_dir, "--extract", bif_path, "--dest", dest_dir])
+    data_dir = find_path_ignore_case(game_dir, "data")
+    if data_dir is None:
+        return
+    for f in os.listdir(data_dir):
+        if f.lower().endswith(".bif"):
+            print("Extracting {}...".format(f))
+            bif_path = os.path.join(data_dir, f)
+            run_subprocess([tools_exe, "--game", game_dir, "--extract", bif_path, "--dest", dest_dir])
 
 
 def extract_patch():
-    global game_dir, extract_dir
+    global game_dir, extract_dir, tools_exe
 
     # Create destination directory if it does not exist
-    dest_dir = os.path.join(extract_dir, "patch")
-    if not os.path.exists(dest_dir):
-        os.mkdir(dest_dir)
+    dest_dir = get_or_create_dir(extract_dir, "patch")
 
     # Extract patch.erf
-    patch_path = os.path.join(game_dir, "patch.erf")
-    if os.path.exists(patch_path):
-        print("Extracting patch.erf")
-        run_subprocess(["reone-tools", "--extract", patch_path, "--dest", dest_dir])
+    patch_path = find_path_ignore_case(game_dir, "patch.erf")
+    if patch_path is None:
+        return
+    print("Extracting patch.erf")
+    run_subprocess([tools_exe, "--extract", patch_path, "--dest", dest_dir])
 
 
 def extract_modules():
-    global game_dir, extract_dir
+    global game_dir, extract_dir, tools_exe
 
     # Create destination directory if it does not exist
-    dest_dir_base = os.path.join(extract_dir, "modules")
-    if not os.path.exists(dest_dir_base):
-        os.mkdir(dest_dir_base)
+    dest_dir_base = get_or_create_dir(extract_dir, "modules")
 
     # Extract all module RIM and ERF files
-    modules_dir = os.path.join(game_dir, "modules")
-    if os.path.exists(modules_dir):
-        for f in os.listdir(modules_dir):
-            if f.lower().endswith(".rim") or f.lower().endswith(".erf"):
-                dest_dir = os.path.join(dest_dir_base, f[:-3])
-                if not os.path.exists(dest_dir):
-                    os.mkdir(dest_dir)
-                print("Extracting {}...".format(f))
-                rim_path = os.path.join(modules_dir, f)
-                run_subprocess(["reone-tools", "--extract", rim_path, "--dest", dest_dir])
+    modules_dir = find_path_ignore_case(game_dir, "modules")
+    if modules_dir is None:
+        return
+    for f in os.listdir(modules_dir):
+        if f.lower().endswith(".rim") or f.lower().endswith(".erf"):
+            dest_dir = get_or_create_dir(dest_dir_base, f[:-4])
+            print("Extracting {}...".format(f))
+            rim_path = os.path.join(modules_dir, f)
+            run_subprocess([tools_exe, "--extract", rim_path, "--dest", dest_dir])
 
 
 def extract_textures():
-    global game_dir, extract_dir
+    global game_dir, extract_dir, tools_exe
 
     TEXTURE_PACKS = ["swpc_tex_gui.erf", "swpc_tex_tpa.erf"]
 
     # Create destination directory if it does not exist
-    dest_dir = os.path.join(extract_dir, "data", "textures")
-    if not os.path.exists(dest_dir):
-        os.makedirs(dest_dir)
+    data_dir = get_or_create_dir(extract_dir, "data")
+    dest_dir = get_or_create_dir(data_dir, "textures")
 
     # Extract textures packs
-    texture_packs_dir = os.path.join(game_dir, "texturepacks")
-    if os.path.exists(texture_packs_dir):
-        for f in os.listdir(texture_packs_dir):
-            if f in TEXTURE_PACKS:
-                texture_pack_dir = os.path.join(texture_packs_dir, f)
-                print("Extracting {}...".format(texture_pack_dir))
-                run_subprocess(["reone-tools", "--extract", texture_pack_dir, "--dest", dest_dir])
+    texture_packs_dir = find_path_ignore_case(game_dir, "texturepacks")
+    if texture_packs_dir is None:
+        return
+    for f in os.listdir(texture_packs_dir):
+        if f in TEXTURE_PACKS:
+            texture_pack_dir = os.path.join(texture_packs_dir, f)
+            print("Extracting {}...".format(texture_pack_dir))
+            run_subprocess([tools_exe, "--extract", texture_pack_dir, "--dest", dest_dir])
 
 
 def extract_dialog():
     global game_dir, extract_dir
 
-    tlk_path = os.path.join(game_dir, "dialog.tlk")
-    if os.path.exists(tlk_path):
-        print("Copying {}...".format(tlk_path))
-        try:
-            shutil.copy(tlk_path, extract_dir)
-        except PermissionError:
-            pass
+    tlk_path = find_path_ignore_case(game_dir, "dialog.tlk")
+    if tlk_path is None:
+        return
+    print("Copying {}...".format(tlk_path))
+    try:
+        shutil.copy(tlk_path, extract_dir)
+    except PermissionError:
+        pass
 
 
 def extract_voices():
     global game_dir, extract_dir
 
     # Create destination directory if it does not exist
-    dest_dir = os.path.join(extract_dir, "voices")
-    if not os.path.exists(dest_dir):
-        os.mkdir(dest_dir)
+    dest_dir = get_or_create_dir(extract_dir, "voices")
 
     # Extract audio files from streamwaves/streamvoice
-    voices_dir = os.path.join(game_dir, "streamwaves")
-    if not os.path.exists(voices_dir):
-        voices_dir = os.path.join(game_dir, "streamvoice")
-    if os.path.exists(voices_dir):
-        for f in glob.glob("{}/**".format(voices_dir), recursive=True):
-            _, extension = os.path.splitext(f)
-            if extension == ".wav":
-                dest_path = os.path.join(dest_dir, os.path.basename(f))
-                try:
-                    shutil.copyfile(f, dest_path)
-                except PermissionError:
-                    pass
+    voices_dir = find_path_ignore_case(game_dir, "streamwaves")
+    if voices_dir is None:
+        voices_dir = find_path_ignore_case(game_dir, "streamvoice")
+    if voices_dir is None:
+        return
+    for f in glob.glob("{}/**".format(voices_dir), recursive=True):
+        _, extension = os.path.splitext(f)
+        if extension.lower() == ".wav":
+            dest_path = os.path.join(dest_dir, os.path.basename(f))
+            try:
+                shutil.copyfile(f, dest_path)
+            except PermissionError:
+                pass
 
 
 def extract_lips():
-    global game_dir, extract_dir
+    global game_dir, extract_dir, tools_exe
 
     # Create destination directory if it does not exist
-    dest_dir = os.path.join(extract_dir, "lips")
-    if not os.path.exists(dest_dir):
-        os.mkdir(dest_dir)
+    dest_dir = get_or_create_dir(extract_dir, "lips")
 
     # Extract LIP files from lips
-    lips_dir = os.path.join(game_dir, "lips")
-    if os.path.exists(lips_dir):
-        for f in os.listdir(lips_dir):
-            _, extension = os.path.splitext(f)
-            if extension == ".mod":
-                mod_path = os.path.join(lips_dir, f)
-                print("Extracting {}...".format(mod_path))
-                run_subprocess(["reone-tools", "--extract", mod_path, "--dest", dest_dir])
+    lips_dir = find_path_ignore_case(game_dir, "lips")
+    if lips_dir is None:
+        return
+    for f in os.listdir(lips_dir):
+        _, extension = os.path.splitext(f)
+        if extension.lower() == ".mod":
+            mod_path = os.path.join(lips_dir, f)
+            print("Extracting {}...".format(mod_path))
+            run_subprocess([tools_exe, "--extract", mod_path, "--dest", dest_dir])
 
 
 def is_convertible_to_json(path):
@@ -278,53 +281,56 @@ def is_convertible_to_json(path):
         ]
 
     _, extension = os.path.splitext(path)
-    return extension in CONVERTIBLE_EXT
+    return extension.lower() in CONVERTIBLE_EXT
 
 
 def convert_to_json():
-    global extract_dir
+    global extract_dir, tools_exe
 
     for f in glob.glob("{}/**".format(extract_dir), recursive=True):
         if is_convertible_to_json(f):
             json_path = f + ".json"
-            if not os.path.exists(json_path):
-                print("Converting {} to JSON...".format(f))
-                run_subprocess(["reone-tools", "--to-json", f])
+            if os.path.exists(json_path):
+                continue
+            print("Converting {} to JSON...".format(f))
+            run_subprocess([tools_exe, "--to-json", f])
 
 
 def convert_to_tga():
-    global extract_dir
+    global extract_dir, tools_exe
 
     for f in glob.glob("{}/**/*.tpc".format(extract_dir), recursive=True):
         filename, _ = os.path.splitext(f)
         tga_path = os.path.join(os.path.dirname(f), filename + ".tga")
-        if not os.path.exists(tga_path):
-            print("Converting {} to TGA/TXI...".format(f))
-            run_subprocess(["reone-tools", "--to-tga", f], check_retcode=False)
+        if os.path.exists(tga_path):
+            continue
+        print("Converting {} to TGA/TXI...".format(f))
+        run_subprocess([tools_exe, "--to-tga", f], check_retcode=False)
 
 
 def convert_to_ascii_pth():
-    global extract_dir
+    global extract_dir, tools_exe
 
     for f in glob.glob("{}/**/*.pth".format(extract_dir), recursive=True):
         print("Converting {} to ASCII PTH...".format(f))
-        run_subprocess(["reone-tools", "--to-ascii", f])
+        run_subprocess([tools_exe, "--to-ascii", f])
 
 
 def disassemble_scripts():
-    global game_tsl, extract_dir
+    global game_tsl, extract_dir, nwnnsscomp_exe
 
     for f in glob.glob("{}/**/*.ncs".format(extract_dir), recursive=True):
         filename, _ = os.path.splitext(f)
         pcode_path = os.path.join(os.path.dirname(f), filename + ".pcode")
-        if not os.path.exists(pcode_path):
-            print("Disassembling {}...".format(f))
+        if os.path.exists(pcode_path):
+            continue
+        print("Disassembling {}...".format(f))
 
-            args = ["nwnnsscomp", "-d", f, "-o", pcode_path]
-            if game_tsl:
-                args.append("-g 2")
+        args = [nwnnsscomp_exe, "-d", f, "-o", pcode_path]
+        if game_tsl:
+            args.append("-g 2")
 
-            run_subprocess(args, silent=False)
+        run_subprocess(args, silent=False)
 
 
 root = tkinter.Tk()
