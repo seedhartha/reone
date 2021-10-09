@@ -104,6 +104,11 @@ set(COMMON_SOURCES
 add_library(libcommon STATIC ${COMMON_HEADERS} ${COMMON_SOURCES})
 set_target_properties(libcommon PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(libcommon PRIVATE src/engine/pch.h)
+target_link_libraries(libcommon PUBLIC ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+
+if(NOT MSVC)
+    target_link_libraries(libcommon PRIVATE Threads::Threads -latomic)
+endif()
 
 ## END libcommon static library
 
@@ -266,6 +271,13 @@ set(GRAPHICS_SOURCES
 add_library(libgraphics STATIC ${GRAPHICS_HEADERS} ${GRAPHICS_SOURCES})
 set_target_properties(libgraphics PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(libgraphics PRIVATE src/engine/pch.h)
+target_link_libraries(libgraphics PUBLIC libs3tc GLEW::GLEW ${OPENGL_LIBRARIES})
+
+if(MSVC)
+    target_link_libraries(libgraphics PUBLIC SDL2::SDL2)
+else()
+    target_link_libraries(libgraphics PUBLIC ${SDL2_LIBRARIES})
+endif()
 
 ## END libgraphics static library
 
@@ -294,6 +306,12 @@ set(AUDIO_SOURCES
 add_library(libaudio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES})
 set_target_properties(libaudio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(libaudio PRIVATE src/engine/pch.h)
+target_link_libraries(libaudio PUBLIC ${MAD_LIBRARY})
+if(MSVC)
+    target_link_libraries(libaudio PUBLIC OpenAL::OpenAL)
+else()
+    target_link_libraries(libaudio PUBLIC ${OpenAL_LIBRARIES})
+endif()
 
 ## END libaudio static library
 
@@ -313,6 +331,7 @@ target_precompile_headers(libvideo PRIVATE src/engine/pch.h)
 
 if(ENABLE_VIDEO)
     target_compile_definitions(libvideo PRIVATE R_ENABLE_VIDEO)
+    target_link_libraries(libvideo PUBLIC ${FFMPEG_LIBRARIES})
 endif()
 
 ## END libvideo static library
@@ -928,6 +947,7 @@ set(GAME_SOURCES
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(libgame PRIVATE src/engine/pch.h)
+target_link_libraries(libgame PUBLIC libscript libgui libscene libvideo libaudio libgraphics libresource libcommon)
 
 ## END libgame static library
 
@@ -968,24 +988,7 @@ endif()
 add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_precompile_headers(reone PRIVATE src/engine/pch.h)
-
-target_link_libraries(reone PRIVATE
-    libgame libscript libgui libscene libvideo libaudio libgraphics libresource libcommon
-    libs3tc
-    ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
-    GLEW::GLEW
-    ${OPENGL_LIBRARIES}
-    ${MAD_LIBRARY})
-
-if(MSVC)
-    target_link_libraries(reone PRIVATE SDL2::SDL2 OpenAL::OpenAL)
-else()
-    target_link_libraries(reone PRIVATE ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads -latomic)
-endif()
-
-if(ENABLE_VIDEO)
-    target_link_libraries(reone PRIVATE ${FFMPEG_LIBRARIES})
-endif()
+target_link_libraries(reone PRIVATE libgame ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 list(APPEND InstallTargets reone)
 
@@ -1017,24 +1020,7 @@ if(BUILD_TOOLS)
     add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
     set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     target_precompile_headers(reone-tools PRIVATE src/engine/pch.h)
-
-    target_link_libraries(reone-tools PRIVATE
-        libgame libscript libgui libscene libvideo libaudio libgraphics libresource libcommon
-        libs3tc
-        ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_REGEX_LIBRARY} ${Boost_SYSTEM_LIBRARY}
-        GLEW::GLEW
-        ${OPENGL_LIBRARIES}
-        ${MAD_LIBRARY})
-
-    if(MSVC)
-        target_link_libraries(reone-tools PRIVATE SDL2::SDL2 OpenAL::OpenAL)
-    else()
-        target_link_libraries(reone-tools PRIVATE ${SDL2_LIBRARIES} ${SDL2_LIBRARIES} ${OpenAL_LIBRARIES} Threads::Threads -latomic)
-    endif()
-
-    if(ENABLE_VIDEO)
-        target_link_libraries(reone-tools PRIVATE ${FFMPEG_LIBRARIES})
-    endif()
+    target_link_libraries(reone-tools PRIVATE libgame ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_REGEX_LIBRARY})
 
     list(APPEND InstallTargets reone-tools)
 endif()
@@ -1045,6 +1031,8 @@ endif()
 
 if(BUILD_LAUNCHER)
     if(wxWidgets_FOUND)
+        include(${wxWidgets_USE_FILE})
+
         set(LAUNCHER_HEADERS
             src/launcher/app.h
             src/launcher/frame.h)
@@ -1060,11 +1048,10 @@ if(BUILD_LAUNCHER)
             add_executable(reone-launcher ${LAUNCHER_HEADERS} ${LAUNCHER_SOURCES})
         endif()
 
-        include(${wxWidgets_USE_FILE})
-        target_link_libraries(reone-launcher ${wxWidgets_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
-
         set_target_properties(reone-launcher PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
         target_precompile_headers(reone-launcher PRIVATE src/engine/pch.h)
+        target_link_libraries(reone-launcher ${wxWidgets_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+
         list(APPEND InstallTargets reone-launcher)
     else()
         message(WARNING "wxWidgets not found - launcher cannot be built")
@@ -1090,17 +1077,8 @@ if(BUILD_TESTS)
         tests/script/execution.cpp)
 
     add_executable(reone-tests ${TEST_SOURCES})
-    target_link_libraries(reone-tests PRIVATE
-        libgame libscript libresource libcommon
-        ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-
-    if(MSVC)
-        target_link_libraries(reone-tests PRIVATE SDL2::SDL2)
-    else()
-        target_link_libraries(reone-tests PRIVATE ${SDL2_LIBRARIES})
-    endif()
-
     target_precompile_headers(reone-tests PRIVATE src/engine/pch.h)
+    target_link_libraries(reone-tests PRIVATE libgame ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
     enable_testing()
     add_test(reone-tests reone-tests)
