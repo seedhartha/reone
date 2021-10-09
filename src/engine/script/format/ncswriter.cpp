@@ -1,0 +1,120 @@
+/*
+ * Copyright (c) 2020-2021 The reone project contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "ncswriter.h"
+
+#include "../../common/collectionutil.h"
+#include "../../common/streamutil.h"
+#include "../../common/streamwriter.h"
+
+#include "../program.h"
+
+using namespace std;
+
+namespace endian = boost::endian;
+namespace fs = boost::filesystem;
+
+namespace reone {
+
+namespace script {
+
+void NcsWriter::save(const fs::path &path) {
+    auto stream = make_shared<ostringstream>();
+    StreamWriter writer(stream, endian::order::big);
+
+    auto instructions = mapToValues(_program.instructions());
+    sort(instructions.begin(), instructions.end(), [](auto &a, auto &b) { return a.offset < b.offset; });
+
+    for (auto &ins : instructions) {
+        auto pos = 13 + static_cast<uint32_t>(writer.tell());
+        if (pos != ins.offset) {
+            throw runtime_error(str(boost::format("Instruction offset mismatch: expected=%04x, actual=%04x") % ins.offset % pos));
+        }
+
+        writer.putByte(static_cast<int>(ins.type) & 0xff);
+        writer.putByte((static_cast<int>(ins.type) >> 8) & 0xff);
+
+        switch (ins.type) {
+        case InstructionType::CPDOWNSP:
+        case InstructionType::CPTOPSP:
+        case InstructionType::CPDOWNBP:
+        case InstructionType::CPTOPBP:
+            writer.putInt32(ins.stackOffset);
+            writer.putUint16(ins.size);
+            break;
+        case InstructionType::CONSTI:
+            writer.putInt32(ins.intValue);
+            break;
+        case InstructionType::CONSTF:
+            writer.putFloat(ins.floatValue);
+            break;
+        case InstructionType::CONSTS: {
+            writer.putUint16(ins.strValue.length());
+            writer.putString(ins.strValue);
+            break;
+        }
+        case InstructionType::CONSTO:
+            writer.putInt32(ins.objectId);
+            break;
+        case InstructionType::ACTION:
+            writer.putUint16(ins.routine);
+            writer.putByte(ins.argCount);
+            break;
+        case InstructionType::MOVSP:
+            writer.putInt32(ins.stackOffset);
+            break;
+        case InstructionType::JMP:
+        case InstructionType::JSR:
+        case InstructionType::JZ:
+        case InstructionType::JNZ:
+            writer.putInt32(ins.jumpOffset - ins.offset);
+            break;
+        case InstructionType::DESTRUCT:
+            writer.putUint16(ins.size);
+            writer.putInt16(ins.stackOffset);
+            writer.putUint16(ins.sizeNoDestroy);
+            break;
+        case InstructionType::DECISP:
+        case InstructionType::INCISP:
+        case InstructionType::DECIBP:
+        case InstructionType::INCIBP:
+            writer.putInt32(ins.stackOffset);
+            break;
+        case InstructionType::STORE_STATE:
+            writer.putUint32(ins.size);
+            writer.putUint32(ins.sizeLocals);
+            break;
+        case InstructionType::EQUALTT:
+            writer.putUint16(ins.size);
+            break;
+        default:
+            break;
+        }
+    }
+
+    auto ncs = make_shared<fs::ofstream>(path);
+    StreamWriter ncsWriter(ncs, endian::order::big);
+
+    ncsWriter.putString(string("NCS V1.0", 8));
+    ncsWriter.putByte(0x42);
+    ncsWriter.putUint32(13 + writer.tell());
+    ncsWriter.putString(stream->str());
+}
+
+} // namespace script
+
+} // namespace reone

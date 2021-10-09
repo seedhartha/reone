@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "types.h"
+
 namespace reone {
 
 namespace script {
@@ -26,6 +28,7 @@ class IRoutineProvider;
 struct Instruction;
 
 std::string describeInstruction(const Instruction &ins, const IRoutineProvider &routines);
+InstructionType parseInstructionType(const std::string &desc);
 
 } // namespace script
 

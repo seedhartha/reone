@@ -42,6 +42,18 @@ inline std::map<Src, Dest> associate(const std::vector<Src> &source, const std::
     return move(result);
 }
 
+template <class Src, class K, class V>
+inline std::map<K, V> associate(
+    const std::vector<Src> &source,
+    const std::function<K(const Src &)> &keyFn,
+    const std::function<V(const Src &)> &valueFn) {
+    std::map<K, V> result;
+    for (auto &item : source) {
+        result.insert(make_pair(keyFn(item), valueFn(item)));
+    }
+    return move(result);
+}
+
 template <class K, class V>
 inline V getFromLookupOrNull(const std::map<K, V> &lookup, K key) {
     auto maybeValue = lookup.find(key);
@@ -85,6 +97,15 @@ inline std::vector<V> mapToValues(const std::unordered_map<K, V> &map) {
         values.push_back(pair.second);
     }
     return move(values);
+}
+
+template <class K, class V>
+inline std::vector<std::pair<K, V>> mapToEntries(const std::unordered_map<K, V> &map) {
+    std::vector<std::pair<K, V>> entries;
+    for (auto &pair : map) {
+        entries.push_back(pair);
+    }
+    return move(entries);
 }
 
 } // namespace reone
