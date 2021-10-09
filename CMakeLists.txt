@@ -653,7 +653,6 @@ set(GAME_HEADERS
     src/engine/game/core/gui/saveload.h
     src/engine/game/core/gui/selectoverlay.h
     src/engine/game/core/gui/sounds.h
-    src/engine/game/core/kotor.h
     src/engine/game/core/location.h
     src/engine/game/core/map.h
     src/engine/game/core/object/area.h
@@ -685,17 +684,18 @@ set(GAME_HEADERS
     src/engine/game/core/script/routine/impl/declarations.h
     src/engine/game/core/script/routine/impl/objectutil.h
     src/engine/game/core/script/routine/iroutines.h
-    src/engine/game/core/script/routine/registrar/kotor.h
-    src/engine/game/core/script/routine/registrar/registrar.h
-    src/engine/game/core/script/routine/registrar/tsl.h
+    src/engine/game/core/script/routine/registrar.h
     src/engine/game/core/script/routine/routines.h
     src/engine/game/core/script/runner.h
     src/engine/game/core/soundsets.h
     src/engine/game/core/surface.h
     src/engine/game/core/surfaces.h
     src/engine/game/core/talent.h
-    src/engine/game/core/tsl.h
-    src/engine/game/core/types.h)
+    src/engine/game/core/types.h
+    src/engine/game/kotor/kotor.h
+    src/engine/game/kotor/routine/registrar/kotor.h
+    src/engine/game/tsl/routine/registrar/tsl.h
+    src/engine/game/tsl/tsl.h)
 
 set(GAME_SOURCES
     src/engine/game/core/action/action.cpp
@@ -891,7 +891,6 @@ set(GAME_SOURCES
     src/engine/game/core/gui/saveload.cpp
     src/engine/game/core/gui/selectoverlay.cpp
     src/engine/game/core/gui/sounds.cpp
-    src/engine/game/core/kotor.cpp
     src/engine/game/core/map.cpp
     src/engine/game/core/object/area.cpp
     src/engine/game/core/object/creature.cpp
@@ -937,12 +936,13 @@ set(GAME_SOURCES
     src/engine/game/core/script/routine/impl/talent.cpp
     src/engine/game/core/script/routine/impl/time.cpp
     src/engine/game/core/script/routine/impl/vector.cpp
-    src/engine/game/core/script/routine/registrar/kotor.cpp
-    src/engine/game/core/script/routine/registrar/tsl.cpp
     src/engine/game/core/script/runner.cpp
     src/engine/game/core/soundsets.cpp
     src/engine/game/core/surfaces.cpp
-    src/engine/game/core/tsl.cpp)
+    src/engine/game/kotor/kotor.cpp
+    src/engine/game/kotor/routine/registrar/kotor.cpp
+    src/engine/game/tsl/routine/registrar/tsl.cpp
+    src/engine/game/tsl/tsl.cpp)
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
