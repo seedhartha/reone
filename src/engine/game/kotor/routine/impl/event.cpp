@@ -26,10 +26,9 @@
 
 #include "../../../core/event.h"
 #include "../../../core/game.h"
+#include "../../../core/script/routine/argutil.h"
 #include "../../../core/script/routine/context.h"
 #include "../../../core/script/runner.h"
-
-#include "argutil.h"
 
 using namespace std;
 

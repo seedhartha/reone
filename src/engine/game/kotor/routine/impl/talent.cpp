@@ -25,10 +25,9 @@
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/types.h"
 
+#include "../../../core/script/routine/argutil.h"
 #include "../../../core/script/routine/context.h"
 #include "../../../core/talent.h"
-
-#include "argutil.h"
 
 using namespace std;
 

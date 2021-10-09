@@ -425,30 +425,6 @@ Variable setPlayerTunnelInfinite(const vector<Variable> &args, const RoutineCont
     throw NotImplementedException();
 }
 
-Variable getSwoopUpgrade(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable getTrackPosition(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable setFollowerPosition(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable destroyMiniGameObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable setJumpSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable playerApplyForce(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
 } // namespace minigame
 
 } // namespace routine

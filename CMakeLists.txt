@@ -646,8 +646,10 @@ set(GAMECORE_HEADERS
     src/engine/game/core/reputes.h
     src/engine/game/core/room.h
     src/engine/game/core/savedgame.h
+    src/engine/game/core/script/routine/argutil.h
     src/engine/game/core/script/routine/context.h
     src/engine/game/core/script/routine/iroutines.h
+    src/engine/game/core/script/routine/objectutil.h
     src/engine/game/core/script/routine/registrar.h
     src/engine/game/core/script/routine/routines.h
     src/engine/game/core/script/runner.h
@@ -840,6 +842,7 @@ set(GAMECORE_SOURCES
     src/engine/game/core/profileoverlay.cpp
     src/engine/game/core/reputes.cpp
     src/engine/game/core/room.cpp
+    src/engine/game/core/script/routine/argutil.cpp
     src/engine/game/core/script/runner.cpp
     src/engine/game/core/soundsets.cpp
     src/engine/game/core/surfaces.cpp)
@@ -888,9 +891,7 @@ set(KOTOR_HEADERS
     src/engine/game/kotor/gui/selectoverlay.h
     src/engine/game/kotor/gui/sounds.h
     src/engine/game/kotor/kotor.h
-    src/engine/game/kotor/routine/impl/argutil.h
     src/engine/game/kotor/routine/impl/declarations.h
-    src/engine/game/kotor/routine/impl/objectutil.h
     src/engine/game/kotor/routine/registrar.h)
 
 set(KOTOR_SOURCES
@@ -930,7 +931,6 @@ set(KOTOR_SOURCES
     src/engine/game/kotor/kotor.cpp
     src/engine/game/kotor/routine/impl/action.cpp
     src/engine/game/kotor/routine/impl/ambientsound.cpp
-    src/engine/game/kotor/routine/impl/argutil.cpp
     src/engine/game/kotor/routine/impl/convert.cpp
     src/engine/game/kotor/routine/impl/effect.cpp
     src/engine/game/kotor/routine/impl/encounter.cpp
@@ -963,11 +963,17 @@ target_link_libraries(libkotor PUBLIC libgamecore)
 ## libtsl static library
 
 set(TSL_HEADERS
+    src/engine/game/tsl/routine/impl/declarations.h
     src/engine/game/tsl/routine/registrar.h
     src/engine/game/tsl/tsl.h)
 
 set(TSL_SOURCES
     src/engine/game/tsl/routine/registrar.cpp
+    src/engine/game/tsl/routine/impl/action.cpp
+    src/engine/game/tsl/routine/impl/effect.cpp
+    src/engine/game/tsl/routine/impl/main.cpp
+    src/engine/game/tsl/routine/impl/minigame.cpp
+    src/engine/game/tsl/routine/impl/party.cpp
     src/engine/game/tsl/tsl.cpp)
 
 add_library(libtsl STATIC ${TSL_HEADERS} ${TSL_SOURCES})
