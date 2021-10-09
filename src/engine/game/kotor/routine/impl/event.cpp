@@ -16,17 +16,18 @@
  */
 
 /** @file
- *  Implementation of movie-related routines.
+ *  Implementation of event-related routines.
  */
 
 #include "declarations.h"
 
-#include "../../../../../script/exception/notimpl.h"
-#include "../../../../../script/types.h"
+#include "../../../../common/logutil.h"
+#include "../../../../script/exception/notimpl.h"
 
-#include "../../../game.h"
-
-#include "../context.h"
+#include "../../../core/event.h"
+#include "../../../core/game.h"
+#include "../../../core/script/routine/context.h"
+#include "../../../core/script/runner.h"
 
 #include "argutil.h"
 
@@ -40,23 +41,32 @@ namespace game {
 
 namespace routine {
 
-Variable playMovie(const vector<Variable> &args, const RoutineContext &ctx) {
-    string movie(boost::to_lower_copy(getString(args, 0)));
+Variable signalEvent(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto object = getObject(args, 0, ctx);
+    auto toRun = getEvent(args, 1);
 
-    ctx.game.playVideo(movie);
+    debug(boost::format("Event signalled: %s %s") % object->tag() % toRun->number());
+    ctx.scriptRunner.run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
 
     return Variable::ofNull();
 }
 
-Variable isMoviePlaying(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable eventUserDefined(const vector<Variable> &args, const RoutineContext &ctx) {
+    int eventNumber = getInt(args, 0);
+    auto event = make_shared<Event>(eventNumber);
+
+    return Variable::ofEvent(event);
+}
+
+Variable eventSpellCastAt(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable queueMovie(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable eventConversation(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playMovieQueue(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable eventActivateItem(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

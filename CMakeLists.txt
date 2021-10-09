@@ -647,9 +647,6 @@ set(GAMECORE_HEADERS
     src/engine/game/core/room.h
     src/engine/game/core/savedgame.h
     src/engine/game/core/script/routine/context.h
-    src/engine/game/core/script/routine/impl/argutil.h
-    src/engine/game/core/script/routine/impl/declarations.h
-    src/engine/game/core/script/routine/impl/objectutil.h
     src/engine/game/core/script/routine/iroutines.h
     src/engine/game/core/script/routine/registrar.h
     src/engine/game/core/script/routine/routines.h
@@ -843,29 +840,6 @@ set(GAMECORE_SOURCES
     src/engine/game/core/profileoverlay.cpp
     src/engine/game/core/reputes.cpp
     src/engine/game/core/room.cpp
-    src/engine/game/core/script/routine/impl/action.cpp
-    src/engine/game/core/script/routine/impl/ambientsound.cpp
-    src/engine/game/core/script/routine/impl/argutil.cpp
-    src/engine/game/core/script/routine/impl/convert.cpp
-    src/engine/game/core/script/routine/impl/effect.cpp
-    src/engine/game/core/script/routine/impl/encounter.cpp
-    src/engine/game/core/script/routine/impl/event.cpp
-    src/engine/game/core/script/routine/impl/log.cpp
-    src/engine/game/core/script/routine/impl/main.cpp
-    src/engine/game/core/script/routine/impl/math.cpp
-    src/engine/game/core/script/routine/impl/minigame.cpp
-    src/engine/game/core/script/routine/impl/movie.cpp
-    src/engine/game/core/script/routine/impl/music.cpp
-    src/engine/game/core/script/routine/impl/party.cpp
-    src/engine/game/core/script/routine/impl/perception.cpp
-    src/engine/game/core/script/routine/impl/planet.cpp
-    src/engine/game/core/script/routine/impl/random.cpp
-    src/engine/game/core/script/routine/impl/soundobject.cpp
-    src/engine/game/core/script/routine/impl/stealth.cpp
-    src/engine/game/core/script/routine/impl/string.cpp
-    src/engine/game/core/script/routine/impl/talent.cpp
-    src/engine/game/core/script/routine/impl/time.cpp
-    src/engine/game/core/script/routine/impl/vector.cpp
     src/engine/game/core/script/runner.cpp
     src/engine/game/core/soundsets.cpp
     src/engine/game/core/surfaces.cpp)
@@ -914,6 +888,9 @@ set(KOTOR_HEADERS
     src/engine/game/kotor/gui/selectoverlay.h
     src/engine/game/kotor/gui/sounds.h
     src/engine/game/kotor/kotor.h
+    src/engine/game/kotor/routine/impl/argutil.h
+    src/engine/game/kotor/routine/impl/declarations.h
+    src/engine/game/kotor/routine/impl/objectutil.h
     src/engine/game/kotor/routine/registrar.h)
 
 set(KOTOR_SOURCES
@@ -951,6 +928,29 @@ set(KOTOR_SOURCES
     src/engine/game/kotor/gui/selectoverlay.cpp
     src/engine/game/kotor/gui/sounds.cpp
     src/engine/game/kotor/kotor.cpp
+    src/engine/game/kotor/routine/impl/action.cpp
+    src/engine/game/kotor/routine/impl/ambientsound.cpp
+    src/engine/game/kotor/routine/impl/argutil.cpp
+    src/engine/game/kotor/routine/impl/convert.cpp
+    src/engine/game/kotor/routine/impl/effect.cpp
+    src/engine/game/kotor/routine/impl/encounter.cpp
+    src/engine/game/kotor/routine/impl/event.cpp
+    src/engine/game/kotor/routine/impl/log.cpp
+    src/engine/game/kotor/routine/impl/main.cpp
+    src/engine/game/kotor/routine/impl/math.cpp
+    src/engine/game/kotor/routine/impl/minigame.cpp
+    src/engine/game/kotor/routine/impl/movie.cpp
+    src/engine/game/kotor/routine/impl/music.cpp
+    src/engine/game/kotor/routine/impl/party.cpp
+    src/engine/game/kotor/routine/impl/perception.cpp
+    src/engine/game/kotor/routine/impl/planet.cpp
+    src/engine/game/kotor/routine/impl/random.cpp
+    src/engine/game/kotor/routine/impl/soundobject.cpp
+    src/engine/game/kotor/routine/impl/stealth.cpp
+    src/engine/game/kotor/routine/impl/string.cpp
+    src/engine/game/kotor/routine/impl/talent.cpp
+    src/engine/game/kotor/routine/impl/time.cpp
+    src/engine/game/kotor/routine/impl/vector.cpp
     src/engine/game/kotor/routine/registrar.cpp)
 
 add_library(libkotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES})

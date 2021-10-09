@@ -21,12 +21,11 @@
 
 #include "declarations.h"
 
-#include "../../../../../common/logutil.h"
-#include "../../../../../script/exception/notimpl.h"
+#include "../../../../common/logutil.h"
+#include "../../../../script/exception/notimpl.h"
 
-#include "../../../object/object.h"
-
-#include "../context.h"
+#include "../../../core/object/object.h"
+#include "../../../core/script/routine/context.h"
 
 #include "argutil.h"
 

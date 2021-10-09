@@ -21,9 +21,9 @@
 
 #include "declarations.h"
 
-#include "../../../../../script/exception/notimpl.h"
+#include "../../../../script/exception/notimpl.h"
 
-#include "../context.h"
+#include "../../../core/script/routine/context.h"
 
 using namespace std;
 

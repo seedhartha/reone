@@ -21,9 +21,9 @@
 
 #include "declarations.h"
 
-#include "../../../../../script/types.h"
+#include "../../../../script/types.h"
 
-#include "../context.h"
+#include "../../../core/script/routine/context.h"
 
 #include "argutil.h"
 

@@ -16,19 +16,16 @@
  */
 
 /** @file
- *  Implementation of event-related routines.
+ *  Implementation of movie-related routines.
  */
 
 #include "declarations.h"
 
-#include "../../../../../common/logutil.h"
-#include "../../../../../script/exception/notimpl.h"
+#include "../../../../script/exception/notimpl.h"
+#include "../../../../script/types.h"
 
-#include "../../../event.h"
-#include "../../../game.h"
-#include "../../../script/runner.h"
-
-#include "../context.h"
+#include "../../../core/game.h"
+#include "../../../core/script/routine/context.h"
 
 #include "argutil.h"
 
@@ -42,32 +39,23 @@ namespace game {
 
 namespace routine {
 
-Variable signalEvent(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto object = getObject(args, 0, ctx);
-    auto toRun = getEvent(args, 1);
+Variable playMovie(const vector<Variable> &args, const RoutineContext &ctx) {
+    string movie(boost::to_lower_copy(getString(args, 0)));
 
-    debug(boost::format("Event signalled: %s %s") % object->tag() % toRun->number());
-    ctx.scriptRunner.run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
+    ctx.game.playVideo(movie);
 
     return Variable::ofNull();
 }
 
-Variable eventUserDefined(const vector<Variable> &args, const RoutineContext &ctx) {
-    int eventNumber = getInt(args, 0);
-    auto event = make_shared<Event>(eventNumber);
-
-    return Variable::ofEvent(event);
-}
-
-Variable eventSpellCastAt(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable isMoviePlaying(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable eventConversation(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable queueMovie(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable eventActivateItem(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable playMovieQueue(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

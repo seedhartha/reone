@@ -21,14 +21,13 @@
 
 #include "declarations.h"
 
-#include "../../../../../common/logutil.h"
-#include "../../../../../script/exception/argument.h"
+#include "../../../../common/logutil.h"
+#include "../../../../script/exception/argument.h"
 
-#include "../../../action/factory.h"
-#include "../../../game.h"
-#include "../../../object/creature.h"
-
-#include "../context.h"
+#include "../../../core/action/factory.h"
+#include "../../../core/game.h"
+#include "../../../core/object/creature.h"
+#include "../../../core/script/routine/context.h"
 
 #include "argutil.h"
 
