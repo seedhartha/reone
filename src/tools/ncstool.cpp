@@ -176,6 +176,7 @@ private:
             });
             break;
         case InstructionType::EQUALTT:
+        case InstructionType::NEQUALTT:
             applyArguments(argsLine, "^ (\\d+)$", 1, [&ins](auto &args) {
                 ins.size = atoi(args[0].c_str());
             });

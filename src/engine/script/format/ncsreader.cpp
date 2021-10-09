@@ -106,6 +106,7 @@ void NcsReader::readInstruction(size_t &offset) {
         ins.sizeLocals = readUint32();
         break;
     case InstructionType::EQUALTT:
+    case InstructionType::NEQUALTT:
         ins.size = readUint16();
         break;
     case InstructionType::NOP:
@@ -134,7 +135,6 @@ void NcsReader::readInstruction(size_t &offset) {
     case InstructionType::NEQUALFF:
     case InstructionType::NEQUALSS:
     case InstructionType::NEQUALOO:
-    case InstructionType::NEQUALTT:
     case InstructionType::NEQUALEFFEFF:
     case InstructionType::NEQUALEVTEVT:
     case InstructionType::NEQUALLOCLOC:

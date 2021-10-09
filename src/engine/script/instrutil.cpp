@@ -163,6 +163,10 @@ string describeInstruction(const Instruction &ins, const IRoutineProvider &routi
     case InstructionType::ACTION:
         desc += str(boost::format(" %s(%d), %d") % routines.get(ins.routine).name() % ins.routine % ins.argCount);
         break;
+    case InstructionType::EQUALTT:
+    case InstructionType::NEQUALTT:
+        desc += " " + to_string(ins.size);
+        break;
     case InstructionType::MOVSP:
         desc += str(boost::format(" %d") % ins.stackOffset);
         break;
