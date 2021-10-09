@@ -27,11 +27,9 @@
 #include "../../../core/effect/effect.h"
 #include "../../../core/effect/factory.h"
 #include "../../../core/game.h"
-#include "../../../core/types.h"
-
+#include "../../../core/script/routine/argutil.h"
 #include "../../../core/script/routine/context.h"
-
-#include "argutil.h"
+#include "../../../core/types.h"
 
 using namespace std;
 
@@ -487,61 +485,6 @@ Variable effectCutSceneParalyze(const vector<Variable> &args, const RoutineConte
 
 Variable effectCutSceneStunned(const vector<Variable> &args, const RoutineContext &ctx) {
     auto effect = ctx.effectFactory.newCutsceneStunned();
-    return Variable::ofEffect(move(effect));
-}
-
-Variable effectForceBody(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newForceBody();
-    return Variable::ofEffect(move(effect));
-}
-
-Variable effectFury(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newFury();
-    return Variable::ofEffect(move(effect));
-}
-
-Variable effectBlind(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newBlind();
-    return Variable::ofEffect(move(effect));
-}
-
-Variable effectFPRegenModifier(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newFPRegenModifier();
-    return Variable::ofEffect(move(effect));
-}
-
-Variable effectVPRegenModifier(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newVPRegenModifier();
-    return Variable::ofEffect(move(effect));
-}
-
-Variable effectCrush(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newCrush();
-    return Variable::ofEffect(move(effect));
-}
-
-Variable effectDroidConfused(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDroidConfused();
-    return Variable::ofEffect(move(effect));
-}
-
-Variable effectForceSight(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newForceSight();
-    return Variable::ofEffect(move(effect));
-}
-
-Variable effectMindTrick(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newMindTrick();
-    return Variable::ofEffect(move(effect));
-}
-
-Variable effectFactionModifier(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newFactionModifier();
-    return Variable::ofEffect(move(effect));
-}
-
-Variable effectDroidScramble(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDroidScramble();
     return Variable::ofEffect(move(effect));
 }
 

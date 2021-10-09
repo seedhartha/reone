@@ -27,9 +27,8 @@
 #include "../../../core/action/factory.h"
 #include "../../../core/game.h"
 #include "../../../core/object/creature.h"
+#include "../../../core/script/routine/argutil.h"
 #include "../../../core/script/routine/context.h"
-
-#include "argutil.h"
 
 using namespace std;
 
@@ -477,24 +476,6 @@ Variable actionBarkString(const vector<Variable> &args, const RoutineContext &ct
 
 Variable actionFollowLeader(const vector<Variable> &args, const RoutineContext &ctx) {
     auto action = ctx.actionFactory.newFollowLeader();
-    getCaller(ctx)->addAction(move(action));
-
-    return Variable::ofNull();
-}
-
-Variable actionFollowOwner(const vector<Variable> &args, const RoutineContext &ctx) {
-    float range = getFloatOrElse(args, 0, 2.5f);
-
-    auto action = ctx.actionFactory.newFollowOwner();
-    getCaller(ctx)->addAction(move(action));
-
-    return Variable::ofNull();
-}
-
-Variable actionSwitchWeapons(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: arguments
-
-    auto action = ctx.actionFactory.newSwitchWeapons();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();

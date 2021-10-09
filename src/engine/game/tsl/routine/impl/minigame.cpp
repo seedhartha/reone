@@ -16,17 +16,12 @@
  */
 
 /** @file
- *  Implementation of movie-related routines.
+ *  Implementation of minigame-related routines.
  */
 
 #include "declarations.h"
 
 #include "../../../../script/exception/notimpl.h"
-#include "../../../../script/types.h"
-
-#include "../../../core/game.h"
-#include "../../../core/script/routine/argutil.h"
-#include "../../../core/script/routine/context.h"
 
 using namespace std;
 
@@ -38,25 +33,33 @@ namespace game {
 
 namespace routine {
 
-Variable playMovie(const vector<Variable> &args, const RoutineContext &ctx) {
-    string movie(boost::to_lower_copy(getString(args, 0)));
+namespace minigame {
 
-    ctx.game.playVideo(movie);
-
-    return Variable::ofNull();
-}
-
-Variable isMoviePlaying(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getSwoopUpgrade(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable queueMovie(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getTrackPosition(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playMovieQueue(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setFollowerPosition(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
+
+Variable destroyMiniGameObject(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable setJumpSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable playerApplyForce(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+} // namespace minigame
 
 } // namespace routine
 

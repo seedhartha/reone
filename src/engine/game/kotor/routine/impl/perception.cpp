@@ -25,10 +25,9 @@
 #include "../../../../script/types.h"
 
 #include "../../../core/object/creature.h"
+#include "../../../core/script/routine/argutil.h"
 #include "../../../core/script/routine/context.h"
-
-#include "argutil.h"
-#include "objectutil.h"
+#include "../../../core/script/routine/objectutil.h"
 
 using namespace std;
 

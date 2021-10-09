@@ -25,9 +25,8 @@
 #include "../../../../script/types.h"
 
 #include "../../../core/game.h"
+#include "../../../core/script/routine/argutil.h"
 #include "../../../core/script/routine/context.h"
-
-#include "argutil.h"
 
 using namespace std;
 

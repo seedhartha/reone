@@ -16,15 +16,16 @@
  */
 
 /** @file
- *  Implementation of movie-related routines.
+ *  Implementation of action-related routines.
  */
 
 #include "declarations.h"
 
-#include "../../../../script/exception/notimpl.h"
-#include "../../../../script/types.h"
+#include "../../../../script/exception/argument.h"
 
+#include "../../../core/action/factory.h"
 #include "../../../core/game.h"
+#include "../../../core/object/creature.h"
 #include "../../../core/script/routine/argutil.h"
 #include "../../../core/script/routine/context.h"
 
@@ -38,24 +39,22 @@ namespace game {
 
 namespace routine {
 
-Variable playMovie(const vector<Variable> &args, const RoutineContext &ctx) {
-    string movie(boost::to_lower_copy(getString(args, 0)));
+Variable actionFollowOwner(const vector<Variable> &args, const RoutineContext &ctx) {
+    float range = getFloatOrElse(args, 0, 2.5f);
 
-    ctx.game.playVideo(movie);
+    auto action = ctx.actionFactory.newFollowOwner();
+    getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
 
-Variable isMoviePlaying(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
+Variable actionSwitchWeapons(const vector<Variable> &args, const RoutineContext &ctx) {
+    // TODO: arguments
 
-Variable queueMovie(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
+    auto action = ctx.actionFactory.newSwitchWeapons();
+    getCaller(ctx)->addAction(move(action));
 
-Variable playMovieQueue(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    return Variable::ofNull();
 }
 
 } // namespace routine
