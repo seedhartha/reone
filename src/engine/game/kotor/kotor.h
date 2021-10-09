@@ -20,13 +20,22 @@
 
 #include "../core/game.h"
 
+#include "gui/chargen/chargen.h"
+#include "gui/computer.h"
+#include "gui/container.h"
+#include "gui/conversation.h"
+#include "gui/dialog.h"
+#include "gui/hud.h"
+#include "gui/ingame/ingame.h"
+#include "gui/loadscreen.h"
+#include "gui/mainmenu.h"
+#include "gui/partyselect.h"
+#include "gui/saveload.h"
+
 namespace reone {
 
 namespace game {
 
-/**
- * KotOR game.
- */
 class KotOR : public Game {
 public:
     KotOR(
@@ -69,6 +78,68 @@ public:
         resource::Strings &strings);
 
     void initResourceProviders() override;
+
+    HUD &hud() const { return *_hud; }
+    CharacterGeneration &characterGeneration() { return *_charGen; }
+    Conversation &conversation() { return *_conversation; }
+
+    bool isInConversation() const { return _screen == GameScreen::Conversation; }
+
+protected:
+    void loadModule(const std::string &name, std::string entry = "") override;
+
+    void onModuleSelected(const std::string &name) override;
+    void drawHUD() override;
+    CameraType getConversationCamera(int &cameraId) const override;
+    void setBarkBubbleText(std::string text, float durartion) override;
+
+    // GUI
+
+    std::unique_ptr<MainMenu> _mainMenu;
+    std::unique_ptr<LoadingScreen> _loadScreen;
+    std::unique_ptr<CharacterGeneration> _charGen;
+    std::unique_ptr<HUD> _hud;
+    std::unique_ptr<InGameMenu> _inGame;
+    std::unique_ptr<DialogGUI> _dialog;
+    std::unique_ptr<ComputerGUI> _computer;
+    std::unique_ptr<ContainerGUI> _container;
+    std::unique_ptr<PartySelection> _partySelect;
+    std::unique_ptr<SaveLoad> _saveLoad;
+
+    Conversation *_conversation {nullptr}; /**< pointer to either DialogGUI or ComputerGUI  */
+
+    void loadMainMenu();
+    void loadLoadingScreen();
+    void loadCharacterGeneration();
+    void loadHUD();
+    void loadInGame();
+    void loadDialog();
+    void loadComputer();
+    void loadContainer();
+    void loadPartySelection();
+    void loadSaveLoad();
+
+    void openMainMenu() override;
+    void openSaveLoad(SaveLoadMode mode) override;
+    void openInGame() override;
+    void openInGameMenu(InGameMenuTab tab) override;
+    void openContainer(const std::shared_ptr<SpatialObject> &container) override;
+    void openPartySelection(const PartySelectionContext &ctx) override;
+    void openLevelUp() override;
+
+    void startCharacterGeneration() override;
+    void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef) override;
+
+    void resumeConversation() override;
+    void pauseConversation() override;
+
+    void changeScreen(GameScreen screen);
+
+    gui::GUI *getScreenGUI() const override;
+
+    void withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block);
+
+    // END GUI
 };
 
 } // namespace game

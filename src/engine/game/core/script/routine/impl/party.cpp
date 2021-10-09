@@ -27,6 +27,7 @@
 #include "../../../../../script/types.h"
 
 #include "../../../game.h"
+#include "../../../object/creature.h"
 #include "../../../party.h"
 
 #include "../context.h"

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -18,22 +17,25 @@
 
 #pragma once
 
-#include "../kotor/kotor.h"
+#include "../../../gui/control/button.h"
+#include "../../../gui/control/label.h"
+#include "../../../gui/control/listbox.h"
+
+#include "../../core/savedgame.h"
+
+#include "gui.h"
 
 namespace reone {
 
 namespace game {
 
-class TSL : public KotOR {
+class SaveLoad : public GameGUI {
 public:
-    TSL(
-        boost::filesystem::path path,
-        Options options,
+    SaveLoad(
+        Game *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,
-        Cursors &cursors,
-        EffectFactory &effectFactory,
         Feats &feats,
         FootstepSounds &footstepSounds,
         GUISounds &guiSounds,
@@ -42,7 +44,6 @@ public:
         Portraits &portraits,
         Reputes &reputes,
         ScriptRunner &scriptRunner,
-        Skills &skills,
         SoundSets &soundSets,
         Surfaces &surfaces,
         audio::AudioFiles &audioFiles,
@@ -59,13 +60,59 @@ public:
         graphics::Textures &textures,
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
-        scene::SceneGraph &sceneGraph,
-        scene::WorldRenderPipeline &worldRenderPipeline,
-        script::Scripts &scripts,
         resource::Resources &resources,
         resource::Strings &strings);
 
-    void initResourceProviders() override;
+    void load() override;
+
+    void refresh();
+
+    void setMode(SaveLoadMode mode);
+
+private:
+    struct SavedGameDescriptor {
+        int number {0};
+        SavedGame save;
+        boost::filesystem::path path;
+    };
+
+    struct Binding {
+        std::shared_ptr<gui::Button> btnBack;
+        std::shared_ptr<gui::Button> btnDelete;
+        std::shared_ptr<gui::Button> btnSaveLoad;
+        std::shared_ptr<gui::Label> lblAreaName;
+        std::shared_ptr<gui::Label> lblPanelName;
+        std::shared_ptr<gui::Label> lblPlanetName;
+        std::shared_ptr<gui::Label> lblPm1;
+        std::shared_ptr<gui::Label> lblPm2;
+        std::shared_ptr<gui::Label> lblPm3;
+        std::shared_ptr<gui::Label> lblScreenshot;
+        std::shared_ptr<gui::ListBox> lbGames;
+
+        // TSL only
+        std::shared_ptr<gui::Button> btnFilter;
+        std::shared_ptr<gui::Label> lblBar1;
+        std::shared_ptr<gui::Label> lblBar2;
+        std::shared_ptr<gui::Label> lblBar3;
+        std::shared_ptr<gui::Label> lblBar4;
+        std::shared_ptr<gui::Label> lblPcName;
+        std::shared_ptr<gui::Label> lblTimePlayed;
+        // END TSL only
+    } _binding;
+
+    SaveLoadMode _mode {SaveLoadMode::Save};
+    std::vector<SavedGameDescriptor> _saves;
+
+    void bindControls();
+    void refreshSavedGames();
+    void indexSavedGame(boost::filesystem::path path);
+
+    void saveGame(int number);
+    void loadGame(int number);
+    void deleteGame(int number);
+
+    int getSelectedSaveNumber() const;
+    int getNewSaveNumber() const;
 };
 
 } // namespace game

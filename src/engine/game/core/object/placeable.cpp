@@ -21,6 +21,7 @@
 #include "../../../graphics/walkmesh/walkmeshes.h"
 #include "../../../resource/2da.h"
 #include "../../../resource/resources.h"
+#include "../../../resource/strings.h"
 #include "../../../scene/node/model.h"
 #include "../../../script/types.h"
 

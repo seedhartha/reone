@@ -27,7 +27,6 @@
 #include "../../game/core/effect/factory.h"
 #include "../../game/core/footstepsounds.h"
 #include "../../game/core/game.h"
-#include "../../game/core/gui/sounds.h"
 #include "../../game/core/object/factory.h"
 #include "../../game/core/party.h"
 #include "../../game/core/portraits.h"
@@ -37,6 +36,7 @@
 #include "../../game/core/script/runner.h"
 #include "../../game/core/soundsets.h"
 #include "../../game/core/surfaces.h"
+#include "../../game/kotor/gui/sounds.h"
 #include "../../game/types.h"
 
 namespace reone {

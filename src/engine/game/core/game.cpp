@@ -33,6 +33,7 @@
 #include "../../graphics/texture/textures.h"
 #include "../../graphics/walkmesh/walkmeshes.h"
 #include "../../graphics/window.h"
+#include "../../gui/gui.h"
 #include "../../resource/format/erfreader.h"
 #include "../../resource/format/erfwriter.h"
 #include "../../resource/format/gffwriter.h"
@@ -70,8 +71,6 @@ static constexpr char kModulesDirectoryName[] = "modules";
 
 static constexpr int kNfoBufferSize = 1024;
 static constexpr int kScreenBufferSize = 262144;
-
-static bool g_conversationsEnabled = true;
 
 Game::Game(
     bool tsl,
@@ -157,7 +156,7 @@ int Game::run() {
     openMainMenu();
 
     if (!_options.module.empty()) {
-        _mainMenu->onModuleSelected(_options.module);
+        onModuleSelected(_options.module);
     } else {
         playVideo("legal");
     }
@@ -229,25 +228,6 @@ void Game::playVideo(const string &name) {
     }
 }
 
-void Game::openMainMenu() {
-    if (!_mainMenu) {
-        loadMainMenu();
-    }
-    if (!_saveLoad) {
-        loadSaveLoad();
-    }
-    playMusic(_mainMenuMusicResRef);
-    changeScreen(GameScreen::MainMenu);
-}
-
-void Game::changeScreen(GameScreen screen) {
-    GUI *gui = getScreenGUI();
-    if (gui) {
-        gui->resetFocus();
-    }
-    _screen = screen;
-}
-
 void Game::playMusic(const string &resRef) {
     if (_musicResRef == resRef)
         return;
@@ -257,123 +237,6 @@ void Game::playMusic(const string &resRef) {
         _music.reset();
     }
     _musicResRef = resRef;
-}
-
-void Game::loadMainMenu() {
-    _mainMenu = make_unique<MainMenu>(
-        this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _resources,
-        _strings);
-    _mainMenu->load();
-}
-
-void Game::loadModule(const string &name, string entry) {
-    info("Load module: " + name);
-
-    withLoadingScreen("load_" + name, [this, &name, &entry]() {
-        if (!_hud) {
-            loadHUD();
-        }
-        if (!_inGame) {
-            loadInGame();
-        }
-        if (!_dialog) {
-            loadDialog();
-        }
-        if (!_computer) {
-            loadComputer();
-        }
-        if (!_container) {
-            loadContainer();
-        }
-        if (!_partySelect) {
-            loadPartySelection();
-        }
-        if (!_charGen) {
-            loadCharacterGeneration();
-        }
-
-        _soundSets.invalidate();
-        _textures.invalidateCache();
-        _models.invalidateCache();
-        _walkmeshes.invalidateCache();
-        _lips.invalidate();
-        _audioFiles.invalidate();
-        _scripts.invalidate();
-
-        loadModuleResources(name);
-
-        if (_module) {
-            _module->area()->runOnExitScript();
-            _module->area()->unloadParty();
-        }
-
-        _loadScreen->setProgress(50);
-        drawAll();
-
-        auto maybeModule = _loadedModules.find(name);
-        if (maybeModule != _loadedModules.end()) {
-            _module = maybeModule->second;
-        } else {
-            _module = _objectFactory.newModule();
-
-            shared_ptr<GffStruct> ifo(_resources.getGFF("module", ResourceType::Ifo));
-            _module->load(name, *ifo, _loadFromSaveGame);
-
-            _loadedModules.insert(make_pair(name, _module));
-        }
-
-        _module->loadParty(entry, _loadFromSaveGame);
-        _module->area()->fill(_sceneGraph);
-
-        _loadScreen->setProgress(100);
-        drawAll();
-
-        string musicName(_module->area()->music());
-        playMusic(musicName);
-
-        _ticks = SDL_GetTicks();
-        openInGame();
-        _loadFromSaveGame = false;
-    });
-}
-
-void Game::withLoadingScreen(const string &imageResRef, const function<void()> &block) {
-    if (!_loadScreen) {
-        loadLoadingScreen();
-    }
-    _loadScreen->setImage(imageResRef);
-    _loadScreen->setProgress(0);
-    changeScreen(GameScreen::Loading);
-    drawAll();
-    block();
 }
 
 void Game::loadModuleResources(const string &moduleName) {
@@ -462,7 +325,7 @@ void Game::drawGUI() {
     switch (_screen) {
     case GameScreen::InGame:
         if (_cameraType == CameraType::ThirdPerson) {
-            _hud->draw();
+            drawHUD();
         }
         if (_console->isOpen()) {
             _console->draw();
@@ -477,277 +340,6 @@ void Game::drawGUI() {
         }
         break;
     }
-    }
-}
-
-void Game::loadHUD() {
-    _hud = make_unique<HUD>(
-        this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _skills,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _resources,
-        _strings);
-    _hud->load();
-}
-
-void Game::loadDialog() {
-    _dialog = make_unique<DialogGUI>(
-        this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _resources,
-        _strings);
-    _dialog->load();
-}
-
-void Game::loadComputer() {
-    _computer = make_unique<ComputerGUI>(
-        this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _resources,
-        _strings);
-    _computer->load();
-}
-
-void Game::loadContainer() {
-    _container = make_unique<ContainerGUI>(
-        this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _resources,
-        _strings);
-    _container->load();
-}
-
-void Game::loadPartySelection() {
-    _partySelect = make_unique<PartySelection>(
-        this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _resources,
-        _strings);
-    _partySelect->load();
-}
-
-void Game::loadSaveLoad() {
-    _saveLoad = make_unique<SaveLoad>(
-        this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _resources,
-        _strings);
-    _saveLoad->load();
-}
-
-void Game::loadInGame() {
-    _inGame = make_unique<InGameMenu>(
-        this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _resources,
-        _strings);
-    _inGame->load();
-}
-
-GUI *Game::getScreenGUI() const {
-    switch (_screen) {
-    case GameScreen::MainMenu:
-        return _mainMenu.get();
-    case GameScreen::Loading:
-        return _loadScreen.get();
-    case GameScreen::CharacterGeneration:
-        return _charGen.get();
-    case GameScreen::InGame:
-        return _cameraType == CameraType::ThirdPerson ? _hud.get() : nullptr;
-    case GameScreen::InGameMenu:
-        return _inGame.get();
-    case GameScreen::Conversation:
-        return _conversation;
-    case GameScreen::Container:
-        return _container.get();
-    case GameScreen::PartySelection:
-        return _partySelect.get();
-    case GameScreen::SaveLoad:
-        return _saveLoad.get();
-    default:
-        return nullptr;
     }
 }
 
@@ -838,196 +430,18 @@ float Game::measureFrameTime() {
     return dt * _gameSpeed;
 }
 
-void Game::loadLoadingScreen() {
-    _loadScreen = make_unique<LoadingScreen>(
-        this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _resources,
-        _strings);
-    _loadScreen->load();
-}
-
-void Game::loadCharacterGeneration() {
-    _charGen = make_unique<CharacterGeneration>(
-        this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _resources,
-        _strings);
-    _charGen->load();
-}
-
 void Game::deinit() {
     _audioPlayer.deinit();
     _window.deinit();
-}
-
-void Game::startCharacterGeneration() {
-    withLoadingScreen(_charGenLoadScreenResRef, [this]() {
-        if (!_charGen) {
-            loadCharacterGeneration();
-        }
-        _loadScreen->setProgress(100);
-        drawAll();
-        playMusic(_charGenMusicResRef);
-        changeScreen(GameScreen::CharacterGeneration);
-    });
 }
 
 void Game::quit() {
     _quit = true;
 }
 
-void Game::openInGame() {
-    changeScreen(GameScreen::InGame);
-}
-
-void Game::openInGameMenu(InGameMenu::Tab tab) {
-    // Take a screenshot to be used in SaveLoad menu
-    _window.clear();
-    _worldRenderPipeline.setTakeScreenshot(true);
-    _worldRenderPipeline.render();
-
-    setCursorType(CursorType::Default);
-    switch (tab) {
-    case InGameMenu::Tab::Equipment:
-        _inGame->openEquipment();
-        break;
-    case InGameMenu::Tab::Inventory:
-        _inGame->openInventory();
-        break;
-    case InGameMenu::Tab::Character:
-        _inGame->openCharacter();
-        break;
-    case InGameMenu::Tab::Abilities:
-        _inGame->openAbilities();
-        break;
-    case InGameMenu::Tab::Messages:
-        _inGame->openMessages();
-        break;
-    case InGameMenu::Tab::Journal:
-        _inGame->openJournal();
-        break;
-    case InGameMenu::Tab::Map:
-        _inGame->openMap();
-        break;
-    case InGameMenu::Tab::Options:
-        _inGame->openOptions();
-        break;
-    default:
-        break;
-    }
-    changeScreen(GameScreen::InGameMenu);
-}
-
-void Game::startDialog(const shared_ptr<SpatialObject> &owner, const string &resRef) {
-    if (!g_conversationsEnabled)
-        return;
-
-    shared_ptr<GffStruct> dlg(_resources.getGFF(resRef, ResourceType::Dlg));
-    if (!dlg) {
-        warn("Game: conversation not found: " + resRef);
-        return;
-    }
-
-    stopMovement();
-    setRelativeMouseMode(false);
-    setCursorType(CursorType::Default);
-    changeScreen(GameScreen::Conversation);
-
-    auto dialog = make_shared<Dialog>(resRef, &_strings);
-    dialog->load(*dlg);
-
-    bool computerConversation = dialog->conversationType() == ConversationType::Computer;
-    _conversation = computerConversation ? _computer.get() : static_cast<Conversation *>(_dialog.get());
-    _conversation->start(dialog, owner);
-}
-
 void Game::stopMovement() {
     getActiveCamera()->stopMovement();
     _module->player().stopMovement();
-}
-
-void Game::openContainer(const shared_ptr<SpatialObject> &container) {
-    stopMovement();
-    setRelativeMouseMode(false);
-    setCursorType(CursorType::Default);
-    _container->open(container);
-    changeScreen(GameScreen::Container);
-}
-
-void Game::openPartySelection(const PartySelection::Context &ctx) {
-    stopMovement();
-    setRelativeMouseMode(false);
-    setCursorType(CursorType::Default);
-    _partySelect->prepare(ctx);
-    changeScreen(GameScreen::PartySelection);
-}
-
-void Game::openSaveLoad(SaveLoad::Mode mode) {
-    setRelativeMouseMode(false);
-    setCursorType(CursorType::Default);
-    _saveLoad->setMode(mode);
-    _saveLoad->refresh();
-    changeScreen(GameScreen::SaveLoad);
-}
-
-void Game::openLevelUp() {
-    setRelativeMouseMode(false);
-    setCursorType(CursorType::Default);
-    _charGen->startLevelUp();
-    changeScreen(GameScreen::CharacterGeneration);
 }
 
 void Game::scheduleModuleTransition(const string &moduleName, const string &entry) {
@@ -1039,7 +453,7 @@ void Game::updateCamera(float dt) {
     switch (_screen) {
     case GameScreen::Conversation: {
         int cameraId;
-        CameraType cameraType = _conversation->getCamera(cameraId);
+        CameraType cameraType = getConversationCamera(cameraId);
         if (cameraType == CameraType::Static) {
             _module->area()->setStaticCamera(cameraId);
         }

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -18,22 +17,25 @@
 
 #pragma once
 
-#include "../kotor/kotor.h"
+#include "../../../gui/control/label.h"
+#include "../../../gui/control/listbox.h"
+
+#include "../../core/camera/dialog.h"
+#include "../../core/object/creature.h"
+
+#include "conversation.h"
 
 namespace reone {
 
 namespace game {
 
-class TSL : public KotOR {
+class DialogGUI : public Conversation {
 public:
-    TSL(
-        boost::filesystem::path path,
-        Options options,
+    DialogGUI(
+        Game *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,
-        Cursors &cursors,
-        EffectFactory &effectFactory,
         Feats &feats,
         FootstepSounds &footstepSounds,
         GUISounds &guiSounds,
@@ -42,7 +44,6 @@ public:
         Portraits &portraits,
         Reputes &reputes,
         ScriptRunner &scriptRunner,
-        Skills &skills,
         SoundSets &soundSets,
         Surfaces &surfaces,
         audio::AudioFiles &audioFiles,
@@ -59,13 +60,61 @@ public:
         graphics::Textures &textures,
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
-        scene::SceneGraph &sceneGraph,
-        scene::WorldRenderPipeline &worldRenderPipeline,
-        script::Scripts &scripts,
         resource::Resources &resources,
         resource::Strings &strings);
 
-    void initResourceProviders() override;
+    void load() override;
+    void update(float dt) override;
+
+private:
+    struct Participant {
+        std::shared_ptr<graphics::Model> model;
+        std::shared_ptr<Creature> creature;
+    };
+
+    struct Binding {
+        std::shared_ptr<gui::Label> lblMessage;
+        std::shared_ptr<gui::ListBox> lbReplies;
+    } _binding;
+
+    std::shared_ptr<SpatialObject> _currentSpeaker;
+    std::map<std::string, Participant> _participantByTag;
+
+    void bindControls();
+    void addFrame(std::string tag, int top, int height);
+    void configureMessage();
+    void configureReplies();
+    void repositionMessage();
+
+    void updateCamera();
+    void updateParticipantAnimations();
+
+    glm::vec3 getTalkPosition(const SpatialObject &object) const;
+    DialogCamera::Variant getRandomCameraVariant() const;
+    std::string getStuntAnimationName(int ordinal) const;
+    AnimationType getStuntAnimationType(int ordinal) const;
+
+    void setMessage(std::string message) override;
+    void setReplyLines(std::vector<std::string> lines) override;
+
+    void onStart() override;
+    void onFinish() override;
+    void onLoadEntry() override;
+    void onEntryEnded() override;
+
+    // Loading
+
+    void loadFrames();
+    void loadCurrentSpeaker();
+
+    // END Loading
+
+    // Participants
+
+    void loadStuntParticipants();
+    void releaseStuntParticipants();
+
+    // END Participants
 };
 
 } // namespace game

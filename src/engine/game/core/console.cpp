@@ -29,6 +29,7 @@
 
 #include "effect/factory.h"
 #include "game.h"
+#include "object/creature.h"
 #include "party.h"
 
 using namespace std;

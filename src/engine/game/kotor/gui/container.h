@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -18,22 +17,25 @@
 
 #pragma once
 
-#include "../kotor/kotor.h"
+#include "gui.h"
+
+#include "../../../gui/control/button.h"
+#include "../../../gui/control/label.h"
+#include "../../../gui/control/listbox.h"
+
+#include "../../core/object/spatial.h"
 
 namespace reone {
 
 namespace game {
 
-class TSL : public KotOR {
+class ContainerGUI : public GameGUI {
 public:
-    TSL(
-        boost::filesystem::path path,
-        Options options,
+    ContainerGUI(
+        Game *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,
-        Cursors &cursors,
-        EffectFactory &effectFactory,
         Feats &feats,
         FootstepSounds &footstepSounds,
         GUISounds &guiSounds,
@@ -42,7 +44,6 @@ public:
         Portraits &portraits,
         Reputes &reputes,
         ScriptRunner &scriptRunner,
-        Skills &skills,
         SoundSets &soundSets,
         Surfaces &surfaces,
         audio::AudioFiles &audioFiles,
@@ -59,13 +60,30 @@ public:
         graphics::Textures &textures,
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
-        scene::SceneGraph &sceneGraph,
-        scene::WorldRenderPipeline &worldRenderPipeline,
-        script::Scripts &scripts,
         resource::Resources &resources,
         resource::Strings &strings);
 
-    void initResourceProviders() override;
+    void load() override;
+    void open(std::shared_ptr<SpatialObject> contanier);
+
+    SpatialObject &container() const { return *_container; }
+
+private:
+    struct Binding {
+        std::shared_ptr<gui::Label> lblMessage;
+        std::shared_ptr<gui::ListBox> lbItems;
+        std::shared_ptr<gui::Button> btnOk;
+        std::shared_ptr<gui::Button> btnGiveItems;
+        std::shared_ptr<gui::Button> btnCancel;
+    } _binding;
+
+    std::shared_ptr<SpatialObject> _container;
+
+    void bindControls();
+    void configureItemsListBox();
+    void transferItemsToPlayer();
+
+    std::shared_ptr<graphics::Texture> getItemFrameTexture(int stackSize) const;
 };
 
 } // namespace game

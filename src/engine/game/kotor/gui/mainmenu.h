@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -18,22 +17,28 @@
 
 #pragma once
 
-#include "../kotor/kotor.h"
+#include "../../../gui/control/button.h"
+#include "../../../gui/control/label.h"
+#include "../../../gui/control/listbox.h"
+#include "../../../resource/types.h"
+#include "../../../scene/graph.h"
+#include "../../../scene/node/model.h"
+
+#include "../../core/types.h"
+
+#include "gui.h"
 
 namespace reone {
 
 namespace game {
 
-class TSL : public KotOR {
+class MainMenu : public GameGUI {
 public:
-    TSL(
-        boost::filesystem::path path,
-        Options options,
+    MainMenu(
+        Game *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,
-        Cursors &cursors,
-        EffectFactory &effectFactory,
         Feats &feats,
         FootstepSounds &footstepSounds,
         GUISounds &guiSounds,
@@ -42,7 +47,6 @@ public:
         Portraits &portraits,
         Reputes &reputes,
         ScriptRunner &scriptRunner,
-        Skills &skills,
         SoundSets &soundSets,
         Surfaces &surfaces,
         audio::AudioFiles &audioFiles,
@@ -59,13 +63,44 @@ public:
         graphics::Textures &textures,
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
-        scene::SceneGraph &sceneGraph,
-        scene::WorldRenderPipeline &worldRenderPipeline,
-        script::Scripts &scripts,
         resource::Resources &resources,
         resource::Strings &strings);
 
-    void initResourceProviders() override;
+    void load() override;
+
+    void onModuleSelected(const std::string &name);
+
+private:
+    struct Binding {
+        std::shared_ptr<gui::ListBox> lbModules;
+        std::shared_ptr<gui::Label> lbl3dView;
+        std::shared_ptr<gui::Label> lblGameLogo;
+        std::shared_ptr<gui::Label> lblBw;
+        std::shared_ptr<gui::Label> lblLucas;
+        std::shared_ptr<gui::Button> btnLoadGame;
+        std::shared_ptr<gui::Button> btnNewGame;
+        std::shared_ptr<gui::Button> btnMovies;
+        std::shared_ptr<gui::Button> btnOptions;
+        std::shared_ptr<gui::Label> lblNewContent;
+        std::shared_ptr<gui::Button> btnExit;
+        std::shared_ptr<gui::Button> btnWarp;
+
+        // TSL only
+        std::shared_ptr<gui::Label> lblMenuBg;
+        std::shared_ptr<gui::Button> btnMusic;
+        std::shared_ptr<gui::Button> btnMoreGames;
+        std::shared_ptr<gui::Button> btnTslrcm;
+        // END TSL only
+    } _binding;
+
+    void bindControls();
+    void configureButtons();
+    void setup3DView();
+    void setButtonColors(gui::Control &control);
+    void startModuleSelection();
+    void loadModuleNames();
+
+    std::shared_ptr<scene::ModelSceneNode> getKotorModel(scene::SceneGraph &sceneGraph);
 };
 
 } // namespace game

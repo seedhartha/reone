@@ -27,6 +27,7 @@
 #include "../../resource/types.h"
 
 #include "game.h"
+#include "object/creature.h"
 #include "object/waypoint.h"
 #include "party.h"
 
