@@ -103,7 +103,11 @@ private:
         string argsLine(line.substr(9 + typeDesc.length()));
 
         InstructionType type = parseInstructionType(typeDesc);
-        Instruction ins {.offset = offset, .type = type};
+
+        Instruction ins;
+        ins.offset = offset;
+        ins.type = type;
+
         switch (type) {
         case InstructionType::CPDOWNSP:
         case InstructionType::CPTOPSP:
