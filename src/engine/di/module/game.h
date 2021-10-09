@@ -32,7 +32,7 @@
 #include "../../game/core/party.h"
 #include "../../game/core/portraits.h"
 #include "../../game/core/reputes.h"
-#include "../../game/core/script/routine/registrar/registrar.h"
+#include "../../game/core/script/routine/registrar.h"
 #include "../../game/core/script/routine/routines.h"
 #include "../../game/core/script/runner.h"
 #include "../../game/core/soundsets.h"

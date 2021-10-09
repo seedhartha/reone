@@ -18,18 +18,18 @@
 
 #pragma once
 
-#include "game.h"
+#include "../core/game.h"
 
 namespace reone {
 
 namespace game {
 
 /**
- * TSL game.
+ * KotOR game.
  */
-class TSL : public Game {
+class KotOR : public Game {
 public:
-    TSL(
+    KotOR(
         boost::filesystem::path path,
         Options options,
         ActionFactory &actionFactory,
