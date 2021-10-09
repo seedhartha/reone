@@ -65,6 +65,7 @@ ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<E
         {InstructionType::EQUALFF, &ScriptExecution::executeEQUALxx},
         {InstructionType::EQUALSS, &ScriptExecution::executeEQUALxx},
         {InstructionType::EQUALOO, &ScriptExecution::executeEQUALxx},
+        {InstructionType::EQUALTT, &ScriptExecution::executeEQUALTT},
         {InstructionType::EQUALEFFEFF, &ScriptExecution::executeEQUALxx},
         {InstructionType::EQUALEVTEVT, &ScriptExecution::executeEQUALxx},
         {InstructionType::EQUALLOCLOC, &ScriptExecution::executeEQUALxx},
@@ -73,6 +74,7 @@ ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<E
         {InstructionType::NEQUALFF, &ScriptExecution::executeNEQUALxx},
         {InstructionType::NEQUALSS, &ScriptExecution::executeNEQUALxx},
         {InstructionType::NEQUALOO, &ScriptExecution::executeNEQUALxx},
+        {InstructionType::NEQUALTT, &ScriptExecution::executeNEQUALTT},
         {InstructionType::NEQUALEFFEFF, &ScriptExecution::executeNEQUALxx},
         {InstructionType::NEQUALEVTEVT, &ScriptExecution::executeNEQUALxx},
         {InstructionType::NEQUALLOCLOC, &ScriptExecution::executeNEQUALxx},
@@ -382,12 +384,44 @@ void ScriptExecution::executeEQUALxx(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(static_cast<int>(equal)));
 }
 
+void ScriptExecution::executeEQUALTT(const Instruction &ins) {
+    int numVariables = ins.size / 4;
+    vector<Variable> vars1;
+    for (int i = 0; i < numVariables; ++i) {
+        vars1.push_back(move(_stack.back()));
+        _stack.pop_back();
+    }
+    vector<Variable> vars2;
+    for (int i = 0; i < numVariables; ++i) {
+        vars2.push_back(move(_stack.back()));
+        _stack.pop_back();
+    }
+    bool equal = std::equal(vars1.begin(), vars1.end(), vars2.begin());
+    _stack.push_back(Variable::ofInt(static_cast<int>(equal)));
+}
+
 void ScriptExecution::executeNEQUALxx(const Instruction &ins) {
     size_t stackSize = _stack.size();
     bool notEqual = _stack[stackSize - 2] != _stack[stackSize - 1];
 
     _stack.pop_back();
     _stack.pop_back();
+    _stack.push_back(Variable::ofInt(static_cast<int>(notEqual)));
+}
+
+void ScriptExecution::executeNEQUALTT(const Instruction &ins) {
+    int numVariables = ins.size / 4;
+    vector<Variable> vars1;
+    for (int i = 0; i < numVariables; ++i) {
+        vars1.push_back(move(_stack.back()));
+        _stack.pop_back();
+    }
+    vector<Variable> vars2;
+    for (int i = 0; i < numVariables; ++i) {
+        vars2.push_back(move(_stack.back()));
+        _stack.pop_back();
+    }
+    bool notEqual = !std::equal(vars1.begin(), vars1.end(), vars2.begin());
     _stack.push_back(Variable::ofInt(static_cast<int>(notEqual)));
 }
 

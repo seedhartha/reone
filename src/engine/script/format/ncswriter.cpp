@@ -74,6 +74,10 @@ void NcsWriter::save(const fs::path &path) {
             writer.putUint16(ins.routine);
             writer.putByte(ins.argCount);
             break;
+        case InstructionType::EQUALTT:
+        case InstructionType::NEQUALTT:
+            writer.putUint16(ins.size);
+            break;
         case InstructionType::MOVSP:
             writer.putInt32(ins.stackOffset);
             break;
@@ -97,9 +101,6 @@ void NcsWriter::save(const fs::path &path) {
         case InstructionType::STORE_STATE:
             writer.putUint32(ins.size);
             writer.putUint32(ins.sizeLocals);
-            break;
-        case InstructionType::EQUALTT:
-            writer.putUint16(ins.size);
             break;
         default:
             break;
