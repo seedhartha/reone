@@ -25,8 +25,6 @@ namespace game {
 
 struct RoutineContext;
 
-class Game;
-
 namespace routine {
 
 #define R_ROUTINE(x) script::Variable(x)(const std::vector<script::Variable> &args, const RoutineContext &ctx);

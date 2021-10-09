@@ -30,7 +30,7 @@ struct Variable;
 
 namespace game {
 
-class RoutineContext;
+struct RoutineContext;
 
 class IRoutines : public script::IRoutineProvider {
 public:
