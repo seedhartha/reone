@@ -37,6 +37,7 @@
 #include "../../game/core/script/runner.h"
 #include "../../game/core/soundsets.h"
 #include "../../game/core/surfaces.h"
+#include "../../game/types.h"
 
 namespace reone {
 

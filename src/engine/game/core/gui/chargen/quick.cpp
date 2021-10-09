@@ -106,7 +106,7 @@ void QuickCharacterGeneration::load() {
     bindControls();
     doSetStep(0);
 
-    if (_game->id() == GameID::KotOR) {
+    if (!_game->isTSL()) {
         _binding.lblDecoration->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 

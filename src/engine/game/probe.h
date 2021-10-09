@@ -17,9 +17,11 @@
 
 #pragma once
 
-#include "game/core/types.h"
+#include "types.h"
 
 namespace reone {
+
+namespace game {
 
 class GameProbe {
 public:
@@ -27,10 +29,12 @@ public:
         _gamePath(std::move(gamePath)) {
     }
 
-    game::GameID invoke();
+    GameID invoke();
 
 private:
     boost::filesystem::path _gamePath;
 };
+
+} // namespace game
 
 } // namespace reone

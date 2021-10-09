@@ -34,11 +34,6 @@ constexpr char kObjectTagPlayer[] = "player";
 constexpr float kDefaultRaycastDistance = 8.0f;
 constexpr float kSelectionDistance = 8.0f;
 
-enum class GameID {
-    KotOR,
-    TSL
-};
-
 enum class BackgroundType {
     None,
     Menu,

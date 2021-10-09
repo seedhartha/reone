@@ -77,7 +77,7 @@ TSL::TSL(
     Resources &resources,
     Strings &strings) :
     Game(
-        GameID::TSL,
+        true,
         move(path),
         move(options),
         actionFactory,

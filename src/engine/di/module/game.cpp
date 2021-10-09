@@ -43,7 +43,7 @@ namespace di {
 
 void GameModule::init() {
     _surfaces = make_unique<Surfaces>(_resource.resources());
-    _cursors = make_unique<Cursors>(_gameId, _graphics.context(), _graphics.meshes(), _graphics.shaders(), _graphics.window(), _resource.resources());
+    _cursors = make_unique<Cursors>(_graphics.context(), _graphics.meshes(), _graphics.shaders(), _graphics.window(), _resource.resources());
     _soundSets = make_unique<SoundSets>(_audio.audioFiles(), _resource.resources(), _resource.strings());
     _footstepSounds = make_unique<FootstepSounds>(_audio.audioFiles(), _resource.resources());
     _guiSounds = make_unique<GUISounds>(_audio.audioFiles(), _resource.resources());

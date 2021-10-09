@@ -15,30 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "gameprobe.h"
-
-#include "common/pathutil.h"
-
-using namespace std;
-
-using namespace reone::game;
-
-namespace fs = boost::filesystem;
+#pragma once
 
 namespace reone {
 
-GameID GameProbe::invoke() {
-    // If there is a KotOR executable then game is KotOR
-    fs::path exePathK1(getPathIgnoreCase(_gamePath, "swkotor.exe", false));
-    if (!exePathK1.empty())
-        return GameID::KotOR;
+namespace game {
 
-    // If there is a TSL executable then game is TSL
-    fs::path exePathK2(getPathIgnoreCase(_gamePath, "swkotor2.exe", false));
-    if (!exePathK2.empty())
-        return GameID::TSL;
+enum class GameID {
+    KotOR,
+    TSL
+};
 
-    throw logic_error("Unable to determine game ID: " + _gamePath.string());
-}
+} // namespace game
 
 } // namespace reone

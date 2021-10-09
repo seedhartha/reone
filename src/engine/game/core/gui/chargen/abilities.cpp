@@ -261,7 +261,7 @@ void CharGenAbilities::bindControls() {
     _binding.wisPlusBtn = getControl<Button>("WIS_PLUS_BTN");
     _binding.chaPlusBtn = getControl<Button>("CHA_PLUS_BTN");
 
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.lblAbilityMod = getControl<Label>("LBL_ABILITY_MOD");
     }
 }
@@ -285,7 +285,7 @@ void CharGenAbilities::reset(bool newGame) {
 void CharGenAbilities::refreshControls() {
     _binding.remainingSelectionsLbl->setTextMessage(to_string(_points));
     _binding.costPointsLbl->setTextMessage("");
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.lblAbilityMod->setTextMessage("");
     }
 

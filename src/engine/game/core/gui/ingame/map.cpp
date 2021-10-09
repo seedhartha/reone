@@ -123,7 +123,7 @@ void MapMenu::load() {
         refreshSelectedNote();
     });
 
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.btnPrtySlct->setOnClick([this]() {
             _game->openPartySelection(PartySelection::Context());
         });
@@ -139,7 +139,7 @@ void MapMenu::bindControls() {
     _binding.lblMap = getControl<Label>("LBL_Map");
     _binding.lblMapNote = getControl<Label>("LBL_MapNote");
 
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.btnPrtySlct = getControl<Button>("BTN_PRTYSLCT");
     }
 }

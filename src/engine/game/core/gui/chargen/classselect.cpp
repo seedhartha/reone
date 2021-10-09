@@ -121,7 +121,7 @@ ClassSelection::ClassSelection(
         strings) {
     _resRef = getResRef("classsel");
 
-    if (game->isKotOR()) {
+    if (!game->isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
 
@@ -161,12 +161,12 @@ void ClassSelection::setupClassButtons() {
     _enlargedButtonSize = glm::vec2(_binding.btnSel1->extent().width, _binding.btnSel1->extent().height);
     _defaultButtonSize = glm::vec2(_binding.btnSel2->extent().width, _binding.btnSel2->extent().height);
 
-    setupClassButton(0, Gender::Male, _game->isKotOR() ? ClassType::Scoundrel : ClassType::JediConsular);
-    setupClassButton(1, Gender::Male, _game->isKotOR() ? ClassType::Scout : ClassType::JediSentinel);
-    setupClassButton(2, Gender::Male, _game->isKotOR() ? ClassType::Soldier : ClassType::JediGuardian);
-    setupClassButton(3, Gender::Female, _game->isKotOR() ? ClassType::Soldier : ClassType::JediGuardian);
-    setupClassButton(4, Gender::Female, _game->isKotOR() ? ClassType::Scout : ClassType::JediSentinel);
-    setupClassButton(5, Gender::Female, _game->isKotOR() ? ClassType::Scoundrel : ClassType::JediConsular);
+    setupClassButton(0, Gender::Male, !_game->isTSL() ? ClassType::Scoundrel : ClassType::JediConsular);
+    setupClassButton(1, Gender::Male, !_game->isTSL() ? ClassType::Scout : ClassType::JediSentinel);
+    setupClassButton(2, Gender::Male, !_game->isTSL() ? ClassType::Soldier : ClassType::JediGuardian);
+    setupClassButton(3, Gender::Female, !_game->isTSL() ? ClassType::Soldier : ClassType::JediGuardian);
+    setupClassButton(4, Gender::Female, !_game->isTSL() ? ClassType::Scout : ClassType::JediSentinel);
+    setupClassButton(5, Gender::Female, !_game->isTSL() ? ClassType::Scoundrel : ClassType::JediConsular);
 
     setClassButtonEnlarged(0, false);
 }

@@ -164,7 +164,7 @@ void AbilitiesMenu::bindControls() {
     _binding.lbAbility = getControl<ListBox>("LB_ABILITY");
     _binding.lbDesc = getControl<ListBox>("LB_DESC");
 
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.btnChange1 = getControl<Button>("BTN_CHANGE1");
         _binding.btnChange2 = getControl<Button>("BTN_CHANGE2");
         _binding.lblPortrait = getControl<Label>("LBL_PORTRAIT");
@@ -221,7 +221,7 @@ void AbilitiesMenu::refreshControls() {
 }
 
 void AbilitiesMenu::refreshPortraits() {
-    if (_game->id() != GameID::KotOR)
+    if (_game->isTSL())
         return;
 
     Party &party = _party;

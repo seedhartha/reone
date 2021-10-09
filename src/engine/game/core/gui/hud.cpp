@@ -455,7 +455,7 @@ void HUD::update(float dt) {
         Label &lblLevelUp = *levevlUpLabels[i];
 
         Label *lblLvlUpBg;
-        if (_game->isKotOR()) {
+        if (!_game->isTSL()) {
             lblLvlUpBg = lvlUpBgLabels[i];
         }
 
@@ -465,14 +465,14 @@ void HUD::update(float dt) {
             lblChar.setBorderFill(member->portrait());
             lblBack.setVisible(true);
             lblLevelUp.setVisible(member->isLevelUpPending());
-            if (_game->isKotOR()) {
+            if (!_game->isTSL()) {
                 lblLvlUpBg->setVisible(member->isLevelUpPending());
             }
         } else {
             lblChar.setVisible(false);
             lblBack.setVisible(false);
             lblLevelUp.setVisible(false);
-            if (_game->isKotOR()) {
+            if (!_game->isTSL()) {
                 lblLvlUpBg->setVisible(false);
             }
         }
@@ -560,7 +560,7 @@ void HUD::toggleCombat(bool enabled) {
     _binding.lblQueue2->setVisible(enabled);
     _binding.lblQueue3->setVisible(enabled);
 
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.lblCombatBg1->setVisible(enabled);
         _binding.lblCombatBg2->setVisible(enabled);
         _binding.lblCombatBg3->setVisible(enabled);

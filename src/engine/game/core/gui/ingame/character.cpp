@@ -119,7 +119,7 @@ void CharacterMenu::load() {
         _game->openLevelUp();
     });
 
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.btnCharLeft->setVisible(false);
         _binding.btnCharRight->setVisible(false);
 
@@ -177,7 +177,7 @@ void CharacterMenu::bindControls() {
     _binding.btnExit = getControl<Button>("BTN_EXIT");
     _binding.btnAuto = getControl<Button>("BTN_AUTO");
     _binding.btnLevelup = getControl<Button>("BTN_LEVELUP");
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.lblAdorn = getControl<Label>("LBL_ADORN");
         _binding.btnScripts = getControl<Button>("BTN_SCRIPTS");
         _binding.lblClass = getControl<Label>("LBL_CLASS");
@@ -228,7 +228,7 @@ void CharacterMenu::refreshControls() {
     shared_ptr<Creature> partyLeader(_party.getLeader());
     CreatureAttributes &attributes = partyLeader->attributes();
 
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.lblClass1->setTextMessage(describeClass(attributes.getClassByPosition(1)));
         _binding.lblClass2->setTextMessage(describeClass(attributes.getClassByPosition(2)));
         _binding.lblLevel1->setTextMessage(toStringOrEmptyIfZero(attributes.getLevelByPosition(1)));
@@ -272,7 +272,7 @@ string CharacterMenu::describeClass(ClassType clazz) const {
 }
 
 void CharacterMenu::refreshPortraits() {
-    if (_game->id() != GameID::KotOR)
+    if (_game->isTSL())
         return;
 
     Party &party = _party;
