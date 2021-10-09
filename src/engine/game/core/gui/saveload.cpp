@@ -111,7 +111,7 @@ SaveLoad::SaveLoad(
 
     initForGame();
 
-    if (game->id() == GameID::KotOR) {
+    if (!game->isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
 }

@@ -187,7 +187,7 @@ void Equipment::load() {
 
 void Equipment::bindControls() {
     _binding.lblCantEquip = getControl<Label>("LBL_CANTEQUIP");
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.lblAttackInfo = getControl<Label>("LBL_ATTACK_INFO");
         _binding.lblPortBord = getControl<Label>("LBL_PORT_BORD");
         _binding.lblPortrait = getControl<Label>("LBL_PORTRAIT");
@@ -219,7 +219,7 @@ void Equipment::bindControls() {
     _binding.lblToHitR = getControl<Label>("LBL_TOHITR");
     _binding.lbItems = getControl<ListBox>("LB_ITEMS");
     for (auto &slotName : g_slotNames) {
-        if ((slotName.first == Slot::WeapL2 || slotName.first == Slot::WeapR2) && _game->isKotOR())
+        if ((slotName.first == Slot::WeapL2 || slotName.first == Slot::WeapR2) && !_game->isTSL())
             continue;
         _binding.lblInv[slotName.first] = getControl<Label>("LBL_INV_" + slotName.second);
         _binding.btnInv[slotName.first] = getControl<Button>("BTN_INV_" + slotName.second);
@@ -324,7 +324,7 @@ void Equipment::update() {
 
     auto partyLeader(_party.getLeader());
 
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         string vitalityString(str(boost::format("%d/\n%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
         _binding.lblVitality->setTextMessage(vitalityString);
     }
@@ -332,7 +332,7 @@ void Equipment::update() {
 }
 
 void Equipment::updatePortraits() {
-    if (_game->id() != GameID::KotOR)
+    if (_game->isTSL())
         return;
 
     Party &party = _party;
@@ -362,7 +362,7 @@ void Equipment::selectSlot(Slot slot) {
     _binding.lbDesc->setVisible(!noneSelected);
     _binding.lblSlotName->setVisible(noneSelected);
 
-    if (_game->id() == GameID::KotOR) {
+    if (!_game->isTSL()) {
         _binding.lblPortBord->setVisible(noneSelected);
         _binding.lblPortrait->setVisible(noneSelected);
         _binding.lblTxtBar->setVisible(noneSelected);

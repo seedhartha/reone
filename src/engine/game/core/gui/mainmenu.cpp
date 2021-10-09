@@ -206,7 +206,7 @@ void MainMenu::setButtonColors(Control &control) {
 }
 
 void MainMenu::setup3DView() {
-    if (_game->id() != GameID::KotOR)
+    if (_game->isTSL())
         return;
 
     const Control::Extent &extent = _binding.lbl3dView->extent();

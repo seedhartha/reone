@@ -74,7 +74,7 @@ static constexpr int kScreenBufferSize = 262144;
 static bool g_conversationsEnabled = true;
 
 Game::Game(
-    GameID gameId,
+    bool tsl,
     fs::path path,
     Options options,
     ActionFactory &actionFactory,
@@ -112,7 +112,7 @@ Game::Game(
     Scripts &scripts,
     Resources &resources,
     Strings &strings) :
-    _gameId(gameId),
+    _tsl(tsl),
     _path(move(path)),
     _options(move(options)),
     _actionFactory(actionFactory),
@@ -1191,14 +1191,6 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
     }
 
     return false;
-}
-
-bool Game::isKotOR() const {
-    return _gameId == GameID::KotOR;
-}
-
-bool Game::isTSL() const {
-    return _gameId == GameID::TSL;
 }
 
 bool Game::getGlobalBoolean(const string &name) const {

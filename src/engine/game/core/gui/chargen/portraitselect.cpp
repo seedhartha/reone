@@ -115,7 +115,7 @@ PortraitSelection::PortraitSelection(
 
     initForGame();
 
-    if (game->isKotOR()) {
+    if (!game->isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
 }

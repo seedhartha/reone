@@ -79,7 +79,7 @@ KotOR::KotOR(
     Resources &resources,
     Strings &strings) :
     Game(
-        GameID::KotOR,
+        false,
         move(path),
         move(options),
         actionFactory,

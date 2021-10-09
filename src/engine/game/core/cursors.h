@@ -43,13 +43,11 @@ namespace game {
 class Cursors : boost::noncopyable {
 public:
     Cursors(
-        GameID gameId,
         graphics::Context &context,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
         graphics::Window &window,
         resource::Resources &resources) :
-        _gameId(gameId),
         _context(context),
         _meshes(meshes),
         _shaders(shaders),
@@ -64,8 +62,6 @@ public:
     std::shared_ptr<graphics::Cursor> get(CursorType type);
 
 private:
-    GameID _gameId;
-
     std::unordered_map<CursorType, std::shared_ptr<graphics::Cursor>> _cache;
 
     // Services

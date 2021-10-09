@@ -136,7 +136,7 @@ void CustomCharacterGeneration::load() {
         _charGen->finish();
     });
 
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.lblBg->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 }

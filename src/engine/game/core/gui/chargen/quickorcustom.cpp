@@ -111,7 +111,7 @@ void QuickOrCustom::load() {
     GUI::load();
     bindControls();
 
-    if (_game->id() == GameID::KotOR) {
+    if (!_game->isTSL()) {
         _binding.lblRbg->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 

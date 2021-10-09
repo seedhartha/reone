@@ -117,7 +117,7 @@ class Surfaces;
 class Game : public graphics::IEventHandler, boost::noncopyable {
 public:
     Game(
-        GameID gameId,
+        bool tsl,
         boost::filesystem::path path,
         Options options,
         ActionFactory &actionFactory,
@@ -174,6 +174,7 @@ public:
 
     void playVideo(const std::string &name);
 
+    bool isTSL() const { return _tsl; }
     bool isLoadFromSaveGame() const;
     bool isPaused() const { return _paused; }
     bool isInConversation() const { return _screen == GameScreen::Conversation; }
@@ -181,7 +182,6 @@ public:
     Camera *getActiveCamera() const;
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
-    GameID id() const { return _gameId; }
     const Options &options() const { return _options; }
     std::shared_ptr<Module> module() const { return _module; }
     HUD &hud() const { return *_hud; }
@@ -194,13 +194,6 @@ public:
     void setLoadFromSaveGame(bool load);
     void setPaused(bool paused);
     void setRelativeMouseMode(bool relative);
-
-    // Game ID
-
-    bool isKotOR() const;
-    bool isTSL() const;
-
-    // END Game ID
 
     // Module loading
 
@@ -275,7 +268,7 @@ public:
 protected:
     const std::string kDataDirectoryName {"data"};
 
-    GameID _gameId;
+    bool _tsl;
     boost::filesystem::path _path;
 
     std::string _mainMenuMusicResRef;

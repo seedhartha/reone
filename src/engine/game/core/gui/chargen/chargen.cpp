@@ -116,7 +116,7 @@ void CharacterGeneration::load() {
     _binding.lblLevelVal->setVisible(false);
     _binding.lblName->setTextMessage("");
 
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.lblLevel->setVisible(false);
         _binding.vitArrowLbl->setVisible(false);
         _binding.defArrowLbl->setVisible(false);
@@ -155,7 +155,7 @@ void CharacterGeneration::bindControls() {
     _binding.wisAbLbl = getControl<Label>("WIS_AB_LBL");
     _binding.chaAbLbl = getControl<Label>("CHA_AB_LBL");
 
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.newLbl = getControl<Label>("NEW_LBL");
         _binding.oldLbl = getControl<Label>("OLD_LBL");
         _binding.lblLevel = getControl<Label>("LBL_LEVEL");
@@ -611,7 +611,7 @@ void CharacterGeneration::setAttributesVisible(bool visible) {
         _binding.intAbLbl.get(),
         _binding.wisAbLbl.get(),
         _binding.chaAbLbl.get()};
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         attributesLabels.push_back(_binding.oldFortLbl.get());
         attributesLabels.push_back(_binding.oldReflLbl.get());
         attributesLabels.push_back(_binding.oldWillLbl.get());
@@ -745,7 +745,7 @@ void CharacterGeneration::finish() {
         party.addMember(kNpcPlayer, player);
         party.setPlayer(player);
 
-        string moduleName(_game->isKotOR() ? "end_m01aa" : "001ebo");
+        string moduleName(!_game->isTSL() ? "end_m01aa" : "001ebo");
         _game->loadModule(moduleName);
     }
 }

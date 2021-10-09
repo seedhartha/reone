@@ -691,7 +691,9 @@ set(GAME_HEADERS
     src/engine/game/core/surface.h
     src/engine/game/core/surfaces.h
     src/engine/game/core/talent.h
-    src/engine/game/core/types.h)
+    src/engine/game/core/types.h
+    src/engine/game/probe.h
+    src/engine/game/types.h)
 
 set(GAME_SOURCES
     src/engine/game/core/action/action.cpp
@@ -934,7 +936,8 @@ set(GAME_SOURCES
     src/engine/game/core/script/routine/impl/vector.cpp
     src/engine/game/core/script/runner.cpp
     src/engine/game/core/soundsets.cpp
-    src/engine/game/core/surfaces.cpp)
+    src/engine/game/core/surfaces.cpp
+    src/engine/game/probe.cpp)
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -989,7 +992,6 @@ set(REONE_HEADERS
     src/engine/di/module/scene.h
     src/engine/di/module/script.h
     src/engine/engine.h
-    src/engine/gameprobe.h
     src/engine/optionsparser.h
     src/engine/pch.h)
 
@@ -1003,7 +1005,6 @@ set(REONE_SOURCES
     src/engine/di/module/scene.cpp
     src/engine/di/module/script.cpp
     src/engine/engine.cpp
-    src/engine/gameprobe.cpp
     src/engine/main.cpp
     src/engine/optionsparser.cpp)
 

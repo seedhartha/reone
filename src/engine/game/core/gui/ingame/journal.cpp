@@ -105,7 +105,7 @@ void JournalMenu::load() {
     });
     _binding.btnSwapText->setDisabled(true);
 
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.btnQuestItems->setDisabled(true);
         _binding.btnSort->setDisabled(true);
     }
@@ -115,7 +115,7 @@ void JournalMenu::bindControls() {
     _binding.btnExit = getControl<Button>("BTN_EXIT");
     _binding.btnSwapText = getControl<Button>("BTN_SWAPTEXT");
 
-    if (_game->isKotOR()) {
+    if (!_game->isTSL()) {
         _binding.btnQuestItems = getControl<Button>("BTN_QUESTITEMS");
         _binding.btnSort = getControl<Button>("BTN_SORT");
     }
