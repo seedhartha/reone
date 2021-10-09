@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../../core/script/routine/registrar.h"
+#include "../../core/script/routine/registrar.h"
 
 namespace reone {
 
@@ -25,9 +25,9 @@ namespace game {
 
 class IRoutines;
 
-class TSLRoutineRegistrar : public RoutineRegistrar {
+class KotORRoutineRegistrar : public RoutineRegistrar {
 public:
-    TSLRoutineRegistrar(IRoutines &routines) :
+    KotORRoutineRegistrar(IRoutines &routines) :
         _routines(routines) {
     }
 

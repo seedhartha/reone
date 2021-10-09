@@ -691,11 +691,7 @@ set(GAME_HEADERS
     src/engine/game/core/surface.h
     src/engine/game/core/surfaces.h
     src/engine/game/core/talent.h
-    src/engine/game/core/types.h
-    src/engine/game/kotor/kotor.h
-    src/engine/game/kotor/routine/registrar/kotor.h
-    src/engine/game/tsl/routine/registrar/tsl.h
-    src/engine/game/tsl/tsl.h)
+    src/engine/game/core/types.h)
 
 set(GAME_SOURCES
     src/engine/game/core/action/action.cpp
@@ -938,11 +934,7 @@ set(GAME_SOURCES
     src/engine/game/core/script/routine/impl/vector.cpp
     src/engine/game/core/script/runner.cpp
     src/engine/game/core/soundsets.cpp
-    src/engine/game/core/surfaces.cpp
-    src/engine/game/kotor/kotor.cpp
-    src/engine/game/kotor/routine/registrar/kotor.cpp
-    src/engine/game/tsl/routine/registrar/tsl.cpp
-    src/engine/game/tsl/tsl.cpp)
+    src/engine/game/core/surfaces.cpp)
 
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -950,6 +942,40 @@ target_precompile_headers(libgame PRIVATE src/engine/pch.h)
 target_link_libraries(libgame PUBLIC libscript libgui libscene libvideo libaudio libgraphics libresource libcommon)
 
 ## END libgame static library
+
+## libkotor static library
+
+set(KOTOR_HEADERS
+    src/engine/game/kotor/kotor.h
+    src/engine/game/kotor/routine/registrar.h)
+
+set(KOTOR_SOURCES
+    src/engine/game/kotor/kotor.cpp
+    src/engine/game/kotor/routine/registrar.cpp)
+
+add_library(libkotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES})
+set_target_properties(libkotor PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libkotor PRIVATE src/engine/pch.h)
+target_link_libraries(libkotor PUBLIC libgame)
+
+## END libkotor static library
+
+## libtsl static library
+
+set(TSL_HEADERS
+    src/engine/game/tsl/routine/registrar.h
+    src/engine/game/tsl/tsl.h)
+
+set(TSL_SOURCES
+    src/engine/game/tsl/routine/registrar.cpp
+    src/engine/game/tsl/tsl.cpp)
+
+add_library(libtsl STATIC ${TSL_HEADERS} ${TSL_SOURCES})
+set_target_properties(libtsl PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libtsl PRIVATE src/engine/pch.h)
+target_link_libraries(libtsl PUBLIC libgame)
+
+## END libtsl static library
 
 ## reone executable
 
@@ -988,7 +1014,7 @@ endif()
 add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_precompile_headers(reone PRIVATE src/engine/pch.h)
-target_link_libraries(reone PRIVATE libgame ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(reone PRIVATE libtsl libkotor ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 list(APPEND InstallTargets reone)
 
@@ -1020,7 +1046,7 @@ if(BUILD_TOOLS)
     add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
     set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     target_precompile_headers(reone-tools PRIVATE src/engine/pch.h)
-    target_link_libraries(reone-tools PRIVATE libgame ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_REGEX_LIBRARY})
+    target_link_libraries(reone-tools PRIVATE libtsl libkotor ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_REGEX_LIBRARY})
 
     list(APPEND InstallTargets reone-tools)
 endif()
