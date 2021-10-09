@@ -17,10 +17,10 @@
 
 #include "game.h"
 
-#include "../../game/kotor.h"
-#include "../../game/script/routine/registrar/kotor.h"
-#include "../../game/script/routine/registrar/tsl.h"
-#include "../../game/tsl.h"
+#include "../../game/core/kotor.h"
+#include "../../game/core/script/routine/registrar/kotor.h"
+#include "../../game/core/script/routine/registrar/tsl.h"
+#include "../../game/core/tsl.h"
 
 #include "audio.h"
 #include "graphics.h"

@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../game/options.h"
-#include "../game/types.h"
+#include "../game/core/options.h"
+#include "../game/core/types.h"
 
 #include "module/audio.h"
 #include "module/common.h"

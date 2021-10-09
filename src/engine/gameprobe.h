@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "game/types.h"
+#include "game/core/types.h"
 
 namespace reone {
 

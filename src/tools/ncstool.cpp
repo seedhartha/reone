@@ -21,9 +21,9 @@
 
 #include "../engine/common/collectionutil.h"
 #include "../engine/common/logutil.h"
-#include "../engine/game/script/routine/iroutines.h"
-#include "../engine/game/script/routine/registrar/kotor.h"
-#include "../engine/game/script/routine/registrar/tsl.h"
+#include "../engine/game/core/script/routine/iroutines.h"
+#include "../engine/game/core/script/routine/registrar/kotor.h"
+#include "../engine/game/core/script/routine/registrar/tsl.h"
 #include "../engine/script/format/ncsreader.h"
 #include "../engine/script/format/ncswriter.h"
 #include "../engine/script/instrutil.h"
