@@ -19,12 +19,14 @@
 
 #include "../engine/common/collectionutil.h"
 #include "../engine/common/logutil.h"
+#include "../engine/game/script/routine/iroutines.h"
 #include "../engine/game/script/routine/registrar/kotor.h"
 #include "../engine/game/script/routine/registrar/tsl.h"
-#include "../engine/game/script/routine/routines.h"
 #include "../engine/script/format/ncsreader.h"
 #include "../engine/script/instrutil.h"
 #include "../engine/script/program.h"
+#include "../engine/script/routine.h"
+#include "../engine/script/variable.h"
 
 using namespace std;
 
@@ -37,6 +39,29 @@ namespace fs = boost::filesystem;
 namespace reone {
 
 namespace tools {
+
+class StubRoutines : public IRoutines {
+public:
+    void add(
+        string name,
+        VariableType retType,
+        vector<VariableType> argTypes,
+        Variable (*fn)(const vector<Variable> &args, const RoutineContext &ctx)) override {
+
+        Routine routine(
+            move(name),
+            retType,
+            move(argTypes),
+            [](auto &args, auto &ctx) { return Variable::ofNull(); });
+
+        _routines.push_back(move(routine));
+    }
+
+    const Routine &get(int index) const override { return _routines[index]; }
+
+private:
+    vector<Routine> _routines;
+};
 
 void NcsTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     if (operation == Operation::ToPCODE) {
@@ -51,14 +76,7 @@ void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
     auto instructions = mapToValues(program->instructions());
     sort(instructions.begin(), instructions.end(), [](auto &a, auto &b) { return a.offset < b.offset; });
 
-    Routines routines(
-        *((ActionFactory *)nullptr),
-        *((Combat *)nullptr),
-        *((EffectFactory *)nullptr),
-        *((Party *)nullptr),
-        *((Reputes *)nullptr),
-        *((ScriptRunner *)nullptr),
-        *((Strings *)nullptr));
+    StubRoutines routines;
     if (_tsl) {
         TSLRoutineRegistrar registar(routines);
         registar.invoke();

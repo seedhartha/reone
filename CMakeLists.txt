@@ -663,6 +663,7 @@ set(GAME_HEADERS
     src/engine/game/script/routine/impl/argutil.h
     src/engine/game/script/routine/impl/declarations.h
     src/engine/game/script/routine/impl/objectutil.h
+    src/engine/game/script/routine/iroutines.h
     src/engine/game/script/routine/routines.h
     src/engine/game/script/runner.h
     src/engine/game/soundsets.h

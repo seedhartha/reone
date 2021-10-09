@@ -259,15 +259,13 @@ void ScriptExecution::executeCONSTO(const Instruction &ins) {
 
 void ScriptExecution::executeACTION(const Instruction &ins) {
     const Routine &routine = _context->routines->get(ins.routine);
-
     if (ins.argCount > routine.getArgumentCount()) {
         throw runtime_error("Too many routine arguments");
     }
-    vector<Variable> args;
 
+    vector<Variable> args;
     for (int i = 0; i < ins.argCount; ++i) {
         VariableType type = routine.getArgumentType(i);
-
         switch (type) {
         case VariableType::Vector:
             args.push_back(getVectorFromStack());
@@ -281,7 +279,6 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
         }
         default:
             Variable var(_stack.back());
-
             if (var.type != type) {
                 throw runtime_error("Invalid argument variable type");
             }
@@ -290,8 +287,8 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
             break;
         }
     }
-    Variable retValue = routine.invoke(args, *_context);
 
+    Variable retValue = routine.invoke(args, *_context);
     if (isLogChannelEnabled(LogChannels::script2)) {
         vector<string> argStrings;
         for (auto &arg : args) {
