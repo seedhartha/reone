@@ -41,6 +41,21 @@ struct Variable {
         float floatValue;
     };
 
+    const std::string toString() const;
+
+    bool operator==(const Variable &other) const {
+        return type == other.type &&
+               strValue == other.strValue &&
+               vecValue == other.vecValue &&
+               engineType == other.engineType &&
+               context == other.context &&
+               intValue == other.intValue;
+    }
+
+    bool operator!=(const Variable &other) const {
+        return !operator==(other);
+    }
+
     static Variable ofNull();
     static Variable ofInt(int value);
     static Variable ofFloat(float value);
@@ -52,20 +67,6 @@ struct Variable {
     static Variable ofLocation(std::shared_ptr<EngineType> engineType);
     static Variable ofTalent(std::shared_ptr<EngineType> engineType);
     static Variable ofAction(std::shared_ptr<ExecutionContext> context);
-
-    Variable operator+(const Variable &other) const;
-    Variable operator-(const Variable &other) const;
-    Variable operator*(const Variable &other) const;
-    Variable operator/(const Variable &other) const;
-
-    bool operator==(const Variable &other) const;
-    bool operator!=(const Variable &other) const;
-    bool operator<(const Variable &other) const;
-    bool operator<=(const Variable &other) const;
-    bool operator>(const Variable &other) const;
-    bool operator>=(const Variable &other) const;
-
-    const std::string toString() const;
 };
 
 } // namespace script

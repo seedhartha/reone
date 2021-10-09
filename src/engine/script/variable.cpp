@@ -17,84 +17,11 @@
 
 #include "variable.h"
 
-#include "enginetype.h"
-
 using namespace std;
 
 namespace reone {
 
 namespace script {
-
-Variable Variable::operator+(const Variable &other) const {
-    if (type == VariableType::Int && other.type == VariableType::Int) {
-        return Variable::ofInt(intValue + other.intValue);
-    }
-    if (type == VariableType::Int && other.type == VariableType::Float) {
-        return Variable::ofFloat(intValue + other.floatValue);
-    }
-    if (type == VariableType::Float && other.type == VariableType::Int) {
-        return Variable::ofFloat(floatValue + other.intValue);
-    }
-    if (type == VariableType::Float && other.type == VariableType::Float) {
-        return Variable::ofFloat(floatValue + other.floatValue);
-    }
-    if (type == VariableType::String && other.type == VariableType::String) {
-        return Variable::ofString(strValue + other.strValue);
-    }
-
-    throw logic_error(str(boost::format("Unsupported variable types: %02x %02x") % static_cast<int>(type) % static_cast<int>(other.type)));
-}
-
-Variable Variable::operator-(const Variable &other) const {
-    if (type == VariableType::Int && other.type == VariableType::Int) {
-        return Variable::ofInt(intValue - other.intValue);
-    }
-    if (type == VariableType::Int && other.type == VariableType::Float) {
-        return Variable::ofFloat(intValue - other.floatValue);
-    }
-    if (type == VariableType::Float && other.type == VariableType::Int) {
-        return Variable::ofFloat(floatValue - other.intValue);
-    }
-    if (type == VariableType::Float && other.type == VariableType::Float) {
-        return Variable::ofFloat(floatValue - other.floatValue);
-    }
-
-    throw logic_error(str(boost::format("Unsupported variable types: %02x %02x") % static_cast<int>(type) % static_cast<int>(other.type)));
-}
-
-Variable Variable::operator*(const Variable &other) const {
-    if (type == VariableType::Int && other.type == VariableType::Int) {
-        return Variable::ofInt(intValue * other.intValue);
-    }
-    if (type == VariableType::Int && other.type == VariableType::Float) {
-        return Variable::ofFloat(intValue * other.floatValue);
-    }
-    if (type == VariableType::Float && other.type == VariableType::Int) {
-        return Variable::ofFloat(floatValue * other.intValue);
-    }
-    if (type == VariableType::Float && other.type == VariableType::Float) {
-        return Variable::ofFloat(floatValue * other.floatValue);
-    }
-
-    throw logic_error(str(boost::format("Unsupported variable types: %02x %02x") % static_cast<int>(type) % static_cast<int>(other.type)));
-}
-
-Variable Variable::operator/(const Variable &other) const {
-    if (type == VariableType::Int && other.type == VariableType::Int) {
-        return Variable::ofInt(intValue / other.intValue);
-    }
-    if (type == VariableType::Int && other.type == VariableType::Float) {
-        return Variable::ofFloat(intValue / other.floatValue);
-    }
-    if (type == VariableType::Float && other.type == VariableType::Int) {
-        return Variable::ofFloat(floatValue / other.intValue);
-    }
-    if (type == VariableType::Float && other.type == VariableType::Float) {
-        return Variable::ofFloat(floatValue / other.floatValue);
-    }
-
-    throw logic_error(str(boost::format("Unsupported variable types: %02x %02x") % static_cast<int>(type) % static_cast<int>(other.type)));
-}
 
 Variable Variable::ofNull() {
     Variable result;
@@ -170,79 +97,6 @@ Variable Variable::ofAction(shared_ptr<ExecutionContext> context) {
     result.type = VariableType::Action;
     result.context = move(context);
     return move(result);
-}
-
-bool Variable::operator==(const Variable &other) const {
-    if (type != other.type)
-        return false;
-
-    switch (type) {
-    case VariableType::Int:
-        return intValue == other.intValue;
-    case VariableType::Float:
-        return floatValue == other.floatValue;
-    case VariableType::String:
-        return strValue == other.strValue;
-    case VariableType::Object:
-        return objectId == other.objectId;
-    case VariableType::Effect:
-    case VariableType::Event:
-    case VariableType::Location:
-    case VariableType::Talent:
-        return engineType == other.engineType;
-    default:
-        throw logic_error("Unsupported variable type: " + to_string(static_cast<int>(type)));
-    }
-
-    return true;
-}
-
-bool Variable::operator!=(const Variable &other) const {
-    return !operator==(other);
-}
-
-bool Variable::operator<(const Variable &other) const {
-    switch (type) {
-    case VariableType::Int:
-        return intValue < other.intValue;
-    case VariableType::Float:
-        return floatValue < other.floatValue;
-    default:
-        throw logic_error(str(boost::format("Unsupported variable type: %02x") % static_cast<int>(type)));
-    }
-}
-
-bool Variable::operator<=(const Variable &other) const {
-    switch (type) {
-    case VariableType::Int:
-        return intValue <= other.intValue;
-    case VariableType::Float:
-        return floatValue <= other.floatValue;
-    default:
-        throw logic_error(str(boost::format("Unsupported variable type: %02x") % static_cast<int>(type)));
-    }
-}
-
-bool Variable::operator>(const Variable &other) const {
-    switch (type) {
-    case VariableType::Int:
-        return intValue > other.intValue;
-    case VariableType::Float:
-        return floatValue > other.floatValue;
-    default:
-        throw logic_error(str(boost::format("Unsupported variable type: %02x") % static_cast<int>(type)));
-    }
-}
-
-bool Variable::operator>=(const Variable &other) const {
-    switch (type) {
-    case VariableType::Int:
-        return intValue >= other.intValue;
-    case VariableType::Float:
-        return floatValue >= other.floatValue;
-    default:
-        throw logic_error(str(boost::format("Unsupported variable type: %02x") % static_cast<int>(type)));
-    }
 }
 
 const string Variable::toString() const {

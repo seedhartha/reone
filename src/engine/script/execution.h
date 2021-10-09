@@ -55,9 +55,27 @@ private:
         _handlers.insert(std::make_pair(type, std::bind(handler, this, std::placeholders::_1)));
     }
 
-    Variable getVectorFromStack();
-    Variable getFloatFromStack();
-    void getTwoIntegersFromStack(Variable &left, Variable &right);
+    int getIntFromStack();
+    float getFloatFromStack();
+    glm::vec3 getVectorFromStack();
+
+    void withStackVariables(const std::function<void(const Variable &, const Variable &)> &fn);
+    void withIntsFromStack(const std::function<void(int, int)> &fn);
+    void withIntFloatFromStack(const std::function<void(int, float)> &fn);
+    void withFloatIntFromStack(const std::function<void(float, int)> &fn);
+    void withFloatsFromStack(const std::function<void(float, float)> &fn);
+    void withStringsFromStack(const std::function<void(const std::string &, const std::string &)> &fn);
+    void withObjectsFromStack(const std::function<void(uint32_t, uint32_t)> &fn);
+    void withEffectsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn);
+    void withEventsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn);
+    void withLocationsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn);
+    void withTalentsFromStack(const std::function<void(const std::shared_ptr<EngineType> &, const std::shared_ptr<EngineType> &)> &fn);
+
+    void withFloatVectorFromStack(const std::function<void(float, const glm::vec3 &)> &fn);
+    void withVectorFloatFromStack(const std::function<void(const glm::vec3 &, float)> &fn);
+    void withVectorsFromStack(const std::function<void(const glm::vec3 &, const glm::vec3 &)> &fn);
+
+    void throwIfInvalidType(VariableType expected, VariableType actual);
 
     // Handlers
 
@@ -81,21 +99,58 @@ private:
     R_INSTR_HANDLER(INCORII)
     R_INSTR_HANDLER(EXCORII)
     R_INSTR_HANDLER(BOOLANDII)
-    R_INSTR_HANDLER(EQUALxx)
+    R_INSTR_HANDLER(EQUALII)
+    R_INSTR_HANDLER(EQUALFF)
+    R_INSTR_HANDLER(EQUALSS)
+    R_INSTR_HANDLER(EQUALOO)
     R_INSTR_HANDLER(EQUALTT)
-    R_INSTR_HANDLER(NEQUALxx)
+    R_INSTR_HANDLER(EQUALEFFEFF)
+    R_INSTR_HANDLER(EQUALEVTEVT)
+    R_INSTR_HANDLER(EQUALLOCLOC)
+    R_INSTR_HANDLER(EQUALTALTAL)
+    R_INSTR_HANDLER(NEQUALII)
+    R_INSTR_HANDLER(NEQUALFF)
+    R_INSTR_HANDLER(NEQUALSS)
+    R_INSTR_HANDLER(NEQUALOO)
     R_INSTR_HANDLER(NEQUALTT)
-    R_INSTR_HANDLER(GEQxx)
-    R_INSTR_HANDLER(GTxx)
-    R_INSTR_HANDLER(LTxx)
-    R_INSTR_HANDLER(LEQxx)
+    R_INSTR_HANDLER(NEQUALEFFEFF)
+    R_INSTR_HANDLER(NEQUALEVTEVT)
+    R_INSTR_HANDLER(NEQUALLOCLOC)
+    R_INSTR_HANDLER(NEQUALTALTAL)
+    R_INSTR_HANDLER(GEQII)
+    R_INSTR_HANDLER(GEQFF)
+    R_INSTR_HANDLER(GTII)
+    R_INSTR_HANDLER(GTFF)
+    R_INSTR_HANDLER(LTII)
+    R_INSTR_HANDLER(LTFF)
+    R_INSTR_HANDLER(LEQII)
+    R_INSTR_HANDLER(LEQFF)
     R_INSTR_HANDLER(SHLEFTII)
     R_INSTR_HANDLER(SHRIGHTII)
     R_INSTR_HANDLER(USHRIGHTII)
-    R_INSTR_HANDLER(ADDxx)
-    R_INSTR_HANDLER(SUBxx)
-    R_INSTR_HANDLER(MULxx)
-    R_INSTR_HANDLER(DIVxx)
+    R_INSTR_HANDLER(ADDII)
+    R_INSTR_HANDLER(ADDIF)
+    R_INSTR_HANDLER(ADDFI)
+    R_INSTR_HANDLER(ADDFF)
+    R_INSTR_HANDLER(ADDSS)
+    R_INSTR_HANDLER(ADDVV)
+    R_INSTR_HANDLER(SUBII)
+    R_INSTR_HANDLER(SUBIF)
+    R_INSTR_HANDLER(SUBFI)
+    R_INSTR_HANDLER(SUBFF)
+    R_INSTR_HANDLER(SUBVV)
+    R_INSTR_HANDLER(MULII)
+    R_INSTR_HANDLER(MULIF)
+    R_INSTR_HANDLER(MULFI)
+    R_INSTR_HANDLER(MULFF)
+    R_INSTR_HANDLER(MULVF)
+    R_INSTR_HANDLER(MULFV)
+    R_INSTR_HANDLER(DIVII)
+    R_INSTR_HANDLER(DIVIF)
+    R_INSTR_HANDLER(DIVFI)
+    R_INSTR_HANDLER(DIVFF)
+    R_INSTR_HANDLER(DIVVF)
+    R_INSTR_HANDLER(DIVFV)
     R_INSTR_HANDLER(MODII)
     R_INSTR_HANDLER(NEGI)
     R_INSTR_HANDLER(NEGF)

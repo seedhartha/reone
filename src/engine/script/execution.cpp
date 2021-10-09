@@ -61,58 +61,58 @@ ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<E
         {InstructionType::INCORII, &ScriptExecution::executeINCORII},
         {InstructionType::EXCORII, &ScriptExecution::executeEXCORII},
         {InstructionType::BOOLANDII, &ScriptExecution::executeBOOLANDII},
-        {InstructionType::EQUALII, &ScriptExecution::executeEQUALxx},
-        {InstructionType::EQUALFF, &ScriptExecution::executeEQUALxx},
-        {InstructionType::EQUALSS, &ScriptExecution::executeEQUALxx},
-        {InstructionType::EQUALOO, &ScriptExecution::executeEQUALxx},
+        {InstructionType::EQUALII, &ScriptExecution::executeEQUALII},
+        {InstructionType::EQUALFF, &ScriptExecution::executeEQUALFF},
+        {InstructionType::EQUALSS, &ScriptExecution::executeEQUALSS},
+        {InstructionType::EQUALOO, &ScriptExecution::executeEQUALOO},
         {InstructionType::EQUALTT, &ScriptExecution::executeEQUALTT},
-        {InstructionType::EQUALEFFEFF, &ScriptExecution::executeEQUALxx},
-        {InstructionType::EQUALEVTEVT, &ScriptExecution::executeEQUALxx},
-        {InstructionType::EQUALLOCLOC, &ScriptExecution::executeEQUALxx},
-        {InstructionType::EQUALTALTAL, &ScriptExecution::executeEQUALxx},
-        {InstructionType::NEQUALII, &ScriptExecution::executeNEQUALxx},
-        {InstructionType::NEQUALFF, &ScriptExecution::executeNEQUALxx},
-        {InstructionType::NEQUALSS, &ScriptExecution::executeNEQUALxx},
-        {InstructionType::NEQUALOO, &ScriptExecution::executeNEQUALxx},
+        {InstructionType::EQUALEFFEFF, &ScriptExecution::executeEQUALEFFEFF},
+        {InstructionType::EQUALEVTEVT, &ScriptExecution::executeEQUALEVTEVT},
+        {InstructionType::EQUALLOCLOC, &ScriptExecution::executeEQUALLOCLOC},
+        {InstructionType::EQUALTALTAL, &ScriptExecution::executeEQUALTALTAL},
+        {InstructionType::NEQUALII, &ScriptExecution::executeNEQUALII},
+        {InstructionType::NEQUALFF, &ScriptExecution::executeNEQUALFF},
+        {InstructionType::NEQUALSS, &ScriptExecution::executeNEQUALSS},
+        {InstructionType::NEQUALOO, &ScriptExecution::executeNEQUALOO},
         {InstructionType::NEQUALTT, &ScriptExecution::executeNEQUALTT},
-        {InstructionType::NEQUALEFFEFF, &ScriptExecution::executeNEQUALxx},
-        {InstructionType::NEQUALEVTEVT, &ScriptExecution::executeNEQUALxx},
-        {InstructionType::NEQUALLOCLOC, &ScriptExecution::executeNEQUALxx},
-        {InstructionType::NEQUALTALTAL, &ScriptExecution::executeNEQUALxx},
-        {InstructionType::GEQII, &ScriptExecution::executeGEQxx},
-        {InstructionType::GEQFF, &ScriptExecution::executeGEQxx},
-        {InstructionType::GTII, &ScriptExecution::executeGTxx},
-        {InstructionType::GTFF, &ScriptExecution::executeGTxx},
-        {InstructionType::LTII, &ScriptExecution::executeLTxx},
-        {InstructionType::LTFF, &ScriptExecution::executeLTxx},
-        {InstructionType::LEQII, &ScriptExecution::executeLEQxx},
-        {InstructionType::LEQFF, &ScriptExecution::executeLEQxx},
+        {InstructionType::NEQUALEFFEFF, &ScriptExecution::executeNEQUALEFFEFF},
+        {InstructionType::NEQUALEVTEVT, &ScriptExecution::executeNEQUALEVTEVT},
+        {InstructionType::NEQUALLOCLOC, &ScriptExecution::executeNEQUALLOCLOC},
+        {InstructionType::NEQUALTALTAL, &ScriptExecution::executeNEQUALTALTAL},
+        {InstructionType::GEQII, &ScriptExecution::executeGEQII},
+        {InstructionType::GEQFF, &ScriptExecution::executeGEQFF},
+        {InstructionType::GTII, &ScriptExecution::executeGTII},
+        {InstructionType::GTFF, &ScriptExecution::executeGTFF},
+        {InstructionType::LTII, &ScriptExecution::executeLTII},
+        {InstructionType::LTFF, &ScriptExecution::executeLTFF},
+        {InstructionType::LEQII, &ScriptExecution::executeLEQII},
+        {InstructionType::LEQFF, &ScriptExecution::executeLEQFF},
         {InstructionType::SHLEFTII, &ScriptExecution::executeSHLEFTII},
         {InstructionType::SHRIGHTII, &ScriptExecution::executeSHRIGHTII},
         {InstructionType::USHRIGHTII, &ScriptExecution::executeUSHRIGHTII},
-        {InstructionType::ADDII, &ScriptExecution::executeADDxx},
-        {InstructionType::ADDIF, &ScriptExecution::executeADDxx},
-        {InstructionType::ADDFI, &ScriptExecution::executeADDxx},
-        {InstructionType::ADDFF, &ScriptExecution::executeADDxx},
-        {InstructionType::ADDSS, &ScriptExecution::executeADDxx},
-        {InstructionType::ADDVV, &ScriptExecution::executeADDxx},
-        {InstructionType::SUBII, &ScriptExecution::executeSUBxx},
-        {InstructionType::SUBIF, &ScriptExecution::executeSUBxx},
-        {InstructionType::SUBFI, &ScriptExecution::executeSUBxx},
-        {InstructionType::SUBFF, &ScriptExecution::executeSUBxx},
-        {InstructionType::SUBVV, &ScriptExecution::executeSUBxx},
-        {InstructionType::MULII, &ScriptExecution::executeMULxx},
-        {InstructionType::MULIF, &ScriptExecution::executeMULxx},
-        {InstructionType::MULFI, &ScriptExecution::executeMULxx},
-        {InstructionType::MULFF, &ScriptExecution::executeMULxx},
-        {InstructionType::MULVF, &ScriptExecution::executeMULxx},
-        {InstructionType::MULFV, &ScriptExecution::executeMULxx},
-        {InstructionType::DIVII, &ScriptExecution::executeDIVxx},
-        {InstructionType::DIVIF, &ScriptExecution::executeDIVxx},
-        {InstructionType::DIVFI, &ScriptExecution::executeDIVxx},
-        {InstructionType::DIVFF, &ScriptExecution::executeDIVxx},
-        {InstructionType::DIVVF, &ScriptExecution::executeDIVxx},
-        {InstructionType::DIVFV, &ScriptExecution::executeDIVxx},
+        {InstructionType::ADDII, &ScriptExecution::executeADDII},
+        {InstructionType::ADDIF, &ScriptExecution::executeADDIF},
+        {InstructionType::ADDFI, &ScriptExecution::executeADDFI},
+        {InstructionType::ADDFF, &ScriptExecution::executeADDFF},
+        {InstructionType::ADDSS, &ScriptExecution::executeADDSS},
+        {InstructionType::ADDVV, &ScriptExecution::executeADDVV},
+        {InstructionType::SUBII, &ScriptExecution::executeSUBII},
+        {InstructionType::SUBIF, &ScriptExecution::executeSUBIF},
+        {InstructionType::SUBFI, &ScriptExecution::executeSUBFI},
+        {InstructionType::SUBFF, &ScriptExecution::executeSUBFF},
+        {InstructionType::SUBVV, &ScriptExecution::executeSUBVV},
+        {InstructionType::MULII, &ScriptExecution::executeMULII},
+        {InstructionType::MULIF, &ScriptExecution::executeMULIF},
+        {InstructionType::MULFI, &ScriptExecution::executeMULFI},
+        {InstructionType::MULFF, &ScriptExecution::executeMULFF},
+        {InstructionType::MULVF, &ScriptExecution::executeMULVF},
+        {InstructionType::MULFV, &ScriptExecution::executeMULFV},
+        {InstructionType::DIVII, &ScriptExecution::executeDIVII},
+        {InstructionType::DIVIF, &ScriptExecution::executeDIVIF},
+        {InstructionType::DIVFI, &ScriptExecution::executeDIVFI},
+        {InstructionType::DIVFF, &ScriptExecution::executeDIVFF},
+        {InstructionType::DIVVF, &ScriptExecution::executeDIVVF},
+        {InstructionType::DIVFV, &ScriptExecution::executeDIVFV},
         {InstructionType::MODII, &ScriptExecution::executeMODII},
         {InstructionType::NEGI, &ScriptExecution::executeNEGI},
         {InstructionType::NEGF, &ScriptExecution::executeNEGF},
@@ -270,7 +270,7 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
         VariableType type = routine.getArgumentType(i);
         switch (type) {
         case VariableType::Vector:
-            args.push_back(getVectorFromStack());
+            args.push_back(Variable::ofVector(getVectorFromStack()));
             break;
 
         case VariableType::Action: {
@@ -313,75 +313,58 @@ void ScriptExecution::executeACTION(const Instruction &ins) {
     }
 }
 
-Variable ScriptExecution::getVectorFromStack() {
-    float x = getFloatFromStack().floatValue;
-    float y = getFloatFromStack().floatValue;
-    float z = getFloatFromStack().floatValue;
-
-    return Variable::ofVector(glm::vec3(x, y, z));
-}
-
-Variable ScriptExecution::getFloatFromStack() {
-    Variable var(_stack.back());
-
-    if (var.type != VariableType::Float) {
-        throw runtime_error("Invalid variable type for a vector component");
-    }
-    _stack.pop_back();
-
-    return move(var);
-}
-
 void ScriptExecution::executeLOGANDII(const Instruction &ins) {
-    Variable left, right;
-    getTwoIntegersFromStack(left, right);
-
-    _stack.push_back(Variable::ofInt(static_cast<int>(left.intValue && right.intValue)));
-}
-
-void ScriptExecution::getTwoIntegersFromStack(Variable &left, Variable &right) {
-    right = _stack.back();
-    _stack.pop_back();
-
-    left = _stack.back();
-    _stack.pop_back();
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left && right)));
+    });
 }
 
 void ScriptExecution::executeLOGORII(const Instruction &ins) {
-    Variable left, right;
-    getTwoIntegersFromStack(left, right);
-
-    _stack.push_back(Variable::ofInt(static_cast<int>(left.intValue || right.intValue)));
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left || right)));
+    });
 }
 
 void ScriptExecution::executeINCORII(const Instruction &ins) {
-    Variable left, right;
-    getTwoIntegersFromStack(left, right);
-
-    _stack.push_back(Variable::ofInt(left.intValue | right.intValue));
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(left | right));
+    });
 }
 
 void ScriptExecution::executeEXCORII(const Instruction &ins) {
-    Variable left, right;
-    getTwoIntegersFromStack(left, right);
-
-    _stack.push_back(Variable::ofInt(left.intValue ^ right.intValue));
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(left ^ right));
+    });
 }
 
 void ScriptExecution::executeBOOLANDII(const Instruction &ins) {
-    Variable left, right;
-    getTwoIntegersFromStack(left, right);
-
-    _stack.push_back(Variable::ofInt(left.intValue & right.intValue));
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(left & right));
+    });
 }
 
-void ScriptExecution::executeEQUALxx(const Instruction &ins) {
-    size_t stackSize = _stack.size();
-    bool equal = _stack[stackSize - 2] == _stack[stackSize - 1];
+void ScriptExecution::executeEQUALII(const Instruction &ins) {
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
+    });
+}
 
-    _stack.pop_back();
-    _stack.pop_back();
-    _stack.push_back(Variable::ofInt(static_cast<int>(equal)));
+void ScriptExecution::executeEQUALFF(const Instruction &ins) {
+    withFloatsFromStack([this](float left, float right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
+    });
+}
+
+void ScriptExecution::executeEQUALSS(const Instruction &ins) {
+    withStringsFromStack([this](auto &left, auto &right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
+    });
+}
+
+void ScriptExecution::executeEQUALOO(const Instruction &ins) {
+    withObjectsFromStack([this](uint32_t left, uint32_t right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
+    });
 }
 
 void ScriptExecution::executeEQUALTT(const Instruction &ins) {
@@ -400,13 +383,52 @@ void ScriptExecution::executeEQUALTT(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(static_cast<int>(equal)));
 }
 
-void ScriptExecution::executeNEQUALxx(const Instruction &ins) {
-    size_t stackSize = _stack.size();
-    bool notEqual = _stack[stackSize - 2] != _stack[stackSize - 1];
+void ScriptExecution::executeEQUALEFFEFF(const Instruction &ins) {
+    withEffectsFromStack([this](auto &left, auto &right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
+    });
+}
 
-    _stack.pop_back();
-    _stack.pop_back();
-    _stack.push_back(Variable::ofInt(static_cast<int>(notEqual)));
+void ScriptExecution::executeEQUALEVTEVT(const Instruction &ins) {
+    withEventsFromStack([this](auto &left, auto &right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
+    });
+}
+
+void ScriptExecution::executeEQUALLOCLOC(const Instruction &ins) {
+    withLocationsFromStack([this](auto &left, auto &right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
+    });
+}
+
+void ScriptExecution::executeEQUALTALTAL(const Instruction &ins) {
+    withTalentsFromStack([this](auto &left, auto &right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left == right)));
+    });
+}
+
+void ScriptExecution::executeNEQUALII(const Instruction &ins) {
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
+    });
+}
+
+void ScriptExecution::executeNEQUALFF(const Instruction &ins) {
+    withFloatsFromStack([this](float left, float right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
+    });
+}
+
+void ScriptExecution::executeNEQUALSS(const Instruction &ins) {
+    withStringsFromStack([this](auto &left, auto &right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
+    });
+}
+
+void ScriptExecution::executeNEQUALOO(const Instruction &ins) {
+    withObjectsFromStack([this](uint32_t left, uint32_t right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
+    });
 }
 
 void ScriptExecution::executeNEQUALTT(const Instruction &ins) {
@@ -425,105 +447,244 @@ void ScriptExecution::executeNEQUALTT(const Instruction &ins) {
     _stack.push_back(Variable::ofInt(static_cast<int>(notEqual)));
 }
 
-void ScriptExecution::executeGEQxx(const Instruction &ins) {
-    size_t stackSize = _stack.size();
-    bool ge = _stack[stackSize - 2] >= _stack[stackSize - 1];
-
-    _stack.pop_back();
-    _stack.pop_back();
-    _stack.push_back(Variable::ofInt(static_cast<int>(ge)));
+void ScriptExecution::executeNEQUALEFFEFF(const Instruction &ins) {
+    withEffectsFromStack([this](auto &left, auto &right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
+    });
 }
 
-void ScriptExecution::executeGTxx(const Instruction &ins) {
-    size_t stackSize = _stack.size();
-    bool greater = _stack[stackSize - 2] > _stack[stackSize - 1];
-
-    _stack.pop_back();
-    _stack.pop_back();
-    _stack.push_back(Variable::ofInt(static_cast<int>(greater)));
+void ScriptExecution::executeNEQUALEVTEVT(const Instruction &ins) {
+    withEventsFromStack([this](auto &left, auto &right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
+    });
 }
 
-void ScriptExecution::executeLTxx(const Instruction &ins) {
-    size_t stackSize = _stack.size();
-    bool less = _stack[stackSize - 2] < _stack[stackSize - 1];
-
-    _stack.pop_back();
-    _stack.pop_back();
-    _stack.push_back(Variable::ofInt(static_cast<int>(less)));
+void ScriptExecution::executeNEQUALLOCLOC(const Instruction &ins) {
+    withLocationsFromStack([this](auto &left, auto &right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
+    });
 }
 
-void ScriptExecution::executeLEQxx(const Instruction &ins) {
-    size_t stackSize = _stack.size();
-    bool le = _stack[stackSize - 2] <= _stack[stackSize - 1];
+void ScriptExecution::executeNEQUALTALTAL(const Instruction &ins) {
+    withTalentsFromStack([this](auto &left, auto &right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left != right)));
+    });
+}
 
-    _stack.pop_back();
-    _stack.pop_back();
-    _stack.push_back(Variable::ofInt(static_cast<int>(le)));
+void ScriptExecution::executeGEQII(const Instruction &ins) {
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left >= right)));
+    });
+}
+
+void ScriptExecution::executeGEQFF(const Instruction &ins) {
+    withFloatsFromStack([this](float left, float right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left >= right)));
+    });
+}
+
+void ScriptExecution::executeGTII(const Instruction &ins) {
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left > right)));
+    });
+}
+
+void ScriptExecution::executeGTFF(const Instruction &ins) {
+    withFloatsFromStack([this](float left, float right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left > right)));
+    });
+}
+
+void ScriptExecution::executeLTII(const Instruction &ins) {
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left < right)));
+    });
+}
+
+void ScriptExecution::executeLTFF(const Instruction &ins) {
+    withFloatsFromStack([this](float left, float right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left < right)));
+    });
+}
+
+void ScriptExecution::executeLEQII(const Instruction &ins) {
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left <= right)));
+    });
+}
+
+void ScriptExecution::executeLEQFF(const Instruction &ins) {
+    withFloatsFromStack([this](float left, float right) {
+        _stack.push_back(Variable::ofInt(static_cast<int>(left <= right)));
+    });
 }
 
 void ScriptExecution::executeSHLEFTII(const Instruction &ins) {
-    Variable left, right;
-    getTwoIntegersFromStack(left, right);
-
-    _stack.push_back(Variable::ofInt(left.intValue << right.intValue));
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(left << right));
+    });
 }
 
 void ScriptExecution::executeSHRIGHTII(const Instruction &ins) {
-    Variable left, right;
-    getTwoIntegersFromStack(left, right);
-
-    _stack.push_back(Variable::ofInt(left.intValue >> right.intValue));
+    withIntsFromStack([this](int left, int right) {
+        int result = left;
+        if (result < 0) {
+            result = -((-result) >> right);
+        } else {
+            result >>= right;
+        }
+        _stack.push_back(Variable::ofInt(result));
+    });
 }
 
 void ScriptExecution::executeUSHRIGHTII(const Instruction &ins) {
-    Variable left, right;
-    getTwoIntegersFromStack(left, right);
-
-    // TODO: proper unsigned shift
-    _stack.push_back(Variable::ofInt(left.intValue >> right.intValue));
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(left >> right));
+    });
 }
 
-void ScriptExecution::executeADDxx(const Instruction &ins) {
-    size_t stackSize = _stack.size();
-    Variable result(_stack[stackSize - 2] + _stack[stackSize - 1]);
-
-    _stack.pop_back();
-    _stack.pop_back();
-    _stack.push_back(move(result));
+void ScriptExecution::executeADDII(const Instruction &ins) {
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(left + right));
+    });
 }
 
-void ScriptExecution::executeSUBxx(const Instruction &ins) {
-    size_t stackSize = _stack.size();
-    Variable result(_stack[stackSize - 2] - _stack[stackSize - 1]);
-
-    _stack.pop_back();
-    _stack.pop_back();
-    _stack.push_back(move(result));
+void ScriptExecution::executeADDIF(const Instruction &ins) {
+    withIntFloatFromStack([this](int left, float right) {
+        _stack.push_back(Variable::ofFloat(left + right));
+    });
 }
 
-void ScriptExecution::executeMULxx(const Instruction &ins) {
-    size_t stackSize = _stack.size();
-    Variable result(_stack[stackSize - 2] * _stack[stackSize - 1]);
-
-    _stack.pop_back();
-    _stack.pop_back();
-    _stack.push_back(move(result));
+void ScriptExecution::executeADDFI(const Instruction &ins) {
+    withFloatIntFromStack([this](float left, int right) {
+        _stack.push_back(Variable::ofFloat(left + right));
+    });
 }
 
-void ScriptExecution::executeDIVxx(const Instruction &ins) {
-    size_t stackSize = _stack.size();
-    Variable result(_stack[stackSize - 2] / _stack[stackSize - 1]);
+void ScriptExecution::executeADDFF(const Instruction &ins) {
+    withFloatsFromStack([this](float left, float right) {
+        _stack.push_back(Variable::ofFloat(left + right));
+    });
+}
 
-    _stack.pop_back();
-    _stack.pop_back();
-    _stack.push_back(move(result));
+void ScriptExecution::executeADDSS(const Instruction &ins) {
+    withStringsFromStack([this](auto &left, auto &right) {
+        _stack.push_back(Variable::ofString(left + right));
+    });
+}
+
+void ScriptExecution::executeADDVV(const Instruction &ins) {
+    withVectorsFromStack([this](auto &left, auto &right) {
+        _stack.push_back(Variable::ofVector(left + right));
+    });
+}
+
+void ScriptExecution::executeSUBII(const Instruction &ins) {
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(left - right));
+    });
+}
+
+void ScriptExecution::executeSUBIF(const Instruction &ins) {
+    withIntFloatFromStack([this](int left, float right) {
+        _stack.push_back(Variable::ofFloat(left - right));
+    });
+}
+
+void ScriptExecution::executeSUBFI(const Instruction &ins) {
+    withFloatIntFromStack([this](float left, int right) {
+        _stack.push_back(Variable::ofFloat(left - right));
+    });
+}
+
+void ScriptExecution::executeSUBFF(const Instruction &ins) {
+    withFloatsFromStack([this](float left, float right) {
+        _stack.push_back(Variable::ofFloat(left - right));
+    });
+}
+
+void ScriptExecution::executeSUBVV(const Instruction &ins) {
+    withVectorsFromStack([this](auto &left, auto &right) {
+        _stack.push_back(Variable::ofVector(left - right));
+    });
+}
+
+void ScriptExecution::executeMULII(const Instruction &ins) {
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(left * right));
+    });
+}
+
+void ScriptExecution::executeMULIF(const Instruction &ins) {
+    withIntFloatFromStack([this](int left, float right) {
+        _stack.push_back(Variable::ofFloat(left * right));
+    });
+}
+
+void ScriptExecution::executeMULFI(const Instruction &ins) {
+    withFloatIntFromStack([this](float left, int right) {
+        _stack.push_back(Variable::ofFloat(left * right));
+    });
+}
+
+void ScriptExecution::executeMULFF(const Instruction &ins) {
+    withFloatsFromStack([this](float left, float right) {
+        _stack.push_back(Variable::ofFloat(left * right));
+    });
+}
+
+void ScriptExecution::executeMULVF(const Instruction &ins) {
+    withVectorFloatFromStack([this](auto &left, float right) {
+        _stack.push_back(Variable::ofVector(left * right));
+    });
+}
+
+void ScriptExecution::executeMULFV(const Instruction &ins) {
+    withFloatVectorFromStack([this](float left, auto &right) {
+        _stack.push_back(Variable::ofVector(left * right));
+    });
+}
+
+void ScriptExecution::executeDIVII(const Instruction &ins) {
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(left / right));
+    });
+}
+
+void ScriptExecution::executeDIVIF(const Instruction &ins) {
+    withIntFloatFromStack([this](int left, float right) {
+        _stack.push_back(Variable::ofFloat(left / right));
+    });
+}
+
+void ScriptExecution::executeDIVFI(const Instruction &ins) {
+    withFloatIntFromStack([this](float left, int right) {
+        _stack.push_back(Variable::ofFloat(left / right));
+    });
+}
+
+void ScriptExecution::executeDIVFF(const Instruction &ins) {
+    withFloatsFromStack([this](float left, float right) {
+        _stack.push_back(Variable::ofFloat(left / right));
+    });
+}
+
+void ScriptExecution::executeDIVVF(const Instruction &ins) {
+    withVectorFloatFromStack([this](auto &left, float right) {
+        _stack.push_back(Variable::ofVector(left / right));
+    });
+}
+
+void ScriptExecution::executeDIVFV(const Instruction &ins) {
+    withFloatVectorFromStack([this](float left, auto &right) {
+        _stack.push_back(Variable::ofVector(left / right));
+    });
 }
 
 void ScriptExecution::executeMODII(const Instruction &ins) {
-    Variable left, right;
-    getTwoIntegersFromStack(left, right);
-
-    _stack.push_back(Variable::ofInt(left.intValue % right.intValue));
+    withIntsFromStack([this](int left, int right) {
+        _stack.push_back(Variable::ofInt(left % right));
+    });
 }
 
 void ScriptExecution::executeNEGI(const Instruction &ins) {
@@ -551,9 +712,7 @@ void ScriptExecution::executeJSR(const Instruction &ins) {
 }
 
 void ScriptExecution::executeJZ(const Instruction &ins) {
-    bool zero = _stack.back().intValue == 0;
-    _stack.pop_back();
-
+    bool zero = getIntFromStack() == 0;
     if (zero) {
         _nextInstruction = ins.jumpOffset;
     }
@@ -590,17 +749,13 @@ void ScriptExecution::executeINCISP(const Instruction &ins) {
 }
 
 void ScriptExecution::executeNOTI(const Instruction &ins) {
-    bool zero = _stack.back().intValue == 0;
-    _stack.pop_back();
-
-    _stack.push_back(Variable::ofInt(static_cast<int>(zero)));
+    int value = getIntFromStack();
+    _stack.push_back(Variable::ofInt(static_cast<int>(!value)));
 }
 
 void ScriptExecution::executeJNZ(const Instruction &ins) {
-    bool zero = _stack.back().intValue == 0;
-    _stack.pop_back();
-
-    if (!zero) {
+    bool notZero = getIntFromStack() != 0;
+    if (notZero) {
         _nextInstruction = ins.jumpOffset;
     }
 }
@@ -640,8 +795,7 @@ void ScriptExecution::executeSAVEBP(const Instruction &ins) {
 }
 
 void ScriptExecution::executeRESTOREBP(const Instruction &ins) {
-    _globalCount = _stack.back().intValue;
-    _stack.pop_back();
+    _globalCount = getIntFromStack();
 }
 
 void ScriptExecution::executeSTORE_STATE(const Instruction &ins) {
@@ -663,6 +817,154 @@ void ScriptExecution::executeSTORE_STATE(const Instruction &ins) {
 
     _savedState.program = _program;
     _savedState.insOffset = ins.offset + 0x10;
+}
+
+int ScriptExecution::getIntFromStack() {
+    Variable var(move(_stack.back()));
+    _stack.pop_back();
+
+    throwIfInvalidType(VariableType::Int, var.type);
+
+    return var.intValue;
+}
+
+float ScriptExecution::getFloatFromStack() {
+    Variable var(move(_stack.back()));
+    _stack.pop_back();
+
+    throwIfInvalidType(VariableType::Float, var.type);
+
+    return var.floatValue;
+}
+
+glm::vec3 ScriptExecution::getVectorFromStack() {
+    float x = getFloatFromStack();
+    float y = getFloatFromStack();
+    float z = getFloatFromStack();
+
+    return glm::vec3(x, y, z);
+}
+
+void ScriptExecution::withStackVariables(const function<void(const Variable &, const Variable &)> &fn) {
+    Variable second(move(_stack.back()));
+    _stack.pop_back();
+
+    Variable first(move(_stack.back()));
+    _stack.pop_back();
+
+    fn(first, second);
+}
+
+void ScriptExecution::withIntsFromStack(const function<void(int, int)> &fn) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
+        throwIfInvalidType(VariableType::Int, left.type);
+        throwIfInvalidType(VariableType::Int, right.type);
+        fn(left.intValue, right.intValue);
+    });
+}
+
+void ScriptExecution::withIntFloatFromStack(const function<void(int, float)> &fn) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
+        throwIfInvalidType(VariableType::Int, left.type);
+        throwIfInvalidType(VariableType::Float, right.type);
+        fn(left.intValue, right.floatValue);
+    });
+}
+
+void ScriptExecution::withFloatIntFromStack(const function<void(float, int)> &fn) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
+        throwIfInvalidType(VariableType::Float, left.type);
+        throwIfInvalidType(VariableType::Int, right.type);
+        fn(left.floatValue, right.intValue);
+    });
+}
+
+void ScriptExecution::withFloatsFromStack(const function<void(float, float)> &fn) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
+        throwIfInvalidType(VariableType::Float, left.type);
+        throwIfInvalidType(VariableType::Float, right.type);
+        fn(left.floatValue, right.floatValue);
+    });
+}
+
+void ScriptExecution::withStringsFromStack(const function<void(const string &, const string &)> &fn) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
+        throwIfInvalidType(VariableType::String, left.type);
+        throwIfInvalidType(VariableType::String, right.type);
+        fn(left.strValue, right.strValue);
+    });
+}
+
+void ScriptExecution::withObjectsFromStack(const function<void(uint32_t, uint32_t)> &fn) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
+        throwIfInvalidType(VariableType::Object, left.type);
+        throwIfInvalidType(VariableType::Object, right.type);
+        fn(left.objectId, right.objectId);
+    });
+}
+
+void ScriptExecution::withEffectsFromStack(const function<void(const shared_ptr<EngineType> &, const shared_ptr<EngineType> &)> &fn) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
+        throwIfInvalidType(VariableType::Effect, left.type);
+        throwIfInvalidType(VariableType::Effect, right.type);
+        fn(left.engineType, right.engineType);
+    });
+}
+
+void ScriptExecution::withEventsFromStack(const function<void(const shared_ptr<EngineType> &, const shared_ptr<EngineType> &)> &fn) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
+        throwIfInvalidType(VariableType::Event, left.type);
+        throwIfInvalidType(VariableType::Event, right.type);
+        fn(left.engineType, right.engineType);
+    });
+}
+
+void ScriptExecution::withLocationsFromStack(const function<void(const shared_ptr<EngineType> &, const shared_ptr<EngineType> &)> &fn) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
+        throwIfInvalidType(VariableType::Location, left.type);
+        throwIfInvalidType(VariableType::Location, right.type);
+        fn(left.engineType, right.engineType);
+    });
+}
+
+void ScriptExecution::withTalentsFromStack(const function<void(const shared_ptr<EngineType> &, const shared_ptr<EngineType> &)> &fn) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
+        throwIfInvalidType(VariableType::Talent, left.type);
+        throwIfInvalidType(VariableType::Talent, right.type);
+        fn(left.engineType, right.engineType);
+    });
+}
+
+void ScriptExecution::withFloatVectorFromStack(const function<void(float, const glm::vec3 &)> &fn) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
+        throwIfInvalidType(VariableType::Float, left.type);
+        throwIfInvalidType(VariableType::Vector, right.type);
+        fn(left.floatValue, right.vecValue);
+    });
+}
+
+void ScriptExecution::withVectorFloatFromStack(const function<void(const glm::vec3 &, float)> &fn) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
+        throwIfInvalidType(VariableType::Vector, left.type);
+        throwIfInvalidType(VariableType::Float, right.type);
+        fn(left.vecValue, right.floatValue);
+    });
+}
+
+void ScriptExecution::withVectorsFromStack(const function<void(const glm::vec3 &, const glm::vec3 &)> &fn) {
+    withStackVariables([this, &fn](auto &left, auto &right) {
+        throwIfInvalidType(VariableType::Vector, left.type);
+        throwIfInvalidType(VariableType::Vector, right.type);
+        fn(left.vecValue, right.vecValue);
+    });
+}
+
+void ScriptExecution::throwIfInvalidType(VariableType expected, VariableType actual) {
+    if (actual != expected) {
+        throw runtime_error(str(boost::format("Invalid variable type: expected=%d, actual=%d") %
+                                static_cast<int>(expected) %
+                                static_cast<int>(actual)));
+    }
 }
 
 int ScriptExecution::getStackSize() const {
