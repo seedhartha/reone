@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tsl.h"
+#include "registrar.h"
 
-#include "../../../../script/types.h"
+#include "../../../script/types.h"
 
-#include "../../../core/script/routine/impl/declarations.h"
-#include "../../../core/script/routine/iroutines.h"
+#include "../../core/script/routine/impl/declarations.h"
+#include "../../core/script/routine/iroutines.h"
 
 namespace reone {
 
@@ -38,7 +38,7 @@ namespace game {
 #define VT_VECTOR script::VariableType::Vector
 #define VT_ACTION script::VariableType::Action
 
-void TSLRoutineRegistrar::invoke() {
+void KotORRoutineRegistrar::invoke() {
     _routines.add("Random", VT_I, {VT_I}, &routine::random);
     _routines.add("PrintString", VT_V, {VT_S}, &routine::printString);
     _routines.add("PrintFloat", VT_V, {VT_F, VT_I, VT_I}, &routine::printFloat);
@@ -70,7 +70,7 @@ void TSLRoutineRegistrar::invoke() {
     _routines.add("GetFacing", VT_F, {VT_O}, &routine::getFacing);
     _routines.add("GetItemPossessor", VT_O, {VT_O}, &routine::getItemPossessor);
     _routines.add("GetItemPossessedBy", VT_O, {VT_O, VT_S}, &routine::getItemPossessedBy);
-    _routines.add("CreateItemOnObject", VT_O, {VT_S, VT_O, VT_I, VT_I}, &routine::createItemOnObject);
+    _routines.add("CreateItemOnObject", VT_O, {VT_S, VT_O, VT_I}, &routine::createItemOnObject);
     _routines.add("ActionEquipItem", VT_V, {VT_O, VT_I, VT_I}, &routine::actionEquipItem);
     _routines.add("ActionUnequipItem", VT_V, {VT_O, VT_I}, &routine::actionUnequipItem);
     _routines.add("ActionPickUpItem", VT_V, {VT_O}, &routine::actionPickUpItem);
@@ -121,7 +121,7 @@ void TSLRoutineRegistrar::invoke() {
     _routines.add("EffectDamage", VT_EFFECT, {VT_I, VT_I, VT_I}, &routine::effectDamage);
     _routines.add("EffectAbilityIncrease", VT_EFFECT, {VT_I, VT_I}, &routine::effectAbilityIncrease);
     _routines.add("EffectDamageResistance", VT_EFFECT, {VT_I, VT_I, VT_I}, &routine::effectDamageResistance);
-    _routines.add("EffectResurrection", VT_EFFECT, {VT_I}, &routine::effectResurrection);
+    _routines.add("EffectResurrection", VT_EFFECT, {}, &routine::effectResurrection);
     _routines.add("GetPlayerRestrictMode", VT_I, {VT_O}, &routine::getPlayerRestrictMode);
     _routines.add("GetCasterLevel", VT_I, {VT_O}, &routine::getCasterLevel);
     _routines.add("GetFirstEffect", VT_EFFECT, {VT_O}, &routine::getFirstEffect);
@@ -172,7 +172,7 @@ void TSLRoutineRegistrar::invoke() {
     _routines.add("EffectEntangle", VT_EFFECT, {}, &routine::effectEntangle);
     _routines.add("SignalEvent", VT_V, {VT_O, VT_EVENT}, &routine::signalEvent);
     _routines.add("EventUserDefined", VT_EVENT, {VT_I}, &routine::eventUserDefined);
-    _routines.add("EffectDeath", VT_EFFECT, {VT_I, VT_I, VT_I}, &routine::effectDeath);
+    _routines.add("EffectDeath", VT_EFFECT, {VT_I, VT_I}, &routine::effectDeath);
     _routines.add("EffectKnockdown", VT_EFFECT, {}, &routine::effectKnockdown);
     _routines.add("ActionGiveItem", VT_V, {VT_O, VT_O}, &routine::actionGiveItem);
     _routines.add("ActionTakeItem", VT_V, {VT_O, VT_O}, &routine::actionTakeItem);
@@ -240,10 +240,10 @@ void TSLRoutineRegistrar::invoke() {
     _routines.add("GetTransitionTarget", VT_O, {VT_O}, &routine::getTransitionTarget);
     _routines.add("EffectLinkEffects", VT_EFFECT, {VT_EFFECT, VT_EFFECT}, &routine::effectLinkEffects);
     _routines.add("GetObjectByTag", VT_O, {VT_S, VT_I}, &routine::getObjectByTag);
-    _routines.add("AdjustAlignment", VT_V, {VT_O, VT_I, VT_I, VT_I}, &routine::adjustAlignment);
+    _routines.add("AdjustAlignment", VT_V, {VT_O, VT_I, VT_I}, &routine::adjustAlignment);
     _routines.add("ActionWait", VT_V, {VT_F}, &routine::actionWait);
     _routines.add("SetAreaTransitionBMP", VT_V, {VT_I, VT_S}, &routine::setAreaTransitionBMP);
-    _routines.add("ActionStartConversation", VT_V, {VT_O, VT_S, VT_I, VT_I, VT_I, VT_S, VT_S, VT_S, VT_S, VT_S, VT_S, VT_I, VT_I, VT_I, VT_I}, &routine::actionStartConversation);
+    _routines.add("ActionStartConversation", VT_V, {VT_O, VT_S, VT_I, VT_I, VT_I, VT_S, VT_S, VT_S, VT_S, VT_S, VT_S, VT_I}, &routine::actionStartConversation);
     _routines.add("ActionPauseConversation", VT_V, {}, &routine::actionPauseConversation);
     _routines.add("ActionResumeConversation", VT_V, {}, &routine::actionResumeConversation);
     _routines.add("EffectBeam", VT_EFFECT, {VT_I, VT_O, VT_I, VT_I}, &routine::effectBeam);
@@ -280,7 +280,7 @@ void TSLRoutineRegistrar::invoke() {
     _routines.add("GetPCSpeaker", VT_O, {}, &routine::getPCSpeaker);
     _routines.add("GetStringByStrRef", VT_S, {VT_I}, &routine::getStringByStrRef);
     _routines.add("ActionSpeakStringByStrRef", VT_V, {VT_I, VT_I}, &routine::actionSpeakStringByStrRef);
-    _routines.add("DestroyObject", VT_V, {VT_O, VT_F, VT_I, VT_F, VT_I}, &routine::destroyObject);
+    _routines.add("DestroyObject", VT_V, {VT_O, VT_F, VT_I, VT_F}, &routine::destroyObject);
     _routines.add("GetModule", VT_O, {}, &routine::getModule);
     _routines.add("CreateObject", VT_O, {VT_I, VT_S, VT_LOCATION, VT_I}, &routine::createObject);
     _routines.add("EventSpellCastAt", VT_EVENT, {VT_O, VT_I, VT_I}, &routine::eventSpellCastAt);
@@ -359,7 +359,7 @@ void TSLRoutineRegistrar::invoke() {
     _routines.add("GetLastAttackType", VT_I, {VT_O}, &routine::getLastAttackType);
     _routines.add("GetLastAttackMode", VT_I, {VT_O}, &routine::getLastAttackMode);
     _routines.add("GetDistanceBetween2D", VT_F, {VT_O, VT_O}, &routine::getDistanceBetween2D);
-    _routines.add("GetIsInCombat", VT_I, {VT_O, VT_I}, &routine::getIsInCombat);
+    _routines.add("GetIsInCombat", VT_I, {VT_O}, &routine::getIsInCombat);
     _routines.add("GetLastAssociateCommand", VT_I, {VT_O}, &routine::getLastAssociateCommand);
     _routines.add("GiveGoldToCreature", VT_V, {VT_O, VT_I}, &routine::giveGoldToCreature);
     _routines.add("SetIsDestroyable", VT_V, {VT_I, VT_I, VT_I}, &routine::setIsDestroyable);
@@ -393,7 +393,7 @@ void TSLRoutineRegistrar::invoke() {
     _routines.add("EffectSkillIncrease", VT_EFFECT, {VT_I, VT_I}, &routine::effectSkillIncrease);
     _routines.add("GetInventoryDisturbType", VT_I, {}, &routine::getInventoryDisturbType);
     _routines.add("GetInventoryDisturbItem", VT_O, {}, &routine::getInventoryDisturbItem);
-    _routines.add("ShowUpgradeScreen", VT_V, {VT_O, VT_O, VT_I, VT_I, VT_S}, &routine::showUpgradeScreen);
+    _routines.add("ShowUpgradeScreen", VT_V, {VT_O}, &routine::showUpgradeScreen);
     _routines.add("VersusAlignmentEffect", VT_EFFECT, {VT_EFFECT, VT_I, VT_I}, &routine::versusAlignmentEffect);
     _routines.add("VersusRacialTypeEffect", VT_EFFECT, {VT_EFFECT, VT_I}, &routine::versusRacialTypeEffect);
     _routines.add("VersusTrapEffect", VT_EFFECT, {VT_EFFECT}, &routine::versusTrapEffect);
@@ -467,8 +467,8 @@ void TSLRoutineRegistrar::invoke() {
     _routines.add("MusicBackgroundPlay", VT_V, {VT_O}, &routine::musicBackgroundPlay);
     _routines.add("MusicBackgroundStop", VT_V, {VT_O}, &routine::musicBackgroundStop);
     _routines.add("MusicBackgroundSetDelay", VT_V, {VT_O, VT_I}, &routine::musicBackgroundSetDelay);
-    _routines.add("MusicBackgroundChangeDay", VT_V, {VT_O, VT_I, VT_I}, &routine::musicBackgroundChangeDay);
-    _routines.add("MusicBackgroundChangeNight", VT_V, {VT_O, VT_I, VT_I}, &routine::musicBackgroundChangeNight);
+    _routines.add("MusicBackgroundChangeDay", VT_V, {VT_O, VT_I}, &routine::musicBackgroundChangeDay);
+    _routines.add("MusicBackgroundChangeNight", VT_V, {VT_O, VT_I}, &routine::musicBackgroundChangeNight);
     _routines.add("MusicBattlePlay", VT_V, {VT_O}, &routine::musicBattlePlay);
     _routines.add("MusicBattleStop", VT_V, {VT_O}, &routine::musicBattleStop);
     _routines.add("MusicBattleChange", VT_V, {VT_O, VT_I}, &routine::musicBattleChange);
@@ -716,7 +716,7 @@ void TSLRoutineRegistrar::invoke() {
 
     _routines.add("AddJournalWorldEntry", VT_V, {VT_I, VT_S, VT_S}, &routine::addJournalWorldEntry);
     _routines.add("AddJournalWorldEntryStrref", VT_V, {VT_I, VT_I}, &routine::addJournalWorldEntryStrref);
-    _routines.add("BarkString", VT_V, {VT_O, VT_I, VT_I, VT_I}, &routine::barkString);
+    _routines.add("BarkString", VT_V, {VT_O, VT_I}, &routine::barkString);
     _routines.add("DeleteJournalWorldAllEntries", VT_V, {}, &routine::deleteJournalWorldAllEntries);
     _routines.add("DeleteJournalWorldEntry", VT_V, {VT_I}, &routine::deleteJournalWorldEntry);
     _routines.add("DeleteJournalWorldEntryStrref", VT_V, {VT_I}, &routine::deleteJournalWorldEntryStrref);
@@ -759,7 +759,7 @@ void TSLRoutineRegistrar::invoke() {
     _routines.add("GetNPCSelectability", VT_I, {VT_I}, &routine::getNPCSelectability);
     _routines.add("ClearAllEffects", VT_V, {}, &routine::clearAllEffects);
     _routines.add("GetLastConversation", VT_S, {}, &routine::getLastConversation);
-    _routines.add("ShowPartySelectionGUI", VT_V, {VT_S, VT_I, VT_I, VT_I}, &routine::showPartySelectionGUI);
+    _routines.add("ShowPartySelectionGUI", VT_V, {VT_S, VT_I, VT_I}, &routine::showPartySelectionGUI);
     _routines.add("GetStandardFaction", VT_I, {VT_O}, &routine::getStandardFaction);
     _routines.add("GivePlotXP", VT_V, {VT_S, VT_I}, &routine::givePlotXP);
     _routines.add("GetMinOneHP", VT_I, {VT_O}, &routine::getMinOneHP);
@@ -782,7 +782,7 @@ void TSLRoutineRegistrar::invoke() {
     _routines.add("ActionFollowLeader", VT_V, {}, &routine::actionFollowLeader);
     _routines.add("SetForcePowerUnsuccessful", VT_V, {VT_I, VT_O}, &routine::setForcePowerUnsuccessful);
     _routines.add("GetIsDebilitated", VT_I, {VT_O}, &routine::getIsDebilitated);
-    _routines.add("PlayMovie", VT_V, {VT_S, VT_I}, &routine::playMovie);
+    _routines.add("PlayMovie", VT_V, {VT_S}, &routine::playMovie);
     _routines.add("SaveNPCState", VT_V, {VT_I}, &routine::saveNPCState);
     _routines.add("GetCategoryFromTalent", VT_I, {VT_TALENT}, &routine::getCategoryFromTalent);
     _routines.add("SurrenderByFaction", VT_V, {VT_I, VT_I}, &routine::surrenderByFaction);
@@ -817,125 +817,10 @@ void TSLRoutineRegistrar::invoke() {
     _routines.add("SetMusicVolume", VT_V, {VT_F}, &routine::setMusicVolume);
     _routines.add("CreateItemOnFloor", VT_O, {VT_S, VT_LOCATION, VT_I}, &routine::createItemOnFloor);
     _routines.add("SetAvailableNPCId", VT_V, {VT_I, VT_O}, &routine::setAvailableNPCId);
-    _routines.add("GetScriptParameter", VT_I, {VT_I}, &routine::getScriptParameter);
-    _routines.add("SetFadeUntilScript", VT_V, {}, &routine::setFadeUntilScript);
-    _routines.add("EffectForceBody", VT_EFFECT, {VT_I}, &routine::effectForceBody);
-    _routines.add("GetItemComponent", VT_I, {}, &routine::getItemComponent);
-    _routines.add("GetItemComponentPieceValue", VT_I, {}, &routine::getItemComponentPieceValue);
-    _routines.add("ShowChemicalUpgradeScreen", VT_V, {VT_O}, &routine::showChemicalUpgradeScreen);
-    _routines.add("GetChemicals", VT_I, {}, &routine::getChemicals);
-    _routines.add("GetChemicalPieceValue", VT_I, {}, &routine::getChemicalPieceValue);
-    _routines.add("GetSpellForcePointCost", VT_I, {}, &routine::getSpellForcePointCost);
-    _routines.add("EffectFury", VT_EFFECT, {}, &routine::effectFury);
-    _routines.add("EffectBlind", VT_EFFECT, {}, &routine::effectBlind);
-    _routines.add("EffectFPRegenModifier", VT_EFFECT, {VT_I}, &routine::effectFPRegenModifier);
-    _routines.add("EffectVPRegenModifier", VT_EFFECT, {VT_I}, &routine::effectVPRegenModifier);
-    _routines.add("EffectCrush", VT_EFFECT, {}, &routine::effectCrush);
-
-    _routines.add("SWMG_GetSwoopUpgrade", VT_I, {VT_I}, &routine::minigame::getSwoopUpgrade);
-
-    _routines.add("GetFeatAcquired", VT_I, {VT_I, VT_O}, &routine::getFeatAcquired);
-    _routines.add("GetSpellAcquired", VT_I, {VT_I, VT_O}, &routine::getSpellAcquired);
-    _routines.add("ShowSwoopUpgradeScreen", VT_V, {}, &routine::showSwoopUpgradeScreen);
-    _routines.add("GrantFeat", VT_V, {VT_I, VT_O}, &routine::grantFeat);
-    _routines.add("GrantSpell", VT_V, {VT_I, VT_O}, &routine::grantSpell);
-    _routines.add("SpawnMine", VT_V, {VT_I, VT_LOCATION, VT_I, VT_I, VT_O}, &routine::spawnMine);
-
-    _routines.add("SWMG_GetTrackPosition", VT_VECTOR, {VT_O}, &routine::minigame::getTrackPosition);
-    _routines.add("SWMG_SetFollowerPosition", VT_VECTOR, {VT_VECTOR}, &routine::minigame::setFollowerPosition);
-
-    _routines.add("SetFakeCombatState", VT_V, {VT_O, VT_I}, &routine::setFakeCombatState);
-
-    _routines.add("SWMG_DestroyMiniGameObject", VT_V, {VT_O}, &routine::minigame::destroyMiniGameObject);
-
-    _routines.add("GetOwnerDemolitionsSkill", VT_I, {VT_O}, &routine::getOwnerDemolitionsSkill);
-    _routines.add("SetOrientOnClick", VT_V, {VT_O, VT_I}, &routine::setOrientOnClick);
-    _routines.add("GetInfluence", VT_I, {VT_I}, &routine::getInfluence);
-    _routines.add("SetInfluence", VT_V, {VT_I, VT_I}, &routine::setInfluence);
-    _routines.add("ModifyInfluence", VT_V, {VT_I, VT_I}, &routine::modifyInfluence);
-    _routines.add("GetRacialSubType", VT_I, {VT_O}, &routine::getRacialSubType);
-    _routines.add("IncrementGlobalNumber", VT_V, {VT_S, VT_I}, &routine::incrementGlobalNumber);
-    _routines.add("DecrementGlobalNumber", VT_V, {VT_S, VT_I}, &routine::decrementGlobalNumber);
-    _routines.add("SetBonusForcePoints", VT_V, {VT_O, VT_I}, &routine::setBonusForcePoints);
-    _routines.add("AddBonusForcePoints", VT_V, {VT_O, VT_I}, &routine::addBonusForcePoints);
-    _routines.add("GetBonusForcePoints", VT_V, {VT_O}, &routine::getBonusForcePoints);
-
-    _routines.add("SWMG_SetJumpSpeed", VT_V, {VT_F}, &routine::minigame::setJumpSpeed);
-
     _routines.add("IsMoviePlaying", VT_I, {}, &routine::isMoviePlaying);
     _routines.add("QueueMovie", VT_V, {VT_S, VT_I}, &routine::queueMovie);
     _routines.add("PlayMovieQueue", VT_V, {VT_I}, &routine::playMovieQueue);
-    _routines.add("YavinHackDoorClose", VT_V, {VT_O}, &routine::yavinHackCloseDoor);
-    _routines.add("EffectDroidConfused", VT_EFFECT, {}, &routine::effectDroidConfused);
-    _routines.add("IsStealthed", VT_I, {VT_O}, &routine::isStealthed);
-    _routines.add("IsMeditating", VT_I, {VT_O}, &routine::isMeditating);
-    _routines.add("IsInTotalDefense", VT_I, {VT_O}, &routine::isInTotalDefense);
-    _routines.add("SetHealTarget", VT_V, {VT_O, VT_O}, &routine::setHealTarget);
-    _routines.add("GetHealTarget", VT_O, {VT_O}, &routine::getHealTarget);
-    _routines.add("GetRandomDestination", VT_VECTOR, {VT_O, VT_I}, &routine::getRandomDestination);
-    _routines.add("IsFormActive", VT_I, {VT_O, VT_I}, &routine::isFormActive);
-    _routines.add("GetSpellFormMask", VT_I, {VT_I}, &routine::getSpellFormMask);
-    _routines.add("GetSpellBaseForcePointCost", VT_I, {VT_I}, &routine::getSpellBaseForcePointCost);
-    _routines.add("SetKeepStealthInDialog", VT_V, {VT_I}, &routine::setKeepStealthInDialog);
-    _routines.add("HasLineOfSight", VT_I, {VT_VECTOR, VT_VECTOR, VT_O, VT_O}, &routine::hasLineOfSight);
-    _routines.add("ShowDemoScreen", VT_I, {VT_S, VT_I, VT_I, VT_I, VT_I}, &routine::showDemoScreen);
-    _routines.add("ForceHeartbeat", VT_V, {VT_O}, &routine::forceHeartbeat);
-    _routines.add("EffectForceSight", VT_EFFECT, {}, &routine::effectForceSight);
-    _routines.add("IsRunning", VT_I, {VT_O}, &routine::isRunning);
-
-    _routines.add("SWMG_PlayerApplyForce", VT_V, {VT_VECTOR}, &routine::minigame::playerApplyForce);
-
-    _routines.add("SetForfeitConditions", VT_V, {VT_I}, &routine::setForfeitConditions);
-    _routines.add("GetLastForfeitViolation", VT_I, {}, &routine::getLastForfeitViolation);
-    _routines.add("ModifyReflexSavingThrowBase", VT_V, {VT_O, VT_I}, &routine::modifyReflexSavingThrowBase);
-    _routines.add("ModifyFortitudeSavingThrowBase", VT_V, {VT_O, VT_I}, &routine::modifyFortitudeSavingThrowBase);
-    _routines.add("ModifyWillSavingThrowBase", VT_V, {VT_O, VT_I}, &routine::modifyWillSavingThrowBase);
-    _routines.add("GetScriptStringParameter", VT_S, {}, &routine::getScriptStringParameter);
-    _routines.add("GetObjectPersonalSpace", VT_F, {VT_O}, &routine::getObjectPersonalSpace);
-    _routines.add("AdjustCreatureAttributes", VT_V, {VT_O, VT_I, VT_I}, &routine::adjustCreatureAttributes);
-    _routines.add("SetCreatureAILevel", VT_V, {VT_O, VT_I}, &routine::setCreatureAILevel);
-    _routines.add("ResetCreatureAILevel", VT_V, {VT_O}, &routine::resetCreatureAILevel);
-    _routines.add("AddAvailablePUPByTemplate", VT_I, {VT_I, VT_S}, &routine::addAvailablePUPByTemplate);
-    _routines.add("AddAvailablePUPByObject", VT_I, {VT_I, VT_O}, &routine::addAvailablePUPByObject);
-    _routines.add("AssignPUP", VT_I, {VT_I, VT_I}, &routine::assignPUP);
-    _routines.add("SpawnAvailablePUP", VT_O, {VT_I, VT_LOCATION}, &routine::spawnAvailablePUP);
-    _routines.add("AddPartyPuppet", VT_I, {VT_I, VT_O}, &routine::addPartyPuppet);
-    _routines.add("GetPUPOwner", VT_O, {VT_O}, &routine::getPUPOwner);
-    _routines.add("GetIsPuppet", VT_I, {VT_O}, &routine::getIsPuppet);
-    _routines.add("ActionFollowOwner", VT_V, {VT_F}, &routine::actionFollowOwner);
-    _routines.add("GetIsPartyLeader", VT_I, {VT_O}, &routine::getIsPartyLeader);
-    _routines.add("GetPartyLeader", VT_O, {}, &routine::getPartyLeader);
-    _routines.add("RemoveNPCFromPartyToBase", VT_I, {VT_I}, &routine::removeNPCFromPartyToBase);
-    _routines.add("CreatureFlourishWeapon", VT_V, {VT_O}, &routine::creatureFlourishWeapon);
-    _routines.add("EffectMindTrick", VT_EFFECT, {}, &routine::effectMindTrick);
-    _routines.add("EffectFactionModifier", VT_EFFECT, {VT_I}, &routine::effectFactionModifier);
-    _routines.add("ChangeObjectAppearance", VT_V, {VT_O, VT_I}, &routine::changeObjectAppearance);
-    _routines.add("GetIsXBox", VT_I, {}, &routine::getIsXBox);
-    _routines.add("EffectDroidScramble", VT_EFFECT, {}, &routine::effectDroidScramble);
-    _routines.add("ActionSwitchWeapons", VT_V, {}, &routine::actionSwitchWeapons);
-    _routines.add("PlayOverlayAnimation", VT_V, {VT_O, VT_I}, &routine::playOverlayAnimation);
-    _routines.add("UnlockAllSongs", VT_V, {}, &routine::unlockAllSongs);
-    _routines.add("DisableMap", VT_V, {VT_I}, &routine::disableMap);
-    _routines.add("DetonateMine", VT_V, {VT_O}, &routine::detonateMine);
-    _routines.add("DisableHealthRegen", VT_V, {VT_I}, &routine::disableHealthRegen);
-    _routines.add("SetCurrentForm", VT_V, {VT_O, VT_I}, &routine::setCurrentForm);
-    _routines.add("SetDisableTransit", VT_V, {VT_I}, &routine::setDisableTransit);
-    _routines.add("SetInputClass", VT_V, {VT_I}, &routine::setInputClass);
-    _routines.add("SetForceAlwaysUpdate", VT_V, {VT_O, VT_I}, &routine::setForceAlwaysUpdate);
-    _routines.add("EnableRain", VT_V, {VT_I}, &routine::enableRain);
-    _routines.add("DisplayMessageBox", VT_V, {VT_I, VT_S}, &routine::displayMessageBox);
-    _routines.add("DisplayDatapad", VT_V, {VT_O}, &routine::displayDatapad);
-    _routines.add("RemoveHeartbeat", VT_V, {VT_O}, &routine::removeHeartbeat);
-    _routines.add("RemoveEffectByID", VT_V, {VT_O, VT_I}, &routine::removeEffectByID);
-    _routines.add("RemoveEffectByExactMatch", VT_V, {VT_O, VT_EFFECT}, &routine::removeEffectByExactMatch);
-    _routines.add("AdjustCreatureSkills", VT_V, {VT_O, VT_I, VT_I}, &routine::adjustCreatureSkills);
-    _routines.add("GetSkillRankBase", VT_I, {VT_I, VT_O}, &routine::getSkillRankBase);
-    _routines.add("EnableRendering", VT_V, {VT_O, VT_I}, &routine::enableRendering);
-    _routines.add("GetCombatActionsPending", VT_I, {VT_O}, &routine::getCombatActionsPending);
-    _routines.add("SaveNPCByObject", VT_V, {VT_I, VT_O}, &routine::saveNPCByObject);
-    _routines.add("SavePUPByObject", VT_V, {VT_I, VT_O}, &routine::savePUPByObject);
-    _routines.add("GetIsPlayerMadeCharacter", VT_I, {VT_O}, &routine::getIsPlayerMadeCharacter);
-    _routines.add("RebuildPartyTable", VT_V, {}, &routine::rebuildPartyTable);
+    _routines.add("YavinHackCloseDoor", VT_V, {VT_O}, &routine::yavinHackCloseDoor);
 }
 
 } // namespace game

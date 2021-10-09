@@ -18,8 +18,8 @@
 #include "game.h"
 
 #include "../../game/kotor/kotor.h"
-#include "../../game/kotor/routine/registrar/kotor.h"
-#include "../../game/tsl/routine/registrar/tsl.h"
+#include "../../game/kotor/routine/registrar.h"
+#include "../../game/tsl/routine/registrar.h"
 #include "../../game/tsl/tsl.h"
 
 #include "audio.h"
