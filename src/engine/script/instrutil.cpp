@@ -139,7 +139,7 @@ string describeInstruction(const Instruction &ins, const IRoutineProvider &routi
     case InstructionType::CPTOPSP:
     case InstructionType::CPDOWNBP:
     case InstructionType::CPTOPBP:
-        desc += str(boost::format(" %d %02x") % ins.stackOffset % ins.size);
+        desc += str(boost::format(" %d, %d") % ins.stackOffset % ins.size);
         break;
     case InstructionType::CONSTI:
         desc += " " + to_string(ins.intValue);
@@ -154,7 +154,7 @@ string describeInstruction(const Instruction &ins, const IRoutineProvider &routi
         desc += " " + to_string(ins.objectId);
         break;
     case InstructionType::ACTION:
-        desc += str(boost::format(" %s:%d %d") % routines.get(ins.routine).name() % ins.routine % ins.argCount);
+        desc += str(boost::format(" %s(%d), %d") % routines.get(ins.routine).name() % ins.routine % ins.argCount);
         break;
     case InstructionType::MOVSP:
         desc += str(boost::format(" %d") % ins.stackOffset);
@@ -166,16 +166,16 @@ string describeInstruction(const Instruction &ins, const IRoutineProvider &routi
         desc += str(boost::format(" %04x") % ins.jumpOffset);
         break;
     case InstructionType::DESTRUCT:
-        desc += str(boost::format(" %02x %02x %02x") % ins.size % ins.stackOffset % ins.sizeNoDestroy);
+        desc += str(boost::format(" %d, %d, %d") % ins.size % ins.stackOffset % ins.sizeNoDestroy);
         break;
     case InstructionType::DECISP:
     case InstructionType::INCISP:
     case InstructionType::DECIBP:
     case InstructionType::INCIBP:
-        desc += str(boost::format(" %04x") % ins.stackOffset);
+        desc += str(boost::format(" %d") % ins.stackOffset);
         break;
     case InstructionType::STORE_STATE:
-        desc += str(boost::format(" %04x %04x") % ins.size % ins.sizeLocals);
+        desc += str(boost::format(" %d, %d") % ins.size % ins.sizeLocals);
         break;
     default:
         break;
