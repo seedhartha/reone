@@ -21,13 +21,12 @@
 
 #include "declarations.h"
 
-#include "../../../../../common/logutil.h"
-#include "../../../../../script/exception/notimpl.h"
-#include "../../../../../script/types.h"
+#include "../../../../common/logutil.h"
+#include "../../../../script/exception/notimpl.h"
+#include "../../../../script/types.h"
 
-#include "../../../object/sound.h"
-
-#include "../context.h"
+#include "../../../core/object/sound.h"
+#include "../../../core/script/routine/context.h"
 
 #include "argutil.h"
 

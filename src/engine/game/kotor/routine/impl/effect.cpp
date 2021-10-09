@@ -21,15 +21,15 @@
 
 #include "declarations.h"
 
-#include "../../../../../script/exception/argument.h"
-#include "../../../../../script/exception/notimpl.h"
+#include "../../../../script/exception/argument.h"
+#include "../../../../script/exception/notimpl.h"
 
-#include "../../../effect/effect.h"
-#include "../../../effect/factory.h"
-#include "../../../game.h"
-#include "../../../types.h"
+#include "../../../core/effect/effect.h"
+#include "../../../core/effect/factory.h"
+#include "../../../core/game.h"
+#include "../../../core/types.h"
 
-#include "../context.h"
+#include "../../../core/script/routine/context.h"
 
 #include "argutil.h"
 

@@ -21,13 +21,12 @@
 
 #include "declarations.h"
 
-#include "../../../../../script/exception/argument.h"
-#include "../../../../../script/exception/notimpl.h"
-#include "../../../../../script/types.h"
+#include "../../../../script/exception/argument.h"
+#include "../../../../script/exception/notimpl.h"
+#include "../../../../script/types.h"
 
-#include "../../../talent.h"
-
-#include "../context.h"
+#include "../../../core/script/routine/context.h"
+#include "../../../core/talent.h"
 
 #include "argutil.h"
 

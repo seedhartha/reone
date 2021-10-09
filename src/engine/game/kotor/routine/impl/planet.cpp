@@ -16,14 +16,15 @@
  */
 
 /** @file
- *  Implementation of routines related to ambient sounds.
+ *  Implementation of planet-related routines.
  */
 
 #include "declarations.h"
 
-#include "../../../../../script/exception/notimpl.h"
+#include "../../../../script/exception/notimpl.h"
+#include "../../../../script/types.h"
 
-#include "../context.h"
+#include "../../../core/script/routine/context.h"
 
 using namespace std;
 
@@ -35,27 +36,23 @@ namespace game {
 
 namespace routine {
 
-Variable ambientSoundPlay(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setPlanetSelectable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable ambientSoundStop(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getPlanetSelectable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable ambientSoundChangeDay(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setPlanetAvailable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable ambientSoundChangeNight(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getPlanetAvailable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable ambientSoundSetDayVolume(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable ambientSoundSetNightVolume(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getSelectedPlanet(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

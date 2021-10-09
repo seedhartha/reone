@@ -21,12 +21,11 @@
 
 #include "declarations.h"
 
-#include "../../../../../common/logutil.h"
-#include "../../../../../script/types.h"
+#include "../../../../common/logutil.h"
+#include "../../../../script/types.h"
 
-#include "../../../object/creature.h"
-
-#include "../context.h"
+#include "../../../core/object/creature.h"
+#include "../../../core/script/routine/context.h"
 
 #include "argutil.h"
 #include "objectutil.h"

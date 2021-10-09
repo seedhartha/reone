@@ -16,17 +16,14 @@
  */
 
 /** @file
- *  Implementation of vector-related routines.
+ *  Implementation of routines related to ambient sounds.
  */
 
 #include "declarations.h"
 
-#include "../../../../../script/exception/notimpl.h"
-#include "../../../../../script/types.h"
+#include "../../../../script/exception/notimpl.h"
 
-#include "../context.h"
-
-#include "argutil.h"
+#include "../../../core/script/routine/context.h"
 
 using namespace std;
 
@@ -38,28 +35,27 @@ namespace game {
 
 namespace routine {
 
-Variable vectorMagnitude(const vector<Variable> &args, const RoutineContext &ctx) {
-    glm::vec3 value(getVector(args, 0));
-    return Variable::ofFloat(glm::length(value));
-}
-
-Variable vectorNormalize(const vector<Variable> &args, const RoutineContext &ctx) {
-    glm::vec3 value(getVector(args, 0));
-    return Variable::ofVector(glm::normalize(value));
-}
-
-Variable vectorCreate(const vector<Variable> &args, const RoutineContext &ctx) {
-    float x = getFloat(args, 0);
-    float y = getFloat(args, 1);
-    float z = getFloat(args, 2);
-    return Variable::ofVector(glm::vec3(x, y, z));
-}
-
-Variable angleToVector(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable ambientSoundPlay(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable vectorToAngle(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable ambientSoundStop(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable ambientSoundChangeDay(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable ambientSoundChangeNight(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable ambientSoundSetDayVolume(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable ambientSoundSetNightVolume(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

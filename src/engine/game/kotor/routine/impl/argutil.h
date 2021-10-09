@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../../../../../common/collectionutil.h"
-#include "../../../../../script/variable.h"
+#include "../../../../common/collectionutil.h"
+#include "../../../../script/variable.h"
 
 namespace reone {
 

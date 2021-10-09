@@ -17,19 +17,18 @@
 
 #include "argutil.h"
 
-#include "../../../../../script/exception/argument.h"
-#include "../../../../../script/executioncontext.h"
+#include "../../../../script/exception/argument.h"
+#include "../../../../script/executioncontext.h"
 
-#include "../../../effect/effect.h"
-#include "../../../event.h"
-#include "../../../game.h"
-#include "../../../location.h"
-#include "../../../object/creature.h"
-#include "../../../object/door.h"
-#include "../../../object/sound.h"
-#include "../../../talent.h"
-
-#include "../context.h"
+#include "../../../core/effect/effect.h"
+#include "../../../core/event.h"
+#include "../../../core/game.h"
+#include "../../../core/location.h"
+#include "../../../core/object/creature.h"
+#include "../../../core/object/door.h"
+#include "../../../core/object/sound.h"
+#include "../../../core/script/routine/context.h"
+#include "../../../core/talent.h"
 
 using namespace std;
 

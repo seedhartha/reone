@@ -21,16 +21,15 @@
 
 #include "declarations.h"
 
-#include "../../../../../common/logutil.h"
-#include "../../../../../common/randomutil.h"
-#include "../../../../../script/exception/notimpl.h"
-#include "../../../../../script/types.h"
+#include "../../../../common/logutil.h"
+#include "../../../../common/randomutil.h"
+#include "../../../../script/exception/notimpl.h"
+#include "../../../../script/types.h"
 
-#include "../../../game.h"
-#include "../../../object/creature.h"
-#include "../../../party.h"
-
-#include "../context.h"
+#include "../../../core/game.h"
+#include "../../../core/object/creature.h"
+#include "../../../core/party.h"
+#include "../../../core/script/routine/context.h"
 
 #include "argutil.h"
 #include "objectutil.h"

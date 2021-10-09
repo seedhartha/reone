@@ -19,8 +19,8 @@
 
 #include "../../../script/types.h"
 
-#include "../../core/script/routine/impl/declarations.h"
 #include "../../core/script/routine/iroutines.h"
+#include "../../kotor/routine/impl/declarations.h"
 
 namespace reone {
 

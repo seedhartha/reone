@@ -21,10 +21,10 @@
 
 #include "declarations.h"
 
-#include "../../../../../common/randomutil.h"
-#include "../../../../../script/types.h"
+#include "../../../../common/randomutil.h"
+#include "../../../../script/types.h"
 
-#include "../context.h"
+#include "../../../core/script/routine/context.h"
 
 #include "argutil.h"
 
