@@ -29,17 +29,6 @@ namespace reone {
 
 namespace script {
 
-Routine::Routine(
-    string name,
-    VariableType retType,
-    vector<VariableType> argTypes,
-    function<Variable(const vector<Variable> &, ExecutionContext &ctx)> fn) :
-    _name(move(name)),
-    _returnType(retType),
-    _argumentTypes(move(argTypes)),
-    _func(move(fn)) {
-}
-
 Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) const {
     try {
         return _func(args, ctx);

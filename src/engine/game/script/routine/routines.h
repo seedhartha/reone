@@ -17,13 +17,12 @@
 
 #pragma once
 
-#include "../../../script/executioncontext.h"
+#include "../../../common/collectionutil.h"
 #include "../../../script/routine.h"
-#include "../../../script/routineprovider.h"
-#include "../../../script/types.h"
 #include "../../../script/variable.h"
 
 #include "context.h"
+#include "iroutines.h"
 
 namespace reone {
 
@@ -43,7 +42,7 @@ class Party;
 class Reputes;
 class ScriptRunner;
 
-class Routines : public script::IRoutineProvider, boost::noncopyable {
+class Routines : public IRoutines, boost::noncopyable {
 public:
     Routines(
         ActionFactory &actionFactory,
@@ -63,23 +62,25 @@ public:
     }
 
     const script::Routine &get(int index) const override {
+        if (isOutOfRange(_routines, index)) {
+            throw std::out_of_range("index is out of range");
+        }
         return _routines[index];
     }
 
     void setGame(Game &game) { _game = &game; }
 
-    template <class T>
     void add(
         std::string name,
         script::VariableType retType,
         std::vector<script::VariableType> argTypes,
-        const T &fn) {
+        script::Variable (*fn)(const std::vector<script::Variable> &args, const RoutineContext &ctx)) override {
 
         _routines.emplace_back(
             std::move(name),
             retType,
             std::move(argTypes),
-            [&](auto &args, auto &execution) {
+            [this, fn](auto &args, auto &execution) {
                 RoutineContext ctx(
                     _actionFactory,
                     _combat,

@@ -17,24 +17,28 @@
 
 #pragma once
 
-#include "registrar.h"
+#include "../../../script/routineprovider.h"
+#include "../../../script/types.h"
 
 namespace reone {
 
+namespace script {
+
+struct Variable;
+
+}
+
 namespace game {
 
-class IRoutines;
+class RoutineContext;
 
-class TSLRoutineRegistrar : public RoutineRegistrar {
+class IRoutines : public script::IRoutineProvider {
 public:
-    TSLRoutineRegistrar(IRoutines &routines) :
-        _routines(routines) {
-    }
-
-    void invoke() override;
-
-private:
-    IRoutines &_routines;
+    virtual void add(
+        std::string name,
+        script::VariableType retType,
+        std::vector<script::VariableType> argTypes,
+        script::Variable (*fn)(const std::vector<script::Variable> &args, const RoutineContext &ctx)) = 0;
 };
 
 } // namespace game

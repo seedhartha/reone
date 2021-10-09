@@ -32,7 +32,12 @@ public:
         std::string name,
         VariableType retType,
         std::vector<VariableType> argTypes,
-        std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> fn);
+        std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> fn) :
+        _name(std::move(name)),
+        _returnType(retType),
+        _argumentTypes(std::move(argTypes)),
+        _func(std::move(fn)) {
+    }
 
     Variable invoke(const std::vector<Variable> &args, ExecutionContext &ctx) const;
 

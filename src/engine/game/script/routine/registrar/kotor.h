@@ -23,18 +23,18 @@ namespace reone {
 
 namespace game {
 
-class Routines;
+class IRoutines;
 
 class KotORRoutineRegistrar : public RoutineRegistrar {
 public:
-    KotORRoutineRegistrar(Routines &routines) :
+    KotORRoutineRegistrar(IRoutines &routines) :
         _routines(routines) {
     }
 
     void invoke() override;
 
 private:
-    Routines &_routines;
+    IRoutines &_routines;
 };
 
 } // namespace game
