@@ -22,6 +22,7 @@
 #include "declarations.h"
 
 #include "../../../../../common/logutil.h"
+#include "../../../../../resource/strings.h"
 #include "../../../../../script/exception/argument.h"
 #include "../../../../../script/exception/notimpl.h"
 #include "../../../../../script/executioncontext.h"
@@ -2035,7 +2036,7 @@ Variable showPartySelectionGUI(const vector<Variable> &args, const RoutineContex
     int forceNpc1 = getIntOrElse(args, 1, -1);
     int forceNpc2 = getIntOrElse(args, 2, -1);
 
-    PartySelection::Context partyCtx;
+    PartySelectionContext partyCtx;
     partyCtx.exitScript = move(exitScript);
     partyCtx.forceNpc1 = forceNpc1;
     partyCtx.forceNpc2 = forceNpc2;

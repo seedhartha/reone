@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -18,22 +17,54 @@
 
 #pragma once
 
-#include "../kotor/kotor.h"
+#include "../../../gui/gui.h"
+
+#include "../../core/types.h"
 
 namespace reone {
 
+namespace graphics {
+
+class Lips;
+class Models;
+class Walkmeshes;
+
+} // namespace graphics
+
+namespace audio {
+
+class AudioFiles;
+class AudioPlayer;
+
+} // namespace audio
+
 namespace game {
 
-class TSL : public KotOR {
-public:
-    TSL(
-        boost::filesystem::path path,
-        Options options,
+class ActionFactory;
+class Classes;
+class Combat;
+class Feats;
+class FootstepSounds;
+class Game;
+class GUISounds;
+class ObjectFactory;
+class Party;
+class Portraits;
+class Reputes;
+class ScriptRunner;
+class SoundSets;
+class Surfaces;
+
+/**
+ * Encapsulates game-specific GUI configuration.
+ */
+class GameGUI : public gui::GUI {
+protected:
+    GameGUI(
+        Game *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,
-        Cursors &cursors,
-        EffectFactory &effectFactory,
         Feats &feats,
         FootstepSounds &footstepSounds,
         GUISounds &guiSounds,
@@ -42,7 +73,6 @@ public:
         Portraits &portraits,
         Reputes &reputes,
         ScriptRunner &scriptRunner,
-        Skills &skills,
         SoundSets &soundSets,
         Surfaces &surfaces,
         audio::AudioFiles &audioFiles,
@@ -59,13 +89,45 @@ public:
         graphics::Textures &textures,
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
-        scene::SceneGraph &sceneGraph,
-        scene::WorldRenderPipeline &worldRenderPipeline,
-        script::Scripts &scripts,
         resource::Resources &resources,
         resource::Strings &strings);
 
-    void initResourceProviders() override;
+    void initForGame();
+
+    std::string getResRef(const std::string &base) const;
+
+protected:
+    Game *_game;
+
+    // Services
+
+    ActionFactory &_actionFactory;
+    Classes &_classes;
+    Combat &_combat;
+    Feats &_feats;
+    FootstepSounds &_footstepSounds;
+    GUISounds &_guiSounds;
+    ObjectFactory &_objectFactory;
+    Party &_party;
+    Portraits &_portraits;
+    Reputes &_reputes;
+    ScriptRunner &_scriptRunner;
+    SoundSets &_soundSets;
+    Surfaces &_surfaces;
+
+    audio::AudioFiles &_audioFiles;
+    audio::AudioPlayer &_audioPlayer;
+    graphics::Lips &_lips;
+    graphics::Models &_models;
+    graphics::Walkmeshes &_walkmeshes;
+
+    // END Services
+
+    void loadBackground(BackgroundType type);
+
+private:
+    void onClick(const std::string &control) override;
+    void onFocusChanged(const std::string &control, bool focus) override;
 };
 
 } // namespace game

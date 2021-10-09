@@ -17,25 +17,15 @@
 
 #pragma once
 
+#include "../../audio/soundhandle.h"
 #include "../../graphics/eventhandler.h"
 #include "../../video/video.h"
 
 #include "camera/camera.h"
 #include "console.h"
-#include "gui/chargen/chargen.h"
-#include "gui/computer.h"
-#include "gui/container.h"
-#include "gui/conversation.h"
-#include "gui/dialog.h"
-#include "gui/hud.h"
-#include "gui/ingame/ingame.h"
-#include "gui/loadscreen.h"
-#include "gui/mainmenu.h"
-#include "gui/partyselect.h"
-#include "gui/profileoverlay.h"
-#include "gui/saveload.h"
 #include "object/module.h"
 #include "options.h"
+#include "profileoverlay.h"
 
 namespace reone {
 
@@ -76,6 +66,12 @@ class SceneGraph;
 class WorldRenderPipeline;
 
 } // namespace scene
+
+namespace gui {
+
+class GUI;
+
+}
 
 namespace script {
 
@@ -177,23 +173,32 @@ public:
     bool isTSL() const { return _tsl; }
     bool isLoadFromSaveGame() const;
     bool isPaused() const { return _paused; }
-    bool isInConversation() const { return _screen == GameScreen::Conversation; }
 
     Camera *getActiveCamera() const;
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
     const Options &options() const { return _options; }
     std::shared_ptr<Module> module() const { return _module; }
-    HUD &hud() const { return *_hud; }
-    CharacterGeneration &characterGeneration() { return *_charGen; }
     CameraType cameraType() const { return _cameraType; }
-    Conversation &conversation() { return *_conversation; }
     const std::set<std::string> &moduleNames() const { return _moduleNames; }
 
     void setCursorType(CursorType type);
     void setLoadFromSaveGame(bool load);
     void setPaused(bool paused);
     void setRelativeMouseMode(bool relative);
+
+    virtual void openMainMenu() = 0;
+    virtual void openInGame() = 0;
+    virtual void openInGameMenu(InGameMenuTab tab) = 0;
+    virtual void openContainer(const std::shared_ptr<SpatialObject> &container) = 0;
+    virtual void openPartySelection(const PartySelectionContext &ctx) = 0;
+    virtual void openLevelUp() = 0;
+    virtual void openSaveLoad(SaveLoadMode mode) = 0;
+    virtual void startCharacterGeneration() = 0;
+    virtual void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef) = 0;
+    virtual void pauseConversation() = 0;
+    virtual void resumeConversation() = 0;
+    virtual void setBarkBubbleText(std::string text, float durartion) = 0;
 
     // Module loading
 
@@ -203,7 +208,7 @@ public:
      * @param name name of the module to load
      * @param entry tag of the waypoint to spawn at, or empty string to use the default entry point
      */
-    void loadModule(const std::string &name, std::string entry = "");
+    virtual void loadModule(const std::string &name, std::string entry = "") = 0;
 
     /**
      * Schedules transition to the specified module with the specified entry point.
@@ -214,21 +219,6 @@ public:
     void scheduleModuleTransition(const std::string &moduleName, const std::string &entry);
 
     // END Module loading
-
-    // Game screens
-
-    void openMainMenu();
-    void openSaveLoad(SaveLoad::Mode mode);
-    void openInGame();
-    void openInGameMenu(InGameMenu::Tab tab);
-    void openContainer(const std::shared_ptr<SpatialObject> &container);
-    void openPartySelection(const PartySelection::Context &ctx);
-    void openLevelUp();
-
-    void startCharacterGeneration();
-    void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef);
-
-    // END Game screens
 
     // Globals/locals
 
@@ -266,6 +256,19 @@ public:
     // END IEventHandler
 
 protected:
+    enum class GameScreen {
+        None,
+        MainMenu,
+        Loading,
+        CharacterGeneration,
+        InGame,
+        InGameMenu,
+        Conversation,
+        Container,
+        PartySelection,
+        SaveLoad
+    };
+
     const std::string kDataDirectoryName {"data"};
 
     bool _tsl;
@@ -274,6 +277,8 @@ protected:
     std::string _mainMenuMusicResRef;
     std::string _charGenMusicResRef;
     std::string _charGenLoadScreenResRef;
+
+    GameScreen _screen {GameScreen::MainMenu};
 
     // Services
 
@@ -324,23 +329,18 @@ protected:
 
     // END GUI colors
 
-private:
-    enum class GameScreen {
-        None,
-        MainMenu,
-        Loading,
-        CharacterGeneration,
-        InGame,
-        InGameMenu,
-        Conversation,
-        Container,
-        PartySelection,
-        SaveLoad
-    };
+    void stopMovement();
+
+    // Rendering
+
+    void drawAll();
+    void drawWorld();
+    void drawGUI();
+
+    // END Rendering
 
     Options _options;
 
-    GameScreen _screen {GameScreen::MainMenu};
     uint32_t _ticks {0};
     bool _quit {false};
     std::shared_ptr<video::Video> _video;
@@ -349,7 +349,6 @@ private:
     bool _loadFromSaveGame {false};
     CameraType _cameraType {CameraType::ThirdPerson};
     bool _paused {false};
-    Conversation *_conversation {nullptr}; /**< pointer to either DialogGUI or ComputerGUI  */
     std::set<std::string> _moduleNames;
 
     // Modules
@@ -362,17 +361,6 @@ private:
     // END Modules
 
     // GUI
-
-    std::unique_ptr<MainMenu> _mainMenu;
-    std::unique_ptr<LoadingScreen> _loadScreen;
-    std::unique_ptr<CharacterGeneration> _charGen;
-    std::unique_ptr<HUD> _hud;
-    std::unique_ptr<InGameMenu> _inGame;
-    std::unique_ptr<DialogGUI> _dialog;
-    std::unique_ptr<ComputerGUI> _computer;
-    std::unique_ptr<ContainerGUI> _container;
-    std::unique_ptr<PartySelection> _partySelect;
-    std::unique_ptr<SaveLoad> _saveLoad;
 
     std::unique_ptr<Console> _console;
     std::unique_ptr<ProfileOverlay> _profileOverlay;
@@ -405,8 +393,6 @@ private:
     void playMusic(const std::string &resRef);
     void runMainLoop();
     void toggleInGameCameraType();
-    void stopMovement();
-    void changeScreen(GameScreen screen);
 
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);
@@ -416,7 +402,7 @@ private:
     void updateMusic();
     void updateSceneGraph(float dt);
 
-    gui::GUI *getScreenGUI() const;
+    virtual gui::GUI *getScreenGUI() const = 0;
 
     // Resource management
 
@@ -425,40 +411,15 @@ private:
 
     // END Resource management
 
-    // Loading
-
-    void loadCharacterGeneration();
-    void loadContainer();
-    void loadDialog();
-    void loadComputer();
-    void loadHUD();
-    void loadInGame();
-    void loadLoadingScreen();
-    void loadMainMenu();
-    void loadPartySelection();
-    void loadSaveLoad();
-
-    // END Loading
-
-    // Rendering
-
-    void drawAll();
-    void drawWorld();
-    void drawGUI();
-
-    // END Rendering
-
     // Save games
 
     std::shared_ptr<resource::GffStruct> getPartyMemberNFOStruct(int index) const;
 
     // END Save games
 
-    // Helper methods
-
-    void withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block);
-
-    // END Helper methods
+    virtual void onModuleSelected(const std::string &name) = 0;
+    virtual void drawHUD() = 0;
+    virtual CameraType getConversationCamera(int &cameraId) const = 0;
 };
 
 } // namespace game

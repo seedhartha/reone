@@ -21,6 +21,7 @@
 #include "../../../audio/player.h"
 #include "../../../resource/2da.h"
 #include "../../../resource/resources.h"
+#include "../../../resource/strings.h"
 
 #include "../game.h"
 

@@ -982,6 +982,24 @@ enum class TalentType {
     Invalid = 3
 };
 
+enum class InGameMenuTab {
+    None,
+    Equipment,
+    Inventory,
+    Character,
+    Abilities,
+    Messages,
+    Journal,
+    Map,
+    Options
+};
+
+enum class SaveLoadMode {
+    Save,
+    LoadFromMainMenu,
+    LoadFromInGame
+};
+
 struct InventorySlot {
     static constexpr int head = 0;
     static constexpr int body = 1;
@@ -998,6 +1016,12 @@ struct InventorySlot {
     static constexpr int cArmour = 17;
     static constexpr int rightWeapon2 = 18;
     static constexpr int leftWeapon2 = 19;
+};
+
+struct PartySelectionContext {
+    std::string exitScript;
+    int forceNpc1 {-1};
+    int forceNpc2 {-2};
 };
 
 typedef std::unordered_map<SoundSetEntry, std::shared_ptr<audio::AudioStream>> SoundSet;

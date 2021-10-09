@@ -76,8 +76,7 @@ TSL::TSL(
     Scripts &scripts,
     Resources &resources,
     Strings &strings) :
-    Game(
-        true,
+    KotOR(
         move(path),
         move(options),
         actionFactory,
@@ -115,6 +114,8 @@ TSL::TSL(
         scripts,
         resources,
         strings) {
+    _tsl = true;
+
     _mainMenuMusicResRef = "mus_sion";
     _charGenMusicResRef = "mus_main";
     _charGenLoadScreenResRef = "load_default";

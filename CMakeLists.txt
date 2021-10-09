@@ -619,40 +619,6 @@ set(GAMECORE_HEADERS
     src/engine/game/core/event.h
     src/engine/game/core/footstepsounds.h
     src/engine/game/core/game.h
-    src/engine/game/core/gui/barkbubble.h
-    src/engine/game/core/gui/chargen/abilities.h
-    src/engine/game/core/gui/chargen/chargen.h
-    src/engine/game/core/gui/chargen/classselect.h
-    src/engine/game/core/gui/chargen/custom.h
-    src/engine/game/core/gui/chargen/feats.h
-    src/engine/game/core/gui/chargen/levelup.h
-    src/engine/game/core/gui/chargen/nameentry.h
-    src/engine/game/core/gui/chargen/portraitselect.h
-    src/engine/game/core/gui/chargen/quick.h
-    src/engine/game/core/gui/chargen/quickorcustom.h
-    src/engine/game/core/gui/chargen/skills.h
-    src/engine/game/core/gui/computer.h
-    src/engine/game/core/gui/container.h
-    src/engine/game/core/gui/conversation.h
-    src/engine/game/core/gui/dialog.h
-    src/engine/game/core/gui/gui.h
-    src/engine/game/core/gui/hud.h
-    src/engine/game/core/gui/ingame/abilities.h
-    src/engine/game/core/gui/ingame/character.h
-    src/engine/game/core/gui/ingame/equip.h
-    src/engine/game/core/gui/ingame/ingame.h
-    src/engine/game/core/gui/ingame/inventory.h
-    src/engine/game/core/gui/ingame/journal.h
-    src/engine/game/core/gui/ingame/map.h
-    src/engine/game/core/gui/ingame/messages.h
-    src/engine/game/core/gui/ingame/options.h
-    src/engine/game/core/gui/loadscreen.h
-    src/engine/game/core/gui/mainmenu.h
-    src/engine/game/core/gui/partyselect.h
-    src/engine/game/core/gui/profileoverlay.h
-    src/engine/game/core/gui/saveload.h
-    src/engine/game/core/gui/selectoverlay.h
-    src/engine/game/core/gui/sounds.h
     src/engine/game/core/location.h
     src/engine/game/core/map.h
     src/engine/game/core/object/area.h
@@ -676,6 +642,7 @@ set(GAMECORE_HEADERS
     src/engine/game/core/player.h
     src/engine/game/core/portrait.h
     src/engine/game/core/portraits.h
+    src/engine/game/core/profileoverlay.h
     src/engine/game/core/reputes.h
     src/engine/game/core/room.h
     src/engine/game/core/savedgame.h
@@ -853,40 +820,6 @@ set(GAMECORE_SOURCES
     src/engine/game/core/effect/whirlwind.cpp
     src/engine/game/core/footstepsounds.cpp
     src/engine/game/core/game.cpp
-    src/engine/game/core/gui/barkbubble.cpp
-    src/engine/game/core/gui/chargen/abilities.cpp
-    src/engine/game/core/gui/chargen/chargen.cpp
-    src/engine/game/core/gui/chargen/classselect.cpp
-    src/engine/game/core/gui/chargen/custom.cpp
-    src/engine/game/core/gui/chargen/feats.cpp
-    src/engine/game/core/gui/chargen/levelup.cpp
-    src/engine/game/core/gui/chargen/nameentry.cpp
-    src/engine/game/core/gui/chargen/portraitselect.cpp
-    src/engine/game/core/gui/chargen/quick.cpp
-    src/engine/game/core/gui/chargen/quickorcustom.cpp
-    src/engine/game/core/gui/chargen/skills.cpp
-    src/engine/game/core/gui/computer.cpp
-    src/engine/game/core/gui/container.cpp
-    src/engine/game/core/gui/conversation.cpp
-    src/engine/game/core/gui/dialog.cpp
-    src/engine/game/core/gui/gui.cpp
-    src/engine/game/core/gui/hud.cpp
-    src/engine/game/core/gui/ingame/abilities.cpp
-    src/engine/game/core/gui/ingame/character.cpp
-    src/engine/game/core/gui/ingame/equip.cpp
-    src/engine/game/core/gui/ingame/ingame.cpp
-    src/engine/game/core/gui/ingame/inventory.cpp
-    src/engine/game/core/gui/ingame/journal.cpp
-    src/engine/game/core/gui/ingame/map.cpp
-    src/engine/game/core/gui/ingame/messages.cpp
-    src/engine/game/core/gui/ingame/options.cpp
-    src/engine/game/core/gui/loadscreen.cpp
-    src/engine/game/core/gui/mainmenu.cpp
-    src/engine/game/core/gui/partyselect.cpp
-    src/engine/game/core/gui/profileoverlay.cpp
-    src/engine/game/core/gui/saveload.cpp
-    src/engine/game/core/gui/selectoverlay.cpp
-    src/engine/game/core/gui/sounds.cpp
     src/engine/game/core/map.cpp
     src/engine/game/core/object/area.cpp
     src/engine/game/core/object/creature.cpp
@@ -907,6 +840,7 @@ set(GAMECORE_SOURCES
     src/engine/game/core/pathfinder.cpp
     src/engine/game/core/player.cpp
     src/engine/game/core/portraits.cpp
+    src/engine/game/core/profileoverlay.cpp
     src/engine/game/core/reputes.cpp
     src/engine/game/core/room.cpp
     src/engine/game/core/script/routine/impl/action.cpp
@@ -946,10 +880,76 @@ target_link_libraries(libgamecore PUBLIC libscript libgui libscene libvideo liba
 ## libkotor static library
 
 set(KOTOR_HEADERS
+    src/engine/game/kotor/gui/barkbubble.h
+    src/engine/game/kotor/gui/chargen/abilities.h
+    src/engine/game/kotor/gui/chargen/chargen.h
+    src/engine/game/kotor/gui/chargen/classselect.h
+    src/engine/game/kotor/gui/chargen/custom.h
+    src/engine/game/kotor/gui/chargen/feats.h
+    src/engine/game/kotor/gui/chargen/levelup.h
+    src/engine/game/kotor/gui/chargen/nameentry.h
+    src/engine/game/kotor/gui/chargen/portraitselect.h
+    src/engine/game/kotor/gui/chargen/quick.h
+    src/engine/game/kotor/gui/chargen/quickorcustom.h
+    src/engine/game/kotor/gui/chargen/skills.h
+    src/engine/game/kotor/gui/computer.h
+    src/engine/game/kotor/gui/container.h
+    src/engine/game/kotor/gui/conversation.h
+    src/engine/game/kotor/gui/dialog.h
+    src/engine/game/kotor/gui/gui.h
+    src/engine/game/kotor/gui/hud.h
+    src/engine/game/kotor/gui/ingame/abilities.h
+    src/engine/game/kotor/gui/ingame/character.h
+    src/engine/game/kotor/gui/ingame/equip.h
+    src/engine/game/kotor/gui/ingame/ingame.h
+    src/engine/game/kotor/gui/ingame/inventory.h
+    src/engine/game/kotor/gui/ingame/journal.h
+    src/engine/game/kotor/gui/ingame/map.h
+    src/engine/game/kotor/gui/ingame/messages.h
+    src/engine/game/kotor/gui/ingame/options.h
+    src/engine/game/kotor/gui/loadscreen.h
+    src/engine/game/kotor/gui/mainmenu.h
+    src/engine/game/kotor/gui/partyselect.h
+    src/engine/game/kotor/gui/saveload.h
+    src/engine/game/kotor/gui/selectoverlay.h
+    src/engine/game/kotor/gui/sounds.h
     src/engine/game/kotor/kotor.h
     src/engine/game/kotor/routine/registrar.h)
 
 set(KOTOR_SOURCES
+    src/engine/game/kotor/gui/barkbubble.cpp
+    src/engine/game/kotor/gui/chargen/abilities.cpp
+    src/engine/game/kotor/gui/chargen/chargen.cpp
+    src/engine/game/kotor/gui/chargen/classselect.cpp
+    src/engine/game/kotor/gui/chargen/custom.cpp
+    src/engine/game/kotor/gui/chargen/feats.cpp
+    src/engine/game/kotor/gui/chargen/levelup.cpp
+    src/engine/game/kotor/gui/chargen/nameentry.cpp
+    src/engine/game/kotor/gui/chargen/portraitselect.cpp
+    src/engine/game/kotor/gui/chargen/quick.cpp
+    src/engine/game/kotor/gui/chargen/quickorcustom.cpp
+    src/engine/game/kotor/gui/chargen/skills.cpp
+    src/engine/game/kotor/gui/computer.cpp
+    src/engine/game/kotor/gui/container.cpp
+    src/engine/game/kotor/gui/conversation.cpp
+    src/engine/game/kotor/gui/dialog.cpp
+    src/engine/game/kotor/gui/gui.cpp
+    src/engine/game/kotor/gui/hud.cpp
+    src/engine/game/kotor/gui/ingame/abilities.cpp
+    src/engine/game/kotor/gui/ingame/character.cpp
+    src/engine/game/kotor/gui/ingame/equip.cpp
+    src/engine/game/kotor/gui/ingame/ingame.cpp
+    src/engine/game/kotor/gui/ingame/inventory.cpp
+    src/engine/game/kotor/gui/ingame/journal.cpp
+    src/engine/game/kotor/gui/ingame/map.cpp
+    src/engine/game/kotor/gui/ingame/messages.cpp
+    src/engine/game/kotor/gui/ingame/options.cpp
+    src/engine/game/kotor/gui/loadscreen.cpp
+    src/engine/game/kotor/gui/mainmenu.cpp
+    src/engine/game/kotor/gui/partyselect.cpp
+    src/engine/game/kotor/gui/saveload.cpp
+    src/engine/game/kotor/gui/selectoverlay.cpp
+    src/engine/game/kotor/gui/sounds.cpp
     src/engine/game/kotor/kotor.cpp
     src/engine/game/kotor/routine/registrar.cpp)
 
@@ -973,7 +973,7 @@ set(TSL_SOURCES
 add_library(libtsl STATIC ${TSL_HEADERS} ${TSL_SOURCES})
 set_target_properties(libtsl PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(libtsl PRIVATE src/engine/pch.h)
-target_link_libraries(libtsl PUBLIC libgamecore)
+target_link_libraries(libtsl PUBLIC libkotor)
 
 ## END libtsl static library
 
@@ -989,7 +989,7 @@ set(GAME_SOURCES
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(libgame PRIVATE src/engine/pch.h)
-target_link_libraries(libgame PUBLIC libtsl libkotor)
+target_link_libraries(libgame PUBLIC libtsl)
 
 ## END libgame static library
 

@@ -26,6 +26,7 @@
 
 #include "../../../action/factory.h"
 #include "../../../game.h"
+#include "../../../object/creature.h"
 
 #include "../context.h"
 

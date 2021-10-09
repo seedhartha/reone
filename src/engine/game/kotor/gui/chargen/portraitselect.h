@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -18,22 +17,33 @@
 
 #pragma once
 
-#include "../kotor/kotor.h"
+#include "../../../../scene/node/model.h"
+
+#include "../../../core/portrait.h"
+
+#include "../gui.h"
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+class Label;
+
+} // namespace gui
+
 namespace game {
 
-class TSL : public KotOR {
+class CharacterGeneration;
+
+class PortraitSelection : public GameGUI {
 public:
-    TSL(
-        boost::filesystem::path path,
-        Options options,
+    PortraitSelection(
+        CharacterGeneration *charGen,
+        Game *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,
-        Cursors &cursors,
-        EffectFactory &effectFactory,
         Feats &feats,
         FootstepSounds &footstepSounds,
         GUISounds &guiSounds,
@@ -42,7 +52,6 @@ public:
         Portraits &portraits,
         Reputes &reputes,
         ScriptRunner &scriptRunner,
-        Skills &skills,
         SoundSets &soundSets,
         Surfaces &surfaces,
         audio::AudioFiles &audioFiles,
@@ -59,13 +68,37 @@ public:
         graphics::Textures &textures,
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
-        scene::SceneGraph &sceneGraph,
-        scene::WorldRenderPipeline &worldRenderPipeline,
-        script::Scripts &scripts,
         resource::Resources &resources,
         resource::Strings &strings);
 
-    void initResourceProviders() override;
+    void load() override;
+
+    void updatePortraits();
+    void resetCurrentPortrait();
+
+private:
+    struct Binding {
+        std::shared_ptr<gui::Label> lblHead;
+        std::shared_ptr<gui::Label> lblPortrait;
+        std::shared_ptr<gui::Button> btnArrL;
+        std::shared_ptr<gui::Button> btnArrR;
+        std::shared_ptr<gui::Button> btnAccept;
+        std::shared_ptr<gui::Button> btnBack;
+    } _binding;
+
+    CharacterGeneration *_charGen;
+
+    std::vector<Portrait> _filteredPortraits;
+    int _currentPortrait {0};
+
+    void bindControls();
+    void loadCurrentPortrait();
+    void loadHeadModel();
+
+    int getAppearanceFromCurrentPortrait() const;
+    std::shared_ptr<scene::ModelSceneNode> getCharacterModel(scene::SceneGraph &sceneGraph);
+
+    void setButtonColors(gui::Control &control);
 };
 
 } // namespace game
