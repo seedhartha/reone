@@ -445,9 +445,9 @@ target_precompile_headers(libscript PRIVATE src/engine/pch.h)
 
 ## END libscript static library
 
-## libgame static library
+## libgamecore static library
 
-set(GAME_HEADERS
+set(GAMECORE_HEADERS
     src/engine/game/core/action/action.h
     src/engine/game/core/action/attack.h
     src/engine/game/core/action/barkstring.h
@@ -691,11 +691,9 @@ set(GAME_HEADERS
     src/engine/game/core/surface.h
     src/engine/game/core/surfaces.h
     src/engine/game/core/talent.h
-    src/engine/game/core/types.h
-    src/engine/game/probe.h
-    src/engine/game/types.h)
+    src/engine/game/core/types.h)
 
-set(GAME_SOURCES
+set(GAMECORE_SOURCES
     src/engine/game/core/action/action.cpp
     src/engine/game/core/action/attack.cpp
     src/engine/game/core/action/barkstring.cpp
@@ -936,15 +934,14 @@ set(GAME_SOURCES
     src/engine/game/core/script/routine/impl/vector.cpp
     src/engine/game/core/script/runner.cpp
     src/engine/game/core/soundsets.cpp
-    src/engine/game/core/surfaces.cpp
-    src/engine/game/probe.cpp)
+    src/engine/game/core/surfaces.cpp)
 
-add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
-set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(libgame PRIVATE src/engine/pch.h)
-target_link_libraries(libgame PUBLIC libscript libgui libscene libvideo libaudio libgraphics libresource libcommon)
+add_library(libgamecore STATIC ${GAMECORE_HEADERS} ${GAMECORE_SOURCES})
+set_target_properties(libgamecore PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libgamecore PRIVATE src/engine/pch.h)
+target_link_libraries(libgamecore PUBLIC libscript libgui libscene libvideo libaudio libgraphics libresource libcommon)
 
-## END libgame static library
+## END libgamecore static library
 
 ## libkotor static library
 
@@ -959,7 +956,7 @@ set(KOTOR_SOURCES
 add_library(libkotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES})
 set_target_properties(libkotor PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(libkotor PRIVATE src/engine/pch.h)
-target_link_libraries(libkotor PUBLIC libgame)
+target_link_libraries(libkotor PUBLIC libgamecore)
 
 ## END libkotor static library
 
@@ -976,9 +973,25 @@ set(TSL_SOURCES
 add_library(libtsl STATIC ${TSL_HEADERS} ${TSL_SOURCES})
 set_target_properties(libtsl PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(libtsl PRIVATE src/engine/pch.h)
-target_link_libraries(libtsl PUBLIC libgame)
+target_link_libraries(libtsl PUBLIC libgamecore)
 
 ## END libtsl static library
+
+## libgame static library
+
+set(GAME_HEADERS
+    src/engine/game/probe.h
+    src/engine/game/types.h)
+
+set(GAME_SOURCES
+    src/engine/game/probe.cpp)
+
+add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
+set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(libgame PRIVATE src/engine/pch.h)
+target_link_libraries(libgame PUBLIC libtsl libkotor)
+
+## END libgame static library
 
 ## reone executable
 
@@ -1015,7 +1028,7 @@ endif()
 add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_precompile_headers(reone PRIVATE src/engine/pch.h)
-target_link_libraries(reone PRIVATE libtsl libkotor ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(reone PRIVATE libgame ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 list(APPEND InstallTargets reone)
 
@@ -1047,7 +1060,7 @@ if(BUILD_TOOLS)
     add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
     set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     target_precompile_headers(reone-tools PRIVATE src/engine/pch.h)
-    target_link_libraries(reone-tools PRIVATE libtsl libkotor ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_REGEX_LIBRARY})
+    target_link_libraries(reone-tools PRIVATE libgame ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_REGEX_LIBRARY})
 
     list(APPEND InstallTargets reone-tools)
 endif()
