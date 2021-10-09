@@ -17,6 +17,8 @@
 
 #include "instrutil.h"
 
+#include "../common/collectionutil.h"
+
 #include "program.h"
 #include "routine.h"
 #include "routineprovider.h"
@@ -124,8 +126,13 @@ static unordered_map<InstructionType, string> g_descByInstrType {
     {InstructionType::STORE_STATE, "STORE_STATE"},
     {InstructionType::NOP2, "NOP2"}};
 
+static map<string, InstructionType> g_instrTypeByDesc = associate<pair<InstructionType, string>, string, InstructionType>(
+    mapToEntries(g_descByInstrType),
+    [](auto &pair) { return pair.second; },
+    [](auto &pair) { return pair.first; });
+
 string describeInstruction(const Instruction &ins, const IRoutineProvider &routines) {
-    string desc(str(boost::format("%04x") % ins.offset));
+    string desc(str(boost::format("%08x") % ins.offset));
 
     auto maybeDesc = g_descByInstrType.find(ins.type);
     if (maybeDesc == g_descByInstrType.end()) {
@@ -163,7 +170,7 @@ string describeInstruction(const Instruction &ins, const IRoutineProvider &routi
     case InstructionType::JSR:
     case InstructionType::JZ:
     case InstructionType::JNZ:
-        desc += str(boost::format(" %04x") % ins.jumpOffset);
+        desc += str(boost::format(" %08x") % ins.jumpOffset);
         break;
     case InstructionType::DESTRUCT:
         desc += str(boost::format(" %d, %d, %d") % ins.size % ins.stackOffset % ins.sizeNoDestroy);
@@ -182,6 +189,14 @@ string describeInstruction(const Instruction &ins, const IRoutineProvider &routi
     }
 
     return move(desc);
+}
+
+InstructionType parseInstructionType(const string &desc) {
+    auto maybeInstrType = g_instrTypeByDesc.find(desc);
+    if (maybeInstrType == g_instrTypeByDesc.end()) {
+        throw invalid_argument("Unrecognized instruction type: " + desc);
+    }
+    return maybeInstrType->second;
 }
 
 } // namespace script

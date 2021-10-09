@@ -47,7 +47,8 @@ static const unordered_map<string, Operation> g_operations {
     {"to-ascii", Operation::ToASCII},
     {"to-tlk", Operation::ToTLK},
     {"to-lip", Operation::ToLIP},
-    {"to-pcode", Operation::ToPCODE}};
+    {"to-pcode", Operation::ToPCODE},
+    {"to-ncs", Operation::ToNCS}};
 
 static fs::path getDestination(const po::variables_map &vars) {
     fs::path result;
@@ -104,6 +105,7 @@ void Program::initOptions() {
         ("to-tlk", "convert JSON to TLK")                                                    //
         ("to-lip", "convert JSON to LIP")                                                    //
         ("to-pcode", "convert NCS to PCODE")                                                 //
+        ("to-ncs", "convert PCODE to NCS")                                                   //
         ("target", po::value<string>(), "target name or path to input file");
 }
 

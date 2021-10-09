@@ -29,7 +29,7 @@ option(ENABLE_VIDEO "enable video playback" ON)
 option(USE_EXTERNAL_GLM "use GLM library from external subdirectory" ON)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-find_package(Boost REQUIRED COMPONENTS filesystem program_options system OPTIONAL_COMPONENTS unit_test_framework)
+find_package(Boost REQUIRED COMPONENTS filesystem program_options system OPTIONAL_COMPONENTS regex unit_test_framework)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(MAD REQUIRED)
@@ -401,6 +401,7 @@ set(SCRIPT_HEADERS
     src/engine/script/executioncontext.h
     src/engine/script/executionstate.h
     src/engine/script/format/ncsreader.h
+    src/engine/script/format/ncswriter.h
     src/engine/script/instrutil.h
     src/engine/script/program.h
     src/engine/script/routine.h
@@ -412,6 +413,7 @@ set(SCRIPT_HEADERS
 set(SCRIPT_SOURCES
     src/engine/script/execution.cpp
     src/engine/script/format/ncsreader.cpp
+    src/engine/script/format/ncswriter.cpp
     src/engine/script/instrutil.cpp
     src/engine/script/program.cpp
     src/engine/script/routine.cpp
@@ -1019,7 +1021,7 @@ if(BUILD_TOOLS)
     target_link_libraries(reone-tools PRIVATE
         libgame libscript libgui libscene libvideo libaudio libgraphics libresource libcommon
         libs3tc
-        ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_SYSTEM_LIBRARY}
+        ${Boost_FILESYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_REGEX_LIBRARY} ${Boost_SYSTEM_LIBRARY}
         GLEW::GLEW
         ${OPENGL_LIBRARIES}
         ${MAD_LIBRARY})

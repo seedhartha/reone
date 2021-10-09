@@ -19,28 +19,22 @@
 
 namespace reone {
 
-namespace tools {
+namespace script {
 
-enum class Operation {
-    None,
-    List,
-    Extract,
-    Unwrap,
-    ToJSON,
-    ToTGA,
-    To2DA,
-    ToGFF,
-    ToRIM,
-    ToERF,
-    ToMOD,
-    ToPTH,
-    ToASCII,
-    ToTLK,
-    ToLIP,
-    ToPCODE,
-    ToNCS
+class ScriptProgram;
+
+class NcsWriter {
+public:
+    NcsWriter(ScriptProgram &program) :
+        _program(program) {
+    }
+
+    void save(const boost::filesystem::path &path);
+
+private:
+    ScriptProgram &_program;
 };
 
-} // namespace tools
+} // namespace script
 
 } // namespace reone
