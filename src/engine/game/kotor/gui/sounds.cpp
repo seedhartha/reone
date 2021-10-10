@@ -34,6 +34,9 @@ GUISounds::GUISounds(AudioFiles &audioFiles, Resources &resources) :
 
 void GUISounds::init() {
     shared_ptr<TwoDA> sounds(_resources.get2DA("guisounds"));
+    if (!sounds) {
+        return;
+    }
     loadSound(*sounds, "Clicked_Default", _onClick);
     loadSound(*sounds, "Entered_Default", _onEnter);
 }

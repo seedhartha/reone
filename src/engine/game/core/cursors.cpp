@@ -50,19 +50,25 @@ void Cursors::deinit() {
 
 shared_ptr<Cursor> Cursors::get(CursorType type) {
     auto maybeCursor = _cache.find(type);
-    if (maybeCursor != _cache.end())
+    if (maybeCursor != _cache.end()) {
         return maybeCursor->second;
-
+    }
     const pair<uint32_t, uint32_t> &groupNames = getCursorGroupNames(type);
     vector<uint32_t> cursorNamesUp(getCursorNamesFromCursorGroup(groupNames.first));
+    if (cursorNamesUp.empty()) {
+        return nullptr;
+    }
     vector<uint32_t> cursorNamesDown(getCursorNamesFromCursorGroup(groupNames.second));
+    if (cursorNamesDown.empty()) {
+        return nullptr;
+    }
     shared_ptr<Texture> textureUp(newTextureFromCursor(cursorNamesUp.back()));
     shared_ptr<Texture> textureDown(newTextureFromCursor(cursorNamesDown.back()));
 
     auto cursor = make_shared<Cursor>(textureUp, textureDown, _context, _meshes, _shaders, _window);
-    auto inserted = _cache.insert(make_pair(type, cursor));
+    _cache.insert(make_pair(type, cursor));
 
-    return inserted.first->second;
+    return move(cursor);
 }
 
 const pair<uint32_t, uint32_t> &Cursors::getCursorGroupNames(CursorType type) {
@@ -75,6 +81,10 @@ const pair<uint32_t, uint32_t> &Cursors::getCursorGroupNames(CursorType type) {
 
 vector<uint32_t> Cursors::getCursorNamesFromCursorGroup(uint32_t name) {
     shared_ptr<ByteArray> bytes(_resources.getFromExe(name, PEResourceType::CursorGroup));
+    if (!bytes) {
+        return vector<uint32_t>();
+    }
+
     StreamReader reader(wrap(bytes));
     reader.ignore(4); // Reserved, ResType
     uint16_t resCount = reader.getUint16();

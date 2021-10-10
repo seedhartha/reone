@@ -38,6 +38,9 @@ Reputes::Reputes(Resources &resources) :
 
 void Reputes::init() {
     shared_ptr<TwoDA> repute(_resources.get2DA("repute"));
+    if (!repute) {
+        return;
+    }
 
     for (int row = 0; row < repute->getRowCount(); ++row) {
         g_factionLabels.push_back(boost::to_lower_copy(repute->getString(row, "label")));

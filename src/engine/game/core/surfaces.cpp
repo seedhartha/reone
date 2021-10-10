@@ -34,6 +34,9 @@ Surfaces::Surfaces(Resources &resources) :
 
 void Surfaces::init() {
     shared_ptr<TwoDA> surfacemat(_resources.get2DA("surfacemat"));
+    if (!surfacemat) {
+        return;
+    }
     for (int row = 0; row < surfacemat->getRowCount(); ++row) {
         Surface surface;
         surface.label = surfacemat->getString(row, "label");

@@ -34,6 +34,9 @@ Portraits::Portraits(Textures &textures, Resources &resources) :
 
 void Portraits::init() {
     shared_ptr<TwoDA> portraits(_resources.get2DA("portraits"));
+    if (!portraits) {
+        return;
+    }
 
     for (int row = 0; row < portraits->getRowCount(); ++row) {
         string resRef(boost::to_lower_copy(portraits->getString(row, "baseresref")));

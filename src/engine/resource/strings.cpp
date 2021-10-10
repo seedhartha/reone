@@ -30,7 +30,9 @@ namespace resource {
 
 void Strings::init(const fs::path &gameDir) {
     fs::path tlkPath(getPathIgnoreCase(gameDir, "dialog.tlk"));
-    _tlk.load(tlkPath);
+    if (!tlkPath.empty()) {
+        _tlk.load(tlkPath);
+    }
 }
 
 string Strings::get(int strRef) {
