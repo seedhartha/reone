@@ -495,7 +495,10 @@ void Game::updateCamera(float dt) {
 
         glm::vec3 listenerPosition;
         if (_cameraType == CameraType::ThirdPerson) {
-            listenerPosition = _party.getLeader()->position() + 1.7f; // TODO: height based on appearance
+            shared_ptr<Creature> partyLeader(_party.getLeader());
+            if (partyLeader) {
+                listenerPosition = partyLeader->position() + 1.7f; // TODO: height based on appearance
+            }
         } else {
             listenerPosition = camera->sceneNode()->absoluteTransform()[3];
         }

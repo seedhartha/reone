@@ -84,7 +84,7 @@ void Module::loadInfo(const GffStruct &ifo) {
 }
 
 void Module::loadArea(const GffStruct &ifo, bool fromSave) {
-    reone::info("Load area: " + _info.entryArea);
+    reone::info("Load area '" + _info.entryArea + "'");
 
     _area = _objectFactory.newArea();
 
