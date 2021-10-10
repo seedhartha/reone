@@ -25,7 +25,7 @@ namespace di {
 
 void CommonModule::init() {
     _executor = make_unique<Executor>();
-    _executor->init();
+    //_executor->init();
 }
 
 } // namespace di
