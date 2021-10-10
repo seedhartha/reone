@@ -89,7 +89,15 @@ void Module::loadArea(const GffStruct &ifo, bool fromSave) {
     _area = _objectFactory.newArea();
 
     shared_ptr<GffStruct> are(_resources.getGFF(_info.entryArea, ResourceType::Are));
+    if (!are) {
+        return;
+    }
+
     shared_ptr<GffStruct> git(_resources.getGFF(_info.entryArea, ResourceType::Git));
+    if (!git) {
+        return;
+    }
+
     _area->load(_info.entryArea, *are, *git, fromSave);
 }
 

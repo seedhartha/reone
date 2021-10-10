@@ -20,13 +20,15 @@
 #include "../../../gui/control/label.h"
 #include "../../../gui/control/progressbar.h"
 
+#include "../../core/gui/loadscreen.h"
+
 #include "gui.h"
 
 namespace reone {
 
 namespace game {
 
-class LoadingScreen : public GameGUI {
+class LoadingScreen : public GameGUI, public ILoadingScreen {
 public:
     LoadingScreen(
         KotOR *game,
@@ -62,8 +64,8 @@ public:
 
     void load() override;
 
-    void setImage(const std::string &resRef);
-    void setProgress(int progress);
+    void setImage(const std::string &resRef) override;
+    void setProgress(int progress) override;
 
 private:
     struct Binding {

@@ -23,6 +23,7 @@
 
 #include "camera/camera.h"
 #include "console.h"
+#include "gui/loadscreen.h"
 #include "object/module.h"
 #include "options.h"
 #include "profileoverlay.h"
@@ -207,7 +208,7 @@ public:
      * @param name name of the module to load
      * @param entry tag of the waypoint to spawn at, or empty string to use the default entry point
      */
-    virtual void loadModule(const std::string &name, std::string entry = "") = 0;
+    void loadModule(const std::string &name, std::string entry = "");
 
     /**
      * Schedules transition to the specified module with the specified entry point.
@@ -361,6 +362,8 @@ protected:
 
     // GUI
 
+    std::unique_ptr<ILoadingScreen> _loadScreen;
+
     std::unique_ptr<Console> _console;
     std::unique_ptr<ProfileOverlay> _profileOverlay;
 
@@ -385,6 +388,9 @@ protected:
 
     void deinit();
 
+    virtual void loadModuleNames() = 0;
+    virtual void loadModuleResources(const std::string &moduleName) = 0;
+
     void update();
 
     void loadNextModule();
@@ -403,12 +409,17 @@ protected:
 
     virtual gui::GUI *getScreenGUI() const = 0;
 
-    // Resource management
+    // GUI
 
-    void loadModuleNames();
-    void loadModuleResources(const std::string &moduleName);
+    virtual void loadInGameMenus() = 0;
+    virtual void loadLoadingScreen() = 0;
 
-    // END Resource management
+    virtual void openInGame() = 0;
+    virtual void changeScreen(GameScreen screen) = 0;
+
+    void withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block);
+
+    // END GUI
 
     // Save games
 

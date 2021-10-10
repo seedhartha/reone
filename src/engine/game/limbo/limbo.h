@@ -108,15 +108,21 @@ private:
     void initResourceProviders() override;
     void start() override;
 
-    void loadModule(const std::string &name, std::string entry = "") override {}
+    void loadModuleNames() override;
+    void loadModuleResources(const std::string &moduleName) override;
+
+    void loadInGameMenus() override {}
+    void loadLoadingScreen() override {}
 
     void openMainMenu() override {}
+    void openInGame() override {}
     void openContainer(const std::shared_ptr<SpatialObject> &container) override {}
     void openPartySelection(const PartySelectionContext &ctx) override {}
     void openSaveLoad(SaveLoadMode mode) override {}
     void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef) override {}
     void pauseConversation() override {}
     void resumeConversation() override {}
+    void changeScreen(GameScreen screen) override {}
 
     void onModuleSelected(const std::string &name) {}
     void drawHUD() {}

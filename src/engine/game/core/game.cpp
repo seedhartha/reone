@@ -67,8 +67,6 @@ namespace reone {
 
 namespace game {
 
-static constexpr char kModulesDirectoryName[] = "modules";
-
 static constexpr int kNfoBufferSize = 1024;
 static constexpr int kScreenBufferSize = 262144;
 
@@ -172,16 +170,62 @@ int Game::run() {
     return 0;
 }
 
-void Game::loadModuleNames() {
-    fs::path modules(getPathIgnoreCase(_path, kModulesDirectoryName));
+void Game::loadModule(const string &name, string entry) {
+    info("Load module '" + name + "'");
 
-    for (auto &entry : fs::directory_iterator(modules)) {
-        string filename(boost::to_lower_copy(entry.path().filename().string()));
-        if (boost::ends_with(filename, ".mod") || (boost::ends_with(filename, ".rim") && !boost::ends_with(filename, "_s.rim"))) {
-            string moduleName(boost::to_lower_copy(filename.substr(0, filename.size() - 4)));
-            _moduleNames.insert(move(moduleName));
+    withLoadingScreen("load_" + name, [this, &name, &entry]() {
+        loadInGameMenus();
+
+        _soundSets.invalidate();
+        _textures.invalidateCache();
+        _models.invalidateCache();
+        _walkmeshes.invalidateCache();
+        _lips.invalidate();
+        _audioFiles.invalidate();
+        _scripts.invalidate();
+
+        loadModuleResources(name);
+
+        if (_module) {
+            _module->area()->runOnExitScript();
+            _module->area()->unloadParty();
         }
-    }
+
+        if (_loadScreen) {
+            _loadScreen->setProgress(50);
+        }
+        drawAll();
+
+        auto maybeModule = _loadedModules.find(name);
+        if (maybeModule != _loadedModules.end()) {
+            _module = maybeModule->second;
+        } else {
+            _module = _objectFactory.newModule();
+
+            shared_ptr<GffStruct> ifo(_resources.getGFF("module", ResourceType::Ifo));
+            if (!ifo) {
+                return;
+            }
+
+            _module->load(name, *ifo, _loadFromSaveGame);
+            _loadedModules.insert(make_pair(name, _module));
+        }
+
+        _module->loadParty(entry, _loadFromSaveGame);
+        _module->area()->fill(_sceneGraph);
+
+        if (_loadScreen) {
+            _loadScreen->setProgress(100);
+        }
+        drawAll();
+
+        string musicName(_module->area()->music());
+        playMusic(musicName);
+
+        _ticks = SDL_GetTicks();
+        openInGame();
+        _loadFromSaveGame = false;
+    });
 }
 
 void Game::setCursorType(CursorType type) {
@@ -228,27 +272,6 @@ void Game::playMusic(const string &resRef) {
         _music.reset();
     }
     _musicResRef = resRef;
-}
-
-void Game::loadModuleResources(const string &moduleName) {
-    _resources.invalidateCache();
-    _resources.clearTransientProviders();
-
-    fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));
-    fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod"));
-    if (fs::exists(modPath)) {
-        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false), true);
-    } else {
-        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"), true);
-        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
-    }
-
-    fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-    _resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
-
-    if (isTSL()) {
-        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"), true);
-    }
 }
 
 void Game::drawAll() {
@@ -298,7 +321,14 @@ void Game::toggleInGameCameraType() {
 }
 
 Camera *Game::getActiveCamera() const {
-    return _module ? &(_module->area()->getCamera(_cameraType)) : nullptr;
+    if (!_module) {
+        return nullptr;
+    }
+    shared_ptr<Area> area(_module->area());
+    if (!area) {
+        return nullptr;
+    }
+    return &area->getCamera(_cameraType);
 }
 
 shared_ptr<Object> Game::getObjectById(uint32_t id) const {
@@ -796,6 +826,19 @@ void Game::loadFromFile(const fs::path &path) {
     for (auto &global : nfoRoot->getList("GlobalLocations")) {
         setGlobalLocation(global->getString("Name"), make_shared<Location>(global->getVector("Position"), global->getFloat("Facing")));
     }
+}
+
+void Game::withLoadingScreen(const string &imageResRef, const function<void()> &block) {
+    if (!_loadScreen) {
+        loadLoadingScreen();
+    }
+    if (_loadScreen) {
+        _loadScreen->setImage(imageResRef);
+        _loadScreen->setProgress(0);
+    }
+    changeScreen(GameScreen::Loading);
+    drawAll();
+    block();
 }
 
 } // namespace game
