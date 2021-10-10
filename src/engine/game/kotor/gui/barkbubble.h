@@ -29,7 +29,7 @@ namespace game {
 class BarkBubble : public GameGUI {
 public:
     BarkBubble(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

@@ -29,9 +29,10 @@
 #include "../../../scene/types.h"
 #include "../../../script/execution.h"
 
-#include "../../core/game.h"
 #include "../../core/party.h"
 #include "../../core/script/routine/routines.h"
+
+#include "../kotor.h"
 
 using namespace std;
 
@@ -84,7 +85,7 @@ static const unordered_map<string, AnimationType> g_animTypeByName {
     {"kneel_talk_sad", AnimationType::LoopingKneelTalkSad}};
 
 DialogGUI::DialogGUI(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

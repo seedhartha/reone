@@ -49,7 +49,7 @@ public:
     };
 
     Equipment(
-        Game *game,
+        KotOR *game,
         InGameMenu &inGameMenu,
         ActionFactory &actionFactory,
         Classes &classes,

@@ -17,7 +17,7 @@
 
 #include "computer.h"
 
-#include "../../core/game.h"
+#include "../kotor.h"
 
 using namespace std;
 
@@ -29,7 +29,7 @@ namespace reone {
 namespace game {
 
 ComputerGUI::ComputerGUI(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

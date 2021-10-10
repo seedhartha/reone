@@ -25,9 +25,10 @@
 
 #include "../../core/action/usefeat.h"
 #include "../../core/d20/feats.h"
-#include "../../core/game.h"
 #include "../../core/object/creature.h"
 #include "../../core/party.h"
+
+#include "../kotor.h"
 
 using namespace std;
 
@@ -42,7 +43,7 @@ namespace game {
 static string g_attackIcon("i_attack");
 
 HUD::HUD(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

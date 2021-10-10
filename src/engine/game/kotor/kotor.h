@@ -79,19 +79,28 @@ public:
 
     void initResourceProviders() override;
 
-    HUD &hud() const { return *_hud; }
-    CharacterGeneration &characterGeneration() { return *_charGen; }
-    Conversation &conversation() { return *_conversation; }
-
-    bool isInConversation() const { return _screen == GameScreen::Conversation; }
-
-protected:
     void loadModule(const std::string &name, std::string entry = "") override;
 
+    void openMainMenu() override;
+    void openSaveLoad(SaveLoadMode mode) override;
+    void openInGame();
+    void openInGameMenu(InGameMenuTab tab);
+    void openContainer(const std::shared_ptr<SpatialObject> &container) override;
+    void openPartySelection(const PartySelectionContext &ctx) override;
+    void openLevelUp();
+
+    void startCharacterGeneration();
+    void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef) override;
+
+    void resumeConversation() override;
+    void pauseConversation() override;
+
+    void setBarkBubbleText(std::string text, float durartion);
+
+protected:
     void onModuleSelected(const std::string &name) override;
     void drawHUD() override;
     CameraType getConversationCamera(int &cameraId) const override;
-    void setBarkBubbleText(std::string text, float durartion) override;
 
     // GUI
 
@@ -118,20 +127,6 @@ protected:
     void loadContainer();
     void loadPartySelection();
     void loadSaveLoad();
-
-    void openMainMenu() override;
-    void openSaveLoad(SaveLoadMode mode) override;
-    void openInGame() override;
-    void openInGameMenu(InGameMenuTab tab) override;
-    void openContainer(const std::shared_ptr<SpatialObject> &container) override;
-    void openPartySelection(const PartySelectionContext &ctx) override;
-    void openLevelUp() override;
-
-    void startCharacterGeneration() override;
-    void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef) override;
-
-    void resumeConversation() override;
-    void pauseConversation() override;
 
     void changeScreen(GameScreen screen);
 

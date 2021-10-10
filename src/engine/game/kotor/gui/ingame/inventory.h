@@ -34,7 +34,7 @@ namespace game {
 class InventoryMenu : public GameGUI {
 public:
     InventoryMenu(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

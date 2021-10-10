@@ -21,11 +21,12 @@
 #include "../../../gui/control/imagebutton.h"
 #include "../../../resource/strings.h"
 
-#include "../../core/game.h"
 #include "../../core/object/creature.h"
 #include "../../core/object/item.h"
 #include "../../core/object/placeable.h"
 #include "../../core/party.h"
+
+#include "../kotor.h"
 
 using namespace std;
 
@@ -42,7 +43,7 @@ static constexpr int kGiveItemResRef = 47885;
 static constexpr int kInventoryResRef = 393;
 
 ContainerGUI::ContainerGUI(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

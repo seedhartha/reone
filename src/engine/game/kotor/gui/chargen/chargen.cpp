@@ -23,10 +23,11 @@
 #include "../../../../resource/resources.h"
 
 #include "../../../core/d20/classes.h"
-#include "../../../core/game.h"
 #include "../../../core/object/factory.h"
 #include "../../../core/party.h"
 #include "../../../core/portraits.h"
+
+#include "../../kotor.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -43,7 +44,7 @@ namespace game {
 static constexpr float kModelScale = 1.1f;
 
 CharacterGeneration::CharacterGeneration(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

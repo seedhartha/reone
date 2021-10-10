@@ -32,7 +32,7 @@ constexpr int kNpcCount = 9;
 class PartySelection : public GameGUI {
 public:
     PartySelection(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

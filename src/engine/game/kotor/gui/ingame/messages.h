@@ -32,7 +32,7 @@ namespace game {
 class MessagesMenu : public GameGUI {
 public:
     MessagesMenu(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

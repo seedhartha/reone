@@ -25,11 +25,12 @@
 #include "../../../../resource/strings.h"
 
 #include "../../../core/d20/classes.h"
-#include "../../../core/game.h"
 #include "../../../core/object/creature.h"
 #include "../../../core/object/factory.h"
 #include "../../../core/party.h"
 #include "../../../core/portraits.h"
+
+#include "../../kotor.h"
 
 #include "chargen.h"
 
@@ -60,7 +61,7 @@ static map<ClassType, int> g_classDescStrRefs {
     {ClassType::JediGuardian, 48033}};
 
 ClassSelection::ClassSelection(
-    Game *game,
+    KotOR *game,
     CharacterGeneration &charGen,
     ActionFactory &actionFactory,
     Classes &classes,

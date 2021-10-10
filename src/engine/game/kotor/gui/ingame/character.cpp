@@ -21,9 +21,10 @@
 #include "../../../../gui/scenebuilder.h"
 
 #include "../../../core/d20/classes.h"
-#include "../../../core/game.h"
 #include "../../../core/object/factory.h"
 #include "../../../core/party.h"
+
+#include "../../kotor.h"
 
 #include "ingame.h"
 
@@ -40,7 +41,7 @@ namespace reone {
 namespace game {
 
 CharacterMenu::CharacterMenu(
-    Game *game,
+    KotOR *game,
     InGameMenu &inGameMenu,
     ActionFactory &actionFactory,
     Classes &classes,

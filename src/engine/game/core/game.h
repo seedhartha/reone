@@ -188,17 +188,12 @@ public:
     void setRelativeMouseMode(bool relative);
 
     virtual void openMainMenu() = 0;
-    virtual void openInGame() = 0;
-    virtual void openInGameMenu(InGameMenuTab tab) = 0;
     virtual void openContainer(const std::shared_ptr<SpatialObject> &container) = 0;
     virtual void openPartySelection(const PartySelectionContext &ctx) = 0;
-    virtual void openLevelUp() = 0;
     virtual void openSaveLoad(SaveLoadMode mode) = 0;
-    virtual void startCharacterGeneration() = 0;
     virtual void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef) = 0;
     virtual void pauseConversation() = 0;
     virtual void resumeConversation() = 0;
-    virtual void setBarkBubbleText(std::string text, float durartion) = 0;
 
     // Module loading
 

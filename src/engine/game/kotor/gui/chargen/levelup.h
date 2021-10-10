@@ -36,7 +36,7 @@ class LevelUpMenu : public GameGUI {
 public:
     LevelUpMenu(
         CharacterGeneration *charGen,
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

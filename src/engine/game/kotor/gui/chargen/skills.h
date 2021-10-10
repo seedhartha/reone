@@ -39,7 +39,7 @@ class CharGenSkills : public GameGUI {
 public:
     CharGenSkills(
         CharacterGeneration *charGen,
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

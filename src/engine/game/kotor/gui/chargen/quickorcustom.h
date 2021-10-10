@@ -37,7 +37,7 @@ class QuickOrCustom : public GameGUI {
 public:
     QuickOrCustom(
         CharacterGeneration *charGen,
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

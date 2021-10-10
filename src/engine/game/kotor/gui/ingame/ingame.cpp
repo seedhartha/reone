@@ -17,7 +17,7 @@
 
 #include "ingame.h"
 
-#include "../../../core/game.h"
+#include "../../kotor.h"
 
 using namespace std;
 
@@ -30,7 +30,7 @@ namespace reone {
 namespace game {
 
 InGameMenu::InGameMenu(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

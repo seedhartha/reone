@@ -38,7 +38,7 @@ class Skills;
 class HUD : public GameGUI {
 public:
     HUD(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

@@ -45,8 +45,8 @@ class Classes;
 class Combat;
 class Feats;
 class FootstepSounds;
-class Game;
 class GUISounds;
+class KotOR;
 class ObjectFactory;
 class Party;
 class Portraits;
@@ -61,7 +61,7 @@ class Surfaces;
 class GameGUI : public gui::GUI {
 protected:
     GameGUI(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,
@@ -97,7 +97,7 @@ protected:
     std::string getResRef(const std::string &base) const;
 
 protected:
-    Game *_game;
+    KotOR *_game;
 
     // Services
 

@@ -26,8 +26,9 @@
 #include "../../../gui/control/listbox.h"
 #include "../../../resource/resources.h"
 
-#include "../../core/game.h"
 #include "../../core/script/runner.h"
+
+#include "../kotor.h"
 
 using namespace std;
 
@@ -45,7 +46,7 @@ static constexpr float kDefaultEntryDuration = 10.0f;
 static bool g_allEntriesSkippable = false;
 
 Conversation::Conversation(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

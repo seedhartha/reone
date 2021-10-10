@@ -20,7 +20,7 @@
 #include "../../../audio/player.h"
 #include "../../../graphics/texture/textures.h"
 
-#include "../../core/game.h"
+#include "../kotor.h"
 
 #include "sounds.h"
 
@@ -36,7 +36,7 @@ namespace reone {
 namespace game {
 
 GameGUI::GameGUI(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

@@ -22,7 +22,7 @@
 #include "../../../../gui/control/listbox.h"
 #include "../../../../resource/strings.h"
 
-#include "../../../core/game.h"
+#include "../../kotor.h"
 
 #include "chargen.h"
 
@@ -41,7 +41,7 @@ static constexpr int kStrRefCustomHelpText = 242;
 
 QuickOrCustom::QuickOrCustom(
     CharacterGeneration *charGen,
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

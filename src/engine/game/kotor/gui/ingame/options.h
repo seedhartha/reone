@@ -32,7 +32,7 @@ namespace game {
 class OptionsMenu : public GameGUI {
 public:
     OptionsMenu(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

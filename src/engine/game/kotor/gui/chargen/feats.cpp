@@ -19,6 +19,8 @@
 
 #include "../../../../gui/control/button.h"
 
+#include "../../kotor.h"
+
 #include "chargen.h"
 
 using namespace std;
@@ -33,7 +35,7 @@ namespace game {
 
 CharGenFeats::CharGenFeats(
     CharacterGeneration *charGen,
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

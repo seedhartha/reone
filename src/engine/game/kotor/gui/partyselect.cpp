@@ -22,12 +22,13 @@
 #include "../../../resource/strings.h"
 #include "../../../script/types.h"
 
-#include "../../core/game.h"
 #include "../../core/object/factory.h"
 #include "../../core/party.h"
 #include "../../core/portrait.h"
 #include "../../core/portraits.h"
 #include "../../core/script/runner.h"
+
+#include "../kotor.h"
 
 using namespace std;
 
@@ -49,7 +50,7 @@ static glm::vec3 g_kotorColorOn = {0.984314f, 1.0f, 0};
 static glm::vec3 g_kotorColorAdded = {0, 0.831373f, 0.090196f};
 
 PartySelection::PartySelection(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

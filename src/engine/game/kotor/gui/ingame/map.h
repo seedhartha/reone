@@ -36,7 +36,7 @@ class Waypoint;
 class MapMenu : public GameGUI {
 public:
     MapMenu(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

@@ -21,7 +21,7 @@
 #include "../../../../gui/control/button.h"
 #include "../../../../resource/resources.h"
 
-#include "../../../core/game.h"
+#include "../../kotor.h"
 
 #include "chargen.h"
 
@@ -37,7 +37,7 @@ namespace game {
 
 NameEntry::NameEntry(
     CharacterGeneration *charGen,
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

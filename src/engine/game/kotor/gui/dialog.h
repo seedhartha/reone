@@ -32,7 +32,7 @@ namespace game {
 class DialogGUI : public Conversation {
 public:
     DialogGUI(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

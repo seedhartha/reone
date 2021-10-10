@@ -21,9 +21,10 @@
 #include "../../../../gui/control/label.h"
 #include "../../../../gui/control/listbox.h"
 
-#include "../../../core/game.h"
 #include "../../../core/object/creature.h"
 #include "../../../core/party.h"
+
+#include "../../kotor.h"
 
 using namespace std;
 
@@ -36,7 +37,7 @@ namespace reone {
 namespace game {
 
 InventoryMenu::InventoryMenu(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

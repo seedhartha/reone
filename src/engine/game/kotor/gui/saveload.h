@@ -32,7 +32,7 @@ namespace game {
 class SaveLoad : public GameGUI {
 public:
     SaveLoad(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,
