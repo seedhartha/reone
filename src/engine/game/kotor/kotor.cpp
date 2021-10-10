@@ -180,6 +180,16 @@ void KotOR::initResourceProviders() {
     _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
 }
 
+void KotOR::start() {
+    openMainMenu();
+
+    if (!_options.module.empty()) {
+        onModuleSelected(_options.module);
+    } else {
+        playVideo("legal");
+    }
+}
+
 void KotOR::loadModule(const string &name, string entry) {
     info("Load module: " + name);
 

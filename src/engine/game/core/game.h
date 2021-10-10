@@ -152,6 +152,10 @@ public:
         resource::Resources &resources,
         resource::Strings &strings);
 
+    virtual ~Game() {
+        deinit();
+    }
+
     virtual void initResourceProviders() = 0;
 
     void init();
@@ -321,6 +325,8 @@ protected:
     glm::vec3 _guiColorDisabled {0.0f};
 
     // END GUI colors
+
+    virtual void start() = 0;
 
     void stopMovement();
 
