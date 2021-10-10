@@ -19,15 +19,15 @@
  *  Implementation of routines related to perception.
  */
 
-#include "declarations.h"
+#include "../declarations.h"
 
-#include "../../../../common/logutil.h"
-#include "../../../../script/types.h"
+#include "../../../../../common/logutil.h"
+#include "../../../../../script/types.h"
 
-#include "../../../core/object/creature.h"
-#include "../../../core/script/routine/argutil.h"
-#include "../../../core/script/routine/context.h"
-#include "../../../core/script/routine/objectutil.h"
+#include "../../../object/creature.h"
+#include "../../../script/routine/argutil.h"
+#include "../../../script/routine/context.h"
+#include "../../../script/routine/objectutil.h"
 
 using namespace std;
 

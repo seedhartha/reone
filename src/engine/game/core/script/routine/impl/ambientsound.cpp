@@ -16,17 +16,14 @@
  */
 
 /** @file
- *  Implementation of movie-related routines.
+ *  Implementation of routines related to ambient sounds.
  */
 
-#include "declarations.h"
+#include "../declarations.h"
 
-#include "../../../../script/exception/notimpl.h"
-#include "../../../../script/types.h"
+#include "../../../../../script/exception/notimpl.h"
 
-#include "../../../core/game.h"
-#include "../../../core/script/routine/argutil.h"
-#include "../../../core/script/routine/context.h"
+#include "../../../script/routine/context.h"
 
 using namespace std;
 
@@ -38,23 +35,27 @@ namespace game {
 
 namespace routine {
 
-Variable playMovie(const vector<Variable> &args, const RoutineContext &ctx) {
-    string movie(boost::to_lower_copy(getString(args, 0)));
-
-    ctx.game.playVideo(movie);
-
-    return Variable::ofNull();
-}
-
-Variable isMoviePlaying(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable ambientSoundPlay(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable queueMovie(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable ambientSoundStop(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable playMovieQueue(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable ambientSoundChangeDay(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable ambientSoundChangeNight(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable ambientSoundSetDayVolume(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable ambientSoundSetNightVolume(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

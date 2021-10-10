@@ -19,14 +19,14 @@
  *  Implementation of stealth-related routines.
  */
 
-#include "declarations.h"
+#include "../declarations.h"
 
-#include "../../../../script/exception/notimpl.h"
-#include "../../../../script/types.h"
+#include "../../../../../script/exception/notimpl.h"
+#include "../../../../../script/types.h"
 
-#include "../../../core/game.h"
-#include "../../../core/script/routine/argutil.h"
-#include "../../../core/script/routine/context.h"
+#include "../../../game.h"
+#include "../../../script/routine/argutil.h"
+#include "../../../script/routine/context.h"
 
 using namespace std;
 

@@ -19,14 +19,14 @@
  *  Implementation of time-related routines.
  */
 
-#include "declarations.h"
+#include "../declarations.h"
 
-#include "../../../../common/logutil.h"
-#include "../../../../script/exception/notimpl.h"
+#include "../../../../../common/logutil.h"
+#include "../../../../../script/exception/notimpl.h"
 
-#include "../../../core/object/object.h"
-#include "../../../core/script/routine/argutil.h"
-#include "../../../core/script/routine/context.h"
+#include "../../../object/object.h"
+#include "../../../script/routine/argutil.h"
+#include "../../../script/routine/context.h"
 
 using namespace std;
 

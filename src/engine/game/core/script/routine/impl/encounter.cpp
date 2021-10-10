@@ -16,15 +16,14 @@
  */
 
 /** @file
- *  Implementation of planet-related routines.
+ *  Implementation of encounter-related routines.
  */
 
-#include "declarations.h"
+#include "../declarations.h"
 
-#include "../../../../script/exception/notimpl.h"
-#include "../../../../script/types.h"
+#include "../../../../../script/exception/notimpl.h"
 
-#include "../../../core/script/routine/context.h"
+#include "../../../script/routine/context.h"
 
 using namespace std;
 
@@ -36,23 +35,35 @@ namespace game {
 
 namespace routine {
 
-Variable setPlanetSelectable(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getEncounterActive(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlanetSelectable(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setEncounterActive(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable setPlanetAvailable(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getEncounterSpawnsMax(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlanetAvailable(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable setEncounterSpawnsMax(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getSelectedPlanet(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable getEncounterSpawnsCurrent(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable setEncounterSpawnsCurrent(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable setEncounterDifficulty(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable getEncounterDifficulty(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

@@ -19,15 +19,15 @@
  *  Implementation of routines related to sound objects.
  */
 
-#include "declarations.h"
+#include "../declarations.h"
 
-#include "../../../../common/logutil.h"
-#include "../../../../script/exception/notimpl.h"
-#include "../../../../script/types.h"
+#include "../../../../../common/logutil.h"
+#include "../../../../../script/exception/notimpl.h"
+#include "../../../../../script/types.h"
 
-#include "../../../core/object/sound.h"
-#include "../../../core/script/routine/argutil.h"
-#include "../../../core/script/routine/context.h"
+#include "../../../object/sound.h"
+#include "../../../script/routine/argutil.h"
+#include "../../../script/routine/context.h"
 
 using namespace std;
 

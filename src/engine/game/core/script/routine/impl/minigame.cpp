@@ -19,11 +19,11 @@
  *  Implementation of minigame-related routines.
  */
 
-#include "declarations.h"
+#include "../declarations.h"
 
-#include "../../../../script/exception/notimpl.h"
+#include "../../../../../script/exception/notimpl.h"
 
-#include "../../../core/script/routine/context.h"
+#include "../../../script/routine/context.h"
 
 using namespace std;
 
@@ -424,6 +424,34 @@ Variable getPlayerTunnelInfinite(const vector<Variable> &args, const RoutineCont
 Variable setPlayerTunnelInfinite(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
+
+// TSL
+
+Variable getSwoopUpgrade(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable getTrackPosition(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable setFollowerPosition(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable destroyMiniGameObject(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable setJumpSpeed(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable playerApplyForce(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+// END TSL
 
 } // namespace minigame
 
