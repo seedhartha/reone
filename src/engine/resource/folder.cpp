@@ -57,10 +57,10 @@ void Folder::loadDirectory(const fs::path &path) {
     }
 }
 
-shared_ptr<ByteArray> Folder::find(const string &resRef, ResourceType type) {
+shared_ptr<ByteArray> Folder::find(const ResourceId &id) {
     fs::path path;
     for (auto &res : _resources) {
-        if (res.first == resRef && res.second.type == type) {
+        if (res.first == id.resRef && res.second.type == id.type) {
             path = res.second.path;
             break;
         }

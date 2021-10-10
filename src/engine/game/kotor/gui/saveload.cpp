@@ -261,12 +261,12 @@ static SavedGame peekSavedGame(const fs::path &path) {
     ErfReader erf;
     erf.load(path);
 
-    shared_ptr<ByteArray> nfoData(erf.find("savenfo", ResourceType::Res));
+    shared_ptr<ByteArray> nfoData(erf.find(ResourceId("savenfo", ResourceType::Res)));
     GffReader nfo;
     nfo.load(wrap(nfoData));
 
     shared_ptr<Texture> screen;
-    shared_ptr<ByteArray> screenData(erf.find("screen", ResourceType::Tga));
+    shared_ptr<ByteArray> screenData(erf.find(ResourceId("screen", ResourceType::Tga)));
     if (screenData) {
         TgaReader tga("screen", TextureUsage::GUI);
         tga.load(wrap(screenData));

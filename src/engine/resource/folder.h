@@ -34,7 +34,7 @@ public:
 
     void load(const boost::filesystem::path &path);
 
-    std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
+    std::shared_ptr<ByteArray> find(const ResourceId &id) override;
 
     int getId() const override { return _id; }
 

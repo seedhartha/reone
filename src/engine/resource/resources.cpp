@@ -182,7 +182,7 @@ shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) 
 
 shared_ptr<ByteArray> Resources::doGetRaw(const ResourceId &id, const vector<unique_ptr<IResourceProvider>> &providers) {
     for (auto provider = providers.rbegin(); provider != providers.rend(); ++provider) {
-        shared_ptr<ByteArray> data((*provider)->find(id.resRef, id.type));
+        shared_ptr<ByteArray> data((*provider)->find(id));
         if (data) {
             debug(boost::format("Resource '%s' found in provider %d") % id.string() % (*provider)->getId(), LogChannels::resources2);
             return data;

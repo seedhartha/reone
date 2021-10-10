@@ -757,7 +757,7 @@ void Game::loadFromFile(const fs::path &path) {
     ErfReader erf;
     erf.load(path);
 
-    shared_ptr<ByteArray> nfoData(erf.find("savenfo", ResourceType::Res));
+    shared_ptr<ByteArray> nfoData(erf.find(ResourceId("savenfo", ResourceType::Res)));
 
     GffReader nfo;
     nfo.load(wrap(nfoData));

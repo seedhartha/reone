@@ -19,6 +19,7 @@
 
 #include "../common/types.h"
 
+#include "id.h"
 #include "types.h"
 
 namespace reone {
@@ -33,7 +34,7 @@ public:
     virtual ~IResourceProvider() {
     }
 
-    virtual std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) = 0;
+    virtual std::shared_ptr<ByteArray> find(const ResourceId &id) = 0;
 
     virtual int getId() const = 0;
 };

@@ -28,18 +28,17 @@ namespace resource {
 
 class RimReader : public BinaryReader, public IResourceProvider {
 public:
-    struct Resource {
-        std::string resRef;
-        ResourceType resType {ResourceType::Invalid};
+    struct ResourceEntry {
+        ResourceId resId;
         uint32_t offset {0};
         uint32_t size {0};
     };
 
     RimReader(int id = kDefaultProviderId);
 
-    std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType resType) override;
+    std::shared_ptr<ByteArray> find(const ResourceId &id) override;
 
-    const std::vector<Resource> &resources() const { return _resources; }
+    const std::vector<ResourceEntry> &resources() const { return _resources; }
 
     int getId() const override { return _id; }
     ByteArray getResourceData(int idx);
@@ -49,12 +48,14 @@ private:
 
     int _resourceCount {0};
     uint32_t _resourcesOffset {0};
-    std::vector<Resource> _resources;
+    std::vector<ResourceEntry> _resources;
+    std::unordered_map<ResourceId, int, ResourceIdHasher> _resIdxByResId;
 
     void doLoad() override;
     void loadResources();
-    Resource readResource();
-    ByteArray getResourceData(const Resource &res);
+
+    ResourceEntry readResource();
+    ByteArray getResourceData(const ResourceEntry &res);
 };
 
 } // namespace resource

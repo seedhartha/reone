@@ -53,7 +53,7 @@ void RimTool::invoke(Operation operation, const fs::path &target, const fs::path
 
 void RimTool::list(const RimReader &rim) {
     for (auto &res : rim.resources()) {
-        cout << res.resRef << " " << getExtByResType(res.resType) << endl;
+        cout << res.resId.string() << endl;
     }
 }
 
@@ -67,13 +67,13 @@ void RimTool::extract(RimReader &rim, const fs::path &destPath) {
     }
 
     for (size_t i = 0; i < rim.resources().size(); ++i) {
-        const RimReader::Resource &resEntry = rim.resources()[i];
-        string ext(getExtByResType(resEntry.resType));
-        cout << "Extracting " << resEntry.resRef << " " << ext << endl;
+        const RimReader::ResourceEntry &resEntry = rim.resources()[i];
+        cout << "Extracting " << resEntry.resId.string() << endl;
+        string ext(getExtByResType(resEntry.resId.type));
         ByteArray data(rim.getResourceData(static_cast<int>(i)));
 
         fs::path resPath(destPath);
-        resPath.append(resEntry.resRef + "." + ext);
+        resPath.append(resEntry.resId.resRef + "." + ext);
 
         fs::ofstream res(resPath, ios::binary);
         res.write(&data[0], data.size());

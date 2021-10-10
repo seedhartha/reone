@@ -74,8 +74,8 @@ KeyReader::FileEntry KeyReader::readFileEntry() {
     ignore(2);
 
     FileEntry entry;
-    entry.fileSize = fileSize;
     entry.filename = readCString(filenameOffset, filenameSize);
+    entry.fileSize = fileSize;
 
     return move(entry);
 }
