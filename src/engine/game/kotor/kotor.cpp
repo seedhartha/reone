@@ -20,6 +20,7 @@
 #include "../../audio/files.h"
 #include "../../audio/player.h"
 #include "../../common/collectionutil.h"
+#include "../../common/exception/validation.h"
 #include "../../common/logutil.h"
 #include "../../common/pathutil.h"
 #include "../../common/streamutil.h"
@@ -186,7 +187,7 @@ void KotOR::initResourceProviders() {
 void KotOR::loadModuleNames() {
     fs::path modules(getPathIgnoreCase(_path, kModulesDirectoryName));
     if (modules.empty()) {
-        return;
+        throw ValidationException("Modules directory not found");
     }
     for (auto &entry : fs::directory_iterator(modules)) {
         string filename(boost::to_lower_copy(entry.path().filename().string()));
@@ -213,24 +214,24 @@ void KotOR::loadModuleResources(const string &moduleName) {
 
     fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));
     if (modulesPath.empty()) {
-        return;
+        throw ValidationException("Modules directory not found");
     }
 
     fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod"));
     if (!modPath.empty()) {
-        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false), true);
+        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false));
     } else {
-        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"), true);
-        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
+        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"));
+        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"));
     }
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-    if (!lipsPath.empty()) {
-        _resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
+    if (lipsPath.empty()) {
+        _resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"));
     }
 
     if (isTSL()) {
-        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"), true);
+        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"));
     }
 }
 

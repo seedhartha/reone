@@ -17,6 +17,7 @@
 
 #include "limbo.h"
 
+#include "../../common/exception/validation.h"
 #include "../../common/logutil.h"
 #include "../../common/pathutil.h"
 #include "../../resource/resources.h"
@@ -45,7 +46,7 @@ void Limbo::initResourceProviders() {
 void Limbo::loadModuleNames() {
     fs::path modules(getPathIgnoreCase(_path, kModulesDirectoryName));
     if (modules.empty()) {
-        return;
+        throw ValidationException("Modules directory not found");
     }
     for (auto &entry : fs::directory_iterator(modules)) {
         string filename(boost::to_lower_copy(entry.path().filename().string()));
@@ -66,13 +67,14 @@ void Limbo::loadModuleResources(const string &moduleName) {
 
     fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));
     if (modulesPath.empty()) {
-        return;
+        throw ValidationException("Modules directory not found");
     }
 
     fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod"));
-    if (!modPath.empty()) {
-        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod"), true);
+    if (modPath.empty()) {
+        throw ValidationException("Module MOD archive not found");
     }
+    _resources.indexErfFile(modPath);
 }
 
 } // namespace game
