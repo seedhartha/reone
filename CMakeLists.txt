@@ -878,6 +878,23 @@ target_link_libraries(libgamecore PUBLIC libscript libgui libscene libvideo liba
 
 ## END libgamecore static library
 
+## liblimbo static library
+
+set(LIMBO_HEADERS
+    src/engine/game/limbo/limbo.h
+    src/engine/game/limbo/routine/registrar.h)
+
+set(LIMBO_SOURCES
+    src/engine/game/limbo/limbo.cpp
+    src/engine/game/limbo/routine/registrar.cpp)
+
+add_library(liblimbo STATIC ${LIMBO_HEADERS} ${LIMBO_SOURCES})
+set_target_properties(liblimbo PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(liblimbo PRIVATE src/engine/pch.h)
+target_link_libraries(liblimbo PUBLIC libgamecore)
+
+## END liblimbo static library
+
 ## libkotor static library
 
 set(KOTOR_HEADERS
@@ -990,7 +1007,7 @@ set(GAME_SOURCES
 add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(libgame PRIVATE src/engine/pch.h)
-target_link_libraries(libgame PUBLIC libtsl)
+target_link_libraries(libgame PUBLIC liblimbo libtsl)
 
 ## END libgame static library
 

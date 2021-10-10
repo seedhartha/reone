@@ -17,14 +17,24 @@
 
 #pragma once
 
+#include "../../core/script/routine/registrar.h"
+
 namespace reone {
 
 namespace game {
 
-enum class GameID {
-    Limbo, // standalone, for testing
-    KotOR,
-    TSL
+class IRoutines;
+
+class LimboRoutineRegistrar : public RoutineRegistrar {
+public:
+    LimboRoutineRegistrar(IRoutines &routines) :
+        _routines(routines) {
+    }
+
+    void invoke() override;
+
+private:
+    IRoutines &_routines;
 };
 
 } // namespace game

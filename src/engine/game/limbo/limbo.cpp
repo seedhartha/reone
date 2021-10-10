@@ -15,17 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "limbo.h"
 
 namespace reone {
 
 namespace game {
-
-enum class GameID {
-    Limbo, // standalone, for testing
-    KotOR,
-    TSL
-};
 
 } // namespace game
 

@@ -19,6 +19,8 @@
 
 #include "../../game/kotor/kotor.h"
 #include "../../game/kotor/routine/registrar.h"
+#include "../../game/limbo/limbo.h"
+#include "../../game/limbo/routine/registrar.h"
 #include "../../game/tsl/routine/registrar.h"
 #include "../../game/tsl/tsl.h"
 
@@ -106,6 +108,46 @@ void GameModule::init() {
 
 unique_ptr<Game> GameModule::newGame() {
     switch (_gameId) {
+    case GameID::Limbo:
+        return make_unique<Limbo>(
+            _gamePath,
+            _gameOptions,
+            *_actionFactory,
+            *_classes,
+            *_combat,
+            *_cursors,
+            *_effectFactory,
+            *_feats,
+            *_footstepSounds,
+            *_guiSounds,
+            *_objectFactory,
+            *_party,
+            *_portraits,
+            *_reputes,
+            *_scriptRunner,
+            *_skills,
+            *_soundSets,
+            *_surfaces,
+            _audio.audioFiles(),
+            _audio.audioPlayer(),
+            _graphics.context(),
+            _graphics.features(),
+            _graphics.fonts(),
+            _graphics.lips(),
+            _graphics.materials(),
+            _graphics.meshes(),
+            _graphics.models(),
+            _graphics.pbrIbl(),
+            _graphics.shaders(),
+            _graphics.textures(),
+            _graphics.walkmeshes(),
+            _graphics.window(),
+            _scene.sceneGraph(),
+            _scene.worldRenderPipeline(),
+            _script.scripts(),
+            _resource.resources(),
+            _resource.strings());
+
     case GameID::KotOR:
         return make_unique<KotOR>(
             _gamePath,
@@ -193,6 +235,8 @@ unique_ptr<Game> GameModule::newGame() {
 
 unique_ptr<RoutineRegistrar> GameModule::newRoutineRegistrar() {
     switch (_gameId) {
+    case GameID::Limbo:
+        return make_unique<LimboRoutineRegistrar>(*_routines);
     case GameID::KotOR:
         return make_unique<KotORRoutineRegistrar>(*_routines);
     case GameID::TSL:
