@@ -37,7 +37,7 @@ void NcsReader::doLoad() {
     uint32_t length = readUint32();
 
     _program = make_unique<ScriptProgram>(_resRef);
-    _program->_length = length;
+    _program->setLength(length);
 
     size_t off = tell();
     while (off < length) {
@@ -88,7 +88,7 @@ void NcsReader::readInstruction(size_t &offset) {
     case InstructionType::JSR:
     case InstructionType::JZ:
     case InstructionType::JNZ:
-        ins.jumpOffset = static_cast<uint32_t>(offset + readInt32());
+        ins.jumpOffset = readInt32();
         break;
     case InstructionType::DESTRUCT:
         ins.size = readUint16();
@@ -190,7 +190,7 @@ void NcsReader::readInstruction(size_t &offset) {
     size_t pos = tell();
     ins.nextOffset = static_cast<uint32_t>(pos);
 
-    _program->_instructions.insert(make_pair(static_cast<uint32_t>(offset), move(ins)));
+    _program->add(move(ins));
 
     offset = pos;
 }

@@ -153,9 +153,8 @@ private:
         case InstructionType::JSR:
         case InstructionType::JZ:
         case InstructionType::JNZ:
-            applyArguments(argsLine, "^ ([\\d\\w]{8})$", 1, [&ins](auto &args) {
-                char *p = nullptr;
-                ins.jumpOffset = strtoul(args[0].c_str(), &p, 16);
+            applyArguments(argsLine, "^ [\\d\\w]{8}\\(([-\\d]+)\\)$", 1, [&ins](auto &args) {
+                ins.jumpOffset = atoi(args[0].c_str());
             });
             break;
         case InstructionType::DESTRUCT:
@@ -218,8 +217,6 @@ void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
     NcsReader ncs("");
     ncs.load(path);
     auto program = ncs.program();
-    auto instructions = mapToValues(program->instructions());
-    sort(instructions.begin(), instructions.end(), [](auto &a, auto &b) { return a.offset < b.offset; });
 
     StubRoutines routines;
     if (_tsl) {
@@ -235,7 +232,7 @@ void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
 
     fs::ofstream pcode(pcodePath);
     try {
-        for (auto &instr : instructions) {
+        for (auto &instr : program->instructions()) {
             pcode << describeInstruction(instr, routines) << endl;
         }
     } catch (const exception &e) {

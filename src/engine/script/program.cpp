@@ -24,11 +24,13 @@ namespace reone {
 namespace script {
 
 void ScriptProgram::add(Instruction instr) {
-    _instructions.insert(make_pair(instr.offset, instr));
+    _instructions.push_back(move(instr));
+    _insIdxByOffset.insert(make_pair(instr.offset, _instructions.size() - 1));
 }
 
 const Instruction &ScriptProgram::getInstruction(uint32_t offset) const {
-    return _instructions.find(offset)->second;
+    int idx = _insIdxByOffset.find(offset)->second;
+    return _instructions[idx];
 }
 
 } // namespace script

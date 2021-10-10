@@ -23,8 +23,6 @@ namespace reone {
 
 namespace script {
 
-class NcsReader;
-
 struct Instruction {
     uint32_t offset {0};
     InstructionType type {InstructionType::NOP};
@@ -59,20 +57,20 @@ public:
 
     void add(Instruction instr);
 
-    const Instruction &getInstruction(uint32_t offset) const;
-
     const std::string &name() const { return _name; }
     uint32_t length() const { return _length; }
-    const std::unordered_map<uint32_t, Instruction> instructions() const { return _instructions; }
+    const std::vector<Instruction> instructions() const { return _instructions; }
+
+    const Instruction &getInstruction(uint32_t offset) const;
 
     void setLength(uint32_t length) { _length = length; }
 
 private:
     std::string _name;
-    uint32_t _length {0};
-    std::unordered_map<uint32_t, Instruction> _instructions;
 
-    friend class NcsReader;
+    uint32_t _length {0};
+    std::vector<Instruction> _instructions;
+    std::unordered_map<uint32_t, int> _insIdxByOffset;
 };
 
 } // namespace script
