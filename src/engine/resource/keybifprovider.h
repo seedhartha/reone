@@ -28,7 +28,7 @@ class BifReader;
 
 class KeyBifResourceProvider : public IResourceProvider {
 public:
-    KeyBifResourceProvider(int id) :
+    KeyBifResourceProvider(int id = kDefaultProviderId) :
         _id(id) {
     }
 

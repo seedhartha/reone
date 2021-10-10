@@ -74,7 +74,7 @@ void KeyBifTool::listKEY(const KeyReader &key) {
 void KeyBifTool::listBIF(const KeyReader &key, const BifReader &bif, int bifIdx) {
     for (auto &keyEntry : key.keys()) {
         if (keyEntry.bifIdx == bifIdx) {
-            cout << keyEntry.resRef << " " << getExtByResType(keyEntry.resType) << endl;
+            cout << keyEntry.resId.string() << endl;
         }
     }
 }
@@ -89,15 +89,15 @@ void KeyBifTool::extractBIF(const KeyReader &key, BifReader &bif, int bifIdx, co
     }
 
     for (auto &keyEntry : key.keys()) {
-        if (keyEntry.bifIdx != bifIdx)
+        if (keyEntry.bifIdx != bifIdx) {
             continue;
-
-        string ext(getExtByResType(keyEntry.resType));
-        cout << "Extracting " + keyEntry.resRef << " " << ext << endl;
+        }
+        cout << "Extracting " + keyEntry.resId.string() << endl;
+        string ext(getExtByResType(keyEntry.resId.type));
         unique_ptr<ByteArray> data(bif.getResourceData(keyEntry.resIdx));
 
         fs::path resPath(destPath);
-        resPath.append(keyEntry.resRef + "." + ext);
+        resPath.append(keyEntry.resId.resRef + "." + ext);
 
         fs::ofstream out(resPath, ios::binary);
         out.write(&(*data)[0], data->size());

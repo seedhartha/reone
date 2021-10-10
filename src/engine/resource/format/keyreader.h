@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../id.h"
 #include "../types.h"
 
 #include "binreader.h"
@@ -33,16 +34,15 @@ public:
     };
 
     struct KeyEntry {
-        std::string resRef;
-        ResourceType resType {ResourceType::Invalid};
+        ResourceId resId;
         int bifIdx {0};
         int resIdx {0};
     };
 
     KeyReader();
 
+    bool find(const ResourceId &id, KeyEntry &outKey) const;
     const std::string &getFilename(int idx) const;
-    bool find(const std::string &resRef, ResourceType type, KeyEntry &key) const;
 
     const std::vector<FileEntry> &files() const { return _files; }
     const std::vector<KeyEntry> &keys() const { return _keys; }
@@ -54,11 +54,14 @@ private:
     uint32_t _keysOffset {0};
     std::vector<FileEntry> _files;
     std::vector<KeyEntry> _keys;
+    std::unordered_map<ResourceId, int, ResourceIdHasher> _keyIdxByResId;
 
     void doLoad() override;
+
     void loadFiles();
-    FileEntry readFileEntry();
     void loadKeys();
+
+    FileEntry readFileEntry();
     KeyEntry readKeyEntry();
 };
 

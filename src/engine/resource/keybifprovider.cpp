@@ -35,10 +35,11 @@ void KeyBifResourceProvider::init(const fs::path &keyPath) {
 }
 
 shared_ptr<ByteArray> KeyBifResourceProvider::find(const std::string &resRef, ResourceType type) {
+    ResourceId id(resRef, type);
     KeyReader::KeyEntry key;
-    if (!_keyFile.find(resRef, type, key))
+    if (!_keyFile.find(id, key)) {
         return nullptr;
-
+    }
     shared_ptr<ByteArray> result;
 
     auto maybeBif = _bifCache.find(key.bifIdx);
