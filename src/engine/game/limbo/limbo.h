@@ -105,7 +105,9 @@ public:
     }
 
 private:
-    void initResourceProviders() override {}
+    void initResourceProviders() override;
+    void start() override;
+
     void loadModule(const std::string &name, std::string entry = "") override {}
 
     void openMainMenu() override {}

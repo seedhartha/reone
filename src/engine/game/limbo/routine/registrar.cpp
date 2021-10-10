@@ -50,6 +50,8 @@ void LimboRoutineRegistrar::invoke() {
     _routines.add("pow", VT_F, {VT_F, VT_F}, &routine::pow);
     _routines.add("sqrt", VT_F, {VT_F}, &routine::sqrt);
     _routines.add("abs", VT_I, {VT_I}, &routine::abs);
+
+    _routines.add("StartNewModule", VT_V, {VT_S, VT_S, VT_S, VT_S, VT_S, VT_S, VT_S, VT_S}, &routine::startNewModule);
 }
 
 } // namespace game

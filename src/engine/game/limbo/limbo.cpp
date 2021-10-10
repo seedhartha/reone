@@ -17,9 +17,29 @@
 
 #include "limbo.h"
 
+#include "../../common/pathutil.h"
+#include "../../resource/resources.h"
+
+#include "../core/script/runner.h"
+
+namespace fs = boost::filesystem;
+
 namespace reone {
 
 namespace game {
+
+static constexpr char kStartScriptResRef[] = "start";
+
+void Limbo::initResourceProviders() {
+    fs::path dataDir(getPathIgnoreCase(_path, "data"));
+    if (!dataDir.empty()) {
+        _resources.indexDirectory(dataDir);
+    }
+}
+
+void Limbo::start() {
+    _scriptRunner.run(kStartScriptResRef);
+}
 
 } // namespace game
 

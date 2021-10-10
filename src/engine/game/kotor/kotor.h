@@ -98,6 +98,8 @@ public:
     void setBarkBubbleText(std::string text, float durartion);
 
 protected:
+    void start() override;
+
     void onModuleSelected(const std::string &name) override;
     void drawHUD() override;
     CameraType getConversationCamera(int &cameraId) const override;

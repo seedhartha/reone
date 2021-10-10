@@ -151,22 +151,6 @@ Game::Game(
     _strings(strings) {
 }
 
-int Game::run() {
-    init();
-    openMainMenu();
-
-    if (!_options.module.empty()) {
-        onModuleSelected(_options.module);
-    } else {
-        playVideo("legal");
-    }
-
-    runMainLoop();
-    deinit();
-
-    return 0;
-}
-
 void Game::init() {
     _window.setEventHandler(this);
     _walkmeshes.setWalkableSurfaces(_surfaces.getWalkableSurfaceIndices());
@@ -179,6 +163,13 @@ void Game::init() {
 
     loadModuleNames();
     setCursorType(CursorType::Default);
+}
+
+int Game::run() {
+    start();
+    runMainLoop();
+
+    return 0;
 }
 
 void Game::loadModuleNames() {
