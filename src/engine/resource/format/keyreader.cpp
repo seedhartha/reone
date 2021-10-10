@@ -32,6 +32,22 @@ KeyReader::KeyReader() :
     BinaryReader(kSignatureSize, kSignature) {
 }
 
+bool KeyReader::find(const ResourceId &id, KeyEntry &outKey) const {
+    auto maybeKey = _keyIdxByResId.find(id);
+    if (maybeKey == _keyIdxByResId.end()) {
+        return false;
+    }
+    outKey = _keys[maybeKey->second];
+    return true;
+}
+
+const string &KeyReader::getFilename(int idx) const {
+    if (idx >= _files.size()) {
+        throw out_of_range("KEY: file index out of range: " + to_string(idx));
+    }
+    return _files[idx].filename;
+}
+
 void KeyReader::doLoad() {
     _bifCount = readUint32();
     _keyCount = readUint32();
@@ -69,45 +85,23 @@ void KeyReader::loadKeys() {
     seek(_keysOffset);
 
     for (int i = 0; i < _keyCount; ++i) {
-        _keys.push_back(readKeyEntry());
+        KeyEntry entry(readKeyEntry());
+        _keyIdxByResId.insert(make_pair(entry.resId, i));
+        _keys.push_back(move(entry));
     }
 }
 
 KeyReader::KeyEntry KeyReader::readKeyEntry() {
-    string resRef(readCString(16));
+    string resRef(boost::to_lower_copy(readCString(16)));
     uint16_t resType = readUint16();
     uint32_t resId = readUint32();
 
     KeyEntry entry;
-    entry.resRef = boost::to_lower_copy(resRef);
-    entry.resType = static_cast<ResourceType>(resType);
+    entry.resId = ResourceId(std::move(resRef), static_cast<ResourceType>(resType));
     entry.bifIdx = resId >> 20;
     entry.resIdx = resId & 0xfffff;
 
-    return entry;
-}
-
-const string &KeyReader::getFilename(int idx) const {
-    if (idx >= _files.size()) {
-        throw out_of_range("KEY: file index out of range: " + to_string(idx));
-    }
-    return _files[idx].filename;
-}
-
-bool KeyReader::find(const string &resRef, ResourceType type, KeyEntry &key) const {
-    string lcResRef(boost::to_lower_copy(resRef));
-
-    auto it = find_if(
-        _keys.begin(),
-        _keys.end(),
-        [&](const KeyEntry &e) { return e.resRef == lcResRef && e.resType == type; });
-
-    if (it == _keys.end())
-        return false;
-
-    key = *it;
-
-    return true;
+    return move(entry);
 }
 
 } // namespace resource

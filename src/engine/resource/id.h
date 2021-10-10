@@ -28,8 +28,11 @@ struct ResourceId {
     std::string resRef;
     ResourceType type {ResourceType::Invalid};
 
+    ResourceId() = default;
+
     ResourceId(std::string resRef, ResourceType type) :
-        resRef(std::move(resRef)), type(type) {
+        resRef(std::move(resRef)),
+        type(type) {
     }
 
     std::string string() const {
