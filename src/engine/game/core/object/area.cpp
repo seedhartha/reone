@@ -17,6 +17,7 @@
 
 #include "area.h"
 
+#include "../../../common/exception/validation.h"
 #include "../../../common/guardutil.h"
 #include "../../../common/logutil.h"
 #include "../../../common/randomutil.h"
@@ -158,8 +159,13 @@ void Area::load(string name, const GffStruct &are, const GffStruct &git, bool fr
 }
 
 void Area::loadLYT() {
+    shared_ptr<ByteArray> lytData(_resources.getRaw(_name, ResourceType::Lyt));
+    if (!lytData) {
+        throw ValidationException("Area LYT file not found");
+    }
+
     LytReader lyt;
-    lyt.load(wrap(_resources.getRaw(_name, ResourceType::Lyt)));
+    lyt.load(wrap(lytData));
 
     for (auto &lytRoom : lyt.rooms()) {
         shared_ptr<Model> model(_models.get(lytRoom.name));

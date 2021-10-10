@@ -66,6 +66,9 @@ void Module::loadInfo(const GffStruct &ifo) {
     // Entry location
 
     _info.entryArea = ifo.getString("Mod_Entry_Area");
+    if (_info.entryArea.empty()) {
+        throw ValidationException("Mod_Entry_Area must not be empty");
+    }
 
     _info.entryPosition.x = ifo.getFloat("Mod_Entry_X");
     _info.entryPosition.y = ifo.getFloat("Mod_Entry_Y");
@@ -91,12 +94,12 @@ void Module::loadArea(const GffStruct &ifo, bool fromSave) {
 
     shared_ptr<GffStruct> are(_resources.getGFF(_info.entryArea, ResourceType::Are));
     if (!are) {
-        throw ValidationException("Module ARE file not found");
+        throw ValidationException("Area ARE file not found");
     }
 
     shared_ptr<GffStruct> git(_resources.getGFF(_info.entryArea, ResourceType::Git));
     if (!git) {
-        throw ValidationException("Module GIT file not found");
+        throw ValidationException("Area GIT file not found");
     }
 
     _area->load(_info.entryArea, *are, *git, fromSave);
