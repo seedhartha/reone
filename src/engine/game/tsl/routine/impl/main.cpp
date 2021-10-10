@@ -61,6 +61,10 @@ Variable getChemicalPieceValue(const vector<Variable> &args, const RoutineContex
     throw NotImplementedException();
 }
 
+Variable getSpellForcePointCost(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
 Variable getFeatAcquired(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }

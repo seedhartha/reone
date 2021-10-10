@@ -2242,10 +2242,6 @@ Variable createItemOnFloor(const vector<Variable> &args, const RoutineContext &c
     throw NotImplementedException();
 }
 
-Variable getSpellForcePointCost(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
 Variable yavinHackCloseDoor(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
