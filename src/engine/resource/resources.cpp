@@ -136,7 +136,7 @@ shared_ptr<ByteArray> Resources::getRaw(const string &resRef, ResourceType type,
         data = doGetRaw(id, _transientProviders);
     }
     if (!data && logNotFound) {
-        warn("Not found: " + id.string(), LogChannels::resources);
+        warn("Resource '" + id.string() + "' not found", LogChannels::resources);
     }
     auto pair = _rawCache.insert(make_pair(id, move(data)));
     return pair.first->second;
