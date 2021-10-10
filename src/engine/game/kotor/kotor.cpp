@@ -177,7 +177,6 @@ void KotOR::initResourceProviders() {
     }
 
     _resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
-    _resources.indexDirectory(getPathIgnoreCase(fs::current_path(), kDataDirectoryName));
     _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
 }
 

@@ -139,9 +139,8 @@ void TSL::initResourceProviders() {
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
     _resources.indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
 
-    _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
     _resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
-    _resources.indexDirectory(getPathIgnoreCase(fs::current_path(), kDataDirectoryName));
+    _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
 }
 
 } // namespace game
