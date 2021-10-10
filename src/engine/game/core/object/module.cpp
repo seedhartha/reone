@@ -17,6 +17,7 @@
 
 #include "module.h"
 
+#include "../../../common/exception/validation.h"
 #include "../../../common/logutil.h"
 #include "../../../resource/resources.h"
 
@@ -90,12 +91,12 @@ void Module::loadArea(const GffStruct &ifo, bool fromSave) {
 
     shared_ptr<GffStruct> are(_resources.getGFF(_info.entryArea, ResourceType::Are));
     if (!are) {
-        return;
+        throw ValidationException("Module ARE file not found");
     }
 
     shared_ptr<GffStruct> git(_resources.getGFF(_info.entryArea, ResourceType::Git));
     if (!git) {
-        return;
+        throw ValidationException("Module GIT file not found");
     }
 
     _area->load(_info.entryArea, *are, *git, fromSave);

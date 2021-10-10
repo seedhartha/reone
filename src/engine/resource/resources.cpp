@@ -42,51 +42,46 @@ namespace reone {
 namespace resource {
 
 void Resources::indexKeyFile(const fs::path &path) {
-    if (!fs::exists(path))
+    if (!fs::exists(path)) {
         return;
-
+    }
     auto keyBif = make_unique<KeyBifResourceProvider>(_providers.size());
     keyBif->init(path);
-
     indexProvider(move(keyBif), path);
 }
 
 void Resources::indexErfFile(const fs::path &path, bool transient) {
-    if (!fs::exists(path))
+    if (!fs::exists(path)) {
         return;
-
+    }
     auto erf = make_unique<ErfReader>(_providers.size());
     erf->load(path);
-
     indexProvider(move(erf), path, transient);
 }
 
 void Resources::indexRimFile(const fs::path &path, bool transient) {
-    if (!fs::exists(path))
+    if (!fs::exists(path)) {
         return;
-
+    }
     auto rim = make_unique<RimReader>(_providers.size());
     rim->load(path);
-
     indexProvider(move(rim), path, transient);
 }
 
 void Resources::indexDirectory(const fs::path &path) {
-    if (!fs::exists(path))
+    if (!fs::exists(path)) {
         return;
-
+    }
     auto folder = make_unique<Folder>(static_cast<int>(_providers.size()));
     folder->load(path);
-
     indexProvider(move(folder), path);
 }
 
 void Resources::indexExeFile(const fs::path &path) {
-    if (!fs::exists(path))
+    if (!fs::exists(path)) {
         return;
-
+    }
     _exeFile.load(path);
-
     debug("Index executable " + path.string(), LogChannels::resources);
 }
 

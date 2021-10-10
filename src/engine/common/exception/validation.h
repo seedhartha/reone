@@ -19,17 +19,11 @@
 
 namespace reone {
 
-namespace script {
-
-class ArgumentException : public std::logic_error {
+class ValidationException : public std::logic_error {
 public:
-    ArgumentException() = default;
-
-    ArgumentException(const std::string &message) :
+    ValidationException(const std::string &message) :
         std::logic_error(message) {
     }
 };
-
-} // namespace script
 
 } // namespace reone

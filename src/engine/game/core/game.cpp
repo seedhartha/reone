@@ -20,6 +20,7 @@
 #include "../../audio/files.h"
 #include "../../audio/player.h"
 #include "../../common/collectionutil.h"
+#include "../../common/exception/validation.h"
 #include "../../common/logutil.h"
 #include "../../common/pathutil.h"
 #include "../../common/streamutil.h"
@@ -204,7 +205,7 @@ void Game::loadModule(const string &name, string entry) {
 
             shared_ptr<GffStruct> ifo(_resources.getGFF("module", ResourceType::Ifo));
             if (!ifo) {
-                return;
+                throw ValidationException("Module IFO file not found");
             }
 
             _module->load(name, *ifo, _loadFromSaveGame);
