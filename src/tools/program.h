@@ -19,6 +19,8 @@
 
 #include <boost/program_options.hpp>
 
+#include "../engine/game/types.h"
+
 #include "types.h"
 
 namespace reone {
@@ -47,7 +49,7 @@ private:
     boost::filesystem::path _gamePath;
     boost::filesystem::path _destPath;
     std::string _target;
-    bool _tsl {false};
+    game::GameID _gameId {game::GameID::Limbo};
     tools::Operation _operation {tools::Operation::None};
     std::vector<std::shared_ptr<tools::ITool>> _tools;
 

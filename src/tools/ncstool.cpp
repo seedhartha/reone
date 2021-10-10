@@ -23,6 +23,7 @@
 #include "../engine/common/logutil.h"
 #include "../engine/game/core/script/routine/iroutines.h"
 #include "../engine/game/kotor/routine/registrar.h"
+#include "../engine/game/limbo/routine/registrar.h"
 #include "../engine/game/tsl/routine/registrar.h"
 #include "../engine/script/format/ncsreader.h"
 #include "../engine/script/format/ncswriter.h"
@@ -214,18 +215,12 @@ void NcsTool::invoke(Operation operation, const fs::path &target, const fs::path
 }
 
 void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
+    StubRoutines routines;
+    fillRoutines(routines);
+
     NcsReader ncs("");
     ncs.load(path);
     auto program = ncs.program();
-
-    StubRoutines routines;
-    if (_tsl) {
-        TSLRoutineRegistrar registar(routines);
-        registar.invoke();
-    } else {
-        KotORRoutineRegistrar registar(routines);
-        registar.invoke();
-    }
 
     fs::path pcodePath(destPath);
     pcodePath.append(path.filename().string() + ".pcode");
@@ -243,13 +238,7 @@ void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
 
 void NcsTool::toNCS(const fs::path &path, const fs::path &destPath) {
     StubRoutines routines;
-    if (_tsl) {
-        TSLRoutineRegistrar registar(routines);
-        registar.invoke();
-    } else {
-        KotORRoutineRegistrar registar(routines);
-        registar.invoke();
-    }
+    fillRoutines(routines);
 
     PcodeReader pcode(path);
     pcode.load();
@@ -267,6 +256,21 @@ bool NcsTool::supports(Operation operation, const fs::path &target) const {
     return !fs::is_directory(target) &&
            ((target.extension() == ".ncs" && operation == Operation::ToPCODE) ||
             (target.extension() == ".pcode" && operation == Operation::ToNCS));
+}
+
+void NcsTool::fillRoutines(IRoutines &routines) {
+    switch (_gameId) {
+    case GameID::TSL:
+        TSLRoutineRegistrar(routines).invoke();
+        break;
+    case GameID::Limbo:
+        LimboRoutineRegistrar(routines).invoke();
+        break;
+    default: {
+        KotORRoutineRegistrar(routines).invoke();
+        break;
+    }
+    }
 }
 
 } // namespace tools
