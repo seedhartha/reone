@@ -28,16 +28,24 @@ namespace resource {
 
 class Folder : public IResourceProvider {
 public:
+    Folder(int id = kDefaultProviderId) :
+        _id(id) {
+    }
+
     void load(const boost::filesystem::path &path);
 
     bool supports(ResourceType type) const override;
     std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
+
+    int getId() const override { return _id; }
 
 private:
     struct Resource {
         boost::filesystem::path path;
         ResourceType type;
     };
+
+    int _id;
 
     boost::filesystem::path _path;
     std::multimap<std::string, Resource> _resources;

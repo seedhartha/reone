@@ -28,13 +28,20 @@ class BifReader;
 
 class KeyBifResourceProvider : public IResourceProvider {
 public:
+    KeyBifResourceProvider(int id) :
+        _id(id) {
+    }
+
     void init(const boost::filesystem::path &keyPath);
 
+    bool supports(ResourceType type) const override;
     std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
 
-    bool supports(ResourceType type) const override;
+    int getId() const override { return _id; }
 
 private:
+    int _id;
+
     boost::filesystem::path _gamePath;
     KeyReader _keyFile;
     std::unordered_map<int, std::unique_ptr<BifReader>> _bifCache;

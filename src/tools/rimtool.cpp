@@ -34,7 +34,7 @@ void RimTool::invoke(Operation operation, const fs::path &target, const fs::path
     switch (operation) {
     case Operation::List:
     case Operation::Extract: {
-        RimReader rim;
+        RimReader rim(0);
         rim.load(target);
         if (operation == Operation::List) {
             list(rim);

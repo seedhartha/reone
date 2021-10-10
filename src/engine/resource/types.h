@@ -21,6 +21,8 @@ namespace reone {
 
 namespace resource {
 
+constexpr int kDefaultProviderId = -1;
+
 /**
  * Used together with a ResRef to locate game resources.
  */

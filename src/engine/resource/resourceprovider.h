@@ -26,20 +26,21 @@ namespace reone {
 namespace resource {
 
 /**
- * Common interface to query for game resources.
+ * An interface to query for game resources.
  */
 class IResourceProvider {
 public:
     virtual ~IResourceProvider() {
     }
 
-    virtual std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) = 0;
-
     /**
-     * @return true if this resource provider supports the specified ResType,
-     *         false otherwise
+     * @return true if this resource provider supports the specified ResType, false otherwise
      */
     virtual bool supports(ResourceType type) const = 0;
+
+    virtual std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) = 0;
+
+    virtual int getId() const = 0;
 };
 
 } // namespace resource

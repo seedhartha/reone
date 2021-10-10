@@ -176,9 +176,9 @@ void KotOR::initResourceProviders() {
         _resources.indexErfFile(getPathIgnoreCase(lipsPath, filename));
     }
 
-    _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
     _resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
     _resources.indexDirectory(getPathIgnoreCase(fs::current_path(), kDataDirectoryName));
+    _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
 }
 
 void KotOR::loadModule(const string &name, string entry) {

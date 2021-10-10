@@ -28,8 +28,9 @@ namespace resource {
 static constexpr int kSignatureSize = 8;
 static const char kSignature[] = "RIM V1.0";
 
-RimReader::RimReader() :
-    BinaryReader(kSignatureSize, kSignature) {
+RimReader::RimReader(int id) :
+    BinaryReader(kSignatureSize, kSignature),
+    _id(id) {
 }
 
 void RimReader::doLoad() {

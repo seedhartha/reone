@@ -35,15 +35,19 @@ public:
         uint32_t size {0};
     };
 
-    RimReader();
+    RimReader(int id = kDefaultProviderId);
 
     bool supports(ResourceType type) const override;
     std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType resType) override;
-    ByteArray getResourceData(int idx);
 
     const std::vector<Resource> &resources() const { return _resources; }
 
+    int getId() const override { return _id; }
+    ByteArray getResourceData(int idx);
+
 private:
+    int _id;
+
     int _resourceCount {0};
     uint32_t _resourcesOffset {0};
     std::vector<Resource> _resources;
