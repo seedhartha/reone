@@ -19,16 +19,16 @@
  *  Implementation of event-related routines.
  */
 
-#include "declarations.h"
+#include "../declarations.h"
 
-#include "../../../../common/logutil.h"
-#include "../../../../script/exception/notimpl.h"
+#include "../../../../../common/logutil.h"
+#include "../../../../../script/exception/notimpl.h"
 
-#include "../../../core/event.h"
-#include "../../../core/game.h"
-#include "../../../core/script/routine/argutil.h"
-#include "../../../core/script/routine/context.h"
-#include "../../../core/script/runner.h"
+#include "../../../event.h"
+#include "../../../game.h"
+#include "../../../script/routine/argutil.h"
+#include "../../../script/routine/context.h"
+#include "../../../script/runner.h"
 
 using namespace std;
 

@@ -19,15 +19,15 @@
  *  Implementation of talent-related routines.
  */
 
-#include "declarations.h"
+#include "../declarations.h"
 
-#include "../../../../script/exception/argument.h"
-#include "../../../../script/exception/notimpl.h"
-#include "../../../../script/types.h"
+#include "../../../../../script/exception/argument.h"
+#include "../../../../../script/exception/notimpl.h"
+#include "../../../../../script/types.h"
 
-#include "../../../core/script/routine/argutil.h"
-#include "../../../core/script/routine/context.h"
-#include "../../../core/talent.h"
+#include "../../../script/routine/argutil.h"
+#include "../../../script/routine/context.h"
+#include "../../../talent.h"
 
 using namespace std;
 

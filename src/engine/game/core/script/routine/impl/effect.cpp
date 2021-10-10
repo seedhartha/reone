@@ -19,17 +19,17 @@
  *  Implementation of effect-related routines.
  */
 
-#include "declarations.h"
+#include "../declarations.h"
 
-#include "../../../../script/exception/argument.h"
-#include "../../../../script/exception/notimpl.h"
+#include "../../../../../script/exception/argument.h"
+#include "../../../../../script/exception/notimpl.h"
 
-#include "../../../core/effect/effect.h"
-#include "../../../core/effect/factory.h"
-#include "../../../core/game.h"
-#include "../../../core/script/routine/argutil.h"
-#include "../../../core/script/routine/context.h"
-#include "../../../core/types.h"
+#include "../../../effect/effect.h"
+#include "../../../effect/factory.h"
+#include "../../../game.h"
+#include "../../../script/routine/argutil.h"
+#include "../../../script/routine/context.h"
+#include "../../../types.h"
 
 using namespace std;
 
@@ -487,6 +487,65 @@ Variable effectCutSceneStunned(const vector<Variable> &args, const RoutineContex
     auto effect = ctx.effectFactory.newCutsceneStunned();
     return Variable::ofEffect(move(effect));
 }
+
+// TSL
+
+Variable effectForceBody(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto effect = ctx.effectFactory.newForceBody();
+    return Variable::ofEffect(move(effect));
+}
+
+Variable effectFury(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto effect = ctx.effectFactory.newFury();
+    return Variable::ofEffect(move(effect));
+}
+
+Variable effectBlind(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto effect = ctx.effectFactory.newBlind();
+    return Variable::ofEffect(move(effect));
+}
+
+Variable effectFPRegenModifier(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto effect = ctx.effectFactory.newFPRegenModifier();
+    return Variable::ofEffect(move(effect));
+}
+
+Variable effectVPRegenModifier(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto effect = ctx.effectFactory.newVPRegenModifier();
+    return Variable::ofEffect(move(effect));
+}
+
+Variable effectCrush(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto effect = ctx.effectFactory.newCrush();
+    return Variable::ofEffect(move(effect));
+}
+
+Variable effectDroidConfused(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto effect = ctx.effectFactory.newDroidConfused();
+    return Variable::ofEffect(move(effect));
+}
+
+Variable effectForceSight(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto effect = ctx.effectFactory.newForceSight();
+    return Variable::ofEffect(move(effect));
+}
+
+Variable effectMindTrick(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto effect = ctx.effectFactory.newMindTrick();
+    return Variable::ofEffect(move(effect));
+}
+
+Variable effectFactionModifier(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto effect = ctx.effectFactory.newFactionModifier();
+    return Variable::ofEffect(move(effect));
+}
+
+Variable effectDroidScramble(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto effect = ctx.effectFactory.newDroidScramble();
+    return Variable::ofEffect(move(effect));
+}
+
+// END TSL
 
 } // namespace routine
 

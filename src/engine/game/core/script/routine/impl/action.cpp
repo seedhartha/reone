@@ -19,16 +19,16 @@
  *  Implementation of action-related routines.
  */
 
-#include "declarations.h"
+#include "../declarations.h"
 
-#include "../../../../common/logutil.h"
-#include "../../../../script/exception/argument.h"
+#include "../../../../../common/logutil.h"
+#include "../../../../../script/exception/argument.h"
 
-#include "../../../core/action/factory.h"
-#include "../../../core/game.h"
-#include "../../../core/object/creature.h"
-#include "../../../core/script/routine/argutil.h"
-#include "../../../core/script/routine/context.h"
+#include "../../../action/factory.h"
+#include "../../../game.h"
+#include "../../../object/creature.h"
+#include "../../../script/routine/argutil.h"
+#include "../../../script/routine/context.h"
 
 using namespace std;
 
@@ -480,6 +480,28 @@ Variable actionFollowLeader(const vector<Variable> &args, const RoutineContext &
 
     return Variable::ofNull();
 }
+
+// TSL
+
+Variable actionFollowOwner(const vector<Variable> &args, const RoutineContext &ctx) {
+    float range = getFloatOrElse(args, 0, 2.5f);
+
+    auto action = ctx.actionFactory.newFollowOwner();
+    getCaller(ctx)->addAction(move(action));
+
+    return Variable::ofNull();
+}
+
+Variable actionSwitchWeapons(const vector<Variable> &args, const RoutineContext &ctx) {
+    // TODO: arguments
+
+    auto action = ctx.actionFactory.newSwitchWeapons();
+    getCaller(ctx)->addAction(move(action));
+
+    return Variable::ofNull();
+}
+
+// END TSL
 
 } // namespace routine
 

@@ -19,13 +19,13 @@
  *  Implementation of routines related to random number generation.
  */
 
-#include "declarations.h"
+#include "../declarations.h"
 
-#include "../../../../common/randomutil.h"
-#include "../../../../script/types.h"
+#include "../../../../../common/randomutil.h"
+#include "../../../../../script/types.h"
 
-#include "../../../core/script/routine/argutil.h"
-#include "../../../core/script/routine/context.h"
+#include "../../../script/routine/argutil.h"
+#include "../../../script/routine/context.h"
 
 using namespace std;
 

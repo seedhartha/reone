@@ -19,19 +19,19 @@
  *  Implementation of party-related routines.
  */
 
-#include "declarations.h"
+#include "../declarations.h"
 
-#include "../../../../common/logutil.h"
-#include "../../../../common/randomutil.h"
-#include "../../../../script/exception/notimpl.h"
-#include "../../../../script/types.h"
+#include "../../../../../common/logutil.h"
+#include "../../../../../common/randomutil.h"
+#include "../../../../../script/exception/notimpl.h"
+#include "../../../../../script/types.h"
 
-#include "../../../core/game.h"
-#include "../../../core/object/creature.h"
-#include "../../../core/party.h"
-#include "../../../core/script/routine/argutil.h"
-#include "../../../core/script/routine/context.h"
-#include "../../../core/script/routine/objectutil.h"
+#include "../../../game.h"
+#include "../../../object/creature.h"
+#include "../../../party.h"
+#include "../../../script/routine/argutil.h"
+#include "../../../script/routine/context.h"
+#include "../../../script/routine/objectutil.h"
 
 using namespace std;
 
@@ -155,6 +155,63 @@ Variable saveNPCState(const vector<Variable> &args, const RoutineContext &ctx) {
 Variable setAvailableNPCId(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
+
+// TSL
+
+Variable addAvailablePUPByTemplate(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable addAvailablePUPByObject(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable assignPUP(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable spawnAvailablePUP(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable addPartyPuppet(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable getPUPOwner(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable getIsPuppet(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable getIsPartyLeader(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable getPartyLeader(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto player = ctx.party.getLeader();
+    return Variable::ofObject(getObjectIdOrInvalid(player));
+}
+
+Variable removeNPCFromPartyToBase(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable saveNPCByObject(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable savePUPByObject(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable rebuildPartyTable(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+// END TSL
 
 } // namespace routine
 
