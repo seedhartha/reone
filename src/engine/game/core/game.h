@@ -264,8 +264,6 @@ protected:
         SaveLoad
     };
 
-    const std::string kDataDirectoryName {"data"};
-
     bool _tsl;
     boost::filesystem::path _path;
 
