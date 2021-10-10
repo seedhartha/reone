@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../engine/game/types.h"
 #include "../engine/resource/format/2dareader.h"
 #include "../engine/resource/format/bifreader.h"
 #include "../engine/resource/format/erfreader.h"
@@ -26,6 +27,12 @@
 #include "types.h"
 
 namespace reone {
+
+namespace game {
+
+class IRoutines;
+
+}
 
 namespace tools {
 
@@ -191,8 +198,8 @@ private:
 
 class NcsTool : public ITool {
 public:
-    NcsTool(bool tsl) :
-        _tsl(tsl) {
+    NcsTool(game::GameID gameId) :
+        _gameId(gameId) {
     }
 
     void invoke(
@@ -204,10 +211,12 @@ public:
     bool supports(Operation operation, const boost::filesystem::path &target) const override;
 
 private:
-    bool _tsl;
+    game::GameID _gameId;
 
     void toPCODE(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
     void toNCS(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
+
+    void fillRoutines(game::IRoutines &routines);
 };
 
 } // namespace tools
