@@ -70,6 +70,8 @@ private:
 
     // END Caches
 
+    void indexProvider(std::unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient = false);
+
     std::string getCacheKey(const std::string &resRef, ResourceType type) const;
 
     std::shared_ptr<ByteArray> doGetRaw(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);

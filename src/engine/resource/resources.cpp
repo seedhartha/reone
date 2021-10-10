@@ -45,56 +45,40 @@ void Resources::indexKeyFile(const fs::path &path) {
     if (!fs::exists(path))
         return;
 
-    auto keyBif = make_unique<KeyBifResourceProvider>();
+    auto keyBif = make_unique<KeyBifResourceProvider>(_providers.size());
     keyBif->init(path);
 
-    _providers.push_back(move(keyBif));
-
-    debug("Index " + path.string(), LogChannels::resources);
+    indexProvider(move(keyBif), path);
 }
 
 void Resources::indexErfFile(const fs::path &path, bool transient) {
     if (!fs::exists(path))
         return;
 
-    auto erf = make_unique<ErfReader>();
+    auto erf = make_unique<ErfReader>(_providers.size());
     erf->load(path);
 
-    if (transient) {
-        _transientProviders.push_back(move(erf));
-    } else {
-        _providers.push_back(move(erf));
-    }
-
-    debug("Index " + path.string(), LogChannels::resources);
+    indexProvider(move(erf), path, transient);
 }
 
 void Resources::indexRimFile(const fs::path &path, bool transient) {
     if (!fs::exists(path))
         return;
 
-    auto rim = make_unique<RimReader>();
+    auto rim = make_unique<RimReader>(_providers.size());
     rim->load(path);
 
-    if (transient) {
-        _transientProviders.push_back(move(rim));
-    } else {
-        _providers.push_back(move(rim));
-    }
-
-    debug("Index " + path.string(), LogChannels::resources);
+    indexProvider(move(rim), path, transient);
 }
 
 void Resources::indexDirectory(const fs::path &path) {
     if (!fs::exists(path))
         return;
 
-    auto folder = make_unique<Folder>();
+    auto folder = make_unique<Folder>(_providers.size());
     folder->load(path);
 
-    _providers.push_back(move(folder));
-
-    debug("Index " + path.string(), LogChannels::resources);
+    indexProvider(move(folder), path);
 }
 
 void Resources::indexExeFile(const fs::path &path) {
@@ -103,7 +87,16 @@ void Resources::indexExeFile(const fs::path &path) {
 
     _exeFile.load(path);
 
-    debug("Index " + path.string(), LogChannels::resources);
+    debug("Index executable " + path.string(), LogChannels::resources);
+}
+
+void Resources::indexProvider(unique_ptr<IResourceProvider> &&provider, const fs::path &path, bool transient) {
+    debug(boost::format("Index provider %d at '%s'") % provider->getId() % path.string(), LogChannels::resources);
+    if (transient) {
+        _transientProviders.push_back(move(provider));
+    } else {
+        _providers.push_back(move(provider));
+    }
 }
 
 void Resources::invalidateCache() {
@@ -113,6 +106,9 @@ void Resources::invalidateCache() {
 }
 
 void Resources::clearTransientProviders() {
+    for (auto &provider : _transientProviders) {
+        debug("Remove provider " + to_string(provider->getId()), LogChannels::resources);
+    }
     _transientProviders.clear();
 }
 
@@ -147,10 +143,6 @@ shared_ptr<ByteArray> Resources::getRaw(const string &resRef, ResourceType type,
     return pair.first->second;
 }
 
-string Resources::getCacheKey(const string &resRef, ResourceType type) const {
-    return str(boost::format("%s.%s") % resRef % getExtByResType(type));
-}
-
 shared_ptr<TwoDA> Resources::get2DA(const string &resRef, bool logNotFound) {
     return getResource<TwoDA>(resRef, _2daCache, [&]() {
         shared_ptr<ByteArray> data(getRaw(resRef, ResourceType::TwoDa, logNotFound));
@@ -164,19 +156,6 @@ shared_ptr<TwoDA> Resources::get2DA(const string &resRef, bool logNotFound) {
 
         return move(twoDa);
     });
-}
-
-shared_ptr<ByteArray> Resources::doGetRaw(const vector<unique_ptr<IResourceProvider>> &providers, const string &resRef, ResourceType type) {
-    for (auto provider = providers.rbegin(); provider != providers.rend(); ++provider) {
-        if (!(*provider)->supports(type))
-            continue;
-
-        shared_ptr<ByteArray> data((*provider)->find(resRef, type));
-        if (data)
-            return data;
-    }
-
-    return nullptr;
 }
 
 shared_ptr<GffStruct> Resources::getGFF(const string &resRef, ResourceType type) {
@@ -198,6 +177,30 @@ shared_ptr<GffStruct> Resources::getGFF(const string &resRef, ResourceType type)
 
 shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) {
     return _exeFile.find(name, type);
+}
+
+string Resources::getCacheKey(const string &resRef, ResourceType type) const {
+    return str(boost::format("%s.%s") % resRef % getExtByResType(type));
+}
+
+shared_ptr<ByteArray> Resources::doGetRaw(const vector<unique_ptr<IResourceProvider>> &providers, const string &resRef, ResourceType type) {
+    for (auto provider = providers.rbegin(); provider != providers.rend(); ++provider) {
+        if (!(*provider)->supports(type))
+            continue;
+
+        shared_ptr<ByteArray> data((*provider)->find(resRef, type));
+        if (data) {
+            debug(boost::format("Resource '%s' of type '%s' found in provider %d") %
+                      resRef %
+                      getExtByResType(type) %
+                      (*provider)->getId(),
+                  LogChannels::resources);
+
+            return data;
+        }
+    }
+
+    return nullptr;
 }
 
 } // namespace resource

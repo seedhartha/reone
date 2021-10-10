@@ -39,16 +39,20 @@ public:
         uint32_t size {0};
     };
 
-    ErfReader();
+    ErfReader(int id = kDefaultProviderId);
 
     bool supports(ResourceType type) const override;
     std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
-    ByteArray getResourceData(int idx);
 
     int entryCount() const { return _entryCount; }
     const std::vector<Key> &keys() const { return _keys; }
 
+    int getId() const override { return _id; }
+    ByteArray getResourceData(int idx);
+
 private:
+    int _id;
+
     int _entryCount {0};
     uint32_t _keysOffset {0};
     uint32_t _resourcesOffset {0};

@@ -29,8 +29,9 @@ static constexpr int kSignatureSize = 8;
 static const char kSignatureErf[] = "ERF V1.0";
 static const char kSignatureMod[] = "MOD V1.0";
 
-ErfReader::ErfReader() :
-    BinaryReader(0, nullptr) {
+ErfReader::ErfReader(int id) :
+    BinaryReader(0, nullptr),
+    _id(id) {
 }
 
 void ErfReader::doLoad() {
