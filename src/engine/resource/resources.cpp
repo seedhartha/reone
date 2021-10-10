@@ -194,7 +194,7 @@ shared_ptr<ByteArray> Resources::doGetRaw(const vector<unique_ptr<IResourceProvi
                       resRef %
                       getExtByResType(type) %
                       (*provider)->getId(),
-                  LogChannels::resources);
+                  LogChannels::resources2);
 
             return data;
         }
