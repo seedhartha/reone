@@ -177,7 +177,12 @@ shared_ptr<GffStruct> Resources::getGFF(const string &resRef, ResourceType type)
 }
 
 shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) {
-    return _exeFile.find(name, type);
+    auto data = _exeFile.find(name, type);
+    if (!data) {
+        warn(boost::format("Resource %u of type %d not found in EXE") % name % static_cast<int>(type), LogChannels::resources);
+        return nullptr;
+    }
+    return move(data);
 }
 
 shared_ptr<ByteArray> Resources::doGetRaw(const ResourceId &id, const vector<unique_ptr<IResourceProvider>> &providers) {

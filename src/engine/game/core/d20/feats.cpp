@@ -34,8 +34,9 @@ namespace game {
 
 void Feats::init() {
     shared_ptr<TwoDA> feats(_resources.get2DA("feat"));
-    if (!feats)
+    if (!feats) {
         return;
+    }
 
     for (int row = 0; row < feats->getRowCount(); ++row) {
         string name(_strings.get(feats->getInt(row, "name", -1)));

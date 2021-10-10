@@ -157,8 +157,9 @@ void Window::clear() const {
 }
 
 void Window::drawCursor() const {
-    if (_relativeMouseMode)
+    if (_relativeMouseMode || !_cursor) {
         return;
+    }
 
     int x, y;
     uint32_t state = SDL_GetMouseState(&x, &y);
