@@ -136,6 +136,7 @@ set(RESOURCE_HEADERS
     src/engine/resource/format/tlkreader.h
     src/engine/resource/format/tlkwriter.h
     src/engine/resource/format/visreader.h
+    src/engine/resource/id.h
     src/engine/resource/keybifprovider.h
     src/engine/resource/resourceprovider.h
     src/engine/resource/resources.h

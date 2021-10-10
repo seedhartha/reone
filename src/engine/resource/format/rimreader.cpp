@@ -67,10 +67,6 @@ RimReader::Resource RimReader::readResource() {
     return move(res);
 }
 
-bool RimReader::supports(ResourceType type) const {
-    return true;
-}
-
 shared_ptr<ByteArray> RimReader::find(const string &resRef, ResourceType type) {
     string lcResRef(boost::to_lower_copy(resRef));
 

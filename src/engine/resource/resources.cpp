@@ -75,7 +75,7 @@ void Resources::indexDirectory(const fs::path &path) {
     if (!fs::exists(path))
         return;
 
-    auto folder = make_unique<Folder>(_providers.size());
+    auto folder = make_unique<Folder>(static_cast<int>(_providers.size()));
     folder->load(path);
 
     indexProvider(move(folder), path);
@@ -112,40 +112,41 @@ void Resources::clearTransientProviders() {
     _transientProviders.clear();
 }
 
-template <class T>
-static shared_ptr<T> getResource(const string &key, unordered_map<string, shared_ptr<T>> &cache, const function<shared_ptr<T>()> &getter) {
-    auto maybeResource = cache.find(key);
-    if (maybeResource != cache.end())
-        return maybeResource->second;
-
-    auto inserted = cache.insert(make_pair(key, getter()));
+template <class V, class Cache>
+static shared_ptr<V> getResource(const ResourceId &id, Cache &cache, const function<shared_ptr<V>()> &getter) {
+    auto maybeRes = cache.find(id);
+    if (maybeRes != cache.end()) {
+        return maybeRes->second;
+    }
+    auto inserted = cache.insert(make_pair(id, getter()));
     return inserted.first->second;
 }
 
 shared_ptr<ByteArray> Resources::getRaw(const string &resRef, ResourceType type, bool logNotFound) {
-    if (resRef.empty())
+    if (resRef.empty()) {
         return nullptr;
-
-    string cacheKey(getCacheKey(resRef, type));
-    auto res = _rawCache.find(cacheKey);
-    if (res != _rawCache.end())
-        return res->second;
-
-    shared_ptr<ByteArray> data = doGetRaw(_providers, resRef, type);
+    }
+    ResourceId id(resRef, type);
+    auto maybeRes = _rawCache.find(id);
+    if (maybeRes != _rawCache.end()) {
+        return maybeRes->second;
+    }
+    shared_ptr<ByteArray> data(doGetRaw(id, _providers));
     if (!data) {
-        data = doGetRaw(_transientProviders, resRef, type);
+        data = doGetRaw(id, _transientProviders);
     }
     if (!data && logNotFound) {
-        warn("Not found: " + cacheKey, LogChannels::resources);
+        warn("Not found: " + id.string(), LogChannels::resources);
     }
-    auto pair = _rawCache.insert(make_pair(cacheKey, move(data)));
-
+    auto pair = _rawCache.insert(make_pair(id, move(data)));
     return pair.first->second;
 }
 
 shared_ptr<TwoDA> Resources::get2DA(const string &resRef, bool logNotFound) {
-    return getResource<TwoDA>(resRef, _2daCache, [&]() {
-        shared_ptr<ByteArray> data(getRaw(resRef, ResourceType::TwoDa, logNotFound));
+    ResourceId id(resRef, ResourceType::TwoDa);
+
+    return getResource<TwoDA>(id, _2daCache, [this, &id, &logNotFound]() {
+        shared_ptr<ByteArray> data(getRaw(id.resRef, id.type, logNotFound));
         shared_ptr<TwoDA> twoDa;
 
         if (data) {
@@ -159,10 +160,10 @@ shared_ptr<TwoDA> Resources::get2DA(const string &resRef, bool logNotFound) {
 }
 
 shared_ptr<GffStruct> Resources::getGFF(const string &resRef, ResourceType type) {
-    string cacheKey(getCacheKey(resRef, type));
+    ResourceId id(resRef, type);
 
-    return getResource<GffStruct>(cacheKey, _gffCache, [this, &resRef, &type]() {
-        shared_ptr<ByteArray> data(getRaw(resRef, type));
+    return getResource<GffStruct>(id, _gffCache, [this, &id]() {
+        shared_ptr<ByteArray> data(getRaw(id.resRef, id.type));
         shared_ptr<GffStruct> gffs;
 
         if (data) {
@@ -179,27 +180,14 @@ shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) 
     return _exeFile.find(name, type);
 }
 
-string Resources::getCacheKey(const string &resRef, ResourceType type) const {
-    return str(boost::format("%s.%s") % resRef % getExtByResType(type));
-}
-
-shared_ptr<ByteArray> Resources::doGetRaw(const vector<unique_ptr<IResourceProvider>> &providers, const string &resRef, ResourceType type) {
+shared_ptr<ByteArray> Resources::doGetRaw(const ResourceId &id, const vector<unique_ptr<IResourceProvider>> &providers) {
     for (auto provider = providers.rbegin(); provider != providers.rend(); ++provider) {
-        if (!(*provider)->supports(type))
-            continue;
-
-        shared_ptr<ByteArray> data((*provider)->find(resRef, type));
+        shared_ptr<ByteArray> data((*provider)->find(id.resRef, id.type));
         if (data) {
-            debug(boost::format("Resource '%s' of type '%s' found in provider %d") %
-                      resRef %
-                      getExtByResType(type) %
-                      (*provider)->getId(),
-                  LogChannels::resources2);
-
+            debug(boost::format("Resource '%s' found in provider %d") % id.string() % (*provider)->getId(), LogChannels::resources2);
             return data;
         }
     }
-
     return nullptr;
 }
 

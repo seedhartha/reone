@@ -65,10 +65,6 @@ shared_ptr<ByteArray> KeyBifResourceProvider::find(const std::string &resRef, Re
     return move(result);
 }
 
-bool KeyBifResourceProvider::supports(ResourceType type) const {
-    return true;
-}
-
 } // namespace resource
 
 } // namespace reone

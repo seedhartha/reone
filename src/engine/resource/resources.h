@@ -20,6 +20,7 @@
 #include "../common/types.h"
 
 #include "format/pereader.h"
+#include "id.h"
 #include "resourceprovider.h"
 #include "types.h"
 
@@ -64,17 +65,15 @@ private:
 
     // Caches
 
-    std::unordered_map<std::string, std::shared_ptr<ByteArray>> _rawCache;
-    std::unordered_map<std::string, std::shared_ptr<TwoDA>> _2daCache;
-    std::unordered_map<std::string, std::shared_ptr<GffStruct>> _gffCache;
+    std::unordered_map<ResourceId, std::shared_ptr<ByteArray>, ResourceIdHasher> _rawCache;
+    std::unordered_map<ResourceId, std::shared_ptr<TwoDA>, ResourceIdHasher> _2daCache;
+    std::unordered_map<ResourceId, std::shared_ptr<GffStruct>, ResourceIdHasher> _gffCache;
 
     // END Caches
 
     void indexProvider(std::unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient = false);
 
-    std::string getCacheKey(const std::string &resRef, ResourceType type) const;
-
-    std::shared_ptr<ByteArray> doGetRaw(const std::vector<std::unique_ptr<IResourceProvider>> &providers, const std::string &resRef, ResourceType type);
+    std::shared_ptr<ByteArray> doGetRaw(const ResourceId &id, const std::vector<std::unique_ptr<IResourceProvider>> &providers);
 };
 
 } // namespace resource

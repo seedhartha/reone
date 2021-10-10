@@ -41,7 +41,6 @@ public:
 
     ErfReader(int id = kDefaultProviderId);
 
-    bool supports(ResourceType type) const override;
     std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
 
     int entryCount() const { return _entryCount; }

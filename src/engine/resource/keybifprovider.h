@@ -34,7 +34,6 @@ public:
 
     void init(const boost::filesystem::path &keyPath);
 
-    bool supports(ResourceType type) const override;
     std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
 
     int getId() const override { return _id; }
