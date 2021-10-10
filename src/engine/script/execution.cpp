@@ -703,18 +703,18 @@ void ScriptExecution::executeMOVSP(const Instruction &ins) {
 }
 
 void ScriptExecution::executeJMP(const Instruction &ins) {
-    _nextInstruction = ins.jumpOffset;
+    _nextInstruction = ins.offset + ins.jumpOffset;
 }
 
 void ScriptExecution::executeJSR(const Instruction &ins) {
     _returnOffsets.push_back(ins.nextOffset);
-    _nextInstruction = ins.jumpOffset;
+    _nextInstruction = ins.offset + ins.jumpOffset;
 }
 
 void ScriptExecution::executeJZ(const Instruction &ins) {
     bool zero = getIntFromStack() == 0;
     if (zero) {
-        _nextInstruction = ins.jumpOffset;
+        _nextInstruction = ins.offset + ins.jumpOffset;
     }
 }
 
@@ -756,7 +756,7 @@ void ScriptExecution::executeNOTI(const Instruction &ins) {
 void ScriptExecution::executeJNZ(const Instruction &ins) {
     bool notZero = getIntFromStack() != 0;
     if (notZero) {
-        _nextInstruction = ins.jumpOffset;
+        _nextInstruction = ins.offset + ins.jumpOffset;
     }
 }
 

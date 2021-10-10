@@ -36,15 +36,8 @@ void NcsWriter::save(const fs::path &path) {
     auto stream = make_shared<ostringstream>();
     StreamWriter writer(stream, endian::order::big);
 
-    auto instructions = mapToValues(_program.instructions());
-    sort(instructions.begin(), instructions.end(), [](auto &a, auto &b) { return a.offset < b.offset; });
-
-    for (auto &ins : instructions) {
+    for (auto &ins : _program.instructions()) {
         auto pos = 13 + static_cast<uint32_t>(writer.tell());
-        if (pos != ins.offset) {
-            throw runtime_error(str(boost::format("Instruction offset mismatch: expected=%04x, actual=%04x") % ins.offset % pos));
-        }
-
         writer.putByte(static_cast<int>(ins.type) & 0xff);
         writer.putByte((static_cast<int>(ins.type) >> 8) & 0xff);
 
@@ -85,7 +78,7 @@ void NcsWriter::save(const fs::path &path) {
         case InstructionType::JSR:
         case InstructionType::JZ:
         case InstructionType::JNZ:
-            writer.putInt32(ins.jumpOffset - ins.offset);
+            writer.putInt32(ins.jumpOffset);
             break;
         case InstructionType::DESTRUCT:
             writer.putUint16(ins.size);

@@ -168,14 +168,16 @@ string describeInstruction(const Instruction &ins, const IRoutineProvider &routi
         desc += " " + to_string(ins.size);
         break;
     case InstructionType::MOVSP:
-        desc += str(boost::format(" %d") % ins.stackOffset);
+        desc += " " + to_string(ins.stackOffset);
         break;
     case InstructionType::JMP:
     case InstructionType::JSR:
     case InstructionType::JZ:
-    case InstructionType::JNZ:
-        desc += str(boost::format(" %08x") % ins.jumpOffset);
+    case InstructionType::JNZ: {
+        uint32_t jumpAddr = ins.offset + ins.jumpOffset;
+        desc += str(boost::format(" %08x(%d)") % jumpAddr % ins.jumpOffset);
         break;
+    }
     case InstructionType::DESTRUCT:
         desc += str(boost::format(" %d, %d, %d") % ins.size % ins.stackOffset % ins.sizeNoDestroy);
         break;
@@ -183,7 +185,7 @@ string describeInstruction(const Instruction &ins, const IRoutineProvider &routi
     case InstructionType::INCISP:
     case InstructionType::DECIBP:
     case InstructionType::INCIBP:
-        desc += str(boost::format(" %d") % ins.stackOffset);
+        desc += " " + to_string(ins.stackOffset);
         break;
     case InstructionType::STORE_STATE:
         desc += str(boost::format(" %d, %d") % ins.size % ins.sizeLocals);
