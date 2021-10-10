@@ -57,10 +57,6 @@ void Folder::loadDirectory(const fs::path &path) {
     }
 }
 
-bool Folder::supports(ResourceType type) const {
-    return true;
-}
-
 shared_ptr<ByteArray> Folder::find(const string &resRef, ResourceType type) {
     fs::path path;
     for (auto &res : _resources) {

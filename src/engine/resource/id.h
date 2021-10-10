@@ -17,39 +17,34 @@
 
 #pragma once
 
-#include "../common/types.h"
-
-#include "resourceprovider.h"
 #include "types.h"
+#include "typeutil.h"
 
 namespace reone {
 
 namespace resource {
 
-class Folder : public IResourceProvider {
-public:
-    Folder(int id = kDefaultProviderId) :
-        _id(id) {
+struct ResourceId {
+    std::string resRef;
+    ResourceType type {ResourceType::Invalid};
+
+    ResourceId(std::string resRef, ResourceType type) :
+        resRef(std::move(resRef)), type(type) {
     }
 
-    void load(const boost::filesystem::path &path);
+    std::string string() const {
+        return resRef + "." + getExtByResType(type);
+    }
 
-    std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
+    bool operator==(const ResourceId &other) const {
+        return resRef == other.resRef && type == other.type;
+    }
+};
 
-    int getId() const override { return _id; }
-
-private:
-    struct Resource {
-        boost::filesystem::path path;
-        ResourceType type;
-    };
-
-    int _id;
-
-    boost::filesystem::path _path;
-    std::multimap<std::string, Resource> _resources;
-
-    void loadDirectory(const boost::filesystem::path &path);
+struct ResourceIdHasher {
+    size_t operator()(const ResourceId &id) const {
+        return std::hash<std::string>()(id.string());
+    }
 };
 
 } // namespace resource

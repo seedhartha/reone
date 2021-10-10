@@ -37,7 +37,6 @@ public:
 
     RimReader(int id = kDefaultProviderId);
 
-    bool supports(ResourceType type) const override;
     std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType resType) override;
 
     const std::vector<Resource> &resources() const { return _resources; }

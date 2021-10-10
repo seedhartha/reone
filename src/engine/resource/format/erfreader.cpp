@@ -107,10 +107,6 @@ ErfReader::Resource ErfReader::readResource() {
     return move(res);
 }
 
-bool ErfReader::supports(ResourceType type) const {
-    return true;
-}
-
 shared_ptr<ByteArray> ErfReader::find(const string &resRef, ResourceType type) {
     string lcResRef(boost::to_lower_copy(resRef));
     int idx = -1;
