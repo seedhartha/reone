@@ -29,8 +29,8 @@ namespace resource {
 class KeyReader : public BinaryReader {
 public:
     struct FileEntry {
-        uint32_t fileSize {0};
         std::string filename;
+        uint32_t fileSize {0};
     };
 
     struct KeyEntry {

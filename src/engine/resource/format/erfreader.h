@@ -28,23 +28,21 @@ namespace resource {
 
 class ErfReader : public BinaryReader, public IResourceProvider {
 public:
-    struct Key {
-        std::string resRef {0};
-        uint32_t resId {0};
-        ResourceType resType {ResourceType::Invalid};
+    struct KeyEntry {
+        ResourceId resId;
     };
 
-    struct Resource {
+    struct ResourceEntry {
         uint32_t offset {0};
         uint32_t size {0};
     };
 
     ErfReader(int id = kDefaultProviderId);
 
-    std::shared_ptr<ByteArray> find(const std::string &resRef, ResourceType type) override;
+    std::shared_ptr<ByteArray> find(const ResourceId &id) override;
 
     int entryCount() const { return _entryCount; }
-    const std::vector<Key> &keys() const { return _keys; }
+    const std::vector<KeyEntry> &keys() const { return _keys; }
 
     int getId() const override { return _id; }
     ByteArray getResourceData(int idx);
@@ -55,17 +53,19 @@ private:
     int _entryCount {0};
     uint32_t _keysOffset {0};
     uint32_t _resourcesOffset {0};
-    std::vector<Key> _keys;
-    std::vector<Resource> _resources;
+    std::vector<KeyEntry> _keys;
+    std::vector<ResourceEntry> _resources;
+    std::unordered_map<ResourceId, int, ResourceIdHasher> _resIdxByResId;
 
     void doLoad() override;
 
     void checkSignature();
     void loadKeys();
-    Key readKey();
     void loadResources();
-    Resource readResource();
-    ByteArray getResourceData(const Resource &res);
+
+    KeyEntry readKeyEntry();
+    ResourceEntry readResourceEntry();
+    ByteArray getResourceData(const ResourceEntry &res);
 };
 
 } // namespace resource

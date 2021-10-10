@@ -47,41 +47,37 @@ void RimReader::loadResources() {
     seek(_resourcesOffset);
 
     for (int i = 0; i < _resourceCount; ++i) {
-        _resources.push_back(readResource());
+        ResourceEntry res(readResource());
+        _resIdxByResId.insert(make_pair(res.resId, i));
+        _resources.push_back(move(res));
     }
 }
 
-RimReader::Resource RimReader::readResource() {
-    string resRef(readCString(16));
+RimReader::ResourceEntry RimReader::readResource() {
+    string resRef(boost::to_lower_copy(readCString(16)));
     uint16_t type = readUint16();
     ignore(4 + 2);
     uint32_t offset = readUint32();
     uint32_t size = readUint32();
 
-    Resource res;
-    res.resRef = boost::to_lower_copy(resRef);
-    res.resType = static_cast<ResourceType>(type);
+    ResourceEntry res;
+    res.resId = ResourceId(resRef, static_cast<ResourceType>(type));
     res.offset = offset;
     res.size = size;
 
     return move(res);
 }
 
-shared_ptr<ByteArray> RimReader::find(const string &resRef, ResourceType type) {
-    string lcResRef(boost::to_lower_copy(resRef));
-
-    auto it = find_if(
-        _resources.begin(),
-        _resources.end(),
-        [&](const Resource &res) { return res.resRef == lcResRef && res.resType == type; });
-
-    if (it == _resources.end())
+shared_ptr<ByteArray> RimReader::find(const ResourceId &id) {
+    auto maybeIdx = _resIdxByResId.find(id);
+    if (maybeIdx == _resIdxByResId.end()) {
         return nullptr;
-
-    return make_shared<ByteArray>(getResourceData(*it));
+    }
+    const ResourceEntry &res = _resources[maybeIdx->second];
+    return make_shared<ByteArray>(getResourceData(res));
 }
 
-ByteArray RimReader::getResourceData(const Resource &res) {
+ByteArray RimReader::getResourceData(const ResourceEntry &res) {
     return readBytes(res.offset, res.size);
 }
 

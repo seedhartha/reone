@@ -52,7 +52,7 @@ void ErfTool::invoke(Operation operation, const fs::path &target, const fs::path
 
 void ErfTool::list(const ErfReader &erf) {
     for (auto &key : erf.keys()) {
-        cout << key.resRef << " " << getExtByResType(key.resType) << endl;
+        cout << key.resId.string() << endl;
     }
 }
 
@@ -66,13 +66,13 @@ void ErfTool::extract(ErfReader &erf, const fs::path &destPath) {
     }
 
     for (size_t i = 0; i < erf.keys().size(); ++i) {
-        const ErfReader::Key &key = erf.keys()[i];
-        string ext(getExtByResType(key.resType));
-        cout << "Extracting " << key.resRef << " " << ext << endl;
+        const ErfReader::KeyEntry &key = erf.keys()[i];
+        cout << "Extracting " << key.resId.string() << endl;
+        string ext(getExtByResType(key.resId.type));
         ByteArray data(erf.getResourceData(static_cast<int>(i)));
 
         fs::path resPath(destPath);
-        resPath.append(key.resRef + "." + ext);
+        resPath.append(key.resId.resRef + "." + ext);
 
         fs::ofstream res(resPath, ios::binary);
         res.write(&data[0], data.size());

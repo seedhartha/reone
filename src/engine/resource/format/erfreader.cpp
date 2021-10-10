@@ -69,20 +69,20 @@ void ErfReader::loadKeys() {
     seek(_keysOffset);
 
     for (int i = 0; i < _entryCount; ++i) {
-        _keys.push_back(readKey());
+        KeyEntry key(readKeyEntry());
+        _resIdxByResId.insert(make_pair(key.resId, i));
+        _keys.push_back(move(key));
     }
 }
 
-ErfReader::Key ErfReader::readKey() {
-    string resRef(readCString(16));
+ErfReader::KeyEntry ErfReader::readKeyEntry() {
+    string resRef(boost::to_lower_copy(readCString(16)));
     uint32_t resId = readUint32();
     uint16_t resType = readUint16();
     ignore(2);
 
-    Key key;
-    key.resRef = boost::to_lower_copy(resRef);
-    key.resId = resId;
-    key.resType = static_cast<ResourceType>(resType);
+    KeyEntry key;
+    key.resId = ResourceId(move(resRef), static_cast<ResourceType>(resType));
 
     return move(key);
 }
@@ -92,39 +92,31 @@ void ErfReader::loadResources() {
     seek(_resourcesOffset);
 
     for (int i = 0; i < _entryCount; ++i) {
-        _resources.push_back(readResource());
+        _resources.push_back(readResourceEntry());
     }
 }
 
-ErfReader::Resource ErfReader::readResource() {
+ErfReader::ResourceEntry ErfReader::readResourceEntry() {
     uint32_t offset = readUint32();
     uint32_t size = readUint32();
 
-    Resource res;
+    ResourceEntry res;
     res.offset = offset;
     res.size = size;
 
     return move(res);
 }
 
-shared_ptr<ByteArray> ErfReader::find(const string &resRef, ResourceType type) {
-    string lcResRef(boost::to_lower_copy(resRef));
-    int idx = -1;
-
-    for (int i = 0; i < _entryCount; ++i) {
-        if (_keys[i].resRef == lcResRef && _keys[i].resType == type) {
-            idx = i;
-            break;
-        }
-    }
-    if (idx == -1)
+shared_ptr<ByteArray> ErfReader::find(const ResourceId &id) {
+    auto maybeIdx = _resIdxByResId.find(id);
+    if (maybeIdx == _resIdxByResId.end()) {
         return nullptr;
-    const Resource &res = _resources[idx];
-
+    }
+    const ResourceEntry &res = _resources[maybeIdx->second];
     return make_shared<ByteArray>(getResourceData(res));
 }
 
-ByteArray ErfReader::getResourceData(const Resource &res) {
+ByteArray ErfReader::getResourceData(const ResourceEntry &res) {
     return readBytes(res.offset, res.size);
 }
 
