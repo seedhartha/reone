@@ -50,6 +50,8 @@
 #include "../core/soundsets.h"
 #include "../core/surfaces.h"
 
+#include "gui/loadscreen.h"
+
 using namespace std;
 
 using namespace reone::audio;
@@ -68,6 +70,7 @@ namespace game {
 static constexpr char kPatchFilename[] = "patch.erf";
 static constexpr char kWavesDirectoryName[] = "streamwaves";
 static constexpr char kExeFilename[] = "swkotor.exe";
+static constexpr char kModulesDirectoryName[] = "modules";
 
 static vector<string> g_nonTransientLipFiles {"global.mod", "localization.mod"};
 
@@ -180,6 +183,20 @@ void KotOR::initResourceProviders() {
     _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
 }
 
+void KotOR::loadModuleNames() {
+    fs::path modules(getPathIgnoreCase(_path, kModulesDirectoryName));
+    if (modules.empty()) {
+        return;
+    }
+    for (auto &entry : fs::directory_iterator(modules)) {
+        string filename(boost::to_lower_copy(entry.path().filename().string()));
+        if (boost::ends_with(filename, ".mod") || (boost::ends_with(filename, ".rim") && !boost::ends_with(filename, "_s.rim"))) {
+            string moduleName(boost::to_lower_copy(filename.substr(0, filename.size() - 4)));
+            _moduleNames.insert(move(moduleName));
+        }
+    }
+}
+
 void KotOR::start() {
     openMainMenu();
 
@@ -190,75 +207,31 @@ void KotOR::start() {
     }
 }
 
-void KotOR::loadModule(const string &name, string entry) {
-    info("Load module: " + name);
+void KotOR::loadModuleResources(const string &moduleName) {
+    _resources.invalidateCache();
+    _resources.clearTransientProviders();
 
-    withLoadingScreen("load_" + name, [this, &name, &entry]() {
-        if (!_hud) {
-            loadHUD();
-        }
-        if (!_inGame) {
-            loadInGame();
-        }
-        if (!_dialog) {
-            loadDialog();
-        }
-        if (!_computer) {
-            loadComputer();
-        }
-        if (!_container) {
-            loadContainer();
-        }
-        if (!_partySelect) {
-            loadPartySelection();
-        }
-        if (!_charGen) {
-            loadCharacterGeneration();
-        }
+    fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));
+    if (modulesPath.empty()) {
+        return;
+    }
 
-        _soundSets.invalidate();
-        _textures.invalidateCache();
-        _models.invalidateCache();
-        _walkmeshes.invalidateCache();
-        _lips.invalidate();
-        _audioFiles.invalidate();
-        _scripts.invalidate();
+    fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod"));
+    if (!modPath.empty()) {
+        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false), true);
+    } else {
+        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"), true);
+        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
+    }
 
-        loadModuleResources(name);
+    fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
+    if (!lipsPath.empty()) {
+        _resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
+    }
 
-        if (_module) {
-            _module->area()->runOnExitScript();
-            _module->area()->unloadParty();
-        }
-
-        _loadScreen->setProgress(50);
-        drawAll();
-
-        auto maybeModule = _loadedModules.find(name);
-        if (maybeModule != _loadedModules.end()) {
-            _module = maybeModule->second;
-        } else {
-            _module = _objectFactory.newModule();
-
-            shared_ptr<GffStruct> ifo(_resources.getGFF("module", ResourceType::Ifo));
-            _module->load(name, *ifo, _loadFromSaveGame);
-
-            _loadedModules.insert(make_pair(name, _module));
-        }
-
-        _module->loadParty(entry, _loadFromSaveGame);
-        _module->area()->fill(_sceneGraph);
-
-        _loadScreen->setProgress(100);
-        drawAll();
-
-        string musicName(_module->area()->music());
-        playMusic(musicName);
-
-        _ticks = SDL_GetTicks();
-        openInGame();
-        _loadFromSaveGame = false;
-    });
+    if (isTSL()) {
+        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"), true);
+    }
 }
 
 void KotOR::onModuleSelected(const string &module) {
@@ -275,6 +248,27 @@ CameraType KotOR::getConversationCamera(int &cameraId) const {
 
 void KotOR::setBarkBubbleText(string text, float duration) {
     _hud->barkBubble().setBarkText(text, duration);
+}
+
+void KotOR::loadInGameMenus() {
+    if (!_hud) {
+        loadHUD();
+    }
+    if (!_inGame) {
+        loadInGame();
+    }
+    if (!_dialog) {
+        loadDialog();
+    }
+    if (!_computer) {
+        loadComputer();
+    }
+    if (!_container) {
+        loadContainer();
+    }
+    if (!_partySelect) {
+        loadPartySelection();
+    }
 }
 
 void KotOR::loadMainMenu() {
@@ -555,7 +549,7 @@ void KotOR::loadLoadingScreen() {
         _window,
         _resources,
         _strings);
-    _loadScreen->load();
+    static_cast<LoadingScreen *>(_loadScreen.get())->load();
 }
 
 void KotOR::loadCharacterGeneration() {
@@ -768,7 +762,7 @@ GUI *KotOR::getScreenGUI() const {
     case GameScreen::MainMenu:
         return _mainMenu.get();
     case GameScreen::Loading:
-        return _loadScreen.get();
+        return static_cast<LoadingScreen *>(_loadScreen.get());
     case GameScreen::CharacterGeneration:
         return _charGen.get();
     case GameScreen::InGame:
@@ -786,17 +780,6 @@ GUI *KotOR::getScreenGUI() const {
     default:
         return nullptr;
     }
-}
-
-void KotOR::withLoadingScreen(const string &imageResRef, const function<void()> &block) {
-    if (!_loadScreen) {
-        loadLoadingScreen();
-    }
-    _loadScreen->setImage(imageResRef);
-    _loadScreen->setProgress(0);
-    changeScreen(GameScreen::Loading);
-    drawAll();
-    block();
 }
 
 } // namespace game

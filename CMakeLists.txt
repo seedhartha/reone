@@ -821,6 +821,7 @@ set(GAMECORE_SOURCES
     src/engine/game/core/effect/whirlwind.cpp
     src/engine/game/core/footstepsounds.cpp
     src/engine/game/core/game.cpp
+    src/engine/game/core/gui/loadscreen.h
     src/engine/game/core/map.cpp
     src/engine/game/core/object/area.cpp
     src/engine/game/core/object/creature.cpp

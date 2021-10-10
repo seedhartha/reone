@@ -17,10 +17,13 @@
 
 #include "limbo.h"
 
+#include "../../common/logutil.h"
 #include "../../common/pathutil.h"
 #include "../../resource/resources.h"
 
 #include "../core/script/runner.h"
+
+using namespace std;
 
 namespace fs = boost::filesystem;
 
@@ -28,17 +31,48 @@ namespace reone {
 
 namespace game {
 
+static constexpr char kDataDirectoryName[] = "data";
+static constexpr char kModulesDirectoryName[] = "modules";
 static constexpr char kStartScriptResRef[] = "start";
 
 void Limbo::initResourceProviders() {
-    fs::path dataDir(getPathIgnoreCase(_path, "data"));
+    fs::path dataDir(getPathIgnoreCase(_path, kDataDirectoryName));
     if (!dataDir.empty()) {
         _resources.indexDirectory(dataDir);
     }
 }
 
+void Limbo::loadModuleNames() {
+    fs::path modules(getPathIgnoreCase(_path, kModulesDirectoryName));
+    if (modules.empty()) {
+        return;
+    }
+    for (auto &entry : fs::directory_iterator(modules)) {
+        string filename(boost::to_lower_copy(entry.path().filename().string()));
+        if (boost::ends_with(filename, ".mod")) {
+            string moduleName(boost::to_lower_copy(filename.substr(0, filename.size() - 4)));
+            _moduleNames.insert(move(moduleName));
+        }
+    }
+}
+
 void Limbo::start() {
     _scriptRunner.run(kStartScriptResRef);
+}
+
+void Limbo::loadModuleResources(const string &moduleName) {
+    _resources.invalidateCache();
+    _resources.clearTransientProviders();
+
+    fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));
+    if (modulesPath.empty()) {
+        return;
+    }
+
+    fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod"));
+    if (!modPath.empty()) {
+        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod"), true);
+    }
 }
 
 } // namespace game

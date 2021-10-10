@@ -27,7 +27,6 @@
 #include "gui/dialog.h"
 #include "gui/hud.h"
 #include "gui/ingame/ingame.h"
-#include "gui/loadscreen.h"
 #include "gui/mainmenu.h"
 #include "gui/partyselect.h"
 #include "gui/saveload.h"
@@ -79,11 +78,9 @@ public:
 
     void initResourceProviders() override;
 
-    void loadModule(const std::string &name, std::string entry = "") override;
-
     void openMainMenu() override;
     void openSaveLoad(SaveLoadMode mode) override;
-    void openInGame();
+    void openInGame() override;
     void openInGameMenu(InGameMenuTab tab);
     void openContainer(const std::shared_ptr<SpatialObject> &container) override;
     void openPartySelection(const PartySelectionContext &ctx) override;
@@ -100,6 +97,9 @@ public:
 protected:
     void start() override;
 
+    void loadModuleNames() override;
+    void loadModuleResources(const std::string &moduleName) override;
+
     void onModuleSelected(const std::string &name) override;
     void drawHUD() override;
     CameraType getConversationCamera(int &cameraId) const override;
@@ -107,7 +107,6 @@ protected:
     // GUI
 
     std::unique_ptr<MainMenu> _mainMenu;
-    std::unique_ptr<LoadingScreen> _loadScreen;
     std::unique_ptr<CharacterGeneration> _charGen;
     std::unique_ptr<HUD> _hud;
     std::unique_ptr<InGameMenu> _inGame;
@@ -119,8 +118,9 @@ protected:
 
     Conversation *_conversation {nullptr}; /**< pointer to either DialogGUI or ComputerGUI  */
 
+    void loadInGameMenus() override;
     void loadMainMenu();
-    void loadLoadingScreen();
+    void loadLoadingScreen() override;
     void loadCharacterGeneration();
     void loadHUD();
     void loadInGame();
@@ -130,11 +130,9 @@ protected:
     void loadPartySelection();
     void loadSaveLoad();
 
-    void changeScreen(GameScreen screen);
+    void changeScreen(GameScreen screen) override;
 
     gui::GUI *getScreenGUI() const override;
-
-    void withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block);
 
     // END GUI
 };
