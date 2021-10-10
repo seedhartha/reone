@@ -25,9 +25,10 @@
 #include "../../../resource/resources.h"
 #include "../../../scene/types.h"
 
-#include "../../core/game.h"
 #include "../../core/object/factory.h"
 #include "../../core/party.h"
+
+#include "../kotor.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -50,7 +51,7 @@ static const char kBlueprintResRefAtton[] = "p_atton";
 static const char kBlueprintResRefKreia[] = "p_kreia";
 
 MainMenu::MainMenu(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

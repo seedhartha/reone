@@ -36,7 +36,7 @@ namespace game {
 class AbilitiesMenu : public GameGUI {
 public:
     AbilitiesMenu(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

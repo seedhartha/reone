@@ -29,7 +29,7 @@ namespace game {
 class ComputerGUI : public Conversation {
 public:
     ComputerGUI(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

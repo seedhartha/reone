@@ -19,7 +19,7 @@
 
 #include "../../../resource/resources.h"
 
-#include "../../core/game.h"
+#include "../kotor.h"
 
 using namespace std;
 
@@ -31,7 +31,7 @@ namespace reone {
 namespace game {
 
 LoadingScreen::LoadingScreen(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

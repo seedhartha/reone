@@ -32,7 +32,7 @@ namespace game {
 class JournalMenu : public GameGUI {
 public:
     JournalMenu(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

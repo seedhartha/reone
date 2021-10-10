@@ -35,7 +35,7 @@ class CharGenFeats : public GameGUI {
 public:
     CharGenFeats(
         CharacterGeneration *charGen,
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

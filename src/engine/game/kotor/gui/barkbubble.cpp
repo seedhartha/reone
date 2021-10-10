@@ -17,7 +17,7 @@
 
 #include "barkbubble.h"
 
-#include "../../core/game.h"
+#include "../kotor.h"
 
 using namespace std;
 
@@ -28,7 +28,7 @@ namespace reone {
 namespace game {
 
 BarkBubble::BarkBubble(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

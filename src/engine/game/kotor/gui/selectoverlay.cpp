@@ -35,9 +35,10 @@
 #include "../../core/action/useskill.h"
 #include "../../core/d20/feats.h"
 #include "../../core/d20/skills.h"
-#include "../../core/game.h"
 #include "../../core/party.h"
 #include "../../core/reputes.h"
+
+#include "../kotor.h"
 
 using namespace std;
 

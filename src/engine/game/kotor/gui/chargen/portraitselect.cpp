@@ -27,10 +27,11 @@
 #include "../../../../resource/resources.h"
 #include "../../../../scene/node/model.h"
 
-#include "../../../core/game.h"
 #include "../../../core/object/factory.h"
 #include "../../../core/portrait.h"
 #include "../../../core/portraits.h"
+
+#include "../../kotor.h"
 
 #include "chargen.h"
 
@@ -50,7 +51,7 @@ static constexpr float kModelScale = 0.2f;
 
 PortraitSelection::PortraitSelection(
     CharacterGeneration *charGen,
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

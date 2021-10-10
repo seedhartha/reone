@@ -36,7 +36,7 @@ class CustomCharacterGeneration : public GameGUI {
 public:
     CustomCharacterGeneration(
         CharacterGeneration *charGen,
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

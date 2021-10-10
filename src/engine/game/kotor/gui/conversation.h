@@ -41,7 +41,7 @@ namespace game {
 class Conversation : public GameGUI {
 public:
     Conversation(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

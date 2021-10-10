@@ -21,9 +21,10 @@
 #include "../../../../gui/control/label.h"
 #include "../../../../resource/strings.h"
 
-#include "../../../core/game.h"
 #include "../../../core/map.h"
 #include "../../../core/object/waypoint.h"
+
+#include "../../kotor.h"
 
 using namespace std;
 
@@ -37,7 +38,7 @@ namespace game {
 static constexpr int kStrRefMapNote = 349;
 
 MapMenu::MapMenu(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

@@ -29,7 +29,7 @@ namespace game {
 class LoadingScreen : public GameGUI {
 public:
     LoadingScreen(
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

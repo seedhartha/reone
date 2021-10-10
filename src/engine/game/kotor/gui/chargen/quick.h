@@ -36,7 +36,7 @@ class QuickCharacterGeneration : public GameGUI {
 public:
     QuickCharacterGeneration(
         CharacterGeneration *charGen,
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

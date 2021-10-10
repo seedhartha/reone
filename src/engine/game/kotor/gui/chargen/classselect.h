@@ -41,7 +41,7 @@ class CharacterGeneration;
 class ClassSelection : public GameGUI {
 public:
     ClassSelection(
-        Game *game,
+        KotOR *game,
         CharacterGeneration &charGen,
         ActionFactory &actionFactory,
         Classes &classes,

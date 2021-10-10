@@ -40,7 +40,7 @@ class PortraitSelection : public GameGUI {
 public:
     PortraitSelection(
         CharacterGeneration *charGen,
-        Game *game,
+        KotOR *game,
         ActionFactory &actionFactory,
         Classes &classes,
         Combat &combat,

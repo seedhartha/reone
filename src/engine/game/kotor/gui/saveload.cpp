@@ -24,7 +24,7 @@
 #include "../../../resource/format/gffreader.h"
 #include "../../../resource/strings.h"
 
-#include "../../core/game.h"
+#include "../kotor.h"
 
 namespace fs = boost::filesystem;
 
@@ -46,7 +46,7 @@ static constexpr int kStrRefSaveGame = 1588;
 static constexpr int kStrRefLoad = 1589;
 
 SaveLoad::SaveLoad(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,

@@ -25,9 +25,10 @@
 #include "../../../../resource/resources.h"
 #include "../../../../resource/strings.h"
 
-#include "../../../core/game.h"
 #include "../../../core/object/creature.h"
 #include "../../../core/party.h"
+
+#include "../../kotor.h"
 
 using namespace std;
 
@@ -44,7 +45,7 @@ static constexpr int kStrRefBonus = 32129;
 static constexpr int kStrRefTotalRank = 41904;
 
 AbilitiesMenu::AbilitiesMenu(
-    Game *game,
+    KotOR *game,
     ActionFactory &actionFactory,
     Classes &classes,
     Combat &combat,
