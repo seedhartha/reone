@@ -185,47 +185,51 @@ void Game::loadModule(const string &name, string entry) {
         _audioFiles.invalidate();
         _scripts.invalidate();
 
-        loadModuleResources(name);
+        try {
+            loadModuleResources(name);
 
-        if (_module) {
-            _module->area()->runOnExitScript();
-            _module->area()->unloadParty();
-        }
-
-        if (_loadScreen) {
-            _loadScreen->setProgress(50);
-        }
-        drawAll();
-
-        auto maybeModule = _loadedModules.find(name);
-        if (maybeModule != _loadedModules.end()) {
-            _module = maybeModule->second;
-        } else {
-            _module = _objectFactory.newModule();
-
-            shared_ptr<GffStruct> ifo(_resources.getGFF("module", ResourceType::Ifo));
-            if (!ifo) {
-                throw ValidationException("Module IFO file not found");
+            if (_module) {
+                _module->area()->runOnExitScript();
+                _module->area()->unloadParty();
             }
 
-            _module->load(name, *ifo, _loadFromSaveGame);
-            _loadedModules.insert(make_pair(name, _module));
+            if (_loadScreen) {
+                _loadScreen->setProgress(50);
+            }
+            drawAll();
+
+            auto maybeModule = _loadedModules.find(name);
+            if (maybeModule != _loadedModules.end()) {
+                _module = maybeModule->second;
+            } else {
+                _module = _objectFactory.newModule();
+
+                shared_ptr<GffStruct> ifo(_resources.getGFF("module", ResourceType::Ifo));
+                if (!ifo) {
+                    throw ValidationException("Module IFO file not found");
+                }
+
+                _module->load(name, *ifo, _loadFromSaveGame);
+                _loadedModules.insert(make_pair(name, _module));
+            }
+
+            _module->loadParty(entry, _loadFromSaveGame);
+            _module->area()->fill(_sceneGraph);
+
+            if (_loadScreen) {
+                _loadScreen->setProgress(100);
+            }
+            drawAll();
+
+            string musicName(_module->area()->music());
+            playMusic(musicName);
+
+            _ticks = SDL_GetTicks();
+            openInGame();
+            _loadFromSaveGame = false;
+        } catch (const ValidationException &e) {
+            error("Failed loading module '" + name + "': " + string(e.what()));
         }
-
-        _module->loadParty(entry, _loadFromSaveGame);
-        _module->area()->fill(_sceneGraph);
-
-        if (_loadScreen) {
-            _loadScreen->setProgress(100);
-        }
-        drawAll();
-
-        string musicName(_module->area()->music());
-        playMusic(musicName);
-
-        _ticks = SDL_GetTicks();
-        openInGame();
-        _loadFromSaveGame = false;
     });
 }
 
