@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tools.h"
+#include "erf.h"
 
-#include "../engine/resource/format/erfwriter.h"
-#include "../engine/resource/typeutil.h"
+#include "../../engine/resource/format/erfwriter.h"
+#include "../../engine/resource/typeutil.h"
 
 using namespace std;
 

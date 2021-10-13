@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tools.h"
+#include "pth.h"
 
-#include "../engine/common/streamutil.h"
-#include "../engine/common/streamwriter.h"
-#include "../engine/resource/format/gffreader.h"
-#include "../engine/resource/format/gffwriter.h"
+#include "../../engine/common/streamutil.h"
+#include "../../engine/common/streamwriter.h"
+#include "../../engine/resource/format/gffreader.h"
+#include "../../engine/resource/format/gffwriter.h"
 
 using namespace std;
 

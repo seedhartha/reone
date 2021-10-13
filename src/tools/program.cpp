@@ -20,7 +20,17 @@
 #include "../engine/common/pathutil.h"
 #include "../engine/resource/types.h"
 
-#include "tools.h"
+#include "tool/2da.h"
+#include "tool/audio.h"
+#include "tool/erf.h"
+#include "tool/gff.h"
+#include "tool/keybif.h"
+#include "tool/lip.h"
+#include "tool/ncs.h"
+#include "tool/pth.h"
+#include "tool/rim.h"
+#include "tool/tlk.h"
+#include "tool/tpc.h"
 
 using namespace std;
 

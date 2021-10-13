@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tools.h"
+#include "lip.h"
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../engine/graphics/lip/format/lipreader.h"
-#include "../engine/graphics/lip/format/lipwriter.h"
+#include "../../engine/graphics/lip/format/lipreader.h"
+#include "../../engine/graphics/lip/format/lipwriter.h"
 
 using namespace std;
 

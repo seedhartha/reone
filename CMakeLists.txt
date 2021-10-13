@@ -1059,23 +1059,34 @@ list(APPEND InstallTargets reone)
 if(BUILD_TOOLS)
     set(TOOLS_HEADERS
         src/tools/program.h
-        src/tools/tools.h
+        src/tools/tool/2da.h
+        src/tools/tool/audio.h
+        src/tools/tool/erf.h
+        src/tools/tool/gff.h
+        src/tools/tool/itool.h
+        src/tools/tool/keybif.h
+        src/tools/tool/lip.h
+        src/tools/tool/ncs.h
+        src/tools/tool/pth.h
+        src/tools/tool/rim.h
+        src/tools/tool/tlk.h
+        src/tools/tool/tpc.h
         src/tools/types.h)
 
     set(TOOLS_SOURCES
-        src/tools/2datool.cpp
-        src/tools/audiotool.cpp
-        src/tools/erftool.cpp
-        src/tools/gfftool.cpp
-        src/tools/keybiftool.cpp
-        src/tools/liptool.cpp
         src/tools/main.cpp
-        src/tools/ncstool.cpp
         src/tools/program.cpp
-        src/tools/pthtool.cpp
-        src/tools/rimtool.cpp
-        src/tools/tlktool.cpp
-        src/tools/tpctool.cpp)
+        src/tools/tool/2da.cpp
+        src/tools/tool/audio.cpp
+        src/tools/tool/erf.cpp
+        src/tools/tool/gff.cpp
+        src/tools/tool/keybif.cpp
+        src/tools/tool/lip.cpp
+        src/tools/tool/ncs.cpp
+        src/tools/tool/pth.cpp
+        src/tools/tool/rim.cpp
+        src/tools/tool/tlk.cpp
+        src/tools/tool/tpc.cpp)
 
     add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
     set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

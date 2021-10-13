@@ -15,14 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tools.h"
+#include "gff.h"
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../engine/common/streamwriter.h"
-#include "../engine/resource/format/gffreader.h"
-#include "../engine/resource/format/gffwriter.h"
-#include "../engine/resource/typeutil.h"
+#include "../../engine/common/streamwriter.h"
+#include "../../engine/resource/format/gffreader.h"
+#include "../../engine/resource/format/gffwriter.h"
+#include "../../engine/resource/typeutil.h"
 
 using namespace std;
 

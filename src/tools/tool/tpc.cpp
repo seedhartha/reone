@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tools.h"
+#include "tpc.h"
 
 #include "s3tc.h"
 
-#include "../engine/common/logutil.h"
-#include "../engine/graphics/texture/format/tgawriter.h"
-#include "../engine/graphics/texture/format/tpcreader.h"
+#include "../../engine/common/logutil.h"
+#include "../../engine/graphics/texture/format/tgawriter.h"
+#include "../../engine/graphics/texture/format/tpcreader.h"
 
 using namespace std;
 
