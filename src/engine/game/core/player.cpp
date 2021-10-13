@@ -176,7 +176,9 @@ void Player::stopMovement() {
     _moveRight = false;
 
     shared_ptr<Creature> partyLeader(_party->getLeader());
-    partyLeader->setMovementType(Creature::MovementType::None);
+    if (partyLeader) {
+        partyLeader->setMovementType(Creature::MovementType::None);
+    }
 }
 
 bool Player::isMovementRequested() const {

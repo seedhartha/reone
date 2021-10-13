@@ -34,7 +34,7 @@ namespace graphics {
 
 Model::Model(
     string name,
-    Classification classification,
+    int classification,
     shared_ptr<ModelNode> rootNode,
     vector<shared_ptr<Animation>> animations,
     shared_ptr<Model> superModel,

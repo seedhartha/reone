@@ -736,7 +736,7 @@ void Area::updateVisibility() {
 
 void Area::updateSounds() {
     glm::vec3 refPosition;
-    if (_game->cameraType() == CameraType::ThirdPerson) {
+    if (_game->cameraType() == CameraType::ThirdPerson && _party.getLeader()) {
         refPosition = _party.getLeader()->position();
     } else {
         refPosition = _game->getActiveCamera()->sceneNode()->absoluteTransform()[3];

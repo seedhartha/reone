@@ -137,7 +137,7 @@ void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &f
 }
 
 bool Module::handle(const SDL_Event &event) {
-    if (_player->handle(event))
+    if (_player && _player->handle(event))
         return true;
     if (_area->handle(event))
         return true;

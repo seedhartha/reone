@@ -309,7 +309,7 @@ bool Creature::equip(int slot, const shared_ptr<Item> &item) {
         if (model) {
             if (slot == InventorySlot::rightWeapon) {
                 auto weapon = static_pointer_cast<ModelSceneNode>(model->getAttachment("rhand"));
-                if (weapon && weapon->model()->classification() == Model::Classification::Lightsaber) {
+                if (weapon && weapon->model()->classification() == MdlClassification::lightsaber) {
                     weapon->playAnimation("powerup");
                 }
             }

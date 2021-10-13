@@ -216,6 +216,8 @@ void Game::loadModule(const string &name, string entry) {
             _module->loadParty(entry, _loadFromSaveGame);
             _module->area()->fill(_sceneGraph);
 
+            info("Module '" + name + "' loaded successfully");
+
             if (_loadScreen) {
                 _loadScreen->setProgress(100);
             }

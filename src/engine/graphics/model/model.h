@@ -34,20 +34,9 @@ class ModelNode;
  */
 class Model : boost::noncopyable {
 public:
-    enum class Classification {
-        Other,
-        Effect,
-        Tile,
-        Character,
-        Door,
-        Lightsaber,
-        Placeable,
-        Flyer
-    };
-
     Model(
         std::string name,
-        Classification classification,
+        int classification,
         std::shared_ptr<ModelNode> rootNode,
         std::vector<std::shared_ptr<Animation>> animations,
         std::shared_ptr<Model> superModel,
@@ -58,7 +47,7 @@ public:
     bool isAffectedByFog() const { return _affectedByFog; }
 
     const std::string &name() const { return _name; }
-    Classification classification() const { return _classification; }
+    int classification() const { return _classification; }
     std::shared_ptr<ModelNode> rootNode() const { return _rootNode; }
     std::shared_ptr<Model> superModel() const { return _superModel; }
     float animationScale() const { return _animationScale; }
@@ -84,7 +73,7 @@ public:
 
 private:
     std::string _name;
-    Classification _classification;
+    int _classification;
     std::shared_ptr<ModelNode> _rootNode;
     std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
     std::shared_ptr<Model> _superModel;
