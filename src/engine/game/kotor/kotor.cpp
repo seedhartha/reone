@@ -154,6 +154,9 @@ KotOR::KotOR(
         scripts,
         resources,
         strings) {
+
+    _screen = GameScreen::MainMenu;
+
     _mainMenuMusicResRef = "mus_theme_cult";
     _charGenMusicResRef = "mus_theme_rep";
     _charGenLoadScreenResRef = "load_chargen";

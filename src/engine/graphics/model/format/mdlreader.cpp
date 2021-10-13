@@ -36,10 +36,6 @@ namespace reone {
 
 namespace graphics {
 
-static constexpr int kMdlDataOffset = 12;
-static constexpr uint32_t kFunctionPtrTslPC = 4285200;
-static constexpr uint32_t kFunctionPtrTslXbox = 4285872;
-
 static constexpr int kFlagBezier = 16;
 
 struct EmitterFlags {
@@ -58,24 +54,6 @@ struct EmitterFlags {
     static constexpr int flag13 = 0x1000;
 };
 
-// Classification
-
-static unordered_map<uint8_t, Model::Classification> g_classifications {
-    {0, Model::Classification::Other},
-    {1, Model::Classification::Effect},
-    {2, Model::Classification::Tile},
-    {4, Model::Classification::Character},
-    {8, Model::Classification::Door},
-    {0x10, Model::Classification::Lightsaber},
-    {0x20, Model::Classification::Placeable},
-    {0x40, Model::Classification::Flyer}};
-
-static Model::Classification getClassification(uint8_t ordinal) {
-    return getFromLookupOrElse(g_classifications, ordinal, Model::Classification::Other);
-}
-
-// END Classification
-
 MdlReader::MdlReader(Models &models, Textures &textures) :
     BinaryReader(4, "\000\000\000\000"),
     _models(models),
@@ -91,7 +69,7 @@ void MdlReader::load(const shared_ptr<istream> &mdl, const shared_ptr<istream> &
 }
 
 static bool isTSLFunctionPointer(uint32_t ptr) {
-    return ptr == kFunctionPtrTslPC || ptr == kFunctionPtrTslXbox;
+    return ptr == kMdlModelFuncPtr1TslPC || ptr == kMdlModelFuncPtr1TslXbox;
 }
 
 void MdlReader::doLoad() {
@@ -150,7 +128,7 @@ void MdlReader::doLoad() {
 
     _model = make_unique<Model>(
         name,
-        getClassification(classification),
+        classification,
         move(rootNode),
         move(animations),
         move(superModel),
@@ -210,16 +188,16 @@ shared_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *pare
 
     node->setFlags(flags);
 
-    if (flags & NodeFlags::mesh) {
+    if (flags & MdlNodeFlags::mesh) {
         node->setMesh(readMesh(flags));
     }
-    if (flags & NodeFlags::light) {
+    if (flags & MdlNodeFlags::light) {
         node->setLight(readLight());
     }
-    if (flags & NodeFlags::emitter) {
+    if (flags & MdlNodeFlags::emitter) {
         node->setEmitter(readEmitter());
     }
-    if (flags & NodeFlags::reference) {
+    if (flags & MdlNodeFlags::reference) {
         node->setReference(readReference());
     }
     if (!anim) {
@@ -308,7 +286,7 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         attributes.offTanSpaceNormals = offMdxTanSpace + 6 * sizeof(float);
     }
 
-    if (flags & NodeFlags::skin) {
+    if (flags & MdlNodeFlags::skin) {
         // Skin Mesh Header
         ignore(3 * 4); // unknown
         uint32_t offMdxBoneWeights = readUint32();
@@ -328,7 +306,7 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         attributes.offBoneIndices = offMdxBoneIndices;
         attributes.offBoneWeights = offMdxBoneWeights;
 
-    } else if (flags & NodeFlags::dangly) {
+    } else if (flags & MdlNodeFlags::dangly) {
         // Dangly Mesh Header
         ArrayDefinition constraintArrayDef(readArrayDefinition());
         float displacement = readFloat();
@@ -353,12 +331,12 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
             danglyMesh->constraints[i].position = glm::make_vec3(&positionValues[0]);
         }
 
-    } else if (flags & NodeFlags::aabb) {
+    } else if (flags & MdlNodeFlags::aabb) {
         // AABB Mesh Header
         uint32_t offTree = readUint32();
         aabbTree = readAABBTree(offTree);
 
-    } else if (flags & NodeFlags::saber) {
+    } else if (flags & MdlNodeFlags::saber) {
         // Lightsaber blade is a special case. It consists of four to eight
         // planes. Some of these planes are normal meshes, but some differ in
         // that their geometry is stored in the MDL, not MDX.
@@ -424,12 +402,12 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     }
 
     // Read vertices
-    if (!(flags & NodeFlags::saber) && mdxVertexSize > 0) {
+    if (!(flags & MdlNodeFlags::saber) && mdxVertexSize > 0) {
         _mdxReader->seek(offMdxData);
         vertices = _mdxReader->getFloatArray(numVertices * mdxVertexSize / sizeof(float));
     }
 
-    if (!(flags & NodeFlags::saber) && faceArrayDef.count > 0) {
+    if (!(flags & MdlNodeFlags::saber) && faceArrayDef.count > 0) {
         // Faces
         seek(kMdlDataOffset + faceArrayDef.offset);
         for (uint32_t i = 0; i < faceArrayDef.count; ++i) {
@@ -478,7 +456,7 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     nodeMesh->skin = move(skin);
     nodeMesh->danglyMesh = move(danglyMesh);
     nodeMesh->aabbTree = move(aabbTree);
-    nodeMesh->saber = flags & NodeFlags::saber;
+    nodeMesh->saber = flags & MdlNodeFlags::saber;
 
     return move(nodeMesh);
 }
@@ -832,11 +810,11 @@ void MdlReader::initControllerFn() {
 
 MdlReader::ControllerFn MdlReader::getControllerFn(uint32_t type, int nodeFlags) {
     ControllerFn fn;
-    if (nodeFlags & NodeFlags::mesh) {
+    if (nodeFlags & MdlNodeFlags::mesh) {
         fn = getFromLookupOrNull(_meshControllers, type);
-    } else if (nodeFlags & NodeFlags::light) {
+    } else if (nodeFlags & MdlNodeFlags::light) {
         fn = getFromLookupOrNull(_lightControllers, type);
-    } else if (nodeFlags & NodeFlags::emitter) {
+    } else if (nodeFlags & MdlNodeFlags::emitter) {
         fn = getFromLookupOrNull(_emitterControllers, type);
     }
     if (!fn) {

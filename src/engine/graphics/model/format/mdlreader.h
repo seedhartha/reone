@@ -39,20 +39,6 @@ public:
     std::shared_ptr<graphics::Model> model() const { return _model; }
 
 private:
-    struct NodeFlags {
-        static constexpr int header = 1;
-        static constexpr int light = 2;
-        static constexpr int emitter = 4;
-        static constexpr int camera = 8;
-        static constexpr int reference = 0x10;
-        static constexpr int mesh = 0x20;
-        static constexpr int skin = 0x40;
-        static constexpr int anim = 0x80;
-        static constexpr int dangly = 0x100;
-        static constexpr int aabb = 0x200;
-        static constexpr int saber = 0x800;
-    };
-
     struct ArrayDefinition {
         uint32_t offset {0};
         uint32_t count {0};

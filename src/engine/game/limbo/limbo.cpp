@@ -77,6 +77,14 @@ void Limbo::loadModuleResources(const string &moduleName) {
     _resources.indexErfFile(modPath);
 }
 
+void Limbo::openInGame() {
+    changeScreen(GameScreen::InGame);
+}
+
+void Limbo::changeScreen(GameScreen screen) {
+    _screen = screen;
+}
+
 } // namespace game
 
 } // namespace reone

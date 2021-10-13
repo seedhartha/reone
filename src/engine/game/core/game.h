@@ -272,11 +272,10 @@ protected:
     bool _tsl;
     boost::filesystem::path _path;
 
+    GameScreen _screen {GameScreen::None};
     std::string _mainMenuMusicResRef;
     std::string _charGenMusicResRef;
     std::string _charGenLoadScreenResRef;
-
-    GameScreen _screen {GameScreen::MainMenu};
 
     // Services
 

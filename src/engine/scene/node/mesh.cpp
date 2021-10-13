@@ -212,7 +212,7 @@ bool MeshSceneNode::isTransparent() const {
         return false; // Meshless nodes are opaque
 
     // Character models are opaque
-    if (_model->model()->classification() == Model::Classification::Character)
+    if (_model->model()->classification() == MdlClassification::character)
         return false;
 
     // Model nodes with alpha less than 1.0 are transparent

@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -17,29 +18,32 @@
 
 #pragma once
 
+#include "../../engine/game/types.h"
+
+#include "itool.h"
+
 namespace reone {
 
 namespace tools {
 
-enum class Operation {
-    None,
-    List,
-    Extract,
-    Unwrap,
-    ToJSON,
-    ToTGA,
-    To2DA,
-    ToGFF,
-    ToRIM,
-    ToERF,
-    ToMOD,
-    ToPTH,
-    ToASCII,
-    ToTLK,
-    ToLIP,
-    ToPCODE,
-    ToNCS,
-    ToMDL
+class MdlTool : public ITool {
+public:
+    MdlTool(game::GameID gameId) :
+        _gameId(gameId) {
+    }
+
+    void invoke(
+        Operation operation,
+        const boost::filesystem::path &target,
+        const boost::filesystem::path &gamePath,
+        const boost::filesystem::path &destPath) override;
+
+    bool supports(Operation operation, const boost::filesystem::path &target) const override;
+
+private:
+    game::GameID _gameId;
+
+    void toMDL(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
 
 } // namespace tools

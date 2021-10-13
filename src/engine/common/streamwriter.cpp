@@ -57,6 +57,16 @@ void StreamWriter::putString(const string &str) {
     _stream->write(&str[0], str.length());
 }
 
+void StreamWriter::putStringExact(const string &str, int len) {
+    int strLen = min(len, static_cast<int>(str.length()));
+    if (strLen > 0) {
+        _stream->write(&str[0], strLen);
+    }
+    for (int i = 0; i < len - strLen; ++i) {
+        _stream->put('\0');
+    }
+}
+
 void StreamWriter::putCString(const string &str) {
     int len = static_cast<int>(strnlen(&str[0], str.length()));
     _stream->write(&str[0], len);

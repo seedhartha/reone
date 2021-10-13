@@ -43,6 +43,7 @@ public:
     void putInt64(int64_t val);
     void putFloat(float val);
     void putString(const std::string &str);
+    void putStringExact(const std::string &str, int len);
     void putCString(const std::string &str);
     void putBytes(const ByteArray &bytes);
     void putBytes(int count, uint8_t val = 0);
