@@ -190,8 +190,13 @@ void Area::loadLYT() {
 }
 
 void Area::loadVIS() {
+    auto visData = _resources.getRaw(_name, ResourceType::Vis);
+    if (!visData) {
+        return;
+    }
+
     VisReader vis;
-    vis.load(wrap(_resources.getRaw(_name, ResourceType::Vis)));
+    vis.load(wrap(visData));
 
     _visibility = fixVisibility(vis.visibility());
 }
@@ -207,8 +212,9 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
 
 void Area::loadPTH() {
     shared_ptr<GffStruct> pth(_resources.getGFF(_name, ResourceType::Pth));
-    if (!pth)
+    if (!pth) {
         return;
+    }
 
     Path path;
     path.load(*pth);
@@ -1506,6 +1512,9 @@ void Area::loadARE(const GffStruct &are) {
 
 void Area::loadCameraStyle(const GffStruct &are) {
     shared_ptr<TwoDA> cameraStyles(_resources.get2DA("camerastyle"));
+    if (!cameraStyles) {
+        throw ValidationException("camerastyle 2DA not found");
+    }
 
     int areaStyleIdx = are.getInt("CameraStyle");
     _camStyleDefault.load(*cameraStyles, areaStyleIdx);

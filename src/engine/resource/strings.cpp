@@ -17,6 +17,7 @@
 
 #include "strings.h"
 
+#include "../common/exception/validation.h"
 #include "../common/pathutil.h"
 #include "../resource/talktable.h"
 
@@ -30,9 +31,10 @@ namespace resource {
 
 void Strings::init(const fs::path &gameDir) {
     fs::path tlkPath(getPathIgnoreCase(gameDir, "dialog.tlk"));
-    if (!tlkPath.empty()) {
-        _tlk.load(tlkPath);
+    if (tlkPath.empty()) {
+        throw ValidationException("dialog.tlk file not found");
     }
+    _tlk.load(tlkPath);
 }
 
 string Strings::get(int strRef) {
