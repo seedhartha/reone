@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tools.h"
+#include "audio.h"
 
-#include "../engine/common/streamreader.h"
+#include "../../engine/common/streamreader.h"
 
 using namespace std;
 

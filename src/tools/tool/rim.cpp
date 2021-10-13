@@ -15,10 +15,10 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "tools.h"
+#include "rim.h"
 
-#include "../engine/resource/format/rimwriter.h"
-#include "../engine/resource/typeutil.h"
+#include "../../engine/resource/format/rimwriter.h"
+#include "../../engine/resource/typeutil.h"
 
 using namespace std;
 

@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tools.h"
+#include "keybif.h"
 
-#include "../engine/common/pathutil.h"
-#include "../engine/resource/typeutil.h"
+#include "../../engine/common/pathutil.h"
+#include "../../engine/resource/typeutil.h"
 
 using namespace std;
 

@@ -15,13 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tools.h"
+#include "tlk.h"
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../engine/resource/format/tlkreader.h"
-#include "../engine/resource/format/tlkwriter.h"
-#include "../engine/resource/talktable.h"
+#include "../../engine/resource/format/tlkreader.h"
+#include "../../engine/resource/format/tlkwriter.h"
+#include "../../engine/resource/talktable.h"
 
 using namespace std;
 

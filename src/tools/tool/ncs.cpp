@@ -15,22 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "tools.h"
+#include "ncs.h"
 
 #include <boost/regex.hpp>
 
-#include "../engine/common/collectionutil.h"
-#include "../engine/common/logutil.h"
-#include "../engine/game/core/script/routine/iroutines.h"
-#include "../engine/game/kotor/routine/registrar.h"
-#include "../engine/game/limbo/routine/registrar.h"
-#include "../engine/game/tsl/routine/registrar.h"
-#include "../engine/script/format/ncsreader.h"
-#include "../engine/script/format/ncswriter.h"
-#include "../engine/script/instrutil.h"
-#include "../engine/script/program.h"
-#include "../engine/script/routine.h"
-#include "../engine/script/variable.h"
+#include "../../engine/common/collectionutil.h"
+#include "../../engine/common/logutil.h"
+#include "../../engine/game/core/script/routine/iroutines.h"
+#include "../../engine/game/kotor/routine/registrar.h"
+#include "../../engine/game/limbo/routine/registrar.h"
+#include "../../engine/game/tsl/routine/registrar.h"
+#include "../../engine/script/format/ncsreader.h"
+#include "../../engine/script/format/ncswriter.h"
+#include "../../engine/script/instrutil.h"
+#include "../../engine/script/program.h"
+#include "../../engine/script/routine.h"
+#include "../../engine/script/variable.h"
 
 using namespace std;
 
