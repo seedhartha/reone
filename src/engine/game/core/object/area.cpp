@@ -71,6 +71,8 @@ static constexpr float kMaxCollisionDistance = 8.0f;
 static constexpr float kMaxCollisionDistance2 = kMaxCollisionDistance * kMaxCollisionDistance;
 static constexpr float kLineOfSightTestHeight = 1.7f; // TODO: make it appearance-based
 
+static CameraStyle g_defaultCameraStyle {3.2f, 83.0f, 0.45f, 55.0f};
+
 static bool g_debugPath = false;
 
 Area::Area(
@@ -1203,6 +1205,10 @@ void Area::loadGIT(const GffStruct &git) {
 
 void Area::loadProperties(const GffStruct &git) {
     shared_ptr<GffStruct> props(git.getStruct("AreaProperties"));
+    if (!props) {
+        warn("Area properties not found in GIT");
+        return;
+    }
     int musicIdx = props->getInt("MusicDay");
     if (musicIdx) {
         shared_ptr<TwoDA> musicTable(_resources.get2DA("ambientmusic"));
@@ -1513,7 +1519,9 @@ void Area::loadARE(const GffStruct &are) {
 void Area::loadCameraStyle(const GffStruct &are) {
     shared_ptr<TwoDA> cameraStyles(_resources.get2DA("camerastyle"));
     if (!cameraStyles) {
-        throw ValidationException("camerastyle 2DA not found");
+        _camStyleDefault = g_defaultCameraStyle;
+        _camStyleCombat = g_defaultCameraStyle;
+        return;
     }
 
     int areaStyleIdx = are.getInt("CameraStyle");
@@ -1537,7 +1545,12 @@ void Area::loadScripts(const GffStruct &are) {
 }
 
 void Area::loadMap(const GffStruct &are) {
-    _map.load(_name, *are.getStruct("Map"));
+    auto mapStruct = are.getStruct("Map");
+    if (!mapStruct) {
+        warn("Map properties not found in ARE");
+        return;
+    }
+    _map.load(_name, *mapStruct);
 }
 
 void Area::loadStealthXP(const GffStruct &are) {
