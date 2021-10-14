@@ -95,15 +95,6 @@ public:
     void setBarkBubbleText(std::string text, float durartion);
 
 protected:
-    void start() override;
-
-    void loadModuleNames() override;
-    void loadModuleResources(const std::string &moduleName) override;
-
-    void onModuleSelected(const std::string &name) override;
-    void drawHUD() override;
-    CameraType getConversationCamera(int &cameraId) const override;
-
     // GUI
 
     std::unique_ptr<MainMenu> _mainMenu;
@@ -118,6 +109,13 @@ protected:
 
     Conversation *_conversation {nullptr}; /**< pointer to either DialogGUI or ComputerGUI  */
 
+    // END GUI
+
+    void start() override;
+
+    void loadModuleNames() override;
+    void loadModuleResources(const std::string &moduleName) override;
+
     void loadInGameMenus() override;
     void loadMainMenu();
     void loadLoadingScreen() override;
@@ -130,11 +128,14 @@ protected:
     void loadPartySelection();
     void loadSaveLoad();
 
+    void onModuleSelected(const std::string &name) override;
+    void drawHUD() override;
+
     void changeScreen(GameScreen screen) override;
 
+    void getDefaultPartyMembers(std::string &member1, std::string &member2, std::string &member3) const override;
     gui::GUI *getScreenGUI() const override;
-
-    // END GUI
+    CameraType getConversationCamera(int &cameraId) const override;
 };
 
 } // namespace game

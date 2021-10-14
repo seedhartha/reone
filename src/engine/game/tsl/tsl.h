@@ -66,6 +66,8 @@ public:
         resource::Strings &strings);
 
     void initResourceProviders() override;
+
+    void getDefaultPartyMembers(std::string &member1, std::string &member2, std::string &member3) const override;
 };
 
 } // namespace game

@@ -390,23 +390,30 @@ protected:
     virtual void loadModuleNames() = 0;
     virtual void loadModuleResources(const std::string &moduleName) = 0;
 
+    void runMainLoop();
     void update();
 
-    void loadNextModule();
     float measureFrameTime();
+
+    void updateMusic();
+    void updateVideo(float dt);
+    void updateCamera(float dt);
+    void updateSceneGraph(float dt);
+
+    void loadDefaultParty();
+    void loadNextModule();
     void playMusic(const std::string &resRef);
-    void runMainLoop();
     void toggleInGameCameraType();
 
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 
-    void updateCamera(float dt);
-    void updateVideo(float dt);
-    void updateMusic();
-    void updateSceneGraph(float dt);
+    virtual void onModuleSelected(const std::string &name) = 0;
+    virtual void drawHUD() = 0;
 
+    virtual void getDefaultPartyMembers(std::string &member1, std::string &member2, std::string &member3) const;
     virtual gui::GUI *getScreenGUI() const = 0;
+    virtual CameraType getConversationCamera(int &cameraId) const = 0;
 
     // GUI
 
@@ -425,10 +432,6 @@ protected:
     std::shared_ptr<resource::GffStruct> getPartyMemberNFOStruct(int index) const;
 
     // END Save games
-
-    virtual void onModuleSelected(const std::string &name) = 0;
-    virtual void drawHUD() = 0;
-    virtual CameraType getConversationCamera(int &cameraId) const = 0;
 };
 
 } // namespace game

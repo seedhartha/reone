@@ -73,7 +73,10 @@ static constexpr char kWavesDirectoryName[] = "streamwaves";
 static constexpr char kExeFilename[] = "swkotor.exe";
 static constexpr char kModulesDirectoryName[] = "modules";
 
-static vector<string> g_nonTransientLipFiles {"global.mod", "localization.mod"};
+static constexpr char kBlueprintResRefCarth[] = "p_carth";
+static constexpr char kBlueprintResRefBastila[] = "p_bastilla";
+
+static const vector<string> g_nonTransientLipFiles {"global.mod", "localization.mod"};
 
 static bool g_conversationsEnabled = true;
 
@@ -784,6 +787,14 @@ GUI *KotOR::getScreenGUI() const {
     default:
         return nullptr;
     }
+}
+
+void KotOR::getDefaultPartyMembers(string &member1, string &member2, string &member3) const {
+    member1 = kBlueprintResRefCarth;
+    member2 = kBlueprintResRefBastila;
+    member3.clear();
+
+    Game::getDefaultPartyMembers(member1, member2, member3);
 }
 
 } // namespace game
