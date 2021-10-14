@@ -71,6 +71,7 @@ static constexpr float kMaxCollisionDistance = 8.0f;
 static constexpr float kMaxCollisionDistance2 = kMaxCollisionDistance * kMaxCollisionDistance;
 static constexpr float kLineOfSightTestHeight = 1.7f; // TODO: make it appearance-based
 
+static glm::vec3 g_defaultAmbientColor {0.2f};
 static CameraStyle g_defaultCameraStyle {3.2f, 83.0f, 0.45f, 55.0f};
 
 static bool g_debugPath = false;
@@ -1534,7 +1535,7 @@ void Area::loadCameraStyle(const GffStruct &are) {
 }
 
 void Area::loadAmbientColor(const GffStruct &are) {
-    _ambientColor = are.getColor("DynAmbientColor");
+    _ambientColor = are.getColor("DynAmbientColor", g_defaultAmbientColor);
 }
 
 void Area::loadScripts(const GffStruct &are) {
