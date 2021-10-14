@@ -319,6 +319,10 @@ void ModelSceneNode::updateAnimations(float dt) {
 }
 
 void ModelSceneNode::updateAnimationChannel(AnimationChannel &channel, float dt) {
+    if (!channel.lipAnim && !channel.anim) {
+        return;
+    }
+
     // Take length from the lip animation, if any
     float length = channel.lipAnim ? channel.lipAnim->length() : channel.anim->length();
 
