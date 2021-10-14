@@ -71,6 +71,8 @@ public:
 
     // END Animations
 
+    static std::unique_ptr<Model> newHeadless(std::string name);
+
 private:
     std::string _name;
     int _classification;
@@ -78,6 +80,8 @@ private:
     std::unordered_map<std::string, std::shared_ptr<Animation>> _animations;
     std::shared_ptr<Model> _superModel;
     float _animationScale; /**< scales supermodel animations */
+
+    bool _headless {false}; /**< not backed by a file */
 
     AABB _aabb;
     bool _affectedByFog;

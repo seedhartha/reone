@@ -18,6 +18,7 @@
 #include "mdlwriter.h"
 
 #include "../../mesh/mesh.h"
+#include "../../texture/texture.h"
 #include "../../types.h"
 
 #include "../model.h"
@@ -143,7 +144,7 @@ void MdlWriter::writeModelHeader(int numNodes, uint32_t offRootNode, uint32_t md
     }
     mdl.putFloat(kDefaultRadius);
     mdl.putFloat(_model.animationScale());
-    mdl.putStringExact("NULL", 32); // supermodel name
+    mdl.putStringExact(_model.superModel() ? _model.superModel()->name() : "NULL", 32); // supermodel name
     mdl.putUint32(offRootNode);
     mdl.putUint32(0); // unknown
     mdl.putUint32(mdxSize);
@@ -264,6 +265,7 @@ void MdlWriter::writeMesh(uint32_t offRaw, const ModelNode::TriangleMesh &mesh, 
     uint32_t funcPtr1 = _tsl ? kMdlMeshFuncPtr1TslPC : kMdlMeshFuncPtr1KotorPC;
     uint32_t funcPtr2 = _tsl ? kMdlMeshFuncPtr2TslPC : kMdlMeshFuncPtr2KotorPC;
     vector<float> average {0.0f, 0.0f, 0.0f};
+    string bitmap(mesh.diffuseMap ? mesh.diffuseMap->name() : "NULL");
     uint32_t animateUV = 0;
     float uvDirectionX = 0.0f;
     float uvDirectionY = 0.0f;
@@ -302,7 +304,7 @@ void MdlWriter::writeMesh(uint32_t offRaw, const ModelNode::TriangleMesh &mesh, 
         mdl.putFloat(mesh.ambient[i]);
     }
     mdl.putUint32(mesh.transparency);
-    mdl.putStringExact("NULL", 32);       // bitmap
+    mdl.putStringExact(bitmap, 32);       // bitmap
     mdl.putStringExact("", 32);           // bitmap2
     mdl.putStringExact("", 12);           // bitmap?
     mdl.putStringExact("", 12);           // bitmap?
