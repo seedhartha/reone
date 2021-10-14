@@ -1,0 +1,58 @@
+# Exported from blender at Thursday, 2021-10-14
+filedependancy m01aa.blend
+newmodel m01aa_01
+setsupermodel m01aa_01 NULL
+classification Other
+classification_unk1 0
+ignorefog 0
+setanimationscale 1.0
+beginmodelgeom m01aa_01
+node dummy m01aa_01
+  parent NULL
+endnode
+node trimesh 01_object001
+  parent m01aa_01
+  position  0  0 -0.1
+  orientation  0  1  0  0
+  wirecolor 1.0 1.0 1.0
+  ambient 1.0 1.0 1.0
+  alpha 1.0
+  diffuse 0.0 0.0 0.0
+  tangentspace 0
+  bitmap NULL
+  bitmap2 NULL
+  selfillumcolor 0.0 0.0 0.0
+  render 1
+  shadow 0
+  lightmapped 0
+  beaming 0
+  inheritcolor 0
+  m_bIsBackgroundGeometry 0
+  dirt_enabled 0
+  dirt_texture 1
+  dirt_worldspace 1
+  hologram_donotdraw 0
+  animateuv 0
+  uvdirectionx 1.0
+  uvdirectiony 1.0
+  uvjitter 0.0
+  uvjitterspeed 0.0
+  transparencyhint 0
+  verts 4
+    -5 -5  0
+     5 -5  0
+    -5  5  0
+     5  5  0
+  faces 2
+    1 2 0  1  0 1 2   0
+    1 3 2  1  0 3 1   0
+  tverts 4
+     1  0
+     0  1
+     0  0
+     1  1
+endnode
+endmodelgeom m01aa_01
+
+# ANIM ASCII
+donemodel m01aa_01
