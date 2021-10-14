@@ -35,6 +35,7 @@
 #include "../../graphics/walkmesh/walkmeshes.h"
 #include "../../graphics/window.h"
 #include "../../gui/gui.h"
+#include "../../resource/2da.h"
 #include "../../resource/format/erfreader.h"
 #include "../../resource/format/erfwriter.h"
 #include "../../resource/format/gffwriter.h"
@@ -213,6 +214,10 @@ void Game::loadModule(const string &name, string entry) {
                 _loadedModules.insert(make_pair(name, _module));
             }
 
+            if (_party.isEmpty()) {
+                loadDefaultParty();
+            }
+
             _module->loadParty(entry, _loadFromSaveGame);
             _module->area()->fill(_sceneGraph);
 
@@ -233,6 +238,46 @@ void Game::loadModule(const string &name, string entry) {
             error("Failed loading module '" + name + "': " + string(e.what()));
         }
     });
+}
+
+void Game::loadDefaultParty() {
+    string member1, member2, member3;
+    getDefaultPartyMembers(member1, member2, member3);
+
+    Party &party = _party;
+    if (!member1.empty()) {
+        shared_ptr<Creature> player(_objectFactory.newCreature());
+        player->loadFromBlueprint(member1);
+        player->setTag(kObjectTagPlayer);
+        player->setImmortal(true);
+        party.addMember(kNpcPlayer, player);
+        party.setPlayer(player);
+    }
+    if (!member2.empty()) {
+        shared_ptr<Creature> companion(_objectFactory.newCreature());
+        companion->loadFromBlueprint(member2);
+        companion->setImmortal(true);
+        party.addMember(0, companion);
+    }
+    if (!member3.empty()) {
+        shared_ptr<Creature> companion(_objectFactory.newCreature());
+        companion->loadFromBlueprint(member3);
+        companion->setImmortal(true);
+        party.addMember(1, companion);
+    }
+}
+
+void Game::getDefaultPartyMembers(string &member1, string &member2, string &member3) const {
+    shared_ptr<TwoDA> defaultParty(_resources.get2DA("defaultparty"));
+    if (!defaultParty) {
+        return;
+    }
+    if (defaultParty->getRowCount() < 1) {
+        throw ValidationException("defaultparty 2DA is empty");
+    }
+    member1 = defaultParty->getString(0, "partymember0");
+    member2 = defaultParty->getString(1, "partymember1");
+    member3 = defaultParty->getString(2, "partymember2");
 }
 
 void Game::setCursorType(CursorType type) {

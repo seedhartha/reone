@@ -21,8 +21,6 @@
 #include "../../../common/logutil.h"
 #include "../../../graphics/model/models.h"
 #include "../../../gui/scenebuilder.h"
-#include "../../../resource/2da.h"
-#include "../../../resource/resources.h"
 #include "../../../scene/types.h"
 
 #include "../../core/object/factory.h"
@@ -44,11 +42,6 @@ namespace reone {
 namespace game {
 
 static constexpr float kKotorModelSize = 1.4f;
-
-static const char kBlueprintResRefCarth[] = "p_carth";
-static const char kBlueprintResRefBastila[] = "p_bastilla";
-static const char kBlueprintResRefAtton[] = "p_atton";
-static const char kBlueprintResRefKreia[] = "p_kreia";
 
 MainMenu::MainMenu(
     KotOR *game,
@@ -269,51 +262,6 @@ void MainMenu::loadModuleNames() {
 }
 
 void MainMenu::onModuleSelected(const string &name) {
-    string member1Blueprint;
-    string member2Blueprint;
-    string member3Blueprint;
-
-    if (_game->isTSL()) {
-        member1Blueprint = kBlueprintResRefAtton;
-        member2Blueprint = kBlueprintResRefKreia;
-    } else {
-        member1Blueprint = kBlueprintResRefCarth;
-        member2Blueprint = kBlueprintResRefBastila;
-    }
-    shared_ptr<TwoDA> defaultParty(_resources.get2DA("defaultparty"));
-    if (defaultParty) {
-        for (int row = 0; row < defaultParty->getRowCount(); ++row) {
-            if (defaultParty->getBool(row, "tsl") == _game->isTSL()) {
-                member1Blueprint = defaultParty->getString(row, "partymember0");
-                member2Blueprint = defaultParty->getString(row, "partymember1");
-                member3Blueprint = defaultParty->getString(row, "partymember2");
-                break;
-            }
-        }
-    }
-
-    Party &party = _party;
-    if (!member1Blueprint.empty()) {
-        shared_ptr<Creature> player(_objectFactory.newCreature());
-        player->loadFromBlueprint(member1Blueprint);
-        player->setTag(kObjectTagPlayer);
-        player->setImmortal(true);
-        party.addMember(kNpcPlayer, player);
-        party.setPlayer(player);
-    }
-    if (!member2Blueprint.empty()) {
-        shared_ptr<Creature> companion(_objectFactory.newCreature());
-        companion->loadFromBlueprint(member2Blueprint);
-        companion->setImmortal(true);
-        party.addMember(0, companion);
-    }
-    if (!member3Blueprint.empty()) {
-        shared_ptr<Creature> companion(_objectFactory.newCreature());
-        companion->loadFromBlueprint(member3Blueprint);
-        companion->setImmortal(true);
-        party.addMember(1, companion);
-    }
-
     _game->loadModule(name);
 }
 

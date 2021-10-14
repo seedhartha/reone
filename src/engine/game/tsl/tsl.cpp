@@ -18,6 +18,7 @@
 #include "tsl.h"
 
 #include "../../common/pathutil.h"
+#include "../../resource/2da.h"
 #include "../../resource/resources.h"
 
 using namespace std;
@@ -37,6 +38,9 @@ namespace game {
 static constexpr char kVoiceDirectoryName[] = "streamvoice";
 static constexpr char kLocalizationLipFilename[] = "localization";
 static constexpr char kExeFilename[] = "swkotor2.exe";
+
+static constexpr char kBlueprintResRefAtton[] = "p_atton";
+static constexpr char kBlueprintResRefKreia[] = "p_kreia";
 
 TSL::TSL(
     fs::path path,
@@ -141,6 +145,14 @@ void TSL::initResourceProviders() {
 
     _resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
     _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
+}
+
+void TSL::getDefaultPartyMembers(string &member1, string &member2, string &member3) const {
+    member1 = kBlueprintResRefAtton;
+    member2 = kBlueprintResRefKreia;
+    member3.clear();
+
+    Game::getDefaultPartyMembers(member1, member2, member3);
 }
 
 } // namespace game

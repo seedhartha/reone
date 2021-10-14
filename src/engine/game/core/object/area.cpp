@@ -715,17 +715,18 @@ void Area::updateRoomVisibility() {
 
 void Area::update3rdPersonCameraTarget() {
     shared_ptr<SpatialObject> partyLeader(_party.getLeader());
-    if (!partyLeader)
+    if (!partyLeader) {
         return;
-
+    }
     glm::vec3 position(partyLeader->position());
-
     auto model = static_pointer_cast<ModelSceneNode>(partyLeader->sceneNode());
+    if (!model) {
+        return;
+    }
     shared_ptr<ModelNode> cameraHook(model->model()->getNodeByName("camerahook"));
     if (cameraHook) {
         position += glm::vec3(cameraHook->absoluteTransform()[3]);
     }
-
     _thirdPersonCamera->setTargetPosition(position);
 }
 

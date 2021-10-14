@@ -20,11 +20,14 @@
 #include "../../common/exception/validation.h"
 #include "../../common/logutil.h"
 #include "../../common/pathutil.h"
+#include "../../resource/2da.h"
 #include "../../resource/resources.h"
 
 #include "../core/script/runner.h"
 
 using namespace std;
+
+using namespace reone::resource;
 
 namespace fs = boost::filesystem;
 
