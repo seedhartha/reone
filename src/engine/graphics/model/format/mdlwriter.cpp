@@ -43,9 +43,6 @@ static const vector<float> g_defaultBoundingBox {-5.0f, -5.0f, -1.0f, 5.0f, 5.0f
 void MdlWriter::save(const fs::path &mdlPath, const fs::path &mdxPath) {
     // Write to MDL/MDX buffers
 
-    auto mdxBuf = make_shared<stringstream>();
-    StreamWriter mdxBufWriter(mdxBuf);
-
     auto nodeNamesBuf = make_shared<stringstream>();
     StreamWriter nodeNamesWriter(nodeNamesBuf);
     vector<uint32_t> nodeNameOffsets;
@@ -55,22 +52,33 @@ void MdlWriter::save(const fs::path &mdlPath, const fs::path &mdxPath) {
     uint32_t nodeNamesSize = nodeNamesData.length();
     int numNodes = static_cast<int>(nodeNameOffsets.size());
     uint32_t offNodes = kGeometryHeaderSize + kModelHeaderSize + 4 * numNodes + nodeNamesSize;
+    uint32_t offRaw = kGeometryHeaderSize + kModelHeaderSize + 4 * numNodes + nodeNamesSize + getTreeSize(*_model.rootNode());
+
+    auto rawBuf = make_shared<stringstream>();
+    StreamWriter rawBufWriter(rawBuf);
+
+    auto mdxBuf = make_shared<stringstream>();
+    StreamWriter mdxBufWriter(mdxBuf);
 
     auto nodesBuf = make_shared<stringstream>();
     StreamWriter nodesWriter(nodesBuf);
     int nodeDfsIdx = 0;
-    writeNodes(offNodes, 0, *_model.rootNode(), nodesWriter, mdxBufWriter, nodeDfsIdx);
+    writeNodes(offNodes, 0, offNodes, offRaw, *_model.rootNode(), nodesWriter, rawBufWriter, mdxBufWriter, nodeDfsIdx);
 
     // TODO: animations
 
     auto mdlBuf = make_shared<stringstream>();
     StreamWriter mdlBufWriter(mdlBuf);
 
+    string mdxData(mdxBuf->str());
+    uint32_t mdxSize = static_cast<uint32_t>(mdxData.length());
+
     writeGeometryHeader(numNodes, offNodes, mdlBufWriter);
-    writeModelHeader(numNodes, offNodes, mdlBufWriter);
+    writeModelHeader(numNodes, offNodes, mdxSize, mdlBufWriter);
     writeNodeNameOffsets(nodeNameOffsets, mdlBufWriter);
     mdlBufWriter.putString(nodeNamesData);
     mdlBufWriter.putString(nodesBuf->str());
+    mdlBufWriter.putString(rawBuf->str());
 
     // END Write to MDL/MDX buffers
 
@@ -78,9 +86,6 @@ void MdlWriter::save(const fs::path &mdlPath, const fs::path &mdxPath) {
 
     string mdlData(mdlBuf->str());
     uint32_t mdlSize = static_cast<uint32_t>(mdlData.length());
-
-    string mdxData(mdxBuf->str());
-    uint32_t mdxSize = static_cast<uint32_t>(mdxData.length());
 
     auto mdl = make_shared<fs::ofstream>(mdlPath, ios::binary);
     StreamWriter mdlWriter(mdl);
@@ -119,12 +124,11 @@ void MdlWriter::writeGeometryHeader(int numNodes, uint32_t offRootNode, StreamWr
     mdl.putBytes(3, 0); // padding
 }
 
-void MdlWriter::writeModelHeader(int numNodes, uint32_t offRootNode, StreamWriter &mdl) {
+void MdlWriter::writeModelHeader(int numNodes, uint32_t offRootNode, uint32_t mdxSize, StreamWriter &mdl) {
     uint8_t subclassification = 0;
     uint8_t affectedByFog = 1;
     uint32_t numChildModels = 0;
     uint32_t superModelRef = 0;
-    uint32_t mdxSize2 = 0;
     uint32_t mdxOffset = 0;
 
     mdl.putByte(static_cast<uint8_t>(_model.classification()));
@@ -139,10 +143,10 @@ void MdlWriter::writeModelHeader(int numNodes, uint32_t offRootNode, StreamWrite
     }
     mdl.putFloat(kDefaultRadius);
     mdl.putFloat(_model.animationScale());
-    mdl.putStringExact("NULL", 32);
+    mdl.putStringExact("NULL", 32); // supermodel name
     mdl.putUint32(offRootNode);
     mdl.putUint32(0); // unknown
-    mdl.putUint32(mdxSize2);
+    mdl.putUint32(mdxSize);
     mdl.putUint32(mdxOffset);
     writeArrayDef(kGeometryHeaderSize + kModelHeaderSize, numNodes, mdl); // node names
 }
@@ -164,28 +168,18 @@ void MdlWriter::writeNodeNames(ModelNode &node, StreamWriter &mdl, vector<uint32
     }
 }
 
-void MdlWriter::writeNodes(uint32_t offNodes, uint32_t offParent, ModelNode &node, StreamWriter &mdl, StreamWriter &mdx, int &dfsIdx) {
-    uint32_t offThis = offNodes + static_cast<uint32_t>(mdl.tell());
-
-    uint32_t nodeSize = kNodeSizeDummy;
-    if (node.flags() & MdlNodeFlags::mesh) {
-        nodeSize += _tsl ? kNodeSizeTrimeshTsl : kNodeSizeTrimeshKotor;
-    }
-
-    uint16_t flags = node.flags();
+void MdlWriter::writeNodes(uint32_t offRoot, uint32_t offParent, uint32_t offNode, uint32_t offRaw, ModelNode &node, StreamWriter &mdl, StreamWriter &raw, StreamWriter &mdx, int &dfsIdx) {
     uint16_t nodeId = dfsIdx;
     uint16_t nameIndex = dfsIdx;
-    uint32_t offRootNode = offNodes;
-    uint32_t offParentNode = offParent;
-    uint32_t offChildren = offThis + nodeSize;
+    uint32_t offChildren = offNode + getNodeSize(node);
     uint32_t numChildren = static_cast<uint32_t>(node.children().size());
 
-    mdl.putUint16(flags);
+    mdl.putUint16(node.flags());
     mdl.putUint16(nodeId);
     mdl.putUint16(nameIndex);
     mdl.putUint16(0); // padding
-    mdl.putUint32(offRootNode);
-    mdl.putUint32(offParentNode);
+    mdl.putUint32(offRoot);
+    mdl.putUint32(offParent);
     for (int i = 0; i < 3; ++i) {
         mdl.putFloat(node.restPosition()[i]);
     }
@@ -197,19 +191,79 @@ void MdlWriter::writeNodes(uint32_t offNodes, uint32_t offParent, ModelNode &nod
     writeArrayDef(0, 0, mdl);                     // controllers
     writeArrayDef(0, 0, mdl);                     // controllers data
 
+    // Node types
+
     if (node.flags() & MdlNodeFlags::mesh) {
-        writeMesh(*node.mesh(), mdl, mdx);
+        writeMesh(offRaw, *node.mesh(), mdl, raw, mdx);
     }
+
+    // END Node ypes
+
+    // Child nodes
+
+    auto childBuf = make_shared<stringstream>();
+    StreamWriter childBufWriter(childBuf);
+
+    vector<uint32_t> childOffsets;
+    uint32_t offChild = offNode + static_cast<uint32_t>(mdl.tell()) + 4 * numChildren;
     for (auto &child : node.children()) {
-        writeNodes(offNodes, offThis, *child, mdl, mdx, ++dfsIdx);
+        childOffsets.push_back(offChild);
+        writeNodes(offRoot, offNode, offChild, offRaw, *child, childBufWriter, raw, mdx, ++dfsIdx);
+        offChild += static_cast<uint32_t>(childBufWriter.tell());
     }
+    for (auto &offset : childOffsets) {
+        mdl.putUint32(offset);
+    }
+
+    string childData(childBuf->str());
+    mdl.putString(childData);
+
+    // END Child nodes
 }
 
-void MdlWriter::writeMesh(const ModelNode::TriangleMesh &mesh, StreamWriter &mdl, StreamWriter &mdx) {
+void MdlWriter::writeMesh(uint32_t offRaw, const ModelNode::TriangleMesh &mesh, StreamWriter &mdl, StreamWriter &raw, StreamWriter &mdx) {
+    // Faces
+
+    int numFaces = static_cast<int>(mesh.mesh->indices().size()) / 3;
+    uint32_t offFaces = offRaw + static_cast<uint32_t>(raw.tell());
+    for (int i = 0; i < numFaces; ++i) {
+        // normal
+        raw.putFloat(0.0f);
+        raw.putFloat(0.0f);
+        raw.putFloat(1.0f);
+
+        raw.putFloat(0.0f); // distance
+        raw.putUint32(0);   // material
+
+        // adjacent faces
+        raw.putUint16(0);
+        raw.putUint16(0);
+        raw.putUint16(0);
+
+        // face indices
+        raw.putUint16(0);
+        raw.putUint16(0);
+        raw.putUint16(0);
+    }
+
+    // END Faces
+
+    // Indices
+
+    uint32_t offNumIndices = offRaw + static_cast<uint32_t>(raw.tell());
+    raw.putUint32(static_cast<uint32_t>(mesh.mesh->indices().size()));
+
+    uint32_t offOffIndices = 4 + offNumIndices;
+    raw.putUint32(4 + offOffIndices);
+    for (auto &idx : mesh.mesh->indices()) {
+        raw.putUint16(idx);
+    }
+
+    // END Indices
+
     uint32_t funcPtr1 = _tsl ? kMdlMeshFuncPtr1TslPC : kMdlMeshFuncPtr1KotorPC;
     uint32_t funcPtr2 = _tsl ? kMdlMeshFuncPtr2TslPC : kMdlMeshFuncPtr2KotorPC;
     vector<float> average {0.0f, 0.0f, 0.0f};
-    uint32_t transparencyHint = 0;
     uint32_t animateUV = 0;
     float uvDirectionX = 0.0f;
     float uvDirectionY = 0.0f;
@@ -233,7 +287,7 @@ void MdlWriter::writeMesh(const ModelNode::TriangleMesh &mesh, StreamWriter &mdl
 
     mdl.putUint32(funcPtr1);
     mdl.putUint32(funcPtr2);
-    writeArrayDef(0, 0, mdl); // faces
+    writeArrayDef(offFaces, numFaces, mdl); // faces
     for (auto &val : g_defaultBoundingBox) {
         mdl.putFloat(val);
     }
@@ -247,15 +301,15 @@ void MdlWriter::writeMesh(const ModelNode::TriangleMesh &mesh, StreamWriter &mdl
     for (int i = 0; i < 3; ++i) {
         mdl.putFloat(mesh.ambient[i]);
     }
-    mdl.putUint32(transparencyHint);
-    mdl.putStringExact("NULL", 32);
-    mdl.putStringExact("NULL", 32);
-    mdl.putStringExact("NULL", 12);
-    mdl.putStringExact("NULL", 12);
-    writeArrayDef(0, 0, mdl);   // indices count
-    writeArrayDef(0, 0, mdl);   // indices offset
-    writeArrayDef(0, 0, mdl);   // inverted counter
-    mdl.putBytes(3 * 4 + 8, 0); // unknown
+    mdl.putUint32(mesh.transparency);
+    mdl.putStringExact("NULL", 32);       // bitmap
+    mdl.putStringExact("", 32);           // bitmap2
+    mdl.putStringExact("", 12);           // bitmap?
+    mdl.putStringExact("", 12);           // bitmap?
+    writeArrayDef(offNumIndices, 1, mdl); // indices count
+    writeArrayDef(offOffIndices, 1, mdl); // indices offset
+    writeArrayDef(0, 0, mdl);             // inverted counter
+    mdl.putBytes(3 * 4 + 8, 0);           // unknown
     mdl.putUint32(animateUV);
     mdl.putFloat(uvDirectionX);
     mdl.putFloat(uvDirectionY);
@@ -302,6 +356,22 @@ void MdlWriter::writeArrayDef(uint32_t offset, uint32_t count, StreamWriter &mdl
     mdl.putUint32(offset);
     mdl.putUint32(count);
     mdl.putUint32(count);
+}
+
+uint32_t MdlWriter::getTreeSize(const ModelNode &node) const {
+    uint32_t result = getNodeSize(node) + 4 * static_cast<uint32_t>(node.children().size());
+    for (auto &child : node.children()) {
+        result += getTreeSize(*child);
+    }
+    return result;
+}
+
+uint32_t MdlWriter::getNodeSize(const ModelNode &node) const {
+    uint32_t result = kNodeSizeDummy;
+    if (node.flags() & MdlNodeFlags::mesh) {
+        result += _tsl ? kNodeSizeTrimeshTsl : kNodeSizeTrimeshKotor;
+    }
+    return result;
 }
 
 } // namespace graphics
