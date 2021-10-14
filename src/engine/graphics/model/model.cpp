@@ -22,6 +22,7 @@
 #include "../../common/logutil.h"
 
 #include "../mesh/mesh.h"
+#include "../types.h"
 
 #include "animation.h"
 #include "modelnode.h"
@@ -41,11 +42,13 @@ Model::Model(
     float animationScale) :
     _name(move(name)),
     _classification(classification),
-    _rootNode(ensurePresent(rootNode, "rootNode")),
+    _rootNode(rootNode),
     _superModel(move(superModel)),
     _animationScale(animationScale) {
 
-    fillNodeByName(_rootNode);
+    if (_rootNode) {
+        fillNodeByName(_rootNode);
+    }
     computeAABB();
 
     for (auto &anim : animations) {
@@ -136,6 +139,18 @@ shared_ptr<Animation> Model::getAnimation(const string &name) const {
     }
 
     return move(anim);
+}
+
+unique_ptr<Model> Model::newHeadless(string name) {
+    auto model = make_unique<Model>(
+        move(name),
+        MdlClassification::other,
+        nullptr,
+        vector<shared_ptr<Animation>>(),
+        nullptr,
+        1.0f);
+    model->_headless = true;
+    return move(model);
 }
 
 } // namespace graphics

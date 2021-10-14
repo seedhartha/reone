@@ -23,6 +23,8 @@
 #include "../../engine/graphics/model/format/mdlwriter.h"
 #include "../../engine/graphics/model/model.h"
 #include "../../engine/graphics/model/modelnode.h"
+#include "../../engine/graphics/texture/texture.h"
+#include "../../engine/graphics/texture/textureutil.h"
 #include "../../engine/graphics/types.h"
 
 using namespace std;
@@ -52,7 +54,7 @@ public:
         map<string, int> nodeIdxByName;
 
         string modelName;
-        string superModelName;
+        std::shared_ptr<Model> superModel;
         int classification = 0;
         float animationScale = kDefaultAnimationScale;
         int nodeFlags = 0;
@@ -64,6 +66,7 @@ public:
         glm::vec3 meshAmbient(g_defaultAmbient);
         int meshTransparency = 0;
         bool meshRender = false;
+        std::shared_ptr<Texture> meshBitmap;
         int meshNumVerts = 0;
         int meshNumTVerts = 0;
         int meshNumFaces = 0;
@@ -124,9 +127,9 @@ public:
             if (instruction == "newmodel") {
                 modelName = tokens[1];
             } else if (instruction == "setsupermodel") {
-                superModelName = tokens[2];
+                const string &superModelName = tokens[2];
                 if (!superModelName.empty() && boost::to_lower_copy(superModelName) != "null") {
-                    throw ValidationException("Super models are not implemented yet");
+                    superModel = Model::newHeadless(superModelName);
                 }
             } else if (instruction == "classification") {
                 classification = parseClassification(tokens[1]);
@@ -145,6 +148,7 @@ public:
                 meshAmbient = g_defaultAmbient;
                 meshTransparency = 0;
                 meshRender = false;
+                meshBitmap.reset();
                 meshNumVerts = 0;
                 meshNumTVerts = 0;
                 meshNumFaces = 0;
@@ -231,6 +235,7 @@ public:
                     triMesh->ambient = meshAmbient;
                     triMesh->transparency = meshTransparency;
                     triMesh->render = meshRender;
+                    triMesh->diffuseMap = move(meshBitmap);
                     modelNode->setMesh(move(triMesh));
                 }
                 nodeIdxByName[boost::to_lower_copy(nodeName)] = static_cast<int>(nodes.size());
@@ -256,10 +261,12 @@ public:
                 meshAmbient.r = atof(tokens[1].c_str());
                 meshAmbient.g = atof(tokens[2].c_str());
                 meshAmbient.b = atof(tokens[3].c_str());
-            } else if (instruction == "transparency") {
+            } else if (instruction == "transparencyhint") {
                 meshTransparency = atoi(tokens[1].c_str());
             } else if (instruction == "render") {
                 meshRender = atoi(tokens[1].c_str()) != 0;
+            } else if (instruction == "bitmap") {
+                meshBitmap = make_shared<Texture>(tokens[1], getTextureProperties(TextureUsage::Diffuse, true));
             } else if (instruction == "verts") {
                 meshNumVerts = atoi(tokens[1].c_str());
             } else if (instruction == "tverts") {
@@ -274,7 +281,7 @@ public:
             classification,
             nodes[0],
             vector<shared_ptr<Animation>>(),
-            nullptr,
+            move(superModel),
             animationScale);
     }
 
