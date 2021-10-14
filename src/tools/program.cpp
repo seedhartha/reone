@@ -26,7 +26,6 @@
 #include "tool/gff.h"
 #include "tool/keybif.h"
 #include "tool/lip.h"
-#include "tool/mdl.h"
 #include "tool/ncs.h"
 #include "tool/pth.h"
 #include "tool/rim.h"
@@ -60,8 +59,7 @@ static const unordered_map<string, Operation> g_operations {
     {"to-tlk", Operation::ToTLK},
     {"to-lip", Operation::ToLIP},
     {"to-pcode", Operation::ToPCODE},
-    {"to-ncs", Operation::ToNCS},
-    {"to-mdl", Operation::ToMDL}};
+    {"to-ncs", Operation::ToNCS}};
 
 static fs::path getDestination(const po::variables_map &vars) {
     fs::path result;
@@ -176,7 +174,6 @@ void Program::loadTools() {
     _tools.push_back(make_shared<PthTool>());
     _tools.push_back(make_shared<AudioTool>());
     _tools.push_back(make_shared<NcsTool>(_gameId));
-    _tools.push_back(make_shared<MdlTool>(_gameId));
 }
 
 shared_ptr<ITool> Program::getTool() const {

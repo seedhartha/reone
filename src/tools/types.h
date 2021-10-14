@@ -38,8 +38,7 @@ enum class Operation {
     ToTLK,
     ToLIP,
     ToPCODE,
-    ToNCS,
-    ToMDL
+    ToNCS
 };
 
 } // namespace tools
