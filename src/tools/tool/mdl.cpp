@@ -101,7 +101,6 @@ public:
                 glm::vec3 tvert;
                 tvert.x = atof(tokens[0].c_str());
                 tvert.y = atof(tokens[1].c_str());
-                tvert.z = atof(tokens[2].c_str());
                 meshTVerts.push_back(move(tvert));
                 --meshNumTVerts;
                 continue;
@@ -132,14 +131,14 @@ public:
                     superModel = Model::newHeadless(superModelName);
                 }
             } else if (instruction == "classification") {
-                classification = parseClassification(tokens[1]);
+                classification = parseClassification(boost::to_lower_copy(tokens[1]));
             } else if (instruction == "setanimationscale") {
                 animationScale = atof(tokens[1].c_str());
             } else if (instruction == "node") {
                 if (!nodeName.empty()) {
                     throw ValidationException("Cannot start a node because another node is already started: " + nodeName);
                 }
-                nodeFlags = parseNodeFlags(tokens[1]);
+                nodeFlags = parseNodeFlags(boost::to_lower_copy(tokens[1]));
                 nodeName = tokens[2];
                 nodeParent.clear();
                 nodePosition = glm::vec3(0.0f);
