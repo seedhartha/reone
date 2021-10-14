@@ -206,7 +206,6 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/model/animatedproperty.h
     src/engine/graphics/model/animation.h
     src/engine/graphics/model/format/mdlreader.h
-    src/engine/graphics/model/format/mdlwriter.h
     src/engine/graphics/model/model.h
     src/engine/graphics/model/modelnode.h
     src/engine/graphics/model/models.h
@@ -247,7 +246,6 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/mesh/meshes.cpp
     src/engine/graphics/model/animation.cpp
     src/engine/graphics/model/format/mdlreader.cpp
-    src/engine/graphics/model/format/mdlwriter.cpp
     src/engine/graphics/model/model.cpp
     src/engine/graphics/model/modelnode.cpp
     src/engine/graphics/model/models.cpp
@@ -1068,7 +1066,6 @@ if(BUILD_TOOLS)
         src/tools/tool/itool.h
         src/tools/tool/keybif.h
         src/tools/tool/lip.h
-        src/tools/tool/mdl.h
         src/tools/tool/ncs.h
         src/tools/tool/pth.h
         src/tools/tool/rim.h
@@ -1085,7 +1082,6 @@ if(BUILD_TOOLS)
         src/tools/tool/gff.cpp
         src/tools/tool/keybif.cpp
         src/tools/tool/lip.cpp
-        src/tools/tool/mdl.cpp
         src/tools/tool/ncs.cpp
         src/tools/tool/pth.cpp
         src/tools/tool/rim.cpp
