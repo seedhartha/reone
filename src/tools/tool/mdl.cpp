@@ -62,6 +62,7 @@ public:
         glm::quat nodeOrientation(1.0f, 0.0f, 0.0f, 0.0f);
         glm::vec3 meshDiffuse(g_defaultDiffuse);
         glm::vec3 meshAmbient(g_defaultAmbient);
+        int meshTransparency = 0;
         bool meshRender = false;
         int meshNumVerts = 0;
         int meshNumTVerts = 0;
@@ -142,6 +143,7 @@ public:
                 nodeOrientation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
                 meshDiffuse = g_defaultDiffuse;
                 meshAmbient = g_defaultAmbient;
+                meshTransparency = 0;
                 meshRender = false;
                 meshNumVerts = 0;
                 meshNumTVerts = 0;
@@ -227,6 +229,7 @@ public:
                     triMesh->mesh = move(mesh);
                     triMesh->diffuse = meshDiffuse;
                     triMesh->ambient = meshAmbient;
+                    triMesh->transparency = meshTransparency;
                     triMesh->render = meshRender;
                     modelNode->setMesh(move(triMesh));
                 }
@@ -235,6 +238,16 @@ public:
                 nodeName.clear();
             } else if (instruction == "parent") {
                 nodeParent = tokens[1];
+            } else if (instruction == "position") {
+                nodePosition.x = atof(tokens[1].c_str());
+                nodePosition.y = atof(tokens[2].c_str());
+                nodePosition.z = atof(tokens[3].c_str());
+            } else if (instruction == "orientation") {
+                float x = atof(tokens[1].c_str());
+                float y = atof(tokens[2].c_str());
+                float z = atof(tokens[3].c_str());
+                float a = atof(tokens[4].c_str());
+                nodeOrientation = glm::angleAxis(a, glm::vec3(x, y, z));
             } else if (instruction == "diffuse") {
                 meshDiffuse.r = atof(tokens[1].c_str());
                 meshDiffuse.g = atof(tokens[2].c_str());
@@ -243,6 +256,8 @@ public:
                 meshAmbient.r = atof(tokens[1].c_str());
                 meshAmbient.g = atof(tokens[2].c_str());
                 meshAmbient.b = atof(tokens[3].c_str());
+            } else if (instruction == "transparency") {
+                meshTransparency = atoi(tokens[1].c_str());
             } else if (instruction == "render") {
                 meshRender = atoi(tokens[1].c_str()) != 0;
             } else if (instruction == "verts") {
