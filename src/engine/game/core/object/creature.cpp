@@ -18,6 +18,7 @@
 #include "creature.h"
 
 #include "../../../audio/player.h"
+#include "../../../common/exception/validation.h"
 #include "../../../common/logutil.h"
 #include "../../../common/randomutil.h"
 #include "../../../common/streamutil.h"
@@ -87,6 +88,10 @@ void Creature::loadFromBlueprint(const string &resRef) {
 
 void Creature::loadAppearance() {
     shared_ptr<TwoDA> appearances(_resources.get2DA("appearance"));
+    if (!appearances) {
+        throw ValidationException("appearance 2DA is not found");
+    }
+
     _modelType = parseModelType(appearances->getString(_appearance, "modeltype"));
     _walkSpeed = appearances->getFloat(_appearance, "walkdist");
     _runSpeed = appearances->getFloat(_appearance, "rundist");
@@ -110,7 +115,7 @@ Creature::ModelType Creature::parseModelType(const string &s) const {
         return ModelType::Character;
     }
 
-    throw logic_error("Unsupported model type: " + s);
+    throw logic_error("Model type '" + s + "' is not supported");
 }
 
 void Creature::updateModel() {
@@ -1099,6 +1104,9 @@ string Creature::getBodyModelName() const {
     }
 
     shared_ptr<TwoDA> appearance(_resources.get2DA("appearance"));
+    if (!appearance) {
+        throw ValidationException("appearance 2DA is not found");
+    }
 
     string modelName(appearance->getString(_appearance, column));
     boost::to_lower(modelName);
@@ -1124,6 +1132,9 @@ string Creature::getBodyTextureName() const {
     }
 
     shared_ptr<TwoDA> appearance(_resources.get2DA("appearance"));
+    if (!appearance) {
+        throw ValidationException("appearance 2DA is not found");
+    }
 
     string texName(boost::to_lower_copy(appearance->getString(_appearance, column)));
     if (texName.empty())
@@ -1148,16 +1159,21 @@ string Creature::getBodyTextureName() const {
 }
 
 string Creature::getHeadModelName() const {
-    if (_modelType != Creature::ModelType::Character)
+    if (_modelType != Creature::ModelType::Character) {
         return "";
-
+    }
     shared_ptr<TwoDA> appearance(_resources.get2DA("appearance"));
-
+    if (!appearance) {
+        throw ValidationException("appearance 2DA is not found");
+    }
     int headIdx = appearance->getInt(_appearance, "normalhead", -1);
-    if (headIdx == -1)
+    if (headIdx == -1) {
         return "";
-
+    }
     shared_ptr<TwoDA> heads(_resources.get2DA("heads"));
+    if (!heads) {
+        throw ValidationException("heads 2DA is not found");
+    }
 
     string modelName(heads->getString(headIdx, "head"));
     boost::to_lower(modelName);
@@ -1274,19 +1290,26 @@ void Creature::loadNameFromUTC(const GffStruct &utc) {
 }
 
 void Creature::loadSoundSetFromUTC(const GffStruct &utc) {
-    uint32_t soundSetIdx = utc.getUint("SoundSetFile");
-    if (soundSetIdx != 0xffff) {
-        shared_ptr<TwoDA> soundSetTable(_resources.get2DA("soundset"));
-        string soundSetResRef(soundSetTable->getString(soundSetIdx, "resref"));
-        if (!soundSetResRef.empty()) {
-            _soundSet = _soundSets.get(soundSetResRef);
-        }
+    uint32_t soundSetIdx = utc.getUint("SoundSetFile", 0xffff);
+    if (soundSetIdx == 0xffff) {
+        return;
+    }
+    shared_ptr<TwoDA> soundSetTable(_resources.get2DA("soundset"));
+    if (!soundSetTable) {
+        return;
+    }
+    string soundSetResRef(soundSetTable->getString(soundSetIdx, "resref"));
+    if (!soundSetResRef.empty()) {
+        _soundSet = _soundSets.get(soundSetResRef);
     }
 }
 
 void Creature::loadBodyBagFromUTC(const GffStruct &utc) {
-    int bodyBag = utc.getInt("BodyBag");
     shared_ptr<TwoDA> bodyBags(_resources.get2DA("bodybag"));
+    if (!bodyBags) {
+        return;
+    }
+    int bodyBag = utc.getInt("BodyBag");
     _bodyBag.name = _strings.get(bodyBags->getInt(bodyBag, "name"));
     _bodyBag.appearance = bodyBags->getInt(bodyBag, "appearance");
     _bodyBag.corpse = bodyBags->getBool(bodyBag, "corpse");
@@ -1324,8 +1347,11 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
 }
 
 void Creature::loadPerceptionRangeFromUTC(const GffStruct &utc) {
-    int rangeIdx = utc.getInt("PerceptionRange");
     shared_ptr<TwoDA> ranges(_resources.get2DA("ranges"));
+    if (!ranges) {
+        return;
+    }
+    int rangeIdx = utc.getInt("PerceptionRange");
     _perception.sightRange = ranges->getFloat(rangeIdx, "primaryrange");
     _perception.hearingRange = ranges->getFloat(rangeIdx, "secondaryrange");
 }
