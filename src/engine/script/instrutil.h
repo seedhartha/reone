@@ -23,11 +23,13 @@ namespace reone {
 
 namespace script {
 
-class IRoutineProvider;
-
 struct Instruction;
 
+class IRoutineProvider;
+
 std::string describeInstruction(const Instruction &ins, const IRoutineProvider &routines);
+
+const std::string &describeInstructionType(InstructionType type);
 InstructionType parseInstructionType(const std::string &desc);
 
 } // namespace script
