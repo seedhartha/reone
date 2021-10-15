@@ -132,14 +132,7 @@ static map<string, InstructionType> g_instrTypeByDesc = associate<pair<Instructi
     [](auto &pair) { return pair.first; });
 
 string describeInstruction(const Instruction &ins, const IRoutineProvider &routines) {
-    string desc(str(boost::format("%08x") % ins.offset));
-
-    auto maybeDesc = g_descByInstrType.find(ins.type);
-    if (maybeDesc == g_descByInstrType.end()) {
-        throw runtime_error(str(boost::format("Unsupported instruction type: %04x") % static_cast<int>(ins.type)));
-    }
-
-    desc += " " + maybeDesc->second;
+    string desc(str(boost::format("%08x %s") % ins.offset % describeInstructionType(ins.type)));
 
     switch (ins.type) {
     case InstructionType::CPDOWNSP:
@@ -195,6 +188,14 @@ string describeInstruction(const Instruction &ins, const IRoutineProvider &routi
     }
 
     return move(desc);
+}
+
+const string &describeInstructionType(InstructionType type) {
+    auto maybeDesc = g_descByInstrType.find(type);
+    if (maybeDesc == g_descByInstrType.end()) {
+        throw invalid_argument("Unsupported instruction type: " + to_string(static_cast<int>(type)));
+    }
+    return maybeDesc->second;
 }
 
 InstructionType parseInstructionType(const string &desc) {

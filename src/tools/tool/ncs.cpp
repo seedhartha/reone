@@ -20,6 +20,7 @@
 #include <boost/regex.hpp>
 
 #include "../../engine/common/collectionutil.h"
+#include "../../engine/common/exception/validation.h"
 #include "../../engine/common/logutil.h"
 #include "../../engine/game/core/script/routine/iroutines.h"
 #include "../../engine/game/kotor/routine/registrar.h"
@@ -74,13 +75,43 @@ public:
     }
 
     void load() {
+        vector<string> insLines;
+        map<int, string> labelByLineIdx;
+        map<int, uint32_t> addrByLineIdx;
+
         fs::ifstream pcode(_path);
-
-        _program = make_shared<ScriptProgram>("");
-
         string line;
+        boost::smatch what;
+        boost::regex re("^([_\\d\\w]+):$");
+        uint32_t addr = 13;
         while (getline(pcode, line)) {
-            _program->add(parseInstruction(line));
+            boost::trim(line);
+            if (line.empty()) {
+                continue;
+            }
+            int lineIdx = static_cast<int>(insLines.size());
+            if (boost::regex_match(line, what, re)) {
+                labelByLineIdx[lineIdx] = what[1].str();
+                continue;
+            }
+            addrByLineIdx[lineIdx] = addr;
+            addr += getInstructionSize(line);
+            insLines.push_back(line);
+        }
+
+        fs::path filename(_path.filename());
+        filename.replace_extension(); // drop .pcode
+        filename.replace_extension(); // drop .ncs
+
+        _addrByLabel.clear();
+        for (auto &pair : labelByLineIdx) {
+            _addrByLabel[pair.second] = addrByLineIdx[pair.first];
+        }
+
+        _program = make_shared<ScriptProgram>(filename.string());
+        for (size_t i = 0; i < insLines.size(); ++i) {
+            uint32_t insAddr = addrByLineIdx.find(static_cast<int>(i))->second;
+            _program->add(parseInstruction(insLines[i], insAddr));
         }
     }
 
@@ -90,23 +121,69 @@ private:
     fs::path _path;
 
     shared_ptr<ScriptProgram> _program;
+    map<string, uint32_t> _addrByLabel;
 
-    Instruction parseInstruction(const string &line) const {
-        char *p = nullptr;
+    int getInstructionSize(const string &line) {
+        int result = 2;
 
-        boost::smatch what;
-        boost::regex re("^([\\d\\w]{8}) (\\w+).*$");
-        if (!boost::regex_match(line, what, re)) {
-            throw invalid_argument("line must contain at least offset and instruction type");
-        }
-        uint32_t offset = strtoul(what[1].str().c_str(), &p, 16);
-        string typeDesc = what[2].str();
-        string argsLine(line.substr(9 + typeDesc.length()));
+        size_t spaceIdx = line.find(" ");
+        string typeDesc(spaceIdx != string::npos ? line.substr(0, spaceIdx) : line);
+        string argsLine(line.substr(typeDesc.length()));
+        InstructionType type = parseInstructionType(typeDesc);
 
+        switch (type) {
+        case InstructionType::CPDOWNSP:
+        case InstructionType::CPTOPSP:
+        case InstructionType::CPDOWNBP:
+        case InstructionType::CPTOPBP:
+        case InstructionType::DESTRUCT:
+            result += 6;
+            break;
+        case InstructionType::CONSTI:
+        case InstructionType::CONSTF:
+        case InstructionType::CONSTO:
+        case InstructionType::MOVSP:
+        case InstructionType::JMP:
+        case InstructionType::JSR:
+        case InstructionType::JZ:
+        case InstructionType::JNZ:
+        case InstructionType::DECISP:
+        case InstructionType::INCISP:
+        case InstructionType::DECIBP:
+        case InstructionType::INCIBP:
+            result += 4;
+            break;
+        case InstructionType::CONSTS:
+            result += 2;
+            applyArguments(argsLine, "^ \"(.*)\"$", 1, [&result](auto &args) {
+                result += args[0].length();
+            });
+            break;
+        case InstructionType::ACTION:
+            result += 3;
+            break;
+        case InstructionType::STORE_STATE:
+            result += 8;
+            break;
+        case InstructionType::EQUALTT:
+        case InstructionType::NEQUALTT:
+            result += 2;
+            break;
+        default:
+            break;
+        };
+
+        return result;
+    }
+
+    Instruction parseInstruction(const string &line, uint32_t addr) const {
+        size_t spaceIdx = line.find(" ");
+        string typeDesc(spaceIdx != string::npos ? line.substr(0, spaceIdx) : line);
+        string argsLine(line.substr(typeDesc.length()));
         InstructionType type = parseInstructionType(typeDesc);
 
         Instruction ins;
-        ins.offset = offset;
+        ins.offset = addr;
         ins.type = type;
 
         switch (type) {
@@ -154,8 +231,13 @@ private:
         case InstructionType::JSR:
         case InstructionType::JZ:
         case InstructionType::JNZ:
-            applyArguments(argsLine, "^ [\\d\\w]{8}\\(([-\\d]+)\\)$", 1, [&ins](auto &args) {
-                ins.jumpOffset = atoi(args[0].c_str());
+            applyArguments(argsLine, "^ ([_\\d\\w]+)$", 1, [this, &ins](auto &args) {
+                const string &label = args[0];
+                auto maybeAddr = _addrByLabel.find(label);
+                if (maybeAddr == _addrByLabel.end()) {
+                    throw ValidationException("Instruction address not found by label '" + label + "'");
+                }
+                ins.jumpOffset = maybeAddr->second - ins.offset;
             });
             break;
         case InstructionType::DESTRUCT:
@@ -206,6 +288,107 @@ private:
     }
 };
 
+class PcodeWriter {
+public:
+    PcodeWriter(ScriptProgram &program, IRoutines &routines) :
+        _program(program),
+        _routines(routines) {
+    }
+
+    void save(const fs::path &path) {
+        fs::ofstream pcode(path);
+        try {
+            set<uint32_t> jumpOffsets;
+            for (auto &instr : _program.instructions()) {
+                switch (instr.type) {
+                case InstructionType::JMP:
+                case InstructionType::JSR:
+                case InstructionType::JZ:
+                case InstructionType::JNZ:
+                    jumpOffsets.insert(instr.offset + instr.jumpOffset);
+                    break;
+                default:
+                    break;
+                }
+            }
+            for (auto &instr : _program.instructions()) {
+                writeInstruction(instr, pcode, jumpOffsets);
+            }
+        } catch (const exception &e) {
+            fs::remove(path);
+            throw runtime_error(e.what());
+        }
+    }
+
+private:
+    ScriptProgram &_program;
+    IRoutines &_routines;
+
+    void writeInstruction(const Instruction &ins, fs::ofstream &pcode, const set<uint32_t> &jumpOffsets) {
+        if (jumpOffsets.count(ins.offset) > 0) {
+            string label(str(boost::format("fn_%08x:") % ins.offset));
+            pcode << label << endl;
+        }
+
+        string desc(describeInstructionType(ins.type));
+
+        switch (ins.type) {
+        case InstructionType::CPDOWNSP:
+        case InstructionType::CPTOPSP:
+        case InstructionType::CPDOWNBP:
+        case InstructionType::CPTOPBP:
+            desc += str(boost::format(" %d, %d") % ins.stackOffset % ins.size);
+            break;
+        case InstructionType::CONSTI:
+            desc += " " + to_string(ins.intValue);
+            break;
+        case InstructionType::CONSTF:
+            desc += " " + to_string(ins.floatValue);
+            break;
+        case InstructionType::CONSTS:
+            desc += " \"" + ins.strValue + "\"";
+            break;
+        case InstructionType::CONSTO:
+            desc += " " + to_string(ins.objectId);
+            break;
+        case InstructionType::ACTION:
+            desc += str(boost::format(" %s(%d), %d") % _routines.get(ins.routine).name() % ins.routine % ins.argCount);
+            break;
+        case InstructionType::EQUALTT:
+        case InstructionType::NEQUALTT:
+            desc += " " + to_string(ins.size);
+            break;
+        case InstructionType::MOVSP:
+            desc += " " + to_string(ins.stackOffset);
+            break;
+        case InstructionType::JMP:
+        case InstructionType::JSR:
+        case InstructionType::JZ:
+        case InstructionType::JNZ: {
+            uint32_t jumpAddr = ins.offset + ins.jumpOffset;
+            desc += str(boost::format(" fn_%08x") % jumpAddr);
+            break;
+        }
+        case InstructionType::DESTRUCT:
+            desc += str(boost::format(" %d, %d, %d") % ins.size % ins.stackOffset % ins.sizeNoDestroy);
+            break;
+        case InstructionType::DECISP:
+        case InstructionType::INCISP:
+        case InstructionType::DECIBP:
+        case InstructionType::INCIBP:
+            desc += " " + to_string(ins.stackOffset);
+            break;
+        case InstructionType::STORE_STATE:
+            desc += str(boost::format(" %d, %d") % ins.size % ins.sizeLocals);
+            break;
+        default:
+            break;
+        }
+
+        pcode << desc << endl;
+    }
+};
+
 void NcsTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     if (operation == Operation::ToPCODE) {
         toPCODE(target, destPath);
@@ -220,20 +403,12 @@ void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
 
     NcsReader ncs("");
     ncs.load(path);
-    auto program = ncs.program();
 
     fs::path pcodePath(destPath);
     pcodePath.append(path.filename().string() + ".pcode");
 
-    fs::ofstream pcode(pcodePath);
-    try {
-        for (auto &instr : program->instructions()) {
-            pcode << describeInstruction(instr, routines) << endl;
-        }
-    } catch (const exception &e) {
-        fs::remove(pcodePath);
-        throw runtime_error(e.what());
-    }
+    PcodeWriter pcode(*ncs.program(), routines);
+    pcode.save(pcodePath);
 }
 
 void NcsTool::toNCS(const fs::path &path, const fs::path &destPath) {

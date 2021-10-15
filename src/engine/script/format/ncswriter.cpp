@@ -18,6 +18,7 @@
 #include "ncswriter.h"
 
 #include "../../common/collectionutil.h"
+#include "../../common/exception/validation.h"
 #include "../../common/streamutil.h"
 #include "../../common/streamwriter.h"
 
@@ -38,6 +39,10 @@ void NcsWriter::save(const fs::path &path) {
 
     for (auto &ins : _program.instructions()) {
         auto pos = 13 + static_cast<uint32_t>(writer.tell());
+        if (ins.offset != pos) {
+            throw ValidationException(str(boost::format("Instruction offset mismatch: expected=%08x, actual=%08x") % ins.offset % pos));
+        }
+
         writer.putByte(static_cast<int>(ins.type) & 0xff);
         writer.putByte((static_cast<int>(ins.type) >> 8) & 0xff);
 
