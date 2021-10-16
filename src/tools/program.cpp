@@ -27,7 +27,6 @@
 #include "tool/keybif.h"
 #include "tool/lip.h"
 #include "tool/ncs.h"
-#include "tool/pth.h"
 #include "tool/rim.h"
 #include "tool/tlk.h"
 #include "tool/tpc.h"
@@ -54,8 +53,6 @@ static const unordered_map<string, Operation> g_operations {
     {"to-rim", Operation::ToRIM},
     {"to-erf", Operation::ToERF},
     {"to-mod", Operation::ToMOD},
-    {"to-pth", Operation::ToPTH},
-    {"to-ascii", Operation::ToASCII},
     {"to-tlk", Operation::ToTLK},
     {"to-lip", Operation::ToLIP},
     {"to-pcode", Operation::ToPCODE},
@@ -112,13 +109,10 @@ void Program::initOptions() {
         ("to-rim", "create RIM archive from directory")                                        //
         ("to-erf", "create ERF archive from directory")                                        //
         ("to-mod", "create MOD archive from directory")                                        //
-        ("to-pth", "convert ASCII PTH to binary PTH")                                          //
-        ("to-ascii", "convert binary PTH to ASCII")                                            //
         ("to-tlk", "convert JSON to TLK")                                                      //
         ("to-lip", "convert JSON to LIP")                                                      //
         ("to-pcode", "convert NCS to PCODE")                                                   //
         ("to-ncs", "convert PCODE to NCS")                                                     //
-        ("to-mdl", "convert ASCII MDL to MDL")                                                 //
         ("target", po::value<string>(), "target name or path to input file");
 }
 
@@ -171,7 +165,6 @@ void Program::loadTools() {
     _tools.push_back(make_shared<LipTool>());
     _tools.push_back(make_shared<GffTool>());
     _tools.push_back(make_shared<TpcTool>());
-    _tools.push_back(make_shared<PthTool>());
     _tools.push_back(make_shared<AudioTool>());
     _tools.push_back(make_shared<NcsTool>(_gameId));
 }
