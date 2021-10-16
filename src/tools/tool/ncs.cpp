@@ -227,14 +227,8 @@ private:
             });
             break;
         case InstructionType::ACTION:
-            applyArguments(argsLine, "^ (\\w+|\\w+\\(\\d+\\)), (\\d+)$", 2, [this, &ins](auto &args) {
-                size_t openBracketIdx = args[0].find('(');
-                if (openBracketIdx != string::npos) {
-                    string number(args[0].substr(openBracketIdx + 1, args[0].length() - openBracketIdx - 2));
-                    ins.routine = atoi(number.c_str());
-                } else {
-                    ins.routine = _routines.getIndexByName(args[0]);
-                }
+            applyArguments(argsLine, "^ (\\w+), (\\d+)$", 2, [this, &ins](auto &args) {
+                ins.routine = _routines.getIndexByName(args[0]);
                 ins.argCount = atoi(args[1].c_str());
             });
             break;
@@ -368,7 +362,7 @@ private:
             desc += " " + to_string(ins.objectId);
             break;
         case InstructionType::ACTION:
-            desc += str(boost::format(" %s(%d), %d") % _routines.get(ins.routine).name() % ins.routine % ins.argCount);
+            desc += str(boost::format(" %s, %d") % _routines.get(ins.routine).name() % ins.argCount);
             break;
         case InstructionType::EQUALTT:
         case InstructionType::NEQUALTT:
