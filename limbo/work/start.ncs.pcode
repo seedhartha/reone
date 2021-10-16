@@ -1,2 +1,2 @@
 CONSTS "m01aa"
-ACTION StartNewModule(11), 1
+ACTION StartNewModule, 1
