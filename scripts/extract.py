@@ -44,9 +44,8 @@ steps = [
     ["extract_lips", "Extract LIP files (y/n)?"],
     ["convert_to_json", "Convert 2DA, GFF, TLK and LIP to JSON (y/n)?"],
     ["convert_to_tga", "Convert TPC to TGA/TXI (y/n)?"],
-    ["convert_to_ascii_pth", "Convert binary PTH to ASCII PTH (y/n)?"],
     ["disassemble_scripts", "Disassemble NCS scripts (y/n)?"]
-    ]
+]
 
 
 def find_path_ignore_case(dir, name):
@@ -140,7 +139,8 @@ def extract_bifs():
         if f.lower().endswith(".bif"):
             print("Extracting {}...".format(f))
             bif_path = os.path.join(data_dir, f)
-            run_subprocess([tools_exe, "--game", game_dir, "--extract", bif_path, "--dest", dest_dir])
+            run_subprocess([tools_exe, "--game", game_dir,
+                           "--extract", bif_path, "--dest", dest_dir])
 
 
 def extract_patch():
@@ -172,7 +172,8 @@ def extract_modules():
             dest_dir = get_or_create_dir(dest_dir_base, f[:-4])
             print("Extracting {}...".format(f))
             rim_path = os.path.join(modules_dir, f)
-            run_subprocess([tools_exe, "--extract", rim_path, "--dest", dest_dir])
+            run_subprocess(
+                [tools_exe, "--extract", rim_path, "--dest", dest_dir])
 
 
 def extract_textures():
@@ -192,7 +193,8 @@ def extract_textures():
         if f in TEXTURE_PACKS:
             texture_pack_dir = os.path.join(texture_packs_dir, f)
             print("Extracting {}...".format(texture_pack_dir))
-            run_subprocess([tools_exe, "--extract", texture_pack_dir, "--dest", dest_dir])
+            run_subprocess(
+                [tools_exe, "--extract", texture_pack_dir, "--dest", dest_dir])
 
 
 def extract_dialog():
@@ -245,7 +247,8 @@ def extract_lips():
         if extension.lower() == ".mod":
             mod_path = os.path.join(lips_dir, f)
             print("Extracting {}...".format(mod_path))
-            run_subprocess([tools_exe, "--extract", mod_path, "--dest", dest_dir])
+            run_subprocess(
+                [tools_exe, "--extract", mod_path, "--dest", dest_dir])
 
 
 def is_convertible_to_json(path):
@@ -258,7 +261,7 @@ def is_convertible_to_json(path):
         ".tlk",
         ".lip",
         ".pth"
-        ]
+    ]
 
     _, extension = os.path.splitext(path)
     return extension.lower() in CONVERTIBLE_EXT
@@ -286,14 +289,6 @@ def convert_to_tga():
             continue
         print("Converting {} to TGA/TXI...".format(f))
         run_subprocess([tools_exe, "--to-tga", f], check_retcode=False)
-
-
-def convert_to_ascii_pth():
-    global extract_dir, tools_exe
-
-    for f in glob.glob("{}/**/*.pth".format(extract_dir), recursive=True):
-        print("Converting {} to ASCII PTH...".format(f))
-        run_subprocess([tools_exe, "--to-ascii", f])
 
 
 def disassemble_scripts():
@@ -366,10 +361,6 @@ for step in steps:
         if step[0] == "convert_to_tga":
             configure_tools_dir()
             convert_to_tga()
-
-        if step[0] == "convert_to_ascii_pth":
-            configure_tools_dir()
-            convert_to_ascii_pth()
 
         if step[0] == "disassemble_scripts":
             configure_game_dir()

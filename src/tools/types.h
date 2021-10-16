@@ -33,8 +33,6 @@ enum class Operation {
     ToRIM,
     ToERF,
     ToMOD,
-    ToPTH,
-    ToASCII,
     ToTLK,
     ToLIP,
     ToPCODE,

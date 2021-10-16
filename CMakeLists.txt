@@ -1067,7 +1067,6 @@ if(BUILD_TOOLS)
         src/tools/tool/keybif.h
         src/tools/tool/lip.h
         src/tools/tool/ncs.h
-        src/tools/tool/pth.h
         src/tools/tool/rim.h
         src/tools/tool/tlk.h
         src/tools/tool/tpc.h
@@ -1083,7 +1082,6 @@ if(BUILD_TOOLS)
         src/tools/tool/keybif.cpp
         src/tools/tool/lip.cpp
         src/tools/tool/ncs.cpp
-        src/tools/tool/pth.cpp
         src/tools/tool/rim.cpp
         src/tools/tool/tlk.cpp
         src/tools/tool/tpc.cpp)
