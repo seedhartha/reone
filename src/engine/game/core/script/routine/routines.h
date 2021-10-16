@@ -61,15 +61,6 @@ public:
         _strings(strings) {
     }
 
-    const script::Routine &get(int index) const override {
-        if (isOutOfRange(_routines, index)) {
-            throw std::out_of_range("index is out of range");
-        }
-        return _routines[index];
-    }
-
-    void setGame(Game &game) { _game = &game; }
-
     void add(
         std::string name,
         script::VariableType retType,
@@ -95,6 +86,24 @@ public:
                 return fn(args, std::move(ctx));
             });
     }
+
+    int getIndexByName(const std::string &name) const override {
+        for (size_t i = 0; i < _routines.size(); ++i) {
+            if (_routines[i].name() == name) {
+                return static_cast<int>(i);
+            }
+        }
+        return -1;
+    }
+
+    const script::Routine &get(int index) const override {
+        if (isOutOfRange(_routines, index)) {
+            throw std::out_of_range("index is out of range");
+        }
+        return _routines[index];
+    }
+
+    void setGame(Game &game) { _game = &game; }
 
 private:
     std::vector<script::Routine> _routines;

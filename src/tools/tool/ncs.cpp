@@ -62,6 +62,14 @@ public:
         _routines.push_back(move(routine));
     }
 
+    int getIndexByName(const std::string &name) const override {
+        for (size_t i = 0; i < _routines.size(); ++i) {
+            if (_routines[i].name() == name) {
+                return static_cast<int>(i);
+            }
+        }
+    }
+
     const Routine &get(int index) const override { return _routines[index]; }
 
 private:
@@ -70,8 +78,9 @@ private:
 
 class PcodeReader {
 public:
-    PcodeReader(fs::path path) :
-        _path(move(path)) {
+    PcodeReader(fs::path path, IRoutines &routines) :
+        _path(move(path)),
+        _routines(routines) {
     }
 
     void load() {
@@ -119,6 +128,7 @@ public:
 
 private:
     fs::path _path;
+    IRoutines &_routines;
 
     shared_ptr<ScriptProgram> _program;
     map<string, uint32_t> _addrByLabel;
@@ -217,8 +227,14 @@ private:
             });
             break;
         case InstructionType::ACTION:
-            applyArguments(argsLine, "^ \\w+\\((\\d+)\\), (\\d+)$", 2, [&ins](auto &args) {
-                ins.routine = atoi(args[0].c_str());
+            applyArguments(argsLine, "^ (\\w+|\\w+\\(\\d+\\)), (\\d+)$", 2, [this, &ins](auto &args) {
+                size_t openBracketIdx = args[0].find('(');
+                if (openBracketIdx != string::npos) {
+                    string number(args[0].substr(openBracketIdx + 1, args[0].length() - openBracketIdx - 2));
+                    ins.routine = atoi(number.c_str());
+                } else {
+                    ins.routine = _routines.getIndexByName(args[0]);
+                }
                 ins.argCount = atoi(args[1].c_str());
             });
             break;
@@ -415,7 +431,7 @@ void NcsTool::toNCS(const fs::path &path, const fs::path &destPath) {
     StubRoutines routines;
     fillRoutines(routines);
 
-    PcodeReader pcode(path);
+    PcodeReader pcode(path, routines);
     pcode.load();
     auto program = pcode.program();
 

@@ -28,6 +28,7 @@ public:
     virtual ~IRoutineProvider() {
     }
 
+    virtual int getIndexByName(const std::string &name) const = 0;
     virtual const Routine &get(int index) const = 0;
 };
 
