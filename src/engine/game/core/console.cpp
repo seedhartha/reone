@@ -75,6 +75,7 @@ void Console::initCommands() {
     addCommand("kill", bind(&Console::cmdKill, this, _1));
     addCommand("additem", bind(&Console::cmdAddItem, this, _1));
     addCommand("givexp", bind(&Console::cmdGiveXP, this, _1));
+    addCommand("warp", bind(&Console::cmdWarp, this, _1));
 }
 
 void Console::addCommand(const std::string &name, const CommandHandler &handler) {
@@ -207,6 +208,14 @@ void Console::cmdGiveXP(vector<string> tokens) {
 
     int amount = stoi(tokens[1]);
     static_pointer_cast<Creature>(object)->giveXP(amount);
+}
+
+void Console::cmdWarp(vector<string> tokens) {
+    if (tokens.size() < 2) {
+        print("Usage: warp module");
+        return;
+    }
+    _game.loadModule(tokens[1]);
 }
 
 void Console::print(const string &text) {
