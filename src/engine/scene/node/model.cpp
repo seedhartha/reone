@@ -299,7 +299,6 @@ void ModelSceneNode::updateAnimations(float dt) {
     // Apply states and compute bone transforms only when this model is not culled
     if (!_culled) {
         applyAnimationStates(*_model->rootNode());
-        computeBoneTransforms();
     }
 
     // Erase finished channels
@@ -534,15 +533,6 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
 
     for (auto &child : modelNode.children()) {
         applyAnimationStates(*child);
-    }
-}
-
-void ModelSceneNode::computeBoneTransforms() {
-    for (auto &node : _nodeByNumber) {
-        glm::mat4 transform(1.0f);
-        transform = node.second->absoluteTransform() * node.second->modelNode()->absoluteTransformInverse(); // make relative to the rest pose (world space)
-        transform = _absTransformInv * transform;                                                            // world space to model space
-        node.second->setBoneTransform(move(transform));
     }
 }
 

@@ -174,7 +174,6 @@ private:
     void updateAnimationChannel(AnimationChannel &channel, float dt);
     void computeAnimationStates(AnimationChannel &channel, float time, const graphics::ModelNode &modelNode);
     void applyAnimationStates(const graphics::ModelNode &modelNode);
-    void computeBoneTransforms();
 
     static AnimationBlendMode getAnimationBlendMode(int flags);
 
