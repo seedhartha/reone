@@ -31,11 +31,13 @@ Animation::Animation(
     string name,
     float length,
     float transitionTime,
+    string root,
     shared_ptr<ModelNode> rootNode,
     vector<Event> events) :
     _name(move(name)),
     _length(length),
     _transitionTime(transitionTime),
+    _root(move(root)),
     _rootNode(move(rootNode)),
     _events(move(events)) {
 

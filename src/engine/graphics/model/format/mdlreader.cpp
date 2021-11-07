@@ -80,7 +80,7 @@ void MdlReader::doLoad() {
     // Geometry Header
     uint32_t funcPtr1 = readUint32();
     uint32_t funcPtr2 = readUint32();
-    string name(readCString(32));
+    string name(boost::to_lower_copy(readCString(32)));
     uint32_t offRootNode = readUint32();
     uint32_t numNodes = readUint32();
     ignore(6 * 4); // unknown
@@ -107,6 +107,7 @@ void MdlReader::doLoad() {
     ArrayDefinition nameArrayDef(readArrayDefinition());
 
     _tsl = isTSLFunctionPointer(funcPtr1);
+    _modelName = name;
     _offAnimRoot = offAnimRoot;
 
     // Read node names
@@ -716,7 +717,7 @@ unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
     // Animation Header
     float length = readFloat();
     float transitionTime = readFloat();
-    string root(readCString(32));
+    string root(boost::to_lower_copy(readCString(32)));
     ArrayDefinition eventArrayDef(readArrayDefinition());
     ignore(4); // unknown
 
@@ -739,6 +740,7 @@ unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
         move(name),
         length,
         transitionTime,
+        root != _modelName ? root : "",
         move(rootNode),
         move(events));
 }
