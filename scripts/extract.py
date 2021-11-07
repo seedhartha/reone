@@ -42,7 +42,7 @@ steps = [
     ["extract_textures", "Extract texture packs (y/n)?"],
     ["extract_voices", "Extract streamwaves/streamvoices (y/n)?"],
     ["extract_lips", "Extract LIP files (y/n)?"],
-    ["convert_to_json", "Convert 2DA, GFF, TLK and LIP to JSON (y/n)?"],
+    ["convert_to_json", "Convert 2DA, GFF, TLK, LIP and SSF to JSON (y/n)?"],
     ["convert_to_tga", "Convert TPC to TGA/TXI (y/n)?"],
     ["disassemble_scripts", "Disassemble NCS scripts (y/n)?"]
 ]
@@ -260,7 +260,8 @@ def is_convertible_to_json(path):
         ".dlg",
         ".tlk",
         ".lip",
-        ".pth"
+        ".pth",
+        ".ssf"
     ]
 
     _, extension = os.path.splitext(path)

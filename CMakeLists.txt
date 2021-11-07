@@ -134,6 +134,7 @@ set(RESOURCE_HEADERS
     src/engine/resource/format/rimreader.h
     src/engine/resource/format/rimwriter.h
     src/engine/resource/format/ssfreader.h
+    src/engine/resource/format/ssfwriter.h
     src/engine/resource/format/tlkreader.h
     src/engine/resource/format/tlkwriter.h
     src/engine/resource/format/visreader.h
@@ -166,6 +167,7 @@ set(RESOURCE_SOURCES
     src/engine/resource/format/rimreader.cpp
     src/engine/resource/format/rimwriter.cpp
     src/engine/resource/format/ssfreader.cpp
+    src/engine/resource/format/ssfwriter.cpp
     src/engine/resource/format/tlkreader.cpp
     src/engine/resource/format/tlkwriter.cpp
     src/engine/resource/format/visreader.cpp
@@ -1068,6 +1070,7 @@ if(BUILD_TOOLS)
         src/tools/tool/lip.h
         src/tools/tool/ncs.h
         src/tools/tool/rim.h
+        src/tools/tool/ssf.h
         src/tools/tool/tlk.h
         src/tools/tool/tpc.h
         src/tools/types.h)
@@ -1083,6 +1086,7 @@ if(BUILD_TOOLS)
         src/tools/tool/lip.cpp
         src/tools/tool/ncs.cpp
         src/tools/tool/rim.cpp
+        src/tools/tool/ssf.cpp
         src/tools/tool/tlk.cpp
         src/tools/tool/tpc.cpp)
 

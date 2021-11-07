@@ -19,27 +19,20 @@
 
 namespace reone {
 
-namespace tools {
+namespace resource {
 
-enum class Operation {
-    None,
-    List,
-    Extract,
-    Unwrap,
-    ToJSON,
-    ToTGA,
-    To2DA,
-    ToGFF,
-    ToRIM,
-    ToERF,
-    ToMOD,
-    ToTLK,
-    ToLIP,
-    ToPCODE,
-    ToNCS,
-    ToSSF
+class SsfWriter {
+public:
+    SsfWriter(std::vector<uint32_t> soundSet) :
+        _soundSet(std::move(soundSet)) {
+    }
+
+    void save(const boost::filesystem::path &path);
+
+private:
+    std::vector<uint32_t> _soundSet;
 };
 
-} // namespace tools
+} // namespace resource
 
 } // namespace reone
