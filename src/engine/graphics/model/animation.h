@@ -34,6 +34,7 @@ public:
         std::string name,
         float length,
         float transitionTime,
+        std::string root,
         std::shared_ptr<ModelNode> rootNode,
         std::vector<Event> events);
 
@@ -43,6 +44,7 @@ public:
     const std::string &name() const { return _name; }
     float length() const { return _length; }
     float transitionTime() const { return _transitionTime; }
+    const std::string &root() const { return _root; }
     std::shared_ptr<ModelNode> rootNode() const { return _rootNode; }
     const std::vector<Event> &events() const { return _events; }
 
@@ -50,6 +52,7 @@ private:
     std::string _name;
     float _length {0.0f};
     float _transitionTime {0.0f}; /**< time in seconds where this animation overlaps with other animations */
+    std::string _root;
     std::shared_ptr<ModelNode> _rootNode;
     std::vector<Event> _events;
 

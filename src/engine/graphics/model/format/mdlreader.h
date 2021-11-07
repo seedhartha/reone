@@ -70,6 +70,7 @@ private:
     std::vector<std::shared_ptr<ModelNode>> _nodes; /**< nodes in read order (DFS) */
     std::map<uint16_t, uint16_t> _nodeFlags;
     std::shared_ptr<graphics::Model> _model;
+    std::string _modelName;
     uint32_t _offAnimRoot {0};
 
     void doLoad() override;

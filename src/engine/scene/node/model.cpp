@@ -364,9 +364,23 @@ void ModelSceneNode::updateAnimationChannel(AnimationChannel &channel, float dt)
     }
 }
 
+static bool doesNodeHaveAncestor(const ModelNode &node, const std::string &name) {
+    if (name.empty()) {
+        return true;
+    }
+    if (node.name() == name) {
+        return true;
+    }
+    auto parent = node.parent();
+    if (!parent) {
+        return false;
+    }
+    return doesNodeHaveAncestor(*parent, name);
+}
+
 void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float time, const ModelNode &modelNode) {
     shared_ptr<ModelNode> animNode(channel.anim->getNodeByNumber(modelNode.number()));
-    if (animNode && modelNode.isAnimated()) {
+    if (animNode && modelNode.isAnimated() && doesNodeHaveAncestor(modelNode, channel.anim->root())) {
         AnimationState state;
         state.flags = 0;
 
