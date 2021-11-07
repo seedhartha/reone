@@ -40,8 +40,10 @@ class Texture;
 class ModelNode : boost::noncopyable {
 public:
     struct Skin {
-        std::vector<uint16_t> boneNodeNumber; /**< node number per bone, used for skeletal animation */
+        std::vector<uint32_t> boneSerial;     /**< node index per bone (DFS ordering) */
+        std::vector<uint16_t> boneNodeNumber; /**< node number per bone */
         std::vector<float> boneMap;           /**< bone index per node (DFS ordering) */
+        std::vector<glm::mat4> boneMatrices;  /**< each matrix is inverse of bone transform in this node space */
     };
 
     struct UVAnimation {

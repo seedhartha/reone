@@ -330,7 +330,10 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
                     if (nodeNumber != 0xffff) {
                         shared_ptr<ModelNodeSceneNode> bone(_model->getNodeByNumber(nodeNumber));
                         if (bone && bone->type() == SceneNodeType::Mesh) {
-                            tmp = _modelNode->absoluteTransformInverse() * bone->boneTransform() * _modelNode->absoluteTransform();
+                            tmp = _modelNode->absoluteTransformInverse() *
+                                  _model->absoluteTransformInverse() *
+                                  bone->absoluteTransform() *
+                                  mesh->skin->boneMatrices[mesh->skin->boneSerial[i - 1]];
                         }
                     }
                 }

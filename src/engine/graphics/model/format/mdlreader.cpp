@@ -301,9 +301,22 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         ignore(4); // padding
 
         vector<float> boneMap(readFloatArray(kMdlDataOffset + offBones, numBones));
+        vector<float> qBoneValues(readFloatArray(kMdlDataOffset + qBoneArrayDef.offset, 4 * numBones));
+        vector<float> tBoneValues(readFloatArray(kMdlDataOffset + tBoneArrayDef.offset, 3 * numBones));
+
+        vector<glm::mat4> boneMatrices;
+        boneMatrices.resize(numBones);
+        for (int i = 0; i < numBones; ++i) {
+            const float *qBone = &qBoneValues[4 * i];
+            glm::mat4 boneMatrix(1.0f);
+            boneMatrix *= glm::translate(glm::make_vec3(&tBoneValues[3 * i]));
+            boneMatrix *= glm::mat4_cast(glm::quat(qBone[0], qBone[1], qBone[2], qBone[3]));
+            boneMatrices[i] = move(boneMatrix);
+        }
 
         skin = make_shared<ModelNode::Skin>();
         skin->boneMap = move(boneMap);
+        skin->boneMatrices = move(boneMatrices);
         attributes.offBoneIndices = offMdxBoneIndices;
         attributes.offBoneWeights = offMdxBoneWeights;
 
@@ -679,10 +692,12 @@ void MdlReader::prepareSkinMeshes() {
         for (size_t i = 0; i < skin->boneMap.size(); ++i) {
             auto boneIdx = static_cast<uint16_t>(skin->boneMap[i]);
             if (boneIdx >= skin->boneNodeNumber.size()) {
+                skin->boneSerial.resize(boneIdx + 1);
                 skin->boneNodeNumber.resize(boneIdx + 1);
             }
             if (boneIdx != 0xffff) {
                 shared_ptr<ModelNode> boneNode(_nodes[i]);
+                skin->boneSerial[boneIdx] = i;
                 skin->boneNodeNumber[boneIdx] = boneNode->number();
             }
         }
