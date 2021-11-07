@@ -17,6 +17,24 @@ We do not distribute copyrighted materials - instead, we require our users and d
 
 Lastly, reone is explicitly a non-commercial project: we do not seek to gain profit, neither through donations nor other means.
 
+## Installation
+
+To install reone, either download a prebuilt executable from the [releases](https://github.com/seedhartha/reone/releases) page, or build it from source. Building it requires a modern C++ compiler and a set of free and open source libraries. See detailed instructions for your operating system [here](https://github.com/seedhartha/reone/wiki/Installation).
+
+reone is being developed and tested against unmodded Steam versions of both KotOR and TSL. Compatibility with any other version is not guaranteed, although GOG and retail versions should work with no or minor modification.
+
+Install [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) to run prebuilt Windows executables.
+
+## Usage
+
+Use reone-launcher application to choose a game directory and launch reone. Alternatively, reone can be started from the command line: `reone --game GAME_DIR`
+
+## Configuration
+
+reone can be configured via the launcher, the configuration file or the command line.
+
+Configuration file, named "reone.cfg", must be located in the current directory. See complete list of program options [here](https://github.com/seedhartha/reone/wiki/Program-options).
+
 ## Contributing
 
 reone is open to potential contributors. Contact us on [this](https://discord.gg/6sqSyfn8Jp) Discord server if you're interested in taking a particular task from the [roadmap](https://github.com/seedhartha/reone/wiki/Roadmap).
@@ -28,26 +46,6 @@ Developer resources:
 - [Tooling](https://github.com/seedhartha/reone/wiki/Tooling)
 - [Modding](https://github.com/seedhartha/reone/wiki/Modding)
 - [Knowledge Database](https://github.com/seedhartha/reone/wiki/Knowledge-Database)
-
-## Installation
-
-To install reone, either download a prebuilt executable from the [releases](https://github.com/seedhartha/reone/releases) page, or build it from source. Building it requires a modern C++ compiler and a set of free and open source libraries. See detailed instructions for your operating system [here](https://github.com/seedhartha/reone/wiki/Installation).
-
-reone is being developed and tested against unmodded Steam versions of both KotOR and TSL. Compatibility with any other version is not guaranteed, although GOG and retail versions should work with no or minor modification.
-
-Install [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) to run prebuilt Windows executables.
-
-## Usage
-
-Launch reone using the launcher application or from the command line:
-
-`reone --game C:\swkotor`
-
-## Configuration
-
-reone can be configured via the launcher, the configuration file or the command line.
-
-Configuration file, named "reone.cfg", must be located in the current directory. See complete list of program options [here](https://github.com/seedhartha/reone/wiki/Program-options).
 
 ## Similar Projects
 
