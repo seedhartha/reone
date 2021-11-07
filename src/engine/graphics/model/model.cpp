@@ -97,7 +97,7 @@ shared_ptr<ModelNode> Model::getNodeByNameRecursive(const string &name) const {
 }
 
 shared_ptr<ModelNode> Model::getAABBNode() const {
-    for (auto &node : _nodeByName) {
+    for (auto &node : _nodeByNumber) {
         if (node.second->isAABBMesh())
             return node.second;
     }
