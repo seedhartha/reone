@@ -35,21 +35,26 @@ public:
         glm::vec3 normal {0.0f};
     };
 
+    struct AABB {
+        glm::vec3 min {0.0f};
+        glm::vec3 max {0.0f};
+        int faceIdx {-1};
+        std::shared_ptr<AABB> child1;
+        std::shared_ptr<AABB> child2;
+    };
+
     bool raycastWalkableFirst(const glm::vec3 &origin, const glm::vec3 &dir, float &distance, int &material) const;
     bool raycastNonWalkableFirst(const glm::vec3 &origin, const glm::vec3 &dir, float &distance, glm::vec3 &normal) const;
     bool raycastNonWalkableClosest(const glm::vec3 &origin, const glm::vec3 &dir, float &distance, glm::vec3 &normal) const;
 
     const std::vector<Face> &grassFaces() const { return _grassFaces; }
-    const AABB &aabb() const { return _aabb; }
 
 private:
     std::vector<Face> _walkableFaces;
     std::vector<Face> _nonWalkableFaces;
     std::vector<Face> _grassFaces;
 
-    AABB _aabb;
-
-    void computeAABB();
+    std::shared_ptr<AABB> _rootAabb;
 
     friend class BwmReader;
 };

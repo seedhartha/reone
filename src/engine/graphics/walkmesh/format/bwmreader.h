@@ -70,8 +70,7 @@ private:
     void loadIndices();
     void loadMaterials();
     void loadNormals();
-
-    void makeWalkmesh();
+    void loadAABB();
 };
 
 } // namespace graphics
