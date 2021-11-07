@@ -366,7 +366,7 @@ void ModelSceneNode::updateAnimationChannel(AnimationChannel &channel, float dt)
 
 void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float time, const ModelNode &modelNode) {
     shared_ptr<ModelNode> animNode(channel.anim->getNodeByNumber(modelNode.number()));
-    if (animNode && _inanimateNodes.count(modelNode.name()) == 0) {
+    if (animNode && modelNode.isAnimated()) {
         AnimationState state;
         state.flags = 0;
 

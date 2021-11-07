@@ -44,28 +44,28 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
 Variable Routine::onException(const string &msg, const exception &ex) const {
     switch (_returnType) {
     case VariableType::Void:
-        warn(msg);
+        warn(msg, LogChannels::script);
         return Variable::ofNull();
     case VariableType::String:
-        warn(msg);
+        warn(msg, LogChannels::script);
         return Variable::ofString("");
     case VariableType::Vector:
-        warn(msg);
+        warn(msg, LogChannels::script);
         return Variable::ofVector(glm::vec3(0.0f));
     case VariableType::Object:
-        warn(msg);
+        warn(msg, LogChannels::script);
         return Variable::ofObject(kObjectInvalid);
     case VariableType::Effect:
-        warn(msg);
+        warn(msg, LogChannels::script);
         return Variable::ofEffect(nullptr);
     case VariableType::Event:
-        warn(msg);
+        warn(msg, LogChannels::script);
         return Variable::ofEvent(nullptr);
     case VariableType::Location:
-        warn(msg);
+        warn(msg, LogChannels::script);
         return Variable::ofLocation(nullptr);
     case VariableType::Talent:
-        warn(msg);
+        warn(msg, LogChannels::script);
         return Variable::ofTalent(nullptr);
     default:
         // With Int, Float and Action return types, halt script execution

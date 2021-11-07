@@ -104,19 +104,6 @@ shared_ptr<ModelNode> Model::getAABBNode() const {
     return nullptr;
 }
 
-set<string> Model::getAncestorNodes(const string &parentName) const {
-    set<string> result;
-
-    auto maybeParent = _nodeByName.find(parentName);
-    if (maybeParent != _nodeByName.end()) {
-        for (const ModelNode *node = maybeParent->second->parent(); node; node = node->parent()) {
-            result.insert(node->name());
-        }
-    }
-
-    return move(result);
-}
-
 vector<string> Model::getAnimationNames() const {
     vector<string> result;
 
@@ -144,18 +131,6 @@ shared_ptr<Animation> Model::getAnimation(const string &name) const {
     }
 
     return move(anim);
-}
-
-unique_ptr<Model> Model::newHeadless(string name) {
-    auto model = make_unique<Model>(
-        move(name),
-        MdlClassification::other,
-        nullptr,
-        vector<shared_ptr<Animation>>(),
-        nullptr,
-        1.0f);
-    model->_headless = true;
-    return move(model);
 }
 
 } // namespace graphics

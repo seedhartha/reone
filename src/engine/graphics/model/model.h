@@ -61,7 +61,6 @@ public:
     std::shared_ptr<ModelNode> getNodeByName(const std::string &name) const;
     std::shared_ptr<ModelNode> getNodeByNameRecursive(const std::string &name) const;
     std::shared_ptr<ModelNode> getAABBNode() const;
-    std::set<std::string> getAncestorNodes(const std::string &parentName) const;
 
     // END Nodes
 
@@ -71,8 +70,6 @@ public:
     std::shared_ptr<Animation> getAnimation(const std::string &name) const;
 
     // END Animations
-
-    static std::unique_ptr<Model> newHeadless(std::string name);
 
 private:
     std::string _name;

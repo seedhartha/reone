@@ -84,8 +84,6 @@ public:
 
     std::string getActiveAnimationName() const;
 
-    void setInanimateNodes(std::set<std::string> nodes) { _inanimateNodes = std::move(nodes); }
-
     // END Animation
 
     // Attachments
@@ -160,7 +158,6 @@ private:
 
     std::deque<AnimationChannel> _animChannels;
     AnimationBlendMode _animBlendMode {AnimationBlendMode::Single};
-    std::set<std::string> _inanimateNodes; /**< names of nodes that are not to be animated */
 
     // END Animation
 
