@@ -104,6 +104,7 @@ private:
     void cmdKill(std::vector<std::string> tokens);
     void cmdAddItem(std::vector<std::string> tokens);
     void cmdGiveXP(std::vector<std::string> tokens);
+    void cmdWarp(std::vector<std::string> tokens);
 
     // END Commands
 };
