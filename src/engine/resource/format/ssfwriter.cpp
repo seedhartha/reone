@@ -15,31 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "ssfwriter.h"
+
+#include "../../common/streamwriter.h"
+
+using namespace std;
+
+namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace tools {
+namespace resource {
 
-enum class Operation {
-    None,
-    List,
-    Extract,
-    Unwrap,
-    ToJSON,
-    ToTGA,
-    To2DA,
-    ToGFF,
-    ToRIM,
-    ToERF,
-    ToMOD,
-    ToTLK,
-    ToLIP,
-    ToPCODE,
-    ToNCS,
-    ToSSF
-};
+void SsfWriter::save(const fs::path &path) {
+    auto stream = make_shared<fs::ofstream>(path);
+    StreamWriter writer(stream);
 
-} // namespace tools
+    writer.putString("SSF V1.1");
+    writer.putUint32(12); // offset to entries
+
+    for (auto val : _soundSet) {
+        writer.putUint32(val);
+    }
+}
+
+} // namespace resource
 
 } // namespace reone

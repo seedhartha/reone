@@ -28,6 +28,7 @@
 #include "tool/lip.h"
 #include "tool/ncs.h"
 #include "tool/rim.h"
+#include "tool/ssf.h"
 #include "tool/tlk.h"
 #include "tool/tpc.h"
 
@@ -56,7 +57,8 @@ static const unordered_map<string, Operation> g_operations {
     {"to-tlk", Operation::ToTLK},
     {"to-lip", Operation::ToLIP},
     {"to-pcode", Operation::ToPCODE},
-    {"to-ncs", Operation::ToNCS}};
+    {"to-ncs", Operation::ToNCS},
+    {"to-ssf", Operation::ToSSF}};
 
 static fs::path getDestination(const po::variables_map &vars) {
     fs::path result;
@@ -102,7 +104,7 @@ void Program::initOptions() {
         ("limbo", po::value<bool>()->default_value(false), "is (dis)assembled NCS for Limbo?") //
         ("list", "list file contents")("extract", "extract file contents")                     //
         ("unwrap", "unwrap an audio file")                                                     //
-        ("to-json", "convert 2DA, GFF or TLK file to JSON")                                    //
+        ("to-json", "convert 2DA, GFF, TLK, LIP or SSF file to JSON")                          //
         ("to-tga", "convert TPC image to TGA")                                                 //
         ("to-2da", "convert JSON to 2DA")                                                      //
         ("to-gff", "convert JSON to GFF")                                                      //
@@ -113,6 +115,7 @@ void Program::initOptions() {
         ("to-lip", "convert JSON to LIP")                                                      //
         ("to-pcode", "convert NCS to PCODE")                                                   //
         ("to-ncs", "convert PCODE to NCS")                                                     //
+        ("to-ssf", "convert JSON to SSF")                                                      //
         ("target", po::value<string>(), "target name or path to input file");
 }
 
@@ -163,6 +166,7 @@ void Program::loadTools() {
     _tools.push_back(make_shared<TwoDaTool>());
     _tools.push_back(make_shared<TlkTool>());
     _tools.push_back(make_shared<LipTool>());
+    _tools.push_back(make_shared<SsfTool>());
     _tools.push_back(make_shared<GffTool>());
     _tools.push_back(make_shared<TpcTool>());
     _tools.push_back(make_shared<AudioTool>());
