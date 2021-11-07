@@ -64,6 +64,7 @@ public:
     void computeAABB();
     void signalEvent(const std::string &name);
 
+    std::shared_ptr<ModelNodeSceneNode> getNodeByNumber(uint16_t number) const;
     std::shared_ptr<ModelNodeSceneNode> getNodeByName(const std::string &name) const;
 
     std::shared_ptr<graphics::Model> model() const { return _model; }
@@ -149,6 +150,7 @@ private:
 
     // Lookups
 
+    std::unordered_map<uint16_t, std::shared_ptr<ModelNodeSceneNode>> _nodeByNumber;
     std::unordered_map<std::string, std::shared_ptr<ModelNodeSceneNode>> _nodeByName;
     std::unordered_map<std::string, std::shared_ptr<SceneNode>> _attachments;
 

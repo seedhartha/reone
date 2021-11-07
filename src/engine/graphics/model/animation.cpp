@@ -39,10 +39,10 @@ Animation::Animation(
     _rootNode(move(rootNode)),
     _events(move(events)) {
 
-    fillNodeByName();
+    fillLookups();
 }
 
-void Animation::fillNodeByName() {
+void Animation::fillLookups() {
     stack<shared_ptr<ModelNode>> nodes;
     nodes.push(_rootNode);
 
@@ -50,7 +50,7 @@ void Animation::fillNodeByName() {
         shared_ptr<ModelNode> node(nodes.top());
         nodes.pop();
 
-        _nodeByName.insert(make_pair(node->name(), node));
+        _nodeByNumber.insert(make_pair(node->number(), node));
 
         for (auto &child : node->children()) {
             nodes.push(child);
@@ -58,8 +58,8 @@ void Animation::fillNodeByName() {
     }
 }
 
-shared_ptr<ModelNode> Animation::getNodeByName(const string &name) const {
-    return getFromLookupOrNull(_nodeByName, name);
+shared_ptr<ModelNode> Animation::getNodeByNumber(uint16_t number) const {
+    return getFromLookupOrNull(_nodeByNumber, number);
 }
 
 } // namespace graphics
