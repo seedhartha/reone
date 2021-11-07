@@ -118,7 +118,7 @@ void ModelSceneNode::update(float dt) {
 void ModelSceneNode::computeAABB() {
     _aabb.reset();
 
-    for (auto &node : _nodeByName) {
+    for (auto &node : _nodeByNumber) {
         if (node.second->type() == SceneNodeType::Mesh) {
             shared_ptr<ModelNode> modelNode(node.second->modelNode());
             AABB modelSpaceAABB(modelNode->mesh()->mesh->aabb() * modelNode->absoluteTransform());
@@ -153,7 +153,7 @@ void ModelSceneNode::signalEvent(const string &name) {
     debug(boost::format("Model '%s': event '%s' signalled") % _model->name() % name);
 
     if (name == "detonate") {
-        for (auto &node : _nodeByName) {
+        for (auto &node : _nodeByNumber) {
             if (node.second->type() == SceneNodeType::Emitter) {
                 static_pointer_cast<EmitterSceneNode>(node.second)->detonate();
             }
@@ -198,7 +198,7 @@ void ModelSceneNode::setDiffuseTexture(shared_ptr<Texture> texture) {
 }
 
 void ModelSceneNode::setAppliedForce(glm::vec3 force) {
-    for (auto &node : _nodeByName) {
+    for (auto &node : _nodeByNumber) {
         if (node.second->type() == SceneNodeType::Mesh) {
             static_pointer_cast<MeshSceneNode>(node.second)->setAppliedForce(force);
         }
@@ -439,8 +439,8 @@ void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float tim
 }
 
 void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
-    auto maybeSceneNode = _nodeByName.find(modelNode.name());
-    if (maybeSceneNode != _nodeByName.end()) {
+    auto maybeSceneNode = _nodeByNumber.find(modelNode.number());
+    if (maybeSceneNode != _nodeByNumber.end()) {
         shared_ptr<SceneNode> sceneNode(maybeSceneNode->second);
         AnimationState combined;
 
@@ -524,7 +524,7 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
 }
 
 void ModelSceneNode::computeBoneTransforms() {
-    for (auto &node : _nodeByName) {
+    for (auto &node : _nodeByNumber) {
         glm::mat4 transform(1.0f);
         transform = node.second->absoluteTransform() * node.second->modelNode()->absoluteTransformInverse(); // make relative to the rest pose (world space)
         transform = _absTransformInv * transform;                                                            // world space to model space
