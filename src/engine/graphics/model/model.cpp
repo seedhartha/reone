@@ -52,13 +52,13 @@ Model::Model(
     computeAABB();
 
     for (auto &anim : animations) {
-        _animations.insert(make_pair(anim->name(), anim));
+        _animations[anim->name()] = anim;
     }
 }
 
 void Model::fillLookups(const shared_ptr<ModelNode> &node) {
-    _nodeByNumber.insert(make_pair(node->number(), node));
-    _nodeByName.insert(make_pair(node->name(), node));
+    _nodeByNumber[node->number()] = node;
+    _nodeByName[node->name()] = node;
 
     for (auto &child : node->children()) {
         fillLookups(child);
@@ -68,7 +68,7 @@ void Model::fillLookups(const shared_ptr<ModelNode> &node) {
 void Model::computeAABB() {
     _aabb.reset();
 
-    for (auto &node : _nodeByName) {
+    for (auto &node : _nodeByNumber) {
         shared_ptr<ModelNode::TriangleMesh> mesh(node.second->mesh());
         if (mesh) {
             _aabb.expand(mesh->mesh->aabb() * node.second->absoluteTransform());

@@ -94,8 +94,8 @@ void ModelSceneNode::buildNodeTree(shared_ptr<ModelNode> node, SceneNode *parent
         sceneNode->setLocalTransform(node->localTransform());
         parent->addChild(sceneNode);
     }
-    _nodeByNumber.insert(make_pair(node->number(), sceneNode));
-    _nodeByName.insert(make_pair(node->name(), sceneNode));
+    _nodeByNumber[node->number()] = sceneNode;
+    _nodeByName[node->name()] = sceneNode;
 
     if (node->isReference()) {
         auto model = _sceneGraph.newModel(node->reference()->model, _usage, _animEventListener);
@@ -359,7 +359,7 @@ void ModelSceneNode::updateAnimationChannel(AnimationChannel &channel, float dt)
     // Compute animation states only when this model is not culled
     if (!_culled) {
         float time = channel.transition ? channel.anim->transitionTime() : channel.time;
-        channel.stateByName.clear();
+        channel.stateByNodeNumber.clear();
         computeAnimationStates(channel, time, *_model->rootNode());
     }
 }
@@ -430,7 +430,7 @@ void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float tim
             state.selfIllumColor = move(animSelfIllum);
         }
 
-        channel.stateByName.insert(make_pair(modelNode.name(), move(state)));
+        channel.stateByNodeNumber[modelNode.number()] = move(state);
     }
 
     for (auto &child : modelNode.children()) {
@@ -447,10 +447,10 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
         switch (_animBlendMode) {
         case AnimationBlendMode::Single:
         case AnimationBlendMode::Blend: {
-            auto state1 = getFromLookupOrElse(_animChannels[0].stateByName, modelNode.name(), AnimationState());
+            auto state1 = getFromLookupOrElse(_animChannels[0].stateByNodeNumber, modelNode.number(), AnimationState());
             bool blend = _animBlendMode == AnimationBlendMode::Blend && _animChannels[0].transition && _animChannels.size() > 1ll;
             if (blend) {
-                auto state2 = getFromLookupOrElse(_animChannels[1].stateByName, modelNode.name(), AnimationState());
+                auto state2 = getFromLookupOrElse(_animChannels[1].stateByNodeNumber, modelNode.number(), AnimationState());
                 if (state1.flags & AnimationStateFlags::transform && state2.flags & AnimationStateFlags::transform) {
                     float factor = glm::min(1.0f, _animChannels[0].time / _animChannels[0].anim->transitionTime());
                     glm::vec3 scale1, scale2, translation1, translation2, skew;
@@ -485,8 +485,8 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
         }
         case AnimationBlendMode::Overlay:
             for (auto &channel : _animChannels) {
-                auto maybeState = channel.stateByName.find(modelNode.name());
-                if (maybeState == channel.stateByName.end())
+                auto maybeState = channel.stateByNodeNumber.find(modelNode.number());
+                if (maybeState == channel.stateByNodeNumber.end())
                     continue;
                 const AnimationState &state = maybeState->second;
                 if ((state.flags & AnimationStateFlags::transform) && !(combined.flags & AnimationStateFlags::transform)) {
