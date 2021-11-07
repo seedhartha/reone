@@ -23,21 +23,6 @@ namespace reone {
 
 namespace graphics {
 
-void Walkmesh::computeAABB() {
-    _aabb.reset();
-
-    for (auto &face : _walkableFaces) {
-        _aabb.expand(face.vertices[0]);
-        _aabb.expand(face.vertices[1]);
-        _aabb.expand(face.vertices[2]);
-    }
-    for (auto &face : _nonWalkableFaces) {
-        _aabb.expand(face.vertices[0]);
-        _aabb.expand(face.vertices[1]);
-        _aabb.expand(face.vertices[2]);
-    }
-}
-
 bool Walkmesh::raycastWalkableFirst(const glm::vec3 &origin, const glm::vec3 &dir, float &distance, int &material) const {
     glm::vec2 baryPosition(0.0f);
     float tempDistance = 0.0f;

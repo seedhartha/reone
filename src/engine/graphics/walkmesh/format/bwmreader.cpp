@@ -60,58 +60,12 @@ void BwmReader::doLoad() {
         _offsetPerimeters = readUint32();
     }
 
+    _walkmesh = make_shared<Walkmesh>();
+
     loadVertices();
     loadIndices();
     loadMaterials();
     loadNormals();
-
-    makeWalkmesh();
-}
-
-void BwmReader::loadVertices() {
-    _vertices.reserve(3 * _numVertices);
-    seek(_offsetVertices);
-
-    for (uint32_t i = 0; i < _numVertices; ++i) {
-        _vertices.push_back(readFloat());
-        _vertices.push_back(readFloat());
-        _vertices.push_back(readFloat());
-    }
-}
-
-void BwmReader::loadIndices() {
-    _indices.reserve(3 * _numFaces);
-    seek(_offsetIndices);
-
-    for (uint32_t i = 0; i < _numFaces; ++i) {
-        _indices.push_back(readUint32());
-        _indices.push_back(readUint32());
-        _indices.push_back(readUint32());
-    }
-}
-
-void BwmReader::loadMaterials() {
-    _materials.reserve(_numFaces);
-    seek(_offsetMaterials);
-
-    for (uint32_t i = 0; i < _numFaces; ++i) {
-        _materials.push_back(readUint32());
-    }
-}
-
-void BwmReader::loadNormals() {
-    _normals.reserve(3 * _numFaces);
-    seek(_offsetNormals);
-
-    for (uint32_t i = 0; i < _numFaces; ++i) {
-        _normals.push_back(readFloat());
-        _normals.push_back(readFloat());
-        _normals.push_back(readFloat());
-    }
-}
-
-void BwmReader::makeWalkmesh() {
-    _walkmesh = make_shared<Walkmesh>();
 
     for (uint32_t i = 0; i < _numFaces; ++i) {
         uint32_t material = _materials[i];
@@ -133,7 +87,89 @@ void BwmReader::makeWalkmesh() {
         }
     }
 
-    _walkmesh->computeAABB();
+    if (_type == WalkmeshType::WOK) {
+        loadAABB();
+    }
+}
+
+void BwmReader::loadVertices() {
+    seek(_offsetVertices);
+    _vertices.reserve(3 * _numVertices);
+
+    for (uint32_t i = 0; i < _numVertices; ++i) {
+        _vertices.push_back(readFloat());
+        _vertices.push_back(readFloat());
+        _vertices.push_back(readFloat());
+    }
+}
+
+void BwmReader::loadIndices() {
+    seek(_offsetIndices);
+    _indices.reserve(3 * _numFaces);
+
+    for (uint32_t i = 0; i < _numFaces; ++i) {
+        _indices.push_back(readUint32());
+        _indices.push_back(readUint32());
+        _indices.push_back(readUint32());
+    }
+}
+
+void BwmReader::loadMaterials() {
+    seek(_offsetMaterials);
+    _materials.reserve(_numFaces);
+
+    for (uint32_t i = 0; i < _numFaces; ++i) {
+        _materials.push_back(readUint32());
+    }
+}
+
+void BwmReader::loadNormals() {
+    seek(_offsetNormals);
+    _normals.reserve(3 * _numFaces);
+
+    for (uint32_t i = 0; i < _numFaces; ++i) {
+        _normals.push_back(readFloat());
+        _normals.push_back(readFloat());
+        _normals.push_back(readFloat());
+    }
+}
+
+void BwmReader::loadAABB() {
+    seek(_offsetAabb);
+
+    vector<shared_ptr<Walkmesh::AABB>> aabbs;
+    aabbs.resize(_numAabb);
+
+    vector<pair<uint32_t, uint32_t>> aabbChildren;
+    aabbChildren.resize(_numAabb);
+
+    for (uint32_t i = 0; i < _numAabb; ++i) {
+        vector<float> bounds(readFloatArray(6));
+        int faceIdx = readInt32();
+        ignore(4); // unknown
+        uint32_t mostSignificantPlane = readUint32();
+        uint32_t childIdx1 = readUint32();
+        uint32_t childIdx2 = readUint32();
+
+        aabbs[i] = make_shared<Walkmesh::AABB>();
+        aabbs[i]->min = glm::make_vec3(&bounds[0]);
+        aabbs[i]->max = glm::make_vec3(&bounds[3]);
+        aabbs[i]->faceIdx = faceIdx;
+
+        aabbChildren[i] = make_pair(childIdx1, childIdx2);
+    }
+
+    for (uint32_t i = 0; i < _numAabb; ++i) {
+        if (aabbs[i]->faceIdx != -1) {
+            continue;
+        }
+        uint32_t childIdx1 = aabbChildren[i].first;
+        uint32_t childIdx2 = aabbChildren[i].second;
+        aabbs[i]->child1 = aabbs[childIdx1];
+        aabbs[i]->child2 = aabbs[childIdx2];
+    }
+
+    _walkmesh->_rootAabb = aabbs[0];
 }
 
 } // namespace graphics
