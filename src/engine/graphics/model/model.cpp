@@ -47,7 +47,7 @@ Model::Model(
     _animationScale(animationScale) {
 
     if (_rootNode) {
-        fillNodeByName(_rootNode);
+        fillLookups(_rootNode);
     }
     computeAABB();
 
@@ -56,11 +56,12 @@ Model::Model(
     }
 }
 
-void Model::fillNodeByName(const shared_ptr<ModelNode> &node) {
+void Model::fillLookups(const shared_ptr<ModelNode> &node) {
+    _nodeByNumber.insert(make_pair(node->number(), node));
     _nodeByName.insert(make_pair(node->name(), node));
 
     for (auto &child : node->children()) {
-        fillNodeByName(child);
+        fillLookups(child);
     }
 }
 
@@ -77,6 +78,10 @@ void Model::computeAABB() {
 
 void Model::init() {
     _rootNode->init();
+}
+
+shared_ptr<ModelNode> Model::getNodeByNumber(uint16_t number) const {
+    return getFromLookupOrNull(_nodeByNumber, number);
 }
 
 shared_ptr<ModelNode> Model::getNodeByName(const string &name) const {

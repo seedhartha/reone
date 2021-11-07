@@ -162,7 +162,7 @@ shared_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *pare
     seek(kMdlDataOffset + offset);
 
     uint16_t flags = readUint16();
-    uint16_t nodeId = readUint16();
+    uint16_t nodeNumber = readUint16();
     uint16_t nameIndex = readUint16();
     ignore(2); // padding
     uint32_t offRootNode = readUint32();
@@ -181,6 +181,7 @@ shared_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *pare
     glm::quat restOrientation(orientationValues[0], orientationValues[1], orientationValues[2], orientationValues[3]);
 
     auto node = make_shared<ModelNode>(
+        nodeNumber,
         name,
         move(restPosition),
         move(restOrientation),
@@ -202,7 +203,7 @@ shared_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *pare
     }
     if (!anim) {
         _nodes.push_back(node);
-        _nodeFlags.insert(make_pair(name, flags));
+        _nodeFlags.insert(make_pair(nodeNumber, flags));
     }
 
     vector<float> controllerData(readFloatArray(kMdlDataOffset + controllerDataArrayDef.offset, controllerDataArrayDef.count));
@@ -638,7 +639,7 @@ shared_ptr<ModelNode::Reference> MdlReader::readReference() {
 void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const vector<float> &data, bool anim, ModelNode &node) {
     uint16_t nodeFlags;
     if (anim) {
-        nodeFlags = _nodeFlags.find(node.name())->second;
+        nodeFlags = _nodeFlags.find(node.number())->second;
     } else {
         nodeFlags = node.flags();
     }
@@ -677,12 +678,12 @@ void MdlReader::prepareSkinMeshes() {
         shared_ptr<ModelNode::Skin> skin(node->mesh()->skin);
         for (size_t i = 0; i < skin->boneMap.size(); ++i) {
             auto boneIdx = static_cast<uint16_t>(skin->boneMap[i]);
-            if (boneIdx >= skin->boneNodeName.size()) {
-                skin->boneNodeName.resize(boneIdx + 1);
+            if (boneIdx >= skin->boneNodeNumber.size()) {
+                skin->boneNodeNumber.resize(boneIdx + 1);
             }
             if (boneIdx != 0xffff) {
                 shared_ptr<ModelNode> boneNode(_nodes[i]);
-                skin->boneNodeName[boneIdx] = boneNode->name();
+                skin->boneNodeNumber[boneIdx] = boneNode->number();
             }
         }
     }

@@ -40,8 +40,8 @@ class Texture;
 class ModelNode : boost::noncopyable {
 public:
     struct Skin {
-        std::vector<std::string> boneNodeName; /**< node name per bone, used for skeletal animation */
-        std::vector<float> boneMap;            /**< bone index per node (DFS ordering) */
+        std::vector<uint16_t> boneNodeNumber; /**< node number per bone, used for skeletal animation */
+        std::vector<float> boneMap;           /**< bone index per node (DFS ordering) */
     };
 
     struct UVAnimation {
@@ -171,6 +171,7 @@ public:
     };
 
     ModelNode(
+        uint16_t number,
         std::string name,
         glm::vec3 restPosition,
         glm::quat restOrientation,
@@ -182,6 +183,7 @@ public:
 
     std::vector<uint32_t> getFacesByMaterial(uint32_t material) const;
 
+    uint16_t number() const { return _number; }
     const std::string &name() const { return _name; }
     uint16_t flags() const { return _flags; }
     const ModelNode *parent() const { return _parent; }
@@ -295,6 +297,7 @@ public:
     // END Keyframes
 
 private:
+    uint16_t _number;
     std::string _name;
     const ModelNode *_parent;
 

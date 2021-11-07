@@ -94,6 +94,7 @@ void ModelSceneNode::buildNodeTree(shared_ptr<ModelNode> node, SceneNode *parent
         sceneNode->setLocalTransform(node->localTransform());
         parent->addChild(sceneNode);
     }
+    _nodeByNumber.insert(make_pair(node->number(), sceneNode));
     _nodeByName.insert(make_pair(node->name(), sceneNode));
 
     if (node->isReference()) {
@@ -173,6 +174,10 @@ void ModelSceneNode::attach(const string &parentName, shared_ptr<SceneNode> node
     _attachments.insert(make_pair(parentName, node));
 
     computeAABB();
+}
+
+shared_ptr<ModelNodeSceneNode> ModelSceneNode::getNodeByNumber(uint16_t number) const {
+    return getFromLookupOrNull(_nodeByNumber, number);
 }
 
 shared_ptr<ModelNodeSceneNode> ModelSceneNode::getNodeByName(const string &name) const {
@@ -360,7 +365,7 @@ void ModelSceneNode::updateAnimationChannel(AnimationChannel &channel, float dt)
 }
 
 void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float time, const ModelNode &modelNode) {
-    shared_ptr<ModelNode> animNode(channel.anim->getNodeByName(modelNode.name()));
+    shared_ptr<ModelNode> animNode(channel.anim->getNodeByNumber(modelNode.number()));
     if (animNode && _inanimateNodes.count(modelNode.name()) == 0) {
         AnimationState state;
         state.flags = 0;

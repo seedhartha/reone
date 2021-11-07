@@ -68,7 +68,7 @@ private:
     bool _tsl {false}; /**< is this a TSL model? */
     std::vector<std::string> _nodeNames;
     std::vector<std::shared_ptr<ModelNode>> _nodes; /**< loaded model nodes (DFS ordering) */
-    std::map<std::string, uint16_t> _nodeFlags;
+    std::map<uint16_t, uint16_t> _nodeFlags;
     std::shared_ptr<graphics::Model> _model;
 
     void doLoad() override;
