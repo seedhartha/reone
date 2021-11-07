@@ -119,7 +119,7 @@ private:
         std::shared_ptr<graphics::LipAnimation> lipAnim;
         AnimationProperties properties;
         float time {0.0f};
-        std::unordered_map<std::string, AnimationState> stateByName;
+        std::unordered_map<uint16_t, AnimationState> stateByNodeNumber;
         bool freeze {false};     /**< channel time is not to be updated */
         bool transition {false}; /**< when computing states, use animation transition time as channel time */
         bool finished {false};   /**< finished channels will be erased from the queue */
