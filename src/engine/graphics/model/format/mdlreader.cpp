@@ -100,20 +100,21 @@ void MdlReader::doLoad() {
     float radius = readFloat();
     float animationScale = readFloat();
     string superModelName(boost::to_lower_copy(readCString(32)));
-    uint32_t offHeadRootNode = readUint32();
+    uint32_t offAnimRoot = readUint32();
     ignore(4); // unknown
     uint32_t mdxSize2 = readUint32();
     uint32_t mdxOffset = readUint32();
     ArrayDefinition nameArrayDef(readArrayDefinition());
 
     _tsl = isTSLFunctionPointer(funcPtr1);
+    _offAnimRoot = offAnimRoot;
 
     // Read node names
     vector<uint32_t> nameOffsets(readUint32Array(kMdlDataOffset + nameArrayDef.offset, nameArrayDef.count));
     readNodeNames(nameOffsets);
 
     // Read nodes
-    shared_ptr<ModelNode> rootNode(readNode(offRootNode, nullptr));
+    shared_ptr<ModelNode> rootNode(readNodes(offRootNode, nullptr, false));
     prepareSkinMeshes();
 
     // Load supermodel
@@ -158,8 +159,11 @@ void MdlReader::readNodeNames(const vector<uint32_t> &offsets) {
     }
 }
 
-shared_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *parent, bool anim) {
+shared_ptr<ModelNode> MdlReader::readNodes(uint32_t offset, const ModelNode *parent, bool animated, bool animNode) {
     seek(kMdlDataOffset + offset);
+    if (!animated && offset == _offAnimRoot) {
+        animated = true;
+    }
 
     uint16_t flags = readUint16();
     uint16_t nodeNumber = readUint16();
@@ -185,6 +189,7 @@ shared_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *pare
         name,
         move(restPosition),
         move(restOrientation),
+        animated,
         parent);
 
     node->setFlags(flags);
@@ -201,17 +206,17 @@ shared_ptr<ModelNode> MdlReader::readNode(uint32_t offset, const ModelNode *pare
     if (flags & MdlNodeFlags::reference) {
         node->setReference(readReference());
     }
-    if (!anim) {
+    if (!animNode) {
         _nodes.push_back(node);
         _nodeFlags.insert(make_pair(nodeNumber, flags));
     }
 
     vector<float> controllerData(readFloatArray(kMdlDataOffset + controllerDataArrayDef.offset, controllerDataArrayDef.count));
-    readControllers(controllerArrayDef.offset, controllerArrayDef.count, controllerData, anim, *node);
+    readControllers(controllerArrayDef.offset, controllerArrayDef.count, controllerData, animNode, *node);
 
     vector<uint32_t> childOffsets(readUint32Array(kMdlDataOffset + childArrayDef.offset, childArrayDef.count));
     for (uint32_t offset : childOffsets) {
-        node->addChild(readNode(offset, node.get(), anim));
+        node->addChild(readNodes(offset, node.get(), animated, animNode));
     }
 
     return move(node);
@@ -636,9 +641,9 @@ shared_ptr<ModelNode::Reference> MdlReader::readReference() {
     return move(reference);
 }
 
-void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const vector<float> &data, bool anim, ModelNode &node) {
+void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const vector<float> &data, bool animNode, ModelNode &node) {
     uint16_t nodeFlags;
-    if (anim) {
+    if (animNode) {
         nodeFlags = _nodeFlags.find(node.number())->second;
     } else {
         nodeFlags = node.flags();
@@ -665,7 +670,7 @@ void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const vec
         if (fn) {
             fn(key, data, node);
         } else {
-            debug(boost::format("Unsupported MDL controller type: %d") % static_cast<int>(key.type));
+            debug(boost::format("Unsupported MDL controller type: %d") % static_cast<int>(key.type), LogChannels::graphics);
         }
     }
 }
@@ -721,7 +726,7 @@ unique_ptr<Animation> MdlReader::readAnimation(uint32_t offset) {
     ArrayDefinition eventArrayDef(readArrayDefinition());
     ignore(4); // unknown
 
-    shared_ptr<ModelNode> rootNode(readNode(offRootNode, nullptr, true));
+    shared_ptr<ModelNode> rootNode(readNodes(offRootNode, nullptr, false, true));
 
     // Events
     vector<Animation::Event> events;

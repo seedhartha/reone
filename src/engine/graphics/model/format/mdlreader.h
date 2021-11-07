@@ -67,18 +67,19 @@ private:
     std::unique_ptr<StreamReader> _mdxReader;
     bool _tsl {false}; /**< is this a TSL model? */
     std::vector<std::string> _nodeNames;
-    std::vector<std::shared_ptr<ModelNode>> _nodes; /**< loaded model nodes (DFS ordering) */
+    std::vector<std::shared_ptr<ModelNode>> _nodes; /**< nodes in read order (DFS) */
     std::map<uint16_t, uint16_t> _nodeFlags;
     std::shared_ptr<graphics::Model> _model;
+    uint32_t _offAnimRoot {0};
 
     void doLoad() override;
 
     ArrayDefinition readArrayDefinition();
     void readNodeNames(const std::vector<uint32_t> &offsets);
-    std::shared_ptr<graphics::ModelNode> readNode(uint32_t offset, const ModelNode *parent, bool anim = false);
+    std::shared_ptr<graphics::ModelNode> readNodes(uint32_t offset, const ModelNode *parent, bool animated, bool animNode = false);
     std::vector<std::shared_ptr<graphics::Animation>> readAnimations(const std::vector<uint32_t> &offsets);
     std::unique_ptr<graphics::Animation> readAnimation(uint32_t offset);
-    void readControllers(uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, bool anim, graphics::ModelNode &node);
+    void readControllers(uint32_t keyOffset, uint32_t keyCount, const std::vector<float> &data, bool animNode, graphics::ModelNode &node);
 
     std::shared_ptr<ModelNode::Reference> readReference();
     std::shared_ptr<ModelNode::Light> readLight();

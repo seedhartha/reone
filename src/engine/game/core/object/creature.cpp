@@ -1051,7 +1051,6 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
         shared_ptr<Model> headModel(_models.get(headModelName));
         if (headModel) {
             auto headSceneNode = _sceneGraph.newModel(headModel, ModelUsage::Creature, this);
-            headSceneNode->setInanimateNodes(bodyModel->getAncestorNodes(g_headHookNode));
             bodySceneNode->attach(g_headHookNode, move(headSceneNode));
             if (maskModel) {
                 auto maskSceneNode = _sceneGraph.newModel(maskModel, ModelUsage::Equipment, this);

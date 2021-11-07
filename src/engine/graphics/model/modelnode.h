@@ -175,11 +175,14 @@ public:
         std::string name,
         glm::vec3 restPosition,
         glm::quat restOrientation,
+        bool animated,
         const ModelNode *parent = nullptr);
 
     void init();
 
     void addChild(std::shared_ptr<ModelNode> child);
+
+    bool isAnimated() const { return _animated; }
 
     std::vector<uint32_t> getFacesByMaterial(uint32_t material) const;
 
@@ -300,6 +303,7 @@ private:
     uint16_t _number;
     std::string _name;
     const ModelNode *_parent;
+    bool _animated;
 
     uint16_t _flags {0};
     std::vector<std::shared_ptr<ModelNode>> _children;
