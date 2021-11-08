@@ -1286,6 +1286,8 @@ void Area::loadEncounters(const GffStruct &git) {
 bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room *&room) const {
     static glm::vec3 down(0.0f, 0.0f, -1.0f);
 
+    auto walkcheckSurfaces = _surfaces.getWalkcheckSurfaceIndices();
+
     // Test object walkmeshes
     for (auto &o : _objects) {
         // Object must have a valid model and walkmesh
@@ -1303,7 +1305,7 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
         glm::vec2 objSpacePos(model->absoluteTransformInverse() * glm::vec4(point, 0.0f, 1.0f));
         glm::vec3 origin(objSpacePos, kElevationTestZ);
         float distance = 0.0f;
-        auto face = walkmesh->raycast(origin, down, 2.0f * kElevationTestZ, distance);
+        auto face = walkmesh->raycast(walkcheckSurfaces, origin, down, 2.0f * kElevationTestZ, distance);
         if (face) {
             return false;
         }
@@ -1320,7 +1322,7 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
 
         glm::vec3 origin(point, kElevationTestZ);
         float distance;
-        auto face = walkmesh->raycast(origin, down, 2.0f * kElevationTestZ, distance);
+        auto face = walkmesh->raycast(walkcheckSurfaces, origin, down, 2.0f * kElevationTestZ, distance);
         if (face) {
             if (!face->walkable) {
                 return false;
@@ -1409,6 +1411,7 @@ bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::
     }
 
     // Test room walkmeshes
+    auto walkcheckSurfaces = _surfaces.getWalkcheckSurfaceIndices();
     for (auto &r : _rooms) {
         // Room must have a valid model and walkmesh
         shared_ptr<ModelSceneNode> model(r.second->model());
@@ -1418,7 +1421,7 @@ bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::
         }
 
         float distance;
-        auto face = walkmesh->raycast(start, dir, maxDistance, distance);
+        auto face = walkmesh->raycast(walkcheckSurfaces, start, dir, maxDistance, distance);
         if (face && distance < minDistance) {
             minDistance = distance;
         }
@@ -1436,6 +1439,7 @@ bool Area::getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm
     if (end == start) {
         return false;
     }
+    auto walkcheckSurfaces = _surfaces.getWalkcheckSurfaceIndices();
     glm::vec3 endToStart(end - start);
     glm::vec3 dir(glm::normalize(endToStart));
     float minDistance = numeric_limits<float>::max();
@@ -1450,7 +1454,7 @@ bool Area::getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm
         }
 
         float distance;
-        auto face = walkmesh->raycast(start, dir, maxDistance, distance);
+        auto face = walkmesh->raycast(walkcheckSurfaces, start, dir, maxDistance, distance);
         if (face && distance < minDistance) {
             minDistance = distance;
             normal = face->normal;
@@ -1492,6 +1496,7 @@ bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target)
     }
 
     // Test room walkmeshes
+    auto walkcheckSurfaces = _surfaces.getWalkcheckSurfaceIndices();
     for (auto &r : _rooms) {
         shared_ptr<ModelSceneNode> model(r.second->model());
         shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
@@ -1507,7 +1512,7 @@ bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target)
         }
 
         float distance;
-        auto face = walkmesh->raycast(start, dir, maxDistance, distance);
+        auto face = walkmesh->raycast(walkcheckSurfaces, start, dir, maxDistance, distance);
         if (face) {
             return false;
         }

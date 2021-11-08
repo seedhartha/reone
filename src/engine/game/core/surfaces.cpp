@@ -40,7 +40,8 @@ void Surfaces::init() {
     for (int row = 0; row < surfacemat->getRowCount(); ++row) {
         Surface surface;
         surface.label = surfacemat->getString(row, "label");
-        surface.walkable = surfacemat->getBool(row, "walk");
+        surface.walk = surfacemat->getBool(row, "walk");
+        surface.walkcheck = surfacemat->getBool(row, "walkcheck");
         surface.grass = surfacemat->getBool(row, "grass");
         surface.sound = surfacemat->getString(row, "sound");
         _surfaces.push_back(move(surface));
@@ -51,7 +52,7 @@ bool Surfaces::isWalkable(int index) const {
     if (index < 0 || index >= static_cast<int>(_surfaces.size())) {
         throw out_of_range("index is out of range");
     }
-    return _surfaces[index].walkable;
+    return _surfaces[index].walk;
 }
 
 const Surface &Surfaces::getSurface(int index) const {
@@ -73,6 +74,10 @@ set<uint32_t> Surfaces::getSurfaceIndices(const function<bool(const Surface &)> 
 
 set<uint32_t> Surfaces::getGrassSurfaceIndices() const {
     return getSurfaceIndices([](auto &surface) { return surface.grass; });
+}
+
+set<uint32_t> Surfaces::getWalkcheckSurfaceIndices() const {
+    return getSurfaceIndices([](auto &surface) { return surface.walkcheck; });
 }
 
 } // namespace game
