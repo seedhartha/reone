@@ -131,24 +131,28 @@ bool AABB::intersect(const AABB &other) const {
            (_min.z <= other._max.z && _max.z >= other._min.z);
 }
 
-// Algorithm adapted from https://gamedev.stackexchange.com/a/18459
 bool AABB::raycast(const glm::vec3 &origin, const glm::vec3 &dir, float maxDistance, float &outDistance) const {
-    glm::vec3 dirfrac(1.0f / dir);
-    float tx1 = (_min.x - origin.x) * dirfrac.x;
-    float tx2 = (_max.x - origin.x) * dirfrac.x;
-    float ty1 = (_min.y - origin.y) * dirfrac.y;
-    float ty2 = (_max.y - origin.y) * dirfrac.y;
-    float tz1 = (_min.z - origin.z) * dirfrac.z;
-    float tz2 = (_max.z - origin.z) * dirfrac.z;
-    float tmin = glm::max(glm::max(glm::min(tx1, tx2), glm::min(ty1, ty2)), glm::min(tz1, tz2));
-    float tmax = glm::min(glm::min(glm::max(tx1, tx2), glm::max(ty1, ty2)), glm::max(tz1, tz2));
+    glm::vec3 invDir(1.0f / dir);
+    glm::vec3 t1((_min - origin) * invDir);
+    glm::vec3 t2((_max - origin) * invDir);
 
-    if (tmin > 0.0f && tmax >= 0.0f && tmax >= tmin && tmin < maxDistance) {
-        outDistance = tmin;
-        return true;
+    float tmin = glm::min(t1.x, t2.x);
+    float tmax = glm::max(t1.x, t2.x);
+
+    tmin = glm::max(tmin, glm::min(t1.y, t2.y));
+    tmax = glm::min(tmax, glm::max(t1.y, t2.y));
+    tmin = glm::max(tmin, glm::min(t1.z, t2.z));
+    tmax = glm::min(tmax, glm::max(t1.z, t2.z));
+
+    if (tmax < glm::max(0.0f, tmin)) {
+        return false;
+    }
+    if (tmin >= maxDistance) {
+        return false;
     }
 
-    return false;
+    outDistance = tmin;
+    return true;
 }
 
 glm::vec3 AABB::getSize() const {
