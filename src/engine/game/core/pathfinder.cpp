@@ -42,6 +42,10 @@ const Pathfinder::ContextVertex &Pathfinder::Context::getVertexWithLeastTotalCos
 
 void Pathfinder::load(const vector<Path::Point> &points, const unordered_map<int, float> &pointZ) {
     for (uint16_t i = 0; i < points.size(); ++i) {
+        if (pointZ.count(i) == 0) {
+            continue;
+        }
+
         const Path::Point &point = points[i];
         glm::vec3 pointVec(point.x, point.y, pointZ.find(i)->second);
         _vertices.push_back(pointVec);

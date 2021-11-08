@@ -41,9 +41,10 @@ public:
      *
      * @param origin ray origin
      * @param dir ray direction
+     * @param maxDistance maximum distance to test
      * @param[out] distance to the intersection point (negative if ray origin is inside this AABB)
      */
-    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, float &distance) const;
+    bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, float maxDistance, float &outDistance) const;
 
     glm::vec3 getSize() const;
 

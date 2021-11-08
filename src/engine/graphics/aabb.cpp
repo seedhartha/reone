@@ -132,7 +132,7 @@ bool AABB::intersect(const AABB &other) const {
 }
 
 // Algorithm adapted from https://gamedev.stackexchange.com/a/18459
-bool AABB::raycast(const glm::vec3 &origin, const glm::vec3 &dir, float &distance) const {
+bool AABB::raycast(const glm::vec3 &origin, const glm::vec3 &dir, float maxDistance, float &outDistance) const {
     glm::vec3 dirfrac(1.0f / dir);
     float tx1 = (_min.x - origin.x) * dirfrac.x;
     float tx2 = (_max.x - origin.x) * dirfrac.x;
@@ -143,8 +143,8 @@ bool AABB::raycast(const glm::vec3 &origin, const glm::vec3 &dir, float &distanc
     float tmin = glm::max(glm::max(glm::min(tx1, tx2), glm::min(ty1, ty2)), glm::min(tz1, tz2));
     float tmax = glm::min(glm::min(glm::max(tx1, tx2), glm::max(ty1, ty2)), glm::max(tz1, tz2));
 
-    if (tmin > 0.0f && tmax >= 0.0f && tmax >= tmin) {
-        distance = tmin;
+    if (tmin > 0.0f && tmax >= 0.0f && tmax >= tmin && tmin < maxDistance) {
+        outDistance = tmin;
         return true;
     }
 
