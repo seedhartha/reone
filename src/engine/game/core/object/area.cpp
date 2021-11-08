@@ -1445,6 +1445,9 @@ bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::
 }
 
 bool Area::getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::vec3 &normal) const {
+    if (end == start) {
+        return false;
+    }
     glm::vec3 endToStart(end - start);
     glm::vec3 dir(glm::normalize(endToStart));
     float minDistance = numeric_limits<float>::max();
