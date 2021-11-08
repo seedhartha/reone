@@ -93,8 +93,8 @@ void Creature::loadAppearance() {
     }
 
     _modelType = parseModelType(appearances->getString(_appearance, "modeltype"));
-    _walkSpeed = appearances->getFloat(_appearance, "walkdist");
-    _runSpeed = appearances->getFloat(_appearance, "rundist");
+    _walkSpeed = appearances->getFloat(_appearance, "walkdist", 1.0f);
+    _runSpeed = appearances->getFloat(_appearance, "rundist", 1.0f);
     _footstepType = appearances->getInt(_appearance, "footsteptype", -1);
 
     if (_portraitId > 0) {
