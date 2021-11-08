@@ -45,11 +45,6 @@ const Walkmesh::Face *Walkmesh::raycast(const glm::vec3 &origin, const glm::vec3
 const Walkmesh::Face *Walkmesh::raycastAABB(AABB &aabb, const glm::vec3 &origin, const glm::vec3 &dir, float maxDistance, float &outDistance) const {
     float distance = 0.0f;
 
-    // Find ray/AABB intersection
-    if (!aabb.value.raycast(origin, dir, maxDistance, distance)) {
-        return nullptr;
-    }
-
     // For AABB tree leafs, find ray/face intersection
     if (aabb.faceIdx != -1) {
         const Face &face = _faces[aabb.faceIdx];
@@ -60,7 +55,12 @@ const Walkmesh::Face *Walkmesh::raycastAABB(AABB &aabb, const glm::vec3 &origin,
         return nullptr;
     }
 
-    // Otherwise, find intersection in child AABB nodes
+    // For AABB tree nodes, find ray/AABB intersection
+    if (!aabb.value.raycast(origin, dir, maxDistance, distance)) {
+        return nullptr;
+    }
+
+    // Find intersection with child AABB nodes
     if (aabb.child1) {
         auto face = raycastAABB(*aabb.child1, origin, dir, maxDistance, distance);
         if (face) {
