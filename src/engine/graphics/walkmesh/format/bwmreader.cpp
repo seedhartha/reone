@@ -82,11 +82,12 @@ void BwmReader::doLoad() {
         face.vertices.push_back(glm::make_vec3(&_vertices[3 * indices[1]]));
         face.vertices.push_back(glm::make_vec3(&_vertices[3 * indices[2]]));
         face.normal = glm::make_vec3(&_normals[3 * i]);
+        face.walkable = i < numWalkableFaces;
 
-        if (i >= numWalkableFaces) {
-            _walkmesh->_nonWalkableFaces.push_back(move(face));
-        } else {
+        if (face.walkable) {
             _walkmesh->_walkableFaces.push_back(move(face));
+        } else {
+            _walkmesh->_nonWalkableFaces.push_back(move(face));
         }
     }
 

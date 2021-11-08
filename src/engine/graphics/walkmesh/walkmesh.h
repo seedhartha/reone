@@ -33,6 +33,8 @@ public:
         uint32_t material {0};
         std::vector<glm::vec3> vertices;
         glm::vec3 normal {0.0f};
+
+        bool walkable {false}; // can be determined from material
     };
 
     struct AABB {
@@ -47,12 +49,9 @@ public:
     bool raycastNonWalkableFirst(const glm::vec3 &origin, const glm::vec3 &dir, float &distance, glm::vec3 &normal) const;
     bool raycastNonWalkableClosest(const glm::vec3 &origin, const glm::vec3 &dir, float &distance, glm::vec3 &normal) const;
 
-    const std::vector<Face> &grassFaces() const { return _grassFaces; }
-
 private:
     std::vector<Face> _walkableFaces;
     std::vector<Face> _nonWalkableFaces;
-    std::vector<Face> _grassFaces;
 
     std::shared_ptr<AABB> _rootAabb;
 
