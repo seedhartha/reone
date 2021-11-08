@@ -1318,12 +1318,6 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
             continue;
         }
 
-        // Point must be inside room AABB in 2D object space
-        glm::vec2 roomSpacePos(model->absoluteTransformInverse() * glm::vec4(point, 0.0f, 1.0f));
-        if (!model->aabb().contains(roomSpacePos)) {
-            continue;
-        }
-
         glm::vec3 origin(point, kElevationTestZ);
         float distance;
         auto face = walkmesh->raycast(origin, down, 2.0f * kElevationTestZ, distance);
@@ -1423,12 +1417,6 @@ bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::
             continue;
         }
 
-        // Start of path must be inside room AABB
-        glm::vec2 roomSpacePos(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
-        if (!model->aabb().contains(roomSpacePos)) {
-            continue;
-        }
-
         float distance;
         auto face = walkmesh->raycast(start, dir, maxDistance, distance);
         if (face && distance < minDistance) {
@@ -1453,17 +1441,11 @@ bool Area::getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm
     float minDistance = numeric_limits<float>::max();
     float maxDistance = glm::length(endToStart);
 
-    // Test non-walkable faces of room walkmeshes
+    // Test room walkmeshes
     for (auto &r : _rooms) {
         shared_ptr<ModelSceneNode> model(r.second->model());
         shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
         if (!model || !walkmesh) {
-            continue;
-        }
-
-        // Start of path must be inside room AABB
-        glm::vec2 roomSpacePos(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
-        if (!model->aabb().contains(roomSpacePos)) {
             continue;
         }
 
