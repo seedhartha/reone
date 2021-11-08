@@ -25,9 +25,8 @@ namespace reone {
 
 namespace graphics {
 
-BwmReader::BwmReader(set<uint32_t> walkableSurfaces) :
-    BinaryReader(8, "BWM V1.0"),
-    _walkableSurfaces(move(walkableSurfaces)) {
+BwmReader::BwmReader() :
+    BinaryReader(8, "BWM V1.0") {
 }
 
 void BwmReader::doLoad() {
@@ -36,28 +35,29 @@ void BwmReader::doLoad() {
     ignore(48 + 12); // reserved + position
 
     _numVertices = readUint32();
-    if (_numVertices == 0)
+    if (_numVertices == 0) {
         return;
+    }
 
-    _offsetVertices = readUint32();
+    _offVertices = readUint32();
     _numFaces = readUint32();
-    _offsetIndices = readUint32();
-    _offsetMaterials = readUint32();
-    _offsetNormals = readUint32();
-    _offsetPlanarDistances = readUint32();
+    _offIndices = readUint32();
+    _offMaterials = readUint32();
+    _offNormals = readUint32();
+    _offPlanarDistances = readUint32();
 
     if (_type == WalkmeshType::WOK) {
         _numAabb = readUint32();
-        _offsetAabb = readUint32();
+        _offAabb = readUint32();
 
         ignore(4); // unknown
 
         _numAdjacencies = readUint32();
-        _offsetAdjacencies = readUint32();
+        _offAdjacencies = readUint32();
         _numEdges = readUint32();
         _offsetEdges = readUint32();
         _numPerimeters = readUint32();
-        _offsetPerimeters = readUint32();
+        _offPerimeters = readUint32();
     }
 
     _walkmesh = make_shared<Walkmesh>();
@@ -66,6 +66,10 @@ void BwmReader::doLoad() {
     loadIndices();
     loadMaterials();
     loadNormals();
+
+    // In WOK adjacencies are calculated only for walkable faces.
+    // In PWK/DWK there no walkable faces.
+    uint32_t numWalkableFaces = _numAdjacencies;
 
     for (uint32_t i = 0; i < _numFaces; ++i) {
         uint32_t material = _materials[i];
@@ -79,11 +83,10 @@ void BwmReader::doLoad() {
         face.vertices.push_back(glm::make_vec3(&_vertices[3 * indices[2]]));
         face.normal = glm::make_vec3(&_normals[3 * i]);
 
-        bool walkable = _walkableSurfaces.count(material) > 0;
-        if (walkable) {
-            _walkmesh->_walkableFaces.push_back(move(face));
-        } else {
+        if (i >= numWalkableFaces) {
             _walkmesh->_nonWalkableFaces.push_back(move(face));
+        } else {
+            _walkmesh->_walkableFaces.push_back(move(face));
         }
     }
 
@@ -93,7 +96,7 @@ void BwmReader::doLoad() {
 }
 
 void BwmReader::loadVertices() {
-    seek(_offsetVertices);
+    seek(_offVertices);
     _vertices.reserve(3 * _numVertices);
 
     for (uint32_t i = 0; i < _numVertices; ++i) {
@@ -104,7 +107,7 @@ void BwmReader::loadVertices() {
 }
 
 void BwmReader::loadIndices() {
-    seek(_offsetIndices);
+    seek(_offIndices);
     _indices.reserve(3 * _numFaces);
 
     for (uint32_t i = 0; i < _numFaces; ++i) {
@@ -115,7 +118,7 @@ void BwmReader::loadIndices() {
 }
 
 void BwmReader::loadMaterials() {
-    seek(_offsetMaterials);
+    seek(_offMaterials);
     _materials.reserve(_numFaces);
 
     for (uint32_t i = 0; i < _numFaces; ++i) {
@@ -124,7 +127,7 @@ void BwmReader::loadMaterials() {
 }
 
 void BwmReader::loadNormals() {
-    seek(_offsetNormals);
+    seek(_offNormals);
     _normals.reserve(3 * _numFaces);
 
     for (uint32_t i = 0; i < _numFaces; ++i) {
@@ -135,7 +138,7 @@ void BwmReader::loadNormals() {
 }
 
 void BwmReader::loadAABB() {
-    seek(_offsetAabb);
+    seek(_offAabb);
 
     vector<shared_ptr<Walkmesh::AABB>> aabbs;
     aabbs.resize(_numAabb);

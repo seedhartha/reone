@@ -53,7 +53,7 @@ shared_ptr<Walkmesh> Walkmeshes::doGet(const string &resRef, ResourceType type) 
     shared_ptr<Walkmesh> walkmesh;
 
     if (data) {
-        BwmReader bwm(_walkableSurfaces);
+        BwmReader bwm;
         bwm.load(wrap(data));
         walkmesh = bwm.walkmesh();
     }
