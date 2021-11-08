@@ -36,14 +36,6 @@ public:
     bool contains(const glm::vec3 &point) const;
     bool intersect(const AABB &other) const;
 
-    /**
-     * Casts a ray and tests if it intersects this AABB.
-     *
-     * @param origin ray origin
-     * @param dir ray direction
-     * @param maxDistance maximum distance to test
-     * @param[out] distance to the intersection point (negative if ray origin is inside this AABB)
-     */
     bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, float maxDistance, float &outDistance) const;
 
     glm::vec3 getSize() const;
