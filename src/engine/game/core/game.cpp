@@ -153,7 +153,6 @@ Game::Game(
 
 void Game::init() {
     _window.setEventHandler(this);
-    _walkmeshes.setWalkableSurfaces(_surfaces.getWalkableSurfaceIndices());
 
     _console = make_unique<Console>(*this, _effectFactory, _party, _fonts, _meshes, _shaders, _window);
     _console->init();

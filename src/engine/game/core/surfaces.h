@@ -34,7 +34,6 @@ public:
     bool isWalkable(int index) const;
 
     const Surface &getSurface(int index) const;
-    std::set<uint32_t> getWalkableSurfaceIndices() const;
     std::set<uint32_t> getGrassSurfaceIndices() const;
 
 private:

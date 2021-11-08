@@ -27,7 +27,7 @@ class Walkmesh;
 
 class BwmReader : public resource::BinaryReader {
 public:
-    BwmReader(std::set<uint32_t> walkableSurfaces);
+    BwmReader();
 
     std::shared_ptr<Walkmesh> walkmesh() const { return _walkmesh; }
 
@@ -37,25 +37,23 @@ private:
         WOK = 1
     };
 
-    std::set<uint32_t> _walkableSurfaces;
-
     WalkmeshType _type {WalkmeshType::WOK};
 
     uint32_t _numVertices {0};
-    uint32_t _offsetVertices {0};
+    uint32_t _offVertices {0};
     uint32_t _numFaces {0};
-    uint32_t _offsetIndices {0};
-    uint32_t _offsetMaterials {0};
-    uint32_t _offsetNormals {0};
-    uint32_t _offsetPlanarDistances {0};
+    uint32_t _offIndices {0};
+    uint32_t _offMaterials {0};
+    uint32_t _offNormals {0};
+    uint32_t _offPlanarDistances {0};
     uint32_t _numAabb {0};
-    uint32_t _offsetAabb {0};
+    uint32_t _offAabb {0};
     uint32_t _numAdjacencies {0};
-    uint32_t _offsetAdjacencies {0};
+    uint32_t _offAdjacencies {0};
     uint32_t _numEdges {0};
     uint32_t _offsetEdges {0};
     uint32_t _numPerimeters {0};
-    uint32_t _offsetPerimeters {0};
+    uint32_t _offPerimeters {0};
 
     std::vector<float> _vertices;
     std::vector<uint32_t> _indices;
