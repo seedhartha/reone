@@ -47,15 +47,32 @@ public:
     /**
      * @return pointer to intersected face or nullptr, when no intersection
      */
-    const Walkmesh::Face *raycast(const glm::vec3 &origin, const glm::vec3 &dir, float maxDistance, float &outDistance) const;
+    const Walkmesh::Face *raycast(
+        std::set<uint32_t> walkcheckSurfaces,
+        const glm::vec3 &origin,
+        const glm::vec3 &dir,
+        float maxDistance,
+        float &outDistance) const;
 
 private:
     std::vector<Face> _faces;
     std::shared_ptr<AABB> _rootAabb;
 
-    const Walkmesh::Face *raycastAABB(AABB &aabb, const glm::vec3 &origin, const glm::vec3 &dir, float maxDistance, float &outDistance) const;
+    const Walkmesh::Face *raycastAABB(
+        std::set<uint32_t> walkcheckSurfaces,
+        AABB &aabb,
+        const glm::vec3 &origin,
+        const glm::vec3 &dir,
+        float maxDistance,
+        float &outDistance) const;
 
-    bool raycastFace(const Walkmesh::Face &face, const glm::vec3 &origin, const glm::vec3 &dir, float maxDistance, float &outDistance) const;
+    bool raycastFace(
+        std::set<uint32_t> walkcheckSurfaces,
+        const Walkmesh::Face &face,
+        const glm::vec3 &origin,
+        const glm::vec3 &dir,
+        float maxDistance,
+        float &outDistance) const;
 
     friend class BwmReader;
 };
