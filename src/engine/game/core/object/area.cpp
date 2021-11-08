@@ -1286,43 +1286,51 @@ void Area::loadEncounters(const GffStruct &git) {
 bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room *&room) const {
     static glm::vec3 down(0.0f, 0.0f, -1.0f);
 
-    // Test non-walkable faces of object walkmeshes
+    // Test object walkmeshes
     for (auto &o : _objects) {
+        // Object must have a valid model and walkmesh
         auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
         shared_ptr<Walkmesh> walkmesh(o->getWalkmesh());
-        if (!model || !walkmesh)
+        if (!model || !walkmesh) {
             continue;
+        }
 
         // Distance to object must not exceed maximum collision distance
-        if (o->getDistanceTo2(point) > kMaxCollisionDistance2)
+        if (o->getDistanceTo2(point) > kMaxCollisionDistance2) {
             continue;
+        }
 
-        // Test non-walkable faces beneath the specified point (object space)
         glm::vec2 objSpacePos(model->absoluteTransformInverse() * glm::vec4(point, 0.0f, 1.0f));
-        float distance;
-        glm::vec3 normal;
-        if (walkmesh->raycastNonWalkableFirst(glm::vec3(objSpacePos, kElevationTestZ), down, distance, normal))
+        float distance = 0.0f;
+        auto face = walkmesh->raycast(glm::vec3(objSpacePos, kElevationTestZ), down, distance);
+        if (face) {
             return false;
+        }
     }
 
-    // Test walkable faces of room walkmeshes
+    // Test room walkmeshes
     for (auto &r : _rooms) {
+        // Room must have a valid model and walkmesh
         shared_ptr<ModelSceneNode> model(r.second->model());
         shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
-        if (!model || !walkmesh)
+        if (!model || !walkmesh) {
             continue;
+        }
 
         // Point must be inside room AABB in 2D object space
         glm::vec2 roomSpacePos(model->absoluteTransformInverse() * glm::vec4(point, 0.0f, 1.0f));
-        if (!model->aabb().contains(roomSpacePos))
+        if (!model->aabb().contains(roomSpacePos)) {
             continue;
+        }
 
-        // Test walkable faces beneath the specified point (world space)
         float distance;
-        int tempMaterial;
-        if (walkmesh->raycastWalkableFirst(glm::vec3(point, kElevationTestZ), down, distance, tempMaterial)) {
+        auto face = walkmesh->raycast(glm::vec3(point, kElevationTestZ), down, distance);
+        if (face) {
+            if (!face->walkable) {
+                return false;
+            }
             z = kElevationTestZ - distance;
-            material = tempMaterial;
+            material = face->material;
             room = r.second.get();
             return true;
         }
@@ -1381,16 +1389,19 @@ bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::
 
     // Test AABB of door objects
     for (auto &o : _objects) {
-        if (o->type() != ObjectType::Door)
+        if (o->type() != ObjectType::Door) {
             continue;
+        }
 
         auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
-        if (!model)
+        if (!model) {
             continue;
+        }
 
         // Distance to object must not exceed maximum collision distance
-        if (o->getDistanceTo2(start) > kMaxCollisionDistance2)
+        if (o->getDistanceTo2(start) > kMaxCollisionDistance2) {
             continue;
+        }
 
         glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
         glm::vec3 objSpaceDir(model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
@@ -1400,21 +1411,24 @@ bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::
         }
     }
 
-    // Test non-walkable faces of room walkmeshes
+    // Test room walkmeshes
     for (auto &r : _rooms) {
+        // Room must have a valid model and walkmesh
         shared_ptr<ModelSceneNode> model(r.second->model());
         shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
-        if (!model || !walkmesh)
+        if (!model || !walkmesh) {
             continue;
+        }
 
         // Start of path must be inside room AABB
         glm::vec2 roomSpacePos(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
-        if (!model->aabb().contains(roomSpacePos))
+        if (!model->aabb().contains(roomSpacePos)) {
             continue;
+        }
 
         float distance;
-        glm::vec3 normal;
-        if (walkmesh->raycastNonWalkableClosest(start, dir, distance, normal) && distance < minDistance && distance < maxDistance) {
+        auto face = walkmesh->raycast(start, dir, distance);
+        if (face && distance < minDistance && distance < maxDistance) {
             minDistance = distance;
         }
     }
@@ -1446,10 +1460,10 @@ bool Area::getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm
             continue;
 
         float distance;
-        glm::vec3 tempNormal;
-        if (walkmesh->raycastNonWalkableClosest(start, dir, distance, tempNormal) && distance < minDistance && distance < maxDistance) {
+        auto face = walkmesh->raycast(start, dir, distance);
+        if (face && distance < minDistance && distance < maxDistance) {
             minDistance = distance;
-            normal = tempNormal;
+            normal = face->normal;
         }
     }
 
@@ -1484,7 +1498,7 @@ bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target)
             return false;
     }
 
-    // Test non-walkable faces of room walkmeshes
+    // Test room walkmeshes
     for (auto &r : _rooms) {
         shared_ptr<ModelSceneNode> model(r.second->model());
         shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
@@ -1498,9 +1512,10 @@ bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target)
             continue;
 
         float distance;
-        glm::vec3 normal;
-        if (walkmesh->raycastNonWalkableClosest(start, dir, distance, normal) && distance < maxDistance)
+        auto face = walkmesh->raycast(start, dir, distance);
+        if (face && distance < maxDistance) {
             return false;
+        }
     }
 
     return true;

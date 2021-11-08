@@ -84,11 +84,7 @@ void BwmReader::doLoad() {
         face.normal = glm::make_vec3(&_normals[3 * i]);
         face.walkable = i < numWalkableFaces;
 
-        if (face.walkable) {
-            _walkmesh->_walkableFaces.push_back(move(face));
-        } else {
-            _walkmesh->_nonWalkableFaces.push_back(move(face));
-        }
+        _walkmesh->_faces.push_back(move(face));
     }
 
     if (_type == WalkmeshType::WOK) {
@@ -156,8 +152,7 @@ void BwmReader::loadAABB() {
         uint32_t childIdx2 = readUint32();
 
         aabbs[i] = make_shared<Walkmesh::AABB>();
-        aabbs[i]->min = glm::make_vec3(&bounds[0]);
-        aabbs[i]->max = glm::make_vec3(&bounds[3]);
+        aabbs[i]->value = AABB(glm::make_vec3(&bounds[0]), glm::make_vec3(&bounds[3]));
         aabbs[i]->faceIdx = faceIdx;
 
         aabbChildren[i] = make_pair(childIdx1, childIdx2);
