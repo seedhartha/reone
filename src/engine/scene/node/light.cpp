@@ -103,7 +103,7 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     uniforms.combined.general.projection = glm::ortho(0.0f, w, 0.0f, h);
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.alpha = 0.5f;
-    //uniforms.combined.general.color = glm::vec4(flare.colorShift, 1.0f);
+    // uniforms.combined.general.color = glm::vec4(flare.colorShift, 1.0f);
 
     _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
 

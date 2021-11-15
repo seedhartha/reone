@@ -90,7 +90,7 @@ bool Door::isSelectable() const {
 void Door::open(const shared_ptr<Object> &triggerrer) {
     auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
     if (model) {
-        //model->setDefaultAnimation("opened1", AnimationProperties::fromFlags(AnimationFlags::loop));
+        // model->setDefaultAnimation("opened1", AnimationProperties::fromFlags(AnimationFlags::loop));
         model->playAnimation("opening1");
     }
     _open = true;
@@ -99,7 +99,7 @@ void Door::open(const shared_ptr<Object> &triggerrer) {
 void Door::close(const shared_ptr<Object> &triggerrer) {
     auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
     if (model) {
-        //model->setDefaultAnimation("closed", AnimationProperties::fromFlags(AnimationFlags::loop));
+        // model->setDefaultAnimation("closed", AnimationProperties::fromFlags(AnimationFlags::loop));
         model->playAnimation("closing1");
     }
     _open = false;
