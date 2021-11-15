@@ -55,10 +55,10 @@ public:
     std::vector<glm::vec3> getTriangleCoords(int faceIdx) const;
 
     /**
-    * @param faceIdx face index
-    * @param baryPosition barycentric point coordinates
-    * @return first texture coordinates
-    */
+     * @param faceIdx face index
+     * @param baryPosition barycentric point coordinates
+     * @return first texture coordinates
+     */
     glm::vec2 getTriangleTexCoords1(int faceIdx, const glm::vec3 &baryPosition) const;
 
     /**
