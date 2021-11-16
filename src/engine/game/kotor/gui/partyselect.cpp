@@ -23,12 +23,12 @@
 #include "../../../resource/strings.h"
 #include "../../../script/types.h"
 
-#include "../../../resource/gffs.h"
 #include "../../core/object/factory.h"
 #include "../../core/party.h"
 #include "../../core/portrait.h"
 #include "../../core/portraits.h"
 #include "../../core/script/runner.h"
+#include "../../core/services.h"
 
 #include "../kotor.h"
 
@@ -52,72 +52,8 @@ static int g_strRefRemove = 38456;
 static glm::vec3 g_kotorColorOn = {0.984314f, 1.0f, 0};
 static glm::vec3 g_kotorColorAdded = {0, 0.831373f, 0.090196f};
 
-PartySelection::PartySelection(
-    KotOR *game,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    GameGUI(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas) {
+PartySelection::PartySelection(KotOR *game, Services &services) :
+    GameGUI(game, services) {
     if (game->isTSL()) {
         _resRef = "partyselect_p";
     } else {
@@ -146,13 +82,13 @@ void PartySelection::load() {
         changeParty();
         _game->openInGame();
         if (!_context.exitScript.empty()) {
-            _scriptRunner.run(_context.exitScript);
+            _services.scriptRunner.run(_context.exitScript);
         }
     });
     _binding.btnBack->setOnClick([this]() {
         _game->openInGame();
         if (!_context.exitScript.empty()) {
-            _scriptRunner.run(_context.exitScript);
+            _services.scriptRunner.run(_context.exitScript);
         }
     });
     _binding.btnNpc0->setOnClick([this]() {
@@ -266,7 +202,7 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
     if (ctx.forceNpc2 >= 0) {
         addNpc(ctx.forceNpc2);
     }
-    Party &party = _party;
+    Party &party = _services.party;
     vector<Label *> charLabels {
         _binding.lblChar0.get(),
         _binding.lblChar1.get(),
@@ -304,14 +240,14 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
 
         if (party.isMemberAvailable(i)) {
             string blueprintResRef(party.getAvailableMember(i));
-            shared_ptr<GffStruct> utc(_gffs.get(blueprintResRef, ResourceType::Utc));
+            shared_ptr<GffStruct> utc(_services.gffs.get(blueprintResRef, ResourceType::Utc));
             shared_ptr<Texture> portrait;
             int portraitId = utc->getInt("PortraitId", 0);
             if (portraitId > 0) {
-                portrait = _portraits.getTextureByIndex(portraitId);
+                portrait = _services.portraits.getTextureByIndex(portraitId);
             } else {
                 int appearance = utc->getInt("Appearance_Type");
-                portrait = _portraits.getTextureByAppearance(appearance);
+                portrait = _services.portraits.getTextureByAppearance(appearance);
             }
             btnNpc.setDisabled(false);
             lblChar.setBorderFill(move(portrait));
@@ -404,11 +340,11 @@ void PartySelection::changeParty() {
     shared_ptr<Area> area(_game->module()->area());
     area->unloadParty();
 
-    Party &party = _party;
+    Party &party = _services.party;
     party.clear();
     party.addMember(kNpcPlayer, party.player());
 
-    shared_ptr<Creature> player(_party.player());
+    shared_ptr<Creature> player(_services.party.player());
 
     for (int i = 0; i < kNpcCount; ++i) {
         if (!_added[i])
@@ -416,7 +352,7 @@ void PartySelection::changeParty() {
 
         string blueprintResRef(party.getAvailableMember(i));
 
-        shared_ptr<Creature> creature(_objectFactory.newCreature());
+        shared_ptr<Creature> creature(_services.objectFactory.newCreature());
         creature->loadFromBlueprint(blueprintResRef);
         creature->setFaction(Faction::Friendly1);
         creature->setImmortal(true);

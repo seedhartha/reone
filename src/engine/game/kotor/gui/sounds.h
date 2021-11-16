@@ -39,7 +39,8 @@ namespace game {
 class GUISounds : boost::noncopyable {
 public:
     GUISounds(audio::AudioFiles &audioFiles, resource::TwoDas &twoDas) :
-        _audioFiles(audioFiles), _twoDas(twoDas) {
+        _audioFiles(audioFiles),
+        _twoDas(twoDas) {
     }
 
     ~GUISounds();

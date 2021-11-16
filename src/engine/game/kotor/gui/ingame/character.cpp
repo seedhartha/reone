@@ -23,6 +23,7 @@
 #include "../../../core/d20/classes.h"
 #include "../../../core/object/factory.h"
 #include "../../../core/party.h"
+#include "../../../core/services.h"
 
 #include "../../kotor.h"
 
@@ -44,70 +45,8 @@ namespace game {
 CharacterMenu::CharacterMenu(
     KotOR *game,
     InGameMenu &inGameMenu,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    GameGUI(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas),
+    Services &services) :
+    GameGUI(game, services),
     _inGameMenu(inGameMenu) {
     _resRef = getResRef("character");
 
@@ -218,7 +157,7 @@ void CharacterMenu::bindControls() {
 }
 
 void CharacterMenu::update(float dt) {
-    shared_ptr<Creature> leader(_party.getLeader());
+    shared_ptr<Creature> leader(_services.party.getLeader());
     _binding.btnLevelup->setVisible(leader->isLevelUpPending());
     _binding.btnAuto->setVisible(leader->isLevelUpPending());
     GUI::update(dt);
@@ -233,7 +172,7 @@ static string describeAbilityModifier(int value) {
 }
 
 void CharacterMenu::refreshControls() {
-    shared_ptr<Creature> partyLeader(_party.getLeader());
+    shared_ptr<Creature> partyLeader(_services.party.getLeader());
     CreatureAttributes &attributes = partyLeader->attributes();
 
     if (!_game->isTSL()) {
@@ -276,14 +215,14 @@ string CharacterMenu::describeClass(ClassType clazz) const {
     if (clazz == ClassType::Invalid)
         return "";
 
-    return _classes.get(clazz)->name();
+    return _services.classes.get(clazz)->name();
 }
 
 void CharacterMenu::refreshPortraits() {
     if (_game->isTSL())
         return;
 
-    Party &party = _party;
+    Party &party = _services.party;
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
 
@@ -318,32 +257,32 @@ void CharacterMenu::refresh3D() {
 }
 
 shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) const {
-    auto partyLeader = _party.getLeader();
+    auto partyLeader = _services.party.getLeader();
 
     auto objectFactory = make_shared<ObjectFactory>(
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas,
+        _services.actionFactory,
+        _services.classes,
+        _services.combat,
+        _services.footstepSounds,
+        _services.party,
+        _services.portraits,
+        _services.reputes,
+        _services.scriptRunner,
+        _services.soundSets,
+        _services.surfaces,
+        _services.audioFiles,
+        _services.audioPlayer,
+        _services.context,
+        _services.meshes,
+        _services.models,
+        _services.shaders,
+        _services.textures,
+        _services.walkmeshes,
+        _services.window,
+        _services.gffs,
+        _services.resources,
+        _services.strings,
+        _services.twoDas,
         sceneGraph);
     objectFactory->setGame(*_game);
 
@@ -364,7 +303,7 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) 
     character->loadAppearance();
     character->updateModelAnimation();
 
-    auto sceneModel = sceneGraph.newModel(_models.get("charmain_light"), ModelUsage::GUI);
+    auto sceneModel = sceneGraph.newModel(_services.models.get("charmain_light"), ModelUsage::GUI);
     sceneModel->attach("charmain_light", character->sceneNode());
 
     return move(sceneModel);

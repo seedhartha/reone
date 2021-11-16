@@ -31,6 +31,7 @@
 
 #include "../../core/party.h"
 #include "../../core/script/routine/routines.h"
+#include "../../core/services.h"
 
 #include "../kotor.h"
 
@@ -84,72 +85,8 @@ static const unordered_map<string, AnimationType> g_animTypeByName {
     {"kneel_talk_angry", AnimationType::LoopingKneelTalkAngry},
     {"kneel_talk_sad", AnimationType::LoopingKneelTalkSad}};
 
-DialogGUI::DialogGUI(
-    KotOR *game,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    Conversation(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas) {
+DialogGUI::DialogGUI(KotOR *game, Services &services) :
+    Conversation(game, services) {
     _resRef = getResRef("dialog");
     _scaling = ScalingMode::Stretch;
 }
@@ -236,7 +173,7 @@ void DialogGUI::loadStuntParticipants() {
         participant.creature = creature;
 
         if (_dialog->isAnimatedCutscene()) {
-            shared_ptr<Model> model(_models.get(stunt.stuntModel));
+            shared_ptr<Model> model(_services.models.get(stunt.stuntModel));
             if (!model) {
                 warn("Dialog: stunt model not found: " + stunt.stuntModel);
                 continue;
@@ -280,7 +217,7 @@ void DialogGUI::loadCurrentSpeaker() {
 
     // Make current speaker face the player, and vice versa
     if (_currentSpeaker) {
-        shared_ptr<Creature> player(_party.player());
+        shared_ptr<Creature> player(_services.party.player());
         player->face(*_currentSpeaker);
 
         auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
@@ -295,7 +232,7 @@ void DialogGUI::updateCamera() {
     shared_ptr<Area> area(_game->module()->area());
 
     if (_dialog->cameraModel().empty()) {
-        shared_ptr<Creature> player(_party.player());
+        shared_ptr<Creature> player(_services.party.player());
         glm::vec3 listenerPosition(player ? getTalkPosition(*player) : glm::vec3(0.0f));
         glm::vec3 speakerPosition(_currentSpeaker ? getTalkPosition(*_currentSpeaker) : glm::vec3(0.0f));
         auto &camera = area->getCamera<DialogCamera>(CameraType::Dialog);
@@ -373,7 +310,7 @@ string DialogGUI::getStuntAnimationName(int ordinal) const {
 }
 
 AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
-    shared_ptr<TwoDA> animations(_twoDas.get("dialoganimations"));
+    shared_ptr<TwoDA> animations(_services.twoDas.get("dialoganimations"));
     int index = ordinal - 10000;
 
     if (index < 0 || index >= animations->getRowCount()) {

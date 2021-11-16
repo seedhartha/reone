@@ -27,6 +27,7 @@
 
 #include "../../../core/object/creature.h"
 #include "../../../core/party.h"
+#include "../../../core/services.h"
 
 #include "../../kotor.h"
 
@@ -45,72 +46,8 @@ static constexpr int kStrRefSkillRank = 1579;
 static constexpr int kStrRefBonus = 32129;
 static constexpr int kStrRefTotalRank = 41904;
 
-AbilitiesMenu::AbilitiesMenu(
-    KotOR *game,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    GameGUI(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas) {
+AbilitiesMenu::AbilitiesMenu(KotOR *game, Services &services) :
+    GameGUI(game, services) {
     _resRef = getResRef("abilities");
 
     initForGame();
@@ -140,7 +77,7 @@ void AbilitiesMenu::load() {
         if (maybeSkillInfo == _skills.end())
             return;
 
-        shared_ptr<Creature> partyLeader(_party.getLeader());
+        shared_ptr<Creature> partyLeader(_services.party.getLeader());
 
         _binding.lblRankVal->setTextMessage(to_string(partyLeader->attributes().getSkillRank(skill)));
         _binding.lblBonusVal->setTextMessage("0");
@@ -191,7 +128,7 @@ void AbilitiesMenu::bindControls() {
 }
 
 void AbilitiesMenu::loadSkills() {
-    shared_ptr<TwoDA> skills(_twoDas.get("skills"));
+    shared_ptr<TwoDA> skills(_services.twoDas.get("skills"));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         auto skill = static_cast<SkillType>(row);
 
@@ -233,7 +170,7 @@ void AbilitiesMenu::refreshPortraits() {
     if (_game->isTSL())
         return;
 
-    Party &party = _party;
+    Party &party = _services.party;
     shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));

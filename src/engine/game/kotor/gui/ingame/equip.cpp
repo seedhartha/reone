@@ -24,6 +24,7 @@
 #include "../../../core/object/factory.h"
 #include "../../../core/object/item.h"
 #include "../../../core/party.h"
+#include "../../../core/services.h"
 
 #include "../../kotor.h"
 
@@ -72,70 +73,8 @@ static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
 Equipment::Equipment(
     KotOR *game,
     InGameMenu &inGameMenu,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    GameGUI(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas),
+    Services &services) :
+    GameGUI(game, services),
     _inGameMenu(inGameMenu) {
     _resRef = getResRef("equip");
 
@@ -287,7 +226,7 @@ void Equipment::onItemsListBoxItemClick(const string &item) {
     if (_selectedSlot == Slot::None)
         return;
 
-    shared_ptr<Creature> player(_party.player());
+    shared_ptr<Creature> player(_services.party.player());
     shared_ptr<Item> itemObj;
     if (item != "[none]") {
         for (auto &playerItem : player->items()) {
@@ -298,7 +237,7 @@ void Equipment::onItemsListBoxItemClick(const string &item) {
         }
     }
     int slot = getInventorySlot(_selectedSlot);
-    shared_ptr<Creature> partyLeader(_party.getLeader());
+    shared_ptr<Creature> partyLeader(_services.party.getLeader());
     shared_ptr<Item> equipped(partyLeader->getEquippedItem(slot));
 
     if (equipped != itemObj) {
@@ -312,7 +251,7 @@ void Equipment::onItemsListBoxItemClick(const string &item) {
                 if (last) {
                     partyLeader->equip(slot, itemObj);
                 } else {
-                    shared_ptr<Item> clonedItem(_objectFactory.newItem());
+                    shared_ptr<Item> clonedItem(_services.objectFactory.newItem());
                     clonedItem->loadFromBlueprint(itemObj->blueprintResRef());
                     partyLeader->equip(slot, clonedItem);
                 }
@@ -328,7 +267,7 @@ void Equipment::update() {
     updateEquipment();
     selectSlot(Slot::None);
 
-    auto partyLeader(_party.getLeader());
+    auto partyLeader(_services.party.getLeader());
 
     if (!_game->isTSL()) {
         string vitalityString(str(boost::format("%d/\n%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
@@ -341,7 +280,7 @@ void Equipment::updatePortraits() {
     if (_game->isTSL())
         return;
 
-    Party &party = _party;
+    Party &party = _services.party;
     shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
@@ -379,7 +318,7 @@ void Equipment::selectSlot(Slot slot) {
 }
 
 void Equipment::updateEquipment() {
-    shared_ptr<Creature> partyLeader(_party.getLeader());
+    shared_ptr<Creature> partyLeader(_services.party.getLeader());
     auto &equipment = partyLeader->equipment();
 
     for (auto &lbl : _binding.lblInv) {
@@ -472,7 +411,7 @@ void Equipment::updateItems() {
 
         _binding.lbItems->addItem(move(lbItem));
     }
-    shared_ptr<Creature> player(_party.player());
+    shared_ptr<Creature> player(_services.party.player());
 
     for (auto &item : player->items()) {
         if (_selectedSlot == Slot::None) {

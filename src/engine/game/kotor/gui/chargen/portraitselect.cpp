@@ -30,6 +30,7 @@
 #include "../../../core/object/factory.h"
 #include "../../../core/portrait.h"
 #include "../../../core/portraits.h"
+#include "../../../core/services.h"
 
 #include "../../kotor.h"
 
@@ -53,70 +54,8 @@ static constexpr float kModelScale = 0.2f;
 PortraitSelection::PortraitSelection(
     CharacterGeneration *charGen,
     KotOR *game,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    GameGUI(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas),
+    Services &services) :
+    GameGUI(game, services),
     _charGen(charGen) {
 
     _resRef = getResRef("portcust");
@@ -207,29 +146,29 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
     // Create a creature from the current portrait
 
     auto objectFactory = make_unique<ObjectFactory>(
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
+        _services.actionFactory,
+        _services.classes,
+        _services.combat,
+        _services.footstepSounds,
+        _services.party,
+        _services.portraits,
+        _services.reputes,
+        _services.scriptRunner,
+        _services.soundSets,
+        _services.surfaces,
+        _services.audioFiles,
+        _services.audioPlayer,
+        _services.context,
+        _services.meshes,
+        _services.models,
         _shaders,
         _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
+        _services.walkmeshes,
+        _services.window,
+        _services.gffs,
         _resources,
         _strings,
-        _twoDas,
+        _services.twoDas,
         sceneGraph);
     objectFactory->setGame(*_game);
 
@@ -248,7 +187,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
     if (cameraHook) {
         creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->absoluteTransform()[3].z));
     }
-    auto model = sceneGraph.newModel(_models.get("cghead_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(_services.models.get("cghead_light"), ModelUsage::GUI);
     model->attach("cghead_light", creatureModel);
 
     return move(model);
@@ -268,7 +207,7 @@ int PortraitSelection::getAppearanceFromCurrentPortrait() const {
 void PortraitSelection::updatePortraits() {
     _filteredPortraits.clear();
     int sex = _charGen->character().gender == Gender::Female ? 1 : 0;
-    for (auto &portrait : _portraits.portraits()) {
+    for (auto &portrait : _services.portraits.portraits()) {
         if (portrait.forPC && portrait.sex == sex) {
             _filteredPortraits.push_back(move(portrait));
         }

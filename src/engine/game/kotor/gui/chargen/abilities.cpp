@@ -23,6 +23,7 @@
 #include "../../../../resource/strings.h"
 
 #include "../../../core/d20/classes.h"
+#include "../../../core/services.h"
 
 #include "../../kotor.h"
 
@@ -62,70 +63,8 @@ static const unordered_map<Ability, int> g_descStrRefByAbility {
 CharGenAbilities::CharGenAbilities(
     CharacterGeneration *charGen,
     KotOR *game,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    GameGUI(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas),
+    Services &services) :
+    GameGUI(game, services),
     _charGen(charGen) {
     _resRef = getResRef("abchrgen");
 
@@ -169,7 +108,7 @@ void CharGenAbilities::load() {
     });
     _binding.btnRecommended->setOnClick([this]() {
         ClassType classType = _charGen->character().attributes.getEffectiveClass();
-        shared_ptr<CreatureClass> clazz(_classes.get(classType));
+        shared_ptr<CreatureClass> clazz(_services.classes.get(classType));
         _attributes = clazz->defaultAttributes();
         _points = 0;
         refreshControls();
