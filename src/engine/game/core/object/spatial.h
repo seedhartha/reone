@@ -167,6 +167,7 @@ protected:
         graphics::Walkmeshes &walkmeshes,
         resource::Resources &resources,
         resource::Strings &strings,
+        resource::TwoDas &twoDas,
         scene::SceneGraph &sceneGraph) :
         Object(
             id,
@@ -193,6 +194,7 @@ protected:
             walkmeshes,
             resources,
             strings,
+            twoDas,
             sceneGraph) {
     }
 

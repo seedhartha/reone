@@ -17,18 +17,31 @@
 
 #pragma once
 
-#include "../../../audio/files.h"
 #include "../../../audio/stream.h"
-#include "../../../resource/2da.h"
-#include "../../../resource/resources.h"
 
 namespace reone {
+
+namespace resource {
+
+class TwoDA;
+class TwoDas;
+
+} // namespace resource
+
+namespace audio {
+
+class AudioFiles;
+
+}
 
 namespace game {
 
 class GUISounds : boost::noncopyable {
 public:
-    GUISounds(audio::AudioFiles &audioFiles, resource::Resources &resources);
+    GUISounds(audio::AudioFiles &audioFiles, resource::TwoDas &twoDas) :
+        _audioFiles(audioFiles), _twoDas(twoDas) {
+    }
+
     ~GUISounds();
 
     void init();
@@ -39,7 +52,7 @@ public:
 
 private:
     audio::AudioFiles &_audioFiles;
-    resource::Resources &_resources;
+    resource::TwoDas &_twoDas;
 
     std::shared_ptr<audio::AudioStream> _onClick;
     std::shared_ptr<audio::AudioStream> _onEnter;

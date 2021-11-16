@@ -32,6 +32,8 @@ void ResourceModule::init() {
 
     _strings = make_unique<Strings>();
     _strings->init(_gamePath);
+
+    _twoDas = make_unique<TwoDas>(*_resources);
 }
 
 } // namespace di

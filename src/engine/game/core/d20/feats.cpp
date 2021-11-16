@@ -20,7 +20,7 @@
 #include "../../../common/collectionutil.h"
 #include "../../../graphics/texture/textures.h"
 #include "../../../resource/2da.h"
-#include "../../../resource/resources.h"
+#include "../../../resource/2das.h"
 #include "../../../resource/strings.h"
 
 using namespace std;
@@ -33,7 +33,7 @@ namespace reone {
 namespace game {
 
 void Feats::init() {
-    shared_ptr<TwoDA> feats(_resources.get2DA("feat"));
+    shared_ptr<TwoDA> feats(_twoDas.get("feat"));
     if (!feats) {
         return;
     }

@@ -62,7 +62,8 @@ public:
         scene::WorldRenderPipeline &worldRenderPipeline,
         script::Scripts &scripts,
         resource::Resources &resources,
-        resource::Strings &strings) :
+        resource::Strings &strings,
+        resource::TwoDas &twoDas) :
         Game(
             false,
             std::move(path),
@@ -101,7 +102,8 @@ public:
             worldRenderPipeline,
             scripts,
             resources,
-            strings) {
+            strings,
+            twoDas) {
     }
 
 private:

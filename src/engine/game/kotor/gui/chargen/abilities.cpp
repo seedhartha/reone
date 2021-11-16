@@ -89,7 +89,8 @@ CharGenAbilities::CharGenAbilities(
     graphics::Walkmeshes &walkmeshes,
     graphics::Window &window,
     resource::Resources &resources,
-    resource::Strings &strings) :
+    resource::Strings &strings,
+    resource::TwoDas &twoDas) :
     GameGUI(
         game,
         actionFactory,
@@ -120,7 +121,8 @@ CharGenAbilities::CharGenAbilities(
         walkmeshes,
         window,
         resources,
-        strings),
+        strings,
+        twoDas),
     _charGen(charGen) {
     _resRef = getResRef("abchrgen");
 

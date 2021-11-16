@@ -22,6 +22,7 @@
 #include "../../../graphics/model/models.h"
 #include "../../../graphics/texture/textures.h"
 #include "../../../resource/2da.h"
+#include "../../../resource/2das.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 
@@ -102,7 +103,7 @@ void Item::loadUTI(const GffStruct &uti) {
     _textureVariation = uti.getInt("TextureVar", 1);
     _bodyVariation = uti.getInt("BodyVariation", 1);
 
-    shared_ptr<TwoDA> baseItems(_resources.get2DA("baseitems"));
+    shared_ptr<TwoDA> baseItems(_twoDas.get("baseitems"));
     _attackRange = baseItems->getInt(_baseItem, "maxattackrange");
     _criticalHitMultiplier = baseItems->getInt(_baseItem, "crithitmult");
     _criticalThreat = baseItems->getInt(_baseItem, "critthreat");
@@ -136,11 +137,11 @@ void Item::loadUTI(const GffStruct &uti) {
 }
 
 void Item::loadAmmunitionType() {
-    shared_ptr<TwoDA> baseItems(_resources.get2DA("baseitems"));
+    shared_ptr<TwoDA> baseItems(_twoDas.get("baseitems"));
 
     int ammunitionIdx = baseItems->getInt(_baseItem, "ammunitiontype", -1);
     if (ammunitionIdx != -1) {
-        shared_ptr<TwoDA> twoDa(_resources.get2DA("ammunitiontypes"));
+        shared_ptr<TwoDA> twoDa(_twoDas.get("ammunitiontypes"));
         _ammunitionType = make_shared<Item::AmmunitionType>();
         _ammunitionType->model = _models.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "model")));
         _ammunitionType->shotSound1 = _audioFiles.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));

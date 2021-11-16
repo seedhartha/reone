@@ -17,6 +17,8 @@
 
 #include "sounds.h"
 
+#include "../../../audio/files.h"
+#include "../../../resource/2das.h"
 #include "../../../resource/format/2dareader.h"
 
 using namespace std;
@@ -28,12 +30,8 @@ namespace reone {
 
 namespace game {
 
-GUISounds::GUISounds(AudioFiles &audioFiles, Resources &resources) :
-    _audioFiles(audioFiles), _resources(resources) {
-}
-
 void GUISounds::init() {
-    shared_ptr<TwoDA> sounds(_resources.get2DA("guisounds"));
+    shared_ptr<TwoDA> sounds(_twoDas.get("guisounds"));
     if (!sounds) {
         return;
     }

@@ -19,7 +19,7 @@
 
 #include "../common/collectionutil.h"
 #include "../resource/2da.h"
-#include "../resource/resources.h"
+#include "../resource/2das.h"
 
 #include "material.h"
 
@@ -31,15 +31,11 @@ namespace reone {
 
 namespace graphics {
 
-Materials::Materials(Resources &resources) :
-    _resources(resources) {
-}
-
 void Materials::init() {
-    if (_inited)
+    if (_inited) {
         return;
-
-    shared_ptr<TwoDA> materials(_resources.get2DA("material", false));
+    }
+    shared_ptr<TwoDA> materials(_twoDas.get("material"));
     if (materials) {
         for (int row = 0; row < materials->getRowCount(); ++row) {
             string tex(boost::to_lower_copy(materials->getString(row, "tex")));
@@ -60,7 +56,6 @@ void Materials::init() {
             _materials.insert(make_pair(tex, move(material)));
         }
     }
-
     _inited = true;
 }
 

@@ -44,18 +44,18 @@ namespace reone {
 namespace di {
 
 void GameModule::init() {
-    _surfaces = make_unique<Surfaces>(_resource.resources());
+    _surfaces = make_unique<Surfaces>(_resource.twoDas());
     _cursors = make_unique<Cursors>(_graphics.context(), _graphics.meshes(), _graphics.shaders(), _graphics.window(), _resource.resources());
     _soundSets = make_unique<SoundSets>(_audio.audioFiles(), _resource.resources(), _resource.strings());
-    _footstepSounds = make_unique<FootstepSounds>(_audio.audioFiles(), _resource.resources());
-    _guiSounds = make_unique<GUISounds>(_audio.audioFiles(), _resource.resources());
+    _footstepSounds = make_unique<FootstepSounds>(_audio.audioFiles(), _resource.twoDas());
+    _guiSounds = make_unique<GUISounds>(_audio.audioFiles(), _resource.twoDas());
     _scriptRunner = make_unique<ScriptRunner>(_script.scripts());
-    _reputes = make_unique<Reputes>(_resource.resources());
-    _skills = make_unique<Skills>(_graphics.textures(), _resource.resources(), _resource.strings());
-    _feats = make_unique<Feats>(_graphics.textures(), _resource.resources(), _resource.strings());
-    _spells = make_unique<Spells>(_graphics.textures(), _resource.resources(), _resource.strings());
-    _classes = make_unique<Classes>(_resource.resources(), _resource.strings());
-    _portraits = make_unique<Portraits>(_graphics.textures(), _resource.resources());
+    _reputes = make_unique<Reputes>(_resource.twoDas());
+    _skills = make_unique<Skills>(_graphics.textures(), _resource.strings(), _resource.twoDas());
+    _feats = make_unique<Feats>(_graphics.textures(), _resource.strings(), _resource.twoDas());
+    _spells = make_unique<Spells>(_graphics.textures(), _resource.strings(), _resource.twoDas());
+    _classes = make_unique<Classes>(_resource.strings(), _resource.twoDas());
+    _portraits = make_unique<Portraits>(_graphics.textures(), _resource.twoDas());
     _actionFactory = make_unique<ActionFactory>();
     _party = make_unique<Party>();
     _combat = make_unique<Combat>(*_effectFactory, _scene.sceneGraph());
@@ -81,6 +81,7 @@ void GameModule::init() {
         _graphics.window(),
         _resource.resources(),
         _resource.strings(),
+        _resource.twoDas(),
         _scene.sceneGraph());
     _effectFactory = make_unique<EffectFactory>();
     _routines = make_unique<Routines>(*_actionFactory, *_combat, *_effectFactory, *_party, *_reputes, *_scriptRunner, _resource.strings());
@@ -146,7 +147,8 @@ unique_ptr<Game> GameModule::newGame() {
             _scene.worldRenderPipeline(),
             _script.scripts(),
             _resource.resources(),
-            _resource.strings());
+            _resource.strings(),
+            _resource.twoDas());
 
     case GameID::KotOR:
         return make_unique<KotOR>(
@@ -186,7 +188,8 @@ unique_ptr<Game> GameModule::newGame() {
             _scene.worldRenderPipeline(),
             _script.scripts(),
             _resource.resources(),
-            _resource.strings());
+            _resource.strings(),
+            _resource.twoDas());
 
     case GameID::TSL:
         return make_unique<TSL>(
@@ -226,7 +229,8 @@ unique_ptr<Game> GameModule::newGame() {
             _scene.worldRenderPipeline(),
             _script.scripts(),
             _resource.resources(),
-            _resource.strings());
+            _resource.strings(),
+            _resource.twoDas());
 
     default:
         throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));

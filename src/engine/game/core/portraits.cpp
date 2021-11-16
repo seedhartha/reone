@@ -17,7 +17,9 @@
 
 #include "portraits.h"
 
+#include "../../graphics/texture/textures.h"
 #include "../../resource/2da.h"
+#include "../../resource/2das.h"
 
 using namespace std;
 
@@ -28,12 +30,8 @@ namespace reone {
 
 namespace game {
 
-Portraits::Portraits(Textures &textures, Resources &resources) :
-    _textures(textures), _resources(resources) {
-}
-
 void Portraits::init() {
-    shared_ptr<TwoDA> portraits(_resources.get2DA("portraits"));
+    shared_ptr<TwoDA> portraits(_twoDas.get("portraits"));
     if (!portraits) {
         return;
     }

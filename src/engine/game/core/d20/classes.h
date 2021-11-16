@@ -27,25 +27,26 @@ namespace reone {
 
 namespace resource {
 
-class Resources;
+class Strings;
+class TwoDas;
 
-}
+} // namespace resource
 
 namespace game {
 
 class Classes : public MemoryCache<ClassType, CreatureClass> {
 public:
-    Classes(resource::Resources &resources, resource::Strings &strings) :
+    Classes(resource::Strings &strings, resource::TwoDas &twoDas) :
         MemoryCache(std::bind(&Classes::doGet, this, std::placeholders::_1)),
-        _resources(resources),
-        _strings(strings) {
+        _strings(strings),
+        _twoDas(twoDas) {
     }
 
 private:
     // Services
 
-    resource::Resources &_resources;
     resource::Strings &_strings;
+    resource::TwoDas &_twoDas;
 
     // END Services
 

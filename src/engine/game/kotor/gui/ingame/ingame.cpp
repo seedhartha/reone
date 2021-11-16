@@ -21,8 +21,9 @@
 
 using namespace std;
 
-using namespace reone::gui;
+using namespace reone::audio;
 using namespace reone::graphics;
+using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
@@ -44,22 +45,23 @@ InGameMenu::InGameMenu(
     ScriptRunner &scriptRunner,
     SoundSets &soundSets,
     Surfaces &surfaces,
-    audio::AudioFiles &audioFiles,
-    audio::AudioPlayer &audioPlayer,
-    graphics::Context &context,
-    graphics::Features &features,
-    graphics::Fonts &fonts,
-    graphics::Lips &lips,
-    graphics::Materials &materials,
-    graphics::Meshes &meshes,
-    graphics::Models &models,
-    graphics::PBRIBL &pbrIbl,
-    graphics::Shaders &shaders,
-    graphics::Textures &textures,
-    graphics::Walkmeshes &walkmeshes,
-    graphics::Window &window,
-    resource::Resources &resources,
-    resource::Strings &strings) :
+    AudioFiles &audioFiles,
+    AudioPlayer &audioPlayer,
+    Context &context,
+    Features &features,
+    Fonts &fonts,
+    Lips &lips,
+    Materials &materials,
+    Meshes &meshes,
+    Models &models,
+    PBRIBL &pbrIbl,
+    Shaders &shaders,
+    Textures &textures,
+    Walkmeshes &walkmeshes,
+    Window &window,
+    Resources &resources,
+    Strings &strings,
+    TwoDas &twoDas) :
     GameGUI(
         game,
         actionFactory,
@@ -90,7 +92,8 @@ InGameMenu::InGameMenu(
         walkmeshes,
         window,
         resources,
-        strings) {
+        strings,
+        twoDas) {
     _resRef = getResRef("top");
 
     if (game->isTSL()) {
@@ -212,7 +215,8 @@ void InGameMenu::loadEquipment() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _equip->load();
 }
 
@@ -247,7 +251,8 @@ void InGameMenu::loadInventory() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _inventory->load();
 }
 
@@ -283,7 +288,8 @@ void InGameMenu::loadCharacter() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _character->load();
 }
 
@@ -318,7 +324,8 @@ void InGameMenu::loadAbilities() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _abilities->load();
 }
 
@@ -353,7 +360,8 @@ void InGameMenu::loadMessages() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _messages->load();
 }
 
@@ -388,7 +396,8 @@ void InGameMenu::loadJournal() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _journal->load();
 }
 
@@ -423,7 +432,8 @@ void InGameMenu::loadMap() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _map->load();
 }
 
@@ -458,7 +468,8 @@ void InGameMenu::loadOptions() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _options->load();
 }
 

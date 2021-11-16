@@ -34,7 +34,7 @@ void GraphicsModule::init() {
     _context = make_unique<Context>();
     _meshes = make_unique<Meshes>();
     _textures = make_unique<Textures>(*_context, _resource.resources());
-    _materials = make_unique<Materials>(_resource.resources());
+    _materials = make_unique<Materials>(_resource.twoDas());
     _models = make_unique<Models>(*_textures, _resource.resources());
     _walkmeshes = make_unique<Walkmeshes>(_resource.resources());
     _lips = make_unique<Lips>(_resource.resources());

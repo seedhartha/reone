@@ -17,12 +17,22 @@
 
 #pragma once
 
-#include "../../audio/files.h"
 #include "../../audio/stream.h"
 #include "../../common/cache.h"
-#include "../../resource/resources.h"
 
 namespace reone {
+
+namespace resource {
+
+class TwoDas;
+
+}
+
+namespace audio {
+
+class AudioFiles;
+
+}
 
 namespace game {
 
@@ -39,13 +49,15 @@ struct FootstepTypeSounds {
 
 class FootstepSounds : public MemoryCache<uint32_t, FootstepTypeSounds> {
 public:
-    FootstepSounds(audio::AudioFiles &audioFiles, resource::Resources &resources);
+    FootstepSounds(
+        audio::AudioFiles &audioFiles,
+        resource::TwoDas &twoDas);
 
     std::shared_ptr<FootstepTypeSounds> doGet(uint32_t type);
 
 private:
     audio::AudioFiles &_audioFiles;
-    resource::Resources &_resources;
+    resource::TwoDas &_twoDas;
 };
 
 } // namespace game

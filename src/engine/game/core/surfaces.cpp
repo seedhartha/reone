@@ -19,6 +19,7 @@
 
 #include "../../common/guardutil.h"
 #include "../../resource/2da.h"
+#include "../../resource/2das.h"
 
 using namespace std;
 
@@ -28,12 +29,8 @@ namespace reone {
 
 namespace game {
 
-Surfaces::Surfaces(Resources &resources) :
-    _resources(resources) {
-}
-
 void Surfaces::init() {
-    shared_ptr<TwoDA> surfacemat(_resources.get2DA("surfacemat"));
+    shared_ptr<TwoDA> surfacemat(_twoDas.get("surfacemat"));
     if (!surfacemat) {
         return;
     }

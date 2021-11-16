@@ -51,6 +51,7 @@ public:
         graphics::Walkmeshes &walkmeshes,
         resource::Resources &resources,
         resource::Strings &strings,
+        resource::TwoDas &twoDas,
         scene::SceneGraph &sceneGraph) :
         SpatialObject(
             id,
@@ -77,6 +78,7 @@ public:
             walkmeshes,
             resources,
             strings,
+            twoDas,
             sceneGraph) {
     }
 

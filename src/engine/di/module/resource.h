@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../../resource/2das.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
@@ -32,12 +33,14 @@ public:
 
     void init();
 
+    resource::TwoDas &twoDas() { return *_twoDas; }
     resource::Resources &resources() { return *_resources; }
     resource::Strings &strings() { return *_strings; }
 
 private:
     boost::filesystem::path _gamePath;
 
+    std::unique_ptr<resource::TwoDas> _twoDas;
     std::unique_ptr<resource::Resources> _resources;
     std::unique_ptr<resource::Strings> _strings;
 };

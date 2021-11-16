@@ -25,7 +25,7 @@
 #include "../../../graphics/model/models.h"
 #include "../../../gui/control/panel.h"
 #include "../../../resource/2da.h"
-#include "../../../resource/resources.h"
+#include "../../../resource/2das.h"
 #include "../../../scene/types.h"
 #include "../../../script/execution.h"
 
@@ -114,7 +114,8 @@ DialogGUI::DialogGUI(
     graphics::Walkmeshes &walkmeshes,
     graphics::Window &window,
     resource::Resources &resources,
-    resource::Strings &strings) :
+    resource::Strings &strings,
+    resource::TwoDas &twoDas) :
     Conversation(
         game,
         actionFactory,
@@ -145,7 +146,8 @@ DialogGUI::DialogGUI(
         walkmeshes,
         window,
         resources,
-        strings) {
+        strings,
+        twoDas) {
     _resRef = getResRef("dialog");
     _scaling = ScalingMode::Stretch;
 }
@@ -369,7 +371,7 @@ string DialogGUI::getStuntAnimationName(int ordinal) const {
 }
 
 AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
-    shared_ptr<TwoDA> animations(_resources.get2DA("dialoganimations"));
+    shared_ptr<TwoDA> animations(_twoDas.get("dialoganimations"));
     int index = ordinal - 10000;
 
     if (index < 0 || index >= animations->getRowCount()) {

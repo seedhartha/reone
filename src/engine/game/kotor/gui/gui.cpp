@@ -65,7 +65,8 @@ GameGUI::GameGUI(
     Walkmeshes &walkmeshes,
     Window &window,
     Resources &resources,
-    Strings &strings) :
+    Strings &strings,
+    TwoDas &twoDas) :
     GUI(
         game->options().graphics,
         context,
@@ -97,7 +98,8 @@ GameGUI::GameGUI(
     _audioPlayer(audioPlayer),
     _lips(lips),
     _models(models),
-    _walkmeshes(walkmeshes) {
+    _walkmeshes(walkmeshes),
+    _twoDas(twoDas) {
 }
 
 void GameGUI::onClick(const string &control) {

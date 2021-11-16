@@ -39,6 +39,7 @@ namespace resource {
 
 class Resources;
 class Strings;
+class TwoDas;
 
 } // namespace resource
 
@@ -106,6 +107,7 @@ public:
         graphics::Window &window,
         resource::Resources &resources,
         resource::Strings &strings,
+        resource::TwoDas &twoDas,
         scene::SceneGraph &sceneGraph) :
         _actionFactory(actionFactory),
         _classes(classes),
@@ -128,6 +130,7 @@ public:
         _window(window),
         _resources(resources),
         _strings(strings),
+        _twoDas(twoDas),
         _sceneGraph(sceneGraph) {
     }
 
@@ -181,6 +184,7 @@ private:
     graphics::Window &_window;
     resource::Resources &_resources;
     resource::Strings &_strings;
+    resource::TwoDas &_twoDas;
     scene::SceneGraph &_sceneGraph;
 
     // END Services

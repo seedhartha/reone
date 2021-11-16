@@ -84,6 +84,7 @@ public:
         graphics::Window &window,
         resource::Resources &resources,
         resource::Strings &strings,
+        resource::TwoDas &twoDas,
         scene::SceneGraph &sceneGraph);
 
     void load(std::string name, const resource::GffStruct &are, const resource::GffStruct &git, bool fromSave = false);

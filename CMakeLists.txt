@@ -117,6 +117,8 @@ endif()
 
 set(RESOURCE_HEADERS
     src/engine/resource/2da.h
+    src/engine/resource/2das.h
+    src/engine/resource/gffs.h
     src/engine/resource/gffstruct.h
     src/engine/resource/folder.h
     src/engine/resource/format/2dareader.h
@@ -149,7 +151,9 @@ set(RESOURCE_HEADERS
 
 set(RESOURCE_SOURCES
     src/engine/resource/2da.cpp
+    src/engine/resource/2das.cpp
     src/engine/resource/gfffield.cpp
+    src/engine/resource/gffs.cpp
     src/engine/resource/gffstruct.cpp
     src/engine/resource/folder.cpp
     src/engine/resource/format/2dareader.cpp

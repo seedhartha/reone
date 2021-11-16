@@ -35,6 +35,7 @@
 #include "../../graphics/walkmesh/walkmeshes.h"
 #include "../../graphics/window.h"
 #include "../../gui/gui.h"
+#include "../../resource/2das.h"
 #include "../../resource/format/erfreader.h"
 #include "../../resource/format/erfwriter.h"
 #include "../../resource/format/gffwriter.h"
@@ -117,7 +118,8 @@ KotOR::KotOR(
     WorldRenderPipeline &worldRenderPipeline,
     Scripts &scripts,
     Resources &resources,
-    Strings &strings) :
+    Strings &strings,
+    TwoDas &twoDas) :
     Game(
         false,
         move(path),
@@ -156,7 +158,8 @@ KotOR::KotOR(
         worldRenderPipeline,
         scripts,
         resources,
-        strings) {
+        strings,
+        twoDas) {
 
     _screen = GameScreen::MainMenu;
 
@@ -215,6 +218,7 @@ void KotOR::start() {
 }
 
 void KotOR::loadModuleResources(const string &moduleName) {
+    _twoDas.invalidate();
     _resources.invalidateCache();
     _resources.clearTransientProviders();
 
@@ -309,7 +313,8 @@ void KotOR::loadMainMenu() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _mainMenu->load();
 }
 
@@ -345,7 +350,8 @@ void KotOR::loadHUD() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _hud->load();
 }
 
@@ -380,7 +386,8 @@ void KotOR::loadDialog() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _dialog->load();
 }
 
@@ -415,7 +422,8 @@ void KotOR::loadComputer() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _computer->load();
 }
 
@@ -450,7 +458,8 @@ void KotOR::loadContainer() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _container->load();
 }
 
@@ -485,7 +494,8 @@ void KotOR::loadPartySelection() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _partySelect->load();
 }
 
@@ -520,7 +530,8 @@ void KotOR::loadSaveLoad() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _saveLoad->load();
 }
 
@@ -555,7 +566,8 @@ void KotOR::loadLoadingScreen() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     static_cast<LoadingScreen *>(_loadScreen.get())->load();
 }
 
@@ -590,7 +602,8 @@ void KotOR::loadCharacterGeneration() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _charGen->load();
 }
 
@@ -625,7 +638,8 @@ void KotOR::loadInGame() {
         _walkmeshes,
         _window,
         _resources,
-        _strings);
+        _strings,
+        _twoDas);
     _inGame->load();
 }
 

@@ -20,6 +20,7 @@
 #include "../../../audio/files.h"
 #include "../../../audio/player.h"
 #include "../../../resource/2da.h"
+#include "../../../resource/2das.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 
@@ -163,7 +164,7 @@ void Sound::loadUTS(const GffStruct &uts) {
 }
 
 void Sound::loadPriorityFromUTS(const GffStruct &uts) {
-    shared_ptr<TwoDA> priorityGroups(_resources.get2DA("prioritygroups"));
+    shared_ptr<TwoDA> priorityGroups(_twoDas.get("prioritygroups"));
     int priorityIdx = uts.getInt("Priority");
     _priority = priorityGroups->getInt(priorityIdx, "priority");
 }

@@ -79,7 +79,8 @@ TSL::TSL(
     WorldRenderPipeline &worldRenderPipeline,
     Scripts &scripts,
     Resources &resources,
-    Strings &strings) :
+    Strings &strings,
+    TwoDas &twoDas) :
     KotOR(
         move(path),
         move(options),
@@ -117,7 +118,8 @@ TSL::TSL(
         worldRenderPipeline,
         scripts,
         resources,
-        strings) {
+        strings,
+        twoDas) {
     _tsl = true;
 
     _mainMenuMusicResRef = "mus_sion";

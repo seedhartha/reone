@@ -17,46 +17,26 @@
 
 #pragma once
 
-#include "portrait.h"
+#include "../common/cache.h"
+
+#include "2da.h"
 
 namespace reone {
 
 namespace resource {
 
-class TwoDas;
+class Resources;
 
-}
-
-namespace graphics {
-
-class Textures;
-
-}
-
-namespace game {
-
-class Portraits : boost::noncopyable {
+class TwoDas : public MemoryCache<std::string, TwoDA> {
 public:
-    Portraits(graphics::Textures &textures, resource::TwoDas &twoDas) :
-        _textures(textures), _twoDas(twoDas) {
-    }
-
-    void init();
-
-    std::shared_ptr<graphics::Texture> getTextureByIndex(int index);
-    std::shared_ptr<graphics::Texture> getTextureByAppearance(int appearance);
-
-    const std::vector<Portrait> &portraits() const { return _portraits; }
+    TwoDas(Resources &resources);
 
 private:
-    graphics::Textures &_textures;
-    resource::TwoDas &_twoDas;
+    Resources &_resources;
 
-    std::vector<Portrait> _portraits;
-
-    std::shared_ptr<graphics::Texture> getPortraitTexture(const Portrait &portrait) const;
+    std::shared_ptr<TwoDA> doGet(const std::string &resRef);
 };
 
-} // namespace game
+} // namespace resource
 
 } // namespace reone

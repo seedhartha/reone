@@ -21,9 +21,7 @@
 #include "../common/pathutil.h"
 #include "../common/streamutil.h"
 
-#include "2da.h"
 #include "folder.h"
-#include "format/2dareader.h"
 #include "format/bifreader.h"
 #include "format/erfreader.h"
 #include "format/gffreader.h"
@@ -96,7 +94,6 @@ void Resources::indexProvider(unique_ptr<IResourceProvider> &&provider, const fs
 
 void Resources::invalidateCache() {
     _rawCache.clear();
-    _2daCache.clear();
     _gffCache.clear();
 }
 
@@ -135,23 +132,6 @@ shared_ptr<ByteArray> Resources::getRaw(const string &resRef, ResourceType type,
     }
     auto pair = _rawCache.insert(make_pair(id, move(data)));
     return pair.first->second;
-}
-
-shared_ptr<TwoDA> Resources::get2DA(const string &resRef, bool logNotFound) {
-    ResourceId id(resRef, ResourceType::TwoDa);
-
-    return getResource<TwoDA>(id, _2daCache, [this, &id, &logNotFound]() {
-        shared_ptr<ByteArray> data(getRaw(id.resRef, id.type, logNotFound));
-        shared_ptr<TwoDA> twoDa;
-
-        if (data) {
-            TwoDaReader file;
-            file.load(wrap(data));
-            twoDa = file.twoDa();
-        }
-
-        return move(twoDa);
-    });
 }
 
 shared_ptr<GffStruct> Resources::getGFF(const string &resRef, ResourceType type) {

@@ -23,6 +23,12 @@
 
 namespace reone {
 
+namespace resource {
+
+class TwoDas;
+
+}
+
 namespace graphics {
 
 class Lips;
@@ -90,7 +96,8 @@ protected:
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
         resource::Resources &resources,
-        resource::Strings &strings);
+        resource::Strings &strings,
+        resource::TwoDas &twoDas);
 
     void initForGame();
 
@@ -120,6 +127,7 @@ protected:
     graphics::Lips &_lips;
     graphics::Models &_models;
     graphics::Walkmeshes &_walkmeshes;
+    resource::TwoDas &_twoDas;
 
     // END Services
 

@@ -22,7 +22,7 @@
 #include "../../../../gui/control/label.h"
 #include "../../../../gui/control/listbox.h"
 #include "../../../../resource/2da.h"
-#include "../../../../resource/resources.h"
+#include "../../../../resource/2das.h"
 #include "../../../../resource/strings.h"
 
 #include "../../../core/object/creature.h"
@@ -74,7 +74,8 @@ AbilitiesMenu::AbilitiesMenu(
     graphics::Walkmeshes &walkmeshes,
     graphics::Window &window,
     resource::Resources &resources,
-    resource::Strings &strings) :
+    resource::Strings &strings,
+    resource::TwoDas &twoDas) :
     GameGUI(
         game,
         actionFactory,
@@ -105,7 +106,8 @@ AbilitiesMenu::AbilitiesMenu(
         walkmeshes,
         window,
         resources,
-        strings) {
+        strings,
+        twoDas) {
     _resRef = getResRef("abilities");
 
     initForGame();
@@ -186,7 +188,7 @@ void AbilitiesMenu::bindControls() {
 }
 
 void AbilitiesMenu::loadSkills() {
-    shared_ptr<TwoDA> skills(_resources.get2DA("skills"));
+    shared_ptr<TwoDA> skills(_twoDas.get("skills"));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         auto skill = static_cast<SkillType>(row);
 

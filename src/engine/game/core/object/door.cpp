@@ -21,6 +21,7 @@
 #include "../../../graphics/model/models.h"
 #include "../../../graphics/walkmesh/walkmeshes.h"
 #include "../../../resource/2da.h"
+#include "../../../resource/2das.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 #include "../../../scene/node/model.h"
@@ -59,7 +60,7 @@ void Door::loadFromBlueprint(const string &resRef) {
 
     loadUTD(*utd);
 
-    shared_ptr<TwoDA> doors(_resources.get2DA("genericdoors"));
+    shared_ptr<TwoDA> doors(_twoDas.get("genericdoors"));
     string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
     auto model = _sceneGraph.newModel(_models.get(modelName), ModelUsage::Door);

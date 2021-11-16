@@ -17,8 +17,10 @@
 
 #include "footstepsounds.h"
 
+#include "../../audio/files.h"
 #include "../../common/guardutil.h"
 #include "../../resource/2da.h"
+#include "../../resource/2das.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -30,16 +32,18 @@ namespace reone {
 
 namespace game {
 
-FootstepSounds::FootstepSounds(AudioFiles &audioFiles, Resources &resources) :
+FootstepSounds::FootstepSounds(
+    AudioFiles &audioFiles,
+    TwoDas &twoDas) :
     MemoryCache(bind(&FootstepSounds::doGet, this, _1)),
     _audioFiles(audioFiles),
-    _resources(resources) {
+    _twoDas(twoDas) {
 }
 
 shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
     shared_ptr<FootstepTypeSounds> result;
 
-    shared_ptr<TwoDA> twoDa(_resources.get2DA("footstepsounds"));
+    shared_ptr<TwoDA> twoDa(_twoDas.get("footstepsounds"));
     if (twoDa) {
         result = make_shared<FootstepTypeSounds>();
         map<string, vector<shared_ptr<AudioStream>> &> dict {
