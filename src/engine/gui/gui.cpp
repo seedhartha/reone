@@ -26,6 +26,7 @@
 #include "../graphics/texture/texture.h"
 #include "../graphics/texture/textures.h"
 #include "../graphics/window.h"
+#include "../resource/gffs.h"
 #include "../resource/gffstruct.h"
 #include "../resource/resources.h"
 
@@ -60,6 +61,7 @@ GUI::GUI(
     Shaders &shaders,
     Textures &textures,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings) :
     _options(move(options)),
@@ -72,6 +74,7 @@ GUI::GUI(
     _shaders(shaders),
     _textures(textures),
     _window(window),
+    _gffs(gffs),
     _resources(resources),
     _strings(strings) {
 
@@ -85,7 +88,7 @@ void GUI::load() {
 
     debug("Load " + _resRef, LogChannels::gui);
 
-    shared_ptr<GffStruct> gui(_resources.getGFF(_resRef, ResourceType::Gui));
+    shared_ptr<GffStruct> gui(_gffs.get(_resRef, ResourceType::Gui));
     ControlType type = Control::getType(*gui);
     string tag(Control::getTag(*gui));
 

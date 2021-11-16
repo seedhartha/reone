@@ -38,8 +38,9 @@
 using namespace std;
 using namespace std::placeholders;
 
-using namespace reone::gui;
+using namespace reone::audio;
 using namespace reone::graphics;
+using namespace reone::gui;
 using namespace reone::resource;
 using namespace reone::scene;
 
@@ -65,23 +66,24 @@ PortraitSelection::PortraitSelection(
     ScriptRunner &scriptRunner,
     SoundSets &soundSets,
     Surfaces &surfaces,
-    audio::AudioFiles &audioFiles,
-    audio::AudioPlayer &audioPlayer,
-    graphics::Context &context,
-    graphics::Features &features,
-    graphics::Fonts &fonts,
-    graphics::Lips &lips,
-    graphics::Materials &materials,
-    graphics::Meshes &meshes,
-    graphics::Models &models,
-    graphics::PBRIBL &pbrIbl,
-    graphics::Shaders &shaders,
-    graphics::Textures &textures,
-    graphics::Walkmeshes &walkmeshes,
-    graphics::Window &window,
-    resource::Resources &resources,
-    resource::Strings &strings,
-    resource::TwoDas &twoDas) :
+    AudioFiles &audioFiles,
+    AudioPlayer &audioPlayer,
+    Context &context,
+    Features &features,
+    Fonts &fonts,
+    Lips &lips,
+    Materials &materials,
+    Meshes &meshes,
+    Models &models,
+    PBRIBL &pbrIbl,
+    Shaders &shaders,
+    Textures &textures,
+    Walkmeshes &walkmeshes,
+    Window &window,
+    Gffs &gffs,
+    Resources &resources,
+    Strings &strings,
+    TwoDas &twoDas) :
     GameGUI(
         game,
         actionFactory,
@@ -111,6 +113,7 @@ PortraitSelection::PortraitSelection(
         textures,
         walkmeshes,
         window,
+        gffs,
         resources,
         strings,
         twoDas),
@@ -223,6 +226,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas,

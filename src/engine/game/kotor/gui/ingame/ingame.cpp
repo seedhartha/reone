@@ -59,6 +59,7 @@ InGameMenu::InGameMenu(
     Textures &textures,
     Walkmeshes &walkmeshes,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -91,6 +92,7 @@ InGameMenu::InGameMenu(
         textures,
         walkmeshes,
         window,
+        gffs,
         resources,
         strings,
         twoDas) {
@@ -214,6 +216,7 @@ void InGameMenu::loadEquipment() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -250,6 +253,7 @@ void InGameMenu::loadInventory() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -287,6 +291,7 @@ void InGameMenu::loadCharacter() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -323,6 +328,7 @@ void InGameMenu::loadAbilities() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -359,6 +365,7 @@ void InGameMenu::loadMessages() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -395,6 +402,7 @@ void InGameMenu::loadJournal() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -431,6 +439,7 @@ void InGameMenu::loadMap() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -467,6 +476,7 @@ void InGameMenu::loadOptions() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);

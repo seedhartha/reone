@@ -18,10 +18,12 @@
 #include "partyselect.h"
 
 #include "../../../graphics/texture/textures.h"
+#include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 #include "../../../script/types.h"
 
+#include "../../../resource/gffs.h"
 #include "../../core/object/factory.h"
 #include "../../core/party.h"
 #include "../../core/portrait.h"
@@ -79,6 +81,7 @@ PartySelection::PartySelection(
     Textures &textures,
     Walkmeshes &walkmeshes,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -111,6 +114,7 @@ PartySelection::PartySelection(
         textures,
         walkmeshes,
         window,
+        gffs,
         resources,
         strings,
         twoDas) {
@@ -300,7 +304,7 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
 
         if (party.isMemberAvailable(i)) {
             string blueprintResRef(party.getAvailableMember(i));
-            shared_ptr<GffStruct> utc(_resources.getGFF(blueprintResRef, ResourceType::Utc));
+            shared_ptr<GffStruct> utc(_gffs.get(blueprintResRef, ResourceType::Utc));
             shared_ptr<Texture> portrait;
             int portraitId = utc->getInt("PortraitId", 0);
             if (portraitId > 0) {

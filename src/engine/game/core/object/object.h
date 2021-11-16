@@ -26,6 +26,7 @@ namespace reone {
 
 namespace resource {
 
+class Gffs;
 class Resources;
 class Strings;
 class TwoDas;
@@ -188,6 +189,7 @@ protected:
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
     graphics::Walkmeshes &_walkmeshes;
+    resource::Gffs &_gffs;
     resource::Resources &_resources;
     resource::Strings &_strings;
     resource::TwoDas &_twoDas;
@@ -240,6 +242,7 @@ protected:
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Walkmeshes &walkmeshes,
+        resource::Gffs &gffs,
         resource::Resources &resources,
         resource::Strings &strings,
         resource::TwoDas &twoDas,
@@ -266,6 +269,7 @@ protected:
         _shaders(shaders),
         _textures(textures),
         _walkmeshes(walkmeshes),
+        _gffs(gffs),
         _resources(resources),
         _twoDas(twoDas),
         _strings(strings),

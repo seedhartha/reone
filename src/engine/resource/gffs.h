@@ -17,11 +17,28 @@
 
 #pragma once
 
+#include "gffstruct.h"
+#include "id.h"
+#include "types.h"
+
 namespace reone {
 
 namespace resource {
 
+class Resources;
+
 class Gffs {
+public:
+    Gffs(Resources &resources) :
+        _resources(resources) {
+    }
+
+    std::shared_ptr<GffStruct> get(const std::string &resRef, ResourceType type);
+
+private:
+    Resources &_resources;
+
+    std::unordered_map<ResourceId, std::shared_ptr<GffStruct>, ResourceIdHasher> _cache;
 };
 
 } // namespace resource

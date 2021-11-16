@@ -32,6 +32,7 @@ namespace reone {
 
 namespace resource {
 
+class Gffs;
 class Resources;
 class Strings;
 class TwoDas;
@@ -151,6 +152,7 @@ public:
         scene::SceneGraph &sceneGraph,
         scene::WorldRenderPipeline &worldRenderPipeline,
         script::Scripts &scripts,
+        resource::Gffs &gffs,
         resource::Resources &resources,
         resource::Strings &strings,
         resource::TwoDas &twoDas);
@@ -315,6 +317,7 @@ protected:
     scene::SceneGraph &_sceneGraph;
     scene::WorldRenderPipeline &_worldRenderPipeline;
     script::Scripts &_scripts;
+    resource::Gffs &_gffs;
     resource::Resources &_resources;
     resource::Strings &_strings;
     resource::TwoDas &_twoDas;

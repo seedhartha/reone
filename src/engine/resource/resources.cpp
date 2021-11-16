@@ -19,17 +19,13 @@
 
 #include "../common/logutil.h"
 #include "../common/pathutil.h"
-#include "../common/streamutil.h"
 
 #include "folder.h"
 #include "format/bifreader.h"
 #include "format/erfreader.h"
-#include "format/gffreader.h"
 #include "format/rimreader.h"
-#include "gffstruct.h"
 #include "keybifprovider.h"
 #include "resourceprovider.h"
-#include "typeutil.h"
 
 using namespace std;
 
@@ -93,8 +89,7 @@ void Resources::indexProvider(unique_ptr<IResourceProvider> &&provider, const fs
 }
 
 void Resources::invalidateCache() {
-    _rawCache.clear();
-    _gffCache.clear();
+    _cache.clear();
 }
 
 void Resources::clearTransientProviders() {
@@ -119,8 +114,8 @@ shared_ptr<ByteArray> Resources::getRaw(const string &resRef, ResourceType type,
         return nullptr;
     }
     ResourceId id(resRef, type);
-    auto maybeRes = _rawCache.find(id);
-    if (maybeRes != _rawCache.end()) {
+    auto maybeRes = _cache.find(id);
+    if (maybeRes != _cache.end()) {
         return maybeRes->second;
     }
     shared_ptr<ByteArray> data(doGetRaw(id, _providers));
@@ -130,25 +125,8 @@ shared_ptr<ByteArray> Resources::getRaw(const string &resRef, ResourceType type,
     if (!data && logNotFound) {
         warn("Resource '" + id.string() + "' not found", LogChannels::resources);
     }
-    auto pair = _rawCache.insert(make_pair(id, move(data)));
-    return pair.first->second;
-}
-
-shared_ptr<GffStruct> Resources::getGFF(const string &resRef, ResourceType type) {
-    ResourceId id(resRef, type);
-
-    return getResource<GffStruct>(id, _gffCache, [this, &id]() {
-        shared_ptr<ByteArray> data(getRaw(id.resRef, id.type));
-        shared_ptr<GffStruct> gffs;
-
-        if (data) {
-            GffReader gff;
-            gff.load(wrap(data));
-            gffs = gff.root();
-        }
-
-        return move(gffs);
-    });
+    auto inserted = _cache.insert(make_pair(id, move(data)));
+    return inserted.first->second;
 }
 
 shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) {

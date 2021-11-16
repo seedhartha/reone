@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../../resource/2das.h"
+#include "../../resource/gffs.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
 
@@ -33,16 +34,18 @@ public:
 
     void init();
 
-    resource::TwoDas &twoDas() { return *_twoDas; }
+    resource::Gffs &gffs() { return *_gffs; }
     resource::Resources &resources() { return *_resources; }
     resource::Strings &strings() { return *_strings; }
+    resource::TwoDas &twoDas() { return *_twoDas; }
 
 private:
     boost::filesystem::path _gamePath;
 
-    std::unique_ptr<resource::TwoDas> _twoDas;
+    std::unique_ptr<resource::Gffs> _gffs;
     std::unique_ptr<resource::Resources> _resources;
     std::unique_ptr<resource::Strings> _strings;
+    std::unique_ptr<resource::TwoDas> _twoDas;
 };
 
 } // namespace di

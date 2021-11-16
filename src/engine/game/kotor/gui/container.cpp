@@ -72,6 +72,7 @@ ContainerGUI::ContainerGUI(
     Textures &textures,
     Walkmeshes &walkmeshes,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -104,6 +105,7 @@ ContainerGUI::ContainerGUI(
         textures,
         walkmeshes,
         window,
+        gffs,
         resources,
         strings,
         twoDas) {

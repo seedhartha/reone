@@ -62,6 +62,7 @@ public:
         scene::SceneGraph &sceneGraph,
         scene::WorldRenderPipeline &worldRenderPipeline,
         script::Scripts &scripts,
+        resource::Gffs &gffs,
         resource::Resources &resources,
         resource::Strings &strings,
         resource::TwoDas &twoDas);

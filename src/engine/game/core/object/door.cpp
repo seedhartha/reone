@@ -22,6 +22,7 @@
 #include "../../../graphics/walkmesh/walkmeshes.h"
 #include "../../../resource/2da.h"
 #include "../../../resource/2das.h"
+#include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 #include "../../../scene/node/model.h"
@@ -54,7 +55,7 @@ void Door::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Door::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utd(_resources.getGFF(resRef, ResourceType::Utd));
+    shared_ptr<GffStruct> utd(_gffs.get(resRef, ResourceType::Utd));
     if (!utd)
         return;
 

@@ -37,6 +37,7 @@ namespace reone {
 
 namespace resource {
 
+class Gffs;
 class Resources;
 class Strings;
 class TwoDas;
@@ -105,6 +106,7 @@ public:
         graphics::Textures &textures,
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
+        resource::Gffs &gffs,
         resource::Resources &resources,
         resource::Strings &strings,
         resource::TwoDas &twoDas,
@@ -128,6 +130,7 @@ public:
         _textures(textures),
         _walkmeshes(walkmeshes),
         _window(window),
+        _gffs(gffs),
         _resources(resources),
         _strings(strings),
         _twoDas(twoDas),
@@ -182,6 +185,7 @@ private:
     graphics::Textures &_textures;
     graphics::Walkmeshes &_walkmeshes;
     graphics::Window &_window;
+    resource::Gffs &_gffs;
     resource::Resources &_resources;
     resource::Strings &_strings;
     resource::TwoDas &_twoDas;

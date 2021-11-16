@@ -28,9 +28,6 @@ namespace reone {
 
 namespace resource {
 
-class GffStruct;
-class TwoDA;
-
 /**
  * Encapsulates game resource management. Contains a prioritized list of
  * resource providers, that it queries for resources by ResRef and ResType.
@@ -50,10 +47,11 @@ public:
     void clearTransientProviders();
 
     std::shared_ptr<ByteArray> getRaw(const std::string &resRef, ResourceType type, bool logNotFound = true);
-    std::shared_ptr<GffStruct> getGFF(const std::string &resRef, ResourceType type);
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
 
 private:
+    std::unordered_map<ResourceId, std::shared_ptr<ByteArray>, ResourceIdHasher> _cache;
+
     // Providers
 
     PEReader _exeFile;
@@ -61,13 +59,6 @@ private:
     std::vector<std::unique_ptr<IResourceProvider>> _transientProviders; /**< transient providers are replaced when switching between modules */
 
     // END Providers
-
-    // Caches
-
-    std::unordered_map<ResourceId, std::shared_ptr<ByteArray>, ResourceIdHasher> _rawCache;
-    std::unordered_map<ResourceId, std::shared_ptr<GffStruct>, ResourceIdHasher> _gffCache;
-
-    // END Caches
 
     void indexProvider(std::unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient = false);
 
