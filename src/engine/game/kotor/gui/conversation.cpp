@@ -27,14 +27,15 @@
 #include "../../../resource/resources.h"
 
 #include "../../core/script/runner.h"
+#include "../../core/services.h"
 
 #include "../kotor.h"
 
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::gui;
 using namespace reone::graphics;
+using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
@@ -44,74 +45,6 @@ namespace game {
 static constexpr float kDefaultEntryDuration = 10.0f;
 
 static bool g_allEntriesSkippable = false;
-
-Conversation::Conversation(
-    KotOR *game,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    GameGUI(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas) {
-}
 
 void Conversation::start(const shared_ptr<Dialog> &dialog, const shared_ptr<SpatialObject> &owner) {
     debug("Start " + dialog->resRef(), LogChannels::conversation);
@@ -144,7 +77,7 @@ void Conversation::loadConversationBackground() {
 
 void Conversation::loadCameraModel() {
     string modelResRef(_dialog->cameraModel());
-    _cameraModel = modelResRef.empty() ? nullptr : _models.get(modelResRef);
+    _cameraModel = modelResRef.empty() ? nullptr : _services.models.get(modelResRef);
 }
 
 void Conversation::onStart() {
@@ -170,7 +103,7 @@ int Conversation::indexOfFirstActive(const vector<Dialog::EntryReplyLink> &links
 }
 
 bool Conversation::evaluateCondition(const string &scriptResRef) {
-    return _scriptRunner.run(scriptResRef, _owner->id()) != 0;
+    return _services.scriptRunner.run(scriptResRef, _owner->id()) != 0;
 }
 
 void Conversation::finish() {
@@ -180,7 +113,7 @@ void Conversation::finish() {
 
     // Run EndConversation script
     if (!_dialog->endScript().empty()) {
-        _scriptRunner.run(_dialog->endScript(), _owner->id());
+        _services.scriptRunner.run(_dialog->endScript(), _owner->id());
     }
 }
 
@@ -212,7 +145,7 @@ void Conversation::loadEntry(int index, bool start) {
 
     // Run entry script
     if (!_currentEntry->script.empty()) {
-        _scriptRunner.run(_currentEntry->script, _owner->id());
+        _services.scriptRunner.run(_currentEntry->script, _owner->id());
     }
 }
 
@@ -236,8 +169,8 @@ void Conversation::loadVoiceOver() {
         voiceResRef = _currentEntry->voResRef;
     }
     if (!voiceResRef.empty()) {
-        _currentVoice = _audioPlayer.play(voiceResRef, AudioType::Voice);
-        _lipAnimation = _lips.get(voiceResRef);
+        _currentVoice = _services.audioPlayer.play(voiceResRef, AudioType::Voice);
+        _lipAnimation = _services.lips.get(voiceResRef);
     }
 }
 
@@ -299,7 +232,7 @@ void Conversation::pickReply(int index) {
 
     // Run reply script
     if (!reply.script.empty()) {
-        _scriptRunner.run(reply.script, _owner->id());
+        _services.scriptRunner.run(reply.script, _owner->id());
     }
 
     int entryIdx = indexOfFirstActive(reply.entries);

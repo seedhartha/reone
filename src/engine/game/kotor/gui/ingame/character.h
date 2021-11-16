@@ -36,37 +36,7 @@ public:
     CharacterMenu(
         KotOR *game,
         InGameMenu &inGameMenu,
-        ActionFactory &actionFactory,
-        Classes &classes,
-        Combat &combat,
-        Feats &feats,
-        FootstepSounds &footstepSounds,
-        GUISounds &guiSounds,
-        ObjectFactory &objectFactory,
-        Party &party,
-        Portraits &portraits,
-        Reputes &reputes,
-        ScriptRunner &scriptRunner,
-        SoundSets &soundSets,
-        Surfaces &surfaces,
-        audio::AudioFiles &audioFiles,
-        audio::AudioPlayer &audioPlayer,
-        graphics::Context &context,
-        graphics::Features &features,
-        graphics::Fonts &fonts,
-        graphics::Lips &lips,
-        graphics::Materials &materials,
-        graphics::Meshes &meshes,
-        graphics::Models &models,
-        graphics::PBRIBL &pbrIbl,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Walkmeshes &walkmeshes,
-        graphics::Window &window,
-        resource::Gffs &gffs,
-        resource::Resources &resources,
-        resource::Strings &strings,
-        resource::TwoDas &twoDas);
+        Services &services);
 
     void load() override;
     void update(float dt) override;

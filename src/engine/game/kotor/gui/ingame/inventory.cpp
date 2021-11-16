@@ -23,6 +23,7 @@
 
 #include "../../../core/object/creature.h"
 #include "../../../core/party.h"
+#include "../../../core/services.h"
 
 #include "../../kotor.h"
 
@@ -37,72 +38,8 @@ namespace reone {
 
 namespace game {
 
-InventoryMenu::InventoryMenu(
-    KotOR *game,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    GameGUI(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas) {
+InventoryMenu::InventoryMenu(KotOR *game, Services &services) :
+    GameGUI(game, services) {
     _resRef = getResRef("inventory");
 
     initForGame();
@@ -168,7 +105,7 @@ void InventoryMenu::refreshPortraits() {
     if (!!_game->isTSL())
         return;
 
-    Party &party = _party;
+    Party &party = _services.party;
     shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));

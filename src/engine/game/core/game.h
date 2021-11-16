@@ -47,7 +47,7 @@ constexpr char kSoundsDirectoryName[] = "streamsounds";
 constexpr char kLipsDirectoryName[] = "lips";
 constexpr char kOverrideDirectoryName[] = "override";
 
-class Services;
+struct Services;
 
 /**
  * Abstract game.

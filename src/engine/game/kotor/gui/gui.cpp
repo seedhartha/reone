@@ -20,6 +20,8 @@
 #include "../../../audio/player.h"
 #include "../../../graphics/texture/textures.h"
 
+#include "../../core/services.h"
+
 #include "../kotor.h"
 
 #include "sounds.h"
@@ -27,90 +29,40 @@
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::gui;
 using namespace reone::graphics;
+using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
 namespace game {
 
-GameGUI::GameGUI(
-    KotOR *game,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    audio::AudioFiles &audioFiles,
-    audio::AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
+GameGUI::GameGUI(KotOR *game, Services &services) :
     GUI(
         game->options().graphics,
-        context,
-        features,
-        fonts,
-        materials,
-        meshes,
-        pbrIbl,
-        shaders,
-        textures,
-        window,
-        gffs,
-        resources,
-        strings),
+        services.context,
+        services.features,
+        services.fonts,
+        services.materials,
+        services.meshes,
+        services.pbrIbl,
+        services.shaders,
+        services.textures,
+        services.window,
+        services.gffs,
+        services.resources,
+        services.strings),
     _game(game),
-    _actionFactory(actionFactory),
-    _classes(classes),
-    _combat(combat),
-    _feats(feats),
-    _footstepSounds(footstepSounds),
-    _guiSounds(guiSounds),
-    _objectFactory(objectFactory),
-    _party(party),
-    _portraits(portraits),
-    _reputes(reputes),
-    _scriptRunner(scriptRunner),
-    _soundSets(soundSets),
-    _surfaces(surfaces),
-    _audioFiles(audioFiles),
-    _audioPlayer(audioPlayer),
-    _lips(lips),
-    _models(models),
-    _walkmeshes(walkmeshes),
-    _twoDas(twoDas) {
+    _services(services) {
 }
 
 void GameGUI::onClick(const string &control) {
-    _audioPlayer.play(_guiSounds.getOnClick(), AudioType::Sound);
+    _services.audioPlayer.play(_services.guiSounds.getOnClick(), AudioType::Sound);
 }
 
 void GameGUI::onFocusChanged(const string &control, bool focus) {
     if (focus) {
-        _audioPlayer.play(_guiSounds.getOnEnter(), AudioType::Sound);
+        _services.audioPlayer.play(_services.guiSounds.getOnEnter(), AudioType::Sound);
     }
 }
 

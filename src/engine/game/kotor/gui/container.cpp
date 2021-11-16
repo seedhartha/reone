@@ -25,6 +25,7 @@
 #include "../../core/object/item.h"
 #include "../../core/object/placeable.h"
 #include "../../core/party.h"
+#include "../../core/services.h"
 
 #include "../kotor.h"
 
@@ -43,72 +44,8 @@ static constexpr int kSwitchToResRef = 47884;
 static constexpr int kGiveItemResRef = 47885;
 static constexpr int kInventoryResRef = 393;
 
-ContainerGUI::ContainerGUI(
-    KotOR *game,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    GameGUI(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas) {
+ContainerGUI::ContainerGUI(KotOR *game, Services &services) :
+    GameGUI(game, services) {
     _resRef = getResRef("container");
 
     initForGame();
@@ -185,7 +122,7 @@ shared_ptr<Texture> ContainerGUI::getItemFrameTexture(int stackSize) const {
 }
 
 void ContainerGUI::transferItemsToPlayer() {
-    shared_ptr<Creature> player(_party.player());
+    shared_ptr<Creature> player(_services.party.player());
     _container->moveDropableItemsTo(*player);
 
     auto placeable = dynamic_pointer_cast<Placeable>(_container);

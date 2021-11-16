@@ -25,6 +25,7 @@
 
 #include "../../core/object/factory.h"
 #include "../../core/party.h"
+#include "../../core/services.h"
 
 #include "../kotor.h"
 
@@ -43,72 +44,8 @@ namespace game {
 
 static constexpr float kKotorModelSize = 1.4f;
 
-MainMenu::MainMenu(
-    KotOR *game,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    GameGUI(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas) {
+MainMenu::MainMenu(KotOR *game, Services &services) :
+    GameGUI(game, services) {
     if (game->isTSL()) {
         _resRef = "mainmenu8x6_p";
     } else {
@@ -231,7 +168,7 @@ void MainMenu::setup3DView() {
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
-    auto model = sceneGraph.newModel(_models.get("mainmenu"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(_services.models.get("mainmenu"), ModelUsage::GUI);
     model->playAnimation("default", AnimationProperties::fromFlags(AnimationFlags::loop));
     return move(model);
 }

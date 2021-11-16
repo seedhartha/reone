@@ -23,6 +23,7 @@
 #include "../../../../resource/strings.h"
 
 #include "../../../core/d20/classes.h"
+#include "../../../core/services.h"
 
 #include "../../kotor.h"
 
@@ -52,70 +53,8 @@ static const unordered_map<SkillType, int> g_descStrRefBySkill {
 CharGenSkills::CharGenSkills(
     CharacterGeneration *charGen,
     KotOR *game,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    GameGUI(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas),
+    Services &services) :
+    GameGUI(game, services),
     _charGen(charGen) {
 
     _resRef = getResRef("skchrgen");
@@ -286,7 +225,7 @@ void CharGenSkills::bindControls() {
 
 void CharGenSkills::reset(bool newGame) {
     const CreatureAttributes &attributes = _charGen->character().attributes;
-    shared_ptr<CreatureClass> clazz(_classes.get(attributes.getEffectiveClass()));
+    shared_ptr<CreatureClass> clazz(_services.classes.get(attributes.getEffectiveClass()));
 
     _points = glm::max(1, (clazz->skillPointBase() + attributes.getAbilityModifier(Ability::Intelligence)) / 2);
 
@@ -342,7 +281,7 @@ void CharGenSkills::refreshControls() {
 bool CharGenSkills::canIncreaseSkill(SkillType skill) const {
     ClassType clazz = _charGen->character().attributes.getEffectiveClass();
 
-    shared_ptr<CreatureClass> creatureClass(_classes.get(clazz));
+    shared_ptr<CreatureClass> creatureClass(_services.classes.get(clazz));
     int maxSkillRank = creatureClass->isClassSkill(skill) ? 4 : 2;
     int pointCost = creatureClass->isClassSkill(skill) ? 1 : 2;
 
@@ -359,7 +298,7 @@ void CharGenSkills::updateCharacter() {
 
 int CharGenSkills::getPointCost(SkillType skill) const {
     ClassType clazz = _charGen->character().attributes.getEffectiveClass();
-    shared_ptr<CreatureClass> creatureClass(_classes.get(clazz));
+    shared_ptr<CreatureClass> creatureClass(_services.classes.get(clazz));
     return creatureClass->isClassSkill(skill) ? 1 : 2;
 }
 

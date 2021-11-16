@@ -29,6 +29,7 @@
 #include "../../../core/object/factory.h"
 #include "../../../core/party.h"
 #include "../../../core/portraits.h"
+#include "../../../core/services.h"
 
 #include "../../kotor.h"
 
@@ -61,72 +62,10 @@ static map<ClassType, int> g_classDescStrRefs {
     {ClassType::JediGuardian, 48033}};
 
 ClassSelection::ClassSelection(
-    KotOR *game,
     CharacterGeneration &charGen,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    GameGUI(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas),
+    KotOR *game,
+    Services &services) :
+    GameGUI(game, services),
     _charGen(charGen) {
     _resRef = getResRef("classsel");
 
@@ -186,7 +125,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     Character character;
     character.gender = gender;
     character.appearance = appearance;
-    character.attributes = _classes.get(clazz)->defaultAttributes();
+    character.attributes = _services.classes.get(clazz)->defaultAttributes();
 
     // Button control
 
@@ -258,7 +197,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
 vector<Portrait> ClassSelection::getPCPortraitsByGender(Gender gender) {
     vector<Portrait> result;
     int sex = gender == Gender::Female ? 1 : 0;
-    for (auto &portrait : _portraits.portraits()) {
+    for (auto &portrait : _services.portraits.portraits()) {
         if (portrait.forPC && portrait.sex == sex) {
             result.push_back(portrait);
         }
@@ -291,29 +230,29 @@ int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz)
 
 shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, SceneGraph &sceneGraph) {
     auto objectFactory = make_unique<ObjectFactory>(
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
+        _services.actionFactory,
+        _services.classes,
+        _services.combat,
+        _services.footstepSounds,
+        _services.party,
+        _services.portraits,
+        _services.reputes,
+        _services.scriptRunner,
+        _services.soundSets,
+        _services.surfaces,
+        _services.audioFiles,
+        _services.audioPlayer,
+        _services.context,
+        _services.meshes,
+        _services.models,
         _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
+        _services.textures,
+        _services.walkmeshes,
+        _services.window,
+        _services.gffs,
+        _services.resources,
         _strings,
-        _twoDas,
+        _services.twoDas,
         sceneGraph);
     objectFactory->setGame(*_game);
 
@@ -325,7 +264,7 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, Sce
     character->sceneNode()->setCullable(false);
     character->updateModelAnimation();
 
-    auto model = sceneGraph.newModel(_models.get("cgbody_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(_services.models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", character->sceneNode());
 
     return move(model);
@@ -360,7 +299,7 @@ void ClassSelection::onClassButtonFocusChanged(int index, bool focus) {
     ClassType clazz = button.character.attributes.getEffectiveClass();
 
     string classText(_strings.get(g_genderStrRefs[button.character.gender]));
-    classText += " " + _classes.get(clazz)->name();
+    classText += " " + _services.classes.get(clazz)->name();
     _binding.lblClass->setTextMessage(classText);
 
     string descText(_strings.get(g_classDescStrRefs[clazz]));

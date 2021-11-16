@@ -27,6 +27,7 @@
 #include "../../core/d20/feats.h"
 #include "../../core/object/creature.h"
 #include "../../core/party.h"
+#include "../../core/services.h"
 
 #include "../kotor.h"
 
@@ -43,86 +44,21 @@ namespace game {
 
 static string g_attackIcon("i_attack");
 
-HUD::HUD(
-    KotOR *game,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    Skills &skills,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
-    GameGUI(
-        game,
-        actionFactory,
-        classes,
-        combat,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        gffs,
-        resources,
-        strings,
-        twoDas),
+HUD::HUD(KotOR *game, Services &services) :
+    GameGUI(game, services),
     _select(
         *game,
-        actionFactory,
-        _feats,
-        _party,
-        reputes,
-        skills,
-        _context,
-        _fonts,
-        _meshes,
-        _shaders,
-        _textures,
-        _window) {
+        services.actionFactory,
+        services.feats,
+        services.party,
+        services.reputes,
+        services.skills,
+        services.context,
+        services.fonts,
+        services.meshes,
+        services.shaders,
+        services.textures,
+        services.window) {
     _resRef = getResRef("mipc28x6");
     _resolutionX = 800;
     _resolutionY = 600;
@@ -240,10 +176,10 @@ void HUD::load() {
         _game->openInGameMenu(InGameMenuTab::Options);
     });
     _binding.btnClearAll->setOnClick([this]() {
-        _party.getLeader()->clearAllActions();
+        _services.party.getLeader()->clearAllActions();
     });
     _binding.btnClearOne->setOnClick([this]() {
-        for (auto &action : _party.getLeader()->actions()) {
+        for (auto &action : _services.party.getLeader()->actions()) {
             if (action->type() == ActionType::AttackObject) {
                 action->complete();
                 break;
@@ -251,7 +187,7 @@ void HUD::load() {
         }
     });
     _binding.btnClearOne2->setOnClick([this]() {
-        for (auto &action : _party.getLeader()->actions()) {
+        for (auto &action : _services.party.getLeader()->actions()) {
             if (action->type() == ActionType::AttackObject) {
                 action->complete();
                 break;
@@ -262,47 +198,15 @@ void HUD::load() {
         _game->openInGameMenu(InGameMenuTab::Equipment);
     });
     _binding.btnChar2->setOnClick([this]() {
-        _party.setPartyLeaderByIndex(1);
+        _services.party.setPartyLeaderByIndex(1);
     });
     _binding.btnChar3->setOnClick([this]() {
-        _party.setPartyLeaderByIndex(2);
+        _services.party.setPartyLeaderByIndex(2);
     });
 
     _select.load();
 
-    _barkBubble = make_unique<BarkBubble>(
-        _game,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas);
+    _barkBubble = make_unique<BarkBubble>(_game, _services);
     _barkBubble->load();
 }
 
@@ -440,7 +344,7 @@ bool HUD::handle(const SDL_Event &event) {
 void HUD::update(float dt) {
     GUI::update(dt);
 
-    Party &party = _party;
+    Party &party = _services.party;
     vector<Label *> charLabels {
         _binding.lblChar1.get(),
         _binding.lblChar2.get(),
@@ -506,7 +410,7 @@ void HUD::draw() {
 
     drawMinimap();
 
-    Party &party = _party;
+    Party &party = _services.party;
     for (int i = 0; i < party.getSize(); ++i) {
         drawHealth(i);
     }
@@ -532,7 +436,7 @@ void HUD::drawHealth(int memberIndex) {
     if (_game->isTSL())
         return;
 
-    Party &party = _party;
+    Party &party = _services.party;
     shared_ptr<Creature> member(party.getMember(memberIndex));
     vector<Label *> backLabels {
         _binding.lblBack1.get(),
@@ -577,7 +481,7 @@ void HUD::toggleCombat(bool enabled) {
 }
 
 void HUD::refreshActionQueueItems() const {
-    auto &actions = _party.getLeader()->actions();
+    auto &actions = _services.party.getLeader()->actions();
     vector<Label *> queueLabels {
         _binding.lblQueue0.get(),
         _binding.lblQueue1.get(),
@@ -593,7 +497,7 @@ void HUD::refreshActionQueueItems() const {
                 break;
             case ActionType::UseFeat: {
                 auto featAction = static_pointer_cast<UseFeatAction>(actions[i]);
-                shared_ptr<Feat> feat(_feats.get(featAction->feat()));
+                shared_ptr<Feat> feat(_services.feats.get(featAction->feat()));
                 if (feat) {
                     item.setBorderFill(feat->icon);
                 }
