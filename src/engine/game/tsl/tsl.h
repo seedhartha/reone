@@ -63,7 +63,8 @@ public:
         scene::WorldRenderPipeline &worldRenderPipeline,
         script::Scripts &scripts,
         resource::Resources &resources,
-        resource::Strings &strings);
+        resource::Strings &strings,
+        resource::TwoDas &twoDas);
 
     void initResourceProviders() override;
 

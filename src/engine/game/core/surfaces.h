@@ -17,17 +17,23 @@
 
 #pragma once
 
-#include "../../resource/resources.h"
-
 #include "surface.h"
 
 namespace reone {
+
+namespace resource {
+
+class TwoDas;
+
+}
 
 namespace game {
 
 class Surfaces : boost::noncopyable {
 public:
-    Surfaces(resource::Resources &resources);
+    Surfaces(resource::TwoDas &twoDas) :
+        _twoDas(twoDas) {
+    }
 
     void init();
 
@@ -39,7 +45,7 @@ public:
     std::set<uint32_t> getWalkcheckSurfaceIndices() const;
 
 private:
-    resource::Resources &_resources;
+    resource::TwoDas &_twoDas;
 
     std::vector<Surface> _surfaces;
 

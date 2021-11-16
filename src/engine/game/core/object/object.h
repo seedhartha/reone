@@ -28,6 +28,7 @@ namespace resource {
 
 class Resources;
 class Strings;
+class TwoDas;
 
 } // namespace resource
 
@@ -189,6 +190,7 @@ protected:
     graphics::Walkmeshes &_walkmeshes;
     resource::Resources &_resources;
     resource::Strings &_strings;
+    resource::TwoDas &_twoDas;
     scene::SceneGraph &_sceneGraph;
 
     // END Services
@@ -240,6 +242,7 @@ protected:
         graphics::Walkmeshes &walkmeshes,
         resource::Resources &resources,
         resource::Strings &strings,
+        resource::TwoDas &twoDas,
         scene::SceneGraph &sceneGraph) :
         _id(id),
         _type(type),
@@ -264,6 +267,7 @@ protected:
         _textures(textures),
         _walkmeshes(walkmeshes),
         _resources(resources),
+        _twoDas(twoDas),
         _strings(strings),
         _sceneGraph(sceneGraph) {
     }

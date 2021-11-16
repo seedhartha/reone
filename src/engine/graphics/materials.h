@@ -21,7 +21,7 @@ namespace reone {
 
 namespace resource {
 
-class Resources;
+class TwoDas;
 
 }
 
@@ -31,7 +31,10 @@ struct Material;
 
 class Materials : boost::noncopyable {
 public:
-    Materials(resource::Resources &resources);
+    Materials(resource::TwoDas &twoDas) :
+        _twoDas(twoDas) {
+    }
+
     ~Materials();
 
     void init();
@@ -43,7 +46,7 @@ public:
     std::shared_ptr<Material> get(const std::string &texResRef) const;
 
 private:
-    resource::Resources &_resources;
+    resource::TwoDas &_twoDas;
 
     bool _inited {false};
     std::unordered_map<std::string, std::shared_ptr<Material>> _materials;

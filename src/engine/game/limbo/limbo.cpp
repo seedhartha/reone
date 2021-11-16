@@ -21,6 +21,7 @@
 #include "../../common/logutil.h"
 #include "../../common/pathutil.h"
 #include "../../resource/2da.h"
+#include "../../resource/2das.h"
 #include "../../resource/resources.h"
 
 #include "../core/script/runner.h"
@@ -65,6 +66,7 @@ void Limbo::start() {
 }
 
 void Limbo::loadModuleResources(const string &moduleName) {
+    _twoDas.invalidate();
     _resources.invalidateCache();
     _resources.clearTransientProviders();
 

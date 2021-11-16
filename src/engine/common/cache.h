@@ -28,7 +28,7 @@ template <class K, class V>
 class MemoryCache : boost::noncopyable {
 public:
     /**
-     * @param compute function used to lazily compute a value given a key
+     * @param compute function used to lazily compute a value by key
      */
     MemoryCache(std::function<std::shared_ptr<V>(K)> compute) :
         _compute(ensurePresent(compute, "compute")) {
@@ -44,11 +44,10 @@ public:
      */
     std::shared_ptr<V> get(K key) {
         auto maybeObject = _objects.find(key);
-        if (maybeObject != _objects.end())
+        if (maybeObject != _objects.end()) {
             return maybeObject->second;
-
+        }
         auto object = _compute(key);
-
         return _objects.insert(make_pair(key, move(object))).first->second;
     }
 

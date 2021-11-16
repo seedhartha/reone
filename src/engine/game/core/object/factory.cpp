@@ -51,6 +51,7 @@ shared_ptr<Module> ObjectFactory::newModule() {
         _walkmeshes,
         _resources,
         _strings,
+        _twoDas,
         _sceneGraph);
 }
 
@@ -79,6 +80,7 @@ shared_ptr<Area> ObjectFactory::newArea() {
         _window,
         _resources,
         _strings,
+        _twoDas,
         _sceneGraph);
 }
 
@@ -106,6 +108,7 @@ shared_ptr<Creature> ObjectFactory::newCreature() {
         _walkmeshes,
         _resources,
         _strings,
+        _twoDas,
         _sceneGraph);
 }
 
@@ -133,6 +136,7 @@ shared_ptr<Placeable> ObjectFactory::newPlaceable() {
         _walkmeshes,
         _resources,
         _strings,
+        _twoDas,
         _sceneGraph);
 }
 
@@ -160,6 +164,7 @@ shared_ptr<Door> ObjectFactory::newDoor() {
         _walkmeshes,
         _resources,
         _strings,
+        _twoDas,
         _sceneGraph);
 }
 
@@ -187,6 +192,7 @@ shared_ptr<Waypoint> ObjectFactory::newWaypoint() {
         _walkmeshes,
         _resources,
         _strings,
+        _twoDas,
         _sceneGraph);
 }
 
@@ -214,6 +220,7 @@ shared_ptr<Trigger> ObjectFactory::newTrigger() {
         _walkmeshes,
         _resources,
         _strings,
+        _twoDas,
         _sceneGraph);
 }
 
@@ -241,6 +248,7 @@ shared_ptr<Item> ObjectFactory::newItem() {
         _walkmeshes,
         _resources,
         _strings,
+        _twoDas,
         _sceneGraph);
 }
 
@@ -268,6 +276,7 @@ shared_ptr<Sound> ObjectFactory::newSound() {
         _walkmeshes,
         _resources,
         _strings,
+        _twoDas,
         _sceneGraph);
 }
 
@@ -295,6 +304,7 @@ shared_ptr<PlaceableCamera> ObjectFactory::newCamera() {
         _walkmeshes,
         _resources,
         _strings,
+        _twoDas,
         _sceneGraph);
 }
 
@@ -322,6 +332,7 @@ shared_ptr<Encounter> ObjectFactory::newEncounter() {
         _walkmeshes,
         _resources,
         _strings,
+        _twoDas,
         _sceneGraph);
 }
 

@@ -80,7 +80,8 @@ PortraitSelection::PortraitSelection(
     graphics::Walkmeshes &walkmeshes,
     graphics::Window &window,
     resource::Resources &resources,
-    resource::Strings &strings) :
+    resource::Strings &strings,
+    resource::TwoDas &twoDas) :
     GameGUI(
         game,
         actionFactory,
@@ -111,7 +112,8 @@ PortraitSelection::PortraitSelection(
         walkmeshes,
         window,
         resources,
-        strings),
+        strings,
+        twoDas),
     _charGen(charGen) {
 
     _resRef = getResRef("portcust");
@@ -223,6 +225,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
         _window,
         _resources,
         _strings,
+        _twoDas,
         sceneGraph);
     objectFactory->setGame(*_game);
 

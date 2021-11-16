@@ -28,8 +28,8 @@ namespace reone {
 
 namespace resource {
 
-class Resources;
 class Strings;
+class TwoDas;
 
 } // namespace resource
 
@@ -42,12 +42,12 @@ public:
     CreatureClass(
         ClassType type,
         Classes &classes,
-        resource::Resources &resources,
-        resource::Strings &strings) :
+        resource::Strings &strings,
+        resource::TwoDas &twoDas) :
         _type(type),
         _classes(classes),
-        _resources(resources),
-        _strings(strings) {
+        _strings(strings),
+        _twoDas(twoDas) {
     }
 
     void load(const resource::TwoDA &twoDa, int row);
@@ -86,8 +86,8 @@ private:
 
     Classes &_classes;
 
-    resource::Resources &_resources;
     resource::Strings &_strings;
+    resource::TwoDas &_twoDas;
 
     // END Services
 

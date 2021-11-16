@@ -25,6 +25,7 @@
 
 using namespace std;
 
+using namespace reone::audio;
 using namespace reone::gui;
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -51,20 +52,21 @@ CharGenFeats::CharGenFeats(
     Surfaces &surfaces,
     audio::AudioFiles &audioFiles,
     audio::AudioPlayer &audioPlayer,
-    graphics::Context &context,
-    graphics::Features &features,
-    graphics::Fonts &fonts,
-    graphics::Lips &lips,
-    graphics::Materials &materials,
-    graphics::Meshes &meshes,
-    graphics::Models &models,
-    graphics::PBRIBL &pbrIbl,
-    graphics::Shaders &shaders,
-    graphics::Textures &textures,
-    graphics::Walkmeshes &walkmeshes,
-    graphics::Window &window,
-    resource::Resources &resources,
-    resource::Strings &strings) :
+    Context &context,
+    Features &features,
+    Fonts &fonts,
+    Lips &lips,
+    Materials &materials,
+    Meshes &meshes,
+    Models &models,
+    PBRIBL &pbrIbl,
+    Shaders &shaders,
+    Textures &textures,
+    Walkmeshes &walkmeshes,
+    Window &window,
+    Resources &resources,
+    Strings &strings,
+    TwoDas &twoDas) :
     GameGUI(
         game,
         actionFactory,
@@ -95,7 +97,8 @@ CharGenFeats::CharGenFeats(
         walkmeshes,
         window,
         resources,
-        strings),
+        strings,
+        twoDas),
     _charGen(charGen) {
 
     _resRef = getResRef("ftchrgen");

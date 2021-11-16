@@ -17,17 +17,23 @@
 
 #pragma once
 
-#include "../../resource/resources.h"
-
 #include "object/creature.h"
 
 namespace reone {
+
+namespace resource {
+
+class TwoDas;
+
+}
 
 namespace game {
 
 class Reputes : boost::noncopyable {
 public:
-    Reputes(resource::Resources &resources);
+    Reputes(resource::TwoDas &twoDas) :
+        _twoDas(twoDas) {
+    }
 
     void init();
 
@@ -36,7 +42,7 @@ public:
     bool getIsNeutral(const Creature &left, const Creature &right);
 
 private:
-    resource::Resources &_resources;
+    resource::TwoDas &_twoDas;
 
     int getRepute(const Creature &left, const Creature &right) const;
 };

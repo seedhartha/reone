@@ -36,6 +36,7 @@
 #include "../../graphics/window.h"
 #include "../../gui/gui.h"
 #include "../../resource/2da.h"
+#include "../../resource/2das.h"
 #include "../../resource/format/erfreader.h"
 #include "../../resource/format/erfwriter.h"
 #include "../../resource/format/gffwriter.h"
@@ -110,7 +111,8 @@ Game::Game(
     WorldRenderPipeline &worldRenderPipeline,
     Scripts &scripts,
     Resources &resources,
-    Strings &strings) :
+    Strings &strings,
+    TwoDas &twoDas) :
     _tsl(tsl),
     _path(move(path)),
     _options(move(options)),
@@ -148,7 +150,8 @@ Game::Game(
     _worldRenderPipeline(worldRenderPipeline),
     _scripts(scripts),
     _resources(resources),
-    _strings(strings) {
+    _strings(strings),
+    _twoDas(twoDas) {
 }
 
 void Game::init() {
@@ -267,7 +270,7 @@ void Game::loadDefaultParty() {
 }
 
 void Game::getDefaultPartyMembers(string &member1, string &member2, string &member3) const {
-    shared_ptr<TwoDA> defaultParty(_resources.get2DA("defaultparty"));
+    shared_ptr<TwoDA> defaultParty(_twoDas.get("defaultparty"));
     if (!defaultParty) {
         return;
     }

@@ -50,7 +50,6 @@ public:
     void clearTransientProviders();
 
     std::shared_ptr<ByteArray> getRaw(const std::string &resRef, ResourceType type, bool logNotFound = true);
-    std::shared_ptr<TwoDA> get2DA(const std::string &resRef, bool logNotFound = true);
     std::shared_ptr<GffStruct> getGFF(const std::string &resRef, ResourceType type);
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
 
@@ -66,7 +65,6 @@ private:
     // Caches
 
     std::unordered_map<ResourceId, std::shared_ptr<ByteArray>, ResourceIdHasher> _rawCache;
-    std::unordered_map<ResourceId, std::shared_ptr<TwoDA>, ResourceIdHasher> _2daCache;
     std::unordered_map<ResourceId, std::shared_ptr<GffStruct>, ResourceIdHasher> _gffCache;
 
     // END Caches

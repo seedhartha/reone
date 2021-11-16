@@ -70,7 +70,8 @@ public:
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
         resource::Resources &resources,
-        resource::Strings &strings);
+        resource::Strings &strings,
+        resource::TwoDas &twoDas);
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;

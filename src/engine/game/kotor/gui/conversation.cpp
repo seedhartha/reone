@@ -75,7 +75,8 @@ Conversation::Conversation(
     graphics::Walkmeshes &walkmeshes,
     graphics::Window &window,
     resource::Resources &resources,
-    resource::Strings &strings) :
+    resource::Strings &strings,
+    resource::TwoDas &twoDas) :
     GameGUI(
         game,
         actionFactory,
@@ -106,7 +107,8 @@ Conversation::Conversation(
         walkmeshes,
         window,
         resources,
-        strings) {
+        strings,
+        twoDas) {
 }
 
 void Conversation::start(const shared_ptr<Dialog> &dialog, const shared_ptr<SpatialObject> &owner) {

@@ -18,6 +18,7 @@
 #include "reputes.h"
 
 #include "../../resource/2da.h"
+#include "../../resource/2das.h"
 
 using namespace std;
 
@@ -32,12 +33,8 @@ static constexpr int kDefaultRepute = 50;
 static vector<string> g_factionLabels;
 static vector<vector<int>> g_factionValues;
 
-Reputes::Reputes(Resources &resources) :
-    _resources(resources) {
-}
-
 void Reputes::init() {
-    shared_ptr<TwoDA> repute(_resources.get2DA("repute"));
+    shared_ptr<TwoDA> repute(_twoDas.get("repute"));
     if (!repute) {
         return;
     }

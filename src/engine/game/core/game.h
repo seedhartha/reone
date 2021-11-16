@@ -34,6 +34,7 @@ namespace resource {
 
 class Resources;
 class Strings;
+class TwoDas;
 
 } // namespace resource
 
@@ -151,7 +152,8 @@ public:
         scene::WorldRenderPipeline &worldRenderPipeline,
         script::Scripts &scripts,
         resource::Resources &resources,
-        resource::Strings &strings);
+        resource::Strings &strings,
+        resource::TwoDas &twoDas);
 
     virtual ~Game() {
         deinit();
@@ -315,6 +317,7 @@ protected:
     script::Scripts &_scripts;
     resource::Resources &_resources;
     resource::Strings &_strings;
+    resource::TwoDas &_twoDas;
 
     // END Services
 

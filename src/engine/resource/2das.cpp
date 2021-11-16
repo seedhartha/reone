@@ -15,56 +15,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "2das.h"
 
-#include "../types.h"
+#include "../common/streamutil.h"
 
-#include "feat.h"
+#include "format/2dareader.h"
+#include "resources.h"
+
+using namespace std;
+using namespace std::placeholders;
 
 namespace reone {
 
 namespace resource {
 
-class Strings;
-class TwoDas;
-
-} // namespace resource
-
-namespace graphics {
-
-class Textures;
-
+TwoDas::TwoDas(Resources &resources) :
+    MemoryCache(bind(&TwoDas::doGet, this, _1)),
+    _resources(resources) {
 }
 
-namespace game {
-
-class Feats : boost::noncopyable {
-public:
-    Feats(
-        graphics::Textures &textures,
-        resource::Strings &strings,
-        resource::TwoDas &twoDas) :
-        _textures(textures),
-        _strings(strings),
-        _twoDas(twoDas) {
+shared_ptr<TwoDA> TwoDas::doGet(const string &resRef) {
+    auto raw = _resources.getRaw(resRef, ResourceType::TwoDa);
+    if (!raw) {
+        return nullptr;
     }
+    TwoDaReader twoDa;
+    twoDa.load(wrap(raw));
+    return twoDa.twoDa();
+}
 
-    void init();
-
-    std::shared_ptr<Feat> get(FeatType type) const;
-
-private:
-    std::unordered_map<FeatType, std::shared_ptr<Feat>> _feats;
-
-    // Services
-
-    graphics::Textures &_textures;
-    resource::Strings &_strings;
-    resource::TwoDas &_twoDas;
-
-    // END Services
-};
-
-} // namespace game
+} // namespace resource
 
 } // namespace reone

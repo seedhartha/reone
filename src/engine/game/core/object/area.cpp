@@ -29,6 +29,7 @@
 #include "../../../graphics/texture/textures.h"
 #include "../../../graphics/walkmesh/walkmeshes.h"
 #include "../../../resource/2da.h"
+#include "../../../resource/2das.h"
 #include "../../../resource/format/lytreader.h"
 #include "../../../resource/format/visreader.h"
 #include "../../../resource/resources.h"
@@ -101,6 +102,7 @@ Area::Area(
     Window &window,
     Resources &resources,
     Strings &strings,
+    TwoDas &twoDas,
     SceneGraph &sceneGraph) :
     Object(
         id,
@@ -127,6 +129,7 @@ Area::Area(
         walkmeshes,
         resources,
         strings,
+        twoDas,
         sceneGraph),
     _map(*game, _party, _context, _meshes, _shaders, _textures, window) {
 
@@ -1213,7 +1216,7 @@ void Area::loadProperties(const GffStruct &git) {
     }
     int musicIdx = props->getInt("MusicDay");
     if (musicIdx) {
-        shared_ptr<TwoDA> musicTable(_resources.get2DA("ambientmusic"));
+        shared_ptr<TwoDA> musicTable(_twoDas.get("ambientmusic"));
         _music = musicTable->getString(musicIdx, "resource");
     }
 }
@@ -1534,7 +1537,7 @@ void Area::loadARE(const GffStruct &are) {
 }
 
 void Area::loadCameraStyle(const GffStruct &are) {
-    shared_ptr<TwoDA> cameraStyles(_resources.get2DA("camerastyle"));
+    shared_ptr<TwoDA> cameraStyles(_twoDas.get("camerastyle"));
     if (!cameraStyles) {
         _camStyleDefault = g_defaultCameraStyle;
         _camStyleCombat = g_defaultCameraStyle;

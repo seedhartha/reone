@@ -20,6 +20,7 @@
 #include "../../../graphics/model/models.h"
 #include "../../../graphics/walkmesh/walkmeshes.h"
 #include "../../../resource/2da.h"
+#include "../../../resource/2das.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 #include "../../../scene/node/model.h"
@@ -53,7 +54,7 @@ void Placeable::loadFromBlueprint(const string &resRef) {
 
     loadUTP(*utp);
 
-    shared_ptr<TwoDA> placeables(_resources.get2DA("placeables"));
+    shared_ptr<TwoDA> placeables(_twoDas.get("placeables"));
     string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
     auto model = _sceneGraph.newModel(_models.get(modelName), ModelUsage::Placeable);

@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "../../../graphics/texture/textures.h"
-
 #include "../types.h"
 
 #include "spell.h"
@@ -27,10 +25,16 @@ namespace reone {
 
 namespace resource {
 
-class Resources;
 class Strings;
+class TwoDas;
 
 } // namespace resource
+
+namespace graphics {
+
+class Textures;
+
+}
 
 namespace game {
 
@@ -38,11 +42,11 @@ class Spells : boost::noncopyable {
 public:
     Spells(
         graphics::Textures &textures,
-        resource::Resources &resources,
-        resource::Strings &strings) :
+        resource::Strings &strings,
+        resource::TwoDas &twoDas) :
         _textures(textures),
-        _resources(resources),
-        _strings(strings) {
+        _strings(strings),
+        _twoDas(twoDas) {
     }
 
     void init();
@@ -55,8 +59,8 @@ private:
     // Services
 
     graphics::Textures &_textures;
-    resource::Resources &_resources;
     resource::Strings &_strings;
+    resource::TwoDas &_twoDas;
 
     // END Services
 };
