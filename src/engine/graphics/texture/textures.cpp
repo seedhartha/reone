@@ -59,7 +59,7 @@ void Textures::init() {
     bindDefaults();
 }
 
-void Textures::invalidateCache() {
+void Textures::invalidate() {
     _cache.clear();
 }
 

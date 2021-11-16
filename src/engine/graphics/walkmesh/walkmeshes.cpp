@@ -34,7 +34,7 @@ Walkmeshes::Walkmeshes(Resources &resources) :
     _resources(resources) {
 }
 
-void Walkmeshes::invalidateCache() {
+void Walkmeshes::invalidate() {
     _cache.clear();
 }
 

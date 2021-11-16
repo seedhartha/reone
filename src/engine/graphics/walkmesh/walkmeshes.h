@@ -37,7 +37,7 @@ class Walkmeshes : boost::noncopyable {
 public:
     Walkmeshes(resource::Resources &resources);
 
-    void invalidateCache();
+    void invalidate();
 
     std::shared_ptr<Walkmesh> get(const std::string &resRef, resource::ResourceType type);
 

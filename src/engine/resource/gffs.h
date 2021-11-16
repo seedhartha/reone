@@ -33,6 +33,10 @@ public:
         _resources(resources) {
     }
 
+    void invalidate() {
+        _cache.clear();
+    }
+
     std::shared_ptr<GffStruct> get(const std::string &resRef, ResourceType type);
 
 private:

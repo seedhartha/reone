@@ -654,6 +654,7 @@ set(GAMECORE_HEADERS
     src/engine/game/core/reputes.h
     src/engine/game/core/room.h
     src/engine/game/core/savedgame.h
+    src/engine/game/core/services.h
     src/engine/game/core/script/routine/argutil.h
     src/engine/game/core/script/routine/context.h
     src/engine/game/core/script/routine/declarations.h

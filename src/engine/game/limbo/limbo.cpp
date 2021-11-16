@@ -22,9 +22,11 @@
 #include "../../common/pathutil.h"
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
+#include "../../resource/gffs.h"
 #include "../../resource/resources.h"
 
 #include "../core/script/runner.h"
+#include "../core/services.h"
 
 using namespace std;
 
@@ -43,7 +45,7 @@ static constexpr char kStartScriptResRef[] = "start";
 void Limbo::initResourceProviders() {
     fs::path dataDir(getPathIgnoreCase(_path, kDataDirectoryName));
     if (!dataDir.empty()) {
-        _resources.indexDirectory(dataDir);
+        _services.resources.indexDirectory(dataDir);
     }
 }
 
@@ -62,13 +64,14 @@ void Limbo::loadModuleNames() {
 }
 
 void Limbo::start() {
-    _scriptRunner.run(kStartScriptResRef);
+    _services.scriptRunner.run(kStartScriptResRef);
 }
 
 void Limbo::loadModuleResources(const string &moduleName) {
-    _twoDas.invalidate();
-    _resources.invalidateCache();
-    _resources.clearTransientProviders();
+    _services.twoDas.invalidate();
+    _services.gffs.invalidate();
+    _services.resources.invalidate();
+    _services.resources.clearTransientProviders();
 
     fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));
     if (modulesPath.empty()) {
@@ -79,7 +82,7 @@ void Limbo::loadModuleResources(const string &moduleName) {
     if (modPath.empty()) {
         throw ValidationException("Module MOD archive not found");
     }
-    _resources.indexErfFile(modPath);
+    _services.resources.indexErfFile(modPath);
 }
 
 void Limbo::openInGame() {

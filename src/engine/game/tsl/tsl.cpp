@@ -21,6 +21,8 @@
 #include "../../resource/2da.h"
 #include "../../resource/resources.h"
 
+#include "../core/services.h"
+
 using namespace std;
 
 using namespace reone::audio;
@@ -45,83 +47,11 @@ static constexpr char kBlueprintResRefKreia[] = "p_kreia";
 TSL::TSL(
     fs::path path,
     Options options,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Cursors &cursors,
-    EffectFactory &effectFactory,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    Skills &skills,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    SceneGraph &sceneGraph,
-    WorldRenderPipeline &worldRenderPipeline,
-    Scripts &scripts,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
+    Services &services) :
     KotOR(
         move(path),
         move(options),
-        actionFactory,
-        classes,
-        combat,
-        cursors,
-        effectFactory,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        skills,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        sceneGraph,
-        worldRenderPipeline,
-        scripts,
-        gffs,
-        resources,
-        strings,
-        twoDas) {
+        services) {
     _tsl = true;
 
     _mainMenuMusicResRef = "mus_sion";
@@ -134,21 +64,21 @@ TSL::TSL(
 }
 
 void TSL::initResourceProviders() {
-    _resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
+    _services.resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
 
     fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
-    _resources.indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
-    _resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
+    _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
+    _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
 
-    _resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
-    _resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
-    _resources.indexDirectory(getPathIgnoreCase(_path, kVoiceDirectoryName));
+    _services.resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
+    _services.resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
+    _services.resources.indexDirectory(getPathIgnoreCase(_path, kVoiceDirectoryName));
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-    _resources.indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
+    _services.resources.indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
 
-    _resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
-    _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
+    _services.resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
+    _services.resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
 }
 
 void TSL::getDefaultPartyMembers(string &member1, string &member2, string &member3) const {

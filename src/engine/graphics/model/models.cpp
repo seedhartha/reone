@@ -38,7 +38,7 @@ Models::Models(Textures &textures, Resources &resources) :
     _textures(textures), _resources(resources) {
 }
 
-void Models::invalidateCache() {
+void Models::invalidate() {
     _cache.clear();
 }
 

@@ -50,6 +50,7 @@
 #include "../core/location.h"
 #include "../core/object/factory.h"
 #include "../core/party.h"
+#include "../core/services.h"
 #include "../core/soundsets.h"
 #include "../core/surfaces.h"
 
@@ -85,84 +86,12 @@ static bool g_conversationsEnabled = true;
 KotOR::KotOR(
     fs::path path,
     Options options,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Cursors &cursors,
-    EffectFactory &effectFactory,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    Skills &skills,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    SceneGraph &sceneGraph,
-    WorldRenderPipeline &worldRenderPipeline,
-    Scripts &scripts,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
+    Services &services) :
     Game(
         false,
         move(path),
         move(options),
-        actionFactory,
-        classes,
-        combat,
-        cursors,
-        effectFactory,
-        feats,
-        footstepSounds,
-        guiSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        skills,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        features,
-        fonts,
-        lips,
-        materials,
-        meshes,
-        models,
-        pbrIbl,
-        shaders,
-        textures,
-        walkmeshes,
-        window,
-        sceneGraph,
-        worldRenderPipeline,
-        scripts,
-        gffs,
-        resources,
-        strings,
-        twoDas) {
+        services) {
 
     _screen = GameScreen::MainMenu;
 
@@ -176,24 +105,24 @@ KotOR::KotOR(
 }
 
 void KotOR::initResourceProviders() {
-    _resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
-    _resources.indexErfFile(getPathIgnoreCase(_path, kPatchFilename));
+    _services.resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
+    _services.resources.indexErfFile(getPathIgnoreCase(_path, kPatchFilename));
 
     fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
-    _resources.indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
-    _resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
+    _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
+    _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
 
-    _resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
-    _resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
-    _resources.indexDirectory(getPathIgnoreCase(_path, kWavesDirectoryName));
+    _services.resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
+    _services.resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
+    _services.resources.indexDirectory(getPathIgnoreCase(_path, kWavesDirectoryName));
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
     for (auto &filename : g_nonTransientLipFiles) {
-        _resources.indexErfFile(getPathIgnoreCase(lipsPath, filename));
+        _services.resources.indexErfFile(getPathIgnoreCase(lipsPath, filename));
     }
 
-    _resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
-    _resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
+    _services.resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
+    _services.resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
 }
 
 void KotOR::loadModuleNames() {
@@ -221,9 +150,10 @@ void KotOR::start() {
 }
 
 void KotOR::loadModuleResources(const string &moduleName) {
-    _twoDas.invalidate();
-    _resources.invalidateCache();
-    _resources.clearTransientProviders();
+    _services.twoDas.invalidate();
+    _services.gffs.invalidate();
+    _services.resources.invalidate();
+    _services.resources.clearTransientProviders();
 
     fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));
     if (modulesPath.empty()) {
@@ -232,19 +162,19 @@ void KotOR::loadModuleResources(const string &moduleName) {
 
     fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod"));
     if (!modPath.empty()) {
-        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false));
+        _services.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false));
     } else {
-        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"));
-        _resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"));
+        _services.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"));
+        _services.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"));
     }
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
     if (lipsPath.empty()) {
-        _resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"));
+        _services.resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"));
     }
 
     if (isTSL()) {
-        _resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"));
+        _services.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"));
     }
 }
 
@@ -288,371 +218,371 @@ void KotOR::loadInGameMenus() {
 void KotOR::loadMainMenu() {
     _mainMenu = make_unique<MainMenu>(
         this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas);
+        _services.actionFactory,
+        _services.classes,
+        _services.combat,
+        _services.feats,
+        _services.footstepSounds,
+        _services.guiSounds,
+        _services.objectFactory,
+        _services.party,
+        _services.portraits,
+        _services.reputes,
+        _services.scriptRunner,
+        _services.soundSets,
+        _services.surfaces,
+        _services.audioFiles,
+        _services.audioPlayer,
+        _services.context,
+        _services.features,
+        _services.fonts,
+        _services.lips,
+        _services.materials,
+        _services.meshes,
+        _services.models,
+        _services.pbrIbl,
+        _services.shaders,
+        _services.textures,
+        _services.walkmeshes,
+        _services.window,
+        _services.gffs,
+        _services.resources,
+        _services.strings,
+        _services.twoDas);
     _mainMenu->load();
 }
 
 void KotOR::loadHUD() {
     _hud = make_unique<HUD>(
         this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _skills,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas);
+        _services.actionFactory,
+        _services.classes,
+        _services.combat,
+        _services.feats,
+        _services.footstepSounds,
+        _services.guiSounds,
+        _services.objectFactory,
+        _services.party,
+        _services.portraits,
+        _services.reputes,
+        _services.scriptRunner,
+        _services.skills,
+        _services.soundSets,
+        _services.surfaces,
+        _services.audioFiles,
+        _services.audioPlayer,
+        _services.context,
+        _services.features,
+        _services.fonts,
+        _services.lips,
+        _services.materials,
+        _services.meshes,
+        _services.models,
+        _services.pbrIbl,
+        _services.shaders,
+        _services.textures,
+        _services.walkmeshes,
+        _services.window,
+        _services.gffs,
+        _services.resources,
+        _services.strings,
+        _services.twoDas);
     _hud->load();
 }
 
 void KotOR::loadDialog() {
     _dialog = make_unique<DialogGUI>(
         this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas);
+        _services.actionFactory,
+        _services.classes,
+        _services.combat,
+        _services.feats,
+        _services.footstepSounds,
+        _services.guiSounds,
+        _services.objectFactory,
+        _services.party,
+        _services.portraits,
+        _services.reputes,
+        _services.scriptRunner,
+        _services.soundSets,
+        _services.surfaces,
+        _services.audioFiles,
+        _services.audioPlayer,
+        _services.context,
+        _services.features,
+        _services.fonts,
+        _services.lips,
+        _services.materials,
+        _services.meshes,
+        _services.models,
+        _services.pbrIbl,
+        _services.shaders,
+        _services.textures,
+        _services.walkmeshes,
+        _services.window,
+        _services.gffs,
+        _services.resources,
+        _services.strings,
+        _services.twoDas);
     _dialog->load();
 }
 
 void KotOR::loadComputer() {
     _computer = make_unique<ComputerGUI>(
         this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas);
+        _services.actionFactory,
+        _services.classes,
+        _services.combat,
+        _services.feats,
+        _services.footstepSounds,
+        _services.guiSounds,
+        _services.objectFactory,
+        _services.party,
+        _services.portraits,
+        _services.reputes,
+        _services.scriptRunner,
+        _services.soundSets,
+        _services.surfaces,
+        _services.audioFiles,
+        _services.audioPlayer,
+        _services.context,
+        _services.features,
+        _services.fonts,
+        _services.lips,
+        _services.materials,
+        _services.meshes,
+        _services.models,
+        _services.pbrIbl,
+        _services.shaders,
+        _services.textures,
+        _services.walkmeshes,
+        _services.window,
+        _services.gffs,
+        _services.resources,
+        _services.strings,
+        _services.twoDas);
     _computer->load();
 }
 
 void KotOR::loadContainer() {
     _container = make_unique<ContainerGUI>(
         this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas);
+        _services.actionFactory,
+        _services.classes,
+        _services.combat,
+        _services.feats,
+        _services.footstepSounds,
+        _services.guiSounds,
+        _services.objectFactory,
+        _services.party,
+        _services.portraits,
+        _services.reputes,
+        _services.scriptRunner,
+        _services.soundSets,
+        _services.surfaces,
+        _services.audioFiles,
+        _services.audioPlayer,
+        _services.context,
+        _services.features,
+        _services.fonts,
+        _services.lips,
+        _services.materials,
+        _services.meshes,
+        _services.models,
+        _services.pbrIbl,
+        _services.shaders,
+        _services.textures,
+        _services.walkmeshes,
+        _services.window,
+        _services.gffs,
+        _services.resources,
+        _services.strings,
+        _services.twoDas);
     _container->load();
 }
 
 void KotOR::loadPartySelection() {
     _partySelect = make_unique<PartySelection>(
         this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas);
+        _services.actionFactory,
+        _services.classes,
+        _services.combat,
+        _services.feats,
+        _services.footstepSounds,
+        _services.guiSounds,
+        _services.objectFactory,
+        _services.party,
+        _services.portraits,
+        _services.reputes,
+        _services.scriptRunner,
+        _services.soundSets,
+        _services.surfaces,
+        _services.audioFiles,
+        _services.audioPlayer,
+        _services.context,
+        _services.features,
+        _services.fonts,
+        _services.lips,
+        _services.materials,
+        _services.meshes,
+        _services.models,
+        _services.pbrIbl,
+        _services.shaders,
+        _services.textures,
+        _services.walkmeshes,
+        _services.window,
+        _services.gffs,
+        _services.resources,
+        _services.strings,
+        _services.twoDas);
     _partySelect->load();
 }
 
 void KotOR::loadSaveLoad() {
     _saveLoad = make_unique<SaveLoad>(
         this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas);
+        _services.actionFactory,
+        _services.classes,
+        _services.combat,
+        _services.feats,
+        _services.footstepSounds,
+        _services.guiSounds,
+        _services.objectFactory,
+        _services.party,
+        _services.portraits,
+        _services.reputes,
+        _services.scriptRunner,
+        _services.soundSets,
+        _services.surfaces,
+        _services.audioFiles,
+        _services.audioPlayer,
+        _services.context,
+        _services.features,
+        _services.fonts,
+        _services.lips,
+        _services.materials,
+        _services.meshes,
+        _services.models,
+        _services.pbrIbl,
+        _services.shaders,
+        _services.textures,
+        _services.walkmeshes,
+        _services.window,
+        _services.gffs,
+        _services.resources,
+        _services.strings,
+        _services.twoDas);
     _saveLoad->load();
 }
 
 void KotOR::loadLoadingScreen() {
     _loadScreen = make_unique<LoadingScreen>(
         this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas);
+        _services.actionFactory,
+        _services.classes,
+        _services.combat,
+        _services.feats,
+        _services.footstepSounds,
+        _services.guiSounds,
+        _services.objectFactory,
+        _services.party,
+        _services.portraits,
+        _services.reputes,
+        _services.scriptRunner,
+        _services.soundSets,
+        _services.surfaces,
+        _services.audioFiles,
+        _services.audioPlayer,
+        _services.context,
+        _services.features,
+        _services.fonts,
+        _services.lips,
+        _services.materials,
+        _services.meshes,
+        _services.models,
+        _services.pbrIbl,
+        _services.shaders,
+        _services.textures,
+        _services.walkmeshes,
+        _services.window,
+        _services.gffs,
+        _services.resources,
+        _services.strings,
+        _services.twoDas);
     static_cast<LoadingScreen *>(_loadScreen.get())->load();
 }
 
 void KotOR::loadCharacterGeneration() {
     _charGen = make_unique<CharacterGeneration>(
         this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas);
+        _services.actionFactory,
+        _services.classes,
+        _services.combat,
+        _services.feats,
+        _services.footstepSounds,
+        _services.guiSounds,
+        _services.objectFactory,
+        _services.party,
+        _services.portraits,
+        _services.reputes,
+        _services.scriptRunner,
+        _services.soundSets,
+        _services.surfaces,
+        _services.audioFiles,
+        _services.audioPlayer,
+        _services.context,
+        _services.features,
+        _services.fonts,
+        _services.lips,
+        _services.materials,
+        _services.meshes,
+        _services.models,
+        _services.pbrIbl,
+        _services.shaders,
+        _services.textures,
+        _services.walkmeshes,
+        _services.window,
+        _services.gffs,
+        _services.resources,
+        _services.strings,
+        _services.twoDas);
     _charGen->load();
 }
 
 void KotOR::loadInGame() {
     _inGame = make_unique<InGameMenu>(
         this,
-        _actionFactory,
-        _classes,
-        _combat,
-        _feats,
-        _footstepSounds,
-        _guiSounds,
-        _objectFactory,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _features,
-        _fonts,
-        _lips,
-        _materials,
-        _meshes,
-        _models,
-        _pbrIbl,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas);
+        _services.actionFactory,
+        _services.classes,
+        _services.combat,
+        _services.feats,
+        _services.footstepSounds,
+        _services.guiSounds,
+        _services.objectFactory,
+        _services.party,
+        _services.portraits,
+        _services.reputes,
+        _services.scriptRunner,
+        _services.soundSets,
+        _services.surfaces,
+        _services.audioFiles,
+        _services.audioPlayer,
+        _services.context,
+        _services.features,
+        _services.fonts,
+        _services.lips,
+        _services.materials,
+        _services.meshes,
+        _services.models,
+        _services.pbrIbl,
+        _services.shaders,
+        _services.textures,
+        _services.walkmeshes,
+        _services.window,
+        _services.gffs,
+        _services.resources,
+        _services.strings,
+        _services.twoDas);
     _inGame->load();
 }
 
@@ -673,9 +603,9 @@ void KotOR::openInGame() {
 
 void KotOR::openInGameMenu(InGameMenuTab tab) {
     // Take a screenshot to be used in SaveLoad menu
-    _window.clear();
-    _worldRenderPipeline.setTakeScreenshot(true);
-    _worldRenderPipeline.render();
+    _services.window.clear();
+    _services.worldRenderPipeline.setTakeScreenshot(true);
+    _services.worldRenderPipeline.render();
 
     setCursorType(CursorType::Default);
     switch (tab) {
@@ -756,7 +686,7 @@ void KotOR::startDialog(const shared_ptr<SpatialObject> &owner, const string &re
     if (!g_conversationsEnabled)
         return;
 
-    shared_ptr<GffStruct> dlg(_gffs.get(resRef, ResourceType::Dlg));
+    shared_ptr<GffStruct> dlg(_services.gffs.get(resRef, ResourceType::Dlg));
     if (!dlg) {
         warn("Game: conversation not found: " + resRef);
         return;
@@ -767,7 +697,7 @@ void KotOR::startDialog(const shared_ptr<SpatialObject> &owner, const string &re
     setCursorType(CursorType::Default);
     changeScreen(GameScreen::Conversation);
 
-    auto dialog = make_shared<Dialog>(resRef, &_strings);
+    auto dialog = make_shared<Dialog>(resRef, &_services.strings);
     dialog->load(*dlg);
 
     bool computerConversation = dialog->conversationType() == ConversationType::Computer;

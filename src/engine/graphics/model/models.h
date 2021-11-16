@@ -36,7 +36,7 @@ class Models : boost::noncopyable {
 public:
     Models(Textures &textures, resource::Resources &resources);
 
-    void invalidateCache();
+    void invalidate();
 
     std::shared_ptr<Model> get(const std::string &resRef);
 

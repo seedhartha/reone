@@ -34,6 +34,7 @@
 #include "../../game/core/script/routine/registrar.h"
 #include "../../game/core/script/routine/routines.h"
 #include "../../game/core/script/runner.h"
+#include "../../game/core/services.h"
 #include "../../game/core/soundsets.h"
 #include "../../game/core/surfaces.h"
 #include "../../game/kotor/gui/sounds.h"
@@ -85,11 +86,12 @@ public:
     game::Party &party() { return *_party; }
     game::Portraits &portraits() { return *_portraits; }
     game::Reputes &reputes() { return *_reputes; }
-    game::Routines &routines() { return *_routines; }
     game::RoutineRegistrar &routineRegistrar() { return *_routineRegistrar; }
+    game::Routines &routines() { return *_routines; }
     game::ScriptRunner &scriptRunner() { return *_scriptRunner; }
-    game::SoundSets &soundSets() { return *_soundSets; }
+    game::Services &services() { return *_services; }
     game::Skills &skills() { return *_skills; }
+    game::SoundSets &soundSets() { return *_soundSets; }
     game::Spells &spells() { return *_spells; }
     game::Surfaces &surfaces() { return *_surfaces; }
 
@@ -120,8 +122,9 @@ private:
     std::unique_ptr<game::Routines> _routines;
     std::unique_ptr<game::RoutineRegistrar> _routineRegistrar;
     std::unique_ptr<game::ScriptRunner> _scriptRunner;
-    std::unique_ptr<game::SoundSets> _soundSets;
+    std::unique_ptr<game::Services> _services;
     std::unique_ptr<game::Skills> _skills;
+    std::unique_ptr<game::SoundSets> _soundSets;
     std::unique_ptr<game::Spells> _spells;
     std::unique_ptr<game::Surfaces> _surfaces;
 

@@ -43,7 +43,7 @@ public:
     void indexDirectory(const boost::filesystem::path &path);
     void indexExeFile(const boost::filesystem::path &path);
 
-    void invalidateCache();
+    void invalidate();
     void clearTransientProviders();
 
     std::shared_ptr<ByteArray> getRaw(const std::string &resRef, ResourceType type, bool logNotFound = true);
