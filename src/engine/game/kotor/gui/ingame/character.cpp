@@ -71,6 +71,7 @@ CharacterMenu::CharacterMenu(
     Textures &textures,
     Walkmeshes &walkmeshes,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -103,6 +104,7 @@ CharacterMenu::CharacterMenu(
         textures,
         walkmeshes,
         window,
+        gffs,
         resources,
         strings,
         twoDas),
@@ -338,6 +340,7 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) 
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas,

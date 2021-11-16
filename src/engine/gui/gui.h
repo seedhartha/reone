@@ -25,6 +25,7 @@ namespace reone {
 
 namespace resource {
 
+class Gffs;
 class GffStruct;
 class Resources;
 class Strings;
@@ -101,6 +102,7 @@ protected:
     graphics::Textures &_textures;
     graphics::Window &_window;
 
+    resource::Gffs &_gffs;
     resource::Resources &_resources;
     resource::Strings &_strings;
 
@@ -117,6 +119,7 @@ protected:
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,
+        resource::Gffs &gffs,
         resource::Resources &resources,
         resource::Strings &strings);
 

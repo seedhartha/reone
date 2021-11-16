@@ -32,6 +32,7 @@
 #include "../../../resource/2das.h"
 #include "../../../resource/format/lytreader.h"
 #include "../../../resource/format/visreader.h"
+#include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 #include "../../../scene/node/grass.h"
@@ -100,6 +101,7 @@ Area::Area(
     Textures &textures,
     Walkmeshes &walkmeshes,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas,
@@ -127,6 +129,7 @@ Area::Area(
         shaders,
         textures,
         walkmeshes,
+        gffs,
         resources,
         strings,
         twoDas,
@@ -217,7 +220,7 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
 }
 
 void Area::loadPTH() {
-    shared_ptr<GffStruct> pth(_resources.getGFF(_name, ResourceType::Pth));
+    shared_ptr<GffStruct> pth(_gffs.get(_name, ResourceType::Pth));
     if (!pth) {
         return;
     }

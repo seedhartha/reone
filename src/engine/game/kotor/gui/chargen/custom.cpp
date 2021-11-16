@@ -65,6 +65,7 @@ CustomCharacterGeneration::CustomCharacterGeneration(
     Textures &textures,
     Walkmeshes &walkmeshes,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -97,6 +98,7 @@ CustomCharacterGeneration::CustomCharacterGeneration(
         textures,
         walkmeshes,
         window,
+        gffs,
         resources,
         strings,
         twoDas),

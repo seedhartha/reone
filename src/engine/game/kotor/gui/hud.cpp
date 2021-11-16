@@ -73,6 +73,7 @@ HUD::HUD(
     Textures &textures,
     Walkmeshes &walkmeshes,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -105,6 +106,7 @@ HUD::HUD(
         textures,
         walkmeshes,
         window,
+        gffs,
         resources,
         strings,
         twoDas),
@@ -297,6 +299,7 @@ void HUD::load() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);

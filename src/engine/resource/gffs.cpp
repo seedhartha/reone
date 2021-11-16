@@ -17,9 +17,33 @@
 
 #include "gffs.h"
 
+#include "../common/streamutil.h"
+
+#include "format/gffreader.h"
+#include "resources.h"
+
+using namespace std;
+
 namespace reone {
 
 namespace resource {
+
+shared_ptr<GffStruct> Gffs::get(const string &resRef, ResourceType type) {
+    ResourceId id(resRef, type);
+    auto maybeGff = _cache.find(id);
+    if (maybeGff != _cache.end()) {
+        return maybeGff->second;
+    }
+    shared_ptr<GffStruct> gff;
+    auto maybeRaw = _resources.getRaw(resRef, type);
+    if (maybeRaw) {
+        GffReader reader;
+        reader.load(wrap(*maybeRaw));
+        gff = reader.root();
+    }
+    auto inserted = _cache.insert(make_pair(id, gff));
+    return inserted.first->second;
+}
 
 } // namespace resource
 

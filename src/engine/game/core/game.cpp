@@ -40,6 +40,7 @@
 #include "../../resource/format/erfreader.h"
 #include "../../resource/format/erfwriter.h"
 #include "../../resource/format/gffwriter.h"
+#include "../../resource/gffs.h"
 #include "../../resource/resources.h"
 #include "../../scene/pipeline/world.h"
 #include "../../script/scripts.h"
@@ -110,6 +111,7 @@ Game::Game(
     SceneGraph &sceneGraph,
     WorldRenderPipeline &worldRenderPipeline,
     Scripts &scripts,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -149,6 +151,7 @@ Game::Game(
     _sceneGraph(sceneGraph),
     _worldRenderPipeline(worldRenderPipeline),
     _scripts(scripts),
+    _gffs(gffs),
     _resources(resources),
     _strings(strings),
     _twoDas(twoDas) {
@@ -207,7 +210,7 @@ void Game::loadModule(const string &name, string entry) {
             } else {
                 _module = _objectFactory.newModule();
 
-                shared_ptr<GffStruct> ifo(_resources.getGFF("module", ResourceType::Ifo));
+                shared_ptr<GffStruct> ifo(_gffs.get("module", ResourceType::Ifo));
                 if (!ifo) {
                     throw ValidationException("Module IFO file not found");
                 }

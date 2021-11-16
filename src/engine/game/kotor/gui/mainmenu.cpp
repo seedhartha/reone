@@ -32,8 +32,8 @@ using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::audio;
-using namespace reone::gui;
 using namespace reone::graphics;
+using namespace reone::gui;
 using namespace reone::resource;
 using namespace reone::scene;
 
@@ -72,6 +72,7 @@ MainMenu::MainMenu(
     Textures &textures,
     Walkmeshes &walkmeshes,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -104,6 +105,7 @@ MainMenu::MainMenu(
         textures,
         walkmeshes,
         window,
+        gffs,
         resources,
         strings,
         twoDas) {

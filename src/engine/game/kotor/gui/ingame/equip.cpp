@@ -99,6 +99,7 @@ Equipment::Equipment(
     Textures &textures,
     Walkmeshes &walkmeshes,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -131,6 +132,7 @@ Equipment::Equipment(
         textures,
         walkmeshes,
         window,
+        gffs,
         resources,
         strings,
         twoDas),

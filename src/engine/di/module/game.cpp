@@ -79,6 +79,7 @@ void GameModule::init() {
         _graphics.textures(),
         _graphics.walkmeshes(),
         _graphics.window(),
+        _resource.gffs(),
         _resource.resources(),
         _resource.strings(),
         _resource.twoDas(),
@@ -146,6 +147,7 @@ unique_ptr<Game> GameModule::newGame() {
             _scene.sceneGraph(),
             _scene.worldRenderPipeline(),
             _script.scripts(),
+            _resource.gffs(),
             _resource.resources(),
             _resource.strings(),
             _resource.twoDas());
@@ -187,6 +189,7 @@ unique_ptr<Game> GameModule::newGame() {
             _scene.sceneGraph(),
             _scene.worldRenderPipeline(),
             _script.scripts(),
+            _resource.gffs(),
             _resource.resources(),
             _resource.strings(),
             _resource.twoDas());
@@ -228,6 +231,7 @@ unique_ptr<Game> GameModule::newGame() {
             _scene.sceneGraph(),
             _scene.worldRenderPipeline(),
             _script.scripts(),
+            _resource.gffs(),
             _resource.resources(),
             _resource.strings(),
             _resource.twoDas());

@@ -78,6 +78,7 @@ TSL::TSL(
     SceneGraph &sceneGraph,
     WorldRenderPipeline &worldRenderPipeline,
     Scripts &scripts,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -117,6 +118,7 @@ TSL::TSL(
         sceneGraph,
         worldRenderPipeline,
         scripts,
+        gffs,
         resources,
         strings,
         twoDas) {

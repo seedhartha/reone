@@ -17,6 +17,7 @@
 
 #include "waypoint.h"
 
+#include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 
@@ -46,7 +47,7 @@ void Waypoint::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Waypoint::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utw(_resources.getGFF(resRef, ResourceType::Utw));
+    shared_ptr<GffStruct> utw(_gffs.get(resRef, ResourceType::Utw));
     if (utw) {
         loadUTW(*utw);
     }

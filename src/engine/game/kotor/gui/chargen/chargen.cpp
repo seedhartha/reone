@@ -73,6 +73,7 @@ CharacterGeneration::CharacterGeneration(
     Textures &textures,
     Walkmeshes &walkmeshes,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -105,6 +106,7 @@ CharacterGeneration::CharacterGeneration(
         textures,
         walkmeshes,
         window,
+        gffs,
         resources,
         strings,
         twoDas) {
@@ -210,6 +212,7 @@ void CharacterGeneration::loadClassSelection() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -247,6 +250,7 @@ void CharacterGeneration::loadQuickOrCustom() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -284,6 +288,7 @@ void CharacterGeneration::loadQuick() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -321,6 +326,7 @@ void CharacterGeneration::loadCustom() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -358,6 +364,7 @@ void CharacterGeneration::loadPortraitSelection() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -395,6 +402,7 @@ void CharacterGeneration::loadAbilities() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -432,6 +440,7 @@ void CharacterGeneration::loadSkills() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -469,6 +478,7 @@ void CharacterGeneration::loadFeats() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -506,6 +516,7 @@ void CharacterGeneration::loadNameEntry() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -543,6 +554,7 @@ void CharacterGeneration::loadLevelUp() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -826,6 +838,7 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas,

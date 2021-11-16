@@ -23,6 +23,7 @@
 #include "../../../graphics/texture/textures.h"
 #include "../../../resource/2da.h"
 #include "../../../resource/2das.h"
+#include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 
@@ -39,7 +40,7 @@ namespace reone {
 namespace game {
 
 void Item::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> uti(_resources.getGFF(resRef, ResourceType::Uti));
+    shared_ptr<GffStruct> uti(_gffs.get(resRef, ResourceType::Uti));
     if (uti) {
         loadUTI(*uti);
     }

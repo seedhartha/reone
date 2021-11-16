@@ -21,6 +21,7 @@
 #include "../../../graphics/walkmesh/walkmeshes.h"
 #include "../../../resource/2da.h"
 #include "../../../resource/2das.h"
+#include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 #include "../../../scene/node/model.h"
@@ -48,7 +49,7 @@ void Placeable::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Placeable::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utp(_resources.getGFF(resRef, ResourceType::Utp));
+    shared_ptr<GffStruct> utp(_gffs.get(resRef, ResourceType::Utp));
     if (!utp)
         return;
 

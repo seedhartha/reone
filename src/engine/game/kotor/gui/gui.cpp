@@ -64,6 +64,7 @@ GameGUI::GameGUI(
     Textures &textures,
     Walkmeshes &walkmeshes,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -78,6 +79,7 @@ GameGUI::GameGUI(
         shaders,
         textures,
         window,
+        gffs,
         resources,
         strings),
     _game(game),

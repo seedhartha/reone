@@ -90,6 +90,7 @@ ClassSelection::ClassSelection(
     Textures &textures,
     Walkmeshes &walkmeshes,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -122,6 +123,7 @@ ClassSelection::ClassSelection(
         textures,
         walkmeshes,
         window,
+        gffs,
         resources,
         strings,
         twoDas),
@@ -308,6 +310,7 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, Sce
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas,

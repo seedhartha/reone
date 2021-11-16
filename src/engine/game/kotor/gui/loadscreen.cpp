@@ -61,6 +61,7 @@ LoadingScreen::LoadingScreen(
     Textures &textures,
     Walkmeshes &walkmeshes,
     Window &window,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -93,6 +94,7 @@ LoadingScreen::LoadingScreen(
         textures,
         walkmeshes,
         window,
+        gffs,
         resources,
         strings,
         twoDas) {

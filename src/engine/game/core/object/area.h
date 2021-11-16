@@ -82,6 +82,7 @@ public:
         graphics::Textures &textures,
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
+        resource::Gffs &gffs,
         resource::Resources &resources,
         resource::Strings &strings,
         resource::TwoDas &twoDas,

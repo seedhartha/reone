@@ -21,6 +21,7 @@
 #include "../../../audio/player.h"
 #include "../../../resource/2da.h"
 #include "../../../resource/2das.h"
+#include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 
@@ -44,7 +45,7 @@ void Sound::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Sound::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> uts(_resources.getGFF(resRef, ResourceType::Uts));
+    shared_ptr<GffStruct> uts(_gffs.get(resRef, ResourceType::Uts));
     if (uts) {
         loadUTS(*uts);
     }

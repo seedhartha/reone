@@ -39,6 +39,7 @@
 #include "../../resource/format/erfreader.h"
 #include "../../resource/format/erfwriter.h"
 #include "../../resource/format/gffwriter.h"
+#include "../../resource/gffs.h"
 #include "../../resource/resources.h"
 #include "../../scene/pipeline/world.h"
 #include "../../script/scripts.h"
@@ -117,6 +118,7 @@ KotOR::KotOR(
     SceneGraph &sceneGraph,
     WorldRenderPipeline &worldRenderPipeline,
     Scripts &scripts,
+    Gffs &gffs,
     Resources &resources,
     Strings &strings,
     TwoDas &twoDas) :
@@ -157,6 +159,7 @@ KotOR::KotOR(
         sceneGraph,
         worldRenderPipeline,
         scripts,
+        gffs,
         resources,
         strings,
         twoDas) {
@@ -312,6 +315,7 @@ void KotOR::loadMainMenu() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -349,6 +353,7 @@ void KotOR::loadHUD() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -385,6 +390,7 @@ void KotOR::loadDialog() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -421,6 +427,7 @@ void KotOR::loadComputer() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -457,6 +464,7 @@ void KotOR::loadContainer() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -493,6 +501,7 @@ void KotOR::loadPartySelection() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -529,6 +538,7 @@ void KotOR::loadSaveLoad() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -565,6 +575,7 @@ void KotOR::loadLoadingScreen() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -601,6 +612,7 @@ void KotOR::loadCharacterGeneration() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -637,6 +649,7 @@ void KotOR::loadInGame() {
         _textures,
         _walkmeshes,
         _window,
+        _gffs,
         _resources,
         _strings,
         _twoDas);
@@ -743,7 +756,7 @@ void KotOR::startDialog(const shared_ptr<SpatialObject> &owner, const string &re
     if (!g_conversationsEnabled)
         return;
 
-    shared_ptr<GffStruct> dlg(_resources.getGFF(resRef, ResourceType::Dlg));
+    shared_ptr<GffStruct> dlg(_gffs.get(resRef, ResourceType::Dlg));
     if (!dlg) {
         warn("Game: conversation not found: " + resRef);
         return;

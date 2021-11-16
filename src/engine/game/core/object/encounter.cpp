@@ -17,6 +17,7 @@
 
 #include "encounter.h"
 
+#include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 
@@ -40,7 +41,7 @@ void Encounter::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Encounter::loadFromBlueprint(const string &blueprintResRef) {
-    shared_ptr<GffStruct> ute(_resources.getGFF(blueprintResRef, ResourceType::Ute));
+    shared_ptr<GffStruct> ute(_gffs.get(blueprintResRef, ResourceType::Ute));
     if (ute) {
         loadUTE(*ute);
     }

@@ -18,6 +18,7 @@
 #include "trigger.h"
 
 #include "../../../common/logutil.h"
+#include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 
@@ -68,7 +69,7 @@ void Trigger::loadGeometryFromGIT(const GffStruct &gffs) {
 }
 
 void Trigger::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utt(_resources.getGFF(resRef, ResourceType::Utt));
+    shared_ptr<GffStruct> utt(_gffs.get(resRef, ResourceType::Utt));
     if (utt) {
         loadUTT(*utt);
     }

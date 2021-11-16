@@ -27,6 +27,7 @@
 #include "../../../graphics/texture/textures.h"
 #include "../../../resource/2da.h"
 #include "../../../resource/2das.h"
+#include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
 #include "../../../scene/types.h"
@@ -80,7 +81,7 @@ void Creature::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Creature::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utc(_resources.getGFF(resRef, ResourceType::Utc));
+    shared_ptr<GffStruct> utc(_gffs.get(resRef, ResourceType::Utc));
     if (utc) {
         loadUTC(*utc);
         loadAppearance();
