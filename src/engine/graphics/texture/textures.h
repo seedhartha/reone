@@ -37,7 +37,7 @@ public:
     Textures(Context &context, resource::Resources &resources);
 
     void init();
-    void invalidateCache();
+    void invalidate();
 
     /**
      * Binds default textures to all texture units. Call once per framebuffer.

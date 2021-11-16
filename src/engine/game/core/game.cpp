@@ -51,6 +51,7 @@
 #include "location.h"
 #include "object/factory.h"
 #include "party.h"
+#include "services.h"
 #include "soundsets.h"
 #include "surfaces.h"
 
@@ -78,92 +79,20 @@ Game::Game(
     bool tsl,
     fs::path path,
     Options options,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    Cursors &cursors,
-    EffectFactory &effectFactory,
-    Feats &feats,
-    FootstepSounds &footstepSounds,
-    GUISounds &guiSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    Skills &skills,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Features &features,
-    Fonts &fonts,
-    Lips &lips,
-    Materials &materials,
-    Meshes &meshes,
-    Models &models,
-    PBRIBL &pbrIbl,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    SceneGraph &sceneGraph,
-    WorldRenderPipeline &worldRenderPipeline,
-    Scripts &scripts,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas) :
+    Services &services) :
     _tsl(tsl),
     _path(move(path)),
     _options(move(options)),
-    _actionFactory(actionFactory),
-    _classes(classes),
-    _combat(combat),
-    _cursors(cursors),
-    _effectFactory(effectFactory),
-    _feats(feats),
-    _footstepSounds(footstepSounds),
-    _guiSounds(guiSounds),
-    _objectFactory(objectFactory),
-    _party(party),
-    _portraits(portraits),
-    _reputes(reputes),
-    _scriptRunner(scriptRunner),
-    _skills(skills),
-    _soundSets(soundSets),
-    _surfaces(surfaces),
-    _audioFiles(audioFiles),
-    _audioPlayer(audioPlayer),
-    _context(context),
-    _features(features),
-    _fonts(fonts),
-    _lips(lips),
-    _materials(materials),
-    _meshes(meshes),
-    _models(models),
-    _pbrIbl(pbrIbl),
-    _shaders(shaders),
-    _textures(textures),
-    _walkmeshes(walkmeshes),
-    _window(window),
-    _sceneGraph(sceneGraph),
-    _worldRenderPipeline(worldRenderPipeline),
-    _scripts(scripts),
-    _gffs(gffs),
-    _resources(resources),
-    _strings(strings),
-    _twoDas(twoDas) {
+    _services(services) {
 }
 
 void Game::init() {
-    _window.setEventHandler(this);
+    _services.window.setEventHandler(this);
 
-    _console = make_unique<Console>(*this, _effectFactory, _party, _fonts, _meshes, _shaders, _window);
+    _console = make_unique<Console>(*this, _services.effectFactory, _services.party, _services.fonts, _services.meshes, _services.shaders, _services.window);
     _console->init();
 
-    _profileOverlay = make_unique<ProfileOverlay>(_fonts, _meshes, _shaders, _window);
+    _profileOverlay = make_unique<ProfileOverlay>(_services.fonts, _services.meshes, _services.shaders, _services.window);
     _profileOverlay->init();
 
     loadModuleNames();
@@ -183,13 +112,13 @@ void Game::loadModule(const string &name, string entry) {
     withLoadingScreen("load_" + name, [this, &name, &entry]() {
         loadInGameMenus();
 
-        _soundSets.invalidate();
-        _textures.invalidateCache();
-        _models.invalidateCache();
-        _walkmeshes.invalidateCache();
-        _lips.invalidate();
-        _audioFiles.invalidate();
-        _scripts.invalidate();
+        _services.soundSets.invalidate();
+        _services.textures.invalidate();
+        _services.models.invalidate();
+        _services.walkmeshes.invalidate();
+        _services.lips.invalidate();
+        _services.audioFiles.invalidate();
+        _services.scripts.invalidate();
 
         try {
             loadModuleResources(name);
@@ -208,9 +137,9 @@ void Game::loadModule(const string &name, string entry) {
             if (maybeModule != _loadedModules.end()) {
                 _module = maybeModule->second;
             } else {
-                _module = _objectFactory.newModule();
+                _module = _services.objectFactory.newModule();
 
-                shared_ptr<GffStruct> ifo(_gffs.get("module", ResourceType::Ifo));
+                shared_ptr<GffStruct> ifo(_services.gffs.get("module", ResourceType::Ifo));
                 if (!ifo) {
                     throw ValidationException("Module IFO file not found");
                 }
@@ -219,12 +148,12 @@ void Game::loadModule(const string &name, string entry) {
                 _loadedModules.insert(make_pair(name, _module));
             }
 
-            if (_party.isEmpty()) {
+            if (_services.party.isEmpty()) {
                 loadDefaultParty();
             }
 
             _module->loadParty(entry, _loadFromSaveGame);
-            _module->area()->fill(_sceneGraph);
+            _module->area()->fill(_services.sceneGraph);
 
             info("Module '" + name + "' loaded successfully");
 
@@ -249,9 +178,9 @@ void Game::loadDefaultParty() {
     string member1, member2, member3;
     getDefaultPartyMembers(member1, member2, member3);
 
-    Party &party = _party;
+    Party &party = _services.party;
     if (!member1.empty()) {
-        shared_ptr<Creature> player(_objectFactory.newCreature());
+        shared_ptr<Creature> player(_services.objectFactory.newCreature());
         player->loadFromBlueprint(member1);
         player->setTag(kObjectTagPlayer);
         player->setImmortal(true);
@@ -259,13 +188,13 @@ void Game::loadDefaultParty() {
         party.setPlayer(player);
     }
     if (!member2.empty()) {
-        shared_ptr<Creature> companion(_objectFactory.newCreature());
+        shared_ptr<Creature> companion(_services.objectFactory.newCreature());
         companion->loadFromBlueprint(member2);
         companion->setImmortal(true);
         party.addMember(0, companion);
     }
     if (!member3.empty()) {
-        shared_ptr<Creature> companion(_objectFactory.newCreature());
+        shared_ptr<Creature> companion(_services.objectFactory.newCreature());
         companion->loadFromBlueprint(member3);
         companion->setImmortal(true);
         party.addMember(1, companion);
@@ -273,7 +202,7 @@ void Game::loadDefaultParty() {
 }
 
 void Game::getDefaultPartyMembers(string &member1, string &member2, string &member3) const {
-    shared_ptr<TwoDA> defaultParty(_twoDas.get("defaultparty"));
+    shared_ptr<TwoDA> defaultParty(_services.twoDas.get("defaultparty"));
     if (!defaultParty) {
         return;
     }
@@ -288,9 +217,9 @@ void Game::getDefaultPartyMembers(string &member1, string &member2, string &memb
 void Game::setCursorType(CursorType type) {
     if (_cursorType != type) {
         if (type == CursorType::None) {
-            _window.setCursor(nullptr);
+            _services.window.setCursor(nullptr);
         } else {
-            _window.setCursor(_cursors.get(type));
+            _services.window.setCursor(_services.cursors.get(type));
         }
         _cursorType = type;
     }
@@ -302,7 +231,7 @@ void Game::playVideo(const string &name) {
         return;
     }
 
-    BikReader bik(path, _context, _meshes, _shaders);
+    BikReader bik(path, _services.context, _services.meshes, _services.shaders);
     bik.load();
 
     _video = bik.video();
@@ -316,7 +245,7 @@ void Game::playVideo(const string &name) {
     }
     shared_ptr<AudioStream> audio(_video->audio());
     if (audio) {
-        _movieAudio = _audioPlayer.play(audio, AudioType::Movie);
+        _movieAudio = _services.audioPlayer.play(audio, AudioType::Movie);
     }
 }
 
@@ -333,30 +262,30 @@ void Game::playMusic(const string &resRef) {
 
 void Game::drawAll() {
     // Compute derived PBR IBL textures from queued environment maps
-    _pbrIbl.refresh();
+    _services.pbrIbl.refresh();
 
-    _window.clear();
+    _services.window.clear();
 
     if (_video) {
         _video->draw();
     } else {
         drawWorld();
         drawGUI();
-        _window.drawCursor();
+        _services.window.drawCursor();
     }
 
     _profileOverlay->draw();
-    _window.swapBuffers();
+    _services.window.swapBuffers();
 }
 
 void Game::drawWorld() {
-    _worldRenderPipeline.render();
+    _services.worldRenderPipeline.render();
 }
 
 void Game::toggleInGameCameraType() {
     switch (_cameraType) {
     case CameraType::FirstPerson:
-        if (_party.getLeader()) {
+        if (_services.party.getLeader()) {
             _cameraType = CameraType::ThirdPerson;
         }
         break;
@@ -395,7 +324,7 @@ shared_ptr<Object> Game::getObjectById(uint32_t id) const {
     case kObjectInvalid:
         return nullptr;
     default:
-        return _objectFactory.getObjectById(id);
+        return _services.objectFactory.getObjectById(id);
     }
 }
 
@@ -433,9 +362,9 @@ void Game::runMainLoop() {
     _ticks = SDL_GetTicks();
 
     while (!_quit) {
-        _window.processEvents(_quit);
+        _services.window.processEvents(_quit);
 
-        if (_window.isInFocus()) {
+        if (_services.window.isInFocus()) {
             update();
             drawAll();
         }
@@ -460,7 +389,7 @@ void Game::update() {
     bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
     if (updModule && !_paused) {
         _module->update(dt);
-        _combat.update(dt);
+        _services.combat.update(dt);
     }
 
     GUI *gui = getScreenGUI();
@@ -489,7 +418,7 @@ void Game::updateMusic() {
         return;
 
     if (!_music || _music->isStopped()) {
-        _music = _audioPlayer.play(_musicResRef, AudioType::Music);
+        _music = _services.audioPlayer.play(_musicResRef, AudioType::Music);
     }
 }
 
@@ -509,8 +438,8 @@ float Game::measureFrameTime() {
 }
 
 void Game::deinit() {
-    _audioPlayer.deinit();
-    _window.deinit();
+    _services.audioPlayer.deinit();
+    _services.window.deinit();
 }
 
 void Game::quit() {
@@ -552,14 +481,14 @@ void Game::updateCamera(float dt) {
 
         glm::vec3 listenerPosition;
         if (_cameraType == CameraType::ThirdPerson) {
-            shared_ptr<Creature> partyLeader(_party.getLeader());
+            shared_ptr<Creature> partyLeader(_services.party.getLeader());
             if (partyLeader) {
                 listenerPosition = partyLeader->position() + 1.7f; // TODO: height based on appearance
             }
         } else {
             listenerPosition = camera->sceneNode()->absoluteTransform()[3];
         }
-        _audioPlayer.setListenerPosition(listenerPosition);
+        _services.audioPlayer.setListenerPosition(listenerPosition);
     }
 }
 
@@ -570,17 +499,17 @@ void Game::updateSceneGraph(float dt) {
 
     // Select a reference node for dynamic lighting
     shared_ptr<SceneNode> lightingRefNode;
-    shared_ptr<Creature> partyLeader(_party.getLeader());
+    shared_ptr<Creature> partyLeader(_services.party.getLeader());
     if (partyLeader && _cameraType == CameraType::ThirdPerson) {
         lightingRefNode = partyLeader->sceneNode();
     } else {
         lightingRefNode = camera->sceneNode();
     }
 
-    _sceneGraph.setActiveCamera(camera->sceneNode());
-    _sceneGraph.setLightingRefNode(lightingRefNode);
-    _sceneGraph.setUpdateRoots(!_paused);
-    _sceneGraph.update(dt);
+    _services.sceneGraph.setActiveCamera(camera->sceneNode());
+    _services.sceneGraph.setLightingRefNode(lightingRefNode);
+    _services.sceneGraph.setUpdateRoots(!_paused);
+    _services.sceneGraph.update(dt);
 }
 
 bool Game::handle(const SDL_Event &event) {
@@ -597,7 +526,7 @@ bool Game::handle(const SDL_Event &event) {
             if (_console->handle(event)) {
                 return true;
             }
-            if (_party.handle(event)) {
+            if (_services.party.handle(event)) {
                 return true;
             }
             Camera *camera = getActiveCamera();
@@ -669,14 +598,14 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
 
     case SDLK_F1:
         if (_options.developer) {
-            _features.toggle(Feature::PBR);
+            _services.features.toggle(Feature::PBR);
             return true;
         }
         break;
 
     case SDLK_F3:
         if (_options.developer) {
-            _features.toggle(Feature::DynamicRoomLighting);
+            _services.features.toggle(Feature::DynamicRoomLighting);
             return true;
         }
         break;
@@ -726,7 +655,7 @@ void Game::setPaused(bool paused) {
 }
 
 void Game::setRelativeMouseMode(bool relative) {
-    _window.setRelativeMouseMode(relative);
+    _services.window.setRelativeMouseMode(relative);
 }
 
 void Game::saveToFile(const fs::path &path) {
@@ -734,7 +663,7 @@ void Game::saveToFile(const fs::path &path) {
 
     vector<shared_ptr<GffStruct>> nfoPartyMembers;
     for (int i = 0; i < 3; ++i) {
-        if (_party.getSize() > i) {
+        if (_services.party.getSize() > i) {
             nfoPartyMembers.push_back(getPartyMemberNFOStruct(i));
         }
     }
@@ -804,7 +733,7 @@ void Game::saveToFile(const fs::path &path) {
     io::array_sink screenSink(&screenBuffer[0], kScreenBufferSize);
     auto screenStream = make_shared<io::stream<io::array_sink>>(screenSink);
 
-    shared_ptr<Texture> screenshot(_worldRenderPipeline.screenshot());
+    shared_ptr<Texture> screenshot(_services.worldRenderPipeline.screenshot());
     TgaWriter tga(screenshot);
     tga.save(*screenStream);
     screenBuffer.resize(screenStream->tellp());
@@ -823,10 +752,10 @@ void Game::saveToFile(const fs::path &path) {
 }
 
 shared_ptr<GffStruct> Game::getPartyMemberNFOStruct(int index) const {
-    auto member = _party.getMember(index);
+    auto member = _services.party.getMember(index);
 
     return make_shared<GffStruct>(0, vector<GffField> {
-                                         GffField::newByte("NPC", _party.getNPCByMemberIndex(index)),
+                                         GffField::newByte("NPC", _services.party.getNPCByMemberIndex(index)),
                                          GffField::newCExoString("TemplateResRef", member->blueprintResRef()),
                                          GffField::newVector("Position", member->position()),
                                          GffField::newFloat("Facing", member->getFacing())});
@@ -851,7 +780,7 @@ void Game::loadFromFile(const fs::path &path) {
 
     // Party
     vector<shared_ptr<GffStruct>> nfoParty(nfoRoot->getList("Party"));
-    _party.clear();
+    _services.party.clear();
     for (size_t i = 0; i < nfoParty.size(); ++i) {
         shared_ptr<GffStruct> member(nfoParty[i]);
         int npc = member->getInt("NPC");
@@ -859,7 +788,7 @@ void Game::loadFromFile(const fs::path &path) {
         glm::vec3 position(member->getVector("Position"));
         float facing = member->getFloat("Facing");
 
-        shared_ptr<Creature> creature(_objectFactory.newCreature());
+        shared_ptr<Creature> creature(_services.objectFactory.newCreature());
         if (npc == -1) {
             creature->setTag(kObjectTagPlayer);
         }
@@ -867,9 +796,9 @@ void Game::loadFromFile(const fs::path &path) {
         creature->setImmortal(true);
         creature->setPosition(move(position));
         creature->setFacing(facing);
-        _party.addMember(npc, creature);
+        _services.party.addMember(npc, creature);
         if (i == 0) {
-            _party.setPlayer(creature);
+            _services.party.setPlayer(creature);
         }
     }
 

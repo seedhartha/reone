@@ -30,55 +30,9 @@
 
 namespace reone {
 
-namespace resource {
-
-class Gffs;
-class Resources;
-class Strings;
-class TwoDas;
-
-} // namespace resource
-
-namespace graphics {
-
-class Context;
-class Features;
-class Fonts;
-class Lips;
-class Materials;
-class Meshes;
-class Models;
-class PBRIBL;
-class Shaders;
-class Textures;
-class Walkmeshes;
-class Window;
-
-} // namespace graphics
-
-namespace audio {
-
-class AudioFiles;
-class AudioPlayer;
-
-} // namespace audio
-
-namespace scene {
-
-class SceneGraph;
-class WorldRenderPipeline;
-
-} // namespace scene
-
 namespace gui {
 
 class GUI;
-
-}
-
-namespace script {
-
-class Scripts;
 
 }
 
@@ -93,22 +47,7 @@ constexpr char kSoundsDirectoryName[] = "streamsounds";
 constexpr char kLipsDirectoryName[] = "lips";
 constexpr char kOverrideDirectoryName[] = "override";
 
-class ActionFactory;
-class Classes;
-class Combat;
-class Cursors;
-class EffectFactory;
-class Feats;
-class FootstepSounds;
-class GUISounds;
-class ObjectFactory;
-class Party;
-class Portraits;
-class Reputes;
-class ScriptRunner;
-class Skills;
-class SoundSets;
-class Surfaces;
+class Services;
 
 /**
  * Abstract game.
@@ -119,43 +58,7 @@ public:
         bool tsl,
         boost::filesystem::path path,
         Options options,
-        ActionFactory &actionFactory,
-        Classes &classes,
-        Combat &combat,
-        Cursors &cursors,
-        EffectFactory &effectFactory,
-        Feats &feats,
-        FootstepSounds &footstepSounds,
-        GUISounds &guiSounds,
-        ObjectFactory &objectFactory,
-        Party &party,
-        Portraits &portraits,
-        Reputes &reputes,
-        ScriptRunner &scriptRunner,
-        Skills &skills,
-        SoundSets &soundSets,
-        Surfaces &surfaces,
-        audio::AudioFiles &audioFiles,
-        audio::AudioPlayer &audioPlayer,
-        graphics::Context &context,
-        graphics::Features &features,
-        graphics::Fonts &fonts,
-        graphics::Lips &lips,
-        graphics::Materials &materials,
-        graphics::Meshes &meshes,
-        graphics::Models &models,
-        graphics::PBRIBL &pbrIbl,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Walkmeshes &walkmeshes,
-        graphics::Window &window,
-        scene::SceneGraph &sceneGraph,
-        scene::WorldRenderPipeline &worldRenderPipeline,
-        script::Scripts &scripts,
-        resource::Gffs &gffs,
-        resource::Resources &resources,
-        resource::Strings &strings,
-        resource::TwoDas &twoDas);
+        Services &services);
 
     virtual ~Game() {
         deinit();
@@ -275,54 +178,12 @@ protected:
 
     bool _tsl;
     boost::filesystem::path _path;
+    Services &_services;
 
     GameScreen _screen {GameScreen::None};
     std::string _mainMenuMusicResRef;
     std::string _charGenMusicResRef;
     std::string _charGenLoadScreenResRef;
-
-    // Services
-
-    ActionFactory &_actionFactory;
-    Classes &_classes;
-    Combat &_combat;
-    Cursors &_cursors;
-    EffectFactory &_effectFactory;
-    Feats &_feats;
-    FootstepSounds &_footstepSounds;
-    GUISounds &_guiSounds;
-    ObjectFactory &_objectFactory;
-    Party &_party;
-    Portraits &_portraits;
-    Reputes &_reputes;
-    ScriptRunner &_scriptRunner;
-    Skills &_skills;
-    SoundSets &_soundSets;
-    Surfaces &_surfaces;
-
-    audio::AudioFiles &_audioFiles;
-    audio::AudioPlayer &_audioPlayer;
-    graphics::Context &_context;
-    graphics::Features &_features;
-    graphics::Fonts &_fonts;
-    graphics::Lips &_lips;
-    graphics::Materials &_materials;
-    graphics::Meshes &_meshes;
-    graphics::Models &_models;
-    graphics::PBRIBL &_pbrIbl;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Walkmeshes &_walkmeshes;
-    graphics::Window &_window;
-    scene::SceneGraph &_sceneGraph;
-    scene::WorldRenderPipeline &_worldRenderPipeline;
-    script::Scripts &_scripts;
-    resource::Gffs &_gffs;
-    resource::Resources &_resources;
-    resource::Strings &_strings;
-    resource::TwoDas &_twoDas;
-
-    // END Services
 
     // GUI colors
 

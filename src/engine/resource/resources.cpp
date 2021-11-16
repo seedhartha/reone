@@ -88,7 +88,7 @@ void Resources::indexProvider(unique_ptr<IResourceProvider> &&provider, const fs
     }
 }
 
-void Resources::invalidateCache() {
+void Resources::invalidate() {
     _cache.clear();
 }
 
