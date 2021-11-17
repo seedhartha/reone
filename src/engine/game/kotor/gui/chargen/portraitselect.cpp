@@ -145,34 +145,7 @@ void PortraitSelection::loadHeadModel() {
 shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &sceneGraph) {
     // Create a creature from the current portrait
 
-    auto objectFactory = make_unique<ObjectFactory>(
-        _services.actionFactory,
-        _services.classes,
-        _services.combat,
-        _services.footstepSounds,
-        _services.party,
-        _services.portraits,
-        _services.reputes,
-        _services.scriptRunner,
-        _services.soundSets,
-        _services.surfaces,
-        _services.audioFiles,
-        _services.audioPlayer,
-        _services.context,
-        _services.meshes,
-        _services.models,
-        _shaders,
-        _textures,
-        _services.walkmeshes,
-        _services.window,
-        _services.gffs,
-        _resources,
-        _strings,
-        _services.twoDas,
-        sceneGraph);
-    objectFactory->setGame(*_game);
-
-    shared_ptr<Creature> creature(objectFactory->newCreature());
+    shared_ptr<Creature> creature(_services.objectFactory.newCreature());
     creature->setFacing(-glm::half_pi<float>());
     creature->setAppearance(getAppearanceFromCurrentPortrait());
     creature->equip("g_a_clothes01");

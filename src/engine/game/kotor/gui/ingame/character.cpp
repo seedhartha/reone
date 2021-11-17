@@ -259,34 +259,7 @@ void CharacterMenu::refresh3D() {
 shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) const {
     auto partyLeader = _services.party.getLeader();
 
-    auto objectFactory = make_shared<ObjectFactory>(
-        _services.actionFactory,
-        _services.classes,
-        _services.combat,
-        _services.footstepSounds,
-        _services.party,
-        _services.portraits,
-        _services.reputes,
-        _services.scriptRunner,
-        _services.soundSets,
-        _services.surfaces,
-        _services.audioFiles,
-        _services.audioPlayer,
-        _services.context,
-        _services.meshes,
-        _services.models,
-        _services.shaders,
-        _services.textures,
-        _services.walkmeshes,
-        _services.window,
-        _services.gffs,
-        _services.resources,
-        _services.strings,
-        _services.twoDas,
-        sceneGraph);
-    objectFactory->setGame(*_game);
-
-    auto character = objectFactory->newCreature();
+    auto character = _services.objectFactory.newCreature();
     character->setFacing(-glm::half_pi<float>());
     character->setAppearance(partyLeader->appearance());
 

@@ -425,34 +425,7 @@ void CharacterGeneration::reloadCharacterModel() {
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
-    auto objectFactory = make_unique<ObjectFactory>(
-        _services.actionFactory,
-        _services.classes,
-        _services.combat,
-        _services.footstepSounds,
-        _services.party,
-        _services.portraits,
-        _services.reputes,
-        _services.scriptRunner,
-        _services.soundSets,
-        _services.surfaces,
-        _services.audioFiles,
-        _services.audioPlayer,
-        _services.context,
-        _services.meshes,
-        _services.models,
-        _services.shaders,
-        _services.textures,
-        _services.walkmeshes,
-        _services.window,
-        _services.gffs,
-        _services.resources,
-        _services.strings,
-        _services.twoDas,
-        sceneGraph);
-    objectFactory->setGame(*_game);
-
-    shared_ptr<Creature> creature(objectFactory->newCreature());
+    shared_ptr<Creature> creature(_services.objectFactory.newCreature());
     creature->setFacing(-glm::half_pi<float>());
     creature->setAppearance(_character.appearance);
     creature->equip("g_a_clothes01");

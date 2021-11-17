@@ -29,6 +29,7 @@
 
 #include "../game.h"
 #include "../script/runner.h"
+#include "../services.h"
 
 using namespace std;
 
@@ -49,21 +50,21 @@ void Placeable::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Placeable::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utp(_gffs.get(resRef, ResourceType::Utp));
+    shared_ptr<GffStruct> utp(_services.gffs.get(resRef, ResourceType::Utp));
     if (!utp)
         return;
 
     loadUTP(*utp);
 
-    shared_ptr<TwoDA> placeables(_twoDas.get("placeables"));
+    shared_ptr<TwoDA> placeables(_services.twoDas.get("placeables"));
     string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
-    auto model = _sceneGraph.newModel(_models.get(modelName), ModelUsage::Placeable);
+    auto model = _services.sceneGraph.newModel(_services.models.get(modelName), ModelUsage::Placeable);
     model->setCullable(true);
     model->setDrawDistance(64.0f);
     _sceneNode = move(model);
 
-    _walkmesh = _walkmeshes.get(modelName, ResourceType::Pwk);
+    _walkmesh = _services.walkmeshes.get(modelName, ResourceType::Pwk);
 }
 
 void Placeable::loadTransformFromGIT(const GffStruct &gffs) {
@@ -86,19 +87,19 @@ shared_ptr<Walkmesh> Placeable::getWalkmesh() const {
 
 void Placeable::runOnUsed(shared_ptr<SpatialObject> usedBy) {
     if (!_onUsed.empty()) {
-        _scriptRunner.run(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
+        _services.scriptRunner.run(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
     }
 }
 
 void Placeable::runOnInvDisturbed(shared_ptr<SpatialObject> triggerrer) {
     if (!_onInvDisturbed.empty()) {
-        _scriptRunner.run(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
+        _services.scriptRunner.run(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
     }
 }
 
 void Placeable::loadUTP(const GffStruct &utp) {
     _tag = boost::to_lower_copy(utp.getString("Tag"));
-    _name = _strings.get(utp.getInt("LocName"));
+    _name = _services.strings.get(utp.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utp.getString("TemplateResRef"));
     _conversation = boost::to_lower_copy(utp.getString("Conversation"));
     _interruptable = utp.getBool("Interruptable");

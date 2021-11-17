@@ -62,31 +62,7 @@ public:
     Area(
         uint32_t id,
         Game *game,
-        ActionFactory &actionFactory,
-        Classes &classes,
-        Combat &combat,
-        FootstepSounds &footstepSounds,
-        ObjectFactory &objectFactory,
-        Party &party,
-        Portraits &portraits,
-        Reputes &reputes,
-        ScriptRunner &scriptRunner,
-        SoundSets &soundSets,
-        Surfaces &surfaces,
-        audio::AudioFiles &audioFiles,
-        audio::AudioPlayer &audioPlayer,
-        graphics::Context &context,
-        graphics::Meshes &meshes,
-        graphics::Models &models,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Walkmeshes &walkmeshes,
-        graphics::Window &window,
-        resource::Gffs &gffs,
-        resource::Resources &resources,
-        resource::Strings &strings,
-        resource::TwoDas &twoDas,
-        scene::SceneGraph &sceneGraph);
+        Services &services);
 
     void load(std::string name, const resource::GffStruct &are, const resource::GffStruct &git, bool fromSave = false);
 

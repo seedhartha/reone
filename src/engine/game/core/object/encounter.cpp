@@ -22,6 +22,7 @@
 #include "../../../resource/strings.h"
 
 #include "../game.h"
+#include "../services.h"
 
 using namespace std;
 
@@ -41,7 +42,7 @@ void Encounter::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Encounter::loadFromBlueprint(const string &blueprintResRef) {
-    shared_ptr<GffStruct> ute(_gffs.get(blueprintResRef, ResourceType::Ute));
+    shared_ptr<GffStruct> ute(_services.gffs.get(blueprintResRef, ResourceType::Ute));
     if (ute) {
         loadUTE(*ute);
     }
@@ -80,7 +81,7 @@ void Encounter::loadSpawnPointsFromGIT(const GffStruct &gffs) {
 
 void Encounter::loadUTE(const GffStruct &ute) {
     _tag = boost::to_lower_copy(ute.getString("Tag"));
-    _name = _strings.get(ute.getInt("LocalizedName"));
+    _name = _services.strings.get(ute.getInt("LocalizedName"));
     _blueprintResRef = boost::to_lower_copy(ute.getString("TemplateResRef"));
     _active = ute.getBool("Active");
     _difficultyIndex = ute.getInt("DifficultyIndex"); // index into encdifficulty.2da

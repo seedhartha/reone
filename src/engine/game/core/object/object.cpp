@@ -21,6 +21,7 @@
 #include "../../../common/guardutil.h"
 
 #include "../action/context.h"
+#include "../services.h"
 
 using namespace std;
 
@@ -112,7 +113,7 @@ void Object::executeActions(float dt) {
     if (_actions.empty())
         return;
 
-    ActionContext ctx(_combat, _objectFactory, _party, _scriptRunner);
+    ActionContext ctx(_services.combat, _services.objectFactory, _services.party, _services.scriptRunner);
     shared_ptr<Action> action(_actions.front());
     action->execute(*this, ctx, dt);
 }

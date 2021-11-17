@@ -229,34 +229,7 @@ int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz)
 }
 
 shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, SceneGraph &sceneGraph) {
-    auto objectFactory = make_unique<ObjectFactory>(
-        _services.actionFactory,
-        _services.classes,
-        _services.combat,
-        _services.footstepSounds,
-        _services.party,
-        _services.portraits,
-        _services.reputes,
-        _services.scriptRunner,
-        _services.soundSets,
-        _services.surfaces,
-        _services.audioFiles,
-        _services.audioPlayer,
-        _services.context,
-        _services.meshes,
-        _services.models,
-        _shaders,
-        _services.textures,
-        _services.walkmeshes,
-        _services.window,
-        _services.gffs,
-        _services.resources,
-        _strings,
-        _services.twoDas,
-        sceneGraph);
-    objectFactory->setGame(*_game);
-
-    shared_ptr<Creature> character(objectFactory->newCreature());
+    shared_ptr<Creature> character(_services.objectFactory.newCreature());
     character->setFacing(-glm::half_pi<float>());
     character->setAppearance(appearance);
     character->equip("g_a_clothes01");
