@@ -59,31 +59,7 @@ void GameModule::init() {
     _actionFactory = make_unique<ActionFactory>();
     _party = make_unique<Party>();
     _combat = make_unique<Combat>(*_effectFactory, _scene.sceneGraph());
-    _objectFactory = make_unique<ObjectFactory>(
-        *_actionFactory,
-        *_classes,
-        *_combat,
-        *_footstepSounds,
-        *_party,
-        *_portraits,
-        *_reputes,
-        *_scriptRunner,
-        *_soundSets,
-        *_surfaces,
-        _audio.audioFiles(),
-        _audio.audioPlayer(),
-        _graphics.context(),
-        _graphics.meshes(),
-        _graphics.models(),
-        _graphics.shaders(),
-        _graphics.textures(),
-        _graphics.walkmeshes(),
-        _graphics.window(),
-        _resource.gffs(),
-        _resource.resources(),
-        _resource.strings(),
-        _resource.twoDas(),
-        _scene.sceneGraph());
+    _objectFactory = make_unique<ObjectFactory>();
     _effectFactory = make_unique<EffectFactory>();
     _routines = make_unique<Routines>(*_actionFactory, *_combat, *_effectFactory, *_party, *_reputes, *_scriptRunner, _resource.strings());
     _routineRegistrar = newRoutineRegistrar();
@@ -134,6 +110,7 @@ void GameModule::init() {
     _party->setGame(*_game);
     _combat->setGame(*_game);
     _objectFactory->setGame(*_game);
+    _objectFactory->setServices(*_services);
     _routines->setGame(*_game);
 
     _game->initResourceProviders();

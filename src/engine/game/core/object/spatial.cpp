@@ -21,6 +21,7 @@
 #include "../../../common/logutil.h"
 
 #include "../room.h"
+#include "../services.h"
 
 #include "factory.h"
 #include "item.h"
@@ -46,7 +47,7 @@ shared_ptr<Item> SpatialObject::addItem(const string &resRef, int stackSize, boo
         result->setStackSize(prevStackSize + stackSize);
 
     } else {
-        result = _objectFactory.newItem();
+        result = _services.objectFactory.newItem();
         result->loadFromBlueprint(resRef);
         result->setStackSize(stackSize);
         result->setDropable(dropable);

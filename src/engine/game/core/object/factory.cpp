@@ -28,323 +28,47 @@ namespace reone {
 namespace game {
 
 shared_ptr<Module> ObjectFactory::newModule() {
-    return newObject<Module>(
-        _game,
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        *this,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas,
-        _sceneGraph);
+    return newObject<Module>(_game, *_services);
 }
 
 shared_ptr<Area> ObjectFactory::newArea() {
-    return newObject<Area>(
-        _game,
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        *this,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _window,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas,
-        _sceneGraph);
+    return newObject<Area>(_game, *_services);
 }
 
 shared_ptr<Creature> ObjectFactory::newCreature() {
-    return newObject<Creature>(
-        _game,
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        *this,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas,
-        _sceneGraph);
+    return newObject<Creature>(_game, *_services);
 }
 
 shared_ptr<Placeable> ObjectFactory::newPlaceable() {
-    return newObject<Placeable>(
-        _game,
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        *this,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas,
-        _sceneGraph);
+    return newObject<Placeable>(_game, *_services);
 }
 
 shared_ptr<Door> ObjectFactory::newDoor() {
-    return newObject<Door>(
-        _game,
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        *this,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas,
-        _sceneGraph);
+    return newObject<Door>(_game, *_services);
 }
 
 shared_ptr<Waypoint> ObjectFactory::newWaypoint() {
-    return newObject<Waypoint>(
-        _game,
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        *this,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas,
-        _sceneGraph);
+    return newObject<Waypoint>(_game, *_services);
 }
 
 shared_ptr<Trigger> ObjectFactory::newTrigger() {
-    return newObject<Trigger>(
-        _game,
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        *this,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas,
-        _sceneGraph);
+    return newObject<Trigger>(_game, *_services);
 }
 
 shared_ptr<Item> ObjectFactory::newItem() {
-    return newObject<Item>(
-        _game,
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        *this,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas,
-        _sceneGraph);
+    return newObject<Item>(_game, *_services);
 }
 
 shared_ptr<Sound> ObjectFactory::newSound() {
-    return newObject<Sound>(
-        _game,
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        *this,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas,
-        _sceneGraph);
+    return newObject<Sound>(_game, *_services);
 }
 
 shared_ptr<PlaceableCamera> ObjectFactory::newCamera() {
-    return newObject<PlaceableCamera>(
-        _game,
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        *this,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas,
-        _sceneGraph);
+    return newObject<PlaceableCamera>(_game, *_services);
 }
 
 shared_ptr<Encounter> ObjectFactory::newEncounter() {
-    return newObject<Encounter>(
-        _game,
-        _actionFactory,
-        _classes,
-        _combat,
-        _footstepSounds,
-        *this,
-        _party,
-        _portraits,
-        _reputes,
-        _scriptRunner,
-        _soundSets,
-        _surfaces,
-        _audioFiles,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _models,
-        _shaders,
-        _textures,
-        _walkmeshes,
-        _gffs,
-        _resources,
-        _strings,
-        _twoDas,
-        _sceneGraph);
+    return newObject<Encounter>(_game, *_services);
 }
 
 shared_ptr<Object> ObjectFactory::getObjectById(uint32_t id) const {

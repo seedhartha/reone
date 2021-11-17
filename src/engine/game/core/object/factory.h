@@ -35,108 +35,12 @@
 
 namespace reone {
 
-namespace resource {
-
-class Gffs;
-class Resources;
-class Strings;
-class TwoDas;
-
-} // namespace resource
-
-namespace graphics {
-
-class Context;
-class Meshes;
-class Models;
-class Shaders;
-class Textures;
-class Walkmeshes;
-class Window;
-
-} // namespace graphics
-
-namespace audio {
-
-class AudioFiles;
-class AudioPlayer;
-
-} // namespace audio
-
-namespace scene {
-
-class SceneGraph;
-
-}
-
 namespace game {
 
-class ActionFactory;
-class Classes;
-class Combat;
-class FootstepSounds;
-class Game;
-class ObjectFactory;
-class Party;
-class Portraits;
-class Reputes;
-class ScriptRunner;
-class SoundSets;
-class Surfaces;
+struct Services;
 
 class ObjectFactory {
 public:
-    ObjectFactory(
-        ActionFactory &actionFactory,
-        Classes &classes,
-        Combat &combat,
-        FootstepSounds &footstepSounds,
-        Party &party,
-        Portraits &portraits,
-        Reputes &reputes,
-        ScriptRunner &scriptRunner,
-        SoundSets &soundSets,
-        Surfaces &surfaces,
-        audio::AudioFiles &audioFiles,
-        audio::AudioPlayer &audioPlayer,
-        graphics::Context &context,
-        graphics::Meshes &meshes,
-        graphics::Models &models,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Walkmeshes &walkmeshes,
-        graphics::Window &window,
-        resource::Gffs &gffs,
-        resource::Resources &resources,
-        resource::Strings &strings,
-        resource::TwoDas &twoDas,
-        scene::SceneGraph &sceneGraph) :
-        _actionFactory(actionFactory),
-        _classes(classes),
-        _combat(combat),
-        _footstepSounds(footstepSounds),
-        _party(party),
-        _portraits(portraits),
-        _reputes(reputes),
-        _scriptRunner(scriptRunner),
-        _soundSets(soundSets),
-        _surfaces(surfaces),
-        _audioFiles(audioFiles),
-        _audioPlayer(audioPlayer),
-        _context(context),
-        _meshes(meshes),
-        _models(models),
-        _shaders(shaders),
-        _textures(textures),
-        _walkmeshes(walkmeshes),
-        _window(window),
-        _gffs(gffs),
-        _resources(resources),
-        _strings(strings),
-        _twoDas(twoDas),
-        _sceneGraph(sceneGraph) {
-    }
-
     std::shared_ptr<Module> newModule();
     std::shared_ptr<Area> newArea();
     std::shared_ptr<Creature> newCreature();
@@ -152,6 +56,7 @@ public:
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
     void setGame(Game &game) { _game = &game; }
+    void setServices(Services &services) { _services = &services; }
 
     template <class T>
     std::shared_ptr<T> getObjectById(uint32_t id) const {
@@ -160,38 +65,10 @@ public:
 
 private:
     Game *_game {nullptr};
+    Services *_services {nullptr};
+
     uint32_t _counter {2}; // ids 0 and 1 are reserved
     std::unordered_map<uint32_t, std::shared_ptr<Object>> _objectById;
-
-    // Services
-
-    ActionFactory &_actionFactory;
-    Classes &_classes;
-    Combat &_combat;
-    FootstepSounds &_footstepSounds;
-    Party &_party;
-    Portraits &_portraits;
-    Reputes &_reputes;
-    ScriptRunner &_scriptRunner;
-    SoundSets &_soundSets;
-    Surfaces &_surfaces;
-
-    audio::AudioFiles &_audioFiles;
-    audio::AudioPlayer &_audioPlayer;
-    graphics::Context &_context;
-    graphics::Meshes &_meshes;
-    graphics::Models &_models;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Walkmeshes &_walkmeshes;
-    graphics::Window &_window;
-    resource::Gffs &_gffs;
-    resource::Resources &_resources;
-    resource::Strings &_strings;
-    resource::TwoDas &_twoDas;
-    scene::SceneGraph &_sceneGraph;
-
-    // END Services
 
     template <class T, class... Args>
     std::shared_ptr<T> newObject(Args &&...args) {

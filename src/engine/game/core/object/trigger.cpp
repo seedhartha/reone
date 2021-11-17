@@ -24,6 +24,7 @@
 
 #include "../game.h"
 #include "../script/runner.h"
+#include "../services.h"
 
 using namespace std;
 
@@ -40,7 +41,7 @@ void Trigger::loadFromGIT(const GffStruct &gffs) {
     loadFromBlueprint(templateResRef);
 
     _tag = boost::to_lower_copy(gffs.getString("Tag"));
-    _transitionDestin = _strings.get(gffs.getInt("TransitionDestin"));
+    _transitionDestin = _services.strings.get(gffs.getInt("TransitionDestin"));
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
     _linkedToFlags = gffs.getInt("LinkedToFlags");
@@ -69,7 +70,7 @@ void Trigger::loadGeometryFromGIT(const GffStruct &gffs) {
 }
 
 void Trigger::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utt(_gffs.get(resRef, ResourceType::Utt));
+    shared_ptr<GffStruct> utt(_services.gffs.get(resRef, ResourceType::Utt));
     if (utt) {
         loadUTT(*utt);
     }
@@ -88,7 +89,7 @@ void Trigger::update(float dt) {
     for (auto &tenant : tenantsToRemove) {
         _tenants.erase(tenant);
         if (!_onExit.empty()) {
-            _scriptRunner.run(_onExit, _id, tenant->id());
+            _services.scriptRunner.run(_onExit, _id, tenant->id());
         }
     }
 }
@@ -115,7 +116,7 @@ bool Trigger::isTenant(const std::shared_ptr<SpatialObject> &object) const {
 void Trigger::loadUTT(const GffStruct &utt) {
     _tag = boost::to_lower_copy(utt.getString("Tag"));
     _blueprintResRef = boost::to_lower_copy(utt.getString("TemplateResRef"));
-    _name = _strings.get(utt.getInt("LocalizedName"));
+    _name = _services.strings.get(utt.getInt("LocalizedName"));
     _autoRemoveKey = utt.getBool("AutoRemoveKey"); // always 0, but could be useful
     _faction = utt.getEnum("Faction", Faction::Invalid);
     _keyName = utt.getString("KeyName");

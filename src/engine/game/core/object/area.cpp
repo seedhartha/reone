@@ -44,6 +44,7 @@
 #include "../reputes.h"
 #include "../room.h"
 #include "../script/runner.h"
+#include "../services.h"
 #include "../surfaces.h"
 
 #include "factory.h"
@@ -81,60 +82,13 @@ static bool g_debugPath = false;
 Area::Area(
     uint32_t id,
     Game *game,
-    ActionFactory &actionFactory,
-    Classes &classes,
-    Combat &combat,
-    FootstepSounds &footstepSounds,
-    ObjectFactory &objectFactory,
-    Party &party,
-    Portraits &portraits,
-    Reputes &reputes,
-    ScriptRunner &scriptRunner,
-    SoundSets &soundSets,
-    Surfaces &surfaces,
-    AudioFiles &audioFiles,
-    AudioPlayer &audioPlayer,
-    Context &context,
-    Meshes &meshes,
-    Models &models,
-    Shaders &shaders,
-    Textures &textures,
-    Walkmeshes &walkmeshes,
-    Window &window,
-    Gffs &gffs,
-    Resources &resources,
-    Strings &strings,
-    TwoDas &twoDas,
-    SceneGraph &sceneGraph) :
+    Services &services) :
     Object(
         id,
         ObjectType::Area,
         game,
-        actionFactory,
-        classes,
-        combat,
-        footstepSounds,
-        objectFactory,
-        party,
-        portraits,
-        reputes,
-        scriptRunner,
-        soundSets,
-        surfaces,
-        audioFiles,
-        audioPlayer,
-        context,
-        meshes,
-        models,
-        shaders,
-        textures,
-        walkmeshes,
-        gffs,
-        resources,
-        strings,
-        twoDas,
-        sceneGraph),
-    _map(*game, _party, _context, _meshes, _shaders, _textures, window) {
+        services),
+    _map(*game, services.party, services.context, services.meshes, services.shaders, services.textures, services.window) {
 
     init();
 
@@ -168,7 +122,7 @@ void Area::load(string name, const GffStruct &are, const GffStruct &git, bool fr
 }
 
 void Area::loadLYT() {
-    shared_ptr<ByteArray> lytData(_resources.getRaw(_name, ResourceType::Lyt));
+    shared_ptr<ByteArray> lytData(_services.resources.getRaw(_name, ResourceType::Lyt));
     if (!lytData) {
         throw ValidationException("Area LYT file not found");
     }
@@ -177,13 +131,13 @@ void Area::loadLYT() {
     lyt.load(wrap(lytData));
 
     for (auto &lytRoom : lyt.rooms()) {
-        shared_ptr<Model> model(_models.get(lytRoom.name));
+        shared_ptr<Model> model(_services.models.get(lytRoom.name));
         if (!model)
             continue;
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
 
-        auto sceneNode = _sceneGraph.newModel(model, ModelUsage::Room);
+        auto sceneNode = _services.sceneGraph.newModel(model, ModelUsage::Room);
         sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {
@@ -191,7 +145,7 @@ void Area::loadLYT() {
             }
         }
 
-        shared_ptr<Walkmesh> walkmesh(_walkmeshes.get(lytRoom.name, ResourceType::Wok));
+        shared_ptr<Walkmesh> walkmesh(_services.walkmeshes.get(lytRoom.name, ResourceType::Wok));
 
         auto room = make_unique<Room>(lytRoom.name, position, move(sceneNode), walkmesh);
         _rooms.insert(make_pair(room->name(), move(room)));
@@ -199,7 +153,7 @@ void Area::loadLYT() {
 }
 
 void Area::loadVIS() {
-    auto visData = _resources.getRaw(_name, ResourceType::Vis);
+    auto visData = _services.resources.getRaw(_name, ResourceType::Vis);
     if (!visData) {
         return;
     }
@@ -220,7 +174,7 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
 }
 
 void Area::loadPTH() {
-    shared_ptr<GffStruct> pth(_gffs.get(_name, ResourceType::Pth));
+    shared_ptr<GffStruct> pth(_services.gffs.get(_name, ResourceType::Pth));
     if (!pth) {
         return;
     }
@@ -251,7 +205,7 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     glm::vec3 position(entryPosition);
     position.z += 1.7f;
 
-    SceneGraph *sceneGraph = &_sceneGraph;
+    SceneGraph *sceneGraph = &_services.sceneGraph;
 
     _firstPersonCamera = make_unique<FirstPersonCamera>(_cameraAspect, glm::radians(kDefaultFieldOfView), sceneGraph);
     _firstPersonCamera->setPosition(position);
@@ -295,7 +249,7 @@ void Area::doDestroyObjects() {
 }
 
 void Area::doDestroyObject(uint32_t objectId) {
-    shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(_objectFactory.getObjectById(objectId)));
+    shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(_services.objectFactory.getObjectById(objectId)));
     if (!object)
         return;
     {
@@ -307,7 +261,7 @@ void Area::doDestroyObject(uint32_t objectId) {
     {
         auto sceneNode = object->sceneNode();
         if (sceneNode) {
-            _sceneGraph.removeRoot(sceneNode);
+            _services.sceneGraph.removeRoot(sceneNode);
         }
     }
     {
@@ -373,7 +327,7 @@ void Area::landObject(SpatialObject &object) {
 }
 
 void Area::loadParty(const glm::vec3 &position, float facing, bool fromSave) {
-    Party &party = _party;
+    Party &party = _services.party;
 
     for (int i = 0; i < party.getSize(); ++i) {
         shared_ptr<Creature> member(party.getMember(i));
@@ -387,7 +341,7 @@ void Area::loadParty(const glm::vec3 &position, float facing, bool fromSave) {
 }
 
 void Area::unloadParty() {
-    Party &party = _party;
+    Party &party = _services.party;
 
     for (int i = 0; i < party.getSize(); ++i) {
         doDestroyObject(party.getMember(i)->id());
@@ -395,10 +349,10 @@ void Area::unloadParty() {
 }
 
 void Area::reloadParty() {
-    shared_ptr<Creature> player(_party.player());
+    shared_ptr<Creature> player(_services.party.player());
     loadParty(player->position(), player->getFacing());
 
-    fill(_sceneGraph);
+    fill(_services.sceneGraph);
 }
 
 bool Area::handle(const SDL_Event &event) {
@@ -512,7 +466,7 @@ bool Area::doMoveCreature(const shared_ptr<Creature> &creature, const glm::vec3 
         creature->setPosition(glm::vec3(dest.x, dest.y, z));
         creature->setWalkmeshMaterial(material);
 
-        if (creature == _party.getLeader()) {
+        if (creature == _services.party.getLeader()) {
             onPartyLeaderMoved(room != oldRoom);
         }
 
@@ -540,22 +494,22 @@ void Area::runOnEnterScript() {
     if (_onEnter.empty())
         return;
 
-    auto player = _party.player();
+    auto player = _services.party.player();
     if (!player)
         return;
 
-    _scriptRunner.run(_onEnter, _id, player->id());
+    _services.scriptRunner.run(_onEnter, _id, player->id());
 }
 
 void Area::runOnExitScript() {
     if (_onExit.empty())
         return;
 
-    auto player = _party.player();
+    auto player = _services.party.player();
     if (!player)
         return;
 
-    _scriptRunner.run(_onExit, _id, player->id());
+    _services.scriptRunner.run(_onExit, _id, player->id());
 }
 
 void Area::destroyObject(const SpatialObject &object) {
@@ -601,8 +555,8 @@ void Area::fill(SceneGraph &sceneGraph) {
         shared_ptr<ModelNode> aabbNode(sceneNode->model()->getAABBNode());
         if (aabbNode && _grass.texture) {
             glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), room.second->position()));
-            auto grass = make_shared<GrassSceneNode>(room.first, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap, sceneGraph, _context, _meshes, _shaders);
-            for (auto &material : _surfaces.getGrassSurfaceIndices()) {
+            auto grass = make_shared<GrassSceneNode>(room.first, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap, sceneGraph, _services.context, _services.meshes, _services.shaders);
+            for (auto &material : _services.surfaces.getGrassSurfaceIndices()) {
                 for (auto &face : aabbNode->getFacesByMaterial(material)) {
                     vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getTriangleCoords(face));
                     float area = calculateTriangleArea(vertices);
@@ -660,7 +614,7 @@ glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &objec
 }
 
 void Area::update3rdPersonCameraFacing() {
-    shared_ptr<SpatialObject> partyLeader(_party.getLeader());
+    shared_ptr<SpatialObject> partyLeader(_services.party.getLeader());
     if (!partyLeader)
         return;
 
@@ -678,7 +632,7 @@ void Area::startDialog(const shared_ptr<SpatialObject> &object, const string &re
 }
 
 void Area::onPartyLeaderMoved(bool roomChanged) {
-    shared_ptr<Creature> partyLeader(_party.getLeader());
+    shared_ptr<Creature> partyLeader(_services.party.getLeader());
     if (!partyLeader)
         return;
 
@@ -690,7 +644,7 @@ void Area::onPartyLeaderMoved(bool roomChanged) {
 }
 
 void Area::updateRoomVisibility() {
-    shared_ptr<Creature> partyLeader(_party.getLeader());
+    shared_ptr<Creature> partyLeader(_services.party.getLeader());
     Room *leaderRoom = partyLeader ? partyLeader->room() : nullptr;
     bool allVisible = _game->cameraType() != CameraType::ThirdPerson || !leaderRoom;
 
@@ -720,7 +674,7 @@ void Area::updateRoomVisibility() {
 }
 
 void Area::update3rdPersonCameraTarget() {
-    shared_ptr<SpatialObject> partyLeader(_party.getLeader());
+    shared_ptr<SpatialObject> partyLeader(_services.party.getLeader());
     if (!partyLeader) {
         return;
     }
@@ -744,8 +698,8 @@ void Area::updateVisibility() {
 
 void Area::updateSounds() {
     glm::vec3 refPosition;
-    if (_game->cameraType() == CameraType::ThirdPerson && _party.getLeader()) {
-        refPosition = _party.getLeader()->position();
+    if (_game->cameraType() == CameraType::ThirdPerson && _services.party.getLeader()) {
+        refPosition = _services.party.getLeader()->position();
     } else {
         refPosition = _game->getActiveCamera()->sceneNode()->absoluteTransform()[3];
     }
@@ -806,7 +760,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
             return;
         }
         if (!trigger->getOnEnter().empty()) {
-            _scriptRunner.run(trigger->getOnEnter(), trigger->id(), triggerrer->id());
+            _services.scriptRunner.run(trigger->getOnEnter(), trigger->id(), triggerrer->id());
         }
     }
 }
@@ -814,12 +768,12 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
 void Area::updateHeartbeat(float dt) {
     if (_heartbeatTimer.advance(dt)) {
         if (!_onHeartbeat.empty()) {
-            _scriptRunner.run(_onHeartbeat, _id);
+            _services.scriptRunner.run(_onHeartbeat, _id);
         }
         for (auto &object : _objects) {
             string heartbeat(object->getOnHeartbeat());
             if (!heartbeat.empty()) {
-                _scriptRunner.run(heartbeat, object->id());
+                _services.scriptRunner.run(heartbeat, object->id());
             }
         }
         _heartbeatTimer.setTimeout(kHeartbeatInterval);
@@ -891,13 +845,13 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
 
     switch (type) {
     case ObjectType::Item: {
-        auto item = _objectFactory.newItem();
+        auto item = _services.objectFactory.newItem();
         item->loadFromBlueprint(blueprintResRef);
         object = move(item);
         break;
     }
     case ObjectType::Creature: {
-        auto creature = _objectFactory.newCreature();
+        auto creature = _services.objectFactory.newCreature();
         creature->loadFromBlueprint(blueprintResRef);
         creature->setPosition(location->position());
         creature->setFacing(location->facing());
@@ -905,7 +859,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
         break;
     }
     case ObjectType::Placeable: {
-        auto placeable = _objectFactory.newPlaceable();
+        auto placeable = _services.objectFactory.newPlaceable();
         placeable->loadFromBlueprint(blueprintResRef);
         object = move(placeable);
         break;
@@ -922,7 +876,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
         add(spatial);
         auto model = spatial->sceneNode();
         if (model) {
-            _sceneGraph.addRoot(model);
+            _services.sceneGraph.addRoot(model);
         }
         auto creature = dynamic_pointer_cast<Creature>(spatial);
         if (creature) {
@@ -973,7 +927,7 @@ vector<shared_ptr<SpatialObject>> Area::getSelectableObjects() const {
     vector<shared_ptr<SpatialObject>> result;
     vector<pair<shared_ptr<SpatialObject>, float>> distances;
 
-    shared_ptr<SpatialObject> partyLeader(_party.getLeader());
+    shared_ptr<SpatialObject> partyLeader(_services.party.getLeader());
     glm::vec3 origin(partyLeader->position());
 
     for (auto &object : objects()) {
@@ -1058,15 +1012,15 @@ bool Area::matchesCriterias(const Creature &creature, const SearchCriteriaList &
             auto reputation = static_cast<ReputationType>(criteria.second);
             switch (reputation) {
             case ReputationType::Friend:
-                if (!target || !_reputes.getIsFriend(creature, *static_pointer_cast<Creature>(target)))
+                if (!target || !_services.reputes.getIsFriend(creature, *static_pointer_cast<Creature>(target)))
                     return false;
                 break;
             case ReputationType::Enemy:
-                if (!target || !_reputes.getIsEnemy(creature, *static_pointer_cast<Creature>(target)))
+                if (!target || !_services.reputes.getIsEnemy(creature, *static_pointer_cast<Creature>(target)))
                     return false;
                 break;
             case ReputationType::Neutral:
-                if (!target || !_reputes.getIsNeutral(creature, *static_pointer_cast<Creature>(target)))
+                if (!target || !_services.reputes.getIsNeutral(creature, *static_pointer_cast<Creature>(target)))
                     return false;
                 break;
             default:
@@ -1134,7 +1088,7 @@ shared_ptr<Creature> Area::getNearestCreatureToLocation(const Location &location
         }
     }
 
-    sort(candidates.begin(), candidates.end(), [](auto &left, auto &right) {
+    std::sort(candidates.begin(), candidates.end(), [](auto &left, auto &right) {
         return left.second < right.second;
     });
 
@@ -1219,14 +1173,14 @@ void Area::loadProperties(const GffStruct &git) {
     }
     int musicIdx = props->getInt("MusicDay");
     if (musicIdx) {
-        shared_ptr<TwoDA> musicTable(_twoDas.get("ambientmusic"));
+        shared_ptr<TwoDA> musicTable(_services.twoDas.get("ambientmusic"));
         _music = musicTable->getString(musicIdx, "resource");
     }
 }
 
 void Area::loadCreatures(const GffStruct &git) {
     for (auto &gffs : git.getList("Creature List")) {
-        shared_ptr<Creature> creature(_objectFactory.newCreature());
+        shared_ptr<Creature> creature(_services.objectFactory.newCreature());
         creature->loadFromGIT(*gffs);
         landObject(*creature);
         add(creature);
@@ -1235,7 +1189,7 @@ void Area::loadCreatures(const GffStruct &git) {
 
 void Area::loadDoors(const GffStruct &git) {
     for (auto &gffs : git.getList("Door List")) {
-        shared_ptr<Door> door(_objectFactory.newDoor());
+        shared_ptr<Door> door(_services.objectFactory.newDoor());
         door->loadFromGIT(*gffs);
         add(door);
     }
@@ -1243,7 +1197,7 @@ void Area::loadDoors(const GffStruct &git) {
 
 void Area::loadPlaceables(const GffStruct &git) {
     for (auto &gffs : git.getList("Placeable List")) {
-        shared_ptr<Placeable> placeable(_objectFactory.newPlaceable());
+        shared_ptr<Placeable> placeable(_services.objectFactory.newPlaceable());
         placeable->loadFromGIT(*gffs);
         add(placeable);
     }
@@ -1251,7 +1205,7 @@ void Area::loadPlaceables(const GffStruct &git) {
 
 void Area::loadWaypoints(const GffStruct &git) {
     for (auto &gffs : git.getList("WaypointList")) {
-        shared_ptr<Waypoint> waypoint(_objectFactory.newWaypoint());
+        shared_ptr<Waypoint> waypoint(_services.objectFactory.newWaypoint());
         waypoint->loadFromGIT(*gffs);
         add(waypoint);
     }
@@ -1259,7 +1213,7 @@ void Area::loadWaypoints(const GffStruct &git) {
 
 void Area::loadTriggers(const GffStruct &git) {
     for (auto &gffs : git.getList("TriggerList")) {
-        shared_ptr<Trigger> trigger(_objectFactory.newTrigger());
+        shared_ptr<Trigger> trigger(_services.objectFactory.newTrigger());
         trigger->loadFromGIT(*gffs);
         add(trigger);
     }
@@ -1267,7 +1221,7 @@ void Area::loadTriggers(const GffStruct &git) {
 
 void Area::loadSounds(const GffStruct &git) {
     for (auto &gffs : git.getList("SoundList")) {
-        shared_ptr<Sound> sound(_objectFactory.newSound());
+        shared_ptr<Sound> sound(_services.objectFactory.newSound());
         sound->loadFromGIT(*gffs);
         add(sound);
     }
@@ -1275,7 +1229,7 @@ void Area::loadSounds(const GffStruct &git) {
 
 void Area::loadCameras(const GffStruct &git) {
     for (auto &gffs : git.getList("CameraList")) {
-        shared_ptr<PlaceableCamera> camera(_objectFactory.newCamera());
+        shared_ptr<PlaceableCamera> camera(_services.objectFactory.newCamera());
         camera->loadFromGIT(*gffs);
         add(camera);
     }
@@ -1283,7 +1237,7 @@ void Area::loadCameras(const GffStruct &git) {
 
 void Area::loadEncounters(const GffStruct &git) {
     for (auto &gffs : git.getList("Encounter List")) {
-        shared_ptr<Encounter> encounter(_objectFactory.newEncounter());
+        shared_ptr<Encounter> encounter(_services.objectFactory.newEncounter());
         encounter->loadFromGIT(*gffs);
         add(encounter);
     }
@@ -1292,7 +1246,7 @@ void Area::loadEncounters(const GffStruct &git) {
 bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room *&room) const {
     static glm::vec3 down(0.0f, 0.0f, -1.0f);
 
-    auto walkcheckSurfaces = _surfaces.getWalkcheckSurfaceIndices();
+    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaceIndices();
 
     // Test object walkmeshes
     for (auto &o : _objects) {
@@ -1344,8 +1298,8 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
 }
 
 shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
-    shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
-    shared_ptr<Creature> partyLeader(_party.getLeader());
+    shared_ptr<CameraSceneNode> camera(_services.sceneGraph.activeCamera());
+    shared_ptr<Creature> partyLeader(_services.party.getLeader());
     if (!camera || !partyLeader) {
         return nullptr;
     }
@@ -1381,7 +1335,7 @@ shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
     }
     if (distances.empty())
         return nullptr;
-    sort(distances.begin(), distances.end(), [](auto &left, auto &right) { return left.second < right.second; });
+    std::sort(distances.begin(), distances.end(), [](auto &left, auto &right) { return left.second < right.second; });
 
     return distances[0].first;
 }
@@ -1417,7 +1371,7 @@ bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::
     }
 
     // Test room walkmeshes
-    auto walkcheckSurfaces = _surfaces.getWalkcheckSurfaceIndices();
+    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaceIndices();
     for (auto &r : _rooms) {
         // Room must have a valid model and walkmesh
         shared_ptr<ModelSceneNode> model(r.second->model());
@@ -1445,7 +1399,7 @@ bool Area::getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm
     if (end == start) {
         return false;
     }
-    auto walkcheckSurfaces = _surfaces.getWalkcheckSurfaceIndices();
+    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaceIndices();
     glm::vec3 endToStart(end - start);
     glm::vec3 dir(glm::normalize(endToStart));
     float minDistance = numeric_limits<float>::max();
@@ -1502,7 +1456,7 @@ bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target)
     }
 
     // Test room walkmeshes
-    auto walkcheckSurfaces = _surfaces.getWalkcheckSurfaceIndices();
+    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaceIndices();
     for (auto &r : _rooms) {
         shared_ptr<ModelSceneNode> model(r.second->model());
         shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
@@ -1528,7 +1482,7 @@ bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target)
 }
 
 void Area::loadARE(const GffStruct &are) {
-    _localizedName = _strings.get(are.getInt("Name"));
+    _localizedName = _services.strings.get(are.getInt("Name"));
 
     loadCameraStyle(are);
     loadAmbientColor(are);
@@ -1540,7 +1494,7 @@ void Area::loadARE(const GffStruct &are) {
 }
 
 void Area::loadCameraStyle(const GffStruct &are) {
-    shared_ptr<TwoDA> cameraStyles(_twoDas.get("camerastyle"));
+    shared_ptr<TwoDA> cameraStyles(_services.twoDas.get("camerastyle"));
     if (!cameraStyles) {
         _camStyleDefault = g_defaultCameraStyle;
         _camStyleCombat = g_defaultCameraStyle;
@@ -1585,7 +1539,7 @@ void Area::loadStealthXP(const GffStruct &are) {
 void Area::loadGrass(const GffStruct &are) {
     string texName(boost::to_lower_copy(are.getString("Grass_TexName")));
     if (!texName.empty()) {
-        _grass.texture = _textures.get(texName, TextureUsage::Diffuse);
+        _grass.texture = _services.textures.get(texName, TextureUsage::Diffuse);
     }
     _grass.density = are.getFloat("Grass_Density");
     _grass.quadSize = are.getFloat("Grass_QuadSize");
