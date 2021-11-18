@@ -26,7 +26,7 @@
 #include "../../graphics/texture/textures.h"
 #include "../../graphics/texture/textureutil.h"
 
-#include "../graph.h"
+#include "../graphs.h"
 #include "../node/camera.h"
 
 using namespace std;
@@ -38,49 +38,65 @@ namespace reone {
 namespace scene {
 
 void ControlRenderPipeline::init() {
-    _geometryColor = make_unique<Texture>("geometry_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _geometryColor->init();
-    _geometryColor->bind();
-    _geometryColor->clearPixels(static_cast<int>(_extent[2]), static_cast<int>(_extent[3]), PixelFormat::RGBA);
-    _geometryColor->unbind();
-
-    _geometryDepth = make_unique<Renderbuffer>();
-    _geometryDepth->init();
-    _geometryDepth->bind();
-    _geometryDepth->configure(static_cast<int>(_extent[2]), static_cast<int>(_extent[3]), PixelFormat::Depth);
-    _context.unbindRenderbuffer();
-
     _geometry.init();
-    _geometry.bind();
-    _geometry.attachColor(*_geometryColor);
-    _geometry.attachDepth(*_geometryDepth);
-    _geometry.checkCompleteness();
-    _context.unbindFramebuffer();
 }
 
-void ControlRenderPipeline::render(const glm::ivec2 &offset) {
+void ControlRenderPipeline::prepareFor(const glm::ivec4 &extent) {
+    AttachmentsId attachmentsId {extent};
+    if (_attachments.count(attachmentsId) > 0) {
+        return;
+    }
+
+    auto colorBuffer = make_unique<Texture>("color", getTextureProperties(TextureUsage::ColorBuffer));
+    colorBuffer->init();
+    colorBuffer->bind();
+    colorBuffer->clearPixels(extent[2], extent[3], PixelFormat::RGBA);
+    colorBuffer->unbind();
+
+    auto depthBuffer = make_unique<Renderbuffer>();
+    depthBuffer->init();
+    depthBuffer->bind();
+    depthBuffer->configure(extent[2], extent[3], PixelFormat::Depth);
+    _context.unbindRenderbuffer();
+
+    Attachments attachments {move(colorBuffer), move(depthBuffer)};
+    _attachments.insert(make_pair(attachmentsId, move(attachments)));
+}
+
+void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &extent, const glm::ivec2 &offset) {
+    AttachmentsId attachmentsId {extent};
+    auto maybeAttachments = _attachments.find(attachmentsId);
+    if (maybeAttachments == _attachments.end()) {
+        return;
+    }
+    auto &attachments = maybeAttachments->second;
+    SceneGraph &sceneGraph = _sceneGraphs.get(sceneName);
+
     // Set uniforms prototype
 
-    shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
+    shared_ptr<CameraSceneNode> camera(sceneGraph.activeCamera());
 
     ShaderUniforms uniforms(_shaders.defaultUniforms());
     uniforms.combined.general.projection = camera->projection();
     uniforms.combined.general.view = camera->view();
     uniforms.combined.general.cameraPosition = camera->absoluteTransform()[3];
 
-    _sceneGraph.setUniformsPrototype(move(uniforms));
+    sceneGraph.setUniformsPrototype(move(uniforms));
 
     // Draw to framebuffer
 
     glm::ivec4 oldViewport(_context.viewport());
-    _context.setViewport(glm::ivec4(0, 0, _extent[2], _extent[3]));
+    _context.setViewport(glm::ivec4(0, 0, extent[2], extent[3]));
 
     bool oldDepthTest = _context.isDepthTestEnabled();
     _context.setDepthTestEnabled(true);
 
     _geometry.bind();
+    _geometry.attachColor(*attachments.colorBuffer);
+    _geometry.attachDepth(*attachments.depthBuffer);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    _sceneGraph.draw();
+    sceneGraph.draw();
 
     _context.unbindFramebuffer();
     _context.setDepthTestEnabled(oldDepthTest);
@@ -89,7 +105,7 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
     // Draw control
 
     _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _geometryColor->bind();
+    attachments.colorBuffer->bind();
 
     glm::mat4 projection(glm::ortho(
         0.0f,
@@ -98,8 +114,8 @@ void ControlRenderPipeline::render(const glm::ivec2 &offset) {
         0.0f));
 
     glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(_extent[0] + offset.x, _extent[1] + offset.y, 0.0f));
-    transform = glm::scale(transform, glm::vec3(_extent[2], _extent[3], 1.0f));
+    transform = glm::translate(transform, glm::vec3(extent[0] + offset.x, extent[1] + offset.y, 0.0f));
+    transform = glm::scale(transform, glm::vec3(extent[2], extent[3], 1.0f));
 
     uniforms = ShaderUniforms();
     uniforms.combined.general.projection = move(projection);

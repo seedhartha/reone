@@ -18,7 +18,8 @@
 #include "character.h"
 
 #include "../../../../graphics/model/models.h"
-#include "../../../../gui/scenebuilder.h"
+#include "../../../../gui/sceneinitializer.h"
+#include "../../../../scene/graphs.h"
 
 #include "../../../core/d20/classes.h"
 #include "../../../core/object/factory.h"
@@ -26,6 +27,7 @@
 #include "../../../core/services.h"
 
 #include "../../kotor.h"
+#include "../../types.h"
 
 #include "ingame.h"
 
@@ -234,32 +236,25 @@ void CharacterMenu::refreshPortraits() {
 }
 
 void CharacterMenu::refresh3D() {
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneNameCharacter);
     float aspect = _binding.lbl3dChar->extent().width / static_cast<float>(_binding.lbl3dChar->extent().height);
 
-    auto scene = SceneBuilder(
-                     _options,
-                     _context,
-                     _features,
-                     _materials,
-                     _meshes,
-                     _pbrIbl,
-                     _shaders,
-                     _textures)
-                     .aspect(aspect)
-                     .depth(0.1f, 10.0f)
-                     .modelSupplier(bind(&CharacterMenu::getSceneModel, this, _1))
-                     .modelOffset(glm::vec2(0.0f, 1.7f))
-                     .cameraFromModelNode("camerahook")
-                     .lightingRefFromModelNode("charmain_light")
-                     .build();
+    SceneInitializer(sceneGraph)
+        .aspect(aspect)
+        .depth(0.1f, 10.0f)
+        .modelSupplier(bind(&CharacterMenu::getSceneModel, this, _1))
+        .modelOffset(glm::vec2(0.0f, 1.7f))
+        .cameraFromModelNode("camerahook")
+        .lightingRefFromModelNode("charmain_light")
+        .invoke();
 
-    _binding.lbl3dChar->setScene(move(scene));
+    _binding.lbl3dChar->setSceneName(kSceneNameCharacter);
 }
 
 shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) const {
     auto partyLeader = _services.party.getLeader();
 
-    auto character = _services.objectFactory.newCreature();
+    auto character = _services.objectFactory.newCreature(sceneGraph.name());
     character->setFacing(-glm::half_pi<float>());
     character->setAppearance(partyLeader->appearance());
 

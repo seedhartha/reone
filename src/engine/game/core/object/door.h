@@ -29,11 +29,13 @@ class Door : public SpatialObject {
 public:
     Door(
         uint32_t id,
+        std::string sceneName,
         Game *game,
         Services &services) :
         SpatialObject(
             id,
             ObjectType::Door,
+            std::move(sceneName),
             game,
             services) {
     }

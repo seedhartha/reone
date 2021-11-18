@@ -54,7 +54,8 @@ class AudioPlayer;
 
 namespace scene {
 
-class SceneGraph;
+class ControlRenderPipeline;
+class SceneGraphs;
 class WorldRenderPipeline;
 
 } // namespace scene
@@ -116,7 +117,8 @@ struct Services {
     graphics::Textures &textures;
     graphics::Walkmeshes &walkmeshes;
     graphics::Window &window;
-    scene::SceneGraph &sceneGraph;
+    scene::ControlRenderPipeline &controlRenderPipeline;
+    scene::SceneGraphs &sceneGraphs;
     scene::WorldRenderPipeline &worldRenderPipeline;
     script::Scripts &scripts;
     resource::Gffs &gffs;
@@ -155,7 +157,8 @@ struct Services {
         graphics::Textures &textures,
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
-        scene::SceneGraph &sceneGraph,
+        scene::ControlRenderPipeline &controlRenderPipeline,
+        scene::SceneGraphs &sceneGraphs,
         scene::WorldRenderPipeline &worldRenderPipeline,
         script::Scripts &scripts,
         resource::Gffs &gffs,
@@ -193,7 +196,8 @@ struct Services {
         textures(textures),
         walkmeshes(walkmeshes),
         window(window),
-        sceneGraph(sceneGraph),
+        controlRenderPipeline(controlRenderPipeline),
+        sceneGraphs(sceneGraphs),
         worldRenderPipeline(worldRenderPipeline),
         scripts(scripts),
         gffs(gffs),

@@ -19,8 +19,6 @@
 
 #include "../../graphics/texture/texture.h"
 #include "../../graphics/types.h"
-#include "../../scene/graph.h"
-#include "../../scene/pipeline/control.h"
 
 #include "../types.h"
 
@@ -107,7 +105,7 @@ public:
     virtual ~Control() = default;
 
     virtual void load(const resource::GffStruct &gffs);
-    virtual void update(float dt);
+    virtual void update(float dt) {}
 
     /**
      * Stretches this control in both directions.
@@ -127,6 +125,7 @@ public:
     const std::string &tag() const { return _tag; }
     const Text &text() const { return _text; }
     const std::vector<std::string> &textLines() const { return _textLines; }
+    const std::string &sceneName() const { return _sceneName; }
 
     void setTag(std::string tag) { _tag = std::move(tag); }
     void setBorder(Border border);
@@ -147,7 +146,7 @@ public:
     void setHilightFill(std::string resRef);
     void setHilightFill(std::shared_ptr<graphics::Texture> texture);
     void setPadding(int padding);
-    void setScene(std::unique_ptr<scene::SceneGraph> scene);
+    void setSceneName(std::string name);
     void setText(Text text);
     void setTextColor(glm::vec3 color);
     void setTextMessage(std::string text);
@@ -166,7 +165,6 @@ public:
     // Rendering
 
     virtual void draw(const glm::ivec2 &offset, const std::vector<std::string> &text);
-    void draw3D(const glm::ivec2 &offset);
 
     // END Rendering
 
@@ -187,7 +185,7 @@ protected:
     std::shared_ptr<Border> _border;
     std::shared_ptr<Border> _hilight;
     Text _text;
-    std::unique_ptr<scene::SceneGraph> _scene;
+    std::string _sceneName;
     int _padding {0};
     glm::mat4 _transform {1.0f};
     bool _visible {true};
@@ -247,8 +245,6 @@ protected:
     virtual const glm::vec3 &getBorderColor() const;
 
 private:
-    std::unique_ptr<scene::ControlRenderPipeline> _pipeline;
-
     void loadExtent(const resource::GffStruct &gffs);
     void loadBorder(const resource::GffStruct &gffs);
     void loadText(const resource::GffStruct &gffs);

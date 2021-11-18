@@ -20,7 +20,8 @@
 #include "../../../audio/player.h"
 #include "../../../common/logutil.h"
 #include "../../../graphics/model/models.h"
-#include "../../../gui/scenebuilder.h"
+#include "../../../gui/sceneinitializer.h"
+#include "../../../scene/graphs.h"
 #include "../../../scene/types.h"
 
 #include "../../core/object/factory.h"
@@ -28,6 +29,7 @@
 #include "../../core/services.h"
 
 #include "../kotor.h"
+#include "../types.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -141,30 +143,24 @@ void MainMenu::setButtonColors(Control &control) {
 }
 
 void MainMenu::setup3DView() {
-    if (_game->isTSL())
+    if (_game->isTSL()) {
         return;
+    }
 
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneNameMainMenu);
     const Control::Extent &extent = _binding.lbl3dView->extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 
-    unique_ptr<SceneGraph> scene(SceneBuilder(
-                                     _options,
-                                     _context,
-                                     _features,
-                                     _materials,
-                                     _meshes,
-                                     _pbrIbl,
-                                     _shaders,
-                                     _textures)
-                                     .aspect(aspect)
-                                     .depth(0.1f, 10.0f)
-                                     .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
-                                     .modelScale(kKotorModelSize)
-                                     .cameraFromModelNode("camerahook")
-                                     .lightingRefFromModelNode("rootdummy")
-                                     .build());
+    SceneInitializer(sceneGraph)
+        .aspect(aspect)
+        .depth(0.1f, 10.0f)
+        .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
+        .modelScale(kKotorModelSize)
+        .cameraFromModelNode("camerahook")
+        .lightingRefFromModelNode("rootdummy")
+        .invoke();
 
-    _binding.lbl3dView->setScene(move(scene));
+    _binding.lbl3dView->setSceneName(kSceneNameMainMenu);
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {

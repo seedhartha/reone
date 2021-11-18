@@ -21,7 +21,6 @@
 #include "../../../graphics/types.h"
 #include "../../../resource/format/gffreader.h"
 #include "../../../resource/types.h"
-#include "../../../scene/graph.h"
 
 #include "../camera/animated.h"
 #include "../camera/dialog.h"

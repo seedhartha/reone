@@ -130,6 +130,8 @@ protected:
         float duration {0.0f};
     };
 
+    std::string _sceneName;
+
     glm::vec3 _position {0.0f};
     glm::quat _orientation {1.0f, 0.0f, 0.0f, 0.0f};
     glm::mat4 _transform {1.0f};
@@ -145,13 +147,15 @@ protected:
     SpatialObject(
         uint32_t id,
         ObjectType type,
+        std::string sceneName,
         Game *game,
         Services &services) :
         Object(
             id,
             type,
             game,
-            services) {
+            services),
+        _sceneName(std::move(sceneName)) {
     }
 
     virtual void updateTransform();

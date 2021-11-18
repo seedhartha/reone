@@ -17,10 +17,13 @@
 
 #include "scene.h"
 
+#include "../../game/core/types.h"
+
 #include "graphics.h"
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::scene;
 
@@ -29,7 +32,7 @@ namespace reone {
 namespace di {
 
 void SceneModule::init() {
-    _sceneGraph = make_unique<SceneGraph>(
+    _sceneGraphs = make_unique<SceneGraphs>(
         _options,
         _graphics.context(),
         _graphics.features(),
@@ -39,8 +42,12 @@ void SceneModule::init() {
         _graphics.shaders(),
         _graphics.textures());
 
-    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, *_sceneGraph, _graphics.context(), _graphics.meshes(), _graphics.shaders());
+    auto &mainGraph = _sceneGraphs->get(kSceneNameMain);
+    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, mainGraph, _graphics.context(), _graphics.meshes(), _graphics.shaders());
     _worldRenderPipeline->init();
+
+    _controlRenderPipeline = make_unique<ControlRenderPipeline>(*_sceneGraphs, _graphics.context(), _graphics.meshes(), _graphics.shaders());
+    _controlRenderPipeline->init();
 }
 
 } // namespace di

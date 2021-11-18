@@ -350,6 +350,7 @@ set(SCENE_HEADERS
     src/engine/scene/animeventlistener.h
     src/engine/scene/animproperties.h
     src/engine/scene/graph.h
+    src/engine/scene/graphs.h
     src/engine/scene/node/camera.h
     src/engine/scene/node/dummy.h
     src/engine/scene/node/emitter.h
@@ -366,6 +367,7 @@ set(SCENE_HEADERS
 
 set(SCENE_SOURCES
     src/engine/scene/graph.cpp
+    src/engine/scene/graphs.cpp
     src/engine/scene/node/camera.cpp
     src/engine/scene/node/emitter.cpp
     src/engine/scene/node/grass.cpp
@@ -397,7 +399,7 @@ set(GUI_HEADERS
     src/engine/gui/control/slider.h
     src/engine/gui/control/togglebutton.h
     src/engine/gui/gui.h
-    src/engine/gui/scenebuilder.h
+    src/engine/gui/sceneinitializer.h
     src/engine/gui/textinput.h
     src/engine/gui/types.h)
 
@@ -409,7 +411,7 @@ set(GUI_SOURCES
     src/engine/gui/control/scrollbar.cpp
     src/engine/gui/control/togglebutton.cpp
     src/engine/gui/gui.cpp
-    src/engine/gui/scenebuilder.cpp
+    src/engine/gui/sceneinitializer.cpp
     src/engine/gui/textinput.cpp)
 
 add_library(libgui STATIC ${GUI_HEADERS} ${GUI_SOURCES})

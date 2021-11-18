@@ -33,36 +33,56 @@ class Texture;
 
 namespace scene {
 
-class SceneGraph;
+class SceneGraphs;
 
 class ControlRenderPipeline : boost::noncopyable {
 public:
     ControlRenderPipeline(
-        glm::ivec4 extent,
-        SceneGraph &sceneGraph,
+        SceneGraphs &sceneGraphs,
         graphics::Context &context,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders) :
-        _extent(std::move(extent)),
-        _sceneGraph(sceneGraph),
+        _sceneGraphs(sceneGraphs),
         _context(context),
         _meshes(meshes),
         _shaders(shaders) {
     }
 
     void init();
-    void render(const glm::ivec2 &offset);
+    void prepareFor(const glm::ivec4 &extent);
+
+    void render(const std::string &sceneName, const glm::ivec4 &extent, const glm::ivec2 &offset);
 
 private:
-    glm::vec4 _extent;
+    struct AttachmentsId {
+        glm::ivec4 extent;
+
+        bool operator==(const AttachmentsId &other) const {
+            return extent == other.extent;
+        }
+    };
+
+    struct AttachmentsIdHasher {
+        size_t operator()(const AttachmentsId &id) const {
+            std::hash<int> intHash;
+            return intHash(id.extent[0]) ^
+                   intHash(id.extent[1]) ^
+                   intHash(id.extent[2]) ^
+                   intHash(id.extent[3]);
+        }
+    };
+
+    struct Attachments {
+        std::unique_ptr<graphics::Texture> colorBuffer;
+        std::unique_ptr<graphics::Renderbuffer> depthBuffer;
+    };
 
     graphics::Framebuffer _geometry;
-    std::unique_ptr<graphics::Texture> _geometryColor;
-    std::unique_ptr<graphics::Renderbuffer> _geometryDepth;
+    std::unordered_map<AttachmentsId, Attachments, AttachmentsIdHasher> _attachments;
 
     // Services
 
-    SceneGraph &_sceneGraph;
+    SceneGraphs &_sceneGraphs;
 
     graphics::Context &_context;
     graphics::Meshes &_meshes;

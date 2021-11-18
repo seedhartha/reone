@@ -32,11 +32,13 @@ class Placeable : public SpatialObject {
 public:
     Placeable(
         uint32_t id,
+        std::string sceneName,
         Game *game,
         Services &services) :
         SpatialObject(
             id,
             ObjectType::Placeable,
+            std::move(sceneName),
             game,
             services) {
     }

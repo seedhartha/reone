@@ -31,11 +31,13 @@ class Trigger : public SpatialObject {
 public:
     Trigger(
         uint32_t id,
+        std::string sceneName,
         Game *game,
         Services &services) :
         SpatialObject(
             id,
             ObjectType::Trigger,
+            std::move(sceneName),
             game,
             services) {
     }

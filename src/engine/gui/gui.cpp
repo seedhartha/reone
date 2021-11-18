@@ -29,6 +29,8 @@
 #include "../resource/gffs.h"
 #include "../resource/gffstruct.h"
 #include "../resource/resources.h"
+#include "../scene/graphs.h"
+#include "../scene/pipeline/control.h"
 
 #include "control/button.h"
 #include "control/imagebutton.h"
@@ -45,6 +47,7 @@ using namespace std::placeholders;
 
 using namespace reone::graphics;
 using namespace reone::resource;
+using namespace reone::scene;
 
 namespace reone {
 
@@ -52,6 +55,8 @@ namespace gui {
 
 GUI::GUI(
     GraphicsOptions options,
+    ControlRenderPipeline &controlRenderPipeline,
+    SceneGraphs &sceneGraphs,
     Context &context,
     Features &features,
     Fonts &fonts,
@@ -65,6 +70,8 @@ GUI::GUI(
     Resources &resources,
     Strings &strings) :
     _options(move(options)),
+    _controlRenderPipeline(controlRenderPipeline),
+    _sceneGraphs(sceneGraphs),
     _context(context),
     _features(features),
     _fonts(fonts),
@@ -258,15 +265,31 @@ Control *GUI::getControlAt(int x, int y, const function<bool(const Control &)> &
 void GUI::update(float dt) {
     for (auto &control : _controls) {
         control->update(dt);
+
+        if (!control->isVisible()) {
+            continue;
+        }
+        const string &sceneName = control->sceneName();
+        if (!sceneName.empty()) {
+            glm::ivec4 extent(
+                control->extent().left,
+                control->extent().top,
+                control->extent().width,
+                control->extent().height);
+
+            _sceneGraphs.get(sceneName).update(dt);
+            _controlRenderPipeline.prepareFor(extent);
+        }
     }
 }
 
 void GUI::draw() {
-    if (_background)
+    if (_background) {
         drawBackground();
-    if (_rootControl)
+    }
+    if (_rootControl) {
         _rootControl->draw(_rootOffset, _rootControl->textLines());
-
+    }
     for (auto &control : _controls) {
         control->draw(_controlOffset, control->textLines());
     }
@@ -274,7 +297,20 @@ void GUI::draw() {
 
 void GUI::draw3D() {
     for (auto &control : _controls) {
-        control->draw3D(_controlOffset);
+        if (!control->isVisible()) {
+            continue;
+        }
+        const string &sceneName = control->sceneName();
+        if (sceneName.empty()) {
+            continue;
+        }
+        glm::ivec4 extent(
+            control->extent().left,
+            control->extent().top,
+            control->extent().width,
+            control->extent().height);
+
+        _controlRenderPipeline.render(sceneName, extent, _controlOffset);
     }
 }
 

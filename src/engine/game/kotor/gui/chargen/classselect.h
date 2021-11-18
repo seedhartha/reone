@@ -27,6 +27,13 @@
 
 namespace reone {
 
+namespace scene {
+
+class ModelSceneNode;
+class SceneGraph;
+
+} // namespace scene
+
 namespace gui {
 
 class Button;

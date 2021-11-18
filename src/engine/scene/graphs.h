@@ -19,6 +19,8 @@
 
 #include "../graphics/options.h"
 
+#include "graph.h"
+
 namespace reone {
 
 namespace graphics {
@@ -35,19 +37,9 @@ class Textures;
 
 namespace scene {
 
-class ModelSceneNode;
-class SceneGraph;
-
-} // namespace scene
-
-namespace gui {
-
-/**
- * Utility class for initialization of 3D controls.
- */
-class SceneBuilder {
+class SceneGraphs {
 public:
-    SceneBuilder(
+    SceneGraphs(
         graphics::GraphicsOptions options,
         graphics::Context &context,
         graphics::Features &features,
@@ -55,25 +47,21 @@ public:
         graphics::Meshes &meshes,
         graphics::PBRIBL &pbrIbl,
         graphics::Shaders &shaders,
-        graphics::Textures &textures);
+        graphics::Textures &textures) :
+        _options(std::move(options)),
+        _context(context),
+        _features(features),
+        _materials(materials),
+        _meshes(meshes),
+        _pbrIbl(pbrIbl),
+        _shaders(shaders),
+        _textures(textures) {
+    }
 
-    std::unique_ptr<scene::SceneGraph> build();
-
-    SceneBuilder &aspect(float aspect);
-    SceneBuilder &depth(float zNear, float zFar);
-    SceneBuilder &modelSupplier(const std::function<std::shared_ptr<scene::ModelSceneNode>(scene::SceneGraph &)> &supplier);
-    SceneBuilder &modelScale(float scale);
-    SceneBuilder &modelOffset(glm::vec2 offset);
-    SceneBuilder &cameraTransform(glm::mat4 transform);
-    SceneBuilder &cameraFromModelNode(std::string nodeName);
-    SceneBuilder &ambientLightColor(glm::vec3 color);
-    SceneBuilder &lightingRefFromModelNode(std::string nodeName);
+    SceneGraph &get(const std::string &name);
 
 private:
     graphics::GraphicsOptions _options;
-
-    // Services
-
     graphics::Context &_context;
     graphics::Features &_features;
     graphics::Materials &_materials;
@@ -82,20 +70,9 @@ private:
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
 
-    // END Services
-
-    float _aspect {1.0f};
-    float _zNear {0.1f};
-    float _zFar {1000.0f};
-    std::function<std::shared_ptr<scene::ModelSceneNode>(scene::SceneGraph &)> _modelSupplier;
-    float _modelScale {1.0f};
-    glm::vec2 _modelOffset {0.0f};
-    glm::mat4 _cameraTransform {1.0f};
-    std::string _cameraNodeName;
-    glm::vec3 _ambientLightColor {0.0f};
-    std::string _lightingRefNodeName;
+    std::unordered_map<std::string, std::unique_ptr<SceneGraph>> _scenes;
 };
 
-} // namespace gui
+} // namespace scene
 
 } // namespace reone

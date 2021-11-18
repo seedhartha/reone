@@ -174,12 +174,6 @@ bool Control::handleClick(int x, int y) {
     return true;
 }
 
-void Control::update(float dt) {
-    if (_scene) {
-        _scene->update(dt);
-    }
-}
-
 void Control::draw(const glm::ivec2 &offset, const vector<string> &text) {
     if (!_visible)
         return;
@@ -457,13 +451,6 @@ void Control::getTextPosition(glm::ivec2 &position, int lineCount, const glm::iv
     }
 }
 
-void Control::draw3D(const glm::ivec2 &offset) {
-    if (!_visible || !_scene)
-        return;
-
-    _pipeline->render(offset);
-}
-
 void Control::stretch(float x, float y, int mask) {
     if (mask & kStretchLeft) {
         _extent.left = static_cast<int>(_extent.left * x);
@@ -613,14 +600,8 @@ void Control::setTextColor(glm::vec3 color) {
     _text.color = move(color);
 }
 
-void Control::setScene(unique_ptr<SceneGraph> scene) {
-    _scene = move(scene);
-
-    if (_scene) {
-        glm::ivec4 extent(_extent.left, _extent.top, _extent.width, _extent.height);
-        _pipeline = make_unique<ControlRenderPipeline>(extent, *_scene, _context, _meshes, _shaders);
-        _pipeline->init();
-    }
+void Control::setSceneName(string name) {
+    _sceneName = move(name);
 }
 
 void Control::setPadding(int padding) {

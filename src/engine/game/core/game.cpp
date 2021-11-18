@@ -42,6 +42,7 @@
 #include "../../resource/format/gffwriter.h"
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
+#include "../../scene/graphs.h"
 #include "../../scene/pipeline/world.h"
 #include "../../script/scripts.h"
 #include "../../video/format/bikreader.h"
@@ -153,7 +154,9 @@ void Game::loadModule(const string &name, string entry) {
             }
 
             _module->loadParty(entry, _loadFromSaveGame);
-            _module->area()->fill(_services.sceneGraph);
+
+            auto &sceneGraph = _services.sceneGraphs.get(kSceneNameMain);
+            _module->area()->fill(sceneGraph);
 
             info("Module '" + name + "' loaded successfully");
 
@@ -506,10 +509,11 @@ void Game::updateSceneGraph(float dt) {
         lightingRefNode = camera->sceneNode();
     }
 
-    _services.sceneGraph.setActiveCamera(camera->sceneNode());
-    _services.sceneGraph.setLightingRefNode(lightingRefNode);
-    _services.sceneGraph.setUpdateRoots(!_paused);
-    _services.sceneGraph.update(dt);
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneNameMain);
+    sceneGraph.setActiveCamera(camera->sceneNode());
+    sceneGraph.setLightingRefNode(lightingRefNode);
+    sceneGraph.setUpdateRoots(!_paused);
+    sceneGraph.update(dt);
 }
 
 bool Game::handle(const SDL_Event &event) {

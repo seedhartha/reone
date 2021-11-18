@@ -21,8 +21,9 @@
 #include "../../../../graphics/model/models.h"
 #include "../../../../gui/control/button.h"
 #include "../../../../gui/control/label.h"
-#include "../../../../gui/scenebuilder.h"
+#include "../../../../gui/sceneinitializer.h"
 #include "../../../../resource/strings.h"
+#include "../../../../scene/graphs.h"
 
 #include "../../../core/d20/classes.h"
 #include "../../../core/object/creature.h"
@@ -32,6 +33,7 @@
 #include "../../../core/services.h"
 
 #include "../../kotor.h"
+#include "../../types.h"
 
 #include "chargen.h"
 
@@ -159,23 +161,20 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
 
     // 3D control
 
+    string sceneName(kSceneNameClassSelect);
+    sceneName += "." + to_string(index);
+
+    auto &sceneGraph = _services.sceneGraphs.get(sceneName);
     float aspect = extent.width / static_cast<float>(extent.height);
-    unique_ptr<SceneGraph> scene(SceneBuilder(
-                                     _options,
-                                     _context,
-                                     _features,
-                                     _materials,
-                                     _meshes,
-                                     _pbrIbl,
-                                     _shaders,
-                                     _textures)
-                                     .aspect(aspect)
-                                     .depth(0.1f, 10.0f)
-                                     .modelSupplier([&](SceneGraph &sceneGraph) { return getCharacterModel(appearance, sceneGraph); })
-                                     .modelScale(kModelScale)
-                                     .cameraFromModelNode("camerahook")
-                                     .lightingRefFromModelNode("cgbody_light")
-                                     .build());
+
+    SceneInitializer(sceneGraph)
+        .aspect(aspect)
+        .depth(0.1f, 10.0f)
+        .modelSupplier([&](SceneGraph &sceneGraph) { return getCharacterModel(appearance, sceneGraph); })
+        .modelScale(kModelScale)
+        .cameraFromModelNode("camerahook")
+        .lightingRefFromModelNode("cgbody_light")
+        .invoke();
 
     vector<Label *> threeDModels {
         _binding.threeDModel1.get(),
@@ -185,7 +184,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
         _binding.threeDModel5.get(),
         _binding.threeDModel6.get(),
     };
-    threeDModels[index]->setScene(move(scene));
+    threeDModels[index]->setSceneName(sceneName);
 
     ClassButton classButton;
     classButton.control = &selButton;
@@ -229,7 +228,7 @@ int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz)
 }
 
 shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, SceneGraph &sceneGraph) {
-    shared_ptr<Creature> character(_services.objectFactory.newCreature());
+    shared_ptr<Creature> character(_services.objectFactory.newCreature(sceneGraph.name()));
     character->setFacing(-glm::half_pi<float>());
     character->setAppearance(appearance);
     character->equip("g_a_clothes01");

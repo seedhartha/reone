@@ -23,8 +23,9 @@
 #include "../../../../graphics/texture/textures.h"
 #include "../../../../gui/control/button.h"
 #include "../../../../gui/control/label.h"
-#include "../../../../gui/scenebuilder.h"
+#include "../../../../gui/sceneinitializer.h"
 #include "../../../../resource/resources.h"
+#include "../../../../scene/graphs.h"
 #include "../../../../scene/node/model.h"
 
 #include "../../../core/object/factory.h"
@@ -33,6 +34,7 @@
 #include "../../../core/services.h"
 
 #include "../../kotor.h"
+#include "../../types.h"
 
 #include "chargen.h"
 
@@ -120,32 +122,25 @@ void PortraitSelection::setButtonColors(Control &control) {
 }
 
 void PortraitSelection::loadHeadModel() {
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneNamePortraitSelect);
     float aspect = _binding.lblHead->extent().width / static_cast<float>(_binding.lblHead->extent().height);
 
-    unique_ptr<SceneGraph> scene(SceneBuilder(
-                                     _options,
-                                     _context,
-                                     _features,
-                                     _materials,
-                                     _meshes,
-                                     _pbrIbl,
-                                     _shaders,
-                                     _textures)
-                                     .aspect(aspect)
-                                     .depth(0.1f, 10.0f)
-                                     .modelSupplier(bind(&PortraitSelection::getCharacterModel, this, _1))
-                                     .modelScale(kModelScale)
-                                     .cameraFromModelNode(_charGen->character().gender == Gender::Male ? "camerahookm" : "camerahookf")
-                                     .lightingRefFromModelNode("cghead_light")
-                                     .build());
+    SceneInitializer(sceneGraph)
+        .aspect(aspect)
+        .depth(0.1f, 10.0f)
+        .modelSupplier(bind(&PortraitSelection::getCharacterModel, this, _1))
+        .modelScale(kModelScale)
+        .cameraFromModelNode(_charGen->character().gender == Gender::Male ? "camerahookm" : "camerahookf")
+        .lightingRefFromModelNode("cghead_light")
+        .invoke();
 
-    _binding.lblHead->setScene(move(scene));
+    _binding.lblHead->setSceneName(kSceneNamePortraitSelect);
 }
 
 shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &sceneGraph) {
     // Create a creature from the current portrait
 
-    shared_ptr<Creature> creature(_services.objectFactory.newCreature());
+    shared_ptr<Creature> creature(_services.objectFactory.newCreature(sceneGraph.name()));
     creature->setFacing(-glm::half_pi<float>());
     creature->setAppearance(getAppearanceFromCurrentPortrait());
     creature->equip("g_a_clothes01");

@@ -32,11 +32,13 @@ class Sound : public SpatialObject {
 public:
     Sound(
         uint32_t id,
+        std::string sceneName,
         Game *game,
         Services &services) :
         SpatialObject(
             id,
             ObjectType::Sound,
+            std::move(sceneName),
             game,
             services) {
     }
