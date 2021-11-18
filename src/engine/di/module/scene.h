@@ -18,7 +18,8 @@
 #pragma once
 
 #include "../../graphics/options.h"
-#include "../../scene/graph.h"
+#include "../../scene/graphs.h"
+#include "../../scene/pipeline/control.h"
 #include "../../scene/pipeline/world.h"
 
 namespace reone {
@@ -36,15 +37,17 @@ public:
 
     void init();
 
-    scene::SceneGraph &sceneGraph() { return *_sceneGraph; }
+    scene::SceneGraphs &sceneGraphs() { return *_sceneGraphs; }
     scene::WorldRenderPipeline &worldRenderPipeline() { return *_worldRenderPipeline; }
+    scene::ControlRenderPipeline &controlRenderPipeline() { return *_controlRenderPipeline; }
 
 private:
     graphics::GraphicsOptions _options;
     GraphicsModule &_graphics;
 
-    std::unique_ptr<scene::SceneGraph> _sceneGraph;
+    std::unique_ptr<scene::SceneGraphs> _sceneGraphs;
     std::unique_ptr<scene::WorldRenderPipeline> _worldRenderPipeline;
+    std::unique_ptr<scene::ControlRenderPipeline> _controlRenderPipeline;
 };
 
 } // namespace di

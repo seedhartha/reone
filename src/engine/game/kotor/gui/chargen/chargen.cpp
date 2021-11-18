@@ -19,8 +19,9 @@
 
 #include "../../../../graphics/model/models.h"
 #include "../../../../gui/control/label.h"
-#include "../../../../gui/scenebuilder.h"
+#include "../../../../gui/sceneinitializer.h"
 #include "../../../../resource/resources.h"
+#include "../../../../scene/graphs.h"
 
 #include "../../../core/d20/classes.h"
 #include "../../../core/object/factory.h"
@@ -29,6 +30,7 @@
 #include "../../../core/services.h"
 
 #include "../../kotor.h"
+#include "../../types.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -400,32 +402,25 @@ void CharacterGeneration::setCharacter(Character character) {
 }
 
 void CharacterGeneration::reloadCharacterModel() {
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneNameCharGen);
     const Control::Extent &extent = _binding.modelLbl->extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 
-    unique_ptr<SceneGraph> scene(SceneBuilder(
-                                     _options,
-                                     _context,
-                                     _features,
-                                     _materials,
-                                     _meshes,
-                                     _pbrIbl,
-                                     _shaders,
-                                     _textures)
-                                     .aspect(aspect)
-                                     .depth(0.1f, 10.0f)
-                                     .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, _1))
-                                     .modelScale(kModelScale)
-                                     .cameraFromModelNode("camerahook")
-                                     .lightingRefFromModelNode("cgbody_light")
-                                     .build());
+    SceneInitializer(sceneGraph)
+        .aspect(aspect)
+        .depth(0.1f, 10.0f)
+        .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, _1))
+        .modelScale(kModelScale)
+        .cameraFromModelNode("camerahook")
+        .lightingRefFromModelNode("cgbody_light")
+        .invoke();
 
-    _binding.modelLbl->setScene(move(scene));
+    _binding.modelLbl->setSceneName(kSceneNameCharGen);
     _binding.portraitLbl->setBorderFill(_services.portraits.getTextureByAppearance(_character.appearance));
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
-    shared_ptr<Creature> creature(_services.objectFactory.newCreature());
+    shared_ptr<Creature> creature(_services.objectFactory.newCreature(sceneGraph.name()));
     creature->setFacing(-glm::half_pi<float>());
     creature->setAppearance(_character.appearance);
     creature->equip("g_a_clothes01");

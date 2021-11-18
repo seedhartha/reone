@@ -108,12 +108,12 @@ protected:
         Timer timer;
     };
 
+    uint32_t _id;
+    ObjectType _type;
     Game *_game;
     Services &_services;
 
-    uint32_t _id {0};
     std::string _tag;
-    ObjectType _type {ObjectType::Invalid};
     std::string _blueprintResRef;
     std::string _name;
     std::string _conversation;

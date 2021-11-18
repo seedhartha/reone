@@ -46,6 +46,13 @@ class Window;
 
 } // namespace graphics
 
+namespace scene {
+
+class ControlRenderPipeline;
+class SceneGraphs;
+
+} // namespace scene
+
 namespace gui {
 
 constexpr int kDefaultResolutionX = 640;
@@ -92,6 +99,9 @@ protected:
 
     // Services
 
+    scene::ControlRenderPipeline &_controlRenderPipeline;
+    scene::SceneGraphs &_sceneGraphs;
+
     graphics::Context &_context;
     graphics::Features &_features;
     graphics::Fonts &_fonts;
@@ -110,6 +120,8 @@ protected:
 
     GUI(
         graphics::GraphicsOptions options,
+        scene::ControlRenderPipeline &controlRenderPipeline,
+        scene::SceneGraphs &sceneGraphs,
         graphics::Context &context,
         graphics::Features &features,
         graphics::Fonts &fonts,

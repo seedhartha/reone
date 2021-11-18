@@ -17,6 +17,7 @@
 
 #include "game.h"
 
+#include "../../game/core/types.h"
 #include "../../game/kotor/kotor.h"
 #include "../../game/kotor/routine/registrar.h"
 #include "../../game/limbo/limbo.h"
@@ -58,7 +59,7 @@ void GameModule::init() {
     _portraits = make_unique<Portraits>(_graphics.textures(), _resource.twoDas());
     _actionFactory = make_unique<ActionFactory>();
     _party = make_unique<Party>();
-    _combat = make_unique<Combat>(*_effectFactory, _scene.sceneGraph());
+    _combat = make_unique<Combat>(*_effectFactory, _scene.sceneGraphs().get(kSceneNameMain));
     _objectFactory = make_unique<ObjectFactory>();
     _effectFactory = make_unique<EffectFactory>();
     _routines = make_unique<Routines>(*_actionFactory, *_combat, *_effectFactory, *_party, *_reputes, *_scriptRunner, _resource.strings());
@@ -95,7 +96,8 @@ void GameModule::init() {
         _graphics.textures(),
         _graphics.walkmeshes(),
         _graphics.window(),
-        _scene.sceneGraph(),
+        _scene.controlRenderPipeline(),
+        _scene.sceneGraphs(),
         _scene.worldRenderPipeline(),
         _script.scripts(),
         _resource.gffs(),

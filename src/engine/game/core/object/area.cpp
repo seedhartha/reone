@@ -35,8 +35,11 @@
 #include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
+#include "../../../scene/graphs.h"
 #include "../../../scene/node/grass.h"
 #include "../../../scene/types.h"
+
+#include "../../core/types.h"
 
 #include "../game.h"
 #include "../location.h"
@@ -137,7 +140,7 @@ void Area::loadLYT() {
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
 
-        auto sceneNode = _services.sceneGraph.newModel(model, ModelUsage::Room);
+        auto sceneNode = _services.sceneGraphs.get(kSceneNameMain).newModel(model, ModelUsage::Room);
         sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {
@@ -205,7 +208,7 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     glm::vec3 position(entryPosition);
     position.z += 1.7f;
 
-    SceneGraph *sceneGraph = &_services.sceneGraph;
+    SceneGraph *sceneGraph = &_services.sceneGraphs.get(kSceneNameMain);
 
     _firstPersonCamera = make_unique<FirstPersonCamera>(_cameraAspect, glm::radians(kDefaultFieldOfView), sceneGraph);
     _firstPersonCamera->setPosition(position);
@@ -261,7 +264,7 @@ void Area::doDestroyObject(uint32_t objectId) {
     {
         auto sceneNode = object->sceneNode();
         if (sceneNode) {
-            _services.sceneGraph.removeRoot(sceneNode);
+            _services.sceneGraphs.get(kSceneNameMain).removeRoot(sceneNode);
         }
     }
     {
@@ -352,7 +355,7 @@ void Area::reloadParty() {
     shared_ptr<Creature> player(_services.party.player());
     loadParty(player->position(), player->getFacing());
 
-    fill(_services.sceneGraph);
+    fill(_services.sceneGraphs.get(kSceneNameMain));
 }
 
 bool Area::handle(const SDL_Event &event) {
@@ -535,7 +538,7 @@ static inline glm::vec3 getRandomBarycentric() {
 }
 
 void Area::fill(SceneGraph &sceneGraph) {
-    sceneGraph.clearRoots();
+    sceneGraph.clear();
 
     // Area properties
 
@@ -876,7 +879,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
         add(spatial);
         auto model = spatial->sceneNode();
         if (model) {
-            _services.sceneGraph.addRoot(model);
+            _services.sceneGraphs.get(kSceneNameMain).addRoot(model);
         }
         auto creature = dynamic_pointer_cast<Creature>(spatial);
         if (creature) {
@@ -1298,7 +1301,7 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
 }
 
 shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
-    shared_ptr<CameraSceneNode> camera(_services.sceneGraph.activeCamera());
+    shared_ptr<CameraSceneNode> camera(_services.sceneGraphs.get(kSceneNameMain).activeCamera());
     shared_ptr<Creature> partyLeader(_services.party.getLeader());
     if (!camera || !partyLeader) {
         return nullptr;

@@ -40,8 +40,9 @@ static constexpr float kMaxGrassDistance = 16.0f;
 
 static const bool g_debugAABB = false;
 
-void SceneGraph::clearRoots() {
+void SceneGraph::clear() {
     _roots.clear();
+    _closestLights.clear();
 }
 
 void SceneGraph::addRoot(shared_ptr<SceneNode> node) {
@@ -377,6 +378,10 @@ vector<LightSceneNode *> SceneGraph::getLightsAt(
     }
 
     return move(result);
+}
+
+unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {
+    return make_unique<DummySceneNode>(move(modelNode), *this, _context, _meshes, _shaders);
 }
 
 unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUsage usage, IAnimationEventListener *animEventListener) {

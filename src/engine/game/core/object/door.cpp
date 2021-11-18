@@ -25,6 +25,7 @@
 #include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
+#include "../../../scene/graphs.h"
 #include "../../../scene/node/model.h"
 #include "../../../scene/types.h"
 #include "../../../script/scripts.h"
@@ -65,7 +66,7 @@ void Door::loadFromBlueprint(const string &resRef) {
     shared_ptr<TwoDA> doors(_services.twoDas.get("genericdoors"));
     string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
-    auto model = _services.sceneGraph.newModel(_services.models.get(modelName), ModelUsage::Door);
+    auto model = _services.sceneGraphs.get(_sceneName).newModel(_services.models.get(modelName), ModelUsage::Door);
     model->setCullable(true);
     model->setDrawDistance(FLT_MAX);
 

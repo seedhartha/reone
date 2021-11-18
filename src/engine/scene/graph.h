@@ -21,6 +21,7 @@
 #include "../graphics/shader/shaders.h"
 
 #include "node/camera.h"
+#include "node/dummy.h"
 #include "node/emitter.h"
 #include "node/grass.h"
 #include "node/light.h"
@@ -53,6 +54,7 @@ class ModelSceneNode;
 class SceneGraph : boost::noncopyable {
 public:
     SceneGraph(
+        std::string name,
         graphics::GraphicsOptions options,
         graphics::Context &context,
         graphics::Features &features,
@@ -61,6 +63,7 @@ public:
         graphics::PBRIBL &pbrIbl,
         graphics::Shaders &shaders,
         graphics::Textures &textures) :
+        _name(std::move(name)),
         _options(std::move(options)),
         _context(context),
         _features(features),
@@ -79,6 +82,7 @@ public:
 
     void draw(bool shadowPass = false);
 
+    const std::string &name() const { return _name; }
     const graphics::GraphicsOptions &options() const { return _options; }
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
     graphics::ShaderUniforms uniformsPrototype() const { return _uniformsPrototype; }
@@ -87,20 +91,9 @@ public:
     void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
     void setUniformsPrototype(graphics::ShaderUniforms &&uniforms) { _uniformsPrototype = uniforms; }
 
-    // Factory methods
-
-    std::unique_ptr<ModelSceneNode> newModel(
-        std::shared_ptr<graphics::Model> model,
-        ModelUsage usage,
-        IAnimationEventListener *animEventListener = nullptr);
-
-    std::unique_ptr<CameraSceneNode> newCamera(std::string name, glm::mat4 projection);
-
-    // END Factory methods
-
     // Roots
 
-    void clearRoots();
+    void clear();
     void addRoot(std::shared_ptr<SceneNode> node);
     void removeRoot(const std::shared_ptr<SceneNode> &node);
 
@@ -139,7 +132,21 @@ public:
 
     // END Fog
 
+    // Factory methods
+
+    std::unique_ptr<DummySceneNode> newDummy(std::shared_ptr<graphics::ModelNode> modelNode);
+
+    std::unique_ptr<ModelSceneNode> newModel(
+        std::shared_ptr<graphics::Model> model,
+        ModelUsage usage,
+        IAnimationEventListener *animEventListener = nullptr);
+
+    std::unique_ptr<CameraSceneNode> newCamera(std::string name, glm::mat4 projection);
+
+    // END Factory methods
+
 private:
+    std::string _name;
     graphics::GraphicsOptions _options;
 
     std::vector<std::shared_ptr<SceneNode>> _roots;

@@ -30,6 +30,7 @@
 #include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
+#include "../../../scene/graphs.h"
 #include "../../../scene/types.h"
 #include "../../../script/types.h"
 
@@ -123,7 +124,7 @@ Creature::ModelType Creature::parseModelType(const string &s) const {
 
 void Creature::updateModel() {
     if (_sceneNode) {
-        _services.sceneGraph.removeRoot(_sceneNode);
+        _services.sceneGraphs.get(_sceneName).removeRoot(_sceneNode);
     }
     shared_ptr<ModelSceneNode> model(buildModel());
     if (model) {
@@ -132,7 +133,7 @@ void Creature::updateModel() {
         if (!_stunt) {
             model->setLocalTransform(_transform);
         }
-        _services.sceneGraph.addRoot(model);
+        _services.sceneGraphs.get(_sceneName).addRoot(model);
         _animDirty = true;
     }
     _sceneNode = model;
@@ -1027,7 +1028,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!bodyModel)
         return nullptr;
 
-    auto bodySceneNode = _services.sceneGraph.newModel(bodyModel, ModelUsage::Creature, this);
+    auto bodySceneNode = _services.sceneGraphs.get(_sceneName).newModel(bodyModel, ModelUsage::Creature, this);
 
     // Body texture
 
@@ -1053,10 +1054,10 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!headModelName.empty()) {
         shared_ptr<Model> headModel(_services.models.get(headModelName));
         if (headModel) {
-            auto headSceneNode = _services.sceneGraph.newModel(headModel, ModelUsage::Creature, this);
+            auto headSceneNode = _services.sceneGraphs.get(_sceneName).newModel(headModel, ModelUsage::Creature, this);
             bodySceneNode->attach(g_headHookNode, move(headSceneNode));
             if (maskModel) {
-                auto maskSceneNode = _services.sceneGraph.newModel(maskModel, ModelUsage::Equipment, this);
+                auto maskSceneNode = _services.sceneGraphs.get(_sceneName).newModel(maskModel, ModelUsage::Equipment, this);
                 headSceneNode->attach(g_maskHookNode, move(maskSceneNode));
             }
         }
@@ -1068,7 +1069,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!rightWeaponModelName.empty()) {
         shared_ptr<Model> weaponModel(_services.models.get(rightWeaponModelName));
         if (weaponModel) {
-            auto weaponSceneNode = _services.sceneGraph.newModel(weaponModel, ModelUsage::Equipment, this);
+            auto weaponSceneNode = _services.sceneGraphs.get(_sceneName).newModel(weaponModel, ModelUsage::Equipment, this);
             bodySceneNode->attach(g_rightHandNode, move(weaponSceneNode));
         }
     }
@@ -1079,7 +1080,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!leftWeaponModelName.empty()) {
         shared_ptr<Model> weaponModel(_services.models.get(leftWeaponModelName));
         if (weaponModel) {
-            auto weaponSceneNode = _services.sceneGraph.newModel(weaponModel, ModelUsage::Equipment, this);
+            auto weaponSceneNode = _services.sceneGraphs.get(_sceneName).newModel(weaponModel, ModelUsage::Equipment, this);
             bodySceneNode->attach(g_leftHandNode, move(weaponSceneNode));
         }
     }

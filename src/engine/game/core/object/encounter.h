@@ -29,11 +29,13 @@ class Encounter : public SpatialObject {
 public:
     Encounter(
         uint32_t id,
+        std::string sceneName,
         Game *game,
         Services &services) :
         SpatialObject(
             id,
             ObjectType::Encounter,
+            std::move(sceneName),
             game,
             services) {
     }

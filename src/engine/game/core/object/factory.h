@@ -43,15 +43,16 @@ class ObjectFactory {
 public:
     std::shared_ptr<Module> newModule();
     std::shared_ptr<Area> newArea();
-    std::shared_ptr<Creature> newCreature();
-    std::shared_ptr<Placeable> newPlaceable();
-    std::shared_ptr<Door> newDoor();
-    std::shared_ptr<Waypoint> newWaypoint();
-    std::shared_ptr<Trigger> newTrigger();
     std::shared_ptr<Item> newItem();
-    std::shared_ptr<Sound> newSound();
-    std::shared_ptr<PlaceableCamera> newCamera();
-    std::shared_ptr<Encounter> newEncounter();
+
+    std::shared_ptr<Creature> newCreature(std::string sceneName = kSceneNameMain);
+    std::shared_ptr<Placeable> newPlaceable(std::string sceneName = kSceneNameMain);
+    std::shared_ptr<Door> newDoor(std::string sceneName = kSceneNameMain);
+    std::shared_ptr<Waypoint> newWaypoint(std::string sceneName = kSceneNameMain);
+    std::shared_ptr<Trigger> newTrigger(std::string sceneName = kSceneNameMain);
+    std::shared_ptr<Sound> newSound(std::string sceneName = kSceneNameMain);
+    std::shared_ptr<PlaceableCamera> newCamera(std::string sceneName = kSceneNameMain);
+    std::shared_ptr<Encounter> newEncounter(std::string sceneName = kSceneNameMain);
 
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 

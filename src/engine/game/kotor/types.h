@@ -17,42 +17,15 @@
 
 #pragma once
 
-#include "spatial.h"
-
-#include "../../../resource/format/gffreader.h"
-
-#include "../camera/camera.h"
-
 namespace reone {
 
 namespace game {
 
-class PlaceableCamera : public SpatialObject, public Camera {
-public:
-    PlaceableCamera(
-        uint32_t id,
-        std::string sceneName,
-        Game *game,
-        Services &services) :
-        SpatialObject(
-            id,
-            ObjectType::Camera,
-            std::move(sceneName),
-            game,
-            services) {
-    }
-
-    void loadFromGIT(const resource::GffStruct &gffs);
-
-    int cameraId() const { return _cameraId; }
-    float fieldOfView() const { return _fieldOfView; }
-
-private:
-    int _cameraId {0};
-    float _fieldOfView {0.0f};
-
-    void loadTransformFromGIT(const resource::GffStruct &gffs);
-};
+constexpr char kSceneNameMainMenu[] = "mainmenu";
+constexpr char kSceneNameCharGen[] = "chargen";
+constexpr char kSceneNameClassSelect[] = "classselect";
+constexpr char kSceneNamePortraitSelect[] = "portraitselect";
+constexpr char kSceneNameCharacter[] = "character";
 
 } // namespace game
 
