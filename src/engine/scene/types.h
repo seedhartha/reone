@@ -28,7 +28,9 @@ enum class SceneNodeType {
     Mesh,
     Light,
     Emitter,
-    Grass
+    Particle,
+    Grass,
+    GrassCluster
 };
 
 enum class ModelUsage {

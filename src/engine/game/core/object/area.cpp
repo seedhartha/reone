@@ -37,6 +37,7 @@
 #include "../../../resource/strings.h"
 #include "../../../scene/graphs.h"
 #include "../../../scene/node/grass.h"
+#include "../../../scene/node/grasscluster.h"
 #include "../../../scene/types.h"
 
 #include "../../core/types.h"
@@ -567,12 +568,11 @@ void Area::fill(SceneGraph &sceneGraph) {
                         glm::vec3 baryPosition(getRandomBarycentric());
                         glm::vec3 position(aabbTransform * glm::vec4(barycentricToCartesian(vertices[0], vertices[1], vertices[2], baryPosition), 1.0f));
                         glm::vec2 lightmapUV(aabbNode->mesh()->mesh->getTriangleTexCoords2(face, baryPosition));
-                        auto cluster = make_shared<GrassSceneNode::Cluster>();
-                        cluster->parent = grass.get();
-                        cluster->position = move(position);
-                        cluster->variant = getRandomGrassVariant();
-                        cluster->lightmapUV = move(lightmapUV);
-                        grass->addCluster(move(cluster));
+                        auto cluster = grass->newCluster();
+                        cluster->setPosition(move(position));
+                        cluster->setVariant(getRandomGrassVariant());
+                        cluster->setLightmapUV(move(lightmapUV));
+                        grass->addChild(move(cluster));
                     }
                 }
             }

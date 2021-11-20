@@ -158,7 +158,8 @@ private:
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
     std::vector<GrassSceneNode *> _grass;
-    std::vector<std::pair<SceneNode *, std::vector<std::shared_ptr<SceneNodeElement>>>> _elements;
+
+    std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _elements; // particles and grass clusters
 
     uint32_t _textureId {0};
     bool _updateRoots {true};

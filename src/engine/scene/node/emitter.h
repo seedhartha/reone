@@ -20,8 +20,6 @@
 #include "../../common/timer.h"
 #include "../../graphics/beziercurve.h"
 
-#include "../nodeelement.h"
-
 #include "modelnode.h"
 
 namespace reone {
@@ -29,21 +27,10 @@ namespace reone {
 namespace scene {
 
 class ModelSceneNode;
+class ParticleSceneNode;
 
 class EmitterSceneNode : public ModelNodeSceneNode {
 public:
-    struct Particle : public SceneNodeElement {
-        glm::vec3 position {0.0f};
-        glm::vec3 dir {0.0f}; // used in Linked render mode
-        glm::vec3 color {1.0f};
-        glm::vec3 velocity {0.0f};
-        glm::vec2 size {1.0f};
-        float animLength {0.0f};
-        float lifetime {0.0f};
-        float alpha {1.0f};
-        int frame {0};
-    };
-
     EmitterSceneNode(
         const ModelSceneNode *model,
         std::shared_ptr<graphics::ModelNode> modelNode,
@@ -53,11 +40,18 @@ public:
         graphics::Shaders &shaders);
 
     void update(float dt) override;
-    void drawElements(const std::vector<std::shared_ptr<SceneNodeElement>> &elements, int count) override;
+    void drawElements(const std::vector<SceneNode *> &elements, int count) override;
 
     void detonate();
 
-    const std::deque<std::shared_ptr<Particle>> &particles() const { return _particles; }
+    const graphics::BezierCurve<float> &particleSize() const { return _particleSize; }
+    const graphics::BezierCurve<glm::vec3> &color() const { return _color; }
+    const graphics::BezierCurve<float> &alpha() const { return _alpha; }
+
+    float lifeExpectancy() const { return _lifeExpectancy; }
+    int frameStart() const { return _frameStart; }
+    int frameEnd() const { return _frameEnd; }
+    float grav() const { return _grav; }
 
 private:
     const ModelSceneNode *_model;
@@ -84,7 +78,6 @@ private:
 
     float _birthInterval {0.0f};
     Timer _birthTimer;
-    std::deque<std::shared_ptr<Particle>> _particles;
     bool _spawned {false};
 
     void spawnParticles(float dt);
@@ -92,10 +85,7 @@ private:
     void doSpawnParticle();
     void spawnLightningParticles();
 
-    void updateParticle(Particle &particle, float dt);
-    void updateParticleAnimation(Particle &particle, float dt);
-
-    bool isParticleExpired(Particle &particle) const;
+    std::unique_ptr<ParticleSceneNode> newParticle();
 };
 
 } // namespace scene

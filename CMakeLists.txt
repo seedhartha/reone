@@ -355,12 +355,13 @@ set(SCENE_HEADERS
     src/engine/scene/node/dummy.h
     src/engine/scene/node/emitter.h
     src/engine/scene/node/grass.h
+    src/engine/scene/node/grasscluster.h
     src/engine/scene/node/light.h
     src/engine/scene/node/mesh.h
     src/engine/scene/node/model.h
     src/engine/scene/node/modelnode.h
+    src/engine/scene/node/particle.h
     src/engine/scene/node/scenenode.h
-    src/engine/scene/nodeelement.h
     src/engine/scene/pipeline/control.h
     src/engine/scene/pipeline/world.h
     src/engine/scene/types.h)
@@ -375,6 +376,7 @@ set(SCENE_SOURCES
     src/engine/scene/node/mesh.cpp
     src/engine/scene/node/model.cpp
     src/engine/scene/node/modelnode.cpp
+    src/engine/scene/node/particle.cpp
     src/engine/scene/node/scenenode.cpp
     src/engine/scene/pipeline/control.cpp
     src/engine/scene/pipeline/world.cpp)
