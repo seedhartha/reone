@@ -20,7 +20,7 @@
 #include "../../graphics/barycentricutil.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/triangleutil.h"
-#include "../../scene/graphs.h"
+#include "../../scene/graph.h"
 #include "../../scene/node/grasscluster.h"
 #include "../../scene/node/model.h"
 
@@ -40,23 +40,22 @@ namespace reone {
 namespace game {
 
 void SceneManager::refresh(Area &area) {
-    auto &sceneGraph = _sceneGraphs.get(kSceneMain);
-    sceneGraph.clear();
+    _sceneGraph.clear();
 
     // Area properties
 
-    sceneGraph.setAmbientLightColor(area.ambientColor());
-    sceneGraph.setFogEnabled(area.fogEnabled());
-    sceneGraph.setFogNear(area.fogNear());
-    sceneGraph.setFogFar(area.fogFar());
-    sceneGraph.setFogColor(area.fogColor());
+    _sceneGraph.setAmbientLightColor(area.ambientColor());
+    _sceneGraph.setFogEnabled(area.fogEnabled());
+    _sceneGraph.setFogNear(area.fogNear());
+    _sceneGraph.setFogFar(area.fogFar());
+    _sceneGraph.setFogColor(area.fogColor());
 
     // Room models
 
     for (auto &room : area.rooms()) {
         auto modelSceneNode = room.second->model();
         if (modelSceneNode) {
-            sceneGraph.addRoot(modelSceneNode);
+            _sceneGraph.addRoot(modelSceneNode);
         }
         auto &grass = area.grass();
         if (!grass.texture) {
@@ -67,7 +66,7 @@ void SceneManager::refresh(Area &area) {
             continue;
         }
         glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), room.second->position()));
-        auto grassSceneNode = sceneGraph.newGrass(room.first, glm::vec2(grass.quadSize), grass.texture, aabbNode->mesh()->lightmap);
+        auto grassSceneNode = _sceneGraph.newGrass(room.first, glm::vec2(grass.quadSize), grass.texture, aabbNode->mesh()->lightmap);
         for (auto &material : _surfaces.getGrassSurfaceIndices()) {
             for (auto &face : aabbNode->getFacesByMaterial(material)) {
                 vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getTriangleCoords(face));
@@ -84,7 +83,7 @@ void SceneManager::refresh(Area &area) {
                 }
             }
         }
-        sceneGraph.addRoot(move(grassSceneNode));
+        _sceneGraph.addRoot(move(grassSceneNode));
     }
 
     // Objects
@@ -92,7 +91,7 @@ void SceneManager::refresh(Area &area) {
     for (auto &object : area.objects()) {
         shared_ptr<SceneNode> sceneNode(object->sceneNode());
         if (sceneNode) {
-            sceneGraph.addRoot(sceneNode);
+            _sceneGraph.addRoot(sceneNode);
         }
     }
 }
@@ -102,8 +101,7 @@ void SceneManager::onObjectCreated(const SpatialObject &object) {
     if (!sceneNode) {
         return;
     }
-    auto &sceneGraph = _sceneGraphs.get(kSceneMain);
-    sceneGraph.addRoot(sceneNode);
+    _sceneGraph.addRoot(sceneNode);
 }
 
 } // namespace game

@@ -21,7 +21,7 @@ namespace reone {
 
 namespace scene {
 
-class SceneGraphs;
+class SceneGraph;
 
 }
 
@@ -36,9 +36,9 @@ class Surfaces;
  */
 class SceneManager {
 public:
-    SceneManager(Surfaces &surfaces, scene::SceneGraphs &sceneGraphs) :
+    SceneManager(Surfaces &surfaces, scene::SceneGraph &sceneGraph) :
         _surfaces(surfaces),
-        _sceneGraphs(sceneGraphs) {
+        _sceneGraph(sceneGraph) {
     }
 
     void refresh(Area &area);
@@ -47,7 +47,7 @@ public:
 
 private:
     Surfaces &_surfaces;
-    scene::SceneGraphs &_sceneGraphs;
+    scene::SceneGraph &_sceneGraph;
 };
 
 } // namespace game

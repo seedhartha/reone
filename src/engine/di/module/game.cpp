@@ -62,7 +62,7 @@ void GameModule::init() {
     _effectFactory = make_unique<EffectFactory>();
     _routines = make_unique<Routines>();
     _routineRegistrar = newRoutineRegistrar();
-    _sceneManager = make_unique<SceneManager>(*_surfaces, _scene.sceneGraphs());
+    _sceneManager = make_unique<SceneManager>(*_surfaces, _scene.sceneGraphs().get(kSceneMain));
 
     _services = make_unique<Services>(
         *_actionFactory,
