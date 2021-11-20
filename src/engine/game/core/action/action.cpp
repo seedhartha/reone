@@ -25,7 +25,7 @@ namespace reone {
 
 namespace game {
 
-void Action::execute(Object &actor, ActionContext &ctx, float dt) {
+void Action::execute(Object &actor, float dt) {
     warn("Action execution not implemented: " + to_string(static_cast<int>(_type)));
     complete();
 }

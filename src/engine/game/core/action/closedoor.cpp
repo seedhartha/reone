@@ -20,8 +20,7 @@
 #include "../game.h"
 #include "../object/door.h"
 #include "../object/factory.h"
-
-#include "context.h"
+#include "../services.h"
 
 using namespace std;
 
@@ -29,8 +28,8 @@ namespace reone {
 
 namespace game {
 
-void CloseDoorAction::execute(Object &actor, ActionContext &ctx, float dt) {
-    auto creatureActor = ctx.objectFactory.getObjectById<Creature>(actor.id());
+void CloseDoorAction::execute(Object &actor, float dt) {
+    auto creatureActor = _services.objectFactory.getObjectById<Creature>(actor.id());
     auto door = dynamic_pointer_cast<Door>(_object);
 
     bool reached = !creatureActor || creatureActor->navigateTo(door->position(), true, kDefaultMaxObjectDistance, dt);

@@ -85,13 +85,15 @@ Game::Game(
     _tsl(tsl),
     _path(move(path)),
     _options(move(options)),
-    _services(services) {
+    _services(services),
+    _party(*this),
+    _combat(*this, services) {
 }
 
 void Game::init() {
     _services.window.setEventHandler(this);
 
-    _console = make_unique<Console>(*this, _services.effectFactory, _services.party, _services.fonts, _services.meshes, _services.shaders, _services.window);
+    _console = make_unique<Console>(*this, _services.effectFactory, _party, _services.fonts, _services.meshes, _services.shaders, _services.window);
     _console->init();
 
     _profileOverlay = make_unique<ProfileOverlay>(_services.fonts, _services.meshes, _services.shaders, _services.window);
@@ -150,7 +152,7 @@ void Game::loadModule(const string &name, string entry) {
                 _loadedModules.insert(make_pair(name, _module));
             }
 
-            if (_services.party.isEmpty()) {
+            if (_party.isEmpty()) {
                 loadDefaultParty();
             }
 
@@ -180,26 +182,25 @@ void Game::loadDefaultParty() {
     string member1, member2, member3;
     getDefaultPartyMembers(member1, member2, member3);
 
-    Party &party = _services.party;
     if (!member1.empty()) {
         shared_ptr<Creature> player(_services.objectFactory.newCreature());
         player->loadFromBlueprint(member1);
         player->setTag(kObjectTagPlayer);
         player->setImmortal(true);
-        party.addMember(kNpcPlayer, player);
-        party.setPlayer(player);
+        _party.addMember(kNpcPlayer, player);
+        _party.setPlayer(player);
     }
     if (!member2.empty()) {
         shared_ptr<Creature> companion(_services.objectFactory.newCreature());
         companion->loadFromBlueprint(member2);
         companion->setImmortal(true);
-        party.addMember(0, companion);
+        _party.addMember(0, companion);
     }
     if (!member3.empty()) {
         shared_ptr<Creature> companion(_services.objectFactory.newCreature());
         companion->loadFromBlueprint(member3);
         companion->setImmortal(true);
-        party.addMember(1, companion);
+        _party.addMember(1, companion);
     }
 }
 
@@ -287,7 +288,7 @@ void Game::drawWorld() {
 void Game::toggleInGameCameraType() {
     switch (_cameraType) {
     case CameraType::FirstPerson:
-        if (_services.party.getLeader()) {
+        if (_party.getLeader()) {
             _cameraType = CameraType::ThirdPerson;
         }
         break;
@@ -391,7 +392,7 @@ void Game::update() {
     bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
     if (updModule && !_paused) {
         _module->update(dt);
-        _services.combat.update(dt);
+        _combat.update(dt);
     }
 
     GUI *gui = getScreenGUI();
@@ -483,7 +484,7 @@ void Game::updateCamera(float dt) {
 
         glm::vec3 listenerPosition;
         if (_cameraType == CameraType::ThirdPerson) {
-            shared_ptr<Creature> partyLeader(_services.party.getLeader());
+            shared_ptr<Creature> partyLeader(_party.getLeader());
             if (partyLeader) {
                 listenerPosition = partyLeader->position() + 1.7f; // TODO: height based on appearance
             }
@@ -501,7 +502,7 @@ void Game::updateSceneGraph(float dt) {
 
     // Select a reference node for dynamic lighting
     shared_ptr<SceneNode> lightingRefNode;
-    shared_ptr<Creature> partyLeader(_services.party.getLeader());
+    shared_ptr<Creature> partyLeader(_party.getLeader());
     if (partyLeader && _cameraType == CameraType::ThirdPerson) {
         lightingRefNode = partyLeader->sceneNode();
     } else {
@@ -529,7 +530,7 @@ bool Game::handle(const SDL_Event &event) {
             if (_console->handle(event)) {
                 return true;
             }
-            if (_services.party.handle(event)) {
+            if (_party.handle(event)) {
                 return true;
             }
             Camera *camera = getActiveCamera();
@@ -666,7 +667,7 @@ void Game::saveToFile(const fs::path &path) {
 
     vector<shared_ptr<GffStruct>> nfoPartyMembers;
     for (int i = 0; i < 3; ++i) {
-        if (_services.party.getSize() > i) {
+        if (_party.getSize() > i) {
             nfoPartyMembers.push_back(getPartyMemberNFOStruct(i));
         }
     }
@@ -755,10 +756,10 @@ void Game::saveToFile(const fs::path &path) {
 }
 
 shared_ptr<GffStruct> Game::getPartyMemberNFOStruct(int index) const {
-    auto member = _services.party.getMember(index);
+    auto member = _party.getMember(index);
 
     return make_shared<GffStruct>(0, vector<GffField> {
-                                         GffField::newByte("NPC", _services.party.getNPCByMemberIndex(index)),
+                                         GffField::newByte("NPC", _party.getNPCByMemberIndex(index)),
                                          GffField::newCExoString("TemplateResRef", member->blueprintResRef()),
                                          GffField::newVector("Position", member->position()),
                                          GffField::newFloat("Facing", member->getFacing())});
@@ -783,7 +784,7 @@ void Game::loadFromFile(const fs::path &path) {
 
     // Party
     vector<shared_ptr<GffStruct>> nfoParty(nfoRoot->getList("Party"));
-    _services.party.clear();
+    _party.clear();
     for (size_t i = 0; i < nfoParty.size(); ++i) {
         shared_ptr<GffStruct> member(nfoParty[i]);
         int npc = member->getInt("NPC");
@@ -799,9 +800,9 @@ void Game::loadFromFile(const fs::path &path) {
         creature->setImmortal(true);
         creature->setPosition(move(position));
         creature->setFacing(facing);
-        _services.party.addMember(npc, creature);
+        _party.addMember(npc, creature);
         if (i == 0) {
-            _services.party.setPlayer(creature);
+            _party.setPlayer(creature);
         }
     }
 

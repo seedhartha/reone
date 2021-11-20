@@ -226,7 +226,7 @@ void Equipment::onItemsListBoxItemClick(const string &item) {
     if (_selectedSlot == Slot::None)
         return;
 
-    shared_ptr<Creature> player(_services.party.player());
+    shared_ptr<Creature> player(_game.party().player());
     shared_ptr<Item> itemObj;
     if (item != "[none]") {
         for (auto &playerItem : player->items()) {
@@ -237,7 +237,7 @@ void Equipment::onItemsListBoxItemClick(const string &item) {
         }
     }
     int slot = getInventorySlot(_selectedSlot);
-    shared_ptr<Creature> partyLeader(_services.party.getLeader());
+    shared_ptr<Creature> partyLeader(_game.party().getLeader());
     shared_ptr<Item> equipped(partyLeader->getEquippedItem(slot));
 
     if (equipped != itemObj) {
@@ -267,7 +267,7 @@ void Equipment::update() {
     updateEquipment();
     selectSlot(Slot::None);
 
-    auto partyLeader(_services.party.getLeader());
+    auto partyLeader(_game.party().getLeader());
 
     if (!_game.isTSL()) {
         string vitalityString(str(boost::format("%d/\n%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
@@ -280,7 +280,7 @@ void Equipment::updatePortraits() {
     if (_game.isTSL())
         return;
 
-    Party &party = _services.party;
+    Party &party = _game.party();
     shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
@@ -318,7 +318,7 @@ void Equipment::selectSlot(Slot slot) {
 }
 
 void Equipment::updateEquipment() {
-    shared_ptr<Creature> partyLeader(_services.party.getLeader());
+    shared_ptr<Creature> partyLeader(_game.party().getLeader());
     auto &equipment = partyLeader->equipment();
 
     for (auto &lbl : _binding.lblInv) {
@@ -411,7 +411,7 @@ void Equipment::updateItems() {
 
         _binding.lbItems->addItem(move(lbItem));
     }
-    shared_ptr<Creature> player(_services.party.player());
+    shared_ptr<Creature> player(_game.party().player());
 
     for (auto &item : player->items()) {
         if (_selectedSlot == Slot::None) {

@@ -77,7 +77,7 @@ void AbilitiesMenu::load() {
         if (maybeSkillInfo == _skills.end())
             return;
 
-        shared_ptr<Creature> partyLeader(_services.party.getLeader());
+        shared_ptr<Creature> partyLeader(_game.party().getLeader());
 
         _binding.lblRankVal->setTextMessage(to_string(partyLeader->attributes().getSkillRank(skill)));
         _binding.lblBonusVal->setTextMessage("0");
@@ -170,7 +170,7 @@ void AbilitiesMenu::refreshPortraits() {
     if (_game.isTSL())
         return;
 
-    Party &party = _services.party;
+    Party &party = _game.party();
     shared_ptr<Creature> partyLeader(party.getLeader());
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));

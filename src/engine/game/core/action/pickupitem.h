@@ -27,12 +27,12 @@ class Item;
 
 class PickUpItemAction : public Action {
 public:
-    PickUpItemAction(Game &game, std::shared_ptr<Item> item) :
-        Action(game, ActionType::PickUpItem),
+    PickUpItemAction(Game &game, Services &services, std::shared_ptr<Item> item) :
+        Action(game, services, ActionType::PickUpItem),
         _item(std::move(item)) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 
 private:
     std::shared_ptr<Item> _item;

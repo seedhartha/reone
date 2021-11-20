@@ -207,7 +207,6 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/materials.h
     src/engine/graphics/mesh/mesh.h
     src/engine/graphics/mesh/meshes.h
-    src/engine/graphics/mesh/triangleutil.h
     src/engine/graphics/mesh/vertexattributes.h
     src/engine/graphics/model/animatedproperty.h
     src/engine/graphics/model/animation.h
@@ -229,6 +228,7 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/texture/textures.h
     src/engine/graphics/texture/textureutil.h
     src/engine/graphics/textutil.h
+    src/engine/graphics/triangleutil.h
     src/engine/graphics/types.h
     src/engine/graphics/walkmesh/format/bwmreader.h
     src/engine/graphics/walkmesh/walkmesh.h
@@ -469,7 +469,6 @@ set(GAMECORE_HEADERS
     src/engine/game/core/action/castspellatlocation.h
     src/engine/game/core/action/castspellatobject.h
     src/engine/game/core/action/closedoor.h
-    src/engine/game/core/action/context.h
     src/engine/game/core/action/docommand.h
     src/engine/game/core/action/equipitem.h
     src/engine/game/core/action/equipmostdamagingmelee.h

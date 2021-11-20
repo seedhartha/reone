@@ -25,11 +25,11 @@ namespace game {
 
 class OpenContainerAction : public ObjectAction {
 public:
-    OpenContainerAction(Game &game, std::shared_ptr<Object> object) :
-        ObjectAction(game, ActionType::OpenContainer, std::move(object)) {
+    OpenContainerAction(Game &game, Services &services, std::shared_ptr<Object> object) :
+        ObjectAction(game, services, ActionType::OpenContainer, std::move(object)) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

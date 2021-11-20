@@ -20,16 +20,15 @@
 #include "../game.h"
 #include "../object/factory.h"
 #include "../party.h"
-
-#include "context.h"
+#include "../services.h"
 
 namespace reone {
 
 namespace game {
 
-void FollowLeaderAction::execute(Object &actor, ActionContext &ctx, float dt) {
-    auto creatureActor = ctx.objectFactory.getObjectById<Creature>(actor.id());
-    glm::vec3 destination(ctx.party.getLeader()->position());
+void FollowLeaderAction::execute(Object &actor, float dt) {
+    auto creatureActor = _services.objectFactory.getObjectById<Creature>(actor.id());
+    glm::vec3 destination(_game.party().getLeader()->position());
     float distance2 = creatureActor->getDistanceTo2(glm::vec2(destination));
     bool run = distance2 > kDistanceWalk;
 

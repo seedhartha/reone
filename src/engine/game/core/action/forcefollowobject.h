@@ -25,11 +25,11 @@ namespace game {
 
 class ForceFollowObjectAction : public Action {
 public:
-    ForceFollowObjectAction(Game &game) :
-        Action(game, ActionType::ForceFollowObject) {
+    ForceFollowObjectAction(Game &game, Services &services) :
+        Action(game, services, ActionType::ForceFollowObject) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

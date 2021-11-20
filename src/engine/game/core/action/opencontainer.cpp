@@ -20,8 +20,7 @@
 #include "../game.h"
 #include "../object/factory.h"
 #include "../object/placeable.h"
-
-#include "context.h"
+#include "../services.h"
 
 using namespace std;
 
@@ -29,8 +28,8 @@ namespace reone {
 
 namespace game {
 
-void OpenContainerAction::execute(Object &actor, ActionContext &ctx, float dt) {
-    auto creatureActor = ctx.objectFactory.getObjectById<Creature>(actor.id());
+void OpenContainerAction::execute(Object &actor, float dt) {
+    auto creatureActor = _services.objectFactory.getObjectById<Creature>(actor.id());
     auto placeable = static_pointer_cast<Placeable>(_object);
     bool reached = creatureActor->navigateTo(placeable->position(), true, kDefaultMaxObjectDistance, dt);
     if (reached) {

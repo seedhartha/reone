@@ -29,6 +29,7 @@
 #include "../../../game.h"
 #include "../../../script/routine/argutil.h"
 #include "../../../script/routine/context.h"
+#include "../../../services.h"
 #include "../../../types.h"
 
 using namespace std;
@@ -42,32 +43,32 @@ namespace game {
 namespace routine {
 
 Variable effectAssuredHit(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newAssuredHit();
+    auto effect = ctx.services.effectFactory.newAssuredHit();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectHeal(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newHeal();
+    auto effect = ctx.services.effectFactory.newHeal();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamage(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDamage(0, DamageType::Universal, nullptr);
+    auto effect = ctx.services.effectFactory.newDamage(0, DamageType::Universal, nullptr);
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectAbilityIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newAbilityIncrease();
+    auto effect = ctx.services.effectFactory.newAbilityIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageResistance(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDamageResistance();
+    auto effect = ctx.services.effectFactory.newDamageResistance();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectResurrection(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newResurrection();
+    auto effect = ctx.services.effectFactory.newResurrection();
     return Variable::ofEffect(move(effect));
 }
 
@@ -105,97 +106,97 @@ Variable extraordinaryEffect(const vector<Variable> &args, const RoutineContext 
 }
 
 Variable effectACIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newACIncrease();
+    auto effect = ctx.services.effectFactory.newACIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSavingThrowIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newSavingThrowIncrease();
+    auto effect = ctx.services.effectFactory.newSavingThrowIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectAttackIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newAttackIncrease();
+    auto effect = ctx.services.effectFactory.newAttackIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageReduction(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDamageReduction();
+    auto effect = ctx.services.effectFactory.newDamageReduction();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDamageIncrease();
+    auto effect = ctx.services.effectFactory.newDamageIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectEntangle(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newEntangle();
+    auto effect = ctx.services.effectFactory.newEntangle();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDeath(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDeath();
+    auto effect = ctx.services.effectFactory.newDeath();
     return Variable::ofEffect(std::move(effect));
 }
 
 Variable effectKnockdown(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newKnockdown();
+    auto effect = ctx.services.effectFactory.newKnockdown();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectParalyze(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newParalyze();
+    auto effect = ctx.services.effectFactory.newParalyze();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSpellImmunity(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newSpellImmunity();
+    auto effect = ctx.services.effectFactory.newSpellImmunity();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceJump(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newForceJump();
+    auto effect = ctx.services.effectFactory.newForceJump();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSleep(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newSleep();
+    auto effect = ctx.services.effectFactory.newSleep();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectTemporaryForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newTemporaryForcePoints();
+    auto effect = ctx.services.effectFactory.newTemporaryForcePoints();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectConfused(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newConfused();
+    auto effect = ctx.services.effectFactory.newConfused();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectFrightened(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newFrightened();
+    auto effect = ctx.services.effectFactory.newFrightened();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectChoke(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newChoke();
+    auto effect = ctx.services.effectFactory.newChoke();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectStunned(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newStunned();
+    auto effect = ctx.services.effectFactory.newStunned();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectRegenerate(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newRegenerate();
+    auto effect = ctx.services.effectFactory.newRegenerate();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectMovementSpeedIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newMovementSpeedIncrease();
+    auto effect = ctx.services.effectFactory.newMovementSpeedIncrease();
     return Variable::ofEffect(move(effect));
 }
 
@@ -204,57 +205,57 @@ Variable getEffectType(const vector<Variable> &args, const RoutineContext &ctx) 
 }
 
 Variable effectAreaOfEffect(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newAreaOfEffect();
+    auto effect = ctx.services.effectFactory.newAreaOfEffect();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectVisualEffect(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newVisual();
+    auto effect = ctx.services.effectFactory.newVisual();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectLinkEffects(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newLinkEffects();
+    auto effect = ctx.services.effectFactory.newLinkEffects();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectBeam(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newBeam();
+    auto effect = ctx.services.effectFactory.newBeam();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceResistanceIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newForceResistanceIncrease();
+    auto effect = ctx.services.effectFactory.newForceResistanceIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectBodyFuel(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newBodyFuel();
+    auto effect = ctx.services.effectFactory.newBodyFuel();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectPoison(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newPoison();
+    auto effect = ctx.services.effectFactory.newPoison();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectAssuredDeflection(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newAssuredDeflection();
+    auto effect = ctx.services.effectFactory.newAssuredDeflection();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForcePushTargeted(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newForcePushTargeted();
+    auto effect = ctx.services.effectFactory.newForcePushTargeted();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectHaste(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newHaste();
+    auto effect = ctx.services.effectFactory.newHaste();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectImmunity(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newImmunity();
+    auto effect = ctx.services.effectFactory.newImmunity();
     return Variable::ofEffect(move(effect));
 }
 
@@ -263,17 +264,17 @@ Variable getEffectSpellId(const vector<Variable> &args, const RoutineContext &ct
 }
 
 Variable effectDamageImmunityIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDamageImmunityIncrease();
+    auto effect = ctx.services.effectFactory.newDamageImmunityIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectTemporaryHitpoints(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newTemporaryHitPoints();
+    auto effect = ctx.services.effectFactory.newTemporaryHitPoints();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSkillIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newSkillIncrease();
+    auto effect = ctx.services.effectFactory.newSkillIncrease();
     return Variable::ofEffect(move(effect));
 }
 
@@ -290,162 +291,162 @@ Variable versusTrapEffect(const vector<Variable> &args, const RoutineContext &ct
 }
 
 Variable effectDamageForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDamageForcePoints();
+    auto effect = ctx.services.effectFactory.newDamageForcePoints();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectHealForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newHealForcePoints();
+    auto effect = ctx.services.effectFactory.newHealForcePoints();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectHitPointChangeWhenDying(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newHitPointsChangeWhenDying();
+    auto effect = ctx.services.effectFactory.newHitPointsChangeWhenDying();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDroidStun(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDroidStun();
+    auto effect = ctx.services.effectFactory.newDroidStun();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForcePushed(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newForcePushed();
+    auto effect = ctx.services.effectFactory.newForcePushed();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceResisted(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newForceResisted();
+    auto effect = ctx.services.effectFactory.newForceResisted();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceFizzle(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newForceFizzle();
+    auto effect = ctx.services.effectFactory.newForceFizzle();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectAbilityDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newAbilityDecrease();
+    auto effect = ctx.services.effectFactory.newAbilityDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectAttackDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newAttackDecrease();
+    auto effect = ctx.services.effectFactory.newAttackDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDamageDecrease();
+    auto effect = ctx.services.effectFactory.newDamageDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageImmunityDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDamageImmunityDecrease();
+    auto effect = ctx.services.effectFactory.newDamageImmunityDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectACDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newACDecrease();
+    auto effect = ctx.services.effectFactory.newACDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectMovementSpeedDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newMovementSpeedDecrease();
+    auto effect = ctx.services.effectFactory.newMovementSpeedDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSavingThrowDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newSavingThrowDecrease();
+    auto effect = ctx.services.effectFactory.newSavingThrowDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSkillDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newSkillDecrease();
+    auto effect = ctx.services.effectFactory.newSkillDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceResistanceDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newForceResistanceDecrease();
+    auto effect = ctx.services.effectFactory.newForceResistanceDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectInvisibility(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newInvisibility();
+    auto effect = ctx.services.effectFactory.newInvisibility();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectConcealment(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newConcealment();
+    auto effect = ctx.services.effectFactory.newConcealment();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceShield(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newForceShield();
+    auto effect = ctx.services.effectFactory.newForceShield();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDispelMagicAll(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDispelMagicAll();
+    auto effect = ctx.services.effectFactory.newDispelMagicAll();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDisguise(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDisguise();
+    auto effect = ctx.services.effectFactory.newDisguise();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectTrueSeeing(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newTrueSeeing();
+    auto effect = ctx.services.effectFactory.newTrueSeeing();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSeeInvisible(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newSeeInvisible();
+    auto effect = ctx.services.effectFactory.newSeeInvisible();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectTimeStop(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newTimeStop();
+    auto effect = ctx.services.effectFactory.newTimeStop();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectBlasterDeflectionIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newBlasterDeflectionIncrease();
+    auto effect = ctx.services.effectFactory.newBlasterDeflectionIncrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectBlasterDeflectionDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newBlasterDeflectionDecrease();
+    auto effect = ctx.services.effectFactory.newBlasterDeflectionDecrease();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectHorrified(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newHorrified();
+    auto effect = ctx.services.effectFactory.newHorrified();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectSpellLevelAbsorption(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newSpellLevelAbsorption();
+    auto effect = ctx.services.effectFactory.newSpellLevelAbsorption();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDispelMagicBest(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDispelMagicBest();
+    auto effect = ctx.services.effectFactory.newDispelMagicBest();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectMissChance(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newMissChance();
+    auto effect = ctx.services.effectFactory.newMissChance();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectModifyAttacks(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newModifyAttacks();
+    auto effect = ctx.services.effectFactory.newModifyAttacks();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageShield(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDamageShield();
+    auto effect = ctx.services.effectFactory.newDamageShield();
     return Variable::ofEffect(move(effect));
 }
 
@@ -454,94 +455,94 @@ Variable setEffectIcon(const vector<Variable> &args, const RoutineContext &ctx) 
 }
 
 Variable effectForceDrain(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newForceDrain();
+    auto effect = ctx.services.effectFactory.newForceDrain();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectPsychicStatic(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newPsychicStatic();
+    auto effect = ctx.services.effectFactory.newPsychicStatic();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectLightsaberThrow(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newLightsaberThrow();
+    auto effect = ctx.services.effectFactory.newLightsaberThrow();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectWhirlWind(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newWhirlWind();
+    auto effect = ctx.services.effectFactory.newWhirlWind();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectCutSceneHorrified(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newCutsceneHorrified();
+    auto effect = ctx.services.effectFactory.newCutsceneHorrified();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectCutSceneParalyze(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newCutsceneParalyze();
+    auto effect = ctx.services.effectFactory.newCutsceneParalyze();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectCutSceneStunned(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newCutsceneStunned();
+    auto effect = ctx.services.effectFactory.newCutsceneStunned();
     return Variable::ofEffect(move(effect));
 }
 
 // TSL
 
 Variable effectForceBody(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newForceBody();
+    auto effect = ctx.services.effectFactory.newForceBody();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectFury(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newFury();
+    auto effect = ctx.services.effectFactory.newFury();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectBlind(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newBlind();
+    auto effect = ctx.services.effectFactory.newBlind();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectFPRegenModifier(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newFPRegenModifier();
+    auto effect = ctx.services.effectFactory.newFPRegenModifier();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectVPRegenModifier(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newVPRegenModifier();
+    auto effect = ctx.services.effectFactory.newVPRegenModifier();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectCrush(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newCrush();
+    auto effect = ctx.services.effectFactory.newCrush();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDroidConfused(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDroidConfused();
+    auto effect = ctx.services.effectFactory.newDroidConfused();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceSight(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newForceSight();
+    auto effect = ctx.services.effectFactory.newForceSight();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectMindTrick(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newMindTrick();
+    auto effect = ctx.services.effectFactory.newMindTrick();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectFactionModifier(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newFactionModifier();
+    auto effect = ctx.services.effectFactory.newFactionModifier();
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDroidScramble(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = ctx.effectFactory.newDroidScramble();
+    auto effect = ctx.services.effectFactory.newDroidScramble();
     return Variable::ofEffect(move(effect));
 }
 

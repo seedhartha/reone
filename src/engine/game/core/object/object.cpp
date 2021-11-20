@@ -19,7 +19,6 @@
 
 #include "../../../common/collectionutil.h"
 
-#include "../action/context.h"
 #include "../services.h"
 
 using namespace std;
@@ -109,12 +108,11 @@ void Object::updateDelayedActions(float dt) {
 }
 
 void Object::executeActions(float dt) {
-    if (_actions.empty())
+    if (_actions.empty()) {
         return;
-
-    ActionContext ctx(_services.combat, _services.objectFactory, _services.party, _services.scriptRunner);
+    }
     shared_ptr<Action> action(_actions.front());
-    action->execute(*this, ctx, dt);
+    action->execute(*this, dt);
 }
 
 bool Object::hasUserActionsPending() const {

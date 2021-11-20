@@ -32,8 +32,8 @@ public:
 protected:
     std::shared_ptr<Location> _location;
 
-    LocationAction(Game &game, ActionType type, const std::shared_ptr<Location> &location) :
-        Action(game, type),
+    LocationAction(Game &game, Services &services, ActionType type, const std::shared_ptr<Location> &location) :
+        Action(game, services, type),
         _location(location) {
     }
 };

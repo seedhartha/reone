@@ -25,11 +25,11 @@ namespace game {
 
 class EquipMostDamagingMeleeAction : public Action {
 public:
-    EquipMostDamagingMeleeAction(Game &game) :
-        Action(game, ActionType::EquipMostDamagingMelee) {
+    EquipMostDamagingMeleeAction(Game &game, Services &services) :
+        Action(game, services, ActionType::EquipMostDamagingMelee) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

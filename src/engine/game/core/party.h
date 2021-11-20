@@ -35,6 +35,10 @@ public:
         std::shared_ptr<Creature> creature;
     };
 
+    Party(Game &game) :
+        _game(game) {
+    }
+
     bool handle(const SDL_Event &event);
 
     void clear();
@@ -49,7 +53,6 @@ public:
     std::shared_ptr<Creature> player() const { return _player; }
     const std::vector<Member> &members() const { return _members; }
 
-    void setGame(Game &game) { _game = &game; }
     void setPartyLeader(int npc);
     void setPartyLeaderByIndex(int index);
     void setPlayer(const std::shared_ptr<Creature> &player);
@@ -84,7 +87,8 @@ public:
     // END Available members
 
 private:
-    Game *_game {nullptr};
+    Game &_game;
+
     std::shared_ptr<Creature> _player;
     std::map<int, std::string> _availableMembers;
     std::vector<Member> _members;

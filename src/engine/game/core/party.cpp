@@ -122,7 +122,7 @@ void Party::onLeaderChanged() {
         member.creature->clearAllActions();
     }
 
-    _game->module()->area()->onPartyLeaderMoved(true);
+    _game.module()->area()->onPartyLeaderMoved(true);
 }
 
 const string &Party::getAvailableMember(int npc) const {

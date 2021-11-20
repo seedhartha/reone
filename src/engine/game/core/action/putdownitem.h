@@ -27,12 +27,12 @@ class Item;
 
 class PutDownItemAction : public Action {
 public:
-    PutDownItemAction(Game &game, std::shared_ptr<Item> item) :
-        Action(game, ActionType::PutDownItem),
+    PutDownItemAction(Game &game, Services &services, std::shared_ptr<Item> item) :
+        Action(game, services, ActionType::PutDownItem),
         _item(std::move(item)) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 
 private:
     std::shared_ptr<Item> _item;

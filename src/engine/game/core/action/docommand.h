@@ -31,12 +31,12 @@ namespace game {
 
 class CommandAction : public Action {
 public:
-    CommandAction(Game &game, std::shared_ptr<script::ExecutionContext> context) :
-        Action(game, ActionType::DoCommand),
+    CommandAction(Game &game, Services &services, std::shared_ptr<script::ExecutionContext> context) :
+        Action(game, services, ActionType::DoCommand),
         _context(move(context)) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 
     std::shared_ptr<script::ExecutionContext> context() const { return _context; }
 

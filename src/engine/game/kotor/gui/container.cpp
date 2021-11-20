@@ -122,7 +122,7 @@ shared_ptr<Texture> ContainerGUI::getItemFrameTexture(int stackSize) const {
 }
 
 void ContainerGUI::transferItemsToPlayer() {
-    shared_ptr<Creature> player(_services.party.player());
+    shared_ptr<Creature> player(_game.party().player());
     _container->moveDropableItemsTo(*player);
 
     auto placeable = dynamic_pointer_cast<Placeable>(_container);

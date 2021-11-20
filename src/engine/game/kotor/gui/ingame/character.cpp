@@ -159,7 +159,7 @@ void CharacterMenu::bindControls() {
 }
 
 void CharacterMenu::update(float dt) {
-    shared_ptr<Creature> leader(_services.party.getLeader());
+    shared_ptr<Creature> leader(_game.party().getLeader());
     _binding.btnLevelup->setVisible(leader->isLevelUpPending());
     _binding.btnAuto->setVisible(leader->isLevelUpPending());
     GUI::update(dt);
@@ -174,7 +174,7 @@ static string describeAbilityModifier(int value) {
 }
 
 void CharacterMenu::refreshControls() {
-    shared_ptr<Creature> partyLeader(_services.party.getLeader());
+    shared_ptr<Creature> partyLeader(_game.party().getLeader());
     CreatureAttributes &attributes = partyLeader->attributes();
 
     if (!_game.isTSL()) {
@@ -224,7 +224,7 @@ void CharacterMenu::refreshPortraits() {
     if (_game.isTSL())
         return;
 
-    Party &party = _services.party;
+    Party &party = _game.party();
     shared_ptr<Creature> partyMember1(party.getMember(1));
     shared_ptr<Creature> partyMember2(party.getMember(2));
 
@@ -252,7 +252,7 @@ void CharacterMenu::refresh3D() {
 }
 
 shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) const {
-    auto partyLeader = _services.party.getLeader();
+    auto partyLeader = _game.party().getLeader();
 
     auto character = _services.objectFactory.newCreature(sceneGraph.name());
     character->setFacing(-glm::half_pi<float>());

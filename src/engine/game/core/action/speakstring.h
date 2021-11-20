@@ -27,13 +27,13 @@ namespace game {
 
 class SpeakStringAction : public Action {
 public:
-    SpeakStringAction(Game &game, std::string stringToSpeak, TalkVolume talkVolume) :
-        Action(game, ActionType::SpeakString),
+    SpeakStringAction(Game &game, Services &services, std::string stringToSpeak, TalkVolume talkVolume) :
+        Action(game, services, ActionType::SpeakString),
         _stringToSpeak(std::move(stringToSpeak)),
         _talkVolume(talkVolume) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 
 private:
     std::string _stringToSpeak;

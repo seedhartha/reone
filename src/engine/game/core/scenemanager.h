@@ -43,7 +43,7 @@ public:
 
     void refresh(Area &area);
 
-    void onObjectAdded(const SpatialObject &object);
+    void onObjectCreated(const SpatialObject &object);
 
 private:
     Surfaces &_surfaces;

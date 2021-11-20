@@ -25,7 +25,7 @@ namespace reone {
 
 namespace game {
 
-void JumpToObjectAction::execute(Object &actor, ActionContext &ctx, float dt) {
+void JumpToObjectAction::execute(Object &actor, float dt) {
     auto spatialObject = static_pointer_cast<SpatialObject>(_object);
 
     auto spatialActor = static_cast<SpatialObject *>(&actor);

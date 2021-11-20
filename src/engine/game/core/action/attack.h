@@ -25,9 +25,10 @@ namespace game {
 
 class AttackAction : public ObjectAction {
 public:
-    AttackAction(Game &game, std::shared_ptr<Object> object, float range, bool userAction, bool passive) :
+    AttackAction(Game &game, Services &services, std::shared_ptr<Object> object, float range, bool userAction, bool passive) :
         ObjectAction(
             game,
+            services,
             ActionType::AttackObject,
             std::move(object),
             range,
@@ -35,7 +36,7 @@ public:
         _passive(passive) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 
 private:
     bool _passive;

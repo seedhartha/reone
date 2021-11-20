@@ -23,8 +23,7 @@
 #include "../object/door.h"
 #include "../object/factory.h"
 #include "../script/runner.h"
-
-#include "context.h"
+#include "../services.h"
 
 using namespace std;
 
@@ -32,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-void OpenLockAction::execute(Object &actor, ActionContext &ctx, float dt) {
+void OpenLockAction::execute(Object &actor, float dt) {
     if (!_object || _object->type() != ObjectType::Door) {
         warn("ActionExecutor: unsupported OpenLock object: " + to_string(_object->id()));
         complete();
@@ -40,7 +39,7 @@ void OpenLockAction::execute(Object &actor, ActionContext &ctx, float dt) {
     }
 
     auto door = static_pointer_cast<Door>(_object);
-    auto creatureActor = ctx.objectFactory.getObjectById<Creature>(actor.id());
+    auto creatureActor = _services.objectFactory.getObjectById<Creature>(actor.id());
 
     bool reached = creatureActor->navigateTo(door->position(), true, kDefaultMaxObjectDistance, dt);
     if (reached) {
@@ -53,7 +52,7 @@ void OpenLockAction::execute(Object &actor, ActionContext &ctx, float dt) {
 
             string onOpen(door->getOnOpen());
             if (!onOpen.empty()) {
-                ctx.scriptRunner.run(onOpen, door->id(), actor.id());
+                _services.scriptRunner.run(onOpen, door->id(), actor.id());
             }
         }
 

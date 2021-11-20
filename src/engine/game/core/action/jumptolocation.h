@@ -25,11 +25,11 @@ namespace game {
 
 class JumpToLocationAction : public LocationAction {
 public:
-    JumpToLocationAction(Game &game, std::shared_ptr<Location> location) :
-        LocationAction(game, ActionType::JumpToLocation, std::move(location)) {
+    JumpToLocationAction(Game &game, Services &services, std::shared_ptr<Location> location) :
+        LocationAction(game, services, ActionType::JumpToLocation, std::move(location)) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

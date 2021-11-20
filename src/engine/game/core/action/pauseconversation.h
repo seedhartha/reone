@@ -25,11 +25,11 @@ namespace game {
 
 class PauseConversationAction : public Action {
 public:
-    PauseConversationAction(Game &game) :
-        Action(game, ActionType::PauseConversation) {
+    PauseConversationAction(Game &game, Services &services) :
+        Action(game, services, ActionType::PauseConversation) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

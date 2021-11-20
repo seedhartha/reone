@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void WaitAction::execute(Object &actor, ActionContext &ctx, float dt) {
+void WaitAction::execute(Object &actor, float dt) {
     if (advance(dt)) {
         complete();
     }

@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void BarkStringAction::execute(Object &actor, ActionContext &ctx, float dt) {
+void BarkStringAction::execute(Object &actor, float dt) {
     // TODO: implement
 
     complete();

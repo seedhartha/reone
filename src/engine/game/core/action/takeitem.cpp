@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void TakeItemAction::execute(Object &actor, ActionContext &ctx, float dt) {
+void TakeItemAction::execute(Object &actor, float dt) {
     // TODO: implement
 
     complete();

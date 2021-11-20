@@ -18,7 +18,6 @@
 #pragma once
 
 #include "../../game/core/action/factory.h"
-#include "../../game/core/combat.h"
 #include "../../game/core/cursors.h"
 #include "../../game/core/d20/classes.h"
 #include "../../game/core/d20/feats.h"
@@ -28,7 +27,6 @@
 #include "../../game/core/footstepsounds.h"
 #include "../../game/core/game.h"
 #include "../../game/core/object/factory.h"
-#include "../../game/core/party.h"
 #include "../../game/core/portraits.h"
 #include "../../game/core/reputes.h"
 #include "../../game/core/scenemanager.h"
@@ -89,7 +87,6 @@ private:
 
     std::unique_ptr<game::ActionFactory> _actionFactory;
     std::unique_ptr<game::Classes> _classes;
-    std::unique_ptr<game::Combat> _combat;
     std::unique_ptr<game::Cursors> _cursors;
     std::unique_ptr<game::EffectFactory> _effectFactory;
     std::unique_ptr<game::Feats> _feats;
@@ -97,7 +94,6 @@ private:
     std::unique_ptr<game::Game> _game;
     std::unique_ptr<game::GUISounds> _guiSounds;
     std::unique_ptr<game::ObjectFactory> _objectFactory;
-    std::unique_ptr<game::Party> _party;
     std::unique_ptr<game::Portraits> _portraits;
     std::unique_ptr<game::Reputes> _reputes;
     std::unique_ptr<game::Routines> _routines;

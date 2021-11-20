@@ -25,11 +25,11 @@ namespace game {
 
 class BarkStringAction : public Action {
 public:
-    BarkStringAction(Game &game) :
-        Action(game, ActionType::BarkString) {
+    BarkStringAction(Game &game, Services &services) :
+        Action(game, services, ActionType::BarkString) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

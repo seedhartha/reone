@@ -25,12 +25,12 @@ namespace game {
 
 class MoveToLocationAction : public LocationAction {
 public:
-    MoveToLocationAction(Game &game, std::shared_ptr<Location> destination, bool run) :
-        LocationAction(game, ActionType::MoveToLocation, std::move(destination)),
+    MoveToLocationAction(Game &game, Services &services, std::shared_ptr<Location> destination, bool run) :
+        LocationAction(game, services, ActionType::MoveToLocation, std::move(destination)),
         _run(run) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 
     bool isRun() const { return _run; }
 

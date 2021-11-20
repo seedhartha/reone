@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void SurrenderToEnemiesAction::execute(Object &actor, ActionContext &ctx, float dt) {
+void SurrenderToEnemiesAction::execute(Object &actor, float dt) {
     // TODO: implement
 
     complete();
