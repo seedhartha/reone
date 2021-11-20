@@ -58,6 +58,8 @@ public:
         _textures(textures) {
     }
 
+    void add(std::string name);
+
     SceneGraph &get(const std::string &name);
 
 private:

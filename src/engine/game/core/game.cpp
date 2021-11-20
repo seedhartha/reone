@@ -508,7 +508,7 @@ void Game::updateSceneGraph(float dt) {
         lightingRefNode = camera->sceneNode();
     }
 
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneNameMain);
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
     sceneGraph.setActiveCamera(camera->sceneNode());
     sceneGraph.setLightingRefNode(lightingRefNode);
     sceneGraph.setUpdateRoots(!_paused);

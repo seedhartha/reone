@@ -161,7 +161,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
 
     // 3D control
 
-    string sceneName(kSceneNameClassSelect);
+    string sceneName(kSceneClassSelect);
     sceneName += "." + to_string(index);
 
     auto &sceneGraph = _services.sceneGraphs.get(sceneName);

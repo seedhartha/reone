@@ -40,7 +40,7 @@ namespace reone {
 namespace game {
 
 void SceneManager::refresh(Area &area) {
-    auto &sceneGraph = _sceneGraphs.get(kSceneNameMain);
+    auto &sceneGraph = _sceneGraphs.get(kSceneMain);
     sceneGraph.clear();
 
     // Area properties
@@ -102,7 +102,7 @@ void SceneManager::onObjectAdded(const SpatialObject &object) {
     if (!sceneNode) {
         return;
     }
-    auto &sceneGraph = _sceneGraphs.get(kSceneNameMain);
+    auto &sceneGraph = _sceneGraphs.get(kSceneMain);
     sceneGraph.addRoot(sceneNode);
 }
 

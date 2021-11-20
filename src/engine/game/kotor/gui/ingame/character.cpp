@@ -236,7 +236,7 @@ void CharacterMenu::refreshPortraits() {
 }
 
 void CharacterMenu::refresh3D() {
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneNameCharacter);
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneCharacter);
     float aspect = _binding.lbl3dChar->extent().width / static_cast<float>(_binding.lbl3dChar->extent().height);
 
     SceneInitializer(sceneGraph)
@@ -248,7 +248,7 @@ void CharacterMenu::refresh3D() {
         .lightingRefFromModelNode("charmain_light")
         .invoke();
 
-    _binding.lbl3dChar->setSceneName(kSceneNameCharacter);
+    _binding.lbl3dChar->setSceneName(kSceneCharacter);
 }
 
 shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) const {

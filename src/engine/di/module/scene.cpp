@@ -18,6 +18,7 @@
 #include "scene.h"
 
 #include "../../game/core/types.h"
+#include "../../game/kotor/types.h"
 
 #include "graphics.h"
 
@@ -42,8 +43,18 @@ void SceneModule::init() {
         _graphics.shaders(),
         _graphics.textures());
 
-    auto &mainGraph = _sceneGraphs->get(kSceneNameMain);
-    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, mainGraph, _graphics.context(), _graphics.meshes(), _graphics.shaders());
+    _sceneGraphs->add(kSceneMain);
+    _sceneGraphs->add(kSceneMainMenu);
+    _sceneGraphs->add(kSceneCharGen);
+    for (int i = 0; i < kNumClasses; ++i) {
+        _sceneGraphs->add(str(boost::format("%s.%d") % kSceneClassSelect % i));
+    }
+    _sceneGraphs->add(kScenePortraitSelect);
+    _sceneGraphs->add(kSceneCharacter);
+
+    auto &mainScene = _sceneGraphs->get(kSceneMain);
+
+    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, mainScene, _graphics.context(), _graphics.meshes(), _graphics.shaders());
     _worldRenderPipeline->init();
 
     _controlRenderPipeline = make_unique<ControlRenderPipeline>(*_sceneGraphs, _graphics.context(), _graphics.meshes(), _graphics.shaders());

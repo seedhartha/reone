@@ -147,7 +147,7 @@ void MainMenu::setup3DView() {
         return;
     }
 
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneNameMainMenu);
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMainMenu);
     const Control::Extent &extent = _binding.lbl3dView->extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 
@@ -160,7 +160,7 @@ void MainMenu::setup3DView() {
         .lightingRefFromModelNode("rootdummy")
         .invoke();
 
-    _binding.lbl3dView->setSceneName(kSceneNameMainMenu);
+    _binding.lbl3dView->setSceneName(kSceneMainMenu);
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
