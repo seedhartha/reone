@@ -103,6 +103,15 @@ void SceneManager::refresh(Area &area) {
     }
 }
 
+void SceneManager::onObjectAdded(const SpatialObject &object) {
+    auto sceneNode = object.sceneNode();
+    if (!sceneNode) {
+        return;
+    }
+    auto &sceneGraph = _sceneGraphs.get(kSceneNameMain);
+    sceneGraph.addRoot(sceneNode);
+}
+
 } // namespace game
 
 } // namespace reone

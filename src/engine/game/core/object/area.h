@@ -78,7 +78,6 @@ public:
     void update(float dt);
 
     void destroyObject(const SpatialObject &object);
-    void fill(scene::SceneGraph &sceneGraph);
     void initCameras(const glm::vec3 &entryPosition, float entryFacing);
 
     void onPartyLeaderMoved(bool roomChanged = false);
