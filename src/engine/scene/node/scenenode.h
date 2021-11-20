@@ -19,7 +19,6 @@
 
 #include "../../graphics/aabb.h"
 
-#include "../nodeelement.h"
 #include "../types.h"
 
 namespace reone {
@@ -40,11 +39,11 @@ class SceneNode : boost::noncopyable {
 public:
     void addChild(std::shared_ptr<SceneNode> node);
     void removeChild(SceneNode &node);
+    void removeAllChildren();
 
     virtual void update(float dt);
     virtual void draw();
-
-    virtual void drawElements(const std::vector<std::shared_ptr<SceneNodeElement>> &elements, int count = -1) {}
+    virtual void drawElements(const std::vector<SceneNode *> &elements, int count = -1) {}
 
     bool isVisible() const { return _visible; }
     bool isCullable() const { return _cullable; }
@@ -77,6 +76,7 @@ public:
 
     const std::string &name() const { return _name; }
     SceneNodeType type() const { return _type; }
+    SceneNode *parent() { return _parent; }
     const SceneNode *parent() const { return _parent; }
     const std::vector<std::shared_ptr<SceneNode>> &children() const { return _children; }
     const graphics::AABB &aabb() const { return _aabb; }
@@ -100,7 +100,7 @@ protected:
     SceneNodeType _type;
 
     graphics::AABB _aabb;
-    const SceneNode *_parent {nullptr};
+    SceneNode *_parent {nullptr};
     std::vector<std::shared_ptr<SceneNode>> _children;
 
     // Services

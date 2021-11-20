@@ -17,53 +17,40 @@
 
 #pragma once
 
-#include "../../common/guardutil.h"
-
 #include "scenenode.h"
 
 namespace reone {
 
-namespace graphics {
-
-class Texture;
-
-}
-
 namespace scene {
 
-class GrassClusterSceneNode;
-
-class GrassSceneNode : public SceneNode {
+class GrassClusterSceneNode : public SceneNode {
 public:
-    GrassSceneNode(
-        std::string name,
-        glm::vec2 quadSize,
-        std::shared_ptr<graphics::Texture> texture,
-        std::shared_ptr<graphics::Texture> lightmap,
+    GrassClusterSceneNode(
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders) :
         SceneNode(
-            std::move(name),
-            SceneNodeType::Grass,
+            "",
+            SceneNodeType::GrassCluster,
             sceneGraph,
             context,
             meshes,
-            shaders),
-        _quadSize(std::move(quadSize)),
-        _texture(ensurePresent(texture, "texture")),
-        _lightmap(lightmap) {
+            shaders) {
     }
 
-    void drawElements(const std::vector<SceneNode *> &elements, int count) override;
+    const glm::vec3 &position() const { return _position; }
+    const glm::vec2 &lightmapUV() const { return _lightmapUV; }
+    int variant() const { return _variant; }
 
-    std::unique_ptr<GrassClusterSceneNode> newCluster();
+    void setPosition(glm::vec3 position) { _position = std::move(position); }
+    void setLightmapUV(glm::vec2 uv) { _lightmapUV = std::move(uv); }
+    void setVariant(int variant) { _variant = variant; }
 
 private:
-    glm::vec2 _quadSize {0.0f};
-    std::shared_ptr<graphics::Texture> _texture;
-    std::shared_ptr<graphics::Texture> _lightmap;
+    glm::vec3 _position {0.0f};
+    glm::vec2 _lightmapUV {0.0f};
+    int _variant {0};
 };
 
 } // namespace scene

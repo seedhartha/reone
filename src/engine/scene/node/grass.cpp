@@ -26,6 +26,8 @@
 
 #include "../graph.h"
 
+#include "grasscluster.h"
+
 using namespace std;
 
 using namespace reone::graphics;
@@ -34,17 +36,10 @@ namespace reone {
 
 namespace scene {
 
-void GrassSceneNode::clear() {
-    _clusters.clear();
-}
-
-void GrassSceneNode::addCluster(shared_ptr<Cluster> cluster) {
-    _clusters.push_back(move(cluster));
-}
-
-void GrassSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &elements, int count) {
-    if (elements.empty())
+void GrassSceneNode::drawElements(const vector<SceneNode *> &elements, int count) {
+    if (elements.empty()) {
         return;
+    }
     if (count == -1) {
         count = static_cast<int>(elements.size());
     }
@@ -63,14 +58,18 @@ void GrassSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &el
     }
 
     for (int i = 0; i < count; ++i) {
-        auto cluster = static_pointer_cast<GrassSceneNode::Cluster>(elements[i]);
+        auto cluster = static_cast<GrassClusterSceneNode *>(elements[i]);
         uniforms.grass->quadSize = _quadSize;
-        uniforms.grass->clusters[i].positionVariant = glm::vec4(cluster->position, static_cast<float>(cluster->variant));
-        uniforms.grass->clusters[i].lightmapUV = cluster->lightmapUV;
+        uniforms.grass->clusters[i].positionVariant = glm::vec4(cluster->position(), static_cast<float>(cluster->variant()));
+        uniforms.grass->clusters[i].lightmapUV = cluster->lightmapUV();
     }
 
     _shaders.activate(ShaderProgram::GrassGrass, uniforms);
     _meshes.grass().drawInstanced(count);
+}
+
+unique_ptr<GrassClusterSceneNode> GrassSceneNode::newCluster() {
+    return make_unique<GrassClusterSceneNode>(_sceneGraph, _context, _meshes, _shaders);
 }
 
 } // namespace scene

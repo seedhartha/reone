@@ -24,9 +24,11 @@
 #include "node/camera.h"
 #include "node/emitter.h"
 #include "node/grass.h"
+#include "node/grasscluster.h"
 #include "node/light.h"
 #include "node/mesh.h"
 #include "node/model.h"
+#include "node/particle.h"
 
 using namespace std;
 
@@ -219,19 +221,20 @@ void SceneGraph::prepareTransparentMeshes() {
 void SceneGraph::prepareLeafs() {
     static glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
 
-    vector<pair<shared_ptr<SceneNodeElement>, float>> elements;
+    vector<pair<SceneNode *, float>> elements;
     glm::vec3 cameraPos(_activeCamera->absoluteTransform()[3]);
 
     // Add grass clusters
     for (auto &grass : _grass) {
         float grassDistance2 = kMaxGrassDistance * kMaxGrassDistance;
         size_t numLeafs = elements.size();
-        for (auto &cluster : grass->clusters()) {
-            float distance2 = glm::distance2(cameraPos, cluster->position);
+        for (auto &grassChild : grass->children()) {
+            auto cluster = static_pointer_cast<GrassClusterSceneNode>(grassChild);
+            float distance2 = glm::distance2(cameraPos, cluster->position());
             if (distance2 <= grassDistance2) {
-                glm::vec3 screen(glm::project(cluster->position, _activeCamera->view(), _activeCamera->projection(), viewport));
+                glm::vec3 screen(glm::project(cluster->position(), _activeCamera->view(), _activeCamera->projection(), viewport));
                 if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
-                    elements.push_back(make_pair(cluster, screen.z));
+                    elements.push_back(make_pair(cluster.get(), screen.z));
                 }
             }
         }
@@ -240,10 +243,11 @@ void SceneGraph::prepareLeafs() {
     // Add particles
     for (auto &emitter : _emitters) {
         glm::mat4 modelView(_activeCamera->view() * emitter->absoluteTransform());
-        for (auto &particle : emitter->particles()) {
-            glm::vec3 screen(glm::project(particle->position, modelView, _activeCamera->projection(), viewport));
+        for (auto &emitterChild : emitter->children()) {
+            auto particle = static_pointer_cast<ParticleSceneNode>(emitterChild);
+            glm::vec3 screen(glm::project(particle->position(), modelView, _activeCamera->projection(), viewport));
             if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
-                elements.push_back(make_pair(particle, screen.z));
+                elements.push_back(make_pair(particle.get(), screen.z));
             }
         }
     }
@@ -253,16 +257,16 @@ void SceneGraph::prepareLeafs() {
 
     // Group elements into buckets
     _elements.clear();
-    vector<shared_ptr<SceneNodeElement>> nodeElements;
+    vector<SceneNode *> nodeElements;
     for (auto &elementDepth : elements) {
         if (!nodeElements.empty()) {
-            _elements.push_back(make_pair(nodeElements[0]->parent, nodeElements));
+            _elements.push_back(make_pair(nodeElements[0]->parent(), nodeElements));
             nodeElements.clear();
         }
         nodeElements.push_back(elementDepth.first);
     }
     if (!nodeElements.empty()) {
-        _elements.push_back(make_pair(nodeElements[0]->parent, nodeElements));
+        _elements.push_back(make_pair(nodeElements[0]->parent(), nodeElements));
     }
 }
 
@@ -306,9 +310,9 @@ void SceneGraph::draw(bool shadowPass) {
     _context.setBackFaceCullingEnabled(false);
 
     // Render particles and grass clusters
-    for (auto &nodeLeaf : _elements) {
-        int count = nodeLeaf.first->type() == SceneNodeType::Grass && nodeLeaf.second.size() > kMaxGrassClusters ? kMaxGrassClusters : -1;
-        nodeLeaf.first->drawElements(nodeLeaf.second, count);
+    for (auto &elem : _elements) {
+        int count = elem.first->type() == SceneNodeType::Grass && elem.second.size() > kMaxGrassClusters ? kMaxGrassClusters : -1;
+        elem.first->drawElements(elem.second, count);
     }
 
     // Render lens flares

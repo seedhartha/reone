@@ -28,6 +28,7 @@
 #include "../graph.h"
 
 #include "camera.h"
+#include "particle.h"
 
 using namespace std;
 
@@ -92,19 +93,20 @@ void EmitterSceneNode::update(float dt) {
     removeExpiredParticles(dt);
     spawnParticles(dt);
 
-    for (auto &particle : _particles) {
-        updateParticle(*particle, dt);
+    for (auto &child : _children) {
+        auto particle = static_pointer_cast<ParticleSceneNode>(child);
+        particle->update(dt);
     }
 }
 
 void EmitterSceneNode::removeExpiredParticles(float dt) {
-    while (!_particles.empty() && isParticleExpired(*_particles[0])) {
-        _particles.pop_front();
+    if (_lifeExpectancy == -1.0f) {
+        return;
     }
-}
-
-bool EmitterSceneNode::isParticleExpired(Particle &particle) const {
-    return _lifeExpectancy != -1.0f && particle.lifetime >= _lifeExpectancy;
+    auto expired = remove_if(_children.begin(), _children.end(), [](auto &child) {
+        return static_pointer_cast<ParticleSceneNode>(child)->isExpired();
+    });
+    _children.erase(expired, _children.end());
 }
 
 void EmitterSceneNode::spawnParticles(float dt) {
@@ -119,7 +121,7 @@ void EmitterSceneNode::spawnParticles(float dt) {
         }
         break;
     case ModelNode::Emitter::UpdateMode::Single:
-        if (!_spawned || (_particles.empty() && emitter->loop)) {
+        if (!_spawned || (_children.empty() && emitter->loop)) {
             doSpawnParticle();
             _spawned = true;
         }
@@ -136,6 +138,10 @@ void EmitterSceneNode::spawnParticles(float dt) {
 }
 
 void EmitterSceneNode::doSpawnParticle() {
+    if (_children.size() >= kMaxParticles) {
+        return;
+    }
+
     float halfW = 0.005f * _size.x;
     float halfH = 0.005f * _size.y;
     glm::vec3 position(random(-halfW, halfW), random(-halfH, halfH), 0.0f);
@@ -147,19 +153,14 @@ void EmitterSceneNode::doSpawnParticle() {
 
     glm::vec3 velocity((_velocity + random(0.0f, _randomVelocity)) * dir);
 
-    auto particle = make_shared<Particle>();
-    particle->parent = this;
-    particle->position = move(position);
-    particle->velocity = move(velocity);
-    particle->frame = _frameStart;
+    auto particle = newParticle();
+    particle->setPosition(move(position));
+    particle->setVelocity(move(velocity));
+    particle->setFrame(_frameStart);
     if (_fps > 0.0f) {
-        particle->animLength = (_frameEnd - _frameStart + 1) / _fps;
+        particle->setAnimLength((_frameEnd - _frameStart + 1) / _fps);
     }
-
-    while (_particles.size() >= kMaxParticles) {
-        _particles.pop_front();
-    }
-    _particles.push_back(particle);
+    addChild(move(particle));
 }
 
 void EmitterSceneNode::spawnLightningParticles() {
@@ -191,80 +192,35 @@ void EmitterSceneNode::spawnLightningParticles() {
     }
     segments[_lightningSubDiv].second = emitterSpaceRefPos;
 
-    _particles.clear();
+    _children.clear();
     for (auto &segment : segments) {
         glm::vec3 endToStart(segment.second - segment.first);
         glm::vec3 center(0.5f * (segment.first + segment.second));
-        auto particle = make_shared<Particle>();
-        particle->parent = this;
-        particle->position = move(center);
-        particle->dir = _absTransform * glm::vec4(glm::normalize(endToStart), 0.0f);
-        particle->size = glm::vec2(_lightningScale, glm::length(endToStart));
-        _particles.push_back(move(particle));
+        auto particle = newParticle();
+        particle->setPosition(move(center));
+        particle->setDir(_absTransform * glm::vec4(glm::normalize(endToStart), 0.0f));
+        particle->setSize(glm::vec2(_lightningScale, glm::length(endToStart)));
+        addChild(move(particle));
     }
-}
-
-void EmitterSceneNode::updateParticle(Particle &particle, float dt) {
-    // Lightning emitters are updated elsewhere
-    if (_modelNode->emitter()->updateMode == ModelNode::Emitter::UpdateMode::Lightning)
-        return;
-
-    if (_lifeExpectancy != -1.0f) {
-        particle.lifetime = glm::min(particle.lifetime + dt, _lifeExpectancy);
-    } else if (particle.lifetime == particle.animLength) {
-        particle.lifetime = 0.0f;
-    } else {
-        particle.lifetime = glm::min(particle.lifetime + dt, particle.animLength);
-    }
-
-    if (!isParticleExpired(particle)) {
-        particle.position += particle.velocity * dt;
-
-        // Gravity-type P2P emitter
-        if (_modelNode->emitter()->p2p && !_modelNode->emitter()->p2pBezier) {
-            auto ref = find_if(_children.begin(), _children.end(), [](auto &child) { return child->type() == SceneNodeType::Dummy; });
-            if (ref != _children.end()) {
-                glm::vec3 emitterSpaceRefPos(_absTransformInv * (*ref)->absoluteTransform()[3]);
-                glm::vec3 pullDir(glm::normalize(emitterSpaceRefPos - particle.position));
-                particle.velocity += _grav * pullDir * dt;
-            }
-        }
-
-        updateParticleAnimation(particle, dt);
-    }
-}
-
-void EmitterSceneNode::updateParticleAnimation(Particle &particle, float dt) {
-    float factor;
-    if (_lifeExpectancy != -1.0f) {
-        factor = particle.lifetime / static_cast<float>(_lifeExpectancy);
-    } else if (particle.animLength > 0.0f) {
-        factor = particle.lifetime / particle.animLength;
-    } else {
-        factor = 0.0f;
-    }
-
-    particle.frame = static_cast<int>(glm::ceil(_frameStart + factor * (_frameEnd - _frameStart)));
-    particle.size = glm::vec2(_particleSize.get(factor));
-    particle.color = _color.get(factor);
-    particle.alpha = _alpha.get(factor);
 }
 
 void EmitterSceneNode::detonate() {
     doSpawnParticle();
 }
 
-void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &elements, int count) {
-    if (elements.empty())
+void EmitterSceneNode::drawElements(const vector<SceneNode *> &elements, int count) {
+    if (elements.empty()) {
         return;
+    }
     if (count == -1) {
         count = static_cast<int>(elements.size());
     }
 
     shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
     shared_ptr<Texture> texture(emitter->texture);
-    if (!texture)
+    if (!texture) {
         return;
+    }
 
     ShaderUniforms uniforms(_sceneGraph.uniformsPrototype());
     uniforms.combined.featureMask |= UniformFeatureFlags::particles;
@@ -272,21 +228,21 @@ void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &
     uniforms.particles->render = static_cast<int>(emitter->renderMode);
 
     for (int i = 0; i < count; ++i) {
-        auto particle = static_pointer_cast<Particle>(elements[i]);
+        auto particle = static_cast<ParticleSceneNode *>(elements[i]);
 
         glm::mat4 transform(_absTransform);
-        transform = glm::translate(transform, particle->position);
+        transform = glm::translate(transform, particle->position());
         if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
-            transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * kProjectileSpeed) * particle->size.x, particle->size.y, 1.0f));
+            transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * kProjectileSpeed) * particle->size().x, particle->size().y, 1.0f));
         } else {
-            transform = glm::scale(transform, glm::vec3(particle->size, 1.0f));
+            transform = glm::scale(transform, glm::vec3(particle->size(), 1.0f));
         }
 
         uniforms.particles->particles[i].transform = move(transform);
-        uniforms.particles->particles[i].dir = glm::vec4(particle->dir, 1.0f);
-        uniforms.particles->particles[i].color = glm::vec4(particle->color, particle->alpha);
-        uniforms.particles->particles[i].size = glm::vec2(particle->size);
-        uniforms.particles->particles[i].frame = particle->frame;
+        uniforms.particles->particles[i].dir = glm::vec4(particle->dir(), 1.0f);
+        uniforms.particles->particles[i].color = glm::vec4(particle->color(), particle->alpha());
+        uniforms.particles->particles[i].size = glm::vec2(particle->size());
+        uniforms.particles->particles[i].frame = particle->frame();
     }
 
     _shaders.activate(ShaderProgram::ParticleParticle, uniforms);
@@ -301,6 +257,10 @@ void EmitterSceneNode::drawElements(const vector<shared_ptr<SceneNodeElement>> &
     }
     _meshes.billboard().drawInstanced(count);
     _context.setBlendMode(oldBlendMode);
+}
+
+unique_ptr<ParticleSceneNode> EmitterSceneNode::newParticle() {
+    return make_unique<ParticleSceneNode>(*this, _sceneGraph, _context, _meshes, _shaders);
 }
 
 } // namespace scene

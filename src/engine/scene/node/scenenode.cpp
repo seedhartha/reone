@@ -57,6 +57,14 @@ void SceneNode::removeChild(SceneNode &node) {
     }
 }
 
+void SceneNode::removeAllChildren() {
+    for (auto &child : _children) {
+        child->_parent = nullptr;
+        child->computeAbsoluteTransforms();
+    }
+    _children.clear();
+}
+
 void SceneNode::update(float dt) {
     for (auto &child : _children) {
         child->update(dt);
