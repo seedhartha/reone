@@ -362,6 +362,7 @@ set(SCENE_HEADERS
     src/engine/scene/node/modelnode.h
     src/engine/scene/node/particle.h
     src/engine/scene/node/scenenode.h
+    src/engine/scene/node/walkmesh.h
     src/engine/scene/pipeline/control.h
     src/engine/scene/pipeline/world.h
     src/engine/scene/types.h)

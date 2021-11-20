@@ -17,6 +17,8 @@
 
 #include "room.h"
 
+#include "../../scene/node/model.h"
+
 #include "object/spatial.h"
 
 using namespace std;
@@ -28,24 +30,12 @@ namespace reone {
 
 namespace game {
 
-Room::Room(
-    const string &name,
-    const glm::vec3 &position,
-    const std::shared_ptr<ModelSceneNode> &model,
-    const std::shared_ptr<Walkmesh> &walkmesh) :
-    _name(name),
-    _position(position), _model(model), _walkmesh(walkmesh) {
-}
-
 void Room::addTenant(SpatialObject *object) {
     _tenants.insert(object);
 }
 
 void Room::removeTenant(SpatialObject *object) {
     _tenants.erase(object);
-}
-
-void Room::update(float dt) {
 }
 
 void Room::setVisible(bool visible) {

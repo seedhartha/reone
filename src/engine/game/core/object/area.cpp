@@ -38,6 +38,7 @@
 #include "../../../scene/graphs.h"
 #include "../../../scene/node/grass.h"
 #include "../../../scene/node/grasscluster.h"
+#include "../../../scene/node/walkmesh.h"
 #include "../../../scene/types.h"
 
 #include "../../core/types.h"
@@ -136,22 +137,27 @@ void Area::loadLYT() {
 
     for (auto &lytRoom : lyt.rooms()) {
         shared_ptr<Model> model(_services.models.get(lytRoom.name));
-        if (!model)
+        if (!model) {
             continue;
+        }
+        auto &sceneGraph = _services.sceneGraphs.get(kSceneNameMain);
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
-
-        auto sceneNode = _services.sceneGraphs.get(kSceneNameMain).newModel(model, ModelUsage::Room);
-        sceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
+        auto modelSceneNode = sceneGraph.newModel(model, ModelUsage::Room);
+        modelSceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {
-                sceneNode->playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
+                modelSceneNode->playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
             }
         }
 
+        shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
         shared_ptr<Walkmesh> walkmesh(_services.walkmeshes.get(lytRoom.name, ResourceType::Wok));
+        if (walkmesh) {
+            walkmeshSceneNode = sceneGraph.newWalkmesh(lytRoom.name, *walkmesh);
+        }
 
-        auto room = make_unique<Room>(lytRoom.name, position, move(sceneNode), walkmesh);
+        auto room = make_unique<Room>(lytRoom.name, position, move(modelSceneNode), move(walkmeshSceneNode));
         _rooms.insert(make_pair(room->name(), move(room)));
     }
 }
@@ -411,9 +417,6 @@ void Area::update(float dt) {
     if (!_game->isPaused()) {
         Object::update(dt);
 
-        for (auto &room : _rooms) {
-            room.second->update(dt);
-        }
         for (auto &object : _objects) {
             object->update(dt);
         }
@@ -1279,14 +1282,14 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
     for (auto &r : _rooms) {
         // Room must have a valid model and walkmesh
         shared_ptr<ModelSceneNode> model(r.second->model());
-        shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
+        shared_ptr<WalkmeshSceneNode> walkmesh(r.second->walkmesh());
         if (!model || !walkmesh) {
             continue;
         }
 
         glm::vec3 origin(point, kElevationTestZ);
         float distance;
-        auto face = walkmesh->raycast(walkcheckSurfaces, origin, down, 2.0f * kElevationTestZ, distance);
+        auto face = walkmesh->walkmesh().raycast(walkcheckSurfaces, origin, down, 2.0f * kElevationTestZ, distance);
         if (face) {
             if (!face->walkable) {
                 return false;
@@ -1379,13 +1382,13 @@ bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::
     for (auto &r : _rooms) {
         // Room must have a valid model and walkmesh
         shared_ptr<ModelSceneNode> model(r.second->model());
-        shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
+        shared_ptr<WalkmeshSceneNode> walkmesh(r.second->walkmesh());
         if (!model || !walkmesh) {
             continue;
         }
 
         float distance;
-        auto face = walkmesh->raycast(walkcheckSurfaces, start, dir, maxDistance, distance);
+        auto face = walkmesh->walkmesh().raycast(walkcheckSurfaces, start, dir, maxDistance, distance);
         if (face && distance < minDistance) {
             minDistance = distance;
         }
@@ -1412,13 +1415,13 @@ bool Area::getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm
     // Test room walkmeshes
     for (auto &r : _rooms) {
         shared_ptr<ModelSceneNode> model(r.second->model());
-        shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
+        shared_ptr<WalkmeshSceneNode> walkmesh(r.second->walkmesh());
         if (!model || !walkmesh) {
             continue;
         }
 
         float distance;
-        auto face = walkmesh->raycast(walkcheckSurfaces, start, dir, maxDistance, distance);
+        auto face = walkmesh->walkmesh().raycast(walkcheckSurfaces, start, dir, maxDistance, distance);
         if (face && distance < minDistance) {
             minDistance = distance;
             normal = face->normal;
@@ -1463,7 +1466,7 @@ bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target)
     auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaceIndices();
     for (auto &r : _rooms) {
         shared_ptr<ModelSceneNode> model(r.second->model());
-        shared_ptr<Walkmesh> walkmesh(r.second->walkmesh());
+        shared_ptr<WalkmeshSceneNode> walkmesh(r.second->walkmesh());
         if (!model || !walkmesh) {
             continue;
         }
@@ -1476,7 +1479,7 @@ bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target)
         }
 
         float distance;
-        auto face = walkmesh->raycast(walkcheckSurfaces, start, dir, maxDistance, distance);
+        auto face = walkmesh->walkmesh().raycast(walkcheckSurfaces, start, dir, maxDistance, distance);
         if (face) {
             return false;
         }

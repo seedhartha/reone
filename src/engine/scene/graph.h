@@ -38,6 +38,7 @@ class Meshes;
 class PBRIBL;
 class Shaders;
 class Textures;
+class Walkmesh;
 
 } // namespace graphics
 
@@ -45,6 +46,7 @@ namespace scene {
 
 class IAnimationEventListener;
 class ModelSceneNode;
+class WalkmeshSceneNode;
 
 /**
  * Responsible for managing drawable objects and their relations.
@@ -135,13 +137,14 @@ public:
     // Factory methods
 
     std::unique_ptr<DummySceneNode> newDummy(std::shared_ptr<graphics::ModelNode> modelNode);
+    std::unique_ptr<CameraSceneNode> newCamera(std::string name, glm::mat4 projection);
 
     std::unique_ptr<ModelSceneNode> newModel(
         std::shared_ptr<graphics::Model> model,
         ModelUsage usage,
         IAnimationEventListener *animEventListener = nullptr);
 
-    std::unique_ptr<CameraSceneNode> newCamera(std::string name, glm::mat4 projection);
+    std::unique_ptr<WalkmeshSceneNode> newWalkmesh(std::string name, const graphics::Walkmesh &walkmesh);
 
     // END Factory methods
 
