@@ -28,7 +28,7 @@ class EmitterSceneNode;
 class ParticleSceneNode : public SceneNode {
 public:
     ParticleSceneNode(
-        EmitterSceneNode &emitter,
+        const EmitterSceneNode &emitter,
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
@@ -66,7 +66,7 @@ public:
     void setLifetime(float lifetime) { _lifetime = lifetime; }
 
 private:
-    EmitterSceneNode &_emitter;
+    const EmitterSceneNode &_emitter;
 
     glm::vec3 _position {0.0f};
     glm::vec3 _dir {0.0f}; // used in Linked render mode
