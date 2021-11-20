@@ -20,6 +20,7 @@
 #include "../graphics/context.h"
 #include "../graphics/mesh/mesh.h"
 #include "../graphics/mesh/meshes.h"
+#include "../graphics/walkmesh/walkmesh.h"
 
 #include "node/camera.h"
 #include "node/emitter.h"
@@ -29,6 +30,7 @@
 #include "node/mesh.h"
 #include "node/model.h"
 #include "node/particle.h"
+#include "node/walkmesh.h"
 
 using namespace std;
 
@@ -388,6 +390,16 @@ unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode)
     return make_unique<DummySceneNode>(move(modelNode), *this, _context, _meshes, _shaders);
 }
 
+unique_ptr<CameraSceneNode> SceneGraph::newCamera(string name, glm::mat4 projection) {
+    return make_unique<CameraSceneNode>(
+        move(name),
+        move(projection),
+        *this,
+        _context,
+        _meshes,
+        _shaders);
+}
+
 unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUsage usage, IAnimationEventListener *animEventListener) {
     return make_unique<ModelSceneNode>(
         move(model),
@@ -403,10 +415,10 @@ unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUs
         animEventListener);
 }
 
-unique_ptr<CameraSceneNode> SceneGraph::newCamera(string name, glm::mat4 projection) {
-    return make_unique<CameraSceneNode>(
+unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(string name, const Walkmesh &walkmesh) {
+    return make_unique<WalkmeshSceneNode>(
         move(name),
-        move(projection),
+        walkmesh,
         *this,
         _context,
         _meshes,

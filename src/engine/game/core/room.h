@@ -17,10 +17,14 @@
 
 #pragma once
 
-#include "../../graphics/walkmesh/walkmesh.h"
-#include "../../scene/node/model.h"
-
 namespace reone {
+
+namespace scene {
+
+class ModelSceneNode;
+class WalkmeshSceneNode;
+
+} // namespace scene
 
 namespace game {
 
@@ -29,21 +33,25 @@ class SpatialObject;
 class Room {
 public:
     Room(
-        const std::string &name,
-        const glm::vec3 &position,
-        const std::shared_ptr<scene::ModelSceneNode> &model,
-        const std::shared_ptr<graphics::Walkmesh> &walkmesh);
+        std::string name,
+        glm::vec3 position,
+        std::shared_ptr<scene::ModelSceneNode> model,
+        std::shared_ptr<scene::WalkmeshSceneNode> walkmesh) :
+        _name(std::move(name)),
+        _position(std::move(position)),
+        _model(model),
+        _walkmesh(walkmesh) {
+    }
 
     void addTenant(SpatialObject *object);
     void removeTenant(SpatialObject *object);
-    void update(float dt);
 
     bool isVisible() const { return _visible; }
 
     const std::string &name() const { return _name; }
     const glm::vec3 &position() const { return _position; }
     std::shared_ptr<scene::ModelSceneNode> model() const { return _model; }
-    std::shared_ptr<graphics::Walkmesh> walkmesh() const { return _walkmesh; }
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmesh() const { return _walkmesh; }
 
     void setVisible(bool visible);
 
@@ -51,7 +59,8 @@ private:
     std::string _name;
     glm::vec3 _position {0.0f};
     std::shared_ptr<scene::ModelSceneNode> _model;
-    std::shared_ptr<graphics::Walkmesh> _walkmesh;
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmesh;
+
     std::set<SpatialObject *> _tenants;
     bool _visible {true};
 };
