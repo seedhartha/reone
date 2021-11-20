@@ -24,31 +24,14 @@
 
 namespace reone {
 
-namespace graphics {
-
-class Fonts;
-class Meshes;
-class Shaders;
-class Window;
-
-} // namespace graphics
-
 namespace game {
 
-class EffectFactory;
 class Game;
-class Party;
+struct Services;
 
 class Console : boost::noncopyable {
 public:
-    Console(
-        Game &game,
-        EffectFactory &effectFactory,
-        Party &party,
-        graphics::Fonts &fonts,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Window &window);
+    Console(Game &game, Services &services);
 
     void init();
     bool handle(const SDL_Event &event);
@@ -60,8 +43,8 @@ private:
     typedef std::function<void(std::vector<std::string>)> CommandHandler;
 
     Game &_game;
+    Services &_services;
 
-    graphics::GraphicsOptions _opts;
     std::shared_ptr<graphics::Font> _font;
     bool _open {false};
     gui::TextInput _input;
@@ -79,18 +62,6 @@ private:
 
     void drawBackground();
     void drawLines();
-
-    // Services
-
-    EffectFactory &_effectFactory;
-    Party &_party;
-
-    graphics::Fonts &_fonts;
-    graphics::Meshes &_meshes;
-    graphics::Shaders &_shaders;
-    graphics::Window &_window;
-
-    // END Services
 
     // Commands
 

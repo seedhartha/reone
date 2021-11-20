@@ -29,7 +29,6 @@
 #include "../../../object/creature.h"
 #include "../../../script/routine/argutil.h"
 #include "../../../script/routine/context.h"
-#include "../../../services.h"
 
 using namespace std;
 
@@ -42,7 +41,7 @@ namespace game {
 namespace routine {
 
 Variable actionRandomWalk(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto action = ctx.services.actionFactory.newRandomWalk();
+    auto action = ctx.game.actionFactory().newRandomWalk();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -52,7 +51,7 @@ Variable actionMoveToLocation(const vector<Variable> &args, const RoutineContext
     auto destination = getLocationEngineType(args, 0);
     bool run = getBoolOrElse(args, 1, false);
 
-    auto action = ctx.services.actionFactory.newMoveToLocation(move(destination), run);
+    auto action = ctx.game.actionFactory().newMoveToLocation(move(destination), run);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -63,7 +62,7 @@ Variable actionMoveToObject(const vector<Variable> &args, const RoutineContext &
     bool run = getBoolOrElse(args, 1, false);
     float range = getFloatOrElse(args, 2, 1.0f);
 
-    auto action = ctx.services.actionFactory.newMoveToObject(move(moveTo), run, range);
+    auto action = ctx.game.actionFactory().newMoveToObject(move(moveTo), run, range);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -74,7 +73,7 @@ Variable actionMoveAwayFromObject(const vector<Variable> &args, const RoutineCon
     bool run = getBoolOrElse(args, 1, false);
     float range = getFloatOrElse(args, 2, 40.0f);
 
-    auto action = ctx.services.actionFactory.newMoveAwayFromObject(move(fleeFrom), run, range);
+    auto action = ctx.game.actionFactory().newMoveAwayFromObject(move(fleeFrom), run, range);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -85,7 +84,7 @@ Variable actionEquipItem(const vector<Variable> &args, const RoutineContext &ctx
     int inventorySlot = getInt(args, 1);
     bool instant = getBoolOrElse(args, 2, false);
 
-    auto action = ctx.services.actionFactory.newEquipItem(move(item), inventorySlot, instant);
+    auto action = ctx.game.actionFactory().newEquipItem(move(item), inventorySlot, instant);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -95,7 +94,7 @@ Variable actionUnequipItem(const vector<Variable> &args, const RoutineContext &c
     auto item = getItem(args, 0, ctx);
     bool instant = getBoolOrElse(args, 1, false);
 
-    auto action = ctx.services.actionFactory.newUnequipItem(move(item), instant);
+    auto action = ctx.game.actionFactory().newUnequipItem(move(item), instant);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -104,7 +103,7 @@ Variable actionUnequipItem(const vector<Variable> &args, const RoutineContext &c
 Variable actionPickUpItem(const vector<Variable> &args, const RoutineContext &ctx) {
     auto item = getItem(args, 0, ctx);
 
-    auto action = ctx.services.actionFactory.newPickUpItem(move(item));
+    auto action = ctx.game.actionFactory().newPickUpItem(move(item));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -113,7 +112,7 @@ Variable actionPickUpItem(const vector<Variable> &args, const RoutineContext &ct
 Variable actionPutDownItem(const vector<Variable> &args, const RoutineContext &ctx) {
     auto item = getItem(args, 0, ctx);
 
-    auto action = ctx.services.actionFactory.newPutDownItem(move(item));
+    auto action = ctx.game.actionFactory().newPutDownItem(move(item));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -124,7 +123,7 @@ Variable actionAttack(const vector<Variable> &args, const RoutineContext &ctx) {
     auto attackee = getSpatialObject(args, 0, ctx);
     bool passive = getBoolOrElse(args, 1, false);
 
-    auto action = ctx.services.actionFactory.newAttack(attackee, caller->getAttackRange(), false, passive);
+    auto action = ctx.game.actionFactory().newAttack(attackee, caller->getAttackRange(), false, passive);
     caller->addAction(move(action));
 
     return Variable::ofNull();
@@ -135,7 +134,7 @@ Variable actionSpeakString(const vector<Variable> &args, const RoutineContext &c
     string stringToSpeak(getString(args, 0));
     auto talkVolume = getEnumOrElse(args, 1, TalkVolume::Talk);
 
-    auto action = ctx.services.actionFactory.newSpeakString(move(stringToSpeak), talkVolume);
+    auto action = ctx.game.actionFactory().newSpeakString(move(stringToSpeak), talkVolume);
     caller->addAction(move(action));
 
     return Variable::ofNull();
@@ -146,7 +145,7 @@ Variable actionPlayAnimation(const vector<Variable> &args, const RoutineContext 
     float speed = getFloatOrElse(args, 1, 1.0f);
     float durationSeconds = getFloatOrElse(args, 2, 0.0f);
 
-    auto action = ctx.services.actionFactory.newPlayAnimation(animation, speed, durationSeconds);
+    auto action = ctx.game.actionFactory().newPlayAnimation(animation, speed, durationSeconds);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -155,7 +154,7 @@ Variable actionPlayAnimation(const vector<Variable> &args, const RoutineContext 
 Variable actionOpenDoor(const vector<Variable> &args, const RoutineContext &ctx) {
     auto door = getObject(args, 0, ctx);
 
-    auto action = ctx.services.actionFactory.newOpenDoor(door);
+    auto action = ctx.game.actionFactory().newOpenDoor(door);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -164,7 +163,7 @@ Variable actionOpenDoor(const vector<Variable> &args, const RoutineContext &ctx)
 Variable actionCloseDoor(const vector<Variable> &args, const RoutineContext &ctx) {
     auto door = getObject(args, 0, ctx);
 
-    auto action = ctx.services.actionFactory.newCloseDoor(door);
+    auto action = ctx.game.actionFactory().newCloseDoor(door);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -179,7 +178,7 @@ Variable actionCastSpellAtObject(const vector<Variable> &args, const RoutineCont
     auto projectilePathType = getEnumOrElse(args, 5, ProjectilePathType::Default);
     bool instantSpell = getBoolOrElse(args, 6, false);
 
-    auto action = ctx.services.actionFactory.newCastSpellAtObject();
+    auto action = ctx.game.actionFactory().newCastSpellAtObject();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -189,7 +188,7 @@ Variable actionGiveItem(const vector<Variable> &args, const RoutineContext &ctx)
     auto item = getItem(args, 0, ctx);
     auto giveTo = getObject(args, 1, ctx);
 
-    auto action = ctx.services.actionFactory.newGiveItem();
+    auto action = ctx.game.actionFactory().newGiveItem();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -199,7 +198,7 @@ Variable actionTakeItem(const vector<Variable> &args, const RoutineContext &ctx)
     auto item = getItem(args, 0, ctx);
     auto takeFrom = getObject(args, 1, ctx);
 
-    auto action = ctx.services.actionFactory.newTakeItem();
+    auto action = ctx.game.actionFactory().newTakeItem();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -209,7 +208,7 @@ Variable actionForceFollowObject(const vector<Variable> &args, const RoutineCont
     auto follow = getObject(args, 0, ctx);
     float followDistance = getFloatOrElse(args, 1, 0.0f);
 
-    auto action = ctx.services.actionFactory.newForceFollowObject();
+    auto action = ctx.game.actionFactory().newForceFollowObject();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -220,7 +219,7 @@ Variable actionJumpToObject(const vector<Variable> &args, const RoutineContext &
     auto jumpTo = getObject(args, 0, ctx);
     bool walkStraightLine = getBoolOrElse(args, 1, true);
 
-    auto action = ctx.services.actionFactory.newJumpToObject(move(jumpTo));
+    auto action = ctx.game.actionFactory().newJumpToObject(move(jumpTo));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -229,7 +228,7 @@ Variable actionJumpToObject(const vector<Variable> &args, const RoutineContext &
 Variable actionWait(const vector<Variable> &args, const RoutineContext &ctx) {
     float seconds = getFloat(args, 0);
 
-    auto action = ctx.services.actionFactory.newWait(seconds);
+    auto action = ctx.game.actionFactory().newWait(seconds);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -245,21 +244,21 @@ Variable actionStartConversation(const vector<Variable> &args, const RoutineCont
     if (dialogResRef.empty()) {
         dialogResRef = caller->conversation();
     }
-    auto action = ctx.services.actionFactory.newStartConversation(move(objectToConverse), move(dialogResRef), ignoreStartRange);
+    auto action = ctx.game.actionFactory().newStartConversation(move(objectToConverse), move(dialogResRef), ignoreStartRange);
     caller->addAction(move(action));
 
     return Variable::ofNull();
 }
 
 Variable actionPauseConversation(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto action = ctx.services.actionFactory.newPauseConversation();
+    auto action = ctx.game.actionFactory().newPauseConversation();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
 
 Variable actionResumeConversation(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto action = ctx.services.actionFactory.newResumeConversation();
+    auto action = ctx.game.actionFactory().newResumeConversation();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -268,7 +267,7 @@ Variable actionResumeConversation(const vector<Variable> &args, const RoutineCon
 Variable actionJumpToLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     auto location = getLocationEngineType(args, 0);
 
-    auto action = ctx.services.actionFactory.newJumpToLocation(move(location));
+    auto action = ctx.game.actionFactory().newJumpToLocation(move(location));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -282,7 +281,7 @@ Variable actionCastSpellAtLocation(const vector<Variable> &args, const RoutineCo
     auto projectilePathType = getEnumOrElse(args, 4, ProjectilePathType::Default);
     bool instantSpell = getBoolOrElse(args, 5, false);
 
-    auto action = ctx.services.actionFactory.newCastSpellAtLocation();
+    auto action = ctx.game.actionFactory().newCastSpellAtLocation();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -292,7 +291,7 @@ Variable actionSpeakStringByStrRef(const vector<Variable> &args, const RoutineCo
     int strRef = getInt(args, 0);
     auto talkVolume = getEnumOrElse(args, 1, TalkVolume::Talk);
 
-    auto action = ctx.services.actionFactory.newSpeakStringByStrRef();
+    auto action = ctx.game.actionFactory().newSpeakStringByStrRef();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -303,7 +302,7 @@ Variable actionUseFeat(const vector<Variable> &args, const RoutineContext &ctx) 
     auto feat = getEnum<FeatType>(args, 0);
     auto target = getObject(args, 1, ctx);
 
-    auto action = ctx.services.actionFactory.newUseFeat(target, feat);
+    auto action = ctx.game.actionFactory().newUseFeat(target, feat);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -316,7 +315,7 @@ Variable actionUseSkill(const vector<Variable> &args, const RoutineContext &ctx)
     int subSkill = getIntOrElse(args, 2, 0);
     auto itemUsed = getObject(args, 3, ctx);
 
-    auto action = ctx.services.actionFactory.newUseSkill(target, skill);
+    auto action = ctx.game.actionFactory().newUseSkill(target, skill);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -325,7 +324,7 @@ Variable actionUseSkill(const vector<Variable> &args, const RoutineContext &ctx)
 Variable actionDoCommand(const vector<Variable> &args, const RoutineContext &ctx) {
     auto action = getAction(args, 0);
 
-    auto commandAction = ctx.services.actionFactory.newDoCommand(move(action));
+    auto commandAction = ctx.game.actionFactory().newDoCommand(move(action));
     getCaller(ctx)->addAction(move(commandAction));
 
     return Variable::ofNull();
@@ -335,7 +334,7 @@ Variable actionUseTalentOnObject(const vector<Variable> &args, const RoutineCont
     auto chosenTalen = getTalent(args, 0);
     auto target = getObject(args, 1, ctx);
 
-    auto action = ctx.services.actionFactory.newUseTalentOnObject();
+    auto action = ctx.game.actionFactory().newUseTalentOnObject();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -345,7 +344,7 @@ Variable actionUseTalentAtLocation(const vector<Variable> &args, const RoutineCo
     auto chosenTalen = getTalent(args, 0);
     auto targetLocation = getLocationEngineType(args, 1);
 
-    auto action = ctx.services.actionFactory.newUseTalentAtLocation();
+    auto action = ctx.game.actionFactory().newUseTalentAtLocation();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -354,7 +353,7 @@ Variable actionUseTalentAtLocation(const vector<Variable> &args, const RoutineCo
 Variable actionInteractObject(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: arguments
 
-    auto action = ctx.services.actionFactory.newInteractObject();
+    auto action = ctx.game.actionFactory().newInteractObject();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -363,7 +362,7 @@ Variable actionInteractObject(const vector<Variable> &args, const RoutineContext
 Variable actionMoveAwayFromLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: arguments
 
-    auto action = ctx.services.actionFactory.newMoveAwayFromLocation();
+    auto action = ctx.game.actionFactory().newMoveAwayFromLocation();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -372,7 +371,7 @@ Variable actionMoveAwayFromLocation(const vector<Variable> &args, const RoutineC
 Variable actionSurrenderToEnemies(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: arguments
 
-    auto action = ctx.services.actionFactory.newSurrenderToEnemies();
+    auto action = ctx.game.actionFactory().newSurrenderToEnemies();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -384,7 +383,7 @@ Variable actionForceMoveToLocation(const vector<Variable> &args, const RoutineCo
     bool run = getBoolOrElse(args, 1, false);
     float timeout = getFloatOrElse(args, 2, 30.0f);
 
-    auto action = ctx.services.actionFactory.newMoveToLocation(move(destination));
+    auto action = ctx.game.actionFactory().newMoveToLocation(move(destination));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -397,7 +396,7 @@ Variable actionForceMoveToObject(const vector<Variable> &args, const RoutineCont
     float range = getFloatOrElse(args, 2, 1.0f);
     float timeout = getFloatOrElse(args, 3, 30.0f);
 
-    auto action = ctx.services.actionFactory.newMoveToObject(move(moveTo), run, range);
+    auto action = ctx.game.actionFactory().newMoveToObject(move(moveTo), run, range);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -406,7 +405,7 @@ Variable actionForceMoveToObject(const vector<Variable> &args, const RoutineCont
 Variable actionEquipMostDamagingMelee(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: arguments
 
-    auto action = ctx.services.actionFactory.newEquipMostDamagingMelee();
+    auto action = ctx.game.actionFactory().newEquipMostDamagingMelee();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -415,7 +414,7 @@ Variable actionEquipMostDamagingMelee(const vector<Variable> &args, const Routin
 Variable actionEquipMostDamagingRanged(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: arguments
 
-    auto action = ctx.services.actionFactory.newEquipMostDamagingRanged();
+    auto action = ctx.game.actionFactory().newEquipMostDamagingRanged();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -424,7 +423,7 @@ Variable actionEquipMostDamagingRanged(const vector<Variable> &args, const Routi
 Variable actionEquipMostEffectiveArmor(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: arguments
 
-    auto action = ctx.services.actionFactory.newEquipMostEffectiveArmor();
+    auto action = ctx.game.actionFactory().newEquipMostEffectiveArmor();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -433,7 +432,7 @@ Variable actionEquipMostEffectiveArmor(const vector<Variable> &args, const Routi
 Variable actionUnlockObject(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: arguments
 
-    auto action = ctx.services.actionFactory.newUnlockObject();
+    auto action = ctx.game.actionFactory().newUnlockObject();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -442,7 +441,7 @@ Variable actionUnlockObject(const vector<Variable> &args, const RoutineContext &
 Variable actionLockObject(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: arguments
 
-    auto action = ctx.services.actionFactory.newLockObject();
+    auto action = ctx.game.actionFactory().newLockObject();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -451,7 +450,7 @@ Variable actionLockObject(const vector<Variable> &args, const RoutineContext &ct
 Variable actionCastFakeSpellAtObject(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: arguments
 
-    auto action = ctx.services.actionFactory.newCastFakeSpellAtObject();
+    auto action = ctx.game.actionFactory().newCastFakeSpellAtObject();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -460,7 +459,7 @@ Variable actionCastFakeSpellAtObject(const vector<Variable> &args, const Routine
 Variable actionCastFakeSpellAtLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: arguments
 
-    auto action = ctx.services.actionFactory.newCastFakeSpellAtLocation();
+    auto action = ctx.game.actionFactory().newCastFakeSpellAtLocation();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -469,14 +468,14 @@ Variable actionCastFakeSpellAtLocation(const vector<Variable> &args, const Routi
 Variable actionBarkString(const vector<Variable> &args, const RoutineContext &ctx) {
     int strRef = getInt(args, 0);
 
-    auto action = ctx.services.actionFactory.newBarkString();
+    auto action = ctx.game.actionFactory().newBarkString();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
 
 Variable actionFollowLeader(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto action = ctx.services.actionFactory.newFollowLeader();
+    auto action = ctx.game.actionFactory().newFollowLeader();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -487,7 +486,7 @@ Variable actionFollowLeader(const vector<Variable> &args, const RoutineContext &
 Variable actionFollowOwner(const vector<Variable> &args, const RoutineContext &ctx) {
     float range = getFloatOrElse(args, 0, 2.5f);
 
-    auto action = ctx.services.actionFactory.newFollowOwner();
+    auto action = ctx.game.actionFactory().newFollowOwner();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -496,7 +495,7 @@ Variable actionFollowOwner(const vector<Variable> &args, const RoutineContext &c
 Variable actionSwitchWeapons(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: arguments
 
-    auto action = ctx.services.actionFactory.newSwitchWeapons();
+    auto action = ctx.game.actionFactory().newSwitchWeapons();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();

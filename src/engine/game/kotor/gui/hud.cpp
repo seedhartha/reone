@@ -46,19 +46,7 @@ static string g_attackIcon("i_attack");
 
 HUD::HUD(KotOR &game, Services &services) :
     GameGUI(game, services),
-    _select(
-        game,
-        services.actionFactory,
-        services.feats,
-        game.party(),
-        services.reputes,
-        services.skills,
-        services.context,
-        services.fonts,
-        services.meshes,
-        services.shaders,
-        services.textures,
-        services.window) {
+    _select(game, services) {
     _resRef = getResRef("mipc28x6");
     _resolutionX = 800;
     _resolutionY = 600;

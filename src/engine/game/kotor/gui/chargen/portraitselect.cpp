@@ -140,7 +140,7 @@ void PortraitSelection::loadHeadModel() {
 shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &sceneGraph) {
     // Create a creature from the current portrait
 
-    shared_ptr<Creature> creature(_services.objectFactory.newCreature(sceneGraph.name()));
+    shared_ptr<Creature> creature(_game.objectFactory().newCreature(sceneGraph.name()));
     creature->setFacing(-glm::half_pi<float>());
     creature->setAppearance(getAppearanceFromCurrentPortrait());
     creature->equip("g_a_clothes01");

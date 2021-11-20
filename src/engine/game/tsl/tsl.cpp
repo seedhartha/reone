@@ -23,6 +23,8 @@
 
 #include "../core/services.h"
 
+#include "routine/registrar.h"
+
 using namespace std;
 
 using namespace reone::audio;
@@ -87,6 +89,10 @@ void TSL::getDefaultPartyMembers(string &member1, string &member2, string &membe
     member3.clear();
 
     Game::getDefaultPartyMembers(member1, member2, member3);
+}
+
+void TSL::initRoutines() {
+    TSLRoutineRegistrar(_routines).invoke();
 }
 
 } // namespace game

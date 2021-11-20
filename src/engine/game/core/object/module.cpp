@@ -92,7 +92,7 @@ void Module::loadInfo(const GffStruct &ifo) {
 void Module::loadArea(const GffStruct &ifo, bool fromSave) {
     reone::info("Load area '" + _info.entryArea + "'");
 
-    _area = _services.objectFactory.newArea();
+    _area = _game.objectFactory().newArea();
 
     shared_ptr<GffStruct> are(_services.gffs.get(_info.entryArea, ResourceType::Are));
     if (!are) {
@@ -240,16 +240,16 @@ void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
     if (creature->isDead()) {
         if (!creature->items().empty()) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(_services.actionFactory.newOpenContainer(creature));
+            partyLeader->addAction(_game.actionFactory().newOpenContainer(creature));
         }
     } else {
         bool isEnemy = _services.reputes.getIsEnemy(*partyLeader, *creature);
         if (isEnemy) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(_services.actionFactory.newAttack(creature));
+            partyLeader->addAction(_game.actionFactory().newAttack(creature));
         } else if (!creature->conversation().empty()) {
             partyLeader->clearAllActions();
-            partyLeader->addAction(_services.actionFactory.newStartConversation(creature, creature->conversation()));
+            partyLeader->addAction(_game.actionFactory().newStartConversation(creature, creature->conversation()));
         }
     }
 }
@@ -262,7 +262,7 @@ void Module::onDoorClick(const shared_ptr<Door> &door) {
     if (!door->isOpen()) {
         shared_ptr<Creature> partyLeader(_game.party().getLeader());
         partyLeader->clearAllActions();
-        partyLeader->addAction(_services.actionFactory.newOpenDoor(door));
+        partyLeader->addAction(_game.actionFactory().newOpenDoor(door));
     }
 }
 
@@ -271,10 +271,10 @@ void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
 
     if (placeable->hasInventory()) {
         partyLeader->clearAllActions();
-        partyLeader->addAction(_services.actionFactory.newOpenContainer(placeable));
+        partyLeader->addAction(_game.actionFactory().newOpenContainer(placeable));
     } else if (!placeable->conversation().empty()) {
         partyLeader->clearAllActions();
-        partyLeader->addAction(_services.actionFactory.newStartConversation(placeable, placeable->conversation()));
+        partyLeader->addAction(_game.actionFactory().newStartConversation(placeable, placeable->conversation()));
     } else {
         placeable->runOnUsed(move(partyLeader));
     }

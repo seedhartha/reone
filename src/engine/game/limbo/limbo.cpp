@@ -28,6 +28,8 @@
 #include "../core/script/runner.h"
 #include "../core/services.h"
 
+#include "routine/registrar.h"
+
 using namespace std;
 
 using namespace reone::resource;
@@ -64,7 +66,7 @@ void Limbo::loadModuleNames() {
 }
 
 void Limbo::start() {
-    _services.scriptRunner.run(kStartScriptResRef);
+    _scriptRunner.run(kStartScriptResRef);
 }
 
 void Limbo::loadModuleResources(const string &moduleName) {
@@ -91,6 +93,10 @@ void Limbo::openInGame() {
 
 void Limbo::changeScreen(GameScreen screen) {
     _screen = screen;
+}
+
+void Limbo::initRoutines() {
+    LimboRoutineRegistrar(_routines).invoke();
 }
 
 } // namespace game

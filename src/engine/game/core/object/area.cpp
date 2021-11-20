@@ -258,7 +258,7 @@ void Area::doDestroyObjects() {
 }
 
 void Area::doDestroyObject(uint32_t objectId) {
-    shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(_services.objectFactory.getObjectById(objectId)));
+    shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(_game.objectFactory().getObjectById(objectId)));
     if (!object)
         return;
     {
@@ -359,7 +359,7 @@ void Area::reloadParty() {
     shared_ptr<Creature> player(_game.party().player());
     loadParty(player->position(), player->getFacing());
     for (auto &member : _game.party().members()) {
-        _services.sceneManager.onObjectCreated(*member.creature);
+        _game.sceneManager().onObjectCreated(*member.creature);
     }
 }
 
@@ -503,7 +503,7 @@ void Area::runOnEnterScript() {
     if (!player)
         return;
 
-    _services.scriptRunner.run(_onEnter, _id, player->id());
+    _game.scriptRunner().run(_onEnter, _id, player->id());
 }
 
 void Area::runOnExitScript() {
@@ -514,7 +514,7 @@ void Area::runOnExitScript() {
     if (!player)
         return;
 
-    _services.scriptRunner.run(_onExit, _id, player->id());
+    _game.scriptRunner().run(_onExit, _id, player->id());
 }
 
 void Area::destroyObject(const SpatialObject &object) {
@@ -694,7 +694,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
             return;
         }
         if (!trigger->getOnEnter().empty()) {
-            _services.scriptRunner.run(trigger->getOnEnter(), trigger->id(), triggerrer->id());
+            _game.scriptRunner().run(trigger->getOnEnter(), trigger->id(), triggerrer->id());
         }
     }
 }
@@ -702,12 +702,12 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
 void Area::updateHeartbeat(float dt) {
     if (_heartbeatTimer.advance(dt)) {
         if (!_onHeartbeat.empty()) {
-            _services.scriptRunner.run(_onHeartbeat, _id);
+            _game.scriptRunner().run(_onHeartbeat, _id);
         }
         for (auto &object : _objects) {
             string heartbeat(object->getOnHeartbeat());
             if (!heartbeat.empty()) {
-                _services.scriptRunner.run(heartbeat, object->id());
+                _game.scriptRunner().run(heartbeat, object->id());
             }
         }
         _heartbeatTimer.setTimeout(kHeartbeatInterval);
@@ -777,13 +777,13 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
 
     switch (type) {
     case ObjectType::Item: {
-        auto item = _services.objectFactory.newItem();
+        auto item = _game.objectFactory().newItem();
         item->loadFromBlueprint(blueprintResRef);
         object = move(item);
         break;
     }
     case ObjectType::Creature: {
-        auto creature = _services.objectFactory.newCreature();
+        auto creature = _game.objectFactory().newCreature();
         creature->loadFromBlueprint(blueprintResRef);
         creature->setPosition(location->position());
         creature->setFacing(location->facing());
@@ -791,7 +791,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
         break;
     }
     case ObjectType::Placeable: {
-        auto placeable = _services.objectFactory.newPlaceable();
+        auto placeable = _game.objectFactory().newPlaceable();
         placeable->loadFromBlueprint(blueprintResRef);
         object = move(placeable);
         break;
@@ -1112,7 +1112,7 @@ void Area::loadProperties(const GffStruct &git) {
 
 void Area::loadCreatures(const GffStruct &git) {
     for (auto &gffs : git.getList("Creature List")) {
-        shared_ptr<Creature> creature(_services.objectFactory.newCreature());
+        shared_ptr<Creature> creature(_game.objectFactory().newCreature());
         creature->loadFromGIT(*gffs);
         landObject(*creature);
         add(creature);
@@ -1121,7 +1121,7 @@ void Area::loadCreatures(const GffStruct &git) {
 
 void Area::loadDoors(const GffStruct &git) {
     for (auto &gffs : git.getList("Door List")) {
-        shared_ptr<Door> door(_services.objectFactory.newDoor());
+        shared_ptr<Door> door(_game.objectFactory().newDoor());
         door->loadFromGIT(*gffs);
         add(door);
     }
@@ -1129,7 +1129,7 @@ void Area::loadDoors(const GffStruct &git) {
 
 void Area::loadPlaceables(const GffStruct &git) {
     for (auto &gffs : git.getList("Placeable List")) {
-        shared_ptr<Placeable> placeable(_services.objectFactory.newPlaceable());
+        shared_ptr<Placeable> placeable(_game.objectFactory().newPlaceable());
         placeable->loadFromGIT(*gffs);
         add(placeable);
     }
@@ -1137,7 +1137,7 @@ void Area::loadPlaceables(const GffStruct &git) {
 
 void Area::loadWaypoints(const GffStruct &git) {
     for (auto &gffs : git.getList("WaypointList")) {
-        shared_ptr<Waypoint> waypoint(_services.objectFactory.newWaypoint());
+        shared_ptr<Waypoint> waypoint(_game.objectFactory().newWaypoint());
         waypoint->loadFromGIT(*gffs);
         add(waypoint);
     }
@@ -1145,7 +1145,7 @@ void Area::loadWaypoints(const GffStruct &git) {
 
 void Area::loadTriggers(const GffStruct &git) {
     for (auto &gffs : git.getList("TriggerList")) {
-        shared_ptr<Trigger> trigger(_services.objectFactory.newTrigger());
+        shared_ptr<Trigger> trigger(_game.objectFactory().newTrigger());
         trigger->loadFromGIT(*gffs);
         add(trigger);
     }
@@ -1153,7 +1153,7 @@ void Area::loadTriggers(const GffStruct &git) {
 
 void Area::loadSounds(const GffStruct &git) {
     for (auto &gffs : git.getList("SoundList")) {
-        shared_ptr<Sound> sound(_services.objectFactory.newSound());
+        shared_ptr<Sound> sound(_game.objectFactory().newSound());
         sound->loadFromGIT(*gffs);
         add(sound);
     }
@@ -1161,7 +1161,7 @@ void Area::loadSounds(const GffStruct &git) {
 
 void Area::loadCameras(const GffStruct &git) {
     for (auto &gffs : git.getList("CameraList")) {
-        shared_ptr<PlaceableCamera> camera(_services.objectFactory.newCamera());
+        shared_ptr<PlaceableCamera> camera(_game.objectFactory().newCamera());
         camera->loadFromGIT(*gffs);
         add(camera);
     }
@@ -1169,7 +1169,7 @@ void Area::loadCameras(const GffStruct &git) {
 
 void Area::loadEncounters(const GffStruct &git) {
     for (auto &gffs : git.getList("Encounter List")) {
-        shared_ptr<Encounter> encounter(_services.objectFactory.newEncounter());
+        shared_ptr<Encounter> encounter(_game.objectFactory().newEncounter());
         encounter->loadFromGIT(*gffs);
         add(encounter);
     }

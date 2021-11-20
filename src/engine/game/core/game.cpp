@@ -87,17 +87,21 @@ Game::Game(
     _options(move(options)),
     _services(services),
     _party(*this),
-    _combat(*this, services) {
+    _combat(*this, services),
+    _actionFactory(*this, services),
+    _objectFactory(*this, services),
+    _routines(*this, services),
+    _sceneManager(services.surfaces, services.sceneGraphs.get(kSceneMain)),
+    _scriptRunner(_routines, services.scripts),
+    _console(*this, services),
+    _profileOverlay(services) {
 }
 
 void Game::init() {
     _services.window.setEventHandler(this);
 
-    _console = make_unique<Console>(*this, _services.effectFactory, _party, _services.fonts, _services.meshes, _services.shaders, _services.window);
-    _console->init();
-
-    _profileOverlay = make_unique<ProfileOverlay>(_services.fonts, _services.meshes, _services.shaders, _services.window);
-    _profileOverlay->init();
+    _console.init();
+    _profileOverlay.init();
 
     loadModuleNames();
     setCursorType(CursorType::Default);
@@ -141,7 +145,7 @@ void Game::loadModule(const string &name, string entry) {
             if (maybeModule != _loadedModules.end()) {
                 _module = maybeModule->second;
             } else {
-                _module = _services.objectFactory.newModule();
+                _module = _objectFactory.newModule();
 
                 shared_ptr<GffStruct> ifo(_services.gffs.get("module", ResourceType::Ifo));
                 if (!ifo) {
@@ -157,7 +161,7 @@ void Game::loadModule(const string &name, string entry) {
             }
 
             _module->loadParty(entry, _loadFromSaveGame);
-            _services.sceneManager.refresh(*_module->area());
+            _sceneManager.refresh(*_module->area());
 
             info("Module '" + name + "' loaded successfully");
 
@@ -183,7 +187,7 @@ void Game::loadDefaultParty() {
     getDefaultPartyMembers(member1, member2, member3);
 
     if (!member1.empty()) {
-        shared_ptr<Creature> player(_services.objectFactory.newCreature());
+        shared_ptr<Creature> player(_objectFactory.newCreature());
         player->loadFromBlueprint(member1);
         player->setTag(kObjectTagPlayer);
         player->setImmortal(true);
@@ -191,13 +195,13 @@ void Game::loadDefaultParty() {
         _party.setPlayer(player);
     }
     if (!member2.empty()) {
-        shared_ptr<Creature> companion(_services.objectFactory.newCreature());
+        shared_ptr<Creature> companion(_objectFactory.newCreature());
         companion->loadFromBlueprint(member2);
         companion->setImmortal(true);
         _party.addMember(0, companion);
     }
     if (!member3.empty()) {
-        shared_ptr<Creature> companion(_services.objectFactory.newCreature());
+        shared_ptr<Creature> companion(_objectFactory.newCreature());
         companion->loadFromBlueprint(member3);
         companion->setImmortal(true);
         _party.addMember(1, companion);
@@ -277,7 +281,7 @@ void Game::drawAll() {
         _services.window.drawCursor();
     }
 
-    _profileOverlay->draw();
+    _profileOverlay.draw();
     _services.window.swapBuffers();
 }
 
@@ -327,7 +331,7 @@ shared_ptr<Object> Game::getObjectById(uint32_t id) const {
     case kObjectInvalid:
         return nullptr;
     default:
-        return _services.objectFactory.getObjectById(id);
+        return _objectFactory.getObjectById(id);
     }
 }
 
@@ -337,8 +341,8 @@ void Game::drawGUI() {
         if (_cameraType == CameraType::ThirdPerson) {
             drawHUD();
         }
-        if (_console->isOpen()) {
-            _console->draw();
+        if (_console.isOpen()) {
+            _console.draw();
         }
         break;
 
@@ -401,7 +405,7 @@ void Game::update() {
     }
     updateSceneGraph(dt);
 
-    _profileOverlay->update(dt);
+    _profileOverlay.update(dt);
 }
 
 void Game::updateVideo(float dt) {
@@ -517,7 +521,7 @@ void Game::updateSceneGraph(float dt) {
 }
 
 bool Game::handle(const SDL_Event &event) {
-    if (_profileOverlay->handle(event))
+    if (_profileOverlay.handle(event))
         return true;
 
     if (!_video) {
@@ -527,7 +531,7 @@ bool Game::handle(const SDL_Event &event) {
         }
         switch (_screen) {
         case GameScreen::InGame: {
-            if (_console->handle(event)) {
+            if (_console.handle(event)) {
                 return true;
             }
             if (_party.handle(event)) {
@@ -792,7 +796,7 @@ void Game::loadFromFile(const fs::path &path) {
         glm::vec3 position(member->getVector("Position"));
         float facing = member->getFloat("Facing");
 
-        shared_ptr<Creature> creature(_services.objectFactory.newCreature());
+        shared_ptr<Creature> creature(_objectFactory.newCreature());
         if (npc == -1) {
             creature->setTag(kObjectTagPlayer);
         }

@@ -31,7 +31,7 @@ namespace game {
 constexpr float kDetectionRange = 20.0f;
 
 class Game;
-class Services;
+struct Services;
 
 class Combat {
 public:

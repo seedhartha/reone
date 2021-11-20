@@ -26,24 +26,18 @@
 
 namespace reone {
 
-namespace resource {
-
-class Strings;
-
-}
-
 namespace game {
 
-class ActionFactory;
-class Combat;
-class EffectFactory;
 class Game;
-class Party;
-class Reputes;
-class ScriptRunner;
+class Services;
 
 class Routines : public IRoutines, boost::noncopyable {
 public:
+    Routines(Game &game, Services &services) :
+        _game(game),
+        _services(services) {
+    }
+
     void add(
         std::string name,
         script::VariableType retType,
@@ -55,7 +49,7 @@ public:
             retType,
             std::move(argTypes),
             [this, fn](auto &args, auto &execution) {
-                RoutineContext ctx(*_game, *_services, execution);
+                RoutineContext ctx(_game, _services, execution);
                 return fn(args, std::move(ctx));
             });
     }
@@ -76,12 +70,9 @@ public:
         return _routines[index];
     }
 
-    void setGame(Game &game) { _game = &game; }
-    void setServices(Services &services) { _services = &services; }
-
 private:
-    Game *_game {nullptr};
-    Services *_services {nullptr};
+    Game &_game;
+    Services &_services;
 
     std::vector<script::Routine> _routines;
 };

@@ -24,6 +24,8 @@
 #include "../../graphics/textutil.h"
 #include "../../graphics/window.h"
 
+#include "services.h"
+
 using namespace std;
 
 using namespace reone::graphics;
@@ -40,7 +42,7 @@ void ProfileOverlay::init() {
     _refreshTimer.setTimeout(kRefreshInterval);
     _frequency = SDL_GetPerformanceFrequency();
     _counter = SDL_GetPerformanceCounter();
-    _font = _fonts.get(kFontResRef);
+    _font = _services.fonts.get(kFontResRef);
 }
 
 bool ProfileOverlay::handle(const SDL_Event &event) {
@@ -106,14 +108,14 @@ void ProfileOverlay::drawBackground() {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(kFrameWidth, 2.0f * _font->height(), 1.0f));
 
-    ShaderUniforms uniforms(_shaders.defaultUniforms());
-    uniforms.combined.general.projection = _window.getOrthoProjection();
+    ShaderUniforms uniforms(_services.shaders.defaultUniforms());
+    uniforms.combined.general.projection = _services.window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     uniforms.combined.general.alpha = 0.5f;
 
-    _shaders.activate(ShaderProgram::SimpleColor, uniforms);
-    _meshes.quad().draw();
+    _services.shaders.activate(ShaderProgram::SimpleColor, uniforms);
+    _services.meshes.quad().draw();
 }
 
 void ProfileOverlay::drawText() {

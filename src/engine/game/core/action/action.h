@@ -26,7 +26,7 @@ namespace game {
 class Creature;
 class Game;
 class Object;
-class Services;
+struct Services;
 
 class Action : boost::noncopyable {
 public:

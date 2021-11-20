@@ -28,7 +28,7 @@ class ExecutionContext;
 namespace game {
 
 class Game;
-class Services;
+struct Services;
 
 struct RoutineContext {
     Game &game;

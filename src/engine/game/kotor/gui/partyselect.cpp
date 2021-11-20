@@ -82,13 +82,13 @@ void PartySelection::load() {
         changeParty();
         _game.openInGame();
         if (!_context.exitScript.empty()) {
-            _services.scriptRunner.run(_context.exitScript);
+            _game.scriptRunner().run(_context.exitScript);
         }
     });
     _binding.btnBack->setOnClick([this]() {
         _game.openInGame();
         if (!_context.exitScript.empty()) {
-            _services.scriptRunner.run(_context.exitScript);
+            _game.scriptRunner().run(_context.exitScript);
         }
     });
     _binding.btnNpc0->setOnClick([this]() {
@@ -352,7 +352,7 @@ void PartySelection::changeParty() {
 
         string blueprintResRef(party.getAvailableMember(i));
 
-        shared_ptr<Creature> creature(_services.objectFactory.newCreature());
+        shared_ptr<Creature> creature(_game.objectFactory().newCreature());
         creature->loadFromBlueprint(blueprintResRef);
         creature->setFaction(Faction::Friendly1);
         creature->setImmortal(true);

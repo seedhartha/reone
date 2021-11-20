@@ -30,7 +30,7 @@ namespace reone {
 namespace game {
 
 void OpenDoorAction::execute(Object &actor, float dt) {
-    shared_ptr<Object> actorPtr(_services.objectFactory.getObjectById(actor.id()));
+    shared_ptr<Object> actorPtr(_game.objectFactory().getObjectById(actor.id()));
     auto creatureActor = dynamic_pointer_cast<Creature>(actorPtr);
     auto door = dynamic_pointer_cast<Door>(_object);
 
@@ -40,14 +40,14 @@ void OpenDoorAction::execute(Object &actor, float dt) {
         if (!isObjectSelf && door->isLocked()) {
             string onFailToOpen(door->getOnFailToOpen());
             if (!onFailToOpen.empty()) {
-                _services.scriptRunner.run(onFailToOpen, door->id(), actor.id());
+                _game.scriptRunner().run(onFailToOpen, door->id(), actor.id());
             }
         } else {
             door->open(actorPtr);
             if (!isObjectSelf) {
                 string onOpen(door->getOnOpen());
                 if (!onOpen.empty()) {
-                    _services.scriptRunner.run(onOpen, door->id(), actor.id(), -1);
+                    _game.scriptRunner().run(onOpen, door->id(), actor.id(), -1);
                 }
             }
         }

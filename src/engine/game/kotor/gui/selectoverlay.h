@@ -24,42 +24,17 @@
 
 namespace reone {
 
-namespace graphics {
-
-class Context;
-class Fonts;
-class Meshes;
-class Shaders;
-class Textures;
-class Window;
-
-} // namespace graphics
-
 namespace game {
 
-class ActionFactory;
-class Feats;
 class Game;
-class Party;
-class Reputes;
-class Skills;
+class Services;
 class SpatialObject;
 
 class SelectionOverlay {
 public:
     SelectionOverlay(
         Game &game,
-        ActionFactory &actionFactory,
-        Feats &feats,
-        Party &party,
-        Reputes &reputes,
-        Skills &skills,
-        graphics::Context &context,
-        graphics::Fonts &fonts,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Window &window);
+        Services &services);
 
     void load();
 
@@ -74,6 +49,7 @@ private:
     };
 
     Game &_game;
+    Services &_services;
 
     std::shared_ptr<graphics::Font> _font;
     std::shared_ptr<graphics::Texture> _friendlyReticle;
@@ -93,23 +69,6 @@ private:
     bool _hilightedHostile {false};
     bool _selectedHostile {false};
     bool _hasActions {false};
-
-    // Services
-
-    ActionFactory &_actionFactory;
-    Feats &_feats;
-    Party &_party;
-    Reputes &_reputes;
-    Skills &_skills;
-
-    graphics::Context &_context;
-    graphics::Fonts &_fonts;
-    graphics::Meshes &_meshes;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Window &_window;
-
-    // END Services
 
     bool handleMouseMotion(const SDL_MouseMotionEvent &event);
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);

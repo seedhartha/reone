@@ -79,6 +79,7 @@ protected:
 
     void start() override;
 
+    void initRoutines() override;
     void loadModuleNames() override;
     void loadModuleResources(const std::string &moduleName) override;
 

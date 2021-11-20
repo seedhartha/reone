@@ -31,6 +31,7 @@
 #include "game.h"
 #include "object/creature.h"
 #include "party.h"
+#include "services.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -48,20 +49,9 @@ static constexpr int kVisibleLineCount = 15;
 
 Console::Console(
     Game &game,
-    EffectFactory &effectFactory,
-    Party &party,
-    Fonts &fonts,
-    Meshes &meshes,
-    Shaders &shaders,
-    Window &window) :
+    Services &services) :
     _game(game),
-    _effectFactory(effectFactory),
-    _party(party),
-    _fonts(fonts),
-    _meshes(meshes),
-    _shaders(shaders),
-    _window(window),
-    _opts(game.options().graphics),
+    _services(services),
     _input(TextInputFlags::console) {
 
     initCommands();
@@ -124,7 +114,7 @@ void Console::cmdListAnim(vector<string> tokens) {
     ;
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
-        object = _party.getLeader();
+        object = _game.party().getLeader();
         if (!object) {
             print("listanim: no object selected");
             return;
@@ -154,7 +144,7 @@ void Console::cmdPlayAnim(vector<string> tokens) {
     }
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
-        object = _party.getLeader();
+        object = _game.party().getLeader();
         if (!object) {
             print("playanim: no object selected");
             return;
@@ -170,7 +160,7 @@ void Console::cmdKill(vector<string> tokens) {
         print("kill: no object selected");
         return;
     }
-    auto effect = _effectFactory.newDamage(100000, DamageType::Universal, nullptr);
+    auto effect = _game.effectFactory().newDamage(100000, DamageType::Universal, nullptr);
     object->applyEffect(move(effect), DurationType::Instant);
 }
 
@@ -181,7 +171,7 @@ void Console::cmdAddItem(vector<string> tokens) {
     }
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
-        object = _party.getLeader();
+        object = _game.party().getLeader();
         if (!object) {
             print("additem: no object selected");
             return;
@@ -199,7 +189,7 @@ void Console::cmdGiveXP(vector<string> tokens) {
 
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
-        object = _party.getLeader();
+        object = _game.party().getLeader();
     }
     if (!object || object->type() != ObjectType::Creature) {
         print("givexp: no creature selected");
@@ -230,7 +220,7 @@ void Console::trimOutput() {
 }
 
 void Console::init() {
-    _font = _fonts.get("fnt_console");
+    _font = _services.fonts.get("fnt_console");
 }
 
 bool Console::handle(const SDL_Event &event) {
@@ -322,16 +312,16 @@ void Console::drawBackground() {
     float height = kVisibleLineCount * _font->height();
 
     glm::mat4 transform(1.0f);
-    transform = glm::scale(transform, glm::vec3(_opts.width, height, 1.0f));
+    transform = glm::scale(transform, glm::vec3(_game.options().graphics.width, height, 1.0f));
 
     ShaderUniforms uniforms;
-    uniforms.combined.general.projection = _window.getOrthoProjection();
+    uniforms.combined.general.projection = _services.window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     uniforms.combined.general.alpha = 0.5f;
 
-    _shaders.activate(ShaderProgram::SimpleColor, uniforms);
-    _meshes.quad().draw();
+    _services.shaders.activate(ShaderProgram::SimpleColor, uniforms);
+    _services.meshes.quad().draw();
 }
 
 void Console::drawLines() {
