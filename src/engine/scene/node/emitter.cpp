@@ -122,7 +122,7 @@ void EmitterSceneNode::removeExpiredParticles(float dt) {
         }
     }
     for (auto &particle : expiredParticles) {
-        removeChild(*particle);
+        removeChild(particle);
         _particlePool.push_back(particle);
     }
 }
