@@ -26,7 +26,7 @@ namespace scene {
 void SceneNode::addChild(shared_ptr<SceneNode> node) {
     node->_parent = this;
     node->computeAbsoluteTransforms();
-    _children.push_back(node);
+    _children.insert(node);
 }
 
 void SceneNode::computeAbsoluteTransforms() {
@@ -44,17 +44,15 @@ void SceneNode::computeAbsoluteTransforms() {
     onAbsoluteTransformChanged();
 }
 
-void SceneNode::removeChild(SceneNode &node) {
-    auto maybeChild = find_if(
-        _children.begin(),
-        _children.end(),
-        [&node](auto &n) { return n.get() == &node; });
-
-    if (maybeChild != _children.end()) {
-        node._parent = nullptr;
-        node.computeAbsoluteTransforms();
-        _children.erase(maybeChild);
+void SceneNode::removeChild(const shared_ptr<SceneNode> &node) {
+    auto maybeChild = _children.find(node);
+    if (maybeChild == _children.end()) {
+        return;
     }
+    auto child = *maybeChild;
+    child->_parent = nullptr;
+    child->computeAbsoluteTransforms();
+    _children.erase(maybeChild);
 }
 
 void SceneNode::removeAllChildren() {
