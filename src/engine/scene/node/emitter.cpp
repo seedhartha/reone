@@ -87,6 +87,17 @@ EmitterSceneNode::EmitterSceneNode(
     if (_birthrate != 0.0f) {
         _birthInterval = 1.0f / _birthrate;
     }
+
+    // Pre-allocate particles
+    int numParticles;
+    if (_modelNode->emitter()->updateMode == ModelNode::Emitter::UpdateMode::Single) {
+        numParticles = 1;
+    } else {
+        numParticles = kMaxParticles;
+    }
+    for (int i = 0; i < numParticles; ++i) {
+        _particlePool.push_back(newParticle());
+    }
 }
 
 void EmitterSceneNode::update(float dt) {
@@ -103,10 +114,17 @@ void EmitterSceneNode::removeExpiredParticles(float dt) {
     if (_lifeExpectancy == -1.0f) {
         return;
     }
-    auto expired = remove_if(_children.begin(), _children.end(), [](auto &child) {
-        return static_pointer_cast<ParticleSceneNode>(child)->isExpired();
-    });
-    _children.erase(expired, _children.end());
+    vector<shared_ptr<SceneNode>> expiredParticles;
+    for (auto &child : _children) {
+        auto particle = static_pointer_cast<ParticleSceneNode>(child);
+        if (particle->isExpired()) {
+            expiredParticles.push_back(child);
+        }
+    }
+    for (auto &particle : expiredParticles) {
+        removeChild(*particle);
+        _particlePool.push_back(particle);
+    }
 }
 
 void EmitterSceneNode::spawnParticles(float dt) {
@@ -138,36 +156,41 @@ void EmitterSceneNode::spawnParticles(float dt) {
 }
 
 void EmitterSceneNode::doSpawnParticle() {
-    if (_children.size() >= kMaxParticles) {
+    // Take particle from the pool, if available
+    if (_particlePool.empty()) {
         return;
     }
+    auto particle = static_pointer_cast<ParticleSceneNode>(_particlePool.front());
+    particle->setLifetime(0.0f);
 
     float halfW = 0.005f * _size.x;
     float halfH = 0.005f * _size.y;
     glm::vec3 position(random(-halfW, halfW), random(-halfH, halfH), 0.0f);
+    particle->setPosition(move(position));
 
     float halfSpread = 0.5f * _spread;
     float angle1 = random(-halfSpread, halfSpread);
     float angle2 = random(-halfSpread, halfSpread);
     glm::vec3 dir(glm::sin(angle1), glm::sin(angle2), glm::cos(angle1) * glm::cos(angle2));
-
     glm::vec3 velocity((_velocity + random(0.0f, _randomVelocity)) * dir);
-
-    auto particle = newParticle();
-    particle->setPosition(move(position));
     particle->setVelocity(move(velocity));
+
     particle->setFrame(_frameStart);
     if (_fps > 0.0f) {
         particle->setAnimLength((_frameEnd - _frameStart + 1) / _fps);
     }
+
+    // Remove particle from pool and append it to emitter
+    _particlePool.pop_front();
     addChild(move(particle));
 }
 
 void EmitterSceneNode::spawnLightningParticles() {
     // Ensure there is a reference node directly under this emitter
     auto ref = find_if(_children.begin(), _children.end(), [](auto &child) { return child->type() == SceneNodeType::Dummy; });
-    if (ref == _children.end())
+    if (ref == _children.end()) {
         return;
+    }
 
     float halfW = 0.005f * _size.x;
     float halfH = 0.005f * _size.y;
@@ -192,14 +215,27 @@ void EmitterSceneNode::spawnLightningParticles() {
     }
     segments[_lightningSubDiv].second = emitterSpaceRefPos;
 
+    // Return all particles to pool
+    for (auto &child : _children) {
+        _particlePool.push_back(child);
+    }
     _children.clear();
+
     for (auto &segment : segments) {
+        // Take particle from the pool, if available
+        if (_particlePool.empty()) {
+            return;
+        }
+        auto particle = static_pointer_cast<ParticleSceneNode>(_particlePool.front());
+        _particlePool.pop_front();
+        particle->setLifetime(0.0f);
+
         glm::vec3 endToStart(segment.second - segment.first);
         glm::vec3 center(0.5f * (segment.first + segment.second));
-        auto particle = newParticle();
         particle->setPosition(move(center));
         particle->setDir(_absTransform * glm::vec4(glm::normalize(endToStart), 0.0f));
         particle->setSize(glm::vec2(_lightningScale, glm::length(endToStart)));
+
         addChild(move(particle));
     }
 }

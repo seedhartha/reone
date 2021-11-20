@@ -356,6 +356,7 @@ void Area::reloadParty() {
     shared_ptr<Creature> player(_services.party.player());
     loadParty(player->position(), player->getFacing());
 
+    // TODO: don't have to reload the whole scene
     fill(_services.sceneGraphs.get(kSceneNameMain));
 }
 
