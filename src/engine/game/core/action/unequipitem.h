@@ -27,13 +27,13 @@ class Item;
 
 class UnequipItemAction : public Action {
 public:
-    UnequipItemAction(Game &game, std::shared_ptr<Item> item, bool instant) :
-        Action(game, ActionType::UnequipItem),
+    UnequipItemAction(Game &game, Services &services, std::shared_ptr<Item> item, bool instant) :
+        Action(game, services, ActionType::UnequipItem),
         _item(std::move(item)),
         _instant(instant) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 
 private:
     std::shared_ptr<Item> _item;

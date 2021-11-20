@@ -25,12 +25,12 @@ namespace game {
 
 class UseSkillAction : public ObjectAction {
 public:
-    UseSkillAction(Game &game, std::shared_ptr<Object> object, SkillType skill) :
-        ObjectAction(game, ActionType::UseSkill, std::move(object)),
+    UseSkillAction(Game &game, Services &services, std::shared_ptr<Object> object, SkillType skill) :
+        ObjectAction(game, services, ActionType::UseSkill, std::move(object)),
         _skill(skill) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 
     SkillType skill() const { return _skill; }
 

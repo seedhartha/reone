@@ -19,58 +19,28 @@
 
 namespace reone {
 
-namespace resource {
-
-class Strings;
-
-}
-
 namespace script {
 
-struct ExecutionContext;
+class ExecutionContext;
 
 }
 
 namespace game {
 
-class ActionFactory;
-class Combat;
-class EffectFactory;
 class Game;
-class Party;
-class Reputes;
-class ScriptRunner;
+class Services;
 
 struct RoutineContext {
-    ActionFactory &actionFactory;
-    Combat &combat;
-    EffectFactory &effectFactory;
     Game &game;
-    Party &party;
-    Reputes &reputes;
-    ScriptRunner &scriptRunner;
-
-    resource::Strings &strings;
+    Services &services;
     script::ExecutionContext &execution;
 
     RoutineContext(
-        ActionFactory &actionFactory,
-        Combat &combat,
-        EffectFactory &effectFactory,
         Game &game,
-        Party &party,
-        Reputes &reputes,
-        ScriptRunner &scriptRunner,
-        resource::Strings &strings,
+        Services &services,
         script::ExecutionContext &execution) :
-        actionFactory(actionFactory),
-        combat(combat),
-        effectFactory(effectFactory),
         game(game),
-        party(party),
-        reputes(reputes),
-        scriptRunner(scriptRunner),
-        strings(strings),
+        services(services),
         execution(execution) {
     }
 };

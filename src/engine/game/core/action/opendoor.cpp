@@ -21,8 +21,7 @@
 #include "../object/door.h"
 #include "../object/factory.h"
 #include "../script/runner.h"
-
-#include "context.h"
+#include "../services.h"
 
 using namespace std;
 
@@ -30,8 +29,8 @@ namespace reone {
 
 namespace game {
 
-void OpenDoorAction::execute(Object &actor, ActionContext &ctx, float dt) {
-    shared_ptr<Object> actorPtr(ctx.objectFactory.getObjectById(actor.id()));
+void OpenDoorAction::execute(Object &actor, float dt) {
+    shared_ptr<Object> actorPtr(_services.objectFactory.getObjectById(actor.id()));
     auto creatureActor = dynamic_pointer_cast<Creature>(actorPtr);
     auto door = dynamic_pointer_cast<Door>(_object);
 
@@ -41,14 +40,14 @@ void OpenDoorAction::execute(Object &actor, ActionContext &ctx, float dt) {
         if (!isObjectSelf && door->isLocked()) {
             string onFailToOpen(door->getOnFailToOpen());
             if (!onFailToOpen.empty()) {
-                ctx.scriptRunner.run(onFailToOpen, door->id(), actor.id());
+                _services.scriptRunner.run(onFailToOpen, door->id(), actor.id());
             }
         } else {
             door->open(actorPtr);
             if (!isObjectSelf) {
                 string onOpen(door->getOnOpen());
                 if (!onOpen.empty()) {
-                    ctx.scriptRunner.run(onOpen, door->id(), actor.id(), -1);
+                    _services.scriptRunner.run(onOpen, door->id(), actor.id(), -1);
                 }
             }
         }

@@ -25,11 +25,11 @@ namespace game {
 
 class InteractObjectAction : public Action {
 public:
-    InteractObjectAction(Game &game) :
-        Action(game, ActionType::InteractObject) {
+    InteractObjectAction(Game &game, Services &services) :
+        Action(game, services, ActionType::InteractObject) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

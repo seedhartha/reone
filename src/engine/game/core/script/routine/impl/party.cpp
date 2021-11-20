@@ -46,13 +46,13 @@ namespace routine {
 Variable setPartyLeader(const vector<Variable> &args, const RoutineContext &ctx) {
     int npc = getInt(args, 0);
 
-    ctx.party.setPartyLeader(npc);
+    ctx.game.party().setPartyLeader(npc);
 
     return Variable::ofNull();
 }
 
 Variable getPartyMemberCount(const vector<Variable> &args, const RoutineContext &ctx) {
-    return Variable::ofInt(ctx.party.getSize());
+    return Variable::ofInt(ctx.game.party().getSize());
 }
 
 Variable addToParty(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -67,7 +67,7 @@ Variable addPartyMember(const vector<Variable> &args, const RoutineContext &ctx)
     int npc = getInt(args, 0);
     auto creature = getCreature(args, 1, ctx);
 
-    bool result = ctx.party.addAvailableMember(npc, creature->blueprintResRef());
+    bool result = ctx.game.party().addAvailableMember(npc, creature->blueprintResRef());
 
     return Variable::ofInt(static_cast<int>(result));
 }
@@ -76,8 +76,8 @@ Variable removePartyMember(const vector<Variable> &args, const RoutineContext &c
     bool result = false;
     int npc = getInt(args, 0);
 
-    if (ctx.party.isMember(npc)) {
-        ctx.party.removeMember(npc);
+    if (ctx.game.party().isMember(npc)) {
+        ctx.game.party().removeMember(npc);
 
         shared_ptr<Area> area(ctx.game.module()->area());
         area->unloadParty();
@@ -91,12 +91,12 @@ Variable removePartyMember(const vector<Variable> &args, const RoutineContext &c
 
 Variable isObjectPartyMember(const vector<Variable> &args, const RoutineContext &ctx) {
     auto creature = getCreature(args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(ctx.party.isMember(*creature)));
+    return Variable::ofInt(static_cast<int>(ctx.game.party().isMember(*creature)));
 }
 
 Variable getPartyMemberByIndex(const vector<Variable> &args, const RoutineContext &ctx) {
     int index = getInt(args, 0);
-    auto member = ctx.party.getMember(index);
+    auto member = ctx.game.party().getMember(index);
 
     return Variable::ofObject(getObjectIdOrInvalid(member));
 }
@@ -107,14 +107,14 @@ Variable addAvailableNPCByObject(const vector<Variable> &args, const RoutineCont
 
 Variable removeAvailableNPC(const vector<Variable> &args, const RoutineContext &ctx) {
     int npc = getInt(args, 0);
-    bool removed = ctx.party.removeAvailableMember(npc);
+    bool removed = ctx.game.party().removeAvailableMember(npc);
 
     return Variable::ofInt(static_cast<int>(removed));
 }
 
 Variable isAvailableCreature(const vector<Variable> &args, const RoutineContext &ctx) {
     int npc = getInt(args, 0);
-    bool isAvailable = ctx.party.isMemberAvailable(npc);
+    bool isAvailable = ctx.game.party().isMemberAvailable(npc);
 
     return Variable::ofInt(static_cast<int>(isAvailable));
 }
@@ -123,7 +123,7 @@ Variable addAvailableNPCByTemplate(const vector<Variable> &args, const RoutineCo
     int npc = getInt(args, 0);
     string blueprint(boost::to_lower_copy(getString(args, 1)));
 
-    bool added = ctx.party.addAvailableMember(npc, blueprint);
+    bool added = ctx.game.party().addAvailableMember(npc, blueprint);
 
     return Variable::ofInt(static_cast<int>(added));
 }
@@ -134,7 +134,7 @@ Variable spawnAvailableNPC(const vector<Variable> &args, const RoutineContext &c
 
 Variable isNPCPartyMember(const vector<Variable> &args, const RoutineContext &ctx) {
     int npc = getInt(args, 0);
-    bool isMember = ctx.party.isMember(npc);
+    bool isMember = ctx.game.party().isMember(npc);
 
     return Variable::ofInt(static_cast<int>(isMember));
 }
@@ -191,7 +191,7 @@ Variable getIsPartyLeader(const vector<Variable> &args, const RoutineContext &ct
 }
 
 Variable getPartyLeader(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto player = ctx.party.getLeader();
+    auto player = ctx.game.party().getLeader();
     return Variable::ofObject(getObjectIdOrInvalid(player));
 }
 

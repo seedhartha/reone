@@ -19,15 +19,14 @@
 
 #include "../game.h"
 #include "../object/factory.h"
-
-#include "context.h"
+#include "../services.h"
 
 namespace reone {
 
 namespace game {
 
-void MoveToPointAction::execute(Object &actor, ActionContext &ctx, float dt) {
-    auto creatureActor = ctx.objectFactory.getObjectById<Creature>(actor.id());
+void MoveToPointAction::execute(Object &actor, float dt) {
+    auto creatureActor = _services.objectFactory.getObjectById<Creature>(actor.id());
     bool reached = creatureActor->navigateTo(_point, true, 1.0f, dt);
     if (reached) {
         complete();

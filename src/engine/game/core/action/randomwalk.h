@@ -25,11 +25,11 @@ namespace game {
 
 class RandomWalkAction : public Action {
 public:
-    RandomWalkAction(Game &game) :
-        Action(game, ActionType::RandomWalk) {
+    RandomWalkAction(Game &game, Services &services) :
+        Action(game, services, ActionType::RandomWalk) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

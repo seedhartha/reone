@@ -19,8 +19,7 @@
 
 #include "../game.h"
 #include "../object/factory.h"
-
-#include "context.h"
+#include "../services.h"
 
 using namespace std;
 
@@ -28,8 +27,8 @@ namespace reone {
 
 namespace game {
 
-void FollowAction::execute(Object &actor, ActionContext &ctx, float dt) {
-    auto creatureActor = ctx.objectFactory.getObjectById<Creature>(actor.id());
+void FollowAction::execute(Object &actor, float dt) {
+    auto creatureActor = _services.objectFactory.getObjectById<Creature>(actor.id());
     auto object = static_pointer_cast<SpatialObject>(_object);
     glm::vec3 dest(object->position());
     float distance2 = creatureActor->getDistanceTo2(glm::vec2(dest));

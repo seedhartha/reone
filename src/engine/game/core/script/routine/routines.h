@@ -44,23 +44,6 @@ class ScriptRunner;
 
 class Routines : public IRoutines, boost::noncopyable {
 public:
-    Routines(
-        ActionFactory &actionFactory,
-        Combat &combat,
-        EffectFactory &effectFactory,
-        Party &party,
-        Reputes &reputes,
-        ScriptRunner &scriptRunner,
-        resource::Strings &strings) :
-        _actionFactory(actionFactory),
-        _combat(combat),
-        _effectFactory(effectFactory),
-        _party(party),
-        _reputes(reputes),
-        _scriptRunner(scriptRunner),
-        _strings(strings) {
-    }
-
     void add(
         std::string name,
         script::VariableType retType,
@@ -72,17 +55,7 @@ public:
             retType,
             std::move(argTypes),
             [this, fn](auto &args, auto &execution) {
-                RoutineContext ctx(
-                    _actionFactory,
-                    _combat,
-                    _effectFactory,
-                    *_game,
-                    _party,
-                    _reputes,
-                    _scriptRunner,
-                    _strings,
-                    execution);
-
+                RoutineContext ctx(*_game, *_services, execution);
                 return fn(args, std::move(ctx));
             });
     }
@@ -104,24 +77,13 @@ public:
     }
 
     void setGame(Game &game) { _game = &game; }
+    void setServices(Services &services) { _services = &services; }
 
 private:
-    std::vector<script::Routine> _routines;
-
     Game *_game {nullptr};
+    Services *_services {nullptr};
 
-    // Services
-
-    ActionFactory &_actionFactory;
-    Combat &_combat;
-    EffectFactory &_effectFactory;
-    Party &_party;
-    Reputes &_reputes;
-    ScriptRunner &_scriptRunner;
-
-    resource::Strings &_strings;
-
-    // END Services
+    std::vector<script::Routine> _routines;
 };
 
 } // namespace game

@@ -25,11 +25,11 @@ namespace game {
 
 class FollowOwnerAction : public Action {
 public:
-    FollowOwnerAction(Game &game) :
-        Action(game, ActionType::FollowOwner) {
+    FollowOwnerAction(Game &game, Services &services) :
+        Action(game, services, ActionType::FollowOwner) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

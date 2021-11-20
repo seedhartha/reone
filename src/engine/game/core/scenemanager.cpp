@@ -19,7 +19,7 @@
 
 #include "../../graphics/barycentricutil.h"
 #include "../../graphics/mesh/mesh.h"
-#include "../../graphics/mesh/triangleutil.h"
+#include "../../graphics/triangleutil.h"
 #include "../../scene/graphs.h"
 #include "../../scene/node/grasscluster.h"
 #include "../../scene/node/model.h"
@@ -97,7 +97,7 @@ void SceneManager::refresh(Area &area) {
     }
 }
 
-void SceneManager::onObjectAdded(const SpatialObject &object) {
+void SceneManager::onObjectCreated(const SpatialObject &object) {
     auto sceneNode = object.sceneNode();
     if (!sceneNode) {
         return;

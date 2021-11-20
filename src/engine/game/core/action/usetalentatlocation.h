@@ -25,11 +25,11 @@ namespace game {
 
 class UseTalentAtLocationAction : public Action {
 public:
-    UseTalentAtLocationAction(Game &game) :
-        Action(game, ActionType::UseTalentAtLocation) {
+    UseTalentAtLocationAction(Game &game, Services &services) :
+        Action(game, services, ActionType::UseTalentAtLocation) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

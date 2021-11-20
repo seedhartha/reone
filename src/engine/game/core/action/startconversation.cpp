@@ -20,8 +20,7 @@
 #include "../game.h"
 #include "../object/factory.h"
 #include "../party.h"
-
-#include "context.h"
+#include "../services.h"
 
 using namespace std;
 
@@ -31,8 +30,8 @@ namespace game {
 
 static constexpr float kMaxConversationDistance = 4.0f;
 
-void StartConversationAction::execute(Object &actor, ActionContext &ctx, float dt) {
-    shared_ptr<Object> actorPtr(ctx.objectFactory.getObjectById(actor.id()));
+void StartConversationAction::execute(Object &actor, float dt) {
+    shared_ptr<Object> actorPtr(_services.objectFactory.getObjectById(actor.id()));
     auto creatureActor = static_pointer_cast<Creature>(actorPtr);
     auto object = static_pointer_cast<SpatialObject>(_object);
 
@@ -42,7 +41,7 @@ void StartConversationAction::execute(Object &actor, ActionContext &ctx, float d
         creatureActor->navigateTo(object->position(), true, kMaxConversationDistance, dt);
 
     if (reached) {
-        bool isActorLeader = ctx.party.getLeader() == actorPtr;
+        bool isActorLeader = _game.party().getLeader() == actorPtr;
         _game.module()->area()->startDialog(isActorLeader ? object : static_pointer_cast<SpatialObject>(actorPtr), _dialogResRef);
         complete();
     }

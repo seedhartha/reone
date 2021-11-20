@@ -26,18 +26,12 @@
 
 namespace reone {
 
-namespace scene {
-
-class SceneGraph;
-
-}
-
 namespace game {
 
 constexpr float kDetectionRange = 20.0f;
 
-class EffectFactory;
 class Game;
+class Services;
 
 class Combat {
 public:
@@ -50,10 +44,10 @@ public:
     };
 
     Combat(
-        EffectFactory &effectFactory,
-        scene::SceneGraph &sceneGraph) :
-        _effectFactory(effectFactory),
-        _sceneGraph(sceneGraph) {
+        Game &game,
+        Services &services) :
+        _game(game),
+        _services(services) {
     }
 
     /**
@@ -71,8 +65,6 @@ public:
         int damage = -1);
 
     void update(float dt);
-
-    void setGame(Game &game) { _game = &game; }
 
 private:
     enum class RoundState {
@@ -107,16 +99,10 @@ private:
 
     typedef std::map<uint32_t, std::unique_ptr<Round>> RoundMap;
 
-    Game *_game {nullptr};
+    Game &_game;
+    Services &_services;
+
     RoundMap _roundByAttacker;
-
-    // Services
-
-    EffectFactory &_effectFactory;
-
-    scene::SceneGraph &_sceneGraph;
-
-    // END Services
 
     void updateRound(Round &round, float dt);
     void startAttack(Attack &attack, bool duel);

@@ -278,7 +278,7 @@ void CharacterGeneration::startQuick() {
 void CharacterGeneration::startLevelUp() {
     _type = Type::LevelUp;
 
-    shared_ptr<Creature> partyLeader(_services.party.getLeader());
+    shared_ptr<Creature> partyLeader(_game.party().getLeader());
 
     Character character;
     character.appearance = partyLeader->appearance();
@@ -364,7 +364,7 @@ void CharacterGeneration::finish() {
         ClassType classType = _character.attributes.getEffectiveClass();
         shared_ptr<CreatureClass> clazz(_services.classes.get(classType));
         _character.attributes.addClassLevels(clazz.get(), 1);
-        shared_ptr<Creature> partyLeader(_services.party.getLeader());
+        shared_ptr<Creature> partyLeader(_game.party().getLeader());
         partyLeader->attributes() = _character.attributes;
         _game.openInGame();
     } else {
@@ -377,7 +377,7 @@ void CharacterGeneration::finish() {
         player->setImmortal(true);
         player->attributes() = _character.attributes;
 
-        Party &party = _services.party;
+        Party &party = _game.party();
         party.clear();
         party.addMember(kNpcPlayer, player);
         party.setPlayer(player);

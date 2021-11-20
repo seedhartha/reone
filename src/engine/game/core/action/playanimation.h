@@ -27,14 +27,14 @@ namespace game {
 
 class PlayAnimationAction : public Action {
 public:
-    PlayAnimationAction(Game &game, AnimationType anim, float speed, float durationSeconds) :
-        Action(game, ActionType::PlayAnimation),
+    PlayAnimationAction(Game &game, Services &services, AnimationType anim, float speed, float durationSeconds) :
+        Action(game, services, ActionType::PlayAnimation),
         _anim(anim),
         _speed(speed),
         _durationSeconds(durationSeconds) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 
 private:
     AnimationType _anim;

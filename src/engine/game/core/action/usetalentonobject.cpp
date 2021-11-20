@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void UseTalentOnObjectAction::execute(Object &actor, ActionContext &ctx, float dt) {
+void UseTalentOnObjectAction::execute(Object &actor, float dt) {
     // TODO: implement
 
     complete();

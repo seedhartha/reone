@@ -25,11 +25,11 @@ namespace game {
 
 class CastFakeSpellAtObjectAction : public Action {
 public:
-    CastFakeSpellAtObjectAction(Game &game) :
-        Action(game, ActionType::CastFakeSpellAtObject) {
+    CastFakeSpellAtObjectAction(Game &game, Services &services) :
+        Action(game, services, ActionType::CastFakeSpellAtObject) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

@@ -25,11 +25,11 @@ namespace game {
 
 class LockObjectAction : public Action {
 public:
-    LockObjectAction(Game &game) :
-        Action(game, ActionType::Lock) {
+    LockObjectAction(Game &game, Services &services) :
+        Action(game, services, ActionType::Lock) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

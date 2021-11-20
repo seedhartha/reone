@@ -217,7 +217,7 @@ void DialogGUI::loadCurrentSpeaker() {
 
     // Make current speaker face the player, and vice versa
     if (_currentSpeaker) {
-        shared_ptr<Creature> player(_services.party.player());
+        shared_ptr<Creature> player(_game.party().player());
         player->face(*_currentSpeaker);
 
         auto speakerCreature = dynamic_pointer_cast<Creature>(_currentSpeaker);
@@ -232,7 +232,7 @@ void DialogGUI::updateCamera() {
     shared_ptr<Area> area(_game.module()->area());
 
     if (_dialog->cameraModel().empty()) {
-        shared_ptr<Creature> player(_services.party.player());
+        shared_ptr<Creature> player(_game.party().player());
         glm::vec3 listenerPosition(player ? getTalkPosition(*player) : glm::vec3(0.0f));
         glm::vec3 speakerPosition(_currentSpeaker ? getTalkPosition(*_currentSpeaker) : glm::vec3(0.0f));
         auto &camera = area->getCamera<DialogCamera>(CameraType::Dialog);

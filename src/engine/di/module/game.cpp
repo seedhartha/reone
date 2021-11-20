@@ -58,25 +58,21 @@ void GameModule::init() {
     _classes = make_unique<Classes>(_resource.strings(), _resource.twoDas());
     _portraits = make_unique<Portraits>(_graphics.textures(), _resource.twoDas());
     _actionFactory = make_unique<ActionFactory>();
-    _party = make_unique<Party>();
-    _combat = make_unique<Combat>(*_effectFactory, _scene.sceneGraphs().get(kSceneMain));
     _objectFactory = make_unique<ObjectFactory>();
     _effectFactory = make_unique<EffectFactory>();
-    _routines = make_unique<Routines>(*_actionFactory, *_combat, *_effectFactory, *_party, *_reputes, *_scriptRunner, _resource.strings());
+    _routines = make_unique<Routines>();
     _routineRegistrar = newRoutineRegistrar();
     _sceneManager = make_unique<SceneManager>(*_surfaces, _scene.sceneGraphs());
 
     _services = make_unique<Services>(
         *_actionFactory,
         *_classes,
-        *_combat,
         *_cursors,
         *_effectFactory,
         *_feats,
         *_footstepSounds,
         *_guiSounds,
         *_objectFactory,
-        *_party,
         *_portraits,
         *_reputes,
         *_sceneManager,
@@ -111,11 +107,11 @@ void GameModule::init() {
 
     _scriptRunner->setRoutines(*_routines);
     _actionFactory->setGame(*_game);
-    _party->setGame(*_game);
-    _combat->setGame(*_game);
+    _actionFactory->setServices(*_services);
     _objectFactory->setGame(*_game);
     _objectFactory->setServices(*_services);
     _routines->setGame(*_game);
+    _routines->setServices(*_services);
 
     _game->initResourceProviders();
     _surfaces->init();

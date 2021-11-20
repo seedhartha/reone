@@ -24,7 +24,7 @@ namespace reone {
 
 namespace game {
 
-void JumpToLocationAction::execute(Object &actor, ActionContext &ctx, float dt) {
+void JumpToLocationAction::execute(Object &actor, float dt) {
     auto spatialActor = static_cast<SpatialObject *>(&actor);
     spatialActor->setPosition(_location->position());
     spatialActor->setFacing(_location->facing());

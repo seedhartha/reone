@@ -27,8 +27,8 @@ namespace game {
 
 class WaitAction : public Action {
 public:
-    WaitAction(Game &game, float seconds) :
-        Action(game, ActionType::Wait) {
+    WaitAction(Game &game, Services &services, float seconds) :
+        Action(game, services, ActionType::Wait) {
         _timer.setTimeout(seconds);
     }
 
@@ -41,7 +41,7 @@ public:
         return _timer.advance(dt);
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 
 private:
     Timer _timer;

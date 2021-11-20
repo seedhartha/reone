@@ -25,11 +25,11 @@ namespace game {
 
 class MoveAwayFromLocationAction : public Action {
 public:
-    MoveAwayFromLocationAction(Game &game) :
-        Action(game, ActionType::MoveAwayFromLocation) {
+    MoveAwayFromLocationAction(Game &game, Services &services) :
+        Action(game, services, ActionType::MoveAwayFromLocation) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

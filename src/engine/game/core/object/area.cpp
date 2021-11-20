@@ -92,7 +92,7 @@ Area::Area(
         ObjectType::Area,
         game,
         services),
-    _map(game, services.party, services.context, services.meshes, services.shaders, services.textures, services.window) {
+    _map(game, game.party(), services.context, services.meshes, services.shaders, services.textures, services.window) {
 
     init();
 
@@ -336,7 +336,7 @@ void Area::landObject(SpatialObject &object) {
 }
 
 void Area::loadParty(const glm::vec3 &position, float facing, bool fromSave) {
-    Party &party = _services.party;
+    Party &party = _game.party();
 
     for (int i = 0; i < party.getSize(); ++i) {
         shared_ptr<Creature> member(party.getMember(i));
@@ -350,16 +350,16 @@ void Area::loadParty(const glm::vec3 &position, float facing, bool fromSave) {
 }
 
 void Area::unloadParty() {
-    for (auto &member : _services.party.members()) {
+    for (auto &member : _game.party().members()) {
         doDestroyObject(member.creature->id());
     }
 }
 
 void Area::reloadParty() {
-    shared_ptr<Creature> player(_services.party.player());
+    shared_ptr<Creature> player(_game.party().player());
     loadParty(player->position(), player->getFacing());
-    for (auto &member : _services.party.members()) {
-        _services.sceneManager.onObjectAdded(*member.creature);
+    for (auto &member : _game.party().members()) {
+        _services.sceneManager.onObjectCreated(*member.creature);
     }
 }
 
@@ -471,7 +471,7 @@ bool Area::doMoveCreature(const shared_ptr<Creature> &creature, const glm::vec3 
         creature->setPosition(glm::vec3(dest.x, dest.y, z));
         creature->setWalkmeshMaterial(material);
 
-        if (creature == _services.party.getLeader()) {
+        if (creature == _game.party().getLeader()) {
             onPartyLeaderMoved(room != oldRoom);
         }
 
@@ -499,7 +499,7 @@ void Area::runOnEnterScript() {
     if (_onEnter.empty())
         return;
 
-    auto player = _services.party.player();
+    auto player = _game.party().player();
     if (!player)
         return;
 
@@ -510,7 +510,7 @@ void Area::runOnExitScript() {
     if (_onExit.empty())
         return;
 
-    auto player = _services.party.player();
+    auto player = _game.party().player();
     if (!player)
         return;
 
@@ -548,7 +548,7 @@ glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &objec
 }
 
 void Area::update3rdPersonCameraFacing() {
-    shared_ptr<SpatialObject> partyLeader(_services.party.getLeader());
+    shared_ptr<SpatialObject> partyLeader(_game.party().getLeader());
     if (!partyLeader)
         return;
 
@@ -566,7 +566,7 @@ void Area::startDialog(const shared_ptr<SpatialObject> &object, const string &re
 }
 
 void Area::onPartyLeaderMoved(bool roomChanged) {
-    shared_ptr<Creature> partyLeader(_services.party.getLeader());
+    shared_ptr<Creature> partyLeader(_game.party().getLeader());
     if (!partyLeader)
         return;
 
@@ -578,7 +578,7 @@ void Area::onPartyLeaderMoved(bool roomChanged) {
 }
 
 void Area::updateRoomVisibility() {
-    shared_ptr<Creature> partyLeader(_services.party.getLeader());
+    shared_ptr<Creature> partyLeader(_game.party().getLeader());
     Room *leaderRoom = partyLeader ? partyLeader->room() : nullptr;
     bool allVisible = _game.cameraType() != CameraType::ThirdPerson || !leaderRoom;
 
@@ -608,7 +608,7 @@ void Area::updateRoomVisibility() {
 }
 
 void Area::update3rdPersonCameraTarget() {
-    shared_ptr<SpatialObject> partyLeader(_services.party.getLeader());
+    shared_ptr<SpatialObject> partyLeader(_game.party().getLeader());
     if (!partyLeader) {
         return;
     }
@@ -632,8 +632,8 @@ void Area::updateVisibility() {
 
 void Area::updateSounds() {
     glm::vec3 refPosition;
-    if (_game.cameraType() == CameraType::ThirdPerson && _services.party.getLeader()) {
-        refPosition = _services.party.getLeader()->position();
+    if (_game.cameraType() == CameraType::ThirdPerson && _game.party().getLeader()) {
+        refPosition = _game.party().getLeader()->position();
     } else {
         refPosition = _game.getActiveCamera()->sceneNode()->absoluteTransform()[3];
     }
@@ -859,7 +859,7 @@ vector<shared_ptr<SpatialObject>> Area::getSelectableObjects() const {
     vector<shared_ptr<SpatialObject>> result;
     vector<pair<shared_ptr<SpatialObject>, float>> distances;
 
-    shared_ptr<SpatialObject> partyLeader(_services.party.getLeader());
+    shared_ptr<SpatialObject> partyLeader(_game.party().getLeader());
     glm::vec3 origin(partyLeader->position());
 
     for (auto &object : objects()) {
@@ -1231,7 +1231,7 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
 
 shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
     shared_ptr<CameraSceneNode> camera(_services.sceneGraphs.get(kSceneMain).activeCamera());
-    shared_ptr<Creature> partyLeader(_services.party.getLeader());
+    shared_ptr<Creature> partyLeader(_game.party().getLeader());
     if (!camera || !partyLeader) {
         return nullptr;
     }

@@ -77,7 +77,6 @@ class Feats;
 class FootstepSounds;
 class GUISounds;
 class ObjectFactory;
-class Party;
 class Portraits;
 class Reputes;
 class SceneManager;
@@ -89,14 +88,12 @@ class Surfaces;
 struct Services {
     ActionFactory &actionFactory;
     Classes &classes;
-    Combat &combat;
     Cursors &cursors;
     EffectFactory &effectFactory;
     Feats &feats;
     FootstepSounds &footstepSounds;
     GUISounds &guiSounds;
     ObjectFactory &objectFactory;
-    Party &party;
     Portraits &portraits;
     Reputes &reputes;
     SceneManager &sceneManager;
@@ -131,14 +128,12 @@ struct Services {
     Services(
         ActionFactory &actionFactory,
         Classes &classes,
-        Combat &combat,
         Cursors &cursors,
         EffectFactory &effectFactory,
         Feats &feats,
         FootstepSounds &footstepSounds,
         GUISounds &guiSounds,
         ObjectFactory &objectFactory,
-        Party &party,
         Portraits &portraits,
         Reputes &reputes,
         SceneManager &sceneManager,
@@ -170,14 +165,12 @@ struct Services {
         resource::TwoDas &twoDas) :
         actionFactory(actionFactory),
         classes(classes),
-        combat(combat),
         cursors(cursors),
         effectFactory(effectFactory),
         feats(feats),
         footstepSounds(footstepSounds),
         guiSounds(guiSounds),
         objectFactory(objectFactory),
-        party(party),
         portraits(portraits),
         reputes(reputes),
         sceneManager(sceneManager),

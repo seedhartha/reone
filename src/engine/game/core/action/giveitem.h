@@ -25,11 +25,11 @@ namespace game {
 
 class GiveItemAction : public Action {
 public:
-    GiveItemAction(Game &game) :
-        Action(game, ActionType::GiveItem) {
+    GiveItemAction(Game &game, Services &services) :
+        Action(game, services, ActionType::GiveItem) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

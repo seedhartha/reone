@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void SpeakStringByStrRefAction::execute(Object &actor, ActionContext &ctx, float dt) {
+void SpeakStringByStrRefAction::execute(Object &actor, float dt) {
     // TODO: implement
 
     complete();

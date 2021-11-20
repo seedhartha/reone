@@ -19,9 +19,11 @@
 
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
+#include "../../scene/graphs.h"
 
 #include "effect/factory.h"
 #include "game.h"
+#include "services.h"
 
 using namespace std;
 
@@ -348,7 +350,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
                 attack.target->applyEffect(effect, DurationType::Instant);
             }
         } else {
-            shared_ptr<DamageEffect> effect(_effectFactory.newDamage(attack.damage, DamageType::Universal, attack.attacker));
+            shared_ptr<DamageEffect> effect(_services.effectFactory.newDamage(attack.damage, DamageType::Universal, attack.attacker));
             attack.target->applyEffect(move(effect), DurationType::Instant);
         }
         break;
@@ -361,7 +363,7 @@ void Combat::applyAttackResult(const Attack &attack, bool offHand) {
                 attack.target->applyEffect(effect, DurationType::Instant);
             }
         } else {
-            shared_ptr<DamageEffect> effect(_effectFactory.newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, attack.attacker));
+            shared_ptr<DamageEffect> effect(_services.effectFactory.newDamage(criticalHitMultiplier * attack.damage, DamageType::Universal, attack.attacker));
             attack.target->applyEffect(move(effect), DurationType::Instant);
         }
         break;
@@ -383,7 +385,7 @@ vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> d
         type = static_cast<DamageType>(weapon->damageFlags());
     }
     amount = glm::max(1, amount);
-    shared_ptr<DamageEffect> effect(_effectFactory.newDamage(multiplier * amount, type, move(damager)));
+    shared_ptr<DamageEffect> effect(_services.effectFactory.newDamage(multiplier * amount, type, move(damager)));
 
     return vector<shared_ptr<DamageEffect>> {move(effect)};
 }
@@ -426,10 +428,10 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
     round.projectileDir = glm::normalize(projectileTarget - projectilePos);
 
     // Create and add a projectile to the scene graph
-    round.projectile = _sceneGraph.newModel(ammunitionType->model, ModelUsage::Projectile);
+    round.projectile = _services.sceneGraphs.get(kSceneMain).newModel(ammunitionType->model, ModelUsage::Projectile);
     round.projectile->signalEvent(kModelEventDetonate);
     round.projectile->setLocalTransform(glm::translate(projectilePos));
-    _sceneGraph.addRoot(round.projectile);
+    _services.sceneGraphs.get(kSceneMain).addRoot(round.projectile);
 
     // Play shot sound, if any
     weapon->playShotSound(0, projectilePos);
@@ -450,7 +452,7 @@ void Combat::updateProjectile(Round &round, float dt) {
 
 void Combat::resetProjectile(Round &round) {
     if (round.projectile) {
-        _sceneGraph.removeRoot(round.projectile);
+        _services.sceneGraphs.get(kSceneMain).removeRoot(round.projectile);
         round.projectile.reset();
     }
 }

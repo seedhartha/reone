@@ -25,11 +25,11 @@ namespace game {
 
 class SpeakStringByStrRefAction : public Action {
 public:
-    SpeakStringByStrRefAction(Game &game) :
-        Action(game, ActionType::SpeakStringByStrRef) {
+    SpeakStringByStrRefAction(Game &game, Services &services) :
+        Action(game, services, ActionType::SpeakStringByStrRef) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

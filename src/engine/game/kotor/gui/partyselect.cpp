@@ -202,7 +202,7 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
     if (ctx.forceNpc2 >= 0) {
         addNpc(ctx.forceNpc2);
     }
-    Party &party = _services.party;
+    Party &party = _game.party();
     vector<Label *> charLabels {
         _binding.lblChar0.get(),
         _binding.lblChar1.get(),
@@ -340,11 +340,11 @@ void PartySelection::changeParty() {
     shared_ptr<Area> area(_game.module()->area());
     area->unloadParty();
 
-    Party &party = _services.party;
+    Party &party = _game.party();
     party.clear();
     party.addMember(kNpcPlayer, party.player());
 
-    shared_ptr<Creature> player(_services.party.player());
+    shared_ptr<Creature> player(_game.party().player());
 
     for (int i = 0; i < kNpcCount; ++i) {
         if (!_added[i])

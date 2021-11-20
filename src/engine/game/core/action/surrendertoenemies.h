@@ -25,11 +25,11 @@ namespace game {
 
 class SurrenderToEnemiesAction : public Action {
 public:
-    SurrenderToEnemiesAction(Game &game) :
-        Action(game, ActionType::SurrenderToEnemies) {
+    SurrenderToEnemiesAction(Game &game, Services &services) :
+        Action(game, services, ActionType::SurrenderToEnemies) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

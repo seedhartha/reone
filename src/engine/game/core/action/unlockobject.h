@@ -25,11 +25,11 @@ namespace game {
 
 class UnlockObjectAction : public Action {
 public:
-    UnlockObjectAction(Game &game) :
-        Action(game, ActionType::OpenLock) {
+    UnlockObjectAction(Game &game, Services &services) :
+        Action(game, services, ActionType::OpenLock) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

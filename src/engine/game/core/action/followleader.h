@@ -25,11 +25,11 @@ namespace game {
 
 class FollowLeaderAction : public Action {
 public:
-    FollowLeaderAction(Game &game) :
-        Action(game, ActionType::FollowLeader) {
+    FollowLeaderAction(Game &game, Services &services) :
+        Action(game, services, ActionType::FollowLeader) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

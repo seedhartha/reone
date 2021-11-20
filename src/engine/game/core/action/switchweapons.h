@@ -25,11 +25,11 @@ namespace game {
 
 class SwitchWeaponsAction : public Action {
 public:
-    SwitchWeaponsAction(Game &game) :
-        Action(game, ActionType::SwitchWeapons) {
+    SwitchWeaponsAction(Game &game, Services &services) :
+        Action(game, services, ActionType::SwitchWeapons) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

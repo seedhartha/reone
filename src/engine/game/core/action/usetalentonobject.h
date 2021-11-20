@@ -25,11 +25,11 @@ namespace game {
 
 class UseTalentOnObjectAction : public Action {
 public:
-    UseTalentOnObjectAction(Game &game) :
-        Action(game, ActionType::UseTalentOnObject) {
+    UseTalentOnObjectAction(Game &game, Services &services) :
+        Action(game, services, ActionType::UseTalentOnObject) {
     }
 
-    void execute(Object &actor, ActionContext &ctx, float dt) override;
+    void execute(Object &actor, float dt) override;
 };
 
 } // namespace game

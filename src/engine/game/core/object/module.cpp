@@ -108,7 +108,7 @@ void Module::loadArea(const GffStruct &ifo, bool fromSave) {
 }
 
 void Module::loadPlayer() {
-    _player = make_unique<Player>(*this, *_area, _area->getCamera(CameraType::ThirdPerson), _services.party);
+    _player = make_unique<Player>(*this, *_area, _area->getCamera(CameraType::ThirdPerson), _game.party());
 }
 
 void Module::loadParty(const string &entry, bool fromSave) {
@@ -177,7 +177,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
                 cursor = CursorType::Pickup;
             } else {
                 auto creature = static_pointer_cast<Creature>(object);
-                bool isEnemy = _services.reputes.getIsEnemy(*creature, *_services.party.getLeader());
+                bool isEnemy = _services.reputes.getIsEnemy(*creature, *_game.party().getLeader());
                 cursor = isEnemy ? CursorType::Attack : CursorType::Talk;
             }
             break;
@@ -235,7 +235,7 @@ void Module::onObjectClick(const shared_ptr<SpatialObject> &object) {
 void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
     debug(boost::format("Module: click: creature '%s', faction %d") % creature->tag() % static_cast<int>(creature->faction()));
 
-    shared_ptr<Creature> partyLeader(_services.party.getLeader());
+    shared_ptr<Creature> partyLeader(_game.party().getLeader());
 
     if (creature->isDead()) {
         if (!creature->items().empty()) {
@@ -260,14 +260,14 @@ void Module::onDoorClick(const shared_ptr<Door> &door) {
         return;
     }
     if (!door->isOpen()) {
-        shared_ptr<Creature> partyLeader(_services.party.getLeader());
+        shared_ptr<Creature> partyLeader(_game.party().getLeader());
         partyLeader->clearAllActions();
         partyLeader->addAction(_services.actionFactory.newOpenDoor(door));
     }
 }
 
 void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
-    shared_ptr<Creature> partyLeader(_services.party.getLeader());
+    shared_ptr<Creature> partyLeader(_game.party().getLeader());
 
     if (placeable->hasInventory()) {
         partyLeader->clearAllActions();
@@ -292,7 +292,7 @@ vector<ContextAction> Module::getContextActions(const shared_ptr<Object> &object
 
     switch (object->type()) {
     case ObjectType::Creature: {
-        auto leader = _services.party.getLeader();
+        auto leader = _game.party().getLeader();
         auto creature = static_pointer_cast<Creature>(object);
         if (!creature->isDead() && _services.reputes.getIsEnemy(*leader, *creature)) {
             actions.push_back(ContextAction(ActionType::AttackObject));
@@ -347,7 +347,7 @@ vector<ContextAction> Module::getContextActions(const shared_ptr<Object> &object
     }
     case ObjectType::Door: {
         auto door = static_pointer_cast<Door>(object);
-        if (door->isLocked() && !door->isKeyRequired() && _services.party.getLeader()->attributes().hasSkill(SkillType::Security)) {
+        if (door->isLocked() && !door->isKeyRequired() && _game.party().getLeader()->attributes().hasSkill(SkillType::Security)) {
             actions.push_back(ContextAction(SkillType::Security));
         }
         break;

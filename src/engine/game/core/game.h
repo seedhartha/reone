@@ -22,10 +22,12 @@
 #include "../../video/video.h"
 
 #include "camera/camera.h"
+#include "combat.h"
 #include "console.h"
 #include "gui/loadscreen.h"
 #include "object/module.h"
 #include "options.h"
+#include "party.h"
 #include "profileoverlay.h"
 
 namespace reone {
@@ -90,6 +92,8 @@ public:
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
     const Options &options() const { return _options; }
+    Party &party() { return _party; }
+    Combat &combat() { return _combat; }
     std::shared_ptr<Module> module() const { return _module; }
     CameraType cameraType() const { return _cameraType; }
     const std::set<std::string> &moduleNames() const { return _moduleNames; }
@@ -178,34 +182,15 @@ protected:
 
     bool _tsl;
     boost::filesystem::path _path;
+    Options _options;
     Services &_services;
+    Party _party;
+    Combat _combat;
 
     GameScreen _screen {GameScreen::None};
     std::string _mainMenuMusicResRef;
     std::string _charGenMusicResRef;
     std::string _charGenLoadScreenResRef;
-
-    // GUI colors
-
-    glm::vec3 _guiColorBase {0.0f};
-    glm::vec3 _guiColorHilight {0.0f};
-    glm::vec3 _guiColorDisabled {0.0f};
-
-    // END GUI colors
-
-    virtual void start() = 0;
-
-    void stopMovement();
-
-    // Rendering
-
-    void drawAll();
-    void drawWorld();
-    void drawGUI();
-
-    // END Rendering
-
-    Options _options;
 
     uint32_t _ticks {0};
     bool _quit {false};
@@ -216,6 +201,14 @@ protected:
     CameraType _cameraType {CameraType::ThirdPerson};
     bool _paused {false};
     std::set<std::string> _moduleNames;
+
+    // GUI colors
+
+    glm::vec3 _guiColorBase {0.0f};
+    glm::vec3 _guiColorHilight {0.0f};
+    glm::vec3 _guiColorDisabled {0.0f};
+
+    // END GUI colors
 
     // Modules
 
@@ -254,6 +247,10 @@ protected:
 
     void deinit();
 
+    virtual void start() = 0;
+
+    void stopMovement();
+
     virtual void loadModuleNames() = 0;
     virtual void loadModuleResources(const std::string &moduleName) = 0;
 
@@ -282,6 +279,16 @@ protected:
     virtual gui::GUI *getScreenGUI() const = 0;
     virtual CameraType getConversationCamera(int &cameraId) const = 0;
 
+    std::shared_ptr<resource::GffStruct> getPartyMemberNFOStruct(int index) const;
+
+    // Rendering
+
+    void drawAll();
+    void drawWorld();
+    void drawGUI();
+
+    // END Rendering
+
     // GUI
 
     virtual void loadInGameMenus() = 0;
@@ -293,12 +300,6 @@ protected:
     void withLoadingScreen(const std::string &imageResRef, const std::function<void()> &block);
 
     // END GUI
-
-    // Save games
-
-    std::shared_ptr<resource::GffStruct> getPartyMemberNFOStruct(int index) const;
-
-    // END Save games
 };
 
 } // namespace game
