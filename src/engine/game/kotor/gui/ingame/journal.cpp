@@ -33,7 +33,7 @@ namespace reone {
 namespace game {
 
 JournalMenu::JournalMenu(
-    KotOR *game,
+    KotOR &game,
     Services &services) :
     GameGUI(game, services) {
     _resRef = getResRef("journal");
@@ -47,11 +47,11 @@ void JournalMenu::load() {
     bindControls();
 
     _binding.btnExit->setOnClick([this]() {
-        _game->openInGame();
+        _game.openInGame();
     });
     _binding.btnSwapText->setDisabled(true);
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.btnQuestItems->setDisabled(true);
         _binding.btnSort->setDisabled(true);
     }
@@ -61,7 +61,7 @@ void JournalMenu::bindControls() {
     _binding.btnExit = getControl<Button>("BTN_EXIT");
     _binding.btnSwapText = getControl<Button>("BTN_SWAPTEXT");
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.btnQuestItems = getControl<Button>("BTN_QUESTITEMS");
         _binding.btnSort = getControl<Button>("BTN_SORT");
     }

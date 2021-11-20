@@ -38,8 +38,8 @@ class CharacterGeneration;
 class CharGenAbilities : public GameGUI {
 public:
     CharGenAbilities(
-        CharacterGeneration *charGen,
-        KotOR *game,
+        CharacterGeneration &charGen,
+        KotOR &game,
         Services &services);
 
     void load() override;
@@ -88,7 +88,7 @@ private:
         // END KotOR only
     } _binding;
 
-    CharacterGeneration *_charGen;
+    CharacterGeneration &_charGen;
     CreatureAttributes _attributes;
     int _points {0};
 

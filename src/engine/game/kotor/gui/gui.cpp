@@ -37,9 +37,9 @@ namespace reone {
 
 namespace game {
 
-GameGUI::GameGUI(KotOR *game, Services &services) :
+GameGUI::GameGUI(KotOR &game, Services &services) :
     GUI(
-        game->options().graphics,
+        game.options().graphics,
         services.controlRenderPipeline,
         services.sceneGraphs,
         services.context,
@@ -69,23 +69,23 @@ void GameGUI::onFocusChanged(const string &control, bool focus) {
 }
 
 void GameGUI::initForGame() {
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         _resolutionX = 800;
         _resolutionY = 600;
     } else {
         _hasDefaultHilightColor = true;
-        _defaultHilightColor = _game->getGUIColorHilight();
+        _defaultHilightColor = _game.getGUIColorHilight();
     }
 }
 
 string GameGUI::getResRef(const std::string &base) const {
-    return _game->isTSL() ? base + "_p" : base;
+    return _game.isTSL() ? base + "_p" : base;
 }
 
 void GameGUI::loadBackground(BackgroundType type) {
     string resRef;
 
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         switch (type) {
         case BackgroundType::Computer0:
         case BackgroundType::Computer1:

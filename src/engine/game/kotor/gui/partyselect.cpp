@@ -52,9 +52,9 @@ static int g_strRefRemove = 38456;
 static glm::vec3 g_kotorColorOn = {0.984314f, 1.0f, 0};
 static glm::vec3 g_kotorColorAdded = {0, 0.831373f, 0.090196f};
 
-PartySelection::PartySelection(KotOR *game, Services &services) :
+PartySelection::PartySelection(KotOR &game, Services &services) :
     GameGUI(game, services) {
-    if (game->isTSL()) {
+    if (game.isTSL()) {
         _resRef = "partyselect_p";
     } else {
         _resRef = "partyselection";
@@ -80,13 +80,13 @@ void PartySelection::load() {
     });
     _binding.btnDone->setOnClick([this]() {
         changeParty();
-        _game->openInGame();
+        _game.openInGame();
         if (!_context.exitScript.empty()) {
             _services.scriptRunner.run(_context.exitScript);
         }
     });
     _binding.btnBack->setOnClick([this]() {
-        _game->openInGame();
+        _game.openInGame();
         if (!_context.exitScript.empty()) {
             _services.scriptRunner.run(_context.exitScript);
         }
@@ -119,7 +119,7 @@ void PartySelection::load() {
         onNpcButtonClick(8);
     });
 
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         _binding.btnNpc9->setOnClick([this]() {
             onNpcButtonClick(9);
         });
@@ -171,7 +171,7 @@ void PartySelection::bindControls() {
     _binding.lblNpcName = getControl<Label>("LBL_NPC_NAME");
     _binding.lblTitle = getControl<Label>("LBL_TITLE");
 
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         _binding.btnNpc9 = getControl<ToggleButton>("BTN_NPC9");
         _binding.btnNpc10 = getControl<ToggleButton>("BTN_NPC10");
         _binding.btnNpc11 = getControl<ToggleButton>("BTN_NPC11");
@@ -224,7 +224,7 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
         _binding.lblNa6.get(),
         _binding.lblNa7.get(),
         _binding.lblNa8.get()};
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         charLabels.push_back(_binding.lblChar9.get());
         charLabels.push_back(_binding.lblChar10.get());
         charLabels.push_back(_binding.lblChar11.get());
@@ -280,7 +280,7 @@ ToggleButton &PartySelection::getNpcButton(int npc) {
         _binding.btnNpc7.get(),
         _binding.btnNpc8.get(),
         _binding.btnNpc9.get()};
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         npcButtons.push_back(_binding.btnNpc10.get());
         npcButtons.push_back(_binding.btnNpc11.get());
     }
@@ -337,7 +337,7 @@ void PartySelection::refreshNpcButtons() {
 }
 
 void PartySelection::changeParty() {
-    shared_ptr<Area> area(_game->module()->area());
+    shared_ptr<Area> area(_game.module()->area());
     area->unloadParty();
 
     Party &party = _services.party;

@@ -32,7 +32,7 @@ namespace reone {
 
 namespace game {
 
-MessagesMenu::MessagesMenu(KotOR *game, Services &services) :
+MessagesMenu::MessagesMenu(KotOR &game, Services &services) :
     GameGUI(game, services) {
     _resRef = getResRef("messages");
 
@@ -45,10 +45,10 @@ void MessagesMenu::load() {
     bindControls();
 
     _binding.btnExit->setOnClick([this]() {
-        _game->openInGame();
+        _game.openInGame();
     });
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.btnShow->setDisabled(true);
     }
 }
@@ -56,7 +56,7 @@ void MessagesMenu::load() {
 void MessagesMenu::bindControls() {
     _binding.btnExit = getControl<Button>("BTN_EXIT");
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.btnShow = getControl<Button>("BTN_SHOW");
     }
 }

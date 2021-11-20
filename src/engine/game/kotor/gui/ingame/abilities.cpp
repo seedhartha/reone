@@ -46,7 +46,7 @@ static constexpr int kStrRefSkillRank = 1579;
 static constexpr int kStrRefBonus = 32129;
 static constexpr int kStrRefTotalRank = 41904;
 
-AbilitiesMenu::AbilitiesMenu(KotOR *game, Services &services) :
+AbilitiesMenu::AbilitiesMenu(KotOR &game, Services &services) :
     GameGUI(game, services) {
     _resRef = getResRef("abilities");
 
@@ -88,7 +88,7 @@ void AbilitiesMenu::load() {
         _binding.lbDesc->addTextLinesAsItems(maybeSkillInfo->second.description);
     });
     _binding.btnExit->setOnClick([this]() {
-        _game->openInGame();
+        _game.openInGame();
     });
 
     loadSkills();
@@ -110,7 +110,7 @@ void AbilitiesMenu::bindControls() {
     _binding.lbAbility = getControl<ListBox>("LB_ABILITY");
     _binding.lbDesc = getControl<ListBox>("LB_DESC");
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.btnChange1 = getControl<Button>("BTN_CHANGE1");
         _binding.btnChange2 = getControl<Button>("BTN_CHANGE2");
         _binding.lblPortrait = getControl<Label>("LBL_PORTRAIT");
@@ -154,7 +154,7 @@ void AbilitiesMenu::loadSkills() {
 
 shared_ptr<Texture> AbilitiesMenu::getFrameTexture() const {
     string resRef;
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         resRef = "uibit_eqp_itm1";
     } else {
         resRef = "lbl_hex_3";
@@ -167,7 +167,7 @@ void AbilitiesMenu::refreshControls() {
 }
 
 void AbilitiesMenu::refreshPortraits() {
-    if (_game->isTSL())
+    if (_game.isTSL())
         return;
 
     Party &party = _services.party;

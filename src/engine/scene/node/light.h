@@ -30,8 +30,8 @@ class ModelSceneNode;
 class LightSceneNode : public ModelNodeSceneNode {
 public:
     LightSceneNode(
-        const ModelSceneNode *model,
-        std::shared_ptr<graphics::ModelNode> modelNode,
+        const ModelSceneNode &model,
+        const graphics::ModelNode &modelNode,
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
@@ -55,7 +55,7 @@ public:
     void setFadeFactor(float factor) { _fadeFactor = factor; }
 
 private:
-    const ModelSceneNode *_model;
+    const ModelSceneNode &_model;
 
     glm::vec3 _color {0.0f};
     float _radius {0.0f};

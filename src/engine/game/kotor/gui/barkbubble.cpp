@@ -30,7 +30,7 @@ namespace reone {
 
 namespace game {
 
-BarkBubble::BarkBubble(KotOR *game, Services &services) :
+BarkBubble::BarkBubble(KotOR &game, Services &services) :
     GameGUI(game, services) {
     _resRef = getResRef("barkbubble");
     _scaling = ScalingMode::PositionRelativeToCenter;

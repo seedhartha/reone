@@ -36,10 +36,10 @@ static constexpr float kMaxRotationSpeed = 2.5f;
 static constexpr float kRotationAcceleration = 1.0f;
 static constexpr float kMouseRotationSpeed = 0.001f;
 
-ThirdPersonCamera::ThirdPersonCamera(float aspect, const CameraStyle &style, Game *game, SceneGraph *sceneGraph) :
+ThirdPersonCamera::ThirdPersonCamera(float aspect, const CameraStyle &style, Game &game, SceneGraph &sceneGraph) :
     _game(game) {
     glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
-    _sceneNode = sceneGraph->newCamera("", move(projection));
+    _sceneNode = sceneGraph.newCamera("", move(projection));
     _style = style;
 }
 
@@ -120,7 +120,7 @@ bool ThirdPersonCamera::handleMouseButtonDown(const SDL_MouseButtonEvent &event)
         _mouseLookMode = true;
         _rotateCCW = false;
         _rotateCW = false;
-        _game->setRelativeMouseMode(true);
+        _game.setRelativeMouseMode(true);
         return true;
     }
     return false;
@@ -129,7 +129,7 @@ bool ThirdPersonCamera::handleMouseButtonDown(const SDL_MouseButtonEvent &event)
 bool ThirdPersonCamera::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
     if (event.button == SDL_BUTTON_RIGHT) {
         _mouseLookMode = false;
-        _game->setRelativeMouseMode(false);
+        _game.setRelativeMouseMode(false);
         return true;
     }
     return false;

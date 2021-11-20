@@ -137,7 +137,7 @@ void Console::cmdListAnim(vector<string> tokens) {
     }
 
     auto model = static_pointer_cast<ModelSceneNode>(object->sceneNode());
-    vector<string> anims(model->model()->getAnimationNames());
+    vector<string> anims(model->model().getAnimationNames());
     sort(anims.begin(), anims.end());
 
     for (auto &anim : anims) {

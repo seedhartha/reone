@@ -47,8 +47,8 @@ static constexpr float kUvAnimationSpeed = 250.0f;
 static bool g_debugWalkmesh = false;
 
 MeshSceneNode::MeshSceneNode(
-    const ModelSceneNode *model,
-    shared_ptr<ModelNode> modelNode,
+    const ModelSceneNode &model,
+    const ModelNode &modelNode,
     SceneGraph &sceneGraph,
     Context &context,
     Features &features,
@@ -64,20 +64,20 @@ MeshSceneNode::MeshSceneNode(
         context,
         meshes,
         shaders),
-    _model(ensurePresent(model, "model")),
+    _model(model),
     _features(features),
     _materials(materials),
     _pbrIbl(pbrIbl),
     _textures(textures) {
 
-    _alpha = _modelNode->alpha().getByFrameOrElse(0, 1.0f);
-    _selfIllumColor = _modelNode->selfIllumColor().getByFrameOrElse(0, glm::vec3(0.0f));
+    _alpha = _modelNode.alpha().getByFrameOrElse(0, 1.0f);
+    _selfIllumColor = _modelNode.selfIllumColor().getByFrameOrElse(0, glm::vec3(0.0f));
 
     initTextures();
 }
 
 void MeshSceneNode::initTextures() {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (!mesh)
         return;
 
@@ -121,7 +121,7 @@ void MeshSceneNode::refreshAdditionalTextures() {
 void MeshSceneNode::update(float dt) {
     SceneNode::update(dt);
 
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (mesh) {
         updateUVAnimation(dt, *mesh);
         updateBumpmapAnimation(dt, *mesh);
@@ -184,22 +184,22 @@ void MeshSceneNode::updateDanglyMeshAnimation(float dt, const ModelNode::Triangl
 
 bool MeshSceneNode::shouldRender() const {
     if (g_debugWalkmesh)
-        return _modelNode->isAABBMesh();
+        return _modelNode.isAABBMesh();
 
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
-    if (!mesh || !mesh->render || _modelNode->alpha().getByFrameOrElse(0, 1.0f) == 0.0f)
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
+    if (!mesh || !mesh->render || _modelNode.alpha().getByFrameOrElse(0, 1.0f) == 0.0f)
         return false;
 
-    return !_modelNode->isAABBMesh();
+    return !_modelNode.isAABBMesh();
 }
 
 bool MeshSceneNode::shouldCastShadows() const {
     // Skin nodes must not cast shadows
-    if (_modelNode->isSkinMesh())
+    if (_modelNode.isSkinMesh())
         return false;
 
     // Meshless nodes must not cast shadows
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (!mesh)
         return false;
 
@@ -207,12 +207,12 @@ bool MeshSceneNode::shouldCastShadows() const {
 }
 
 bool MeshSceneNode::isTransparent() const {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (!mesh)
         return false; // Meshless nodes are opaque
 
     // Character models are opaque
-    if (_model->model()->classification() == MdlClassification::character)
+    if (_model.model().classification() == MdlClassification::character)
         return false;
 
     // Model nodes with alpha less than 1.0 are transparent
@@ -258,7 +258,7 @@ static bool isReceivingShadows(const ModelSceneNode &model, const MeshSceneNode 
 }
 
 void MeshSceneNode::drawSingle(bool shadowPass) {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
     if (!mesh)
         return;
 
@@ -313,7 +313,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
             }
         }
 
-        bool receivesShadows = isReceivingShadows(*_model, *this);
+        bool receivesShadows = isReceivingShadows(_model, *this);
         if (receivesShadows) {
             uniforms.combined.featureMask |= UniformFeatureFlags::shadows;
         }
@@ -328,10 +328,10 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
                 if (i < 1 + mesh->skin->boneNodeNumber.size()) {
                     uint16_t nodeNumber = mesh->skin->boneNodeNumber[i - 1];
                     if (nodeNumber != 0xffff) {
-                        shared_ptr<ModelNodeSceneNode> bone(_model->getNodeByNumber(nodeNumber));
+                        shared_ptr<ModelNodeSceneNode> bone(_model.getNodeByNumber(nodeNumber));
                         if (bone && bone->type() == SceneNodeType::Mesh) {
-                            tmp = _modelNode->absoluteTransformInverse() *
-                                  _model->absoluteTransformInverse() *
+                            tmp = _modelNode.absoluteTransformInverse() *
+                                  _model.absoluteTransformInverse() *
                                   bone->absoluteTransform() *
                                   mesh->skin->boneMatrices[mesh->skin->boneSerial[i - 1]];
                         }
@@ -365,7 +365,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
                 shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
                 shaderLight.multiplier = lights[i]->multiplier() * (1.0f - lights[i]->fadeFactor());
                 shaderLight.radius = lights[i]->radius();
-                shaderLight.ambientOnly = static_cast<int>(lights[i]->modelNode()->light()->ambientOnly);
+                shaderLight.ambientOnly = static_cast<int>(lights[i]->modelNode().light()->ambientOnly);
             }
         }
 
@@ -379,7 +379,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
             }
         }
 
-        if (_sceneGraph.isFogEnabled() && _model->model()->isAffectedByFog()) {
+        if (_sceneGraph.isFogEnabled() && _model.model().isAffectedByFog()) {
             uniforms.combined.featureMask |= UniformFeatureFlags::fog;
             uniforms.combined.general.fogNear = _sceneGraph.fogNear();
             uniforms.combined.general.fogFar = _sceneGraph.fogFar();
@@ -440,7 +440,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
 }
 
 bool MeshSceneNode::isLightingEnabled() const {
-    if (!isLightingEnabledByUsage(_model->usage()))
+    if (!isLightingEnabledByUsage(_model.usage()))
         return false;
 
     // Lighting is disabled for lightmapped models, unless dynamic room lighting is enabled
@@ -459,7 +459,7 @@ bool MeshSceneNode::isLightingEnabled() const {
 }
 
 void MeshSceneNode::setAppliedForce(glm::vec3 force) {
-    if (_modelNode->isDanglyMesh()) {
+    if (_modelNode.isDanglyMesh()) {
         // Convert force from world to object space
         _danglymeshAnimation.force = _absTransformInv * glm::vec4(force, 0.0f);
     }

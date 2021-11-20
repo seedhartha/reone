@@ -17,12 +17,17 @@
 
 #pragma once
 
-#include "../../resource/format/gffreader.h"
-#include "../../resource/strings.h"
+#include "../../resource/gffstruct.h"
 
 #include "types.h"
 
 namespace reone {
+
+namespace resource {
+
+class Strings;
+
+}
 
 namespace game {
 
@@ -65,7 +70,10 @@ public:
         std::vector<ParticipantAnimation> animations;
     };
 
-    Dialog(std::string resRef, resource::Strings *strings);
+    Dialog(std::string resRef, resource::Strings &strings) :
+        _resRef(std::move(resRef)),
+        _strings(strings) {
+    }
 
     void load(const resource::GffStruct &dlg);
 
@@ -85,7 +93,7 @@ public:
 
 private:
     std::string _resRef;
-    resource::Strings *_strings;
+    resource::Strings &_strings;
 
     bool _skippable {false};
     std::string _cameraModel;

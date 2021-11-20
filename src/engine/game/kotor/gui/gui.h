@@ -34,14 +34,14 @@ class KotOR;
  */
 class GameGUI : public gui::GUI {
 protected:
-    GameGUI(KotOR *game, Services &services);
+    GameGUI(KotOR &game, Services &services);
 
     void initForGame();
 
     std::string getResRef(const std::string &base) const;
 
 protected:
-    KotOR *_game;
+    KotOR &_game;
     Services &_services;
 
     void loadBackground(BackgroundType type);

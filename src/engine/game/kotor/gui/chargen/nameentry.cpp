@@ -37,8 +37,8 @@ namespace reone {
 namespace game {
 
 NameEntry::NameEntry(
-    CharacterGeneration *charGen,
-    KotOR *game,
+    CharacterGeneration &charGen,
+    KotOR &game,
     Services &services) :
     GameGUI(game, services),
     _charGen(charGen),
@@ -63,11 +63,11 @@ void NameEntry::load() {
         loadRandomName();
     });
     _binding.endBtn->setOnClick([this]() {
-        _charGen->goToNextStep();
-        _charGen->openSteps();
+        _charGen.goToNextStep();
+        _charGen.openSteps();
     });
     _binding.btnBack->setOnClick([this]() {
-        _charGen->openSteps();
+        _charGen.openSteps();
     });
 }
 
@@ -96,7 +96,7 @@ void NameEntry::loadRandomName() {
 }
 
 string NameEntry::getRandomName() const {
-    Gender gender = _charGen->character().gender;
+    Gender gender = _charGen.character().gender;
     const LtrReader &nameLtr = gender == Gender::Female ? _femaleLtr : _maleLtr;
     return nameLtr.getRandomName(8) + " " + _lastNameLtr.getRandomName(8);
 }

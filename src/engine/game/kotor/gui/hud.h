@@ -37,7 +37,7 @@ class Skills;
 
 class HUD : public GameGUI {
 public:
-    HUD(KotOR *game, Services &services);
+    HUD(KotOR &game, Services &services);
 
     void load() override;
 

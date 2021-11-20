@@ -51,8 +51,8 @@ static const unordered_map<SkillType, int> g_descStrRefBySkill {
     {SkillType::TreatInjury, 258}};
 
 CharGenSkills::CharGenSkills(
-    CharacterGeneration *charGen,
-    KotOR *game,
+    CharacterGeneration &charGen,
+    KotOR &game,
     Services &services) :
     GameGUI(game, services),
     _charGen(charGen) {
@@ -77,7 +77,7 @@ void CharGenSkills::load() {
         _binding.treatInjuryLbl.get()};
     for (auto &label : skillLabels) {
         label->setFocusable(true);
-        label->setHilightColor(_game->getGUIColorBase());
+        label->setHilightColor(_game.getGUIColorBase());
     }
 
     _binding.lbDesc->setProtoMatchContent(true);
@@ -98,11 +98,11 @@ void CharGenSkills::load() {
         if (_points > 0) {
             updateCharacter();
         }
-        _charGen->goToNextStep();
-        _charGen->openSteps();
+        _charGen.goToNextStep();
+        _charGen.openSteps();
     });
     _binding.btnBack->setOnClick([this]() {
-        _charGen->openSteps();
+        _charGen.openSteps();
     });
 
     _binding.computerUseLbl->setOnFocusChanged([this](bool focus) {
@@ -224,7 +224,7 @@ void CharGenSkills::bindControls() {
 }
 
 void CharGenSkills::reset(bool newGame) {
-    const CreatureAttributes &attributes = _charGen->character().attributes;
+    const CreatureAttributes &attributes = _charGen.character().attributes;
     shared_ptr<CreatureClass> clazz(_services.classes.get(attributes.getEffectiveClass()));
 
     _points = glm::max(1, (clazz->skillPointBase() + attributes.getAbilityModifier(Ability::Intelligence)) / 2);
@@ -279,7 +279,7 @@ void CharGenSkills::refreshControls() {
 }
 
 bool CharGenSkills::canIncreaseSkill(SkillType skill) const {
-    ClassType clazz = _charGen->character().attributes.getEffectiveClass();
+    ClassType clazz = _charGen.character().attributes.getEffectiveClass();
 
     shared_ptr<CreatureClass> creatureClass(_services.classes.get(clazz));
     int maxSkillRank = creatureClass->isClassSkill(skill) ? 4 : 2;
@@ -289,15 +289,15 @@ bool CharGenSkills::canIncreaseSkill(SkillType skill) const {
 }
 
 void CharGenSkills::updateCharacter() {
-    Character character(_charGen->character());
+    Character character(_charGen.character());
     for (auto &skillRank : _attributes.skillRanks()) {
         character.attributes.setSkillRank(skillRank.first, skillRank.second);
     }
-    _charGen->setCharacter(move(character));
+    _charGen.setCharacter(move(character));
 }
 
 int CharGenSkills::getPointCost(SkillType skill) const {
-    ClassType clazz = _charGen->character().attributes.getEffectiveClass();
+    ClassType clazz = _charGen.character().attributes.getEffectiveClass();
     shared_ptr<CreatureClass> creatureClass(_services.classes.get(clazz));
     return creatureClass->isClassSkill(skill) ? 1 : 2;
 }

@@ -31,7 +31,7 @@ namespace game {
 
 class MessagesMenu : public GameGUI {
 public:
-    MessagesMenu(KotOR *game, Services &services);
+    MessagesMenu(KotOR &game, Services &services);
 
     void load() override;
 

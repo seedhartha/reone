@@ -30,7 +30,7 @@ namespace game {
 
 class LoadingScreen : public GameGUI, public ILoadingScreen {
 public:
-    LoadingScreen(KotOR *game, Services &services);
+    LoadingScreen(KotOR &game, Services &services);
 
     void load() override;
 

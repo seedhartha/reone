@@ -65,13 +65,13 @@ static map<ClassType, int> g_classDescStrRefs {
 
 ClassSelection::ClassSelection(
     CharacterGeneration &charGen,
-    KotOR *game,
+    KotOR &game,
     Services &services) :
     GameGUI(game, services),
     _charGen(charGen) {
     _resRef = getResRef("classsel");
 
-    if (!game->isTSL()) {
+    if (!game.isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
 
@@ -111,12 +111,12 @@ void ClassSelection::setupClassButtons() {
     _enlargedButtonSize = glm::vec2(_binding.btnSel1->extent().width, _binding.btnSel1->extent().height);
     _defaultButtonSize = glm::vec2(_binding.btnSel2->extent().width, _binding.btnSel2->extent().height);
 
-    setupClassButton(0, Gender::Male, !_game->isTSL() ? ClassType::Scoundrel : ClassType::JediConsular);
-    setupClassButton(1, Gender::Male, !_game->isTSL() ? ClassType::Scout : ClassType::JediSentinel);
-    setupClassButton(2, Gender::Male, !_game->isTSL() ? ClassType::Soldier : ClassType::JediGuardian);
-    setupClassButton(3, Gender::Female, !_game->isTSL() ? ClassType::Soldier : ClassType::JediGuardian);
-    setupClassButton(4, Gender::Female, !_game->isTSL() ? ClassType::Scout : ClassType::JediSentinel);
-    setupClassButton(5, Gender::Female, !_game->isTSL() ? ClassType::Scoundrel : ClassType::JediConsular);
+    setupClassButton(0, Gender::Male, !_game.isTSL() ? ClassType::Scoundrel : ClassType::JediConsular);
+    setupClassButton(1, Gender::Male, !_game.isTSL() ? ClassType::Scout : ClassType::JediSentinel);
+    setupClassButton(2, Gender::Male, !_game.isTSL() ? ClassType::Soldier : ClassType::JediGuardian);
+    setupClassButton(3, Gender::Female, !_game.isTSL() ? ClassType::Soldier : ClassType::JediGuardian);
+    setupClassButton(4, Gender::Female, !_game.isTSL() ? ClassType::Scout : ClassType::JediSentinel);
+    setupClassButton(5, Gender::Female, !_game.isTSL() ? ClassType::Scoundrel : ClassType::JediConsular);
 
     setClassButtonEnlarged(0, false);
 }
@@ -236,15 +236,15 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, Sce
     character->sceneNode()->setCullable(false);
     character->updateModelAnimation();
 
-    auto model = sceneGraph.newModel(_services.models.get("cgbody_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(*_services.models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", character->sceneNode());
 
     return move(model);
 }
 
 void ClassSelection::setButtonColors(Control &control) {
-    control.setBorderColor(_game->getGUIColorBase());
-    control.setHilightColor(_game->getGUIColorHilight());
+    control.setBorderColor(_game.getGUIColorBase());
+    control.setHilightColor(_game.getGUIColorHilight());
 }
 
 void ClassSelection::setClassButtonEnlarged(int index, bool enlarged) {

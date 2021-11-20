@@ -36,8 +36,8 @@ namespace reone {
 namespace game {
 
 QuickCharacterGeneration::QuickCharacterGeneration(
-    CharacterGeneration *charGen,
-    KotOR *game,
+    CharacterGeneration &charGen,
+    KotOR &game,
     Services &services) :
     GameGUI(game, services),
     _charGen(charGen) {
@@ -52,29 +52,29 @@ void QuickCharacterGeneration::load() {
     bindControls();
     doSetStep(0);
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.lblDecoration->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 
     _binding.btnCancel->setOnClick([this]() {
         setStep(0);
-        _charGen->openQuickOrCustom();
+        _charGen.openQuickOrCustom();
     });
     _binding.btnBack->setOnClick([this]() {
         if (_step == 0) {
-            _charGen->openQuickOrCustom();
+            _charGen.openQuickOrCustom();
         } else {
             setStep(_step - 1);
         }
     });
     _binding.btnStepName1->setOnClick([this]() {
-        _charGen->openPortraitSelection();
+        _charGen.openPortraitSelection();
     });
     _binding.btnStepName2->setOnClick([this]() {
-        _charGen->openNameEntry();
+        _charGen.openNameEntry();
     });
     _binding.btnStepName3->setOnClick([this]() {
-        _charGen->finish();
+        _charGen.finish();
     });
 }
 

@@ -408,7 +408,7 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
 
     // Determine projectile position
     glm::vec3 projectilePos;
-    shared_ptr<ModelNode> bulletHook(weaponModel->model()->getNodeByName("bullethook"));
+    shared_ptr<ModelNode> bulletHook(weaponModel->model().getNodeByName("bullethook"));
     if (bulletHook) {
         projectilePos = weaponModel->absoluteTransform() * bulletHook->absoluteTransform()[3];
     } else {
@@ -417,7 +417,7 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
 
     // Determine projectile direction
     glm::vec3 projectileTarget;
-    shared_ptr<ModelNode> impact(targetModel->model()->getNodeByName("impact"));
+    shared_ptr<ModelNode> impact(targetModel->model().getNodeByName("impact"));
     if (impact) {
         projectileTarget = targetModel->absoluteTransform() * impact->absoluteTransform()[3];
     } else {
@@ -426,7 +426,7 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
     round.projectileDir = glm::normalize(projectileTarget - projectilePos);
 
     // Create and add a projectile to the scene graph
-    round.projectile = _sceneGraph.newModel(ammunitionType->model, ModelUsage::Projectile);
+    round.projectile = _sceneGraph.newModel(*ammunitionType->model, ModelUsage::Projectile);
     round.projectile->signalEvent(kModelEventDetonate);
     round.projectile->setLocalTransform(glm::translate(projectilePos));
     _sceneGraph.addRoot(round.projectile);

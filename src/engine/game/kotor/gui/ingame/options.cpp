@@ -32,7 +32,7 @@ namespace reone {
 
 namespace game {
 
-OptionsMenu::OptionsMenu(KotOR *game, Services &services) :
+OptionsMenu::OptionsMenu(KotOR &game, Services &services) :
     GameGUI(game, services) {
     _resRef = getResRef("optionsingame");
 
@@ -45,13 +45,13 @@ void OptionsMenu::load() {
     bindControls();
 
     _binding.btnLoadGame->setOnClick([this]() {
-        _game->openSaveLoad(SaveLoadMode::LoadFromInGame);
+        _game.openSaveLoad(SaveLoadMode::LoadFromInGame);
     });
     _binding.btnSaveGame->setOnClick([this]() {
-        _game->openSaveLoad(SaveLoadMode::Save);
+        _game.openSaveLoad(SaveLoadMode::Save);
     });
     _binding.btnExit->setOnClick([this]() {
-        _game->openInGame();
+        _game.openInGame();
     });
 }
 

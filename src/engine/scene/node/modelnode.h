@@ -31,13 +31,13 @@ namespace scene {
 
 class ModelNodeSceneNode : public SceneNode {
 public:
-    std::shared_ptr<graphics::ModelNode> modelNode() const { return _modelNode; }
+    const graphics::ModelNode &modelNode() const { return _modelNode; }
 
 protected:
-    std::shared_ptr<graphics::ModelNode> _modelNode;
+    const graphics::ModelNode &_modelNode;
 
     ModelNodeSceneNode(
-        std::shared_ptr<graphics::ModelNode> modelNode,
+        const graphics::ModelNode &modelNode,
         SceneNodeType type,
         SceneGraph &sceneGraph,
         graphics::Context &context,

@@ -35,7 +35,7 @@ namespace game {
 
 class AbilitiesMenu : public GameGUI {
 public:
-    AbilitiesMenu(KotOR *game, Services &services);
+    AbilitiesMenu(KotOR &game, Services &services);
 
     void load() override;
 

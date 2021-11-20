@@ -39,7 +39,7 @@ const float kDefaultAnimCamFOV = 55.0f;
 
 class AnimatedCamera : public Camera {
 public:
-    AnimatedCamera(float aspect, scene::SceneGraph *sceneGraph);
+    AnimatedCamera(float aspect, scene::SceneGraph &sceneGraph);
 
     void update(float dt) override;
 
@@ -51,7 +51,7 @@ public:
     void setFieldOfView(float fovy);
 
 private:
-    scene::SceneGraph *_sceneGraph;
+    scene::SceneGraph &_sceneGraph;
     float _aspect {1.0f};
     std::unique_ptr<scene::ModelSceneNode> _model;
     float _fovy {kDefaultAnimCamFOV};

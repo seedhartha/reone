@@ -86,14 +86,14 @@ static bool g_debugPath = false;
 
 Area::Area(
     uint32_t id,
-    Game *game,
+    Game &game,
     Services &services) :
     Object(
         id,
         ObjectType::Area,
         game,
         services),
-    _map(*game, services.party, services.context, services.meshes, services.shaders, services.textures, services.window) {
+    _map(game, services.party, services.context, services.meshes, services.shaders, services.textures, services.window) {
 
     init();
 
@@ -101,7 +101,7 @@ Area::Area(
 }
 
 void Area::init() {
-    const GraphicsOptions &opts = _game->options().graphics;
+    const GraphicsOptions &opts = _game.options().graphics;
     _cameraAspect = opts.width / static_cast<float>(opts.height);
 
     _objectsByType.insert(make_pair(ObjectType::Creature, ObjectList()));
@@ -143,7 +143,7 @@ void Area::loadLYT() {
         auto &sceneGraph = _services.sceneGraphs.get(kSceneNameMain);
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
-        auto modelSceneNode = sceneGraph.newModel(model, ModelUsage::Room);
+        auto modelSceneNode = sceneGraph.newModel(*model, ModelUsage::Room);
         modelSceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {
@@ -215,7 +215,7 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     glm::vec3 position(entryPosition);
     position.z += 1.7f;
 
-    SceneGraph *sceneGraph = &_services.sceneGraphs.get(kSceneNameMain);
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneNameMain);
 
     _firstPersonCamera = make_unique<FirstPersonCamera>(_cameraAspect, glm::radians(kDefaultFieldOfView), sceneGraph);
     _firstPersonCamera->setPosition(position);
@@ -403,7 +403,7 @@ void Area::printDebugInfo(const SpatialObject &object) {
     ostringstream ss;
     ss << boost::format("tag='%s'") % object.tag();
     ss << boost::format(",pos=[%0.2f,%0.2f,%0.2f]") % object.position().x % object.position().y % object.position().z;
-    ss << boost::format(",model='%s'") % model->model()->name();
+    ss << boost::format(",model='%s'") % model->model().name();
 
     debug("Selected object: " + ss.str());
 }
@@ -414,7 +414,7 @@ void Area::update(float dt) {
     updateSounds();
     updateObjectSelection();
 
-    if (!_game->isPaused()) {
+    if (!_game.isPaused()) {
         Object::update(dt);
 
         for (auto &object : _objects) {
@@ -560,7 +560,7 @@ void Area::fill(SceneGraph &sceneGraph) {
         if (sceneNode) {
             sceneGraph.addRoot(sceneNode);
         }
-        shared_ptr<ModelNode> aabbNode(sceneNode->model()->getAABBNode());
+        shared_ptr<ModelNode> aabbNode(sceneNode->model().getAABBNode());
         if (aabbNode && _grass.texture) {
             glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), room.second->position()));
             auto grass = make_shared<GrassSceneNode>(room.first, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap, sceneGraph, _services.context, _services.meshes, _services.shaders);
@@ -635,7 +635,7 @@ void Area::startDialog(const shared_ptr<SpatialObject> &object, const string &re
     if (resRef.empty())
         return;
 
-    _game->startDialog(object, finalResRef);
+    _game.startDialog(object, finalResRef);
 }
 
 void Area::onPartyLeaderMoved(bool roomChanged) {
@@ -653,7 +653,7 @@ void Area::onPartyLeaderMoved(bool roomChanged) {
 void Area::updateRoomVisibility() {
     shared_ptr<Creature> partyLeader(_services.party.getLeader());
     Room *leaderRoom = partyLeader ? partyLeader->room() : nullptr;
-    bool allVisible = _game->cameraType() != CameraType::ThirdPerson || !leaderRoom;
+    bool allVisible = _game.cameraType() != CameraType::ThirdPerson || !leaderRoom;
 
     if (allVisible) {
         for (auto &room : _rooms) {
@@ -690,7 +690,7 @@ void Area::update3rdPersonCameraTarget() {
     if (!model) {
         return;
     }
-    shared_ptr<ModelNode> cameraHook(model->model()->getNodeByName("camerahook"));
+    shared_ptr<ModelNode> cameraHook(model->model().getNodeByName("camerahook"));
     if (cameraHook) {
         position += glm::vec3(cameraHook->absoluteTransform()[3]);
     }
@@ -698,17 +698,17 @@ void Area::update3rdPersonCameraTarget() {
 }
 
 void Area::updateVisibility() {
-    if (_game->cameraType() != CameraType::ThirdPerson) {
+    if (_game.cameraType() != CameraType::ThirdPerson) {
         updateRoomVisibility();
     }
 }
 
 void Area::updateSounds() {
     glm::vec3 refPosition;
-    if (_game->cameraType() == CameraType::ThirdPerson && _services.party.getLeader()) {
+    if (_game.cameraType() == CameraType::ThirdPerson && _services.party.getLeader()) {
         refPosition = _services.party.getLeader()->position();
     } else {
-        refPosition = _game->getActiveCamera()->sceneNode()->absoluteTransform()[3];
+        refPosition = _game.getActiveCamera()->sceneNode()->absoluteTransform()[3];
     }
 
     vector<pair<Sound *, float>> soundDistances;
@@ -763,7 +763,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
         trigger->addTenant(triggerrer);
 
         if (!trigger->linkedToModule().empty()) {
-            _game->scheduleModuleTransition(trigger->linkedToModule(), trigger->linkedTo());
+            _game.scheduleModuleTransition(trigger->linkedToModule(), trigger->linkedTo());
             return;
         }
         if (!trigger->getOnEnter().empty()) {
@@ -1311,7 +1311,7 @@ shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
         return nullptr;
     }
 
-    const GraphicsOptions &opts = _game->options().graphics;
+    const GraphicsOptions &opts = _game.options().graphics;
     glm::vec4 viewport(0.0f, 0.0f, opts.width, opts.height);
     glm::vec3 start(glm::unProject(glm::vec3(x, opts.height - y, 0.0f), camera->view(), camera->projection(), viewport));
     glm::vec3 end(glm::unProject(glm::vec3(x, opts.height - y, 1.0f), camera->view(), camera->projection(), viewport));

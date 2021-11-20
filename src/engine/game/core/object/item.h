@@ -44,7 +44,7 @@ public:
 
     Item(
         uint32_t id,
-        Game *game,
+        Game &game,
         Services &services) :
         Object(
             id,

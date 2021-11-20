@@ -32,11 +32,11 @@ namespace reone {
 
 namespace game {
 
-LoadingScreen::LoadingScreen(KotOR *game, Services &services) :
+LoadingScreen::LoadingScreen(KotOR &game, Services &services) :
     GameGUI(game, services) {
     _resRef = getResRef("loadscreen");
 
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         _resolutionX = 800;
         _resolutionY = 600;
     } else {

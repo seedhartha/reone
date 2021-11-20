@@ -34,8 +34,8 @@ namespace reone {
 namespace game {
 
 LevelUpMenu::LevelUpMenu(
-    CharacterGeneration *charGen,
-    KotOR *game,
+    CharacterGeneration &charGen,
+    KotOR &game,
     Services &services) :
     GameGUI(game, services),
     _charGen(charGen) {
@@ -51,16 +51,16 @@ void LevelUpMenu::load() {
     doSetStep(0);
 
     _binding.btnBack->setOnClick([this]() {
-        _charGen->cancel();
+        _charGen.cancel();
     });
     _binding.btnStepName1->setOnClick([this]() {
-        _charGen->openAbilities();
+        _charGen.openAbilities();
     });
     _binding.btnStepName2->setOnClick([this]() {
-        _charGen->openSkills();
+        _charGen.openSkills();
     });
     _binding.btnStepName5->setOnClick([this]() {
-        _charGen->finish();
+        _charGen.finish();
     });
 }
 
@@ -84,7 +84,7 @@ void LevelUpMenu::bindControls() {
 }
 
 void LevelUpMenu::reset() {
-    int nextLevel = _charGen->character().attributes.getAggregateLevel() + 1;
+    int nextLevel = _charGen.character().attributes.getAggregateLevel() + 1;
     _hasAttributes = nextLevel % 4 == 0;
 
     // TODO: feats and Force Powers are not yet implemented

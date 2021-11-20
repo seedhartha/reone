@@ -195,7 +195,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
         _area->hilightObject(nullptr);
     }
 
-    _game->setCursorType(cursor);
+    _game.setCursorType(cursor);
 
     return true;
 }
@@ -256,7 +256,7 @@ void Module::onCreatureClick(const shared_ptr<Creature> &creature) {
 
 void Module::onDoorClick(const shared_ptr<Door> &door) {
     if (!door->linkedToModule().empty()) {
-        _game->scheduleModuleTransition(door->linkedToModule(), door->linkedTo());
+        _game.scheduleModuleTransition(door->linkedToModule(), door->linkedTo());
         return;
     }
     if (!door->isOpen()) {
@@ -281,7 +281,7 @@ void Module::onPlaceableClick(const shared_ptr<Placeable> &placeable) {
 }
 
 void Module::update(float dt) {
-    if (_game->cameraType() == CameraType::ThirdPerson) {
+    if (_game.cameraType() == CameraType::ThirdPerson) {
         _player->update(dt);
     }
     _area->update(dt);
@@ -362,8 +362,8 @@ vector<ContextAction> Module::getContextActions(const shared_ptr<Object> &object
 bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {
     switch (event.keysym.sym) {
     case SDLK_SPACE: {
-        bool paused = !_game->isPaused();
-        _game->setPaused(paused);
+        bool paused = !_game.isPaused();
+        _game.setPaused(paused);
         return true;
     }
     default:

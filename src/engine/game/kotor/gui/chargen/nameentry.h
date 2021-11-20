@@ -37,8 +37,8 @@ class CharacterGeneration;
 class NameEntry : public GameGUI {
 public:
     NameEntry(
-        CharacterGeneration *charGen,
-        KotOR *game,
+        CharacterGeneration &charGen,
+        KotOR &game,
         Services &services);
 
     void load() override;
@@ -54,7 +54,7 @@ private:
         std::shared_ptr<gui::Control> nameBoxEdit;
     } _binding;
 
-    CharacterGeneration *_charGen;
+    CharacterGeneration &_charGen;
     gui::TextInput _input;
     resource::LtrReader _maleLtr;
     resource::LtrReader _femaleLtr;

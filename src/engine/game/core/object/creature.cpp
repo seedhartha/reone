@@ -189,19 +189,19 @@ void Creature::updateModelAnimation() {
 
     switch (_movementType) {
     case MovementType::Run:
-        anim = model->model()->getAnimation(getRunAnimation());
+        anim = model->model().getAnimation(getRunAnimation());
         break;
     case MovementType::Walk:
-        anim = model->model()->getAnimation(getWalkAnimation());
+        anim = model->model().getAnimation(getWalkAnimation());
         break;
     default:
         if (_dead) {
-            anim = model->model()->getAnimation(getDeadAnimation());
+            anim = model->model().getAnimation(getDeadAnimation());
         } else if (_talking) {
-            anim = model->model()->getAnimation(getTalkNormalAnimation());
-            talkAnim = model->model()->getAnimation(getHeadTalkAnimation());
+            anim = model->model().getAnimation(getTalkNormalAnimation());
+            talkAnim = model->model().getAnimation(getHeadTalkAnimation());
         } else {
-            anim = model->model()->getAnimation(getPauseAnimation());
+            anim = model->model().getAnimation(getPauseAnimation());
         }
         break;
     }
@@ -318,7 +318,7 @@ bool Creature::equip(int slot, const shared_ptr<Item> &item) {
         if (model) {
             if (slot == InventorySlot::rightWeapon) {
                 auto weapon = static_pointer_cast<ModelSceneNode>(model->getAttachment("rhand"));
-                if (weapon && weapon->model()->classification() == MdlClassification::lightsaber) {
+                if (weapon && weapon->model().classification() == MdlClassification::lightsaber) {
                     weapon->playAnimation("powerup");
                 }
             }
@@ -401,7 +401,7 @@ glm::vec3 Creature::getSelectablePosition() const {
     if (!model)
         return _position;
 
-    shared_ptr<ModelNode> talkDummy(model->model()->getNodeByNameRecursive(g_talkDummyNode));
+    shared_ptr<ModelNode> talkDummy(model->model().getNodeByNameRecursive(g_talkDummyNode));
     if (!talkDummy || _dead)
         return model->getWorldCenterOfAABB();
 
@@ -738,7 +738,7 @@ void Creature::advanceOnPath(bool run, float dt) {
         _path->selectNextPoint();
     } else {
         shared_ptr<Creature> creature(_services.objectFactory.getObjectById<Creature>(_id));
-        if (_game->module()->area()->moveCreatureTowards(creature, dest, run, dt)) {
+        if (_game.module()->area()->moveCreatureTowards(creature, dest, run, dt)) {
             setMovementType(run ? Creature::MovementType::Run : Creature::MovementType::Walk);
             setAppliedForce(glm::vec3(glm::normalize(glm::vec2(dest - origin)), 0.0f));
         } else {
@@ -749,7 +749,7 @@ void Creature::advanceOnPath(bool run, float dt) {
 }
 
 void Creature::updatePath(const glm::vec3 &dest) {
-    vector<glm::vec3> points(_game->module()->area()->pathfinder().findPath(_position, dest));
+    vector<glm::vec3> points(_game.module()->area()->pathfinder().findPath(_position, dest));
     uint32_t now = SDL_GetTicks();
     setPath(dest, move(points), now);
 }
@@ -1028,7 +1028,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!bodyModel)
         return nullptr;
 
-    auto bodySceneNode = _services.sceneGraphs.get(_sceneName).newModel(bodyModel, ModelUsage::Creature, this);
+    auto bodySceneNode = _services.sceneGraphs.get(_sceneName).newModel(*bodyModel, ModelUsage::Creature, this);
 
     // Body texture
 
@@ -1054,10 +1054,10 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!headModelName.empty()) {
         shared_ptr<Model> headModel(_services.models.get(headModelName));
         if (headModel) {
-            auto headSceneNode = _services.sceneGraphs.get(_sceneName).newModel(headModel, ModelUsage::Creature, this);
+            auto headSceneNode = _services.sceneGraphs.get(_sceneName).newModel(*headModel, ModelUsage::Creature, this);
             bodySceneNode->attach(g_headHookNode, move(headSceneNode));
             if (maskModel) {
-                auto maskSceneNode = _services.sceneGraphs.get(_sceneName).newModel(maskModel, ModelUsage::Equipment, this);
+                auto maskSceneNode = _services.sceneGraphs.get(_sceneName).newModel(*maskModel, ModelUsage::Equipment, this);
                 headSceneNode->attach(g_maskHookNode, move(maskSceneNode));
             }
         }
@@ -1069,7 +1069,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!rightWeaponModelName.empty()) {
         shared_ptr<Model> weaponModel(_services.models.get(rightWeaponModelName));
         if (weaponModel) {
-            auto weaponSceneNode = _services.sceneGraphs.get(_sceneName).newModel(weaponModel, ModelUsage::Equipment, this);
+            auto weaponSceneNode = _services.sceneGraphs.get(_sceneName).newModel(*weaponModel, ModelUsage::Equipment, this);
             bodySceneNode->attach(g_rightHandNode, move(weaponSceneNode));
         }
     }
@@ -1080,7 +1080,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!leftWeaponModelName.empty()) {
         shared_ptr<Model> weaponModel(_services.models.get(leftWeaponModelName));
         if (weaponModel) {
-            auto weaponSceneNode = _services.sceneGraphs.get(_sceneName).newModel(weaponModel, ModelUsage::Equipment, this);
+            auto weaponSceneNode = _services.sceneGraphs.get(_sceneName).newModel(*weaponModel, ModelUsage::Equipment, this);
             bodySceneNode->attach(g_leftHandNode, move(weaponSceneNode));
         }
     }

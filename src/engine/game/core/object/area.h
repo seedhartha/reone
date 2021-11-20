@@ -60,7 +60,7 @@ public:
 
     Area(
         uint32_t id,
-        Game *game,
+        Game &game,
         Services &services);
 
     void load(std::string name, const resource::GffStruct &are, const resource::GffStruct &git, bool fromSave = false);

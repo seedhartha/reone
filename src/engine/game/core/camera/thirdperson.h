@@ -28,7 +28,7 @@ class Game;
 
 class ThirdPersonCamera : public Camera {
 public:
-    ThirdPersonCamera(float aspect, const CameraStyle &style, Game *game, scene::SceneGraph *sceneGraph);
+    ThirdPersonCamera(float aspect, const CameraStyle &style, Game &game, scene::SceneGraph &sceneGraph);
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
@@ -40,7 +40,7 @@ public:
     void setStyle(CameraStyle style);
 
 private:
-    Game *_game;
+    Game &_game;
 
     CameraStyle _style;
     glm::vec3 _targetPosition {0.0f};

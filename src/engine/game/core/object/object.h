@@ -110,7 +110,7 @@ protected:
 
     uint32_t _id;
     ObjectType _type;
-    Game *_game;
+    Game &_game;
     Services &_services;
 
     std::string _tag;
@@ -152,7 +152,7 @@ protected:
     Object(
         uint32_t id,
         ObjectType type,
-        Game *game,
+        Game &game,
         Services &services) :
         _id(id),
         _type(type),

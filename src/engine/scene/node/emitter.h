@@ -32,8 +32,8 @@ class ParticleSceneNode;
 class EmitterSceneNode : public ModelNodeSceneNode {
 public:
     EmitterSceneNode(
-        const ModelSceneNode *model,
-        std::shared_ptr<graphics::ModelNode> modelNode,
+        const ModelSceneNode &model,
+        const graphics::ModelNode &modelNode,
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
@@ -54,7 +54,7 @@ public:
     float grav() const { return _grav; }
 
 private:
-    const ModelSceneNode *_model;
+    const ModelSceneNode &_model;
 
     graphics::BezierCurve<float> _particleSize;
     graphics::BezierCurve<glm::vec3> _color;

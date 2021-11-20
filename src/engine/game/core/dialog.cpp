@@ -17,7 +17,6 @@
 
 #include "dialog.h"
 
-#include "../../common/guardutil.h"
 #include "../../resource/strings.h"
 
 using namespace std;
@@ -27,11 +26,6 @@ using namespace reone::resource;
 namespace reone {
 
 namespace game {
-
-Dialog::Dialog(string resRef, Strings *strings) :
-    _resRef(move(resRef)),
-    _strings(ensurePresent(strings, "strings")) {
-}
 
 void Dialog::load(const GffStruct &dlg) {
     _skippable = dlg.getBool("Skippable");
@@ -68,7 +62,7 @@ Dialog::EntryReply Dialog::getEntryReply(const GffStruct &gffs) const {
 
     EntryReply entry;
     entry.speaker = gffs.getString("Speaker");
-    entry.text = strRef == -1 ? "" : _strings->get(strRef);
+    entry.text = strRef == -1 ? "" : _strings.get(strRef);
     entry.voResRef = gffs.getString("VO_ResRef");
     entry.script = gffs.getString("Script");
     entry.sound = gffs.getString("Sound");

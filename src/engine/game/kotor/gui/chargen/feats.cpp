@@ -35,8 +35,8 @@ namespace reone {
 namespace game {
 
 CharGenFeats::CharGenFeats(
-    CharacterGeneration *charGen,
-    KotOR *game,
+    CharacterGeneration &charGen,
+    KotOR &game,
     Services &services) :
     GameGUI(game, services),
     _charGen(charGen) {
@@ -51,11 +51,11 @@ void CharGenFeats::load() {
     bindControls();
 
     _binding.btnAccept->setOnClick([this]() {
-        _charGen->goToNextStep();
-        _charGen->openSteps();
+        _charGen.goToNextStep();
+        _charGen.openSteps();
     });
     _binding.btnBack->setOnClick([this]() {
-        _charGen->openSteps();
+        _charGen.openSteps();
     });
     _binding.btnSelect->setDisabled(true);
     _binding.btnRecommended->setDisabled(true);

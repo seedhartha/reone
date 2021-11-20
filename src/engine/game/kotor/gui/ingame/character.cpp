@@ -45,7 +45,7 @@ namespace reone {
 namespace game {
 
 CharacterMenu::CharacterMenu(
-    KotOR *game,
+    KotOR &game,
     InGameMenu &inGameMenu,
     Services &services) :
     GameGUI(game, services),
@@ -62,13 +62,13 @@ void CharacterMenu::load() {
 
     _binding.btnAuto->setDisabled(true);
     _binding.btnExit->setOnClick([this]() {
-        _game->openInGame();
+        _game.openInGame();
     });
     _binding.btnLevelup->setOnClick([this]() {
-        _game->openLevelUp();
+        _game.openLevelUp();
     });
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.btnCharLeft->setVisible(false);
         _binding.btnCharRight->setVisible(false);
 
@@ -126,7 +126,7 @@ void CharacterMenu::bindControls() {
     _binding.btnExit = getControl<Button>("BTN_EXIT");
     _binding.btnAuto = getControl<Button>("BTN_AUTO");
     _binding.btnLevelup = getControl<Button>("BTN_LEVELUP");
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.lblAdorn = getControl<Label>("LBL_ADORN");
         _binding.btnScripts = getControl<Button>("BTN_SCRIPTS");
         _binding.lblClass = getControl<Label>("LBL_CLASS");
@@ -177,7 +177,7 @@ void CharacterMenu::refreshControls() {
     shared_ptr<Creature> partyLeader(_services.party.getLeader());
     CreatureAttributes &attributes = partyLeader->attributes();
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.lblClass1->setTextMessage(describeClass(attributes.getClassByPosition(1)));
         _binding.lblClass2->setTextMessage(describeClass(attributes.getClassByPosition(2)));
         _binding.lblLevel1->setTextMessage(toStringOrEmptyIfZero(attributes.getLevelByPosition(1)));
@@ -221,7 +221,7 @@ string CharacterMenu::describeClass(ClassType clazz) const {
 }
 
 void CharacterMenu::refreshPortraits() {
-    if (_game->isTSL())
+    if (_game.isTSL())
         return;
 
     Party &party = _services.party;
@@ -271,7 +271,7 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) 
     character->loadAppearance();
     character->updateModelAnimation();
 
-    auto sceneModel = sceneGraph.newModel(_services.models.get("charmain_light"), ModelUsage::GUI);
+    auto sceneModel = sceneGraph.newModel(*_services.models.get("charmain_light"), ModelUsage::GUI);
     sceneModel->attach("charmain_light", character->sceneNode());
 
     return move(sceneModel);

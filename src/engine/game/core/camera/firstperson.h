@@ -25,7 +25,7 @@ namespace game {
 
 class FirstPersonCamera : public Camera {
 public:
-    FirstPersonCamera(float aspect, float fovy, scene::SceneGraph *sceneGraph);
+    FirstPersonCamera(float aspect, float fovy, scene::SceneGraph &sceneGraph);
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;

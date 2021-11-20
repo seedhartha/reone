@@ -39,7 +39,7 @@ namespace game {
 
 static constexpr int kStrRefMapNote = 349;
 
-MapMenu::MapMenu(KotOR *game, Services &services) :
+MapMenu::MapMenu(KotOR &game, Services &services) :
     GameGUI(game, services) {
     _resRef = getResRef("map");
 
@@ -53,7 +53,7 @@ void MapMenu::load() {
 
     _binding.btnReturn->setDisabled(true);
     _binding.btnExit->setOnClick([this]() {
-        _game->openInGame();
+        _game.openInGame();
     });
     _binding.btnUp->setOnClick([this]() {
         if (--_selectedNoteIdx == -1) {
@@ -68,9 +68,9 @@ void MapMenu::load() {
         refreshSelectedNote();
     });
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.btnPrtySlct->setOnClick([this]() {
-            _game->openPartySelection(PartySelectionContext());
+            _game.openPartySelection(PartySelectionContext());
         });
     }
 }
@@ -84,7 +84,7 @@ void MapMenu::bindControls() {
     _binding.lblMap = getControl<Label>("LBL_Map");
     _binding.lblMapNote = getControl<Label>("LBL_MapNote");
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.btnPrtySlct = getControl<Button>("BTN_PRTYSLCT");
     }
 }
@@ -100,14 +100,14 @@ void MapMenu::draw() {
         extent.width,
         extent.height);
 
-    _game->module()->area()->map().draw(Map::Mode::Default, bounds);
+    _game.module()->area()->map().draw(Map::Mode::Default, bounds);
 }
 
 void MapMenu::refreshControls() {
-    _binding.lblArea->setTextMessage(_game->module()->area()->localizedName());
+    _binding.lblArea->setTextMessage(_game.module()->area()->localizedName());
     _notes.clear();
 
-    for (auto &object : _game->module()->area()->getObjectsByType(ObjectType::Waypoint)) {
+    for (auto &object : _game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         auto waypoint = static_pointer_cast<Waypoint>(object);
         if (waypoint->isMapNoteEnabled() && !waypoint->mapNote().empty()) {
             _notes.push_back(waypoint);
@@ -131,7 +131,7 @@ void MapMenu::refreshSelectedNote() {
         _binding.lblMapNote->setTextMessage(text);
     }
 
-    _game->module()->area()->map().setSelectedNote(note);
+    _game.module()->area()->map().setSelectedNote(note);
 }
 
 } // namespace game

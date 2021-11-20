@@ -85,7 +85,7 @@ static const unordered_map<string, AnimationType> g_animTypeByName {
     {"kneel_talk_angry", AnimationType::LoopingKneelTalkAngry},
     {"kneel_talk_sad", AnimationType::LoopingKneelTalkSad}};
 
-DialogGUI::DialogGUI(KotOR *game, Services &services) :
+DialogGUI::DialogGUI(KotOR &game, Services &services) :
     Conversation(game, services) {
     _resRef = getResRef("dialog");
     _scaling = ScalingMode::Stretch;
@@ -135,20 +135,20 @@ void DialogGUI::addFrame(string tag, int top, int height) {
 
 void DialogGUI::configureMessage() {
     _binding.lblMessage->setExtentTop(-_rootControl->extent().top);
-    _binding.lblMessage->setTextColor(_game->getGUIColorBase());
+    _binding.lblMessage->setTextColor(_game.getGUIColorBase());
 }
 
 void DialogGUI::configureReplies() {
     _binding.lbReplies->setProtoMatchContent(true);
-    _binding.lbReplies->protoItem().setHilightColor(_game->getGUIColorHilight());
-    _binding.lbReplies->protoItem().setTextColor(_game->getGUIColorBase());
+    _binding.lbReplies->protoItem().setHilightColor(_game.getGUIColorHilight());
+    _binding.lbReplies->protoItem().setTextColor(_game.getGUIColorBase());
 }
 
 void DialogGUI::onStart() {
     _currentSpeaker = _owner;
     loadStuntParticipants();
 
-    auto &camera = _game->module()->area()->getCamera<AnimatedCamera>(CameraType::Animated);
+    auto &camera = _game.module()->area()->getCamera<AnimatedCamera>(CameraType::Animated);
     camera.setModel(_cameraModel);
 }
 
@@ -163,7 +163,7 @@ void DialogGUI::loadStuntParticipants() {
         if (stunt.participant == kObjectTagOwner) {
             creature = dynamic_pointer_cast<Creature>(_owner);
         } else {
-            creature = dynamic_pointer_cast<Creature>(_game->module()->area()->getObjectByTag(stunt.participant));
+            creature = dynamic_pointer_cast<Creature>(_game.module()->area()->getObjectByTag(stunt.participant));
         }
         if (!creature) {
             warn("Dialog: participant creature not found by tag: " + stunt.participant);
@@ -196,7 +196,7 @@ void DialogGUI::onLoadEntry() {
 }
 
 void DialogGUI::loadCurrentSpeaker() {
-    shared_ptr<Area> area(_game->module()->area());
+    shared_ptr<Area> area(_game.module()->area());
     shared_ptr<SpatialObject> speaker;
 
     if (!_currentEntry->speaker.empty()) {
@@ -229,7 +229,7 @@ void DialogGUI::loadCurrentSpeaker() {
 }
 
 void DialogGUI::updateCamera() {
-    shared_ptr<Area> area(_game->module()->area());
+    shared_ptr<Area> area(_game.module()->area());
 
     if (_dialog->cameraModel().empty()) {
         shared_ptr<Creature> player(_services.party.player());
@@ -251,7 +251,7 @@ glm::vec3 DialogGUI::getTalkPosition(const SpatialObject &object) const {
     if (!model)
         return object.position();
 
-    shared_ptr<ModelNode> talkDummy(model->model()->getNodeByNameRecursive("talkdummy"));
+    shared_ptr<ModelNode> talkDummy(model->model().getNodeByNameRecursive("talkdummy"));
     if (!talkDummy)
         return model->getWorldCenterOfAABB();
 
@@ -291,7 +291,7 @@ void DialogGUI::updateParticipantAnimations() {
             if (anim.participant == "owner") {
                 participant = dynamic_pointer_cast<Creature>(_owner);
             } else {
-                participant = dynamic_pointer_cast<Creature>(_game->module()->area()->getObjectByTag(anim.participant));
+                participant = dynamic_pointer_cast<Creature>(_game.module()->area()->getObjectByTag(anim.participant));
             }
             if (!participant) {
                 warn("Dialog: participant creature not found by tag: " + anim.participant);
@@ -384,8 +384,8 @@ void DialogGUI::update(float dt) {
     Conversation::update(dt);
 
     // Dialog camera follows the current speaker, if any
-    if (_currentSpeaker && _game->cameraType() == CameraType::Dialog) {
-        auto &camera = _game->module()->area()->getCamera<DialogCamera>(CameraType::Dialog);
+    if (_currentSpeaker && _game.cameraType() == CameraType::Dialog) {
+        auto &camera = _game.module()->area()->getCamera<DialogCamera>(CameraType::Dialog);
         camera.setSpeakerPosition(getTalkPosition(*_currentSpeaker));
     }
 }

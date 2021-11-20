@@ -109,7 +109,7 @@ bool Conversation::evaluateCondition(const string &scriptResRef) {
 void Conversation::finish() {
     onFinish();
 
-    _game->openInGame();
+    _game.openInGame();
 
     // Run EndConversation script
     if (!_dialog->endScript().empty()) {
@@ -137,7 +137,7 @@ void Conversation::loadEntry(int index, bool start) {
         oneLiner = reply.text.empty() && reply.entries.empty();
     }
     if (oneLiner) {
-        _game->setBarkBubbleText(_currentEntry->text, _entryDuration);
+        _game.setBarkBubbleText(_currentEntry->text, _entryDuration);
         debug("Dialog: finish (one-liner)");
         finish();
         return;
