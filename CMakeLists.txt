@@ -207,6 +207,7 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/materials.h
     src/engine/graphics/mesh/mesh.h
     src/engine/graphics/mesh/meshes.h
+    src/engine/graphics/mesh/triangleutil.h
     src/engine/graphics/mesh/vertexattributes.h
     src/engine/graphics/model/animatedproperty.h
     src/engine/graphics/model/animation.h

@@ -19,6 +19,7 @@
 
 #include "../../graphics/barycentricutil.h"
 #include "../../graphics/mesh/mesh.h"
+#include "../../graphics/mesh/triangleutil.h"
 #include "../../scene/graphs.h"
 #include "../../scene/node/grasscluster.h"
 #include "../../scene/node/model.h"
@@ -37,13 +38,6 @@ using namespace reone::scene;
 namespace reone {
 
 namespace game {
-
-static inline float calculateTriangleArea(const vector<glm::vec3> &verts) {
-    float a = glm::distance(verts[0], verts[1]);
-    float b = glm::distance(verts[0], verts[2]);
-    float c = glm::distance(verts[1], verts[2]);
-    return 0.25f * glm::sqrt((a + b + c) * (-a + b + c) * (a - b + c) * (a + b - c));
-}
 
 void SceneManager::refresh(Area &area) {
     auto &sceneGraph = _sceneGraphs.get(kSceneNameMain);
