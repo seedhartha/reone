@@ -38,13 +38,13 @@ void ParticleSceneNode::update(float dt) {
 
     if (_emitter.lifeExpectancy() != -1.0f) {
         _lifetime = glm::min(_lifetime + dt, _emitter.lifeExpectancy());
+        if (isExpired()) {
+            return;
+        }
     } else if (_lifetime == _animLength) {
         _lifetime = 0.0f;
     } else {
         _lifetime = glm::min(_lifetime + dt, _animLength);
-    }
-    if (isExpired()) {
-        return;
     }
 
     _position += _velocity * dt;
