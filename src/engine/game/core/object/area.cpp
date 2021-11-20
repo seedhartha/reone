@@ -350,17 +350,17 @@ void Area::loadParty(const glm::vec3 &position, float facing, bool fromSave) {
 }
 
 void Area::unloadParty() {
-    Party &party = _services.party;
-
-    for (int i = 0; i < party.getSize(); ++i) {
-        doDestroyObject(party.getMember(i)->id());
+    for (auto &member : _services.party.members()) {
+        doDestroyObject(member.creature->id());
     }
 }
 
 void Area::reloadParty() {
     shared_ptr<Creature> player(_services.party.player());
     loadParty(player->position(), player->getFacing());
-    _services.sceneManager.refresh(*this);
+    for (auto &member : _services.party.members()) {
+        _services.sceneManager.onObjectAdded(*member.creature);
+    }
 }
 
 bool Area::handle(const SDL_Event &event) {

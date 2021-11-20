@@ -30,6 +30,11 @@ class Object;
  */
 class Party {
 public:
+    struct Member {
+        int npc {0};
+        std::shared_ptr<Creature> creature;
+    };
+
     bool handle(const SDL_Event &event);
 
     void clear();
@@ -42,6 +47,7 @@ public:
     std::shared_ptr<Creature> getLeader() const;
 
     std::shared_ptr<Creature> player() const { return _player; }
+    const std::vector<Member> &members() const { return _members; }
 
     void setGame(Game &game) { _game = &game; }
     void setPartyLeader(int npc);
@@ -78,11 +84,6 @@ public:
     // END Available members
 
 private:
-    struct Member {
-        int npc {0};
-        std::shared_ptr<Creature> creature;
-    };
-
     Game *_game {nullptr};
     std::shared_ptr<Creature> _player;
     std::map<int, std::string> _availableMembers;

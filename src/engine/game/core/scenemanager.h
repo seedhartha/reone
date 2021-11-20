@@ -28,6 +28,7 @@ class SceneGraphs;
 namespace game {
 
 class Area;
+class SpatialObject;
 class Surfaces;
 
 /**
@@ -41,6 +42,8 @@ public:
     }
 
     void refresh(Area &area);
+
+    void onObjectAdded(const SpatialObject &object);
 
 private:
     Surfaces &_surfaces;
