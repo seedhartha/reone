@@ -31,6 +31,7 @@
 #include "../../game/core/party.h"
 #include "../../game/core/portraits.h"
 #include "../../game/core/reputes.h"
+#include "../../game/core/scenemanager.h"
 #include "../../game/core/script/routine/registrar.h"
 #include "../../game/core/script/routine/routines.h"
 #include "../../game/core/script/runner.h"
@@ -73,27 +74,7 @@ public:
 
     void init();
 
-    game::ActionFactory &actionFactory() { return *_actionFactory; }
-    game::Classes &classes() { return *_classes; }
-    game::Combat &combat() { return *_combat; }
-    game::Cursors &cursors() { return *_cursors; }
-    game::EffectFactory &effectFactory() { return *_effectFactory; }
-    game::Feats &feats() { return *_feats; }
-    game::FootstepSounds &footstepSounds() { return *_footstepSounds; }
     game::Game &game() { return *_game; }
-    game::GUISounds &guiSounds() { return *_guiSounds; }
-    game::ObjectFactory &objectFactory() { return *_objectFactory; }
-    game::Party &party() { return *_party; }
-    game::Portraits &portraits() { return *_portraits; }
-    game::Reputes &reputes() { return *_reputes; }
-    game::RoutineRegistrar &routineRegistrar() { return *_routineRegistrar; }
-    game::Routines &routines() { return *_routines; }
-    game::ScriptRunner &scriptRunner() { return *_scriptRunner; }
-    game::Services &services() { return *_services; }
-    game::Skills &skills() { return *_skills; }
-    game::SoundSets &soundSets() { return *_soundSets; }
-    game::Spells &spells() { return *_spells; }
-    game::Surfaces &surfaces() { return *_surfaces; }
 
 private:
     game::GameID _gameId;
@@ -121,6 +102,7 @@ private:
     std::unique_ptr<game::Reputes> _reputes;
     std::unique_ptr<game::Routines> _routines;
     std::unique_ptr<game::RoutineRegistrar> _routineRegistrar;
+    std::unique_ptr<game::SceneManager> _sceneManager;
     std::unique_ptr<game::ScriptRunner> _scriptRunner;
     std::unique_ptr<game::Services> _services;
     std::unique_ptr<game::Skills> _skills;
