@@ -17,7 +17,6 @@
 
 #include "mesh.h"
 
-#include "../../common/guardutil.h"
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
 #include "../../graphics/context.h"

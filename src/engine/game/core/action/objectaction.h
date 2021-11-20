@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "../../../common/guardutil.h"
-
 #include "action.h"
 
 namespace reone {
@@ -38,7 +36,7 @@ protected:
 
     ObjectAction(Game &game, ActionType type, std::shared_ptr<Object> object, float range = 1.0f, bool userAction = false) :
         Action(game, type, userAction),
-        _object(ensurePresent(object, "object")),
+        _object(std::move(object)),
         _range(range) {
     }
 };

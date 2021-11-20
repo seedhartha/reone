@@ -19,8 +19,6 @@
 
 #include "action.h"
 
-#include "../../../common/guardutil.h"
-
 namespace reone {
 
 namespace game {
@@ -31,7 +29,7 @@ class UnequipItemAction : public Action {
 public:
     UnequipItemAction(Game &game, std::shared_ptr<Item> item, bool instant) :
         Action(game, ActionType::UnequipItem),
-        _item(ensurePresent(item, "item")),
+        _item(std::move(item)),
         _instant(instant) {
     }
 

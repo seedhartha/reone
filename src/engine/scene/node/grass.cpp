@@ -17,7 +17,6 @@
 
 #include "grass.h"
 
-#include "../../common/guardutil.h"
 #include "../../graphics/context.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"

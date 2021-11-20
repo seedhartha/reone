@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "../../common/guardutil.h"
 #include "../../common/types.h"
 
 #include "../types.h"
@@ -36,7 +35,7 @@ public:
         ResourceType resType,
         std::shared_ptr<GffStruct> root) :
         _resType(resType),
-        _root(ensurePresent(root, "root")) {
+        _root(std::move(root)) {
     }
 
     void save(const boost::filesystem::path &path);

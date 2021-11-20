@@ -23,8 +23,6 @@
 
 #include "s3tc.h"
 
-#include "../../../common/guardutil.h"
-
 #include "../texture.h"
 
 using namespace std;
@@ -38,7 +36,7 @@ namespace graphics {
 static constexpr int kHeaderSize = 18;
 
 TgaWriter::TgaWriter(shared_ptr<Texture> texture) :
-    _texture(ensurePresent(texture, "texture")) {
+    _texture(move(texture)) {
 }
 
 void TgaWriter::save(ostream &out, bool compress) {

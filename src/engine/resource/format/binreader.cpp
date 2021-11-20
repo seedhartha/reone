@@ -17,7 +17,6 @@
 
 #include "binreader.h"
 
-#include "../../common/guardutil.h"
 #include "../../common/streamreader.h"
 
 using namespace std;
@@ -38,8 +37,6 @@ BinaryReader::BinaryReader(int signSize, const char *sign) :
 }
 
 void BinaryReader::load(shared_ptr<istream> in) {
-    ensurePresent(in, "in");
-
     _in = in;
     _reader = make_unique<StreamReader>(in, _endianess);
 

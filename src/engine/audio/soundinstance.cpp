@@ -17,7 +17,6 @@
 
 #include "soundinstance.h"
 
-#include "../common/guardutil.h"
 #include "../common/logutil.h"
 
 #include "soundhandle.h"
@@ -32,7 +31,7 @@ namespace audio {
 static constexpr int kMaxBufferCount = 8;
 
 SoundInstance::SoundInstance(shared_ptr<AudioStream> stream, bool loop, float gain, bool positional, glm::vec3 position) :
-    _stream(ensurePresent(stream, "stream")),
+    _stream(stream),
     _loop(loop),
     _gain(gain),
     _positional(positional),

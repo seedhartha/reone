@@ -19,8 +19,6 @@
 
 #include "action.h"
 
-#include "../../../common/guardutil.h"
-
 namespace reone {
 
 namespace game {
@@ -31,7 +29,7 @@ class PutDownItemAction : public Action {
 public:
     PutDownItemAction(Game &game, std::shared_ptr<Item> item) :
         Action(game, ActionType::PutDownItem),
-        _item(ensurePresent(item, "item")) {
+        _item(std::move(item)) {
     }
 
     void execute(Object &actor, ActionContext &ctx, float dt) override;

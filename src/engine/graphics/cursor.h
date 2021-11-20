@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "../common/guardutil.h"
-
 namespace reone {
 
 namespace graphics {
@@ -38,8 +36,8 @@ public:
         Meshes &meshes,
         Shaders &shaders,
         Window &window) :
-        _up(ensurePresent(up, "up")),
-        _down(ensurePresent(down, "down")),
+        _up(std::move(up)),
+        _down(std::move(down)),
         _context(context),
         _meshes(meshes),
         _shaders(shaders),

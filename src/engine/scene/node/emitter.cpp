@@ -17,7 +17,6 @@
 
 #include "emitter.h"
 
-#include "../../common/guardutil.h"
 #include "../../common/randomutil.h"
 #include "../../graphics/context.h"
 #include "../../graphics/mesh/mesh.h"

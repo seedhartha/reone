@@ -17,7 +17,6 @@
 
 #include "surfaces.h"
 
-#include "../../common/guardutil.h"
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
 

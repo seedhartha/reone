@@ -17,8 +17,6 @@
 
 #include "font.h"
 
-#include "../common/guardutil.h"
-
 #include "context.h"
 #include "mesh/mesh.h"
 #include "mesh/meshes.h"
@@ -40,8 +38,6 @@ Font::Font(Window &window, Context &context, Meshes &meshes, Shaders &shaders) :
 }
 
 void Font::load(shared_ptr<Texture> texture) {
-    ensurePresent(texture, "texture");
-
     _texture = texture;
 
     const Texture::Features &features = texture->features();

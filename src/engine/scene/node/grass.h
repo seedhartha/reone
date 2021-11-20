@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "../../common/guardutil.h"
-
 #include "scenenode.h"
 
 namespace reone {
@@ -52,7 +50,7 @@ public:
             meshes,
             shaders),
         _quadSize(std::move(quadSize)),
-        _texture(ensurePresent(texture, "texture")),
+        _texture(std::move(texture)),
         _lightmap(lightmap) {
     }
 
