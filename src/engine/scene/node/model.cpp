@@ -39,7 +39,7 @@ namespace scene {
 static constexpr float kTransitionLength = 0.25f;
 
 ModelSceneNode::ModelSceneNode(
-    const Model &model,
+    shared_ptr<Model> model,
     ModelUsage usage,
     SceneGraph &sceneGraph,
     Context &context,
@@ -51,7 +51,7 @@ ModelSceneNode::ModelSceneNode(
     Textures &textures,
     IAnimationEventListener *animEventListener) :
     SceneNode(
-        model.name(),
+        model->name(),
         SceneNodeType::Model,
         sceneGraph,
         context,
@@ -67,41 +67,41 @@ ModelSceneNode::ModelSceneNode(
 
     _volumetric = true;
 
-    buildNodeTree(*_model.rootNode(), *this);
+    buildNodeTree(_model->rootNode(), *this);
     computeAABB();
 }
 
-void ModelSceneNode::buildNodeTree(const ModelNode &node, SceneNode &parent) {
+void ModelSceneNode::buildNodeTree(shared_ptr<ModelNode> node, SceneNode &parent) {
     // Convert model node to scene node
     shared_ptr<ModelNodeSceneNode> sceneNode;
-    if (node.isMesh()) {
+    if (node->isMesh()) {
         sceneNode = newMeshSceneNode(node);
-    } else if (node.isLight()) {
+    } else if (node->isLight()) {
         sceneNode = newLightSceneNode(node);
-    } else if (node.isEmitter()) {
+    } else if (node->isEmitter()) {
         sceneNode = newEmitterSceneNode(node);
     } else {
         sceneNode = newDummySceneNode(node);
     }
 
-    if (node.isSkinMesh()) {
+    if (node->isSkinMesh()) {
         // Reparent skin meshes to prevent animation being applied twice
-        glm::mat4 transform(node.parent()->absoluteTransform() * node.localTransform());
+        glm::mat4 transform(node->parent()->absoluteTransform() * node->localTransform());
         sceneNode->setLocalTransform(move(transform));
         addChild(sceneNode);
     } else {
-        sceneNode->setLocalTransform(node.localTransform());
+        sceneNode->setLocalTransform(node->localTransform());
         parent.addChild(sceneNode);
     }
-    _nodeByNumber[node.number()] = sceneNode;
-    _nodeByName[node.name()] = sceneNode;
+    _nodeByNumber[node->number()] = sceneNode;
+    _nodeByName[node->name()] = sceneNode;
 
-    if (node.isReference()) {
-        auto model = _sceneGraph.newModel(*node.reference()->model, _usage, _animEventListener);
-        attach(node.name(), move(model));
+    if (node->isReference()) {
+        auto model = _sceneGraph.newModel(node->reference()->model, _usage, _animEventListener);
+        attach(node->name(), move(model));
     }
-    for (auto &child : node.children()) {
-        buildNodeTree(*child, *sceneNode);
+    for (auto &child : node->children()) {
+        buildNodeTree(child, *sceneNode);
     }
 }
 
@@ -132,24 +132,24 @@ void ModelSceneNode::computeAABB() {
     }
 }
 
-unique_ptr<DummySceneNode> ModelSceneNode::newDummySceneNode(const ModelNode &node) const {
+unique_ptr<DummySceneNode> ModelSceneNode::newDummySceneNode(shared_ptr<ModelNode> node) const {
     return make_unique<DummySceneNode>(node, _sceneGraph, _context, _meshes, _shaders);
 }
 
-unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(const ModelNode &node) const {
+unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(shared_ptr<ModelNode> node) const {
     return make_unique<MeshSceneNode>(*this, node, _sceneGraph, _context, _features, _materials, _meshes, _pbrIbl, _shaders, _textures);
 }
 
-unique_ptr<LightSceneNode> ModelSceneNode::newLightSceneNode(const ModelNode &node) const {
-    return make_unique<LightSceneNode>(*this, node, _sceneGraph, _context, _meshes, _shaders);
+unique_ptr<LightSceneNode> ModelSceneNode::newLightSceneNode(shared_ptr<ModelNode> node) const {
+    return make_unique<LightSceneNode>(node, _sceneGraph, _context, _meshes, _shaders);
 }
 
-unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(const ModelNode &node) const {
-    return make_unique<EmitterSceneNode>(*this, node, _sceneGraph, _context, _meshes, _shaders);
+unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(shared_ptr<ModelNode> node) const {
+    return make_unique<EmitterSceneNode>(node, _sceneGraph, _context, _meshes, _shaders);
 }
 
 void ModelSceneNode::signalEvent(const string &name) {
-    debug(boost::format("Model '%s': event '%s' signalled") % _model.name() % name);
+    debug(boost::format("Model '%s': event '%s' signalled") % _model->name() % name);
 
     if (name == "detonate") {
         for (auto &node : _nodeByNumber) {
@@ -184,7 +184,7 @@ shared_ptr<ModelNodeSceneNode> ModelSceneNode::getNodeByName(const string &name)
 }
 
 shared_ptr<SceneNode> ModelSceneNode::getAttachment(const string &parentName) const {
-    auto parent = _model.getNodeByName(parentName);
+    auto parent = _model->getNodeByName(parentName);
     return parent ? getFromLookupOrNull(_attachments, parent->name()) : nullptr;
 }
 
@@ -210,7 +210,7 @@ void ModelSceneNode::setAppliedForce(glm::vec3 force) {
 }
 
 void ModelSceneNode::playAnimation(const string &name, AnimationProperties properties) {
-    shared_ptr<Animation> anim(_model.getAnimation(name));
+    shared_ptr<Animation> anim(_model->getAnimation(name));
     if (anim) {
         playAnimation(anim, nullptr, move(properties));
     }
@@ -218,7 +218,7 @@ void ModelSceneNode::playAnimation(const string &name, AnimationProperties prope
 
 void ModelSceneNode::playAnimation(shared_ptr<Animation> anim, shared_ptr<LipAnimation> lipAnim, AnimationProperties properties) {
     if (properties.scale == 0.0f) {
-        properties.scale = _model.animationScale();
+        properties.scale = _model->animationScale();
     }
 
     // Return if same animation is already playing
@@ -297,7 +297,7 @@ void ModelSceneNode::updateAnimations(float dt) {
 
     // Apply states and compute bone transforms only when this model is not culled
     if (!_culled) {
-        applyAnimationStates(*_model.rootNode());
+        applyAnimationStates(*_model->rootNode());
     }
 
     // Erase finished channels
@@ -358,7 +358,7 @@ void ModelSceneNode::updateAnimationChannel(AnimationChannel &channel, float dt)
     if (!_culled) {
         float time = channel.transition ? channel.anim->transitionTime() : channel.time;
         channel.stateByNodeNumber.clear();
-        computeAnimationStates(channel, time, *_model.rootNode());
+        computeAnimationStates(channel, time, *_model->rootNode());
     }
 }
 

@@ -47,7 +47,7 @@ static bool g_debugWalkmesh = false;
 
 MeshSceneNode::MeshSceneNode(
     const ModelSceneNode &model,
-    const ModelNode &modelNode,
+    shared_ptr<ModelNode> modelNode,
     SceneGraph &sceneGraph,
     Context &context,
     Features &features,
@@ -69,14 +69,14 @@ MeshSceneNode::MeshSceneNode(
     _pbrIbl(pbrIbl),
     _textures(textures) {
 
-    _alpha = _modelNode.alpha().getByFrameOrElse(0, 1.0f);
-    _selfIllumColor = _modelNode.selfIllumColor().getByFrameOrElse(0, glm::vec3(0.0f));
+    _alpha = _modelNode->alpha().getByFrameOrElse(0, 1.0f);
+    _selfIllumColor = _modelNode->selfIllumColor().getByFrameOrElse(0, glm::vec3(0.0f));
 
     initTextures();
 }
 
 void MeshSceneNode::initTextures() {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
     if (!mesh)
         return;
 
@@ -120,7 +120,7 @@ void MeshSceneNode::refreshAdditionalTextures() {
 void MeshSceneNode::update(float dt) {
     SceneNode::update(dt);
 
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
     if (mesh) {
         updateUVAnimation(dt, *mesh);
         updateBumpmapAnimation(dt, *mesh);
@@ -183,22 +183,22 @@ void MeshSceneNode::updateDanglyMeshAnimation(float dt, const ModelNode::Triangl
 
 bool MeshSceneNode::shouldRender() const {
     if (g_debugWalkmesh)
-        return _modelNode.isAABBMesh();
+        return _modelNode->isAABBMesh();
 
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
-    if (!mesh || !mesh->render || _modelNode.alpha().getByFrameOrElse(0, 1.0f) == 0.0f)
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    if (!mesh || !mesh->render || _modelNode->alpha().getByFrameOrElse(0, 1.0f) == 0.0f)
         return false;
 
-    return !_modelNode.isAABBMesh();
+    return !_modelNode->isAABBMesh();
 }
 
 bool MeshSceneNode::shouldCastShadows() const {
     // Skin nodes must not cast shadows
-    if (_modelNode.isSkinMesh())
+    if (_modelNode->isSkinMesh())
         return false;
 
     // Meshless nodes must not cast shadows
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
     if (!mesh)
         return false;
 
@@ -206,7 +206,7 @@ bool MeshSceneNode::shouldCastShadows() const {
 }
 
 bool MeshSceneNode::isTransparent() const {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
     if (!mesh)
         return false; // Meshless nodes are opaque
 
@@ -252,12 +252,11 @@ bool MeshSceneNode::isSelfIlluminated() const {
 
 static bool isReceivingShadows(const ModelSceneNode &model, const MeshSceneNode &modelNode) {
     // Only room models receive shadows, unless model node is self-illuminated
-    return model.usage() == ModelUsage::Room &&
-           !modelNode.isSelfIlluminated();
+    return model.usage() == ModelUsage::Room && !modelNode.isSelfIlluminated();
 }
 
 void MeshSceneNode::drawSingle(bool shadowPass) {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode.mesh());
+    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
     if (!mesh)
         return;
 
@@ -329,7 +328,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
                     if (nodeNumber != 0xffff) {
                         shared_ptr<ModelNodeSceneNode> bone(_model.getNodeByNumber(nodeNumber));
                         if (bone && bone->type() == SceneNodeType::Mesh) {
-                            tmp = _modelNode.absoluteTransformInverse() *
+                            tmp = _modelNode->absoluteTransformInverse() *
                                   _model.absoluteTransformInverse() *
                                   bone->absoluteTransform() *
                                   mesh->skin->boneMatrices[mesh->skin->boneSerial[i - 1]];
@@ -458,7 +457,7 @@ bool MeshSceneNode::isLightingEnabled() const {
 }
 
 void MeshSceneNode::setAppliedForce(glm::vec3 force) {
-    if (_modelNode.isDanglyMesh()) {
+    if (_modelNode->isDanglyMesh()) {
         // Convert force from world to object space
         _danglymeshAnimation.force = _absTransformInv * glm::vec4(force, 0.0f);
     }

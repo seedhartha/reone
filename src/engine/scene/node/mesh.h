@@ -42,7 +42,7 @@ class MeshSceneNode : public ModelNodeSceneNode {
 public:
     MeshSceneNode(
         const ModelSceneNode &model,
-        const graphics::ModelNode &modelNode,
+        std::shared_ptr<graphics::ModelNode> modelNode,
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Features &features,

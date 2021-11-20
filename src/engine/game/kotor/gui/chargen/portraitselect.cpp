@@ -155,7 +155,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
     if (cameraHook) {
         creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->absoluteTransform()[3].z));
     }
-    auto model = sceneGraph.newModel(*_services.models.get("cghead_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(_services.models.get("cghead_light"), ModelUsage::GUI);
     model->attach("cghead_light", creatureModel);
 
     return move(model);

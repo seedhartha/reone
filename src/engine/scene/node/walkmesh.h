@@ -33,7 +33,7 @@ class WalkmeshSceneNode : public SceneNode {
 public:
     WalkmeshSceneNode(
         std::string name,
-        const graphics::Walkmesh &walkmesh,
+        std::shared_ptr<graphics::Walkmesh> walkmesh,
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
@@ -45,15 +45,15 @@ public:
             context,
             meshes,
             shaders),
-        _walkmesh(walkmesh) {
+        _walkmesh(std::move(walkmesh)) {
     }
 
-    const graphics::Walkmesh &walkmesh() const { return _walkmesh; }
+    const graphics::Walkmesh &walkmesh() const { return *_walkmesh; }
 
     void setEnabled(bool enabled) { _enabled = enabled; }
 
 private:
-    const graphics::Walkmesh &_walkmesh;
+    std::shared_ptr<graphics::Walkmesh> _walkmesh;
 
     bool _enabled {true}; /**< sometimes there is more than 1 walkmesh per object */
 };
