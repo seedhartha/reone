@@ -38,6 +38,8 @@ public:
 
 private:
     void initResourceProviders() override;
+    void initRoutines() override;
+
     void start() override;
 
     void loadModuleNames() override;

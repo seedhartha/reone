@@ -41,6 +41,11 @@ struct Services;
 
 class ObjectFactory {
 public:
+    ObjectFactory(Game &game, Services &services) :
+        _game(game),
+        _services(services) {
+    }
+
     std::shared_ptr<Module> newModule();
     std::shared_ptr<Area> newArea();
     std::shared_ptr<Item> newItem();
@@ -56,17 +61,14 @@ public:
 
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
-    void setGame(Game &game) { _game = &game; }
-    void setServices(Services &services) { _services = &services; }
-
     template <class T>
     std::shared_ptr<T> getObjectById(uint32_t id) const {
         return std::dynamic_pointer_cast<T>(getObjectById(id));
     }
 
 private:
-    Game *_game {nullptr};
-    Services *_services {nullptr};
+    Game &_game;
+    Services &_services;
 
     uint32_t _counter {2}; // ids 0 and 1 are reserved
     std::unordered_map<uint32_t, std::shared_ptr<Object>> _objectById;

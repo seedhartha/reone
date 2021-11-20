@@ -89,7 +89,7 @@ void Trigger::update(float dt) {
     for (auto &tenant : tenantsToRemove) {
         _tenants.erase(tenant);
         if (!_onExit.empty()) {
-            _services.scriptRunner.run(_onExit, _id, tenant->id());
+            _game.scriptRunner().run(_onExit, _id, tenant->id());
         }
     }
 }

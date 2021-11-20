@@ -21,14 +21,20 @@
 #include "../../graphics/eventhandler.h"
 #include "../../video/video.h"
 
+#include "action/factory.h"
 #include "camera/camera.h"
 #include "combat.h"
 #include "console.h"
+#include "effect/factory.h"
 #include "gui/loadscreen.h"
+#include "object/factory.h"
 #include "object/module.h"
 #include "options.h"
 #include "party.h"
 #include "profileoverlay.h"
+#include "scenemanager.h"
+#include "script/routine/routines.h"
+#include "script/runner.h"
 
 namespace reone {
 
@@ -94,6 +100,12 @@ public:
     const Options &options() const { return _options; }
     Party &party() { return _party; }
     Combat &combat() { return _combat; }
+    ActionFactory &actionFactory() { return _actionFactory; }
+    EffectFactory &effectFactory() { return _effectFactory; }
+    ObjectFactory &objectFactory() { return _objectFactory; }
+    SceneManager &sceneManager() { return _sceneManager; }
+    ScriptRunner &scriptRunner() { return _scriptRunner; }
+
     std::shared_ptr<Module> module() const { return _module; }
     CameraType cameraType() const { return _cameraType; }
     const std::set<std::string> &moduleNames() const { return _moduleNames; }
@@ -184,8 +196,6 @@ protected:
     boost::filesystem::path _path;
     Options _options;
     Services &_services;
-    Party _party;
-    Combat _combat;
 
     GameScreen _screen {GameScreen::None};
     std::string _mainMenuMusicResRef;
@@ -201,6 +211,19 @@ protected:
     CameraType _cameraType {CameraType::ThirdPerson};
     bool _paused {false};
     std::set<std::string> _moduleNames;
+
+    // Services
+
+    Party _party;
+    Combat _combat;
+    ActionFactory _actionFactory;
+    EffectFactory _effectFactory;
+    ObjectFactory _objectFactory;
+    Routines _routines;
+    SceneManager _sceneManager;
+    ScriptRunner _scriptRunner;
+
+    // END Services
 
     // GUI colors
 
@@ -223,8 +246,8 @@ protected:
 
     std::unique_ptr<ILoadingScreen> _loadScreen;
 
-    std::unique_ptr<Console> _console;
-    std::unique_ptr<ProfileOverlay> _profileOverlay;
+    Console _console;
+    ProfileOverlay _profileOverlay;
 
     // END GUI
 
@@ -272,6 +295,7 @@ protected:
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 
+    virtual void initRoutines() = 0;
     virtual void onModuleSelected(const std::string &name) = 0;
     virtual void drawHUD() = 0;
 

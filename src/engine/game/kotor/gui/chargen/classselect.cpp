@@ -228,7 +228,7 @@ int ClassSelection::getRandomCharacterAppearance(Gender gender, ClassType clazz)
 }
 
 shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, SceneGraph &sceneGraph) {
-    shared_ptr<Creature> character(_services.objectFactory.newCreature(sceneGraph.name()));
+    shared_ptr<Creature> character(_game.objectFactory().newCreature(sceneGraph.name()));
     character->setFacing(-glm::half_pi<float>());
     character->setAppearance(appearance);
     character->equip("g_a_clothes01");

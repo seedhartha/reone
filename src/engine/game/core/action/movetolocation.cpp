@@ -27,7 +27,7 @@ namespace reone {
 namespace game {
 
 void MoveToLocationAction::execute(Object &actor, float dt) {
-    auto creatureActor = _services.objectFactory.getObjectById<Creature>(actor.id());
+    auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
     glm::vec3 destination(_location->position());
 
     bool reached = creatureActor->navigateTo(destination, _run, 1.0f, dt);

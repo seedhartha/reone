@@ -58,7 +58,7 @@ Variable assignCommand(const vector<Variable> &args, const RoutineContext &ctx) 
     auto subject = getObject(args, 0, ctx);
     auto action = getAction(args, 1);
 
-    auto objectAction = ctx.services.actionFactory.newDoCommand(move(action));
+    auto objectAction = ctx.game.actionFactory().newDoCommand(move(action));
     subject->addAction(move(objectAction));
 
     return Variable::ofNull();
@@ -68,7 +68,7 @@ Variable delayCommand(const vector<Variable> &args, const RoutineContext &ctx) {
     float seconds = getFloat(args, 0);
     auto action = getAction(args, 1);
 
-    auto objectAction = ctx.services.actionFactory.newDoCommand(move(action));
+    auto objectAction = ctx.game.actionFactory().newDoCommand(move(action));
     getCaller(ctx)->delayAction(move(objectAction), seconds);
 
     return Variable::ofNull();
@@ -79,7 +79,7 @@ Variable executeScript(const vector<Variable> &args, const RoutineContext &ctx) 
     auto target = getObject(args, 1, ctx);
     int scriptVar = getIntOrElse(args, 2, -1);
 
-    ctx.services.scriptRunner.run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
+    ctx.game.scriptRunner().run(script, target->id(), kObjectInvalid, kObjectInvalid, scriptVar);
 
     return Variable::ofNull();
 }
@@ -1039,7 +1039,7 @@ Variable getIsPlayableRacialType(const vector<Variable> &args, const RoutineCont
 Variable jumpToLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     auto destination = getLocationEngineType(args, 0);
 
-    auto action = ctx.services.actionFactory.newJumpToLocation(move(destination));
+    auto action = ctx.game.actionFactory().newJumpToLocation(move(destination));
     getCaller(ctx)->addActionOnTop(move(action));
 
     return Variable::ofNull();
@@ -1361,7 +1361,7 @@ Variable jumpToObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto jumpTo = getObject(args, 0, ctx);
     bool walkStraightLine = getBoolOrElse(args, 1, true);
 
-    auto action = ctx.services.actionFactory.newJumpToObject(move(jumpTo));
+    auto action = ctx.game.actionFactory().newJumpToObject(move(jumpTo));
     getCaller(ctx)->addActionOnTop(move(action));
 
     return Variable::ofNull();

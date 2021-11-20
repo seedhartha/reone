@@ -39,7 +39,7 @@ void OpenLockAction::execute(Object &actor, float dt) {
     }
 
     auto door = static_pointer_cast<Door>(_object);
-    auto creatureActor = _services.objectFactory.getObjectById<Creature>(actor.id());
+    auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
 
     bool reached = creatureActor->navigateTo(door->position(), true, kDefaultMaxObjectDistance, dt);
     if (reached) {
@@ -52,7 +52,7 @@ void OpenLockAction::execute(Object &actor, float dt) {
 
             string onOpen(door->getOnOpen());
             if (!onOpen.empty()) {
-                _services.scriptRunner.run(onOpen, door->id(), actor.id());
+                _game.scriptRunner().run(onOpen, door->id(), actor.id());
             }
         }
 

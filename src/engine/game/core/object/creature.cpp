@@ -290,7 +290,7 @@ void Creature::playAnimation(CombatAnimation anim, CreatureWieldType wield, int 
 }
 
 bool Creature::equip(const string &resRef) {
-    shared_ptr<Item> item(_services.objectFactory.newItem());
+    shared_ptr<Item> item(_game.objectFactory().newItem());
     item->loadFromBlueprint(resRef);
 
     bool equipped = false;
@@ -430,13 +430,13 @@ int Creature::getNeededXP() const {
 
 void Creature::runSpawnScript() {
     if (!_onSpawn.empty()) {
-        _services.scriptRunner.run(_onSpawn, _id, kObjectInvalid);
+        _game.scriptRunner().run(_onSpawn, _id, kObjectInvalid);
     }
 }
 
 void Creature::runEndRoundScript() {
     if (!_onEndRound.empty()) {
-        _services.scriptRunner.run(_onEndRound, _id, kObjectInvalid);
+        _game.scriptRunner().run(_onEndRound, _id, kObjectInvalid);
     }
 }
 
@@ -469,7 +469,7 @@ void Creature::die() {
 
 void Creature::runDeathScript() {
     if (!_onDeath.empty()) {
-        _services.scriptRunner.run(_onDeath, _id, kObjectInvalid);
+        _game.scriptRunner().run(_onDeath, _id, kObjectInvalid);
     }
 }
 
@@ -525,7 +525,7 @@ void Creature::onObjectSeen(const shared_ptr<SpatialObject> &object) {
 
 void Creature::runOnNoticeScript() {
     if (!_onNotice.empty()) {
-        _services.scriptRunner.run(_onNotice, _id, _perception.lastPerceived->id());
+        _game.scriptRunner().run(_onNotice, _id, _perception.lastPerceived->id());
     }
 }
 
@@ -737,7 +737,7 @@ void Creature::advanceOnPath(bool run, float dt) {
     if (distToDest <= 1.0f) {
         _path->selectNextPoint();
     } else {
-        shared_ptr<Creature> creature(_services.objectFactory.getObjectById<Creature>(_id));
+        shared_ptr<Creature> creature(_game.objectFactory().getObjectById<Creature>(_id));
         if (_game.module()->area()->moveCreatureTowards(creature, dest, run, dt)) {
             setMovementType(run ? Creature::MovementType::Run : Creature::MovementType::Walk);
             setAppliedForce(glm::vec3(glm::normalize(glm::vec2(dest - origin)), 0.0f));

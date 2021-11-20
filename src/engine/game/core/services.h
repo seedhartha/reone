@@ -68,36 +68,26 @@ class Scripts;
 
 namespace game {
 
-class ActionFactory;
 class Classes;
 class Combat;
 class Cursors;
-class EffectFactory;
 class Feats;
 class FootstepSounds;
 class GUISounds;
-class ObjectFactory;
 class Portraits;
 class Reputes;
-class SceneManager;
-class ScriptRunner;
 class Skills;
 class SoundSets;
 class Surfaces;
 
 struct Services {
-    ActionFactory &actionFactory;
     Classes &classes;
     Cursors &cursors;
-    EffectFactory &effectFactory;
     Feats &feats;
     FootstepSounds &footstepSounds;
     GUISounds &guiSounds;
-    ObjectFactory &objectFactory;
     Portraits &portraits;
     Reputes &reputes;
-    SceneManager &sceneManager;
-    ScriptRunner &scriptRunner;
     Skills &skills;
     SoundSets &soundSets;
     Surfaces &surfaces;
@@ -126,18 +116,13 @@ struct Services {
     resource::TwoDas &twoDas;
 
     Services(
-        ActionFactory &actionFactory,
         Classes &classes,
         Cursors &cursors,
-        EffectFactory &effectFactory,
         Feats &feats,
         FootstepSounds &footstepSounds,
         GUISounds &guiSounds,
-        ObjectFactory &objectFactory,
         Portraits &portraits,
         Reputes &reputes,
-        SceneManager &sceneManager,
-        ScriptRunner &scriptRunner,
         Skills &skills,
         SoundSets &soundSets,
         Surfaces &surfaces,
@@ -163,18 +148,13 @@ struct Services {
         resource::Resources &resources,
         resource::Strings &strings,
         resource::TwoDas &twoDas) :
-        actionFactory(actionFactory),
         classes(classes),
         cursors(cursors),
-        effectFactory(effectFactory),
         feats(feats),
         footstepSounds(footstepSounds),
         guiSounds(guiSounds),
-        objectFactory(objectFactory),
         portraits(portraits),
         reputes(reputes),
-        sceneManager(sceneManager),
-        scriptRunner(scriptRunner),
         skills(skills),
         soundSets(soundSets),
         surfaces(surfaces),

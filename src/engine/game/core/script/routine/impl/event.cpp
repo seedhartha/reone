@@ -46,7 +46,7 @@ Variable signalEvent(const vector<Variable> &args, const RoutineContext &ctx) {
     auto toRun = getEvent(args, 1);
 
     debug(boost::format("Event signalled: %s %s") % object->tag() % toRun->number());
-    ctx.services.scriptRunner.run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
+    ctx.game.scriptRunner().run(object->getOnUserDefined(), object->id(), kObjectInvalid, toRun->number());
 
     return Variable::ofNull();
 }

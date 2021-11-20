@@ -28,47 +28,47 @@ namespace reone {
 namespace game {
 
 shared_ptr<Module> ObjectFactory::newModule() {
-    return newObject<Module>(*_game, *_services);
+    return newObject<Module>(_game, _services);
 }
 
 shared_ptr<Area> ObjectFactory::newArea() {
-    return newObject<Area>(*_game, *_services);
+    return newObject<Area>(_game, _services);
 }
 
 shared_ptr<Item> ObjectFactory::newItem() {
-    return newObject<Item>(*_game, *_services);
+    return newObject<Item>(_game, _services);
 }
 
 shared_ptr<Creature> ObjectFactory::newCreature(string sceneName) {
-    return newObject<Creature>(move(sceneName), *_game, *_services);
+    return newObject<Creature>(move(sceneName), _game, _services);
 }
 
 shared_ptr<Placeable> ObjectFactory::newPlaceable(string sceneName) {
-    return newObject<Placeable>(move(sceneName), *_game, *_services);
+    return newObject<Placeable>(move(sceneName), _game, _services);
 }
 
 shared_ptr<Door> ObjectFactory::newDoor(string sceneName) {
-    return newObject<Door>(move(sceneName), *_game, *_services);
+    return newObject<Door>(move(sceneName), _game, _services);
 }
 
 shared_ptr<Waypoint> ObjectFactory::newWaypoint(string sceneName) {
-    return newObject<Waypoint>(move(sceneName), *_game, *_services);
+    return newObject<Waypoint>(move(sceneName), _game, _services);
 }
 
 shared_ptr<Trigger> ObjectFactory::newTrigger(string sceneName) {
-    return newObject<Trigger>(move(sceneName), *_game, *_services);
+    return newObject<Trigger>(move(sceneName), _game, _services);
 }
 
 shared_ptr<Sound> ObjectFactory::newSound(string sceneName) {
-    return newObject<Sound>(move(sceneName), *_game, *_services);
+    return newObject<Sound>(move(sceneName), _game, _services);
 }
 
 shared_ptr<PlaceableCamera> ObjectFactory::newCamera(string sceneName) {
-    return newObject<PlaceableCamera>(move(sceneName), *_game, *_services);
+    return newObject<PlaceableCamera>(move(sceneName), _game, _services);
 }
 
 shared_ptr<Encounter> ObjectFactory::newEncounter(string sceneName) {
-    return newObject<Encounter>(move(sceneName), *_game, *_services);
+    return newObject<Encounter>(move(sceneName), _game, _services);
 }
 
 shared_ptr<Object> ObjectFactory::getObjectById(uint32_t id) const {

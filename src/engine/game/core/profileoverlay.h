@@ -22,28 +22,14 @@
 
 namespace reone {
 
-namespace graphics {
-
-class Fonts;
-class Meshes;
-class Shaders;
-class Window;
-
-} // namespace graphics
-
 namespace game {
+
+struct Services;
 
 class ProfileOverlay {
 public:
-    ProfileOverlay(
-        graphics::Fonts &fonts,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Window &window) :
-        _fonts(fonts),
-        _meshes(meshes),
-        _shaders(shaders),
-        _window(window) {
+    ProfileOverlay(Services &services) :
+        _services(services) {
     }
 
     void init();
@@ -57,6 +43,8 @@ private:
         int onePerLow {0}; /**< 1% Low */
     };
 
+    Services &_services;
+
     uint64_t _frequency {0};
     uint64_t _counter {0};
     std::shared_ptr<graphics::Font> _font;
@@ -66,15 +54,6 @@ private:
     Timer _refreshTimer;
     std::vector<float> _frametimes;
     FPS _fps;
-
-    // Services
-
-    graphics::Fonts &_fonts;
-    graphics::Meshes &_meshes;
-    graphics::Shaders &_shaders;
-    graphics::Window &_window;
-
-    // END Services
 
     void calculateFPS();
 

@@ -88,13 +88,13 @@ shared_ptr<Walkmesh> Placeable::getWalkmesh() const {
 
 void Placeable::runOnUsed(shared_ptr<SpatialObject> usedBy) {
     if (!_onUsed.empty()) {
-        _services.scriptRunner.run(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
+        _game.scriptRunner().run(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
     }
 }
 
 void Placeable::runOnInvDisturbed(shared_ptr<SpatialObject> triggerrer) {
     if (!_onInvDisturbed.empty()) {
-        _services.scriptRunner.run(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
+        _game.scriptRunner().run(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
     }
 }
 

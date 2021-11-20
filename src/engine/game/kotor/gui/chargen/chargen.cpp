@@ -368,7 +368,7 @@ void CharacterGeneration::finish() {
         partyLeader->attributes() = _character.attributes;
         _game.openInGame();
     } else {
-        shared_ptr<Creature> player(_services.objectFactory.newCreature());
+        shared_ptr<Creature> player(_game.objectFactory().newCreature());
         player->setTag(kObjectTagPlayer);
         player->setGender(_character.gender);
         player->setAppearance(_character.appearance);
@@ -420,7 +420,7 @@ void CharacterGeneration::reloadCharacterModel() {
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
-    shared_ptr<Creature> creature(_services.objectFactory.newCreature(sceneGraph.name()));
+    shared_ptr<Creature> creature(_game.objectFactory().newCreature(sceneGraph.name()));
     creature->setFacing(-glm::half_pi<float>());
     creature->setAppearance(_character.appearance);
     creature->equip("g_a_clothes01");

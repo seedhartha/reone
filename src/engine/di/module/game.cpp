@@ -19,10 +19,7 @@
 
 #include "../../game/core/types.h"
 #include "../../game/kotor/kotor.h"
-#include "../../game/kotor/routine/registrar.h"
 #include "../../game/limbo/limbo.h"
-#include "../../game/limbo/routine/registrar.h"
-#include "../../game/tsl/routine/registrar.h"
 #include "../../game/tsl/tsl.h"
 
 #include "audio.h"
@@ -45,38 +42,26 @@ namespace reone {
 namespace di {
 
 void GameModule::init() {
-    _surfaces = make_unique<Surfaces>(_resource.twoDas());
+    _classes = make_unique<Classes>(_resource.strings(), _resource.twoDas());
     _cursors = make_unique<Cursors>(_graphics.context(), _graphics.meshes(), _graphics.shaders(), _graphics.window(), _resource.resources());
-    _soundSets = make_unique<SoundSets>(_audio.audioFiles(), _resource.resources(), _resource.strings());
+    _feats = make_unique<Feats>(_graphics.textures(), _resource.strings(), _resource.twoDas());
     _footstepSounds = make_unique<FootstepSounds>(_audio.audioFiles(), _resource.twoDas());
     _guiSounds = make_unique<GUISounds>(_audio.audioFiles(), _resource.twoDas());
+    _portraits = make_unique<Portraits>(_graphics.textures(), _resource.twoDas());
     _reputes = make_unique<Reputes>(_resource.twoDas());
     _skills = make_unique<Skills>(_graphics.textures(), _resource.strings(), _resource.twoDas());
-    _feats = make_unique<Feats>(_graphics.textures(), _resource.strings(), _resource.twoDas());
+    _soundSets = make_unique<SoundSets>(_audio.audioFiles(), _resource.resources(), _resource.strings());
     _spells = make_unique<Spells>(_graphics.textures(), _resource.strings(), _resource.twoDas());
-    _classes = make_unique<Classes>(_resource.strings(), _resource.twoDas());
-    _portraits = make_unique<Portraits>(_graphics.textures(), _resource.twoDas());
-    _actionFactory = make_unique<ActionFactory>();
-    _objectFactory = make_unique<ObjectFactory>();
-    _effectFactory = make_unique<EffectFactory>();
-    _routines = make_unique<Routines>();
-    _scriptRunner = make_unique<ScriptRunner>(*_routines, _script.scripts());
-    _routineRegistrar = newRoutineRegistrar();
-    _sceneManager = make_unique<SceneManager>(*_surfaces, _scene.sceneGraphs().get(kSceneMain));
+    _surfaces = make_unique<Surfaces>(_resource.twoDas());
 
     _services = make_unique<Services>(
-        *_actionFactory,
         *_classes,
         *_cursors,
-        *_effectFactory,
         *_feats,
         *_footstepSounds,
         *_guiSounds,
-        *_objectFactory,
         *_portraits,
         *_reputes,
-        *_sceneManager,
-        *_scriptRunner,
         *_skills,
         *_soundSets,
         *_surfaces,
@@ -105,13 +90,6 @@ void GameModule::init() {
 
     _game = newGame();
 
-    _actionFactory->setGame(*_game);
-    _actionFactory->setServices(*_services);
-    _objectFactory->setGame(*_game);
-    _objectFactory->setServices(*_services);
-    _routines->setGame(*_game);
-    _routines->setServices(*_services);
-
     _game->initResourceProviders();
     _surfaces->init();
     _guiSounds->init();
@@ -120,7 +98,6 @@ void GameModule::init() {
     _feats->init();
     _spells->init();
     _portraits->init();
-    _routineRegistrar->invoke();
     _game->init();
 }
 
@@ -134,19 +111,6 @@ unique_ptr<Game> GameModule::newGame() {
         return make_unique<TSL>(_gamePath, _gameOptions, *_services);
     default:
         throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
-    }
-}
-
-unique_ptr<RoutineRegistrar> GameModule::newRoutineRegistrar() {
-    switch (_gameId) {
-    case GameID::Limbo:
-        return make_unique<LimboRoutineRegistrar>(*_routines);
-    case GameID::KotOR:
-        return make_unique<KotORRoutineRegistrar>(*_routines);
-    case GameID::TSL:
-        return make_unique<TSLRoutineRegistrar>(*_routines);
-    default:
-        throw invalid_argument("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
     }
 }
 

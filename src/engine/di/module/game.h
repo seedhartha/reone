@@ -17,22 +17,15 @@
 
 #pragma once
 
-#include "../../game/core/action/factory.h"
 #include "../../game/core/cursors.h"
 #include "../../game/core/d20/classes.h"
 #include "../../game/core/d20/feats.h"
 #include "../../game/core/d20/skills.h"
 #include "../../game/core/d20/spells.h"
-#include "../../game/core/effect/factory.h"
 #include "../../game/core/footstepsounds.h"
 #include "../../game/core/game.h"
-#include "../../game/core/object/factory.h"
 #include "../../game/core/portraits.h"
 #include "../../game/core/reputes.h"
-#include "../../game/core/scenemanager.h"
-#include "../../game/core/script/routine/registrar.h"
-#include "../../game/core/script/routine/routines.h"
-#include "../../game/core/script/runner.h"
 #include "../../game/core/services.h"
 #include "../../game/core/soundsets.h"
 #include "../../game/core/surfaces.h"
@@ -85,29 +78,22 @@ private:
     SceneModule &_scene;
     ScriptModule &_script;
 
-    std::unique_ptr<game::ActionFactory> _actionFactory;
     std::unique_ptr<game::Classes> _classes;
     std::unique_ptr<game::Cursors> _cursors;
-    std::unique_ptr<game::EffectFactory> _effectFactory;
     std::unique_ptr<game::Feats> _feats;
     std::unique_ptr<game::FootstepSounds> _footstepSounds;
     std::unique_ptr<game::Game> _game;
     std::unique_ptr<game::GUISounds> _guiSounds;
-    std::unique_ptr<game::ObjectFactory> _objectFactory;
     std::unique_ptr<game::Portraits> _portraits;
     std::unique_ptr<game::Reputes> _reputes;
-    std::unique_ptr<game::Routines> _routines;
-    std::unique_ptr<game::RoutineRegistrar> _routineRegistrar;
-    std::unique_ptr<game::SceneManager> _sceneManager;
-    std::unique_ptr<game::ScriptRunner> _scriptRunner;
-    std::unique_ptr<game::Services> _services;
     std::unique_ptr<game::Skills> _skills;
     std::unique_ptr<game::SoundSets> _soundSets;
     std::unique_ptr<game::Spells> _spells;
     std::unique_ptr<game::Surfaces> _surfaces;
 
+    std::unique_ptr<game::Services> _services;
+
     std::unique_ptr<game::Game> newGame();
-    std::unique_ptr<game::RoutineRegistrar> newRoutineRegistrar();
 };
 
 } // namespace di
