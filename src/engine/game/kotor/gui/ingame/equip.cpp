@@ -71,7 +71,7 @@ static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
     {Equipment::Slot::WeapR2, 31379}};
 
 Equipment::Equipment(
-    KotOR *game,
+    KotOR &game,
     InGameMenu &inGameMenu,
     Services &services) :
     GameGUI(game, services),
@@ -97,14 +97,14 @@ void Equipment::load() {
 
     _binding.btnEquip->setOnClick([this]() {
         if (_selectedSlot == Slot::None) {
-            _game->openInGame();
+            _game.openInGame();
         } else {
             selectSlot(Slot::None);
         }
     });
     _binding.btnBack->setOnClick([this]() {
         if (_selectedSlot == Slot::None) {
-            _game->openInGame();
+            _game.openInGame();
         } else {
             selectSlot(Slot::None);
         }
@@ -132,7 +132,7 @@ void Equipment::load() {
 
 void Equipment::bindControls() {
     _binding.lblCantEquip = getControl<Label>("LBL_CANTEQUIP");
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.lblAttackInfo = getControl<Label>("LBL_ATTACK_INFO");
         _binding.lblPortBord = getControl<Label>("LBL_PORT_BORD");
         _binding.lblPortrait = getControl<Label>("LBL_PORTRAIT");
@@ -164,7 +164,7 @@ void Equipment::bindControls() {
     _binding.lblToHitR = getControl<Label>("LBL_TOHITR");
     _binding.lbItems = getControl<ListBox>("LB_ITEMS");
     for (auto &slotName : g_slotNames) {
-        if ((slotName.first == Slot::WeapL2 || slotName.first == Slot::WeapR2) && !_game->isTSL())
+        if ((slotName.first == Slot::WeapL2 || slotName.first == Slot::WeapR2) && !_game.isTSL())
             continue;
         _binding.lblInv[slotName.first] = getControl<Label>("LBL_INV_" + slotName.second);
         _binding.btnInv[slotName.first] = getControl<Button>("BTN_INV_" + slotName.second);
@@ -189,8 +189,8 @@ void Equipment::configureItemsListBox() {
     });
 
     ImageButton &protoItem = static_cast<ImageButton &>(_binding.lbItems->protoItem());
-    protoItem.setBorderColor(_game->getGUIColorBase());
-    protoItem.setHilightColor(_game->getGUIColorHilight());
+    protoItem.setBorderColor(_game.getGUIColorBase());
+    protoItem.setHilightColor(_game.getGUIColorHilight());
 }
 
 static int getInventorySlot(Equipment::Slot slot) {
@@ -269,7 +269,7 @@ void Equipment::update() {
 
     auto partyLeader(_services.party.getLeader());
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         string vitalityString(str(boost::format("%d/\n%d") % partyLeader->currentHitPoints() % partyLeader->hitPoints()));
         _binding.lblVitality->setTextMessage(vitalityString);
     }
@@ -277,7 +277,7 @@ void Equipment::update() {
 }
 
 void Equipment::updatePortraits() {
-    if (_game->isTSL())
+    if (_game.isTSL())
         return;
 
     Party &party = _services.party;
@@ -307,7 +307,7 @@ void Equipment::selectSlot(Slot slot) {
     _binding.lbDesc->setVisible(!noneSelected);
     _binding.lblSlotName->setVisible(noneSelected);
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.lblPortBord->setVisible(noneSelected);
         _binding.lblPortrait->setVisible(noneSelected);
         _binding.lblTxtBar->setVisible(noneSelected);
@@ -437,7 +437,7 @@ void Equipment::updateItems() {
 
 shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
     string resRef;
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";

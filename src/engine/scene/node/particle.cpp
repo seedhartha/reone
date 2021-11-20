@@ -31,8 +31,8 @@ namespace scene {
 
 void ParticleSceneNode::update(float dt) {
     // Lightning emitters are updated elsewhere
-    shared_ptr<ModelNode> modelNode(_emitter.modelNode());
-    if (modelNode->emitter()->updateMode == ModelNode::Emitter::UpdateMode::Lightning) {
+    auto &modelNode = _emitter.modelNode();
+    if (modelNode.emitter()->updateMode == ModelNode::Emitter::UpdateMode::Lightning) {
         return;
     }
 
@@ -50,7 +50,7 @@ void ParticleSceneNode::update(float dt) {
     _position += _velocity * dt;
 
     // Gravity-type P2P emitter
-    if (modelNode->emitter()->p2p && !modelNode->emitter()->p2pBezier) {
+    if (modelNode.emitter()->p2p && !modelNode.emitter()->p2pBezier) {
         auto ref = find_if(_children.begin(), _children.end(), [](auto &child) { return child->type() == SceneNodeType::Dummy; });
         if (ref != _children.end()) {
             glm::vec3 emitterSpaceRefPos(_emitter.absoluteTransformInverse() * (*ref)->absoluteTransform()[3]);

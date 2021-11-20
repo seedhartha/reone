@@ -38,7 +38,7 @@ namespace reone {
 
 namespace game {
 
-InventoryMenu::InventoryMenu(KotOR *game, Services &services) :
+InventoryMenu::InventoryMenu(KotOR &game, Services &services) :
     GameGUI(game, services) {
     _resRef = getResRef("inventory");
 
@@ -53,10 +53,10 @@ void InventoryMenu::load() {
     _binding.lblCreditsValue->setVisible(false);
     _binding.btnUseItem->setDisabled(true);
     _binding.btnExit->setOnClick([this]() {
-        _game->openInGame();
+        _game.openInGame();
     });
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.lblVit->setVisible(false);
         _binding.lblDef->setVisible(false);
         _binding.btnChange1->setFocusable(false);
@@ -74,7 +74,7 @@ void InventoryMenu::bindControls() {
     _binding.lbDescription = getControl<ListBox>("LB_DESCRIPTION");
     _binding.lbItems = getControl<ListBox>("LB_ITEMS");
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.btnChange1 = getControl<Button>("BTN_CHANGE1");
         _binding.btnChange2 = getControl<Button>("BTN_CHANGE2");
         _binding.btnQuestItems = getControl<Button>("BTN_QUESTITEMS");
@@ -102,7 +102,7 @@ void InventoryMenu::bindControls() {
 }
 
 void InventoryMenu::refreshPortraits() {
-    if (!!_game->isTSL())
+    if (!!_game.isTSL())
         return;
 
     Party &party = _services.party;

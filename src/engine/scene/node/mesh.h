@@ -41,8 +41,8 @@ class ModelSceneNode;
 class MeshSceneNode : public ModelNodeSceneNode {
 public:
     MeshSceneNode(
-        const ModelSceneNode *model,
-        std::shared_ptr<graphics::ModelNode> modelNode,
+        const ModelSceneNode &model,
+        const graphics::ModelNode &modelNode,
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Features &features,
@@ -61,7 +61,7 @@ public:
     bool isTransparent() const;
     bool isSelfIlluminated() const;
 
-    const ModelSceneNode *model() const { return _model; }
+    const ModelSceneNode &model() const { return _model; }
 
     void setDiffuseTexture(const std::shared_ptr<graphics::Texture> &texture);
     void setAlpha(float alpha) { _alpha = alpha; }
@@ -81,7 +81,7 @@ private:
         glm::vec3 stride {0.0f}; /**< how far have vertices traveled from the rest position in object space */
     } _danglymeshAnimation;
 
-    const ModelSceneNode *_model;
+    const ModelSceneNode &_model;
 
     graphics::Material _material;
     glm::vec2 _uvOffset {0.0f};

@@ -35,8 +35,8 @@ class CharacterGeneration;
 class CustomCharacterGeneration : public GameGUI {
 public:
     CustomCharacterGeneration(
-        CharacterGeneration *charGen,
-        KotOR *game,
+        CharacterGeneration &charGen,
+        KotOR &game,
         Services &services);
 
     void load() override;
@@ -72,7 +72,7 @@ private:
         std::shared_ptr<gui::Label> lblNum6;
     } _binding;
 
-    CharacterGeneration *_charGen;
+    CharacterGeneration &_charGen;
     int _step {0};
 
     void bindControls();

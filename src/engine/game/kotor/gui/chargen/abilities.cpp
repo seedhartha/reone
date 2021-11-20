@@ -61,8 +61,8 @@ static const unordered_map<Ability, int> g_descStrRefByAbility {
     {Ability::Charisma, 227}};
 
 CharGenAbilities::CharGenAbilities(
-    CharacterGeneration *charGen,
-    KotOR *game,
+    CharacterGeneration &charGen,
+    KotOR &game,
     Services &services) :
     GameGUI(game, services),
     _charGen(charGen) {
@@ -86,7 +86,7 @@ void CharGenAbilities::load() {
         _binding.chaLbl.get()};
     for (auto &label : labels) {
         label->setFocusable(true);
-        label->setHilightColor(_game->getGUIColorBase());
+        label->setHilightColor(_game.getGUIColorBase());
     }
 
     _binding.strPointsBtn->setDisabled(true);
@@ -100,14 +100,14 @@ void CharGenAbilities::load() {
         if (_points > 0)
             return;
         updateCharacter();
-        _charGen->goToNextStep();
-        _charGen->openSteps();
+        _charGen.goToNextStep();
+        _charGen.openSteps();
     });
     _binding.btnBack->setOnClick([this]() {
-        _charGen->openSteps();
+        _charGen.openSteps();
     });
     _binding.btnRecommended->setOnClick([this]() {
-        ClassType classType = _charGen->character().attributes.getEffectiveClass();
+        ClassType classType = _charGen.character().attributes.getEffectiveClass();
         shared_ptr<CreatureClass> clazz(_services.classes.get(classType));
         _attributes = clazz->defaultAttributes();
         _points = 0;
@@ -208,13 +208,13 @@ void CharGenAbilities::bindControls() {
     _binding.wisPlusBtn = getControl<Button>("WIS_PLUS_BTN");
     _binding.chaPlusBtn = getControl<Button>("CHA_PLUS_BTN");
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.lblAbilityMod = getControl<Label>("LBL_ABILITY_MOD");
     }
 }
 
 void CharGenAbilities::reset(bool newGame) {
-    _attributes = _charGen->character().attributes;
+    _attributes = _charGen.character().attributes;
     _points = newGame ? kStartingPoints : 1;
 
     if (newGame) {
@@ -232,7 +232,7 @@ void CharGenAbilities::reset(bool newGame) {
 void CharGenAbilities::refreshControls() {
     _binding.remainingSelectionsLbl->setTextMessage(to_string(_points));
     _binding.costPointsLbl->setTextMessage("");
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.lblAbilityMod->setTextMessage("");
     }
 
@@ -267,11 +267,11 @@ static Ability getAbilityByAlias(const string &alias) {
 }
 
 void CharGenAbilities::updateCharacter() {
-    Character character(_charGen->character());
+    Character character(_charGen.character());
     for (auto &abilityScore : _attributes.abilityScores()) {
         character.attributes.setAbilityScore(abilityScore.first, abilityScore.second);
     }
-    _charGen->setCharacter(move(character));
+    _charGen.setCharacter(move(character));
 }
 
 void CharGenAbilities::onAbilityLabelFocusChanged(Ability ability, bool focus) {

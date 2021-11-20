@@ -34,8 +34,8 @@ class CharacterGeneration;
 class CharGenFeats : public GameGUI {
 public:
     CharGenFeats(
-        CharacterGeneration *charGen,
-        KotOR *game,
+        CharacterGeneration &charGen,
+        KotOR &game,
         Services &services);
 
     void load() override;
@@ -48,7 +48,7 @@ private:
         std::shared_ptr<gui::Button> btnRecommended;
     } _binding;
 
-    CharacterGeneration *_charGen;
+    CharacterGeneration &_charGen;
 
     void bindControls();
 };

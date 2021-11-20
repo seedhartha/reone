@@ -66,7 +66,7 @@ void Door::loadFromBlueprint(const string &resRef) {
     shared_ptr<TwoDA> doors(_services.twoDas.get("genericdoors"));
     string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
-    auto model = _services.sceneGraphs.get(_sceneName).newModel(_services.models.get(modelName), ModelUsage::Door);
+    auto model = _services.sceneGraphs.get(_sceneName).newModel(*_services.models.get(modelName), ModelUsage::Door);
     model->setCullable(true);
     model->setDrawDistance(FLT_MAX);
 

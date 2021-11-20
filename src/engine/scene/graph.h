@@ -136,11 +136,11 @@ public:
 
     // Factory methods
 
-    std::unique_ptr<DummySceneNode> newDummy(std::shared_ptr<graphics::ModelNode> modelNode);
+    std::unique_ptr<DummySceneNode> newDummy(const graphics::ModelNode &modelNode);
     std::unique_ptr<CameraSceneNode> newCamera(std::string name, glm::mat4 projection);
 
     std::unique_ptr<ModelSceneNode> newModel(
-        std::shared_ptr<graphics::Model> model,
+        const graphics::Model &model,
         ModelUsage usage,
         IAnimationEventListener *animEventListener = nullptr);
 

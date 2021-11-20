@@ -216,52 +216,52 @@ void KotOR::loadInGameMenus() {
 }
 
 void KotOR::loadMainMenu() {
-    _mainMenu = make_unique<MainMenu>(this, _services);
+    _mainMenu = make_unique<MainMenu>(*this, _services);
     _mainMenu->load();
 }
 
 void KotOR::loadHUD() {
-    _hud = make_unique<HUD>(this, _services);
+    _hud = make_unique<HUD>(*this, _services);
     _hud->load();
 }
 
 void KotOR::loadDialog() {
-    _dialog = make_unique<DialogGUI>(this, _services);
+    _dialog = make_unique<DialogGUI>(*this, _services);
     _dialog->load();
 }
 
 void KotOR::loadComputer() {
-    _computer = make_unique<ComputerGUI>(this, _services);
+    _computer = make_unique<ComputerGUI>(*this, _services);
     _computer->load();
 }
 
 void KotOR::loadContainer() {
-    _container = make_unique<ContainerGUI>(this, _services);
+    _container = make_unique<ContainerGUI>(*this, _services);
     _container->load();
 }
 
 void KotOR::loadPartySelection() {
-    _partySelect = make_unique<PartySelection>(this, _services);
+    _partySelect = make_unique<PartySelection>(*this, _services);
     _partySelect->load();
 }
 
 void KotOR::loadSaveLoad() {
-    _saveLoad = make_unique<SaveLoad>(this, _services);
+    _saveLoad = make_unique<SaveLoad>(*this, _services);
     _saveLoad->load();
 }
 
 void KotOR::loadLoadingScreen() {
-    _loadScreen = make_unique<LoadingScreen>(this, _services);
+    _loadScreen = make_unique<LoadingScreen>(*this, _services);
     static_cast<LoadingScreen *>(_loadScreen.get())->load();
 }
 
 void KotOR::loadCharacterGeneration() {
-    _charGen = make_unique<CharacterGeneration>(this, _services);
+    _charGen = make_unique<CharacterGeneration>(*this, _services);
     _charGen->load();
 }
 
 void KotOR::loadInGame() {
-    _inGame = make_unique<InGameMenu>(this, _services);
+    _inGame = make_unique<InGameMenu>(*this, _services);
     _inGame->load();
 }
 
@@ -376,7 +376,7 @@ void KotOR::startDialog(const shared_ptr<SpatialObject> &owner, const string &re
     setCursorType(CursorType::Default);
     changeScreen(GameScreen::Conversation);
 
-    auto dialog = make_shared<Dialog>(resRef, &_services.strings);
+    auto dialog = make_shared<Dialog>(resRef, _services.strings);
     dialog->load(*dlg);
 
     bool computerConversation = dialog->conversationType() == ConversationType::Computer;

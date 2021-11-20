@@ -129,7 +129,7 @@ void SceneGraph::updateLighting() {
     // Update shadow light
     _shadowLight = nullptr;
     for (auto &light : _closestLights) {
-        if (light->modelNode()->light()->shadow) {
+        if (light->modelNode().light()->shadow) {
             _shadowLight = light;
             break;
         }
@@ -205,8 +205,8 @@ void SceneGraph::prepareTransparentMeshes() {
         meshToCamera.insert(make_pair(mesh, mesh->getDistanceTo2(cameraPosition)));
     }
     sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&meshToCamera](auto &left, auto &right) {
-        int leftTransparency = left->modelNode()->mesh()->transparency;
-        int rightTransparency = right->modelNode()->mesh()->transparency;
+        int leftTransparency = left->modelNode().mesh()->transparency;
+        int rightTransparency = right->modelNode().mesh()->transparency;
 
         if (leftTransparency < rightTransparency)
             return true;
@@ -320,12 +320,12 @@ void SceneGraph::draw(bool shadowPass) {
     // Render lens flares
     for (auto &light : _lights) {
         // Ignore lights that are too far away or outside of camera frustum
-        float flareRadius = light->modelNode()->light()->flareRadius;
+        float flareRadius = light->modelNode().light()->flareRadius;
         if (_activeCamera->getDistanceTo2(*light) > flareRadius * flareRadius ||
             !_activeCamera->isInFrustum(light->absoluteTransform()[3]))
             continue;
 
-        for (auto &flare : light->modelNode()->light()->flares) {
+        for (auto &flare : light->modelNode().light()->flares) {
             light->drawLensFlares(flare);
         }
     }
@@ -359,8 +359,8 @@ vector<LightSceneNode *> SceneGraph::getLightsAt(
         LightSceneNode *leftLight = left.first;
         LightSceneNode *rightLight = right.first;
 
-        int leftPriority = leftLight->modelNode()->light()->priority;
-        int rightPriority = rightLight->modelNode()->light()->priority;
+        int leftPriority = leftLight->modelNode().light()->priority;
+        int rightPriority = rightLight->modelNode().light()->priority;
 
         if (leftPriority < rightPriority)
             return true;
@@ -386,8 +386,8 @@ vector<LightSceneNode *> SceneGraph::getLightsAt(
     return move(result);
 }
 
-unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {
-    return make_unique<DummySceneNode>(move(modelNode), *this, _context, _meshes, _shaders);
+unique_ptr<DummySceneNode> SceneGraph::newDummy(const ModelNode &modelNode) {
+    return make_unique<DummySceneNode>(modelNode, *this, _context, _meshes, _shaders);
 }
 
 unique_ptr<CameraSceneNode> SceneGraph::newCamera(string name, glm::mat4 projection) {
@@ -400,9 +400,9 @@ unique_ptr<CameraSceneNode> SceneGraph::newCamera(string name, glm::mat4 project
         _shaders);
 }
 
-unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUsage usage, IAnimationEventListener *animEventListener) {
+unique_ptr<ModelSceneNode> SceneGraph::newModel(const Model &model, ModelUsage usage, IAnimationEventListener *animEventListener) {
     return make_unique<ModelSceneNode>(
-        move(model),
+        model,
         usage,
         *this,
         _context,

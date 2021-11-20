@@ -54,8 +54,8 @@ namespace game {
 static constexpr float kModelScale = 0.2f;
 
 PortraitSelection::PortraitSelection(
-    CharacterGeneration *charGen,
-    KotOR *game,
+    CharacterGeneration &charGen,
+    KotOR &game,
     Services &services) :
     GameGUI(game, services),
     _charGen(charGen) {
@@ -64,7 +64,7 @@ PortraitSelection::PortraitSelection(
 
     initForGame();
 
-    if (!game->isTSL()) {
+    if (!game.isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
 }
@@ -90,15 +90,15 @@ void PortraitSelection::load() {
         loadHeadModel();
     });
     _binding.btnAccept->setOnClick([this]() {
-        Character character(_charGen->character());
+        Character character(_charGen.character());
         character.appearance = getAppearanceFromCurrentPortrait();
-        _charGen->setCharacter(move(character));
-        _charGen->goToNextStep();
-        _charGen->openSteps();
+        _charGen.setCharacter(move(character));
+        _charGen.goToNextStep();
+        _charGen.openSteps();
     });
     _binding.btnBack->setOnClick([this]() {
         resetCurrentPortrait();
-        _charGen->openSteps();
+        _charGen.openSteps();
     });
 }
 
@@ -113,11 +113,11 @@ void PortraitSelection::bindControls() {
 
 void PortraitSelection::setButtonColors(Control &control) {
     Control::Text text(control.text());
-    text.color = _game->getGUIColorBase();
+    text.color = _game.getGUIColorBase();
     control.setText(move(text));
 
     Control::Border hilight(control.hilight());
-    hilight.color = _game->getGUIColorHilight();
+    hilight.color = _game.getGUIColorHilight();
     control.setHilight(move(hilight));
 }
 
@@ -130,7 +130,7 @@ void PortraitSelection::loadHeadModel() {
         .depth(0.1f, 10.0f)
         .modelSupplier(bind(&PortraitSelection::getCharacterModel, this, _1))
         .modelScale(kModelScale)
-        .cameraFromModelNode(_charGen->character().gender == Gender::Male ? "camerahookm" : "camerahookf")
+        .cameraFromModelNode(_charGen.character().gender == Gender::Male ? "camerahookm" : "camerahookf")
         .lightingRefFromModelNode("cghead_light")
         .invoke();
 
@@ -151,18 +151,18 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
     // Attach creature model to the root scene node
 
     auto creatureModel = static_pointer_cast<ModelSceneNode>(creature->sceneNode());
-    shared_ptr<ModelNode> cameraHook(creatureModel->model()->getNodeByName("camerahook"));
+    shared_ptr<ModelNode> cameraHook(creatureModel->model().getNodeByName("camerahook"));
     if (cameraHook) {
         creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->absoluteTransform()[3].z));
     }
-    auto model = sceneGraph.newModel(_services.models.get("cghead_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(*_services.models.get("cghead_light"), ModelUsage::GUI);
     model->attach("cghead_light", creatureModel);
 
     return move(model);
 }
 
 int PortraitSelection::getAppearanceFromCurrentPortrait() const {
-    switch (_charGen->character().attributes.getEffectiveClass()) {
+    switch (_charGen.character().attributes.getEffectiveClass()) {
     case ClassType::Scoundrel:
         return _filteredPortraits[_currentPortrait].appearanceS;
     case ClassType::Soldier:
@@ -174,7 +174,7 @@ int PortraitSelection::getAppearanceFromCurrentPortrait() const {
 
 void PortraitSelection::updatePortraits() {
     _filteredPortraits.clear();
-    int sex = _charGen->character().gender == Gender::Female ? 1 : 0;
+    int sex = _charGen.character().gender == Gender::Female ? 1 : 0;
     for (auto &portrait : _services.portraits.portraits()) {
         if (portrait.forPC && portrait.sex == sex) {
             _filteredPortraits.push_back(move(portrait));
@@ -184,7 +184,7 @@ void PortraitSelection::updatePortraits() {
 }
 
 void PortraitSelection::resetCurrentPortrait() {
-    int appearance = _charGen->character().appearance;
+    int appearance = _charGen.character().appearance;
     auto maybePortrait = find_if(_filteredPortraits.begin(), _filteredPortraits.end(), [&appearance](const Portrait &portrait) {
         return portrait.appearanceNumber == appearance ||
                portrait.appearanceS == appearance ||

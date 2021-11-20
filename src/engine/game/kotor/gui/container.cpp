@@ -44,7 +44,7 @@ static constexpr int kSwitchToResRef = 47884;
 static constexpr int kGiveItemResRef = 47885;
 static constexpr int kInventoryResRef = 393;
 
-ContainerGUI::ContainerGUI(KotOR *game, Services &services) :
+ContainerGUI::ContainerGUI(KotOR &game, Services &services) :
     GameGUI(game, services) {
     _resRef = getResRef("container");
 
@@ -63,10 +63,10 @@ void ContainerGUI::load() {
 
     _binding.btnOk->setOnClick([this]() {
         transferItemsToPlayer();
-        _game->openInGame();
+        _game.openInGame();
     });
     _binding.btnCancel->setOnClick([this]() {
-        _game->openInGame();
+        _game.openInGame();
     });
 
     configureItemsListBox();
@@ -113,7 +113,7 @@ void ContainerGUI::open(shared_ptr<SpatialObject> container) {
 
 shared_ptr<Texture> ContainerGUI::getItemFrameTexture(int stackSize) const {
     string resRef;
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         resRef = stackSize > 1 ? "uibit_eqp_itm3" : "uibit_eqp_itm1";
     } else {
         resRef = stackSize > 1 ? "lbl_hex_7" : "lbl_hex_3";

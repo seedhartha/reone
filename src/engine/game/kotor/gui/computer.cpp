@@ -30,12 +30,12 @@ namespace reone {
 
 namespace game {
 
-ComputerGUI::ComputerGUI(KotOR *game, Services &services) :
+ComputerGUI::ComputerGUI(KotOR &game, Services &services) :
     Conversation(game, services) {
     _resRef = getResRef("computer");
     _scaling = ScalingMode::Stretch;
 
-    if (game->isTSL()) {
+    if (game.isTSL()) {
         _resolutionX = 800;
         _resolutionY = 600;
     }
@@ -60,7 +60,7 @@ void ComputerGUI::bindControls() {
     _binding.lbMessage = getControl<ListBox>("LB_MESSAGE");
     _binding.lbReplies = getControl<ListBox>("LB_REPLIES");
 
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         _binding.lblBar1 = getControl<Label>("LBL_BAR1");
         _binding.lblBar2 = getControl<Label>("LBL_BAR2");
         _binding.lblBar3 = getControl<Label>("LBL_BAR3");
@@ -82,14 +82,14 @@ void ComputerGUI::bindControls() {
 
 void ComputerGUI::configureMessage() {
     _binding.lbMessage->setProtoMatchContent(true);
-    _binding.lbMessage->protoItem().setHilightColor(_game->getGUIColorHilight());
-    _binding.lbMessage->protoItem().setTextColor(_game->getGUIColorBase());
+    _binding.lbMessage->protoItem().setHilightColor(_game.getGUIColorHilight());
+    _binding.lbMessage->protoItem().setTextColor(_game.getGUIColorBase());
 }
 
 void ComputerGUI::configureReplies() {
     _binding.lbReplies->setProtoMatchContent(true);
-    _binding.lbReplies->protoItem().setHilightColor(_game->getGUIColorHilight());
-    _binding.lbReplies->protoItem().setTextColor(_game->getGUIColorBase());
+    _binding.lbReplies->protoItem().setHilightColor(_game.getGUIColorHilight());
+    _binding.lbReplies->protoItem().setTextColor(_game.getGUIColorBase());
     _binding.lbReplies->setOnItemClick([this](auto &item) {
         int replyIdx = stoi(item);
         pickReply(replyIdx);

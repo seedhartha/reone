@@ -66,7 +66,7 @@ public:
         LevelUp
     };
 
-    CharacterGeneration(KotOR *game, Services &services);
+    CharacterGeneration(KotOR &game, Services &services);
 
     void load() override;
     bool handle(const SDL_Event &event) override;

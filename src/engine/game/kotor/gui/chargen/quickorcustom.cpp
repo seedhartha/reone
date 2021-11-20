@@ -41,8 +41,8 @@ static constexpr int kStrRefQuickHelpText = 241;
 static constexpr int kStrRefCustomHelpText = 242;
 
 QuickOrCustom::QuickOrCustom(
-    CharacterGeneration *charGen,
-    KotOR *game,
+    CharacterGeneration &charGen,
+    KotOR &game,
     Services &services) :
     GameGUI(game, services),
     _charGen(charGen) {
@@ -56,14 +56,14 @@ void QuickOrCustom::load() {
     GUI::load();
     bindControls();
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.lblRbg->setDiscardColor(glm::vec3(0.0f, 0.0f, 0.082353f));
     }
 
     _binding.lbDesc->setProtoMatchContent(true);
 
     _binding.btnBack->setOnClick([this]() {
-        _charGen->openClassSelection();
+        _charGen.openClassSelection();
     });
 
     _binding.quickCharBtn->setOnFocusChanged([this](bool focus) {
@@ -74,7 +74,7 @@ void QuickOrCustom::load() {
         _binding.lbDesc->addTextLinesAsItems(text);
     });
     _binding.quickCharBtn->setOnClick([this]() {
-        _charGen->startQuick();
+        _charGen.startQuick();
     });
 
     _binding.custCharBtn->setOnFocusChanged([this](bool focus) {
@@ -85,7 +85,7 @@ void QuickOrCustom::load() {
         _binding.lbDesc->addTextLinesAsItems(text);
     });
     _binding.custCharBtn->setOnClick([this]() {
-        _charGen->startCustom();
+        _charGen.startCustom();
     });
 }
 

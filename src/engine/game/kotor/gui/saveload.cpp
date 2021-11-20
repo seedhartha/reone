@@ -46,13 +46,13 @@ static constexpr int kStrRefSave = 1587;
 static constexpr int kStrRefSaveGame = 1588;
 static constexpr int kStrRefLoad = 1589;
 
-SaveLoad::SaveLoad(KotOR *game, Services &services) :
+SaveLoad::SaveLoad(KotOR &game, Services &services) :
     GameGUI(game, services) {
     _resRef = getResRef("saveload");
 
     initForGame();
 
-    if (!game->isTSL()) {
+    if (!game.isTSL()) {
         loadBackground(BackgroundType::Menu);
     }
 }
@@ -67,7 +67,7 @@ void SaveLoad::load() {
     _binding.lbGames->setSelectionMode(ListBox::SelectionMode::OnClick);
     _binding.lbGames->setPadding(3);
     _binding.lbGames->protoItem().setUseBorderColorOverride(true);
-    _binding.lbGames->protoItem().setBorderColorOverride(_game->getGUIColorBase());
+    _binding.lbGames->protoItem().setBorderColorOverride(_game.getGUIColorBase());
     _binding.lbGames->protoItem().setHilightColor(_defaultHilightColor);
     _binding.lbGames->setOnItemClick([this](const string &item) {
         // Get save number by item tag
@@ -124,10 +124,10 @@ void SaveLoad::load() {
         switch (_mode) {
         case SaveLoadMode::Save:
         case SaveLoadMode::LoadFromInGame:
-            _game->openInGame();
+            _game.openInGame();
             break;
         default:
-            _game->openMainMenu();
+            _game.openMainMenu();
             break;
         }
     });
@@ -146,7 +146,7 @@ void SaveLoad::bindControls() {
     _binding.lblScreenshot = getControl<Label>("LBL_SCREENSHOT");
     _binding.lbGames = getControl<ListBox>("LB_GAMES");
 
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         _binding.btnFilter = getControl<Button>("BTN_FILTER");
         _binding.lblBar1 = getControl<Label>("LBL_BAR1");
         _binding.lblBar2 = getControl<Label>("LBL_BAR2");
@@ -267,14 +267,14 @@ static fs::path getSaveGamePath(int number) {
 
 void SaveLoad::saveGame(int number) {
     fs::path savPath(getSaveGamePath(number));
-    _game->saveToFile(savPath);
+    _game.saveToFile(savPath);
     refresh();
 }
 
 void SaveLoad::loadGame(int number) {
     auto maybeSave = find_if(_saves.begin(), _saves.end(), [&number](auto &save) { return save.number == number; });
     if (maybeSave != _saves.end()) {
-        _game->loadFromFile(maybeSave->path);
+        _game.loadFromFile(maybeSave->path);
     }
 }
 

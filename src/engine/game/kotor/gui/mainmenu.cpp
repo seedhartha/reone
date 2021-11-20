@@ -46,9 +46,9 @@ namespace game {
 
 static constexpr float kKotorModelSize = 1.4f;
 
-MainMenu::MainMenu(KotOR *game, Services &services) :
+MainMenu::MainMenu(KotOR &game, Services &services) :
     GameGUI(game, services) {
-    if (game->isTSL()) {
+    if (game.isTSL()) {
         _resRef = "mainmenu8x6_p";
     } else {
         _resRef = "mainmenu16x12";
@@ -78,18 +78,18 @@ void MainMenu::load() {
     }
 
     // Hide warp button in developer mode
-    if (!_game->options().developer) {
+    if (!_game.options().developer) {
         _binding.btnWarp->setVisible(false);
     }
 
     _binding.btnNewGame->setOnClick([this]() {
-        _game->startCharacterGeneration();
+        _game.startCharacterGeneration();
     });
     _binding.btnLoadGame->setOnClick([this]() {
-        _game->openSaveLoad(SaveLoadMode::LoadFromMainMenu);
+        _game.openSaveLoad(SaveLoadMode::LoadFromMainMenu);
     });
     _binding.btnExit->setOnClick([this]() {
-        _game->quit();
+        _game.quit();
     });
     _binding.btnWarp->setOnClick([this]() {
         startModuleSelection();
@@ -116,7 +116,7 @@ void MainMenu::bindControls() {
     _binding.btnExit = getControl<Button>("BTN_EXIT");
     _binding.btnWarp = getControl<Button>("BTN_WARP");
 
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         _binding.btnMusic = getControl<Button>("BTN_MUSIC");
         _binding.btnMoreGames = getControl<Button>("BTN_MOREGAMES");
         _binding.btnTslrcm = getControl<Button>("BTN_TSLRCM");
@@ -132,18 +132,18 @@ void MainMenu::configureButtons() {
     setButtonColors(*_binding.btnNewGame);
     setButtonColors(*_binding.btnOptions);
 
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         setButtonColors(*_binding.btnMusic);
     }
 }
 
 void MainMenu::setButtonColors(Control &control) {
-    control.setTextColor(_game->getGUIColorBase());
-    control.setHilightColor(_game->getGUIColorHilight());
+    control.setTextColor(_game.getGUIColorBase());
+    control.setHilightColor(_game.getGUIColorHilight());
 }
 
 void MainMenu::setup3DView() {
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         return;
     }
 
@@ -164,7 +164,7 @@ void MainMenu::setup3DView() {
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
-    auto model = sceneGraph.newModel(_services.models.get("mainmenu"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(*_services.models.get("mainmenu"), ModelUsage::GUI);
     model->playAnimation("default", AnimationProperties::fromFlags(AnimationFlags::loop));
     return move(model);
 }
@@ -182,7 +182,7 @@ void MainMenu::startModuleSelection() {
     _binding.lbl3dView->setVisible(false);
     _binding.lblGameLogo->setVisible(false);
 
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         _binding.btnMusic->setVisible(false);
     } else {
         _binding.lblMenuBg->setVisible(false);
@@ -190,7 +190,7 @@ void MainMenu::startModuleSelection() {
 }
 
 void MainMenu::loadModuleNames() {
-    for (auto &module : _game->moduleNames()) {
+    for (auto &module : _game.moduleNames()) {
         ListBox::Item item;
         item.tag = module;
         item.text = module;
@@ -199,7 +199,7 @@ void MainMenu::loadModuleNames() {
 }
 
 void MainMenu::onModuleSelected(const string &name) {
-    _game->loadModule(name);
+    _game.loadModule(name);
 }
 
 } // namespace game

@@ -38,8 +38,8 @@ class CharacterGeneration;
 class CharGenSkills : public GameGUI {
 public:
     CharGenSkills(
-        CharacterGeneration *charGen,
-        KotOR *game,
+        CharacterGeneration &charGen,
+        KotOR &game,
         Services &services);
 
     void load() override;
@@ -89,7 +89,7 @@ private:
         std::shared_ptr<gui::ListBox> lbDesc;
     } _binding;
 
-    CharacterGeneration *_charGen;
+    CharacterGeneration &_charGen;
     CreatureAttributes _attributes;
     int _points {0};
 

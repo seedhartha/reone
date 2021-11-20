@@ -33,9 +33,9 @@ namespace game {
 static constexpr float kMovementSpeed = 4.0f;
 static constexpr float kMouseMultiplier = glm::pi<float>() / 4000.0f;
 
-FirstPersonCamera::FirstPersonCamera(float aspect, float fovy, SceneGraph *sceneGraph) {
+FirstPersonCamera::FirstPersonCamera(float aspect, float fovy, SceneGraph &sceneGraph) {
     glm::mat4 projection(glm::perspective(fovy, aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
-    _sceneNode = sceneGraph->newCamera("", move(projection));
+    _sceneNode = sceneGraph.newCamera("", move(projection));
 }
 
 bool FirstPersonCamera::handle(const SDL_Event &event) {

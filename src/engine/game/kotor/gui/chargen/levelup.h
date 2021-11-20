@@ -35,8 +35,8 @@ class CharacterGeneration;
 class LevelUpMenu : public GameGUI {
 public:
     LevelUpMenu(
-        CharacterGeneration *charGen,
-        KotOR *game,
+        CharacterGeneration &charGen,
+        KotOR &game,
         Services &services);
 
     void load() override;
@@ -67,7 +67,7 @@ private:
         std::shared_ptr<gui::Label> lblNum5;
     } _binding;
 
-    CharacterGeneration *_charGen;
+    CharacterGeneration &_charGen;
     int _step {0};
     bool _hasAttributes {false};
 

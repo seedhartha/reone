@@ -148,7 +148,7 @@ protected:
         uint32_t id,
         ObjectType type,
         std::string sceneName,
-        Game *game,
+        Game &game,
         Services &services) :
         Object(
             id,

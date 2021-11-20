@@ -31,12 +31,12 @@ namespace reone {
 namespace game {
 
 InGameMenu::InGameMenu(
-    KotOR *game,
+    KotOR &game,
     Services &services) :
     GameGUI(game, services) {
     _resRef = getResRef("top");
 
-    if (game->isTSL()) {
+    if (game.isTSL()) {
         _resolutionX = 800;
         _resolutionY = 600;
     }
@@ -280,11 +280,11 @@ void InGameMenu::openOptions() {
 }
 
 shared_ptr<Button> InGameMenu::getBtnChange2() {
-    return _game->isTSL() ? getControl<Button>("BTN_CHANGE2") : nullptr;
+    return _game.isTSL() ? getControl<Button>("BTN_CHANGE2") : nullptr;
 }
 
 shared_ptr<Button> InGameMenu::getBtnChange3() {
-    return _game->isTSL() ? getControl<Button>("BTN_CHANGE3") : nullptr;
+    return _game.isTSL() ? getControl<Button>("BTN_CHANGE3") : nullptr;
 }
 
 } // namespace game

@@ -32,7 +32,7 @@ public:
     PlaceableCamera(
         uint32_t id,
         std::string sceneName,
-        Game *game,
+        Game &game,
         Services &services) :
         SpatialObject(
             id,

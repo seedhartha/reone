@@ -26,13 +26,13 @@ namespace scene {
 class DummySceneNode : public ModelNodeSceneNode {
 public:
     DummySceneNode(
-        std::shared_ptr<graphics::ModelNode> modelNode,
+        const graphics::ModelNode &modelNode,
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders) :
         ModelNodeSceneNode(
-            std::move(modelNode),
+            modelNode,
             SceneNodeType::Dummy,
             sceneGraph,
             context,

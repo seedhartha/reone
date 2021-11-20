@@ -52,7 +52,7 @@ void SceneInitializer::invoke() {
     if (_cameraNodeName.empty()) {
         cameraNode->setLocalTransform(_cameraTransform);
     } else {
-        shared_ptr<ModelNode> modelNode(model->model()->getNodeByName(_cameraNodeName));
+        shared_ptr<ModelNode> modelNode(model->model().getNodeByName(_cameraNodeName));
         if (modelNode) {
             cameraNode->setLocalTransform(modelNode->absoluteTransform() * _cameraTransform);
         }
@@ -61,9 +61,9 @@ void SceneInitializer::invoke() {
 
     shared_ptr<DummySceneNode> lightingRefNode;
     if (!_lightingRefNodeName.empty()) {
-        shared_ptr<ModelNode> modelNode(model->model()->getNodeByName(_lightingRefNodeName));
+        shared_ptr<ModelNode> modelNode(model->model().getNodeByName(_lightingRefNodeName));
         if (modelNode) {
-            lightingRefNode = _sceneGraph.newDummy(modelNode);
+            lightingRefNode = _sceneGraph.newDummy(*modelNode);
             lightingRefNode->setLocalTransform(modelNode->absoluteTransform());
         }
     }

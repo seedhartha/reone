@@ -44,10 +44,10 @@ namespace game {
 
 static string g_attackIcon("i_attack");
 
-HUD::HUD(KotOR *game, Services &services) :
+HUD::HUD(KotOR &game, Services &services) :
     GameGUI(game, services),
     _select(
-        *game,
+        game,
         services.actionFactory,
         services.feats,
         services.party,
@@ -137,7 +137,7 @@ void HUD::load() {
     _binding.tbSolo->setVisible(false);
     _binding.tbStealth->setVisible(false);
 
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         _binding.btnSwapWeapons->setVisible(false);
         _binding.btnAction4->setVisible(false);
         _binding.btnAction5->setVisible(false);
@@ -152,28 +152,28 @@ void HUD::load() {
     }
 
     _binding.btnEqu->setOnClick([this]() {
-        _game->openInGameMenu(InGameMenuTab::Equipment);
+        _game.openInGameMenu(InGameMenuTab::Equipment);
     });
     _binding.btnInv->setOnClick([this]() {
-        _game->openInGameMenu(InGameMenuTab::Inventory);
+        _game.openInGameMenu(InGameMenuTab::Inventory);
     });
     _binding.btnChar->setOnClick([this]() {
-        _game->openInGameMenu(InGameMenuTab::Character);
+        _game.openInGameMenu(InGameMenuTab::Character);
     });
     _binding.btnAbi->setOnClick([this]() {
-        _game->openInGameMenu(InGameMenuTab::Abilities);
+        _game.openInGameMenu(InGameMenuTab::Abilities);
     });
     _binding.btnMsg->setOnClick([this]() {
-        _game->openInGameMenu(InGameMenuTab::Messages);
+        _game.openInGameMenu(InGameMenuTab::Messages);
     });
     _binding.btnJou->setOnClick([this]() {
-        _game->openInGameMenu(InGameMenuTab::Journal);
+        _game.openInGameMenu(InGameMenuTab::Journal);
     });
     _binding.btnMap->setOnClick([this]() {
-        _game->openInGameMenu(InGameMenuTab::Map);
+        _game.openInGameMenu(InGameMenuTab::Map);
     });
     _binding.btnOpt->setOnClick([this]() {
-        _game->openInGameMenu(InGameMenuTab::Options);
+        _game.openInGameMenu(InGameMenuTab::Options);
     });
     _binding.btnClearAll->setOnClick([this]() {
         _services.party.getLeader()->clearAllActions();
@@ -195,7 +195,7 @@ void HUD::load() {
         }
     });
     _binding.btnChar1->setOnClick([this]() {
-        _game->openInGameMenu(InGameMenuTab::Equipment);
+        _game.openInGameMenu(InGameMenuTab::Equipment);
     });
     _binding.btnChar2->setOnClick([this]() {
         _services.party.setPartyLeaderByIndex(1);
@@ -314,7 +314,7 @@ void HUD::bindControls() {
     _binding.tbSolo = getControl<ToggleButton>("TB_SOLO");
     _binding.tbStealth = getControl<ToggleButton>("TB_STEALTH");
 
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         _binding.btnAction4 = getControl<Button>("BTN_ACTION4");
         _binding.btnAction5 = getControl<Button>("BTN_ACTION5");
         _binding.btnActionDown4 = getControl<Button>("BTN_ACTIONDOWN4");
@@ -368,7 +368,7 @@ void HUD::update(float dt) {
         Label &lblLevelUp = *levevlUpLabels[i];
 
         Label *lblLvlUpBg;
-        if (!_game->isTSL()) {
+        if (!_game.isTSL()) {
             lblLvlUpBg = lvlUpBgLabels[i];
         }
 
@@ -378,14 +378,14 @@ void HUD::update(float dt) {
             lblChar.setBorderFill(member->portrait());
             lblBack.setVisible(true);
             lblLevelUp.setVisible(member->isLevelUpPending());
-            if (!_game->isTSL()) {
+            if (!_game.isTSL()) {
                 lblLvlUpBg->setVisible(member->isLevelUpPending());
             }
         } else {
             lblChar.setVisible(false);
             lblBack.setVisible(false);
             lblLevelUp.setVisible(false);
-            if (!_game->isTSL()) {
+            if (!_game.isTSL()) {
                 lblLvlUpBg->setVisible(false);
             }
         }
@@ -402,7 +402,7 @@ void HUD::update(float dt) {
     _barkBubble->update(dt);
 
     // Hide minimap when there is no image to display
-    _binding.lblMapBorder->setVisible(_game->module()->area()->map().isLoaded());
+    _binding.lblMapBorder->setVisible(_game.module()->area()->map().isLoaded());
 }
 
 void HUD::draw() {
@@ -428,12 +428,12 @@ void HUD::drawMinimap() {
     bounds[2] = static_cast<float>(extent.width);
     bounds[3] = static_cast<float>(extent.height);
 
-    shared_ptr<Area> area(_game->module()->area());
+    shared_ptr<Area> area(_game.module()->area());
     area->map().draw(Map::Mode::Minimap, bounds);
 }
 
 void HUD::drawHealth(int memberIndex) {
-    if (_game->isTSL())
+    if (_game.isTSL())
         return;
 
     Party &party = _services.party;
@@ -473,7 +473,7 @@ void HUD::toggleCombat(bool enabled) {
     _binding.lblQueue2->setVisible(enabled);
     _binding.lblQueue3->setVisible(enabled);
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.lblCombatBg1->setVisible(enabled);
         _binding.lblCombatBg2->setVisible(enabled);
         _binding.lblCombatBg3->setVisible(enabled);

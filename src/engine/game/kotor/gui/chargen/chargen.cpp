@@ -47,7 +47,7 @@ namespace game {
 
 static constexpr float kModelScale = 1.1f;
 
-CharacterGeneration::CharacterGeneration(KotOR *game, Services &services) :
+CharacterGeneration::CharacterGeneration(KotOR &game, Services &services) :
     GameGUI(game, services) {
     _resRef = getResRef("maincg");
 
@@ -62,7 +62,7 @@ void CharacterGeneration::load() {
     _binding.lblLevelVal->setVisible(false);
     _binding.lblName->setTextMessage("");
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.lblLevel->setVisible(false);
         _binding.vitArrowLbl->setVisible(false);
         _binding.defArrowLbl->setVisible(false);
@@ -101,7 +101,7 @@ void CharacterGeneration::bindControls() {
     _binding.wisAbLbl = getControl<Label>("WIS_AB_LBL");
     _binding.chaAbLbl = getControl<Label>("CHA_AB_LBL");
 
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         _binding.newLbl = getControl<Label>("NEW_LBL");
         _binding.oldLbl = getControl<Label>("OLD_LBL");
         _binding.lblLevel = getControl<Label>("LBL_LEVEL");
@@ -126,47 +126,47 @@ void CharacterGeneration::loadClassSelection() {
 }
 
 void CharacterGeneration::loadQuickOrCustom() {
-    _quickOrCustom = make_unique<QuickOrCustom>(this, _game, _services);
+    _quickOrCustom = make_unique<QuickOrCustom>(*this, _game, _services);
     _quickOrCustom->load();
 }
 
 void CharacterGeneration::loadQuick() {
-    _quick = make_unique<QuickCharacterGeneration>(this, _game, _services);
+    _quick = make_unique<QuickCharacterGeneration>(*this, _game, _services);
     _quick->load();
 }
 
 void CharacterGeneration::loadCustom() {
-    _custom = make_unique<CustomCharacterGeneration>(this, _game, _services);
+    _custom = make_unique<CustomCharacterGeneration>(*this, _game, _services);
     _custom->load();
 }
 
 void CharacterGeneration::loadPortraitSelection() {
-    _portraitSelection = make_unique<PortraitSelection>(this, _game, _services);
+    _portraitSelection = make_unique<PortraitSelection>(*this, _game, _services);
     _portraitSelection->load();
 }
 
 void CharacterGeneration::loadAbilities() {
-    _abilities = make_unique<CharGenAbilities>(this, _game, _services);
+    _abilities = make_unique<CharGenAbilities>(*this, _game, _services);
     _abilities->load();
 }
 
 void CharacterGeneration::loadSkills() {
-    _charGenSkills = make_unique<CharGenSkills>(this, _game, _services);
+    _charGenSkills = make_unique<CharGenSkills>(*this, _game, _services);
     _charGenSkills->load();
 }
 
 void CharacterGeneration::loadFeats() {
-    _charGenFeats = make_unique<CharGenFeats>(this, _game, _services);
+    _charGenFeats = make_unique<CharGenFeats>(*this, _game, _services);
     _charGenFeats->load();
 }
 
 void CharacterGeneration::loadNameEntry() {
-    _nameEntry = make_unique<NameEntry>(this, _game, _services);
+    _nameEntry = make_unique<NameEntry>(*this, _game, _services);
     _nameEntry->load();
 }
 
 void CharacterGeneration::loadLevelUp() {
-    _levelUp = make_unique<LevelUpMenu>(this, _game, _services);
+    _levelUp = make_unique<LevelUpMenu>(*this, _game, _services);
     _levelUp->load();
 }
 
@@ -248,7 +248,7 @@ void CharacterGeneration::setAttributesVisible(bool visible) {
         _binding.intAbLbl.get(),
         _binding.wisAbLbl.get(),
         _binding.chaAbLbl.get()};
-    if (!_game->isTSL()) {
+    if (!_game.isTSL()) {
         attributesLabels.push_back(_binding.oldFortLbl.get());
         attributesLabels.push_back(_binding.oldReflLbl.get());
         attributesLabels.push_back(_binding.oldWillLbl.get());
@@ -353,9 +353,9 @@ void CharacterGeneration::openLevelUp() {
 
 void CharacterGeneration::cancel() {
     if (_type == Type::LevelUp) {
-        _game->openInGame();
+        _game.openInGame();
     } else {
-        _game->openMainMenu();
+        _game.openMainMenu();
     }
 }
 
@@ -366,7 +366,7 @@ void CharacterGeneration::finish() {
         _character.attributes.addClassLevels(clazz.get(), 1);
         shared_ptr<Creature> partyLeader(_services.party.getLeader());
         partyLeader->attributes() = _character.attributes;
-        _game->openInGame();
+        _game.openInGame();
     } else {
         shared_ptr<Creature> player(_services.objectFactory.newCreature());
         player->setTag(kObjectTagPlayer);
@@ -382,8 +382,8 @@ void CharacterGeneration::finish() {
         party.addMember(kNpcPlayer, player);
         party.setPlayer(player);
 
-        string moduleName(!_game->isTSL() ? "end_m01aa" : "001ebo");
-        _game->loadModule(moduleName);
+        string moduleName(!_game.isTSL() ? "end_m01aa" : "001ebo");
+        _game.loadModule(moduleName);
     }
 }
 
@@ -428,7 +428,7 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
     creature->sceneNode()->setCullable(false);
     creature->updateModelAnimation();
 
-    auto model = sceneGraph.newModel(_services.models.get("cgbody_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(*_services.models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", creature->sceneNode());
 
     return move(model);
@@ -453,7 +453,7 @@ void CharacterGeneration::updateAttributes() {
 
     const SavingThrows &throws = clazz->getSavingThrows(1);
 
-    if (_game->isTSL()) {
+    if (_game.isTSL()) {
         _binding.newFortLbl->setTextMessage(to_string(throws.fortitude));
         _binding.newReflLbl->setTextMessage(to_string(throws.reflex));
         _binding.newWillLbl->setTextMessage(to_string(throws.will));

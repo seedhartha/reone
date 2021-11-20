@@ -40,7 +40,7 @@ namespace game {
  */
 class Conversation : public GameGUI {
 public:
-    Conversation(KotOR *game, Services &services) :
+    Conversation(KotOR &game, Services &services) :
         GameGUI(game, services) {
     }
 

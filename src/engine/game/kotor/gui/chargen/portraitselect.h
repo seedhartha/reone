@@ -39,8 +39,8 @@ class CharacterGeneration;
 class PortraitSelection : public GameGUI {
 public:
     PortraitSelection(
-        CharacterGeneration *charGen,
-        KotOR *game,
+        CharacterGeneration &charGen,
+        KotOR &game,
         Services &services);
 
     void load() override;
@@ -58,7 +58,7 @@ private:
         std::shared_ptr<gui::Button> btnBack;
     } _binding;
 
-    CharacterGeneration *_charGen;
+    CharacterGeneration &_charGen;
 
     std::vector<Portrait> _filteredPortraits;
     int _currentPortrait {0};
