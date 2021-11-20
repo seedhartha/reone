@@ -23,12 +23,10 @@ namespace reone {
 
 namespace scene {
 
-SceneGraph &SceneGraphs::get(const string &name) {
-    auto maybeScene = _scenes.find(name);
-    if (maybeScene != _scenes.end()) {
-        return *maybeScene->second;
+void SceneGraphs::add(string name) {
+    if (_scenes.count(name) > 0) {
+        return;
     }
-
     auto scene = make_unique<SceneGraph>(
         name,
         _options,
@@ -40,8 +38,15 @@ SceneGraph &SceneGraphs::get(const string &name) {
         _shaders,
         _textures);
 
-    auto inserted = _scenes.insert(make_pair(name, move(scene)));
-    return *inserted.first->second;
+    _scenes.insert(make_pair(name, move(scene)));
+}
+
+SceneGraph &SceneGraphs::get(const string &name) {
+    auto maybeScene = _scenes.find(name);
+    if (maybeScene == _scenes.end()) {
+        throw logic_error(str(boost::format("Scene not found by name '%s'") % name));
+    }
+    return *maybeScene->second;
 }
 
 } // namespace scene

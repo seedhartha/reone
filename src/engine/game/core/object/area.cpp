@@ -139,7 +139,7 @@ void Area::loadLYT() {
         if (!model) {
             continue;
         }
-        auto &sceneGraph = _services.sceneGraphs.get(kSceneNameMain);
+        auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
 
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
         auto modelSceneNode = sceneGraph.newModel(model, ModelUsage::Room);
@@ -214,7 +214,7 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     glm::vec3 position(entryPosition);
     position.z += 1.7f;
 
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneNameMain);
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
 
     _firstPersonCamera = make_unique<FirstPersonCamera>(_cameraAspect, glm::radians(kDefaultFieldOfView), sceneGraph);
     _firstPersonCamera->setPosition(position);
@@ -270,7 +270,7 @@ void Area::doDestroyObject(uint32_t objectId) {
     {
         auto sceneNode = object->sceneNode();
         if (sceneNode) {
-            _services.sceneGraphs.get(kSceneNameMain).removeRoot(sceneNode);
+            _services.sceneGraphs.get(kSceneMain).removeRoot(sceneNode);
         }
     }
     {
@@ -808,7 +808,7 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
         add(spatial);
         auto model = spatial->sceneNode();
         if (model) {
-            _services.sceneGraphs.get(kSceneNameMain).addRoot(model);
+            _services.sceneGraphs.get(kSceneMain).addRoot(model);
         }
         auto creature = dynamic_pointer_cast<Creature>(spatial);
         if (creature) {
@@ -1230,7 +1230,7 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
 }
 
 shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
-    shared_ptr<CameraSceneNode> camera(_services.sceneGraphs.get(kSceneNameMain).activeCamera());
+    shared_ptr<CameraSceneNode> camera(_services.sceneGraphs.get(kSceneMain).activeCamera());
     shared_ptr<Creature> partyLeader(_services.party.getLeader());
     if (!camera || !partyLeader) {
         return nullptr;

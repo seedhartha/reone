@@ -122,7 +122,7 @@ void PortraitSelection::setButtonColors(Control &control) {
 }
 
 void PortraitSelection::loadHeadModel() {
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneNamePortraitSelect);
+    auto &sceneGraph = _services.sceneGraphs.get(kScenePortraitSelect);
     float aspect = _binding.lblHead->extent().width / static_cast<float>(_binding.lblHead->extent().height);
 
     SceneInitializer(sceneGraph)
@@ -134,7 +134,7 @@ void PortraitSelection::loadHeadModel() {
         .lightingRefFromModelNode("cghead_light")
         .invoke();
 
-    _binding.lblHead->setSceneName(kSceneNamePortraitSelect);
+    _binding.lblHead->setSceneName(kScenePortraitSelect);
 }
 
 shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &sceneGraph) {

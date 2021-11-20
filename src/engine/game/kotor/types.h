@@ -21,11 +21,13 @@ namespace reone {
 
 namespace game {
 
-constexpr char kSceneNameMainMenu[] = "mainmenu";
-constexpr char kSceneNameCharGen[] = "chargen";
-constexpr char kSceneNameClassSelect[] = "classselect";
-constexpr char kSceneNamePortraitSelect[] = "portraitselect";
-constexpr char kSceneNameCharacter[] = "character";
+constexpr int kNumClasses = 6;
+
+constexpr char kSceneMainMenu[] = "mainmenu";
+constexpr char kSceneCharGen[] = "chargen";
+constexpr char kSceneClassSelect[] = "classselect";
+constexpr char kScenePortraitSelect[] = "portraitselect";
+constexpr char kSceneCharacter[] = "character";
 
 } // namespace game
 

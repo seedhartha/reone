@@ -402,7 +402,7 @@ void CharacterGeneration::setCharacter(Character character) {
 }
 
 void CharacterGeneration::reloadCharacterModel() {
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneNameCharGen);
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneCharGen);
     const Control::Extent &extent = _binding.modelLbl->extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 
@@ -415,7 +415,7 @@ void CharacterGeneration::reloadCharacterModel() {
         .lightingRefFromModelNode("cgbody_light")
         .invoke();
 
-    _binding.modelLbl->setSceneName(kSceneNameCharGen);
+    _binding.modelLbl->setSceneName(kSceneCharGen);
     _binding.portraitLbl->setBorderFill(_services.portraits.getTextureByAppearance(_character.appearance));
 }
 
