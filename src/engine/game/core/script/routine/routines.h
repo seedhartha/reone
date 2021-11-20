@@ -108,12 +108,13 @@ public:
 private:
     std::vector<script::Routine> _routines;
 
+    Game *_game {nullptr};
+
     // Services
 
     ActionFactory &_actionFactory;
     Combat &_combat;
     EffectFactory &_effectFactory;
-    Game *_game;
     Party &_party;
     Reputes &_reputes;
     ScriptRunner &_scriptRunner;
