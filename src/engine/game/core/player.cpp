@@ -17,8 +17,6 @@
 
 #include "player.h"
 
-#include "../../common/guardutil.h"
-
 #include "camera/camera.h"
 #include "object/area.h"
 #include "object/creature.h"
@@ -31,15 +29,8 @@ namespace reone {
 
 namespace game {
 
-Player::Player(Module *module, Area *area, Camera *camera, const Party *party) :
-    _module(ensurePresent(module, "module")),
-    _area(ensurePresent(area, "area")),
-    _camera(ensurePresent(camera, "camera")),
-    _party(ensurePresent(party, "party")) {
-}
-
 bool Player::handle(const SDL_Event &event) {
-    shared_ptr<Creature> partyLeader(_party->getLeader());
+    shared_ptr<Creature> partyLeader(_party.getLeader());
     if (!partyLeader)
         return false;
 
@@ -76,7 +67,7 @@ bool Player::handleKeyDown(const SDL_KeyboardEvent &event) {
         return true;
     }
     case SDL_SCANCODE_X: {
-        shared_ptr<Creature> partyLeader(_party->getLeader());
+        shared_ptr<Creature> partyLeader(_party.getLeader());
         partyLeader->playAnimation(CombatAnimation::Draw, partyLeader->getWieldType());
         return true;
     }
@@ -117,7 +108,7 @@ bool Player::handleKeyUp(const SDL_KeyboardEvent &event) {
 }
 
 bool Player::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    if (_camera->isMouseLookMode() && event.button == SDL_BUTTON_LEFT) {
+    if (_camera.isMouseLookMode() && event.button == SDL_BUTTON_LEFT) {
         _moveForward = true;
         _leftPressedInMouseLook = true;
         return true;
@@ -137,7 +128,7 @@ bool Player::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
 }
 
 void Player::update(float dt) {
-    shared_ptr<Creature> partyLeader(_party->getLeader());
+    shared_ptr<Creature> partyLeader(_party.getLeader());
     if (!partyLeader || partyLeader->isMovementRestricted())
         return;
 
@@ -145,13 +136,13 @@ void Player::update(float dt) {
     bool movement = true;
 
     if (_moveForward) {
-        facing = _camera->facing();
+        facing = _camera.facing();
     } else if (_moveBackward) {
-        facing = _camera->facing() + glm::pi<float>();
+        facing = _camera.facing() + glm::pi<float>();
     } else if (_moveLeft) {
-        facing = _camera->facing() + glm::half_pi<float>();
+        facing = _camera.facing() + glm::half_pi<float>();
     } else if (_moveRight) {
-        facing = _camera->facing() - glm::half_pi<float>();
+        facing = _camera.facing() - glm::half_pi<float>();
     } else {
         movement = false;
     }
@@ -159,7 +150,7 @@ void Player::update(float dt) {
     if (movement) {
         partyLeader->clearAllActions();
         glm::vec2 dir(glm::normalize(glm::vec2(-glm::sin(facing), glm::cos(facing))));
-        if (_area->moveCreature(partyLeader, dir, !_walk, dt)) {
+        if (_area.moveCreature(partyLeader, dir, !_walk, dt)) {
             partyLeader->setMovementType(_walk ? Creature::MovementType::Walk : Creature::MovementType::Run);
             partyLeader->setAppliedForce(glm::vec3(dir, 0.0f));
         }
@@ -175,7 +166,7 @@ void Player::stopMovement() {
     _moveBackward = false;
     _moveRight = false;
 
-    shared_ptr<Creature> partyLeader(_party->getLeader());
+    shared_ptr<Creature> partyLeader(_party.getLeader());
     if (partyLeader) {
         partyLeader->setMovementType(Creature::MovementType::None);
     }

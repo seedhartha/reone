@@ -77,7 +77,6 @@ set(COMMON_HEADERS
     src/engine/common/cache.h
     src/engine/common/collectionutil.h
     src/engine/common/exception/validation.h
-    src/engine/common/guardutil.h
     src/engine/common/logutil.h
     src/engine/common/mediastream.h
     src/engine/common/pathutil.h

@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "guardutil.h"
-
 namespace reone {
 
 /**
@@ -31,7 +29,7 @@ public:
      * @param compute function used to lazily compute a value by key
      */
     MemoryCache(std::function<std::shared_ptr<V>(K)> compute) :
-        _compute(ensurePresent(compute, "compute")) {
+        _compute(std::move(compute)) {
     }
 
     void invalidate() {

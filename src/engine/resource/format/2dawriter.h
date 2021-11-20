@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "../../common/guardutil.h"
-
 namespace reone {
 
 class StreamWriter;
@@ -30,7 +28,7 @@ class TwoDA;
 class TwoDaWriter {
 public:
     TwoDaWriter(std::shared_ptr<TwoDA> twoDa) :
-        _twoDa(ensurePresent(twoDa, "twoDa")) {
+        _twoDa(std::move(twoDa)) {
     }
 
     void save(const boost::filesystem::path &path);

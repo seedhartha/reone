@@ -17,7 +17,6 @@
 
 #include "gui.h"
 
-#include "../common/guardutil.h"
 #include "../common/logutil.h"
 #include "../graphics/context.h"
 #include "../graphics/mesh/mesh.h"
@@ -91,8 +90,6 @@ GUI::GUI(
 }
 
 void GUI::load() {
-    ensureNotEmpty(_resRef, "resRef");
-
     debug("Load " + _resRef, LogChannels::gui);
 
     shared_ptr<GffStruct> gui(_gffs.get(_resRef, ResourceType::Gui));

@@ -17,7 +17,6 @@
 
 #include "profileoverlay.h"
 
-#include "../../common/guardutil.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh/mesh.h"
 #include "../../graphics/mesh/meshes.h"

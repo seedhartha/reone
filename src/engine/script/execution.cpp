@@ -17,7 +17,6 @@
 
 #include "execution.h"
 
-#include "../common/guardutil.h"
 #include "../common/logutil.h"
 
 #include "executioncontext.h"
@@ -38,7 +37,7 @@ static constexpr int kStartInstructionOffset = 13;
 
 ScriptExecution::ScriptExecution(shared_ptr<ScriptProgram> program, unique_ptr<ExecutionContext> context) :
     _context(move(context)),
-    _program(ensurePresent(program, "program")) {
+    _program(move(program)) {
 
     static unordered_map<InstructionType, function<void(ScriptExecution *, const Instruction &)>> g_handlers {
         {InstructionType::CPDOWNSP, &ScriptExecution::executeCPDOWNSP},

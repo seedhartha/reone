@@ -19,8 +19,6 @@
 
 #include "SDL2/SDL.h"
 
-#include "../common/guardutil.h"
-
 #include "cursor.h"
 #include "eventhandler.h"
 

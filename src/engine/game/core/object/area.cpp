@@ -18,7 +18,6 @@
 #include "area.h"
 
 #include "../../../common/exception/validation.h"
-#include "../../../common/guardutil.h"
 #include "../../../common/logutil.h"
 #include "../../../common/randomutil.h"
 #include "../../../common/streamutil.h"
@@ -846,8 +845,6 @@ void Area::setUnescapable(bool value) {
 }
 
 shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintResRef, const shared_ptr<Location> &location) {
-    ensurePresent(location, "location");
-
     shared_ptr<Object> object;
 
     switch (type) {

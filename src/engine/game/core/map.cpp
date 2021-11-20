@@ -17,7 +17,6 @@
 
 #include "map.h"
 
-#include "../../common/guardutil.h"
 #include "../../common/logutil.h"
 #include "../../graphics/context.h"
 #include "../../graphics/mesh/mesh.h"

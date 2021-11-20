@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "../../../common/guardutil.h"
-
 #include "action.h"
 
 namespace reone {
@@ -31,7 +29,7 @@ class EquipItemAction : public Action {
 public:
     EquipItemAction(Game &game, std::shared_ptr<Item> item, int inventorySlot, bool instant) :
         Action(game, ActionType::EquipItem),
-        _item(ensurePresent(item, "item")),
+        _item(std::move(item)),
         _inventorySlot(inventorySlot),
         _instant(instant) {
     }

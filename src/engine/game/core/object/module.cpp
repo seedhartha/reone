@@ -108,7 +108,7 @@ void Module::loadArea(const GffStruct &ifo, bool fromSave) {
 }
 
 void Module::loadPlayer() {
-    _player = make_unique<Player>(this, _area.get(), &_area->getCamera(CameraType::ThirdPerson), &_services.party);
+    _player = make_unique<Player>(*this, *_area, _area->getCamera(CameraType::ThirdPerson), _services.party);
 }
 
 void Module::loadParty(const string &entry, bool fromSave) {

@@ -32,7 +32,12 @@ class Party;
  */
 class Player : boost::noncopyable {
 public:
-    Player(Module *module, Area *area, Camera *camera, const Party *party);
+    Player(Module &module, Area &area, Camera &camera, const Party &party) :
+        _module(module),
+        _area(area),
+        _camera(camera),
+        _party(party) {
+    }
 
     bool handle(const SDL_Event &event);
     void update(float dt);
@@ -45,10 +50,10 @@ public:
     void setRestrictMode(bool value) { _restrictMode = value; }
 
 private:
-    Module *_module;
-    Area *_area;
-    Camera *_camera;
-    const Party *_party;
+    Module &_module;
+    Area &_area;
+    Camera &_camera;
+    const Party &_party;
 
     bool _moveForward {false};
     bool _moveLeft {false};

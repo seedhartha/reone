@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "guardutil.h"
 #include "types.h"
 
 namespace reone {
@@ -30,7 +29,7 @@ public:
     StreamWriter(
         std::shared_ptr<std::ostream> stream,
         boost::endian::order endianess = boost::endian::order::little) :
-        _stream(ensurePresent(stream, "stream")),
+        _stream(std::move(stream)),
         _endianess(endianess) {
     }
 
