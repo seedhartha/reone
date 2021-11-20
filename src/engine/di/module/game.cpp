@@ -64,6 +64,7 @@ void GameModule::init() {
     _effectFactory = make_unique<EffectFactory>();
     _routines = make_unique<Routines>(*_actionFactory, *_combat, *_effectFactory, *_party, *_reputes, *_scriptRunner, _resource.strings());
     _routineRegistrar = newRoutineRegistrar();
+    _sceneManager = make_unique<SceneManager>(*_surfaces, _scene.sceneGraphs());
 
     _services = make_unique<Services>(
         *_actionFactory,
@@ -78,6 +79,7 @@ void GameModule::init() {
         *_party,
         *_portraits,
         *_reputes,
+        *_sceneManager,
         *_scriptRunner,
         *_skills,
         *_soundSets,

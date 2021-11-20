@@ -17,7 +17,7 @@
 
 #include "mesh.h"
 
-#include "../baryutil.h"
+#include "../barycentricutil.h"
 
 using namespace std;
 

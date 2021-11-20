@@ -15,11 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @file
- *  Utility functions to convert between cartesian and barycentric coordinate systems.
- */
-
 #pragma once
+
+#include "../common/randomutil.h"
 
 namespace reone {
 
@@ -50,6 +48,12 @@ inline glm::vec2 barycentricToCartesian(const glm::vec2 &a, const glm::vec2 &b, 
 
 inline glm::vec3 barycentricToCartesian(const glm::vec3 &a, const glm::vec3 &b, const glm::vec3 &c, const glm::vec3 &p) {
     return a * p.x + b * p.y + c * p.z;
+}
+
+inline glm::vec3 getRandomBarycentric() {
+    float r1sqrt = glm::sqrt(random(0.0f, 1.0f));
+    float r2 = random(0.0f, 1.0f);
+    return glm::vec3(1.0f - r1sqrt, r1sqrt * (1.0f - r2), r2 * r1sqrt);
 }
 
 } // namespace graphics

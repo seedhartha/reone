@@ -21,7 +21,6 @@
 #include "../../../common/logutil.h"
 #include "../../../common/randomutil.h"
 #include "../../../common/streamutil.h"
-#include "../../../graphics/baryutil.h"
 #include "../../../graphics/mesh/mesh.h"
 #include "../../../graphics/mesh/meshes.h"
 #include "../../../graphics/model/models.h"
@@ -47,6 +46,7 @@
 #include "../party.h"
 #include "../reputes.h"
 #include "../room.h"
+#include "../scenemanager.h"
 #include "../script/runner.h"
 #include "../services.h"
 #include "../surfaces.h"
@@ -360,9 +360,7 @@ void Area::unloadParty() {
 void Area::reloadParty() {
     shared_ptr<Creature> player(_services.party.player());
     loadParty(player->position(), player->getFacing());
-
-    // TODO: don't have to reload the whole scene
-    fill(_services.sceneGraphs.get(kSceneNameMain));
+    _services.sceneManager.refresh(*this);
 }
 
 bool Area::handle(const SDL_Event &event) {
@@ -523,78 +521,8 @@ void Area::destroyObject(const SpatialObject &object) {
     _objectsToDestroy.insert(object.id());
 }
 
-static inline float calculateTriangleArea(const vector<glm::vec3> &verts) {
-    // Adapted from https://www.omnicalculator.com/math/herons-formula
-    float a = glm::distance(verts[0], verts[1]);
-    float b = glm::distance(verts[0], verts[2]);
-    float c = glm::distance(verts[1], verts[2]);
-    return 0.25f * glm::sqrt((a + b + c) * (-a + b + c) * (a - b + c) * (a + b - c));
-}
-
-/**
- * @return random barycentric position
- */
-static inline glm::vec3 getRandomBarycentric() {
-    // Adapted from https://math.stackexchange.com/q/18686
-    float r1sqrt = glm::sqrt(random(0.0f, 1.0f));
-    float r2 = random(0.0f, 1.0f);
-    return glm::vec3(1.0f - r1sqrt, r1sqrt * (1.0f - r2), r2 * r1sqrt);
-}
-
-void Area::fill(SceneGraph &sceneGraph) {
-    sceneGraph.clear();
-
-    // Area properties
-
-    sceneGraph.setAmbientLightColor(_ambientColor);
-    sceneGraph.setFogEnabled(_fogEnabled);
-    sceneGraph.setFogNear(_fogNear);
-    sceneGraph.setFogFar(_fogFar);
-    sceneGraph.setFogColor(_fogColor);
-
-    // Room models
-
-    for (auto &room : _rooms) {
-        shared_ptr<ModelSceneNode> sceneNode(room.second->model());
-        if (sceneNode) {
-            sceneGraph.addRoot(sceneNode);
-        }
-        shared_ptr<ModelNode> aabbNode(sceneNode->model().getAABBNode());
-        if (aabbNode && _grass.texture) {
-            glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), room.second->position()));
-            auto grass = make_shared<GrassSceneNode>(room.first, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap, sceneGraph, _services.context, _services.meshes, _services.shaders);
-            for (auto &material : _services.surfaces.getGrassSurfaceIndices()) {
-                for (auto &face : aabbNode->getFacesByMaterial(material)) {
-                    vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getTriangleCoords(face));
-                    float area = calculateTriangleArea(vertices);
-                    for (int i = 0; i < getNumGrassClusters(area); ++i) {
-                        glm::vec3 baryPosition(getRandomBarycentric());
-                        glm::vec3 position(aabbTransform * glm::vec4(barycentricToCartesian(vertices[0], vertices[1], vertices[2], baryPosition), 1.0f));
-                        glm::vec2 lightmapUV(aabbNode->mesh()->mesh->getTriangleTexCoords2(face, baryPosition));
-                        auto cluster = grass->newCluster();
-                        cluster->setPosition(move(position));
-                        cluster->setVariant(getRandomGrassVariant());
-                        cluster->setLightmapUV(move(lightmapUV));
-                        grass->addChild(move(cluster));
-                    }
-                }
-            }
-            sceneGraph.addRoot(grass);
-        }
-    }
-
-    // Objects
-
-    for (auto &object : _objects) {
-        shared_ptr<SceneNode> sceneNode(object->sceneNode());
-        if (sceneNode) {
-            sceneGraph.addRoot(sceneNode);
-        }
-    }
-}
-
-int Area::getNumGrassClusters(float area) const {
-    return static_cast<int>(glm::round(kGrassDensityFactor * _grass.density * area));
+int Area::getNumGrassClusters(float triArea) const {
+    return static_cast<int>(glm::round(kGrassDensityFactor * _grass.density * triArea));
 }
 
 int Area::getRandomGrassVariant() const {

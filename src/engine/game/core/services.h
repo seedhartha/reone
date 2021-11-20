@@ -80,6 +80,7 @@ class ObjectFactory;
 class Party;
 class Portraits;
 class Reputes;
+class SceneManager;
 class ScriptRunner;
 class Skills;
 class SoundSets;
@@ -98,6 +99,7 @@ struct Services {
     Party &party;
     Portraits &portraits;
     Reputes &reputes;
+    SceneManager &sceneManager;
     ScriptRunner &scriptRunner;
     Skills &skills;
     SoundSets &soundSets;
@@ -139,6 +141,7 @@ struct Services {
         Party &party,
         Portraits &portraits,
         Reputes &reputes,
+        SceneManager &sceneManager,
         ScriptRunner &scriptRunner,
         Skills &skills,
         SoundSets &soundSets,
@@ -177,6 +180,7 @@ struct Services {
         party(party),
         portraits(portraits),
         reputes(reputes),
+        sceneManager(sceneManager),
         scriptRunner(scriptRunner),
         skills(skills),
         soundSets(soundSets),

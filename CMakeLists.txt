@@ -190,7 +190,7 @@ target_precompile_headers(libresource PRIVATE src/engine/pch.h)
 
 set(GRAPHICS_HEADERS
     src/engine/graphics/aabb.h
-    src/engine/graphics/baryutil.h
+    src/engine/graphics/barycentricutil.h
     src/engine/graphics/beziercurve.h
     src/engine/graphics/context.h
     src/engine/graphics/cursor.h
@@ -659,6 +659,7 @@ set(GAMECORE_HEADERS
     src/engine/game/core/room.h
     src/engine/game/core/savedgame.h
     src/engine/game/core/services.h
+    src/engine/game/core/scenemanager.h
     src/engine/game/core/script/routine/argutil.h
     src/engine/game/core/script/routine/context.h
     src/engine/game/core/script/routine/declarations.h
@@ -857,6 +858,7 @@ set(GAMECORE_SOURCES
     src/engine/game/core/profileoverlay.cpp
     src/engine/game/core/reputes.cpp
     src/engine/game/core/room.cpp
+    src/engine/game/core/scenemanager.cpp
     src/engine/game/core/script/routine/argutil.cpp
     src/engine/game/core/script/routine/impl/action.cpp
     src/engine/game/core/script/routine/impl/ambientsound.cpp

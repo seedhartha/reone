@@ -52,6 +52,7 @@
 #include "location.h"
 #include "object/factory.h"
 #include "party.h"
+#include "scenemanager.h"
 #include "services.h"
 #include "soundsets.h"
 #include "surfaces.h"
@@ -154,9 +155,7 @@ void Game::loadModule(const string &name, string entry) {
             }
 
             _module->loadParty(entry, _loadFromSaveGame);
-
-            auto &sceneGraph = _services.sceneGraphs.get(kSceneNameMain);
-            _module->area()->fill(sceneGraph);
+            _services.sceneManager.refresh(*_module->area());
 
             info("Module '" + name + "' loaded successfully");
 

@@ -48,11 +48,6 @@ class IAnimationEventListener;
 class ModelSceneNode;
 class WalkmeshSceneNode;
 
-/**
- * Responsible for managing drawable objects and their relations.
- *
- * @see SceneNode
- */
 class SceneGraph : boost::noncopyable {
 public:
     SceneGraph(
@@ -76,12 +71,7 @@ public:
         _textures(textures) {
     }
 
-    /**
-     * Recursively update the state of this scene graph. Called prior to rendering a frame.
-     * This extracts drawable nodes from roots, culls and sorts objects, updates animation, lighting, shadows and etc.
-     */
     void update(float dt);
-
     void draw(bool shadowPass = false);
 
     const std::string &name() const { return _name; }
@@ -145,6 +135,7 @@ public:
         IAnimationEventListener *animEventListener = nullptr);
 
     std::unique_ptr<WalkmeshSceneNode> newWalkmesh(std::string name, const graphics::Walkmesh &walkmesh);
+    std::unique_ptr<GrassSceneNode> newGrass(std::string name, glm::vec2 quadSize, std::shared_ptr<graphics::Texture> texture, std::shared_ptr<graphics::Texture> lightmap);
 
     // END Factory methods
 

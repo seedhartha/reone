@@ -56,6 +56,15 @@ typedef std::vector<std::shared_ptr<SpatialObject>> ObjectList;
 
 class Area : public Object {
 public:
+    struct Grass {
+        std::shared_ptr<graphics::Texture> texture;
+        float density {0.0f};
+        float quadSize {0.0f};
+        int ambient {0};
+        int diffuse {0};
+        float probabilities[4];
+    };
+
     typedef std::vector<std::pair<CreatureType, int>> SearchCriteriaList;
 
     Area(
@@ -94,6 +103,8 @@ public:
     const std::string &localizedName() const { return _localizedName; }
     const RoomMap &rooms() const { return _rooms; }
     Map &map() { return _map; }
+    const Grass &grass() const { return _grass; }
+    const glm::vec3 &ambientColor() const { return _ambientColor; }
 
     void setUnescapable(bool value);
 
@@ -188,6 +199,22 @@ public:
 
     // END Stealth
 
+    // Grass
+
+    int getNumGrassClusters(float triArea) const;
+    int getRandomGrassVariant() const;
+
+    // END Grass
+
+    // Fog
+
+    bool fogEnabled() const { return _fogEnabled; }
+    float fogNear() const { return _fogNear; }
+    float fogFar() const { return _fogFar; }
+    const glm::vec3 &fogColor() const { return _fogColor; }
+
+    // END Fog
+
     // Scripts
 
     void runSpawnScripts();
@@ -197,15 +224,6 @@ public:
     // END Scripts
 
 private:
-    struct Grass {
-        std::shared_ptr<graphics::Texture> texture;
-        float density {0.0f};
-        float quadSize {0.0f};
-        int ambient {0};
-        int diffuse {0};
-        float probabilities[4];
-    };
-
     Pathfinder _pathfinder;
     std::string _localizedName;
     RoomMap _rooms;
@@ -282,6 +300,10 @@ private:
     void updateHeartbeat(float dt);
 
     void updateRoomVisibility();
+    void doUpdatePerception();
+    void updateObjectSelection();
+
+    bool matchesCriterias(const Creature &creature, const SearchCriteriaList &criterias, std::shared_ptr<SpatialObject> target = nullptr) const;
 
     /**
      * Certain VIS files in the original game have a bug: room A is visible from
@@ -293,9 +315,6 @@ private:
     void printDebugInfo(const SpatialObject &object);
 
     bool doMoveCreature(const std::shared_ptr<Creature> &creature, const glm::vec3 &dest);
-
-    int getNumGrassClusters(float area) const;
-    int getRandomGrassVariant() const;
 
     // Loading ARE
 
@@ -366,24 +385,6 @@ private:
     bool getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::vec3 &normal) const;
 
     // END Collision detection
-
-    // Creature Search
-
-    bool matchesCriterias(const Creature &creature, const SearchCriteriaList &criterias, std::shared_ptr<SpatialObject> target = nullptr) const;
-
-    // END Creature Search
-
-    // Perception
-
-    void doUpdatePerception();
-
-    // END Perception
-
-    // Object Selection
-
-    void updateObjectSelection();
-
-    // END Object Selection
 };
 
 } // namespace game

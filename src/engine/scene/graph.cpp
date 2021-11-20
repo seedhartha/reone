@@ -425,6 +425,18 @@ unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(string name, const Walkmes
         _shaders);
 }
 
+unique_ptr<GrassSceneNode> SceneGraph::newGrass(string name, glm::vec2 quadSize, shared_ptr<Texture> texture, shared_ptr<Texture> lightmap) {
+    return make_unique<GrassSceneNode>(
+        move(name),
+        move(quadSize),
+        move(texture),
+        move(lightmap),
+        *this,
+        _context,
+        _meshes,
+        _shaders);
+}
+
 } // namespace scene
 
 } // namespace reone
