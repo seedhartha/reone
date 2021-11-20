@@ -17,17 +17,24 @@
 
 #pragma once
 
-#include "../../../script/scripts.h"
-
-#include "routine/routines.h"
+#include "../../../script/types.h"
 
 namespace reone {
 
+namespace script {
+
+class Scripts;
+
+}
+
 namespace game {
+
+class Routines;
 
 class ScriptRunner {
 public:
-    ScriptRunner(script::Scripts &scripts) :
+    ScriptRunner(Routines &routines, script::Scripts &scripts) :
+        _routines(routines),
         _scripts(scripts) {
     }
 
@@ -38,12 +45,9 @@ public:
         int userDefinedEventNumber = -1,
         int scriptVar = -1);
 
-    void setRoutines(Routines &routines) { _routines = &routines; }
-
 private:
+    Routines &_routines;
     script::Scripts &_scripts;
-
-    Routines *_routines {nullptr};
 };
 
 } // namespace game

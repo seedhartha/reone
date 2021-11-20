@@ -50,7 +50,6 @@ void GameModule::init() {
     _soundSets = make_unique<SoundSets>(_audio.audioFiles(), _resource.resources(), _resource.strings());
     _footstepSounds = make_unique<FootstepSounds>(_audio.audioFiles(), _resource.twoDas());
     _guiSounds = make_unique<GUISounds>(_audio.audioFiles(), _resource.twoDas());
-    _scriptRunner = make_unique<ScriptRunner>(_script.scripts());
     _reputes = make_unique<Reputes>(_resource.twoDas());
     _skills = make_unique<Skills>(_graphics.textures(), _resource.strings(), _resource.twoDas());
     _feats = make_unique<Feats>(_graphics.textures(), _resource.strings(), _resource.twoDas());
@@ -61,6 +60,7 @@ void GameModule::init() {
     _objectFactory = make_unique<ObjectFactory>();
     _effectFactory = make_unique<EffectFactory>();
     _routines = make_unique<Routines>();
+    _scriptRunner = make_unique<ScriptRunner>(*_routines, _script.scripts());
     _routineRegistrar = newRoutineRegistrar();
     _sceneManager = make_unique<SceneManager>(*_surfaces, _scene.sceneGraphs().get(kSceneMain));
 
@@ -105,7 +105,6 @@ void GameModule::init() {
 
     _game = newGame();
 
-    _scriptRunner->setRoutines(*_routines);
     _actionFactory->setGame(*_game);
     _actionFactory->setServices(*_services);
     _objectFactory->setGame(*_game);

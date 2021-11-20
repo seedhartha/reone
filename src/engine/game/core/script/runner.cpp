@@ -19,8 +19,11 @@
 
 #include "../../../script/execution.h"
 #include "../../../script/executioncontext.h"
+#include "../../../script/scripts.h"
 
 #include "../game.h"
+
+#include "routine/routines.h"
 
 using namespace std;
 
@@ -43,7 +46,7 @@ int ScriptRunner::run(const string &resRef, uint32_t callerId, uint32_t triggerr
         return -1;
 
     auto ctx = make_unique<ExecutionContext>();
-    ctx->routines = _routines;
+    ctx->routines = &_routines;
     ctx->callerId = callerId;
     ctx->triggererId = triggerrerId;
     ctx->userDefinedEventNumber = userDefinedEventNumber;
