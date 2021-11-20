@@ -63,6 +63,7 @@ public:
     void setSize(glm::vec2 size) { _size = std::move(size); }
     void setFrame(int frame) { _frame = frame; }
     void setAnimLength(float length) { _animLength = length; }
+    void setLifetime(float lifetime) { _lifetime = lifetime; }
 
 private:
     EmitterSceneNode &_emitter;
