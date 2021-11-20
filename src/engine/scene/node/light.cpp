@@ -40,8 +40,7 @@ static constexpr float kFadeSpeed = 1.0f;
 static constexpr float kMinDirectionalLightRadius = 1000.0f;
 
 LightSceneNode::LightSceneNode(
-    const ModelSceneNode &model,
-    const ModelNode &modelNode,
+    shared_ptr<ModelNode> modelNode,
     SceneGraph &sceneGraph,
     Context &context,
     Meshes &meshes,
@@ -52,12 +51,11 @@ LightSceneNode::LightSceneNode(
         sceneGraph,
         context,
         meshes,
-        shaders),
-    _model(model) {
+        shaders) {
 
-    _color = modelNode.color().getByFrameOrElse(0, glm::vec3(0.0f));
-    _radius = modelNode.radius().getByFrameOrElse(0, 0.0f);
-    _multiplier = modelNode.multiplier().getByFrameOrElse(0, 0.0f);
+    _color = modelNode->color().getByFrameOrElse(0, glm::vec3(0.0f));
+    _radius = modelNode->radius().getByFrameOrElse(0, 0.0f);
+    _multiplier = modelNode->multiplier().getByFrameOrElse(0, 0.0f);
 }
 
 void LightSceneNode::update(float dt) {
@@ -65,10 +63,10 @@ void LightSceneNode::update(float dt) {
 
     if (_active) {
         // Fade out
-        _fadeFactor = _modelNode.light()->fading ? glm::max(0.0f, _fadeFactor - kFadeSpeed * dt) : 0.0f;
+        _fadeFactor = _modelNode->light()->fading ? glm::max(0.0f, _fadeFactor - kFadeSpeed * dt) : 0.0f;
     } else {
         // Fade in
-        _fadeFactor = _modelNode.light()->fading ? glm::min(1.0f, _fadeFactor + kFadeSpeed * dt) : 1.0f;
+        _fadeFactor = _modelNode->light()->fading ? glm::min(1.0f, _fadeFactor + kFadeSpeed * dt) : 1.0f;
     }
 }
 

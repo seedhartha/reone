@@ -428,7 +428,7 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
     creature->sceneNode()->setCullable(false);
     creature->updateModelAnimation();
 
-    auto model = sceneGraph.newModel(*_services.models.get("cgbody_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(_services.models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", creature->sceneNode());
 
     return move(model);

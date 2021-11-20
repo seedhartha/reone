@@ -63,7 +63,7 @@ void SceneInitializer::invoke() {
     if (!_lightingRefNodeName.empty()) {
         shared_ptr<ModelNode> modelNode(model->model().getNodeByName(_lightingRefNodeName));
         if (modelNode) {
-            lightingRefNode = _sceneGraph.newDummy(*modelNode);
+            lightingRefNode = _sceneGraph.newDummy(modelNode);
             lightingRefNode->setLocalTransform(modelNode->absoluteTransform());
         }
     }

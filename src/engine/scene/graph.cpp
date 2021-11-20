@@ -386,8 +386,8 @@ vector<LightSceneNode *> SceneGraph::getLightsAt(
     return move(result);
 }
 
-unique_ptr<DummySceneNode> SceneGraph::newDummy(const ModelNode &modelNode) {
-    return make_unique<DummySceneNode>(modelNode, *this, _context, _meshes, _shaders);
+unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {
+    return make_unique<DummySceneNode>(move(modelNode), *this, _context, _meshes, _shaders);
 }
 
 unique_ptr<CameraSceneNode> SceneGraph::newCamera(string name, glm::mat4 projection) {
@@ -400,9 +400,9 @@ unique_ptr<CameraSceneNode> SceneGraph::newCamera(string name, glm::mat4 project
         _shaders);
 }
 
-unique_ptr<ModelSceneNode> SceneGraph::newModel(const Model &model, ModelUsage usage, IAnimationEventListener *animEventListener) {
+unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUsage usage, IAnimationEventListener *animEventListener) {
     return make_unique<ModelSceneNode>(
-        model,
+        move(model),
         usage,
         *this,
         _context,
@@ -415,10 +415,10 @@ unique_ptr<ModelSceneNode> SceneGraph::newModel(const Model &model, ModelUsage u
         animEventListener);
 }
 
-unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(string name, const Walkmesh &walkmesh) {
+unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(string name, shared_ptr<Walkmesh> walkmesh) {
     return make_unique<WalkmeshSceneNode>(
         move(name),
-        walkmesh,
+        move(walkmesh),
         *this,
         _context,
         _meshes,

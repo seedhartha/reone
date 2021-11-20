@@ -47,7 +47,7 @@ constexpr float kDefaultDrawDistance = 1024.0f;
 class ModelSceneNode : public SceneNode {
 public:
     ModelSceneNode(
-        const graphics::Model &model,
+        std::shared_ptr<graphics::Model> model,
         ModelUsage usage,
         SceneGraph &sceneGraph,
         graphics::Context &context,
@@ -67,7 +67,7 @@ public:
     std::shared_ptr<ModelNodeSceneNode> getNodeByNumber(uint16_t number) const;
     std::shared_ptr<ModelNodeSceneNode> getNodeByName(const std::string &name) const;
 
-    const graphics::Model &model() const { return _model; }
+    const graphics::Model &model() const { return *_model; }
     ModelUsage usage() const { return _usage; }
     float drawDistance() const { return _drawDistance; }
 
@@ -131,7 +131,7 @@ private:
         }
     };
 
-    const graphics::Model &_model;
+    std::shared_ptr<graphics::Model> _model;
     ModelUsage _usage;
     IAnimationEventListener *_animEventListener;
 
@@ -161,12 +161,12 @@ private:
 
     // END Animation
 
-    void buildNodeTree(const graphics::ModelNode &node, SceneNode &parent);
+    void buildNodeTree(std::shared_ptr<graphics::ModelNode> node, SceneNode &parent);
 
-    std::unique_ptr<DummySceneNode> newDummySceneNode(const graphics::ModelNode &node) const;
-    std::unique_ptr<MeshSceneNode> newMeshSceneNode(const graphics::ModelNode &node) const;
-    std::unique_ptr<LightSceneNode> newLightSceneNode(const graphics::ModelNode &node) const;
-    std::unique_ptr<EmitterSceneNode> newEmitterSceneNode(const graphics::ModelNode &node) const;
+    std::unique_ptr<DummySceneNode> newDummySceneNode(std::shared_ptr<graphics::ModelNode> node) const;
+    std::unique_ptr<MeshSceneNode> newMeshSceneNode(std::shared_ptr<graphics::ModelNode> node) const;
+    std::unique_ptr<LightSceneNode> newLightSceneNode(std::shared_ptr<graphics::ModelNode> node) const;
+    std::unique_ptr<EmitterSceneNode> newEmitterSceneNode(std::shared_ptr<graphics::ModelNode> node) const;
 
     // Animation
 

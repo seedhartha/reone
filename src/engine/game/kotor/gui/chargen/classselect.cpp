@@ -236,7 +236,7 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, Sce
     character->sceneNode()->setCullable(false);
     character->updateModelAnimation();
 
-    auto model = sceneGraph.newModel(*_services.models.get("cgbody_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(_services.models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", character->sceneNode());
 
     return move(model);

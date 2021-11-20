@@ -79,7 +79,7 @@ void AnimatedCamera::setModel(shared_ptr<Model> model) {
         return;
 
     if (model) {
-        _model = _sceneGraph.newModel(*model, ModelUsage::Camera);
+        _model = _sceneGraph.newModel(model, ModelUsage::Camera);
         _model->attach("camerahook", _sceneNode);
     } else {
         _model.reset();

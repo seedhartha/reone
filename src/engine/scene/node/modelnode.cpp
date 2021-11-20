@@ -28,20 +28,20 @@ namespace reone {
 namespace scene {
 
 ModelNodeSceneNode::ModelNodeSceneNode(
-    const ModelNode &modelNode,
+    shared_ptr<ModelNode> modelNode,
     SceneNodeType type,
     SceneGraph &sceneGraph,
     Context &context,
     Meshes &meshes,
     Shaders &shaders) :
     SceneNode(
-        modelNode.name(),
+        modelNode->name(),
         type,
         sceneGraph,
         context,
         meshes,
         shaders),
-    _modelNode(modelNode) {
+    _modelNode(move(modelNode)) {
 }
 
 } // namespace scene
