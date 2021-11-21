@@ -24,4 +24,3 @@
 #ifdef log2
 #undef log2
 #endif
-

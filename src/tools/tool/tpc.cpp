@@ -17,8 +17,6 @@
 
 #include "tpc.h"
 
-#include "s3tc.h"
-
 #include "../../engine/common/logutil.h"
 #include "../../engine/graphics/texture/format/tgawriter.h"
 #include "../../engine/graphics/texture/format/tpcreader.h"

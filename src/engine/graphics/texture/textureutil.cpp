@@ -17,7 +17,7 @@
 
 #include "textureutil.h"
 
-#include "s3tc.h"
+#include "dxtutil.h"
 
 using namespace std;
 
@@ -117,15 +117,15 @@ void decompressMipMap(Texture::MipMap &mipMap, PixelFormat srcFormat, PixelForma
 
     size_t pixelCount = static_cast<size_t>(mipMap.width) * mipMap.height;
     const uint8_t *srcPixels = reinterpret_cast<const uint8_t *>(mipMap.pixels->data());
-    vector<unsigned long> decompPixels(pixelCount);
-    unsigned long *decompPixelsPtr = &decompPixels[0];
+    vector<uint32_t> decompPixels(pixelCount);
+    uint32_t *decompPixelsPtr = &decompPixels[0];
     bool alpha;
 
     if (srcFormat == PixelFormat::DXT5) {
-        BlockDecompressImageDXT5(mipMap.width, mipMap.height, srcPixels, decompPixelsPtr);
+        decompressDXT5(mipMap.width, mipMap.height, srcPixels, decompPixelsPtr);
         alpha = true;
     } else {
-        BlockDecompressImageDXT1(mipMap.width, mipMap.height, srcPixels, decompPixelsPtr);
+        decompressDXT1(mipMap.width, mipMap.height, srcPixels, decompPixelsPtr);
         alpha = false;
     }
 

@@ -18,8 +18,6 @@ project(reone)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(src/external/s3tc)
-
 option(BUILD_TOOLS "build tools executable" OFF)
 option(BUILD_LAUNCHER "build launcher executable" OFF)
 option(BUILD_TESTS "build unit tests" OFF)
@@ -45,7 +43,7 @@ else()
     find_package(Threads REQUIRED)
 endif()
 
-include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src/external/s3tc)
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
 
 if(ENABLE_VIDEO)
     if(MSVC)
@@ -219,6 +217,7 @@ set(GRAPHICS_HEADERS
     src/engine/graphics/pixelutil.h
     src/engine/graphics/renderbuffer.h
     src/engine/graphics/shader/shaders.h
+    src/engine/graphics/texture/dxtutil.h
     src/engine/graphics/texture/format/curreader.h
     src/engine/graphics/texture/format/tgareader.h
     src/engine/graphics/texture/format/tgawriter.h
@@ -262,6 +261,7 @@ set(GRAPHICS_SOURCES
     src/engine/graphics/shader/shaders_common.cpp
     src/engine/graphics/shader/shaders_pbr.cpp
     src/engine/graphics/shader/shaders_phong.cpp
+    src/engine/graphics/texture/dxtutil.cpp
     src/engine/graphics/texture/format/curreader.cpp
     src/engine/graphics/texture/format/tgareader.cpp
     src/engine/graphics/texture/format/tgawriter.cpp
@@ -279,7 +279,7 @@ set(GRAPHICS_SOURCES
 add_library(libgraphics STATIC ${GRAPHICS_HEADERS} ${GRAPHICS_SOURCES})
 set_target_properties(libgraphics PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(libgraphics PRIVATE src/engine/pch.h)
-target_link_libraries(libgraphics PUBLIC libs3tc GLEW::GLEW ${OPENGL_LIBRARIES})
+target_link_libraries(libgraphics PUBLIC GLEW::GLEW ${OPENGL_LIBRARIES})
 
 if(MSVC)
     target_link_libraries(libgraphics PUBLIC SDL2::SDL2)
