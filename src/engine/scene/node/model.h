@@ -71,6 +71,7 @@ public:
     ModelUsage usage() const { return _usage; }
     float drawDistance() const { return _drawDistance; }
 
+    void setModel(std::shared_ptr<graphics::Model> model);
     void setDrawDistance(float distance) { _drawDistance = distance; }
     void setDiffuseTexture(std::shared_ptr<graphics::Texture> texture);
     void setAppliedForce(glm::vec3 force);

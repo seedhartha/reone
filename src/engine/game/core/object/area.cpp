@@ -21,10 +21,12 @@
 #include "../../../common/logutil.h"
 #include "../../../common/randomutil.h"
 #include "../../../common/streamutil.h"
+#include "../../../graphics/barycentricutil.h"
 #include "../../../graphics/mesh/mesh.h"
 #include "../../../graphics/mesh/meshes.h"
 #include "../../../graphics/model/models.h"
 #include "../../../graphics/texture/textures.h"
+#include "../../../graphics/triangleutil.h"
 #include "../../../graphics/walkmesh/walkmeshes.h"
 #include "../../../resource/2da.h"
 #include "../../../resource/2das.h"
@@ -46,7 +48,6 @@
 #include "../party.h"
 #include "../reputes.h"
 #include "../room.h"
-#include "../scenemanager.h"
 #include "../script/runner.h"
 #include "../services.h"
 #include "../surfaces.h"
@@ -130,30 +131,58 @@ void Area::loadLYT() {
     if (!lytData) {
         throw ValidationException("Area LYT file not found");
     }
-
     LytReader lyt;
     lyt.load(wrap(lytData));
 
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+
     for (auto &lytRoom : lyt.rooms()) {
-        shared_ptr<Model> model(_services.models.get(lytRoom.name));
+        auto model = _services.models.get(lytRoom.name);
         if (!model) {
             continue;
         }
-        auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
 
+        // Model
         glm::vec3 position(lytRoom.position.x, lytRoom.position.y, lytRoom.position.z);
-        auto modelSceneNode = sceneGraph.newModel(model, ModelUsage::Room);
+        shared_ptr<ModelSceneNode> modelSceneNode(sceneGraph.newModel(model, ModelUsage::Room));
         modelSceneNode->setLocalTransform(glm::translate(glm::mat4(1.0f), position));
         for (auto &anim : model->getAnimationNames()) {
             if (boost::starts_with(anim, "animloop")) {
                 modelSceneNode->playAnimation(anim, AnimationProperties::fromFlags(AnimationFlags::loopOverlay));
             }
         }
+        sceneGraph.addRoot(modelSceneNode);
 
+        // Walkmesh
         shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
-        shared_ptr<Walkmesh> walkmesh(_services.walkmeshes.get(lytRoom.name, ResourceType::Wok));
+        auto walkmesh = _services.walkmeshes.get(lytRoom.name, ResourceType::Wok);
         if (walkmesh) {
             walkmeshSceneNode = sceneGraph.newWalkmesh(lytRoom.name, walkmesh);
+            sceneGraph.addRoot(walkmeshSceneNode);
+        }
+
+        // Grass
+        auto aabbNode = modelSceneNode->model().getAABBNode();
+        if (_grass.texture && aabbNode) {
+            glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), position));
+            auto grassSceneNode = sceneGraph.newGrass(lytRoom.name, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap);
+            for (auto &material : _services.surfaces.getGrassSurfaceIndices()) {
+                for (auto &face : aabbNode->getFacesByMaterial(material)) {
+                    vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getTriangleCoords(face));
+                    float triArea = calculateTriangleArea(vertices);
+                    for (int i = 0; i < getNumGrassClusters(triArea); ++i) {
+                        glm::vec3 baryPosition(getRandomBarycentric());
+                        glm::vec3 position(aabbTransform * glm::vec4(barycentricToCartesian(vertices[0], vertices[1], vertices[2], baryPosition), 1.0f));
+                        glm::vec2 lightmapUV(aabbNode->mesh()->mesh->getTriangleTexCoords2(face, baryPosition));
+                        auto cluster = grassSceneNode->newCluster();
+                        cluster->setPosition(move(position));
+                        cluster->setVariant(getRandomGrassVariant());
+                        cluster->setLightmapUV(move(lightmapUV));
+                        grassSceneNode->addChild(move(cluster));
+                    }
+                }
+            }
+            sceneGraph.addRoot(move(grassSceneNode));
         }
 
         auto room = make_unique<Room>(lytRoom.name, position, move(modelSceneNode), move(walkmeshSceneNode));
@@ -238,6 +267,12 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
     _objectsByTag[object->tag()].push_back(object);
 
     determineObjectRoom(*object);
+
+    auto sceneNode = object->sceneNode();
+    if (sceneNode) {
+        auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+        sceneGraph.addRoot(sceneNode);
+    }
 }
 
 void Area::determineObjectRoom(SpatialObject &object) {
@@ -259,45 +294,37 @@ void Area::doDestroyObjects() {
 
 void Area::doDestroyObject(uint32_t objectId) {
     shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(_game.objectFactory().getObjectById(objectId)));
-    if (!object)
+    if (!object) {
         return;
-    {
-        Room *room = object->room();
-        if (room) {
-            room->removeTenant(object.get());
+    }
+    auto room = object->room();
+    if (room) {
+        room->removeTenant(object.get());
+    }
+    auto sceneNode = object->sceneNode();
+    if (sceneNode) {
+        auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+        sceneGraph.removeRoot(sceneNode);
+    }
+    auto maybeObject = find_if(_objects.begin(), _objects.end(), [&object](auto &o) { return o.get() == object.get(); });
+    if (maybeObject != _objects.end()) {
+        _objects.erase(maybeObject);
+    }
+    auto maybeTagObjects = _objectsByTag.find(object->tag());
+    if (maybeTagObjects != _objectsByTag.end()) {
+        auto &tagObjects = maybeTagObjects->second;
+        auto maybeObjectByTag = find_if(tagObjects.begin(), tagObjects.end(), [&object](auto &o) { return o.get() == object.get(); });
+        if (maybeObjectByTag != tagObjects.end()) {
+            tagObjects.erase(maybeObjectByTag);
+        }
+        if (tagObjects.empty()) {
+            _objectsByTag.erase(maybeTagObjects);
         }
     }
-    {
-        auto sceneNode = object->sceneNode();
-        if (sceneNode) {
-            _services.sceneGraphs.get(kSceneMain).removeRoot(sceneNode);
-        }
-    }
-    {
-        auto maybeObject = find_if(_objects.begin(), _objects.end(), [&object](auto &o) { return o.get() == object.get(); });
-        if (maybeObject != _objects.end()) {
-            _objects.erase(maybeObject);
-        }
-    }
-    {
-        auto maybeTagObjects = _objectsByTag.find(object->tag());
-        if (maybeTagObjects != _objectsByTag.end()) {
-            ObjectList &tagObjects = maybeTagObjects->second;
-            auto maybeObject = find_if(tagObjects.begin(), tagObjects.end(), [&object](auto &o) { return o.get() == object.get(); });
-            if (maybeObject != tagObjects.end()) {
-                tagObjects.erase(maybeObject);
-            }
-            if (tagObjects.empty()) {
-                _objectsByTag.erase(maybeTagObjects);
-            }
-        }
-    }
-    {
-        ObjectList &typeObjects = _objectsByType.find(object->type())->second;
-        auto maybeObject = find_if(typeObjects.begin(), typeObjects.end(), [&object](auto &o) { return o.get() == object.get(); });
-        if (maybeObject != typeObjects.end()) {
-            typeObjects.erase(maybeObject);
-        }
+    auto &typeObjects = _objectsByType.find(object->type())->second;
+    auto maybeObjectByType = find_if(typeObjects.begin(), typeObjects.end(), [&object](auto &o) { return o.get() == object.get(); });
+    if (maybeObjectByType != typeObjects.end()) {
+        typeObjects.erase(maybeObjectByType);
     }
 }
 
@@ -358,9 +385,6 @@ void Area::unloadParty() {
 void Area::reloadParty() {
     shared_ptr<Creature> player(_game.party().player());
     loadParty(player->position(), player->getFacing());
-    for (auto &member : _game.party().members()) {
-        _game.sceneManager().onObjectCreated(*member.creature);
-    }
 }
 
 bool Area::handle(const SDL_Event &event) {
@@ -806,10 +830,6 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
     auto spatial = dynamic_pointer_cast<SpatialObject>(object);
     if (spatial) {
         add(spatial);
-        auto model = spatial->sceneNode();
-        if (model) {
-            _services.sceneGraphs.get(kSceneMain).addRoot(model);
-        }
         auto creature = dynamic_pointer_cast<Creature>(spatial);
         if (creature) {
             creature->runSpawnScript();
@@ -1444,6 +1464,9 @@ void Area::loadCameraStyle(const GffStruct &are) {
 
 void Area::loadAmbientColor(const GffStruct &are) {
     _ambientColor = are.getColor("DynAmbientColor", g_defaultAmbientColor);
+
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    sceneGraph.setAmbientLightColor(_ambientColor);
 }
 
 void Area::loadScripts(const GffStruct &are) {
@@ -1488,6 +1511,12 @@ void Area::loadFog(const GffStruct &are) {
     _fogNear = are.getFloat("SunFogNear");
     _fogFar = are.getFloat("SunFogFar");
     _fogColor = are.getColor("SunFogColor");
+
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    sceneGraph.setFogEnabled(_fogEnabled);
+    sceneGraph.setFogNear(_fogNear);
+    sceneGraph.setFogFar(_fogFar);
+    sceneGraph.setFogColor(_fogColor);
 }
 
 } // namespace game
