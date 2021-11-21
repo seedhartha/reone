@@ -21,8 +21,7 @@
 
 #include "tgawriter.h"
 
-#include "s3tc.h"
-
+#include "../dxtutil.h"
 #include "../texture.h"
 
 using namespace std;
@@ -143,11 +142,11 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
             memcpy(pixels, mipMapPtr, 4ll * numPixels);
             break;
         case PixelFormat::DXT1: {
-            vector<unsigned long> decompPixels(numPixels);
-            BlockDecompressImageDXT1(mipMap.width, mipMap.height, mipMapPtr, &decompPixels[0]);
-            unsigned long *decompPtr = &decompPixels[0];
+            vector<uint32_t> decompPixels(numPixels);
+            decompressDXT1(mipMap.width, mipMap.height, mipMapPtr, &decompPixels[0]);
+            uint32_t *decompPtr = &decompPixels[0];
             for (int j = 0; j < numPixels; ++j) {
-                unsigned long rgba = *(decompPtr++);
+                uint32_t rgba = *(decompPtr++);
                 *(pixels++) = (rgba >> 8) & 0xff;
                 *(pixels++) = (rgba >> 16) & 0xff;
                 *(pixels++) = (rgba >> 24) & 0xff;
@@ -155,11 +154,11 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
             break;
         }
         case PixelFormat::DXT5: {
-            vector<unsigned long> decompPixels(numPixels);
-            BlockDecompressImageDXT5(mipMap.width, mipMap.height, mipMapPtr, &decompPixels[0]);
-            unsigned long *decompPtr = &decompPixels[0];
+            vector<uint32_t> decompPixels(numPixels);
+            decompressDXT5(mipMap.width, mipMap.height, mipMapPtr, &decompPixels[0]);
+            uint32_t *decompPtr = &decompPixels[0];
             for (int j = 0; j < numPixels; ++j) {
-                unsigned long rgba = *(decompPtr++);
+                uint32_t rgba = *(decompPtr++);
                 *(pixels++) = (rgba >> 8) & 0xff;
                 *(pixels++) = (rgba >> 16) & 0xff;
                 *(pixels++) = (rgba >> 24) & 0xff;
