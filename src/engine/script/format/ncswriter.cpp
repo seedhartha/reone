@@ -105,7 +105,7 @@ void NcsWriter::save(const fs::path &path) {
         }
     }
 
-    auto ncs = make_shared<fs::ofstream>(path);
+    auto ncs = make_shared<fs::ofstream>(path, ios::binary);
     StreamWriter ncsWriter(ncs, endian::order::big);
 
     ncsWriter.putString(string("NCS V1.0", 8));
