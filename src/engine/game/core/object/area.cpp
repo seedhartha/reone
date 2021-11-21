@@ -119,11 +119,11 @@ void Area::init() {
 void Area::load(string name, const GffStruct &are, const GffStruct &git, bool fromSave) {
     _name = move(name);
 
+    loadARE(are);
+    loadGIT(git);
     loadLYT();
     loadVIS();
     loadPTH();
-    loadARE(are);
-    loadGIT(git);
 }
 
 void Area::loadLYT() {
