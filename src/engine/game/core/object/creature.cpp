@@ -133,12 +133,16 @@ void Creature::updateModel() {
         return;
     }
     auto bodyModelName = getBodyModelName();
+    if (bodyModelName.empty()) {
+        return;
+    }
     auto replacement = _services.models.get(bodyModelName);
-
+    if (!replacement) {
+        return;
+    }
     auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
     model->setModel(move(replacement));
     finalizeModel(*model);
-
     if (!_stunt) {
         model->setLocalTransform(_transform);
     }
@@ -1068,8 +1072,8 @@ void Creature::finalizeModel(ModelSceneNode &body) {
     if (!headModelName.empty()) {
         shared_ptr<Model> headModel(_services.models.get(headModelName));
         if (headModel) {
-            auto headSceneNode = sceneGraph.newModel(headModel, ModelUsage::Creature, this);
-            body.attach(g_headHookNode, move(headSceneNode));
+            shared_ptr<ModelSceneNode> headSceneNode(sceneGraph.newModel(headModel, ModelUsage::Creature, this));
+            body.attach(g_headHookNode, headSceneNode);
             if (maskModel) {
                 auto maskSceneNode = sceneGraph.newModel(maskModel, ModelUsage::Equipment, this);
                 headSceneNode->attach(g_maskHookNode, move(maskSceneNode));
@@ -1083,7 +1087,7 @@ void Creature::finalizeModel(ModelSceneNode &body) {
     if (!rightWeaponModelName.empty()) {
         shared_ptr<Model> weaponModel(_services.models.get(rightWeaponModelName));
         if (weaponModel) {
-            auto weaponSceneNode = sceneGraph.newModel(weaponModel, ModelUsage::Equipment, this);
+            shared_ptr<ModelSceneNode> weaponSceneNode(sceneGraph.newModel(weaponModel, ModelUsage::Equipment, this));
             body.attach(g_rightHandNode, move(weaponSceneNode));
         }
     }
@@ -1094,7 +1098,7 @@ void Creature::finalizeModel(ModelSceneNode &body) {
     if (!leftWeaponModelName.empty()) {
         shared_ptr<Model> weaponModel(_services.models.get(leftWeaponModelName));
         if (weaponModel) {
-            auto weaponSceneNode = sceneGraph.newModel(weaponModel, ModelUsage::Equipment, this);
+            shared_ptr<ModelSceneNode> weaponSceneNode(sceneGraph.newModel(weaponModel, ModelUsage::Equipment, this));
             body.attach(g_leftHandNode, move(weaponSceneNode));
         }
     }

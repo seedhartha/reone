@@ -63,6 +63,8 @@ public:
         _script(script) {
     }
 
+    ~GameModule();
+
     void init();
 
     game::Game &game() { return *_game; }

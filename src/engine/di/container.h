@@ -39,6 +39,8 @@ public:
         _gameOptions(std::move(gameOptions)) {
     }
 
+    ~Container();
+
     void init();
 
     game::Game &getGame();

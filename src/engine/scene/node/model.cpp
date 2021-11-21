@@ -133,19 +133,19 @@ void ModelSceneNode::computeAABB() {
 }
 
 unique_ptr<DummySceneNode> ModelSceneNode::newDummySceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<DummySceneNode>(node, _sceneGraph, _context, _meshes, _shaders);
+    return make_unique<DummySceneNode>(move(node), _sceneGraph, _context, _meshes, _shaders);
 }
 
 unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<MeshSceneNode>(*this, node, _sceneGraph, _context, _features, _materials, _meshes, _pbrIbl, _shaders, _textures);
+    return make_unique<MeshSceneNode>(*this, move(node), _sceneGraph, _context, _features, _materials, _meshes, _pbrIbl, _shaders, _textures);
 }
 
 unique_ptr<LightSceneNode> ModelSceneNode::newLightSceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<LightSceneNode>(node, _sceneGraph, _context, _meshes, _shaders);
+    return make_unique<LightSceneNode>(move(node), _sceneGraph, _context, _meshes, _shaders);
 }
 
 unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<EmitterSceneNode>(node, _sceneGraph, _context, _meshes, _shaders);
+    return make_unique<EmitterSceneNode>(move(node), _sceneGraph, _context, _meshes, _shaders);
 }
 
 void ModelSceneNode::signalEvent(const string &name) {

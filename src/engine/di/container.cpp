@@ -43,6 +43,16 @@ void Container::init() {
     _game->init();
 }
 
+Container::~Container() {
+    _game.reset();
+    _script.reset();
+    _scene.reset();
+    _audio.reset();
+    _graphics.reset();
+    _resource.reset();
+    _common.reset();
+}
+
 Game &Container::getGame() {
     return _game->game();
 }

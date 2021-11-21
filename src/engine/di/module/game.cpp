@@ -101,6 +101,23 @@ void GameModule::init() {
     _game->init();
 }
 
+GameModule::~GameModule() {
+    _game.reset();
+    _services.reset();
+
+    _classes.reset();
+    _cursors.reset();
+    _feats.reset();
+    _footstepSounds.reset();
+    _guiSounds.reset();
+    _portraits.reset();
+    _reputes.reset();
+    _skills.reset();
+    _soundSets.reset();
+    _spells.reset();
+    _surfaces.reset();
+}
+
 unique_ptr<Game> GameModule::newGame() {
     switch (_gameId) {
     case GameID::Limbo:
