@@ -52,7 +52,6 @@
 #include "location.h"
 #include "object/factory.h"
 #include "party.h"
-#include "scenemanager.h"
 #include "services.h"
 #include "soundsets.h"
 #include "surfaces.h"
@@ -91,7 +90,6 @@ Game::Game(
     _actionFactory(*this, services),
     _objectFactory(*this, services),
     _routines(*this, services),
-    _sceneManager(services.surfaces, services.sceneGraphs.get(kSceneMain)),
     _scriptRunner(_routines, services.scripts),
     _console(*this, services),
     _profileOverlay(services) {
@@ -130,17 +128,18 @@ void Game::loadModule(const string &name, string entry) {
         _services.scripts.invalidate();
 
         try {
-            loadModuleResources(name);
-
             if (_module) {
                 _module->area()->runOnExitScript();
                 _module->area()->unloadParty();
             }
 
+            loadModuleResources(name);
             if (_loadScreen) {
                 _loadScreen->setProgress(50);
             }
             drawAll();
+
+            _services.sceneGraphs.get(kSceneMain).clear();
 
             auto maybeModule = _loadedModules.find(name);
             if (maybeModule != _loadedModules.end()) {
@@ -162,7 +161,6 @@ void Game::loadModule(const string &name, string entry) {
             }
 
             _module->loadParty(entry, _loadFromSaveGame);
-            _sceneManager.refresh(*_module->area());
 
             info("Module '" + name + "' loaded successfully");
 

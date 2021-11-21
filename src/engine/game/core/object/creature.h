@@ -112,80 +112,36 @@ public:
     void stopTalking();
 
     bool isSelectable() const override;
-    bool isMovementRestricted() const {
-        return _movementRestricted;
-    }
+    bool isMovementRestricted() const { return _movementRestricted; }
     bool isLevelUpPending() const;
 
     glm::vec3 getSelectablePosition() const override;
     float getAttackRange() const;
     int getNeededXP() const;
 
-    Gender gender() const {
-        return _gender;
-    }
-    ModelType modelType() const {
-        return _modelType;
-    }
-    int appearance() const {
-        return _appearance;
-    }
-    std::shared_ptr<graphics::Texture> portrait() const {
-        return _portrait;
-    }
-    float walkSpeed() const {
-        return _walkSpeed;
-    }
-    float runSpeed() const {
-        return _runSpeed;
-    }
-    CreatureAttributes &attributes() {
-        return _attributes;
-    }
-    Faction faction() const {
-        return _faction;
-    }
-    int xp() const {
-        return _xp;
-    }
-    RacialType racialType() const {
-        return _race;
-    }
-    Subrace subrace() const {
-        return _subrace;
-    }
-    NPCAIStyle aiStyle() const {
-        return _aiStyle;
-    }
-    int walkmeshMaterial() const {
-        return _walkmeshMaterial;
-    }
+    Gender gender() const { return _gender; }
+    ModelType modelType() const { return _modelType; }
+    int appearance() const { return _appearance; }
+    std::shared_ptr<graphics::Texture> portrait() const { return _portrait; }
+    float walkSpeed() const { return _walkSpeed; }
+    float runSpeed() const { return _runSpeed; }
+    CreatureAttributes &attributes() { return _attributes; }
+    Faction faction() const { return _faction; }
+    int xp() const { return _xp; }
+    RacialType racialType() const { return _race; }
+    Subrace subrace() const { return _subrace; }
+    NPCAIStyle aiStyle() const { return _aiStyle; }
+    int walkmeshMaterial() const { return _walkmeshMaterial; }
 
-    void setGender(Gender gender) {
-        _gender = gender;
-    }
-    void setAppearance(int appearance) {
-        _appearance = appearance;
-    }
+    void setGender(Gender gender) { _gender = gender; }
+    void setAppearance(int appearance) { _appearance = appearance; }
     void setMovementType(MovementType type);
-    void setFaction(Faction faction) {
-        _faction = faction;
-    }
-    void setMovementRestricted(bool restricted) {
-        _movementRestricted = restricted;
-    }
-    void setImmortal(bool immortal) {
-        _immortal = immortal;
-    }
-    void setXP(int xp) {
-        _xp = xp;
-    }
-    void setAIStyle(NPCAIStyle style) {
-        _aiStyle = style;
-    }
-    void setWalkmeshMaterial(int material) {
-        _walkmeshMaterial = material;
-    }
+    void setFaction(Faction faction) { _faction = faction; }
+    void setMovementRestricted(bool restricted) { _movementRestricted = restricted; }
+    void setImmortal(bool immortal) { _immortal = immortal; }
+    void setXP(int xp) { _xp = xp; }
+    void setAIStyle(NPCAIStyle style) { _aiStyle = style; }
+    void setWalkmeshMaterial(int material) { _walkmeshMaterial = material; }
 
     // Animation
 
@@ -210,9 +166,7 @@ public:
     std::shared_ptr<Item> getEquippedItem(int slot) const;
     CreatureWieldType getWieldType() const;
 
-    const std::map<int, std::shared_ptr<Item>> &equipment() const {
-        return _equipment;
-    }
+    const std::map<int, std::shared_ptr<Item>> &equipment() const { return _equipment; }
 
     // END Equipment
 
@@ -225,9 +179,7 @@ public:
     void clearPath();
     void setPath(const glm::vec3 &dest, std::vector<glm::vec3> &&points, uint32_t timeFound);
 
-    std::shared_ptr<Path> &path() {
-        return _path;
-    }
+    std::shared_ptr<Path> &path() { return _path; }
 
     // END Pathfinding
 
@@ -238,9 +190,7 @@ public:
     void onObjectHeard(const std::shared_ptr<SpatialObject> &object);
     void onObjectInaudible(const std::shared_ptr<SpatialObject> &object);
 
-    const Perception &perception() const {
-        return _perception;
-    }
+    const Perception &perception() const { return _perception; }
 
     // END Perception
 
@@ -249,18 +199,12 @@ public:
     void activateCombat();
     void deactivateCombat(float delay);
 
-    bool isInCombat() const {
-        return _combatState.active;
-    }
-    bool isDebilitated() const {
-        return _combatState.debilitated;
-    }
+    bool isInCombat() const { return _combatState.active; }
+    bool isDebilitated() const { return _combatState.debilitated; }
     bool isTwoWeaponFighting() const;
 
     std::shared_ptr<SpatialObject> getAttemptedAttackTarget() const;
-    std::shared_ptr<SpatialObject> getAttackTarget() const {
-        return _combatState.attackTarget;
-    }
+    std::shared_ptr<SpatialObject> getAttackTarget() const { return _combatState.attackTarget; }
     int getAttackBonus(bool offHand = false) const;
     int getDefense() const;
     void getMainHandDamage(int &min, int &max) const;
@@ -283,9 +227,7 @@ public:
     void giveGold(int amount);
     void takeGold(int amount);
 
-    int gold() const {
-        return _gold;
-    }
+    int gold() const { return _gold; }
 
     // END Gold
 
@@ -385,6 +327,7 @@ private:
     // Appearance
 
     std::shared_ptr<scene::ModelSceneNode> buildModel();
+    void finalizeModel(scene::ModelSceneNode &body);
 
     std::string getBodyModelName() const;
     std::string getBodyTextureName() const;

@@ -107,7 +107,13 @@ void Creature::loadAppearance() {
         _portrait = _services.portraits.getTextureByAppearance(_appearance);
     }
 
-    updateModel();
+    auto model = buildModel();
+    finalizeModel(*model);
+
+    _sceneNode = move(model);
+    _sceneNode->setLocalTransform(_transform);
+
+    _animDirty = true;
 }
 
 Creature::ModelType Creature::parseModelType(const string &s) const {
@@ -123,20 +129,20 @@ Creature::ModelType Creature::parseModelType(const string &s) const {
 }
 
 void Creature::updateModel() {
-    if (_sceneNode) {
-        _services.sceneGraphs.get(_sceneName).removeRoot(_sceneNode);
+    if (!_sceneNode) {
+        return;
     }
-    shared_ptr<ModelSceneNode> model(buildModel());
-    if (model) {
-        model->setCullable(true);
-        model->setDrawDistance(32.0f);
-        if (!_stunt) {
-            model->setLocalTransform(_transform);
-        }
-        _services.sceneGraphs.get(_sceneName).addRoot(model);
-        _animDirty = true;
+    auto bodyModelName = getBodyModelName();
+    auto replacement = _services.models.get(bodyModelName);
+
+    auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
+    model->setModel(move(replacement));
+    finalizeModel(*model);
+
+    if (!_stunt) {
+        model->setLocalTransform(_transform);
     }
-    _sceneNode = model;
+    _animDirty = true;
 }
 
 void Creature::loadTransformFromGIT(const GffStruct &gffs) {
@@ -305,8 +311,9 @@ bool Creature::equip(const string &resRef) {
 }
 
 bool Creature::equip(int slot, const shared_ptr<Item> &item) {
-    if (!item->isEquippable(slot))
+    if (!item->isEquippable(slot)) {
         return false;
+    }
 
     _equipment[slot] = item;
     item->setEquipped(true);
@@ -314,13 +321,11 @@ bool Creature::equip(int slot, const shared_ptr<Item> &item) {
     if (_sceneNode) {
         updateModel();
 
-        auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
-        if (model) {
-            if (slot == InventorySlot::rightWeapon) {
-                auto weapon = static_pointer_cast<ModelSceneNode>(model->getAttachment("rhand"));
-                if (weapon && weapon->model().classification() == MdlClassification::lightsaber) {
-                    weapon->playAnimation("powerup");
-                }
+        if (slot == InventorySlot::rightWeapon) {
+            auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
+            auto weapon = static_pointer_cast<ModelSceneNode>(model->getAttachment("rhand"));
+            if (weapon && weapon->model().classification() == MdlClassification::lightsaber) {
+                weapon->playAnimation("powerup");
             }
         }
     }
@@ -330,15 +335,15 @@ bool Creature::equip(int slot, const shared_ptr<Item> &item) {
 
 void Creature::unequip(const shared_ptr<Item> &item) {
     for (auto &equipped : _equipment) {
-        if (equipped.second == item) {
-            item->setEquipped(false);
-            _equipment.erase(equipped.first);
-
-            if (_sceneNode) {
-                updateModel();
-            }
-            break;
+        if (equipped.second != item) {
+            continue;
         }
+        item->setEquipped(false);
+        _equipment.erase(equipped.first);
+        if (_sceneNode) {
+            updateModel();
+        }
+        break;
     }
 }
 
@@ -1020,15 +1025,24 @@ string Creature::getActiveAnimationName() const {
 }
 
 shared_ptr<ModelSceneNode> Creature::buildModel() {
-    string bodyModelName(getBodyModelName());
-    if (bodyModelName.empty())
+    string modelName(getBodyModelName());
+    if (modelName.empty()) {
         return nullptr;
-
-    shared_ptr<Model> bodyModel(_services.models.get(bodyModelName));
-    if (!bodyModel)
+    }
+    shared_ptr<Model> model(_services.models.get(modelName));
+    if (!model) {
         return nullptr;
+    }
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
+    auto sceneNode = sceneGraph.newModel(model, ModelUsage::Creature, this);
+    sceneNode->setCullable(true);
+    sceneNode->setDrawDistance(32.0f);
 
-    auto bodySceneNode = _services.sceneGraphs.get(_sceneName).newModel(bodyModel, ModelUsage::Creature, this);
+    return move(sceneNode);
+}
+
+void Creature::finalizeModel(ModelSceneNode &body) {
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
 
     // Body texture
 
@@ -1036,7 +1050,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!bodyTextureName.empty()) {
         shared_ptr<Texture> texture(_services.textures.get(bodyTextureName, TextureUsage::Diffuse));
         if (texture) {
-            bodySceneNode->setDiffuseTexture(texture);
+            body.setDiffuseTexture(texture);
         }
     }
 
@@ -1054,10 +1068,10 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!headModelName.empty()) {
         shared_ptr<Model> headModel(_services.models.get(headModelName));
         if (headModel) {
-            auto headSceneNode = _services.sceneGraphs.get(_sceneName).newModel(headModel, ModelUsage::Creature, this);
-            bodySceneNode->attach(g_headHookNode, move(headSceneNode));
+            auto headSceneNode = sceneGraph.newModel(headModel, ModelUsage::Creature, this);
+            body.attach(g_headHookNode, move(headSceneNode));
             if (maskModel) {
-                auto maskSceneNode = _services.sceneGraphs.get(_sceneName).newModel(maskModel, ModelUsage::Equipment, this);
+                auto maskSceneNode = sceneGraph.newModel(maskModel, ModelUsage::Equipment, this);
                 headSceneNode->attach(g_maskHookNode, move(maskSceneNode));
             }
         }
@@ -1069,8 +1083,8 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!rightWeaponModelName.empty()) {
         shared_ptr<Model> weaponModel(_services.models.get(rightWeaponModelName));
         if (weaponModel) {
-            auto weaponSceneNode = _services.sceneGraphs.get(_sceneName).newModel(weaponModel, ModelUsage::Equipment, this);
-            bodySceneNode->attach(g_rightHandNode, move(weaponSceneNode));
+            auto weaponSceneNode = sceneGraph.newModel(weaponModel, ModelUsage::Equipment, this);
+            body.attach(g_rightHandNode, move(weaponSceneNode));
         }
     }
 
@@ -1080,12 +1094,10 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!leftWeaponModelName.empty()) {
         shared_ptr<Model> weaponModel(_services.models.get(leftWeaponModelName));
         if (weaponModel) {
-            auto weaponSceneNode = _services.sceneGraphs.get(_sceneName).newModel(weaponModel, ModelUsage::Equipment, this);
-            bodySceneNode->attach(g_leftHandNode, move(weaponSceneNode));
+            auto weaponSceneNode = sceneGraph.newModel(weaponModel, ModelUsage::Equipment, this);
+            body.attach(g_leftHandNode, move(weaponSceneNode));
         }
     }
-
-    return move(bodySceneNode);
 }
 
 string Creature::getBodyModelName() const {

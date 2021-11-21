@@ -32,7 +32,6 @@
 #include "options.h"
 #include "party.h"
 #include "profileoverlay.h"
-#include "scenemanager.h"
 #include "script/routine/routines.h"
 #include "script/runner.h"
 
@@ -103,7 +102,6 @@ public:
     ActionFactory &actionFactory() { return _actionFactory; }
     EffectFactory &effectFactory() { return _effectFactory; }
     ObjectFactory &objectFactory() { return _objectFactory; }
-    SceneManager &sceneManager() { return _sceneManager; }
     ScriptRunner &scriptRunner() { return _scriptRunner; }
 
     std::shared_ptr<Module> module() const { return _module; }
@@ -220,7 +218,6 @@ protected:
     EffectFactory _effectFactory;
     ObjectFactory _objectFactory;
     Routines _routines;
-    SceneManager _sceneManager;
     ScriptRunner _scriptRunner;
 
     // END Services

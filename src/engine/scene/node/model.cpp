@@ -550,6 +550,22 @@ string ModelSceneNode::getActiveAnimationName() const {
     return channel.anim->name();
 }
 
+void ModelSceneNode::setModel(shared_ptr<Model> model) {
+    _children.clear();
+
+    _model = move(model);
+
+    _nodeByName.clear();
+    _nodeByNumber.clear();
+    _attachments.clear();
+
+    _animChannels.clear();
+    _animBlendMode = AnimationBlendMode::Single;
+
+    buildNodeTree(_model->rootNode(), *this);
+    computeAABB();
+}
+
 } // namespace scene
 
 } // namespace reone
