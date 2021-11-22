@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "../../../graphics/walkmesh/walkmesh.h"
 #include "../../../scene/animproperties.h"
 #include "../../../scene/graph.h"
 #include "../../../scene/node/scenenode.h"
@@ -59,8 +58,6 @@ public:
 
     virtual glm::vec3 getSelectablePosition() const;
     float getFacing() const { return glm::eulerAngles(_orientation).z; }
-
-    virtual std::shared_ptr<graphics::Walkmesh> getWalkmesh() const;
 
     Room *room() const { return _room; }
     const glm::vec3 &position() const { return _position; }

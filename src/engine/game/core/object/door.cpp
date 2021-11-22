@@ -58,23 +58,40 @@ void Door::loadFromGIT(const GffStruct &gffs) {
 
 void Door::loadFromBlueprint(const string &resRef) {
     shared_ptr<GffStruct> utd(_services.gffs.get(resRef, ResourceType::Utd));
-    if (!utd)
+    if (!utd) {
         return;
-
+    }
     loadUTD(*utd);
-
     shared_ptr<TwoDA> doors(_services.twoDas.get("genericdoors"));
     string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
-    auto model = _services.sceneGraphs.get(_sceneName).newModel(_services.models.get(modelName), ModelUsage::Door);
-    model->setCullable(true);
-    model->setDrawDistance(FLT_MAX);
+    auto model = _services.models.get(modelName);
+    if (!model) {
+        return;
+    }
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
 
-    _sceneNode = move(model);
+    auto sceneNode = sceneGraph.newModel(move(model), ModelUsage::Door);
+    sceneNode->setCullable(true);
+    sceneNode->setDrawDistance(FLT_MAX);
+    _sceneNode = move(sceneNode);
 
-    _closedWalkmesh = _services.walkmeshes.get(modelName + "0", ResourceType::Dwk);
-    _open1Walkmesh = _services.walkmeshes.get(modelName + "1", ResourceType::Dwk);
-    _open2Walkmesh = _services.walkmeshes.get(modelName + "2", ResourceType::Dwk);
+    auto walkmeshOpen1 = _services.walkmeshes.get(modelName + "0", ResourceType::Dwk);
+    if (walkmeshOpen1) {
+        _walkmeshOpen1 = sceneGraph.newWalkmesh(str(boost::format("%s.open1") % modelName), move(walkmeshOpen1));
+        _walkmeshOpen1->setEnabled(false);
+    }
+
+    auto walkmeshOpen2 = _services.walkmeshes.get(modelName + "1", ResourceType::Dwk);
+    if (walkmeshOpen2) {
+        _walkmeshOpen2 = sceneGraph.newWalkmesh(str(boost::format("%s.open2") % modelName), move(walkmeshOpen2));
+        _walkmeshOpen2->setEnabled(false);
+    }
+
+    auto walkmeshClosed = _services.walkmeshes.get(modelName + "2", ResourceType::Dwk);
+    if (walkmeshClosed) {
+        _walkmeshClosed = sceneGraph.newWalkmesh(str(boost::format("%s.closed") % modelName), move(walkmeshClosed));
+    }
 }
 
 void Door::loadTransformFromGIT(const GffStruct &gffs) {
@@ -97,6 +114,15 @@ void Door::open(const shared_ptr<Object> &triggerrer) {
         // model->setDefaultAnimation("opened1", AnimationProperties::fromFlags(AnimationFlags::loop));
         model->playAnimation("opening1");
     }
+    if (_walkmeshOpen1) {
+        _walkmeshOpen1->setEnabled(true);
+    }
+    if (_walkmeshOpen2) {
+        _walkmeshOpen2->setEnabled(false);
+    }
+    if (_walkmeshClosed) {
+        _walkmeshClosed->setEnabled(false);
+    }
     _open = true;
 }
 
@@ -106,11 +132,16 @@ void Door::close(const shared_ptr<Object> &triggerrer) {
         // model->setDefaultAnimation("closed", AnimationProperties::fromFlags(AnimationFlags::loop));
         model->playAnimation("closing1");
     }
+    if (_walkmeshOpen1) {
+        _walkmeshOpen1->setEnabled(false);
+    }
+    if (_walkmeshOpen2) {
+        _walkmeshOpen2->setEnabled(false);
+    }
+    if (_walkmeshClosed) {
+        _walkmeshClosed->setEnabled(true);
+    }
     _open = false;
-}
-
-shared_ptr<Walkmesh> Door::getWalkmesh() const {
-    return _open ? _open1Walkmesh : _closedWalkmesh;
 }
 
 void Door::setLocked(bool locked) {
