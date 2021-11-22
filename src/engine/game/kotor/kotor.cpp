@@ -55,7 +55,7 @@
 #include "../core/surfaces.h"
 
 #include "gui/loadscreen.h"
-#include "routine/registrar.h"
+#include "routine/registerutil.h"
 
 using namespace std;
 
@@ -435,7 +435,7 @@ void KotOR::getDefaultPartyMembers(string &member1, string &member2, string &mem
 }
 
 void KotOR::initRoutines() {
-    KotORRoutineRegistrar(_routines).invoke();
+    registerRoutinesKotOR(_routines);
 }
 
 } // namespace game

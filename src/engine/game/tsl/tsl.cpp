@@ -23,7 +23,7 @@
 
 #include "../core/services.h"
 
-#include "routine/registrar.h"
+#include "routine/registerutil.h"
 
 using namespace std;
 
@@ -92,7 +92,7 @@ void TSL::getDefaultPartyMembers(string &member1, string &member2, string &membe
 }
 
 void TSL::initRoutines() {
-    TSLRoutineRegistrar(_routines).invoke();
+    registerRoutinesTSL(_routines);
 }
 
 } // namespace game

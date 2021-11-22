@@ -21,13 +21,9 @@ namespace reone {
 
 namespace game {
 
-/**
- * Registers engine routines for use in scripts.
- */
-class RoutineRegistrar {
-public:
-    virtual void invoke() = 0;
-};
+class IRoutines;
+
+void registerRoutinesTSL(IRoutines &routines);
 
 } // namespace game
 

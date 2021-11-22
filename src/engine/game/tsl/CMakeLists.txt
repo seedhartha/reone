@@ -14,11 +14,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(TSL_HEADERS
-    routine/registrar.h
+    routine/registerutil.h
     tsl.h)
 
 set(TSL_SOURCES
-    routine/registrar.cpp
+    routine/registerutil.cpp
     tsl.cpp)
 
 add_library(tsl STATIC ${TSL_HEADERS} ${TSL_SOURCES})

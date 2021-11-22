@@ -23,9 +23,9 @@
 #include "../../engine/common/exception/validation.h"
 #include "../../engine/common/logutil.h"
 #include "../../engine/game/core/script/routine/iroutines.h"
-#include "../../engine/game/kotor/routine/registrar.h"
-#include "../../engine/game/limbo/routine/registrar.h"
-#include "../../engine/game/tsl/routine/registrar.h"
+#include "../../engine/game/kotor/routine/registerutil.h"
+#include "../../engine/game/limbo/routine/registerutil.h"
+#include "../../engine/game/tsl/routine/registerutil.h"
 #include "../../engine/script/format/ncsreader.h"
 #include "../../engine/script/format/ncswriter.h"
 #include "../../engine/script/instrutil.h"
@@ -446,13 +446,13 @@ bool NcsTool::supports(Operation operation, const fs::path &target) const {
 void NcsTool::fillRoutines(IRoutines &routines) {
     switch (_gameId) {
     case GameID::TSL:
-        TSLRoutineRegistrar(routines).invoke();
+        registerRoutinesTSL(routines);
         break;
     case GameID::Limbo:
-        LimboRoutineRegistrar(routines).invoke();
+        registerRoutinesLimbo(routines);
         break;
     default: {
-        KotORRoutineRegistrar(routines).invoke();
+        registerRoutinesKotOR(routines);
         break;
     }
     }

@@ -17,25 +17,13 @@
 
 #pragma once
 
-#include "../../core/script/routine/registrar.h"
-
 namespace reone {
 
 namespace game {
 
 class IRoutines;
 
-class TSLRoutineRegistrar : public RoutineRegistrar {
-public:
-    TSLRoutineRegistrar(IRoutines &routines) :
-        _routines(routines) {
-    }
-
-    void invoke() override;
-
-private:
-    IRoutines &_routines;
-};
+void registerRoutinesKotOR(IRoutines &routines);
 
 } // namespace game
 
