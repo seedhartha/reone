@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(TEST_SOURCES
-    common/async/executor.cpp
     common/cache.cpp
     common/mediastream.cpp
     common/streamreader.cpp

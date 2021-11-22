@@ -26,7 +26,6 @@ namespace reone {
 namespace di {
 
 void Container::init() {
-    _common = make_unique<CommonModule>();
     _resource = make_unique<ResourceModule>(_gameOptions.gamePath);
     _graphics = make_unique<GraphicsModule>(_gameOptions.graphics, *_resource);
     _audio = make_unique<AudioModule>(_gameOptions.audio, *_resource);
@@ -34,7 +33,6 @@ void Container::init() {
     _script = make_unique<ScriptModule>(*_resource);
     _game = make_unique<GameModule>(_gameId, _gameOptions, _gameOptions.gamePath, *_resource, *_graphics, *_audio, *_scene, *_script);
 
-    _common->init();
     _resource->init();
     _graphics->init();
     _audio->init();
@@ -50,7 +48,6 @@ Container::~Container() {
     _audio.reset();
     _graphics.reset();
     _resource.reset();
-    _common.reset();
 }
 
 Game &Container::getGame() {

@@ -21,7 +21,6 @@
 #include "../game/types.h"
 
 #include "module/audio.h"
-#include "module/common.h"
 #include "module/game.h"
 #include "module/graphics.h"
 #include "module/resource.h"
@@ -49,7 +48,6 @@ private:
     game::GameID _gameId;
     game::Options _gameOptions;
 
-    std::unique_ptr<CommonModule> _common;
     std::unique_ptr<ResourceModule> _resource;
     std::unique_ptr<GraphicsModule> _graphics;
     std::unique_ptr<AudioModule> _audio;
