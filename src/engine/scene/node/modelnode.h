@@ -42,7 +42,14 @@ protected:
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders);
+        graphics::Shaders &shaders) :
+        SceneNode(
+            type,
+            sceneGraph,
+            context,
+            meshes,
+            shaders) {
+    }
 };
 
 } // namespace scene

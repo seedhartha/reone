@@ -74,7 +74,6 @@ public:
 
     glm::vec3 getWorldCenterOfAABB() const;
 
-    const std::string &name() const { return _name; }
     SceneNodeType type() const { return _type; }
     SceneNode *parent() { return _parent; }
     const SceneNode *parent() const { return _parent; }
@@ -96,7 +95,6 @@ public:
     // END Transformations
 
 protected:
-    std::string _name;
     SceneNodeType _type;
 
     graphics::AABB _aabb;
@@ -131,13 +129,11 @@ protected:
     // END Flags
 
     SceneNode(
-        std::string name,
         SceneNodeType type,
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders) :
-        _name(std::move(name)),
         _type(type),
         _sceneGraph(sceneGraph),
         _context(context),

@@ -51,7 +51,6 @@ ModelSceneNode::ModelSceneNode(
     Textures &textures,
     IAnimationEventListener *animEventListener) :
     SceneNode(
-        model->name(),
         SceneNodeType::Model,
         sceneGraph,
         context,

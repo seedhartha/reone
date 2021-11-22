@@ -390,9 +390,8 @@ unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode)
     return make_unique<DummySceneNode>(move(modelNode), *this, _context, _meshes, _shaders);
 }
 
-unique_ptr<CameraSceneNode> SceneGraph::newCamera(string name, glm::mat4 projection) {
+unique_ptr<CameraSceneNode> SceneGraph::newCamera(glm::mat4 projection) {
     return make_unique<CameraSceneNode>(
-        move(name),
         move(projection),
         *this,
         _context,
@@ -415,9 +414,8 @@ unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUs
         animEventListener);
 }
 
-unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(string name, shared_ptr<Walkmesh> walkmesh) {
+unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(shared_ptr<Walkmesh> walkmesh) {
     return make_unique<WalkmeshSceneNode>(
-        move(name),
         move(walkmesh),
         *this,
         _context,
@@ -425,9 +423,8 @@ unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(string name, shared_ptr<Wa
         _shaders);
 }
 
-unique_ptr<GrassSceneNode> SceneGraph::newGrass(string name, glm::vec2 quadSize, shared_ptr<Texture> texture, shared_ptr<Texture> lightmap) {
+unique_ptr<GrassSceneNode> SceneGraph::newGrass(glm::vec2 quadSize, shared_ptr<Texture> texture, shared_ptr<Texture> lightmap) {
     return make_unique<GrassSceneNode>(
-        move(name),
         move(quadSize),
         move(texture),
         move(lightmap),

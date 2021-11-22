@@ -35,7 +35,7 @@ AnimatedCamera::AnimatedCamera(float aspect, SceneGraph &sceneGraph) :
     _sceneGraph(sceneGraph),
     _aspect(aspect) {
 
-    _sceneNode = _sceneGraph.newCamera("", glm::mat4(1.0f));
+    _sceneNode = _sceneGraph.newCamera(glm::mat4(1.0f));
 
     updateProjection();
 }

@@ -31,7 +31,6 @@ public:
         graphics::Meshes &meshes,
         graphics::Shaders &shaders) :
         SceneNode(
-            "",
             SceneNodeType::GrassCluster,
             sceneGraph,
             context,

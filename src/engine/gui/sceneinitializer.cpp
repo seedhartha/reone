@@ -48,7 +48,7 @@ void SceneInitializer::invoke() {
     _sceneGraph.addRoot(model);
     _sceneGraph.setAmbientLightColor(_ambientLightColor);
 
-    shared_ptr<CameraSceneNode> cameraNode(_sceneGraph.newCamera("", projection));
+    shared_ptr<CameraSceneNode> cameraNode(_sceneGraph.newCamera(projection));
     if (_cameraNodeName.empty()) {
         cameraNode->setLocalTransform(_cameraTransform);
     } else {
