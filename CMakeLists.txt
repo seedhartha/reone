@@ -24,8 +24,6 @@ option(BUILD_TESTS "build unit tests" OFF)
 
 option(ENABLE_VIDEO "enable video playback" ON)
 
-option(USE_EXTERNAL_GLM "use GLM library from external subdirectory" ON)
-
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 find_package(Boost REQUIRED COMPONENTS filesystem program_options system OPTIONAL_COMPONENTS regex unit_test_framework)
 find_package(OpenGL REQUIRED)
@@ -43,7 +41,7 @@ else()
     find_package(Threads REQUIRED)
 endif()
 
-include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${MAD_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src/external/glm)
 
 if(ENABLE_VIDEO)
     if(MSVC)
@@ -52,12 +50,6 @@ if(ENABLE_VIDEO)
         pkg_check_modules(FFMPEG REQUIRED libavcodec libavformat libavutil libswresample libswscale)
     endif()
     include_directories(${FFMPEG_INCLUDE_DIRS})
-endif()
-
-if(USE_EXTERNAL_GLM)
-    include_directories(${CMAKE_SOURCE_DIR}/src/external/glm)
-else()
-    find_package(glm REQUIRED)
 endif()
 
 add_compile_definitions(BOOST_BIND_GLOBAL_PLACEHOLDERS)
