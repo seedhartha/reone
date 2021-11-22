@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../../../resource/format/gffreader.h"
+#include "../../../scene/node/walkmesh.h"
 
 #include "spatial.h"
 
@@ -46,13 +47,11 @@ public:
     void loadFromGIT(const resource::GffStruct &gffs);
     void loadFromBlueprint(const std::string &resRef);
 
-    bool isSelectable() const override;
-
     bool hasInventory() const { return _hasInventory; }
-
+    bool isSelectable() const override { return _usable; }
     bool isUsable() const { return _usable; }
 
-    std::shared_ptr<graphics::Walkmesh> getWalkmesh() const override;
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmesh() const { return _walkmesh; }
 
     // Scripts
 
@@ -65,7 +64,6 @@ private:
     int _appearance {0};
     bool _hasInventory {false};
     bool _usable {false};
-    std::shared_ptr<graphics::Walkmesh> _walkmesh;
     Faction _faction {Faction::Invalid};
     bool _keyRequired {false};
     bool _lockable {false};
@@ -76,6 +74,8 @@ private:
     int _fortitude {0};
     bool _partyInteract {false};
     bool _static {false};
+
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmesh;
 
     // Scripts
 

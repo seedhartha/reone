@@ -196,10 +196,6 @@ bool SpatialObject::isSelectable() const {
     return false;
 }
 
-shared_ptr<Walkmesh> SpatialObject::getWalkmesh() const {
-    return nullptr;
-}
-
 glm::vec3 SpatialObject::getSelectablePosition() const {
     auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
     return model ? model->getWorldCenterOfAABB() : _position;

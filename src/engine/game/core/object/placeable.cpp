@@ -46,26 +46,33 @@ namespace game {
 void Placeable::loadFromGIT(const GffStruct &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
-
     loadTransformFromGIT(gffs);
 }
 
 void Placeable::loadFromBlueprint(const string &resRef) {
     shared_ptr<GffStruct> utp(_services.gffs.get(resRef, ResourceType::Utp));
-    if (!utp)
+    if (!utp) {
         return;
-
+    }
     loadUTP(*utp);
-
     shared_ptr<TwoDA> placeables(_services.twoDas.get("placeables"));
     string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
-    auto model = _services.sceneGraphs.get(_sceneName).newModel(_services.models.get(modelName), ModelUsage::Placeable);
-    model->setCullable(true);
-    model->setDrawDistance(64.0f);
-    _sceneNode = move(model);
+    auto model = _services.models.get(modelName);
+    if (!model) {
+        return;
+    }
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
 
-    _walkmesh = _services.walkmeshes.get(modelName, ResourceType::Pwk);
+    auto sceneNode = sceneGraph.newModel(move(model), ModelUsage::Placeable);
+    sceneNode->setCullable(true);
+    sceneNode->setDrawDistance(64.0f);
+    _sceneNode = move(sceneNode);
+
+    auto walkmesh = _services.walkmeshes.get(modelName, ResourceType::Pwk);
+    if (walkmesh) {
+        _walkmesh = sceneGraph.newWalkmesh(modelName, move(walkmesh));
+    }
 }
 
 void Placeable::loadTransformFromGIT(const GffStruct &gffs) {
@@ -76,14 +83,6 @@ void Placeable::loadTransformFromGIT(const GffStruct &gffs) {
     _orientation = glm::quat(glm::vec3(0.0f, 0.0f, gffs.getFloat("Bearing")));
 
     updateTransform();
-}
-
-bool Placeable::isSelectable() const {
-    return _usable;
-}
-
-shared_ptr<Walkmesh> Placeable::getWalkmesh() const {
-    return _walkmesh;
 }
 
 void Placeable::runOnUsed(shared_ptr<SpatialObject> usedBy) {

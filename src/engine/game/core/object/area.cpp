@@ -27,6 +27,7 @@
 #include "../../../graphics/model/models.h"
 #include "../../../graphics/texture/textures.h"
 #include "../../../graphics/triangleutil.h"
+#include "../../../graphics/walkmesh/walkmesh.h"
 #include "../../../graphics/walkmesh/walkmeshes.h"
 #include "../../../resource/2da.h"
 #include "../../../resource/2das.h"
@@ -268,10 +269,31 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
 
     determineObjectRoom(*object);
 
-    auto sceneNode = object->sceneNode();
-    if (sceneNode) {
-        auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
-        sceneGraph.addRoot(sceneNode);
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto model = object->sceneNode();
+    if (model) {
+        sceneGraph.addRoot(model);
+    }
+    if (object->type() == ObjectType::Placeable) {
+        auto placeable = static_pointer_cast<Placeable>(object);
+        auto walkmesh = placeable->walkmesh();
+        if (walkmesh) {
+            sceneGraph.addRoot(walkmesh);
+        }
+    } else if (object->type() == ObjectType::Door) {
+        auto door = static_pointer_cast<Door>(object);
+        auto walkmeshOpen1 = door->walkmeshOpen1();
+        if (walkmeshOpen1) {
+            sceneGraph.addRoot(walkmeshOpen1);
+        }
+        auto walkmeshOpen2 = door->walkmeshOpen2();
+        if (walkmeshOpen2) {
+            sceneGraph.addRoot(walkmeshOpen2);
+        }
+        auto walkmeshClosed = door->walkmeshClosed();
+        if (walkmeshClosed) {
+            sceneGraph.addRoot(walkmeshClosed);
+        }
     }
 }
 
@@ -301,11 +323,34 @@ void Area::doDestroyObject(uint32_t objectId) {
     if (room) {
         room->removeTenant(object.get());
     }
+
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
     auto sceneNode = object->sceneNode();
     if (sceneNode) {
-        auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
         sceneGraph.removeRoot(sceneNode);
     }
+    if (object->type() == ObjectType::Placeable) {
+        auto placeable = static_pointer_cast<Placeable>(object);
+        auto walkmesh = placeable->walkmesh();
+        if (walkmesh) {
+            sceneGraph.removeRoot(walkmesh);
+        }
+    } else if (object->type() == ObjectType::Door) {
+        auto door = static_pointer_cast<Door>(object);
+        auto walkmeshOpen1 = door->walkmeshOpen1();
+        if (walkmeshOpen1) {
+            sceneGraph.removeRoot(walkmeshOpen1);
+        }
+        auto walkmeshOpen2 = door->walkmeshOpen2();
+        if (walkmeshOpen2) {
+            sceneGraph.removeRoot(walkmeshOpen2);
+        }
+        auto walkmeshClosed = door->walkmeshClosed();
+        if (walkmeshClosed) {
+            sceneGraph.removeRoot(walkmeshClosed);
+        }
+    }
+
     auto maybeObject = find_if(_objects.begin(), _objects.end(), [&object](auto &o) { return o.get() == object.get(); });
     if (maybeObject != _objects.end()) {
         _objects.erase(maybeObject);
@@ -1200,6 +1245,7 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
 
     auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaceIndices();
 
+    /*
     // Test object walkmeshes
     for (auto &o : _objects) {
         // Object must have a valid model and walkmesh
@@ -1222,6 +1268,7 @@ bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room
             return false;
         }
     }
+    */
 
     // Test room walkmeshes
     for (auto &r : _rooms) {

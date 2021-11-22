@@ -20,6 +20,7 @@
 #include "spatial.h"
 
 #include "../../../resource/format/gffreader.h"
+#include "../../../scene/node/walkmesh.h"
 
 namespace reone {
 
@@ -52,8 +53,6 @@ public:
     bool isStatic() const { return _static; }
     bool isKeyRequired() const { return _keyRequired; }
 
-    std::shared_ptr<graphics::Walkmesh> getWalkmesh() const override;
-
     const std::string &getOnOpen() const { return _onOpen; }
     const std::string &getOnFailToOpen() const { return _onFailToOpen; }
 
@@ -63,6 +62,14 @@ public:
     const std::string &transitionDestin() const { return _transitionDestin; }
 
     void setLocked(bool locked);
+
+    // Walkmeshes
+
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshOpen1() const { return _walkmeshOpen1; }
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshOpen2() const { return _walkmeshOpen2; }
+    std::shared_ptr<scene::WalkmeshSceneNode> walkmeshClosed() const { return _walkmeshClosed; }
+
+    // END Walkmeshes
 
 private:
     bool _locked {false};
@@ -80,6 +87,14 @@ private:
     bool _lockable {false};
     std::string _keyName;
 
+    // Walkmeshes
+
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen1;
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshOpen2;
+    std::shared_ptr<scene::WalkmeshSceneNode> _walkmeshClosed;
+
+    // END Walkmeshes
+
     // Scripts
 
     std::string _onOpen;
@@ -93,14 +108,6 @@ private:
     std::string _onSpellCastAt;
 
     // END Scripts
-
-    // Walkmeshes
-
-    std::shared_ptr<graphics::Walkmesh> _closedWalkmesh;
-    std::shared_ptr<graphics::Walkmesh> _open1Walkmesh;
-    std::shared_ptr<graphics::Walkmesh> _open2Walkmesh;
-
-    // END Walkmeshes
 
     void loadTransformFromGIT(const resource::GffStruct &gffs);
 
