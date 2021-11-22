@@ -76,11 +76,6 @@ add_subdirectory(src/engine/video) # video static library
 add_subdirectory(src/engine/scene) # scene static library
 add_subdirectory(src/engine/gui) # gui static library
 add_subdirectory(src/engine/script) # script static library
-
-add_subdirectory(src/engine/game/core) # gamecore static library
-add_subdirectory(src/engine/game/limbo) # limbo static library
-add_subdirectory(src/engine/game/kotor) # kotor static library
-add_subdirectory(src/engine/game/tsl) # tsl static library
 add_subdirectory(src/engine/game) # game static library
 
 # END Engine libraries

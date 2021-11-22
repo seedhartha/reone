@@ -13,6 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+add_subdirectory(core) # gamecore static library
+add_subdirectory(limbo) # limbo static library
+add_subdirectory(kotor) # kotor static library
+add_subdirectory(tsl) # tsl static library
+
 set(GAME_HEADERS
     probe.h
     types.h)
