@@ -28,15 +28,8 @@ namespace reone {
 
 namespace resource {
 
-/**
- * Encapsulates game resource management. Contains a prioritized list of
- * resource providers, that it queries for resources by ResRef and ResType.
- * Caches found resources.
- */
 class Resources : boost::noncopyable {
 public:
-    Resources() = default;
-
     void indexKeyFile(const boost::filesystem::path &path);
     void indexErfFile(const boost::filesystem::path &path, bool transient = false);
     void indexRimFile(const boost::filesystem::path &path, bool transient = false);
@@ -46,23 +39,17 @@ public:
     void invalidate();
     void clearTransientProviders();
 
-    std::shared_ptr<ByteArray> getRaw(const std::string &resRef, ResourceType type, bool logNotFound = true);
+    std::shared_ptr<ByteArray> get(const std::string &resRef, ResourceType type, bool logNotFound = true);
     std::shared_ptr<ByteArray> getFromExe(uint32_t name, PEResourceType type);
 
 private:
-    std::unordered_map<ResourceId, std::shared_ptr<ByteArray>, ResourceIdHasher> _cache;
-
-    // Providers
-
     PEReader _exeFile;
     std::vector<std::unique_ptr<IResourceProvider>> _providers;
     std::vector<std::unique_ptr<IResourceProvider>> _transientProviders; /**< transient providers are replaced when switching between modules */
 
-    // END Providers
-
     void indexProvider(std::unique_ptr<IResourceProvider> &&provider, const boost::filesystem::path &path, bool transient = false);
 
-    std::shared_ptr<ByteArray> doGetRaw(const ResourceId &id, const std::vector<std::unique_ptr<IResourceProvider>> &providers);
+    std::shared_ptr<ByteArray> getFromProviders(const ResourceId &id, const std::vector<std::unique_ptr<IResourceProvider>> &providers);
 };
 
 } // namespace resource

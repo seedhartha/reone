@@ -38,7 +38,7 @@ Lips::Lips(Resources &resources) :
 }
 
 shared_ptr<LipAnimation> Lips::doGet(string resRef) {
-    shared_ptr<ByteArray> lipData(_resources.getRaw(resRef, ResourceType::Lip));
+    shared_ptr<ByteArray> lipData(_resources.get(resRef, ResourceType::Lip));
     if (!lipData)
         return nullptr;
 

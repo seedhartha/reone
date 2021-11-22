@@ -153,7 +153,6 @@ void KotOR::start() {
 void KotOR::loadModuleResources(const string &moduleName) {
     _services.twoDas.invalidate();
     _services.gffs.invalidate();
-    _services.resources.invalidate();
     _services.resources.clearTransientProviders();
 
     fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));

@@ -35,7 +35,7 @@ shared_ptr<GffStruct> Gffs::get(const string &resRef, ResourceType type) {
         return maybeGff->second;
     }
     shared_ptr<GffStruct> gff;
-    auto maybeRaw = _resources.getRaw(resRef, type);
+    auto maybeRaw = _resources.get(resRef, type);
     if (maybeRaw) {
         GffReader reader;
         reader.load(wrap(*maybeRaw));

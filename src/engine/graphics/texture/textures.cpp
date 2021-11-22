@@ -112,14 +112,14 @@ shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {
 shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     shared_ptr<Texture> texture;
 
-    shared_ptr<ByteArray> tgaData(_resources.getRaw(resRef, ResourceType::Tga, false));
+    shared_ptr<ByteArray> tgaData(_resources.get(resRef, ResourceType::Tga, false));
     if (tgaData) {
         TgaReader tga(resRef, usage);
         tga.load(wrap(tgaData));
         texture = tga.texture();
 
         if (texture) {
-            shared_ptr<ByteArray> txiData(_resources.getRaw(resRef, ResourceType::Txi, false));
+            shared_ptr<ByteArray> txiData(_resources.get(resRef, ResourceType::Txi, false));
             if (txiData) {
                 TxiReader txi;
                 txi.load(wrap(txiData));
@@ -129,7 +129,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     }
 
     if (!texture) {
-        shared_ptr<ByteArray> tpcData(_resources.getRaw(resRef, ResourceType::Tpc, false));
+        shared_ptr<ByteArray> tpcData(_resources.get(resRef, ResourceType::Tpc, false));
         if (tpcData) {
             TpcReader tpc(resRef, usage);
             tpc.load(wrap(tpcData));
