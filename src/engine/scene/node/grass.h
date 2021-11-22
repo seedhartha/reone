@@ -34,7 +34,6 @@ class GrassClusterSceneNode;
 class GrassSceneNode : public SceneNode {
 public:
     GrassSceneNode(
-        std::string name,
         glm::vec2 quadSize,
         std::shared_ptr<graphics::Texture> texture,
         std::shared_ptr<graphics::Texture> lightmap,
@@ -43,7 +42,6 @@ public:
         graphics::Meshes &meshes,
         graphics::Shaders &shaders) :
         SceneNode(
-            std::move(name),
             SceneNodeType::Grass,
             sceneGraph,
             context,

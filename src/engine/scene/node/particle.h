@@ -34,7 +34,6 @@ public:
         graphics::Meshes &meshes,
         graphics::Shaders &shaders) :
         SceneNode(
-            "",
             SceneNodeType::Particle,
             sceneGraph,
             context,

@@ -127,15 +127,15 @@ public:
     // Factory methods
 
     std::unique_ptr<DummySceneNode> newDummy(std::shared_ptr<graphics::ModelNode> modelNode);
-    std::unique_ptr<CameraSceneNode> newCamera(std::string name, glm::mat4 projection);
+    std::unique_ptr<CameraSceneNode> newCamera(glm::mat4 projection);
 
     std::unique_ptr<ModelSceneNode> newModel(
         std::shared_ptr<graphics::Model> model,
         ModelUsage usage,
         IAnimationEventListener *animEventListener = nullptr);
 
-    std::unique_ptr<WalkmeshSceneNode> newWalkmesh(std::string name, std::shared_ptr<graphics::Walkmesh> walkmesh);
-    std::unique_ptr<GrassSceneNode> newGrass(std::string name, glm::vec2 quadSize, std::shared_ptr<graphics::Texture> texture, std::shared_ptr<graphics::Texture> lightmap);
+    std::unique_ptr<WalkmeshSceneNode> newWalkmesh(std::shared_ptr<graphics::Walkmesh> walkmesh);
+    std::unique_ptr<GrassSceneNode> newGrass(glm::vec2 quadSize, std::shared_ptr<graphics::Texture> texture, std::shared_ptr<graphics::Texture> lightmap);
 
     // END Factory methods
 

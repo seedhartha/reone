@@ -71,7 +71,7 @@ void Placeable::loadFromBlueprint(const string &resRef) {
 
     auto walkmesh = _services.walkmeshes.get(modelName, ResourceType::Pwk);
     if (walkmesh) {
-        _walkmesh = sceneGraph.newWalkmesh(modelName, move(walkmesh));
+        _walkmesh = sceneGraph.newWalkmesh(move(walkmesh));
     }
 }
 

@@ -158,7 +158,7 @@ void Area::loadLYT() {
         shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
         auto walkmesh = _services.walkmeshes.get(lytRoom.name, ResourceType::Wok);
         if (walkmesh) {
-            walkmeshSceneNode = sceneGraph.newWalkmesh(lytRoom.name, walkmesh);
+            walkmeshSceneNode = sceneGraph.newWalkmesh(walkmesh);
             sceneGraph.addRoot(walkmeshSceneNode);
         }
 
@@ -166,7 +166,7 @@ void Area::loadLYT() {
         auto aabbNode = modelSceneNode->model().getAABBNode();
         if (_grass.texture && aabbNode) {
             glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), position));
-            auto grassSceneNode = sceneGraph.newGrass(lytRoom.name, glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap);
+            auto grassSceneNode = sceneGraph.newGrass(glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap);
             for (auto &material : _services.surfaces.getGrassSurfaceIndices()) {
                 for (auto &face : aabbNode->getFacesByMaterial(material)) {
                     vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getTriangleCoords(face));

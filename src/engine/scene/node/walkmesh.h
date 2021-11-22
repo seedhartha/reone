@@ -32,14 +32,12 @@ namespace scene {
 class WalkmeshSceneNode : public SceneNode {
 public:
     WalkmeshSceneNode(
-        std::string name,
         std::shared_ptr<graphics::Walkmesh> walkmesh,
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders) :
         SceneNode(
-            std::move(name),
             SceneNodeType::Walkmesh,
             sceneGraph,
             context,

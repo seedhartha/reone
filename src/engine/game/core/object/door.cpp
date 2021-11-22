@@ -78,19 +78,19 @@ void Door::loadFromBlueprint(const string &resRef) {
 
     auto walkmeshOpen1 = _services.walkmeshes.get(modelName + "0", ResourceType::Dwk);
     if (walkmeshOpen1) {
-        _walkmeshOpen1 = sceneGraph.newWalkmesh(str(boost::format("%s.open1") % modelName), move(walkmeshOpen1));
+        _walkmeshOpen1 = sceneGraph.newWalkmesh(move(walkmeshOpen1));
         _walkmeshOpen1->setEnabled(false);
     }
 
     auto walkmeshOpen2 = _services.walkmeshes.get(modelName + "1", ResourceType::Dwk);
     if (walkmeshOpen2) {
-        _walkmeshOpen2 = sceneGraph.newWalkmesh(str(boost::format("%s.open2") % modelName), move(walkmeshOpen2));
+        _walkmeshOpen2 = sceneGraph.newWalkmesh(move(walkmeshOpen2));
         _walkmeshOpen2->setEnabled(false);
     }
 
     auto walkmeshClosed = _services.walkmeshes.get(modelName + "2", ResourceType::Dwk);
     if (walkmeshClosed) {
-        _walkmeshClosed = sceneGraph.newWalkmesh(str(boost::format("%s.closed") % modelName), move(walkmeshClosed));
+        _walkmeshClosed = sceneGraph.newWalkmesh(move(walkmeshClosed));
     }
 }
 
