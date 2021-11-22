@@ -16,7 +16,6 @@
 set(REONE_HEADERS
     di/container.h
     di/module/audio.h
-    di/module/common.h
     di/module/game.h
     di/module/graphics.h
     di/module/resource.h
@@ -29,7 +28,6 @@ set(REONE_HEADERS
 set(REONE_SOURCES
     di/container.cpp
     di/module/audio.cpp
-    di/module/common.cpp
     di/module/game.cpp
     di/module/graphics.cpp
     di/module/resource.cpp

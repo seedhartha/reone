@@ -14,9 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(COMMON_HEADERS
-    async/executor.h
-    async/impl/task.h
-    async/task.h
     cache.h
     collectionutil.h
     exception/validation.h
@@ -33,8 +30,6 @@ set(COMMON_HEADERS
     unicodeutil.h)
 
 set(COMMON_SOURCES
-    async/executor.cpp
-    async/impl/task.cpp
     logutil.cpp
     pathutil.cpp
     randomutil.cpp
