@@ -217,7 +217,6 @@ set(GAMECORE_HEADERS
     script/routine/declarations.h
     script/routine/iroutines.h
     script/routine/objectutil.h
-    script/routine/registrar.h
     script/routine/routines.h
     script/runner.h
     soundsets.h

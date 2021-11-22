@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "registrar.h"
+#include "registerutil.h"
 
 #include "../../../script/types.h"
 
@@ -38,20 +38,20 @@ namespace game {
 #define VT_VECTOR script::VariableType::Vector
 #define VT_ACTION script::VariableType::Action
 
-void LimboRoutineRegistrar::invoke() {
-    _routines.add("fabs", VT_F, {VT_F}, &routine::fabs);
-    _routines.add("cos", VT_F, {VT_F}, &routine::cos);
-    _routines.add("sin", VT_F, {VT_F}, &routine::sin);
-    _routines.add("tan", VT_F, {VT_F}, &routine::tan);
-    _routines.add("acos", VT_F, {VT_F}, &routine::acos);
-    _routines.add("asin", VT_F, {VT_F}, &routine::asin);
-    _routines.add("atan", VT_F, {VT_F}, &routine::atan);
-    _routines.add("log", VT_F, {VT_F}, &routine::log);
-    _routines.add("pow", VT_F, {VT_F, VT_F}, &routine::pow);
-    _routines.add("sqrt", VT_F, {VT_F}, &routine::sqrt);
-    _routines.add("abs", VT_I, {VT_I}, &routine::abs);
+void registerRoutinesLimbo(IRoutines &routines) {
+    routines.add("fabs", VT_F, {VT_F}, &routine::fabs);
+    routines.add("cos", VT_F, {VT_F}, &routine::cos);
+    routines.add("sin", VT_F, {VT_F}, &routine::sin);
+    routines.add("tan", VT_F, {VT_F}, &routine::tan);
+    routines.add("acos", VT_F, {VT_F}, &routine::acos);
+    routines.add("asin", VT_F, {VT_F}, &routine::asin);
+    routines.add("atan", VT_F, {VT_F}, &routine::atan);
+    routines.add("log", VT_F, {VT_F}, &routine::log);
+    routines.add("pow", VT_F, {VT_F, VT_F}, &routine::pow);
+    routines.add("sqrt", VT_F, {VT_F}, &routine::sqrt);
+    routines.add("abs", VT_I, {VT_I}, &routine::abs);
 
-    _routines.add("StartNewModule", VT_V, {VT_S, VT_S, VT_S, VT_S, VT_S, VT_S, VT_S, VT_S}, &routine::startNewModule);
+    routines.add("StartNewModule", VT_V, {VT_S, VT_S, VT_S, VT_S, VT_S, VT_S, VT_S, VT_S}, &routine::startNewModule);
 }
 
 } // namespace game

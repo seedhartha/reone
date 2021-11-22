@@ -28,7 +28,7 @@
 #include "../core/script/runner.h"
 #include "../core/services.h"
 
-#include "routine/registrar.h"
+#include "routine/registerutil.h"
 
 using namespace std;
 
@@ -96,7 +96,7 @@ void Limbo::changeScreen(GameScreen screen) {
 }
 
 void Limbo::initRoutines() {
-    LimboRoutineRegistrar(_routines).invoke();
+    registerRoutinesLimbo(_routines);
 }
 
 } // namespace game

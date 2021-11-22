@@ -15,11 +15,11 @@
 
 set(LIMBO_HEADERS
     limbo.h
-    routine/registrar.h)
+    routine/registerutil.h)
 
 set(LIMBO_SOURCES
     limbo.cpp
-    routine/registrar.cpp)
+    routine/registerutil.cpp)
 
 add_library(limbo STATIC ${LIMBO_HEADERS} ${LIMBO_SOURCES})
 set_target_properties(limbo PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
