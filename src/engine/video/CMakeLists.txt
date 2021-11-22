@@ -21,11 +21,11 @@ set(VIDEO_SOURCES
     format/bikreader.cpp
     video.cpp)
 
-add_library(libvideo STATIC ${VIDEO_HEADERS} ${VIDEO_SOURCES})
-set_target_properties(libvideo PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(libvideo PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+add_library(video STATIC ${VIDEO_HEADERS} ${VIDEO_SOURCES})
+set_target_properties(video PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(video PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
 
 if(ENABLE_VIDEO)
-    target_compile_definitions(libvideo PRIVATE R_ENABLE_VIDEO)
-    target_link_libraries(libvideo PUBLIC ${FFMPEG_LIBRARIES})
+    target_compile_definitions(video PRIVATE R_ENABLE_VIDEO)
+    target_link_libraries(video PUBLIC ${FFMPEG_LIBRARIES})
 endif()

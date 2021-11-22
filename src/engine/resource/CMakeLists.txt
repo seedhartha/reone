@@ -79,6 +79,6 @@ set(RESOURCE_SOURCES
     talktable.cpp
     typeutil.cpp)
 
-add_library(libresource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES})
-set_target_properties(libresource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(libresource PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+add_library(resource STATIC ${RESOURCE_HEADERS} ${RESOURCE_SOURCES})
+set_target_properties(resource PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(resource PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)

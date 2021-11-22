@@ -49,6 +49,6 @@ set(SCENE_SOURCES
     pipeline/control.cpp
     pipeline/world.cpp)
 
-add_library(libscene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES})
-set_target_properties(libscene PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(libscene PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+add_library(scene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES})
+set_target_properties(scene PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(scene PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)

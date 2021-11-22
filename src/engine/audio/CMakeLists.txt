@@ -33,12 +33,12 @@ set(AUDIO_SOURCES
     soundinstance.cpp
     stream.cpp)
 
-add_library(libaudio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES})
-set_target_properties(libaudio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(libaudio PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
-target_link_libraries(libaudio PUBLIC ${MAD_LIBRARY})
+add_library(audio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES})
+set_target_properties(audio PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(audio PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+target_link_libraries(audio PUBLIC ${MAD_LIBRARY})
 if(MSVC)
-    target_link_libraries(libaudio PUBLIC OpenAL::OpenAL)
+    target_link_libraries(audio PUBLIC OpenAL::OpenAL)
 else()
-    target_link_libraries(libaudio PUBLIC ${OpenAL_LIBRARIES})
+    target_link_libraries(audio PUBLIC ${OpenAL_LIBRARIES})
 endif()

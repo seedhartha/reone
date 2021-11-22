@@ -87,7 +87,7 @@ set(KOTOR_SOURCES
     kotor.cpp
     routine/registrar.cpp)
 
-add_library(libkotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES})
-set_target_properties(libkotor PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(libkotor PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
-target_link_libraries(libkotor PUBLIC libgamecore)
+add_library(kotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES})
+set_target_properties(kotor PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(kotor PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+target_link_libraries(kotor PUBLIC gamecore)

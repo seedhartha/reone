@@ -20,7 +20,7 @@ set(GAME_HEADERS
 set(GAME_SOURCES
     probe.cpp)
 
-add_library(libgame STATIC ${GAME_HEADERS} ${GAME_SOURCES})
-set_target_properties(libgame PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(libgame PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
-target_link_libraries(libgame PUBLIC liblimbo libtsl)
+add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES})
+set_target_properties(game PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(game PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+target_link_libraries(game PUBLIC limbo tsl)
