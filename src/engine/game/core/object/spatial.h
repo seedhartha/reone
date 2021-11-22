@@ -20,6 +20,7 @@
 #include "../../../scene/animproperties.h"
 #include "../../../scene/graph.h"
 #include "../../../scene/node/scenenode.h"
+#include "../../../scene/user.h"
 
 #include "../action/playanimation.h"
 #include "../effect/effect.h"
@@ -34,7 +35,7 @@ namespace game {
 class Item;
 class Room;
 
-class SpatialObject : public Object {
+class SpatialObject : public Object, public scene::IUser {
 public:
     void update(float dt) override;
 

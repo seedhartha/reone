@@ -111,6 +111,7 @@ void Creature::loadAppearance() {
     finalizeModel(*model);
 
     _sceneNode = move(model);
+    _sceneNode->setUser(*this);
     _sceneNode->setLocalTransform(_transform);
 
     _animDirty = true;

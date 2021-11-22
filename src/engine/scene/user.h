@@ -17,40 +17,11 @@
 
 #pragma once
 
-#include "scenenode.h"
-
 namespace reone {
-
-namespace graphics {
-
-class ModelNode;
-
-}
 
 namespace scene {
 
-class ModelNodeSceneNode : public SceneNode {
-public:
-    const graphics::ModelNode &modelNode() const { return *_modelNode; }
-
-protected:
-    std::shared_ptr<graphics::ModelNode> _modelNode;
-
-    ModelNodeSceneNode(
-        std::shared_ptr<graphics::ModelNode> modelNode,
-        SceneNodeType type,
-        SceneGraph &sceneGraph,
-        graphics::Context &context,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders) :
-        SceneNode(
-            type,
-            sceneGraph,
-            context,
-            meshes,
-            shaders),
-        _modelNode(std::move(modelNode)) {
-    }
+class IUser {
 };
 
 } // namespace scene
