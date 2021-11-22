@@ -40,6 +40,6 @@ set(SCRIPT_SOURCES
     scripts.cpp
     variable.cpp)
 
-add_library(libscript STATIC ${SCRIPT_HEADERS} ${SCRIPT_SOURCES})
-set_target_properties(libscript PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(libscript PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+add_library(script STATIC ${SCRIPT_HEADERS} ${SCRIPT_SOURCES})
+set_target_properties(script PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(script PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)

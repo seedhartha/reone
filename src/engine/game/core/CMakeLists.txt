@@ -437,7 +437,7 @@ set(GAMECORE_SOURCES
     soundsets.cpp
     surfaces.cpp)
 
-add_library(libgamecore STATIC ${GAMECORE_HEADERS} ${GAMECORE_SOURCES})
-set_target_properties(libgamecore PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(libgamecore PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
-target_link_libraries(libgamecore PUBLIC libscript libgui libscene libvideo libaudio libgraphics libresource libcommon)
+add_library(gamecore STATIC ${GAMECORE_HEADERS} ${GAMECORE_SOURCES})
+set_target_properties(gamecore PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(gamecore PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+target_link_libraries(gamecore PUBLIC script gui scene video audio graphics resource common)

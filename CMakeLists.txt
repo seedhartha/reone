@@ -106,6 +106,6 @@ if(UNIX AND NOT APPLE)
 endif()
 
 install(TARGETS ${InstallTargets} DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(TARGETS libcommon libresource libgraphics libaudio libvideo libscript libgame DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS common resource graphics audio video script game DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 ## END Installation

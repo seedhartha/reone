@@ -21,7 +21,7 @@ set(TSL_SOURCES
     routine/registrar.cpp
     tsl.cpp)
 
-add_library(libtsl STATIC ${TSL_HEADERS} ${TSL_SOURCES})
-set_target_properties(libtsl PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(libtsl PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
-target_link_libraries(libtsl PUBLIC libkotor)
+add_library(tsl STATIC ${TSL_HEADERS} ${TSL_SOURCES})
+set_target_properties(tsl PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(tsl PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+target_link_libraries(tsl PUBLIC kotor)

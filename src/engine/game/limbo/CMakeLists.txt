@@ -21,7 +21,7 @@ set(LIMBO_SOURCES
     limbo.cpp
     routine/registrar.cpp)
 
-add_library(liblimbo STATIC ${LIMBO_HEADERS} ${LIMBO_SOURCES})
-set_target_properties(liblimbo PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(liblimbo PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
-target_link_libraries(liblimbo PUBLIC libgamecore)
+add_library(limbo STATIC ${LIMBO_HEADERS} ${LIMBO_SOURCES})
+set_target_properties(limbo PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(limbo PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+target_link_libraries(limbo PUBLIC gamecore)

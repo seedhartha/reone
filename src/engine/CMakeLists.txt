@@ -46,6 +46,6 @@ endif()
 add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_precompile_headers(reone PRIVATE pch.h)
-target_link_libraries(reone PRIVATE libgame ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(reone PRIVATE game ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 list(APPEND InstallTargets reone)
