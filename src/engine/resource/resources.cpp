@@ -88,10 +88,6 @@ void Resources::indexProvider(unique_ptr<IResourceProvider> &&provider, const fs
     }
 }
 
-void Resources::invalidate() {
-    _cache.clear();
-}
-
 void Resources::clearTransientProviders() {
     for (auto &provider : _transientProviders) {
         debug("Remove provider " + to_string(provider->getId()), LogChannels::resources);
@@ -99,34 +95,19 @@ void Resources::clearTransientProviders() {
     _transientProviders.clear();
 }
 
-template <class V, class Cache>
-static shared_ptr<V> getResource(const ResourceId &id, Cache &cache, const function<shared_ptr<V>()> &getter) {
-    auto maybeRes = cache.find(id);
-    if (maybeRes != cache.end()) {
-        return maybeRes->second;
-    }
-    auto inserted = cache.insert(make_pair(id, getter()));
-    return inserted.first->second;
-}
-
-shared_ptr<ByteArray> Resources::getRaw(const string &resRef, ResourceType type, bool logNotFound) {
+shared_ptr<ByteArray> Resources::get(const string &resRef, ResourceType type, bool logNotFound) {
     if (resRef.empty()) {
         return nullptr;
     }
     ResourceId id(resRef, type);
-    auto maybeRes = _cache.find(id);
-    if (maybeRes != _cache.end()) {
-        return maybeRes->second;
-    }
-    shared_ptr<ByteArray> data(doGetRaw(id, _providers));
+    shared_ptr<ByteArray> data(getFromProviders(id, _providers));
     if (!data) {
-        data = doGetRaw(id, _transientProviders);
+        data = getFromProviders(id, _transientProviders);
     }
     if (!data && logNotFound) {
         warn("Resource '" + id.string() + "' not found", LogChannels::resources);
     }
-    auto inserted = _cache.insert(make_pair(id, move(data)));
-    return inserted.first->second;
+    return move(data);
 }
 
 shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) {
@@ -138,7 +119,7 @@ shared_ptr<ByteArray> Resources::getFromExe(uint32_t name, PEResourceType type) 
     return move(data);
 }
 
-shared_ptr<ByteArray> Resources::doGetRaw(const ResourceId &id, const vector<unique_ptr<IResourceProvider>> &providers) {
+shared_ptr<ByteArray> Resources::getFromProviders(const ResourceId &id, const vector<unique_ptr<IResourceProvider>> &providers) {
     for (auto provider = providers.rbegin(); provider != providers.rend(); ++provider) {
         shared_ptr<ByteArray> data((*provider)->find(id));
         if (data) {

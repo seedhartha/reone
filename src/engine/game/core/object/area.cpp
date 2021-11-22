@@ -128,7 +128,7 @@ void Area::load(string name, const GffStruct &are, const GffStruct &git, bool fr
 }
 
 void Area::loadLYT() {
-    shared_ptr<ByteArray> lytData(_services.resources.getRaw(_name, ResourceType::Lyt));
+    shared_ptr<ByteArray> lytData(_services.resources.get(_name, ResourceType::Lyt));
     if (!lytData) {
         throw ValidationException("Area LYT file not found");
     }
@@ -195,7 +195,7 @@ void Area::loadLYT() {
 }
 
 void Area::loadVIS() {
-    auto visData = _services.resources.getRaw(_name, ResourceType::Vis);
+    auto visData = _services.resources.get(_name, ResourceType::Vis);
     if (!visData) {
         return;
     }
