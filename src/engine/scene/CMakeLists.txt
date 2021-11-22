@@ -32,7 +32,8 @@ set(SCENE_HEADERS
     node/walkmesh.h
     pipeline/control.h
     pipeline/world.h
-    types.h)
+    types.h
+    user.h)
 
 set(SCENE_SOURCES
     graph.cpp

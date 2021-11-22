@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../../scene/user.h"
+
 namespace reone {
 
 namespace scene {
@@ -30,7 +32,7 @@ namespace game {
 
 class SpatialObject;
 
-class Room {
+class Room : public scene::IUser {
 public:
     Room(
         std::string name,

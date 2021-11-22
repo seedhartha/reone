@@ -33,6 +33,7 @@ class Shaders;
 
 namespace scene {
 
+class IUser;
 class SceneGraph;
 
 class SceneNode : boost::noncopyable {
@@ -80,6 +81,7 @@ public:
     const std::unordered_set<std::shared_ptr<SceneNode>> &children() const { return _children; }
     const graphics::AABB &aabb() const { return _aabb; }
 
+    void setUser(IUser &user) { _user = &user; }
     void setVisible(bool visible) { _visible = visible; }
     void setCullable(bool cullable) { _cullable = cullable; }
     void setCulled(bool culled) { _culled = culled; }
@@ -98,8 +100,11 @@ protected:
     SceneNodeType _type;
 
     graphics::AABB _aabb;
+
     SceneNode *_parent {nullptr};
     std::unordered_set<std::shared_ptr<SceneNode>> _children;
+
+    IUser *_user {nullptr};
 
     // Services
 

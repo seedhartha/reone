@@ -186,7 +186,10 @@ void Area::loadLYT() {
             sceneGraph.addRoot(move(grassSceneNode));
         }
 
-        auto room = make_unique<Room>(lytRoom.name, position, move(modelSceneNode), move(walkmeshSceneNode));
+        auto room = make_unique<Room>(lytRoom.name, position, move(modelSceneNode), walkmeshSceneNode);
+        if (walkmeshSceneNode) {
+            walkmeshSceneNode->setUser(*room);
+        }
         _rooms.insert(make_pair(room->name(), move(room)));
     }
 }
