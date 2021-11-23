@@ -183,6 +183,8 @@ set(GAMECORE_HEADERS
     effect/whirlwind.h
     event.h
     footstepsounds.h
+    format/lytreader.h
+    format/visreader.h
     game.h
     location.h
     map.h
@@ -211,7 +213,6 @@ set(GAMECORE_HEADERS
     reputes.h
     room.h
     savedgame.h
-    services.h
     script/routine/argutil.h
     script/routine/context.h
     script/routine/declarations.h
@@ -219,6 +220,7 @@ set(GAMECORE_HEADERS
     script/routine/objectutil.h
     script/routine/routines.h
     script/runner.h
+    services.h
     soundsets.h
     surface.h
     surfaces.h
@@ -384,6 +386,8 @@ set(GAMECORE_SOURCES
     effect/vpregenmodifier.cpp
     effect/whirlwind.cpp
     footstepsounds.cpp
+    format/lytreader.cpp
+    format/visreader.cpp
     game.cpp
     gui/loadscreen.h
     map.cpp

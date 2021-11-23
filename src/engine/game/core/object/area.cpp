@@ -31,8 +31,6 @@
 #include "../../../graphics/walkmesh/walkmeshes.h"
 #include "../../../resource/2da.h"
 #include "../../../resource/2das.h"
-#include "../../../resource/format/lytreader.h"
-#include "../../../resource/format/visreader.h"
 #include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
@@ -42,8 +40,8 @@
 #include "../../../scene/node/walkmesh.h"
 #include "../../../scene/types.h"
 
-#include "../../core/types.h"
-
+#include "../format/lytreader.h"
+#include "../format/visreader.h"
 #include "../game.h"
 #include "../location.h"
 #include "../party.h"
@@ -52,6 +50,7 @@
 #include "../script/runner.h"
 #include "../services.h"
 #include "../surfaces.h"
+#include "../types.h"
 
 #include "factory.h"
 

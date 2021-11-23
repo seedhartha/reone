@@ -23,7 +23,7 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
 void LytReader::load(const shared_ptr<istream> &in) {
     if (!in) {
@@ -53,11 +53,9 @@ void LytReader::load() {
 }
 
 void LytReader::processLine(const string &line) {
-    string trimmed(line);
-    boost::trim(trimmed);
-
     vector<string> tokens;
-    boost::split(tokens, trimmed, boost::is_space(), boost::token_compress_on);
+    string trimLine(boost::trim_copy(line));
+    boost::split(tokens, trimLine, boost::is_space(), boost::token_compress_on);
 
     const string &first = tokens[0];
     switch (_state) {
@@ -75,30 +73,18 @@ void LytReader::processLine(const string &line) {
                 _rooms.reserve(_roomCount);
                 _state = State::Rooms;
             }
-        } else if (first == "doorhookcount") {
-            _doorHookCount = stoi(tokens[1]);
-            if (_doorHookCount > 0) {
-                _doorHooks.reserve(_doorHookCount);
-                _state = State::DoorHooks;
-            }
         }
         break;
     case State::Rooms:
-        _rooms.push_back(getRoom(tokens));
+        _rooms.push_back(parseRoom(tokens));
         if (_rooms.size() == _roomCount) {
-            _state = State::Layout;
-        }
-        break;
-    case State::DoorHooks:
-        _doorHooks.push_back(getDoorHook(tokens));
-        if (_doorHooks.size() == _doorHookCount) {
             _state = State::Layout;
         }
         break;
     }
 }
 
-LytReader::Room LytReader::getRoom(const vector<string> &tokens) const {
+LytReader::Room LytReader::parseRoom(const vector<string> &tokens) const {
     Room room;
     room.name = boost::to_lower_copy(tokens[0]);
     room.position = glm::vec3(
@@ -109,18 +95,6 @@ LytReader::Room LytReader::getRoom(const vector<string> &tokens) const {
     return move(room);
 }
 
-LytReader::DoorHook LytReader::getDoorHook(const vector<string> &tokens) const {
-    DoorHook door;
-    door.room = boost::to_lower_copy(tokens[0]);
-    door.name = boost::to_lower_copy(tokens[1]);
-    door.position = glm::vec3(
-        stof(tokens[2]),
-        stof(tokens[3]),
-        stof(tokens[4]));
-
-    return move(door);
-}
-
-} // namespace resource
+} // namespace game
 
 } // namespace reone

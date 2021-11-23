@@ -94,8 +94,6 @@ enum class PEResourceType {
     Manifest = 24
 };
 
-typedef std::multimap<std::string, std::string> Visibility;
-
 } // namespace resource
 
 } // namespace reone

@@ -21,7 +21,7 @@ using namespace std;
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
 void VisReader::load(const shared_ptr<istream> &in) {
     if (!in) {
@@ -53,6 +53,6 @@ void VisReader::processLine(const string &line) {
     }
 }
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone

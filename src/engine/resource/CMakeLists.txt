@@ -29,7 +29,6 @@ set(RESOURCE_HEADERS
     format/gffwriter.h
     format/keyreader.h
     format/ltrreader.h
-    format/lytreader.h
     format/pereader.h
     format/rimreader.h
     format/rimwriter.h
@@ -37,7 +36,6 @@ set(RESOURCE_HEADERS
     format/ssfwriter.h
     format/tlkreader.h
     format/tlkwriter.h
-    format/visreader.h
     id.h
     keybifprovider.h
     resourceprovider.h
@@ -64,7 +62,6 @@ set(RESOURCE_SOURCES
     format/gffwriter.cpp
     format/keyreader.cpp
     format/ltrreader.cpp
-    format/lytreader.cpp
     format/pereader.cpp
     format/rimreader.cpp
     format/rimwriter.cpp
@@ -72,7 +69,6 @@ set(RESOURCE_SOURCES
     format/ssfwriter.cpp
     format/tlkreader.cpp
     format/tlkwriter.cpp
-    format/visreader.cpp
     keybifprovider.cpp
     resources.cpp
     strings.cpp

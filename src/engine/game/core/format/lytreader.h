@@ -19,7 +19,7 @@
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
 class LytReader : boost::noncopyable {
 public:
@@ -38,7 +38,6 @@ public:
     void load(const boost::filesystem::path &path);
 
     const std::vector<Room> &rooms() const { return _rooms; }
-    const std::vector<DoorHook> &doorHooks() const { return _doorHooks; }
 
 private:
     enum class State {
@@ -52,16 +51,14 @@ private:
     boost::filesystem::path _path;
     State _state {State::None};
     int _roomCount {0};
-    int _doorHookCount {0};
     std::vector<Room> _rooms;
-    std::vector<DoorHook> _doorHooks;
 
     void load();
     void processLine(const std::string &line);
-    Room getRoom(const std::vector<std::string> &tokens) const;
-    DoorHook getDoorHook(const std::vector<std::string> &tokens) const;
+
+    Room parseRoom(const std::vector<std::string> &tokens) const;
 };
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone
