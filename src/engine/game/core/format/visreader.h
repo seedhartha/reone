@@ -21,7 +21,7 @@
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
 class VisReader : boost::noncopyable {
 public:
@@ -36,6 +36,6 @@ private:
     void processLine(const std::string &line);
 };
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone
