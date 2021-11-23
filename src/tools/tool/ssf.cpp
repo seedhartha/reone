@@ -19,12 +19,12 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../../engine/resource/format/ssfreader.h"
-#include "../../engine/resource/format/ssfwriter.h"
+#include "../../engine/game/core/format/ssfreader.h"
+#include "../../engine/game/core/format/ssfwriter.h"
 
 using namespace std;
 
-using namespace reone::resource;
+using namespace reone::game;
 
 namespace fs = boost::filesystem;
 namespace pt = boost::property_tree;

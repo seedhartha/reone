@@ -32,8 +32,6 @@ set(RESOURCE_HEADERS
     format/pereader.h
     format/rimreader.h
     format/rimwriter.h
-    format/ssfreader.h
-    format/ssfwriter.h
     format/tlkreader.h
     format/tlkwriter.h
     id.h
@@ -65,8 +63,6 @@ set(RESOURCE_SOURCES
     format/pereader.cpp
     format/rimreader.cpp
     format/rimwriter.cpp
-    format/ssfreader.cpp
-    format/ssfwriter.cpp
     format/tlkreader.cpp
     format/tlkwriter.cpp
     keybifprovider.cpp

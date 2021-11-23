@@ -17,7 +17,7 @@
 
 #include "ssfwriter.h"
 
-#include "../../common/streamwriter.h"
+#include "../../../common/streamwriter.h"
 
 using namespace std;
 
@@ -25,7 +25,7 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
 void SsfWriter::save(const fs::path &path) {
     auto stream = make_shared<fs::ofstream>(path);
@@ -39,6 +39,6 @@ void SsfWriter::save(const fs::path &path) {
     }
 }
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone
