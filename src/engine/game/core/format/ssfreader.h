@@ -15,25 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ssfreader.h"
+#pragma once
 
-using namespace std;
+#include "../../../resource/format/binreader.h"
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
-SsfReader::SsfReader() :
-    BinaryReader(8, "SSF V1.1") {
-}
+class SsfReader : public resource::BinaryReader {
+public:
+    SsfReader();
 
-void SsfReader::doLoad() {
-    uint32_t tableOffset = readUint32();
-    int entryCount = static_cast<int>((_size - tableOffset) / 4);
-    seek(tableOffset);
-    _soundSet = readUint32Array(entryCount);
-}
+    const std::vector<uint32_t> &soundSet() const { return _soundSet; }
 
-} // namespace resource
+private:
+    std::vector<uint32_t> _soundSet;
+
+    void doLoad() override;
+};
+
+} // namespace game
 
 } // namespace reone

@@ -19,7 +19,7 @@
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
 class SsfWriter {
 public:
@@ -33,6 +33,6 @@ private:
     std::vector<uint32_t> _soundSet;
 };
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone

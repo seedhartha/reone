@@ -184,6 +184,8 @@ set(GAMECORE_HEADERS
     event.h
     footstepsounds.h
     format/lytreader.h
+    format/ssfreader.h
+    format/ssfwriter.h
     format/visreader.h
     game.h
     location.h
@@ -387,6 +389,8 @@ set(GAMECORE_SOURCES
     effect/whirlwind.cpp
     footstepsounds.cpp
     format/lytreader.cpp
+    format/ssfreader.cpp
+    format/ssfwriter.cpp
     format/visreader.cpp
     game.cpp
     gui/loadscreen.h
