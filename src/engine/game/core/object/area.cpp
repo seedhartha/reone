@@ -34,6 +34,7 @@
 #include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
+#include "../../../scene/collision.h"
 #include "../../../scene/graphs.h"
 #include "../../../scene/node/grass.h"
 #include "../../../scene/node/grasscluster.h"
@@ -123,6 +124,182 @@ void Area::load(string name, const GffStruct &are, const GffStruct &git, bool fr
     loadLYT();
     loadVIS();
     loadPTH();
+}
+
+void Area::loadARE(const GffStruct &are) {
+    _localizedName = _services.strings.get(are.getInt("Name"));
+
+    loadCameraStyle(are);
+    loadAmbientColor(are);
+    loadScripts(are);
+    loadMap(are);
+    loadStealthXP(are);
+    loadGrass(are);
+    loadFog(are);
+}
+
+void Area::loadCameraStyle(const GffStruct &are) {
+    shared_ptr<TwoDA> cameraStyles(_services.twoDas.get("camerastyle"));
+    if (!cameraStyles) {
+        _camStyleDefault = g_defaultCameraStyle;
+        _camStyleCombat = g_defaultCameraStyle;
+        return;
+    }
+
+    int areaStyleIdx = are.getInt("CameraStyle");
+    _camStyleDefault.load(*cameraStyles, areaStyleIdx);
+
+    int combatStyleIdx = cameraStyles->indexByCellValue("name", "Combat");
+    if (combatStyleIdx != -1) {
+        _camStyleCombat.load(*cameraStyles, combatStyleIdx);
+    }
+}
+
+void Area::loadAmbientColor(const GffStruct &are) {
+    _ambientColor = are.getColor("DynAmbientColor", g_defaultAmbientColor);
+
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    sceneGraph.setAmbientLightColor(_ambientColor);
+}
+
+void Area::loadScripts(const GffStruct &are) {
+    _onEnter = are.getString("OnEnter");
+    _onExit = are.getString("OnExit");
+    _onHeartbeat = are.getString("OnHeartbeat");
+    _onUserDefined = are.getString("OnUserDefined");
+}
+
+void Area::loadMap(const GffStruct &are) {
+    auto mapStruct = are.getStruct("Map");
+    if (!mapStruct) {
+        warn("Map properties not found in ARE");
+        return;
+    }
+    _map.load(_name, *mapStruct);
+}
+
+void Area::loadStealthXP(const GffStruct &are) {
+    _stealthXPEnabled = are.getBool("StealthXPEnabled");
+    _stealthXPDecrement = are.getInt("StealthXPLoss"); // TODO: loss = decrement?
+    _maxStealthXP = are.getInt("StealthXPMax");
+}
+
+void Area::loadGrass(const GffStruct &are) {
+    string texName(boost::to_lower_copy(are.getString("Grass_TexName")));
+    if (!texName.empty()) {
+        _grass.texture = _services.textures.get(texName, TextureUsage::Diffuse);
+    }
+    _grass.density = are.getFloat("Grass_Density");
+    _grass.quadSize = are.getFloat("Grass_QuadSize");
+    _grass.ambient = are.getInt("Grass_Ambient");
+    _grass.diffuse = are.getInt("Grass_Diffuse");
+    _grass.probabilities[0] = are.getFloat("Grass_Prob_UL");
+    _grass.probabilities[1] = are.getFloat("Grass_Prob_UR");
+    _grass.probabilities[2] = are.getFloat("Grass_Prob_LL");
+    _grass.probabilities[3] = are.getFloat("Grass_Prob_LR");
+}
+
+void Area::loadFog(const GffStruct &are) {
+    _fogEnabled = are.getBool("SunFogOn");
+    _fogNear = are.getFloat("SunFogNear");
+    _fogFar = are.getFloat("SunFogFar");
+    _fogColor = are.getColor("SunFogColor");
+
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    sceneGraph.setFogEnabled(_fogEnabled);
+    sceneGraph.setFogNear(_fogNear);
+    sceneGraph.setFogFar(_fogFar);
+    sceneGraph.setFogColor(_fogColor);
+}
+
+void Area::loadGIT(const GffStruct &git) {
+    loadProperties(git);
+    loadCreatures(git);
+    loadDoors(git);
+    loadPlaceables(git);
+    loadWaypoints(git);
+    loadTriggers(git);
+    loadSounds(git);
+    loadCameras(git);
+    loadEncounters(git);
+}
+
+void Area::loadProperties(const GffStruct &git) {
+    shared_ptr<GffStruct> props(git.getStruct("AreaProperties"));
+    if (!props) {
+        warn("Area properties not found in GIT");
+        return;
+    }
+    int musicIdx = props->getInt("MusicDay");
+    if (musicIdx) {
+        shared_ptr<TwoDA> musicTable(_services.twoDas.get("ambientmusic"));
+        _music = musicTable->getString(musicIdx, "resource");
+    }
+}
+
+void Area::loadCreatures(const GffStruct &git) {
+    for (auto &gffs : git.getList("Creature List")) {
+        shared_ptr<Creature> creature(_game.objectFactory().newCreature());
+        creature->loadFromGIT(*gffs);
+        landObject(*creature);
+        add(creature);
+    }
+}
+
+void Area::loadDoors(const GffStruct &git) {
+    for (auto &gffs : git.getList("Door List")) {
+        shared_ptr<Door> door(_game.objectFactory().newDoor());
+        door->loadFromGIT(*gffs);
+        add(door);
+    }
+}
+
+void Area::loadPlaceables(const GffStruct &git) {
+    for (auto &gffs : git.getList("Placeable List")) {
+        shared_ptr<Placeable> placeable(_game.objectFactory().newPlaceable());
+        placeable->loadFromGIT(*gffs);
+        add(placeable);
+    }
+}
+
+void Area::loadWaypoints(const GffStruct &git) {
+    for (auto &gffs : git.getList("WaypointList")) {
+        shared_ptr<Waypoint> waypoint(_game.objectFactory().newWaypoint());
+        waypoint->loadFromGIT(*gffs);
+        add(waypoint);
+    }
+}
+
+void Area::loadTriggers(const GffStruct &git) {
+    for (auto &gffs : git.getList("TriggerList")) {
+        shared_ptr<Trigger> trigger(_game.objectFactory().newTrigger());
+        trigger->loadFromGIT(*gffs);
+        add(trigger);
+    }
+}
+
+void Area::loadSounds(const GffStruct &git) {
+    for (auto &gffs : git.getList("SoundList")) {
+        shared_ptr<Sound> sound(_game.objectFactory().newSound());
+        sound->loadFromGIT(*gffs);
+        add(sound);
+    }
+}
+
+void Area::loadCameras(const GffStruct &git) {
+    for (auto &gffs : git.getList("CameraList")) {
+        shared_ptr<PlaceableCamera> camera(_game.objectFactory().newCamera());
+        camera->loadFromGIT(*gffs);
+        add(camera);
+    }
+}
+
+void Area::loadEncounters(const GffStruct &git) {
+    for (auto &gffs : git.getList("Encounter List")) {
+        shared_ptr<Encounter> encounter(_game.objectFactory().newEncounter());
+        encounter->loadFromGIT(*gffs);
+        add(encounter);
+    }
 }
 
 void Area::loadLYT() {
@@ -218,24 +395,22 @@ void Area::loadPTH() {
     if (!pth) {
         return;
     }
-
     Path path;
     path.load(*pth);
 
     const vector<Path::Point> &points = path.points();
     unordered_map<int, float> pointZ;
 
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+
     for (size_t i = 0; i < points.size(); ++i) {
         const Path::Point &point = points[i];
-        Room *room = nullptr;
-        float z = 0.0f;
-        int material = 0;
-
-        if (!testElevationAt(glm::vec2(point.x, point.y), z, material, room)) {
+        Collision collision;
+        if (!sceneGraph.testElevation(glm::vec2(point.x, point.y), collision)) {
             warn(boost::format("Point %d elevation not found") % i);
             continue;
         }
-        pointZ.insert(make_pair(i, z));
+        pointZ.insert(make_pair(i, collision.intersection.z));
     }
 
     _pathfinder.load(points, pointZ);
@@ -252,13 +427,10 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     _firstPersonCamera->setFacing(entryFacing);
 
     _thirdPersonCamera = make_unique<ThirdPersonCamera>(_cameraAspect, _camStyleDefault, _game, sceneGraph);
-    _thirdPersonCamera->setFindObstacle(bind(&Area::getCameraObstacle, this, _1, _2, _3));
     _thirdPersonCamera->setTargetPosition(position);
     _thirdPersonCamera->setFacing(entryFacing);
 
     _dialogCamera = make_unique<DialogCamera>(_cameraAspect, _camStyleDefault, sceneGraph);
-    _dialogCamera->setFindObstacle(bind(&Area::getCameraObstacle, this, _1, _2, _3));
-
     _animatedCamera = make_unique<AnimatedCamera>(_cameraAspect, sceneGraph);
     _staticCamera = make_unique<StaticCamera>(_cameraAspect, sceneGraph);
 }
@@ -299,13 +471,18 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
 }
 
 void Area::determineObjectRoom(SpatialObject &object) {
-    glm::vec3 position(object.position());
     Room *room = nullptr;
-    int material = 0;
 
-    if (testElevationAt(position, position.z, material, room)) {
-        object.setRoom(room);
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    Collision collision;
+    if (sceneGraph.testElevation(object.position(), collision)) {
+        auto userRoom = dynamic_cast<Room *>(collision.user);
+        if (userRoom) {
+            room = room;
+        }
     }
+
+    object.setRoom(room);
 }
 
 void Area::doDestroyObjects() {
@@ -389,20 +566,23 @@ shared_ptr<SpatialObject> Area::getObjectByTag(const string &tag, int nth) const
 }
 
 void Area::landObject(SpatialObject &object) {
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
     glm::vec3 position(object.position());
-    Room *room = nullptr;
-    int material = 0;
+    Collision collision;
 
-    if (testElevationAt(position, position.z, material, room)) {
-        object.setPosition(position);
+    // Test elevation at object position
+    if (sceneGraph.testElevation(position, collision)) {
+        object.setPosition(collision.intersection);
         return;
     }
+
+    // Test elevations in a circle around object position
     for (int i = 0; i < 4; ++i) {
         float angle = i * glm::half_pi<float>();
         position = object.position() + glm::vec3(glm::sin(angle), glm::cos(angle), 0.0f);
 
-        if (testElevationAt(position, position.z, material, room)) {
-            object.setPosition(position);
+        if (sceneGraph.testElevation(position, collision)) {
+            object.setPosition(collision.intersection);
             return;
         }
     }
@@ -497,66 +677,81 @@ bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &d
     static glm::vec3 up {0.0f, 0.0f, 1.0f};
     static glm::vec3 zOffset {0.0f, 0.0f, 0.1f};
 
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    Collision collision;
+
+    // Set creature facing
+
     float facing = -glm::atan(dir.x, dir.y);
     creature->setFacing(facing);
+
+    // Test obstacle between origin and destination
+
+    glm::vec3 origin(creature->position());
+    origin.z += 0.1f;
 
     float speed = run ? creature->runSpeed() : creature->walkSpeed();
     float speedDt = speed * dt;
 
-    glm::vec3 dest(creature->position());
+    glm::vec3 dest(origin);
     dest.x += dir.x * speedDt;
     dest.y += dir.y * speedDt;
 
-    // If obstacle is found once, try moving along the face normal
-    glm::vec3 normal;
-    if (getCreatureObstacle(creature->position() + zOffset, dest + zOffset, normal)) {
-        glm::vec3 creatureToDest(glm::normalize(dest - creature->position()));
+    if (sceneGraph.testObstacle(origin, dest, creature.get(), collision)) {
+        // Try moving along the surface
+        glm::vec2 right(glm::normalize(glm::vec2(glm::cross(up, collision.normal))));
+        glm::vec2 newDir(glm::normalize(right * glm::dot(dir, right)));
 
-        glm::vec3 right(glm::cross(up, normal));
-        right *= glm::dot(creatureToDest, right);
+        dest = origin;
+        dest.x += newDir.x * speedDt;
+        dest.y += newDir.y * speedDt;
 
-        glm::vec2 dir2(glm::normalize(glm::vec2(right)));
-
-        dest = creature->position();
-        dest.x += dir2.x * speedDt;
-        dest.y += dir2.y * speedDt;
-
-        // If obstacle is found twice, abort movement
-        if (getCreatureObstacle(creature->position() + zOffset, dest + zOffset, normal))
+        if (sceneGraph.testObstacle(origin, dest, creature.get(), collision)) {
             return false;
-    }
-
-    return doMoveCreature(creature, dest);
-}
-
-bool Area::doMoveCreature(const shared_ptr<Creature> &creature, const glm::vec3 &dest) {
-    float z;
-    Room *room;
-    int material;
-
-    if (testElevationAt(dest, z, material, room)) {
-        const Room *oldRoom = creature->room();
-
-        creature->setRoom(room);
-        creature->setPosition(glm::vec3(dest.x, dest.y, z));
-        creature->setWalkmeshMaterial(material);
-
-        if (creature == _game.party().getLeader()) {
-            onPartyLeaderMoved(room != oldRoom);
         }
-
-        checkTriggersIntersection(creature);
-
-        return true;
     }
 
-    return false;
+    // Test elevation at destination
+
+    if (!sceneGraph.testElevation(dest, collision)) {
+        return false;
+    }
+
+    auto userRoom = dynamic_cast<Room *>(collision.user);
+    auto prevRoom = creature->room();
+
+    creature->setRoom(userRoom);
+    creature->setPosition(glm::vec3(dest.x, dest.y, collision.intersection.z));
+    creature->setWalkmeshMaterial(collision.material);
+
+    if (creature == _game.party().getLeader()) {
+        onPartyLeaderMoved(userRoom != prevRoom);
+    }
+
+    checkTriggersIntersection(creature);
+
+    return true;
 }
 
 bool Area::moveCreatureTowards(const shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt) {
     glm::vec2 delta(dest - glm::vec2(creature->position()));
     glm::vec2 dir(glm::normalize(delta));
     return moveCreature(creature, dir, run, dt);
+}
+
+bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target) const {
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    Collision collision;
+
+    glm::vec3 origin(subject.position());
+    glm::vec3 dest(target.position());
+    dest.z += kLineOfSightTestHeight;
+
+    if (sceneGraph.testObstacle(origin, dest, &subject, collision)) {
+        return collision.user == &target;
+    }
+
+    return false;
 }
 
 void Area::runSpawnScripts() {
@@ -1151,115 +1346,6 @@ void Area::doUpdatePerception() {
     }
 }
 
-void Area::loadGIT(const GffStruct &git) {
-    loadProperties(git);
-    loadCreatures(git);
-    loadDoors(git);
-    loadPlaceables(git);
-    loadWaypoints(git);
-    loadTriggers(git);
-    loadSounds(git);
-    loadCameras(git);
-    loadEncounters(git);
-}
-
-void Area::loadProperties(const GffStruct &git) {
-    shared_ptr<GffStruct> props(git.getStruct("AreaProperties"));
-    if (!props) {
-        warn("Area properties not found in GIT");
-        return;
-    }
-    int musicIdx = props->getInt("MusicDay");
-    if (musicIdx) {
-        shared_ptr<TwoDA> musicTable(_services.twoDas.get("ambientmusic"));
-        _music = musicTable->getString(musicIdx, "resource");
-    }
-}
-
-void Area::loadCreatures(const GffStruct &git) {
-    for (auto &gffs : git.getList("Creature List")) {
-        shared_ptr<Creature> creature(_game.objectFactory().newCreature());
-        creature->loadFromGIT(*gffs);
-        landObject(*creature);
-        add(creature);
-    }
-}
-
-void Area::loadDoors(const GffStruct &git) {
-    for (auto &gffs : git.getList("Door List")) {
-        shared_ptr<Door> door(_game.objectFactory().newDoor());
-        door->loadFromGIT(*gffs);
-        add(door);
-    }
-}
-
-void Area::loadPlaceables(const GffStruct &git) {
-    for (auto &gffs : git.getList("Placeable List")) {
-        shared_ptr<Placeable> placeable(_game.objectFactory().newPlaceable());
-        placeable->loadFromGIT(*gffs);
-        add(placeable);
-    }
-}
-
-void Area::loadWaypoints(const GffStruct &git) {
-    for (auto &gffs : git.getList("WaypointList")) {
-        shared_ptr<Waypoint> waypoint(_game.objectFactory().newWaypoint());
-        waypoint->loadFromGIT(*gffs);
-        add(waypoint);
-    }
-}
-
-void Area::loadTriggers(const GffStruct &git) {
-    for (auto &gffs : git.getList("TriggerList")) {
-        shared_ptr<Trigger> trigger(_game.objectFactory().newTrigger());
-        trigger->loadFromGIT(*gffs);
-        add(trigger);
-    }
-}
-
-void Area::loadSounds(const GffStruct &git) {
-    for (auto &gffs : git.getList("SoundList")) {
-        shared_ptr<Sound> sound(_game.objectFactory().newSound());
-        sound->loadFromGIT(*gffs);
-        add(sound);
-    }
-}
-
-void Area::loadCameras(const GffStruct &git) {
-    for (auto &gffs : git.getList("CameraList")) {
-        shared_ptr<PlaceableCamera> camera(_game.objectFactory().newCamera());
-        camera->loadFromGIT(*gffs);
-        add(camera);
-    }
-}
-
-void Area::loadEncounters(const GffStruct &git) {
-    for (auto &gffs : git.getList("Encounter List")) {
-        shared_ptr<Encounter> encounter(_game.objectFactory().newEncounter());
-        encounter->loadFromGIT(*gffs);
-        add(encounter);
-    }
-}
-
-bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room *&room) const {
-    SceneGraph::Collision collision;
-
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
-    if (sceneGraph.getElevationAt(point, collision)) {
-        z = collision.intersection.z;
-        material = collision.material;
-
-        auto userRoom = dynamic_cast<Room *>(collision.user);
-        if (userRoom) {
-            room = userRoom;
-        }
-
-        return true;
-    }
-
-    return false;
-}
-
 shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
     shared_ptr<CameraSceneNode> camera(_services.sceneGraphs.get(kSceneMain).activeCamera());
     shared_ptr<Creature> partyLeader(_game.party().getLeader());
@@ -1301,233 +1387,6 @@ shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
     std::sort(distances.begin(), distances.end(), [](auto &left, auto &right) { return left.second < right.second; });
 
     return distances[0].first;
-}
-
-bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::vec3 &intersection) const {
-    glm::vec3 endToStart(end - start);
-    glm::vec3 dir(glm::normalize(endToStart));
-    float minDistance = numeric_limits<float>::max();
-    float maxDistance = glm::length(endToStart);
-
-    // Test AABB of door objects
-    for (auto &o : _objects) {
-        if (o->type() != ObjectType::Door) {
-            continue;
-        }
-
-        auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
-        if (!model) {
-            continue;
-        }
-
-        // Distance to object must not exceed maximum collision distance
-        if (o->getDistanceTo2(start) > kMaxCollisionDistance2) {
-            continue;
-        }
-
-        glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
-        glm::vec3 objSpaceDir(model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
-        float distance;
-        if (model->aabb().raycast(objSpaceStart, objSpaceDir, maxDistance, distance) && distance < minDistance) {
-            minDistance = distance;
-        }
-    }
-
-    // Test room walkmeshes
-    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaces();
-    for (auto &r : _rooms) {
-        // Room must have a valid model and walkmesh
-        shared_ptr<ModelSceneNode> model(r.second->model());
-        shared_ptr<WalkmeshSceneNode> walkmesh(r.second->walkmesh());
-        if (!model || !walkmesh) {
-            continue;
-        }
-
-        float distance;
-        auto face = walkmesh->walkmesh().raycast(walkcheckSurfaces, start, dir, maxDistance, distance);
-        if (face && distance < minDistance) {
-            minDistance = distance;
-        }
-    }
-
-    if (minDistance != numeric_limits<float>::max()) {
-        intersection = start + minDistance * dir;
-        return true;
-    }
-
-    return false;
-}
-
-bool Area::getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::vec3 &normal) const {
-    if (end == start) {
-        return false;
-    }
-    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaces();
-    glm::vec3 endToStart(end - start);
-    glm::vec3 dir(glm::normalize(endToStart));
-    float minDistance = numeric_limits<float>::max();
-    float maxDistance = glm::length(endToStart);
-
-    // Test room walkmeshes
-    for (auto &r : _rooms) {
-        shared_ptr<ModelSceneNode> model(r.second->model());
-        shared_ptr<WalkmeshSceneNode> walkmesh(r.second->walkmesh());
-        if (!model || !walkmesh) {
-            continue;
-        }
-
-        float distance;
-        auto face = walkmesh->walkmesh().raycast(walkcheckSurfaces, start, dir, maxDistance, distance);
-        if (face && distance < minDistance) {
-            minDistance = distance;
-            normal = face->normal;
-        }
-    }
-
-    return minDistance != numeric_limits<float>::max();
-}
-
-bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target) const {
-    static glm::vec3 offsetZ {0.0f, 0.0f, kLineOfSightTestHeight};
-
-    glm::vec3 start(subject.position() + offsetZ);
-    glm::vec3 end(target.position() + offsetZ);
-    glm::vec3 startToEnd(end - start);
-    glm::vec3 dir(glm::normalize(startToEnd));
-    float maxDistance = glm::length(startToEnd);
-
-    for (auto &o : _objects) {
-        if (o->type() != ObjectType::Door) {
-            continue;
-        }
-
-        auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
-        if (!model) {
-            continue;
-        }
-
-        // Distance to object must not exceed maximum collision distance
-        if (o->getDistanceTo2(start) > kMaxCollisionDistance2)
-            continue;
-
-        glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
-        glm::vec3 objSpaceDir(model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
-        float distance;
-        if (model->aabb().raycast(objSpaceStart, objSpaceDir, maxDistance, distance)) {
-            return false;
-        }
-    }
-
-    // Test room walkmeshes
-    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaces();
-    for (auto &r : _rooms) {
-        shared_ptr<ModelSceneNode> model(r.second->model());
-        shared_ptr<WalkmeshSceneNode> walkmesh(r.second->walkmesh());
-        if (!model || !walkmesh) {
-            continue;
-        }
-
-        // Start or end of path must be inside room AABB
-        glm::vec2 roomSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
-        glm::vec2 roomSpaceEnd(model->absoluteTransformInverse() * glm::vec4(end, 1.0f));
-        if (!model->aabb().contains(roomSpaceStart) && !model->aabb().contains(roomSpaceEnd)) {
-            continue;
-        }
-
-        float distance;
-        auto face = walkmesh->walkmesh().raycast(walkcheckSurfaces, start, dir, maxDistance, distance);
-        if (face) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void Area::loadARE(const GffStruct &are) {
-    _localizedName = _services.strings.get(are.getInt("Name"));
-
-    loadCameraStyle(are);
-    loadAmbientColor(are);
-    loadScripts(are);
-    loadMap(are);
-    loadStealthXP(are);
-    loadGrass(are);
-    loadFog(are);
-}
-
-void Area::loadCameraStyle(const GffStruct &are) {
-    shared_ptr<TwoDA> cameraStyles(_services.twoDas.get("camerastyle"));
-    if (!cameraStyles) {
-        _camStyleDefault = g_defaultCameraStyle;
-        _camStyleCombat = g_defaultCameraStyle;
-        return;
-    }
-
-    int areaStyleIdx = are.getInt("CameraStyle");
-    _camStyleDefault.load(*cameraStyles, areaStyleIdx);
-
-    int combatStyleIdx = cameraStyles->indexByCellValue("name", "Combat");
-    if (combatStyleIdx != -1) {
-        _camStyleCombat.load(*cameraStyles, combatStyleIdx);
-    }
-}
-
-void Area::loadAmbientColor(const GffStruct &are) {
-    _ambientColor = are.getColor("DynAmbientColor", g_defaultAmbientColor);
-
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
-    sceneGraph.setAmbientLightColor(_ambientColor);
-}
-
-void Area::loadScripts(const GffStruct &are) {
-    _onEnter = are.getString("OnEnter");
-    _onExit = are.getString("OnExit");
-    _onHeartbeat = are.getString("OnHeartbeat");
-    _onUserDefined = are.getString("OnUserDefined");
-}
-
-void Area::loadMap(const GffStruct &are) {
-    auto mapStruct = are.getStruct("Map");
-    if (!mapStruct) {
-        warn("Map properties not found in ARE");
-        return;
-    }
-    _map.load(_name, *mapStruct);
-}
-
-void Area::loadStealthXP(const GffStruct &are) {
-    _stealthXPEnabled = are.getBool("StealthXPEnabled");
-    _stealthXPDecrement = are.getInt("StealthXPLoss"); // TODO: loss = decrement?
-    _maxStealthXP = are.getInt("StealthXPMax");
-}
-
-void Area::loadGrass(const GffStruct &are) {
-    string texName(boost::to_lower_copy(are.getString("Grass_TexName")));
-    if (!texName.empty()) {
-        _grass.texture = _services.textures.get(texName, TextureUsage::Diffuse);
-    }
-    _grass.density = are.getFloat("Grass_Density");
-    _grass.quadSize = are.getFloat("Grass_QuadSize");
-    _grass.ambient = are.getInt("Grass_Ambient");
-    _grass.diffuse = are.getInt("Grass_Diffuse");
-    _grass.probabilities[0] = are.getFloat("Grass_Prob_UL");
-    _grass.probabilities[1] = are.getFloat("Grass_Prob_UR");
-    _grass.probabilities[2] = are.getFloat("Grass_Prob_LL");
-    _grass.probabilities[3] = are.getFloat("Grass_Prob_LR");
-}
-
-void Area::loadFog(const GffStruct &are) {
-    _fogEnabled = are.getBool("SunFogOn");
-    _fogNear = are.getFloat("SunFogNear");
-    _fogFar = are.getFloat("SunFogFar");
-    _fogColor = are.getColor("SunFogColor");
-
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
-    sceneGraph.setFogEnabled(_fogEnabled);
-    sceneGraph.setFogNear(_fogNear);
-    sceneGraph.setFogFar(_fogFar);
-    sceneGraph.setFogColor(_fogColor);
 }
 
 } // namespace game

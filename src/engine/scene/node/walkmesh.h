@@ -19,13 +19,9 @@
 
 #include "scenenode.h"
 
+#include "../../graphics/walkmesh/walkmesh.h"
+
 namespace reone {
-
-namespace graphics {
-
-class Walkmesh;
-
-}
 
 namespace scene {
 
@@ -44,7 +40,11 @@ public:
             meshes,
             shaders),
         _walkmesh(std::move(walkmesh)) {
+
+        computeAABB();
     }
+
+    bool isEnabled() const { return _enabled; }
 
     const graphics::Walkmesh &walkmesh() const { return *_walkmesh; }
 
@@ -54,6 +54,8 @@ private:
     std::shared_ptr<graphics::Walkmesh> _walkmesh;
 
     bool _enabled {true}; /**< sometimes there is more than 1 walkmesh per object */
+
+    void computeAABB();
 };
 
 } // namespace scene

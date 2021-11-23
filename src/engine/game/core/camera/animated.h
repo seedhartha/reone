@@ -30,8 +30,9 @@ class Model;
 namespace scene {
 
 class ModelSceneNode;
+class SceneGraph;
 
-}
+} // namespace scene
 
 namespace game {
 
@@ -51,8 +52,9 @@ public:
     void setFieldOfView(float fovy);
 
 private:
-    scene::SceneGraph &_sceneGraph;
     float _aspect {1.0f};
+    scene::SceneGraph &_sceneGraph;
+
     std::unique_ptr<scene::ModelSceneNode> _model;
     float _fovy {kDefaultAnimCamFOV};
 

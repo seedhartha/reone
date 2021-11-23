@@ -22,6 +22,12 @@
 
 namespace reone {
 
+namespace scene {
+
+class SceneGraph;
+
+}
+
 namespace game {
 
 class Game;
@@ -36,18 +42,17 @@ public:
 
     void setTargetPosition(glm::vec3 position);
     void setFacing(float facing);
-    void setFindObstacle(const std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> &fn);
     void setStyle(CameraStyle style);
 
 private:
     Game &_game;
+    scene::SceneGraph &_sceneGraph;
 
     CameraStyle _style;
     glm::vec3 _targetPosition {0.0f};
     bool _rotateCCW {false};
     bool _rotateCW {false};
     float _rotationSpeed {0.0f};
-    std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> _findObstacle;
 
     void updateSceneNode();
 

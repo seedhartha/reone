@@ -658,8 +658,8 @@ void registerRoutinesTSL(IRoutines &routines) {
     routines.add("SWMG_GetPlayer", VT_O, {}, &routine::minigame::getPlayer);
     routines.add("SWMG_GetEnemyCount", VT_I, {}, &routine::minigame::getEnemyCount);
     routines.add("SWMG_GetEnemy", VT_O, {VT_I}, &routine::minigame::getEnemy);
-    routines.add("SWMG_GetObstacleCount", VT_I, {}, &routine::minigame::getObstacleCount);
-    routines.add("SWMG_GetObstacle", VT_O, {VT_I}, &routine::minigame::getObstacle);
+    routines.add("SWMG_GetObstacleCount", VT_I, {}, &routine::minigame::testObstacleCount);
+    routines.add("SWMG_GetObstacle", VT_O, {VT_I}, &routine::minigame::testObstacle);
     routines.add("SWMG_GetHitPoints", VT_I, {VT_O}, &routine::minigame::getHitPoints);
     routines.add("SWMG_GetMaxHitPoints", VT_I, {VT_O}, &routine::minigame::getMaxHitPoints);
     routines.add("SWMG_SetMaxHitPoints", VT_V, {VT_O, VT_I}, &routine::minigame::setMaxHitPoints);

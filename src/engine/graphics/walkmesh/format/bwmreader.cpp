@@ -32,7 +32,13 @@ BwmReader::BwmReader() :
 void BwmReader::doLoad() {
     _type = static_cast<WalkmeshType>(readUint32());
 
-    ignore(48 + 12); // reserved + position
+    vector<float> relUsePosition1(readFloatArray(3));
+    vector<float> relUsePosition2(readFloatArray(3));
+    vector<float> absUsePosition1(readFloatArray(3));
+    vector<float> absUsePosition2(readFloatArray(3));
+
+    vector<float> position(readFloatArray(3));
+    _position = glm::make_vec3(&position[0]);
 
     _numVertices = readUint32();
     if (_numVertices == 0) {

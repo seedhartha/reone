@@ -173,11 +173,11 @@ Variable getEnemy(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getObstacleCount(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable testObstacleCount(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getObstacle(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable testObstacle(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

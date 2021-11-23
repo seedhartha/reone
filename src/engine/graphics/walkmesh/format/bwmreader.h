@@ -38,6 +38,7 @@ private:
     };
 
     WalkmeshType _type {WalkmeshType::WOK};
+    glm::vec3 _position {0.0f};
 
     uint32_t _numVertices {0};
     uint32_t _offVertices {0};

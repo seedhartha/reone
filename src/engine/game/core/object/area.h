@@ -312,8 +312,8 @@ private:
     Visibility fixVisibility(const Visibility &visiblity);
 
     void printDebugInfo(const SpatialObject &object);
-
-    bool doMoveCreature(const std::shared_ptr<Creature> &creature, const glm::vec3 &dest);
+    void determineObjectRoom(SpatialObject &object);
+    void checkTriggersIntersection(const std::shared_ptr<SpatialObject> &triggerrer);
 
     // Loading ARE
 
@@ -350,40 +350,6 @@ private:
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 
     // END User input
-
-    // Collision detection
-
-    void determineObjectRoom(SpatialObject &object);
-    void checkTriggersIntersection(const std::shared_ptr<SpatialObject> &triggerrer);
-
-    /**
-     * @param position 2D coordinates to test elevation at
-     * @param[out] z elevation at the specified 2D coordinates
-     * @param[out] room room which the walkable face belongs to, if any
-     * @param[out] material material of the walkable face, if any
-     *
-     * @return true if there is a walkable face at the specified coordinates, false otherwise
-     */
-    bool testElevationAt(const glm::vec2 &point, float &z, int &material, Room *&room) const;
-
-    /**
-     * @param start start of the camera path
-     * @param end end of the camera path
-     * @param[out] intersection intersection point with a non-walkable face, if any
-     *
-     * @return true if a walkmesh or an object are blocking the camera path, false otherwise
-     */
-    bool getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::vec3 &intersection) const;
-
-    /**
-     * @param start start of the creature path
-     * @param end end of the creature path
-     *
-     * @return true if a walkmesh or an object are blocking the creature path, false otherwise
-     */
-    bool getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::vec3 &normal) const;
-
-    // END Collision detection
 };
 
 } // namespace game

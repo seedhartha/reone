@@ -129,9 +129,9 @@ bool Player::handleMouseButtonUp(const SDL_MouseButtonEvent &event) {
 
 void Player::update(float dt) {
     shared_ptr<Creature> partyLeader(_party.getLeader());
-    if (!partyLeader || partyLeader->isMovementRestricted())
+    if (!partyLeader || partyLeader->isMovementRestricted()) {
         return;
-
+    }
     float facing = 0.0f;
     bool movement = true;
 

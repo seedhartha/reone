@@ -21,6 +21,12 @@
 
 namespace reone {
 
+namespace scene {
+
+class SceneGraph;
+
+}
+
 namespace game {
 
 class PlaceableCamera;

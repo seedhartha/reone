@@ -52,6 +52,8 @@ public:
         float maxDistance,
         float &outDistance) const;
 
+    const std::vector<Face> &faces() const { return _faces; }
+
 private:
     std::vector<Face> _faces;
     std::shared_ptr<AABB> _rootAabb;
