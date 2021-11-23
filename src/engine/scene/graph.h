@@ -26,6 +26,7 @@
 #include "node/grass.h"
 #include "node/light.h"
 #include "node/mesh.h"
+#include "user.h"
 
 namespace reone {
 
@@ -50,6 +51,12 @@ class WalkmeshSceneNode;
 
 class SceneGraph : boost::noncopyable {
 public:
+    struct Collision {
+        glm::vec3 intersection {0.0f};
+        IUser *user {nullptr};
+        int material {-1};
+    };
+
     SceneGraph(
         std::string name,
         graphics::GraphicsOptions options,
@@ -90,6 +97,15 @@ public:
     void removeRoot(const std::shared_ptr<SceneNode> &node);
 
     // END Roots
+
+    // Collision detection
+
+    bool getElevationAt(const glm::vec2 &position, Collision &outCollision) const;
+
+    void setWalkableSurfaces(std::set<uint32_t> surfaces) { _walkableSurfaces = std::move(surfaces); }
+    void setWalkcheckSurfaces(std::set<uint32_t> surfaces) { _walkcheckSurfaces = std::move(surfaces); }
+
+    // END Collision detection
 
     // Lighting and shadows
 
@@ -158,6 +174,9 @@ private:
     uint32_t _textureId {0};
     bool _updateRoots {true};
     graphics::ShaderUniforms _uniformsPrototype;
+
+    std::set<uint32_t> _walkableSurfaces;
+    std::set<uint32_t> _walkcheckSurfaces;
 
     // Services
 

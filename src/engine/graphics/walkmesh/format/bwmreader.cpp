@@ -67,10 +67,6 @@ void BwmReader::doLoad() {
     loadMaterials();
     loadNormals();
 
-    // In WOK adjacencies are calculated only for walkable faces.
-    // In PWK/DWK there no walkable faces.
-    uint32_t numWalkableFaces = _numAdjacencies;
-
     for (uint32_t i = 0; i < _numFaces; ++i) {
         uint32_t material = _materials[i];
         uint32_t *indices = &_indices[3 * i + 0];
@@ -82,7 +78,6 @@ void BwmReader::doLoad() {
         face.vertices.push_back(glm::make_vec3(&_vertices[3 * indices[1]]));
         face.vertices.push_back(glm::make_vec3(&_vertices[3 * indices[2]]));
         face.normal = glm::make_vec3(&_normals[3 * i]);
-        face.walkable = i < numWalkableFaces;
 
         _walkmesh->_faces.push_back(move(face));
     }

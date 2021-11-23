@@ -22,6 +22,9 @@ namespace reone {
 namespace scene {
 
 class IUser {
+public:
+    virtual ~IUser() {
+    }
 };
 
 } // namespace scene

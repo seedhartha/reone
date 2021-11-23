@@ -98,6 +98,13 @@ Game::Game(
 void Game::init() {
     _services.window.setEventHandler(this);
 
+    auto walkableSurfaces = _services.surfaces.getWalkableSurfaces();
+    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaces();
+    for (auto &scene : _services.sceneGraphs.scenes()) {
+        scene.second->setWalkableSurfaces(walkableSurfaces);
+        scene.second->setWalkcheckSurfaces(walkcheckSurfaces);
+    }
+
     _console.init();
     _profileOverlay.init();
 

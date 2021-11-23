@@ -62,6 +62,8 @@ public:
 
     SceneGraph &get(const std::string &name);
 
+    const std::unordered_map<std::string, std::unique_ptr<SceneGraph>> &scenes() const { return _scenes; }
+
 private:
     graphics::GraphicsOptions _options;
     graphics::Context &_context;

@@ -93,9 +93,10 @@ private:
 
     // END Scripts
 
+    void loadUTP(const resource::GffStruct &utp);
     void loadTransformFromGIT(const resource::GffStruct &gffs);
 
-    void loadUTP(const resource::GffStruct &utp);
+    void updateTransform() override;
 };
 
 } // namespace game

@@ -40,6 +40,7 @@ namespace reone {
 
 namespace scene {
 
+static constexpr float kElevationTestZ = 1024.0f;
 static constexpr float kMaxGrassDistance = 16.0f;
 
 static const bool g_debugAABB = false;
@@ -384,6 +385,33 @@ vector<LightSceneNode *> SceneGraph::getLightsAt(
     }
 
     return move(result);
+}
+
+bool SceneGraph::getElevationAt(const glm::vec2 &position, Collision &outCollision) const {
+    static glm::vec3 down(0.0f, 0.0f, -1.0f);
+
+    glm::vec3 origin(position, kElevationTestZ);
+
+    for (auto &root : _roots) {
+        if (root->type() != SceneNodeType::Walkmesh) {
+            continue;
+        }
+        auto walkmesh = static_pointer_cast<WalkmeshSceneNode>(root);
+        float distance = 0.0f;
+        auto face = walkmesh->walkmesh().raycast(_walkcheckSurfaces, origin, down, 2.0f * kElevationTestZ, distance);
+        if (face) {
+            if (_walkableSurfaces.count(face->material) == 0) {
+                // non-walkable
+                return false;
+            }
+            outCollision.intersection = origin + distance * down;
+            outCollision.user = walkmesh->user();
+            outCollision.material = face->material;
+            return true;
+        }
+    }
+
+    return false;
 }
 
 unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {

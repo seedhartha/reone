@@ -80,6 +80,8 @@ public:
     const SceneNode *parent() const { return _parent; }
     const std::unordered_set<std::shared_ptr<SceneNode>> &children() const { return _children; }
     const graphics::AABB &aabb() const { return _aabb; }
+    IUser *user() { return _user; }
+    const IUser *user() const { return _user; }
 
     void setUser(IUser &user) { _user = &user; }
     void setVisible(bool visible) { _visible = visible; }
@@ -99,10 +101,10 @@ public:
 protected:
     SceneNodeType _type;
 
-    graphics::AABB _aabb;
-
     SceneNode *_parent {nullptr};
     std::unordered_set<std::shared_ptr<SceneNode>> _children;
+
+    graphics::AABB _aabb;
 
     IUser *_user {nullptr};
 

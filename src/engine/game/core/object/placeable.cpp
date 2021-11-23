@@ -165,6 +165,14 @@ void Placeable::loadUTP(const GffStruct &utp) {
     // - Comment (toolset only)
 }
 
+void Placeable::updateTransform() {
+    SpatialObject::updateTransform();
+
+    if (_walkmesh) {
+        _walkmesh->setLocalTransform(_transform);
+    }
+}
+
 } // namespace game
 
 } // namespace reone
