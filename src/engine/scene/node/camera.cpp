@@ -100,7 +100,11 @@ bool CameraSceneNode::isInFrustum(const AABB &aabb) const {
 }
 
 bool CameraSceneNode::isInFrustum(const SceneNode &other) const {
-    return other.isVolumetric() ? isInFrustum(other.aabb() * other.absoluteTransform()) : isInFrustum(other.absoluteTransform()[3]);
+    if (other.isPoint()) {
+        return isInFrustum(other.absoluteTransform()[3]);
+    } else {
+        return isInFrustum(other.aabb() * other.absoluteTransform());
+    }
 }
 
 void CameraSceneNode::setProjection(glm::mat4 projection) {

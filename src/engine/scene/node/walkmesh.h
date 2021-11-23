@@ -41,6 +41,7 @@ public:
             shaders),
         _walkmesh(std::move(walkmesh)) {
 
+        _point = false;
         computeAABB();
     }
 

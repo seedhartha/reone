@@ -64,8 +64,7 @@ ModelSceneNode::ModelSceneNode(
     _textures(textures),
     _animEventListener(animEventListener) {
 
-    _volumetric = true;
-
+    _point = false;
     buildNodeTree(_model->rootNode(), *this);
     computeAABB();
 }

@@ -40,6 +40,8 @@ public:
             meshes,
             shaders),
         _emitter(emitter) {
+
+        _point = false;
     }
 
     void update(float dt);
