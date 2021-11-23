@@ -17,35 +17,19 @@
 
 #pragma once
 
+#include "user.h"
+
 namespace reone {
 
 namespace scene {
 
-class CameraSceneNode;
-
-}
-
-namespace game {
-
-class Camera {
-public:
-    virtual bool handle(const SDL_Event &event);
-    virtual void update(float dt);
-
-    virtual void stopMovement();
-
-    float facing() const { return _facing; }
-    std::shared_ptr<scene::CameraSceneNode> sceneNode() const { return _sceneNode; }
-    bool isMouseLookMode() const { return _mouseLookMode; }
-
-protected:
-    float _facing {0.0f};
-    std::shared_ptr<scene::CameraSceneNode> _sceneNode;
-    bool _mouseLookMode {false};
-
-    Camera() = default;
+struct Collision {
+    IUser *user {nullptr};
+    glm::vec3 intersection {0.0f};
+    glm::vec3 normal {0.0f, 0.0f, 1.0f};
+    int material {-1};
 };
 
-} // namespace game
+} // namespace scene
 
 } // namespace reone

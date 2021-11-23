@@ -77,24 +77,24 @@ void Door::loadFromBlueprint(const string &resRef) {
     modelSceneNode->setDrawDistance(FLT_MAX);
     _sceneNode = move(modelSceneNode);
 
-    auto walkmeshOpen1 = _services.walkmeshes.get(modelName + "0", ResourceType::Dwk);
+    auto walkmeshClosed = _services.walkmeshes.get(modelName + "0", ResourceType::Dwk);
+    if (walkmeshClosed) {
+        _walkmeshClosed = sceneGraph.newWalkmesh(move(walkmeshClosed));
+        _walkmeshClosed->setUser(*this);
+    }
+
+    auto walkmeshOpen1 = _services.walkmeshes.get(modelName + "1", ResourceType::Dwk);
     if (walkmeshOpen1) {
         _walkmeshOpen1 = sceneGraph.newWalkmesh(move(walkmeshOpen1));
         _walkmeshOpen1->setUser(*this);
         _walkmeshOpen1->setEnabled(false);
     }
 
-    auto walkmeshOpen2 = _services.walkmeshes.get(modelName + "1", ResourceType::Dwk);
+    auto walkmeshOpen2 = _services.walkmeshes.get(modelName + "2", ResourceType::Dwk);
     if (walkmeshOpen2) {
         _walkmeshOpen2 = sceneGraph.newWalkmesh(move(walkmeshOpen2));
         _walkmeshOpen2->setUser(*this);
         _walkmeshOpen2->setEnabled(false);
-    }
-
-    auto walkmeshClosed = _services.walkmeshes.get(modelName + "2", ResourceType::Dwk);
-    if (walkmeshClosed) {
-        _walkmeshClosed = sceneGraph.newWalkmesh(move(walkmeshClosed));
-        _walkmeshClosed->setUser(*this);
     }
 }
 

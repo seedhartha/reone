@@ -18,6 +18,7 @@
 #include "dialog.h"
 
 #include "../../../graphics/types.h"
+#include "../../../scene/collision.h"
 #include "../../../scene/graph.h"
 #include "../../../scene/node/camera.h"
 
@@ -30,7 +31,9 @@ namespace reone {
 
 namespace game {
 
-DialogCamera::DialogCamera(float aspect, const CameraStyle &style, SceneGraph &sceneGraph) {
+DialogCamera::DialogCamera(float aspect, const CameraStyle &style, SceneGraph &sceneGraph) :
+    _sceneGraph(sceneGraph) {
+
     glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
     _sceneNode = sceneGraph.newCamera(move(projection));
 }
@@ -54,10 +57,6 @@ void DialogCamera::setVariant(Variant variant) {
         _variant = variant;
         updateSceneNode();
     }
-}
-
-void DialogCamera::setFindObstacle(function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> fn) {
-    _findObstacle = move(fn);
 }
 
 void DialogCamera::updateSceneNode() {
@@ -116,12 +115,12 @@ void DialogCamera::updateSceneNode() {
         target += 0.25f * down;
         break;
     }
-    if (_findObstacle) {
-        static glm::vec3 intersection;
-        if (_findObstacle(target, eye, intersection)) {
-            eye = intersection;
-        }
+
+    Collision collision;
+    if (_sceneGraph.testObstacle(target, eye, nullptr, collision)) {
+        eye = collision.intersection;
     }
+
     glm::mat4 transform(1.0f);
     transform *= glm::inverse(glm::lookAt(eye, target, up));
 

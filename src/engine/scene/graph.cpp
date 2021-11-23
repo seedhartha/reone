@@ -22,6 +22,7 @@
 #include "../graphics/mesh/meshes.h"
 #include "../graphics/walkmesh/walkmesh.h"
 
+#include "collision.h"
 #include "node/camera.h"
 #include "node/emitter.h"
 #include "node/grass.h"
@@ -274,6 +275,9 @@ void SceneGraph::prepareLeafs() {
 }
 
 void SceneGraph::draw(bool shadowPass) {
+    static glm::vec3 white {1.0f, 1.0f, 1.0f};
+    static glm::vec3 red {1.0f, 0.0f, 0.0f};
+
     if (!_activeCamera)
         return;
 
@@ -294,11 +298,18 @@ void SceneGraph::draw(bool shadowPass) {
 
     if (g_debugAABB) {
         for (auto &root : _roots) {
+            bool walkmesh = root->type() == SceneNodeType::Walkmesh;
+            if (walkmesh && !static_pointer_cast<WalkmeshSceneNode>(root)->isEnabled()) {
+                continue;
+            }
+
             glm::mat4 transform(root->absoluteTransform());
+            transform *= glm::translate(root->aabb().center());
             transform *= glm::scale(root->aabb().getSize());
 
             ShaderUniforms uniforms(_uniformsPrototype);
             uniforms.combined.general.model = move(transform);
+            uniforms.combined.general.color = glm::vec4(walkmesh ? red : white, 1.0f);
 
             _shaders.activate(ShaderProgram::SimpleColor, uniforms);
             _meshes.aabb().draw();
@@ -387,7 +398,7 @@ vector<LightSceneNode *> SceneGraph::getLightsAt(
     return move(result);
 }
 
-bool SceneGraph::getElevationAt(const glm::vec2 &position, Collision &outCollision) const {
+bool SceneGraph::testElevation(const glm::vec2 &position, Collision &outCollision) const {
     static glm::vec3 down(0.0f, 0.0f, -1.0f);
 
     glm::vec3 origin(position, kElevationTestZ);
@@ -397,21 +408,60 @@ bool SceneGraph::getElevationAt(const glm::vec2 &position, Collision &outCollisi
             continue;
         }
         auto walkmesh = static_pointer_cast<WalkmeshSceneNode>(root);
+        if (!walkmesh->isEnabled()) {
+            continue;
+        }
+        auto objSpaceOrigin = glm::vec3(walkmesh->absoluteTransformInverse() * glm::vec4(origin, 1.0f));
         float distance = 0.0f;
-        auto face = walkmesh->walkmesh().raycast(_walkcheckSurfaces, origin, down, 2.0f * kElevationTestZ, distance);
+        auto face = walkmesh->walkmesh().raycast(_walkcheckSurfaces, objSpaceOrigin, down, 2.0f * kElevationTestZ, distance);
         if (face) {
             if (_walkableSurfaces.count(face->material) == 0) {
                 // non-walkable
                 return false;
             }
-            outCollision.intersection = origin + distance * down;
             outCollision.user = walkmesh->user();
+            outCollision.intersection = origin + distance * down;
+            outCollision.normal = walkmesh->absoluteTransform() * glm::vec4(face->normal, 0.0f);
             outCollision.material = face->material;
             return true;
         }
     }
 
     return false;
+}
+
+bool SceneGraph::testObstacle(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const {
+    glm::vec3 originToDest(dest - origin);
+    glm::vec3 dir(glm::normalize(originToDest));
+    float maxDistance = glm::length(originToDest);
+    float minDistance = numeric_limits<float>::max();
+
+    for (auto &root : _roots) {
+        if (root->type() != SceneNodeType::Walkmesh) {
+            continue;
+        }
+        if (root->user() == excludeUser) {
+            continue;
+        }
+        auto walkmesh = static_pointer_cast<WalkmeshSceneNode>(root);
+        if (!walkmesh->isEnabled()) {
+            continue;
+        }
+        glm::vec3 objSpaceOrigin(walkmesh->absoluteTransformInverse() * glm::vec4(origin, 1.0f));
+        glm::vec3 objSpaceDir(walkmesh->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
+        float distance = 0.0f;
+        auto face = walkmesh->walkmesh().raycast(_walkcheckSurfaces, objSpaceOrigin, objSpaceDir, 2.0f * kElevationTestZ, distance);
+        if (!face || distance > maxDistance || distance > minDistance) {
+            continue;
+        }
+        outCollision.user = walkmesh->user();
+        outCollision.intersection = origin + distance * dir;
+        outCollision.normal = walkmesh->absoluteTransform() * glm::vec4(face->normal, 0.0f);
+        outCollision.material = face->material;
+        minDistance = distance;
+    }
+
+    return minDistance != numeric_limits<float>::max();
 }
 
 unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {

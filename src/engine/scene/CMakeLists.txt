@@ -16,6 +16,7 @@
 set(SCENE_HEADERS
     animeventlistener.h
     animproperties.h
+    collision.h
     graph.h
     graphs.h
     node/camera.h
@@ -46,6 +47,7 @@ set(SCENE_SOURCES
     node/model.cpp
     node/particle.cpp
     node/scenenode.cpp
+    node/walkmesh.cpp
     pipeline/control.cpp
     pipeline/world.cpp)
 

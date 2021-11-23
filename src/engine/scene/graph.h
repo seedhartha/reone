@@ -45,18 +45,13 @@ class Walkmesh;
 
 namespace scene {
 
+class Collision;
 class IAnimationEventListener;
 class ModelSceneNode;
 class WalkmeshSceneNode;
 
 class SceneGraph : boost::noncopyable {
 public:
-    struct Collision {
-        glm::vec3 intersection {0.0f};
-        IUser *user {nullptr};
-        int material {-1};
-    };
-
     SceneGraph(
         std::string name,
         graphics::GraphicsOptions options,
@@ -100,7 +95,8 @@ public:
 
     // Collision detection
 
-    bool getElevationAt(const glm::vec2 &position, Collision &outCollision) const;
+    bool testElevation(const glm::vec2 &position, Collision &outCollision) const;
+    bool testObstacle(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const;
 
     void setWalkableSurfaces(std::set<uint32_t> surfaces) { _walkableSurfaces = std::move(surfaces); }
     void setWalkcheckSurfaces(std::set<uint32_t> surfaces) { _walkcheckSurfaces = std::move(surfaces); }

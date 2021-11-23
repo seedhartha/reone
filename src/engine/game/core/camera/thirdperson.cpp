@@ -17,6 +17,7 @@
 
 #include "thirdperson.h"
 
+#include "../../../scene/collision.h"
 #include "../../../scene/graph.h"
 #include "../../../scene/node/camera.h"
 
@@ -35,9 +36,12 @@ static constexpr float kMinRotationSpeed = 1.0f;
 static constexpr float kMaxRotationSpeed = 2.5f;
 static constexpr float kRotationAcceleration = 1.0f;
 static constexpr float kMouseRotationSpeed = 0.001f;
+static constexpr float kTargetPadding = 0.05f;
 
 ThirdPersonCamera::ThirdPersonCamera(float aspect, const CameraStyle &style, Game &game, SceneGraph &sceneGraph) :
-    _game(game) {
+    _game(game),
+    _sceneGraph(sceneGraph) {
+
     glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
     _sceneNode = sceneGraph.newCamera(move(projection));
     _style = style;
@@ -151,25 +155,31 @@ void ThirdPersonCamera::update(float dt) {
 }
 
 void ThirdPersonCamera::updateSceneNode() {
-    glm::vec3 cameraPosition(_targetPosition);
-    cameraPosition.x += _style.distance * glm::sin(_facing);
-    cameraPosition.y -= _style.distance * glm::cos(_facing);
-    cameraPosition.z += _style.height;
+    static glm::vec3 up {0.0f, 0.0f, 1.0f};
 
-    if (_findObstacle) {
-        glm::vec3 intersection(0.0f);
-        if (_findObstacle(_targetPosition, cameraPosition, intersection)) {
-            cameraPosition = intersection;
-        }
+    glm::vec3 dir(
+        glm::sin(_facing),
+        -glm::cos(_facing),
+        0.0f);
+
+    glm::vec3 targetPos(_targetPosition);
+    targetPos += kTargetPadding * dir;
+
+    glm::vec3 cameraPos(_targetPosition);
+    cameraPos += _style.distance * dir;
+    cameraPos.z += _style.height;
+
+    Collision collision;
+    if (_sceneGraph.testObstacle(targetPos, cameraPos, nullptr, collision)) {
+        cameraPos = collision.intersection;
     }
-    glm::vec3 up(0.0f, 0.0f, 1.0f);
-    glm::quat orientation(glm::quatLookAt(glm::normalize(_targetPosition - cameraPosition), up));
+
+    glm::quat orientation(glm::quatLookAt(glm::normalize(targetPos - cameraPos), up));
 
     glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, cameraPosition);
+    transform *= glm::translate(cameraPos);
     transform *= glm::mat4_cast(orientation);
-
-    _sceneNode->setLocalTransform(transform);
+    _sceneNode->setLocalTransform(move(transform));
 }
 
 void ThirdPersonCamera::stopMovement() {
@@ -186,10 +196,6 @@ void ThirdPersonCamera::setTargetPosition(glm::vec3 position) {
 void ThirdPersonCamera::setFacing(float facing) {
     _facing = facing;
     updateSceneNode();
-}
-
-void ThirdPersonCamera::setFindObstacle(const function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> &fn) {
-    _findObstacle = fn;
 }
 
 void ThirdPersonCamera::setStyle(CameraStyle style) {
