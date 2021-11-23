@@ -17,16 +17,16 @@
 
 #pragma once
 
-#include "binreader.h"
+#include "../../../resource/format/binreader.h"
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
 /**
  * Encapsulates the LTR file format, used to generate random names.
  */
-class LtrReader : public BinaryReader {
+class LtrReader : public resource::BinaryReader {
 public:
     LtrReader();
 
@@ -49,6 +49,6 @@ private:
     void readLetterSet(LetterSet &set);
 };
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone

@@ -17,13 +17,15 @@
 
 #include "ltrreader.h"
 
-#include "../../common/randomutil.h"
+#include "../../../common/randomutil.h"
 
 using namespace std;
 
+using namespace reone::resource;
+
 namespace reone {
 
-namespace resource {
+namespace game {
 
 static const vector<char> g_letters {
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
@@ -145,6 +147,6 @@ string LtrReader::getRandomName(int maxLength) const {
     return move(name);
 }
 
-} // namespace resource
+} // namespace game
 
 } // namespace reone

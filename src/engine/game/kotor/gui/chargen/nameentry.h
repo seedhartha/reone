@@ -18,7 +18,8 @@
 #pragma once
 
 #include "../../../../gui/textinput.h"
-#include "../../../../resource/format/ltrreader.h"
+
+#include "../../../core/format/ltrreader.h"
 
 #include "../gui.h"
 
@@ -56,12 +57,12 @@ private:
 
     CharacterGeneration &_charGen;
     gui::TextInput _input;
-    resource::LtrReader _maleLtr;
-    resource::LtrReader _femaleLtr;
-    resource::LtrReader _lastNameLtr;
+    LtrReader _maleLtr;
+    LtrReader _femaleLtr;
+    LtrReader _lastNameLtr;
 
     void bindControls();
-    void loadLtrFile(const std::string &resRef, resource::LtrReader &ltr);
+    void loadLtrFile(const std::string &resRef, LtrReader &ltr);
 
     std::string getRandomName() const;
 };
