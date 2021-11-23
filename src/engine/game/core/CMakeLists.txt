@@ -183,6 +183,7 @@ set(GAMECORE_HEADERS
     effect/whirlwind.h
     event.h
     footstepsounds.h
+    format/ltrreader.h
     format/lytreader.h
     format/ssfreader.h
     format/ssfwriter.h
@@ -388,6 +389,7 @@ set(GAMECORE_SOURCES
     effect/vpregenmodifier.cpp
     effect/whirlwind.cpp
     footstepsounds.cpp
+    format/ltrreader.cpp
     format/lytreader.cpp
     format/ssfreader.cpp
     format/ssfwriter.cpp
