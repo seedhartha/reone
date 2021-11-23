@@ -49,7 +49,7 @@ public:
     bool isVisible() const { return _visible; }
     bool isCullable() const { return _cullable; }
     bool isCulled() const { return _culled; }
-    bool isVolumetric() const { return _volumetric; }
+    bool isPoint() const { return _point; }
 
     glm::vec3 getOrigin() const;
 
@@ -129,9 +129,9 @@ protected:
     // Flags
 
     bool _visible {true};
-    bool _cullable {false};   /**< can this scene node be frustum- or distance-culled? */
-    bool _culled {false};     /**< has this scene node been frustum- or distance-culled? */
-    bool _volumetric {false}; /**< does this scene node have a bounding box? */
+    bool _cullable {false}; /**< can this scene node be frustum- or distance-culled? */
+    bool _culled {false};   /**< has this scene node been frustum- or distance-culled? */
+    bool _point {true};
 
     // END Flags
 

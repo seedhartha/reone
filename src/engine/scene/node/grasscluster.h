@@ -36,6 +36,8 @@ public:
             context,
             meshes,
             shaders) {
+
+        _point = false;
     }
 
     const glm::vec3 &position() const { return _position; }
