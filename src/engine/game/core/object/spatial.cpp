@@ -220,6 +220,7 @@ void SpatialObject::setPosition(const glm::vec3 &position) {
 void SpatialObject::updateTransform() {
     _transform = glm::translate(glm::mat4(1.0f), _position);
     _transform *= glm::mat4_cast(_orientation);
+
     if (_sceneNode && !_stunt) {
         _sceneNode->setLocalTransform(_transform);
     }

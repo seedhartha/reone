@@ -74,7 +74,6 @@ static constexpr float kGrassDensityFactor = 0.25f;
 
 static constexpr float kUpdatePerceptionInterval = 1.0f; // seconds
 
-static constexpr float kElevationTestZ = 1024.0f;
 static constexpr float kMaxCollisionDistance = 8.0f;
 static constexpr float kMaxCollisionDistance2 = kMaxCollisionDistance * kMaxCollisionDistance;
 static constexpr float kLineOfSightTestHeight = 1.7f; // TODO: make it appearance-based
@@ -166,7 +165,7 @@ void Area::loadLYT() {
         if (_grass.texture && aabbNode) {
             glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), position));
             auto grassSceneNode = sceneGraph.newGrass(glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap);
-            for (auto &material : _services.surfaces.getGrassSurfaceIndices()) {
+            for (auto &material : _services.surfaces.getGrassSurfaces()) {
                 for (auto &face : aabbNode->getFacesByMaterial(material)) {
                     vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getTriangleCoords(face));
                     float triArea = calculateTriangleArea(vertices);
@@ -1243,56 +1242,19 @@ void Area::loadEncounters(const GffStruct &git) {
 }
 
 bool Area::testElevationAt(const glm::vec2 &point, float &z, int &material, Room *&room) const {
-    static glm::vec3 down(0.0f, 0.0f, -1.0f);
+    SceneGraph::Collision collision;
 
-    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaceIndices();
+    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    if (sceneGraph.getElevationAt(point, collision)) {
+        z = collision.intersection.z;
+        material = collision.material;
 
-    /*
-    // Test object walkmeshes
-    for (auto &o : _objects) {
-        // Object must have a valid model and walkmesh
-        auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
-        shared_ptr<Walkmesh> walkmesh(o->getWalkmesh());
-        if (!model || !walkmesh) {
-            continue;
+        auto userRoom = dynamic_cast<Room *>(collision.user);
+        if (userRoom) {
+            room = userRoom;
         }
 
-        // Distance to object must not exceed maximum collision distance
-        if (o->getDistanceTo2(point) > kMaxCollisionDistance2) {
-            continue;
-        }
-
-        glm::vec2 objSpacePos(model->absoluteTransformInverse() * glm::vec4(point, 0.0f, 1.0f));
-        glm::vec3 origin(objSpacePos, kElevationTestZ);
-        float distance = 0.0f;
-        auto face = walkmesh->raycast(walkcheckSurfaces, origin, down, 2.0f * kElevationTestZ, distance);
-        if (face) {
-            return false;
-        }
-    }
-    */
-
-    // Test room walkmeshes
-    for (auto &r : _rooms) {
-        // Room must have a valid model and walkmesh
-        shared_ptr<ModelSceneNode> model(r.second->model());
-        shared_ptr<WalkmeshSceneNode> walkmesh(r.second->walkmesh());
-        if (!model || !walkmesh) {
-            continue;
-        }
-
-        glm::vec3 origin(point, kElevationTestZ);
-        float distance;
-        auto face = walkmesh->walkmesh().raycast(walkcheckSurfaces, origin, down, 2.0f * kElevationTestZ, distance);
-        if (face) {
-            if (!face->walkable) {
-                return false;
-            }
-            z = kElevationTestZ - distance;
-            material = face->material;
-            room = r.second.get();
-            return true;
-        }
+        return true;
     }
 
     return false;
@@ -1372,7 +1334,7 @@ bool Area::getCameraObstacle(const glm::vec3 &start, const glm::vec3 &end, glm::
     }
 
     // Test room walkmeshes
-    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaceIndices();
+    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaces();
     for (auto &r : _rooms) {
         // Room must have a valid model and walkmesh
         shared_ptr<ModelSceneNode> model(r.second->model());
@@ -1400,7 +1362,7 @@ bool Area::getCreatureObstacle(const glm::vec3 &start, const glm::vec3 &end, glm
     if (end == start) {
         return false;
     }
-    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaceIndices();
+    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaces();
     glm::vec3 endToStart(end - start);
     glm::vec3 dir(glm::normalize(endToStart));
     float minDistance = numeric_limits<float>::max();
@@ -1457,7 +1419,7 @@ bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target)
     }
 
     // Test room walkmeshes
-    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaceIndices();
+    auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaces();
     for (auto &r : _rooms) {
         shared_ptr<ModelSceneNode> model(r.second->model());
         shared_ptr<WalkmeshSceneNode> walkmesh(r.second->walkmesh());

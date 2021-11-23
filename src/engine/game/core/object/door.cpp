@@ -210,6 +210,20 @@ void Door::loadUTD(const GffStruct &utd) {
     // - Comment (toolset only)
 }
 
+void Door::updateTransform() {
+    SpatialObject::updateTransform();
+
+    if (_walkmeshOpen1) {
+        _walkmeshOpen1->setLocalTransform(_transform);
+    }
+    if (_walkmeshOpen2) {
+        _walkmeshOpen2->setLocalTransform(_transform);
+    }
+    if (_walkmeshClosed) {
+        _walkmeshClosed->setLocalTransform(_transform);
+    }
+}
+
 } // namespace game
 
 } // namespace reone

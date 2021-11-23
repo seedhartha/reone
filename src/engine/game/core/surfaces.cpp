@@ -68,11 +68,15 @@ set<uint32_t> Surfaces::getSurfaceIndices(const function<bool(const Surface &)> 
     return move(result);
 }
 
-set<uint32_t> Surfaces::getGrassSurfaceIndices() const {
+set<uint32_t> Surfaces::getGrassSurfaces() const {
     return getSurfaceIndices([](auto &surface) { return surface.grass; });
 }
 
-set<uint32_t> Surfaces::getWalkcheckSurfaceIndices() const {
+set<uint32_t> Surfaces::getWalkableSurfaces() const {
+    return getSurfaceIndices([](auto &surface) { return surface.walk; });
+}
+
+set<uint32_t> Surfaces::getWalkcheckSurfaces() const {
     return getSurfaceIndices([](auto &surface) { return surface.walkcheck; });
 }
 
