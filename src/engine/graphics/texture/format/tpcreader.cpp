@@ -103,15 +103,15 @@ void TpcReader::loadPixels() {
         vector<Texture::MipMap> mipMaps;
         mipMaps.reserve(_mipMapCount);
 
-        for (int i = 0; i < _mipMapCount; ++i) {
+        for (int j = 0; j < _mipMapCount; ++j) {
             Texture::MipMap mipMap;
             int dataSize;
-            if (i == 0) {
+            if (j == 0) {
                 mipMap.width = _width;
                 mipMap.height = _height;
                 dataSize = _dataSize;
             } else {
-                getMipMapSize(i, mipMap.width, mipMap.height);
+                getMipMapSize(j, mipMap.width, mipMap.height);
                 dataSize = getMipMapDataSize(mipMap.width, mipMap.height);
             }
             mipMap.pixels = make_shared<ByteArray>(_reader->getBytes(dataSize));
