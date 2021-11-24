@@ -284,8 +284,10 @@ ModelSceneNode::AnimationBlendMode ModelSceneNode::getAnimationBlendMode(int fla
 }
 
 void ModelSceneNode::updateAnimations(float dt) {
-    if (_animChannels.empty())
+    if (_animChannels.empty()) {
+        playAnimation("default", AnimationProperties::fromFlags(AnimationFlags::loop));
         return;
+    }
 
     for (auto &channel : _animChannels) {
         if (!channel.freeze) {

@@ -107,10 +107,10 @@ void Creature::loadAppearance() {
         _portrait = _services.portraits.getTextureByAppearance(_appearance);
     }
 
-    auto model = buildModel();
-    finalizeModel(*model);
+    auto modelSceneNode = buildModel();
+    finalizeModel(*modelSceneNode);
 
-    _sceneNode = move(model);
+    _sceneNode = move(modelSceneNode);
     _sceneNode->setUser(*this);
     _sceneNode->setLocalTransform(_transform);
 
