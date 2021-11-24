@@ -744,6 +744,8 @@ bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target)
     Collision collision;
 
     glm::vec3 origin(subject.position());
+    origin.z += kLineOfSightTestHeight;
+
     glm::vec3 dest(target.position());
     dest.z += kLineOfSightTestHeight;
 
@@ -751,7 +753,7 @@ bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target)
         return collision.user == &target;
     }
 
-    return false;
+    return true;
 }
 
 void Area::runSpawnScripts() {
