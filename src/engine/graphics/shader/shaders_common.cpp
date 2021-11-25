@@ -245,13 +245,13 @@ vec3 getNormalFromBumpMap(vec2 uv) {
     float dBy = bumpmapSampleDv.r - bumpmapSample.r;
     vec3 normal = vec3(-dBx * uBumpmaps.scaling, -dBy * uBumpmaps.scaling, 1.0);
 
-    return normalize(normal * fragTanSpace);
+    return normalize(fragTanSpace * normal);
 }
 
 vec3 getNormalFromNormalMap(vec2 uv) {
     vec4 bumpmapSample = texture(sBumpMap, uv);
     vec3 normal = bumpmapSample.rgb * 2.0 - 1.0;
-    return normalize(normal * fragTanSpace);
+    return normalize(fragTanSpace * normal);
 }
 
 vec3 getNormal(vec2 uv) {
@@ -406,7 +406,7 @@ void main() {
         vec3 T = normalize(normalMatrix * aTangent);
         vec3 B = normalize(normalMatrix * aBitangent);
         vec3 N = normalize(normalMatrix * aTanSpaceNormal);
-        fragTanSpace = transpose(mat3(T, B, N));
+        fragTanSpace = mat3(T, B, N);
     }
 
     // Compute light space fragment position for directional lights
