@@ -113,6 +113,9 @@ void EmitterSceneNode::removeExpiredParticles(float dt) {
     }
     vector<shared_ptr<SceneNode>> expiredParticles;
     for (auto &child : _children) {
+        if (child->type() != SceneNodeType::Particle) {
+            continue;
+        }
         auto particle = static_pointer_cast<ParticleSceneNode>(child);
         if (particle->isExpired()) {
             expiredParticles.push_back(child);
