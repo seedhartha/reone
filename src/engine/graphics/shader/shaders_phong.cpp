@@ -76,7 +76,7 @@ void main() {
     vec3 N = getNormal(uv);
     float shadow = getShadow();
     vec4 diffuseSample = texture(sDiffuseMap, uv);
-    bool opaque = isFeatureEnabled(FEATURE_ENVMAP) || isFeatureEnabled(FEATURE_BUMPMAP) || isFeatureEnabled(FEATURE_NORMALMAP);
+    bool opaque = isFeatureEnabled(FEATURE_ENVMAP) || isFeatureEnabled(FEATURE_NORMALMAP) || isFeatureEnabled(FEATURE_HEIGHTMAP);
 
     vec3 lighting;
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {

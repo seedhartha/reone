@@ -114,7 +114,10 @@ void MeshSceneNode::refreshAdditionalTextures() {
         _nodeTextures.envmap = _textures.get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap);
     }
     if (!features.bumpmapTexture.empty()) {
-        _nodeTextures.bumpmap = _textures.get(features.bumpmapTexture, TextureUsage::Bumpmap);
+        auto bumpmap = _textures.get(features.bumpmapTexture, TextureUsage::NormalMap);
+        if (bumpmap) {
+            _nodeTextures.bumpmap = _textures.get(features.bumpmapTexture, bumpmap->isGrayscale() ? TextureUsage::HeightMap : TextureUsage::NormalMap);
+        }
     }
 }
 
@@ -137,17 +140,17 @@ void MeshSceneNode::updateUVAnimation(float dt, const ModelNode::TriangleMesh &m
 }
 
 void MeshSceneNode::updateBumpmapAnimation(float dt, const ModelNode::TriangleMesh &mesh) {
-    if (!_nodeTextures.bumpmap)
+    if (!_nodeTextures.bumpmap) {
         return;
-
+    }
     const Texture::Features &features = _nodeTextures.bumpmap->features();
     if (features.procedureType == Texture::ProcedureType::Cycle) {
         int frameCount = features.numX * features.numY;
         float length = frameCount / static_cast<float>(features.fps);
-        _bumpmapTime = glm::min(_bumpmapTime + dt, length);
-        _bumpmapFrame = static_cast<int>(glm::round((frameCount - 1) * (_bumpmapTime / length)));
-        if (_bumpmapTime == length) {
-            _bumpmapTime = 0.0f;
+        _bumpmapCycleTime = glm::min(_bumpmapCycleTime + dt, length);
+        _bumpmapCycleFrame = static_cast<int>(glm::round((frameCount - 1) * (_bumpmapCycleTime / length)));
+        if (_bumpmapCycleTime == length) {
+            _bumpmapCycleTime = 0.0f;
         }
     }
 }
@@ -303,10 +306,21 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
 
         if (_nodeTextures.bumpmap) {
             if (_nodeTextures.bumpmap->isGrayscale()) {
-                uniforms.combined.featureMask |= UniformFeatureFlags::bumpmap;
-                uniforms.combined.bumpmaps.gridSize = glm::vec2(_nodeTextures.bumpmap->features().numX, _nodeTextures.bumpmap->features().numY);
-                uniforms.combined.bumpmaps.scaling = _nodeTextures.bumpmap->features().bumpMapScaling;
-                uniforms.combined.bumpmaps.frame = _bumpmapFrame;
+                uniforms.combined.featureMask |= UniformFeatureFlags::heightmap;
+                uniforms.combined.heightMap.scaling = _nodeTextures.bumpmap->features().bumpMapScaling;
+                if (_nodeTextures.bumpmap->features().procedureType == Texture::ProcedureType::Cycle) {
+                    int gridX = _nodeTextures.bumpmap->features().numX;
+                    int gridY = _nodeTextures.bumpmap->features().numY;
+                    float oneOverGridX = 1.0f / static_cast<float>(gridX);
+                    float oneOverGridY = 1.0f / static_cast<float>(gridY);
+                    uniforms.combined.heightMap.frameBounds = glm::vec4(
+                        oneOverGridX * (_bumpmapCycleFrame % gridX),
+                        oneOverGridY * (_bumpmapCycleFrame / gridX),
+                        oneOverGridX,
+                        oneOverGridY);
+                } else {
+                    uniforms.combined.heightMap.frameBounds = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+                }
             } else {
                 uniforms.combined.featureMask |= UniformFeatureFlags::normalmap;
             }

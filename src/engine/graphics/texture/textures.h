@@ -44,6 +44,8 @@ public:
      */
     void bindDefaults();
 
+    void add(std::string resRef, std::shared_ptr<Texture> texture);
+
     std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
 
 private:

@@ -47,7 +47,7 @@ Texture::Properties getTextureProperties(TextureUsage usage, bool headless) {
         properties.wrap = Texture::Wrapping::ClampToBorder;
         properties.borderColor = glm::vec4(1.0f);
 
-    } else if (usage == TextureUsage::Bumpmap) {
+    } else if (usage == TextureUsage::NormalMap || usage == TextureUsage::HeightMap) {
         properties.minFilter = Texture::Filtering::Linear;
     }
 

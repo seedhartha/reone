@@ -85,8 +85,8 @@ private:
 
     graphics::Material _material;
     glm::vec2 _uvOffset {0.0f};
-    float _bumpmapTime {0.0f};
-    int _bumpmapFrame {0};
+    float _bumpmapCycleTime {0.0f};
+    int _bumpmapCycleFrame {0};
     float _alpha {1.0f};
     glm::vec3 _selfIllumColor {0.0f};
     bool _transparent {false};
