@@ -46,6 +46,7 @@ public:
     virtual void draw();
     virtual void drawElements(const std::vector<SceneNode *> &elements, int count = -1) {}
 
+    bool isEnabled() const { return _enabled; }
     bool isVisible() const { return _visible; }
     bool isCullable() const { return _cullable; }
     bool isCulled() const { return _culled; }
@@ -84,9 +85,6 @@ public:
     const IUser *user() const { return _user; }
 
     void setUser(IUser &user) { _user = &user; }
-    void setVisible(bool visible) { _visible = visible; }
-    void setCullable(bool cullable) { _cullable = cullable; }
-    void setCulled(bool culled) { _culled = culled; }
 
     // Transformations
 
@@ -97,6 +95,15 @@ public:
     void setLocalTransform(glm::mat4 transform);
 
     // END Transformations
+
+    // Flags
+
+    void setEnabled(bool enabled) { _enabled = enabled; }
+    void setVisible(bool visible) { _visible = visible; }
+    void setCullable(bool cullable) { _cullable = cullable; }
+    void setCulled(bool culled) { _culled = culled; }
+
+    // END Flags
 
 protected:
     SceneNodeType _type;
@@ -128,6 +135,7 @@ protected:
 
     // Flags
 
+    bool _enabled {true};
     bool _visible {true};
     bool _cullable {false}; /**< can this scene node be frustum- or distance-culled? */
     bool _culled {false};   /**< has this scene node been frustum- or distance-culled? */
