@@ -30,7 +30,6 @@ public:
         Options options,
         Services &services) :
         Game(
-            false,
             std::move(path),
             std::move(options),
             services) {

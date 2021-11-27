@@ -33,6 +33,8 @@ public:
 
     void initResourceProviders() override;
 
+    bool isTSL() const override { return true; }
+
 private:
     void initRoutines() override;
 

@@ -58,6 +58,8 @@ public:
     void resumeConversation() override;
     void pauseConversation() override;
 
+    virtual bool isTSL() const { return false; }
+
     void setBarkBubbleText(std::string text, float durartion);
 
 protected:

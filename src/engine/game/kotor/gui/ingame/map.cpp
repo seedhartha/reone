@@ -100,7 +100,7 @@ void MapMenu::draw() {
         extent.width,
         extent.height);
 
-    _game.module()->area()->map().draw(Map::Mode::Default, bounds);
+    _game.map().draw(Map::Mode::Default, bounds);
 }
 
 void MapMenu::refreshControls() {
@@ -131,7 +131,7 @@ void MapMenu::refreshSelectedNote() {
         _binding.lblMapNote->setTextMessage(text);
     }
 
-    _game.module()->area()->map().setSelectedNote(note);
+    _game.map().setSelectedNote(note);
 }
 
 } // namespace game

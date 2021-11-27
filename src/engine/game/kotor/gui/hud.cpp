@@ -390,7 +390,7 @@ void HUD::update(float dt) {
     _barkBubble->update(dt);
 
     // Hide minimap when there is no image to display
-    _binding.lblMapBorder->setVisible(_game.module()->area()->map().isLoaded());
+    _binding.lblMapBorder->setVisible(_game.map().isLoaded());
 }
 
 void HUD::draw() {
@@ -417,7 +417,7 @@ void HUD::drawMinimap() {
     bounds[3] = static_cast<float>(extent.height);
 
     shared_ptr<Area> area(_game.module()->area());
-    area->map().draw(Map::Mode::Minimap, bounds);
+    _game.map().draw(Map::Mode::Minimap, bounds);
 }
 
 void HUD::drawHealth(int memberIndex) {

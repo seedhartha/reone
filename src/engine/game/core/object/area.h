@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../../../common/timer.h"
+#include "../../../graphics/texture/texture.h"
 #include "../../../graphics/types.h"
 #include "../../../resource/format/gffreader.h"
 #include "../../../resource/types.h"
@@ -27,7 +28,6 @@
 #include "../camera/firstperson.h"
 #include "../camera/static.h"
 #include "../camera/thirdperson.h"
-#include "../map.h"
 #include "../pathfinder.h"
 #include "../types.h"
 
@@ -101,7 +101,6 @@ public:
     const Pathfinder &pathfinder() const { return _pathfinder; }
     const std::string &localizedName() const { return _localizedName; }
     const RoomMap &rooms() const { return _rooms; }
-    Map &map() { return _map; }
     const Grass &grass() const { return _grass; }
     const glm::vec3 &ambientColor() const { return _ambientColor; }
 
@@ -231,7 +230,6 @@ private:
     CameraStyle _camStyleCombat;
     std::string _music;
     Timer _heartbeatTimer;
-    Map _map;
     bool _unescapable {false};
     Grass _grass;
     glm::vec3 _ambientColor {0.0f};

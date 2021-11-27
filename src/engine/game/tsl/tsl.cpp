@@ -54,8 +54,6 @@ TSL::TSL(
         move(path),
         move(options),
         services) {
-    _tsl = true;
-
     _mainMenuMusicResRef = "mus_sion";
     _charGenMusicResRef = "mus_main";
     _charGenLoadScreenResRef = "load_default";
@@ -63,6 +61,8 @@ TSL::TSL(
     _guiColorBase = glm::vec3(0.192157f, 0.768627f, 0.647059f);
     _guiColorHilight = glm::vec3(0.768627f, 0.768627f, 0.686275f);
     _guiColorDisabled = glm::vec3(0.513725f, 0.513725f, 0.415686f);
+
+    _map.setArrowResRef("mm_barrow_p");
 }
 
 void TSL::initResourceProviders() {

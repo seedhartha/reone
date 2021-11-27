@@ -27,6 +27,7 @@
 #include "console.h"
 #include "effect/factory.h"
 #include "gui/loadscreen.h"
+#include "map.h"
 #include "object/factory.h"
 #include "object/module.h"
 #include "options.h"
@@ -62,7 +63,6 @@ struct Services;
 class Game : public graphics::IEventHandler, boost::noncopyable {
 public:
     Game(
-        bool tsl,
         boost::filesystem::path path,
         Options options,
         Services &services);
@@ -89,7 +89,6 @@ public:
 
     void playVideo(const std::string &name);
 
-    bool isTSL() const { return _tsl; }
     bool isLoadFromSaveGame() const;
     bool isPaused() const { return _paused; }
 
@@ -103,6 +102,7 @@ public:
     EffectFactory &effectFactory() { return _effectFactory; }
     ObjectFactory &objectFactory() { return _objectFactory; }
     ScriptRunner &scriptRunner() { return _scriptRunner; }
+    Map &map() { return _map; }
 
     std::shared_ptr<Module> module() const { return _module; }
     CameraType cameraType() const { return _cameraType; }
@@ -190,7 +190,6 @@ protected:
         SaveLoad
     };
 
-    bool _tsl;
     boost::filesystem::path _path;
     Options _options;
     Services &_services;
@@ -243,6 +242,7 @@ protected:
 
     std::unique_ptr<ILoadingScreen> _loadScreen;
 
+    Map _map;
     Console _console;
     ProfileOverlay _profileOverlay;
 

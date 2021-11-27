@@ -77,11 +77,9 @@ static constexpr int kNfoBufferSize = 1024;
 static constexpr int kScreenBufferSize = 262144;
 
 Game::Game(
-    bool tsl,
     fs::path path,
     Options options,
     Services &services) :
-    _tsl(tsl),
     _path(move(path)),
     _options(move(options)),
     _services(services),
@@ -92,7 +90,8 @@ Game::Game(
     _routines(*this, services),
     _scriptRunner(_routines, services.scripts),
     _console(*this, services),
-    _profileOverlay(services) {
+    _profileOverlay(services),
+    _map(*this, services) {
 }
 
 void Game::init() {

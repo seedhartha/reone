@@ -89,11 +89,9 @@ KotOR::KotOR(
     Options options,
     Services &services) :
     Game(
-        false,
         move(path),
         move(options),
         services) {
-
     _screen = GameScreen::MainMenu;
 
     _mainMenuMusicResRef = "mus_theme_cult";
@@ -103,6 +101,8 @@ KotOR::KotOR(
     _guiColorBase = glm::vec3(0.0f, 0.639216f, 0.952941f);
     _guiColorHilight = glm::vec3(0.980392f, 1.0f, 0.0f);
     _guiColorDisabled = glm::vec3(0.0f, 0.349020f, 0.549020f);
+
+    _map.setArrowResRef("mm_barrow");
 }
 
 void KotOR::initResourceProviders() {
