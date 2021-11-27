@@ -47,6 +47,6 @@ set(TOOLS_SOURCES
 add_executable(reone-tools ${TOOLS_HEADERS} ${TOOLS_SOURCES})
 set_target_properties(reone-tools PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_precompile_headers(reone-tools PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
-target_link_libraries(reone-tools PRIVATE game ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_REGEX_LIBRARY})
+target_link_libraries(reone-tools PRIVATE tsl ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_REGEX_LIBRARY})
 
 list(APPEND InstallTargets reone-tools)
