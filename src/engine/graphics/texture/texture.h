@@ -111,6 +111,9 @@ public:
      */
     void clearPixels(int w, int h, PixelFormat format);
 
+    glm::vec4 sample(float s, float t) const;
+    glm::vec4 sample(int x, int y) const;
+
     /**
      * @return true if this is a cube map texture, false otherwise
      */

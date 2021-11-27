@@ -319,6 +319,80 @@ void Texture::setFeatures(Features features) {
     _features = move(features);
 }
 
+glm::vec4 Texture::sample(float s, float t) const {
+    int x = glm::round(s * (_width - 1));
+    int y = glm::round(t * (_height - 1));
+    return sample(x, y);
+}
+
+glm::vec4 Texture::sample(int x, int y) const {
+    if (_layers.empty()) {
+        throw logic_error("Cannot sample an empty texture");
+    }
+    if (_layers.size() > 1ll) {
+        throw logic_error("Sampling a cube texture is not supported");
+    }
+    if (isCompressed(_pixelFormat)) {
+        throw logic_error("Sampling a compressed texture is not supported");
+    }
+    bool grayscale = isGrayscale();
+    bool alpha = _pixelFormat == PixelFormat::RGBA || _pixelFormat == PixelFormat::BGRA;
+    int bpp = grayscale ? 1 : (alpha ? 4 : 3);
+
+    // Wrapping (repeat)
+    if (x < 0) {
+        x = _width - (-x % _width);
+    } else if (x >= _width) {
+        x %= _width;
+    }
+    if (y < 0) {
+        y = _height - (-y % _height);
+    } else if (y >= _height) {
+        y %= _height;
+    }
+
+    auto &pixels = *_layers.front().mipMaps.front().pixels;
+    auto pixel = &pixels[bpp * (y * _width + x)];
+
+    float r = 0.0f;
+    float g = 0.0f;
+    float b = 0.0f;
+    float a = 1.0f;
+    switch (_pixelFormat) {
+    case PixelFormat::Grayscale:
+        r = static_cast<uint8_t>(pixel[0]) / 255.0f;
+        g = r;
+        b = r;
+        break;
+    case PixelFormat::RGB:
+        r = static_cast<uint8_t>(pixel[0]) / 255.0f;
+        g = static_cast<uint8_t>(pixel[1]) / 255.0f;
+        b = static_cast<uint8_t>(pixel[2]) / 255.0f;
+        break;
+    case PixelFormat::RGBA:
+        r = static_cast<uint8_t>(pixel[0]) / 255.0f;
+        g = static_cast<uint8_t>(pixel[1]) / 255.0f;
+        b = static_cast<uint8_t>(pixel[2]) / 255.0f;
+        a = static_cast<uint8_t>(pixel[3]) / 255.0f;
+        break;
+    case PixelFormat::BGR:
+        r = static_cast<uint8_t>(pixel[2]) / 255.0f;
+        g = static_cast<uint8_t>(pixel[1]) / 255.0f;
+        b = static_cast<uint8_t>(pixel[0]) / 255.0f;
+        break;
+    case PixelFormat::BGRA:
+        r = static_cast<uint8_t>(pixel[2]) / 255.0f;
+        g = static_cast<uint8_t>(pixel[1]) / 255.0f;
+        b = static_cast<uint8_t>(pixel[0]) / 255.0f;
+        a = static_cast<uint8_t>(pixel[3]) / 255.0f;
+        break;
+    default:
+        throw logic_error("Unsupported texture format: " + to_string(static_cast<int>(_pixelFormat)));
+    }
+
+    return glm::vec4(r, g, b, a);
+}
+
 } // namespace graphics
 
 } // namespace reone
