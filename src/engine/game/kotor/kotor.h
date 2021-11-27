@@ -35,6 +35,15 @@ namespace reone {
 
 namespace game {
 
+constexpr char kKeyFilename[] = "chitin.key";
+constexpr char kTexturePackDirectoryName[] = "texturepacks";
+constexpr char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
+constexpr char kTexturePackFilename[] = "swpc_tex_tpa.erf";
+constexpr char kMusicDirectoryName[] = "streammusic";
+constexpr char kSoundsDirectoryName[] = "streamsounds";
+constexpr char kLipsDirectoryName[] = "lips";
+constexpr char kOverrideDirectoryName[] = "override";
+
 class KotOR : public Game {
 public:
     KotOR(
