@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 add_subdirectory(core) # gamecore static library
-add_subdirectory(limbo) # limbo static library
 add_subdirectory(kotor) # kotor static library
 add_subdirectory(tsl) # tsl static library
 
@@ -28,4 +27,4 @@ set(GAME_SOURCES
 add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(game PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(game PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
-target_link_libraries(game PUBLIC limbo tsl)
+target_link_libraries(game PUBLIC tsl)

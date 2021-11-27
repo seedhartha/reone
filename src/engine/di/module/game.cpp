@@ -19,7 +19,6 @@
 
 #include "../../game/core/types.h"
 #include "../../game/kotor/kotor.h"
-#include "../../game/limbo/limbo.h"
 #include "../../game/tsl/tsl.h"
 
 #include "audio.h"
@@ -120,8 +119,6 @@ GameModule::~GameModule() {
 
 unique_ptr<Game> GameModule::newGame() {
     switch (_gameId) {
-    case GameID::Limbo:
-        return make_unique<Limbo>(_gamePath, _gameOptions, *_services);
     case GameID::KotOR:
         return make_unique<KotOR>(_gamePath, _gameOptions, *_services);
     case GameID::TSL:
