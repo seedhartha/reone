@@ -45,16 +45,10 @@ public:
         computeAABB();
     }
 
-    bool isEnabled() const { return _enabled; }
-
     const graphics::Walkmesh &walkmesh() const { return *_walkmesh; }
-
-    void setEnabled(bool enabled) { _enabled = enabled; }
 
 private:
     std::shared_ptr<graphics::Walkmesh> _walkmesh;
-
-    bool _enabled {true}; /**< sometimes there is more than 1 walkmesh per object */
 
     void computeAABB();
 };
