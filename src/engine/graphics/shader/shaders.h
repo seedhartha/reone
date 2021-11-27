@@ -48,20 +48,20 @@ struct UniformFeatureFlags {
     static constexpr int lightmap = 2;
     static constexpr int envmap = 4;
     static constexpr int pbrIbl = 8;
-    static constexpr int bumpmap = 0x10;
-    static constexpr int skeletal = 0x20;
-    static constexpr int lighting = 0x40;
-    static constexpr int selfIllum = 0x80;
-    static constexpr int discard = 0x100;
-    static constexpr int shadows = 0x200;
-    static constexpr int particles = 0x400;
-    static constexpr int water = 0x800;
-    static constexpr int normalmap = 0x2000;
-    static constexpr int blur = 0x4000;
-    static constexpr int text = 0x8000;
-    static constexpr int grass = 0x10000;
-    static constexpr int fog = 0x20000;
-    static constexpr int danglymesh = 0x40000;
+    static constexpr int normalmap = 0x10;
+    static constexpr int heightmap = 0x20;
+    static constexpr int skeletal = 0x40;
+    static constexpr int lighting = 0x80;
+    static constexpr int selfIllum = 0x100;
+    static constexpr int discard = 0x200;
+    static constexpr int shadows = 0x400;
+    static constexpr int particles = 0x800;
+    static constexpr int water = 0x1000;
+    static constexpr int blur = 0x2000;
+    static constexpr int text = 0x4000;
+    static constexpr int grass = 0x8000;
+    static constexpr int fog = 0x10000;
+    static constexpr int danglymesh = 0x20000;
 };
 
 struct ShaderGeneral {
@@ -92,18 +92,18 @@ struct ShaderMaterial {
     char padding[4];
 };
 
+struct ShaderHeightMap {
+    glm::vec4 frameBounds {0.0f};
+    float scaling {1.0f};
+    char padding[12];
+};
+
 struct ShaderShadows {
     glm::mat4 lightSpaceMatrices[kNumCubeFaces];
     glm::vec4 lightPosition {0.0f}; /**< W = 0 if light is directional */
     int lightPresent {false};
     float strength {1.0f};
     char padding[8];
-};
-
-struct ShaderBumpmaps {
-    glm::vec2 gridSize {1.0f};
-    float scaling {0.0f};
-    int frame {0};
 };
 
 struct ShaderBlur {
@@ -117,8 +117,8 @@ struct CombinedUniforms {
 
     ShaderGeneral general;
     ShaderMaterial material;
+    ShaderHeightMap heightMap;
     ShaderShadows shadows;
-    ShaderBumpmaps bumpmaps;
     ShaderBlur blur;
 };
 

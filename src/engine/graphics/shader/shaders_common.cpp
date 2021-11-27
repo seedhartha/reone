@@ -32,20 +32,20 @@ const int FEATURE_DIFFUSE = 1;
 const int FEATURE_LIGHTMAP = 2;
 const int FEATURE_ENVMAP = 4;
 const int FEATURE_PBRIBL = 8;
-const int FEATURE_BUMPMAP = 0x10;
-const int FEATURE_SKELETAL = 0x20;
-const int FEATURE_LIGHTING = 0x40;
-const int FEATURE_SELFILLUM = 0x80;
-const int FEATURE_DISCARD = 0x100;
-const int FEATURE_SHADOWS = 0x200;
-const int FEATURE_PARTICLES = 0x400;
-const int FEATURE_WATER = 0x800;
-const int FEATURE_NORMALMAP = 0x2000;
-const int FEATURE_BLUR = 0x4000;
-const int FEATURE_TEXT = 0x8000;
-const int FEATURE_GRASS = 0x10000;
-const int FEATURE_FOG = 0x20000;
-const int FEATURE_DANGLYMESH = 0x40000;
+const int FEATURE_NORMALMAP = 0x10;
+const int FEATURE_HEIGHTMAP = 0x20;
+const int FEATURE_SKELETAL = 0x40;
+const int FEATURE_LIGHTING = 0x80;
+const int FEATURE_SELFILLUM = 0x100;
+const int FEATURE_DISCARD = 0x200;
+const int FEATURE_SHADOWS = 0x400;
+const int FEATURE_PARTICLES = 0x800;
+const int FEATURE_WATER = 0x1000;
+const int FEATURE_BLUR = 0x2000;
+const int FEATURE_TEXT = 0x4000;
+const int FEATURE_GRASS = 0x8000;
+const int FEATURE_FOG = 0x10000;
+const int FEATURE_DANGLYMESH = 0x20000;
 
 const int NUM_CUBE_FACES = 6;
 const int MAX_BONES = 24;
@@ -88,17 +88,16 @@ struct Material {
     float roughness;
 };
 
+struct HeightMap {
+    vec4 frameBounds;
+    float scaling;
+};
+
 struct Shadows {
     mat4 lightSpaceMatrices[NUM_CUBE_FACES];
     vec4 lightPosition;
     bool lightPresent;
     float strength;
-};
-
-struct Bumpmap {
-    vec2 gridSize;
-    float scaling;
-    int frame;
 };
 
 struct Blur {
@@ -110,8 +109,8 @@ layout(std140) uniform Combined {
     int uFeatureMask;
     General uGeneral;
     Material uMaterial;
+    HeightMap uHeightMap;
     Shadows uShadows;
-    Bumpmap uBumpmaps;
     Blur uBlur;
 };
 
@@ -221,51 +220,52 @@ vec3 applyFog(vec3 objectColor) {
 
 char g_shaderBaseNormals[] = R"END(
 vec2 packTexCoords(vec2 uv, vec4 bounds) {
-    return bounds.xy + bounds.zw * clamp(fract(uv), 0.001, 0.999);
-}
-
-vec3 getNormalFromBumpMap(vec2 uv) {
-    vec2 oneOverGridSize = 1.0 / uBumpmaps.gridSize;
-
-    vec4 frameBounds;
-    frameBounds[0] = oneOverGridSize.x * (uBumpmaps.frame % int(uBumpmaps.gridSize.x));
-    frameBounds[1] = oneOverGridSize.y * (uBumpmaps.frame / int(uBumpmaps.gridSize.y));
-    frameBounds[2] = oneOverGridSize.x;
-    frameBounds[3] = oneOverGridSize.y;
-
-    vec2 du = dFdx(uv);
-    vec2 dv = dFdy(uv);
-    vec2 packedUv = packTexCoords(uv, frameBounds);
-    vec2 packedUvDu = packTexCoords(uv + du, frameBounds);
-    vec2 packedUvDv = packTexCoords(uv + dv, frameBounds);
-    vec4 bumpmapSample = texture(sBumpMap, packedUv);
-    vec4 bumpmapSampleDu = texture(sBumpMap, packedUvDu);
-    vec4 bumpmapSampleDv = texture(sBumpMap, packedUvDv);
-    float dBx = bumpmapSampleDu.r - bumpmapSample.r;
-    float dBy = bumpmapSampleDv.r - bumpmapSample.r;
-    vec3 normal = vec3(-dBx * uBumpmaps.scaling, -dBy * uBumpmaps.scaling, 1.0);
-
-    return normalize(fragTanSpace * normal);
+    if (uv.x < 0.0) {
+        uv.x = 1.0 - mod(-uv.x, 1.0);
+    } else if (uv.x > 1.0) {
+        uv.x = mod(uv.x, 1.0);
+    }
+    if (uv.y < 0.0) {
+        uv.y = 1.0 - mod(-uv.y, 1.0);
+    } else if (uv.y > 1.0) {
+        uv.y = mod(uv.y, 1.0);
+    }
+    return bounds.xy + bounds.zw * uv;
 }
 
 vec3 getNormalFromNormalMap(vec2 uv) {
-    vec4 bumpmapSample = texture(sBumpMap, uv);
-    vec3 normal = bumpmapSample.rgb * 2.0 - 1.0;
-    return normalize(fragTanSpace * normal);
+    vec4 sample = texture(sBumpMap, uv);
+    vec3 normal = sample.rgb * 2.0 - 1.0;
+    return fragTanSpace * normalize(normal);
+}
+
+vec3 getNormalFromHeightMap(vec2 uv) {
+    vec2 du = dFdx(uv);
+    vec2 dv = dFdy(uv);
+
+    vec2 uvPacked = packTexCoords(uv, uHeightMap.frameBounds);
+    vec2 uvPackedDu = packTexCoords(uv + du, uHeightMap.frameBounds);
+    vec2 uvPackedDv = packTexCoords(uv + dv, uHeightMap.frameBounds);
+    vec4 sample = texture(sBumpMap, uvPacked);
+    vec4 sampleDu = texture(sBumpMap, uvPackedDu);
+    vec4 sampleDv = texture(sBumpMap, uvPackedDv);
+    float dBx = sampleDu.r - sample.r;
+    float dBy = sampleDv.r - sample.r;
+
+    vec3 normal = vec3(-dBx, -dBy, 1.0);
+    normal.xy *= uHeightMap.scaling;
+
+    return fragTanSpace * normalize(normal);
 }
 
 vec3 getNormal(vec2 uv) {
-    vec3 result;
-
-    if (isFeatureEnabled(FEATURE_BUMPMAP)) {
-        result = getNormalFromBumpMap(uv);
-    } else if (isFeatureEnabled(FEATURE_NORMALMAP)) {
-        result = getNormalFromNormalMap(uv);
+    if (isFeatureEnabled(FEATURE_NORMALMAP)) {
+        return getNormalFromNormalMap(uv);
+    } else if (isFeatureEnabled(FEATURE_HEIGHTMAP)) {
+        return getNormalFromHeightMap(uv);
     } else {
-        result = normalize(fragNormal);
+        return normalize(fragNormal);
     }
-
-    return result;
 }
 )END";
 
@@ -402,7 +402,7 @@ void main() {
     fragTexCoords = aTexCoords;
     fragLightmapCoords = aLightmapCoords;
 
-    if (isFeatureEnabled(FEATURE_BUMPMAP) || isFeatureEnabled(FEATURE_NORMALMAP)) {
+    if (isFeatureEnabled(FEATURE_NORMALMAP) || isFeatureEnabled(FEATURE_HEIGHTMAP)) {
         vec3 T = normalize(normalMatrix * aTangent);
         vec3 B = normalize(normalMatrix * aBitangent);
         vec3 N = normalize(normalMatrix * aTanSpaceNormal);

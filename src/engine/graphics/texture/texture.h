@@ -71,7 +71,7 @@ public:
         std::string envmapTexture;
         std::string bumpyShinyTexture;
         std::string bumpmapTexture;
-        float bumpMapScaling {0.0f};
+        float bumpMapScaling {1.0f};
         Blending blending {Blending::None};
         int numChars {0};
         float fontHeight {0.0f};
