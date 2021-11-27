@@ -22,7 +22,6 @@ namespace reone {
 namespace game {
 
 enum class GameID {
-    Limbo, // standalone, for testing
     KotOR,
     TSL
 };

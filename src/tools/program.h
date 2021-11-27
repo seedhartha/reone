@@ -49,7 +49,7 @@ private:
     boost::filesystem::path _gamePath;
     boost::filesystem::path _destPath;
     std::string _target;
-    game::GameID _gameId {game::GameID::Limbo};
+    game::GameID _gameId {game::GameID::KotOR};
     tools::Operation _operation {tools::Operation::None};
     std::vector<std::shared_ptr<tools::ITool>> _tools;
 

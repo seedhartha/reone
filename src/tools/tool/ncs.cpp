@@ -24,7 +24,6 @@
 #include "../../engine/common/logutil.h"
 #include "../../engine/game/core/script/routine/iroutines.h"
 #include "../../engine/game/kotor/routine/registerutil.h"
-#include "../../engine/game/limbo/routine/registerutil.h"
 #include "../../engine/game/tsl/routine/registerutil.h"
 #include "../../engine/script/format/ncsreader.h"
 #include "../../engine/script/format/ncswriter.h"
@@ -444,17 +443,10 @@ bool NcsTool::supports(Operation operation, const fs::path &target) const {
 }
 
 void NcsTool::fillRoutines(IRoutines &routines) {
-    switch (_gameId) {
-    case GameID::TSL:
+    if (_gameId == GameID::TSL) {
         registerRoutinesTSL(routines);
-        break;
-    case GameID::Limbo:
-        registerRoutinesLimbo(routines);
-        break;
-    default: {
+    } else {
         registerRoutinesKotOR(routines);
-        break;
-    }
     }
 }
 

@@ -30,12 +30,6 @@ namespace reone {
 namespace game {
 
 GameID GameProbe::invoke() {
-    // If there is a "limbo" file then game is Limbo
-    fs::path limboPath(getPathIgnoreCase(_gamePath, "limbo", false));
-    if (!limboPath.empty()) {
-        return GameID::Limbo;
-    }
-
     // If there is a KotOR executable then game is KotOR
     fs::path exePathK1(getPathIgnoreCase(_gamePath, "swkotor.exe", false));
     if (!exePathK1.empty()) {

@@ -97,25 +97,24 @@ int Program::run() {
 }
 
 void Program::initOptions() {
-    _optsCmdLine.add_options()                                                                 //
-        ("game", po::value<string>(), "path to game directory")                                //
-        ("dest", po::value<string>(), "path to destination directory")                         //
-        ("tsl", po::value<bool>()->default_value(false), "is (dis)assembled NCS for TSL?")     //
-        ("limbo", po::value<bool>()->default_value(false), "is (dis)assembled NCS for Limbo?") //
-        ("list", "list file contents")("extract", "extract file contents")                     //
-        ("unwrap", "unwrap an audio file")                                                     //
-        ("to-json", "convert 2DA, GFF, TLK, LIP or SSF file to JSON")                          //
-        ("to-tga", "convert TPC image to TGA")                                                 //
-        ("to-2da", "convert JSON to 2DA")                                                      //
-        ("to-gff", "convert JSON to GFF")                                                      //
-        ("to-rim", "create RIM archive from directory")                                        //
-        ("to-erf", "create ERF archive from directory")                                        //
-        ("to-mod", "create MOD archive from directory")                                        //
-        ("to-tlk", "convert JSON to TLK")                                                      //
-        ("to-lip", "convert JSON to LIP")                                                      //
-        ("to-pcode", "convert NCS to PCODE")                                                   //
-        ("to-ncs", "convert PCODE to NCS")                                                     //
-        ("to-ssf", "convert JSON to SSF")                                                      //
+    _optsCmdLine.add_options()                                                             //
+        ("game", po::value<string>(), "path to game directory")                            //
+        ("dest", po::value<string>(), "path to destination directory")                     //
+        ("tsl", po::value<bool>()->default_value(false), "is (dis)assembled NCS for TSL?") //
+        ("list", "list file contents")("extract", "extract file contents")                 //
+        ("unwrap", "unwrap an audio file")                                                 //
+        ("to-json", "convert 2DA, GFF, TLK, LIP or SSF file to JSON")                      //
+        ("to-tga", "convert TPC image to TGA")                                             //
+        ("to-2da", "convert JSON to 2DA")                                                  //
+        ("to-gff", "convert JSON to GFF")                                                  //
+        ("to-rim", "create RIM archive from directory")                                    //
+        ("to-erf", "create ERF archive from directory")                                    //
+        ("to-mod", "create MOD archive from directory")                                    //
+        ("to-tlk", "convert JSON to TLK")                                                  //
+        ("to-lip", "convert JSON to LIP")                                                  //
+        ("to-pcode", "convert NCS to PCODE")                                               //
+        ("to-ncs", "convert PCODE to NCS")                                                 //
+        ("to-ssf", "convert JSON to SSF")                                                  //
         ("target", po::value<string>(), "target name or path to input file");
 }
 
@@ -138,9 +137,7 @@ void Program::loadOptions() {
     _destPath = getDestination(_variables);
     _target = _variables.count("target") > 0 ? _variables["target"].as<string>() : "";
 
-    if (_variables["limbo"].as<bool>()) {
-        _gameId = GameID::Limbo;
-    } else if (_variables["tsl"].as<bool>()) {
+    if (_variables["tsl"].as<bool>()) {
         _gameId = GameID::TSL;
     } else {
         _gameId = GameID::KotOR;
