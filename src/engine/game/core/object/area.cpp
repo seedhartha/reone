@@ -92,11 +92,8 @@ Area::Area(
         id,
         ObjectType::Area,
         game,
-        services),
-    _map(game, game.party(), services.context, services.meshes, services.shaders, services.textures, services.window) {
-
+        services) {
     init();
-
     _heartbeatTimer.setTimeout(kHeartbeatInterval);
 }
 
@@ -175,7 +172,7 @@ void Area::loadMap(const GffStruct &are) {
         warn("Map properties not found in ARE");
         return;
     }
-    _map.load(_name, *mapStruct);
+    _game.map().load(_name, *mapStruct);
 }
 
 void Area::loadStealthXP(const GffStruct &are) {

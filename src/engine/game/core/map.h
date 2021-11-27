@@ -18,24 +18,20 @@
 #pragma once
 
 #include "../../graphics/texture/texture.h"
-#include "../../resource/format/gffreader.h"
 
 namespace reone {
 
-namespace graphics {
+namespace resource {
 
-class Context;
-class Meshes;
-class Shaders;
-class Textures;
-class Window;
+class GffStruct;
 
-} // namespace graphics
+}
 
 namespace game {
 
+struct Services;
+
 class Game;
-class Party;
 class Waypoint;
 
 class Map {
@@ -47,19 +43,9 @@ public:
 
     Map(
         Game &game,
-        Party &party,
-        graphics::Context &context,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Window &window) :
+        Services &services) :
         _game(game),
-        _party(party),
-        _context(context),
-        _meshes(meshes),
-        _shaders(shaders),
-        _textures(textures),
-        _window(window) {
+        _services(services) {
     }
 
     void load(const std::string &area, const resource::GffStruct &gffs);
@@ -67,10 +53,12 @@ public:
 
     bool isLoaded() const { return static_cast<bool>(_areaTexture); }
 
-    void setSelectedNote(const std::shared_ptr<Waypoint> &waypoint);
+    void setArrowResRef(std::string resRef) { _arrowResRef = std::move(resRef); }
+    void setSelectedNote(std::shared_ptr<Waypoint> waypoint) { _selectedNote = std::move(waypoint); }
 
 private:
     Game &_game;
+    Services &_services;
 
     int _northAxis {0};
     glm::vec2 _worldPoint1 {0.0f};
@@ -82,19 +70,8 @@ private:
     std::shared_ptr<graphics::Texture> _arrowTexture;
     std::shared_ptr<graphics::Texture> _noteTexture;
 
+    std::string _arrowResRef;
     std::shared_ptr<Waypoint> _selectedNote;
-
-    // Services
-
-    Party &_party;
-
-    graphics::Context &_context;
-    graphics::Meshes &_meshes;
-    graphics::Shaders &_shaders;
-    graphics::Textures &_textures;
-    graphics::Window &_window;
-
-    // END Services
 
     void loadProperties(const resource::GffStruct &gffs);
     void loadTextures(const std::string &area);
