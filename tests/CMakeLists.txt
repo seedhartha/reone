@@ -26,7 +26,7 @@ set(TEST_SOURCES
 
 add_executable(reone-tests ${TEST_SOURCES})
 target_precompile_headers(reone-tests PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
-target_link_libraries(reone-tests PRIVATE game ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(reone-tests PRIVATE gamecore ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 enable_testing()
 add_test(reone-tests reone-tests)

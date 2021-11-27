@@ -101,6 +101,6 @@ if(UNIX AND NOT APPLE)
 endif()
 
 install(TARGETS ${InstallTargets} DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(TARGETS common resource graphics audio video script game DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS common resource graphics audio video script gamecore kotor tsl game DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 ## END Installation
