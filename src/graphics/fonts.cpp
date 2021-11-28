@@ -18,9 +18,9 @@
 #include "fonts.h"
 
 #include "context.h"
-#include "mesh/meshes.h"
-#include "shader/shaders.h"
-#include "texture/textures.h"
+#include "meshes.h"
+#include "shaders.h"
+#include "textures.h"
 #include "window.h"
 
 using namespace std;

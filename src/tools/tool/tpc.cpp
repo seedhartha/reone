@@ -18,8 +18,8 @@
 #include "tpc.h"
 
 #include "../../common/logutil.h"
-#include "../../graphics/texture/format/tgawriter.h"
-#include "../../graphics/texture/format/tpcreader.h"
+#include "../../graphics/format/tgawriter.h"
+#include "../../graphics/format/tpcreader.h"
 
 using namespace std;
 

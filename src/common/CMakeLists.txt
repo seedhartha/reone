@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(COMMON_HEADERS
-    cache.h
+    memorycache.h
     collectionutil.h
     exception/validation.h
     logutil.h

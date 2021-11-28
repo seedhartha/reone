@@ -19,9 +19,9 @@
 
 #include "../../common/logutil.h"
 #include "../../graphics/font.h"
-#include "../../graphics/mesh/meshes.h"
+#include "../../graphics/meshes.h"
 #include "../../graphics/renderbuffer.h"
-#include "../../graphics/shader/shaders.h"
+#include "../../graphics/shaders.h"
 #include "../../graphics/textutil.h"
 #include "../../resource/gffstruct.h"
 #include "../../resource/resources.h"

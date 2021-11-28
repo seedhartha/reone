@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../graphics/options.h"
-#include "../graphics/shader/shaders.h"
+#include "../graphics/shaders.h"
 
 #include "node/camera.h"
 #include "node/dummy.h"

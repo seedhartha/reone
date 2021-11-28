@@ -18,12 +18,12 @@
 #include "progressbar.h"
 
 #include "../../graphics/context.h"
-#include "../../graphics/mesh/mesh.h"
-#include "../../graphics/mesh/meshes.h"
+#include "../../graphics/mesh.h"
+#include "../../graphics/meshes.h"
 #include "../../graphics/renderbuffer.h"
-#include "../../graphics/shader/shaders.h"
-#include "../../graphics/texture/texture.h"
-#include "../../graphics/texture/textures.h"
+#include "../../graphics/shaders.h"
+#include "../../graphics/texture.h"
+#include "../../graphics/textures.h"
 #include "../../graphics/window.h"
 #include "../../resource/gffstruct.h"
 

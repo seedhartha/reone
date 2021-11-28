@@ -22,7 +22,7 @@
 #include "../../../game/object/item.h"
 #include "../../../game/party.h"
 #include "../../../game/services.h"
-#include "../../../graphics/texture/textures.h"
+#include "../../../graphics/textures.h"
 #include "../../../resource/strings.h"
 
 #include "../../kotor.h"

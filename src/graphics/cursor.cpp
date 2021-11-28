@@ -18,10 +18,10 @@
 #include "cursor.h"
 
 #include "context.h"
-#include "mesh/mesh.h"
-#include "mesh/meshes.h"
-#include "shader/shaders.h"
-#include "texture/texture.h"
+#include "mesh.h"
+#include "meshes.h"
+#include "shaders.h"
+#include "texture.h"
 #include "window.h"
 
 using namespace std;

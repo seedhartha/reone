@@ -25,7 +25,7 @@
 #include "../../game/party.h"
 #include "../../game/script/routine/routines.h"
 #include "../../game/services.h"
-#include "../../graphics/model/models.h"
+#include "../../graphics/models.h"
 #include "../../gui/control/panel.h"
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"

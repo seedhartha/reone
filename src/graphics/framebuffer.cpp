@@ -18,7 +18,7 @@
 #include "framebuffer.h"
 
 #include "renderbuffer.h"
-#include "texture/texture.h"
+#include "texture.h"
 
 using namespace std;
 

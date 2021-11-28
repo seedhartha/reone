@@ -24,7 +24,7 @@
 #include "../../../game/party.h"
 #include "../../../game/portraits.h"
 #include "../../../game/services.h"
-#include "../../../graphics/model/models.h"
+#include "../../../graphics/models.h"
 #include "../../../gui/control/button.h"
 #include "../../../gui/control/label.h"
 #include "../../../gui/sceneinitializer.h"

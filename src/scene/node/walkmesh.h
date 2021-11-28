@@ -19,7 +19,7 @@
 
 #include "scenenode.h"
 
-#include "../../graphics/walkmesh/walkmesh.h"
+#include "../../graphics/walkmesh.h"
 
 namespace reone {
 

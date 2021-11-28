@@ -18,12 +18,12 @@
 #include "pbribl.h"
 
 #include "context.h"
-#include "mesh/mesh.h"
-#include "mesh/meshes.h"
+#include "mesh.h"
+#include "meshes.h"
 #include "renderbuffer.h"
-#include "shader/shaders.h"
-#include "texture/texture.h"
-#include "texture/textureutil.h"
+#include "shaders.h"
+#include "texture.h"
+#include "textureutil.h"
 
 using namespace std;
 

@@ -19,7 +19,7 @@
 
 #include "../../common/streamutil.h"
 #include "../../graphics/cursor.h"
-#include "../../graphics/texture/format/curreader.h"
+#include "../../graphics/format/curreader.h"
 #include "../../resource/resources.h"
 
 using namespace std;

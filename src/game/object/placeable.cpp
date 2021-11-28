@@ -17,8 +17,8 @@
 
 #include "placeable.h"
 
-#include "../../graphics/model/models.h"
-#include "../../graphics/walkmesh/walkmeshes.h"
+#include "../../graphics/models.h"
+#include "../../graphics/walkmeshes.h"
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
 #include "../../resource/gffs.h"

@@ -18,7 +18,7 @@
 #include "spells.h"
 
 #include "../../common/collectionutil.h"
-#include "../../graphics/texture/textures.h"
+#include "../../graphics/textures.h"
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
 #include "../../resource/strings.h"
