@@ -85,13 +85,16 @@ static bool g_debugPath = false;
 
 Area::Area(
     uint32_t id,
+    string sceneName,
     Game &game,
     Services &services) :
     Object(
         id,
         ObjectType::Area,
         game,
-        services) {
+        services),
+    _sceneName(move(sceneName)) {
+
     init();
     _heartbeatTimer.setTimeout(kHeartbeatInterval);
 }
@@ -154,7 +157,7 @@ void Area::loadCameraStyle(const GffStruct &are) {
 void Area::loadAmbientColor(const GffStruct &are) {
     _ambientColor = are.getColor("DynAmbientColor", g_defaultAmbientColor);
 
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     sceneGraph.setAmbientLightColor(_ambientColor);
 }
 
@@ -201,7 +204,7 @@ void Area::loadFog(const GffStruct &are) {
     _fogFar = are.getFloat("SunFogFar");
     _fogColor = are.getColor("SunFogColor");
 
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     sceneGraph.setFogEnabled(_fogEnabled);
     sceneGraph.setFogNear(_fogNear);
     sceneGraph.setFogFar(_fogFar);
@@ -235,7 +238,7 @@ void Area::loadProperties(const GffStruct &git) {
 
 void Area::loadCreatures(const GffStruct &git) {
     for (auto &gffs : git.getList("Creature List")) {
-        shared_ptr<Creature> creature(_game.objectFactory().newCreature());
+        shared_ptr<Creature> creature(_game.objectFactory().newCreature(_sceneName));
         creature->loadFromGIT(*gffs);
         landObject(*creature);
         add(creature);
@@ -244,7 +247,7 @@ void Area::loadCreatures(const GffStruct &git) {
 
 void Area::loadDoors(const GffStruct &git) {
     for (auto &gffs : git.getList("Door List")) {
-        shared_ptr<Door> door(_game.objectFactory().newDoor());
+        shared_ptr<Door> door(_game.objectFactory().newDoor(_sceneName));
         door->loadFromGIT(*gffs);
         add(door);
     }
@@ -252,7 +255,7 @@ void Area::loadDoors(const GffStruct &git) {
 
 void Area::loadPlaceables(const GffStruct &git) {
     for (auto &gffs : git.getList("Placeable List")) {
-        shared_ptr<Placeable> placeable(_game.objectFactory().newPlaceable());
+        shared_ptr<Placeable> placeable(_game.objectFactory().newPlaceable(_sceneName));
         placeable->loadFromGIT(*gffs);
         add(placeable);
     }
@@ -260,7 +263,7 @@ void Area::loadPlaceables(const GffStruct &git) {
 
 void Area::loadWaypoints(const GffStruct &git) {
     for (auto &gffs : git.getList("WaypointList")) {
-        shared_ptr<Waypoint> waypoint(_game.objectFactory().newWaypoint());
+        shared_ptr<Waypoint> waypoint(_game.objectFactory().newWaypoint(_sceneName));
         waypoint->loadFromGIT(*gffs);
         add(waypoint);
     }
@@ -268,7 +271,7 @@ void Area::loadWaypoints(const GffStruct &git) {
 
 void Area::loadTriggers(const GffStruct &git) {
     for (auto &gffs : git.getList("TriggerList")) {
-        shared_ptr<Trigger> trigger(_game.objectFactory().newTrigger());
+        shared_ptr<Trigger> trigger(_game.objectFactory().newTrigger(_sceneName));
         trigger->loadFromGIT(*gffs);
         add(trigger);
     }
@@ -276,7 +279,7 @@ void Area::loadTriggers(const GffStruct &git) {
 
 void Area::loadSounds(const GffStruct &git) {
     for (auto &gffs : git.getList("SoundList")) {
-        shared_ptr<Sound> sound(_game.objectFactory().newSound());
+        shared_ptr<Sound> sound(_game.objectFactory().newSound(_sceneName));
         sound->loadFromGIT(*gffs);
         add(sound);
     }
@@ -284,7 +287,7 @@ void Area::loadSounds(const GffStruct &git) {
 
 void Area::loadCameras(const GffStruct &git) {
     for (auto &gffs : git.getList("CameraList")) {
-        shared_ptr<PlaceableCamera> camera(_game.objectFactory().newCamera());
+        shared_ptr<PlaceableCamera> camera(_game.objectFactory().newCamera(_sceneName));
         camera->loadFromGIT(*gffs);
         add(camera);
     }
@@ -292,7 +295,7 @@ void Area::loadCameras(const GffStruct &git) {
 
 void Area::loadEncounters(const GffStruct &git) {
     for (auto &gffs : git.getList("Encounter List")) {
-        shared_ptr<Encounter> encounter(_game.objectFactory().newEncounter());
+        shared_ptr<Encounter> encounter(_game.objectFactory().newEncounter(_sceneName));
         encounter->loadFromGIT(*gffs);
         add(encounter);
     }
@@ -306,7 +309,7 @@ void Area::loadLYT() {
     LytReader lyt;
     lyt.load(wrap(lytData));
 
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
 
     for (auto &lytRoom : lyt.rooms()) {
         auto model = _services.models.get(lytRoom.name);
@@ -397,7 +400,7 @@ void Area::loadPTH() {
     const vector<Path::Point> &points = path.points();
     unordered_map<int, float> pointZ;
 
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
 
     for (size_t i = 0; i < points.size(); ++i) {
         const Path::Point &point = points[i];
@@ -416,7 +419,7 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     glm::vec3 position(entryPosition);
     position.z += 1.7f;
 
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
 
     _firstPersonCamera = make_unique<FirstPersonCamera>(_cameraAspect, glm::radians(kDefaultFieldOfView), sceneGraph);
     _firstPersonCamera->setPosition(position);
@@ -438,7 +441,7 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
 
     determineObjectRoom(*object);
 
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     auto sceneNode = object->sceneNode();
     if (sceneNode) {
         sceneGraph.addRoot(sceneNode);
@@ -469,7 +472,7 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
 void Area::determineObjectRoom(SpatialObject &object) {
     Room *room = nullptr;
 
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     Collision collision;
     if (sceneGraph.testElevation(object.position(), collision)) {
         auto userRoom = dynamic_cast<Room *>(collision.user);
@@ -498,7 +501,7 @@ void Area::doDestroyObject(uint32_t objectId) {
         room->removeTenant(object.get());
     }
 
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     auto sceneNode = object->sceneNode();
     if (sceneNode) {
         sceneGraph.removeRoot(sceneNode);
@@ -562,7 +565,7 @@ shared_ptr<SpatialObject> Area::getObjectByTag(const string &tag, int nth) const
 }
 
 void Area::landObject(SpatialObject &object) {
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     glm::vec3 position(object.position());
     Collision collision;
 
@@ -672,7 +675,7 @@ bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &d
     static glm::vec3 up {0.0f, 0.0f, 1.0f};
     static glm::vec3 zOffset {0.0f, 0.0f, 0.1f};
 
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     Collision collision;
 
     // Set creature facing
@@ -735,7 +738,7 @@ bool Area::moveCreatureTowards(const shared_ptr<Creature> &creature, const glm::
 }
 
 bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target) const {
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     Collision collision;
 
     glm::vec3 origin(subject.position());
@@ -1298,7 +1301,7 @@ void Area::doUpdatePerception() {
 }
 
 shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
-    shared_ptr<CameraSceneNode> camera(_services.sceneGraphs.get(kSceneMain).activeCamera());
+    shared_ptr<CameraSceneNode> camera(_services.sceneGraphs.get(_sceneName).activeCamera());
     shared_ptr<Creature> partyLeader(_game.party().getLeader());
     if (!camera || !partyLeader) {
         return nullptr;

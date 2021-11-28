@@ -47,9 +47,9 @@ public:
     }
 
     std::shared_ptr<Module> newModule();
-    std::shared_ptr<Area> newArea();
     std::shared_ptr<Item> newItem();
 
+    std::shared_ptr<Area> newArea(std::string sceneName = kSceneMain);
     std::shared_ptr<Creature> newCreature(std::string sceneName = kSceneMain);
     std::shared_ptr<Placeable> newPlaceable(std::string sceneName = kSceneMain);
     std::shared_ptr<Door> newDoor(std::string sceneName = kSceneMain);
