@@ -28,13 +28,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 NameEntry::NameEntry(
     CharacterGeneration &charGen,
@@ -101,6 +102,6 @@ string NameEntry::getRandomName() const {
     return nameLtr.getRandomName(8) + " " + _lastNameLtr.getRandomName(8);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

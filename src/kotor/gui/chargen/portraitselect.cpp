@@ -41,6 +41,7 @@ using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
@@ -48,7 +49,7 @@ using namespace reone::scene;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr float kModelScale = 0.2f;
 
@@ -204,6 +205,6 @@ void PortraitSelection::loadCurrentPortrait() {
     _binding.lblPortrait->setBorderFill(portrait);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

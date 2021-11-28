@@ -31,7 +31,7 @@ class ListBox;
 
 } // namespace gui
 
-namespace game {
+namespace kotor {
 
 class CharacterGeneration;
 
@@ -40,7 +40,7 @@ public:
     CharGenSkills(
         CharacterGeneration &charGen,
         KotOR &game,
-        Services &services);
+        game::Services &services);
 
     void load() override;
 
@@ -90,22 +90,22 @@ private:
     } _binding;
 
     CharacterGeneration &_charGen;
-    CreatureAttributes _attributes;
+    game::CreatureAttributes _attributes;
     int _points {0};
 
     void bindControls();
     void refreshControls();
     void updateCharacter();
 
-    bool canIncreaseSkill(SkillType skill) const;
+    bool canIncreaseSkill(game::SkillType skill) const;
 
-    int getPointCost(SkillType skill) const;
+    int getPointCost(game::SkillType skill) const;
 
-    void onMinusButtonClick(SkillType skill);
-    void onPlusButtonClick(SkillType skill);
-    void onSkillLabelFocusChanged(SkillType skill, bool focus);
+    void onMinusButtonClick(game::SkillType skill);
+    void onPlusButtonClick(game::SkillType skill);
+    void onSkillLabelFocusChanged(game::SkillType skill, bool focus);
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

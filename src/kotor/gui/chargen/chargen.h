@@ -42,7 +42,7 @@ class Label;
 
 }
 
-namespace game {
+namespace kotor {
 
 enum class CharGenScreen {
     ClassSelection,
@@ -65,7 +65,7 @@ public:
         LevelUp
     };
 
-    CharacterGeneration(KotOR &game, Services &services);
+    CharacterGeneration(KotOR &game, game::Services &services);
 
     void load() override;
     bool handle(const SDL_Event &event) override;
@@ -94,9 +94,9 @@ public:
 
     void goToNextStep();
 
-    const Character &character() const { return _character; }
+    const game::Character &character() const { return _character; }
 
-    void setCharacter(Character character);
+    void setCharacter(game::Character character);
 
 private:
     struct Binding {
@@ -142,7 +142,7 @@ private:
 
     CharGenScreen _screen {CharGenScreen::ClassSelection};
     Type _type {Type::Quick};
-    Character _character;
+    game::Character _character;
 
     // Sub GUI
 
@@ -185,6 +185,6 @@ private:
     // END Loading
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

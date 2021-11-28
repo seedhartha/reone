@@ -27,7 +27,7 @@ class Button;
 
 }
 
-namespace game {
+namespace kotor {
 
 class CharacterGeneration;
 
@@ -36,7 +36,7 @@ public:
     CharGenFeats(
         CharacterGeneration &charGen,
         KotOR &game,
-        Services &services);
+        game::Services &services);
 
     void load() override;
 
@@ -53,6 +53,6 @@ private:
     void bindControls();
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

@@ -27,11 +27,11 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 class DialogGUI : public Conversation {
 public:
-    DialogGUI(KotOR &game, Services &services);
+    DialogGUI(KotOR &game, game::Services &services);
 
     void load() override;
     void update(float dt) override;
@@ -39,7 +39,7 @@ public:
 private:
     struct Participant {
         std::shared_ptr<graphics::Model> model;
-        std::shared_ptr<Creature> creature;
+        std::shared_ptr<game::Creature> creature;
     };
 
     struct Binding {
@@ -47,7 +47,7 @@ private:
         std::shared_ptr<gui::ListBox> lbReplies;
     } _binding;
 
-    std::shared_ptr<SpatialObject> _currentSpeaker;
+    std::shared_ptr<game::SpatialObject> _currentSpeaker;
     std::map<std::string, Participant> _participantByTag;
 
     void bindControls();
@@ -59,10 +59,10 @@ private:
     void updateCamera();
     void updateParticipantAnimations();
 
-    glm::vec3 getTalkPosition(const SpatialObject &object) const;
-    DialogCamera::Variant getRandomCameraVariant() const;
+    glm::vec3 getTalkPosition(const game::SpatialObject &object) const;
+    game::DialogCamera::Variant getRandomCameraVariant() const;
     std::string getStuntAnimationName(int ordinal) const;
-    AnimationType getStuntAnimationType(int ordinal) const;
+    game::AnimationType getStuntAnimationType(int ordinal) const;
 
     void setMessage(std::string message) override;
     void setReplyLines(std::vector<std::string> lines) override;
@@ -87,6 +87,6 @@ private:
     // END Participants
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

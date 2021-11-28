@@ -37,6 +37,7 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::gui;
 using namespace reone::graphics;
 using namespace reone::resource;
@@ -45,7 +46,7 @@ using namespace reone::script;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static const char kControlTagTopFrame[] = "TOP";
 static const char kControlTagBottomFrame[] = "BOTTOM";
@@ -389,6 +390,6 @@ void DialogGUI::update(float dt) {
     }
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

@@ -29,7 +29,7 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 /**
  * Base GUI for conversations.
@@ -39,7 +39,7 @@ namespace game {
  */
 class Conversation : public GameGUI {
 public:
-    Conversation(KotOR &game, Services &services) :
+    Conversation(KotOR &game, game::Services &services) :
         GameGUI(game, services) {
     }
 
@@ -51,14 +51,14 @@ public:
      *
      * @param owner owner of the conversation
      */
-    void start(const std::shared_ptr<Dialog> &dialog, const std::shared_ptr<SpatialObject> &owner);
+    void start(const std::shared_ptr<game::Dialog> &dialog, const std::shared_ptr<game::SpatialObject> &owner);
 
     /**
      * Get camera used in this conversation.
      *
      * @param cameraId will be set to camera ID, if animated camera is used
      */
-    CameraType getCamera(int &cameraId) const;
+    game::CameraType getCamera(int &cameraId) const;
 
     /**
      * Pause this conversation. When paused, entries cannot be skipped by clicking the mouse.
@@ -68,11 +68,11 @@ public:
     void resume();
 
 protected:
-    std::shared_ptr<Dialog> _dialog;
-    std::shared_ptr<SpatialObject> _owner;
+    std::shared_ptr<game::Dialog> _dialog;
+    std::shared_ptr<game::SpatialObject> _owner;
     std::shared_ptr<graphics::Model> _cameraModel;
     std::shared_ptr<graphics::LipAnimation> _lipAnimation;
-    const Dialog::EntryReply *_currentEntry {nullptr};
+    const game::Dialog::EntryReply *_currentEntry {nullptr};
     bool _entryEnded {false};
     bool _paused {false};
 
@@ -95,7 +95,7 @@ private:
     std::shared_ptr<audio::SoundHandle> _currentVoice;
     Timer _endEntryTimer;
     float _entryDuration {0.0f};
-    std::vector<const Dialog::EntryReply *> _replies;
+    std::vector<const game::Dialog::EntryReply *> _replies;
     bool _autoPickFirstReply {false};
 
     void loadConversationBackground();
@@ -118,7 +118,7 @@ private:
     /**
      * @return index of the first active entry/reply from the specified list, -1 otherwise
      */
-    int indexOfFirstActive(const std::vector<Dialog::EntryReplyLink> &links);
+    int indexOfFirstActive(const std::vector<game::Dialog::EntryReplyLink> &links);
 
     /**
      * Executes the specified script and checks its return value.
@@ -140,6 +140,6 @@ private:
     // END Event handlers
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

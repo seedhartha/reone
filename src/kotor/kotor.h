@@ -33,7 +33,7 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 constexpr char kKeyFilename[] = "chitin.key";
 constexpr char kTexturePackDirectoryName[] = "texturepacks";
@@ -44,25 +44,25 @@ constexpr char kSoundsDirectoryName[] = "streamsounds";
 constexpr char kLipsDirectoryName[] = "lips";
 constexpr char kOverrideDirectoryName[] = "override";
 
-class KotOR : public Game {
+class KotOR : public game::Game {
 public:
     KotOR(
         boost::filesystem::path path,
-        Options options,
-        Services &services);
+        game::Options options,
+        game::Services &services);
 
     void initResourceProviders() override;
 
     void openMainMenu() override;
-    void openSaveLoad(SaveLoadMode mode) override;
+    void openSaveLoad(game::SaveLoadMode mode) override;
     void openInGame() override;
-    void openInGameMenu(InGameMenuTab tab);
-    void openContainer(const std::shared_ptr<SpatialObject> &container) override;
-    void openPartySelection(const PartySelectionContext &ctx) override;
+    void openInGameMenu(game::InGameMenuTab tab);
+    void openContainer(const std::shared_ptr<game::SpatialObject> &container) override;
+    void openPartySelection(const game::PartySelectionContext &ctx) override;
     void openLevelUp();
 
     void startCharacterGeneration();
-    void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef) override;
+    void startDialog(const std::shared_ptr<game::SpatialObject> &owner, const std::string &resRef) override;
 
     void resumeConversation() override;
     void pauseConversation() override;
@@ -113,9 +113,9 @@ protected:
 
     void getDefaultPartyMembers(std::string &member1, std::string &member2, std::string &member3) const override;
     gui::GUI *getScreenGUI() const override;
-    CameraType getConversationCamera(int &cameraId) const override;
+    game::CameraType getConversationCamera(int &cameraId) const override;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

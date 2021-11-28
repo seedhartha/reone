@@ -26,6 +26,10 @@ namespace game {
 
 struct Services;
 
+}
+
+namespace kotor {
+
 class KotOR;
 
 /**
@@ -33,7 +37,7 @@ class KotOR;
  */
 class GameGUI : public gui::GUI {
 protected:
-    GameGUI(KotOR &game, Services &services);
+    GameGUI(KotOR &game, game::Services &services);
 
     void initForGame();
 
@@ -41,15 +45,15 @@ protected:
 
 protected:
     KotOR &_game;
-    Services &_services;
+    game::Services &_services;
 
-    void loadBackground(BackgroundType type);
+    void loadBackground(game::BackgroundType type);
 
 private:
     void onClick(const std::string &control) override;
     void onFocusChanged(const std::string &control, bool focus) override;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

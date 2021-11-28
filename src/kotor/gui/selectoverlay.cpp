@@ -41,12 +41,13 @@
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr int kOffsetToReticle = 8;
 static constexpr int kTitleBarWidth = 250;
@@ -436,6 +437,6 @@ glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {
     return (_selectedObject && _selectedHostile) ? red : _game.getGUIColorBase();
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

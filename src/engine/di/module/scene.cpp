@@ -27,6 +27,7 @@ using namespace std;
 
 using namespace reone::game;
 using namespace reone::graphics;
+using namespace reone::kotor;
 using namespace reone::scene;
 
 namespace reone {

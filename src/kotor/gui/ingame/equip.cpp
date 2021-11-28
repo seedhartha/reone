@@ -33,13 +33,14 @@ using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr int kStrRefNone = 363;
 
@@ -444,6 +445,6 @@ shared_ptr<Texture> Equipment::getItemFrameTexture(int stackSize) const {
     return _textures.get(resRef, TextureUsage::GUI);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

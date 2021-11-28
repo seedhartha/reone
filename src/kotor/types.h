@@ -19,7 +19,7 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 constexpr int kNumClasses = 6;
 
@@ -29,6 +29,6 @@ constexpr char kSceneClassSelect[] = "classselect";
 constexpr char kScenePortraitSelect[] = "portraitselect";
 constexpr char kSceneCharacter[] = "character";
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

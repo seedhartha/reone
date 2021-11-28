@@ -22,13 +22,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 ComputerGUI::ComputerGUI(KotOR &game, Services &services) :
     Conversation(game, services) {
@@ -115,6 +116,6 @@ void ComputerGUI::setReplyLines(vector<string> lines) {
     }
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

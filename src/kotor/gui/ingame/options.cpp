@@ -24,13 +24,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 OptionsMenu::OptionsMenu(KotOR &game, Services &services) :
     GameGUI(game, services) {
@@ -61,6 +62,6 @@ void OptionsMenu::bindControls() {
     _binding.btnExit = getControl<Button>("BTN_EXIT");
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

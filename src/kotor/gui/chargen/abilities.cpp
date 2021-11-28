@@ -32,13 +32,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr int kStartingPoints = 30;
 static constexpr int kMinAbilityScore = 8;
@@ -299,6 +300,6 @@ void CharGenAbilities::onPlusButtonClick(Ability ability) {
     refreshControls();
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

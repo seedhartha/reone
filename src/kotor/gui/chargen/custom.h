@@ -28,7 +28,7 @@ class Label;
 
 } // namespace gui
 
-namespace game {
+namespace kotor {
 
 class CharacterGeneration;
 
@@ -37,7 +37,7 @@ public:
     CustomCharacterGeneration(
         CharacterGeneration &charGen,
         KotOR &game,
-        Services &services);
+        game::Services &services);
 
     void load() override;
 
@@ -79,6 +79,6 @@ private:
     void doSetStep(int step);
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

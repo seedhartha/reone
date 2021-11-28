@@ -26,13 +26,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::gui;
 using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 CharGenFeats::CharGenFeats(
     CharacterGeneration &charGen,
@@ -68,6 +69,6 @@ void CharGenFeats::bindControls() {
     _binding.btnRecommended = getControl<Button>("BTN_RECOMMENDED");
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

@@ -27,16 +27,16 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 class ContainerGUI : public GameGUI {
 public:
-    ContainerGUI(KotOR &game, Services &services);
+    ContainerGUI(KotOR &game, game::Services &services);
 
     void load() override;
-    void open(std::shared_ptr<SpatialObject> contanier);
+    void open(std::shared_ptr<game::SpatialObject> contanier);
 
-    SpatialObject &container() const { return *_container; }
+    game::SpatialObject &container() const { return *_container; }
 
 private:
     struct Binding {
@@ -47,7 +47,7 @@ private:
         std::shared_ptr<gui::Button> btnCancel;
     } _binding;
 
-    std::shared_ptr<SpatialObject> _container;
+    std::shared_ptr<game::SpatialObject> _container;
 
     void bindControls();
     void configureItemsListBox();
@@ -56,6 +56,6 @@ private:
     std::shared_ptr<graphics::Texture> getItemFrameTexture(int stackSize) const;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

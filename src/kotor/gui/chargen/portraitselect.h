@@ -17,9 +17,8 @@
 
 #pragma once
 
-#include "../../../scene/node/model.h"
-
 #include "../../../game/portrait.h"
+#include "../../../scene/node/model.h"
 
 #include "../gui.h"
 
@@ -32,7 +31,7 @@ class Label;
 
 } // namespace gui
 
-namespace game {
+namespace kotor {
 
 class CharacterGeneration;
 
@@ -41,7 +40,7 @@ public:
     PortraitSelection(
         CharacterGeneration &charGen,
         KotOR &game,
-        Services &services);
+        game::Services &services);
 
     void load() override;
 
@@ -60,7 +59,7 @@ private:
 
     CharacterGeneration &_charGen;
 
-    std::vector<Portrait> _filteredPortraits;
+    std::vector<game::Portrait> _filteredPortraits;
     int _currentPortrait {0};
 
     void bindControls();
@@ -73,6 +72,6 @@ private:
     void setButtonColors(gui::Control &control);
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

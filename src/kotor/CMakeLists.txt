@@ -46,7 +46,6 @@ set(KOTOR_HEADERS
     gui/partyselect.h
     gui/saveload.h
     gui/selectoverlay.h
-    gui/sounds.h
     kotor.h
     routine/registerutil.h
     tsl.h)
@@ -84,7 +83,6 @@ set(KOTOR_SOURCES
     gui/partyselect.cpp
     gui/saveload.cpp
     gui/selectoverlay.cpp
-    gui/sounds.cpp
     kotor.cpp
     routine/registerutil.cpp
     tsl.cpp)

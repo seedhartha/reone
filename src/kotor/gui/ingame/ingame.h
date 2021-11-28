@@ -30,11 +30,11 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 class InGameMenu : public GameGUI {
 public:
-    InGameMenu(KotOR &game, Services &services);
+    InGameMenu(KotOR &game, game::Services &services);
 
     void load() override;
     bool handle(const SDL_Event &event) override;
@@ -75,7 +75,7 @@ private:
         std::shared_ptr<gui::Button> btnOpt;
     } _binding;
 
-    InGameMenuTab _tab {InGameMenuTab::None};
+    game::InGameMenuTab _tab {game::InGameMenuTab::None};
 
     std::unique_ptr<CharacterMenu> _character;
     std::unique_ptr<Equipment> _equip;
@@ -88,7 +88,7 @@ private:
 
     void bindControls();
     void updateTabButtons();
-    void changeTab(InGameMenuTab tab);
+    void changeTab(game::InGameMenuTab tab);
 
     void loadCharacter();
     void loadEquipment();
@@ -104,6 +104,6 @@ private:
     void setTabLabelsFocusable(bool focusable);
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

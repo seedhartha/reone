@@ -22,14 +22,14 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 class TSL : public KotOR {
 public:
     TSL(
         boost::filesystem::path path,
-        Options options,
-        Services &services);
+        game::Options options,
+        game::Services &services);
 
     void initResourceProviders() override;
 
@@ -41,6 +41,6 @@ private:
     void getDefaultPartyMembers(std::string &member1, std::string &member2, std::string &member3) const override;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

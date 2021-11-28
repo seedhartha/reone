@@ -30,13 +30,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 InventoryMenu::InventoryMenu(KotOR &game, Services &services) :
     GameGUI(game, services) {
@@ -119,6 +120,6 @@ void InventoryMenu::refreshPortraits() {
     _binding.btnChange2->setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

@@ -21,9 +21,11 @@
 #include "../../game/script/routine/iroutines.h"
 #include "../../script/types.h"
 
+using namespace reone::game;
+
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 #define VT_V script::VariableType::Void
 #define VT_I script::VariableType::Int
@@ -1722,6 +1724,6 @@ void registerRoutinesTSL(IRoutines &routines) {
     routines.add("RebuildPartyTable", VT_V, {}, &routine::rebuildPartyTable);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

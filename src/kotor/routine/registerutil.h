@@ -23,9 +23,13 @@ namespace game {
 
 class IRoutines;
 
-void registerRoutinesKotOR(IRoutines &routines);
-void registerRoutinesTSL(IRoutines &routines);
+}
 
-} // namespace game
+namespace kotor {
+
+void registerRoutinesKotOR(game::IRoutines &routines);
+void registerRoutinesTSL(game::IRoutines &routines);
+
+} // namespace kotor
 
 } // namespace reone

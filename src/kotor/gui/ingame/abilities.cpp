@@ -33,13 +33,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr int kStrRefSkillRank = 1579;
 static constexpr int kStrRefBonus = 32129;
@@ -181,6 +182,6 @@ void AbilitiesMenu::refreshPortraits() {
     _binding.btnChange2->setHilightFill(partyMember2 ? partyMember2->portrait() : nullptr);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

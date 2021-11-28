@@ -33,13 +33,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static string g_attackIcon("i_attack");
 
@@ -499,6 +500,6 @@ void HUD::refreshActionQueueItems() const {
     }
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

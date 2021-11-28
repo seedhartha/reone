@@ -24,13 +24,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 JournalMenu::JournalMenu(
     KotOR &game,
@@ -67,6 +68,6 @@ void JournalMenu::bindControls() {
     }
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

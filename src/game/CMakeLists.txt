@@ -189,6 +189,7 @@ set(GAME_HEADERS
     format/ssfwriter.h
     format/visreader.h
     game.h
+    guisounds.h
     location.h
     map.h
     object/area.h
@@ -395,6 +396,7 @@ set(GAME_SOURCES
     format/ssfwriter.cpp
     format/visreader.cpp
     game.cpp
+    guisounds.cpp
     gui/loadscreen.h
     map.cpp
     object/area.cpp

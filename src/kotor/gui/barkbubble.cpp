@@ -22,13 +22,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 BarkBubble::BarkBubble(KotOR &game, Services &services) :
     GameGUI(game, services) {
@@ -78,6 +79,6 @@ void BarkBubble::setBarkText(const string &text, float duration) {
     }
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

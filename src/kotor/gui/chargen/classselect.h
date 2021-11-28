@@ -41,7 +41,7 @@ class Label;
 
 } // namespace gui
 
-namespace game {
+namespace kotor {
 
 class CharacterGeneration;
 
@@ -50,7 +50,7 @@ public:
     ClassSelection(
         CharacterGeneration &charGen,
         KotOR &game,
-        Services &services);
+        game::Services &services);
 
     void load() override;
 
@@ -58,7 +58,7 @@ private:
     struct ClassButton {
         gui::Control *control {nullptr};
         glm::ivec2 center {0};
-        Character character;
+        game::Character character;
     };
 
     struct Binding {
@@ -87,11 +87,11 @@ private:
 
     void bindControls();
     void setupClassButtons();
-    void setupClassButton(int index, Gender gender, ClassType clazz);
+    void setupClassButton(int index, game::Gender gender, game::ClassType clazz);
 
     std::shared_ptr<scene::ModelSceneNode> getCharacterModel(int appearance, scene::SceneGraph &sceneGraph);
-    int getRandomCharacterAppearance(Gender gender, ClassType clazz);
-    std::vector<Portrait> getPCPortraitsByGender(Gender gender);
+    int getRandomCharacterAppearance(game::Gender gender, game::ClassType clazz);
+    std::vector<game::Portrait> getPCPortraitsByGender(game::Gender gender);
 
     void setButtonColors(gui::Control &control);
     void setClassButtonEnlarged(int index, bool enlarged);
@@ -100,6 +100,6 @@ private:
     void onClassButtonClick(int index);
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

@@ -60,6 +60,7 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
@@ -70,7 +71,7 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr char kPatchFilename[] = "patch.erf";
 static constexpr char kWavesDirectoryName[] = "streamwaves";
@@ -437,6 +438,6 @@ void KotOR::initRoutines() {
     registerRoutinesKotOR(_routines);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

@@ -24,11 +24,11 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 class BarkBubble : public GameGUI {
 public:
-    BarkBubble(KotOR &game, Services &services);
+    BarkBubble(KotOR &game, game::Services &services);
 
     void load() override;
     void update(float dt) override;
@@ -46,6 +46,6 @@ private:
     void bindControls();
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

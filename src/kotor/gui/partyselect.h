@@ -25,17 +25,17 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 constexpr int kNpcCount = 9;
 
 class PartySelection : public GameGUI {
 public:
-    PartySelection(KotOR &game, Services &services);
+    PartySelection(KotOR &game, game::Services &services);
 
     void load() override;
 
-    void prepare(const PartySelectionContext &ctx);
+    void prepare(const game::PartySelectionContext &ctx);
 
 private:
     struct Binding {
@@ -96,7 +96,7 @@ private:
         // END TSL only
     } _binding;
 
-    PartySelectionContext _context;
+    game::PartySelectionContext _context;
     int _selectedNpc {-1};
     bool _added[kNpcCount] {false};
     int _availableCount {0};
@@ -115,6 +115,6 @@ private:
     void onNpcButtonClick(int npc);
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

@@ -24,12 +24,12 @@
 #include "../../game/d20/spells.h"
 #include "../../game/footstepsounds.h"
 #include "../../game/game.h"
+#include "../../game/guisounds.h"
 #include "../../game/portraits.h"
 #include "../../game/reputes.h"
 #include "../../game/services.h"
 #include "../../game/soundsets.h"
 #include "../../game/surfaces.h"
-#include "../../kotor/gui/sounds.h"
 
 #include "../../types.h"
 
