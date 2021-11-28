@@ -35,10 +35,12 @@ enum class LogLevel {
     Debug
 };
 
+#ifdef R_ENABLE_MULTITHREADING
+static mutex g_logMutex;
+#endif
+
 static int g_logChannels = LogChannels::general;
 static bool g_logToFile = false;
-static mutex g_logMutex;
-
 static unique_ptr<fs::ofstream> g_logFile;
 
 static const unordered_map<LogLevel, string> g_nameByLogLevel {
@@ -79,7 +81,10 @@ static void log(ostream &out, LogLevel level, const string &s, int channel) {
                       describeLogChannel(channel) %
                       s);
 
+#ifdef R_ENABLE_MULTITHREADING
     lock_guard<mutex> lock(g_logMutex);
+#endif
+
     out << msg << endl;
 }
 

@@ -25,6 +25,7 @@ option(BUILD_LAUNCHER "build launcher executable" OFF)
 option(BUILD_TESTS "build unit tests" OFF)
 
 option(ENABLE_VIDEO "enable video playback" ON)
+option(ENABLE_MULTITHREADING "enable multithreaded execution" OFF)
 
 # END Options
 

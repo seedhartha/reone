@@ -39,6 +39,10 @@ set(COMMON_SOURCES
     threadutil.cpp
     unicodeutil.cpp)
 
+if(ENABLE_MULTITHREADING)
+    target_compile_definitions(common PUBLIC R_ENABLE_MULTITHREADING)
+endif()
+
 add_library(common STATIC ${COMMON_HEADERS} ${COMMON_SOURCES})
 set_target_properties(common PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(common PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)

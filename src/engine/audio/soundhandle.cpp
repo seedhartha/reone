@@ -43,11 +43,12 @@ void SoundHandle::setState(State state) {
     _state = state;
 }
 
-void SoundHandle::setPosition(const glm::vec3 &position) {
-    if (_position.load() != position) {
-        _position = position;
-        _positionDirty = true;
+void SoundHandle::setPosition(glm::vec3 position) {
+    if (_position == position) {
+        return;
     }
+    _position = move(position);
+    _positionDirty = true;
 }
 
 } // namespace audio

@@ -36,15 +36,17 @@ public:
         _audioFiles(audioFiles) {
     }
 
-    ~AudioPlayer();
+    ~AudioPlayer() { deinit(); }
 
     void init();
     void deinit();
 
+    void update(float dt);
+
     std::shared_ptr<SoundHandle> play(const std::string &resRef, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f));
     std::shared_ptr<SoundHandle> play(const std::shared_ptr<AudioStream> &stream, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f));
 
-    void setListenerPosition(const glm::vec3 &position);
+    void setListenerPosition(glm::vec3 position);
 
 private:
     AudioOptions _options;
@@ -52,17 +54,11 @@ private:
 
     ALCdevice *_device {nullptr};
     ALCcontext *_context {nullptr};
-    std::thread _thread;
-    std::atomic_bool _run {true};
+
+    glm::vec3 _listenerPosition {0.0f};
+    bool _listenerPositionDirty {false};
+
     std::vector<std::shared_ptr<SoundInstance>> _sounds;
-    std::recursive_mutex _soundsMutex;
-    std::atomic<glm::vec3> _listenerPosition;
-    std::atomic_bool _listenerPositionDirty {false};
-
-    void threadStart();
-
-    void initAL();
-    void deinitAL();
 
     void enqueue(const std::shared_ptr<SoundInstance> &sound);
 
