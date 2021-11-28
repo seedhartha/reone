@@ -25,8 +25,8 @@
 #include "../../graphics/window.h"
 #include "../../resource/gffstruct.h"
 
-#include "game.h"
-#include "services.h"
+#include "../game.h"
+#include "../services.h"
 
 using namespace std;
 

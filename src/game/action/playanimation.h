@@ -19,7 +19,7 @@
 
 #include "../types.h"
 
-#include "action.h"
+#include "../action.h"
 
 namespace reone {
 

@@ -20,7 +20,7 @@
 #include "../../../script/exception/argument.h"
 #include "../../../script/executioncontext.h"
 
-#include "../../effect/effect.h"
+#include "../../effect.h"
 #include "../../event.h"
 #include "../../game.h"
 #include "../../location.h"

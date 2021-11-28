@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "scenenode.h"
+#include "../node.h"
 
 namespace reone {
 

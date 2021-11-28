@@ -19,6 +19,7 @@ set(SCENE_HEADERS
     collision.h
     graph.h
     graphs.h
+    node.h
     node/camera.h
     node/dummy.h
     node/emitter.h
@@ -29,7 +30,6 @@ set(SCENE_HEADERS
     node/model.h
     node/modelnode.h
     node/particle.h
-    node/scenenode.h
     node/sound.h
     node/walkmesh.h
     pipeline/control.h
@@ -40,6 +40,7 @@ set(SCENE_HEADERS
 set(SCENE_SOURCES
     graph.cpp
     graphs.cpp
+    node.cpp
     node/camera.cpp
     node/emitter.cpp
     node/grass.cpp
@@ -47,7 +48,6 @@ set(SCENE_SOURCES
     node/mesh.cpp
     node/model.cpp
     node/particle.cpp
-    node/scenenode.cpp
     node/sound.cpp
     node/walkmesh.cpp
     pipeline/control.cpp

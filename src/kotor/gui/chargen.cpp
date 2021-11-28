@@ -17,19 +17,19 @@
 
 #include "chargen.h"
 
-#include "../../../game/d20/classes.h"
-#include "../../../game/object/factory.h"
-#include "../../../game/party.h"
-#include "../../../game/portraits.h"
-#include "../../../game/services.h"
-#include "../../../graphics/models.h"
-#include "../../../gui/control/label.h"
-#include "../../../gui/sceneinitializer.h"
-#include "../../../scene/graphs.h"
+#include "../../game/d20/classes.h"
+#include "../../game/object/factory.h"
+#include "../../game/party.h"
+#include "../../game/portraits.h"
+#include "../../game/services.h"
+#include "../../graphics/models.h"
+#include "../../gui/control/label.h"
+#include "../../gui/sceneinitializer.h"
 #include "../../resource/resources.h"
+#include "../../scene/graphs.h"
 
-#include "../../kotor.h"
-#include "../../types.h"
+#include "../kotor.h"
+#include "../types.h"
 
 using namespace std;
 using namespace std::placeholders;

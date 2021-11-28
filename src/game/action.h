@@ -17,16 +17,17 @@
 
 #pragma once
 
-#include "../types.h"
+#include "types.h"
 
 namespace reone {
 
 namespace game {
 
+struct Services;
+
 class Creature;
 class Game;
 class Object;
-struct Services;
 
 class Action : boost::noncopyable {
 public:

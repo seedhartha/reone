@@ -23,8 +23,8 @@
 #include "../../gui/control/togglebutton.h"
 #include "../../resource/types.h"
 
+#include "../gui.h"
 #include "barkbubble.h"
-#include "gui.h"
 #include "selectoverlay.h"
 
 namespace reone {

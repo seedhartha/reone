@@ -34,7 +34,7 @@
 #include "../../kotor.h"
 #include "../../types.h"
 
-#include "chargen.h"
+#include "../chargen.h"
 
 using namespace std;
 

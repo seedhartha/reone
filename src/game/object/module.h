@@ -24,8 +24,8 @@
 #include "../contextaction.h"
 #include "../player.h"
 
+#include "../object.h"
 #include "area.h"
-#include "object.h"
 
 namespace reone {
 

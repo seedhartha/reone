@@ -15,19 +15,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "effect.h"
+#pragma once
 
-#include "../../common/logutil.h"
+#include "../script/enginetype.h"
 
-using namespace std;
+#include "types.h"
 
 namespace reone {
 
 namespace game {
 
-void Effect::applyTo(SpatialObject &object) {
-    debug("Unsupported effect type: " + to_string(static_cast<int>(_type)));
-}
+class SpatialObject;
+
+class Effect : public script::EngineType {
+public:
+    Effect(EffectType type) :
+        _type(type) {
+    }
+
+    virtual void applyTo(SpatialObject &object);
+
+    EffectType type() const { return _type; }
+
+protected:
+    EffectType _type;
+};
 
 } // namespace game
 

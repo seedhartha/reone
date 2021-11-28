@@ -19,7 +19,7 @@
 
 #include "../types.h"
 
-#include "camera.h"
+#include "../camera.h"
 #include "camerastyle.h"
 
 namespace reone {

@@ -17,9 +17,9 @@
 
 #include "object.h"
 
-#include "../../common/collectionutil.h"
+#include "../common/collectionutil.h"
 
-#include "../services.h"
+#include "services.h"
 
 using namespace std;
 

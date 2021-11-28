@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "../../graphics/aabb.h"
+#include "../graphics/aabb.h"
 
-#include "../types.h"
+#include "types.h"
 
 namespace reone {
 

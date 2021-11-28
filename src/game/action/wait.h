@@ -19,7 +19,7 @@
 
 #include "../../common/timer.h"
 
-#include "action.h"
+#include "../action.h"
 
 namespace reone {
 

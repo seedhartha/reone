@@ -19,7 +19,7 @@
 
 #include "../../graphics/aabb.h"
 
-#include "scenenode.h"
+#include "../node.h"
 
 namespace reone {
 

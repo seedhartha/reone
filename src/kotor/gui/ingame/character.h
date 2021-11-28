@@ -23,7 +23,7 @@
 #include "../../../gui/control/slider.h"
 #include "../../../scene/node/model.h"
 
-#include "../gui.h"
+#include "../../gui.h"
 
 namespace reone {
 

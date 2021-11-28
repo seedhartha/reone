@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "control.h"
+#include "../control.h"
 
 namespace reone {
 

@@ -15,21 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "effect.h"
 
-#include "../types.h"
+#include "../common/logutil.h"
+
+using namespace std;
 
 namespace reone {
 
-class ITool {
-public:
-    virtual void invoke(
-        Operation operation,
-        const boost::filesystem::path &target,
-        const boost::filesystem::path &gamePath,
-        const boost::filesystem::path &destPath) = 0;
+namespace game {
 
-    virtual bool supports(Operation operation, const boost::filesystem::path &target) const = 0;
-};
+void Effect::applyTo(SpatialObject &object) {
+    debug("Unsupported effect type: " + to_string(static_cast<int>(_type)));
+}
+
+} // namespace game
 
 } // namespace reone

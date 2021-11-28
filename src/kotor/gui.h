@@ -17,30 +17,43 @@
 
 #pragma once
 
-#include "../../script/enginetype.h"
-
-#include "../types.h"
+#include "../game/types.h"
+#include "../gui/gui.h"
 
 namespace reone {
 
 namespace game {
 
-class SpatialObject;
+struct Services;
 
-class Effect : public script::EngineType {
-public:
-    Effect(EffectType type) :
-        _type(type) {
-    }
+}
 
-    virtual void applyTo(SpatialObject &object);
+namespace kotor {
 
-    EffectType type() const { return _type; }
+class KotOR;
+
+/**
+ * Encapsulates game-specific GUI configuration.
+ */
+class GameGUI : public gui::GUI {
+protected:
+    GameGUI(KotOR &game, game::Services &services);
+
+    void initForGame();
+
+    std::string getResRef(const std::string &base) const;
 
 protected:
-    EffectType _type;
+    KotOR &_game;
+    game::Services &_services;
+
+    void loadBackground(game::BackgroundType type);
+
+private:
+    void onClick(const std::string &control) override;
+    void onFocusChanged(const std::string &control, bool focus) override;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

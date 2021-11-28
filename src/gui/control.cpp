@@ -17,20 +17,20 @@
 
 #include "control.h"
 
-#include "../../common/logutil.h"
-#include "../../graphics/context.h"
-#include "../../graphics/fonts.h"
-#include "../../graphics/mesh.h"
-#include "../../graphics/meshes.h"
-#include "../../graphics/renderbuffer.h"
-#include "../../graphics/shaders.h"
-#include "../../graphics/textures.h"
-#include "../../graphics/textutil.h"
-#include "../../graphics/window.h"
-#include "../../resource/gffstruct.h"
-#include "../../resource/strings.h"
+#include "../common/logutil.h"
+#include "../graphics/context.h"
+#include "../graphics/fonts.h"
+#include "../graphics/mesh.h"
+#include "../graphics/meshes.h"
+#include "../graphics/renderbuffer.h"
+#include "../graphics/shaders.h"
+#include "../graphics/textures.h"
+#include "../graphics/textutil.h"
+#include "../graphics/window.h"
+#include "../resource/gffstruct.h"
+#include "../resource/strings.h"
 
-#include "../gui.h"
+#include "gui.h"
 
 using namespace std;
 

@@ -17,7 +17,7 @@
 
 #include "player.h"
 
-#include "camera/camera.h"
+#include "camera.h"
 #include "object/area.h"
 #include "object/creature.h"
 #include "object/module.h"

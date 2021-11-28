@@ -21,7 +21,7 @@
 #include "../../gui/control/label.h"
 #include "../../gui/control/togglebutton.h"
 
-#include "gui.h"
+#include "../gui.h"
 
 namespace reone {
 

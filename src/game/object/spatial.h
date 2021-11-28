@@ -19,14 +19,14 @@
 
 #include "../../scene/animproperties.h"
 #include "../../scene/graph.h"
-#include "../../scene/node/scenenode.h"
+#include "../../scene/node.h"
 #include "../../scene/user.h"
 
 #include "../action/playanimation.h"
-#include "../effect/effect.h"
+#include "../effect.h"
 #include "../types.h"
 
-#include "object.h"
+#include "../object.h"
 
 namespace reone {
 

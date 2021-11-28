@@ -15,6 +15,7 @@
 
 set(TOOLS_HEADERS
     program.h
+    tool.h
     tool/2da.h
     tool/audio.h
     tool/erf.h
@@ -25,7 +26,6 @@ set(TOOLS_HEADERS
     tool/rim.h
     tool/ssf.h
     tool/tlk.h
-    tool/tool.h
     tool/tpc.h
     types.h)
 

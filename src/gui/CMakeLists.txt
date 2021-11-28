@@ -14,8 +14,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(GUI_HEADERS
+    control.h
     control/button.h
-    control/control.h
     control/imagebutton.h
     control/label.h
     control/listbox.h
@@ -30,7 +30,7 @@ set(GUI_HEADERS
     types.h)
 
 set(GUI_SOURCES
-    control/control.cpp
+    control.cpp
     control/imagebutton.cpp
     control/listbox.cpp
     control/progressbar.cpp

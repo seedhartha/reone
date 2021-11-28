@@ -15,21 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "action.h"
+#pragma once
 
-#include "../../common/logutil.h"
-
-using namespace std;
+#include "types.h"
 
 namespace reone {
 
-namespace game {
+class ITool {
+public:
+    virtual void invoke(
+        Operation operation,
+        const boost::filesystem::path &target,
+        const boost::filesystem::path &gamePath,
+        const boost::filesystem::path &destPath) = 0;
 
-void Action::execute(Object &actor, float dt) {
-    warn("Action execution not implemented: " + to_string(static_cast<int>(_type)));
-    complete();
-}
-
-} // namespace game
+    virtual bool supports(Operation operation, const boost::filesystem::path &target) const = 0;
+};
 
 } // namespace reone

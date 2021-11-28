@@ -22,7 +22,7 @@
 #include "../declarations.h"
 
 #include "../../../../common/logutil.h"
-#include "../../../../game/object/object.h"
+#include "../../../../game/object.h"
 #include "../../../../game/script/routine/argutil.h"
 #include "../../../../game/script/routine/context.h"
 #include "../../../../script/exception/notimpl.h"

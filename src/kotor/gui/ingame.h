@@ -19,14 +19,14 @@
 
 #include "../gui.h"
 
-#include "abilities.h"
-#include "character.h"
-#include "equip.h"
-#include "inventory.h"
-#include "journal.h"
-#include "map.h"
-#include "messages.h"
-#include "options.h"
+#include "ingame/abilities.h"
+#include "ingame/character.h"
+#include "ingame/equip.h"
+#include "ingame/inventory.h"
+#include "ingame/journal.h"
+#include "ingame/map.h"
+#include "ingame/messages.h"
+#include "ingame/options.h"
 
 namespace reone {
 

@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(GAME_HEADERS
-    action/action.h
+    action.h
     action/attack.h
     action/barkstring.h
     action/castfakespellatlocation.h
@@ -67,8 +67,8 @@ set(GAME_HEADERS
     action/usetalentonobject.h
     action/wait.h
     animationutil.h
+    camera.h
     camera/animated.h
-    camera/camera.h
     camera/camerastyle.h
     camera/dialog.h
     camera/firstperson.h
@@ -76,7 +76,6 @@ set(GAME_HEADERS
     camera/thirdperson.h
     character.h
     combat.h
-    console.h
     contextaction.h
     cursors.h
     d20/attributes.h
@@ -90,6 +89,7 @@ set(GAME_HEADERS
     d20/spell.h
     d20/spells.h
     dialog.h
+    effect.h
     effect/abilitydecrease.h
     effect/abilityincrease.h
     effect/acdecrease.h
@@ -127,7 +127,6 @@ set(GAME_HEADERS
     effect/droidconfused.h
     effect/droidscramble.h
     effect/droidstun.h
-    effect/effect.h
     effect/entangle.h
     effect/factionmodifier.h
     effect/factory.h
@@ -189,10 +188,13 @@ set(GAME_HEADERS
     format/ssfwriter.h
     format/visreader.h
     game.h
+    gui/console.h
     gui/loadscreen.h
+    gui/map.h
+    gui/profileoverlay.h
     gui/sounds.h
     location.h
-    map.h
+    object.h
     object/area.h
     object/creature.h
     object/door.h
@@ -200,7 +202,6 @@ set(GAME_HEADERS
     object/factory.h
     object/item.h
     object/module.h
-    object/object.h
     object/placeable.h
     object/placeablecamera.h
     object/sound.h
@@ -214,7 +215,6 @@ set(GAME_HEADERS
     player.h
     portrait.h
     portraits.h
-    profileoverlay.h
     reputes.h
     room.h
     savedgame.h
@@ -231,7 +231,7 @@ set(GAME_HEADERS
     types.h)
 
 set(GAME_SOURCES
-    action/action.cpp
+    action.cpp
     action/attack.cpp
     action/barkstring.cpp
     action/castfakespellatlocation.cpp
@@ -281,15 +281,14 @@ set(GAME_SOURCES
     action/usetalentonobject.cpp
     action/wait.cpp
     animationutil.cpp
+    camera.cpp
     camera/animated.cpp
-    camera/camera.cpp
     camera/camerastyle.cpp
     camera/dialog.cpp
     camera/firstperson.cpp
     camera/static.cpp
     camera/thirdperson.cpp
     combat.cpp
-    console.cpp
     cursors.cpp
     d20/attributes.cpp
     d20/class.cpp
@@ -298,6 +297,7 @@ set(GAME_SOURCES
     d20/skills.cpp
     d20/spells.cpp
     dialog.cpp
+    effect.cpp
     effect/abilitydecrease.cpp
     effect/abilityincrease.cpp
     effect/acdecrease.cpp
@@ -335,7 +335,6 @@ set(GAME_SOURCES
     effect/droidconfused.cpp
     effect/droidscramble.cpp
     effect/droidstun.cpp
-    effect/effect.cpp
     effect/entangle.cpp
     effect/factionmodifier.cpp
     effect/forcebody.cpp
@@ -395,8 +394,11 @@ set(GAME_SOURCES
     format/ssfwriter.cpp
     format/visreader.cpp
     game.cpp
+    gui/console.cpp
+    gui/map.cpp
+    gui/profileoverlay.cpp
     gui/sounds.cpp
-    map.cpp
+    object.cpp
     object/area.cpp
     object/creature.cpp
     object/door.cpp
@@ -404,7 +406,6 @@ set(GAME_SOURCES
     object/factory.cpp
     object/item.cpp
     object/module.cpp
-    object/object.cpp
     object/placeable.cpp
     object/placeablecamera.cpp
     object/sound.cpp
@@ -416,7 +417,6 @@ set(GAME_SOURCES
     pathfinder.cpp
     player.cpp
     portraits.cpp
-    profileoverlay.cpp
     reputes.cpp
     room.cpp
     script/routine/argutil.cpp

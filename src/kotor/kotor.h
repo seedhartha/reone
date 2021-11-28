@@ -20,13 +20,13 @@
 
 #include "../game/game.h"
 
-#include "gui/chargen/chargen.h"
+#include "gui/chargen.h"
 #include "gui/computer.h"
 #include "gui/container.h"
 #include "gui/conversation.h"
 #include "gui/dialog.h"
 #include "gui/hud.h"
-#include "gui/ingame/ingame.h"
+#include "gui/ingame.h"
 #include "gui/mainmenu.h"
 #include "gui/partyselect.h"
 #include "gui/saveload.h"

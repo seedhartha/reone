@@ -21,7 +21,7 @@
 
 #include "../declarations.h"
 
-#include "../../../../game/effect/effect.h"
+#include "../../../../game/effect.h"
 #include "../../../../game/effect/factory.h"
 #include "../../../../game/game.h"
 #include "../../../../game/script/routine/argutil.h"

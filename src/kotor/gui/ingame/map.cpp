@@ -17,12 +17,11 @@
 
 #include "map.h"
 
+#include "../../../game/gui/map.h"
+#include "../../../game/object/waypoint.h"
 #include "../../../gui/control/button.h"
 #include "../../../gui/control/label.h"
 #include "../../../resource/strings.h"
-
-#include "../../../game/map.h"
-#include "../../../game/object/waypoint.h"
 
 #include "../../kotor.h"
 

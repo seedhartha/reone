@@ -17,7 +17,7 @@
 
 #include "ingame.h"
 
-#include "../../kotor.h"
+#include "../kotor.h"
 
 using namespace std;
 

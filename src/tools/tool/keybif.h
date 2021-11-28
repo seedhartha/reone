@@ -20,7 +20,7 @@
 #include "../../resource/format/bifreader.h"
 #include "../../resource/format/keyreader.h"
 
-#include "tool.h"
+#include "../tool.h"
 
 namespace reone {
 
