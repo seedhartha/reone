@@ -28,5 +28,4 @@ add_executable(reone-tests ${TEST_SOURCES})
 target_precompile_headers(reone-tests PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(reone-tests PRIVATE kotor ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
-enable_testing()
 add_test(reone-tests reone-tests)

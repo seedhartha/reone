@@ -93,6 +93,7 @@ if(BUILD_LAUNCHER)
 endif()
 
 if(BUILD_TESTS)
+    enable_testing()
     add_subdirectory(tests) # unit tests
 endif()
 
