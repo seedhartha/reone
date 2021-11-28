@@ -20,6 +20,7 @@
 #include "../../game/core/types.h"
 #include "../../game/kotor/types.h"
 
+#include "audio.h"
 #include "graphics.h"
 
 using namespace std;
@@ -35,6 +36,7 @@ namespace di {
 void SceneModule::init() {
     _sceneGraphs = make_unique<SceneGraphs>(
         _options,
+        _audio.audioPlayer(),
         _graphics.context(),
         _graphics.features(),
         _graphics.materials(),

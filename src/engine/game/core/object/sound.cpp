@@ -24,6 +24,8 @@
 #include "../../../resource/gffs.h"
 #include "../../../resource/resources.h"
 #include "../../../resource/strings.h"
+#include "../../../scene/graphs.h"
+#include "../../../scene/node/sound.h"
 
 #include "../game.h"
 #include "../services.h"
@@ -41,93 +43,15 @@ namespace game {
 void Sound::loadFromGIT(const GffStruct &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
-
     loadTransformFromGIT(gffs);
 }
 
 void Sound::loadFromBlueprint(const string &resRef) {
     shared_ptr<GffStruct> uts(_services.gffs.get(resRef, ResourceType::Uts));
-    if (uts) {
-        loadUTS(*uts);
-    }
-}
-
-void Sound::loadTransformFromGIT(const GffStruct &gffs) {
-    _position[0] = gffs.getFloat("XPosition");
-    _position[1] = gffs.getFloat("YPosition");
-    _position[2] = gffs.getFloat("ZPosition");
-
-    updateTransform();
-}
-
-void Sound::update(float dt) {
-    SpatialObject::update(dt);
-
-    if (_sound) {
-        if (_audible) {
-            _sound->setPosition(getPosition());
-        } else {
-            _sound->stop();
-            _sound.reset();
-        }
-    }
-    if (!_active || !_audible)
+    if (!uts) {
         return;
-
-    if (!_sound || _sound->isStopped()) {
-        if (_timeout > 0.0f) {
-            _timeout = glm::max(0.0f, _timeout - dt);
-            return;
-        }
-        const vector<string> &sounds = _sounds;
-        int soundCount = static_cast<int>(sounds.size());
-        if (sounds.empty()) {
-            _active = false;
-            return;
-        } else if (++_soundIdx >= soundCount) {
-            if (_looping) {
-                _soundIdx = 0;
-            } else {
-                _active = false;
-                return;
-            }
-        }
-        playSound(sounds[_soundIdx], soundCount == 1 && _continuous);
-        _timeout = _interval / 1000.0f;
     }
-}
-
-void Sound::playSound(const string &resRef, bool loop) {
-    float gain = _volume / 127.0f;
-    _sound = _services.audioPlayer.play(resRef, AudioType::Sound, loop, gain, _positional, getPosition());
-}
-
-void Sound::play() {
-    if (_sound) {
-        _sound->stop();
-    }
-
-    _timeout = 0.0f;
-    _active = true;
-}
-
-void Sound::stop() {
-    if (_sound) {
-        _sound->stop();
-        _sound.reset();
-    }
-
-    _active = false;
-}
-
-glm::vec3 Sound::getPosition() const {
-    glm::vec3 position(_transform[3]);
-    position.z += _elevation;
-    return move(position);
-}
-
-void Sound::setAudible(bool audible) {
-    _audible = audible;
+    loadUTS(*uts);
 }
 
 void Sound::loadUTS(const GffStruct &uts) {
@@ -169,6 +93,76 @@ void Sound::loadPriorityFromUTS(const GffStruct &uts) {
     shared_ptr<TwoDA> priorityGroups(_services.twoDas.get("prioritygroups"));
     int priorityIdx = uts.getInt("Priority");
     _priority = priorityGroups->getInt(priorityIdx, "priority");
+}
+
+void Sound::loadTransformFromGIT(const GffStruct &gffs) {
+    _position[0] = gffs.getFloat("XPosition");
+    _position[1] = gffs.getFloat("YPosition");
+    _position[2] = gffs.getFloat("ZPosition");
+
+    updateTransform();
+
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
+    auto sceneNode = sceneGraph.newSound();
+    sceneNode->setEnabled(_active);
+    sceneNode->setPriority(_priority);
+    sceneNode->setMaxDistance(_maxDistance);
+    _sceneNode = move(sceneNode);
+}
+
+void Sound::update(float dt) {
+    SpatialObject::update(dt);
+    if (!_active) {
+        return;
+    }
+    auto &sceneNode = static_cast<SoundSceneNode &>(*_sceneNode);
+    if (sceneNode.isSoundPlaying()) {
+        return;
+    }
+    if (_timeout > 0.0f) {
+        _timeout = glm::max(0.0f, _timeout - dt);
+        return;
+    }
+    const vector<string> &sounds = _sounds;
+    int soundCount = static_cast<int>(sounds.size());
+    if (sounds.empty()) {
+        setActive(false);
+        return;
+    } else if (++_soundIdx >= soundCount) {
+        if (_looping) {
+            _soundIdx = 0;
+        } else {
+            setActive(false);
+            return;
+        }
+    }
+    float gain = _volume / 127.0f;
+    bool loop = soundCount == 1 && _continuous;
+    sceneNode.playSound(sounds[_soundIdx], gain, _positional, loop);
+    _timeout = _interval / 1000.0f;
+}
+
+void Sound::updateTransform() {
+    SpatialObject::updateTransform();
+    if (!_sceneNode) {
+        return;
+    }
+    glm::mat4 transform(_transform);
+    transform *= glm::translate(glm::vec3(0.0f, 0.0f, _elevation));
+    _sceneNode->setLocalTransform(_transform);
+}
+
+void Sound::setActive(bool active) {
+    if (_active == active) {
+        return;
+    }
+    if (_sceneNode) {
+        _sceneNode->setEnabled(active);
+    }
+    if (active) {
+        _timeout = 0.0f;
+    }
+    _active = active;
 }
 
 } // namespace game

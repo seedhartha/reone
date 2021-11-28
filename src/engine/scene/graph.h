@@ -43,11 +43,18 @@ class Walkmesh;
 
 } // namespace graphics
 
+namespace audio {
+
+class AudioPlayer;
+
+}
+
 namespace scene {
 
 class Collision;
 class IAnimationEventListener;
 class ModelSceneNode;
+class SoundSceneNode;
 class WalkmeshSceneNode;
 
 class SceneGraph : boost::noncopyable {
@@ -55,6 +62,7 @@ public:
     SceneGraph(
         std::string name,
         graphics::GraphicsOptions options,
+        audio::AudioPlayer &audioPlayer,
         graphics::Context &context,
         graphics::Features &features,
         graphics::Materials &materials,
@@ -64,6 +72,7 @@ public:
         graphics::Textures &textures) :
         _name(std::move(name)),
         _options(std::move(options)),
+        _audioPlayer(audioPlayer),
         _context(context),
         _features(features),
         _materials(materials),
@@ -140,6 +149,7 @@ public:
 
     std::unique_ptr<DummySceneNode> newDummy(std::shared_ptr<graphics::ModelNode> modelNode);
     std::unique_ptr<CameraSceneNode> newCamera(glm::mat4 projection);
+    std::unique_ptr<SoundSceneNode> newSound();
 
     std::unique_ptr<ModelSceneNode> newModel(
         std::shared_ptr<graphics::Model> model,
@@ -176,6 +186,8 @@ private:
 
     // Services
 
+    audio::AudioPlayer &_audioPlayer;
+
     graphics::Context &_context;
     graphics::Features &_features;
     graphics::Materials &_materials;
@@ -206,6 +218,7 @@ private:
 
     void cullRoots();
     void updateLighting();
+    void updateSounds();
 
     void refreshNodeLists();
     void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);

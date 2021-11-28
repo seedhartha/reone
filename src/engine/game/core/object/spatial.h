@@ -134,13 +134,14 @@ protected:
     glm::quat _orientation {1.0f, 0.0f, 0.0f, 0.0f};
     glm::mat4 _transform {1.0f};
     bool _visible {true};
-    std::shared_ptr<scene::SceneNode> _sceneNode;
     Room *_room {nullptr};
     std::vector<std::shared_ptr<Item>> _items;
     std::deque<AppliedEffect> _effects;
     bool _open {false};
     bool _stunt {false};
     std::string _activeAnimName;
+
+    std::shared_ptr<scene::SceneNode> _sceneNode;
 
     SpatialObject(
         uint32_t id,

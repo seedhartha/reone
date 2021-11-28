@@ -30,6 +30,7 @@ set(SCENE_HEADERS
     node/modelnode.h
     node/particle.h
     node/scenenode.h
+    node/sound.h
     node/walkmesh.h
     pipeline/control.h
     pipeline/world.h
@@ -47,6 +48,7 @@ set(SCENE_SOURCES
     node/model.cpp
     node/particle.cpp
     node/scenenode.cpp
+    node/sound.cpp
     node/walkmesh.cpp
     pipeline/control.cpp
     pipeline/world.cpp)

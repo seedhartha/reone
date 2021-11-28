@@ -49,13 +49,13 @@ Variable soundObjectGetFixedVariance(const vector<Variable> &args, const Routine
 
 Variable soundObjectPlay(const vector<Variable> &args, const RoutineContext &ctx) {
     auto sound = getSound(args, 0, ctx);
-    sound->play();
+    sound->setActive(true);
     return Variable::ofNull();
 }
 
 Variable soundObjectStop(const vector<Variable> &args, const RoutineContext &ctx) {
     auto sound = getSound(args, 0, ctx);
-    sound->stop();
+    sound->setActive(false);
     return Variable::ofNull();
 }
 
