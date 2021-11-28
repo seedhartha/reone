@@ -18,7 +18,6 @@
 #include "player.h"
 
 #include "../common/logutil.h"
-#include "../common/threadutil.h"
 
 #include "files.h"
 #include "soundhandle.h"
@@ -35,44 +34,6 @@ static constexpr float kMaxPositionalSoundDistance = 16.0f;
 static constexpr float kMaxPositionalSoundDistance2 = kMaxPositionalSoundDistance * kMaxPositionalSoundDistance;
 
 void AudioPlayer::init() {
-    _thread = thread(bind(&AudioPlayer::threadStart, this));
-}
-
-void AudioPlayer::threadStart() {
-    setThreadName("audio");
-    initAL();
-    debug("Thread started", LogChannels::audio);
-
-    vector<shared_ptr<SoundInstance>> sounds;
-    while (_run) {
-        {
-            lock_guard<recursive_mutex> lock(_soundsMutex);
-            auto maybeSounds = remove_if(
-                _sounds.begin(), _sounds.end(),
-                [](auto &sound) { return sound->handle()->isStopped(); });
-
-            _sounds.erase(maybeSounds, _sounds.end());
-            sounds = _sounds;
-        }
-        if (_listenerPositionDirty) {
-            glm::vec3 position(_listenerPosition.load());
-            alListener3f(AL_POSITION, position.x, position.y, position.z);
-            _listenerPositionDirty = false;
-        }
-        for (auto &sound : sounds) {
-            if (sound->handle()->isNotInited()) {
-                sound->init();
-            }
-            sound->update();
-        }
-        this_thread::yield();
-    }
-
-    deinitAL();
-    debug("Thread stopped", LogChannels::audio);
-}
-
-void AudioPlayer::initAL() {
     _device = alcOpenDevice(nullptr);
     if (!_device) {
         throw runtime_error("Failed to open an OpenAL device");
@@ -84,7 +45,7 @@ void AudioPlayer::initAL() {
     alcMakeContextCurrent(_context);
 }
 
-void AudioPlayer::deinitAL() {
+void AudioPlayer::deinit() {
     if (_context) {
         alcMakeContextCurrent(nullptr);
         alcDestroyContext(_context);
@@ -96,22 +57,32 @@ void AudioPlayer::deinitAL() {
     }
 }
 
-AudioPlayer::~AudioPlayer() {
-    deinit();
-}
+void AudioPlayer::update(float dt) {
+    // Remove stopped sounds
+    auto maybeSounds = remove_if(
+        _sounds.begin(), _sounds.end(),
+        [](auto &sound) { return sound->handle()->isStopped(); });
+    _sounds.erase(maybeSounds, _sounds.end());
 
-void AudioPlayer::deinit() {
-    _run = false;
+    // Update listener position
+    if (_listenerPositionDirty) {
+        glm::vec3 position(_listenerPosition);
+        alListener3f(AL_POSITION, position.x, position.y, position.z);
+        _listenerPositionDirty = false;
+    }
 
-    if (_thread.joinable()) {
-        _thread.join();
+    // Update sounds, init them if not already
+    for (auto &sound : _sounds) {
+        if (sound->handle()->isNotInited()) {
+            sound->init();
+        }
+        sound->update();
     }
 }
 
 shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
     shared_ptr<AudioStream> stream(_audioFiles.get(resRef));
     if (!stream) {
-        warn("AudioPlayer: file not found: " + resRef);
         return nullptr;
     }
     auto sound = make_shared<SoundInstance>(stream, loop, getGain(type, gain), positional, move(position));
@@ -135,32 +106,30 @@ float AudioPlayer::getGain(AudioType type, float gain) const {
         volume = _options.movieVolume;
         break;
     default:
-        return 85;
+        return 85.0f;
     }
-
     return gain * (volume / 100.0f);
 }
 
 void AudioPlayer::enqueue(const shared_ptr<SoundInstance> &sound) {
-    lock_guard<recursive_mutex> lock(_soundsMutex);
     _sounds.push_back(sound);
 }
 
 shared_ptr<SoundHandle> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
-    if (positional && glm::distance2(_listenerPosition.load(), position) > kMaxPositionalSoundDistance2)
+    if (positional && glm::distance2(_listenerPosition, position) > kMaxPositionalSoundDistance2) {
         return nullptr;
-
+    }
     auto sound = make_shared<SoundInstance>(stream, loop, getGain(type, gain), positional, move(position));
     enqueue(sound);
-
     return sound->handle();
 }
 
-void AudioPlayer::setListenerPosition(const glm::vec3 &position) {
-    if (_listenerPosition.load() != position) {
-        _listenerPosition = position;
-        _listenerPositionDirty = true;
+void AudioPlayer::setListenerPosition(glm::vec3 position) {
+    if (_listenerPosition == position) {
+        return;
     }
+    _listenerPosition = move(position);
+    _listenerPositionDirty = true;
 }
 
 } // namespace audio

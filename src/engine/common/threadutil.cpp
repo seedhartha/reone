@@ -23,12 +23,19 @@ using namespace std;
 
 namespace reone {
 
-static map<thread::id, std::string> g_names;
+#ifdef R_ENABLE_MULTITHREADING
 static mutex g_namesMutex;
+#endif
+
+static map<thread::id, std::string> g_names;
 
 string getThreadName() {
     thread::id id(this_thread::get_id());
+
+#ifdef R_ENABLE_MULTITHREADING
     lock_guard<mutex> lock(g_namesMutex);
+#endif
+
     return getFromLookupOrElse(g_names, id, [&id]() {
         stringstream ss;
         ss << id;
@@ -37,7 +44,10 @@ string getThreadName() {
 }
 
 void setThreadName(string name) {
+#ifdef R_ENABLE_MULTITHREADING
     lock_guard<mutex> lock(g_namesMutex);
+#endif
+
     g_names[this_thread::get_id()] = move(name);
 }
 

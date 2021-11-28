@@ -381,7 +381,9 @@ void Game::runMainLoop() {
             drawAll();
         }
 
+#ifdef R_ENABLE_MULTITHREADING
         this_thread::yield();
+#endif
     }
 }
 
@@ -409,6 +411,7 @@ void Game::update() {
         gui->update(dt);
     }
     updateSceneGraph(dt);
+    _services.audioPlayer.update(dt);
 
     _profileOverlay.update(dt);
 }
@@ -506,8 +509,9 @@ void Game::updateCamera(float dt) {
 
 void Game::updateSceneGraph(float dt) {
     const Camera *camera = getActiveCamera();
-    if (!camera)
+    if (!camera) {
         return;
+    }
 
     // Select a reference node for dynamic lighting
     shared_ptr<SceneNode> lightingRefNode;
