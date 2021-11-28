@@ -17,7 +17,7 @@
 
 #include "audio.h"
 
-#include "../../engine/common/streamreader.h"
+#include "../../common/streamreader.h"
 
 using namespace std;
 

@@ -19,10 +19,10 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../../engine/common/streamwriter.h"
-#include "../../engine/resource/2da.h"
-#include "../../engine/resource/format/2dareader.h"
-#include "../../engine/resource/format/2dawriter.h"
+#include "../../common/streamwriter.h"
+#include "../../resource/2da.h"
+#include "../../resource/format/2dareader.h"
+#include "../../resource/format/2dawriter.h"
 
 using namespace std;
 

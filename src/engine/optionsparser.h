@@ -19,7 +19,7 @@
 
 #include <boost/program_options.hpp>
 
-#include "game/core/options.h"
+#include "../game/options.h"
 
 namespace reone {
 

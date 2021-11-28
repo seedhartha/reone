@@ -19,9 +19,9 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../../engine/resource/format/tlkreader.h"
-#include "../../engine/resource/format/tlkwriter.h"
-#include "../../engine/resource/talktable.h"
+#include "../../resource/format/tlkreader.h"
+#include "../../resource/format/tlkwriter.h"
+#include "../../resource/talktable.h"
 
 using namespace std;
 

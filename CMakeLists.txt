@@ -69,17 +69,17 @@ endif()
 
 # Engine libraries
 
-add_subdirectory(src/engine/common) # common static library
-add_subdirectory(src/engine/resource) # resource static library
-add_subdirectory(src/engine/graphics) # graphics static library
-add_subdirectory(src/engine/audio) # audio static library
-add_subdirectory(src/engine/gui) # gui static library
-add_subdirectory(src/engine/scene) # scene static library
-add_subdirectory(src/engine/video) # video static library
-add_subdirectory(src/engine/script) # script static library
-add_subdirectory(src/engine/game/core) # game static library
-add_subdirectory(src/engine/game/kotor) # kotor static library
-add_subdirectory(src/engine/game/tsl) # tsl static library
+add_subdirectory(src/common) # common static library
+add_subdirectory(src/resource) # resource static library
+add_subdirectory(src/graphics) # graphics static library
+add_subdirectory(src/audio) # audio static library
+add_subdirectory(src/gui) # gui static library
+add_subdirectory(src/scene) # scene static library
+add_subdirectory(src/video) # video static library
+add_subdirectory(src/script) # script static library
+add_subdirectory(src/game) # game static library
+add_subdirectory(src/kotor) # kotor static library
+add_subdirectory(src/tsl) # tsl static library
 
 # END Engine libraries
 

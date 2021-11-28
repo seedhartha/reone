@@ -17,8 +17,8 @@
 
 #include "rim.h"
 
-#include "../../engine/resource/format/rimwriter.h"
-#include "../../engine/resource/typeutil.h"
+#include "../../resource/format/rimwriter.h"
+#include "../../resource/typeutil.h"
 
 using namespace std;
 

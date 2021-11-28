@@ -17,20 +17,21 @@
 
 #pragma once
 
-#include "../../game/core/cursors.h"
-#include "../../game/core/d20/classes.h"
-#include "../../game/core/d20/feats.h"
-#include "../../game/core/d20/skills.h"
-#include "../../game/core/d20/spells.h"
-#include "../../game/core/footstepsounds.h"
-#include "../../game/core/game.h"
-#include "../../game/core/portraits.h"
-#include "../../game/core/reputes.h"
-#include "../../game/core/services.h"
-#include "../../game/core/soundsets.h"
-#include "../../game/core/surfaces.h"
-#include "../../game/kotor/gui/sounds.h"
-#include "../../game/types.h"
+#include "../../game/cursors.h"
+#include "../../game/d20/classes.h"
+#include "../../game/d20/feats.h"
+#include "../../game/d20/skills.h"
+#include "../../game/d20/spells.h"
+#include "../../game/footstepsounds.h"
+#include "../../game/game.h"
+#include "../../game/portraits.h"
+#include "../../game/reputes.h"
+#include "../../game/services.h"
+#include "../../game/soundsets.h"
+#include "../../game/surfaces.h"
+#include "../../kotor/gui/sounds.h"
+
+#include "../../types.h"
 
 namespace reone {
 

@@ -22,7 +22,7 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/engine/common/timer.h"
+#include "../../src/common/timer.h"
 
 using namespace reone;
 

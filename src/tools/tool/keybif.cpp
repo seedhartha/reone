@@ -17,8 +17,8 @@
 
 #include "keybif.h"
 
-#include "../../engine/common/pathutil.h"
-#include "../../engine/resource/typeutil.h"
+#include "../../common/pathutil.h"
+#include "../../resource/typeutil.h"
 
 using namespace std;
 

@@ -22,10 +22,10 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/engine/script/execution.h"
-#include "../../src/engine/script/executioncontext.h"
-#include "../../src/engine/script/program.h"
-#include "../../src/engine/script/variable.h"
+#include "../../src/script/execution.h"
+#include "../../src/script/executioncontext.h"
+#include "../../src/script/program.h"
+#include "../../src/script/variable.h"
 
 using namespace std;
 

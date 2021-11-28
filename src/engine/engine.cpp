@@ -17,10 +17,10 @@
 
 #include "engine.h"
 
-#include "common/logutil.h"
+#include "../common/logutil.h"
 
 #include "di/container.h"
-#include "game/probe.h"
+#include "gameprobe.h"
 #include "optionsparser.h"
 
 using namespace reone::di;

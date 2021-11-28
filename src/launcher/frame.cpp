@@ -21,7 +21,7 @@
 
 #include <wx/display.h>
 
-#include "../engine/common/types.h"
+#include "../common/types.h"
 
 using namespace std;
 

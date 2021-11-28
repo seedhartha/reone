@@ -19,8 +19,8 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../../engine/game/core/format/ssfreader.h"
-#include "../../engine/game/core/format/ssfwriter.h"
+#include "../../game/format/ssfreader.h"
+#include "../../game/format/ssfwriter.h"
 
 using namespace std;
 
