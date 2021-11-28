@@ -17,9 +17,10 @@
 
 #include "registerutil.h"
 
-#include "../../game/script/routine/declarations.h"
 #include "../../game/script/routine/iroutines.h"
 #include "../../script/types.h"
+
+#include "declarations.h"
 
 using namespace reone::game;
 

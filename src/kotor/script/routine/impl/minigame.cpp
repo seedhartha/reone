@@ -21,17 +21,17 @@
 
 #include "../declarations.h"
 
+#include "../../../../game/script/routine/context.h"
 #include "../../../../script/exception/notimpl.h"
-
-#include "../context.h"
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::script;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 namespace routine {
 
@@ -457,6 +457,6 @@ Variable playerApplyForce(const vector<Variable> &args, const RoutineContext &ct
 
 } // namespace routine
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

@@ -18,7 +18,7 @@
 #include "gui.h"
 
 #include "../../audio/player.h"
-#include "../../game/guisounds.h"
+#include "../../game/gui/sounds.h"
 #include "../../game/services.h"
 #include "../../graphics/texture/textures.h"
 

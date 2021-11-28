@@ -22,35 +22,33 @@
 #include "../declarations.h"
 
 #include "../../../../common/logutil.h"
+#include "../../../../game/action/factory.h"
+#include "../../../../game/combat.h"
+#include "../../../../game/game.h"
+#include "../../../../game/location.h"
+#include "../../../../game/object/door.h"
+#include "../../../../game/object/spatial.h"
+#include "../../../../game/party.h"
+#include "../../../../game/reputes.h"
+#include "../../../../game/script/routine/argutil.h"
+#include "../../../../game/script/routine/context.h"
+#include "../../../../game/script/routine/objectutil.h"
+#include "../../../../game/script/runner.h"
+#include "../../../../game/services.h"
 #include "../../../../resource/strings.h"
 #include "../../../../script/exception/argument.h"
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/executioncontext.h"
 
-#include "../../../action/factory.h"
-#include "../../../combat.h"
-#include "../../../game.h"
-#include "../../../location.h"
-#include "../../../object/door.h"
-#include "../../../object/spatial.h"
-#include "../../../party.h"
-#include "../../../reputes.h"
-#include "../../../services.h"
-
-#include "../../routine/objectutil.h"
-#include "../../runner.h"
-
-#include "../argutil.h"
-#include "../context.h"
-
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::scene;
 using namespace reone::script;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 namespace routine {
 
@@ -2547,6 +2545,6 @@ Variable getIsPlayerMadeCharacter(const vector<Variable> &args, const RoutineCon
 
 } // namespace routine
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

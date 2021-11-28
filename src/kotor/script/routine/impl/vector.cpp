@@ -16,48 +16,53 @@
  */
 
 /** @file
- *  Implementation of planet-related routines.
+ *  Implementation of vector-related routines.
  */
 
 #include "../declarations.h"
 
+#include "../../../../game/script/routine/argutil.h"
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/types.h"
 
-#include "../context.h"
-
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::script;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 namespace routine {
 
-Variable setPlanetSelectable(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable vectorMagnitude(const vector<Variable> &args, const RoutineContext &ctx) {
+    glm::vec3 value(getVector(args, 0));
+    return Variable::ofFloat(glm::length(value));
+}
+
+Variable vectorNormalize(const vector<Variable> &args, const RoutineContext &ctx) {
+    glm::vec3 value(getVector(args, 0));
+    return Variable::ofVector(glm::normalize(value));
+}
+
+Variable vectorCreate(const vector<Variable> &args, const RoutineContext &ctx) {
+    float x = getFloat(args, 0);
+    float y = getFloat(args, 1);
+    float z = getFloat(args, 2);
+    return Variable::ofVector(glm::vec3(x, y, z));
+}
+
+Variable angleToVector(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable getPlanetSelectable(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable setPlanetAvailable(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable getPlanetAvailable(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable getSelectedPlanet(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable vectorToAngle(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
 } // namespace routine
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

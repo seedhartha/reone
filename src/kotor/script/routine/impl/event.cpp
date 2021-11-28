@@ -22,23 +22,22 @@
 #include "../declarations.h"
 
 #include "../../../../common/logutil.h"
+#include "../../../../game/event.h"
+#include "../../../../game/game.h"
+#include "../../../../game/script/routine/argutil.h"
+#include "../../../../game/script/routine/context.h"
+#include "../../../../game/script/runner.h"
+#include "../../../../game/services.h"
 #include "../../../../script/exception/notimpl.h"
-
-#include "../../../event.h"
-#include "../../../game.h"
-#include "../../../script/runner.h"
-#include "../../../services.h"
-
-#include "../argutil.h"
-#include "../context.h"
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::script;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 namespace routine {
 
@@ -73,6 +72,6 @@ Variable eventActivateItem(const vector<Variable> &args, const RoutineContext &c
 
 } // namespace routine
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

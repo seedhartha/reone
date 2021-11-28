@@ -24,7 +24,7 @@
 #include "../../game/d20/spells.h"
 #include "../../game/footstepsounds.h"
 #include "../../game/game.h"
-#include "../../game/guisounds.h"
+#include "../../game/gui/sounds.h"
 #include "../../game/portraits.h"
 #include "../../game/reputes.h"
 #include "../../game/services.h"

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "guisounds.h"
+#include "sounds.h"
 
 #include "../../audio/files.h"
 #include "../../resource/2das.h"

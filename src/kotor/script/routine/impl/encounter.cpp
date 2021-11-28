@@ -23,15 +23,16 @@
 
 #include "../../../../script/exception/notimpl.h"
 
-#include "../context.h"
+#include "../../../../game/script/routine/context.h"
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::script;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 namespace routine {
 
@@ -69,6 +70,6 @@ Variable getEncounterDifficulty(const vector<Variable> &args, const RoutineConte
 
 } // namespace routine
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

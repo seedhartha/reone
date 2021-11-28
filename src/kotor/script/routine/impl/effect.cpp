@@ -21,25 +21,24 @@
 
 #include "../declarations.h"
 
+#include "../../../../game/effect/effect.h"
+#include "../../../../game/effect/factory.h"
+#include "../../../../game/game.h"
+#include "../../../../game/script/routine/argutil.h"
+#include "../../../../game/script/routine/context.h"
+#include "../../../../game/services.h"
+#include "../../../../game/types.h"
 #include "../../../../script/exception/argument.h"
 #include "../../../../script/exception/notimpl.h"
 
-#include "../../../effect/effect.h"
-#include "../../../effect/factory.h"
-#include "../../../game.h"
-#include "../../../services.h"
-#include "../../../types.h"
-
-#include "../argutil.h"
-#include "../context.h"
-
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::script;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 namespace routine {
 
@@ -551,6 +550,6 @@ Variable effectDroidScramble(const vector<Variable> &args, const RoutineContext 
 
 } // namespace routine
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone
