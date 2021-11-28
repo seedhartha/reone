@@ -19,10 +19,11 @@
 
 #include "../../../common/collectionutil.h"
 #include "../../../script/routine.h"
+#include "../../../script/routineprovider.h"
+#include "../../../script/types.h"
 #include "../../../script/variable.h"
 
 #include "context.h"
-#include "iroutines.h"
 
 namespace reone {
 
@@ -30,6 +31,15 @@ namespace game {
 
 class Game;
 class Services;
+
+class IRoutines : public script::IRoutineProvider {
+public:
+    virtual void add(
+        std::string name,
+        script::VariableType retType,
+        std::vector<script::VariableType> argTypes,
+        script::Variable (*fn)(const std::vector<script::Variable> &args, const RoutineContext &ctx)) = 0;
+};
 
 class Routines : public IRoutines, boost::noncopyable {
 public:

@@ -22,8 +22,9 @@
 #include "../../common/collectionutil.h"
 #include "../../common/exception/validation.h"
 #include "../../common/logutil.h"
-#include "../../game/script/routine/iroutines.h"
-#include "../../kotor/script/routine/registerutil.h"
+#include "../../game/script/routine/routines.h"
+#include "../../kotor/kotor.h"
+#include "../../kotor/tsl.h"
 #include "../../script/format/ncsreader.h"
 #include "../../script/format/ncswriter.h"
 #include "../../script/instrutil.h"
@@ -443,9 +444,9 @@ bool NcsTool::supports(Operation operation, const fs::path &target) const {
 
 void NcsTool::fillRoutines(IRoutines &routines) {
     if (_gameId == GameID::TSL) {
-        registerRoutinesTSL(routines);
+        TSL::fillScriptRoutines(routines);
     } else {
-        registerRoutinesKotOR(routines);
+        KotOR::fillScriptRoutines(routines);
     }
 }
 

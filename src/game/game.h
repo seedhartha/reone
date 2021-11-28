@@ -283,7 +283,7 @@ protected:
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 
-    virtual void initRoutines() = 0;
+    virtual void initScriptRoutines() = 0;
     virtual void onModuleSelected(const std::string &name) = 0;
     virtual void drawHUD() = 0;
 

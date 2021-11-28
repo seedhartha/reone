@@ -71,6 +71,8 @@ public:
 
     void setBarkBubbleText(std::string text, float durartion);
 
+    static void fillScriptRoutines(game::IRoutines &routines);
+
 protected:
     // GUI
 
@@ -90,7 +92,7 @@ protected:
 
     void start() override;
 
-    void initRoutines() override;
+    void initScriptRoutines() override;
     void loadModuleNames() override;
     void loadModuleResources(const std::string &moduleName) override;
 

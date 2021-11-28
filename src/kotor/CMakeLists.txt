@@ -48,7 +48,6 @@ set(KOTOR_HEADERS
     gui/selectoverlay.h
     kotor.h
     script/routine/declarations.h
-    script/routine/registerutil.h
     tsl.h)
 
 set(KOTOR_SOURCES
@@ -107,7 +106,6 @@ set(KOTOR_SOURCES
     script/routine/impl/talent.cpp
     script/routine/impl/time.cpp
     script/routine/impl/vector.cpp
-    script/routine/registerutil.cpp
     tsl.cpp)
 
 add_library(kotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES})
