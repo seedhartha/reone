@@ -31,6 +31,7 @@
 #include "node/mesh.h"
 #include "node/model.h"
 #include "node/particle.h"
+#include "node/sound.h"
 #include "node/walkmesh.h"
 
 using namespace std;
@@ -43,6 +44,7 @@ namespace scene {
 
 static constexpr float kElevationTestZ = 1024.0f;
 static constexpr float kMaxGrassDistance = 16.0f;
+static constexpr int kMaxSoundCount = 4;
 
 static const bool g_debugAABB = false;
 
@@ -68,20 +70,22 @@ void SceneGraph::update(float dt) {
             root->update(dt);
         }
     }
-    if (_activeCamera) {
-        cullRoots();
-        refreshNodeLists();
-        updateLighting();
-        prepareTransparentMeshes();
-        prepareLeafs();
+    if (!_activeCamera) {
+        return;
     }
+    cullRoots();
+    refreshNodeLists();
+    updateLighting();
+    prepareTransparentMeshes();
+    prepareLeafs();
+    updateSounds();
 }
 
 void SceneGraph::cullRoots() {
     for (auto &root : _roots) {
-        if (root->type() != SceneNodeType::Model)
+        if (root->type() != SceneNodeType::Model) {
             continue;
-
+        }
         auto modelRoot = static_pointer_cast<ModelSceneNode>(root);
 
         bool culled =
@@ -94,8 +98,9 @@ void SceneGraph::cullRoots() {
 }
 
 void SceneGraph::updateLighting() {
-    if (!_lightingRefNode)
+    if (!_lightingRefNode) {
         return;
+    }
 
     // Find next closest lights and create a lookup
     vector<LightSceneNode *> lights(getLightsAt(kMaxLights));
@@ -271,6 +276,50 @@ void SceneGraph::prepareLeafs() {
     }
     if (!nodeElements.empty()) {
         _elements.push_back(make_pair(nodeElements[0]->parent(), nodeElements));
+    }
+}
+
+void SceneGraph::updateSounds() {
+    vector<pair<SoundSceneNode *, float>> distances;
+    glm::vec3 cameraPos(_activeCamera->localTransform()[3]);
+
+    // For each sound, calculate its distance to the camera
+    for (auto &root : _roots) {
+        if (root->type() != SceneNodeType::Sound) {
+            continue;
+        }
+        auto sound = static_pointer_cast<SoundSceneNode>(root);
+        sound->setAudible(false);
+        if (!sound->isEnabled()) {
+            continue;
+        }
+        float dist2 = sound->getDistanceTo2(cameraPos);
+        float maxDist2 = sound->maxDistance() * sound->maxDistance();
+        if (dist2 > maxDist2) {
+            continue;
+        }
+        distances.push_back(make_pair(sound.get(), dist2));
+    }
+
+    // Take up to N most closest sounds to the camera
+    sort(distances.begin(), distances.end(), [](auto &left, auto &right) {
+        int leftPriority = left.first->priority();
+        int rightPriority = right.first->priority();
+        if (leftPriority < rightPriority) {
+            return true;
+        }
+        if (leftPriority > rightPriority) {
+            return false;
+        }
+        return left.second < right.second;
+    });
+    if (distances.size() > kMaxSoundCount) {
+        distances.erase(distances.begin() + kMaxSoundCount, distances.end());
+    }
+
+    // Mark closest sounds as audible
+    for (auto &pair : distances) {
+        pair.first->setAudible(true);
     }
 }
 
@@ -472,6 +521,15 @@ unique_ptr<CameraSceneNode> SceneGraph::newCamera(glm::mat4 projection) {
     return make_unique<CameraSceneNode>(
         move(projection),
         *this,
+        _context,
+        _meshes,
+        _shaders);
+}
+
+unique_ptr<SoundSceneNode> SceneGraph::newSound() {
+    return make_unique<SoundSceneNode>(
+        *this,
+        _audioPlayer,
         _context,
         _meshes,
         _shaders);

@@ -293,7 +293,6 @@ private:
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
     void updateVisibility();
-    void updateSounds();
     void updateHeartbeat(float dt);
 
     void updateRoomVisibility();

@@ -24,6 +24,7 @@ namespace scene {
 enum class SceneNodeType {
     Dummy,
     Camera,
+    Sound,
     Model,
     Mesh,
     Light,

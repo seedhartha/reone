@@ -35,12 +35,19 @@ class Textures;
 
 } // namespace graphics
 
+namespace audio {
+
+class AudioPlayer;
+
+}
+
 namespace scene {
 
 class SceneGraphs {
 public:
     SceneGraphs(
         graphics::GraphicsOptions options,
+        audio::AudioPlayer &audioPlayer,
         graphics::Context &context,
         graphics::Features &features,
         graphics::Materials &materials,
@@ -49,6 +56,7 @@ public:
         graphics::Shaders &shaders,
         graphics::Textures &textures) :
         _options(std::move(options)),
+        _audioPlayer(audioPlayer),
         _context(context),
         _features(features),
         _materials(materials),
@@ -66,6 +74,8 @@ public:
 
 private:
     graphics::GraphicsOptions _options;
+
+    audio::AudioPlayer &_audioPlayer;
     graphics::Context &_context;
     graphics::Features &_features;
     graphics::Materials &_materials;

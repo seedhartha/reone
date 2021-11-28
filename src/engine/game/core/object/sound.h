@@ -48,9 +48,6 @@ public:
 
     void update(float dt) override;
 
-    void play();
-    void stop();
-
     bool isActive() const { return _active; }
 
     glm::vec3 getPosition() const;
@@ -63,7 +60,7 @@ public:
     bool looping() const { return _looping; }
     bool positional() const { return _positional; }
 
-    void setAudible(bool audible);
+    void setActive(bool active);
 
 private:
     bool _active {false};
@@ -78,9 +75,6 @@ private:
     bool _positional {false};
     int _interval {0};
     int _volume {0};
-    std::vector<std::string> _sounds;
-    bool _audible {false};
-    std::shared_ptr<audio::SoundHandle> _sound;
     bool _randomPosition {false};
     int _random {0};
     float _randomRangeX {0.0f};
@@ -89,14 +83,15 @@ private:
     float _pitchVariation {0.0f};
     int _volumeVrtn {0};
 
+    std::vector<std::string> _sounds;
+
     void loadTransformFromGIT(const resource::GffStruct &gffs);
 
-    void playSound(const std::string &resRef, bool loop);
+    void updateTransform() override;
 
     // Blueprint
 
     void loadUTS(const resource::GffStruct &uts);
-
     void loadPriorityFromUTS(const resource::GffStruct &uts);
 
     // END Blueprint

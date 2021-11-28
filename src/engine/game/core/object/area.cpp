@@ -70,7 +70,6 @@ namespace reone {
 namespace game {
 
 static constexpr float kDefaultFieldOfView = 75.0f;
-static constexpr int kMaxSoundCount = 4;
 static constexpr float kGrassDensityFactor = 0.25f;
 
 static constexpr float kUpdatePerceptionInterval = 1.0f; // seconds
@@ -440,9 +439,9 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
     determineObjectRoom(*object);
 
     auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
-    auto model = object->sceneNode();
-    if (model) {
-        sceneGraph.addRoot(model);
+    auto sceneNode = object->sceneNode();
+    if (sceneNode) {
+        sceneGraph.addRoot(sceneNode);
     }
     if (object->type() == ObjectType::Placeable) {
         auto placeable = static_pointer_cast<Placeable>(object);
@@ -452,6 +451,10 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
         }
     } else if (object->type() == ObjectType::Door) {
         auto door = static_pointer_cast<Door>(object);
+        auto walkmeshClosed = door->walkmeshClosed();
+        if (walkmeshClosed) {
+            sceneGraph.addRoot(walkmeshClosed);
+        }
         auto walkmeshOpen1 = door->walkmeshOpen1();
         if (walkmeshOpen1) {
             sceneGraph.addRoot(walkmeshOpen1);
@@ -459,10 +462,6 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
         auto walkmeshOpen2 = door->walkmeshOpen2();
         if (walkmeshOpen2) {
             sceneGraph.addRoot(walkmeshOpen2);
-        }
-        auto walkmeshClosed = door->walkmeshClosed();
-        if (walkmeshClosed) {
-            sceneGraph.addRoot(walkmeshClosed);
         }
     }
 }
@@ -655,7 +654,6 @@ void Area::printDebugInfo(const SpatialObject &object) {
 void Area::update(float dt) {
     doDestroyObjects();
     updateVisibility();
-    updateSounds();
     updateObjectSelection();
 
     if (!_game.isPaused()) {
@@ -891,52 +889,6 @@ void Area::update3rdPersonCameraTarget() {
 void Area::updateVisibility() {
     if (_game.cameraType() != CameraType::ThirdPerson) {
         updateRoomVisibility();
-    }
-}
-
-void Area::updateSounds() {
-    glm::vec3 refPosition;
-    if (_game.cameraType() == CameraType::ThirdPerson && _game.party().getLeader()) {
-        refPosition = _game.party().getLeader()->position();
-    } else {
-        refPosition = _game.getActiveCamera()->sceneNode()->absoluteTransform()[3];
-    }
-
-    vector<pair<Sound *, float>> soundDistances;
-
-    for (auto &sound : _objectsByType[ObjectType::Sound]) {
-        Sound *soundPtr = static_cast<Sound *>(sound.get());
-        soundPtr->setAudible(false);
-
-        if (!soundPtr->isActive())
-            continue;
-
-        float maxDist2 = soundPtr->maxDistance();
-        maxDist2 *= maxDist2;
-
-        float dist2 = soundPtr->getDistanceTo2(refPosition);
-        if (dist2 > maxDist2)
-            continue;
-
-        soundDistances.push_back(make_pair(soundPtr, dist2));
-    }
-
-    sort(soundDistances.begin(), soundDistances.end(), [](auto &left, auto &right) {
-        int leftPriority = left.first->priority();
-        int rightPriority = right.first->priority();
-
-        if (leftPriority < rightPriority)
-            return true;
-        if (leftPriority > rightPriority)
-            return false;
-
-        return left.second < right.second;
-    });
-    if (soundDistances.size() > kMaxSoundCount) {
-        soundDistances.erase(soundDistances.begin() + kMaxSoundCount, soundDistances.end());
-    }
-    for (auto &sound : soundDistances) {
-        sound.first->setAudible(true);
     }
 }
 

@@ -26,12 +26,14 @@ namespace reone {
 
 namespace di {
 
+class AudioModule;
 class GraphicsModule;
 
 class SceneModule : boost::noncopyable {
 public:
-    SceneModule(graphics::GraphicsOptions options, GraphicsModule &graphics) :
+    SceneModule(graphics::GraphicsOptions options, AudioModule &audio, GraphicsModule &graphics) :
         _options(std::move(options)),
+        _audio(audio),
         _graphics(graphics) {
     }
 
@@ -43,6 +45,7 @@ public:
 
 private:
     graphics::GraphicsOptions _options;
+    AudioModule &_audio;
     GraphicsModule &_graphics;
 
     std::unique_ptr<scene::SceneGraphs> _sceneGraphs;

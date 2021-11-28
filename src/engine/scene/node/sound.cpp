@@ -15,39 +15,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "graphs.h"
+#include "sound.h"
+
+#include "../../audio/player.h"
 
 using namespace std;
+
+using namespace reone::audio;
 
 namespace reone {
 
 namespace scene {
 
-void SceneGraphs::add(string name) {
-    if (_scenes.count(name) > 0) {
-        return;
-    }
-    auto scene = make_unique<SceneGraph>(
-        name,
-        _options,
-        _audioPlayer,
-        _context,
-        _features,
-        _materials,
-        _meshes,
-        _pbrIbl,
-        _shaders,
-        _textures);
-
-    _scenes.insert(make_pair(name, move(scene)));
+void SoundSceneNode::playSound(const string &resRef, float gain, bool positional, bool loop) {
+    _sound = _audioPlayer.play(resRef, AudioType::Sound, loop, gain, positional, _absTransform[3]);
 }
 
-SceneGraph &SceneGraphs::get(const string &name) {
-    auto maybeScene = _scenes.find(name);
-    if (maybeScene == _scenes.end()) {
-        throw logic_error(str(boost::format("Scene not found by name '%s'") % name));
+bool SoundSceneNode::isSoundPlaying() const {
+    return _sound && !_sound->isStopped();
+}
+
+void SoundSceneNode::setAudible(bool audible) {
+    if (_audible == audible) {
+        return;
     }
-    return *maybeScene->second;
+    if (!audible && _sound) {
+        _sound->stop();
+        _sound.reset();
+    }
+    _audible = audible;
 }
 
 } // namespace scene

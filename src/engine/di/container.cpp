@@ -29,7 +29,7 @@ void Container::init() {
     _resource = make_unique<ResourceModule>(_gameOptions.gamePath);
     _graphics = make_unique<GraphicsModule>(_gameOptions.graphics, *_resource);
     _audio = make_unique<AudioModule>(_gameOptions.audio, *_resource);
-    _scene = make_unique<SceneModule>(_gameOptions.graphics, *_graphics);
+    _scene = make_unique<SceneModule>(_gameOptions.graphics, *_audio, *_graphics);
     _script = make_unique<ScriptModule>(*_resource);
     _game = make_unique<GameModule>(_gameId, _gameOptions, _gameOptions.gamePath, *_resource, *_graphics, *_audio, *_scene, *_script);
 
