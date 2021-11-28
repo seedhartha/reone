@@ -31,8 +31,6 @@ namespace pt = boost::property_tree;
 
 namespace reone {
 
-namespace tools {
-
 void LipTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     if (operation == Operation::ToJSON) {
         toJSON(target, destPath);
@@ -90,7 +88,5 @@ bool LipTool::supports(Operation operation, const fs::path &target) const {
     return !fs::is_directory(target) &&
            ((target.extension() == ".lip" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::ToLIP));
 }
-
-} // namespace tools
 
 } // namespace reone

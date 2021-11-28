@@ -21,8 +21,6 @@
 
 namespace reone {
 
-namespace tools {
-
 class ITool {
 public:
     virtual void invoke(
@@ -33,7 +31,5 @@ public:
 
     virtual bool supports(Operation operation, const boost::filesystem::path &target) const = 0;
 };
-
-} // namespace tools
 
 } // namespace reone

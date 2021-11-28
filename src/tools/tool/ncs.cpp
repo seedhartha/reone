@@ -41,8 +41,6 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace tools {
-
 class StubRoutines : public IRoutines {
 public:
     void add(
@@ -449,7 +447,5 @@ void NcsTool::fillRoutines(IRoutines &routines) {
         registerRoutinesKotOR(routines);
     }
 }
-
-} // namespace tools
 
 } // namespace reone

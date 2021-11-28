@@ -23,8 +23,6 @@
 
 namespace reone {
 
-namespace tools {
-
 class RimTool : public ITool {
 public:
     void invoke(
@@ -40,7 +38,5 @@ private:
     void extract(resource::RimReader &rim, const boost::filesystem::path &destPath);
     void toRIM(const boost::filesystem::path &target);
 };
-
-} // namespace tools
 
 } // namespace reone

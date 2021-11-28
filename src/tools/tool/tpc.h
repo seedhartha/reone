@@ -21,8 +21,6 @@
 
 namespace reone {
 
-namespace tools {
-
 class TpcTool : public ITool {
 public:
     void invoke(
@@ -36,7 +34,5 @@ public:
 private:
     void toTGA(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
-
-} // namespace tools
 
 } // namespace reone

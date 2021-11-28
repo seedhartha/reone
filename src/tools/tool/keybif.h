@@ -24,8 +24,6 @@
 
 namespace reone {
 
-namespace tools {
-
 class KeyBifTool : public ITool {
 public:
     void invoke(
@@ -41,7 +39,5 @@ private:
     void listBIF(const resource::KeyReader &key, const resource::BifReader &bif, int bifIdx);
     void extractBIF(const resource::KeyReader &key, resource::BifReader &bif, int bifIdx, const boost::filesystem::path &destPath);
 };
-
-} // namespace tools
 
 } // namespace reone

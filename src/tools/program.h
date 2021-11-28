@@ -25,11 +25,7 @@
 
 namespace reone {
 
-namespace tools {
-
 class ITool;
-
-}
 
 class Program : boost::noncopyable {
 public:
@@ -50,8 +46,8 @@ private:
     boost::filesystem::path _destPath;
     std::string _target;
     game::GameID _gameId {game::GameID::KotOR};
-    tools::Operation _operation {tools::Operation::None};
-    std::vector<std::shared_ptr<tools::ITool>> _tools;
+    Operation _operation {Operation::None};
+    std::vector<std::shared_ptr<ITool>> _tools;
 
     void initOptions();
     void parseOptions();
@@ -59,7 +55,7 @@ private:
 
     void loadTools();
 
-    std::shared_ptr<tools::ITool> getTool() const;
+    std::shared_ptr<ITool> getTool() const;
 };
 
 } // namespace reone

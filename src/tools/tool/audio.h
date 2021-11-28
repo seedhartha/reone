@@ -21,8 +21,6 @@
 
 namespace reone {
 
-namespace tools {
-
 class AudioTool : public ITool {
     void invoke(
         Operation operation,
@@ -35,7 +33,5 @@ class AudioTool : public ITool {
 private:
     void unwrap(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
-
-} // namespace tools
 
 } // namespace reone

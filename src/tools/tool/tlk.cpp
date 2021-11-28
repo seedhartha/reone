@@ -32,8 +32,6 @@ namespace pt = boost::property_tree;
 
 namespace reone {
 
-namespace tools {
-
 void TlkTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     if (operation == Operation::ToJSON) {
         toJSON(target, destPath);
@@ -97,7 +95,5 @@ bool TlkTool::supports(Operation operation, const fs::path &target) const {
     return !fs::is_directory(target) &&
            ((target.extension() == ".tlk" && operation == Operation::ToJSON) || (target.extension() == ".json" && operation == Operation::ToTLK));
 }
-
-} // namespace tools
 
 } // namespace reone

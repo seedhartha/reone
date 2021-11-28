@@ -19,8 +19,6 @@
 
 namespace reone {
 
-namespace tools {
-
 enum class Operation {
     None,
     List,
@@ -39,7 +37,5 @@ enum class Operation {
     ToNCS,
     ToSSF
 };
-
-} // namespace tools
 
 } // namespace reone

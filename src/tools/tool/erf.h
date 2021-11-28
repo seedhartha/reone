@@ -23,8 +23,6 @@
 
 namespace reone {
 
-namespace tools {
-
 class ErfTool : public ITool {
 public:
     void invoke(
@@ -40,7 +38,5 @@ private:
     void extract(resource::ErfReader &erf, const boost::filesystem::path &destPath);
     void toERF(Operation operation, const boost::filesystem::path &target);
 };
-
-} // namespace tools
 
 } // namespace reone
