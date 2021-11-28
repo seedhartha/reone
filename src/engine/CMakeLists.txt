@@ -22,6 +22,8 @@ set(REONE_HEADERS
     di/module/scene.h
     di/module/script.h
     engine.h
+    game/probe.h
+    game/types.h
     optionsparser.h
     pch.h)
 
@@ -34,6 +36,7 @@ set(REONE_SOURCES
     di/module/scene.cpp
     di/module/script.cpp
     engine.cpp
+    game/probe.cpp
     main.cpp
     optionsparser.cpp)
 
@@ -44,6 +47,6 @@ endif()
 add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_precompile_headers(reone PRIVATE pch.h)
-target_link_libraries(reone PRIVATE game ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(reone PRIVATE tsl ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 list(APPEND InstallTargets reone)

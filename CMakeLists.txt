@@ -73,11 +73,13 @@ add_subdirectory(src/engine/common) # common static library
 add_subdirectory(src/engine/resource) # resource static library
 add_subdirectory(src/engine/graphics) # graphics static library
 add_subdirectory(src/engine/audio) # audio static library
-add_subdirectory(src/engine/video) # video static library
-add_subdirectory(src/engine/scene) # scene static library
 add_subdirectory(src/engine/gui) # gui static library
+add_subdirectory(src/engine/scene) # scene static library
+add_subdirectory(src/engine/video) # video static library
 add_subdirectory(src/engine/script) # script static library
-add_subdirectory(src/engine/game) # game static library
+add_subdirectory(src/engine/game/core) # game static library
+add_subdirectory(src/engine/game/kotor) # kotor static library
+add_subdirectory(src/engine/game/tsl) # tsl static library
 
 # END Engine libraries
 
@@ -102,6 +104,6 @@ if(UNIX AND NOT APPLE)
 endif()
 
 install(TARGETS ${InstallTargets} DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(TARGETS common resource graphics audio video script gamecore kotor tsl game DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS common resource graphics audio scene video script game kotor tsl DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 ## END Installation
