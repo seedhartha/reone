@@ -30,7 +30,6 @@
 #include "../../script/program.h"
 #include "../../script/routine.h"
 #include "../../script/variable.h"
-#include "../../tsl/routine/registerutil.h"
 
 using namespace std;
 
@@ -67,6 +66,7 @@ public:
                 return static_cast<int>(i);
             }
         }
+        return -1;
     }
 
     const Routine &get(int index) const override { return _routines[index]; }

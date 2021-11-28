@@ -79,7 +79,6 @@ add_subdirectory(src/video) # video static library
 add_subdirectory(src/script) # script static library
 add_subdirectory(src/game) # game static library
 add_subdirectory(src/kotor) # kotor static library
-add_subdirectory(src/tsl) # tsl static library
 
 # END Engine libraries
 
@@ -104,6 +103,6 @@ if(UNIX AND NOT APPLE)
 endif()
 
 install(TARGETS ${InstallTargets} DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(TARGETS common resource graphics audio scene video script game kotor tsl DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS common resource graphics audio scene video script game kotor DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 ## END Installation

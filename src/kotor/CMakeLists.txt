@@ -48,7 +48,8 @@ set(KOTOR_HEADERS
     gui/selectoverlay.h
     gui/sounds.h
     kotor.h
-    routine/registerutil.h)
+    routine/registerutil.h
+    tsl.h)
 
 set(KOTOR_SOURCES
     gui/barkbubble.cpp
@@ -85,7 +86,8 @@ set(KOTOR_SOURCES
     gui/selectoverlay.cpp
     gui/sounds.cpp
     kotor.cpp
-    routine/registerutil.cpp)
+    routine/registerutil.cpp
+    tsl.cpp)
 
 add_library(kotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES})
 set_target_properties(kotor PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
