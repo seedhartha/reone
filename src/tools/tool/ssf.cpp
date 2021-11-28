@@ -31,8 +31,6 @@ namespace pt = boost::property_tree;
 
 namespace reone {
 
-namespace tools {
-
 void SsfTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     if (operation == Operation::ToJSON) {
         toJSON(target, destPath);
@@ -82,7 +80,5 @@ bool SsfTool::supports(Operation operation, const fs::path &target) const {
     return (operation == Operation::ToJSON && target.extension() == ".ssf") ||
            (operation == Operation::ToSSF && target.extension() == ".json");
 }
-
-} // namespace tools
 
 } // namespace reone

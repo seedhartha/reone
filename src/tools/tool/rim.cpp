@@ -28,8 +28,6 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace tools {
-
 void RimTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     switch (operation) {
     case Operation::List:
@@ -129,7 +127,5 @@ bool RimTool::supports(Operation operation, const fs::path &target) const {
         return false;
     }
 }
-
-} // namespace tools
 
 } // namespace reone

@@ -28,8 +28,6 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace tools {
-
 void KeyBifTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     bool isKey = target.extension() == ".key";
     if (isKey) {
@@ -119,7 +117,5 @@ bool KeyBifTool::supports(Operation operation, const fs::path &target) const {
         return false;
     }
 }
-
-} // namespace tools
 
 } // namespace reone

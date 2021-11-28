@@ -33,8 +33,6 @@ namespace pt = boost::property_tree;
 
 namespace reone {
 
-namespace tools {
-
 void GffTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     switch (operation) {
     case Operation::ToJSON:
@@ -264,7 +262,5 @@ bool GffTool::supports(Operation operation, const fs::path &target) const {
     return !fs::is_directory(target) &&
            (operation == Operation::ToJSON || operation == Operation::ToGFF);
 }
-
-} // namespace tools
 
 } // namespace reone

@@ -21,8 +21,6 @@
 
 namespace reone {
 
-namespace tools {
-
 class SsfTool : public ITool {
 public:
     void invoke(
@@ -37,7 +35,5 @@ private:
     void toJSON(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
     void toSSF(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
-
-} // namespace tools
 
 } // namespace reone

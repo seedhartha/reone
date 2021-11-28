@@ -29,8 +29,6 @@ class IRoutines;
 
 }
 
-namespace tools {
-
 class NcsTool : public ITool {
 public:
     NcsTool(game::GameID gameId) :
@@ -53,7 +51,5 @@ private:
 
     void fillRoutines(game::IRoutines &routines);
 };
-
-} // namespace tools
 
 } // namespace reone

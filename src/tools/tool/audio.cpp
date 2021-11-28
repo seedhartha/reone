@@ -25,8 +25,6 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace tools {
-
 void AudioTool::invoke(Operation operation, const fs::path &target, const fs::path &gamePath, const fs::path &destPath) {
     if (operation == Operation::Unwrap) {
         unwrap(target, destPath);
@@ -82,7 +80,5 @@ bool AudioTool::supports(Operation operation, const fs::path &target) const {
            target.extension() == ".wav" &&
            operation == Operation::Unwrap;
 }
-
-} // namespace tools
 
 } // namespace reone

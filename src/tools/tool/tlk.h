@@ -21,8 +21,6 @@
 
 namespace reone {
 
-namespace tools {
-
 class TlkTool : public ITool {
 public:
     void invoke(
@@ -37,7 +35,5 @@ private:
     void toJSON(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
     void toTLK(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
 };
-
-} // namespace tools
 
 } // namespace reone

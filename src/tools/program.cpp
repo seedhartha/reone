@@ -36,7 +36,6 @@ using namespace std;
 
 using namespace reone::game;
 using namespace reone::resource;
-using namespace reone::tools;
 
 namespace fs = boost::filesystem;
 namespace po = boost::program_options;
