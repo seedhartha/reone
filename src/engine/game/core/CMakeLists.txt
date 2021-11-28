@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-set(GAMECORE_HEADERS
+set(GAME_HEADERS
     action/action.h
     action/attack.h
     action/barkstring.h
@@ -230,7 +230,7 @@ set(GAMECORE_HEADERS
     talent.h
     types.h)
 
-set(GAMECORE_SOURCES
+set(GAME_SOURCES
     action/action.cpp
     action/attack.cpp
     action/barkstring.cpp
@@ -446,7 +446,7 @@ set(GAMECORE_SOURCES
     soundsets.cpp
     surfaces.cpp)
 
-add_library(gamecore STATIC ${GAMECORE_HEADERS} ${GAMECORE_SOURCES})
-set_target_properties(gamecore PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(gamecore PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
-target_link_libraries(gamecore PUBLIC script gui scene video audio graphics resource common)
+add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES})
+set_target_properties(game PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(game PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+target_link_libraries(game PUBLIC script gui scene video audio graphics resource common)
