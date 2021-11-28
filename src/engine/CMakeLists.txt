@@ -24,7 +24,6 @@ set(REONE_HEADERS
     engine.h
     gameprobe.h
     optionsparser.h
-    pch.h
     types.h)
 
 set(REONE_SOURCES
@@ -46,7 +45,7 @@ endif()
 
 add_executable(reone ${REONE_HEADERS} ${REONE_SOURCES})
 set_target_properties(reone PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-target_precompile_headers(reone PRIVATE pch.h)
+target_precompile_headers(reone PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(reone PRIVATE kotor ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 list(APPEND InstallTargets reone)

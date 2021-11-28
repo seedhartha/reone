@@ -45,7 +45,7 @@ endif()
 
 add_library(common STATIC ${COMMON_HEADERS} ${COMMON_SOURCES})
 set_target_properties(common PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(common PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+target_precompile_headers(common PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(common PUBLIC ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
 if(NOT MSVC)
