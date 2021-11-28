@@ -35,8 +35,10 @@ public:
 
     bool isTSL() const override { return true; }
 
+    static void fillScriptRoutines(game::IRoutines &routines);
+
 private:
-    void initRoutines() override;
+    void initScriptRoutines() override;
 
     void getDefaultPartyMembers(std::string &member1, std::string &member2, std::string &member3) const override;
 };

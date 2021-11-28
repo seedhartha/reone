@@ -220,7 +220,6 @@ set(GAME_HEADERS
     savedgame.h
     script/routine/argutil.h
     script/routine/context.h
-    script/routine/iroutines.h
     script/routine/objectutil.h
     script/routine/routines.h
     script/runner.h
