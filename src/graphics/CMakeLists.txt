@@ -91,9 +91,6 @@ set(GRAPHICS_SOURCES
     pbribl.cpp
     pixelutil.cpp
     renderbuffer.cpp
-    shaders_common.cpp
-    shaders_pbr.cpp
-    shaders_phong.cpp
     shaders.cpp
     texture.cpp
     textures.cpp
