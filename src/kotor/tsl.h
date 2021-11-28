@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -17,13 +18,28 @@
 
 #pragma once
 
+#include "kotor.h"
+
 namespace reone {
 
 namespace game {
 
-class IRoutines;
+class TSL : public KotOR {
+public:
+    TSL(
+        boost::filesystem::path path,
+        Options options,
+        Services &services);
 
-void registerRoutinesTSL(IRoutines &routines);
+    void initResourceProviders() override;
+
+    bool isTSL() const override { return true; }
+
+private:
+    void initRoutines() override;
+
+    void getDefaultPartyMembers(std::string &member1, std::string &member2, std::string &member3) const override;
+};
 
 } // namespace game
 

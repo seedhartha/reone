@@ -19,7 +19,7 @@
 
 #include "../../game/types.h"
 #include "../../kotor/kotor.h"
-#include "../../tsl/tsl.h"
+#include "../../kotor/tsl.h"
 
 #include "audio.h"
 #include "graphics.h"

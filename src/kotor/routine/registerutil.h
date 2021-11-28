@@ -24,6 +24,7 @@ namespace game {
 class IRoutines;
 
 void registerRoutinesKotOR(IRoutines &routines);
+void registerRoutinesTSL(IRoutines &routines);
 
 } // namespace game
 
