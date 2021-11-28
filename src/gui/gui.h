@@ -19,7 +19,7 @@
 
 #include "../graphics/options.h"
 
-#include "control/control.h"
+#include "control.h"
 
 namespace reone {
 

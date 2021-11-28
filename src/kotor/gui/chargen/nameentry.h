@@ -21,7 +21,7 @@
 
 #include "../../../game/format/ltrreader.h"
 
-#include "../gui.h"
+#include "../../gui.h"
 
 namespace reone {
 

@@ -19,7 +19,7 @@
 
 #include "../../../game/d20/attributes.h"
 
-#include "../gui.h"
+#include "../../gui.h"
 
 namespace reone {
 

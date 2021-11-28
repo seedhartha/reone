@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "gui.h"
+#include "../gui.h"
 
 #include "../../gui/control/button.h"
 #include "../../gui/control/label.h"

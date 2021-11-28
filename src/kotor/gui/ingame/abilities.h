@@ -19,7 +19,7 @@
 
 #include "../../../game/types.h"
 
-#include "../gui.h"
+#include "../../gui.h"
 
 namespace reone {
 

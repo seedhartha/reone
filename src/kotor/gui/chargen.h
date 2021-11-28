@@ -17,22 +17,22 @@
 
 #pragma once
 
-#include "../../../game/character.h"
-#include "../../../scene/graph.h"
-#include "../../../scene/node/model.h"
+#include "../../game/character.h"
+#include "../../scene/graph.h"
+#include "../../scene/node/model.h"
 
 #include "../gui.h"
 
-#include "abilities.h"
-#include "classselect.h"
-#include "custom.h"
-#include "feats.h"
-#include "levelup.h"
-#include "nameentry.h"
-#include "portraitselect.h"
-#include "quick.h"
-#include "quickorcustom.h"
-#include "skills.h"
+#include "chargen/abilities.h"
+#include "chargen/classselect.h"
+#include "chargen/custom.h"
+#include "chargen/feats.h"
+#include "chargen/levelup.h"
+#include "chargen/nameentry.h"
+#include "chargen/portraitselect.h"
+#include "chargen/quick.h"
+#include "chargen/quickorcustom.h"
+#include "chargen/skills.h"
 
 namespace reone {
 

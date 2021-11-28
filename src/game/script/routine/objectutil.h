@@ -17,7 +17,7 @@
 
 #include "../../../script/types.h"
 
-#include "../../object/object.h"
+#include "../../object.h"
 
 namespace reone {
 

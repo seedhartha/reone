@@ -15,45 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "action.h"
 
-#include "../../game/types.h"
-#include "../../gui/gui.h"
+#include "../common/logutil.h"
+
+using namespace std;
 
 namespace reone {
 
 namespace game {
 
-struct Services;
-
+void Action::execute(Object &actor, float dt) {
+    warn("Action execution not implemented: " + to_string(static_cast<int>(_type)));
+    complete();
 }
 
-namespace kotor {
-
-class KotOR;
-
-/**
- * Encapsulates game-specific GUI configuration.
- */
-class GameGUI : public gui::GUI {
-protected:
-    GameGUI(KotOR &game, game::Services &services);
-
-    void initForGame();
-
-    std::string getResRef(const std::string &base) const;
-
-protected:
-    KotOR &_game;
-    game::Services &_services;
-
-    void loadBackground(game::BackgroundType type);
-
-private:
-    void onClick(const std::string &control) override;
-    void onFocusChanged(const std::string &control, bool focus) override;
-};
-
-} // namespace kotor
+} // namespace game
 
 } // namespace reone

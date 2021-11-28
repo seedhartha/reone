@@ -21,7 +21,7 @@
 
 #include "../../resource/format/gffreader.h"
 
-#include "../camera/camera.h"
+#include "../camera.h"
 
 namespace reone {
 

@@ -22,7 +22,7 @@
 #include "../../../gui/control/label.h"
 #include "../../../gui/control/listbox.h"
 
-#include "../gui.h"
+#include "../../gui.h"
 
 namespace reone {
 

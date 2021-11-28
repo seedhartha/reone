@@ -27,7 +27,7 @@
 
 #include "../../kotor.h"
 
-#include "chargen.h"
+#include "../chargen.h"
 
 using namespace std;
 

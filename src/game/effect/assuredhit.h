@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "effect.h"
+#include "../effect.h"
 
 namespace reone {
 

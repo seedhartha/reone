@@ -19,7 +19,7 @@
 
 #include "../../engine/types.h"
 
-#include "tool.h"
+#include "../tool.h"
 
 namespace reone {
 

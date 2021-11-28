@@ -27,11 +27,11 @@
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
 
-#include "effect/factory.h"
-#include "game.h"
-#include "object/creature.h"
-#include "party.h"
-#include "services.h"
+#include "../effect/factory.h"
+#include "../game.h"
+#include "../object/creature.h"
+#include "../party.h"
+#include "../services.h"
 
 using namespace std;
 using namespace std::placeholders;

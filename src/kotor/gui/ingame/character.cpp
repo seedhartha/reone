@@ -28,7 +28,7 @@
 #include "../../kotor.h"
 #include "../../types.h"
 
-#include "ingame.h"
+#include "../ingame.h"
 
 using namespace std;
 using namespace std::placeholders;

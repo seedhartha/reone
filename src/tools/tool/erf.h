@@ -19,7 +19,7 @@
 
 #include "../../resource/format/erfreader.h"
 
-#include "tool.h"
+#include "../tool.h"
 
 namespace reone {
 

@@ -14,9 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(KOTOR_HEADERS
+    gui.h
     gui/barkbubble.h
+    gui/chargen.h
     gui/chargen/abilities.h
-    gui/chargen/chargen.h
     gui/chargen/classselect.h
     gui/chargen/custom.h
     gui/chargen/feats.h
@@ -30,12 +31,11 @@ set(KOTOR_HEADERS
     gui/container.h
     gui/conversation.h
     gui/dialog.h
-    gui/gui.h
     gui/hud.h
+    gui/ingame.h
     gui/ingame/abilities.h
     gui/ingame/character.h
     gui/ingame/equip.h
-    gui/ingame/ingame.h
     gui/ingame/inventory.h
     gui/ingame/journal.h
     gui/ingame/map.h
@@ -51,9 +51,10 @@ set(KOTOR_HEADERS
     tsl.h)
 
 set(KOTOR_SOURCES
+    gui.cpp
     gui/barkbubble.cpp
+    gui/chargen.cpp
     gui/chargen/abilities.cpp
-    gui/chargen/chargen.cpp
     gui/chargen/classselect.cpp
     gui/chargen/custom.cpp
     gui/chargen/feats.cpp
@@ -67,12 +68,11 @@ set(KOTOR_SOURCES
     gui/container.cpp
     gui/conversation.cpp
     gui/dialog.cpp
-    gui/gui.cpp
     gui/hud.cpp
+    gui/ingame.cpp
     gui/ingame/abilities.cpp
     gui/ingame/character.cpp
     gui/ingame/equip.cpp
-    gui/ingame/ingame.cpp
     gui/ingame/inventory.cpp
     gui/ingame/journal.cpp
     gui/ingame/map.cpp

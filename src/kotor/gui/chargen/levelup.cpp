@@ -22,7 +22,7 @@
 
 #include "../../kotor.h"
 
-#include "chargen.h"
+#include "../chargen.h"
 
 using namespace reone::audio;
 using namespace reone::game;

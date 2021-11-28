@@ -25,7 +25,7 @@
 #include "../../graphics/lipanimation.h"
 #include "../../graphics/model.h"
 
-#include "gui.h"
+#include "../gui.h"
 
 namespace reone {
 

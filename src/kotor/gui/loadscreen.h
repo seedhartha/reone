@@ -21,7 +21,7 @@
 #include "../../gui/control/label.h"
 #include "../../gui/control/progressbar.h"
 
-#include "gui.h"
+#include "../gui.h"
 
 namespace reone {
 

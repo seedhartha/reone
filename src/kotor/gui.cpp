@@ -17,12 +17,12 @@
 
 #include "gui.h"
 
-#include "../../audio/player.h"
-#include "../../game/gui/sounds.h"
-#include "../../game/services.h"
-#include "../../graphics/textures.h"
+#include "../audio/player.h"
+#include "../game/gui/sounds.h"
+#include "../game/services.h"
+#include "../graphics/textures.h"
 
-#include "../kotor.h"
+#include "kotor.h"
 
 using namespace std;
 

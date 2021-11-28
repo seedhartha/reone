@@ -21,7 +21,7 @@
 #include "../../script/executioncontext.h"
 #include "../../script/program.h"
 
-#include "../object/object.h"
+#include "../object.h"
 
 using namespace std;
 
