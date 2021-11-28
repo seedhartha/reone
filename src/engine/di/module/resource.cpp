@@ -25,8 +25,6 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace di {
-
 void ResourceModule::init() {
     _resources = make_unique<Resources>();
 
@@ -36,7 +34,5 @@ void ResourceModule::init() {
     _twoDas = make_unique<TwoDas>(*_resources);
     _gffs = make_unique<Gffs>(*_resources);
 }
-
-} // namespace di
 
 } // namespace reone

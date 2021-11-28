@@ -25,15 +25,11 @@ using namespace reone::audio;
 
 namespace reone {
 
-namespace di {
-
 void AudioModule::init() {
     _audioFiles = make_unique<AudioFiles>(_resource.resources());
 
     _audioPlayer = make_unique<AudioPlayer>(_options, *_audioFiles);
     _audioPlayer->init();
 }
-
-} // namespace di
 
 } // namespace reone

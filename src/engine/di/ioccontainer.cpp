@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "container.h"
+#include "ioccontainer.h"
 
 using namespace std;
 
@@ -23,9 +23,7 @@ using namespace reone::game;
 
 namespace reone {
 
-namespace di {
-
-void Container::init() {
+void IocContainer::init() {
     _resource = make_unique<ResourceModule>(_gameOptions.gamePath);
     _graphics = make_unique<GraphicsModule>(_gameOptions.graphics, *_resource);
     _audio = make_unique<AudioModule>(_gameOptions.audio, *_resource);
@@ -41,7 +39,7 @@ void Container::init() {
     _game->init();
 }
 
-Container::~Container() {
+IocContainer::~IocContainer() {
     _game.reset();
     _script.reset();
     _scene.reset();
@@ -50,10 +48,8 @@ Container::~Container() {
     _resource.reset();
 }
 
-Game &Container::getGame() {
+Game &IocContainer::getGame() {
     return _game->game();
 }
-
-} // namespace di
 
 } // namespace reone

@@ -24,8 +24,6 @@
 
 namespace reone {
 
-namespace di {
-
 class AudioModule;
 class GraphicsModule;
 
@@ -52,7 +50,5 @@ private:
     std::unique_ptr<scene::WorldRenderPipeline> _worldRenderPipeline;
     std::unique_ptr<scene::ControlRenderPipeline> _controlRenderPipeline;
 };
-
-} // namespace di
 
 } // namespace reone

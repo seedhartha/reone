@@ -29,16 +29,14 @@
 
 namespace reone {
 
-namespace di {
-
-class Container {
+class IocContainer {
 public:
-    Container(game::GameID gameId, game::Options gameOptions) :
+    IocContainer(game::GameID gameId, game::Options gameOptions) :
         _gameId(gameId),
         _gameOptions(std::move(gameOptions)) {
     }
 
-    ~Container();
+    ~IocContainer();
 
     void init();
 
@@ -55,7 +53,5 @@ private:
     std::unique_ptr<ScriptModule> _script;
     std::unique_ptr<GameModule> _game;
 };
-
-} // namespace di
 
 } // namespace reone

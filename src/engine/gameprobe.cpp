@@ -29,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-GameID GameProbe::invoke() {
+GameID GameProbe::probe() {
     // If there is a KotOR executable then game is KotOR
     fs::path exePathK1(getPathIgnoreCase(_gamePath, "swkotor.exe", false));
     if (!exePathK1.empty()) {

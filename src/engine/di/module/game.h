@@ -35,8 +35,6 @@
 
 namespace reone {
 
-namespace di {
-
 class AudioModule;
 class GraphicsModule;
 class ResourceModule;
@@ -98,7 +96,5 @@ private:
 
     std::unique_ptr<game::Game> newGame();
 };
-
-} // namespace di
 
 } // namespace reone

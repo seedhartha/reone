@@ -33,8 +33,6 @@
 
 namespace reone {
 
-namespace di {
-
 class ResourceModule;
 
 class GraphicsModule : boost::noncopyable {
@@ -76,7 +74,5 @@ private:
     std::unique_ptr<graphics::Walkmeshes> _walkmeshes;
     std::unique_ptr<graphics::Window> _window;
 };
-
-} // namespace di
 
 } // namespace reone

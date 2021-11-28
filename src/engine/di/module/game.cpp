@@ -39,8 +39,6 @@ using namespace reone::script;
 
 namespace reone {
 
-namespace di {
-
 void GameModule::init() {
     _classes = make_unique<Classes>(_resource.strings(), _resource.twoDas());
     _cursors = make_unique<Cursors>(_graphics.context(), _graphics.meshes(), _graphics.shaders(), _graphics.window(), _resource.resources());
@@ -128,7 +126,5 @@ unique_ptr<Game> GameModule::newGame() {
         throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
     }
 }
-
-} // namespace di
 
 } // namespace reone

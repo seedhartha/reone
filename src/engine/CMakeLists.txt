@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(REONE_HEADERS
-    di/container.h
+    di/ioccontainer.h
     di/module/audio.h
     di/module/game.h
     di/module/graphics.h
@@ -28,7 +28,7 @@ set(REONE_HEADERS
     types.h)
 
 set(REONE_SOURCES
-    di/container.cpp
+    di/ioccontainer.cpp
     di/module/audio.cpp
     di/module/game.cpp
     di/module/graphics.cpp
