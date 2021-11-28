@@ -23,8 +23,6 @@
 
 namespace reone {
 
-namespace di {
-
 class ResourceModule;
 
 class AudioModule : boost::noncopyable {
@@ -46,7 +44,5 @@ private:
     std::unique_ptr<audio::AudioFiles> _audioFiles;
     std::unique_ptr<audio::AudioPlayer> _audioPlayer;
 };
-
-} // namespace di
 
 } // namespace reone

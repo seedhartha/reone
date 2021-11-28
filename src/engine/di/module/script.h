@@ -21,8 +21,6 @@
 
 namespace reone {
 
-namespace di {
-
 class ResourceModule;
 
 class ScriptModule : boost::noncopyable {
@@ -40,7 +38,5 @@ private:
 
     std::unique_ptr<script::Scripts> _scripts;
 };
-
-} // namespace di
 
 } // namespace reone

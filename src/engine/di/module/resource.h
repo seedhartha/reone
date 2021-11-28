@@ -24,8 +24,6 @@
 
 namespace reone {
 
-namespace di {
-
 class ResourceModule : boost::noncopyable {
 public:
     ResourceModule(boost::filesystem::path gamePath) :
@@ -47,7 +45,5 @@ private:
     std::unique_ptr<resource::Strings> _strings;
     std::unique_ptr<resource::TwoDas> _twoDas;
 };
-
-} // namespace di
 
 } // namespace reone

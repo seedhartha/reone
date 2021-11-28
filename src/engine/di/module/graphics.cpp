@@ -26,8 +26,6 @@ using namespace reone::resource;
 
 namespace reone {
 
-namespace di {
-
 void GraphicsModule::init() {
     _features = make_unique<Features>(_options);
     _window = make_unique<Window>(_options);
@@ -51,7 +49,5 @@ void GraphicsModule::init() {
     _shaders->init();
     _pbrIbl->init();
 }
-
-} // namespace di
 
 } // namespace reone

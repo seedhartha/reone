@@ -19,11 +19,10 @@
 
 #include "../common/logutil.h"
 
-#include "di/container.h"
+#include "di/ioccontainer.h"
 #include "gameprobe.h"
 #include "optionsparser.h"
 
-using namespace reone::di;
 using namespace reone::game;
 
 namespace reone {
@@ -36,9 +35,9 @@ int Engine::run() {
     setLogChannels(gameOptions.logChannels);
 
     GameProbe gameProbe(gameOptions.gamePath);
-    GameID gameId = gameProbe.invoke();
+    GameID gameId = gameProbe.probe();
 
-    Container container(gameId, gameOptions);
+    IocContainer container(gameId, gameOptions);
     container.init();
 
     return container.getGame().run();

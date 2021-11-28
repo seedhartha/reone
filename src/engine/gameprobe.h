@@ -29,7 +29,7 @@ public:
         _gamePath(std::move(gamePath)) {
     }
 
-    GameID invoke();
+    GameID probe();
 
 private:
     boost::filesystem::path _gamePath;

@@ -32,8 +32,6 @@ using namespace reone::scene;
 
 namespace reone {
 
-namespace di {
-
 void SceneModule::init() {
     _sceneGraphs = make_unique<SceneGraphs>(
         _options,
@@ -63,7 +61,5 @@ void SceneModule::init() {
     _controlRenderPipeline = make_unique<ControlRenderPipeline>(*_sceneGraphs, _graphics.context(), _graphics.meshes(), _graphics.shaders());
     _controlRenderPipeline->init();
 }
-
-} // namespace di
 
 } // namespace reone
