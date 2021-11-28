@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../engine/game/types.h"
+#include "../../engine/types.h"
 
 #include "itool.h"
 

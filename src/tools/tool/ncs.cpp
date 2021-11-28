@@ -19,18 +19,18 @@
 
 #include <boost/regex.hpp>
 
-#include "../../engine/common/collectionutil.h"
-#include "../../engine/common/exception/validation.h"
-#include "../../engine/common/logutil.h"
-#include "../../engine/game/core/script/routine/iroutines.h"
-#include "../../engine/game/kotor/routine/registerutil.h"
-#include "../../engine/game/tsl/routine/registerutil.h"
-#include "../../engine/script/format/ncsreader.h"
-#include "../../engine/script/format/ncswriter.h"
-#include "../../engine/script/instrutil.h"
-#include "../../engine/script/program.h"
-#include "../../engine/script/routine.h"
-#include "../../engine/script/variable.h"
+#include "../../common/collectionutil.h"
+#include "../../common/exception/validation.h"
+#include "../../common/logutil.h"
+#include "../../game/script/routine/iroutines.h"
+#include "../../kotor/routine/registerutil.h"
+#include "../../script/format/ncsreader.h"
+#include "../../script/format/ncswriter.h"
+#include "../../script/instrutil.h"
+#include "../../script/program.h"
+#include "../../script/routine.h"
+#include "../../script/variable.h"
+#include "../../tsl/routine/registerutil.h"
 
 using namespace std;
 

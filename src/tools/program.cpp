@@ -17,8 +17,8 @@
 
 #include "program.h"
 
-#include "../engine/common/pathutil.h"
-#include "../engine/resource/types.h"
+#include "../common/pathutil.h"
+#include "../resource/types.h"
 
 #include "tool/2da.h"
 #include "tool/audio.h"

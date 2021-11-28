@@ -22,10 +22,10 @@ set(REONE_HEADERS
     di/module/scene.h
     di/module/script.h
     engine.h
-    game/probe.h
-    game/types.h
+    gameprobe.h
     optionsparser.h
-    pch.h)
+    pch.h
+    types.h)
 
 set(REONE_SOURCES
     di/container.cpp
@@ -36,7 +36,7 @@ set(REONE_SOURCES
     di/module/scene.cpp
     di/module/script.cpp
     engine.cpp
-    game/probe.cpp
+    gameprobe.cpp
     main.cpp
     optionsparser.cpp)
 

@@ -17,8 +17,8 @@
 
 #include "erf.h"
 
-#include "../../engine/resource/format/erfwriter.h"
-#include "../../engine/resource/typeutil.h"
+#include "../../resource/format/erfwriter.h"
+#include "../../resource/typeutil.h"
 
 using namespace std;
 

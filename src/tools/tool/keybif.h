@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "../../engine/resource/format/bifreader.h"
-#include "../../engine/resource/format/keyreader.h"
+#include "../../resource/format/bifreader.h"
+#include "../../resource/format/keyreader.h"
 
 #include "itool.h"
 

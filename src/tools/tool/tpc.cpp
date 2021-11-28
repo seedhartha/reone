@@ -17,9 +17,9 @@
 
 #include "tpc.h"
 
-#include "../../engine/common/logutil.h"
-#include "../../engine/graphics/texture/format/tgawriter.h"
-#include "../../engine/graphics/texture/format/tpcreader.h"
+#include "../../common/logutil.h"
+#include "../../graphics/texture/format/tgawriter.h"
+#include "../../graphics/texture/format/tpcreader.h"
 
 using namespace std;
 
