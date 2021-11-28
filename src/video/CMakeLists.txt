@@ -23,7 +23,7 @@ set(VIDEO_SOURCES
 
 add_library(video STATIC ${VIDEO_HEADERS} ${VIDEO_SOURCES})
 set_target_properties(video PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(video PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+target_precompile_headers(video PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 
 if(ENABLE_VIDEO)
     target_compile_definitions(video PRIVATE R_ENABLE_VIDEO)

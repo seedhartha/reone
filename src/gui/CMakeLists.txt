@@ -42,4 +42,4 @@ set(GUI_SOURCES
 
 add_library(gui STATIC ${GUI_HEADERS} ${GUI_SOURCES})
 set_target_properties(gui PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(gui PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+target_precompile_headers(gui PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)

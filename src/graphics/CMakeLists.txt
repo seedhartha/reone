@@ -105,7 +105,7 @@ set(GRAPHICS_SOURCES
 
 add_library(graphics STATIC ${GRAPHICS_HEADERS} ${GRAPHICS_SOURCES})
 set_target_properties(graphics PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(graphics PRIVATE ${CMAKE_SOURCE_DIR}/src/engine/pch.h)
+target_precompile_headers(graphics PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(graphics PUBLIC GLEW::GLEW ${OPENGL_LIBRARIES})
 
 if(MSVC)
