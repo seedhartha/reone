@@ -23,8 +23,8 @@
 #include "../../game/object/creature.h"
 #include "../../game/party.h"
 #include "../../game/services.h"
-#include "../../graphics/mesh/mesh.h"
-#include "../../graphics/mesh/meshes.h"
+#include "../../graphics/mesh.h"
+#include "../../graphics/meshes.h"
 #include "../../graphics/window.h"
 #include "../../gui/control/label.h"
 

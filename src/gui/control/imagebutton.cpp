@@ -19,11 +19,11 @@
 
 #include "../../graphics/context.h"
 #include "../../graphics/fonts.h"
-#include "../../graphics/mesh/mesh.h"
-#include "../../graphics/mesh/meshes.h"
+#include "../../graphics/mesh.h"
+#include "../../graphics/meshes.h"
 #include "../../graphics/renderbuffer.h"
-#include "../../graphics/shader/shaders.h"
-#include "../../graphics/texture/texture.h"
+#include "../../graphics/shaders.h"
+#include "../../graphics/texture.h"
 #include "../../graphics/window.h"
 
 #include "../gui.h"

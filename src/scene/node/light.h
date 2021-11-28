@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../graphics/model/modelnode.h"
+#include "../../graphics/modelnode.h"
 
 #include "modelnode.h"
 

@@ -15,92 +15,92 @@
 
 set(GRAPHICS_HEADERS
     aabb.h
+    animatedproperty.h
+    animation.h
     barycentricutil.h
     beziercurve.h
     context.h
     cursor.h
+    dxtutil.h
     eventhandler.h
     features.h
     font.h
     fonts.h
+    format/bwmreader.h
+    format/curreader.h
+    format/lipreader.h
+    format/lipwriter.h
+    format/mdlreader.h
+    format/tgareader.h
+    format/tgawriter.h
+    format/tpcreader.h
+    format/txireader.h
     framebuffer.h
-    lip/animation.h
-    lip/format/lipreader.h
-    lip/format/lipwriter.h
-    lip/lips.h
+    lipanimation.h
+    lips.h
     material.h
     materials.h
-    mesh/mesh.h
-    mesh/meshes.h
-    mesh/vertexattributes.h
-    model/animatedproperty.h
-    model/animation.h
-    model/format/mdlreader.h
-    model/model.h
-    model/modelnode.h
-    model/models.h
+    mesh.h
+    meshes.h
+    model.h
+    modelnode.h
+    models.h
     options.h
     pbribl.h
     pixelutil.h
     renderbuffer.h
-    shader/shaders.h
-    texture/dxtutil.h
-    texture/format/curreader.h
-    texture/format/tgareader.h
-    texture/format/tgawriter.h
-    texture/format/tpcreader.h
-    texture/format/txireader.h
-    texture/texture.h
-    texture/textures.h
-    texture/textureutil.h
+    shaders.h
+    texture.h
+    textures.h
+    textureutil.h
     textutil.h
     triangleutil.h
     types.h
-    walkmesh/format/bwmreader.h
-    walkmesh/walkmesh.h
-    walkmesh/walkmeshes.h
+    vertexattributes.h
+    walkmesh.h
+    walkmeshes.h
     window.h)
 
 set(GRAPHICS_SOURCES
     aabb.cpp
+    animation.cpp
     context.cpp
     cursor.cpp
+    dxtutil.cpp
     features.cpp
     font.cpp
     fonts.cpp
+    format/bwmreader.cpp
+    format/curreader.cpp
+    format/lipreader.cpp
+    format/lipwriter.cpp
+    format/mdlreader.cpp
+    format/tgareader.cpp
+    format/tgawriter.cpp
+    format/tpcreader.cpp
+    format/txireader.cpp
     framebuffer.cpp
-    lip/animation.cpp
-    lip/format/lipreader.cpp
-    lip/format/lipwriter.cpp
-    lip/lips.cpp
+    lipanimation.cpp
+    lips.cpp
     materials.cpp
-    mesh/mesh.cpp
-    mesh/meshes.cpp
-    model/animation.cpp
-    model/format/mdlreader.cpp
-    model/model.cpp
-    model/modelnode.cpp
-    model/models.cpp
+    mesh.cpp
+    meshes.cpp
+    model.cpp
+    modelnode.cpp
+    models.cpp
     pbribl.cpp
     pixelutil.cpp
     renderbuffer.cpp
-    shader/shaders.cpp
-    shader/shaders_common.cpp
-    shader/shaders_pbr.cpp
-    shader/shaders_phong.cpp
-    texture/dxtutil.cpp
-    texture/format/curreader.cpp
-    texture/format/tgareader.cpp
-    texture/format/tgawriter.cpp
-    texture/format/tpcreader.cpp
-    texture/format/txireader.cpp
-    texture/texture.cpp
-    texture/textures.cpp
-    texture/textureutil.cpp
+    shaders_common.cpp
+    shaders_pbr.cpp
+    shaders_phong.cpp
+    shaders.cpp
+    texture.cpp
+    textures.cpp
+    textureutil.cpp
     textutil.cpp
-    walkmesh/format/bwmreader.cpp
-    walkmesh/walkmesh.cpp
-    walkmesh/walkmeshes.cpp
+    walkmesh.cpp
+    walkmeshes.cpp
     window.cpp)
 
 add_library(graphics STATIC ${GRAPHICS_HEADERS} ${GRAPHICS_SOURCES})

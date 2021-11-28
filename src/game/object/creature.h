@@ -19,7 +19,7 @@
 
 #include "../../audio/stream.h"
 #include "../../common/timer.h"
-#include "../../graphics/lip/animation.h"
+#include "../../graphics/lipanimation.h"
 #include "../../resource/format/2dareader.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/types.h"

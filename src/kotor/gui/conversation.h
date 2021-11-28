@@ -22,8 +22,8 @@
 #include "../../game/dialog.h"
 #include "../../game/object/spatial.h"
 #include "../../game/types.h"
-#include "../../graphics/lip/animation.h"
-#include "../../graphics/model/model.h"
+#include "../../graphics/lipanimation.h"
+#include "../../graphics/model.h"
 
 #include "gui.h"
 

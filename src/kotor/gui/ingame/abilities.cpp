@@ -20,7 +20,7 @@
 #include "../../../game/object/creature.h"
 #include "../../../game/party.h"
 #include "../../../game/services.h"
-#include "../../../graphics/texture/textures.h"
+#include "../../../graphics/textures.h"
 #include "../../../gui/control/button.h"
 #include "../../../gui/control/label.h"
 #include "../../../gui/control/listbox.h"

@@ -22,7 +22,7 @@
 #include "../../game/object/factory.h"
 #include "../../game/party.h"
 #include "../../game/services.h"
-#include "../../graphics/model/models.h"
+#include "../../graphics/models.h"
 #include "../../gui/sceneinitializer.h"
 #include "../../scene/graphs.h"
 #include "../../scene/types.h"

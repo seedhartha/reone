@@ -22,7 +22,7 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
-#include "../../src/common/cache.h"
+#include "../../src/common/memorycache.h"
 
 using namespace std;
 using namespace std::placeholders;

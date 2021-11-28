@@ -18,9 +18,9 @@
 #include "graph.h"
 
 #include "../graphics/context.h"
-#include "../graphics/mesh/mesh.h"
-#include "../graphics/mesh/meshes.h"
-#include "../graphics/walkmesh/walkmesh.h"
+#include "../graphics/mesh.h"
+#include "../graphics/meshes.h"
+#include "../graphics/walkmesh.h"
 
 #include "collision.h"
 #include "node/camera.h"

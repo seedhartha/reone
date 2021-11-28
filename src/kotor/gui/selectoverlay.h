@@ -19,7 +19,7 @@
 
 #include "../../game/contextaction.h"
 #include "../../graphics/font.h"
-#include "../../graphics/texture/texture.h"
+#include "../../graphics/texture.h"
 
 namespace reone {
 

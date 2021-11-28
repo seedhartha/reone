@@ -19,8 +19,8 @@
 
 #include "../../audio/files.h"
 #include "../../audio/player.h"
-#include "../../graphics/model/models.h"
-#include "../../graphics/texture/textures.h"
+#include "../../graphics/models.h"
+#include "../../graphics/textures.h"
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
 #include "../../resource/gffs.h"

@@ -20,7 +20,7 @@
 #include "../../audio/player.h"
 #include "../../game/gui/sounds.h"
 #include "../../game/services.h"
-#include "../../graphics/texture/textures.h"
+#include "../../graphics/textures.h"
 
 #include "../kotor.h"
 

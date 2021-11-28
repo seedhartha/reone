@@ -17,8 +17,8 @@
 
 #include "../../common/collectionutil.h"
 #include "../../common/logutil.h"
-#include "../../graphics/mesh/mesh.h"
-#include "../../graphics/model/animation.h"
+#include "../../graphics/animation.h"
+#include "../../graphics/mesh.h"
 
 #include "../graph.h"
 #include "../types.h"

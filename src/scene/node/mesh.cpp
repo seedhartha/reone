@@ -22,10 +22,10 @@
 #include "../../graphics/context.h"
 #include "../../graphics/features.h"
 #include "../../graphics/materials.h"
-#include "../../graphics/mesh/mesh.h"
+#include "../../graphics/mesh.h"
 #include "../../graphics/pbribl.h"
-#include "../../graphics/texture/texture.h"
-#include "../../graphics/texture/textures.h"
+#include "../../graphics/texture.h"
+#include "../../graphics/textures.h"
 
 #include "../graph.h"
 

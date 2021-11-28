@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../../common/timer.h"
-#include "../../graphics/texture/texture.h"
+#include "../../graphics/texture.h"
 #include "../../graphics/types.h"
 #include "../../resource/format/gffreader.h"
 #include "../../resource/types.h"

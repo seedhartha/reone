@@ -23,7 +23,7 @@
 #include "../../game/portraits.h"
 #include "../../game/script/runner.h"
 #include "../../game/services.h"
-#include "../../graphics/texture/textures.h"
+#include "../../graphics/textures.h"
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"

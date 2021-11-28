@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../graphics/texture/texture.h"
+#include "../../graphics/texture.h"
 #include "../../graphics/types.h"
 
 #include "../types.h"

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../common/cache.h"
+#include "../../common/memorycache.h"
 
 #include "types.h"
 

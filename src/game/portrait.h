@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../graphics/texture/texture.h"
+#include "../../graphics/texture.h"
 
 namespace reone {
 

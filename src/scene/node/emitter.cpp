@@ -19,10 +19,10 @@
 
 #include "../../common/randomutil.h"
 #include "../../graphics/context.h"
-#include "../../graphics/mesh/mesh.h"
-#include "../../graphics/mesh/meshes.h"
-#include "../../graphics/shader/shaders.h"
-#include "../../graphics/texture/texture.h"
+#include "../../graphics/mesh.h"
+#include "../../graphics/meshes.h"
+#include "../../graphics/shaders.h"
+#include "../../graphics/texture.h"
 
 #include "../graph.h"
 
