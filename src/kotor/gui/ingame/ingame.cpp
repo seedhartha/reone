@@ -22,13 +22,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 InGameMenu::InGameMenu(
     KotOR &game,
@@ -287,6 +288,6 @@ shared_ptr<Button> InGameMenu::getBtnChange3() {
     return _game.isTSL() ? getControl<Button>("BTN_CHANGE3") : nullptr;
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

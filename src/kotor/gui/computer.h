@@ -24,11 +24,11 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 class ComputerGUI : public Conversation {
 public:
-    ComputerGUI(KotOR &game, Services &services);
+    ComputerGUI(KotOR &game, game::Services &services);
 
     void load() override;
 
@@ -75,6 +75,6 @@ private:
     void setReplyLines(std::vector<std::string> lines) override;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

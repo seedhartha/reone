@@ -24,13 +24,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 LoadingScreen::LoadingScreen(KotOR &game, Services &services) :
     GameGUI(game, services) {
@@ -66,6 +67,6 @@ void LoadingScreen::setProgress(int progress) {
     _binding.pbProgress->setValue(progress);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

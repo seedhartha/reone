@@ -29,6 +29,11 @@ namespace reone {
 namespace game {
 
 class Creature;
+
+}
+
+namespace kotor {
+
 class InGameMenu;
 
 class Equipment : public GameGUI {
@@ -51,7 +56,7 @@ public:
     Equipment(
         KotOR &game,
         InGameMenu &inGameMenu,
-        Services &services);
+        game::Services &services);
 
     void load() override;
 
@@ -125,6 +130,6 @@ private:
     void onItemsListBoxItemClick(const std::string &item);
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

@@ -29,11 +29,11 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 class MainMenu : public GameGUI {
 public:
-    MainMenu(KotOR &game, Services &services);
+    MainMenu(KotOR &game, game::Services &services);
 
     void load() override;
 
@@ -72,6 +72,6 @@ private:
     std::shared_ptr<scene::ModelSceneNode> getKotorModel(scene::SceneGraph &sceneGraph);
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

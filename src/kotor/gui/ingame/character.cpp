@@ -34,6 +34,7 @@ using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
@@ -41,7 +42,7 @@ using namespace reone::scene;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 CharacterMenu::CharacterMenu(
     KotOR &game,
@@ -276,6 +277,6 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) 
     return move(sceneModel);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

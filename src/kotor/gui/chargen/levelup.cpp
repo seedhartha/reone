@@ -25,13 +25,14 @@
 #include "chargen.h"
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 LevelUpMenu::LevelUpMenu(
     CharacterGeneration &charGen,
@@ -161,6 +162,6 @@ void LevelUpMenu::doSetStep(int step) {
     _binding.btnStepName5->setFocus(_step == 4);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

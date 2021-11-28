@@ -33,9 +33,13 @@ namespace game {
 class Map;
 class Waypoint;
 
+} // namespace game
+
+namespace kotor {
+
 class MapMenu : public GameGUI {
 public:
-    MapMenu(KotOR &game, Services &services);
+    MapMenu(KotOR &game, game::Services &services);
 
     void load() override;
     void draw() override;
@@ -57,13 +61,13 @@ private:
         // END KotOR only
     } _binding;
 
-    std::vector<std::shared_ptr<Waypoint>> _notes;
+    std::vector<std::shared_ptr<game::Waypoint>> _notes;
     int _selectedNoteIdx {0};
 
     void bindControls();
     void refreshSelectedNote();
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

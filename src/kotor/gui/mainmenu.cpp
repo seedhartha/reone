@@ -34,6 +34,7 @@ using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
@@ -41,7 +42,7 @@ using namespace reone::scene;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr float kKotorModelSize = 1.4f;
 
@@ -199,6 +200,6 @@ void MainMenu::onModuleSelected(const string &name) {
     _game.loadModule(name);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

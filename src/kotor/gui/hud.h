@@ -35,9 +35,13 @@ class ActionFactory;
 class Reputes;
 class Skills;
 
+} // namespace game
+
+namespace kotor {
+
 class HUD : public GameGUI {
 public:
-    HUD(KotOR &game, Services &services);
+    HUD(KotOR &game, game::Services &services);
 
     void load() override;
 
@@ -185,6 +189,6 @@ private:
     void drawMinimap();
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

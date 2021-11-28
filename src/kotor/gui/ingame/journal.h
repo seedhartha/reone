@@ -27,11 +27,11 @@ class Button;
 
 }
 
-namespace game {
+namespace kotor {
 
 class JournalMenu : public GameGUI {
 public:
-    JournalMenu(KotOR &game, Services &services);
+    JournalMenu(KotOR &game, game::Services &services);
 
     void load() override;
 
@@ -49,6 +49,6 @@ private:
     void bindControls();
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

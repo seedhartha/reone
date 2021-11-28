@@ -27,13 +27,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::gui;
 using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 CustomCharacterGeneration::CustomCharacterGeneration(
     CharacterGeneration &charGen,
@@ -172,6 +173,6 @@ void CustomCharacterGeneration::goToNextStep() {
     }
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

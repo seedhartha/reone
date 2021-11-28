@@ -18,23 +18,23 @@
 #include "gui.h"
 
 #include "../../audio/player.h"
+#include "../../game/guisounds.h"
 #include "../../game/services.h"
 #include "../../graphics/texture/textures.h"
 
 #include "../kotor.h"
 
-#include "sounds.h"
-
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 GameGUI::GameGUI(KotOR &game, Services &services) :
     GUI(
@@ -124,6 +124,6 @@ void GameGUI::loadBackground(BackgroundType type) {
     _background = _textures.get(resRef, TextureUsage::Diffuse);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

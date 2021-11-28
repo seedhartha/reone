@@ -27,7 +27,7 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 class InGameMenu;
 
@@ -36,7 +36,7 @@ public:
     CharacterMenu(
         KotOR &game,
         InGameMenu &inGameMenu,
-        Services &services);
+        game::Services &services);
 
     void load() override;
     void update(float dt) override;
@@ -128,9 +128,9 @@ private:
     void refresh3D();
 
     std::shared_ptr<scene::ModelSceneNode> getSceneModel(scene::SceneGraph &sceneGraph) const;
-    std::string describeClass(ClassType clazz) const;
+    std::string describeClass(game::ClassType clazz) const;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

@@ -25,15 +25,20 @@ namespace reone {
 
 namespace game {
 
+struct Services;
+
 class Game;
-class Services;
 class SpatialObject;
+
+} // namespace game
+
+namespace kotor {
 
 class SelectionOverlay {
 public:
     SelectionOverlay(
-        Game &game,
-        Services &services);
+        game::Game &game,
+        game::Services &services);
 
     void load();
 
@@ -43,12 +48,12 @@ public:
 
 private:
     struct ActionSlot {
-        std::vector<ContextAction> actions;
+        std::vector<game::ContextAction> actions;
         uint32_t indexSelected {0};
     };
 
-    Game &_game;
-    Services &_services;
+    game::Game &_game;
+    game::Services &_services;
 
     std::shared_ptr<graphics::Font> _font;
     std::shared_ptr<graphics::Texture> _friendlyReticle;
@@ -58,8 +63,8 @@ private:
     std::shared_ptr<graphics::Texture> _friendlyScroll;
     std::shared_ptr<graphics::Texture> _hostileScroll;
     std::shared_ptr<graphics::Texture> _hilightedScroll;
-    std::shared_ptr<SpatialObject> _hilightedObject;
-    std::shared_ptr<SpatialObject> _selectedObject;
+    std::shared_ptr<game::SpatialObject> _hilightedObject;
+    std::shared_ptr<game::SpatialObject> _selectedObject;
     std::vector<ActionSlot> _actionSlots;
     glm::vec3 _hilightedScreenCoords {0.0f};
     glm::vec3 _selectedScreenCoords {0.0f};
@@ -85,6 +90,6 @@ private:
     glm::vec3 getColorFromSelectedObject() const;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

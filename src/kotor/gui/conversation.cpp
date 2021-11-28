@@ -33,13 +33,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr float kDefaultEntryDuration = 10.0f;
 
@@ -337,6 +338,6 @@ void Conversation::resume() {
     _paused = false;
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

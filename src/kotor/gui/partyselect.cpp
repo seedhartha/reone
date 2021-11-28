@@ -34,6 +34,7 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
@@ -41,7 +42,7 @@ using namespace reone::script;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr int kMaxFollowerCount = 2;
 
@@ -361,6 +362,6 @@ void PartySelection::changeParty() {
     area->reloadParty();
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

@@ -31,11 +31,11 @@ class ListBox;
 
 } // namespace gui
 
-namespace game {
+namespace kotor {
 
 class AbilitiesMenu : public GameGUI {
 public:
-    AbilitiesMenu(KotOR &game, Services &services);
+    AbilitiesMenu(KotOR &game, game::Services &services);
 
     void load() override;
 
@@ -43,7 +43,7 @@ public:
 
 private:
     struct SkillInfo {
-        SkillType skill;
+        game::SkillType skill;
         std::string name;
         std::string description;
         std::shared_ptr<graphics::Texture> icon;
@@ -88,7 +88,7 @@ private:
         // END TSL only
     } _binding;
 
-    std::unordered_map<SkillType, SkillInfo> _skills;
+    std::unordered_map<game::SkillType, SkillInfo> _skills;
 
     void bindControls();
     void loadSkills();
@@ -97,6 +97,6 @@ private:
     std::shared_ptr<graphics::Texture> getFrameTexture() const;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

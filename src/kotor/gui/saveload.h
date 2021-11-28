@@ -27,22 +27,22 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 class SaveLoad : public GameGUI {
 public:
-    SaveLoad(KotOR &game, Services &services);
+    SaveLoad(KotOR &game, game::Services &services);
 
     void load() override;
 
     void refresh();
 
-    void setMode(SaveLoadMode mode);
+    void setMode(game::SaveLoadMode mode);
 
 private:
     struct SavedGameDescriptor {
         int number {0};
-        SavedGame save;
+        game::SavedGame save;
         boost::filesystem::path path;
     };
 
@@ -70,7 +70,7 @@ private:
         // END TSL only
     } _binding;
 
-    SaveLoadMode _mode {SaveLoadMode::Save};
+    game::SaveLoadMode _mode {game::SaveLoadMode::Save};
     std::vector<SavedGameDescriptor> _saves;
 
     void bindControls();
@@ -85,6 +85,6 @@ private:
     int getNewSaveNumber() const;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

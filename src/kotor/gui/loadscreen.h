@@ -25,11 +25,11 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
-class LoadingScreen : public GameGUI, public ILoadingScreen {
+class LoadingScreen : public GameGUI, public game::ILoadingScreen {
 public:
-    LoadingScreen(KotOR &game, Services &services);
+    LoadingScreen(KotOR &game, game::Services &services);
 
     void load() override;
 
@@ -47,6 +47,6 @@ private:
     void bindControls();
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

@@ -34,6 +34,7 @@
 using namespace std;
 
 using namespace reone::game;
+using namespace reone::kotor;
 using namespace reone::resource;
 using namespace reone::script;
 

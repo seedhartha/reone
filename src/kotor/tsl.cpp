@@ -27,6 +27,7 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
@@ -36,7 +37,7 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr char kVoiceDirectoryName[] = "streamvoice";
 static constexpr char kLocalizationLipFilename[] = "localization";
@@ -94,6 +95,6 @@ void TSL::initRoutines() {
     registerRoutinesTSL(_routines);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

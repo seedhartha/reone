@@ -29,11 +29,11 @@ class ListBox;
 
 } // namespace gui
 
-namespace game {
+namespace kotor {
 
 class InventoryMenu : public GameGUI {
 public:
-    InventoryMenu(KotOR &game, Services &services);
+    InventoryMenu(KotOR &game, game::Services &services);
 
     void load() override;
 
@@ -81,6 +81,6 @@ private:
     void bindControls();
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

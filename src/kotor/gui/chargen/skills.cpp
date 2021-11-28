@@ -32,13 +32,14 @@
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::gui;
 using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static const unordered_map<SkillType, int> g_descStrRefBySkill {
     {SkillType::ComputerUse, 244},
@@ -327,6 +328,6 @@ void CharGenSkills::onSkillLabelFocusChanged(SkillType skill, bool focus) {
     _binding.lbDesc->addTextLinesAsItems(description);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone
