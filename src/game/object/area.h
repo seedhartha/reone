@@ -69,6 +69,7 @@ public:
 
     Area(
         uint32_t id,
+        std::string sceneName,
         Game &game,
         Services &services);
 
@@ -222,6 +223,8 @@ public:
     // END Scripts
 
 private:
+    std::string _sceneName;
+
     Pathfinder _pathfinder;
     std::string _localizedName;
     RoomMap _rooms;

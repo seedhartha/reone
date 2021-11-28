@@ -31,12 +31,12 @@ shared_ptr<Module> ObjectFactory::newModule() {
     return newObject<Module>(_game, _services);
 }
 
-shared_ptr<Area> ObjectFactory::newArea() {
-    return newObject<Area>(_game, _services);
-}
-
 shared_ptr<Item> ObjectFactory::newItem() {
     return newObject<Item>(_game, _services);
+}
+
+shared_ptr<Area> ObjectFactory::newArea(string sceneName) {
+    return newObject<Area>(move(sceneName), _game, _services);
 }
 
 shared_ptr<Creature> ObjectFactory::newCreature(string sceneName) {
