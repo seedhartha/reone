@@ -23,7 +23,7 @@
 #include "../../common/exception/validation.h"
 #include "../../common/logutil.h"
 #include "../../game/script/routine/iroutines.h"
-#include "../../kotor/routine/registerutil.h"
+#include "../../kotor/script/routine/registerutil.h"
 #include "../../script/format/ncsreader.h"
 #include "../../script/format/ncswriter.h"
 #include "../../script/instrutil.h"

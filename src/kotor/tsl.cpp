@@ -22,7 +22,7 @@
 #include "../resource/2da.h"
 #include "../resource/resources.h"
 
-#include "routine/registerutil.h"
+#include "script/routine/registerutil.h"
 
 using namespace std;
 

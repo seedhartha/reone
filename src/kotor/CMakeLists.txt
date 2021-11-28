@@ -47,7 +47,8 @@ set(KOTOR_HEADERS
     gui/saveload.h
     gui/selectoverlay.h
     kotor.h
-    routine/registerutil.h
+    script/routine/declarations.h
+    script/routine/registerutil.h
     tsl.h)
 
 set(KOTOR_SOURCES
@@ -84,7 +85,29 @@ set(KOTOR_SOURCES
     gui/saveload.cpp
     gui/selectoverlay.cpp
     kotor.cpp
-    routine/registerutil.cpp
+    script/routine/impl/action.cpp
+    script/routine/impl/ambientsound.cpp
+    script/routine/impl/convert.cpp
+    script/routine/impl/effect.cpp
+    script/routine/impl/encounter.cpp
+    script/routine/impl/event.cpp
+    script/routine/impl/log.cpp
+    script/routine/impl/main.cpp
+    script/routine/impl/math.cpp
+    script/routine/impl/minigame.cpp
+    script/routine/impl/movie.cpp
+    script/routine/impl/music.cpp
+    script/routine/impl/party.cpp
+    script/routine/impl/perception.cpp
+    script/routine/impl/planet.cpp
+    script/routine/impl/random.cpp
+    script/routine/impl/soundobject.cpp
+    script/routine/impl/stealth.cpp
+    script/routine/impl/string.cpp
+    script/routine/impl/talent.cpp
+    script/routine/impl/time.cpp
+    script/routine/impl/vector.cpp
+    script/routine/registerutil.cpp
     tsl.cpp)
 
 add_library(kotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES})

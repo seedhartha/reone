@@ -55,7 +55,7 @@
 #include "../game/surfaces.h"
 
 #include "gui/loadscreen.h"
-#include "routine/registerutil.h"
+#include "script/routine/registerutil.h"
 
 using namespace std;
 

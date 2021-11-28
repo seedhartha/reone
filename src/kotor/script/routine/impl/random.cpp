@@ -22,18 +22,18 @@
 #include "../declarations.h"
 
 #include "../../../../common/randomutil.h"
+#include "../../../../game/script/routine/argutil.h"
+#include "../../../../game/script/routine/context.h"
 #include "../../../../script/types.h"
-
-#include "../argutil.h"
-#include "../context.h"
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::script;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 namespace routine {
 
@@ -145,6 +145,6 @@ Variable d100(const vector<Variable> &args, const RoutineContext &ctx) {
 
 } // namespace routine
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

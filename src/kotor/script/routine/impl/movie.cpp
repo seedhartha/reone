@@ -16,53 +16,50 @@
  */
 
 /** @file
- *  Implementation of vector-related routines.
+ *  Implementation of movie-related routines.
  */
 
 #include "../declarations.h"
 
+#include "../../../../game/game.h"
+#include "../../../../game/script/routine/argutil.h"
+#include "../../../../game/script/routine/objectutil.h"
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/types.h"
 
-#include "../argutil.h"
-
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::script;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 namespace routine {
 
-Variable vectorMagnitude(const vector<Variable> &args, const RoutineContext &ctx) {
-    glm::vec3 value(getVector(args, 0));
-    return Variable::ofFloat(glm::length(value));
+Variable playMovie(const vector<Variable> &args, const RoutineContext &ctx) {
+    string movie(boost::to_lower_copy(getString(args, 0)));
+
+    ctx.game.playVideo(movie);
+
+    return Variable::ofNull();
 }
 
-Variable vectorNormalize(const vector<Variable> &args, const RoutineContext &ctx) {
-    glm::vec3 value(getVector(args, 0));
-    return Variable::ofVector(glm::normalize(value));
-}
-
-Variable vectorCreate(const vector<Variable> &args, const RoutineContext &ctx) {
-    float x = getFloat(args, 0);
-    float y = getFloat(args, 1);
-    float z = getFloat(args, 2);
-    return Variable::ofVector(glm::vec3(x, y, z));
-}
-
-Variable angleToVector(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable isMoviePlaying(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
-Variable vectorToAngle(const vector<Variable> &args, const RoutineContext &ctx) {
+Variable queueMovie(const vector<Variable> &args, const RoutineContext &ctx) {
+    throw NotImplementedException();
+}
+
+Variable playMovieQueue(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
 } // namespace routine
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

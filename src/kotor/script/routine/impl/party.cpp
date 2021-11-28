@@ -23,24 +23,23 @@
 
 #include "../../../../common/logutil.h"
 #include "../../../../common/randomutil.h"
+#include "../../../../game/game.h"
+#include "../../../../game/object/creature.h"
+#include "../../../../game/party.h"
+#include "../../../../game/script/routine/argutil.h"
+#include "../../../../game/script/routine/context.h"
+#include "../../../../game/script/routine/objectutil.h"
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/types.h"
 
-#include "../../../game.h"
-#include "../../../object/creature.h"
-#include "../../../party.h"
-
-#include "../argutil.h"
-#include "../context.h"
-#include "../objectutil.h"
-
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::script;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 namespace routine {
 
@@ -216,6 +215,6 @@ Variable rebuildPartyTable(const vector<Variable> &args, const RoutineContext &c
 
 } // namespace routine
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

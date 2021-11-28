@@ -21,20 +21,20 @@
 
 #include "../declarations.h"
 
+#include "../../../../game/game.h"
+#include "../../../../game/script/routine/argutil.h"
+#include "../../../../game/script/routine/context.h"
+#include "../../../../game/script/routine/objectutil.h"
 #include "../../../../script/types.h"
-
-#include "../../../game.h"
-
-#include "../argutil.h"
-#include "../context.h"
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::script;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 namespace routine {
 
@@ -99,6 +99,6 @@ Variable getIsDusk(const vector<Variable> &args, const RoutineContext &ctx) {
 
 } // namespace routine
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone
