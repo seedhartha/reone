@@ -19,13 +19,13 @@ set(TOOLS_HEADERS
     tool/audio.h
     tool/erf.h
     tool/gff.h
-    tool/itool.h
     tool/keybif.h
     tool/lip.h
     tool/ncs.h
     tool/rim.h
     tool/ssf.h
     tool/tlk.h
+    tool/tool.h
     tool/tpc.h
     types.h)
 

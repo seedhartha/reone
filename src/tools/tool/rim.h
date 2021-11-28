@@ -19,7 +19,7 @@
 
 #include "../../resource/format/rimreader.h"
 
-#include "itool.h"
+#include "tool.h"
 
 namespace reone {
 
