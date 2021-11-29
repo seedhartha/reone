@@ -30,7 +30,7 @@ public:
         _argv(argv) {
     }
 
-    game::Options invoke();
+    game::Options parse();
 
 private:
     int _argc;

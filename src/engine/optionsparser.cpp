@@ -35,7 +35,7 @@ static constexpr int kDefaultVoiceVolume = 85;
 static constexpr int kDefaultSoundVolume = 85;
 static constexpr int kDefaultMovieVolume = 85;
 
-Options OptionsParser::invoke() {
+Options OptionsParser::parse() {
     // Initialize options description
 
     po::options_description descCommon;

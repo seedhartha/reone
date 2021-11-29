@@ -29,7 +29,7 @@ namespace reone {
 
 int Engine::run() {
     OptionsParser optionsParser(_argc, _argv);
-    Options gameOptions(optionsParser.invoke());
+    Options gameOptions(optionsParser.parse());
 
     setLogToFile(gameOptions.logToFile);
     setLogChannels(gameOptions.logChannels);
