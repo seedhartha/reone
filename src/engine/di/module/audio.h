@@ -32,7 +32,10 @@ public:
         _resource(resource) {
     }
 
+    ~AudioModule() { deinit(); }
+
     void init();
+    void deinit();
 
     audio::AudioFiles &audioFiles() { return *_audioFiles; }
     audio::AudioPlayer &audioPlayer() { return *_audioPlayer; }

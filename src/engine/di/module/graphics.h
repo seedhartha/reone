@@ -42,7 +42,10 @@ public:
         _resource(resource) {
     }
 
+    ~GraphicsModule() { deinit(); }
+
     void init();
+    void deinit();
 
     graphics::Context &context() { return *_context; }
     graphics::Features &features() { return *_features; }

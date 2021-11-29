@@ -29,13 +29,8 @@
 
 using namespace std;
 
-using namespace reone::audio;
 using namespace reone::game;
-using namespace reone::graphics;
 using namespace reone::kotor;
-using namespace reone::resource;
-using namespace reone::scene;
-using namespace reone::script;
 
 namespace reone {
 
@@ -99,21 +94,20 @@ void GameModule::init() {
     _game->init();
 }
 
-GameModule::~GameModule() {
+void GameModule::deinit() {
     _game.reset();
     _services.reset();
-
-    _classes.reset();
-    _cursors.reset();
-    _feats.reset();
-    _footstepSounds.reset();
-    _guiSounds.reset();
-    _portraits.reset();
-    _reputes.reset();
-    _skills.reset();
-    _soundSets.reset();
-    _spells.reset();
     _surfaces.reset();
+    _spells.reset();
+    _soundSets.reset();
+    _skills.reset();
+    _reputes.reset();
+    _portraits.reset();
+    _guiSounds.reset();
+    _footstepSounds.reset();
+    _feats.reset();
+    _cursors.reset();
+    _classes.reset();
 }
 
 unique_ptr<Game> GameModule::newGame() {

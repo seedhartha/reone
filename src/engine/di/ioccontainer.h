@@ -36,9 +36,10 @@ public:
         _gameOptions(std::move(gameOptions)) {
     }
 
-    ~IocContainer();
+    ~IocContainer() { deinit(); }
 
     void init();
+    void deinit();
 
     game::Game &getGame();
 

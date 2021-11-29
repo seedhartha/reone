@@ -29,7 +29,10 @@ public:
         _resource(resource) {
     }
 
+    ~ScriptModule() { deinit(); }
+
     void init();
+    void deinit();
 
     script::Scripts &scripts() { return *_scripts; }
 

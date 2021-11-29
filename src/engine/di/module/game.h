@@ -62,9 +62,10 @@ public:
         _script(script) {
     }
 
-    ~GameModule();
+    ~GameModule() { deinit(); }
 
     void init();
+    void deinit();
 
     game::Game &game() { return *_game; }
 

@@ -21,18 +21,22 @@ using namespace std;
 
 using namespace reone::resource;
 
-namespace fs = boost::filesystem;
-
 namespace reone {
 
 void ResourceModule::init() {
     _resources = make_unique<Resources>();
-
     _strings = make_unique<Strings>();
-    _strings->init(_gamePath);
-
     _twoDas = make_unique<TwoDas>(*_resources);
     _gffs = make_unique<Gffs>(*_resources);
+
+    _strings->init(_gamePath);
+}
+
+void ResourceModule::deinit() {
+    _gffs.reset();
+    _twoDas.reset();
+    _strings.reset();
+    _resources.reset();
 }
 
 } // namespace reone
