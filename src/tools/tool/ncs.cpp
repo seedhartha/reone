@@ -21,7 +21,6 @@
 
 #include "../../common/collectionutil.h"
 #include "../../common/exception/validation.h"
-#include "../../common/logutil.h"
 #include "../../game/script/routine/routines.h"
 #include "../../kotor/kotor.h"
 #include "../../kotor/tsl.h"

@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../common/logutil.h"
-
 #include "program.h"
 
 using namespace std;
@@ -28,7 +26,7 @@ int main(int argc, char **argv) {
         return Program(argc, argv).run();
     } catch (const exception &ex) {
         try {
-            error("Program terminated exceptionally: " + string(ex.what()));
+            cerr << "Program terminated exceptionally: " << string(ex.what()) << endl;
         } catch (...) {
         }
         return 1;
