@@ -17,7 +17,6 @@
 
 #include "tpc.h"
 
-#include "../../common/logutil.h"
 #include "../../graphics/format/tgawriter.h"
 #include "../../graphics/format/tpcreader.h"
 
