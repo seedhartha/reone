@@ -380,10 +380,6 @@ void Game::runMainLoop() {
             update();
             drawAll();
         }
-
-#ifdef R_ENABLE_MULTITHREADING
-        this_thread::yield();
-#endif
     }
 }
 

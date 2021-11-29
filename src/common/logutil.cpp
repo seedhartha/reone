@@ -18,7 +18,6 @@
 #include "logutil.h"
 
 #include "collectionutil.h"
-#include "threadutil.h"
 
 using namespace std;
 
@@ -35,10 +34,7 @@ enum class LogLevel {
     Debug
 };
 
-#ifdef R_ENABLE_MULTITHREADING
-static mutex g_logMutex;
-#endif
-
+static thread::id g_mainThreadId;
 static int g_logChannels = LogChannels::general;
 static bool g_logToFile = false;
 static unique_ptr<fs::ofstream> g_logFile;
@@ -75,32 +71,32 @@ static string describeLogChannel(int channel) {
 }
 
 static void log(ostream &out, LogLevel level, const string &s, int channel) {
-    boost::format msg(boost::format("%s [%s] %s: %s") %
+    boost::format msg(boost::format("%s %s: %s") %
                       describeLogLevel(level) %
-                      getThreadName() %
                       describeLogChannel(channel) %
                       s);
-
-#ifdef R_ENABLE_MULTITHREADING
-    lock_guard<mutex> lock(g_logMutex);
-#endif
 
     out << msg << endl;
 }
 
 static void log(LogLevel level, const string &s, int channel) {
-    if (!isLogChannelEnabled(channel))
+    if (!isLogChannelEnabled(channel)) {
         return;
-
+    }
+    if (this_thread::get_id() != g_mainThreadId) {
+        throw logic_error("Must not log outside the main thread");
+    }
     if (g_logToFile && !g_logFile) {
         fs::path path(fs::current_path());
         path.append(kLogFilename);
-
         g_logFile = make_unique<fs::ofstream>(path);
     }
-
     auto &out = g_logToFile ? *g_logFile : cout;
     log(out, level, s, channel);
+}
+
+void initLog() {
+    g_mainThreadId = this_thread::get_id();
 }
 
 void error(const string &s, int channel) {
