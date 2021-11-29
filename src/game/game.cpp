@@ -76,27 +76,8 @@ namespace game {
 static constexpr int kNfoBufferSize = 1024;
 static constexpr int kScreenBufferSize = 262144;
 
-Game::Game(
-    fs::path path,
-    Options options,
-    Services &services) :
-    _path(move(path)),
-    _options(move(options)),
-    _services(services),
-    _party(*this),
-    _combat(*this, services),
-    _actionFactory(*this, services),
-    _objectFactory(*this, services),
-    _routines(*this, services),
-    _scriptRunner(_routines, services.scripts),
-    _console(*this, services),
-    _profileOverlay(services),
-    _map(*this, services) {
-}
-
 void Game::init() {
-    _services.window.setEventHandler(this);
-
+    // Surfaces
     auto walkableSurfaces = _services.surfaces.getWalkableSurfaces();
     auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaces();
     for (auto &scene : _services.sceneGraphs.scenes()) {
@@ -104,6 +85,7 @@ void Game::init() {
         scene.second->setWalkcheckSurfaces(walkcheckSurfaces);
     }
 
+    // GUI
     _console.init();
     _profileOverlay.init();
 
@@ -115,8 +97,66 @@ void Game::init() {
 int Game::run() {
     start();
     runMainLoop();
-
     return 0;
+}
+
+void Game::runMainLoop() {
+    _ticks = SDL_GetTicks();
+    while (!_quit) {
+        _services.window.processEvents(_quit);
+        if (!_services.window.isInFocus()) {
+            continue;
+        }
+        update();
+        drawAll();
+    }
+}
+
+void Game::update() {
+    float dt = measureFrameTime();
+
+    if (_video) {
+        updateVideo(dt);
+    } else {
+        updateMusic();
+    }
+    if (!_nextModule.empty()) {
+        loadNextModule();
+    }
+    updateCamera(dt);
+
+    bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
+    if (updModule && !_paused) {
+        _module->update(dt);
+        _combat.update(dt);
+    }
+
+    GUI *gui = getScreenGUI();
+    if (gui) {
+        gui->update(dt);
+    }
+    updateSceneGraph(dt);
+    _services.audioPlayer.update(dt);
+
+    _profileOverlay.update(dt);
+}
+
+void Game::drawAll() {
+    // Compute derived PBR IBL textures from queued environment maps
+    _services.pbrIbl.refresh();
+
+    _services.window.clear();
+
+    if (_video) {
+        _video->draw();
+    } else {
+        drawWorld();
+        drawGUI();
+        _services.window.drawCursor();
+    }
+
+    _profileOverlay.draw();
+    _services.window.swapBuffers();
 }
 
 void Game::loadModule(const string &name, string entry) {
@@ -272,24 +312,6 @@ void Game::playMusic(const string &resRef) {
     _musicResRef = resRef;
 }
 
-void Game::drawAll() {
-    // Compute derived PBR IBL textures from queued environment maps
-    _services.pbrIbl.refresh();
-
-    _services.window.clear();
-
-    if (_video) {
-        _video->draw();
-    } else {
-        drawWorld();
-        drawGUI();
-        _services.window.drawCursor();
-    }
-
-    _profileOverlay.draw();
-    _services.window.swapBuffers();
-}
-
 void Game::drawWorld() {
     _services.worldRenderPipeline.render();
 }
@@ -370,48 +392,6 @@ void Game::setLoadFromSaveGame(bool load) {
     _loadFromSaveGame = load;
 }
 
-void Game::runMainLoop() {
-    _ticks = SDL_GetTicks();
-
-    while (!_quit) {
-        _services.window.processEvents(_quit);
-
-        if (_services.window.isInFocus()) {
-            update();
-            drawAll();
-        }
-    }
-}
-
-void Game::update() {
-    float dt = measureFrameTime();
-
-    if (_video) {
-        updateVideo(dt);
-    } else {
-        updateMusic();
-    }
-    if (!_nextModule.empty()) {
-        loadNextModule();
-    }
-    updateCamera(dt);
-
-    bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
-    if (updModule && !_paused) {
-        _module->update(dt);
-        _combat.update(dt);
-    }
-
-    GUI *gui = getScreenGUI();
-    if (gui) {
-        gui->update(dt);
-    }
-    updateSceneGraph(dt);
-    _services.audioPlayer.update(dt);
-
-    _profileOverlay.update(dt);
-}
-
 void Game::updateVideo(float dt) {
     _video->update(dt);
 
@@ -446,11 +426,6 @@ float Game::measureFrameTime() {
     _ticks = ticks;
 
     return dt * _gameSpeed;
-}
-
-void Game::deinit() {
-    _services.audioPlayer.deinit();
-    _services.window.deinit();
 }
 
 void Game::quit() {

@@ -23,8 +23,6 @@ namespace script {
 
 class ArgumentException : public std::logic_error {
 public:
-    ArgumentException() = default;
-
     ArgumentException(const std::string &message) :
         std::logic_error(message) {
     }
