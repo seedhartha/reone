@@ -229,6 +229,8 @@ void Module::onObjectClick(const shared_ptr<SpatialObject> &object) {
     case ObjectType::Placeable:
         onPlaceableClick(static_pointer_cast<Placeable>(object));
         break;
+    default:
+        break;
     }
 }
 

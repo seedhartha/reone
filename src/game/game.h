@@ -35,6 +35,7 @@
 #include "party.h"
 #include "script/routine/routines.h"
 #include "script/runner.h"
+#include "services.h"
 
 namespace reone {
 
@@ -46,36 +47,37 @@ class GUI;
 
 namespace game {
 
-struct Services;
-
-/**
- * Abstract game.
- */
 class Game : public graphics::IEventHandler, boost::noncopyable {
 public:
     Game(
         boost::filesystem::path path,
         Options options,
-        Services &services);
-
-    virtual ~Game() {
-        deinit();
+        Services &services) :
+        _path(std::move(path)),
+        _options(std::move(options)),
+        _services(services),
+        _party(*this),
+        _combat(*this, services),
+        _actionFactory(*this, services),
+        _objectFactory(*this, services),
+        _routines(*this, services),
+        _scriptRunner(_routines, services.scripts),
+        _console(*this, services),
+        _profileOverlay(services),
+        _map(*this, services) {
     }
+
+    virtual ~Game() = default;
 
     virtual void initResourceProviders() = 0;
 
     void init();
 
     /**
-     * Initializes the engine, run the main game loop and clean up on exit.
-     *
-     * @return the exit code
+     * @return exit code
      */
     int run();
 
-    /**
-     * Requests termination of the main game loop.
-     */
     void quit();
 
     void playVideo(const std::string &name);
@@ -115,19 +117,10 @@ public:
     // Module loading
 
     /**
-     * Loads a module with the specified name and entry point.
-     *
-     * @param name name of the module to load
-     * @param entry tag of the waypoint to spawn at, or empty string to use the default entry point
+     * @param entry waypoint tag to spawn at, or empty string to spawn at default location
      */
     void loadModule(const std::string &name, std::string entry = "");
 
-    /**
-     * Schedules transition to the specified module with the specified entry point.
-     *
-     * @param name name of the module to load
-     * @param entry tag of the waypoint to spawn at
-     */
     void scheduleModuleTransition(const std::string &moduleName, const std::string &entry);
 
     // END Module loading
@@ -255,8 +248,6 @@ protected:
     std::map<std::string, std::shared_ptr<Location>> _globalLocations;
 
     // END Globals/locals
-
-    void deinit();
 
     virtual void start() = 0;
 

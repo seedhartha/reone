@@ -240,7 +240,7 @@ public:
 
     // IAnimationEventListener
 
-    void onEventSignalled(const std::string &name);
+    void onEventSignalled(const std::string &name) override;
 
     // END IAnimationEventListener
 

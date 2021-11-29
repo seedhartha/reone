@@ -92,6 +92,8 @@ void GameModule::init() {
     _spells->init();
     _portraits->init();
     _game->init();
+
+    _graphics.window().setEventHandler(_game.get());
 }
 
 void GameModule::deinit() {

@@ -177,7 +177,7 @@ static FieldClassification getFieldData(const GffField &field, uint32_t &simple,
         return FieldClassification::Complex;
     }
     default:
-        throw logic_error("Unsupported field type: " + static_cast<int>(field.type));
+        throw logic_error("Unsupported field type: " + to_string(static_cast<int>(field.type)));
     }
 }
 
