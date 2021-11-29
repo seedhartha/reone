@@ -21,6 +21,8 @@
 
 namespace reone {
 
+void initLog();
+
 void error(const std::string &s, int channel = LogChannels::general);
 void error(const boost::format &s, int channel = LogChannels::general);
 void warn(const std::string &s, int channel = LogChannels::general);

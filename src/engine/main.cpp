@@ -16,7 +16,6 @@
  */
 
 #include "../common/logutil.h"
-#include "../common/threadutil.h"
 
 #include "engine.h"
 
@@ -25,7 +24,7 @@ using namespace std;
 using namespace reone;
 
 int main(int argc, char **argv) {
-    setThreadName("main");
+    initLog();
     try {
         return Engine(argc, argv).run();
     } catch (const exception &ex) {

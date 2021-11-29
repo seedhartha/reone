@@ -24,7 +24,6 @@ set(COMMON_HEADERS
     streamreader.h
     streamutil.h
     streamwriter.h
-    threadutil.h
     timer.h
     types.h
     unicodeutil.h)
@@ -36,12 +35,7 @@ set(COMMON_SOURCES
     streamreader.cpp
     streamutil.cpp
     streamwriter.cpp
-    threadutil.cpp
     unicodeutil.cpp)
-
-if(ENABLE_MULTITHREADING)
-    target_compile_definitions(common PUBLIC R_ENABLE_MULTITHREADING)
-endif()
 
 add_library(common STATIC ${COMMON_HEADERS} ${COMMON_SOURCES})
 set_target_properties(common PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
