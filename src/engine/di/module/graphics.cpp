@@ -22,7 +22,6 @@
 using namespace std;
 
 using namespace reone::graphics;
-using namespace reone::resource;
 
 namespace reone {
 
@@ -48,6 +47,17 @@ void GraphicsModule::init() {
     _materials->init();
     _shaders->init();
     _pbrIbl->init();
+}
+
+void GraphicsModule::deinit() {
+    _pbrIbl.reset();
+    _shaders.reset();
+    _materials.reset();
+    _textures.reset();
+    _meshes.reset();
+    _context.reset();
+    _window.reset();
+    _features.reset();
 }
 
 } // namespace reone

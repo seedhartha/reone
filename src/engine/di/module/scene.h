@@ -35,7 +35,10 @@ public:
         _graphics(graphics) {
     }
 
+    ~SceneModule() { deinit(); }
+
     void init();
+    void deinit();
 
     scene::SceneGraphs &sceneGraphs() { return *_sceneGraphs; }
     scene::WorldRenderPipeline &worldRenderPipeline() { return *_worldRenderPipeline; }

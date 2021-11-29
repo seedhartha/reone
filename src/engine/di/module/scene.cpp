@@ -26,7 +26,6 @@
 using namespace std;
 
 using namespace reone::game;
-using namespace reone::graphics;
 using namespace reone::kotor;
 using namespace reone::scene;
 
@@ -44,6 +43,7 @@ void SceneModule::init() {
         _graphics.shaders(),
         _graphics.textures());
 
+    // Init scenes
     _sceneGraphs->add(kSceneMain);
     _sceneGraphs->add(kSceneMainMenu);
     _sceneGraphs->add(kSceneCharGen);
@@ -52,14 +52,19 @@ void SceneModule::init() {
     }
     _sceneGraphs->add(kScenePortraitSelect);
     _sceneGraphs->add(kSceneCharacter);
-
     auto &mainScene = _sceneGraphs->get(kSceneMain);
 
     _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, mainScene, _graphics.context(), _graphics.meshes(), _graphics.shaders());
-    _worldRenderPipeline->init();
-
     _controlRenderPipeline = make_unique<ControlRenderPipeline>(*_sceneGraphs, _graphics.context(), _graphics.meshes(), _graphics.shaders());
+
+    _worldRenderPipeline->init();
     _controlRenderPipeline->init();
+}
+
+void SceneModule::deinit() {
+    _controlRenderPipeline.reset();
+    _worldRenderPipeline.reset();
+    _sceneGraphs.reset();
 }
 
 } // namespace reone

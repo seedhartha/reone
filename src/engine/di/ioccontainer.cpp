@@ -39,7 +39,7 @@ void IocContainer::init() {
     _game->init();
 }
 
-IocContainer::~IocContainer() {
+void IocContainer::deinit() {
     _game.reset();
     _script.reset();
     _scene.reset();

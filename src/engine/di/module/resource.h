@@ -30,7 +30,10 @@ public:
         _gamePath(std::move(gamePath)) {
     }
 
+    ~ResourceModule() { deinit(); }
+
     void init();
+    void deinit();
 
     resource::Gffs &gffs() { return *_gffs; }
     resource::Resources &resources() { return *_resources; }

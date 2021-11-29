@@ -21,13 +21,16 @@
 
 using namespace std;
 
-using namespace reone::resource;
 using namespace reone::script;
 
 namespace reone {
 
 void ScriptModule::init() {
     _scripts = make_unique<Scripts>(_resource.resources());
+}
+
+void ScriptModule::deinit() {
+    _scripts.reset();
 }
 
 } // namespace reone
