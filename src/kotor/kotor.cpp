@@ -446,11 +446,7 @@ void KotOR::getDefaultPartyMembers(string &member1, string &member2, string &mem
     Game::getDefaultPartyMembers(member1, member2, member3);
 }
 
-void KotOR::initScriptRoutines() {
-    fillScriptRoutines(_routines);
-}
-
-void KotOR::fillScriptRoutines(IRoutines &routines) {
+void fillScriptRoutinesKotOR(IRoutines &routines) {
     routines.add("Random", VT_I, {VT_I}, &routine::random);
     routines.add("PrintString", VT_V, {VT_S}, &routine::printString);
     routines.add("PrintFloat", VT_V, {VT_F, VT_I, VT_I}, &routine::printFloat);
@@ -1233,6 +1229,10 @@ void KotOR::fillScriptRoutines(IRoutines &routines) {
     routines.add("QueueMovie", VT_V, {VT_S, VT_I}, &routine::queueMovie);
     routines.add("PlayMovieQueue", VT_V, {VT_I}, &routine::playMovieQueue);
     routines.add("YavinHackCloseDoor", VT_V, {VT_O}, &routine::yavinHackCloseDoor);
+}
+
+void KotOR::initScriptRoutines() {
+    fillScriptRoutinesKotOR(_routines);
 }
 
 } // namespace kotor

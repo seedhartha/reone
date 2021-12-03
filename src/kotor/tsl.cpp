@@ -103,11 +103,7 @@ void TSL::getDefaultPartyMembers(string &member1, string &member2, string &membe
     Game::getDefaultPartyMembers(member1, member2, member3);
 }
 
-void TSL::initScriptRoutines() {
-    fillScriptRoutines(_routines);
-}
-
-void TSL::fillScriptRoutines(IRoutines &routines) {
+void fillScriptRoutinesTSL(IRoutines &routines) {
     routines.add("Random", VT_I, {VT_I}, &routine::random);
     routines.add("PrintString", VT_V, {VT_S}, &routine::printString);
     routines.add("PrintFloat", VT_V, {VT_F, VT_I, VT_I}, &routine::printFloat);
@@ -1005,6 +1001,10 @@ void TSL::fillScriptRoutines(IRoutines &routines) {
     routines.add("SavePUPByObject", VT_V, {VT_I, VT_O}, &routine::savePUPByObject);
     routines.add("GetIsPlayerMadeCharacter", VT_I, {VT_O}, &routine::getIsPlayerMadeCharacter);
     routines.add("RebuildPartyTable", VT_V, {}, &routine::rebuildPartyTable);
+}
+
+void TSL::initScriptRoutines() {
+    fillScriptRoutinesTSL(_routines);
 }
 
 } // namespace kotor

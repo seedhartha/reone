@@ -71,8 +71,6 @@ public:
 
     void setBarkBubbleText(std::string text, float durartion);
 
-    static void fillScriptRoutines(game::IRoutines &routines);
-
 protected:
     // GUI
 
