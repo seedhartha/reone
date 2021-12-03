@@ -17,12 +17,7 @@
 
 #include "player.h"
 
-#include "../common/logutil.h"
-
 #include "files.h"
-#include "soundhandle.h"
-#include "soundinstance.h"
-#include "stream.h"
 
 using namespace std;
 
@@ -30,64 +25,19 @@ namespace reone {
 
 namespace audio {
 
-static constexpr float kMaxPositionalSoundDistance = 16.0f;
-static constexpr float kMaxPositionalSoundDistance2 = kMaxPositionalSoundDistance * kMaxPositionalSoundDistance;
-
-void AudioPlayer::init() {
-    _device = alcOpenDevice(nullptr);
-    if (!_device) {
-        throw runtime_error("Failed to open an OpenAL device");
-    }
-    _context = alcCreateContext(_device, nullptr);
-    if (!_context) {
-        throw runtime_error("Failed to create an OpenAL context");
-    }
-    alcMakeContextCurrent(_context);
-}
-
-void AudioPlayer::deinit() {
-    if (_context) {
-        alcMakeContextCurrent(nullptr);
-        alcDestroyContext(_context);
-        _context = nullptr;
-    }
-    if (_device) {
-        alcCloseDevice(_device);
-        _device = nullptr;
-    }
-}
-
-void AudioPlayer::update(float dt) {
-    // Remove stopped sounds
-    auto maybeSounds = remove_if(
-        _sounds.begin(), _sounds.end(),
-        [](auto &sound) { return sound->handle()->isStopped(); });
-    _sounds.erase(maybeSounds, _sounds.end());
-
-    // Update listener position
-    if (_listenerPositionDirty) {
-        glm::vec3 position(_listenerPosition);
-        alListener3f(AL_POSITION, position.x, position.y, position.z);
-        _listenerPositionDirty = false;
-    }
-
-    // Update sounds, init them if not already
-    for (auto &sound : _sounds) {
-        if (sound->handle()->isNotInited()) {
-            sound->init();
-        }
-        sound->update();
-    }
-}
-
-shared_ptr<SoundHandle> AudioPlayer::play(const string &resRef, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
+shared_ptr<AudioSource> AudioPlayer::play(const string &resRef, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
     shared_ptr<AudioStream> stream(_audioFiles.get(resRef));
     if (!stream) {
         return nullptr;
     }
-    auto sound = make_shared<SoundInstance>(stream, loop, getGain(type, gain), positional, move(position));
-    enqueue(sound);
-    return sound->handle();
+    return play(move(stream), type, loop, gain, positional, move(position));
+}
+
+shared_ptr<AudioSource> AudioPlayer::play(shared_ptr<AudioStream> stream, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
+    auto source = make_shared<AudioSource>(move(stream), loop, getGain(type, gain), positional, move(position));
+    source->init();
+    source->play();
+    return move(source);
 }
 
 float AudioPlayer::getGain(AudioType type, float gain) const {
@@ -106,30 +56,10 @@ float AudioPlayer::getGain(AudioType type, float gain) const {
         volume = _options.movieVolume;
         break;
     default:
-        return 85.0f;
+        volume = 85.0f;
+        break;
     }
     return gain * (volume / 100.0f);
-}
-
-void AudioPlayer::enqueue(const shared_ptr<SoundInstance> &sound) {
-    _sounds.push_back(sound);
-}
-
-shared_ptr<SoundHandle> AudioPlayer::play(const shared_ptr<AudioStream> &stream, AudioType type, bool loop, float gain, bool positional, glm::vec3 position) {
-    if (positional && glm::distance2(_listenerPosition, position) > kMaxPositionalSoundDistance2) {
-        return nullptr;
-    }
-    auto sound = make_shared<SoundInstance>(stream, loop, getGain(type, gain), positional, move(position));
-    enqueue(sound);
-    return sound->handle();
-}
-
-void AudioPlayer::setListenerPosition(glm::vec3 position) {
-    if (_listenerPosition == position) {
-        return;
-    }
-    _listenerPosition = move(position);
-    _listenerPositionDirty = true;
 }
 
 } // namespace audio

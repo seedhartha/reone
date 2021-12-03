@@ -17,6 +17,7 @@
 
 #include "game.h"
 
+#include "../../audio/context.h"
 #include "../../audio/files.h"
 #include "../../audio/player.h"
 #include "../../common/collectionutil.h"
@@ -136,7 +137,6 @@ void Game::update() {
         gui->update(dt);
     }
     updateSceneGraph(dt);
-    _services.audioPlayer.update(dt);
 
     _profileOverlay.update(dt);
 }
@@ -302,9 +302,9 @@ void Game::playVideo(const string &name) {
 }
 
 void Game::playMusic(const string &resRef) {
-    if (_musicResRef == resRef)
+    if (_musicResRef == resRef) {
         return;
-
+    }
     if (_music) {
         _music->stop();
         _music.reset();
@@ -394,6 +394,9 @@ void Game::setLoadFromSaveGame(bool load) {
 
 void Game::updateVideo(float dt) {
     _video->update(dt);
+    if (_movieAudio) {
+        _movieAudio->update();
+    }
 
     if (_video->isFinished()) {
         if (_movieAudio) {
@@ -405,10 +408,12 @@ void Game::updateVideo(float dt) {
 }
 
 void Game::updateMusic() {
-    if (_musicResRef.empty())
+    if (_musicResRef.empty()) {
         return;
-
-    if (!_music || _music->isStopped()) {
+    }
+    if (_music && _music->isPlaying()) {
+        _music->update();
+    } else {
         _music = _services.audioPlayer.play(_musicResRef, AudioType::Music);
     }
 }
@@ -474,7 +479,7 @@ void Game::updateCamera(float dt) {
         } else {
             listenerPosition = camera->sceneNode()->absoluteTransform()[3];
         }
-        _services.audioPlayer.setListenerPosition(listenerPosition);
+        _services.audioContext.setListenerPosition(move(listenerPosition));
     }
 }
 

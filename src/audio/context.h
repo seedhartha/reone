@@ -15,41 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "soundhandle.h"
-
-using namespace std;
+#pragma once
 
 namespace reone {
 
 namespace audio {
 
-void SoundHandle::stop() {
-    _state = State::Stopped;
-}
+class AudioContext : public boost::noncopyable {
+public:
+    ~AudioContext() { deinit(); }
 
-void SoundHandle::resetPositionDirty() {
-    _positionDirty = false;
-}
+    void init();
+    void deinit();
 
-bool SoundHandle::isNotInited() const {
-    return _state == State::NotInited;
-}
+    void setListenerPosition(glm::vec3 position);
 
-bool SoundHandle::isStopped() const {
-    return _state == State::Stopped;
-}
+private:
+    ALCdevice *_device {nullptr};
+    ALCcontext *_context {nullptr};
 
-void SoundHandle::setState(State state) {
-    _state = state;
-}
-
-void SoundHandle::setPosition(glm::vec3 position) {
-    if (_position == position) {
-        return;
-    }
-    _position = move(position);
-    _positionDirty = true;
-}
+    glm::vec3 _listenerPosition {0.0f};
+};
 
 } // namespace audio
 

@@ -21,38 +21,51 @@ namespace reone {
 
 namespace audio {
 
-class SoundHandle : boost::noncopyable {
-public:
-    enum class State {
-        NotInited,
-        Playing,
-        Stopped
-    };
+class AudioStream;
 
-    SoundHandle(float duration, glm::vec3 position) :
-        _duration(duration),
+class AudioSource {
+public:
+    AudioSource(std::shared_ptr<AudioStream> stream, bool loop, float gain, bool positional, glm::vec3 position) :
+        _stream(std::move(stream)),
+        _loop(loop),
+        _gain(gain),
+        _positional(positional),
         _position(std::move(position)) {
     }
 
+    AudioSource(AudioSource &&) = default;
+    ~AudioSource() { deinit(); }
+
+    AudioSource &operator=(AudioSource &&) = default;
+
+    void init();
+    void update();
+
+    void play();
     void stop();
-    void resetPositionDirty();
 
-    bool isNotInited() const;
-    bool isStopped() const;
-    bool isPositionDirty() const { return _positionDirty; }
+    bool isPlaying() const { return _playing; }
 
-    float duration() const { return _duration; }
-    glm::vec3 position() const { return _position; }
+    float duration() const;
 
-    void setState(State state);
     void setPosition(glm::vec3 position);
 
 private:
-    float _duration;
+    std::shared_ptr<AudioStream> _stream;
+    bool _loop;
+    float _gain;
+    bool _positional;
     glm::vec3 _position;
 
-    State _state {State::NotInited};
-    bool _positionDirty {false};
+    bool _playing {false};
+
+    std::vector<uint32_t> _buffers;
+    bool _streaming {false};
+    uint32_t _source {0};
+    int _nextFrame {0};
+    int _nextBuffer {0};
+
+    void deinit();
 };
 
 } // namespace audio

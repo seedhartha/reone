@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../audio/soundhandle.h"
+#include "../../audio/source.h"
 #include "../../common/timer.h"
 #include "../../game/dialog.h"
 #include "../../game/object/spatial.h"
@@ -92,7 +92,7 @@ protected:
     virtual void onEntryEnded();
 
 private:
-    std::shared_ptr<audio::SoundHandle> _currentVoice;
+    std::shared_ptr<audio::AudioSource> _currentVoice;
     Timer _endEntryTimer;
     float _entryDuration {0.0f};
     std::vector<const game::Dialog::EntryReply *> _replies;

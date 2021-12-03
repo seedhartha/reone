@@ -47,6 +47,7 @@ class Window;
 
 namespace audio {
 
+class AudioContext;
 class AudioFiles;
 class AudioPlayer;
 
@@ -92,6 +93,7 @@ struct Services {
     SoundSets &soundSets;
     Surfaces &surfaces;
 
+    audio::AudioContext &audioContext;
     audio::AudioFiles &audioFiles;
     audio::AudioPlayer &audioPlayer;
     graphics::Context &context;
@@ -126,6 +128,7 @@ struct Services {
         Skills &skills,
         SoundSets &soundSets,
         Surfaces &surfaces,
+        audio::AudioContext &audioContext,
         audio::AudioFiles &audioFiles,
         audio::AudioPlayer &audioPlayer,
         graphics::Context &context,
@@ -159,6 +162,7 @@ struct Services {
         soundSets(soundSets),
         surfaces(surfaces),
 
+        audioContext(audioContext),
         audioFiles(audioFiles),
         audioPlayer(audioPlayer),
         context(context),

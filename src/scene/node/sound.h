@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../audio/soundhandle.h"
+#include "../../audio/source.h"
 
 #include "../node.h"
 
@@ -48,6 +48,8 @@ public:
         _audioPlayer(audioPlayer) {
     }
 
+    void update(float dt) override;
+
     void playSound(const std::string &resRef, float gain, bool positional, bool loop);
 
     bool isSoundPlaying() const;
@@ -67,7 +69,7 @@ private:
     float _maxDistance {0.0f};
     bool _audible {false};
 
-    std::shared_ptr<audio::SoundHandle> _sound;
+    std::shared_ptr<audio::AudioSource> _source;
 };
 
 } // namespace scene

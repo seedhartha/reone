@@ -27,13 +27,15 @@ namespace reone {
 
 void AudioModule::init() {
     _audioFiles = make_unique<AudioFiles>(_resource.resources());
+    _audioContext = make_unique<AudioContext>();
     _audioPlayer = make_unique<AudioPlayer>(_options, *_audioFiles);
 
-    _audioPlayer->init();
+    _audioContext->init();
 }
 
 void AudioModule::deinit() {
     _audioPlayer.reset();
+    _audioContext.reset();
     _audioFiles.reset();
 }
 

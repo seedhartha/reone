@@ -18,6 +18,7 @@
 #pragma once
 
 #include "options.h"
+#include "source.h"
 #include "types.h"
 
 namespace reone {
@@ -26,8 +27,6 @@ namespace audio {
 
 class AudioFiles;
 class AudioStream;
-class SoundHandle;
-class SoundInstance;
 
 class AudioPlayer : boost::noncopyable {
 public:
@@ -36,31 +35,12 @@ public:
         _audioFiles(audioFiles) {
     }
 
-    ~AudioPlayer() { deinit(); }
-
-    void init();
-    void deinit();
-
-    void update(float dt);
-
-    std::shared_ptr<SoundHandle> play(const std::string &resRef, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f));
-    std::shared_ptr<SoundHandle> play(const std::shared_ptr<AudioStream> &stream, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f));
-
-    void setListenerPosition(glm::vec3 position);
+    std::shared_ptr<AudioSource> play(const std::string &resRef, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f));
+    std::shared_ptr<AudioSource> play(std::shared_ptr<AudioStream> stream, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f));
 
 private:
     AudioOptions _options;
     AudioFiles &_audioFiles;
-
-    ALCdevice *_device {nullptr};
-    ALCcontext *_context {nullptr};
-
-    glm::vec3 _listenerPosition {0.0f};
-    bool _listenerPositionDirty {false};
-
-    std::vector<std::shared_ptr<SoundInstance>> _sounds;
-
-    void enqueue(const std::shared_ptr<SoundInstance> &sound);
 
     float getGain(AudioType type, float gain) const;
 };

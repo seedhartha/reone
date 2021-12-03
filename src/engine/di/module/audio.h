@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../../audio/context.h"
 #include "../../audio/files.h"
 #include "../../audio/options.h"
 #include "../../audio/player.h"
@@ -37,6 +38,7 @@ public:
     void init();
     void deinit();
 
+    audio::AudioContext &audioContext() { return *_audioContext; }
     audio::AudioFiles &audioFiles() { return *_audioFiles; }
     audio::AudioPlayer &audioPlayer() { return *_audioPlayer; }
 
@@ -44,6 +46,7 @@ private:
     audio::AudioOptions _options;
     ResourceModule &_resource;
 
+    std::unique_ptr<audio::AudioContext> _audioContext;
     std::unique_ptr<audio::AudioFiles> _audioFiles;
     std::unique_ptr<audio::AudioPlayer> _audioPlayer;
 };

@@ -34,7 +34,6 @@ public:
     };
 
     void add(Frame &&frame);
-    void fill(int frameIdx, uint32_t buffer);
 
     int getFrameCount() const;
     const Frame &getFrame(int index) const;
