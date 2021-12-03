@@ -35,8 +35,6 @@ public:
 
     bool isTSL() const override { return true; }
 
-    static void fillScriptRoutines(game::IRoutines &routines);
-
 private:
     void initScriptRoutines() override;
 

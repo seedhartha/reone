@@ -22,8 +22,6 @@
 #include "../../common/collectionutil.h"
 #include "../../common/exception/validation.h"
 #include "../../game/script/routine/routines.h"
-#include "../../kotor/kotor.h"
-#include "../../kotor/tsl.h"
 #include "../../script/format/ncsreader.h"
 #include "../../script/format/ncswriter.h"
 #include "../../script/instrutil.h"
@@ -34,13 +32,19 @@
 using namespace std;
 
 using namespace reone::game;
-using namespace reone::kotor;
 using namespace reone::resource;
 using namespace reone::script;
 
 namespace fs = boost::filesystem;
 
 namespace reone {
+
+namespace kotor {
+
+extern void fillScriptRoutinesKotOR(game::IRoutines &routines);
+extern void fillScriptRoutinesTSL(game::IRoutines &routines);
+
+} // namespace kotor
 
 class StubRoutines : public IRoutines {
 public:
@@ -443,9 +447,9 @@ bool NcsTool::supports(Operation operation, const fs::path &target) const {
 
 void NcsTool::fillRoutines(IRoutines &routines) {
     if (_gameId == GameID::TSL) {
-        TSL::fillScriptRoutines(routines);
+        kotor::fillScriptRoutinesTSL(routines);
     } else {
-        KotOR::fillScriptRoutines(routines);
+        kotor::fillScriptRoutinesKotOR(routines);
     }
 }
 
