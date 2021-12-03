@@ -15,11 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "soundinstance.h"
+#include "source.h"
 
-#include "../common/logutil.h"
-
-#include "soundhandle.h"
 #include "stream.h"
 
 using namespace std;
@@ -30,52 +27,61 @@ namespace audio {
 
 static constexpr int kMaxBufferCount = 8;
 
-SoundInstance::SoundInstance(shared_ptr<AudioStream> stream, bool loop, float gain, bool positional, glm::vec3 position) :
-    _stream(stream),
-    _loop(loop),
-    _gain(gain),
-    _positional(positional),
-    _handle(make_shared<SoundHandle>(stream->duration(), move(position))) {
+static int getALFormat(AudioFormat format) {
+    switch (format) {
+    case AudioFormat::Mono8:
+        return AL_FORMAT_MONO8;
+    case AudioFormat::Mono16:
+        return AL_FORMAT_MONO16;
+    case AudioFormat::Stereo8:
+        return AL_FORMAT_STEREO8;
+    case AudioFormat::Stereo16:
+        return AL_FORMAT_STEREO16;
+    default:
+        throw logic_error("Unknown audio format: " + to_string(static_cast<int>(format)));
+    }
 }
 
-void SoundInstance::init() {
+static void fillBuffer(const AudioStream::Frame &frame, uint32_t buffer) {
+    alBufferData(
+        buffer,
+        getALFormat(frame.format),
+        &frame.samples[0],
+        static_cast<int>(frame.samples.size()),
+        frame.sampleRate);
+}
+
+void AudioSource::init() {
     int frameCount = _stream->getFrameCount();
     int bufferCount = min(max(frameCount, 1), kMaxBufferCount);
 
     _buffers.resize(bufferCount);
-    _buffered = bufferCount > 1;
+    _streaming = bufferCount > 1;
 
     alGenBuffers(bufferCount, &_buffers[0]);
     alGenSources(1, &_source);
     alSourcef(_source, AL_GAIN, _gain);
 
     if (_positional) {
-        glm::vec3 position(_handle->position());
-        alSource3f(_source, AL_POSITION, position.x, position.y, position.z);
+        alSource3f(_source, AL_POSITION, _position.x, _position.y, _position.z);
     } else {
         alSourcei(_source, AL_SOURCE_RELATIVE, AL_TRUE);
     }
-    if (_buffered) {
+    if (_streaming) {
         for (int i = 0; i < bufferCount; ++i) {
-            _stream->fill(_nextFrame, _buffers[i]);
-            ++_nextFrame;
+            auto &frame = _stream->getFrame(_nextFrame++);
+            fillBuffer(frame, _buffers[i]);
         }
         alSourceQueueBuffers(_source, bufferCount, &_buffers[0]);
     } else {
-        _stream->fill(0, _buffers[0]);
+        auto &frame = _stream->getFrame(0);
+        fillBuffer(frame, _buffers[0]);
         alSourcei(_source, AL_BUFFER, _buffers[0]);
         alSourcei(_source, AL_LOOPING, _loop);
     }
-
-    alSourcePlay(_source);
-    _handle->setState(SoundHandle::State::Playing);
 }
 
-SoundInstance::~SoundInstance() {
-    deinit();
-}
-
-void SoundInstance::deinit() {
+void AudioSource::deinit() {
     if (_source) {
         alSourceStop(_source);
         alDeleteSources(1, &_source);
@@ -87,17 +93,12 @@ void SoundInstance::deinit() {
     }
 }
 
-void SoundInstance::update() {
-    if (_positional && _handle->isPositionDirty()) {
-        glm::vec3 position(_handle->position());
-        alSource3f(_source, AL_POSITION, position.x, position.y, position.z);
-        _handle->resetPositionDirty();
-    }
-    if (!_buffered) {
+void AudioSource::update() {
+    if (!_streaming) {
         ALint state = 0;
         alGetSourcei(_source, AL_SOURCE_STATE, &state);
         if (state == AL_STOPPED) {
-            _handle->setState(SoundHandle::State::Stopped);
+            _playing = false;
         }
         return;
     }
@@ -109,7 +110,8 @@ void SoundInstance::update() {
             _nextFrame = 0;
         }
         if (_nextFrame < _stream->getFrameCount()) {
-            _stream->fill(_nextFrame++, _buffers[_nextBuffer]);
+            auto &frame = _stream->getFrame(_nextFrame++);
+            fillBuffer(frame, _buffers[_nextBuffer]);
             alSourceQueueBuffers(_source, 1, &_buffers[_nextBuffer]);
         }
         _nextBuffer = (_nextBuffer + 1) % static_cast<int>(_buffers.size());
@@ -117,8 +119,37 @@ void SoundInstance::update() {
     ALint queued = 0;
     alGetSourcei(_source, AL_BUFFERS_QUEUED, &queued);
     if (queued == 0) {
-        _handle->setState(SoundHandle::State::Stopped);
+        _playing = false;
     }
+}
+
+void AudioSource::play() {
+    if (!_source) {
+        return;
+    }
+    alSourcePlay(_source);
+    _playing = true;
+}
+
+void AudioSource::stop() {
+    if (_source) {
+        alSourceStop(_source);
+    }
+    _playing = false;
+}
+
+float AudioSource::duration() const {
+    return _stream->duration();
+}
+
+void AudioSource::setPosition(glm::vec3 position) {
+    if (_position == position) {
+        return;
+    }
+    if (_source && _positional) {
+        alSource3f(_source, AL_POSITION, position.x, position.y, position.z);
+    }
+    _position = move(position);
 }
 
 } // namespace audio

@@ -14,23 +14,23 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(AUDIO_HEADERS
+    context.h
     files.h
     format/mp3reader.h
     format/wavreader.h
     options.h
     player.h
-    soundhandle.h
-    soundinstance.h
+    source.h
     stream.h
     types.h)
 
 set(AUDIO_SOURCES
+    context.cpp
     files.cpp
     format/mp3reader.cpp
     format/wavreader.cpp
     player.cpp
-    soundhandle.cpp
-    soundinstance.cpp
+    source.cpp
     stream.cpp)
 
 add_library(audio STATIC ${AUDIO_HEADERS} ${AUDIO_SOURCES})

@@ -28,29 +28,6 @@ void AudioStream::add(Frame &&frame) {
     _frames.push_back(move(frame));
 }
 
-void AudioStream::fill(int frameIdx, uint32_t buffer) {
-    if (frameIdx >= _frames.size()) {
-        throw out_of_range("Frame index out of range: " + to_string(frameIdx));
-    }
-    Frame &frame = _frames[frameIdx];
-    alBufferData(buffer, getALAudioFormat(frame.format), &frame.samples[0], static_cast<int>(frame.samples.size()), frame.sampleRate);
-}
-
-int AudioStream::getALAudioFormat(AudioFormat format) const {
-    switch (format) {
-    case AudioFormat::Mono8:
-        return AL_FORMAT_MONO8;
-    case AudioFormat::Mono16:
-        return AL_FORMAT_MONO16;
-    case AudioFormat::Stereo8:
-        return AL_FORMAT_STEREO8;
-    case AudioFormat::Stereo16:
-        return AL_FORMAT_STEREO16;
-    default:
-        throw logic_error("Unknown audio format: " + to_string(static_cast<int>(format)));
-    }
-}
-
 int AudioStream::getFrameCount() const {
     return static_cast<int>(_frames.size());
 }

@@ -58,6 +58,7 @@ void GameModule::init() {
         *_skills,
         *_soundSets,
         *_surfaces,
+        _audio.audioContext(),
         _audio.audioFiles(),
         _audio.audioPlayer(),
         _graphics.context(),

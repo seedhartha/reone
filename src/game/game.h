@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../audio/soundhandle.h"
+#include "../../audio/source.h"
 #include "../../graphics/eventhandler.h"
 #include "../../video/video.h"
 
@@ -235,8 +235,8 @@ protected:
     // Audio
 
     std::string _musicResRef;
-    std::shared_ptr<audio::SoundHandle> _music;
-    std::shared_ptr<audio::SoundHandle> _movieAudio;
+    std::shared_ptr<audio::AudioSource> _music;
+    std::shared_ptr<audio::AudioSource> _movieAudio;
 
     // END Audio
 

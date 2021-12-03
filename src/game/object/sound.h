@@ -19,10 +19,13 @@
 
 #include "spatial.h"
 
-#include "../../audio/soundhandle.h"
-#include "../../resource/format/gffreader.h"
-
 namespace reone {
+
+namespace resource {
+
+class GffStruct;
+
+}
 
 namespace game {
 

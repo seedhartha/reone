@@ -312,7 +312,7 @@ void Conversation::update(float dt) {
     GameGUI::update(dt);
 
     if (!_entryEnded &&
-        ((_currentVoice && _currentVoice->isStopped()) || _endEntryTimer.advance(dt))) {
+        ((_currentVoice && !_currentVoice->isPlaying()) || _endEntryTimer.advance(dt))) {
 
         endCurrentEntry();
     }

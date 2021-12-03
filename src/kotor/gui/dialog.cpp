@@ -19,7 +19,7 @@
 
 #include "../../audio/files.h"
 #include "../../audio/player.h"
-#include "../../audio/soundhandle.h"
+#include "../../audio/source.h"
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
 #include "../../game/party.h"

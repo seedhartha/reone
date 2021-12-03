@@ -27,21 +27,28 @@ namespace reone {
 
 namespace scene {
 
+void SoundSceneNode::update(float dt) {
+    SceneNode::update(dt);
+    if (_source) {
+        _source->update();
+    }
+}
+
 void SoundSceneNode::playSound(const string &resRef, float gain, bool positional, bool loop) {
-    _sound = _audioPlayer.play(resRef, AudioType::Sound, loop, gain, positional, _absTransform[3]);
+    _source = _audioPlayer.play(resRef, AudioType::Sound, loop, gain, positional, _absTransform[3]);
 }
 
 bool SoundSceneNode::isSoundPlaying() const {
-    return _sound && !_sound->isStopped();
+    return _source && _source->isPlaying();
 }
 
 void SoundSceneNode::setAudible(bool audible) {
     if (_audible == audible) {
         return;
     }
-    if (!audible && _sound) {
-        _sound->stop();
-        _sound.reset();
+    if (!audible && _source) {
+        _source->stop();
+        _source.reset();
     }
     _audible = audible;
 }
