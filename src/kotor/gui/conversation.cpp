@@ -311,6 +311,9 @@ bool Conversation::handleKeyUp(const SDL_KeyboardEvent &event) {
 void Conversation::update(float dt) {
     GameGUI::update(dt);
 
+    if (_currentVoice) {
+        _currentVoice->update();
+    }
     if (!_entryEnded &&
         ((_currentVoice && !_currentVoice->isPlaying()) || _endEntryTimer.advance(dt))) {
 

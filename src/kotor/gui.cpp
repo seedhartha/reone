@@ -57,16 +57,6 @@ GameGUI::GameGUI(KotOR &game, Services &services) :
     _services(services) {
 }
 
-void GameGUI::onClick(const string &control) {
-    _services.audioPlayer.play(_services.guiSounds.getOnClick(), AudioType::Sound);
-}
-
-void GameGUI::onFocusChanged(const string &control, bool focus) {
-    if (focus) {
-        _services.audioPlayer.play(_services.guiSounds.getOnEnter(), AudioType::Sound);
-    }
-}
-
 void GameGUI::initForGame() {
     if (_game.isTSL()) {
         _resolutionX = 800;
@@ -77,8 +67,12 @@ void GameGUI::initForGame() {
     }
 }
 
-string GameGUI::getResRef(const std::string &base) const {
-    return _game.isTSL() ? base + "_p" : base;
+void GameGUI::update(float dt) {
+    GUI::update(dt);
+
+    if (_audioSource) {
+        _audioSource->update();
+    }
 }
 
 void GameGUI::loadBackground(BackgroundType type) {
@@ -122,6 +116,20 @@ void GameGUI::loadBackground(BackgroundType type) {
     }
 
     _background = _textures.get(resRef, TextureUsage::Diffuse);
+}
+
+string GameGUI::getResRef(const std::string &base) const {
+    return _game.isTSL() ? base + "_p" : base;
+}
+
+void GameGUI::onClick(const string &control) {
+    _audioSource = _services.audioPlayer.play(_services.guiSounds.getOnClick(), AudioType::Sound);
+}
+
+void GameGUI::onFocusChanged(const string &control, bool focus) {
+    if (focus) {
+        _audioSource = _services.audioPlayer.play(_services.guiSounds.getOnEnter(), AudioType::Sound);
+    }
 }
 
 } // namespace kotor

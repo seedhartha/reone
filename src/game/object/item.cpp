@@ -47,18 +47,28 @@ void Item::loadFromBlueprint(const string &resRef) {
     }
 }
 
+void Item::update(float dt) {
+    if (_audioSource) {
+        _audioSource->update();
+    }
+}
+
 void Item::playShotSound(int variant, glm::vec3 position) {
-    if (_ammunitionType) {
-        shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1);
-        if (sound) {
-            _services.audioPlayer.play(sound, AudioType::Sound, false, 1.0f, true, move(position));
-        }
+    if (!_ammunitionType) {
+        return;
+    }
+    shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->shotSound2 : _ammunitionType->shotSound1);
+    if (sound) {
+        _audioSource = _services.audioPlayer.play(sound, AudioType::Sound, false, 1.0f, true, move(position));
     }
 }
 
 void Item::playImpactSound(int variant, glm::vec3 position) {
-    if (_ammunitionType) {
-        shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1);
+    if (!_ammunitionType) {
+        return;
+    }
+    shared_ptr<AudioStream> sound(variant == 1 ? _ammunitionType->impactSound2 : _ammunitionType->impactSound1);
+    if (sound) {
         _services.audioPlayer.play(sound, AudioType::Sound, false, 1.0f, true, move(position));
     }
 }
