@@ -32,7 +32,7 @@ const Walkmesh::Face *Walkmesh::raycast(
 
     // For area walkmeshes, find intersection via AABB tree
     if (_rootAabb) {
-        return raycastAABB(walkcheckSurfaces, *_rootAabb, origin, dir, maxDistance, outDistance);
+        return raycastAABB(walkcheckSurfaces, origin, dir, maxDistance, outDistance);
     }
 
     // For placeable and door walkmeshes, test all faces for intersection
@@ -50,7 +50,6 @@ const Walkmesh::Face *Walkmesh::raycast(
 
 const Walkmesh::Face *Walkmesh::raycastAABB(
     set<uint32_t> walkcheckSurfaces,
-    AABB &aabb,
     const glm::vec3 &origin,
     const glm::vec3 &dir,
     float maxDistance,
@@ -58,34 +57,34 @@ const Walkmesh::Face *Walkmesh::raycastAABB(
 
     float distance = 0.0f;
 
-    // For AABB tree leafs, find ray/face intersection
-    if (aabb.faceIdx != -1) {
-        const Face &face = _faces[aabb.faceIdx];
-        if (raycastFace(walkcheckSurfaces, face, origin, dir, maxDistance, distance)) {
-            outDistance = distance;
-            return &face;
-        }
-        return nullptr;
-    }
+    stack<AABB *> aabbs;
+    aabbs.push(_rootAabb.get());
 
-    // For AABB tree nodes, find ray/AABB intersection
-    if (!aabb.value.raycast(origin, dir, maxDistance, distance)) {
-        return nullptr;
-    }
+    while (!aabbs.empty()) {
+        auto aabb = aabbs.top();
+        aabbs.pop();
 
-    // Find intersection with child AABB nodes
-    if (aabb.child1) {
-        auto face = raycastAABB(walkcheckSurfaces, *aabb.child1, origin, dir, maxDistance, distance);
-        if (face) {
-            outDistance = distance;
-            return face;
+        // Test ray/face intersection for tree leafs
+        if (aabb->faceIdx != -1) {
+            const Face &face = _faces[aabb->faceIdx];
+            if (raycastFace(walkcheckSurfaces, face, origin, dir, maxDistance, distance)) {
+                outDistance = distance;
+                return &face;
+            }
+            continue;
         }
-    }
-    if (aabb.child2) {
-        auto face = raycastAABB(walkcheckSurfaces, *aabb.child2, origin, dir, maxDistance, distance);
-        if (face) {
-            outDistance = distance;
-            return face;
+
+        // Test ray/AABB intersection
+        if (!aabb->value.raycast(origin, dir, maxDistance, distance)) {
+            continue;
+        }
+
+        // Find intersection with child AABB nodes
+        if (aabb->child1) {
+            aabbs.push(aabb->child1.get());
+        }
+        if (aabb->child2) {
+            aabbs.push(aabb->child2.get());
         }
     }
 
