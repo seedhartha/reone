@@ -175,9 +175,17 @@ bool Creature::isSelectable() const {
 
 void Creature::update(float dt) {
     SpatialObject::update(dt);
+
     updateModelAnimation();
     updateHealth();
     updateCombat(dt);
+
+    if (_audioSourceVoice) {
+        _audioSourceVoice->update();
+    }
+    if (_audioSourceFootstep) {
+        _audioSourceFootstep->update();
+    }
 }
 
 void Creature::updateModelAnimation() {
@@ -455,14 +463,15 @@ void Creature::giveXP(int amount) {
 }
 
 void Creature::playSound(SoundSetEntry entry, bool positional) {
-    if (!_soundSet)
+    if (!_soundSet) {
         return;
-
-    auto maybeSound = _soundSet->find(entry);
-    if (maybeSound != _soundSet->end()) {
-        glm::vec3 position(_position + 1.7f);
-        _services.audioPlayer.play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
     }
+    auto maybeSound = _soundSet->find(entry);
+    if (maybeSound == _soundSet->end()) {
+        return;
+    }
+    glm::vec3 position(_position + 1.7f);
+    _audioSourceVoice = _services.audioPlayer.play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
 }
 
 void Creature::die() {
@@ -651,36 +660,39 @@ void Creature::setAppliedForce(glm::vec3 force) {
 }
 
 void Creature::onEventSignalled(const string &name) {
-    if (name == "snd_footstep" && _footstepType != -1 && _walkmeshMaterial != -1) {
-        shared_ptr<FootstepTypeSounds> sounds(_services.footstepSounds.get(_footstepType));
-        if (sounds) {
-            const Surface &surface = _services.surfaces.getSurface(_walkmeshMaterial);
-            vector<shared_ptr<AudioStream>> materialSounds;
-            if (surface.sound == "DT") {
-                materialSounds = sounds->dirt;
-            } else if (surface.sound == "GR") {
-                materialSounds = sounds->grass;
-            } else if (surface.sound == "ST") {
-                materialSounds = sounds->stone;
-            } else if (surface.sound == "WD") {
-                materialSounds = sounds->wood;
-            } else if (surface.sound == "WT") {
-                materialSounds = sounds->water;
-            } else if (surface.sound == "CP") {
-                materialSounds = sounds->carpet;
-            } else if (surface.sound == "MT") {
-                materialSounds = sounds->metal;
-            } else if (surface.sound == "LV") {
-                materialSounds = sounds->leaves;
-            }
-            int index = random(0, 3);
-            if (index < static_cast<int>(materialSounds.size())) {
-                shared_ptr<AudioStream> sound(materialSounds[index]);
-                if (sound) {
-                    _services.audioPlayer.play(sound, AudioType::Sound, false, 1.0f, true, _position);
-                }
-            }
-        }
+    if (_footstepType == -1 || _walkmeshMaterial == -1 || name != "snd_footstep") {
+        return;
+    }
+    shared_ptr<FootstepTypeSounds> sounds(_services.footstepSounds.get(_footstepType));
+    if (!sounds) {
+        return;
+    }
+    const Surface &surface = _services.surfaces.getSurface(_walkmeshMaterial);
+    vector<shared_ptr<AudioStream>> materialSounds;
+    if (surface.sound == "DT") {
+        materialSounds = sounds->dirt;
+    } else if (surface.sound == "GR") {
+        materialSounds = sounds->grass;
+    } else if (surface.sound == "ST") {
+        materialSounds = sounds->stone;
+    } else if (surface.sound == "WD") {
+        materialSounds = sounds->wood;
+    } else if (surface.sound == "WT") {
+        materialSounds = sounds->water;
+    } else if (surface.sound == "CP") {
+        materialSounds = sounds->carpet;
+    } else if (surface.sound == "MT") {
+        materialSounds = sounds->metal;
+    } else if (surface.sound == "LV") {
+        materialSounds = sounds->leaves;
+    }
+    int index = random(0, 3);
+    if (index >= static_cast<int>(materialSounds.size())) {
+        return;
+    }
+    shared_ptr<AudioStream> sound(materialSounds[index]);
+    if (sound) {
+        _audioSourceFootstep = _services.audioPlayer.play(sound, AudioType::Sound, false, 1.0f, true, _position);
     }
 }
 

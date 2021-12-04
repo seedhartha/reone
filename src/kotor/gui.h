@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../audio/source.h"
 #include "../game/types.h"
 #include "../gui/gui.h"
 
@@ -41,6 +42,8 @@ protected:
 
     void initForGame();
 
+    void update(float dt) override;
+
     std::string getResRef(const std::string &base) const;
 
 protected:
@@ -50,6 +53,8 @@ protected:
     void loadBackground(game::BackgroundType type);
 
 private:
+    std::shared_ptr<audio::AudioSource> _audioSource;
+
     void onClick(const std::string &control) override;
     void onFocusChanged(const std::string &control, bool focus) override;
 };

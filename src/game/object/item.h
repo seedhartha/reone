@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "../../audio/source.h"
 #include "../../audio/stream.h"
 #include "../../graphics/model.h"
 #include "../../graphics/texture.h"
@@ -54,6 +55,8 @@ public:
     }
 
     void loadFromBlueprint(const std::string &resRef);
+
+    void update(float dt) override;
 
     void playShotSound(int variant, glm::vec3 position);
     void playImpactSound(int variant, glm::vec3 position);
@@ -119,6 +122,8 @@ private:
     int _addCost {0};
     std::string _description;
     bool _stolen {false};
+
+    std::shared_ptr<audio::AudioSource> _audioSource;
 
     // Blueprint
 

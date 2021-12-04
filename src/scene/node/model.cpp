@@ -147,8 +147,6 @@ unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(shared_ptr<Mode
 }
 
 void ModelSceneNode::signalEvent(const string &name) {
-    debug(boost::format("Model '%s': event '%s' signalled") % _model->name() % name);
-
     if (name == "detonate") {
         for (auto &node : _nodeByNumber) {
             if (node.second->type() == SceneNodeType::Emitter) {
@@ -330,6 +328,7 @@ void ModelSceneNode::updateAnimationChannel(AnimationChannel &channel, float dt)
     float length = channel.lipAnim ? channel.lipAnim->length() : channel.anim->length();
 
     // Advance time
+    float oldTime = channel.time;
     channel.time = glm::min(length, channel.time + channel.properties.speed * dt);
 
     // Clear transition flag if past transition time
@@ -339,7 +338,7 @@ void ModelSceneNode::updateAnimationChannel(AnimationChannel &channel, float dt)
 
     // Signal events between previous and current time
     for (auto &event : channel.anim->events()) {
-        if (event.time > channel.time && event.time <= channel.time) {
+        if (event.time > oldTime && event.time <= channel.time) {
             signalEvent(event.name);
         }
     }
