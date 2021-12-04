@@ -64,7 +64,6 @@ private:
 
     const Walkmesh::Face *raycastAABB(
         std::set<uint32_t> walkcheckSurfaces,
-        AABB &aabb,
         const glm::vec3 &origin,
         const glm::vec3 &dir,
         float maxDistance,
