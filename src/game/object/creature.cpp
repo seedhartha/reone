@@ -708,7 +708,7 @@ bool Creature::navigateTo(const glm::vec3 &dest, bool run, float distance, float
     if (_movementRestricted)
         return false;
 
-    float distToDest2 = getDistanceTo2(glm::vec2(dest));
+    float distToDest2 = getSquareDistanceTo(glm::vec2(dest));
     if (distToDest2 <= distance * distance) {
         setMovementType(Creature::MovementType::None);
         clearPath();

@@ -52,11 +52,15 @@ public:
         float maxDistance,
         float &outDistance) const;
 
+    bool isAreaWalkmesh() const { return _area; }
+
     const std::vector<Face> &faces() const { return _faces; }
 
 private:
     std::vector<Face> _faces;
     std::shared_ptr<AABB> _rootAabb;
+
+    bool _area {false};
 
     const Walkmesh::Face *raycastAABB(
         std::set<uint32_t> walkcheckSurfaces,

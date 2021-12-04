@@ -911,7 +911,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
 
     for (auto &object : _objectsByType[ObjectType::Trigger]) {
         auto trigger = static_pointer_cast<Trigger>(object);
-        if (trigger->getDistanceTo2(position2d) > kDefaultRaycastDistance2)
+        if (trigger->getSquareDistanceTo(position2d) > kDefaultRaycastDistance2)
             continue;
         if (trigger->isTenant(triggerrer) || !trigger->isIn(position2d))
             continue;
@@ -1096,7 +1096,7 @@ vector<shared_ptr<SpatialObject>> Area::getSelectableObjects() const {
         if (!model || !model->isVisible())
             continue;
 
-        float dist2 = object->getDistanceTo2(origin);
+        float dist2 = object->getSquareDistanceTo(origin);
         if (dist2 > kSelectionDistance * kSelectionDistance)
             continue;
 
@@ -1131,7 +1131,7 @@ shared_ptr<SpatialObject> Area::getNearestObject(const glm::vec3 &origin, int nt
 
     for (auto &object : _objects) {
         if (predicate(object)) {
-            candidates.push_back(make_pair(object, object->getDistanceTo2(origin)));
+            candidates.push_back(make_pair(object, object->getSquareDistanceTo(origin)));
         }
     }
     sort(candidates.begin(), candidates.end(), [](auto &left, auto &right) { return left.second < right.second; });
@@ -1151,7 +1151,7 @@ shared_ptr<Creature> Area::getNearestCreature(const std::shared_ptr<SpatialObjec
     for (auto &object : getObjectsByType(ObjectType::Creature)) {
         auto creature = static_pointer_cast<Creature>(object);
         if (matchesCriterias(*creature, criterias, target)) {
-            float distance2 = creature->getDistanceTo2(*target);
+            float distance2 = creature->getSquareDistanceTo(*target);
             candidates.push_back(make_pair(move(creature), distance2));
         }
     }
@@ -1241,7 +1241,7 @@ shared_ptr<Creature> Area::getNearestCreatureToLocation(const Location &location
     for (auto &object : getObjectsByType(ObjectType::Creature)) {
         auto creature = static_pointer_cast<Creature>(object);
         if (matchesCriterias(*creature, criterias)) {
-            float distance2 = creature->getDistanceTo2(location.position());
+            float distance2 = creature->getSquareDistanceTo(location.position());
             candidates.push_back(make_pair(move(creature), distance2));
         }
     }
@@ -1280,7 +1280,7 @@ void Area::doUpdatePerception() {
             bool heard = false;
             bool seen = false;
 
-            float distance2 = creature->getDistanceTo2(*other);
+            float distance2 = creature->getSquareDistanceTo(*other);
             if (distance2 <= hearingRange2) {
                 heard = true;
             }
@@ -1336,7 +1336,7 @@ shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
             continue;
 
         // Distance to object must not exceed maximum collision distance
-        if (o->getDistanceTo2(start) > kMaxCollisionDistance2)
+        if (o->getSquareDistanceTo(start) > kMaxCollisionDistance2)
             continue;
 
         // Test object AABB (object space)

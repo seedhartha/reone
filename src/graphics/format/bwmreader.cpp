@@ -67,6 +67,7 @@ void BwmReader::doLoad() {
     }
 
     _walkmesh = make_shared<Walkmesh>();
+    _walkmesh->_area = _type == WalkmeshType::WOK;
 
     loadVertices();
     loadIndices();

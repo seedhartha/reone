@@ -88,7 +88,7 @@ float SpatialObject::getDistanceTo(const glm::vec2 &point) const {
     return glm::distance(glm::vec2(_position), point);
 }
 
-float SpatialObject::getDistanceTo2(const glm::vec2 &point) const {
+float SpatialObject::getSquareDistanceTo(const glm::vec2 &point) const {
     return glm::distance2(glm::vec2(_position), point);
 }
 
@@ -96,7 +96,7 @@ float SpatialObject::getDistanceTo(const glm::vec3 &point) const {
     return glm::distance(_position, point);
 }
 
-float SpatialObject::getDistanceTo2(const glm::vec3 &point) const {
+float SpatialObject::getSquareDistanceTo(const glm::vec3 &point) const {
     return glm::distance2(_position, point);
 }
 
@@ -104,7 +104,7 @@ float SpatialObject::getDistanceTo(const SpatialObject &other) const {
     return glm::distance(_position, other._position);
 }
 
-float SpatialObject::getDistanceTo2(const SpatialObject &other) const {
+float SpatialObject::getSquareDistanceTo(const SpatialObject &other) const {
     return glm::distance2(_position, other._position);
 }
 
