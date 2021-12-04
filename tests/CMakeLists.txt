@@ -15,7 +15,6 @@
 
 set(TEST_SOURCES
     common/cache.cpp
-    common/mediastream.cpp
     common/streamreader.cpp
     common/timer.cpp
     common/unicodeutil.cpp

@@ -13,19 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-set(VIDEO_HEADERS
+set(MOVIE_HEADERS
     format/bikreader.h
-    video.h)
+    movie.h
+    videostream.h)
 
-set(VIDEO_SOURCES
+set(MOVIE_SOURCES
     format/bikreader.cpp
-    video.cpp)
+    movie.cpp)
 
-add_library(video STATIC ${VIDEO_HEADERS} ${VIDEO_SOURCES})
-set_target_properties(video PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-target_precompile_headers(video PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
+add_library(movie STATIC ${MOVIE_HEADERS} ${MOVIE_SOURCES})
+set_target_properties(movie PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+target_precompile_headers(movie PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 
-if(ENABLE_VIDEO)
-    target_compile_definitions(video PRIVATE R_ENABLE_VIDEO)
-    target_link_libraries(video PUBLIC ${FFMPEG_LIBRARIES})
+if(ENABLE_MOVIE)
+    target_compile_definitions(movie PRIVATE R_ENABLE_MOVIE)
+    target_link_libraries(movie PUBLIC ${FFMPEG_LIBRARIES})
 endif()

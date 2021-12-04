@@ -14,11 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(COMMON_HEADERS
-    memorycache.h
     collectionutil.h
     exception/validation.h
     logutil.h
-    mediastream.h
+    memorycache.h
     pathutil.h
     randomutil.h
     streamreader.h

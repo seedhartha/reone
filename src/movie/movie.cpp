@@ -15,8 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "video.h"
+#include "movie.h"
 
+#include "../audio/player.h"
 #include "../graphics/context.h"
 #include "../graphics/mesh.h"
 #include "../graphics/meshes.h"
@@ -30,62 +31,66 @@ using namespace reone::graphics;
 
 namespace reone {
 
-namespace video {
+namespace movie {
 
-void Video::init() {
-    if (!_inited) {
+void Movie::init() {
+    if (!_texture && _videoStream) {
+        _width = _videoStream->width();
+        _height = _videoStream->height();
         _texture = make_shared<Texture>("video", getTextureProperties(TextureUsage::Video));
         _texture->init();
-        _inited = true;
+    }
+    if (!_audioSource && _audioStream) {
+        _audioSource = _audioPlayer.play(_audioStream, AudioType::Movie);
     }
 }
 
-void Video::deinit() {
-    if (_inited) {
+void Movie::deinit() {
+    if (_audioSource) {
+        _audioSource.reset();
+    }
+    if (_audioStream) {
+        _audioStream.reset();
+    }
+    if (_texture) {
         _texture.reset();
-        _inited = false;
+    }
+    if (_videoStream) {
+        _videoStream.reset();
     }
 }
 
-void Video::update(float dt) {
-    if (!_finished) {
-        updateFrame(dt);
-        updateFrameTexture();
+void Movie::update(float dt) {
+    if (_finished) {
+        return;
     }
-}
-
-void Video::updateFrame(float dt) {
     _time += dt;
-
-    int frame = static_cast<int>(_fps * _time);
-    _frame = _stream->get(frame);
-
-    if (!_frame) {
+    _videoStream->seek(_time);
+    auto &frame = _videoStream->frame();
+    if (frame.pixels) {
+        _context.setActiveTextureUnit(TextureUnits::diffuseMap);
+        _texture->bind();
+        _texture->setPixels(_width, _height, PixelFormat::RGB, frame.pixels);
+    }
+    if (_videoStream->hasEnded()) {
         _finished = true;
+        return;
+    }
+    if (_audioSource) {
+        _audioSource->update();
     }
 }
 
-void Video::updateFrameTexture() {
-    if (!_frame)
-        return;
-
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _texture->bind();
-    _texture->setPixels(_width, _height, PixelFormat::RGB, _frame->pixels);
-}
-
-void Video::draw() {
-    if (!_inited)
-        return;
-
+void Movie::draw() {
     _context.setActiveTextureUnit(TextureUnits::diffuseMap);
     _texture->bind();
 
     ShaderUniforms uniforms;
     _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+
     _meshes.quadNDCFlipY().draw();
 }
 
-} // namespace video
+} // namespace movie
 
 } // namespace reone

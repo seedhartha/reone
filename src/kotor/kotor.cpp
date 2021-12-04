@@ -35,6 +35,7 @@
 #include "../../graphics/walkmeshes.h"
 #include "../../graphics/window.h"
 #include "../../gui/gui.h"
+#include "../../movie/format/bikreader.h"
 #include "../../resource/2das.h"
 #include "../../resource/format/erfreader.h"
 #include "../../resource/format/erfwriter.h"
@@ -43,7 +44,6 @@
 #include "../../resource/resources.h"
 #include "../../scene/pipeline/world.h"
 #include "../../script/scripts.h"
-#include "../../video/format/bikreader.h"
 
 #include "../game/combat.h"
 #include "../game/cursors.h"

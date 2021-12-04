@@ -17,16 +17,12 @@
 
 #pragma once
 
-#include "../common/mediastream.h"
+#include "../audio/source.h"
 #include "../common/types.h"
 
+#include "videostream.h"
+
 namespace reone {
-
-namespace audio {
-
-class AudioStream;
-
-}
 
 namespace graphics {
 
@@ -37,23 +33,27 @@ class Texture;
 
 } // namespace graphics
 
-namespace video {
+namespace audio {
+
+class AudioPlayer;
+
+}
+
+namespace movie {
 
 class BikReader;
 
-class Video {
+class Movie {
 public:
-    struct Frame {
-        std::shared_ptr<ByteArray> pixels;
-    };
-
-    Video(
+    Movie(
         graphics::Context &context,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders) :
+        graphics::Shaders &shaders,
+        audio::AudioPlayer &audioPlayer) :
         _context(context),
         _meshes(meshes),
-        _shaders(shaders) {
+        _shaders(shaders),
+        _audioPlayer(audioPlayer) {
     }
 
     void init();
@@ -66,23 +66,21 @@ public:
 
     bool isFinished() const { return _finished; }
 
-    std::shared_ptr<audio::AudioStream> audio() const { return _audio; }
-
-    void setMediaStream(std::shared_ptr<MediaStream<Frame>> stream) { _stream = std::move(stream); }
+    void setVideoStream(std::shared_ptr<VideoStream> stream) { _videoStream = std::move(stream); }
+    void setAudioStream(std::shared_ptr<audio::AudioStream> stream) { _audioStream = std::move(stream); }
 
 private:
     int _width {0};
     int _height {0};
-    float _fps {0.0f};
-    std::shared_ptr<MediaStream<Frame>> _stream;
 
-    bool _inited {false};
     float _time {0.0f};
-    std::shared_ptr<Frame> _frame;
     bool _finished {false};
 
+    std::shared_ptr<VideoStream> _videoStream;
+    std::shared_ptr<audio::AudioStream> _audioStream;
+
     std::shared_ptr<graphics::Texture> _texture;
-    std::shared_ptr<audio::AudioStream> _audio;
+    std::shared_ptr<audio::AudioSource> _audioSource;
 
     // Services
 
@@ -90,14 +88,11 @@ private:
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
 
+    audio::AudioPlayer &_audioPlayer;
+
     // END Services
-
-    void updateFrame(float dt);
-    void updateFrameTexture();
-
-    friend class BinkVideoDecoder;
 };
 
-} // namespace video
+} // namespace movie
 
 } // namespace reone
