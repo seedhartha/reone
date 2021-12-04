@@ -32,9 +32,13 @@ struct WindowID {
     static constexpr wxWindowID resolution = wxID_HIGHEST + 4;
     static constexpr wxWindowID fullscreen = wxID_HIGHEST + 5;
     static constexpr wxWindowID enhancedGfx = wxID_HIGHEST + 6;
-    static constexpr wxWindowID logChannels = wxID_HIGHEST + 8;
-    static constexpr wxWindowID logFile = wxID_HIGHEST + 9;
-    static constexpr wxWindowID saveConfig = wxID_HIGHEST + 10;
+    static constexpr wxWindowID musicVolume = wxID_HIGHEST + 7;
+    static constexpr wxWindowID voiceVolume = wxID_HIGHEST + 8;
+    static constexpr wxWindowID soundVolume = wxID_HIGHEST + 9;
+    static constexpr wxWindowID movieVolume = wxID_HIGHEST + 10;
+    static constexpr wxWindowID logChannels = wxID_HIGHEST + 11;
+    static constexpr wxWindowID logFile = wxID_HIGHEST + 12;
+    static constexpr wxWindowID saveConfig = wxID_HIGHEST + 13;
 };
 
 class LauncherFrame : public wxFrame {
@@ -49,6 +53,10 @@ private:
         int height {0};
         bool fullscreen {false};
         bool pbr {false};
+        int musicvol {0};
+        int voicevol {0};
+        int soundvol {0};
+        int movievol {0};
         int logch {0};
         bool logfile {false};
     } _config;
@@ -58,6 +66,10 @@ private:
     wxCheckBox *_checkBoxDev;
     wxCheckBox *_checkBoxFullscreen;
     wxCheckBox *_checkBoxEnhancedGfx;
+    wxSlider *_sliderVolumeMusic;
+    wxSlider *_sliderVolumeVoice;
+    wxSlider *_sliderVolumeSound;
+    wxSlider *_sliderVolumeMovie;
     wxCheckListBox *_checkListBoxLogChannels;
     wxCheckBox *_checkBoxLogFile;
 
