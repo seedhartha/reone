@@ -36,6 +36,7 @@
 #include "../../graphics/walkmeshes.h"
 #include "../../graphics/window.h"
 #include "../../gui/gui.h"
+#include "../../movie/format/bikreader.h"
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
 #include "../../resource/format/erfreader.h"
@@ -46,7 +47,6 @@
 #include "../../scene/graphs.h"
 #include "../../scene/pipeline/world.h"
 #include "../../script/scripts.h"
-#include "../../video/format/bikreader.h"
 
 #include "combat.h"
 #include "cursors.h"
@@ -65,7 +65,7 @@ using namespace reone::graphics;
 using namespace reone::resource;
 using namespace reone::scene;
 using namespace reone::script;
-using namespace reone::video;
+using namespace reone::movie;
 
 namespace fs = boost::filesystem;
 namespace io = boost::iostreams;
@@ -283,7 +283,7 @@ void Game::playVideo(const string &name) {
         return;
     }
 
-    BikReader bik(path, _services.context, _services.meshes, _services.shaders);
+    BikReader bik(path, _services.context, _services.meshes, _services.shaders, _services.audioPlayer);
     bik.load();
 
     _video = bik.video();
@@ -294,10 +294,6 @@ void Game::playVideo(const string &name) {
     if (_music) {
         _music->stop();
         _music.reset();
-    }
-    shared_ptr<AudioStream> audio(_video->audio());
-    if (audio) {
-        _movieAudio = _services.audioPlayer.play(audio, AudioType::Movie);
     }
 }
 
@@ -394,15 +390,8 @@ void Game::setLoadFromSaveGame(bool load) {
 
 void Game::updateVideo(float dt) {
     _video->update(dt);
-    if (_movieAudio) {
-        _movieAudio->update();
-    }
 
     if (_video->isFinished()) {
-        if (_movieAudio) {
-            _movieAudio->stop();
-            _movieAudio.reset();
-        }
         _video.reset();
     }
 }

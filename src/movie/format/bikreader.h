@@ -27,9 +27,15 @@ class Shaders;
 
 } // namespace graphics
 
-namespace video {
+namespace audio {
 
-class Video;
+class AudioPlayer;
+
+}
+
+namespace movie {
+
+class Movie;
 
 /**
  * Encapsulates loading Bink Video files using FFmpeg.
@@ -42,21 +48,23 @@ public:
         boost::filesystem::path path,
         graphics::Context &context,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders) :
+        graphics::Shaders &shaders,
+        audio::AudioPlayer &audioPlayer) :
         _path(std::move(path)),
         _context(context),
         _meshes(meshes),
-        _shaders(shaders) {
+        _shaders(shaders),
+        _audioPlayer(audioPlayer) {
     }
 
     void load();
 
-    std::shared_ptr<Video> video() const { return _video; }
+    std::shared_ptr<Movie> video() const { return _video; }
 
 private:
     boost::filesystem::path _path;
 
-    std::shared_ptr<Video> _video;
+    std::shared_ptr<Movie> _video;
 
     // Services
 
@@ -64,9 +72,11 @@ private:
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
 
+    audio::AudioPlayer &_audioPlayer;
+
     // END Services
 };
 
-} // namespace video
+} // namespace movie
 
 } // namespace reone

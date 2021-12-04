@@ -19,7 +19,7 @@
 
 #include "../../audio/source.h"
 #include "../../graphics/eventhandler.h"
-#include "../../video/video.h"
+#include "../../movie/movie.h"
 
 #include "action/factory.h"
 #include "camera.h"
@@ -185,7 +185,7 @@ protected:
 
     uint32_t _ticks {0};
     bool _quit {false};
-    std::shared_ptr<video::Video> _video;
+    std::shared_ptr<movie::Movie> _video;
     CursorType _cursorType {CursorType::None};
     float _gameSpeed {1.0f};
     bool _loadFromSaveGame {false};
@@ -236,7 +236,6 @@ protected:
 
     std::string _musicResRef;
     std::shared_ptr<audio::AudioSource> _music;
-    std::shared_ptr<audio::AudioSource> _movieAudio;
 
     // END Audio
 
