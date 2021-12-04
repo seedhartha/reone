@@ -45,6 +45,9 @@ namespace scene {
 static constexpr float kElevationTestZ = 1024.0f;
 static constexpr int kMaxSoundCount = 4;
 
+static constexpr float kMaxCollisionDistance = 8.0f;
+static constexpr float kMaxCollisionDistance2 = kMaxCollisionDistance * kMaxCollisionDistance;
+
 static constexpr float kMaxGrassDistance = 16.0f;
 static constexpr float kMaxGrassDistance2 = kMaxGrassDistance * kMaxGrassDistance;
 
@@ -112,7 +115,7 @@ void SceneGraph::cullRoots() {
     for (auto &root : _modelRoots) {
         bool culled =
             !root->isVisible() ||
-            root->getDistanceTo2(*_activeCamera) > root->drawDistance() * root->drawDistance() ||
+            root->getSquareDistanceTo(*_activeCamera) > root->drawDistance() * root->drawDistance() ||
             (root->isCullable() && !_activeCamera->isInFrustum(*root));
 
         root->setCulled(culled);
@@ -227,7 +230,7 @@ void SceneGraph::prepareTransparentMeshes() {
     glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
     unordered_map<SceneNode *, float> meshToCamera;
     for (auto &mesh : _transparentMeshes) {
-        meshToCamera.insert(make_pair(mesh, mesh->getDistanceTo2(cameraPosition)));
+        meshToCamera.insert(make_pair(mesh, mesh->getSquareDistanceTo(cameraPosition)));
     }
     sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&meshToCamera](auto &left, auto &right) {
         int leftTransparency = left->modelNode().mesh()->transparency;
@@ -310,7 +313,7 @@ void SceneGraph::updateSounds() {
         if (!root->isEnabled()) {
             continue;
         }
-        float dist2 = root->getDistanceTo2(cameraPos);
+        float dist2 = root->getSquareDistanceTo(cameraPos);
         float maxDist2 = root->maxDistance() * root->maxDistance();
         if (dist2 > maxDist2) {
             continue;
@@ -379,7 +382,7 @@ void SceneGraph::draw(bool shadowPass) {
     for (auto &light : _lights) {
         // Ignore lights that are too far away or outside of camera frustum
         float flareRadius = light->modelNode().light()->flareRadius;
-        if (_activeCamera->getDistanceTo2(*light) > flareRadius * flareRadius ||
+        if (_activeCamera->getSquareDistanceTo(*light) > flareRadius * flareRadius ||
             !_activeCamera->isInFrustum(light->absoluteTransform()[3]))
             continue;
 
@@ -405,7 +408,7 @@ vector<LightSceneNode *> SceneGraph::getLightsAt(
 
         // Only account for lights whose distance to the reference node is
         // within range of the light.
-        float distance = light->getDistanceTo2(*_lightingRefNode);
+        float distance = light->getSquareDistanceTo(*_lightingRefNode);
         if (distance > light->radius() * light->radius())
             continue;
 
@@ -453,6 +456,12 @@ bool SceneGraph::testElevation(const glm::vec2 &position, Collision &outCollisio
         if (!root->isEnabled()) {
             continue;
         }
+        if (!root->walkmesh().isAreaWalkmesh()) {
+            float distance2 = root->getSquareDistanceTo2D(position);
+            if (distance2 > kMaxCollisionDistance2) {
+                continue;
+            }
+        }
         auto objSpaceOrigin = glm::vec3(root->absoluteTransformInverse() * glm::vec4(origin, 1.0f));
         float distance = 0.0f;
         auto face = root->walkmesh().raycast(_walkcheckSurfaces, objSpaceOrigin, down, 2.0f * kElevationTestZ, distance);
@@ -484,6 +493,12 @@ bool SceneGraph::testObstacle(const glm::vec3 &origin, const glm::vec3 &dest, co
         }
         if (!root->isEnabled()) {
             continue;
+        }
+        if (!root->walkmesh().isAreaWalkmesh()) {
+            float distance2 = root->getSquareDistanceTo(origin);
+            if (distance2 > kMaxCollisionDistance2) {
+                continue;
+            }
         }
         glm::vec3 objSpaceOrigin(root->absoluteTransformInverse() * glm::vec4(origin, 1.0f));
         glm::vec3 objSpaceDir(root->absoluteTransformInverse() * glm::vec4(dir, 0.0f));

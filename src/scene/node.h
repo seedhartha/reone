@@ -53,26 +53,13 @@ public:
     bool isPoint() const { return _point; }
 
     glm::vec3 getOrigin() const;
+    glm::vec2 getOrigin2D() const;
 
-    /**
-     * @return distance from the origin of this node to the specified point
-     */
     float getDistanceTo(const glm::vec3 &point) const;
-
-    /**
-     * @return squared distance from the origin of this node to the specified point
-     */
-    float getDistanceTo2(const glm::vec3 &point) const;
-
-    /**
-     * @return distance between origins of this and the specified node
-     */
     float getDistanceTo(const SceneNode &other) const;
-
-    /**
-     * @return squared distance between origins of this and the specified node
-     */
-    float getDistanceTo2(const SceneNode &other) const;
+    float getSquareDistanceTo(const glm::vec3 &point) const;
+    float getSquareDistanceTo(const SceneNode &other) const;
+    float getSquareDistanceTo2D(const glm::vec2 &point) const;
 
     glm::vec3 getWorldCenterOfAABB() const;
 
