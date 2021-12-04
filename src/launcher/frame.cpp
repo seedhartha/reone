@@ -57,6 +57,8 @@ LauncherFrame::LauncherFrame() :
     _checkBoxDev = new wxCheckBox(this, WindowID::devMode, "Developer Mode", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
     _checkBoxDev->SetValue(_config.devMode);
 
+    // Graphics
+
     wxArrayString resChoices;
     resChoices.Add("800x600");
     resChoices.Add("1024x768");
@@ -87,6 +89,40 @@ LauncherFrame::LauncherFrame() :
     graphicsSizer->Add(resSizer, 0, wxEXPAND, 0);
     graphicsSizer->Add(_checkBoxFullscreen, 0, wxEXPAND | wxALL, 3);
     graphicsSizer->Add(_checkBoxEnhancedGfx, 0, wxEXPAND | wxALL, 3);
+
+    // END Graphics
+
+    // Audio
+
+    _sliderVolumeMusic = new wxSlider(this, WindowID::musicVolume, _config.musicvol, 0, 100, wxDefaultPosition, wxDefaultSize);
+    auto sizerVolumeMusic = new wxBoxSizer(wxHORIZONTAL);
+    sizerVolumeMusic->Add(new wxStaticText(this, wxID_ANY, "Music Volume", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
+    sizerVolumeMusic->Add(_sliderVolumeMusic, 1, wxEXPAND | wxALL, 3);
+
+    _sliderVolumeVoice = new wxSlider(this, WindowID::voiceVolume, _config.voicevol, 0, 100, wxDefaultPosition, wxDefaultSize);
+    auto sizerVolumeVoice = new wxBoxSizer(wxHORIZONTAL);
+    sizerVolumeVoice->Add(new wxStaticText(this, wxID_ANY, "Voice Volume", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
+    sizerVolumeVoice->Add(_sliderVolumeVoice, 1, wxEXPAND | wxALL, 3);
+
+    _sliderVolumeSound = new wxSlider(this, WindowID::soundVolume, _config.soundvol, 0, 100, wxDefaultPosition, wxDefaultSize);
+    auto sizerVolumeSound = new wxBoxSizer(wxHORIZONTAL);
+    sizerVolumeSound->Add(new wxStaticText(this, wxID_ANY, "Sound Volume", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
+    sizerVolumeSound->Add(_sliderVolumeSound, 1, wxEXPAND | wxALL, 3);
+
+    _sliderVolumeMovie = new wxSlider(this, WindowID::movieVolume, _config.movievol, 0, 100, wxDefaultPosition, wxDefaultSize);
+    auto sizerVolumeMovie = new wxBoxSizer(wxHORIZONTAL);
+    sizerVolumeMovie->Add(new wxStaticText(this, wxID_ANY, "Movie Volume", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
+    sizerVolumeMovie->Add(_sliderVolumeMovie, 1, wxEXPAND | wxALL, 3);
+
+    auto audioSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Audio");
+    audioSizer->Add(sizerVolumeMusic, 0, wxEXPAND, 0);
+    audioSizer->Add(sizerVolumeVoice, 0, wxEXPAND, 0);
+    audioSizer->Add(sizerVolumeSound, 0, wxEXPAND, 0);
+    audioSizer->Add(sizerVolumeMovie, 0, wxEXPAND, 0);
+
+    // END Audio
+
+    // Debug
 
     wxArrayString logChannelChoices;
     logChannelChoices.Add("Resources");
@@ -123,11 +159,14 @@ LauncherFrame::LauncherFrame() :
     debugSizer->Add(logChannelsSizer, 0, wxEXPAND, 0);
     debugSizer->Add(_checkBoxLogFile, 0, wxEXPAND, 0);
 
+    // END Debug
+
     auto topSizer = new wxBoxSizer(wxVERTICAL);
     topSizer->SetMinSize(400, 100);
     topSizer->Add(gameSizer, 0, wxEXPAND, 0);
     topSizer->Add(_checkBoxDev, 0, wxEXPAND | wxALL, 3);
     topSizer->Add(graphicsSizer, 0, wxEXPAND | wxALL, 3);
+    topSizer->Add(audioSizer, 0, wxEXPAND | wxALL, 3);
     topSizer->Add(debugSizer, 0, wxEXPAND | wxALL, 3);
     topSizer->Add(new wxButton(this, WindowID::launch, "Launch"), 0, wxEXPAND | wxALL, 3);
     topSizer->Add(new wxButton(this, WindowID::saveConfig, "Save Configuration"), 0, wxEXPAND | wxALL, 3);
@@ -137,7 +176,19 @@ LauncherFrame::LauncherFrame() :
 
 void LauncherFrame::LoadConfiguration() {
     po::options_description options;
-    options.add_options()("game", po::value<string>())("dev", po::value<bool>())("width", po::value<int>())("height", po::value<int>())("fullscreen", po::value<bool>())("pbr", po::value<bool>())("logch", po::value<int>())("logfile", po::value<bool>());
+    options.add_options()                 //
+        ("game", po::value<string>())     //
+        ("dev", po::value<bool>())        //
+        ("width", po::value<int>())       //
+        ("height", po::value<int>())      //
+        ("fullscreen", po::value<bool>()) //
+        ("pbr", po::value<bool>())        //
+        ("musicvol", po::value<int>())    //
+        ("voicevol", po::value<int>())    //
+        ("soundvol", po::value<int>())    //
+        ("movievol", po::value<int>())    //
+        ("logch", po::value<int>())       //
+        ("logfile", po::value<bool>());
 
     po::variables_map vars;
     if (fs::exists(kConfigFilename)) {
@@ -150,6 +201,10 @@ void LauncherFrame::LoadConfiguration() {
     _config.width = vars.count("width") > 0 ? vars["width"].as<int>() : 1024;
     _config.height = vars.count("height") > 0 ? vars["height"].as<int>() : 768;
     _config.fullscreen = vars.count("fullscreen") > 0 ? vars["fullscreen"].as<bool>() : false;
+    _config.musicvol = vars.count("musicvol") > 0 ? vars["musicvol"].as<int>() : 85;
+    _config.voicevol = vars.count("voicevol") > 0 ? vars["voicevol"].as<int>() : 85;
+    _config.soundvol = vars.count("soundvol") > 0 ? vars["soundvol"].as<int>() : 85;
+    _config.movievol = vars.count("movievol") > 0 ? vars["movievol"].as<int>() : 85;
     _config.pbr = vars.count("pbr") > 0 ? vars["pbr"].as<bool>() : false;
     _config.logch = vars.count("logch") > 0 ? vars["logch"].as<int>() : LogChannels::general;
     _config.logfile = vars.count("logfile") > 0 ? vars["logfile"].as<bool>() : false;
@@ -169,7 +224,19 @@ void LauncherFrame::OnLaunch(wxCommandEvent &event) {
 }
 
 void LauncherFrame::SaveConfiguration() {
-    static set<string> recognized {"game=", "width=", "height=", "fullscreen=", "pbr=", "dev=", "logch=", "logfile="};
+    static set<string> recognized {
+        "game=",
+        "dev=",
+        "width=",
+        "height=",
+        "fullscreen=",
+        "pbr=",
+        "musicvol=",
+        "voicevol=",
+        "soundvol=",
+        "movievol=",
+        "logch=",
+        "logfile="};
 
     string resolution(_choiceResolution->GetStringSelection());
 
@@ -214,6 +281,10 @@ void LauncherFrame::SaveConfiguration() {
     _config.height = stoi(tokens[1]);
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
     _config.pbr = _checkBoxEnhancedGfx->IsChecked();
+    _config.musicvol = _sliderVolumeMusic->GetValue();
+    _config.voicevol = _sliderVolumeVoice->GetValue();
+    _config.soundvol = _sliderVolumeSound->GetValue();
+    _config.movievol = _sliderVolumeMovie->GetValue();
     _config.logch = logch;
     _config.logfile = _checkBoxLogFile->IsChecked();
 
@@ -240,6 +311,10 @@ void LauncherFrame::SaveConfiguration() {
     config << "height=" << _config.height << endl;
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
     config << "pbr=" << (_config.pbr ? 1 : 0) << endl;
+    config << "musicvol=" << _config.musicvol << endl;
+    config << "voicevol=" << _config.voicevol << endl;
+    config << "soundvol=" << _config.soundvol << endl;
+    config << "movievol=" << _config.movievol << endl;
     config << "logch=" << _config.logch << endl;
     config << "logfile=" << (_config.logfile ? 1 : 0) << endl;
     for (auto &line : lines) {
@@ -258,9 +333,9 @@ void LauncherFrame::OnGameDirLeftDown(wxMouseEvent &event) {
     }
 }
 
-wxBEGIN_EVENT_TABLE(LauncherFrame, wxFrame)
-    EVT_BUTTON(WindowID::launch, LauncherFrame::OnLaunch)
-        EVT_BUTTON(WindowID::saveConfig, LauncherFrame::OnSaveConfig)
-            wxEND_EVENT_TABLE()
+wxBEGIN_EVENT_TABLE(LauncherFrame, wxFrame)                       //
+    EVT_BUTTON(WindowID::launch, LauncherFrame::OnLaunch)         //
+    EVT_BUTTON(WindowID::saveConfig, LauncherFrame::OnSaveConfig) //
+    wxEND_EVENT_TABLE()
 
 } // namespace reone
