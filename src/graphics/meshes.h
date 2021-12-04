@@ -23,13 +23,9 @@ namespace reone {
 
 namespace graphics {
 
-/**
- * Registry of common reusable meshes.
- */
 class Meshes : boost::noncopyable {
 public:
-    Meshes() = default;
-    ~Meshes();
+    ~Meshes() { deinit(); }
 
     void init();
     void deinit();
@@ -44,10 +40,7 @@ public:
     Mesh &quadNDCFlipY() const { return *_quadNDCFlipY; }
     Mesh &billboard() const { return *_billboard; }
     Mesh &grass() const { return *_grass; }
-    Mesh &cube() const { return *_cube; }
-    Mesh &sphere() const { return *_sphere; }
     Mesh &cubemap() const { return *_cubemap; }
-    Mesh &aabb() const { return *_aabb; }
 
 private:
     bool _inited {false};
@@ -62,10 +55,7 @@ private:
     std::unique_ptr<Mesh> _quadNDCFlipY;
     std::unique_ptr<Mesh> _billboard;
     std::unique_ptr<Mesh> _grass;
-    std::unique_ptr<Mesh> _cube;
-    std::unique_ptr<Mesh> _sphere;
     std::unique_ptr<Mesh> _cubemap;
-    std::unique_ptr<Mesh> _aabb;
 };
 
 } // namespace graphics

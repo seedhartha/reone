@@ -25,34 +25,19 @@ namespace reone {
 
 namespace graphics {
 
-Mesh::Mesh(vector<float> vertices, vector<uint16_t> indices, VertexAttributes attributes, DrawMode mode) :
-    _vertices(move(vertices)),
-    _indices(move(indices)),
-    _attributes(move(attributes)),
-    _mode(mode) {
-
-    if (attributes.stride == 0) {
-        throw invalid_argument("stride in attributes must not be zero");
-    }
-    _vertexCount = static_cast<int>(_vertices.size()) / (attributes.stride / sizeof(float));
-
-    computeAABB();
-}
-
-void Mesh::computeAABB() {
-    _aabb.reset();
-
-    auto coordsPtr = reinterpret_cast<uint8_t *>(&_vertices[0]) + _attributes.offCoords;
-
-    for (size_t i = 0; i < _vertexCount; ++i) {
-        _aabb.expand(glm::make_vec3(reinterpret_cast<const float *>(coordsPtr)));
-        coordsPtr += _attributes.stride;
-    }
-}
-
 void Mesh::init() {
-    if (_inited)
+    if (_inited) {
         return;
+    }
+    vector<uint16_t> indices;
+    indices.reserve(3 * _faces.size());
+    for (auto &face : _faces) {
+        indices.push_back(face.indices[0]);
+        indices.push_back(face.indices[1]);
+        indices.push_back(face.indices[2]);
+    }
+
+    // OpenGL
 
     glGenBuffers(1, &_vboId);
     glGenBuffers(1, &_iboId);
@@ -62,146 +47,116 @@ void Mesh::init() {
     glBindBuffer(GL_ARRAY_BUFFER, _vboId);
     glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(float), &_vertices[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iboId);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(uint16_t), &_indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint16_t), &indices[0], GL_STATIC_DRAW);
 
-    if (_attributes.offCoords != -1) {
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offCoords)));
-    }
-    if (_attributes.offNormals != -1) {
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, _spec.stride, reinterpret_cast<void *>(0));
+    if (_spec.offNormals != -1) {
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offNormals)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, _spec.stride, reinterpret_cast<void *>(static_cast<size_t>(_spec.offNormals)));
     }
-    if (_attributes.offTexCoords1 != -1) {
+    if (_spec.offUV1 != -1) {
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offTexCoords1)));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, _spec.stride, reinterpret_cast<void *>(static_cast<size_t>(_spec.offUV1)));
     }
-    if (_attributes.offTexCoords2 != -1) {
+    if (_spec.offUV2 != -1) {
         glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offTexCoords2)));
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, _spec.stride, reinterpret_cast<void *>(static_cast<size_t>(_spec.offUV2)));
     }
-    if (_attributes.offTangents != -1) {
+    if (_spec.offTanSpace != -1) {
+        // Bitangents
         glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offTangents)));
-    }
-    if (_attributes.offBitangents != -1) {
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, _spec.stride, reinterpret_cast<void *>(static_cast<size_t>(_spec.offTanSpace)));
+        // Tangents
         glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offBitangents)));
-    }
-    if (_attributes.offTanSpaceNormals != -1) {
+        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, _spec.stride, reinterpret_cast<void *>(static_cast<size_t>(_spec.offTanSpace + 3 * sizeof(float))));
+        // Normals
         glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offTanSpaceNormals)));
+        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, _spec.stride, reinterpret_cast<void *>(static_cast<size_t>(_spec.offTanSpace + 6 * sizeof(float))));
     }
-    if (_attributes.offBoneIndices != -1) {
+    if (_spec.offBoneIndices != -1) {
         glEnableVertexAttribArray(7);
-        glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offBoneIndices)));
+        glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, _spec.stride, reinterpret_cast<void *>(static_cast<size_t>(_spec.offBoneIndices)));
     }
-    if (_attributes.offBoneWeights != -1) {
+    if (_spec.offBoneWeights != -1) {
         glEnableVertexAttribArray(8);
-        glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, _attributes.stride, reinterpret_cast<void *>(static_cast<size_t>(_attributes.offBoneWeights)));
+        glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, _spec.stride, reinterpret_cast<void *>(static_cast<size_t>(_spec.offBoneWeights)));
     }
 
     glBindVertexArray(0);
 
+    // END OpenGL
+
+    computeAABB();
+
     _inited = true;
 }
 
-Mesh::~Mesh() {
-    deinit();
-}
-
 void Mesh::deinit() {
-    if (!_inited)
+    if (!_inited) {
         return;
-
+    }
     glDeleteVertexArrays(1, &_vaoId);
     glDeleteBuffers(1, &_iboId);
     glDeleteBuffers(1, &_vboId);
-
     _inited = false;
-}
-
-static inline GLenum getModeGL(Mesh::DrawMode mode) {
-    switch (mode) {
-    case Mesh::DrawMode::Lines:
-        return GL_LINES;
-    case Mesh::DrawMode::Triangles:
-        return GL_TRIANGLES;
-    case Mesh::DrawMode::TriangleStrip:
-        return GL_TRIANGLE_STRIP;
-    default:
-        throw invalid_argument("Unsupported draw mode: " + to_string(static_cast<int>(mode)));
-    }
 }
 
 void Mesh::draw() {
     glBindVertexArray(_vaoId);
-    glDrawElements(getModeGL(_mode), static_cast<GLsizei>(_indices.size()), GL_UNSIGNED_SHORT, nullptr);
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(3 * _faces.size()), GL_UNSIGNED_SHORT, nullptr);
 }
 
 void Mesh::drawInstanced(int count) {
     glBindVertexArray(_vaoId);
-    glDrawElementsInstanced(getModeGL(_mode), static_cast<GLsizei>(_indices.size()), GL_UNSIGNED_SHORT, nullptr, count);
+    glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(3 * _faces.size()), GL_UNSIGNED_SHORT, nullptr, count);
 }
 
-void Mesh::ensureTriangles() const {
-    if (_mode != DrawMode::Triangles) {
-        throw logic_error("Unsupported draw mode: " + to_string(static_cast<int>(_mode)));
+void Mesh::computeAABB() {
+    _aabb.reset();
+
+    auto valsPerVert = _spec.stride / sizeof(float);
+    auto numVerts = _vertices.size() / valsPerVert;
+    for (auto i = 0; i < numVerts; ++i) {
+        auto vertPtr = &_vertices[i * valsPerVert];
+        _aabb.expand(glm::make_vec3(&vertPtr[_spec.offCoords / sizeof(float)]));
     }
 }
 
-void Mesh::drawTriangles(int startFace, int numFaces) {
-    ensureTriangles();
-    glBindVertexArray(_vaoId);
-    glDrawElements(GL_TRIANGLES, 3 * numFaces, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(3ll * startFace * sizeof(uint16_t)));
-}
+vector<glm::vec3> Mesh::getFaceVertexCoords(int faceIdx) const {
+    vector<glm::vec3> coords(3);
 
-void Mesh::drawTrianglesInstanced(int startFace, int numFaces, int count) {
-    ensureTriangles();
-    glBindVertexArray(_vaoId);
-    glDrawElementsInstanced(GL_TRIANGLES, 3 * numFaces, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(3ll * startFace * sizeof(uint16_t)), count);
-}
-
-vector<glm::vec3> Mesh::getTriangleCoords(int faceIdx) const {
-    return getTriangleAttributes<glm::vec3>(faceIdx, _attributes.offCoords);
-}
-
-glm::vec2 Mesh::getTriangleTexCoords1(int faceIdx, const glm::vec3 &baryPosition) const {
-    auto points = getTriangleAttributes<glm::vec2>(faceIdx, _attributes.offTexCoords1);
-
-    return !points.empty() ? barycentricToCartesian(points[0], points[1], points[2], baryPosition) : glm::vec2(0.0f);
-}
-
-glm::vec2 Mesh::getTriangleTexCoords2(int faceIdx, const glm::vec3 &baryPosition) const {
-    auto points = getTriangleAttributes<glm::vec2>(faceIdx, _attributes.offTexCoords2);
-
-    return !points.empty() ? barycentricToCartesian(points[0], points[1], points[2], baryPosition) : glm::vec2(0.0f);
-}
-
-template <class T>
-vector<T> Mesh::getTriangleAttributes(int faceIdx, int offset) const {
-    ensureTriangles();
-    if (faceIdx < 0 || faceIdx >= static_cast<int>(_indices.size()) / 3) {
-        throw out_of_range("faceIdx out of range");
+    auto &indices = _faces[faceIdx].indices;
+    for (int i = 0; i < 3; ++i) {
+        auto vertPtr = &_vertices[indices[i] * (_spec.stride / sizeof(float))];
+        coords[i] = glm::make_vec3(&vertPtr[_spec.offCoords / sizeof(float)]);
     }
-    if (offset == -1)
-        return vector<T>();
 
-    auto a = getVertexAttribute<T>(_indices[3ll * faceIdx + 0], offset);
-    auto b = getVertexAttribute<T>(_indices[3ll * faceIdx + 1], offset);
-    auto c = getVertexAttribute<T>(_indices[3ll * faceIdx + 2], offset);
-
-    return vector<T> {a, b, c};
+    return move(coords);
 }
 
-template <>
-glm::vec2 Mesh::getVertexAttribute(uint16_t vertexIdx, int offset) const {
-    return glm::make_vec2(&_vertices[(static_cast<size_t>(vertexIdx) * _attributes.stride + offset) / sizeof(float)]);
+glm::vec2 Mesh::getFaceUV1(int faceIdx, const glm::vec3 &baryPosition) const {
+    vector<glm::vec2> uv(3);
+
+    auto &indices = _faces[faceIdx].indices;
+    for (int i = 0; i < 3; ++i) {
+        auto vertPtr = &_vertices[indices[i] * (_spec.stride / sizeof(float))];
+        uv[i] = glm::make_vec2(&vertPtr[_spec.offUV1 / sizeof(float)]);
+    }
+
+    return barycentricToCartesian(uv[0], uv[1], uv[2], baryPosition);
 }
 
-template <>
-glm::vec3 Mesh::getVertexAttribute(uint16_t vertexIdx, int offset) const {
-    return glm::make_vec3(&_vertices[(static_cast<size_t>(vertexIdx) * _attributes.stride + offset) / sizeof(float)]);
+glm::vec2 Mesh::getFaceUV2(int faceIdx, const glm::vec3 &baryPosition) const {
+    vector<glm::vec2> uv(3);
+
+    auto &indices = _faces[faceIdx].indices;
+    for (int i = 0; i < 3; ++i) {
+        auto vertPtr = &_vertices[indices[i] * (_spec.stride / sizeof(float))];
+        uv[i] = glm::make_vec2(&vertPtr[_spec.offUV2 / sizeof(float)]);
+    }
+
+    return barycentricToCartesian(uv[0], uv[1], uv[2], baryPosition);
 }
 
 } // namespace graphics

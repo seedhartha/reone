@@ -56,7 +56,6 @@ set(GRAPHICS_HEADERS
     textutil.h
     triangleutil.h
     types.h
-    vertexattributes.h
     walkmesh.h
     walkmeshes.h
     window.h)

@@ -18,25 +18,46 @@
 #pragma once
 
 #include "aabb.h"
-#include "vertexattributes.h"
 
 namespace reone {
 
 namespace graphics {
 
-/**
- * Polygon mesh. Consists of vertices and faces.
- */
 class Mesh : boost::noncopyable {
 public:
-    enum class DrawMode {
-        Lines,
-        Triangles,
-        TriangleStrip
+    struct VertexSpec {
+        int stride {0};
+        int offCoords {-1};
+        int offNormals {-1};
+        int offUV1 {-1};
+        int offUV2 {-1};
+        int offTanSpace {-1};
+        int offBoneIndices {-1};
+        int offBoneWeights {-1};
     };
 
-    Mesh(std::vector<float> vertices, std::vector<uint16_t> indices, VertexAttributes attributes, DrawMode mode = DrawMode::Triangles);
-    ~Mesh();
+    struct Face {
+        uint16_t indices[3] {0};
+        uint16_t adjacentFaces[3] {0xffff};
+        glm::vec3 normal {0.0f};
+        uint32_t material {0};
+
+        Face() = default;
+
+        Face(uint16_t i1, uint16_t i2, uint16_t i3) {
+            indices[0] = i1;
+            indices[1] = i2;
+            indices[2] = i3;
+        }
+    };
+
+    Mesh(std::vector<float> vertices, std::vector<Face> faces, VertexSpec spec) :
+        _vertices(std::move(vertices)),
+        _faces(std::move(faces)),
+        _spec(std::move(spec)) {
+    }
+
+    ~Mesh() { deinit(); }
 
     void init();
     void deinit();
@@ -44,43 +65,19 @@ public:
     void draw();
     void drawInstanced(int count);
 
-    void drawTriangles(int startFace, int numFaces);
-    void drawTrianglesInstanced(int startFace, int numFaces, int count);
+    std::vector<glm::vec3> getFaceVertexCoords(int faceIdx) const;
+    glm::vec2 getFaceUV1(int faceIdx, const glm::vec3 &baryPosition) const;
+    glm::vec2 getFaceUV2(int faceIdx, const glm::vec3 &baryPosition) const;
 
-    /**
-     * @param faceIdx face index
-     * @return coordinates of three triangle vertices
-     */
-    std::vector<glm::vec3> getTriangleCoords(int faceIdx) const;
-
-    /**
-     * @param faceIdx face index
-     * @param baryPosition barycentric point coordinates
-     * @return first texture coordinates
-     */
-    glm::vec2 getTriangleTexCoords1(int faceIdx, const glm::vec3 &baryPosition) const;
-
-    /**
-     * @param faceIdx face index
-     * @param baryPosition barycentric point coordinates
-     * @return second texture coordinates
-     */
-    glm::vec2 getTriangleTexCoords2(int faceIdx, const glm::vec3 &baryPosition) const;
-
-    const std::vector<float> &vertices() const { return _vertices; }
-    const std::vector<uint16_t> &indices() const { return _indices; }
-    const VertexAttributes &attributes() const { return _attributes; }
     const AABB &aabb() const { return _aabb; }
 
 private:
     std::vector<float> _vertices;
-    std::vector<uint16_t> _indices;
-    VertexAttributes _attributes;
-    DrawMode _mode;
+    std::vector<Face> _faces;
+    VertexSpec _spec;
 
-    int _vertexCount {0};
-    bool _inited {false};
     AABB _aabb;
+    bool _inited {false};
 
     // OpenGL
 
@@ -91,14 +88,6 @@ private:
     // END OpenGL
 
     void computeAABB();
-
-    inline void ensureTriangles() const;
-
-    template <class T>
-    std::vector<T> getTriangleAttributes(int faceIdx, int offset) const;
-
-    template <class T>
-    inline T getVertexAttribute(uint16_t vertexIdx, int offset) const;
 };
 
 } // namespace graphics
