@@ -25,7 +25,6 @@
 #include "../model.h"
 #include "../models.h"
 #include "../textures.h"
-#include "../vertexattributes.h"
 
 using namespace std;
 
@@ -274,17 +273,13 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     shared_ptr<ModelNode::DanglyMesh> danglyMesh;
     shared_ptr<ModelNode::AABBTree> aabbTree;
 
-    VertexAttributes attributes;
-    attributes.stride = mdxVertexSize;
-    attributes.offCoords = offMdxVertices;
-    attributes.offNormals = offMdxNormals;
-    attributes.offTexCoords1 = offMdxTexCoords1;
-    attributes.offTexCoords2 = offMdxTexCoords2;
-    if (offMdxTanSpace != -1) {
-        attributes.offBitangents = offMdxTanSpace + 0 * sizeof(float);
-        attributes.offTangents = offMdxTanSpace + 3 * sizeof(float);
-        attributes.offTanSpaceNormals = offMdxTanSpace + 6 * sizeof(float);
-    }
+    Mesh::VertexSpec spec;
+    spec.stride = mdxVertexSize;
+    spec.offCoords = offMdxVertices;
+    spec.offNormals = offMdxNormals;
+    spec.offUV1 = offMdxTexCoords1;
+    spec.offUV2 = offMdxTexCoords2;
+    spec.offTanSpace = offMdxTanSpace;
 
     if (flags & MdlNodeFlags::skin) {
         // Skin Mesh Header
@@ -316,8 +311,9 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         skin = make_shared<ModelNode::Skin>();
         skin->boneMap = move(boneMap);
         skin->boneMatrices = move(boneMatrices);
-        attributes.offBoneIndices = offMdxBoneIndices;
-        attributes.offBoneWeights = offMdxBoneWeights;
+
+        spec.offBoneIndices = static_cast<int>(offMdxBoneIndices);
+        spec.offBoneWeights = static_cast<int>(offMdxBoneWeights);
 
     } else if (flags & MdlNodeFlags::dangly) {
         // Dangly Mesh Header
@@ -388,30 +384,21 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
             *(verticesPtr++) = vertexCoordsPtr[1];
             *(verticesPtr++) = vertexCoordsPtr[2];
 
-            // Texture coordinates
-            float *texCoordsPtr = &texCoords[2ll * referenceIdx];
-            *(verticesPtr++) = texCoordsPtr[0];
-            *(verticesPtr++) = texCoordsPtr[1];
-
             // Normals
             float *normalsPtr = &normals[3ll * referenceIdx];
             *(verticesPtr++) = normalsPtr[0];
             *(verticesPtr++) = normalsPtr[1];
             *(verticesPtr++) = normalsPtr[2];
+
+            // Texture coordinates
+            float *texCoordsPtr = &texCoords[2ll * referenceIdx];
+            *(verticesPtr++) = texCoordsPtr[0];
+            *(verticesPtr++) = texCoordsPtr[1];
+
+            spec.offCoords = 0;
+            spec.offNormals = 3 * sizeof(float);
+            spec.offUV1 = 6 * sizeof(float);
         }
-
-        attributes.stride = 8 * sizeof(float);
-        attributes.offCoords = 0;
-        attributes.offTexCoords1 = 3 * sizeof(float);
-        attributes.offNormals = 5 * sizeof(float);
-
-        indices = {
-            0, 13, 12, 0, 1, 13,
-            1, 14, 13, 1, 2, 14,
-            2, 15, 14, 2, 3, 15,
-            8, 4, 5, 8, 5, 9,
-            9, 5, 6, 9, 6, 10,
-            10, 6, 7, 10, 7, 11};
     }
 
     // Read vertices
@@ -420,7 +407,10 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         vertices = _mdxReader->getFloatArray(numVertices * mdxVertexSize / sizeof(float));
     }
 
+    vector<Mesh::Face> faces;
     if (!(flags & MdlNodeFlags::saber) && faceArrayDef.count > 0) {
+        faces.resize(faceArrayDef.count);
+
         // Faces
         seek(kMdlDataOffset + faceArrayDef.offset);
         for (uint32_t i = 0; i < faceArrayDef.count; ++i) {
@@ -430,6 +420,17 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
             vector<uint16_t> adjacentFaces(readUint16Array(3));
             vector<uint16_t> faceIndices(readUint16Array(3));
             materialFaces[material].push_back(i);
+
+            Mesh::Face face;
+            face.indices[0] = faceIndices[0];
+            face.indices[1] = faceIndices[1];
+            face.indices[2] = faceIndices[2];
+            face.adjacentFaces[0] = adjacentFaces[0];
+            face.adjacentFaces[1] = adjacentFaces[1];
+            face.adjacentFaces[2] = adjacentFaces[2];
+            face.normal = glm::make_vec3(&normalValues[0]);
+            face.material = material;
+            faces[i] = move(face);
         }
 
         // Indices
@@ -437,9 +438,23 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         uint32_t offIndices = readUint32();
         seek(kMdlDataOffset + offIndices);
         indices = readUint16Array(3 * faceArrayDef.count);
+
+    } else if (flags & MdlNodeFlags::saber) {
+        faces.emplace_back(0, 13, 12);
+        faces.emplace_back(0, 1, 13);
+        faces.emplace_back(1, 14, 13);
+        faces.emplace_back(1, 2, 14);
+        faces.emplace_back(2, 15, 14);
+        faces.emplace_back(2, 3, 15);
+        faces.emplace_back(8, 4, 5);
+        faces.emplace_back(8, 5, 9);
+        faces.emplace_back(9, 5, 6);
+        faces.emplace_back(9, 6, 10);
+        faces.emplace_back(10, 6, 7);
+        faces.emplace_back(10, 7, 11);
     }
 
-    auto mesh = make_unique<Mesh>(vertices, indices, attributes);
+    auto mesh = make_unique<Mesh>(move(vertices), move(faces), spec);
 
     ModelNode::UVAnimation uvAnimation;
     if (animateUV) {

@@ -346,12 +346,12 @@ void Area::loadLYT() {
             grassSceneNode = sceneGraph.newGrass(glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap);
             for (auto &material : _services.surfaces.getGrassSurfaces()) {
                 for (auto &face : aabbNode->getFacesByMaterial(material)) {
-                    vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getTriangleCoords(face));
+                    vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getFaceVertexCoords(face));
                     float triArea = calculateTriangleArea(vertices);
                     for (int i = 0; i < getNumGrassClusters(triArea); ++i) {
                         glm::vec3 baryPosition(getRandomBarycentric());
                         glm::vec3 position(aabbTransform * glm::vec4(barycentricToCartesian(vertices[0], vertices[1], vertices[2], baryPosition), 1.0f));
-                        glm::vec2 lightmapUV(aabbNode->mesh()->mesh->getTriangleTexCoords2(face, baryPosition));
+                        glm::vec2 lightmapUV(aabbNode->mesh()->mesh->getFaceUV2(face, baryPosition));
                         auto cluster = grassSceneNode->newCluster();
                         cluster->setPosition(move(position));
                         cluster->setVariant(getRandomGrassVariant());
