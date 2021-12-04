@@ -42,14 +42,19 @@ void Room::setVisible(bool visible) {
     for (auto &tenant : _tenants) {
         tenant->setVisible(visible);
     }
-    if (_visible == visible)
+    if (_visible == visible) {
         return;
-
-    _visible = visible;
-
+    }
     if (_model) {
         _model->setVisible(visible);
     }
+    if (_walkmesh) {
+        _walkmesh->setEnabled(visible);
+    }
+    if (_grass) {
+        _grass->setVisible(visible);
+    }
+    _visible = visible;
 }
 
 } // namespace game

@@ -339,10 +339,11 @@ void Area::loadLYT() {
         }
 
         // Grass
+        shared_ptr<GrassSceneNode> grassSceneNode;
         auto aabbNode = modelSceneNode->model().getAABBNode();
         if (_grass.texture && aabbNode) {
             glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), position));
-            auto grassSceneNode = sceneGraph.newGrass(glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap);
+            grassSceneNode = sceneGraph.newGrass(glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap);
             for (auto &material : _services.surfaces.getGrassSurfaces()) {
                 for (auto &face : aabbNode->getFacesByMaterial(material)) {
                     vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getTriangleCoords(face));
@@ -359,10 +360,10 @@ void Area::loadLYT() {
                     }
                 }
             }
-            sceneGraph.addRoot(move(grassSceneNode));
+            sceneGraph.addRoot(grassSceneNode);
         }
 
-        auto room = make_unique<Room>(lytRoom.name, position, move(modelSceneNode), walkmeshSceneNode);
+        auto room = make_unique<Room>(lytRoom.name, position, move(modelSceneNode), walkmeshSceneNode, move(grassSceneNode));
         if (walkmeshSceneNode) {
             walkmeshSceneNode->setUser(*room);
         }
@@ -910,7 +911,7 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
 
     for (auto &object : _objectsByType[ObjectType::Trigger]) {
         auto trigger = static_pointer_cast<Trigger>(object);
-        if (trigger->getDistanceTo2(position2d) > kDefaultRaycastDistance * kDefaultRaycastDistance)
+        if (trigger->getDistanceTo2(position2d) > kDefaultRaycastDistance2)
             continue;
         if (trigger->isTenant(triggerrer) || !trigger->isIn(position2d))
             continue;
