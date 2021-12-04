@@ -43,8 +43,10 @@ namespace reone {
 namespace scene {
 
 static constexpr float kElevationTestZ = 1024.0f;
-static constexpr float kMaxGrassDistance = 16.0f;
 static constexpr int kMaxSoundCount = 4;
+
+static constexpr float kMaxGrassDistance = 16.0f;
+static constexpr float kMaxGrassDistance2 = kMaxGrassDistance * kMaxGrassDistance;
 
 void SceneGraph::clear() {
     _modelRoots.clear();
@@ -251,16 +253,19 @@ void SceneGraph::prepareLeafs() {
 
     // Add grass clusters
     for (auto &grass : _grassRoots) {
-        float grassDistance2 = kMaxGrassDistance * kMaxGrassDistance;
+        if (!grass->isVisible()) {
+            continue;
+        }
         size_t numLeafs = elements.size();
         for (auto &grassChild : grass->children()) {
-            auto cluster = static_pointer_cast<GrassClusterSceneNode>(grassChild);
+            auto cluster = static_cast<GrassClusterSceneNode *>(grassChild.get());
             float distance2 = glm::distance2(cameraPos, cluster->position());
-            if (distance2 <= grassDistance2) {
-                glm::vec3 screen(glm::project(cluster->position(), _activeCamera->view(), _activeCamera->projection(), viewport));
-                if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
-                    elements.push_back(make_pair(cluster.get(), screen.z));
-                }
+            if (distance2 > kMaxGrassDistance2) {
+                continue;
+            }
+            glm::vec3 screen(glm::project(cluster->position(), _activeCamera->view(), _activeCamera->projection(), viewport));
+            if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
+                elements.push_back(make_pair(cluster, screen.z));
             }
         }
     }
@@ -269,10 +274,10 @@ void SceneGraph::prepareLeafs() {
     for (auto &emitter : _emitters) {
         glm::mat4 modelView(_activeCamera->view() * emitter->absoluteTransform());
         for (auto &emitterChild : emitter->children()) {
-            auto particle = static_pointer_cast<ParticleSceneNode>(emitterChild);
+            auto particle = static_cast<ParticleSceneNode *>(emitterChild.get());
             glm::vec3 screen(glm::project(particle->position(), modelView, _activeCamera->projection(), viewport));
             if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
-                elements.push_back(make_pair(particle.get(), screen.z));
+                elements.push_back(make_pair(particle, screen.z));
             }
         }
     }
