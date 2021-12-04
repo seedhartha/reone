@@ -38,6 +38,8 @@
 #include "../../scene/graphs.h"
 #include "../../scene/node/grass.h"
 #include "../../scene/node/grasscluster.h"
+#include "../../scene/node/model.h"
+#include "../../scene/node/sound.h"
 #include "../../scene/node/walkmesh.h"
 #include "../../scene/types.h"
 
@@ -409,7 +411,7 @@ void Area::loadPTH() {
             warn(boost::format("Point %d elevation not found") % i);
             continue;
         }
-        pointZ.insert(make_pair(i, collision.intersection.z));
+        pointZ.insert(make_pair(static_cast<int>(i), collision.intersection.z));
     }
 
     _pathfinder.load(points, pointZ);
@@ -444,7 +446,11 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
     auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     auto sceneNode = object->sceneNode();
     if (sceneNode) {
-        sceneGraph.addRoot(sceneNode);
+        if (sceneNode->type() == SceneNodeType::Model) {
+            sceneGraph.addRoot(static_pointer_cast<ModelSceneNode>(sceneNode));
+        } else if (sceneNode->type() == SceneNodeType::Sound) {
+            sceneGraph.addRoot(static_pointer_cast<SoundSceneNode>(sceneNode));
+        }
     }
     if (object->type() == ObjectType::Placeable) {
         auto placeable = static_pointer_cast<Placeable>(object);
@@ -504,7 +510,11 @@ void Area::doDestroyObject(uint32_t objectId) {
     auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     auto sceneNode = object->sceneNode();
     if (sceneNode) {
-        sceneGraph.removeRoot(sceneNode);
+        if (sceneNode->type() == SceneNodeType::Model) {
+            sceneGraph.removeRoot(static_pointer_cast<ModelSceneNode>(sceneNode));
+        } else if (sceneNode->type() == SceneNodeType::Sound) {
+            sceneGraph.removeRoot(static_pointer_cast<SoundSceneNode>(sceneNode));
+        }
     }
     if (object->type() == ObjectType::Placeable) {
         auto placeable = static_pointer_cast<Placeable>(object);

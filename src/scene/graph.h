@@ -97,8 +97,16 @@ public:
     // Roots
 
     void clear();
-    void addRoot(std::shared_ptr<SceneNode> node);
-    void removeRoot(const std::shared_ptr<SceneNode> &node);
+
+    void addRoot(std::shared_ptr<ModelSceneNode> node);
+    void addRoot(std::shared_ptr<WalkmeshSceneNode> node);
+    void addRoot(std::shared_ptr<SoundSceneNode> node);
+    void addRoot(std::shared_ptr<GrassSceneNode> node);
+
+    void removeRoot(const std::shared_ptr<ModelSceneNode> &node);
+    void removeRoot(const std::shared_ptr<WalkmeshSceneNode> &node);
+    void removeRoot(const std::shared_ptr<SoundSceneNode> &node);
+    void removeRoot(const std::shared_ptr<GrassSceneNode> &node);
 
     // END Roots
 
@@ -165,15 +173,7 @@ private:
     std::string _name;
     graphics::GraphicsOptions _options;
 
-    std::vector<std::shared_ptr<SceneNode>> _roots;
     std::shared_ptr<CameraSceneNode> _activeCamera;
-
-    std::vector<MeshSceneNode *> _opaqueMeshes;
-    std::vector<MeshSceneNode *> _transparentMeshes;
-    std::vector<MeshSceneNode *> _shadowMeshes;
-    std::vector<LightSceneNode *> _lights;
-    std::vector<EmitterSceneNode *> _emitters;
-    std::vector<GrassSceneNode *> _grass;
 
     std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _elements; // particles and grass clusters
 
@@ -197,6 +197,25 @@ private:
     graphics::Textures &_textures;
 
     // END Services
+
+    // Roots
+
+    std::set<std::shared_ptr<ModelSceneNode>> _modelRoots;
+    std::set<std::shared_ptr<WalkmeshSceneNode>> _walkmeshRoots;
+    std::set<std::shared_ptr<SoundSceneNode>> _soundRoots;
+    std::set<std::shared_ptr<GrassSceneNode>> _grassRoots;
+
+    // END Roots
+
+    // Leafs
+
+    std::vector<MeshSceneNode *> _opaqueMeshes;
+    std::vector<MeshSceneNode *> _transparentMeshes;
+    std::vector<MeshSceneNode *> _shadowMeshes;
+    std::vector<LightSceneNode *> _lights;
+    std::vector<EmitterSceneNode *> _emitters;
+
+    // END Leafs
 
     // Lighting and shadows
 

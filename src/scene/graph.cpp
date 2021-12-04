@@ -46,27 +46,52 @@ static constexpr float kElevationTestZ = 1024.0f;
 static constexpr float kMaxGrassDistance = 16.0f;
 static constexpr int kMaxSoundCount = 4;
 
-static const bool g_debugAABB = false;
-
 void SceneGraph::clear() {
-    _roots.clear();
+    _modelRoots.clear();
+    _walkmeshRoots.clear();
+    _soundRoots.clear();
+    _grassRoots.clear();
     _closestLights.clear();
 }
 
-void SceneGraph::addRoot(shared_ptr<SceneNode> node) {
-    _roots.push_back(move(node));
+void SceneGraph::addRoot(shared_ptr<ModelSceneNode> node) {
+    _modelRoots.insert(move(node));
 }
 
-void SceneGraph::removeRoot(const shared_ptr<SceneNode> &node) {
-    auto maybeRoot = find(_roots.begin(), _roots.end(), node);
-    if (maybeRoot != _roots.end()) {
-        _roots.erase(maybeRoot);
-    }
+void SceneGraph::addRoot(shared_ptr<WalkmeshSceneNode> node) {
+    _walkmeshRoots.insert(move(node));
+}
+
+void SceneGraph::addRoot(shared_ptr<SoundSceneNode> node) {
+    _soundRoots.insert(move(node));
+}
+
+void SceneGraph::addRoot(shared_ptr<GrassSceneNode> node) {
+    _grassRoots.insert(move(node));
+}
+
+void SceneGraph::removeRoot(const shared_ptr<ModelSceneNode> &node) {
+    _modelRoots.erase(node);
+}
+
+void SceneGraph::removeRoot(const shared_ptr<WalkmeshSceneNode> &node) {
+    _walkmeshRoots.erase(node);
+}
+
+void SceneGraph::removeRoot(const shared_ptr<SoundSceneNode> &node) {
+    _soundRoots.erase(node);
+}
+
+void SceneGraph::removeRoot(const shared_ptr<GrassSceneNode> &node) {
+    _grassRoots.erase(node);
 }
 
 void SceneGraph::update(float dt) {
     if (_updateRoots) {
-        for (auto &root : _roots) {
+        for (auto &root : _modelRoots) {
+            root->update(dt);
+        }
+        for (auto &root : _soundRoots) {
             root->update(dt);
         }
     }
@@ -82,18 +107,13 @@ void SceneGraph::update(float dt) {
 }
 
 void SceneGraph::cullRoots() {
-    for (auto &root : _roots) {
-        if (root->type() != SceneNodeType::Model) {
-            continue;
-        }
-        auto modelRoot = static_pointer_cast<ModelSceneNode>(root);
-
+    for (auto &root : _modelRoots) {
         bool culled =
-            !modelRoot->isVisible() ||
-            modelRoot->getDistanceTo2(*_activeCamera) > modelRoot->drawDistance() * modelRoot->drawDistance() ||
-            (modelRoot->isCullable() && !_activeCamera->isInFrustum(*root));
+            !root->isVisible() ||
+            root->getDistanceTo2(*_activeCamera) > root->drawDistance() * root->drawDistance() ||
+            (root->isCullable() && !_activeCamera->isInFrustum(*root));
 
-        modelRoot->setCulled(culled);
+        root->setCulled(culled);
     }
 }
 
@@ -149,9 +169,8 @@ void SceneGraph::refreshNodeLists() {
     _shadowMeshes.clear();
     _lights.clear();
     _emitters.clear();
-    _grass.clear();
 
-    for (auto &root : _roots) {
+    for (auto &root : _modelRoots) {
         refreshFromSceneNode(root);
     }
 }
@@ -189,9 +208,6 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
         break;
     case SceneNodeType::Emitter:
         _emitters.push_back(static_pointer_cast<EmitterSceneNode>(node).get());
-        break;
-    case SceneNodeType::Grass:
-        _grass.push_back(static_pointer_cast<GrassSceneNode>(node).get());
         break;
     default:
         break;
@@ -234,7 +250,7 @@ void SceneGraph::prepareLeafs() {
     glm::vec3 cameraPos(_activeCamera->absoluteTransform()[3]);
 
     // Add grass clusters
-    for (auto &grass : _grass) {
+    for (auto &grass : _grassRoots) {
         float grassDistance2 = kMaxGrassDistance * kMaxGrassDistance;
         size_t numLeafs = elements.size();
         for (auto &grassChild : grass->children()) {
@@ -284,21 +300,17 @@ void SceneGraph::updateSounds() {
     glm::vec3 cameraPos(_activeCamera->localTransform()[3]);
 
     // For each sound, calculate its distance to the camera
-    for (auto &root : _roots) {
-        if (root->type() != SceneNodeType::Sound) {
+    for (auto &root : _soundRoots) {
+        root->setAudible(false);
+        if (!root->isEnabled()) {
             continue;
         }
-        auto sound = static_pointer_cast<SoundSceneNode>(root);
-        sound->setAudible(false);
-        if (!sound->isEnabled()) {
-            continue;
-        }
-        float dist2 = sound->getDistanceTo2(cameraPos);
-        float maxDist2 = sound->maxDistance() * sound->maxDistance();
+        float dist2 = root->getDistanceTo2(cameraPos);
+        float maxDist2 = root->maxDistance() * root->maxDistance();
         if (dist2 > maxDist2) {
             continue;
         }
-        distances.push_back(make_pair(sound.get(), dist2));
+        distances.push_back(make_pair(root.get(), dist2));
     }
 
     // Take up to N most closest sounds to the camera
@@ -343,26 +355,6 @@ void SceneGraph::draw(bool shadowPass) {
     // Render opaque meshes
     for (auto &mesh : _opaqueMeshes) {
         mesh->drawSingle(false);
-    }
-
-    if (g_debugAABB) {
-        for (auto &root : _roots) {
-            bool walkmesh = root->type() == SceneNodeType::Walkmesh;
-            if (walkmesh && !static_pointer_cast<WalkmeshSceneNode>(root)->isEnabled()) {
-                continue;
-            }
-
-            glm::mat4 transform(root->absoluteTransform());
-            transform *= glm::translate(root->aabb().center());
-            transform *= glm::scale(root->aabb().getSize());
-
-            ShaderUniforms uniforms(_uniformsPrototype);
-            uniforms.combined.general.model = move(transform);
-            uniforms.combined.general.color = glm::vec4(walkmesh ? red : white, 1.0f);
-
-            _shaders.activate(ShaderProgram::SimpleColor, uniforms);
-            _meshes.aabb().draw();
-        }
     }
 
     // Render transparent meshes
@@ -452,25 +444,21 @@ bool SceneGraph::testElevation(const glm::vec2 &position, Collision &outCollisio
 
     glm::vec3 origin(position, kElevationTestZ);
 
-    for (auto &root : _roots) {
-        if (root->type() != SceneNodeType::Walkmesh) {
+    for (auto &root : _walkmeshRoots) {
+        if (!root->isEnabled()) {
             continue;
         }
-        auto walkmesh = static_pointer_cast<WalkmeshSceneNode>(root);
-        if (!walkmesh->isEnabled()) {
-            continue;
-        }
-        auto objSpaceOrigin = glm::vec3(walkmesh->absoluteTransformInverse() * glm::vec4(origin, 1.0f));
+        auto objSpaceOrigin = glm::vec3(root->absoluteTransformInverse() * glm::vec4(origin, 1.0f));
         float distance = 0.0f;
-        auto face = walkmesh->walkmesh().raycast(_walkcheckSurfaces, objSpaceOrigin, down, 2.0f * kElevationTestZ, distance);
+        auto face = root->walkmesh().raycast(_walkcheckSurfaces, objSpaceOrigin, down, 2.0f * kElevationTestZ, distance);
         if (face) {
             if (_walkableSurfaces.count(face->material) == 0) {
                 // non-walkable
                 return false;
             }
-            outCollision.user = walkmesh->user();
+            outCollision.user = root->user();
             outCollision.intersection = origin + distance * down;
-            outCollision.normal = walkmesh->absoluteTransform() * glm::vec4(face->normal, 0.0f);
+            outCollision.normal = root->absoluteTransform() * glm::vec4(face->normal, 0.0f);
             outCollision.material = face->material;
             return true;
         }
@@ -485,27 +473,23 @@ bool SceneGraph::testObstacle(const glm::vec3 &origin, const glm::vec3 &dest, co
     float maxDistance = glm::length(originToDest);
     float minDistance = numeric_limits<float>::max();
 
-    for (auto &root : _roots) {
-        if (root->type() != SceneNodeType::Walkmesh) {
-            continue;
-        }
+    for (auto &root : _walkmeshRoots) {
         if (root->user() == excludeUser) {
             continue;
         }
-        auto walkmesh = static_pointer_cast<WalkmeshSceneNode>(root);
-        if (!walkmesh->isEnabled()) {
+        if (!root->isEnabled()) {
             continue;
         }
-        glm::vec3 objSpaceOrigin(walkmesh->absoluteTransformInverse() * glm::vec4(origin, 1.0f));
-        glm::vec3 objSpaceDir(walkmesh->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
+        glm::vec3 objSpaceOrigin(root->absoluteTransformInverse() * glm::vec4(origin, 1.0f));
+        glm::vec3 objSpaceDir(root->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
         float distance = 0.0f;
-        auto face = walkmesh->walkmesh().raycast(_walkcheckSurfaces, objSpaceOrigin, objSpaceDir, 2.0f * kElevationTestZ, distance);
+        auto face = root->walkmesh().raycast(_walkcheckSurfaces, objSpaceOrigin, objSpaceDir, 2.0f * kElevationTestZ, distance);
         if (!face || distance > maxDistance || distance > minDistance) {
             continue;
         }
-        outCollision.user = walkmesh->user();
+        outCollision.user = root->user();
         outCollision.intersection = origin + distance * dir;
-        outCollision.normal = walkmesh->absoluteTransform() * glm::vec4(face->normal, 0.0f);
+        outCollision.normal = root->absoluteTransform() * glm::vec4(face->normal, 0.0f);
         outCollision.material = face->material;
         minDistance = distance;
     }
