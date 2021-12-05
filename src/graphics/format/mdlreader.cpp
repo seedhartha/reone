@@ -394,11 +394,12 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
             float *texCoordsPtr = &texCoords[2ll * referenceIdx];
             *(verticesPtr++) = texCoordsPtr[0];
             *(verticesPtr++) = texCoordsPtr[1];
-
-            spec.offCoords = 0;
-            spec.offNormals = 3 * sizeof(float);
-            spec.offUV1 = 6 * sizeof(float);
         }
+
+        spec.stride = 8 * sizeof(float);
+        spec.offCoords = 0;
+        spec.offNormals = 3 * sizeof(float);
+        spec.offUV1 = 6 * sizeof(float);
     }
 
     // Read vertices
