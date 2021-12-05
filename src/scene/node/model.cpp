@@ -376,7 +376,7 @@ static bool doesNodeHaveAncestor(const ModelNode &node, const std::string &name)
 }
 
 void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float time, const ModelNode &modelNode) {
-    shared_ptr<ModelNode> animNode(channel.anim->getNodeByNumber(modelNode.number()));
+    shared_ptr<ModelNode> animNode(channel.anim->getNodeByName(modelNode.name()));
     if (animNode && modelNode.isAnimated() && doesNodeHaveAncestor(modelNode, channel.anim->root())) {
         AnimationState state;
         state.flags = 0;

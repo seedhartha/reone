@@ -53,6 +53,7 @@ void Animation::fillLookups() {
         nodes.pop();
 
         _nodeByNumber.insert(make_pair(node->number(), node));
+        _nodeByName.insert(make_pair(node->name(), node));
 
         for (auto &child : node->children()) {
             nodes.push(child);
@@ -62,6 +63,10 @@ void Animation::fillLookups() {
 
 shared_ptr<ModelNode> Animation::getNodeByNumber(uint16_t number) const {
     return getFromLookupOrNull(_nodeByNumber, number);
+}
+
+shared_ptr<ModelNode> Animation::getNodeByName(const string &name) const {
+    return getFromLookupOrNull(_nodeByName, name);
 }
 
 } // namespace graphics

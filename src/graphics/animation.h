@@ -57,6 +57,7 @@ private:
     std::vector<Event> _events;
 
     std::unordered_map<uint16_t, std::shared_ptr<ModelNode>> _nodeByNumber;
+    std::unordered_map<std::string, std::shared_ptr<ModelNode>> _nodeByName;
 
     void fillLookups();
 };
