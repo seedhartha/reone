@@ -27,7 +27,6 @@
 #ifdef R_ENABLE_MOVIE
 
 extern "C" {
-
 #include "libavformat/avformat.h"
 #include "libavutil/imgutils.h"
 #include "libswresample/swresample.h"
@@ -214,7 +213,8 @@ private:
             return;
         }
 
-        while (av_read_frame(_formatCtx, &packet) >= 0) {
+        int ret;
+        while ((ret = av_read_frame(_formatCtx, &packet)) >= 0) {
             if (packet.stream_index != _videoStreamIdx) {
                 continue;
             }
@@ -226,14 +226,11 @@ private:
             }
 
             avcodec_send_packet(_videoCodecCtx, &packet);
-
-            int ret;
             if ((ret = avcodec_receive_frame(_videoCodecCtx, _avFrame)) < 0) {
                 if (ret == AVERROR_EOF || ret == AVERROR(EAGAIN)) {
                     continue;
                 } else {
-                    _ended = true;
-                    goto cleanup;
+                    break;
                 }
             }
 
@@ -254,7 +251,9 @@ private:
 
             break;
         }
-    cleanup:
+        if (ret < 0) {
+            _ended = true;
+        }
         av_packet_unref(&packet);
     }
 
@@ -262,13 +261,12 @@ private:
         _audioStream = make_shared<AudioStream>();
 
         AVPacket packet;
-        while (av_read_frame(_formatCtx, &packet) >= 0) {
+        int ret;
+        while ((ret = av_read_frame(_formatCtx, &packet)) >= 0) {
             if (packet.stream_index != _audioStreamIdx) {
                 continue;
             }
             avcodec_send_packet(_audioCodecCtx, &packet);
-
-            int ret;
             while ((ret = avcodec_receive_frame(_audioCodecCtx, _avFrame)) >= 0) {
                 // Resample frame
                 int numSamples = swr_get_out_samples(_swrContext, _avFrame->nb_samples);
@@ -291,12 +289,10 @@ private:
                 if (ret == AVERROR_EOF || ret == AVERROR(EAGAIN)) {
                     continue;
                 } else {
-                    _ended = true;
-                    goto cleanup;
+                    break;
                 }
             }
         }
-    cleanup:
         av_packet_unref(&packet);
     }
 
