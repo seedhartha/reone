@@ -21,12 +21,10 @@
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
 #include "../../common/streamutil.h"
-#include "../../graphics/barycentricutil.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/models.h"
 #include "../../graphics/textures.h"
-#include "../../graphics/triangleutil.h"
 #include "../../graphics/walkmesh.h"
 #include "../../graphics/walkmeshes.h"
 #include "../../resource/2da.h"
@@ -72,13 +70,11 @@ namespace reone {
 namespace game {
 
 static constexpr float kDefaultFieldOfView = 75.0f;
-static constexpr float kGrassDensityFactor = 0.25f;
-
 static constexpr float kUpdatePerceptionInterval = 1.0f; // seconds
+static constexpr float kLineOfSightTestHeight = 1.7f;    // TODO: make it appearance-based
 
 static constexpr float kMaxCollisionDistance = 8.0f;
 static constexpr float kMaxCollisionDistance2 = kMaxCollisionDistance * kMaxCollisionDistance;
-static constexpr float kLineOfSightTestHeight = 1.7f; // TODO: make it appearance-based
 
 static glm::vec3 g_defaultAmbientColor {0.2f};
 static CameraStyle g_defaultCameraStyle {3.2f, 83.0f, 0.45f, 55.0f};
@@ -312,7 +308,6 @@ void Area::loadLYT() {
     lyt.load(wrap(lytData));
 
     auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
-
     for (auto &lytRoom : lyt.rooms()) {
         auto model = _services.models.get(lytRoom.name);
         if (!model) {
@@ -342,24 +337,14 @@ void Area::loadLYT() {
         shared_ptr<GrassSceneNode> grassSceneNode;
         auto aabbNode = modelSceneNode->model().getAABBNode();
         if (_grass.texture && aabbNode) {
-            glm::mat4 aabbTransform(glm::translate(aabbNode->absoluteTransform(), position));
-            grassSceneNode = sceneGraph.newGrass(glm::vec2(_grass.quadSize), _grass.texture, aabbNode->mesh()->lightmap);
-            for (auto &material : _services.surfaces.getGrassSurfaces()) {
-                for (auto &face : aabbNode->getFacesByMaterial(material)) {
-                    vector<glm::vec3> vertices(aabbNode->mesh()->mesh->getFaceVertexCoords(face));
-                    float triArea = calculateTriangleArea(vertices);
-                    for (int i = 0; i < getNumGrassClusters(triArea); ++i) {
-                        glm::vec3 baryPosition(getRandomBarycentric());
-                        glm::vec3 position(aabbTransform * glm::vec4(barycentricToCartesian(vertices[0], vertices[1], vertices[2], baryPosition), 1.0f));
-                        glm::vec2 lightmapUV(aabbNode->mesh()->mesh->getFaceUV2(face, baryPosition));
-                        auto cluster = grassSceneNode->newCluster();
-                        cluster->setPosition(move(position));
-                        cluster->setVariant(getRandomGrassVariant());
-                        cluster->setLightmapUV(move(lightmapUV));
-                        grassSceneNode->addChild(move(cluster));
-                    }
-                }
-            }
+            grassSceneNode = sceneGraph.newGrass(
+                _grass.density,
+                _grass.quadSize,
+                _grass.probabilities,
+                _services.surfaces.getGrassSurfaces(),
+                _grass.texture,
+                aabbNode);
+            grassSceneNode->setLocalTransform(glm::translate(position) * aabbNode->absoluteTransform());
             sceneGraph.addRoot(grassSceneNode);
         }
 
@@ -795,24 +780,6 @@ void Area::runOnExitScript() {
 
 void Area::destroyObject(const SpatialObject &object) {
     _objectsToDestroy.insert(object.id());
-}
-
-int Area::getNumGrassClusters(float triArea) const {
-    return static_cast<int>(glm::round(kGrassDensityFactor * _grass.density * triArea));
-}
-
-int Area::getRandomGrassVariant() const {
-    float sum = _grass.probabilities[0] + _grass.probabilities[1] + _grass.probabilities[2] + _grass.probabilities[3];
-    float val = random(0.0f, 1.0f) * sum;
-    float upper = 0.0f;
-
-    for (int i = 0; i < 3; ++i) {
-        upper += _grass.probabilities[i];
-        if (val < upper)
-            return i;
-    }
-
-    return 3;
 }
 
 glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &object, const glm::mat4 &projection, const glm::mat4 &view) const {

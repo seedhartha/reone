@@ -48,9 +48,6 @@ static constexpr int kMaxSoundCount = 4;
 static constexpr float kMaxCollisionDistance = 8.0f;
 static constexpr float kMaxCollisionDistance2 = kMaxCollisionDistance * kMaxCollisionDistance;
 
-static constexpr float kMaxGrassDistance = 16.0f;
-static constexpr float kMaxGrassDistance2 = kMaxGrassDistance * kMaxGrassDistance;
-
 void SceneGraph::clear() {
     _modelRoots.clear();
     _walkmeshRoots.clear();
@@ -94,6 +91,9 @@ void SceneGraph::removeRoot(const shared_ptr<GrassSceneNode> &node) {
 void SceneGraph::update(float dt) {
     if (_updateRoots) {
         for (auto &root : _modelRoots) {
+            root->update(dt);
+        }
+        for (auto &root : _grassRoots) {
             root->update(dt);
         }
         for (auto &root : _soundRoots) {
@@ -251,24 +251,23 @@ void SceneGraph::prepareTransparentMeshes() {
 void SceneGraph::prepareLeafs() {
     static glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
 
-    vector<pair<SceneNode *, float>> elements;
-    glm::vec3 cameraPos(_activeCamera->absoluteTransform()[3]);
+    vector<pair<SceneNode *, float>> leafs;
+    auto cameraPos = _activeCamera->getOrigin();
 
     // Add grass clusters
     for (auto &grass : _grassRoots) {
         if (!grass->isVisible()) {
             continue;
         }
-        size_t numLeafs = elements.size();
-        for (auto &grassChild : grass->children()) {
-            auto cluster = static_cast<GrassClusterSceneNode *>(grassChild.get());
-            float distance2 = glm::distance2(cameraPos, cluster->position());
-            if (distance2 > kMaxGrassDistance2) {
+        glm::mat4 modelView(_activeCamera->view() * grass->absoluteTransform());
+        for (auto &child : grass->children()) {
+            if (child->type() != SceneNodeType::GrassCluster) {
                 continue;
             }
-            glm::vec3 screen(glm::project(cluster->position(), _activeCamera->view(), _activeCamera->projection(), viewport));
+            auto cluster = static_cast<GrassClusterSceneNode *>(child.get());
+            glm::vec3 screen(glm::project(cluster->position(), modelView, _activeCamera->projection(), viewport));
             if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
-                elements.push_back(make_pair(cluster, screen.z));
+                leafs.push_back(make_pair(cluster, screen.z));
             }
         }
     }
@@ -276,30 +275,33 @@ void SceneGraph::prepareLeafs() {
     // Add particles
     for (auto &emitter : _emitters) {
         glm::mat4 modelView(_activeCamera->view() * emitter->absoluteTransform());
-        for (auto &emitterChild : emitter->children()) {
-            auto particle = static_cast<ParticleSceneNode *>(emitterChild.get());
+        for (auto &child : emitter->children()) {
+            if (child->type() != SceneNodeType::Particle) {
+                continue;
+            }
+            auto particle = static_cast<ParticleSceneNode *>(child.get());
             glm::vec3 screen(glm::project(particle->position(), modelView, _activeCamera->projection(), viewport));
             if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
-                elements.push_back(make_pair(particle, screen.z));
+                leafs.push_back(make_pair(particle, screen.z));
             }
         }
     }
 
-    // Sort elements back to front
-    sort(elements.begin(), elements.end(), [](auto &left, auto &right) { return left.second > right.second; });
+    // Sort leafs back to front
+    sort(leafs.begin(), leafs.end(), [](auto &left, auto &right) { return left.second > right.second; });
 
-    // Group elements into buckets
-    _elements.clear();
-    vector<SceneNode *> nodeElements;
-    for (auto &elementDepth : elements) {
-        if (!nodeElements.empty()) {
-            _elements.push_back(make_pair(nodeElements[0]->parent(), nodeElements));
-            nodeElements.clear();
+    // Group leafs into buckets
+    _leafs.clear();
+    vector<SceneNode *> nodeLeafs;
+    for (auto &leafDepth : leafs) {
+        if (!nodeLeafs.empty()) {
+            _leafs.push_back(make_pair(nodeLeafs[0]->parent(), nodeLeafs));
+            nodeLeafs.clear();
         }
-        nodeElements.push_back(elementDepth.first);
+        nodeLeafs.push_back(leafDepth.first);
     }
-    if (!nodeElements.empty()) {
-        _elements.push_back(make_pair(nodeElements[0]->parent(), nodeElements));
+    if (!nodeLeafs.empty()) {
+        _leafs.push_back(make_pair(nodeLeafs[0]->parent(), nodeLeafs));
     }
 }
 
@@ -347,11 +349,12 @@ void SceneGraph::draw(bool shadowPass) {
     static glm::vec3 white {1.0f, 1.0f, 1.0f};
     static glm::vec3 red {1.0f, 0.0f, 0.0f};
 
-    if (!_activeCamera)
+    if (!_activeCamera) {
         return;
+    }
 
+    // Render only shadow meshes on shadow pass
     if (shadowPass) {
-        // Render shadow meshes
         for (auto &mesh : _shadowMeshes) {
             mesh->drawSingle(true);
         }
@@ -373,9 +376,9 @@ void SceneGraph::draw(bool shadowPass) {
     _context.setBackFaceCullingEnabled(false);
 
     // Render particles and grass clusters
-    for (auto &elem : _elements) {
-        int count = elem.first->type() == SceneNodeType::Grass && elem.second.size() > kMaxGrassClusters ? kMaxGrassClusters : -1;
-        elem.first->drawElements(elem.second, count);
+    for (auto &nodeLeaf : _leafs) {
+        int count = nodeLeaf.first->type() == SceneNodeType::Grass && nodeLeaf.second.size() > kMaxGrassClusters ? kMaxGrassClusters : -1;
+        nodeLeaf.first->drawElements(nodeLeaf.second, count);
     }
 
     // Render lens flares
@@ -396,8 +399,9 @@ vector<LightSceneNode *> SceneGraph::getLightsAt(
     int count,
     function<bool(const LightSceneNode &)> predicate) const {
 
-    if (!_lightingRefNode)
+    if (!_lightingRefNode) {
         return vector<LightSceneNode *>();
+    }
 
     // Compute distances between each light and the reference node
     vector<pair<LightSceneNode *, float>> distances;
@@ -419,18 +423,16 @@ vector<LightSceneNode *> SceneGraph::getLightsAt(
     sort(distances.begin(), distances.end(), [](auto &left, auto &right) {
         LightSceneNode *leftLight = left.first;
         LightSceneNode *rightLight = right.first;
-
         int leftPriority = leftLight->modelNode().light()->priority;
         int rightPriority = rightLight->modelNode().light()->priority;
-
-        if (leftPriority < rightPriority)
+        if (leftPriority < rightPriority) {
             return true;
-        if (leftPriority > rightPriority)
+        }
+        if (leftPriority > rightPriority) {
             return false;
-
+        }
         float leftDistance = left.second;
         float rightDistance = right.second;
-
         return leftDistance < rightDistance;
     });
 
@@ -563,11 +565,14 @@ unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(shared_ptr<Walkmesh> walkm
         _shaders);
 }
 
-unique_ptr<GrassSceneNode> SceneGraph::newGrass(glm::vec2 quadSize, shared_ptr<Texture> texture, shared_ptr<Texture> lightmap) {
+unique_ptr<GrassSceneNode> SceneGraph::newGrass(float density, float quadSize, glm::vec4 probabilities, set<uint32_t> materials, shared_ptr<Texture> texture, shared_ptr<ModelNode> aabbNode) {
     return make_unique<GrassSceneNode>(
-        move(quadSize),
+        density,
+        quadSize,
+        move(probabilities),
+        move(materials),
         move(texture),
-        move(lightmap),
+        move(aabbNode),
         *this,
         _context,
         _meshes,

@@ -18,6 +18,7 @@
 #include "mesh.h"
 
 #include "barycentricutil.h"
+#include "triangleutil.h"
 
 using namespace std;
 
@@ -87,6 +88,7 @@ void Mesh::init() {
 
     // END OpenGL
 
+    computeFaceData();
     computeAABB();
 
     _inited = true;
@@ -112,6 +114,24 @@ void Mesh::drawInstanced(int count) {
     glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(3 * _faces.size()), GL_UNSIGNED_SHORT, nullptr, count);
 }
 
+void Mesh::computeFaceData() {
+    for (auto &face : _faces) {
+        vector<glm::vec3> verts(getVertexCoords(face));
+        // Normal
+        if (face.normal[0] == 0.0f && face.normal[1] == 0.0f && face.normal[2] == 0.0f) {
+            face.normal = calculateTriangleNormal(verts);
+        }
+        // Centroid
+        if (face.centroid[0] == 0.0f || face.centroid[1] == 0.0f || face.centroid[2] == 0.0f) {
+            face.centroid = (verts[0] + verts[1] + verts[2]) / 3.0f;
+        }
+        // Area
+        if (face.area == 0.0f) {
+            face.area = calculateTriangleArea(verts);
+        }
+    }
+}
+
 void Mesh::computeAABB() {
     _aabb.reset();
 
@@ -123,39 +143,30 @@ void Mesh::computeAABB() {
     }
 }
 
-vector<glm::vec3> Mesh::getFaceVertexCoords(int faceIdx) const {
+vector<glm::vec3> Mesh::getVertexCoords(const Face &face) const {
     vector<glm::vec3> coords(3);
-
-    auto &indices = _faces[faceIdx].indices;
     for (int i = 0; i < 3; ++i) {
-        auto vertPtr = &_vertices[indices[i] * (_spec.stride / sizeof(float))];
+        auto vertPtr = &_vertices[face.indices[i] * (_spec.stride / sizeof(float))];
         coords[i] = glm::make_vec3(&vertPtr[_spec.offCoords / sizeof(float)]);
     }
-
     return move(coords);
 }
 
-glm::vec2 Mesh::getFaceUV1(int faceIdx, const glm::vec3 &baryPosition) const {
+glm::vec2 Mesh::getUV1(const Face &face, const glm::vec3 &baryPosition) const {
     vector<glm::vec2> uv(3);
-
-    auto &indices = _faces[faceIdx].indices;
     for (int i = 0; i < 3; ++i) {
-        auto vertPtr = &_vertices[indices[i] * (_spec.stride / sizeof(float))];
+        auto vertPtr = &_vertices[face.indices[i] * (_spec.stride / sizeof(float))];
         uv[i] = glm::make_vec2(&vertPtr[_spec.offUV1 / sizeof(float)]);
     }
-
     return barycentricToCartesian(uv[0], uv[1], uv[2], baryPosition);
 }
 
-glm::vec2 Mesh::getFaceUV2(int faceIdx, const glm::vec3 &baryPosition) const {
+glm::vec2 Mesh::getUV2(const Face &face, const glm::vec3 &baryPosition) const {
     vector<glm::vec2> uv(3);
-
-    auto &indices = _faces[faceIdx].indices;
     for (int i = 0; i < 3; ++i) {
-        auto vertPtr = &_vertices[indices[i] * (_spec.stride / sizeof(float))];
+        auto vertPtr = &_vertices[face.indices[i] * (_spec.stride / sizeof(float))];
         uv[i] = glm::make_vec2(&vertPtr[_spec.offUV2 / sizeof(float)]);
     }
-
     return barycentricToCartesian(uv[0], uv[1], uv[2], baryPosition);
 }
 

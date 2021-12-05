@@ -78,7 +78,6 @@ public:
 
     struct TriangleMesh {
         std::shared_ptr<Mesh> mesh;
-        std::unordered_map<uint32_t, std::vector<uint32_t>> materialFaces;
         UVAnimation uvAnimation;
         glm::vec3 diffuse {1.0f};
         glm::vec3 ambient {1.0f};
@@ -184,8 +183,6 @@ public:
     void addChild(std::shared_ptr<ModelNode> child);
 
     bool isAnimated() const { return _animated; }
-
-    std::vector<uint32_t> getFacesByMaterial(uint32_t material) const;
 
     uint16_t number() const { return _number; }
     const std::string &name() const { return _name; }
