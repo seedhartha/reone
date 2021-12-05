@@ -165,7 +165,14 @@ public:
         IAnimationEventListener *animEventListener = nullptr);
 
     std::unique_ptr<WalkmeshSceneNode> newWalkmesh(std::shared_ptr<graphics::Walkmesh> walkmesh);
-    std::unique_ptr<GrassSceneNode> newGrass(glm::vec2 quadSize, std::shared_ptr<graphics::Texture> texture, std::shared_ptr<graphics::Texture> lightmap);
+
+    std::unique_ptr<GrassSceneNode> newGrass(
+        float density,
+        float quadSize,
+        glm::vec4 probabilities,
+        std::set<uint32_t> materials,
+        std::shared_ptr<graphics::Texture> texture,
+        std::shared_ptr<graphics::ModelNode> aabbNode);
 
     // END Factory methods
 
@@ -174,8 +181,6 @@ private:
     graphics::GraphicsOptions _options;
 
     std::shared_ptr<CameraSceneNode> _activeCamera;
-
-    std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _elements; // particles and grass clusters
 
     uint32_t _textureId {0};
     bool _updateRoots {true};
@@ -214,6 +219,8 @@ private:
     std::vector<MeshSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
+
+    std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _leafs; // particles and grass clusters
 
     // END Leafs
 

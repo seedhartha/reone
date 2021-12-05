@@ -62,7 +62,7 @@ public:
         float quadSize {0.0f};
         int ambient {0};
         int diffuse {0};
-        float probabilities[4];
+        glm::vec4 probabilities {0.0f};
     };
 
     typedef std::vector<std::pair<CreatureType, int>> SearchCriteriaList;
@@ -197,13 +197,6 @@ public:
     void setStealthXPDecrement(int value);
 
     // END Stealth
-
-    // Grass
-
-    int getNumGrassClusters(float triArea) const;
-    int getRandomGrassVariant() const;
-
-    // END Grass
 
     // Fog
 

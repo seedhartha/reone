@@ -17,26 +17,32 @@
 
 #pragma once
 
+#include "../../graphics/types.h"
+
 #include "../node.h"
+
+#include "grasscluster.h"
 
 namespace reone {
 
 namespace graphics {
 
+class ModelNode;
 class Texture;
 
-}
+} // namespace graphics
 
 namespace scene {
-
-class GrassClusterSceneNode;
 
 class GrassSceneNode : public SceneNode {
 public:
     GrassSceneNode(
-        glm::vec2 quadSize,
+        float density,
+        float quadSize,
+        glm::vec4 probabilities,
+        std::set<uint32_t> materials,
         std::shared_ptr<graphics::Texture> texture,
-        std::shared_ptr<graphics::Texture> lightmap,
+        std::shared_ptr<graphics::ModelNode> aabbNode,
         SceneGraph &sceneGraph,
         graphics::Context &context,
         graphics::Meshes &meshes,
@@ -47,19 +53,38 @@ public:
             context,
             meshes,
             shaders),
-        _quadSize(std::move(quadSize)),
+        _density(density),
+        _quadSize(quadSize),
+        _probabilities(std::move(probabilities)),
+        _materials(std::move(materials)),
         _texture(std::move(texture)),
-        _lightmap(lightmap) {
+        _aabbNode(std::move(aabbNode)) {
+
+        init();
     }
 
+    void init();
+
+    void update(float dt) override;
+
     void drawElements(const std::vector<SceneNode *> &elements, int count) override;
+
+    int getNumClustersInFace(float area) const;
+    int getRandomGrassVariant() const;
 
     std::unique_ptr<GrassClusterSceneNode> newCluster();
 
 private:
-    glm::vec2 _quadSize {0.0f};
+    float _density;
+    float _quadSize;
+    glm::vec4 _probabilities;
+    std::set<uint32_t> _materials;
     std::shared_ptr<graphics::Texture> _texture;
-    std::shared_ptr<graphics::Texture> _lightmap;
+    std::shared_ptr<graphics::ModelNode> _aabbNode;
+
+    std::vector<int> _grassFaces;
+    std::stack<std::shared_ptr<GrassClusterSceneNode>> _clusterPool;                          /**< pre-allocated pool of clusters */
+    std::map<int, std::vector<std::shared_ptr<GrassClusterSceneNode>>> _materializedClusters; /**< materialized clusters grouped by face */
 };
 
 } // namespace scene

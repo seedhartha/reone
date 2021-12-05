@@ -39,8 +39,10 @@ public:
     struct Face {
         uint16_t indices[3] {0};
         uint16_t adjacentFaces[3] {0xffff};
-        glm::vec3 normal {0.0f};
         uint32_t material {0};
+        glm::vec3 normal {0.0f};
+        glm::vec3 centroid {0.0f};
+        float area {0.0f};
 
         Face() = default;
 
@@ -65,10 +67,11 @@ public:
     void draw();
     void drawInstanced(int count);
 
-    std::vector<glm::vec3> getFaceVertexCoords(int faceIdx) const;
-    glm::vec2 getFaceUV1(int faceIdx, const glm::vec3 &baryPosition) const;
-    glm::vec2 getFaceUV2(int faceIdx, const glm::vec3 &baryPosition) const;
+    std::vector<glm::vec3> getVertexCoords(const Face &face) const;
+    glm::vec2 getUV1(const Face &face, const glm::vec3 &baryPosition) const;
+    glm::vec2 getUV2(const Face &face, const glm::vec3 &baryPosition) const;
 
+    const std::vector<Face> &faces() const { return _faces; }
     const AABB &aabb() const { return _aabb; }
 
 private:
@@ -87,6 +90,7 @@ private:
 
     // END OpenGL
 
+    void computeFaceData();
     void computeAABB();
 };
 

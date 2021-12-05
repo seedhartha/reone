@@ -21,6 +21,15 @@ namespace reone {
 
 namespace graphics {
 
+inline glm::vec3 calculateTriangleNormal(const std::vector<glm::vec3> &verts) {
+    auto u = verts[1] - verts[0];
+    auto v = verts[2] - verts[0];
+    return glm::vec3(
+        u.y * v.z - u.z * v.y,
+        u.z * v.x - u.x * v.z,
+        u.x * v.y - u.y * v.x);
+}
+
 inline float calculateTriangleArea(const std::vector<glm::vec3> &verts) {
     float a = glm::distance(verts[0], verts[1]);
     float b = glm::distance(verts[0], verts[2]);

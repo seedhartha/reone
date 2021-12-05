@@ -125,13 +125,6 @@ bool ModelNode::getScale(int leftFrameIdx, int rightFrameIdx, float factor, floa
     return true;
 }
 
-vector<uint32_t> ModelNode::getFacesByMaterial(uint32_t material) const {
-    if (!_mesh || _mesh->materialFaces.count(material) == 0)
-        return vector<uint32_t>();
-
-    return _mesh->materialFaces.find(material)->second;
-}
-
 } // namespace graphics
 
 } // namespace reone

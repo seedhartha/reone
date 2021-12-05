@@ -268,7 +268,6 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
 
     vector<float> vertices;
     vector<uint16_t> indices;
-    unordered_map<uint32_t, vector<uint32_t>> materialFaces;
     shared_ptr<ModelNode::Skin> skin;
     shared_ptr<ModelNode::DanglyMesh> danglyMesh;
     shared_ptr<ModelNode::AABBTree> aabbTree;
@@ -420,7 +419,6 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
             uint32_t material = readUint32();
             vector<uint16_t> adjacentFaces(readUint16Array(3));
             vector<uint16_t> faceIndices(readUint16Array(3));
-            materialFaces[material].push_back(i);
 
             Mesh::Face face;
             face.indices[0] = faceIndices[0];
@@ -472,7 +470,6 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
 
     auto nodeMesh = make_unique<ModelNode::TriangleMesh>();
     nodeMesh->mesh = move(mesh);
-    nodeMesh->materialFaces = move(materialFaces);
     nodeMesh->uvAnimation = move(uvAnimation);
     nodeMesh->diffuse = glm::make_vec3(&diffuse[0]);
     nodeMesh->ambient = glm::make_vec3(&ambient[0]);
