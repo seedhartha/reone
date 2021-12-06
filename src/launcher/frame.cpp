@@ -33,7 +33,7 @@ namespace reone {
 static const char kIconName[] = "reone";
 static const char kConfigFilename[] = "reone.cfg";
 
-static const wxSize g_windowSize {400, 400};
+static const wxSize g_windowSize {640, 400};
 
 LauncherFrame::LauncherFrame() :
     wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX)) {
@@ -47,14 +47,16 @@ LauncherFrame::LauncherFrame() :
 
     // Setup controls
 
+    auto labelGameDir = new wxStaticText(this, wxID_ANY, "Game Directory", wxDefaultPosition, wxDefaultSize);
+
     _textCtrlGameDir = new wxTextCtrl(this, WindowID::gameDir, _config.gameDir, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
     _textCtrlGameDir->Bind(wxEVT_LEFT_DOWN, &LauncherFrame::OnGameDirLeftDown, this, WindowID::gameDir);
 
-    auto gameSizer = new wxBoxSizer(wxHORIZONTAL);
-    gameSizer->Add(new wxStaticText(this, wxID_ANY, "Game Directory", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
-    gameSizer->Add(_textCtrlGameDir, 1, wxEXPAND | wxALL, 3);
+    auto gameSizer = new wxBoxSizer(wxVERTICAL);
+    gameSizer->Add(labelGameDir, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    gameSizer->Add(_textCtrlGameDir, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
-    _checkBoxDev = new wxCheckBox(this, WindowID::devMode, "Developer Mode", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+    _checkBoxDev = new wxCheckBox(this, WindowID::devMode, "Developer Mode", wxDefaultPosition, wxDefaultSize);
     _checkBoxDev->SetValue(_config.devMode);
 
     // Graphics
@@ -72,53 +74,51 @@ LauncherFrame::LauncherFrame() :
         resSelection = resChoices.GetCount() - 1;
     }
 
+    auto labelResolution = new wxStaticText(this, wxID_ANY, "Screen Resolution", wxDefaultPosition, wxDefaultSize);
+
     _choiceResolution = new wxChoice(this, WindowID::resolution, wxDefaultPosition, wxDefaultSize, resChoices);
     _choiceResolution->SetSelection(resSelection);
 
-    auto resSizer = new wxBoxSizer(wxHORIZONTAL);
-    resSizer->Add(new wxStaticText(this, wxID_ANY, "Screen Resolution", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
-    resSizer->Add(_choiceResolution, 1, wxEXPAND | wxALL, 3);
+    auto resSizer = new wxBoxSizer(wxVERTICAL);
+    resSizer->Add(labelResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    resSizer->Add(_choiceResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
-    _checkBoxFullscreen = new wxCheckBox(this, WindowID::fullscreen, "Fullscreen", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+    _checkBoxFullscreen = new wxCheckBox(this, WindowID::fullscreen, "Fullscreen", wxDefaultPosition, wxDefaultSize);
     _checkBoxFullscreen->SetValue(_config.fullscreen);
 
-    _checkBoxEnhancedGfx = new wxCheckBox(this, WindowID::enhancedGfx, "Enhanced Graphics", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+    _checkBoxEnhancedGfx = new wxCheckBox(this, WindowID::enhancedGfx, "Enhanced Graphics", wxDefaultPosition, wxDefaultSize);
     _checkBoxEnhancedGfx->SetValue(_config.pbr);
 
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
-    graphicsSizer->Add(resSizer, 0, wxEXPAND, 0);
-    graphicsSizer->Add(_checkBoxFullscreen, 0, wxEXPAND | wxALL, 3);
-    graphicsSizer->Add(_checkBoxEnhancedGfx, 0, wxEXPAND | wxALL, 3);
+    graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(_checkBoxEnhancedGfx, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
     // END Graphics
 
     // Audio
 
+    auto labelVolumeMusic = new wxStaticText(this, wxID_ANY, "Music Volume", wxDefaultPosition, wxDefaultSize);
     _sliderVolumeMusic = new wxSlider(this, WindowID::musicVolume, _config.musicvol, 0, 100, wxDefaultPosition, wxDefaultSize);
-    auto sizerVolumeMusic = new wxBoxSizer(wxHORIZONTAL);
-    sizerVolumeMusic->Add(new wxStaticText(this, wxID_ANY, "Music Volume", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
-    sizerVolumeMusic->Add(_sliderVolumeMusic, 1, wxEXPAND | wxALL, 3);
 
+    auto labelVolumeVoice = new wxStaticText(this, wxID_ANY, "Voice Volume", wxDefaultPosition, wxDefaultSize);
     _sliderVolumeVoice = new wxSlider(this, WindowID::voiceVolume, _config.voicevol, 0, 100, wxDefaultPosition, wxDefaultSize);
-    auto sizerVolumeVoice = new wxBoxSizer(wxHORIZONTAL);
-    sizerVolumeVoice->Add(new wxStaticText(this, wxID_ANY, "Voice Volume", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
-    sizerVolumeVoice->Add(_sliderVolumeVoice, 1, wxEXPAND | wxALL, 3);
 
+    auto labelVolumeSound = new wxStaticText(this, wxID_ANY, "Sound Volume", wxDefaultPosition, wxDefaultSize);
     _sliderVolumeSound = new wxSlider(this, WindowID::soundVolume, _config.soundvol, 0, 100, wxDefaultPosition, wxDefaultSize);
-    auto sizerVolumeSound = new wxBoxSizer(wxHORIZONTAL);
-    sizerVolumeSound->Add(new wxStaticText(this, wxID_ANY, "Sound Volume", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
-    sizerVolumeSound->Add(_sliderVolumeSound, 1, wxEXPAND | wxALL, 3);
 
+    auto labelVolumeMovie = new wxStaticText(this, wxID_ANY, "Movie Volume", wxDefaultPosition, wxDefaultSize);
     _sliderVolumeMovie = new wxSlider(this, WindowID::movieVolume, _config.movievol, 0, 100, wxDefaultPosition, wxDefaultSize);
-    auto sizerVolumeMovie = new wxBoxSizer(wxHORIZONTAL);
-    sizerVolumeMovie->Add(new wxStaticText(this, wxID_ANY, "Movie Volume", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
-    sizerVolumeMovie->Add(_sliderVolumeMovie, 1, wxEXPAND | wxALL, 3);
 
     auto audioSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Audio");
-    audioSizer->Add(sizerVolumeMusic, 0, wxEXPAND, 0);
-    audioSizer->Add(sizerVolumeVoice, 0, wxEXPAND, 0);
-    audioSizer->Add(sizerVolumeSound, 0, wxEXPAND, 0);
-    audioSizer->Add(sizerVolumeMovie, 0, wxEXPAND, 0);
+    audioSizer->Add(labelVolumeMusic, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    audioSizer->Add(_sliderVolumeMusic, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    audioSizer->Add(labelVolumeVoice, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    audioSizer->Add(_sliderVolumeVoice, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    audioSizer->Add(labelVolumeSound, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    audioSizer->Add(_sliderVolumeSound, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    audioSizer->Add(labelVolumeMovie, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    audioSizer->Add(_sliderVolumeMovie, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
     // END Audio
 
@@ -136,6 +136,8 @@ LauncherFrame::LauncherFrame() :
     logChannelChoices.Add("Script (verbose)");
     logChannelChoices.Add("Script (very verbose)");
 
+    auto labelLogChannels = new wxStaticText(this, wxID_ANY, "Log Channels", wxDefaultPosition, wxDefaultSize);
+
     _checkListBoxLogChannels = new wxCheckListBox(this, WindowID::logChannels, wxDefaultPosition, wxDefaultSize, logChannelChoices);
     _checkListBoxLogChannels->Check(0, _config.logch & LogChannels::resources);
     _checkListBoxLogChannels->Check(1, _config.logch & LogChannels::resources2);
@@ -148,30 +150,33 @@ LauncherFrame::LauncherFrame() :
     _checkListBoxLogChannels->Check(8, _config.logch & LogChannels::script2);
     _checkListBoxLogChannels->Check(9, _config.logch & LogChannels::script3);
 
-    auto logChannelsSizer = new wxBoxSizer(wxHORIZONTAL);
-    logChannelsSizer->Add(new wxStaticText(this, wxID_ANY, "Log Channels", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), 1, wxEXPAND | wxALL, 3);
-    logChannelsSizer->Add(_checkListBoxLogChannels, 1, wxEXPAND | wxALL, 3);
-
-    _checkBoxLogFile = new wxCheckBox(this, WindowID::logFile, "Log to File", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
+    _checkBoxLogFile = new wxCheckBox(this, WindowID::logFile, "Log to File", wxDefaultPosition, wxDefaultSize);
     _checkBoxLogFile->SetValue(_config.logfile);
 
     auto debugSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Debug");
-    debugSizer->Add(logChannelsSizer, 0, wxEXPAND, 0);
-    debugSizer->Add(_checkBoxLogFile, 0, wxEXPAND, 0);
+    debugSizer->Add(labelLogChannels, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    debugSizer->Add(_checkListBoxLogChannels, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    debugSizer->Add(_checkBoxLogFile, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
     // END Debug
 
     auto topSizer = new wxBoxSizer(wxVERTICAL);
-    topSizer->SetMinSize(400, 100);
-    topSizer->Add(gameSizer, 0, wxEXPAND, 0);
-    topSizer->Add(_checkBoxDev, 0, wxEXPAND | wxALL, 3);
-    topSizer->Add(graphicsSizer, 0, wxEXPAND | wxALL, 3);
-    topSizer->Add(audioSizer, 0, wxEXPAND | wxALL, 3);
-    topSizer->Add(debugSizer, 0, wxEXPAND | wxALL, 3);
-    topSizer->Add(new wxButton(this, WindowID::launch, "Launch"), 0, wxEXPAND | wxALL, 3);
-    topSizer->Add(new wxButton(this, WindowID::saveConfig, "Save Configuration"), 0, wxEXPAND | wxALL, 3);
+    topSizer->Add(graphicsSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    topSizer->Add(audioSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
-    SetSizerAndFit(topSizer);
+    auto topSizer2 = new wxBoxSizer(wxHORIZONTAL);
+    topSizer2->Add(topSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    topSizer2->Add(debugSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
+
+    auto topSizer3 = new wxBoxSizer(wxVERTICAL);
+    topSizer3->SetMinSize(640, 100);
+    topSizer3->Add(gameSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    topSizer3->Add(_checkBoxDev, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    topSizer3->Add(topSizer2, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    topSizer3->Add(new wxButton(this, WindowID::launch, "Launch"), wxSizerFlags(0).Expand().Border(wxALL, 3));
+    topSizer3->Add(new wxButton(this, WindowID::saveConfig, "Save Configuration"), wxSizerFlags(0).Expand().Border(wxALL, 3));
+
+    SetSizerAndFit(topSizer3);
 }
 
 void LauncherFrame::LoadConfiguration() {
