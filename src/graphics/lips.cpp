@@ -39,10 +39,10 @@ Lips::Lips(Resources &resources) :
 
 shared_ptr<LipAnimation> Lips::doGet(string resRef) {
     shared_ptr<ByteArray> lipData(_resources.get(resRef, ResourceType::Lip));
-    if (!lipData)
+    if (!lipData) {
         return nullptr;
-
-    LipReader lip;
+    }
+    LipReader lip(resRef);
     lip.load(wrap(lipData));
 
     return lip.animation();

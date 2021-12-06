@@ -25,8 +25,9 @@ namespace reone {
 
 namespace graphics {
 
-LipReader::LipReader() :
-    BinaryReader(8, "LIP V1.0") {
+LipReader::LipReader(string name) :
+    BinaryReader(8, "LIP V1.0"),
+    _name(move(name)) {
 }
 
 void LipReader::doLoad() {
@@ -43,7 +44,7 @@ void LipReader::doLoad() {
         keyframes.push_back(move(keyframe));
     }
 
-    _animation = make_shared<LipAnimation>(length, move(keyframes));
+    _animation = make_shared<LipAnimation>(_name, length, move(keyframes));
 }
 
 } // namespace graphics

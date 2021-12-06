@@ -43,7 +43,7 @@ void LipTool::toJSON(const fs::path &path, const fs::path &destPath) {
     pt::ptree tree;
     pt::ptree keyframes;
 
-    LipReader lip;
+    LipReader lip("");
     lip.load(path);
 
     shared_ptr<LipAnimation> animation(lip.animation());
@@ -74,7 +74,7 @@ void LipTool::toLIP(const fs::path &path, const fs::path &destPath) {
         keyframe.shape = keyframeTree.second.get("shape", 0);
         keyframes.push_back(move(keyframe));
     }
-    LipAnimation animation(length, move(keyframes));
+    LipAnimation animation("", length, move(keyframes));
 
     fs::path lipPath(destPath);
     lipPath.append(path.filename().string());

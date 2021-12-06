@@ -182,7 +182,7 @@ void KotOR::loadModuleResources(const string &moduleName) {
     }
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-    if (lipsPath.empty()) {
+    if (!lipsPath.empty()) {
         _services.resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"));
     }
 

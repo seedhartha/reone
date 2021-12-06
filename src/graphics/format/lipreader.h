@@ -27,11 +27,13 @@ class LipAnimation;
 
 class LipReader : public resource::BinaryReader {
 public:
-    LipReader();
+    LipReader(std::string name);
 
     std::shared_ptr<LipAnimation> animation() const { return _animation; }
 
 private:
+    std::string _name;
+
     std::shared_ptr<LipAnimation> _animation;
 
     void doLoad() override;
