@@ -1060,7 +1060,7 @@ vector<shared_ptr<SpatialObject>> Area::getSelectableObjects() const {
             continue;
 
         auto model = static_pointer_cast<ModelSceneNode>(object->sceneNode());
-        if (!model || !model->isVisible())
+        if (!model || !model->isEnabled())
             continue;
 
         float dist2 = object->getSquareDistanceTo(origin);

@@ -114,7 +114,7 @@ void SceneGraph::update(float dt) {
 void SceneGraph::cullRoots() {
     for (auto &root : _modelRoots) {
         bool culled =
-            !root->isVisible() ||
+            !root->isEnabled() ||
             root->getSquareDistanceTo(*_activeCamera) > root->drawDistance() * root->drawDistance() ||
             (root->isCullable() && !_activeCamera->isInFrustum(*root));
 
@@ -256,7 +256,7 @@ void SceneGraph::prepareLeafs() {
 
     // Add grass clusters
     for (auto &grass : _grassRoots) {
-        if (!grass->isVisible()) {
+        if (!grass->isEnabled()) {
             continue;
         }
         glm::mat4 modelView(_activeCamera->view() * grass->absoluteTransform());

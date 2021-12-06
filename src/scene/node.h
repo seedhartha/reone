@@ -47,7 +47,6 @@ public:
     virtual void drawElements(const std::vector<SceneNode *> &elements, int count = -1) {}
 
     bool isEnabled() const { return _enabled; }
-    bool isVisible() const { return _visible; }
     bool isCullable() const { return _cullable; }
     bool isCulled() const { return _culled; }
     bool isPoint() const { return _point; }
@@ -86,7 +85,6 @@ public:
     // Flags
 
     void setEnabled(bool enabled) { _enabled = enabled; }
-    void setVisible(bool visible) { _visible = visible; }
     void setCullable(bool cullable) { _cullable = cullable; }
     void setCulled(bool culled) { _culled = culled; }
 
@@ -123,10 +121,9 @@ protected:
     // Flags
 
     bool _enabled {true};
-    bool _visible {true};
-    bool _cullable {false}; /**< can this scene node be frustum- or distance-culled? */
-    bool _culled {false};   /**< has this scene node been frustum- or distance-culled? */
-    bool _point {true};
+    bool _cullable {false}; /**< can this node be frustum- or distance-culled? */
+    bool _culled {false};   /**< has this node been frustum- or distance-culled? */
+    bool _point {true};     /**< is this node represented by a single point?  */
 
     // END Flags
 
