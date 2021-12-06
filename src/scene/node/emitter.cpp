@@ -296,7 +296,7 @@ void EmitterSceneNode::drawElements(const vector<SceneNode *> &elements, int cou
 }
 
 unique_ptr<ParticleSceneNode> EmitterSceneNode::newParticle() {
-    return make_unique<ParticleSceneNode>(*this, _sceneGraph, _context, _meshes, _shaders);
+    return make_unique<ParticleSceneNode>(*this, _sceneGraph);
 }
 
 } // namespace scene

@@ -188,7 +188,7 @@ int GrassSceneNode::getRandomGrassVariant() const {
 }
 
 unique_ptr<GrassClusterSceneNode> GrassSceneNode::newCluster() {
-    return make_unique<GrassClusterSceneNode>(_sceneGraph, _context, _meshes, _shaders);
+    return make_unique<GrassClusterSceneNode>(_sceneGraph);
 }
 
 } // namespace scene

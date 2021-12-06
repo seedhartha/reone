@@ -524,21 +524,11 @@ unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode)
 }
 
 unique_ptr<CameraSceneNode> SceneGraph::newCamera(glm::mat4 projection) {
-    return make_unique<CameraSceneNode>(
-        move(projection),
-        *this,
-        _context,
-        _meshes,
-        _shaders);
+    return make_unique<CameraSceneNode>(move(projection), *this);
 }
 
 unique_ptr<SoundSceneNode> SceneGraph::newSound() {
-    return make_unique<SoundSceneNode>(
-        *this,
-        _audioPlayer,
-        _context,
-        _meshes,
-        _shaders);
+    return make_unique<SoundSceneNode>(*this, _audioPlayer);
 }
 
 unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUsage usage, IAnimationEventListener *animEventListener) {
@@ -557,12 +547,7 @@ unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUs
 }
 
 unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(shared_ptr<Walkmesh> walkmesh) {
-    return make_unique<WalkmeshSceneNode>(
-        move(walkmesh),
-        *this,
-        _context,
-        _meshes,
-        _shaders);
+    return make_unique<WalkmeshSceneNode>(move(walkmesh), *this);
 }
 
 unique_ptr<GrassSceneNode> SceneGraph::newGrass(float density, float quadSize, glm::vec4 probabilities, set<uint32_t> materials, shared_ptr<Texture> texture, shared_ptr<ModelNode> aabbNode) {

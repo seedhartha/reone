@@ -27,18 +27,8 @@ class EmitterSceneNode;
 
 class ParticleSceneNode : public SceneNode {
 public:
-    ParticleSceneNode(
-        const EmitterSceneNode &emitter,
-        SceneGraph &sceneGraph,
-        graphics::Context &context,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders) :
-        SceneNode(
-            SceneNodeType::Particle,
-            sceneGraph,
-            context,
-            meshes,
-            shaders),
+    ParticleSceneNode(const EmitterSceneNode &emitter, SceneGraph &sceneGraph) :
+        SceneNode(SceneNodeType::Particle, sceneGraph),
         _emitter(emitter) {
 
         _point = false;

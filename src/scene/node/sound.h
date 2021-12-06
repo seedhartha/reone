@@ -33,18 +33,8 @@ namespace scene {
 
 class SoundSceneNode : public SceneNode {
 public:
-    SoundSceneNode(
-        SceneGraph &sceneGraph,
-        audio::AudioPlayer &audioPlayer,
-        graphics::Context &context,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders) :
-        SceneNode(
-            SceneNodeType::Sound,
-            sceneGraph,
-            context,
-            meshes,
-            shaders),
+    SoundSceneNode(SceneGraph &sceneGraph, audio::AudioPlayer &audioPlayer) :
+        SceneNode(SceneNodeType::Sound, sceneGraph),
         _audioPlayer(audioPlayer) {
     }
 

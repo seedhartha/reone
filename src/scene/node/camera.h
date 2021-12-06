@@ -27,18 +27,8 @@ namespace scene {
 
 class CameraSceneNode : public SceneNode {
 public:
-    CameraSceneNode(
-        glm::mat4 projection,
-        SceneGraph &sceneGraph,
-        graphics::Context &context,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders) :
-        SceneNode(
-            SceneNodeType::Camera,
-            sceneGraph,
-            context,
-            meshes,
-            shaders),
+    CameraSceneNode(glm::mat4 projection, SceneGraph &sceneGraph) :
+        SceneNode(SceneNodeType::Camera, sceneGraph),
         _projection(std::move(projection)) {
     }
 
