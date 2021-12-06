@@ -23,10 +23,6 @@ namespace reone {
 
 namespace graphics {
 
-LipAnimation::LipAnimation(float length, vector<Keyframe> keyframes) :
-    _length(length), _keyframes(move(keyframes)) {
-}
-
 bool LipAnimation::getKeyframes(float time, uint8_t &leftShape, uint8_t &rightShape, float &factor) const {
     if (_keyframes.empty())
         return false;
