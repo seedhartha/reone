@@ -238,7 +238,7 @@ void SpatialObject::setVisible(bool visible) {
     _visible = visible;
 
     if (_sceneNode) {
-        _sceneNode->setVisible(visible);
+        _sceneNode->setEnabled(visible);
     }
 }
 

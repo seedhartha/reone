@@ -105,9 +105,9 @@ void ModelSceneNode::buildNodeTree(shared_ptr<ModelNode> node, SceneNode &parent
 
 void ModelSceneNode::update(float dt) {
     // Optimization: skip invisible models
-    if (!_visible)
+    if (!_enabled) {
         return;
-
+    }
     SceneNode::update(dt);
     updateAnimations(dt);
 }

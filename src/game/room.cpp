@@ -46,13 +46,13 @@ void Room::setVisible(bool visible) {
         return;
     }
     if (_model) {
-        _model->setVisible(visible);
+        _model->setEnabled(visible);
     }
     if (_walkmesh) {
         _walkmesh->setEnabled(visible);
     }
     if (_grass) {
-        _grass->setVisible(visible);
+        _grass->setEnabled(visible);
     }
     _visible = visible;
 }
