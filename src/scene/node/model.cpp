@@ -50,17 +50,15 @@ ModelSceneNode::ModelSceneNode(
     Shaders &shaders,
     Textures &textures,
     IAnimationEventListener *animEventListener) :
-    SceneNode(
-        SceneNodeType::Model,
-        sceneGraph,
-        context,
-        meshes,
-        shaders),
+    SceneNode(SceneNodeType::Model, sceneGraph),
     _model(model),
     _usage(usage),
+    _context(context),
     _features(features),
     _materials(materials),
+    _meshes(meshes),
     _pbrIbl(pbrIbl),
+    _shaders(shaders),
     _textures(textures),
     _animEventListener(animEventListener) {
 

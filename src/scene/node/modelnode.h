@@ -23,9 +23,12 @@ namespace reone {
 
 namespace graphics {
 
+class Context;
+class Meshes;
 class ModelNode;
+class Shaders;
 
-}
+} // namespace graphics
 
 namespace scene {
 
@@ -43,14 +46,21 @@ protected:
         graphics::Context &context,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders) :
-        SceneNode(
-            type,
-            sceneGraph,
-            context,
-            meshes,
-            shaders),
-        _modelNode(std::move(modelNode)) {
+        SceneNode(type, sceneGraph),
+        _modelNode(std::move(modelNode)),
+        _context(context),
+        _meshes(meshes),
+        _shaders(shaders) {
     }
+
+protected:
+    // Services
+
+    graphics::Context &_context;
+    graphics::Meshes &_meshes;
+    graphics::Shaders &_shaders;
+
+    // END Services
 };
 
 } // namespace scene

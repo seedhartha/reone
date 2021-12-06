@@ -23,14 +23,6 @@
 
 namespace reone {
 
-namespace graphics {
-
-class Context;
-class Meshes;
-class Shaders;
-
-} // namespace graphics
-
 namespace scene {
 
 class IUser;
@@ -72,6 +64,14 @@ public:
 
     void setUser(IUser &user) { _user = &user; }
 
+    // Flags
+
+    void setEnabled(bool enabled) { _enabled = enabled; }
+    void setCullable(bool cullable) { _cullable = cullable; }
+    void setCulled(bool culled) { _culled = culled; }
+
+    // END Flags
+
     // Transformations
 
     const glm::mat4 &localTransform() const { return _localTransform; }
@@ -82,16 +82,9 @@ public:
 
     // END Transformations
 
-    // Flags
-
-    void setEnabled(bool enabled) { _enabled = enabled; }
-    void setCullable(bool cullable) { _cullable = cullable; }
-    void setCulled(bool culled) { _culled = culled; }
-
-    // END Flags
-
 protected:
     SceneNodeType _type;
+    SceneGraph &_sceneGraph;
 
     SceneNode *_parent {nullptr};
     std::unordered_set<std::shared_ptr<SceneNode>> _children;
@@ -99,24 +92,6 @@ protected:
     graphics::AABB _aabb;
 
     IUser *_user {nullptr};
-
-    // Services
-
-    SceneGraph &_sceneGraph;
-
-    graphics::Context &_context;
-    graphics::Meshes &_meshes;
-    graphics::Shaders &_shaders;
-
-    // END Services
-
-    // Transformations
-
-    glm::mat4 _localTransform {1.0f};
-    glm::mat4 _absTransform {1.0f};
-    glm::mat4 _absTransformInv {1.0f};
-
-    // END Transformations
 
     // Flags
 
@@ -127,17 +102,17 @@ protected:
 
     // END Flags
 
-    SceneNode(
-        SceneNodeType type,
-        SceneGraph &sceneGraph,
-        graphics::Context &context,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders) :
+    // Transformations
+
+    glm::mat4 _localTransform {1.0f};
+    glm::mat4 _absTransform {1.0f};
+    glm::mat4 _absTransformInv {1.0f};
+
+    // END Transformations
+
+    SceneNode(SceneNodeType type, SceneGraph &sceneGraph) :
         _type(type),
-        _sceneGraph(sceneGraph),
-        _context(context),
-        _meshes(meshes),
-        _shaders(shaders) {
+        _sceneGraph(sceneGraph) {
     }
 
     void computeAbsoluteTransforms();

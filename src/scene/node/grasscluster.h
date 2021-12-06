@@ -25,18 +25,8 @@ namespace scene {
 
 class GrassClusterSceneNode : public SceneNode {
 public:
-    GrassClusterSceneNode(
-        SceneGraph &sceneGraph,
-        graphics::Context &context,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders) :
-        SceneNode(
-            SceneNodeType::GrassCluster,
-            sceneGraph,
-            context,
-            meshes,
-            shaders) {
-
+    GrassClusterSceneNode(SceneGraph &sceneGraph) :
+        SceneNode(SceneNodeType::GrassCluster, sceneGraph) {
         _point = false;
     }
 

@@ -27,18 +27,8 @@ namespace scene {
 
 class WalkmeshSceneNode : public SceneNode {
 public:
-    WalkmeshSceneNode(
-        std::shared_ptr<graphics::Walkmesh> walkmesh,
-        SceneGraph &sceneGraph,
-        graphics::Context &context,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders) :
-        SceneNode(
-            SceneNodeType::Walkmesh,
-            sceneGraph,
-            context,
-            meshes,
-            shaders),
+    WalkmeshSceneNode(std::shared_ptr<graphics::Walkmesh> walkmesh, SceneGraph &sceneGraph) :
+        SceneNode(SceneNodeType::Walkmesh, sceneGraph),
         _walkmesh(std::move(walkmesh)) {
 
         _point = false;

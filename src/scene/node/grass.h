@@ -27,7 +27,10 @@ namespace reone {
 
 namespace graphics {
 
+class Context;
+class Meshes;
 class ModelNode;
+class Shaders;
 class Texture;
 
 } // namespace graphics
@@ -47,18 +50,16 @@ public:
         graphics::Context &context,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders) :
-        SceneNode(
-            SceneNodeType::Grass,
-            sceneGraph,
-            context,
-            meshes,
-            shaders),
+        SceneNode(SceneNodeType::Grass, sceneGraph),
         _density(density),
         _quadSize(quadSize),
         _probabilities(std::move(probabilities)),
         _materials(std::move(materials)),
         _texture(std::move(texture)),
-        _aabbNode(std::move(aabbNode)) {
+        _aabbNode(std::move(aabbNode)),
+        _context(context),
+        _meshes(meshes),
+        _shaders(shaders) {
 
         init();
     }
@@ -85,6 +86,14 @@ private:
     std::vector<int> _grassFaces;
     std::stack<std::shared_ptr<GrassClusterSceneNode>> _clusterPool;                          /**< pre-allocated pool of clusters */
     std::map<int, std::vector<std::shared_ptr<GrassClusterSceneNode>>> _materializedClusters; /**< materialized clusters grouped by face */
+
+    // Services
+
+    graphics::Context &_context;
+    graphics::Meshes &_meshes;
+    graphics::Shaders &_shaders;
+
+    // END Services
 };
 
 } // namespace scene

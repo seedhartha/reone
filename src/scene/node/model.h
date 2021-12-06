@@ -140,9 +140,12 @@ private:
 
     // Services
 
+    graphics::Context &_context;
     graphics::Features &_features;
     graphics::Materials &_materials;
+    graphics::Meshes &_meshes;
     graphics::PBRIBL &_pbrIbl;
+    graphics::Shaders &_shaders;
     graphics::Textures &_textures;
 
     // END Services
