@@ -140,6 +140,7 @@ LauncherFrame::LauncherFrame() :
     logChannelChoices.Add("Graphics");
     logChannelChoices.Add("Audio");
     logChannelChoices.Add("GUI");
+    logChannelChoices.Add("Perception");
     logChannelChoices.Add("Conversation");
     logChannelChoices.Add("Combat");
     logChannelChoices.Add("Script");
@@ -154,11 +155,12 @@ LauncherFrame::LauncherFrame() :
     _checkListBoxLogChannels->Check(2, _config.logch & LogChannels::graphics);
     _checkListBoxLogChannels->Check(3, _config.logch & LogChannels::audio);
     _checkListBoxLogChannels->Check(4, _config.logch & LogChannels::gui);
-    _checkListBoxLogChannels->Check(5, _config.logch & LogChannels::conversation);
-    _checkListBoxLogChannels->Check(6, _config.logch & LogChannels::combat);
-    _checkListBoxLogChannels->Check(7, _config.logch & LogChannels::script);
-    _checkListBoxLogChannels->Check(8, _config.logch & LogChannels::script2);
-    _checkListBoxLogChannels->Check(9, _config.logch & LogChannels::script3);
+    _checkListBoxLogChannels->Check(5, _config.logch & LogChannels::perception);
+    _checkListBoxLogChannels->Check(6, _config.logch & LogChannels::conversation);
+    _checkListBoxLogChannels->Check(7, _config.logch & LogChannels::combat);
+    _checkListBoxLogChannels->Check(8, _config.logch & LogChannels::script);
+    _checkListBoxLogChannels->Check(9, _config.logch & LogChannels::script2);
+    _checkListBoxLogChannels->Check(10, _config.logch & LogChannels::script3);
 
     _checkBoxLogFile = new wxCheckBox(this, WindowID::logFile, "Log to File", wxDefaultPosition, wxDefaultSize);
     _checkBoxLogFile->SetValue(_config.logfile);
@@ -280,18 +282,21 @@ void LauncherFrame::SaveConfiguration() {
         logch |= LogChannels::gui;
     }
     if (_checkListBoxLogChannels->IsChecked(5)) {
-        logch |= LogChannels::conversation;
+        logch |= LogChannels::perception;
     }
     if (_checkListBoxLogChannels->IsChecked(6)) {
-        logch |= LogChannels::combat;
+        logch |= LogChannels::conversation;
     }
     if (_checkListBoxLogChannels->IsChecked(7)) {
-        logch |= LogChannels::script;
+        logch |= LogChannels::combat;
     }
     if (_checkListBoxLogChannels->IsChecked(8)) {
-        logch |= LogChannels::script2;
+        logch |= LogChannels::script;
     }
     if (_checkListBoxLogChannels->IsChecked(9)) {
+        logch |= LogChannels::script2;
+    }
+    if (_checkListBoxLogChannels->IsChecked(10)) {
         logch |= LogChannels::script3;
     }
 
