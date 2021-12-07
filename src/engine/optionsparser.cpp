@@ -37,7 +37,6 @@ Options OptionsParser::parse() {
     descCommon.add_options()                                                                         //
         ("game", po::value<string>(), "path to game directory")                                      //
         ("dev", po::value<bool>()->default_value(false), "enable developer mode")                    //
-        ("module", po::value<string>(), "name of a module to load")                                  //
         ("width", po::value<int>()->default_value(800), "window width")                              //
         ("height", po::value<int>()->default_value(600), "window height")                            //
         ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")                 //
@@ -75,7 +74,6 @@ Options OptionsParser::parse() {
     options.audio.soundVolume = vars["soundvol"].as<int>();
     options.audio.movieVolume = vars["movievol"].as<int>();
     options.developer = vars["dev"].as<bool>();
-    options.module = vars.count("module") > 0 ? vars["module"].as<string>() : "";
     options.logLevel = static_cast<LogLevel>(vars["loglevel"].as<int>());
     options.logChannels = vars["logch"].as<int>();
     options.logToFile = vars["logfile"].as<bool>();

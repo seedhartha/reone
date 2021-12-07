@@ -27,7 +27,6 @@ namespace game {
 
 struct Options {
     boost::filesystem::path gamePath;
-    std::string module;
     bool developer {false};
 
     graphics::GraphicsOptions graphics;
@@ -37,7 +36,6 @@ struct Options {
     LogLevel logLevel {LogChannels::general};
     int logChannels {0};
     bool logToFile {false};
-    // END Logging
 };
 
 } // namespace game
