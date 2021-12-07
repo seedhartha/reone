@@ -126,12 +126,12 @@ void WorldRenderPipeline::init() {
     _shadowsDepth = make_unique<Texture>("shadows_depth", getTextureProperties(TextureUsage::DepthBuffer));
     _shadowsDepth->init();
     _shadowsDepth->bind();
-    _shadowsDepth->clearPixels(1024 * _options.shadowResolution, 1024 * _options.shadowResolution, PixelFormat::Depth);
+    _shadowsDepth->clearPixels(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
 
     _cubeShadowsDepth = make_unique<Texture>("cubeshadows_depth", getTextureProperties(TextureUsage::CubeMapDepthBuffer));
     _cubeShadowsDepth->init();
     _cubeShadowsDepth->bind();
-    _cubeShadowsDepth->clearPixels(1024 * _options.shadowResolution, 1024 * _options.shadowResolution, PixelFormat::Depth);
+    _cubeShadowsDepth->clearPixels(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
 
     _shadows.init();
 
@@ -208,9 +208,6 @@ void WorldRenderPipeline::computeLightSpaceMatrices() {
 }
 
 void WorldRenderPipeline::drawShadows() {
-    if (_options.shadowResolution < 1)
-        return;
-
     // Set uniforms prototype
 
     const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
@@ -232,7 +229,7 @@ void WorldRenderPipeline::drawShadows() {
     // Set viewport
 
     glm::ivec4 oldViewport(_context.viewport());
-    _context.setViewport(glm::ivec4(0, 0, 1024 * _options.shadowResolution, 1024 * _options.shadowResolution));
+    _context.setViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
 
     // Enable depth testing
 

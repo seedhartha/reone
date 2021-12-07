@@ -19,8 +19,6 @@
 
 #include <boost/program_options.hpp>
 
-#include <wx/display.h>
-
 #include "../common/types.h"
 
 using namespace std;
@@ -83,11 +81,26 @@ LauncherFrame::LauncherFrame() :
     resSizer->Add(labelResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
     resSizer->Add(_choiceResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
+    wxArrayString shadowResChoices;
+    shadowResChoices.Add("1024");
+    shadowResChoices.Add("2048");
+    shadowResChoices.Add("4096");
+
+    auto labelShadowResolution = new wxStaticText(this, wxID_ANY, "Shadow Map Resolution", wxDefaultPosition, wxDefaultSize);
+
+    _choiceShadowResolution = new wxChoice(this, WindowID::shadowResolution, wxDefaultPosition, wxDefaultSize, shadowResChoices);
+    _choiceShadowResolution->SetSelection(_config.shadowres);
+
+    auto shadowResSizer = new wxBoxSizer(wxVERTICAL);
+    shadowResSizer->Add(labelShadowResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    shadowResSizer->Add(_choiceShadowResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
+
     _checkBoxFullscreen = new wxCheckBox(this, WindowID::fullscreen, "Fullscreen", wxDefaultPosition, wxDefaultSize);
     _checkBoxFullscreen->SetValue(_config.fullscreen);
 
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
     graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(shadowResSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
     // END Graphics
@@ -191,19 +204,20 @@ LauncherFrame::LauncherFrame() :
 
 void LauncherFrame::LoadConfiguration() {
     po::options_description options;
-    options.add_options()                 //
-        ("game", po::value<string>())     //
-        ("dev", po::value<bool>())        //
-        ("width", po::value<int>())       //
-        ("height", po::value<int>())      //
-        ("fullscreen", po::value<bool>()) //
-        ("musicvol", po::value<int>())    //
-        ("voicevol", po::value<int>())    //
-        ("soundvol", po::value<int>())    //
-        ("movievol", po::value<int>())    //
-        ("loglevel", po::value<int>())    //
-        ("logch", po::value<int>())       //
-        ("logfile", po::value<bool>());
+    options.add_options()                                                               //
+        ("game", po::value<string>()->default_value(""))                                //
+        ("dev", po::value<bool>()->default_value(false))                                //
+        ("width", po::value<int>()->default_value(1024))                                //
+        ("height", po::value<int>()->default_value(768))                                //
+        ("fullscreen", po::value<bool>()->default_value(false))                         //
+        ("shadowres", po::value<int>()->default_value(0))                               //
+        ("musicvol", po::value<int>()->default_value(85))                               //
+        ("voicevol", po::value<int>()->default_value(85))                               //
+        ("soundvol", po::value<int>()->default_value(85))                               //
+        ("movievol", po::value<int>()->default_value(85))                               //
+        ("loglevel", po::value<int>()->default_value(static_cast<int>(LogLevel::Info))) //
+        ("logch", po::value<int>()->default_value(LogChannels::general))                //
+        ("logfile", po::value<bool>()->default_value(false));
 
     po::variables_map vars;
     if (fs::exists(kConfigFilename)) {
@@ -211,18 +225,19 @@ void LauncherFrame::LoadConfiguration() {
     }
     po::notify(vars);
 
-    _config.gameDir = vars.count("game") > 0 ? vars["game"].as<string>() : "";
-    _config.devMode = vars.count("dev") > 0 ? vars["dev"].as<bool>() : false;
-    _config.width = vars.count("width") > 0 ? vars["width"].as<int>() : 1024;
-    _config.height = vars.count("height") > 0 ? vars["height"].as<int>() : 768;
-    _config.fullscreen = vars.count("fullscreen") > 0 ? vars["fullscreen"].as<bool>() : false;
-    _config.musicvol = vars.count("musicvol") > 0 ? vars["musicvol"].as<int>() : 85;
-    _config.voicevol = vars.count("voicevol") > 0 ? vars["voicevol"].as<int>() : 85;
-    _config.soundvol = vars.count("soundvol") > 0 ? vars["soundvol"].as<int>() : 85;
-    _config.movievol = vars.count("movievol") > 0 ? vars["movievol"].as<int>() : 85;
-    _config.loglevel = vars.count("loglevel") > 0 ? vars["loglevel"].as<int>() : static_cast<int>(LogLevel::Info);
-    _config.logch = vars.count("logch") > 0 ? vars["logch"].as<int>() : LogChannels::general;
-    _config.logfile = vars.count("logfile") > 0 ? vars["logfile"].as<bool>() : false;
+    _config.gameDir = vars["game"].as<string>();
+    _config.devMode = vars["dev"].as<bool>();
+    _config.width = vars["width"].as<int>();
+    _config.height = vars["height"].as<int>();
+    _config.fullscreen = vars["fullscreen"].as<bool>();
+    _config.shadowres = vars["shadowres"].as<int>();
+    _config.musicvol = vars["musicvol"].as<int>();
+    _config.voicevol = vars["voicevol"].as<int>();
+    _config.soundvol = vars["soundvol"].as<int>();
+    _config.movievol = vars["movievol"].as<int>();
+    _config.loglevel = vars["loglevel"].as<int>();
+    _config.logch = vars["logch"].as<int>();
+    _config.logfile = vars["logfile"].as<bool>();
 }
 
 void LauncherFrame::OnLaunch(wxCommandEvent &event) {
@@ -245,6 +260,7 @@ void LauncherFrame::SaveConfiguration() {
         "width=",
         "height=",
         "fullscreen=",
+        "shadowres=",
         "musicvol=",
         "voicevol=",
         "soundvol=",
@@ -298,6 +314,7 @@ void LauncherFrame::SaveConfiguration() {
     _config.width = stoi(tokens[0]);
     _config.height = stoi(tokens[1]);
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
+    _config.shadowres = _choiceShadowResolution->GetSelection();
     _config.musicvol = _sliderVolumeMusic->GetValue();
     _config.voicevol = _sliderVolumeVoice->GetValue();
     _config.soundvol = _sliderVolumeSound->GetValue();
@@ -328,6 +345,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "width=" << _config.width << endl;
     config << "height=" << _config.height << endl;
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
+    config << "shadowres=" << _config.shadowres << endl;
     config << "musicvol=" << _config.musicvol << endl;
     config << "voicevol=" << _config.voicevol << endl;
     config << "soundvol=" << _config.soundvol << endl;
