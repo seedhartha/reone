@@ -20,10 +20,7 @@
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
 #include "../../graphics/context.h"
-#include "../../graphics/features.h"
-#include "../../graphics/materials.h"
 #include "../../graphics/mesh.h"
-#include "../../graphics/pbribl.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
 
@@ -50,10 +47,7 @@ MeshSceneNode::MeshSceneNode(
     shared_ptr<ModelNode> modelNode,
     SceneGraph &sceneGraph,
     Context &context,
-    Features &features,
-    Materials &materials,
     Meshes &meshes,
-    PBRIBL &pbrIbl,
     Shaders &shaders,
     Textures &textures) :
     ModelNodeSceneNode(
@@ -64,9 +58,6 @@ MeshSceneNode::MeshSceneNode(
         meshes,
         shaders),
     _model(model),
-    _features(features),
-    _materials(materials),
-    _pbrIbl(pbrIbl),
     _textures(textures) {
 
     _point = false;
@@ -85,19 +76,7 @@ void MeshSceneNode::initTextures() {
     _nodeTextures.lightmap = mesh->lightmap;
     _nodeTextures.bumpmap = mesh->bumpmap;
 
-    refreshMaterial();
     refreshAdditionalTextures();
-}
-
-void MeshSceneNode::refreshMaterial() {
-    _material = Material();
-
-    if (_nodeTextures.diffuse) {
-        shared_ptr<Material> material(_materials.get(_nodeTextures.diffuse->name()));
-        if (material) {
-            _material = *material;
-        }
-    }
 }
 
 void MeshSceneNode::refreshAdditionalTextures() {
@@ -277,33 +256,17 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         program = ShaderProgram::SimpleDepth;
 
     } else {
-        if (!_nodeTextures.diffuse) {
-            program = ShaderProgram::ModelBlinnPhongDiffuseless;
-        } else if (_features.isEnabled(Feature::PBR)) {
-            program = ShaderProgram::ModelPBR;
-        } else {
-            program = ShaderProgram::ModelBlinnPhong;
-        }
+        program = _nodeTextures.diffuse ? ShaderProgram::ModelBlinnPhong : ShaderProgram::ModelBlinnPhongDiffuseless;
 
         if (_nodeTextures.diffuse) {
             uniforms.combined.featureMask |= UniformFeatureFlags::diffuse;
         }
-
         if (_nodeTextures.envmap) {
             uniforms.combined.featureMask |= UniformFeatureFlags::envmap;
-
-            if (_features.isEnabled(Feature::PBR)) {
-                bool derived = _pbrIbl.contains(_nodeTextures.envmap.get());
-                if (derived) {
-                    uniforms.combined.featureMask |= UniformFeatureFlags::pbrIbl;
-                }
-            }
         }
-
-        if (_nodeTextures.lightmap && !_features.isEnabled(Feature::DynamicRoomLighting)) {
+        if (_nodeTextures.lightmap) {
             uniforms.combined.featureMask |= UniformFeatureFlags::lightmap;
         }
-
         if (_nodeTextures.bumpmap) {
             if (_nodeTextures.bumpmap->isGrayscale()) {
                 uniforms.combined.featureMask |= UniformFeatureFlags::heightmap;
@@ -364,9 +327,6 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
             uniforms.combined.featureMask |= UniformFeatureFlags::lighting;
             uniforms.combined.material.ambient = glm::vec4(mesh->ambient, 1.0f);
             uniforms.combined.material.diffuse = glm::vec4(mesh->diffuse, 1.0f);
-            uniforms.combined.material.shininess = _material.shininess;
-            uniforms.combined.material.metallic = _material.metallic;
-            uniforms.combined.material.roughness = _material.roughness;
             uniforms.lighting->lightCount = static_cast<int>(lights.size());
 
             for (size_t i = 0; i < lights.size(); ++i) {
@@ -428,16 +388,6 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     if (_nodeTextures.envmap) {
         _context.setActiveTextureUnit(TextureUnits::environmentMap);
         _nodeTextures.envmap->bind();
-
-        PBRIBL::Derived derived;
-        if (_pbrIbl.getDerived(_nodeTextures.envmap.get(), derived)) {
-            _context.setActiveTextureUnit(TextureUnits::irradianceMap);
-            derived.irradianceMap->bind();
-            _context.setActiveTextureUnit(TextureUnits::prefilterMap);
-            derived.prefilterMap->bind();
-            _context.setActiveTextureUnit(TextureUnits::brdfLookup);
-            derived.brdfLookup->bind();
-        }
     }
     if (_nodeTextures.bumpmap) {
         _context.setActiveTextureUnit(TextureUnits::bumpMap);
@@ -457,7 +407,7 @@ bool MeshSceneNode::isLightingEnabled() const {
         return false;
 
     // Lighting is disabled for lightmapped models, unless dynamic room lighting is enabled
-    if (_nodeTextures.lightmap && !_features.isEnabled(Feature::DynamicRoomLighting))
+    if (_nodeTextures.lightmap)
         return false;
 
     // Lighting is disabled for self-illuminated model nodes, e.g. sky boxes
@@ -480,7 +430,6 @@ void MeshSceneNode::setAppliedForce(glm::vec3 force) {
 
 void MeshSceneNode::setDiffuseTexture(const shared_ptr<Texture> &texture) {
     _nodeTextures.diffuse = texture;
-    refreshMaterial();
     refreshAdditionalTextures();
 }
 

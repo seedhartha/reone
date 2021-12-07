@@ -45,7 +45,6 @@ Developer resources:
 - [Code Style](https://github.com/seedhartha/reone/wiki/Code-Style)
 - [Testing](https://github.com/seedhartha/reone/wiki/Testing)
 - [Tooling](https://github.com/seedhartha/reone/wiki/Tooling)
-- [Modding](https://github.com/seedhartha/reone/wiki/Modding)
 - [Knowledge Database](https://github.com/seedhartha/reone/wiki/Knowledge-Database)
 
 ## Similar Projects

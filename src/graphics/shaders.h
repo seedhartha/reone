@@ -47,21 +47,20 @@ struct UniformFeatureFlags {
     static constexpr int diffuse = 1;
     static constexpr int lightmap = 2;
     static constexpr int envmap = 4;
-    static constexpr int pbrIbl = 8;
-    static constexpr int normalmap = 0x10;
-    static constexpr int heightmap = 0x20;
-    static constexpr int skeletal = 0x40;
-    static constexpr int lighting = 0x80;
-    static constexpr int selfIllum = 0x100;
-    static constexpr int discard = 0x200;
-    static constexpr int shadows = 0x400;
-    static constexpr int particles = 0x800;
-    static constexpr int water = 0x1000;
-    static constexpr int blur = 0x2000;
-    static constexpr int text = 0x4000;
-    static constexpr int grass = 0x8000;
-    static constexpr int fog = 0x10000;
-    static constexpr int danglymesh = 0x20000;
+    static constexpr int normalmap = 8;
+    static constexpr int heightmap = 0x10;
+    static constexpr int skeletal = 0x20;
+    static constexpr int lighting = 0x40;
+    static constexpr int selfIllum = 0x80;
+    static constexpr int discard = 0x100;
+    static constexpr int shadows = 0x200;
+    static constexpr int particles = 0x400;
+    static constexpr int water = 0x800;
+    static constexpr int blur = 0x1000;
+    static constexpr int text = 0x2000;
+    static constexpr int grass = 0x4000;
+    static constexpr int fog = 0x8000;
+    static constexpr int danglymesh = 0x10000;
 };
 
 struct ShaderGeneral {
@@ -86,10 +85,6 @@ struct ShaderGeneral {
 struct ShaderMaterial {
     glm::vec4 ambient {1.0f};
     glm::vec4 diffuse {0.0f};
-    float shininess {0.0f};
-    float metallic {0.0f};
-    float roughness {1.0f};
-    char padding[4];
 };
 
 struct ShaderHeightMap {
@@ -211,7 +206,6 @@ public:
 
 private:
     enum class ShaderName {
-        // Common
         VertexSimple,
         VertexModel,
         VertexParticle,
@@ -227,16 +221,8 @@ private:
         FragmentGrass,
         FragmentBlur,
         FragmentPresentWorld,
-
-        // Blinn-Phong
         FragmentBlinnPhong,
         FragmentBlinnPhongDiffuseless,
-
-        // PBR
-        FragmentIrradiance,
-        FragmentPrefilter,
-        FragmentBRDF,
-        FragmentPBR
     };
 
     bool _inited {false};

@@ -26,11 +26,9 @@
 #include "../../common/pathutil.h"
 #include "../../common/streamutil.h"
 #include "../../common/streamwriter.h"
-#include "../../graphics/features.h"
 #include "../../graphics/format/tgawriter.h"
 #include "../../graphics/lips.h"
 #include "../../graphics/models.h"
-#include "../../graphics/pbribl.h"
 #include "../../graphics/renderbuffer.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/walkmeshes.h"
@@ -142,9 +140,6 @@ void Game::update() {
 }
 
 void Game::drawAll() {
-    // Compute derived PBR IBL textures from queued environment maps
-    _services.pbrIbl.refresh();
-
     _services.window.clear();
 
     if (_video) {
@@ -251,19 +246,6 @@ void Game::loadDefaultParty() {
         companion->setImmortal(true);
         _party.addMember(1, companion);
     }
-}
-
-void Game::getDefaultPartyMembers(string &member1, string &member2, string &member3) const {
-    shared_ptr<TwoDA> defaultParty(_services.twoDas.get("defaultparty"));
-    if (!defaultParty) {
-        return;
-    }
-    if (defaultParty->getRowCount() < 1) {
-        throw ValidationException("defaultparty 2DA is empty");
-    }
-    member1 = defaultParty->getString(0, "partymember0");
-    member2 = defaultParty->getString(1, "partymember1");
-    member3 = defaultParty->getString(2, "partymember2");
 }
 
 void Game::setCursorType(CursorType type) {
@@ -574,20 +556,6 @@ bool Game::handleKeyDown(const SDL_KeyboardEvent &event) {
     case SDLK_v:
         if (_options.developer && _screen == GameScreen::InGame) {
             toggleInGameCameraType();
-            return true;
-        }
-        break;
-
-    case SDLK_F1:
-        if (_options.developer) {
-            _services.features.toggle(Feature::PBR);
-            return true;
-        }
-        break;
-
-    case SDLK_F3:
-        if (_options.developer) {
-            _services.features.toggle(Feature::DynamicRoomLighting);
             return true;
         }
         break;

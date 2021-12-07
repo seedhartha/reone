@@ -36,10 +36,7 @@ void SceneModule::init() {
         _options,
         _audio.audioPlayer(),
         _graphics.context(),
-        _graphics.features(),
-        _graphics.materials(),
         _graphics.meshes(),
-        _graphics.pbrIbl(),
         _graphics.shaders(),
         _graphics.textures());
 

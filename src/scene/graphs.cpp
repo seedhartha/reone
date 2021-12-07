@@ -32,10 +32,7 @@ void SceneGraphs::add(string name) {
         _options,
         _audioPlayer,
         _context,
-        _features,
-        _materials,
         _meshes,
-        _pbrIbl,
         _shaders,
         _textures);
 

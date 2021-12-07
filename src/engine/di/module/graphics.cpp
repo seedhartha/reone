@@ -26,38 +26,29 @@ using namespace reone::graphics;
 namespace reone {
 
 void GraphicsModule::init() {
-    _features = make_unique<Features>(_options);
     _window = make_unique<Window>(_options);
     _context = make_unique<Context>();
     _meshes = make_unique<Meshes>();
     _textures = make_unique<Textures>(*_context, _resource.resources());
-    _materials = make_unique<Materials>(_resource.twoDas());
     _models = make_unique<Models>(*_textures, _resource.resources());
     _walkmeshes = make_unique<Walkmeshes>(_resource.resources());
     _lips = make_unique<Lips>(_resource.resources());
     _shaders = make_unique<Shaders>();
-    _pbrIbl = make_unique<PBRIBL>(*_context, *_meshes, *_shaders);
     _fonts = make_unique<Fonts>(*_window, *_context, *_meshes, *_textures, *_shaders);
 
-    _features->init();
     _window->init();
     _context->init();
     _meshes->init();
     _textures->init();
-    _materials->init();
     _shaders->init();
-    _pbrIbl->init();
 }
 
 void GraphicsModule::deinit() {
-    _pbrIbl.reset();
     _shaders.reset();
-    _materials.reset();
     _textures.reset();
     _meshes.reset();
     _context.reset();
     _window.reset();
-    _features.reset();
 }
 
 } // namespace reone

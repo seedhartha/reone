@@ -26,7 +26,6 @@ struct GraphicsOptions {
     int height {0};
     int shadowResolution {0};
     bool fullscreen {false};
-    bool pbr {false};
 };
 
 } // namespace graphics

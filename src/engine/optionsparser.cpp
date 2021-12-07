@@ -41,7 +41,6 @@ Options OptionsParser::parse() {
         ("width", po::value<int>()->default_value(800), "window width")                              //
         ("height", po::value<int>()->default_value(600), "window height")                            //
         ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")                 //
-        ("pbr", po::value<bool>()->default_value(false), "enable enhanced graphics mode")            //
         ("shadowres", po::value<int>()->default_value(2), "shadow map resolution")                   //
         ("musicvol", po::value<int>()->default_value(85), "music volume in percents")                //
         ("voicevol", po::value<int>()->default_value(85), "voice volume in percents")                //
@@ -71,7 +70,6 @@ Options OptionsParser::parse() {
     options.graphics.height = vars["height"].as<int>();
     options.graphics.shadowResolution = vars["shadowres"].as<int>();
     options.graphics.fullscreen = vars["fullscreen"].as<bool>();
-    options.graphics.pbr = vars["pbr"].as<bool>();
     options.audio.musicVolume = vars["musicvol"].as<int>();
     options.audio.voiceVolume = vars["voicevol"].as<int>();
     options.audio.soundVolume = vars["soundvol"].as<int>();

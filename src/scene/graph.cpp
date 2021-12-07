@@ -537,10 +537,7 @@ unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUs
         usage,
         *this,
         _context,
-        _features,
-        _materials,
         _meshes,
-        _pbrIbl,
         _shaders,
         _textures,
         animEventListener);

@@ -86,13 +86,9 @@ LauncherFrame::LauncherFrame() :
     _checkBoxFullscreen = new wxCheckBox(this, WindowID::fullscreen, "Fullscreen", wxDefaultPosition, wxDefaultSize);
     _checkBoxFullscreen->SetValue(_config.fullscreen);
 
-    _checkBoxEnhancedGfx = new wxCheckBox(this, WindowID::enhancedGfx, "Enhanced Graphics", wxDefaultPosition, wxDefaultSize);
-    _checkBoxEnhancedGfx->SetValue(_config.pbr);
-
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
     graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(_checkBoxEnhancedGfx, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
     // END Graphics
 
@@ -201,7 +197,6 @@ void LauncherFrame::LoadConfiguration() {
         ("width", po::value<int>())       //
         ("height", po::value<int>())      //
         ("fullscreen", po::value<bool>()) //
-        ("pbr", po::value<bool>())        //
         ("musicvol", po::value<int>())    //
         ("voicevol", po::value<int>())    //
         ("soundvol", po::value<int>())    //
@@ -225,7 +220,6 @@ void LauncherFrame::LoadConfiguration() {
     _config.voicevol = vars.count("voicevol") > 0 ? vars["voicevol"].as<int>() : 85;
     _config.soundvol = vars.count("soundvol") > 0 ? vars["soundvol"].as<int>() : 85;
     _config.movievol = vars.count("movievol") > 0 ? vars["movievol"].as<int>() : 85;
-    _config.pbr = vars.count("pbr") > 0 ? vars["pbr"].as<bool>() : false;
     _config.loglevel = vars.count("loglevel") > 0 ? vars["loglevel"].as<int>() : static_cast<int>(LogLevel::Info);
     _config.logch = vars.count("logch") > 0 ? vars["logch"].as<int>() : LogChannels::general;
     _config.logfile = vars.count("logfile") > 0 ? vars["logfile"].as<bool>() : false;
@@ -251,7 +245,6 @@ void LauncherFrame::SaveConfiguration() {
         "width=",
         "height=",
         "fullscreen=",
-        "pbr=",
         "musicvol=",
         "voicevol=",
         "soundvol=",
@@ -305,7 +298,6 @@ void LauncherFrame::SaveConfiguration() {
     _config.width = stoi(tokens[0]);
     _config.height = stoi(tokens[1]);
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
-    _config.pbr = _checkBoxEnhancedGfx->IsChecked();
     _config.musicvol = _sliderVolumeMusic->GetValue();
     _config.voicevol = _sliderVolumeVoice->GetValue();
     _config.soundvol = _sliderVolumeSound->GetValue();
@@ -336,7 +328,6 @@ void LauncherFrame::SaveConfiguration() {
     config << "width=" << _config.width << endl;
     config << "height=" << _config.height << endl;
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
-    config << "pbr=" << (_config.pbr ? 1 : 0) << endl;
     config << "musicvol=" << _config.musicvol << endl;
     config << "voicevol=" << _config.voicevol << endl;
     config << "soundvol=" << _config.soundvol << endl;
