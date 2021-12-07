@@ -47,27 +47,8 @@ static string describeLogLevel(LogLevel level) {
     });
 }
 
-static const unordered_map<int, string> g_nameByLogChannel {
-    {LogChannels::general, "General"},
-    {LogChannels::resources, "Resources"},
-    {LogChannels::resources2, "Resources"},
-    {LogChannels::graphics, "Graphics"},
-    {LogChannels::audio, "Audio"},
-    {LogChannels::gui, "GUI"},
-    {LogChannels::conversation, "Conversation"},
-    {LogChannels::combat, "Combat"},
-    {LogChannels::script, "Script"},
-    {LogChannels::script2, "Script"},
-    {LogChannels::script3, "Script"}};
-
-static string describeLogChannel(int channel) {
-    return getFromLookupOrElse(g_nameByLogChannel, channel, [&channel]() {
-        return to_string(channel);
-    });
-}
-
 static void log(ostream &out, LogLevel level, const string &s, int channel) {
-    auto msg = boost::format("%s %s: %s") % describeLogLevel(level) % describeLogChannel(channel) % s;
+    auto msg = boost::format("%s %s") % describeLogLevel(level) % s;
     out << msg << endl;
 }
 
