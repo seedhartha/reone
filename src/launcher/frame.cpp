@@ -122,7 +122,17 @@ LauncherFrame::LauncherFrame() :
 
     // END Audio
 
-    // Debug
+    // Logging
+
+    wxArrayString logLevelChoices;
+    logLevelChoices.Add("Error");
+    logLevelChoices.Add("Warning");
+    logLevelChoices.Add("Info");
+    logLevelChoices.Add("Debug");
+
+    auto labelLogLevel = new wxStaticText(this, wxID_ANY, "Level", wxDefaultPosition, wxDefaultSize);
+    _choiceLogLevel = new wxChoice(this, WindowID::logLevel, wxDefaultPosition, wxDefaultSize, logLevelChoices);
+    _choiceLogLevel->SetSelection(_config.loglevel);
 
     wxArrayString logChannelChoices;
     logChannelChoices.Add("Resources");
@@ -136,7 +146,7 @@ LauncherFrame::LauncherFrame() :
     logChannelChoices.Add("Script (verbose)");
     logChannelChoices.Add("Script (very verbose)");
 
-    auto labelLogChannels = new wxStaticText(this, wxID_ANY, "Log Channels", wxDefaultPosition, wxDefaultSize);
+    auto labelLogChannels = new wxStaticText(this, wxID_ANY, "Channels", wxDefaultPosition, wxDefaultSize);
 
     _checkListBoxLogChannels = new wxCheckListBox(this, WindowID::logChannels, wxDefaultPosition, wxDefaultSize, logChannelChoices);
     _checkListBoxLogChannels->Check(0, _config.logch & LogChannels::resources);
@@ -153,12 +163,14 @@ LauncherFrame::LauncherFrame() :
     _checkBoxLogFile = new wxCheckBox(this, WindowID::logFile, "Log to File", wxDefaultPosition, wxDefaultSize);
     _checkBoxLogFile->SetValue(_config.logfile);
 
-    auto debugSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Debug");
-    debugSizer->Add(labelLogChannels, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    debugSizer->Add(_checkListBoxLogChannels, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    debugSizer->Add(_checkBoxLogFile, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    auto loggingSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Logging");
+    loggingSizer->Add(labelLogLevel, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    loggingSizer->Add(_choiceLogLevel, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    loggingSizer->Add(labelLogChannels, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    loggingSizer->Add(_checkListBoxLogChannels, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    loggingSizer->Add(_checkBoxLogFile, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
-    // END Debug
+    // END Logging
 
     auto topSizer = new wxBoxSizer(wxVERTICAL);
     topSizer->Add(graphicsSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
@@ -166,7 +178,7 @@ LauncherFrame::LauncherFrame() :
 
     auto topSizer2 = new wxBoxSizer(wxHORIZONTAL);
     topSizer2->Add(topSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
-    topSizer2->Add(debugSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    topSizer2->Add(loggingSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
 
     auto topSizer3 = new wxBoxSizer(wxVERTICAL);
     topSizer3->SetMinSize(640, 100);
@@ -192,6 +204,7 @@ void LauncherFrame::LoadConfiguration() {
         ("voicevol", po::value<int>())    //
         ("soundvol", po::value<int>())    //
         ("movievol", po::value<int>())    //
+        ("loglevel", po::value<int>())    //
         ("logch", po::value<int>())       //
         ("logfile", po::value<bool>());
 
@@ -211,6 +224,7 @@ void LauncherFrame::LoadConfiguration() {
     _config.soundvol = vars.count("soundvol") > 0 ? vars["soundvol"].as<int>() : 85;
     _config.movievol = vars.count("movievol") > 0 ? vars["movievol"].as<int>() : 85;
     _config.pbr = vars.count("pbr") > 0 ? vars["pbr"].as<bool>() : false;
+    _config.loglevel = vars.count("loglevel") > 0 ? vars["loglevel"].as<int>() : static_cast<int>(LogLevel::Info);
     _config.logch = vars.count("logch") > 0 ? vars["logch"].as<int>() : LogChannels::general;
     _config.logfile = vars.count("logfile") > 0 ? vars["logfile"].as<bool>() : false;
 }
@@ -240,6 +254,7 @@ void LauncherFrame::SaveConfiguration() {
         "voicevol=",
         "soundvol=",
         "movievol=",
+        "loglevel=",
         "logch=",
         "logfile="};
 
@@ -290,6 +305,7 @@ void LauncherFrame::SaveConfiguration() {
     _config.voicevol = _sliderVolumeVoice->GetValue();
     _config.soundvol = _sliderVolumeSound->GetValue();
     _config.movievol = _sliderVolumeMovie->GetValue();
+    _config.loglevel = _choiceLogLevel->GetSelection();
     _config.logch = logch;
     _config.logfile = _checkBoxLogFile->IsChecked();
 
@@ -320,6 +336,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "voicevol=" << _config.voicevol << endl;
     config << "soundvol=" << _config.soundvol << endl;
     config << "movievol=" << _config.movievol << endl;
+    config << "loglevel=" << _config.loglevel << endl;
     config << "logch=" << _config.logch << endl;
     config << "logfile=" << (_config.logfile ? 1 : 0) << endl;
     for (auto &line : lines) {

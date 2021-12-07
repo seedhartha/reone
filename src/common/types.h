@@ -19,6 +19,13 @@
 
 namespace reone {
 
+enum class LogLevel {
+    Error,
+    Warn,
+    Info,
+    Debug
+};
+
 /**
  * Bit flags corresponding to different log channels.
  */

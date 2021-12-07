@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../../audio/options.h"
+#include "../../common/types.h"
 #include "../../graphics/options.h"
 
 namespace reone {
@@ -26,12 +27,17 @@ namespace game {
 
 struct Options {
     boost::filesystem::path gamePath;
-    graphics::GraphicsOptions graphics;
-    audio::AudioOptions audio;
     std::string module;
     bool developer {false};
-    bool logToFile {false};
+
+    graphics::GraphicsOptions graphics;
+    audio::AudioOptions audio;
+
+    // Logging
+    LogLevel logLevel {LogChannels::general};
     int logChannels {0};
+    bool logToFile {false};
+    // END Logging
 };
 
 } // namespace game

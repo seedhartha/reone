@@ -36,9 +36,10 @@ struct WindowID {
     static constexpr wxWindowID voiceVolume = wxID_HIGHEST + 8;
     static constexpr wxWindowID soundVolume = wxID_HIGHEST + 9;
     static constexpr wxWindowID movieVolume = wxID_HIGHEST + 10;
-    static constexpr wxWindowID logChannels = wxID_HIGHEST + 11;
-    static constexpr wxWindowID logFile = wxID_HIGHEST + 12;
-    static constexpr wxWindowID saveConfig = wxID_HIGHEST + 13;
+    static constexpr wxWindowID logLevel = wxID_HIGHEST + 11;
+    static constexpr wxWindowID logChannels = wxID_HIGHEST + 12;
+    static constexpr wxWindowID logFile = wxID_HIGHEST + 13;
+    static constexpr wxWindowID saveConfig = wxID_HIGHEST + 14;
 };
 
 class LauncherFrame : public wxFrame {
@@ -57,6 +58,7 @@ private:
         int voicevol {0};
         int soundvol {0};
         int movievol {0};
+        int loglevel {0};
         int logch {0};
         bool logfile {false};
     } _config;
@@ -70,6 +72,7 @@ private:
     wxSlider *_sliderVolumeVoice;
     wxSlider *_sliderVolumeSound;
     wxSlider *_sliderVolumeMovie;
+    wxChoice *_choiceLogLevel;
     wxCheckListBox *_checkListBoxLogChannels;
     wxCheckBox *_checkBoxLogFile;
 

@@ -17,6 +17,8 @@
 
 #include "optionsparser.h"
 
+#include "../common/types.h"
+
 using namespace std;
 
 using namespace reone::game;
@@ -28,31 +30,25 @@ namespace reone {
 
 static constexpr char kConfigFilename[] = "reone.cfg";
 
-static constexpr int kDefaultShadowResolution = 2;
-
-static constexpr int kDefaultMusicVolume = 85;
-static constexpr int kDefaultVoiceVolume = 85;
-static constexpr int kDefaultSoundVolume = 85;
-static constexpr int kDefaultMovieVolume = 85;
-
 Options OptionsParser::parse() {
     // Initialize options description
 
     po::options_description descCommon;
-    descCommon.add_options()                                                                              //
-        ("game", po::value<string>(), "path to game directory")                                           //
-        ("dev", po::value<bool>()->default_value(false), "enable developer mode")                         //
-        ("module", po::value<string>(), "name of a module to load")                                       //
-        ("width", po::value<int>()->default_value(800), "window width")                                   //
-        ("height", po::value<int>()->default_value(600), "window height")                                 //
-        ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")                      //
-        ("pbr", po::value<bool>()->default_value(false), "enable enhanced graphics mode")                 //
-        ("shadowres", po::value<int>()->default_value(kDefaultShadowResolution), "shadow map resolution") //
-        ("musicvol", po::value<int>()->default_value(kDefaultMusicVolume), "music volume in percents")    //
-        ("voicevol", po::value<int>()->default_value(kDefaultVoiceVolume), "voice volume in percents")    //
-        ("soundvol", po::value<int>()->default_value(kDefaultSoundVolume), "sound volume in percents")    //
-        ("movievol", po::value<int>()->default_value(kDefaultMovieVolume), "movie volume in percents")    //
-        ("logch", po::value<int>(), "log channel mask")                                                   //
+    descCommon.add_options()                                                                         //
+        ("game", po::value<string>(), "path to game directory")                                      //
+        ("dev", po::value<bool>()->default_value(false), "enable developer mode")                    //
+        ("module", po::value<string>(), "name of a module to load")                                  //
+        ("width", po::value<int>()->default_value(800), "window width")                              //
+        ("height", po::value<int>()->default_value(600), "window height")                            //
+        ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")                 //
+        ("pbr", po::value<bool>()->default_value(false), "enable enhanced graphics mode")            //
+        ("shadowres", po::value<int>()->default_value(2), "shadow map resolution")                   //
+        ("musicvol", po::value<int>()->default_value(85), "music volume in percents")                //
+        ("voicevol", po::value<int>()->default_value(85), "voice volume in percents")                //
+        ("soundvol", po::value<int>()->default_value(85), "sound volume in percents")                //
+        ("movievol", po::value<int>()->default_value(85), "movie volume in percents")                //
+        ("loglevel", po::value<int>()->default_value(static_cast<int>(LogLevel::Info)), "log level") //
+        ("logch", po::value<int>()->default_value(LogChannels::general), "log channel mask")         //
         ("logfile", po::value<bool>()->default_value(false), "log to file");
 
     po::options_description descCmdLine {"Usage"};
@@ -82,10 +78,9 @@ Options OptionsParser::parse() {
     options.audio.movieVolume = vars["movievol"].as<int>();
     options.developer = vars["dev"].as<bool>();
     options.module = vars.count("module") > 0 ? vars["module"].as<string>() : "";
+    options.logLevel = static_cast<LogLevel>(vars["loglevel"].as<int>());
+    options.logChannels = vars["logch"].as<int>();
     options.logToFile = vars["logfile"].as<bool>();
-    if (vars.count("logch") > 0) {
-        options.logChannels = vars["logch"].as<int>();
-    }
 
     return move(options);
 }
