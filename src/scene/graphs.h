@@ -26,10 +26,7 @@ namespace reone {
 namespace graphics {
 
 class Context;
-class Features;
-class Materials;
 class Meshes;
-class PBRIBL;
 class Shaders;
 class Textures;
 
@@ -49,19 +46,13 @@ public:
         graphics::GraphicsOptions options,
         audio::AudioPlayer &audioPlayer,
         graphics::Context &context,
-        graphics::Features &features,
-        graphics::Materials &materials,
         graphics::Meshes &meshes,
-        graphics::PBRIBL &pbrIbl,
         graphics::Shaders &shaders,
         graphics::Textures &textures) :
         _options(std::move(options)),
         _audioPlayer(audioPlayer),
         _context(context),
-        _features(features),
-        _materials(materials),
         _meshes(meshes),
-        _pbrIbl(pbrIbl),
         _shaders(shaders),
         _textures(textures) {
     }
@@ -75,16 +66,18 @@ public:
 private:
     graphics::GraphicsOptions _options;
 
-    audio::AudioPlayer &_audioPlayer;
+    std::unordered_map<std::string, std::unique_ptr<SceneGraph>> _scenes;
+
+    // Services
+
     graphics::Context &_context;
-    graphics::Features &_features;
-    graphics::Materials &_materials;
     graphics::Meshes &_meshes;
-    graphics::PBRIBL &_pbrIbl;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
 
-    std::unordered_map<std::string, std::unique_ptr<SceneGraph>> _scenes;
+    audio::AudioPlayer &_audioPlayer;
+
+    // END Services
 };
 
 } // namespace scene

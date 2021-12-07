@@ -99,8 +99,6 @@ void TSL::getDefaultPartyMembers(string &member1, string &member2, string &membe
     member1 = kBlueprintResRefAtton;
     member2 = kBlueprintResRefKreia;
     member3.clear();
-
-    Game::getDefaultPartyMembers(member1, member2, member3);
 }
 
 void fillScriptRoutinesTSL(IRoutines &routines) {

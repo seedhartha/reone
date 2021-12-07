@@ -53,7 +53,6 @@ private:
         int width {0};
         int height {0};
         bool fullscreen {false};
-        bool pbr {false};
         int musicvol {0};
         int voicevol {0};
         int soundvol {0};
@@ -67,7 +66,6 @@ private:
     wxChoice *_choiceResolution;
     wxCheckBox *_checkBoxDev;
     wxCheckBox *_checkBoxFullscreen;
-    wxCheckBox *_checkBoxEnhancedGfx;
     wxSlider *_sliderVolumeMusic;
     wxSlider *_sliderVolumeVoice;
     wxSlider *_sliderVolumeSound;

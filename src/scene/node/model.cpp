@@ -43,10 +43,7 @@ ModelSceneNode::ModelSceneNode(
     ModelUsage usage,
     SceneGraph &sceneGraph,
     Context &context,
-    Features &features,
-    Materials &materials,
     Meshes &meshes,
-    PBRIBL &pbrIbl,
     Shaders &shaders,
     Textures &textures,
     IAnimationEventListener *animEventListener) :
@@ -54,10 +51,7 @@ ModelSceneNode::ModelSceneNode(
     _model(model),
     _usage(usage),
     _context(context),
-    _features(features),
-    _materials(materials),
     _meshes(meshes),
-    _pbrIbl(pbrIbl),
     _shaders(shaders),
     _textures(textures),
     _animEventListener(animEventListener) {
@@ -133,7 +127,7 @@ unique_ptr<DummySceneNode> ModelSceneNode::newDummySceneNode(shared_ptr<ModelNod
 }
 
 unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<MeshSceneNode>(*this, move(node), _sceneGraph, _context, _features, _materials, _meshes, _pbrIbl, _shaders, _textures);
+    return make_unique<MeshSceneNode>(*this, move(node), _sceneGraph, _context, _meshes, _shaders, _textures);
 }
 
 unique_ptr<LightSceneNode> ModelSceneNode::newLightSceneNode(shared_ptr<ModelNode> node) const {

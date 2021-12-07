@@ -18,14 +18,11 @@
 #pragma once
 
 #include "../../graphics/context.h"
-#include "../../graphics/features.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/lips.h"
-#include "../../graphics/materials.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/models.h"
 #include "../../graphics/options.h"
-#include "../../graphics/pbribl.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/walkmeshes.h"
@@ -48,13 +45,10 @@ public:
     void deinit();
 
     graphics::Context &context() { return *_context; }
-    graphics::Features &features() { return *_features; }
     graphics::Fonts &fonts() { return *_fonts; }
     graphics::Lips &lips() { return *_lips; }
-    graphics::Materials &materials() { return *_materials; }
     graphics::Meshes &meshes() { return *_meshes; }
     graphics::Models &models() { return *_models; }
-    graphics::PBRIBL &pbrIbl() { return *_pbrIbl; }
     graphics::Shaders &shaders() { return *_shaders; }
     graphics::Textures &textures() { return *_textures; }
     graphics::Walkmeshes &walkmeshes() { return *_walkmeshes; }
@@ -65,13 +59,10 @@ private:
     ResourceModule &_resource;
 
     std::unique_ptr<graphics::Context> _context;
-    std::unique_ptr<graphics::Features> _features;
     std::unique_ptr<graphics::Fonts> _fonts;
     std::unique_ptr<graphics::Lips> _lips;
-    std::unique_ptr<graphics::Materials> _materials;
     std::unique_ptr<graphics::Meshes> _meshes;
     std::unique_ptr<graphics::Models> _models;
-    std::unique_ptr<graphics::PBRIBL> _pbrIbl;
     std::unique_ptr<graphics::Shaders> _shaders;
     std::unique_ptr<graphics::Textures> _textures;
     std::unique_ptr<graphics::Walkmeshes> _walkmeshes;

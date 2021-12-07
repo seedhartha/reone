@@ -82,11 +82,6 @@ struct MdlNodeFlags {
 
 // END MDL
 
-enum class Feature {
-    PBR,
-    DynamicRoomLighting
-};
-
 /**
  * This is a hint to the engine when configuring texture properties.
  */

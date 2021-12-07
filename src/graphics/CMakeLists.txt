@@ -23,7 +23,6 @@ set(GRAPHICS_HEADERS
     cursor.h
     dxtutil.h
     eventhandler.h
-    features.h
     font.h
     fonts.h
     format/bwmreader.h
@@ -38,15 +37,12 @@ set(GRAPHICS_HEADERS
     framebuffer.h
     lipanimation.h
     lips.h
-    material.h
-    materials.h
     mesh.h
     meshes.h
     model.h
     modelnode.h
     models.h
     options.h
-    pbribl.h
     pixelutil.h
     renderbuffer.h
     shaders.h
@@ -66,7 +62,6 @@ set(GRAPHICS_SOURCES
     context.cpp
     cursor.cpp
     dxtutil.cpp
-    features.cpp
     font.cpp
     fonts.cpp
     format/bwmreader.cpp
@@ -81,13 +76,11 @@ set(GRAPHICS_SOURCES
     framebuffer.cpp
     lipanimation.cpp
     lips.cpp
-    materials.cpp
     mesh.cpp
     meshes.cpp
     model.cpp
     modelnode.cpp
     models.cpp
-    pbribl.cpp
     pixelutil.cpp
     renderbuffer.cpp
     shaders.cpp

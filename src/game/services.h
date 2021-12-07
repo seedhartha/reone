@@ -31,13 +31,10 @@ class TwoDas;
 namespace graphics {
 
 class Context;
-class Features;
 class Fonts;
 class Lips;
-class Materials;
 class Meshes;
 class Models;
-class PBRIBL;
 class Shaders;
 class Textures;
 class Walkmeshes;
@@ -97,13 +94,10 @@ struct Services {
     audio::AudioFiles &audioFiles;
     audio::AudioPlayer &audioPlayer;
     graphics::Context &context;
-    graphics::Features &features;
     graphics::Fonts &fonts;
     graphics::Lips &lips;
-    graphics::Materials &materials;
     graphics::Meshes &meshes;
     graphics::Models &models;
-    graphics::PBRIBL &pbrIbl;
     graphics::Shaders &shaders;
     graphics::Textures &textures;
     graphics::Walkmeshes &walkmeshes;
@@ -132,13 +126,10 @@ struct Services {
         audio::AudioFiles &audioFiles,
         audio::AudioPlayer &audioPlayer,
         graphics::Context &context,
-        graphics::Features &features,
         graphics::Fonts &fonts,
         graphics::Lips &lips,
-        graphics::Materials &materials,
         graphics::Meshes &meshes,
         graphics::Models &models,
-        graphics::PBRIBL &pbrIbl,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Walkmeshes &walkmeshes,
@@ -166,13 +157,10 @@ struct Services {
         audioFiles(audioFiles),
         audioPlayer(audioPlayer),
         context(context),
-        features(features),
         fonts(fonts),
         lips(lips),
-        materials(materials),
         meshes(meshes),
         models(models),
-        pbrIbl(pbrIbl),
         shaders(shaders),
         textures(textures),
         walkmeshes(walkmeshes),

@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "../../graphics/material.h"
 #include "../../graphics/modelnode.h"
 
 #include "modelnode.h"
@@ -26,9 +25,6 @@ namespace reone {
 
 namespace graphics {
 
-class Features;
-class Materials;
-class PBRIBL;
 class Texture;
 class Textures;
 
@@ -45,10 +41,7 @@ public:
         std::shared_ptr<graphics::ModelNode> modelNode,
         SceneGraph &sceneGraph,
         graphics::Context &context,
-        graphics::Features &features,
-        graphics::Materials &materials,
         graphics::Meshes &meshes,
-        graphics::PBRIBL &pbrIbl,
         graphics::Shaders &shaders,
         graphics::Textures &textures);
 
@@ -83,7 +76,6 @@ private:
 
     const ModelSceneNode &_model;
 
-    graphics::Material _material;
     glm::vec2 _uvOffset {0.0f};
     float _bumpmapCycleTime {0.0f};
     int _bumpmapCycleFrame {0};
@@ -93,16 +85,12 @@ private:
 
     void initTextures();
 
-    void refreshMaterial();
     void refreshAdditionalTextures();
 
     bool isLightingEnabled() const;
 
     // Services
 
-    graphics::Features &_features;
-    graphics::Materials &_materials;
-    graphics::PBRIBL &_pbrIbl;
     graphics::Textures &_textures;
 
     // END Services

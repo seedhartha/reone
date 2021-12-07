@@ -24,10 +24,7 @@ namespace reone {
 namespace graphics {
 
 class Context;
-class Features;
-class Materials;
 class Meshes;
-class PBRIBL;
 class Shaders;
 class Textures;
 

@@ -21,7 +21,6 @@
 #include "../../graphics/format/tgawriter.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
-#include "../../graphics/pbribl.h"
 #include "../../graphics/renderbuffer.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"

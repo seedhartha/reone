@@ -33,9 +33,6 @@ namespace reone {
 
 namespace graphics {
 
-class Features;
-class Materials;
-class PBRIBL;
 class Textures;
 
 } // namespace graphics
@@ -51,10 +48,7 @@ public:
         ModelUsage usage,
         SceneGraph &sceneGraph,
         graphics::Context &context,
-        graphics::Features &features,
-        graphics::Materials &materials,
         graphics::Meshes &meshes,
-        graphics::PBRIBL &pbrIbl,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         IAnimationEventListener *animEventListener = nullptr);
@@ -141,10 +135,7 @@ private:
     // Services
 
     graphics::Context &_context;
-    graphics::Features &_features;
-    graphics::Materials &_materials;
     graphics::Meshes &_meshes;
-    graphics::PBRIBL &_pbrIbl;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
 

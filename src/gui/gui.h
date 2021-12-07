@@ -35,11 +35,8 @@ class Strings;
 namespace graphics {
 
 class Context;
-class Features;
 class Fonts;
-class Materials;
 class Meshes;
-class PBRIBL;
 class Shaders;
 class Texture;
 class Window;
@@ -103,11 +100,8 @@ protected:
     scene::SceneGraphs &_sceneGraphs;
 
     graphics::Context &_context;
-    graphics::Features &_features;
     graphics::Fonts &_fonts;
-    graphics::Materials &_materials;
     graphics::Meshes &_meshes;
-    graphics::PBRIBL &_pbrIbl;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
     graphics::Window &_window;
@@ -123,11 +117,8 @@ protected:
         scene::ControlRenderPipeline &controlRenderPipeline,
         scene::SceneGraphs &sceneGraphs,
         graphics::Context &context,
-        graphics::Features &features,
         graphics::Fonts &fonts,
-        graphics::Materials &materials,
         graphics::Meshes &meshes,
-        graphics::PBRIBL &pbrIbl,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,

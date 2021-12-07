@@ -33,10 +33,7 @@ namespace reone {
 namespace graphics {
 
 class Context;
-class Features;
-class Materials;
 class Meshes;
-class PBRIBL;
 class Shaders;
 class Textures;
 class Walkmesh;
@@ -64,20 +61,14 @@ public:
         graphics::GraphicsOptions options,
         audio::AudioPlayer &audioPlayer,
         graphics::Context &context,
-        graphics::Features &features,
-        graphics::Materials &materials,
         graphics::Meshes &meshes,
-        graphics::PBRIBL &pbrIbl,
         graphics::Shaders &shaders,
         graphics::Textures &textures) :
         _name(std::move(name)),
         _options(std::move(options)),
         _audioPlayer(audioPlayer),
         _context(context),
-        _features(features),
-        _materials(materials),
         _meshes(meshes),
-        _pbrIbl(pbrIbl),
         _shaders(shaders),
         _textures(textures) {
     }
@@ -194,10 +185,7 @@ private:
     audio::AudioPlayer &_audioPlayer;
 
     graphics::Context &_context;
-    graphics::Features &_features;
-    graphics::Materials &_materials;
     graphics::Meshes &_meshes;
-    graphics::PBRIBL &_pbrIbl;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
 

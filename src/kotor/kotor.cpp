@@ -25,11 +25,9 @@
 #include "../../common/pathutil.h"
 #include "../../common/streamutil.h"
 #include "../../common/streamwriter.h"
-#include "../../graphics/features.h"
 #include "../../graphics/format/tgawriter.h"
 #include "../../graphics/lips.h"
 #include "../../graphics/models.h"
-#include "../../graphics/pbribl.h"
 #include "../../graphics/renderbuffer.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/walkmeshes.h"
@@ -442,8 +440,6 @@ void KotOR::getDefaultPartyMembers(string &member1, string &member2, string &mem
     member1 = kBlueprintResRefCarth;
     member2 = kBlueprintResRefBastila;
     member3.clear();
-
-    Game::getDefaultPartyMembers(member1, member2, member3);
 }
 
 void fillScriptRoutinesKotOR(IRoutines &routines) {
