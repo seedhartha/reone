@@ -152,13 +152,8 @@ void KotOR::loadModuleNames() {
 }
 
 void KotOR::start() {
+    playVideo("legal");
     openMainMenu();
-
-    if (!_options.module.empty()) {
-        onModuleSelected(_options.module);
-    } else {
-        playVideo("legal");
-    }
 }
 
 void KotOR::loadModuleResources(const string &moduleName) {
