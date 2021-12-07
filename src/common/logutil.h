@@ -32,9 +32,11 @@ void info(const boost::format &s, int channel = LogChannels::general);
 void debug(const std::string &s, int channel = LogChannels::general);
 void debug(const boost::format &s, int channel = LogChannels::general);
 
+bool isLogLevelEnabled(LogLevel level);
 bool isLogChannelEnabled(int channel);
 
+void setLogLevel(LogLevel level);
 void setLogChannels(int mask);
-void setLogToFile(bool logToFile);
+void setLogToFile(bool log);
 
 } // namespace reone

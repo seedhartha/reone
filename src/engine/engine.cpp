@@ -31,6 +31,7 @@ int Engine::run() {
     OptionsParser optionsParser(_argc, _argv);
     Options gameOptions(optionsParser.parse());
 
+    setLogLevel(gameOptions.logLevel);
     setLogToFile(gameOptions.logToFile);
     setLogChannels(gameOptions.logChannels);
 

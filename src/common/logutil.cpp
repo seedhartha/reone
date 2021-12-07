@@ -25,17 +25,13 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-const char kLogFilename[] = "reone.log";
-
-enum class LogLevel {
-    Error,
-    Warn,
-    Info,
-    Debug
-};
+static constexpr char kLogFilename[] = "reone.log";
 
 static thread::id g_mainThreadId;
-static int g_logChannels = LogChannels::general;
+
+static int g_channels = LogChannels::general;
+static LogLevel g_level = LogLevel::Info;
+
 static bool g_logToFile = false;
 static unique_ptr<fs::ofstream> g_logFile;
 
@@ -71,15 +67,14 @@ static string describeLogChannel(int channel) {
 }
 
 static void log(ostream &out, LogLevel level, const string &s, int channel) {
-    boost::format msg(boost::format("%s %s: %s") %
-                      describeLogLevel(level) %
-                      describeLogChannel(channel) %
-                      s);
-
+    auto msg = boost::format("%s %s: %s") % describeLogLevel(level) % describeLogChannel(channel) % s;
     out << msg << endl;
 }
 
 static void log(LogLevel level, const string &s, int channel) {
+    if (!isLogLevelEnabled(level)) {
+        return;
+    }
     if (!isLogChannelEnabled(channel)) {
         return;
     }
@@ -131,16 +126,24 @@ void debug(const boost::format &s, int channel) {
     return debug(str(s), channel);
 }
 
+bool isLogLevelEnabled(LogLevel level) {
+    return static_cast<int>(level) <= static_cast<int>(g_level);
+}
+
 bool isLogChannelEnabled(int channel) {
-    return g_logChannels & channel;
+    return g_channels & channel;
+}
+
+void setLogLevel(LogLevel level) {
+    g_level = level;
 }
 
 void setLogChannels(int mask) {
-    g_logChannels = mask;
+    g_channels = mask;
 }
 
-void setLogToFile(bool logToFile) {
-    g_logToFile = logToFile;
+void setLogToFile(bool log) {
+    g_logToFile = log;
 }
 
 } // namespace reone
