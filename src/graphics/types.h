@@ -33,55 +33,6 @@ constexpr int kMaxCharacters = 128;
 constexpr int kMaxGrassClusters = 256;
 constexpr int kMaxDanglymeshConstraints = 512;
 
-// MDL
-
-constexpr int kMdlDataOffset = 12;
-
-constexpr uint32_t kMdlModelFuncPtr1KotorPC = 4273776;
-constexpr uint32_t kMdlModelFuncPtr2KotorPC = 4216096;
-constexpr uint32_t kMdlModelFuncPtr1KotorXbox = 4254992;
-constexpr uint32_t kMdlModelFuncPtr2KotorXbox = 4255008;
-constexpr uint32_t kMdlModelFuncPtr1TslPC = 4285200;
-constexpr uint32_t kMdlModelFuncPtr2TslPC = 4216320;
-constexpr uint32_t kMdlModelFuncPtr1TslXbox = 4285872;
-constexpr uint32_t kMdlModelFuncPtr2TslXbox = 4216016;
-
-constexpr uint32_t kMdlMeshFuncPtr1KotorPC = 4216656;
-constexpr uint32_t kMdlMeshFuncPtr2KotorPC = 4216672;
-constexpr uint32_t kMdlMeshFuncPtr1KotorXbox = 4267376;
-constexpr uint32_t kMdlMeshFuncPtr2KotorXbox = 4264048;
-constexpr uint32_t kMdlMeshFuncPtr1TslPC = 4216880;
-constexpr uint32_t kMdlMeshFuncPtr2TslPC = 4216896;
-constexpr uint32_t kMdlMeshFuncPtr1TslXbox = 4216576;
-constexpr uint32_t kMdlMeshFuncPtr2TslXbox = 4216592;
-
-struct MdlClassification {
-    static constexpr int other = 0;
-    static constexpr int effect = 1;
-    static constexpr int tile = 2;
-    static constexpr int character = 4;
-    static constexpr int door = 8;
-    static constexpr int lightsaber = 0x10;
-    static constexpr int placeable = 0x20;
-    static constexpr int flyer = 0x40;
-};
-
-struct MdlNodeFlags {
-    static constexpr int dummy = 1;
-    static constexpr int light = 2;
-    static constexpr int emitter = 4;
-    static constexpr int camera = 8;
-    static constexpr int reference = 0x10;
-    static constexpr int mesh = 0x20;
-    static constexpr int skin = 0x40;
-    static constexpr int anim = 0x80;
-    static constexpr int dangly = 0x100;
-    static constexpr int aabb = 0x200;
-    static constexpr int saber = 0x800;
-};
-
-// END MDL
-
 /**
  * This is a hint to the engine when configuring texture properties.
  */
@@ -151,18 +102,75 @@ enum class TextGravity {
     RightTop
 };
 
-struct TextureUnits {
-    static constexpr int diffuseMap {0};
-    static constexpr int lightmap {1};
-    static constexpr int environmentMap {2};
-    static constexpr int bumpMap {3};
-    static constexpr int bloom {4};
-    static constexpr int irradianceMap {5};
-    static constexpr int prefilterMap {6};
-    static constexpr int brdfLookup {7};
-    static constexpr int shadowMap {8};
-    static constexpr int shadowMapCube {9};
+struct ClearBuffers {
+    static constexpr int color = 1;
+    static constexpr int depth = 2;
+    static constexpr int stencil = 4;
+
+    static constexpr int colorDepth = color | depth;
 };
+
+struct TextureUnits {
+    static constexpr int diffuseMap = 0;
+    static constexpr int lightmap = 1;
+    static constexpr int environmentMap = 2;
+    static constexpr int bumpMap = 3;
+    static constexpr int bloom = 4;
+    static constexpr int irradianceMap = 5;
+    static constexpr int prefilterMap = 6;
+    static constexpr int brdfLookup = 7;
+    static constexpr int shadowMap = 8;
+    static constexpr int shadowMapCube = 9;
+};
+
+// MDL
+
+constexpr int kMdlDataOffset = 12;
+
+constexpr uint32_t kMdlModelFuncPtr1KotorPC = 4273776;
+constexpr uint32_t kMdlModelFuncPtr2KotorPC = 4216096;
+constexpr uint32_t kMdlModelFuncPtr1KotorXbox = 4254992;
+constexpr uint32_t kMdlModelFuncPtr2KotorXbox = 4255008;
+constexpr uint32_t kMdlModelFuncPtr1TslPC = 4285200;
+constexpr uint32_t kMdlModelFuncPtr2TslPC = 4216320;
+constexpr uint32_t kMdlModelFuncPtr1TslXbox = 4285872;
+constexpr uint32_t kMdlModelFuncPtr2TslXbox = 4216016;
+
+constexpr uint32_t kMdlMeshFuncPtr1KotorPC = 4216656;
+constexpr uint32_t kMdlMeshFuncPtr2KotorPC = 4216672;
+constexpr uint32_t kMdlMeshFuncPtr1KotorXbox = 4267376;
+constexpr uint32_t kMdlMeshFuncPtr2KotorXbox = 4264048;
+constexpr uint32_t kMdlMeshFuncPtr1TslPC = 4216880;
+constexpr uint32_t kMdlMeshFuncPtr2TslPC = 4216896;
+constexpr uint32_t kMdlMeshFuncPtr1TslXbox = 4216576;
+constexpr uint32_t kMdlMeshFuncPtr2TslXbox = 4216592;
+
+struct MdlClassification {
+    static constexpr int other = 0;
+    static constexpr int effect = 1;
+    static constexpr int tile = 2;
+    static constexpr int character = 4;
+    static constexpr int door = 8;
+    static constexpr int lightsaber = 0x10;
+    static constexpr int placeable = 0x20;
+    static constexpr int flyer = 0x40;
+};
+
+struct MdlNodeFlags {
+    static constexpr int dummy = 1;
+    static constexpr int light = 2;
+    static constexpr int emitter = 4;
+    static constexpr int camera = 8;
+    static constexpr int reference = 0x10;
+    static constexpr int mesh = 0x20;
+    static constexpr int skin = 0x40;
+    static constexpr int anim = 0x80;
+    static constexpr int dangly = 0x100;
+    static constexpr int aabb = 0x200;
+    static constexpr int saber = 0x800;
+};
+
+// END MDL
 
 } // namespace graphics
 

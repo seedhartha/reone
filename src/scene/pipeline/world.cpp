@@ -244,12 +244,12 @@ void WorldRenderPipeline::drawShadows() {
     } else {
         _shadows.attachDepth(*_cubeShadowsDepth);
     }
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
+    _shadows.disableDrawBuffer();
+    _shadows.disableReadBuffer();
 
     // Draw the scene
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+    _context.clear(ClearBuffers::depth);
     _sceneGraph.draw(true);
 
     // Restore context
@@ -300,9 +300,7 @@ void WorldRenderPipeline::drawGeometry() {
     // Bind geometry framebuffer
 
     _geometry.bind();
-
-    static constexpr GLenum buffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-    glDrawBuffers(2, buffers);
+    _geometry.setDrawBuffersToColor(2);
 
     if (shadowLight) {
         if (shadowLight->isDirectional()) {
@@ -316,7 +314,7 @@ void WorldRenderPipeline::drawGeometry() {
 
     // Draw the scene
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _context.clear(ClearBuffers::colorDepth);
     _sceneGraph.draw();
 
     // Restore context
@@ -355,7 +353,7 @@ void WorldRenderPipeline::applyHorizontalBlur() {
 
     // Draw a quad
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _context.clear(ClearBuffers::colorDepth);
     _meshes.quadNDC().draw();
 
     // Restore context
@@ -393,7 +391,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
 
     // Draw a quad
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _context.clear(ClearBuffers::colorDepth);
     _meshes.quadNDC().draw();
 
     // Restore context

@@ -84,6 +84,22 @@ void Framebuffer::checkCompleteness() {
     }
 }
 
+void Framebuffer::disableDrawBuffer() {
+    glDrawBuffer(GL_NONE);
+}
+
+void Framebuffer::disableReadBuffer() {
+    glReadBuffer(GL_NONE);
+}
+
+void Framebuffer::setDrawBuffersToColor(int count) {
+    static constexpr GLenum attachments[] {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+    if (count != 1 && count != 2) {
+        throw invalid_argument("count must be 1 or 2");
+    }
+    glDrawBuffers(count, attachments);
+}
+
 } // namespace graphics
 
 } // namespace reone

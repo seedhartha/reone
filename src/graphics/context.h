@@ -27,6 +27,8 @@ class Context : boost::noncopyable {
 public:
     void init();
 
+    void clear(int mask);
+
     void unbindFramebuffer();
     void unbindRenderbuffer();
 
