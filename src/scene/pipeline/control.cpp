@@ -25,6 +25,7 @@
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/textureutil.h"
+#include "../../graphics/types.h"
 
 #include "../graphs.h"
 #include "../node/camera.h"
@@ -95,7 +96,7 @@ void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &ex
     _geometry.attachColor(*attachments.colorBuffer);
     _geometry.attachDepth(*attachments.depthBuffer);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _context.clear(ClearBuffers::colorDepth);
     sceneGraph.draw();
 
     _context.unbindFramebuffer();

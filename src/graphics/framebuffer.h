@@ -63,6 +63,23 @@ public:
      */
     void checkCompleteness();
 
+    // Buffers
+
+    /**
+     * @note this framebuffer must be bound
+     */
+    void disableDrawBuffer();
+    /**
+     * @note this framebuffer must be bound
+     */
+    void disableReadBuffer();
+    /**
+     * @note this framebuffer must be bound
+     */
+    void setDrawBuffersToColor(int count);
+
+    // END Buffers
+
 private:
     bool _inited {false};
     uint32_t _framebuffer {0};
