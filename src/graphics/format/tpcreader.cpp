@@ -31,8 +31,8 @@ namespace reone {
 
 namespace graphics {
 
-TpcReader::TpcReader(const string &resRef, TextureUsage usage, bool headless) :
-    BinaryReader(0), _resRef(resRef), _usage(usage), _headless(headless) {
+TpcReader::TpcReader(const string &resRef, TextureUsage usage) :
+    BinaryReader(0), _resRef(resRef), _usage(usage) {
 }
 
 void TpcReader::doLoad() {
@@ -144,11 +144,7 @@ void TpcReader::loadFeatures() {
 }
 
 void TpcReader::makeTexture() {
-    _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage, _headless));
-    if (!_headless) {
-        _texture->init();
-        _texture->bind();
-    }
+    _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage));
     _texture->setPixels(_width, _height, getPixelFormat(), move(_pixels));
     _texture->setFeatures(move(_features));
 }

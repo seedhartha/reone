@@ -61,11 +61,10 @@ void Font::load(shared_ptr<Texture> texture) {
 }
 
 void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &color, TextGravity gravity) {
-    if (text.empty())
+    if (text.empty()) {
         return;
-
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _texture->bind();
+    }
+    _context.bindTexture(0, _texture);
 
     glm::vec3 textOffset(getTextOffset(text, gravity), 0.0f);
 

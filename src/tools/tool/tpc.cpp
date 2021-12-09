@@ -37,7 +37,7 @@ void TpcTool::invoke(Operation operation, const fs::path &target, const fs::path
 void TpcTool::toTGA(const fs::path &path, const fs::path &destPath) {
     // Read TPC
 
-    TpcReader tpc("", TextureUsage::GUI, true);
+    TpcReader tpc("", TextureUsage::GUI);
     tpc.load(path);
 
     // Write TGA

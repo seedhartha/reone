@@ -212,8 +212,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
         }
 
-        _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-        border.fill->bind();
+        _context.bindTexture(0, border.fill);
 
         BlendMode oldBlendMode = _context.blendMode();
         if (border.fill->isAdditive()) {
@@ -226,8 +225,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int width = size.x - 2 * border.dimension;
         int height = size.y - 2 * border.dimension;
 
-        _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-        border.edge->bind();
+        _context.bindTexture(0, border.edge);
 
         if (height > 0.0f) {
             int x = _extent.left + offset.x;
@@ -303,8 +301,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int x = _extent.left + offset.x;
         int y = _extent.top + offset.y;
 
-        _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-        border.corner->bind();
+        _context.bindTexture(0, border.corner);
 
         // Top left corner
         {

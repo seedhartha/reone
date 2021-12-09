@@ -27,7 +27,7 @@ inline bool isCompressed(PixelFormat format) {
     return format == PixelFormat::DXT1 || format == PixelFormat::DXT5;
 }
 
-Texture::Properties getTextureProperties(TextureUsage usage, bool headless = false);
+Texture::Properties getTextureProperties(TextureUsage usage);
 
 /**
  * KotOR and TSL cube maps require specific transformations before use.

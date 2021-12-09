@@ -26,18 +26,15 @@ namespace graphics {
 class Renderbuffer;
 class Texture;
 
-/**
- * Abstraction over the OpenGL framebuffer used for off-screen rendering.
- */
 class Framebuffer : boost::noncopyable {
 public:
-    Framebuffer() = default;
-    ~Framebuffer();
+    ~Framebuffer() { deinit(); }
 
     void init();
     void deinit();
 
-    void bind() const;
+    void bind();
+    void unbind();
 
     /**
      * Attaches a texture as a color buffer of this framebuffer. Framebuffer must be bound.
@@ -63,6 +60,8 @@ public:
      */
     void checkCompleteness();
 
+    uint32_t nameGL() const { return _nameGL; }
+
     // Buffers
 
     /**
@@ -81,8 +80,7 @@ public:
     // END Buffers
 
 private:
-    bool _inited {false};
-    uint32_t _framebuffer {0};
+    uint32_t _nameGL {0};
 };
 
 } // namespace graphics

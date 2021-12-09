@@ -71,23 +71,23 @@ private:
 
     // Framebuffers
 
-    graphics::Framebuffer _geometry;
-    graphics::Framebuffer _verticalBlur;
-    graphics::Framebuffer _horizontalBlur;
-    graphics::Framebuffer _shadows;
-    graphics::Framebuffer _screenshot;
+    std::shared_ptr<graphics::Framebuffer> _geometry;
+    std::shared_ptr<graphics::Framebuffer> _verticalBlur;
+    std::shared_ptr<graphics::Framebuffer> _horizontalBlur;
+    std::shared_ptr<graphics::Framebuffer> _shadows;
+    std::shared_ptr<graphics::Framebuffer> _screenshot;
 
     // END Framebuffers
 
     // Framebuffer targets
 
-    std::unique_ptr<graphics::Renderbuffer> _depthRenderbuffer;
-    std::unique_ptr<graphics::Texture> _geometryColor1;
-    std::unique_ptr<graphics::Texture> _geometryColor2;
-    std::unique_ptr<graphics::Texture> _verticalBlurColor;
-    std::unique_ptr<graphics::Texture> _horizontalBlurColor;
-    std::unique_ptr<graphics::Texture> _shadowsDepth;
-    std::unique_ptr<graphics::Texture> _cubeShadowsDepth;
+    std::shared_ptr<graphics::Renderbuffer> _depthRenderbuffer;
+    std::shared_ptr<graphics::Texture> _geometryColor1;
+    std::shared_ptr<graphics::Texture> _geometryColor2;
+    std::shared_ptr<graphics::Texture> _verticalBlurColor;
+    std::shared_ptr<graphics::Texture> _horizontalBlurColor;
+    std::shared_ptr<graphics::Texture> _shadowsDepth;
+    std::shared_ptr<graphics::Texture> _cubeShadowsDepth;
     std::shared_ptr<graphics::Texture> _screenshotColor;
 
     // END Framebuffers targets

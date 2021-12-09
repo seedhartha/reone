@@ -68,8 +68,6 @@ void Movie::update(float dt) {
     _videoStream->seek(_time);
     auto &frame = _videoStream->frame();
     if (frame.pixels) {
-        _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-        _texture->bind();
         _texture->setPixels(_width, _height, PixelFormat::RGB, frame.pixels);
     }
     if (_videoStream->hasEnded()) {
@@ -82,8 +80,8 @@ void Movie::update(float dt) {
 }
 
 void Movie::draw() {
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _texture->bind();
+    _context.bindTexture(0, _texture);
+    _texture->refresh();
 
     ShaderUniforms uniforms;
     _shaders.activate(ShaderProgram::SimpleGUI, uniforms);

@@ -17,6 +17,10 @@
 
 #include "context.h"
 
+#include "framebuffer.h"
+#include "renderbuffer.h"
+#include "texture.h"
+
 using namespace std;
 
 namespace reone {
@@ -26,6 +30,21 @@ namespace graphics {
 void Context::init() {
     glGetIntegerv(GL_VIEWPORT, &_viewport[0]);
     setBlendMode(BlendMode::Default);
+}
+
+void Context::deinit() {
+    if (_boundFramebuffer != 0) {
+        unbindFramebuffer();
+        _boundFramebuffer = 0;
+    }
+    if (_boundRenderbuffer != 0) {
+        unbindRenderbuffer();
+        _boundRenderbuffer = 0;
+    }
+    for (size_t i = 0; i < _boundTextures.size(); ++i) {
+        unbindTexture(static_cast<int>(i));
+    }
+    _boundTextures.clear();
 }
 
 void Context::clear(int mask) {
@@ -40,14 +59,6 @@ void Context::clear(int mask) {
         glMask |= GL_STENCIL_BUFFER_BIT;
     }
     glClear(glMask);
-}
-
-void Context::unbindFramebuffer() {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void Context::unbindRenderbuffer() {
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
 void Context::setViewport(glm::ivec4 viewport) {
@@ -94,18 +105,10 @@ static uint32_t getPolygonModeGL(PolygonMode mode) {
 }
 
 void Context::setPolygonMode(PolygonMode mode) {
-    if (_polygonMode == mode)
+    if (_polygonMode == mode) {
         return;
-
+    }
     glPolygonMode(GL_FRONT_AND_BACK, getPolygonModeGL(mode));
-}
-
-void Context::setActiveTextureUnit(int n) {
-    if (_textureUnit == n)
-        return;
-
-    glActiveTexture(GL_TEXTURE0 + n);
-    _textureUnit = n;
 }
 
 void Context::setBlendMode(BlendMode mode) {
@@ -143,6 +146,68 @@ void Context::withScissorTest(const glm::ivec4 &bounds, const function<void()> &
     block();
 
     glDisable(GL_SCISSOR_TEST);
+}
+
+void Context::bindFramebuffer(shared_ptr<Framebuffer> framebuffer) {
+    if (_boundFramebuffer == framebuffer) {
+        return;
+    }
+    framebuffer->bind();
+    _boundFramebuffer = move(framebuffer);
+}
+
+void Context::bindRenderbuffer(shared_ptr<Renderbuffer> renderbuffer) {
+    if (_boundRenderbuffer == renderbuffer) {
+        return;
+    }
+    renderbuffer->bind();
+    _boundRenderbuffer = move(renderbuffer);
+}
+
+void Context::bindTexture(int unit, shared_ptr<Texture> texture) {
+    size_t numUnits = _boundTextures.size();
+    if (numUnits <= unit) {
+        _boundTextures.resize(unit + 1);
+    }
+    if (_boundTextures[unit] == texture) {
+        return;
+    }
+    setActiveTextureUnit(unit);
+    texture->bind();
+    _boundTextures[unit] = move(texture);
+}
+
+void Context::unbindFramebuffer() {
+    if (!_boundFramebuffer) {
+        return;
+    }
+    _boundFramebuffer->unbind();
+    _boundFramebuffer = 0;
+}
+
+void Context::unbindRenderbuffer() {
+    if (!_boundRenderbuffer) {
+        return;
+    }
+    _boundRenderbuffer->unbind();
+    _boundRenderbuffer = 0;
+}
+
+void Context::unbindTexture(int unit) {
+    if (!_boundTextures[unit]) {
+        return;
+    }
+    setActiveTextureUnit(unit);
+    _boundTextures[unit]->unbind();
+    _boundTextures[unit].reset();
+}
+
+void Context::setActiveTextureUnit(int unit) {
+    if (_textureUnit == unit) {
+        return;
+    }
+    glActiveTexture(GL_TEXTURE0 + unit);
+    _textureUnit = unit;
 }
 
 } // namespace graphics

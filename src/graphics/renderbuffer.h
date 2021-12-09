@@ -23,29 +23,28 @@ namespace reone {
 
 namespace graphics {
 
-/**
- * Abstraction over the OpenGL renderbuffer.
- */
 class Renderbuffer : boost::noncopyable {
 public:
-    Renderbuffer() = default;
-    ~Renderbuffer();
+    ~Renderbuffer() { deinit(); }
 
     void init();
     void deinit();
 
-    void bind() const;
+    void bind();
+    void unbind();
 
-    /**
-     * Configures this renderbuffers size and internal format. Renderbuffer must be bound.
-     */
-    void configure(int w, int h, PixelFormat format);
+    void clearPixels(int w, int h, PixelFormat format);
+    void refresh();
 
-    uint32_t id() const { return _id; }
+    uint32_t nameGL() const { return _nameGL; }
 
 private:
+    int _width {0};
+    int _height {0};
+    PixelFormat _pixelFormat {PixelFormat::RGB};
+
     bool _inited {false};
-    uint32_t _id {0};
+    uint32_t _nameGL {0};
 };
 
 } // namespace graphics

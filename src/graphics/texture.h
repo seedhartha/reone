@@ -25,9 +25,6 @@ namespace reone {
 
 namespace graphics {
 
-/**
- * Abstraction over the OpenGL texture object.
- */
 class Texture : boost::noncopyable {
 public:
     enum class Filtering {
@@ -60,8 +57,7 @@ public:
         Filtering maxFilter {Filtering::Linear};
         Wrapping wrap {Wrapping::Repeat};
         glm::vec3 borderColor {1.0f};
-        bool cubemap {false};  /**< is this a cube map texture? */
-        bool headless {false}; /**< must an OpenGL texture be created? */
+        bool cubemap {false}; /**< is this a cube map texture? */
     };
 
     /**
@@ -95,59 +91,51 @@ public:
     };
 
     Texture(std::string name, Properties properties);
-
-    ~Texture();
+    ~Texture() { deinit(); }
 
     void init();
     void deinit();
 
-    void bind() const;
-    void unbind() const;
+    void bind();
+    void unbind();
+
+    void configure();
+    void refresh();
 
     void flushGPUToCPU();
-
-    /**
-     * Clears this texture pixels. Texture must be bound, unless it is headless.
-     */
-    void clearPixels(int w, int h, PixelFormat format);
 
     glm::vec4 sample(float s, float t) const;
     glm::vec4 sample(int x, int y) const;
 
-    /**
-     * @return true if this is a cube map texture, false otherwise
-     */
-    bool isCubeMap() const;
-
-    bool isAdditive() const;
-    bool isGrayscale() const;
+    bool isCubeMap() const { return _properties.cubemap; }
+    bool isAdditive() const { return _features.blending == Blending::Additive; }
+    bool isGrayscale() const { return _pixelFormat == PixelFormat::Grayscale; }
 
     const std::string &name() const { return _name; }
     int width() const { return _width; }
     int height() const { return _height; }
     const std::vector<Layer> &layers() const { return _layers; }
     const Features &features() const { return _features; }
-    uint32_t textureId() const { return _textureId; }
+    uint32_t nameGL() const { return _nameGL; }
     PixelFormat pixelFormat() const { return _pixelFormat; }
 
-    /**
-     * Sets this texture pixels from a single image. Texture must be bound, unless it is headless.
-     */
-    void setPixels(int w, int h, PixelFormat format, std::shared_ptr<ByteArray> pixels);
+    void setFeatures(Features features) { _features = std::move(features); }
 
-    /**
-     * Sets this texture pixels from multiple images. Texture must be bound, unless it is headless.
-     */
+    // Pixels
+
+    void clearPixels(int w, int h, PixelFormat format);
+
+    void setPixels(int w, int h, PixelFormat format, std::shared_ptr<ByteArray> pixels);
     void setPixels(int w, int h, PixelFormat format, std::vector<Layer> layers);
 
-    void setFeatures(Features features);
+    // END Pixels
 
 private:
     std::string _name;
     Properties _properties;
 
     bool _inited {false};
-    uint32_t _textureId {0};
+    uint32_t _nameGL {0};
 
     int _width {0};
     int _height {0};
@@ -158,17 +146,10 @@ private:
     void configure2D();
     void configureCubeMap();
 
-    void refresh();
     void refresh2D();
     void refreshCubeMap();
 
     void fillTarget(uint32_t target, int level, int width, int height, const void *pixels = nullptr, int size = 0);
-
-    bool isMipmapFilter(Filtering filter) const;
-
-    uint32_t getFilterGL(Filtering filter) const;
-    uint32_t getPixelFormatGL() const;
-    uint32_t getPixelTypeGL() const;
 };
 
 } // namespace graphics

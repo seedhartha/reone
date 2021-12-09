@@ -34,7 +34,10 @@ class Texture;
 
 class Textures : boost::noncopyable {
 public:
-    Textures(Context &context, resource::Resources &resources);
+    Textures(Context &context, resource::Resources &resources) :
+        _context(context),
+        _resources(resources) {
+    }
 
     void init();
     void invalidate();

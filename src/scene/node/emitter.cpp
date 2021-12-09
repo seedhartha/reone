@@ -282,9 +282,7 @@ void EmitterSceneNode::drawElements(const vector<SceneNode *> &elements, int cou
     }
 
     _shaders.activate(ShaderProgram::ParticleParticle, uniforms);
-
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    texture->bind();
+    _context.bindTexture(TextureUnits::diffuseMap, texture);
 
     BlendMode oldBlendMode(_context.blendMode());
     bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;

@@ -20,6 +20,7 @@
 #include "../../common/streamutil.h"
 #include "../../graphics/cursor.h"
 #include "../../graphics/format/curreader.h"
+#include "../../graphics/texture.h"
 #include "../../resource/resources.h"
 
 using namespace std;
@@ -63,7 +64,9 @@ shared_ptr<Cursor> Cursors::get(CursorType type) {
         return nullptr;
     }
     shared_ptr<Texture> textureUp(newTextureFromCursor(cursorNamesUp.back()));
+    textureUp->init();
     shared_ptr<Texture> textureDown(newTextureFromCursor(cursorNamesDown.back()));
+    textureDown->init();
 
     auto cursor = make_shared<Cursor>(textureUp, textureDown, _context, _meshes, _shaders, _window);
     _cache.insert(make_pair(type, cursor));

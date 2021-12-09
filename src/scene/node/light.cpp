@@ -75,8 +75,7 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     if (!camera)
         return;
 
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    flare.texture->bind();
+    _context.bindTexture(TextureUnits::diffuseMap, flare.texture);
 
     glm::vec4 lightPos(_absTransform[3]);
     glm::vec4 lightPosNdc(camera->projection() * camera->view() * lightPos);

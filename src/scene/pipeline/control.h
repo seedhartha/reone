@@ -73,11 +73,11 @@ private:
     };
 
     struct Attachments {
-        std::unique_ptr<graphics::Texture> colorBuffer;
-        std::unique_ptr<graphics::Renderbuffer> depthBuffer;
+        std::shared_ptr<graphics::Texture> colorBuffer;
+        std::shared_ptr<graphics::Renderbuffer> depthBuffer;
     };
 
-    graphics::Framebuffer _geometry;
+    std::shared_ptr<graphics::Framebuffer> _geometry;
     std::unordered_map<AttachmentsId, Attachments, AttachmentsIdHasher> _attachments;
 
     // Services

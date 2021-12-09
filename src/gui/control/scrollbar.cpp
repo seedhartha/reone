@@ -61,11 +61,10 @@ void ScrollBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
 }
 
 void ScrollBar::drawThumb(const glm::ivec2 &offset) {
-    if (!_thumb.image || _state.numVisible >= _state.count)
+    if (!_thumb.image || _state.numVisible >= _state.count) {
         return;
-
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _thumb.image->bind();
+    }
+    _context.bindTexture(0, _thumb.image);
 
     ShaderUniforms uniforms;
     uniforms.combined.general.projection = _window.getOrthoProjection();
@@ -113,8 +112,7 @@ void ScrollBar::drawArrows(const glm::ivec2 &offset) {
     if (!canScrollUp && !canScrollDown)
         return;
 
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _dir.image->bind();
+    _context.bindTexture(0, _dir.image);
 
     if (canScrollUp) {
         drawUpArrow(offset);

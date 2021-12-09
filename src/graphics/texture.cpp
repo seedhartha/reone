@@ -26,29 +26,110 @@ namespace reone {
 
 namespace graphics {
 
+static bool isMipmapFilter(Texture::Filtering filter) {
+    switch (filter) {
+    case Texture::Filtering::NearestMipmapNearest:
+    case Texture::Filtering::LinearMipmapNearest:
+    case Texture::Filtering::NearestMipmapLinear:
+    case Texture::Filtering::LinearMipmapLinear:
+        return true;
+    default:
+        return false;
+    }
+}
+
+static uint32_t getPixelFormatGL(PixelFormat format) {
+    switch (format) {
+    case PixelFormat::Grayscale:
+        return GL_RED;
+    case PixelFormat::RGB:
+        return GL_RGB;
+    case PixelFormat::RGBA:
+    case PixelFormat::DXT1:
+    case PixelFormat::DXT5:
+        return GL_RGBA;
+    case PixelFormat::BGR:
+        return GL_BGR;
+    case PixelFormat::BGRA:
+        return GL_BGRA;
+    case PixelFormat::Depth:
+        return GL_DEPTH_COMPONENT;
+    default:
+        throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(format)));
+    }
+}
+
+static uint32_t getPixelTypeGL(PixelFormat format) {
+    switch (format) {
+    case PixelFormat::Grayscale:
+    case PixelFormat::RGB:
+    case PixelFormat::RGBA:
+    case PixelFormat::BGR:
+    case PixelFormat::BGRA:
+        return GL_UNSIGNED_BYTE;
+    case PixelFormat::Depth:
+        return GL_FLOAT;
+    default:
+        throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(format)));
+    }
+}
+
+static uint32_t getFilterGL(Texture::Filtering filter) {
+    switch (filter) {
+    case Texture::Filtering::Nearest:
+        return GL_NEAREST;
+    case Texture::Filtering::NearestMipmapNearest:
+        return GL_NEAREST_MIPMAP_NEAREST;
+    case Texture::Filtering::LinearMipmapNearest:
+        return GL_LINEAR_MIPMAP_NEAREST;
+    case Texture::Filtering::NearestMipmapLinear:
+        return GL_NEAREST_MIPMAP_LINEAR;
+    case Texture::Filtering::LinearMipmapLinear:
+        return GL_LINEAR_MIPMAP_LINEAR;
+    case Texture::Filtering::Linear:
+    default:
+        return GL_LINEAR;
+    }
+}
+
 Texture::Texture(string name, Properties properties) :
     _name(move(name)),
     _properties(move(properties)) {
 }
 
 void Texture::init() {
-    if (!_inited) {
-        glGenTextures(1, &_textureId);
-        bind();
-
-        if (isCubeMap()) {
-            configureCubeMap();
-        } else {
-            configure2D();
-        }
-
-        unbind();
-        _inited = true;
+    if (_inited) {
+        return;
     }
+    glGenTextures(1, &_nameGL);
+    bind();
+    configure();
+    refresh();
+    _inited = true;
 }
 
-bool Texture::isCubeMap() const {
-    return _properties.cubemap;
+void Texture::deinit() {
+    if (!_inited) {
+        return;
+    }
+    glDeleteTextures(1, &_nameGL);
+    _inited = false;
+}
+
+void Texture::bind() {
+    glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, _nameGL);
+}
+
+void Texture::unbind() {
+    glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, 0);
+}
+
+void Texture::configure() {
+    if (isCubeMap()) {
+        configureCubeMap();
+    } else {
+        configure2D();
+    }
 }
 
 void Texture::configureCubeMap() {
@@ -74,24 +155,6 @@ void Texture::configureCubeMap() {
     }
 }
 
-uint32_t Texture::getFilterGL(Filtering filter) const {
-    switch (filter) {
-    case Filtering::Nearest:
-        return GL_NEAREST;
-    case Filtering::NearestMipmapNearest:
-        return GL_NEAREST_MIPMAP_NEAREST;
-    case Filtering::LinearMipmapNearest:
-        return GL_LINEAR_MIPMAP_NEAREST;
-    case Filtering::NearestMipmapLinear:
-        return GL_NEAREST_MIPMAP_LINEAR;
-    case Filtering::LinearMipmapLinear:
-        return GL_LINEAR_MIPMAP_LINEAR;
-    case Filtering::Linear:
-    default:
-        return GL_LINEAR;
-    }
-}
-
 void Texture::configure2D() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getFilterGL(_properties.minFilter));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.maxFilter));
@@ -110,31 +173,6 @@ void Texture::configure2D() {
     default:
         // Wrap is GL_REPEAT by default in OpenGL
         break;
-    }
-}
-
-Texture::~Texture() {
-    deinit();
-}
-
-void Texture::deinit() {
-    if (_inited) {
-        glDeleteTextures(1, &_textureId);
-        _inited = false;
-    }
-}
-
-void Texture::clearPixels(int w, int h, PixelFormat format) {
-    if (!_properties.headless && !_inited) {
-        throw logic_error("Texture has not been initialized: " + _name);
-    }
-    _width = w;
-    _height = h;
-    _pixelFormat = format;
-    _layers.clear();
-
-    if (!_properties.headless) {
-        refresh();
     }
 }
 
@@ -162,73 +200,6 @@ void Texture::refreshCubeMap() {
     }
 }
 
-void Texture::fillTarget(uint32_t target, int level, int width, int height, const void *pixels, int size) {
-    switch (_pixelFormat) {
-    case PixelFormat::DXT1:
-    case PixelFormat::DXT5:
-        glCompressedTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, size, pixels);
-        break;
-    case PixelFormat::Grayscale:
-    case PixelFormat::RGB:
-    case PixelFormat::RGBA:
-    case PixelFormat::BGR:
-    case PixelFormat::BGRA:
-    case PixelFormat::Depth:
-        glTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, getPixelFormatGL(), getPixelTypeGL(), pixels);
-        break;
-    default:
-        break;
-    }
-}
-
-uint32_t Texture::getPixelFormatGL() const {
-    switch (_pixelFormat) {
-    case PixelFormat::Grayscale:
-        return GL_RED;
-    case PixelFormat::RGB:
-        return GL_RGB;
-    case PixelFormat::RGBA:
-    case PixelFormat::DXT1:
-    case PixelFormat::DXT5:
-        return GL_RGBA;
-    case PixelFormat::BGR:
-        return GL_BGR;
-    case PixelFormat::BGRA:
-        return GL_BGRA;
-    case PixelFormat::Depth:
-        return GL_DEPTH_COMPONENT;
-    default:
-        throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
-    }
-}
-
-uint32_t Texture::getPixelTypeGL() const {
-    switch (_pixelFormat) {
-    case PixelFormat::Grayscale:
-    case PixelFormat::RGB:
-    case PixelFormat::RGBA:
-    case PixelFormat::BGR:
-    case PixelFormat::BGRA:
-        return GL_UNSIGNED_BYTE;
-    case PixelFormat::Depth:
-        return GL_FLOAT;
-    default:
-        throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(_pixelFormat)));
-    }
-}
-
-bool Texture::isMipmapFilter(Filtering filter) const {
-    switch (filter) {
-    case Filtering::NearestMipmapNearest:
-    case Filtering::LinearMipmapNearest:
-    case Filtering::NearestMipmapLinear:
-    case Filtering::LinearMipmapLinear:
-        return true;
-    default:
-        return false;
-    }
-}
-
 void Texture::refresh2D() {
     int numMipMaps = 0;
 
@@ -251,38 +222,30 @@ void Texture::refresh2D() {
     }
 }
 
-void Texture::bind() const {
-    glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, _textureId);
+void Texture::fillTarget(uint32_t target, int level, int width, int height, const void *pixels, int size) {
+    switch (_pixelFormat) {
+    case PixelFormat::DXT1:
+    case PixelFormat::DXT5:
+        glCompressedTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, size, pixels);
+        break;
+    case PixelFormat::Grayscale:
+    case PixelFormat::RGB:
+    case PixelFormat::RGBA:
+    case PixelFormat::BGR:
+    case PixelFormat::BGRA:
+    case PixelFormat::Depth:
+        glTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, getPixelFormatGL(_pixelFormat), getPixelTypeGL(_pixelFormat), pixels);
+        break;
+    default:
+        break;
+    }
 }
 
-void Texture::unbind() const {
-    glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, 0);
-}
-
-void Texture::flushGPUToCPU() {
-    if (_properties.cubemap)
-        throw logic_error("Cubemaps are not supported");
-
-    Layer layer;
-    layer.mipMaps.resize(1);
-
-    MipMap &mipMap = layer.mipMaps[0];
-    mipMap.width = _width;
-    mipMap.height = _height;
-    mipMap.pixels = make_shared<ByteArray>();
-    mipMap.pixels->resize(3 * _width * _height);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, &(*mipMap.pixels)[0]);
-
+void Texture::clearPixels(int w, int h, PixelFormat format) {
+    _width = w;
+    _height = h;
+    _pixelFormat = format;
     _layers.clear();
-    _layers.push_back(move(layer));
-}
-
-bool Texture::isAdditive() const {
-    return _features.blending == Blending::Additive;
-}
-
-bool Texture::isGrayscale() const {
-    return _pixelFormat == PixelFormat::Grayscale;
 }
 
 void Texture::setPixels(int w, int h, PixelFormat format, shared_ptr<ByteArray> pixels) {
@@ -298,9 +261,6 @@ void Texture::setPixels(int w, int h, PixelFormat format, shared_ptr<ByteArray> 
 }
 
 void Texture::setPixels(int w, int h, PixelFormat format, vector<Layer> layers) {
-    if (!_properties.headless && !_inited) {
-        throw logic_error("Texture has not been initialized: " + _name);
-    }
     if (layers.empty()) {
         throw invalid_argument("layers is empty");
     }
@@ -308,14 +268,24 @@ void Texture::setPixels(int w, int h, PixelFormat format, vector<Layer> layers) 
     _height = h;
     _pixelFormat = format;
     _layers = move(layers);
-
-    if (!_properties.headless) {
-        refresh();
-    }
 }
 
-void Texture::setFeatures(Features features) {
-    _features = move(features);
+void Texture::flushGPUToCPU() {
+    if (_properties.cubemap) {
+        throw logic_error("Flushing cube maps is not supported");
+    }
+    Layer layer;
+    layer.mipMaps.resize(1);
+
+    MipMap &mipMap = layer.mipMaps[0];
+    mipMap.width = _width;
+    mipMap.height = _height;
+    mipMap.pixels = make_shared<ByteArray>();
+    mipMap.pixels->resize(3 * _width * _height);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, &(*mipMap.pixels)[0]);
+
+    _layers.clear();
+    _layers.push_back(move(layer));
 }
 
 glm::vec4 Texture::sample(float s, float t) const {
