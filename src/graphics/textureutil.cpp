@@ -25,9 +25,8 @@ namespace reone {
 
 namespace graphics {
 
-Texture::Properties getTextureProperties(TextureUsage usage, bool headless) {
+Texture::Properties getTextureProperties(TextureUsage usage) {
     Texture::Properties properties;
-    properties.headless = headless;
 
     if (usage == TextureUsage::GUI ||
         usage == TextureUsage::ColorBuffer ||

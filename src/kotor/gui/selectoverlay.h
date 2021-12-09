@@ -78,7 +78,7 @@ private:
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleMouseWheel(const SDL_MouseWheelEvent &event);
 
-    void drawReticle(graphics::Texture &texture, const glm::vec3 &screenCoords);
+    void drawReticle(std::shared_ptr<graphics::Texture> texture, const glm::vec3 &screenCoords);
     void drawTitleBar();
     void drawHealthBar();
     void drawActionBar();

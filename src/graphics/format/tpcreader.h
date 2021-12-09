@@ -27,10 +27,7 @@ namespace graphics {
 
 class TpcReader : public resource::BinaryReader {
 public:
-    /**
-     * @param headless true if texture will not be used for rendering
-     */
-    TpcReader(const std::string &resRef, TextureUsage usage, bool headless = false);
+    TpcReader(const std::string &resRef, TextureUsage usage);
 
     std::shared_ptr<Texture> texture() const { return _texture; }
     const ByteArray &txiData() const { return _txiData; }
@@ -44,7 +41,6 @@ private:
 
     std::string _resRef;
     TextureUsage _usage;
-    bool _headless;
 
     uint32_t _dataSize {0};
     bool _compressed {false};

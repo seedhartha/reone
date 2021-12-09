@@ -173,7 +173,6 @@ private:
 
     std::shared_ptr<CameraSceneNode> _activeCamera;
 
-    uint32_t _textureId {0};
     bool _updateRoots {true};
     graphics::ShaderUniforms _uniformsPrototype;
 

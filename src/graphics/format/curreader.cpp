@@ -84,8 +84,6 @@ void CurReader::loadData() {
     layer.mipMaps.push_back(move(mipMap));
 
     _texture = make_shared<Texture>("", getTextureProperties(TextureUsage::GUI));
-    _texture->init();
-    _texture->bind();
     _texture->setPixels(_width, _width, PixelFormat::BGRA, vector<Texture::Layer> {layer});
 }
 

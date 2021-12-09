@@ -38,22 +38,16 @@ namespace reone {
 
 namespace graphics {
 
-Textures::Textures(Context &context, Resources &resources) :
-    _context(context), _resources(resources) {
-}
-
 void Textures::init() {
     // Initialize default texture
     _default = make_shared<Texture>("default", getTextureProperties(TextureUsage::Default));
-    _default->init();
-    _default->bind();
     _default->clearPixels(1, 1, PixelFormat::RGB);
+    _default->init();
 
     // Initialize default cubemap texture
     _defaultCubemap = make_shared<Texture>("default_cubemap", getTextureProperties(TextureUsage::CubeMapDefault));
-    _defaultCubemap->init();
-    _defaultCubemap->bind();
     _defaultCubemap->clearPixels(1, 1, PixelFormat::RGB);
+    _defaultCubemap->init();
 
     bindDefaults();
 }
@@ -63,35 +57,16 @@ void Textures::invalidate() {
 }
 
 void Textures::bindDefaults() {
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _default->bind();
-
-    _context.setActiveTextureUnit(TextureUnits::lightmap);
-    _default->bind();
-
-    _context.setActiveTextureUnit(TextureUnits::environmentMap);
-    _defaultCubemap->bind();
-
-    _context.setActiveTextureUnit(TextureUnits::bumpMap);
-    _default->bind();
-
-    _context.setActiveTextureUnit(TextureUnits::bloom);
-    _default->bind();
-
-    _context.setActiveTextureUnit(TextureUnits::irradianceMap);
-    _defaultCubemap->bind();
-
-    _context.setActiveTextureUnit(TextureUnits::prefilterMap);
-    _defaultCubemap->bind();
-
-    _context.setActiveTextureUnit(TextureUnits::brdfLookup);
-    _default->bind();
-
-    _context.setActiveTextureUnit(TextureUnits::shadowMap);
-    _default->bind();
-
-    _context.setActiveTextureUnit(TextureUnits::shadowMapCube);
-    _defaultCubemap->bind();
+    _context.bindTexture(TextureUnits::diffuseMap, _default);
+    _context.bindTexture(TextureUnits::lightmap, _default);
+    _context.bindTexture(TextureUnits::environmentMap, _defaultCubemap);
+    _context.bindTexture(TextureUnits::bumpMap, _default);
+    _context.bindTexture(TextureUnits::bloom, _default);
+    _context.bindTexture(TextureUnits::irradianceMap, _defaultCubemap);
+    _context.bindTexture(TextureUnits::prefilterMap, _defaultCubemap);
+    _context.bindTexture(TextureUnits::brdfLookup, _default);
+    _context.bindTexture(TextureUnits::shadowMap, _default);
+    _context.bindTexture(TextureUnits::shadowMapCube, _defaultCubemap);
 }
 
 shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {
@@ -136,7 +111,9 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
         }
     }
 
-    if (!texture) {
+    if (texture) {
+        texture->init();
+    } else {
         warn("Texture not found: " + resRef, LogChannels::graphics);
     }
 

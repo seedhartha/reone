@@ -27,55 +27,54 @@ namespace reone {
 namespace graphics {
 
 void Framebuffer::init() {
-    if (!_inited) {
-        glGenFramebuffers(1, &_framebuffer);
-        _inited = true;
+    if (!_nameGL) {
+        glGenFramebuffers(1, &_nameGL);
     }
-}
-
-Framebuffer::~Framebuffer() {
-    deinit();
 }
 
 void Framebuffer::deinit() {
-    if (_inited) {
-        glDeleteFramebuffers(1, &_framebuffer);
-        _inited = false;
+    if (_nameGL) {
+        glDeleteFramebuffers(1, &_nameGL);
+        _nameGL = 0;
     }
 }
 
-void Framebuffer::bind() const {
-    glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
+void Framebuffer::bind() {
+    glBindFramebuffer(GL_FRAMEBUFFER, _nameGL);
+}
+
+void Framebuffer::unbind() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Framebuffer::attachColor(const Texture &texture, int index, int mip) const {
     if (texture.isCubeMap()) {
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, texture.textureId(), mip);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, texture.nameGL(), mip);
     } else {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, texture.textureId(), mip);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, texture.nameGL(), mip);
     }
 }
 
 void Framebuffer::attachColor(const Renderbuffer &renderbuffer, int index) const {
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_RENDERBUFFER, renderbuffer.id());
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_RENDERBUFFER, renderbuffer.nameGL());
 }
 
 void Framebuffer::attachCubeMapFaceAsColor(const Texture &texture, CubeMapFace face, int index, int mip) const {
     if (texture.isCubeMap()) {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(face), texture.textureId(), mip);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(face), texture.nameGL(), mip);
     }
 }
 
 void Framebuffer::attachDepth(const Texture &texture) const {
     if (texture.isCubeMap()) {
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture.textureId(), 0);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture.nameGL(), 0);
     } else {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture.textureId(), 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture.nameGL(), 0);
     }
 }
 
 void Framebuffer::attachDepth(const Renderbuffer &renderbuffer) const {
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer.id());
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer.nameGL());
 }
 
 void Framebuffer::checkCompleteness() {

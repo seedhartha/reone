@@ -110,8 +110,6 @@ void TgaReader::loadTexture() {
     }
 
     _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage));
-    _texture->init();
-    _texture->bind();
     _texture->setPixels(_width, _height, format, move(layers));
 }
 

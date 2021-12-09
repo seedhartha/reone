@@ -24,29 +24,39 @@ namespace reone {
 namespace graphics {
 
 void Renderbuffer::init() {
-    if (!_inited) {
-        glGenRenderbuffers(1, &_id);
-        _inited = true;
+    if (_inited) {
+        return;
     }
-}
-
-Renderbuffer::~Renderbuffer() {
-    deinit();
+    glGenRenderbuffers(1, &_nameGL);
+    bind();
+    refresh();
+    _inited = true;
 }
 
 void Renderbuffer::deinit() {
-    if (_inited) {
-        glDeleteRenderbuffers(1, &_id);
-        _inited = false;
+    if (!_inited) {
+        return;
     }
+    glDeleteRenderbuffers(1, &_nameGL);
+    _inited = false;
 }
 
-void Renderbuffer::bind() const {
-    glBindRenderbuffer(GL_RENDERBUFFER, _id);
+void Renderbuffer::bind() {
+    glBindRenderbuffer(GL_RENDERBUFFER, _nameGL);
 }
 
-void Renderbuffer::configure(int w, int h, PixelFormat format) {
-    glRenderbufferStorage(GL_RENDERBUFFER, getInternalPixelFormatGL(format), w, h);
+void Renderbuffer::unbind() {
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+}
+
+void Renderbuffer::clearPixels(int w, int h, PixelFormat format) {
+    _width = w;
+    _height = h;
+    _pixelFormat = format;
+}
+
+void Renderbuffer::refresh() {
+    glRenderbufferStorage(GL_RENDERBUFFER, getInternalPixelFormatGL(_pixelFormat), _width, _height);
 }
 
 } // namespace graphics

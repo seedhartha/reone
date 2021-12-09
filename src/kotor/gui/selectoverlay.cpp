@@ -242,23 +242,22 @@ void SelectionOverlay::update() {
 
 void SelectionOverlay::draw() {
     if (_hilightedObject) {
-        drawReticle(_hilightedHostile ? *_hostileReticle : *_friendlyReticle, _hilightedScreenCoords);
+        drawReticle(_hilightedHostile ? _hostileReticle : _friendlyReticle, _hilightedScreenCoords);
     }
     if (_selectedObject) {
-        drawReticle(_selectedHostile ? *_hostileReticle2 : *_friendlyReticle2, _selectedScreenCoords);
+        drawReticle(_selectedHostile ? _hostileReticle2 : _friendlyReticle2, _selectedScreenCoords);
         drawActionBar();
         drawTitleBar();
         drawHealthBar();
     }
 }
 
-void SelectionOverlay::drawReticle(Texture &texture, const glm::vec3 &screenCoords) {
-    _services.context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    texture.bind();
+void SelectionOverlay::drawReticle(shared_ptr<Texture> texture, const glm::vec3 &screenCoords) {
+    _services.context.bindTexture(0, texture);
 
     const GraphicsOptions &opts = _game.options().graphics;
-    int width = texture.width();
-    int height = texture.height();
+    int width = texture->width();
+    int height = texture->height();
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3((opts.width * screenCoords.x) - width / 2, (opts.height * (1.0f - screenCoords.y)) - height / 2, 0.0f));
@@ -350,8 +349,7 @@ void SelectionOverlay::drawActionFrame(int index) {
     } else {
         frameTexture = _friendlyScroll;
     }
-    _services.context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    frameTexture->bind();
+    _services.context.bindTexture(0, frameTexture);
 
     float frameX, frameY;
     getActionScreenCoords(index, frameX, frameY);
@@ -410,8 +408,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     if (!texture)
         return;
 
-    _services.context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    texture->bind();
+    _services.context.bindTexture(0, texture);
 
     float frameX, frameY;
     getActionScreenCoords(index, frameX, frameY);

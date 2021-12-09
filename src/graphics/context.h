@@ -17,6 +17,9 @@
 
 #pragma once
 
+#include "framebuffer.h"
+#include "renderbuffer.h"
+#include "texture.h"
 #include "types.h"
 
 namespace reone {
@@ -25,12 +28,12 @@ namespace graphics {
 
 class Context : boost::noncopyable {
 public:
+    ~Context() { deinit(); }
+
     void init();
+    void deinit();
 
     void clear(int mask);
-
-    void unbindFramebuffer();
-    void unbindRenderbuffer();
 
     bool isDepthTestEnabled() const { return _depthTest; }
 
@@ -42,18 +45,39 @@ public:
     void setDepthTestEnabled(bool enabled);
     void setBackFaceCullingEnabled(bool enabled);
     void setPolygonMode(PolygonMode mode);
-    void setActiveTextureUnit(int n);
     void setBlendMode(BlendMode mode);
 
     void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
+
+    // Bindings
+
+    void bindFramebuffer(std::shared_ptr<Framebuffer> framebuffer);
+    void bindRenderbuffer(std::shared_ptr<Renderbuffer> renderbuffer);
+    void bindTexture(int unit, std::shared_ptr<Texture> texture);
+
+    void unbindFramebuffer();
+    void unbindRenderbuffer();
+    void unbindTexture(int unit);
+
+    // END Bindings
 
 private:
     glm::ivec4 _viewport {0};
     bool _depthTest {false};
     bool _backFaceCulling {false};
-    int _textureUnit {0};
     PolygonMode _polygonMode {PolygonMode::Fill};
     BlendMode _blendMode {BlendMode::None};
+    int _textureUnit {0};
+
+    // Bindings
+
+    std::shared_ptr<Framebuffer> _boundFramebuffer;
+    std::shared_ptr<Renderbuffer> _boundRenderbuffer;
+    std::vector<std::shared_ptr<Texture>> _boundTextures;
+
+    // END Bindings
+
+    void setActiveTextureUnit(int unit);
 };
 
 } // namespace graphics

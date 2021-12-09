@@ -79,8 +79,6 @@ private:
     std::shared_ptr<Model> _superModel;
     float _animationScale; /**< scales supermodel animations */
 
-    bool _headless {false}; /**< not backed by a file */
-
     AABB _aabb;
     bool _affectedByFog;
 

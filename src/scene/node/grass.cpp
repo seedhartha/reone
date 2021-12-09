@@ -145,16 +145,13 @@ void GrassSceneNode::drawElements(const vector<SceneNode *> &elements, int count
         count = static_cast<int>(elements.size());
     }
 
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _texture->bind();
+    _context.bindTexture(TextureUnits::diffuseMap, _texture);
 
     ShaderUniforms uniforms(_sceneGraph.uniformsPrototype());
     uniforms.combined.featureMask |= UniformFeatureFlags::grass;
 
     if (_aabbNode->mesh()->lightmap) {
-        _context.setActiveTextureUnit(TextureUnits::lightmap);
-        _aabbNode->mesh()->lightmap->bind();
-
+        _context.bindTexture(TextureUnits::lightmap, _aabbNode->mesh()->lightmap);
         uniforms.combined.featureMask |= UniformFeatureFlags::lightmap;
     }
 

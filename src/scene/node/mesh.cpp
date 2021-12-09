@@ -377,21 +377,17 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     // Setup textures
 
     if (_nodeTextures.diffuse) {
-        _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-        _nodeTextures.diffuse->bind();
+        _context.bindTexture(TextureUnits::diffuseMap, _nodeTextures.diffuse);
         additive = _nodeTextures.diffuse->isAdditive();
     }
     if (_nodeTextures.lightmap) {
-        _context.setActiveTextureUnit(TextureUnits::lightmap);
-        _nodeTextures.lightmap->bind();
+        _context.bindTexture(TextureUnits::lightmap, _nodeTextures.lightmap);
     }
     if (_nodeTextures.envmap) {
-        _context.setActiveTextureUnit(TextureUnits::environmentMap);
-        _nodeTextures.envmap->bind();
+        _context.bindTexture(TextureUnits::environmentMap, _nodeTextures.envmap);
     }
     if (_nodeTextures.bumpmap) {
-        _context.setActiveTextureUnit(TextureUnits::bumpMap);
-        _nodeTextures.bumpmap->bind();
+        _context.bindTexture(TextureUnits::bumpMap, _nodeTextures.bumpmap);
     }
 
     BlendMode oldBlendMode(_context.blendMode());

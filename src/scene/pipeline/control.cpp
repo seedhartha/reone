@@ -39,7 +39,8 @@ namespace reone {
 namespace scene {
 
 void ControlRenderPipeline::init() {
-    _geometry.init();
+    _geometry = make_shared<Framebuffer>();
+    _geometry->init();
 }
 
 void ControlRenderPipeline::prepareFor(const glm::ivec4 &extent) {
@@ -49,16 +50,12 @@ void ControlRenderPipeline::prepareFor(const glm::ivec4 &extent) {
     }
 
     auto colorBuffer = make_unique<Texture>("color", getTextureProperties(TextureUsage::ColorBuffer));
-    colorBuffer->init();
-    colorBuffer->bind();
     colorBuffer->clearPixels(extent[2], extent[3], PixelFormat::RGBA);
-    colorBuffer->unbind();
+    colorBuffer->init();
 
     auto depthBuffer = make_unique<Renderbuffer>();
+    depthBuffer->clearPixels(extent[2], extent[3], PixelFormat::Depth);
     depthBuffer->init();
-    depthBuffer->bind();
-    depthBuffer->configure(extent[2], extent[3], PixelFormat::Depth);
-    _context.unbindRenderbuffer();
 
     Attachments attachments {move(colorBuffer), move(depthBuffer)};
     _attachments.insert(make_pair(attachmentsId, move(attachments)));
@@ -92,9 +89,9 @@ void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &ex
     bool oldDepthTest = _context.isDepthTestEnabled();
     _context.setDepthTestEnabled(true);
 
-    _geometry.bind();
-    _geometry.attachColor(*attachments.colorBuffer);
-    _geometry.attachDepth(*attachments.depthBuffer);
+    _context.bindFramebuffer(_geometry);
+    _geometry->attachColor(*attachments.colorBuffer);
+    _geometry->attachDepth(*attachments.depthBuffer);
 
     _context.clear(ClearBuffers::colorDepth);
     sceneGraph.draw();
@@ -105,8 +102,7 @@ void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &ex
 
     // Draw control
 
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    attachments.colorBuffer->bind();
+    _context.bindTexture(0, attachments.colorBuffer);
 
     glm::mat4 projection(glm::ortho(
         0.0f,

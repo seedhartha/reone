@@ -68,86 +68,81 @@ void WorldRenderPipeline::init() {
     // Reusable depth renderbuffer
 
     _depthRenderbuffer = make_unique<Renderbuffer>();
+    _depthRenderbuffer->clearPixels(_options.width, _options.height, PixelFormat::Depth);
     _depthRenderbuffer->init();
-    _depthRenderbuffer->bind();
-    _depthRenderbuffer->configure(_options.width, _options.height, PixelFormat::Depth);
-    _context.unbindRenderbuffer();
 
     // Geometry framebuffer
 
     _geometryColor1 = make_unique<Texture>("geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
-    _geometryColor1->init();
-    _geometryColor1->bind();
     _geometryColor1->clearPixels(_options.width, _options.height, PixelFormat::RGB);
+    _geometryColor1->init();
 
     _geometryColor2 = make_unique<Texture>("geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
-    _geometryColor2->init();
-    _geometryColor2->bind();
     _geometryColor2->clearPixels(_options.width, _options.height, PixelFormat::RGB);
+    _geometryColor2->init();
 
-    _geometry.init();
-    _geometry.bind();
-    _geometry.attachColor(*_geometryColor1, 0);
-    _geometry.attachColor(*_geometryColor2, 1);
-    _geometry.attachDepth(*_depthRenderbuffer);
-    _geometry.checkCompleteness();
+    _geometry = make_shared<Framebuffer>();
+    _geometry->init();
+    _context.bindFramebuffer(_geometry);
+    _geometry->attachColor(*_geometryColor1, 0);
+    _geometry->attachColor(*_geometryColor2, 1);
+    _geometry->attachDepth(*_depthRenderbuffer);
+    _geometry->checkCompleteness();
     _context.unbindFramebuffer();
 
     // Vertical blur framebuffer
 
     _verticalBlurColor = make_unique<Texture>("verticalblur_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _verticalBlurColor->init();
-    _verticalBlurColor->bind();
     _verticalBlurColor->clearPixels(_options.width, _options.height, PixelFormat::RGB);
+    _verticalBlurColor->init();
 
-    _verticalBlur.init();
-    _verticalBlur.bind();
-    _verticalBlur.attachColor(*_verticalBlurColor);
-    _verticalBlur.attachDepth(*_depthRenderbuffer);
-    _verticalBlur.checkCompleteness();
+    _verticalBlur = make_shared<Framebuffer>();
+    _verticalBlur->init();
+    _context.bindFramebuffer(_verticalBlur);
+    _verticalBlur->attachColor(*_verticalBlurColor);
+    _verticalBlur->attachDepth(*_depthRenderbuffer);
+    _verticalBlur->checkCompleteness();
     _context.unbindFramebuffer();
 
     // Horizontal blur framebuffer
 
     _horizontalBlurColor = make_unique<Texture>("horizontalblur_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _horizontalBlurColor->init();
-    _horizontalBlurColor->bind();
     _horizontalBlurColor->clearPixels(_options.width, _options.height, PixelFormat::RGB);
+    _horizontalBlurColor->init();
 
-    _horizontalBlur.init();
-    _horizontalBlur.bind();
-    _horizontalBlur.attachColor(*_horizontalBlurColor);
-    _horizontalBlur.attachDepth(*_depthRenderbuffer);
-    _horizontalBlur.checkCompleteness();
+    _horizontalBlur = make_shared<Framebuffer>();
+    _horizontalBlur->init();
+    _context.bindFramebuffer(_horizontalBlur);
+    _horizontalBlur->attachColor(*_horizontalBlurColor);
+    _horizontalBlur->attachDepth(*_depthRenderbuffer);
+    _horizontalBlur->checkCompleteness();
     _context.unbindFramebuffer();
 
     // Shadows framebuffer
 
     _shadowsDepth = make_unique<Texture>("shadows_depth", getTextureProperties(TextureUsage::DepthBuffer));
-    _shadowsDepth->init();
-    _shadowsDepth->bind();
     _shadowsDepth->clearPixels(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
+    _shadowsDepth->init();
 
     _cubeShadowsDepth = make_unique<Texture>("cubeshadows_depth", getTextureProperties(TextureUsage::CubeMapDepthBuffer));
-    _cubeShadowsDepth->init();
-    _cubeShadowsDepth->bind();
     _cubeShadowsDepth->clearPixels(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
+    _cubeShadowsDepth->init();
 
-    _shadows.init();
+    _shadows = make_shared<Framebuffer>();
+    _shadows->init();
 
     // Screenshot framebuffer
 
     _screenshotColor = make_unique<Texture>("result_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _screenshotColor->init();
-    _screenshotColor->bind();
     _screenshotColor->clearPixels(kScreenshotResolution, kScreenshotResolution, PixelFormat::RGB);
-    _screenshotColor->unbind();
+    _screenshotColor->init();
 
-    _screenshot.init();
-    _screenshot.bind();
-    _screenshot.attachColor(*_screenshotColor);
-    _screenshot.attachDepth(*_depthRenderbuffer);
-    _screenshot.checkCompleteness();
+    _screenshot = make_shared<Framebuffer>();
+    _screenshot->init();
+    _context.bindFramebuffer(_screenshot);
+    _screenshot->attachColor(*_screenshotColor);
+    _screenshot->attachDepth(*_depthRenderbuffer);
+    _screenshot->checkCompleteness();
     _context.unbindFramebuffer();
 }
 
@@ -238,14 +233,14 @@ void WorldRenderPipeline::drawShadows() {
 
     // Bind shadows framebuffer
 
-    _shadows.bind();
+    _context.bindFramebuffer(_shadows);
     if (shadowLight->isDirectional()) {
-        _shadows.attachDepth(*_shadowsDepth);
+        _shadows->attachDepth(*_shadowsDepth);
     } else {
-        _shadows.attachDepth(*_cubeShadowsDepth);
+        _shadows->attachDepth(*_cubeShadowsDepth);
     }
-    _shadows.disableDrawBuffer();
-    _shadows.disableReadBuffer();
+    _shadows->disableDrawBuffer();
+    _shadows->disableReadBuffer();
 
     // Draw the scene
 
@@ -299,16 +294,14 @@ void WorldRenderPipeline::drawGeometry() {
 
     // Bind geometry framebuffer
 
-    _geometry.bind();
-    _geometry.setDrawBuffersToColor(2);
+    _context.bindFramebuffer(_geometry);
+    _geometry->setDrawBuffersToColor(2);
 
     if (shadowLight) {
         if (shadowLight->isDirectional()) {
-            _context.setActiveTextureUnit(TextureUnits::shadowMap);
-            _shadowsDepth->bind();
+            _context.bindTexture(TextureUnits::shadowMap, _shadowsDepth);
         } else {
-            _context.setActiveTextureUnit(TextureUnits::shadowMapCube);
-            _cubeShadowsDepth->bind();
+            _context.bindTexture(TextureUnits::shadowMapCube, _cubeShadowsDepth);
         }
     }
 
@@ -332,12 +325,11 @@ void WorldRenderPipeline::applyHorizontalBlur() {
 
     // Bind horizontal blur framebuffer
 
-    _horizontalBlur.bind();
+    _context.bindFramebuffer(_horizontalBlur);
 
     // Bind bright geometry texture
 
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _geometryColor2->bind();
+    _context.bindTexture(0, _geometryColor2);
 
     // Set shader uniforms
 
@@ -370,12 +362,11 @@ void WorldRenderPipeline::applyVerticalBlur() {
 
     // Bind vertical blur framebuffer
 
-    _verticalBlur.bind();
+    _context.bindFramebuffer(_verticalBlur);
 
     // Bind diffuse map
 
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _horizontalBlurColor->bind();
+    _context.bindTexture(0, _horizontalBlurColor);
 
     // Set shader uniforms
 
@@ -407,18 +398,16 @@ void WorldRenderPipeline::drawResult() {
     if (_takeScreenshot) {
         oldViewport = _context.viewport();
         _context.setViewport(glm::ivec4(0, 0, kScreenshotResolution, kScreenshotResolution));
-        _screenshot.bind();
+        _context.bindFramebuffer(_screenshot);
     }
 
     // Bind geometry texture
 
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _geometryColor1->bind();
+    _context.bindTexture(0, _geometryColor1);
 
     // Bind blur texture
 
-    _context.setActiveTextureUnit(TextureUnits::bloom);
-    _verticalBlurColor->bind();
+    _context.bindTexture(TextureUnits::bloom, _verticalBlurColor);
 
     // Set shader uniforms
 
@@ -440,7 +429,7 @@ void WorldRenderPipeline::drawResult() {
 }
 
 void WorldRenderPipeline::saveScreenshot() {
-    _screenshotColor->bind();
+    _context.bindTexture(0, _screenshotColor);
     _screenshotColor->flushGPUToCPU();
 }
 

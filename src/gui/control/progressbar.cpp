@@ -49,11 +49,10 @@ void ProgressBar::load(const GffStruct &gffs) {
 }
 
 void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
-    if (_value == 0 || !_progress.fill)
+    if (_value == 0 || !_progress.fill) {
         return;
-
-    _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _progress.fill->bind();
+    }
+    _context.bindTexture(0, _progress.fill);
 
     float w = _extent.width * _value / 100.0f;
 

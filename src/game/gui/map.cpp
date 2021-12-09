@@ -78,11 +78,10 @@ void Map::draw(Mode mode, const glm::vec4 &bounds) {
 void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
     if (mode == Mode::Minimap) {
         shared_ptr<Creature> partyLeader(_game.party().getLeader());
-        if (!partyLeader)
+        if (!partyLeader) {
             return;
-
-        _services.context.setActiveTextureUnit(TextureUnits::diffuseMap);
-        _areaTexture->bind();
+        }
+        _services.context.bindTexture(0, _areaTexture);
 
         glm::vec2 worldPos(partyLeader->position());
         glm::vec2 mapPos(getMapPosition(worldPos));
@@ -105,8 +104,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         _services.context.withScissorTest(scissorBounds, [&]() { _services.meshes.quad().draw(); });
 
     } else {
-        _services.context.setActiveTextureUnit(TextureUnits::diffuseMap);
-        _areaTexture->bind();
+        _services.context.bindTexture(0, _areaTexture);
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(bounds[0], bounds[1], 0.0f));
@@ -122,11 +120,10 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
 }
 
 void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
-    if (mode != Mode::Default)
+    if (mode != Mode::Default) {
         return;
-
-    _services.context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _noteTexture->bind();
+    }
+    _services.context.bindTexture(0, _noteTexture);
 
     for (auto &object : _game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         auto waypoint = static_pointer_cast<Waypoint>(object);
@@ -187,11 +184,10 @@ glm::vec2 Map::getMapPosition(const glm::vec2 &world) const {
 
 void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     shared_ptr<Creature> partyLeader(_game.party().getLeader());
-    if (!partyLeader)
+    if (!partyLeader) {
         return;
-
-    _services.context.setActiveTextureUnit(TextureUnits::diffuseMap);
-    _arrowTexture->bind();
+    }
+    _services.context.bindTexture(0, _arrowTexture);
 
     glm::vec3 arrowPos(0.0f);
 

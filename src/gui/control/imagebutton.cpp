@@ -89,8 +89,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconFrame) {
-        _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-        iconFrame->bind();
+        _context.bindTexture(0, iconFrame);
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
@@ -106,8 +105,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconTexture) {
-        _context.setActiveTextureUnit(TextureUnits::diffuseMap);
-        iconTexture->bind();
+        _context.bindTexture(0, iconTexture);
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
