@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "game.h"
+#include "kotor.h"
 
 #include "../../game/types.h"
 #include "../../kotor/cursors.h"
@@ -35,7 +35,7 @@ using namespace reone::kotor;
 
 namespace reone {
 
-void GameModule::init() {
+void KotorModule::init() {
     _classes = make_unique<Classes>(_resource.strings(), _resource.twoDas());
     _cursors = make_unique<Cursors>(_graphics.context(), _graphics.meshes(), _graphics.shaders(), _graphics.window(), _resource.resources());
     _feats = make_unique<Feats>(_graphics.textures(), _resource.strings(), _resource.twoDas());
@@ -95,7 +95,7 @@ void GameModule::init() {
     _graphics.window().setEventHandler(_game.get());
 }
 
-void GameModule::deinit() {
+void KotorModule::deinit() {
     _game.reset();
     _services.reset();
     _surfaces.reset();
@@ -111,7 +111,7 @@ void GameModule::deinit() {
     _classes.reset();
 }
 
-unique_ptr<Game> GameModule::newGame() {
+unique_ptr<Game> KotorModule::newGame() {
     switch (_gameId) {
     case GameID::KotOR:
         return make_unique<KotOR>(_gamePath, _gameOptions, *_services);

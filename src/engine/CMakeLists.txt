@@ -16,8 +16,8 @@
 set(REONE_HEADERS
     di/ioccontainer.h
     di/module/audio.h
-    di/module/game.h
     di/module/graphics.h
+    di/module/kotor.h
     di/module/resource.h
     di/module/scene.h
     di/module/script.h
@@ -29,8 +29,8 @@ set(REONE_HEADERS
 set(REONE_SOURCES
     di/ioccontainer.cpp
     di/module/audio.cpp
-    di/module/game.cpp
     di/module/graphics.cpp
+    di/module/kotor.cpp
     di/module/resource.cpp
     di/module/scene.cpp
     di/module/script.cpp

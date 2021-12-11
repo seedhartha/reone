@@ -29,18 +29,18 @@ void IocContainer::init() {
     _audio = make_unique<AudioModule>(_gameOptions.audio, *_resource);
     _scene = make_unique<SceneModule>(_gameOptions.graphics, *_audio, *_graphics);
     _script = make_unique<ScriptModule>(*_resource);
-    _game = make_unique<GameModule>(_gameId, _gameOptions, _gameOptions.gamePath, *_resource, *_graphics, *_audio, *_scene, *_script);
+    _kotor = make_unique<KotorModule>(_gameId, _gameOptions, _gameOptions.gamePath, *_resource, *_graphics, *_audio, *_scene, *_script);
 
     _resource->init();
     _graphics->init();
     _audio->init();
     _scene->init();
     _script->init();
-    _game->init();
+    _kotor->init();
 }
 
 void IocContainer::deinit() {
-    _game.reset();
+    _kotor.reset();
     _script.reset();
     _scene.reset();
     _audio.reset();
@@ -49,7 +49,7 @@ void IocContainer::deinit() {
 }
 
 Game &IocContainer::getGame() {
-    return _game->game();
+    return _kotor->game();
 }
 
 } // namespace reone
