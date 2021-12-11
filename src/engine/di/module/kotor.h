@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "../../game/cursors.h"
 #include "../../game/d20/classes.h"
 #include "../../game/d20/feats.h"
 #include "../../game/d20/skills.h"
@@ -30,6 +29,7 @@
 #include "../../game/services.h"
 #include "../../game/soundsets.h"
 #include "../../game/surfaces.h"
+#include "../../kotor/cursors.h"
 
 #include "../../types.h"
 
@@ -41,9 +41,9 @@ class ResourceModule;
 class SceneModule;
 class ScriptModule;
 
-class GameModule : boost::noncopyable {
+class KotorModule : boost::noncopyable {
 public:
-    GameModule(
+    KotorModule(
         game::GameID gameId,
         game::Options gameOptions,
         boost::filesystem::path gamePath,
@@ -62,7 +62,7 @@ public:
         _script(script) {
     }
 
-    ~GameModule() { deinit(); }
+    ~KotorModule() { deinit(); }
 
     void init();
     void deinit();
@@ -81,7 +81,7 @@ private:
     ScriptModule &_script;
 
     std::unique_ptr<game::Classes> _classes;
-    std::unique_ptr<game::ICursors> _cursors;
+    std::unique_ptr<kotor::Cursors> _cursors;
     std::unique_ptr<game::Feats> _feats;
     std::unique_ptr<game::FootstepSounds> _footstepSounds;
     std::unique_ptr<game::Game> _game;
