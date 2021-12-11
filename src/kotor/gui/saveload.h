@@ -77,8 +77,8 @@ private:
     void refreshSavedGames();
     void indexSavedGame(boost::filesystem::path path);
 
-    void saveGame(int number);
-    void loadGame(int number);
+    void saveGame(int number) {}
+    void loadGame(int number) {}
     void deleteGame(int number);
 
     int getSelectedSaveNumber() const;

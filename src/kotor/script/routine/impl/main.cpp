@@ -863,7 +863,7 @@ Variable randomName(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getLoadFromSaveGame(const vector<Variable> &args, const RoutineContext &ctx) {
-    return Variable::ofInt(static_cast<int>(ctx.game.isLoadFromSaveGame()));
+    return Variable::ofInt(static_cast<int>(false));
 }
 
 Variable getName(const vector<Variable> &args, const RoutineContext &ctx) {
