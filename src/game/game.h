@@ -82,7 +82,6 @@ public:
 
     void playVideo(const std::string &name);
 
-    bool isLoadFromSaveGame() const;
     bool isPaused() const { return _paused; }
 
     Camera *getActiveCamera() const;
@@ -102,7 +101,6 @@ public:
     const std::set<std::string> &moduleNames() const { return _moduleNames; }
 
     void setCursorType(CursorType type);
-    void setLoadFromSaveGame(bool load);
     void setPaused(bool paused);
     void setRelativeMouseMode(bool relative);
 
@@ -138,13 +136,6 @@ public:
     void setGlobalString(const std::string &name, const std::string &value);
 
     // END Globals/locals
-
-    // Saved games
-
-    void saveToFile(const boost::filesystem::path &path);
-    void loadFromFile(const boost::filesystem::path &path);
-
-    // END Saved games
 
     // GUI colors
 
@@ -188,7 +179,6 @@ protected:
     std::shared_ptr<movie::Movie> _video;
     CursorType _cursorType {CursorType::None};
     float _gameSpeed {1.0f};
-    bool _loadFromSaveGame {false};
     CameraType _cameraType {CameraType::ThirdPerson};
     bool _paused {false};
     std::set<std::string> _moduleNames;
@@ -280,8 +270,6 @@ protected:
     virtual void getDefaultPartyMembers(std::string &member1, std::string &member2, std::string &member3) const = 0;
     virtual gui::GUI *getScreenGUI() const = 0;
     virtual CameraType getConversationCamera(int &cameraId) const = 0;
-
-    std::shared_ptr<resource::GffStruct> getPartyMemberNFOStruct(int index) const;
 
     // Rendering
 

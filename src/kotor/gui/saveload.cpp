@@ -266,19 +266,6 @@ static fs::path getSaveGamePath(int number) {
     return move(result);
 }
 
-void SaveLoad::saveGame(int number) {
-    fs::path savPath(getSaveGamePath(number));
-    _game.saveToFile(savPath);
-    refresh();
-}
-
-void SaveLoad::loadGame(int number) {
-    auto maybeSave = find_if(_saves.begin(), _saves.end(), [&number](auto &save) { return save.number == number; });
-    if (maybeSave != _saves.end()) {
-        _game.loadFromFile(maybeSave->path);
-    }
-}
-
 void SaveLoad::deleteGame(int number) {
     auto maybeSave = find_if(_saves.begin(), _saves.end(), [&number](auto &save) { return save.number == number; });
     if (maybeSave != _saves.end()) {

@@ -72,9 +72,6 @@ namespace reone {
 
 namespace game {
 
-static constexpr int kNfoBufferSize = 1024;
-static constexpr int kScreenBufferSize = 262144;
-
 void Game::init() {
     // Surfaces
     auto walkableSurfaces = _services.surfaces.getWalkableSurfaces();
@@ -193,7 +190,7 @@ void Game::loadModule(const string &name, string entry) {
                     throw ValidationException("Module IFO file not found");
                 }
 
-                _module->load(name, *ifo, _loadFromSaveGame);
+                _module->load(name, *ifo);
                 _loadedModules.insert(make_pair(name, _module));
             }
 
@@ -201,7 +198,7 @@ void Game::loadModule(const string &name, string entry) {
                 loadDefaultParty();
             }
 
-            _module->loadParty(entry, _loadFromSaveGame);
+            _module->loadParty(entry);
 
             info("Module '" + name + "' loaded successfully");
 
@@ -215,7 +212,6 @@ void Game::loadModule(const string &name, string entry) {
 
             _ticks = SDL_GetTicks();
             openInGame();
-            _loadFromSaveGame = false;
         } catch (const ValidationException &e) {
             error("Failed loading module '" + name + "': " + string(e.what()));
         }
@@ -360,14 +356,6 @@ void Game::drawGUI() {
         break;
     }
     }
-}
-
-bool Game::isLoadFromSaveGame() const {
-    return _loadFromSaveGame;
-}
-
-void Game::setLoadFromSaveGame(bool load) {
-    _loadFromSaveGame = load;
 }
 
 void Game::updateVideo(float dt) {
@@ -606,165 +594,6 @@ void Game::setPaused(bool paused) {
 
 void Game::setRelativeMouseMode(bool relative) {
     _services.window.setRelativeMouseMode(relative);
-}
-
-void Game::saveToFile(const fs::path &path) {
-    // Prepare savenfo RES
-
-    vector<shared_ptr<GffStruct>> nfoPartyMembers;
-    for (int i = 0; i < 3; ++i) {
-        if (_party.getSize() > i) {
-            nfoPartyMembers.push_back(getPartyMemberNFOStruct(i));
-        }
-    }
-
-    vector<shared_ptr<GffStruct>> nfoGlobalBooleans;
-    for (auto &global : _globalBooleans) {
-        auto gffs = make_shared<GffStruct>(2, vector<GffField> {
-                                                  GffField::newCExoString("Name", global.first),
-                                                  GffField::newByte("Value", static_cast<uint32_t>(global.second))});
-        nfoGlobalBooleans.push_back(move(gffs));
-    }
-
-    vector<shared_ptr<GffStruct>> nfoGlobalNumbers;
-    for (auto &global : _globalNumbers) {
-        auto gffs = make_shared<GffStruct>(2, vector<GffField> {
-                                                  GffField::newCExoString("Name", global.first),
-                                                  GffField::newInt("Value", global.second)});
-        nfoGlobalNumbers.push_back(move(gffs));
-    }
-
-    vector<shared_ptr<GffStruct>> nfoGlobalStrings;
-    for (auto &global : _globalStrings) {
-        auto gffs = make_shared<GffStruct>(2, vector<GffField> {
-                                                  GffField::newCExoString("Name", global.first),
-                                                  GffField::newCExoString("Value", global.second)});
-        nfoGlobalStrings.push_back(move(gffs));
-    }
-
-    vector<shared_ptr<GffStruct>> nfoGlobalLocations;
-    for (auto &global : _globalLocations) {
-        auto gffs = make_shared<GffStruct>(3, vector<GffField> {
-                                                  GffField::newCExoString("Name", global.first),
-                                                  GffField::newVector("Position", global.second->position()),
-                                                  GffField::newFloat("Facing", global.second->facing())});
-        nfoGlobalLocations.push_back(move(gffs));
-    }
-
-    auto nfoRoot = make_shared<GffStruct>(0xffffffff);
-    nfoRoot->add(GffField::newCExoString("LastModule", _module->name()));
-    nfoRoot->add(GffField::newList("Party", move(nfoPartyMembers)));
-    nfoRoot->add(GffField::newList("GlobalBooleans", move(nfoGlobalBooleans)));
-    nfoRoot->add(GffField::newList("GlobalNumbers", move(nfoGlobalNumbers)));
-    nfoRoot->add(GffField::newList("GlobalStrings", move(nfoGlobalStrings)));
-    nfoRoot->add(GffField::newList("GlobalLocations", move(nfoGlobalLocations)));
-
-    char nfoBuffer[kNfoBufferSize];
-    io::array_sink nfoSink(nfoBuffer, kNfoBufferSize);
-    auto nfoStream = make_shared<io::stream<io::array_sink>>(nfoSink);
-
-    GffWriter nfo(ResourceType::Res, nfoRoot);
-    nfo.save(nfoStream);
-    size_t nfoSize = nfoStream->tellp();
-
-    ByteArray nfoResData;
-    nfoResData.resize(nfoSize);
-    memcpy(&nfoResData[0], nfoBuffer, nfoSize);
-
-    ErfWriter::Resource nfoRes;
-    nfoRes.resRef = "savenfo";
-    nfoRes.resType = ResourceType::Res;
-    nfoRes.data = move(nfoResData);
-
-    // Prepare screen TGA
-
-    ByteArray screenBuffer;
-    screenBuffer.resize(kScreenBufferSize);
-    io::array_sink screenSink(&screenBuffer[0], kScreenBufferSize);
-    auto screenStream = make_shared<io::stream<io::array_sink>>(screenSink);
-
-    shared_ptr<Texture> screenshot(_services.worldRenderPipeline.screenshot());
-    TgaWriter tga(screenshot);
-    tga.save(*screenStream);
-    screenBuffer.resize(screenStream->tellp());
-
-    ErfWriter::Resource screenRes;
-    screenRes.resRef = "screen";
-    screenRes.resType = ResourceType::Tga;
-    screenRes.data = move(screenBuffer);
-
-    // Save ERF
-
-    ErfWriter erf;
-    erf.add(move(nfoRes));
-    erf.add(move(screenRes));
-    erf.save(ErfWriter::FileType::ERF, path);
-}
-
-shared_ptr<GffStruct> Game::getPartyMemberNFOStruct(int index) const {
-    auto member = _party.getMember(index);
-
-    return make_shared<GffStruct>(0, vector<GffField> {
-                                         GffField::newByte("NPC", _party.getNPCByMemberIndex(index)),
-                                         GffField::newCExoString("TemplateResRef", member->blueprintResRef()),
-                                         GffField::newVector("Position", member->position()),
-                                         GffField::newFloat("Facing", member->getFacing())});
-}
-
-void Game::loadFromFile(const fs::path &path) {
-    setLoadFromSaveGame(true);
-
-    ErfReader erf;
-    erf.load(path);
-
-    shared_ptr<ByteArray> nfoData(erf.find(ResourceId("savenfo", ResourceType::Res)));
-
-    GffReader nfo;
-    nfo.load(wrap(nfoData));
-
-    shared_ptr<GffStruct> nfoRoot(nfo.root());
-
-    // Module
-    string lastModule(nfoRoot->getString("LastModule"));
-    scheduleModuleTransition(lastModule, "");
-
-    // Party
-    vector<shared_ptr<GffStruct>> nfoParty(nfoRoot->getList("Party"));
-    _party.clear();
-    for (size_t i = 0; i < nfoParty.size(); ++i) {
-        shared_ptr<GffStruct> member(nfoParty[i]);
-        int npc = member->getInt("NPC");
-        string blueprintResRef(member->getString("TemplateResRef"));
-        glm::vec3 position(member->getVector("Position"));
-        float facing = member->getFloat("Facing");
-
-        shared_ptr<Creature> creature(_objectFactory.newCreature());
-        if (npc == -1) {
-            creature->setTag(kObjectTagPlayer);
-        }
-        creature->loadFromBlueprint(blueprintResRef);
-        creature->setImmortal(true);
-        creature->setPosition(move(position));
-        creature->setFacing(facing);
-        _party.addMember(npc, creature);
-        if (i == 0) {
-            _party.setPlayer(creature);
-        }
-    }
-
-    // Globals
-    for (auto &global : nfoRoot->getList("GlobalBooleans")) {
-        setGlobalBoolean(global->getString("Name"), global->getBool("Value"));
-    }
-    for (auto &global : nfoRoot->getList("GlobalNumbers")) {
-        setGlobalNumber(global->getString("Name"), global->getInt("Value"));
-    }
-    for (auto &global : nfoRoot->getList("GlobalStrings")) {
-        setGlobalString(global->getString("Name"), global->getString("Value"));
-    }
-    for (auto &global : nfoRoot->getList("GlobalLocations")) {
-        setGlobalLocation(global->getString("Name"), make_shared<Location>(global->getVector("Position"), global->getFloat("Facing")));
-    }
 }
 
 void Game::withLoadingScreen(const string &imageResRef, const function<void()> &block) {
