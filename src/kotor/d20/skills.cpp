@@ -25,12 +25,13 @@
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 void Skills::init() {
     shared_ptr<TwoDA> skills(_twoDas.get("skills"));
@@ -55,6 +56,6 @@ shared_ptr<Skill> Skills::get(SkillType type) const {
     return getFromLookupOrNull(_skills, type);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

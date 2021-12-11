@@ -19,50 +19,17 @@
 
 #include "../types.h"
 
-#include "feat.h"
-
 namespace reone {
-
-namespace resource {
-
-class Strings;
-class TwoDas;
-
-} // namespace resource
-
-namespace graphics {
-
-class Textures;
-
-}
 
 namespace game {
 
-class Feats : boost::noncopyable {
+struct Feat;
+
+class IFeats : boost::noncopyable {
 public:
-    Feats(
-        graphics::Textures &textures,
-        resource::Strings &strings,
-        resource::TwoDas &twoDas) :
-        _textures(textures),
-        _strings(strings),
-        _twoDas(twoDas) {
-    }
+    virtual ~IFeats() = default;
 
-    void init();
-
-    std::shared_ptr<Feat> get(FeatType type) const;
-
-private:
-    std::unordered_map<FeatType, std::shared_ptr<Feat>> _feats;
-
-    // Services
-
-    graphics::Textures &_textures;
-    resource::Strings &_strings;
-    resource::TwoDas &_twoDas;
-
-    // END Services
+    virtual std::shared_ptr<Feat> get(FeatType type) const = 0;
 };
 
 } // namespace game

@@ -19,50 +19,17 @@
 
 #include "../types.h"
 
-#include "skill.h"
-
 namespace reone {
-
-namespace resource {
-
-class Strings;
-class TwoDas;
-
-} // namespace resource
-
-namespace graphics {
-
-class Textures;
-
-}
 
 namespace game {
 
-class Skills : boost::noncopyable {
+struct Skill;
+
+class ISkills : boost::noncopyable {
 public:
-    Skills(
-        graphics::Textures &textures,
-        resource::Strings &strings,
-        resource::TwoDas &twoDas) :
-        _textures(textures),
-        _strings(strings),
-        _twoDas(twoDas) {
-    }
+    virtual ~ISkills() = default;
 
-    void init();
-
-    std::shared_ptr<Skill> get(SkillType type) const;
-
-private:
-    std::unordered_map<SkillType, std::shared_ptr<Skill>> _skills;
-
-    // Services
-
-    graphics::Textures &_textures;
-    resource::Strings &_strings;
-    resource::TwoDas &_twoDas;
-
-    // END Services
+    virtual std::shared_ptr<Skill> get(SkillType type) const = 0;
 };
 
 } // namespace game

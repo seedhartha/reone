@@ -66,27 +66,29 @@ class Scripts;
 
 namespace game {
 
-class Classes;
 class Combat;
-class Feats;
 class FootstepSounds;
 class GUISounds;
+class IClasses;
 class ICursors;
+class IFeats;
+class ISkills;
+class ISpells;
 class Portraits;
 class Reputes;
-class Skills;
 class SoundSets;
 class Surfaces;
 
 struct Services {
-    Classes &classes;
-    Feats &feats;
     FootstepSounds &footstepSounds;
     GUISounds &guiSounds;
+    IClasses &classes;
     ICursors &cursors;
+    IFeats &feats;
+    ISkills &skills;
+    ISpells &spells;
     Portraits &portraits;
     Reputes &reputes;
-    Skills &skills;
     SoundSets &soundSets;
     Surfaces &surfaces;
 
@@ -112,14 +114,15 @@ struct Services {
     resource::TwoDas &twoDas;
 
     Services(
-        Classes &classes,
-        Feats &feats,
         FootstepSounds &footstepSounds,
         GUISounds &guiSounds,
+        IClasses &classes,
         ICursors &cursors,
+        IFeats &feats,
+        ISkills &skills,
+        ISpells &spells,
         Portraits &portraits,
         Reputes &reputes,
-        Skills &skills,
         SoundSets &soundSets,
         Surfaces &surfaces,
         audio::AudioContext &audioContext,
@@ -142,14 +145,15 @@ struct Services {
         resource::Resources &resources,
         resource::Strings &strings,
         resource::TwoDas &twoDas) :
-        classes(classes),
-        feats(feats),
         footstepSounds(footstepSounds),
         guiSounds(guiSounds),
         cursors(cursors),
+        classes(classes),
+        feats(feats),
+        skills(skills),
+        spells(spells),
         portraits(portraits),
         reputes(reputes),
-        skills(skills),
         soundSets(soundSets),
         surfaces(surfaces),
 

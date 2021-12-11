@@ -15,6 +15,10 @@
 
 set(KOTOR_HEADERS
     cursors.h
+    d20/classes.h
+    d20/feats.h
+    d20/skills.h
+    d20/spells.h
     gui.h
     gui/barkbubble.h
     gui/chargen.h
@@ -53,6 +57,10 @@ set(KOTOR_HEADERS
 
 set(KOTOR_SOURCES
     cursors.cpp
+    d20/classes.cpp
+    d20/feats.cpp
+    d20/skills.cpp
+    d20/spells.cpp
     gui.cpp
     gui/barkbubble.cpp
     gui/chargen.cpp

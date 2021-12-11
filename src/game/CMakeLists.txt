@@ -291,10 +291,6 @@ set(GAME_SOURCES
     combat.cpp
     d20/attributes.cpp
     d20/class.cpp
-    d20/classes.cpp
-    d20/feats.cpp
-    d20/skills.cpp
-    d20/spells.cpp
     dialog.cpp
     effect.cpp
     effect/abilitydecrease.cpp

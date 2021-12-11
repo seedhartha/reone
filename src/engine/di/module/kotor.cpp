@@ -18,7 +18,6 @@
 #include "kotor.h"
 
 #include "../../game/types.h"
-#include "../../kotor/cursors.h"
 #include "../../kotor/kotor.h"
 #include "../../kotor/tsl.h"
 
@@ -49,14 +48,15 @@ void KotorModule::init() {
     _surfaces = make_unique<Surfaces>(_resource.twoDas());
 
     _services = make_unique<Services>(
-        *_classes,
-        *_feats,
         *_footstepSounds,
         *_guiSounds,
+        *_classes,
         *_cursors,
+        *_feats,
+        *_skills,
+        *_spells,
         *_portraits,
         *_reputes,
-        *_skills,
         *_soundSets,
         *_surfaces,
         _audio.audioContext(),
