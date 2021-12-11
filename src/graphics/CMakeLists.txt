@@ -18,7 +18,6 @@ set(GRAPHICS_HEADERS
     animatedproperty.h
     animation.h
     barycentricutil.h
-    beziercurve.h
     context.h
     cursor.h
     dxtutil.h

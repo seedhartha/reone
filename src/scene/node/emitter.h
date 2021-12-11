@@ -18,7 +18,6 @@
 #pragma once
 
 #include "../../common/timer.h"
-#include "../../graphics/beziercurve.h"
 
 #include "modelnode.h"
 
@@ -43,9 +42,9 @@ public:
 
     void detonate();
 
-    const graphics::BezierCurve<float> &particleSize() const { return _particleSize; }
-    const graphics::BezierCurve<glm::vec3> &color() const { return _color; }
-    const graphics::BezierCurve<float> &alpha() const { return _alpha; }
+    float getParticleSize(float time) const { return _particleSize.get(time); };
+    glm::vec3 getColor(float time) const { return _color.get(time); };
+    float getAlpha(float time) const { return _alpha.get(time); };
 
     float lifeExpectancy() const { return _lifeExpectancy; }
     int frameStart() const { return _frameStart; }
@@ -53,9 +52,24 @@ public:
     float grav() const { return _grav; }
 
 private:
-    graphics::BezierCurve<float> _particleSize;
-    graphics::BezierCurve<glm::vec3> _color;
-    graphics::BezierCurve<float> _alpha;
+    template <class T>
+    struct StartMidEnd {
+        T start;
+        T mid;
+        T end;
+
+        T get(float factor) const {
+            if (factor < 0.5f) {
+                return glm::mix(start, mid, 2.0f * factor);
+            } else {
+                return glm::mix(mid, end, 2.0f * factor - 1.0f);
+            }
+        }
+    };
+
+    StartMidEnd<float> _particleSize;
+    StartMidEnd<glm::vec3> _color;
+    StartMidEnd<float> _alpha;
 
     float _birthrate {0.0f};      /**< rate of particle birth per second */
     float _lifeExpectancy {0.0f}; /**< life of each particle in seconds */

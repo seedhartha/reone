@@ -73,9 +73,9 @@ void ParticleSceneNode::updateAnimation(float dt) {
     }
 
     _frame = static_cast<int>(glm::ceil(_emitter.frameStart() + factor * (_emitter.frameEnd() - _emitter.frameStart())));
-    _size = glm::vec2(_emitter.particleSize().get(factor));
-    _color = _emitter.color().get(factor);
-    _alpha = _emitter.alpha().get(factor);
+    _size = glm::vec2(_emitter.getParticleSize(factor));
+    _color = _emitter.getColor(factor);
+    _alpha = _emitter.getAlpha(factor);
 }
 
 bool ParticleSceneNode::isExpired() const {
