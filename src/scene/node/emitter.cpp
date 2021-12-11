@@ -71,15 +71,15 @@ EmitterSceneNode::EmitterSceneNode(
     _lightningScale = modelNode->lightingScale().getByFrameOrElse(0, 0.0f);
     _lightningSubDiv = static_cast<int>(modelNode->lightingSubDiv().getByFrameOrElse(0, 0.0f));
 
-    _particleSize.setStart(modelNode->sizeStart().getByFrameOrElse(0, 0.0f));
-    _particleSize.setMid(modelNode->sizeMid().getByFrameOrElse(0, 0.0f));
-    _particleSize.setEnd(modelNode->sizeEnd().getByFrameOrElse(0, 0.0f));
-    _color.setStart(modelNode->colorStart().getByFrameOrElse(0, glm::vec3(0.0f)));
-    _color.setMid(modelNode->colorMid().getByFrameOrElse(0, glm::vec3(0.0f)));
-    _color.setEnd(modelNode->colorEnd().getByFrameOrElse(0, glm::vec3(0.0f)));
-    _alpha.setStart(modelNode->alphaStart().getByFrameOrElse(0, 0.0f));
-    _alpha.setMid(modelNode->alphaMid().getByFrameOrElse(0, 0.0f));
-    _alpha.setEnd(modelNode->alphaEnd().getByFrameOrElse(0, 0.0f));
+    _particleSize.start = modelNode->sizeStart().getByFrameOrElse(0, 0.0f);
+    _particleSize.mid = modelNode->sizeMid().getByFrameOrElse(0, 0.0f);
+    _particleSize.end = modelNode->sizeEnd().getByFrameOrElse(0, 0.0f);
+    _color.start = modelNode->colorStart().getByFrameOrElse(0, glm::vec3(0.0f));
+    _color.mid = modelNode->colorMid().getByFrameOrElse(0, glm::vec3(0.0f));
+    _color.end = modelNode->colorEnd().getByFrameOrElse(0, glm::vec3(0.0f));
+    _alpha.start = modelNode->alphaStart().getByFrameOrElse(0, 0.0f);
+    _alpha.mid = modelNode->alphaMid().getByFrameOrElse(0, 0.0f);
+    _alpha.end = modelNode->alphaEnd().getByFrameOrElse(0, 0.0f);
 
     if (_birthrate != 0.0f) {
         _birthInterval = 1.0f / _birthrate;
