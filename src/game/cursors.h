@@ -21,63 +21,19 @@
 
 namespace reone {
 
-namespace resource {
+namespace graphics {
 
-class Resources;
+class Cursor;
 
 }
 
-namespace graphics {
-
-class Context;
-class Cursor;
-class Meshes;
-class Shaders;
-class Texture;
-class Window;
-
-} // namespace graphics
-
 namespace game {
 
-class Cursors : boost::noncopyable {
+class ICursors : boost::noncopyable {
 public:
-    Cursors(
-        graphics::Context &context,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders,
-        graphics::Window &window,
-        resource::Resources &resources) :
-        _context(context),
-        _meshes(meshes),
-        _shaders(shaders),
-        _window(window),
-        _resources(resources) {
-    }
+    virtual ~ICursors() = default;
 
-    ~Cursors();
-
-    void deinit();
-
-    std::shared_ptr<graphics::Cursor> get(CursorType type);
-
-private:
-    std::unordered_map<CursorType, std::shared_ptr<graphics::Cursor>> _cache;
-
-    // Services
-
-    graphics::Context &_context;
-    graphics::Meshes &_meshes;
-    graphics::Shaders &_shaders;
-    graphics::Window &_window;
-    resource::Resources &_resources;
-
-    // END Services
-
-    std::shared_ptr<graphics::Texture> newTextureFromCursor(uint32_t name);
-
-    const std::pair<uint32_t, uint32_t> &getCursorGroupNames(CursorType type);
-    std::vector<uint32_t> getCursorNamesFromCursorGroup(uint32_t name);
+    virtual std::shared_ptr<graphics::Cursor> get(CursorType type) = 0;
 };
 
 } // namespace game

@@ -44,13 +44,13 @@
 #include "../../script/scripts.h"
 
 #include "../game/combat.h"
-#include "../game/cursors.h"
 #include "../game/location.h"
 #include "../game/object/factory.h"
 #include "../game/party.h"
 #include "../game/services.h"
 #include "../game/soundsets.h"
 #include "../game/surfaces.h"
+#include "../kotor/cursors.h"
 
 #include "gui/loadscreen.h"
 #include "script/routine/declarations.h"

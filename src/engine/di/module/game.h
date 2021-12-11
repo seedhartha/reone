@@ -81,7 +81,7 @@ private:
     ScriptModule &_script;
 
     std::unique_ptr<game::Classes> _classes;
-    std::unique_ptr<game::Cursors> _cursors;
+    std::unique_ptr<game::ICursors> _cursors;
     std::unique_ptr<game::Feats> _feats;
     std::unique_ptr<game::FootstepSounds> _footstepSounds;
     std::unique_ptr<game::Game> _game;
