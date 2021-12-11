@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(KOTOR_HEADERS
+    cursors.h
     gui.h
     gui/barkbubble.h
     gui/chargen.h
@@ -51,6 +52,7 @@ set(KOTOR_HEADERS
     tsl.h)
 
 set(KOTOR_SOURCES
+    cursors.cpp
     gui.cpp
     gui/barkbubble.cpp
     gui/chargen.cpp

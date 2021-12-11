@@ -289,7 +289,6 @@ set(GAME_SOURCES
     camera/static.cpp
     camera/thirdperson.cpp
     combat.cpp
-    cursors.cpp
     d20/attributes.cpp
     d20/class.cpp
     d20/classes.cpp

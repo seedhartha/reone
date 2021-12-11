@@ -25,12 +25,13 @@
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_groupNamesByType {
     {CursorType::Default, {1, 2}},
@@ -40,10 +41,6 @@ static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_groupNamesByType {
     {CursorType::DisableMine, {33, 34}},
     {CursorType::RecoverMine, {37, 38}},
     {CursorType::Attack, {51, 52}}};
-
-Cursors::~Cursors() {
-    deinit();
-}
 
 void Cursors::deinit() {
     _cache.clear();
@@ -111,6 +108,6 @@ shared_ptr<Texture> Cursors::newTextureFromCursor(uint32_t name) {
     return cur.texture();
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

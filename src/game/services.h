@@ -68,10 +68,10 @@ namespace game {
 
 class Classes;
 class Combat;
-class Cursors;
 class Feats;
 class FootstepSounds;
 class GUISounds;
+class ICursors;
 class Portraits;
 class Reputes;
 class Skills;
@@ -80,10 +80,10 @@ class Surfaces;
 
 struct Services {
     Classes &classes;
-    Cursors &cursors;
     Feats &feats;
     FootstepSounds &footstepSounds;
     GUISounds &guiSounds;
+    ICursors &cursors;
     Portraits &portraits;
     Reputes &reputes;
     Skills &skills;
@@ -113,10 +113,10 @@ struct Services {
 
     Services(
         Classes &classes,
-        Cursors &cursors,
         Feats &feats,
         FootstepSounds &footstepSounds,
         GUISounds &guiSounds,
+        ICursors &cursors,
         Portraits &portraits,
         Reputes &reputes,
         Skills &skills,
@@ -143,10 +143,10 @@ struct Services {
         resource::Strings &strings,
         resource::TwoDas &twoDas) :
         classes(classes),
-        cursors(cursors),
         feats(feats),
         footstepSounds(footstepSounds),
         guiSounds(guiSounds),
+        cursors(cursors),
         portraits(portraits),
         reputes(reputes),
         skills(skills),

@@ -18,6 +18,7 @@
 #include "game.h"
 
 #include "../../game/types.h"
+#include "../../kotor/cursors.h"
 #include "../../kotor/kotor.h"
 #include "../../kotor/tsl.h"
 
@@ -49,10 +50,10 @@ void GameModule::init() {
 
     _services = make_unique<Services>(
         *_classes,
-        *_cursors,
         *_feats,
         *_footstepSounds,
         *_guiSounds,
+        *_cursors,
         *_portraits,
         *_reputes,
         *_skills,
