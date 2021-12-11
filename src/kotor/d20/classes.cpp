@@ -21,11 +21,12 @@
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static const char kClassesTableResRef[] = "classes";
 
@@ -38,6 +39,6 @@ shared_ptr<CreatureClass> Classes::doGet(ClassType type) {
     return move(clazz);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

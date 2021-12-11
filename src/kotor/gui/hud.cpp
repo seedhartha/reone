@@ -19,6 +19,7 @@
 
 #include "../../common/logutil.h"
 #include "../../game/action/usefeat.h"
+#include "../../game/d20/feat.h"
 #include "../../game/d20/feats.h"
 #include "../../game/object/creature.h"
 #include "../../game/party.h"

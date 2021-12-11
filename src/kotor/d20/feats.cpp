@@ -25,12 +25,13 @@
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 void Feats::init() {
     shared_ptr<TwoDA> feats(_twoDas.get("feat"));
@@ -65,6 +66,6 @@ shared_ptr<Feat> Feats::get(FeatType type) const {
     return getFromLookupOrNull(_feats, type);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

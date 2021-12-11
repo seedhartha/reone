@@ -17,10 +17,6 @@
 
 #pragma once
 
-#include "../../game/d20/classes.h"
-#include "../../game/d20/feats.h"
-#include "../../game/d20/skills.h"
-#include "../../game/d20/spells.h"
 #include "../../game/footstepsounds.h"
 #include "../../game/game.h"
 #include "../../game/gui/sounds.h"
@@ -30,6 +26,10 @@
 #include "../../game/soundsets.h"
 #include "../../game/surfaces.h"
 #include "../../kotor/cursors.h"
+#include "../../kotor/d20/classes.h"
+#include "../../kotor/d20/feats.h"
+#include "../../kotor/d20/skills.h"
+#include "../../kotor/d20/spells.h"
 
 #include "../../types.h"
 
@@ -80,18 +80,19 @@ private:
     SceneModule &_scene;
     ScriptModule &_script;
 
-    std::unique_ptr<game::Classes> _classes;
-    std::unique_ptr<kotor::Cursors> _cursors;
-    std::unique_ptr<game::Feats> _feats;
     std::unique_ptr<game::FootstepSounds> _footstepSounds;
     std::unique_ptr<game::Game> _game;
     std::unique_ptr<game::GUISounds> _guiSounds;
     std::unique_ptr<game::Portraits> _portraits;
     std::unique_ptr<game::Reputes> _reputes;
-    std::unique_ptr<game::Skills> _skills;
     std::unique_ptr<game::SoundSets> _soundSets;
-    std::unique_ptr<game::Spells> _spells;
     std::unique_ptr<game::Surfaces> _surfaces;
+
+    std::unique_ptr<kotor::Classes> _classes;
+    std::unique_ptr<kotor::Cursors> _cursors;
+    std::unique_ptr<kotor::Feats> _feats;
+    std::unique_ptr<kotor::Skills> _skills;
+    std::unique_ptr<kotor::Spells> _spells;
 
     std::unique_ptr<game::Services> _services;
 

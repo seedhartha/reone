@@ -32,8 +32,8 @@ namespace reone {
 namespace game {
 
 class ActionFactory;
+class ISkills;
 class Reputes;
-class Skills;
 
 } // namespace game
 

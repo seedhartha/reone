@@ -17,21 +17,53 @@
 
 #pragma once
 
-#include "../types.h"
+#include "../../game/d20/skill.h"
+#include "../../game/d20/skills.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-struct Spell;
+class Strings;
+class TwoDas;
 
-class ISpells : boost::noncopyable {
+} // namespace resource
+
+namespace graphics {
+
+class Textures;
+
+}
+
+namespace kotor {
+
+class Skills : public game::ISkills {
 public:
-    virtual ~ISpells() = default;
+    Skills(
+        graphics::Textures &textures,
+        resource::Strings &strings,
+        resource::TwoDas &twoDas) :
+        _textures(textures),
+        _strings(strings),
+        _twoDas(twoDas) {
+    }
 
-    virtual std::shared_ptr<Spell> get(ForcePower type) const = 0;
+    void init();
+
+    std::shared_ptr<game::Skill> get(game::SkillType type) const;
+
+private:
+    std::unordered_map<game::SkillType, std::shared_ptr<game::Skill>> _skills;
+
+    // Services
+
+    graphics::Textures &_textures;
+    resource::Strings &_strings;
+    resource::TwoDas &_twoDas;
+
+    // END Services
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

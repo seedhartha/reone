@@ -17,21 +17,38 @@
 
 #pragma once
 
-#include "../types.h"
+#include "../../game/d20/classes.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-struct Spell;
+class Strings;
+class TwoDas;
 
-class ISpells : boost::noncopyable {
+} // namespace resource
+
+namespace kotor {
+
+class Classes : public game::IClasses {
 public:
-    virtual ~ISpells() = default;
+    Classes(resource::Strings &strings, resource::TwoDas &twoDas) :
+        IClasses(std::bind(&Classes::doGet, this, std::placeholders::_1)),
+        _strings(strings),
+        _twoDas(twoDas) {
+    }
 
-    virtual std::shared_ptr<Spell> get(ForcePower type) const = 0;
+private:
+    // Services
+
+    resource::Strings &_strings;
+    resource::TwoDas &_twoDas;
+
+    // END Services
+
+    std::shared_ptr<game::CreatureClass> doGet(game::ClassType type);
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone
