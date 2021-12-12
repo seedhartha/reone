@@ -59,10 +59,7 @@ public:
         _party(*this),
         _combat(*this, services),
         _actionFactory(*this, services),
-        _objectFactory(*this, services),
-        _console(*this, services),
-        _profileOverlay(services),
-        _map(*this, services) {
+        _objectFactory(*this, services) {
     }
 
     virtual ~Game() = default;
@@ -92,7 +89,7 @@ public:
     EffectFactory &effectFactory() { return _effectFactory; }
     ObjectFactory &objectFactory() { return _objectFactory; }
     ScriptRunner &scriptRunner() { return *_scriptRunner; }
-    Map &map() { return _map; }
+    IMap &map() { return *_map; }
 
     std::shared_ptr<Module> module() const { return _module; }
     CameraType cameraType() const { return _cameraType; }
@@ -213,11 +210,10 @@ protected:
 
     // GUI
 
+    std::unique_ptr<IMap> _map;
+    std::unique_ptr<IConsole> _console;
     std::unique_ptr<ILoadingScreen> _loadScreen;
-
-    Map _map;
-    Console _console;
-    ProfileOverlay _profileOverlay;
+    std::unique_ptr<IProfileOverlay> _profileOverlay;
 
     // END GUI
 

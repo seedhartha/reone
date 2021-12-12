@@ -17,48 +17,17 @@
 
 #pragma once
 
-#include "../../common/timer.h"
-#include "../../graphics/font.h"
-
 namespace reone {
 
 namespace game {
 
-struct Services;
-
-class ProfileOverlay {
+class IProfileOverlay : boost::noncopyable {
 public:
-    ProfileOverlay(Services &services) :
-        _services(services) {
-    }
+    virtual ~IProfileOverlay() = default;
 
-    void init();
-    bool handle(const SDL_Event &event);
-    void update(float dt);
-    void draw();
-
-private:
-    struct FPS {
-        int average {0};
-        int onePerLow {0}; /**< 1% Low */
-    };
-
-    Services &_services;
-
-    uint64_t _frequency {0};
-    uint64_t _counter {0};
-    std::shared_ptr<graphics::Font> _font;
-
-    bool _enabled {false};
-
-    Timer _refreshTimer;
-    std::vector<float> _frametimes;
-    FPS _fps;
-
-    void calculateFPS();
-
-    void drawBackground();
-    void drawText();
+    virtual bool handle(const SDL_Event &event) = 0;
+    virtual void update(float dt) = 0;
+    virtual void draw() = 0;
 };
 
 } // namespace game

@@ -53,7 +53,10 @@
 
 #include "cursors.h"
 #include "dialogs.h"
+#include "gui/console.h"
 #include "gui/loadscreen.h"
+#include "gui/map.h"
+#include "gui/profileoverlay.h"
 #include "script/routines.h"
 
 using namespace std;
@@ -124,7 +127,17 @@ void KotOR::init() {
     _guiColorHilight = glm::vec3(0.980392f, 1.0f, 0.0f);
     _guiColorDisabled = glm::vec3(0.0f, 0.349020f, 0.549020f);
 
-    _map.setArrowResRef("mm_barrow");
+    auto map = make_unique<Map>(*this, _services);
+    map->setArrowResRef("mm_barrow");
+    _map = move(map);
+
+    auto console = make_unique<Console>(*this, _services);
+    console->init();
+    _console = move(console);
+
+    auto profileOverlay = make_unique<ProfileOverlay>(_services);
+    profileOverlay->init();
+    _profileOverlay = move(profileOverlay);
 }
 
 void KotOR::loadModuleNames() {

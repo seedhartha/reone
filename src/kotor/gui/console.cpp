@@ -18,6 +18,11 @@
 #include "console.h"
 
 #include "../../common/logutil.h"
+#include "../../game/effect/factory.h"
+#include "../../game/game.h"
+#include "../../game/object/creature.h"
+#include "../../game/party.h"
+#include "../../game/services.h"
 #include "../../graphics/font.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh.h"
@@ -27,22 +32,17 @@
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
 
-#include "../effect/factory.h"
-#include "../game.h"
-#include "../object/creature.h"
-#include "../party.h"
-#include "../services.h"
-
 using namespace std;
 using namespace std::placeholders;
 
+using namespace reone::game;
 using namespace reone::gui;
 using namespace reone::graphics;
 using namespace reone::scene;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr int kMaxOutputLineCount = 100;
 static constexpr int kVisibleLineCount = 15;
@@ -343,6 +343,6 @@ void Console::drawLines() {
     }
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

@@ -42,6 +42,7 @@ set(KOTOR_HEADERS
     gui/chargen/quickorcustom.h
     gui/chargen/skills.h
     gui/computer.h
+    gui/console.h
     gui/container.h
     gui/conversation.h
     gui/dialog.h
@@ -57,7 +58,9 @@ set(KOTOR_HEADERS
     gui/ingame/options.h
     gui/loadscreen.h
     gui/mainmenu.h
+    gui/map.h
     gui/partyselect.h
+    gui/profileoverlay.h
     gui/saveload.h
     gui/selectoverlay.h
     gui/sounds.h
@@ -104,6 +107,7 @@ set(KOTOR_SOURCES
     gui/chargen/quickorcustom.cpp
     gui/chargen/skills.cpp
     gui/computer.cpp
+    gui/console.cpp
     gui/container.cpp
     gui/conversation.cpp
     gui/dialog.cpp
@@ -119,7 +123,9 @@ set(KOTOR_SOURCES
     gui/ingame/options.cpp
     gui/loadscreen.cpp
     gui/mainmenu.cpp
+    gui/map.cpp
     gui/partyselect.cpp
+    gui/profileoverlay.cpp
     gui/saveload.cpp
     gui/selectoverlay.cpp
     gui/sounds.cpp

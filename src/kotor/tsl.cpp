@@ -22,6 +22,10 @@
 #include "../resource/2da.h"
 #include "../resource/resources.h"
 
+#include "gui/console.h"
+#include "gui/loadscreen.h"
+#include "gui/map.h"
+#include "gui/profileoverlay.h"
 #include "script/routines.h"
 
 using namespace std;
@@ -81,7 +85,17 @@ void TSL::init() {
     _guiColorHilight = glm::vec3(0.768627f, 0.768627f, 0.686275f);
     _guiColorDisabled = glm::vec3(0.513725f, 0.513725f, 0.415686f);
 
-    _map.setArrowResRef("mm_barrow_p");
+    auto map = make_unique<Map>(*this, _services);
+    map->setArrowResRef("mm_barrow_p");
+    _map = move(map);
+
+    auto console = make_unique<Console>(*this, _services);
+    console->init();
+    _console = move(console);
+
+    auto profileOverlay = make_unique<ProfileOverlay>(_services);
+    profileOverlay->init();
+    _profileOverlay = move(profileOverlay);
 }
 
 void TSL::getDefaultPartyMembers(string &member1, string &member2, string &member3) const {

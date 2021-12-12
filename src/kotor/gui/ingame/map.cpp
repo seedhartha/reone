@@ -100,7 +100,7 @@ void MapMenu::draw() {
         extent.width,
         extent.height);
 
-    _game.map().draw(Map::Mode::Default, bounds);
+    _game.map().draw(IMap::Mode::Default, bounds);
 }
 
 void MapMenu::refreshControls() {

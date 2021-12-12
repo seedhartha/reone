@@ -378,9 +378,6 @@ set(GAME_SOURCES
     effect/vpregenmodifier.cpp
     effect/whirlwind.cpp
     game.cpp
-    gui/console.cpp
-    gui/map.cpp
-    gui/profileoverlay.cpp
     object.cpp
     object/area.cpp
     object/creature.cpp
