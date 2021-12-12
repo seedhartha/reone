@@ -19,6 +19,7 @@ set(KOTOR_HEADERS
     d20/feats.h
     d20/skills.h
     d20/spells.h
+    footstepsounds.h
     gui.h
     gui/barkbubble.h
     gui/chargen.h
@@ -51,8 +52,13 @@ set(KOTOR_HEADERS
     gui/partyselect.h
     gui/saveload.h
     gui/selectoverlay.h
+    gui/sounds.h
     kotor.h
+    portraits.h
+    reputes.h
     script/routine/declarations.h
+    soundsets.h
+    surfaces.h
     tsl.h)
 
 set(KOTOR_SOURCES
@@ -61,6 +67,7 @@ set(KOTOR_SOURCES
     d20/feats.cpp
     d20/skills.cpp
     d20/spells.cpp
+    footstepsounds.cpp
     gui.cpp
     gui/barkbubble.cpp
     gui/chargen.cpp
@@ -93,7 +100,10 @@ set(KOTOR_SOURCES
     gui/partyselect.cpp
     gui/saveload.cpp
     gui/selectoverlay.cpp
+    gui/sounds.cpp
     kotor.cpp
+    portraits.cpp
+    reputes.cpp
     script/routine/impl/action.cpp
     script/routine/impl/ambientsound.cpp
     script/routine/impl/convert.cpp
@@ -116,6 +126,8 @@ set(KOTOR_SOURCES
     script/routine/impl/talent.cpp
     script/routine/impl/time.cpp
     script/routine/impl/vector.cpp
+    soundsets.cpp
+    surfaces.cpp
     tsl.cpp)
 
 add_library(kotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES})

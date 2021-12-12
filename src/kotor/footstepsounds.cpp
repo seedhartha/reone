@@ -25,19 +25,12 @@ using namespace std;
 using namespace std::placeholders;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
-
-FootstepSounds::FootstepSounds(
-    AudioFiles &audioFiles,
-    TwoDas &twoDas) :
-    MemoryCache(bind(&FootstepSounds::doGet, this, _1)),
-    _audioFiles(audioFiles),
-    _twoDas(twoDas) {
-}
+namespace kotor {
 
 shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
     shared_ptr<FootstepTypeSounds> result;
@@ -67,6 +60,6 @@ shared_ptr<FootstepTypeSounds> FootstepSounds::doGet(uint32_t type) {
     return move(result);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

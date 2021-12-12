@@ -17,17 +17,16 @@
 
 #pragma once
 
-#include "../../game/d20/skill.h"
-#include "../../game/d20/skills.h"
+#include "../game/portrait.h"
+#include "../game/portraits.h"
 
 namespace reone {
 
 namespace resource {
 
-class Strings;
 class TwoDas;
 
-} // namespace resource
+}
 
 namespace graphics {
 
@@ -37,31 +36,26 @@ class Textures;
 
 namespace kotor {
 
-class Skills : public game::ISkills {
+class Portraits : public game::IPortraits {
 public:
-    Skills(
-        graphics::Textures &textures,
-        resource::Strings &strings,
-        resource::TwoDas &twoDas) :
-        _textures(textures),
-        _strings(strings),
-        _twoDas(twoDas) {
+    Portraits(graphics::Textures &textures, resource::TwoDas &twoDas) :
+        _textures(textures), _twoDas(twoDas) {
     }
 
     void init();
 
-    std::shared_ptr<game::Skill> get(game::SkillType type) const override;
+    std::shared_ptr<graphics::Texture> getTextureByIndex(int index) const override;
+    std::shared_ptr<graphics::Texture> getTextureByAppearance(int appearance) const override;
+
+    const std::vector<game::Portrait> &portraits() const override { return _portraits; }
 
 private:
-    std::unordered_map<game::SkillType, std::shared_ptr<game::Skill>> _skills;
-
-    // Services
-
     graphics::Textures &_textures;
-    resource::Strings &_strings;
     resource::TwoDas &_twoDas;
 
-    // END Services
+    std::vector<game::Portrait> _portraits;
+
+    std::shared_ptr<graphics::Texture> getPortraitTexture(const game::Portrait &portrait) const;
 };
 
 } // namespace kotor

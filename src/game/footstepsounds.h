@@ -22,18 +22,6 @@
 
 namespace reone {
 
-namespace resource {
-
-class TwoDas;
-
-}
-
-namespace audio {
-
-class AudioFiles;
-
-}
-
 namespace game {
 
 struct FootstepTypeSounds {
@@ -47,17 +35,11 @@ struct FootstepTypeSounds {
     std::vector<std::shared_ptr<audio::AudioStream>> leaves;
 };
 
-class FootstepSounds : public MemoryCache<uint32_t, FootstepTypeSounds> {
+class IFootstepSounds : public MemoryCache<uint32_t, FootstepTypeSounds> {
 public:
-    FootstepSounds(
-        audio::AudioFiles &audioFiles,
-        resource::TwoDas &twoDas);
-
-    std::shared_ptr<FootstepTypeSounds> doGet(uint32_t type);
-
-private:
-    audio::AudioFiles &_audioFiles;
-    resource::TwoDas &_twoDas;
+    IFootstepSounds(std::function<std::shared_ptr<FootstepTypeSounds>(uint32_t)> compute) :
+        MemoryCache(std::move(compute)) {
+    }
 };
 
 } // namespace game

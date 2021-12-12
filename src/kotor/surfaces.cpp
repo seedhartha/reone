@@ -22,11 +22,12 @@
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 void Surfaces::init() {
     shared_ptr<TwoDA> surfacemat(_twoDas.get("surfacemat"));
@@ -80,6 +81,6 @@ set<uint32_t> Surfaces::getWalkcheckSurfaces() const {
     return getSurfaceIndices([](auto &surface) { return surface.walkcheck; });
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

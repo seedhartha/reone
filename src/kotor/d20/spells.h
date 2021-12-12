@@ -50,7 +50,7 @@ public:
 
     void init();
 
-    std::shared_ptr<game::Spell> get(game::ForcePower type) const;
+    std::shared_ptr<game::Spell> get(game::ForcePower type) const override;
 
 private:
     std::unordered_map<game::ForcePower, std::shared_ptr<game::Spell>> _spells;

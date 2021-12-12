@@ -28,7 +28,7 @@ using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 void GUISounds::init() {
     shared_ptr<TwoDA> sounds(_twoDas.get("guisounds"));
@@ -55,6 +55,6 @@ void GUISounds::deinit() {
     _onEnter.reset();
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

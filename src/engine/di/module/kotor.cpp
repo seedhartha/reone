@@ -48,16 +48,16 @@ void KotorModule::init() {
     _surfaces = make_unique<Surfaces>(_resource.twoDas());
 
     _services = make_unique<Services>(
-        *_footstepSounds,
-        *_guiSounds,
         *_classes,
         *_cursors,
         *_feats,
-        *_skills,
-        *_spells,
+        *_footstepSounds,
+        *_guiSounds,
         *_portraits,
         *_reputes,
+        *_skills,
         *_soundSets,
+        *_spells,
         *_surfaces,
         _audio.audioContext(),
         _audio.audioFiles(),

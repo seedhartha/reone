@@ -17,24 +17,45 @@
 
 #pragma once
 
+#include "../game/soundsets.h"
+
 namespace reone {
 
 namespace audio {
 
-class AudioStream;
+class AudioFiles;
 
 }
 
-namespace game {
+namespace resource {
 
-class IGUISounds : boost::noncopyable {
+class Resources;
+class Strings;
+
+} // namespace resource
+
+namespace kotor {
+
+class SoundSets : public game::ISoundSets {
 public:
-    virtual ~IGUISounds() = default;
+    SoundSets(
+        audio::AudioFiles &audioFiles,
+        resource::Resources &resources,
+        resource::Strings &strings) :
+        ISoundSets(std::bind(&SoundSets::doGet, this, std::placeholders::_1)),
+        _audioFiles(audioFiles),
+        _resources(resources),
+        _strings(strings) {
+    }
 
-    virtual std::shared_ptr<audio::AudioStream> getOnClick() const = 0;
-    virtual std::shared_ptr<audio::AudioStream> getOnEnter() const = 0;
+private:
+    audio::AudioFiles &_audioFiles;
+    resource::Resources &_resources;
+    resource::Strings &_strings;
+
+    std::shared_ptr<game::SoundSet> doGet(std::string resRef);
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

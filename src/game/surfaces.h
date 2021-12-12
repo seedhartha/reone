@@ -21,36 +21,21 @@
 
 namespace reone {
 
-namespace resource {
-
-class TwoDas;
-
-}
-
 namespace game {
 
-class Surfaces : boost::noncopyable {
+struct Surface;
+
+class ISurfaces : boost::noncopyable {
 public:
-    Surfaces(resource::TwoDas &twoDas) :
-        _twoDas(twoDas) {
-    }
+    virtual ~ISurfaces() = default;
 
-    void init();
+    virtual bool isWalkable(int index) const = 0;
 
-    bool isWalkable(int index) const;
+    virtual const Surface &getSurface(int index) const = 0;
 
-    const Surface &getSurface(int index) const;
-
-    std::set<uint32_t> getGrassSurfaces() const;
-    std::set<uint32_t> getWalkableSurfaces() const;
-    std::set<uint32_t> getWalkcheckSurfaces() const;
-
-private:
-    resource::TwoDas &_twoDas;
-
-    std::vector<Surface> _surfaces;
-
-    inline std::set<uint32_t> getSurfaceIndices(const std::function<bool(const Surface &)> &pred) const;
+    virtual std::set<uint32_t> getGrassSurfaces() const = 0;
+    virtual std::set<uint32_t> getWalkableSurfaces() const = 0;
+    virtual std::set<uint32_t> getWalkcheckSurfaces() const = 0;
 };
 
 } // namespace game

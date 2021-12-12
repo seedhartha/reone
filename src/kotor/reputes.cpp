@@ -20,13 +20,16 @@
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
 
+#include "../game/object/creature.h"
+
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr int kDefaultRepute = 50;
 
@@ -61,7 +64,7 @@ void Reputes::init() {
     }
 }
 
-bool Reputes::getIsEnemy(const Creature &left, const Creature &right) {
+bool Reputes::getIsEnemy(const Creature &left, const Creature &right) const {
     // HACK: friendlies must not attack each other, unless both are immortal
     if ((left.faction() == Faction::Friendly1 && right.faction() == Faction::Friendly2) ||
         (left.faction() == Faction::Friendly2 && right.faction() == Faction::Friendly1)) {
@@ -70,6 +73,14 @@ bool Reputes::getIsEnemy(const Creature &left, const Creature &right) {
     }
 
     return getRepute(left, right) < 50;
+}
+
+bool Reputes::getIsFriend(const Creature &left, const Creature &right) const {
+    return getRepute(left, right) > 50;
+}
+
+bool Reputes::getIsNeutral(const Creature &left, const Creature &right) const {
+    return getRepute(left, right) == 50;
 }
 
 int Reputes::getRepute(const Creature &left, const Creature &right) const {
@@ -83,14 +94,6 @@ int Reputes::getRepute(const Creature &left, const Creature &right) const {
     return g_factionValues[leftFaction][rightFaction];
 }
 
-bool Reputes::getIsFriend(const Creature &left, const Creature &right) {
-    return getRepute(left, right) > 50;
-}
-
-bool Reputes::getIsNeutral(const Creature &left, const Creature &right) {
-    return getRepute(left, right) == 50;
-}
-
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

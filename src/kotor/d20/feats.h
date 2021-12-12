@@ -50,7 +50,7 @@ public:
 
     void init();
 
-    std::shared_ptr<game::Feat> get(game::FeatType type) const;
+    std::shared_ptr<game::Feat> get(game::FeatType type) const override;
 
 private:
     std::unordered_map<game::FeatType, std::shared_ptr<game::Feat>> _feats;
