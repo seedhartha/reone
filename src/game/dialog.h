@@ -17,26 +17,17 @@
 
 #pragma once
 
-#include "../../resource/gffstruct.h"
-
 #include "types.h"
 
 namespace reone {
 
-namespace resource {
-
-class Strings;
-
-}
-
 namespace game {
 
-struct DialogWaitFlags {
-    static constexpr int waitAnimFinish = 1;
-};
+struct Dialog {
+    struct WaitFlags {
+        static constexpr int waitAnimFinish = 1;
+    };
 
-class Dialog : boost::noncopyable {
-public:
     struct Stunt {
         std::string participant;
         std::string stuntModel;
@@ -70,47 +61,24 @@ public:
         std::vector<ParticipantAnimation> animations;
     };
 
-    Dialog(std::string resRef, resource::Strings &strings) :
-        _resRef(std::move(resRef)),
-        _strings(strings) {
-    }
+    std::string resRef;
+    bool skippable {false};
+    std::string cameraModel;
+    std::vector<EntryReplyLink> startEntries;
+    std::vector<EntryReply> entries;
+    std::vector<EntryReply> replies;
+    std::string endScript;
+    int entryIndex {-1};
+    bool animatedCutscene {false};
+    std::vector<Stunt> stunts;
+    ConversationType conversationType {ConversationType::Cinematic};
+    ComputerType computerType {ComputerType::Normal};
 
-    void load(const resource::GffStruct &dlg);
+    bool isSkippable() const { return skippable; }
+    bool isAnimatedCutscene() const { return animatedCutscene; }
 
-    bool isSkippable() const { return _skippable; }
-    bool isAnimatedCutscene() const { return _animatedCutscene; }
-
-    const EntryReply &getEntry(int index) const;
-    const EntryReply &getReply(int index) const;
-
-    const std::string &resRef() const { return _resRef; }
-    const std::string &cameraModel() const { return _cameraModel; }
-    const std::vector<EntryReplyLink> &startEntries() const { return _startEntries; }
-    const std::vector<Stunt> &stunts() const { return _stunts; }
-    const std::string &endScript() const { return _endScript; }
-    ConversationType conversationType() const { return _conversationType; }
-    ComputerType computerType() const { return _computerType; }
-
-private:
-    std::string _resRef;
-    resource::Strings &_strings;
-
-    bool _skippable {false};
-    std::string _cameraModel;
-    std::vector<EntryReplyLink> _startEntries;
-    std::vector<EntryReply> _entries;
-    std::vector<EntryReply> _replies;
-    std::string _endScript;
-    int _entryIndex {-1};
-    bool _animatedCutscene {false};
-    std::vector<Stunt> _stunts;
-    ConversationType _conversationType {ConversationType::Cinematic};
-    ComputerType _computerType {ComputerType::Normal};
-
-    EntryReplyLink getEntryReplyLink(const resource::GffStruct &gffs) const;
-    EntryReply getEntryReply(const resource::GffStruct &gffs) const;
-    Stunt getStunt(const resource::GffStruct &gffs) const;
-    ParticipantAnimation getParticipantAnimation(const resource::GffStruct &gffs) const;
+    const EntryReply &getEntry(int index) const { return entries[index]; }
+    const EntryReply &getReply(int index) const { return replies[index]; }
 };
 
 } // namespace game

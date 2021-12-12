@@ -15,52 +15,66 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "dialog.h"
+#include "dialogs.h"
 
+#include "../../resource/gffs.h"
 #include "../../resource/strings.h"
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
-void Dialog::load(const GffStruct &dlg) {
-    _skippable = dlg.getBool("Skippable");
-    _cameraModel = dlg.getString("CameraModel");
-    _endScript = dlg.getString("EndConversation");
-    _animatedCutscene = dlg.getBool("AnimatedCut");
-    _conversationType = dlg.getEnum("ConversationType", ConversationType::Cinematic);
-    _computerType = dlg.getEnum("ComputerType", ComputerType::Normal);
-
-    for (auto &entry : dlg.getList("EntryList")) {
-        _entries.push_back(getEntryReply(*entry));
+shared_ptr<Dialog> Dialogs::doGet(string resRef) {
+    auto dlg = _gffs.get(resRef, ResourceType::Dlg);
+    if (!dlg) {
+        return nullptr;
     }
-    for (auto &reply : dlg.getList("ReplyList")) {
-        _replies.push_back(getEntryReply(*reply));
-    }
-    for (auto &entry : dlg.getList("StartingList")) {
-        _startEntries.push_back(getEntryReplyLink(*entry));
-    }
-    for (auto &stunt : dlg.getList("StuntList")) {
-        _stunts.push_back(getStunt(*stunt));
-    }
+    return loadDialog(*dlg);
 }
 
-Dialog::EntryReplyLink Dialog::getEntryReplyLink(const GffStruct &gffs) const {
-    EntryReplyLink link;
+unique_ptr<Dialog> Dialogs::loadDialog(const GffStruct &dlg) {
+    auto dialog = make_unique<Dialog>();
+
+    dialog->skippable = dlg.getBool("Skippable");
+    dialog->cameraModel = dlg.getString("CameraModel");
+    dialog->endScript = dlg.getString("EndConversation");
+    dialog->animatedCutscene = dlg.getBool("AnimatedCut");
+    dialog->conversationType = dlg.getEnum("ConversationType", ConversationType::Cinematic);
+    dialog->computerType = dlg.getEnum("ComputerType", ComputerType::Normal);
+
+    for (auto &entry : dlg.getList("EntryList")) {
+        dialog->entries.push_back(getEntryReply(*entry));
+    }
+    for (auto &reply : dlg.getList("ReplyList")) {
+        dialog->replies.push_back(getEntryReply(*reply));
+    }
+    for (auto &entry : dlg.getList("StartingList")) {
+        dialog->startEntries.push_back(getEntryReplyLink(*entry));
+    }
+    for (auto &stunt : dlg.getList("StuntList")) {
+        dialog->stunts.push_back(getStunt(*stunt));
+    }
+
+    return move(dialog);
+}
+
+Dialog::EntryReplyLink Dialogs::getEntryReplyLink(const GffStruct &gffs) const {
+    Dialog::EntryReplyLink link;
     link.index = gffs.getInt("Index");
     link.active = gffs.getString("Active");
 
     return move(link);
 }
 
-Dialog::EntryReply Dialog::getEntryReply(const GffStruct &gffs) const {
+Dialog::EntryReply Dialogs::getEntryReply(const GffStruct &gffs) const {
     int strRef = gffs.getInt("Text");
 
-    EntryReply entry;
+    Dialog::EntryReply entry;
     entry.speaker = gffs.getString("Speaker");
     entry.text = strRef == -1 ? "" : _strings.get(strRef);
     entry.voResRef = gffs.getString("VO_ResRef");
@@ -90,28 +104,20 @@ Dialog::EntryReply Dialog::getEntryReply(const GffStruct &gffs) const {
     return move(entry);
 }
 
-Dialog::Stunt Dialog::getStunt(const GffStruct &gffs) const {
-    Stunt stunt;
+Dialog::Stunt Dialogs::getStunt(const GffStruct &gffs) const {
+    Dialog::Stunt stunt;
     stunt.participant = boost::to_lower_copy(gffs.getString("Participant"));
     stunt.stuntModel = boost::to_lower_copy(gffs.getString("StuntModel"));
     return move(stunt);
 }
 
-Dialog::ParticipantAnimation Dialog::getParticipantAnimation(const GffStruct &gffs) const {
-    ParticipantAnimation anim;
+Dialog::ParticipantAnimation Dialogs::getParticipantAnimation(const GffStruct &gffs) const {
+    Dialog::ParticipantAnimation anim;
     anim.participant = boost::to_lower_copy(gffs.getString("Participant"));
     anim.animation = gffs.getInt("Animation");
     return move(anim);
 }
 
-const Dialog::EntryReply &Dialog::getEntry(int index) const {
-    return _entries[index];
-}
-
-const Dialog::EntryReply &Dialog::getReply(int index) const {
-    return _replies[index];
-}
-
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

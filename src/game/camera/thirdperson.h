@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../camera.h"
-#include "camerastyle.h"
+#include "../camerastyle.h"
 
 namespace reone {
 

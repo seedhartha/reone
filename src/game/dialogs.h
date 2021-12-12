@@ -17,46 +17,19 @@
 
 #pragma once
 
-#include "../types.h"
+#include "../common/memorycache.h"
 
-#include "../camera.h"
-#include "../camerastyle.h"
+#include "dialog.h"
 
 namespace reone {
 
-namespace scene {
-
-class SceneGraph;
-
-}
-
 namespace game {
 
-class DialogCamera : public Camera {
+class IDialogs : public MemoryCache<std::string, Dialog> {
 public:
-    enum class Variant {
-        Both,
-        SpeakerClose,
-        SpeakerFar,
-        ListenerClose,
-        ListenerFar
-    };
-
-    DialogCamera(float aspect, const CameraStyle &style, scene::SceneGraph &sceneGraph);
-
-    void setSpeakerPosition(glm::vec3 position);
-    void setListenerPosition(glm::vec3 position);
-    void setVariant(Variant variant);
-    void setFindObstacle(std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> fn);
-
-private:
-    scene::SceneGraph &_sceneGraph;
-
-    glm::vec3 _speakerPosition {0.0f};
-    glm::vec3 _listenerPosition {0.0f};
-    Variant _variant {Variant::Both};
-
-    void updateSceneNode();
+    IDialogs(std::function<std::shared_ptr<Dialog>(std::string)> compute) :
+        MemoryCache(std::move(compute)) {
+    }
 };
 
 } // namespace game

@@ -17,20 +17,36 @@
 
 #pragma once
 
+#include "../game/camerastyle.h"
+#include "../game/camerastyles.h"
+
 namespace reone {
 
-namespace game {
+namespace resource {
 
-struct Path {
-    struct Point {
-        float x {0.0f};
-        float y {0.0f};
-        std::vector<int> adjPoints;
-    };
+class TwoDas;
 
-    std::vector<Point> points;
+}
+
+namespace kotor {
+
+class CameraStyles : public game::ICameraStyles {
+public:
+    CameraStyles(resource::TwoDas &twoDas) :
+        _twoDas(twoDas) {
+    }
+
+    void init();
+
+    std::shared_ptr<game::CameraStyle> get(int index) const override;
+    std::shared_ptr<game::CameraStyle> get(const std::string &name) const override;
+
+private:
+    resource::TwoDas &_twoDas;
+
+    std::vector<std::shared_ptr<game::CameraStyle>> _styles;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

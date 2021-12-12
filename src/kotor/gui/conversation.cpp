@@ -47,7 +47,7 @@ static constexpr float kDefaultEntryDuration = 10.0f;
 static bool g_allEntriesSkippable = false;
 
 void Conversation::start(const shared_ptr<Dialog> &dialog, const shared_ptr<SpatialObject> &owner) {
-    debug("Start " + dialog->resRef(), LogChannels::conversation);
+    debug("Start " + dialog->resRef, LogChannels::conversation);
 
     _dialog = dialog;
     _owner = owner;
@@ -68,15 +68,15 @@ static BackgroundType getBackgroundType(ComputerType compType) {
 }
 
 void Conversation::loadConversationBackground() {
-    if (_dialog->conversationType() == ConversationType::Computer) {
-        loadBackground(getBackgroundType(_dialog->computerType()));
+    if (_dialog->conversationType == ConversationType::Computer) {
+        loadBackground(getBackgroundType(_dialog->computerType));
     } else {
         loadBackground(BackgroundType::None);
     }
 }
 
 void Conversation::loadCameraModel() {
-    string modelResRef(_dialog->cameraModel());
+    string modelResRef(_dialog->cameraModel);
     _cameraModel = modelResRef.empty() ? nullptr : _services.models.get(modelResRef);
 }
 
@@ -84,7 +84,7 @@ void Conversation::onStart() {
 }
 
 void Conversation::loadStartEntry() {
-    int entryIdx = indexOfFirstActive(_dialog->startEntries());
+    int entryIdx = indexOfFirstActive(_dialog->startEntries);
     if (entryIdx == -1) {
         debug("Finish (no active start entry)", LogChannels::conversation);
         finish();
@@ -112,8 +112,8 @@ void Conversation::finish() {
     _game.openInGame();
 
     // Run EndConversation script
-    if (!_dialog->endScript().empty()) {
-        _game.scriptRunner().run(_dialog->endScript(), _owner->id());
+    if (!_dialog->endScript.empty()) {
+        _game.scriptRunner().run(_dialog->endScript, _owner->id());
     }
 }
 
@@ -186,7 +186,7 @@ static string getCameraAnimationName(int ordinal) {
 void Conversation::scheduleEndOfEntry() {
     float duration = kDefaultEntryDuration;
 
-    if (_cameraModel && (_currentEntry->waitFlags & DialogWaitFlags::waitAnimFinish)) {
+    if (_cameraModel && (_currentEntry->waitFlags & Dialog::WaitFlags::waitAnimFinish)) {
         string animName(getCameraAnimationName(_currentEntry->cameraAnimation));
         shared_ptr<Animation> animation(_cameraModel->getAnimation(animName));
         if (animation) {
@@ -327,7 +327,7 @@ void Conversation::update(float dt) {
 }
 
 CameraType Conversation::getCamera(int &cameraId) const {
-    string cameraModel(_dialog->cameraModel());
+    string cameraModel(_dialog->cameraModel);
     if (!cameraModel.empty()) {
         return CameraType::Animated;
     }

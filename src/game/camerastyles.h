@@ -17,46 +17,16 @@
 
 #pragma once
 
-#include "../types.h"
-
-#include "../camera.h"
-#include "../camerastyle.h"
-
 namespace reone {
-
-namespace scene {
-
-class SceneGraph;
-
-}
 
 namespace game {
 
-class DialogCamera : public Camera {
+class ICameraStyles : boost::noncopyable {
 public:
-    enum class Variant {
-        Both,
-        SpeakerClose,
-        SpeakerFar,
-        ListenerClose,
-        ListenerFar
-    };
+    virtual ~ICameraStyles() = default;
 
-    DialogCamera(float aspect, const CameraStyle &style, scene::SceneGraph &sceneGraph);
-
-    void setSpeakerPosition(glm::vec3 position);
-    void setListenerPosition(glm::vec3 position);
-    void setVariant(Variant variant);
-    void setFindObstacle(std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> fn);
-
-private:
-    scene::SceneGraph &_sceneGraph;
-
-    glm::vec3 _speakerPosition {0.0f};
-    glm::vec3 _listenerPosition {0.0f};
-    Variant _variant {Variant::Both};
-
-    void updateSceneNode();
+    virtual std::shared_ptr<CameraStyle> get(int index) const = 0;
+    virtual std::shared_ptr<CameraStyle> get(const std::string &name) const = 0;
 };
 
 } // namespace game

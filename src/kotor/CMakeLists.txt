@@ -15,11 +15,13 @@
 
 set(KOTOR_HEADERS
     arealayouts.h
+    camerastyles.h
     cursors.h
     d20/classes.h
     d20/feats.h
     d20/skills.h
     d20/spells.h
+    dialogs.h
     footstepsounds.h
     format/ltrreader.h
     format/lytreader.h
@@ -60,6 +62,7 @@ set(KOTOR_HEADERS
     gui/selectoverlay.h
     gui/sounds.h
     kotor.h
+    paths.h
     portraits.h
     reputes.h
     roomvisibilities.h
@@ -74,11 +77,13 @@ set(KOTOR_HEADERS
 
 set(KOTOR_SOURCES
     arealayouts.cpp
+    camerastyles.cpp
     cursors.cpp
     d20/classes.cpp
     d20/feats.cpp
     d20/skills.cpp
     d20/spells.cpp
+    dialogs.cpp
     footstepsounds.cpp
     format/ltrreader.cpp
     format/lytreader.cpp
@@ -119,6 +124,7 @@ set(KOTOR_SOURCES
     gui/selectoverlay.cpp
     gui/sounds.cpp
     kotor.cpp
+    paths.cpp
     portraits.cpp
     reputes.cpp
     roomvisibilities.cpp

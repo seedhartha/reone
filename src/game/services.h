@@ -67,11 +67,14 @@ class Scripts;
 namespace game {
 
 class IAreaLayouts;
+class ICameraStyles;
 class IClasses;
 class ICursors;
+class IDialogs;
 class IFeats;
 class IFootstepSounds;
 class IGUISounds;
+class IPaths;
 class IPortraits;
 class IReputes;
 class IRoomVisibilities;
@@ -82,11 +85,14 @@ class ISurfaces;
 
 struct Services {
     IAreaLayouts &areaLayouts;
+    ICameraStyles &cameraStyles;
     IClasses &classes;
     ICursors &cursors;
+    IDialogs &dialogs;
     IFeats &feats;
     IFootstepSounds &footstepSounds;
     IGUISounds &guiSounds;
+    IPaths &paths;
     IPortraits &portraits;
     IReputes &reputes;
     IRoomVisibilities &roomVisibilities;
@@ -118,11 +124,14 @@ struct Services {
 
     Services(
         IAreaLayouts &areaLayouts,
+        ICameraStyles &cameraStyles,
         IClasses &classes,
         ICursors &cursors,
+        IDialogs &dialogs,
         IFeats &feats,
         IFootstepSounds &footstepSounds,
         IGUISounds &guiSounds,
+        IPaths &paths,
         IPortraits &portraits,
         IReputes &reputes,
         IRoomVisibilities &roomVisibilities,
@@ -151,11 +160,14 @@ struct Services {
         resource::Strings &strings,
         resource::TwoDas &twoDas) :
         areaLayouts(areaLayouts),
+        cameraStyles(cameraStyles),
         classes(classes),
         cursors(cursors),
+        dialogs(dialogs),
         feats(feats),
         footstepSounds(footstepSounds),
         guiSounds(guiSounds),
+        paths(paths),
         portraits(portraits),
         reputes(reputes),
         roomVisibilities(roomVisibilities),
