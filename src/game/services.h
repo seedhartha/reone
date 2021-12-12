@@ -66,31 +66,30 @@ class Scripts;
 
 namespace game {
 
-class Combat;
-class FootstepSounds;
-class GUISounds;
+class IFootstepSounds;
+class IGUISounds;
 class IClasses;
 class ICursors;
 class IFeats;
 class ISkills;
 class ISpells;
-class Portraits;
-class Reputes;
-class SoundSets;
-class Surfaces;
+class IPortraits;
+class IReputes;
+class ISoundSets;
+class ISurfaces;
 
 struct Services {
-    FootstepSounds &footstepSounds;
-    GUISounds &guiSounds;
     IClasses &classes;
     ICursors &cursors;
     IFeats &feats;
+    IFootstepSounds &footstepSounds;
+    IGUISounds &guiSounds;
+    IPortraits &portraits;
+    IReputes &reputes;
     ISkills &skills;
+    ISoundSets &soundSets;
     ISpells &spells;
-    Portraits &portraits;
-    Reputes &reputes;
-    SoundSets &soundSets;
-    Surfaces &surfaces;
+    ISurfaces &surfaces;
 
     audio::AudioContext &audioContext;
     audio::AudioFiles &audioFiles;
@@ -114,17 +113,17 @@ struct Services {
     resource::TwoDas &twoDas;
 
     Services(
-        FootstepSounds &footstepSounds,
-        GUISounds &guiSounds,
         IClasses &classes,
         ICursors &cursors,
         IFeats &feats,
+        IFootstepSounds &footstepSounds,
+        IGUISounds &guiSounds,
+        IPortraits &portraits,
+        IReputes &reputes,
         ISkills &skills,
+        ISoundSets &soundSets,
         ISpells &spells,
-        Portraits &portraits,
-        Reputes &reputes,
-        SoundSets &soundSets,
-        Surfaces &surfaces,
+        ISurfaces &surfaces,
         audio::AudioContext &audioContext,
         audio::AudioFiles &audioFiles,
         audio::AudioPlayer &audioPlayer,
@@ -145,16 +144,16 @@ struct Services {
         resource::Resources &resources,
         resource::Strings &strings,
         resource::TwoDas &twoDas) :
+        classes(classes),
+        cursors(cursors),
+        feats(feats),
         footstepSounds(footstepSounds),
         guiSounds(guiSounds),
-        cursors(cursors),
-        classes(classes),
-        feats(feats),
-        skills(skills),
-        spells(spells),
         portraits(portraits),
         reputes(reputes),
+        skills(skills),
         soundSets(soundSets),
+        spells(spells),
         surfaces(surfaces),
 
         audioContext(audioContext),

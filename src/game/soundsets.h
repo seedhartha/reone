@@ -23,39 +23,13 @@
 
 namespace reone {
 
-namespace audio {
-
-class AudioFiles;
-
-}
-
-namespace resource {
-
-class Resources;
-class Strings;
-
-} // namespace resource
-
 namespace game {
 
-class SoundSets : public MemoryCache<std::string, SoundSet> {
+class ISoundSets : public MemoryCache<std::string, SoundSet> {
 public:
-    SoundSets(
-        audio::AudioFiles &audioFiles,
-        resource::Resources &resources,
-        resource::Strings &strings) :
-        MemoryCache(std::bind(&SoundSets::doGet, this, std::placeholders::_1)),
-        _audioFiles(audioFiles),
-        _resources(resources),
-        _strings(strings) {
+    ISoundSets(std::function<std::shared_ptr<SoundSet>(std::string)> compute) :
+        MemoryCache(std::move(compute)) {
     }
-
-private:
-    audio::AudioFiles &_audioFiles;
-    resource::Resources &_resources;
-    resource::Strings &_strings;
-
-    std::shared_ptr<SoundSet> doGet(std::string resRef);
 };
 
 } // namespace game

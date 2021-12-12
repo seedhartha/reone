@@ -382,7 +382,6 @@ set(GAME_SOURCES
     effect/visual.cpp
     effect/vpregenmodifier.cpp
     effect/whirlwind.cpp
-    footstepsounds.cpp
     format/ltrreader.cpp
     format/lytreader.cpp
     format/ssfreader.cpp
@@ -392,7 +391,6 @@ set(GAME_SOURCES
     gui/console.cpp
     gui/map.cpp
     gui/profileoverlay.cpp
-    gui/sounds.cpp
     object.cpp
     object/area.cpp
     object/creature.cpp
@@ -411,13 +409,9 @@ set(GAME_SOURCES
     path.cpp
     pathfinder.cpp
     player.cpp
-    portraits.cpp
-    reputes.cpp
     room.cpp
     script/routine/argutil.cpp
-    script/runner.cpp
-    soundsets.cpp
-    surfaces.cpp)
+    script/runner.cpp)
 
 add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES})
 set_target_properties(game PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

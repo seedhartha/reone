@@ -21,14 +21,17 @@
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
 
+#include "../game/portrait.h"
+
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 void Portraits::init() {
     shared_ptr<TwoDA> portraits(_twoDas.get("portraits"));
@@ -51,7 +54,7 @@ void Portraits::init() {
     }
 }
 
-shared_ptr<Texture> Portraits::getTextureByIndex(int index) {
+shared_ptr<Texture> Portraits::getTextureByIndex(int index) const {
     shared_ptr<Texture> result;
     if (index >= 0 && index < static_cast<int>(_portraits.size())) {
         result = getPortraitTexture(_portraits[index]);
@@ -59,11 +62,7 @@ shared_ptr<Texture> Portraits::getTextureByIndex(int index) {
     return move(result);
 }
 
-shared_ptr<Texture> Portraits::getPortraitTexture(const Portrait &portrait) const {
-    return _textures.get(portrait.resRef, TextureUsage::GUI);
-}
-
-shared_ptr<Texture> Portraits::getTextureByAppearance(int appearance) {
+shared_ptr<Texture> Portraits::getTextureByAppearance(int appearance) const {
     for (auto &portrait : _portraits) {
         if (portrait.appearanceNumber == appearance ||
             portrait.appearanceS == appearance ||
@@ -73,6 +72,10 @@ shared_ptr<Texture> Portraits::getTextureByAppearance(int appearance) {
     return nullptr;
 }
 
-} // namespace game
+shared_ptr<Texture> Portraits::getPortraitTexture(const Portrait &portrait) const {
+    return _textures.get(portrait.resRef, TextureUsage::GUI);
+}
+
+} // namespace kotor
 
 } // namespace reone

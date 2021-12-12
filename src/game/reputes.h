@@ -17,34 +17,19 @@
 
 #pragma once
 
-#include "object/creature.h"
-
 namespace reone {
-
-namespace resource {
-
-class TwoDas;
-
-}
 
 namespace game {
 
-class Reputes : boost::noncopyable {
+class Creature;
+
+class IReputes : boost::noncopyable {
 public:
-    Reputes(resource::TwoDas &twoDas) :
-        _twoDas(twoDas) {
-    }
+    virtual ~IReputes() = default;
 
-    void init();
-
-    bool getIsEnemy(const Creature &left, const Creature &right);
-    bool getIsFriend(const Creature &left, const Creature &right);
-    bool getIsNeutral(const Creature &left, const Creature &right);
-
-private:
-    resource::TwoDas &_twoDas;
-
-    int getRepute(const Creature &left, const Creature &right) const;
+    virtual bool getIsEnemy(const Creature &left, const Creature &right) const = 0;
+    virtual bool getIsFriend(const Creature &left, const Creature &right) const = 0;
+    virtual bool getIsNeutral(const Creature &left, const Creature &right) const = 0;
 };
 
 } // namespace game

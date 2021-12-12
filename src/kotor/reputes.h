@@ -17,24 +17,36 @@
 
 #pragma once
 
+#include "../game/reputes.h"
+
 namespace reone {
 
-namespace audio {
+namespace resource {
 
-class AudioStream;
+class TwoDas;
 
 }
 
-namespace game {
+namespace kotor {
 
-class IGUISounds : boost::noncopyable {
+class Reputes : public game::IReputes {
 public:
-    virtual ~IGUISounds() = default;
+    Reputes(resource::TwoDas &twoDas) :
+        _twoDas(twoDas) {
+    }
 
-    virtual std::shared_ptr<audio::AudioStream> getOnClick() const = 0;
-    virtual std::shared_ptr<audio::AudioStream> getOnEnter() const = 0;
+    void init();
+
+    bool getIsEnemy(const game::Creature &left, const game::Creature &right) const override;
+    bool getIsFriend(const game::Creature &left, const game::Creature &right) const override;
+    bool getIsNeutral(const game::Creature &left, const game::Creature &right) const override;
+
+private:
+    resource::TwoDas &_twoDas;
+
+    int getRepute(const game::Creature &left, const game::Creature &right) const;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

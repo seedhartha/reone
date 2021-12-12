@@ -17,24 +17,43 @@
 
 #pragma once
 
+#include "../game/surface.h"
+#include "../game/surfaces.h"
+
 namespace reone {
 
-namespace audio {
+namespace resource {
 
-class AudioStream;
+class TwoDas;
 
 }
 
-namespace game {
+namespace kotor {
 
-class IGUISounds : boost::noncopyable {
+class Surfaces : public game::ISurfaces {
 public:
-    virtual ~IGUISounds() = default;
+    Surfaces(resource::TwoDas &twoDas) :
+        _twoDas(twoDas) {
+    }
 
-    virtual std::shared_ptr<audio::AudioStream> getOnClick() const = 0;
-    virtual std::shared_ptr<audio::AudioStream> getOnEnter() const = 0;
+    void init();
+
+    bool isWalkable(int index) const override;
+
+    const game::Surface &getSurface(int index) const override;
+
+    std::set<uint32_t> getGrassSurfaces() const override;
+    std::set<uint32_t> getWalkableSurfaces() const override;
+    std::set<uint32_t> getWalkcheckSurfaces() const override;
+
+private:
+    resource::TwoDas &_twoDas;
+
+    std::vector<game::Surface> _surfaces;
+
+    inline std::set<uint32_t> getSurfaceIndices(const std::function<bool(const game::Surface &)> &pred) const;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

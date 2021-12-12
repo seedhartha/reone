@@ -17,51 +17,48 @@
 
 #pragma once
 
-#include "../../game/d20/skill.h"
-#include "../../game/d20/skills.h"
+#include "../../game/gui/sounds.h"
 
 namespace reone {
 
 namespace resource {
 
-class Strings;
+class TwoDA;
 class TwoDas;
 
 } // namespace resource
 
-namespace graphics {
+namespace audio {
 
-class Textures;
+class AudioFiles;
 
 }
 
 namespace kotor {
 
-class Skills : public game::ISkills {
+class GUISounds : public game::IGUISounds {
 public:
-    Skills(
-        graphics::Textures &textures,
-        resource::Strings &strings,
-        resource::TwoDas &twoDas) :
-        _textures(textures),
-        _strings(strings),
+    GUISounds(audio::AudioFiles &audioFiles, resource::TwoDas &twoDas) :
+        _audioFiles(audioFiles),
         _twoDas(twoDas) {
     }
 
-    void init();
+    ~GUISounds();
 
-    std::shared_ptr<game::Skill> get(game::SkillType type) const override;
+    void init();
+    void deinit();
+
+    std::shared_ptr<audio::AudioStream> getOnClick() const { return _onClick; }
+    std::shared_ptr<audio::AudioStream> getOnEnter() const { return _onEnter; }
 
 private:
-    std::unordered_map<game::SkillType, std::shared_ptr<game::Skill>> _skills;
-
-    // Services
-
-    graphics::Textures &_textures;
-    resource::Strings &_strings;
+    audio::AudioFiles &_audioFiles;
     resource::TwoDas &_twoDas;
 
-    // END Services
+    std::shared_ptr<audio::AudioStream> _onClick;
+    std::shared_ptr<audio::AudioStream> _onEnter;
+
+    void loadSound(const resource::TwoDA &twoDa, const std::string &label, std::shared_ptr<audio::AudioStream> &sound);
 };
 
 } // namespace kotor

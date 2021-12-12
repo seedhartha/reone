@@ -17,24 +17,41 @@
 
 #pragma once
 
+#include "../game/footstepsounds.h"
+
 namespace reone {
 
-namespace audio {
+namespace resource {
 
-class AudioStream;
+class TwoDas;
 
 }
 
-namespace game {
+namespace audio {
 
-class IGUISounds : boost::noncopyable {
+class AudioFiles;
+
+}
+
+namespace kotor {
+
+class FootstepSounds : public game::IFootstepSounds {
 public:
-    virtual ~IGUISounds() = default;
+    FootstepSounds(
+        audio::AudioFiles &audioFiles,
+        resource::TwoDas &twoDas) :
+        IFootstepSounds(std::bind(&FootstepSounds::doGet, this, std::placeholders::_1)),
+        _audioFiles(audioFiles),
+        _twoDas(twoDas) {
+    }
 
-    virtual std::shared_ptr<audio::AudioStream> getOnClick() const = 0;
-    virtual std::shared_ptr<audio::AudioStream> getOnEnter() const = 0;
+    std::shared_ptr<game::FootstepTypeSounds> doGet(uint32_t type);
+
+private:
+    audio::AudioFiles &_audioFiles;
+    resource::TwoDas &_twoDas;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

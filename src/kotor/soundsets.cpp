@@ -19,19 +19,19 @@
 
 #include "../../audio/files.h"
 #include "../../common/streamutil.h"
+#include "../../game/format/ssfreader.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
-
-#include "format/ssfreader.h"
 
 using namespace std;
 
 using namespace reone::audio;
+using namespace reone::game;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
     auto data = _resources.get(resRef, ResourceType::Ssf);
@@ -55,6 +55,6 @@ shared_ptr<SoundSet> SoundSets::doGet(string resRef) {
     return move(result);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone
