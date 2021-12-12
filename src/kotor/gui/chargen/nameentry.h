@@ -19,8 +19,7 @@
 
 #include "../../../gui/textinput.h"
 
-#include "../../../game/format/ltrreader.h"
-
+#include "../../format/ltrreader.h"
 #include "../../gui.h"
 
 namespace reone {
@@ -57,12 +56,12 @@ private:
 
     CharacterGeneration &_charGen;
     gui::TextInput _input;
-    game::LtrReader _maleLtr;
-    game::LtrReader _femaleLtr;
-    game::LtrReader _lastNameLtr;
+    LtrReader _maleLtr;
+    LtrReader _femaleLtr;
+    LtrReader _lastNameLtr;
 
     void bindControls();
-    void loadLtrFile(const std::string &resRef, game::LtrReader &ltr);
+    void loadLtrFile(const std::string &resRef, LtrReader &ltr);
 
     std::string getRandomName() const;
 };

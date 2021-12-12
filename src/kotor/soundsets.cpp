@@ -19,9 +19,10 @@
 
 #include "../../audio/files.h"
 #include "../../common/streamutil.h"
-#include "../../game/format/ssfreader.h"
 #include "../../resource/resources.h"
 #include "../../resource/strings.h"
+
+#include "format/ssfreader.h"
 
 using namespace std;
 

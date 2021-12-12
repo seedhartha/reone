@@ -15,27 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ssfreader.h"
-
-using namespace std;
-
-using namespace reone::resource;
+#pragma once
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
-SsfReader::SsfReader() :
-    BinaryReader(8, "SSF V1.1") {
-}
+class SsfWriter {
+public:
+    SsfWriter(std::vector<uint32_t> soundSet) :
+        _soundSet(std::move(soundSet)) {
+    }
 
-void SsfReader::doLoad() {
-    uint32_t tableOffset = readUint32();
-    int entryCount = static_cast<int>((_size - tableOffset) / 4);
-    seek(tableOffset);
-    _soundSet = readUint32Array(entryCount);
-}
+    void save(const boost::filesystem::path &path);
 
-} // namespace game
+private:
+    std::vector<uint32_t> _soundSet;
+};
+
+} // namespace kotor
 
 } // namespace reone

@@ -15,24 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "ssfwriter.h"
+
+#include "../../common/streamwriter.h"
+
+using namespace std;
+
+namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
-class SsfWriter {
-public:
-    SsfWriter(std::vector<uint32_t> soundSet) :
-        _soundSet(std::move(soundSet)) {
+void SsfWriter::save(const fs::path &path) {
+    auto stream = make_shared<fs::ofstream>(path);
+    StreamWriter writer(stream);
+
+    writer.putString("SSF V1.1");
+    writer.putUint32(12); // offset to entries
+
+    for (auto val : _soundSet) {
+        writer.putUint32(val);
     }
+}
 
-    void save(const boost::filesystem::path &path);
-
-private:
-    std::vector<uint32_t> _soundSet;
-};
-
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

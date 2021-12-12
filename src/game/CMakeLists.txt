@@ -182,10 +182,7 @@ set(GAME_HEADERS
     effect/whirlwind.h
     event.h
     footstepsounds.h
-    format/ltrreader.h
     format/lytreader.h
-    format/ssfreader.h
-    format/ssfwriter.h
     format/visreader.h
     game.h
     gui/console.h
@@ -382,10 +379,7 @@ set(GAME_SOURCES
     effect/visual.cpp
     effect/vpregenmodifier.cpp
     effect/whirlwind.cpp
-    format/ltrreader.cpp
     format/lytreader.cpp
-    format/ssfreader.cpp
-    format/ssfwriter.cpp
     format/visreader.cpp
     game.cpp
     gui/console.cpp
