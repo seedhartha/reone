@@ -418,7 +418,7 @@ void HUD::drawMinimap() {
     bounds[3] = static_cast<float>(extent.height);
 
     shared_ptr<Area> area(_game.module()->area());
-    _game.map().draw(Map::Mode::Minimap, bounds);
+    _game.map().draw(IMap::Mode::Minimap, bounds);
 }
 
 void HUD::drawHealth(int memberIndex) {

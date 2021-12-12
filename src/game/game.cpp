@@ -81,10 +81,6 @@ void Game::init() {
         scene.second->setWalkcheckSurfaces(walkcheckSurfaces);
     }
 
-    // GUI
-    _console.init();
-    _profileOverlay.init();
-
     loadModuleNames();
     setCursorType(CursorType::Default);
 }
@@ -132,7 +128,7 @@ void Game::update() {
     }
     updateSceneGraph(dt);
 
-    _profileOverlay.update(dt);
+    _profileOverlay->update(dt);
 }
 
 void Game::drawAll() {
@@ -146,7 +142,7 @@ void Game::drawAll() {
         _services.window.drawCursor();
     }
 
-    _profileOverlay.draw();
+    _profileOverlay->draw();
     _services.window.swapBuffers();
 }
 
@@ -341,8 +337,8 @@ void Game::drawGUI() {
         if (_cameraType == CameraType::ThirdPerson) {
             drawHUD();
         }
-        if (_console.isOpen()) {
-            _console.draw();
+        if (_console->isOpen()) {
+            _console->draw();
         }
         break;
 
@@ -464,7 +460,7 @@ void Game::updateSceneGraph(float dt) {
 }
 
 bool Game::handle(const SDL_Event &event) {
-    if (_profileOverlay.handle(event))
+    if (_profileOverlay->handle(event))
         return true;
 
     if (!_video) {
@@ -474,7 +470,7 @@ bool Game::handle(const SDL_Event &event) {
         }
         switch (_screen) {
         case GameScreen::InGame: {
-            if (_console.handle(event)) {
+            if (_console->handle(event)) {
                 return true;
             }
             if (_party.handle(event)) {

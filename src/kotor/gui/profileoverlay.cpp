@@ -17,6 +17,7 @@
 
 #include "profileoverlay.h"
 
+#include "../../game/services.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
@@ -24,15 +25,13 @@
 #include "../../graphics/textutil.h"
 #include "../../graphics/window.h"
 
-#include "../services.h"
-
 using namespace std;
 
 using namespace reone::graphics;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr int kFrameWidth = 125;
 static constexpr char kFontResRef[] = "fnt_console";
@@ -132,6 +131,6 @@ void ProfileOverlay::drawText() {
     }
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

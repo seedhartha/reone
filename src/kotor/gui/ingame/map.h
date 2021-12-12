@@ -30,7 +30,6 @@ class Label;
 
 namespace game {
 
-class Map;
 class Waypoint;
 
 } // namespace game

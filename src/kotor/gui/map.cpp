@@ -18,6 +18,8 @@
 #include "map.h"
 
 #include "../../common/logutil.h"
+#include "../../game/game.h"
+#include "../../game/services.h"
 #include "../../graphics/context.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/shaders.h"
@@ -25,17 +27,15 @@
 #include "../../graphics/window.h"
 #include "../../resource/gffstruct.h"
 
-#include "../game.h"
-#include "../services.h"
-
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static constexpr int kArrowSize = 32;
 static constexpr int kMapNoteSize = 16;
@@ -235,6 +235,6 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     _services.meshes.quad().draw();
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone
