@@ -30,15 +30,16 @@
 #include "../../../../game/object/spatial.h"
 #include "../../../../game/party.h"
 #include "../../../../game/reputes.h"
-#include "../../../../game/script/routine/argutil.h"
-#include "../../../../game/script/routine/context.h"
-#include "../../../../game/script/routine/objectutil.h"
 #include "../../../../game/script/runner.h"
 #include "../../../../game/services.h"
 #include "../../../../resource/strings.h"
 #include "../../../../script/exception/argument.h"
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/executioncontext.h"
+
+#include "../argutil.h"
+#include "../context.h"
+#include "../objectutil.h"
 
 using namespace std;
 

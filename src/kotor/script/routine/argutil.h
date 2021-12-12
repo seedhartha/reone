@@ -30,8 +30,6 @@ struct ExecutionContext;
 
 namespace game {
 
-struct RoutineContext;
-
 class Door;
 class Creature;
 class Effect;
@@ -42,6 +40,12 @@ class Object;
 class Sound;
 class SpatialObject;
 class Talent;
+
+} // namespace game
+
+namespace kotor {
+
+struct RoutineContext;
 
 bool getBool(const std::vector<script::Variable> &args, int index);
 int getInt(const std::vector<script::Variable> &args, int index);
@@ -55,24 +59,24 @@ float getFloatOrElse(const std::vector<script::Variable> &args, int index, float
 std::string getStringOrElse(const std::vector<script::Variable> &args, int index, std::string defValue);
 glm::vec3 getVectorOrElse(const std::vector<script::Variable> &args, int index, glm::vec3 defValue);
 
-std::shared_ptr<Object> getCaller(const RoutineContext &ctx);
-std::shared_ptr<SpatialObject> getCallerAsSpatial(const RoutineContext &ctx);
-std::shared_ptr<Creature> getCallerAsCreature(const RoutineContext &ctx);
-std::shared_ptr<Object> getTriggerrer(const RoutineContext &ctx);
+std::shared_ptr<game::Object> getCaller(const RoutineContext &ctx);
+std::shared_ptr<game::SpatialObject> getCallerAsSpatial(const RoutineContext &ctx);
+std::shared_ptr<game::Creature> getCallerAsCreature(const RoutineContext &ctx);
+std::shared_ptr<game::Object> getTriggerrer(const RoutineContext &ctx);
 
-std::shared_ptr<Object> getObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Object> getObjectOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<SpatialObject> getSpatialObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<SpatialObject> getSpatialObjectOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Creature> getCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Creature> getCreatureOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Door> getDoor(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Item> getItem(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Sound> getSound(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<Effect> getEffect(const std::vector<script::Variable> &args, int index);
-std::shared_ptr<Event> getEvent(const std::vector<script::Variable> &args, int index);
-std::shared_ptr<Location> getLocationEngineType(const std::vector<script::Variable> &args, int index);
-std::shared_ptr<Talent> getTalent(const std::vector<script::Variable> &args, int index);
+std::shared_ptr<game::Object> getObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::Object> getObjectOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::SpatialObject> getSpatialObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::SpatialObject> getSpatialObjectOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::Creature> getCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::Creature> getCreatureOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::Door> getDoor(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::Item> getItem(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::Sound> getSound(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::Effect> getEffect(const std::vector<script::Variable> &args, int index);
+std::shared_ptr<game::Event> getEvent(const std::vector<script::Variable> &args, int index);
+std::shared_ptr<game::Location> getLocationEngineType(const std::vector<script::Variable> &args, int index);
+std::shared_ptr<game::Talent> getTalent(const std::vector<script::Variable> &args, int index);
 std::shared_ptr<script::ExecutionContext> getAction(const std::vector<script::Variable> &args, int index);
 
 template <class T>
@@ -88,6 +92,6 @@ inline T getEnumOrElse(const std::vector<script::Variable> &args, int index, T d
     return isOutOfRange(args, index) ? std::move(defValue) : static_cast<T>(args[index].intValue);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

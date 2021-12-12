@@ -25,9 +25,9 @@ namespace script {
 
 struct Instruction;
 
-class IRoutineProvider;
+class IRoutines;
 
-std::string describeInstruction(const Instruction &ins, const IRoutineProvider &routines);
+std::string describeInstruction(const Instruction &ins, const IRoutines &routines);
 
 const std::string &describeInstructionType(InstructionType type);
 InstructionType parseInstructionType(const std::string &desc);

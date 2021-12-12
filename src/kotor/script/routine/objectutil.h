@@ -15,23 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "../../../game/object.h"
+#include "../../../script/types.h"
 
 namespace reone {
 
-namespace script {
+namespace kotor {
 
-class Routine;
+inline uint32_t getObjectIdOrInvalid(const std::shared_ptr<game::Object> &object) {
+    return object ? object->id() : script::kObjectInvalid;
+}
 
-class IRoutineProvider {
-public:
-    virtual ~IRoutineProvider() {
-    }
-
-    virtual int getIndexByName(const std::string &name) const = 0;
-    virtual const Routine &get(int index) const = 0;
-};
-
-} // namespace script
+} // namespace kotor
 
 } // namespace reone

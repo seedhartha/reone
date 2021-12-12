@@ -15,18 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "../../../script/types.h"
-
-#include "../../object.h"
+#pragma once
 
 namespace reone {
 
-namespace game {
+namespace script {
 
-inline uint32_t getObjectIdOrInvalid(const std::shared_ptr<Object> &object) {
-    return object ? object->id() : script::kObjectInvalid;
-}
+class Routine;
 
-} // namespace game
+class IRoutines : boost::noncopyable {
+public:
+    virtual ~IRoutines() {
+    }
+
+    virtual const Routine &get(int index) const = 0;
+};
+
+} // namespace script
 
 } // namespace reone

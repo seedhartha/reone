@@ -85,7 +85,6 @@ void Game::init() {
     _console.init();
     _profileOverlay.init();
 
-    initScriptRoutines();
     loadModuleNames();
     setCursorType(CursorType::Default);
 }

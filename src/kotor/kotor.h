@@ -49,9 +49,16 @@ public:
     KotOR(
         boost::filesystem::path path,
         game::Options options,
-        game::Services &services);
+        game::Services &services) :
+        Game(
+            std::move(path),
+            std::move(options),
+            services) {
+    }
 
     void initResourceProviders() override;
+
+    void init() override;
 
     void openMainMenu() override;
     void openSaveLoad(game::SaveLoadMode mode) override;
@@ -90,7 +97,6 @@ protected:
 
     void start() override;
 
-    void initScriptRoutines() override;
     void loadModuleNames() override;
     void loadModuleResources(const std::string &moduleName) override;
 

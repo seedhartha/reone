@@ -25,9 +25,11 @@
 #include "../../../../game/action/factory.h"
 #include "../../../../game/game.h"
 #include "../../../../game/object/creature.h"
-#include "../../../../game/script/routine/argutil.h"
-#include "../../../../game/script/routine/context.h"
+
 #include "../../../../script/exception/argument.h"
+
+#include "../argutil.h"
+#include "../context.h"
 
 using namespace std;
 

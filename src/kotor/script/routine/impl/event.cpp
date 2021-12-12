@@ -24,11 +24,12 @@
 #include "../../../../common/logutil.h"
 #include "../../../../game/event.h"
 #include "../../../../game/game.h"
-#include "../../../../game/script/routine/argutil.h"
-#include "../../../../game/script/routine/context.h"
 #include "../../../../game/script/runner.h"
 #include "../../../../game/services.h"
 #include "../../../../script/exception/notimpl.h"
+
+#include "../argutil.h"
+#include "../context.h"
 
 using namespace std;
 

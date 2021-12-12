@@ -21,7 +21,7 @@
 
 #include "../../common/collectionutil.h"
 #include "../../common/exception/validation.h"
-#include "../../game/script/routine/routines.h"
+#include "../../kotor/script/routines.h"
 #include "../../script/format/ncsreader.h"
 #include "../../script/format/ncswriter.h"
 #include "../../script/instrutil.h"
@@ -32,6 +32,7 @@
 using namespace std;
 
 using namespace reone::game;
+using namespace reone::kotor;
 using namespace reone::resource;
 using namespace reone::script;
 
@@ -39,48 +40,17 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace kotor {
-
-extern void fillScriptRoutinesKotOR(game::IRoutines &routines);
-extern void fillScriptRoutinesTSL(game::IRoutines &routines);
-
-} // namespace kotor
-
-class StubRoutines : public IRoutines {
-public:
-    void add(
-        string name,
-        VariableType retType,
-        vector<VariableType> argTypes,
-        Variable (*fn)(const vector<Variable> &args, const RoutineContext &ctx)) override {
-
-        Routine routine(
-            move(name),
-            retType,
-            move(argTypes),
-            [](auto &args, auto &ctx) { return Variable::ofNull(); });
-
-        _routines.push_back(move(routine));
+static void initRoutines(GameID gameId, Routines &routines) {
+    if (gameId == GameID::TSL) {
+        routines.initForTSL();
+    } else {
+        routines.initForKotOR();
     }
-
-    int getIndexByName(const std::string &name) const override {
-        for (size_t i = 0; i < _routines.size(); ++i) {
-            if (_routines[i].name() == name) {
-                return static_cast<int>(i);
-            }
-        }
-        return -1;
-    }
-
-    const Routine &get(int index) const override { return _routines[index]; }
-
-private:
-    vector<Routine> _routines;
-};
+}
 
 class PcodeReader {
 public:
-    PcodeReader(fs::path path, IRoutines &routines) :
+    PcodeReader(fs::path path, Routines &routines) :
         _path(move(path)),
         _routines(routines) {
     }
@@ -130,7 +100,7 @@ public:
 
 private:
     fs::path _path;
-    IRoutines &_routines;
+    Routines &_routines;
 
     shared_ptr<ScriptProgram> _program;
     map<string, uint32_t> _addrByLabel;
@@ -302,7 +272,7 @@ private:
 
 class PcodeWriter {
 public:
-    PcodeWriter(ScriptProgram &program, IRoutines &routines) :
+    PcodeWriter(ScriptProgram &program, Routines &routines) :
         _program(program),
         _routines(routines) {
     }
@@ -334,7 +304,7 @@ public:
 
 private:
     ScriptProgram &_program;
-    IRoutines &_routines;
+    Routines &_routines;
 
     void writeInstruction(const Instruction &ins, fs::ofstream &pcode, const set<uint32_t> &jumpOffsets) {
         if (jumpOffsets.count(ins.offset) > 0) {
@@ -410,8 +380,8 @@ void NcsTool::invoke(Operation operation, const fs::path &target, const fs::path
 }
 
 void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
-    StubRoutines routines;
-    fillRoutines(routines);
+    Routines routines(*(Game *)nullptr, *(Services *)nullptr);
+    initRoutines(_gameId, routines);
 
     NcsReader ncs("");
     ncs.load(path);
@@ -424,8 +394,8 @@ void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
 }
 
 void NcsTool::toNCS(const fs::path &path, const fs::path &destPath) {
-    StubRoutines routines;
-    fillRoutines(routines);
+    Routines routines(*(Game *)nullptr, *(Services *)nullptr);
+    initRoutines(_gameId, routines);
 
     PcodeReader pcode(path, routines);
     pcode.load();
@@ -443,14 +413,6 @@ bool NcsTool::supports(Operation operation, const fs::path &target) const {
     return !fs::is_directory(target) &&
            ((target.extension() == ".ncs" && operation == Operation::ToPCODE) ||
             (target.extension() == ".pcode" && operation == Operation::ToNCS));
-}
-
-void NcsTool::fillRoutines(IRoutines &routines) {
-    if (_gameId == GameID::TSL) {
-        kotor::fillScriptRoutinesTSL(routines);
-    } else {
-        kotor::fillScriptRoutinesKotOR(routines);
-    }
 }
 
 } // namespace reone

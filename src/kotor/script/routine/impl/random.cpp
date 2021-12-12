@@ -22,9 +22,10 @@
 #include "../declarations.h"
 
 #include "../../../../common/randomutil.h"
-#include "../../../../game/script/routine/argutil.h"
-#include "../../../../game/script/routine/context.h"
 #include "../../../../script/types.h"
+
+#include "../argutil.h"
+#include "../context.h"
 
 using namespace std;
 

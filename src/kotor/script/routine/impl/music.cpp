@@ -22,9 +22,10 @@
 #include "../declarations.h"
 
 #include "../../../../common/logutil.h"
-#include "../../../../game/script/routine/context.h"
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/types.h"
+
+#include "../context.h"
 
 using namespace std;
 

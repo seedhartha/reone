@@ -20,6 +20,7 @@
 #include "../../audio/source.h"
 #include "../../graphics/eventhandler.h"
 #include "../../movie/movie.h"
+#include "../../script/routines.h"
 
 #include "action/factory.h"
 #include "camera.h"
@@ -33,7 +34,6 @@
 #include "object/module.h"
 #include "options.h"
 #include "party.h"
-#include "script/routine/routines.h"
 #include "script/runner.h"
 #include "services.h"
 
@@ -60,8 +60,6 @@ public:
         _combat(*this, services),
         _actionFactory(*this, services),
         _objectFactory(*this, services),
-        _routines(*this, services),
-        _scriptRunner(_routines, services.scripts),
         _console(*this, services),
         _profileOverlay(services),
         _map(*this, services) {
@@ -71,7 +69,7 @@ public:
 
     virtual void initResourceProviders() = 0;
 
-    void init();
+    virtual void init();
 
     /**
      * @return exit code
@@ -93,7 +91,7 @@ public:
     ActionFactory &actionFactory() { return _actionFactory; }
     EffectFactory &effectFactory() { return _effectFactory; }
     ObjectFactory &objectFactory() { return _objectFactory; }
-    ScriptRunner &scriptRunner() { return _scriptRunner; }
+    ScriptRunner &scriptRunner() { return *_scriptRunner; }
     Map &map() { return _map; }
 
     std::shared_ptr<Module> module() const { return _module; }
@@ -190,8 +188,9 @@ protected:
     ActionFactory _actionFactory;
     EffectFactory _effectFactory;
     ObjectFactory _objectFactory;
-    Routines _routines;
-    ScriptRunner _scriptRunner;
+
+    std::unique_ptr<script::IRoutines> _routines;
+    std::unique_ptr<ScriptRunner> _scriptRunner;
 
     // END Services
 
@@ -263,7 +262,6 @@ protected:
     bool handleMouseButtonDown(const SDL_MouseButtonEvent &event);
     bool handleKeyDown(const SDL_KeyboardEvent &event);
 
-    virtual void initScriptRoutines() = 0;
     virtual void onModuleSelected(const std::string &name) = 0;
     virtual void drawHUD() = 0;
 
