@@ -15,27 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "roomvisibilities.h"
 
-#include "../types.h"
+#include "../../common/streamutil.h"
+#include "../../resource/resources.h"
+
+#include "format/visreader.h"
+
+using namespace std;
+
+using namespace reone::game;
+using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
-class VisReader : boost::noncopyable {
-public:
-    void load(const std::shared_ptr<std::istream> &in);
+shared_ptr<RoomVisibility> RoomVisibilities::doGet(string resRef) {
+    auto data = _resources.get(resRef, ResourceType::Vis);
+    if (!data) {
+        return nullptr;
+    }
+    VisReader vis;
+    vis.load(wrap(data));
+    return make_shared<RoomVisibility>(vis.visibility());
+}
 
-    const Visibility &visibility() const { return _visibility; }
-
-private:
-    Visibility _visibility;
-    std::string _roomFrom;
-
-    void processLine(const std::string &line);
-};
-
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

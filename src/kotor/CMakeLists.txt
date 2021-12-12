@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(KOTOR_HEADERS
+    arealayouts.h
     cursors.h
     d20/classes.h
     d20/feats.h
@@ -21,8 +22,10 @@ set(KOTOR_HEADERS
     d20/spells.h
     footstepsounds.h
     format/ltrreader.h
+    format/lytreader.h
     format/ssfreader.h
     format/ssfwriter.h
+    format/visreader.h
     gui.h
     gui/barkbubble.h
     gui/chargen.h
@@ -59,12 +62,14 @@ set(KOTOR_HEADERS
     kotor.h
     portraits.h
     reputes.h
+    roomvisibilities.h
     script/routine/declarations.h
     soundsets.h
     surfaces.h
     tsl.h)
 
 set(KOTOR_SOURCES
+    arealayouts.cpp
     cursors.cpp
     d20/classes.cpp
     d20/feats.cpp
@@ -72,8 +77,10 @@ set(KOTOR_SOURCES
     d20/spells.cpp
     footstepsounds.cpp
     format/ltrreader.cpp
+    format/lytreader.cpp
     format/ssfreader.cpp
     format/ssfwriter.cpp
+    format/visreader.cpp
     gui.cpp
     gui/barkbubble.cpp
     gui/chargen.cpp
@@ -110,6 +117,7 @@ set(KOTOR_SOURCES
     kotor.cpp
     portraits.cpp
     reputes.cpp
+    roomvisibilities.cpp
     script/routine/impl/action.cpp
     script/routine/impl/ambientsound.cpp
     script/routine/impl/convert.cpp

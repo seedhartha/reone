@@ -221,7 +221,7 @@ private:
     Pathfinder _pathfinder;
     std::string _localizedName;
     RoomMap _rooms;
-    Visibility _visibility;
+    RoomVisibility _visibility;
     CameraStyle _camStyleDefault;
     CameraStyle _camStyleCombat;
     std::string _music;
@@ -288,10 +288,10 @@ private:
     void add(const std::shared_ptr<SpatialObject> &object);
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
-    void updateVisibility();
+    void updateRoomVisibility();
     void updateHeartbeat(float dt);
 
-    void updateRoomVisibility();
+    void updateRoomRoomVisibility();
     void doUpdatePerception();
     void updateObjectSelection();
 
@@ -302,7 +302,7 @@ private:
      * room B, but room B is not visible from room A. This function makes room
      * relations symmetric.
      */
-    Visibility fixVisibility(const Visibility &visiblity);
+    RoomVisibility fixRoomVisibility(const RoomVisibility &visiblity);
 
     void printDebugInfo(const SpatialObject &object);
     void determineObjectRoom(SpatialObject &object);

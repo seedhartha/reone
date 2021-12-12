@@ -66,19 +66,22 @@ class Scripts;
 
 namespace game {
 
-class IFootstepSounds;
-class IGUISounds;
+class IAreaLayouts;
 class IClasses;
 class ICursors;
 class IFeats;
-class ISkills;
-class ISpells;
+class IFootstepSounds;
+class IGUISounds;
 class IPortraits;
 class IReputes;
+class IRoomVisibilities;
+class ISkills;
 class ISoundSets;
+class ISpells;
 class ISurfaces;
 
 struct Services {
+    IAreaLayouts &areaLayouts;
     IClasses &classes;
     ICursors &cursors;
     IFeats &feats;
@@ -86,6 +89,7 @@ struct Services {
     IGUISounds &guiSounds;
     IPortraits &portraits;
     IReputes &reputes;
+    IRoomVisibilities &roomVisibilities;
     ISkills &skills;
     ISoundSets &soundSets;
     ISpells &spells;
@@ -113,6 +117,7 @@ struct Services {
     resource::TwoDas &twoDas;
 
     Services(
+        IAreaLayouts &areaLayouts,
         IClasses &classes,
         ICursors &cursors,
         IFeats &feats,
@@ -120,6 +125,7 @@ struct Services {
         IGUISounds &guiSounds,
         IPortraits &portraits,
         IReputes &reputes,
+        IRoomVisibilities &roomVisibilities,
         ISkills &skills,
         ISoundSets &soundSets,
         ISpells &spells,
@@ -144,6 +150,7 @@ struct Services {
         resource::Resources &resources,
         resource::Strings &strings,
         resource::TwoDas &twoDas) :
+        areaLayouts(areaLayouts),
         classes(classes),
         cursors(cursors),
         feats(feats),
@@ -151,6 +158,7 @@ struct Services {
         guiSounds(guiSounds),
         portraits(portraits),
         reputes(reputes),
+        roomVisibilities(roomVisibilities),
         skills(skills),
         soundSets(soundSets),
         spells(spells),

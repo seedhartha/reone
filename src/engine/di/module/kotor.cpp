@@ -35,6 +35,7 @@ using namespace reone::kotor;
 namespace reone {
 
 void KotorModule::init() {
+    _areaLayouts = make_unique<AreaLayouts>(_resource.resources());
     _classes = make_unique<Classes>(_resource.strings(), _resource.twoDas());
     _cursors = make_unique<Cursors>(_graphics.context(), _graphics.meshes(), _graphics.shaders(), _graphics.window(), _resource.resources());
     _feats = make_unique<Feats>(_graphics.textures(), _resource.strings(), _resource.twoDas());
@@ -42,12 +43,14 @@ void KotorModule::init() {
     _guiSounds = make_unique<GUISounds>(_audio.audioFiles(), _resource.twoDas());
     _portraits = make_unique<Portraits>(_graphics.textures(), _resource.twoDas());
     _reputes = make_unique<Reputes>(_resource.twoDas());
+    _roomVisibilities = make_unique<RoomVisibilities>(_resource.resources());
     _skills = make_unique<Skills>(_graphics.textures(), _resource.strings(), _resource.twoDas());
     _soundSets = make_unique<SoundSets>(_audio.audioFiles(), _resource.resources(), _resource.strings());
     _spells = make_unique<Spells>(_graphics.textures(), _resource.strings(), _resource.twoDas());
     _surfaces = make_unique<Surfaces>(_resource.twoDas());
 
     _services = make_unique<Services>(
+        *_areaLayouts,
         *_classes,
         *_cursors,
         *_feats,
@@ -55,6 +58,7 @@ void KotorModule::init() {
         *_guiSounds,
         *_portraits,
         *_reputes,
+        *_roomVisibilities,
         *_skills,
         *_soundSets,
         *_spells,
