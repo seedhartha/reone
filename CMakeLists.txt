@@ -22,7 +22,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 option(BUILD_TOOLS "build tools executable" OFF)
 option(BUILD_LAUNCHER "build launcher executable" OFF)
-option(BUILD_TESTS "build unit tests" OFF)
 
 option(ENABLE_MOVIE "enable movie playback" ON)
 
@@ -31,7 +30,7 @@ option(ENABLE_MOVIE "enable movie playback" ON)
 # Dependencies
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-find_package(Boost REQUIRED COMPONENTS filesystem program_options system OPTIONAL_COMPONENTS regex unit_test_framework)
+find_package(Boost REQUIRED COMPONENTS filesystem program_options system OPTIONAL_COMPONENTS regex)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(MAD REQUIRED)
@@ -89,11 +88,6 @@ endif()
 
 if(BUILD_LAUNCHER)
     add_subdirectory(src/launcher) # reone-launcher executable
-endif()
-
-if(BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(tests) # unit tests
 endif()
 
 ## Installation
