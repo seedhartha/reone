@@ -75,68 +75,116 @@ namespace reone {
 
 namespace kotor {
 
+static constexpr char kKeyFilename[] = "chitin.key";
+static constexpr char kTexturePackDirectoryName[] = "texturepacks";
+static constexpr char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
+static constexpr char kTexturePackFilename[] = "swpc_tex_tpa.erf";
+static constexpr char kMusicDirectoryName[] = "streammusic";
+static constexpr char kSoundsDirectoryName[] = "streamsounds";
+static constexpr char kLipsDirectoryName[] = "lips";
+static constexpr char kOverrideDirectoryName[] = "override";
+
 static constexpr char kPatchFilename[] = "patch.erf";
-static constexpr char kWavesDirectoryName[] = "streamwaves";
-static constexpr char kExeFilename[] = "swkotor.exe";
 static constexpr char kModulesDirectoryName[] = "modules";
+static constexpr char kWavesDirectoryName[] = "streamwaves";
+static constexpr char kVoiceDirectoryName[] = "streamvoice";
+static constexpr char kLocalizationLipFilename[] = "localization";
 
 static constexpr char kBlueprintResRefCarth[] = "p_carth";
 static constexpr char kBlueprintResRefBastila[] = "p_bastilla";
+static constexpr char kBlueprintResRefAtton[] = "p_atton";
+static constexpr char kBlueprintResRefKreia[] = "p_kreia";
+
+static constexpr char kExeFilenameKotor[] = "swkotor.exe";
+static constexpr char kExeFilenameTsl[] = "swkotor2.exe";
 
 static const vector<string> g_nonTransientLipFiles {"global.mod", "localization.mod"};
 
 static bool g_conversationsEnabled = true;
 
 void KotOR::initResourceProviders() {
-    _services.resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
-    _services.resources.indexErfFile(getPathIgnoreCase(_path, kPatchFilename));
+    if (_tsl) {
+        _services.resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
 
-    fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
-    _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
-    _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
+        fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
+        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
+        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
 
-    _services.resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
-    _services.resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
-    _services.resources.indexDirectory(getPathIgnoreCase(_path, kWavesDirectoryName));
+        _services.resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
+        _services.resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
+        _services.resources.indexDirectory(getPathIgnoreCase(_path, kVoiceDirectoryName));
 
-    fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-    for (auto &filename : g_nonTransientLipFiles) {
-        _services.resources.indexErfFile(getPathIgnoreCase(lipsPath, filename));
+        fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
+        _services.resources.indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
+
+        _services.resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
+        _services.resources.indexExeFile(getPathIgnoreCase(_path, kExeFilenameTsl));
+
+    } else {
+        _services.resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
+        _services.resources.indexErfFile(getPathIgnoreCase(_path, kPatchFilename));
+
+        fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
+        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
+        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
+
+        _services.resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
+        _services.resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
+        _services.resources.indexDirectory(getPathIgnoreCase(_path, kWavesDirectoryName));
+
+        fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
+        for (auto &filename : g_nonTransientLipFiles) {
+            _services.resources.indexErfFile(getPathIgnoreCase(lipsPath, filename));
+        }
+
+        _services.resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
+        _services.resources.indexExeFile(getPathIgnoreCase(_path, kExeFilenameKotor));
     }
-
-    _services.resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
-    _services.resources.indexExeFile(getPathIgnoreCase(_path, kExeFilename));
 }
 
 void KotOR::init() {
     Game::init();
 
     auto routines = make_unique<Routines>(*this, _services);
-    routines->initForKotOR();
+    _scriptRunner = make_unique<ScriptRunner>(*routines, _services.scripts);
 
-    _routines = move(routines);
-    _scriptRunner = make_unique<ScriptRunner>(*_routines, _services.scripts);
+    auto map = make_unique<Map>(*this, _services);
+    auto console = make_unique<Console>(*this, _services);
+    auto profileOverlay = make_unique<ProfileOverlay>(_services);
+
+    console->init();
+    profileOverlay->init();
+
+    if (_tsl) {
+        _mainMenuMusicResRef = "mus_sion";
+        _charGenMusicResRef = "mus_main";
+        _charGenLoadScreenResRef = "load_default";
+
+        _guiColorBase = glm::vec3(0.192157f, 0.768627f, 0.647059f);
+        _guiColorHilight = glm::vec3(0.768627f, 0.768627f, 0.686275f);
+        _guiColorDisabled = glm::vec3(0.513725f, 0.513725f, 0.415686f);
+
+        routines->initForTSL();
+        map->setArrowResRef("mm_barrow_p");
+
+    } else {
+        _mainMenuMusicResRef = "mus_theme_cult";
+        _charGenMusicResRef = "mus_theme_rep";
+        _charGenLoadScreenResRef = "load_chargen";
+
+        _guiColorBase = glm::vec3(0.0f, 0.639216f, 0.952941f);
+        _guiColorHilight = glm::vec3(0.980392f, 1.0f, 0.0f);
+        _guiColorDisabled = glm::vec3(0.0f, 0.349020f, 0.549020f);
+
+        routines->initForKotOR();
+        map->setArrowResRef("mm_barrow");
+    }
 
     _screen = GameScreen::MainMenu;
 
-    _mainMenuMusicResRef = "mus_theme_cult";
-    _charGenMusicResRef = "mus_theme_rep";
-    _charGenLoadScreenResRef = "load_chargen";
-
-    _guiColorBase = glm::vec3(0.0f, 0.639216f, 0.952941f);
-    _guiColorHilight = glm::vec3(0.980392f, 1.0f, 0.0f);
-    _guiColorDisabled = glm::vec3(0.0f, 0.349020f, 0.549020f);
-
-    auto map = make_unique<Map>(*this, _services);
-    map->setArrowResRef("mm_barrow");
+    _routines = move(routines);
     _map = move(map);
-
-    auto console = make_unique<Console>(*this, _services);
-    console->init();
     _console = move(console);
-
-    auto profileOverlay = make_unique<ProfileOverlay>(_services);
-    profileOverlay->init();
     _profileOverlay = move(profileOverlay);
 }
 
@@ -433,8 +481,13 @@ GUI *KotOR::getScreenGUI() const {
 }
 
 void KotOR::getDefaultPartyMembers(string &member1, string &member2, string &member3) const {
-    member1 = kBlueprintResRefCarth;
-    member2 = kBlueprintResRefBastila;
+    if (_tsl) {
+        member1 = kBlueprintResRefAtton;
+        member2 = kBlueprintResRefKreia;
+    } else {
+        member1 = kBlueprintResRefCarth;
+        member2 = kBlueprintResRefBastila;
+    }
     member3.clear();
 }
 
