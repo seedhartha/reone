@@ -20,6 +20,9 @@ set(KOTOR_HEADERS
     d20/skills.h
     d20/spells.h
     footstepsounds.h
+    format/ltrreader.h
+    format/ssfreader.h
+    format/ssfwriter.h
     gui.h
     gui/barkbubble.h
     gui/chargen.h
@@ -68,6 +71,9 @@ set(KOTOR_SOURCES
     d20/skills.cpp
     d20/spells.cpp
     footstepsounds.cpp
+    format/ltrreader.cpp
+    format/ssfreader.cpp
+    format/ssfwriter.cpp
     gui.cpp
     gui/barkbubble.cpp
     gui/chargen.cpp

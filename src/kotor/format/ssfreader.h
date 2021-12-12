@@ -21,7 +21,7 @@
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 class SsfReader : public resource::BinaryReader {
 public:
@@ -35,6 +35,6 @@ private:
     void doLoad() override;
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

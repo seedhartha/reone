@@ -15,40 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "ssfreader.h"
 
-#include "../../resource/format/binreader.h"
+using namespace std;
+
+using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
-/**
- * Encapsulates the LTR file format, used to generate random names.
- */
-class LtrReader : public resource::BinaryReader {
-public:
-    LtrReader();
+SsfReader::SsfReader() :
+    BinaryReader(8, "SSF V1.1") {
+}
 
-    std::string getRandomName(int maxLength) const;
+void SsfReader::doLoad() {
+    uint32_t tableOffset = readUint32();
+    int entryCount = static_cast<int>((_size - tableOffset) / 4);
+    seek(tableOffset);
+    _soundSet = readUint32Array(entryCount);
+}
 
-private:
-    struct LetterSet {
-        std::vector<float> start;
-        std::vector<float> mid;
-        std::vector<float> end;
-    };
-
-    int _letterCount {0};
-    LetterSet _singleLetters;
-    std::vector<LetterSet> _doubleLetters;
-    std::vector<std::vector<LetterSet>> _trippleLetters;
-
-    void doLoad() override;
-
-    void readLetterSet(LetterSet &set);
-};
-
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

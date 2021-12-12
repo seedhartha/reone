@@ -15,30 +15,40 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ssfwriter.h"
+#pragma once
 
-#include "../../common/streamwriter.h"
-
-using namespace std;
-
-namespace fs = boost::filesystem;
+#include "../../resource/format/binreader.h"
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
-void SsfWriter::save(const fs::path &path) {
-    auto stream = make_shared<fs::ofstream>(path);
-    StreamWriter writer(stream);
+/**
+ * Encapsulates the LTR file format, used to generate random names.
+ */
+class LtrReader : public resource::BinaryReader {
+public:
+    LtrReader();
 
-    writer.putString("SSF V1.1");
-    writer.putUint32(12); // offset to entries
+    std::string getRandomName(int maxLength) const;
 
-    for (auto val : _soundSet) {
-        writer.putUint32(val);
-    }
-}
+private:
+    struct LetterSet {
+        std::vector<float> start;
+        std::vector<float> mid;
+        std::vector<float> end;
+    };
 
-} // namespace game
+    int _letterCount {0};
+    LetterSet _singleLetters;
+    std::vector<LetterSet> _doubleLetters;
+    std::vector<std::vector<LetterSet>> _trippleLetters;
+
+    void doLoad() override;
+
+    void readLetterSet(LetterSet &set);
+};
+
+} // namespace kotor
 
 } // namespace reone

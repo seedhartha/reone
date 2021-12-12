@@ -25,7 +25,7 @@ using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 static const vector<char> g_letters {
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
@@ -147,6 +147,6 @@ string LtrReader::getRandomName(int maxLength) const {
     return move(name);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone
