@@ -35,25 +35,18 @@ namespace reone {
 
 namespace kotor {
 
-constexpr char kKeyFilename[] = "chitin.key";
-constexpr char kTexturePackDirectoryName[] = "texturepacks";
-constexpr char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
-constexpr char kTexturePackFilename[] = "swpc_tex_tpa.erf";
-constexpr char kMusicDirectoryName[] = "streammusic";
-constexpr char kSoundsDirectoryName[] = "streamsounds";
-constexpr char kLipsDirectoryName[] = "lips";
-constexpr char kOverrideDirectoryName[] = "override";
-
 class KotOR : public game::Game {
 public:
     KotOR(
+        bool tsl,
         boost::filesystem::path path,
         game::Options options,
         game::Services &services) :
         Game(
             std::move(path),
             std::move(options),
-            services) {
+            services),
+        _tsl(tsl) {
     }
 
     void initResourceProviders() override;
@@ -74,11 +67,13 @@ public:
     void resumeConversation() override;
     void pauseConversation() override;
 
-    virtual bool isTSL() const { return false; }
+    bool isTSL() const { return _tsl; }
 
     void setBarkBubbleText(std::string text, float durartion);
 
-protected:
+private:
+    bool _tsl;
+
     // GUI
 
     std::unique_ptr<MainMenu> _mainMenu;

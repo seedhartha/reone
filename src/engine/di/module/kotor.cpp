@@ -19,7 +19,6 @@
 
 #include "../../game/types.h"
 #include "../../kotor/kotor.h"
-#include "../../kotor/tsl.h"
 
 #include "audio.h"
 #include "graphics.h"
@@ -131,9 +130,8 @@ void KotorModule::deinit() {
 unique_ptr<Game> KotorModule::newGame() {
     switch (_gameId) {
     case GameID::KotOR:
-        return make_unique<KotOR>(_gamePath, _gameOptions, *_services);
     case GameID::TSL:
-        return make_unique<TSL>(_gamePath, _gameOptions, *_services);
+        return make_unique<KotOR>(_gameId == GameID::TSL, _gamePath, _gameOptions, *_services);
     default:
         throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
     }

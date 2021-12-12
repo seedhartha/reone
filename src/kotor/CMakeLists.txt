@@ -75,8 +75,7 @@ set(KOTOR_HEADERS
     script/routine/objectutil.h
     script/routines.h
     soundsets.h
-    surfaces.h
-    tsl.h)
+    surfaces.h)
 
 set(KOTOR_SOURCES
     arealayouts.cpp
@@ -159,8 +158,7 @@ set(KOTOR_SOURCES
     script/routine/impl/vector.cpp
     script/routines.cpp
     soundsets.cpp
-    surfaces.cpp
-    tsl.cpp)
+    surfaces.cpp)
 
 add_library(kotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES})
 set_target_properties(kotor PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
