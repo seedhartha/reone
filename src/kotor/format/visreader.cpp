@@ -19,9 +19,11 @@
 
 using namespace std;
 
+using namespace reone::game;
+
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 void VisReader::load(const shared_ptr<istream> &in) {
     if (!in) {
@@ -53,6 +55,6 @@ void VisReader::processLine(const string &line) {
     }
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

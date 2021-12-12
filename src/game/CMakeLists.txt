@@ -67,6 +67,8 @@ set(GAME_HEADERS
     action/usetalentonobject.h
     action/wait.h
     animationutil.h
+    arealayout.h
+    arealayouts.h
     camera.h
     camera/animated.h
     camera/camerastyle.h
@@ -182,8 +184,6 @@ set(GAME_HEADERS
     effect/whirlwind.h
     event.h
     footstepsounds.h
-    format/lytreader.h
-    format/visreader.h
     game.h
     gui/console.h
     gui/loadscreen.h
@@ -214,6 +214,7 @@ set(GAME_HEADERS
     portraits.h
     reputes.h
     room.h
+    roomvisibilities.h
     savedgame.h
     script/routine/argutil.h
     script/routine/context.h
@@ -379,8 +380,6 @@ set(GAME_SOURCES
     effect/visual.cpp
     effect/vpregenmodifier.cpp
     effect/whirlwind.cpp
-    format/lytreader.cpp
-    format/visreader.cpp
     game.cpp
     gui/console.cpp
     gui/map.cpp

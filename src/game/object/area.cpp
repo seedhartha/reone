@@ -41,13 +41,13 @@
 #include "../../scene/node/walkmesh.h"
 #include "../../scene/types.h"
 
-#include "../format/lytreader.h"
-#include "../format/visreader.h"
+#include "../arealayouts.h"
 #include "../game.h"
 #include "../location.h"
 #include "../party.h"
 #include "../reputes.h"
 #include "../room.h"
+#include "../roomvisibilities.h"
 #include "../script/runner.h"
 #include "../services.h"
 #include "../surfaces.h"
@@ -300,15 +300,12 @@ void Area::loadEncounters(const GffStruct &git) {
 }
 
 void Area::loadLYT() {
-    shared_ptr<ByteArray> lytData(_services.resources.get(_name, ResourceType::Lyt));
-    if (!lytData) {
+    auto layout = _services.areaLayouts.get(_name);
+    if (!layout) {
         throw ValidationException("Area LYT file not found");
     }
-    LytReader lyt;
-    lyt.load(wrap(lytData));
-
     auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
-    for (auto &lytRoom : lyt.rooms()) {
+    for (auto &lytRoom : layout->rooms) {
         auto model = _services.models.get(lytRoom.name);
         if (!model) {
             continue;
@@ -357,19 +354,15 @@ void Area::loadLYT() {
 }
 
 void Area::loadVIS() {
-    auto visData = _services.resources.get(_name, ResourceType::Vis);
-    if (!visData) {
+    auto visibility = _services.roomVisibilities.get(_name);
+    if (!visibility) {
         return;
     }
-
-    VisReader vis;
-    vis.load(wrap(visData));
-
-    _visibility = fixVisibility(vis.visibility());
+    _visibility = fixRoomVisibility(*visibility);
 }
 
-Visibility Area::fixVisibility(const Visibility &visibility) {
-    Visibility result;
+RoomVisibility Area::fixRoomVisibility(const RoomVisibility &visibility) {
+    RoomVisibility result;
     for (auto &pair : visibility) {
         result.insert(pair);
         result.insert(make_pair(pair.second, pair.first));
@@ -652,7 +645,7 @@ void Area::printDebugInfo(const SpatialObject &object) {
 
 void Area::update(float dt) {
     doDestroyObjects();
-    updateVisibility();
+    updateRoomVisibility();
     updateObjectSelection();
 
     if (!_game.isPaused()) {
@@ -814,13 +807,13 @@ void Area::onPartyLeaderMoved(bool roomChanged) {
         return;
 
     if (roomChanged) {
-        updateRoomVisibility();
+        updateRoomRoomVisibility();
     }
     update3rdPersonCameraTarget();
     selectNearestObject();
 }
 
-void Area::updateRoomVisibility() {
+void Area::updateRoomRoomVisibility() {
     shared_ptr<Creature> partyLeader(_game.party().getLeader());
     Room *leaderRoom = partyLeader ? partyLeader->room() : nullptr;
     bool allVisible = _game.cameraType() != CameraType::ThirdPerson || !leaderRoom;
@@ -867,9 +860,9 @@ void Area::update3rdPersonCameraTarget() {
     _thirdPersonCamera->setTargetPosition(position);
 }
 
-void Area::updateVisibility() {
+void Area::updateRoomVisibility() {
     if (_game.cameraType() != CameraType::ThirdPerson) {
-        updateRoomVisibility();
+        updateRoomRoomVisibility();
     }
 }
 

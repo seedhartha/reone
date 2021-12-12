@@ -19,6 +19,7 @@
 
 #include "../../game/game.h"
 #include "../../game/services.h"
+#include "../../kotor/arealayouts.h"
 #include "../../kotor/cursors.h"
 #include "../../kotor/d20/classes.h"
 #include "../../kotor/d20/feats.h"
@@ -28,6 +29,7 @@
 #include "../../kotor/gui/sounds.h"
 #include "../../kotor/portraits.h"
 #include "../../kotor/reputes.h"
+#include "../../kotor/roomvisibilities.h"
 #include "../../kotor/soundsets.h"
 #include "../../kotor/surfaces.h"
 
@@ -80,6 +82,7 @@ private:
     SceneModule &_scene;
     ScriptModule &_script;
 
+    std::unique_ptr<kotor::AreaLayouts> _areaLayouts;
     std::unique_ptr<kotor::Classes> _classes;
     std::unique_ptr<kotor::Cursors> _cursors;
     std::unique_ptr<kotor::Feats> _feats;
@@ -87,6 +90,7 @@ private:
     std::unique_ptr<kotor::GUISounds> _guiSounds;
     std::unique_ptr<kotor::Portraits> _portraits;
     std::unique_ptr<kotor::Reputes> _reputes;
+    std::unique_ptr<kotor::RoomVisibilities> _roomVisibilities;
     std::unique_ptr<kotor::Skills> _skills;
     std::unique_ptr<kotor::SoundSets> _soundSets;
     std::unique_ptr<kotor::Spells> _spells;

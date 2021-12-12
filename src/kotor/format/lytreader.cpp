@@ -19,11 +19,13 @@
 
 using namespace std;
 
+using namespace reone::game;
+
 namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 void LytReader::load(const shared_ptr<istream> &in) {
     if (!in) {
@@ -70,31 +72,30 @@ void LytReader::processLine(const string &line) {
         } else if (first == "roomcount") {
             _roomCount = stoi(tokens[1]);
             if (_roomCount > 0) {
-                _rooms.reserve(_roomCount);
+                _layout.rooms.reserve(_roomCount);
                 _state = State::Rooms;
             }
         }
         break;
     case State::Rooms:
-        _rooms.push_back(parseRoom(tokens));
-        if (_rooms.size() == _roomCount) {
+        appendRoom(tokens);
+        if (_layout.rooms.size() == _roomCount) {
             _state = State::Layout;
         }
         break;
     }
 }
 
-LytReader::Room LytReader::parseRoom(const vector<string> &tokens) const {
-    Room room;
+void LytReader::appendRoom(const vector<string> &tokens) {
+    AreaLayout::Room room;
     room.name = boost::to_lower_copy(tokens[0]);
     room.position = glm::vec3(
         stof(tokens[1]),
         stof(tokens[2]),
         stof(tokens[3]));
-
-    return move(room);
+    _layout.rooms.push_back(move(room));
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

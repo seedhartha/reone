@@ -21,42 +21,13 @@ namespace reone {
 
 namespace game {
 
-class LytReader : boost::noncopyable {
-public:
+struct AreaLayout {
     struct Room {
         std::string name;
-        glm::vec3 position;
+        glm::vec3 position {0.0f};
     };
 
-    struct DoorHook {
-        std::string room;
-        std::string name;
-        glm::vec3 position;
-    };
-
-    void load(const std::shared_ptr<std::istream> &in);
-    void load(const boost::filesystem::path &path);
-
-    const std::vector<Room> &rooms() const { return _rooms; }
-
-private:
-    enum class State {
-        None,
-        Layout,
-        Rooms,
-        DoorHooks
-    };
-
-    std::shared_ptr<std::istream> _in;
-    boost::filesystem::path _path;
-    State _state {State::None};
-    int _roomCount {0};
-    std::vector<Room> _rooms;
-
-    void load();
-    void processLine(const std::string &line);
-
-    Room parseRoom(const std::vector<std::string> &tokens) const;
+    std::vector<Room> rooms;
 };
 
 } // namespace game
