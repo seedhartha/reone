@@ -71,11 +71,12 @@ set(GAME_HEADERS
     arealayouts.h
     camera.h
     camera/animated.h
-    camera/camerastyle.h
     camera/dialog.h
     camera/firstperson.h
     camera/static.h
     camera/thirdperson.h
+    camerastyle.h
+    camerastyles.h
     character.h
     combat.h
     contextaction.h
@@ -91,6 +92,7 @@ set(GAME_HEADERS
     d20/spell.h
     d20/spells.h
     dialog.h
+    dialogs.h
     effect.h
     effect/abilitydecrease.h
     effect/abilityincrease.h
@@ -209,6 +211,7 @@ set(GAME_HEADERS
     party.h
     path.h
     pathfinder.h
+    paths.h
     player.h
     portrait.h
     portraits.h
@@ -277,7 +280,6 @@ set(GAME_SOURCES
     animationutil.cpp
     camera.cpp
     camera/animated.cpp
-    camera/camerastyle.cpp
     camera/dialog.cpp
     camera/firstperson.cpp
     camera/static.cpp
@@ -285,7 +287,6 @@ set(GAME_SOURCES
     combat.cpp
     d20/attributes.cpp
     d20/class.cpp
-    dialog.cpp
     effect.cpp
     effect/abilitydecrease.cpp
     effect/abilityincrease.cpp
@@ -395,7 +396,6 @@ set(GAME_SOURCES
     object/trigger.cpp
     object/waypoint.cpp
     party.cpp
-    path.cpp
     pathfinder.cpp
     player.cpp
     room.cpp

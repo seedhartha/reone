@@ -15,22 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "camerastyle.h"
+#pragma once
 
-#include "../../resource/2da.h"
-#include "../../resource/resources.h"
+#include "../game/paths.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-void CameraStyle::load(const resource::TwoDA &twoDa, int row) {
-    distance = twoDa.getFloat(row, "distance");
-    pitch = twoDa.getFloat(row, "pitch");
-    viewAngle = twoDa.getFloat(row, "viewangle");
-    height = twoDa.getFloat(row, "height");
-}
+class Gffs;
+class GffStruct;
 
-} // namespace game
+} // namespace resource
+
+namespace kotor {
+
+class Paths : public game::IPaths {
+public:
+    Paths(resource::Gffs &gffs) :
+        IPaths(std::bind(&Paths::doGet, this, std::placeholders::_1)),
+        _gffs(gffs) {
+    }
+
+private:
+    resource::Gffs &_gffs;
+
+    std::shared_ptr<game::Path> doGet(std::string resRef);
+
+    std::unique_ptr<game::Path> loadPath(const resource::GffStruct &pth) const;
+};
+
+} // namespace kotor
 
 } // namespace reone

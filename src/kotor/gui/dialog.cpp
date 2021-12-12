@@ -157,7 +157,7 @@ void DialogGUI::loadStuntParticipants() {
 
     _participantByTag.clear();
 
-    for (auto &stunt : _dialog->stunts()) {
+    for (auto &stunt : _dialog->stunts) {
         shared_ptr<Creature> creature;
         if (stunt.participant == kObjectTagOwner) {
             creature = dynamic_pointer_cast<Creature>(_owner);
@@ -230,7 +230,7 @@ void DialogGUI::loadCurrentSpeaker() {
 void DialogGUI::updateCamera() {
     shared_ptr<Area> area(_game.module()->area());
 
-    if (_dialog->cameraModel().empty()) {
+    if (_dialog->cameraModel.empty()) {
         shared_ptr<Creature> player(_game.party().player());
         glm::vec3 listenerPosition(player ? getTalkPosition(*player) : glm::vec3(0.0f));
         glm::vec3 speakerPosition(_currentSpeaker ? getTalkPosition(*_currentSpeaker) : glm::vec3(0.0f));

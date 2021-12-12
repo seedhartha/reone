@@ -52,6 +52,7 @@
 #include "../game/surfaces.h"
 
 #include "cursors.h"
+#include "dialogs.h"
 #include "gui/loadscreen.h"
 #include "script/routines.h"
 
@@ -371,10 +372,8 @@ void KotOR::startDialog(const shared_ptr<SpatialObject> &owner, const string &re
     setCursorType(CursorType::Default);
     changeScreen(GameScreen::Conversation);
 
-    auto dialog = make_shared<Dialog>(resRef, _services.strings);
-    dialog->load(*dlg);
-
-    bool computerConversation = dialog->conversationType() == ConversationType::Computer;
+    auto dialog = _services.dialogs.get(resRef);
+    bool computerConversation = dialog->conversationType == ConversationType::Computer;
     _conversation = computerConversation ? _computer.get() : static_cast<Conversation *>(_dialog.get());
     _conversation->start(dialog, owner);
 }

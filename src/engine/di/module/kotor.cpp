@@ -36,11 +36,14 @@ namespace reone {
 
 void KotorModule::init() {
     _areaLayouts = make_unique<AreaLayouts>(_resource.resources());
+    _cameraStyles = make_unique<CameraStyles>(_resource.twoDas());
     _classes = make_unique<Classes>(_resource.strings(), _resource.twoDas());
     _cursors = make_unique<Cursors>(_graphics.context(), _graphics.meshes(), _graphics.shaders(), _graphics.window(), _resource.resources());
+    _dialogs = make_unique<Dialogs>(_resource.gffs(), _resource.strings());
     _feats = make_unique<Feats>(_graphics.textures(), _resource.strings(), _resource.twoDas());
     _footstepSounds = make_unique<FootstepSounds>(_audio.audioFiles(), _resource.twoDas());
     _guiSounds = make_unique<GUISounds>(_audio.audioFiles(), _resource.twoDas());
+    _paths = make_unique<Paths>(_resource.gffs());
     _portraits = make_unique<Portraits>(_graphics.textures(), _resource.twoDas());
     _reputes = make_unique<Reputes>(_resource.twoDas());
     _roomVisibilities = make_unique<RoomVisibilities>(_resource.resources());
@@ -51,11 +54,14 @@ void KotorModule::init() {
 
     _services = make_unique<Services>(
         *_areaLayouts,
+        *_cameraStyles,
         *_classes,
         *_cursors,
+        *_dialogs,
         *_feats,
         *_footstepSounds,
         *_guiSounds,
+        *_paths,
         *_portraits,
         *_reputes,
         *_roomVisibilities,
@@ -87,13 +93,14 @@ void KotorModule::init() {
     _game = newGame();
 
     _game->initResourceProviders();
-    _surfaces->init();
+    _cameraStyles->init();
+    _feats->init();
     _guiSounds->init();
+    _portraits->init();
     _reputes->init();
     _skills->init();
-    _feats->init();
     _spells->init();
-    _portraits->init();
+    _surfaces->init();
     _game->init();
 
     _graphics.window().setEventHandler(_game.get());
@@ -102,17 +109,23 @@ void KotorModule::init() {
 void KotorModule::deinit() {
     _game.reset();
     _services.reset();
-    _surfaces.reset();
-    _spells.reset();
-    _soundSets.reset();
-    _skills.reset();
-    _reputes.reset();
-    _portraits.reset();
-    _guiSounds.reset();
-    _footstepSounds.reset();
-    _feats.reset();
-    _cursors.reset();
+
+    _areaLayouts.reset();
+    _cameraStyles.reset();
     _classes.reset();
+    _cursors.reset();
+    _dialogs.reset();
+    _feats.reset();
+    _footstepSounds.reset();
+    _guiSounds.reset();
+    _paths.reset();
+    _portraits.reset();
+    _reputes.reset();
+    _roomVisibilities.reset();
+    _skills.reset();
+    _soundSets.reset();
+    _spells.reset();
+    _surfaces.reset();
 }
 
 unique_ptr<Game> KotorModule::newGame() {

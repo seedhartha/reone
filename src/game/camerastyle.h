@@ -19,21 +19,14 @@
 
 namespace reone {
 
-namespace resource {
-
-class TwoDA;
-
-}
-
 namespace game {
 
 struct CameraStyle {
+    std::string name;
     float distance {0.0f};
     float pitch {0.0f};
     float height {0.0f};
     float viewAngle {0.0f};
-
-    void load(const resource::TwoDA &twoDa, int row);
 };
 
 } // namespace game

@@ -19,8 +19,6 @@
 
 using namespace std;
 
-using namespace reone::resource;
-
 namespace reone {
 
 namespace game {

@@ -42,9 +42,11 @@
 #include "../../scene/types.h"
 
 #include "../arealayouts.h"
+#include "../camerastyles.h"
 #include "../game.h"
 #include "../location.h"
 #include "../party.h"
+#include "../paths.h"
 #include "../reputes.h"
 #include "../room.h"
 #include "../roomvisibilities.h"
@@ -77,7 +79,7 @@ static constexpr float kMaxCollisionDistance = 8.0f;
 static constexpr float kMaxCollisionDistance2 = kMaxCollisionDistance * kMaxCollisionDistance;
 
 static glm::vec3 g_defaultAmbientColor {0.2f};
-static CameraStyle g_defaultCameraStyle {3.2f, 83.0f, 0.45f, 55.0f};
+static CameraStyle g_defaultCameraStyle {"", 3.2f, 83.0f, 0.45f, 55.0f};
 
 static bool g_debugPath = false;
 
@@ -136,19 +138,21 @@ void Area::loadARE(const GffStruct &are) {
 }
 
 void Area::loadCameraStyle(const GffStruct &are) {
-    shared_ptr<TwoDA> cameraStyles(_services.twoDas.get("camerastyle"));
-    if (!cameraStyles) {
+    // Area
+    int areaStyleIdx = are.getInt("CameraStyle");
+    shared_ptr<CameraStyle> areaStyle(_services.cameraStyles.get(areaStyleIdx));
+    if (areaStyle) {
+        _camStyleDefault = *areaStyle;
+    } else {
         _camStyleDefault = g_defaultCameraStyle;
-        _camStyleCombat = g_defaultCameraStyle;
-        return;
     }
 
-    int areaStyleIdx = are.getInt("CameraStyle");
-    _camStyleDefault.load(*cameraStyles, areaStyleIdx);
-
-    int combatStyleIdx = cameraStyles->indexByCellValue("name", "Combat");
-    if (combatStyleIdx != -1) {
-        _camStyleCombat.load(*cameraStyles, combatStyleIdx);
+    // Combat
+    shared_ptr<CameraStyle> combatStyle(_services.cameraStyles.get("Combat"));
+    if (combatStyle) {
+        _camStyleDefault = *combatStyle;
+    } else {
+        _camStyleCombat = g_defaultCameraStyle;
     }
 }
 
@@ -371,20 +375,16 @@ RoomVisibility Area::fixRoomVisibility(const RoomVisibility &visibility) {
 }
 
 void Area::loadPTH() {
-    shared_ptr<GffStruct> pth(_services.gffs.get(_name, ResourceType::Pth));
-    if (!pth) {
+    shared_ptr<Path> path(_services.paths.get(_name));
+    if (!path) {
         return;
     }
-    Path path;
-    path.load(*pth);
-
-    const vector<Path::Point> &points = path.points();
     unordered_map<int, float> pointZ;
 
     auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
 
-    for (size_t i = 0; i < points.size(); ++i) {
-        const Path::Point &point = points[i];
+    for (size_t i = 0; i < path->points.size(); ++i) {
+        const Path::Point &point = path->points[i];
         Collision collision;
         if (!sceneGraph.testElevation(glm::vec2(point.x, point.y), collision)) {
             warn(boost::format("Point %d elevation not found") % i);
@@ -393,7 +393,7 @@ void Area::loadPTH() {
         pointZ.insert(make_pair(static_cast<int>(i), collision.intersection.z));
     }
 
-    _pathfinder.load(points, pointZ);
+    _pathfinder.load(path->points, pointZ);
 }
 
 void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {

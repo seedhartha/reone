@@ -15,31 +15,42 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "path.h"
+#include "paths.h"
+
+#include "../../resource/gffs.h"
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
-void Path::load(const GffStruct &pth) {
+shared_ptr<Path> Paths::doGet(string resRef) {
+    auto pth = _gffs.get(resRef, ResourceType::Pth);
+    if (!pth) {
+        return nullptr;
+    }
+    return loadPath(*pth);
+}
+
+unique_ptr<Path> Paths::loadPath(const GffStruct &pth) const {
+    auto path = make_unique<Path>();
+
     vector<int> connections;
-
     for (auto &connection : pth.getList("Path_Conections")) {
         int destination = connection->getInt("Destination");
         connections.push_back(destination);
     }
-
     for (auto &pointGffs : pth.getList("Path_Points")) {
         int connectionCount = pointGffs->getInt("Conections");
         int firstConnection = pointGffs->getInt("First_Conection");
         float x = pointGffs->getFloat("X");
         float y = pointGffs->getFloat("Y");
 
-        Point point;
+        Path::Point point;
         point.x = x;
         point.y = y;
 
@@ -48,10 +59,12 @@ void Path::load(const GffStruct &pth) {
             int pointIdx = connections[connectionIdx];
             point.adjPoints.push_back(pointIdx);
         }
-        _points.push_back(move(point));
+        path->points.push_back(move(point));
     }
+
+    return move(path);
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone
