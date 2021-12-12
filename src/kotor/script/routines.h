@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -18,32 +17,48 @@
 
 #pragma once
 
-#include "kotor.h"
+#include "../../script/routine.h"
+#include "../../script/routines.h"
 
 namespace reone {
 
+namespace game {
+
+struct Services;
+
+class Game;
+
+} // namespace game
+
 namespace kotor {
 
-class TSL : public KotOR {
+struct RoutineContext;
+
+class Routines : public script::IRoutines {
 public:
-    TSL(
-        boost::filesystem::path path,
-        game::Options options,
-        game::Services &services) :
-        KotOR(
-            std::move(path),
-            std::move(options),
-            services) {
+    Routines(game::Game &game, game::Services &services) :
+        _game(game),
+        _services(services) {
     }
 
-    void initResourceProviders() override;
+    void initForKotOR();
+    void initForTSL();
 
-    void init() override;
+    const script::Routine &get(int index) const override;
 
-    bool isTSL() const override { return true; }
+    int getIndexByName(const std::string &name) const;
 
 private:
-    void getDefaultPartyMembers(std::string &member1, std::string &member2, std::string &member3) const override;
+    game::Game &_game;
+    game::Services &_services;
+
+    std::vector<script::Routine> _routines;
+
+    void add(
+        std::string name,
+        script::VariableType retType,
+        std::vector<script::VariableType> argTypes,
+        script::Variable (*fn)(const std::vector<script::Variable> &args, const RoutineContext &ctx));
 };
 
 } // namespace kotor

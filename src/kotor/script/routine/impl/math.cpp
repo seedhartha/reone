@@ -21,8 +21,8 @@
 
 #include "../declarations.h"
 
-#include "../../../../game/script/routine/argutil.h"
-#include "../../../../game/script/routine/objectutil.h"
+#include "../argutil.h"
+#include "../objectutil.h"
 
 using namespace std;
 

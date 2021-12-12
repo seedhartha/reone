@@ -63,7 +63,11 @@ set(KOTOR_HEADERS
     portraits.h
     reputes.h
     roomvisibilities.h
+    script/routine/argutil.h
+    script/routine/context.h
     script/routine/declarations.h
+    script/routine/objectutil.h
+    script/routines.h
     soundsets.h
     surfaces.h
     tsl.h)
@@ -118,6 +122,7 @@ set(KOTOR_SOURCES
     portraits.cpp
     reputes.cpp
     roomvisibilities.cpp
+    script/routine/argutil.cpp
     script/routine/impl/action.cpp
     script/routine/impl/ambientsound.cpp
     script/routine/impl/convert.cpp
@@ -140,6 +145,7 @@ set(KOTOR_SOURCES
     script/routine/impl/talent.cpp
     script/routine/impl/time.cpp
     script/routine/impl/vector.cpp
+    script/routines.cpp
     soundsets.cpp
     surfaces.cpp
     tsl.cpp)

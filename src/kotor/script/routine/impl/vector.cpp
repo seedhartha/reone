@@ -21,9 +21,10 @@
 
 #include "../declarations.h"
 
-#include "../../../../game/script/routine/argutil.h"
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/types.h"
+
+#include "../argutil.h"
 
 using namespace std;
 

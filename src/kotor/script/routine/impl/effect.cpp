@@ -24,12 +24,13 @@
 #include "../../../../game/effect.h"
 #include "../../../../game/effect/factory.h"
 #include "../../../../game/game.h"
-#include "../../../../game/script/routine/argutil.h"
-#include "../../../../game/script/routine/context.h"
 #include "../../../../game/services.h"
 #include "../../../../game/types.h"
 #include "../../../../script/exception/argument.h"
 #include "../../../../script/exception/notimpl.h"
+
+#include "../argutil.h"
+#include "../context.h"
 
 using namespace std;
 

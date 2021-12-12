@@ -21,7 +21,7 @@
 
 #include "program.h"
 #include "routine.h"
-#include "routineprovider.h"
+#include "routines.h"
 
 using namespace std;
 
@@ -131,7 +131,7 @@ static map<string, InstructionType> g_instrTypeByDesc = associate<pair<Instructi
     [](auto &pair) { return pair.second; },
     [](auto &pair) { return pair.first; });
 
-string describeInstruction(const Instruction &ins, const IRoutineProvider &routines) {
+string describeInstruction(const Instruction &ins, const IRoutines &routines) {
     string desc(str(boost::format("%08x %s") % ins.offset % describeInstructionType(ins.type)));
 
     switch (ins.type) {

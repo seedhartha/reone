@@ -23,12 +23,6 @@
 
 namespace reone {
 
-namespace game {
-
-class IRoutines;
-
-}
-
 class NcsTool : public ITool {
 public:
     NcsTool(game::GameID gameId) :
@@ -48,8 +42,6 @@ private:
 
     void toPCODE(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
     void toNCS(const boost::filesystem::path &path, const boost::filesystem::path &destPath);
-
-    void fillRoutines(game::IRoutines &routines);
 };
 
 } // namespace reone

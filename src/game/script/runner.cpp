@@ -19,11 +19,10 @@
 
 #include "../../script/execution.h"
 #include "../../script/executioncontext.h"
+#include "../../script/routines.h"
 #include "../../script/scripts.h"
 
 #include "../game.h"
-
-#include "routine/routines.h"
 
 using namespace std;
 

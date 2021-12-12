@@ -20,24 +20,25 @@
 #include "../../../script/exception/argument.h"
 #include "../../../script/executioncontext.h"
 
-#include "../../effect.h"
-#include "../../event.h"
-#include "../../game.h"
-#include "../../location.h"
-#include "../../object/creature.h"
-#include "../../object/door.h"
-#include "../../object/sound.h"
-#include "../../talent.h"
+#include "../../../game/effect.h"
+#include "../../../game/event.h"
+#include "../../../game/game.h"
+#include "../../../game/location.h"
+#include "../../../game/object/creature.h"
+#include "../../../game/object/door.h"
+#include "../../../game/object/sound.h"
+#include "../../../game/talent.h"
 
 #include "context.h"
 
 using namespace std;
 
+using namespace reone::game;
 using namespace reone::script;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
 bool getBool(const vector<Variable> &args, int index) {
     if (isOutOfRange(args, index)) {
@@ -257,6 +258,6 @@ shared_ptr<ExecutionContext> getAction(const vector<Variable> &args, int index) 
     return args[index].context;
 }
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

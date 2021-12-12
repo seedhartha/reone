@@ -25,7 +25,7 @@ set(SCRIPT_HEADERS
     instrutil.h
     program.h
     routine.h
-    routineprovider.h
+    routines.h
     scripts.h
     types.h
     variable.h)

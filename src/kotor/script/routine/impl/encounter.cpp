@@ -23,7 +23,7 @@
 
 #include "../../../../script/exception/notimpl.h"
 
-#include "../../../../game/script/routine/context.h"
+#include "../context.h"
 
 using namespace std;
 

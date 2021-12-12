@@ -216,10 +216,6 @@ set(GAME_HEADERS
     room.h
     roomvisibilities.h
     savedgame.h
-    script/routine/argutil.h
-    script/routine/context.h
-    script/routine/objectutil.h
-    script/routine/routines.h
     script/runner.h
     services.h
     soundsets.h
@@ -403,7 +399,6 @@ set(GAME_SOURCES
     pathfinder.cpp
     player.cpp
     room.cpp
-    script/routine/argutil.cpp
     script/runner.cpp)
 
 add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES})

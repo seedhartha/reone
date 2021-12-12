@@ -23,7 +23,6 @@
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
 #include "../../game/party.h"
-#include "../../game/script/routine/routines.h"
 #include "../../game/services.h"
 #include "../../graphics/models.h"
 #include "../../gui/control/panel.h"
