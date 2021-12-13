@@ -25,6 +25,7 @@
 #include "../../graphics/options.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/textures.h"
+#include "../../graphics/uniformbuffers.h"
 #include "../../graphics/walkmeshes.h"
 #include "../../graphics/window.h"
 
@@ -51,6 +52,7 @@ public:
     graphics::Models &models() { return *_models; }
     graphics::Shaders &shaders() { return *_shaders; }
     graphics::Textures &textures() { return *_textures; }
+    graphics::UniformBuffers &uniformBuffers() { return *_uniformBuffers; }
     graphics::Walkmeshes &walkmeshes() { return *_walkmeshes; }
     graphics::Window &window() { return *_window; }
 
@@ -65,6 +67,7 @@ private:
     std::unique_ptr<graphics::Models> _models;
     std::unique_ptr<graphics::Shaders> _shaders;
     std::unique_ptr<graphics::Textures> _textures;
+    std::unique_ptr<graphics::UniformBuffers> _uniformBuffers;
     std::unique_ptr<graphics::Walkmeshes> _walkmeshes;
     std::unique_ptr<graphics::Window> _window;
 };
