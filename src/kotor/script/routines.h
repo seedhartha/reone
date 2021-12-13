@@ -36,9 +36,11 @@ struct RoutineContext;
 
 class Routines : public script::IRoutines {
 public:
+    Routines() = default;
+
     Routines(game::Game &game, game::Services &services) :
-        _game(game),
-        _services(services) {
+        _game(&game),
+        _services(&services) {
     }
 
     void initForKotOR();
@@ -49,8 +51,8 @@ public:
     int getIndexByName(const std::string &name) const;
 
 private:
-    game::Game &_game;
-    game::Services &_services;
+    game::Game *_game {nullptr};
+    game::Services *_services {nullptr};
 
     std::vector<script::Routine> _routines;
 
