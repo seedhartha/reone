@@ -18,6 +18,7 @@
 #include "routines.h"
 
 #include "../../common/collectionutil.h"
+#include "../../game/services.h"
 #include "../../script/variable.h"
 
 #include "routine/context.h"
@@ -1755,7 +1756,7 @@ void Routines::add(
         retType,
         move(argTypes),
         [this, fn](auto &args, auto &execution) {
-            RoutineContext ctx(_game, _services, execution);
+            RoutineContext ctx(*_game, *_services, execution);
             return fn(args, std::move(ctx));
         });
 }

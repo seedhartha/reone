@@ -380,7 +380,7 @@ void NcsTool::invoke(Operation operation, const fs::path &target, const fs::path
 }
 
 void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
-    Routines routines(*(Game *)nullptr, *(Services *)nullptr);
+    Routines routines;
     initRoutines(_gameId, routines);
 
     NcsReader ncs("");
@@ -394,7 +394,7 @@ void NcsTool::toPCODE(const fs::path &path, const fs::path &destPath) {
 }
 
 void NcsTool::toNCS(const fs::path &path, const fs::path &destPath) {
-    Routines routines(*(Game *)nullptr, *(Services *)nullptr);
+    Routines routines;
     initRoutines(_gameId, routines);
 
     PcodeReader pcode(path, routines);
