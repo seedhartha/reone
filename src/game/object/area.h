@@ -304,7 +304,6 @@ private:
      */
     Visibility fixVisibility(const Visibility &visiblity);
 
-    void printDebugInfo(const SpatialObject &object);
     void determineObjectRoom(SpatialObject &object);
     void checkTriggersIntersection(const std::shared_ptr<SpatialObject> &triggerrer);
 

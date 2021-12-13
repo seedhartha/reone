@@ -620,27 +620,9 @@ bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
         selectNextObject();
         return true;
 
-    case SDL_SCANCODE_SLASH: {
-        if (_selectedObject) {
-            printDebugInfo(*_selectedObject);
-        }
-        return true;
-    }
-
     default:
         return false;
     }
-}
-
-void Area::printDebugInfo(const SpatialObject &object) {
-    auto model = static_pointer_cast<ModelSceneNode>(object.sceneNode());
-
-    ostringstream ss;
-    ss << boost::format("tag='%s'") % object.tag();
-    ss << boost::format(",pos=[%0.2f,%0.2f,%0.2f]") % object.position().x % object.position().y % object.position().z;
-    ss << boost::format(",model='%s'") % model->model().name();
-
-    debug("Selected object: " + ss.str());
 }
 
 void Area::update(float dt) {
