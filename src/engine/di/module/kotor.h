@@ -32,9 +32,9 @@
 #include "../../kotor/paths.h"
 #include "../../kotor/portraits.h"
 #include "../../kotor/reputes.h"
-#include "../../kotor/roomvisibilities.h"
 #include "../../kotor/soundsets.h"
 #include "../../kotor/surfaces.h"
+#include "../../kotor/visibilities.h"
 
 #include "../../types.h"
 
@@ -96,11 +96,11 @@ private:
     std::unique_ptr<kotor::Paths> _paths;
     std::unique_ptr<kotor::Portraits> _portraits;
     std::unique_ptr<kotor::Reputes> _reputes;
-    std::unique_ptr<kotor::RoomVisibilities> _roomVisibilities;
     std::unique_ptr<kotor::Skills> _skills;
     std::unique_ptr<kotor::SoundSets> _soundSets;
     std::unique_ptr<kotor::Spells> _spells;
     std::unique_ptr<kotor::Surfaces> _surfaces;
+    std::unique_ptr<kotor::Visibilities> _visibilities;
 
     std::unique_ptr<game::Services> _services;
     std::unique_ptr<game::Game> _game;

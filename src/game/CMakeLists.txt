@@ -217,7 +217,6 @@ set(GAME_HEADERS
     portraits.h
     reputes.h
     room.h
-    roomvisibilities.h
     savedgame.h
     script/runner.h
     services.h
@@ -225,7 +224,8 @@ set(GAME_HEADERS
     surface.h
     surfaces.h
     talent.h
-    types.h)
+    types.h
+    visibilities.h)
 
 set(GAME_SOURCES
     action.cpp

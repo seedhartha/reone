@@ -77,11 +77,11 @@ class IGUISounds;
 class IPaths;
 class IPortraits;
 class IReputes;
-class IRoomVisibilities;
 class ISkills;
 class ISoundSets;
 class ISpells;
 class ISurfaces;
+class IVisibilities;
 
 struct Services {
     IAreaLayouts &areaLayouts;
@@ -95,11 +95,11 @@ struct Services {
     IPaths &paths;
     IPortraits &portraits;
     IReputes &reputes;
-    IRoomVisibilities &roomVisibilities;
     ISkills &skills;
     ISoundSets &soundSets;
     ISpells &spells;
     ISurfaces &surfaces;
+    IVisibilities &visibilities;
 
     audio::AudioContext &audioContext;
     audio::AudioFiles &audioFiles;
@@ -134,11 +134,11 @@ struct Services {
         IPaths &paths,
         IPortraits &portraits,
         IReputes &reputes,
-        IRoomVisibilities &roomVisibilities,
         ISkills &skills,
         ISoundSets &soundSets,
         ISpells &spells,
         ISurfaces &surfaces,
+        IVisibilities &visibilities,
         audio::AudioContext &audioContext,
         audio::AudioFiles &audioFiles,
         audio::AudioPlayer &audioPlayer,
@@ -170,11 +170,11 @@ struct Services {
         paths(paths),
         portraits(portraits),
         reputes(reputes),
-        roomVisibilities(roomVisibilities),
         skills(skills),
         soundSets(soundSets),
         spells(spells),
         surfaces(surfaces),
+        visibilities(visibilities),
 
         audioContext(audioContext),
         audioFiles(audioFiles),

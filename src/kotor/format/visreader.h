@@ -27,10 +27,10 @@ class VisReader : boost::noncopyable {
 public:
     void load(const std::shared_ptr<std::istream> &in);
 
-    const game::RoomVisibility &visibility() const { return _visibility; }
+    const game::Visibility &visibility() const { return _visibility; }
 
 private:
-    game::RoomVisibility _visibility;
+    game::Visibility _visibility;
     std::string _roomFrom;
 
     void processLine(const std::string &line);

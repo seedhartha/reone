@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "roomvisibilities.h"
+#include "visibilities.h"
 
 #include "../../common/streamutil.h"
 #include "../../resource/resources.h"
@@ -31,14 +31,14 @@ namespace reone {
 
 namespace kotor {
 
-shared_ptr<RoomVisibility> RoomVisibilities::doGet(string resRef) {
+shared_ptr<Visibility> Visibilities::doGet(string resRef) {
     auto data = _resources.get(resRef, ResourceType::Vis);
     if (!data) {
         return nullptr;
     }
     VisReader vis;
     vis.load(wrap(data));
-    return make_shared<RoomVisibility>(vis.visibility());
+    return make_shared<Visibility>(vis.visibility());
 }
 
 } // namespace kotor

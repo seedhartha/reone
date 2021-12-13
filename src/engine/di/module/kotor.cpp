@@ -45,7 +45,7 @@ void KotorModule::init() {
     _paths = make_unique<Paths>(_resource.gffs());
     _portraits = make_unique<Portraits>(_graphics.textures(), _resource.twoDas());
     _reputes = make_unique<Reputes>(_resource.twoDas());
-    _roomVisibilities = make_unique<RoomVisibilities>(_resource.resources());
+    _visibilities = make_unique<Visibilities>(_resource.resources());
     _skills = make_unique<Skills>(_graphics.textures(), _resource.strings(), _resource.twoDas());
     _soundSets = make_unique<SoundSets>(_audio.audioFiles(), _resource.resources(), _resource.strings());
     _spells = make_unique<Spells>(_graphics.textures(), _resource.strings(), _resource.twoDas());
@@ -63,11 +63,11 @@ void KotorModule::init() {
         *_paths,
         *_portraits,
         *_reputes,
-        *_roomVisibilities,
         *_skills,
         *_soundSets,
         *_spells,
         *_surfaces,
+        *_visibilities,
         _audio.audioContext(),
         _audio.audioFiles(),
         _audio.audioPlayer(),
@@ -120,7 +120,7 @@ void KotorModule::deinit() {
     _paths.reset();
     _portraits.reset();
     _reputes.reset();
-    _roomVisibilities.reset();
+    _visibilities.reset();
     _skills.reset();
     _soundSets.reset();
     _spells.reset();
