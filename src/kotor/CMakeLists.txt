@@ -68,14 +68,14 @@ set(KOTOR_HEADERS
     paths.h
     portraits.h
     reputes.h
-    roomvisibilities.h
     script/routine/argutil.h
     script/routine/context.h
     script/routine/declarations.h
     script/routine/objectutil.h
     script/routines.h
     soundsets.h
-    surfaces.h)
+    surfaces.h
+    visibilities.h)
 
 set(KOTOR_SOURCES
     arealayouts.cpp
@@ -132,7 +132,6 @@ set(KOTOR_SOURCES
     paths.cpp
     portraits.cpp
     reputes.cpp
-    roomvisibilities.cpp
     script/routine/argutil.cpp
     script/routine/impl/action.cpp
     script/routine/impl/ambientsound.cpp
@@ -158,7 +157,8 @@ set(KOTOR_SOURCES
     script/routine/impl/vector.cpp
     script/routines.cpp
     soundsets.cpp
-    surfaces.cpp)
+    surfaces.cpp
+    visibilities.cpp)
 
 add_library(kotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES})
 set_target_properties(kotor PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

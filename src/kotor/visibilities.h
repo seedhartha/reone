@@ -17,21 +17,31 @@
 
 #pragma once
 
-#include "../common/memorycache.h"
-
-#include "types.h"
+#include "../game/visibilities.h"
 
 namespace reone {
 
-namespace game {
+namespace resource {
 
-class IRoomVisibilities : public MemoryCache<std::string, RoomVisibility> {
+class Resources;
+
+}
+
+namespace kotor {
+
+class Visibilities : public game::IVisibilities {
 public:
-    IRoomVisibilities(std::function<std::shared_ptr<RoomVisibility>(std::string)> compute) :
-        MemoryCache(std::move(compute)) {
+    Visibilities(resource::Resources &resources) :
+        IVisibilities(std::bind(&Visibilities::doGet, this, std::placeholders::_1)),
+        _resources(resources) {
     }
+
+private:
+    resource::Resources &_resources;
+
+    std::shared_ptr<game::Visibility> doGet(std::string resRef);
 };
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

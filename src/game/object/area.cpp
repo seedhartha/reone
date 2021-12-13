@@ -49,11 +49,11 @@
 #include "../paths.h"
 #include "../reputes.h"
 #include "../room.h"
-#include "../roomvisibilities.h"
 #include "../script/runner.h"
 #include "../services.h"
 #include "../surfaces.h"
 #include "../types.h"
+#include "../visibilities.h"
 
 #include "factory.h"
 
@@ -358,15 +358,15 @@ void Area::loadLYT() {
 }
 
 void Area::loadVIS() {
-    auto visibility = _services.roomVisibilities.get(_name);
+    auto visibility = _services.visibilities.get(_name);
     if (!visibility) {
         return;
     }
-    _visibility = fixRoomVisibility(*visibility);
+    _visibility = fixVisibility(*visibility);
 }
 
-RoomVisibility Area::fixRoomVisibility(const RoomVisibility &visibility) {
-    RoomVisibility result;
+Visibility Area::fixVisibility(const Visibility &visibility) {
+    Visibility result;
     for (auto &pair : visibility) {
         result.insert(pair);
         result.insert(make_pair(pair.second, pair.first));
@@ -645,7 +645,7 @@ void Area::printDebugInfo(const SpatialObject &object) {
 
 void Area::update(float dt) {
     doDestroyObjects();
-    updateRoomVisibility();
+    updateVisibility();
     updateObjectSelection();
 
     if (!_game.isPaused()) {
@@ -807,13 +807,13 @@ void Area::onPartyLeaderMoved(bool roomChanged) {
         return;
 
     if (roomChanged) {
-        updateRoomRoomVisibility();
+        updateRoomVisibility();
     }
     update3rdPersonCameraTarget();
     selectNearestObject();
 }
 
-void Area::updateRoomRoomVisibility() {
+void Area::updateRoomVisibility() {
     shared_ptr<Creature> partyLeader(_game.party().getLeader());
     Room *leaderRoom = partyLeader ? partyLeader->room() : nullptr;
     bool allVisible = _game.cameraType() != CameraType::ThirdPerson || !leaderRoom;
@@ -860,9 +860,9 @@ void Area::update3rdPersonCameraTarget() {
     _thirdPersonCamera->setTargetPosition(position);
 }
 
-void Area::updateRoomVisibility() {
+void Area::updateVisibility() {
     if (_game.cameraType() != CameraType::ThirdPerson) {
-        updateRoomRoomVisibility();
+        updateRoomVisibility();
     }
 }
 
