@@ -28,23 +28,38 @@ namespace reone {
 namespace graphics {
 
 void Context::init() {
+    if (_inited) {
+        return;
+    }
     glGetIntegerv(GL_VIEWPORT, &_viewport[0]);
     setBlendMode(BlendMode::Default);
+    _inited = true;
 }
 
 void Context::deinit() {
+    if (!_inited) {
+        return;
+    }
     if (_boundFramebuffer != 0) {
         unbindFramebuffer();
-        _boundFramebuffer = 0;
+        _boundFramebuffer.reset();
     }
     if (_boundRenderbuffer != 0) {
         unbindRenderbuffer();
-        _boundRenderbuffer = 0;
+        _boundRenderbuffer.reset();
     }
+
     for (size_t i = 0; i < _boundTextures.size(); ++i) {
         unbindTexture(static_cast<int>(i));
     }
     _boundTextures.clear();
+
+    for (size_t i = 0; i < _boundUniformBuffers.size(); ++i) {
+        unbindUniformBuffer(static_cast<int>(i));
+    }
+    _boundUniformBuffers.clear();
+
+    _inited = false;
 }
 
 void Context::clear(int mask) {
@@ -177,12 +192,25 @@ void Context::bindTexture(int unit, shared_ptr<Texture> texture) {
     _boundTextures[unit] = move(texture);
 }
 
+void Context::bindUniformBuffer(int index, shared_ptr<UniformBuffer> buffer) {
+    size_t numBuffers = _boundUniformBuffers.size();
+    if (numBuffers <= index) {
+        _boundUniformBuffers.resize(index + 1);
+    }
+    if (_uniformBufferIndex == index && _boundUniformBuffers[index] == buffer) {
+        return;
+    }
+    buffer->bind(index);
+    _uniformBufferIndex = index;
+    _boundUniformBuffers[index] = move(buffer);
+}
+
 void Context::unbindFramebuffer() {
     if (!_boundFramebuffer) {
         return;
     }
     _boundFramebuffer->unbind();
-    _boundFramebuffer = 0;
+    _boundFramebuffer.reset();
 }
 
 void Context::unbindRenderbuffer() {
@@ -190,7 +218,7 @@ void Context::unbindRenderbuffer() {
         return;
     }
     _boundRenderbuffer->unbind();
-    _boundRenderbuffer = 0;
+    _boundRenderbuffer.reset();
 }
 
 void Context::unbindTexture(int unit) {
@@ -200,6 +228,14 @@ void Context::unbindTexture(int unit) {
     setActiveTextureUnit(unit);
     _boundTextures[unit]->unbind();
     _boundTextures[unit].reset();
+}
+
+void Context::unbindUniformBuffer(int index) {
+    if (!_boundUniformBuffers[index]) {
+        return;
+    }
+    _boundUniformBuffers[index]->unbind(index);
+    _boundUniformBuffers[index].reset();
 }
 
 void Context::setActiveTextureUnit(int unit) {

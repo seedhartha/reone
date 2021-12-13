@@ -191,10 +191,17 @@ struct ShaderUniforms {
     std::shared_ptr<DanglymeshUniforms> danglymesh;
 };
 
+class Context;
+class UniformBuffers;
+
 class Shaders : boost::noncopyable {
 public:
-    Shaders() = default;
-    ~Shaders();
+    Shaders(Context &context, UniformBuffers &uniformBuffers) :
+        _context(context),
+        _uniformBuffers(uniformBuffers) {
+    }
+
+    ~Shaders() { deinit(); }
 
     void init();
     void deinit();
@@ -225,6 +232,9 @@ private:
         FragmentBlinnPhongDiffuseless,
     };
 
+    Context &_context;
+    UniformBuffers &_uniformBuffers;
+
     bool _inited {false};
     std::unordered_map<ShaderName, uint32_t> _shaders;
     std::unordered_map<ShaderProgram, uint32_t> _programs;
@@ -232,25 +242,10 @@ private:
     uint32_t _activeOrdinal {0};
     ShaderUniforms _defaultUniforms;
 
-    // UBO
-
-    uint32_t _uboCombined {0};
-    uint32_t _uboText {0};
-    uint32_t _uboLighting {0};
-    uint32_t _uboSkeletal {0};
-    uint32_t _uboParticles {0};
-    uint32_t _uboGrass {0};
-    uint32_t _uboDanglymesh {0};
-
-    // END UBO
-
     void initShader(ShaderName name, unsigned int type, std::vector<const char *> sources);
     void initProgram(ShaderProgram program, std::vector<ShaderName> shaders);
-    void initUBOs();
+    void initUniformBlock(const std::string &name, int bindingPoint);
     void initTextureUniforms();
-
-    template <class T>
-    void initUBO(const std::string &block, int bindingPoint, uint32_t ubo, const T &defaults, size_t size = sizeof(T));
 
     void setUniforms(const ShaderUniforms &locals);
     void setUniform(const std::string &name, int value);

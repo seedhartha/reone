@@ -17,8 +17,10 @@
 
 #include "shaders.h"
 
+#include "context.h"
 #include "texture.h"
 #include "textures.h"
+#include "uniformbuffers.h"
 
 using namespace std;
 
@@ -844,13 +846,13 @@ void main() {
 }
 )END";
 
-static constexpr int kBindingPointIndexCombined = 1;
-static constexpr int kBindingPointIndexText = 2;
-static constexpr int kBindingPointIndexLighting = 3;
-static constexpr int kBindingPointIndexSkeletal = 4;
-static constexpr int kBindingPointIndexParticles = 5;
-static constexpr int kBindingPointIndexGrass = 6;
-static constexpr int kBindingPointIndexDanglymesh = 7;
+static constexpr int kBindingPointIndexCombined = 0;
+static constexpr int kBindingPointIndexText = 1;
+static constexpr int kBindingPointIndexLighting = 2;
+static constexpr int kBindingPointIndexSkeletal = 3;
+static constexpr int kBindingPointIndexParticles = 4;
+static constexpr int kBindingPointIndexGrass = 5;
+static constexpr int kBindingPointIndexDanglymesh = 6;
 
 void Shaders::init() {
     if (_inited) {
@@ -887,19 +889,18 @@ void Shaders::init() {
     initProgram(ShaderProgram::TextText, {ShaderName::VertexText, ShaderName::FragmentText});
     initProgram(ShaderProgram::BillboardGUI, {ShaderName::VertexBillboard, ShaderName::FragmentGUI});
 
-    glGenBuffers(1, &_uboCombined);
-    glGenBuffers(1, &_uboText);
-    glGenBuffers(1, &_uboLighting);
-    glGenBuffers(1, &_uboSkeletal);
-    glGenBuffers(1, &_uboParticles);
-    glGenBuffers(1, &_uboGrass);
-    glGenBuffers(1, &_uboDanglymesh);
-
     for (auto &program : _programs) {
         glUseProgram(program.second);
         _activeOrdinal = program.second;
 
-        initUBOs();
+        initUniformBlock("Combined", kBindingPointIndexCombined);
+        initUniformBlock("Text", kBindingPointIndexText);
+        initUniformBlock("Lighting", kBindingPointIndexLighting);
+        initUniformBlock("Skeletal", kBindingPointIndexSkeletal);
+        initUniformBlock("Particles", kBindingPointIndexParticles);
+        initUniformBlock("Grass", kBindingPointIndexGrass);
+        initUniformBlock("Danglymesh", kBindingPointIndexDanglymesh);
+
         initTextureUniforms();
 
         _activeOrdinal = 0;
@@ -914,6 +915,25 @@ void Shaders::init() {
     _defaultUniforms.danglymesh = make_shared<DanglymeshUniforms>();
 
     _inited = true;
+}
+
+void Shaders::deinit() {
+    if (!_inited)
+        return;
+
+    // Delete programs
+    for (auto &pair : _programs) {
+        glDeleteProgram(pair.second);
+    }
+    _programs.clear();
+
+    // Delete shaders
+    for (auto &pair : _shaders) {
+        glDeleteShader(pair.second);
+    }
+    _shaders.clear();
+
+    _inited = false;
 }
 
 void Shaders::initShader(ShaderName name, unsigned int type, vector<const char *> sources) {
@@ -956,32 +976,12 @@ void Shaders::initProgram(ShaderProgram program, vector<ShaderName> shaders) {
     _programs.insert(make_pair(program, ordinal));
 }
 
-void Shaders::initUBOs() {
-    static ShaderUniforms defaultsCombined;
-    static TextUniforms defaultsText;
-    static LightingUniforms defaultsLighting;
-    static SkeletalUniforms defaultsSkeletal;
-    static ParticlesUniforms defaultsParticles;
-    static GrassUniforms defaultsGrass;
-    static DanglymeshUniforms defaultsDanglymesh;
-
-    initUBO("Combined", kBindingPointIndexCombined, _uboCombined, defaultsCombined, offsetof(ShaderUniforms, text));
-    initUBO("Text", kBindingPointIndexText, _uboText, defaultsText);
-    initUBO("Lighting", kBindingPointIndexLighting, _uboLighting, defaultsLighting);
-    initUBO("Skeletal", kBindingPointIndexSkeletal, _uboSkeletal, defaultsSkeletal);
-    initUBO("Particles", kBindingPointIndexParticles, _uboParticles, defaultsParticles);
-    initUBO("Grass", kBindingPointIndexGrass, _uboGrass, defaultsGrass);
-    initUBO("Danglymesh", kBindingPointIndexDanglymesh, _uboDanglymesh, defaultsDanglymesh);
-}
-
-template <class T>
-void Shaders::initUBO(const string &block, int bindingPoint, uint32_t ubo, const T &defaults, size_t size) {
-    uint32_t blockIdx = glGetUniformBlockIndex(_activeOrdinal, block.c_str());
-    if (blockIdx != GL_INVALID_INDEX) {
-        glUniformBlockBinding(_activeOrdinal, blockIdx, bindingPoint);
-        glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, ubo);
-        glBufferData(GL_UNIFORM_BUFFER, size, &defaults, GL_STATIC_DRAW);
+void Shaders::initUniformBlock(const string &name, int bindingPoint) {
+    GLuint blockIdx = glGetUniformBlockIndex(_activeOrdinal, name.c_str());
+    if (blockIdx == GL_INVALID_INDEX) {
+        return;
     }
+    glUniformBlockBinding(_activeOrdinal, blockIdx, bindingPoint);
 }
 
 void Shaders::initTextureUniforms() {
@@ -995,59 +995,6 @@ void Shaders::initTextureUniforms() {
     setUniform("sBRDFLookup", TextureUnits::brdfLookup);
     setUniform("sShadowMap", TextureUnits::shadowMap);
     setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
-}
-
-Shaders::~Shaders() {
-    deinit();
-}
-
-void Shaders::deinit() {
-    if (!_inited)
-        return;
-
-    // Delete UBO
-    if (_uboCombined) {
-        glDeleteBuffers(1, &_uboCombined);
-        _uboCombined = 0;
-    }
-    if (_uboText) {
-        glDeleteBuffers(1, &_uboText);
-        _uboText = 0;
-    }
-    if (_uboLighting) {
-        glDeleteBuffers(1, &_uboLighting);
-        _uboLighting = 0;
-    }
-    if (_uboSkeletal) {
-        glDeleteBuffers(1, &_uboSkeletal);
-        _uboSkeletal = 0;
-    }
-    if (_uboParticles) {
-        glDeleteBuffers(1, &_uboParticles);
-        _uboParticles = 0;
-    }
-    if (_uboGrass) {
-        glDeleteBuffers(1, &_uboGrass);
-        _uboGrass = 0;
-    }
-    if (_uboDanglymesh) {
-        glDeleteBuffers(1, &_uboDanglymesh);
-        _uboDanglymesh = 0;
-    }
-
-    // Delete programs
-    for (auto &pair : _programs) {
-        glDeleteProgram(pair.second);
-    }
-    _programs.clear();
-
-    // Delete shaders
-    for (auto &pair : _shaders) {
-        glDeleteShader(pair.second);
-    }
-    _shaders.clear();
-
-    _inited = false;
 }
 
 void Shaders::activate(ShaderProgram program, const ShaderUniforms &uniforms) {
@@ -1070,32 +1017,32 @@ unsigned int Shaders::getOrdinal(ShaderProgram program) const {
 }
 
 void Shaders::setUniforms(const ShaderUniforms &uniforms) {
-    glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexCombined, _uboCombined);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(CombinedUniforms), &uniforms.combined);
+    _context.bindUniformBuffer(kBindingPointIndexCombined, _uniformBuffers.combinedPtr());
+    _uniformBuffers.combined().setData(&uniforms.combined, sizeof(CombinedUniforms), true);
 
     if (uniforms.combined.featureMask & UniformFeatureFlags::text) {
-        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexText, _uboText);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(TextUniforms), uniforms.text.get());
+        _context.bindUniformBuffer(kBindingPointIndexText, _uniformBuffers.textPtr());
+        _uniformBuffers.text().setData(uniforms.text.get(), sizeof(TextUniforms), true);
     }
     if (uniforms.combined.featureMask & UniformFeatureFlags::lighting) {
-        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexLighting, _uboLighting);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(LightingUniforms), uniforms.lighting.get());
+        _context.bindUniformBuffer(kBindingPointIndexLighting, _uniformBuffers.lightingPtr());
+        _uniformBuffers.lighting().setData(uniforms.lighting.get(), sizeof(LightingUniforms), true);
     }
     if (uniforms.combined.featureMask & UniformFeatureFlags::skeletal) {
-        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexSkeletal, _uboSkeletal);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(SkeletalUniforms), uniforms.skeletal.get());
+        _context.bindUniformBuffer(kBindingPointIndexSkeletal, _uniformBuffers.skeletalPtr());
+        _uniformBuffers.skeletal().setData(uniforms.skeletal.get(), sizeof(SkeletalUniforms), true);
     }
     if (uniforms.combined.featureMask & UniformFeatureFlags::particles) {
-        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexParticles, _uboParticles);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ParticlesUniforms), uniforms.particles.get());
+        _context.bindUniformBuffer(kBindingPointIndexParticles, _uniformBuffers.particlesPtr());
+        _uniformBuffers.particles().setData(uniforms.particles.get(), sizeof(ParticlesUniforms), true);
     }
     if (uniforms.combined.featureMask & UniformFeatureFlags::grass) {
-        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexGrass, _uboGrass);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(GrassUniforms), uniforms.grass.get());
+        _context.bindUniformBuffer(kBindingPointIndexGrass, _uniformBuffers.grassPtr());
+        _uniformBuffers.grass().setData(uniforms.grass.get(), sizeof(GrassUniforms), true);
     }
     if (uniforms.combined.featureMask & UniformFeatureFlags::danglymesh) {
-        glBindBufferBase(GL_UNIFORM_BUFFER, kBindingPointIndexDanglymesh, _uboDanglymesh);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(DanglymeshUniforms), uniforms.danglymesh.get());
+        _context.bindUniformBuffer(kBindingPointIndexDanglymesh, _uniformBuffers.danglymeshPtr());
+        _uniformBuffers.danglymesh().setData(uniforms.danglymesh.get(), sizeof(DanglymeshUniforms), true);
     }
 }
 
