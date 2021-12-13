@@ -19,7 +19,6 @@
 
 #include "../../game/game.h"
 #include "../../game/services.h"
-#include "../../kotor/arealayouts.h"
 #include "../../kotor/camerastyles.h"
 #include "../../kotor/cursors.h"
 #include "../../kotor/d20/classes.h"
@@ -29,6 +28,7 @@
 #include "../../kotor/dialogs.h"
 #include "../../kotor/footstepsounds.h"
 #include "../../kotor/gui/sounds.h"
+#include "../../kotor/layouts.h"
 #include "../../kotor/paths.h"
 #include "../../kotor/portraits.h"
 #include "../../kotor/reputes.h"
@@ -85,7 +85,6 @@ private:
     SceneModule &_scene;
     ScriptModule &_script;
 
-    std::unique_ptr<kotor::AreaLayouts> _areaLayouts;
     std::unique_ptr<kotor::CameraStyles> _cameraStyles;
     std::unique_ptr<kotor::Classes> _classes;
     std::unique_ptr<kotor::Cursors> _cursors;
@@ -93,6 +92,7 @@ private:
     std::unique_ptr<kotor::Feats> _feats;
     std::unique_ptr<kotor::FootstepSounds> _footstepSounds;
     std::unique_ptr<kotor::GUISounds> _guiSounds;
+    std::unique_ptr<kotor::Layouts> _layouts;
     std::unique_ptr<kotor::Paths> _paths;
     std::unique_ptr<kotor::Portraits> _portraits;
     std::unique_ptr<kotor::Reputes> _reputes;

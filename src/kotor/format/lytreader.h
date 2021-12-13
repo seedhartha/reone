@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../game/arealayout.h"
+#include "../../game/layout.h"
 
 namespace reone {
 
@@ -28,7 +28,7 @@ public:
     void load(const std::shared_ptr<std::istream> &in);
     void load(const boost::filesystem::path &path);
 
-    const game::AreaLayout &layout() const { return _layout; }
+    const game::Layout &layout() const { return _layout; }
 
 private:
     enum class State {
@@ -42,7 +42,7 @@ private:
     State _state {State::None};
     int _roomCount {0};
 
-    game::AreaLayout _layout;
+    game::Layout _layout;
 
     void load();
     void processLine(const std::string &line);

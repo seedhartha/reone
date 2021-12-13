@@ -67,8 +67,6 @@ set(GAME_HEADERS
     action/usetalentonobject.h
     action/wait.h
     animationutil.h
-    arealayout.h
-    arealayouts.h
     camera.h
     camera/animated.h
     camera/dialog.h
@@ -192,6 +190,8 @@ set(GAME_HEADERS
     gui/map.h
     gui/profileoverlay.h
     gui/sounds.h
+    layout.h
+    layouts.h
     location.h
     object.h
     object/area.h

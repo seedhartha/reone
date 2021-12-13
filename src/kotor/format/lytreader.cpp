@@ -87,7 +87,7 @@ void LytReader::processLine(const string &line) {
 }
 
 void LytReader::appendRoom(const vector<string> &tokens) {
-    AreaLayout::Room room;
+    Layout::Room room;
     room.name = boost::to_lower_copy(tokens[0]);
     room.position = glm::vec3(
         stof(tokens[1]),

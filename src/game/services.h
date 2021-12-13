@@ -66,7 +66,6 @@ class Scripts;
 
 namespace game {
 
-class IAreaLayouts;
 class ICameraStyles;
 class IClasses;
 class ICursors;
@@ -74,6 +73,7 @@ class IDialogs;
 class IFeats;
 class IFootstepSounds;
 class IGUISounds;
+class ILayouts;
 class IPaths;
 class IPortraits;
 class IReputes;
@@ -84,7 +84,6 @@ class ISurfaces;
 class IVisibilities;
 
 struct Services {
-    IAreaLayouts &areaLayouts;
     ICameraStyles &cameraStyles;
     IClasses &classes;
     ICursors &cursors;
@@ -92,6 +91,7 @@ struct Services {
     IFeats &feats;
     IFootstepSounds &footstepSounds;
     IGUISounds &guiSounds;
+    ILayouts &layouts;
     IPaths &paths;
     IPortraits &portraits;
     IReputes &reputes;
@@ -123,7 +123,6 @@ struct Services {
     resource::TwoDas &twoDas;
 
     Services(
-        IAreaLayouts &areaLayouts,
         ICameraStyles &cameraStyles,
         IClasses &classes,
         ICursors &cursors,
@@ -131,6 +130,7 @@ struct Services {
         IFeats &feats,
         IFootstepSounds &footstepSounds,
         IGUISounds &guiSounds,
+        ILayouts &layouts,
         IPaths &paths,
         IPortraits &portraits,
         IReputes &reputes,
@@ -159,7 +159,6 @@ struct Services {
         resource::Resources &resources,
         resource::Strings &strings,
         resource::TwoDas &twoDas) :
-        areaLayouts(areaLayouts),
         cameraStyles(cameraStyles),
         classes(classes),
         cursors(cursors),
@@ -167,6 +166,7 @@ struct Services {
         feats(feats),
         footstepSounds(footstepSounds),
         guiSounds(guiSounds),
+        layouts(layouts),
         paths(paths),
         portraits(portraits),
         reputes(reputes),

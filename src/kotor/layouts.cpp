@@ -15,23 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "layouts.h"
 
-#include "../common/memorycache.h"
+#include "../../common/streamutil.h"
+#include "../../resource/resources.h"
 
-#include "arealayout.h"
+#include "format/lytreader.h"
+
+using namespace std;
+
+using namespace reone::game;
+using namespace reone::resource;
 
 namespace reone {
 
-namespace game {
+namespace kotor {
 
-class IAreaLayouts : public MemoryCache<std::string, AreaLayout> {
-public:
-    IAreaLayouts(std::function<std::shared_ptr<AreaLayout>(std::string)> compute) :
-        MemoryCache(std::move(compute)) {
+shared_ptr<Layout> Layouts::doGet(string resRef) {
+    auto data = _resources.get(resRef, ResourceType::Lyt);
+    if (!data) {
+        return nullptr;
     }
-};
+    LytReader lyt;
+    lyt.load(wrap(data));
+    return make_shared<Layout>(lyt.layout());
+}
 
-} // namespace game
+} // namespace kotor
 
 } // namespace reone

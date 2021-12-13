@@ -17,31 +17,21 @@
 
 #pragma once
 
-#include "../game/arealayouts.h"
+#include "../common/memorycache.h"
+
+#include "layout.h"
 
 namespace reone {
 
-namespace resource {
+namespace game {
 
-class Resources;
-
-}
-
-namespace kotor {
-
-class AreaLayouts : public game::IAreaLayouts {
+class ILayouts : public MemoryCache<std::string, Layout> {
 public:
-    AreaLayouts(resource::Resources &resources) :
-        IAreaLayouts(std::bind(&AreaLayouts::doGet, this, std::placeholders::_1)),
-        _resources(resources) {
+    ILayouts(std::function<std::shared_ptr<Layout>(std::string)> compute) :
+        MemoryCache(std::move(compute)) {
     }
-
-private:
-    resource::Resources &_resources;
-
-    std::shared_ptr<game::AreaLayout> doGet(std::string resRef);
 };
 
-} // namespace kotor
+} // namespace game
 
 } // namespace reone
