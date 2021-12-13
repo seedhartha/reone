@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(KOTOR_HEADERS
-    arealayouts.h
     camerastyles.h
     cursors.h
     d20/classes.h
@@ -65,6 +64,7 @@ set(KOTOR_HEADERS
     gui/selectoverlay.h
     gui/sounds.h
     kotor.h
+    layouts.h
     paths.h
     portraits.h
     reputes.h
@@ -78,7 +78,6 @@ set(KOTOR_HEADERS
     visibilities.h)
 
 set(KOTOR_SOURCES
-    arealayouts.cpp
     camerastyles.cpp
     cursors.cpp
     d20/classes.cpp
@@ -129,6 +128,7 @@ set(KOTOR_SOURCES
     gui/selectoverlay.cpp
     gui/sounds.cpp
     kotor.cpp
+    layouts.cpp
     paths.cpp
     portraits.cpp
     reputes.cpp

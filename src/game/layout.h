@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-struct AreaLayout {
+struct Layout {
     struct Room {
         std::string name;
         glm::vec3 position {0.0f};

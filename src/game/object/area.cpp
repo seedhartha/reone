@@ -41,9 +41,9 @@
 #include "../../scene/node/walkmesh.h"
 #include "../../scene/types.h"
 
-#include "../arealayouts.h"
 #include "../camerastyles.h"
 #include "../game.h"
+#include "../layouts.h"
 #include "../location.h"
 #include "../party.h"
 #include "../paths.h"
@@ -304,7 +304,7 @@ void Area::loadEncounters(const GffStruct &git) {
 }
 
 void Area::loadLYT() {
-    auto layout = _services.areaLayouts.get(_name);
+    auto layout = _services.layouts.get(_name);
     if (!layout) {
         throw ValidationException("Area LYT file not found");
     }

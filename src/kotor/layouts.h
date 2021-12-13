@@ -15,31 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "arealayouts.h"
+#pragma once
 
-#include "../../common/streamutil.h"
-#include "../../resource/resources.h"
-
-#include "format/lytreader.h"
-
-using namespace std;
-
-using namespace reone::game;
-using namespace reone::resource;
+#include "../game/layouts.h"
 
 namespace reone {
 
+namespace resource {
+
+class Resources;
+
+}
+
 namespace kotor {
 
-shared_ptr<AreaLayout> AreaLayouts::doGet(string resRef) {
-    auto data = _resources.get(resRef, ResourceType::Lyt);
-    if (!data) {
-        return nullptr;
+class Layouts : public game::ILayouts {
+public:
+    Layouts(resource::Resources &resources) :
+        ILayouts(std::bind(&Layouts::doGet, this, std::placeholders::_1)),
+        _resources(resources) {
     }
-    LytReader lyt;
-    lyt.load(wrap(data));
-    return make_shared<AreaLayout>(lyt.layout());
-}
+
+private:
+    resource::Resources &_resources;
+
+    std::shared_ptr<game::Layout> doGet(std::string resRef);
+};
 
 } // namespace kotor
 
