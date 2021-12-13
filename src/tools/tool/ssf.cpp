@@ -19,12 +19,12 @@
 
 #include <boost/property_tree/json_parser.hpp>
 
-#include "../../kotor/format/ssfreader.h"
-#include "../../kotor/format/ssfwriter.h"
+#include "../../game/format/ssfreader.h"
+#include "../../game/format/ssfwriter.h"
 
 using namespace std;
 
-using namespace reone::kotor;
+using namespace reone::game;
 
 namespace fs = boost::filesystem;
 namespace pt = boost::property_tree;

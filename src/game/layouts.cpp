@@ -15,34 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "layouts.h"
 
-#include "../common/memorycache.h"
+#include "../../common/streamutil.h"
+#include "../../resource/resources.h"
 
-#include "layout.h"
+#include "format/lytreader.h"
+
+using namespace std;
+
+using namespace reone::resource;
 
 namespace reone {
 
-namespace resource {
-
-class Resources;
-
-}
-
 namespace game {
 
-class Layouts : public MemoryCache<std::string, Layout> {
-public:
-    Layouts(resource::Resources &resources) :
-        MemoryCache(std::bind(&Layouts::doGet, this, std::placeholders::_1)),
-        _resources(resources) {
+shared_ptr<Layout> Layouts::doGet(string resRef) {
+    auto data = _resources.get(resRef, ResourceType::Lyt);
+    if (!data) {
+        return nullptr;
     }
-
-private:
-    resource::Resources &_resources;
-
-    std::shared_ptr<Layout> doGet(std::string resRef);
-};
+    LytReader lyt;
+    lyt.load(wrap(data));
+    return make_shared<Layout>(lyt.layout());
+}
 
 } // namespace game
 

@@ -66,40 +66,40 @@ class Scripts;
 
 namespace game {
 
-class ICameraStyles;
-class IClasses;
+class CameraStyles;
+class Classes;
+class Dialogs;
+class Feats;
+class FootstepSounds;
+class GUISounds;
 class ICursors;
-class IDialogs;
-class IFeats;
-class IFootstepSounds;
-class IGUISounds;
-class ILayouts;
-class IPaths;
-class IPortraits;
-class IReputes;
-class ISkills;
-class ISoundSets;
-class ISpells;
-class ISurfaces;
-class IVisibilities;
+class Layouts;
+class Paths;
+class Portraits;
+class Reputes;
+class Skills;
+class SoundSets;
+class Spells;
+class Surfaces;
+class Visibilities;
 
 struct Services {
-    ICameraStyles &cameraStyles;
-    IClasses &classes;
+    CameraStyles &cameraStyles;
+    Classes &classes;
+    Dialogs &dialogs;
+    Feats &feats;
+    FootstepSounds &footstepSounds;
+    GUISounds &guiSounds;
     ICursors &cursors;
-    IDialogs &dialogs;
-    IFeats &feats;
-    IFootstepSounds &footstepSounds;
-    IGUISounds &guiSounds;
-    ILayouts &layouts;
-    IPaths &paths;
-    IPortraits &portraits;
-    IReputes &reputes;
-    ISkills &skills;
-    ISoundSets &soundSets;
-    ISpells &spells;
-    ISurfaces &surfaces;
-    IVisibilities &visibilities;
+    Layouts &layouts;
+    Paths &paths;
+    Portraits &portraits;
+    Reputes &reputes;
+    Skills &skills;
+    SoundSets &soundSets;
+    Spells &spells;
+    Surfaces &surfaces;
+    Visibilities &visibilities;
 
     audio::AudioContext &audioContext;
     audio::AudioFiles &audioFiles;
@@ -123,22 +123,22 @@ struct Services {
     resource::TwoDas &twoDas;
 
     Services(
-        ICameraStyles &cameraStyles,
-        IClasses &classes,
+        CameraStyles &cameraStyles,
+        Classes &classes,
+        Dialogs &dialogs,
+        Feats &feats,
+        FootstepSounds &footstepSounds,
+        GUISounds &guiSounds,
         ICursors &cursors,
-        IDialogs &dialogs,
-        IFeats &feats,
-        IFootstepSounds &footstepSounds,
-        IGUISounds &guiSounds,
-        ILayouts &layouts,
-        IPaths &paths,
-        IPortraits &portraits,
-        IReputes &reputes,
-        ISkills &skills,
-        ISoundSets &soundSets,
-        ISpells &spells,
-        ISurfaces &surfaces,
-        IVisibilities &visibilities,
+        Layouts &layouts,
+        Paths &paths,
+        Portraits &portraits,
+        Reputes &reputes,
+        Skills &skills,
+        SoundSets &soundSets,
+        Spells &spells,
+        Surfaces &surfaces,
+        Visibilities &visibilities,
         audio::AudioContext &audioContext,
         audio::AudioFiles &audioFiles,
         audio::AudioPlayer &audioPlayer,
@@ -161,11 +161,11 @@ struct Services {
         resource::TwoDas &twoDas) :
         cameraStyles(cameraStyles),
         classes(classes),
-        cursors(cursors),
         dialogs(dialogs),
         feats(feats),
         footstepSounds(footstepSounds),
         guiSounds(guiSounds),
+        cursors(cursors),
         layouts(layouts),
         paths(paths),
         portraits(portraits),

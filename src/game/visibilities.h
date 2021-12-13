@@ -23,13 +23,25 @@
 
 namespace reone {
 
+namespace resource {
+
+class Resources;
+
+}
+
 namespace game {
 
-class IVisibilities : public MemoryCache<std::string, Visibility> {
+class Visibilities : public MemoryCache<std::string, Visibility> {
 public:
-    IVisibilities(std::function<std::shared_ptr<Visibility>(std::string)> compute) :
-        MemoryCache(std::move(compute)) {
+    Visibilities(resource::Resources &resources) :
+        MemoryCache(std::bind(&Visibilities::doGet, this, std::placeholders::_1)),
+        _resources(resources) {
     }
+
+private:
+    resource::Resources &_resources;
+
+    std::shared_ptr<Visibility> doGet(std::string resRef);
 };
 
 } // namespace game

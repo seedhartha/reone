@@ -15,34 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "ssfreader.h"
 
-#include "../common/memorycache.h"
+using namespace std;
 
-#include "layout.h"
+using namespace reone::resource;
 
 namespace reone {
 
-namespace resource {
-
-class Resources;
-
-}
-
 namespace game {
 
-class Layouts : public MemoryCache<std::string, Layout> {
-public:
-    Layouts(resource::Resources &resources) :
-        MemoryCache(std::bind(&Layouts::doGet, this, std::placeholders::_1)),
-        _resources(resources) {
-    }
+SsfReader::SsfReader() :
+    BinaryReader(8, "SSF V1.1") {
+}
 
-private:
-    resource::Resources &_resources;
-
-    std::shared_ptr<Layout> doGet(std::string resRef);
-};
+void SsfReader::doLoad() {
+    uint32_t tableOffset = readUint32();
+    int entryCount = static_cast<int>((_size - tableOffset) / 4);
+    seek(tableOffset);
+    _soundSet = readUint32Array(entryCount);
+}
 
 } // namespace game
 

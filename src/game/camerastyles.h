@@ -17,16 +17,33 @@
 
 #pragma once
 
+#include "camerastyle.h"
+
 namespace reone {
+
+namespace resource {
+
+class TwoDas;
+
+}
 
 namespace game {
 
-class ICameraStyles : boost::noncopyable {
+class CameraStyles : boost::noncopyable {
 public:
-    virtual ~ICameraStyles() = default;
+    CameraStyles(resource::TwoDas &twoDas) :
+        _twoDas(twoDas) {
+    }
 
-    virtual std::shared_ptr<CameraStyle> get(int index) const = 0;
-    virtual std::shared_ptr<CameraStyle> get(const std::string &name) const = 0;
+    void init();
+
+    std::shared_ptr<CameraStyle> get(int index) const;
+    std::shared_ptr<CameraStyle> get(const std::string &name) const;
+
+private:
+    resource::TwoDas &_twoDas;
+
+    std::vector<std::shared_ptr<CameraStyle>> _styles;
 };
 
 } // namespace game

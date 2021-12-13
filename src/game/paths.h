@@ -23,13 +23,28 @@
 
 namespace reone {
 
+namespace resource {
+
+class Gffs;
+class GffStruct;
+
+} // namespace resource
+
 namespace game {
 
-class IPaths : public MemoryCache<std::string, Path> {
+class Paths : public MemoryCache<std::string, Path> {
 public:
-    IPaths(std::function<std::shared_ptr<Path>(std::string)> compute) :
-        MemoryCache(std::move(compute)) {
+    Paths(resource::Gffs &gffs) :
+        MemoryCache(std::bind(&Paths::doGet, this, std::placeholders::_1)),
+        _gffs(gffs) {
     }
+
+private:
+    resource::Gffs &_gffs;
+
+    std::shared_ptr<Path> doGet(std::string resRef);
+
+    std::unique_ptr<Path> loadPath(const resource::GffStruct &pth) const;
 };
 
 } // namespace game

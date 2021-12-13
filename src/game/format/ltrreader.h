@@ -17,31 +17,36 @@
 
 #pragma once
 
-#include "../common/memorycache.h"
-
-#include "layout.h"
+#include "../../resource/format/binreader.h"
 
 namespace reone {
 
-namespace resource {
-
-class Resources;
-
-}
-
 namespace game {
 
-class Layouts : public MemoryCache<std::string, Layout> {
+/**
+ * Encapsulates the LTR file format, used to generate random names.
+ */
+class LtrReader : public resource::BinaryReader {
 public:
-    Layouts(resource::Resources &resources) :
-        MemoryCache(std::bind(&Layouts::doGet, this, std::placeholders::_1)),
-        _resources(resources) {
-    }
+    LtrReader();
+
+    std::string getRandomName(int maxLength) const;
 
 private:
-    resource::Resources &_resources;
+    struct LetterSet {
+        std::vector<float> start;
+        std::vector<float> mid;
+        std::vector<float> end;
+    };
 
-    std::shared_ptr<Layout> doGet(std::string resRef);
+    int _letterCount {0};
+    LetterSet _singleLetters;
+    std::vector<LetterSet> _doubleLetters;
+    std::vector<std::vector<LetterSet>> _trippleLetters;
+
+    void doLoad() override;
+
+    void readLetterSet(LetterSet &set);
 };
 
 } // namespace game

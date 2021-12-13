@@ -19,17 +19,32 @@
 
 namespace reone {
 
+namespace resource {
+
+class TwoDas;
+
+}
+
 namespace game {
 
 class Creature;
 
-class IReputes : boost::noncopyable {
+class Reputes : boost::noncopyable {
 public:
-    virtual ~IReputes() = default;
+    Reputes(resource::TwoDas &twoDas) :
+        _twoDas(twoDas) {
+    }
 
-    virtual bool getIsEnemy(const Creature &left, const Creature &right) const = 0;
-    virtual bool getIsFriend(const Creature &left, const Creature &right) const = 0;
-    virtual bool getIsNeutral(const Creature &left, const Creature &right) const = 0;
+    void init();
+
+    bool getIsEnemy(const Creature &left, const Creature &right) const;
+    bool getIsFriend(const Creature &left, const Creature &right) const;
+    bool getIsNeutral(const Creature &left, const Creature &right) const;
+
+private:
+    resource::TwoDas &_twoDas;
+
+    int getRepute(const Creature &left, const Creature &right) const;
 };
 
 } // namespace game

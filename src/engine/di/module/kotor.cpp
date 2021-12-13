@@ -54,11 +54,11 @@ void KotorModule::init() {
     _services = make_unique<Services>(
         *_cameraStyles,
         *_classes,
-        *_cursors,
         *_dialogs,
         *_feats,
         *_footstepSounds,
         *_guiSounds,
+        *_cursors,
         *_layouts,
         *_paths,
         *_portraits,

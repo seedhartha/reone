@@ -17,31 +17,37 @@
 
 #pragma once
 
-#include "../common/memorycache.h"
-
-#include "layout.h"
+#include "../../game/layout.h"
 
 namespace reone {
 
-namespace resource {
-
-class Resources;
-
-}
-
 namespace game {
 
-class Layouts : public MemoryCache<std::string, Layout> {
+class LytReader : boost::noncopyable {
 public:
-    Layouts(resource::Resources &resources) :
-        MemoryCache(std::bind(&Layouts::doGet, this, std::placeholders::_1)),
-        _resources(resources) {
-    }
+    void load(const std::shared_ptr<std::istream> &in);
+    void load(const boost::filesystem::path &path);
+
+    const Layout &layout() const { return _layout; }
 
 private:
-    resource::Resources &_resources;
+    enum class State {
+        None,
+        Layout,
+        Rooms
+    };
 
-    std::shared_ptr<Layout> doGet(std::string resRef);
+    std::shared_ptr<std::istream> _in;
+    boost::filesystem::path _path;
+    State _state {State::None};
+    int _roomCount {0};
+
+    Layout _layout;
+
+    void load();
+    void processLine(const std::string &line);
+
+    void appendRoom(const std::vector<std::string> &tokens);
 };
 
 } // namespace game

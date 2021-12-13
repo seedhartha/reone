@@ -44,6 +44,7 @@
 #include "../../script/scripts.h"
 
 #include "../game/combat.h"
+#include "../game/dialogs.h"
 #include "../game/location.h"
 #include "../game/object/factory.h"
 #include "../game/party.h"
@@ -52,7 +53,6 @@
 #include "../game/surfaces.h"
 
 #include "cursors.h"
-#include "dialogs.h"
 #include "gui/console.h"
 #include "gui/loadscreen.h"
 #include "gui/map.h"

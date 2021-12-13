@@ -15,34 +15,41 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "guisounds.h"
 
-#include "../common/memorycache.h"
+#include "../audio/files.h"
+#include "../resource/2das.h"
+#include "../resource/format/2dareader.h"
 
-#include "layout.h"
+using namespace std;
+
+using namespace reone::audio;
+using namespace reone::resource;
 
 namespace reone {
 
-namespace resource {
-
-class Resources;
-
-}
-
 namespace game {
 
-class Layouts : public MemoryCache<std::string, Layout> {
-public:
-    Layouts(resource::Resources &resources) :
-        MemoryCache(std::bind(&Layouts::doGet, this, std::placeholders::_1)),
-        _resources(resources) {
+void GUISounds::init() {
+    shared_ptr<TwoDA> sounds(_twoDas.get("guisounds"));
+    if (!sounds) {
+        return;
     }
+    loadSound(*sounds, "Clicked_Default", _onClick);
+    loadSound(*sounds, "Entered_Default", _onEnter);
+}
 
-private:
-    resource::Resources &_resources;
+void GUISounds::loadSound(const TwoDA &twoDa, const string &label, shared_ptr<AudioStream> &sound) {
+    int row = twoDa.indexByCellValue("label", label);
+    if (row != -1) {
+        sound = _audioFiles.get(twoDa.getString(row, "soundresref"));
+    }
+}
 
-    std::shared_ptr<Layout> doGet(std::string resRef);
-};
+void GUISounds::deinit() {
+    _onClick.reset();
+    _onEnter.reset();
+}
 
 } // namespace game
 
