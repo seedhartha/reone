@@ -17,24 +17,24 @@
 
 #pragma once
 
+#include "../../game/camerastyles.h"
+#include "../../game/d20/classes.h"
+#include "../../game/d20/feats.h"
+#include "../../game/d20/skills.h"
+#include "../../game/d20/spells.h"
+#include "../../game/dialogs.h"
+#include "../../game/footstepsounds.h"
 #include "../../game/game.h"
+#include "../../game/guisounds.h"
+#include "../../game/layouts.h"
+#include "../../game/paths.h"
+#include "../../game/portraits.h"
+#include "../../game/reputes.h"
 #include "../../game/services.h"
-#include "../../kotor/camerastyles.h"
+#include "../../game/soundsets.h"
+#include "../../game/surfaces.h"
+#include "../../game/visibilities.h"
 #include "../../kotor/cursors.h"
-#include "../../kotor/d20/classes.h"
-#include "../../kotor/d20/feats.h"
-#include "../../kotor/d20/skills.h"
-#include "../../kotor/d20/spells.h"
-#include "../../kotor/dialogs.h"
-#include "../../kotor/footstepsounds.h"
-#include "../../kotor/gui/sounds.h"
-#include "../../kotor/layouts.h"
-#include "../../kotor/paths.h"
-#include "../../kotor/portraits.h"
-#include "../../kotor/reputes.h"
-#include "../../kotor/soundsets.h"
-#include "../../kotor/surfaces.h"
-#include "../../kotor/visibilities.h"
 
 #include "../../types.h"
 
@@ -85,22 +85,23 @@ private:
     SceneModule &_scene;
     ScriptModule &_script;
 
-    std::unique_ptr<kotor::CameraStyles> _cameraStyles;
-    std::unique_ptr<kotor::Classes> _classes;
     std::unique_ptr<kotor::Cursors> _cursors;
-    std::unique_ptr<kotor::Dialogs> _dialogs;
-    std::unique_ptr<kotor::Feats> _feats;
-    std::unique_ptr<kotor::FootstepSounds> _footstepSounds;
-    std::unique_ptr<kotor::GUISounds> _guiSounds;
-    std::unique_ptr<kotor::Layouts> _layouts;
-    std::unique_ptr<kotor::Paths> _paths;
-    std::unique_ptr<kotor::Portraits> _portraits;
-    std::unique_ptr<kotor::Reputes> _reputes;
-    std::unique_ptr<kotor::Skills> _skills;
-    std::unique_ptr<kotor::SoundSets> _soundSets;
-    std::unique_ptr<kotor::Spells> _spells;
-    std::unique_ptr<kotor::Surfaces> _surfaces;
-    std::unique_ptr<kotor::Visibilities> _visibilities;
+
+    std::unique_ptr<game::CameraStyles> _cameraStyles;
+    std::unique_ptr<game::Classes> _classes;
+    std::unique_ptr<game::Dialogs> _dialogs;
+    std::unique_ptr<game::Feats> _feats;
+    std::unique_ptr<game::FootstepSounds> _footstepSounds;
+    std::unique_ptr<game::GUISounds> _guiSounds;
+    std::unique_ptr<game::Layouts> _layouts;
+    std::unique_ptr<game::Paths> _paths;
+    std::unique_ptr<game::Portraits> _portraits;
+    std::unique_ptr<game::Reputes> _reputes;
+    std::unique_ptr<game::Skills> _skills;
+    std::unique_ptr<game::SoundSets> _soundSets;
+    std::unique_ptr<game::Spells> _spells;
+    std::unique_ptr<game::Surfaces> _surfaces;
+    std::unique_ptr<game::Visibilities> _visibilities;
 
     std::unique_ptr<game::Services> _services;
     std::unique_ptr<game::Game> _game;

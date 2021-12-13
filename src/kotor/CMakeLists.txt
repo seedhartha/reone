@@ -14,19 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(KOTOR_HEADERS
-    camerastyles.h
     cursors.h
-    d20/classes.h
-    d20/feats.h
-    d20/skills.h
-    d20/spells.h
-    dialogs.h
-    footstepsounds.h
-    format/ltrreader.h
-    format/lytreader.h
-    format/ssfreader.h
-    format/ssfwriter.h
-    format/visreader.h
     gui.h
     gui/barkbubble.h
     gui/chargen.h
@@ -62,35 +50,15 @@ set(KOTOR_HEADERS
     gui/profileoverlay.h
     gui/saveload.h
     gui/selectoverlay.h
-    gui/sounds.h
     kotor.h
-    layouts.h
-    paths.h
-    portraits.h
-    reputes.h
     script/routine/argutil.h
     script/routine/context.h
     script/routine/declarations.h
     script/routine/objectutil.h
-    script/routines.h
-    soundsets.h
-    surfaces.h
-    visibilities.h)
+    script/routines.h)
 
 set(KOTOR_SOURCES
-    camerastyles.cpp
     cursors.cpp
-    d20/classes.cpp
-    d20/feats.cpp
-    d20/skills.cpp
-    d20/spells.cpp
-    dialogs.cpp
-    footstepsounds.cpp
-    format/ltrreader.cpp
-    format/lytreader.cpp
-    format/ssfreader.cpp
-    format/ssfwriter.cpp
-    format/visreader.cpp
     gui.cpp
     gui/barkbubble.cpp
     gui/chargen.cpp
@@ -126,12 +94,7 @@ set(KOTOR_SOURCES
     gui/profileoverlay.cpp
     gui/saveload.cpp
     gui/selectoverlay.cpp
-    gui/sounds.cpp
     kotor.cpp
-    layouts.cpp
-    paths.cpp
-    portraits.cpp
-    reputes.cpp
     script/routine/argutil.cpp
     script/routine/impl/action.cpp
     script/routine/impl/ambientsound.cpp
@@ -155,10 +118,7 @@ set(KOTOR_SOURCES
     script/routine/impl/talent.cpp
     script/routine/impl/time.cpp
     script/routine/impl/vector.cpp
-    script/routines.cpp
-    soundsets.cpp
-    surfaces.cpp
-    visibilities.cpp)
+    script/routines.cpp)
 
 add_library(kotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES})
 set_target_properties(kotor PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

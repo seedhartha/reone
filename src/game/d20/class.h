@@ -35,13 +35,13 @@ class TwoDas;
 
 namespace game {
 
-class IClasses;
+class Classes;
 
 class CreatureClass {
 public:
     CreatureClass(
         ClassType type,
-        IClasses &classes,
+        Classes &classes,
         resource::Strings &strings,
         resource::TwoDas &twoDas) :
         _type(type),
@@ -84,7 +84,7 @@ private:
 
     // Services
 
-    IClasses &_classes;
+    Classes &_classes;
 
     resource::Strings &_strings;
     resource::TwoDas &_twoDas;

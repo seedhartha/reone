@@ -184,12 +184,17 @@ set(GAME_HEADERS
     effect/whirlwind.h
     event.h
     footstepsounds.h
+    format/ltrreader.h
+    format/lytreader.h
+    format/ssfreader.h
+    format/ssfwriter.h
+    format/visreader.h
     game.h
     gui/console.h
     gui/loadscreen.h
     gui/map.h
     gui/profileoverlay.h
-    gui/sounds.h
+    guisounds.h
     layout.h
     layouts.h
     location.h
@@ -284,9 +289,15 @@ set(GAME_SOURCES
     camera/firstperson.cpp
     camera/static.cpp
     camera/thirdperson.cpp
+    camerastyles.cpp
     combat.cpp
     d20/attributes.cpp
     d20/class.cpp
+    d20/classes.cpp
+    d20/feats.cpp
+    d20/skills.cpp
+    d20/spells.cpp
+    dialogs.cpp
     effect.cpp
     effect/abilitydecrease.cpp
     effect/abilityincrease.cpp
@@ -377,7 +388,15 @@ set(GAME_SOURCES
     effect/visual.cpp
     effect/vpregenmodifier.cpp
     effect/whirlwind.cpp
+    footstepsounds.cpp
+    format/ltrreader.cpp
+    format/lytreader.cpp
+    format/ssfreader.cpp
+    format/ssfwriter.cpp
+    format/visreader.cpp
     game.cpp
+    guisounds.cpp
+    layouts.cpp
     object.cpp
     object/area.cpp
     object/creature.cpp
@@ -394,8 +413,14 @@ set(GAME_SOURCES
     object/waypoint.cpp
     party.cpp
     pathfinder.cpp
+    paths.cpp
     player.cpp
+    portraits.cpp
+    reputes.cpp
     room.cpp
+    soundsets.cpp
+    surfaces.cpp
+    visibilities.cpp
     script/runner.cpp)
 
 add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES})

@@ -15,34 +15,43 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "visreader.h"
 
-#include "../common/memorycache.h"
-
-#include "layout.h"
+using namespace std;
 
 namespace reone {
 
-namespace resource {
-
-class Resources;
-
-}
-
 namespace game {
 
-class Layouts : public MemoryCache<std::string, Layout> {
-public:
-    Layouts(resource::Resources &resources) :
-        MemoryCache(std::bind(&Layouts::doGet, this, std::placeholders::_1)),
-        _resources(resources) {
+void VisReader::load(const shared_ptr<istream> &in) {
+    if (!in) {
+        throw invalid_argument("Invalid input stream");
     }
+    char buf[32];
+    do {
+        in->getline(buf, sizeof(buf));
 
-private:
-    resource::Resources &_resources;
+        string line(buf);
+        boost::trim(line);
 
-    std::shared_ptr<Layout> doGet(std::string resRef);
-};
+        if (line.empty())
+            continue;
+
+        processLine(line);
+    } while (!in->eof());
+}
+
+void VisReader::processLine(const string &line) {
+    vector<string> tokens;
+    boost::split(tokens, line, boost::is_space(), boost::token_compress_on);
+
+    if (tokens.size() == 2) {
+        _roomFrom = boost::to_lower_copy(tokens[0]);
+    } else {
+        string room(boost::to_lower_copy(tokens[0]));
+        _visibility.insert(make_pair(_roomFrom, move(room)));
+    }
+}
 
 } // namespace game
 

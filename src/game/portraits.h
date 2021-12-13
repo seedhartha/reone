@@ -17,26 +17,45 @@
 
 #pragma once
 
+#include "portrait.h"
+
 namespace reone {
+
+namespace resource {
+
+class TwoDas;
+
+} // namespace resource
 
 namespace graphics {
 
 class Texture;
+class Textures;
 
-}
+} // namespace graphics
 
 namespace game {
 
-struct Portrait;
-
-class IPortraits : boost::noncopyable {
+class Portraits : boost::noncopyable {
 public:
-    virtual ~IPortraits() = default;
+    Portraits(graphics::Textures &textures, resource::TwoDas &twoDas) :
+        _textures(textures), _twoDas(twoDas) {
+    }
 
-    virtual std::shared_ptr<graphics::Texture> getTextureByIndex(int index) const = 0;
-    virtual std::shared_ptr<graphics::Texture> getTextureByAppearance(int appearance) const = 0;
+    void init();
 
-    virtual const std::vector<Portrait> &portraits() const = 0;
+    std::shared_ptr<graphics::Texture> getTextureByIndex(int index) const;
+    std::shared_ptr<graphics::Texture> getTextureByAppearance(int appearance) const;
+
+    const std::vector<Portrait> &portraits() const { return _portraits; }
+
+private:
+    graphics::Textures &_textures;
+    resource::TwoDas &_twoDas;
+
+    std::vector<Portrait> _portraits;
+
+    std::shared_ptr<graphics::Texture> getPortraitTexture(const Portrait &portrait) const;
 };
 
 } // namespace game

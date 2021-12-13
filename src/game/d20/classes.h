@@ -25,13 +25,32 @@
 
 namespace reone {
 
+namespace resource {
+
+class Strings;
+class TwoDas;
+
+} // namespace resource
+
 namespace game {
 
-class IClasses : public MemoryCache<ClassType, CreatureClass> {
+class Classes : public MemoryCache<ClassType, CreatureClass> {
 public:
-    IClasses(std::function<std::shared_ptr<CreatureClass>(ClassType)> compute) :
-        MemoryCache(std::move(compute)) {
+    Classes(resource::Strings &strings, resource::TwoDas &twoDas) :
+        MemoryCache(std::bind(&Classes::doGet, this, std::placeholders::_1)),
+        _strings(strings),
+        _twoDas(twoDas) {
     }
+
+private:
+    // Services
+
+    resource::Strings &_strings;
+    resource::TwoDas &_twoDas;
+
+    // END Services
+
+    std::shared_ptr<CreatureClass> doGet(ClassType type);
 };
 
 } // namespace game

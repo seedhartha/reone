@@ -17,31 +17,20 @@
 
 #pragma once
 
-#include "../common/memorycache.h"
-
-#include "layout.h"
-
 namespace reone {
-
-namespace resource {
-
-class Resources;
-
-}
 
 namespace game {
 
-class Layouts : public MemoryCache<std::string, Layout> {
+class SsfWriter {
 public:
-    Layouts(resource::Resources &resources) :
-        MemoryCache(std::bind(&Layouts::doGet, this, std::placeholders::_1)),
-        _resources(resources) {
+    SsfWriter(std::vector<uint32_t> soundSet) :
+        _soundSet(std::move(soundSet)) {
     }
 
-private:
-    resource::Resources &_resources;
+    void save(const boost::filesystem::path &path);
 
-    std::shared_ptr<Layout> doGet(std::string resRef);
+private:
+    std::vector<uint32_t> _soundSet;
 };
 
 } // namespace game

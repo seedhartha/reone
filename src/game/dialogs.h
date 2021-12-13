@@ -23,13 +23,36 @@
 
 namespace reone {
 
+namespace resource {
+
+class Gffs;
+class GffStruct;
+class Strings;
+
+} // namespace resource
+
 namespace game {
 
-class IDialogs : public MemoryCache<std::string, Dialog> {
+class Dialogs : public MemoryCache<std::string, Dialog> {
 public:
-    IDialogs(std::function<std::shared_ptr<Dialog>(std::string)> compute) :
-        MemoryCache(std::move(compute)) {
+    Dialogs(resource::Gffs &gffs, resource::Strings &strings) :
+        MemoryCache(std::bind(&Dialogs::doGet, this, std::placeholders::_1)),
+        _gffs(gffs),
+        _strings(strings) {
     }
+
+private:
+    resource::Gffs &_gffs;
+    resource::Strings &_strings;
+
+    std::shared_ptr<Dialog> doGet(std::string resRef);
+
+    std::unique_ptr<Dialog> loadDialog(const resource::GffStruct &dlg);
+
+    Dialog::EntryReplyLink getEntryReplyLink(const resource::GffStruct &gffs) const;
+    Dialog::EntryReply getEntryReply(const resource::GffStruct &gffs) const;
+    Dialog::Stunt getStunt(const resource::GffStruct &gffs) const;
+    Dialog::ParticipantAnimation getParticipantAnimation(const resource::GffStruct &gffs) const;
 };
 
 } // namespace game

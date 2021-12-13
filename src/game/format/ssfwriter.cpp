@@ -15,34 +15,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "ssfwriter.h"
 
-#include "../common/memorycache.h"
+#include "../../common/streamwriter.h"
 
-#include "layout.h"
+using namespace std;
+
+namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace resource {
-
-class Resources;
-
-}
-
 namespace game {
 
-class Layouts : public MemoryCache<std::string, Layout> {
-public:
-    Layouts(resource::Resources &resources) :
-        MemoryCache(std::bind(&Layouts::doGet, this, std::placeholders::_1)),
-        _resources(resources) {
+void SsfWriter::save(const fs::path &path) {
+    auto stream = make_shared<fs::ofstream>(path);
+    StreamWriter writer(stream);
+
+    writer.putString("SSF V1.1");
+    writer.putUint32(12); // offset to entries
+
+    for (auto val : _soundSet) {
+        writer.putUint32(val);
     }
-
-private:
-    resource::Resources &_resources;
-
-    std::shared_ptr<Layout> doGet(std::string resRef);
-};
+}
 
 } // namespace game
 

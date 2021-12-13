@@ -15,34 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "classes.h"
 
-#include "../common/memorycache.h"
+#include "../../resource/2das.h"
 
-#include "layout.h"
+using namespace std;
+
+using namespace reone::resource;
 
 namespace reone {
 
-namespace resource {
-
-class Resources;
-
-}
-
 namespace game {
 
-class Layouts : public MemoryCache<std::string, Layout> {
-public:
-    Layouts(resource::Resources &resources) :
-        MemoryCache(std::bind(&Layouts::doGet, this, std::placeholders::_1)),
-        _resources(resources) {
-    }
+static const char kClassesTableResRef[] = "classes";
 
-private:
-    resource::Resources &_resources;
+shared_ptr<CreatureClass> Classes::doGet(ClassType type) {
+    shared_ptr<TwoDA> classes(_twoDas.get(kClassesTableResRef));
 
-    std::shared_ptr<Layout> doGet(std::string resRef);
-};
+    auto clazz = make_shared<CreatureClass>(type, *this, _strings, _twoDas);
+    clazz->load(*classes, static_cast<int>(type));
+
+    return move(clazz);
+}
 
 } // namespace game
 

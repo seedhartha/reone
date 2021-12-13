@@ -19,17 +19,50 @@
 
 #include "../types.h"
 
+#include "spell.h"
+
 namespace reone {
+
+namespace resource {
+
+class Strings;
+class TwoDas;
+
+} // namespace resource
+
+namespace graphics {
+
+class Textures;
+
+}
 
 namespace game {
 
-struct Spell;
-
-class ISpells : boost::noncopyable {
+class Spells : boost::noncopyable {
 public:
-    virtual ~ISpells() = default;
+    Spells(
+        graphics::Textures &textures,
+        resource::Strings &strings,
+        resource::TwoDas &twoDas) :
+        _textures(textures),
+        _strings(strings),
+        _twoDas(twoDas) {
+    }
 
-    virtual std::shared_ptr<Spell> get(ForcePower type) const = 0;
+    void init();
+
+    std::shared_ptr<Spell> get(ForcePower type) const;
+
+private:
+    std::unordered_map<ForcePower, std::shared_ptr<Spell>> _spells;
+
+    // Services
+
+    graphics::Textures &_textures;
+    resource::Strings &_strings;
+    resource::TwoDas &_twoDas;
+
+    // END Services
 };
 
 } // namespace game

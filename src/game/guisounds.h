@@ -17,31 +17,47 @@
 
 #pragma once
 
-#include "../common/memorycache.h"
-
-#include "layout.h"
-
 namespace reone {
 
 namespace resource {
 
-class Resources;
+class TwoDA;
+class TwoDas;
 
-}
+} // namespace resource
+
+namespace audio {
+
+class AudioFiles;
+class AudioStream;
+
+} // namespace audio
 
 namespace game {
 
-class Layouts : public MemoryCache<std::string, Layout> {
+class GUISounds : boost::noncopyable {
 public:
-    Layouts(resource::Resources &resources) :
-        MemoryCache(std::bind(&Layouts::doGet, this, std::placeholders::_1)),
-        _resources(resources) {
+    GUISounds(audio::AudioFiles &audioFiles, resource::TwoDas &twoDas) :
+        _audioFiles(audioFiles),
+        _twoDas(twoDas) {
     }
 
-private:
-    resource::Resources &_resources;
+    ~GUISounds() { deinit(); }
 
-    std::shared_ptr<Layout> doGet(std::string resRef);
+    void init();
+    void deinit();
+
+    std::shared_ptr<audio::AudioStream> getOnClick() const { return _onClick; }
+    std::shared_ptr<audio::AudioStream> getOnEnter() const { return _onEnter; }
+
+private:
+    audio::AudioFiles &_audioFiles;
+    resource::TwoDas &_twoDas;
+
+    std::shared_ptr<audio::AudioStream> _onClick;
+    std::shared_ptr<audio::AudioStream> _onEnter;
+
+    void loadSound(const resource::TwoDA &twoDa, const std::string &label, std::shared_ptr<audio::AudioStream> &sound);
 };
 
 } // namespace game
