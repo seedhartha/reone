@@ -147,11 +147,11 @@ void GrassSceneNode::drawElements(const vector<SceneNode *> &elements, int count
     _context.bindTexture(TextureUnits::diffuseMap, _texture);
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.combined = _sceneGraph.uniformsPrototype().combined;
-    uniforms.combined.featureMask = UniformsFeatureFlags::grass;
+    uniforms.general = _sceneGraph.uniformsPrototype().general;
+    uniforms.general.featureMask = UniformsFeatureFlags::grass;
     if (_aabbNode->mesh()->lightmap) {
         _context.bindTexture(TextureUnits::lightmap, _aabbNode->mesh()->lightmap);
-        uniforms.combined.featureMask |= UniformsFeatureFlags::lightmap;
+        uniforms.general.featureMask |= UniformsFeatureFlags::lightmap;
     }
     for (int i = 0; i < count; ++i) {
         auto cluster = static_cast<GrassClusterSceneNode *>(elements[i]);

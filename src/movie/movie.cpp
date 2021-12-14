@@ -84,7 +84,7 @@ void Movie::draw() {
     _texture->refresh();
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.combined = CombinedUniforms();
+    uniforms.general = GeneralUniforms();
 
     _context.useShaderProgram(_shaders.gui());
     _shaders.refreshUniforms();

@@ -75,10 +75,10 @@ void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &ex
     shared_ptr<CameraSceneNode> camera(sceneGraph.activeCamera());
 
     auto &uniformsPrototype = sceneGraph.uniformsPrototype();
-    uniformsPrototype.combined = CombinedUniforms();
-    uniformsPrototype.combined.general.projection = camera->projection();
-    uniformsPrototype.combined.general.view = camera->view();
-    uniformsPrototype.combined.general.cameraPosition = camera->absoluteTransform()[3];
+    uniformsPrototype.general = GeneralUniforms();
+    uniformsPrototype.general.projection = camera->projection();
+    uniformsPrototype.general.view = camera->view();
+    uniformsPrototype.general.cameraPosition = camera->absoluteTransform()[3];
 
     // Draw to framebuffer
 
@@ -114,9 +114,9 @@ void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &ex
     transform = glm::scale(transform, glm::vec3(extent[2], extent[3], 1.0f));
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.combined = CombinedUniforms();
-    uniforms.combined.general.projection = move(projection);
-    uniforms.combined.general.model = move(transform);
+    uniforms.general = GeneralUniforms();
+    uniforms.general.projection = move(projection);
+    uniforms.general.model = move(transform);
 
     _context.useShaderProgram(_shaders.gui());
     _shaders.refreshUniforms();

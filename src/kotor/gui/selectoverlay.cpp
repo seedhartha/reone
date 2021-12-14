@@ -266,9 +266,9 @@ void SelectionOverlay::drawReticle(shared_ptr<Texture> texture, const glm::vec3 
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
     auto &uniforms = _services.shaders.uniforms();
-    uniforms.combined = CombinedUniforms();
-    uniforms.combined.general.projection = _services.window.getOrthoProjection();
-    uniforms.combined.general.model = move(transform);
+    uniforms.general = GeneralUniforms();
+    uniforms.general.projection = _services.window.getOrthoProjection();
+    uniforms.general.model = move(transform);
 
     _services.context.useShaderProgram(_services.shaders.gui());
     _services.shaders.refreshUniforms();
@@ -293,11 +293,11 @@ void SelectionOverlay::drawTitleBar() {
         transform = glm::scale(transform, glm::vec3(kTitleBarWidth, barHeight, 1.0f));
 
         auto &uniforms = _services.shaders.uniforms();
-        uniforms.combined = CombinedUniforms();
-        uniforms.combined.general.projection = _services.window.getOrthoProjection();
-        uniforms.combined.general.model = move(transform);
-        uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-        uniforms.combined.general.alpha = 0.5f;
+        uniforms.general = GeneralUniforms();
+        uniforms.general.projection = _services.window.getOrthoProjection();
+        uniforms.general.model = move(transform);
+        uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        uniforms.general.alpha = 0.5f;
 
         _services.context.useShaderProgram(_services.shaders.simpleColor());
         _services.shaders.refreshUniforms();
@@ -328,10 +328,10 @@ void SelectionOverlay::drawHealthBar() {
     transform = glm::scale(transform, glm::vec3(w, kHealthBarHeight, 1.0f));
 
     auto &uniforms = _services.shaders.uniforms();
-    uniforms.combined = CombinedUniforms();
-    uniforms.combined.general.projection = _services.window.getOrthoProjection();
-    uniforms.combined.general.model = move(transform);
-    uniforms.combined.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
+    uniforms.general = GeneralUniforms();
+    uniforms.general.projection = _services.window.getOrthoProjection();
+    uniforms.general.model = move(transform);
+    uniforms.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
 
     _services.context.useShaderProgram(_services.shaders.simpleColor());
     _services.shaders.refreshUniforms();
@@ -367,9 +367,9 @@ void SelectionOverlay::drawActionFrame(int index) {
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionHeight, 1.0f));
 
     auto &uniforms = _services.shaders.uniforms();
-    uniforms.combined = CombinedUniforms();
-    uniforms.combined.general.projection = _services.window.getOrthoProjection();
-    uniforms.combined.general.model = move(transform);
+    uniforms.general = GeneralUniforms();
+    uniforms.general.projection = _services.window.getOrthoProjection();
+    uniforms.general.model = move(transform);
 
     _services.context.useShaderProgram(_services.shaders.gui());
     _services.shaders.refreshUniforms();
@@ -431,9 +431,9 @@ void SelectionOverlay::drawActionIcon(int index) {
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionWidth, 1.0f));
 
     auto &uniforms = _services.shaders.uniforms();
-    uniforms.combined = CombinedUniforms();
-    uniforms.combined.general.projection = _services.window.getOrthoProjection();
-    uniforms.combined.general.model = move(transform);
+    uniforms.general = GeneralUniforms();
+    uniforms.general.projection = _services.window.getOrthoProjection();
+    uniforms.general.model = move(transform);
 
     _services.context.useShaderProgram(_services.shaders.gui());
     _services.shaders.refreshUniforms();
