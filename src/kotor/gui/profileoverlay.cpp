@@ -109,7 +109,7 @@ void ProfileOverlay::drawBackground() {
     transform = glm::scale(transform, glm::vec3(kFrameWidth, 2.0f * _font->height(), 1.0f));
 
     auto &uniforms = _services.shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.projection = _services.window.getOrthoProjection();
     uniforms.general.model = move(transform);
     uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);

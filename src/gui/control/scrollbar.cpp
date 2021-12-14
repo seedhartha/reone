@@ -65,7 +65,7 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
         return;
     }
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.projection = _window.getOrthoProjection();
 
     _context.bindTexture(0, _thumb.image);
@@ -130,7 +130,7 @@ void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.projection = _window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
@@ -146,7 +146,7 @@ void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
     transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.projection = _window.getOrthoProjection();
     uniforms.general.model = move(transform);
 

@@ -232,10 +232,8 @@ void WorldRenderPipeline::drawShadows() {
         shadowLight->isDirectional() ? 0.0f : 1.0f);
 
     auto &uniformsPrototype = _sceneGraph.uniformsPrototype();
-    uniformsPrototype.general = GeneralUniforms();
+    uniformsPrototype.general.reset();
     uniformsPrototype.general.featureMask = UniformsFeatureFlags::shadows;
-    uniformsPrototype.general.projection = glm::mat4(1.0f);
-    uniformsPrototype.general.view = glm::mat4(1.0f);
     uniformsPrototype.general.shadowLightPosition = move(lightPosition);
     for (int i = 0; i < kNumCubeFaces; ++i) {
         uniformsPrototype.general.shadowLightSpaceMatrices[i] = _shadowLightSpaceMatrices[i];
@@ -280,7 +278,7 @@ void WorldRenderPipeline::drawGeometry() {
     const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
 
     auto &uniforms = _sceneGraph.uniformsPrototype();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.featureMask = shadowLight ? UniformsFeatureFlags::shadowlight : 0;
     uniforms.general.projection = camera->projection();
     uniforms.general.view = camera->view();
@@ -362,7 +360,7 @@ void WorldRenderPipeline::applyHorizontalBlur() {
     float h = static_cast<float>(_options.height);
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.featureMask = UniformsFeatureFlags::blur;
     uniforms.general.blurResolution = glm::vec2(w, h);
     uniforms.general.blurDirection = glm::vec2(1.0f, 0.0f);
@@ -400,7 +398,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
     float h = static_cast<float>(_options.height);
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.featureMask = UniformsFeatureFlags::blur;
     uniforms.general.blurResolution = glm::vec2(w, h);
     uniforms.general.blurDirection = glm::vec2(0.0f, 1.0f);
@@ -439,7 +437,7 @@ void WorldRenderPipeline::drawResult() {
     // Set shader uniforms
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
 
     // Draw a quad
 
