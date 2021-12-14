@@ -167,16 +167,17 @@ bool Module::handle(const SDL_Event &event) {
 bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
     CursorType cursor = CursorType::Default;
 
-    shared_ptr<SpatialObject> object(_area->getObjectAt(event.x, event.y));
+    auto object = _area->getObjectAt(event.x, event.y);
     if (object && object->isSelectable()) {
-        _area->hilightObject(object);
+        auto objectPtr = _game.objectFactory().getObjectById(object->id());
+        _area->hilightObject(static_pointer_cast<SpatialObject>(objectPtr));
 
         switch (object->type()) {
         case ObjectType::Creature: {
             if (object->isDead()) {
                 cursor = CursorType::Pickup;
             } else {
-                auto creature = static_pointer_cast<Creature>(object);
+                auto creature = static_cast<Creature *>(object);
                 bool isEnemy = _services.reputes.getIsEnemy(*creature, *_game.party().getLeader());
                 cursor = isEnemy ? CursorType::Attack : CursorType::Talk;
             }
@@ -201,19 +202,20 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
 }
 
 bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
-    if (event.button != SDL_BUTTON_LEFT)
+    if (event.button != SDL_BUTTON_LEFT) {
         return false;
-
-    shared_ptr<SpatialObject> object(_area->getObjectAt(event.x, event.y));
-    if (!object || !object->isSelectable())
+    }
+    auto object = _area->getObjectAt(event.x, event.y);
+    if (!object || !object->isSelectable()) {
         return false;
-
+    }
+    auto objectPtr = static_pointer_cast<SpatialObject>(_game.objectFactory().getObjectById(object->id()));
     auto selectedObject = _area->selectedObject();
-    if (object != selectedObject) {
-        _area->selectObject(object);
+    if (objectPtr != selectedObject) {
+        _area->selectObject(objectPtr);
         return true;
     }
-    onObjectClick(object);
+    onObjectClick(objectPtr);
 
     return true;
 }

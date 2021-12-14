@@ -100,15 +100,17 @@ public:
 
     // END Roots
 
-    // Collision detection
+    // Collision detection and object picking
 
     bool testElevation(const glm::vec2 &position, Collision &outCollision) const;
     bool testObstacle(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const;
 
+    std::shared_ptr<ModelSceneNode> pickModelAt(int x, int y, IUser *except = nullptr) const;
+
     void setWalkableSurfaces(std::set<uint32_t> surfaces) { _walkableSurfaces = std::move(surfaces); }
     void setWalkcheckSurfaces(std::set<uint32_t> surfaces) { _walkcheckSurfaces = std::move(surfaces); }
 
-    // END Collision detection
+    // END Collision detection and object picking
 
     // Lighting and shadows
 

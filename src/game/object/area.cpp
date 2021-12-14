@@ -1253,47 +1253,17 @@ void Area::doUpdatePerception() {
     }
 }
 
-shared_ptr<SpatialObject> Area::getObjectAt(int x, int y) const {
-    shared_ptr<CameraSceneNode> camera(_services.sceneGraphs.get(_sceneName).activeCamera());
-    shared_ptr<Creature> partyLeader(_game.party().getLeader());
-    if (!camera || !partyLeader) {
+SpatialObject *Area::getObjectAt(int x, int y) const {
+    auto partyLeader = _game.party().getLeader();
+    if (!partyLeader) {
         return nullptr;
     }
-
-    const GraphicsOptions &opts = _game.options().graphics;
-    glm::vec4 viewport(0.0f, 0.0f, opts.width, opts.height);
-    glm::vec3 start(glm::unProject(glm::vec3(x, opts.height - y, 0.0f), camera->view(), camera->projection(), viewport));
-    glm::vec3 end(glm::unProject(glm::vec3(x, opts.height - y, 1.0f), camera->view(), camera->projection(), viewport));
-    glm::vec3 dir(glm::normalize(end - start));
-
-    // Calculate distances to all selectable objects, return the closest object
-    vector<pair<shared_ptr<SpatialObject>, float>> distances;
-    for (auto &o : _objects) {
-        // Skip non-selectable objects and party leader
-        if (!o->isSelectable() || o == partyLeader)
-            continue;
-
-        auto model = static_pointer_cast<ModelSceneNode>(o->sceneNode());
-        if (!model)
-            continue;
-
-        // Distance to object must not exceed maximum collision distance
-        if (o->getSquareDistanceTo(start) > kMaxCollisionDistance2)
-            continue;
-
-        // Test object AABB (object space)
-        glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
-        glm::vec3 objSpaceDir(model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
-        float distance;
-        if (model->aabb().raycast(objSpaceStart, objSpaceDir, kMaxCollisionDistance, distance)) {
-            distances.push_back(make_pair(o, distance));
-        }
-    }
-    if (distances.empty())
+    auto &scene = _services.sceneGraphs.get(kSceneMain);
+    auto model = scene.pickModelAt(x, y, partyLeader.get());
+    if (!model) {
         return nullptr;
-    std::sort(distances.begin(), distances.end(), [](auto &left, auto &right) { return left.second < right.second; });
-
-    return distances[0].first;
+    }
+    return dynamic_cast<SpatialObject *>(model->user());
 }
 
 } // namespace game

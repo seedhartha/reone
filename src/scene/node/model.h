@@ -58,6 +58,8 @@ public:
     void computeAABB();
     void signalEvent(const std::string &name);
 
+    bool isPickable() const { return _pickable; }
+
     std::shared_ptr<ModelNodeSceneNode> getNodeByNumber(uint16_t number) const;
     std::shared_ptr<ModelNodeSceneNode> getNodeByName(const std::string &name) const;
 
@@ -69,6 +71,7 @@ public:
     void setDrawDistance(float distance) { _drawDistance = distance; }
     void setDiffuseTexture(std::shared_ptr<graphics::Texture> texture);
     void setAppliedForce(glm::vec3 force);
+    void setPickable(bool pickable) { _pickable = pickable; }
 
     // Animation
 
@@ -155,6 +158,12 @@ private:
     AnimationBlendMode _animBlendMode {AnimationBlendMode::Single};
 
     // END Animation
+
+    // Flags
+
+    bool _pickable {true};
+
+    // END Flags
 
     void buildNodeTree(std::shared_ptr<graphics::ModelNode> node, SceneNode &parent);
 
