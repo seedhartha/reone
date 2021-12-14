@@ -31,13 +31,7 @@ public:
     void deinit();
 
     Mesh &quad() const { return *_quad; }
-    Mesh &quadFlipX() const { return *_quadFlipX; }
-    Mesh &quadFlipY() const { return *_quadFlipY; }
-    Mesh &quadFlipXY() const { return *_quadFlipXY; }
-    Mesh &quadSwap() const { return *_quadSwap; }
-    Mesh &quadSwapFlipX() const { return *_quadSwapFlipX; }
     Mesh &quadNDC() const { return *_quadNDC; }
-    Mesh &quadNDCFlipY() const { return *_quadNDCFlipY; }
     Mesh &billboard() const { return *_billboard; }
     Mesh &grass() const { return *_grass; }
     Mesh &cubemap() const { return *_cubemap; }
@@ -46,13 +40,7 @@ private:
     bool _inited {false};
 
     std::unique_ptr<Mesh> _quad;
-    std::unique_ptr<Mesh> _quadFlipX;
-    std::unique_ptr<Mesh> _quadFlipY;
-    std::unique_ptr<Mesh> _quadFlipXY;
-    std::unique_ptr<Mesh> _quadSwap;
-    std::unique_ptr<Mesh> _quadSwapFlipX;
     std::unique_ptr<Mesh> _quadNDC;
-    std::unique_ptr<Mesh> _quadNDCFlipY;
     std::unique_ptr<Mesh> _billboard;
     std::unique_ptr<Mesh> _grass;
     std::unique_ptr<Mesh> _cubemap;

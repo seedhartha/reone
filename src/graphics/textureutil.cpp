@@ -30,14 +30,12 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
 
     if (usage == TextureUsage::GUI ||
         usage == TextureUsage::ColorBuffer ||
-        usage == TextureUsage::IrradianceMap ||
-        usage == TextureUsage::BRDFLookup ||
         usage == TextureUsage::Video) {
 
         properties.minFilter = Texture::Filtering::Linear;
         properties.wrap = Texture::Wrapping::ClampToEdge;
 
-    } else if (usage == TextureUsage::EnvironmentMap || usage == TextureUsage::PrefilterMap) {
+    } else if (usage == TextureUsage::EnvironmentMap) {
         properties.wrap = Texture::Wrapping::ClampToEdge;
 
     } else if (usage == TextureUsage::DepthBuffer || usage == TextureUsage::CubeMapDepthBuffer) {
@@ -52,8 +50,6 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
 
     if (usage == TextureUsage::CubeMapDefault ||
         usage == TextureUsage::EnvironmentMap ||
-        usage == TextureUsage::IrradianceMap ||
-        usage == TextureUsage::PrefilterMap ||
         usage == TextureUsage::CubeMapDepthBuffer) {
 
         properties.cubemap = true;

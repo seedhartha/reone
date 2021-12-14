@@ -65,6 +65,7 @@ layout(std140) uniform General {
     mat4 uProjection;
     mat4 uView;
     mat4 uModel;
+    mat3 uUV;
     vec4 uCameraPosition;
     vec4 uColor;
     vec4 uWorldAmbientColor;
@@ -75,7 +76,6 @@ layout(std140) uniform General {
     vec4 uFogColor;
     vec4 uHeightMapFrameBounds;
     vec4 uShadowLightPosition;
-    vec2 uUvOffset;
     vec2 uBlurResolution;
     vec2 uBlurDirection;
     float uAlpha;
@@ -168,10 +168,6 @@ in mat3 fragTanSpace;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
-
-vec2 getTexCoords() {
-    return fragTexCoords + uUvOffset;
-}
 
 float getAttenuationQuadratic(int light) {
     if (uLights[light].position.w == 0.0) return 1.0;
@@ -574,7 +570,8 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
 void main() {
-    vec4 diffuseSample = texture(sDiffuseMap, fragTexCoords);
+    vec2 uv = vec2(uUV * vec3(fragTexCoords, 1.0));
+    vec4 diffuseSample = texture(sDiffuseMap, uv);
     vec3 objectColor = uColor.rgb * diffuseSample.rgb;
 
     if (isFeatureEnabled(FEATURE_DISCARD) && length(uDiscardColor.rgb - objectColor) < 0.01) discard;
@@ -741,7 +738,7 @@ vec3 getLightingDirect(vec3 N) {
 
 static const string g_shaderFragmentBlinnPhong = R"END(
 void main() {
-    vec2 uv = getTexCoords();
+    vec2 uv = vec2(uUV * vec3(fragTexCoords, 1.0));
     vec3 N = getNormal(uv);
     float shadow = getShadow();
     vec4 diffuseSample = texture(sDiffuseMap, uv);

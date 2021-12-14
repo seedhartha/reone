@@ -205,6 +205,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
+            uniforms.general = GeneralUniforms();
             uniforms.general.featureMask = _discardEnabled ? UniformsFeatureFlags::discard : 0;
             uniforms.general.projection = _window.getOrthoProjection();
             uniforms.general.model = move(transform);
@@ -240,14 +241,18 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
 
                 auto &uniforms = _shaders.uniforms();
-                uniforms.general.featureMask = 0;
+                uniforms.general = GeneralUniforms();
                 uniforms.general.projection = _window.getOrthoProjection();
                 uniforms.general.model = move(transform);
+                uniforms.general.uv = glm::mat3x4(
+                    glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+                    glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+                    glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
                 uniforms.general.color = glm::vec4(color, 1.0f);
 
                 _context.useShaderProgram(_shaders.gui());
                 _shaders.refreshUniforms();
-                _meshes.quadSwapFlipX().draw();
+                _meshes.quad().draw();
             }
 
             // Right edge
@@ -257,14 +262,18 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
 
                 auto &uniforms = _shaders.uniforms();
-                uniforms.general.featureMask = 0;
+                uniforms.general = GeneralUniforms();
                 uniforms.general.projection = _window.getOrthoProjection();
                 uniforms.general.model = move(transform);
+                uniforms.general.uv = glm::mat3x4(
+                    glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+                    glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+                    glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
                 uniforms.general.color = glm::vec4(color, 1.0f);
 
                 _context.useShaderProgram(_shaders.gui());
                 _shaders.refreshUniforms();
-                _meshes.quadSwap().draw();
+                _meshes.quad().draw();
             }
         }
 
@@ -279,7 +288,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
                 auto &uniforms = _shaders.uniforms();
-                uniforms.general.featureMask = 0;
+                uniforms.general = GeneralUniforms();
                 uniforms.general.projection = _window.getOrthoProjection();
                 uniforms.general.model = move(transform);
                 uniforms.general.color = glm::vec4(color, 1.0f);
@@ -296,14 +305,18 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
                 auto &uniforms = _shaders.uniforms();
-                uniforms.general.featureMask = 0;
+                uniforms.general = GeneralUniforms();
                 uniforms.general.projection = _window.getOrthoProjection();
                 uniforms.general.model = move(transform);
+                uniforms.general.uv = glm::mat3x4(
+                    glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+                    glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+                    glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
                 uniforms.general.color = glm::vec4(color, 1.0f);
 
                 _context.useShaderProgram(_shaders.gui());
                 _shaders.refreshUniforms();
-                _meshes.quadFlipY().draw();
+                _meshes.quad().draw();
             }
         }
     }
@@ -320,7 +333,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.general.featureMask = 0;
+            uniforms.general = GeneralUniforms();
             uniforms.general.projection = _window.getOrthoProjection();
             uniforms.general.model = move(transform);
             uniforms.general.color = glm::vec4(color, 1.0f);
@@ -337,14 +350,18 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.general.featureMask = 0;
+            uniforms.general = GeneralUniforms();
             uniforms.general.projection = _window.getOrthoProjection();
             uniforms.general.model = move(transform);
+            uniforms.general.uv = glm::mat3x4(
+                glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+                glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+                glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
             uniforms.general.color = glm::vec4(color, 1.0f);
 
             _context.useShaderProgram(_shaders.gui());
             _shaders.refreshUniforms();
-            _meshes.quadFlipY().draw();
+            _meshes.quad().draw();
         }
 
         // Top right corner
@@ -354,14 +371,18 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.general.featureMask = 0;
+            uniforms.general = GeneralUniforms();
             uniforms.general.projection = _window.getOrthoProjection();
             uniforms.general.model = move(transform);
+            uniforms.general.uv = glm::mat3x4(
+                glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f),
+                glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+                glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
             uniforms.general.color = glm::vec4(color, 1.0f);
 
             _context.useShaderProgram(_shaders.gui());
             _shaders.refreshUniforms();
-            _meshes.quadFlipX().draw();
+            _meshes.quad().draw();
         }
 
         // Bottom right corner
@@ -371,14 +392,18 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.general.featureMask = 0;
+            uniforms.general = GeneralUniforms();
             uniforms.general.projection = _window.getOrthoProjection();
             uniforms.general.model = move(transform);
+            uniforms.general.uv = glm::mat3x4(
+                glm::vec4(-1.0f, 0.0f, 0.0f, 0.0f),
+                glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+                glm::vec4(1.0f, 1.0f, 0.0f, 0.0f));
             uniforms.general.color = glm::vec4(color, 1.0f);
 
             _context.useShaderProgram(_shaders.gui());
             _shaders.refreshUniforms();
-            _meshes.quadFlipXY().draw();
+            _meshes.quad().draw();
         }
     }
 }

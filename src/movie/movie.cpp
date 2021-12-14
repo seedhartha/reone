@@ -85,10 +85,14 @@ void Movie::draw() {
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general = GeneralUniforms();
+    uniforms.general.uv = glm::mat3x4(
+        glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+        glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+        glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
 
     _context.useShaderProgram(_shaders.gui());
     _shaders.refreshUniforms();
-    _meshes.quadNDCFlipY().draw();
+    _meshes.quadNDC().draw();
 }
 
 } // namespace movie

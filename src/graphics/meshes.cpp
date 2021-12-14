@@ -32,78 +32,31 @@ static const vector<float> g_quadVertices {
     0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f, 0.0f
-};
-
-static const vector<float> g_quadFlipXVertices {
-    0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-    1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-    1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 1.0f, 0.0f
-};
-
-static const vector<float> g_quadFlipYVertices {
-    0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-    1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-    1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-    0.0f, 1.0f, 0.0f, 0.0f, 1.0f
-};
-
-static const vector<float> g_quadFlipXYVertices {
-    0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-    1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-    1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-    0.0f, 1.0f, 0.0f, 1.0f, 1.0f
-};
-
-static const vector<float> g_quadSwapVertices {
-    0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-    1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-    0.0f, 1.0f, 0.0f, 0.0f, 0.0f
-};
-
-static const vector<float> g_quadSwapFlipXVertices {
-    0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-    1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-    1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f, 1.0f
-};
+    0.0f, 1.0f, 0.0f, 0.0f, 0.0f};
 
 static const vector<float> g_quadNDCVertices {
     -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
     1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f
-};
-
-static const vector<float> g_quadNDCFlipYVertices {
-    -1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-    1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    1.0f, -1.0f, 0.0f, 1.0f, 1.0f,
-    -1.0f, -1.0f, 0.0f, 0.0f, 1.0f
-};
+    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f};
 
 static const vector<float> g_billboardVertices {
     -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
     0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
     0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
-    -0.5f, 0.5f, 0.0f, 0.0f, 1.0f
-};
+    -0.5f, 0.5f, 0.0f, 0.0f, 1.0f};
 
 static const vector<float> g_grassVertices {
     -0.5f, 0.0f, 0.0f, 0.0f, 0.0f,
     0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
     0.5f, 1.0f, 0.0f, 1.0f, 1.0f,
-    -0.5f, 1.0f, 0.0f, 0.0f, 1.0f
-};
+    -0.5f, 1.0f, 0.0f, 0.0f, 1.0f};
 
 static const vector<Mesh::Face> g_quadFaces {
     Mesh::Face(0, 1, 2),
-    Mesh::Face(2, 3, 0)
-};
+    Mesh::Face(2, 3, 0)};
 
-static const Mesh::VertexSpec g_quadSpec { 5 * sizeof(float), 0, -1, 3 * sizeof(float) };
+static const Mesh::VertexSpec g_quadSpec {5 * sizeof(float), 0, -1, 3 * sizeof(float)};
 
 // END Quads
 
@@ -116,30 +69,30 @@ static const vector<float> g_cubemapVertices {
     1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,  // bottom-right
     -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,  // top-left
     // front face
-    -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,   // bottom-left
-    1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,    // bottom-right
-    1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,     // top-right
-    -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,    // top-left
+    -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom-left
+    1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,  // bottom-right
+    1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,   // top-right
+    -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,  // top-left
     // left face
     -1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,   // top-right
     -1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  // top-left
     -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom-left
     -1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,  // bottom-right
     // right face
-    1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,     // top-left
-    1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,   // bottom-right
-    1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,    // top-right
-    1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,    // bottom-left
+    1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,   // top-left
+    1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom-right
+    1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  // top-right
+    1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,  // bottom-left
     // bottom face
     -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, // top-right
     1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,  // top-left
     1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,   // bottom-left
     -1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,  // bottom-right
     // top face
-    -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,   // top-left
-    1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,     // bottom-right
-    1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,    // top-right
-    -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f     // bottom-left
+    -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top-left
+    1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,   // bottom-right
+    1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,  // top-right
+    -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f   // bottom-left
 };
 
 static const vector<Mesh::Face> g_cubemapFaces {
@@ -154,10 +107,9 @@ static const vector<Mesh::Face> g_cubemapFaces {
     Mesh::Face(16, 17, 18),
     Mesh::Face(18, 19, 16),
     Mesh::Face(20, 21, 22),
-    Mesh::Face(21, 20, 23)
-};
+    Mesh::Face(21, 20, 23)};
 
-static const Mesh::VertexSpec g_cubemapSpec { 8 * sizeof(float), 0, 3 * sizeof(float), 6 * sizeof(float) };
+static const Mesh::VertexSpec g_cubemapSpec {8 * sizeof(float), 0, 3 * sizeof(float), 6 * sizeof(float)};
 
 // END Cubemap
 
@@ -171,15 +123,8 @@ void Meshes::init() {
     if (_inited) {
         return;
     }
-
     _quad = getMesh(g_quadVertices, g_quadFaces, g_quadSpec);
-    _quadFlipX = getMesh(g_quadFlipXVertices, g_quadFaces, g_quadSpec);
-    _quadFlipY = getMesh(g_quadFlipYVertices, g_quadFaces, g_quadSpec);
-    _quadFlipXY = getMesh(g_quadFlipXYVertices, g_quadFaces, g_quadSpec);
-    _quadSwap = getMesh(g_quadSwapVertices, g_quadFaces, g_quadSpec);
-    _quadSwapFlipX = getMesh(g_quadSwapFlipXVertices, g_quadFaces, g_quadSpec);
     _quadNDC = getMesh(g_quadNDCVertices, g_quadFaces, g_quadSpec);
-    _quadNDCFlipY = getMesh(g_quadNDCFlipYVertices, g_quadFaces, g_quadSpec);
     _billboard = getMesh(g_billboardVertices, g_quadFaces, g_quadSpec);
     _grass = getMesh(g_grassVertices, g_quadFaces, g_quadSpec);
     _cubemap = getMesh(g_cubemapVertices, g_cubemapFaces, g_cubemapSpec);
@@ -192,9 +137,6 @@ void Meshes::deinit() {
         return;
     }
     _quad.reset();
-    _quadFlipX.reset();
-    _quadFlipY.reset();
-    _quadFlipXY.reset();
     _quadNDC.reset();
     _billboard.reset();
     _grass.reset();
