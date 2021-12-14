@@ -119,11 +119,8 @@ struct TextureUnits {
     static constexpr int environmentMap = 2;
     static constexpr int bumpMap = 3;
     static constexpr int bloom = 4;
-    static constexpr int irradianceMap = 5;
-    static constexpr int prefilterMap = 6;
-    static constexpr int brdfLookup = 7;
-    static constexpr int shadowMap = 8;
-    static constexpr int shadowMapCube = 9;
+    static constexpr int shadowMap = 5;
+    static constexpr int shadowMapCube = 6;
 };
 
 struct UniformBlockBindingPoints {
