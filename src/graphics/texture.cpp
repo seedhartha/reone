@@ -92,11 +92,6 @@ static uint32_t getFilterGL(Texture::Filtering filter) {
     }
 }
 
-Texture::Texture(string name, Properties properties) :
-    _name(move(name)),
-    _properties(move(properties)) {
-}
-
 void Texture::init() {
     if (_inited) {
         return;
@@ -117,11 +112,13 @@ void Texture::deinit() {
 }
 
 void Texture::bind() {
-    glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, _nameGL);
+    GLenum target = isCubeMap() ? GL_TEXTURE_CUBE_MAP : (isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D);
+    glBindTexture(target, _nameGL);
 }
 
 void Texture::unbind() {
-    glBindTexture(isCubeMap() ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D, 0);
+    GLenum target = isCubeMap() ? GL_TEXTURE_CUBE_MAP : (isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D);
+    glBindTexture(target, 0);
 }
 
 void Texture::configure() {
@@ -156,18 +153,19 @@ void Texture::configureCubeMap() {
 }
 
 void Texture::configure2D() {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getFilterGL(_properties.minFilter));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.maxFilter));
+    GLenum target = isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, getFilterGL(_properties.minFilter));
+    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.maxFilter));
 
     switch (_properties.wrap) {
     case Wrapping::ClampToBorder:
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &_properties.borderColor[0]);
+        glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, &_properties.borderColor[0]);
         break;
     case Wrapping::ClampToEdge:
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         break;
     case Wrapping::Repeat:
     default:
@@ -202,23 +200,21 @@ void Texture::refreshCubeMap() {
 
 void Texture::refresh2D() {
     int numMipMaps = 0;
-
+    GLenum target = isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
     if (!_layers.empty()) {
         numMipMaps = static_cast<int>(_layers[0].mipMaps.size());
         for (int i = 0; i < numMipMaps; ++i) {
             const MipMap &mipMap = _layers[0].mipMaps[i];
-            fillTarget(GL_TEXTURE_2D, i, mipMap.width, mipMap.height, mipMap.pixels->data(), static_cast<int>(mipMap.pixels->size()));
+            fillTarget(target, i, mipMap.width, mipMap.height, mipMap.pixels->data(), static_cast<int>(mipMap.pixels->size()));
         }
     } else {
-        fillTarget(GL_TEXTURE_2D, 0, _width, _height);
+        fillTarget(target, 0, _width, _height);
     }
-
     if (numMipMaps > 1) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, numMipMaps - 1);
-
+        glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, numMipMaps - 1);
     } else if (isMipmapFilter(_properties.minFilter)) {
-        glGenerateMipmap(GL_TEXTURE_2D);
+        glGenerateMipmap(target);
     }
 }
 
@@ -234,7 +230,12 @@ void Texture::fillTarget(uint32_t target, int level, int width, int height, cons
     case PixelFormat::BGR:
     case PixelFormat::BGRA:
     case PixelFormat::Depth:
-        glTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, getPixelFormatGL(_pixelFormat), getPixelTypeGL(_pixelFormat), pixels);
+        if (isMultisample()) {
+            // Multisample textures can only be used as color buffers
+            glTexImage2DMultisample(target, kNumAntiAliasingSamples, getInternalPixelFormatGL(_pixelFormat), width, height, GL_TRUE);
+        } else {
+            glTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, getPixelFormatGL(_pixelFormat), getPixelTypeGL(_pixelFormat), pixels);
+        }
         break;
     default:
         break;
@@ -271,8 +272,11 @@ void Texture::setPixels(int w, int h, PixelFormat format, vector<Layer> layers) 
 }
 
 void Texture::flushGPUToCPU() {
-    if (_properties.cubemap) {
+    if (isCubeMap()) {
         throw logic_error("Flushing cube maps is not supported");
+    }
+    if (isMultisample()) {
+        throw logic_error("Flushing multisample textures is not supported");
     }
     Layer layer;
     layer.mipMaps.resize(1);

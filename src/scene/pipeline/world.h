@@ -71,7 +71,8 @@ private:
 
     // Framebuffers
 
-    std::shared_ptr<graphics::Framebuffer> _geometry;
+    std::shared_ptr<graphics::Framebuffer> _geometry1;
+    std::shared_ptr<graphics::Framebuffer> _geometry2;
     std::shared_ptr<graphics::Framebuffer> _verticalBlur;
     std::shared_ptr<graphics::Framebuffer> _horizontalBlur;
     std::shared_ptr<graphics::Framebuffer> _shadows;
@@ -82,8 +83,11 @@ private:
     // Framebuffer targets
 
     std::shared_ptr<graphics::Renderbuffer> _depthRenderbuffer;
-    std::shared_ptr<graphics::Texture> _geometryColor1;
-    std::shared_ptr<graphics::Texture> _geometryColor2;
+    std::shared_ptr<graphics::Renderbuffer> _depthRenderbufferMultisample;
+    std::shared_ptr<graphics::Texture> _geometry1Color1;
+    std::shared_ptr<graphics::Texture> _geometry1Color2;
+    std::shared_ptr<graphics::Texture> _geometry2Color1;
+    std::shared_ptr<graphics::Texture> _geometry2Color2;
     std::shared_ptr<graphics::Texture> _verticalBlurColor;
     std::shared_ptr<graphics::Texture> _horizontalBlurColor;
     std::shared_ptr<graphics::Texture> _shadowsDepth;

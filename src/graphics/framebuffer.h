@@ -36,45 +36,21 @@ public:
     void bind();
     void unbind();
 
-    /**
-     * Attaches a texture as a color buffer of this framebuffer. Framebuffer must be bound.
-     *
-     * @param texture texture to attach
-     * @param index index of the color buffer
-     * @param mip mip level of the texture
-     */
     void attachColor(const Texture &texture, int index = 0, int mip = 0) const;
-
     void attachColor(const Renderbuffer &renderbuffer, int index = 0) const;
     void attachCubeMapFaceAsColor(const Texture &texture, CubeMapFace face, int index = 0, int mip = 0) const;
-
-    /**
-     * Attaches a texture as a depth buffer of this framebuffer. Framebuffer must be bound.
-     */
     void attachDepth(const Texture &texture) const;
-
     void attachDepth(const Renderbuffer &renderbuffer) const;
 
-    /**
-     * Throws logic_error if this framebuffer is not complete. Framebuffer must be bound.
-     */
-    void checkCompleteness();
+    void blitTo(Framebuffer &other, int width, int height, int numColors = 1);
 
     uint32_t nameGL() const { return _nameGL; }
 
     // Buffers
 
-    /**
-     * @note this framebuffer must be bound
-     */
     void disableDrawBuffer();
-    /**
-     * @note this framebuffer must be bound
-     */
     void disableReadBuffer();
-    /**
-     * @note this framebuffer must be bound
-     */
+
     void setDrawBuffersToColor(int count);
 
     // END Buffers

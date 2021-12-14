@@ -56,7 +56,11 @@ void Renderbuffer::clearPixels(int w, int h, PixelFormat format) {
 }
 
 void Renderbuffer::refresh() {
-    glRenderbufferStorage(GL_RENDERBUFFER, getInternalPixelFormatGL(_pixelFormat), _width, _height);
+    if (_multisample) {
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, kNumAntiAliasingSamples, getInternalPixelFormatGL(_pixelFormat), _width, _height);
+    } else {
+        glRenderbufferStorage(GL_RENDERBUFFER, getInternalPixelFormatGL(_pixelFormat), _width, _height);
+    }
 }
 
 } // namespace graphics

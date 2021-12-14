@@ -28,6 +28,7 @@ void Context::init() {
         return;
     }
     glGetIntegerv(GL_VIEWPORT, &_viewport[0]);
+    glEnable(GL_MULTISAMPLE);
     setBlendMode(BlendMode::Default);
     _inited = true;
 }
