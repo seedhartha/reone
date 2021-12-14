@@ -62,9 +62,6 @@ void Textures::bindDefaults() {
     _context.bindTexture(TextureUnits::environmentMap, _defaultCubemap);
     _context.bindTexture(TextureUnits::bumpMap, _default);
     _context.bindTexture(TextureUnits::bloom, _default);
-    _context.bindTexture(TextureUnits::irradianceMap, _defaultCubemap);
-    _context.bindTexture(TextureUnits::prefilterMap, _defaultCubemap);
-    _context.bindTexture(TextureUnits::brdfLookup, _default);
     _context.bindTexture(TextureUnits::shadowMap, _default);
     _context.bindTexture(TextureUnits::shadowMapCube, _defaultCubemap);
 }

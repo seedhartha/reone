@@ -920,9 +920,6 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
     program->setUniform("sBumpMap", TextureUnits::bumpMap);
     program->setUniform("sBloom", TextureUnits::bloom);
-    program->setUniform("sIrradianceMap", TextureUnits::irradianceMap);
-    program->setUniform("sPrefilterMap", TextureUnits::prefilterMap);
-    program->setUniform("sBRDFLookup", TextureUnits::brdfLookup);
     program->setUniform("sShadowMap", TextureUnits::shadowMap);
     program->setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
 
