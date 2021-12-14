@@ -18,6 +18,7 @@
 #pragma once
 
 #include "framebuffer.h"
+#include "options.h"
 #include "renderbuffer.h"
 #include "shaderprogram.h"
 #include "texture.h"
@@ -30,6 +31,10 @@ namespace graphics {
 
 class Context : boost::noncopyable {
 public:
+    Context(GraphicsOptions options) :
+        _options(std::move(options)) {
+    }
+
     ~Context() { deinit(); }
 
     void init();
@@ -68,6 +73,8 @@ public:
     // END Bindings
 
 private:
+    GraphicsOptions _options;
+
     bool _inited {false};
 
     glm::ivec4 _viewport {0};

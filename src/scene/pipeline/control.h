@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../../graphics/framebuffer.h"
+#include "../../graphics/options.h"
 #include "../../graphics/renderbuffer.h"
 
 namespace reone {
@@ -38,10 +39,12 @@ class SceneGraphs;
 class ControlRenderPipeline : boost::noncopyable {
 public:
     ControlRenderPipeline(
+        graphics::GraphicsOptions options,
         SceneGraphs &sceneGraphs,
         graphics::Context &context,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders) :
+        _options(std::move(options)),
         _sceneGraphs(sceneGraphs),
         _context(context),
         _meshes(meshes),
@@ -78,6 +81,8 @@ private:
         std::shared_ptr<graphics::Renderbuffer> depthBuffer1;
         std::shared_ptr<graphics::Renderbuffer> depthBuffer2;
     };
+
+    graphics::GraphicsOptions _options;
 
     std::shared_ptr<graphics::Framebuffer> _geometry1;
     std::shared_ptr<graphics::Framebuffer> _geometry2;

@@ -47,41 +47,28 @@ static constexpr int kScreenshotResolution = 256;
 
 static bool g_wireframesEnabled = false;
 
-WorldRenderPipeline::WorldRenderPipeline(
-    GraphicsOptions options,
-    SceneGraph &sceneGraph,
-    Context &context,
-    Meshes &meshes,
-    Shaders &shaders) :
-    _options(move(options)),
-    _sceneGraph(sceneGraph),
-    _context(context),
-    _meshes(meshes),
-    _shaders(shaders) {
-
+void WorldRenderPipeline::init() {
     for (int i = 0; i < kNumCubeFaces; ++i) {
         _shadowLightSpaceMatrices[i] = glm::mat4(1.0f);
     }
-}
 
-void WorldRenderPipeline::init() {
     // Reusable depth renderbuffers
 
     _depthRenderbuffer = make_unique<Renderbuffer>();
     _depthRenderbuffer->clearPixels(_options.width, _options.height, PixelFormat::Depth);
     _depthRenderbuffer->init();
 
-    _depthRenderbufferMultisample = make_unique<Renderbuffer>(true);
+    _depthRenderbufferMultisample = make_unique<Renderbuffer>(_options.aaSamples);
     _depthRenderbufferMultisample->clearPixels(_options.width, _options.height, PixelFormat::Depth);
     _depthRenderbufferMultisample->init();
 
     // Multi-sampled geometry framebuffer
 
-    _geometry1Color1 = make_unique<Texture>("geometry1_color1", getTextureProperties(TextureUsage::ColorBufferMultisample));
+    _geometry1Color1 = make_unique<Texture>("geometry1_color1", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
     _geometry1Color1->clearPixels(_options.width, _options.height, PixelFormat::RGB);
     _geometry1Color1->init();
 
-    _geometry1Color2 = make_unique<Texture>("geometry1_color2", getTextureProperties(TextureUsage::ColorBufferMultisample));
+    _geometry1Color2 = make_unique<Texture>("geometry1_color2", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
     _geometry1Color2->clearPixels(_options.width, _options.height, PixelFormat::RGB);
     _geometry1Color2->init();
 

@@ -30,9 +30,9 @@ struct WindowID {
     static constexpr wxWindowID gameDir = wxID_HIGHEST + 2;
     static constexpr wxWindowID devMode = wxID_HIGHEST + 3;
     static constexpr wxWindowID resolution = wxID_HIGHEST + 4;
-    static constexpr wxWindowID shadowResolution = wxID_HIGHEST + 5;
-    static constexpr wxWindowID fullscreen = wxID_HIGHEST + 6;
-    static constexpr wxWindowID enhancedGfx = wxID_HIGHEST + 7;
+    static constexpr wxWindowID antiAliasing = wxID_HIGHEST + 5;
+    static constexpr wxWindowID shadowResolution = wxID_HIGHEST + 6;
+    static constexpr wxWindowID fullscreen = wxID_HIGHEST + 7;
     static constexpr wxWindowID musicVolume = wxID_HIGHEST + 8;
     static constexpr wxWindowID voiceVolume = wxID_HIGHEST + 9;
     static constexpr wxWindowID soundVolume = wxID_HIGHEST + 10;
@@ -54,6 +54,7 @@ private:
         int width {0};
         int height {0};
         bool fullscreen {false};
+        int aasamples {0};
         int shadowres {0};
         int musicvol {0};
         int voicevol {0};
@@ -67,6 +68,7 @@ private:
     wxTextCtrl *_textCtrlGameDir;
     wxCheckBox *_checkBoxDev;
     wxChoice *_choiceResolution;
+    wxChoice *_choiceAntiAliasing;
     wxChoice *_choiceShadowResolution;
     wxCheckBox *_checkBoxFullscreen;
     wxSlider *_sliderVolumeMusic;

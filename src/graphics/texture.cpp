@@ -232,7 +232,7 @@ void Texture::fillTarget(uint32_t target, int level, int width, int height, cons
     case PixelFormat::Depth:
         if (isMultisample()) {
             // Multisample textures can only be used as color buffers
-            glTexImage2DMultisample(target, kNumAntiAliasingSamples, getInternalPixelFormatGL(_pixelFormat), width, height, GL_TRUE);
+            glTexImage2DMultisample(target, _properties.numSamples, getInternalPixelFormatGL(_pixelFormat), width, height, GL_TRUE);
         } else {
             glTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, getPixelFormatGL(_pixelFormat), getPixelTypeGL(_pixelFormat), pixels);
         }

@@ -24,8 +24,9 @@ namespace graphics {
 struct GraphicsOptions {
     int width {0};
     int height {0};
-    int shadowResolution {0};
     bool fullscreen {false};
+    int aaSamples {0};
+    int shadowResolution {0};
 };
 
 } // namespace graphics
