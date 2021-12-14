@@ -32,7 +32,7 @@ namespace graphics {
 
 class Context;
 class Fonts;
-class Lips;
+class LipAnimations;
 class Meshes;
 class Models;
 class Shaders;
@@ -106,7 +106,7 @@ struct Services {
     audio::AudioPlayer &audioPlayer;
     graphics::Context &context;
     graphics::Fonts &fonts;
-    graphics::Lips &lips;
+    graphics::LipAnimations &lips;
     graphics::Meshes &meshes;
     graphics::Models &models;
     graphics::Shaders &shaders;
@@ -144,7 +144,7 @@ struct Services {
         audio::AudioPlayer &audioPlayer,
         graphics::Context &context,
         graphics::Fonts &fonts,
-        graphics::Lips &lips,
+        graphics::LipAnimations &lips,
         graphics::Meshes &meshes,
         graphics::Models &models,
         graphics::Shaders &shaders,

@@ -26,7 +26,7 @@
 #include "../../common/streamutil.h"
 #include "../../common/streamwriter.h"
 #include "../../graphics/format/tgawriter.h"
-#include "../../graphics/lips.h"
+#include "../../graphics/lipanimations.h"
 #include "../../graphics/models.h"
 #include "../../graphics/renderbuffer.h"
 #include "../../graphics/textures.h"
