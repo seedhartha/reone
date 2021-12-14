@@ -95,28 +95,32 @@ void ImageButton::drawIcon(
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
-        ShaderUniforms uniforms;
+        auto &uniforms = _shaders.uniforms();
+        uniforms.combined = CombinedUniforms();
         uniforms.combined.general.projection = _window.getOrthoProjection();
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-        _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+        _context.useShaderProgram(_shaders.gui());
+        _shaders.refreshUniforms();
         _meshes.quad().draw();
     }
 
     if (iconTexture) {
-        _context.bindTexture(0, iconTexture);
-
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
-        ShaderUniforms uniforms;
+        _context.bindTexture(0, iconTexture);
+        _context.useShaderProgram(_shaders.gui());
+
+        auto &uniforms = _shaders.uniforms();
+        uniforms.combined = CombinedUniforms();
         uniforms.combined.general.projection = _window.getOrthoProjection();
         uniforms.combined.general.model = move(transform);
         uniforms.combined.general.color = glm::vec4(1.0f);
+        _shaders.refreshUniforms();
 
-        _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
         _meshes.quad().draw();
     }
 

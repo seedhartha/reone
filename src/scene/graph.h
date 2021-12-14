@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../graphics/options.h"
-#include "../graphics/shaders.h"
+#include "../graphics/uniforms.h"
 
 #include "node/camera.h"
 #include "node/dummy.h"
@@ -79,11 +79,10 @@ public:
     const std::string &name() const { return _name; }
     const graphics::GraphicsOptions &options() const { return _options; }
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
-    graphics::ShaderUniforms uniformsPrototype() const { return _uniformsPrototype; }
+    graphics::Uniforms &uniformsPrototype() { return _uniformsPrototype; }
 
     void setUpdateRoots(bool update) { _updateRoots = update; }
     void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
-    void setUniformsPrototype(graphics::ShaderUniforms &&uniforms) { _uniformsPrototype = uniforms; }
 
     // Roots
 
@@ -174,7 +173,7 @@ private:
     std::shared_ptr<CameraSceneNode> _activeCamera;
 
     bool _updateRoots {true};
-    graphics::ShaderUniforms _uniformsPrototype;
+    graphics::Uniforms _uniformsPrototype;
 
     std::set<uint32_t> _walkableSurfaces;
     std::set<uint32_t> _walkcheckSurfaces;

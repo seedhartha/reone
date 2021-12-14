@@ -74,12 +74,11 @@ void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &ex
 
     shared_ptr<CameraSceneNode> camera(sceneGraph.activeCamera());
 
-    ShaderUniforms uniforms(_shaders.defaultUniforms());
-    uniforms.combined.general.projection = camera->projection();
-    uniforms.combined.general.view = camera->view();
-    uniforms.combined.general.cameraPosition = camera->absoluteTransform()[3];
-
-    sceneGraph.setUniformsPrototype(move(uniforms));
+    auto &uniformsPrototype = sceneGraph.uniformsPrototype();
+    uniformsPrototype.combined = CombinedUniforms();
+    uniformsPrototype.combined.general.projection = camera->projection();
+    uniformsPrototype.combined.general.view = camera->view();
+    uniformsPrototype.combined.general.cameraPosition = camera->absoluteTransform()[3];
 
     // Draw to framebuffer
 
@@ -114,11 +113,13 @@ void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &ex
     transform = glm::translate(transform, glm::vec3(extent[0] + offset.x, extent[1] + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(extent[2], extent[3], 1.0f));
 
-    uniforms = ShaderUniforms();
+    auto &uniforms = _shaders.uniforms();
+    uniforms.combined = CombinedUniforms();
     uniforms.combined.general.projection = move(projection);
     uniforms.combined.general.model = move(transform);
 
-    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    _context.useShaderProgram(_shaders.gui());
+    _shaders.refreshUniforms();
     _meshes.quad().draw();
 }
 

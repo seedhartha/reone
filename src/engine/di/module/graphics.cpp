@@ -33,21 +33,18 @@ void GraphicsModule::init() {
     _models = make_unique<Models>(*_textures, _resource.resources());
     _walkmeshes = make_unique<Walkmeshes>(_resource.resources());
     _lips = make_unique<Lips>(_resource.resources());
-    _uniformBuffers = make_unique<UniformBuffers>();
-    _shaders = make_unique<Shaders>(*_context, *_uniformBuffers);
+    _shaders = make_unique<Shaders>(*_context);
     _fonts = make_unique<Fonts>(*_window, *_context, *_meshes, *_textures, *_shaders);
 
     _window->init();
     _context->init();
     _meshes->init();
     _textures->init();
-    _uniformBuffers->init();
     _shaders->init();
 }
 
 void GraphicsModule::deinit() {
     _shaders.reset();
-    _uniformBuffers.reset();
     _textures.reset();
     _meshes.reset();
     _context.reset();

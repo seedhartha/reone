@@ -144,26 +144,25 @@ void GrassSceneNode::drawElements(const vector<SceneNode *> &elements, int count
     if (count == -1) {
         count = static_cast<int>(elements.size());
     }
-
     _context.bindTexture(TextureUnits::diffuseMap, _texture);
 
-    ShaderUniforms uniforms(_sceneGraph.uniformsPrototype());
-    uniforms.combined.featureMask |= UniformFeatureFlags::grass;
-
+    auto &uniforms = _shaders.uniforms();
+    uniforms.combined = _sceneGraph.uniformsPrototype().combined;
+    uniforms.combined.featureMask = UniformsFeatureFlags::grass;
     if (_aabbNode->mesh()->lightmap) {
         _context.bindTexture(TextureUnits::lightmap, _aabbNode->mesh()->lightmap);
-        uniforms.combined.featureMask |= UniformFeatureFlags::lightmap;
+        uniforms.combined.featureMask |= UniformsFeatureFlags::lightmap;
     }
-
     for (int i = 0; i < count; ++i) {
         auto cluster = static_cast<GrassClusterSceneNode *>(elements[i]);
         glm::vec3 worldSpacePos(_absTransform * glm::vec4(cluster->position(), 1.0f));
-        uniforms.grass->quadSize = glm::vec2(_quadSize);
-        uniforms.grass->clusters[i].positionVariant = glm::vec4(worldSpacePos, static_cast<float>(cluster->variant()));
-        uniforms.grass->clusters[i].lightmapUV = cluster->lightmapUV();
+        uniforms.grass.quadSize = glm::vec2(_quadSize);
+        uniforms.grass.clusters[i].positionVariant = glm::vec4(worldSpacePos, static_cast<float>(cluster->variant()));
+        uniforms.grass.clusters[i].lightmapUV = cluster->lightmapUV();
     }
 
-    _shaders.activate(ShaderProgram::GrassGrass, uniforms);
+    _context.useShaderProgram(_shaders.grass());
+    _shaders.refreshUniforms();
     _meshes.grass().drawInstanced(count);
 }
 

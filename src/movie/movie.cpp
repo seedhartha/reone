@@ -83,9 +83,11 @@ void Movie::draw() {
     _context.bindTexture(0, _texture);
     _texture->refresh();
 
-    ShaderUniforms uniforms;
-    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    auto &uniforms = _shaders.uniforms();
+    uniforms.combined = CombinedUniforms();
 
+    _context.useShaderProgram(_shaders.gui());
+    _shaders.refreshUniforms();
     _meshes.quadNDCFlipY().draw();
 }
 

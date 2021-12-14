@@ -94,14 +94,19 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, topLeft);
         transform = glm::scale(transform, glm::vec3(_areaTexture->width(), _areaTexture->height(), 1.0f));
 
-        ShaderUniforms uniforms;
+        auto &uniforms = _services.shaders.uniforms();
+        uniforms.combined = CombinedUniforms();
         uniforms.combined.general.projection = _services.window.getOrthoProjection();
         uniforms.combined.general.model = transform;
-        _services.shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+
+        _services.context.useShaderProgram(_services.shaders.gui());
+        _services.shaders.refreshUniforms();
 
         int height = _game.options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
-        _services.context.withScissorTest(scissorBounds, [&]() { _services.meshes.quad().draw(); });
+        _services.context.withScissorTest(scissorBounds, [&]() {
+            _services.meshes.quad().draw();
+        });
 
     } else {
         _services.context.bindTexture(0, _areaTexture);
@@ -110,11 +115,13 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, glm::vec3(bounds[0], bounds[1], 0.0f));
         transform = glm::scale(transform, glm::vec3(bounds[2], bounds[3], 1.0f));
 
-        ShaderUniforms uniforms;
+        auto &uniforms = _services.shaders.uniforms();
+        uniforms.combined = CombinedUniforms();
         uniforms.combined.general.projection = _services.window.getOrthoProjection();
         uniforms.combined.general.model = move(transform);
 
-        _services.shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+        _services.context.useShaderProgram(_services.shaders.gui());
+        _services.shaders.refreshUniforms();
         _services.meshes.quad().draw();
     }
 }
@@ -145,12 +152,14 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, glm::vec3(notePos.x - 0.5f * noteSize, notePos.y - 0.5f * noteSize, 0.0f));
         transform = glm::scale(transform, glm::vec3(noteSize, noteSize, 1.0f));
 
-        ShaderUniforms uniforms;
+        auto &uniforms = _services.shaders.uniforms();
+        uniforms.combined = CombinedUniforms();
         uniforms.combined.general.projection = _services.window.getOrthoProjection();
         uniforms.combined.general.model = transform;
         uniforms.combined.general.color = glm::vec4(selected ? _game.getGUIColorHilight() : _game.getGUIColorBase(), 1.0f);
 
-        _services.shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+        _services.context.useShaderProgram(_services.shaders.gui());
+        _services.shaders.refreshUniforms();
         _services.meshes.quad().draw();
     }
 }
@@ -227,11 +236,13 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     transform = glm::translate(transform, glm::vec3(-0.5f * kArrowSize, -0.5f * kArrowSize, 0.0f));
     transform = glm::scale(transform, glm::vec3(kArrowSize, kArrowSize, 1.0f));
 
-    ShaderUniforms uniforms;
+    auto &uniforms = _services.shaders.uniforms();
+    uniforms.combined = CombinedUniforms();
     uniforms.combined.general.projection = _services.window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _services.shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    _services.context.useShaderProgram(_services.shaders.gui());
+    _services.shaders.refreshUniforms();
     _services.meshes.quad().draw();
 }
 

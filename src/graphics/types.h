@@ -102,6 +102,12 @@ enum class TextGravity {
     RightTop
 };
 
+enum class ShaderType {
+    Vertex,
+    Geometry,
+    Fragment
+};
+
 struct ClearBuffers {
     static constexpr int color = 1;
     static constexpr int depth = 2;
@@ -121,6 +127,16 @@ struct TextureUnits {
     static constexpr int brdfLookup = 7;
     static constexpr int shadowMap = 8;
     static constexpr int shadowMapCube = 9;
+};
+
+struct UniformBlockBindingPoints {
+    static constexpr int combined = 0;
+    static constexpr int text = 1;
+    static constexpr int lighting = 2;
+    static constexpr int skeletal = 3;
+    static constexpr int particles = 4;
+    static constexpr int grass = 5;
+    static constexpr int danglymesh = 6;
 };
 
 // MDL

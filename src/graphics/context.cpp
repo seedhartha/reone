@@ -17,10 +17,6 @@
 
 #include "context.h"
 
-#include "framebuffer.h"
-#include "renderbuffer.h"
-#include "texture.h"
-
 using namespace std;
 
 namespace reone {
@@ -74,6 +70,14 @@ void Context::clear(int mask) {
         glMask |= GL_STENCIL_BUFFER_BIT;
     }
     glClear(glMask);
+}
+
+void Context::useShaderProgram(shared_ptr<ShaderProgram> program) {
+    if (_shaderProgram == program) {
+        return;
+    }
+    program->use();
+    _shaderProgram = move(program);
 }
 
 void Context::setViewport(glm::ivec4 viewport) {
@@ -192,17 +196,17 @@ void Context::bindTexture(int unit, shared_ptr<Texture> texture) {
     _boundTextures[unit] = move(texture);
 }
 
-void Context::bindUniformBuffer(int index, shared_ptr<UniformBuffer> buffer) {
+void Context::bindUniformBuffer(int bindingPoint, shared_ptr<UniformBuffer> buffer) {
     size_t numBuffers = _boundUniformBuffers.size();
-    if (numBuffers <= index) {
-        _boundUniformBuffers.resize(index + 1);
+    if (numBuffers <= bindingPoint) {
+        _boundUniformBuffers.resize(bindingPoint + 1);
     }
-    if (_uniformBufferIndex == index && _boundUniformBuffers[index] == buffer) {
+    if (_uniformBufferBindingPoint == bindingPoint && _boundUniformBuffers[bindingPoint] == buffer) {
         return;
     }
-    buffer->bind(index);
-    _uniformBufferIndex = index;
-    _boundUniformBuffers[index] = move(buffer);
+    buffer->bind(bindingPoint);
+    _uniformBufferBindingPoint = bindingPoint;
+    _boundUniformBuffers[bindingPoint] = move(buffer);
 }
 
 void Context::unbindFramebuffer() {

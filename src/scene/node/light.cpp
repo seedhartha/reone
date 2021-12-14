@@ -95,17 +95,20 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     transform = glm::translate(transform, glm::vec3(lightPosScreen.x, lightPosScreen.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(aspect * flare.size * baseFlareSize, flare.size * baseFlareSize, 1.0f));
 
-    ShaderUniforms uniforms;
+    auto &uniforms = _shaders.uniforms();
+    uniforms.combined = CombinedUniforms();
     uniforms.combined.general.projection = glm::ortho(0.0f, w, 0.0f, h);
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.alpha = 0.5f;
     // uniforms.combined.general.color = glm::vec4(flare.colorShift, 1.0f);
 
-    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
-
     BlendMode oldBlendMode = _context.blendMode();
     _context.setBlendMode(BlendMode::Add);
+
+    _context.useShaderProgram(_shaders.gui());
+    _shaders.refreshUniforms();
     _meshes.billboard().draw();
+
     _context.setBlendMode(oldBlendMode);
 }
 

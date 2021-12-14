@@ -213,13 +213,15 @@ void WorldRenderPipeline::drawShadows() {
         glm::vec3(shadowLight->absoluteTransform()[3]),
         shadowLight->isDirectional() ? 0.0f : 1.0f);
 
-    ShaderUniforms uniforms(_shaders.defaultUniforms());
-    uniforms.combined.featureMask |= UniformFeatureFlags::shadows;
-    uniforms.combined.shadows.lightPosition = move(lightPosition);
+    auto &uniformsPrototype = _sceneGraph.uniformsPrototype();
+    uniformsPrototype.combined = CombinedUniforms();
+    uniformsPrototype.combined.featureMask = UniformsFeatureFlags::shadows;
+    uniformsPrototype.combined.general.projection = glm::mat4(1.0f);
+    uniformsPrototype.combined.general.view = glm::mat4(1.0f);
+    uniformsPrototype.combined.shadows.lightPosition = move(lightPosition);
     for (int i = 0; i < kNumCubeFaces; ++i) {
-        uniforms.combined.shadows.lightSpaceMatrices[i] = _lightSpaceMatrices[i];
+        uniformsPrototype.combined.shadows.lightSpaceMatrices[i] = _lightSpaceMatrices[i];
     }
-    _sceneGraph.setUniformsPrototype(move(uniforms));
 
     // Set viewport
 
@@ -259,7 +261,9 @@ void WorldRenderPipeline::drawGeometry() {
     shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
     const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
 
-    ShaderUniforms uniforms(_shaders.defaultUniforms());
+    auto &uniforms = _sceneGraph.uniformsPrototype();
+    uniforms.combined = CombinedUniforms();
+    uniforms.combined.featureMask = 0;
     uniforms.combined.general.projection = camera->projection();
     uniforms.combined.general.view = camera->view();
     uniforms.combined.general.cameraPosition = camera->absoluteTransform()[3];
@@ -277,8 +281,6 @@ void WorldRenderPipeline::drawGeometry() {
             uniforms.combined.shadows.lightSpaceMatrices[i] = _lightSpaceMatrices[i];
         }
     }
-
-    _sceneGraph.setUniformsPrototype(move(uniforms));
 
     // Enable wireframe mode
 
@@ -336,15 +338,16 @@ void WorldRenderPipeline::applyHorizontalBlur() {
     float w = static_cast<float>(_options.width);
     float h = static_cast<float>(_options.height);
 
-    ShaderUniforms uniforms;
-    uniforms.combined.featureMask |= UniformFeatureFlags::blur;
+    auto &uniforms = _shaders.uniforms();
+    uniforms.combined = CombinedUniforms();
+    uniforms.combined.featureMask = UniformsFeatureFlags::blur;
     uniforms.combined.blur.resolution = glm::vec2(w, h);
     uniforms.combined.blur.direction = glm::vec2(1.0f, 0.0f);
 
-    _shaders.activate(ShaderProgram::SimpleBlur, uniforms);
-
     // Draw a quad
 
+    _context.useShaderProgram(_shaders.blur());
+    _shaders.refreshUniforms();
     _context.clear(ClearBuffers::colorDepth);
     _meshes.quadNDC().draw();
 
@@ -373,15 +376,16 @@ void WorldRenderPipeline::applyVerticalBlur() {
     float w = static_cast<float>(_options.width);
     float h = static_cast<float>(_options.height);
 
-    ShaderUniforms uniforms;
-    uniforms.combined.featureMask |= UniformFeatureFlags::blur;
+    auto &uniforms = _shaders.uniforms();
+    uniforms.combined = CombinedUniforms();
+    uniforms.combined.featureMask = UniformsFeatureFlags::blur;
     uniforms.combined.blur.resolution = glm::vec2(w, h);
     uniforms.combined.blur.direction = glm::vec2(0.0f, 1.0f);
 
-    _shaders.activate(ShaderProgram::SimpleBlur, uniforms);
-
     // Draw a quad
 
+    _context.useShaderProgram(_shaders.blur());
+    _shaders.refreshUniforms();
     _context.clear(ClearBuffers::colorDepth);
     _meshes.quadNDC().draw();
 
@@ -411,11 +415,13 @@ void WorldRenderPipeline::drawResult() {
 
     // Set shader uniforms
 
-    ShaderUniforms uniforms;
-    _shaders.activate(ShaderProgram::SimplePresentWorld, uniforms);
+    auto &uniforms = _shaders.uniforms();
+    uniforms.combined = CombinedUniforms();
 
     // Draw a quad
 
+    _context.useShaderProgram(_shaders.presentWorld());
+    _shaders.refreshUniforms();
     _meshes.quadNDC().draw();
 
     // Restore context

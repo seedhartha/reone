@@ -204,21 +204,23 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
             transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-            ShaderUniforms uniforms;
-            uniforms.combined.featureMask |= _discardEnabled ? UniformFeatureFlags::discard : 0;
+            auto &uniforms = _shaders.uniforms();
+            uniforms.combined.featureMask = _discardEnabled ? UniformsFeatureFlags::discard : 0;
             uniforms.combined.general.projection = _window.getOrthoProjection();
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.discardColor = glm::vec4(_discardColor, 1.0f);
-            _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
         }
-
-        _context.bindTexture(0, border.fill);
 
         BlendMode oldBlendMode = _context.blendMode();
         if (border.fill->isAdditive()) {
             _context.setBlendMode(BlendMode::Add);
         }
+
+        _context.bindTexture(0, border.fill);
+        _context.useShaderProgram(_shaders.gui());
+        _shaders.refreshUniforms();
         _meshes.quad().draw();
+
         _context.setBlendMode(oldBlendMode);
     }
     if (border.edge) {
@@ -237,12 +239,14 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
                 transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
 
-                ShaderUniforms uniforms;
+                auto &uniforms = _shaders.uniforms();
+                uniforms.combined.featureMask = 0;
                 uniforms.combined.general.projection = _window.getOrthoProjection();
                 uniforms.combined.general.model = move(transform);
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-                _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+                _context.useShaderProgram(_shaders.gui());
+                _shaders.refreshUniforms();
                 _meshes.quadSwapFlipX().draw();
             }
 
@@ -252,12 +256,14 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::translate(transform, glm::vec3(x + size.x - border.dimension, y, 0.0f));
                 transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
 
-                ShaderUniforms uniforms;
+                auto &uniforms = _shaders.uniforms();
+                uniforms.combined.featureMask = 0;
                 uniforms.combined.general.projection = _window.getOrthoProjection();
                 uniforms.combined.general.model = move(transform);
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-                _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+                _context.useShaderProgram(_shaders.gui());
+                _shaders.refreshUniforms();
                 _meshes.quadSwap().draw();
             }
         }
@@ -272,12 +278,14 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
-                ShaderUniforms uniforms;
+                auto &uniforms = _shaders.uniforms();
+                uniforms.combined.featureMask = 0;
                 uniforms.combined.general.projection = _window.getOrthoProjection();
                 uniforms.combined.general.model = move(transform);
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-                _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+                _context.useShaderProgram(_shaders.gui());
+                _shaders.refreshUniforms();
                 _meshes.quad().draw();
             }
 
@@ -287,12 +295,14 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::translate(transform, glm::vec3(x, y + size.y - border.dimension, 0.0f));
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
-                ShaderUniforms uniforms;
+                auto &uniforms = _shaders.uniforms();
+                uniforms.combined.featureMask = 0;
                 uniforms.combined.general.projection = _window.getOrthoProjection();
                 uniforms.combined.general.model = move(transform);
                 uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-                _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+                _context.useShaderProgram(_shaders.gui());
+                _shaders.refreshUniforms();
                 _meshes.quadFlipY().draw();
             }
         }
@@ -309,12 +319,14 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
-            ShaderUniforms uniforms;
+            auto &uniforms = _shaders.uniforms();
+            uniforms.combined.featureMask = 0;
             uniforms.combined.general.projection = _window.getOrthoProjection();
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-            _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+            _context.useShaderProgram(_shaders.gui());
+            _shaders.refreshUniforms();
             _meshes.quad().draw();
         }
 
@@ -324,12 +336,14 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(transform, glm::vec3(x, y + size.y - border.dimension, 0.0f));
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
-            ShaderUniforms uniforms;
+            auto &uniforms = _shaders.uniforms();
+            uniforms.combined.featureMask = 0;
             uniforms.combined.general.projection = _window.getOrthoProjection();
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-            _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+            _context.useShaderProgram(_shaders.gui());
+            _shaders.refreshUniforms();
             _meshes.quadFlipY().draw();
         }
 
@@ -339,12 +353,14 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(transform, glm::vec3(x + size.x - border.dimension, y, 0.0f));
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
-            ShaderUniforms uniforms;
+            auto &uniforms = _shaders.uniforms();
+            uniforms.combined.featureMask = 0;
             uniforms.combined.general.projection = _window.getOrthoProjection();
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-            _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+            _context.useShaderProgram(_shaders.gui());
+            _shaders.refreshUniforms();
             _meshes.quadFlipX().draw();
         }
 
@@ -354,12 +370,14 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(transform, glm::vec3(x + size.x - border.dimension, y + size.y - border.dimension, 0.0f));
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
-            ShaderUniforms uniforms;
+            auto &uniforms = _shaders.uniforms();
+            uniforms.combined.featureMask = 0;
             uniforms.combined.general.projection = _window.getOrthoProjection();
             uniforms.combined.general.model = move(transform);
             uniforms.combined.general.color = glm::vec4(color, 1.0f);
 
-            _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+            _context.useShaderProgram(_shaders.gui());
+            _shaders.refreshUniforms();
             _meshes.quadFlipXY().draw();
         }
     }
