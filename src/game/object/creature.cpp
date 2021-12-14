@@ -143,6 +143,7 @@ void Creature::updateModel() {
     }
     auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
     model->setModel(move(replacement));
+    model->setPickable(true);
     finalizeModel(*model);
     if (!_stunt) {
         model->setLocalTransform(_transform);

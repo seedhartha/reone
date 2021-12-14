@@ -519,6 +519,40 @@ bool SceneGraph::testObstacle(const glm::vec3 &origin, const glm::vec3 &dest, co
     return minDistance != numeric_limits<float>::max();
 }
 
+shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) const {
+    if (!_activeCamera) {
+        return nullptr;
+    }
+    glm::vec4 viewport(0.0f, 0.0f, _options.width, _options.height);
+    glm::vec3 start(glm::unProject(glm::vec3(x, _options.height - y, 0.0f), _activeCamera->view(), _activeCamera->projection(), viewport));
+    glm::vec3 end(glm::unProject(glm::vec3(x, _options.height - y, 1.0f), _activeCamera->view(), _activeCamera->projection(), viewport));
+    glm::vec3 dir(glm::normalize(end - start));
+
+    vector<pair<shared_ptr<ModelSceneNode>, float>> distances;
+    for (auto &model : _modelRoots) {
+        if (!model->isPickable() || model->user() == except) {
+            continue;
+        }
+        // Distance to object must not exceed maximum collision distance
+        if (model->getSquareDistanceTo(start) > kMaxCollisionDistance2) {
+            continue;
+        }
+        // Test object AABB (object space)
+        glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
+        glm::vec3 objSpaceDir(model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
+        float distance;
+        if (model->aabb().raycast(objSpaceStart, objSpaceDir, kMaxCollisionDistance, distance)) {
+            distances.push_back(make_pair(model, distance));
+        }
+    }
+    if (distances.empty()) {
+        return nullptr;
+    }
+    std::sort(distances.begin(), distances.end(), [](auto &left, auto &right) { return left.second < right.second; });
+
+    return distances[0].first;
+}
+
 unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {
     return make_unique<DummySceneNode>(move(modelNode), *this, _context, _meshes, _shaders);
 }

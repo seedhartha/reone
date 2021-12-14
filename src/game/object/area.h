@@ -93,7 +93,7 @@ public:
 
     bool isUnescapable() const { return _unescapable; }
 
-    std::shared_ptr<SpatialObject> getObjectAt(int x, int y) const;
+    SpatialObject *getObjectAt(int x, int y) const;
     glm::vec3 getSelectableScreenCoords(const std::shared_ptr<SpatialObject> &object, const glm::mat4 &projection, const glm::mat4 &view) const;
 
     const CameraStyle &camStyleDefault() const { return _camStyleDefault; }
