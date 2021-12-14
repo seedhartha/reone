@@ -56,8 +56,8 @@ void Renderbuffer::clearPixels(int w, int h, PixelFormat format) {
 }
 
 void Renderbuffer::refresh() {
-    if (_multisample) {
-        glRenderbufferStorageMultisample(GL_RENDERBUFFER, kNumAntiAliasingSamples, getInternalPixelFormatGL(_pixelFormat), _width, _height);
+    if (_numSamples > 1) {
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, _numSamples, getInternalPixelFormatGL(_pixelFormat), _width, _height);
     } else {
         glRenderbufferStorage(GL_RENDERBUFFER, getInternalPixelFormatGL(_pixelFormat), _width, _height);
     }

@@ -28,8 +28,10 @@ void Context::init() {
         return;
     }
     glGetIntegerv(GL_VIEWPORT, &_viewport[0]);
-    glEnable(GL_MULTISAMPLE);
     setBlendMode(BlendMode::Default);
+    if (_options.aaSamples > 1) {
+        glEnable(GL_MULTISAMPLE);
+    }
     _inited = true;
 }
 

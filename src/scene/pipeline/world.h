@@ -42,9 +42,15 @@ public:
     WorldRenderPipeline(
         graphics::GraphicsOptions options,
         SceneGraph &sceneGraph,
-        graphics::Context &contxt,
+        graphics::Context &context,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders);
+        graphics::Shaders &shaders) :
+        _options(std::move(options)),
+        _sceneGraph(sceneGraph),
+        _context(context),
+        _meshes(meshes),
+        _shaders(shaders) {
+    }
 
     void init();
     void render();

@@ -27,7 +27,7 @@ namespace reone {
 
 void GraphicsModule::init() {
     _window = make_unique<Window>(_options);
-    _context = make_unique<Context>();
+    _context = make_unique<Context>(_options);
     _meshes = make_unique<Meshes>();
     _textures = make_unique<Textures>(*_context, _resource.resources());
     _models = make_unique<Models>(*_textures, _resource.resources());

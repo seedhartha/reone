@@ -25,12 +25,12 @@ namespace reone {
 
 namespace graphics {
 
-Texture::Properties getTextureProperties(TextureUsage usage) {
+Texture::Properties getTextureProperties(TextureUsage usage, int numSamples) {
     Texture::Properties properties;
+    properties.numSamples = numSamples;
 
     if (usage == TextureUsage::GUI ||
         usage == TextureUsage::ColorBuffer ||
-        usage == TextureUsage::ColorBufferMultisample ||
         usage == TextureUsage::Video) {
 
         properties.minFilter = Texture::Filtering::Linear;
@@ -54,10 +54,6 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
         usage == TextureUsage::DepthBufferCubeMap) {
 
         properties.cubemap = true;
-    }
-
-    if (usage == TextureUsage::ColorBufferMultisample) {
-        properties.multisample = true;
     }
 
     return move(properties);

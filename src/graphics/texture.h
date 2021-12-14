@@ -58,7 +58,7 @@ public:
         Wrapping wrap {Wrapping::Repeat};
         glm::vec3 borderColor {1.0f};
         bool cubemap {false};
-        bool multisample {false};
+        int numSamples {1};
     };
 
     /**
@@ -113,7 +113,7 @@ public:
     glm::vec4 sample(int x, int y) const;
 
     bool isCubeMap() const { return _properties.cubemap; }
-    bool isMultisample() const { return _properties.multisample; }
+    bool isMultisample() const { return _properties.numSamples > 1; }
     bool isAdditive() const { return _features.blending == Blending::Additive; }
     bool isGrayscale() const { return _pixelFormat == PixelFormat::Grayscale; }
 

@@ -25,8 +25,8 @@ namespace graphics {
 
 class Renderbuffer : boost::noncopyable {
 public:
-    Renderbuffer(bool multisample = false) :
-        _multisample(multisample) {
+    Renderbuffer(int numSamples = 1) :
+        _numSamples(numSamples) {
     }
 
     ~Renderbuffer() { deinit(); }
@@ -43,7 +43,7 @@ public:
     uint32_t nameGL() const { return _nameGL; }
 
 private:
-    bool _multisample;
+    int _numSamples;
 
     int _width {0};
     int _height {0};

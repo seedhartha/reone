@@ -52,7 +52,7 @@ void ControlRenderPipeline::prepareFor(const glm::ivec4 &extent) {
         return;
     }
 
-    auto colorBuffer1 = make_unique<Texture>("color1", getTextureProperties(TextureUsage::ColorBufferMultisample));
+    auto colorBuffer1 = make_unique<Texture>("color1", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
     colorBuffer1->clearPixels(extent[2], extent[3], PixelFormat::RGBA);
     colorBuffer1->init();
 
@@ -60,7 +60,7 @@ void ControlRenderPipeline::prepareFor(const glm::ivec4 &extent) {
     colorBuffer2->clearPixels(extent[2], extent[3], PixelFormat::RGBA);
     colorBuffer2->init();
 
-    auto depthBuffer1 = make_unique<Renderbuffer>(true);
+    auto depthBuffer1 = make_unique<Renderbuffer>(_options.aaSamples);
     depthBuffer1->clearPixels(extent[2], extent[3], PixelFormat::Depth);
     depthBuffer1->init();
 

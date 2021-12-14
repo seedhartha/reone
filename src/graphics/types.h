@@ -21,7 +21,6 @@ namespace reone {
 
 namespace graphics {
 
-constexpr int kNumAntiAliasingSamples = 4;
 constexpr int kNumCubeFaces = 6;
 
 constexpr float kDefaultClipPlaneNear = 0.1f;
@@ -47,7 +46,6 @@ enum class TextureUsage {
     NormalMap,
     HeightMap,
     ColorBuffer,
-    ColorBufferMultisample,
     DepthBuffer,
     DepthBufferCubeMap,
     Video
