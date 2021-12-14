@@ -345,8 +345,10 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         }
 
         if (_nodeTextures.diffuse) {
-            uniforms.general.uvOffset = _uvOffset;
-
+            uniforms.general.uv = glm::mat3x4(
+                glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+                glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+                glm::vec4(_uvOffset.x, _uvOffset.y, 0.0f, 0.0f));
             float waterAlpha = _nodeTextures.diffuse->features().waterAlpha;
             if (waterAlpha != -1.0f) {
                 uniforms.general.featureMask |= UniformsFeatureFlags::water;

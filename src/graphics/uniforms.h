@@ -48,6 +48,7 @@ struct GeneralUniforms {
     glm::mat4 projection {1.0f};
     glm::mat4 view {1.0f};
     glm::mat4 model {1.0f};
+    glm::mat3x4 uv {1.0f};
     glm::vec4 cameraPosition {0.0f};
     glm::vec4 color {1.0f};
     glm::vec4 worldAmbientColor {1.0f};
@@ -58,7 +59,6 @@ struct GeneralUniforms {
     glm::vec4 fogColor {0.0f};
     glm::vec4 heightMapFrameBounds {0.0f};
     glm::vec4 shadowLightPosition {0.0f}; /**< W = 0 if light is directional */
-    glm::vec2 uvOffset {0.0f};
     glm::vec2 blurResolution {0.0f};
     glm::vec2 blurDirection {0.0f};
     float alpha {1.0f};
@@ -68,7 +68,7 @@ struct GeneralUniforms {
     float heightMapScaling {1.0f};
     float shadowStrength {1.0f};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
-    char padding[12];
+    char padding[4];
     glm::mat4 shadowLightSpaceMatrices[kNumCubeFaces];
 };
 
