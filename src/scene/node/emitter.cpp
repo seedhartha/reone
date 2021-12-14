@@ -166,7 +166,7 @@ void EmitterSceneNode::doSpawnParticle() {
     float halfW = 0.005f * _size.x;
     float halfH = 0.005f * _size.y;
     glm::vec3 position(random(-halfW, halfW), random(-halfH, halfH), 0.0f);
-    particle->setPosition(move(position));
+    particle->setLocalTransform(glm::translate(position));
 
     float halfSpread = 0.5f * _spread;
     float angle1 = random(-halfSpread, halfSpread);
@@ -232,7 +232,7 @@ void EmitterSceneNode::spawnLightningParticles() {
 
         glm::vec3 endToStart(segment.second - segment.first);
         glm::vec3 center(0.5f * (segment.first + segment.second));
-        particle->setPosition(move(center));
+        particle->setLocalTransform(glm::translate(center));
         particle->setDir(_absTransform * glm::vec4(glm::normalize(endToStart), 0.0f));
         particle->setSize(glm::vec2(_lightningScale, glm::length(endToStart)));
 
@@ -266,15 +266,12 @@ void EmitterSceneNode::drawElements(const vector<SceneNode *> &elements, int cou
 
     for (int i = 0; i < count; ++i) {
         auto particle = static_cast<ParticleSceneNode *>(elements[i]);
-
-        glm::mat4 transform(_absTransform);
-        transform = glm::translate(transform, particle->position());
+        auto transform = particle->absoluteTransform();
         if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
             transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * kProjectileSpeed) * particle->size().x, particle->size().y, 1.0f));
         } else {
             transform = glm::scale(transform, glm::vec3(particle->size(), 1.0f));
         }
-
         uniforms.particles.particles[i].transform = move(transform);
         uniforms.particles.particles[i].dir = glm::vec4(particle->dir(), 1.0f);
         uniforms.particles.particles[i].color = glm::vec4(particle->color(), particle->alpha());
