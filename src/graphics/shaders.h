@@ -17,188 +17,21 @@
 
 #pragma once
 
-#include "types.h"
+#include "shader.h"
+#include "shaderprogram.h"
+#include "uniformbuffer.h"
+#include "uniforms.h"
 
 namespace reone {
 
 namespace graphics {
 
-enum class ShaderProgram {
-    None,
-    SimpleColor,
-    SimpleDepth,
-    SimpleGUI,
-    SimpleIrradiance,
-    SimplePrefilter,
-    SimpleBRDF,
-    SimpleBlur,
-    SimplePresentWorld,
-    ModelColor,
-    ModelBlinnPhong,
-    ModelBlinnPhongDiffuseless,
-    ModelPBR,
-    ParticleParticle,
-    GrassGrass,
-    TextText,
-    BillboardGUI
-};
-
-struct UniformFeatureFlags {
-    static constexpr int diffuse = 1;
-    static constexpr int lightmap = 2;
-    static constexpr int envmap = 4;
-    static constexpr int normalmap = 8;
-    static constexpr int heightmap = 0x10;
-    static constexpr int skeletal = 0x20;
-    static constexpr int lighting = 0x40;
-    static constexpr int selfIllum = 0x80;
-    static constexpr int discard = 0x100;
-    static constexpr int shadows = 0x200;
-    static constexpr int particles = 0x400;
-    static constexpr int water = 0x800;
-    static constexpr int blur = 0x1000;
-    static constexpr int text = 0x2000;
-    static constexpr int grass = 0x4000;
-    static constexpr int fog = 0x8000;
-    static constexpr int danglymesh = 0x10000;
-};
-
-struct ShaderGeneral {
-    glm::mat4 projection {1.0f};
-    glm::mat4 view {1.0f};
-    glm::mat4 model {1.0f};
-    glm::vec4 cameraPosition {0.0f};
-    glm::vec4 color {1.0f};
-    glm::vec4 ambientColor {1.0f};
-    glm::vec4 selfIllumColor {1.0f};
-    glm::vec4 discardColor {0.0f};
-    glm::vec4 fogColor {0.0f};
-    glm::vec2 uvOffset {0.0f};
-    float alpha {1.0f};
-    float waterAlpha {1.0f};
-    float roughness {0.0f};
-    float fogNear {0.0f};
-    float fogFar {0.0f};
-    float envmapResolution {0.0f};
-};
-
-struct ShaderMaterial {
-    glm::vec4 ambient {1.0f};
-    glm::vec4 diffuse {0.0f};
-};
-
-struct ShaderHeightMap {
-    glm::vec4 frameBounds {0.0f};
-    float scaling {1.0f};
-    char padding[12];
-};
-
-struct ShaderShadows {
-    glm::mat4 lightSpaceMatrices[kNumCubeFaces];
-    glm::vec4 lightPosition {0.0f}; /**< W = 0 if light is directional */
-    int lightPresent {false};
-    float strength {1.0f};
-    char padding[8];
-};
-
-struct ShaderBlur {
-    glm::vec2 resolution {0.0f};
-    glm::vec2 direction {0.0f};
-};
-
-struct CombinedUniforms {
-    int featureMask {0}; /**< any combination of UniformFeaturesFlags */
-    char padding[12];
-
-    ShaderGeneral general;
-    ShaderMaterial material;
-    ShaderHeightMap heightMap;
-    ShaderShadows shadows;
-    ShaderBlur blur;
-};
-
-struct ShaderLight {
-    glm::vec4 position {0.0f}; /**< W = 0 if light is directional */
-    glm::vec4 color {1.0f};
-    float multiplier {1.0f};
-    float radius {1.0f};
-    int ambientOnly {0};
-    char padding[4];
-};
-
-struct LightingUniforms {
-    int lightCount {0};
-    char padding[12];
-    ShaderLight lights[kMaxLights];
-};
-
-struct SkeletalUniforms {
-    glm::mat4 bones[kMaxBones];
-};
-
-struct ShaderParticle {
-    glm::mat4 transform {1.0f};
-    glm::vec4 dir {0.0f};
-    glm::vec4 color {1.0f};
-    glm::vec2 size {0.0f};
-    int frame {0};
-    char padding[4];
-};
-
-struct ParticlesUniforms {
-    glm::ivec2 gridSize {0};
-    int render {0};
-    char padding[4];
-    ShaderParticle particles[kMaxParticles];
-};
-
-struct ShaderGrassCluster {
-    glm::vec4 positionVariant {0.0f}; /**< fourth component is a variant (0-3) */
-    glm::vec2 lightmapUV {0.0f};
-    char padding[8];
-};
-
-struct GrassUniforms {
-    glm::vec2 quadSize {0.0f};
-    char padding[8];
-    ShaderGrassCluster clusters[kMaxGrassClusters];
-};
-
-struct ShaderCharacter {
-    glm::vec4 posScale {0.0f};
-    glm::vec4 uv {0.0f};
-};
-
-struct TextUniforms {
-    ShaderCharacter chars[kMaxCharacters];
-};
-
-struct DanglymeshUniforms {
-    glm::vec4 stride {0.0f};
-    float displacement {0.0f};
-    char padding[12];
-    glm::vec4 constraints[kMaxDanglymeshConstraints];
-};
-
-struct ShaderUniforms {
-    CombinedUniforms combined;
-
-    std::shared_ptr<TextUniforms> text;
-    std::shared_ptr<LightingUniforms> lighting;
-    std::shared_ptr<SkeletalUniforms> skeletal;
-    std::shared_ptr<ParticlesUniforms> particles;
-    std::shared_ptr<GrassUniforms> grass;
-    std::shared_ptr<DanglymeshUniforms> danglymesh;
-};
-
 class Context;
-class UniformBuffers;
 
 class Shaders : boost::noncopyable {
 public:
-    Shaders(Context &context, UniformBuffers &uniformBuffers) :
-        _context(context),
-        _uniformBuffers(uniformBuffers) {
+    Shaders(Context &context) :
+        _context(context) {
     }
 
     ~Shaders() { deinit(); }
@@ -206,57 +39,55 @@ public:
     void init();
     void deinit();
 
-    void activate(ShaderProgram program, const ShaderUniforms &uniforms);
-    void deactivate();
+    void refreshUniforms();
 
-    const ShaderUniforms &defaultUniforms() const { return _defaultUniforms; }
+    Uniforms &uniforms() { return _uniforms; }
+
+    std::shared_ptr<ShaderProgram> simpleColor() const { return _spSimpleColor; }
+    std::shared_ptr<ShaderProgram> modelColor() const { return _spModelColor; }
+    std::shared_ptr<ShaderProgram> depth() const { return _spDepth; }
+    std::shared_ptr<ShaderProgram> gui() const { return _spGUI; }
+    std::shared_ptr<ShaderProgram> blur() const { return _spBlur; }
+    std::shared_ptr<ShaderProgram> presentWorld() const { return _spPresentWorld; }
+    std::shared_ptr<ShaderProgram> blinnPhong() const { return _spBlinnPhong; }
+    std::shared_ptr<ShaderProgram> blinnPhongDiffuseless() const { return _spBlingPhongDiffuseless; }
+    std::shared_ptr<ShaderProgram> particle() const { return _spParticle; }
+    std::shared_ptr<ShaderProgram> grass() const { return _spGrass; }
+    std::shared_ptr<ShaderProgram> text() const { return _spText; }
+    std::shared_ptr<ShaderProgram> billboard() const { return _spBillboard; }
 
 private:
-    enum class ShaderName {
-        VertexSimple,
-        VertexModel,
-        VertexParticle,
-        VertexGrass,
-        VertexText,
-        VertexBillboard,
-        GeometryDepth,
-        FragmentColor,
-        FragmentDepth,
-        FragmentGUI,
-        FragmentText,
-        FragmentParticle,
-        FragmentGrass,
-        FragmentBlur,
-        FragmentPresentWorld,
-        FragmentBlinnPhong,
-        FragmentBlinnPhongDiffuseless,
-    };
-
     Context &_context;
-    UniformBuffers &_uniformBuffers;
 
     bool _inited {false};
-    std::unordered_map<ShaderName, uint32_t> _shaders;
-    std::unordered_map<ShaderProgram, uint32_t> _programs;
-    ShaderProgram _activeProgram {ShaderProgram::None};
-    uint32_t _activeOrdinal {0};
-    ShaderUniforms _defaultUniforms;
+    Uniforms _uniforms;
 
-    void initShader(ShaderName name, unsigned int type, std::vector<const char *> sources);
-    void initProgram(ShaderProgram program, std::vector<ShaderName> shaders);
-    void initUniformBlock(const std::string &name, int bindingPoint);
-    void initTextureUniforms();
+    // Shader Programs
+    std::shared_ptr<ShaderProgram> _spSimpleColor;
+    std::shared_ptr<ShaderProgram> _spModelColor;
+    std::shared_ptr<ShaderProgram> _spDepth;
+    std::shared_ptr<ShaderProgram> _spGUI;
+    std::shared_ptr<ShaderProgram> _spBlur;
+    std::shared_ptr<ShaderProgram> _spPresentWorld;
+    std::shared_ptr<ShaderProgram> _spBlinnPhong;
+    std::shared_ptr<ShaderProgram> _spBlingPhongDiffuseless;
+    std::shared_ptr<ShaderProgram> _spParticle;
+    std::shared_ptr<ShaderProgram> _spGrass;
+    std::shared_ptr<ShaderProgram> _spText;
+    std::shared_ptr<ShaderProgram> _spBillboard;
 
-    void setUniforms(const ShaderUniforms &locals);
-    void setUniform(const std::string &name, int value);
-    void setUniform(const std::string &name, const std::function<void(int)> &setter);
-    void setUniform(const std::string &name, float value);
-    void setUniform(const std::string &name, const glm::vec2 &v);
-    void setUniform(const std::string &name, const glm::vec3 &v);
-    void setUniform(const std::string &name, const glm::mat4 &m);
-    void setUniform(const std::string &name, const std::vector<glm::mat4> &arr);
+    // Uniform Buffers
+    std::shared_ptr<UniformBuffer> _ubCombined;
+    std::shared_ptr<UniformBuffer> _ubText;
+    std::shared_ptr<UniformBuffer> _ubLighting;
+    std::shared_ptr<UniformBuffer> _ubSkeletal;
+    std::shared_ptr<UniformBuffer> _ubParticles;
+    std::shared_ptr<UniformBuffer> _ubGrass;
+    std::shared_ptr<UniformBuffer> _ubDanglymesh;
 
-    unsigned int getOrdinal(ShaderProgram program) const;
+    std::shared_ptr<Shader> initShader(ShaderType type, std::vector<std::string> sources);
+    std::shared_ptr<ShaderProgram> initShaderProgram(std::vector<std::shared_ptr<Shader>> shaders);
+    std::unique_ptr<UniformBuffer> initUniformBuffer(const void *data, ptrdiff_t size);
 };
 
 } // namespace graphics

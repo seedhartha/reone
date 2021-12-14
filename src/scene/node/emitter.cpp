@@ -258,10 +258,11 @@ void EmitterSceneNode::drawElements(const vector<SceneNode *> &elements, int cou
         return;
     }
 
-    ShaderUniforms uniforms(_sceneGraph.uniformsPrototype());
-    uniforms.combined.featureMask |= UniformFeatureFlags::particles;
-    uniforms.particles->gridSize = emitter->gridSize;
-    uniforms.particles->render = static_cast<int>(emitter->renderMode);
+    auto &uniforms = _shaders.uniforms();
+    uniforms.combined = _sceneGraph.uniformsPrototype().combined;
+    uniforms.combined.featureMask = UniformsFeatureFlags::particles;
+    uniforms.particles.gridSize = emitter->gridSize;
+    uniforms.particles.render = static_cast<int>(emitter->renderMode);
 
     for (int i = 0; i < count; ++i) {
         auto particle = static_cast<ParticleSceneNode *>(elements[i]);
@@ -274,14 +275,15 @@ void EmitterSceneNode::drawElements(const vector<SceneNode *> &elements, int cou
             transform = glm::scale(transform, glm::vec3(particle->size(), 1.0f));
         }
 
-        uniforms.particles->particles[i].transform = move(transform);
-        uniforms.particles->particles[i].dir = glm::vec4(particle->dir(), 1.0f);
-        uniforms.particles->particles[i].color = glm::vec4(particle->color(), particle->alpha());
-        uniforms.particles->particles[i].size = glm::vec2(particle->size());
-        uniforms.particles->particles[i].frame = particle->frame();
+        uniforms.particles.particles[i].transform = move(transform);
+        uniforms.particles.particles[i].dir = glm::vec4(particle->dir(), 1.0f);
+        uniforms.particles.particles[i].color = glm::vec4(particle->color(), particle->alpha());
+        uniforms.particles.particles[i].size = glm::vec2(particle->size());
+        uniforms.particles.particles[i].frame = particle->frame();
     }
 
-    _shaders.activate(ShaderProgram::ParticleParticle, uniforms);
+    _context.useShaderProgram(_shaders.particle());
+    _shaders.refreshUniforms();
     _context.bindTexture(TextureUnits::diffuseMap, texture);
 
     BlendMode oldBlendMode(_context.blendMode());

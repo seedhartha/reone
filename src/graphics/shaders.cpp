@@ -18,9 +18,6 @@
 #include "shaders.h"
 
 #include "context.h"
-#include "texture.h"
-#include "textures.h"
-#include "uniformbuffers.h"
 
 using namespace std;
 
@@ -28,9 +25,7 @@ namespace reone {
 
 namespace graphics {
 
-// Common
-
-static char g_shaderBaseHeader[] = R"END(
+static const string g_shaderBaseHeader = R"END(
 #version 330
 
 const int FEATURE_DIFFUSE = 1;
@@ -177,7 +172,7 @@ bool isFeatureEnabled(int flag) {
 }
 )END";
 
-static char g_shaderBaseModel[] = R"END(
+static const string g_shaderBaseModel = R"END(
 const float SELFILLUM_THRESHOLD = 0.85;
 
 uniform sampler2D sDiffuseMap;
@@ -220,7 +215,7 @@ vec3 applyFog(vec3 objectColor) {
 }
 )END";
 
-static char g_shaderBaseNormals[] = R"END(
+static const string g_shaderBaseNormals = R"END(
 vec2 packTexCoords(vec2 uv, vec4 bounds) {
     if (uv.x < 0.0) {
         uv.x = 1.0 - mod(-uv.x, 1.0);
@@ -271,7 +266,7 @@ vec3 getNormal(vec2 uv) {
 }
 )END";
 
-static char g_shaderBaseShadows[] = R"END(
+static const string g_shaderBaseShadows = R"END(
 float getShadow() {
     if (!isFeatureEnabled(FEATURE_SHADOWS) || !uShadows.lightPresent) return 0.0;
 
@@ -328,7 +323,7 @@ float getShadow() {
 }
 )END";
 
-static char g_shaderVertexSimple[] = R"END(
+static const string g_shaderVertexSimple = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
@@ -343,7 +338,7 @@ void main() {
 }
 )END";
 
-static char g_shaderVertexModel[] = R"END(
+static const string g_shaderVertexModel = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aTexCoords;
@@ -422,7 +417,7 @@ void main() {
 }
 )END";
 
-static char g_shaderVertexParticle[] = R"END(
+static const string g_shaderVertexParticle = R"END(
 const int RENDER_NORMAL = 1;
 const int RENDER_LINKED = 2;
 const int RENDER_BILLBOARD_TO_LOCAL_Z = 3;
@@ -483,7 +478,7 @@ void main() {
 }
 )END";
 
-static char g_shaderVertexGrass[] = R"END(
+static const string g_shaderVertexGrass = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
@@ -506,7 +501,7 @@ void main() {
 }
 )END";
 
-static char g_shaderVertexText[] = R"END(
+static const string g_shaderVertexText = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
@@ -524,7 +519,7 @@ void main() {
 }
 )END";
 
-static char g_shaderVertexBillboard[] = R"END(
+static const string g_shaderVertexBillboard = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
@@ -545,7 +540,7 @@ void main() {
 }
 )END";
 
-static char g_shaderGeometryDepth[] = R"END(
+static const string g_shaderGeometryDepth = R"END(
 layout(triangles) in;
 layout(triangle_strip, max_vertices=18) out;
 
@@ -573,7 +568,7 @@ void main() {
 }
 )END";
 
-static char g_shaderFragmentColor[] = R"END(
+static const string g_shaderFragmentColor = R"END(
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
@@ -583,7 +578,7 @@ void main() {
 }
 )END";
 
-static char g_shaderFragmentDepth[] = R"END(
+static const string g_shaderFragmentDepth = R"END(
 in vec4 fragPosition;
 
 void main() {
@@ -593,7 +588,7 @@ void main() {
 }
 )END";
 
-static char g_shaderFragmentGUI[] = R"END(
+static const string g_shaderFragmentGUI = R"END(
 uniform sampler2D sDiffuseMap;
 
 in vec2 fragTexCoords;
@@ -612,7 +607,7 @@ void main() {
 }
 )END";
 
-static char g_shaderFragmentText[] = R"END(
+static const string g_shaderFragmentText = R"END(
 uniform sampler2D sDiffuseMap;
 
 in vec2 fragTexCoords;
@@ -628,7 +623,7 @@ void main() {
 }
 )END";
 
-static char g_shaderFragmentParticle[] = R"END(
+static const string g_shaderFragmentParticle = R"END(
 uniform sampler2D sDiffuseMap;
 
 in vec2 fragTexCoords;
@@ -657,7 +652,7 @@ void main() {
 }
 )END";
 
-static char g_shaderFragmentGrass[] = R"END(
+static const string g_shaderFragmentGrass = R"END(
 uniform sampler2D sDiffuseMap;
 uniform sampler2D sLightmap;
 
@@ -685,7 +680,7 @@ void main() {
 }
 )END";
 
-static char g_shaderFragmentBlur[] = R"END(
+static const string g_shaderFragmentBlur = R"END(
 uniform sampler2D sDiffuseMap;
 
 out vec4 fragColor;
@@ -705,7 +700,7 @@ void main() {
 }
 )END";
 
-static char g_shaderFragmentPresentWorld[] = R"END(
+static const string g_shaderFragmentPresentWorld = R"END(
 uniform sampler2D sDiffuseMap;
 uniform sampler2D sBloom;
 
@@ -722,7 +717,7 @@ void main() {
 }
 )END";
 
-static char g_shaderBaseBlinnPhong[] = R"END(
+static const string g_shaderBaseBlinnPhong = R"END(
 vec3 getLightingIndirect(vec3 N) {
     vec3 result = uGeneral.ambientColor.rgb * uMaterial.ambient.rgb;
 
@@ -767,7 +762,7 @@ vec3 getLightingDirect(vec3 N) {
 }
 )END";
 
-static char g_shaderFragmentBlinnPhong[] = R"END(
+static const string g_shaderFragmentBlinnPhong = R"END(
 void main() {
     vec2 uv = getTexCoords();
     vec3 N = getNormal(uv);
@@ -821,7 +816,7 @@ void main() {
 }
 )END";
 
-static char g_shaderFragmentBlinnPhongDiffuseless[] = R"END(
+static const string g_shaderFragmentBlinnPhongDiffuseless = R"END(
 void main() {
     vec3 N = normalize(fragNormal);
     float shadow = getShadow();
@@ -846,267 +841,164 @@ void main() {
 }
 )END";
 
-static constexpr int kBindingPointIndexCombined = 0;
-static constexpr int kBindingPointIndexText = 1;
-static constexpr int kBindingPointIndexLighting = 2;
-static constexpr int kBindingPointIndexSkeletal = 3;
-static constexpr int kBindingPointIndexParticles = 4;
-static constexpr int kBindingPointIndexGrass = 5;
-static constexpr int kBindingPointIndexDanglymesh = 6;
-
 void Shaders::init() {
     if (_inited) {
         return;
     }
-    initShader(ShaderName::VertexSimple, GL_VERTEX_SHADER, {g_shaderBaseHeader, g_shaderVertexSimple});
-    initShader(ShaderName::VertexModel, GL_VERTEX_SHADER, {g_shaderBaseHeader, g_shaderVertexModel});
-    initShader(ShaderName::VertexParticle, GL_VERTEX_SHADER, {g_shaderBaseHeader, g_shaderVertexParticle});
-    initShader(ShaderName::VertexGrass, GL_VERTEX_SHADER, {g_shaderBaseHeader, g_shaderVertexGrass});
-    initShader(ShaderName::VertexText, GL_VERTEX_SHADER, {g_shaderBaseHeader, g_shaderVertexText});
-    initShader(ShaderName::VertexBillboard, GL_VERTEX_SHADER, {g_shaderBaseHeader, g_shaderVertexBillboard});
-    initShader(ShaderName::GeometryDepth, GL_GEOMETRY_SHADER, {g_shaderBaseHeader, g_shaderGeometryDepth});
-    initShader(ShaderName::FragmentColor, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentColor});
-    initShader(ShaderName::FragmentDepth, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentDepth});
-    initShader(ShaderName::FragmentGUI, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentGUI});
-    initShader(ShaderName::FragmentText, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentText});
-    initShader(ShaderName::FragmentParticle, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentParticle});
-    initShader(ShaderName::FragmentGrass, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentGrass});
-    initShader(ShaderName::FragmentBlur, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentBlur});
-    initShader(ShaderName::FragmentPresentWorld, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderFragmentPresentWorld});
-    initShader(ShaderName::FragmentBlinnPhong, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseNormals, g_shaderBaseShadows, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhong});
-    initShader(ShaderName::FragmentBlinnPhongDiffuseless, GL_FRAGMENT_SHADER, {g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseNormals, g_shaderBaseShadows, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhongDiffuseless});
 
-    initProgram(ShaderProgram::SimpleColor, {ShaderName::VertexSimple, ShaderName::FragmentColor});
-    initProgram(ShaderProgram::SimpleDepth, {ShaderName::VertexSimple, ShaderName::GeometryDepth, ShaderName::FragmentDepth});
-    initProgram(ShaderProgram::SimpleGUI, {ShaderName::VertexSimple, ShaderName::FragmentGUI});
-    initProgram(ShaderProgram::SimpleBlur, {ShaderName::VertexSimple, ShaderName::FragmentBlur});
-    initProgram(ShaderProgram::SimplePresentWorld, {ShaderName::VertexSimple, ShaderName::FragmentPresentWorld});
-    initProgram(ShaderProgram::ModelColor, {ShaderName::VertexModel, ShaderName::FragmentColor});
-    initProgram(ShaderProgram::ModelBlinnPhong, {ShaderName::VertexModel, ShaderName::FragmentBlinnPhong});
-    initProgram(ShaderProgram::ModelBlinnPhongDiffuseless, {ShaderName::VertexModel, ShaderName::FragmentBlinnPhongDiffuseless});
-    initProgram(ShaderProgram::ParticleParticle, {ShaderName::VertexParticle, ShaderName::FragmentParticle});
-    initProgram(ShaderProgram::GrassGrass, {ShaderName::VertexGrass, ShaderName::FragmentGrass});
-    initProgram(ShaderProgram::TextText, {ShaderName::VertexText, ShaderName::FragmentText});
-    initProgram(ShaderProgram::BillboardGUI, {ShaderName::VertexBillboard, ShaderName::FragmentGUI});
+    // Shaders
+    auto vsSimple = initShader(ShaderType::Vertex, {g_shaderBaseHeader, g_shaderVertexSimple});
+    auto vsModel = initShader(ShaderType::Vertex, {g_shaderBaseHeader, g_shaderVertexModel});
+    auto vsParticle = initShader(ShaderType::Vertex, {g_shaderBaseHeader, g_shaderVertexParticle});
+    auto vsGrass = initShader(ShaderType::Vertex, {g_shaderBaseHeader, g_shaderVertexGrass});
+    auto vsText = initShader(ShaderType::Vertex, {g_shaderBaseHeader, g_shaderVertexText});
+    auto vsBillboard = initShader(ShaderType::Vertex, {g_shaderBaseHeader, g_shaderVertexBillboard});
+    auto gsDepth = initShader(ShaderType::Geometry, {g_shaderBaseHeader, g_shaderGeometryDepth});
+    auto fsColor = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentColor});
+    auto fsDepth = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentDepth});
+    auto fsGUI = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentGUI});
+    auto fsText = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentText});
+    auto fsParticle = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentParticle});
+    auto fsGrass = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentGrass});
+    auto fsBlur = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentBlur});
+    auto fsPresentWorld = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentPresentWorld});
+    auto fsBlinnPhong = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseNormals, g_shaderBaseShadows, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhong});
+    auto fsBlinnPhongDiffuseless = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseNormals, g_shaderBaseShadows, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhongDiffuseless});
 
-    for (auto &program : _programs) {
-        glUseProgram(program.second);
-        _activeOrdinal = program.second;
+    // Shader Programs
+    _spSimpleColor = initShaderProgram({vsSimple, fsColor});
+    _spDepth = initShaderProgram({vsSimple, gsDepth, fsDepth});
+    _spGUI = initShaderProgram({vsSimple, fsGUI});
+    _spBlur = initShaderProgram({vsSimple, fsBlur});
+    _spPresentWorld = initShaderProgram({vsSimple, fsPresentWorld});
+    _spModelColor = initShaderProgram({vsModel, fsColor});
+    _spBlinnPhong = initShaderProgram({vsModel, fsBlinnPhong});
+    _spBlingPhongDiffuseless = initShaderProgram({vsModel, fsBlinnPhongDiffuseless});
+    _spParticle = initShaderProgram({vsParticle, fsParticle});
+    _spGrass = initShaderProgram({vsGrass, fsGrass});
+    _spText = initShaderProgram({vsText, fsText});
+    _spBillboard = initShaderProgram({vsBillboard, fsGUI});
 
-        initUniformBlock("Combined", kBindingPointIndexCombined);
-        initUniformBlock("Text", kBindingPointIndexText);
-        initUniformBlock("Lighting", kBindingPointIndexLighting);
-        initUniformBlock("Skeletal", kBindingPointIndexSkeletal);
-        initUniformBlock("Particles", kBindingPointIndexParticles);
-        initUniformBlock("Grass", kBindingPointIndexGrass);
-        initUniformBlock("Danglymesh", kBindingPointIndexDanglymesh);
-
-        initTextureUniforms();
-
-        _activeOrdinal = 0;
-        glUseProgram(0);
-    }
-
-    _defaultUniforms.text = make_shared<TextUniforms>();
-    _defaultUniforms.lighting = make_shared<LightingUniforms>();
-    _defaultUniforms.skeletal = make_shared<SkeletalUniforms>();
-    _defaultUniforms.particles = make_shared<ParticlesUniforms>();
-    _defaultUniforms.grass = make_shared<GrassUniforms>();
-    _defaultUniforms.danglymesh = make_shared<DanglymeshUniforms>();
+    // Uniform Buffers
+    static CombinedUniforms defaultsCombined;
+    static TextUniforms defaultsText;
+    static LightingUniforms defaultsLighting;
+    static SkeletalUniforms defaultsSkeletal;
+    static ParticlesUniforms defaultsParticles;
+    static GrassUniforms defaultsGrass;
+    static DanglymeshUniforms defaultsDanglymesh;
+    _ubCombined = initUniformBuffer(&defaultsCombined, sizeof(CombinedUniforms));
+    _ubText = initUniformBuffer(&defaultsText, sizeof(TextUniforms));
+    _ubLighting = initUniformBuffer(&defaultsLighting, sizeof(LightingUniforms));
+    _ubSkeletal = initUniformBuffer(&defaultsSkeletal, sizeof(SkeletalUniforms));
+    _ubParticles = initUniformBuffer(&defaultsParticles, sizeof(ParticlesUniforms));
+    _ubGrass = initUniformBuffer(&defaultsGrass, sizeof(GrassUniforms));
+    _ubDanglymesh = initUniformBuffer(&defaultsDanglymesh, sizeof(DanglymeshUniforms));
 
     _inited = true;
 }
 
 void Shaders::deinit() {
-    if (!_inited)
+    if (!_inited) {
         return;
-
-    // Delete programs
-    for (auto &pair : _programs) {
-        glDeleteProgram(pair.second);
     }
-    _programs.clear();
 
-    // Delete shaders
-    for (auto &pair : _shaders) {
-        glDeleteShader(pair.second);
-    }
-    _shaders.clear();
+    // Shader Programs
+    _spSimpleColor.reset();
+    _spDepth.reset();
+    _spGUI.reset();
+    _spBlur.reset();
+    _spPresentWorld.reset();
+    _spModelColor.reset();
+    _spBlinnPhong.reset();
+    _spBlingPhongDiffuseless.reset();
+    _spParticle.reset();
+    _spGrass.reset();
+    _spText.reset();
+    _spBillboard.reset();
+
+    // Uniform Buffers
+    _ubCombined.reset();
+    _ubText.reset();
+    _ubLighting.reset();
+    _ubSkeletal.reset();
+    _ubParticles.reset();
+    _ubGrass.reset();
+    _ubDanglymesh.reset();
 
     _inited = false;
 }
 
-void Shaders::initShader(ShaderName name, unsigned int type, vector<const char *> sources) {
-    GLuint shader = glCreateShader(type);
-    GLint success;
-    char log[512];
-    GLsizei logSize;
-
-    glShaderSource(shader, static_cast<GLsizei>(sources.size()), &sources[0], nullptr);
-    glCompileShader(shader);
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-    if (!success) {
-        glGetShaderInfoLog(shader, sizeof(log), &logSize, log);
-        throw runtime_error(str(boost::format("Shader %d compilation failed: %s") % static_cast<int>(name) % string(log, logSize)));
-    }
-
-    _shaders.insert(make_pair(name, shader));
+shared_ptr<Shader> Shaders::initShader(ShaderType type, vector<string> sources) {
+    auto shader = make_unique<Shader>(type, move(sources));
+    shader->init();
+    return move(shader);
 }
 
-void Shaders::initProgram(ShaderProgram program, vector<ShaderName> shaders) {
-    GLuint ordinal = glCreateProgram();
+shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> shaders) {
+    auto program = make_unique<ShaderProgram>(move(shaders));
+    program->init();
+    program->use();
 
-    for (auto &shader : shaders) {
-        glAttachShader(ordinal, _shaders.find(shader)->second);
-    }
-    glLinkProgram(ordinal);
+    // Samplers
+    program->setUniform("sDiffuseMap", TextureUnits::diffuseMap);
+    program->setUniform("sLightmap", TextureUnits::lightmap);
+    program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
+    program->setUniform("sBumpMap", TextureUnits::bumpMap);
+    program->setUniform("sBloom", TextureUnits::bloom);
+    program->setUniform("sIrradianceMap", TextureUnits::irradianceMap);
+    program->setUniform("sPrefilterMap", TextureUnits::prefilterMap);
+    program->setUniform("sBRDFLookup", TextureUnits::brdfLookup);
+    program->setUniform("sShadowMap", TextureUnits::shadowMap);
+    program->setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
 
-    GLint success;
-    char log[512];
-    GLsizei logSize;
+    // Uniform Blocks
+    program->bindUniformBlock("Combined", UniformBlockBindingPoints::combined);
+    program->bindUniformBlock("Text", UniformBlockBindingPoints::text);
+    program->bindUniformBlock("Lighting", UniformBlockBindingPoints::lighting);
+    program->bindUniformBlock("Skeletal", UniformBlockBindingPoints::skeletal);
+    program->bindUniformBlock("Particles", UniformBlockBindingPoints::particles);
+    program->bindUniformBlock("Grass", UniformBlockBindingPoints::grass);
+    program->bindUniformBlock("Danglymesh", UniformBlockBindingPoints::danglymesh);
 
-    glGetProgramiv(ordinal, GL_LINK_STATUS, &success);
-
-    if (!success) {
-        glGetProgramInfoLog(ordinal, sizeof(log), &logSize, log);
-        throw runtime_error("Shaders: program linking failed: " + string(log, logSize));
-    }
-
-    _programs.insert(make_pair(program, ordinal));
+    return move(program);
 }
 
-void Shaders::initUniformBlock(const string &name, int bindingPoint) {
-    GLuint blockIdx = glGetUniformBlockIndex(_activeOrdinal, name.c_str());
-    if (blockIdx == GL_INVALID_INDEX) {
-        return;
+unique_ptr<UniformBuffer> Shaders::initUniformBuffer(const void *data, ptrdiff_t size) {
+    auto buf = make_unique<UniformBuffer>();
+    buf->setData(data, size);
+    buf->init();
+    return move(buf);
+}
+
+void Shaders::refreshUniforms() {
+    _context.bindUniformBuffer(UniformBlockBindingPoints::combined, _ubCombined);
+    _ubCombined->setData(&_uniforms.combined, sizeof(CombinedUniforms), true);
+
+    if (_uniforms.combined.featureMask & UniformsFeatureFlags::text) {
+        _context.bindUniformBuffer(UniformBlockBindingPoints::text, _ubText);
+        _ubText->setData(&_uniforms.text, sizeof(TextUniforms), true);
     }
-    glUniformBlockBinding(_activeOrdinal, blockIdx, bindingPoint);
-}
-
-void Shaders::initTextureUniforms() {
-    setUniform("sDiffuseMap", TextureUnits::diffuseMap);
-    setUniform("sLightmap", TextureUnits::lightmap);
-    setUniform("sEnvironmentMap", TextureUnits::environmentMap);
-    setUniform("sBumpMap", TextureUnits::bumpMap);
-    setUniform("sBloom", TextureUnits::bloom);
-    setUniform("sIrradianceMap", TextureUnits::irradianceMap);
-    setUniform("sPrefilterMap", TextureUnits::prefilterMap);
-    setUniform("sBRDFLookup", TextureUnits::brdfLookup);
-    setUniform("sShadowMap", TextureUnits::shadowMap);
-    setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
-}
-
-void Shaders::activate(ShaderProgram program, const ShaderUniforms &uniforms) {
-    if (_activeProgram != program) {
-        unsigned int ordinal = getOrdinal(program);
-        glUseProgram(ordinal);
-
-        _activeProgram = program;
-        _activeOrdinal = ordinal;
+    if (_uniforms.combined.featureMask & UniformsFeatureFlags::lighting) {
+        _context.bindUniformBuffer(UniformBlockBindingPoints::lighting, _ubLighting);
+        _ubLighting->setData(&_uniforms.lighting, sizeof(LightingUniforms), true);
     }
-    setUniforms(uniforms);
-}
-
-unsigned int Shaders::getOrdinal(ShaderProgram program) const {
-    auto it = _programs.find(program);
-    if (it == _programs.end()) {
-        throw invalid_argument("Shaders: program not found: " + to_string(static_cast<int>(program)));
+    if (_uniforms.combined.featureMask & UniformsFeatureFlags::skeletal) {
+        _context.bindUniformBuffer(UniformBlockBindingPoints::skeletal, _ubSkeletal);
+        _ubSkeletal->setData(&_uniforms.skeletal, sizeof(SkeletalUniforms), true);
     }
-    return it->second;
-}
-
-void Shaders::setUniforms(const ShaderUniforms &uniforms) {
-    _context.bindUniformBuffer(kBindingPointIndexCombined, _uniformBuffers.combinedPtr());
-    _uniformBuffers.combined().setData(&uniforms.combined, sizeof(CombinedUniforms), true);
-
-    if (uniforms.combined.featureMask & UniformFeatureFlags::text) {
-        _context.bindUniformBuffer(kBindingPointIndexText, _uniformBuffers.textPtr());
-        _uniformBuffers.text().setData(uniforms.text.get(), sizeof(TextUniforms), true);
+    if (_uniforms.combined.featureMask & UniformsFeatureFlags::particles) {
+        _context.bindUniformBuffer(UniformBlockBindingPoints::particles, _ubParticles);
+        _ubParticles->setData(&_uniforms.particles, sizeof(ParticlesUniforms), true);
     }
-    if (uniforms.combined.featureMask & UniformFeatureFlags::lighting) {
-        _context.bindUniformBuffer(kBindingPointIndexLighting, _uniformBuffers.lightingPtr());
-        _uniformBuffers.lighting().setData(uniforms.lighting.get(), sizeof(LightingUniforms), true);
+    if (_uniforms.combined.featureMask & UniformsFeatureFlags::grass) {
+        _context.bindUniformBuffer(UniformBlockBindingPoints::grass, _ubGrass);
+        _ubGrass->setData(&_uniforms.grass, sizeof(GrassUniforms), true);
     }
-    if (uniforms.combined.featureMask & UniformFeatureFlags::skeletal) {
-        _context.bindUniformBuffer(kBindingPointIndexSkeletal, _uniformBuffers.skeletalPtr());
-        _uniformBuffers.skeletal().setData(uniforms.skeletal.get(), sizeof(SkeletalUniforms), true);
+    if (_uniforms.combined.featureMask & UniformsFeatureFlags::danglymesh) {
+        _context.bindUniformBuffer(UniformBlockBindingPoints::danglymesh, _ubDanglymesh);
+        _ubDanglymesh->setData(&_uniforms.danglymesh, sizeof(DanglymeshUniforms), true);
     }
-    if (uniforms.combined.featureMask & UniformFeatureFlags::particles) {
-        _context.bindUniformBuffer(kBindingPointIndexParticles, _uniformBuffers.particlesPtr());
-        _uniformBuffers.particles().setData(uniforms.particles.get(), sizeof(ParticlesUniforms), true);
-    }
-    if (uniforms.combined.featureMask & UniformFeatureFlags::grass) {
-        _context.bindUniformBuffer(kBindingPointIndexGrass, _uniformBuffers.grassPtr());
-        _uniformBuffers.grass().setData(uniforms.grass.get(), sizeof(GrassUniforms), true);
-    }
-    if (uniforms.combined.featureMask & UniformFeatureFlags::danglymesh) {
-        _context.bindUniformBuffer(kBindingPointIndexDanglymesh, _uniformBuffers.danglymeshPtr());
-        _uniformBuffers.danglymesh().setData(uniforms.danglymesh.get(), sizeof(DanglymeshUniforms), true);
-    }
-}
-
-void Shaders::setUniform(const string &name, const glm::mat4 &m) {
-    setUniform(name, [this, &m](int loc) {
-        glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
-    });
-}
-
-void Shaders::setUniform(const string &name, const function<void(int)> &setter) {
-    static unordered_map<uint32_t, unordered_map<string, GLint>> locsByProgram;
-
-    unordered_map<string, GLint> &locs = locsByProgram[_activeOrdinal];
-    auto maybeLoc = locs.find(name);
-    GLint loc = 0;
-
-    if (maybeLoc != locs.end()) {
-        loc = maybeLoc->second;
-    } else {
-        loc = glGetUniformLocation(_activeOrdinal, name.c_str());
-        locs.insert(make_pair(name, loc));
-    }
-    if (loc != -1) {
-        setter(loc);
-    }
-}
-
-void Shaders::setUniform(const string &name, int value) {
-    setUniform(name, [this, &value](int loc) {
-        glUniform1i(loc, value);
-    });
-}
-
-void Shaders::setUniform(const string &name, float value) {
-    setUniform(name, [this, &value](int loc) {
-        glUniform1f(loc, value);
-    });
-}
-
-void Shaders::setUniform(const string &name, const glm::vec2 &v) {
-    setUniform(name, [this, &v](int loc) {
-        glUniform2f(loc, v.x, v.y);
-    });
-}
-
-void Shaders::setUniform(const string &name, const glm::vec3 &v) {
-    setUniform(name, [this, &v](int loc) {
-        glUniform3f(loc, v.x, v.y, v.z);
-    });
-}
-
-void Shaders::setUniform(const string &name, const vector<glm::mat4> &arr) {
-    setUniform(name, [this, &arr](int loc) {
-        glUniformMatrix4fv(loc, static_cast<GLsizei>(arr.size()), GL_FALSE, reinterpret_cast<const GLfloat *>(&arr[0]));
-    });
-}
-
-void Shaders::deactivate() {
-    if (_activeProgram == ShaderProgram::None)
-        return;
-
-    glUseProgram(0);
-    _activeProgram = ShaderProgram::None;
-    _activeOrdinal = 0;
 }
 
 } // namespace graphics

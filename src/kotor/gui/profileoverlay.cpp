@@ -18,6 +18,7 @@
 #include "profileoverlay.h"
 
 #include "../../game/services.h"
+#include "../../graphics/context.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
@@ -107,13 +108,15 @@ void ProfileOverlay::drawBackground() {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(kFrameWidth, 2.0f * _font->height(), 1.0f));
 
-    ShaderUniforms uniforms(_services.shaders.defaultUniforms());
+    auto &uniforms = _services.shaders.uniforms();
+    uniforms.combined = CombinedUniforms();
     uniforms.combined.general.projection = _services.window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     uniforms.combined.general.alpha = 0.5f;
 
-    _services.shaders.activate(ShaderProgram::SimpleColor, uniforms);
+    _services.context.useShaderProgram(_services.shaders.simpleColor());
+    _services.shaders.refreshUniforms();
     _services.meshes.quad().draw();
 }
 

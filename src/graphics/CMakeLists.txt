@@ -44,6 +44,8 @@ set(GRAPHICS_HEADERS
     options.h
     pixelutil.h
     renderbuffer.h
+    shader.h
+    shaderprogram.h
     shaders.h
     texture.h
     textures.h
@@ -52,7 +54,7 @@ set(GRAPHICS_HEADERS
     triangleutil.h
     types.h
     uniformbuffer.h
-    uniformbuffers.h
+    uniforms.h
     walkmesh.h
     walkmeshes.h
     window.h)
@@ -84,13 +86,14 @@ set(GRAPHICS_SOURCES
     models.cpp
     pixelutil.cpp
     renderbuffer.cpp
+    shader.cpp
+    shaderprogram.cpp
     shaders.cpp
     texture.cpp
     textures.cpp
     textureutil.cpp
     textutil.cpp
     uniformbuffer.cpp
-    uniformbuffers.cpp
     walkmesh.cpp
     walkmeshes.cpp
     window.cpp)

@@ -312,11 +312,13 @@ void GUI::drawBackground() {
     transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0));
     transform = glm::scale(transform, glm::vec3(_options.width, _options.height, 1.0f));
 
-    ShaderUniforms uniforms;
+    auto &uniforms = _shaders.uniforms();
+    uniforms.combined = CombinedUniforms();
     uniforms.combined.general.projection = _window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    _context.useShaderProgram(_shaders.gui());
+    _shaders.refreshUniforms();
     _meshes.quad().draw();
 }
 

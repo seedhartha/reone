@@ -17,38 +17,44 @@
 
 #pragma once
 
+#include "shader.h"
+
 namespace reone {
 
 namespace graphics {
 
-class UniformBuffer : boost::noncopyable {
+class ShaderProgram : boost::noncopyable {
 public:
-    ~UniformBuffer() { deinit(); }
+    ShaderProgram(std::vector<std::shared_ptr<Shader>> shaders) :
+        _shaders(std::move(shaders)) {
+    }
+
+    ~ShaderProgram() { deinit(); }
 
     void init();
     void deinit();
 
-    void bind(int index);
-    void unbind(int index);
+    void use();
 
-    void refresh();
+    void bindUniformBlock(const std::string &name, int bindingPoint);
 
-    void setData(const void *data, ptrdiff_t size, bool refresh = false) {
-        _data = data;
-        _size = size;
-        if (refresh) {
-            this->refresh();
-        }
-    }
+    void setUniform(const std::string &name, int value);
+    void setUniform(const std::string &name, float value);
+    void setUniform(const std::string &name, const glm::vec2 &v);
+    void setUniform(const std::string &name, const glm::vec3 &v);
+    void setUniform(const std::string &name, const glm::mat4 &m);
+    void setUniform(const std::string &name, const std::vector<glm::mat4> &arr);
+    void setUniform(const std::string &name, const std::function<void(int)> &setter);
 
 private:
+    std::vector<std::shared_ptr<Shader>> _shaders;
+
     bool _inited {false};
-    const void *_data {nullptr};
-    ptrdiff_t _size {0};
 
     // OpenGL
 
     uint32_t _nameGL {0};
+    std::map<std::string, int> _uniformLocations;
 
     // END OpenGL
 };

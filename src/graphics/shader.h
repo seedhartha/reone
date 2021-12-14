@@ -15,41 +15,40 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "uniformbuffer.h"
+#pragma once
+
+#include "types.h"
 
 namespace reone {
 
 namespace graphics {
 
-void UniformBuffer::init() {
-    if (_inited) {
-        return;
+class Shader : boost::noncopyable {
+public:
+    Shader(ShaderType type, std::vector<std::string> sources) :
+        _type(type),
+        _sources(std::move(sources)) {
     }
-    glGenBuffers(1, &_nameGL);
-    glBindBuffer(GL_UNIFORM_BUFFER, _nameGL);
-    glBufferData(GL_UNIFORM_BUFFER, _size, _data, GL_STATIC_DRAW);
-    _inited = true;
-}
 
-void UniformBuffer::deinit() {
-    if (!_inited) {
-        return;
-    }
-    glDeleteBuffers(1, &_nameGL);
-    _inited = false;
-}
+    ~Shader() { deinit(); }
 
-void UniformBuffer::bind(int index) {
-    glBindBufferBase(GL_UNIFORM_BUFFER, index, _nameGL);
-}
+    void init();
+    void deinit();
 
-void UniformBuffer::unbind(int index) {
-    glBindBufferBase(GL_UNIFORM_BUFFER, index, 0);
-}
+    uint32_t nameGL() const { return _nameGL; }
 
-void UniformBuffer::refresh() {
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, _size, _data);
-}
+private:
+    ShaderType _type;
+    std::vector<std::string> _sources;
+
+    bool _inited {false};
+
+    // OpenGL
+
+    uint32_t _nameGL {0};
+
+    // END OpenGL
+};
 
 } // namespace graphics
 

@@ -24,8 +24,10 @@
 #include "../../game/object/creature.h"
 #include "../../game/party.h"
 #include "../../game/services.h"
+#include "../../graphics/context.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
+#include "../../graphics/shaders.h"
 #include "../../graphics/window.h"
 #include "../../gui/control/label.h"
 
@@ -442,12 +444,14 @@ void HUD::drawHealth(int memberIndex) {
     transform = glm::translate(transform, glm::vec3(_controlOffset.x + extent.left + extent.width - 14.0f, _controlOffset.y + extent.top + extent.height - h, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-    ShaderUniforms uniforms;
+    auto &uniforms = _shaders.uniforms();
+    uniforms.combined = CombinedUniforms();
     uniforms.combined.general.projection = _window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 
-    _shaders.activate(ShaderProgram::SimpleColor, uniforms);
+    _context.useShaderProgram(_shaders.simpleColor());
+    _shaders.refreshUniforms();
     _meshes.quad().draw();
 }
 

@@ -60,11 +60,13 @@ void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, _extent.height, 1.0f));
 
-    ShaderUniforms uniforms;
+    auto &uniforms = _shaders.uniforms();
+    uniforms.combined = CombinedUniforms();
     uniforms.combined.general.projection = _window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    _context.useShaderProgram(_shaders.gui());
+    _shaders.refreshUniforms();
     _meshes.quad().draw();
 }
 

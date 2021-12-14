@@ -23,6 +23,7 @@
 #include "../../game/object/creature.h"
 #include "../../game/party.h"
 #include "../../game/services.h"
+#include "../../graphics/context.h"
 #include "../../graphics/font.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh.h"
@@ -314,13 +315,15 @@ void Console::drawBackground() {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(_game.options().graphics.width, height, 1.0f));
 
-    ShaderUniforms uniforms;
+    auto &uniforms = _services.shaders.uniforms();
+    uniforms.combined = CombinedUniforms();
     uniforms.combined.general.projection = _services.window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
     uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     uniforms.combined.general.alpha = 0.5f;
 
-    _services.shaders.activate(ShaderProgram::SimpleColor, uniforms);
+    _services.context.useShaderProgram(_services.shaders.simpleColor());
+    _services.shaders.refreshUniforms();
     _services.meshes.quad().draw();
 }
 

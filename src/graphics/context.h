@@ -19,6 +19,7 @@
 
 #include "framebuffer.h"
 #include "renderbuffer.h"
+#include "shaderprogram.h"
 #include "texture.h"
 #include "types.h"
 #include "uniformbuffer.h"
@@ -35,6 +36,8 @@ public:
     void deinit();
 
     void clear(int mask);
+
+    void useShaderProgram(std::shared_ptr<ShaderProgram> program);
 
     bool isDepthTestEnabled() const { return _depthTest; }
 
@@ -65,14 +68,17 @@ public:
     // END Bindings
 
 private:
+    bool _inited {false};
+
     glm::ivec4 _viewport {0};
     bool _depthTest {false};
     bool _backFaceCulling {false};
     PolygonMode _polygonMode {PolygonMode::Fill};
     BlendMode _blendMode {BlendMode::None};
+
     int _textureUnit {0};
-    int _uniformBufferIndex {0};
-    bool _inited {false};
+    int _uniformBufferBindingPoint {0};
+    std::shared_ptr<ShaderProgram> _shaderProgram;
 
     // Bindings
 

@@ -38,11 +38,13 @@ void Cursor::draw() {
     transform = glm::translate(transform, glm::vec3(static_cast<float>(_position.x), static_cast<float>(_position.y), 0.0f));
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
-    ShaderUniforms uniforms;
+    auto &uniforms = _shaders.uniforms();
+    uniforms.combined = CombinedUniforms();
     uniforms.combined.general.projection = _window.getOrthoProjection();
     uniforms.combined.general.model = move(transform);
 
-    _shaders.activate(ShaderProgram::SimpleGUI, uniforms);
+    _context.useShaderProgram(_shaders.gui());
+    _shaders.refreshUniforms();
     _meshes.quad().draw();
 }
 
