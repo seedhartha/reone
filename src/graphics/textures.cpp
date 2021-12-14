@@ -45,7 +45,7 @@ void Textures::init() {
     _default->init();
 
     // Initialize default cubemap texture
-    _defaultCubemap = make_shared<Texture>("default_cubemap", getTextureProperties(TextureUsage::CubeMapDefault));
+    _defaultCubemap = make_shared<Texture>("default_cubemap", getTextureProperties(TextureUsage::DefaultCubeMap));
     _defaultCubemap->clearPixels(1, 1, PixelFormat::RGB);
     _defaultCubemap->init();
 

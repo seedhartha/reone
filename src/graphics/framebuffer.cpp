@@ -51,7 +51,8 @@ void Framebuffer::attachColor(const Texture &texture, int index, int mip) const 
     if (texture.isCubeMap()) {
         glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, texture.nameGL(), mip);
     } else {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, texture.nameGL(), mip);
+        GLenum target = texture.isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, target, texture.nameGL(), mip);
     }
 }
 
@@ -69,7 +70,8 @@ void Framebuffer::attachDepth(const Texture &texture) const {
     if (texture.isCubeMap()) {
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture.nameGL(), 0);
     } else {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture.nameGL(), 0);
+        GLenum target = texture.isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target, texture.nameGL(), 0);
     }
 }
 
@@ -77,10 +79,20 @@ void Framebuffer::attachDepth(const Renderbuffer &renderbuffer) const {
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer.nameGL());
 }
 
-void Framebuffer::checkCompleteness() {
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        throw logic_error("Framebuffer is not complete");
+void Framebuffer::blitTo(Framebuffer &other, int width, int height, int numColors) {
+    GLint bound;
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &bound);
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, _nameGL);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, other.nameGL());
+
+    for (int i = 0; i < numColors; ++i) {
+        glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
+        glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, bound);
 }
 
 void Framebuffer::disableDrawBuffer() {

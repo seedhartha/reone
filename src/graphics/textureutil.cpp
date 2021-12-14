@@ -30,6 +30,7 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
 
     if (usage == TextureUsage::GUI ||
         usage == TextureUsage::ColorBuffer ||
+        usage == TextureUsage::ColorBufferMultisample ||
         usage == TextureUsage::Video) {
 
         properties.minFilter = Texture::Filtering::Linear;
@@ -38,7 +39,7 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
     } else if (usage == TextureUsage::EnvironmentMap) {
         properties.wrap = Texture::Wrapping::ClampToEdge;
 
-    } else if (usage == TextureUsage::DepthBuffer || usage == TextureUsage::CubeMapDepthBuffer) {
+    } else if (usage == TextureUsage::DepthBuffer || usage == TextureUsage::DepthBufferCubeMap) {
         properties.minFilter = Texture::Filtering::Nearest;
         properties.maxFilter = Texture::Filtering::Nearest;
         properties.wrap = Texture::Wrapping::ClampToBorder;
@@ -48,11 +49,15 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
         properties.minFilter = Texture::Filtering::Linear;
     }
 
-    if (usage == TextureUsage::CubeMapDefault ||
+    if (usage == TextureUsage::DefaultCubeMap ||
         usage == TextureUsage::EnvironmentMap ||
-        usage == TextureUsage::CubeMapDepthBuffer) {
+        usage == TextureUsage::DepthBufferCubeMap) {
 
         properties.cubemap = true;
+    }
+
+    if (usage == TextureUsage::ColorBufferMultisample) {
+        properties.multisample = true;
     }
 
     return move(properties);

@@ -57,7 +57,8 @@ public:
         Filtering maxFilter {Filtering::Linear};
         Wrapping wrap {Wrapping::Repeat};
         glm::vec3 borderColor {1.0f};
-        bool cubemap {false}; /**< is this a cube map texture? */
+        bool cubemap {false};
+        bool multisample {false};
     };
 
     /**
@@ -90,7 +91,11 @@ public:
         std::vector<MipMap> mipMaps;
     };
 
-    Texture(std::string name, Properties properties);
+    Texture(std::string name, Properties properties) :
+        _name(std::move(name)),
+        _properties(std::move(properties)) {
+    }
+
     ~Texture() { deinit(); }
 
     void init();
@@ -108,6 +113,7 @@ public:
     glm::vec4 sample(int x, int y) const;
 
     bool isCubeMap() const { return _properties.cubemap; }
+    bool isMultisample() const { return _properties.multisample; }
     bool isAdditive() const { return _features.blending == Blending::Additive; }
     bool isGrayscale() const { return _pixelFormat == PixelFormat::Grayscale; }
 

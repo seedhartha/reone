@@ -39,8 +39,11 @@ namespace reone {
 namespace scene {
 
 void ControlRenderPipeline::init() {
-    _geometry = make_shared<Framebuffer>();
-    _geometry->init();
+    _geometry1 = make_shared<Framebuffer>();
+    _geometry1->init();
+
+    _geometry2 = make_shared<Framebuffer>();
+    _geometry2->init();
 }
 
 void ControlRenderPipeline::prepareFor(const glm::ivec4 &extent) {
@@ -49,15 +52,23 @@ void ControlRenderPipeline::prepareFor(const glm::ivec4 &extent) {
         return;
     }
 
-    auto colorBuffer = make_unique<Texture>("color", getTextureProperties(TextureUsage::ColorBuffer));
-    colorBuffer->clearPixels(extent[2], extent[3], PixelFormat::RGBA);
-    colorBuffer->init();
+    auto colorBuffer1 = make_unique<Texture>("color1", getTextureProperties(TextureUsage::ColorBufferMultisample));
+    colorBuffer1->clearPixels(extent[2], extent[3], PixelFormat::RGBA);
+    colorBuffer1->init();
 
-    auto depthBuffer = make_unique<Renderbuffer>();
-    depthBuffer->clearPixels(extent[2], extent[3], PixelFormat::Depth);
-    depthBuffer->init();
+    auto colorBuffer2 = make_unique<Texture>("color2", getTextureProperties(TextureUsage::ColorBuffer));
+    colorBuffer2->clearPixels(extent[2], extent[3], PixelFormat::RGBA);
+    colorBuffer2->init();
 
-    Attachments attachments {move(colorBuffer), move(depthBuffer)};
+    auto depthBuffer1 = make_unique<Renderbuffer>(true);
+    depthBuffer1->clearPixels(extent[2], extent[3], PixelFormat::Depth);
+    depthBuffer1->init();
+
+    auto depthBuffer2 = make_unique<Renderbuffer>();
+    depthBuffer2->clearPixels(extent[2], extent[3], PixelFormat::Depth);
+    depthBuffer2->init();
+
+    Attachments attachments {move(colorBuffer1), move(colorBuffer2), move(depthBuffer1), move(depthBuffer2)};
     _attachments.insert(make_pair(attachmentsId, move(attachments)));
 }
 
@@ -80,7 +91,7 @@ void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &ex
     uniformsPrototype.general.view = camera->view();
     uniformsPrototype.general.cameraPosition = camera->absoluteTransform()[3];
 
-    // Draw to framebuffer
+    // Draw to multi-sampled framebuffer
 
     glm::ivec4 oldViewport(_context.viewport());
     _context.setViewport(glm::ivec4(0, 0, extent[2], extent[3]));
@@ -88,20 +99,26 @@ void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &ex
     bool oldDepthTest = _context.isDepthTestEnabled();
     _context.setDepthTestEnabled(true);
 
-    _context.bindFramebuffer(_geometry);
-    _geometry->attachColor(*attachments.colorBuffer);
-    _geometry->attachDepth(*attachments.depthBuffer);
+    _context.bindFramebuffer(_geometry1);
+    _geometry1->attachColor(*attachments.colorBuffer1);
+    _geometry1->attachDepth(*attachments.depthBuffer1);
 
     _context.clear(ClearBuffers::colorDepth);
     sceneGraph.draw();
 
-    _context.unbindFramebuffer();
-    _context.setDepthTestEnabled(oldDepthTest);
-    _context.setViewport(oldViewport);
+    // Blit multi-sampled framebuffer to normal
+
+    _context.bindFramebuffer(_geometry2);
+    _geometry2->attachColor(*attachments.colorBuffer2);
+    _geometry2->attachDepth(*attachments.depthBuffer2);
+    _geometry1->blitTo(*_geometry2, extent[2], extent[3]);
 
     // Draw control
 
-    _context.bindTexture(0, attachments.colorBuffer);
+    _context.setDepthTestEnabled(oldDepthTest);
+    _context.setViewport(oldViewport);
+    _context.unbindFramebuffer();
+    _context.bindTexture(0, attachments.colorBuffer2);
 
     glm::mat4 projection(glm::ortho(
         0.0f,
