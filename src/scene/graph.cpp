@@ -273,13 +273,12 @@ void SceneGraph::prepareLeafs() {
 
     // Add particles
     for (auto &emitter : _emitters) {
-        glm::mat4 modelView(_activeCamera->view() * emitter->absoluteTransform());
         for (auto &child : emitter->children()) {
             if (child->type() != SceneNodeType::Particle) {
                 continue;
             }
             auto particle = static_cast<ParticleSceneNode *>(child.get());
-            glm::vec3 screen(glm::project(particle->position(), modelView, _activeCamera->projection(), viewport));
+            glm::vec3 screen(glm::project(particle->getOrigin(), _activeCamera->view(), _activeCamera->projection(), viewport));
             if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
                 leafs.push_back(make_pair(particle, screen.z));
             }

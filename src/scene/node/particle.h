@@ -38,7 +38,6 @@ public:
 
     bool isExpired() const;
 
-    const glm::vec3 &position() const { return _position; }
     const glm::vec3 &dir() const { return _dir; }
     const glm::vec3 &color() const { return _color; }
     const glm::vec3 &velocity() const { return _velocity; }
@@ -48,7 +47,6 @@ public:
     float alpha() const { return _alpha; }
     int frame() const { return _frame; }
 
-    void setPosition(glm::vec3 position) { _position = std::move(position); }
     void setDir(glm::vec3 dir) { _dir = std::move(dir); }
     void setVelocity(glm::vec3 velocity) { _velocity = std::move(velocity); }
     void setSize(glm::vec2 size) { _size = std::move(size); }
@@ -59,7 +57,6 @@ public:
 private:
     const EmitterSceneNode &_emitter;
 
-    glm::vec3 _position {0.0f};
     glm::vec3 _dir {0.0f}; // used in Linked render mode
     glm::vec3 _color {1.0f};
     glm::vec3 _velocity {0.0f};

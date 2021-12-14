@@ -47,14 +47,16 @@ void ParticleSceneNode::update(float dt) {
         _lifetime = glm::min(_lifetime + dt, _animLength);
     }
 
-    _position += _velocity * dt;
+    auto transform = _localTransform;
+    transform *= glm::translate(_velocity * dt);
+    setLocalTransform(move(transform));
 
     // Gravity-type P2P emitter
     if (modelNode.emitter()->p2p && !modelNode.emitter()->p2pBezier) {
         auto ref = find_if(_children.begin(), _children.end(), [](auto &child) { return child->type() == SceneNodeType::Dummy; });
         if (ref != _children.end()) {
             glm::vec3 emitterSpaceRefPos(_emitter.absoluteTransformInverse() * (*ref)->absoluteTransform()[3]);
-            glm::vec3 pullDir(glm::normalize(emitterSpaceRefPos - _position));
+            glm::vec3 pullDir(glm::normalize(emitterSpaceRefPos - getOrigin()));
             _velocity += _emitter.grav() * pullDir * dt;
         }
     }
