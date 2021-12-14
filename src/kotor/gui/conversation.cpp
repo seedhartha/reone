@@ -23,7 +23,7 @@
 #include "../../game/script/runner.h"
 #include "../../game/services.h"
 #include "../../graphics/animation.h"
-#include "../../graphics/lips.h"
+#include "../../graphics/lipanimations.h"
 #include "../../graphics/models.h"
 #include "../../gui/control/listbox.h"
 #include "../../resource/resources.h"

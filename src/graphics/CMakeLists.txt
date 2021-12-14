@@ -35,7 +35,7 @@ set(GRAPHICS_HEADERS
     format/txireader.h
     framebuffer.h
     lipanimation.h
-    lips.h
+    lipanimations.h
     mesh.h
     meshes.h
     model.h
@@ -78,7 +78,7 @@ set(GRAPHICS_SOURCES
     format/txireader.cpp
     framebuffer.cpp
     lipanimation.cpp
-    lips.cpp
+    lipanimations.cpp
     mesh.cpp
     meshes.cpp
     model.cpp

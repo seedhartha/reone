@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2020-2021 The reone project contributors
  *
@@ -16,37 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "lips.h"
+#pragma once
 
-#include "../common/streamutil.h"
-#include "../resource/resources.h"
+#include "../common/memorycache.h"
 
-#include "format/lipreader.h"
-
-using namespace std;
-using namespace std::placeholders;
-
-using namespace reone::resource;
+#include "lipanimation.h"
 
 namespace reone {
 
+namespace resource {
+
+class Resources;
+
+}
+
 namespace graphics {
 
-Lips::Lips(Resources &resources) :
-    MemoryCache(bind(&Lips::doGet, this, _1)),
-    _resources(resources) {
-}
-
-shared_ptr<LipAnimation> Lips::doGet(string resRef) {
-    shared_ptr<ByteArray> lipData(_resources.get(resRef, ResourceType::Lip));
-    if (!lipData) {
-        return nullptr;
+class LipAnimations : public MemoryCache<std::string, LipAnimation> {
+public:
+    LipAnimations(resource::Resources &resources) :
+        MemoryCache(std::bind(&LipAnimations::doGet, this, std::placeholders::_1)),
+        _resources(resources) {
     }
-    LipReader lip(resRef);
-    lip.load(wrap(lipData));
 
-    return lip.animation();
-}
+private:
+    resource::Resources &_resources;
+
+    std::shared_ptr<LipAnimation> doGet(std::string resRef);
+};
 
 } // namespace graphics
 

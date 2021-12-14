@@ -19,7 +19,7 @@
 
 #include "../../graphics/context.h"
 #include "../../graphics/fonts.h"
-#include "../../graphics/lips.h"
+#include "../../graphics/lipanimations.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/models.h"
 #include "../../graphics/options.h"
@@ -46,7 +46,7 @@ public:
 
     graphics::Context &context() { return *_context; }
     graphics::Fonts &fonts() { return *_fonts; }
-    graphics::Lips &lips() { return *_lips; }
+    graphics::LipAnimations &lips() { return *_lips; }
     graphics::Meshes &meshes() { return *_meshes; }
     graphics::Models &models() { return *_models; }
     graphics::Shaders &shaders() { return *_shaders; }
@@ -60,7 +60,7 @@ private:
 
     std::unique_ptr<graphics::Context> _context;
     std::unique_ptr<graphics::Fonts> _fonts;
-    std::unique_ptr<graphics::Lips> _lips;
+    std::unique_ptr<graphics::LipAnimations> _lips;
     std::unique_ptr<graphics::Meshes> _meshes;
     std::unique_ptr<graphics::Models> _models;
     std::unique_ptr<graphics::Shaders> _shaders;
