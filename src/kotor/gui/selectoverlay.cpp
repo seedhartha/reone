@@ -266,7 +266,7 @@ void SelectionOverlay::drawReticle(shared_ptr<Texture> texture, const glm::vec3 
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
     auto &uniforms = _services.shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.projection = _services.window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
@@ -293,7 +293,7 @@ void SelectionOverlay::drawTitleBar() {
         transform = glm::scale(transform, glm::vec3(kTitleBarWidth, barHeight, 1.0f));
 
         auto &uniforms = _services.shaders.uniforms();
-        uniforms.general = GeneralUniforms();
+        uniforms.general.reset();
         uniforms.general.projection = _services.window.getOrthoProjection();
         uniforms.general.model = move(transform);
         uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -328,7 +328,7 @@ void SelectionOverlay::drawHealthBar() {
     transform = glm::scale(transform, glm::vec3(w, kHealthBarHeight, 1.0f));
 
     auto &uniforms = _services.shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.projection = _services.window.getOrthoProjection();
     uniforms.general.model = move(transform);
     uniforms.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
@@ -367,7 +367,7 @@ void SelectionOverlay::drawActionFrame(int index) {
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionHeight, 1.0f));
 
     auto &uniforms = _services.shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.projection = _services.window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
@@ -431,7 +431,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionWidth, 1.0f));
 
     auto &uniforms = _services.shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.projection = _services.window.getOrthoProjection();
     uniforms.general.model = move(transform);
 

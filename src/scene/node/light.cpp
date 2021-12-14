@@ -96,7 +96,7 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     transform = glm::scale(transform, glm::vec3(aspect * flare.size * baseFlareSize, flare.size * baseFlareSize, 1.0f));
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.projection = glm::ortho(0.0f, w, 0.0f, h);
     uniforms.general.model = move(transform);
     uniforms.general.alpha = 0.5f;

@@ -313,7 +313,7 @@ void GUI::drawBackground() {
     transform = glm::scale(transform, glm::vec3(_options.width, _options.height, 1.0f));
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.projection = _window.getOrthoProjection();
     uniforms.general.model = move(transform);
 

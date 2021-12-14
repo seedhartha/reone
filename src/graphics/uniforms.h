@@ -70,6 +70,20 @@ struct GeneralUniforms {
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
     char padding[4];
     glm::mat4 shadowLightSpaceMatrices[kNumCubeFaces];
+
+    void reset() {
+        projection = glm::mat4(1.0f);
+        view = glm::mat4(1.0f);
+        model = glm::mat4(1.0f);
+        uv = glm::mat4(1.0f);
+        cameraPosition = glm::vec4(0.0f);
+        color = glm::vec4(1.0f);
+        worldAmbientColor = glm::vec4(1.0f);
+        alpha = 1.0f;
+        featureMask = 0;
+
+        // Rest if feature-dependent
+    }
 };
 
 struct LightUniforms {

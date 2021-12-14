@@ -39,7 +39,7 @@ void Cursor::draw() {
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.projection = _window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
