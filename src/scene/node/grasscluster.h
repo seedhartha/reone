@@ -30,16 +30,13 @@ public:
         _point = false;
     }
 
-    const glm::vec3 &position() const { return _position; }
     const glm::vec2 &lightmapUV() const { return _lightmapUV; }
     int variant() const { return _variant; }
 
-    void setPosition(glm::vec3 position) { _position = std::move(position); }
     void setLightmapUV(glm::vec2 uv) { _lightmapUV = std::move(uv); }
     void setVariant(int variant) { _variant = variant; }
 
 private:
-    glm::vec3 _position {0.0f};
     glm::vec2 _lightmapUV {0.0f};
     int _variant {0};
 };
