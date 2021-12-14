@@ -45,70 +45,47 @@ const int FEATURE_TEXT = 0x2000;
 const int FEATURE_GRASS = 0x4000;
 const int FEATURE_FOG = 0x8000;
 const int FEATURE_DANGLYMESH = 0x10000;
+const int FEATURE_SHADOWLIGHT = 0x20000;
 
 const int NUM_CUBE_FACES = 6;
 const int MAX_BONES = 24;
 const int MAX_LIGHTS = 8;
 const int MAX_PARTICLES = 64;
-const int MAX_CHARS = 128;
+const int MAX_TEXT_CHARS = 128;
 const int MAX_GRASS_CLUSTERS = 256;
 const int MAX_DANGLYMESH_CONSTRAINTS = 512;
 
-const float PI = 3.14159265359;
 const float SHININESS = 8.0;
 const float SHADOW_FAR_PLANE = 10000.0;
 
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
 const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
 
-struct General {
-    mat4 projection;
-    mat4 view;
-    mat4 model;
-    vec4 cameraPosition;
-    vec4 color;
-    vec4 ambientColor;
-    vec4 selfIllumColor;
-    vec4 discardColor;
-    vec4 fogColor;
-    vec2 uvOffset;
-    float alpha;
-    float waterAlpha;
-    float roughness;
-    float fogNear;
-    float fogFar;
-    float envmapResolution;
-};
-
-struct Material {
-    vec4 ambient;
-    vec4 diffuse;
-};
-
-struct HeightMap {
-    vec4 frameBounds;
-    float scaling;
-};
-
-struct Shadows {
-    mat4 lightSpaceMatrices[NUM_CUBE_FACES];
-    vec4 lightPosition;
-    bool lightPresent;
-    float strength;
-};
-
-struct Blur {
-    vec2 resolution;
-    vec2 direction;
-};
-
-layout(std140) uniform Combined {
+layout(std140) uniform General {
+    mat4 uProjection;
+    mat4 uView;
+    mat4 uModel;
+    vec4 uCameraPosition;
+    vec4 uColor;
+    vec4 uWorldAmbientColor;
+    vec4 uAmbientColor;
+    vec4 uDiffuseColor;
+    vec4 uSelfIllumColor;
+    vec4 uDiscardColor;
+    vec4 uFogColor;
+    vec4 uHeightMapFrameBounds;
+    vec4 uShadowLightPosition;
+    vec2 uUvOffset;
+    vec2 uBlurResolution;
+    vec2 uBlurDirection;
+    float uAlpha;
+    float uWaterAlpha;
+    float uFogNear;
+    float uFogFar;
+    float uHeightMapScaling;
+    float uShadowStrength;
     int uFeatureMask;
-    General uGeneral;
-    Material uMaterial;
-    HeightMap uHeightMap;
-    Shadows uShadows;
-    Blur uBlur;
+    mat4 uShadowLightSpaceMatrices[NUM_CUBE_FACES];
 };
 
 struct Character {
@@ -117,7 +94,7 @@ struct Character {
 };
 
 layout(std140) uniform Text {
-    Character uChars[MAX_CHARS];
+    Character uTextChars[MAX_TEXT_CHARS];
 };
 
 struct Light {
@@ -193,7 +170,7 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
 vec2 getTexCoords() {
-    return fragTexCoords + uGeneral.uvOffset;
+    return fragTexCoords + uUvOffset;
 }
 
 float getAttenuationQuadratic(int light) {
@@ -209,9 +186,9 @@ float getAttenuationQuadratic(int light) {
 }
 
 vec3 applyFog(vec3 objectColor) {
-    float distance = length(uGeneral.cameraPosition.xyz - fragPosition);
-    float fogAmount = clamp(distance - uGeneral.fogNear, 0.0, uGeneral.fogFar - uGeneral.fogNear) / (uGeneral.fogFar - uGeneral.fogNear);
-    return mix(objectColor, uGeneral.fogColor.rgb, fogAmount);
+    float distance = length(uCameraPosition.xyz - fragPosition);
+    float fogAmount = clamp(distance - uFogNear, 0.0, uFogFar - uFogNear) / (uFogFar - uFogNear);
+    return mix(objectColor, uFogColor.rgb, fogAmount);
 }
 )END";
 
@@ -240,9 +217,9 @@ vec3 getNormalFromHeightMap(vec2 uv) {
     vec2 du = dFdx(uv);
     vec2 dv = dFdy(uv);
 
-    vec2 uvPacked = packTexCoords(uv, uHeightMap.frameBounds);
-    vec2 uvPackedDu = packTexCoords(uv + du, uHeightMap.frameBounds);
-    vec2 uvPackedDv = packTexCoords(uv + dv, uHeightMap.frameBounds);
+    vec2 uvPacked = packTexCoords(uv, uHeightMapFrameBounds);
+    vec2 uvPackedDu = packTexCoords(uv + du, uHeightMapFrameBounds);
+    vec2 uvPackedDv = packTexCoords(uv + dv, uHeightMapFrameBounds);
     vec4 sample = texture(sBumpMap, uvPacked);
     vec4 sampleDu = texture(sBumpMap, uvPackedDu);
     vec4 sampleDv = texture(sBumpMap, uvPackedDv);
@@ -250,7 +227,7 @@ vec3 getNormalFromHeightMap(vec2 uv) {
     float dBy = sampleDv.r - sample.r;
 
     vec3 normal = vec3(-dBx, -dBy, 1.0);
-    normal.xy *= uHeightMap.scaling;
+    normal.xy *= uHeightMapScaling;
 
     return fragTanSpace * normalize(normal);
 }
@@ -268,11 +245,11 @@ vec3 getNormal(vec2 uv) {
 
 static const string g_shaderBaseShadows = R"END(
 float getShadow() {
-    if (!isFeatureEnabled(FEATURE_SHADOWS) || !uShadows.lightPresent) return 0.0;
+    if (!isFeatureEnabled(FEATURE_SHADOWS) || !isFeatureEnabled(FEATURE_SHADOWLIGHT)) return 0.0;
 
     float result = 0.0;
 
-    if (uShadows.lightPosition.w == 0.0) {
+    if (uShadowLightPosition.w == 0.0) {
         // Directional light
 
         vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -295,7 +272,7 @@ float getShadow() {
     } else {
         // Point light
 
-        vec3 fragToLight = fragPosition - uShadows.lightPosition.xyz;
+        vec3 fragToLight = fragPosition - uShadowLightPosition.xyz;
         float currentDepth = length(fragToLight);
 
         float bias = 0.1;
@@ -318,7 +295,7 @@ float getShadow() {
         result /= samples * samples * samples;
     }
 
-    result *= uShadows.strength;
+    result *= uShadowStrength;
     return result;
 }
 )END";
@@ -331,10 +308,10 @@ out vec3 fragPosition;
 out vec2 fragTexCoords;
 
 void main() {
-    fragPosition = vec3(uGeneral.model * vec4(aPosition, 1.0));
+    fragPosition = vec3(uModel * vec4(aPosition, 1.0));
     fragTexCoords = aTexCoords;
 
-    gl_Position = uGeneral.projection * uGeneral.view * vec4(fragPosition, 1.0);
+    gl_Position = uProjection * uView * vec4(fragPosition, 1.0);
 }
 )END";
 
@@ -392,9 +369,9 @@ void main() {
         position += vec4(stride, 0.0);
     }
 
-    mat3 normalMatrix = transpose(inverse(mat3(uGeneral.model)));
+    mat3 normalMatrix = transpose(inverse(mat3(uModel)));
 
-    fragPosition = vec3(uGeneral.model * position);
+    fragPosition = vec3(uModel * position);
     fragNormal = normalize(normalMatrix * normal.xyz);
     fragTexCoords = aTexCoords;
     fragLightmapCoords = aLightmapCoords;
@@ -407,13 +384,13 @@ void main() {
     }
 
     // Compute light space fragment position for directional lights
-    if (uShadows.lightPresent && uShadows.lightPosition.w == 0.0) {
-        fragPosLightSpace = uShadows.lightSpaceMatrices[0] * vec4(fragPosition, 1.0);
+    if (isFeatureEnabled(FEATURE_SHADOWLIGHT) && uShadowLightPosition.w == 0.0) {
+        fragPosLightSpace = uShadowLightSpaceMatrices[0] * vec4(fragPosition, 1.0);
     } else {
         fragPosLightSpace = vec4(0.0);
     }
 
-    gl_Position = uGeneral.projection * uGeneral.view * vec4(fragPosition, 1.0);
+    gl_Position = uProjection * uView * vec4(fragPosition, 1.0);
 }
 )END";
 
@@ -451,7 +428,7 @@ void main() {
 
     } else if (uParticleRender == RENDER_LINKED) {
         vec3 particlePos = vec3(uParticles[gl_InstanceID].transform[3]);
-        vec3 cameraRight = vec3(uGeneral.view[0][0], uGeneral.view[1][0], uGeneral.view[2][0]);
+        vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
         vec3 up = uParticles[gl_InstanceID].dir.xyz;
 
         P = vec4(
@@ -462,8 +439,8 @@ void main() {
 
     } else {
         vec3 particlePos = vec3(uParticles[gl_InstanceID].transform[3]);
-        vec3 cameraRight = vec3(uGeneral.view[0][0], uGeneral.view[1][0], uGeneral.view[2][0]);
-        vec3 cameraUp = vec3(uGeneral.view[0][1], uGeneral.view[1][1], uGeneral.view[2][1]);
+        vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
+        vec3 cameraUp = vec3(uView[0][1], uView[1][1], uView[2][1]);
 
         P = vec4(
             particlePos +
@@ -472,7 +449,7 @@ void main() {
             1.0);
     }
 
-    gl_Position = uGeneral.projection * uGeneral.view * uGeneral.model * P;
+    gl_Position = uProjection * uView * uModel * P;
     fragTexCoords = aTexCoords;
     fragInstanceID = gl_InstanceID;
 }
@@ -486,8 +463,8 @@ out vec2 fragTexCoords;
 flat out int fragInstanceID;
 
 void main() {
-    vec3 cameraRight = vec3(uGeneral.view[0][0], uGeneral.view[1][0], uGeneral.view[2][0]);
-    vec3 cameraUp = vec3(uGeneral.view[0][1], uGeneral.view[1][1], uGeneral.view[2][1]);
+    vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
+    vec3 cameraUp = vec3(uView[0][1], uView[1][1], uView[2][1]);
 
     vec4 P = vec4(
         uGrassClusters[gl_InstanceID].positionVariant.xyz +
@@ -495,7 +472,7 @@ void main() {
             cameraUp * aPosition.y * uGrassQuadSize.y,
         1.0);
 
-    gl_Position = uGeneral.projection * uGeneral.view * P;
+    gl_Position = uProjection * uView * P;
     fragTexCoords = aTexCoords;
     fragInstanceID = gl_InstanceID;
 }
@@ -510,10 +487,10 @@ flat out int fragInstanceID;
 
 void main() {
     vec4 P = vec4(aPosition, 1.0);
-    P.x += uChars[gl_InstanceID].posScale[0] + aPosition.x * uChars[gl_InstanceID].posScale[2];
-    P.y += uChars[gl_InstanceID].posScale[1] + aPosition.y * uChars[gl_InstanceID].posScale[3];
+    P.x += uTextChars[gl_InstanceID].posScale[0] + aPosition.x * uTextChars[gl_InstanceID].posScale[2];
+    P.y += uTextChars[gl_InstanceID].posScale[1] + aPosition.y * uTextChars[gl_InstanceID].posScale[3];
 
-    gl_Position = uGeneral.projection * uGeneral.view * P;
+    gl_Position = uProjection * uView * P;
     fragTexCoords = aTexCoords;
     fragInstanceID = gl_InstanceID;
 }
@@ -526,16 +503,16 @@ layout(location = 2) in vec2 aTexCoords;
 out vec2 fragTexCoords;
 
 void main() {
-    vec3 cameraRight = vec3(uGeneral.view[0][0], uGeneral.view[1][0], uGeneral.view[2][0]);
-    vec3 cameraUp = vec3(uGeneral.view[0][1], uGeneral.view[1][1], uGeneral.view[2][1]);
+    vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
+    vec3 cameraUp = vec3(uView[0][1], uView[1][1], uView[2][1]);
 
     vec4 P = vec4(
-        vec3(uGeneral.model[3]) +
-            cameraRight * aPosition.x * uGeneral.model[0][0] +
-            cameraUp * aPosition.y * uGeneral.model[1][1],
+        vec3(uModel[3]) +
+            cameraRight * aPosition.x * uModel[0][0] +
+            cameraUp * aPosition.y * uModel[1][1],
         1.0);
 
-    gl_Position = uGeneral.projection * uGeneral.view * P;
+    gl_Position = uProjection * uView * P;
     fragTexCoords = aTexCoords;
 }
 )END";
@@ -547,10 +524,10 @@ layout(triangle_strip, max_vertices=18) out;
 out vec4 fragPosition;
 
 void main() {
-    if (uShadows.lightPosition.w == 0.0) {
+    if (uShadowLightPosition.w == 0.0) {
         for (int i = 0; i < 3; ++i) {
             fragPosition = gl_in[i].gl_Position;
-            gl_Position = uShadows.lightSpaceMatrices[0] * fragPosition;
+            gl_Position = uShadowLightSpaceMatrices[0] * fragPosition;
             EmitVertex();
         }
         EndPrimitive();
@@ -559,7 +536,7 @@ void main() {
             gl_Layer = face;
             for (int i = 0; i < 3; ++i) {
                 fragPosition = gl_in[i].gl_Position;
-                gl_Position = uShadows.lightSpaceMatrices[face] * fragPosition;
+                gl_Position = uShadowLightSpaceMatrices[face] * fragPosition;
                 EmitVertex();
             }
             EndPrimitive();
@@ -573,7 +550,7 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
 void main() {
-    fragColor = vec4(uGeneral.color.rgb, uGeneral.alpha);
+    fragColor = vec4(uColor.rgb, uAlpha);
     fragColorBright = vec4(vec3(0.0), 1.0);
 }
 )END";
@@ -582,7 +559,7 @@ static const string g_shaderFragmentDepth = R"END(
 in vec4 fragPosition;
 
 void main() {
-    float lightDistance = length(fragPosition.xyz - uShadows.lightPosition.xyz);
+    float lightDistance = length(fragPosition.xyz - uShadowLightPosition.xyz);
     lightDistance = lightDistance / SHADOW_FAR_PLANE; // map to [0,1]
     gl_FragDepth = lightDistance;
 }
@@ -598,11 +575,11 @@ layout(location = 1) out vec4 fragColorBright;
 
 void main() {
     vec4 diffuseSample = texture(sDiffuseMap, fragTexCoords);
-    vec3 objectColor = uGeneral.color.rgb * diffuseSample.rgb;
+    vec3 objectColor = uColor.rgb * diffuseSample.rgb;
 
-    if (isFeatureEnabled(FEATURE_DISCARD) && length(uGeneral.discardColor.rgb - objectColor) < 0.01) discard;
+    if (isFeatureEnabled(FEATURE_DISCARD) && length(uDiscardColor.rgb - objectColor) < 0.01) discard;
 
-    fragColor = vec4(objectColor, uGeneral.alpha * diffuseSample.a);
+    fragColor = vec4(objectColor, uAlpha * diffuseSample.a);
     fragColorBright = vec4(vec3(0.0), 1.0);
 }
 )END";
@@ -616,9 +593,9 @@ flat in int fragInstanceID;
 out vec4 fragColor;
 
 void main() {
-    vec2 uv = fragTexCoords * uChars[fragInstanceID].uv.zw + uChars[fragInstanceID].uv.xy;
+    vec2 uv = fragTexCoords * uTextChars[fragInstanceID].uv.zw + uTextChars[fragInstanceID].uv.xy;
     vec4 diffuseSample = texture(sDiffuseMap, uv);
-    vec3 objectColor = uGeneral.color.rgb * diffuseSample.rgb;
+    vec3 objectColor = uColor.rgb * diffuseSample.rgb;
     fragColor = vec4(objectColor, diffuseSample.a);
 }
 )END";
@@ -686,15 +663,15 @@ uniform sampler2D sDiffuseMap;
 out vec4 fragColor;
 
 void main() {
-    vec2 uv = vec2(gl_FragCoord.xy / uBlur.resolution);
+    vec2 uv = vec2(gl_FragCoord.xy / uBlurResolution);
     vec4 color = vec4(0.0);
-    vec2 off1 = vec2(1.3846153846) * uBlur.direction;
-    vec2 off2 = vec2(3.2307692308) * uBlur.direction;
+    vec2 off1 = vec2(1.3846153846) * uBlurDirection;
+    vec2 off2 = vec2(3.2307692308) * uBlurDirection;
     color += texture(sDiffuseMap, uv) * 0.2270270270;
-    color += texture(sDiffuseMap, uv + (off1 / uBlur.resolution)) * 0.3162162162;
-    color += texture(sDiffuseMap, uv - (off1 / uBlur.resolution)) * 0.3162162162;
-    color += texture(sDiffuseMap, uv + (off2 / uBlur.resolution)) * 0.0702702703;
-    color += texture(sDiffuseMap, uv - (off2 / uBlur.resolution)) * 0.0702702703;
+    color += texture(sDiffuseMap, uv + (off1 / uBlurResolution)) * 0.3162162162;
+    color += texture(sDiffuseMap, uv - (off1 / uBlurResolution)) * 0.3162162162;
+    color += texture(sDiffuseMap, uv + (off2 / uBlurResolution)) * 0.0702702703;
+    color += texture(sDiffuseMap, uv - (off2 / uBlurResolution)) * 0.0702702703;
 
     fragColor = color;
 }
@@ -719,12 +696,12 @@ void main() {
 
 static const string g_shaderBaseBlinnPhong = R"END(
 vec3 getLightingIndirect(vec3 N) {
-    vec3 result = uGeneral.ambientColor.rgb * uMaterial.ambient.rgb;
+    vec3 result = uWorldAmbientColor.rgb * uAmbientColor.rgb;
 
     for (int i = 0; i < uLightCount; ++i) {
         if (!uLights[i].ambientOnly) continue;
 
-        vec3 ambient = uLights[i].multiplier * uLights[i].color.rgb * uMaterial.ambient.rgb;
+        vec3 ambient = uLights[i].multiplier * uLights[i].color.rgb * uAmbientColor.rgb;
 
         float attenuation = getAttenuationQuadratic(i);
         ambient *= attenuation;
@@ -737,7 +714,7 @@ vec3 getLightingIndirect(vec3 N) {
 
 vec3 getLightingDirect(vec3 N) {
     vec3 result = vec3(0.0);
-    vec3 V = normalize(uGeneral.cameraPosition.xyz - fragPosition);
+    vec3 V = normalize(uCameraPosition.xyz - fragPosition);
 
     for (int i = 0; i < uLightCount; ++i) {
         if (uLights[i].ambientOnly) continue;
@@ -745,7 +722,7 @@ vec3 getLightingDirect(vec3 N) {
         vec3 L = normalize(uLights[i].position.xyz - fragPosition);
         vec3 H = normalize(V + L);
 
-        vec3 diff = uMaterial.diffuse.rgb * max(dot(L, N), 0.0);
+        vec3 diff = uDiffuseColor.rgb * max(dot(L, N), 0.0);
         vec3 diffuse = uLights[i].multiplier * uLights[i].color.rgb * diff;
 
         float spec = pow(max(dot(N, H), 0.0), SHININESS);
@@ -782,23 +759,23 @@ void main() {
         vec3 direct = getLightingDirect(N);
         lighting = indirect + (1.0 - shadow) * direct;
     } else if (isFeatureEnabled(FEATURE_SELFILLUM)) {
-        lighting = uGeneral.selfIllumColor.rgb;
+        lighting = uSelfIllumColor.rgb;
     } else {
         lighting = vec3(1.0);
     }
 
-    vec3 objectColor = lighting * uGeneral.color.rgb * diffuseSample.rgb;
-    float objectAlpha = (opaque ? 1.0 : diffuseSample.a) * uGeneral.alpha;
+    vec3 objectColor = lighting * uColor.rgb * diffuseSample.rgb;
+    float objectAlpha = (opaque ? 1.0 : diffuseSample.a) * uAlpha;
 
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
-        vec3 V = normalize(uGeneral.cameraPosition.xyz - fragPosition);
+        vec3 V = normalize(uCameraPosition.xyz - fragPosition);
         vec3 R = reflect(-V, N);
         vec4 envmapSample = texture(sEnvironmentMap, R);
         objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
     }
     if (isFeatureEnabled(FEATURE_WATER)) {
-        objectColor *= uGeneral.waterAlpha;
-        objectAlpha *= uGeneral.waterAlpha;
+        objectColor *= uWaterAlpha;
+        objectAlpha *= uWaterAlpha;
     }
     if (isFeatureEnabled(FEATURE_FOG)) {
         objectColor = applyFog(objectColor);
@@ -806,7 +783,7 @@ void main() {
 
     vec3 objectColorBright;
     if (isFeatureEnabled(FEATURE_SELFILLUM)) {
-        objectColorBright = smoothstep(SELFILLUM_THRESHOLD, 1.0, uGeneral.selfIllumColor.rgb * diffuseSample.rgb * diffuseSample.a);
+        objectColorBright = smoothstep(SELFILLUM_THRESHOLD, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * diffuseSample.a);
     } else {
         objectColorBright = vec3(0.0);
     }
@@ -833,8 +810,8 @@ void main() {
         lighting = vec3(1.0);
     }
 
-    vec3 objectColor = lighting * uGeneral.color.rgb;
-    float objectAlpha = uGeneral.alpha;
+    vec3 objectColor = lighting * uColor.rgb;
+    float objectAlpha = uAlpha;
 
     fragColor = vec4(objectColor, objectAlpha);
     fragColorBright = vec4(vec3(0.0), objectAlpha);
@@ -880,14 +857,14 @@ void Shaders::init() {
     _spBillboard = initShaderProgram({vsBillboard, fsGUI});
 
     // Uniform Buffers
-    static CombinedUniforms defaultsCombined;
+    static GeneralUniforms defaultsGeneral;
     static TextUniforms defaultsText;
     static LightingUniforms defaultsLighting;
     static SkeletalUniforms defaultsSkeletal;
     static ParticlesUniforms defaultsParticles;
     static GrassUniforms defaultsGrass;
     static DanglymeshUniforms defaultsDanglymesh;
-    _ubCombined = initUniformBuffer(&defaultsCombined, sizeof(CombinedUniforms));
+    _ubGeneral = initUniformBuffer(&defaultsGeneral, sizeof(GeneralUniforms));
     _ubText = initUniformBuffer(&defaultsText, sizeof(TextUniforms));
     _ubLighting = initUniformBuffer(&defaultsLighting, sizeof(LightingUniforms));
     _ubSkeletal = initUniformBuffer(&defaultsSkeletal, sizeof(SkeletalUniforms));
@@ -918,7 +895,7 @@ void Shaders::deinit() {
     _spBillboard.reset();
 
     // Uniform Buffers
-    _ubCombined.reset();
+    _ubGeneral.reset();
     _ubText.reset();
     _ubLighting.reset();
     _ubSkeletal.reset();
@@ -953,7 +930,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
 
     // Uniform Blocks
-    program->bindUniformBlock("Combined", UniformBlockBindingPoints::combined);
+    program->bindUniformBlock("General", UniformBlockBindingPoints::general);
     program->bindUniformBlock("Text", UniformBlockBindingPoints::text);
     program->bindUniformBlock("Lighting", UniformBlockBindingPoints::lighting);
     program->bindUniformBlock("Skeletal", UniformBlockBindingPoints::skeletal);
@@ -972,30 +949,30 @@ unique_ptr<UniformBuffer> Shaders::initUniformBuffer(const void *data, ptrdiff_t
 }
 
 void Shaders::refreshUniforms() {
-    _context.bindUniformBuffer(UniformBlockBindingPoints::combined, _ubCombined);
-    _ubCombined->setData(&_uniforms.combined, sizeof(CombinedUniforms), true);
+    _context.bindUniformBuffer(UniformBlockBindingPoints::general, _ubGeneral);
+    _ubGeneral->setData(&_uniforms.general, sizeof(GeneralUniforms), true);
 
-    if (_uniforms.combined.featureMask & UniformsFeatureFlags::text) {
+    if (_uniforms.general.featureMask & UniformsFeatureFlags::text) {
         _context.bindUniformBuffer(UniformBlockBindingPoints::text, _ubText);
         _ubText->setData(&_uniforms.text, sizeof(TextUniforms), true);
     }
-    if (_uniforms.combined.featureMask & UniformsFeatureFlags::lighting) {
+    if (_uniforms.general.featureMask & UniformsFeatureFlags::lighting) {
         _context.bindUniformBuffer(UniformBlockBindingPoints::lighting, _ubLighting);
         _ubLighting->setData(&_uniforms.lighting, sizeof(LightingUniforms), true);
     }
-    if (_uniforms.combined.featureMask & UniformsFeatureFlags::skeletal) {
+    if (_uniforms.general.featureMask & UniformsFeatureFlags::skeletal) {
         _context.bindUniformBuffer(UniformBlockBindingPoints::skeletal, _ubSkeletal);
         _ubSkeletal->setData(&_uniforms.skeletal, sizeof(SkeletalUniforms), true);
     }
-    if (_uniforms.combined.featureMask & UniformsFeatureFlags::particles) {
+    if (_uniforms.general.featureMask & UniformsFeatureFlags::particles) {
         _context.bindUniformBuffer(UniformBlockBindingPoints::particles, _ubParticles);
         _ubParticles->setData(&_uniforms.particles, sizeof(ParticlesUniforms), true);
     }
-    if (_uniforms.combined.featureMask & UniformsFeatureFlags::grass) {
+    if (_uniforms.general.featureMask & UniformsFeatureFlags::grass) {
         _context.bindUniformBuffer(UniformBlockBindingPoints::grass, _ubGrass);
         _ubGrass->setData(&_uniforms.grass, sizeof(GrassUniforms), true);
     }
-    if (_uniforms.combined.featureMask & UniformsFeatureFlags::danglymesh) {
+    if (_uniforms.general.featureMask & UniformsFeatureFlags::danglymesh) {
         _context.bindUniformBuffer(UniformBlockBindingPoints::danglymesh, _ubDanglymesh);
         _ubDanglymesh->setData(&_uniforms.danglymesh, sizeof(DanglymeshUniforms), true);
     }

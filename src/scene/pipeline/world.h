@@ -56,7 +56,7 @@ public:
 private:
     graphics::GraphicsOptions _options;
 
-    glm::mat4 _lightSpaceMatrices[graphics::kNumCubeFaces];
+    glm::mat4 _shadowLightSpaceMatrices[graphics::kNumCubeFaces];
     bool _takeScreenshot {false}; /**< render next frame into texture */
 
     // Services

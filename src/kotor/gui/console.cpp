@@ -316,11 +316,11 @@ void Console::drawBackground() {
     transform = glm::scale(transform, glm::vec3(_game.options().graphics.width, height, 1.0f));
 
     auto &uniforms = _services.shaders.uniforms();
-    uniforms.combined = CombinedUniforms();
-    uniforms.combined.general.projection = _services.window.getOrthoProjection();
-    uniforms.combined.general.model = move(transform);
-    uniforms.combined.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    uniforms.combined.general.alpha = 0.5f;
+    uniforms.general = GeneralUniforms();
+    uniforms.general.projection = _services.window.getOrthoProjection();
+    uniforms.general.model = move(transform);
+    uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    uniforms.general.alpha = 0.5f;
 
     _services.context.useShaderProgram(_services.shaders.simpleColor());
     _services.shaders.refreshUniforms();

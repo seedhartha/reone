@@ -259,8 +259,8 @@ void EmitterSceneNode::drawElements(const vector<SceneNode *> &elements, int cou
     }
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.combined = _sceneGraph.uniformsPrototype().combined;
-    uniforms.combined.featureMask = UniformsFeatureFlags::particles;
+    uniforms.general = _sceneGraph.uniformsPrototype().general;
+    uniforms.general.featureMask = UniformsFeatureFlags::particles;
     uniforms.particles.gridSize = emitter->gridSize;
     uniforms.particles.render = static_cast<int>(emitter->renderMode);
 

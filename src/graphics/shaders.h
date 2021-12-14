@@ -77,7 +77,7 @@ private:
     std::shared_ptr<ShaderProgram> _spBillboard;
 
     // Uniform Buffers
-    std::shared_ptr<UniformBuffer> _ubCombined;
+    std::shared_ptr<UniformBuffer> _ubGeneral;
     std::shared_ptr<UniformBuffer> _ubText;
     std::shared_ptr<UniformBuffer> _ubLighting;
     std::shared_ptr<UniformBuffer> _ubSkeletal;

@@ -205,10 +205,10 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.combined.featureMask = _discardEnabled ? UniformsFeatureFlags::discard : 0;
-            uniforms.combined.general.projection = _window.getOrthoProjection();
-            uniforms.combined.general.model = move(transform);
-            uniforms.combined.general.discardColor = glm::vec4(_discardColor, 1.0f);
+            uniforms.general.featureMask = _discardEnabled ? UniformsFeatureFlags::discard : 0;
+            uniforms.general.projection = _window.getOrthoProjection();
+            uniforms.general.model = move(transform);
+            uniforms.general.discardColor = glm::vec4(_discardColor, 1.0f);
         }
 
         BlendMode oldBlendMode = _context.blendMode();
@@ -240,10 +240,10 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
 
                 auto &uniforms = _shaders.uniforms();
-                uniforms.combined.featureMask = 0;
-                uniforms.combined.general.projection = _window.getOrthoProjection();
-                uniforms.combined.general.model = move(transform);
-                uniforms.combined.general.color = glm::vec4(color, 1.0f);
+                uniforms.general.featureMask = 0;
+                uniforms.general.projection = _window.getOrthoProjection();
+                uniforms.general.model = move(transform);
+                uniforms.general.color = glm::vec4(color, 1.0f);
 
                 _context.useShaderProgram(_shaders.gui());
                 _shaders.refreshUniforms();
@@ -257,10 +257,10 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
 
                 auto &uniforms = _shaders.uniforms();
-                uniforms.combined.featureMask = 0;
-                uniforms.combined.general.projection = _window.getOrthoProjection();
-                uniforms.combined.general.model = move(transform);
-                uniforms.combined.general.color = glm::vec4(color, 1.0f);
+                uniforms.general.featureMask = 0;
+                uniforms.general.projection = _window.getOrthoProjection();
+                uniforms.general.model = move(transform);
+                uniforms.general.color = glm::vec4(color, 1.0f);
 
                 _context.useShaderProgram(_shaders.gui());
                 _shaders.refreshUniforms();
@@ -279,10 +279,10 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
                 auto &uniforms = _shaders.uniforms();
-                uniforms.combined.featureMask = 0;
-                uniforms.combined.general.projection = _window.getOrthoProjection();
-                uniforms.combined.general.model = move(transform);
-                uniforms.combined.general.color = glm::vec4(color, 1.0f);
+                uniforms.general.featureMask = 0;
+                uniforms.general.projection = _window.getOrthoProjection();
+                uniforms.general.model = move(transform);
+                uniforms.general.color = glm::vec4(color, 1.0f);
 
                 _context.useShaderProgram(_shaders.gui());
                 _shaders.refreshUniforms();
@@ -296,10 +296,10 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
                 auto &uniforms = _shaders.uniforms();
-                uniforms.combined.featureMask = 0;
-                uniforms.combined.general.projection = _window.getOrthoProjection();
-                uniforms.combined.general.model = move(transform);
-                uniforms.combined.general.color = glm::vec4(color, 1.0f);
+                uniforms.general.featureMask = 0;
+                uniforms.general.projection = _window.getOrthoProjection();
+                uniforms.general.model = move(transform);
+                uniforms.general.color = glm::vec4(color, 1.0f);
 
                 _context.useShaderProgram(_shaders.gui());
                 _shaders.refreshUniforms();
@@ -320,10 +320,10 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.combined.featureMask = 0;
-            uniforms.combined.general.projection = _window.getOrthoProjection();
-            uniforms.combined.general.model = move(transform);
-            uniforms.combined.general.color = glm::vec4(color, 1.0f);
+            uniforms.general.featureMask = 0;
+            uniforms.general.projection = _window.getOrthoProjection();
+            uniforms.general.model = move(transform);
+            uniforms.general.color = glm::vec4(color, 1.0f);
 
             _context.useShaderProgram(_shaders.gui());
             _shaders.refreshUniforms();
@@ -337,10 +337,10 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.combined.featureMask = 0;
-            uniforms.combined.general.projection = _window.getOrthoProjection();
-            uniforms.combined.general.model = move(transform);
-            uniforms.combined.general.color = glm::vec4(color, 1.0f);
+            uniforms.general.featureMask = 0;
+            uniforms.general.projection = _window.getOrthoProjection();
+            uniforms.general.model = move(transform);
+            uniforms.general.color = glm::vec4(color, 1.0f);
 
             _context.useShaderProgram(_shaders.gui());
             _shaders.refreshUniforms();
@@ -354,10 +354,10 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.combined.featureMask = 0;
-            uniforms.combined.general.projection = _window.getOrthoProjection();
-            uniforms.combined.general.model = move(transform);
-            uniforms.combined.general.color = glm::vec4(color, 1.0f);
+            uniforms.general.featureMask = 0;
+            uniforms.general.projection = _window.getOrthoProjection();
+            uniforms.general.model = move(transform);
+            uniforms.general.color = glm::vec4(color, 1.0f);
 
             _context.useShaderProgram(_shaders.gui());
             _shaders.refreshUniforms();
@@ -371,10 +371,10 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.combined.featureMask = 0;
-            uniforms.combined.general.projection = _window.getOrthoProjection();
-            uniforms.combined.general.model = move(transform);
-            uniforms.combined.general.color = glm::vec4(color, 1.0f);
+            uniforms.general.featureMask = 0;
+            uniforms.general.projection = _window.getOrthoProjection();
+            uniforms.general.model = move(transform);
+            uniforms.general.color = glm::vec4(color, 1.0f);
 
             _context.useShaderProgram(_shaders.gui());
             _shaders.refreshUniforms();

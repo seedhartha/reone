@@ -247,10 +247,10 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     // Setup shaders
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.combined = _sceneGraph.uniformsPrototype().combined;
-    uniforms.combined.general.model = _absTransform;
-    uniforms.combined.general.alpha = _alpha;
-    uniforms.combined.general.ambientColor = glm::vec4(_sceneGraph.ambientLightColor(), 1.0f);
+    uniforms.general = _sceneGraph.uniformsPrototype().general;
+    uniforms.general.model = _absTransform;
+    uniforms.general.alpha = _alpha;
+    uniforms.general.worldAmbientColor = glm::vec4(_sceneGraph.ambientLightColor(), 1.0f);
 
     shared_ptr<ShaderProgram> program;
 
@@ -261,43 +261,43 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         program = _nodeTextures.diffuse ? _shaders.blinnPhong() : _shaders.blinnPhongDiffuseless();
 
         if (_nodeTextures.diffuse) {
-            uniforms.combined.featureMask |= UniformsFeatureFlags::diffuse;
+            uniforms.general.featureMask |= UniformsFeatureFlags::diffuse;
         }
         if (_nodeTextures.envmap) {
-            uniforms.combined.featureMask |= UniformsFeatureFlags::envmap;
+            uniforms.general.featureMask |= UniformsFeatureFlags::envmap;
         }
         if (_nodeTextures.lightmap) {
-            uniforms.combined.featureMask |= UniformsFeatureFlags::lightmap;
+            uniforms.general.featureMask |= UniformsFeatureFlags::lightmap;
         }
         if (_nodeTextures.bumpmap) {
             if (_nodeTextures.bumpmap->isGrayscale()) {
-                uniforms.combined.featureMask |= UniformsFeatureFlags::heightmap;
-                uniforms.combined.heightMap.scaling = _nodeTextures.bumpmap->features().bumpMapScaling;
+                uniforms.general.featureMask |= UniformsFeatureFlags::heightmap;
+                uniforms.general.heightMapScaling = _nodeTextures.bumpmap->features().bumpMapScaling;
                 if (_nodeTextures.bumpmap->features().procedureType == Texture::ProcedureType::Cycle) {
                     int gridX = _nodeTextures.bumpmap->features().numX;
                     int gridY = _nodeTextures.bumpmap->features().numY;
                     float oneOverGridX = 1.0f / static_cast<float>(gridX);
                     float oneOverGridY = 1.0f / static_cast<float>(gridY);
-                    uniforms.combined.heightMap.frameBounds = glm::vec4(
+                    uniforms.general.heightMapFrameBounds = glm::vec4(
                         oneOverGridX * (_bumpmapCycleFrame % gridX),
                         oneOverGridY * (_bumpmapCycleFrame / gridX),
                         oneOverGridX,
                         oneOverGridY);
                 } else {
-                    uniforms.combined.heightMap.frameBounds = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+                    uniforms.general.heightMapFrameBounds = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
                 }
             } else {
-                uniforms.combined.featureMask |= UniformsFeatureFlags::normalmap;
+                uniforms.general.featureMask |= UniformsFeatureFlags::normalmap;
             }
         }
 
         bool receivesShadows = isReceivingShadows(_model, *this);
         if (receivesShadows) {
-            uniforms.combined.featureMask |= UniformsFeatureFlags::shadows;
+            uniforms.general.featureMask |= UniformsFeatureFlags::shadows;
         }
 
         if (mesh->skin) {
-            uniforms.combined.featureMask |= UniformsFeatureFlags::skeletal;
+            uniforms.general.featureMask |= UniformsFeatureFlags::skeletal;
 
             // Offset bone matrices by 1 to account for negative bone indices
             uniforms.skeletal.bones[0] = glm::mat4(1.0f);
@@ -320,15 +320,15 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         }
 
         if (isSelfIlluminated()) {
-            uniforms.combined.featureMask |= UniformsFeatureFlags::selfIllum;
-            uniforms.combined.general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
+            uniforms.general.featureMask |= UniformsFeatureFlags::selfIllum;
+            uniforms.general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
         }
         if (isLightingEnabled()) {
             const vector<LightSceneNode *> &lights = _sceneGraph.closestLights();
 
-            uniforms.combined.featureMask |= UniformsFeatureFlags::lighting;
-            uniforms.combined.material.ambient = glm::vec4(mesh->ambient, 1.0f);
-            uniforms.combined.material.diffuse = glm::vec4(mesh->diffuse, 1.0f);
+            uniforms.general.featureMask |= UniformsFeatureFlags::lighting;
+            uniforms.general.ambientColor = glm::vec4(mesh->ambient, 1.0f);
+            uniforms.general.diffuseColor = glm::vec4(mesh->diffuse, 1.0f);
             uniforms.lighting.lightCount = static_cast<int>(lights.size());
 
             for (size_t i = 0; i < lights.size(); ++i) {
@@ -345,25 +345,25 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         }
 
         if (_nodeTextures.diffuse) {
-            uniforms.combined.general.uvOffset = _uvOffset;
+            uniforms.general.uvOffset = _uvOffset;
 
             float waterAlpha = _nodeTextures.diffuse->features().waterAlpha;
             if (waterAlpha != -1.0f) {
-                uniforms.combined.featureMask |= UniformsFeatureFlags::water;
-                uniforms.combined.general.waterAlpha = waterAlpha;
+                uniforms.general.featureMask |= UniformsFeatureFlags::water;
+                uniforms.general.waterAlpha = waterAlpha;
             }
         }
 
         if (_sceneGraph.isFogEnabled() && _model.model().isAffectedByFog()) {
-            uniforms.combined.featureMask |= UniformsFeatureFlags::fog;
-            uniforms.combined.general.fogNear = _sceneGraph.fogNear();
-            uniforms.combined.general.fogFar = _sceneGraph.fogFar();
-            uniforms.combined.general.fogColor = glm::vec4(_sceneGraph.fogColor(), 1.0f);
+            uniforms.general.featureMask |= UniformsFeatureFlags::fog;
+            uniforms.general.fogNear = _sceneGraph.fogNear();
+            uniforms.general.fogFar = _sceneGraph.fogFar();
+            uniforms.general.fogColor = glm::vec4(_sceneGraph.fogColor(), 1.0f);
         }
 
         shared_ptr<ModelNode::DanglyMesh> danglyMesh(mesh->danglyMesh);
         if (danglyMesh) {
-            uniforms.combined.featureMask |= UniformsFeatureFlags::danglymesh;
+            uniforms.general.featureMask |= UniformsFeatureFlags::danglymesh;
             uniforms.danglymesh.stride = glm::vec4(_danglymeshAnimation.stride, 0.0f);
             uniforms.danglymesh.displacement = danglyMesh->displacement;
             for (size_t i = 0; i < danglyMesh->constraints.size(); ++i) {

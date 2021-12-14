@@ -67,20 +67,20 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
     _context.bindTexture(0, _texture);
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.combined = CombinedUniforms();
-    uniforms.combined.featureMask = UniformsFeatureFlags::text;
-    uniforms.combined.general.projection = _window.getOrthoProjection();
-    uniforms.combined.general.color = glm::vec4(color, 1.0f);
+    uniforms.general = GeneralUniforms();
+    uniforms.general.featureMask = UniformsFeatureFlags::text;
+    uniforms.general.projection = _window.getOrthoProjection();
+    uniforms.general.color = glm::vec4(color, 1.0f);
 
-    int numBlocks = static_cast<int>(text.size()) / kMaxCharacters;
-    if (text.size() % kMaxCharacters > 0) {
+    int numBlocks = static_cast<int>(text.size()) / kMaxTextChars;
+    if (text.size() % kMaxTextChars > 0) {
         ++numBlocks;
     }
     glm::vec3 textOffset(getTextOffset(text, gravity), 0.0f);
     for (int i = 0; i < numBlocks; ++i) {
-        int numChars = glm::min(kMaxCharacters, static_cast<int>(text.size()) - i * kMaxCharacters);
+        int numChars = glm::min(kMaxTextChars, static_cast<int>(text.size()) - i * kMaxTextChars);
         for (int j = 0; j < numChars; ++j) {
-            const Glyph &glyph = _glyphs[static_cast<unsigned char>(text[i * kMaxCharacters + j])];
+            const Glyph &glyph = _glyphs[static_cast<unsigned char>(text[i * kMaxTextChars + j])];
 
             glm::vec4 posScale;
             posScale[0] = position.x + textOffset.x;

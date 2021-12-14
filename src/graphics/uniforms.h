@@ -41,6 +41,7 @@ struct UniformsFeatureFlags {
     static constexpr int grass = 0x4000;
     static constexpr int fog = 0x8000;
     static constexpr int danglymesh = 0x10000;
+    static constexpr int shadowlight = 0x20000;
 };
 
 struct GeneralUniforms {
@@ -49,52 +50,26 @@ struct GeneralUniforms {
     glm::mat4 model {1.0f};
     glm::vec4 cameraPosition {0.0f};
     glm::vec4 color {1.0f};
+    glm::vec4 worldAmbientColor {1.0f};
     glm::vec4 ambientColor {1.0f};
+    glm::vec4 diffuseColor {0.0f};
     glm::vec4 selfIllumColor {1.0f};
     glm::vec4 discardColor {0.0f};
     glm::vec4 fogColor {0.0f};
+    glm::vec4 heightMapFrameBounds {0.0f};
+    glm::vec4 shadowLightPosition {0.0f}; /**< W = 0 if light is directional */
     glm::vec2 uvOffset {0.0f};
+    glm::vec2 blurResolution {0.0f};
+    glm::vec2 blurDirection {0.0f};
     float alpha {1.0f};
     float waterAlpha {1.0f};
-    float roughness {0.0f};
     float fogNear {0.0f};
     float fogFar {0.0f};
-    float envmapResolution {0.0f};
-};
-
-struct MaterialUniforms {
-    glm::vec4 ambient {1.0f};
-    glm::vec4 diffuse {0.0f};
-};
-
-struct HeightMapUniforms {
-    glm::vec4 frameBounds {0.0f};
-    float scaling {1.0f};
-    char padding[12];
-};
-
-struct ShadowsUniforms {
-    glm::mat4 lightSpaceMatrices[kNumCubeFaces];
-    glm::vec4 lightPosition {0.0f}; /**< W = 0 if light is directional */
-    int lightPresent {false};
-    float strength {1.0f};
-    char padding[8];
-};
-
-struct BlurUniforms {
-    glm::vec2 resolution {0.0f};
-    glm::vec2 direction {0.0f};
-};
-
-struct CombinedUniforms {
+    float heightMapScaling {1.0f};
+    float shadowStrength {1.0f};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
     char padding[12];
-
-    GeneralUniforms general;
-    MaterialUniforms material;
-    HeightMapUniforms heightMap;
-    ShadowsUniforms shadows;
-    BlurUniforms blur;
+    glm::mat4 shadowLightSpaceMatrices[kNumCubeFaces];
 };
 
 struct LightUniforms {
@@ -150,7 +125,7 @@ struct TextCharacterUniforms {
 };
 
 struct TextUniforms {
-    TextCharacterUniforms chars[kMaxCharacters];
+    TextCharacterUniforms chars[kMaxTextChars];
 };
 
 struct DanglymeshUniforms {
@@ -161,7 +136,7 @@ struct DanglymeshUniforms {
 };
 
 struct Uniforms {
-    CombinedUniforms combined;
+    GeneralUniforms general;
     TextUniforms text;
     LightingUniforms lighting;
     SkeletalUniforms skeletal;

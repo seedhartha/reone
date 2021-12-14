@@ -29,7 +29,7 @@ constexpr float kDefaultClipPlaneFar = 10000.0f;
 constexpr int kMaxBones = 24;
 constexpr int kMaxLights = 8;
 constexpr int kMaxParticles = 64;
-constexpr int kMaxCharacters = 128;
+constexpr int kMaxTextChars = 128;
 constexpr int kMaxGrassClusters = 256;
 constexpr int kMaxDanglymeshConstraints = 512;
 
@@ -130,7 +130,7 @@ struct TextureUnits {
 };
 
 struct UniformBlockBindingPoints {
-    static constexpr int combined = 0;
+    static constexpr int general = 0;
     static constexpr int text = 1;
     static constexpr int lighting = 2;
     static constexpr int skeletal = 3;
