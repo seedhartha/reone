@@ -259,13 +259,12 @@ void SceneGraph::prepareLeafs() {
         if (!grass->isEnabled()) {
             continue;
         }
-        glm::mat4 modelView(_activeCamera->view() * grass->absoluteTransform());
         for (auto &child : grass->children()) {
             if (child->type() != SceneNodeType::GrassCluster) {
                 continue;
             }
             auto cluster = static_cast<GrassClusterSceneNode *>(child.get());
-            glm::vec3 screen(glm::project(cluster->position(), modelView, _activeCamera->projection(), viewport));
+            glm::vec3 screen(glm::project(cluster->getOrigin(), _activeCamera->view(), _activeCamera->projection(), viewport));
             if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
                 leafs.push_back(make_pair(cluster, screen.z));
             }

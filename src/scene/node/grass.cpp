@@ -128,7 +128,7 @@ void GrassSceneNode::update(float dt) {
             glm::vec2 lightmapUV(mesh->getUV2(face, baryPosition));
             auto cluster = _clusterPool.top();
             _clusterPool.pop();
-            cluster->setPosition(move(position));
+            cluster->setLocalTransform(glm::translate(position));
             cluster->setVariant(getRandomGrassVariant());
             cluster->setLightmapUV(move(lightmapUV));
             addChild(cluster);
@@ -155,9 +155,8 @@ void GrassSceneNode::drawElements(const vector<SceneNode *> &elements, int count
     }
     for (int i = 0; i < count; ++i) {
         auto cluster = static_cast<GrassClusterSceneNode *>(elements[i]);
-        glm::vec3 worldSpacePos(_absTransform * glm::vec4(cluster->position(), 1.0f));
         uniforms.grass.quadSize = glm::vec2(_quadSize);
-        uniforms.grass.clusters[i].positionVariant = glm::vec4(worldSpacePos, static_cast<float>(cluster->variant()));
+        uniforms.grass.clusters[i].positionVariant = glm::vec4(cluster->getOrigin(), static_cast<float>(cluster->variant()));
         uniforms.grass.clusters[i].lightmapUV = cluster->lightmapUV();
     }
 
