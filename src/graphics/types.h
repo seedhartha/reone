@@ -99,6 +99,11 @@ enum class TextGravity {
     RightTop
 };
 
+enum class FramebufferTarget {
+    Read,
+    Draw
+};
+
 enum class ShaderType {
     Vertex,
     Geometry,

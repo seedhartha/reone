@@ -99,7 +99,7 @@ void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &ex
     bool oldDepthTest = _context.isDepthTestEnabled();
     _context.setDepthTestEnabled(true);
 
-    _context.bindFramebuffer(_geometry1);
+    _context.bindDrawFramebuffer(_geometry1);
     _geometry1->attachColor(*attachments.colorBuffer1);
     _geometry1->attachDepth(*attachments.depthBuffer1);
 
@@ -108,16 +108,21 @@ void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &ex
 
     // Blit multi-sampled framebuffer to normal
 
-    _context.bindFramebuffer(_geometry2);
+    _context.bindReadFramebuffer(_geometry1);
+    _context.bindDrawFramebuffer(_geometry2);
     _geometry2->attachColor(*attachments.colorBuffer2);
     _geometry2->attachDepth(*attachments.depthBuffer2);
-    _geometry1->blitTo(*_geometry2, extent[2], extent[3]);
+    for (int i = 0; i < 2; ++i) {
+        _geometry1->setReadBuffer(i);
+        _geometry2->setDrawBuffer(i);
+        _geometry1->blit(extent[2], extent[3]);
+    }
 
     // Draw control
 
     _context.setDepthTestEnabled(oldDepthTest);
     _context.setViewport(oldViewport);
-    _context.unbindFramebuffer();
+    _context.unbindDrawFramebuffer();
     _context.bindTexture(0, attachments.colorBuffer2);
 
     glm::mat4 projection(glm::ortho(
