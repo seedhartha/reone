@@ -27,16 +27,19 @@ namespace reone {
 namespace graphics {
 
 void Framebuffer::init() {
-    if (!_nameGL) {
-        glGenFramebuffers(1, &_nameGL);
+    if (_inited) {
+        return;
     }
+    glGenFramebuffers(1, &_nameGL);
+    _inited = true;
 }
 
 void Framebuffer::deinit() {
-    if (_nameGL) {
-        glDeleteFramebuffers(1, &_nameGL);
-        _nameGL = 0;
+    if (!_inited) {
+        return;
     }
+    glDeleteFramebuffers(1, &_nameGL);
+    _inited = false;
 }
 
 static GLenum getTargetGL(FramebufferTarget target) {
@@ -56,6 +59,10 @@ void Framebuffer::unbind(FramebufferTarget target) {
     glBindFramebuffer(getTargetGL(target), 0);
 }
 
+void Framebuffer::blit(int width, int height) {
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+}
+
 void Framebuffer::attachColor(const Texture &texture, int index, int mip) const {
     if (texture.isCubeMap()) {
         glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, texture.nameGL(), mip);
@@ -69,12 +76,6 @@ void Framebuffer::attachColor(const Renderbuffer &renderbuffer, int index) const
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_RENDERBUFFER, renderbuffer.nameGL());
 }
 
-void Framebuffer::attachCubeMapFaceAsColor(const Texture &texture, CubeMapFace face, int index, int mip) const {
-    if (texture.isCubeMap()) {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(face), texture.nameGL(), mip);
-    }
-}
-
 void Framebuffer::attachDepth(const Texture &texture) const {
     if (texture.isCubeMap()) {
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture.nameGL(), 0);
@@ -86,10 +87,6 @@ void Framebuffer::attachDepth(const Texture &texture) const {
 
 void Framebuffer::attachDepth(const Renderbuffer &renderbuffer) const {
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer.nameGL());
-}
-
-void Framebuffer::blit(int width, int height) {
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 void Framebuffer::disableReadBuffer() {
