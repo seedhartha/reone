@@ -39,12 +39,21 @@ void Framebuffer::deinit() {
     }
 }
 
-void Framebuffer::bind() {
-    glBindFramebuffer(GL_FRAMEBUFFER, _nameGL);
+static GLenum getTargetGL(FramebufferTarget target) {
+    switch (target) {
+    case FramebufferTarget::Read:
+        return GL_READ_FRAMEBUFFER;
+    case FramebufferTarget::Draw:
+        return GL_DRAW_FRAMEBUFFER;
+    }
 }
 
-void Framebuffer::unbind() {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+void Framebuffer::bind(FramebufferTarget target) {
+    glBindFramebuffer(getTargetGL(target), _nameGL);
+}
+
+void Framebuffer::unbind(FramebufferTarget target) {
+    glBindFramebuffer(getTargetGL(target), 0);
 }
 
 void Framebuffer::attachColor(const Texture &texture, int index, int mip) const {
@@ -79,36 +88,29 @@ void Framebuffer::attachDepth(const Renderbuffer &renderbuffer) const {
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer.nameGL());
 }
 
-void Framebuffer::blitTo(Framebuffer &other, int width, int height, int numColors) {
-    GLint bound;
-    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &bound);
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, _nameGL);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, other.nameGL());
-
-    for (int i = 0; i < numColors; ++i) {
-        glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
-        glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
-        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, bound);
-}
-
-void Framebuffer::disableDrawBuffer() {
-    glDrawBuffer(GL_NONE);
+void Framebuffer::blit(int width, int height) {
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 void Framebuffer::disableReadBuffer() {
     glReadBuffer(GL_NONE);
 }
 
-void Framebuffer::setDrawBuffersToColor(int count) {
-    static constexpr GLenum attachments[] {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-    if (count != 1 && count != 2) {
-        throw invalid_argument("count must be 1 or 2");
-    }
-    glDrawBuffers(count, attachments);
+void Framebuffer::disableDrawBuffer() {
+    glDrawBuffer(GL_NONE);
+}
+
+void Framebuffer::setReadBuffer(int colorIdx) {
+    glReadBuffer(GL_COLOR_ATTACHMENT0 + colorIdx);
+}
+
+void Framebuffer::setDrawBuffer(int colorIdx) {
+    glDrawBuffer(GL_COLOR_ATTACHMENT0 + colorIdx);
+}
+
+void Framebuffer::setDrawBuffers(int numColors) {
+    static constexpr GLenum colors[] {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+    glDrawBuffers(numColors, colors);
 }
 
 } // namespace graphics

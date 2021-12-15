@@ -39,14 +39,9 @@ void Context::deinit() {
     if (!_inited) {
         return;
     }
-    if (_boundFramebuffer != 0) {
-        unbindFramebuffer();
-        _boundFramebuffer.reset();
-    }
-    if (_boundRenderbuffer != 0) {
-        unbindRenderbuffer();
-        _boundRenderbuffer.reset();
-    }
+    unbindReadFramebuffer();
+    unbindDrawFramebuffer();
+    unbindRenderbuffer();
 
     for (size_t i = 0; i < _boundTextures.size(); ++i) {
         unbindTexture(static_cast<int>(i));
@@ -170,12 +165,20 @@ void Context::withScissorTest(const glm::ivec4 &bounds, const function<void()> &
     glDisable(GL_SCISSOR_TEST);
 }
 
-void Context::bindFramebuffer(shared_ptr<Framebuffer> framebuffer) {
-    if (_boundFramebuffer == framebuffer) {
+void Context::bindReadFramebuffer(shared_ptr<Framebuffer> framebuffer) {
+    if (_boundFramebufferRead == framebuffer) {
         return;
     }
-    framebuffer->bind();
-    _boundFramebuffer = move(framebuffer);
+    framebuffer->bind(FramebufferTarget::Read);
+    _boundFramebufferRead = move(framebuffer);
+}
+
+void Context::bindDrawFramebuffer(shared_ptr<Framebuffer> framebuffer) {
+    if (_boundFramebufferDraw == framebuffer) {
+        return;
+    }
+    framebuffer->bind(FramebufferTarget::Draw);
+    _boundFramebufferDraw = move(framebuffer);
 }
 
 void Context::bindRenderbuffer(shared_ptr<Renderbuffer> renderbuffer) {
@@ -212,12 +215,20 @@ void Context::bindUniformBuffer(int bindingPoint, shared_ptr<UniformBuffer> buff
     _boundUniformBuffers[bindingPoint] = move(buffer);
 }
 
-void Context::unbindFramebuffer() {
-    if (!_boundFramebuffer) {
+void Context::unbindReadFramebuffer() {
+    if (!_boundFramebufferRead) {
         return;
     }
-    _boundFramebuffer->unbind();
-    _boundFramebuffer.reset();
+    _boundFramebufferRead->unbind(FramebufferTarget::Read);
+    _boundFramebufferRead.reset();
+}
+
+void Context::unbindDrawFramebuffer() {
+    if (!_boundFramebufferDraw) {
+        return;
+    }
+    _boundFramebufferDraw->unbind(FramebufferTarget::Draw);
+    _boundFramebufferDraw.reset();
 }
 
 void Context::unbindRenderbuffer() {

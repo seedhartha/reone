@@ -33,8 +33,8 @@ public:
     void init();
     void deinit();
 
-    void bind();
-    void unbind();
+    void bind(FramebufferTarget target = FramebufferTarget::Draw);
+    void unbind(FramebufferTarget target = FramebufferTarget::Draw);
 
     void attachColor(const Texture &texture, int index = 0, int mip = 0) const;
     void attachColor(const Renderbuffer &renderbuffer, int index = 0) const;
@@ -42,16 +42,18 @@ public:
     void attachDepth(const Texture &texture) const;
     void attachDepth(const Renderbuffer &renderbuffer) const;
 
-    void blitTo(Framebuffer &other, int width, int height, int numColors = 1);
+    void blit(int width, int height);
 
     uint32_t nameGL() const { return _nameGL; }
 
     // Buffers
 
-    void disableDrawBuffer();
     void disableReadBuffer();
+    void disableDrawBuffer();
 
-    void setDrawBuffersToColor(int count);
+    void setReadBuffer(int colorIdx);
+    void setDrawBuffer(int colorIdx);
+    void setDrawBuffers(int numColors);
 
     // END Buffers
 
