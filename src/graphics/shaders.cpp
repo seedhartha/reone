@@ -190,17 +190,7 @@ vec3 applyFog(vec3 objectColor) {
 
 static const string g_shaderBaseNormals = R"END(
 vec2 packTexCoords(vec2 uv, vec4 bounds) {
-    if (uv.x < 0.0) {
-        uv.x = 1.0 - mod(-uv.x, 1.0);
-    } else if (uv.x > 1.0) {
-        uv.x = mod(uv.x, 1.0);
-    }
-    if (uv.y < 0.0) {
-        uv.y = 1.0 - mod(-uv.y, 1.0);
-    } else if (uv.y > 1.0) {
-        uv.y = mod(uv.y, 1.0);
-    }
-    return bounds.xy + bounds.zw * uv;
+    return bounds.xy + bounds.zw * fract(uv);
 }
 
 vec3 getNormalFromNormalMap(vec2 uv) {
