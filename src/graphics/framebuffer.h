@@ -36,15 +36,16 @@ public:
     void bind(FramebufferTarget target = FramebufferTarget::Draw);
     void unbind(FramebufferTarget target = FramebufferTarget::Draw);
 
+    void blit(int width, int height);
+
+    // Attachments
+
     void attachColor(const Texture &texture, int index = 0, int mip = 0) const;
     void attachColor(const Renderbuffer &renderbuffer, int index = 0) const;
-    void attachCubeMapFaceAsColor(const Texture &texture, CubeMapFace face, int index = 0, int mip = 0) const;
     void attachDepth(const Texture &texture) const;
     void attachDepth(const Renderbuffer &renderbuffer) const;
 
-    void blit(int width, int height);
-
-    uint32_t nameGL() const { return _nameGL; }
+    // END Attachments
 
     // Buffers
 
@@ -57,8 +58,20 @@ public:
 
     // END Buffers
 
+    // OpenGL
+
+    uint32_t nameGL() const { return _nameGL; }
+
+    // END OpenGL
+
 private:
+    bool _inited {false};
+
+    // OpenGL
+
     uint32_t _nameGL {0};
+
+    // END OpenGL
 };
 
 } // namespace graphics

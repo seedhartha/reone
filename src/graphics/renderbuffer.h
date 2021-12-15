@@ -40,17 +40,26 @@ public:
     void clearPixels(int w, int h, PixelFormat format);
     void refresh();
 
+    // OpenGL
+
     uint32_t nameGL() const { return _nameGL; }
+
+    // END OpenGL
 
 private:
     int _numSamples;
+
+    bool _inited {false};
 
     int _width {0};
     int _height {0};
     PixelFormat _pixelFormat {PixelFormat::RGB};
 
-    bool _inited {false};
+    // OpenGL
+
     uint32_t _nameGL {0};
+
+    // END OpenGL
 };
 
 } // namespace graphics
