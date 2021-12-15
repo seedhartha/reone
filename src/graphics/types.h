@@ -70,7 +70,8 @@ enum class PixelFormat {
     BGRA,
     DXT1,
     DXT5,
-    Depth
+    Depth,
+    DepthStencil
 };
 
 enum class CubeMapFace {
@@ -116,6 +117,8 @@ struct ClearBuffers {
     static constexpr int stencil = 4;
 
     static constexpr int colorDepth = color | depth;
+    static constexpr int colorDepthStencil = color | depth | stencil;
+    static constexpr int depthStencil = depth | stencil;
 };
 
 struct TextureUnits {

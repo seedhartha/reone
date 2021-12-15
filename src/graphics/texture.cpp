@@ -54,6 +54,8 @@ static uint32_t getPixelFormatGL(PixelFormat format) {
         return GL_BGRA;
     case PixelFormat::Depth:
         return GL_DEPTH_COMPONENT;
+    case PixelFormat::DepthStencil:
+        return GL_DEPTH_STENCIL;
     default:
         throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(format)));
     }
@@ -69,6 +71,8 @@ static uint32_t getPixelTypeGL(PixelFormat format) {
         return GL_UNSIGNED_BYTE;
     case PixelFormat::Depth:
         return GL_FLOAT;
+    case PixelFormat::DepthStencil:
+        return GL_UNSIGNED_INT_24_8;
     default:
         throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(format)));
     }
@@ -224,20 +228,13 @@ void Texture::fillTarget(uint32_t target, int level, int width, int height, cons
     case PixelFormat::DXT5:
         glCompressedTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, size, pixels);
         break;
-    case PixelFormat::Grayscale:
-    case PixelFormat::RGB:
-    case PixelFormat::RGBA:
-    case PixelFormat::BGR:
-    case PixelFormat::BGRA:
-    case PixelFormat::Depth:
+    default:
         if (isMultisample()) {
             // Multisample textures can only be used as color buffers
             glTexImage2DMultisample(target, _properties.numSamples, getInternalPixelFormatGL(_pixelFormat), width, height, GL_TRUE);
         } else {
             glTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, getPixelFormatGL(_pixelFormat), getPixelTypeGL(_pixelFormat), pixels);
         }
-        break;
-    default:
         break;
     }
 }

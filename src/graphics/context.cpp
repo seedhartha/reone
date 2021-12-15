@@ -57,17 +57,17 @@ void Context::deinit() {
 }
 
 void Context::clear(int mask) {
-    int glMask = 0;
+    int maskGL = 0;
     if (mask & ClearBuffers::color) {
-        glMask |= GL_COLOR_BUFFER_BIT;
+        maskGL |= GL_COLOR_BUFFER_BIT;
     }
     if (mask & ClearBuffers::depth) {
-        glMask |= GL_DEPTH_BUFFER_BIT;
+        maskGL |= GL_DEPTH_BUFFER_BIT;
     }
     if (mask & ClearBuffers::stencil) {
-        glMask |= GL_STENCIL_BUFFER_BIT;
+        maskGL |= GL_STENCIL_BUFFER_BIT;
     }
-    glClear(glMask);
+    glClear(maskGL);
 }
 
 void Context::useShaderProgram(shared_ptr<ShaderProgram> program) {
