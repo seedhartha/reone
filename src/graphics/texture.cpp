@@ -293,8 +293,8 @@ void Texture::flushGPUToCPU() {
 }
 
 glm::vec4 Texture::sample(float s, float t) const {
-    int x = glm::round(s * (_width - 1));
-    int y = glm::round(t * (_height - 1));
+    int x = glm::round(glm::fract(s) * (_width - 1));
+    int y = glm::round(glm::fract(t) * (_height - 1));
     return sample(x, y);
 }
 
@@ -311,18 +311,6 @@ glm::vec4 Texture::sample(int x, int y) const {
     bool grayscale = isGrayscale();
     bool alpha = _pixelFormat == PixelFormat::RGBA || _pixelFormat == PixelFormat::BGRA;
     int bpp = grayscale ? 1 : (alpha ? 4 : 3);
-
-    // Wrapping (repeat)
-    if (x < 0) {
-        x = _width - (-x % _width);
-    } else if (x >= _width) {
-        x %= _width;
-    }
-    if (y < 0) {
-        y = _height - (-y % _height);
-    } else if (y >= _height) {
-        y %= _height;
-    }
 
     auto &pixels = *_layers.front().mipMaps.front().pixels;
     auto pixel = &pixels[bpp * (y * _width + x)];
