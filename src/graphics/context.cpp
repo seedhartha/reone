@@ -79,18 +79,17 @@ void Context::useShaderProgram(shared_ptr<ShaderProgram> program) {
 }
 
 void Context::setViewport(glm::ivec4 viewport) {
-    if (_viewport == viewport)
+    if (_viewport == viewport) {
         return;
-
+    }
     glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-
     _viewport = move(viewport);
 }
 
 void Context::setDepthTestEnabled(bool enabled) {
-    if (_depthTest == enabled)
+    if (_depthTest == enabled) {
         return;
-
+    }
     if (enabled) {
         glEnable(GL_DEPTH_TEST);
     } else {
@@ -100,9 +99,9 @@ void Context::setDepthTestEnabled(bool enabled) {
 }
 
 void Context::setBackFaceCullingEnabled(bool enabled) {
-    if (_backFaceCulling == enabled)
+    if (_backFaceCulling == enabled) {
         return;
-
+    }
     if (enabled) {
         glEnable(GL_CULL_FACE);
     } else {
@@ -126,12 +125,13 @@ void Context::setPolygonMode(PolygonMode mode) {
         return;
     }
     glPolygonMode(GL_FRONT_AND_BACK, getPolygonModeGL(mode));
+    _polygonMode = mode;
 }
 
 void Context::setBlendMode(BlendMode mode) {
-    if (_blendMode == mode)
+    if (_blendMode == mode) {
         return;
-
+    }
     switch (mode) {
     case BlendMode::None:
         glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
@@ -151,7 +151,6 @@ void Context::setBlendMode(BlendMode mode) {
         glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE);
         break;
     }
-
     _blendMode = mode;
 }
 
