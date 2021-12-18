@@ -48,7 +48,7 @@ public:
 
     void prepareFor(const glm::ivec4 &extent);
 
-    void render(graphics::IScene &scene, const glm::ivec4 &extent, const glm::ivec2 &offset);
+    void draw(graphics::IScene &scene, const glm::ivec4 &extent, const glm::ivec2 &offset);
 
 private:
     struct AttachmentsId {

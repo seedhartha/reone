@@ -301,7 +301,7 @@ void GUI::draw3D() {
             control->extent().width,
             control->extent().height);
 
-        _controlPipeline.render(_sceneGraphs.get(sceneName), extent, _controlOffset);
+        _controlPipeline.draw(_sceneGraphs.get(sceneName), extent, _controlOffset);
     }
 }
 
