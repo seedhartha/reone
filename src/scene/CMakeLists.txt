@@ -32,8 +32,6 @@ set(SCENE_HEADERS
     node/particle.h
     node/sound.h
     node/walkmesh.h
-    pipeline/control.h
-    pipeline/world.h
     types.h
     user.h)
 
@@ -49,9 +47,7 @@ set(SCENE_SOURCES
     node/model.cpp
     node/particle.cpp
     node/sound.cpp
-    node/walkmesh.cpp
-    pipeline/control.cpp
-    pipeline/world.cpp)
+    node/walkmesh.cpp)
 
 add_library(scene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES})
 set_target_properties(scene PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

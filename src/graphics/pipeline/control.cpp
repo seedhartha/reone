@@ -17,26 +17,22 @@
 
 #include "control.h"
 
-#include "../../graphics/context.h"
-#include "../../graphics/mesh.h"
-#include "../../graphics/meshes.h"
-#include "../../graphics/renderbuffer.h"
-#include "../../graphics/shaders.h"
-#include "../../graphics/texture.h"
-#include "../../graphics/textures.h"
-#include "../../graphics/textureutil.h"
-#include "../../graphics/types.h"
-
-#include "../graphs.h"
-#include "../node/camera.h"
+#include "../context.h"
+#include "../mesh.h"
+#include "../meshes.h"
+#include "../renderbuffer.h"
+#include "../scene.h"
+#include "../shaders.h"
+#include "../texture.h"
+#include "../textures.h"
+#include "../textureutil.h"
+#include "../types.h"
 
 using namespace std;
 
-using namespace reone::graphics;
-
 namespace reone {
 
-namespace scene {
+namespace graphics {
 
 void ControlRenderPipeline::init() {
     _geometry1 = make_shared<Framebuffer>();
@@ -72,24 +68,24 @@ void ControlRenderPipeline::prepareFor(const glm::ivec4 &extent) {
     _attachments.insert(make_pair(attachmentsId, move(attachments)));
 }
 
-void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &extent, const glm::ivec2 &offset) {
+void ControlRenderPipeline::render(graphics::IScene &scene, const glm::ivec4 &extent, const glm::ivec2 &offset) {
+    if (!scene.hasCamera()) {
+        return;
+    }
     AttachmentsId attachmentsId {extent};
     auto maybeAttachments = _attachments.find(attachmentsId);
     if (maybeAttachments == _attachments.end()) {
         return;
     }
     auto &attachments = maybeAttachments->second;
-    SceneGraph &sceneGraph = _sceneGraphs.get(sceneName);
 
     // Set uniforms prototype
 
-    shared_ptr<CameraSceneNode> camera(sceneGraph.activeCamera());
-
-    auto &uniformsPrototype = sceneGraph.uniformsPrototype();
+    auto &uniformsPrototype = scene.uniformsPrototype();
     uniformsPrototype.general = GeneralUniforms();
-    uniformsPrototype.general.projection = camera->projection();
-    uniformsPrototype.general.view = camera->view();
-    uniformsPrototype.general.cameraPosition = camera->absoluteTransform()[3];
+    uniformsPrototype.general.projection = scene.cameraProjection();
+    uniformsPrototype.general.view = scene.cameraView();
+    uniformsPrototype.general.cameraPosition = glm::vec4(scene.cameraPosition(), 1.0f);
 
     // Draw to multi-sampled framebuffer
 
@@ -104,7 +100,7 @@ void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &ex
     _geometry1->attachDepth(*attachments.depthBuffer1);
 
     _context.clear(ClearBuffers::colorDepth);
-    sceneGraph.draw();
+    scene.draw();
 
     // Blit multi-sampled framebuffer to normal
 
@@ -145,6 +141,6 @@ void ControlRenderPipeline::render(const string &sceneName, const glm::ivec4 &ex
     _meshes.quad().draw();
 }
 
-} // namespace scene
+} // namespace graphics
 
 } // namespace reone

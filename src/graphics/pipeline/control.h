@@ -17,44 +17,38 @@
 
 #pragma once
 
-#include "../../graphics/framebuffer.h"
-#include "../../graphics/options.h"
-#include "../../graphics/renderbuffer.h"
+#include "../framebuffer.h"
+#include "../options.h"
+#include "../renderbuffer.h"
 
 namespace reone {
 
 namespace graphics {
 
 class Context;
+class IScene;
 class Meshes;
 class Shaders;
 class Texture;
 
-} // namespace graphics
-
-namespace scene {
-
-class SceneGraphs;
-
 class ControlRenderPipeline : boost::noncopyable {
 public:
     ControlRenderPipeline(
-        graphics::GraphicsOptions options,
-        SceneGraphs &sceneGraphs,
-        graphics::Context &context,
-        graphics::Meshes &meshes,
-        graphics::Shaders &shaders) :
+        GraphicsOptions options,
+        Context &context,
+        Meshes &meshes,
+        Shaders &shaders) :
         _options(std::move(options)),
-        _sceneGraphs(sceneGraphs),
         _context(context),
         _meshes(meshes),
         _shaders(shaders) {
     }
 
     void init();
+
     void prepareFor(const glm::ivec4 &extent);
 
-    void render(const std::string &sceneName, const glm::ivec4 &extent, const glm::ivec2 &offset);
+    void render(graphics::IScene &scene, const glm::ivec4 &extent, const glm::ivec2 &offset);
 
 private:
     struct AttachmentsId {
@@ -76,29 +70,27 @@ private:
     };
 
     struct Attachments {
-        std::shared_ptr<graphics::Texture> colorBuffer1;
-        std::shared_ptr<graphics::Texture> colorBuffer2;
-        std::shared_ptr<graphics::Renderbuffer> depthBuffer1;
-        std::shared_ptr<graphics::Renderbuffer> depthBuffer2;
+        std::shared_ptr<Texture> colorBuffer1;
+        std::shared_ptr<Texture> colorBuffer2;
+        std::shared_ptr<Renderbuffer> depthBuffer1;
+        std::shared_ptr<Renderbuffer> depthBuffer2;
     };
 
-    graphics::GraphicsOptions _options;
+    GraphicsOptions _options;
 
-    std::shared_ptr<graphics::Framebuffer> _geometry1;
-    std::shared_ptr<graphics::Framebuffer> _geometry2;
+    std::shared_ptr<Framebuffer> _geometry1;
+    std::shared_ptr<Framebuffer> _geometry2;
     std::unordered_map<AttachmentsId, Attachments, AttachmentsIdHasher> _attachments;
 
     // Services
 
-    SceneGraphs &_sceneGraphs;
-
-    graphics::Context &_context;
-    graphics::Meshes &_meshes;
-    graphics::Shaders &_shaders;
+    Context &_context;
+    Meshes &_meshes;
+    Shaders &_shaders;
 
     // END Services
 };
 
-} // namespace scene
+} // namespace graphics
 
 } // namespace reone
