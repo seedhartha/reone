@@ -107,7 +107,7 @@ struct Services {
     graphics::GraphicsContext &graphicsContext;
     graphics::ControlPipeline &controlPipeline;
     graphics::Fonts &fonts;
-    graphics::LipAnimations &lips;
+    graphics::LipAnimations &lipAnimations;
     graphics::Meshes &meshes;
     graphics::Models &models;
     graphics::Shaders &shaders;
@@ -145,7 +145,7 @@ struct Services {
         graphics::GraphicsContext &graphicsContext,
         graphics::ControlPipeline &controlPipeline,
         graphics::Fonts &fonts,
-        graphics::LipAnimations &lips,
+        graphics::LipAnimations &lipAnimations,
         graphics::Meshes &meshes,
         graphics::Models &models,
         graphics::Shaders &shaders,
@@ -182,7 +182,7 @@ struct Services {
         graphicsContext(graphicsContext),
         controlPipeline(controlPipeline),
         fonts(fonts),
-        lips(lips),
+        lipAnimations(lipAnimations),
         meshes(meshes),
         models(models),
         shaders(shaders),
