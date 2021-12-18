@@ -31,7 +31,7 @@ class TwoDas;
 namespace graphics {
 
 class GraphicsContext;
-class ControlRenderPipeline;
+class ControlPipeline;
 class Fonts;
 class LipAnimations;
 class Meshes;
@@ -40,7 +40,7 @@ class Shaders;
 class Textures;
 class Walkmeshes;
 class Window;
-class WorldRenderPipeline;
+class WorldPipeline;
 
 } // namespace graphics
 
@@ -105,7 +105,7 @@ struct Services {
     audio::AudioFiles &audioFiles;
     audio::AudioPlayer &audioPlayer;
     graphics::GraphicsContext &graphicsContext;
-    graphics::ControlRenderPipeline &controlRenderPipeline;
+    graphics::ControlPipeline &controlPipeline;
     graphics::Fonts &fonts;
     graphics::LipAnimations &lips;
     graphics::Meshes &meshes;
@@ -114,7 +114,7 @@ struct Services {
     graphics::Textures &textures;
     graphics::Walkmeshes &walkmeshes;
     graphics::Window &window;
-    graphics::WorldRenderPipeline &worldRenderPipeline;
+    graphics::WorldPipeline &worldPipeline;
     scene::SceneGraphs &sceneGraphs;
     script::Scripts &scripts;
     resource::Gffs &gffs;
@@ -143,7 +143,7 @@ struct Services {
         audio::AudioFiles &audioFiles,
         audio::AudioPlayer &audioPlayer,
         graphics::GraphicsContext &graphicsContext,
-        graphics::ControlRenderPipeline &controlRenderPipeline,
+        graphics::ControlPipeline &controlPipeline,
         graphics::Fonts &fonts,
         graphics::LipAnimations &lips,
         graphics::Meshes &meshes,
@@ -152,7 +152,7 @@ struct Services {
         graphics::Textures &textures,
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
-        graphics::WorldRenderPipeline &worldRenderPipeline,
+        graphics::WorldPipeline &worldPipeline,
         scene::SceneGraphs &sceneGraphs,
         script::Scripts &scripts,
         resource::Gffs &gffs,
@@ -180,7 +180,7 @@ struct Services {
         audioFiles(audioFiles),
         audioPlayer(audioPlayer),
         graphicsContext(graphicsContext),
-        controlRenderPipeline(controlRenderPipeline),
+        controlPipeline(controlPipeline),
         fonts(fonts),
         lips(lips),
         meshes(meshes),
@@ -189,7 +189,7 @@ struct Services {
         textures(textures),
         walkmeshes(walkmeshes),
         window(window),
-        worldRenderPipeline(worldRenderPipeline),
+        worldPipeline(worldPipeline),
         sceneGraphs(sceneGraphs),
         scripts(scripts),
         gffs(gffs),

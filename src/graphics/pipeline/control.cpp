@@ -34,7 +34,7 @@ namespace reone {
 
 namespace graphics {
 
-void ControlRenderPipeline::init() {
+void ControlPipeline::init() {
     _geometry1 = make_shared<Framebuffer>();
     _geometry1->init();
 
@@ -42,7 +42,7 @@ void ControlRenderPipeline::init() {
     _geometry2->init();
 }
 
-void ControlRenderPipeline::prepareFor(const glm::ivec4 &extent) {
+void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     AttachmentsId attachmentsId {extent};
     if (_attachments.count(attachmentsId) > 0) {
         return;
@@ -68,7 +68,7 @@ void ControlRenderPipeline::prepareFor(const glm::ivec4 &extent) {
     _attachments.insert(make_pair(attachmentsId, move(attachments)));
 }
 
-void ControlRenderPipeline::render(graphics::IScene &scene, const glm::ivec4 &extent, const glm::ivec2 &offset) {
+void ControlPipeline::render(graphics::IScene &scene, const glm::ivec4 &extent, const glm::ivec2 &offset) {
     if (!scene.hasCamera()) {
         return;
     }
