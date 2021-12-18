@@ -31,9 +31,9 @@ class Meshes;
 class Shaders;
 class Texture;
 
-class ControlRenderPipeline : boost::noncopyable {
+class ControlPipeline : boost::noncopyable {
 public:
-    ControlRenderPipeline(
+    ControlPipeline(
         GraphicsOptions options,
         GraphicsContext &graphicsContext,
         Meshes &meshes,

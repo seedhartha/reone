@@ -282,7 +282,7 @@ void Game::playMusic(const string &resRef) {
 }
 
 void Game::drawWorld() {
-    _services.worldRenderPipeline.render();
+    _services.worldPipeline.render();
 }
 
 void Game::toggleInGameCameraType() {

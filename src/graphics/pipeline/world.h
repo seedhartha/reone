@@ -32,9 +32,9 @@ class IScene;
 class Meshes;
 class Shaders;
 
-class WorldRenderPipeline : boost::noncopyable {
+class WorldPipeline : boost::noncopyable {
 public:
-    WorldRenderPipeline(
+    WorldPipeline(
         GraphicsOptions options,
         GraphicsContext &graphicsContext,
         Meshes &meshes,

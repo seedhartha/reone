@@ -56,7 +56,7 @@ GUI::GUI(
     GraphicsOptions options,
     SceneGraphs &sceneGraphs,
     GraphicsContext &graphicsContext,
-    ControlRenderPipeline &controlRenderPipeline,
+    ControlPipeline &controlPipeline,
     Fonts &fonts,
     Meshes &meshes,
     Shaders &shaders,
@@ -68,7 +68,7 @@ GUI::GUI(
     _options(move(options)),
     _sceneGraphs(sceneGraphs),
     _graphicsContext(graphicsContext),
-    _controlRenderPipeline(controlRenderPipeline),
+    _controlPipeline(controlPipeline),
     _fonts(fonts),
     _meshes(meshes),
     _shaders(shaders),
@@ -269,7 +269,7 @@ void GUI::update(float dt) {
                 control->extent().height);
 
             _sceneGraphs.get(sceneName).update(dt);
-            _controlRenderPipeline.prepareFor(extent);
+            _controlPipeline.prepareFor(extent);
         }
     }
 }
@@ -301,7 +301,7 @@ void GUI::draw3D() {
             control->extent().width,
             control->extent().height);
 
-        _controlRenderPipeline.render(_sceneGraphs.get(sceneName), extent, _controlOffset);
+        _controlPipeline.render(_sceneGraphs.get(sceneName), extent, _controlOffset);
     }
 }
 

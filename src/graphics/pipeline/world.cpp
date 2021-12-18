@@ -42,7 +42,7 @@ static constexpr int kScreenshotResolution = 256;
 
 static bool g_wireframesEnabled = false;
 
-void WorldRenderPipeline::init() {
+void WorldPipeline::init() {
     for (int i = 0; i < kNumCubeFaces; ++i) {
         _shadowLightSpaceMatrices[i] = glm::mat4(1.0f);
     }
@@ -146,7 +146,7 @@ void WorldRenderPipeline::init() {
     _graphicsContext.unbindDrawFramebuffer();
 }
 
-void WorldRenderPipeline::render() {
+void WorldPipeline::render() {
     if (!_scene->hasCamera()) {
         return;
     }
@@ -177,7 +177,7 @@ static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) 
     }
 }
 
-void WorldRenderPipeline::computeLightSpaceMatrices() {
+void WorldPipeline::computeLightSpaceMatrices() {
     static glm::vec3 up(0.0f, 0.0f, 1.0f);
 
     if (!_scene->hasShadowLight()) {
@@ -198,7 +198,7 @@ void WorldRenderPipeline::computeLightSpaceMatrices() {
     }
 }
 
-void WorldRenderPipeline::drawShadows() {
+void WorldPipeline::drawShadows() {
     if (!_scene->hasShadowLight()) {
         return;
     }
@@ -242,7 +242,7 @@ void WorldRenderPipeline::drawShadows() {
     _graphicsContext.setViewport(move(oldViewport));
 }
 
-void WorldRenderPipeline::drawGeometry() {
+void WorldPipeline::drawGeometry() {
     // Set uniforms prototype
 
     auto &uniforms = _scene->uniformsPrototype();
@@ -312,7 +312,7 @@ void WorldRenderPipeline::drawGeometry() {
     _graphicsContext.setDepthTestEnabled(oldDepthTest);
 }
 
-void WorldRenderPipeline::applyHorizontalBlur() {
+void WorldPipeline::applyHorizontalBlur() {
     // Enable depth testing
 
     bool oldDepthTest = _graphicsContext.isDepthTestEnabled();
@@ -350,7 +350,7 @@ void WorldRenderPipeline::applyHorizontalBlur() {
     _graphicsContext.setDepthTestEnabled(oldDepthTest);
 }
 
-void WorldRenderPipeline::applyVerticalBlur() {
+void WorldPipeline::applyVerticalBlur() {
     // Enable depth testing
 
     bool oldDepthTest = _graphicsContext.isDepthTestEnabled();
@@ -388,7 +388,7 @@ void WorldRenderPipeline::applyVerticalBlur() {
     _graphicsContext.setDepthTestEnabled(oldDepthTest);
 }
 
-void WorldRenderPipeline::drawResult() {
+void WorldPipeline::drawResult() {
     // Set viewport
 
     glm::ivec4 oldViewport;
@@ -427,7 +427,7 @@ void WorldRenderPipeline::drawResult() {
     }
 }
 
-void WorldRenderPipeline::saveScreenshot() {
+void WorldPipeline::saveScreenshot() {
     _graphicsContext.bindTexture(0, _screenshotColor);
     _screenshotColor->flushGPUToCPU();
 }
