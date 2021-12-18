@@ -50,11 +50,11 @@ void WorldPipeline::init() {
     // Reusable depth renderbuffers
 
     _depthRenderbuffer = make_unique<Renderbuffer>();
-    _depthRenderbuffer->clearPixels(_options.width, _options.height, PixelFormat::Depth);
+    _depthRenderbuffer->configure(_options.width, _options.height, PixelFormat::Depth);
     _depthRenderbuffer->init();
 
     _depthRenderbufferMultisample = make_unique<Renderbuffer>(_options.aaSamples);
-    _depthRenderbufferMultisample->clearPixels(_options.width, _options.height, PixelFormat::Depth);
+    _depthRenderbufferMultisample->configure(_options.width, _options.height, PixelFormat::Depth);
     _depthRenderbufferMultisample->init();
 
     // Multi-sampled geometry framebuffer

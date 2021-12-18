@@ -49,9 +49,9 @@ void Renderbuffer::unbind() {
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-void Renderbuffer::clearPixels(int w, int h, PixelFormat format) {
-    _width = w;
-    _height = h;
+void Renderbuffer::configure(int width, int height, PixelFormat format) {
+    _width = width;
+    _height = height;
     _pixelFormat = format;
 }
 

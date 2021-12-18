@@ -47,24 +47,30 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     if (_attachments.count(attachmentsId) > 0) {
         return;
     }
+    int w = extent[2];
+    int h = extent[3];
 
     auto colorBuffer1 = make_unique<Texture>("color1", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
-    colorBuffer1->clearPixels(extent[2], extent[3], PixelFormat::RGBA);
+    colorBuffer1->clearPixels(w, h, PixelFormat::RGBA);
     colorBuffer1->init();
 
     auto colorBuffer2 = make_unique<Texture>("color2", getTextureProperties(TextureUsage::ColorBuffer));
-    colorBuffer2->clearPixels(extent[2], extent[3], PixelFormat::RGBA);
+    colorBuffer2->clearPixels(w, h, PixelFormat::RGBA);
     colorBuffer2->init();
 
     auto depthBuffer1 = make_unique<Renderbuffer>(_options.aaSamples);
-    depthBuffer1->clearPixels(extent[2], extent[3], PixelFormat::Depth);
+    depthBuffer1->configure(w, h, PixelFormat::Depth);
     depthBuffer1->init();
 
     auto depthBuffer2 = make_unique<Renderbuffer>();
-    depthBuffer2->clearPixels(extent[2], extent[3], PixelFormat::Depth);
+    depthBuffer2->configure(w, h, PixelFormat::Depth);
     depthBuffer2->init();
 
-    Attachments attachments {move(colorBuffer1), move(colorBuffer2), move(depthBuffer1), move(depthBuffer2)};
+    Attachments attachments;
+    attachments.colorBuffer1 = move(colorBuffer1);
+    attachments.colorBuffer2 = move(colorBuffer2);
+    attachments.depthBuffer1 = move(depthBuffer1);
+    attachments.depthBuffer2 = move(depthBuffer2);
     _attachments.insert(make_pair(attachmentsId, move(attachments)));
 }
 
