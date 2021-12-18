@@ -37,7 +37,7 @@ public:
     void bind();
     void unbind();
 
-    void clearPixels(int w, int h, PixelFormat format);
+    void configure(int width, int height, PixelFormat format);
     void refresh();
 
     // OpenGL
