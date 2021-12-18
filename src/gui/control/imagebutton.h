@@ -27,7 +27,7 @@ class ImageButton : public Control {
 public:
     ImageButton(
         GUI &gui,
-        graphics::Context &context,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Fonts &fonts,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
@@ -37,7 +37,7 @@ public:
         Control(
             gui,
             ControlType::ImageButton,
-            context,
+            graphicsContext,
             fonts,
             meshes,
             shaders,

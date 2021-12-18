@@ -29,13 +29,13 @@ class Resources;
 
 namespace graphics {
 
-class Context;
+class GraphicsContext;
 class Texture;
 
 class Textures : boost::noncopyable {
 public:
-    Textures(Context &context, resource::Resources &resources) :
-        _context(context),
+    Textures(GraphicsContext &graphicsContext, resource::Resources &resources) :
+        _graphicsContext(graphicsContext),
         _resources(resources) {
     }
 
@@ -52,7 +52,7 @@ public:
     std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
 
 private:
-    Context &_context;
+    GraphicsContext &_graphicsContext;
     resource::Resources &_resources;
 
     std::shared_ptr<graphics::Texture> _default;

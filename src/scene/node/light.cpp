@@ -42,14 +42,14 @@ static constexpr float kMinDirectionalLightRadius = 1000.0f;
 LightSceneNode::LightSceneNode(
     shared_ptr<ModelNode> modelNode,
     SceneGraph &sceneGraph,
-    Context &context,
+    GraphicsContext &graphicsContext,
     Meshes &meshes,
     Shaders &shaders) :
     ModelNodeSceneNode(
         modelNode,
         SceneNodeType::Light,
         sceneGraph,
-        context,
+        graphicsContext,
         meshes,
         shaders) {
 
@@ -75,7 +75,7 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     if (!camera)
         return;
 
-    _context.bindTexture(TextureUnits::diffuseMap, flare.texture);
+    _graphicsContext.bindTexture(TextureUnits::diffuseMap, flare.texture);
 
     glm::vec4 lightPos(_absTransform[3]);
     glm::vec4 lightPosNdc(camera->projection() * camera->view() * lightPos);
@@ -102,14 +102,14 @@ void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
     uniforms.general.alpha = 0.5f;
     // uniforms.general.color = glm::vec4(flare.colorShift, 1.0f);
 
-    BlendMode oldBlendMode = _context.blendMode();
-    _context.setBlendMode(BlendMode::Add);
+    BlendMode oldBlendMode = _graphicsContext.blendMode();
+    _graphicsContext.setBlendMode(BlendMode::Add);
 
-    _context.useShaderProgram(_shaders.gui());
+    _graphicsContext.useShaderProgram(_shaders.gui());
     _shaders.refreshUniforms();
     _meshes.billboard().draw();
 
-    _context.setBlendMode(oldBlendMode);
+    _graphicsContext.setBlendMode(oldBlendMode);
 }
 
 bool LightSceneNode::isDirectional() const {

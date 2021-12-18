@@ -89,7 +89,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconFrame) {
-        _context.bindTexture(0, iconFrame);
+        _graphicsContext.bindTexture(0, iconFrame);
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
@@ -101,7 +101,7 @@ void ImageButton::drawIcon(
         uniforms.general.model = move(transform);
         uniforms.general.color = glm::vec4(color, 1.0f);
 
-        _context.useShaderProgram(_shaders.gui());
+        _graphicsContext.useShaderProgram(_shaders.gui());
         _shaders.refreshUniforms();
         _meshes.quad().draw();
     }
@@ -111,8 +111,8 @@ void ImageButton::drawIcon(
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
-        _context.bindTexture(0, iconTexture);
-        _context.useShaderProgram(_shaders.gui());
+        _graphicsContext.bindTexture(0, iconTexture);
+        _graphicsContext.useShaderProgram(_shaders.gui());
 
         auto &uniforms = _shaders.uniforms();
         uniforms.general.reset();

@@ -25,7 +25,7 @@ namespace reone {
 
 namespace graphics {
 
-class Context;
+class GraphicsContext;
 class IScene;
 class Meshes;
 class Shaders;
@@ -35,11 +35,11 @@ class ControlRenderPipeline : boost::noncopyable {
 public:
     ControlRenderPipeline(
         GraphicsOptions options,
-        Context &context,
+        GraphicsContext &graphicsContext,
         Meshes &meshes,
         Shaders &shaders) :
         _options(std::move(options)),
-        _context(context),
+        _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders) {
     }
@@ -84,7 +84,7 @@ private:
 
     // Services
 
-    Context &_context;
+    GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
 

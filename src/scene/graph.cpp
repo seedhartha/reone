@@ -359,7 +359,7 @@ void SceneGraph::draw(bool shadowPass) {
         return;
     }
 
-    _context.setBackFaceCullingEnabled(true);
+    _graphicsContext.setBackFaceCullingEnabled(true);
 
     // Render opaque meshes
     for (auto &mesh : _opaqueMeshes) {
@@ -371,7 +371,7 @@ void SceneGraph::draw(bool shadowPass) {
         mesh->drawSingle(false);
     }
 
-    _context.setBackFaceCullingEnabled(false);
+    _graphicsContext.setBackFaceCullingEnabled(false);
 
     // Render particles and grass clusters
     for (auto &nodeLeaf : _leafs) {
@@ -552,7 +552,7 @@ shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) 
 }
 
 unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {
-    return make_unique<DummySceneNode>(move(modelNode), *this, _context, _meshes, _shaders);
+    return make_unique<DummySceneNode>(move(modelNode), *this, _graphicsContext, _meshes, _shaders);
 }
 
 unique_ptr<CameraSceneNode> SceneGraph::newCamera(glm::mat4 projection) {
@@ -568,7 +568,7 @@ unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUs
         move(model),
         usage,
         *this,
-        _context,
+        _graphicsContext,
         _meshes,
         _shaders,
         _textures,
@@ -588,7 +588,7 @@ unique_ptr<GrassSceneNode> SceneGraph::newGrass(float density, float quadSize, g
         move(texture),
         move(aabbNode),
         *this,
-        _context,
+        _graphicsContext,
         _meshes,
         _shaders);
 }

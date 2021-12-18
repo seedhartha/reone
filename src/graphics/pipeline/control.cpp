@@ -89,23 +89,23 @@ void ControlRenderPipeline::render(graphics::IScene &scene, const glm::ivec4 &ex
 
     // Draw to multi-sampled framebuffer
 
-    glm::ivec4 oldViewport(_context.viewport());
-    _context.setViewport(glm::ivec4(0, 0, extent[2], extent[3]));
+    glm::ivec4 oldViewport(_graphicsContext.viewport());
+    _graphicsContext.setViewport(glm::ivec4(0, 0, extent[2], extent[3]));
 
-    bool oldDepthTest = _context.isDepthTestEnabled();
-    _context.setDepthTestEnabled(true);
+    bool oldDepthTest = _graphicsContext.isDepthTestEnabled();
+    _graphicsContext.setDepthTestEnabled(true);
 
-    _context.bindDrawFramebuffer(_geometry1);
+    _graphicsContext.bindDrawFramebuffer(_geometry1);
     _geometry1->attachColor(*attachments.colorBuffer1);
     _geometry1->attachDepth(*attachments.depthBuffer1);
 
-    _context.clear(ClearBuffers::colorDepth);
+    _graphicsContext.clear(ClearBuffers::colorDepth);
     scene.draw();
 
     // Blit multi-sampled framebuffer to normal
 
-    _context.bindReadFramebuffer(_geometry1);
-    _context.bindDrawFramebuffer(_geometry2);
+    _graphicsContext.bindReadFramebuffer(_geometry1);
+    _graphicsContext.bindDrawFramebuffer(_geometry2);
     _geometry2->attachColor(*attachments.colorBuffer2);
     _geometry2->attachDepth(*attachments.depthBuffer2);
     for (int i = 0; i < 2; ++i) {
@@ -116,10 +116,10 @@ void ControlRenderPipeline::render(graphics::IScene &scene, const glm::ivec4 &ex
 
     // Draw control
 
-    _context.setDepthTestEnabled(oldDepthTest);
-    _context.setViewport(oldViewport);
-    _context.unbindDrawFramebuffer();
-    _context.bindTexture(0, attachments.colorBuffer2);
+    _graphicsContext.setDepthTestEnabled(oldDepthTest);
+    _graphicsContext.setViewport(oldViewport);
+    _graphicsContext.unbindDrawFramebuffer();
+    _graphicsContext.bindTexture(0, attachments.colorBuffer2);
 
     glm::mat4 projection(glm::ortho(
         0.0f,
@@ -136,7 +136,7 @@ void ControlRenderPipeline::render(graphics::IScene &scene, const glm::ivec4 &ex
     uniforms.general.projection = move(projection);
     uniforms.general.model = move(transform);
 
-    _context.useShaderProgram(_shaders.gui());
+    _graphicsContext.useShaderProgram(_shaders.gui());
     _shaders.refreshUniforms();
     _meshes.quad().draw();
 }

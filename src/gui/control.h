@@ -33,7 +33,7 @@ class Strings;
 
 namespace graphics {
 
-class Context;
+class GraphicsContext;
 class Font;
 class Fonts;
 class Meshes;
@@ -201,7 +201,7 @@ protected:
 
     // Services
 
-    graphics::Context &_context;
+    graphics::GraphicsContext &_graphicsContext;
     graphics::Fonts &_fonts;
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
@@ -221,7 +221,7 @@ protected:
     Control(
         GUI &gui,
         ControlType type,
-        graphics::Context &context,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Fonts &fonts,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
@@ -230,7 +230,7 @@ protected:
         resource::Strings &strings) :
         _gui(gui),
         _type(type),
-        _context(context),
+        _graphicsContext(graphicsContext),
         _fonts(fonts),
         _meshes(meshes),
         _shaders(shaders),

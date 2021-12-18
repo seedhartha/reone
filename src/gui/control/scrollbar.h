@@ -33,7 +33,7 @@ public:
 
     ScrollBar(
         GUI &gui,
-        graphics::Context &context,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Fonts &fonts,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
@@ -43,7 +43,7 @@ public:
         Control(
             gui,
             ControlType::ScrollBar,
-            context,
+            graphicsContext,
             fonts,
             meshes,
             shaders,

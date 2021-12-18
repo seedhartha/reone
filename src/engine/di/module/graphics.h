@@ -46,7 +46,7 @@ public:
     void init();
     void deinit();
 
-    graphics::Context &context() { return *_context; }
+    graphics::GraphicsContext &graphicsContext() { return *_graphicsContext; }
     graphics::ControlRenderPipeline &controlRenderPipeline() { return *_controlRenderPipeline; }
     graphics::Fonts &fonts() { return *_fonts; }
     graphics::LipAnimations &lips() { return *_lips; }
@@ -62,7 +62,7 @@ private:
     graphics::GraphicsOptions _options;
     ResourceModule &_resource;
 
-    std::unique_ptr<graphics::Context> _context;
+    std::unique_ptr<graphics::GraphicsContext> _graphicsContext;
     std::unique_ptr<graphics::ControlRenderPipeline> _controlRenderPipeline;
     std::unique_ptr<graphics::Fonts> _fonts;
     std::unique_ptr<graphics::LipAnimations> _lips;

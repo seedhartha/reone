@@ -25,7 +25,7 @@ namespace reone {
 
 namespace graphics {
 
-class Context;
+class GraphicsContext;
 class Meshes;
 class Shaders;
 class Textures;
@@ -45,13 +45,13 @@ public:
     SceneGraphs(
         graphics::GraphicsOptions options,
         audio::AudioPlayer &audioPlayer,
-        graphics::Context &context,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
         graphics::Textures &textures) :
         _options(std::move(options)),
         _audioPlayer(audioPlayer),
-        _context(context),
+        _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
         _textures(textures) {
@@ -70,7 +70,7 @@ private:
 
     // Services
 
-    graphics::Context &_context;
+    graphics::GraphicsContext &_graphicsContext;
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;

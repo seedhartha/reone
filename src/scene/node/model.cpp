@@ -42,7 +42,7 @@ ModelSceneNode::ModelSceneNode(
     shared_ptr<Model> model,
     ModelUsage usage,
     SceneGraph &sceneGraph,
-    Context &context,
+    GraphicsContext &graphicsContext,
     Meshes &meshes,
     Shaders &shaders,
     Textures &textures,
@@ -50,7 +50,7 @@ ModelSceneNode::ModelSceneNode(
     SceneNode(SceneNodeType::Model, sceneGraph),
     _model(model),
     _usage(usage),
-    _context(context),
+    _graphicsContext(graphicsContext),
     _meshes(meshes),
     _shaders(shaders),
     _textures(textures),
@@ -123,19 +123,19 @@ void ModelSceneNode::computeAABB() {
 }
 
 unique_ptr<DummySceneNode> ModelSceneNode::newDummySceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<DummySceneNode>(move(node), _sceneGraph, _context, _meshes, _shaders);
+    return make_unique<DummySceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders);
 }
 
 unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<MeshSceneNode>(*this, move(node), _sceneGraph, _context, _meshes, _shaders, _textures);
+    return make_unique<MeshSceneNode>(*this, move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures);
 }
 
 unique_ptr<LightSceneNode> ModelSceneNode::newLightSceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<LightSceneNode>(move(node), _sceneGraph, _context, _meshes, _shaders);
+    return make_unique<LightSceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders);
 }
 
 unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<EmitterSceneNode>(move(node), _sceneGraph, _context, _meshes, _shaders);
+    return make_unique<EmitterSceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders);
 }
 
 void ModelSceneNode::signalEvent(const string &name) {

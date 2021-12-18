@@ -29,13 +29,13 @@ namespace reone {
 
 namespace graphics {
 
-class Context : boost::noncopyable {
+class GraphicsContext : boost::noncopyable {
 public:
-    Context(GraphicsOptions options) :
+    GraphicsContext(GraphicsOptions options) :
         _options(std::move(options)) {
     }
 
-    ~Context() { deinit(); }
+    ~GraphicsContext() { deinit(); }
 
     void init();
     void deinit();

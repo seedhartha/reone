@@ -31,7 +31,7 @@ void SceneGraphs::add(string name) {
         name,
         _options,
         _audioPlayer,
-        _context,
+        _graphicsContext,
         _meshes,
         _shaders,
         _textures);

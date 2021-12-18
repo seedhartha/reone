@@ -81,7 +81,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         if (!partyLeader) {
             return;
         }
-        _services.context.bindTexture(0, _areaTexture);
+        _services.graphicsContext.bindTexture(0, _areaTexture);
 
         glm::vec2 worldPos(partyLeader->position());
         glm::vec2 mapPos(getMapPosition(worldPos));
@@ -99,17 +99,17 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         uniforms.general.projection = _services.window.getOrthoProjection();
         uniforms.general.model = transform;
 
-        _services.context.useShaderProgram(_services.shaders.gui());
+        _services.graphicsContext.useShaderProgram(_services.shaders.gui());
         _services.shaders.refreshUniforms();
 
         int height = _game.options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
-        _services.context.withScissorTest(scissorBounds, [&]() {
+        _services.graphicsContext.withScissorTest(scissorBounds, [&]() {
             _services.meshes.quad().draw();
         });
 
     } else {
-        _services.context.bindTexture(0, _areaTexture);
+        _services.graphicsContext.bindTexture(0, _areaTexture);
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(bounds[0], bounds[1], 0.0f));
@@ -120,7 +120,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         uniforms.general.projection = _services.window.getOrthoProjection();
         uniforms.general.model = move(transform);
 
-        _services.context.useShaderProgram(_services.shaders.gui());
+        _services.graphicsContext.useShaderProgram(_services.shaders.gui());
         _services.shaders.refreshUniforms();
         _services.meshes.quad().draw();
     }
@@ -130,7 +130,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
     if (mode != Mode::Default) {
         return;
     }
-    _services.context.bindTexture(0, _noteTexture);
+    _services.graphicsContext.bindTexture(0, _noteTexture);
 
     for (auto &object : _game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         auto waypoint = static_pointer_cast<Waypoint>(object);
@@ -158,7 +158,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         uniforms.general.model = transform;
         uniforms.general.color = glm::vec4(selected ? _game.getGUIColorHilight() : _game.getGUIColorBase(), 1.0f);
 
-        _services.context.useShaderProgram(_services.shaders.gui());
+        _services.graphicsContext.useShaderProgram(_services.shaders.gui());
         _services.shaders.refreshUniforms();
         _services.meshes.quad().draw();
     }
@@ -196,7 +196,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     if (!partyLeader) {
         return;
     }
-    _services.context.bindTexture(0, _arrowTexture);
+    _services.graphicsContext.bindTexture(0, _arrowTexture);
 
     glm::vec3 arrowPos(0.0f);
 
@@ -241,7 +241,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     uniforms.general.projection = _services.window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _services.context.useShaderProgram(_services.shaders.gui());
+    _services.graphicsContext.useShaderProgram(_services.shaders.gui());
     _services.shaders.refreshUniforms();
     _services.meshes.quad().draw();
 }

@@ -80,7 +80,7 @@ void Movie::update(float dt) {
 }
 
 void Movie::draw() {
-    _context.bindTexture(0, _texture);
+    _graphicsContext.bindTexture(0, _texture);
     _texture->refresh();
 
     auto &uniforms = _shaders.uniforms();
@@ -90,7 +90,7 @@ void Movie::draw() {
         glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
         glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
 
-    _context.useShaderProgram(_shaders.gui());
+    _graphicsContext.useShaderProgram(_shaders.gui());
     _shaders.refreshUniforms();
     _meshes.quadNDC().draw();
 }

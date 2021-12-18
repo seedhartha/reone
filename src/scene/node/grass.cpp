@@ -144,13 +144,13 @@ void GrassSceneNode::drawElements(const vector<SceneNode *> &elements, int count
     if (count == -1) {
         count = static_cast<int>(elements.size());
     }
-    _context.bindTexture(TextureUnits::diffuseMap, _texture);
+    _graphicsContext.bindTexture(TextureUnits::diffuseMap, _texture);
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general = _sceneGraph.uniformsPrototype().general;
     uniforms.general.featureMask = UniformsFeatureFlags::grass;
     if (_aabbNode->mesh()->lightmap) {
-        _context.bindTexture(TextureUnits::lightmap, _aabbNode->mesh()->lightmap);
+        _graphicsContext.bindTexture(TextureUnits::lightmap, _aabbNode->mesh()->lightmap);
         uniforms.general.featureMask |= UniformsFeatureFlags::lightmap;
     }
     for (int i = 0; i < count; ++i) {
@@ -160,7 +160,7 @@ void GrassSceneNode::drawElements(const vector<SceneNode *> &elements, int count
         uniforms.grass.clusters[i].lightmapUV = cluster->lightmapUV();
     }
 
-    _context.useShaderProgram(_shaders.grass());
+    _graphicsContext.useShaderProgram(_shaders.grass());
     _shaders.refreshUniforms();
     _meshes.grass().drawInstanced(count);
 }

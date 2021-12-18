@@ -21,7 +21,7 @@ namespace reone {
 
 namespace graphics {
 
-class Context;
+class GraphicsContext;
 class Meshes;
 class Shaders;
 class Texture;
@@ -32,13 +32,13 @@ public:
     Cursor(
         std::shared_ptr<Texture> up,
         std::shared_ptr<Texture> down,
-        Context &context,
+        GraphicsContext &graphicsContext,
         Meshes &meshes,
         Shaders &shaders,
         Window &window) :
         _up(std::move(up)),
         _down(std::move(down)),
-        _context(context),
+        _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
         _window(window) {
@@ -58,7 +58,7 @@ private:
 
     // Services
 
-    Context &_context;
+    GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
     Window &_window;

@@ -68,8 +68,8 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     uniforms.general.reset();
     uniforms.general.projection = _window.getOrthoProjection();
 
-    _context.bindTexture(0, _thumb.image);
-    _context.useShaderProgram(_shaders.gui());
+    _graphicsContext.bindTexture(0, _thumb.image);
+    _graphicsContext.useShaderProgram(_shaders.gui());
 
     // Top edge
     uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
@@ -114,7 +114,7 @@ void ScrollBar::drawArrows(const glm::ivec2 &offset) {
     if (!canScrollUp && !canScrollDown)
         return;
 
-    _context.bindTexture(0, _dir.image);
+    _graphicsContext.bindTexture(0, _dir.image);
 
     if (canScrollUp) {
         drawUpArrow(offset);
@@ -134,7 +134,7 @@ void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
     uniforms.general.projection = _window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _context.useShaderProgram(_shaders.gui());
+    _graphicsContext.useShaderProgram(_shaders.gui());
     _shaders.refreshUniforms();
     _meshes.quad().draw();
 }
@@ -150,7 +150,7 @@ void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
     uniforms.general.projection = _window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _context.useShaderProgram(_shaders.gui());
+    _graphicsContext.useShaderProgram(_shaders.gui());
     _shaders.refreshUniforms();
     _meshes.quad().draw();
 }

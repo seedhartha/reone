@@ -27,7 +27,7 @@ class Button : public Control {
 public:
     Button(
         GUI &gui,
-        graphics::Context &context,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Fonts &fonts,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
@@ -37,7 +37,7 @@ public:
         Button(
             gui,
             ControlType::Button,
-            context,
+            graphicsContext,
             fonts,
             meshes,
             shaders,
@@ -50,7 +50,7 @@ protected:
     Button(
         GUI &gui,
         ControlType type,
-        graphics::Context &context,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Fonts &fonts,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
@@ -60,7 +60,7 @@ protected:
         Control(
             gui,
             type,
-            context,
+            graphicsContext,
             fonts,
             meshes,
             shaders,

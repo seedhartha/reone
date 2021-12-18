@@ -32,7 +32,7 @@ namespace graphics {
 
 void Cursor::draw() {
     shared_ptr<Texture> texture(_pressed ? _down : _up);
-    _context.bindTexture(0, texture);
+    _graphicsContext.bindTexture(0, texture);
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(static_cast<float>(_position.x), static_cast<float>(_position.y), 0.0f));
@@ -43,7 +43,7 @@ void Cursor::draw() {
     uniforms.general.projection = _window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _context.useShaderProgram(_shaders.gui());
+    _graphicsContext.useShaderProgram(_shaders.gui());
     _shaders.refreshUniforms();
     _meshes.quad().draw();
 }

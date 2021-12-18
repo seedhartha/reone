@@ -27,7 +27,7 @@ class ToggleButton : public Button {
 public:
     ToggleButton(
         GUI &gui,
-        graphics::Context &context,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Fonts &fonts,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
@@ -37,7 +37,7 @@ public:
         Button(
             gui,
             ControlType::ToggleButton,
-            context,
+            graphicsContext,
             fonts,
             meshes,
             shaders,
