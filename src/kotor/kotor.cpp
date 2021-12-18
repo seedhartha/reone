@@ -341,7 +341,7 @@ void KotOR::openInGameMenu(InGameMenuTab tab) {
     // Take a screenshot to be used in SaveLoad menu
     _services.window.clear();
     _services.worldPipeline.setTakeScreenshot(true);
-    _services.worldPipeline.render();
+    _services.worldPipeline.draw();
 
     setCursorType(CursorType::Default);
     switch (tab) {

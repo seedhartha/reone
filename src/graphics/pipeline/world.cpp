@@ -146,7 +146,7 @@ void WorldPipeline::init() {
     _graphicsContext.unbindDrawFramebuffer();
 }
 
-void WorldPipeline::render() {
+void WorldPipeline::draw() {
     if (!_scene->hasCamera()) {
         return;
     }

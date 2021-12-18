@@ -68,7 +68,7 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     _attachments.insert(make_pair(attachmentsId, move(attachments)));
 }
 
-void ControlPipeline::render(graphics::IScene &scene, const glm::ivec4 &extent, const glm::ivec2 &offset) {
+void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, const glm::ivec2 &offset) {
     if (!scene.hasCamera()) {
         return;
     }

@@ -47,7 +47,7 @@ public:
 
     void init();
 
-    void render();
+    void draw();
 
     std::shared_ptr<Texture> screenshot() { return _screenshotColor; }
 
