@@ -255,7 +255,7 @@ void SelectionOverlay::draw() {
 }
 
 void SelectionOverlay::drawReticle(shared_ptr<Texture> texture, const glm::vec3 &screenCoords) {
-    _services.context.bindTexture(0, texture);
+    _services.graphicsContext.bindTexture(0, texture);
 
     const GraphicsOptions &opts = _game.options().graphics;
     int width = texture->width();
@@ -270,7 +270,7 @@ void SelectionOverlay::drawReticle(shared_ptr<Texture> texture, const glm::vec3 
     uniforms.general.projection = _services.window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _services.context.useShaderProgram(_services.shaders.gui());
+    _services.graphicsContext.useShaderProgram(_services.shaders.gui());
     _services.shaders.refreshUniforms();
     _services.meshes.quad().draw();
 }
@@ -299,7 +299,7 @@ void SelectionOverlay::drawTitleBar() {
         uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         uniforms.general.alpha = 0.5f;
 
-        _services.context.useShaderProgram(_services.shaders.simpleColor());
+        _services.graphicsContext.useShaderProgram(_services.shaders.simpleColor());
         _services.shaders.refreshUniforms();
         _services.meshes.quad().draw();
     }
@@ -333,7 +333,7 @@ void SelectionOverlay::drawHealthBar() {
     uniforms.general.model = move(transform);
     uniforms.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
 
-    _services.context.useShaderProgram(_services.shaders.simpleColor());
+    _services.graphicsContext.useShaderProgram(_services.shaders.simpleColor());
     _services.shaders.refreshUniforms();
     _services.meshes.quad().draw();
 }
@@ -357,7 +357,7 @@ void SelectionOverlay::drawActionFrame(int index) {
     } else {
         frameTexture = _friendlyScroll;
     }
-    _services.context.bindTexture(0, frameTexture);
+    _services.graphicsContext.bindTexture(0, frameTexture);
 
     float frameX, frameY;
     getActionScreenCoords(index, frameX, frameY);
@@ -371,7 +371,7 @@ void SelectionOverlay::drawActionFrame(int index) {
     uniforms.general.projection = _services.window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _services.context.useShaderProgram(_services.shaders.gui());
+    _services.graphicsContext.useShaderProgram(_services.shaders.gui());
     _services.shaders.refreshUniforms();
     _services.meshes.quad().draw();
 }
@@ -418,7 +418,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     if (!texture)
         return;
 
-    _services.context.bindTexture(0, texture);
+    _services.graphicsContext.bindTexture(0, texture);
 
     float frameX, frameY;
     getActionScreenCoords(index, frameX, frameY);
@@ -435,7 +435,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     uniforms.general.projection = _services.window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _services.context.useShaderProgram(_services.shaders.gui());
+    _services.graphicsContext.useShaderProgram(_services.shaders.gui());
     _services.shaders.refreshUniforms();
     _services.meshes.quad().draw();
 }

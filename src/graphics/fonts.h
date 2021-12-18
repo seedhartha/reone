@@ -25,18 +25,18 @@ namespace reone {
 
 namespace graphics {
 
-class Context;
+class GraphicsContext;
 class Meshes;
 class Shaders;
 class Textures;
 
 class Fonts : public MemoryCache<std::string, Font> {
 public:
-    Fonts(Window &window, Context &context, Meshes &meshes, Textures &textures, Shaders &shaders);
+    Fonts(Window &window, GraphicsContext &graphicsContext, Meshes &meshes, Textures &textures, Shaders &shaders);
 
 private:
     Window &_window;
-    Context &_context;
+    GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Textures &_textures;
     Shaders &_shaders;

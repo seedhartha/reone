@@ -212,23 +212,23 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.general.discardColor = glm::vec4(_discardColor, 1.0f);
         }
 
-        BlendMode oldBlendMode = _context.blendMode();
+        BlendMode oldBlendMode = _graphicsContext.blendMode();
         if (border.fill->isAdditive()) {
-            _context.setBlendMode(BlendMode::Add);
+            _graphicsContext.setBlendMode(BlendMode::Add);
         }
 
-        _context.bindTexture(0, border.fill);
-        _context.useShaderProgram(_shaders.gui());
+        _graphicsContext.bindTexture(0, border.fill);
+        _graphicsContext.useShaderProgram(_shaders.gui());
         _shaders.refreshUniforms();
         _meshes.quad().draw();
 
-        _context.setBlendMode(oldBlendMode);
+        _graphicsContext.setBlendMode(oldBlendMode);
     }
     if (border.edge) {
         int width = size.x - 2 * border.dimension;
         int height = size.y - 2 * border.dimension;
 
-        _context.bindTexture(0, border.edge);
+        _graphicsContext.bindTexture(0, border.edge);
 
         if (height > 0.0f) {
             int x = _extent.left + offset.x;
@@ -250,7 +250,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                     glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
                 uniforms.general.color = glm::vec4(color, 1.0f);
 
-                _context.useShaderProgram(_shaders.gui());
+                _graphicsContext.useShaderProgram(_shaders.gui());
                 _shaders.refreshUniforms();
                 _meshes.quad().draw();
             }
@@ -271,7 +271,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                     glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
                 uniforms.general.color = glm::vec4(color, 1.0f);
 
-                _context.useShaderProgram(_shaders.gui());
+                _graphicsContext.useShaderProgram(_shaders.gui());
                 _shaders.refreshUniforms();
                 _meshes.quad().draw();
             }
@@ -293,7 +293,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 uniforms.general.model = move(transform);
                 uniforms.general.color = glm::vec4(color, 1.0f);
 
-                _context.useShaderProgram(_shaders.gui());
+                _graphicsContext.useShaderProgram(_shaders.gui());
                 _shaders.refreshUniforms();
                 _meshes.quad().draw();
             }
@@ -314,7 +314,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                     glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
                 uniforms.general.color = glm::vec4(color, 1.0f);
 
-                _context.useShaderProgram(_shaders.gui());
+                _graphicsContext.useShaderProgram(_shaders.gui());
                 _shaders.refreshUniforms();
                 _meshes.quad().draw();
             }
@@ -324,7 +324,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int x = _extent.left + offset.x;
         int y = _extent.top + offset.y;
 
-        _context.bindTexture(0, border.corner);
+        _graphicsContext.bindTexture(0, border.corner);
 
         // Top left corner
         {
@@ -338,7 +338,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.general.model = move(transform);
             uniforms.general.color = glm::vec4(color, 1.0f);
 
-            _context.useShaderProgram(_shaders.gui());
+            _graphicsContext.useShaderProgram(_shaders.gui());
             _shaders.refreshUniforms();
             _meshes.quad().draw();
         }
@@ -359,7 +359,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
             uniforms.general.color = glm::vec4(color, 1.0f);
 
-            _context.useShaderProgram(_shaders.gui());
+            _graphicsContext.useShaderProgram(_shaders.gui());
             _shaders.refreshUniforms();
             _meshes.quad().draw();
         }
@@ -380,7 +380,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
             uniforms.general.color = glm::vec4(color, 1.0f);
 
-            _context.useShaderProgram(_shaders.gui());
+            _graphicsContext.useShaderProgram(_shaders.gui());
             _shaders.refreshUniforms();
             _meshes.quad().draw();
         }
@@ -401,7 +401,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 glm::vec4(1.0f, 1.0f, 0.0f, 0.0f));
             uniforms.general.color = glm::vec4(color, 1.0f);
 
-            _context.useShaderProgram(_shaders.gui());
+            _graphicsContext.useShaderProgram(_shaders.gui());
             _shaders.refreshUniforms();
             _meshes.quad().draw();
         }

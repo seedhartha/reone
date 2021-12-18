@@ -23,7 +23,7 @@ namespace reone {
 
 namespace graphics {
 
-void Context::init() {
+void GraphicsContext::init() {
     if (_inited) {
         return;
     }
@@ -35,7 +35,7 @@ void Context::init() {
     _inited = true;
 }
 
-void Context::deinit() {
+void GraphicsContext::deinit() {
     if (!_inited) {
         return;
     }
@@ -56,7 +56,7 @@ void Context::deinit() {
     _inited = false;
 }
 
-void Context::clear(int mask) {
+void GraphicsContext::clear(int mask) {
     int maskGL = 0;
     if (mask & ClearBuffers::color) {
         maskGL |= GL_COLOR_BUFFER_BIT;
@@ -70,7 +70,7 @@ void Context::clear(int mask) {
     glClear(maskGL);
 }
 
-void Context::useShaderProgram(shared_ptr<ShaderProgram> program) {
+void GraphicsContext::useShaderProgram(shared_ptr<ShaderProgram> program) {
     if (_shaderProgram == program) {
         return;
     }
@@ -78,7 +78,7 @@ void Context::useShaderProgram(shared_ptr<ShaderProgram> program) {
     _shaderProgram = move(program);
 }
 
-void Context::setViewport(glm::ivec4 viewport) {
+void GraphicsContext::setViewport(glm::ivec4 viewport) {
     if (_viewport == viewport) {
         return;
     }
@@ -86,7 +86,7 @@ void Context::setViewport(glm::ivec4 viewport) {
     _viewport = move(viewport);
 }
 
-void Context::setDepthTestEnabled(bool enabled) {
+void GraphicsContext::setDepthTestEnabled(bool enabled) {
     if (_depthTest == enabled) {
         return;
     }
@@ -98,7 +98,7 @@ void Context::setDepthTestEnabled(bool enabled) {
     _depthTest = enabled;
 }
 
-void Context::setBackFaceCullingEnabled(bool enabled) {
+void GraphicsContext::setBackFaceCullingEnabled(bool enabled) {
     if (_backFaceCulling == enabled) {
         return;
     }
@@ -120,7 +120,7 @@ static uint32_t getPolygonModeGL(PolygonMode mode) {
     }
 }
 
-void Context::setPolygonMode(PolygonMode mode) {
+void GraphicsContext::setPolygonMode(PolygonMode mode) {
     if (_polygonMode == mode) {
         return;
     }
@@ -128,7 +128,7 @@ void Context::setPolygonMode(PolygonMode mode) {
     _polygonMode = mode;
 }
 
-void Context::setBlendMode(BlendMode mode) {
+void GraphicsContext::setBlendMode(BlendMode mode) {
     if (_blendMode == mode) {
         return;
     }
@@ -154,7 +154,7 @@ void Context::setBlendMode(BlendMode mode) {
     _blendMode = mode;
 }
 
-void Context::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
+void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
     glEnable(GL_SCISSOR_TEST);
     glScissor(bounds[0], bounds[1], bounds[2], bounds[3]);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -164,7 +164,7 @@ void Context::withScissorTest(const glm::ivec4 &bounds, const function<void()> &
     glDisable(GL_SCISSOR_TEST);
 }
 
-void Context::bindReadFramebuffer(shared_ptr<Framebuffer> framebuffer) {
+void GraphicsContext::bindReadFramebuffer(shared_ptr<Framebuffer> framebuffer) {
     if (_boundFramebufferRead == framebuffer) {
         return;
     }
@@ -172,7 +172,7 @@ void Context::bindReadFramebuffer(shared_ptr<Framebuffer> framebuffer) {
     _boundFramebufferRead = move(framebuffer);
 }
 
-void Context::bindDrawFramebuffer(shared_ptr<Framebuffer> framebuffer) {
+void GraphicsContext::bindDrawFramebuffer(shared_ptr<Framebuffer> framebuffer) {
     if (_boundFramebufferDraw == framebuffer) {
         return;
     }
@@ -180,7 +180,7 @@ void Context::bindDrawFramebuffer(shared_ptr<Framebuffer> framebuffer) {
     _boundFramebufferDraw = move(framebuffer);
 }
 
-void Context::bindRenderbuffer(shared_ptr<Renderbuffer> renderbuffer) {
+void GraphicsContext::bindRenderbuffer(shared_ptr<Renderbuffer> renderbuffer) {
     if (_boundRenderbuffer == renderbuffer) {
         return;
     }
@@ -188,7 +188,7 @@ void Context::bindRenderbuffer(shared_ptr<Renderbuffer> renderbuffer) {
     _boundRenderbuffer = move(renderbuffer);
 }
 
-void Context::bindTexture(int unit, shared_ptr<Texture> texture) {
+void GraphicsContext::bindTexture(int unit, shared_ptr<Texture> texture) {
     size_t numUnits = _boundTextures.size();
     if (numUnits <= unit) {
         _boundTextures.resize(unit + 1);
@@ -201,7 +201,7 @@ void Context::bindTexture(int unit, shared_ptr<Texture> texture) {
     _boundTextures[unit] = move(texture);
 }
 
-void Context::bindUniformBuffer(int bindingPoint, shared_ptr<UniformBuffer> buffer) {
+void GraphicsContext::bindUniformBuffer(int bindingPoint, shared_ptr<UniformBuffer> buffer) {
     size_t numBuffers = _boundUniformBuffers.size();
     if (numBuffers <= bindingPoint) {
         _boundUniformBuffers.resize(bindingPoint + 1);
@@ -214,7 +214,7 @@ void Context::bindUniformBuffer(int bindingPoint, shared_ptr<UniformBuffer> buff
     _boundUniformBuffers[bindingPoint] = move(buffer);
 }
 
-void Context::unbindReadFramebuffer() {
+void GraphicsContext::unbindReadFramebuffer() {
     if (!_boundFramebufferRead) {
         return;
     }
@@ -222,7 +222,7 @@ void Context::unbindReadFramebuffer() {
     _boundFramebufferRead.reset();
 }
 
-void Context::unbindDrawFramebuffer() {
+void GraphicsContext::unbindDrawFramebuffer() {
     if (!_boundFramebufferDraw) {
         return;
     }
@@ -230,7 +230,7 @@ void Context::unbindDrawFramebuffer() {
     _boundFramebufferDraw.reset();
 }
 
-void Context::unbindRenderbuffer() {
+void GraphicsContext::unbindRenderbuffer() {
     if (!_boundRenderbuffer) {
         return;
     }
@@ -238,7 +238,7 @@ void Context::unbindRenderbuffer() {
     _boundRenderbuffer.reset();
 }
 
-void Context::unbindTexture(int unit) {
+void GraphicsContext::unbindTexture(int unit) {
     if (!_boundTextures[unit]) {
         return;
     }
@@ -247,7 +247,7 @@ void Context::unbindTexture(int unit) {
     _boundTextures[unit].reset();
 }
 
-void Context::unbindUniformBuffer(int index) {
+void GraphicsContext::unbindUniformBuffer(int index) {
     if (!_boundUniformBuffers[index]) {
         return;
     }
@@ -255,7 +255,7 @@ void Context::unbindUniformBuffer(int index) {
     _boundUniformBuffers[index].reset();
 }
 
-void Context::setActiveTextureUnit(int unit) {
+void GraphicsContext::setActiveTextureUnit(int unit) {
     if (_textureUnit == unit) {
         return;
     }

@@ -23,7 +23,7 @@ namespace reone {
 
 namespace graphics {
 
-class Context;
+class GraphicsContext;
 class Meshes;
 class ModelNode;
 class Shaders;
@@ -43,12 +43,12 @@ protected:
         std::shared_ptr<graphics::ModelNode> modelNode,
         SceneNodeType type,
         SceneGraph &sceneGraph,
-        graphics::Context &context,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders) :
         SceneNode(type, sceneGraph),
         _modelNode(std::move(modelNode)),
-        _context(context),
+        _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders) {
     }
@@ -56,7 +56,7 @@ protected:
 protected:
     // Services
 
-    graphics::Context &_context;
+    graphics::GraphicsContext &_graphicsContext;
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
 

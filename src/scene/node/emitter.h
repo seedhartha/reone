@@ -33,7 +33,7 @@ public:
     EmitterSceneNode(
         std::shared_ptr<graphics::ModelNode> modelNode,
         SceneGraph &sceneGraph,
-        graphics::Context &context,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders);
 

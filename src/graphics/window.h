@@ -55,7 +55,7 @@ private:
     IEventHandler *_eventHandler {nullptr};
     bool _inited {false};
     SDL_Window *_window {nullptr};
-    SDL_GLContext _context {nullptr};
+    SDL_GLContext _graphicsContext {nullptr};
     bool _relativeMouseMode {false};
     std::shared_ptr<Cursor> _cursor;
     bool _focus {true};

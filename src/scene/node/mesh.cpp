@@ -47,7 +47,7 @@ MeshSceneNode::MeshSceneNode(
     const ModelSceneNode &model,
     shared_ptr<ModelNode> modelNode,
     SceneGraph &sceneGraph,
-    Context &context,
+    GraphicsContext &graphicsContext,
     Meshes &meshes,
     Shaders &shaders,
     Textures &textures) :
@@ -55,7 +55,7 @@ MeshSceneNode::MeshSceneNode(
         modelNode,
         SceneNodeType::Mesh,
         sceneGraph,
-        context,
+        graphicsContext,
         meshes,
         shaders),
     _model(model),
@@ -374,7 +374,7 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
         }
     }
 
-    _context.useShaderProgram(program);
+    _graphicsContext.useShaderProgram(program);
     _shaders.refreshUniforms();
 
     bool additive = false;
@@ -382,25 +382,25 @@ void MeshSceneNode::drawSingle(bool shadowPass) {
     // Setup textures
 
     if (_nodeTextures.diffuse) {
-        _context.bindTexture(TextureUnits::diffuseMap, _nodeTextures.diffuse);
+        _graphicsContext.bindTexture(TextureUnits::diffuseMap, _nodeTextures.diffuse);
         additive = _nodeTextures.diffuse->isAdditive();
     }
     if (_nodeTextures.lightmap) {
-        _context.bindTexture(TextureUnits::lightmap, _nodeTextures.lightmap);
+        _graphicsContext.bindTexture(TextureUnits::lightmap, _nodeTextures.lightmap);
     }
     if (_nodeTextures.envmap) {
-        _context.bindTexture(TextureUnits::environmentMap, _nodeTextures.envmap);
+        _graphicsContext.bindTexture(TextureUnits::environmentMap, _nodeTextures.envmap);
     }
     if (_nodeTextures.bumpmap) {
-        _context.bindTexture(TextureUnits::bumpMap, _nodeTextures.bumpmap);
+        _graphicsContext.bindTexture(TextureUnits::bumpMap, _nodeTextures.bumpmap);
     }
 
-    BlendMode oldBlendMode(_context.blendMode());
+    BlendMode oldBlendMode(_graphicsContext.blendMode());
     if (additive) {
-        _context.setBlendMode(BlendMode::Add);
+        _graphicsContext.setBlendMode(BlendMode::Add);
     }
     mesh->mesh->draw();
-    _context.setBlendMode(oldBlendMode);
+    _graphicsContext.setBlendMode(oldBlendMode);
 }
 
 bool MeshSceneNode::isLightingEnabled() const {

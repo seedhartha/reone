@@ -47,7 +47,7 @@ public:
         std::shared_ptr<graphics::Model> model,
         ModelUsage usage,
         SceneGraph &sceneGraph,
-        graphics::Context &context,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
@@ -137,7 +137,7 @@ private:
 
     // Services
 
-    graphics::Context &_context;
+    graphics::GraphicsContext &_graphicsContext;
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;

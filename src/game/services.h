@@ -30,7 +30,7 @@ class TwoDas;
 
 namespace graphics {
 
-class Context;
+class GraphicsContext;
 class ControlRenderPipeline;
 class Fonts;
 class LipAnimations;
@@ -104,7 +104,7 @@ struct Services {
     audio::AudioContext &audioContext;
     audio::AudioFiles &audioFiles;
     audio::AudioPlayer &audioPlayer;
-    graphics::Context &context;
+    graphics::GraphicsContext &graphicsContext;
     graphics::ControlRenderPipeline &controlRenderPipeline;
     graphics::Fonts &fonts;
     graphics::LipAnimations &lips;
@@ -142,7 +142,7 @@ struct Services {
         audio::AudioContext &audioContext,
         audio::AudioFiles &audioFiles,
         audio::AudioPlayer &audioPlayer,
-        graphics::Context &context,
+        graphics::GraphicsContext &graphicsContext,
         graphics::ControlRenderPipeline &controlRenderPipeline,
         graphics::Fonts &fonts,
         graphics::LipAnimations &lips,
@@ -179,7 +179,7 @@ struct Services {
         audioContext(audioContext),
         audioFiles(audioFiles),
         audioPlayer(audioPlayer),
-        context(context),
+        graphicsContext(graphicsContext),
         controlRenderPipeline(controlRenderPipeline),
         fonts(fonts),
         lips(lips),

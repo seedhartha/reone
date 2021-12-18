@@ -27,19 +27,19 @@ namespace reone {
 
 void GraphicsModule::init() {
     _window = make_unique<Window>(_options);
-    _context = make_unique<Context>(_options);
+    _graphicsContext = make_unique<GraphicsContext>(_options);
     _meshes = make_unique<Meshes>();
-    _textures = make_unique<Textures>(*_context, _resource.resources());
+    _textures = make_unique<Textures>(*_graphicsContext, _resource.resources());
     _models = make_unique<Models>(*_textures, _resource.resources());
     _walkmeshes = make_unique<Walkmeshes>(_resource.resources());
     _lips = make_unique<LipAnimations>(_resource.resources());
-    _shaders = make_unique<Shaders>(*_context);
-    _fonts = make_unique<Fonts>(*_window, *_context, *_meshes, *_textures, *_shaders);
-    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, *_context, *_meshes, *_shaders);
-    _controlRenderPipeline = make_unique<ControlRenderPipeline>(_options, *_context, *_meshes, *_shaders);
+    _shaders = make_unique<Shaders>(*_graphicsContext);
+    _fonts = make_unique<Fonts>(*_window, *_graphicsContext, *_meshes, *_textures, *_shaders);
+    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, *_graphicsContext, *_meshes, *_shaders);
+    _controlRenderPipeline = make_unique<ControlRenderPipeline>(_options, *_graphicsContext, *_meshes, *_shaders);
 
     _window->init();
-    _context->init();
+    _graphicsContext->init();
     _meshes->init();
     _textures->init();
     _shaders->init();
@@ -53,7 +53,7 @@ void GraphicsModule::deinit() {
     _shaders.reset();
     _textures.reset();
     _meshes.reset();
-    _context.reset();
+    _graphicsContext.reset();
     _window.reset();
 }
 

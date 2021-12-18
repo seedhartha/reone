@@ -35,7 +35,7 @@ void SceneModule::init() {
     _sceneGraphs = make_unique<SceneGraphs>(
         _options,
         _audio.audioPlayer(),
-        _graphics.context(),
+        _graphics.graphicsContext(),
         _graphics.meshes(),
         _graphics.shaders(),
         _graphics.textures());

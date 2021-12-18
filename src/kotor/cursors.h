@@ -29,7 +29,7 @@ class Resources;
 
 namespace graphics {
 
-class Context;
+class GraphicsContext;
 class Meshes;
 class Shaders;
 class Texture;
@@ -42,12 +42,12 @@ namespace kotor {
 class Cursors : public game::ICursors {
 public:
     Cursors(
-        graphics::Context &context,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
         graphics::Window &window,
         resource::Resources &resources) :
-        _context(context),
+        _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
         _window(window),
@@ -65,7 +65,7 @@ private:
 
     // Services
 
-    graphics::Context &_context;
+    graphics::GraphicsContext &_graphicsContext;
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
     graphics::Window &_window;

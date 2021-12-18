@@ -60,9 +60,9 @@ void Window::initSDL() {
         throw runtime_error("Failed to create a window: " + string(SDL_GetError()));
     }
 
-    _context = SDL_GL_CreateContext(_window);
+    _graphicsContext = SDL_GL_CreateContext(_window);
 
-    if (!_context) {
+    if (!_graphicsContext) {
         throw runtime_error("Failed to create a GL context: " + string(SDL_GetError()));
     }
 
@@ -89,7 +89,7 @@ Window::~Window() {
 
 void Window::deinit() {
     if (_inited) {
-        SDL_GL_DeleteContext(_context);
+        SDL_GL_DeleteContext(_graphicsContext);
         SDL_DestroyWindow(_window);
         SDL_Quit();
         _inited = false;

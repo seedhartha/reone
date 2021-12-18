@@ -43,14 +43,14 @@ static constexpr float kProjectileSpeed = 16.0f;
 EmitterSceneNode::EmitterSceneNode(
     shared_ptr<ModelNode> modelNode,
     SceneGraph &sceneGraph,
-    Context &context,
+    GraphicsContext &graphicsContext,
     Meshes &meshes,
     Shaders &shaders) :
     ModelNodeSceneNode(
         modelNode,
         SceneNodeType::Emitter,
         sceneGraph,
-        context,
+        graphicsContext,
         meshes,
         shaders) {
 
@@ -279,17 +279,17 @@ void EmitterSceneNode::drawElements(const vector<SceneNode *> &elements, int cou
         uniforms.particles.particles[i].frame = particle->frame();
     }
 
-    _context.useShaderProgram(_shaders.particle());
+    _graphicsContext.useShaderProgram(_shaders.particle());
     _shaders.refreshUniforms();
-    _context.bindTexture(TextureUnits::diffuseMap, texture);
+    _graphicsContext.bindTexture(TextureUnits::diffuseMap, texture);
 
-    BlendMode oldBlendMode(_context.blendMode());
+    BlendMode oldBlendMode(_graphicsContext.blendMode());
     bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
     if (lighten) {
-        _context.setBlendMode(BlendMode::Lighten);
+        _graphicsContext.setBlendMode(BlendMode::Lighten);
     }
     _meshes.billboard().drawInstanced(count);
-    _context.setBlendMode(oldBlendMode);
+    _graphicsContext.setBlendMode(oldBlendMode);
 }
 
 unique_ptr<ParticleSceneNode> EmitterSceneNode::newParticle() {

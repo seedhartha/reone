@@ -30,9 +30,9 @@ namespace reone {
 
 namespace graphics {
 
-Font::Font(Window &window, Context &context, Meshes &meshes, Shaders &shaders) :
+Font::Font(Window &window, GraphicsContext &graphicsContext, Meshes &meshes, Shaders &shaders) :
     _window(window),
-    _context(context),
+    _graphicsContext(graphicsContext),
     _meshes(meshes),
     _shaders(shaders) {
 }
@@ -64,7 +64,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
     if (text.empty()) {
         return;
     }
-    _context.bindTexture(0, _texture);
+    _graphicsContext.bindTexture(0, _texture);
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general.reset();
@@ -93,7 +93,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
 
             textOffset.x += glyph.size.x;
         }
-        _context.useShaderProgram(_shaders.text());
+        _graphicsContext.useShaderProgram(_shaders.text());
         _shaders.refreshUniforms();
         _meshes.quad().drawInstanced(numChars);
     }

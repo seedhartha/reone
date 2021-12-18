@@ -26,12 +26,12 @@ namespace reone {
 
 namespace graphics {
 
-class Context;
+class GraphicsContext;
 
 class Shaders : boost::noncopyable {
 public:
-    Shaders(Context &context) :
-        _context(context) {
+    Shaders(GraphicsContext &graphicsContext) :
+        _graphicsContext(graphicsContext) {
     }
 
     ~Shaders() { deinit(); }
@@ -57,7 +57,7 @@ public:
     std::shared_ptr<ShaderProgram> billboard() const { return _spBillboard; }
 
 private:
-    Context &_context;
+    GraphicsContext &_graphicsContext;
 
     bool _inited {false};
     Uniforms _uniforms;

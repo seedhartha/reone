@@ -57,13 +57,13 @@ void Textures::invalidate() {
 }
 
 void Textures::bindDefaults() {
-    _context.bindTexture(TextureUnits::diffuseMap, _default);
-    _context.bindTexture(TextureUnits::lightmap, _default);
-    _context.bindTexture(TextureUnits::environmentMap, _defaultCubemap);
-    _context.bindTexture(TextureUnits::bumpMap, _default);
-    _context.bindTexture(TextureUnits::bloom, _default);
-    _context.bindTexture(TextureUnits::shadowMap, _default);
-    _context.bindTexture(TextureUnits::shadowMapCube, _defaultCubemap);
+    _graphicsContext.bindTexture(TextureUnits::diffuseMap, _default);
+    _graphicsContext.bindTexture(TextureUnits::lightmap, _default);
+    _graphicsContext.bindTexture(TextureUnits::environmentMap, _defaultCubemap);
+    _graphicsContext.bindTexture(TextureUnits::bumpMap, _default);
+    _graphicsContext.bindTexture(TextureUnits::bloom, _default);
+    _graphicsContext.bindTexture(TextureUnits::shadowMap, _default);
+    _graphicsContext.bindTexture(TextureUnits::shadowMapCube, _defaultCubemap);
 }
 
 shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {

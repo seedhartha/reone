@@ -115,7 +115,7 @@ void ProfileOverlay::drawBackground() {
     uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     uniforms.general.alpha = 0.5f;
 
-    _services.context.useShaderProgram(_services.shaders.simpleColor());
+    _services.graphicsContext.useShaderProgram(_services.shaders.simpleColor());
     _services.shaders.refreshUniforms();
     _services.meshes.quad().draw();
 }

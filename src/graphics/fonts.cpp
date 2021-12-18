@@ -35,10 +35,10 @@ namespace graphics {
 static unordered_map<string, string> g_fontOverride = {
     {"fnt_d16x16", "fnt_d16x16b"}};
 
-Fonts::Fonts(Window &window, Context &context, Meshes &meshes, Textures &textures, Shaders &shaders) :
+Fonts::Fonts(Window &window, GraphicsContext &graphicsContext, Meshes &meshes, Textures &textures, Shaders &shaders) :
     MemoryCache(bind(&Fonts::doGet, this, _1)),
     _window(window),
-    _context(context),
+    _graphicsContext(graphicsContext),
     _meshes(meshes),
     _textures(textures),
     _shaders(shaders) {
@@ -53,7 +53,7 @@ shared_ptr<Font> Fonts::doGet(string resRef) {
     if (!texture)
         return nullptr;
 
-    auto font = make_shared<Font>(_window, _context, _meshes, _shaders);
+    auto font = make_shared<Font>(_window, _graphicsContext, _meshes, _shaders);
     font->load(texture);
 
     return move(font);

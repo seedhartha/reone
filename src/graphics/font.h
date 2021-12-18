@@ -23,7 +23,7 @@ namespace reone {
 
 namespace graphics {
 
-class Context;
+class GraphicsContext;
 class Meshes;
 class Shaders;
 class Texture;
@@ -31,7 +31,7 @@ class Window;
 
 class Font {
 public:
-    Font(Window &window, Context &context, Meshes &meshes, Shaders &shaders);
+    Font(Window &window, GraphicsContext &graphicsContext, Meshes &meshes, Shaders &shaders);
 
     void load(std::shared_ptr<Texture> texture);
 
@@ -53,7 +53,7 @@ private:
     };
 
     Window &_window;
-    Context &_context;
+    GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
 
