@@ -156,7 +156,7 @@ void Game::loadModule(const string &name, string entry) {
         _services.textures.invalidate();
         _services.models.invalidate();
         _services.walkmeshes.invalidate();
-        _services.lips.invalidate();
+        _services.lipAnimations.invalidate();
         _services.audioFiles.invalidate();
         _services.scripts.invalidate();
 

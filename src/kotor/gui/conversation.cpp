@@ -164,14 +164,14 @@ void Conversation::loadVoiceOver() {
     string voiceResRef;
     if (!_currentEntry->sound.empty()) {
         voiceResRef = _currentEntry->sound;
-        _lipAnimation = _services.lips.get(_currentEntry->sound);
+        _lipAnimation = _services.lipAnimations.get(_currentEntry->sound);
     }
     if (!_currentEntry->voResRef.empty()) {
         if (voiceResRef.empty()) {
             voiceResRef = _currentEntry->voResRef;
         }
         if (!_lipAnimation) {
-            _lipAnimation = _services.lips.get(_currentEntry->voResRef);
+            _lipAnimation = _services.lipAnimations.get(_currentEntry->voResRef);
         }
     }
     if (!voiceResRef.empty()) {

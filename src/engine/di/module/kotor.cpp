@@ -74,7 +74,7 @@ void KotorModule::init() {
         _graphics.graphicsContext(),
         _graphics.controlPipeline(),
         _graphics.fonts(),
-        _graphics.lips(),
+        _graphics.lipAnimations(),
         _graphics.meshes(),
         _graphics.models(),
         _graphics.shaders(),

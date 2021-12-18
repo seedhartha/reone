@@ -49,7 +49,7 @@ public:
     graphics::GraphicsContext &graphicsContext() { return *_graphicsContext; }
     graphics::ControlPipeline &controlPipeline() { return *_controlPipeline; }
     graphics::Fonts &fonts() { return *_fonts; }
-    graphics::LipAnimations &lips() { return *_lips; }
+    graphics::LipAnimations &lipAnimations() { return *_lipAnimations; }
     graphics::Meshes &meshes() { return *_meshes; }
     graphics::Models &models() { return *_models; }
     graphics::Shaders &shaders() { return *_shaders; }
@@ -65,7 +65,7 @@ private:
     std::unique_ptr<graphics::GraphicsContext> _graphicsContext;
     std::unique_ptr<graphics::ControlPipeline> _controlPipeline;
     std::unique_ptr<graphics::Fonts> _fonts;
-    std::unique_ptr<graphics::LipAnimations> _lips;
+    std::unique_ptr<graphics::LipAnimations> _lipAnimations;
     std::unique_ptr<graphics::Meshes> _meshes;
     std::unique_ptr<graphics::Models> _models;
     std::unique_ptr<graphics::Shaders> _shaders;
