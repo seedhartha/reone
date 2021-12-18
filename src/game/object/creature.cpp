@@ -108,11 +108,12 @@ void Creature::loadAppearance() {
     }
 
     auto modelSceneNode = buildModel();
-    finalizeModel(*modelSceneNode);
-
-    _sceneNode = move(modelSceneNode);
-    _sceneNode->setUser(*this);
-    _sceneNode->setLocalTransform(_transform);
+    if (modelSceneNode) {
+        finalizeModel(*modelSceneNode);
+        _sceneNode = move(modelSceneNode);
+        _sceneNode->setUser(*this);
+        _sceneNode->setLocalTransform(_transform);
+    }
 
     _animDirty = true;
 }
