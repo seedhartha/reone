@@ -23,6 +23,8 @@
 #include "../../graphics/meshes.h"
 #include "../../graphics/models.h"
 #include "../../graphics/options.h"
+#include "../../graphics/pipeline/control.h"
+#include "../../graphics/pipeline/world.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/walkmeshes.h"
@@ -45,6 +47,7 @@ public:
     void deinit();
 
     graphics::Context &context() { return *_context; }
+    graphics::ControlRenderPipeline &controlRenderPipeline() { return *_controlRenderPipeline; }
     graphics::Fonts &fonts() { return *_fonts; }
     graphics::LipAnimations &lips() { return *_lips; }
     graphics::Meshes &meshes() { return *_meshes; }
@@ -53,12 +56,14 @@ public:
     graphics::Textures &textures() { return *_textures; }
     graphics::Walkmeshes &walkmeshes() { return *_walkmeshes; }
     graphics::Window &window() { return *_window; }
+    graphics::WorldRenderPipeline &worldRenderPipeline() { return *_worldRenderPipeline; }
 
 private:
     graphics::GraphicsOptions _options;
     ResourceModule &_resource;
 
     std::unique_ptr<graphics::Context> _context;
+    std::unique_ptr<graphics::ControlRenderPipeline> _controlRenderPipeline;
     std::unique_ptr<graphics::Fonts> _fonts;
     std::unique_ptr<graphics::LipAnimations> _lips;
     std::unique_ptr<graphics::Meshes> _meshes;
@@ -67,6 +72,7 @@ private:
     std::unique_ptr<graphics::Textures> _textures;
     std::unique_ptr<graphics::Walkmeshes> _walkmeshes;
     std::unique_ptr<graphics::Window> _window;
+    std::unique_ptr<graphics::WorldRenderPipeline> _worldRenderPipeline;
 };
 
 } // namespace reone

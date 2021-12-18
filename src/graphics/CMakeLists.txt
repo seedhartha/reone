@@ -42,8 +42,11 @@ set(GRAPHICS_HEADERS
     modelnode.h
     models.h
     options.h
+    pipeline/control.h
+    pipeline/world.h
     pixelutil.h
     renderbuffer.h
+    scene.h
     shader.h
     shaderprogram.h
     shaders.h
@@ -84,6 +87,8 @@ set(GRAPHICS_SOURCES
     model.cpp
     modelnode.cpp
     models.cpp
+    pipeline/control.cpp
+    pipeline/world.cpp
     pixelutil.cpp
     renderbuffer.cpp
     shader.cpp

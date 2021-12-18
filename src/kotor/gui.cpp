@@ -39,9 +39,9 @@ namespace kotor {
 GameGUI::GameGUI(KotOR &game, Services &services) :
     GUI(
         game.options().graphics,
-        services.controlRenderPipeline,
         services.sceneGraphs,
         services.context,
+        services.controlRenderPipeline,
         services.fonts,
         services.meshes,
         services.shaders,

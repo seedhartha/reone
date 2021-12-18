@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../graphics/options.h"
+#include "../graphics/scene.h"
 #include "../graphics/uniforms.h"
 
 #include "node/camera.h"
@@ -54,7 +55,7 @@ class ModelSceneNode;
 class SoundSceneNode;
 class WalkmeshSceneNode;
 
-class SceneGraph : boost::noncopyable {
+class SceneGraph : public graphics::IScene, boost::noncopyable {
 public:
     SceneGraph(
         std::string name,
@@ -74,12 +75,13 @@ public:
     }
 
     void update(float dt);
-    void draw(bool shadowPass = false);
+
+    void draw(bool shadowPass) override;
 
     const std::string &name() const { return _name; }
     const graphics::GraphicsOptions &options() const { return _options; }
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
-    graphics::Uniforms &uniformsPrototype() { return _uniformsPrototype; }
+    graphics::Uniforms &uniformsPrototype() override { return _uniformsPrototype; }
 
     void setUpdateRoots(bool update) { _updateRoots = update; }
     void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
@@ -100,19 +102,17 @@ public:
 
     // END Roots
 
-    // Collision detection and object picking
+    // Camera
 
-    bool testElevation(const glm::vec2 &position, Collision &outCollision) const;
-    bool testObstacle(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const;
+    bool hasCamera() const override { return static_cast<bool>(_activeCamera); }
 
-    std::shared_ptr<ModelSceneNode> pickModelAt(int x, int y, IUser *except = nullptr) const;
+    glm::vec3 cameraPosition() const override { return _activeCamera->absoluteTransform()[3]; }
+    const glm::mat4 &cameraProjection() const override { return _activeCamera->projection(); }
+    const glm::mat4 &cameraView() const override { return _activeCamera->view(); }
 
-    void setWalkableSurfaces(std::set<uint32_t> surfaces) { _walkableSurfaces = std::move(surfaces); }
-    void setWalkcheckSurfaces(std::set<uint32_t> surfaces) { _walkcheckSurfaces = std::move(surfaces); }
+    // END Camera
 
-    // END Collision detection and object picking
-
-    // Lighting and shadows
+    // Lighting
 
     /**
      * Get up to count lights, sorted by priority and proximity to the reference node.
@@ -123,12 +123,21 @@ public:
 
     const glm::vec3 &ambientLightColor() const { return _ambientLightColor; }
     const std::vector<LightSceneNode *> closestLights() const { return _closestLights; }
-    const LightSceneNode *shadowLight() const { return _shadowLight; }
 
     void setAmbientLightColor(glm::vec3 color) { _ambientLightColor = std::move(color); }
     void setLightingRefNode(std::shared_ptr<SceneNode> node) { _lightingRefNode = std::move(node); }
 
-    // END Lighting and shadows
+    // END Lighting
+
+    // Shadows
+
+    bool hasShadowLight() const override { return _shadowLight; }
+    bool isShadowLightDirectional() const override { return _shadowLight->isDirectional(); }
+
+    glm::vec3 shadowLightPosition() const override { return _shadowLight->absoluteTransform()[3]; }
+    float shadowFadeFactor() const override { return _shadowLight->fadeFactor(); }
+
+    // END Shadows
 
     // Fog
 
@@ -144,6 +153,18 @@ public:
     void setFogColor(glm::vec3 color) { _fogColor = std::move(color); }
 
     // END Fog
+
+    // Collision detection and object picking
+
+    bool testElevation(const glm::vec2 &position, Collision &outCollision) const;
+    bool testObstacle(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const;
+
+    std::shared_ptr<ModelSceneNode> pickModelAt(int x, int y, IUser *except = nullptr) const;
+
+    void setWalkableSurfaces(std::set<uint32_t> surfaces) { _walkableSurfaces = std::move(surfaces); }
+    void setWalkcheckSurfaces(std::set<uint32_t> surfaces) { _walkcheckSurfaces = std::move(surfaces); }
+
+    // END Collision detection and object picking
 
     // Factory methods
 

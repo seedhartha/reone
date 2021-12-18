@@ -35,15 +35,21 @@ void GraphicsModule::init() {
     _lips = make_unique<LipAnimations>(_resource.resources());
     _shaders = make_unique<Shaders>(*_context);
     _fonts = make_unique<Fonts>(*_window, *_context, *_meshes, *_textures, *_shaders);
+    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, *_context, *_meshes, *_shaders);
+    _controlRenderPipeline = make_unique<ControlRenderPipeline>(_options, *_context, *_meshes, *_shaders);
 
     _window->init();
     _context->init();
     _meshes->init();
     _textures->init();
     _shaders->init();
+    _worldRenderPipeline->init();
+    _controlRenderPipeline->init();
 }
 
 void GraphicsModule::deinit() {
+    _worldRenderPipeline.reset();
+    _controlRenderPipeline.reset();
     _shaders.reset();
     _textures.reset();
     _meshes.reset();

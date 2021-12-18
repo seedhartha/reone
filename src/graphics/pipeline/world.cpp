@@ -17,28 +17,23 @@
 
 #include "world.h"
 
-#include "../../graphics/context.h"
-#include "../../graphics/format/tgawriter.h"
-#include "../../graphics/mesh.h"
-#include "../../graphics/meshes.h"
-#include "../../graphics/renderbuffer.h"
-#include "../../graphics/shaders.h"
-#include "../../graphics/texture.h"
-#include "../../graphics/textures.h"
-#include "../../graphics/textureutil.h"
-#include "../../graphics/window.h"
-
-#include "../graph.h"
-#include "../node/camera.h"
-#include "../node/light.h"
+#include "../context.h"
+#include "../format/tgawriter.h"
+#include "../mesh.h"
+#include "../meshes.h"
+#include "../renderbuffer.h"
+#include "../scene.h"
+#include "../shaders.h"
+#include "../texture.h"
+#include "../textures.h"
+#include "../textureutil.h"
+#include "../window.h"
 
 using namespace std;
 
-using namespace reone::graphics;
-
 namespace reone {
 
-namespace scene {
+namespace graphics {
 
 static constexpr float kShadowNearPlane = 0.0f;
 static constexpr float kShadowFarPlane = 10000.0f;
@@ -152,12 +147,10 @@ void WorldRenderPipeline::init() {
 }
 
 void WorldRenderPipeline::render() {
-    shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
-    if (!camera)
+    if (!_scene->hasCamera()) {
         return;
-
+    }
     computeLightSpaceMatrices();
-
     drawShadows();
     drawGeometry();
     applyHorizontalBlur();
@@ -187,14 +180,12 @@ static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) 
 void WorldRenderPipeline::computeLightSpaceMatrices() {
     static glm::vec3 up(0.0f, 0.0f, 1.0f);
 
-    const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
-    if (!shadowLight)
+    if (!_scene->hasShadowLight()) {
         return;
-
-    glm::vec3 lightPosition(shadowLight->absoluteTransform()[3]);
-    glm::vec3 cameraPosition(_sceneGraph.activeCamera()->absoluteTransform()[3]);
-
-    if (shadowLight->isDirectional()) {
+    }
+    glm::vec3 lightPosition(_scene->shadowLightPosition());
+    glm::vec3 cameraPosition(_scene->cameraPosition());
+    if (_scene->isShadowLightDirectional()) {
         glm::mat4 projection(glm::ortho(-kOrthographicScale, kOrthographicScale, -kOrthographicScale, kOrthographicScale, kShadowNearPlane, kShadowFarPlane));
         glm::mat4 lightView(glm::lookAt(lightPosition, cameraPosition, up));
         _shadowLightSpaceMatrices[0] = projection * lightView;
@@ -208,17 +199,15 @@ void WorldRenderPipeline::computeLightSpaceMatrices() {
 }
 
 void WorldRenderPipeline::drawShadows() {
-    // Set uniforms prototype
-
-    const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
-    if (!shadowLight)
+    if (!_scene->hasShadowLight()) {
         return;
+    }
 
+    // Set uniforms prototype
     glm::vec4 lightPosition(
-        glm::vec3(shadowLight->absoluteTransform()[3]),
-        shadowLight->isDirectional() ? 0.0f : 1.0f);
-
-    auto &uniformsPrototype = _sceneGraph.uniformsPrototype();
+        _scene->shadowLightPosition(),
+        _scene->isShadowLightDirectional() ? 0.0f : 1.0f);
+    auto &uniformsPrototype = _scene->uniformsPrototype();
     uniformsPrototype.general.reset();
     uniformsPrototype.general.featureMask = UniformsFeatureFlags::shadows;
     uniformsPrototype.general.shadowLightPosition = move(lightPosition);
@@ -227,19 +216,16 @@ void WorldRenderPipeline::drawShadows() {
     }
 
     // Set viewport
-
     glm::ivec4 oldViewport(_context.viewport());
     _context.setViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
 
     // Enable depth testing
-
     bool oldDepthTest = _context.isDepthTestEnabled();
     _context.setDepthTestEnabled(true);
 
     // Bind shadows framebuffer
-
     _context.bindDrawFramebuffer(_shadows);
-    if (shadowLight->isDirectional()) {
+    if (_scene->isShadowLightDirectional()) {
         _shadows->attachDepth(*_shadowsDepth);
     } else {
         _shadows->attachDepth(*_cubeShadowsDepth);
@@ -248,12 +234,10 @@ void WorldRenderPipeline::drawShadows() {
     _shadows->disableReadBuffer();
 
     // Draw the scene
-
     _context.clear(ClearBuffers::depth);
-    _sceneGraph.draw(true);
+    _scene->draw(true);
 
     // Restore context
-
     _context.setDepthTestEnabled(oldDepthTest);
     _context.setViewport(move(oldViewport));
 }
@@ -261,23 +245,20 @@ void WorldRenderPipeline::drawShadows() {
 void WorldRenderPipeline::drawGeometry() {
     // Set uniforms prototype
 
-    shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
-    const LightSceneNode *shadowLight = _sceneGraph.shadowLight();
-
-    auto &uniforms = _sceneGraph.uniformsPrototype();
+    auto &uniforms = _scene->uniformsPrototype();
     uniforms.general.reset();
-    uniforms.general.featureMask = shadowLight ? UniformsFeatureFlags::shadowlight : 0;
-    uniforms.general.projection = camera->projection();
-    uniforms.general.view = camera->view();
-    uniforms.general.cameraPosition = camera->absoluteTransform()[3];
+    uniforms.general.featureMask = _scene->hasShadowLight() ? UniformsFeatureFlags::shadowlight : 0;
+    uniforms.general.projection = _scene->cameraProjection();
+    uniforms.general.view = _scene->cameraView();
+    uniforms.general.cameraPosition = glm::vec4(_scene->cameraPosition(), 1.0f);
 
-    if (shadowLight) {
+    if (_scene->hasShadowLight()) {
         glm::vec4 lightPosition(
-            glm::vec3(shadowLight->absoluteTransform()[3]),
-            shadowLight->isDirectional() ? 0.0f : 1.0f);
+            _scene->shadowLightPosition(),
+            _scene->isShadowLightDirectional() ? 0.0f : 1.0f);
 
         uniforms.general.shadowLightPosition = move(lightPosition);
-        uniforms.general.shadowStrength = 1.0f - shadowLight->fadeFactor();
+        uniforms.general.shadowStrength = 1.0f - _scene->shadowFadeFactor();
 
         for (int i = 0; i < kNumCubeFaces; ++i) {
             uniforms.general.shadowLightSpaceMatrices[i] = _shadowLightSpaceMatrices[i];
@@ -301,8 +282,8 @@ void WorldRenderPipeline::drawGeometry() {
     _context.bindDrawFramebuffer(_geometry1);
     _geometry1->setDrawBuffers(2);
 
-    if (shadowLight) {
-        if (shadowLight->isDirectional()) {
+    if (_scene->hasShadowLight()) {
+        if (_scene->isShadowLightDirectional()) {
             _context.bindTexture(TextureUnits::shadowMap, _shadowsDepth);
         } else {
             _context.bindTexture(TextureUnits::shadowMapCube, _cubeShadowsDepth);
@@ -312,7 +293,7 @@ void WorldRenderPipeline::drawGeometry() {
     // Draw the scene
 
     _context.clear(ClearBuffers::colorDepth);
-    _sceneGraph.draw();
+    _scene->draw();
 
     // Blit multi-sampled geometry framebuffer to normal
 
@@ -451,6 +432,6 @@ void WorldRenderPipeline::saveScreenshot() {
     _screenshotColor->flushGPUToCPU();
 }
 
-} // namespace scene
+} // namespace graphics
 
 } // namespace reone

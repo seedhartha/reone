@@ -21,6 +21,7 @@
 #include "../graphics/context.h"
 #include "../graphics/mesh.h"
 #include "../graphics/meshes.h"
+#include "../graphics/pipeline/control.h"
 #include "../graphics/shaders.h"
 #include "../graphics/texture.h"
 #include "../graphics/textures.h"
@@ -29,7 +30,6 @@
 #include "../resource/gffstruct.h"
 #include "../resource/resources.h"
 #include "../scene/graphs.h"
-#include "../scene/pipeline/control.h"
 
 #include "control/button.h"
 #include "control/imagebutton.h"
@@ -54,9 +54,9 @@ namespace gui {
 
 GUI::GUI(
     GraphicsOptions options,
-    ControlRenderPipeline &controlRenderPipeline,
     SceneGraphs &sceneGraphs,
     Context &context,
+    ControlRenderPipeline &controlRenderPipeline,
     Fonts &fonts,
     Meshes &meshes,
     Shaders &shaders,
@@ -66,9 +66,9 @@ GUI::GUI(
     Resources &resources,
     Strings &strings) :
     _options(move(options)),
-    _controlRenderPipeline(controlRenderPipeline),
     _sceneGraphs(sceneGraphs),
     _context(context),
+    _controlRenderPipeline(controlRenderPipeline),
     _fonts(fonts),
     _meshes(meshes),
     _shaders(shaders),
@@ -301,7 +301,7 @@ void GUI::draw3D() {
             control->extent().width,
             control->extent().height);
 
-        _controlRenderPipeline.render(sceneName, extent, _controlOffset);
+        _controlRenderPipeline.render(_sceneGraphs.get(sceneName), extent, _controlOffset);
     }
 }
 

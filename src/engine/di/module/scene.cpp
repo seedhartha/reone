@@ -49,18 +49,11 @@ void SceneModule::init() {
     }
     _sceneGraphs->add(kScenePortraitSelect);
     _sceneGraphs->add(kSceneCharacter);
-    auto &mainScene = _sceneGraphs->get(kSceneMain);
 
-    _worldRenderPipeline = make_unique<WorldRenderPipeline>(_options, mainScene, _graphics.context(), _graphics.meshes(), _graphics.shaders());
-    _controlRenderPipeline = make_unique<ControlRenderPipeline>(_options, *_sceneGraphs, _graphics.context(), _graphics.meshes(), _graphics.shaders());
-
-    _worldRenderPipeline->init();
-    _controlRenderPipeline->init();
+    _graphics.worldRenderPipeline().setScene(_sceneGraphs->get(kSceneMain));
 }
 
 void SceneModule::deinit() {
-    _controlRenderPipeline.reset();
-    _worldRenderPipeline.reset();
     _sceneGraphs.reset();
 }
 

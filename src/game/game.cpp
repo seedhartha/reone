@@ -29,6 +29,7 @@
 #include "../../graphics/format/tgawriter.h"
 #include "../../graphics/lipanimations.h"
 #include "../../graphics/models.h"
+#include "../../graphics/pipeline/world.h"
 #include "../../graphics/renderbuffer.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/walkmeshes.h"
@@ -43,7 +44,6 @@
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
 #include "../../scene/graphs.h"
-#include "../../scene/pipeline/world.h"
 #include "../../script/scripts.h"
 
 #include "combat.h"

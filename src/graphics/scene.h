@@ -17,35 +17,41 @@
 
 #pragma once
 
-#include "../../graphics/options.h"
-#include "../../scene/graphs.h"
-
 namespace reone {
 
-class AudioModule;
-class GraphicsModule;
+namespace graphics {
 
-class SceneModule : boost::noncopyable {
+struct Uniforms;
+
+class IScene {
 public:
-    SceneModule(graphics::GraphicsOptions options, AudioModule &audio, GraphicsModule &graphics) :
-        _options(std::move(options)),
-        _audio(audio),
-        _graphics(graphics) {
-    }
+    virtual ~IScene() = default;
 
-    ~SceneModule() { deinit(); }
+    virtual void draw(bool shadowPass = false) = 0;
 
-    void init();
-    void deinit();
+    virtual Uniforms &uniformsPrototype() = 0;
 
-    scene::SceneGraphs &sceneGraphs() { return *_sceneGraphs; }
+    // Camera
 
-private:
-    graphics::GraphicsOptions _options;
-    AudioModule &_audio;
-    GraphicsModule &_graphics;
+    virtual bool hasCamera() const = 0;
 
-    std::unique_ptr<scene::SceneGraphs> _sceneGraphs;
+    virtual glm::vec3 cameraPosition() const = 0;
+    virtual const glm::mat4 &cameraProjection() const = 0;
+    virtual const glm::mat4 &cameraView() const = 0;
+
+    // END Camera
+
+    // Shadows
+
+    virtual bool hasShadowLight() const = 0;
+    virtual bool isShadowLightDirectional() const = 0;
+
+    virtual glm::vec3 shadowLightPosition() const = 0;
+    virtual float shadowFadeFactor() const = 0;
+
+    // END Shadows
 };
+
+} // namespace graphics
 
 } // namespace reone

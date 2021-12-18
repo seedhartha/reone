@@ -35,6 +35,7 @@ class Strings;
 namespace graphics {
 
 class Context;
+class ControlRenderPipeline;
 class Fonts;
 class Meshes;
 class Shaders;
@@ -45,7 +46,6 @@ class Window;
 
 namespace scene {
 
-class ControlRenderPipeline;
 class SceneGraphs;
 
 } // namespace scene
@@ -96,10 +96,10 @@ protected:
 
     // Services
 
-    scene::ControlRenderPipeline &_controlRenderPipeline;
     scene::SceneGraphs &_sceneGraphs;
 
     graphics::Context &_context;
+    graphics::ControlRenderPipeline &_controlRenderPipeline;
     graphics::Fonts &_fonts;
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
@@ -114,9 +114,9 @@ protected:
 
     GUI(
         graphics::GraphicsOptions options,
-        scene::ControlRenderPipeline &controlRenderPipeline,
         scene::SceneGraphs &sceneGraphs,
         graphics::Context &context,
+        graphics::ControlRenderPipeline &controlRenderPipeline,
         graphics::Fonts &fonts,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
