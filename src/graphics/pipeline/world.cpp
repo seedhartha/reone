@@ -67,7 +67,8 @@ void WorldPipeline::init() {
     _geometry1Color2->clearPixels(_options.width, _options.height, PixelFormat::RGB);
     _geometry1Color2->init();
 
-    _geometry1 = make_shared<Framebuffer>(_geometry1Color1, _geometry1Color2, _depthRenderbufferMultisample);
+    _geometry1 = make_shared<Framebuffer>();
+    _geometry1->attachColorsDepth(_geometry1Color1, _geometry1Color2, _depthRenderbufferMultisample);
     _geometry1->init();
 
     // Normal geometry framebuffer
@@ -80,7 +81,8 @@ void WorldPipeline::init() {
     _geometry2Color2->clearPixels(_options.width, _options.height, PixelFormat::RGB);
     _geometry2Color2->init();
 
-    _geometry2 = make_shared<Framebuffer>(_geometry2Color1, _geometry2Color2, _depthRenderbuffer);
+    _geometry2 = make_shared<Framebuffer>();
+    _geometry2->attachColorsDepth(_geometry2Color1, _geometry2Color2, _depthRenderbuffer);
     _geometry2->init();
 
     // Vertical blur framebuffer
@@ -89,7 +91,8 @@ void WorldPipeline::init() {
     _verticalBlurColor->clearPixels(_options.width, _options.height, PixelFormat::RGB);
     _verticalBlurColor->init();
 
-    _verticalBlur = make_shared<Framebuffer>(_verticalBlurColor, _depthRenderbuffer);
+    _verticalBlur = make_shared<Framebuffer>();
+    _verticalBlur->attachColorDepth(_verticalBlurColor, _depthRenderbuffer);
     _verticalBlur->init();
 
     // Horizontal blur framebuffer
@@ -98,7 +101,8 @@ void WorldPipeline::init() {
     _horizontalBlurColor->clearPixels(_options.width, _options.height, PixelFormat::RGB);
     _horizontalBlurColor->init();
 
-    _horizontalBlur = make_shared<Framebuffer>(_horizontalBlurColor, _depthRenderbuffer);
+    _horizontalBlur = make_shared<Framebuffer>();
+    _horizontalBlur->attachColorDepth(_horizontalBlurColor, _depthRenderbuffer);
     _horizontalBlur->init();
 
     // Shadows framebuffer
@@ -107,14 +111,16 @@ void WorldPipeline::init() {
     _shadowsDepth->clearPixels(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
     _shadowsDepth->init();
 
-    _directionalLightShadows = make_shared<Framebuffer>(_shadowsDepth);
+    _directionalLightShadows = make_shared<Framebuffer>();
+    _directionalLightShadows->attachDepth(_shadowsDepth);
     _directionalLightShadows->init();
 
     _cubeShadowsDepth = make_unique<Texture>("cubeshadows_depth", getTextureProperties(TextureUsage::DepthBufferCubeMap));
     _cubeShadowsDepth->clearPixels(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
     _cubeShadowsDepth->init();
 
-    _pointLightShadows = make_shared<Framebuffer>(_cubeShadowsDepth);
+    _pointLightShadows = make_shared<Framebuffer>();
+    _pointLightShadows->attachDepth(_cubeShadowsDepth);
     _pointLightShadows->init();
 
     // Screenshot framebuffer
@@ -123,7 +129,8 @@ void WorldPipeline::init() {
     _screenshotColor->clearPixels(kScreenshotResolution, kScreenshotResolution, PixelFormat::RGB);
     _screenshotColor->init();
 
-    _screenshot = make_shared<Framebuffer>(_screenshotColor, _depthRenderbuffer);
+    _screenshot = make_shared<Framebuffer>();
+    _screenshot->attachColorDepth(_screenshotColor, _depthRenderbuffer);
     _screenshot->init();
 }
 
