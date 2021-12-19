@@ -69,12 +69,6 @@ void SceneNode::update(float dt) {
     }
 }
 
-void SceneNode::draw() {
-    for (auto &child : _children) {
-        child->draw();
-    }
-}
-
 glm::vec3 SceneNode::getOrigin() const {
     return glm::vec3(_absTransform[3]);
 }

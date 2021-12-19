@@ -244,12 +244,12 @@ void EmitterSceneNode::detonate() {
     doSpawnParticle();
 }
 
-void EmitterSceneNode::drawElements(const vector<SceneNode *> &elements, int count) {
-    if (elements.empty()) {
+void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs, int count) {
+    if (leafs.empty()) {
         return;
     }
     if (count == -1) {
-        count = static_cast<int>(elements.size());
+        count = static_cast<int>(leafs.size());
     }
 
     shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
@@ -265,7 +265,7 @@ void EmitterSceneNode::drawElements(const vector<SceneNode *> &elements, int cou
     uniforms.particles.render = static_cast<int>(emitter->renderMode);
 
     for (int i = 0; i < count; ++i) {
-        auto particle = static_cast<ParticleSceneNode *>(elements[i]);
+        auto particle = static_cast<ParticleSceneNode *>(leafs[i]);
         auto transform = particle->absoluteTransform();
         if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
             transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * kProjectileSpeed) * particle->size().x, particle->size().y, 1.0f));

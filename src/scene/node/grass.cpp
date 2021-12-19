@@ -137,12 +137,12 @@ void GrassSceneNode::update(float dt) {
     }
 }
 
-void GrassSceneNode::drawElements(const vector<SceneNode *> &elements, int count) {
-    if (elements.empty()) {
+void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs, int count) {
+    if (leafs.empty()) {
         return;
     }
     if (count == -1) {
-        count = static_cast<int>(elements.size());
+        count = static_cast<int>(leafs.size());
     }
     _graphicsContext.bindTexture(TextureUnits::diffuseMap, _texture);
 
@@ -154,7 +154,7 @@ void GrassSceneNode::drawElements(const vector<SceneNode *> &elements, int count
         uniforms.general.featureMask |= UniformsFeatureFlags::lightmap;
     }
     for (int i = 0; i < count; ++i) {
-        auto cluster = static_cast<GrassClusterSceneNode *>(elements[i]);
+        auto cluster = static_cast<GrassClusterSceneNode *>(leafs[i]);
         uniforms.grass.quadSize = glm::vec2(_quadSize);
         uniforms.grass.clusters[i].positionVariant = glm::vec4(cluster->getOrigin(), static_cast<float>(cluster->variant()));
         uniforms.grass.clusters[i].lightmapUV = cluster->lightmapUV();

@@ -68,7 +68,7 @@ public:
 
     void update(float dt) override;
 
-    void drawElements(const std::vector<SceneNode *> &elements, int count) override;
+    void drawLeafs(const std::vector<SceneNode *> &leafs, int count) override;
 
     int getNumClustersInFace(float area) const;
     int getRandomGrassVariant() const;
