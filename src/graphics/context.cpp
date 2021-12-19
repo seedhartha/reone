@@ -38,18 +38,14 @@ void GraphicsContext::deinit() {
     if (!_inited) {
         return;
     }
-    unbindRenderbuffer();
-
-    for (size_t i = 0; i < _boundTextures.size(); ++i) {
+    if (_shaderProgram) {
+        glUseProgram(0);
+        _shaderProgram.reset();
+    }
+    for (size_t i = 0; i < _textures.size(); ++i) {
         unbindTexture(static_cast<int>(i));
     }
-    _boundTextures.clear();
-
-    for (size_t i = 0; i < _boundUniformBuffers.size(); ++i) {
-        unbindUniformBuffer(static_cast<int>(i));
-    }
-    _boundUniformBuffers.clear();
-
+    _textures.clear();
     _inited = false;
 }
 
@@ -59,6 +55,28 @@ void GraphicsContext::useShaderProgram(shared_ptr<ShaderProgram> program) {
     }
     program->use();
     _shaderProgram = move(program);
+}
+
+void GraphicsContext::bindTexture(int unit, shared_ptr<Texture> texture) {
+    size_t numUnits = _textures.size();
+    if (numUnits <= unit) {
+        _textures.resize(unit + 1);
+    }
+    if (_textures[unit] == texture) {
+        return;
+    }
+    setActiveTextureUnit(unit);
+    texture->bind();
+    _textures[unit] = move(texture);
+}
+
+void GraphicsContext::unbindTexture(int unit) {
+    if (!_textures[unit]) {
+        return;
+    }
+    setActiveTextureUnit(unit);
+    _textures[unit]->unbind();
+    _textures[unit].reset();
 }
 
 void GraphicsContext::setDepthTestEnabled(bool enabled) {
@@ -83,24 +101,6 @@ void GraphicsContext::setBackFaceCullingEnabled(bool enabled) {
         glDisable(GL_CULL_FACE);
     }
     _backFaceCulling = enabled;
-}
-
-static uint32_t getPolygonModeGL(PolygonMode mode) {
-    switch (mode) {
-    case PolygonMode::Line:
-        return GL_LINE;
-    case PolygonMode::Fill:
-    default:
-        return GL_FILL;
-    }
-}
-
-void GraphicsContext::setPolygonMode(PolygonMode mode) {
-    if (_polygonMode == mode) {
-        return;
-    }
-    glPolygonMode(GL_FRONT_AND_BACK, getPolygonModeGL(mode));
-    _polygonMode = mode;
 }
 
 void GraphicsContext::setBlendMode(BlendMode mode) {
@@ -129,6 +129,14 @@ void GraphicsContext::setBlendMode(BlendMode mode) {
     _blendMode = mode;
 }
 
+void GraphicsContext::setActiveTextureUnit(int unit) {
+    if (_textureUnit == unit) {
+        return;
+    }
+    glActiveTexture(GL_TEXTURE0 + unit);
+    _textureUnit = unit;
+}
+
 void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
     glEnable(GL_SCISSOR_TEST);
     glScissor(bounds[0], bounds[1], bounds[2], bounds[3]);
@@ -137,73 +145,6 @@ void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<v
     block();
 
     glDisable(GL_SCISSOR_TEST);
-}
-
-void GraphicsContext::bindRenderbuffer(shared_ptr<Renderbuffer> renderbuffer) {
-    if (_boundRenderbuffer == renderbuffer) {
-        return;
-    }
-    renderbuffer->bind();
-    _boundRenderbuffer = move(renderbuffer);
-}
-
-void GraphicsContext::bindTexture(int unit, shared_ptr<Texture> texture) {
-    size_t numUnits = _boundTextures.size();
-    if (numUnits <= unit) {
-        _boundTextures.resize(unit + 1);
-    }
-    if (_boundTextures[unit] == texture) {
-        return;
-    }
-    setActiveTextureUnit(unit);
-    texture->bind();
-    _boundTextures[unit] = move(texture);
-}
-
-void GraphicsContext::bindUniformBuffer(int bindingPoint, shared_ptr<UniformBuffer> buffer) {
-    size_t numBuffers = _boundUniformBuffers.size();
-    if (numBuffers <= bindingPoint) {
-        _boundUniformBuffers.resize(bindingPoint + 1);
-    }
-    if (_uniformBufferBindingPoint == bindingPoint && _boundUniformBuffers[bindingPoint] == buffer) {
-        return;
-    }
-    buffer->bind(bindingPoint);
-    _uniformBufferBindingPoint = bindingPoint;
-    _boundUniformBuffers[bindingPoint] = move(buffer);
-}
-
-void GraphicsContext::unbindRenderbuffer() {
-    if (!_boundRenderbuffer) {
-        return;
-    }
-    _boundRenderbuffer->unbind();
-    _boundRenderbuffer.reset();
-}
-
-void GraphicsContext::unbindTexture(int unit) {
-    if (!_boundTextures[unit]) {
-        return;
-    }
-    setActiveTextureUnit(unit);
-    _boundTextures[unit]->unbind();
-    _boundTextures[unit].reset();
-}
-
-void GraphicsContext::unbindUniformBuffer(int index) {
-    if (!_boundUniformBuffers[index]) {
-        return;
-    }
-    _boundUniformBuffers[index]->unbind(index);
-    _boundUniformBuffers[index].reset();
-}
-
-void GraphicsContext::setActiveTextureUnit(int unit) {
-    if (_textureUnit == unit) {
-        return;
-    }
-    glActiveTexture(GL_TEXTURE0 + unit);
-    _textureUnit = unit;
 }
 
 } // namespace graphics

@@ -40,8 +40,6 @@ static constexpr float kShadowFarPlane = 10000.0f;
 static constexpr float kOrthographicScale = 10.0f;
 static constexpr int kScreenshotResolution = 256;
 
-static bool g_wireframesEnabled = false;
-
 void WorldPipeline::init() {
     for (int i = 0; i < kNumCubeFaces; ++i) {
         _shadowLightSpaceMatrices[i] = glm::mat4(1.0f);
@@ -250,13 +248,6 @@ void WorldPipeline::drawGeometry() {
         }
     }
 
-    // Enable wireframe mode
-
-    PolygonMode oldPolygonMode = _graphicsContext.polygonMode();
-    if (g_wireframesEnabled) {
-        _graphicsContext.setPolygonMode(PolygonMode::Line);
-    }
-
     // Enable depth testing
 
     bool oldDepthTest = _graphicsContext.isDepthTestEnabled();
@@ -293,7 +284,6 @@ void WorldPipeline::drawGeometry() {
     // Restore context
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    _graphicsContext.setPolygonMode(oldPolygonMode);
     _graphicsContext.setDepthTestEnabled(oldDepthTest);
 }
 
