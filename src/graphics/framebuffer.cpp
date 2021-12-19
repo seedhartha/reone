@@ -89,27 +89,6 @@ void Framebuffer::attachDepth(const Renderbuffer &renderbuffer) const {
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer.nameGL());
 }
 
-void Framebuffer::disableReadBuffer() {
-    glReadBuffer(GL_NONE);
-}
-
-void Framebuffer::disableDrawBuffer() {
-    glDrawBuffer(GL_NONE);
-}
-
-void Framebuffer::setReadBuffer(int colorIdx) {
-    glReadBuffer(GL_COLOR_ATTACHMENT0 + colorIdx);
-}
-
-void Framebuffer::setDrawBuffer(int colorIdx) {
-    glDrawBuffer(GL_COLOR_ATTACHMENT0 + colorIdx);
-}
-
-void Framebuffer::setDrawBuffers(int numColors) {
-    static constexpr GLenum colors[] {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-    glDrawBuffers(numColors, colors);
-}
-
 } // namespace graphics
 
 } // namespace reone

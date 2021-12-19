@@ -230,8 +230,8 @@ void WorldPipeline::drawShadows() {
     } else {
         _shadows->attachDepth(*_cubeShadowsDepth);
     }
-    _shadows->disableDrawBuffer();
-    _shadows->disableReadBuffer();
+    glReadBuffer(GL_NONE);
+    glDrawBuffer(GL_NONE);
 
     // Draw the scene
     _graphicsContext.clear(ClearBuffers::depth);
@@ -243,6 +243,8 @@ void WorldPipeline::drawShadows() {
 }
 
 void WorldPipeline::drawGeometry() {
+    static constexpr GLenum colors[] {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+
     // Set uniforms prototype
 
     auto &uniforms = _scene->uniformsPrototype();
@@ -280,7 +282,7 @@ void WorldPipeline::drawGeometry() {
     // Bind multi-sampled geometry framebuffer
 
     _graphicsContext.bindDrawFramebuffer(_geometry1);
-    _geometry1->setDrawBuffers(2);
+    glDrawBuffers(2, colors);
 
     if (_scene->hasShadowLight()) {
         if (_scene->isShadowLightDirectional()) {
@@ -300,8 +302,8 @@ void WorldPipeline::drawGeometry() {
     _graphicsContext.bindReadFramebuffer(_geometry1);
     _graphicsContext.bindDrawFramebuffer(_geometry2);
     for (int i = 0; i < 2; ++i) {
-        _geometry1->setReadBuffer(i);
-        _geometry2->setDrawBuffer(i);
+        glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
+        glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
         _geometry1->blit(_options.width, _options.height);
     }
 
