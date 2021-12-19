@@ -44,8 +44,6 @@ public:
         _shaders(shaders) {
     }
 
-    void init();
-
     void prepareFor(const glm::ivec4 &extent);
 
     void draw(graphics::IScene &scene, const glm::ivec4 &extent, const glm::ivec2 &offset);
@@ -74,12 +72,12 @@ private:
         std::shared_ptr<Texture> colorBuffer2;
         std::shared_ptr<Renderbuffer> depthBuffer1;
         std::shared_ptr<Renderbuffer> depthBuffer2;
+        std::shared_ptr<Framebuffer> framebuffer1;
+        std::shared_ptr<Framebuffer> framebuffer2;
     };
 
     GraphicsOptions _options;
 
-    std::shared_ptr<Framebuffer> _geometry1;
-    std::shared_ptr<Framebuffer> _geometry2;
     std::unordered_map<AttachmentsId, Attachments, AttachmentsIdHasher> _attachments;
 
     // Services

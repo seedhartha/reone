@@ -75,12 +75,13 @@ private:
     std::shared_ptr<Framebuffer> _geometry2;
     std::shared_ptr<Framebuffer> _verticalBlur;
     std::shared_ptr<Framebuffer> _horizontalBlur;
-    std::shared_ptr<Framebuffer> _shadows;
+    std::shared_ptr<Framebuffer> _pointLightShadows;
+    std::shared_ptr<Framebuffer> _directionalLightShadows;
     std::shared_ptr<Framebuffer> _screenshot;
 
     // END Framebuffers
 
-    // Framebuffer targets
+    // Attachments
 
     std::shared_ptr<Renderbuffer> _depthRenderbuffer;
     std::shared_ptr<Renderbuffer> _depthRenderbufferMultisample;
@@ -94,7 +95,7 @@ private:
     std::shared_ptr<Texture> _cubeShadowsDepth;
     std::shared_ptr<Texture> _screenshotColor;
 
-    // END Framebuffers targets
+    // END Attachments
 
     void computeLightSpaceMatrices();
     void drawShadows();

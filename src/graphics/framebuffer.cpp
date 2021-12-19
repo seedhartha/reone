@@ -31,6 +31,9 @@ void Framebuffer::init() {
         return;
     }
     glGenFramebuffers(1, &_nameGL);
+    glBindFramebuffer(GL_FRAMEBUFFER, _nameGL);
+    configure();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     _inited = true;
 }
 
@@ -42,12 +45,36 @@ void Framebuffer::deinit() {
     _inited = false;
 }
 
-void Framebuffer::attachColor(const Texture &texture, int index, int mip) const {
+void Framebuffer::configure() {
+    if (_color1) {
+        if (_color1->isTexture()) {
+            attachColor(static_cast<Texture &>(*_color1), 0);
+        } else if (_color1->isRenderbuffer()) {
+            attachColor(static_cast<Renderbuffer &>(*_color1), 0);
+        }
+    }
+    if (_color2) {
+        if (_color2->isTexture()) {
+            attachColor(static_cast<Texture &>(*_color2), 1);
+        } else if (_color2->isRenderbuffer()) {
+            attachColor(static_cast<Renderbuffer &>(*_color2), 1);
+        }
+    }
+    if (_depth) {
+        if (_depth->isTexture()) {
+            attachDepth(static_cast<Texture &>(*_depth));
+        } else if (_depth->isRenderbuffer()) {
+            attachDepth(static_cast<Renderbuffer &>(*_depth));
+        }
+    }
+}
+
+void Framebuffer::attachColor(const Texture &texture, int index) const {
     if (texture.isCubeMap()) {
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, texture.nameGL(), mip);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, texture.nameGL(), 0);
     } else {
         GLenum target = texture.isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, target, texture.nameGL(), mip);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, target, texture.nameGL(), 0);
     }
 }
 

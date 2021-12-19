@@ -34,14 +34,6 @@ namespace reone {
 
 namespace graphics {
 
-void ControlPipeline::init() {
-    _geometry1 = make_shared<Framebuffer>();
-    _geometry1->init();
-
-    _geometry2 = make_shared<Framebuffer>();
-    _geometry2->init();
-}
-
 void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     AttachmentsId attachmentsId {extent};
     if (_attachments.count(attachmentsId) > 0) {
@@ -50,27 +42,35 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     int w = extent[2];
     int h = extent[3];
 
-    auto colorBuffer1 = make_unique<Texture>("color1", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
+    auto colorBuffer1 = make_shared<Texture>("color1", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
     colorBuffer1->clearPixels(w, h, PixelFormat::RGBA);
     colorBuffer1->init();
 
-    auto colorBuffer2 = make_unique<Texture>("color2", getTextureProperties(TextureUsage::ColorBuffer));
-    colorBuffer2->clearPixels(w, h, PixelFormat::RGBA);
-    colorBuffer2->init();
-
-    auto depthBuffer1 = make_unique<Renderbuffer>(_options.aaSamples);
+    auto depthBuffer1 = make_shared<Renderbuffer>(_options.aaSamples);
     depthBuffer1->configure(w, h, PixelFormat::Depth);
     depthBuffer1->init();
 
-    auto depthBuffer2 = make_unique<Renderbuffer>();
+    auto framebuffer1 = make_unique<Framebuffer>(colorBuffer1, depthBuffer1);
+    framebuffer1->init();
+
+    auto colorBuffer2 = make_shared<Texture>("color2", getTextureProperties(TextureUsage::ColorBuffer));
+    colorBuffer2->clearPixels(w, h, PixelFormat::RGBA);
+    colorBuffer2->init();
+
+    auto depthBuffer2 = make_shared<Renderbuffer>();
     depthBuffer2->configure(w, h, PixelFormat::Depth);
     depthBuffer2->init();
+
+    auto framebuffer2 = make_unique<Framebuffer>(colorBuffer2, depthBuffer2);
+    framebuffer2->init();
 
     Attachments attachments;
     attachments.colorBuffer1 = move(colorBuffer1);
     attachments.colorBuffer2 = move(colorBuffer2);
     attachments.depthBuffer1 = move(depthBuffer1);
     attachments.depthBuffer2 = move(depthBuffer2);
+    attachments.framebuffer1 = move(framebuffer1);
+    attachments.framebuffer2 = move(framebuffer2);
     _attachments.insert(make_pair(attachmentsId, move(attachments)));
 }
 
@@ -84,6 +84,8 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
         return;
     }
     auto &attachments = maybeAttachments->second;
+    auto &framebuffer1 = *attachments.framebuffer1;
+    auto &framebuffer2 = *attachments.framebuffer2;
 
     // Set uniforms prototype
 
@@ -101,19 +103,14 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     bool oldDepthTest = _graphicsContext.isDepthTestEnabled();
     _graphicsContext.setDepthTestEnabled(true);
 
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _geometry1->nameGL());
-    _geometry1->attachColor(*attachments.colorBuffer1);
-    _geometry1->attachDepth(*attachments.depthBuffer1);
-
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer1.nameGL());
     _graphicsContext.clear(ClearBuffers::colorDepth);
     scene.draw();
 
     // Blit multi-sampled framebuffer to normal
 
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, _geometry1->nameGL());
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _geometry2->nameGL());
-    _geometry2->attachColor(*attachments.colorBuffer2);
-    _geometry2->attachDepth(*attachments.depthBuffer2);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer1.nameGL());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer2.nameGL());
     for (int i = 0; i < 2; ++i) {
         glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
         glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);

@@ -17,6 +17,7 @@ set(GRAPHICS_HEADERS
     aabb.h
     animatedproperty.h
     animation.h
+    attachment.h
     barycentricutil.h
     context.h
     cursor.h

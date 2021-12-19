@@ -19,13 +19,14 @@
 
 #include "../common/types.h"
 
+#include "attachment.h"
 #include "types.h"
 
 namespace reone {
 
 namespace graphics {
 
-class Texture : boost::noncopyable {
+class Texture : public IAttachment, boost::noncopyable {
 public:
     enum class Filtering {
         Nearest,
@@ -116,6 +117,9 @@ public:
     bool isMultisample() const { return _properties.numSamples > 1; }
     bool isAdditive() const { return _features.blending == Blending::Additive; }
     bool isGrayscale() const { return _pixelFormat == PixelFormat::Grayscale; }
+
+    bool isTexture() const override { return true; }
+    bool isRenderbuffer() const override { return false; }
 
     const std::string &name() const { return _name; }
     int width() const { return _width; }

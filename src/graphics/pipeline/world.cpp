@@ -47,7 +47,7 @@ void WorldPipeline::init() {
         _shadowLightSpaceMatrices[i] = glm::mat4(1.0f);
     }
 
-    // Reusable depth renderbuffers
+    // Reusable renderbuffers
 
     _depthRenderbuffer = make_unique<Renderbuffer>();
     _depthRenderbuffer->configure(_options.width, _options.height, PixelFormat::Depth);
@@ -67,13 +67,8 @@ void WorldPipeline::init() {
     _geometry1Color2->clearPixels(_options.width, _options.height, PixelFormat::RGB);
     _geometry1Color2->init();
 
-    _geometry1 = make_shared<Framebuffer>();
+    _geometry1 = make_shared<Framebuffer>(_geometry1Color1, _geometry1Color2, _depthRenderbufferMultisample);
     _geometry1->init();
-    glBindFramebuffer(GL_FRAMEBUFFER, _geometry1->nameGL());
-    _geometry1->attachColor(*_geometry1Color1, 0);
-    _geometry1->attachColor(*_geometry1Color2, 1);
-    _geometry1->attachDepth(*_depthRenderbufferMultisample);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Normal geometry framebuffer
 
@@ -85,13 +80,8 @@ void WorldPipeline::init() {
     _geometry2Color2->clearPixels(_options.width, _options.height, PixelFormat::RGB);
     _geometry2Color2->init();
 
-    _geometry2 = make_shared<Framebuffer>();
+    _geometry2 = make_shared<Framebuffer>(_geometry2Color1, _geometry2Color2, _depthRenderbuffer);
     _geometry2->init();
-    glBindFramebuffer(GL_FRAMEBUFFER, _geometry2->nameGL());
-    _geometry2->attachColor(*_geometry2Color1, 0);
-    _geometry2->attachColor(*_geometry2Color2, 1);
-    _geometry2->attachDepth(*_depthRenderbuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Vertical blur framebuffer
 
@@ -99,12 +89,8 @@ void WorldPipeline::init() {
     _verticalBlurColor->clearPixels(_options.width, _options.height, PixelFormat::RGB);
     _verticalBlurColor->init();
 
-    _verticalBlur = make_shared<Framebuffer>();
+    _verticalBlur = make_shared<Framebuffer>(_verticalBlurColor, _depthRenderbuffer);
     _verticalBlur->init();
-    glBindFramebuffer(GL_FRAMEBUFFER, _verticalBlur->nameGL());
-    _verticalBlur->attachColor(*_verticalBlurColor);
-    _verticalBlur->attachDepth(*_depthRenderbuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Horizontal blur framebuffer
 
@@ -112,12 +98,8 @@ void WorldPipeline::init() {
     _horizontalBlurColor->clearPixels(_options.width, _options.height, PixelFormat::RGB);
     _horizontalBlurColor->init();
 
-    _horizontalBlur = make_shared<Framebuffer>();
+    _horizontalBlur = make_shared<Framebuffer>(_horizontalBlurColor, _depthRenderbuffer);
     _horizontalBlur->init();
-    glBindFramebuffer(GL_FRAMEBUFFER, _horizontalBlur->nameGL());
-    _horizontalBlur->attachColor(*_horizontalBlurColor);
-    _horizontalBlur->attachDepth(*_depthRenderbuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Shadows framebuffer
 
@@ -125,12 +107,15 @@ void WorldPipeline::init() {
     _shadowsDepth->clearPixels(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
     _shadowsDepth->init();
 
+    _pointLightShadows = make_shared<Framebuffer>(_shadowsDepth);
+    _pointLightShadows->init();
+
     _cubeShadowsDepth = make_unique<Texture>("cubeshadows_depth", getTextureProperties(TextureUsage::DepthBufferCubeMap));
     _cubeShadowsDepth->clearPixels(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
     _cubeShadowsDepth->init();
 
-    _shadows = make_shared<Framebuffer>();
-    _shadows->init();
+    _directionalLightShadows = make_shared<Framebuffer>(_cubeShadowsDepth);
+    _directionalLightShadows->init();
 
     // Screenshot framebuffer
 
@@ -138,12 +123,8 @@ void WorldPipeline::init() {
     _screenshotColor->clearPixels(kScreenshotResolution, kScreenshotResolution, PixelFormat::RGB);
     _screenshotColor->init();
 
-    _screenshot = make_shared<Framebuffer>();
+    _screenshot = make_shared<Framebuffer>(_screenshotColor, _depthRenderbuffer);
     _screenshot->init();
-    glBindFramebuffer(GL_FRAMEBUFFER, _screenshot->nameGL());
-    _screenshot->attachColor(*_screenshotColor);
-    _screenshot->attachDepth(*_depthRenderbuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void WorldPipeline::draw() {
@@ -224,12 +205,8 @@ void WorldPipeline::drawShadows() {
     _graphicsContext.setDepthTestEnabled(true);
 
     // Bind shadows framebuffer
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _shadows->nameGL());
-    if (_scene->isShadowLightDirectional()) {
-        _shadows->attachDepth(*_shadowsDepth);
-    } else {
-        _shadows->attachDepth(*_cubeShadowsDepth);
-    }
+    auto shadows = _scene->isShadowLightDirectional() ? _directionalLightShadows : _pointLightShadows;
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, shadows->nameGL());
     glReadBuffer(GL_NONE);
     glDrawBuffer(GL_NONE);
 

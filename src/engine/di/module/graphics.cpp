@@ -44,7 +44,6 @@ void GraphicsModule::init() {
     _textures->init();
     _shaders->init();
     _worldPipeline->init();
-    _controlPipeline->init();
 }
 
 void GraphicsModule::deinit() {
