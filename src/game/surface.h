@@ -25,6 +25,7 @@ struct Surface {
     std::string label;
     bool walk {false};
     bool walkcheck {false};
+    bool lineOfSight {false};
     bool grass {false};
     std::string sound;
 };

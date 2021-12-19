@@ -157,12 +157,14 @@ public:
     // Collision detection and object picking
 
     bool testElevation(const glm::vec2 &position, Collision &outCollision) const;
-    bool testObstacle(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const;
+    bool testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest, Collision &outCollision) const;
+    bool testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const;
 
     std::shared_ptr<ModelSceneNode> pickModelAt(int x, int y, IUser *except = nullptr) const;
 
     void setWalkableSurfaces(std::set<uint32_t> surfaces) { _walkableSurfaces = std::move(surfaces); }
     void setWalkcheckSurfaces(std::set<uint32_t> surfaces) { _walkcheckSurfaces = std::move(surfaces); }
+    void setLineOfSightSurfaces(std::set<uint32_t> surfaces) { _lineOfSightSurfaces = std::move(surfaces); }
 
     // END Collision detection and object picking
 
@@ -197,9 +199,6 @@ private:
 
     bool _updateRoots {true};
     graphics::Uniforms _uniformsPrototype;
-
-    std::set<uint32_t> _walkableSurfaces;
-    std::set<uint32_t> _walkcheckSurfaces;
 
     // Services
 
@@ -236,9 +235,12 @@ private:
     // Lighting and shadows
 
     glm::vec3 _ambientLightColor {0.5f};
+
     std::shared_ptr<SceneNode> _lightingRefNode; /**< reference node to use when selecting closest light sources */
     std::vector<LightSceneNode *> _closestLights;
-    const LightSceneNode *_shadowLight {nullptr};
+    LightSceneNode *_shadowLight {nullptr};
+
+    LightSceneNode *_flareLight {nullptr};
 
     // END Lighting and shadows
 
@@ -250,6 +252,14 @@ private:
     glm::vec3 _fogColor {0.0f};
 
     // END Fog
+
+    // Surfaces
+
+    std::set<uint32_t> _walkableSurfaces;
+    std::set<uint32_t> _walkcheckSurfaces;
+    std::set<uint32_t> _lineOfSightSurfaces;
+
+    // END Surfaces
 
     void cullRoots();
     void updateLighting();

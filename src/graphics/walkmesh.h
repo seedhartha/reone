@@ -63,14 +63,14 @@ private:
     bool _area {false};
 
     const Walkmesh::Face *raycastAABB(
-        std::set<uint32_t> walkcheckSurfaces,
+        std::set<uint32_t> surfaces,
         const glm::vec3 &origin,
         const glm::vec3 &dir,
         float maxDistance,
         float &outDistance) const;
 
     bool raycastFace(
-        std::set<uint32_t> walkcheckSurfaces,
+        std::set<uint32_t> surfaces,
         const Walkmesh::Face &face,
         const glm::vec3 &origin,
         const glm::vec3 &dir,

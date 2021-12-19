@@ -37,7 +37,7 @@ public:
         graphics::Shaders &shaders);
 
     void update(float dt) override;
-    void drawLensFlares(const graphics::ModelNode::LensFlare &flare);
+    void drawLensFlare(const graphics::ModelNode::LensFlare &flare);
 
     bool isActive() const { return _active; }
     bool isDirectional() const;

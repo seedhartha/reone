@@ -24,7 +24,7 @@ namespace reone {
 namespace graphics {
 
 const Walkmesh::Face *Walkmesh::raycast(
-    set<uint32_t> walkcheckSurfaces,
+    set<uint32_t> surfaces,
     const glm::vec3 &origin,
     const glm::vec3 &dir,
     float maxDistance,
@@ -32,14 +32,14 @@ const Walkmesh::Face *Walkmesh::raycast(
 
     // For area walkmeshes, find intersection via AABB tree
     if (_rootAabb) {
-        return raycastAABB(walkcheckSurfaces, origin, dir, maxDistance, outDistance);
+        return raycastAABB(surfaces, origin, dir, maxDistance, outDistance);
     }
 
     // For placeable and door walkmeshes, test all faces for intersection
     glm::vec2 baryPosition(0.0f);
     float distance = 0.0f;
     for (auto &face : _faces) {
-        if (raycastFace(walkcheckSurfaces, face, origin, dir, maxDistance, distance)) {
+        if (raycastFace(surfaces, face, origin, dir, maxDistance, distance)) {
             outDistance = distance;
             return &face;
         }
@@ -49,7 +49,7 @@ const Walkmesh::Face *Walkmesh::raycast(
 }
 
 const Walkmesh::Face *Walkmesh::raycastAABB(
-    set<uint32_t> walkcheckSurfaces,
+    set<uint32_t> surfaces,
     const glm::vec3 &origin,
     const glm::vec3 &dir,
     float maxDistance,
@@ -67,7 +67,7 @@ const Walkmesh::Face *Walkmesh::raycastAABB(
         // Test ray/face intersection for tree leafs
         if (aabb->faceIdx != -1) {
             const Face &face = _faces[aabb->faceIdx];
-            if (raycastFace(walkcheckSurfaces, face, origin, dir, maxDistance, distance)) {
+            if (raycastFace(surfaces, face, origin, dir, maxDistance, distance)) {
                 outDistance = distance;
                 return &face;
             }
@@ -92,14 +92,14 @@ const Walkmesh::Face *Walkmesh::raycastAABB(
 }
 
 bool Walkmesh::raycastFace(
-    set<uint32_t> walkcheckSurfaces,
+    set<uint32_t> surfaces,
     const Face &face,
     const glm::vec3 &origin,
     const glm::vec3 &dir,
     float maxDistance,
     float &outDistance) const {
 
-    if (walkcheckSurfaces.count(face.material) == 0) {
+    if (surfaces.count(face.material) == 0) {
         return false;
     }
 

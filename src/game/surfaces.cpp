@@ -38,6 +38,7 @@ void Surfaces::init() {
         surface.label = surfacemat->getString(row, "label");
         surface.walk = surfacemat->getBool(row, "walk");
         surface.walkcheck = surfacemat->getBool(row, "walkcheck");
+        surface.lineOfSight = surfacemat->getBool(row, "lineofsight");
         surface.grass = surfacemat->getBool(row, "grass");
         surface.sound = surfacemat->getString(row, "sound");
         _surfaces.push_back(move(surface));
@@ -78,6 +79,10 @@ set<uint32_t> Surfaces::getWalkableSurfaces() const {
 
 set<uint32_t> Surfaces::getWalkcheckSurfaces() const {
     return getSurfaceIndices([](auto &surface) { return surface.walkcheck; });
+}
+
+set<uint32_t> Surfaces::getLineOfSightSurfaces() const {
+    return getSurfaceIndices([](auto &surface) { return surface.lineOfSight; });
 }
 
 } // namespace game

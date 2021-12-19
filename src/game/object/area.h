@@ -111,7 +111,7 @@ public:
 
     std::shared_ptr<Object> createObject(ObjectType type, const std::string &blueprintResRef, const std::shared_ptr<Location> &location);
 
-    bool isInLineOfSight(const Creature &subject, const SpatialObject &target) const;
+    bool isObjectSeen(const Creature &subject, const SpatialObject &object) const;
 
     ObjectList &getObjectsByType(ObjectType type);
     std::shared_ptr<SpatialObject> getObjectByTag(const std::string &tag, int nth = 0) const;

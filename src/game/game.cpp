@@ -76,9 +76,11 @@ void Game::init() {
     // Surfaces
     auto walkableSurfaces = _services.surfaces.getWalkableSurfaces();
     auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaces();
+    auto lineOfSightSurfaces = _services.surfaces.getLineOfSightSurfaces();
     for (auto &scene : _services.sceneGraphs.scenes()) {
         scene.second->setWalkableSurfaces(walkableSurfaces);
         scene.second->setWalkcheckSurfaces(walkcheckSurfaces);
+        scene.second->setLineOfSightSurfaces(lineOfSightSurfaces);
     }
 
     loadModuleNames();
