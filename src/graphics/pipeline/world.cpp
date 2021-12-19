@@ -304,7 +304,7 @@ void WorldPipeline::drawGeometry() {
     for (int i = 0; i < 2; ++i) {
         glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
         glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
-        _geometry1->blit(_options.width, _options.height);
+        glBlitFramebuffer(0, 0, _options.width, _options.height, 0, 0, _options.width, _options.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
 
     // Restore context

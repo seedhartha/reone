@@ -33,8 +33,6 @@ public:
     void init();
     void deinit();
 
-    void blit(int width, int height);
-
     // Attachments
 
     void attachColor(const Texture &texture, int index = 0, int mip = 0) const;
