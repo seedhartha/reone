@@ -34,14 +34,15 @@ struct WindowID {
     static constexpr wxWindowID antiAliasing = wxID_HIGHEST + 6;
     static constexpr wxWindowID shadowResolution = wxID_HIGHEST + 7;
     static constexpr wxWindowID fullscreen = wxID_HIGHEST + 8;
-    static constexpr wxWindowID musicVolume = wxID_HIGHEST + 9;
-    static constexpr wxWindowID voiceVolume = wxID_HIGHEST + 10;
-    static constexpr wxWindowID soundVolume = wxID_HIGHEST + 11;
-    static constexpr wxWindowID movieVolume = wxID_HIGHEST + 12;
-    static constexpr wxWindowID logLevel = wxID_HIGHEST + 13;
-    static constexpr wxWindowID logChannels = wxID_HIGHEST + 14;
-    static constexpr wxWindowID logFile = wxID_HIGHEST + 15;
-    static constexpr wxWindowID saveConfig = wxID_HIGHEST + 16;
+    static constexpr wxWindowID grass = wxID_HIGHEST + 9;
+    static constexpr wxWindowID musicVolume = wxID_HIGHEST + 10;
+    static constexpr wxWindowID voiceVolume = wxID_HIGHEST + 11;
+    static constexpr wxWindowID soundVolume = wxID_HIGHEST + 12;
+    static constexpr wxWindowID movieVolume = wxID_HIGHEST + 13;
+    static constexpr wxWindowID logLevel = wxID_HIGHEST + 14;
+    static constexpr wxWindowID logChannels = wxID_HIGHEST + 15;
+    static constexpr wxWindowID logFile = wxID_HIGHEST + 16;
+    static constexpr wxWindowID saveConfig = wxID_HIGHEST + 17;
 };
 
 class LauncherFrame : public wxFrame {
@@ -56,6 +57,7 @@ private:
         int height {0};
         bool fullscreen {false};
         int texQuality {0};
+        bool grass {true};
         int aasamples {0};
         int shadowres {0};
         int musicvol {0};
@@ -74,6 +76,7 @@ private:
     wxChoice *_choiceAntiAliasing;
     wxChoice *_choiceShadowResolution;
     wxCheckBox *_checkBoxFullscreen;
+    wxCheckBox *_checkBoxGrass;
     wxSlider *_sliderVolumeMusic;
     wxSlider *_sliderVolumeVoice;
     wxSlider *_sliderVolumeSound;

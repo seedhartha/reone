@@ -28,6 +28,7 @@ struct GraphicsOptions {
     int height {0};
     bool fullscreen {false};
     TextureQuality textureQuality {0};
+    bool grass {false};
     int aaSamples {0};
     int shadowResolution {0};
 };

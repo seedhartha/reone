@@ -337,7 +337,7 @@ void Area::loadLYT() {
         // Grass
         shared_ptr<GrassSceneNode> grassSceneNode;
         auto aabbNode = modelSceneNode->model().getAABBNode();
-        if (_grass.texture && aabbNode) {
+        if (_grass.texture && aabbNode && _game.options().graphics.grass) {
             grassSceneNode = sceneGraph.newGrass(
                 _grass.density,
                 _grass.quadSize,
