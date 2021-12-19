@@ -97,14 +97,13 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
 
     // Draw to multi-sampled framebuffer
 
-    glm::ivec4 oldViewport(_graphicsContext.viewport());
-    _graphicsContext.setViewport(glm::ivec4(0, 0, extent[2], extent[3]));
+    glViewport(0, 0, extent[2], extent[3]);
 
     bool oldDepthTest = _graphicsContext.isDepthTestEnabled();
     _graphicsContext.setDepthTestEnabled(true);
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer1.nameGL());
-    _graphicsContext.clear(ClearBuffers::colorDepth);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     scene.draw();
 
     // Blit multi-sampled framebuffer to normal
@@ -120,14 +119,14 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     // Draw control
 
     _graphicsContext.setDepthTestEnabled(oldDepthTest);
-    _graphicsContext.setViewport(oldViewport);
+    glViewport(0, 0, _options.width, _options.height);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     _graphicsContext.bindTexture(0, attachments.colorBuffer2);
 
     glm::mat4 projection(glm::ortho(
         0.0f,
-        static_cast<float>(oldViewport[2]),
-        static_cast<float>(oldViewport[3]),
+        static_cast<float>(_options.width),
+        static_cast<float>(_options.height),
         0.0f));
 
     glm::mat4 transform(1.0f);

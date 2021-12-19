@@ -112,16 +112,6 @@ enum class ShaderType {
     Fragment
 };
 
-struct ClearBuffers {
-    static constexpr int color = 1;
-    static constexpr int depth = 2;
-    static constexpr int stencil = 4;
-
-    static constexpr int colorDepth = color | depth;
-    static constexpr int colorDepthStencil = color | depth | stencil;
-    static constexpr int depthStencil = depth | stencil;
-};
-
 struct TextureUnits {
     static constexpr int diffuseMap = 0;
     static constexpr int lightmap = 1;

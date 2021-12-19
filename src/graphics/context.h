@@ -40,17 +40,13 @@ public:
     void init();
     void deinit();
 
-    void clear(int mask);
-
     void useShaderProgram(std::shared_ptr<ShaderProgram> program);
 
     bool isDepthTestEnabled() const { return _depthTest; }
 
-    const glm::ivec4 &viewport() const { return _viewport; }
     PolygonMode polygonMode() const { return _polygonMode; }
     BlendMode blendMode() const { return _blendMode; }
 
-    void setViewport(glm::ivec4 viewport);
     void setDepthTestEnabled(bool enabled);
     void setBackFaceCullingEnabled(bool enabled);
     void setPolygonMode(PolygonMode mode);
@@ -75,7 +71,6 @@ private:
 
     bool _inited {false};
 
-    glm::ivec4 _viewport {0};
     bool _depthTest {false};
     bool _backFaceCulling {false};
     PolygonMode _polygonMode {PolygonMode::Fill};
