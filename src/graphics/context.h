@@ -42,29 +42,18 @@ public:
 
     void useShaderProgram(std::shared_ptr<ShaderProgram> program);
 
+    void bindTexture(int unit, std::shared_ptr<Texture> texture);
+    void unbindTexture(int unit);
+
     bool isDepthTestEnabled() const { return _depthTest; }
 
-    PolygonMode polygonMode() const { return _polygonMode; }
     BlendMode blendMode() const { return _blendMode; }
 
     void setDepthTestEnabled(bool enabled);
     void setBackFaceCullingEnabled(bool enabled);
-    void setPolygonMode(PolygonMode mode);
     void setBlendMode(BlendMode mode);
 
     void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
-
-    // Bindings
-
-    void bindRenderbuffer(std::shared_ptr<Renderbuffer> renderbuffer);
-    void bindTexture(int unit, std::shared_ptr<Texture> texture);
-    void bindUniformBuffer(int index, std::shared_ptr<UniformBuffer> buffer);
-
-    void unbindRenderbuffer();
-    void unbindTexture(int unit);
-    void unbindUniformBuffer(int index);
-
-    // END Bindings
 
 private:
     GraphicsOptions _options;
@@ -73,20 +62,11 @@ private:
 
     bool _depthTest {false};
     bool _backFaceCulling {false};
-    PolygonMode _polygonMode {PolygonMode::Fill};
+    int _textureUnit {0};
     BlendMode _blendMode {BlendMode::None};
 
-    int _textureUnit {0};
-    int _uniformBufferBindingPoint {0};
     std::shared_ptr<ShaderProgram> _shaderProgram;
-
-    // Bindings
-
-    std::shared_ptr<Renderbuffer> _boundRenderbuffer;
-    std::vector<std::shared_ptr<Texture>> _boundTextures;
-    std::vector<std::shared_ptr<UniformBuffer>> _boundUniformBuffers;
-
-    // END Bindings
+    std::vector<std::shared_ptr<Texture>> _textures;
 
     void setActiveTextureUnit(int unit);
 };

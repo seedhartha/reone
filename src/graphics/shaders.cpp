@@ -933,31 +933,31 @@ unique_ptr<UniformBuffer> Shaders::initUniformBuffer(const void *data, ptrdiff_t
 }
 
 void Shaders::refreshUniforms() {
-    _graphicsContext.bindUniformBuffer(UniformBlockBindingPoints::general, _ubGeneral);
+    _ubGeneral->bind(UniformBlockBindingPoints::general);
     _ubGeneral->setData(&_uniforms.general, sizeof(GeneralUniforms), true);
 
     if (_uniforms.general.featureMask & UniformsFeatureFlags::text) {
-        _graphicsContext.bindUniformBuffer(UniformBlockBindingPoints::text, _ubText);
+        _ubText->bind(UniformBlockBindingPoints::text);
         _ubText->setData(&_uniforms.text, sizeof(TextUniforms), true);
     }
     if (_uniforms.general.featureMask & UniformsFeatureFlags::lighting) {
-        _graphicsContext.bindUniformBuffer(UniformBlockBindingPoints::lighting, _ubLighting);
+        _ubLighting->bind(UniformBlockBindingPoints::lighting);
         _ubLighting->setData(&_uniforms.lighting, sizeof(LightingUniforms), true);
     }
     if (_uniforms.general.featureMask & UniformsFeatureFlags::skeletal) {
-        _graphicsContext.bindUniformBuffer(UniformBlockBindingPoints::skeletal, _ubSkeletal);
+        _ubSkeletal->bind(UniformBlockBindingPoints::skeletal);
         _ubSkeletal->setData(&_uniforms.skeletal, sizeof(SkeletalUniforms), true);
     }
     if (_uniforms.general.featureMask & UniformsFeatureFlags::particles) {
-        _graphicsContext.bindUniformBuffer(UniformBlockBindingPoints::particles, _ubParticles);
+        _ubParticles->bind(UniformBlockBindingPoints::particles);
         _ubParticles->setData(&_uniforms.particles, sizeof(ParticlesUniforms), true);
     }
     if (_uniforms.general.featureMask & UniformsFeatureFlags::grass) {
-        _graphicsContext.bindUniformBuffer(UniformBlockBindingPoints::grass, _ubGrass);
+        _ubGrass->bind(UniformBlockBindingPoints::grass);
         _ubGrass->setData(&_uniforms.grass, sizeof(GrassUniforms), true);
     }
     if (_uniforms.general.featureMask & UniformsFeatureFlags::danglymesh) {
-        _graphicsContext.bindUniformBuffer(UniformBlockBindingPoints::danglymesh, _ubDanglymesh);
+        _ubDanglymesh->bind(UniformBlockBindingPoints::danglymesh);
         _ubDanglymesh->setData(&_uniforms.danglymesh, sizeof(DanglymeshUniforms), true);
     }
 }
