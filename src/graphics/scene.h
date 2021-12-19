@@ -27,7 +27,8 @@ class IScene {
 public:
     virtual ~IScene() = default;
 
-    virtual void draw(bool shadowPass = false) = 0;
+    virtual void draw() = 0;
+    virtual void drawShadows() = 0;
 
     virtual Uniforms &uniformsPrototype() = 0;
 

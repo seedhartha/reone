@@ -211,7 +211,7 @@ void WorldPipeline::drawShadows() {
 
     // Draw the scene
     glClear(GL_DEPTH_BUFFER_BIT);
-    _scene->draw(true);
+    _scene->drawShadows();
 
     // Restore context
     glViewport(0, 0, _options.width, _options.height);
