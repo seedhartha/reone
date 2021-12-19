@@ -35,8 +35,9 @@ public:
     void removeAllChildren();
 
     virtual void update(float dt);
-    virtual void draw();
-    virtual void drawElements(const std::vector<SceneNode *> &elements, int count = -1) {}
+
+    virtual void drawLeafs(const std::vector<SceneNode *> &leafs, int count) {
+    }
 
     bool isEnabled() const { return _enabled; }
     bool isCullable() const { return _cullable; }

@@ -47,7 +47,7 @@ public:
 
     void update(float dt) override;
 
-    void draw() override;
+    void draw();
     void drawShadow();
 
     bool shouldRender() const;

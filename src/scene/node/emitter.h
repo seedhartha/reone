@@ -38,7 +38,8 @@ public:
         graphics::Shaders &shaders);
 
     void update(float dt) override;
-    void drawElements(const std::vector<SceneNode *> &elements, int count) override;
+
+    void drawLeafs(const std::vector<SceneNode *> &leafs, int count) override;
 
     void detonate();
 

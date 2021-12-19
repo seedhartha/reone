@@ -389,7 +389,7 @@ void SceneGraph::draw() {
     // Render particles and grass clusters
     for (auto &nodeLeaf : _leafs) {
         int count = nodeLeaf.first->type() == SceneNodeType::Grass && nodeLeaf.second.size() > kMaxGrassClusters ? kMaxGrassClusters : -1;
-        nodeLeaf.first->drawElements(nodeLeaf.second, count);
+        nodeLeaf.first->drawLeafs(nodeLeaf.second, count);
     }
 
     // Render lens flare
