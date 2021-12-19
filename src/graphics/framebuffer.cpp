@@ -42,23 +42,6 @@ void Framebuffer::deinit() {
     _inited = false;
 }
 
-static GLenum getTargetGL(FramebufferTarget target) {
-    switch (target) {
-    case FramebufferTarget::Read:
-        return GL_READ_FRAMEBUFFER;
-    case FramebufferTarget::Draw:
-        return GL_DRAW_FRAMEBUFFER;
-    }
-}
-
-void Framebuffer::bind(FramebufferTarget target) {
-    glBindFramebuffer(getTargetGL(target), _nameGL);
-}
-
-void Framebuffer::unbind(FramebufferTarget target) {
-    glBindFramebuffer(getTargetGL(target), 0);
-}
-
 void Framebuffer::blit(int width, int height) {
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }

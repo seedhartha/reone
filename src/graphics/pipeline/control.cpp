@@ -88,7 +88,7 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     // Set uniforms prototype
 
     auto &uniformsPrototype = scene.uniformsPrototype();
-    uniformsPrototype.general = GeneralUniforms();
+    uniformsPrototype.general.reset();
     uniformsPrototype.general.projection = scene.cameraProjection();
     uniformsPrototype.general.view = scene.cameraView();
     uniformsPrototype.general.cameraPosition = glm::vec4(scene.cameraPosition(), 1.0f);
@@ -101,7 +101,7 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     bool oldDepthTest = _graphicsContext.isDepthTestEnabled();
     _graphicsContext.setDepthTestEnabled(true);
 
-    _graphicsContext.bindDrawFramebuffer(_geometry1);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _geometry1->nameGL());
     _geometry1->attachColor(*attachments.colorBuffer1);
     _geometry1->attachDepth(*attachments.depthBuffer1);
 
@@ -110,8 +110,8 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
 
     // Blit multi-sampled framebuffer to normal
 
-    _graphicsContext.bindReadFramebuffer(_geometry1);
-    _graphicsContext.bindDrawFramebuffer(_geometry2);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, _geometry1->nameGL());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _geometry2->nameGL());
     _geometry2->attachColor(*attachments.colorBuffer2);
     _geometry2->attachDepth(*attachments.depthBuffer2);
     for (int i = 0; i < 2; ++i) {
@@ -124,7 +124,7 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
 
     _graphicsContext.setDepthTestEnabled(oldDepthTest);
     _graphicsContext.setViewport(oldViewport);
-    _graphicsContext.unbindDrawFramebuffer();
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     _graphicsContext.bindTexture(0, attachments.colorBuffer2);
 
     glm::mat4 projection(glm::ortho(
@@ -138,7 +138,7 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     transform = glm::scale(transform, glm::vec3(extent[2], extent[3], 1.0f));
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = GeneralUniforms();
+    uniforms.general.reset();
     uniforms.general.projection = move(projection);
     uniforms.general.model = move(transform);
 
