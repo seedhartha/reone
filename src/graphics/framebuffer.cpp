@@ -42,10 +42,6 @@ void Framebuffer::deinit() {
     _inited = false;
 }
 
-void Framebuffer::blit(int width, int height) {
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-}
-
 void Framebuffer::attachColor(const Texture &texture, int index, int mip) const {
     if (texture.isCubeMap()) {
         glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, texture.nameGL(), mip);

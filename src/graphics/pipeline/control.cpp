@@ -117,7 +117,7 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     for (int i = 0; i < 2; ++i) {
         glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
         glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
-        _geometry1->blit(extent[2], extent[3]);
+        glBlitFramebuffer(0, 0, extent[2], extent[3], 0, 0, extent[2], extent[3], GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
 
     // Draw control
