@@ -47,17 +47,6 @@ public:
 
     // END Attachments
 
-    // Buffers
-
-    void disableReadBuffer();
-    void disableDrawBuffer();
-
-    void setReadBuffer(int colorIdx);
-    void setDrawBuffer(int colorIdx);
-    void setDrawBuffers(int numColors);
-
-    // END Buffers
-
     // OpenGL
 
     uint32_t nameGL() const { return _nameGL; }

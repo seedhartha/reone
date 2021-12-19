@@ -115,8 +115,8 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     _geometry2->attachColor(*attachments.colorBuffer2);
     _geometry2->attachDepth(*attachments.depthBuffer2);
     for (int i = 0; i < 2; ++i) {
-        _geometry1->setReadBuffer(i);
-        _geometry2->setDrawBuffer(i);
+        glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
+        glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
         _geometry1->blit(extent[2], extent[3]);
     }
 
