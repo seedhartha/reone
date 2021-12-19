@@ -239,7 +239,7 @@ void Texture::fillTarget(uint32_t target, int level, int width, int height, cons
     }
 }
 
-void Texture::clearPixels(int w, int h, PixelFormat format) {
+void Texture::clear(int w, int h, PixelFormat format) {
     _width = w;
     _height = h;
     _pixelFormat = format;
