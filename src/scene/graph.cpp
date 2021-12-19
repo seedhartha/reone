@@ -365,22 +365,13 @@ void SceneGraph::updateSounds() {
     }
 }
 
-void SceneGraph::draw(bool shadowPass) {
+void SceneGraph::draw() {
     static glm::vec3 white {1.0f, 1.0f, 1.0f};
     static glm::vec3 red {1.0f, 0.0f, 0.0f};
 
     if (!_activeCamera) {
         return;
     }
-
-    // Render only shadow meshes on shadow pass
-    if (shadowPass) {
-        for (auto &mesh : _shadowMeshes) {
-            mesh->drawSingle(true);
-        }
-        return;
-    }
-
     _graphicsContext.setBackFaceCullingEnabled(true);
 
     // Render opaque meshes
@@ -406,6 +397,15 @@ void SceneGraph::draw(bool shadowPass) {
         for (auto &flare : _flareLight->modelNode().light()->flares) {
             _flareLight->drawLensFlare(flare);
         }
+    }
+}
+
+void SceneGraph::drawShadows() {
+    if (!_activeCamera) {
+        return;
+    }
+    for (auto &mesh : _shadowMeshes) {
+        mesh->drawSingle(true);
     }
 }
 

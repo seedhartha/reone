@@ -76,7 +76,8 @@ public:
 
     void update(float dt);
 
-    void draw(bool shadowPass) override;
+    void draw() override;
+    void drawShadows() override;
 
     const std::string &name() const { return _name; }
     const graphics::GraphicsOptions &options() const { return _options; }
