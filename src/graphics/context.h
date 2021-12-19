@@ -60,15 +60,9 @@ public:
 
     // Bindings
 
-    void bindReadFramebuffer(std::shared_ptr<Framebuffer> framebuffer);
-    void bindDrawFramebuffer(std::shared_ptr<Framebuffer> framebuffer);
-
     void bindRenderbuffer(std::shared_ptr<Renderbuffer> renderbuffer);
     void bindTexture(int unit, std::shared_ptr<Texture> texture);
     void bindUniformBuffer(int index, std::shared_ptr<UniformBuffer> buffer);
-
-    void unbindReadFramebuffer();
-    void unbindDrawFramebuffer();
 
     void unbindRenderbuffer();
     void unbindTexture(int unit);
@@ -92,9 +86,6 @@ private:
     std::shared_ptr<ShaderProgram> _shaderProgram;
 
     // Bindings
-
-    std::shared_ptr<Framebuffer> _boundFramebufferRead;
-    std::shared_ptr<Framebuffer> _boundFramebufferDraw;
 
     std::shared_ptr<Renderbuffer> _boundRenderbuffer;
     std::vector<std::shared_ptr<Texture>> _boundTextures;

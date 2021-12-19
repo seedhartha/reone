@@ -69,11 +69,11 @@ void WorldPipeline::init() {
 
     _geometry1 = make_shared<Framebuffer>();
     _geometry1->init();
-    _graphicsContext.bindDrawFramebuffer(_geometry1);
+    glBindFramebuffer(GL_FRAMEBUFFER, _geometry1->nameGL());
     _geometry1->attachColor(*_geometry1Color1, 0);
     _geometry1->attachColor(*_geometry1Color2, 1);
     _geometry1->attachDepth(*_depthRenderbufferMultisample);
-    _graphicsContext.unbindDrawFramebuffer();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Normal geometry framebuffer
 
@@ -87,11 +87,11 @@ void WorldPipeline::init() {
 
     _geometry2 = make_shared<Framebuffer>();
     _geometry2->init();
-    _graphicsContext.bindDrawFramebuffer(_geometry2);
+    glBindFramebuffer(GL_FRAMEBUFFER, _geometry2->nameGL());
     _geometry2->attachColor(*_geometry2Color1, 0);
     _geometry2->attachColor(*_geometry2Color2, 1);
     _geometry2->attachDepth(*_depthRenderbuffer);
-    _graphicsContext.unbindDrawFramebuffer();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Vertical blur framebuffer
 
@@ -101,10 +101,10 @@ void WorldPipeline::init() {
 
     _verticalBlur = make_shared<Framebuffer>();
     _verticalBlur->init();
-    _graphicsContext.bindDrawFramebuffer(_verticalBlur);
+    glBindFramebuffer(GL_FRAMEBUFFER, _verticalBlur->nameGL());
     _verticalBlur->attachColor(*_verticalBlurColor);
     _verticalBlur->attachDepth(*_depthRenderbuffer);
-    _graphicsContext.unbindDrawFramebuffer();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Horizontal blur framebuffer
 
@@ -114,10 +114,10 @@ void WorldPipeline::init() {
 
     _horizontalBlur = make_shared<Framebuffer>();
     _horizontalBlur->init();
-    _graphicsContext.bindDrawFramebuffer(_horizontalBlur);
+    glBindFramebuffer(GL_FRAMEBUFFER, _horizontalBlur->nameGL());
     _horizontalBlur->attachColor(*_horizontalBlurColor);
     _horizontalBlur->attachDepth(*_depthRenderbuffer);
-    _graphicsContext.unbindDrawFramebuffer();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Shadows framebuffer
 
@@ -140,10 +140,10 @@ void WorldPipeline::init() {
 
     _screenshot = make_shared<Framebuffer>();
     _screenshot->init();
-    _graphicsContext.bindDrawFramebuffer(_screenshot);
+    glBindFramebuffer(GL_FRAMEBUFFER, _screenshot->nameGL());
     _screenshot->attachColor(*_screenshotColor);
     _screenshot->attachDepth(*_depthRenderbuffer);
-    _graphicsContext.unbindDrawFramebuffer();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void WorldPipeline::draw() {
@@ -224,7 +224,7 @@ void WorldPipeline::drawShadows() {
     _graphicsContext.setDepthTestEnabled(true);
 
     // Bind shadows framebuffer
-    _graphicsContext.bindDrawFramebuffer(_shadows);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _shadows->nameGL());
     if (_scene->isShadowLightDirectional()) {
         _shadows->attachDepth(*_shadowsDepth);
     } else {
@@ -281,7 +281,7 @@ void WorldPipeline::drawGeometry() {
 
     // Bind multi-sampled geometry framebuffer
 
-    _graphicsContext.bindDrawFramebuffer(_geometry1);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _geometry1->nameGL());
     glDrawBuffers(2, colors);
 
     if (_scene->hasShadowLight()) {
@@ -299,8 +299,8 @@ void WorldPipeline::drawGeometry() {
 
     // Blit multi-sampled geometry framebuffer to normal
 
-    _graphicsContext.bindReadFramebuffer(_geometry1);
-    _graphicsContext.bindDrawFramebuffer(_geometry2);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, _geometry1->nameGL());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _geometry2->nameGL());
     for (int i = 0; i < 2; ++i) {
         glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
         glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
@@ -309,7 +309,7 @@ void WorldPipeline::drawGeometry() {
 
     // Restore context
 
-    _graphicsContext.unbindDrawFramebuffer();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     _graphicsContext.setPolygonMode(oldPolygonMode);
     _graphicsContext.setDepthTestEnabled(oldDepthTest);
 }
@@ -322,7 +322,7 @@ void WorldPipeline::applyHorizontalBlur() {
 
     // Bind horizontal blur framebuffer
 
-    _graphicsContext.bindDrawFramebuffer(_horizontalBlur);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _horizontalBlur->nameGL());
 
     // Bind bright geometry texture
 
@@ -348,7 +348,7 @@ void WorldPipeline::applyHorizontalBlur() {
 
     // Restore context
 
-    _graphicsContext.unbindDrawFramebuffer();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     _graphicsContext.setDepthTestEnabled(oldDepthTest);
 }
 
@@ -360,7 +360,7 @@ void WorldPipeline::applyVerticalBlur() {
 
     // Bind vertical blur framebuffer
 
-    _graphicsContext.bindDrawFramebuffer(_verticalBlur);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _verticalBlur->nameGL());
 
     // Bind diffuse map
 
@@ -386,7 +386,7 @@ void WorldPipeline::applyVerticalBlur() {
 
     // Restore context
 
-    _graphicsContext.unbindDrawFramebuffer();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     _graphicsContext.setDepthTestEnabled(oldDepthTest);
 }
 
@@ -397,7 +397,7 @@ void WorldPipeline::drawResult() {
     if (_takeScreenshot) {
         oldViewport = _graphicsContext.viewport();
         _graphicsContext.setViewport(glm::ivec4(0, 0, kScreenshotResolution, kScreenshotResolution));
-        _graphicsContext.bindDrawFramebuffer(_screenshot);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _screenshot->nameGL());
     }
 
     // Bind geometry texture
@@ -423,7 +423,7 @@ void WorldPipeline::drawResult() {
 
     if (_takeScreenshot) {
         saveScreenshot();
-        _graphicsContext.unbindDrawFramebuffer();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         _graphicsContext.setViewport(move(oldViewport));
         _takeScreenshot = false; // finished taking a screenshot
     }

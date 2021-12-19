@@ -39,8 +39,6 @@ void GraphicsContext::deinit() {
     if (!_inited) {
         return;
     }
-    unbindReadFramebuffer();
-    unbindDrawFramebuffer();
     unbindRenderbuffer();
 
     for (size_t i = 0; i < _boundTextures.size(); ++i) {
@@ -164,22 +162,6 @@ void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<v
     glDisable(GL_SCISSOR_TEST);
 }
 
-void GraphicsContext::bindReadFramebuffer(shared_ptr<Framebuffer> framebuffer) {
-    if (_boundFramebufferRead == framebuffer) {
-        return;
-    }
-    framebuffer->bind(FramebufferTarget::Read);
-    _boundFramebufferRead = move(framebuffer);
-}
-
-void GraphicsContext::bindDrawFramebuffer(shared_ptr<Framebuffer> framebuffer) {
-    if (_boundFramebufferDraw == framebuffer) {
-        return;
-    }
-    framebuffer->bind(FramebufferTarget::Draw);
-    _boundFramebufferDraw = move(framebuffer);
-}
-
 void GraphicsContext::bindRenderbuffer(shared_ptr<Renderbuffer> renderbuffer) {
     if (_boundRenderbuffer == renderbuffer) {
         return;
@@ -212,22 +194,6 @@ void GraphicsContext::bindUniformBuffer(int bindingPoint, shared_ptr<UniformBuff
     buffer->bind(bindingPoint);
     _uniformBufferBindingPoint = bindingPoint;
     _boundUniformBuffers[bindingPoint] = move(buffer);
-}
-
-void GraphicsContext::unbindReadFramebuffer() {
-    if (!_boundFramebufferRead) {
-        return;
-    }
-    _boundFramebufferRead->unbind(FramebufferTarget::Read);
-    _boundFramebufferRead.reset();
-}
-
-void GraphicsContext::unbindDrawFramebuffer() {
-    if (!_boundFramebufferDraw) {
-        return;
-    }
-    _boundFramebufferDraw->unbind(FramebufferTarget::Draw);
-    _boundFramebufferDraw.reset();
 }
 
 void GraphicsContext::unbindRenderbuffer() {

@@ -33,9 +33,6 @@ public:
     void init();
     void deinit();
 
-    void bind(FramebufferTarget target = FramebufferTarget::Draw);
-    void unbind(FramebufferTarget target = FramebufferTarget::Draw);
-
     void blit(int width, int height);
 
     // Attachments
