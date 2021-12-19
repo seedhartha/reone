@@ -215,14 +215,6 @@ void InGameMenu::draw() {
     GUI::draw();
 }
 
-void InGameMenu::draw3D() {
-    GUI *tabGui = getActiveTabGUI();
-    if (tabGui) {
-        tabGui->draw3D();
-    }
-    GUI::draw3D();
-}
-
 void InGameMenu::openEquipment() {
     _equip->update();
     changeTab(InGameMenuTab::Equipment);

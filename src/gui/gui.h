@@ -62,7 +62,6 @@ public:
     virtual bool handle(const SDL_Event &event);
     virtual void update(float dt);
     virtual void draw();
-    virtual void draw3D();
 
     void resetFocus();
 

@@ -27,10 +27,13 @@ void GraphicsContext::init() {
     if (_inited) {
         return;
     }
-    setBlendMode(BlendMode::Default);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
     if (_options.aaSamples > 1) {
         glEnable(GL_MULTISAMPLE);
     }
+    setBlendMode(BlendMode::Default);
     _inited = true;
 }
 
@@ -77,18 +80,6 @@ void GraphicsContext::unbindTexture(int unit) {
     setActiveTextureUnit(unit);
     _textures[unit]->unbind();
     _textures[unit].reset();
-}
-
-void GraphicsContext::setDepthTestEnabled(bool enabled) {
-    if (_depthTest == enabled) {
-        return;
-    }
-    if (enabled) {
-        glEnable(GL_DEPTH_TEST);
-    } else {
-        glDisable(GL_DEPTH_TEST);
-    }
-    _depthTest = enabled;
 }
 
 void GraphicsContext::setBackFaceCullingEnabled(bool enabled) {

@@ -100,12 +100,9 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     // Draw to multi-sampled framebuffer
 
     glViewport(0, 0, extent[2], extent[3]);
-
-    bool oldDepthTest = _graphicsContext.isDepthTestEnabled();
-    _graphicsContext.setDepthTestEnabled(true);
-
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer1.nameGL());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     scene.draw();
 
     // Blit multi-sampled framebuffer to normal
@@ -120,9 +117,8 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
 
     // Draw control
 
-    _graphicsContext.setDepthTestEnabled(oldDepthTest);
     glViewport(0, 0, _options.width, _options.height);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     _graphicsContext.bindTexture(0, attachments.colorBuffer2);
 
     glm::mat4 projection(glm::ortho(
@@ -142,7 +138,10 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
 
     _graphicsContext.useShaderProgram(_shaders.gui());
     _shaders.refreshUniforms();
+
+    glDisable(GL_DEPTH_TEST);
     _meshes.quad().draw();
+    glEnable(GL_DEPTH_TEST);
 }
 
 } // namespace graphics

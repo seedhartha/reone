@@ -348,7 +348,6 @@ void Game::drawGUI() {
         GUI *gui = getScreenGUI();
         if (gui) {
             gui->draw();
-            gui->draw3D();
         }
         break;
     }
