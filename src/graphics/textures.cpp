@@ -41,12 +41,12 @@ namespace graphics {
 void Textures::init() {
     // Initialize default texture
     _default = make_shared<Texture>("default", getTextureProperties(TextureUsage::Default));
-    _default->clearPixels(1, 1, PixelFormat::RGB);
+    _default->clear(1, 1, PixelFormat::RGB);
     _default->init();
 
     // Initialize default cubemap texture
     _defaultCubemap = make_shared<Texture>("default_cubemap", getTextureProperties(TextureUsage::DefaultCubeMap));
-    _defaultCubemap->clearPixels(1, 1, PixelFormat::RGB);
+    _defaultCubemap->clear(1, 1, PixelFormat::RGB);
     _defaultCubemap->init();
 
     bindDefaults();

@@ -43,7 +43,7 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     int h = extent[3];
 
     auto colorBuffer1 = make_shared<Texture>("color1", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
-    colorBuffer1->clearPixels(w, h, PixelFormat::RGBA);
+    colorBuffer1->clear(w, h, PixelFormat::RGBA);
     colorBuffer1->init();
 
     auto depthBuffer1 = make_shared<Renderbuffer>(_options.aaSamples);
@@ -55,7 +55,7 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     framebuffer1->init();
 
     auto colorBuffer2 = make_shared<Texture>("color2", getTextureProperties(TextureUsage::ColorBuffer));
-    colorBuffer2->clearPixels(w, h, PixelFormat::RGBA);
+    colorBuffer2->clear(w, h, PixelFormat::RGBA);
     colorBuffer2->init();
 
     auto depthBuffer2 = make_shared<Renderbuffer>();

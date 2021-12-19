@@ -133,7 +133,7 @@ public:
 
     // Pixels
 
-    void clearPixels(int w, int h, PixelFormat format);
+    void clear(int w, int h, PixelFormat format);
 
     void setPixels(int w, int h, PixelFormat format, std::shared_ptr<ByteArray> pixels);
     void setPixels(int w, int h, PixelFormat format, std::vector<Layer> layers);

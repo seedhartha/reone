@@ -60,11 +60,11 @@ void WorldPipeline::init() {
     // Multi-sampled geometry framebuffer
 
     _geometry1Color1 = make_unique<Texture>("geometry1_color1", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
-    _geometry1Color1->clearPixels(_options.width, _options.height, PixelFormat::RGB);
+    _geometry1Color1->clear(_options.width, _options.height, PixelFormat::RGB);
     _geometry1Color1->init();
 
     _geometry1Color2 = make_unique<Texture>("geometry1_color2", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
-    _geometry1Color2->clearPixels(_options.width, _options.height, PixelFormat::RGB);
+    _geometry1Color2->clear(_options.width, _options.height, PixelFormat::RGB);
     _geometry1Color2->init();
 
     _geometry1 = make_shared<Framebuffer>();
@@ -74,11 +74,11 @@ void WorldPipeline::init() {
     // Normal geometry framebuffer
 
     _geometry2Color1 = make_unique<Texture>("geometry2_color1", getTextureProperties(TextureUsage::ColorBuffer));
-    _geometry2Color1->clearPixels(_options.width, _options.height, PixelFormat::RGB);
+    _geometry2Color1->clear(_options.width, _options.height, PixelFormat::RGB);
     _geometry2Color1->init();
 
     _geometry2Color2 = make_unique<Texture>("geometry2_color2", getTextureProperties(TextureUsage::ColorBuffer));
-    _geometry2Color2->clearPixels(_options.width, _options.height, PixelFormat::RGB);
+    _geometry2Color2->clear(_options.width, _options.height, PixelFormat::RGB);
     _geometry2Color2->init();
 
     _geometry2 = make_shared<Framebuffer>();
@@ -88,7 +88,7 @@ void WorldPipeline::init() {
     // Vertical blur framebuffer
 
     _verticalBlurColor = make_unique<Texture>("verticalblur_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _verticalBlurColor->clearPixels(_options.width, _options.height, PixelFormat::RGB);
+    _verticalBlurColor->clear(_options.width, _options.height, PixelFormat::RGB);
     _verticalBlurColor->init();
 
     _verticalBlur = make_shared<Framebuffer>();
@@ -98,7 +98,7 @@ void WorldPipeline::init() {
     // Horizontal blur framebuffer
 
     _horizontalBlurColor = make_unique<Texture>("horizontalblur_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _horizontalBlurColor->clearPixels(_options.width, _options.height, PixelFormat::RGB);
+    _horizontalBlurColor->clear(_options.width, _options.height, PixelFormat::RGB);
     _horizontalBlurColor->init();
 
     _horizontalBlur = make_shared<Framebuffer>();
@@ -108,7 +108,7 @@ void WorldPipeline::init() {
     // Shadows framebuffer
 
     _shadowsDepth = make_unique<Texture>("shadows_depth", getTextureProperties(TextureUsage::DepthBuffer));
-    _shadowsDepth->clearPixels(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
+    _shadowsDepth->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
     _shadowsDepth->init();
 
     _directionalLightShadows = make_shared<Framebuffer>();
@@ -116,7 +116,7 @@ void WorldPipeline::init() {
     _directionalLightShadows->init();
 
     _cubeShadowsDepth = make_unique<Texture>("cubeshadows_depth", getTextureProperties(TextureUsage::DepthBufferCubeMap));
-    _cubeShadowsDepth->clearPixels(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
+    _cubeShadowsDepth->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
     _cubeShadowsDepth->init();
 
     _pointLightShadows = make_shared<Framebuffer>();
@@ -126,7 +126,7 @@ void WorldPipeline::init() {
     // Screenshot framebuffer
 
     _screenshotColor = make_unique<Texture>("result_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _screenshotColor->clearPixels(kScreenshotResolution, kScreenshotResolution, PixelFormat::RGB);
+    _screenshotColor->clear(kScreenshotResolution, kScreenshotResolution, PixelFormat::RGB);
     _screenshotColor->init();
 
     _screenshot = make_shared<Framebuffer>();
