@@ -282,15 +282,10 @@ void GUI::draw() {
         _rootControl->draw(_rootOffset, _rootControl->textLines());
     }
     for (auto &control : _controls) {
-        control->draw(_controlOffset, control->textLines());
-    }
-}
-
-void GUI::draw3D() {
-    for (auto &control : _controls) {
         if (!control->isVisible()) {
             continue;
         }
+        control->draw(_controlOffset, control->textLines());
         const string &sceneName = control->sceneName();
         if (sceneName.empty()) {
             continue;

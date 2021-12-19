@@ -71,7 +71,6 @@ public:
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;
     void draw() override;
-    void draw3D() override;
 
     void startQuick();
     void startCustom();

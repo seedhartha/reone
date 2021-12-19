@@ -45,11 +45,8 @@ public:
     void bindTexture(int unit, std::shared_ptr<Texture> texture);
     void unbindTexture(int unit);
 
-    bool isDepthTestEnabled() const { return _depthTest; }
-
     BlendMode blendMode() const { return _blendMode; }
 
-    void setDepthTestEnabled(bool enabled);
     void setBackFaceCullingEnabled(bool enabled);
     void setBlendMode(BlendMode mode);
 
@@ -60,10 +57,9 @@ private:
 
     bool _inited {false};
 
-    bool _depthTest {false};
     bool _backFaceCulling {false};
-    int _textureUnit {0};
     BlendMode _blendMode {BlendMode::None};
+    int _textureUnit {0};
 
     std::shared_ptr<ShaderProgram> _shaderProgram;
     std::vector<std::shared_ptr<Texture>> _textures;

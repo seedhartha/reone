@@ -201,12 +201,7 @@ void WorldPipeline::drawShadows() {
         uniformsPrototype.general.shadowLightSpaceMatrices[i] = _shadowLightSpaceMatrices[i];
     }
 
-    // Set viewport
     glViewport(0, 0, _options.shadowResolution, _options.shadowResolution);
-
-    // Enable depth testing
-    bool oldDepthTest = _graphicsContext.isDepthTestEnabled();
-    _graphicsContext.setDepthTestEnabled(true);
 
     // Bind shadows framebuffer
     auto shadows = _scene->isShadowLightDirectional() ? _directionalLightShadows : _pointLightShadows;
@@ -219,7 +214,6 @@ void WorldPipeline::drawShadows() {
     _scene->draw(true);
 
     // Restore context
-    _graphicsContext.setDepthTestEnabled(oldDepthTest);
     glViewport(0, 0, _options.width, _options.height);
 }
 
@@ -247,11 +241,6 @@ void WorldPipeline::drawGeometry() {
             uniforms.general.shadowLightSpaceMatrices[i] = _shadowLightSpaceMatrices[i];
         }
     }
-
-    // Enable depth testing
-
-    bool oldDepthTest = _graphicsContext.isDepthTestEnabled();
-    _graphicsContext.setDepthTestEnabled(true);
 
     // Bind multi-sampled geometry framebuffer
 
@@ -284,15 +273,9 @@ void WorldPipeline::drawGeometry() {
     // Restore context
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    _graphicsContext.setDepthTestEnabled(oldDepthTest);
 }
 
 void WorldPipeline::applyHorizontalBlur() {
-    // Enable depth testing
-
-    bool oldDepthTest = _graphicsContext.isDepthTestEnabled();
-    _graphicsContext.setDepthTestEnabled(true);
-
     // Bind horizontal blur framebuffer
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _horizontalBlur->nameGL());
@@ -322,15 +305,9 @@ void WorldPipeline::applyHorizontalBlur() {
     // Restore context
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    _graphicsContext.setDepthTestEnabled(oldDepthTest);
 }
 
 void WorldPipeline::applyVerticalBlur() {
-    // Enable depth testing
-
-    bool oldDepthTest = _graphicsContext.isDepthTestEnabled();
-    _graphicsContext.setDepthTestEnabled(true);
-
     // Bind vertical blur framebuffer
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _verticalBlur->nameGL());
@@ -360,7 +337,6 @@ void WorldPipeline::applyVerticalBlur() {
     // Restore context
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    _graphicsContext.setDepthTestEnabled(oldDepthTest);
 }
 
 void WorldPipeline::drawResult() {

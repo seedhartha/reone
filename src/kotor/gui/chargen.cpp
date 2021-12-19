@@ -214,11 +214,6 @@ void CharacterGeneration::draw() {
     getSubGUI()->draw();
 }
 
-void CharacterGeneration::draw3D() {
-    GUI::draw3D();
-    getSubGUI()->draw3D();
-}
-
 void CharacterGeneration::openClassSelection() {
     _binding.modelLbl->setVisible(false);
     changeScreen(CharGenScreen::ClassSelection);
