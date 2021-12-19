@@ -144,12 +144,16 @@ LauncherFrame::LauncherFrame() :
     _checkBoxFullscreen = new wxCheckBox(this, WindowID::fullscreen, "Fullscreen", wxDefaultPosition, wxDefaultSize);
     _checkBoxFullscreen->SetValue(_config.fullscreen);
 
+    _checkBoxGrass = new wxCheckBox(this, WindowID::grass, "Grass", wxDefaultPosition, wxDefaultSize);
+    _checkBoxGrass->SetValue(_config.grass);
+
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
     graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(textureQualitySizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(antiAliasingSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(shadowResSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(_checkBoxGrass, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
     // END Graphics
 
@@ -258,6 +262,7 @@ void LauncherFrame::LoadConfiguration() {
         ("width", po::value<int>()->default_value(1024))                                //
         ("height", po::value<int>()->default_value(768))                                //
         ("fullscreen", po::value<bool>()->default_value(false))                         //
+        ("grass", po::value<bool>()->default_value(true))                               //
         ("texquality", po::value<int>()->default_value(0))                              //
         ("aasamples", po::value<int>()->default_value(0))                               //
         ("shadowres", po::value<int>()->default_value(0))                               //
@@ -280,6 +285,7 @@ void LauncherFrame::LoadConfiguration() {
     _config.width = vars["width"].as<int>();
     _config.height = vars["height"].as<int>();
     _config.fullscreen = vars["fullscreen"].as<bool>();
+    _config.grass = vars["grass"].as<bool>();
     _config.texQuality = vars["texquality"].as<int>();
     _config.aasamples = vars["aasamples"].as<int>();
     _config.shadowres = vars["shadowres"].as<int>();
@@ -312,6 +318,7 @@ void LauncherFrame::SaveConfiguration() {
         "width=",
         "height=",
         "fullscreen=",
+        "grass=",
         "texquality=",
         "aasamples=",
         "shadowres=",
@@ -368,6 +375,7 @@ void LauncherFrame::SaveConfiguration() {
     _config.width = stoi(tokens[0]);
     _config.height = stoi(tokens[1]);
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
+    _config.grass = _checkBoxGrass->IsChecked();
     _config.texQuality = _choiceTextureQuality->GetSelection();
     _config.aasamples = _choiceAntiAliasing->GetSelection();
     _config.shadowres = _choiceShadowResolution->GetSelection();
@@ -401,6 +409,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "width=" << _config.width << endl;
     config << "height=" << _config.height << endl;
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
+    config << "grass=" << (_config.grass ? 1 : 0) << endl;
     config << "texquality=" << _config.texQuality << endl;
     config << "aasamples=" << _config.aasamples << endl;
     config << "shadowres=" << _config.shadowres << endl;
