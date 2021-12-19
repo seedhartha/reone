@@ -117,7 +117,7 @@ void DialogCamera::updateSceneNode() {
     }
 
     Collision collision;
-    if (_sceneGraph.testObstacle(target, eye, nullptr, collision)) {
+    if (_sceneGraph.testLineOfSight(target, eye, collision)) {
         eye = collision.intersection;
     }
 

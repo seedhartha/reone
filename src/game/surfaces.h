@@ -44,6 +44,7 @@ public:
     std::set<uint32_t> getGrassSurfaces() const;
     std::set<uint32_t> getWalkableSurfaces() const;
     std::set<uint32_t> getWalkcheckSurfaces() const;
+    std::set<uint32_t> getLineOfSightSurfaces() const;
 
 private:
     resource::TwoDas &_twoDas;

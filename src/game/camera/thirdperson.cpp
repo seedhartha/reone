@@ -170,7 +170,7 @@ void ThirdPersonCamera::updateSceneNode() {
     cameraPos.z += _style.height;
 
     Collision collision;
-    if (_sceneGraph.testObstacle(targetPos, cameraPos, nullptr, collision)) {
+    if (_sceneGraph.testLineOfSight(targetPos, cameraPos, collision)) {
         cameraPos = collision.intersection;
     }
 

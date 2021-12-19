@@ -73,7 +73,8 @@ namespace game {
 
 static constexpr float kDefaultFieldOfView = 75.0f;
 static constexpr float kUpdatePerceptionInterval = 1.0f; // seconds
-static constexpr float kLineOfSightTestHeight = 1.7f;    // TODO: make it appearance-based
+static constexpr float kLineOfSightHeight = 1.7f;        // TODO: make it appearance-based
+static constexpr float kLineOfSightFOV = glm::radians(60.0f);
 
 static constexpr float kMaxCollisionDistance = 8.0f;
 static constexpr float kMaxCollisionDistance2 = kMaxCollisionDistance * kMaxCollisionDistance;
@@ -666,7 +667,7 @@ bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &d
     dest.x += dir.x * speedDt;
     dest.y += dir.y * speedDt;
 
-    if (sceneGraph.testObstacle(origin, dest, creature.get(), collision)) {
+    if (sceneGraph.testWalk(origin, dest, creature.get(), collision)) {
         // Try moving along the surface
         glm::vec2 right(glm::normalize(glm::vec2(glm::cross(up, collision.normal))));
         glm::vec2 newDir(glm::normalize(right * glm::dot(dir, right)));
@@ -675,7 +676,7 @@ bool Area::moveCreature(const shared_ptr<Creature> &creature, const glm::vec2 &d
         dest.x += newDir.x * speedDt;
         dest.y += newDir.y * speedDt;
 
-        if (sceneGraph.testObstacle(origin, dest, creature.get(), collision)) {
+        if (sceneGraph.testWalk(origin, dest, creature.get(), collision)) {
             return false;
         }
     }
@@ -708,18 +709,22 @@ bool Area::moveCreatureTowards(const shared_ptr<Creature> &creature, const glm::
     return moveCreature(creature, dir, run, dt);
 }
 
-bool Area::isInLineOfSight(const Creature &subject, const SpatialObject &target) const {
+bool Area::isObjectSeen(const Creature &subject, const SpatialObject &object) const {
+    if (!subject.isInLineOfSight(object, kLineOfSightFOV)) {
+        return false;
+    }
     auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
-    Collision collision;
 
     glm::vec3 origin(subject.position());
-    origin.z += kLineOfSightTestHeight;
+    origin.z += kLineOfSightHeight;
 
-    glm::vec3 dest(target.position());
-    dest.z += kLineOfSightTestHeight;
+    glm::vec3 dest(object.position());
+    dest.z += kLineOfSightHeight;
 
-    if (sceneGraph.testObstacle(origin, dest, &subject, collision)) {
-        return collision.user == &target;
+    Collision collision;
+    if (sceneGraph.testLineOfSight(origin, dest, collision)) {
+        return collision.user == &object ||
+               subject.getSquareDistanceTo(object) < glm::distance2(origin, collision.intersection);
     }
 
     return true;
@@ -1227,7 +1232,7 @@ void Area::doUpdatePerception() {
                 heard = true;
             }
             if (distance2 <= sightRange2) {
-                seen = isInLineOfSight(*creature, *other);
+                seen = isObjectSeen(*creature, *other);
             }
 
             // Hearing

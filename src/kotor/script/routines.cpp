@@ -665,8 +665,8 @@ void Routines::initForKotOR() {
     add("SWMG_GetPlayer", R_OBJECT, {}, &routine::minigame::getPlayer);
     add("SWMG_GetEnemyCount", R_INT, {}, &routine::minigame::getEnemyCount);
     add("SWMG_GetEnemy", R_OBJECT, {R_INT}, &routine::minigame::getEnemy);
-    add("SWMG_GetObstacleCount", R_INT, {}, &routine::minigame::testObstacleCount);
-    add("SWMG_GetObstacle", R_OBJECT, {R_INT}, &routine::minigame::testObstacle);
+    add("SWMG_GetObstacleCount", R_INT, {}, &routine::minigame::testWalkCount);
+    add("SWMG_GetObstacle", R_OBJECT, {R_INT}, &routine::minigame::testWalk);
     add("SWMG_GetHitPoints", R_INT, {R_OBJECT}, &routine::minigame::getHitPoints);
     add("SWMG_GetMaxHitPoints", R_INT, {R_OBJECT}, &routine::minigame::getMaxHitPoints);
     add("SWMG_SetMaxHitPoints", R_VOID, {R_OBJECT, R_INT}, &routine::minigame::setMaxHitPoints);
@@ -1450,8 +1450,8 @@ void Routines::initForTSL() {
     add("SWMG_GetPlayer", R_OBJECT, {}, &routine::minigame::getPlayer);
     add("SWMG_GetEnemyCount", R_INT, {}, &routine::minigame::getEnemyCount);
     add("SWMG_GetEnemy", R_OBJECT, {R_INT}, &routine::minigame::getEnemy);
-    add("SWMG_GetObstacleCount", R_INT, {}, &routine::minigame::testObstacleCount);
-    add("SWMG_GetObstacle", R_OBJECT, {R_INT}, &routine::minigame::testObstacle);
+    add("SWMG_GetObstacleCount", R_INT, {}, &routine::minigame::testWalkCount);
+    add("SWMG_GetObstacle", R_OBJECT, {R_INT}, &routine::minigame::testWalk);
     add("SWMG_GetHitPoints", R_INT, {R_OBJECT}, &routine::minigame::getHitPoints);
     add("SWMG_GetMaxHitPoints", R_INT, {R_OBJECT}, &routine::minigame::getMaxHitPoints);
     add("SWMG_SetMaxHitPoints", R_VOID, {R_OBJECT, R_INT}, &routine::minigame::setMaxHitPoints);

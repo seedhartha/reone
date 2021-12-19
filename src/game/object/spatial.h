@@ -56,6 +56,7 @@ public:
 
     virtual bool isSelectable() const;
     bool isOpen() const { return _open; }
+    bool isInLineOfSight(const SpatialObject &other, float fov) const;
 
     virtual glm::vec3 getSelectablePosition() const;
     float getFacing() const { return glm::eulerAngles(_orientation).z; }

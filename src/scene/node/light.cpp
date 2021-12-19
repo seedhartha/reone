@@ -70,22 +70,24 @@ void LightSceneNode::update(float dt) {
     }
 }
 
-void LightSceneNode::drawLensFlares(const ModelNode::LensFlare &flare) {
+void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
-    if (!camera)
+    if (!camera) {
         return;
-
+    }
     _graphicsContext.bindTexture(TextureUnits::diffuseMap, flare.texture);
 
     glm::vec4 lightPos(_absTransform[3]);
     glm::vec4 lightPosNdc(camera->projection() * camera->view() * lightPos);
-
+    if (lightPosNdc.z < 0.0f) {
+        return;
+    }
     float w = static_cast<float>(_sceneGraph.options().width);
     float h = static_cast<float>(_sceneGraph.options().height);
 
     glm::vec3 lightPosScreen(glm::vec3(lightPosNdc) / lightPosNdc.w);
-    lightPosScreen *= 0.5f;
-    lightPosScreen += 0.5f;
+    lightPosScreen += 1.0f;
+    lightPosScreen /= 2.0f;
     lightPosScreen *= glm::vec3(w, h, 1.0f);
 
     float aspect = flare.texture->width() / static_cast<float>(flare.texture->height());

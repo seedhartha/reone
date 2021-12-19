@@ -45,8 +45,11 @@ namespace scene {
 static constexpr float kElevationTestZ = 1024.0f;
 static constexpr int kMaxSoundCount = 4;
 
-static constexpr float kMaxCollisionDistance = 8.0f;
-static constexpr float kMaxCollisionDistance2 = kMaxCollisionDistance * kMaxCollisionDistance;
+static constexpr float kMaxCollisionDistanceWalk = 8.0f;
+static constexpr float kMaxCollisionDistanceWalk2 = kMaxCollisionDistanceWalk * kMaxCollisionDistanceWalk;
+
+static constexpr float kMaxCollisionDistanceLineOfSight = 16.0f;
+static constexpr float kMaxCollisionDistanceLineOfSight2 = kMaxCollisionDistanceLineOfSight * kMaxCollisionDistanceLineOfSight;
 
 void SceneGraph::clear() {
     _modelRoots.clear();
@@ -123,6 +126,26 @@ void SceneGraph::cullRoots() {
 }
 
 void SceneGraph::updateLighting() {
+    _shadowLight = nullptr;
+    _flareLight = nullptr;
+
+    // Update flare light
+    for (auto &light : _lights) {
+        float radius = light->modelNode().light()->flareRadius;
+        if (_activeCamera->getSquareDistanceTo(*light) > radius * radius) {
+            continue;
+        }
+        if (light->modelNode().light()->flares.empty()) {
+            continue;
+        }
+        Collision collision;
+        if (testLineOfSight(_activeCamera->getOrigin(), light->getOrigin(), collision)) {
+            continue;
+        }
+        _flareLight = light;
+        break;
+    }
+
     if (!_lightingRefNode) {
         return;
     }
@@ -159,7 +182,6 @@ void SceneGraph::updateLighting() {
         }
     }
     // Update shadow light
-    _shadowLight = nullptr;
     for (auto &light : _closestLights) {
         if (light->modelNode().light()->shadow) {
             _shadowLight = light;
@@ -379,16 +401,10 @@ void SceneGraph::draw(bool shadowPass) {
         nodeLeaf.first->drawElements(nodeLeaf.second, count);
     }
 
-    // Render lens flares
-    for (auto &light : _lights) {
-        // Ignore lights that are too far away or outside of camera frustum
-        float flareRadius = light->modelNode().light()->flareRadius;
-        if (_activeCamera->getSquareDistanceTo(*light) > flareRadius * flareRadius ||
-            !_activeCamera->isInFrustum(light->absoluteTransform()[3]))
-            continue;
-
-        for (auto &flare : light->modelNode().light()->flares) {
-            light->drawLensFlares(flare);
+    // Render lens flare
+    if (_flareLight) {
+        for (auto &flare : _flareLight->modelNode().light()->flares) {
+            _flareLight->drawLensFlare(flare);
         }
     }
 }
@@ -458,7 +474,7 @@ bool SceneGraph::testElevation(const glm::vec2 &position, Collision &outCollisio
         }
         if (!root->walkmesh().isAreaWalkmesh()) {
             float distance2 = root->getSquareDistanceTo2D(position);
-            if (distance2 > kMaxCollisionDistance2) {
+            if (distance2 > kMaxCollisionDistanceWalk2) {
                 continue;
             }
         }
@@ -481,29 +497,59 @@ bool SceneGraph::testElevation(const glm::vec2 &position, Collision &outCollisio
     return false;
 }
 
-bool SceneGraph::testObstacle(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const {
+bool SceneGraph::testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest, Collision &outCollision) const {
     glm::vec3 originToDest(dest - origin);
     glm::vec3 dir(glm::normalize(originToDest));
     float maxDistance = glm::length(originToDest);
     float minDistance = numeric_limits<float>::max();
 
     for (auto &root : _walkmeshRoots) {
-        if (root->user() == excludeUser) {
-            continue;
-        }
         if (!root->isEnabled()) {
             continue;
         }
         if (!root->walkmesh().isAreaWalkmesh()) {
             float distance2 = root->getSquareDistanceTo(origin);
-            if (distance2 > kMaxCollisionDistance2) {
+            if (distance2 > kMaxCollisionDistanceLineOfSight2) {
                 continue;
             }
         }
         glm::vec3 objSpaceOrigin(root->absoluteTransformInverse() * glm::vec4(origin, 1.0f));
         glm::vec3 objSpaceDir(root->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
         float distance = 0.0f;
-        auto face = root->walkmesh().raycast(_walkcheckSurfaces, objSpaceOrigin, objSpaceDir, 2.0f * kElevationTestZ, distance);
+        auto face = root->walkmesh().raycast(_lineOfSightSurfaces, objSpaceOrigin, objSpaceDir, kMaxCollisionDistanceLineOfSight, distance);
+        if (!face || distance > maxDistance || distance > minDistance) {
+            continue;
+        }
+        outCollision.user = root->user();
+        outCollision.intersection = origin + distance * dir;
+        outCollision.normal = root->absoluteTransform() * glm::vec4(face->normal, 0.0f);
+        outCollision.material = face->material;
+        minDistance = distance;
+    }
+
+    return minDistance != numeric_limits<float>::max();
+}
+
+bool SceneGraph::testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const IUser *excludeUser, Collision &outCollision) const {
+    glm::vec3 originToDest(dest - origin);
+    glm::vec3 dir(glm::normalize(originToDest));
+    float maxDistance = glm::length(originToDest);
+    float minDistance = numeric_limits<float>::max();
+
+    for (auto &root : _walkmeshRoots) {
+        if (!root->isEnabled() || root->user() == excludeUser) {
+            continue;
+        }
+        if (!root->walkmesh().isAreaWalkmesh()) {
+            float distance2 = root->getSquareDistanceTo(origin);
+            if (distance2 > kMaxCollisionDistanceWalk2) {
+                continue;
+            }
+        }
+        glm::vec3 objSpaceOrigin(root->absoluteTransformInverse() * glm::vec4(origin, 1.0f));
+        glm::vec3 objSpaceDir(root->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
+        float distance = 0.0f;
+        auto face = root->walkmesh().raycast(_walkcheckSurfaces, objSpaceOrigin, objSpaceDir, kMaxCollisionDistanceWalk, distance);
         if (!face || distance > maxDistance || distance > minDistance) {
             continue;
         }
@@ -532,14 +578,14 @@ shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) 
             continue;
         }
         // Distance to object must not exceed maximum collision distance
-        if (model->getSquareDistanceTo(start) > kMaxCollisionDistance2) {
+        if (model->getSquareDistanceTo(start) > kMaxCollisionDistanceLineOfSight2) {
             continue;
         }
         // Test object AABB (object space)
         glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
         glm::vec3 objSpaceDir(model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
         float distance;
-        if (model->aabb().raycast(objSpaceStart, objSpaceDir, kMaxCollisionDistance, distance)) {
+        if (model->aabb().raycast(objSpaceStart, objSpaceDir, kMaxCollisionDistanceLineOfSight, distance)) {
             distances.push_back(make_pair(model, distance));
         }
     }
