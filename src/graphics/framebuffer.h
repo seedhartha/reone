@@ -29,23 +29,45 @@ class Texture;
 
 class Framebuffer : boost::noncopyable {
 public:
-    Framebuffer(std::shared_ptr<IAttachment> depth) :
-        _depth(std::move(depth)) {
-    }
-
-    Framebuffer(std::shared_ptr<IAttachment> color, std::shared_ptr<IAttachment> depth) :
-        _color1(std::move(color)),
-        _depth(std::move(depth)) {
-    }
-
-    Framebuffer(std::shared_ptr<IAttachment> color1, std::shared_ptr<IAttachment> color2, std::shared_ptr<IAttachment> depth) :
-        _color1(std::move(color1)),
-        _color2(std::move(color2)),
-        _depth(std::move(depth)) {
-    }
+    enum class Attachment {
+        Color1,
+        Color2,
+        Depth,
+        DepthStencil
+    };
 
     ~Framebuffer() {
         deinit();
+    }
+
+    void attachDepth(std::shared_ptr<IAttachment> depth) {
+        _depth = std::move(depth);
+    }
+
+    void attachDepthStencil(std::shared_ptr<IAttachment> depthStencil) {
+        _depthStencil = std::move(depthStencil);
+    }
+
+    void attachColorDepth(std::shared_ptr<IAttachment> color, std::shared_ptr<IAttachment> depth) {
+        _color1 = std::move(color);
+        _depth = std::move(depth);
+    }
+
+    void attachColorDepthStencil(std::shared_ptr<IAttachment> color, std::shared_ptr<IAttachment> depthStencil) {
+        _color1 = std::move(color);
+        _depthStencil = std::move(depthStencil);
+    }
+
+    void attachColorsDepth(std::shared_ptr<IAttachment> color1, std::shared_ptr<IAttachment> color2, std::shared_ptr<IAttachment> depth) {
+        _color1 = std::move(color1);
+        _color2 = std::move(color2);
+        _depth = std::move(depth);
+    }
+
+    void attachColorsDepthStencil(std::shared_ptr<IAttachment> color1, std::shared_ptr<IAttachment> color2, std::shared_ptr<IAttachment> depthStencil) {
+        _color1 = std::move(color1);
+        _color2 = std::move(color2);
+        _depthStencil = std::move(depthStencil);
     }
 
     void init();
@@ -65,13 +87,12 @@ private:
     std::shared_ptr<IAttachment> _color1;
     std::shared_ptr<IAttachment> _color2;
     std::shared_ptr<IAttachment> _depth;
+    std::shared_ptr<IAttachment> _depthStencil;
 
     void configure();
 
-    void attachColor(const Texture &texture, int index = 0) const;
-    void attachColor(const Renderbuffer &renderbuffer, int index = 0) const;
-    void attachDepth(const Texture &texture) const;
-    void attachDepth(const Renderbuffer &renderbuffer) const;
+    void attachTexture(const Texture &texture, Attachment attachment) const;
+    void attachRenderbuffer(const Renderbuffer &renderbuffer, Attachment attachment) const;
 
     // OpenGL
 

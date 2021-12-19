@@ -50,7 +50,8 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     depthBuffer1->configure(w, h, PixelFormat::Depth);
     depthBuffer1->init();
 
-    auto framebuffer1 = make_unique<Framebuffer>(colorBuffer1, depthBuffer1);
+    auto framebuffer1 = make_unique<Framebuffer>();
+    framebuffer1->attachColorDepth(colorBuffer1, depthBuffer1);
     framebuffer1->init();
 
     auto colorBuffer2 = make_shared<Texture>("color2", getTextureProperties(TextureUsage::ColorBuffer));
@@ -61,7 +62,8 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     depthBuffer2->configure(w, h, PixelFormat::Depth);
     depthBuffer2->init();
 
-    auto framebuffer2 = make_unique<Framebuffer>(colorBuffer2, depthBuffer2);
+    auto framebuffer2 = make_unique<Framebuffer>();
+    framebuffer2->attachColorDepth(colorBuffer2, depthBuffer2);
     framebuffer2->init();
 
     Attachments attachments;

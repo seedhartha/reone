@@ -48,51 +48,61 @@ void Framebuffer::deinit() {
 void Framebuffer::configure() {
     if (_color1) {
         if (_color1->isTexture()) {
-            attachColor(static_cast<Texture &>(*_color1), 0);
+            attachTexture(static_cast<Texture &>(*_color1), Attachment::Color1);
         } else if (_color1->isRenderbuffer()) {
-            attachColor(static_cast<Renderbuffer &>(*_color1), 0);
+            attachRenderbuffer(static_cast<Renderbuffer &>(*_color1), Attachment::Color1);
         }
     }
     if (_color2) {
         if (_color2->isTexture()) {
-            attachColor(static_cast<Texture &>(*_color2), 1);
+            attachTexture(static_cast<Texture &>(*_color2), Attachment::Color2);
         } else if (_color2->isRenderbuffer()) {
-            attachColor(static_cast<Renderbuffer &>(*_color2), 1);
+            attachRenderbuffer(static_cast<Renderbuffer &>(*_color2), Attachment::Color2);
         }
     }
     if (_depth) {
         if (_depth->isTexture()) {
-            attachDepth(static_cast<Texture &>(*_depth));
+            attachTexture(static_cast<Texture &>(*_depth), Attachment::Depth);
         } else if (_depth->isRenderbuffer()) {
-            attachDepth(static_cast<Renderbuffer &>(*_depth));
+            attachRenderbuffer(static_cast<Renderbuffer &>(*_depth), Attachment::Depth);
+        }
+    }
+    if (_depthStencil) {
+        if (_depthStencil->isTexture()) {
+            attachTexture(static_cast<Texture &>(*_depthStencil), Attachment::DepthStencil);
+        } else if (_depth->isRenderbuffer()) {
+            attachRenderbuffer(static_cast<Renderbuffer &>(*_depthStencil), Attachment::DepthStencil);
         }
     }
 }
 
-void Framebuffer::attachColor(const Texture &texture, int index) const {
+static GLenum getAttachmentGL(Framebuffer::Attachment attachment) {
+    switch (attachment) {
+    case Framebuffer::Attachment::Color1:
+        return GL_COLOR_ATTACHMENT0;
+    case Framebuffer::Attachment::Color2:
+        return GL_COLOR_ATTACHMENT1;
+    case Framebuffer::Attachment::Depth:
+        return GL_DEPTH_ATTACHMENT;
+    case Framebuffer::Attachment::DepthStencil:
+        return GL_DEPTH_STENCIL_ATTACHMENT;
+    }
+    throw invalid_argument("Unsupported framebuffer attachment: " + to_string(static_cast<int>(attachment)));
+}
+
+void Framebuffer::attachTexture(const Texture &texture, Attachment attachment) const {
+    auto attachmentGL = getAttachmentGL(attachment);
     if (texture.isCubeMap()) {
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, texture.nameGL(), 0);
+        glFramebufferTexture(GL_FRAMEBUFFER, attachmentGL, texture.nameGL(), 0);
     } else {
         GLenum target = texture.isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, target, texture.nameGL(), 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentGL, target, texture.nameGL(), 0);
     }
 }
 
-void Framebuffer::attachColor(const Renderbuffer &renderbuffer, int index) const {
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_RENDERBUFFER, renderbuffer.nameGL());
-}
-
-void Framebuffer::attachDepth(const Texture &texture) const {
-    if (texture.isCubeMap()) {
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture.nameGL(), 0);
-    } else {
-        GLenum target = texture.isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target, texture.nameGL(), 0);
-    }
-}
-
-void Framebuffer::attachDepth(const Renderbuffer &renderbuffer) const {
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer.nameGL());
+void Framebuffer::attachRenderbuffer(const Renderbuffer &renderbuffer, Attachment attachment) const {
+    auto attachmentGL = getAttachmentGL(attachment);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachmentGL, GL_RENDERBUFFER, renderbuffer.nameGL());
 }
 
 } // namespace graphics
