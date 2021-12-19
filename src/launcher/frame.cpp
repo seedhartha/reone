@@ -141,10 +141,10 @@ LauncherFrame::LauncherFrame() :
 
     // END Shadow Map Resolution
 
-    _checkBoxFullscreen = new wxCheckBox(this, WindowID::fullscreen, "Fullscreen", wxDefaultPosition, wxDefaultSize);
+    _checkBoxFullscreen = new wxCheckBox(this, WindowID::fullscreen, "Enable Fullscreen", wxDefaultPosition, wxDefaultSize);
     _checkBoxFullscreen->SetValue(_config.fullscreen);
 
-    _checkBoxGrass = new wxCheckBox(this, WindowID::grass, "Grass", wxDefaultPosition, wxDefaultSize);
+    _checkBoxGrass = new wxCheckBox(this, WindowID::grass, "Enable Grass", wxDefaultPosition, wxDefaultSize);
     _checkBoxGrass->SetValue(_config.grass);
 
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
@@ -235,23 +235,20 @@ LauncherFrame::LauncherFrame() :
 
     // END Logging
 
-    auto topSizer = new wxBoxSizer(wxVERTICAL);
-    topSizer->Add(graphicsSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    topSizer->Add(audioSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    auto topSizer = new wxBoxSizer(wxHORIZONTAL);
+    topSizer->Add(graphicsSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    topSizer->Add(audioSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    topSizer->Add(loggingSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
 
-    auto topSizer2 = new wxBoxSizer(wxHORIZONTAL);
-    topSizer2->Add(topSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
-    topSizer2->Add(loggingSizer, wxSizerFlags(1).Expand().Border(wxALL, 3));
+    auto topSizer2 = new wxBoxSizer(wxVERTICAL);
+    topSizer2->SetMinSize(640, 100);
+    topSizer2->Add(gameSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    topSizer2->Add(_checkBoxDev, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    topSizer2->Add(topSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    topSizer2->Add(new wxButton(this, WindowID::launch, "Launch"), wxSizerFlags(0).Expand().Border(wxALL, 3));
+    topSizer2->Add(new wxButton(this, WindowID::saveConfig, "Save Configuration"), wxSizerFlags(0).Expand().Border(wxALL, 3));
 
-    auto topSizer3 = new wxBoxSizer(wxVERTICAL);
-    topSizer3->SetMinSize(640, 100);
-    topSizer3->Add(gameSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    topSizer3->Add(_checkBoxDev, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    topSizer3->Add(topSizer2, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    topSizer3->Add(new wxButton(this, WindowID::launch, "Launch"), wxSizerFlags(0).Expand().Border(wxALL, 3));
-    topSizer3->Add(new wxButton(this, WindowID::saveConfig, "Save Configuration"), wxSizerFlags(0).Expand().Border(wxALL, 3));
-
-    SetSizerAndFit(topSizer3);
+    SetSizerAndFit(topSizer2);
 }
 
 void LauncherFrame::LoadConfiguration() {
