@@ -189,16 +189,15 @@ void WorldPipeline::drawShadows() {
         return;
     }
 
-    // Set uniforms prototype
+    // Set global uniforms
     glm::vec4 lightPosition(
         _scene->shadowLightPosition(),
         _scene->isShadowLightDirectional() ? 0.0f : 1.0f);
-    auto &uniformsPrototype = _scene->uniformsPrototype();
-    uniformsPrototype.general.reset();
-    uniformsPrototype.general.featureMask = UniformsFeatureFlags::shadows;
-    uniformsPrototype.general.shadowLightPosition = move(lightPosition);
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.shadowLightPosition = move(lightPosition);
     for (int i = 0; i < kNumCubeFaces; ++i) {
-        uniformsPrototype.general.shadowLightSpaceMatrices[i] = _shadowLightSpaceMatrices[i];
+        uniforms.general.shadowLightSpaceMatrices[i] = _shadowLightSpaceMatrices[i];
     }
 
     glViewport(0, 0, _options.shadowResolution, _options.shadowResolution);
@@ -220,14 +219,17 @@ void WorldPipeline::drawShadows() {
 void WorldPipeline::drawGeometry() {
     static constexpr GLenum colors[] {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
 
-    // Set uniforms prototype
+    // Set global uniforms
 
-    auto &uniforms = _scene->uniformsPrototype();
-    uniforms.general.reset();
-    uniforms.general.featureMask = _scene->hasShadowLight() ? UniformsFeatureFlags::shadowlight : 0;
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
     uniforms.general.projection = _scene->cameraProjection();
     uniforms.general.view = _scene->cameraView();
     uniforms.general.cameraPosition = glm::vec4(_scene->cameraPosition(), 1.0f);
+    uniforms.general.worldAmbientColor = glm::vec4(_scene->ambientLightColor(), 1.0f);
+    uniforms.general.fogNear = _scene->fogNear();
+    uniforms.general.fogFar = _scene->fogFar();
+    uniforms.general.fogColor = glm::vec4(_scene->fogColor(), 1.0f);
 
     if (_scene->hasShadowLight()) {
         glm::vec4 lightPosition(
@@ -242,7 +244,7 @@ void WorldPipeline::drawGeometry() {
         }
     }
 
-    // Bind multi-sampled geometry framebuffer
+    // Bind multi-sampled framebuffer
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _geometry1->nameGL());
     glDrawBuffers(2, colors);
@@ -260,7 +262,7 @@ void WorldPipeline::drawGeometry() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     _scene->draw();
 
-    // Blit multi-sampled geometry framebuffer to normal
+    // Blit multi-sampled framebuffer to standard framebuffer
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, _geometry1->nameGL());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _geometry2->nameGL());
@@ -290,7 +292,8 @@ void WorldPipeline::applyHorizontalBlur() {
     float h = static_cast<float>(_options.height);
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general.reset();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::blur;
     uniforms.general.blurResolution = glm::vec2(w, h);
     uniforms.general.blurDirection = glm::vec2(1.0f, 0.0f);
@@ -322,7 +325,8 @@ void WorldPipeline::applyVerticalBlur() {
     float h = static_cast<float>(_options.height);
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general.reset();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::blur;
     uniforms.general.blurResolution = glm::vec2(w, h);
     uniforms.general.blurDirection = glm::vec2(0.0f, 1.0f);
@@ -358,7 +362,8 @@ void WorldPipeline::drawResult() {
     // Set shader uniforms
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general.reset();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
 
     // Draw a quad
 

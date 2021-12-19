@@ -82,7 +82,6 @@ public:
     const std::string &name() const { return _name; }
     const graphics::GraphicsOptions &options() const { return _options; }
     std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
-    graphics::Uniforms &uniformsPrototype() override { return _uniformsPrototype; }
 
     void setUpdateRoots(bool update) { _updateRoots = update; }
     void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
@@ -122,13 +121,28 @@ public:
         int count = graphics::kMaxLights,
         std::function<bool(const LightSceneNode &)> predicate = [](auto &light) { return true; }) const;
 
-    const glm::vec3 &ambientLightColor() const { return _ambientLightColor; }
+    const glm::vec3 &ambientLightColor() const override { return _ambientLightColor; }
     const std::vector<LightSceneNode *> closestLights() const { return _closestLights; }
 
     void setAmbientLightColor(glm::vec3 color) { _ambientLightColor = std::move(color); }
     void setLightingRefNode(std::shared_ptr<SceneNode> node) { _lightingRefNode = std::move(node); }
 
     // END Lighting
+
+    // Fog
+
+    bool isFogEnabled() const { return _fogEnabled; }
+
+    float fogNear() const override { return _fogNear; }
+    float fogFar() const override { return _fogFar; }
+    const glm::vec3 &fogColor() const override { return _fogColor; }
+
+    void setFogEnabled(bool enabled) { _fogEnabled = enabled; }
+    void setFogNear(float near) { _fogNear = near; }
+    void setFogFar(float far) { _fogFar = far; }
+    void setFogColor(glm::vec3 color) { _fogColor = std::move(color); }
+
+    // END Fog
 
     // Shadows
 
@@ -139,21 +153,6 @@ public:
     float shadowFadeFactor() const override { return _shadowLight->fadeFactor(); }
 
     // END Shadows
-
-    // Fog
-
-    bool isFogEnabled() const { return _fogEnabled; }
-
-    float fogNear() const { return _fogNear; }
-    float fogFar() const { return _fogFar; }
-    const glm::vec3 &fogColor() const { return _fogColor; }
-
-    void setFogEnabled(bool enabled) { _fogEnabled = enabled; }
-    void setFogNear(float near) { _fogNear = near; }
-    void setFogFar(float far) { _fogFar = far; }
-    void setFogColor(glm::vec3 color) { _fogColor = std::move(color); }
-
-    // END Fog
 
     // Collision detection and object picking
 
@@ -199,7 +198,6 @@ private:
     std::shared_ptr<CameraSceneNode> _activeCamera;
 
     bool _updateRoots {true};
-    graphics::Uniforms _uniformsPrototype;
 
     // Services
 

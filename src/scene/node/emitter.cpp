@@ -259,7 +259,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs, int count) {
     }
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = _sceneGraph.uniformsPrototype().general;
+    uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::particles;
     uniforms.particles.gridSize = emitter->gridSize;
     uniforms.particles.render = static_cast<int>(emitter->renderMode);

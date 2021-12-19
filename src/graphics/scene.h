@@ -30,7 +30,7 @@ public:
     virtual void draw() = 0;
     virtual void drawShadows() = 0;
 
-    virtual Uniforms &uniformsPrototype() = 0;
+    virtual const glm::vec3 &ambientLightColor() const = 0;
 
     // Camera
 
@@ -41,6 +41,14 @@ public:
     virtual const glm::mat4 &cameraView() const = 0;
 
     // END Camera
+
+    // Fog
+
+    virtual float fogNear() const = 0;
+    virtual float fogFar() const = 0;
+    virtual const glm::vec3 &fogColor() const = 0;
+
+    // END Fog
 
     // Shadows
 
