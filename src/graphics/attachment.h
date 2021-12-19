@@ -17,53 +17,16 @@
 
 #pragma once
 
-#include "attachment.h"
-#include "types.h"
-
 namespace reone {
 
 namespace graphics {
 
-class Renderbuffer : public IAttachment, boost::noncopyable {
+class IAttachment {
 public:
-    Renderbuffer(int numSamples = 1) :
-        _numSamples(numSamples) {
-    }
+    virtual ~IAttachment() = default;
 
-    ~Renderbuffer() { deinit(); }
-
-    void init();
-    void deinit();
-
-    void bind();
-    void unbind();
-
-    void configure(int width, int height, PixelFormat format);
-    void refresh();
-
-    bool isTexture() const override { return false; }
-    bool isRenderbuffer() const override { return true; }
-
-    // OpenGL
-
-    uint32_t nameGL() const { return _nameGL; }
-
-    // END OpenGL
-
-private:
-    int _numSamples;
-
-    bool _inited {false};
-
-    int _width {0};
-    int _height {0};
-    PixelFormat _pixelFormat {PixelFormat::RGB};
-
-    // OpenGL
-
-    uint32_t _nameGL {0};
-
-    // END OpenGL
+    virtual bool isTexture() const = 0;
+    virtual bool isRenderbuffer() const = 0;
 };
 
 } // namespace graphics

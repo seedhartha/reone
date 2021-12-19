@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "attachment.h"
 #include "types.h"
 
 namespace reone {
@@ -28,28 +29,49 @@ class Texture;
 
 class Framebuffer : boost::noncopyable {
 public:
-    ~Framebuffer() { deinit(); }
+    Framebuffer(std::shared_ptr<IAttachment> depth) :
+        _depth(std::move(depth)) {
+    }
+
+    Framebuffer(std::shared_ptr<IAttachment> color, std::shared_ptr<IAttachment> depth) :
+        _color1(std::move(color)),
+        _depth(std::move(depth)) {
+    }
+
+    Framebuffer(std::shared_ptr<IAttachment> color1, std::shared_ptr<IAttachment> color2, std::shared_ptr<IAttachment> depth) :
+        _color1(std::move(color1)),
+        _color2(std::move(color2)),
+        _depth(std::move(depth)) {
+    }
+
+    ~Framebuffer() {
+        deinit();
+    }
 
     void init();
     void deinit();
 
-    // Attachments
-
-    void attachColor(const Texture &texture, int index = 0, int mip = 0) const;
-    void attachColor(const Renderbuffer &renderbuffer, int index = 0) const;
-    void attachDepth(const Texture &texture) const;
-    void attachDepth(const Renderbuffer &renderbuffer) const;
-
-    // END Attachments
-
     // OpenGL
 
-    uint32_t nameGL() const { return _nameGL; }
+    uint32_t nameGL() const {
+        return _nameGL;
+    }
 
     // END OpenGL
 
 private:
     bool _inited {false};
+
+    std::shared_ptr<IAttachment> _color1;
+    std::shared_ptr<IAttachment> _color2;
+    std::shared_ptr<IAttachment> _depth;
+
+    void configure();
+
+    void attachColor(const Texture &texture, int index = 0) const;
+    void attachColor(const Renderbuffer &renderbuffer, int index = 0) const;
+    void attachDepth(const Texture &texture) const;
+    void attachDepth(const Renderbuffer &renderbuffer) const;
 
     // OpenGL
 
