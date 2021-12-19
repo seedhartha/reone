@@ -147,7 +147,7 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs, int count) {
     _graphicsContext.bindTexture(TextureUnits::diffuseMap, _texture);
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = _sceneGraph.uniformsPrototype().general;
+    uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::grass;
     if (_aabbNode->mesh()->lightmap) {
         _graphicsContext.bindTexture(TextureUnits::lightmap, _aabbNode->mesh()->lightmap);

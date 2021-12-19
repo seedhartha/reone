@@ -67,7 +67,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
     _graphicsContext.bindTexture(0, _texture);
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general.reset();
+    uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::text;
     uniforms.general.projection = _window.getOrthoProjection();
     uniforms.general.color = glm::vec4(color, 1.0f);

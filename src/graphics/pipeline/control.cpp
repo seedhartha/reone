@@ -89,13 +89,14 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     auto &framebuffer1 = *attachments.framebuffer1;
     auto &framebuffer2 = *attachments.framebuffer2;
 
-    // Set uniforms prototype
+    // Set global uniforms
 
-    auto &uniformsPrototype = scene.uniformsPrototype();
-    uniformsPrototype.general.reset();
-    uniformsPrototype.general.projection = scene.cameraProjection();
-    uniformsPrototype.general.view = scene.cameraView();
-    uniformsPrototype.general.cameraPosition = glm::vec4(scene.cameraPosition(), 1.0f);
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.projection = scene.cameraProjection();
+    uniforms.general.view = scene.cameraView();
+    uniforms.general.cameraPosition = glm::vec4(scene.cameraPosition(), 1.0f);
+    uniforms.general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
 
     // Draw to multi-sampled framebuffer
 
@@ -105,7 +106,7 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
 
     scene.draw();
 
-    // Blit multi-sampled framebuffer to normal
+    // Blit multi-sampled framebuffer to standard framebuffer
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer1.nameGL());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer2.nameGL());
@@ -131,8 +132,8 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     transform = glm::translate(transform, glm::vec3(extent[0] + offset.x, extent[1] + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(extent[2], extent[3], 1.0f));
 
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.reset();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
     uniforms.general.projection = move(projection);
     uniforms.general.model = move(transform);
 

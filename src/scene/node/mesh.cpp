@@ -248,10 +248,9 @@ void MeshSceneNode::draw() {
     // Setup shaders
 
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = _sceneGraph.uniformsPrototype().general;
+    uniforms.general.resetLocals();
     uniforms.general.model = _absTransform;
     uniforms.general.alpha = _alpha;
-    uniforms.general.worldAmbientColor = glm::vec4(_sceneGraph.ambientLightColor(), 1.0f);
 
     auto program = _nodeTextures.diffuse ? _shaders.blinnPhong() : _shaders.blinnPhongDiffuseless();
 
@@ -287,7 +286,7 @@ void MeshSceneNode::draw() {
     }
 
     bool receivesShadows = isReceivingShadows(_model, *this);
-    if (receivesShadows) {
+    if (receivesShadows && _sceneGraph.hasShadowLight()) {
         uniforms.general.featureMask |= UniformsFeatureFlags::shadows;
     }
 
@@ -353,9 +352,6 @@ void MeshSceneNode::draw() {
 
     if (_sceneGraph.isFogEnabled() && _model.model().isAffectedByFog()) {
         uniforms.general.featureMask |= UniformsFeatureFlags::fog;
-        uniforms.general.fogNear = _sceneGraph.fogNear();
-        uniforms.general.fogFar = _sceneGraph.fogFar();
-        uniforms.general.fogColor = glm::vec4(_sceneGraph.fogColor(), 1.0f);
     }
 
     auto danglyMesh = mesh->danglyMesh;
@@ -403,10 +399,9 @@ void MeshSceneNode::drawShadow() {
         return;
     }
     auto &uniforms = _shaders.uniforms();
-    uniforms.general = _sceneGraph.uniformsPrototype().general;
+    uniforms.general.resetLocals();
     uniforms.general.model = _absTransform;
     uniforms.general.alpha = _alpha;
-    uniforms.general.worldAmbientColor = glm::vec4(_sceneGraph.ambientLightColor(), 1.0f);
 
     _graphicsContext.useShaderProgram(_shaders.depth());
     _shaders.refreshUniforms();

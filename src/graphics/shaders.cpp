@@ -45,7 +45,6 @@ const int FEATURE_TEXT = 0x2000;
 const int FEATURE_GRASS = 0x4000;
 const int FEATURE_FOG = 0x8000;
 const int FEATURE_DANGLYMESH = 0x10000;
-const int FEATURE_SHADOWLIGHT = 0x20000;
 
 const int NUM_CUBE_FACES = 6;
 const int MAX_BONES = 24;
@@ -231,7 +230,7 @@ vec3 getNormal(vec2 uv) {
 
 static const string g_shaderBaseShadows = R"END(
 float getShadow() {
-    if (!isFeatureEnabled(FEATURE_SHADOWS) || !isFeatureEnabled(FEATURE_SHADOWLIGHT)) return 0.0;
+    if (!isFeatureEnabled(FEATURE_SHADOWS)) return 0.0;
 
     float result = 0.0;
 
@@ -370,7 +369,7 @@ void main() {
     }
 
     // Compute light space fragment position for directional lights
-    if (isFeatureEnabled(FEATURE_SHADOWLIGHT) && uShadowLightPosition.w == 0.0) {
+    if (isFeatureEnabled(FEATURE_SHADOWS) && uShadowLightPosition.w == 0.0) {
         fragPosLightSpace = uShadowLightSpaceMatrices[0] * vec4(fragPosition, 1.0);
     } else {
         fragPosLightSpace = vec4(0.0);

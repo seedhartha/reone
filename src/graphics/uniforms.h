@@ -41,7 +41,6 @@ struct UniformsFeatureFlags {
     static constexpr int grass = 0x4000;
     static constexpr int fog = 0x8000;
     static constexpr int danglymesh = 0x10000;
-    static constexpr int shadowlight = 0x20000;
 };
 
 struct GeneralUniforms {
@@ -66,23 +65,41 @@ struct GeneralUniforms {
     float fogNear {0.0f};
     float fogFar {0.0f};
     float heightMapScaling {1.0f};
-    float shadowStrength {1.0f};
+    float shadowStrength {0.0f};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
     char padding[4];
-    glm::mat4 shadowLightSpaceMatrices[kNumCubeFaces];
+    glm::mat4 shadowLightSpaceMatrices[kNumCubeFaces] {glm::mat4(1.0f)};
 
-    void reset() {
+    void resetGlobals() {
         projection = glm::mat4(1.0f);
         view = glm::mat4(1.0f);
-        model = glm::mat4(1.0f);
-        uv = glm::mat4(1.0f);
         cameraPosition = glm::vec4(0.0f);
-        color = glm::vec4(1.0f);
         worldAmbientColor = glm::vec4(1.0f);
-        alpha = 1.0f;
-        featureMask = 0;
+        fogColor = glm::vec4(0.0f);
+        shadowLightPosition = glm::vec4(0.0f);
+        fogNear = 0.0f;
+        fogFar = 0.0f;
+        shadowStrength = 1.0f;
+        for (int i = 0; i < kNumCubeFaces; ++i) {
+            shadowLightSpaceMatrices[i] = glm::mat4(1.0f);
+        }
+    }
 
-        // Rest if feature-dependent
+    void resetLocals() {
+        model = glm::mat4(1.0f);
+        uv = glm::mat3x4(1.0f);
+        color = glm::vec4(1.0f);
+        ambientColor = glm::vec4(1.0f);
+        diffuseColor = glm::vec4(0.0f);
+        selfIllumColor = glm::vec4(1.0f);
+        discardColor = glm::vec4(0.0f);
+        heightMapFrameBounds = glm::vec4(0.0f);
+        blurResolution = glm::vec2(0.0f);
+        blurDirection = glm::vec2(0.0f);
+        alpha = 1.0f;
+        waterAlpha = 1.0f;
+        heightMapScaling = 1.0f;
+        featureMask = 0;
     }
 };
 
@@ -102,7 +119,7 @@ struct LightingUniforms {
 };
 
 struct SkeletalUniforms {
-    glm::mat4 bones[kMaxBones];
+    glm::mat4 bones[kMaxBones] {glm::mat4(1.0f)};
 };
 
 struct ParticleUniforms {
@@ -146,7 +163,7 @@ struct DanglymeshUniforms {
     glm::vec4 stride {0.0f};
     float displacement {0.0f};
     char padding[12];
-    glm::vec4 constraints[kMaxDanglymeshConstraints];
+    glm::vec4 constraints[kMaxDanglymeshConstraints] {glm::vec4(0.0f)};
 };
 
 struct Uniforms {

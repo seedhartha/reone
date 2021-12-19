@@ -205,7 +205,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.general.reset();
+            uniforms.general.resetLocals();
             uniforms.general.featureMask = _discardEnabled ? UniformsFeatureFlags::discard : 0;
             uniforms.general.projection = _window.getOrthoProjection();
             uniforms.general.model = move(transform);
@@ -241,7 +241,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
 
                 auto &uniforms = _shaders.uniforms();
-                uniforms.general.reset();
+                uniforms.general.resetLocals();
                 uniforms.general.projection = _window.getOrthoProjection();
                 uniforms.general.model = move(transform);
                 uniforms.general.uv = glm::mat3x4(
@@ -262,7 +262,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(border.dimension, height, 1.0f));
 
                 auto &uniforms = _shaders.uniforms();
-                uniforms.general.reset();
+                uniforms.general.resetLocals();
                 uniforms.general.projection = _window.getOrthoProjection();
                 uniforms.general.model = move(transform);
                 uniforms.general.uv = glm::mat3x4(
@@ -288,7 +288,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
                 auto &uniforms = _shaders.uniforms();
-                uniforms.general.reset();
+                uniforms.general.resetLocals();
                 uniforms.general.projection = _window.getOrthoProjection();
                 uniforms.general.model = move(transform);
                 uniforms.general.color = glm::vec4(color, 1.0f);
@@ -305,7 +305,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
                 transform = glm::scale(transform, glm::vec3(width, border.dimension, 1.0f));
 
                 auto &uniforms = _shaders.uniforms();
-                uniforms.general.reset();
+                uniforms.general.resetLocals();
                 uniforms.general.projection = _window.getOrthoProjection();
                 uniforms.general.model = move(transform);
                 uniforms.general.uv = glm::mat3x4(
@@ -333,7 +333,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.general.reset();
+            uniforms.general.resetLocals();
             uniforms.general.projection = _window.getOrthoProjection();
             uniforms.general.model = move(transform);
             uniforms.general.color = glm::vec4(color, 1.0f);
@@ -350,7 +350,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.general.reset();
+            uniforms.general.resetLocals();
             uniforms.general.projection = _window.getOrthoProjection();
             uniforms.general.model = move(transform);
             uniforms.general.uv = glm::mat3x4(
@@ -371,7 +371,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.general.reset();
+            uniforms.general.resetLocals();
             uniforms.general.projection = _window.getOrthoProjection();
             uniforms.general.model = move(transform);
             uniforms.general.uv = glm::mat3x4(
@@ -392,7 +392,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::scale(transform, glm::vec3(border.dimension, border.dimension, 1.0f));
 
             auto &uniforms = _shaders.uniforms();
-            uniforms.general.reset();
+            uniforms.general.resetLocals();
             uniforms.general.projection = _window.getOrthoProjection();
             uniforms.general.model = move(transform);
             uniforms.general.uv = glm::mat3x4(
