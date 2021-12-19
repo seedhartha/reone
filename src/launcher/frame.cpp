@@ -35,7 +35,6 @@ static const wxSize g_windowSize {640, 400};
 
 LauncherFrame::LauncherFrame() :
     wxFrame(nullptr, wxID_ANY, "reone", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX)) {
-    // Configure this frame
 
 #ifdef _WIN32
     SetIcon(wxIcon(kIconName));
@@ -57,7 +56,11 @@ LauncherFrame::LauncherFrame() :
     _checkBoxDev = new wxCheckBox(this, WindowID::devMode, "Developer Mode", wxDefaultPosition, wxDefaultSize);
     _checkBoxDev->SetValue(_config.devMode);
 
+    // END Setup controls
+
     // Graphics
+
+    // Screen Resolution
 
     wxArrayString resChoices;
     resChoices.Add("800x600");
@@ -81,6 +84,10 @@ LauncherFrame::LauncherFrame() :
     resSizer->Add(labelResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
     resSizer->Add(_choiceResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
+    // END Screen Resolution
+
+    // Anti-Aliasing
+
     wxArrayString antiAliasingChoices;
     antiAliasingChoices.Add("No AA");
     antiAliasingChoices.Add("MSAA x2");
@@ -96,6 +103,28 @@ LauncherFrame::LauncherFrame() :
     antiAliasingSizer->Add(labelAntiAliasing, wxSizerFlags(0).Expand().Border(wxALL, 3));
     antiAliasingSizer->Add(_choiceAntiAliasing, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
+    wxArrayString textureQualityChoices;
+    textureQualityChoices.Add("High");
+    textureQualityChoices.Add("Medium");
+    textureQualityChoices.Add("Low");
+
+    // END Anti-Aliasing
+
+    // Texture Quality
+
+    auto labelTextureQuality = new wxStaticText(this, wxID_ANY, "Texture Quality", wxDefaultPosition, wxDefaultSize);
+
+    _choiceTextureQuality = new wxChoice(this, WindowID::textureQuality, wxDefaultPosition, wxDefaultSize, textureQualityChoices);
+    _choiceTextureQuality->SetSelection(_config.texQuality);
+
+    auto textureQualitySizer = new wxBoxSizer(wxVERTICAL);
+    textureQualitySizer->Add(labelTextureQuality, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    textureQualitySizer->Add(_choiceTextureQuality, wxSizerFlags(0).Expand().Border(wxALL, 3));
+
+    // END Texture Quality
+
+    // Shadow Map Resolution
+
     wxArrayString shadowResChoices;
     shadowResChoices.Add("1024");
     shadowResChoices.Add("2048");
@@ -110,11 +139,14 @@ LauncherFrame::LauncherFrame() :
     shadowResSizer->Add(labelShadowResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
     shadowResSizer->Add(_choiceShadowResolution, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
+    // END Shadow Map Resolution
+
     _checkBoxFullscreen = new wxCheckBox(this, WindowID::fullscreen, "Fullscreen", wxDefaultPosition, wxDefaultSize);
     _checkBoxFullscreen->SetValue(_config.fullscreen);
 
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
     graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(textureQualitySizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(antiAliasingSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(shadowResSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand().Border(wxALL, 3));
@@ -226,6 +258,7 @@ void LauncherFrame::LoadConfiguration() {
         ("width", po::value<int>()->default_value(1024))                                //
         ("height", po::value<int>()->default_value(768))                                //
         ("fullscreen", po::value<bool>()->default_value(false))                         //
+        ("texquality", po::value<int>()->default_value(0))                              //
         ("aasamples", po::value<int>()->default_value(0))                               //
         ("shadowres", po::value<int>()->default_value(0))                               //
         ("musicvol", po::value<int>()->default_value(85))                               //
@@ -247,6 +280,7 @@ void LauncherFrame::LoadConfiguration() {
     _config.width = vars["width"].as<int>();
     _config.height = vars["height"].as<int>();
     _config.fullscreen = vars["fullscreen"].as<bool>();
+    _config.texQuality = vars["texquality"].as<int>();
     _config.aasamples = vars["aasamples"].as<int>();
     _config.shadowres = vars["shadowres"].as<int>();
     _config.musicvol = vars["musicvol"].as<int>();
@@ -278,6 +312,7 @@ void LauncherFrame::SaveConfiguration() {
         "width=",
         "height=",
         "fullscreen=",
+        "texquality=",
         "aasamples=",
         "shadowres=",
         "musicvol=",
@@ -333,6 +368,7 @@ void LauncherFrame::SaveConfiguration() {
     _config.width = stoi(tokens[0]);
     _config.height = stoi(tokens[1]);
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
+    _config.texQuality = _choiceTextureQuality->GetSelection();
     _config.aasamples = _choiceAntiAliasing->GetSelection();
     _config.shadowres = _choiceShadowResolution->GetSelection();
     _config.musicvol = _sliderVolumeMusic->GetValue();
@@ -365,6 +401,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "width=" << _config.width << endl;
     config << "height=" << _config.height << endl;
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
+    config << "texquality=" << _config.texQuality << endl;
     config << "aasamples=" << _config.aasamples << endl;
     config << "shadowres=" << _config.shadowres << endl;
     config << "musicvol=" << _config.musicvol << endl;

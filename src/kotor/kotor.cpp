@@ -76,19 +76,21 @@ namespace reone {
 namespace kotor {
 
 static constexpr char kKeyFilename[] = "chitin.key";
-static constexpr char kTexturePackDirectoryName[] = "texturepacks";
-static constexpr char kGUITexturePackFilename[] = "swpc_tex_gui.erf";
-static constexpr char kTexturePackFilename[] = "swpc_tex_tpa.erf";
-static constexpr char kMusicDirectoryName[] = "streammusic";
-static constexpr char kSoundsDirectoryName[] = "streamsounds";
-static constexpr char kLipsDirectoryName[] = "lips";
-static constexpr char kOverrideDirectoryName[] = "override";
-
 static constexpr char kPatchFilename[] = "patch.erf";
 static constexpr char kModulesDirectoryName[] = "modules";
+static constexpr char kTexturePackDirectoryName[] = "texturepacks";
+static constexpr char kMusicDirectoryName[] = "streammusic";
+static constexpr char kSoundsDirectoryName[] = "streamsounds";
 static constexpr char kWavesDirectoryName[] = "streamwaves";
 static constexpr char kVoiceDirectoryName[] = "streamvoice";
+static constexpr char kLipsDirectoryName[] = "lips";
 static constexpr char kLocalizationLipFilename[] = "localization";
+static constexpr char kOverrideDirectoryName[] = "override";
+
+static constexpr char kTexturePackFilenameGUI[] = "swpc_tex_gui.erf";
+static constexpr char kTexturePackFilenameHigh[] = "swpc_tex_tpa.erf";
+static constexpr char kTexturePackFilenameMedium[] = "swpc_tex_tpb.erf";
+static constexpr char kTexturePackFilenameLow[] = "swpc_tex_tpc.erf";
 
 static constexpr char kBlueprintResRefCarth[] = "p_carth";
 static constexpr char kBlueprintResRefBastila[] = "p_bastilla";
@@ -103,12 +105,19 @@ static const vector<string> g_nonTransientLipFiles {"global.mod", "localization.
 static bool g_conversationsEnabled = true;
 
 void KotOR::initResourceProviders() {
+    static const unordered_map<TextureQuality, string> texPackByQuality {
+        {TextureQuality::High, kTexturePackFilenameHigh},
+        {TextureQuality::Medium, kTexturePackFilenameMedium},
+        {TextureQuality::Low, kTexturePackFilenameLow}};
+
     if (_tsl) {
         _services.resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
 
         fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
-        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
-        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
+        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
+
+        auto texPack = texPackByQuality.find(_options.graphics.textureQuality)->second;
+        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, texPack));
 
         _services.resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
         _services.resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
@@ -125,8 +134,10 @@ void KotOR::initResourceProviders() {
         _services.resources.indexErfFile(getPathIgnoreCase(_path, kPatchFilename));
 
         fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
-        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kGUITexturePackFilename));
-        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilename));
+        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
+
+        auto texPack = texPackByQuality.find(_options.graphics.textureQuality)->second;
+        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, texPack));
 
         _services.resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
         _services.resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
