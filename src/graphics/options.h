@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "types.h"
+
 namespace reone {
 
 namespace graphics {
@@ -25,6 +27,7 @@ struct GraphicsOptions {
     int width {0};
     int height {0};
     bool fullscreen {false};
+    TextureQuality textureQuality {0};
     int aaSamples {0};
     int shadowResolution {0};
 };

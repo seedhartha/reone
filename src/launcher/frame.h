@@ -30,17 +30,18 @@ struct WindowID {
     static constexpr wxWindowID gameDir = wxID_HIGHEST + 2;
     static constexpr wxWindowID devMode = wxID_HIGHEST + 3;
     static constexpr wxWindowID resolution = wxID_HIGHEST + 4;
-    static constexpr wxWindowID antiAliasing = wxID_HIGHEST + 5;
-    static constexpr wxWindowID shadowResolution = wxID_HIGHEST + 6;
-    static constexpr wxWindowID fullscreen = wxID_HIGHEST + 7;
-    static constexpr wxWindowID musicVolume = wxID_HIGHEST + 8;
-    static constexpr wxWindowID voiceVolume = wxID_HIGHEST + 9;
-    static constexpr wxWindowID soundVolume = wxID_HIGHEST + 10;
-    static constexpr wxWindowID movieVolume = wxID_HIGHEST + 11;
-    static constexpr wxWindowID logLevel = wxID_HIGHEST + 12;
-    static constexpr wxWindowID logChannels = wxID_HIGHEST + 13;
-    static constexpr wxWindowID logFile = wxID_HIGHEST + 14;
-    static constexpr wxWindowID saveConfig = wxID_HIGHEST + 15;
+    static constexpr wxWindowID textureQuality = wxID_HIGHEST + 5;
+    static constexpr wxWindowID antiAliasing = wxID_HIGHEST + 6;
+    static constexpr wxWindowID shadowResolution = wxID_HIGHEST + 7;
+    static constexpr wxWindowID fullscreen = wxID_HIGHEST + 8;
+    static constexpr wxWindowID musicVolume = wxID_HIGHEST + 9;
+    static constexpr wxWindowID voiceVolume = wxID_HIGHEST + 10;
+    static constexpr wxWindowID soundVolume = wxID_HIGHEST + 11;
+    static constexpr wxWindowID movieVolume = wxID_HIGHEST + 12;
+    static constexpr wxWindowID logLevel = wxID_HIGHEST + 13;
+    static constexpr wxWindowID logChannels = wxID_HIGHEST + 14;
+    static constexpr wxWindowID logFile = wxID_HIGHEST + 15;
+    static constexpr wxWindowID saveConfig = wxID_HIGHEST + 16;
 };
 
 class LauncherFrame : public wxFrame {
@@ -54,6 +55,7 @@ private:
         int width {0};
         int height {0};
         bool fullscreen {false};
+        int texQuality {0};
         int aasamples {0};
         int shadowres {0};
         int musicvol {0};
@@ -68,6 +70,7 @@ private:
     wxTextCtrl *_textCtrlGameDir;
     wxCheckBox *_checkBoxDev;
     wxChoice *_choiceResolution;
+    wxChoice *_choiceTextureQuality;
     wxChoice *_choiceAntiAliasing;
     wxChoice *_choiceShadowResolution;
     wxCheckBox *_checkBoxFullscreen;

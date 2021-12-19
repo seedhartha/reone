@@ -51,6 +51,12 @@ enum class TextureUsage {
     Video
 };
 
+enum class TextureQuality {
+    High,
+    Medium,
+    Low
+};
+
 enum class TGADataType {
     RGBA = 2,
     Grayscale = 3,
