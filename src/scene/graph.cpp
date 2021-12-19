@@ -376,12 +376,12 @@ void SceneGraph::draw() {
 
     // Render opaque meshes
     for (auto &mesh : _opaqueMeshes) {
-        mesh->drawSingle(false);
+        mesh->draw();
     }
 
     // Render transparent meshes
     for (auto &mesh : _transparentMeshes) {
-        mesh->drawSingle(false);
+        mesh->draw();
     }
 
     _graphicsContext.setBackFaceCullingEnabled(false);
@@ -405,7 +405,7 @@ void SceneGraph::drawShadows() {
         return;
     }
     for (auto &mesh : _shadowMeshes) {
-        mesh->drawSingle(true);
+        mesh->drawShadow();
     }
 }
 
