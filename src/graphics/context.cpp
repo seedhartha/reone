@@ -27,7 +27,6 @@ void GraphicsContext::init() {
     if (_inited) {
         return;
     }
-    glGetIntegerv(GL_VIEWPORT, &_viewport[0]);
     setBlendMode(BlendMode::Default);
     if (_options.aaSamples > 1) {
         glEnable(GL_MULTISAMPLE);
@@ -54,34 +53,12 @@ void GraphicsContext::deinit() {
     _inited = false;
 }
 
-void GraphicsContext::clear(int mask) {
-    int maskGL = 0;
-    if (mask & ClearBuffers::color) {
-        maskGL |= GL_COLOR_BUFFER_BIT;
-    }
-    if (mask & ClearBuffers::depth) {
-        maskGL |= GL_DEPTH_BUFFER_BIT;
-    }
-    if (mask & ClearBuffers::stencil) {
-        maskGL |= GL_STENCIL_BUFFER_BIT;
-    }
-    glClear(maskGL);
-}
-
 void GraphicsContext::useShaderProgram(shared_ptr<ShaderProgram> program) {
     if (_shaderProgram == program) {
         return;
     }
     program->use();
     _shaderProgram = move(program);
-}
-
-void GraphicsContext::setViewport(glm::ivec4 viewport) {
-    if (_viewport == viewport) {
-        return;
-    }
-    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-    _viewport = move(viewport);
 }
 
 void GraphicsContext::setDepthTestEnabled(bool enabled) {

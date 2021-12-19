@@ -107,15 +107,15 @@ void WorldPipeline::init() {
     _shadowsDepth->clearPixels(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
     _shadowsDepth->init();
 
-    _pointLightShadows = make_shared<Framebuffer>(_shadowsDepth);
-    _pointLightShadows->init();
+    _directionalLightShadows = make_shared<Framebuffer>(_shadowsDepth);
+    _directionalLightShadows->init();
 
     _cubeShadowsDepth = make_unique<Texture>("cubeshadows_depth", getTextureProperties(TextureUsage::DepthBufferCubeMap));
     _cubeShadowsDepth->clearPixels(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
     _cubeShadowsDepth->init();
 
-    _directionalLightShadows = make_shared<Framebuffer>(_cubeShadowsDepth);
-    _directionalLightShadows->init();
+    _pointLightShadows = make_shared<Framebuffer>(_cubeShadowsDepth);
+    _pointLightShadows->init();
 
     // Screenshot framebuffer
 
@@ -197,8 +197,7 @@ void WorldPipeline::drawShadows() {
     }
 
     // Set viewport
-    glm::ivec4 oldViewport(_graphicsContext.viewport());
-    _graphicsContext.setViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution));
+    glViewport(0, 0, _options.shadowResolution, _options.shadowResolution);
 
     // Enable depth testing
     bool oldDepthTest = _graphicsContext.isDepthTestEnabled();
@@ -211,12 +210,12 @@ void WorldPipeline::drawShadows() {
     glDrawBuffer(GL_NONE);
 
     // Draw the scene
-    _graphicsContext.clear(ClearBuffers::depth);
+    glClear(GL_DEPTH_BUFFER_BIT);
     _scene->draw(true);
 
     // Restore context
     _graphicsContext.setDepthTestEnabled(oldDepthTest);
-    _graphicsContext.setViewport(move(oldViewport));
+    glViewport(0, 0, _options.width, _options.height);
 }
 
 void WorldPipeline::drawGeometry() {
@@ -271,7 +270,7 @@ void WorldPipeline::drawGeometry() {
 
     // Draw the scene
 
-    _graphicsContext.clear(ClearBuffers::colorDepth);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     _scene->draw();
 
     // Blit multi-sampled geometry framebuffer to normal
@@ -320,7 +319,7 @@ void WorldPipeline::applyHorizontalBlur() {
 
     _graphicsContext.useShaderProgram(_shaders.blur());
     _shaders.refreshUniforms();
-    _graphicsContext.clear(ClearBuffers::colorDepth);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     _meshes.quadNDC().draw();
 
     // Restore context
@@ -358,7 +357,7 @@ void WorldPipeline::applyVerticalBlur() {
 
     _graphicsContext.useShaderProgram(_shaders.blur());
     _shaders.refreshUniforms();
-    _graphicsContext.clear(ClearBuffers::colorDepth);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     _meshes.quadNDC().draw();
 
     // Restore context
@@ -372,8 +371,7 @@ void WorldPipeline::drawResult() {
 
     glm::ivec4 oldViewport;
     if (_takeScreenshot) {
-        oldViewport = _graphicsContext.viewport();
-        _graphicsContext.setViewport(glm::ivec4(0, 0, kScreenshotResolution, kScreenshotResolution));
+        glViewport(0, 0, kScreenshotResolution, kScreenshotResolution);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _screenshot->nameGL());
     }
 
@@ -401,12 +399,13 @@ void WorldPipeline::drawResult() {
     if (_takeScreenshot) {
         saveScreenshot();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        _graphicsContext.setViewport(move(oldViewport));
+        glViewport(0, 0, kScreenshotResolution, kScreenshotResolution);
         _takeScreenshot = false; // finished taking a screenshot
     }
 }
 
 void WorldPipeline::saveScreenshot() {
+    glViewport(0, 0, _options.width, _options.height);
     _graphicsContext.bindTexture(0, _screenshotColor);
     _screenshotColor->flushGPUToCPU();
 }
