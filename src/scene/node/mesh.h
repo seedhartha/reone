@@ -46,7 +46,9 @@ public:
         graphics::Textures &textures);
 
     void update(float dt) override;
-    void drawSingle(bool shadowPass);
+
+    void draw() override;
+    void drawShadow();
 
     bool shouldRender() const;
     bool shouldCastShadows() const;

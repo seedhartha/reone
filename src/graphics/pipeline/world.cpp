@@ -342,7 +342,6 @@ void WorldPipeline::applyVerticalBlur() {
 void WorldPipeline::drawResult() {
     // Set viewport
 
-    glm::ivec4 oldViewport;
     if (_takeScreenshot) {
         glViewport(0, 0, kScreenshotResolution, kScreenshotResolution);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _screenshot->nameGL());
