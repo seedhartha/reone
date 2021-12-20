@@ -51,7 +51,7 @@ void Window::init() {
         throw runtime_error("Failed to create a GL context: " + string(SDL_GetError()));
     }
 
-    SDL_GL_SetSwapInterval(0);
+    SDL_GL_SetSwapInterval(_options.vsync ? 1 : 0);
     _inited = true;
 }
 

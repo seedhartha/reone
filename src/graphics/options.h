@@ -27,6 +27,7 @@ struct GraphicsOptions {
     int width {0};
     int height {0};
     bool fullscreen {false};
+    bool vsync {true};
     TextureQuality textureQuality {0};
     bool grass {false};
     int aaSamples {0};
