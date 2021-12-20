@@ -27,7 +27,10 @@ void GraphicsContext::init() {
     if (_inited) {
         return;
     }
+    glewInit();
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glDepthFunc(GL_LEQUAL);
 
     if (_options.aaSamples > 1) {
