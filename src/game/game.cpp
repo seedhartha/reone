@@ -134,8 +134,6 @@ void Game::update() {
 }
 
 void Game::drawAll() {
-    _services.window.clear();
-
     if (_video) {
         _video->draw();
     } else {

@@ -136,6 +136,7 @@ void WorldPipeline::draw() {
     if (!_scene->hasCamera()) {
         return;
     }
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     computeLightSpaceMatrices();
     drawShadows();
     drawGeometry();

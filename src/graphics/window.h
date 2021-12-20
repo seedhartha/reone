@@ -29,15 +29,17 @@ class IEventHandler;
 
 class Window : boost::noncopyable {
 public:
-    Window(GraphicsOptions options);
-    ~Window();
+    Window(GraphicsOptions options) :
+        _options(std::move(options)) {
+    }
+
+    ~Window() { deinit(); }
 
     void init();
     void deinit();
 
     void processEvents(bool &quit);
 
-    void clear() const;
     void drawCursor() const;
     void swapBuffers() const;
 
@@ -55,13 +57,10 @@ private:
     IEventHandler *_eventHandler {nullptr};
     bool _inited {false};
     SDL_Window *_window {nullptr};
-    SDL_GLContext _graphicsContext {nullptr};
+    SDL_GLContext _context {nullptr};
     bool _relativeMouseMode {false};
     std::shared_ptr<Cursor> _cursor;
     bool _focus {true};
-
-    void initSDL();
-    void initGL();
 
     bool handleEvent(const SDL_Event &event, bool &quit);
     bool handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit);

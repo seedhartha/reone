@@ -28,45 +28,31 @@ namespace reone {
 
 namespace graphics {
 
-Window::Window(GraphicsOptions options) :
-    _options(move(options)) {
-}
-
 void Window::init() {
-    if (_inited)
+    if (_inited) {
         return;
-
-    initSDL();
-    initGL();
-
-    _inited = true;
-}
-
-void Window::initSDL() {
+    }
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    int flags = getWindowFlags();
-
     _window = SDL_CreateWindow(
         "reone",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
         _options.width, _options.height,
-        flags);
-
+        getWindowFlags());
     if (!_window) {
         throw runtime_error("Failed to create a window: " + string(SDL_GetError()));
     }
 
-    _graphicsContext = SDL_GL_CreateContext(_window);
-
-    if (!_graphicsContext) {
+    _context = SDL_GL_CreateContext(_window);
+    if (!_context) {
         throw runtime_error("Failed to create a GL context: " + string(SDL_GetError()));
     }
 
     SDL_GL_SetSwapInterval(0);
+    _inited = true;
 }
 
 int Window::getWindowFlags() const {
@@ -77,34 +63,22 @@ int Window::getWindowFlags() const {
     return flags;
 }
 
-void Window::initGL() {
-    glewInit();
-    glEnable(GL_BLEND);
-    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-}
-
-Window::~Window() {
-    deinit();
-}
-
 void Window::deinit() {
-    if (_inited) {
-        SDL_GL_DeleteContext(_graphicsContext);
-        SDL_DestroyWindow(_window);
-        SDL_Quit();
-        _inited = false;
+    if (!_inited) {
+        return;
     }
+    SDL_GL_DeleteContext(_context);
+    SDL_DestroyWindow(_window);
+    SDL_Quit();
+    _inited = false;
 }
 
 void Window::processEvents(bool &quit) {
-    if (!_inited)
-        return;
-
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        if (handleEvent(event, quit))
+        if (handleEvent(event, quit)) {
             continue;
-
+        }
         _eventHandler->handle(event);
     }
 }
@@ -131,7 +105,6 @@ bool Window::handleKeyDownEvent(const SDL_KeyboardEvent &event, bool &quit) {
             return true;
         }
         return false;
-
     default:
         return false;
     }
@@ -150,15 +123,10 @@ bool Window::handleWindowEvent(const SDL_WindowEvent &event) {
     }
 }
 
-void Window::clear() const {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
 void Window::drawCursor() const {
     if (_relativeMouseMode || !_cursor) {
         return;
     }
-
     int x, y;
     uint32_t state = SDL_GetMouseState(&x, &y);
     bool pressed = state & SDL_BUTTON(1);
@@ -169,9 +137,7 @@ void Window::drawCursor() const {
 }
 
 void Window::swapBuffers() const {
-    if (_inited) {
-        SDL_GL_SwapWindow(_window);
-    }
+    SDL_GL_SwapWindow(_window);
 }
 
 glm::mat4 Window::getOrthoProjection(float near, float far) const {
