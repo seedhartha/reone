@@ -47,6 +47,9 @@ private:
     bool _backFaceCulling {false};
     BlendMode _blendMode {BlendMode::None};
 
+    void enableBackFaceCulling();
+    void disableBackFaceCulling();
+
     void setBlendMode(BlendMode mode);
 };
 
