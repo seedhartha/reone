@@ -171,6 +171,10 @@ void SpatialObject::applyInstantEffect(Effect &effect) {
 void SpatialObject::update(float dt) {
     Object::update(dt);
     updateEffects(dt);
+
+    if (_sceneNode && _sceneNode->type() == SceneNodeType::Model) {
+        static_pointer_cast<ModelSceneNode>(_sceneNode)->setPickable(isSelectable());
+    }
 }
 
 void SpatialObject::updateEffects(float dt) {
