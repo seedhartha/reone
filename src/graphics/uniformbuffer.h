@@ -36,6 +36,7 @@ public:
     void setData(const void *data, ptrdiff_t size, bool refresh = false) {
         _data = data;
         _size = size;
+
         if (refresh) {
             this->refresh();
         }

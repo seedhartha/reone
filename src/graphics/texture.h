@@ -105,9 +105,6 @@ public:
     void bind();
     void unbind();
 
-    void configure();
-    void refresh();
-
     void flushGPUToCPU();
 
     glm::vec4 sample(float s, float t) const;
@@ -126,32 +123,45 @@ public:
     int height() const { return _height; }
     const std::vector<Layer> &layers() const { return _layers; }
     const Features &features() const { return _features; }
-    uint32_t nameGL() const { return _nameGL; }
     PixelFormat pixelFormat() const { return _pixelFormat; }
 
     void setFeatures(Features features) { _features = std::move(features); }
 
     // Pixels
 
-    void clear(int w, int h, PixelFormat format);
+    void clear(int w, int h, PixelFormat format, bool refresh = false);
 
-    void setPixels(int w, int h, PixelFormat format, std::shared_ptr<ByteArray> pixels);
-    void setPixels(int w, int h, PixelFormat format, std::vector<Layer> layers);
+    void setPixels(int w, int h, PixelFormat format, std::shared_ptr<ByteArray> pixels, bool refresh = false);
+    void setPixels(int w, int h, PixelFormat format, std::vector<Layer> layers, bool refresh = false);
 
     // END Pixels
+
+    // OpenGL
+
+    uint32_t nameGL() const { return _nameGL; }
+
+    // END OpenGL
 
 private:
     std::string _name;
     Properties _properties;
 
     bool _inited {false};
-    uint32_t _nameGL {0};
 
     int _width {0};
     int _height {0};
     PixelFormat _pixelFormat {PixelFormat::BGR};
     std::vector<Layer> _layers; /**< either one for 2D textures, or six for cube maps */
     Features _features;
+
+    // OpenGL
+
+    uint32_t _nameGL {0};
+
+    // END OpenGL
+
+    void configure();
+    void refresh();
 
     void configure2D();
     void configureCubeMap();

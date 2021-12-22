@@ -18,6 +18,7 @@
 #include "movie.h"
 
 #include "../audio/player.h"
+#include "../graphics/context.h"
 #include "../graphics/mesh.h"
 #include "../graphics/meshes.h"
 #include "../graphics/shaders.h"
@@ -66,10 +67,6 @@ void Movie::update(float dt) {
     }
     _time += dt;
     _videoStream->seek(_time);
-    auto &frame = _videoStream->frame();
-    if (frame.pixels) {
-        _texture->setPixels(_width, _height, PixelFormat::RGB, frame.pixels);
-    }
     if (_videoStream->hasEnded()) {
         _finished = true;
         return;
@@ -80,9 +77,11 @@ void Movie::update(float dt) {
 }
 
 void Movie::draw() {
-    _textures.bind(*_texture);
-    _texture->refresh();
-
+    auto &frame = _videoStream->frame();
+    if (frame.pixels) {
+        _textures.bind(*_texture);
+        _texture->setPixels(_width, _height, PixelFormat::RGB, frame.pixels, true);
+    }
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
     uniforms.general.uv = glm::mat3x4(
