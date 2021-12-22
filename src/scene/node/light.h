@@ -34,7 +34,20 @@ public:
         SceneGraph &sceneGraph,
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders);
+        graphics::Shaders &shaders,
+        graphics::Textures &textures) :
+        ModelNodeSceneNode(
+            modelNode,
+            SceneNodeType::Light,
+            sceneGraph,
+            graphicsContext,
+            meshes,
+            shaders,
+            textures) {
+        init();
+    }
+
+    void init();
 
     void update(float dt) override;
     void drawLensFlare(const graphics::ModelNode::LensFlare &flare);

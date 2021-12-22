@@ -598,7 +598,7 @@ shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) 
 }
 
 unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {
-    return make_unique<DummySceneNode>(move(modelNode), *this, _graphicsContext, _meshes, _shaders);
+    return make_unique<DummySceneNode>(move(modelNode), *this, _graphicsContext, _meshes, _shaders, _textures);
 }
 
 unique_ptr<CameraSceneNode> SceneGraph::newCamera(glm::mat4 projection) {
@@ -636,7 +636,8 @@ unique_ptr<GrassSceneNode> SceneGraph::newGrass(float density, float quadSize, g
         *this,
         _graphicsContext,
         _meshes,
-        _shaders);
+        _shaders,
+        _textures);
 }
 
 } // namespace scene

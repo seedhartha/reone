@@ -23,6 +23,7 @@
 #include "../../graphics/meshes.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
+#include "../../graphics/textures.h"
 
 #include "../graph.h"
 
@@ -40,46 +41,33 @@ namespace scene {
 static constexpr float kMotionBlurStrength = 0.25f;
 static constexpr float kProjectileSpeed = 16.0f;
 
-EmitterSceneNode::EmitterSceneNode(
-    shared_ptr<ModelNode> modelNode,
-    SceneGraph &sceneGraph,
-    GraphicsContext &graphicsContext,
-    Meshes &meshes,
-    Shaders &shaders) :
-    ModelNodeSceneNode(
-        modelNode,
-        SceneNodeType::Emitter,
-        sceneGraph,
-        graphicsContext,
-        meshes,
-        shaders) {
+void EmitterSceneNode::init() {
+    _birthrate = _modelNode->birthrate().getByFrameOrElse(0, 0.0f);
+    _lifeExpectancy = _modelNode->lifeExp().getByFrameOrElse(0, 0.0f);
+    _size.x = _modelNode->xSize().getByFrameOrElse(0, 0.0f);
+    _size.y = _modelNode->ySize().getByFrameOrElse(0, 0.0f);
+    _frameStart = static_cast<int>(_modelNode->frameStart().getByFrameOrElse(0, 0.0f));
+    _frameEnd = static_cast<int>(_modelNode->frameEnd().getByFrameOrElse(0, 0.0f));
+    _fps = _modelNode->fps().getByFrameOrElse(0, 0.0f);
+    _spread = _modelNode->spread().getByFrameOrElse(0, 0.0f);
+    _velocity = _modelNode->velocity().getByFrameOrElse(0, 0.0f);
+    _randomVelocity = _modelNode->randVel().getByFrameOrElse(0, 0.0f);
+    _mass = _modelNode->mass().getByFrameOrElse(0, 0.0f);
+    _grav = _modelNode->grav().getByFrameOrElse(0, 0.0f);
+    _lightningDelay = _modelNode->lightingDelay().getByFrameOrElse(0, 0.0f);
+    _lightningRadius = _modelNode->lightingRadius().getByFrameOrElse(0, 0.0f);
+    _lightningScale = _modelNode->lightingScale().getByFrameOrElse(0, 0.0f);
+    _lightningSubDiv = static_cast<int>(_modelNode->lightingSubDiv().getByFrameOrElse(0, 0.0f));
 
-    _birthrate = modelNode->birthrate().getByFrameOrElse(0, 0.0f);
-    _lifeExpectancy = modelNode->lifeExp().getByFrameOrElse(0, 0.0f);
-    _size.x = modelNode->xSize().getByFrameOrElse(0, 0.0f);
-    _size.y = modelNode->ySize().getByFrameOrElse(0, 0.0f);
-    _frameStart = static_cast<int>(modelNode->frameStart().getByFrameOrElse(0, 0.0f));
-    _frameEnd = static_cast<int>(modelNode->frameEnd().getByFrameOrElse(0, 0.0f));
-    _fps = modelNode->fps().getByFrameOrElse(0, 0.0f);
-    _spread = modelNode->spread().getByFrameOrElse(0, 0.0f);
-    _velocity = modelNode->velocity().getByFrameOrElse(0, 0.0f);
-    _randomVelocity = modelNode->randVel().getByFrameOrElse(0, 0.0f);
-    _mass = modelNode->mass().getByFrameOrElse(0, 0.0f);
-    _grav = modelNode->grav().getByFrameOrElse(0, 0.0f);
-    _lightningDelay = modelNode->lightingDelay().getByFrameOrElse(0, 0.0f);
-    _lightningRadius = modelNode->lightingRadius().getByFrameOrElse(0, 0.0f);
-    _lightningScale = modelNode->lightingScale().getByFrameOrElse(0, 0.0f);
-    _lightningSubDiv = static_cast<int>(modelNode->lightingSubDiv().getByFrameOrElse(0, 0.0f));
-
-    _particleSize.start = modelNode->sizeStart().getByFrameOrElse(0, 0.0f);
-    _particleSize.mid = modelNode->sizeMid().getByFrameOrElse(0, 0.0f);
-    _particleSize.end = modelNode->sizeEnd().getByFrameOrElse(0, 0.0f);
-    _color.start = modelNode->colorStart().getByFrameOrElse(0, glm::vec3(0.0f));
-    _color.mid = modelNode->colorMid().getByFrameOrElse(0, glm::vec3(0.0f));
-    _color.end = modelNode->colorEnd().getByFrameOrElse(0, glm::vec3(0.0f));
-    _alpha.start = modelNode->alphaStart().getByFrameOrElse(0, 0.0f);
-    _alpha.mid = modelNode->alphaMid().getByFrameOrElse(0, 0.0f);
-    _alpha.end = modelNode->alphaEnd().getByFrameOrElse(0, 0.0f);
+    _particleSize.start = _modelNode->sizeStart().getByFrameOrElse(0, 0.0f);
+    _particleSize.mid = _modelNode->sizeMid().getByFrameOrElse(0, 0.0f);
+    _particleSize.end = _modelNode->sizeEnd().getByFrameOrElse(0, 0.0f);
+    _color.start = _modelNode->colorStart().getByFrameOrElse(0, glm::vec3(0.0f));
+    _color.mid = _modelNode->colorMid().getByFrameOrElse(0, glm::vec3(0.0f));
+    _color.end = _modelNode->colorEnd().getByFrameOrElse(0, glm::vec3(0.0f));
+    _alpha.start = _modelNode->alphaStart().getByFrameOrElse(0, 0.0f);
+    _alpha.mid = _modelNode->alphaMid().getByFrameOrElse(0, 0.0f);
+    _alpha.end = _modelNode->alphaEnd().getByFrameOrElse(0, 0.0f);
 
     if (_birthrate != 0.0f) {
         _birthInterval = 1.0f / _birthrate;
@@ -280,7 +268,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs, int count) {
     }
 
     _shaders.use(_shaders.particle(), true);
-    _graphicsContext.bindTexture(TextureUnits::diffuseMap, texture);
+    _textures.bind(*texture, TextureUnits::diffuseMap);
 
     BlendMode oldBlendMode(_graphicsContext.blendMode());
     bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;

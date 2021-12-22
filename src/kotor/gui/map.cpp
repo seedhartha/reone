@@ -81,7 +81,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         if (!partyLeader) {
             return;
         }
-        _services.graphicsContext.bindTexture(0, _areaTexture);
+        _services.textures.bind(*_areaTexture);
 
         glm::vec2 worldPos(partyLeader->position());
         glm::vec2 mapPos(getMapPosition(worldPos));
@@ -108,7 +108,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         });
 
     } else {
-        _services.graphicsContext.bindTexture(0, _areaTexture);
+        _services.textures.bind(*_areaTexture);
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(bounds[0], bounds[1], 0.0f));
@@ -128,7 +128,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
     if (mode != Mode::Default) {
         return;
     }
-    _services.graphicsContext.bindTexture(0, _noteTexture);
+    _services.textures.bind(*_noteTexture);
 
     for (auto &object : _game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         auto waypoint = static_pointer_cast<Waypoint>(object);
@@ -193,7 +193,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     if (!partyLeader) {
         return;
     }
-    _services.graphicsContext.bindTexture(0, _arrowTexture);
+    _services.textures.bind(*_arrowTexture);
 
     glm::vec3 arrowPos(0.0f);
 

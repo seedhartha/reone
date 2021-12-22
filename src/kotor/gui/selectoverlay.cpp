@@ -255,7 +255,7 @@ void SelectionOverlay::draw() {
 }
 
 void SelectionOverlay::drawReticle(shared_ptr<Texture> texture, const glm::vec3 &screenCoords) {
-    _services.graphicsContext.bindTexture(0, texture);
+    _services.textures.bind(*texture);
 
     const GraphicsOptions &opts = _game.options().graphics;
     int width = texture->width();
@@ -354,7 +354,7 @@ void SelectionOverlay::drawActionFrame(int index) {
     } else {
         frameTexture = _friendlyScroll;
     }
-    _services.graphicsContext.bindTexture(0, frameTexture);
+    _services.textures.bind(*frameTexture);
 
     float frameX, frameY;
     getActionScreenCoords(index, frameX, frameY);
@@ -414,7 +414,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     if (!texture)
         return;
 
-    _services.graphicsContext.bindTexture(0, texture);
+    _services.textures.bind(*texture);
 
     float frameX, frameY;
     getActionScreenCoords(index, frameX, frameY);

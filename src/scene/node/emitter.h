@@ -35,7 +35,21 @@ public:
         SceneGraph &sceneGraph,
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders);
+        graphics::Shaders &shaders,
+        graphics::Textures &textures) :
+        ModelNodeSceneNode(
+            modelNode,
+            SceneNodeType::Emitter,
+            sceneGraph,
+            graphicsContext,
+            meshes,
+            shaders,
+            textures) {
+
+        init();
+    }
+
+    void init();
 
     void update(float dt) override;
 

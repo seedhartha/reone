@@ -23,15 +23,20 @@ namespace reone {
 
 namespace graphics {
 
-class GraphicsContext;
 class Meshes;
 class Shaders;
 class Texture;
+class Textures;
 class Window;
 
 class Font {
 public:
-    Font(Window &window, GraphicsContext &graphicsContext, Meshes &meshes, Shaders &shaders);
+    Font(Meshes &meshes, Shaders &shaders, Textures &textures, Window &window) :
+        _meshes(meshes),
+        _shaders(shaders),
+        _textures(textures),
+        _window(window) {
+    }
 
     void load(std::shared_ptr<Texture> texture);
 
@@ -52,10 +57,10 @@ private:
         glm::vec2 size {0.0f};
     };
 
-    Window &_window;
-    GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
+    Textures &_textures;
+    Window &_window;
 
     std::shared_ptr<Texture> _texture;
     float _height {0.0f};

@@ -52,7 +52,7 @@ void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
     if (_value == 0 || !_progress.fill) {
         return;
     }
-    _graphicsContext.bindTexture(0, _progress.fill);
+    _textures.bind(*_progress.fill);
 
     float w = _extent.width * _value / 100.0f;
 

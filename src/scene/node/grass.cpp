@@ -23,6 +23,7 @@
 #include "../../graphics/meshes.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
+#include "../../graphics/textures.h"
 #include "../../graphics/triangleutil.h"
 
 #include "../graph.h"
@@ -144,13 +145,13 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs, int count) {
     if (count == -1) {
         count = static_cast<int>(leafs.size());
     }
-    _graphicsContext.bindTexture(TextureUnits::diffuseMap, _texture);
+    _textures.bind(*_texture, TextureUnits::diffuseMap);
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::grass;
     if (_aabbNode->mesh()->lightmap) {
-        _graphicsContext.bindTexture(TextureUnits::lightmap, _aabbNode->mesh()->lightmap);
+        _textures.bind(*_aabbNode->mesh()->lightmap, TextureUnits::lightmap);
         uniforms.general.featureMask |= UniformsFeatureFlags::lightmap;
     }
     for (int i = 0; i < count; ++i) {

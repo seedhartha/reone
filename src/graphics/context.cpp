@@ -40,39 +40,6 @@ void GraphicsContext::init() {
     _inited = true;
 }
 
-void GraphicsContext::deinit() {
-    if (!_inited) {
-        return;
-    }
-    for (size_t i = 0; i < _textures.size(); ++i) {
-        unbindTexture(static_cast<int>(i));
-    }
-    _textures.clear();
-    _inited = false;
-}
-
-void GraphicsContext::bindTexture(int unit, shared_ptr<Texture> texture) {
-    size_t numUnits = _textures.size();
-    if (numUnits <= unit) {
-        _textures.resize(unit + 1);
-    }
-    if (_textures[unit] == texture) {
-        return;
-    }
-    setActiveTextureUnit(unit);
-    texture->bind();
-    _textures[unit] = move(texture);
-}
-
-void GraphicsContext::unbindTexture(int unit) {
-    if (!_textures[unit]) {
-        return;
-    }
-    setActiveTextureUnit(unit);
-    _textures[unit]->unbind();
-    _textures[unit].reset();
-}
-
 void GraphicsContext::setBackFaceCullingEnabled(bool enabled) {
     if (_backFaceCulling == enabled) {
         return;
@@ -109,14 +76,6 @@ void GraphicsContext::setBlendMode(BlendMode mode) {
         break;
     }
     _blendMode = mode;
-}
-
-void GraphicsContext::setActiveTextureUnit(int unit) {
-    if (_textureUnit == unit) {
-        return;
-    }
-    glActiveTexture(GL_TEXTURE0 + unit);
-    _textureUnit = unit;
 }
 
 void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {

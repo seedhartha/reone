@@ -21,7 +21,6 @@
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
-#include "context.h"
 #include "format/curreader.h"
 #include "format/tgareader.h"
 #include "format/tpcreader.h"
@@ -56,14 +55,22 @@ void Textures::invalidate() {
     _cache.clear();
 }
 
+void Textures::bind(Texture &texture, int unit) {
+    if (_activeUnit != unit) {
+        glActiveTexture(GL_TEXTURE0 + unit);
+        _activeUnit = unit;
+    }
+    texture.bind();
+}
+
 void Textures::bindDefaults() {
-    _graphicsContext.bindTexture(TextureUnits::diffuseMap, _default);
-    _graphicsContext.bindTexture(TextureUnits::lightmap, _default);
-    _graphicsContext.bindTexture(TextureUnits::environmentMap, _defaultCubemap);
-    _graphicsContext.bindTexture(TextureUnits::bumpMap, _default);
-    _graphicsContext.bindTexture(TextureUnits::bloom, _default);
-    _graphicsContext.bindTexture(TextureUnits::shadowMap, _default);
-    _graphicsContext.bindTexture(TextureUnits::shadowMapCube, _defaultCubemap);
+    bind(*_default, TextureUnits::diffuseMap);
+    bind(*_default, TextureUnits::lightmap);
+    bind(*_defaultCubemap, TextureUnits::environmentMap);
+    bind(*_default, TextureUnits::bumpMap);
+    bind(*_default, TextureUnits::bloom);
+    bind(*_default, TextureUnits::shadowMap);
+    bind(*_defaultCubemap, TextureUnits::shadowMapCube);
 }
 
 shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {

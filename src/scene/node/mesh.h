@@ -43,7 +43,21 @@ public:
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
-        graphics::Textures &textures);
+        graphics::Textures &textures) :
+        ModelNodeSceneNode(
+            modelNode,
+            SceneNodeType::Mesh,
+            sceneGraph,
+            graphicsContext,
+            meshes,
+            shaders,
+            textures),
+        _model(model) {
+
+        init();
+    }
+
+    void init();
 
     void update(float dt) override;
 
@@ -90,12 +104,6 @@ private:
     void refreshAdditionalTextures();
 
     bool isLightingEnabled() const;
-
-    // Services
-
-    graphics::Textures &_textures;
-
-    // END Services
 
     // Animation
 

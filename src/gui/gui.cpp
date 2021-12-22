@@ -301,7 +301,7 @@ void GUI::draw() {
 }
 
 void GUI::drawBackground() {
-    _graphicsContext.bindTexture(0, _background);
+    _textures.bind(*_background);
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0));

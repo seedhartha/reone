@@ -32,14 +32,19 @@ class Textures;
 
 class Fonts : public MemoryCache<std::string, Font> {
 public:
-    Fonts(Window &window, GraphicsContext &graphicsContext, Meshes &meshes, Textures &textures, Shaders &shaders);
+    Fonts(Meshes &meshes, Shaders &shaders, Textures &textures, Window &window) :
+        MemoryCache(std::bind(&Fonts::doGet, this, std::placeholders::_1)),
+        _meshes(meshes),
+        _shaders(shaders),
+        _textures(textures),
+        _window(window) {
+    }
 
 private:
-    Window &_window;
-    GraphicsContext &_graphicsContext;
     Meshes &_meshes;
-    Textures &_textures;
     Shaders &_shaders;
+    Textures &_textures;
+    Window &_window;
 
     std::shared_ptr<Font> doGet(std::string resRef);
 };

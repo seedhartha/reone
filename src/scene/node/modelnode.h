@@ -27,6 +27,7 @@ class GraphicsContext;
 class Meshes;
 class ModelNode;
 class Shaders;
+class Textures;
 
 } // namespace graphics
 
@@ -45,12 +46,14 @@ protected:
         SceneGraph &sceneGraph,
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders) :
+        graphics::Shaders &shaders,
+        graphics::Textures &textures) :
         SceneNode(type, sceneGraph),
         _modelNode(std::move(modelNode)),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
-        _shaders(shaders) {
+        _shaders(shaders),
+        _textures(textures) {
     }
 
 protected:
@@ -59,6 +62,7 @@ protected:
     graphics::GraphicsContext &_graphicsContext;
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
+    graphics::Textures &_textures;
 
     // END Services
 };

@@ -21,6 +21,7 @@
 #include "../options.h"
 #include "../renderbuffer.h"
 #include "../texture.h"
+#include "../textures.h"
 #include "../types.h"
 
 namespace reone {
@@ -31,6 +32,7 @@ class GraphicsContext;
 class IScene;
 class Meshes;
 class Shaders;
+class Textures;
 
 class WorldPipeline : boost::noncopyable {
 public:
@@ -38,11 +40,13 @@ public:
         GraphicsOptions options,
         GraphicsContext &graphicsContext,
         Meshes &meshes,
-        Shaders &shaders) :
+        Shaders &shaders,
+        Textures &textures) :
         _options(std::move(options)),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
-        _shaders(shaders) {
+        _shaders(shaders),
+        _textures(textures) {
     }
 
     void init();
@@ -66,6 +70,7 @@ private:
     GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
+    Textures &_textures;
 
     // END Services
 

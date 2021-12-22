@@ -21,10 +21,10 @@ namespace reone {
 
 namespace graphics {
 
-class GraphicsContext;
 class Meshes;
 class Shaders;
 class Texture;
+class Textures;
 class Window;
 
 class Cursor : boost::noncopyable {
@@ -32,15 +32,15 @@ public:
     Cursor(
         std::shared_ptr<Texture> up,
         std::shared_ptr<Texture> down,
-        GraphicsContext &graphicsContext,
         Meshes &meshes,
         Shaders &shaders,
+        Textures &textures,
         Window &window) :
         _up(std::move(up)),
         _down(std::move(down)),
-        _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
+        _textures(textures),
         _window(window) {
     }
 
@@ -58,9 +58,9 @@ private:
 
     // Services
 
-    GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
+    Textures &_textures;
     Window &_window;
 
     // END Services

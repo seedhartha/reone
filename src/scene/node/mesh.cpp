@@ -43,24 +43,7 @@ static constexpr float kUvAnimationSpeed = 250.0f;
 
 static bool g_debugWalkmesh = false;
 
-MeshSceneNode::MeshSceneNode(
-    const ModelSceneNode &model,
-    shared_ptr<ModelNode> modelNode,
-    SceneGraph &sceneGraph,
-    GraphicsContext &graphicsContext,
-    Meshes &meshes,
-    Shaders &shaders,
-    Textures &textures) :
-    ModelNodeSceneNode(
-        modelNode,
-        SceneNodeType::Mesh,
-        sceneGraph,
-        graphicsContext,
-        meshes,
-        shaders),
-    _model(model),
-    _textures(textures) {
-
+void MeshSceneNode::init() {
     _point = false;
     _alpha = _modelNode->alpha().getByFrameOrElse(0, 1.0f);
     _selfIllumColor = _modelNode->selfIllumColor().getByFrameOrElse(0, glm::vec3(0.0f));
@@ -371,17 +354,17 @@ void MeshSceneNode::draw() {
     // Setup textures
 
     if (_nodeTextures.diffuse) {
-        _graphicsContext.bindTexture(TextureUnits::diffuseMap, _nodeTextures.diffuse);
+        _textures.bind(*_nodeTextures.diffuse, TextureUnits::diffuseMap);
         additive = _nodeTextures.diffuse->isAdditive();
     }
     if (_nodeTextures.lightmap) {
-        _graphicsContext.bindTexture(TextureUnits::lightmap, _nodeTextures.lightmap);
+        _textures.bind(*_nodeTextures.lightmap, TextureUnits::lightmap);
     }
     if (_nodeTextures.envmap) {
-        _graphicsContext.bindTexture(TextureUnits::environmentMap, _nodeTextures.envmap);
+        _textures.bind(*_nodeTextures.envmap, TextureUnits::environmentMap);
     }
     if (_nodeTextures.bumpmap) {
-        _graphicsContext.bindTexture(TextureUnits::bumpMap, _nodeTextures.bumpmap);
+        _textures.bind(*_nodeTextures.bumpmap, TextureUnits::bumpMap);
     }
 
     BlendMode oldBlendMode(_graphicsContext.blendMode());

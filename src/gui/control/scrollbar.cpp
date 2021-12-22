@@ -17,7 +17,6 @@
 
 #include "scrollbar.h"
 
-#include "../../graphics/context.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/renderbuffer.h"
@@ -68,7 +67,7 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     uniforms.general.resetLocals();
     uniforms.general.projection = _window.getOrthoProjection();
 
-    _graphicsContext.bindTexture(0, _thumb.image);
+    _textures.bind(*_thumb.image);
 
     // Top edge
     uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
@@ -113,7 +112,7 @@ void ScrollBar::drawArrows(const glm::ivec2 &offset) {
     if (!canScrollUp && !canScrollDown)
         return;
 
-    _graphicsContext.bindTexture(0, _dir.image);
+    _textures.bind(*_dir.image);
 
     if (canScrollUp) {
         drawUpArrow(offset);

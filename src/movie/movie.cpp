@@ -18,10 +18,10 @@
 #include "movie.h"
 
 #include "../audio/player.h"
-#include "../graphics/context.h"
 #include "../graphics/mesh.h"
 #include "../graphics/meshes.h"
 #include "../graphics/shaders.h"
+#include "../graphics/textures.h"
 #include "../graphics/textureutil.h"
 
 using namespace std;
@@ -80,7 +80,7 @@ void Movie::update(float dt) {
 }
 
 void Movie::draw() {
-    _graphicsContext.bindTexture(0, _texture);
+    _textures.bind(*_texture);
     _texture->refresh();
 
     auto &uniforms = _shaders.uniforms();
