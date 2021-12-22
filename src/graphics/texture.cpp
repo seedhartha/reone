@@ -116,12 +116,12 @@ void Texture::deinit() {
 }
 
 void Texture::bind() {
-    GLenum target = isCubeMap() ? GL_TEXTURE_CUBE_MAP : (isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D);
+    auto target = getTargetGL();
     glBindTexture(target, _nameGL);
 }
 
 void Texture::unbind() {
-    GLenum target = isCubeMap() ? GL_TEXTURE_CUBE_MAP : (isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D);
+    auto target = getTargetGL();
     glBindTexture(target, 0);
 }
 
@@ -157,7 +157,7 @@ void Texture::configureCubeMap() {
 }
 
 void Texture::configure2D() {
-    GLenum target = isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+    auto target = getTargetGL();
     glTexParameteri(target, GL_TEXTURE_MIN_FILTER, getFilterGL(_properties.minFilter));
     glTexParameteri(target, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.maxFilter));
 
@@ -181,6 +181,8 @@ void Texture::configure2D() {
 void Texture::refresh() {
     if (isCubeMap()) {
         refreshCubeMap();
+    } else if (isMultilayer()) {
+        refresh2DArray();
     } else {
         refresh2D();
     }
@@ -188,11 +190,11 @@ void Texture::refresh() {
 
 void Texture::refreshCubeMap() {
     for (int i = 0; i < kNumCubeFaces; ++i) {
-        if (i < _layers.size()) {
+        if (i < _layers.size() && !_layers[i].mipMaps.empty()) {
             const MipMap &mipMap = _layers[i].mipMaps.front();
-            fillTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mipMap.width, mipMap.height, mipMap.pixels->data(), static_cast<int>(mipMap.pixels->size()));
+            fillTarget2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mipMap.width, mipMap.height, mipMap.pixels->data(), static_cast<int>(mipMap.pixels->size()));
         } else {
-            fillTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _width, _height);
+            fillTarget2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _width, _height);
         }
     }
 
@@ -202,48 +204,37 @@ void Texture::refreshCubeMap() {
     }
 }
 
+void Texture::refresh2DArray() {
+    int numLayers = static_cast<int>(_layers.size());
+    fillTarget3D(_width, _height, numLayers);
+}
+
 void Texture::refresh2D() {
-    int numMipMaps = 0;
     GLenum target = isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
-    if (!_layers.empty()) {
-        numMipMaps = static_cast<int>(_layers[0].mipMaps.size());
+    int numMipMaps = !_layers.empty() ? static_cast<int>(_layers[0].mipMaps.size()) : 0;
+    if (numMipMaps > 0) {
         for (int i = 0; i < numMipMaps; ++i) {
             const MipMap &mipMap = _layers[0].mipMaps[i];
-            fillTarget(target, i, mipMap.width, mipMap.height, mipMap.pixels->data(), static_cast<int>(mipMap.pixels->size()));
+            fillTarget2D(target, i, mipMap.width, mipMap.height, mipMap.pixels->data(), static_cast<int>(mipMap.pixels->size()));
+        }
+        if (numMipMaps > 1) {
+            glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
+            glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, numMipMaps - 1);
+        } else if (isMipmapFilter(_properties.minFilter)) {
+            glGenerateMipmap(target);
         }
     } else {
-        fillTarget(target, 0, _width, _height);
-    }
-    if (numMipMaps > 1) {
-        glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
-        glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, numMipMaps - 1);
-    } else if (isMipmapFilter(_properties.minFilter)) {
-        glGenerateMipmap(target);
+        fillTarget2D(target, 0, _width, _height);
     }
 }
 
-void Texture::fillTarget(uint32_t target, int level, int width, int height, const void *pixels, int size) {
-    switch (_pixelFormat) {
-    case PixelFormat::DXT1:
-    case PixelFormat::DXT5:
-        glCompressedTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, size, pixels);
-        break;
-    default:
-        if (isMultisample()) {
-            // Multisample textures can only be used as color buffers
-            glTexImage2DMultisample(target, _properties.numSamples, getInternalPixelFormatGL(_pixelFormat), width, height, GL_TRUE);
-        } else {
-            glTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, getPixelFormatGL(_pixelFormat), getPixelTypeGL(_pixelFormat), pixels);
-        }
-        break;
-    }
-}
-
-void Texture::clear(int w, int h, PixelFormat format, bool refresh) {
+void Texture::clear(int w, int h, PixelFormat format, int numLayers, bool refresh) {
     _width = w;
     _height = h;
     _pixelFormat = format;
+
     _layers.clear();
+    _layers.resize(numLayers);
 
     if (refresh) {
         this->refresh();
@@ -277,8 +268,8 @@ void Texture::setPixels(int w, int h, PixelFormat format, vector<Layer> layers, 
 }
 
 void Texture::flushGPUToCPU() {
-    if (isCubeMap()) {
-        throw logic_error("Flushing cube maps is not supported");
+    if (isMultilayer()) {
+        throw logic_error("Flushing cubemap or array textures is not supported");
     }
     if (isMultisample()) {
         throw logic_error("Flushing multisample textures is not supported");
@@ -304,14 +295,14 @@ glm::vec4 Texture::sample(float s, float t) const {
 }
 
 glm::vec4 Texture::sample(int x, int y) const {
-    if (_layers.empty()) {
-        throw logic_error("Cannot sample an empty texture");
+    if (isMultilayer()) {
+        throw logic_error("Sampling cubemap or array textures is not supported");
     }
-    if (_layers.size() > 1ll) {
-        throw logic_error("Sampling a cube texture is not supported");
+    if (isMultisample()) {
+        throw logic_error("Sampling multisample textures is not supported");
     }
     if (isCompressed(_pixelFormat)) {
-        throw logic_error("Sampling a compressed texture is not supported");
+        throw logic_error("Sampling compressed textures is not supported");
     }
     bool grayscale = isGrayscale();
     bool alpha = _pixelFormat == PixelFormat::RGBA || _pixelFormat == PixelFormat::BGRA;
@@ -357,6 +348,37 @@ glm::vec4 Texture::sample(int x, int y) const {
     }
 
     return glm::vec4(r, g, b, a);
+}
+
+void Texture::fillTarget2D(uint32_t target, int level, int width, int height, const void *pixels, int size) {
+    switch (_pixelFormat) {
+    case PixelFormat::DXT1:
+    case PixelFormat::DXT5:
+        glCompressedTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, size, pixels);
+        break;
+    default:
+        if (isMultisample()) {
+            // Multisample textures can only be used as color buffers
+            glTexImage2DMultisample(target, _properties.numSamples, getInternalPixelFormatGL(_pixelFormat), width, height, GL_TRUE);
+        } else {
+            glTexImage2D(target, level, getInternalPixelFormatGL(_pixelFormat), width, height, 0, getPixelFormatGL(_pixelFormat), getPixelTypeGL(_pixelFormat), pixels);
+        }
+        break;
+    }
+}
+
+void Texture::fillTarget3D(int width, int height, int depth) {
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, getInternalPixelFormatGL(_pixelFormat), width, height, depth, 0, getPixelFormatGL(_pixelFormat), getPixelTypeGL(_pixelFormat), nullptr);
+}
+
+uint32_t Texture::getTargetGL() const {
+    if (isCubeMap()) {
+        return GL_TEXTURE_CUBE_MAP;
+    } else if (isMultilayer()) {
+        return GL_TEXTURE_2D_ARRAY;
+    } else {
+        return isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+    }
 }
 
 } // namespace graphics

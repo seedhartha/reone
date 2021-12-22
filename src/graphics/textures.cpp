@@ -48,6 +48,11 @@ void Textures::init() {
     _defaultCubemap->clear(1, 1, PixelFormat::RGB);
     _defaultCubemap->init();
 
+    // Initialize default array texture
+    _defaultArray = make_shared<Texture>("default_array", getTextureProperties(TextureUsage::Default));
+    _defaultArray->clear(1, 1, PixelFormat::RGB, kNumShadowCascades);
+    _defaultArray->init();
+
     bindDefaults();
 }
 
@@ -69,8 +74,8 @@ void Textures::bindDefaults() {
     bind(*_defaultCubemap, TextureUnits::environmentMap);
     bind(*_default, TextureUnits::bumpMap);
     bind(*_default, TextureUnits::bloom);
-    bind(*_default, TextureUnits::shadowMap);
-    bind(*_defaultCubemap, TextureUnits::shadowMapCube);
+    bind(*_defaultArray, TextureUnits::shadowMap);
+    bind(*_defaultCubemap, TextureUnits::cubeShadowMap);
 }
 
 shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {
@@ -120,7 +125,6 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     } else {
         warn("Texture not found: " + resRef, LogChannels::graphics);
     }
-
     return move(texture);
 }
 
