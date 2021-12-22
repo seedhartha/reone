@@ -22,6 +22,7 @@
 #include "../../graphics/meshes.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
+#include "../../graphics/textures.h"
 #include "../../graphics/window.h"
 
 #include "../graph.h"
@@ -39,23 +40,10 @@ namespace scene {
 static constexpr float kFadeSpeed = 1.0f;
 static constexpr float kMinDirectionalLightRadius = 1000.0f;
 
-LightSceneNode::LightSceneNode(
-    shared_ptr<ModelNode> modelNode,
-    SceneGraph &sceneGraph,
-    GraphicsContext &graphicsContext,
-    Meshes &meshes,
-    Shaders &shaders) :
-    ModelNodeSceneNode(
-        modelNode,
-        SceneNodeType::Light,
-        sceneGraph,
-        graphicsContext,
-        meshes,
-        shaders) {
-
-    _color = modelNode->color().getByFrameOrElse(0, glm::vec3(0.0f));
-    _radius = modelNode->radius().getByFrameOrElse(0, 0.0f);
-    _multiplier = modelNode->multiplier().getByFrameOrElse(0, 0.0f);
+void LightSceneNode::init() {
+    _color = _modelNode->color().getByFrameOrElse(0, glm::vec3(0.0f));
+    _radius = _modelNode->radius().getByFrameOrElse(0, 0.0f);
+    _multiplier = _modelNode->multiplier().getByFrameOrElse(0, 0.0f);
 }
 
 void LightSceneNode::update(float dt) {
@@ -75,7 +63,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     if (!camera) {
         return;
     }
-    _graphicsContext.bindTexture(TextureUnits::diffuseMap, flare.texture);
+    _textures.bind(*flare.texture, TextureUnits::diffuseMap);
 
     glm::vec4 lightPos(_absTransform[3]);
     glm::vec4 lightPosNdc(camera->projection() * camera->view() * lightPos);

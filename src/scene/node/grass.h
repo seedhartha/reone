@@ -32,6 +32,7 @@ class Meshes;
 class ModelNode;
 class Shaders;
 class Texture;
+class Textures;
 
 } // namespace graphics
 
@@ -49,7 +50,8 @@ public:
         SceneGraph &sceneGraph,
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders) :
+        graphics::Shaders &shaders,
+        graphics::Textures &textures) :
         SceneNode(SceneNodeType::Grass, sceneGraph),
         _density(density),
         _quadSize(quadSize),
@@ -59,7 +61,8 @@ public:
         _aabbNode(std::move(aabbNode)),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
-        _shaders(shaders) {
+        _shaders(shaders),
+        _textures(textures) {
 
         init();
     }
@@ -92,6 +95,7 @@ private:
     graphics::GraphicsContext &_graphicsContext;
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
+    graphics::Textures &_textures;
 
     // END Services
 };

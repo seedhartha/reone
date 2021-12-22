@@ -17,13 +17,13 @@
 
 #include "imagebutton.h"
 
-#include "../../graphics/context.h"
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/renderbuffer.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
+#include "../../graphics/textures.h"
 #include "../../graphics/window.h"
 
 #include "../gui.h"
@@ -89,7 +89,7 @@ void ImageButton::drawIcon(
     }
 
     if (iconFrame) {
-        _graphicsContext.bindTexture(0, iconFrame);
+        _textures.bind(*iconFrame);
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
@@ -110,7 +110,7 @@ void ImageButton::drawIcon(
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
-        _graphicsContext.bindTexture(0, iconTexture);
+        _textures.bind(*iconTexture);
 
         auto &uniforms = _shaders.uniforms();
         uniforms.general.resetLocals();

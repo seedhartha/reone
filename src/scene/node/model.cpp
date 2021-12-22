@@ -123,7 +123,7 @@ void ModelSceneNode::computeAABB() {
 }
 
 unique_ptr<DummySceneNode> ModelSceneNode::newDummySceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<DummySceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders);
+    return make_unique<DummySceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures);
 }
 
 unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(shared_ptr<ModelNode> node) const {
@@ -131,11 +131,11 @@ unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(shared_ptr<ModelNode>
 }
 
 unique_ptr<LightSceneNode> ModelSceneNode::newLightSceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<LightSceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders);
+    return make_unique<LightSceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures);
 }
 
 unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(shared_ptr<ModelNode> node) const {
-    return make_unique<EmitterSceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders);
+    return make_unique<EmitterSceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures);
 }
 
 void ModelSceneNode::signalEvent(const string &name) {

@@ -29,30 +29,25 @@ class Resources;
 
 namespace graphics {
 
-class GraphicsContext;
 class Texture;
 
 class Textures : boost::noncopyable {
 public:
-    Textures(GraphicsContext &graphicsContext, resource::Resources &resources) :
-        _graphicsContext(graphicsContext),
+    Textures(resource::Resources &resources) :
         _resources(resources) {
     }
 
     void init();
     void invalidate();
 
-    /**
-     * Binds default textures to all texture units. Call once per framebuffer.
-     */
+    void bind(Texture &texture, int unit = 0);
     void bindDefaults();
-
-    void add(std::string resRef, std::shared_ptr<Texture> texture);
 
     std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
 
 private:
-    GraphicsContext &_graphicsContext;
+    int _activeUnit {0};
+
     resource::Resources &_resources;
 
     std::shared_ptr<graphics::Texture> _default;

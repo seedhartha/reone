@@ -65,7 +65,7 @@ shared_ptr<Cursor> Cursors::get(CursorType type) {
     shared_ptr<Texture> textureDown(newTextureFromCursor(cursorNamesDown.back()));
     textureDown->init();
 
-    auto cursor = make_shared<Cursor>(textureUp, textureDown, _graphicsContext, _meshes, _shaders, _window);
+    auto cursor = make_shared<Cursor>(textureUp, textureDown, _meshes, _shaders, _textures, _window);
     _cache.insert(make_pair(type, cursor));
 
     return move(cursor);

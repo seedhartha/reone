@@ -30,6 +30,7 @@ class IScene;
 class Meshes;
 class Shaders;
 class Texture;
+class Textures;
 
 class ControlPipeline : boost::noncopyable {
 public:
@@ -37,11 +38,13 @@ public:
         GraphicsOptions options,
         GraphicsContext &graphicsContext,
         Meshes &meshes,
-        Shaders &shaders) :
+        Shaders &shaders,
+        Textures &textures) :
         _options(std::move(options)),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
-        _shaders(shaders) {
+        _shaders(shaders),
+        _textures(textures) {
     }
 
     void prepareFor(const glm::ivec4 &extent);
@@ -85,6 +88,7 @@ private:
     GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
+    Textures &_textures;
 
     // END Services
 };

@@ -252,9 +252,9 @@ void WorldPipeline::drawGeometry() {
 
     if (_scene->hasShadowLight()) {
         if (_scene->isShadowLightDirectional()) {
-            _graphicsContext.bindTexture(TextureUnits::shadowMap, _shadowsDepth);
+            _textures.bind(*_shadowsDepth, TextureUnits::shadowMap);
         } else {
-            _graphicsContext.bindTexture(TextureUnits::shadowMapCube, _cubeShadowsDepth);
+            _textures.bind(*_cubeShadowsDepth, TextureUnits::shadowMapCube);
         }
     }
 
@@ -285,7 +285,7 @@ void WorldPipeline::applyHorizontalBlur() {
 
     // Bind bright geometry texture
 
-    _graphicsContext.bindTexture(0, _geometry2Color2);
+    _textures.bind(*_geometry2Color2);
 
     // Set shader uniforms
 
@@ -317,7 +317,7 @@ void WorldPipeline::applyVerticalBlur() {
 
     // Bind diffuse map
 
-    _graphicsContext.bindTexture(0, _horizontalBlurColor);
+    _textures.bind(*_horizontalBlurColor);
 
     // Set shader uniforms
 
@@ -352,11 +352,11 @@ void WorldPipeline::drawResult() {
 
     // Bind geometry texture
 
-    _graphicsContext.bindTexture(0, _geometry2Color1);
+    _textures.bind(*_geometry2Color1);
 
     // Bind blur texture
 
-    _graphicsContext.bindTexture(TextureUnits::bloom, _verticalBlurColor);
+    _textures.bind(*_verticalBlurColor, TextureUnits::bloom);
 
     // Set shader uniforms
 
@@ -381,7 +381,7 @@ void WorldPipeline::drawResult() {
 
 void WorldPipeline::saveScreenshot() {
     glViewport(0, 0, _options.width, _options.height);
-    _graphicsContext.bindTexture(0, _screenshotColor);
+    _textures.bind(*_screenshotColor);
     _screenshotColor->flushGPUToCPU();
 }
 

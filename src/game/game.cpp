@@ -256,7 +256,7 @@ void Game::playVideo(const string &name) {
         return;
     }
 
-    BikReader bik(path, _services.graphicsContext, _services.meshes, _services.shaders, _services.audioPlayer);
+    BikReader bik(path, _services.meshes, _services.shaders, _services.textures, _services.audioPlayer);
     bik.load();
 
     _video = bik.video();

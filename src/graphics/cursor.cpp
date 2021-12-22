@@ -17,11 +17,11 @@
 
 #include "cursor.h"
 
-#include "context.h"
 #include "mesh.h"
 #include "meshes.h"
 #include "shaders.h"
 #include "texture.h"
+#include "textures.h"
 #include "window.h"
 
 using namespace std;
@@ -32,7 +32,7 @@ namespace graphics {
 
 void Cursor::draw() {
     shared_ptr<Texture> texture(_pressed ? _down : _up);
-    _graphicsContext.bindTexture(0, texture);
+    _textures.bind(*texture);
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(static_cast<float>(_position.x), static_cast<float>(_position.y), 0.0f));

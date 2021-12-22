@@ -17,11 +17,11 @@
 
 #include "font.h"
 
-#include "context.h"
 #include "mesh.h"
 #include "meshes.h"
 #include "shaders.h"
 #include "texture.h"
+#include "textures.h"
 #include "window.h"
 
 using namespace std;
@@ -29,13 +29,6 @@ using namespace std;
 namespace reone {
 
 namespace graphics {
-
-Font::Font(Window &window, GraphicsContext &graphicsContext, Meshes &meshes, Shaders &shaders) :
-    _window(window),
-    _graphicsContext(graphicsContext),
-    _meshes(meshes),
-    _shaders(shaders) {
-}
 
 void Font::load(shared_ptr<Texture> texture) {
     _texture = texture;
@@ -64,7 +57,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
     if (text.empty()) {
         return;
     }
-    _graphicsContext.bindTexture(0, _texture);
+    _textures.bind(*_texture);
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();

@@ -21,9 +21,9 @@ namespace reone {
 
 namespace graphics {
 
-class GraphicsContext;
 class Meshes;
 class Shaders;
+class Textures;
 
 } // namespace graphics
 
@@ -46,14 +46,14 @@ class BikReader {
 public:
     BikReader(
         boost::filesystem::path path,
-        graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
+        graphics::Textures &textures,
         audio::AudioPlayer &audioPlayer) :
         _path(std::move(path)),
-        _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
+        _textures(textures),
         _audioPlayer(audioPlayer) {
     }
 
@@ -68,9 +68,9 @@ private:
 
     // Services
 
-    graphics::GraphicsContext &_graphicsContext;
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
+    graphics::Textures &_textures;
 
     audio::AudioPlayer &_audioPlayer;
 

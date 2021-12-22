@@ -120,7 +120,7 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
 
     glViewport(0, 0, _options.width, _options.height);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    _graphicsContext.bindTexture(0, attachments.colorBuffer2);
+    _textures.bind(*attachments.colorBuffer2);
 
     glm::mat4 projection(glm::ortho(
         0.0f,

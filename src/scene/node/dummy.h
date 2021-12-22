@@ -30,14 +30,16 @@ public:
         SceneGraph &sceneGraph,
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
-        graphics::Shaders &shaders) :
+        graphics::Shaders &shaders,
+        graphics::Textures &textures) :
         ModelNodeSceneNode(
             std::move(modelNode),
             SceneNodeType::Dummy,
             sceneGraph,
             graphicsContext,
             meshes,
-            shaders) {
+            shaders,
+            textures) {
     }
 };
 

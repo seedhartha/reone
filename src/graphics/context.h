@@ -34,13 +34,7 @@ public:
         _options(std::move(options)) {
     }
 
-    ~GraphicsContext() { deinit(); }
-
     void init();
-    void deinit();
-
-    void bindTexture(int unit, std::shared_ptr<Texture> texture);
-    void unbindTexture(int unit);
 
     BlendMode blendMode() const { return _blendMode; }
 
@@ -56,11 +50,6 @@ private:
 
     bool _backFaceCulling {false};
     BlendMode _blendMode {BlendMode::None};
-    int _textureUnit {0};
-
-    std::vector<std::shared_ptr<Texture>> _textures;
-
-    void setActiveTextureUnit(int unit);
 };
 
 } // namespace graphics

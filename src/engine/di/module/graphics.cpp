@@ -29,14 +29,14 @@ void GraphicsModule::init() {
     _window = make_unique<Window>(_options);
     _graphicsContext = make_unique<GraphicsContext>(_options);
     _meshes = make_unique<Meshes>();
-    _textures = make_unique<Textures>(*_graphicsContext, _resource.resources());
+    _textures = make_unique<Textures>(_resource.resources());
     _models = make_unique<Models>(*_textures, _resource.resources());
     _walkmeshes = make_unique<Walkmeshes>(_resource.resources());
     _lipAnimations = make_unique<LipAnimations>(_resource.resources());
     _shaders = make_unique<Shaders>();
-    _fonts = make_unique<Fonts>(*_window, *_graphicsContext, *_meshes, *_textures, *_shaders);
-    _worldPipeline = make_unique<WorldPipeline>(_options, *_graphicsContext, *_meshes, *_shaders);
-    _controlPipeline = make_unique<ControlPipeline>(_options, *_graphicsContext, *_meshes, *_shaders);
+    _fonts = make_unique<Fonts>(*_meshes, *_shaders, *_textures, *_window);
+    _worldPipeline = make_unique<WorldPipeline>(_options, *_graphicsContext, *_meshes, *_shaders, *_textures);
+    _controlPipeline = make_unique<ControlPipeline>(_options, *_graphicsContext, *_meshes, *_shaders, *_textures);
 
     _window->init();
     _graphicsContext->init();

@@ -217,7 +217,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             _graphicsContext.setBlendMode(BlendMode::Add);
         }
 
-        _graphicsContext.bindTexture(0, border.fill);
+        _textures.bind(*border.fill);
         _shaders.use(_shaders.gui(), true);
         _meshes.quad().draw();
 
@@ -227,7 +227,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int width = size.x - 2 * border.dimension;
         int height = size.y - 2 * border.dimension;
 
-        _graphicsContext.bindTexture(0, border.edge);
+        _textures.bind(*border.edge);
 
         if (height > 0.0f) {
             int x = _extent.left + offset.x;
@@ -319,7 +319,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         int x = _extent.left + offset.x;
         int y = _extent.top + offset.y;
 
-        _graphicsContext.bindTexture(0, border.corner);
+        _textures.bind(*border.corner);
 
         // Top left corner
         {
