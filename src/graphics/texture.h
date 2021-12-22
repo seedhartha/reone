@@ -111,6 +111,7 @@ public:
     glm::vec4 sample(int x, int y) const;
 
     bool isCubeMap() const { return _properties.cubemap; }
+    bool isMultilayer() const { return _layers.size() > 1ll; }
     bool isMultisample() const { return _properties.numSamples > 1; }
     bool isAdditive() const { return _features.blending == Blending::Additive; }
     bool isGrayscale() const { return _pixelFormat == PixelFormat::Grayscale; }
@@ -129,7 +130,7 @@ public:
 
     // Pixels
 
-    void clear(int w, int h, PixelFormat format, bool refresh = false);
+    void clear(int w, int h, PixelFormat format, int numLayers = 1, bool refresh = false);
 
     void setPixels(int w, int h, PixelFormat format, std::shared_ptr<ByteArray> pixels, bool refresh = false);
     void setPixels(int w, int h, PixelFormat format, std::vector<Layer> layers, bool refresh = false);
@@ -167,9 +168,13 @@ private:
     void configureCubeMap();
 
     void refresh2D();
+    void refresh2DArray();
     void refreshCubeMap();
 
-    void fillTarget(uint32_t target, int level, int width, int height, const void *pixels = nullptr, int size = 0);
+    void fillTarget2D(uint32_t target, int level, int width, int height, const void *pixels = nullptr, int size = 0);
+    void fillTarget3D(int width, int height, int depth);
+
+    uint32_t getTargetGL() const;
 };
 
 } // namespace graphics

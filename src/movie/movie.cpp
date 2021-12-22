@@ -39,6 +39,7 @@ void Movie::init() {
         _width = _videoStream->width();
         _height = _videoStream->height();
         _texture = make_shared<Texture>("video", getTextureProperties(TextureUsage::Video));
+        _texture->clear(1, 1, PixelFormat::RGB, 1);
         _texture->init();
     }
     if (!_audioSource && _audioStream) {

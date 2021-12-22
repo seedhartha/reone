@@ -107,7 +107,7 @@ void WorldPipeline::init() {
     // Shadows framebuffer
 
     _shadowsDepth = make_unique<Texture>("shadows_depth", getTextureProperties(TextureUsage::DepthBuffer));
-    _shadowsDepth->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
+    _shadowsDepth->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth, kNumShadowCascades);
     _shadowsDepth->init();
 
     _directionalLightShadows = make_shared<Framebuffer>();
@@ -137,7 +137,6 @@ void WorldPipeline::draw() {
     if (!_scene->hasCamera()) {
         return;
     }
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     computeLightSpaceMatrices();
     drawShadows();
     drawGeometry();
@@ -237,12 +236,21 @@ void WorldPipeline::computeLightSpaceMatrices() {
         return;
     }
     if (_scene->isShadowLightDirectional()) {
+        auto lightDir = glm::normalize(_scene->cameraPosition() - _scene->shadowLightPosition());
         float fov = _scene->cameraFieldOfView();
         float aspect = _options.width / static_cast<float>(_options.height);
         float near = _scene->cameraNearPlane();
-        float far = _scene->cameraFarPlane() / 500.0f;
-        auto lightDir = glm::normalize(_scene->cameraPosition() - _scene->shadowLightPosition());
-        _shadowLightSpaceMatrices[0] = computeDirectionalLightSpaceMatrix(fov, aspect, near, far, lightDir, _scene->cameraView());
+        float far = _scene->cameraFarPlane();
+        vector<float> shadowCascadeLevels {far / 1000.0f, far / 500.0f, far / 250.0f};
+        for (size_t i = 0; i < 1 + shadowCascadeLevels.size(); ++i) {
+            if (i == 0) {
+                _shadowLightSpaceMatrices[i] = computeDirectionalLightSpaceMatrix(fov, aspect, near, shadowCascadeLevels[i], lightDir, _scene->cameraView());
+            } else if (i < shadowCascadeLevels.size()) {
+                _shadowLightSpaceMatrices[i] = computeDirectionalLightSpaceMatrix(fov, aspect, shadowCascadeLevels[i - 1], shadowCascadeLevels[i], lightDir, _scene->cameraView());
+            } else {
+                _shadowLightSpaceMatrices[i] = computeDirectionalLightSpaceMatrix(fov, aspect, shadowCascadeLevels[i - 1], far, lightDir, _scene->cameraView());
+            }
+        }
     } else {
         glm::mat4 projection(glm::perspective(kShadowsPointLightFOV, 1.0f, kShadowsNearPlane, kShadowsFarPlane));
         for (int i = 0; i < kNumCubeFaces; ++i) {
@@ -321,7 +329,7 @@ void WorldPipeline::drawGeometry() {
         if (_scene->isShadowLightDirectional()) {
             _textures.bind(*_shadowsDepth, TextureUnits::shadowMap);
         } else {
-            _textures.bind(*_cubeShadowsDepth, TextureUnits::shadowMapCube);
+            _textures.bind(*_cubeShadowsDepth, TextureUnits::cubeShadowMap);
         }
     }
 
@@ -433,6 +441,7 @@ void WorldPipeline::drawResult() {
 
     // Draw a quad
 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     _shaders.use(_shaders.presentWorld(), true);
     _meshes.quadNDC().draw();
 

@@ -22,6 +22,7 @@ namespace reone {
 namespace graphics {
 
 constexpr int kNumCubeFaces = 6;
+constexpr int kNumShadowCascades = 4;
 
 constexpr float kDefaultClipPlaneNear = 0.1f;
 constexpr float kDefaultClipPlaneFar = 10000.0f;
@@ -119,7 +120,7 @@ struct TextureUnits {
     static constexpr int bumpMap = 3;
     static constexpr int bloom = 4;
     static constexpr int shadowMap = 5;
-    static constexpr int shadowMapCube = 6;
+    static constexpr int cubeShadowMap = 6;
 };
 
 struct UniformBlockBindingPoints {

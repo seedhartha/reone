@@ -52,6 +52,7 @@ private:
 
     std::shared_ptr<graphics::Texture> _default;
     std::shared_ptr<graphics::Texture> _defaultCubemap;
+    std::shared_ptr<graphics::Texture> _defaultArray;
     std::unordered_map<std::string, std::shared_ptr<Texture>> _cache;
 
     std::shared_ptr<Texture> doGet(const std::string &resRef, TextureUsage usage);

@@ -153,15 +153,14 @@ const float SELFILLUM_THRESHOLD = 0.85;
 uniform sampler2D sDiffuseMap;
 uniform sampler2D sLightmap;
 uniform sampler2D sBumpMap;
-uniform sampler2D sShadowMap;
+uniform sampler2DArray sShadowMap;
 uniform samplerCube sEnvironmentMap;
-uniform samplerCube sShadowMapCube;
+uniform samplerCube sCubeShadowMap;
 
-in vec3 fragPosition;
+in vec3 fragPosWorldSpace;
 in vec3 fragNormal;
 in vec2 fragTexCoords;
 in vec2 fragLightmapCoords;
-in vec4 fragPosLightSpace;
 in mat3 fragTanSpace;
 
 layout(location = 0) out vec4 fragColor;
@@ -173,14 +172,14 @@ float getAttenuationQuadratic(int light) {
     float D = uLights[light].radius;
     D *= D;
 
-    float r = length(uLights[light].position.xyz - fragPosition);
+    float r = length(uLights[light].position.xyz - fragPosWorldSpace);
     r *= r;
 
     return D / (D + r);
 }
 
 vec3 applyFog(vec3 objectColor) {
-    float distance = length(uCameraPosition.xyz - fragPosition);
+    float distance = length(uCameraPosition.xyz - fragPosWorldSpace);
     float fogAmount = clamp(distance - uFogNear, 0.0, uFogFar - uFogNear) / (uFogFar - uFogNear);
     return mix(objectColor, uFogColor.rgb, fogAmount);
 }
@@ -192,8 +191,8 @@ vec2 packTexCoords(vec2 uv, vec4 bounds) {
 }
 
 vec3 getNormalFromNormalMap(vec2 uv) {
-    vec4 sample = texture(sBumpMap, uv);
-    vec3 normal = sample.rgb * 2.0 - 1.0;
+    vec4 bumpMapSample = texture(sBumpMap, uv);
+    vec3 normal = bumpMapSample.rgb * 2.0 - 1.0;
     return fragTanSpace * normalize(normal);
 }
 
@@ -204,11 +203,11 @@ vec3 getNormalFromHeightMap(vec2 uv) {
     vec2 uvPacked = packTexCoords(uv, uHeightMapFrameBounds);
     vec2 uvPackedDu = packTexCoords(uv + du, uHeightMapFrameBounds);
     vec2 uvPackedDv = packTexCoords(uv + dv, uHeightMapFrameBounds);
-    vec4 sample = texture(sBumpMap, uvPacked);
-    vec4 sampleDu = texture(sBumpMap, uvPackedDu);
-    vec4 sampleDv = texture(sBumpMap, uvPackedDv);
-    float dBx = sampleDu.r - sample.r;
-    float dBy = sampleDv.r - sample.r;
+    vec4 bumpMapSample = texture(sBumpMap, uvPacked);
+    vec4 bumpMapSampleDu = texture(sBumpMap, uvPackedDu);
+    vec4 bumpMapSampleDv = texture(sBumpMap, uvPackedDv);
+    float dBx = bumpMapSampleDu.r - bumpMapSample.r;
+    float dBy = bumpMapSampleDv.r - bumpMapSample.r;
 
     vec3 normal = vec3(-dBx, -dBy, 1.0);
     normal.xy *= uHeightMapScaling;
@@ -228,36 +227,60 @@ vec3 getNormal(vec2 uv) {
 )END";
 
 static const string g_glslShadows = R"END(
+const float FAR_PLANE = 10000.0;
+const float SHADOW_CASCADE_DISTANCES[3] = float[](FAR_PLANE / 1000.0, FAR_PLANE / 500.0, FAR_PLANE / 250.0);
+const int NUM_SHADOW_CASCADES = 4;
+
 float getShadow(vec3 normal) {
     if (!isFeatureEnabled(FEATURE_SHADOWS)) return 0.0;
 
     float result = 0.0;
 
-    vec3 fragToLight = fragPosition - uShadowLightPosition.xyz;
+    vec3 fragToLight = fragPosWorldSpace - uShadowLightPosition.xyz;
     vec3 lightDir = normalize(fragToLight);
     float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-    bias /= 5000.0;
 
     if (uShadowLightPosition.w == 0.0) {
         // Directional Light
 
+        vec4 fragPosViewSpace = uView * vec4(fragPosWorldSpace, 1.0);
+        float depthValue = abs(fragPosViewSpace.z);
+
+        int layer = -1;
+        for (int i = 0; i < NUM_SHADOW_CASCADES - 1; ++i) {
+            if (depthValue < SHADOW_CASCADE_DISTANCES[i]) {
+                layer = i;
+                break;
+            }
+        }
+        if (layer == -1) {
+            layer = NUM_SHADOW_CASCADES - 1;
+        }
+
+        if (layer == NUM_SHADOW_CASCADES - 1) {
+            bias /= FAR_PLANE * 0.5f;
+        } else {
+            bias /= SHADOW_CASCADE_DISTANCES[layer] * 0.5f;
+        }
+
+        vec4 fragPosLightSpace = uShadowLightSpaceMatrices[layer] * vec4(fragPosWorldSpace, 1.0);
         vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
         projCoords = projCoords * 0.5 + 0.5;
-        float closestDepth = texture(sShadowMap, projCoords.xy).r;
-        float currentDepth = projCoords.z;
 
-        vec2 texelSize = 1.0 / textureSize(sShadowMap, 0);
+        float currentDepth = projCoords.z;
+        if (currentDepth > 1.0) {
+            return 0.0;
+        }
+
+        vec2 texelSize = 1.0 / vec2(textureSize(sShadowMap, 0));
         for (int x = -1; x <= 1; ++x) {
             for (int y = -1; y <= 1; ++y) {
-                float pcfDepth = texture(sShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-                result += (currentDepth - bias) > pcfDepth  ? 1.0 : 0.0;
+                float pcfDepth = texture(sShadowMap, vec3(projCoords.xy + vec2(x, y) * texelSize, layer)).r;
+                result += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;
             }
         }
         result /= 9.0;
 
-        if (projCoords.z > 1.0) {
-            result = 0.0;
-        }
     } else {
         // Point Light
 
@@ -265,10 +288,12 @@ float getShadow(vec3 normal) {
         float samples = 4.0;
         float offset = 0.1;
 
+        bias /= FAR_PLANE * 0.5f;
+
         for (float x = -offset; x < offset; x += offset / (samples * 0.5)) {
             for (float y = -offset; y < offset; y += offset / (samples * 0.5)) {
                 for (float z = -offset; z < offset; z += offset / (samples * 0.5)) {
-                    float closestDepth = texture(sShadowMapCube, fragToLight + vec3(x, y, z)).r;
+                    float closestDepth = texture(sCubeShadowMap, fragToLight + vec3(x, y, z)).r;
                     closestDepth = (SHADOW_FAR_PLANE - SHADOW_NEAR_PLANE) * closestDepth + SHADOW_NEAR_PLANE; // map to [0.1, 10000.0]
 
                     if (currentDepth - bias > closestDepth) {
@@ -306,12 +331,12 @@ vec3 getLightingIndirect(vec3 N) {
 
 vec3 getLightingDirect(vec3 N) {
     vec3 result = vec3(0.0);
-    vec3 V = normalize(uCameraPosition.xyz - fragPosition);
+    vec3 V = normalize(uCameraPosition.xyz - fragPosWorldSpace);
 
     for (int i = 0; i < uLightCount; ++i) {
         if (uLights[i].ambientOnly) continue;
 
-        vec3 L = normalize(uLights[i].position.xyz - fragPosition);
+        vec3 L = normalize(uLights[i].position.xyz - fragPosWorldSpace);
         vec3 H = normalize(V + L);
 
         vec3 diff = uDiffuseColor.rgb * max(dot(L, N), 0.0);
@@ -335,14 +360,14 @@ static const string g_vsSimple = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
-out vec3 fragPosition;
+out vec3 fragPosWorldSpace;
 out vec2 fragTexCoords;
 
 void main() {
-    fragPosition = vec3(uModel * vec4(aPosition, 1.0));
+    fragPosWorldSpace = vec3(uModel * vec4(aPosition, 1.0));
     fragTexCoords = aTexCoords;
 
-    gl_Position = uProjection * uView * vec4(fragPosition, 1.0);
+    gl_Position = uProjection * uView * vec4(fragPosWorldSpace, 1.0);
 }
 )END";
 
@@ -357,11 +382,10 @@ layout(location = 6) in vec3 aTanSpaceNormal;
 layout(location = 7) in vec4 aBoneIndices;
 layout(location = 8) in vec4 aBoneWeights;
 
-out vec3 fragPosition;
+out vec3 fragPosWorldSpace;
 out vec3 fragNormal;
 out vec2 fragTexCoords;
 out vec2 fragLightmapCoords;
-out vec4 fragPosLightSpace;
 out mat3 fragTanSpace;
 
 void main() {
@@ -402,7 +426,7 @@ void main() {
 
     mat3 normalMatrix = transpose(inverse(mat3(uModel)));
 
-    fragPosition = vec3(uModel * position);
+    fragPosWorldSpace = vec3(uModel * position);
     fragNormal = normalize(normalMatrix * normal.xyz);
     fragTexCoords = aTexCoords;
     fragLightmapCoords = aLightmapCoords;
@@ -414,14 +438,7 @@ void main() {
         fragTanSpace = mat3(T, B, N);
     }
 
-    // Compute light space fragment position for directional lights
-    if (isFeatureEnabled(FEATURE_SHADOWS) && uShadowLightPosition.w == 0.0) {
-        fragPosLightSpace = uShadowLightSpaceMatrices[0] * vec4(fragPosition, 1.0);
-    } else {
-        fragPosLightSpace = vec4(0.0);
-    }
-
-    gl_Position = uProjection * uView * vec4(fragPosition, 1.0);
+    gl_Position = uProjection * uView * vec4(fragPosWorldSpace, 1.0);
 }
 )END";
 
@@ -552,14 +569,14 @@ static const string g_gsPointLightShadows = R"END(
 layout(triangles) in;
 layout(triangle_strip, max_vertices=18) out;
 
-out vec4 fragPosition;
+out vec4 fragPosWorldSpace;
 
 void main() {
     for (int face = 0; face < NUM_CUBE_FACES; ++face) {
         gl_Layer = face;
         for (int i = 0; i < 3; ++i) {
-            fragPosition = gl_in[i].gl_Position;
-            gl_Position = uShadowLightSpaceMatrices[face] * fragPosition;
+            fragPosWorldSpace = gl_in[i].gl_Position;
+            gl_Position = uShadowLightSpaceMatrices[face] * fragPosWorldSpace;
             EmitVertex();
         }
         EndPrimitive();
@@ -569,17 +586,20 @@ void main() {
 
 static const string g_gsDirectionalLightShadows = R"END(
 layout(triangles) in;
-layout(triangle_strip, max_vertices=3) out;
+layout(triangle_strip, max_vertices=12) out;
 
-out vec4 fragPosition;
+out vec4 fragPosWorldSpace;
 
 void main() {
-    for (int i = 0; i < 3; ++i) {
-        fragPosition = gl_in[i].gl_Position;
-        gl_Position = uShadowLightSpaceMatrices[0] * fragPosition;
-        EmitVertex();
+    for (int cascade = 0; cascade < 4; ++cascade) {
+        gl_Layer = cascade;
+        for (int i = 0; i < 3; ++i) {
+            fragPosWorldSpace = gl_in[i].gl_Position;
+            gl_Position = uShadowLightSpaceMatrices[cascade] * fragPosWorldSpace;
+            EmitVertex();
+        }
+        EndPrimitive();
     }
-    EndPrimitive();
 }
 )END";
 
@@ -593,13 +613,19 @@ void main() {
 }
 )END";
 
-static const string g_fsShadows = R"END(
-in vec4 fragPosition;
+static const string g_fsPointLightShadows = R"END(
+in vec4 fragPosWorldSpace;
 
 void main() {
-    float lightDistance = length(fragPosition.xyz - uShadowLightPosition.xyz);
+    float lightDistance = length(fragPosWorldSpace.xyz - uShadowLightPosition.xyz);
     lightDistance = (lightDistance - SHADOW_NEAR_PLANE) / (SHADOW_FAR_PLANE - SHADOW_NEAR_PLANE); // map to [0,1]
     gl_FragDepth = lightDistance;
+}
+)END";
+
+static const string g_fsDirectionalLightShadows = R"END(
+void main() {
+    gl_FragDepth = 0.0;
 }
 )END";
 
@@ -762,7 +788,7 @@ void main() {
     float objectAlpha = (opaque ? 1.0 : diffuseSample.a) * uAlpha;
 
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
-        vec3 V = normalize(uCameraPosition.xyz - fragPosition);
+        vec3 V = normalize(uCameraPosition.xyz - fragPosWorldSpace);
         vec3 R = reflect(-V, N);
         vec4 envmapSample = texture(sEnvironmentMap, R);
         objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
@@ -827,7 +853,8 @@ void Shaders::init() {
     auto gsPointLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_gsPointLightShadows});
     auto gsDirectionalLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_gsDirectionalLightShadows});
     auto fsColor = initShader(ShaderType::Fragment, {g_glslHeader, g_fsColor});
-    auto fsShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsShadows});
+    auto fsPointLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsPointLightShadows});
+    auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDirectionalLightShadows});
     auto fsGUI = initShader(ShaderType::Fragment, {g_glslHeader, g_fsGUI});
     auto fsText = initShader(ShaderType::Fragment, {g_glslHeader, g_fsText});
     auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_fsParticle});
@@ -839,8 +866,8 @@ void Shaders::init() {
 
     // Shader Programs
     _spSimpleColor = initShaderProgram({vsSimple, fsColor});
-    _spPointLightShadows = initShaderProgram({vsSimple, gsPointLightShadows, fsShadows});
-    _spDirectionalLightShadows = initShaderProgram({vsSimple, gsDirectionalLightShadows, fsShadows});
+    _spPointLightShadows = initShaderProgram({vsSimple, gsPointLightShadows, fsPointLightShadows});
+    _spDirectionalLightShadows = initShaderProgram({vsSimple, gsDirectionalLightShadows, fsDirectionalLightShadows});
     _spGUI = initShaderProgram({vsSimple, fsGUI});
     _spBlur = initShaderProgram({vsSimple, fsBlur});
     _spPresentWorld = initShaderProgram({vsSimple, fsPresentWorld});
@@ -931,7 +958,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sBumpMap", TextureUnits::bumpMap);
     program->setUniform("sBloom", TextureUnits::bloom);
     program->setUniform("sShadowMap", TextureUnits::shadowMap);
-    program->setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
+    program->setUniform("sCubeShadowMap", TextureUnits::cubeShadowMap);
 
     // Uniform Blocks
     program->bindUniformBlock("General", UniformBlockBindingPoints::general);
