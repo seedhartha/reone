@@ -37,6 +37,9 @@ public:
     virtual bool hasCamera() const = 0;
 
     virtual glm::vec3 cameraPosition() const = 0;
+    virtual float cameraFieldOfView() const = 0;
+    virtual float cameraNearPlane() const = 0;
+    virtual float cameraFarPlane() const = 0;
     virtual const glm::mat4 &cameraProjection() const = 0;
     virtual const glm::mat4 &cameraView() const = 0;
 

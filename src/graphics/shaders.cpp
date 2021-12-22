@@ -53,6 +53,7 @@ const int MAX_GRASS_CLUSTERS = 256;
 const int MAX_DANGLYMESH_CONSTRAINTS = 512;
 
 const float SHININESS = 8.0;
+const float SHADOW_NEAR_PLANE = 0.1;
 const float SHADOW_FAR_PLANE = 10000.0;
 
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
@@ -266,7 +267,7 @@ float getShadow() {
             for (float y = -offset; y < offset; y += offset / (samples * 0.5)) {
                 for (float z = -offset; z < offset; z += offset / (samples * 0.5)) {
                     float closestDepth = texture(sShadowMapCube, fragToLight + vec3(x, y, z)).r;
-                    closestDepth *= SHADOW_FAR_PLANE;
+                    closestDepth = (SHADOW_FAR_PLANE - SHADOW_NEAR_PLANE) * closestDepth + SHADOW_NEAR_PLANE; // map to [0.1, 10000.0]
 
                     if (currentDepth - bias > closestDepth) {
                         result += 1.0;
@@ -595,7 +596,7 @@ in vec4 fragPosition;
 
 void main() {
     float lightDistance = length(fragPosition.xyz - uShadowLightPosition.xyz);
-    lightDistance = lightDistance / SHADOW_FAR_PLANE; // map to [0,1]
+    lightDistance = (lightDistance - SHADOW_NEAR_PLANE) / (SHADOW_FAR_PLANE - SHADOW_NEAR_PLANE); // map to [0,1]
     gl_FragDepth = lightDistance;
 }
 )END";

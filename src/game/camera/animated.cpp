@@ -32,17 +32,15 @@ namespace reone {
 namespace game {
 
 AnimatedCamera::AnimatedCamera(float aspect, SceneGraph &sceneGraph) :
-    _sceneGraph(sceneGraph),
-    _aspect(aspect) {
+    _aspect(aspect),
+    _sceneGraph(sceneGraph) {
 
-    _sceneNode = _sceneGraph.newCamera(glm::mat4(1.0f));
-
+    _sceneNode = _sceneGraph.newCamera(_fovy, _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
     updateProjection();
 }
 
 void AnimatedCamera::updateProjection() {
-    glm::mat4 projection(glm::perspective(glm::radians(_fovy), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
-    _sceneNode->setProjection(projection);
+    _sceneNode->setProjection(glm::radians(_fovy), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 }
 
 void AnimatedCamera::update(float dt) {
@@ -87,6 +85,9 @@ void AnimatedCamera::setModel(shared_ptr<Model> model) {
 }
 
 void AnimatedCamera::setFieldOfView(float fovy) {
+    if (_fovy != fovy) {
+        return;
+    }
     _fovy = fovy;
     updateProjection();
 }

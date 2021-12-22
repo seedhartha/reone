@@ -27,8 +27,30 @@ namespace scene {
 
 class CameraSceneNode : public SceneNode {
 public:
-    CameraSceneNode(glm::mat4 projection, SceneGraph &sceneGraph) :
+    CameraSceneNode(
+        float fieldOfView,
+        float aspect,
+        float nearPlane,
+        float farPlane,
+        SceneGraph &sceneGraph) :
         SceneNode(SceneNodeType::Camera, sceneGraph),
+        _fieldOfView(fieldOfView),
+        _aspect(aspect),
+        _nearPlane(nearPlane),
+        _farPlane(farPlane) {
+
+        setProjection(fieldOfView, aspect, nearPlane, farPlane);
+    }
+
+    // TODO: forbid querying FOV and aspect of orthogonal projection cameras
+    CameraSceneNode(
+        glm::mat4 projection,
+        SceneGraph &sceneGraph) :
+        SceneNode(SceneNodeType::Camera, sceneGraph),
+        _fieldOfView(-1.0f),
+        _aspect(-1.0f),
+        _nearPlane(-1.0f),
+        _farPlane(-1.0f),
         _projection(std::move(projection)) {
     }
 
@@ -36,12 +58,20 @@ public:
     bool isInFrustum(const graphics::AABB &aabb) const;
     bool isInFrustum(const SceneNode &other) const;
 
+    float fieldOfView() const { return _fieldOfView; }
+    float nearPlane() const { return _nearPlane; }
+    float farPlane() const { return _farPlane; }
     const glm::mat4 &projection() const { return _projection; }
     const glm::mat4 &view() const { return _view; }
 
-    void setProjection(glm::mat4 projection);
+    void setProjection(float fieldOfView, float aspect, float nearPlane, float farPlane);
 
 private:
+    float _fieldOfView;
+    float _aspect;
+    float _nearPlane;
+    float _farPlane;
+
     glm::mat4 _projection {1.0f};
     glm::mat4 _view {1.0f};
 
