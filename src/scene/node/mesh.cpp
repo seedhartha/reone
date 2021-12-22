@@ -252,7 +252,7 @@ void MeshSceneNode::draw() {
     uniforms.general.model = _absTransform;
     uniforms.general.alpha = _alpha;
 
-    auto program = _nodeTextures.diffuse ? _shaders.blinnPhong() : _shaders.blinnPhongDiffuseless();
+    auto &program = _nodeTextures.diffuse ? _shaders.blinnPhong() : _shaders.blinnPhongDiffuseless();
 
     if (_nodeTextures.diffuse) {
         uniforms.general.featureMask |= UniformsFeatureFlags::diffuse;
@@ -364,8 +364,7 @@ void MeshSceneNode::draw() {
         }
     }
 
-    _graphicsContext.useShaderProgram(program);
-    _shaders.refreshUniforms();
+    _shaders.use(program, true);
 
     bool additive = false;
 
@@ -403,8 +402,7 @@ void MeshSceneNode::drawShadow() {
     uniforms.general.model = _absTransform;
     uniforms.general.alpha = _alpha;
 
-    _graphicsContext.useShaderProgram(_shaders.depth());
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.depth(), true);
     mesh->mesh->draw();
 }
 

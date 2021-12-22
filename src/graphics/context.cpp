@@ -44,23 +44,11 @@ void GraphicsContext::deinit() {
     if (!_inited) {
         return;
     }
-    if (_shaderProgram) {
-        glUseProgram(0);
-        _shaderProgram.reset();
-    }
     for (size_t i = 0; i < _textures.size(); ++i) {
         unbindTexture(static_cast<int>(i));
     }
     _textures.clear();
     _inited = false;
-}
-
-void GraphicsContext::useShaderProgram(shared_ptr<ShaderProgram> program) {
-    if (_shaderProgram == program) {
-        return;
-    }
-    program->use();
-    _shaderProgram = move(program);
 }
 
 void GraphicsContext::bindTexture(int unit, shared_ptr<Texture> texture) {

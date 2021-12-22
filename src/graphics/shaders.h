@@ -26,43 +26,38 @@ namespace reone {
 
 namespace graphics {
 
-class GraphicsContext;
-
 class Shaders : boost::noncopyable {
 public:
-    Shaders(GraphicsContext &graphicsContext) :
-        _graphicsContext(graphicsContext) {
-    }
-
     ~Shaders() { deinit(); }
 
     void init();
     void deinit();
 
-    void refreshUniforms();
+    void use(ShaderProgram &program, bool refreshUniforms = false);
 
     Uniforms &uniforms() { return _uniforms; }
 
-    std::shared_ptr<ShaderProgram> simpleColor() const { return _spSimpleColor; }
-    std::shared_ptr<ShaderProgram> modelColor() const { return _spModelColor; }
-    std::shared_ptr<ShaderProgram> depth() const { return _spDepth; }
-    std::shared_ptr<ShaderProgram> gui() const { return _spGUI; }
-    std::shared_ptr<ShaderProgram> blur() const { return _spBlur; }
-    std::shared_ptr<ShaderProgram> presentWorld() const { return _spPresentWorld; }
-    std::shared_ptr<ShaderProgram> blinnPhong() const { return _spBlinnPhong; }
-    std::shared_ptr<ShaderProgram> blinnPhongDiffuseless() const { return _spBlingPhongDiffuseless; }
-    std::shared_ptr<ShaderProgram> particle() const { return _spParticle; }
-    std::shared_ptr<ShaderProgram> grass() const { return _spGrass; }
-    std::shared_ptr<ShaderProgram> text() const { return _spText; }
-    std::shared_ptr<ShaderProgram> billboard() const { return _spBillboard; }
+    ShaderProgram &simpleColor() const { return *_spSimpleColor; }
+    ShaderProgram &modelColor() const { return *_spModelColor; }
+    ShaderProgram &depth() const { return *_spDepth; }
+    ShaderProgram &gui() const { return *_spGUI; }
+    ShaderProgram &blur() const { return *_spBlur; }
+    ShaderProgram &presentWorld() const { return *_spPresentWorld; }
+    ShaderProgram &blinnPhong() const { return *_spBlinnPhong; }
+    ShaderProgram &blinnPhongDiffuseless() const { return *_spBlingPhongDiffuseless; }
+    ShaderProgram &particle() const { return *_spParticle; }
+    ShaderProgram &grass() const { return *_spGrass; }
+    ShaderProgram &text() const { return *_spText; }
+    ShaderProgram &billboard() const { return *_spBillboard; }
 
 private:
-    GraphicsContext &_graphicsContext;
-
     bool _inited {false};
     Uniforms _uniforms;
 
+    ShaderProgram *_usedProgram {nullptr};
+
     // Shader Programs
+
     std::shared_ptr<ShaderProgram> _spSimpleColor;
     std::shared_ptr<ShaderProgram> _spModelColor;
     std::shared_ptr<ShaderProgram> _spDepth;
@@ -76,7 +71,10 @@ private:
     std::shared_ptr<ShaderProgram> _spText;
     std::shared_ptr<ShaderProgram> _spBillboard;
 
+    // END Shader Programs
+
     // Uniform Buffers
+
     std::shared_ptr<UniformBuffer> _ubGeneral;
     std::shared_ptr<UniformBuffer> _ubText;
     std::shared_ptr<UniformBuffer> _ubLighting;
@@ -85,9 +83,13 @@ private:
     std::shared_ptr<UniformBuffer> _ubGrass;
     std::shared_ptr<UniformBuffer> _ubDanglymesh;
 
+    // END Uniform Buffers
+
     std::shared_ptr<Shader> initShader(ShaderType type, std::vector<std::string> sources);
     std::shared_ptr<ShaderProgram> initShaderProgram(std::vector<std::shared_ptr<Shader>> shaders);
     std::unique_ptr<UniformBuffer> initUniformBuffer(const void *data, ptrdiff_t size);
+
+    void refreshUniforms();
 };
 
 } // namespace graphics
