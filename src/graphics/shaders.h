@@ -39,7 +39,8 @@ public:
 
     ShaderProgram &simpleColor() const { return *_spSimpleColor; }
     ShaderProgram &modelColor() const { return *_spModelColor; }
-    ShaderProgram &depth() const { return *_spDepth; }
+    ShaderProgram &pointLightShadows() const { return *_spPointLightShadows; }
+    ShaderProgram &directionalLightShadows() const { return *_spDirectionalLightShadows; }
     ShaderProgram &gui() const { return *_spGUI; }
     ShaderProgram &blur() const { return *_spBlur; }
     ShaderProgram &presentWorld() const { return *_spPresentWorld; }
@@ -60,7 +61,8 @@ private:
 
     std::shared_ptr<ShaderProgram> _spSimpleColor;
     std::shared_ptr<ShaderProgram> _spModelColor;
-    std::shared_ptr<ShaderProgram> _spDepth;
+    std::shared_ptr<ShaderProgram> _spPointLightShadows;
+    std::shared_ptr<ShaderProgram> _spDirectionalLightShadows;
     std::shared_ptr<ShaderProgram> _spGUI;
     std::shared_ptr<ShaderProgram> _spBlur;
     std::shared_ptr<ShaderProgram> _spPresentWorld;
