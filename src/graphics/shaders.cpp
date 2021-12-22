@@ -23,7 +23,7 @@ namespace reone {
 
 namespace graphics {
 
-static const string g_shaderBaseHeader = R"END(
+static const string g_glslHeader = R"END(
 #version 330
 
 const int FEATURE_DIFFUSE = 1;
@@ -146,7 +146,7 @@ bool isFeatureEnabled(int flag) {
 }
 )END";
 
-static const string g_shaderBaseModel = R"END(
+static const string g_glslModel = R"END(
 const float SELFILLUM_THRESHOLD = 0.85;
 
 uniform sampler2D sDiffuseMap;
@@ -185,7 +185,7 @@ vec3 applyFog(vec3 objectColor) {
 }
 )END";
 
-static const string g_shaderBaseNormals = R"END(
+static const string g_glslNormals = R"END(
 vec2 packTexCoords(vec2 uv, vec4 bounds) {
     return bounds.xy + bounds.zw * fract(uv);
 }
@@ -226,7 +226,7 @@ vec3 getNormal(vec2 uv) {
 }
 )END";
 
-static const string g_shaderBaseShadows = R"END(
+static const string g_glslShadows = R"END(
 float getShadow() {
     if (!isFeatureEnabled(FEATURE_SHADOWS)) return 0.0;
 
@@ -283,7 +283,52 @@ float getShadow() {
 }
 )END";
 
-static const string g_shaderVertexSimple = R"END(
+static const string g_glslBlinnPhong = R"END(
+vec3 getLightingIndirect(vec3 N) {
+    vec3 result = uWorldAmbientColor.rgb * uAmbientColor.rgb;
+
+    for (int i = 0; i < uLightCount; ++i) {
+        if (!uLights[i].ambientOnly) continue;
+
+        vec3 ambient = uLights[i].multiplier * uLights[i].color.rgb * uAmbientColor.rgb;
+
+        float attenuation = getAttenuationQuadratic(i);
+        ambient *= attenuation;
+
+        result += ambient;
+    }
+
+    return result;
+}
+
+vec3 getLightingDirect(vec3 N) {
+    vec3 result = vec3(0.0);
+    vec3 V = normalize(uCameraPosition.xyz - fragPosition);
+
+    for (int i = 0; i < uLightCount; ++i) {
+        if (uLights[i].ambientOnly) continue;
+
+        vec3 L = normalize(uLights[i].position.xyz - fragPosition);
+        vec3 H = normalize(V + L);
+
+        vec3 diff = uDiffuseColor.rgb * max(dot(L, N), 0.0);
+        vec3 diffuse = uLights[i].multiplier * uLights[i].color.rgb * diff;
+
+        float spec = pow(max(dot(N, H), 0.0), SHININESS);
+        vec3 specular = uLights[i].multiplier * uLights[i].color.rgb * spec;
+
+        float attenuation = getAttenuationQuadratic(i);
+        diffuse *= attenuation;
+        specular *= attenuation;
+
+        result += diffuse + specular;
+    }
+
+    return min(vec3(1.0), result);
+}
+)END";
+
+static const string g_vsSimple = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
@@ -298,7 +343,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderVertexModel = R"END(
+static const string g_vsModel = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aTexCoords;
@@ -377,7 +422,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderVertexParticle = R"END(
+static const string g_vsParticle = R"END(
 const int RENDER_NORMAL = 1;
 const int RENDER_LINKED = 2;
 const int RENDER_BILLBOARD_TO_LOCAL_Z = 3;
@@ -438,7 +483,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderVertexGrass = R"END(
+static const string g_vsGrass = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
@@ -461,7 +506,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderVertexText = R"END(
+static const string g_vsText = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
@@ -479,7 +524,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderVertexBillboard = R"END(
+static const string g_vsBillboard = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aTexCoords;
 
@@ -500,35 +545,42 @@ void main() {
 }
 )END";
 
-static const string g_shaderGeometryDepth = R"END(
+static const string g_gsPointLightShadows = R"END(
 layout(triangles) in;
 layout(triangle_strip, max_vertices=18) out;
 
 out vec4 fragPosition;
 
 void main() {
-    if (uShadowLightPosition.w == 0.0) {
+    for (int face = 0; face < NUM_CUBE_FACES; ++face) {
+        gl_Layer = face;
         for (int i = 0; i < 3; ++i) {
             fragPosition = gl_in[i].gl_Position;
-            gl_Position = uShadowLightSpaceMatrices[0] * fragPosition;
+            gl_Position = uShadowLightSpaceMatrices[face] * fragPosition;
             EmitVertex();
         }
         EndPrimitive();
-    } else {
-        for (int face = 0; face < NUM_CUBE_FACES; ++face) {
-            gl_Layer = face;
-            for (int i = 0; i < 3; ++i) {
-                fragPosition = gl_in[i].gl_Position;
-                gl_Position = uShadowLightSpaceMatrices[face] * fragPosition;
-                EmitVertex();
-            }
-            EndPrimitive();
-        }
     }
 }
 )END";
 
-static const string g_shaderFragmentColor = R"END(
+static const string g_gsDirectionalLightShadows = R"END(
+layout(triangles) in;
+layout(triangle_strip, max_vertices=3) out;
+
+out vec4 fragPosition;
+
+void main() {
+    for (int i = 0; i < 3; ++i) {
+        fragPosition = gl_in[i].gl_Position;
+        gl_Position = uShadowLightSpaceMatrices[0] * fragPosition;
+        EmitVertex();
+    }
+    EndPrimitive();
+}
+)END";
+
+static const string g_fsColor = R"END(
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec4 fragColorBright;
 
@@ -538,7 +590,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderFragmentDepth = R"END(
+static const string g_fsShadows = R"END(
 in vec4 fragPosition;
 
 void main() {
@@ -548,7 +600,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderFragmentGUI = R"END(
+static const string g_fsGUI = R"END(
 uniform sampler2D sDiffuseMap;
 
 in vec2 fragTexCoords;
@@ -568,7 +620,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderFragmentText = R"END(
+static const string g_fsText = R"END(
 uniform sampler2D sDiffuseMap;
 
 in vec2 fragTexCoords;
@@ -584,7 +636,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderFragmentParticle = R"END(
+static const string g_fsParticle = R"END(
 uniform sampler2D sDiffuseMap;
 
 in vec2 fragTexCoords;
@@ -613,7 +665,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderFragmentGrass = R"END(
+static const string g_fsGrass = R"END(
 uniform sampler2D sDiffuseMap;
 uniform sampler2D sLightmap;
 
@@ -641,7 +693,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderFragmentBlur = R"END(
+static const string g_fsBlur = R"END(
 uniform sampler2D sDiffuseMap;
 
 out vec4 fragColor;
@@ -661,7 +713,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderFragmentPresentWorld = R"END(
+static const string g_fsPresentWorld = R"END(
 uniform sampler2D sDiffuseMap;
 uniform sampler2D sBloom;
 
@@ -678,52 +730,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderBaseBlinnPhong = R"END(
-vec3 getLightingIndirect(vec3 N) {
-    vec3 result = uWorldAmbientColor.rgb * uAmbientColor.rgb;
-
-    for (int i = 0; i < uLightCount; ++i) {
-        if (!uLights[i].ambientOnly) continue;
-
-        vec3 ambient = uLights[i].multiplier * uLights[i].color.rgb * uAmbientColor.rgb;
-
-        float attenuation = getAttenuationQuadratic(i);
-        ambient *= attenuation;
-
-        result += ambient;
-    }
-
-    return result;
-}
-
-vec3 getLightingDirect(vec3 N) {
-    vec3 result = vec3(0.0);
-    vec3 V = normalize(uCameraPosition.xyz - fragPosition);
-
-    for (int i = 0; i < uLightCount; ++i) {
-        if (uLights[i].ambientOnly) continue;
-
-        vec3 L = normalize(uLights[i].position.xyz - fragPosition);
-        vec3 H = normalize(V + L);
-
-        vec3 diff = uDiffuseColor.rgb * max(dot(L, N), 0.0);
-        vec3 diffuse = uLights[i].multiplier * uLights[i].color.rgb * diff;
-
-        float spec = pow(max(dot(N, H), 0.0), SHININESS);
-        vec3 specular = uLights[i].multiplier * uLights[i].color.rgb * spec;
-
-        float attenuation = getAttenuationQuadratic(i);
-        diffuse *= attenuation;
-        specular *= attenuation;
-
-        result += diffuse + specular;
-    }
-
-    return min(vec3(1.0), result);
-}
-)END";
-
-static const string g_shaderFragmentBlinnPhong = R"END(
+static const string g_fsBlinnPhong = R"END(
 void main() {
     vec2 uv = vec2(uUV * vec3(fragTexCoords, 1.0));
     vec3 N = getNormal(uv);
@@ -777,7 +784,7 @@ void main() {
 }
 )END";
 
-static const string g_shaderFragmentBlinnPhongDiffuseless = R"END(
+static const string g_fsBlinnPhongDiffuseless = R"END(
 void main() {
     vec3 N = normalize(fragNormal);
     float shadow = getShadow();
@@ -808,27 +815,29 @@ void Shaders::init() {
     }
 
     // Shaders
-    auto vsSimple = initShader(ShaderType::Vertex, {g_shaderBaseHeader, g_shaderVertexSimple});
-    auto vsModel = initShader(ShaderType::Vertex, {g_shaderBaseHeader, g_shaderVertexModel});
-    auto vsParticle = initShader(ShaderType::Vertex, {g_shaderBaseHeader, g_shaderVertexParticle});
-    auto vsGrass = initShader(ShaderType::Vertex, {g_shaderBaseHeader, g_shaderVertexGrass});
-    auto vsText = initShader(ShaderType::Vertex, {g_shaderBaseHeader, g_shaderVertexText});
-    auto vsBillboard = initShader(ShaderType::Vertex, {g_shaderBaseHeader, g_shaderVertexBillboard});
-    auto gsDepth = initShader(ShaderType::Geometry, {g_shaderBaseHeader, g_shaderGeometryDepth});
-    auto fsColor = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentColor});
-    auto fsDepth = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentDepth});
-    auto fsGUI = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentGUI});
-    auto fsText = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentText});
-    auto fsParticle = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentParticle});
-    auto fsGrass = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentGrass});
-    auto fsBlur = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentBlur});
-    auto fsPresentWorld = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderFragmentPresentWorld});
-    auto fsBlinnPhong = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseNormals, g_shaderBaseShadows, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhong});
-    auto fsBlinnPhongDiffuseless = initShader(ShaderType::Fragment, {g_shaderBaseHeader, g_shaderBaseModel, g_shaderBaseNormals, g_shaderBaseShadows, g_shaderBaseBlinnPhong, g_shaderFragmentBlinnPhongDiffuseless});
+    auto vsSimple = initShader(ShaderType::Vertex, {g_glslHeader, g_vsSimple});
+    auto vsModel = initShader(ShaderType::Vertex, {g_glslHeader, g_vsModel});
+    auto vsParticle = initShader(ShaderType::Vertex, {g_glslHeader, g_vsParticle});
+    auto vsGrass = initShader(ShaderType::Vertex, {g_glslHeader, g_vsGrass});
+    auto vsText = initShader(ShaderType::Vertex, {g_glslHeader, g_vsText});
+    auto vsBillboard = initShader(ShaderType::Vertex, {g_glslHeader, g_vsBillboard});
+    auto gsPointLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_gsPointLightShadows});
+    auto gsDirectionalLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_gsDirectionalLightShadows});
+    auto fsColor = initShader(ShaderType::Fragment, {g_glslHeader, g_fsColor});
+    auto fsShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsShadows});
+    auto fsGUI = initShader(ShaderType::Fragment, {g_glslHeader, g_fsGUI});
+    auto fsText = initShader(ShaderType::Fragment, {g_glslHeader, g_fsText});
+    auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_fsParticle});
+    auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_fsGrass});
+    auto fsBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_fsBlur});
+    auto fsPresentWorld = initShader(ShaderType::Fragment, {g_glslHeader, g_fsPresentWorld});
+    auto fsBlinnPhong = initShader(ShaderType::Fragment, {g_glslHeader, g_glslModel, g_glslNormals, g_glslShadows, g_glslBlinnPhong, g_fsBlinnPhong});
+    auto fsBlinnPhongDiffuseless = initShader(ShaderType::Fragment, {g_glslHeader, g_glslModel, g_glslNormals, g_glslShadows, g_glslBlinnPhong, g_fsBlinnPhongDiffuseless});
 
     // Shader Programs
     _spSimpleColor = initShaderProgram({vsSimple, fsColor});
-    _spDepth = initShaderProgram({vsSimple, gsDepth, fsDepth});
+    _spPointLightShadows = initShaderProgram({vsSimple, gsPointLightShadows, fsShadows});
+    _spDirectionalLightShadows = initShaderProgram({vsSimple, gsDirectionalLightShadows, fsShadows});
     _spGUI = initShaderProgram({vsSimple, fsGUI});
     _spBlur = initShaderProgram({vsSimple, fsBlur});
     _spPresentWorld = initShaderProgram({vsSimple, fsPresentWorld});
@@ -866,7 +875,8 @@ void Shaders::deinit() {
 
     // Shader Programs
     _spSimpleColor.reset();
-    _spDepth.reset();
+    _spPointLightShadows.reset();
+    _spDirectionalLightShadows.reset();
     _spGUI.reset();
     _spBlur.reset();
     _spPresentWorld.reset();

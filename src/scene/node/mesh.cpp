@@ -383,7 +383,8 @@ void MeshSceneNode::drawShadow() {
     uniforms.general.model = _absTransform;
     uniforms.general.alpha = _alpha;
 
-    _shaders.use(_shaders.depth(), true);
+    auto &program = _sceneGraph.isShadowLightDirectional() ? _shaders.directionalLightShadows() : _shaders.pointLightShadows();
+    _shaders.use(program, true);
     mesh->mesh->draw();
 }
 
