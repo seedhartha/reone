@@ -20,7 +20,6 @@
 #include "framebuffer.h"
 #include "options.h"
 #include "renderbuffer.h"
-#include "shaderprogram.h"
 #include "texture.h"
 #include "types.h"
 #include "uniformbuffer.h"
@@ -39,8 +38,6 @@ public:
 
     void init();
     void deinit();
-
-    void useShaderProgram(std::shared_ptr<ShaderProgram> program);
 
     void bindTexture(int unit, std::shared_ptr<Texture> texture);
     void unbindTexture(int unit);
@@ -61,7 +58,6 @@ private:
     BlendMode _blendMode {BlendMode::None};
     int _textureUnit {0};
 
-    std::shared_ptr<ShaderProgram> _shaderProgram;
     std::vector<std::shared_ptr<Texture>> _textures;
 
     void setActiveTextureUnit(int unit);

@@ -90,8 +90,7 @@ void Movie::draw() {
         glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
         glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
 
-    _graphicsContext.useShaderProgram(_shaders.gui());
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.gui(), true);
     _meshes.quadNDC().draw();
 }
 

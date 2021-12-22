@@ -450,8 +450,7 @@ void HUD::drawHealth(int memberIndex) {
     uniforms.general.model = move(transform);
     uniforms.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 
-    _graphicsContext.useShaderProgram(_shaders.simpleColor());
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.simpleColor(), true);
     _meshes.quad().draw();
 }
 

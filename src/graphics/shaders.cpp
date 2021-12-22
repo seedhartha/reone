@@ -17,8 +17,6 @@
 
 #include "shaders.h"
 
-#include "context.h"
-
 using namespace std;
 
 namespace reone {
@@ -890,6 +888,16 @@ void Shaders::deinit() {
     _ubDanglymesh.reset();
 
     _inited = false;
+}
+
+void Shaders::use(ShaderProgram &program, bool refreshUniforms) {
+    if (_usedProgram != &program) {
+        program.use();
+        _usedProgram = &program;
+    }
+    if (refreshUniforms) {
+        this->refreshUniforms();
+    }
 }
 
 shared_ptr<Shader> Shaders::initShader(ShaderType type, vector<string> sources) {

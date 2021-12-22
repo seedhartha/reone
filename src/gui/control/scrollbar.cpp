@@ -69,30 +69,29 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     uniforms.general.projection = _window.getOrthoProjection();
 
     _graphicsContext.bindTexture(0, _thumb.image);
-    _graphicsContext.useShaderProgram(_shaders.gui());
 
     // Top edge
     uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
     uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(_extent.width, 1.0f, 1.0f));
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.gui(), true);
     _meshes.quad().draw();
 
     // Left edge
     uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
     uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(1.0f, _extent.height - 2.0f * _extent.width, 1.0f));
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.gui(), true);
     _meshes.quad().draw();
 
     // Right edge
     uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + _extent.width - 1.0f + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
     uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(1.0f, _extent.height - 2.0f * _extent.width, 1.0f));
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.gui(), true);
     _meshes.quad().draw();
 
     // Bottom edge
     uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + offset.x, _extent.top + _extent.height - _extent.width - 1.0f + offset.y, 0.0f));
     uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(_extent.width, 1.0f, 1.0f));
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.gui(), true);
     _meshes.quad().draw();
 
     // Thumb
@@ -101,7 +100,7 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     float y = glm::mix(0.0f, frameHeight - thumbHeight, _state.offset / static_cast<float>(_state.count - _state.numVisible));
     uniforms.general.model = glm::translate(glm::mat4(1.0f), glm::vec3(_extent.left + 2.0f + offset.x, _extent.top + _extent.width + 2.0f + offset.y + y, 0.0f));
     uniforms.general.model = glm::scale(uniforms.general.model, glm::vec3(_extent.width - 4.0f, thumbHeight, 1.0f));
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.gui(), true);
     _meshes.quad().draw();
 }
 
@@ -134,8 +133,7 @@ void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
     uniforms.general.projection = _window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _graphicsContext.useShaderProgram(_shaders.gui());
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.gui(), true);
     _meshes.quad().draw();
 }
 
@@ -150,8 +148,7 @@ void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
     uniforms.general.projection = _window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _graphicsContext.useShaderProgram(_shaders.gui());
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.gui(), true);
     _meshes.quad().draw();
 }
 

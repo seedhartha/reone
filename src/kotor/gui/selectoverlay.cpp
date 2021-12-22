@@ -270,8 +270,7 @@ void SelectionOverlay::drawReticle(shared_ptr<Texture> texture, const glm::vec3 
     uniforms.general.projection = _services.window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _services.graphicsContext.useShaderProgram(_services.shaders.gui());
-    _services.shaders.refreshUniforms();
+    _services.shaders.use(_services.shaders.gui(), true);
     _services.meshes.quad().draw();
 }
 
@@ -299,8 +298,7 @@ void SelectionOverlay::drawTitleBar() {
         uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         uniforms.general.alpha = 0.5f;
 
-        _services.graphicsContext.useShaderProgram(_services.shaders.simpleColor());
-        _services.shaders.refreshUniforms();
+        _services.shaders.use(_services.shaders.simpleColor(), true);
         _services.meshes.quad().draw();
     }
     {
@@ -333,8 +331,7 @@ void SelectionOverlay::drawHealthBar() {
     uniforms.general.model = move(transform);
     uniforms.general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
 
-    _services.graphicsContext.useShaderProgram(_services.shaders.simpleColor());
-    _services.shaders.refreshUniforms();
+    _services.shaders.use(_services.shaders.simpleColor(), true);
     _services.meshes.quad().draw();
 }
 
@@ -371,8 +368,7 @@ void SelectionOverlay::drawActionFrame(int index) {
     uniforms.general.projection = _services.window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _services.graphicsContext.useShaderProgram(_services.shaders.gui());
-    _services.shaders.refreshUniforms();
+    _services.shaders.use(_services.shaders.gui(), true);
     _services.meshes.quad().draw();
 }
 
@@ -435,8 +431,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     uniforms.general.projection = _services.window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _services.graphicsContext.useShaderProgram(_services.shaders.gui());
-    _services.shaders.refreshUniforms();
+    _services.shaders.use(_services.shaders.gui(), true);
     _services.meshes.quad().draw();
 }
 

@@ -99,8 +99,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         uniforms.general.projection = _services.window.getOrthoProjection();
         uniforms.general.model = transform;
 
-        _services.graphicsContext.useShaderProgram(_services.shaders.gui());
-        _services.shaders.refreshUniforms();
+        _services.shaders.use(_services.shaders.gui(), true);
 
         int height = _game.options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
@@ -120,8 +119,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         uniforms.general.projection = _services.window.getOrthoProjection();
         uniforms.general.model = move(transform);
 
-        _services.graphicsContext.useShaderProgram(_services.shaders.gui());
-        _services.shaders.refreshUniforms();
+        _services.shaders.use(_services.shaders.gui(), true);
         _services.meshes.quad().draw();
     }
 }
@@ -158,8 +156,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         uniforms.general.model = transform;
         uniforms.general.color = glm::vec4(selected ? _game.getGUIColorHilight() : _game.getGUIColorBase(), 1.0f);
 
-        _services.graphicsContext.useShaderProgram(_services.shaders.gui());
-        _services.shaders.refreshUniforms();
+        _services.shaders.use(_services.shaders.gui(), true);
         _services.meshes.quad().draw();
     }
 }
@@ -241,8 +238,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     uniforms.general.projection = _services.window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _services.graphicsContext.useShaderProgram(_services.shaders.gui());
-    _services.shaders.refreshUniforms();
+    _services.shaders.use(_services.shaders.gui(), true);
     _services.meshes.quad().draw();
 }
 

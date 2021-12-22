@@ -107,8 +107,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     BlendMode oldBlendMode = _graphicsContext.blendMode();
     _graphicsContext.setBlendMode(BlendMode::Add);
 
-    _graphicsContext.useShaderProgram(_shaders.gui());
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.gui(), true);
     _meshes.billboard().draw();
 
     _graphicsContext.setBlendMode(oldBlendMode);

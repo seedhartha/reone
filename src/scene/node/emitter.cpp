@@ -279,8 +279,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs, int count) {
         uniforms.particles.particles[i].frame = particle->frame();
     }
 
-    _graphicsContext.useShaderProgram(_shaders.particle());
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.particle(), true);
     _graphicsContext.bindTexture(TextureUnits::diffuseMap, texture);
 
     BlendMode oldBlendMode(_graphicsContext.blendMode());

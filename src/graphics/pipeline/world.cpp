@@ -301,9 +301,8 @@ void WorldPipeline::applyHorizontalBlur() {
 
     // Draw a quad
 
-    _graphicsContext.useShaderProgram(_shaders.blur());
-    _shaders.refreshUniforms();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _shaders.use(_shaders.blur(), true);
     _meshes.quadNDC().draw();
 
     // Restore context
@@ -334,9 +333,8 @@ void WorldPipeline::applyVerticalBlur() {
 
     // Draw a quad
 
-    _graphicsContext.useShaderProgram(_shaders.blur());
-    _shaders.refreshUniforms();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _shaders.use(_shaders.blur(), true);
     _meshes.quadNDC().draw();
 
     // Restore context
@@ -368,8 +366,7 @@ void WorldPipeline::drawResult() {
 
     // Draw a quad
 
-    _graphicsContext.useShaderProgram(_shaders.presentWorld());
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.presentWorld(), true);
     _meshes.quadNDC().draw();
 
     // Restore context

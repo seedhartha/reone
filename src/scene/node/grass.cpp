@@ -160,8 +160,7 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs, int count) {
         uniforms.grass.clusters[i].lightmapUV = cluster->lightmapUV();
     }
 
-    _graphicsContext.useShaderProgram(_shaders.grass());
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.grass(), true);
     _meshes.grass().drawInstanced(count);
 }
 

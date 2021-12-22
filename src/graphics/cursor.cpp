@@ -43,8 +43,7 @@ void Cursor::draw() {
     uniforms.general.projection = _window.getOrthoProjection();
     uniforms.general.model = move(transform);
 
-    _graphicsContext.useShaderProgram(_shaders.gui());
-    _shaders.refreshUniforms();
+    _shaders.use(_shaders.gui(), true);
     _meshes.quad().draw();
 }
 

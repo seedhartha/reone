@@ -93,8 +93,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
 
             textOffset.x += glyph.size.x;
         }
-        _graphicsContext.useShaderProgram(_shaders.text());
-        _shaders.refreshUniforms();
+        _shaders.use(_shaders.text(), true);
         _meshes.quad().drawInstanced(numChars);
     }
 }
