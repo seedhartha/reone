@@ -41,6 +41,8 @@ public:
     void setBackFaceCullingEnabled(bool enabled);
     void setBlendMode(BlendMode mode);
 
+    void withoutDepthTest(const std::function<void()> &block);
+
     void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
 
 private:
@@ -48,6 +50,7 @@ private:
 
     bool _inited {false};
 
+    bool _depthTest {true};
     bool _backFaceCulling {false};
     BlendMode _blendMode {BlendMode::None};
 };
