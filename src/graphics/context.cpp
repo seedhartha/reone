@@ -66,13 +66,13 @@ void GraphicsContext::withoutDepthTest(const function<void()> &block) {
 }
 
 void GraphicsContext::withBackFaceCulling(const function<void()> &block) {
-    if (!_backFaceCulling) {
+    if (_backFaceCulling) {
         block();
         return;
     }
-    glEnable(GL_CULL_FACE);
+    enableBackFaceCulling();
     block();
-    glDisable(GL_CULL_FACE);
+    disableBackFaceCulling();
 }
 
 void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
@@ -83,6 +83,22 @@ void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<v
     block();
 
     glDisable(GL_SCISSOR_TEST);
+}
+
+void GraphicsContext::enableBackFaceCulling() {
+    if (_backFaceCulling) {
+        return;
+    }
+    glEnable(GL_CULL_FACE);
+    _backFaceCulling = true;
+}
+
+void GraphicsContext::disableBackFaceCulling() {
+    if (!_backFaceCulling) {
+        return;
+    }
+    glDisable(GL_CULL_FACE);
+    _backFaceCulling = false;
 }
 
 void GraphicsContext::setBlendMode(BlendMode mode) {
