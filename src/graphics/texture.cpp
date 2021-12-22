@@ -239,14 +239,18 @@ void Texture::fillTarget(uint32_t target, int level, int width, int height, cons
     }
 }
 
-void Texture::clear(int w, int h, PixelFormat format) {
+void Texture::clear(int w, int h, PixelFormat format, bool refresh) {
     _width = w;
     _height = h;
     _pixelFormat = format;
     _layers.clear();
+
+    if (refresh) {
+        this->refresh();
+    }
 }
 
-void Texture::setPixels(int w, int h, PixelFormat format, shared_ptr<ByteArray> pixels) {
+void Texture::setPixels(int w, int h, PixelFormat format, shared_ptr<ByteArray> pixels, bool refresh) {
     MipMap mipMap;
     mipMap.width = w;
     mipMap.height = h;
@@ -255,10 +259,10 @@ void Texture::setPixels(int w, int h, PixelFormat format, shared_ptr<ByteArray> 
     Layer layer;
     layer.mipMaps.push_back(move(mipMap));
 
-    setPixels(w, h, format, vector<Layer> {layer});
+    setPixels(w, h, format, vector<Layer> {layer}, refresh);
 }
 
-void Texture::setPixels(int w, int h, PixelFormat format, vector<Layer> layers) {
+void Texture::setPixels(int w, int h, PixelFormat format, vector<Layer> layers, bool refresh) {
     if (layers.empty()) {
         throw invalid_argument("layers is empty");
     }
@@ -266,6 +270,10 @@ void Texture::setPixels(int w, int h, PixelFormat format, vector<Layer> layers) 
     _height = h;
     _pixelFormat = format;
     _layers = move(layers);
+
+    if (refresh) {
+        this->refresh();
+    }
 }
 
 void Texture::flushGPUToCPU() {
