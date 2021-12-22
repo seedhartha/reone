@@ -270,13 +270,11 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs, int count) {
     _shaders.use(_shaders.particle(), true);
     _textures.bind(*texture, TextureUnits::diffuseMap);
 
-    BlendMode oldBlendMode(_graphicsContext.blendMode());
-    bool lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
-    if (lighten) {
-        _graphicsContext.setBlendMode(BlendMode::Lighten);
-    }
-    _meshes.billboard().drawInstanced(count);
-    _graphicsContext.setBlendMode(oldBlendMode);
+    auto lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
+    auto blendMode = lighten ? BlendMode::Lighten : BlendMode::Default;
+    _graphicsContext.withBlendMode(blendMode, [this, &count]() {
+        _meshes.billboard().drawInstanced(count);
+    });
 }
 
 unique_ptr<ParticleSceneNode> EmitterSceneNode::newParticle() {

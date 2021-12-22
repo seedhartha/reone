@@ -211,17 +211,12 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.general.model = move(transform);
             uniforms.general.discardColor = glm::vec4(_discardColor, 1.0f);
         }
-
-        BlendMode oldBlendMode = _graphicsContext.blendMode();
-        if (border.fill->isAdditive()) {
-            _graphicsContext.setBlendMode(BlendMode::Add);
-        }
-
-        _textures.bind(*border.fill);
-        _shaders.use(_shaders.gui(), true);
-        _meshes.quad().draw();
-
-        _graphicsContext.setBlendMode(oldBlendMode);
+        auto blendMode = border.fill->isAdditive() ? BlendMode::Add : BlendMode::Default;
+        _graphicsContext.withBlendMode(blendMode, [this, &border]() {
+            _textures.bind(*border.fill);
+            _shaders.use(_shaders.gui(), true);
+            _meshes.quad().draw();
+        });
     }
     if (border.edge) {
         int width = size.x - 2 * border.dimension;

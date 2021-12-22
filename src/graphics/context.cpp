@@ -28,28 +28,61 @@ void GraphicsContext::init() {
         return;
     }
     glewInit();
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-    glDepthFunc(GL_LEQUAL);
-
     if (_options.aaSamples > 1) {
         glEnable(GL_MULTISAMPLE);
     }
+
+    // Depth Test
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
+    // Blending
+    glEnable(GL_BLEND);
     setBlendMode(BlendMode::Default);
+
     _inited = true;
 }
 
-void GraphicsContext::setBackFaceCullingEnabled(bool enabled) {
-    if (_backFaceCulling == enabled) {
+void GraphicsContext::withBlendMode(BlendMode mode, const function<void()> &block) {
+    auto oldBlendMode = _blendMode;
+    if (oldBlendMode == mode) {
+        block();
         return;
     }
-    if (enabled) {
-        glEnable(GL_CULL_FACE);
-    } else {
-        glDisable(GL_CULL_FACE);
+    setBlendMode(mode);
+    block();
+    setBlendMode(oldBlendMode);
+}
+
+void GraphicsContext::withoutDepthTest(const function<void()> &block) {
+    if (!_depthTest) {
+        block();
+        return;
     }
-    _backFaceCulling = enabled;
+    glDisable(GL_DEPTH_TEST);
+    block();
+    glEnable(GL_DEPTH_TEST);
+}
+
+void GraphicsContext::withBackFaceCulling(const function<void()> &block) {
+    if (!_backFaceCulling) {
+        block();
+        return;
+    }
+    glEnable(GL_CULL_FACE);
+    block();
+    glDisable(GL_CULL_FACE);
+}
+
+void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(bounds[0], bounds[1], bounds[2], bounds[3]);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    block();
+
+    glDisable(GL_SCISSOR_TEST);
 }
 
 void GraphicsContext::setBlendMode(BlendMode mode) {
@@ -76,26 +109,6 @@ void GraphicsContext::setBlendMode(BlendMode mode) {
         break;
     }
     _blendMode = mode;
-}
-
-void GraphicsContext::withoutDepthTest(const function<void()> &block) {
-    if (!_depthTest) {
-        block();
-        return;
-    }
-    glDisable(GL_DEPTH_TEST);
-    block();
-    glEnable(GL_DEPTH_TEST);
-}
-
-void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(bounds[0], bounds[1], bounds[2], bounds[3]);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    block();
-
-    glDisable(GL_SCISSOR_TEST);
 }
 
 } // namespace graphics
