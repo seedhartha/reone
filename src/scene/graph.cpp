@@ -583,7 +583,7 @@ shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) 
         glm::vec3 objSpaceStart(model->absoluteTransformInverse() * glm::vec4(start, 1.0f));
         glm::vec3 objSpaceDir(model->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
         float distance;
-        if (model->aabb().raycast(objSpaceStart, objSpaceDir, kMaxCollisionDistanceLineOfSight, distance)) {
+        if (model->aabb().raycast(objSpaceStart, objSpaceDir, kMaxCollisionDistanceLineOfSight, distance) && distance > 0.0f) {
             distances.push_back(make_pair(model, distance));
         }
     }

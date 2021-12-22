@@ -65,7 +65,6 @@ void Placeable::loadFromBlueprint(const string &resRef) {
     auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
 
     auto sceneNode = sceneGraph.newModel(move(model), ModelUsage::Placeable);
-    sceneNode->setPickable(true);
     sceneNode->setCullable(true);
     sceneNode->setDrawDistance(64.0f);
     _sceneNode = move(sceneNode);

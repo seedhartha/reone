@@ -73,7 +73,6 @@ void Door::loadFromBlueprint(const string &resRef) {
 
     auto modelSceneNode = sceneGraph.newModel(move(model), ModelUsage::Door);
     modelSceneNode->setUser(*this);
-    modelSceneNode->setPickable(true);
     modelSceneNode->setCullable(true);
     modelSceneNode->setDrawDistance(FLT_MAX);
     _sceneNode = move(modelSceneNode);
