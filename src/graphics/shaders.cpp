@@ -228,13 +228,18 @@ vec3 getNormal(vec2 uv) {
 )END";
 
 static const string g_glslShadows = R"END(
-float getShadow() {
+float getShadow(vec3 normal) {
     if (!isFeatureEnabled(FEATURE_SHADOWS)) return 0.0;
 
     float result = 0.0;
 
+    vec3 fragToLight = fragPosition - uShadowLightPosition.xyz;
+    vec3 lightDir = normalize(fragToLight);
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    bias /= 5000.0;
+
     if (uShadowLightPosition.w == 0.0) {
-        // Directional light
+        // Directional Light
 
         vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
         projCoords = projCoords * 0.5 + 0.5;
@@ -245,7 +250,7 @@ float getShadow() {
         for (int x = -1; x <= 1; ++x) {
             for (int y = -1; y <= 1; ++y) {
                 float pcfDepth = texture(sShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-                result += currentDepth > pcfDepth  ? 1.0 : 0.0;
+                result += (currentDepth - bias) > pcfDepth  ? 1.0 : 0.0;
             }
         }
         result /= 9.0;
@@ -254,12 +259,9 @@ float getShadow() {
             result = 0.0;
         }
     } else {
-        // Point light
+        // Point Light
 
-        vec3 fragToLight = fragPosition - uShadowLightPosition.xyz;
         float currentDepth = length(fragToLight);
-
-        float bias = 0.1;
         float samples = 4.0;
         float offset = 0.1;
 
@@ -735,7 +737,7 @@ static const string g_fsBlinnPhong = R"END(
 void main() {
     vec2 uv = vec2(uUV * vec3(fragTexCoords, 1.0));
     vec3 N = getNormal(uv);
-    float shadow = getShadow();
+    float shadow = getShadow(N);
     vec4 diffuseSample = texture(sDiffuseMap, uv);
     bool opaque = isFeatureEnabled(FEATURE_ENVMAP) || isFeatureEnabled(FEATURE_NORMALMAP) || isFeatureEnabled(FEATURE_HEIGHTMAP);
 
@@ -788,7 +790,7 @@ void main() {
 static const string g_fsBlinnPhongDiffuseless = R"END(
 void main() {
     vec3 N = normalize(fragNormal);
-    float shadow = getShadow();
+    float shadow = getShadow(N);
 
     vec3 lighting;
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
