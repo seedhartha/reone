@@ -92,13 +92,10 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     uniforms.general.alpha = 0.5f;
     // uniforms.general.color = glm::vec4(flare.colorShift, 1.0f);
 
-    BlendMode oldBlendMode = _graphicsContext.blendMode();
-    _graphicsContext.setBlendMode(BlendMode::Add);
-
-    _shaders.use(_shaders.gui(), true);
-    _meshes.billboard().draw();
-
-    _graphicsContext.setBlendMode(oldBlendMode);
+    _graphicsContext.withBlendMode(BlendMode::Add, [this]() {
+        _shaders.use(_shaders.gui(), true);
+        _meshes.billboard().draw();
+    });
 }
 
 bool LightSceneNode::isDirectional() const {

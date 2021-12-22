@@ -17,12 +17,8 @@
 
 #pragma once
 
-#include "framebuffer.h"
 #include "options.h"
-#include "renderbuffer.h"
-#include "texture.h"
 #include "types.h"
-#include "uniformbuffer.h"
 
 namespace reone {
 
@@ -36,14 +32,11 @@ public:
 
     void init();
 
-    BlendMode blendMode() const { return _blendMode; }
-
-    void setBackFaceCullingEnabled(bool enabled);
-    void setBlendMode(BlendMode mode);
+    void withBackFaceCulling(const std::function<void()> &block);
+    void withBlendMode(BlendMode mode, const std::function<void()> &block);
+    void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
 
     void withoutDepthTest(const std::function<void()> &block);
-
-    void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
 
 private:
     GraphicsOptions _options;
@@ -53,6 +46,8 @@ private:
     bool _depthTest {true};
     bool _backFaceCulling {false};
     BlendMode _blendMode {BlendMode::None};
+
+    void setBlendMode(BlendMode mode);
 };
 
 } // namespace graphics

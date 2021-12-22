@@ -372,19 +372,17 @@ void SceneGraph::draw() {
     if (!_activeCamera) {
         return;
     }
-    _graphicsContext.setBackFaceCullingEnabled(true);
 
-    // Render opaque meshes
-    for (auto &mesh : _opaqueMeshes) {
-        mesh->draw();
-    }
-
-    // Render transparent meshes
-    for (auto &mesh : _transparentMeshes) {
-        mesh->draw();
-    }
-
-    _graphicsContext.setBackFaceCullingEnabled(false);
+    _graphicsContext.withBackFaceCulling([this]() {
+        // Render opaque meshes
+        for (auto &mesh : _opaqueMeshes) {
+            mesh->draw();
+        }
+        // Render transparent meshes
+        for (auto &mesh : _transparentMeshes) {
+            mesh->draw();
+        }
+    });
 
     // Render particles and grass clusters
     for (auto &nodeLeaf : _leafs) {

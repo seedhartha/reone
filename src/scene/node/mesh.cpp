@@ -367,12 +367,10 @@ void MeshSceneNode::draw() {
         _textures.bind(*_nodeTextures.bumpmap, TextureUnits::bumpMap);
     }
 
-    BlendMode oldBlendMode(_graphicsContext.blendMode());
-    if (additive) {
-        _graphicsContext.setBlendMode(BlendMode::Add);
-    }
-    mesh->mesh->draw();
-    _graphicsContext.setBlendMode(oldBlendMode);
+    auto blendMode = additive ? BlendMode::Add : BlendMode::Default;
+    _graphicsContext.withBlendMode(blendMode, [this, &mesh]() {
+        mesh->mesh->draw();
+    });
 }
 
 void MeshSceneNode::drawShadow() {
