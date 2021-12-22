@@ -42,8 +42,7 @@ ThirdPersonCamera::ThirdPersonCamera(float aspect, const CameraStyle &style, Gam
     _game(game),
     _sceneGraph(sceneGraph) {
 
-    glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
-    _sceneNode = sceneGraph.newCamera(move(projection));
+    _sceneNode = sceneGraph.newCamera(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
     _style = style;
 }
 

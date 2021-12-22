@@ -599,6 +599,10 @@ unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode)
     return make_unique<DummySceneNode>(move(modelNode), *this, _graphicsContext, _meshes, _shaders, _textures);
 }
 
+unique_ptr<CameraSceneNode> SceneGraph::newCamera(float fieldOfView, float aspect, float nearPlane, float farPlane) {
+    return make_unique<CameraSceneNode>(fieldOfView, aspect, nearPlane, farPlane, *this);
+}
+
 unique_ptr<CameraSceneNode> SceneGraph::newCamera(glm::mat4 projection) {
     return make_unique<CameraSceneNode>(move(projection), *this);
 }

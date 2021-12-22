@@ -34,8 +34,7 @@ namespace game {
 DialogCamera::DialogCamera(float aspect, const CameraStyle &style, SceneGraph &sceneGraph) :
     _sceneGraph(sceneGraph) {
 
-    glm::mat4 projection(glm::perspective(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
-    _sceneNode = sceneGraph.newCamera(move(projection));
+    _sceneNode = sceneGraph.newCamera(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 }
 
 void DialogCamera::setSpeakerPosition(glm::vec3 position) {

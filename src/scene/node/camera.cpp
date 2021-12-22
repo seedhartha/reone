@@ -107,8 +107,8 @@ bool CameraSceneNode::isInFrustum(const SceneNode &other) const {
     }
 }
 
-void CameraSceneNode::setProjection(glm::mat4 projection) {
-    _projection = move(projection);
+void CameraSceneNode::setProjection(float fieldOfView, float aspect, float nearPlane, float farPlane) {
+    _projection = glm::perspective(fieldOfView, aspect, nearPlane, farPlane);
     computeFrustumPlanes();
 }
 

@@ -33,13 +33,12 @@ namespace game {
 StaticCamera::StaticCamera(float aspect, SceneGraph &sceneGraph) :
     _aspect(aspect) {
 
-    _sceneNode = sceneGraph.newCamera(glm::mat4(1.0f));
+    _sceneNode = sceneGraph.newCamera(55.0f, aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 }
 
 void StaticCamera::setObject(const PlaceableCamera &object) {
-    glm::mat4 projection(glm::perspective(glm::radians(object.fieldOfView()), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar));
     _sceneNode->setLocalTransform(object.transform());
-    _sceneNode->setProjection(projection);
+    _sceneNode->setProjection(glm::radians(object.fieldOfView()), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 }
 
 } // namespace game

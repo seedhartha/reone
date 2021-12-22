@@ -160,15 +160,19 @@ bool MeshSceneNode::shouldRender() const {
 }
 
 bool MeshSceneNode::shouldCastShadows() const {
+    // Only creature models must cast shadows
+    if (_model.usage() != ModelUsage::Creature) {
+        return false;
+    }
     // Skin nodes must not cast shadows
-    if (_modelNode->isSkinMesh())
+    if (_modelNode->isSkinMesh()) {
         return false;
+    }
 
-    // Meshless nodes must not cast shadows
     shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
-    if (!mesh)
+    if (!mesh) {
         return false;
-
+    }
     return mesh->shadow;
 }
 

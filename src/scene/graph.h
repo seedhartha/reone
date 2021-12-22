@@ -107,6 +107,9 @@ public:
     bool hasCamera() const override { return static_cast<bool>(_activeCamera); }
 
     glm::vec3 cameraPosition() const override { return _activeCamera->absoluteTransform()[3]; }
+    float cameraFieldOfView() const override { return _activeCamera->fieldOfView(); }
+    float cameraNearPlane() const override { return _activeCamera->nearPlane(); }
+    float cameraFarPlane() const override { return _activeCamera->farPlane(); }
     const glm::mat4 &cameraProjection() const override { return _activeCamera->projection(); }
     const glm::mat4 &cameraView() const override { return _activeCamera->view(); }
 
@@ -171,7 +174,15 @@ public:
     // Factory methods
 
     std::unique_ptr<DummySceneNode> newDummy(std::shared_ptr<graphics::ModelNode> modelNode);
+
     std::unique_ptr<CameraSceneNode> newCamera(glm::mat4 projection);
+
+    std::unique_ptr<CameraSceneNode> newCamera(
+        float fieldOfView,
+        float aspect,
+        float nearPlane,
+        float farPlane);
+
     std::unique_ptr<SoundSceneNode> newSound();
 
     std::unique_ptr<ModelSceneNode> newModel(

@@ -35,9 +35,10 @@ namespace reone {
 
 namespace graphics {
 
-static constexpr float kShadowNearPlane = 0.0f;
-static constexpr float kShadowFarPlane = 10000.0f;
-static constexpr float kOrthographicScale = 10.0f;
+static constexpr float kShadowsPointLightFOV = glm::radians(90.0f);
+static constexpr float kShadowsNearPlane = 0.1f;
+static constexpr float kShadowsFarPlane = 10000.0f;
+
 static constexpr int kScreenshotResolution = 256;
 
 void WorldPipeline::init() {
@@ -164,22 +165,88 @@ static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) 
     }
 }
 
+static vector<glm::vec4> computeFrustumCornersWorldSpace(const glm::mat4 &projection, const glm::mat4 &view) {
+    auto inv = glm::inverse(projection * view);
+
+    vector<glm::vec4> corners;
+    for (auto x = 0; x < 2; ++x) {
+        for (auto y = 0; y < 2; ++y) {
+            for (auto z = 0; z < 2; ++z) {
+                auto pt = inv * glm::vec4(2.0f * x - 1.0f, 2.0f * y - 1.0f, 2.0f * z - 1.0f, 1.0f);
+                corners.push_back(pt / pt.w);
+            }
+        }
+    }
+
+    return move(corners);
+}
+
+static glm::mat4 computeDirectionalLightSpaceMatrix(
+    float fov,
+    float aspect,
+    float near, float far,
+    const glm::vec3 &lightDir,
+    const glm::mat4 &cameraView) {
+
+    auto projection = glm::perspective(fov, aspect, near, far);
+
+    glm::vec3 center(0.0f);
+    auto corners = computeFrustumCornersWorldSpace(projection, cameraView);
+    for (auto &v : corners) {
+        center += glm::vec3(v);
+    }
+    center /= corners.size();
+
+    auto lightView = glm::lookAt(center + lightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
+
+    float minX = numeric_limits<float>::max();
+    float maxX = numeric_limits<float>::min();
+    float minY = numeric_limits<float>::max();
+    float maxY = numeric_limits<float>::min();
+    float minZ = numeric_limits<float>::max();
+    float maxZ = numeric_limits<float>::min();
+    for (auto &v : corners) {
+        auto trf = lightView * v;
+        minX = min(minX, trf.x);
+        maxX = max(maxX, trf.x);
+        minY = min(minY, trf.y);
+        maxY = max(maxY, trf.y);
+        minZ = min(minZ, trf.z);
+        maxZ = max(maxZ, trf.z);
+    }
+    float zMult = 10.0f;
+    if (minZ < 0.0f) {
+        minZ *= zMult;
+    } else {
+        minZ /= zMult;
+    }
+    if (maxZ < 0.0f) {
+        maxZ /= zMult;
+    } else {
+        maxZ *= zMult;
+    }
+
+    auto lightProjection = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
+    return lightProjection * lightView;
+}
+
 void WorldPipeline::computeLightSpaceMatrices() {
     static glm::vec3 up(0.0f, 0.0f, 1.0f);
 
     if (!_scene->hasShadowLight()) {
         return;
     }
-    glm::vec3 lightPosition(_scene->shadowLightPosition());
-    glm::vec3 cameraPosition(_scene->cameraPosition());
     if (_scene->isShadowLightDirectional()) {
-        glm::mat4 projection(glm::ortho(-kOrthographicScale, kOrthographicScale, -kOrthographicScale, kOrthographicScale, kShadowNearPlane, kShadowFarPlane));
-        glm::mat4 lightView(glm::lookAt(lightPosition, cameraPosition, up));
-        _shadowLightSpaceMatrices[0] = projection * lightView;
+        float fov = _scene->cameraFieldOfView();
+        float aspect = _options.width / static_cast<float>(_options.height);
+        float near = _scene->cameraNearPlane();
+        float far = _scene->cameraFarPlane() / 500.0f;
+        auto lightDir = glm::normalize(_scene->cameraPosition() - _scene->shadowLightPosition());
+        _shadowLightSpaceMatrices[0] = computeDirectionalLightSpaceMatrix(fov, aspect, near, far, lightDir, _scene->cameraView());
     } else {
-        glm::mat4 projection(glm::perspective(glm::radians(90.0f), 1.0f, kShadowNearPlane, kShadowFarPlane));
+        glm::mat4 projection(glm::perspective(kShadowsPointLightFOV, 1.0f, kShadowsNearPlane, kShadowsFarPlane));
         for (int i = 0; i < kNumCubeFaces; ++i) {
-            glm::mat4 lightView(getPointLightView(lightPosition, static_cast<CubeMapFace>(i)));
+            glm::mat4 lightView(getPointLightView(_scene->shadowLightPosition(), static_cast<CubeMapFace>(i)));
             _shadowLightSpaceMatrices[i] = projection * lightView;
         }
     }
