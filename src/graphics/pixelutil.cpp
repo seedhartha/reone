@@ -38,7 +38,7 @@ uint32_t getInternalPixelFormatGL(PixelFormat format) {
     case PixelFormat::DXT5:
         return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
     case PixelFormat::Depth:
-        return GL_DEPTH_COMPONENT;
+        return GL_DEPTH_COMPONENT32F;
     case PixelFormat::DepthStencil:
         return GL_DEPTH24_STENCIL8;
     default:
