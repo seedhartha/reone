@@ -137,10 +137,10 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     uniforms.general.projection = move(projection);
     uniforms.general.model = move(transform);
 
-    glDisable(GL_DEPTH_TEST);
-    _shaders.use(_shaders.gui(), true);
-    _meshes.quad().draw();
-    glEnable(GL_DEPTH_TEST);
+    _graphicsContext.withoutDepthTest([this]() {
+        _shaders.use(_shaders.gui(), true);
+        _meshes.quad().draw();
+    });
 }
 
 } // namespace graphics

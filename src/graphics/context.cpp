@@ -78,6 +78,16 @@ void GraphicsContext::setBlendMode(BlendMode mode) {
     _blendMode = mode;
 }
 
+void GraphicsContext::withoutDepthTest(const function<void()> &block) {
+    if (!_depthTest) {
+        block();
+        return;
+    }
+    glDisable(GL_DEPTH_TEST);
+    block();
+    glEnable(GL_DEPTH_TEST);
+}
+
 void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
     glEnable(GL_SCISSOR_TEST);
     glScissor(bounds[0], bounds[1], bounds[2], bounds[3]);
