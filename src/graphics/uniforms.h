@@ -58,6 +58,7 @@ struct GeneralUniforms {
     glm::vec4 fogColor {0.0f};
     glm::vec4 heightMapFrameBounds {0.0f};
     glm::vec4 shadowLightPosition {0.0f}; /**< W = 0 if light is directional */
+    glm::vec4 shadowCascadeFarPlanes {0.0f};
     glm::vec2 blurResolution {0.0f};
     glm::vec2 blurDirection {0.0f};
     float alpha {1.0f};
@@ -68,7 +69,7 @@ struct GeneralUniforms {
     float shadowStrength {0.0f};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
     char padding[4];
-    glm::mat4 shadowLightSpaceMatrices[kNumCubeFaces] {glm::mat4(1.0f)};
+    glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
 
     void resetGlobals() {
         projection = glm::mat4(1.0f);
@@ -77,11 +78,12 @@ struct GeneralUniforms {
         worldAmbientColor = glm::vec4(1.0f);
         fogColor = glm::vec4(0.0f);
         shadowLightPosition = glm::vec4(0.0f);
+        shadowCascadeFarPlanes = glm::vec4(0.0f);
         fogNear = 0.0f;
         fogFar = 0.0f;
         shadowStrength = 1.0f;
-        for (int i = 0; i < kNumCubeFaces; ++i) {
-            shadowLightSpaceMatrices[i] = glm::mat4(1.0f);
+        for (int i = 0; i < kNumShadowLightSpace; ++i) {
+            shadowLightSpace[i] = glm::mat4(1.0f);
         }
     }
 

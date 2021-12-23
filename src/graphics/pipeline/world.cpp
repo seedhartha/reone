@@ -41,11 +41,12 @@ static constexpr float kShadowsFarPlane = 10000.0f;
 
 static constexpr int kScreenshotResolution = 256;
 
-void WorldPipeline::init() {
-    for (int i = 0; i < kNumCubeFaces; ++i) {
-        _shadowLightSpaceMatrices[i] = glm::mat4(1.0f);
-    }
+static const vector<float> g_shadowCascadeDivisors {
+    1.0f / 1024.0f,
+    1.0f / 512.0f,
+    1.0f / 256.0f};
 
+void WorldPipeline::init() {
     // Reusable renderbuffers
 
     _depthRenderbuffer = make_unique<Renderbuffer>();
@@ -239,23 +240,22 @@ void WorldPipeline::computeLightSpaceMatrices() {
         auto lightDir = glm::normalize(_scene->cameraPosition() - _scene->shadowLightPosition());
         float fov = _scene->cameraFieldOfView();
         float aspect = _options.width / static_cast<float>(_options.height);
-        float near = _scene->cameraNearPlane();
-        float far = _scene->cameraFarPlane();
-        vector<float> shadowCascadeLevels {far / 1000.0f, far / 500.0f, far / 250.0f};
-        for (size_t i = 0; i < 1 + shadowCascadeLevels.size(); ++i) {
-            if (i == 0) {
-                _shadowLightSpaceMatrices[i] = computeDirectionalLightSpaceMatrix(fov, aspect, near, shadowCascadeLevels[i], lightDir, _scene->cameraView());
-            } else if (i < shadowCascadeLevels.size()) {
-                _shadowLightSpaceMatrices[i] = computeDirectionalLightSpaceMatrix(fov, aspect, shadowCascadeLevels[i - 1], shadowCascadeLevels[i], lightDir, _scene->cameraView());
-            } else {
-                _shadowLightSpaceMatrices[i] = computeDirectionalLightSpaceMatrix(fov, aspect, shadowCascadeLevels[i - 1], far, lightDir, _scene->cameraView());
+        float cameraNear = _scene->cameraNearPlane();
+        float cameraFar = _scene->cameraFarPlane();
+        for (int i = 0; i < kNumShadowCascades; ++i) {
+            float near = cameraNear;
+            if (i > 0) {
+                near = cameraFar * g_shadowCascadeDivisors[i - 1];
             }
+            float far = cameraFar * g_shadowCascadeDivisors[i];
+            _shadowCascadeFarPlanes[i] = far;
+            _shadowLightSpace[i] = computeDirectionalLightSpaceMatrix(fov, aspect, near, far, lightDir, _scene->cameraView());
         }
     } else {
         glm::mat4 projection(glm::perspective(kShadowsPointLightFOV, 1.0f, kShadowsNearPlane, kShadowsFarPlane));
         for (int i = 0; i < kNumCubeFaces; ++i) {
             glm::mat4 lightView(getPointLightView(_scene->shadowLightPosition(), static_cast<CubeMapFace>(i)));
-            _shadowLightSpaceMatrices[i] = projection * lightView;
+            _shadowLightSpace[i] = projection * lightView;
         }
     }
 }
@@ -272,8 +272,8 @@ void WorldPipeline::drawShadows() {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.shadowLightPosition = move(lightPosition);
-    for (int i = 0; i < kNumCubeFaces; ++i) {
-        uniforms.general.shadowLightSpaceMatrices[i] = _shadowLightSpaceMatrices[i];
+    for (int i = 0; i < kNumShadowLightSpace; ++i) {
+        uniforms.general.shadowLightSpace[i] = _shadowLightSpace[i];
     }
 
     glViewport(0, 0, _options.shadowResolution, _options.shadowResolution);
@@ -313,10 +313,11 @@ void WorldPipeline::drawGeometry() {
             _scene->isShadowLightDirectional() ? 0.0f : 1.0f);
 
         uniforms.general.shadowLightPosition = move(lightPosition);
+        uniforms.general.shadowCascadeFarPlanes = _shadowCascadeFarPlanes;
         uniforms.general.shadowStrength = 1.0f - _scene->shadowFadeFactor();
 
-        for (int i = 0; i < kNumCubeFaces; ++i) {
-            uniforms.general.shadowLightSpaceMatrices[i] = _shadowLightSpaceMatrices[i];
+        for (int i = 0; i < kNumShadowLightSpace; ++i) {
+            uniforms.general.shadowLightSpace[i] = _shadowLightSpace[i];
         }
     }
 
