@@ -40,7 +40,7 @@ uint32_t getInternalPixelFormatGL(PixelFormat format) {
     case PixelFormat::Depth:
         return GL_DEPTH_COMPONENT32F;
     case PixelFormat::DepthStencil:
-        return GL_DEPTH24_STENCIL8;
+        return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
     default:
         throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(format)));
     }
