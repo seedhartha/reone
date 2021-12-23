@@ -74,7 +74,7 @@ void Door::loadFromBlueprint(const string &resRef) {
     auto modelSceneNode = sceneGraph.newModel(move(model), ModelUsage::Door);
     modelSceneNode->setUser(*this);
     modelSceneNode->setCullable(true);
-    modelSceneNode->setDrawDistance(FLT_MAX);
+    // modelSceneNode->setDrawDistance(_game.options().graphics.drawDistance);
     _sceneNode = move(modelSceneNode);
 
     auto walkmeshClosed = _services.walkmeshes.get(modelName + "0", ResourceType::Dwk);

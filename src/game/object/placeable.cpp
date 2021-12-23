@@ -66,7 +66,7 @@ void Placeable::loadFromBlueprint(const string &resRef) {
 
     auto sceneNode = sceneGraph.newModel(move(model), ModelUsage::Placeable);
     sceneNode->setCullable(true);
-    sceneNode->setDrawDistance(64.0f);
+    sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
     _sceneNode = move(sceneNode);
 
     auto walkmesh = _services.walkmeshes.get(modelName, ResourceType::Pwk);

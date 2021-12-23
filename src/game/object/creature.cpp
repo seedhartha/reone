@@ -1054,7 +1054,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     auto sceneNode = sceneGraph.newModel(model, ModelUsage::Creature, this);
     sceneNode->setCullable(true);
-    sceneNode->setDrawDistance(32.0f);
+    sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
 
     return move(sceneNode);
 }

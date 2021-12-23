@@ -33,17 +33,18 @@ struct WindowID {
     static constexpr wxWindowID textureQuality = wxID_HIGHEST + 5;
     static constexpr wxWindowID antiAliasing = wxID_HIGHEST + 6;
     static constexpr wxWindowID shadowResolution = wxID_HIGHEST + 7;
-    static constexpr wxWindowID fullscreen = wxID_HIGHEST + 8;
-    static constexpr wxWindowID vsync = wxID_HIGHEST + 9;
-    static constexpr wxWindowID grass = wxID_HIGHEST + 10;
-    static constexpr wxWindowID musicVolume = wxID_HIGHEST + 11;
-    static constexpr wxWindowID voiceVolume = wxID_HIGHEST + 12;
-    static constexpr wxWindowID soundVolume = wxID_HIGHEST + 13;
-    static constexpr wxWindowID movieVolume = wxID_HIGHEST + 14;
-    static constexpr wxWindowID logLevel = wxID_HIGHEST + 15;
-    static constexpr wxWindowID logChannels = wxID_HIGHEST + 16;
-    static constexpr wxWindowID logFile = wxID_HIGHEST + 17;
-    static constexpr wxWindowID saveConfig = wxID_HIGHEST + 18;
+    static constexpr wxWindowID drawDistance = wxID_HIGHEST + 8;
+    static constexpr wxWindowID fullscreen = wxID_HIGHEST + 9;
+    static constexpr wxWindowID vsync = wxID_HIGHEST + 10;
+    static constexpr wxWindowID grass = wxID_HIGHEST + 11;
+    static constexpr wxWindowID musicVolume = wxID_HIGHEST + 12;
+    static constexpr wxWindowID voiceVolume = wxID_HIGHEST + 13;
+    static constexpr wxWindowID soundVolume = wxID_HIGHEST + 14;
+    static constexpr wxWindowID movieVolume = wxID_HIGHEST + 15;
+    static constexpr wxWindowID logLevel = wxID_HIGHEST + 16;
+    static constexpr wxWindowID logChannels = wxID_HIGHEST + 17;
+    static constexpr wxWindowID logFile = wxID_HIGHEST + 18;
+    static constexpr wxWindowID saveConfig = wxID_HIGHEST + 19;
 };
 
 class LauncherFrame : public wxFrame {
@@ -62,6 +63,7 @@ private:
         bool grass {true};
         int aasamples {0};
         int shadowres {0};
+        int drawdist {64};
         int musicvol {0};
         int voicevol {0};
         int soundvol {0};
@@ -77,6 +79,7 @@ private:
     wxChoice *_choiceTextureQuality;
     wxChoice *_choiceAntiAliasing;
     wxChoice *_choiceShadowResolution;
+    wxSlider *_sliderDrawDistance;
     wxCheckBox *_checkBoxFullscreen;
     wxCheckBox *_checkBoxVSync;
     wxCheckBox *_checkBoxGrass;

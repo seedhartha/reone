@@ -19,6 +19,7 @@
 
 #include "../../graphics/lipanimation.h"
 #include "../../graphics/model.h"
+#include "../../graphics/types.h"
 
 #include "../animeventlistener.h"
 #include "../animproperties.h"
@@ -38,8 +39,6 @@ class Textures;
 } // namespace graphics
 
 namespace scene {
-
-constexpr float kDefaultDrawDistance = 1024.0f;
 
 class ModelSceneNode : public SceneNode {
 public:
@@ -133,7 +132,7 @@ private:
     ModelUsage _usage;
     IAnimationEventListener *_animEventListener;
 
-    float _drawDistance {kDefaultDrawDistance};
+    float _drawDistance {std::numeric_limits<float>::max()};
 
     // Services
 

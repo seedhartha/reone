@@ -141,6 +141,17 @@ LauncherFrame::LauncherFrame() :
 
     // END Shadow Map Resolution
 
+    // Draw Distance
+
+    auto labelDrawDistance = new wxStaticText(this, wxID_ANY, "Draw Distance", wxDefaultPosition, wxDefaultSize);
+    _sliderDrawDistance = new wxSlider(this, WindowID::drawDistance, _config.drawdist, 32, 128, wxDefaultPosition, wxDefaultSize);
+
+    auto drawDistanceSizer = new wxBoxSizer(wxVERTICAL);
+    drawDistanceSizer->Add(labelDrawDistance, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    drawDistanceSizer->Add(_sliderDrawDistance, wxSizerFlags(0).Expand().Border(wxALL, 3));
+
+    // END Draw Distance
+
     _checkBoxFullscreen = new wxCheckBox(this, WindowID::fullscreen, "Enable Fullscreen", wxDefaultPosition, wxDefaultSize);
     _checkBoxFullscreen->SetValue(_config.fullscreen);
 
@@ -155,6 +166,7 @@ LauncherFrame::LauncherFrame() :
     graphicsSizer->Add(textureQualitySizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(antiAliasingSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(shadowResSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(drawDistanceSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxVSync, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxGrass, wxSizerFlags(0).Expand().Border(wxALL, 3));
@@ -268,6 +280,7 @@ void LauncherFrame::LoadConfiguration() {
         ("texquality", po::value<int>()->default_value(0))                              //
         ("aasamples", po::value<int>()->default_value(0))                               //
         ("shadowres", po::value<int>()->default_value(0))                               //
+        ("drawdist", po::value<int>()->default_value(1024))                             //
         ("musicvol", po::value<int>()->default_value(85))                               //
         ("voicevol", po::value<int>()->default_value(85))                               //
         ("soundvol", po::value<int>()->default_value(85))                               //
@@ -292,6 +305,7 @@ void LauncherFrame::LoadConfiguration() {
     _config.texQuality = vars["texquality"].as<int>();
     _config.aasamples = vars["aasamples"].as<int>();
     _config.shadowres = vars["shadowres"].as<int>();
+    _config.drawdist = vars["drawdist"].as<int>();
     _config.musicvol = vars["musicvol"].as<int>();
     _config.voicevol = vars["voicevol"].as<int>();
     _config.soundvol = vars["soundvol"].as<int>();
@@ -326,6 +340,7 @@ void LauncherFrame::SaveConfiguration() {
         "texquality=",
         "aasamples=",
         "shadowres=",
+        "drawdist=",
         "musicvol=",
         "voicevol=",
         "soundvol=",
@@ -384,6 +399,7 @@ void LauncherFrame::SaveConfiguration() {
     _config.texQuality = _choiceTextureQuality->GetSelection();
     _config.aasamples = _choiceAntiAliasing->GetSelection();
     _config.shadowres = _choiceShadowResolution->GetSelection();
+    _config.drawdist = _sliderDrawDistance->GetValue();
     _config.musicvol = _sliderVolumeMusic->GetValue();
     _config.voicevol = _sliderVolumeVoice->GetValue();
     _config.soundvol = _sliderVolumeSound->GetValue();
@@ -419,6 +435,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "texquality=" << _config.texQuality << endl;
     config << "aasamples=" << _config.aasamples << endl;
     config << "shadowres=" << _config.shadowres << endl;
+    config << "drawdist=" << _config.drawdist << endl;
     config << "musicvol=" << _config.musicvol << endl;
     config << "voicevol=" << _config.voicevol << endl;
     config << "soundvol=" << _config.soundvol << endl;
