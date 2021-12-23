@@ -55,16 +55,6 @@ void GraphicsContext::withBlendMode(BlendMode mode, const function<void()> &bloc
     setBlendMode(oldBlendMode);
 }
 
-void GraphicsContext::withoutDepthTest(const function<void()> &block) {
-    if (!_depthTest) {
-        block();
-        return;
-    }
-    glDisable(GL_DEPTH_TEST);
-    block();
-    glEnable(GL_DEPTH_TEST);
-}
-
 void GraphicsContext::withBackFaceCulling(const function<void()> &block) {
     if (_backFaceCulling) {
         block();
@@ -83,6 +73,16 @@ void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<v
     block();
 
     glDisable(GL_SCISSOR_TEST);
+}
+
+void GraphicsContext::withoutDepthTest(const function<void()> &block) {
+    if (!_depthTest) {
+        block();
+        return;
+    }
+    glDisable(GL_DEPTH_TEST);
+    block();
+    glEnable(GL_DEPTH_TEST);
 }
 
 void GraphicsContext::enableBackFaceCulling() {
