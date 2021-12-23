@@ -35,23 +35,24 @@ Options OptionsParser::parse() {
     // Initialize options description
 
     po::options_description descCommon;
-    descCommon.add_options()                                                                         //
-        ("game", po::value<string>(), "path to game directory")                                      //
-        ("dev", po::value<bool>()->default_value(false), "enable developer mode")                    //
-        ("width", po::value<int>()->default_value(800), "window width")                              //
-        ("height", po::value<int>()->default_value(600), "window height")                            //
-        ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")                 //
-        ("vsync", po::value<bool>()->default_value(true), "enable v-sync")                           //
-        ("texquality", po::value<int>()->default_value(0), "texture quality")                        //
-        ("grass", po::value<bool>()->default_value(true), "enable grass")                            //
-        ("aasamples", po::value<int>()->default_value(0), "anti-aliasing samples")                   //
-        ("shadowres", po::value<int>()->default_value(0), "shadow map resolution")                   //
-        ("musicvol", po::value<int>()->default_value(85), "music volume in percents")                //
-        ("voicevol", po::value<int>()->default_value(85), "voice volume in percents")                //
-        ("soundvol", po::value<int>()->default_value(85), "sound volume in percents")                //
-        ("movievol", po::value<int>()->default_value(85), "movie volume in percents")                //
-        ("loglevel", po::value<int>()->default_value(static_cast<int>(LogLevel::Info)), "log level") //
-        ("logch", po::value<int>()->default_value(LogChannels::general), "log channel mask")         //
+    descCommon.add_options()                                                                                         //
+        ("game", po::value<string>(), "path to game directory")                                                      //
+        ("dev", po::value<bool>()->default_value(false), "enable developer mode")                                    //
+        ("width", po::value<int>()->default_value(800), "window width")                                              //
+        ("height", po::value<int>()->default_value(600), "window height")                                            //
+        ("fullscreen", po::value<bool>()->default_value(false), "enable fullscreen")                                 //
+        ("vsync", po::value<bool>()->default_value(true), "enable v-sync")                                           //
+        ("texquality", po::value<int>()->default_value(0), "texture quality")                                        //
+        ("grass", po::value<bool>()->default_value(true), "enable grass")                                            //
+        ("aasamples", po::value<int>()->default_value(0), "anti-aliasing samples")                                   //
+        ("shadowres", po::value<int>()->default_value(0), "shadow map resolution")                                   //
+        ("drawdist", po::value<int>()->default_value(static_cast<int>(kDefaultObjectDrawDistance)), "draw distance") //
+        ("musicvol", po::value<int>()->default_value(85), "music volume in percents")                                //
+        ("voicevol", po::value<int>()->default_value(85), "voice volume in percents")                                //
+        ("soundvol", po::value<int>()->default_value(85), "sound volume in percents")                                //
+        ("movievol", po::value<int>()->default_value(85), "movie volume in percents")                                //
+        ("loglevel", po::value<int>()->default_value(static_cast<int>(LogLevel::Info)), "log level")                 //
+        ("logch", po::value<int>()->default_value(LogChannels::general), "log channel mask")                         //
         ("logfile", po::value<bool>()->default_value(false), "log to file");
 
     po::options_description descCmdLine {"Usage"};
@@ -78,6 +79,7 @@ Options OptionsParser::parse() {
     options.graphics.grass = vars["grass"].as<bool>();
     options.graphics.aaSamples = 1 << vars["aasamples"].as<int>();
     options.graphics.shadowResolution = 1 << (10 + vars["shadowres"].as<int>());
+    options.graphics.drawDistance = static_cast<float>(vars["drawdist"].as<int>());
     options.audio.musicVolume = vars["musicvol"].as<int>();
     options.audio.voiceVolume = vars["voicevol"].as<int>();
     options.audio.soundVolume = vars["soundvol"].as<int>();

@@ -32,6 +32,7 @@ struct GraphicsOptions {
     bool grass {false};
     int aaSamples {0};
     int shadowResolution {0};
+    float drawDistance {kDefaultObjectDrawDistance};
 };
 
 } // namespace graphics
