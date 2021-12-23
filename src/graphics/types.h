@@ -23,6 +23,7 @@ namespace graphics {
 
 constexpr int kNumCubeFaces = 6;
 constexpr int kNumShadowCascades = 4;
+constexpr int kNumShadowLightSpace = 6; // max(6, 3)
 
 constexpr float kDefaultClipPlaneNear = 0.1f;
 constexpr float kDefaultClipPlaneFar = 10000.0f;

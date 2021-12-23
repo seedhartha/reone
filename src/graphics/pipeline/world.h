@@ -62,8 +62,10 @@ private:
     GraphicsOptions _options;
 
     IScene *_scene {nullptr};
-    glm::mat4 _shadowLightSpaceMatrices[graphics::kNumCubeFaces];
     bool _takeScreenshot {false}; /**< render next frame into texture */
+
+    glm::vec4 _shadowCascadeFarPlanes {0.0f};
+    glm::mat4 _shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
 
     // Services
 
