@@ -33,6 +33,9 @@ void GraphicsContext::init() {
         glEnable(GL_MULTISAMPLE);
     }
 
+    // Viewport
+    glGetIntegerv(GL_VIEWPORT, &_viewport[0]);
+
     // Depth Test
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
@@ -63,6 +66,16 @@ void GraphicsContext::withBackFaceCulling(const function<void()> &block) {
     enableBackFaceCulling();
     block();
     disableBackFaceCulling();
+}
+
+void GraphicsContext::withViewport(glm::ivec4 viewport, const function<void()> &block) {
+    if (_viewport == viewport) {
+        block();
+        return;
+    }
+    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+    block();
+    glViewport(_viewport[0], _viewport[1], _viewport[2], _viewport[3]);
 }
 
 void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
