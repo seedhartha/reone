@@ -274,20 +274,15 @@ void WorldPipeline::drawShadows() {
         uniforms.general.shadowLightSpace[i] = _shadowLightSpace[i];
     }
 
-    glViewport(0, 0, _options.shadowResolution, _options.shadowResolution);
+    _graphicsContext.withViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution), [this]() {
+        auto shadows = _scene->isShadowLightDirectional() ? _directionalLightShadows : _pointLightShadows;
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, shadows->nameGL());
+        glReadBuffer(GL_NONE);
+        glDrawBuffer(GL_NONE);
 
-    // Bind shadows framebuffer
-    auto shadows = _scene->isShadowLightDirectional() ? _directionalLightShadows : _pointLightShadows;
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, shadows->nameGL());
-    glReadBuffer(GL_NONE);
-    glDrawBuffer(GL_NONE);
-
-    // Draw the scene
-    glClear(GL_DEPTH_BUFFER_BIT);
-    _scene->drawShadows();
-
-    // Restore context
-    glViewport(0, 0, _options.width, _options.height);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        _scene->drawShadows();
+    });
 }
 
 void WorldPipeline::drawGeometry() {
@@ -317,7 +312,7 @@ void WorldPipeline::drawGeometry() {
         }
     }
 
-    // Bind multi-sampled framebuffer
+    // Draw scene to multi-sample framebuffer
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _geometry1->nameGL());
     glDrawBuffers(2, colors);
@@ -330,12 +325,10 @@ void WorldPipeline::drawGeometry() {
         }
     }
 
-    // Draw the scene
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     _scene->draw();
 
-    // Blit multi-sampled framebuffer to standard framebuffer
+    // Blit multi-sample framebuffer to a second framebuffer
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, _geometry1->nameGL());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _geometry2->nameGL());
@@ -344,8 +337,6 @@ void WorldPipeline::drawGeometry() {
         glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
         glBlitFramebuffer(0, 0, _options.width, _options.height, 0, 0, _options.width, _options.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
-
-    // Restore context
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -416,46 +407,33 @@ void WorldPipeline::applyVerticalBlur() {
 
 void WorldPipeline::drawResult() {
     // Set viewport
-
     if (_takeScreenshot) {
         glViewport(0, 0, kScreenshotResolution, kScreenshotResolution);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _screenshot->nameGL());
     }
 
-    // Bind geometry texture
-
+    // Bind textures
     _textures.bind(*_geometry2Color1);
-
-    // Bind blur texture
-
     _textures.bind(*_verticalBlurColor, TextureUnits::bloom);
 
-    // Set shader uniforms
-
+    // Reset uniforms
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
 
     // Draw a quad
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     _shaders.use(_shaders.presentWorld(), true);
     _meshes.quadNDC().draw();
 
-    // Restore context
-
+    // Save screenshot and restore context
     if (_takeScreenshot) {
-        saveScreenshot();
+        glViewport(0, 0, _options.width, _options.height);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glViewport(0, 0, kScreenshotResolution, kScreenshotResolution);
+        _textures.bind(*_screenshotColor);
+        _screenshotColor->flushGPUToCPU();
         _takeScreenshot = false; // finished taking a screenshot
     }
-}
-
-void WorldPipeline::saveScreenshot() {
-    glViewport(0, 0, _options.width, _options.height);
-    _textures.bind(*_screenshotColor);
-    _screenshotColor->flushGPUToCPU();
 }
 
 } // namespace graphics

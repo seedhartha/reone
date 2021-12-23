@@ -110,7 +110,6 @@ private:
     void applyHorizontalBlur();
     void applyVerticalBlur();
     void drawResult();
-    void saveScreenshot();
 };
 
 } // namespace graphics

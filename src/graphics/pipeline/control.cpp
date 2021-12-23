@@ -98,28 +98,28 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     uniforms.general.cameraPosition = glm::vec4(scene.cameraPosition(), 1.0f);
     uniforms.general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
 
-    // Draw to multi-sampled framebuffer
+    int w = extent[2];
+    int h = extent[3];
+    _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &w, &h, &scene, &framebuffer1, &framebuffer2]() {
+        // Draw scene to multi-sample framebuffer
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer1.nameGL());
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        scene.draw();
 
-    glViewport(0, 0, extent[2], extent[3]);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer1.nameGL());
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // Blit multi-sample framebuffer to a second framebuffer
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer1.nameGL());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer2.nameGL());
+        for (int i = 0; i < 2; ++i) {
+            glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
+            glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
+            glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        }
 
-    scene.draw();
-
-    // Blit multi-sampled framebuffer to standard framebuffer
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer1.nameGL());
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer2.nameGL());
-    for (int i = 0; i < 2; ++i) {
-        glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
-        glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
-        glBlitFramebuffer(0, 0, extent[2], extent[3], 0, 0, extent[2], extent[3], GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    });
 
     // Draw control
 
-    glViewport(0, 0, _options.width, _options.height);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     _textures.bind(*attachments.colorBuffer2);
 
     glm::mat4 projection(glm::ortho(
