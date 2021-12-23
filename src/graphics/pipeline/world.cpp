@@ -35,9 +35,9 @@ namespace reone {
 
 namespace graphics {
 
-static constexpr float kShadowsPointLightFOV = glm::radians(90.0f);
-static constexpr float kShadowsNearPlane = 0.1f;
-static constexpr float kShadowsFarPlane = 10000.0f;
+static constexpr float kPointLightShadowsFOV = glm::radians(90.0f);
+static constexpr float kPointLightShadowsNearPlane = 0.1f;
+static constexpr float kPointLightShadowsFarPlane = 10000.0f;
 
 static constexpr int kScreenshotResolution = 256;
 
@@ -252,7 +252,7 @@ void WorldPipeline::computeLightSpaceMatrices() {
             _shadowLightSpace[i] = computeDirectionalLightSpaceMatrix(fov, aspect, near, far, lightDir, _scene->cameraView());
         }
     } else {
-        glm::mat4 projection(glm::perspective(kShadowsPointLightFOV, 1.0f, kShadowsNearPlane, kShadowsFarPlane));
+        glm::mat4 projection(glm::perspective(kPointLightShadowsFOV, 1.0f, kPointLightShadowsNearPlane, kPointLightShadowsFarPlane));
         for (int i = 0; i < kNumCubeFaces; ++i) {
             glm::mat4 lightView(getPointLightView(_scene->shadowLightPosition(), static_cast<CubeMapFace>(i)));
             _shadowLightSpace[i] = projection * lightView;
