@@ -231,8 +231,6 @@ static glm::mat4 computeDirectionalLightSpaceMatrix(
 }
 
 void WorldPipeline::computeLightSpaceMatrices() {
-    static glm::vec3 up(0.0f, 0.0f, 1.0f);
-
     if (!_scene->hasShadowLight()) {
         return;
     }
@@ -311,11 +309,9 @@ void WorldPipeline::drawGeometry() {
         glm::vec4 lightPosition(
             _scene->shadowLightPosition(),
             _scene->isShadowLightDirectional() ? 0.0f : 1.0f);
-
         uniforms.general.shadowLightPosition = move(lightPosition);
         uniforms.general.shadowCascadeFarPlanes = _shadowCascadeFarPlanes;
         uniforms.general.shadowStrength = 1.0f - _scene->shadowFadeFactor();
-
         for (int i = 0; i < kNumShadowLightSpace; ++i) {
             uniforms.general.shadowLightSpace[i] = _shadowLightSpace[i];
         }
