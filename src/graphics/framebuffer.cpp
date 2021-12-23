@@ -70,7 +70,7 @@ void Framebuffer::configure() {
     if (_depthStencil) {
         if (_depthStencil->isTexture()) {
             attachTexture(static_cast<Texture &>(*_depthStencil), Attachment::DepthStencil);
-        } else if (_depth->isRenderbuffer()) {
+        } else if (_depthStencil->isRenderbuffer()) {
             attachRenderbuffer(static_cast<Renderbuffer &>(*_depthStencil), Attachment::DepthStencil);
         }
     }
