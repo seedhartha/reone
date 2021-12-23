@@ -352,6 +352,14 @@ void main() {
 }
 )END";
 
+static const string g_vsShadows = R"END(
+layout(location = 0) in vec3 aPosition;
+
+void main() {
+    gl_Position = uModel * vec4(aPosition, 1.0);
+}
+)END";
+
 static const string g_vsModel = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
@@ -830,6 +838,7 @@ void Shaders::init() {
 
     // Shaders
     auto vsSimple = initShader(ShaderType::Vertex, {g_glslHeader, g_vsSimple});
+    auto vsShadows = initShader(ShaderType::Vertex, {g_glslHeader, g_vsShadows});
     auto vsModel = initShader(ShaderType::Vertex, {g_glslHeader, g_vsModel});
     auto vsParticle = initShader(ShaderType::Vertex, {g_glslHeader, g_vsParticle});
     auto vsGrass = initShader(ShaderType::Vertex, {g_glslHeader, g_vsGrass});
@@ -851,8 +860,8 @@ void Shaders::init() {
 
     // Shader Programs
     _spSimpleColor = initShaderProgram({vsSimple, fsColor});
-    _spPointLightShadows = initShaderProgram({vsSimple, gsPointLightShadows, fsPointLightShadows});
-    _spDirectionalLightShadows = initShaderProgram({vsSimple, gsDirectionalLightShadows, fsDirectionalLightShadows});
+    _spPointLightShadows = initShaderProgram({vsShadows, gsPointLightShadows, fsPointLightShadows});
+    _spDirectionalLightShadows = initShaderProgram({vsShadows, gsDirectionalLightShadows, fsDirectionalLightShadows});
     _spGUI = initShaderProgram({vsSimple, fsGUI});
     _spBlur = initShaderProgram({vsSimple, fsBlur});
     _spPresentWorld = initShaderProgram({vsSimple, fsPresentWorld});

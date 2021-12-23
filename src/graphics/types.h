@@ -27,7 +27,7 @@ constexpr float kDefaultObjectDrawDistance = 64.0f;
 
 constexpr int kNumCubeFaces = 6;
 constexpr int kNumShadowCascades = 4;
-constexpr int kNumShadowLightSpace = 6; // max(6, 3)
+constexpr int kNumShadowLightSpace = 6;
 
 constexpr int kMaxBones = 24;
 constexpr int kMaxLights = 8;
