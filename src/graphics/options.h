@@ -29,7 +29,8 @@ struct GraphicsOptions {
     bool fullscreen {false};
     bool vsync {true};
     TextureQuality textureQuality {0};
-    bool grass {false};
+    bool grass {true};
+    bool dynamicRoomLighting {false};
     int aaSamples {0};
     int shadowResolution {0};
     float drawDistance {kDefaultObjectDrawDistance};
