@@ -157,7 +157,6 @@ void MainMenu::setup3DView() {
         .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
         .modelScale(kKotorModelSize)
         .cameraFromModelNode("camerahook")
-        .lightingRefFromModelNode("rootdummy")
         .invoke();
 
     _binding.lbl3dView->setSceneName(kSceneMainMenu);

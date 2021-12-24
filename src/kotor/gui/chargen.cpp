@@ -407,7 +407,6 @@ void CharacterGeneration::reloadCharacterModel() {
         .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, _1))
         .modelScale(kModelScale)
         .cameraFromModelNode("camerahook")
-        .lightingRefFromModelNode("cgbody_light")
         .invoke();
 
     _binding.modelLbl->setSceneName(kSceneCharGen);

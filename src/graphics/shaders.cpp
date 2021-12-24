@@ -49,7 +49,7 @@ const int NUM_SHADOW_CASCADES = 8;
 const int NUM_SHADOW_LIGHT_SPACE = 8;
 
 const int MAX_BONES = 24;
-const int MAX_LIGHTS = 8;
+const int MAX_LIGHTS = 16;
 const int MAX_PARTICLES = 64;
 const int MAX_TEXT_CHARS = 128;
 const int MAX_GRASS_CLUSTERS = 256;

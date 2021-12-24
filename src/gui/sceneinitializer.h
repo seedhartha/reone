@@ -58,7 +58,6 @@ public:
     SceneInitializer &cameraTransform(glm::mat4 transform);
     SceneInitializer &cameraFromModelNode(std::string nodeName);
     SceneInitializer &ambientLightColor(glm::vec3 color);
-    SceneInitializer &lightingRefFromModelNode(std::string nodeName);
 
 private:
     scene::SceneGraph &_sceneGraph;
@@ -72,7 +71,6 @@ private:
     glm::mat4 _cameraTransform {1.0f};
     std::string _cameraNodeName;
     glm::vec3 _ambientLightColor {0.0f};
-    std::string _lightingRefNodeName;
 };
 
 } // namespace gui

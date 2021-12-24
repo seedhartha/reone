@@ -131,7 +131,6 @@ void PortraitSelection::loadHeadModel() {
         .modelSupplier(bind(&PortraitSelection::getCharacterModel, this, _1))
         .modelScale(kModelScale)
         .cameraFromModelNode(_charGen.character().gender == Gender::Male ? "camerahookm" : "camerahookf")
-        .lightingRefFromModelNode("cghead_light")
         .invoke();
 
     _binding.lblHead->setSceneName(kScenePortraitSelect);

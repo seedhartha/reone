@@ -152,6 +152,17 @@ LauncherFrame::LauncherFrame() :
 
     // END Object Draw Distance
 
+    // Maximum Number of Lights
+
+    auto labelMaxLights = new wxStaticText(this, wxID_ANY, "Maximum Number of Lights", wxDefaultPosition, wxDefaultSize);
+    _sliderMaxLights = new wxSlider(this, wxID_ANY, _config.maxlights, 4, 16, wxDefaultPosition, wxDefaultSize);
+
+    auto maxLightsSizer = new wxBoxSizer(wxVERTICAL);
+    maxLightsSizer->Add(labelMaxLights, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    maxLightsSizer->Add(_sliderMaxLights, wxSizerFlags(0).Expand().Border(wxALL, 3));
+
+    // END Maximum Number of Lights
+
     _checkBoxFullscreen = new wxCheckBox(this, wxID_ANY, "Enable Fullscreen", wxDefaultPosition, wxDefaultSize);
     _checkBoxFullscreen->SetValue(_config.fullscreen);
 
@@ -161,19 +172,16 @@ LauncherFrame::LauncherFrame() :
     _checkBoxGrass = new wxCheckBox(this, wxID_ANY, "Enable Grass", wxDefaultPosition, wxDefaultSize);
     _checkBoxGrass->SetValue(_config.grass);
 
-    _checkBoxDynamicRoomLighting = new wxCheckBox(this, wxID_ANY, "Enable Dynamic Room Lighting", wxDefaultPosition, wxDefaultSize);
-    _checkBoxDynamicRoomLighting->SetValue(_config.dynroomlighting);
-
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
     graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(textureQualitySizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(antiAliasingSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(shadowResSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(drawDistanceSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(maxLightsSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxVSync, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxGrass, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(_checkBoxDynamicRoomLighting, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
     // END Graphics
 
@@ -281,11 +289,11 @@ void LauncherFrame::LoadConfiguration() {
         ("fullscreen", po::value<bool>()->default_value(false))                         //
         ("vsync", po::value<bool>()->default_value(true))                               //
         ("grass", po::value<bool>()->default_value(true))                               //
-        ("dynroomlighting", po::value<bool>()->default_value(false))                    //
         ("texquality", po::value<int>()->default_value(0))                              //
         ("aasamples", po::value<int>()->default_value(0))                               //
         ("shadowres", po::value<int>()->default_value(0))                               //
         ("drawdist", po::value<int>()->default_value(1024))                             //
+        ("maxlights", po::value<int>()->default_value(8))                               //
         ("musicvol", po::value<int>()->default_value(85))                               //
         ("voicevol", po::value<int>()->default_value(85))                               //
         ("soundvol", po::value<int>()->default_value(85))                               //
@@ -307,11 +315,11 @@ void LauncherFrame::LoadConfiguration() {
     _config.fullscreen = vars["fullscreen"].as<bool>();
     _config.vsync = vars["vsync"].as<bool>();
     _config.grass = vars["grass"].as<bool>();
-    _config.dynroomlighting = vars["dynroomlighting"].as<bool>();
     _config.texQuality = vars["texquality"].as<int>();
     _config.aasamples = vars["aasamples"].as<int>();
     _config.shadowres = vars["shadowres"].as<int>();
     _config.drawdist = vars["drawdist"].as<int>();
+    _config.maxlights = vars["maxlights"].as<int>();
     _config.musicvol = vars["musicvol"].as<int>();
     _config.voicevol = vars["voicevol"].as<int>();
     _config.soundvol = vars["soundvol"].as<int>();
@@ -343,11 +351,11 @@ void LauncherFrame::SaveConfiguration() {
         "fullscreen=",
         "vsync=",
         "grass=",
-        "dynroomlighting=",
         "texquality=",
         "aasamples=",
         "shadowres=",
         "drawdist=",
+        "maxlights=",
         "musicvol=",
         "voicevol=",
         "soundvol=",
@@ -403,11 +411,11 @@ void LauncherFrame::SaveConfiguration() {
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
     _config.vsync = _checkBoxVSync->IsChecked();
     _config.grass = _checkBoxGrass->IsChecked();
-    _config.dynroomlighting = _checkBoxDynamicRoomLighting->IsChecked();
     _config.texQuality = _choiceTextureQuality->GetSelection();
     _config.aasamples = _choiceAntiAliasing->GetSelection();
     _config.shadowres = _choiceShadowResolution->GetSelection();
     _config.drawdist = _sliderDrawDistance->GetValue();
+    _config.maxlights = _sliderMaxLights->GetValue();
     _config.musicvol = _sliderVolumeMusic->GetValue();
     _config.voicevol = _sliderVolumeVoice->GetValue();
     _config.soundvol = _sliderVolumeSound->GetValue();
@@ -440,11 +448,11 @@ void LauncherFrame::SaveConfiguration() {
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
     config << "vsync=" << (_config.vsync ? 1 : 0) << endl;
     config << "grass=" << (_config.grass ? 1 : 0) << endl;
-    config << "dynroomlighting=" << (_config.dynroomlighting ? 1 : 0) << endl;
     config << "texquality=" << _config.texQuality << endl;
     config << "aasamples=" << _config.aasamples << endl;
     config << "shadowres=" << _config.shadowres << endl;
     config << "drawdist=" << _config.drawdist << endl;
+    config << "maxlights=" << _config.maxlights << endl;
     config << "musicvol=" << _config.musicvol << endl;
     config << "voicevol=" << _config.voicevol << endl;
     config << "soundvol=" << _config.soundvol << endl;
