@@ -103,57 +103,35 @@ void SceneGraph::update(float dt) {
             root->update(dt);
         }
     }
-    if (!_camera) {
+    if (!_activeCamera) {
         return;
     }
     cullRoots();
     refreshNodeLists();
-    updateLensFlares();
     updateLighting();
+    updateShadowLight();
+    updateFlareLight();
+    updateSounds();
     prepareTransparentMeshes();
     prepareLeafs();
-    updateSounds();
 }
 
 void SceneGraph::cullRoots() {
     for (auto &root : _modelRoots) {
         bool culled =
             !root->isEnabled() ||
-            root->getSquareDistanceTo(*_camera) > root->drawDistance() * root->drawDistance() ||
-            (root->isCullable() && !_camera->isInFrustum(*root));
+            root->getSquareDistanceTo(*_activeCamera) > root->drawDistance() * root->drawDistance() ||
+            (root->isCullable() && !_activeCamera->isInFrustum(*root));
 
         root->setCulled(culled);
     }
 }
 
-void SceneGraph::updateLensFlares() {
-    _flareLight = nullptr;
-
-    // Update flare light
-    for (auto &light : _lights) {
-        float radius = light->modelNode().light()->flareRadius;
-        if (_camera->getSquareDistanceTo(*light) > radius * radius) {
-            continue;
-        }
-        if (light->modelNode().light()->flares.empty()) {
-            continue;
-        }
-        Collision collision;
-        if (testLineOfSight(_camera->getOrigin(), light->getOrigin(), collision)) {
-            continue;
-        }
-        _flareLight = light;
-        break;
-    }
-}
-
 void SceneGraph::updateLighting() {
-    _shadowLight = nullptr;
-
     // Find closest lights and create a lookup
-    auto lights = computeClosestLights();
+    auto closestLights = computeClosestLights(_options.maxLights, [](auto &_) { return true; });
     set<LightSceneNode *> lookup;
-    for (auto &light : lights) {
+    for (auto &light : closestLights) {
         lookup.insert(light);
     }
     // De-activate active lights, unless found in a lookup. Active lights are removed from the lookup
@@ -167,31 +145,100 @@ void SceneGraph::updateLighting() {
     // Remove active lights that are inactive and completely faded
     for (auto it = _activeLights.begin(); it != _activeLights.end();) {
         auto light = *it;
-        if (!light->isActive() && light->fadeFactor() == 1.0f) {
+        if (!light->isActive() && light->strength() == 1.0f) {
             it = _activeLights.erase(it);
         } else {
             ++it;
         }
     }
     // Add closest lights to active lights
-    for (size_t i = 0; i < lights.size() && _activeLights.size() < _options.maxLights; ++i) {
-        if (lookup.count(lights[i]) > 0) {
-            lights[i]->setActive(true);
-            lights[i]->setFadeFactor(1.0f);
-            _activeLights.push_back(lights[i]);
+    for (auto &light : lookup) {
+        if (_activeLights.size() >= _options.maxLights) {
+            return;
         }
+        light->setActive(true);
+        _activeLights.push_back(light);
     }
-    // Update shadow light
-    for (auto &light : _activeLights) {
-        if (!light->modelNode().light()->shadow) {
+}
+
+void SceneGraph::updateShadowLight() {
+    auto closestLights = computeClosestLights(1, [](auto &light) { return light.modelNode().light()->shadow; });
+    if (_shadowLight) {
+        if (closestLights.empty() || _shadowLight != closestLights.front()) {
+            _shadowLight->setActiveShadow(false);
+        }
+        if (!_shadowLight->isActiveShadow() && _shadowLight->shadowStrength() == 0.0f) {
+            _shadowLight = nullptr;
+        }
+        return;
+    }
+    if (!closestLights.empty()) {
+        _shadowLight = closestLights.front();
+        _shadowLight->setActiveShadow(true);
+    }
+}
+
+void SceneGraph::updateFlareLight() {
+    _flareLight = nullptr;
+
+    auto closestLights = computeClosestLights(1, [this](auto &light) {
+        if (light.modelNode().light()->flares.empty()) {
+            return false;
+        }
+        float distance2 = light.getSquareDistanceTo(*_activeCamera);
+        float radius = light.modelNode().light()->flareRadius;
+        if (distance2 > radius * radius) {
+            return false;
+        }
+        Collision collision;
+        if (testLineOfSight(_activeCamera->getOrigin(), light.getOrigin(), collision)) {
+            return false;
+        }
+        return true;
+    });
+
+    if (!closestLights.empty()) {
+        _flareLight = closestLights.front();
+    }
+}
+
+void SceneGraph::updateSounds() {
+    vector<pair<SoundSceneNode *, float>> distances;
+    glm::vec3 cameraPos(_activeCamera->localTransform()[3]);
+
+    // For each sound, calculate its distance to the camera
+    for (auto &root : _soundRoots) {
+        root->setAudible(false);
+        if (!root->isEnabled()) {
             continue;
         }
-        float distance2 = light->getSquareDistanceTo(*_camera);
-        if (distance2 > light->radius() * light->radius()) {
+        float dist2 = root->getSquareDistanceTo(cameraPos);
+        float maxDist2 = root->maxDistance() * root->maxDistance();
+        if (dist2 > maxDist2) {
             continue;
         }
-        _shadowLight = light;
-        break;
+        distances.push_back(make_pair(root.get(), dist2));
+    }
+
+    // Take up to N most closest sounds to the camera
+    sort(distances.begin(), distances.end(), [](auto &left, auto &right) {
+        int leftPriority = left.first->priority();
+        int rightPriority = right.first->priority();
+        if (leftPriority < rightPriority) {
+            return true;
+        }
+        if (leftPriority > rightPriority) {
+            return false;
+        }
+        return left.second < right.second;
+    });
+    if (distances.size() > kMaxSoundCount) {
+        distances.erase(distances.begin() + kMaxSoundCount, distances.end());
+    }
+
+    // Mark closest sounds as audible
+    for (auto &pair : distances) {
+        pair.first->setAudible(true);
     }
 }
 
@@ -254,7 +301,7 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
 
 void SceneGraph::prepareTransparentMeshes() {
     // Sort transparent meshes by transparency and distance to camera, so as to ensure correct blending
-    glm::vec3 cameraPosition(_camera->absoluteTransform()[3]);
+    glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
     unordered_map<SceneNode *, float> meshToCamera;
     for (auto &mesh : _transparentMeshes) {
         meshToCamera.insert(make_pair(mesh, mesh->getSquareDistanceTo(cameraPosition)));
@@ -279,7 +326,7 @@ void SceneGraph::prepareLeafs() {
     static glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
 
     vector<pair<SceneNode *, float>> leafs;
-    auto camera = _camera->camera();
+    auto camera = _activeCamera->camera();
 
     // Add grass clusters
     for (auto &grass : _grassRoots) {
@@ -330,51 +377,11 @@ void SceneGraph::prepareLeafs() {
     }
 }
 
-void SceneGraph::updateSounds() {
-    vector<pair<SoundSceneNode *, float>> distances;
-    glm::vec3 cameraPos(_camera->localTransform()[3]);
-
-    // For each sound, calculate its distance to the camera
-    for (auto &root : _soundRoots) {
-        root->setAudible(false);
-        if (!root->isEnabled()) {
-            continue;
-        }
-        float dist2 = root->getSquareDistanceTo(cameraPos);
-        float maxDist2 = root->maxDistance() * root->maxDistance();
-        if (dist2 > maxDist2) {
-            continue;
-        }
-        distances.push_back(make_pair(root.get(), dist2));
-    }
-
-    // Take up to N most closest sounds to the camera
-    sort(distances.begin(), distances.end(), [](auto &left, auto &right) {
-        int leftPriority = left.first->priority();
-        int rightPriority = right.first->priority();
-        if (leftPriority < rightPriority) {
-            return true;
-        }
-        if (leftPriority > rightPriority) {
-            return false;
-        }
-        return left.second < right.second;
-    });
-    if (distances.size() > kMaxSoundCount) {
-        distances.erase(distances.begin() + kMaxSoundCount, distances.end());
-    }
-
-    // Mark closest sounds as audible
-    for (auto &pair : distances) {
-        pair.first->setAudible(true);
-    }
-}
-
 void SceneGraph::draw() {
     static glm::vec3 white {1.0f, 1.0f, 1.0f};
     static glm::vec3 red {1.0f, 0.0f, 0.0f};
 
-    if (!_camera) {
+    if (!_activeCamera) {
         return;
     }
 
@@ -404,7 +411,7 @@ void SceneGraph::draw() {
 }
 
 void SceneGraph::drawShadows() {
-    if (!_camera) {
+    if (!_activeCamera) {
         return;
     }
     _graphicsContext.withFaceCulling(CullFaceMode::Front, [this]() {
@@ -414,15 +421,18 @@ void SceneGraph::drawShadows() {
     });
 }
 
-vector<LightSceneNode *> SceneGraph::computeClosestLights() const {
+vector<LightSceneNode *> SceneGraph::computeClosestLights(int count, const function<bool(const LightSceneNode &)> &pred) const {
     // Compute distance from each light to the camera
     vector<pair<LightSceneNode *, float>> distances;
     for (auto &light : _lights) {
-        float distance = light->getSquareDistanceTo(*_camera);
-        distances.push_back(make_pair(light, distance));
+        if (!pred(*light)) {
+            continue;
+        }
+        float distance2 = light->getSquareDistanceTo(*_activeCamera);
+        distances.push_back(make_pair(light, distance2));
     }
 
-    // Sort lights by priority and distance to camera
+    // Sort lights by distance to the camera. Directional lights are prioritizied
     sort(distances.begin(), distances.end(), [](auto &a, auto &b) {
         auto aLight = a.first;
         auto bLight = b.first;
@@ -438,8 +448,8 @@ vector<LightSceneNode *> SceneGraph::computeClosestLights() const {
     });
 
     // Keep up to maximum number of lights
-    if (distances.size() > _options.maxLights) {
-        distances.erase(distances.begin() + _options.maxLights, distances.end());
+    if (distances.size() > count) {
+        distances.erase(distances.begin() + count, distances.end());
     }
 
     vector<LightSceneNode *> lights;
@@ -550,7 +560,7 @@ bool SceneGraph::testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const 
 }
 
 shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) const {
-    auto camera = _camera->camera();
+    auto camera = _activeCamera->camera();
     if (!camera) {
         return nullptr;
     }
