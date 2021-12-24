@@ -35,7 +35,7 @@ AnimatedCamera::AnimatedCamera(float aspect, SceneGraph &sceneGraph) :
     _aspect(aspect),
     _sceneGraph(sceneGraph) {
 
-    _sceneNode = _sceneGraph.newCamera(_fovy, _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+    _sceneNode = _sceneGraph.newCamera(glm::radians(_fovy), _aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
     updateProjection();
 }
 

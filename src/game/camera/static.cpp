@@ -33,7 +33,7 @@ namespace game {
 StaticCamera::StaticCamera(float aspect, SceneGraph &sceneGraph) :
     _aspect(aspect) {
 
-    _sceneNode = sceneGraph.newCamera(55.0f, aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+    _sceneNode = sceneGraph.newCamera(glm::radians(55.0f), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 }
 
 void StaticCamera::setObject(const PlaceableCamera &object) {
