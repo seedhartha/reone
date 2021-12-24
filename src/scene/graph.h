@@ -81,10 +81,14 @@ public:
 
     const std::string &name() const { return _name; }
     const graphics::GraphicsOptions &options() const { return _options; }
-    std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
+    std::shared_ptr<CameraSceneNode> cameraNode() const { return _camera; }
+
+    std::shared_ptr<graphics::Camera> camera() const override {
+        return _camera ? _camera->camera() : nullptr;
+    }
 
     void setUpdateRoots(bool update) { _updateRoots = update; }
-    void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
+    void setCameraNode(std::shared_ptr<CameraSceneNode> camera) { _camera = std::move(camera); }
 
     // Roots
 
@@ -101,19 +105,6 @@ public:
     void removeRoot(const std::shared_ptr<GrassSceneNode> &node);
 
     // END Roots
-
-    // Camera
-
-    bool hasCamera() const override { return static_cast<bool>(_activeCamera); }
-
-    glm::vec3 cameraPosition() const override { return _activeCamera->absoluteTransform()[3]; }
-    float cameraFieldOfView() const override { return _activeCamera->fieldOfView(); }
-    float cameraNearPlane() const override { return _activeCamera->nearPlane(); }
-    float cameraFarPlane() const override { return _activeCamera->farPlane(); }
-    const glm::mat4 &cameraProjection() const override { return _activeCamera->projection(); }
-    const glm::mat4 &cameraView() const override { return _activeCamera->view(); }
-
-    // END Camera
 
     // Lighting
 
@@ -174,15 +165,7 @@ public:
     // Factory methods
 
     std::unique_ptr<DummySceneNode> newDummy(std::shared_ptr<graphics::ModelNode> modelNode);
-
-    std::unique_ptr<CameraSceneNode> newCamera(glm::mat4 projection);
-
-    std::unique_ptr<CameraSceneNode> newCamera(
-        float fieldOfView,
-        float aspect,
-        float nearPlane,
-        float farPlane);
-
+    std::unique_ptr<CameraSceneNode> newCamera();
     std::unique_ptr<SoundSceneNode> newSound();
 
     std::unique_ptr<ModelSceneNode> newModel(
@@ -206,7 +189,7 @@ private:
     std::string _name;
     graphics::GraphicsOptions _options;
 
-    std::shared_ptr<CameraSceneNode> _activeCamera;
+    std::shared_ptr<CameraSceneNode> _camera;
 
     bool _updateRoots {true};
 

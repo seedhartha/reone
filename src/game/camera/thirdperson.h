@@ -34,7 +34,7 @@ class Game;
 
 class ThirdPersonCamera : public Camera {
 public:
-    ThirdPersonCamera(float aspect, const CameraStyle &style, Game &game, scene::SceneGraph &sceneGraph);
+    ThirdPersonCamera(const CameraStyle &style, float aspect, Game &game, scene::SceneGraph &sceneGraph);
 
     bool handle(const SDL_Event &event) override;
     void update(float dt) override;

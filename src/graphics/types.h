@@ -115,6 +115,11 @@ enum class ShaderType {
     Fragment
 };
 
+enum class CameraType {
+    Orthographic,
+    Perspective
+};
+
 struct TextureUnits {
     static constexpr int diffuseMap = 0;
     static constexpr int lightmap = 1;

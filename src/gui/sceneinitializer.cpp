@@ -36,19 +36,18 @@ void SceneInitializer::invoke() {
     if (!model) {
         throw logic_error("model is null");
     }
-
-    glm::mat4 projection(glm::ortho(
-        -_aspect * _modelScale + _modelOffset.x,
-        _aspect * _modelScale + _modelOffset.x,
-        -_modelScale + _modelOffset.y,
-        _modelScale + _modelOffset.y,
-        _zNear, _zFar));
-
     _sceneGraph.clear();
     _sceneGraph.addRoot(model);
     _sceneGraph.setAmbientLightColor(_ambientLightColor);
 
-    shared_ptr<CameraSceneNode> cameraNode(_sceneGraph.newCamera(move(projection)));
+    shared_ptr<CameraSceneNode> cameraNode(_sceneGraph.newCamera());
+    cameraNode->setOrthographicProjection(
+        -_aspect * _modelScale + _modelOffset.x,
+        _aspect * _modelScale + _modelOffset.x,
+        -_modelScale + _modelOffset.y,
+        _modelScale + _modelOffset.y,
+        _zNear, _zFar);
+
     if (_cameraNodeName.empty()) {
         cameraNode->setLocalTransform(_cameraTransform);
     } else {
@@ -57,7 +56,7 @@ void SceneInitializer::invoke() {
             cameraNode->setLocalTransform(modelNode->absoluteTransform() * _cameraTransform);
         }
     }
-    _sceneGraph.setActiveCamera(move(cameraNode));
+    _sceneGraph.setCameraNode(move(cameraNode));
 
     shared_ptr<DummySceneNode> lightingRefNode;
     if (!_lightingRefNodeName.empty()) {

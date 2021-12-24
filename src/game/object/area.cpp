@@ -403,15 +403,15 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
 
     auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
 
-    _firstPersonCamera = make_unique<FirstPersonCamera>(_cameraAspect, glm::radians(kDefaultFieldOfView), sceneGraph);
+    _firstPersonCamera = make_unique<FirstPersonCamera>(glm::radians(kDefaultFieldOfView), _cameraAspect, sceneGraph);
     _firstPersonCamera->setPosition(position);
     _firstPersonCamera->setFacing(entryFacing);
 
-    _thirdPersonCamera = make_unique<ThirdPersonCamera>(_cameraAspect, _camStyleDefault, _game, sceneGraph);
+    _thirdPersonCamera = make_unique<ThirdPersonCamera>(_camStyleDefault, _cameraAspect, _game, sceneGraph);
     _thirdPersonCamera->setTargetPosition(position);
     _thirdPersonCamera->setFacing(entryFacing);
 
-    _dialogCamera = make_unique<DialogCamera>(_cameraAspect, _camStyleDefault, sceneGraph);
+    _dialogCamera = make_unique<DialogCamera>(_camStyleDefault, _cameraAspect, sceneGraph);
     _animatedCamera = make_unique<AnimatedCamera>(_cameraAspect, sceneGraph);
     _staticCamera = make_unique<StaticCamera>(_cameraAspect, sceneGraph);
 }

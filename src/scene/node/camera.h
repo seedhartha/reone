@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../graphics/aabb.h"
+#include "../../graphics/camera.h"
 
 #include "../node.h"
 
@@ -27,67 +27,19 @@ namespace scene {
 
 class CameraSceneNode : public SceneNode {
 public:
-    CameraSceneNode(
-        float fieldOfView,
-        float aspect,
-        float nearPlane,
-        float farPlane,
-        SceneGraph &sceneGraph) :
-        SceneNode(SceneNodeType::Camera, sceneGraph),
-        _fieldOfView(fieldOfView),
-        _aspect(aspect),
-        _nearPlane(nearPlane),
-        _farPlane(farPlane) {
-
-        setProjection(fieldOfView, aspect, nearPlane, farPlane);
+    CameraSceneNode(SceneGraph &sceneGraph) :
+        SceneNode(SceneNodeType::Camera, sceneGraph) {
     }
 
-    // TODO: forbid querying FOV and aspect of orthogonal projection cameras
-    CameraSceneNode(
-        glm::mat4 projection,
-        SceneGraph &sceneGraph) :
-        SceneNode(SceneNodeType::Camera, sceneGraph),
-        _fieldOfView(-1.0f),
-        _aspect(-1.0f),
-        _nearPlane(-1.0f),
-        _farPlane(-1.0f),
-        _projection(std::move(projection)) {
-    }
-
-    bool isInFrustum(const glm::vec3 &point) const;
-    bool isInFrustum(const graphics::AABB &aabb) const;
     bool isInFrustum(const SceneNode &other) const;
 
-    float fieldOfView() const { return _fieldOfView; }
-    float nearPlane() const { return _nearPlane; }
-    float farPlane() const { return _farPlane; }
-    const glm::mat4 &projection() const { return _projection; }
-    const glm::mat4 &view() const { return _view; }
+    std::shared_ptr<graphics::Camera> camera() const { return _camera; }
 
-    void setProjection(float fieldOfView, float aspect, float nearPlane, float farPlane);
+    void setOrthographicProjection(float left, float right, float bottom, float top, float zNear, float zFar);
+    void setPerspectiveProjection(float fovy, float aspect, float zNear, float zFar);
 
 private:
-    float _fieldOfView;
-    float _aspect;
-    float _nearPlane;
-    float _farPlane;
-
-    glm::mat4 _projection {1.0f};
-    glm::mat4 _view {1.0f};
-
-    // Frustum planes
-
-    glm::vec4 _frustumLeft {0.0f};
-    glm::vec4 _frustumRight {0.0f};
-    glm::vec4 _frustumBottom {0.0f};
-    glm::vec4 _frustumTop {0.0f};
-    glm::vec4 _frustumNear {0.0f};
-    glm::vec4 _frustumFar {0.0f};
-
-    // END Frustum planes
-
-    void computeView();
-    void computeFrustumPlanes();
+    std::shared_ptr<graphics::Camera> _camera;
 
     void onAbsoluteTransformChanged() override;
 };

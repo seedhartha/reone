@@ -17,6 +17,7 @@
 
 #include "world.h"
 
+#include "../camera/perspective.h"
 #include "../context.h"
 #include "../format/tgawriter.h"
 #include "../mesh.h"
@@ -139,7 +140,7 @@ void WorldPipeline::init() {
 }
 
 void WorldPipeline::draw() {
-    if (!_scene->hasCamera()) {
+    if (!_scene->camera()) {
         return;
     }
     computeLightSpaceMatrices();
@@ -243,11 +244,12 @@ void WorldPipeline::computeLightSpaceMatrices() {
         return;
     }
     if (_scene->isShadowLightDirectional()) {
-        auto lightDir = glm::normalize(_scene->cameraPosition() - _scene->shadowLightPosition());
-        float fov = _scene->cameraFieldOfView();
-        float aspect = _options.width / static_cast<float>(_options.height);
-        float cameraNear = _scene->cameraNearPlane();
-        float cameraFar = _scene->cameraFarPlane();
+        auto camera = static_pointer_cast<PerspectiveCamera>(_scene->camera());
+        auto lightDir = glm::normalize(camera->position() - _scene->shadowLightPosition());
+        float fovy = camera->fovy();
+        float aspect = camera->aspect();
+        float cameraNear = camera->zNear();
+        float cameraFar = camera->zFar();
         for (int i = 0; i < kNumShadowCascades; ++i) {
             float near = cameraNear;
             if (i > 0) {
@@ -257,7 +259,7 @@ void WorldPipeline::computeLightSpaceMatrices() {
             if (i < kNumShadowCascades - 1) {
                 far *= g_shadowCascadeDivisors[i];
             }
-            _shadowLightSpace[i] = computeDirectionalLightSpaceMatrix(fov, aspect, near, far, lightDir, _scene->cameraView());
+            _shadowLightSpace[i] = computeDirectionalLightSpaceMatrix(fovy, aspect, near, far, lightDir, camera->view());
             _shadowCascadeFarPlanes[i / 4][i % 4] = far;
         }
     } else {
@@ -299,13 +301,15 @@ void WorldPipeline::drawShadows() {
 void WorldPipeline::drawGeometry() {
     static constexpr GLenum colors[] {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
 
+    auto camera = _scene->camera();
+
     // Set global uniforms
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
-    uniforms.general.projection = _scene->cameraProjection();
-    uniforms.general.view = _scene->cameraView();
-    uniforms.general.cameraPosition = glm::vec4(_scene->cameraPosition(), 1.0f);
+    uniforms.general.projection = camera->projection();
+    uniforms.general.view = camera->view();
+    uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
     uniforms.general.worldAmbientColor = glm::vec4(_scene->ambientLightColor(), 1.0f);
     uniforms.general.fogNear = _scene->fogNear();
     uniforms.general.fogFar = _scene->fogFar();

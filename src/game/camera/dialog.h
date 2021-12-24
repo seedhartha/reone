@@ -42,7 +42,7 @@ public:
         ListenerFar
     };
 
-    DialogCamera(float aspect, const CameraStyle &style, scene::SceneGraph &sceneGraph);
+    DialogCamera(const CameraStyle &style, float aspect, scene::SceneGraph &sceneGraph);
 
     void setSpeakerPosition(glm::vec3 position);
     void setListenerPosition(glm::vec3 position);

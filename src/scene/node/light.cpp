@@ -59,7 +59,7 @@ void LightSceneNode::update(float dt) {
 }
 
 void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
-    shared_ptr<CameraSceneNode> camera(_sceneGraph.activeCamera());
+    shared_ptr<Camera> camera(_sceneGraph.camera());
     if (!camera) {
         return;
     }

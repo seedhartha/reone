@@ -19,6 +19,9 @@ set(GRAPHICS_HEADERS
     animation.h
     attachment.h
     barycentricutil.h
+    camera.h
+    camera/orthographic.h
+    camera/perspective.h
     context.h
     cursor.h
     dxtutil.h

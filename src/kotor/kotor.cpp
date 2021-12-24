@@ -254,7 +254,7 @@ void KotOR::drawHUD() {
     _hud->draw();
 }
 
-CameraType KotOR::getConversationCamera(int &cameraId) const {
+game::CameraType KotOR::getConversationCamera(int &cameraId) const {
     return _conversation->getCamera(cameraId);
 }
 
@@ -474,7 +474,7 @@ GUI *KotOR::getScreenGUI() const {
     case GameScreen::CharacterGeneration:
         return _charGen.get();
     case GameScreen::InGame:
-        return _cameraType == CameraType::ThirdPerson ? _hud.get() : nullptr;
+        return _cameraType == game::CameraType::ThirdPerson ? _hud.get() : nullptr;
     case GameScreen::InGameMenu:
         return _inGame.get();
     case GameScreen::Conversation:

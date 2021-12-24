@@ -17,6 +17,9 @@
 
 #include "camera.h"
 
+#include "../../graphics/camera/orthographic.h"
+#include "../../graphics/camera/perspective.h"
+
 using namespace std;
 
 using namespace reone::graphics;
@@ -26,90 +29,31 @@ namespace reone {
 namespace scene {
 
 void CameraSceneNode::onAbsoluteTransformChanged() {
-    computeView();
-    computeFrustumPlanes();
-}
-
-void CameraSceneNode::computeView() {
-    _view = _absTransformInv;
-}
-
-void CameraSceneNode::computeFrustumPlanes() {
-    // Implementation of http://www.cs.otago.ac.nz/postgrads/alexis/planeExtraction.pdf
-
-    glm::mat4 vp(_projection * _view);
-    for (int i = 3; i >= 0; --i) {
-        _frustumLeft[i] = vp[i][3] + vp[i][0];
-        _frustumRight[i] = vp[i][3] - vp[i][0];
-        _frustumBottom[i] = vp[i][3] + vp[i][1];
-        _frustumTop[i] = vp[i][3] - vp[i][1];
-        _frustumNear[i] = vp[i][3] + vp[i][2];
-        _frustumFar[i] = vp[i][3] - vp[i][2];
+    if (_camera) {
+        _camera->setView(_absTransformInv);
     }
-
-    _frustumLeft = glm::normalize(_frustumLeft);
-    _frustumRight = glm::normalize(_frustumRight);
-    _frustumBottom = glm::normalize(_frustumBottom);
-    _frustumTop = glm::normalize(_frustumTop);
-    _frustumNear = glm::normalize(_frustumNear);
-    _frustumFar = glm::normalize(_frustumFar);
-}
-
-bool CameraSceneNode::isInFrustum(const glm::vec3 &point) const {
-    glm::vec4 point4(point, 1.0f);
-
-    if (glm::dot(_frustumLeft, point4) < 0.0f)
-        return false;
-    if (glm::dot(_frustumRight, point4) < 0.0f)
-        return false;
-    if (glm::dot(_frustumBottom, point4) < 0.0f)
-        return false;
-    if (glm::dot(_frustumTop, point4) < 0.0f)
-        return false;
-    if (glm::dot(_frustumNear, point4) < 0.0f)
-        return false;
-    if (glm::dot(_frustumFar, point4) < 0.0f)
-        return false;
-
-    return true;
-}
-
-bool CameraSceneNode::isInFrustum(const AABB &aabb) const {
-    // AABB is inside frustum if its center or at least one of its corners is inside
-
-    glm::vec3 center(aabb.center());
-    if (isInFrustum(center))
-        return true;
-
-    glm::vec3 halfSize(aabb.getSize() * 0.5f);
-    vector<glm::vec3> corners {
-        glm::vec3(center.x - halfSize.x, center.y - halfSize.y, center.z - halfSize.z),
-        glm::vec3(center.x + halfSize.x, center.y - halfSize.y, center.z - halfSize.z),
-        glm::vec3(center.x - halfSize.x, center.y + halfSize.y, center.z - halfSize.z),
-        glm::vec3(center.x - halfSize.x, center.y - halfSize.y, center.z + halfSize.z),
-        glm::vec3(center.x + halfSize.x, center.y + halfSize.y, center.z - halfSize.z),
-        glm::vec3(center.x + halfSize.x, center.y - halfSize.y, center.z + halfSize.z),
-        glm::vec3(center.x - halfSize.x, center.y + halfSize.y, center.z + halfSize.z),
-        glm::vec3(center.x + halfSize.x, center.y + halfSize.y, center.z + halfSize.z)};
-    for (auto &corner : corners) {
-        if (isInFrustum(corner))
-            return true;
-    }
-
-    return false;
 }
 
 bool CameraSceneNode::isInFrustum(const SceneNode &other) const {
     if (other.isPoint()) {
-        return isInFrustum(other.absoluteTransform()[3]);
+        return _camera->isInFrustum(other.absoluteTransform()[3]);
     } else {
-        return isInFrustum(other.aabb() * other.absoluteTransform());
+        return _camera->isInFrustum(other.aabb() * other.absoluteTransform());
     }
 }
 
-void CameraSceneNode::setProjection(float fieldOfView, float aspect, float nearPlane, float farPlane) {
-    _projection = glm::perspective(fieldOfView, aspect, nearPlane, farPlane);
-    computeFrustumPlanes();
+void CameraSceneNode::setOrthographicProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
+    auto camera = make_unique<OrthographicCamera>();
+    camera->setProjection(left, right, bottom, top, zNear, zFar);
+    camera->setView(_absTransformInv);
+    _camera = move(camera);
+}
+
+void CameraSceneNode::setPerspectiveProjection(float fovy, float aspect, float zNear, float zFar) {
+    auto camera = make_shared<PerspectiveCamera>();
+    camera->setProjection(fovy, aspect, zNear, zFar);
+    camera->setView(_absTransformInv);
+    _camera = move(camera);
 }
 
 } // namespace scene
