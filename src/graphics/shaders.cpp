@@ -229,6 +229,16 @@ vec3 getNormal(vec2 uv) {
 )END";
 
 static const string g_glslShadows = R"END(
+const vec3 PCF_SAMPLE_OFFSETS[20] = vec3[](
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1),
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1));
+
+const int NUM_PCF_SAMPLES = 20;
+const float PCF_SAMPLE_RADIUS = 0.1;
+
 float getShadow(vec3 normal) {
     if (!isFeatureEnabled(FEATURE_SHADOWS)) {
         return 0.0;
@@ -273,23 +283,14 @@ float getShadow(vec3 normal) {
         vec3 fragToLight = fragPosWorldSpace - uShadowLightPosition.xyz;
         float currentDepth = length(fragToLight);
 
-        float samples = 4.0;
-        float offset = 0.1;
-
-        for (float x = -offset; x < offset; x += offset / (samples * 0.5)) {
-            for (float y = -offset; y < offset; y += offset / (samples * 0.5)) {
-                for (float z = -offset; z < offset; z += offset / (samples * 0.5)) {
-                    float closestDepth = texture(sCubeShadowMap, fragToLight + vec3(x, y, z)).r;
-                    closestDepth *= 10000.0; // map to [0.0, 10000.0]
-
-                    if (currentDepth > closestDepth) {
-                        result += 1.0;
-                    }
-                }
+        for (int i = 0; i < NUM_PCF_SAMPLES; ++i) {
+            float closestDepth = texture(sCubeShadowMap, fragToLight + PCF_SAMPLE_RADIUS * PCF_SAMPLE_OFFSETS[i]).r;
+            closestDepth *= 10000.0; // map to [0.0, 10000.0]
+            if (currentDepth > closestDepth) {
+                result += 1.0;
             }
         }
-
-        result /= samples * samples * samples;
+        result /= NUM_PCF_SAMPLES;
     }
 
     result *= uShadowStrength;
