@@ -230,8 +230,9 @@ vec3 getNormal(vec2 uv) {
 
 static const string g_glslShadows = R"END(
 float getShadow(vec3 normal) {
-    if (!isFeatureEnabled(FEATURE_SHADOWS)) return 0.0;
-
+    if (!isFeatureEnabled(FEATURE_SHADOWS)) {
+        return 0.0;
+    }
     float result = 0.0;
 
     if (uShadowLightPosition.w == 0.0) {

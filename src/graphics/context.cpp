@@ -40,6 +40,9 @@ void GraphicsContext::init() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
+    // Face Culling
+    setCullFaceMode(CullFaceMode::None);
+
     // Blending
     glEnable(GL_BLEND);
     setBlendMode(BlendMode::Default);
@@ -47,7 +50,7 @@ void GraphicsContext::init() {
     _inited = true;
 }
 
-void GraphicsContext::withBlendMode(BlendMode mode, const function<void()> &block) {
+void GraphicsContext::withBlending(BlendMode mode, const function<void()> &block) {
     auto oldBlendMode = _blendMode;
     if (oldBlendMode == mode) {
         block();
@@ -58,14 +61,15 @@ void GraphicsContext::withBlendMode(BlendMode mode, const function<void()> &bloc
     setBlendMode(oldBlendMode);
 }
 
-void GraphicsContext::withBackFaceCulling(const function<void()> &block) {
-    if (_backFaceCulling) {
+void GraphicsContext::withFaceCulling(CullFaceMode mode, const function<void()> &block) {
+    auto oldCullFaceMode = _cullFaceMode;
+    if (oldCullFaceMode == mode) {
         block();
         return;
     }
-    enableBackFaceCulling();
+    setCullFaceMode(mode);
     block();
-    disableBackFaceCulling();
+    setCullFaceMode(oldCullFaceMode);
 }
 
 void GraphicsContext::withViewport(glm::ivec4 viewport, const function<void()> &block) {
@@ -98,20 +102,21 @@ void GraphicsContext::withoutDepthTest(const function<void()> &block) {
     glEnable(GL_DEPTH_TEST);
 }
 
-void GraphicsContext::enableBackFaceCulling() {
-    if (_backFaceCulling) {
+void GraphicsContext::setCullFaceMode(CullFaceMode mode) {
+    if (_cullFaceMode == mode) {
         return;
     }
-    glEnable(GL_CULL_FACE);
-    _backFaceCulling = true;
-}
-
-void GraphicsContext::disableBackFaceCulling() {
-    if (!_backFaceCulling) {
-        return;
+    if (mode == CullFaceMode::None) {
+        glDisable(GL_CULL_FACE);
+    } else {
+        glEnable(GL_CULL_FACE);
+        if (mode == CullFaceMode::Front) {
+            glCullFace(GL_FRONT);
+        } else {
+            glCullFace(GL_BACK);
+        }
     }
-    glDisable(GL_CULL_FACE);
-    _backFaceCulling = false;
+    _cullFaceMode = mode;
 }
 
 void GraphicsContext::setBlendMode(BlendMode mode) {
