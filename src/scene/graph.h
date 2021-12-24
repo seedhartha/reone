@@ -81,14 +81,14 @@ public:
 
     const std::string &name() const { return _name; }
     const graphics::GraphicsOptions &options() const { return _options; }
-    std::shared_ptr<CameraSceneNode> cameraNode() const { return _camera; }
+    std::shared_ptr<CameraSceneNode> activeCamera() const { return _activeCamera; }
 
     std::shared_ptr<graphics::Camera> camera() const override {
-        return _camera ? _camera->camera() : nullptr;
+        return _activeCamera ? _activeCamera->camera() : nullptr;
     }
 
     void setUpdateRoots(bool update) { _updateRoots = update; }
-    void setCameraNode(std::shared_ptr<CameraSceneNode> camera) { _camera = std::move(camera); }
+    void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
 
     // Roots
 
@@ -108,7 +108,7 @@ public:
 
     // Lighting
 
-    std::vector<LightSceneNode *> computeClosestLights() const;
+    std::vector<LightSceneNode *> computeClosestLights(int count, const std::function<bool(const LightSceneNode &)> &pred) const;
 
     const glm::vec3 &ambientLightColor() const override { return _ambientLightColor; }
     const std::vector<LightSceneNode *> activeLights() const { return _activeLights; }
@@ -138,7 +138,7 @@ public:
     bool isShadowLightDirectional() const override { return _shadowLight->isDirectional(); }
 
     glm::vec3 shadowLightPosition() const override { return _shadowLight->absoluteTransform()[3]; }
-    float shadowFadeFactor() const override { return _shadowLight->fadeFactor(); }
+    float shadowStrength() const override { return _shadowLight->shadowStrength(); }
 
     // END Shadows
 
@@ -183,7 +183,7 @@ private:
     std::string _name;
     graphics::GraphicsOptions _options;
 
-    std::shared_ptr<CameraSceneNode> _camera;
+    std::shared_ptr<CameraSceneNode> _activeCamera;
 
     bool _updateRoots {true};
 
@@ -248,8 +248,9 @@ private:
     // END Surfaces
 
     void cullRoots();
-    void updateLensFlares();
     void updateLighting();
+    void updateShadowLight();
+    void updateFlareLight();
     void updateSounds();
 
     void refreshNodeLists();

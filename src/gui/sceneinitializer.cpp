@@ -56,7 +56,7 @@ void SceneInitializer::invoke() {
             cameraNode->setLocalTransform(modelNode->absoluteTransform() * _cameraTransform);
         }
     }
-    _sceneGraph.setCameraNode(move(cameraNode));
+    _sceneGraph.setActiveCamera(move(cameraNode));
 }
 
 SceneInitializer &SceneInitializer::aspect(float aspect) {

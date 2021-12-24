@@ -442,7 +442,7 @@ void Game::updateSceneGraph(float dt) {
         return;
     }
     auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
-    sceneGraph.setCameraNode(camera->sceneNode());
+    sceneGraph.setActiveCamera(camera->sceneNode());
     sceneGraph.setUpdateRoots(!_paused);
     sceneGraph.update(dt);
 }

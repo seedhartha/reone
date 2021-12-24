@@ -156,7 +156,7 @@ bool MeshSceneNode::shouldRender() const {
     if (!mesh || !mesh->render || _modelNode->alpha().getByFrameOrElse(0, 1.0f) == 0.0f) {
         return false;
     }
-    return !_modelNode->isAABBMesh();
+    return !_modelNode->isAABBMesh() && mesh->diffuseMap;
 }
 
 bool MeshSceneNode::shouldCastShadows() const {
@@ -324,7 +324,7 @@ void MeshSceneNode::draw() {
             LightUniforms &shaderLight = uniforms.lighting.lights[i];
             shaderLight.position = move(position);
             shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
-            shaderLight.multiplier = lights[i]->multiplier() * (1.0f - lights[i]->fadeFactor());
+            shaderLight.multiplier = lights[i]->multiplier() * lights[i]->strength();
             shaderLight.radius = lights[i]->radius();
             shaderLight.ambientOnly = static_cast<int>(lights[i]->modelNode().light()->ambientOnly);
         }

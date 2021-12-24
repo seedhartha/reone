@@ -64,7 +64,7 @@ void GrassSceneNode::update(float dt) {
     if (!_enabled) {
         return;
     }
-    auto camera = _sceneGraph.cameraNode();
+    auto camera = _sceneGraph.activeCamera();
     if (!camera) {
         return;
     }

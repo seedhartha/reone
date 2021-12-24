@@ -49,7 +49,7 @@ public:
     virtual bool isShadowLightDirectional() const = 0;
 
     virtual glm::vec3 shadowLightPosition() const = 0;
-    virtual float shadowFadeFactor() const = 0;
+    virtual float shadowStrength() const = 0;
 
     // END Shadows
 };
