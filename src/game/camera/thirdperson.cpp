@@ -38,11 +38,13 @@ static constexpr float kRotationAcceleration = 1.0f;
 static constexpr float kMouseRotationSpeed = 0.001f;
 static constexpr float kTargetPadding = 0.05f;
 
-ThirdPersonCamera::ThirdPersonCamera(float aspect, const CameraStyle &style, Game &game, SceneGraph &sceneGraph) :
+ThirdPersonCamera::ThirdPersonCamera(const CameraStyle &style, float aspect, Game &game, SceneGraph &sceneGraph) :
     _game(game),
     _sceneGraph(sceneGraph) {
 
-    _sceneNode = sceneGraph.newCamera(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+    _sceneNode = sceneGraph.newCamera();
+    _sceneNode->setPerspectiveProjection(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+
     _style = style;
 }
 

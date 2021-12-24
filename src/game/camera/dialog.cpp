@@ -31,10 +31,11 @@ namespace reone {
 
 namespace game {
 
-DialogCamera::DialogCamera(float aspect, const CameraStyle &style, SceneGraph &sceneGraph) :
+DialogCamera::DialogCamera(const CameraStyle &style, float aspect, SceneGraph &sceneGraph) :
     _sceneGraph(sceneGraph) {
 
-    _sceneNode = sceneGraph.newCamera(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
+    _sceneNode = sceneGraph.newCamera();
+    _sceneNode->setPerspectiveProjection(glm::radians(style.viewAngle), aspect, kDefaultClipPlaneNear, kDefaultClipPlaneFar);
 }
 
 void DialogCamera::setSpeakerPosition(glm::vec3 position) {

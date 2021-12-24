@@ -21,41 +21,31 @@
 
 namespace reone {
 
-namespace scene {
+namespace graphics {
 
-class SceneGraph;
-
-}
-
-namespace game {
-
-class FirstPersonCamera : public Camera {
+class PerspectiveCamera : public Camera {
 public:
-    FirstPersonCamera(float fovy, float aspect, scene::SceneGraph &sceneGraph);
+    PerspectiveCamera() :
+        Camera(CameraType::Perspective) {
+    }
 
-    bool handle(const SDL_Event &event) override;
-    void update(float dt) override;
-    void stopMovement() override;
+    float fovy() const { return _fovy; }
+    float aspect() const { return _aspect; }
 
-    void setPosition(const glm::vec3 &position);
-    void setFacing(float facing);
+    void setProjection(float fovy, float aspect, float zNear, float zFar) {
+        _projection = glm::perspective(fovy, aspect, zNear, zFar);
+        _fovy = fovy;
+        _aspect = aspect;
+        _zNear = zNear;
+        _zFar = zFar;
+        updateFrustum();
+    }
 
 private:
-    glm::vec3 _position {0.0f};
-    float _pitch {0.0f};
-    float _multiplier {1.0f};
-    bool _moveForward {false};
-    bool _moveLeft {false};
-    bool _moveBackward {false};
-    bool _moveRight {false};
-
-    bool handleMouseMotion(const SDL_MouseMotionEvent &event);
-    bool handleKeyDown(const SDL_KeyboardEvent &event);
-    bool handleKeyUp(const SDL_KeyboardEvent &event);
-
-    void updateSceneNode();
+    float _fovy {0.0f};
+    float _aspect {1.0f};
 };
 
-} // namespace game
+} // namespace graphics
 
 } // namespace reone

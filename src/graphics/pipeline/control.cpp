@@ -17,6 +17,7 @@
 
 #include "control.h"
 
+#include "../camera.h"
 #include "../context.h"
 #include "../mesh.h"
 #include "../meshes.h"
@@ -77,7 +78,8 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
 }
 
 void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, const glm::ivec2 &offset) {
-    if (!scene.hasCamera()) {
+    auto camera = scene.camera();
+    if (!camera) {
         return;
     }
     AttachmentsId attachmentsId {extent};
@@ -93,9 +95,9 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
-    uniforms.general.projection = scene.cameraProjection();
-    uniforms.general.view = scene.cameraView();
-    uniforms.general.cameraPosition = glm::vec4(scene.cameraPosition(), 1.0f);
+    uniforms.general.projection = camera->projection();
+    uniforms.general.view = camera->view();
+    uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
     uniforms.general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
 
     int w = extent[2];

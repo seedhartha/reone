@@ -103,7 +103,7 @@ void SceneGraph::update(float dt) {
             root->update(dt);
         }
     }
-    if (!_activeCamera) {
+    if (!_camera) {
         return;
     }
     cullRoots();
@@ -118,8 +118,8 @@ void SceneGraph::cullRoots() {
     for (auto &root : _modelRoots) {
         bool culled =
             !root->isEnabled() ||
-            root->getSquareDistanceTo(*_activeCamera) > root->drawDistance() * root->drawDistance() ||
-            (root->isCullable() && !_activeCamera->isInFrustum(*root));
+            root->getSquareDistanceTo(*_camera) > root->drawDistance() * root->drawDistance() ||
+            (root->isCullable() && !_camera->isInFrustum(*root));
 
         root->setCulled(culled);
     }
@@ -132,14 +132,14 @@ void SceneGraph::updateLighting() {
     // Update flare light
     for (auto &light : _lights) {
         float radius = light->modelNode().light()->flareRadius;
-        if (_activeCamera->getSquareDistanceTo(*light) > radius * radius) {
+        if (_camera->getSquareDistanceTo(*light) > radius * radius) {
             continue;
         }
         if (light->modelNode().light()->flares.empty()) {
             continue;
         }
         Collision collision;
-        if (testLineOfSight(_activeCamera->getOrigin(), light->getOrigin(), collision)) {
+        if (testLineOfSight(_camera->getOrigin(), light->getOrigin(), collision)) {
             continue;
         }
         _flareLight = light;
@@ -249,7 +249,7 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
 
 void SceneGraph::prepareTransparentMeshes() {
     // Sort transparent meshes by transparency and distance to camera, so as to ensure correct blending
-    glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
+    glm::vec3 cameraPosition(_camera->absoluteTransform()[3]);
     unordered_map<SceneNode *, float> meshToCamera;
     for (auto &mesh : _transparentMeshes) {
         meshToCamera.insert(make_pair(mesh, mesh->getSquareDistanceTo(cameraPosition)));
@@ -274,7 +274,7 @@ void SceneGraph::prepareLeafs() {
     static glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
 
     vector<pair<SceneNode *, float>> leafs;
-    auto cameraPos = _activeCamera->getOrigin();
+    auto camera = _camera->camera();
 
     // Add grass clusters
     for (auto &grass : _grassRoots) {
@@ -286,7 +286,7 @@ void SceneGraph::prepareLeafs() {
                 continue;
             }
             auto cluster = static_cast<GrassClusterSceneNode *>(child.get());
-            glm::vec3 screen(glm::project(cluster->getOrigin(), _activeCamera->view(), _activeCamera->projection(), viewport));
+            glm::vec3 screen(glm::project(cluster->getOrigin(), camera->view(), camera->projection(), viewport));
             if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
                 leafs.push_back(make_pair(cluster, screen.z));
             }
@@ -300,7 +300,7 @@ void SceneGraph::prepareLeafs() {
                 continue;
             }
             auto particle = static_cast<ParticleSceneNode *>(child.get());
-            glm::vec3 screen(glm::project(particle->getOrigin(), _activeCamera->view(), _activeCamera->projection(), viewport));
+            glm::vec3 screen(glm::project(particle->getOrigin(), camera->view(), camera->projection(), viewport));
             if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
                 leafs.push_back(make_pair(particle, screen.z));
             }
@@ -327,7 +327,7 @@ void SceneGraph::prepareLeafs() {
 
 void SceneGraph::updateSounds() {
     vector<pair<SoundSceneNode *, float>> distances;
-    glm::vec3 cameraPos(_activeCamera->localTransform()[3]);
+    glm::vec3 cameraPos(_camera->localTransform()[3]);
 
     // For each sound, calculate its distance to the camera
     for (auto &root : _soundRoots) {
@@ -369,7 +369,7 @@ void SceneGraph::draw() {
     static glm::vec3 white {1.0f, 1.0f, 1.0f};
     static glm::vec3 red {1.0f, 0.0f, 0.0f};
 
-    if (!_activeCamera) {
+    if (!_camera) {
         return;
     }
 
@@ -399,7 +399,7 @@ void SceneGraph::draw() {
 }
 
 void SceneGraph::drawShadows() {
-    if (!_activeCamera) {
+    if (!_camera) {
         return;
     }
     for (auto &mesh : _shadowMeshes) {
@@ -562,12 +562,13 @@ bool SceneGraph::testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const 
 }
 
 shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) const {
-    if (!_activeCamera) {
+    auto camera = _camera->camera();
+    if (!camera) {
         return nullptr;
     }
     glm::vec4 viewport(0.0f, 0.0f, _options.width, _options.height);
-    glm::vec3 start(glm::unProject(glm::vec3(x, _options.height - y, 0.0f), _activeCamera->view(), _activeCamera->projection(), viewport));
-    glm::vec3 end(glm::unProject(glm::vec3(x, _options.height - y, 1.0f), _activeCamera->view(), _activeCamera->projection(), viewport));
+    glm::vec3 start(glm::unProject(glm::vec3(x, _options.height - y, 0.0f), camera->view(), camera->projection(), viewport));
+    glm::vec3 end(glm::unProject(glm::vec3(x, _options.height - y, 1.0f), camera->view(), camera->projection(), viewport));
     glm::vec3 dir(glm::normalize(end - start));
 
     vector<pair<shared_ptr<ModelSceneNode>, float>> distances;
@@ -599,12 +600,8 @@ unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode)
     return make_unique<DummySceneNode>(move(modelNode), *this, _graphicsContext, _meshes, _shaders, _textures);
 }
 
-unique_ptr<CameraSceneNode> SceneGraph::newCamera(float fieldOfView, float aspect, float nearPlane, float farPlane) {
-    return make_unique<CameraSceneNode>(fieldOfView, aspect, nearPlane, farPlane, *this);
-}
-
-unique_ptr<CameraSceneNode> SceneGraph::newCamera(glm::mat4 projection) {
-    return make_unique<CameraSceneNode>(move(projection), *this);
+unique_ptr<CameraSceneNode> SceneGraph::newCamera() {
+    return make_unique<CameraSceneNode>(*this);
 }
 
 unique_ptr<SoundSceneNode> SceneGraph::newSound() {

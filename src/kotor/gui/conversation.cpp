@@ -326,16 +326,16 @@ void Conversation::update(float dt) {
     }
 }
 
-CameraType Conversation::getCamera(int &cameraId) const {
+game::CameraType Conversation::getCamera(int &cameraId) const {
     string cameraModel(_dialog->cameraModel);
     if (!cameraModel.empty()) {
-        return CameraType::Animated;
+        return game::CameraType::Animated;
     }
     if (_currentEntry->cameraId != -1) {
         cameraId = _currentEntry->cameraId;
-        return CameraType::Static;
+        return game::CameraType::Static;
     }
-    return CameraType::Dialog;
+    return game::CameraType::Dialog;
 }
 
 void Conversation::pause() {

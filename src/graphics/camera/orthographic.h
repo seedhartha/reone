@@ -17,41 +17,24 @@
 
 #pragma once
 
+#include "../camera.h"
+
 namespace reone {
 
 namespace graphics {
 
-struct Uniforms;
-
-class Camera;
-
-class IScene {
+class OrthographicCamera : public Camera {
 public:
-    virtual ~IScene() = default;
+    OrthographicCamera() :
+        Camera(CameraType::Orthographic) {
+    }
 
-    virtual void draw() = 0;
-    virtual void drawShadows() = 0;
-
-    virtual std::shared_ptr<Camera> camera() const = 0;
-    virtual const glm::vec3 &ambientLightColor() const = 0;
-
-    // Fog
-
-    virtual float fogNear() const = 0;
-    virtual float fogFar() const = 0;
-    virtual const glm::vec3 &fogColor() const = 0;
-
-    // END Fog
-
-    // Shadows
-
-    virtual bool hasShadowLight() const = 0;
-    virtual bool isShadowLightDirectional() const = 0;
-
-    virtual glm::vec3 shadowLightPosition() const = 0;
-    virtual float shadowFadeFactor() const = 0;
-
-    // END Shadows
+    void setProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
+        _projection = glm::ortho(left, right, bottom, top, zNear, zFar);
+        _zNear = zNear;
+        _zFar = zFar;
+        updateFrustum();
+    }
 };
 
 } // namespace graphics
