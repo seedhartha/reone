@@ -64,8 +64,8 @@ private:
     IScene *_scene {nullptr};
     bool _takeScreenshot {false}; /**< render next frame into texture */
 
-    glm::vec4 _shadowCascadeFarPlanes {0.0f};
     glm::mat4 _shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
+    glm::vec4 _shadowCascadeFarPlanes[2] {glm::vec4(0.0f)};
 
     // Services
 

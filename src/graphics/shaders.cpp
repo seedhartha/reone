@@ -45,8 +45,8 @@ const int FEATURE_FOG = 0x8000;
 const int FEATURE_DANGLYMESH = 0x10000;
 
 const int NUM_CUBE_FACES = 6;
-const int NUM_SHADOW_CASCADES = 4;
-const int NUM_SHADOW_LIGHT_SPACE = 6;
+const int NUM_SHADOW_CASCADES = 8;
+const int NUM_SHADOW_LIGHT_SPACE = 8;
 
 const int MAX_BONES = 24;
 const int MAX_LIGHTS = 8;
@@ -75,7 +75,6 @@ layout(std140) uniform General {
     vec4 uFogColor;
     vec4 uHeightMapFrameBounds;
     vec4 uShadowLightPosition;
-    vec4 uShadowCascadeFarPlanes;
     vec2 uBlurResolution;
     vec2 uBlurDirection;
     float uAlpha;
@@ -86,6 +85,7 @@ layout(std140) uniform General {
     float uShadowStrength;
     int uFeatureMask;
     mat4 uShadowLightSpace[NUM_SHADOW_LIGHT_SPACE];
+    vec4 uShadowCascadeFarPlanes[2];
 };
 
 struct Character {
@@ -242,7 +242,7 @@ float getShadow(vec3 normal) {
 
         int cascade = NUM_SHADOW_CASCADES - 1;
         for (int i = 0; i < NUM_SHADOW_CASCADES; ++i) {
-            if (depthValue < uShadowCascadeFarPlanes[i]) {
+            if (depthValue < uShadowCascadeFarPlanes[i / 4][i % 4]) {
                 cascade = i;
                 break;
             }
