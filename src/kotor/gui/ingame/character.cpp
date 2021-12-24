@@ -245,7 +245,6 @@ void CharacterMenu::refresh3D() {
         .modelSupplier(bind(&CharacterMenu::getSceneModel, this, _1))
         .modelOffset(glm::vec2(0.0f, 1.7f))
         .cameraFromModelNode("camerahook")
-        .lightingRefFromModelNode("charmain_light")
         .invoke();
 
     _binding.lbl3dChar->setSceneName(kSceneCharacter);

@@ -441,19 +441,8 @@ void Game::updateSceneGraph(float dt) {
     if (!camera) {
         return;
     }
-
-    // Select a reference node for dynamic lighting
-    shared_ptr<SceneNode> lightingRefNode;
-    shared_ptr<Creature> partyLeader(_party.getLeader());
-    if (partyLeader && _cameraType == CameraType::ThirdPerson) {
-        lightingRefNode = partyLeader->sceneNode();
-    } else {
-        lightingRefNode = camera->sceneNode();
-    }
-
     auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
     sceneGraph.setCameraNode(camera->sceneNode());
-    sceneGraph.setLightingRefNode(lightingRefNode);
     sceneGraph.setUpdateRoots(!_paused);
     sceneGraph.update(dt);
 }

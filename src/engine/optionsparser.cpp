@@ -44,10 +44,10 @@ Options OptionsParser::parse() {
         ("vsync", po::value<bool>()->default_value(true), "enable v-sync")                                           //
         ("texquality", po::value<int>()->default_value(0), "texture quality")                                        //
         ("grass", po::value<bool>()->default_value(true), "enable grass")                                            //
-        ("dynroomlighting", po::value<bool>()->default_value(true), "enable dynamic room lighting")                  //
         ("aasamples", po::value<int>()->default_value(0), "anti-aliasing samples")                                   //
         ("shadowres", po::value<int>()->default_value(0), "shadow map resolution")                                   //
         ("drawdist", po::value<int>()->default_value(static_cast<int>(kDefaultObjectDrawDistance)), "draw distance") //
+        ("maxlights", po::value<int>()->default_value(8), "maximum number of lights")                                //
         ("musicvol", po::value<int>()->default_value(85), "music volume in percents")                                //
         ("voicevol", po::value<int>()->default_value(85), "voice volume in percents")                                //
         ("soundvol", po::value<int>()->default_value(85), "sound volume in percents")                                //
@@ -78,10 +78,10 @@ Options OptionsParser::parse() {
     options.graphics.vsync = vars["vsync"].as<bool>();
     options.graphics.textureQuality = static_cast<TextureQuality>(vars["texquality"].as<int>());
     options.graphics.grass = vars["grass"].as<bool>();
-    options.graphics.dynamicRoomLighting = vars["dynroomlighting"].as<bool>();
     options.graphics.aaSamples = 1 << vars["aasamples"].as<int>();
     options.graphics.shadowResolution = 1 << (10 + vars["shadowres"].as<int>());
     options.graphics.drawDistance = static_cast<float>(vars["drawdist"].as<int>());
+    options.graphics.maxLights = vars["maxlights"].as<int>();
     options.audio.musicVolume = vars["musicvol"].as<int>();
     options.audio.voiceVolume = vars["voicevol"].as<int>();
     options.audio.soundVolume = vars["soundvol"].as<int>();

@@ -166,8 +166,6 @@ bool MeshSceneNode::shouldCastShadows() const {
     }
     if (_model.usage() == ModelUsage::Creature) {
         return mesh->shadow && !_modelNode->isSkinMesh();
-    } else if (_sceneGraph.options().dynamicRoomLighting && (_model.usage() == ModelUsage::Room || _model.usage() == ModelUsage::Placeable)) {
-        return mesh->render && !_modelNode->isAABBMesh() && !isTransparent();
     } else {
         return false;
     }
@@ -252,7 +250,7 @@ void MeshSceneNode::draw() {
     if (_nodeTextures.envmap) {
         uniforms.general.featureMask |= UniformsFeatureFlags::envmap;
     }
-    if (_nodeTextures.lightmap && !_sceneGraph.options().dynamicRoomLighting) {
+    if (_nodeTextures.lightmap) {
         uniforms.general.featureMask |= UniformsFeatureFlags::lightmap;
     }
     if (_nodeTextures.bumpmap) {
@@ -310,7 +308,7 @@ void MeshSceneNode::draw() {
         uniforms.general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
     }
     if (isLightingEnabled()) {
-        const vector<LightSceneNode *> &lights = _sceneGraph.closestLights();
+        const vector<LightSceneNode *> &lights = _sceneGraph.activeLights();
 
         uniforms.general.featureMask |= UniformsFeatureFlags::lighting;
         uniforms.general.ambientColor = glm::vec4(mesh->ambient, 1.0f);
@@ -366,7 +364,7 @@ void MeshSceneNode::draw() {
         _textures.bind(*_nodeTextures.diffuse, TextureUnits::diffuseMap);
         additive = _nodeTextures.diffuse->isAdditive();
     }
-    if (_nodeTextures.lightmap && !_sceneGraph.options().dynamicRoomLighting) {
+    if (_nodeTextures.lightmap) {
         _textures.bind(*_nodeTextures.lightmap, TextureUnits::lightmap);
     }
     if (_nodeTextures.envmap) {
@@ -403,7 +401,7 @@ bool MeshSceneNode::isLightingEnabled() const {
     }
 
     // Lighting is disabled for lightmapped models, unless dynamic room lighting is enabled
-    if (_nodeTextures.lightmap && !_sceneGraph.options().dynamicRoomLighting) {
+    if (_nodeTextures.lightmap) {
         return false;
     }
 

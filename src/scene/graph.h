@@ -108,18 +108,12 @@ public:
 
     // Lighting
 
-    /**
-     * Get up to count lights, sorted by priority and proximity to the reference node.
-     */
-    std::vector<LightSceneNode *> getLightsAt(
-        int count = graphics::kMaxLights,
-        std::function<bool(const LightSceneNode &)> predicate = [](auto &light) { return true; }) const;
+    std::vector<LightSceneNode *> computeClosestLights() const;
 
     const glm::vec3 &ambientLightColor() const override { return _ambientLightColor; }
-    const std::vector<LightSceneNode *> closestLights() const { return _closestLights; }
+    const std::vector<LightSceneNode *> activeLights() const { return _activeLights; }
 
     void setAmbientLightColor(glm::vec3 color) { _ambientLightColor = std::move(color); }
-    void setLightingRefNode(std::shared_ptr<SceneNode> node) { _lightingRefNode = std::move(node); }
 
     // END Lighting
 
@@ -229,8 +223,7 @@ private:
 
     glm::vec3 _ambientLightColor {0.5f};
 
-    std::shared_ptr<SceneNode> _lightingRefNode; /**< reference node to use when selecting closest light sources */
-    std::vector<LightSceneNode *> _closestLights;
+    std::vector<LightSceneNode *> _activeLights;
     LightSceneNode *_shadowLight {nullptr};
 
     LightSceneNode *_flareLight {nullptr};
@@ -255,6 +248,7 @@ private:
     // END Surfaces
 
     void cullRoots();
+    void updateLensFlares();
     void updateLighting();
     void updateSounds();
 

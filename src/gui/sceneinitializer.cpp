@@ -57,16 +57,6 @@ void SceneInitializer::invoke() {
         }
     }
     _sceneGraph.setCameraNode(move(cameraNode));
-
-    shared_ptr<DummySceneNode> lightingRefNode;
-    if (!_lightingRefNodeName.empty()) {
-        shared_ptr<ModelNode> modelNode(model->model().getNodeByName(_lightingRefNodeName));
-        if (modelNode) {
-            lightingRefNode = _sceneGraph.newDummy(modelNode);
-            lightingRefNode->setLocalTransform(modelNode->absoluteTransform());
-        }
-    }
-    _sceneGraph.setLightingRefNode(move(lightingRefNode));
 }
 
 SceneInitializer &SceneInitializer::aspect(float aspect) {
@@ -107,11 +97,6 @@ SceneInitializer &SceneInitializer::cameraFromModelNode(string nodeName) {
 
 SceneInitializer &SceneInitializer::ambientLightColor(glm::vec3 color) {
     _ambientLightColor = move(color);
-    return *this;
-}
-
-SceneInitializer &SceneInitializer::lightingRefFromModelNode(string nodeName) {
-    _lightingRefNodeName = move(nodeName);
     return *this;
 }
 

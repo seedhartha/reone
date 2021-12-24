@@ -30,10 +30,10 @@ struct GraphicsOptions {
     bool vsync {true};
     TextureQuality textureQuality {0};
     bool grass {true};
-    bool dynamicRoomLighting {false};
     int aaSamples {0};
     int shadowResolution {0};
     float drawDistance {kDefaultObjectDrawDistance};
+    int maxLights {8};
 };
 
 } // namespace graphics

@@ -173,7 +173,6 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
         .modelSupplier([&](SceneGraph &sceneGraph) { return getCharacterModel(appearance, sceneGraph); })
         .modelScale(kModelScale)
         .cameraFromModelNode("camerahook")
-        .lightingRefFromModelNode("cgbody_light")
         .invoke();
 
     vector<Label *> threeDModels {
