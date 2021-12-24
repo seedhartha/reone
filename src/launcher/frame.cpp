@@ -141,16 +141,16 @@ LauncherFrame::LauncherFrame() :
 
     // END Shadow Map Resolution
 
-    // Draw Distance
+    // Object Draw Distance
 
-    auto labelDrawDistance = new wxStaticText(this, wxID_ANY, "Draw Distance", wxDefaultPosition, wxDefaultSize);
+    auto labelDrawDistance = new wxStaticText(this, wxID_ANY, "Object Draw Distance", wxDefaultPosition, wxDefaultSize);
     _sliderDrawDistance = new wxSlider(this, wxID_ANY, _config.drawdist, 32, 128, wxDefaultPosition, wxDefaultSize);
 
     auto drawDistanceSizer = new wxBoxSizer(wxVERTICAL);
     drawDistanceSizer->Add(labelDrawDistance, wxSizerFlags(0).Expand().Border(wxALL, 3));
     drawDistanceSizer->Add(_sliderDrawDistance, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
-    // END Draw Distance
+    // END Object Draw Distance
 
     _checkBoxFullscreen = new wxCheckBox(this, wxID_ANY, "Enable Fullscreen", wxDefaultPosition, wxDefaultSize);
     _checkBoxFullscreen->SetValue(_config.fullscreen);
