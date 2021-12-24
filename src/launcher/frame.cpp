@@ -53,7 +53,7 @@ LauncherFrame::LauncherFrame() :
     gameSizer->Add(labelGameDir, wxSizerFlags(0).Expand().Border(wxALL, 3));
     gameSizer->Add(_textCtrlGameDir, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
-    _checkBoxDev = new wxCheckBox(this, WindowID::devMode, "Developer Mode", wxDefaultPosition, wxDefaultSize);
+    _checkBoxDev = new wxCheckBox(this, wxID_ANY, "Developer Mode", wxDefaultPosition, wxDefaultSize);
     _checkBoxDev->SetValue(_config.devMode);
 
     // END Setup controls
@@ -77,7 +77,7 @@ LauncherFrame::LauncherFrame() :
 
     auto labelResolution = new wxStaticText(this, wxID_ANY, "Screen Resolution", wxDefaultPosition, wxDefaultSize);
 
-    _choiceResolution = new wxChoice(this, WindowID::resolution, wxDefaultPosition, wxDefaultSize, resChoices);
+    _choiceResolution = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, resChoices);
     _choiceResolution->SetSelection(resSelection);
 
     auto resSizer = new wxBoxSizer(wxVERTICAL);
@@ -96,7 +96,7 @@ LauncherFrame::LauncherFrame() :
 
     auto labelAntiAliasing = new wxStaticText(this, wxID_ANY, "Anti-Aliasing", wxDefaultPosition, wxDefaultSize);
 
-    _choiceAntiAliasing = new wxChoice(this, WindowID::antiAliasing, wxDefaultPosition, wxDefaultSize, antiAliasingChoices);
+    _choiceAntiAliasing = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, antiAliasingChoices);
     _choiceAntiAliasing->SetSelection(_config.aasamples);
 
     auto antiAliasingSizer = new wxBoxSizer(wxVERTICAL);
@@ -114,7 +114,7 @@ LauncherFrame::LauncherFrame() :
 
     auto labelTextureQuality = new wxStaticText(this, wxID_ANY, "Texture Quality", wxDefaultPosition, wxDefaultSize);
 
-    _choiceTextureQuality = new wxChoice(this, WindowID::textureQuality, wxDefaultPosition, wxDefaultSize, textureQualityChoices);
+    _choiceTextureQuality = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, textureQualityChoices);
     _choiceTextureQuality->SetSelection(_config.texQuality);
 
     auto textureQualitySizer = new wxBoxSizer(wxVERTICAL);
@@ -132,7 +132,7 @@ LauncherFrame::LauncherFrame() :
 
     auto labelShadowResolution = new wxStaticText(this, wxID_ANY, "Shadow Map Resolution", wxDefaultPosition, wxDefaultSize);
 
-    _choiceShadowResolution = new wxChoice(this, WindowID::shadowResolution, wxDefaultPosition, wxDefaultSize, shadowResChoices);
+    _choiceShadowResolution = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, shadowResChoices);
     _choiceShadowResolution->SetSelection(_config.shadowres);
 
     auto shadowResSizer = new wxBoxSizer(wxVERTICAL);
@@ -144,7 +144,7 @@ LauncherFrame::LauncherFrame() :
     // Draw Distance
 
     auto labelDrawDistance = new wxStaticText(this, wxID_ANY, "Draw Distance", wxDefaultPosition, wxDefaultSize);
-    _sliderDrawDistance = new wxSlider(this, WindowID::drawDistance, _config.drawdist, 32, 128, wxDefaultPosition, wxDefaultSize);
+    _sliderDrawDistance = new wxSlider(this, wxID_ANY, _config.drawdist, 32, 128, wxDefaultPosition, wxDefaultSize);
 
     auto drawDistanceSizer = new wxBoxSizer(wxVERTICAL);
     drawDistanceSizer->Add(labelDrawDistance, wxSizerFlags(0).Expand().Border(wxALL, 3));
@@ -152,13 +152,13 @@ LauncherFrame::LauncherFrame() :
 
     // END Draw Distance
 
-    _checkBoxFullscreen = new wxCheckBox(this, WindowID::fullscreen, "Enable Fullscreen", wxDefaultPosition, wxDefaultSize);
+    _checkBoxFullscreen = new wxCheckBox(this, wxID_ANY, "Enable Fullscreen", wxDefaultPosition, wxDefaultSize);
     _checkBoxFullscreen->SetValue(_config.fullscreen);
 
-    _checkBoxVSync = new wxCheckBox(this, WindowID::vsync, "Enable V-Sync", wxDefaultPosition, wxDefaultSize);
+    _checkBoxVSync = new wxCheckBox(this, wxID_ANY, "Enable V-Sync", wxDefaultPosition, wxDefaultSize);
     _checkBoxVSync->SetValue(_config.vsync);
 
-    _checkBoxGrass = new wxCheckBox(this, WindowID::grass, "Enable Grass", wxDefaultPosition, wxDefaultSize);
+    _checkBoxGrass = new wxCheckBox(this, wxID_ANY, "Enable Grass", wxDefaultPosition, wxDefaultSize);
     _checkBoxGrass->SetValue(_config.grass);
 
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
@@ -176,16 +176,16 @@ LauncherFrame::LauncherFrame() :
     // Audio
 
     auto labelVolumeMusic = new wxStaticText(this, wxID_ANY, "Music Volume", wxDefaultPosition, wxDefaultSize);
-    _sliderVolumeMusic = new wxSlider(this, WindowID::musicVolume, _config.musicvol, 0, 100, wxDefaultPosition, wxDefaultSize);
+    _sliderVolumeMusic = new wxSlider(this, wxID_ANY, _config.musicvol, 0, 100, wxDefaultPosition, wxDefaultSize);
 
     auto labelVolumeVoice = new wxStaticText(this, wxID_ANY, "Voice Volume", wxDefaultPosition, wxDefaultSize);
-    _sliderVolumeVoice = new wxSlider(this, WindowID::voiceVolume, _config.voicevol, 0, 100, wxDefaultPosition, wxDefaultSize);
+    _sliderVolumeVoice = new wxSlider(this, wxID_ANY, _config.voicevol, 0, 100, wxDefaultPosition, wxDefaultSize);
 
     auto labelVolumeSound = new wxStaticText(this, wxID_ANY, "Sound Volume", wxDefaultPosition, wxDefaultSize);
-    _sliderVolumeSound = new wxSlider(this, WindowID::soundVolume, _config.soundvol, 0, 100, wxDefaultPosition, wxDefaultSize);
+    _sliderVolumeSound = new wxSlider(this, wxID_ANY, _config.soundvol, 0, 100, wxDefaultPosition, wxDefaultSize);
 
     auto labelVolumeMovie = new wxStaticText(this, wxID_ANY, "Movie Volume", wxDefaultPosition, wxDefaultSize);
-    _sliderVolumeMovie = new wxSlider(this, WindowID::movieVolume, _config.movievol, 0, 100, wxDefaultPosition, wxDefaultSize);
+    _sliderVolumeMovie = new wxSlider(this, wxID_ANY, _config.movievol, 0, 100, wxDefaultPosition, wxDefaultSize);
 
     auto audioSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Audio");
     audioSizer->Add(labelVolumeMusic, wxSizerFlags(0).Expand().Border(wxALL, 3));
@@ -208,7 +208,7 @@ LauncherFrame::LauncherFrame() :
     logLevelChoices.Add("Debug");
 
     auto labelLogLevel = new wxStaticText(this, wxID_ANY, "Level", wxDefaultPosition, wxDefaultSize);
-    _choiceLogLevel = new wxChoice(this, WindowID::logLevel, wxDefaultPosition, wxDefaultSize, logLevelChoices);
+    _choiceLogLevel = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, logLevelChoices);
     _choiceLogLevel->SetSelection(_config.loglevel);
 
     wxArrayString logChannelChoices;
@@ -226,7 +226,7 @@ LauncherFrame::LauncherFrame() :
 
     auto labelLogChannels = new wxStaticText(this, wxID_ANY, "Channels", wxDefaultPosition, wxDefaultSize);
 
-    _checkListBoxLogChannels = new wxCheckListBox(this, WindowID::logChannels, wxDefaultPosition, wxDefaultSize, logChannelChoices);
+    _checkListBoxLogChannels = new wxCheckListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, logChannelChoices);
     _checkListBoxLogChannels->Check(0, _config.logch & LogChannels::resources);
     _checkListBoxLogChannels->Check(1, _config.logch & LogChannels::resources2);
     _checkListBoxLogChannels->Check(2, _config.logch & LogChannels::graphics);
@@ -239,7 +239,7 @@ LauncherFrame::LauncherFrame() :
     _checkListBoxLogChannels->Check(9, _config.logch & LogChannels::script2);
     _checkListBoxLogChannels->Check(10, _config.logch & LogChannels::script3);
 
-    _checkBoxLogFile = new wxCheckBox(this, WindowID::logFile, "Log to File", wxDefaultPosition, wxDefaultSize);
+    _checkBoxLogFile = new wxCheckBox(this, wxID_ANY, "Log to File", wxDefaultPosition, wxDefaultSize);
     _checkBoxLogFile->SetValue(_config.logfile);
 
     auto loggingSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Logging");
