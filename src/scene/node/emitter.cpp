@@ -272,7 +272,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs, int count) {
 
     auto lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
     auto blendMode = lighten ? BlendMode::Lighten : BlendMode::Default;
-    _graphicsContext.withBlendMode(blendMode, [this, &count]() {
+    _graphicsContext.withBlending(blendMode, [this, &count]() {
         _meshes.billboard().drawInstanced(count);
     });
 }

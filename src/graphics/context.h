@@ -32,8 +32,8 @@ public:
 
     void init();
 
-    void withBackFaceCulling(const std::function<void()> &block);
-    void withBlendMode(BlendMode mode, const std::function<void()> &block);
+    void withFaceCulling(CullFaceMode mode, const std::function<void()> &block);
+    void withBlending(BlendMode mode, const std::function<void()> &block);
     void withViewport(glm::ivec4 viewport, const std::function<void()> &block);
     void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
 
@@ -45,14 +45,12 @@ private:
     bool _inited {false};
 
     bool _depthTest {true};
-    bool _backFaceCulling {false};
+    CullFaceMode _cullFaceMode {CullFaceMode::None};
     BlendMode _blendMode {BlendMode::None};
 
     glm::ivec4 _viewport {0};
 
-    void enableBackFaceCulling();
-    void disableBackFaceCulling();
-
+    void setCullFaceMode(CullFaceMode mode);
     void setBlendMode(BlendMode mode);
 };
 

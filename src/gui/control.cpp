@@ -212,7 +212,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             uniforms.general.discardColor = glm::vec4(_discardColor, 1.0f);
         }
         auto blendMode = border.fill->isAdditive() ? BlendMode::Add : BlendMode::Default;
-        _graphicsContext.withBlendMode(blendMode, [this, &border]() {
+        _graphicsContext.withBlending(blendMode, [this, &border]() {
             _textures.bind(*border.fill);
             _shaders.use(_shaders.gui(), true);
             _meshes.quad().draw();

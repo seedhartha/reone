@@ -92,7 +92,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     uniforms.general.alpha = 0.5f;
     // uniforms.general.color = glm::vec4(flare.colorShift, 1.0f);
 
-    _graphicsContext.withBlendMode(BlendMode::Add, [this]() {
+    _graphicsContext.withBlending(BlendMode::Add, [this]() {
         _shaders.use(_shaders.gui(), true);
         _meshes.billboard().draw();
     });

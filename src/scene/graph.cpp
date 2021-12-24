@@ -373,7 +373,7 @@ void SceneGraph::draw() {
         return;
     }
 
-    _graphicsContext.withBackFaceCulling([this]() {
+    _graphicsContext.withFaceCulling(CullFaceMode::Back, [this]() {
         // Render opaque meshes
         for (auto &mesh : _opaqueMeshes) {
             mesh->draw();
@@ -402,9 +402,11 @@ void SceneGraph::drawShadows() {
     if (!_camera) {
         return;
     }
-    for (auto &mesh : _shadowMeshes) {
-        mesh->drawShadow();
-    }
+    _graphicsContext.withFaceCulling(CullFaceMode::Front, [this]() {
+        for (auto &mesh : _shadowMeshes) {
+            mesh->drawShadow();
+        }
+    });
 }
 
 vector<LightSceneNode *> SceneGraph::getLightsAt(

@@ -92,6 +92,12 @@ enum class CubeMapFace {
     NegativeZ = 5
 };
 
+enum class CullFaceMode {
+    None,
+    Front,
+    Back
+};
+
 enum class BlendMode {
     None,
     Default,

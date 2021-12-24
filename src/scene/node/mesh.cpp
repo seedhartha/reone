@@ -41,6 +41,7 @@ namespace scene {
 
 static constexpr float kUvAnimationSpeed = 250.0f;
 
+static bool g_dynamicRoomLighting = false;
 static bool g_debugWalkmesh = false;
 
 void MeshSceneNode::init() {
@@ -149,66 +150,71 @@ void MeshSceneNode::updateDanglyMeshAnimation(float dt, const ModelNode::Triangl
 }
 
 bool MeshSceneNode::shouldRender() const {
-    if (g_debugWalkmesh)
+    if (g_debugWalkmesh) {
         return _modelNode->isAABBMesh();
-
+    }
     shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
-    if (!mesh || !mesh->render || _modelNode->alpha().getByFrameOrElse(0, 1.0f) == 0.0f)
+    if (!mesh || !mesh->render || _modelNode->alpha().getByFrameOrElse(0, 1.0f) == 0.0f) {
         return false;
-
+    }
     return !_modelNode->isAABBMesh();
 }
 
 bool MeshSceneNode::shouldCastShadows() const {
-    // Only creature models must cast shadows
-    if (_model.usage() != ModelUsage::Creature) {
-        return false;
-    }
-    // Skin nodes must not cast shadows
-    if (_modelNode->isSkinMesh()) {
-        return false;
-    }
-
     shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
     if (!mesh) {
         return false;
     }
-    return mesh->shadow;
+    if (_model.usage() == ModelUsage::Creature) {
+        return mesh->shadow && !_modelNode->isSkinMesh();
+    } else if (g_dynamicRoomLighting && (_model.usage() == ModelUsage::Room || _model.usage() == ModelUsage::Placeable)) {
+        return mesh->render && !_modelNode->isAABBMesh() && !isTransparent();
+    } else {
+        return false;
+    }
 }
 
 bool MeshSceneNode::isTransparent() const {
     shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
-    if (!mesh)
+    if (!mesh) {
         return false; // Meshless nodes are opaque
+    }
 
     // Character models are opaque
-    if (_model.model().classification() == MdlClassification::character)
+    if (_model.model().classification() == MdlClassification::character) {
         return false;
+    }
 
     // Model nodes with alpha less than 1.0 are transparent
-    if (_alpha < 1.0f)
+    if (_alpha < 1.0f) {
         return true;
+    }
 
     // Model nodes without a diffuse texture are opaque
-    if (!_nodeTextures.diffuse)
+    if (!_nodeTextures.diffuse) {
         return false;
+    }
 
     // Model nodes with transparency hint greater than 0 are transparent
-    if (mesh->transparency > 0)
+    if (mesh->transparency > 0) {
         return true;
+    }
 
     // Model nodes with additive diffuse texture are opaque
-    if (_nodeTextures.diffuse->isAdditive())
+    if (_nodeTextures.diffuse->isAdditive()) {
         return true;
+    }
 
     // Model nodes with an environment map or a bump map are opaque
-    if (_nodeTextures.envmap || _nodeTextures.bumpmap)
+    if (_nodeTextures.envmap || _nodeTextures.bumpmap) {
         return false;
+    }
 
     // Model nodes with RGB diffuse textures are opaque
     PixelFormat format = _nodeTextures.diffuse->pixelFormat();
-    if (format == PixelFormat::RGB || format == PixelFormat::BGR || format == PixelFormat::DXT1)
+    if (format == PixelFormat::RGB || format == PixelFormat::BGR || format == PixelFormat::DXT1) {
         return false;
+    }
 
     return true;
 }
@@ -247,7 +253,7 @@ void MeshSceneNode::draw() {
     if (_nodeTextures.envmap) {
         uniforms.general.featureMask |= UniformsFeatureFlags::envmap;
     }
-    if (_nodeTextures.lightmap) {
+    if (_nodeTextures.lightmap && !g_dynamicRoomLighting) {
         uniforms.general.featureMask |= UniformsFeatureFlags::lightmap;
     }
     if (_nodeTextures.bumpmap) {
@@ -361,7 +367,7 @@ void MeshSceneNode::draw() {
         _textures.bind(*_nodeTextures.diffuse, TextureUnits::diffuseMap);
         additive = _nodeTextures.diffuse->isAdditive();
     }
-    if (_nodeTextures.lightmap) {
+    if (_nodeTextures.lightmap && !g_dynamicRoomLighting) {
         _textures.bind(*_nodeTextures.lightmap, TextureUnits::lightmap);
     }
     if (_nodeTextures.envmap) {
@@ -372,7 +378,7 @@ void MeshSceneNode::draw() {
     }
 
     auto blendMode = additive ? BlendMode::Add : BlendMode::Default;
-    _graphicsContext.withBlendMode(blendMode, [this, &mesh]() {
+    _graphicsContext.withBlending(blendMode, [this, &mesh]() {
         mesh->mesh->draw();
     });
 }
@@ -393,20 +399,24 @@ void MeshSceneNode::drawShadow() {
 }
 
 bool MeshSceneNode::isLightingEnabled() const {
-    if (!isLightingEnabledByUsage(_model.usage()))
+    if (!isLightingEnabledByUsage(_model.usage())) {
         return false;
+    }
 
     // Lighting is disabled for lightmapped models, unless dynamic room lighting is enabled
-    if (_nodeTextures.lightmap)
+    if (_nodeTextures.lightmap && !g_dynamicRoomLighting) {
         return false;
+    }
 
     // Lighting is disabled for self-illuminated model nodes, e.g. sky boxes
-    if (isSelfIlluminated())
+    if (isSelfIlluminated()) {
         return false;
+    }
 
     // Lighting is disabled when diffuse texture is additive
-    if (_nodeTextures.diffuse && _nodeTextures.diffuse->isAdditive())
+    if (_nodeTextures.diffuse && _nodeTextures.diffuse->isAdditive()) {
         return false;
+    }
 
     return true;
 }
