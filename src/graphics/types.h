@@ -26,8 +26,8 @@ constexpr float kDefaultClipPlaneFar = 10000.0f;
 constexpr float kDefaultObjectDrawDistance = 64.0f;
 
 constexpr int kNumCubeFaces = 6;
-constexpr int kNumShadowCascades = 4;
-constexpr int kNumShadowLightSpace = 6;
+constexpr int kNumShadowCascades = 8;
+constexpr int kNumShadowLightSpace = 8;
 
 constexpr int kMaxBones = 24;
 constexpr int kMaxLights = 8;
