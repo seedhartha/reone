@@ -234,14 +234,11 @@ float getShadow(vec3 normal) {
 
     float result = 0.0;
 
-    vec3 fragToLight = fragPosWorldSpace - uShadowLightPosition.xyz;
-    float currentDepth = length(fragToLight);
-
     if (uShadowLightPosition.w == 0.0) {
         // Directional Light
 
-        vec4 fragPosViewSpace = uView * vec4(fragPosWorldSpace, 1.0);
-        float depthValue = abs(fragPosViewSpace.z);
+        vec4 viewSpacePos = uView * vec4(fragPosWorldSpace, 1.0);
+        float depthValue = abs(viewSpacePos.z);
 
         int cascade = NUM_SHADOW_CASCADES - 1;
         for (int i = 0; i < NUM_SHADOW_CASCADES; ++i) {
@@ -251,15 +248,19 @@ float getShadow(vec3 normal) {
             }
         }
 
-        vec4 fragPosLightSpace = uShadowLightSpace[cascade] * vec4(fragPosWorldSpace, 1.0);
-        vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+        vec4 lightSpacePos = uShadowLightSpace[cascade] * vec4(fragPosWorldSpace, 1.0);
+        vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
         projCoords = 0.5 * projCoords + 0.5;
+
+        float currentDepth = projCoords.z;
+        if (currentDepth > 1.0) {
+            return 0.0;
+        }
 
         vec2 texelSize = 1.0 / vec2(textureSize(sShadowMap, 0));
         for (int x = -1; x <= 1; ++x) {
             for (int y = -1; y <= 1; ++y) {
                 float pcfDepth = texture(sShadowMap, vec3(projCoords.xy + vec2(x, y) * texelSize, cascade)).r;
-                pcfDepth *= 10000.0; // map to [0.0, 10000.0]
                 result += currentDepth > pcfDepth ? 1.0 : 0.0;
             }
         }
@@ -267,6 +268,9 @@ float getShadow(vec3 normal) {
 
     } else {
         // Point Light
+
+        vec3 fragToLight = fragPosWorldSpace - uShadowLightPosition.xyz;
+        float currentDepth = length(fragToLight);
 
         float samples = 4.0;
         float offset = 0.1;
@@ -577,14 +581,11 @@ static const string g_gsDirectionalLightShadows = R"END(
 layout(triangles) in;
 layout(triangle_strip, max_vertices=12) out;
 
-out vec4 fragPosWorldSpace;
-
 void main() {
     for (int cascade = 0; cascade < NUM_SHADOW_CASCADES; ++cascade) {
         gl_Layer = cascade;
         for (int i = 0; i < 3; ++i) {
-            fragPosWorldSpace = gl_in[i].gl_Position;
-            gl_Position = uShadowLightSpace[cascade] * fragPosWorldSpace;
+            gl_Position = uShadowLightSpace[cascade] * gl_in[i].gl_Position;
             EmitVertex();
         }
         EndPrimitive();
@@ -613,12 +614,7 @@ void main() {
 )END";
 
 static const string g_fsDirectionalLightShadows = R"END(
-in vec4 fragPosWorldSpace;
-
 void main() {
-    float lightDistance = length(fragPosWorldSpace.xyz - uShadowLightPosition.xyz);
-    lightDistance = lightDistance / 10000.0; // map to [0.0, 1.0]
-    gl_FragDepth = lightDistance;
 }
 )END";
 

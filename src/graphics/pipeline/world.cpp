@@ -172,7 +172,11 @@ static vector<glm::vec4> computeFrustumCornersWorldSpace(const glm::mat4 &projec
     for (auto x = 0; x < 2; ++x) {
         for (auto y = 0; y < 2; ++y) {
             for (auto z = 0; z < 2; ++z) {
-                auto pt = inv * glm::vec4(2.0f * x - 1.0f, 2.0f * y - 1.0f, 2.0f * z - 1.0f, 1.0f);
+                auto pt = inv * glm::vec4(
+                                    2.0f * x - 1.0f,
+                                    2.0f * y - 1.0f,
+                                    2.0f * z - 1.0f,
+                                    1.0f);
                 corners.push_back(pt / pt.w);
             }
         }
@@ -197,7 +201,7 @@ static glm::mat4 computeDirectionalLightSpaceMatrix(
     }
     center /= corners.size();
 
-    auto lightView = glm::lookAt(center + lightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
+    auto lightView = glm::lookAt(center - lightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
 
     float minX = numeric_limits<float>::max();
     float maxX = numeric_limits<float>::min();
