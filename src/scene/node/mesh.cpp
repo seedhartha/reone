@@ -166,6 +166,8 @@ bool MeshSceneNode::shouldCastShadows() const {
     }
     if (_model.usage() == ModelUsage::Creature) {
         return mesh->shadow && !_modelNode->isSkinMesh();
+    } else if (_model.usage() == ModelUsage::Placeable) {
+        return mesh->render;
     } else {
         return false;
     }
