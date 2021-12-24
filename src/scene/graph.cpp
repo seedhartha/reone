@@ -183,10 +183,15 @@ void SceneGraph::updateLighting() {
     }
     // Update shadow light
     for (auto &light : _activeLights) {
-        if (light->modelNode().light()->shadow) {
-            _shadowLight = light;
-            break;
+        if (!light->modelNode().light()->shadow) {
+            continue;
         }
+        float distance2 = light->getSquareDistanceTo(*_camera);
+        if (distance2 > light->radius() * light->radius()) {
+            continue;
+        }
+        _shadowLight = light;
+        break;
     }
 }
 
