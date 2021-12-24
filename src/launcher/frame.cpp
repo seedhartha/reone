@@ -161,6 +161,9 @@ LauncherFrame::LauncherFrame() :
     _checkBoxGrass = new wxCheckBox(this, wxID_ANY, "Enable Grass", wxDefaultPosition, wxDefaultSize);
     _checkBoxGrass->SetValue(_config.grass);
 
+    _checkBoxDynamicRoomLighting = new wxCheckBox(this, wxID_ANY, "Enable Dynamic Room Lighting", wxDefaultPosition, wxDefaultSize);
+    _checkBoxDynamicRoomLighting->SetValue(_config.dynroomlighting);
+
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
     graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(textureQualitySizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
@@ -170,6 +173,7 @@ LauncherFrame::LauncherFrame() :
     graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxVSync, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxGrass, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(_checkBoxDynamicRoomLighting, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
     // END Graphics
 
@@ -277,6 +281,7 @@ void LauncherFrame::LoadConfiguration() {
         ("fullscreen", po::value<bool>()->default_value(false))                         //
         ("vsync", po::value<bool>()->default_value(true))                               //
         ("grass", po::value<bool>()->default_value(true))                               //
+        ("dynroomlighting", po::value<bool>()->default_value(false))                    //
         ("texquality", po::value<int>()->default_value(0))                              //
         ("aasamples", po::value<int>()->default_value(0))                               //
         ("shadowres", po::value<int>()->default_value(0))                               //
@@ -302,6 +307,7 @@ void LauncherFrame::LoadConfiguration() {
     _config.fullscreen = vars["fullscreen"].as<bool>();
     _config.vsync = vars["vsync"].as<bool>();
     _config.grass = vars["grass"].as<bool>();
+    _config.dynroomlighting = vars["dynroomlighting"].as<bool>();
     _config.texQuality = vars["texquality"].as<int>();
     _config.aasamples = vars["aasamples"].as<int>();
     _config.shadowres = vars["shadowres"].as<int>();
@@ -337,6 +343,7 @@ void LauncherFrame::SaveConfiguration() {
         "fullscreen=",
         "vsync=",
         "grass=",
+        "dynroomlighting=",
         "texquality=",
         "aasamples=",
         "shadowres=",
@@ -396,6 +403,7 @@ void LauncherFrame::SaveConfiguration() {
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
     _config.vsync = _checkBoxVSync->IsChecked();
     _config.grass = _checkBoxGrass->IsChecked();
+    _config.dynroomlighting = _checkBoxDynamicRoomLighting->IsChecked();
     _config.texQuality = _choiceTextureQuality->GetSelection();
     _config.aasamples = _choiceAntiAliasing->GetSelection();
     _config.shadowres = _choiceShadowResolution->GetSelection();
@@ -432,6 +440,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
     config << "vsync=" << (_config.vsync ? 1 : 0) << endl;
     config << "grass=" << (_config.grass ? 1 : 0) << endl;
+    config << "dynroomlighting=" << (_config.dynroomlighting ? 1 : 0) << endl;
     config << "texquality=" << _config.texQuality << endl;
     config << "aasamples=" << _config.aasamples << endl;
     config << "shadowres=" << _config.shadowres << endl;

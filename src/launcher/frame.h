@@ -45,6 +45,7 @@ private:
         bool vsync {true};
         int texQuality {0};
         bool grass {true};
+        bool dynroomlighting {false};
         int aasamples {0};
         int shadowres {0};
         int drawdist {64};
@@ -67,6 +68,7 @@ private:
     wxCheckBox *_checkBoxFullscreen;
     wxCheckBox *_checkBoxVSync;
     wxCheckBox *_checkBoxGrass;
+    wxCheckBox *_checkBoxDynamicRoomLighting;
     wxSlider *_sliderVolumeMusic;
     wxSlider *_sliderVolumeVoice;
     wxSlider *_sliderVolumeSound;
