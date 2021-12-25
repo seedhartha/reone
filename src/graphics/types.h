@@ -129,11 +129,11 @@ enum class CameraType {
 struct TextureUnits {
     static constexpr int diffuseMap = 0;
     static constexpr int lightmap = 1;
-    static constexpr int environmentMap = 2;
-    static constexpr int bumpMap = 3;
-    static constexpr int bloom = 4;
-    static constexpr int shadowMap = 5;
-    static constexpr int cubeShadowMap = 6;
+    static constexpr int bumpMap = 2;
+    static constexpr int bloom = 3;
+    static constexpr int environmentMap = 4;
+    static constexpr int cubeShadowMap = 5;
+    static constexpr int shadowMap = 6;
 };
 
 struct UniformBlockBindingPoints {
