@@ -51,125 +51,6 @@ static const vector<float> g_shadowCascadeDivisors {
     0.315f,
     0.635f};
 
-void WorldPipeline::init() {
-    // Reusable renderbuffers
-
-    _depthRenderbuffer = make_unique<Renderbuffer>();
-    _depthRenderbuffer->configure(_options.width, _options.height, PixelFormat::Depth);
-    _depthRenderbuffer->init();
-
-    _depthRenderbufferMultisample = make_unique<Renderbuffer>(_options.aaSamples);
-    _depthRenderbufferMultisample->configure(_options.width, _options.height, PixelFormat::Depth);
-    _depthRenderbufferMultisample->init();
-
-    // Multi-sampled geometry framebuffer
-
-    _geometry1Color1 = make_unique<Texture>("geometry1_color1", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
-    _geometry1Color1->clear(_options.width, _options.height, PixelFormat::RGB);
-    _geometry1Color1->init();
-
-    _geometry1Color2 = make_unique<Texture>("geometry1_color2", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
-    _geometry1Color2->clear(_options.width, _options.height, PixelFormat::RGB);
-    _geometry1Color2->init();
-
-    _geometry1 = make_shared<Framebuffer>();
-    _geometry1->attachColorsDepth(_geometry1Color1, _geometry1Color2, _depthRenderbufferMultisample);
-    _geometry1->init();
-
-    // Normal geometry framebuffer
-
-    _geometry2Color1 = make_unique<Texture>("geometry2_color1", getTextureProperties(TextureUsage::ColorBuffer));
-    _geometry2Color1->clear(_options.width, _options.height, PixelFormat::RGB);
-    _geometry2Color1->init();
-
-    _geometry2Color2 = make_unique<Texture>("geometry2_color2", getTextureProperties(TextureUsage::ColorBuffer));
-    _geometry2Color2->clear(_options.width, _options.height, PixelFormat::RGB);
-    _geometry2Color2->init();
-
-    _geometry2 = make_shared<Framebuffer>();
-    _geometry2->attachColorsDepth(_geometry2Color1, _geometry2Color2, _depthRenderbuffer);
-    _geometry2->init();
-
-    // Vertical blur framebuffer
-
-    _verticalBlurColor = make_unique<Texture>("verticalblur_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _verticalBlurColor->clear(_options.width, _options.height, PixelFormat::RGB);
-    _verticalBlurColor->init();
-
-    _verticalBlur = make_shared<Framebuffer>();
-    _verticalBlur->attachColorDepth(_verticalBlurColor, _depthRenderbuffer);
-    _verticalBlur->init();
-
-    // Horizontal blur framebuffer
-
-    _horizontalBlurColor = make_unique<Texture>("horizontalblur_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _horizontalBlurColor->clear(_options.width, _options.height, PixelFormat::RGB);
-    _horizontalBlurColor->init();
-
-    _horizontalBlur = make_shared<Framebuffer>();
-    _horizontalBlur->attachColorDepth(_horizontalBlurColor, _depthRenderbuffer);
-    _horizontalBlur->init();
-
-    // Shadows framebuffer
-
-    _shadowsDepth = make_unique<Texture>("shadows_depth", getTextureProperties(TextureUsage::DepthBuffer));
-    _shadowsDepth->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth, kNumShadowCascades);
-    _shadowsDepth->init();
-
-    _directionalLightShadows = make_shared<Framebuffer>();
-    _directionalLightShadows->attachDepth(_shadowsDepth);
-    _directionalLightShadows->init();
-
-    _cubeShadowsDepth = make_unique<Texture>("cubeshadows_depth", getTextureProperties(TextureUsage::DepthBufferCubeMap));
-    _cubeShadowsDepth->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
-    _cubeShadowsDepth->init();
-
-    _pointLightShadows = make_shared<Framebuffer>();
-    _pointLightShadows->attachDepth(_cubeShadowsDepth);
-    _pointLightShadows->init();
-
-    // Screenshot framebuffer
-
-    _screenshotColor = make_unique<Texture>("result_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _screenshotColor->clear(kScreenshotResolution, kScreenshotResolution, PixelFormat::RGB);
-    _screenshotColor->init();
-
-    _screenshot = make_shared<Framebuffer>();
-    _screenshot->attachColorDepth(_screenshotColor, _depthRenderbuffer);
-    _screenshot->init();
-}
-
-void WorldPipeline::draw() {
-    if (!_scene->camera()) {
-        return;
-    }
-    computeLightSpaceMatrices();
-    drawShadows();
-    drawGeometry();
-    applyHorizontalBlur();
-    applyVerticalBlur();
-    drawResult();
-}
-
-static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) {
-    switch (face) {
-    case CubeMapFace::PositiveX:
-        return glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-    case CubeMapFace::NegativeX:
-        return glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-    case CubeMapFace::PositiveY:
-        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-    case CubeMapFace::NegativeY:
-        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
-    case CubeMapFace::PositiveZ:
-        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
-    case CubeMapFace::NegativeZ:
-        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
-    default:
-        throw invalid_argument("side is invalid");
-    }
-}
-
 static vector<glm::vec4> computeFrustumCornersWorldSpace(const glm::mat4 &projection, const glm::mat4 &view) {
     auto inv = glm::inverse(projection * view);
 
@@ -239,6 +120,130 @@ static glm::mat4 computeDirectionalLightSpaceMatrix(
     return lightProjection * lightView;
 }
 
+static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) {
+    switch (face) {
+    case CubeMapFace::PositiveX:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+    case CubeMapFace::NegativeX:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+    case CubeMapFace::PositiveY:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+    case CubeMapFace::NegativeY:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+    case CubeMapFace::PositiveZ:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+    case CubeMapFace::NegativeZ:
+        return glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+    default:
+        throw invalid_argument("side is invalid");
+    }
+}
+
+void WorldPipeline::init() {
+    // Common depth buffers
+
+    _dbCommon = make_unique<Renderbuffer>();
+    _dbCommon->configure(_options.width, _options.height, PixelFormat::Depth);
+    _dbCommon->init();
+
+    _dbCommonMS = make_unique<Renderbuffer>(_options.aaSamples);
+    _dbCommonMS->configure(_options.width, _options.height, PixelFormat::Depth);
+    _dbCommonMS->init();
+
+    // Multi-sample geometry framebuffer
+
+    _cbGeometry1MS = make_unique<Texture>("geometry_color1_ms", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
+    _cbGeometry1MS->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbGeometry1MS->init();
+
+    _cbGeometry2MS = make_unique<Texture>("geometry_color2_ms", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
+    _cbGeometry2MS->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbGeometry2MS->init();
+
+    _fbGeometryMS = make_shared<Framebuffer>();
+    _fbGeometryMS->attachColorsDepth(_cbGeometry1MS, _cbGeometry2MS, _dbCommonMS);
+    _fbGeometryMS->init();
+
+    // Geometry framebuffer
+
+    _cbGeometry1 = make_unique<Texture>("geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
+    _cbGeometry1->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbGeometry1->init();
+
+    _cbGeometry2 = make_unique<Texture>("geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
+    _cbGeometry2->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbGeometry2->init();
+
+    _fbGeometry = make_shared<Framebuffer>();
+    _fbGeometry->attachColorsDepth(_cbGeometry1, _cbGeometry2, _dbCommon);
+    _fbGeometry->init();
+
+    // Vertical blur framebuffer
+
+    _cbVerticalBlur = make_unique<Texture>("vertical_blur_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _cbVerticalBlur->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbVerticalBlur->init();
+
+    _fbVerticalBlur = make_shared<Framebuffer>();
+    _fbVerticalBlur->attachColorDepth(_cbVerticalBlur, _dbCommon);
+    _fbVerticalBlur->init();
+
+    // Horizontal blur framebuffer
+
+    _cbHorizontalBlur = make_unique<Texture>("horizontal_blur_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _cbHorizontalBlur->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbHorizontalBlur->init();
+
+    _fbHorizontalBlur = make_shared<Framebuffer>();
+    _fbHorizontalBlur->attachColorDepth(_cbHorizontalBlur, _dbCommon);
+    _fbHorizontalBlur->init();
+
+    // Directional light shadows framebuffer
+
+    _dbDirectionalLightShadows = make_unique<Texture>("point_light_shadows_color", getTextureProperties(TextureUsage::DepthBuffer));
+    _dbDirectionalLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth, kNumShadowCascades);
+    _dbDirectionalLightShadows->init();
+
+    _fbDirectionalLightShadows = make_shared<Framebuffer>();
+    _fbDirectionalLightShadows->attachDepth(_dbDirectionalLightShadows);
+    _fbDirectionalLightShadows->init();
+
+    // Point light shadows framebuffer
+
+    _dbPointLightShadows = make_unique<Texture>("directional_light_shadows_color", getTextureProperties(TextureUsage::DepthBufferCubeMap));
+    _dbPointLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
+    _dbPointLightShadows->init();
+
+    _fbPointLightShadows = make_shared<Framebuffer>();
+    _fbPointLightShadows->attachDepth(_dbPointLightShadows);
+    _fbPointLightShadows->init();
+
+    // Screenshot framebuffer
+
+    _cbScreenshot = make_unique<Texture>("screenshot_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _cbScreenshot->clear(kScreenshotResolution, kScreenshotResolution, PixelFormat::RGB);
+    _cbScreenshot->init();
+
+    _fbScreenshot = make_shared<Framebuffer>();
+    _fbScreenshot->attachColorDepth(_cbScreenshot, _dbCommon);
+    _fbScreenshot->init();
+}
+
+void WorldPipeline::draw() {
+    if (!_scene->camera()) {
+        return;
+    }
+    computeLightSpaceMatrices();
+
+    drawShadows();
+    drawGeometry();
+    drawHorizontalBlur();
+    drawVerticalBlur();
+    presentWorld();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void WorldPipeline::computeLightSpaceMatrices() {
     if (!_scene->hasShadowLight()) {
         return;
@@ -287,12 +292,13 @@ void WorldPipeline::drawShadows() {
         uniforms.general.shadowLightSpace[i] = _shadowLightSpace[i];
     }
 
-    _graphicsContext.withViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution), [this]() {
-        auto shadows = _scene->isShadowLightDirectional() ? _directionalLightShadows : _pointLightShadows;
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, shadows->nameGL());
-        glReadBuffer(GL_NONE);
-        glDrawBuffer(GL_NONE);
+    // Bind shadows framebuffer
+    auto framebuffer = _scene->isShadowLightDirectional() ? _fbDirectionalLightShadows : _fbPointLightShadows;
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->nameGL());
+    glReadBuffer(GL_NONE);
+    glDrawBuffer(GL_NONE);
 
+    _graphicsContext.withViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution), [this]() {
         glClear(GL_DEPTH_BUFFER_BIT);
         _scene->drawShadows();
     });
@@ -331,43 +337,35 @@ void WorldPipeline::drawGeometry() {
 
     // Draw scene to multi-sample framebuffer
 
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _geometry1->nameGL());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbGeometryMS->nameGL());
     glDrawBuffers(2, colors);
 
     if (_scene->hasShadowLight()) {
         if (_scene->isShadowLightDirectional()) {
-            _textures.bind(*_shadowsDepth, TextureUnits::shadowMap);
+            _textures.bind(*_dbDirectionalLightShadows, TextureUnits::shadowMap);
         } else {
-            _textures.bind(*_cubeShadowsDepth, TextureUnits::cubeShadowMap);
+            _textures.bind(*_dbPointLightShadows, TextureUnits::cubeShadowMap);
         }
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     _scene->draw();
 
-    // Blit multi-sample framebuffer to a second framebuffer
+    // Blit multi-sample geometry framebuffer to geometry framebuffer
 
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, _geometry1->nameGL());
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _geometry2->nameGL());
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbGeometryMS->nameGL());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbGeometry->nameGL());
     for (int i = 0; i < 2; ++i) {
         glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
         glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
         glBlitFramebuffer(0, 0, _options.width, _options.height, 0, 0, _options.width, _options.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void WorldPipeline::applyHorizontalBlur() {
-    // Bind horizontal blur framebuffer
+void WorldPipeline::drawHorizontalBlur() {
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbHorizontalBlur->nameGL());
 
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _horizontalBlur->nameGL());
-
-    // Bind bright geometry texture
-
-    _textures.bind(*_geometry2Color2);
-
-    // Set shader uniforms
+    // Set uniforms
 
     float w = static_cast<float>(_options.width);
     float h = static_cast<float>(_options.height);
@@ -379,25 +377,17 @@ void WorldPipeline::applyHorizontalBlur() {
     uniforms.general.blurResolution = glm::vec2(w, h);
     uniforms.general.blurDirection = glm::vec2(1.0f, 0.0f);
 
-    // Draw a quad
+    // Draw quad with second geometry color buffer as texture
+
+    _shaders.use(_shaders.blur(), true);
+    _textures.bind(*_cbGeometry2);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    _shaders.use(_shaders.blur(), true);
     _meshes.quadNDC().draw();
-
-    // Restore context
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void WorldPipeline::applyVerticalBlur() {
-    // Bind vertical blur framebuffer
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _verticalBlur->nameGL());
-
-    // Bind diffuse map
-
-    _textures.bind(*_horizontalBlurColor);
+void WorldPipeline::drawVerticalBlur() {
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbVerticalBlur->nameGL());
 
     // Set shader uniforms
 
@@ -411,45 +401,47 @@ void WorldPipeline::applyVerticalBlur() {
     uniforms.general.blurResolution = glm::vec2(w, h);
     uniforms.general.blurDirection = glm::vec2(0.0f, 1.0f);
 
-    // Draw a quad
+    // Draw quad with horizontal blur color buffer as texture
+
+    _shaders.use(_shaders.blur(), true);
+    _textures.bind(*_cbHorizontalBlur);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    _shaders.use(_shaders.blur(), true);
     _meshes.quadNDC().draw();
-
-    // Restore context
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void WorldPipeline::drawResult() {
-    // Set viewport
-    if (_takeScreenshot) {
-        glViewport(0, 0, kScreenshotResolution, kScreenshotResolution);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _screenshot->nameGL());
-    }
-
-    // Bind textures
-    _textures.bind(*_geometry2Color1);
-    _textures.bind(*_verticalBlurColor, TextureUnits::bloom);
+void WorldPipeline::presentWorld() {
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
     // Reset uniforms
+
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
 
-    // Draw a quad
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Draw quad with geometry color buffer and vertical blur color buffer as textures
+
     _shaders.use(_shaders.presentWorld(), true);
+
+    _textures.bind(*_cbGeometry1);
+    _textures.bind(*_cbVerticalBlur, TextureUnits::bloom);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     _meshes.quadNDC().draw();
 
-    // Save screenshot and restore context
+    // Render to texture
+
     if (_takeScreenshot) {
-        glViewport(0, 0, _options.width, _options.height);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        _textures.bind(*_screenshotColor);
-        _screenshotColor->flushGPUToCPU();
-        _takeScreenshot = false; // finished taking a screenshot
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbScreenshot->nameGL());
+
+        _graphicsContext.withViewport(glm::ivec4(0, 0, kScreenshotResolution, kScreenshotResolution), [this]() {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            _meshes.quadNDC().draw();
+        });
+
+        _textures.bind(*_cbScreenshot);
+        _cbScreenshot->flushGPUToCPU();
+        _takeScreenshot = false;
     }
 }
 
