@@ -55,6 +55,7 @@ const int MAX_TEXT_CHARS = 128;
 const int MAX_GRASS_CLUSTERS = 256;
 
 const float SHININESS = 8.0;
+const float ALPHA_THRESHOLD = 0.2;
 
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
 const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
@@ -665,17 +666,17 @@ void main() {
     float oneOverGridX = 1.0 / uParticleGridSize.x;
     float oneOverGridY = 1.0 / uParticleGridSize.y;
 
-    vec2 texCoords = fragUV1;
-    texCoords.x *= oneOverGridX;
-    texCoords.y *= oneOverGridY;
-
+    vec2 uv = fragUV1;
+    uv.x *= oneOverGridX;
+    uv.y *= oneOverGridY;
     if (uParticles[fragInstanceID].frame > 0) {
-        texCoords.y += oneOverGridY * (uParticles[fragInstanceID].frame / uParticleGridSize.x);
-        texCoords.x += oneOverGridX * (uParticles[fragInstanceID].frame % uParticleGridSize.x);
+        uv.y += oneOverGridY * (uParticles[fragInstanceID].frame / uParticleGridSize.x);
+        uv.x += oneOverGridX * (uParticles[fragInstanceID].frame % uParticleGridSize.x);
     }
-
-    vec4 diffuseSample = texture(sDiffuseMap, texCoords);
-
+    vec4 diffuseSample = texture(sDiffuseMap, uv);
+    if (diffuseSample.a < ALPHA_THRESHOLD) {
+        discard;
+    }
     fragColor = vec4(uParticles[fragInstanceID].color.rgb * diffuseSample.rgb, uParticles[fragInstanceID].color.a * diffuseSample.a);
     fragColorBright = vec4(vec3(0.0), 0.0);
 }
@@ -697,6 +698,9 @@ void main() {
     uv.x += 0.5 * (int(uGrassClusters[fragInstanceID].positionVariant[3]) % 2);
 
     vec4 diffuseSample = texture(sDiffuseMap, uv);
+    if (diffuseSample.a < ALPHA_THRESHOLD) {
+        discard;
+    }
     vec3 objectColor = diffuseSample.rgb;
 
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
@@ -751,7 +755,7 @@ void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
     vec4 diffuseSample = texture(sDiffuseMap, uv);
     bool opaque = isFeatureEnabled(FEATURE_ENVMAP) || isFeatureEnabled(FEATURE_NORMALMAP) || isFeatureEnabled(FEATURE_HEIGHTMAP);
-    if (!opaque && diffuseSample.a < 0.1) {
+    if (!opaque && diffuseSample.a < ALPHA_THRESHOLD) {
         discard;
     }
     vec3 N = getNormal(uv);
