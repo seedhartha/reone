@@ -126,7 +126,7 @@ void Texture::unbind() {
 }
 
 void Texture::configure() {
-    if (isCubeMap()) {
+    if (isCubemap()) {
         configureCubeMap();
     } else {
         configure2D();
@@ -179,28 +179,28 @@ void Texture::configure2D() {
 }
 
 void Texture::refresh() {
-    if (isCubeMap()) {
+    if (isCubemap()) {
         refreshCubeMap();
     } else if (isMultilayer()) {
         refresh2DArray();
     } else {
         refresh2D();
     }
+    if (isMipmapFilter(_properties.minFilter)) {
+        auto target = getTargetGL();
+        glTexParameteri(getTargetGL(), GL_TEXTURE_MAX_LEVEL, 8);
+        glGenerateMipmap(target);
+    }
 }
 
 void Texture::refreshCubeMap() {
     for (int i = 0; i < kNumCubeFaces; ++i) {
-        if (i < _layers.size() && !_layers[i].mipMaps.empty()) {
-            const MipMap &mipMap = _layers[i].mipMaps.front();
-            fillTarget2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mipMap.width, mipMap.height, mipMap.pixels->data(), static_cast<int>(mipMap.pixels->size()));
+        if (_layers.size() > i && _layers[i].pixels) {
+            auto &pixels = _layers[i].pixels;
+            fillTarget2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _width, _height, pixels->data(), static_cast<int>(pixels->size()));
         } else {
             fillTarget2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _width, _height);
         }
-    }
-
-    // Generate mip maps, if required
-    if (isMipmapFilter(_properties.minFilter)) {
-        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     }
 }
 
@@ -211,18 +211,9 @@ void Texture::refresh2DArray() {
 
 void Texture::refresh2D() {
     GLenum target = isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
-    int numMipMaps = !_layers.empty() ? static_cast<int>(_layers[0].mipMaps.size()) : 0;
-    if (numMipMaps > 0) {
-        for (int i = 0; i < numMipMaps; ++i) {
-            const MipMap &mipMap = _layers[0].mipMaps[i];
-            fillTarget2D(target, i, mipMap.width, mipMap.height, mipMap.pixels->data(), static_cast<int>(mipMap.pixels->size()));
-        }
-        if (numMipMaps > 1) {
-            glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
-            glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, numMipMaps - 1);
-        } else if (isMipmapFilter(_properties.minFilter)) {
-            glGenerateMipmap(target);
-        }
+    if (!_layers.empty() && _layers.front().pixels) {
+        auto &pixels = _layers.front().pixels;
+        fillTarget2D(target, 0, _width, _height, pixels->data(), static_cast<int>(pixels->size()));
     } else {
         fillTarget2D(target, 0, _width, _height);
     }
@@ -241,16 +232,8 @@ void Texture::clear(int w, int h, PixelFormat format, int numLayers, bool refres
     }
 }
 
-void Texture::setPixels(int w, int h, PixelFormat format, shared_ptr<ByteArray> pixels, bool refresh) {
-    MipMap mipMap;
-    mipMap.width = w;
-    mipMap.height = h;
-    mipMap.pixels = move(pixels);
-
-    Layer layer;
-    layer.mipMaps.push_back(move(mipMap));
-
-    setPixels(w, h, format, vector<Layer> {layer}, refresh);
+void Texture::setPixels(int w, int h, PixelFormat format, Layer layer, bool refresh) {
+    setPixels(w, h, format, vector<Layer> {move(layer)}, refresh);
 }
 
 void Texture::setPixels(int w, int h, PixelFormat format, vector<Layer> layers, bool refresh) {
@@ -275,14 +258,9 @@ void Texture::flushGPUToCPU() {
         throw logic_error("Flushing multisample textures is not supported");
     }
     Layer layer;
-    layer.mipMaps.resize(1);
-
-    MipMap &mipMap = layer.mipMaps[0];
-    mipMap.width = _width;
-    mipMap.height = _height;
-    mipMap.pixels = make_shared<ByteArray>();
-    mipMap.pixels->resize(3 * _width * _height);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, &(*mipMap.pixels)[0]);
+    layer.pixels = make_shared<ByteArray>();
+    layer.pixels->resize(3 * _width * _height);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, &(*layer.pixels)[0]);
 
     _layers.clear();
     _layers.push_back(move(layer));
@@ -308,7 +286,7 @@ glm::vec4 Texture::sample(int x, int y) const {
     bool alpha = _pixelFormat == PixelFormat::RGBA || _pixelFormat == PixelFormat::BGRA;
     int bpp = grayscale ? 1 : (alpha ? 4 : 3);
 
-    auto &pixels = *_layers.front().mipMaps.front().pixels;
+    auto &pixels = *_layers.front().pixels;
     auto pixel = &pixels[bpp * (y * _width + x)];
 
     float r = 0.0f;
@@ -372,7 +350,7 @@ void Texture::fillTarget3D(int width, int height, int depth) {
 }
 
 uint32_t Texture::getTargetGL() const {
-    if (isCubeMap()) {
+    if (isCubemap()) {
         return GL_TEXTURE_CUBE_MAP;
     } else if (isMultilayer()) {
         return GL_TEXTURE_2D_ARRAY;

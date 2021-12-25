@@ -23,38 +23,13 @@ namespace reone {
 
 namespace graphics {
 
-inline bool isCompressed(PixelFormat format) {
-    return format == PixelFormat::DXT1 || format == PixelFormat::DXT5;
-}
+void prepareCubemap(Texture &texture);
 
 Texture::Properties getTextureProperties(TextureUsage usage, int numSamples = 1);
 
-/**
- * KotOR and TSL cube maps require specific transformations before use.
- * Allegedly, this is what the original engine does.
- *
- * @param layers texture layers to process
- * @param srcFormat source pixel format
- * @param destFormat resulting pixel format (output parameter)
- */
-void prepareCubeMap(std::vector<Texture::Layer> &layers, PixelFormat srcFormat, PixelFormat &destFormat);
-
-/**
- * Decompresses the mip map.
- *
- * @param mipMap mip map to decompress
- * @param srcFormat source pixel format - must be either DXT1 or DXT5
- * @param destFormat pixel format of a decompressed mip map (output parameter)
- */
-void decompressMipMap(Texture::MipMap &mipMap, PixelFormat srcFormat, PixelFormat &destFormat);
-
-/**
- * Rotates the mip map by 90 degrees.
- *
- * @param mipMap mip map to rotate - must be uncompressed
- * @param bpp number of bytes per pixel
- */
-void rotateMipMap90(Texture::MipMap &mipMap, int bpp);
+inline bool isCompressed(PixelFormat format) {
+    return format == PixelFormat::DXT1 || format == PixelFormat::DXT5;
+}
 
 } // namespace graphics
 

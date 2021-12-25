@@ -81,7 +81,7 @@ void Movie::draw() {
     auto &frame = _videoStream->frame();
     if (frame.pixels) {
         _textures.bind(*_texture);
-        _texture->setPixels(_width, _height, PixelFormat::RGB, frame.pixels, true);
+        _texture->setPixels(_width, _height, PixelFormat::RGB, Texture::Layer {frame.pixels}, true);
     }
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();

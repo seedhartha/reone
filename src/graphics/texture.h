@@ -82,14 +82,8 @@ public:
         int fps {0};
     };
 
-    struct MipMap {
-        int width {0};
-        int height {0};
-        std::shared_ptr<ByteArray> pixels;
-    };
-
     struct Layer {
-        std::vector<MipMap> mipMaps;
+        std::shared_ptr<ByteArray> pixels;
     };
 
     Texture(std::string name, Properties properties) :
@@ -110,7 +104,7 @@ public:
     glm::vec4 sample(float s, float t) const;
     glm::vec4 sample(int x, int y) const;
 
-    bool isCubeMap() const { return _properties.cubemap; }
+    bool isCubemap() const { return _properties.cubemap; }
     bool isMultilayer() const { return _layers.size() > 1ll; }
     bool isMultisample() const { return _properties.numSamples > 1; }
     bool isAdditive() const { return _features.blending == Blending::Additive; }
@@ -122,17 +116,19 @@ public:
     const std::string &name() const { return _name; }
     int width() const { return _width; }
     int height() const { return _height; }
+    std::vector<Layer> &layers() { return _layers; }
     const std::vector<Layer> &layers() const { return _layers; }
     const Features &features() const { return _features; }
     PixelFormat pixelFormat() const { return _pixelFormat; }
 
     void setFeatures(Features features) { _features = std::move(features); }
+    void setPixelFormat(PixelFormat format) { _pixelFormat = format; }
 
     // Pixels
 
     void clear(int w, int h, PixelFormat format, int numLayers = 1, bool refresh = false);
 
-    void setPixels(int w, int h, PixelFormat format, std::shared_ptr<ByteArray> pixels, bool refresh = false);
+    void setPixels(int w, int h, PixelFormat format, Layer layer, bool refresh = false);
     void setPixels(int w, int h, PixelFormat format, std::vector<Layer> layers, bool refresh = false);
 
     // END Pixels

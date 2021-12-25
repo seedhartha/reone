@@ -28,12 +28,8 @@ namespace reone {
 
 namespace graphics {
 
-TgaReader::TgaReader(const string &resRef, TextureUsage usage) :
-    BinaryReader(0), _resRef(resRef), _usage(usage) {
-}
-
 void TgaReader::doLoad() {
-    uint8_t idLength = readByte();
+    auto idLength = readByte();
 
     ignore(1);
 
@@ -44,71 +40,51 @@ void TgaReader::doLoad() {
     case TGADataType::RGBA_RLE:
         break;
     default:
-        warn("TGA: unsupported data type: " + to_string(static_cast<int>(_dataType)));
+        warn("Unsupported TGA data type: " + to_string(static_cast<int>(_dataType)));
         return;
     }
 
     ignore(9);
 
-    _width = readUint16();
-    _height = readUint16();
+    auto width = readUint16();
+    auto height = readUint16();
 
     uint8_t bpp = readByte();
-    _alpha = isRGBA() && bpp == 32;
-
-    if ((isRGBA() && bpp != 24 && bpp != 32) ||
-        (isGrayscale() && bpp != 8)) {
-
+    if ((isRGBA() && bpp != 24 && bpp != 32) || (isGrayscale() && bpp != 8)) {
         throw runtime_error("Unsupported bits per pixel: " + to_string(bpp));
     }
 
     uint8_t descriptor = readByte();
-
     bool flipY = (descriptor & 0x10) != 0;
     if (flipY) {
         throw runtime_error("Vertically flipped images are not supported");
     }
 
-    ignore(idLength);
+    bool cubemap = height / width == kNumCubeFaces;
+    if (cubemap) {
+        _width = width;
+        _height = width;
+        _numLayers = kNumCubeFaces;
+    } else {
+        _width = width;
+        _height = height;
+        _numLayers = 1;
+    }
+    _alpha = isRGBA() && bpp == 32;
 
+    ignore(idLength);
     loadTexture();
 }
 
-bool TgaReader::isRGBA() const {
-    return _dataType == TGADataType::RGBA || _dataType == TGADataType::RGBA_RLE;
-}
-
-bool TgaReader::isGrayscale() const {
-    return _dataType == TGADataType::Grayscale;
-}
-
 void TgaReader::loadTexture() {
-    bool cubeMap = _height / _width == 6;
-    int layerCount = cubeMap ? 6 : 1;
-
     vector<Texture::Layer> layers;
-    layers.reserve(layerCount);
-
-    for (int i = 0; i < layerCount; ++i) {
-        int w = _width;
-        int h = cubeMap ? _width : _height;
-
-        Texture::MipMap mipMap;
-        mipMap.width = w;
-        mipMap.height = h;
-        mipMap.pixels = make_shared<ByteArray>(readPixels(w, h));
-
-        Texture::Layer layer;
-        layer.mipMaps.push_back(move(mipMap));
-        layers.push_back(move(layer));
+    layers.reserve(_numLayers);
+    for (int i = 0; i < _numLayers; ++i) {
+        auto pixels = make_shared<ByteArray>(readPixels(_width, _height));
+        layers.push_back(Texture::Layer {move(pixels)});
     }
 
     PixelFormat format = isGrayscale() ? PixelFormat::Grayscale : (_alpha ? PixelFormat::BGRA : PixelFormat::BGR);
-
-    if (cubeMap) {
-        prepareCubeMap(layers, format, format);
-    }
-
     _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage));
     _texture->setPixels(_width, _height, format, move(layers));
 }
@@ -118,12 +94,7 @@ ByteArray TgaReader::readPixels(int w, int h) {
         return readPixelsRLE(w, h);
     }
     int dataSize = (isRGBA() ? (_alpha ? 4 : 3) : 1) * w * h;
-
     return _reader->getBytes(dataSize);
-}
-
-bool TgaReader::isRLE() const {
-    return _dataType == TGADataType::RGBA_RLE;
 }
 
 ByteArray TgaReader::readPixelsRLE(int w, int h) {
@@ -166,6 +137,18 @@ ByteArray TgaReader::readPixelsRLE(int w, int h) {
     }
 
     return move(result);
+}
+
+bool TgaReader::isGrayscale() const {
+    return _dataType == TGADataType::Grayscale;
+}
+
+bool TgaReader::isRGBA() const {
+    return _dataType == TGADataType::RGBA || _dataType == TGADataType::RGBA_RLE;
+}
+
+bool TgaReader::isRLE() const {
+    return _dataType == TGADataType::RGBA_RLE;
 }
 
 } // namespace graphics

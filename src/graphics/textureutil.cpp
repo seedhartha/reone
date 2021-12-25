@@ -25,6 +25,114 @@ namespace reone {
 
 namespace graphics {
 
+static void decompressLayer(int width, int height, Texture::Layer &layer, PixelFormat srcFormat, PixelFormat &dstFormat) {
+    if (!isCompressed(srcFormat)) {
+        throw invalid_argument("format must be either DXT1 or DXT5");
+    }
+
+    size_t numPixels = static_cast<size_t>(width) * height;
+    const uint8_t *srcPixels = reinterpret_cast<const uint8_t *>(layer.pixels->data());
+    vector<uint32_t> decompPixels(numPixels);
+    uint32_t *decompPixelsPtr = &decompPixels[0];
+    bool alpha;
+
+    if (srcFormat == PixelFormat::DXT5) {
+        decompressDXT5(width, height, srcPixels, decompPixelsPtr);
+        alpha = true;
+    } else {
+        decompressDXT1(width, height, srcPixels, decompPixelsPtr);
+        alpha = false;
+    }
+
+    auto destPixels = make_shared<ByteArray>((alpha ? 4ll : 3ll) * numPixels);
+    uint8_t *destPixelsPtr = reinterpret_cast<uint8_t *>(destPixels->data());
+    decompPixelsPtr = &decompPixels[0];
+
+    for (size_t i = 0; i < numPixels; ++i) {
+        unsigned long pixel = *(decompPixelsPtr++);
+        *(destPixelsPtr++) = (pixel >> 24) & 0xff;
+        *(destPixelsPtr++) = (pixel >> 16) & 0xff;
+        *(destPixelsPtr++) = (pixel >> 8) & 0xff;
+        if (alpha) {
+            *(destPixelsPtr++) = pixel & 0xff;
+        }
+    }
+
+    layer.pixels = move(destPixels);
+    dstFormat = alpha ? PixelFormat::RGBA : PixelFormat::RGB;
+}
+
+static void rotateLayer90(int width, int height, Texture::Layer &layer, int bpp) {
+    if (width != height) {
+        throw invalid_argument(str(boost::format("Invalid texture size: width=%d, height=%d") % width % height));
+    }
+    size_t n = width;
+    size_t w = n / 2;
+    size_t h = (n + 1) / 2;
+    uint8_t *pixels = reinterpret_cast<uint8_t *>(layer.pixels->data());
+
+    for (size_t x = 0; x < w; ++x) {
+        for (size_t y = 0; y < h; ++y) {
+            const size_t d0 = (y * n + x) * bpp;
+            const size_t d1 = ((n - 1 - x) * n + y) * bpp;
+            const size_t d2 = ((n - 1 - y) * n + (n - 1 - x)) * bpp;
+            const size_t d3 = (x * n + (n - 1 - y)) * bpp;
+
+            for (size_t p = 0; p < static_cast<size_t>(bpp); ++p) {
+                uint8_t tmp = pixels[d0 + p];
+                pixels[d0 + p] = pixels[d1 + p];
+                pixels[d1 + p] = pixels[d2 + p];
+                pixels[d2 + p] = pixels[d3 + p];
+                pixels[d3 + p] = tmp;
+            }
+        }
+    }
+}
+
+static int getBitsPerPixel(PixelFormat format) {
+    switch (format) {
+    case PixelFormat::Grayscale:
+        return 1;
+    case PixelFormat::RGB:
+    case PixelFormat::BGR:
+        return 3;
+    case PixelFormat::RGBA:
+    case PixelFormat::BGRA:
+        return 4;
+    default:
+        throw invalid_argument("Unsupported pixel format: " + to_string(static_cast<int>(format)));
+    }
+}
+
+void prepareCubemap(Texture &texture) {
+    static constexpr int rotations[] = {1, 3, 0, 2, 2, 0};
+
+    auto &layers = texture.layers();
+    int numLayers = static_cast<int>(layers.size());
+    if (numLayers != kNumCubeFaces) {
+        throw invalid_argument("Invalid layer count: " + to_string(numLayers));
+    }
+    swap(layers[0], layers[1]);
+
+    PixelFormat srcFormat = texture.pixelFormat();
+    PixelFormat dstFormat = texture.pixelFormat();
+    bool compressed = isCompressed(srcFormat);
+
+    for (int i = 0; i < kNumCubeFaces; ++i) {
+        auto &layer = layers[i];
+        if (!layer.pixels) {
+            throw invalid_argument(str(boost::format("layer %d is empty") % i));
+        }
+        if (compressed) {
+            decompressLayer(texture.width(), texture.height(), layer, srcFormat, dstFormat);
+            texture.setPixelFormat(dstFormat);
+        }
+        for (int j = 0; j < rotations[i]; ++j) {
+            rotateLayer90(texture.width(), texture.height(), layer, getBitsPerPixel(dstFormat));
+        }
+    }
+}
+
 Texture::Properties getTextureProperties(TextureUsage usage, int numSamples) {
     Texture::Properties properties;
     properties.numSamples = numSamples;
@@ -45,7 +153,7 @@ Texture::Properties getTextureProperties(TextureUsage usage, int numSamples) {
         properties.wrap = Texture::Wrapping::ClampToBorder;
         properties.borderColor = glm::vec4(1.0f);
 
-    } else if (usage == TextureUsage::NormalMap || usage == TextureUsage::HeightMap) {
+    } else if (usage == TextureUsage::BumpMap) {
         properties.minFilter = Texture::Filtering::Linear;
     }
 
@@ -57,117 +165,6 @@ Texture::Properties getTextureProperties(TextureUsage usage, int numSamples) {
     }
 
     return move(properties);
-}
-
-static int getBitsPerPixel(PixelFormat format) {
-    switch (format) {
-    case PixelFormat::Grayscale:
-        return 1;
-    case PixelFormat::RGB:
-    case PixelFormat::BGR:
-        return 3;
-    case PixelFormat::RGBA:
-    case PixelFormat::BGRA:
-        return 4;
-    default:
-        throw invalid_argument("Unsupported pixel format: " + to_string(static_cast<int>(format)));
-    }
-}
-
-void prepareCubeMap(vector<Texture::Layer> &layers, PixelFormat srcFormat, PixelFormat &destFormat) {
-    static int rotations[] = {1, 3, 0, 2, 2, 0};
-
-    int layerCount = static_cast<int>(layers.size());
-    if (layerCount != kNumCubeFaces) {
-        throw invalid_argument("layer count is invalid");
-    }
-
-    swap(layers[0], layers[1]);
-
-    destFormat = srcFormat;
-
-    bool compressed = isCompressed(srcFormat);
-    for (int i = 0; i < kNumCubeFaces; ++i) {
-        Texture::Layer &layer = layers[i];
-
-        if (layer.mipMaps.empty()) {
-            throw invalid_argument("layer has no mip maps: " + to_string(i));
-        }
-
-        // Cube maps only ever use the base mip map level
-        Texture::MipMap &mipMap = layer.mipMaps.front();
-        if (compressed) {
-            decompressMipMap(mipMap, srcFormat, destFormat);
-        }
-        for (int j = 0; j < rotations[i]; ++j) {
-            rotateMipMap90(mipMap, getBitsPerPixel(destFormat));
-        }
-        layer.mipMaps.erase(layer.mipMaps.begin() + 1, layer.mipMaps.end());
-    }
-}
-
-void decompressMipMap(Texture::MipMap &mipMap, PixelFormat srcFormat, PixelFormat &destFormat) {
-    if (!isCompressed(srcFormat)) {
-        throw invalid_argument("format must be either DXT1 or DXT5");
-    }
-
-    size_t pixelCount = static_cast<size_t>(mipMap.width) * mipMap.height;
-    const uint8_t *srcPixels = reinterpret_cast<const uint8_t *>(mipMap.pixels->data());
-    vector<uint32_t> decompPixels(pixelCount);
-    uint32_t *decompPixelsPtr = &decompPixels[0];
-    bool alpha;
-
-    if (srcFormat == PixelFormat::DXT5) {
-        decompressDXT5(mipMap.width, mipMap.height, srcPixels, decompPixelsPtr);
-        alpha = true;
-    } else {
-        decompressDXT1(mipMap.width, mipMap.height, srcPixels, decompPixelsPtr);
-        alpha = false;
-    }
-
-    auto destPixels = make_shared<ByteArray>((alpha ? 4ll : 3ll) * pixelCount);
-    uint8_t *destPixelsPtr = reinterpret_cast<uint8_t *>(destPixels->data());
-    decompPixelsPtr = &decompPixels[0];
-
-    for (int i = 0; i < mipMap.width * mipMap.height; ++i) {
-        unsigned long pixel = *(decompPixelsPtr++);
-        *(destPixelsPtr++) = (pixel >> 24) & 0xff;
-        *(destPixelsPtr++) = (pixel >> 16) & 0xff;
-        *(destPixelsPtr++) = (pixel >> 8) & 0xff;
-        if (alpha) {
-            *(destPixelsPtr++) = pixel & 0xff;
-        }
-    }
-
-    mipMap.pixels = move(destPixels);
-    destFormat = alpha ? PixelFormat::RGBA : PixelFormat::RGB;
-}
-
-void rotateMipMap90(Texture::MipMap &mipMap, int bpp) {
-    if (mipMap.width != mipMap.height) {
-        throw invalid_argument("mipMap size is invalid");
-    }
-    size_t n = mipMap.width;
-    size_t w = n / 2;
-    size_t h = (n + 1) / 2;
-    uint8_t *pixels = reinterpret_cast<uint8_t *>(mipMap.pixels->data());
-
-    for (size_t x = 0; x < w; ++x) {
-        for (size_t y = 0; y < h; ++y) {
-            const size_t d0 = (y * n + x) * bpp;
-            const size_t d1 = ((n - 1 - x) * n + y) * bpp;
-            const size_t d2 = ((n - 1 - y) * n + (n - 1 - x)) * bpp;
-            const size_t d3 = (x * n + (n - 1 - y)) * bpp;
-
-            for (size_t p = 0; p < static_cast<size_t>(bpp); ++p) {
-                uint8_t tmp = pixels[d0 + p];
-                pixels[d0 + p] = pixels[d1 + p];
-                pixels[d1 + p] = pixels[d2 + p];
-                pixels[d2 + p] = pixels[d3 + p];
-                pixels[d3 + p] = tmp;
-            }
-        }
-    }
 }
 
 } // namespace graphics

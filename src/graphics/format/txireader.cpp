@@ -27,11 +27,9 @@ namespace graphics {
 
 void TxiReader::load(const shared_ptr<istream> &in) {
     if (!in) {
-        throw invalid_argument("TXI: invalid input stream");
+        throw invalid_argument("Invalid TXI input stream");
     }
-
     char buf[64];
-
     do {
         in->getline(buf, sizeof(buf));
 

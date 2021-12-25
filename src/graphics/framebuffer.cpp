@@ -92,7 +92,7 @@ static GLenum getAttachmentGL(Framebuffer::Attachment attachment) {
 
 void Framebuffer::attachTexture(const Texture &texture, Attachment attachment) const {
     auto attachmentGL = getAttachmentGL(attachment);
-    if (texture.isCubeMap() || texture.isMultilayer()) {
+    if (texture.isCubemap() || texture.isMultilayer()) {
         glFramebufferTexture(GL_FRAMEBUFFER, attachmentGL, texture.nameGL(), 0);
     } else {
         GLenum target = texture.isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;

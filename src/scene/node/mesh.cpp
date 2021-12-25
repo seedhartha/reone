@@ -77,10 +77,7 @@ void MeshSceneNode::refreshAdditionalTextures() {
         _nodeTextures.envmap = _textures.get(features.bumpyShinyTexture, TextureUsage::EnvironmentMap);
     }
     if (!features.bumpmapTexture.empty()) {
-        auto bumpmap = _textures.get(features.bumpmapTexture, TextureUsage::NormalMap);
-        if (bumpmap) {
-            _nodeTextures.bumpmap = _textures.get(features.bumpmapTexture, bumpmap->isGrayscale() ? TextureUsage::HeightMap : TextureUsage::NormalMap);
-        }
+        _nodeTextures.bumpmap = _textures.get(features.bumpmapTexture, TextureUsage::BumpMap);
     }
 }
 

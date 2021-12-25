@@ -43,27 +43,29 @@ private:
     TextureUsage _usage;
 
     uint32_t _dataSize {0};
-    bool _compressed {false};
     uint16_t _width {0};
     uint16_t _height {0};
     EncodingType _encoding {EncodingType::Grayscale};
-    uint8_t _mipMapCount {0};
-    bool _cubeMap {false};
-    std::vector<Texture::Layer> _pixels;
-    ByteArray _txiData;
+    bool _compressed {false};
+    int _numLayers {0};
+    uint8_t _numMipMaps {0};
+
+    std::vector<Texture::Layer> _layers;
     Texture::Features _features;
 
     std::shared_ptr<Texture> _texture;
+    ByteArray _txiData;
 
     void doLoad() override;
 
-    void loadPixels();
+    void loadLayers();
     void loadFeatures();
 
-    void makeTexture();
+    void loadTexture();
 
     void getMipMapSize(int index, int &width, int &height) const;
     int getMipMapDataSize(int width, int height) const;
+
     PixelFormat getPixelFormat() const;
 };
 

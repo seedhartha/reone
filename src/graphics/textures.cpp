@@ -122,10 +122,14 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     }
 
     if (texture) {
+        if (texture->isCubemap()) {
+            prepareCubemap(*texture);
+        }
         texture->init();
     } else {
         warn("Texture not found: " + resRef, LogChannels::graphics);
     }
+
     return move(texture);
 }
 
