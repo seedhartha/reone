@@ -102,6 +102,7 @@ private:
         static constexpr int transform = 1;
         static constexpr int alpha = 2;
         static constexpr int selfIllumColor = 4;
+        static constexpr int color = 8;
     };
 
     struct AnimationState {
@@ -109,6 +110,7 @@ private:
         glm::mat4 transform {1.0f};
         float alpha {0.0f};
         glm::vec3 selfIllumColor {0.0f};
+        glm::vec3 color {0.0f};
     };
 
     struct AnimationChannel {

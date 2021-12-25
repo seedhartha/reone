@@ -337,6 +337,7 @@ void MeshSceneNode::draw() {
             shaderLight.multiplier = lights[i]->multiplier() * lights[i]->strength();
             shaderLight.radius = lights[i]->radius();
             shaderLight.ambientOnly = static_cast<int>(lights[i]->modelNode().light()->ambientOnly);
+            shaderLight.dynamicType = lights[i]->modelNode().light()->dynamicType;
         }
     }
 
@@ -410,22 +411,14 @@ bool MeshSceneNode::isLightingEnabled() const {
     if (!isLightingEnabledByUsage(_model.usage())) {
         return false;
     }
-
-    // Lighting is disabled for lightmapped models, unless dynamic room lighting is enabled
-    if (_nodeTextures.lightmap) {
-        return false;
-    }
-
     // Lighting is disabled for self-illuminated model nodes, e.g. sky boxes
     if (isSelfIlluminated()) {
         return false;
     }
-
     // Lighting is disabled when diffuse texture is additive
     if (_nodeTextures.diffuse && _nodeTextures.diffuse->isAdditive()) {
         return false;
     }
-
     return true;
 }
 

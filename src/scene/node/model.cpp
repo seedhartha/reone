@@ -414,25 +414,26 @@ void ModelSceneNode::computeAnimationStates(AnimationChannel &channel, float tim
                 state.flags |= AnimationStateFlags::transform;
             }
         }
-
         if (state.flags & AnimationStateFlags::transform) {
             state.transform *= glm::scale(glm::vec3(scale));
             state.transform *= glm::translate(position);
             state.transform *= glm::mat4_cast(orientation);
         }
-
         float animAlpha;
         if (animNode->alpha().getByTime(time, animAlpha)) {
             state.flags |= AnimationStateFlags::alpha;
             state.alpha = animAlpha;
         }
-
         glm::vec3 animSelfIllum;
         if (animNode->selfIllumColor().getByTime(time, animSelfIllum)) {
             state.flags |= AnimationStateFlags::selfIllumColor;
             state.selfIllumColor = move(animSelfIllum);
         }
-
+        glm::vec3 animColor;
+        if (animNode->color().getByTime(time, animColor)) {
+            state.flags |= AnimationStateFlags::color;
+            state.color = move(animColor);
+        }
         channel.stateByNodeNumber[modelNode.number()] = move(state);
     }
 
@@ -484,13 +485,18 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
                 combined.flags |= AnimationStateFlags::selfIllumColor;
                 combined.selfIllumColor = state1.selfIllumColor;
             }
+            if (state1.flags & AnimationStateFlags::color) {
+                combined.flags |= AnimationStateFlags::color;
+                combined.color = state1.color;
+            }
             break;
         }
         case AnimationBlendMode::Overlay:
             for (auto &channel : _animChannels) {
                 auto maybeState = channel.stateByNodeNumber.find(modelNode.number());
-                if (maybeState == channel.stateByNodeNumber.end())
+                if (maybeState == channel.stateByNodeNumber.end()) {
                     continue;
+                }
                 const AnimationState &state = maybeState->second;
                 if ((state.flags & AnimationStateFlags::transform) && !(combined.flags & AnimationStateFlags::transform)) {
                     combined.flags |= AnimationStateFlags::transform;
@@ -503,6 +509,10 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
                 if ((state.flags & AnimationStateFlags::selfIllumColor) && !(combined.flags & AnimationStateFlags::selfIllumColor)) {
                     combined.flags |= AnimationStateFlags::selfIllumColor;
                     combined.selfIllumColor = state.selfIllumColor;
+                }
+                if ((state.flags & AnimationStateFlags::color) && !(combined.flags & AnimationStateFlags::color)) {
+                    combined.flags |= AnimationStateFlags::color;
+                    combined.color = state.color;
                 }
             }
             break;
@@ -519,6 +529,9 @@ void ModelSceneNode::applyAnimationStates(const ModelNode &modelNode) {
         if (combined.flags & AnimationStateFlags::selfIllumColor) {
             static_pointer_cast<MeshSceneNode>(sceneNode)->setSelfIllumColor(combined.selfIllumColor);
         }
+        if (combined.flags & AnimationStateFlags::color) {
+            static_pointer_cast<LightSceneNode>(sceneNode)->setColor(combined.color);
+        }
     }
 
     for (auto &child : modelNode.children()) {
@@ -531,13 +544,13 @@ bool ModelSceneNode::isAnimationFinished() const {
 }
 
 string ModelSceneNode::getActiveAnimationName() const {
-    if (_animChannels.empty())
+    if (_animChannels.empty()) {
         return "";
-
+    }
     const AnimationChannel &channel = _animChannels.front();
-    if (!channel.anim || channel.finished)
+    if (!channel.anim || channel.finished) {
         return "";
-
+    }
     return channel.anim->name();
 }
 
