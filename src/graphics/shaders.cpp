@@ -749,10 +749,13 @@ void main() {
 static const string g_fsBlinnPhong = R"END(
 void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
-    vec3 N = getNormal(uv);
-    float shadow = getShadow(N);
     vec4 diffuseSample = texture(sDiffuseMap, uv);
     bool opaque = isFeatureEnabled(FEATURE_ENVMAP) || isFeatureEnabled(FEATURE_NORMALMAP) || isFeatureEnabled(FEATURE_HEIGHTMAP);
+    if (!opaque && diffuseSample.a == 0.0) {
+        discard;
+    }
+    vec3 N = getNormal(uv);
+    float shadow = getShadow(N);
 
     vec3 lighting;
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
