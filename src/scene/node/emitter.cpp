@@ -232,27 +232,22 @@ void EmitterSceneNode::detonate() {
     doSpawnParticle();
 }
 
-void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs, int count) {
+void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }
-    if (count == -1) {
-        count = static_cast<int>(leafs.size());
-    }
-
     shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
     shared_ptr<Texture> texture(emitter->texture);
     if (!texture) {
         return;
     }
-
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::particles;
     uniforms.particles.gridSize = emitter->gridSize;
     uniforms.particles.render = static_cast<int>(emitter->renderMode);
 
-    for (int i = 0; i < count; ++i) {
+    for (size_t i = 0; i < leafs.size(); ++i) {
         auto particle = static_cast<ParticleSceneNode *>(leafs[i]);
         auto transform = particle->absoluteTransform();
         if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
@@ -272,8 +267,8 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs, int count) {
 
     auto lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
     auto blendMode = lighten ? BlendMode::Lighten : BlendMode::Default;
-    _graphicsContext.withBlending(blendMode, [this, &count]() {
-        _meshes.billboard().drawInstanced(count);
+    _graphicsContext.withBlending(blendMode, [this, &leafs]() {
+        _meshes.billboard().drawInstanced(leafs.size());
     });
 }
 

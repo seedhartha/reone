@@ -216,7 +216,7 @@ private:
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
 
-    std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _leafs; // particles and grass clusters
+    std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _leafBuckets; // particles and grass clusters
 
     // END Leafs
 

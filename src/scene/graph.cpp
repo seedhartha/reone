@@ -375,17 +375,28 @@ void SceneGraph::prepareLeafs() {
     sort(leafs.begin(), leafs.end(), [](auto &left, auto &right) { return left.second > right.second; });
 
     // Group leafs into buckets
-    _leafs.clear();
-    vector<SceneNode *> nodeLeafs;
+    _leafBuckets.clear();
+    SceneNode *bucketParent = nullptr;
+    vector<SceneNode *> bucket;
     for (auto &leafDepth : leafs) {
-        if (!nodeLeafs.empty()) {
-            _leafs.push_back(make_pair(nodeLeafs[0]->parent(), nodeLeafs));
-            nodeLeafs.clear();
+        auto parent = leafDepth.first->parent();
+        if (!bucket.empty()) {
+            int maxCount = 1;
+            if (parent->type() == SceneNodeType::Grass) {
+                maxCount = kMaxGrassClusters;
+            } else if (parent->type() == SceneNodeType::Emitter) {
+                maxCount = kMaxParticles;
+            }
+            if (bucketParent != parent || bucket.size() >= maxCount) {
+                _leafBuckets.push_back(make_pair(bucketParent, bucket));
+                bucket.clear();
+            }
         }
-        nodeLeafs.push_back(leafDepth.first);
+        bucketParent = parent;
+        bucket.push_back(leafDepth.first);
     }
-    if (!nodeLeafs.empty()) {
-        _leafs.push_back(make_pair(nodeLeafs[0]->parent(), nodeLeafs));
+    if (bucketParent && !bucket.empty()) {
+        _leafBuckets.push_back(make_pair(bucketParent, bucket));
     }
 }
 
@@ -409,9 +420,8 @@ void SceneGraph::draw() {
     });
 
     // Render particles and grass clusters
-    for (auto &nodeLeaf : _leafs) {
-        int count = nodeLeaf.first->type() == SceneNodeType::Grass && nodeLeaf.second.size() > kMaxGrassClusters ? kMaxGrassClusters : -1;
-        nodeLeaf.first->drawLeafs(nodeLeaf.second, count);
+    for (auto &bucket : _leafBuckets) {
+        bucket.first->drawLeafs(bucket.second);
     }
 
     // Render lens flare
