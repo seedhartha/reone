@@ -83,6 +83,7 @@ private:
         std::shared_ptr<graphics::Texture> lightmap;
         std::shared_ptr<graphics::Texture> envmap;
         std::shared_ptr<graphics::Texture> bumpmap;
+        std::shared_ptr<graphics::Texture> danglyConstraints;
     } _nodeTextures;
 
     struct DanglymeshAnimation {

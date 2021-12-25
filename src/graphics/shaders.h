@@ -83,7 +83,6 @@ private:
     std::shared_ptr<UniformBuffer> _ubSkeletal;
     std::shared_ptr<UniformBuffer> _ubParticles;
     std::shared_ptr<UniformBuffer> _ubGrass;
-    std::shared_ptr<UniformBuffer> _ubDanglymesh;
 
     // END Uniform Buffers
 

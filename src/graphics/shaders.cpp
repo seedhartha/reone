@@ -53,7 +53,6 @@ const int MAX_LIGHTS = 16;
 const int MAX_PARTICLES = 64;
 const int MAX_TEXT_CHARS = 128;
 const int MAX_GRASS_CLUSTERS = 256;
-const int MAX_DANGLYMESH_CONSTRAINTS = 2048;
 
 const float SHININESS = 8.0;
 
@@ -75,6 +74,7 @@ layout(std140) uniform General {
     vec4 uFogColor;
     vec4 uHeightMapFrameBounds;
     vec4 uShadowLightPosition;
+    vec4 uDanglyStrideDisplacement;
     vec2 uBlurResolution;
     vec2 uBlurDirection;
     float uAlpha;
@@ -136,12 +136,6 @@ struct GrassCluster {
 layout(std140) uniform Grass {
     vec2 uGrassQuadSize;
     GrassCluster uGrassClusters[MAX_GRASS_CLUSTERS];
-};
-
-layout(std140) uniform Danglymesh {
-    vec4 uDanglymeshStride;
-    float uDanglymeshDisplacement;
-    vec4 uDanglymeshConstraints[MAX_DANGLYMESH_CONSTRAINTS];
 };
 
 bool isFeatureEnabled(int flag) {
@@ -367,6 +361,8 @@ void main() {
 )END";
 
 static const string g_vsModel = R"END(
+uniform sampler1D sDanglyConstraints;
+
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aUV1;
@@ -413,9 +409,9 @@ void main() {
             (uBones[i4] * normal) * w4;
 
     } else if (isFeatureEnabled(FEATURE_DANGLYMESH)) {
-        float multiplier = uDanglymeshConstraints[gl_VertexID / 4][gl_VertexID % 4];
-        vec3 maxStride = vec3(multiplier * uDanglymeshDisplacement);
-        vec3 stride = clamp(uDanglymeshStride.xyz, -maxStride, maxStride);
+        float multiplier = texelFetch(sDanglyConstraints, gl_VertexID, 0).r;
+        vec3 maxStride = vec3(multiplier * uDanglyStrideDisplacement.w);
+        vec3 stride = clamp(uDanglyStrideDisplacement.xyz, -maxStride, maxStride);
         position += vec4(stride, 0.0);
     }
 
@@ -878,14 +874,12 @@ void Shaders::init() {
     static SkeletalUniforms defaultsSkeletal;
     static ParticlesUniforms defaultsParticles;
     static GrassUniforms defaultsGrass;
-    static DanglymeshUniforms defaultsDanglymesh;
     _ubGeneral = initUniformBuffer(&defaultsGeneral, sizeof(GeneralUniforms));
     _ubText = initUniformBuffer(&defaultsText, sizeof(TextUniforms));
     _ubLighting = initUniformBuffer(&defaultsLighting, sizeof(LightingUniforms));
     _ubSkeletal = initUniformBuffer(&defaultsSkeletal, sizeof(SkeletalUniforms));
     _ubParticles = initUniformBuffer(&defaultsParticles, sizeof(ParticlesUniforms));
     _ubGrass = initUniformBuffer(&defaultsGrass, sizeof(GrassUniforms));
-    _ubDanglymesh = initUniformBuffer(&defaultsDanglymesh, sizeof(DanglymeshUniforms));
 
     _inited = true;
 }
@@ -917,7 +911,6 @@ void Shaders::deinit() {
     _ubSkeletal.reset();
     _ubParticles.reset();
     _ubGrass.reset();
-    _ubDanglymesh.reset();
 
     _inited = false;
 }
@@ -948,6 +941,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sLightmap", TextureUnits::lightmap);
     program->setUniform("sBumpMap", TextureUnits::bumpMap);
     program->setUniform("sBloom", TextureUnits::bloom);
+    program->setUniform("sDanglyConstraints", TextureUnits::danglyConstraints);
     program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
     program->setUniform("sCubeShadowMap", TextureUnits::cubeShadowMap);
     program->setUniform("sShadowMap", TextureUnits::shadowMap);
@@ -959,7 +953,6 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->bindUniformBlock("Skeletal", UniformBlockBindingPoints::skeletal);
     program->bindUniformBlock("Particles", UniformBlockBindingPoints::particles);
     program->bindUniformBlock("Grass", UniformBlockBindingPoints::grass);
-    program->bindUniformBlock("Danglymesh", UniformBlockBindingPoints::danglymesh);
 
     return move(program);
 }
@@ -994,10 +987,6 @@ void Shaders::refreshUniforms() {
     if (_uniforms.general.featureMask & UniformsFeatureFlags::grass) {
         _ubGrass->bind(UniformBlockBindingPoints::grass);
         _ubGrass->setData(&_uniforms.grass, sizeof(GrassUniforms), true);
-    }
-    if (_uniforms.general.featureMask & UniformsFeatureFlags::danglymesh) {
-        _ubDanglymesh->bind(UniformBlockBindingPoints::danglymesh);
-        _ubDanglymesh->setData(&_uniforms.danglymesh, sizeof(DanglymeshUniforms), true);
     }
 }
 
