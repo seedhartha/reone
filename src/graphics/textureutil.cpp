@@ -165,6 +165,7 @@ Texture::Properties getTextureProperties(TextureUsage usage, int numSamples) {
     }
 
     if (usage == TextureUsage::Lookup) {
+        properties.minFilter = Texture::Filtering::Nearest;
         properties.lookup = true;
     }
 
