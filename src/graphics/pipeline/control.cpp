@@ -43,37 +43,41 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     int w = extent[2];
     int h = extent[3];
 
-    auto colorBuffer1 = make_shared<Texture>("color1", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
-    colorBuffer1->clear(w, h, PixelFormat::RGBA);
-    colorBuffer1->init();
+    // Multi-sample geometry framebuffer
 
-    auto depthBuffer1 = make_shared<Renderbuffer>(_options.aaSamples);
-    depthBuffer1->configure(w, h, PixelFormat::Depth);
-    depthBuffer1->init();
+    auto cbGeometryMS = make_shared<Texture>("geometry_color_ms", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
+    cbGeometryMS->clear(w, h, PixelFormat::RGBA);
+    cbGeometryMS->init();
 
-    auto framebuffer1 = make_unique<Framebuffer>();
-    framebuffer1->attachColorDepth(colorBuffer1, depthBuffer1);
-    framebuffer1->init();
+    auto dbGeometryMS = make_shared<Renderbuffer>(_options.aaSamples);
+    dbGeometryMS->configure(w, h, PixelFormat::Depth);
+    dbGeometryMS->init();
 
-    auto colorBuffer2 = make_shared<Texture>("color2", getTextureProperties(TextureUsage::ColorBuffer));
-    colorBuffer2->clear(w, h, PixelFormat::RGBA);
-    colorBuffer2->init();
+    auto fbGeometryMS = make_unique<Framebuffer>();
+    fbGeometryMS->attachColorDepth(cbGeometryMS, dbGeometryMS);
+    fbGeometryMS->init();
 
-    auto depthBuffer2 = make_shared<Renderbuffer>();
-    depthBuffer2->configure(w, h, PixelFormat::Depth);
-    depthBuffer2->init();
+    // Geometry framebuffer
 
-    auto framebuffer2 = make_unique<Framebuffer>();
-    framebuffer2->attachColorDepth(colorBuffer2, depthBuffer2);
-    framebuffer2->init();
+    auto cbGeometry = make_shared<Texture>("geometry_color", getTextureProperties(TextureUsage::ColorBuffer));
+    cbGeometry->clear(w, h, PixelFormat::RGBA);
+    cbGeometry->init();
+
+    auto dbGeometry = make_shared<Renderbuffer>();
+    dbGeometry->configure(w, h, PixelFormat::Depth);
+    dbGeometry->init();
+
+    auto fbGeometry = make_unique<Framebuffer>();
+    fbGeometry->attachColorDepth(cbGeometry, dbGeometry);
+    fbGeometry->init();
 
     Attachments attachments;
-    attachments.colorBuffer1 = move(colorBuffer1);
-    attachments.colorBuffer2 = move(colorBuffer2);
-    attachments.depthBuffer1 = move(depthBuffer1);
-    attachments.depthBuffer2 = move(depthBuffer2);
-    attachments.framebuffer1 = move(framebuffer1);
-    attachments.framebuffer2 = move(framebuffer2);
+    attachments.cbGeometryMS = move(cbGeometryMS);
+    attachments.dbGeometryMS = move(dbGeometryMS);
+    attachments.fbGeometryMS = move(fbGeometryMS);
+    attachments.cbGeometry = move(cbGeometry);
+    attachments.dbGeometry = move(dbGeometry);
+    attachments.fbGeometry = move(fbGeometry);
     _attachments.insert(make_pair(attachmentsId, move(attachments)));
 }
 
@@ -88,11 +92,12 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
         return;
     }
     auto &attachments = maybeAttachments->second;
-    auto &framebuffer1 = *attachments.framebuffer1;
-    auto &framebuffer2 = *attachments.framebuffer2;
+    auto &fbGeometryMS = *attachments.fbGeometryMS;
+    auto &fbGeometry = *attachments.fbGeometry;
+    int w = extent[2];
+    int h = extent[3];
 
     // Set global uniforms
-
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.projection = camera->projection();
@@ -100,47 +105,41 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
     uniforms.general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
 
-    int w = extent[2];
-    int h = extent[3];
-    _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &w, &h, &scene, &framebuffer1, &framebuffer2]() {
-        // Draw scene to multi-sample framebuffer
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer1.nameGL());
+    // Draw scene to multi-sample framebuffer
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometryMS.nameGL());
+    _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &w, &h, &scene]() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         scene.draw();
-
-        // Blit multi-sample framebuffer to a second framebuffer
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer1.nameGL());
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer2.nameGL());
-        for (int i = 0; i < 2; ++i) {
-            glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
-            glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
-            glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        }
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     });
 
-    // Draw control
+    // Blit multi-sample geometry framebuffer to geometry framebuffer
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbGeometryMS.nameGL());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometry.nameGL());
+    for (int i = 0; i < 2; ++i) {
+        glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
+        glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
+        glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    }
 
-    _textures.bind(*attachments.colorBuffer2);
+    // Reset framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // Present geometry framebuffer
     glm::mat4 projection(glm::ortho(
         0.0f,
         static_cast<float>(_options.width),
         static_cast<float>(_options.height),
         0.0f));
-
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(extent[0] + offset.x, extent[1] + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(extent[2], extent[3], 1.0f));
-
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
     uniforms.general.projection = move(projection);
     uniforms.general.model = move(transform);
-
+    _shaders.use(_shaders.gui(), true);
+    _textures.bind(*attachments.cbGeometry);
     _graphicsContext.withoutDepthTest([this]() {
-        _shaders.use(_shaders.gui(), true);
         _meshes.quad().draw();
     });
 }

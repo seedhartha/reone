@@ -53,7 +53,7 @@ public:
 
     void draw();
 
-    std::shared_ptr<Texture> screenshot() { return _screenshotColor; }
+    std::shared_ptr<Texture> screenshot() { return _cbScreenshot; }
 
     void setScene(IScene &scene) { _scene = &scene; }
     void setTakeScreenshot(bool take) { _takeScreenshot = take; }
@@ -78,38 +78,43 @@ private:
 
     // Framebuffers
 
-    std::shared_ptr<Framebuffer> _geometry1;
-    std::shared_ptr<Framebuffer> _geometry2;
-    std::shared_ptr<Framebuffer> _verticalBlur;
-    std::shared_ptr<Framebuffer> _horizontalBlur;
-    std::shared_ptr<Framebuffer> _pointLightShadows;
-    std::shared_ptr<Framebuffer> _directionalLightShadows;
-    std::shared_ptr<Framebuffer> _screenshot;
+    std::shared_ptr<Framebuffer> _fbGeometryMS;
+    std::shared_ptr<Framebuffer> _fbGeometry;
+    std::shared_ptr<Framebuffer> _fbVerticalBlur;
+    std::shared_ptr<Framebuffer> _fbHorizontalBlur;
+    std::shared_ptr<Framebuffer> _fbPointLightShadows;
+    std::shared_ptr<Framebuffer> _fbDirectionalLightShadows;
+    std::shared_ptr<Framebuffer> _fbScreenshot;
 
     // END Framebuffers
 
-    // Attachments
+    // Color Buffers
 
-    std::shared_ptr<Renderbuffer> _depthRenderbuffer;
-    std::shared_ptr<Renderbuffer> _depthRenderbufferMultisample;
-    std::shared_ptr<Texture> _geometry1Color1;
-    std::shared_ptr<Texture> _geometry1Color2;
-    std::shared_ptr<Texture> _geometry2Color1;
-    std::shared_ptr<Texture> _geometry2Color2;
-    std::shared_ptr<Texture> _verticalBlurColor;
-    std::shared_ptr<Texture> _horizontalBlurColor;
-    std::shared_ptr<Texture> _shadowsDepth;
-    std::shared_ptr<Texture> _cubeShadowsDepth;
-    std::shared_ptr<Texture> _screenshotColor;
+    std::shared_ptr<Texture> _cbGeometry1MS;
+    std::shared_ptr<Texture> _cbGeometry2MS;
+    std::shared_ptr<Texture> _cbGeometry1;
+    std::shared_ptr<Texture> _cbGeometry2;
+    std::shared_ptr<Texture> _cbVerticalBlur;
+    std::shared_ptr<Texture> _cbHorizontalBlur;
+    std::shared_ptr<Texture> _cbScreenshot;
 
-    // END Attachments
+    // END Color Buffers
+
+    // Depth Buffers
+
+    std::shared_ptr<Renderbuffer> _dbCommonMS;
+    std::shared_ptr<Renderbuffer> _dbCommon;
+    std::shared_ptr<Texture> _dbDirectionalLightShadows;
+    std::shared_ptr<Texture> _dbPointLightShadows;
+
+    // END Depth Buffers
 
     void computeLightSpaceMatrices();
     void drawShadows();
     void drawGeometry();
-    void applyHorizontalBlur();
-    void applyVerticalBlur();
-    void drawResult();
+    void drawHorizontalBlur();
+    void drawVerticalBlur();
+    void presentWorld();
 };
 
 } // namespace graphics
