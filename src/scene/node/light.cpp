@@ -71,14 +71,11 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     if (!camera) {
         return;
     }
-    _textures.bind(*flare.texture, TextureUnits::diffuseMap);
-
     float aspect = flare.texture->width() / static_cast<float>(flare.texture->height());
-    float baseFlareSize = 50.0f;
 
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(_absTransform[3]));
-    transform = glm::scale(transform, glm::vec3(aspect * flare.size * baseFlareSize, flare.size * baseFlareSize, 1.0f));
+    transform = glm::scale(transform, glm::vec3(aspect * flare.size, flare.size, 1.0f));
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
@@ -86,8 +83,9 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     uniforms.general.alpha = 0.5f;
     // uniforms.general.color = glm::vec4(flare.colorShift, 1.0f);
 
+    _shaders.use(_shaders.billboard(), true);
+    _textures.bind(*flare.texture, TextureUnits::diffuseMap);
     _graphicsContext.withBlending(BlendMode::Add, [this]() {
-        _shaders.use(_shaders.billboard(), true);
         _meshes.billboard().draw();
     });
 }

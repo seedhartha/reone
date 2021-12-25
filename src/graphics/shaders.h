@@ -38,7 +38,6 @@ public:
     Uniforms &uniforms() { return _uniforms; }
 
     ShaderProgram &simpleColor() const { return *_spSimpleColor; }
-    ShaderProgram &modelColor() const { return *_spModelColor; }
     ShaderProgram &pointLightShadows() const { return *_spPointLightShadows; }
     ShaderProgram &directionalLightShadows() const { return *_spDirectionalLightShadows; }
     ShaderProgram &gui() const { return *_spGUI; }
@@ -60,7 +59,6 @@ private:
     // Shader Programs
 
     std::shared_ptr<ShaderProgram> _spSimpleColor;
-    std::shared_ptr<ShaderProgram> _spModelColor;
     std::shared_ptr<ShaderProgram> _spPointLightShadows;
     std::shared_ptr<ShaderProgram> _spDirectionalLightShadows;
     std::shared_ptr<ShaderProgram> _spGUI;
