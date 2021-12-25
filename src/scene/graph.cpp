@@ -416,9 +416,11 @@ void SceneGraph::draw() {
 
     // Render lens flare
     if (_flareLight) {
-        for (auto &flare : _flareLight->modelNode().light()->flares) {
-            _flareLight->drawLensFlare(flare);
-        }
+        _graphicsContext.withoutDepthTest([this]() {
+            for (auto &flare : _flareLight->modelNode().light()->flares) {
+                _flareLight->drawLensFlare(flare);
+            }
+        });
     }
 }
 
