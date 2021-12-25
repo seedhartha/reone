@@ -50,10 +50,16 @@ private:
 
     resource::Resources &_resources;
 
-    std::shared_ptr<graphics::Texture> _default;
-    std::shared_ptr<graphics::Texture> _defaultCubemap;
-    std::shared_ptr<graphics::Texture> _defaultArray;
     std::unordered_map<std::string, std::shared_ptr<Texture>> _cache;
+
+    // Defaults
+
+    std::shared_ptr<graphics::Texture> _defaultRGB;
+    std::shared_ptr<graphics::Texture> _defaultArrayDepth;
+    std::shared_ptr<graphics::Texture> _defaultCubemapRGB;
+    std::shared_ptr<graphics::Texture> _defaultCubemapDepth;
+
+    // END Defaults
 
     std::shared_ptr<Texture> doGet(const std::string &resRef, TextureUsage usage);
 };

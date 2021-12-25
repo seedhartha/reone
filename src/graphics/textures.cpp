@@ -38,20 +38,21 @@ namespace reone {
 namespace graphics {
 
 void Textures::init() {
-    // Initialize default texture
-    _default = make_shared<Texture>("default", getTextureProperties(TextureUsage::Default));
-    _default->clear(1, 1, PixelFormat::RGB);
-    _default->init();
+    _defaultRGB = make_shared<Texture>("default_rgb", getTextureProperties(TextureUsage::Default));
+    _defaultRGB->clear(1, 1, PixelFormat::RGB);
+    _defaultRGB->init();
 
-    // Initialize default cubemap texture
-    _defaultCubemap = make_shared<Texture>("default_cubemap", getTextureProperties(TextureUsage::DefaultCubeMap));
-    _defaultCubemap->clear(1, 1, PixelFormat::RGB);
-    _defaultCubemap->init();
+    _defaultCubemapRGB = make_shared<Texture>("default_cubemap_rgb", getTextureProperties(TextureUsage::DefaultCubeMap));
+    _defaultCubemapRGB->clear(1, 1, PixelFormat::RGB, kNumCubeFaces);
+    _defaultCubemapRGB->init();
 
-    // Initialize default array texture
-    _defaultArray = make_shared<Texture>("default_array", getTextureProperties(TextureUsage::Default));
-    _defaultArray->clear(1, 1, PixelFormat::RGB, kNumShadowCascades);
-    _defaultArray->init();
+    _defaultCubemapDepth = make_shared<Texture>("default_cubemap_depth", getTextureProperties(TextureUsage::DefaultCubeMap));
+    _defaultCubemapDepth->clear(1, 1, PixelFormat::Depth, kNumCubeFaces);
+    _defaultCubemapDepth->init();
+
+    _defaultArrayDepth = make_shared<Texture>("default_array_depth", getTextureProperties(TextureUsage::Default));
+    _defaultArrayDepth->clear(1, 1, PixelFormat::Depth, kNumShadowCascades);
+    _defaultArrayDepth->init();
 
     bindDefaults();
 }
@@ -69,13 +70,13 @@ void Textures::bind(Texture &texture, int unit) {
 }
 
 void Textures::bindDefaults() {
-    bind(*_default, TextureUnits::diffuseMap);
-    bind(*_default, TextureUnits::lightmap);
-    bind(*_defaultCubemap, TextureUnits::environmentMap);
-    bind(*_default, TextureUnits::bumpMap);
-    bind(*_default, TextureUnits::bloom);
-    bind(*_defaultArray, TextureUnits::shadowMap);
-    bind(*_defaultCubemap, TextureUnits::cubeShadowMap);
+    bind(*_defaultRGB, TextureUnits::diffuseMap);
+    bind(*_defaultRGB, TextureUnits::lightmap);
+    bind(*_defaultRGB, TextureUnits::bumpMap);
+    bind(*_defaultRGB, TextureUnits::bloom);
+    bind(*_defaultCubemapRGB, TextureUnits::environmentMap);
+    bind(*_defaultCubemapDepth, TextureUnits::cubeShadowMap);
+    bind(*_defaultArrayDepth, TextureUnits::shadowMap);
 }
 
 shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {

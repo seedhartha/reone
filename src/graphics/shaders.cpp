@@ -155,9 +155,9 @@ const float SELFILLUM_THRESHOLD = 0.85;
 uniform sampler2D sDiffuseMap;
 uniform sampler2D sLightmap;
 uniform sampler2D sBumpMap;
-uniform sampler2DArray sShadowMap;
 uniform samplerCube sEnvironmentMap;
 uniform samplerCube sCubeShadowMap;
+uniform sampler2DArray sShadowMap;
 
 in vec3 fragPosWorldSpace;
 in vec3 fragNormalWorldSpace;
@@ -946,11 +946,11 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     // Samplers
     program->setUniform("sDiffuseMap", TextureUnits::diffuseMap);
     program->setUniform("sLightmap", TextureUnits::lightmap);
-    program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
     program->setUniform("sBumpMap", TextureUnits::bumpMap);
     program->setUniform("sBloom", TextureUnits::bloom);
-    program->setUniform("sShadowMap", TextureUnits::shadowMap);
+    program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
     program->setUniform("sCubeShadowMap", TextureUnits::cubeShadowMap);
+    program->setUniform("sShadowMap", TextureUnits::shadowMap);
 
     // Uniform Blocks
     program->bindUniformBlock("General", UniformBlockBindingPoints::general);
