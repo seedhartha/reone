@@ -73,35 +73,21 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     }
     _textures.bind(*flare.texture, TextureUnits::diffuseMap);
 
-    glm::vec4 lightPos(_absTransform[3]);
-    glm::vec4 lightPosNdc(camera->projection() * camera->view() * lightPos);
-    if (lightPosNdc.z < 0.0f) {
-        return;
-    }
-    float w = static_cast<float>(_sceneGraph.options().width);
-    float h = static_cast<float>(_sceneGraph.options().height);
-
-    glm::vec3 lightPosScreen(glm::vec3(lightPosNdc) / lightPosNdc.w);
-    lightPosScreen += 1.0f;
-    lightPosScreen /= 2.0f;
-    lightPosScreen *= glm::vec3(w, h, 1.0f);
-
     float aspect = flare.texture->width() / static_cast<float>(flare.texture->height());
     float baseFlareSize = 50.0f;
 
     glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(lightPosScreen.x, lightPosScreen.y, 0.0f));
+    transform = glm::translate(transform, glm::vec3(_absTransform[3]));
     transform = glm::scale(transform, glm::vec3(aspect * flare.size * baseFlareSize, flare.size * baseFlareSize, 1.0f));
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
-    uniforms.general.projection = glm::ortho(0.0f, w, 0.0f, h);
     uniforms.general.model = move(transform);
     uniforms.general.alpha = 0.5f;
     // uniforms.general.color = glm::vec4(flare.colorShift, 1.0f);
 
     _graphicsContext.withBlending(BlendMode::Add, [this]() {
-        _shaders.use(_shaders.gui(), true);
+        _shaders.use(_shaders.billboard(), true);
         _meshes.billboard().draw();
     });
 }
