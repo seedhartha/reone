@@ -47,7 +47,6 @@ public:
     void setSpeakerPosition(glm::vec3 position);
     void setListenerPosition(glm::vec3 position);
     void setVariant(Variant variant);
-    void setFindObstacle(std::function<bool(const glm::vec3 &, const glm::vec3 &, glm::vec3 &)> fn);
 
 private:
     scene::SceneGraph &_sceneGraph;

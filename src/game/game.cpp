@@ -108,8 +108,8 @@ void Game::runMainLoop() {
 void Game::update() {
     float dt = measureFrameTime();
 
-    if (_video) {
-        updateVideo(dt);
+    if (_movie) {
+        updateMovie(dt);
     } else {
         updateMusic();
     }
@@ -118,7 +118,7 @@ void Game::update() {
     }
     updateCamera(dt);
 
-    bool updModule = !_video && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
+    bool updModule = !_movie && _module && (_screen == GameScreen::InGame || _screen == GameScreen::Conversation);
     if (updModule && !_paused) {
         _module->update(dt);
         _combat.update(dt);
@@ -134,8 +134,8 @@ void Game::update() {
 }
 
 void Game::drawAll() {
-    if (_video) {
-        _video->draw();
+    if (_movie) {
+        _movie->draw();
     } else {
         drawWorld();
         drawGUI();
@@ -259,8 +259,8 @@ void Game::playVideo(const string &name) {
     BikReader bik(path, _services.graphicsContext, _services.meshes, _services.shaders, _services.textures, _services.audioPlayer);
     bik.load();
 
-    _video = bik.video();
-    if (!_video) {
+    _movie = bik.movie();
+    if (!_movie) {
         return;
     }
 
@@ -352,11 +352,11 @@ void Game::drawGUI() {
     }
 }
 
-void Game::updateVideo(float dt) {
-    _video->update(dt);
+void Game::updateMovie(float dt) {
+    _movie->update(dt);
 
-    if (_video->isFinished()) {
-        _video.reset();
+    if (_movie->isFinished()) {
+        _movie.reset();
     }
 }
 
@@ -451,7 +451,7 @@ bool Game::handle(const SDL_Event &event) {
     if (_profileOverlay->handle(event))
         return true;
 
-    if (!_video) {
+    if (!_movie) {
         GUI *gui = getScreenGUI();
         if (gui && gui->handle(event)) {
             return true;
@@ -497,8 +497,8 @@ bool Game::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     if (event.button != SDL_BUTTON_LEFT)
         return false;
 
-    if (_video) {
-        _video->finish();
+    if (_movie) {
+        _movie->finish();
         return true;
     }
 

@@ -50,6 +50,14 @@ void GraphicsContext::init() {
     _inited = true;
 }
 
+void GraphicsContext::clearColorDepth() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void GraphicsContext::clearDepth() {
+    glClear(GL_DEPTH_BUFFER_BIT);
+}
+
 void GraphicsContext::withBlending(BlendMode mode, const function<void()> &block) {
     auto oldBlendMode = _blendMode;
     if (oldBlendMode == mode) {

@@ -171,7 +171,7 @@ protected:
 
     uint32_t _ticks {0};
     bool _quit {false};
-    std::shared_ptr<movie::Movie> _video;
+    std::shared_ptr<movie::Movie> _movie;
     CursorType _cursorType {CursorType::None};
     float _gameSpeed {1.0f};
     CameraType _cameraType {CameraType::ThirdPerson};
@@ -246,7 +246,7 @@ protected:
     float measureFrameTime();
 
     void updateMusic();
-    void updateVideo(float dt);
+    void updateMovie(float dt);
     void updateCamera(float dt);
     void updateSceneGraph(float dt);
 

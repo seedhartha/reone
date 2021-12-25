@@ -297,7 +297,7 @@ private:
     }
 
     void seekBeginning() {
-        av_seek_frame(_formatCtx, _audioStreamIdx, streamTimestampFromTime(_audioStreamIdx, 0.0f), AVSEEK_FLAG_ANY);
+        av_seek_frame(_formatCtx, -1, 0, AVSEEK_FLAG_ANY);
     }
 
     int64_t streamTimestampFromTime(int streamIdx, float time) {
@@ -326,10 +326,10 @@ void BikReader::load() {
     auto decoder = make_shared<BinkVideoDecoder>(_path);
     decoder->load();
 
-    _video = make_shared<Movie>(_graphicsContext, _meshes, _shaders, _textures, _audioPlayer);
-    _video->setVideoStream(decoder);
-    _video->setAudioStream(decoder->audioStream());
-    _video->init();
+    _movie = make_shared<Movie>(_graphicsContext, _meshes, _shaders, _textures, _audioPlayer);
+    _movie->setVideoStream(decoder);
+    _movie->setAudioStream(decoder->audioStream());
+    _movie->init();
 #endif
 }
 

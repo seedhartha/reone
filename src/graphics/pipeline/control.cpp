@@ -108,7 +108,7 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     // Draw scene to multi-sample framebuffer
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometryMS.nameGL());
     _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &w, &h, &scene]() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        _graphicsContext.clearColorDepth();
         scene.draw();
     });
 
