@@ -751,7 +751,7 @@ void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
     vec4 diffuseSample = texture(sDiffuseMap, uv);
     bool opaque = isFeatureEnabled(FEATURE_ENVMAP) || isFeatureEnabled(FEATURE_NORMALMAP) || isFeatureEnabled(FEATURE_HEIGHTMAP);
-    if (!opaque && diffuseSample.a == 0.0) {
+    if (!opaque && diffuseSample.a < 0.1) {
         discard;
     }
     vec3 N = getNormal(uv);
