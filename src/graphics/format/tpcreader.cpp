@@ -37,32 +37,75 @@ TpcReader::TpcReader(const string &resRef, TextureUsage usage) :
 
 void TpcReader::doLoad() {
     uint32_t dataSize = readUint32();
-    _compressed = dataSize > 0;
 
     ignore(4);
 
-    _width = readUint16();
-    _height = readUint16();
+    uint16_t width = readUint16();
+    uint16_t height = readUint16();
     _encoding = static_cast<EncodingType>(readByte());
-    _mipMapCount = readByte();
+    _numMipMaps = readByte();
 
-    _cubeMap = _height / _width == 6;
-    if (_cubeMap) {
-        _height = _width;
+    bool cubemap = height / width == kNumCubeFaces;
+    if (cubemap) {
+        _width = width;
+        _height = width;
+        _numLayers = kNumCubeFaces;
+    } else {
+        _width = width;
+        _height = height;
+        _numLayers = 1;
     }
 
-    if (_compressed) {
+    if (dataSize > 0) {
         _dataSize = dataSize;
+        _compressed = true;
     } else {
         int w, h;
         getMipMapSize(0, w, h);
         _dataSize = getMipMapDataSize(w, h);
     }
 
-    loadPixels();
+    loadLayers();
     loadFeatures();
+    loadTexture();
+}
 
-    makeTexture();
+void TpcReader::loadLayers() {
+    seek(128);
+
+    _layers.reserve(_numLayers);
+
+    for (int i = 0; i < _numLayers; ++i) {
+        auto pixels = make_shared<ByteArray>(_reader->getBytes(_dataSize));
+
+        // Ignore mip maps
+        for (int j = 1; j < _numMipMaps; ++j) {
+            int w, h;
+            getMipMapSize(j, w, h);
+            _reader->ignore(getMipMapDataSize(w, h));
+        }
+
+        _layers.push_back(Texture::Layer {move(pixels)});
+    }
+}
+
+void TpcReader::loadFeatures() {
+    size_t pos = tell();
+    if (pos >= _size) {
+        return;
+    }
+    _txiData = _reader->getBytes(static_cast<int>(_size - pos));
+
+    TxiReader txi;
+    txi.load(wrap(_txiData));
+
+    _features = txi.features();
+}
+
+void TpcReader::loadTexture() {
+    _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage));
+    _texture->setPixels(_width, _height, getPixelFormat(), _layers);
+    _texture->setFeatures(_features);
 }
 
 void TpcReader::getMipMapSize(int index, int &width, int &height) const {
@@ -91,52 +134,7 @@ int TpcReader::getMipMapDataSize(int width, int height) const {
         }
     }
 
-    throw logic_error("TPC: unable to compute mip map size");
-}
-
-void TpcReader::loadPixels() {
-    seek(128);
-
-    int layerCount = _cubeMap ? 6 : 1;
-    _pixels.reserve(layerCount);
-
-    for (int i = 0; i < layerCount; ++i) {
-        Texture::MipMap mipMap;
-        getMipMapSize(0, mipMap.width, mipMap.height);
-        mipMap.pixels = make_shared<ByteArray>(_reader->getBytes(_dataSize));
-
-        for (int j = 1; j < _mipMapCount; ++j) {
-            _reader->ignore(getMipMapDataSize(mipMap.width, mipMap.height));
-        }
-        Texture::Layer layer;
-        layer.mipMaps.push_back(move(mipMap));
-
-        _pixels.push_back(move(layer));
-    }
-
-    PixelFormat format = getPixelFormat();
-    if (_cubeMap) {
-        prepareCubeMap(_pixels, format, format);
-        _compressed = false;
-    }
-}
-
-void TpcReader::loadFeatures() {
-    size_t pos = tell();
-    if (pos < _size) {
-        _txiData = _reader->getBytes(static_cast<int>(_size - pos));
-
-        TxiReader txi;
-        txi.load(wrap(_txiData));
-
-        _features = txi.features();
-    }
-}
-
-void TpcReader::makeTexture() {
-    _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage));
-    _texture->setPixels(_width, _height, getPixelFormat(), move(_pixels));
-    _texture->setFeatures(move(_features));
+    throw logic_error("Unable to compute TPC mip map size");
 }
 
 PixelFormat TpcReader::getPixelFormat() const {
@@ -149,7 +147,7 @@ PixelFormat TpcReader::getPixelFormat() const {
         case EncodingType::RGBA:
             return PixelFormat::RGBA;
         default:
-            throw logic_error("TCP: unsupported texture encoding: " + to_string(static_cast<int>(_encoding)));
+            throw logic_error("Unsupported uncompressed TPC encoding: " + to_string(static_cast<int>(_encoding)));
         }
     } else
         switch (_encoding) {
@@ -158,7 +156,7 @@ PixelFormat TpcReader::getPixelFormat() const {
         case EncodingType::RGBA:
             return PixelFormat::DXT5;
         default:
-            throw logic_error("TCP: unsupported compressed texture encoding: " + to_string(static_cast<int>(_encoding)));
+            throw logic_error("Unsupported compressed TPC encoding: " + to_string(static_cast<int>(_encoding)));
         }
 }
 

@@ -53,14 +53,14 @@ void CurReader::loadHeader() {
 void CurReader::loadData() {
     seek(44);
 
-    int pixelCount = _width * _width;
+    int numPixels = _width * _width;
     int colorCount = _bitCount == 8 ? 256 : 16;
 
     ByteArray palette(_reader->getBytes(4 * colorCount));
-    ByteArray xorData(_reader->getBytes(pixelCount));
-    ByteArray andData(_reader->getBytes(pixelCount / 8));
+    ByteArray xorData(_reader->getBytes(numPixels));
+    ByteArray andData(_reader->getBytes(numPixels / 8));
 
-    auto pixels = make_shared<ByteArray>(4 * pixelCount);
+    auto pixels = make_shared<ByteArray>(4 * numPixels);
 
     for (int y = 0; y < _width; ++y) {
         for (int x = 0; x < _width; ++x) {
@@ -75,16 +75,8 @@ void CurReader::loadData() {
         }
     }
 
-    Texture::MipMap mipMap;
-    mipMap.width = _width;
-    mipMap.height = _width;
-    mipMap.pixels = move(pixels);
-
-    Texture::Layer layer;
-    layer.mipMaps.push_back(move(mipMap));
-
     _texture = make_shared<Texture>("", getTextureProperties(TextureUsage::GUI));
-    _texture->setPixels(_width, _width, PixelFormat::BGRA, vector<Texture::Layer> {layer});
+    _texture->setPixels(_width, _width, PixelFormat::BGRA, Texture::Layer {move(pixels)});
 }
 
 } // namespace graphics

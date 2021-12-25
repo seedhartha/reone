@@ -111,39 +111,39 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
     uint8_t *pixels = &result[0];
 
     for (int i = 0; i < numLayers; ++i) {
-        const Texture::MipMap &mipMap = _texture->layers()[i].mipMaps.front();
-        const uint8_t *mipMapPtr = reinterpret_cast<const uint8_t *>(mipMap.pixels->data());
+        auto &layer = _texture->layers()[i];
+        auto layerPixelsPtr = reinterpret_cast<const uint8_t *>(layer.pixels->data());
 
         switch (_texture->pixelFormat()) {
         case PixelFormat::Grayscale:
-            memcpy(pixels, mipMapPtr, numPixels);
+            memcpy(pixels, layerPixelsPtr, numPixels);
             break;
         case PixelFormat::RGB:
             for (int j = 0; j < numPixels; ++j) {
-                *(pixels++) = mipMapPtr[2];
-                *(pixels++) = mipMapPtr[1];
-                *(pixels++) = mipMapPtr[0];
-                mipMapPtr += 3;
+                *(pixels++) = layerPixelsPtr[2];
+                *(pixels++) = layerPixelsPtr[1];
+                *(pixels++) = layerPixelsPtr[0];
+                layerPixelsPtr += 3;
             }
             break;
         case PixelFormat::RGBA:
             for (int j = 0; j < numPixels; ++j) {
-                *(pixels++) = mipMapPtr[2];
-                *(pixels++) = mipMapPtr[1];
-                *(pixels++) = mipMapPtr[0];
-                *(pixels++) = mipMapPtr[3];
-                mipMapPtr += 4;
+                *(pixels++) = layerPixelsPtr[2];
+                *(pixels++) = layerPixelsPtr[1];
+                *(pixels++) = layerPixelsPtr[0];
+                *(pixels++) = layerPixelsPtr[3];
+                layerPixelsPtr += 4;
             }
             break;
         case PixelFormat::BGR:
-            memcpy(pixels, mipMapPtr, 3ll * numPixels);
+            memcpy(pixels, layerPixelsPtr, 3ll * numPixels);
             break;
         case PixelFormat::BGRA:
-            memcpy(pixels, mipMapPtr, 4ll * numPixels);
+            memcpy(pixels, layerPixelsPtr, 4ll * numPixels);
             break;
         case PixelFormat::DXT1: {
             vector<uint32_t> decompPixels(numPixels);
-            decompressDXT1(mipMap.width, mipMap.height, mipMapPtr, &decompPixels[0]);
+            decompressDXT1(_texture->width(), _texture->height(), layerPixelsPtr, &decompPixels[0]);
             uint32_t *decompPtr = &decompPixels[0];
             for (int j = 0; j < numPixels; ++j) {
                 uint32_t rgba = *(decompPtr++);
@@ -155,7 +155,7 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
         }
         case PixelFormat::DXT5: {
             vector<uint32_t> decompPixels(numPixels);
-            decompressDXT5(mipMap.width, mipMap.height, mipMapPtr, &decompPixels[0]);
+            decompressDXT5(_texture->width(), _texture->height(), layerPixelsPtr, &decompPixels[0]);
             uint32_t *decompPtr = &decompPixels[0];
             for (int j = 0; j < numPixels; ++j) {
                 uint32_t rgba = *(decompPtr++);

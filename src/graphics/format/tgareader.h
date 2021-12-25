@@ -29,7 +29,11 @@ class Texture;
 
 class TgaReader : public resource::BinaryReader {
 public:
-    TgaReader(const std::string &resRef, TextureUsage usage);
+    TgaReader(std::string resRef, TextureUsage usage) :
+        BinaryReader(0),
+        _resRef(std::move(resRef)),
+        _usage(usage) {
+    }
 
     std::shared_ptr<graphics::Texture> texture() const { return _texture; }
 
@@ -40,7 +44,9 @@ private:
     TGADataType _dataType {TGADataType::RGBA};
     int _width {0};
     int _height {0};
+    int _numLayers {0};
     bool _alpha {false};
+
     std::shared_ptr<Texture> _texture;
 
     void doLoad() override;
