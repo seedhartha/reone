@@ -20,11 +20,13 @@
 #include "../location.h"
 #include "../object/spatial.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void JumpToLocationAction::execute(Object &actor, float dt) {
+void JumpToLocationAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     auto spatialActor = static_cast<SpatialObject *>(&actor);
     spatialActor->setPosition(_location->position());
     spatialActor->setFacing(_location->facing());

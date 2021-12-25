@@ -34,7 +34,7 @@ public:
         _instant(instant) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 
 private:
     std::shared_ptr<Item> _item;

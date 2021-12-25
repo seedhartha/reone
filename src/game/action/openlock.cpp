@@ -31,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-void OpenLockAction::execute(Object &actor, float dt) {
+void OpenLockAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     if (!_object || _object->type() != ObjectType::Door) {
         warn("ActionExecutor: unsupported OpenLock object: " + to_string(_object->id()));
         complete();

@@ -30,7 +30,7 @@ public:
         _feat(feat) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 
     FeatType feat() const { return _feat; }
 

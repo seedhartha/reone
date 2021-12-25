@@ -17,11 +17,13 @@
 
 #include "usetalentatlocation.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void UseTalentAtLocationAction::execute(Object &actor, float dt) {
+void UseTalentAtLocationAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

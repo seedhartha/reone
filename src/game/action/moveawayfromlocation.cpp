@@ -17,11 +17,13 @@
 
 #include "moveawayfromlocation.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void MoveAwayFromLocationAction::execute(Object &actor, float dt) {
+void MoveAwayFromLocationAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

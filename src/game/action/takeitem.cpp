@@ -17,11 +17,13 @@
 
 #include "takeitem.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void TakeItemAction::execute(Object &actor, float dt) {
+void TakeItemAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

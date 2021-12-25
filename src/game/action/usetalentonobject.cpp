@@ -17,11 +17,13 @@
 
 #include "usetalentonobject.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void UseTalentOnObjectAction::execute(Object &actor, float dt) {
+void UseTalentOnObjectAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

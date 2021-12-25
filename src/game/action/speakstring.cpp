@@ -17,11 +17,13 @@
 
 #include "speakstring.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void SpeakStringAction::execute(Object &actor, float dt) {
+void SpeakStringAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

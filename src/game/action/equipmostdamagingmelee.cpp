@@ -17,11 +17,13 @@
 
 #include "equipmostdamagingmelee.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void EquipMostDamagingMeleeAction::execute(Object &actor, float dt) {
+void EquipMostDamagingMeleeAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

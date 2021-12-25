@@ -17,11 +17,13 @@
 
 #include "randomwalk.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void RandomWalkAction::execute(Object &actor, float dt) {
+void RandomWalkAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

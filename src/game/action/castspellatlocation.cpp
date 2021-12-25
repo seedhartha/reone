@@ -17,11 +17,13 @@
 
 #include "castspellatlocation.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void CastSpellAtLocationAction::execute(Object &actor, float dt) {
+void CastSpellAtLocationAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

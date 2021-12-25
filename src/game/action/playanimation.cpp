@@ -29,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-void PlayAnimationAction::execute(Object &actor, float dt) {
+void PlayAnimationAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     auto spatial = dynamic_cast<SpatialObject *>(&actor);
     if (!spatial) {
         complete();

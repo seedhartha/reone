@@ -29,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-void UseFeatAction::execute(Object &actor, float dt) {
+void UseFeatAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     // If target is dead, complete the action
     shared_ptr<SpatialObject> target(static_pointer_cast<SpatialObject>(_object));
     if (target->isDead()) {
@@ -41,7 +41,7 @@ void UseFeatAction::execute(Object &actor, float dt) {
 
     // Make the actor follow its target. When reached, register an attack
     if (creatureActor->navigateTo(target->position(), true, _range, dt)) {
-        _game.combat().addAttack(move(creatureActor), move(target), this);
+        _game.combat().addAttack(move(creatureActor), move(target), static_pointer_cast<ObjectAction>(self));
     }
 }
 

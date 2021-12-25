@@ -17,11 +17,13 @@
 
 #include "wait.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void WaitAction::execute(Object &actor, float dt) {
+void WaitAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     if (advance(dt)) {
         complete();
     }

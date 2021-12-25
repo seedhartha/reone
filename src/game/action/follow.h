@@ -30,7 +30,7 @@ public:
         _distance(distance) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 
     float distance() const { return _distance; }
 

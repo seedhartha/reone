@@ -22,11 +22,13 @@
 #include "../object/factory.h"
 #include "../services.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void MoveToLocationAction::execute(Object &actor, float dt) {
+void MoveToLocationAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
     glm::vec3 destination(_location->position());
 

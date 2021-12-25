@@ -17,11 +17,13 @@
 
 #include "equipmosteffectivearmor.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void EquipMostEffectiveArmorAction::execute(Object &actor, float dt) {
+void EquipMostEffectiveArmorAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

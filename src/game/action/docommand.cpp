@@ -31,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-void CommandAction::execute(Object &actor, float dt) {
+void CommandAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     auto executionCtx = make_unique<ExecutionContext>(*_context);
     executionCtx->callerId = actor.id();
 

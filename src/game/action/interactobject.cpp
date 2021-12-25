@@ -17,11 +17,13 @@
 
 #include "interactobject.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void InteractObjectAction::execute(Object &actor, float dt) {
+void InteractObjectAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();
