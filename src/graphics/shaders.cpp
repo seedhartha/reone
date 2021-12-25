@@ -61,6 +61,10 @@ const float ALPHA_THRESHOLD = 0.2;
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
 const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
 
+const int LIGHT_DYNTYPE_AREA = 1;
+const int LIGHT_DYNTYPE_OBJECT = 2;
+const int LIGHT_DYNTYPE_BOTH = LIGHT_DYNTYPE_AREA | LIGHT_DYNTYPE_OBJECT;
+
 layout(std140) uniform General {
     mat4 uProjection;
     mat4 uView;
@@ -106,6 +110,7 @@ struct Light {
     float multiplier;
     float radius;
     bool ambientOnly;
+    int dynamicType;
 };
 
 layout(std140) uniform Lighting {
@@ -313,13 +318,17 @@ vec3 getLightingIndirect(vec3 N) {
     return result;
 }
 
-vec3 getLightingDirect(vec3 N) {
+vec3 getLightingDirect(vec3 N, int dynTypeMask) {
     vec3 result = vec3(0.0);
     vec3 V = normalize(uCameraPosition.xyz - fragPosWorldSpace);
 
     for (int i = 0; i < uLightCount; ++i) {
-        if (uLights[i].ambientOnly) continue;
-
+        if (uLights[i].ambientOnly) {
+            continue;
+        }
+        if ((uLights[i].dynamicType & dynTypeMask) == 0) {
+            continue;
+        }
         vec3 L = normalize(uLights[i].position.xyz - fragPosWorldSpace);
         vec3 H = normalize(V + L);
 
@@ -639,12 +648,13 @@ void main() {
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(sLightmap, fragUV2);
         lighting = (1.0 - 0.5 * shadow) * lightmapSample.rgb;
+        lighting += (1.0 - 0.5 * shadow) * getLightingDirect(N, LIGHT_DYNTYPE_AREA);
         if (isFeatureEnabled(FEATURE_WATER)) {
             lighting = mix(vec3(1.0), lighting, 0.2);
         }
     } else if (isFeatureEnabled(FEATURE_LIGHTING)) {
         vec3 indirect = getLightingIndirect(N);
-        vec3 direct = getLightingDirect(N);
+        vec3 direct = getLightingDirect(N, LIGHT_DYNTYPE_BOTH);
         lighting = indirect + (1.0 - shadow) * direct;
     } else if (isFeatureEnabled(FEATURE_SELFILLUM)) {
         lighting = uSelfIllumColor.rgb;
@@ -690,9 +700,10 @@ void main() {
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(sLightmap, fragUV2);
         lighting = (1.0 - 0.5 * shadow) * lightmapSample.rgb;
+        lighting += (1.0 - 0.5 * shadow) * getLightingDirect(N, LIGHT_DYNTYPE_AREA);
     } else if (isFeatureEnabled(FEATURE_LIGHTING)) {
         vec3 indirect = getLightingIndirect(N);
-        vec3 direct = getLightingDirect(N);
+        vec3 direct = getLightingDirect(N, LIGHT_DYNTYPE_BOTH);
         lighting = min(vec3(1.0), indirect + (1.0 - shadow) * direct);
     } else {
         lighting = vec3(1.0);

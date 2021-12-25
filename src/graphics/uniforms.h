@@ -116,7 +116,7 @@ struct LightUniforms {
     float multiplier {1.0f};
     float radius {1.0f};
     int ambientOnly {0};
-    char padding[4];
+    int dynamicType {0};
 };
 
 struct LightingUniforms {
