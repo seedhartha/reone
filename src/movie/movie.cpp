@@ -84,12 +84,14 @@ void Movie::draw() {
         _texture->setPixels(_width, _height, PixelFormat::RGB, frame.pixels, true);
     }
     auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
     uniforms.general.uv = glm::mat3x4(
         glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
         glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
         glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
 
+    _graphicsContext.clearColorDepth();
     _shaders.use(_shaders.gui(), true);
     _meshes.quadNDC().draw();
 }

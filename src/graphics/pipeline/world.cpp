@@ -299,7 +299,7 @@ void WorldPipeline::drawShadows() {
     glDrawBuffer(GL_NONE);
 
     _graphicsContext.withViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution), [this]() {
-        glClear(GL_DEPTH_BUFFER_BIT);
+        _graphicsContext.clearDepth();
         _scene->drawShadows();
     });
 }
@@ -348,7 +348,7 @@ void WorldPipeline::drawGeometry() {
         }
     }
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _graphicsContext.clearColorDepth();
     _scene->draw();
 
     // Blit multi-sample geometry framebuffer to geometry framebuffer
@@ -382,7 +382,7 @@ void WorldPipeline::drawHorizontalBlur() {
     _shaders.use(_shaders.blur(), true);
     _textures.bind(*_cbGeometry2);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
@@ -406,7 +406,7 @@ void WorldPipeline::drawVerticalBlur() {
     _shaders.use(_shaders.blur(), true);
     _textures.bind(*_cbHorizontalBlur);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
@@ -426,7 +426,7 @@ void WorldPipeline::presentWorld() {
     _textures.bind(*_cbGeometry1);
     _textures.bind(*_cbVerticalBlur, TextureUnits::bloom);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 
     // Render to texture
@@ -435,7 +435,7 @@ void WorldPipeline::presentWorld() {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbScreenshot->nameGL());
 
         _graphicsContext.withViewport(glm::ivec4(0, 0, kScreenshotResolution, kScreenshotResolution), [this]() {
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            _graphicsContext.clearColorDepth();
             _meshes.quadNDC().draw();
         });
 

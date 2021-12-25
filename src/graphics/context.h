@@ -32,6 +32,9 @@ public:
 
     void init();
 
+    void clearColorDepth();
+    void clearDepth();
+
     void withFaceCulling(CullFaceMode mode, const std::function<void()> &block);
     void withBlending(BlendMode mode, const std::function<void()> &block);
     void withViewport(glm::ivec4 viewport, const std::function<void()> &block);

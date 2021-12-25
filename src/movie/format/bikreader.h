@@ -62,12 +62,12 @@ public:
 
     void load();
 
-    std::shared_ptr<Movie> video() const { return _video; }
+    std::shared_ptr<Movie> movie() const { return _movie; }
 
 private:
     boost::filesystem::path _path;
 
-    std::shared_ptr<Movie> _video;
+    std::shared_ptr<Movie> _movie;
 
     // Services
 
