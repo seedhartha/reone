@@ -59,6 +59,7 @@ public:
         Wrapping wrap {Wrapping::Repeat};
         glm::vec3 borderColor {1.0f};
         bool cubemap {false};
+        bool lookup {false};
         int numSamples {1};
     };
 
@@ -105,7 +106,9 @@ public:
     glm::vec4 sample(int x, int y) const;
 
     bool isCubemap() const { return _properties.cubemap; }
-    bool isMultilayer() const { return _layers.size() > 1ll; }
+    bool isLookup() const { return _properties.lookup; }
+    bool is2DArray() const { return _layers.size() > 1ll && !_properties.cubemap; }
+
     bool isMultisample() const { return _properties.numSamples > 1; }
     bool isAdditive() const { return _features.blending == Blending::Additive; }
     bool isGrayscale() const { return _pixelFormat == PixelFormat::Grayscale; }
@@ -160,14 +163,17 @@ private:
     void configure();
     void refresh();
 
+    void configure1D();
     void configure2D();
-    void configureCubeMap();
+    void configureCubemap();
 
+    void refresh1D();
     void refresh2D();
     void refresh2DArray();
-    void refreshCubeMap();
+    void refreshCubemap();
 
-    void fillTarget2D(uint32_t target, int level, int width, int height, const void *pixels = nullptr, int size = 0);
+    void fillTarget1D(int width, const void *pixels = nullptr);
+    void fillTarget2D(uint32_t target, int width, int height, const void *pixels = nullptr, int size = 0);
     void fillTarget3D(int width, int height, int depth);
 
     uint32_t getTargetGL() const;

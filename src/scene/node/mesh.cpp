@@ -24,6 +24,7 @@
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
+#include "../../graphics/textureutil.h"
 
 #include "../graph.h"
 
@@ -53,12 +54,24 @@ void MeshSceneNode::init() {
 
 void MeshSceneNode::initTextures() {
     shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
-    if (!mesh)
+    if (!mesh) {
         return;
-
+    }
     _nodeTextures.diffuse = mesh->diffuseMap;
     _nodeTextures.lightmap = mesh->lightmap;
     _nodeTextures.bumpmap = mesh->bumpmap;
+
+    // Bake danglymesh constraints into texture
+    if (mesh->danglyMesh) {
+        auto pixels = make_unique<ByteArray>();
+        for (auto &con : mesh->danglyMesh->constraints) {
+            pixels->push_back(static_cast<int>(255 * con.multiplier));
+        }
+        auto constraints = make_unique<Texture>("dangly_constraints", getTextureProperties(TextureUsage::Lookup));
+        constraints->setPixels(mesh->danglyMesh->constraints.size(), 1, PixelFormat::Grayscale, Texture::Layer {move(pixels)});
+        constraints->init();
+        _nodeTextures.danglyConstraints = move(constraints);
+    }
 
     refreshAdditionalTextures();
 }
@@ -346,11 +359,7 @@ void MeshSceneNode::draw() {
     auto danglyMesh = mesh->danglyMesh;
     if (danglyMesh) {
         uniforms.general.featureMask |= UniformsFeatureFlags::danglymesh;
-        uniforms.danglymesh.stride = glm::vec4(_danglymeshAnimation.stride, 0.0f);
-        uniforms.danglymesh.displacement = danglyMesh->displacement;
-        for (size_t i = 0; i < danglyMesh->constraints.size(); ++i) {
-            uniforms.danglymesh.constraints[i / 4][i % 4] = danglyMesh->constraints[i].multiplier;
-        }
+        uniforms.general.danglyStrideDisplacement = glm::vec4(_danglymeshAnimation.stride, danglyMesh->displacement);
     }
 
     _shaders.use(program, true);
@@ -371,6 +380,9 @@ void MeshSceneNode::draw() {
     }
     if (_nodeTextures.bumpmap) {
         _textures.bind(*_nodeTextures.bumpmap, TextureUnits::bumpMap);
+    }
+    if (_nodeTextures.danglyConstraints) {
+        _textures.bind(*_nodeTextures.danglyConstraints, TextureUnits::danglyConstraints);
     }
 
     auto blendMode = additive ? BlendMode::Add : BlendMode::Default;

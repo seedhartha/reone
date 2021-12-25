@@ -58,6 +58,7 @@ struct GeneralUniforms {
     glm::vec4 fogColor {0.0f};
     glm::vec4 heightMapFrameBounds {0.0f};
     glm::vec4 shadowLightPosition {0.0f}; /**< W = 0 if light is directional */
+    glm::vec4 danglyStrideDisplacement {0.0f};
     glm::vec2 blurResolution {0.0f};
     glm::vec2 blurDirection {0.0f};
     float alpha {1.0f};
@@ -78,6 +79,7 @@ struct GeneralUniforms {
         worldAmbientColor = glm::vec4(1.0f);
         fogColor = glm::vec4(0.0f);
         shadowLightPosition = glm::vec4(0.0f);
+        danglyStrideDisplacement = glm::vec4(0.0f);
         fogNear = 0.0f;
         fogFar = 0.0f;
         shadowStrength = 1.0f;
@@ -163,13 +165,6 @@ struct TextUniforms {
     TextCharacterUniforms chars[kMaxTextChars];
 };
 
-struct DanglymeshUniforms {
-    glm::vec4 stride {0.0f};
-    float displacement {0.0f};
-    char padding[12];
-    glm::vec4 constraints[kMaxDanglymeshConstraints] {glm::vec4(0.0f)};
-};
-
 struct Uniforms {
     GeneralUniforms general;
     TextUniforms text;
@@ -177,7 +172,6 @@ struct Uniforms {
     SkeletalUniforms skeletal;
     ParticlesUniforms particles;
     GrassUniforms grass;
-    DanglymeshUniforms danglymesh;
 };
 
 } // namespace graphics

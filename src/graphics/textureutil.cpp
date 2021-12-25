@@ -164,6 +164,10 @@ Texture::Properties getTextureProperties(TextureUsage usage, int numSamples) {
         properties.cubemap = true;
     }
 
+    if (usage == TextureUsage::Lookup) {
+        properties.lookup = true;
+    }
+
     return move(properties);
 }
 

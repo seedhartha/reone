@@ -34,7 +34,6 @@ constexpr int kMaxLights = 16;
 constexpr int kMaxParticles = 64;
 constexpr int kMaxTextChars = 128;
 constexpr int kMaxGrassClusters = 256;
-constexpr int kMaxDanglymeshConstraints = 2048;
 
 /**
  * This is a hint to the engine when configuring texture properties.
@@ -50,7 +49,8 @@ enum class TextureUsage {
     ColorBuffer,
     DepthBuffer,
     DepthBufferCubeMap,
-    Video
+    Video,
+    Lookup
 };
 
 enum class TextureQuality {
@@ -130,9 +130,10 @@ struct TextureUnits {
     static constexpr int lightmap = 1;
     static constexpr int bumpMap = 2;
     static constexpr int bloom = 3;
-    static constexpr int environmentMap = 4;
-    static constexpr int cubeShadowMap = 5;
-    static constexpr int shadowMap = 6;
+    static constexpr int danglyConstraints = 4;
+    static constexpr int environmentMap = 5;
+    static constexpr int cubeShadowMap = 6;
+    static constexpr int shadowMap = 7;
 };
 
 struct UniformBlockBindingPoints {
@@ -142,7 +143,6 @@ struct UniformBlockBindingPoints {
     static constexpr int skeletal = 3;
     static constexpr int particles = 4;
     static constexpr int grass = 5;
-    static constexpr int danglymesh = 6;
 };
 
 // MDL
