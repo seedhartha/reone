@@ -31,7 +31,7 @@ struct UniformsFeatureFlags {
     static constexpr int heightmap = 0x10;
     static constexpr int skeletal = 0x20;
     static constexpr int lighting = 0x40;
-    static constexpr int selfIllum = 0x80;
+    static constexpr int selfillum = 0x80;
     static constexpr int discard = 0x100;
     static constexpr int shadows = 0x200;
     static constexpr int particles = 0x400;
@@ -41,6 +41,7 @@ struct UniformsFeatureFlags {
     static constexpr int grass = 0x4000;
     static constexpr int fog = 0x8000;
     static constexpr int danglymesh = 0x10000;
+    static constexpr int fixedsize = 0x20000;
 };
 
 struct GeneralUniforms {
@@ -67,8 +68,8 @@ struct GeneralUniforms {
     float fogFar {0.0f};
     float heightMapScaling {1.0f};
     float shadowStrength {0.0f};
+    float billboardSize {1.0f};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
-    char padding[4];
     glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
     glm::vec4 shadowCascadeFarPlanes[2] {glm::vec4(0.0f)};
 

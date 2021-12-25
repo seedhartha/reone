@@ -316,7 +316,7 @@ void MeshSceneNode::draw() {
     }
 
     if (isSelfIlluminated()) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::selfIllum;
+        uniforms.general.featureMask |= UniformsFeatureFlags::selfillum;
         uniforms.general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
     }
     if (isLightingEnabled()) {

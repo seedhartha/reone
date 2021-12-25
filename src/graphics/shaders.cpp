@@ -43,6 +43,7 @@ const int FEATURE_TEXT = 0x2000;
 const int FEATURE_GRASS = 0x4000;
 const int FEATURE_FOG = 0x8000;
 const int FEATURE_DANGLYMESH = 0x10000;
+const int FEATURE_FIXEDSIZE = 0x20000;
 
 const int NUM_CUBE_FACES = 6;
 const int NUM_SHADOW_CASCADES = 8;
@@ -84,6 +85,7 @@ layout(std140) uniform General {
     float uFogFar;
     float uHeightMapScaling;
     float uShadowStrength;
+    float uBillboardSize;
     int uFeatureMask;
     mat4 uShadowLightSpace[NUM_SHADOW_LIGHT_SPACE];
     vec4 uShadowCascadeFarPlanes[2];
@@ -543,16 +545,21 @@ layout(location = 2) in vec2 aUV1;
 out vec2 fragUV1;
 
 void main() {
-    vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
-    vec3 cameraUp = vec3(uView[0][1], uView[1][1], uView[2][1]);
+    if (isFeatureEnabled(FEATURE_FIXEDSIZE)) {
+        gl_Position = uProjection * uView * uModel * vec4(0.0, 0.0, 0.0, 1.0);
+        gl_Position /= gl_Position.w;
+        gl_Position.xy += uBillboardSize * aPosition.xy;
 
-    vec4 P = vec4(
-        vec3(uModel[3]) +
-            cameraRight * aPosition.x * uModel[0][0] +
-            cameraUp * aPosition.y * uModel[1][1],
-        1.0);
+    } else {
+        vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
+        vec3 cameraUp = vec3(uView[0][1], uView[1][1], uView[2][1]);
+        vec4 P = vec4(
+            vec3(uModel[3]) + cameraRight * aPosition.x + cameraUp * aPosition.y,
+            1.0);
 
-    gl_Position = uProjection * uView * P;
+        gl_Position = uProjection * uView * P;
+    }
+
     fragUV1 = aUV1;
 }
 )END";

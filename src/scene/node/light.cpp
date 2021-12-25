@@ -71,15 +71,11 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     if (!camera) {
         return;
     }
-    float aspect = flare.texture->width() / static_cast<float>(flare.texture->height());
-
-    glm::mat4 transform(1.0f);
-    transform = glm::translate(transform, glm::vec3(_absTransform[3]));
-    transform = glm::scale(transform, glm::vec3(aspect * flare.size, flare.size, 1.0f));
-
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
-    uniforms.general.model = move(transform);
+    uniforms.general.featureMask = UniformsFeatureFlags::fixedsize;
+    uniforms.general.model = glm::translate(glm::vec3(_absTransform[3]));
+    uniforms.general.billboardSize = 0.1f * flare.size;
     uniforms.general.alpha = 0.5f;
     // uniforms.general.color = glm::vec4(flare.colorShift, 1.0f);
 
