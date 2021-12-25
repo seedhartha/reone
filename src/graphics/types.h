@@ -34,7 +34,7 @@ constexpr int kMaxLights = 16;
 constexpr int kMaxParticles = 64;
 constexpr int kMaxTextChars = 128;
 constexpr int kMaxGrassClusters = 256;
-constexpr int kMaxDanglymeshConstraints = 512;
+constexpr int kMaxDanglymeshConstraints = 2048;
 
 /**
  * This is a hint to the engine when configuring texture properties.

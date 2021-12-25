@@ -53,7 +53,7 @@ const int MAX_LIGHTS = 16;
 const int MAX_PARTICLES = 64;
 const int MAX_TEXT_CHARS = 128;
 const int MAX_GRASS_CLUSTERS = 256;
-const int MAX_DANGLYMESH_CONSTRAINTS = 512;
+const int MAX_DANGLYMESH_CONSTRAINTS = 2048;
 
 const float SHININESS = 8.0;
 
