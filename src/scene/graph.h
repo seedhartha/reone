@@ -108,7 +108,7 @@ public:
 
     // Lighting
 
-    std::vector<LightSceneNode *> computeClosestLights(int count, const std::function<bool(const LightSceneNode &)> &pred) const;
+    std::vector<LightSceneNode *> computeClosestLights(int count, const std::function<bool(const LightSceneNode &, float)> &pred) const;
 
     const glm::vec3 &ambientLightColor() const override { return _ambientLightColor; }
     const std::vector<LightSceneNode *> activeLights() const { return _activeLights; }
@@ -186,7 +186,7 @@ private:
     bool _updateRoots {true};
 
     std::shared_ptr<CameraSceneNode> _activeCamera;
-    LightSceneNode *_flareLight {nullptr};
+    std::vector<LightSceneNode *> _flareLights;
 
     // Services
 
@@ -261,7 +261,7 @@ private:
 
     void updateLighting();
     void updateShadowLight(float dt);
-    void updateFlareLight();
+    void updateFlareLights();
     void updateSounds();
 
     void prepareTransparentMeshes();
