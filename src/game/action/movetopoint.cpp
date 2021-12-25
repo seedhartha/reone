@@ -21,11 +21,13 @@
 #include "../object/factory.h"
 #include "../services.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void MoveToPointAction::execute(Object &actor, float dt) {
+void MoveToPointAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
     bool reached = creatureActor->navigateTo(_point, true, 1.0f, dt);
     if (reached) {

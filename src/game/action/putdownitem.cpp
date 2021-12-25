@@ -17,11 +17,13 @@
 
 #include "putdownitem.h"
 
+using namespace std;
+
 namespace reone {
 
 namespace game {
 
-void PutDownItemAction::execute(Object &actor, float dt) {
+void PutDownItemAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     // TODO: implement
 
     complete();

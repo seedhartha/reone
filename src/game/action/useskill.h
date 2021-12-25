@@ -30,7 +30,7 @@ public:
         _skill(skill) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 
     SkillType skill() const { return _skill; }
 

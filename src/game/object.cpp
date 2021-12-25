@@ -112,7 +112,7 @@ void Object::executeActions(float dt) {
         return;
     }
     shared_ptr<Action> action(_actions.front());
-    action->execute(*this, dt);
+    action->execute(action, *this, dt);
 }
 
 bool Object::hasUserActionsPending() const {

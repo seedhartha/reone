@@ -30,7 +30,7 @@ public:
         _point(std::move(point)) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 
     const glm::vec3 &point() const { return _point; }
 

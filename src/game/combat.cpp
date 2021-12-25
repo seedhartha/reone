@@ -41,11 +41,11 @@ static constexpr float kDeactivateDelay = 8.0f;
 static constexpr char kModelEventDetonate[] = "detonate";
 static constexpr float kProjectileSpeed = 16.0f;
 
-static unique_ptr<Combat::Attack> makeAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, ObjectAction *action, AttackResultType resultType, int damage) {
+static unique_ptr<Combat::Attack> makeAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, shared_ptr<ObjectAction> action, AttackResultType resultType, int damage) {
     auto attack = make_unique<Combat::Attack>();
     attack->attacker = move(attacker);
     attack->target = move(target);
-    attack->action = action;
+    attack->action = move(action);
     attack->resultType = resultType;
     attack->damage = damage;
     return move(attack);
@@ -55,7 +55,7 @@ static bool isRoundPastFirstAttack(float time) {
     return time >= 0.5f * kRoundDuration;
 }
 
-void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, ObjectAction *action, AttackResultType resultType, int damage) {
+void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, shared_ptr<ObjectAction> action, AttackResultType resultType, int damage) {
     RoundMap::iterator maybeRound;
 
     // If attacker has already started a combat round, do nothing

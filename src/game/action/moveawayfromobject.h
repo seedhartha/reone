@@ -30,7 +30,7 @@ public:
         _run(run) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 
 private:
     bool _run;

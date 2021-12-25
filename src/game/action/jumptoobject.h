@@ -29,7 +29,7 @@ public:
         ObjectAction(game, services, ActionType::JumpToObject, std::move(object)) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 };
 
 } // namespace game

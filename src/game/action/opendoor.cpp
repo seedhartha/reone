@@ -29,7 +29,7 @@ namespace reone {
 
 namespace game {
 
-void OpenDoorAction::execute(Object &actor, float dt) {
+void OpenDoorAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     shared_ptr<Object> actorPtr(_game.objectFactory().getObjectById(actor.id()));
     auto creatureActor = dynamic_pointer_cast<Creature>(actorPtr);
     auto door = dynamic_pointer_cast<Door>(_object);

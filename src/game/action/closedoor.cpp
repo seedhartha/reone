@@ -28,7 +28,7 @@ namespace reone {
 
 namespace game {
 
-void CloseDoorAction::execute(Object &actor, float dt) {
+void CloseDoorAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
     auto door = dynamic_pointer_cast<Door>(_object);
 

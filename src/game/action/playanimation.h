@@ -34,7 +34,7 @@ public:
         _durationSeconds(durationSeconds) {
     }
 
-    void execute(Object &actor, float dt) override;
+    void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 
 private:
     AnimationType _anim;

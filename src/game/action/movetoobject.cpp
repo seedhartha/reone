@@ -28,7 +28,7 @@ namespace reone {
 
 namespace game {
 
-void MoveToObjectAction::execute(Object &actor, float dt) {
+void MoveToObjectAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     auto object = static_pointer_cast<SpatialObject>(_object);
     glm::vec3 dest(object->position());
     auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
