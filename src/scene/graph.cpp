@@ -42,9 +42,11 @@ namespace reone {
 
 namespace scene {
 
+static constexpr int kMaxFlareLights = 4;
 static constexpr int kMaxSoundCount = 4;
-static constexpr float kShadowFadeSpeed = 1.0f;
 
+static constexpr float kLightingRadius = 8.0f;
+static constexpr float kShadowFadeSpeed = 2.0f;
 static constexpr float kElevationTestZ = 1024.0f;
 
 static constexpr float kMaxCollisionDistanceWalk = 8.0f;
@@ -112,7 +114,7 @@ void SceneGraph::update(float dt) {
     refreshNodeLists();
     updateLighting();
     updateShadowLight(dt);
-    updateFlareLight();
+    updateFlareLights();
     updateSounds();
     prepareTransparentMeshes();
     prepareLeafs();
@@ -131,7 +133,10 @@ void SceneGraph::cullRoots() {
 
 void SceneGraph::updateLighting() {
     // Find closest lights and create a lookup
-    auto closestLights = computeClosestLights(_options.maxLights, [](auto &_) { return true; });
+    auto closestLights = computeClosestLights(_options.maxLights, [](auto &light, float distance2) {
+        float radius = light.radius() + kLightingRadius;
+        return distance2 < radius * radius;
+    });
     set<LightSceneNode *> lookup;
     for (auto &light : closestLights) {
         lookup.insert(light);
@@ -164,12 +169,12 @@ void SceneGraph::updateLighting() {
 }
 
 void SceneGraph::updateShadowLight(float dt) {
-    auto closestLights = computeClosestLights(1, [this](auto &light) {
-        float distance2 = light.getSquareDistanceTo(*_activeCamera);
-        if (distance2 > light.radius() * light.radius()) {
+    auto closestLights = computeClosestLights(1, [this](auto &light, float distance2) {
+        if (!light.modelNode().light()->shadow) {
             return false;
         }
-        return light.modelNode().light()->shadow;
+        float radius = light.radius() + kLightingRadius;
+        return distance2 < radius * radius;
     });
     if (_shadowLight) {
         if (closestLights.empty() || _shadowLight != closestLights.front()) {
@@ -190,28 +195,14 @@ void SceneGraph::updateShadowLight(float dt) {
     }
 }
 
-void SceneGraph::updateFlareLight() {
-    _flareLight = nullptr;
-
-    auto closestLights = computeClosestLights(1, [this](auto &light) {
+void SceneGraph::updateFlareLights() {
+    _flareLights = computeClosestLights(kMaxFlareLights, [](auto &light, float distance2) {
         if (light.modelNode().light()->flares.empty()) {
             return false;
         }
-        float distance2 = light.getSquareDistanceTo(*_activeCamera);
         float radius = light.modelNode().light()->flareRadius;
-        if (distance2 > radius * radius) {
-            return false;
-        }
-        Collision collision;
-        if (testLineOfSight(_activeCamera->getOrigin(), light.getOrigin(), collision)) {
-            return false;
-        }
-        return true;
+        return distance2 < radius * radius;
     });
-
-    if (!closestLights.empty()) {
-        _flareLight = closestLights.front();
-    }
 }
 
 void SceneGraph::updateSounds() {
@@ -424,11 +415,15 @@ void SceneGraph::draw() {
         bucket.first->drawLeafs(bucket.second);
     }
 
-    // Render lens flare
-    if (_flareLight) {
+    // Render lens flares
+    if (!_flareLights.empty()) {
         _graphicsContext.withoutDepthTest([this]() {
-            for (auto &flare : _flareLight->modelNode().light()->flares) {
-                _flareLight->drawLensFlare(flare);
+            for (auto &light : _flareLights) {
+                Collision collision;
+                if (testLineOfSight(_activeCamera->getOrigin(), light->getOrigin(), collision)) {
+                    continue;
+                }
+                light->drawLensFlare(light->modelNode().light()->flares.front());
             }
         });
     }
@@ -445,14 +440,14 @@ void SceneGraph::drawShadows() {
     });
 }
 
-vector<LightSceneNode *> SceneGraph::computeClosestLights(int count, const function<bool(const LightSceneNode &)> &pred) const {
+vector<LightSceneNode *> SceneGraph::computeClosestLights(int count, const function<bool(const LightSceneNode &, float)> &pred) const {
     // Compute distance from each light to the camera
     vector<pair<LightSceneNode *, float>> distances;
     for (auto &light : _lights) {
-        if (!pred(*light)) {
+        float distance2 = light->getSquareDistanceTo(*_activeCamera);
+        if (!pred(*light, distance2)) {
             continue;
         }
-        float distance2 = light->getSquareDistanceTo(*_activeCamera);
         distances.push_back(make_pair(light, distance2));
     }
 

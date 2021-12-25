@@ -37,7 +37,7 @@ namespace reone {
 
 namespace scene {
 
-static constexpr float kFadeSpeed = 1.0f;
+static constexpr float kFadeSpeed = 2.0f;
 static constexpr float kMinDirectionalLightRadius = 1000.0f;
 
 void LightSceneNode::init() {
