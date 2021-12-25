@@ -36,7 +36,7 @@ public:
 
     virtual void update(float dt);
 
-    virtual void drawLeafs(const std::vector<SceneNode *> &leafs, int count) {
+    virtual void drawLeafs(const std::vector<SceneNode *> &leafs) {
     }
 
     bool isEnabled() const { return _enabled; }
