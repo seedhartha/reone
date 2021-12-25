@@ -47,8 +47,9 @@ void TpcReader::doLoad() {
     _mipMapCount = readByte();
 
     _cubeMap = _height / _width == 6;
-    if (_cubeMap)
+    if (_cubeMap) {
         _height = _width;
+    }
 
     if (_compressed) {
         _dataSize = dataSize;
@@ -65,8 +66,8 @@ void TpcReader::doLoad() {
 }
 
 void TpcReader::getMipMapSize(int index, int &width, int &height) const {
-    width = _width >> index;
-    height = _height >> index;
+    width = glm::max(1, _width >> index);
+    height = glm::max(1, _height >> index);
 }
 
 int TpcReader::getMipMapDataSize(int width, int height) const {
@@ -100,26 +101,15 @@ void TpcReader::loadPixels() {
     _pixels.reserve(layerCount);
 
     for (int i = 0; i < layerCount; ++i) {
-        vector<Texture::MipMap> mipMaps;
-        mipMaps.reserve(_mipMapCount);
+        Texture::MipMap mipMap;
+        getMipMapSize(0, mipMap.width, mipMap.height);
+        mipMap.pixels = make_shared<ByteArray>(_reader->getBytes(_dataSize));
 
-        for (int j = 0; j < _mipMapCount; ++j) {
-            Texture::MipMap mipMap;
-            int dataSize;
-            if (j == 0) {
-                mipMap.width = _width;
-                mipMap.height = _height;
-                dataSize = _dataSize;
-            } else {
-                getMipMapSize(j, mipMap.width, mipMap.height);
-                dataSize = getMipMapDataSize(mipMap.width, mipMap.height);
-            }
-            mipMap.pixels = make_shared<ByteArray>(_reader->getBytes(dataSize));
-            mipMaps.push_back(move(mipMap));
+        for (int j = 1; j < _mipMapCount; ++j) {
+            _reader->ignore(getMipMapDataSize(mipMap.width, mipMap.height));
         }
-
         Texture::Layer layer;
-        layer.mipMaps = move(mipMaps);
+        layer.mipMaps.push_back(move(mipMap));
 
         _pixels.push_back(move(layer));
     }
