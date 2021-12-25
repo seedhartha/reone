@@ -63,7 +63,7 @@ public:
     void setRadius(float radius) { _radius = radius; }
     void setMultiplier(float multiplier) { _multiplier = multiplier; }
 
-    // Lighting
+    // Fading
 
     bool isActive() const { return _active; }
 
@@ -72,37 +72,19 @@ public:
 
     float strength() const { return _strength; }
 
-    // END Lighting
-
-    // Shadows
-
-    bool isActiveShadow() const { return _activeShadow; }
-
-    void setActiveShadow(bool active) { _activeShadow = active; }
-    void setShadowStrength(float strength) { _shadowStrength = strength; }
-
-    float shadowStrength() const { return _shadowStrength; }
-
-    // END Shadows
+    // END Fading
 
 private:
     glm::vec3 _color {0.0f};
     float _radius {0.0f};
     float _multiplier {0.0f};
 
-    // Lighting
+    // Fading
 
     bool _active {false};
     float _strength {0.0f};
 
-    // END Lighting
-
-    // Shadows
-
-    bool _activeShadow {false};
-    float _shadowStrength {0.0f};
-
-    // END Shadows
+    // END Fading
 };
 
 } // namespace scene

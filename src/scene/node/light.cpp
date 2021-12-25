@@ -49,7 +49,7 @@ void LightSceneNode::init() {
 void LightSceneNode::update(float dt) {
     SceneNode::update(dt);
 
-    // Lighting
+    // Fading
     bool fading = _modelNode->light()->fading;
     if (_active) {
         if (fading) {
@@ -63,13 +63,6 @@ void LightSceneNode::update(float dt) {
         } else {
             _strength = 0.0f;
         }
-    }
-
-    // Shadows
-    if (_activeShadow) {
-        _shadowStrength = glm::min(1.0f, _shadowStrength + kFadeSpeed * dt);
-    } else {
-        _shadowStrength = glm::max(0.0f, _shadowStrength - kFadeSpeed * dt);
     }
 }
 

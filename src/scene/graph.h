@@ -138,7 +138,7 @@ public:
     bool isShadowLightDirectional() const override { return _shadowLight->isDirectional(); }
 
     glm::vec3 shadowLightPosition() const override { return _shadowLight->absoluteTransform()[3]; }
-    float shadowStrength() const override { return _shadowLight->shadowStrength(); }
+    float shadowStrength() const override { return _shadowStrength; }
 
     // END Shadows
 
@@ -183,9 +183,10 @@ private:
     std::string _name;
     graphics::GraphicsOptions _options;
 
-    std::shared_ptr<CameraSceneNode> _activeCamera;
-
     bool _updateRoots {true};
+
+    std::shared_ptr<CameraSceneNode> _activeCamera;
+    LightSceneNode *_flareLight {nullptr};
 
     // Services
 
@@ -219,16 +220,22 @@ private:
 
     // END Leafs
 
-    // Lighting and shadows
+    // Lighting
 
     glm::vec3 _ambientLightColor {0.5f};
 
     std::vector<LightSceneNode *> _activeLights;
+
+    // END Lighting
+
+    // Shadows
+
+    bool _shadowActive {false};
+    float _shadowStrength {0.0f};
+
     LightSceneNode *_shadowLight {nullptr};
 
-    LightSceneNode *_flareLight {nullptr};
-
-    // END Lighting and shadows
+    // END Shadows
 
     // Fog
 
@@ -248,13 +255,14 @@ private:
     // END Surfaces
 
     void cullRoots();
-    void updateLighting();
-    void updateShadowLight();
-    void updateFlareLight();
-    void updateSounds();
 
     void refreshNodeLists();
     void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);
+
+    void updateLighting();
+    void updateShadowLight(float dt);
+    void updateFlareLight();
+    void updateSounds();
 
     void prepareTransparentMeshes();
     void prepareLeafs();

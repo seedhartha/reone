@@ -42,8 +42,10 @@ namespace reone {
 
 namespace scene {
 
-static constexpr float kElevationTestZ = 1024.0f;
 static constexpr int kMaxSoundCount = 4;
+static constexpr float kShadowFadeSpeed = 1.0f;
+
+static constexpr float kElevationTestZ = 1024.0f;
 
 static constexpr float kMaxCollisionDistanceWalk = 8.0f;
 static constexpr float kMaxCollisionDistanceWalk2 = kMaxCollisionDistanceWalk * kMaxCollisionDistanceWalk;
@@ -109,7 +111,7 @@ void SceneGraph::update(float dt) {
     cullRoots();
     refreshNodeLists();
     updateLighting();
-    updateShadowLight();
+    updateShadowLight(dt);
     updateFlareLight();
     updateSounds();
     prepareTransparentMeshes();
@@ -161,20 +163,30 @@ void SceneGraph::updateLighting() {
     }
 }
 
-void SceneGraph::updateShadowLight() {
-    auto closestLights = computeClosestLights(1, [](auto &light) { return light.modelNode().light()->shadow; });
+void SceneGraph::updateShadowLight(float dt) {
+    auto closestLights = computeClosestLights(1, [this](auto &light) {
+        float distance2 = light.getSquareDistanceTo(*_activeCamera);
+        if (distance2 > light.radius() * light.radius()) {
+            return false;
+        }
+        return light.modelNode().light()->shadow;
+    });
     if (_shadowLight) {
         if (closestLights.empty() || _shadowLight != closestLights.front()) {
-            _shadowLight->setActiveShadow(false);
+            _shadowActive = false;
         }
-        if (!_shadowLight->isActiveShadow() && _shadowLight->shadowStrength() == 0.0f) {
-            _shadowLight = nullptr;
+        if (_shadowActive) {
+            _shadowStrength = glm::min(1.0f, _shadowStrength + kShadowFadeSpeed * dt);
+        } else {
+            _shadowStrength = glm::max(0.0f, _shadowStrength - kShadowFadeSpeed * dt);
+            if (_shadowStrength == 0.0f) {
+                _shadowLight = nullptr;
+            }
         }
-        return;
     }
-    if (!closestLights.empty()) {
+    if (!_shadowLight && !closestLights.empty()) {
         _shadowLight = closestLights.front();
-        _shadowLight->setActiveShadow(true);
+        _shadowActive = true;
     }
 }
 
