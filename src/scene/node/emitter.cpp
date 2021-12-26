@@ -204,10 +204,15 @@ void EmitterSceneNode::spawnLightningParticles() {
     segments[_lightningSubDiv].second = emitterSpaceRefPos;
 
     // Return all particles to pool
-    for (auto &child : _children) {
-        _particlePool.push_back(child);
+    for (auto it = _children.begin(); it != _children.end();) {
+        auto child = *it;
+        if ((*it)->type() == SceneNodeType::Particle) {
+            _particlePool.push_back(child);
+            it = _children.erase(it);
+        } else {
+            ++it;
+        }
     }
-    _children.clear();
 
     for (auto &segment : segments) {
         // Take particle from the pool, if available
@@ -236,30 +241,61 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }
-    shared_ptr<ModelNode::Emitter> emitter(_modelNode->emitter());
-    shared_ptr<Texture> texture(emitter->texture);
+    auto emitter = _modelNode->emitter();
+    auto texture = emitter->texture;
     if (!texture) {
         return;
     }
+    auto emitterRight = glm::vec3(_absTransform[0]);
+    auto emitterUp = glm::vec3(_absTransform[1]);
+    auto emitterForward = glm::vec3(_absTransform[2]);
+
+    auto view = _sceneGraph.activeCamera()->camera()->view();
+    auto cameraRight = glm::vec3(view[0][0], view[1][0], view[2][0]);
+    auto cameraUp = glm::vec3(view[0][1], view[1][1], view[2][1]);
+    auto cameraForward = glm::vec3(view[0][2], view[1][2], view[2][2]);
+
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::particles;
     uniforms.particles.gridSize = emitter->gridSize;
-    uniforms.particles.render = static_cast<int>(emitter->renderMode);
 
     for (size_t i = 0; i < leafs.size(); ++i) {
         auto particle = static_cast<ParticleSceneNode *>(leafs[i]);
-        auto transform = particle->absoluteTransform();
-        if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
-            transform = glm::scale(transform, glm::vec3((1.0f + kMotionBlurStrength * kProjectileSpeed) * particle->size().x, particle->size().y, 1.0f));
-        } else {
-            transform = glm::scale(transform, glm::vec3(particle->size(), 1.0f));
-        }
-        uniforms.particles.particles[i].transform = move(transform);
-        uniforms.particles.particles[i].dir = glm::vec4(particle->dir(), 1.0f);
+        uniforms.particles.particles[i].positionFrame = glm::vec4(particle->getOrigin(), static_cast<float>(particle->frame()));
         uniforms.particles.particles[i].color = glm::vec4(particle->color(), particle->alpha());
         uniforms.particles.particles[i].size = glm::vec2(particle->size());
-        uniforms.particles.particles[i].frame = particle->frame();
+        switch (emitter->renderMode) {
+        case ModelNode::Emitter::RenderMode::BillboardToLocalZ:
+        case ModelNode::Emitter::RenderMode::MotionBlur:
+            uniforms.particles.particles[i].right = glm::vec4(emitterRight, 0.0f);
+            uniforms.particles.particles[i].up = glm::vec4(emitterUp, 0.0f);
+            if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
+                uniforms.particles.particles[i].size = glm::vec2(particle->size().x, (1.0f + kMotionBlurStrength * kProjectileSpeed) * particle->size().y);
+            }
+            break;
+        case ModelNode::Emitter::RenderMode::BillboardToWorldZ:
+            uniforms.particles.particles[i].right = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+            uniforms.particles.particles[i].up = glm::vec4(0.0f, 1.0f, 0.0, 0.0f);
+            break;
+        case ModelNode::Emitter::RenderMode::AlignedToParticleDir:
+            uniforms.particles.particles[i].right = glm::vec4(emitterForward, 0.0f);
+            uniforms.particles.particles[i].up = glm::vec4(emitterRight, 0.0f);
+            break;
+        case ModelNode::Emitter::RenderMode::Linked: {
+            auto particleUp = particle->dir();
+            auto particleForward = glm::cross(particleUp, cameraRight);
+            auto particleRight = glm::cross(particleForward, particleUp);
+            uniforms.particles.particles[i].right = glm::vec4(particleUp, 0.0f);
+            uniforms.particles.particles[i].up = glm::vec4(particleRight, 0.0f);
+            break;
+        }
+        case ModelNode::Emitter::RenderMode::Normal:
+        default:
+            uniforms.particles.particles[i].right = glm::vec4(cameraRight, 0.0f);
+            uniforms.particles.particles[i].up = glm::vec4(cameraUp, 0.0f);
+            break;
+        }
     }
 
     _shaders.use(_shaders.particle(), true);
