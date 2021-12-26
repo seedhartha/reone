@@ -120,7 +120,7 @@ struct LightUniforms {
 };
 
 struct LightingUniforms {
-    int lightCount {0};
+    int numLights {0};
     char padding[12];
     LightUniforms lights[kMaxLights];
 };
@@ -130,18 +130,17 @@ struct SkeletalUniforms {
 };
 
 struct ParticleUniforms {
-    glm::mat4 transform {1.0f};
-    glm::vec4 dir {0.0f};
+    glm::vec4 positionFrame {1.0f};
+    glm::vec4 right {0.0f};
+    glm::vec4 up {0.0f};
     glm::vec4 color {1.0f};
     glm::vec2 size {0.0f};
-    int frame {0};
-    char padding[4];
+    char padding[8];
 };
 
 struct ParticlesUniforms {
     glm::ivec2 gridSize {0};
-    int render {0};
-    char padding[4];
+    char padding[8];
     ParticleUniforms particles[kMaxParticles];
 };
 

@@ -56,7 +56,7 @@ const int MAX_TEXT_CHARS = 128;
 const int MAX_GRASS_CLUSTERS = 256;
 
 const float SHININESS = 8.0;
-const float ALPHA_THRESHOLD = 0.2;
+const float ALPHA_THRESHOLD = 0.1;
 
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
 const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
@@ -114,7 +114,7 @@ struct Light {
 };
 
 layout(std140) uniform Lighting {
-    int uLightCount;
+    int uNumLights;
     Light uLights[MAX_LIGHTS];
 };
 
@@ -123,16 +123,15 @@ layout(std140) uniform Skeletal {
 };
 
 struct Particle {
-    mat4 transform;
-    vec4 dir;
+    vec4 positionFrame;
+    vec4 up;
+    vec4 right;
     vec4 color;
     vec2 size;
-    int frame;
 };
 
 layout(std140) uniform Particles {
     ivec2 uParticleGridSize;
-    int uParticleRender;
     Particle uParticles[MAX_PARTICLES];
 };
 
@@ -304,7 +303,7 @@ static const string g_glslBlinnPhong = R"END(
 vec3 getLightingIndirect(vec3 N) {
     vec3 result = uWorldAmbientColor.rgb * uAmbientColor.rgb;
 
-    for (int i = 0; i < uLightCount; ++i) {
+    for (int i = 0; i < uNumLights; ++i) {
         if (!uLights[i].ambientOnly) continue;
 
         vec3 ambient = uLights[i].multiplier * uLights[i].color.rgb * uAmbientColor.rgb;
@@ -322,7 +321,7 @@ vec3 getLightingDirect(vec3 N, int dynTypeMask) {
     vec3 result = vec3(0.0);
     vec3 V = normalize(uCameraPosition.xyz - fragPosWorldSpace);
 
-    for (int i = 0; i < uLightCount; ++i) {
+    for (int i = 0; i < uNumLights; ++i) {
         if (uLights[i].ambientOnly) {
             continue;
         }
@@ -446,14 +445,6 @@ void main() {
 )END";
 
 static const string g_vsParticle = R"END(
-const int RENDER_NORMAL = 1;
-const int RENDER_LINKED = 2;
-const int RENDER_BILLBOARD_TO_LOCAL_Z = 3;
-const int RENDER_BILLBOARD_TO_WORLD_Z = 4;
-const int RENDER_ALIGNED_TO_WORLD_Z = 5;
-const int RENDER_ALIGNED_TO_PARTICLE_DIR = 6;
-const int RENDER_MOTION_BLUR = 7;
-
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;
 
@@ -461,46 +452,14 @@ out vec2 fragUV1;
 flat out int fragInstanceID;
 
 void main() {
-    vec4 P;
+    vec3 position = uParticles[gl_InstanceID].positionFrame.xyz;
+    vec3 right = uParticles[gl_InstanceID].right.xyz;
+    vec3 up = uParticles[gl_InstanceID].up.xyz;
+    vec4 P = vec4(
+        position + right * aPosition.x * uParticles[gl_InstanceID].size.x + up * aPosition.y * uParticles[gl_InstanceID].size.y,
+        1.0);
 
-    if (uParticleRender == RENDER_BILLBOARD_TO_WORLD_Z) {
-        vec3 particlePos = vec3(uParticles[gl_InstanceID].transform[3]);
-        P = vec4(
-            particlePos +
-                RIGHT * aPosition.x * uParticles[gl_InstanceID].size.x +
-                FORWARD * aPosition.y * uParticles[gl_InstanceID].size.y,
-            1.0);
-
-    } else if (uParticleRender == RENDER_MOTION_BLUR || uParticleRender == RENDER_BILLBOARD_TO_LOCAL_Z) {
-        P = uParticles[gl_InstanceID].transform * vec4(aPosition.y, aPosition.x, aPosition.z, 1.0);
-
-    } else if (uParticleRender == RENDER_ALIGNED_TO_PARTICLE_DIR) {
-        P = uParticles[gl_InstanceID].transform * vec4(aPosition.x, aPosition.z, aPosition.y, 1.0);
-
-    } else if (uParticleRender == RENDER_LINKED) {
-        vec3 particlePos = vec3(uParticles[gl_InstanceID].transform[3]);
-        vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
-        vec3 up = uParticles[gl_InstanceID].dir.xyz;
-
-        P = vec4(
-            particlePos +
-                cameraRight * aPosition.x * uParticles[gl_InstanceID].size.x +
-                up * aPosition.y * uParticles[gl_InstanceID].size.y,
-            1.0);
-
-    } else {
-        vec3 particlePos = vec3(uParticles[gl_InstanceID].transform[3]);
-        vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
-        vec3 cameraUp = vec3(uView[0][1], uView[1][1], uView[2][1]);
-
-        P = vec4(
-            particlePos +
-                cameraRight * aPosition.x * uParticles[gl_InstanceID].size.x +
-                cameraUp * aPosition.y * uParticles[gl_InstanceID].size.y,
-            1.0);
-    }
-
-    gl_Position = uProjection * uView * uModel * P;
+    gl_Position = uProjection * uView * P;
     fragUV1 = aUV1;
     fragInstanceID = gl_InstanceID;
 }
@@ -514,13 +473,10 @@ out vec2 fragUV1;
 flat out int fragInstanceID;
 
 void main() {
-    vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
-    vec3 cameraUp = vec3(uView[0][1], uView[1][1], uView[2][1]);
-
+    vec3 right = vec3(uView[0][0], uView[1][0], uView[2][0]);
+    vec3 up = vec3(uView[0][1], uView[1][1], uView[2][1]);
     vec4 P = vec4(
-        uGrassClusters[gl_InstanceID].positionVariant.xyz +
-            cameraRight * aPosition.x * uGrassQuadSize.x +
-            cameraUp * aPosition.y * uGrassQuadSize.y,
+        uGrassClusters[gl_InstanceID].positionVariant.xyz + right * aPosition.x * uGrassQuadSize.x + up * aPosition.y * uGrassQuadSize.y,
         1.0);
 
     gl_Position = uProjection * uView * P;
@@ -560,10 +516,10 @@ void main() {
         gl_Position.xy += uBillboardSize * aPosition.xy;
 
     } else {
-        vec3 cameraRight = vec3(uView[0][0], uView[1][0], uView[2][0]);
-        vec3 cameraUp = vec3(uView[0][1], uView[1][1], uView[2][1]);
+        vec3 right = vec3(uView[0][0], uView[1][0], uView[2][0]);
+        vec3 up = vec3(uView[0][1], uView[1][1], uView[2][1]);
         vec4 P = vec4(
-            vec3(uModel[3]) + cameraRight * aPosition.x + cameraUp * aPosition.y,
+            vec3(uModel[3]) + right * aPosition.x + up * aPosition.y,
             1.0);
 
         gl_Position = uProjection * uView * P;
@@ -751,14 +707,18 @@ void main() {
     vec2 uv = fragUV1;
     uv.x *= oneOverGridX;
     uv.y *= oneOverGridY;
-    if (uParticles[fragInstanceID].frame > 0) {
-        uv.y += oneOverGridY * (uParticles[fragInstanceID].frame / uParticleGridSize.x);
-        uv.x += oneOverGridX * (uParticles[fragInstanceID].frame % uParticleGridSize.x);
+
+    int frame = int(uParticles[fragInstanceID].positionFrame.w);
+    if (frame > 0) {
+        uv.y += oneOverGridY * (frame / uParticleGridSize.x);
+        uv.x += oneOverGridX * (frame % uParticleGridSize.x);
     }
+
     vec4 diffuseSample = texture(sDiffuseMap, uv);
     if (diffuseSample.a < ALPHA_THRESHOLD) {
         discard;
     }
+
     fragColor = vec4(uParticles[fragInstanceID].color.rgb * diffuseSample.rgb, uParticles[fragInstanceID].color.a * diffuseSample.a);
     fragColorBright = vec4(vec3(0.0), 0.0);
 }

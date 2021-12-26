@@ -325,7 +325,7 @@ void MeshSceneNode::draw() {
         uniforms.general.featureMask |= UniformsFeatureFlags::lighting;
         uniforms.general.ambientColor = glm::vec4(mesh->ambient, 1.0f);
         uniforms.general.diffuseColor = glm::vec4(mesh->diffuse, 1.0f);
-        uniforms.lighting.lightCount = static_cast<int>(lights.size());
+        uniforms.lighting.numLights = static_cast<int>(lights.size());
 
         for (size_t i = 0; i < lights.size(); ++i) {
             glm::vec4 position(lights[i]->absoluteTransform()[3]);
