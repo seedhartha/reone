@@ -45,16 +45,17 @@ const int FEATURE_FOG = 0x8000;
 const int FEATURE_DANGLYMESH = 0x10000;
 const int FEATURE_FIXEDSIZE = 0x20000;
 
-const int NUM_CUBE_FACES = 6;
-const int NUM_SHADOW_CASCADES = 8;
-const int NUM_SHADOW_LIGHT_SPACE = 8;
-
 const int MAX_BONES = 24;
 const int MAX_LIGHTS = 16;
 const int MAX_PARTICLES = 64;
 const int MAX_TEXT_CHARS = 128;
 const int MAX_GRASS_CLUSTERS = 256;
 
+const int NUM_CUBE_FACES = 6;
+const int NUM_SHADOW_CASCADES = 8;
+const int NUM_SHADOW_LIGHT_SPACE = 8;
+
+const float PI = 3.1415926538;
 const float SHININESS = 8.0;
 const float ALPHA_THRESHOLD = 0.1;
 
@@ -143,6 +144,7 @@ struct GrassCluster {
 
 layout(std140) uniform Grass {
     vec2 uGrassQuadSize;
+    float uGrassRadius;
     GrassCluster uGrassClusters[MAX_GRASS_CLUSTERS];
 };
 
@@ -475,8 +477,17 @@ out vec2 fragUV1;
 flat out int fragInstanceID;
 
 void main() {
-    vec3 right = vec3(uView[0][0], uView[1][0], uView[2][0]);
-    vec3 up = vec3(uView[0][1], uView[1][1], uView[2][1]);
+    vec3 clusterToCamera = uGrassClusters[gl_InstanceID].positionVariant.xyz - uCameraPosition.xyz;
+    float A = asin(smoothstep(0.5 * uGrassRadius, uGrassRadius, length(clusterToCamera)));
+    mat4 pitch = mat4(
+        1.0,  0.0,    0.0,    0.0,
+        0.0,  cos(A), sin(A), 0.0,
+        0.0, -sin(A), cos(A), 0.0,
+        0.0,  0.0,    0.0,    1.0);
+
+    mat4 M = pitch * uView;
+    vec3 right = vec3(M[0][0], M[1][0], M[2][0]);
+    vec3 up = vec3(M[0][1], M[1][1], M[2][1]);
     vec4 P = vec4(
         uGrassClusters[gl_InstanceID].positionVariant.xyz + right * aPosition.x * uGrassQuadSize.x + up * aPosition.y * uGrassQuadSize.y,
         1.0);
