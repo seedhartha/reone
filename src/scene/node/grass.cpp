@@ -38,6 +38,7 @@ namespace reone {
 
 namespace scene {
 
+static constexpr int kNumClustersInPool = 2048;
 static constexpr float kGrassDensityFactor = 0.25f;
 
 static constexpr float kMaxClusterDistance = 32.0f;
@@ -55,7 +56,7 @@ void GrassSceneNode::init() {
     }
 
     // Pre-allocate grass clusters
-    for (int i = 0; i < 1024; ++i) {
+    for (int i = 0; i < kNumClustersInPool; ++i) {
         _clusterPool.push(newCluster());
     }
 }
@@ -73,7 +74,7 @@ void GrassSceneNode::update(float dt) {
     auto cameraPos = camera->getOrigin();
     glm::vec3 meshSpaceCameraPos(_absTransformInv * glm::vec4(cameraPos, 1.0f));
 
-    // Return grass clusters in out of distance faces, to the pool
+    // Return grass clusters in out-of-distance faces, to the pool
     set<int> outOfDistance;
     for (auto &pair : _materializedClusters) {
         auto faceIdx = pair.first;
@@ -154,6 +155,7 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     for (size_t i = 0; i < leafs.size(); ++i) {
         auto cluster = static_cast<GrassClusterSceneNode *>(leafs[i]);
         uniforms.grass.quadSize = glm::vec2(_quadSize);
+        uniforms.grass.radius = kMaxClusterDistance;
         uniforms.grass.clusters[i].positionVariant = glm::vec4(cluster->getOrigin(), static_cast<float>(cluster->variant()));
         uniforms.grass.clusters[i].lightmapUV = cluster->lightmapUV();
     }

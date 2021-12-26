@@ -86,6 +86,7 @@ struct GeneralUniforms {
         fogNear = 0.0f;
         fogFar = 0.0f;
         shadowStrength = 1.0f;
+        shadowRadius = 0.0f;
         for (int i = 0; i < kNumShadowLightSpace; ++i) {
             shadowLightSpace[i] = glm::mat4(1.0f);
         }
@@ -108,6 +109,7 @@ struct GeneralUniforms {
         alpha = 1.0f;
         waterAlpha = 1.0f;
         heightMapScaling = 1.0f;
+        billboardSize = 1.0f;
         featureMask = 0;
     }
 };
@@ -154,7 +156,8 @@ struct GrassClusterUniforms {
 
 struct GrassUniforms {
     glm::vec2 quadSize {0.0f};
-    char padding[8];
+    float radius {0.0f};
+    char padding[4];
     GrassClusterUniforms clusters[kMaxGrassClusters];
 };
 
