@@ -50,6 +50,7 @@ public:
 
     virtual glm::vec3 shadowLightPosition() const = 0;
     virtual float shadowStrength() const = 0;
+    virtual float shadowRadius() const = 0;
 
     // END Shadows
 };

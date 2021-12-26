@@ -327,6 +327,7 @@ void WorldPipeline::drawGeometry() {
             _scene->isShadowLightDirectional() ? 0.0f : 1.0f);
         uniforms.general.shadowLightPosition = move(lightPosition);
         uniforms.general.shadowStrength = _scene->shadowStrength();
+        uniforms.general.shadowRadius = _scene->shadowRadius();
         for (int i = 0; i < kNumShadowLightSpace; ++i) {
             uniforms.general.shadowLightSpace[i] = _shadowLightSpace[i];
         }

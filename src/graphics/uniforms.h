@@ -68,8 +68,10 @@ struct GeneralUniforms {
     float fogFar {0.0f};
     float heightMapScaling {1.0f};
     float shadowStrength {0.0f};
+    float shadowRadius {0.0f};
     float billboardSize {1.0f};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
+    char padding[12];
     glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
     glm::vec4 shadowCascadeFarPlanes[2] {glm::vec4(0.0f)};
 
