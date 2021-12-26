@@ -89,6 +89,7 @@ layout(std140) uniform General {
     float uFogFar;
     float uHeightMapScaling;
     float uShadowStrength;
+    float uShadowRadius;
     float uBillboardSize;
     int uFeatureMask;
     mat4 uShadowLightSpace[NUM_SHADOW_LIGHT_SPACE];
@@ -292,6 +293,7 @@ float getShadow(vec3 normal) {
             }
         }
         result /= NUM_PCF_SAMPLES;
+        result *= 1.0 - smoothstep(uShadowRadius, 2.0 * uShadowRadius, currentDepth);
     }
 
     result *= uShadowStrength;

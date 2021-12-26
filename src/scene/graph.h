@@ -139,6 +139,7 @@ public:
 
     glm::vec3 shadowLightPosition() const override { return _shadowLight->absoluteTransform()[3]; }
     float shadowStrength() const override { return _shadowStrength; }
+    float shadowRadius() const override { return _shadowLight->radius(); }
 
     // END Shadows
 
