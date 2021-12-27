@@ -30,7 +30,7 @@ struct GraphicsOptions {
     bool vsync {true};
     TextureQuality textureQuality {0};
     bool grass {true};
-    int aaMethod {AntiAliasingMethods::none};
+    bool fxaa {false};
     int shadowResolution {0};
     float drawDistance {kDefaultObjectDrawDistance};
     int maxLights {8};

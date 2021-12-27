@@ -29,9 +29,6 @@ void GraphicsContext::init() {
     }
     glewInit();
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-    if (_options.aaMethod >= AntiAliasingMethods::msaa2) {
-        glEnable(GL_MULTISAMPLE);
-    }
 
     // Viewport
     glGetIntegerv(GL_VIEWPORT, &_viewport[0]);

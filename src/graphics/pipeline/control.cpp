@@ -43,33 +43,6 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     int w = extent[2];
     int h = extent[3];
 
-    shared_ptr<Texture> cbGeometry1MS;
-    shared_ptr<Texture> cbGeometry2MS;
-    shared_ptr<Renderbuffer> dbGeometryMS;
-    shared_ptr<Framebuffer> fbGeometryMS;
-
-    // Multi-sample geometry framebuffer
-
-    if (_options.aaMethod >= AntiAliasingMethods::msaa2) {
-        int samples = 2 << (_options.aaMethod - AntiAliasingMethods::msaa2);
-
-        cbGeometry1MS = make_shared<Texture>("geometry_color1_ms", getTextureProperties(TextureUsage::ColorBuffer, samples));
-        cbGeometry1MS->clear(w, h, PixelFormat::RGBA);
-        cbGeometry1MS->init();
-
-        cbGeometry2MS = make_shared<Texture>("geometry_color2_ms", getTextureProperties(TextureUsage::ColorBuffer, samples));
-        cbGeometry2MS->clear(w, h, PixelFormat::RGBA);
-        cbGeometry2MS->init();
-
-        dbGeometryMS = make_shared<Renderbuffer>(samples);
-        dbGeometryMS->configure(w, h, PixelFormat::Depth);
-        dbGeometryMS->init();
-
-        fbGeometryMS = make_unique<Framebuffer>();
-        fbGeometryMS->attachColorsDepth(cbGeometry1MS, cbGeometry2MS, dbGeometryMS);
-        fbGeometryMS->init();
-    }
-
     // Geometry framebuffer
 
     auto cbGeometry1 = make_shared<Texture>("geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
@@ -113,17 +86,13 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     // Attachments
 
     Attachments attachments;
-    attachments.cbGeometry1MS = move(cbGeometry1MS);
-    attachments.cbGeometry2MS = move(cbGeometry2MS);
-    attachments.dbGeometryMS = move(dbGeometryMS);
-    attachments.fbGeometryMS = move(fbGeometryMS);
     attachments.cbGeometry1 = move(cbGeometry1);
     attachments.cbGeometry2 = move(cbGeometry2);
-    attachments.dbGeometry = move(dbGeometry);
-    attachments.fbGeometry = move(fbGeometry);
     attachments.cbPing = move(cbPing);
     attachments.cbPong = move(cbPong);
+    attachments.dbGeometry = move(dbGeometry);
     attachments.dbCommon = move(dbCommon);
+    attachments.fbGeometry = move(fbGeometry);
     attachments.fbPing = move(fbPing);
     attachments.fbPong = move(fbPong);
     _attachments.insert(make_pair(attachmentsId, move(attachments)));
@@ -149,7 +118,6 @@ void ControlPipeline::drawGeometry(IScene &scene, Attachments &attachments, cons
     if (!camera) {
         return;
     }
-    auto &fbGeometryMS = *attachments.fbGeometryMS;
     auto &fbGeometry = *attachments.fbGeometry;
     int w = extent[2];
     int h = extent[3];
@@ -162,31 +130,13 @@ void ControlPipeline::drawGeometry(IScene &scene, Attachments &attachments, cons
     uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
     uniforms.general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
 
-    if (_options.aaMethod >= AntiAliasingMethods::msaa2) {
-        // Draw scene to multi-sample geometry framebuffer
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometryMS.nameGL());
-        glDrawBuffers(2, colors);
-        _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &w, &h, &scene]() {
-            _graphicsContext.clearColorDepth();
-            scene.draw();
-        });
-        // Blit multi-sample geometry framebuffer to geometry framebuffer
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, fbGeometryMS.nameGL());
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometry.nameGL());
-        for (int i = 0; i < 2; ++i) {
-            glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
-            glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
-            glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        }
-    } else {
-        // Draw scene to geometry framebuffer
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometry.nameGL());
-        glDrawBuffers(2, colors);
-        _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &w, &h, &scene]() {
-            _graphicsContext.clearColorDepth();
-            scene.draw();
-        });
-    }
+    // Draw scene to geometry framebuffer
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometry.nameGL());
+    glDrawBuffers(2, colors);
+    _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &w, &h, &scene]() {
+        _graphicsContext.clearColorDepth();
+        scene.draw();
+    });
 }
 
 void ControlPipeline::applyBloom(Attachments &attachments, const glm::ivec4 &extent) {
@@ -210,7 +160,7 @@ void ControlPipeline::applyBloom(Attachments &attachments, const glm::ivec4 &ext
 }
 
 void ControlPipeline::applyFXAA(Attachments &attachments, const glm::ivec4 &extent) {
-    if (_options.aaMethod != AntiAliasingMethods::fxaa) {
+    if (!_options.fxaa) {
         return;
     }
     int w = extent[2];
@@ -252,7 +202,7 @@ void ControlPipeline::presentControl(Attachments &attachments, const glm::ivec4 
     // Present ping (bloom) or pong (FXAA) color buffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     _shaders.use(_shaders.gui(), true);
-    _textures.bind(_options.aaMethod == AntiAliasingMethods::fxaa ? *attachments.cbPong : *attachments.cbPing);
+    _textures.bind(_options.fxaa ? *attachments.cbPong : *attachments.cbPing);
     _graphicsContext.withoutDepthTest([this]() {
         _meshes.quad().draw();
     });

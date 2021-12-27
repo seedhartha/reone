@@ -145,14 +145,6 @@ struct UniformBlockBindingPoints {
     static constexpr int grass = 5;
 };
 
-struct AntiAliasingMethods {
-    static constexpr int none = 0;
-    static constexpr int fxaa = 1;
-    static constexpr int msaa2 = 2;
-    static constexpr int msaa4 = 3;
-    static constexpr int msaa8 = 4;
-};
-
 // MDL
 
 constexpr int kMdlDataOffset = 12;

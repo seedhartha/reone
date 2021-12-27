@@ -89,34 +89,14 @@ LauncherFrame::LauncherFrame() :
 
     // END Screen Resolution
 
-    // Anti-Aliasing
+    // Texture Quality
 
-    wxArrayString antiAliasingChoices;
-    antiAliasingChoices.Add("None");
-    antiAliasingChoices.Add("FXAA");
-    antiAliasingChoices.Add("MSAA x2");
-    antiAliasingChoices.Add("MSAA x4");
-    antiAliasingChoices.Add("MSAA x8");
-
-    auto labelAntiAliasing = new wxStaticText(this, wxID_ANY, "Anti-Aliasing", wxDefaultPosition, wxDefaultSize);
-
-    _choiceAntiAliasing = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, antiAliasingChoices);
-    _choiceAntiAliasing->SetSelection(_config.aamethod);
-
-    auto antiAliasingSizer = new wxBoxSizer(wxVERTICAL);
-    antiAliasingSizer->Add(labelAntiAliasing, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    antiAliasingSizer->Add(_choiceAntiAliasing, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    auto labelTextureQuality = new wxStaticText(this, wxID_ANY, "Texture Quality", wxDefaultPosition, wxDefaultSize);
 
     wxArrayString textureQualityChoices;
     textureQualityChoices.Add("High");
     textureQualityChoices.Add("Medium");
     textureQualityChoices.Add("Low");
-
-    // END Anti-Aliasing
-
-    // Texture Quality
-
-    auto labelTextureQuality = new wxStaticText(this, wxID_ANY, "Texture Quality", wxDefaultPosition, wxDefaultSize);
 
     _choiceTextureQuality = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, textureQualityChoices);
     _choiceTextureQuality->SetSelection(_config.texQuality);
@@ -173,18 +153,21 @@ LauncherFrame::LauncherFrame() :
     _checkBoxVSync = new wxCheckBox(this, wxID_ANY, "Enable V-Sync", wxDefaultPosition, wxDefaultSize);
     _checkBoxVSync->SetValue(_config.vsync);
 
+    _checkBoxFXAA = new wxCheckBox(this, wxID_ANY, "Enable FXAA", wxDefaultPosition, wxDefaultSize);
+    _checkBoxFXAA->SetValue(_config.fxaa);
+
     _checkBoxGrass = new wxCheckBox(this, wxID_ANY, "Enable Grass", wxDefaultPosition, wxDefaultSize);
     _checkBoxGrass->SetValue(_config.grass);
 
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
     graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(textureQualitySizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(antiAliasingSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(shadowResSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(drawDistanceSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(maxLightsSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxVSync, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(_checkBoxFXAA, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxGrass, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
     // END Graphics
@@ -292,9 +275,9 @@ void LauncherFrame::LoadConfiguration() {
         ("height", po::value<int>()->default_value(768))                                //
         ("fullscreen", po::value<bool>()->default_value(false))                         //
         ("vsync", po::value<bool>()->default_value(true))                               //
+        ("fxaa", po::value<bool>()->default_value(false))                               //
         ("grass", po::value<bool>()->default_value(true))                               //
         ("texquality", po::value<int>()->default_value(0))                              //
-        ("aamethod", po::value<int>()->default_value(AntiAliasingMethods::none))        //
         ("shadowres", po::value<int>()->default_value(0))                               //
         ("drawdist", po::value<int>()->default_value(1024))                             //
         ("maxlights", po::value<int>()->default_value(8))                               //
@@ -318,9 +301,9 @@ void LauncherFrame::LoadConfiguration() {
     _config.height = vars["height"].as<int>();
     _config.fullscreen = vars["fullscreen"].as<bool>();
     _config.vsync = vars["vsync"].as<bool>();
+    _config.fxaa = vars["fxaa"].as<bool>();
     _config.grass = vars["grass"].as<bool>();
     _config.texQuality = vars["texquality"].as<int>();
-    _config.aamethod = vars["aamethod"].as<int>();
     _config.shadowres = vars["shadowres"].as<int>();
     _config.drawdist = vars["drawdist"].as<int>();
     _config.maxlights = vars["maxlights"].as<int>();
@@ -354,9 +337,9 @@ void LauncherFrame::SaveConfiguration() {
         "height=",
         "fullscreen=",
         "vsync=",
+        "fxaa=",
         "grass=",
         "texquality=",
-        "aamethod=",
         "shadowres=",
         "drawdist=",
         "maxlights=",
@@ -413,9 +396,9 @@ void LauncherFrame::SaveConfiguration() {
     _config.height = stoi(tokens[1]);
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
     _config.vsync = _checkBoxVSync->IsChecked();
+    _config.fxaa = _checkBoxFXAA->IsChecked();
     _config.grass = _checkBoxGrass->IsChecked();
     _config.texQuality = _choiceTextureQuality->GetSelection();
-    _config.aamethod = _choiceAntiAliasing->GetSelection();
     _config.shadowres = _choiceShadowResolution->GetSelection();
     _config.drawdist = _sliderDrawDistance->GetValue();
     _config.maxlights = _sliderMaxLights->GetValue();
@@ -450,9 +433,9 @@ void LauncherFrame::SaveConfiguration() {
     config << "height=" << _config.height << endl;
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
     config << "vsync=" << (_config.vsync ? 1 : 0) << endl;
+    config << "fxaa=" << (_config.fxaa ? 1 : 0) << endl;
     config << "grass=" << (_config.grass ? 1 : 0) << endl;
     config << "texquality=" << _config.texQuality << endl;
-    config << "aamethod=" << _config.aamethod << endl;
     config << "shadowres=" << _config.shadowres << endl;
     config << "drawdist=" << _config.drawdist << endl;
     config << "maxlights=" << _config.maxlights << endl;

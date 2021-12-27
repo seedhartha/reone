@@ -26,10 +26,6 @@ namespace graphics {
 
 class Renderbuffer : public IAttachment, boost::noncopyable {
 public:
-    Renderbuffer(int numSamples = 1) :
-        _numSamples(numSamples) {
-    }
-
     ~Renderbuffer() { deinit(); }
 
     void init();
@@ -51,8 +47,6 @@ public:
     // END OpenGL
 
 private:
-    int _numSamples;
-
     bool _inited {false};
 
     int _width {0};

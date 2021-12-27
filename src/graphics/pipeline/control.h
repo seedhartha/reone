@@ -71,19 +71,15 @@ private:
     };
 
     struct Attachments {
-        std::shared_ptr<Texture> cbGeometry1MS;
-        std::shared_ptr<Texture> cbGeometry2MS;
-        std::shared_ptr<Renderbuffer> dbGeometryMS;
-        std::shared_ptr<Framebuffer> fbGeometryMS;
-
         std::shared_ptr<Texture> cbGeometry1;
         std::shared_ptr<Texture> cbGeometry2;
-        std::shared_ptr<Renderbuffer> dbGeometry;
-        std::shared_ptr<Framebuffer> fbGeometry;
-
         std::shared_ptr<Texture> cbPing;
         std::shared_ptr<Texture> cbPong;
+
+        std::shared_ptr<Renderbuffer> dbGeometry;
         std::shared_ptr<Renderbuffer> dbCommon;
+
+        std::shared_ptr<Framebuffer> fbGeometry;
         std::shared_ptr<Framebuffer> fbPing;
         std::shared_ptr<Framebuffer> fbPong;
     };

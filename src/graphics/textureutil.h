@@ -25,7 +25,7 @@ namespace graphics {
 
 void prepareCubemap(Texture &texture);
 
-Texture::Properties getTextureProperties(TextureUsage usage, int numSamples = 1);
+Texture::Properties getTextureProperties(TextureUsage usage);
 
 inline bool isCompressed(PixelFormat format) {
     return format == PixelFormat::DXT1 || format == PixelFormat::DXT5;

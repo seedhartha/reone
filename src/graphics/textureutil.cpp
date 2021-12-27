@@ -133,9 +133,8 @@ void prepareCubemap(Texture &texture) {
     }
 }
 
-Texture::Properties getTextureProperties(TextureUsage usage, int numSamples) {
+Texture::Properties getTextureProperties(TextureUsage usage) {
     Texture::Properties properties;
-    properties.numSamples = numSamples;
 
     if (usage == TextureUsage::GUI ||
         usage == TextureUsage::ColorBuffer ||
