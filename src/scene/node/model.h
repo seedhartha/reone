@@ -163,7 +163,7 @@ private:
 
     // Flags
 
-    bool _pickable {true};
+    bool _pickable {false};
 
     // END Flags
 
