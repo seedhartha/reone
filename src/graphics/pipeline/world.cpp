@@ -246,13 +246,11 @@ void WorldPipeline::draw() {
     computeLightSpaceMatrices();
     drawShadows();
     drawGeometry();
-    _graphicsContext.withBlending(BlendMode::None, [this]() {
-        applyHorizontalBlur();
-        applyVerticalBlur();
-        applyBloom();
-        applyFXAA();
-        presentWorld();
-    });
+    applyHorizontalBlur();
+    applyVerticalBlur();
+    applyBloom();
+    applyFXAA();
+    presentWorld();
 }
 
 void WorldPipeline::computeLightSpaceMatrices() {
@@ -347,7 +345,6 @@ void WorldPipeline::drawGeometry() {
         // Draw scene to multi-sample geometry framebuffer
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbGeometryMS->nameGL());
         glDrawBuffers(2, colors);
-        _graphicsContext.clearColorDepth();
         if (_scene->hasShadowLight()) {
             if (_scene->isShadowLightDirectional()) {
                 _textures.bind(*_dbDirectionalLightShadows, TextureUnits::shadowMap);
@@ -355,6 +352,7 @@ void WorldPipeline::drawGeometry() {
                 _textures.bind(*_dbPointLightShadows, TextureUnits::cubeShadowMap);
             }
         }
+        _graphicsContext.clearColorDepth();
         _scene->draw();
         // Blit multi-sample geometry framebuffer to geometry framebuffer
         glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbGeometryMS->nameGL());
@@ -410,9 +408,9 @@ void WorldPipeline::applyVerticalBlur() {
 
     // Apply vertical blur to ping color buffer
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbPong->nameGL());
-    _graphicsContext.clearColorDepth();
     _shaders.use(_shaders.blur(), true);
     _textures.bind(*_cbPing);
+    _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
@@ -424,10 +422,10 @@ void WorldPipeline::applyBloom() {
 
     // Combine geometry and pong (horizontal + vertical blur) color buffers
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbPing->nameGL());
-    _graphicsContext.clearColorDepth();
     _shaders.use(_shaders.bloom(), true);
     _textures.bind(*_cbGeometry1);
     _textures.bind(*_cbPong, TextureUnits::bloom);
+    _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
@@ -446,9 +444,9 @@ void WorldPipeline::applyFXAA() {
 
     // Apply FXAA to ping (bloom) color buffer
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbPong->nameGL());
-    _graphicsContext.clearColorDepth();
     _shaders.use(_shaders.fxaa(), true);
     _textures.bind(*_cbPing);
+    _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
@@ -460,9 +458,9 @@ void WorldPipeline::presentWorld() {
 
     // Present ping (bloom) or pong (FXAA) color buffer
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    _graphicsContext.clearColorDepth();
     _shaders.use(_shaders.presentWorld(), true);
     _textures.bind(_options.aaMethod == AntiAliasingMethods::fxaa ? *_cbPong : *_cbPing);
+    _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 
     // Render to screenshot texture

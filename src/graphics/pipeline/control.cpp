@@ -43,7 +43,8 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     int w = extent[2];
     int h = extent[3];
 
-    shared_ptr<Texture> cbGeometryMS;
+    shared_ptr<Texture> cbGeometry1MS;
+    shared_ptr<Texture> cbGeometry2MS;
     shared_ptr<Renderbuffer> dbGeometryMS;
     shared_ptr<Framebuffer> fbGeometryMS;
 
@@ -52,54 +53,102 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     if (_options.aaMethod >= AntiAliasingMethods::msaa2) {
         int samples = 2 << (_options.aaMethod - AntiAliasingMethods::msaa2);
 
-        cbGeometryMS = make_shared<Texture>("geometry_color_ms", getTextureProperties(TextureUsage::ColorBuffer, samples));
-        cbGeometryMS->clear(w, h, PixelFormat::RGBA);
-        cbGeometryMS->init();
+        cbGeometry1MS = make_shared<Texture>("geometry_color1_ms", getTextureProperties(TextureUsage::ColorBuffer, samples));
+        cbGeometry1MS->clear(w, h, PixelFormat::RGBA);
+        cbGeometry1MS->init();
+
+        cbGeometry2MS = make_shared<Texture>("geometry_color2_ms", getTextureProperties(TextureUsage::ColorBuffer, samples));
+        cbGeometry2MS->clear(w, h, PixelFormat::RGBA);
+        cbGeometry2MS->init();
 
         dbGeometryMS = make_shared<Renderbuffer>(samples);
         dbGeometryMS->configure(w, h, PixelFormat::Depth);
         dbGeometryMS->init();
 
         fbGeometryMS = make_unique<Framebuffer>();
-        fbGeometryMS->attachColorDepth(cbGeometryMS, dbGeometryMS);
+        fbGeometryMS->attachColorsDepth(cbGeometry1MS, cbGeometry2MS, dbGeometryMS);
         fbGeometryMS->init();
     }
 
     // Geometry framebuffer
 
-    auto cbGeometry = make_shared<Texture>("geometry_color", getTextureProperties(TextureUsage::ColorBuffer));
-    cbGeometry->clear(w, h, PixelFormat::RGBA);
-    cbGeometry->init();
+    auto cbGeometry1 = make_shared<Texture>("geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
+    cbGeometry1->clear(w, h, PixelFormat::RGBA);
+    cbGeometry1->init();
+
+    auto cbGeometry2 = make_shared<Texture>("geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
+    cbGeometry2->clear(w, h, PixelFormat::RGBA);
+    cbGeometry2->init();
 
     auto dbGeometry = make_shared<Renderbuffer>();
     dbGeometry->configure(w, h, PixelFormat::Depth);
     dbGeometry->init();
 
     auto fbGeometry = make_unique<Framebuffer>();
-    fbGeometry->attachColorDepth(cbGeometry, dbGeometry);
+    fbGeometry->attachColorsDepth(cbGeometry1, cbGeometry2, dbGeometry);
     fbGeometry->init();
 
+    // Reusable ping-pong framebuffers
+
+    auto cbPing = make_shared<Texture>("ping_color", getTextureProperties(TextureUsage::ColorBuffer));
+    cbPing->clear(w, h, PixelFormat::RGBA);
+    cbPing->init();
+
+    auto cbPong = make_shared<Texture>("pong_color", getTextureProperties(TextureUsage::ColorBuffer));
+    cbPong->clear(w, h, PixelFormat::RGBA);
+    cbPong->init();
+
+    auto dbCommon = make_shared<Renderbuffer>();
+    dbCommon->configure(w, h, PixelFormat::Depth);
+    dbCommon->init();
+
+    auto fbPing = make_unique<Framebuffer>();
+    fbPing->attachColorDepth(cbPing, dbCommon);
+    fbPing->init();
+
+    auto fbPong = make_unique<Framebuffer>();
+    fbPong->attachColorDepth(cbPong, dbCommon);
+    fbPong->init();
+
+    // Attachments
+
     Attachments attachments;
-    attachments.cbGeometryMS = move(cbGeometryMS);
+    attachments.cbGeometry1MS = move(cbGeometry1MS);
+    attachments.cbGeometry2MS = move(cbGeometry2MS);
     attachments.dbGeometryMS = move(dbGeometryMS);
     attachments.fbGeometryMS = move(fbGeometryMS);
-    attachments.cbGeometry = move(cbGeometry);
+    attachments.cbGeometry1 = move(cbGeometry1);
+    attachments.cbGeometry2 = move(cbGeometry2);
     attachments.dbGeometry = move(dbGeometry);
     attachments.fbGeometry = move(fbGeometry);
+    attachments.cbPing = move(cbPing);
+    attachments.cbPong = move(cbPong);
+    attachments.dbCommon = move(dbCommon);
+    attachments.fbPing = move(fbPing);
+    attachments.fbPong = move(fbPong);
     _attachments.insert(make_pair(attachmentsId, move(attachments)));
 }
 
-void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, const glm::ivec2 &offset) {
-    auto camera = scene.camera();
-    if (!camera) {
-        return;
-    }
+void ControlPipeline::draw(IScene &scene, const glm::ivec4 &extent, const glm::ivec2 &offset) {
     AttachmentsId attachmentsId {extent};
     auto maybeAttachments = _attachments.find(attachmentsId);
     if (maybeAttachments == _attachments.end()) {
         return;
     }
     auto &attachments = maybeAttachments->second;
+    drawGeometry(scene, attachments, extent);
+    applyBloom(attachments, extent);
+    applyFXAA(attachments, extent);
+    presentControl(attachments, extent, offset);
+}
+
+void ControlPipeline::drawGeometry(IScene &scene, Attachments &attachments, const glm::ivec4 &extent) {
+    static constexpr GLenum colors[] {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+
+    auto camera = scene.camera();
+    if (!camera) {
+        return;
+    }
     auto &fbGeometryMS = *attachments.fbGeometryMS;
     auto &fbGeometry = *attachments.fbGeometry;
     int w = extent[2];
@@ -116,6 +165,7 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     if (_options.aaMethod >= AntiAliasingMethods::msaa2) {
         // Draw scene to multi-sample geometry framebuffer
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometryMS.nameGL());
+        glDrawBuffers(2, colors);
         _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &w, &h, &scene]() {
             _graphicsContext.clearColorDepth();
             scene.draw();
@@ -131,16 +181,59 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     } else {
         // Draw scene to geometry framebuffer
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometry.nameGL());
+        glDrawBuffers(2, colors);
         _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &w, &h, &scene]() {
             _graphicsContext.clearColorDepth();
             scene.draw();
         });
     }
+}
 
-    // Reset framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+void ControlPipeline::applyBloom(Attachments &attachments, const glm::ivec4 &extent) {
+    int w = extent[2];
+    int h = extent[3];
 
-    // Present geometry framebuffer
+    // Reset uniforms
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
+
+    // Combine geometry and bright geometry color buffers
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbPing->nameGL());
+    _shaders.use(_shaders.bloom(), true);
+    _textures.bind(*attachments.cbGeometry1);
+    _textures.bind(*attachments.cbGeometry2, TextureUnits::bloom);
+    _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &attachments]() {
+        _graphicsContext.clearColorDepth();
+        _meshes.quadNDC().draw();
+    });
+}
+
+void ControlPipeline::applyFXAA(Attachments &attachments, const glm::ivec4 &extent) {
+    if (_options.aaMethod != AntiAliasingMethods::fxaa) {
+        return;
+    }
+    int w = extent[2];
+    int h = extent[3];
+
+    // Reset uniforms
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
+    uniforms.general.screenResolution = glm::vec2(extent[2], extent[3]);
+
+    // Apply FXAA to ping (bloom) color buffer
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbPong->nameGL());
+    _shaders.use(_shaders.fxaa(), true);
+    _textures.bind(*attachments.cbPing);
+    _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &attachments]() {
+        _graphicsContext.clearColorDepth();
+        _meshes.quadNDC().draw();
+    });
+}
+
+void ControlPipeline::presentControl(Attachments &attachments, const glm::ivec4 &extent, const glm::ivec2 &offset) {
+    // Set uniforms
     glm::mat4 projection(glm::ortho(
         0.0f,
         static_cast<float>(_options.width),
@@ -149,12 +242,17 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(extent[0] + offset.x, extent[1] + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(extent[2], extent[3], 1.0f));
+
+    auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
     uniforms.general.projection = move(projection);
     uniforms.general.model = move(transform);
+
+    // Present ping (bloom) or pong (FXAA) color buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     _shaders.use(_shaders.gui(), true);
-    _textures.bind(*attachments.cbGeometry);
+    _textures.bind(_options.aaMethod == AntiAliasingMethods::fxaa ? *attachments.cbPong : *attachments.cbPing);
     _graphicsContext.withoutDepthTest([this]() {
         _meshes.quad().draw();
     });
