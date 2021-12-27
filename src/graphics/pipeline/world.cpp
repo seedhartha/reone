@@ -157,7 +157,7 @@ void WorldPipeline::init() {
     // Reusable framebuffers
 
     _cbPing = make_unique<Texture>("ping_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _cbPing->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbPing->clear(_options.width, _options.height, PixelFormat::RGBA);
     _cbPing->init();
 
     _fbPing = make_unique<Framebuffer>();
@@ -165,7 +165,7 @@ void WorldPipeline::init() {
     _fbPing->init();
 
     _cbPong = make_unique<Texture>("pong_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _cbPong->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbPong->clear(_options.width, _options.height, PixelFormat::RGBA);
     _cbPong->init();
 
     _fbPong = make_unique<Framebuffer>();
@@ -246,11 +246,13 @@ void WorldPipeline::draw() {
     computeLightSpaceMatrices();
     drawShadows();
     drawGeometry();
-    applyHorizontalBlur();
-    applyVerticalBlur();
-    applyBloom();
-    applyFXAA();
-    presentWorld();
+    _graphicsContext.withBlending(BlendMode::None, [this]() {
+        applyHorizontalBlur();
+        applyVerticalBlur();
+        applyBloom();
+        applyFXAA();
+        presentWorld();
+    });
 }
 
 void WorldPipeline::computeLightSpaceMatrices() {
@@ -385,8 +387,7 @@ void WorldPipeline::applyHorizontalBlur() {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
-    uniforms.general.featureMask = UniformsFeatureFlags::blur;
-    uniforms.general.blurResolution = glm::vec2(w, h);
+    uniforms.general.screenResolution = glm::vec2(w, h);
     uniforms.general.blurDirection = glm::vec2(1.0f, 0.0f);
 
     // Apply horizontal blur to bright geometry color buffer
@@ -404,8 +405,7 @@ void WorldPipeline::applyVerticalBlur() {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
-    uniforms.general.featureMask = UniformsFeatureFlags::blur;
-    uniforms.general.blurResolution = glm::vec2(w, h);
+    uniforms.general.screenResolution = glm::vec2(w, h);
     uniforms.general.blurDirection = glm::vec2(0.0f, 1.0f);
 
     // Apply vertical blur to ping color buffer
@@ -432,10 +432,17 @@ void WorldPipeline::applyBloom() {
 }
 
 void WorldPipeline::applyFXAA() {
+    if (_options.aaMethod != AntiAliasingMethods::fxaa) {
+        return;
+    }
+
     // Reset uniforms
+    float w = static_cast<float>(_options.width);
+    float h = static_cast<float>(_options.height);
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
+    uniforms.general.screenResolution = glm::vec2(w, h);
 
     // Apply FXAA to ping (bloom) color buffer
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbPong->nameGL());
@@ -451,11 +458,11 @@ void WorldPipeline::presentWorld() {
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
 
-    // Present pong color (FXAA) buffer
+    // Present ping (bloom) or pong (FXAA) color buffer
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     _graphicsContext.clearColorDepth();
     _shaders.use(_shaders.presentWorld(), true);
-    _textures.bind(*_cbPong);
+    _textures.bind(_options.aaMethod == AntiAliasingMethods::fxaa ? *_cbPong : *_cbPing);
     _meshes.quadNDC().draw();
 
     // Render to screenshot texture
