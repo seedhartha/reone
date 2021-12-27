@@ -60,7 +60,6 @@ public:
         glm::vec3 borderColor {1.0f};
         bool cubemap {false};
         bool lookup {false};
-        int numSamples {1};
     };
 
     /**
@@ -109,7 +108,6 @@ public:
     bool isLookup() const { return _properties.lookup; }
     bool is2DArray() const { return _layers.size() > 1ll && !_properties.cubemap; }
 
-    bool isMultisample() const { return _properties.numSamples > 1; }
     bool isAdditive() const { return _features.blending == Blending::Additive; }
     bool isGrayscale() const { return _pixelFormat == PixelFormat::Grayscale; }
 

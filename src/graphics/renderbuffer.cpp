@@ -56,11 +56,7 @@ void Renderbuffer::configure(int width, int height, PixelFormat format) {
 }
 
 void Renderbuffer::refresh() {
-    if (_numSamples > 1) {
-        glRenderbufferStorageMultisample(GL_RENDERBUFFER, _numSamples, getInternalPixelFormatGL(_pixelFormat), _width, _height);
-    } else {
-        glRenderbufferStorage(GL_RENDERBUFFER, getInternalPixelFormatGL(_pixelFormat), _width, _height);
-    }
+    glRenderbufferStorage(GL_RENDERBUFFER, getInternalPixelFormatGL(_pixelFormat), _width, _height);
 }
 
 } // namespace graphics

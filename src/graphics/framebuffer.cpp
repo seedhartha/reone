@@ -95,8 +95,7 @@ void Framebuffer::attachTexture(const Texture &texture, Attachment attachment) c
     if (texture.isCubemap() || texture.is2DArray()) {
         glFramebufferTexture(GL_FRAMEBUFFER, attachmentGL, texture.nameGL(), 0);
     } else {
-        GLenum target = texture.isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
-        glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentGL, target, texture.nameGL(), 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentGL, GL_TEXTURE_2D, texture.nameGL(), 0);
     }
 }
 

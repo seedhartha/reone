@@ -43,9 +43,9 @@ private:
         int height {0};
         bool fullscreen {false};
         bool vsync {true};
+        bool fxaa {false};
         int texQuality {0};
         bool grass {true};
-        int aamethod {0};
         int shadowres {0};
         int drawdist {64};
         int maxlights {8};
@@ -62,14 +62,13 @@ private:
     wxCheckBox *_checkBoxDev;
     wxChoice *_choiceResolution;
     wxChoice *_choiceTextureQuality;
-    wxChoice *_choiceAntiAliasing;
     wxChoice *_choiceShadowResolution;
     wxSlider *_sliderDrawDistance;
     wxSlider *_sliderMaxLights;
     wxCheckBox *_checkBoxFullscreen;
     wxCheckBox *_checkBoxVSync;
+    wxCheckBox *_checkBoxFXAA;
     wxCheckBox *_checkBoxGrass;
-    wxCheckBox *_checkBoxDynamicRoomLighting;
     wxSlider *_sliderVolumeMusic;
     wxSlider *_sliderVolumeVoice;
     wxSlider *_sliderVolumeSound;

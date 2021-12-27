@@ -223,12 +223,11 @@ void Texture::refresh1D() {
 }
 
 void Texture::refresh2D() {
-    GLenum target = isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
     if (!_layers.empty() && _layers.front().pixels) {
         auto &pixels = _layers.front().pixels;
-        fillTarget2D(target, _width, _height, pixels->data(), static_cast<int>(pixels->size()));
+        fillTarget2D(GL_TEXTURE_2D, _width, _height, pixels->data(), static_cast<int>(pixels->size()));
     } else {
-        fillTarget2D(target, _width, _height);
+        fillTarget2D(GL_TEXTURE_2D, _width, _height);
     }
 }
 
@@ -267,9 +266,6 @@ void Texture::flushGPUToCPU() {
     if (is2DArray()) {
         throw logic_error("Flushing cubemap or array textures is not supported");
     }
-    if (isMultisample()) {
-        throw logic_error("Flushing multisample textures is not supported");
-    }
     Layer layer;
     layer.pixels = make_shared<ByteArray>();
     layer.pixels->resize(3 * _width * _height);
@@ -288,9 +284,6 @@ glm::vec4 Texture::sample(float s, float t) const {
 glm::vec4 Texture::sample(int x, int y) const {
     if (is2DArray()) {
         throw logic_error("Sampling cubemap or array textures is not supported");
-    }
-    if (isMultisample()) {
-        throw logic_error("Sampling multisample textures is not supported");
     }
     if (isCompressed(_pixelFormat)) {
         throw logic_error("Sampling compressed textures is not supported");
@@ -363,25 +356,15 @@ void Texture::fillTarget2D(uint32_t target, int width, int height, const void *p
         glCompressedTexImage2D(target, 0, getInternalPixelFormatGL(_pixelFormat), width, height, 0, size, pixels);
         break;
     default:
-        if (isMultisample()) {
-            // Multisample textures can only be allocated, not filled
-            glTexImage2DMultisample(
-                target,
-                _properties.numSamples,
-                getInternalPixelFormatGL(_pixelFormat),
-                width, height,
-                GL_TRUE);
-        } else {
-            glTexImage2D(
-                target,
-                0,
-                getInternalPixelFormatGL(_pixelFormat),
-                width, height,
-                0,
-                getPixelFormatGL(_pixelFormat),
-                getPixelTypeGL(_pixelFormat),
-                pixels);
-        }
+        glTexImage2D(
+            target,
+            0,
+            getInternalPixelFormatGL(_pixelFormat),
+            width, height,
+            0,
+            getPixelFormatGL(_pixelFormat),
+            getPixelTypeGL(_pixelFormat),
+            pixels);
         break;
     }
 }
@@ -406,7 +389,7 @@ uint32_t Texture::getTargetGL() const {
     } else if (is2DArray()) {
         return GL_TEXTURE_2D_ARRAY;
     } else {
-        return isMultisample() ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+        return GL_TEXTURE_2D;
     }
 }
 
