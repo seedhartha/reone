@@ -36,12 +36,11 @@ struct UniformsFeatureFlags {
     static constexpr int shadows = 0x200;
     static constexpr int particles = 0x400;
     static constexpr int water = 0x800;
-    static constexpr int blur = 0x1000;
-    static constexpr int text = 0x2000;
-    static constexpr int grass = 0x4000;
-    static constexpr int fog = 0x8000;
-    static constexpr int danglymesh = 0x10000;
-    static constexpr int fixedsize = 0x20000;
+    static constexpr int text = 0x1000;
+    static constexpr int grass = 0x2000;
+    static constexpr int fog = 0x4000;
+    static constexpr int danglymesh = 0x8000;
+    static constexpr int fixedsize = 0x10000;
 };
 
 struct GeneralUniforms {
@@ -60,7 +59,7 @@ struct GeneralUniforms {
     glm::vec4 fogColor {0.0f};
     glm::vec4 heightMapFrameBounds {0.0f};
     glm::vec4 shadowLightPosition {0.0f}; /**< W = 0 if light is directional */
-    glm::vec2 blurResolution {0.0f};
+    glm::vec2 screenResolution {0.0f};
     glm::vec2 blurDirection {0.0f};
     float alpha {1.0f};
     float waterAlpha {1.0f};
@@ -83,6 +82,7 @@ struct GeneralUniforms {
         worldAmbientColor = glm::vec4(1.0f);
         fogColor = glm::vec4(0.0f);
         shadowLightPosition = glm::vec4(0.0f);
+        screenResolution = glm::vec2(0.0f);
         fogNear = 0.0f;
         fogFar = 0.0f;
         shadowStrength = 1.0f;
@@ -105,7 +105,6 @@ struct GeneralUniforms {
         selfIllumColor = glm::vec4(1.0f);
         discardColor = glm::vec4(0.0f);
         heightMapFrameBounds = glm::vec4(0.0f);
-        blurResolution = glm::vec2(0.0f);
         blurDirection = glm::vec2(0.0f);
         alpha = 1.0f;
         waterAlpha = 1.0f;

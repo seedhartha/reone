@@ -38,12 +38,11 @@ const int FEATURE_DISCARD = 0x100;
 const int FEATURE_SHADOWS = 0x200;
 const int FEATURE_PARTICLES = 0x400;
 const int FEATURE_WATER = 0x800;
-const int FEATURE_BLUR = 0x1000;
-const int FEATURE_TEXT = 0x2000;
-const int FEATURE_GRASS = 0x4000;
-const int FEATURE_FOG = 0x8000;
-const int FEATURE_DANGLYMESH = 0x10000;
-const int FEATURE_FIXEDSIZE = 0x20000;
+const int FEATURE_TEXT = 0x1000;
+const int FEATURE_GRASS = 0x2000;
+const int FEATURE_FOG = 0x4000;
+const int FEATURE_DANGLYMESH = 0x8000;
+const int FEATURE_FIXEDSIZE = 0x10000;
 
 const int MAX_BONES = 24;
 const int MAX_LIGHTS = 16;
@@ -82,7 +81,7 @@ layout(std140) uniform General {
     vec4 uFogColor;
     vec4 uHeightMapFrameBounds;
     vec4 uShadowLightPosition;
-    vec2 uBlurResolution;
+    vec2 uScreenResolution;
     vec2 uBlurDirection;
     float uAlpha;
     float uWaterAlpha;
@@ -784,17 +783,17 @@ uniform sampler2D sDiffuseMap;
 out vec4 fragColor;
 
 void main() {
-    vec2 uv = vec2(gl_FragCoord.xy / uBlurResolution);
-    vec4 color = vec4(0.0);
+    vec2 uv = vec2(gl_FragCoord.xy / uScreenResolution);
+    vec3 color = vec3(0.0);
     vec2 off1 = vec2(1.3846153846) * uBlurDirection;
     vec2 off2 = vec2(3.2307692308) * uBlurDirection;
-    color += texture(sDiffuseMap, uv) * 0.2270270270;
-    color += texture(sDiffuseMap, uv + (off1 / uBlurResolution)) * 0.3162162162;
-    color += texture(sDiffuseMap, uv - (off1 / uBlurResolution)) * 0.3162162162;
-    color += texture(sDiffuseMap, uv + (off2 / uBlurResolution)) * 0.0702702703;
-    color += texture(sDiffuseMap, uv - (off2 / uBlurResolution)) * 0.0702702703;
+    color += texture(sDiffuseMap, uv).rgb * 0.2270270270;
+    color += texture(sDiffuseMap, uv + (off1 / uScreenResolution)).rgb * 0.3162162162;
+    color += texture(sDiffuseMap, uv - (off1 / uScreenResolution)).rgb * 0.3162162162;
+    color += texture(sDiffuseMap, uv + (off2 / uScreenResolution)).rgb * 0.0702702703;
+    color += texture(sDiffuseMap, uv - (off2 / uScreenResolution)).rgb * 0.0702702703;
 
-    fragColor = color;
+    fragColor = vec4(color, 1.0);
 }
 )END";
 
@@ -810,20 +809,211 @@ void main() {
     vec4 diffuseSample = texture(sDiffuseMap, fragUV1);
     vec4 bloomSample = texture(sBloom, fragUV1);
     vec3 color = diffuseSample.rgb + bloomSample.rgb;
+    float luma = dot(color, vec3(0.299, 0.587, 0.114));
 
-    fragColor = vec4(color, 1.0);
+    fragColor = vec4(color, luma);
 }
 )END";
 
 static const string g_fsFXAA = R"END(
+const float SUBPIX = 0.75;
+const float EDGE_THRESHOLD = 0.166;
+const float EDGE_THRESHOLD_MIN = 0.0833;
+
+const int QUALITY_PS = 5;
+const float QUALITY_P0 = 1.0;
+const float QUALITY_P1 = 1.5;
+const float QUALITY_P2 = 2.0;
+const float QUALITY_P3 = 4.0;
+const float QUALITY_P4 = 12.0;
+
 uniform sampler2D sDiffuseMap;
 
 in vec2 fragUV1;
 
 out vec4 fragColor;
 
+float getLuma(vec4 rgba) {
+    return rgba.a;
+}
+
 void main() {
-    fragColor = texture(sDiffuseMap, fragUV1);
+    vec2 rcpFrame = 1.0 / uScreenResolution;
+
+    vec2 posM;
+    posM.x = fragUV1.x;
+    posM.y = fragUV1.y;
+
+    vec4 rgbyM = textureLod(sDiffuseMap, posM, 0.0);
+    float lumaM = rgbyM.a;
+    float lumaS = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(0, 1)));
+    float lumaE = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(1, 0)));
+    float lumaN = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(0, -1)));
+    float lumaW = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(-1, 0)));
+
+    float maxSM = max(lumaS, lumaM);
+    float minSM = min(lumaS, lumaM);
+    float maxESM = max(lumaE, maxSM);
+    float minESM = min(lumaE, minSM);
+    float maxWN = max(lumaN, lumaW);
+    float minWN = min(lumaN, lumaW);
+    float rangeMax = max(maxWN, maxESM);
+    float rangeMin = min(minWN, minESM);
+    float rangeMaxScaled = rangeMax * EDGE_THRESHOLD;
+    float range = rangeMax - rangeMin;
+    float rangeMaxClamped = max(EDGE_THRESHOLD_MIN, rangeMaxScaled);
+    bool earlyExit = range < rangeMaxClamped;
+    if (earlyExit) {
+        fragColor = rgbyM;
+        return;
+    }
+
+    float lumaNW = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(-1,-1)));
+    float lumaSE = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2( 1, 1)));
+    float lumaNE = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2( 1,-1)));
+    float lumaSW = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(-1, 1)));
+
+    float lumaNS = lumaN + lumaS;
+    float lumaWE = lumaW + lumaE;
+    float subpixRcpRange = 1.0/range;
+    float subpixNSWE = lumaNS + lumaWE;
+    float edgeHorz1 = (-2.0 * lumaM) + lumaNS;
+    float edgeVert1 = (-2.0 * lumaM) + lumaWE;
+
+    float lumaNESE = lumaNE + lumaSE;
+    float lumaNWNE = lumaNW + lumaNE;
+    float edgeHorz2 = (-2.0 * lumaE) + lumaNESE;
+    float edgeVert2 = (-2.0 * lumaN) + lumaNWNE;
+
+    float lumaNWSW = lumaNW + lumaSW;
+    float lumaSWSE = lumaSW + lumaSE;
+    float edgeHorz4 = (abs(edgeHorz1) * 2.0) + abs(edgeHorz2);
+    float edgeVert4 = (abs(edgeVert1) * 2.0) + abs(edgeVert2);
+    float edgeHorz3 = (-2.0 * lumaW) + lumaNWSW;
+    float edgeVert3 = (-2.0 * lumaS) + lumaSWSE;
+    float edgeHorz = abs(edgeHorz3) + edgeHorz4;
+    float edgeVert = abs(edgeVert3) + edgeVert4;
+
+    float subpixNWSWNESE = lumaNWSW + lumaNESE;
+    float lengthSign = rcpFrame.x;
+    bool horzSpan = edgeHorz >= edgeVert;
+    float subpixA = subpixNSWE * 2.0 + subpixNWSWNESE;
+
+    if (!horzSpan) lumaN = lumaW;
+    if (!horzSpan) lumaS = lumaE;
+    if (horzSpan) lengthSign = rcpFrame.y;
+    float subpixB = (subpixA * (1.0/12.0)) - lumaM;
+
+    float gradientN = lumaN - lumaM;
+    float gradientS = lumaS - lumaM;
+    float lumaNN = lumaN + lumaM;
+    float lumaSS = lumaS + lumaM;
+    bool pairN = abs(gradientN) >= abs(gradientS);
+    float gradient = max(abs(gradientN), abs(gradientS));
+    if (pairN) lengthSign = -lengthSign;
+    float subpixC = clamp(abs(subpixB) * subpixRcpRange, 0.0, 1.0);
+
+    vec2 posB;
+    posB.x = posM.x;
+    posB.y = posM.y;
+    vec2 offNP;
+    offNP.x = (!horzSpan) ? 0.0 : rcpFrame.x;
+    offNP.y = (horzSpan) ? 0.0 : rcpFrame.y;
+    if (!horzSpan) posB.x += lengthSign * 0.5;
+    if (horzSpan) posB.y += lengthSign * 0.5;
+
+    vec2 posN;
+    posN.x = posB.x - offNP.x * QUALITY_P0;
+    posN.y = posB.y - offNP.y * QUALITY_P0;
+    vec2 posP;
+    posP.x = posB.x + offNP.x * QUALITY_P0;
+    posP.y = posB.y + offNP.y * QUALITY_P0;
+    float subpixD = ((-2.0)*subpixC) + 3.0;
+    float lumaEndN = getLuma(textureLod(sDiffuseMap, posN, 0.0));
+    float subpixE = subpixC * subpixC;
+    float lumaEndP = getLuma(textureLod(sDiffuseMap, posP, 0.0));
+
+    if (!pairN) lumaNN = lumaSS;
+    float gradientScaled = gradient * 1.0/4.0;
+    float lumaMM = lumaM - lumaNN * 0.5;
+    float subpixF = subpixD * subpixE;
+    bool lumaMLTZero = lumaMM < 0.0;
+
+    lumaEndN -= lumaNN * 0.5;
+    lumaEndP -= lumaNN * 0.5;
+    bool doneN = abs(lumaEndN) >= gradientScaled;
+    bool doneP = abs(lumaEndP) >= gradientScaled;
+    if (!doneN) posN.x -= offNP.x * QUALITY_P1;
+    if (!doneN) posN.y -= offNP.y * QUALITY_P1;
+    bool doneNP = (!doneN) || (!doneP);
+    if (!doneP) posP.x += offNP.x * QUALITY_P1;
+    if (!doneP) posP.y += offNP.y * QUALITY_P1;
+
+    if (doneNP) {
+        if (!doneN) lumaEndN = getLuma(textureLod(sDiffuseMap, posN.xy, 0.0));
+        if (!doneP) lumaEndP = getLuma(textureLod(sDiffuseMap, posP.xy, 0.0));
+        if (!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
+        if (!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
+        doneN = abs(lumaEndN) >= gradientScaled;
+        doneP = abs(lumaEndP) >= gradientScaled;
+        if (!doneN) posN.x -= offNP.x * QUALITY_P2;
+        if (!doneN) posN.y -= offNP.y * QUALITY_P2;
+        doneNP = (!doneN) || (!doneP);
+        if (!doneP) posP.x += offNP.x * QUALITY_P2;
+        if (!doneP) posP.y += offNP.y * QUALITY_P2;
+
+        if (doneNP) {
+            if (!doneN) lumaEndN = getLuma(textureLod(sDiffuseMap, posN.xy, 0.0));
+            if (!doneP) lumaEndP = getLuma(textureLod(sDiffuseMap, posP.xy, 0.0));
+            if (!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
+            if (!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
+            doneN = abs(lumaEndN) >= gradientScaled;
+            doneP = abs(lumaEndP) >= gradientScaled;
+            if (!doneN) posN.x -= offNP.x * QUALITY_P3;
+            if (!doneN) posN.y -= offNP.y * QUALITY_P3;
+            doneNP = (!doneN) || (!doneP);
+            if (!doneP) posP.x += offNP.x * QUALITY_P3;
+            if (!doneP) posP.y += offNP.y * QUALITY_P3;
+
+            if (doneNP) {
+                if (!doneN) lumaEndN = getLuma(textureLod(sDiffuseMap, posN.xy, 0.0));
+                if (!doneP) lumaEndP = getLuma(textureLod(sDiffuseMap, posP.xy, 0.0));
+                if (!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
+                if (!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
+                doneN = abs(lumaEndN) >= gradientScaled;
+                doneP = abs(lumaEndP) >= gradientScaled;
+                if (!doneN) posN.x -= offNP.x * QUALITY_P4;
+                if (!doneN) posN.y -= offNP.y * QUALITY_P4;
+                doneNP = (!doneN) || (!doneP);
+                if (!doneP) posP.x += offNP.x * QUALITY_P4;
+                if (!doneP) posP.y += offNP.y * QUALITY_P4;
+            }
+        }
+    }
+
+    float dstN = posM.x - posN.x;
+    float dstP = posP.x - posM.x;
+    if (!horzSpan) dstN = posM.y - posN.y;
+    if (!horzSpan) dstP = posP.y - posM.y;
+
+    bool goodSpanN = (lumaEndN < 0.0) != lumaMLTZero;
+    float spanLength = (dstP + dstN);
+    bool goodSpanP = (lumaEndP < 0.0) != lumaMLTZero;
+    float spanLengthRcp = 1.0/spanLength;
+
+    bool directionN = dstN < dstP;
+    float dst = min(dstN, dstP);
+    bool goodSpan = directionN ? goodSpanN : goodSpanP;
+    float subpixG = subpixF * subpixF;
+    float pixelOffset = (dst * (-spanLengthRcp)) + 0.5;
+    float subpixH = subpixG * SUBPIX;
+
+    float pixelOffsetGood = goodSpan ? pixelOffset : 0.0;
+    float pixelOffsetSubpix = max(pixelOffsetGood, subpixH);
+    if (!horzSpan) posM.x += pixelOffsetSubpix * lengthSign;
+    if (horzSpan) posM.y += pixelOffsetSubpix * lengthSign;
+
+    fragColor = vec4(textureLod(sDiffuseMap, posM, 0.0).rgb, lumaM);
 }
 )END";
 
