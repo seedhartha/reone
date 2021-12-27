@@ -23,6 +23,8 @@ namespace reone {
 
 namespace graphics {
 
+static constexpr float kFrustumProjectionFOVFactor = 1.25f;
+
 class PerspectiveCamera : public Camera {
 public:
     PerspectiveCamera() :
@@ -33,12 +35,14 @@ public:
     float aspect() const { return _aspect; }
 
     void setProjection(float fovy, float aspect, float zNear, float zFar) {
-        _projection = glm::perspective(fovy, aspect, zNear, zFar);
         _fovy = fovy;
         _aspect = aspect;
         _zNear = zNear;
         _zFar = zFar;
-        updateFrustum();
+
+        auto proj = glm::perspective(fovy, aspect, zNear, zFar);
+        auto frustumProj = glm::perspective(kFrustumProjectionFOVFactor * fovy, aspect, zNear, zFar);
+        Camera::setProjection(proj, frustumProj);
     }
 
 private:

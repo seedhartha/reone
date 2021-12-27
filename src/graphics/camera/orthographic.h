@@ -30,10 +30,11 @@ public:
     }
 
     void setProjection(float left, float right, float bottom, float top, float zNear, float zFar) {
-        _projection = glm::ortho(left, right, bottom, top, zNear, zFar);
         _zNear = zNear;
         _zFar = zFar;
-        updateFrustum();
+
+        auto proj = glm::ortho(left, right, bottom, top, zNear, zFar);
+        Camera::setProjection(proj, proj);
     }
 };
 
