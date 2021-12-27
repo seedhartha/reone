@@ -49,16 +49,16 @@ public:
         glm::vec2 dir {0.0f};
     };
 
-    struct DanglyMeshConstraint {
+    struct DanglymeshConstraint {
         float multiplier {0.0f};
         glm::vec3 position {0.0f};
     };
 
-    struct DanglyMesh {
+    struct Danglymesh {
         float displacement {0.0f};
         float tightness {0.0f};
         float period {0.0f};
-        std::vector<DanglyMeshConstraint> constraints;
+        std::vector<DanglymeshConstraint> constraints;
     };
 
     struct AABBTree {
@@ -102,7 +102,7 @@ public:
         // Specialization
 
         std::shared_ptr<Skin> skin;
-        std::shared_ptr<DanglyMesh> danglyMesh;
+        std::shared_ptr<Danglymesh> danglymesh;
         std::shared_ptr<AABBTree> aabbTree;
         bool saber {false};
 
@@ -209,7 +209,7 @@ public:
     bool isEmitter() const { return static_cast<bool>(_emitter); }
     bool isReference() const { return static_cast<bool>(_reference); }
     bool isSkinMesh() const { return _mesh && _mesh->skin; }
-    bool isDanglyMesh() const { return _mesh && _mesh->danglyMesh; }
+    bool isDanglymesh() const { return _mesh && _mesh->danglymesh; }
     bool isAABBMesh() const { return _mesh && _mesh->aabbTree; }
     bool isSaberMesh() const { return _mesh && _mesh->saber; }
 

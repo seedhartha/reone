@@ -62,13 +62,13 @@ void MeshSceneNode::initTextures() {
     _nodeTextures.bumpmap = mesh->bumpmap;
 
     // Bake danglymesh constraints into texture
-    if (mesh->danglyMesh) {
+    if (mesh->danglymesh) {
         auto pixels = make_unique<ByteArray>();
-        for (auto &con : mesh->danglyMesh->constraints) {
+        for (auto &con : mesh->danglymesh->constraints) {
             pixels->push_back(static_cast<int>(255 * con.multiplier));
         }
         auto constraints = make_unique<Texture>("dangly_constraints", getTextureProperties(TextureUsage::Lookup));
-        constraints->setPixels(mesh->danglyMesh->constraints.size(), 1, PixelFormat::Grayscale, Texture::Layer {move(pixels)});
+        constraints->setPixels(mesh->danglymesh->constraints.size(), 1, PixelFormat::Grayscale, Texture::Layer {move(pixels)});
         constraints->init();
         _nodeTextures.danglyConstraints = move(constraints);
     }
@@ -101,7 +101,7 @@ void MeshSceneNode::update(float dt) {
     if (mesh) {
         updateUVAnimation(dt, *mesh);
         updateBumpmapAnimation(dt, *mesh);
-        updateDanglyMeshAnimation(dt, *mesh);
+        updateDanglymeshAnimation(dt, *mesh);
     }
 }
 
@@ -128,34 +128,22 @@ void MeshSceneNode::updateBumpmapAnimation(float dt, const ModelNode::TriangleMe
     }
 }
 
-void MeshSceneNode::updateDanglyMeshAnimation(float dt, const ModelNode::TriangleMesh &mesh) {
-    shared_ptr<ModelNode::DanglyMesh> danglyMesh(mesh.danglyMesh);
-    if (!danglyMesh)
+void MeshSceneNode::updateDanglymeshAnimation(float dt, const ModelNode::TriangleMesh &mesh) {
+    shared_ptr<ModelNode::Danglymesh> danglymesh(mesh.danglymesh);
+    if (!danglymesh) {
         return;
-
-    bool forceApplied = glm::length2(_danglymeshAnimation.force) > 0.0f;
-    if (forceApplied) {
-        // When force is applied, stride in the opposite direction from the applied force
-        glm::vec3 strideDir(-_danglymeshAnimation.force);
-        glm::vec3 maxStride(danglyMesh->displacement);
-        _danglymeshAnimation.stride = glm::clamp(_danglymeshAnimation.stride + danglyMesh->period * strideDir * dt, -maxStride, maxStride);
-    } else {
-        // When force is not applied, gradually nullify stride
-        float strideMag2 = glm::length2(_danglymeshAnimation.stride);
-        if (strideMag2 > 0.0f) {
-            glm::vec3 strideDir(-_danglymeshAnimation.stride);
-            _danglymeshAnimation.stride += danglyMesh->period * strideDir * dt;
-            if ((strideDir.x > 0.0f && _danglymeshAnimation.stride.x > 0.0f) || (strideDir.x < 0.0f && _danglymeshAnimation.stride.x < 0.0f)) {
-                _danglymeshAnimation.stride.x = 0.0f;
-            }
-            if ((strideDir.y > 0.0f && _danglymeshAnimation.stride.y > 0.0f) || (strideDir.y < 0.0f && _danglymeshAnimation.stride.y < 0.0f)) {
-                _danglymeshAnimation.stride.y = 0.0f;
-            }
-            if ((strideDir.z > 0.0f && _danglymeshAnimation.stride.z > 0.0f) || (strideDir.z < 0.0f && _danglymeshAnimation.stride.z < 0.0f)) {
-                _danglymeshAnimation.stride.z = 0.0f;
-            }
-        }
     }
+
+    // Mesh rotation in world space
+    auto delta = _absTransformInv * _danglymeshAnimation.lastTransform;
+    auto matrix = _danglymeshAnimation.matrix * glm::mat4(glm::mat3(delta));
+
+    // Rest
+    float fac = danglymesh->period * dt;
+    matrix = matrix * (1.0f - fac) + glm::mat4(1.0f) * fac;
+
+    _danglymeshAnimation.lastTransform = _absTransform;
+    _danglymeshAnimation.matrix = move(matrix);
 }
 
 bool MeshSceneNode::shouldRender() const {
@@ -357,10 +345,11 @@ void MeshSceneNode::draw() {
         uniforms.general.featureMask |= UniformsFeatureFlags::fog;
     }
 
-    auto danglyMesh = mesh->danglyMesh;
-    if (danglyMesh) {
+    auto danglymesh = mesh->danglymesh;
+    if (danglymesh) {
         uniforms.general.featureMask |= UniformsFeatureFlags::danglymesh;
-        uniforms.general.danglyStrideDisplacement = glm::vec4(_danglymeshAnimation.stride, danglyMesh->displacement);
+        uniforms.general.dangly = glm::mat3x4(_danglymeshAnimation.matrix);
+        uniforms.general.danglyDisplacement = danglymesh->displacement;
     }
 
     _shaders.use(program, true);
@@ -420,13 +409,6 @@ bool MeshSceneNode::isLightingEnabled() const {
         return false;
     }
     return true;
-}
-
-void MeshSceneNode::setAppliedForce(glm::vec3 force) {
-    if (_modelNode->isDanglyMesh()) {
-        // Convert force from world to object space
-        _danglymeshAnimation.force = _absTransformInv * glm::vec4(force, 0.0f);
-    }
 }
 
 void MeshSceneNode::setDiffuseTexture(const shared_ptr<Texture> &texture) {

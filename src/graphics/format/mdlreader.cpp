@@ -269,7 +269,7 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     vector<float> vertices;
     vector<uint16_t> indices;
     shared_ptr<ModelNode::Skin> skin;
-    shared_ptr<ModelNode::DanglyMesh> danglyMesh;
+    shared_ptr<ModelNode::Danglymesh> danglymesh;
     shared_ptr<ModelNode::AABBTree> aabbTree;
 
     Mesh::VertexSpec spec;
@@ -322,21 +322,21 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
         float period = readFloat();
         uint32_t offDanglyVertices = readUint32();
 
-        danglyMesh = make_shared<ModelNode::DanglyMesh>();
-        danglyMesh->displacement = 0.5f * displacement; // displacement is allegedly 1/2 meters per unit
-        danglyMesh->tightness = tightness;
-        danglyMesh->period = period;
+        danglymesh = make_shared<ModelNode::Danglymesh>();
+        danglymesh->displacement = 0.5f * displacement; // displacement is allegedly 1/2 meters per unit
+        danglymesh->tightness = tightness;
+        danglymesh->period = period;
 
-        danglyMesh->constraints.resize(constraintArrayDef.count);
+        danglymesh->constraints.resize(constraintArrayDef.count);
         seek(kMdlDataOffset + constraintArrayDef.offset);
         for (uint32_t i = 0; i < constraintArrayDef.count; ++i) {
             float multiplier = readFloat();
-            danglyMesh->constraints[i].multiplier = glm::clamp(multiplier / 255.0f, 0.0f, 1.0f);
+            danglymesh->constraints[i].multiplier = glm::clamp(multiplier / 255.0f, 0.0f, 1.0f);
         }
         seek(kMdlDataOffset + offDanglyVertices);
         for (uint32_t i = 0; i < constraintArrayDef.count; ++i) {
             vector<float> positionValues(readFloatArray(3));
-            danglyMesh->constraints[i].position = glm::make_vec3(&positionValues[0]);
+            danglymesh->constraints[i].position = glm::make_vec3(&positionValues[0]);
         }
 
     } else if (flags & MdlNodeFlags::aabb) {
@@ -480,7 +480,7 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     nodeMesh->diffuseMap = move(diffuseMap);
     nodeMesh->lightmap = move(lightmap);
     nodeMesh->skin = move(skin);
-    nodeMesh->danglyMesh = move(danglyMesh);
+    nodeMesh->danglymesh = move(danglymesh);
     nodeMesh->aabbTree = move(aabbTree);
     nodeMesh->saber = flags & MdlNodeFlags::saber;
 

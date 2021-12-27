@@ -217,12 +217,6 @@ public:
 
     // END Combat
 
-    // Physics
-
-    void setAppliedForce(glm::vec3 force);
-
-    // END Physics
-
     // Gold
 
     void giveGold(int amount);

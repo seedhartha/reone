@@ -70,6 +70,7 @@ layout(std140) uniform General {
     mat4 uProjection;
     mat4 uView;
     mat4 uModel;
+    mat3 uDangly;
     mat3 uUV;
     vec4 uCameraPosition;
     vec4 uColor;
@@ -81,7 +82,6 @@ layout(std140) uniform General {
     vec4 uFogColor;
     vec4 uHeightMapFrameBounds;
     vec4 uShadowLightPosition;
-    vec4 uDanglyStrideDisplacement;
     vec2 uBlurResolution;
     vec2 uBlurDirection;
     float uAlpha;
@@ -92,6 +92,7 @@ layout(std140) uniform General {
     float uShadowStrength;
     float uShadowRadius;
     float uBillboardSize;
+    float uDanglyDisplacement;
     int uFeatureMask;
     mat4 uShadowLightSpace[NUM_SHADOW_LIGHT_SPACE];
     vec4 uShadowCascadeFarPlanes[2];
@@ -395,8 +396,8 @@ out vec2 fragUV2;
 out mat3 fragTBN;
 
 void main() {
-    vec4 position = vec4(aPosition, 1.0);
-    vec4 normal = vec4(aNormal, 0.0);
+    vec4 P = vec4(aPosition, 1.0);
+    vec4 N = vec4(aNormal, 0.0);
 
     if (isFeatureEnabled(FEATURE_SKELETAL)) {
         int i1 = 1 + int(aBoneIndices[0]);
@@ -409,39 +410,41 @@ void main() {
         float w3 = aBoneWeights[2];
         float w4 = aBoneWeights[3];
 
-        position =
-            (uBones[i1] * position) * w1 +
-            (uBones[i2] * position) * w2 +
-            (uBones[i3] * position) * w3 +
-            (uBones[i4] * position) * w4;
+        P =
+            (uBones[i1] * P) * w1 +
+            (uBones[i2] * P) * w2 +
+            (uBones[i3] * P) * w3 +
+            (uBones[i4] * P) * w4;
 
-        position.w = 1.0;
-
-        normal =
-            (uBones[i1] * normal) * w1 +
-            (uBones[i2] * normal) * w2 +
-            (uBones[i3] * normal) * w3 +
-            (uBones[i4] * normal) * w4;
+        N =
+            (uBones[i1] * N) * w1 +
+            (uBones[i2] * N) * w2 +
+            (uBones[i3] * N) * w3 +
+            (uBones[i4] * N) * w4;
 
     } else if (isFeatureEnabled(FEATURE_DANGLYMESH)) {
         float multiplier = texelFetch(sDanglyConstraints, gl_VertexID, 0).r;
-        vec3 maxStride = vec3(multiplier * uDanglyStrideDisplacement.w);
-        vec3 stride = clamp(uDanglyStrideDisplacement.xyz, -maxStride, maxStride);
-        position += vec4(stride, 0.0);
+        mat3 dangly = mat3(1.0) * (1.0 - multiplier) + uDangly * multiplier;
+        vec3 danglyP = dangly * vec3(P);
+        vec3 danglyN = dangly * vec3(N);
+        vec3 stride = clamp(danglyP - P.xyz, -uDanglyDisplacement, uDanglyDisplacement);
+        P = vec4(P.xyz + stride, 1.0);
+        N = vec4(danglyN, 0.0);
     }
 
-    mat3 normalMatrix = transpose(inverse(mat3(uModel)));
+    fragPosWorldSpace = vec3(uModel * P);
 
-    fragPosWorldSpace = vec3(uModel * position);
-    fragNormalWorldSpace = normalize(normalMatrix * normal.xyz);
+    mat3 normalMatrix = transpose(inverse(mat3(uModel)));
+    fragNormalWorldSpace = normalize(normalMatrix * N.xyz);
+
     fragUV1 = aUV1;
     fragUV2 = aUV2;
 
     if (isFeatureEnabled(FEATURE_NORMALMAP) || isFeatureEnabled(FEATURE_HEIGHTMAP)) {
         vec3 T = normalize(normalMatrix * aTangent);
         vec3 B = normalize(normalMatrix * aBitangent);
-        vec3 N = normalize(normalMatrix * aTanSpaceNormal);
-        fragTBN = mat3(T, B, N);
+        vec3 TSN = normalize(normalMatrix * aTanSpaceNormal);
+        fragTBN = mat3(T, B, TSN);
     }
 
     gl_Position = uProjection * uView * vec4(fragPosWorldSpace, 1.0);
