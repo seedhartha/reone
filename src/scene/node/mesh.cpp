@@ -375,9 +375,11 @@ void MeshSceneNode::draw() {
         _textures.bind(*_nodeTextures.danglyConstraints, TextureUnits::danglyConstraints);
     }
 
-    auto blendMode = additive ? BlendMode::Add : BlendMode::Default;
-    _graphicsContext.withBlending(blendMode, [this, &mesh]() {
-        mesh->mesh->draw();
+    _graphicsContext.withFaceCulling(CullFaceMode::Back, [this, &additive, &mesh]() {
+        auto blendMode = additive ? BlendMode::Add : BlendMode::Default;
+        _graphicsContext.withBlending(blendMode, [this, &mesh]() {
+            mesh->mesh->draw();
+        });
     });
 }
 

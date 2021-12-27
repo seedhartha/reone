@@ -104,6 +104,12 @@ void ModelSceneNode::update(float dt) {
     updateAnimations(dt);
 }
 
+void ModelSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
+    for (auto &leaf : leafs) {
+        static_cast<MeshSceneNode *>(leaf)->draw();
+    }
+}
+
 void ModelSceneNode::computeAABB() {
     _aabb.reset();
 
@@ -122,19 +128,19 @@ void ModelSceneNode::computeAABB() {
     }
 }
 
-unique_ptr<DummySceneNode> ModelSceneNode::newDummySceneNode(shared_ptr<ModelNode> node) const {
+unique_ptr<DummySceneNode> ModelSceneNode::newDummySceneNode(shared_ptr<ModelNode> node) {
     return make_unique<DummySceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures);
 }
 
-unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(shared_ptr<ModelNode> node) const {
+unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(shared_ptr<ModelNode> node) {
     return make_unique<MeshSceneNode>(*this, move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures);
 }
 
-unique_ptr<LightSceneNode> ModelSceneNode::newLightSceneNode(shared_ptr<ModelNode> node) const {
+unique_ptr<LightSceneNode> ModelSceneNode::newLightSceneNode(shared_ptr<ModelNode> node) {
     return make_unique<LightSceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures);
 }
 
-unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(shared_ptr<ModelNode> node) const {
+unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(shared_ptr<ModelNode> node) {
     return make_unique<EmitterSceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures);
 }
 

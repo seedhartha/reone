@@ -37,7 +37,7 @@ class ModelSceneNode;
 class MeshSceneNode : public ModelNodeSceneNode {
 public:
     MeshSceneNode(
-        const ModelSceneNode &model,
+        ModelSceneNode &model,
         std::shared_ptr<graphics::ModelNode> modelNode,
         SceneGraph &sceneGraph,
         graphics::GraphicsContext &graphicsContext,
@@ -70,6 +70,7 @@ public:
     bool isTransparent() const;
     bool isSelfIlluminated() const;
 
+    ModelSceneNode &model() { return _model; }
     const ModelSceneNode &model() const { return _model; }
 
     void setDiffuseTexture(const std::shared_ptr<graphics::Texture> &texture);
@@ -90,7 +91,7 @@ private:
         glm::mat4 matrix {1.0f};
     } _danglymeshAnimation;
 
-    const ModelSceneNode &_model;
+    ModelSceneNode &_model;
 
     glm::vec2 _uvOffset {0.0f};
     float _bumpmapCycleTime {0.0f};

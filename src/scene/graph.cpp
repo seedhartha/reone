@@ -111,12 +111,11 @@ void SceneGraph::update(float dt) {
         return;
     }
     cullRoots();
-    refreshNodeLists();
+    refresh();
     updateLighting();
     updateShadowLight(dt);
     updateFlareLights();
     updateSounds();
-    prepareTransparentMeshes();
     prepareLeafs();
 }
 
@@ -245,7 +244,7 @@ void SceneGraph::updateSounds() {
     }
 }
 
-void SceneGraph::refreshNodeLists() {
+void SceneGraph::refresh() {
     _opaqueMeshes.clear();
     _transparentMeshes.clear();
     _shadowMeshes.clear();
@@ -253,11 +252,11 @@ void SceneGraph::refreshNodeLists() {
     _emitters.clear();
 
     for (auto &root : _modelRoots) {
-        refreshFromSceneNode(root);
+        refreshFromNode(root);
     }
 }
 
-void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
+void SceneGraph::refreshFromNode(const std::shared_ptr<SceneNode> &node) {
     bool propagate = true;
 
     switch (node->type()) {
@@ -297,32 +296,9 @@ void SceneGraph::refreshFromSceneNode(const std::shared_ptr<SceneNode> &node) {
 
     if (propagate) {
         for (auto &child : node->children()) {
-            refreshFromSceneNode(child);
+            refreshFromNode(child);
         }
     }
-}
-
-void SceneGraph::prepareTransparentMeshes() {
-    // Sort transparent meshes by transparency and distance to camera, so as to ensure correct blending
-    glm::vec3 cameraPosition(_activeCamera->absoluteTransform()[3]);
-    unordered_map<SceneNode *, float> meshToCamera;
-    for (auto &mesh : _transparentMeshes) {
-        meshToCamera.insert(make_pair(mesh, mesh->getSquareDistanceTo(cameraPosition)));
-    }
-    sort(_transparentMeshes.begin(), _transparentMeshes.end(), [&meshToCamera](auto &left, auto &right) {
-        int leftTransparency = left->modelNode().mesh()->transparency;
-        int rightTransparency = right->modelNode().mesh()->transparency;
-
-        if (leftTransparency < rightTransparency)
-            return true;
-        if (leftTransparency > rightTransparency)
-            return false;
-
-        float leftDistance = meshToCamera.find(left)->second;
-        float rightDistance = meshToCamera.find(right)->second;
-
-        return leftDistance > rightDistance;
-    });
 }
 
 void SceneGraph::prepareLeafs() {
@@ -330,6 +306,11 @@ void SceneGraph::prepareLeafs() {
 
     vector<pair<SceneNode *, float>> leafs;
     auto camera = _activeCamera->camera();
+
+    // Add transparent meshes
+    for (auto &mesh : _transparentMeshes) {
+        leafs.push_back(make_pair(mesh, mesh->getSquareDistanceTo(camera->position())));
+    }
 
     // Add grass clusters
     for (auto &grass : _grassRoots) {
@@ -343,7 +324,7 @@ void SceneGraph::prepareLeafs() {
             auto cluster = static_cast<GrassClusterSceneNode *>(child.get());
             glm::vec3 screen(glm::project(cluster->getOrigin(), camera->view(), camera->projection(), viewport));
             if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
-                leafs.push_back(make_pair(cluster, screen.z));
+                leafs.push_back(make_pair(cluster, cluster->getSquareDistanceTo(camera->position())));
             }
         }
     }
@@ -357,20 +338,39 @@ void SceneGraph::prepareLeafs() {
             auto particle = static_cast<ParticleSceneNode *>(child.get());
             glm::vec3 screen(glm::project(particle->getOrigin(), camera->view(), camera->projection(), viewport));
             if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
-                leafs.push_back(make_pair(particle, screen.z));
+                leafs.push_back(make_pair(particle, particle->getSquareDistanceTo(camera->position())));
             }
         }
     }
 
-    // Sort leafs back to front
-    sort(leafs.begin(), leafs.end(), [](auto &left, auto &right) { return left.second > right.second; });
+    // Sort leafs back to front to ensure correct blending
+    sort(leafs.begin(), leafs.end(), [](auto &a, auto &b) {
+        bool aMesh = a.first->type() == SceneNodeType::Mesh;
+        bool bMesh = b.first->type() == SceneNodeType::Mesh;
+        if (aMesh && bMesh) {
+            int aTransparency = static_cast<MeshSceneNode *>(a.first)->modelNode().mesh()->transparency;
+            int bTransparency = static_cast<MeshSceneNode *>(b.first)->modelNode().mesh()->transparency;
+            if (aTransparency < bTransparency) {
+                return true;
+            }
+            if (aTransparency > bTransparency) {
+                return false;
+            }
+        }
+        float aDistance = a.second;
+        float bDistance = b.second;
+        return aDistance > bDistance;
+    });
 
     // Group leafs into buckets
     _leafBuckets.clear();
     SceneNode *bucketParent = nullptr;
     vector<SceneNode *> bucket;
-    for (auto &leafDepth : leafs) {
-        auto parent = leafDepth.first->parent();
+    for (auto &[leaf, distance] : leafs) {
+        SceneNode *parent = leaf->parent();
+        if (leaf->type() == SceneNodeType::Mesh) {
+            parent = &static_cast<MeshSceneNode *>(leaf)->model();
+        }
         if (!bucket.empty()) {
             int maxCount = 1;
             if (parent->type() == SceneNodeType::Grass) {
@@ -384,7 +384,7 @@ void SceneGraph::prepareLeafs() {
             }
         }
         bucketParent = parent;
-        bucket.push_back(leafDepth.first);
+        bucket.push_back(leaf);
     }
     if (bucketParent && !bucket.empty()) {
         _leafBuckets.push_back(make_pair(bucketParent, bucket));
@@ -399,20 +399,13 @@ void SceneGraph::draw() {
         return;
     }
 
-    _graphicsContext.withFaceCulling(CullFaceMode::Back, [this]() {
-        // Render opaque meshes
-        for (auto &mesh : _opaqueMeshes) {
-            mesh->draw();
-        }
-        // Render transparent meshes
-        for (auto &mesh : _transparentMeshes) {
-            mesh->draw();
-        }
-    });
-
-    // Render particles and grass clusters
-    for (auto &bucket : _leafBuckets) {
-        bucket.first->drawLeafs(bucket.second);
+    // Render opaque meshes
+    for (auto &mesh : _opaqueMeshes) {
+        mesh->draw();
+    }
+    // Render transparent meshes, particles and grass clusters
+    for (auto &[node, leafs] : _leafBuckets) {
+        node->drawLeafs(leafs);
     }
 
     // Render lens flares

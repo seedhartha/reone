@@ -54,6 +54,8 @@ public:
 
     void update(float dt) override;
 
+    void drawLeafs(const std::vector<SceneNode *> &leafs) override;
+
     void computeAABB();
     void signalEvent(const std::string &name);
 
@@ -167,10 +169,10 @@ private:
 
     void buildNodeTree(std::shared_ptr<graphics::ModelNode> node, SceneNode &parent);
 
-    std::unique_ptr<DummySceneNode> newDummySceneNode(std::shared_ptr<graphics::ModelNode> node) const;
-    std::unique_ptr<MeshSceneNode> newMeshSceneNode(std::shared_ptr<graphics::ModelNode> node) const;
-    std::unique_ptr<LightSceneNode> newLightSceneNode(std::shared_ptr<graphics::ModelNode> node) const;
-    std::unique_ptr<EmitterSceneNode> newEmitterSceneNode(std::shared_ptr<graphics::ModelNode> node) const;
+    std::unique_ptr<DummySceneNode> newDummySceneNode(std::shared_ptr<graphics::ModelNode> node);
+    std::unique_ptr<MeshSceneNode> newMeshSceneNode(std::shared_ptr<graphics::ModelNode> node);
+    std::unique_ptr<LightSceneNode> newLightSceneNode(std::shared_ptr<graphics::ModelNode> node);
+    std::unique_ptr<EmitterSceneNode> newEmitterSceneNode(std::shared_ptr<graphics::ModelNode> node);
 
     // Animation
 
