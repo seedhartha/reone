@@ -217,7 +217,7 @@ private:
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
 
-    std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _leafBuckets; // particles and grass clusters
+    std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _leafBuckets;
 
     // END Leafs
 
@@ -257,15 +257,14 @@ private:
 
     void cullRoots();
 
-    void refreshNodeLists();
-    void refreshFromSceneNode(const std::shared_ptr<SceneNode> &node);
+    void refresh();
+    void refreshFromNode(const std::shared_ptr<SceneNode> &node);
 
     void updateLighting();
     void updateShadowLight(float dt);
     void updateFlareLights();
     void updateSounds();
 
-    void prepareTransparentMeshes();
     void prepareLeafs();
 };
 
