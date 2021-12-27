@@ -302,8 +302,6 @@ void SceneGraph::refreshFromNode(const std::shared_ptr<SceneNode> &node) {
 }
 
 void SceneGraph::prepareLeafs() {
-    static glm::vec4 viewport(-1.0f, -1.0f, 1.0f, 1.0f);
-
     vector<pair<SceneNode *, float>> leafs;
     auto camera = _activeCamera->camera();
 
@@ -322,8 +320,7 @@ void SceneGraph::prepareLeafs() {
                 continue;
             }
             auto cluster = static_cast<GrassClusterSceneNode *>(child.get());
-            glm::vec3 screen(glm::project(cluster->getOrigin(), camera->view(), camera->projection(), viewport));
-            if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
+            if (camera->isInFrustum(cluster->getOrigin())) {
                 leafs.push_back(make_pair(cluster, cluster->getSquareDistanceTo(camera->position())));
             }
         }
@@ -336,8 +333,7 @@ void SceneGraph::prepareLeafs() {
                 continue;
             }
             auto particle = static_cast<ParticleSceneNode *>(child.get());
-            glm::vec3 screen(glm::project(particle->getOrigin(), camera->view(), camera->projection(), viewport));
-            if (screen.z >= 0.5f && glm::abs(screen.x) <= 1.0f && glm::abs(screen.y) <= 1.0f) {
+            if (camera->isInFrustum(particle->getOrigin())) {
                 leafs.push_back(make_pair(particle, particle->getSquareDistanceTo(camera->position())));
             }
         }
