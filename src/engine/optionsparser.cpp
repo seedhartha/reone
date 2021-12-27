@@ -44,7 +44,7 @@ Options OptionsParser::parse() {
         ("vsync", po::value<bool>()->default_value(true), "enable v-sync")                                           //
         ("texquality", po::value<int>()->default_value(0), "texture quality")                                        //
         ("grass", po::value<bool>()->default_value(true), "enable grass")                                            //
-        ("aasamples", po::value<int>()->default_value(0), "anti-aliasing samples")                                   //
+        ("aamethod", po::value<int>()->default_value(AntiAliasingMethods::none), "anti-aliasing method")             //
         ("shadowres", po::value<int>()->default_value(0), "shadow map resolution")                                   //
         ("drawdist", po::value<int>()->default_value(static_cast<int>(kDefaultObjectDrawDistance)), "draw distance") //
         ("maxlights", po::value<int>()->default_value(8), "maximum number of lights")                                //
@@ -78,7 +78,7 @@ Options OptionsParser::parse() {
     options.graphics.vsync = vars["vsync"].as<bool>();
     options.graphics.textureQuality = static_cast<TextureQuality>(vars["texquality"].as<int>());
     options.graphics.grass = vars["grass"].as<bool>();
-    options.graphics.aaSamples = 1 << vars["aasamples"].as<int>();
+    options.graphics.aaMethod = vars["aamethod"].as<int>();
     options.graphics.shadowResolution = 1 << (10 + vars["shadowres"].as<int>());
     options.graphics.drawDistance = static_cast<float>(vars["drawdist"].as<int>());
     options.graphics.maxLights = vars["maxlights"].as<int>();

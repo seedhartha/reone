@@ -45,7 +45,7 @@ private:
         bool vsync {true};
         int texQuality {0};
         bool grass {true};
-        int aasamples {0};
+        int aamethod {0};
         int shadowres {0};
         int drawdist {64};
         int maxlights {8};

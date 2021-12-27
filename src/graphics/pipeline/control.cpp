@@ -43,19 +43,27 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     int w = extent[2];
     int h = extent[3];
 
+    shared_ptr<Texture> cbGeometryMS;
+    shared_ptr<Renderbuffer> dbGeometryMS;
+    shared_ptr<Framebuffer> fbGeometryMS;
+
     // Multi-sample geometry framebuffer
 
-    auto cbGeometryMS = make_shared<Texture>("geometry_color_ms", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
-    cbGeometryMS->clear(w, h, PixelFormat::RGBA);
-    cbGeometryMS->init();
+    if (_options.aaMethod >= AntiAliasingMethods::msaa2) {
+        int samples = 2 << (_options.aaMethod - AntiAliasingMethods::msaa2);
 
-    auto dbGeometryMS = make_shared<Renderbuffer>(_options.aaSamples);
-    dbGeometryMS->configure(w, h, PixelFormat::Depth);
-    dbGeometryMS->init();
+        cbGeometryMS = make_shared<Texture>("geometry_color_ms", getTextureProperties(TextureUsage::ColorBuffer, samples));
+        cbGeometryMS->clear(w, h, PixelFormat::RGBA);
+        cbGeometryMS->init();
 
-    auto fbGeometryMS = make_unique<Framebuffer>();
-    fbGeometryMS->attachColorDepth(cbGeometryMS, dbGeometryMS);
-    fbGeometryMS->init();
+        dbGeometryMS = make_shared<Renderbuffer>(samples);
+        dbGeometryMS->configure(w, h, PixelFormat::Depth);
+        dbGeometryMS->init();
+
+        fbGeometryMS = make_unique<Framebuffer>();
+        fbGeometryMS->attachColorDepth(cbGeometryMS, dbGeometryMS);
+        fbGeometryMS->init();
+    }
 
     // Geometry framebuffer
 
@@ -105,20 +113,28 @@ void ControlPipeline::draw(graphics::IScene &scene, const glm::ivec4 &extent, co
     uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
     uniforms.general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
 
-    // Draw scene to multi-sample framebuffer
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometryMS.nameGL());
-    _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &w, &h, &scene]() {
-        _graphicsContext.clearColorDepth();
-        scene.draw();
-    });
-
-    // Blit multi-sample geometry framebuffer to geometry framebuffer
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbGeometryMS.nameGL());
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometry.nameGL());
-    for (int i = 0; i < 2; ++i) {
-        glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
-        glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
-        glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    if (_options.aaMethod >= AntiAliasingMethods::msaa2) {
+        // Draw scene to multi-sample geometry framebuffer
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometryMS.nameGL());
+        _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &w, &h, &scene]() {
+            _graphicsContext.clearColorDepth();
+            scene.draw();
+        });
+        // Blit multi-sample geometry framebuffer to geometry framebuffer
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, fbGeometryMS.nameGL());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometry.nameGL());
+        for (int i = 0; i < 2; ++i) {
+            glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
+            glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
+            glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        }
+    } else {
+        // Draw scene to geometry framebuffer
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometry.nameGL());
+        _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &w, &h, &scene]() {
+            _graphicsContext.clearColorDepth();
+            scene.draw();
+        });
     }
 
     // Reset framebuffer

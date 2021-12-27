@@ -146,23 +146,31 @@ void WorldPipeline::init() {
     _dbCommon->configure(_options.width, _options.height, PixelFormat::Depth);
     _dbCommon->init();
 
-    _dbCommonMS = make_unique<Renderbuffer>(_options.aaSamples);
-    _dbCommonMS->configure(_options.width, _options.height, PixelFormat::Depth);
-    _dbCommonMS->init();
+    if (_options.aaMethod >= AntiAliasingMethods::msaa2) {
+        int samples = 2 << (_options.aaMethod - AntiAliasingMethods::msaa2);
+
+        _dbCommonMS = make_unique<Renderbuffer>(samples);
+        _dbCommonMS->configure(_options.width, _options.height, PixelFormat::Depth);
+        _dbCommonMS->init();
+    }
 
     // Multi-sample geometry framebuffer
 
-    _cbGeometry1MS = make_unique<Texture>("geometry_color1_ms", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
-    _cbGeometry1MS->clear(_options.width, _options.height, PixelFormat::RGB);
-    _cbGeometry1MS->init();
+    if (_options.aaMethod >= AntiAliasingMethods::msaa2) {
+        int samples = 2 << (_options.aaMethod - AntiAliasingMethods::msaa2);
 
-    _cbGeometry2MS = make_unique<Texture>("geometry_color2_ms", getTextureProperties(TextureUsage::ColorBuffer, _options.aaSamples));
-    _cbGeometry2MS->clear(_options.width, _options.height, PixelFormat::RGB);
-    _cbGeometry2MS->init();
+        _cbGeometry1MS = make_unique<Texture>("geometry_color1_ms", getTextureProperties(TextureUsage::ColorBuffer, samples));
+        _cbGeometry1MS->clear(_options.width, _options.height, PixelFormat::RGB);
+        _cbGeometry1MS->init();
 
-    _fbGeometryMS = make_shared<Framebuffer>();
-    _fbGeometryMS->attachColorsDepth(_cbGeometry1MS, _cbGeometry2MS, _dbCommonMS);
-    _fbGeometryMS->init();
+        _cbGeometry2MS = make_unique<Texture>("geometry_color2_ms", getTextureProperties(TextureUsage::ColorBuffer, samples));
+        _cbGeometry2MS->clear(_options.width, _options.height, PixelFormat::RGB);
+        _cbGeometry2MS->init();
+
+        _fbGeometryMS = make_shared<Framebuffer>();
+        _fbGeometryMS->attachColorsDepth(_cbGeometry1MS, _cbGeometry2MS, _dbCommonMS);
+        _fbGeometryMS->init();
+    }
 
     // Geometry framebuffer
 
@@ -336,30 +344,40 @@ void WorldPipeline::drawGeometry() {
         }
     }
 
-    // Draw scene to multi-sample framebuffer
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbGeometryMS->nameGL());
-    glDrawBuffers(2, colors);
-
-    if (_scene->hasShadowLight()) {
-        if (_scene->isShadowLightDirectional()) {
-            _textures.bind(*_dbDirectionalLightShadows, TextureUnits::shadowMap);
-        } else {
-            _textures.bind(*_dbPointLightShadows, TextureUnits::cubeShadowMap);
+    if (_options.aaMethod >= AntiAliasingMethods::msaa2) {
+        // Draw scene to multi-sample geometry framebuffer
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbGeometryMS->nameGL());
+        glDrawBuffers(2, colors);
+        if (_scene->hasShadowLight()) {
+            if (_scene->isShadowLightDirectional()) {
+                _textures.bind(*_dbDirectionalLightShadows, TextureUnits::shadowMap);
+            } else {
+                _textures.bind(*_dbPointLightShadows, TextureUnits::cubeShadowMap);
+            }
         }
-    }
-
-    _graphicsContext.clearColorDepth();
-    _scene->draw();
-
-    // Blit multi-sample geometry framebuffer to geometry framebuffer
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbGeometryMS->nameGL());
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbGeometry->nameGL());
-    for (int i = 0; i < 2; ++i) {
-        glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
-        glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
-        glBlitFramebuffer(0, 0, _options.width, _options.height, 0, 0, _options.width, _options.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        _graphicsContext.clearColorDepth();
+        _scene->draw();
+        // Blit multi-sample geometry framebuffer to geometry framebuffer
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbGeometryMS->nameGL());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbGeometry->nameGL());
+        for (int i = 0; i < 2; ++i) {
+            glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
+            glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
+            glBlitFramebuffer(0, 0, _options.width, _options.height, 0, 0, _options.width, _options.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        }
+    } else {
+        // Draw scene to geometry framebuffer
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbGeometry->nameGL());
+        glDrawBuffers(2, colors);
+        if (_scene->hasShadowLight()) {
+            if (_scene->isShadowLightDirectional()) {
+                _textures.bind(*_dbDirectionalLightShadows, TextureUnits::shadowMap);
+            } else {
+                _textures.bind(*_dbPointLightShadows, TextureUnits::cubeShadowMap);
+            }
+        }
+        _graphicsContext.clearColorDepth();
+        _scene->draw();
     }
 }
 
