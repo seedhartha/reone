@@ -57,7 +57,7 @@ const int NUM_SHADOW_LIGHT_SPACE = 8;
 
 const float PI = 3.1415926538;
 const float SHININESS = 8.0;
-const float ALPHA_THRESHOLD = 0.1;
+const float ALPHA_THRESHOLD = 0.01;
 
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
 const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
@@ -682,7 +682,11 @@ void main() {
     }
 
     vec3 objectColor = lighting * uColor.rgb;
+
     float objectAlpha = uAlpha;
+    if (objectAlpha < ALPHA_THRESHOLD) {
+        discard;
+    }
 
     fragColor = vec4(objectColor, objectAlpha);
     fragColorBright = vec4(vec3(0.0), objectAlpha);
