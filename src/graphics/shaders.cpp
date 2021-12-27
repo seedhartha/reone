@@ -581,12 +581,10 @@ void main() {
 )END";
 
 static const string g_fsColor = R"END(
-layout(location = 0) out vec4 fragColor;
-layout(location = 1) out vec4 fragColorBright;
+out vec4 fragColor;
 
 void main() {
     fragColor = vec4(uColor.rgb, uAlpha);
-    fragColorBright = vec4(vec3(0.0), 1.0);
 }
 )END";
 
@@ -800,7 +798,7 @@ void main() {
 }
 )END";
 
-static const string g_fsPresentWorld = R"END(
+static const string g_fsBloom = R"END(
 uniform sampler2D sDiffuseMap;
 uniform sampler2D sBloom;
 
@@ -814,6 +812,30 @@ void main() {
     vec3 color = diffuseSample.rgb + bloomSample.rgb;
 
     fragColor = vec4(color, 1.0);
+}
+)END";
+
+static const string g_fsFXAA = R"END(
+uniform sampler2D sDiffuseMap;
+
+in vec2 fragUV1;
+
+out vec4 fragColor;
+
+void main() {
+    fragColor = texture(sDiffuseMap, fragUV1);
+}
+)END";
+
+static const string g_fsPresentWorld = R"END(
+uniform sampler2D sDiffuseMap;
+
+in vec2 fragUV1;
+
+out vec4 fragColor;
+
+void main() {
+    fragColor = texture(sDiffuseMap, fragUV1);
 }
 )END";
 
@@ -875,6 +897,8 @@ void Shaders::init() {
     auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_fsParticle});
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_fsGrass});
     auto fsBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_fsBlur});
+    auto fsBloom = initShader(ShaderType::Fragment, {g_glslHeader, g_fsBloom});
+    auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_fsFXAA});
     auto fsPresentWorld = initShader(ShaderType::Fragment, {g_glslHeader, g_fsPresentWorld});
     auto fsGUI = initShader(ShaderType::Fragment, {g_glslHeader, g_fsGUI});
     auto fsText = initShader(ShaderType::Fragment, {g_glslHeader, g_fsText});
@@ -889,6 +913,8 @@ void Shaders::init() {
     _spParticle = initShaderProgram({vsParticle, fsParticle});
     _spGrass = initShaderProgram({vsGrass, fsGrass});
     _spBlur = initShaderProgram({vsSimple, fsBlur});
+    _spBloom = initShaderProgram({vsSimple, fsBloom});
+    _spFXAA = initShaderProgram({vsSimple, fsFXAA});
     _spPresentWorld = initShaderProgram({vsSimple, fsPresentWorld});
     _spGUI = initShaderProgram({vsSimple, fsGUI});
     _spText = initShaderProgram({vsText, fsText});
@@ -925,6 +951,8 @@ void Shaders::deinit() {
     _spParticle.reset();
     _spGrass.reset();
     _spBlur.reset();
+    _spBloom.reset();
+    _spFXAA.reset();
     _spPresentWorld.reset();
     _spGUI.reset();
     _spText.reset();

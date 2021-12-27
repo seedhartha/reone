@@ -40,15 +40,17 @@ public:
     ShaderProgram &simpleColor() const { return *_spSimpleColor; }
     ShaderProgram &pointLightShadows() const { return *_spPointLightShadows; }
     ShaderProgram &directionalLightShadows() const { return *_spDirectionalLightShadows; }
-    ShaderProgram &gui() const { return *_spGUI; }
-    ShaderProgram &blur() const { return *_spBlur; }
-    ShaderProgram &presentWorld() const { return *_spPresentWorld; }
     ShaderProgram &blinnPhong() const { return *_spBlinnPhong; }
     ShaderProgram &blinnPhongDiffuseless() const { return *_spBlingPhongDiffuseless; }
     ShaderProgram &particle() const { return *_spParticle; }
     ShaderProgram &grass() const { return *_spGrass; }
-    ShaderProgram &text() const { return *_spText; }
     ShaderProgram &billboard() const { return *_spBillboard; }
+    ShaderProgram &blur() const { return *_spBlur; }
+    ShaderProgram &bloom() const { return *_spBloom; }
+    ShaderProgram &fxaa() const { return *_spFXAA; }
+    ShaderProgram &presentWorld() const { return *_spPresentWorld; }
+    ShaderProgram &gui() const { return *_spGUI; }
+    ShaderProgram &text() const { return *_spText; }
 
 private:
     bool _inited {false};
@@ -61,15 +63,17 @@ private:
     std::shared_ptr<ShaderProgram> _spSimpleColor;
     std::shared_ptr<ShaderProgram> _spPointLightShadows;
     std::shared_ptr<ShaderProgram> _spDirectionalLightShadows;
-    std::shared_ptr<ShaderProgram> _spGUI;
-    std::shared_ptr<ShaderProgram> _spBlur;
-    std::shared_ptr<ShaderProgram> _spPresentWorld;
     std::shared_ptr<ShaderProgram> _spBlinnPhong;
     std::shared_ptr<ShaderProgram> _spBlingPhongDiffuseless;
     std::shared_ptr<ShaderProgram> _spParticle;
     std::shared_ptr<ShaderProgram> _spGrass;
-    std::shared_ptr<ShaderProgram> _spText;
     std::shared_ptr<ShaderProgram> _spBillboard;
+    std::shared_ptr<ShaderProgram> _spBlur;
+    std::shared_ptr<ShaderProgram> _spBloom;
+    std::shared_ptr<ShaderProgram> _spFXAA;
+    std::shared_ptr<ShaderProgram> _spPresentWorld;
+    std::shared_ptr<ShaderProgram> _spGUI;
+    std::shared_ptr<ShaderProgram> _spText;
 
     // END Shader Programs
 

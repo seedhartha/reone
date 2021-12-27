@@ -80,11 +80,12 @@ private:
 
     std::shared_ptr<Framebuffer> _fbGeometryMS;
     std::shared_ptr<Framebuffer> _fbGeometry;
-    std::shared_ptr<Framebuffer> _fbVerticalBlur;
-    std::shared_ptr<Framebuffer> _fbHorizontalBlur;
     std::shared_ptr<Framebuffer> _fbPointLightShadows;
     std::shared_ptr<Framebuffer> _fbDirectionalLightShadows;
     std::shared_ptr<Framebuffer> _fbScreenshot;
+
+    std::shared_ptr<Framebuffer> _fbPing;
+    std::shared_ptr<Framebuffer> _fbPong;
 
     // END Framebuffers
 
@@ -94,26 +95,31 @@ private:
     std::shared_ptr<Texture> _cbGeometry2MS;
     std::shared_ptr<Texture> _cbGeometry1;
     std::shared_ptr<Texture> _cbGeometry2;
-    std::shared_ptr<Texture> _cbVerticalBlur;
-    std::shared_ptr<Texture> _cbHorizontalBlur;
     std::shared_ptr<Texture> _cbScreenshot;
+
+    std::shared_ptr<Texture> _cbPing;
+    std::shared_ptr<Texture> _cbPong;
 
     // END Color Buffers
 
     // Depth Buffers
 
-    std::shared_ptr<Renderbuffer> _dbCommonMS;
-    std::shared_ptr<Renderbuffer> _dbCommon;
     std::shared_ptr<Texture> _dbDirectionalLightShadows;
     std::shared_ptr<Texture> _dbPointLightShadows;
+    std::shared_ptr<Renderbuffer> _dbScreenshot;
+
+    std::shared_ptr<Renderbuffer> _dbCommonMS;
+    std::shared_ptr<Renderbuffer> _dbCommon;
 
     // END Depth Buffers
 
     void computeLightSpaceMatrices();
     void drawShadows();
     void drawGeometry();
-    void drawHorizontalBlur();
-    void drawVerticalBlur();
+    void applyHorizontalBlur();
+    void applyVerticalBlur();
+    void applyBloom();
+    void applyFXAA();
     void presentWorld();
 };
 
