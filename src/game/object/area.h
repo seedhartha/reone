@@ -171,12 +171,8 @@ public:
 
     // Object Selection
 
-    void selectNextObject(bool reverse = false);
-    void selectNearestObject();
     void hilightObject(std::shared_ptr<SpatialObject> object);
     void selectObject(std::shared_ptr<SpatialObject> object);
-
-    std::vector<std::shared_ptr<SpatialObject>> getSelectableObjects() const;
 
     std::shared_ptr<SpatialObject> hilightedObject() const { return _hilightedObject; }
     std::shared_ptr<SpatialObject> selectedObject() const { return _selectedObject; }

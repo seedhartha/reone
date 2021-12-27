@@ -612,18 +612,7 @@ bool Area::handle(const SDL_Event &event) {
 }
 
 bool Area::handleKeyDown(const SDL_KeyboardEvent &event) {
-    switch (event.keysym.scancode) {
-    case SDL_SCANCODE_Q:
-        selectNextObject(true);
-        return true;
-
-    case SDL_SCANCODE_E:
-        selectNextObject();
-        return true;
-
-    default:
-        return false;
-    }
+    return false;
 }
 
 void Area::update(float dt) {
@@ -797,7 +786,6 @@ void Area::onPartyLeaderMoved(bool roomChanged) {
         updateRoomVisibility();
     }
     update3rdPersonCameraTarget();
-    selectNearestObject();
 }
 
 void Area::updateRoomVisibility() {
@@ -999,70 +987,6 @@ void Area::updateObjectSelection() {
     if (_selectedObject && !_selectedObject->isSelectable()) {
         _selectedObject.reset();
     }
-}
-
-void Area::selectNextObject(bool reverse) {
-    vector<shared_ptr<SpatialObject>> selectables(getSelectableObjects());
-
-    if (selectables.empty()) {
-        _selectedObject.reset();
-        return;
-    }
-    if (!_selectedObject) {
-        _selectedObject = selectables.front();
-        return;
-    }
-    if (reverse) {
-        auto selected = std::find(selectables.rbegin(), selectables.rend(), _selectedObject);
-        if (selected != selectables.rend()) {
-            selected++;
-        }
-        _selectedObject = selected != selectables.rend() ? *selected : selectables.back();
-
-    } else {
-        auto selected = std::find(selectables.begin(), selectables.end(), _selectedObject);
-        if (selected != selectables.end()) {
-            selected++;
-        }
-        _selectedObject = selected != selectables.end() ? *selected : selectables.front();
-    }
-}
-
-vector<shared_ptr<SpatialObject>> Area::getSelectableObjects() const {
-    vector<shared_ptr<SpatialObject>> result;
-    vector<pair<shared_ptr<SpatialObject>, float>> distances;
-
-    shared_ptr<SpatialObject> partyLeader(_game.party().getLeader());
-    glm::vec3 origin(partyLeader->position());
-
-    for (auto &object : objects()) {
-        if (!object->isSelectable() || object.get() == partyLeader.get())
-            continue;
-
-        auto model = static_pointer_cast<ModelSceneNode>(object->sceneNode());
-        if (!model || !model->isEnabled())
-            continue;
-
-        float dist2 = object->getSquareDistanceTo(origin);
-        if (dist2 > kSelectionDistance * kSelectionDistance)
-            continue;
-
-        distances.push_back(make_pair(object, dist2));
-    }
-
-    sort(distances.begin(), distances.end(), [](auto &left, auto &right) {
-        return left.second < right.second;
-    });
-    for (auto &pair : distances) {
-        result.push_back(pair.first);
-    }
-
-    return move(result);
-}
-
-void Area::selectNearestObject() {
-    _selectedObject.reset();
-    selectNextObject();
 }
 
 void Area::hilightObject(shared_ptr<SpatialObject> object) {
