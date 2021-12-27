@@ -20,8 +20,11 @@
 #include <boost/program_options.hpp>
 
 #include "../common/types.h"
+#include "../graphics/types.h"
 
 using namespace std;
+
+using namespace reone::graphics;
 
 namespace fs = boost::filesystem;
 namespace po = boost::program_options;
@@ -89,7 +92,8 @@ LauncherFrame::LauncherFrame() :
     // Anti-Aliasing
 
     wxArrayString antiAliasingChoices;
-    antiAliasingChoices.Add("No AA");
+    antiAliasingChoices.Add("None");
+    antiAliasingChoices.Add("FXAA");
     antiAliasingChoices.Add("MSAA x2");
     antiAliasingChoices.Add("MSAA x4");
     antiAliasingChoices.Add("MSAA x8");
@@ -97,7 +101,7 @@ LauncherFrame::LauncherFrame() :
     auto labelAntiAliasing = new wxStaticText(this, wxID_ANY, "Anti-Aliasing", wxDefaultPosition, wxDefaultSize);
 
     _choiceAntiAliasing = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, antiAliasingChoices);
-    _choiceAntiAliasing->SetSelection(_config.aasamples);
+    _choiceAntiAliasing->SetSelection(_config.aamethod);
 
     auto antiAliasingSizer = new wxBoxSizer(wxVERTICAL);
     antiAliasingSizer->Add(labelAntiAliasing, wxSizerFlags(0).Expand().Border(wxALL, 3));
@@ -290,7 +294,7 @@ void LauncherFrame::LoadConfiguration() {
         ("vsync", po::value<bool>()->default_value(true))                               //
         ("grass", po::value<bool>()->default_value(true))                               //
         ("texquality", po::value<int>()->default_value(0))                              //
-        ("aasamples", po::value<int>()->default_value(0))                               //
+        ("aamethod", po::value<int>()->default_value(AntiAliasingMethods::none))        //
         ("shadowres", po::value<int>()->default_value(0))                               //
         ("drawdist", po::value<int>()->default_value(1024))                             //
         ("maxlights", po::value<int>()->default_value(8))                               //
@@ -316,7 +320,7 @@ void LauncherFrame::LoadConfiguration() {
     _config.vsync = vars["vsync"].as<bool>();
     _config.grass = vars["grass"].as<bool>();
     _config.texQuality = vars["texquality"].as<int>();
-    _config.aasamples = vars["aasamples"].as<int>();
+    _config.aamethod = vars["aamethod"].as<int>();
     _config.shadowres = vars["shadowres"].as<int>();
     _config.drawdist = vars["drawdist"].as<int>();
     _config.maxlights = vars["maxlights"].as<int>();
@@ -352,7 +356,7 @@ void LauncherFrame::SaveConfiguration() {
         "vsync=",
         "grass=",
         "texquality=",
-        "aasamples=",
+        "aamethod=",
         "shadowres=",
         "drawdist=",
         "maxlights=",
@@ -365,7 +369,6 @@ void LauncherFrame::SaveConfiguration() {
         "logfile="};
 
     string resolution(_choiceResolution->GetStringSelection());
-
     vector<string> tokens;
     boost::split(tokens, resolution, boost::is_any_of("x"), boost::token_compress_on);
 
@@ -412,7 +415,7 @@ void LauncherFrame::SaveConfiguration() {
     _config.vsync = _checkBoxVSync->IsChecked();
     _config.grass = _checkBoxGrass->IsChecked();
     _config.texQuality = _choiceTextureQuality->GetSelection();
-    _config.aasamples = _choiceAntiAliasing->GetSelection();
+    _config.aamethod = _choiceAntiAliasing->GetSelection();
     _config.shadowres = _choiceShadowResolution->GetSelection();
     _config.drawdist = _sliderDrawDistance->GetValue();
     _config.maxlights = _sliderMaxLights->GetValue();
@@ -449,7 +452,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "vsync=" << (_config.vsync ? 1 : 0) << endl;
     config << "grass=" << (_config.grass ? 1 : 0) << endl;
     config << "texquality=" << _config.texQuality << endl;
-    config << "aasamples=" << _config.aasamples << endl;
+    config << "aamethod=" << _config.aamethod << endl;
     config << "shadowres=" << _config.shadowres << endl;
     config << "drawdist=" << _config.drawdist << endl;
     config << "maxlights=" << _config.maxlights << endl;
