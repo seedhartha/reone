@@ -150,9 +150,9 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
     // Attach creature model to the root scene node
 
     auto creatureModel = static_pointer_cast<ModelSceneNode>(creature->sceneNode());
-    shared_ptr<ModelNode> cameraHook(creatureModel->model().getNodeByName("camerahook"));
+    auto cameraHook = creatureModel->getNodeByName("camerahook");
     if (cameraHook) {
-        creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->absoluteTransform()[3].z));
+        creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->getOrigin().z));
     }
     auto model = sceneGraph.newModel(_services.models.get("cghead_light"), ModelUsage::GUI);
     model->attach("cghead_light", creatureModel);

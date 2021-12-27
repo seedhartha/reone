@@ -823,16 +823,16 @@ void Area::update3rdPersonCameraTarget() {
     if (!partyLeader) {
         return;
     }
-    glm::vec3 position(partyLeader->position());
     auto model = static_pointer_cast<ModelSceneNode>(partyLeader->sceneNode());
     if (!model) {
         return;
     }
-    shared_ptr<ModelNode> cameraHook(model->model().getNodeByName("camerahook"));
+    auto cameraHook = model->getNodeByName("camerahook");
     if (cameraHook) {
-        position += glm::vec3(cameraHook->absoluteTransform()[3]);
+        _thirdPersonCamera->setTargetPosition(cameraHook->getOrigin());
+    } else {
+        _thirdPersonCamera->setTargetPosition(model->getWorldCenterOfAABB());
     }
-    _thirdPersonCamera->setTargetPosition(position);
 }
 
 void Area::updateVisibility() {

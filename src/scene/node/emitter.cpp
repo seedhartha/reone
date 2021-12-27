@@ -183,7 +183,7 @@ void EmitterSceneNode::spawnLightningParticles() {
     float halfW = 0.005f * _size.x;
     float halfH = 0.005f * _size.y;
     glm::vec3 origin(random(-halfW, halfW), random(-halfH, halfH), 0.0f);
-    glm::vec3 emitterSpaceRefPos(_absTransformInv * (*ref)->absoluteTransform()[3]);
+    glm::vec3 emitterSpaceRefPos(_absTransformInv * glm::vec4((*ref)->getOrigin(), 1.0f));
     glm::vec3 refToOrigin(emitterSpaceRefPos - origin);
     float distance = glm::abs(refToOrigin.z);
     float segmentLength = distance / static_cast<float>(_lightningSubDiv + 1);
