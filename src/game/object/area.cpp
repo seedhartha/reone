@@ -846,11 +846,9 @@ void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer
 
     for (auto &object : _objectsByType[ObjectType::Trigger]) {
         auto trigger = static_pointer_cast<Trigger>(object);
-        if (trigger->getSquareDistanceTo(position2d) > kDefaultRaycastDistance2)
+        if (trigger->isTenant(triggerrer) || !trigger->isIn(position2d)) {
             continue;
-        if (trigger->isTenant(triggerrer) || !trigger->isIn(position2d))
-            continue;
-
+        }
         debug(boost::format("Trigger '%s' triggerred by '%s'") % trigger->tag() % triggerrer->tag());
         trigger->addTenant(triggerrer);
 

@@ -75,7 +75,7 @@ public:
     void setView(glm::mat4 view) {
         _position = glm::inverse(view)[3];
         _view = std::move(view);
-        updateFrustum();
+        updateFrustumPlanes();
     }
 
 protected:
@@ -85,8 +85,26 @@ protected:
     float _zNear {0.0f};
     float _zFar {0.0f};
 
-    void updateFrustum() {
-        glm::mat4 vp(_projection * _view);
+    void setProjection(glm::mat4 proj, glm::mat4 frustumProj) {
+        _projection = std::move(proj);
+        _frustumProjection = std::move(frustumProj);
+        updateFrustumPlanes();
+    }
+
+private:
+    CameraType _type;
+
+    glm::mat4 _frustumProjection {1.0f};
+
+    glm::vec4 _frustumLeft {0.0f};
+    glm::vec4 _frustumRight {0.0f};
+    glm::vec4 _frustumBottom {0.0f};
+    glm::vec4 _frustumTop {0.0f};
+    glm::vec4 _frustumNear {0.0f};
+    glm::vec4 _frustumFar {0.0f};
+
+    void updateFrustumPlanes() {
+        glm::mat4 vp(_frustumProjection * _view);
         for (int i = 3; i >= 0; --i) {
             _frustumLeft[i] = vp[i][3] + vp[i][0];
             _frustumRight[i] = vp[i][3] - vp[i][0];
@@ -102,16 +120,6 @@ protected:
         _frustumNear = glm::normalize(_frustumNear);
         _frustumFar = glm::normalize(_frustumFar);
     }
-
-private:
-    CameraType _type;
-
-    glm::vec4 _frustumLeft {0.0f};
-    glm::vec4 _frustumRight {0.0f};
-    glm::vec4 _frustumBottom {0.0f};
-    glm::vec4 _frustumTop {0.0f};
-    glm::vec4 _frustumNear {0.0f};
-    glm::vec4 _frustumFar {0.0f};
 };
 
 } // namespace graphics

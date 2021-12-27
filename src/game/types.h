@@ -34,9 +34,6 @@ constexpr char kObjectTagPlayer[] = "player";
 constexpr float kSelectionDistance = 8.0f;
 constexpr char kSceneMain[] = "main";
 
-constexpr float kDefaultRaycastDistance = 8.0f;
-constexpr float kDefaultRaycastDistance2 = kDefaultRaycastDistance * kDefaultRaycastDistance;
-
 enum class BackgroundType {
     None,
     Menu,
