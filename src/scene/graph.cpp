@@ -520,8 +520,8 @@ bool SceneGraph::testLineOfSight(const glm::vec3 &origin, const glm::vec3 &dest,
         glm::vec3 objSpaceOrigin(root->absoluteTransformInverse() * glm::vec4(origin, 1.0f));
         glm::vec3 objSpaceDir(root->absoluteTransformInverse() * glm::vec4(dir, 0.0f));
         float distance = 0.0f;
-        auto face = root->walkmesh().raycast(_lineOfSightSurfaces, objSpaceOrigin, objSpaceDir, kMaxCollisionDistanceLineOfSight, distance);
-        if (!face || distance > maxDistance || distance > minDistance) {
+        auto face = root->walkmesh().raycast(_lineOfSightSurfaces, objSpaceOrigin, objSpaceDir, maxDistance, distance);
+        if (!face || distance > minDistance) {
             continue;
         }
         outCollision.user = root->user();
