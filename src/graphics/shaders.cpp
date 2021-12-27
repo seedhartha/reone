@@ -809,9 +809,8 @@ void main() {
     vec4 diffuseSample = texture(sDiffuseMap, fragUV1);
     vec4 bloomSample = texture(sBloom, fragUV1);
     vec3 color = diffuseSample.rgb + bloomSample.rgb;
-    float luma = dot(color, vec3(0.299, 0.587, 0.114));
 
-    fragColor = vec4(color, luma);
+    fragColor = vec4(color, diffuseSample.a);
 }
 )END";
 
@@ -833,8 +832,8 @@ in vec2 fragUV1;
 
 out vec4 fragColor;
 
-float getLuma(vec4 rgba) {
-    return rgba.a;
+float getLuma(vec4 color) {
+    return dot(color.rgb, vec3(0.299, 0.587, 0.114));
 }
 
 void main() {
@@ -845,7 +844,7 @@ void main() {
     posM.y = fragUV1.y;
 
     vec4 rgbyM = textureLod(sDiffuseMap, posM, 0.0);
-    float lumaM = rgbyM.a;
+    float lumaM = getLuma(rgbyM);
     float lumaS = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(0, 1)));
     float lumaE = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(1, 0)));
     float lumaN = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(0, -1)));
@@ -1013,7 +1012,7 @@ void main() {
     if (!horzSpan) posM.x += pixelOffsetSubpix * lengthSign;
     if (horzSpan) posM.y += pixelOffsetSubpix * lengthSign;
 
-    fragColor = vec4(textureLod(sDiffuseMap, posM, 0.0).rgb, lumaM);
+    fragColor = vec4(textureLod(sDiffuseMap, posM, 0.0).rgb, 1.0);
 }
 )END";
 
