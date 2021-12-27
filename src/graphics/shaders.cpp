@@ -610,9 +610,6 @@ void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
     vec4 diffuseSample = texture(sDiffuseMap, uv);
     bool opaque = isFeatureEnabled(FEATURE_ENVMAP) || isFeatureEnabled(FEATURE_NORMALMAP) || isFeatureEnabled(FEATURE_HEIGHTMAP);
-    if (!opaque && diffuseSample.a < ALPHA_THRESHOLD) {
-        discard;
-    }
     vec3 N = getNormal(uv);
     float shadow = getShadow(N);
 
@@ -635,7 +632,11 @@ void main() {
     }
 
     vec3 objectColor = lighting * uColor.rgb * diffuseSample.rgb;
+
     float objectAlpha = (opaque ? 1.0 : diffuseSample.a) * uAlpha;
+    if (objectAlpha < ALPHA_THRESHOLD) {
+        discard;
+    }
 
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
         vec3 V = normalize(uCameraPosition.xyz - fragPosWorldSpace);
@@ -730,11 +731,14 @@ void main() {
     }
 
     vec4 diffuseSample = texture(sDiffuseMap, uv);
-    if (diffuseSample.a < ALPHA_THRESHOLD) {
+    vec3 objectColor = uParticles[fragInstanceID].color.rgb * diffuseSample.rgb;
+
+    float objectAlpha = uParticles[fragInstanceID].color.a * diffuseSample.a;
+    if (objectAlpha < ALPHA_THRESHOLD) {
         discard;
     }
 
-    fragColor = vec4(uParticles[fragInstanceID].color.rgb * diffuseSample.rgb, uParticles[fragInstanceID].color.a * diffuseSample.a);
+    fragColor = vec4(objectColor, objectAlpha);
     fragColorBright = vec4(vec3(0.0), 0.0);
 }
 )END";
@@ -755,9 +759,6 @@ void main() {
     uv.x += 0.5 * (int(uGrassClusters[fragInstanceID].positionVariant[3]) % 2);
 
     vec4 diffuseSample = texture(sDiffuseMap, uv);
-    if (diffuseSample.a < ALPHA_THRESHOLD) {
-        discard;
-    }
     vec3 objectColor = diffuseSample.rgb;
 
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
@@ -765,7 +766,12 @@ void main() {
         objectColor *= lightmapSample.rgb;
     }
 
-    fragColor = vec4(objectColor, diffuseSample.a);
+    float objectAlpha = diffuseSample.a;
+    if (objectAlpha < ALPHA_THRESHOLD) {
+        discard;
+    }
+
+    fragColor = vec4(objectColor, objectAlpha);
     fragColorBright = vec4(vec3(0.0), 1.0);
 }
 )END";
