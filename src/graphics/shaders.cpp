@@ -645,7 +645,6 @@ void main() {
     }
     if (isFeatureEnabled(FEATURE_WATER)) {
         objectColor *= uWaterAlpha;
-        objectAlpha *= uWaterAlpha;
     }
     if (isFeatureEnabled(FEATURE_FOG)) {
         objectColor = applyFog(objectColor);
