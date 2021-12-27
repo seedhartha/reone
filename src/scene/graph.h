@@ -137,7 +137,7 @@ public:
     bool hasShadowLight() const override { return _shadowLight; }
     bool isShadowLightDirectional() const override { return _shadowLight->isDirectional(); }
 
-    glm::vec3 shadowLightPosition() const override { return _shadowLight->absoluteTransform()[3]; }
+    glm::vec3 shadowLightPosition() const override { return _shadowLight->getOrigin(); }
     float shadowStrength() const override { return _shadowStrength; }
     float shadowRadius() const override { return _shadowLight->radius(); }
 

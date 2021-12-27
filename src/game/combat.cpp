@@ -410,18 +410,18 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
 
     // Determine projectile position
     glm::vec3 projectilePos;
-    shared_ptr<ModelNode> bulletHook(weaponModel->model().getNodeByName("bullethook"));
+    auto bulletHook = weaponModel->getNodeByName("bullethook");
     if (bulletHook) {
-        projectilePos = weaponModel->absoluteTransform() * bulletHook->absoluteTransform()[3];
+        projectilePos = bulletHook->getOrigin();
     } else {
         projectilePos = weaponModel->getOrigin();
     }
 
     // Determine projectile direction
     glm::vec3 projectileTarget;
-    shared_ptr<ModelNode> impact(targetModel->model().getNodeByName("impact"));
+    auto impact = targetModel->getNodeByName("impact");
     if (impact) {
-        projectileTarget = targetModel->absoluteTransform() * impact->absoluteTransform()[3];
+        projectileTarget = impact->getOrigin();
     } else {
         projectileTarget = targetModel->getOrigin();
     }
@@ -439,7 +439,7 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
 }
 
 void Combat::updateProjectile(Round &round, float dt) {
-    glm::vec3 position(round.projectile->absoluteTransform()[3]);
+    auto position = round.projectile->getOrigin();
     position += kProjectileSpeed * round.projectileDir * dt;
 
     float facing = glm::half_pi<float>() - glm::atan(round.projectileDir.x, round.projectileDir.y);

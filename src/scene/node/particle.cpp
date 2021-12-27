@@ -55,7 +55,7 @@ void ParticleSceneNode::update(float dt) {
     if (modelNode.emitter()->p2p && !modelNode.emitter()->p2pBezier) {
         auto ref = find_if(_children.begin(), _children.end(), [](auto &child) { return child->type() == SceneNodeType::Dummy; });
         if (ref != _children.end()) {
-            glm::vec3 emitterSpaceRefPos(_emitter.absoluteTransformInverse() * (*ref)->absoluteTransform()[3]);
+            glm::vec3 emitterSpaceRefPos(_emitter.absoluteTransformInverse() * glm::vec4((*ref)->getOrigin(), 1.0f));
             glm::vec3 pullDir(glm::normalize(emitterSpaceRefPos - getOrigin()));
             _velocity += _emitter.grav() * pullDir * dt;
         }

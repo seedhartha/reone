@@ -297,7 +297,7 @@ void Game::toggleInGameCameraType() {
         shared_ptr<Area> area(_module->area());
         auto &thirdPerson = area->getCamera<ThirdPersonCamera>(CameraType::ThirdPerson);
         auto &firstPerson = area->getCamera<FirstPersonCamera>(CameraType::FirstPerson);
-        firstPerson.setPosition(thirdPerson.sceneNode()->absoluteTransform()[3]);
+        firstPerson.setPosition(thirdPerson.sceneNode()->getOrigin());
         firstPerson.setFacing(thirdPerson.facing());
         _cameraType = CameraType::FirstPerson;
         break;
@@ -430,7 +430,7 @@ void Game::updateCamera(float dt) {
                 listenerPosition = partyLeader->position() + 1.7f; // TODO: height based on appearance
             }
         } else {
-            listenerPosition = camera->sceneNode()->absoluteTransform()[3];
+            listenerPosition = camera->sceneNode()->getOrigin();
         }
         _services.audioContext.setListenerPosition(move(listenerPosition));
     }

@@ -74,7 +74,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::fixedsize;
-    uniforms.general.model = glm::translate(glm::vec3(_absTransform[3]));
+    uniforms.general.model = glm::translate(getOrigin());
     uniforms.general.billboardSize = 0.2f * flare.size;
     uniforms.general.alpha = 0.5f;
     uniforms.general.color = glm::vec4(_color, 1.0f);
