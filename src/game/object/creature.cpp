@@ -417,14 +417,20 @@ void Creature::clearPath() {
 
 glm::vec3 Creature::getSelectablePosition() const {
     auto model = static_pointer_cast<ModelSceneNode>(_sceneNode);
-    if (!model)
+    if (!model) {
         return _position;
-
-    shared_ptr<ModelNode> talkDummy(model->model().getNodeByNameRecursive(g_talkDummyNode));
-    if (!talkDummy || _dead)
+    }
+    if (_dead) {
         return model->getWorldCenterOfAABB();
-
-    return (model->absoluteTransform() * talkDummy->absoluteTransform())[3];
+    }
+    auto headModel = static_pointer_cast<ModelSceneNode>(model->getAttachment(g_headHookNode));
+    if (headModel) {
+        auto talkDummy = headModel->getNodeByName(g_talkDummyNode);
+        return talkDummy ? talkDummy->getOrigin() : headModel->getWorldCenterOfAABB();
+    } else {
+        auto talkDummy = model->getNodeByName(g_talkDummyNode);
+        return talkDummy ? talkDummy->getOrigin() : model->getWorldCenterOfAABB();
+    }
 }
 
 float Creature::getAttackRange() const {
