@@ -48,6 +48,7 @@ struct GeneralUniforms {
     glm::mat4 projection {1.0f};
     glm::mat4 view {1.0f};
     glm::mat4 model {1.0f};
+    glm::mat3x4 dangly {1.0f};
     glm::mat3x4 uv {1.0f};
     glm::vec4 cameraPosition {0.0f};
     glm::vec4 color {1.0f};
@@ -59,7 +60,6 @@ struct GeneralUniforms {
     glm::vec4 fogColor {0.0f};
     glm::vec4 heightMapFrameBounds {0.0f};
     glm::vec4 shadowLightPosition {0.0f}; /**< W = 0 if light is directional */
-    glm::vec4 danglyStrideDisplacement {0.0f};
     glm::vec2 blurResolution {0.0f};
     glm::vec2 blurDirection {0.0f};
     float alpha {1.0f};
@@ -70,8 +70,9 @@ struct GeneralUniforms {
     float shadowStrength {0.0f};
     float shadowRadius {0.0f};
     float billboardSize {1.0f};
+    float danglyDisplacement {0.0f};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
-    char padding[12];
+    char padding[8];
     glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
     glm::vec4 shadowCascadeFarPlanes[2] {glm::vec4(0.0f)};
 
@@ -82,7 +83,6 @@ struct GeneralUniforms {
         worldAmbientColor = glm::vec4(1.0f);
         fogColor = glm::vec4(0.0f);
         shadowLightPosition = glm::vec4(0.0f);
-        danglyStrideDisplacement = glm::vec4(0.0f);
         fogNear = 0.0f;
         fogFar = 0.0f;
         shadowStrength = 1.0f;
@@ -97,6 +97,7 @@ struct GeneralUniforms {
 
     void resetLocals() {
         model = glm::mat4(1.0f);
+        dangly = glm::mat3x4(1.0f);
         uv = glm::mat3x4(1.0f);
         color = glm::vec4(1.0f);
         ambientColor = glm::vec4(1.0f);
@@ -110,6 +111,7 @@ struct GeneralUniforms {
         waterAlpha = 1.0f;
         heightMapScaling = 1.0f;
         billboardSize = 1.0f;
+        danglyDisplacement = 0.0f;
         featureMask = 0;
     }
 };

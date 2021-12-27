@@ -654,12 +654,6 @@ void Creature::getOffhandDamage(int &min, int &max) const {
     getWeaponDamage(InventorySlot::leftWeapon, min, max);
 }
 
-void Creature::setAppliedForce(glm::vec3 force) {
-    if (_sceneNode && _sceneNode->type() == SceneNodeType::Model) {
-        static_pointer_cast<ModelSceneNode>(_sceneNode)->setAppliedForce(force);
-    }
-}
-
 void Creature::onEventSignalled(const string &name) {
     if (_footstepType == -1 || _walkmeshMaterial == -1 || name != "snd_footstep") {
         return;
@@ -763,10 +757,8 @@ void Creature::advanceOnPath(bool run, float dt) {
         shared_ptr<Creature> creature(_game.objectFactory().getObjectById<Creature>(_id));
         if (_game.module()->area()->moveCreatureTowards(creature, dest, run, dt)) {
             setMovementType(run ? Creature::MovementType::Run : Creature::MovementType::Walk);
-            setAppliedForce(glm::vec3(glm::normalize(glm::vec2(dest - origin)), 0.0f));
         } else {
             setMovementType(Creature::MovementType::None);
-            setAppliedForce(glm::vec3(0.0f));
         }
     }
 }

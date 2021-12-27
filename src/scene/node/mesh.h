@@ -75,7 +75,6 @@ public:
     void setDiffuseTexture(const std::shared_ptr<graphics::Texture> &texture);
     void setAlpha(float alpha) { _alpha = alpha; }
     void setSelfIllumColor(glm::vec3 color) { _selfIllumColor = std::move(color); }
-    void setAppliedForce(glm::vec3 force);
 
 private:
     struct NodeTextures {
@@ -87,8 +86,8 @@ private:
     } _nodeTextures;
 
     struct DanglymeshAnimation {
-        glm::vec3 force {0.0f};  /**< net force applied to this scene node */
-        glm::vec3 stride {0.0f}; /**< how far have vertices traveled from the rest position in object space */
+        glm::mat4 lastTransform {1.0f};
+        glm::mat4 matrix {1.0f};
     } _danglymeshAnimation;
 
     const ModelSceneNode &_model;
@@ -110,7 +109,7 @@ private:
 
     void updateUVAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
     void updateBumpmapAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
-    void updateDanglyMeshAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
+    void updateDanglymeshAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
 
     // END Animation
 };

@@ -184,19 +184,6 @@ void ModelSceneNode::setDiffuseTexture(shared_ptr<Texture> texture) {
     }
 }
 
-void ModelSceneNode::setAppliedForce(glm::vec3 force) {
-    for (auto &node : _nodeByNumber) {
-        if (node.second->type() == SceneNodeType::Mesh) {
-            static_pointer_cast<MeshSceneNode>(node.second)->setAppliedForce(force);
-        }
-    }
-    for (auto &attachment : _attachments) {
-        if (attachment.second->type() == SceneNodeType::Model) {
-            static_pointer_cast<ModelSceneNode>(attachment.second)->setAppliedForce(force);
-        }
-    }
-}
-
 void ModelSceneNode::playAnimation(const string &name, AnimationProperties properties) {
     shared_ptr<Animation> anim(_model->getAnimation(name));
     if (anim) {
