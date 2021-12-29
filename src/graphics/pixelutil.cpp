@@ -33,6 +33,8 @@ uint32_t getInternalPixelFormatGL(PixelFormat format) {
     case PixelFormat::RGBA:
     case PixelFormat::BGRA:
         return GL_RGBA8;
+    case PixelFormat::RGB16F:
+        return GL_RGB16F;
     case PixelFormat::DXT1:
         return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
     case PixelFormat::DXT5:

@@ -30,8 +30,7 @@ class Texture;
 class Framebuffer : boost::noncopyable {
 public:
     enum class Attachment {
-        Color1,
-        Color2,
+        Color,
         Depth,
         DepthStencil
     };
@@ -44,30 +43,15 @@ public:
         _depth = std::move(depth);
     }
 
-    void attachDepthStencil(std::shared_ptr<IAttachment> depthStencil) {
-        _depthStencil = std::move(depthStencil);
-    }
-
     void attachColorDepth(std::shared_ptr<IAttachment> color, std::shared_ptr<IAttachment> depth) {
-        _color1 = std::move(color);
+        _colors.clear();
+        _colors.push_back(std::move(color));
         _depth = std::move(depth);
     }
 
-    void attachColorDepthStencil(std::shared_ptr<IAttachment> color, std::shared_ptr<IAttachment> depthStencil) {
-        _color1 = std::move(color);
-        _depthStencil = std::move(depthStencil);
-    }
-
-    void attachColorsDepth(std::shared_ptr<IAttachment> color1, std::shared_ptr<IAttachment> color2, std::shared_ptr<IAttachment> depth) {
-        _color1 = std::move(color1);
-        _color2 = std::move(color2);
+    void attachColorsDepth(std::vector<std::shared_ptr<IAttachment>> colors, std::shared_ptr<IAttachment> depth) {
+        _colors = std::move(colors);
         _depth = std::move(depth);
-    }
-
-    void attachColorsDepthStencil(std::shared_ptr<IAttachment> color1, std::shared_ptr<IAttachment> color2, std::shared_ptr<IAttachment> depthStencil) {
-        _color1 = std::move(color1);
-        _color2 = std::move(color2);
-        _depthStencil = std::move(depthStencil);
     }
 
     void init();
@@ -84,15 +68,14 @@ public:
 private:
     bool _inited {false};
 
-    std::shared_ptr<IAttachment> _color1;
-    std::shared_ptr<IAttachment> _color2;
+    std::vector<std::shared_ptr<IAttachment>> _colors;
     std::shared_ptr<IAttachment> _depth;
     std::shared_ptr<IAttachment> _depthStencil;
 
     void configure();
 
-    void attachTexture(const Texture &texture, Attachment attachment) const;
-    void attachRenderbuffer(const Renderbuffer &renderbuffer, Attachment attachment) const;
+    void attachTexture(const Texture &texture, Attachment attachment, int index = 0) const;
+    void attachRenderbuffer(const Renderbuffer &renderbuffer, Attachment attachment, int index = 0) const;
 
     // OpenGL
 

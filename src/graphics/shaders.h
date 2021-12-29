@@ -45,6 +45,7 @@ public:
     ShaderProgram &particle() const { return *_spParticle; }
     ShaderProgram &grass() const { return *_spGrass; }
     ShaderProgram &billboard() const { return *_spBillboard; }
+    ShaderProgram &ssr() const { return *_spSSR; }
     ShaderProgram &blur() const { return *_spBlur; }
     ShaderProgram &bloom() const { return *_spBloom; }
     ShaderProgram &fxaa() const { return *_spFXAA; }
@@ -68,6 +69,7 @@ private:
     std::shared_ptr<ShaderProgram> _spParticle;
     std::shared_ptr<ShaderProgram> _spGrass;
     std::shared_ptr<ShaderProgram> _spBillboard;
+    std::shared_ptr<ShaderProgram> _spSSR;
     std::shared_ptr<ShaderProgram> _spBlur;
     std::shared_ptr<ShaderProgram> _spBloom;
     std::shared_ptr<ShaderProgram> _spFXAA;

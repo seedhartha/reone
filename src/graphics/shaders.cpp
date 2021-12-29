@@ -67,6 +67,7 @@ const int LIGHT_DYNTYPE_BOTH = LIGHT_DYNTYPE_AREA | LIGHT_DYNTYPE_OBJECT;
 
 layout(std140) uniform General {
     mat4 uProjection;
+    mat4 uScreenProjection;
     mat4 uView;
     mat4 uModel;
     mat3 uDangly;
@@ -169,8 +170,12 @@ in vec2 fragUV1;
 in vec2 fragUV2;
 in mat3 fragTBN;
 
-layout(location = 0) out vec4 fragColor;
-layout(location = 1) out vec4 fragColorBright;
+layout(location = 0) out vec4 fragColor1;
+layout(location = 1) out vec4 fragColor2;
+layout(location = 2) out vec4 fragColorGBufColors;
+layout(location = 3) out vec4 fragColorGBufPositions;
+layout(location = 4) out vec4 fragColorGBufNormals;
+layout(location = 5) out vec4 fragColorGBufRoughness;
 
 float getAttenuationQuadratic(int light) {
     if (uLights[light].position.w == 0.0) return 1.0;
@@ -450,6 +455,32 @@ void main() {
 }
 )END";
 
+static const string g_vsBillboard = R"END(
+layout(location = 0) in vec3 aPosition;
+layout(location = 2) in vec2 aUV1;
+
+out vec2 fragUV1;
+
+void main() {
+    if (isFeatureEnabled(FEATURE_FIXEDSIZE)) {
+        gl_Position = uProjection * uView * uModel * vec4(0.0, 0.0, 0.0, 1.0);
+        gl_Position /= gl_Position.w;
+        gl_Position.xy += uBillboardSize * aPosition.xy;
+
+    } else {
+        vec3 right = vec3(uView[0][0], uView[1][0], uView[2][0]);
+        vec3 up = vec3(uView[0][1], uView[1][1], uView[2][1]);
+        vec4 P = vec4(
+            vec3(uModel[3]) + right * aPosition.x + up * aPosition.y,
+            1.0);
+
+        gl_Position = uProjection * uView * P;
+    }
+
+    fragUV1 = aUV1;
+}
+)END";
+
 static const string g_vsParticle = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;
@@ -518,29 +549,16 @@ void main() {
 }
 )END";
 
-static const string g_vsBillboard = R"END(
+static const string g_vsSSR = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;
 
 out vec2 fragUV1;
 
 void main() {
-    if (isFeatureEnabled(FEATURE_FIXEDSIZE)) {
-        gl_Position = uProjection * uView * uModel * vec4(0.0, 0.0, 0.0, 1.0);
-        gl_Position /= gl_Position.w;
-        gl_Position.xy += uBillboardSize * aPosition.xy;
-
-    } else {
-        vec3 right = vec3(uView[0][0], uView[1][0], uView[2][0]);
-        vec3 up = vec3(uView[0][1], uView[1][1], uView[2][1]);
-        vec4 P = vec4(
-            vec3(uModel[3]) + right * aPosition.x + up * aPosition.y,
-            1.0);
-
-        gl_Position = uProjection * uView * P;
-    }
-
     fragUV1 = aUV1;
+
+    gl_Position = vec4(aPosition, 1.0);
 }
 )END";
 
@@ -580,10 +598,10 @@ void main() {
 )END";
 
 static const string g_fsColor = R"END(
-out vec4 fragColor;
+out vec4 fragColor1;
 
 void main() {
-    fragColor = vec4(uColor.rgb, uAlpha);
+    fragColor1 = vec4(uColor.rgb, uAlpha);
 }
 )END";
 
@@ -635,11 +653,14 @@ void main() {
         discard;
     }
 
+    float roughness = 1.0;
+
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
-        vec3 V = normalize(uCameraPosition.xyz - fragPosWorldSpace);
-        vec3 R = reflect(-V, N);
+        vec3 I = normalize(fragPosWorldSpace - uCameraPosition.xyz);
+        vec3 R = reflect(I, N);
         vec4 envmapSample = texture(sEnvironmentMap, R);
         objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
+        roughness = diffuseSample.a;
     }
     if (isFeatureEnabled(FEATURE_WATER)) {
         objectColor *= uWaterAlpha;
@@ -655,8 +676,15 @@ void main() {
         objectColorBright = vec3(0.0);
     }
 
-    fragColor = vec4(objectColor, objectAlpha);
-    fragColorBright = vec4(objectColorBright, objectAlpha);
+    vec3 positionVS = (uView * vec4(fragPosWorldSpace, 1.0)).xyz;
+    vec3 normalVS = transpose(inverse(mat3(uView))) * N;
+
+    fragColor1 = vec4(objectColor, objectAlpha);
+    fragColor2 = vec4(objectColorBright, objectAlpha);
+    fragColorGBufColors = vec4(objectColor, 1.0);
+    fragColorGBufPositions = vec4(positionVS, 1.0);
+    fragColorGBufNormals = vec4(normalVS * 0.5 + 0.5, 1.0);
+    fragColorGBufRoughness = vec4(roughness, 0.0, 0.0, 1.0);
 }
 )END";
 
@@ -685,8 +713,12 @@ void main() {
         discard;
     }
 
-    fragColor = vec4(objectColor, objectAlpha);
-    fragColorBright = vec4(vec3(0.0), objectAlpha);
+    fragColor1 = vec4(objectColor, objectAlpha);
+    fragColor2 = vec4(0.0);
+    fragColorGBufColors = vec4(0.0);
+    fragColorGBufPositions = vec4(0.0);
+    fragColorGBufNormals = vec4(0.0);
+    fragColorGBufRoughness = vec4(0.0);
 }
 )END";
 
@@ -695,16 +727,24 @@ uniform sampler2D sDiffuseMap;
 
 in vec2 fragUV1;
 
-layout(location = 0) out vec4 fragColor;
-layout(location = 1) out vec4 fragColorBright;
+layout(location = 0) out vec4 fragColor1;
+layout(location = 1) out vec4 fragColor2;
+layout(location = 2) out vec4 fragColorGBufColors;
+layout(location = 3) out vec4 fragColorGBufPositions;
+layout(location = 4) out vec4 fragColorGBufNormals;
+layout(location = 5) out vec4 fragColorGBufRoughness;
 
 void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
     vec4 diffuseSample = texture(sDiffuseMap, uv);
     vec3 objectColor = uColor.rgb * diffuseSample.rgb;
 
-    fragColor = vec4(objectColor, uAlpha * diffuseSample.a);
-    fragColorBright = vec4(vec3(0.0), 1.0);
+    fragColor1 = vec4(objectColor, uAlpha * diffuseSample.a);
+    fragColor2 = vec4(0.0);
+    fragColorGBufColors = vec4(0.0);
+    fragColorGBufPositions = vec4(0.0);
+    fragColorGBufNormals = vec4(0.0);
+    fragColorGBufRoughness = vec4(0.0);
 }
 )END";
 
@@ -714,8 +754,12 @@ uniform sampler2D sDiffuseMap;
 in vec2 fragUV1;
 flat in int fragInstanceID;
 
-layout(location = 0) out vec4 fragColor;
-layout(location = 1) out vec4 fragColorBright;
+layout(location = 0) out vec4 fragColor1;
+layout(location = 1) out vec4 fragColor2;
+layout(location = 2) out vec4 fragColorGBufColors;
+layout(location = 3) out vec4 fragColorGBufPositions;
+layout(location = 4) out vec4 fragColorGBufNormals;
+layout(location = 5) out vec4 fragColorGBufRoughness;
 
 void main() {
     float oneOverGridX = 1.0 / uParticleGridSize.x;
@@ -739,8 +783,12 @@ void main() {
         discard;
     }
 
-    fragColor = vec4(objectColor, objectAlpha);
-    fragColorBright = vec4(vec3(0.0), 0.0);
+    fragColor1 = vec4(objectColor, objectAlpha);
+    fragColor2 = vec4(0.0);
+    fragColorGBufColors = vec4(0.0);
+    fragColorGBufPositions = vec4(0.0);
+    fragColorGBufNormals = vec4(0.0);
+    fragColorGBufRoughness = vec4(0.0);
 }
 )END";
 
@@ -751,8 +799,12 @@ uniform sampler2D sLightmap;
 in vec2 fragUV1;
 flat in int fragInstanceID;
 
-layout(location = 0) out vec4 fragColor;
-layout(location = 1) out vec4 fragColorBright;
+layout(location = 0) out vec4 fragColor1;
+layout(location = 1) out vec4 fragColor2;
+layout(location = 2) out vec4 fragColorGBufColors;
+layout(location = 3) out vec4 fragColorGBufPositions;
+layout(location = 4) out vec4 fragColorGBufNormals;
+layout(location = 5) out vec4 fragColorGBufRoughness;
 
 void main() {
     vec2 uv = vec2(0.5) * fragUV1;
@@ -772,15 +824,192 @@ void main() {
         discard;
     }
 
-    fragColor = vec4(objectColor, objectAlpha);
-    fragColorBright = vec4(vec3(0.0), 1.0);
+    fragColor1 = vec4(objectColor, objectAlpha);
+    fragColor2 = vec4(0.0);
+    fragColorGBufColors = vec4(0.0);
+    fragColorGBufPositions = vec4(0.0);
+    fragColorGBufNormals = vec4(0.0);
+    fragColorGBufRoughness = vec4(0.0);
+}
+)END";
+
+static const string g_fsSSR = R"END(
+const float Z_TICKNESS = 0.005;
+const float Z_NEAR = 0.1;
+const float PIXEL_STRIDE = 2.0;
+const float PIXEL_STRIDE_Z_CUTOFF = 100.0;
+const int ITERATIONS = 128;
+const int BINARY_SEARCH_ITERATIONS = 0;
+const float MAX_DISTANCE = 1000.0;
+const float SCREEN_FADE = 0.8;
+
+uniform sampler2D sDiffuseMap;
+uniform sampler2D sGBufColors;
+uniform sampler2D sGBufPositions;
+uniform sampler2D sGBufNormals;
+uniform sampler2D sGBufRoughness;
+
+in vec2 fragUV1;
+
+out vec4 fragColor;
+
+float distanceSquared(vec2 a, vec2 b) {
+    a -= b;
+    return dot(a, a);
+}
+
+void swapIfBigger(inout float a, inout float b) {
+    if (a > b) {
+        float tmp = a;
+        a = b;
+        b = tmp;
+    }
+}
+
+bool rayIntersectsDepth(float zA, float zB, vec2 pixel) {
+    float cameraZ = texelFetch(sGBufPositions, ivec2(pixel), 0).z;
+    return zB <= cameraZ && zA >= cameraZ - Z_TICKNESS;
+}
+
+bool traceScreenSpaceRay(
+    vec3 rayOrigin,
+    vec3 rayDir,
+    float jitter,
+    out vec2 hitPixel,
+    out vec3 hitPoint) {
+
+    float rayLength = ((rayOrigin.z + rayDir.z * MAX_DISTANCE) > -Z_NEAR) ? (-Z_NEAR - rayOrigin.z) / rayDir.z : MAX_DISTANCE;
+    vec3 rayEnd = rayOrigin + rayDir * rayLength;
+
+    vec4 H0 = uScreenProjection * vec4(rayOrigin, 1.0);
+    vec4 H1 = uScreenProjection * vec4(rayEnd, 1.0);
+    float k0 = 1.0 / H0.w;
+    float k1 = 1.0 / H1.w;
+
+    vec3 Q0 = rayOrigin * k0;
+    vec3 Q1 = rayEnd * k1;
+    vec2 P0 = H0.xy * k0;
+    vec2 P1 = H1.xy * k1;
+
+    P1 += vec2((distanceSquared(P0, P1) < 0.0001) ? 0.01 : 0.0);
+    vec2 delta = P1 - P0;
+
+    bool permute = false;
+    if (abs(delta.x) < abs(delta.y)) {
+        permute = true;
+        delta = delta.yx;
+        P0 = P0.yx;
+        P1 = P1.yx;
+    }
+
+    float stepDir = sign(delta.x);
+    float invdx = stepDir / delta.x;
+
+    vec3 dQ = (Q1 - Q0) * invdx;
+    float dk = (k1 - k0) * invdx;
+    vec2 dP = vec2(stepDir, delta.y * invdx);
+
+    float strideScaler = 1.0 - min(1.0, -rayOrigin.z / PIXEL_STRIDE_Z_CUTOFF);
+    float pixelStride = 1.0 + strideScaler * PIXEL_STRIDE;
+
+    dP *= pixelStride;
+    dQ *= pixelStride;
+    dk *= pixelStride;
+
+    P0 += dP * jitter;
+    Q0 += dQ * jitter;
+    k0 += dk * jitter;
+
+    float i;
+    float zA = 0.0;
+    float zB = 0.0;
+
+    vec4 pqk = vec4(P0, Q0.z, k0);
+    vec4 dPQK = vec4(dP, dQ.z, dk);
+    bool intersect = false;
+
+    for (i = 0; i < ITERATIONS && !intersect; ++i) {
+        pqk += dPQK;
+
+        zA = zB;
+        zB = (dPQK.z * 0.5 + pqk.z) / (dPQK.w * 0.5 + pqk.w);
+        swapIfBigger(zB, zA);
+
+        hitPixel = permute ? pqk.yx : pqk.xy;
+        intersect = rayIntersectsDepth(zA, zB, hitPixel);
+    }
+
+    if (pixelStride > 1.0 && intersect) {
+        pqk -= dPQK;
+        dPQK /= pixelStride;
+
+        float originalStride = pixelStride * 0.5;
+        float stride = originalStride;
+
+        zA = pqk.z / pqk.w;
+        zB = zA;
+
+        for (int j = 0; j < BINARY_SEARCH_ITERATIONS; ++j) {
+            pqk += dPQK * stride;
+
+            zA = zB;
+            zB = (dPQK.z * -0.5 + pqk.z) / (dPQK.w * -0.5 + pqk.w);
+            swapIfBigger(zB, zA);
+
+            hitPixel = permute ? pqk.yx : pqk.xy;
+            originalStride *= 0.5;
+            stride = rayIntersectsDepth(zA, zB, hitPixel) ? -originalStride : originalStride;
+        }
+    }
+
+    Q0.xy += dQ.xy * i;
+    Q0.z = pqk.z;
+    hitPoint = Q0 / pqk.w;
+
+    return intersect;
+} 
+
+void main() {
+    vec4 defaultColor = texture(sDiffuseMap, fragUV1);
+
+    float roughness = texture(sGBufRoughness, fragUV1).r;
+    if (roughness == 1.0) {
+        fragColor = defaultColor;
+        return;
+    }
+
+    vec4 reflectionColor = vec4(0.0);
+    float reflectionFuzziness = 1.0;
+
+    vec3 fragPosVS = texture(sGBufPositions, fragUV1).xyz;
+    vec3 I = normalize(fragPosVS);
+    vec3 N = normalize(texture(sGBufNormals, fragUV1).xyz * 2.0 - 1.0);
+    if (dot(I, N) > 0.0) {
+        fragColor = defaultColor;
+        return;
+    }
+    vec3 R = reflect(I, N);
+
+    vec2 pixel = fragUV1 * uScreenResolution;
+    float jitter = mod((pixel.x + pixel.y) * 0.25, 1.0);
+    vec2 hitPixel = vec2(0.0);
+    vec3 hitPoint = vec3(0.0);
+    if (traceScreenSpaceRay(fragPosVS, R, jitter, hitPixel, hitPoint)) {
+        reflectionColor = texelFetch(sGBufColors, ivec2(hitPixel), 0);
+        vec2 hitNDC = (hitPixel / uScreenResolution) * 2.0 - 1.0;
+        float maxDimension = min(1.0, max(abs(hitNDC.x), abs(hitNDC.y)));
+        reflectionFuzziness = smoothstep(0.0, SCREEN_FADE, maxDimension);
+    }
+
+    vec3 color = mix(defaultColor.rgb, defaultColor.rgb + reflectionColor.rgb, (1.0 - roughness) * (1.0 - reflectionFuzziness));
+    fragColor = vec4(color, defaultColor.a);
 }
 )END";
 
 static const string g_fsBlur = R"END(
 uniform sampler2D sDiffuseMap;
 
-out vec4 fragColor;
+out vec4 fragColor1;
 
 void main() {
     vec2 uv = vec2(gl_FragCoord.xy / uScreenResolution);
@@ -793,7 +1022,7 @@ void main() {
     color += texture(sDiffuseMap, uv + (off2 / uScreenResolution)).rgb * 0.0702702703;
     color += texture(sDiffuseMap, uv - (off2 / uScreenResolution)).rgb * 0.0702702703;
 
-    fragColor = vec4(color, 1.0);
+    fragColor1 = vec4(color, 1.0);
 }
 )END";
 
@@ -803,14 +1032,14 @@ uniform sampler2D sBloom;
 
 in vec2 fragUV1;
 
-out vec4 fragColor;
+out vec4 fragColor1;
 
 void main() {
     vec4 diffuseSample = texture(sDiffuseMap, fragUV1);
     vec4 bloomSample = texture(sBloom, fragUV1);
     vec3 color = diffuseSample.rgb + bloomSample.rgb;
 
-    fragColor = vec4(color, diffuseSample.a);
+    fragColor1 = vec4(color, diffuseSample.a);
 }
 )END";
 
@@ -830,7 +1059,7 @@ uniform sampler2D sDiffuseMap;
 
 in vec2 fragUV1;
 
-out vec4 fragColor;
+out vec4 fragColor1;
 
 float getLuma(vec4 color) {
     return dot(color.rgb, vec3(0.299, 0.587, 0.114));
@@ -863,7 +1092,7 @@ void main() {
     float rangeMaxClamped = max(EDGE_THRESHOLD_MIN, rangeMaxScaled);
     bool earlyExit = range < rangeMaxClamped;
     if (earlyExit) {
-        fragColor = rgbyM;
+        fragColor1 = rgbyM;
         return;
     }
 
@@ -1012,7 +1241,7 @@ void main() {
     if (!horzSpan) posM.x += pixelOffsetSubpix * lengthSign;
     if (horzSpan) posM.y += pixelOffsetSubpix * lengthSign;
 
-    fragColor = vec4(textureLod(sDiffuseMap, posM, 0.0).rgb, 1.0);
+    fragColor1 = vec4(textureLod(sDiffuseMap, posM, 0.0).rgb, 1.0);
 }
 )END";
 
@@ -1021,10 +1250,10 @@ uniform sampler2D sDiffuseMap;
 
 in vec2 fragUV1;
 
-out vec4 fragColor;
+out vec4 fragColor1;
 
 void main() {
-    fragColor = texture(sDiffuseMap, fragUV1);
+    fragColor1 = texture(sDiffuseMap, fragUV1);
 }
 )END";
 
@@ -1033,7 +1262,7 @@ uniform sampler2D sDiffuseMap;
 
 in vec2 fragUV1;
 
-out vec4 fragColor;
+out vec4 fragColor1;
 
 void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
@@ -1042,7 +1271,7 @@ void main() {
     if (isFeatureEnabled(FEATURE_DISCARD) && length(uDiscardColor.rgb - objectColor) < 0.01) {
         discard;
     }
-    fragColor = vec4(objectColor, uAlpha * diffuseSample.a);
+    fragColor1 = vec4(objectColor, uAlpha * diffuseSample.a);
 }
 )END";
 
@@ -1052,13 +1281,13 @@ uniform sampler2D sDiffuseMap;
 in vec2 fragUV1;
 flat in int fragInstanceID;
 
-out vec4 fragColor;
+out vec4 fragColor1;
 
 void main() {
     vec2 uv = fragUV1 * uTextChars[fragInstanceID].uv.zw + uTextChars[fragInstanceID].uv.xy;
     vec4 diffuseSample = texture(sDiffuseMap, uv);
     vec3 objectColor = uColor.rgb * diffuseSample.rgb;
-    fragColor = vec4(objectColor, diffuseSample.a);
+    fragColor1 = vec4(objectColor, diffuseSample.a);
 }
 )END";
 
@@ -1075,6 +1304,7 @@ void Shaders::init() {
     auto vsParticle = initShader(ShaderType::Vertex, {g_glslHeader, g_vsParticle});
     auto vsGrass = initShader(ShaderType::Vertex, {g_glslHeader, g_vsGrass});
     auto vsText = initShader(ShaderType::Vertex, {g_glslHeader, g_vsText});
+    auto vsSSR = initShader(ShaderType::Vertex, {g_glslHeader, g_vsSSR});
     auto gsPointLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_gsPointLightShadows});
     auto gsDirectionalLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_gsDirectionalLightShadows});
     auto fsColor = initShader(ShaderType::Fragment, {g_glslHeader, g_fsColor});
@@ -1085,6 +1315,7 @@ void Shaders::init() {
     auto fsBillboard = initShader(ShaderType::Fragment, {g_glslHeader, g_fsBillboard});
     auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_fsParticle});
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_fsGrass});
+    auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_fsSSR});
     auto fsBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_fsBlur});
     auto fsBloom = initShader(ShaderType::Fragment, {g_glslHeader, g_fsBloom});
     auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_fsFXAA});
@@ -1101,6 +1332,7 @@ void Shaders::init() {
     _spBillboard = initShaderProgram({vsBillboard, fsBillboard});
     _spParticle = initShaderProgram({vsParticle, fsParticle});
     _spGrass = initShaderProgram({vsGrass, fsGrass});
+    _spSSR = initShaderProgram({vsSSR, fsSSR});
     _spBlur = initShaderProgram({vsSimple, fsBlur});
     _spBloom = initShaderProgram({vsSimple, fsBloom});
     _spFXAA = initShaderProgram({vsSimple, fsFXAA});
@@ -1139,6 +1371,7 @@ void Shaders::deinit() {
     _spBillboard.reset();
     _spParticle.reset();
     _spGrass.reset();
+    _spSSR.reset();
     _spBlur.reset();
     _spBloom.reset();
     _spFXAA.reset();
@@ -1183,6 +1416,10 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sLightmap", TextureUnits::lightmap);
     program->setUniform("sBumpMap", TextureUnits::bumpMap);
     program->setUniform("sBloom", TextureUnits::bloom);
+    program->setUniform("sGBufColors", TextureUnits::gBufColors);
+    program->setUniform("sGBufPositions", TextureUnits::gBufPositions);
+    program->setUniform("sGBufNormals", TextureUnits::gBufNormals);
+    program->setUniform("sGBufRoughness", TextureUnits::gBufRoughness);
     program->setUniform("sDanglyConstraints", TextureUnits::danglyConstraints);
     program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
     program->setUniform("sCubeShadowMap", TextureUnits::cubeShadowMap);

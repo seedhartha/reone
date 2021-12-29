@@ -46,18 +46,12 @@ void Framebuffer::deinit() {
 }
 
 void Framebuffer::configure() {
-    if (_color1) {
-        if (_color1->isTexture()) {
-            attachTexture(static_cast<Texture &>(*_color1), Attachment::Color1);
-        } else if (_color1->isRenderbuffer()) {
-            attachRenderbuffer(static_cast<Renderbuffer &>(*_color1), Attachment::Color1);
-        }
-    }
-    if (_color2) {
-        if (_color2->isTexture()) {
-            attachTexture(static_cast<Texture &>(*_color2), Attachment::Color2);
-        } else if (_color2->isRenderbuffer()) {
-            attachRenderbuffer(static_cast<Renderbuffer &>(*_color2), Attachment::Color2);
+    for (size_t i = 0; i < _colors.size(); ++i) {
+        auto &color = _colors[i];
+        if (color->isTexture()) {
+            attachTexture(static_cast<Texture &>(*color), Attachment::Color, i);
+        } else if (color->isRenderbuffer()) {
+            attachRenderbuffer(static_cast<Renderbuffer &>(*color), Attachment::Color, i);
         }
     }
     if (_depth) {
@@ -76,12 +70,10 @@ void Framebuffer::configure() {
     }
 }
 
-static GLenum getAttachmentGL(Framebuffer::Attachment attachment) {
+static GLenum getAttachmentGL(Framebuffer::Attachment attachment, int index = 0) {
     switch (attachment) {
-    case Framebuffer::Attachment::Color1:
-        return GL_COLOR_ATTACHMENT0;
-    case Framebuffer::Attachment::Color2:
-        return GL_COLOR_ATTACHMENT1;
+    case Framebuffer::Attachment::Color:
+        return GL_COLOR_ATTACHMENT0 + index;
     case Framebuffer::Attachment::Depth:
         return GL_DEPTH_ATTACHMENT;
     case Framebuffer::Attachment::DepthStencil:
@@ -90,8 +82,8 @@ static GLenum getAttachmentGL(Framebuffer::Attachment attachment) {
     throw invalid_argument("Unsupported framebuffer attachment: " + to_string(static_cast<int>(attachment)));
 }
 
-void Framebuffer::attachTexture(const Texture &texture, Attachment attachment) const {
-    auto attachmentGL = getAttachmentGL(attachment);
+void Framebuffer::attachTexture(const Texture &texture, Attachment attachment, int index) const {
+    auto attachmentGL = getAttachmentGL(attachment, index);
     if (texture.isCubemap() || texture.is2DArray()) {
         glFramebufferTexture(GL_FRAMEBUFFER, attachmentGL, texture.nameGL(), 0);
     } else {
@@ -99,8 +91,8 @@ void Framebuffer::attachTexture(const Texture &texture, Attachment attachment) c
     }
 }
 
-void Framebuffer::attachRenderbuffer(const Renderbuffer &renderbuffer, Attachment attachment) const {
-    auto attachmentGL = getAttachmentGL(attachment);
+void Framebuffer::attachRenderbuffer(const Renderbuffer &renderbuffer, Attachment attachment, int index) const {
+    auto attachmentGL = getAttachmentGL(attachment, index);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachmentGL, GL_RENDERBUFFER, renderbuffer.nameGL());
 }
 

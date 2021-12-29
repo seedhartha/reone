@@ -78,10 +78,10 @@ private:
 
     // Framebuffers
 
-    std::shared_ptr<Framebuffer> _fbGeometryMS;
-    std::shared_ptr<Framebuffer> _fbGeometry;
     std::shared_ptr<Framebuffer> _fbPointLightShadows;
     std::shared_ptr<Framebuffer> _fbDirectionalLightShadows;
+    std::shared_ptr<Framebuffer> _fbGeometry;
+    std::shared_ptr<Framebuffer> _fbSSR;
     std::shared_ptr<Framebuffer> _fbScreenshot;
 
     std::shared_ptr<Framebuffer> _fbPing;
@@ -91,10 +91,13 @@ private:
 
     // Color Buffers
 
-    std::shared_ptr<Texture> _cbGeometry1MS;
-    std::shared_ptr<Texture> _cbGeometry2MS;
     std::shared_ptr<Texture> _cbGeometry1;
     std::shared_ptr<Texture> _cbGeometry2;
+    std::shared_ptr<Texture> _cbGeometryGBufColors;
+    std::shared_ptr<Texture> _cbGeometryGBufPositions;
+    std::shared_ptr<Texture> _cbGeometryGBufNormals;
+    std::shared_ptr<Texture> _cbGeometryGBufRoughness;
+    std::shared_ptr<Texture> _cbSSR;
     std::shared_ptr<Texture> _cbScreenshot;
 
     std::shared_ptr<Texture> _cbPing;
@@ -108,7 +111,6 @@ private:
     std::shared_ptr<Texture> _dbPointLightShadows;
     std::shared_ptr<Renderbuffer> _dbScreenshot;
 
-    std::shared_ptr<Renderbuffer> _dbCommonMS;
     std::shared_ptr<Renderbuffer> _dbCommon;
 
     // END Depth Buffers
@@ -116,6 +118,7 @@ private:
     void computeLightSpaceMatrices();
     void drawShadows();
     void drawGeometry();
+    void applySSR();
     void applyHorizontalBlur();
     void applyVerticalBlur();
     void applyBloom();

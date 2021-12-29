@@ -58,7 +58,7 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     dbGeometry->init();
 
     auto fbGeometry = make_unique<Framebuffer>();
-    fbGeometry->attachColorsDepth(cbGeometry1, cbGeometry2, dbGeometry);
+    fbGeometry->attachColorsDepth(vector<shared_ptr<IAttachment>> {cbGeometry1, cbGeometry2}, dbGeometry);
     fbGeometry->init();
 
     // Reusable ping-pong framebuffers
