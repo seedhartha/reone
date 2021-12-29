@@ -194,10 +194,6 @@ void WorldPipeline::init() {
     _cbGeometry2->clear(_options.width, _options.height, PixelFormat::RGB);
     _cbGeometry2->init();
 
-    _cbGeometryGBufColors = make_unique<Texture>("geometry_color_gbcolors", getTextureProperties(TextureUsage::ColorBuffer));
-    _cbGeometryGBufColors->clear(_options.width, _options.height, PixelFormat::RGB);
-    _cbGeometryGBufColors->init();
-
     _cbGeometryGBufPositions = make_unique<Texture>("geometry_color_gbpositions", getTextureProperties(TextureUsage::ColorBuffer));
     _cbGeometryGBufPositions->clear(_options.width, _options.height, PixelFormat::RGB16F);
     _cbGeometryGBufPositions->init();
@@ -215,7 +211,6 @@ void WorldPipeline::init() {
         vector<shared_ptr<IAttachment>> {
             _cbGeometry1,
             _cbGeometry2,
-            _cbGeometryGBufColors,
             _cbGeometryGBufPositions,
             _cbGeometryGBufNormals,
             _cbGeometryGBufRoughness},
@@ -324,8 +319,7 @@ void WorldPipeline::drawGeometry() {
         GL_COLOR_ATTACHMENT1,
         GL_COLOR_ATTACHMENT2,
         GL_COLOR_ATTACHMENT3,
-        GL_COLOR_ATTACHMENT4,
-        GL_COLOR_ATTACHMENT5};
+        GL_COLOR_ATTACHMENT4};
 
     auto camera = _scene->camera();
 
@@ -359,7 +353,7 @@ void WorldPipeline::drawGeometry() {
     // Draw scene to geometry framebuffer
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbGeometry->nameGL());
-    glDrawBuffers(_options.ssr ? 6 : 2, colors);
+    glDrawBuffers(_options.ssr ? 5 : 2, colors);
     _graphicsContext.clearColorDepth();
     if (_scene->hasShadowLight()) {
         if (_scene->isShadowLightDirectional()) {
@@ -395,7 +389,6 @@ void WorldPipeline::applySSR() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbSSR->nameGL());
     _shaders.use(_shaders.ssr(), true);
     _textures.bind(*_cbGeometry1);
-    _textures.bind(*_cbGeometryGBufColors, TextureUnits::gBufColors);
     _textures.bind(*_cbGeometryGBufPositions, TextureUnits::gBufPositions);
     _textures.bind(*_cbGeometryGBufNormals, TextureUnits::gBufNormals);
     _textures.bind(*_cbGeometryGBufRoughness, TextureUnits::gBufRoughness);
