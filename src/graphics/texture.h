@@ -109,7 +109,7 @@ public:
     bool is2DArray() const { return _layers.size() > 1ll && !_properties.cubemap; }
 
     bool isAdditive() const { return _features.blending == Blending::Additive; }
-    bool isGrayscale() const { return _pixelFormat == PixelFormat::Grayscale; }
+    bool isGrayscale() const { return _pixelFormat == PixelFormat::R8; }
 
     bool isTexture() const override { return true; }
     bool isRenderbuffer() const override { return false; }
@@ -148,7 +148,7 @@ private:
 
     int _width {0};
     int _height {0};
-    PixelFormat _pixelFormat {PixelFormat::BGR};
+    PixelFormat _pixelFormat {PixelFormat::BGR8};
     std::vector<Layer> _layers; /**< either one for 2D textures, or six for cube maps */
     Features _features;
 

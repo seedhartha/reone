@@ -71,16 +71,16 @@ enum class PolygonMode {
 };
 
 enum class PixelFormat {
-    Grayscale,
-    RGB,
-    RGBA,
-    BGR,
-    BGRA,
+    R8,
     R16F,
+    RGB8,
+    RGBA8,
+    BGR8,
+    BGRA8,
     DXT1,
     DXT5,
-    Depth,
-    DepthStencil
+    Depth32F,
+    Depth32FStencil8
 };
 
 enum class CubeMapFace {

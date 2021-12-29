@@ -143,13 +143,13 @@ void WorldPipeline::init() {
     // Reusable depth buffers
 
     _dbCommon = make_unique<Renderbuffer>();
-    _dbCommon->configure(_options.width, _options.height, PixelFormat::Depth);
+    _dbCommon->configure(_options.width, _options.height, PixelFormat::Depth32F);
     _dbCommon->init();
 
     // Reusable framebuffers
 
     _cbPing = make_unique<Texture>("ping_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _cbPing->clear(_options.width, _options.height, PixelFormat::RGBA);
+    _cbPing->clear(_options.width, _options.height, PixelFormat::RGBA8);
     _cbPing->init();
 
     _fbPing = make_unique<Framebuffer>();
@@ -157,7 +157,7 @@ void WorldPipeline::init() {
     _fbPing->init();
 
     _cbPong = make_unique<Texture>("pong_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _cbPong->clear(_options.width, _options.height, PixelFormat::RGBA);
+    _cbPong->clear(_options.width, _options.height, PixelFormat::RGBA8);
     _cbPong->init();
 
     _fbPong = make_unique<Framebuffer>();
@@ -167,7 +167,7 @@ void WorldPipeline::init() {
     // Directional light shadows framebuffer
 
     _dbDirectionalLightShadows = make_unique<Texture>("point_light_shadows_color", getTextureProperties(TextureUsage::DepthBuffer));
-    _dbDirectionalLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth, kNumShadowCascades);
+    _dbDirectionalLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F, kNumShadowCascades);
     _dbDirectionalLightShadows->init();
 
     _fbDirectionalLightShadows = make_shared<Framebuffer>();
@@ -177,7 +177,7 @@ void WorldPipeline::init() {
     // Point light shadows framebuffer
 
     _dbPointLightShadows = make_unique<Texture>("directional_light_shadows_color", getTextureProperties(TextureUsage::DepthBufferCubeMap));
-    _dbPointLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth);
+    _dbPointLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F);
     _dbPointLightShadows->init();
 
     _fbPointLightShadows = make_shared<Framebuffer>();
@@ -187,11 +187,11 @@ void WorldPipeline::init() {
     // Geometry framebuffer
 
     _cbGeometry1 = make_unique<Texture>("geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
-    _cbGeometry1->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbGeometry1->clear(_options.width, _options.height, PixelFormat::RGB8);
     _cbGeometry1->init();
 
     _cbGeometry2 = make_unique<Texture>("geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
-    _cbGeometry2->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbGeometry2->clear(_options.width, _options.height, PixelFormat::RGB8);
     _cbGeometry2->init();
 
     _cbGeometryGBufDepth = make_unique<Texture>("geometry_color_gbdepth", getTextureProperties(TextureUsage::ColorBuffer));
@@ -199,11 +199,11 @@ void WorldPipeline::init() {
     _cbGeometryGBufDepth->init();
 
     _cbGeometryGBufNormals = make_unique<Texture>("geometry_color_gbnormals", getTextureProperties(TextureUsage::ColorBuffer));
-    _cbGeometryGBufNormals->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbGeometryGBufNormals->clear(_options.width, _options.height, PixelFormat::RGB8);
     _cbGeometryGBufNormals->init();
 
     _cbGeometryGBufRoughness = make_unique<Texture>("geometry_color_gbroughness", getTextureProperties(TextureUsage::ColorBuffer));
-    _cbGeometryGBufRoughness->clear(_options.width, _options.height, PixelFormat::Grayscale);
+    _cbGeometryGBufRoughness->clear(_options.width, _options.height, PixelFormat::R8);
     _cbGeometryGBufRoughness->init();
 
     _fbGeometry = make_shared<Framebuffer>();
@@ -220,7 +220,7 @@ void WorldPipeline::init() {
     // SSR framebuffer
 
     _cbSSR = make_unique<Texture>("ssr_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _cbSSR->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbSSR->clear(_options.width, _options.height, PixelFormat::RGB8);
     _cbSSR->init();
 
     _fbSSR = make_shared<Framebuffer>();
@@ -230,11 +230,11 @@ void WorldPipeline::init() {
     // Screenshot framebuffer
 
     _cbScreenshot = make_unique<Texture>("screenshot_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _cbScreenshot->clear(kScreenshotResolution, kScreenshotResolution, PixelFormat::RGB);
+    _cbScreenshot->clear(kScreenshotResolution, kScreenshotResolution, PixelFormat::RGB8);
     _cbScreenshot->init();
 
     _dbScreenshot = make_unique<Renderbuffer>();
-    _dbScreenshot->configure(kScreenshotResolution, kScreenshotResolution, PixelFormat::Depth);
+    _dbScreenshot->configure(kScreenshotResolution, kScreenshotResolution, PixelFormat::Depth32F);
     _dbScreenshot->init();
 
     _fbScreenshot = make_shared<Framebuffer>();
