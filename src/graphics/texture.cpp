@@ -40,22 +40,22 @@ static bool isMipmapFilter(Texture::Filtering filter) {
 
 static uint32_t getPixelFormatGL(PixelFormat format) {
     switch (format) {
-    case PixelFormat::Grayscale:
+    case PixelFormat::R8:
     case PixelFormat::R16F:
         return GL_RED;
-    case PixelFormat::RGB:
+    case PixelFormat::RGB8:
         return GL_RGB;
-    case PixelFormat::RGBA:
+    case PixelFormat::RGBA8:
     case PixelFormat::DXT1:
     case PixelFormat::DXT5:
         return GL_RGBA;
-    case PixelFormat::BGR:
+    case PixelFormat::BGR8:
         return GL_BGR;
-    case PixelFormat::BGRA:
+    case PixelFormat::BGRA8:
         return GL_BGRA;
-    case PixelFormat::Depth:
+    case PixelFormat::Depth32F:
         return GL_DEPTH_COMPONENT;
-    case PixelFormat::DepthStencil:
+    case PixelFormat::Depth32FStencil8:
         return GL_DEPTH_STENCIL;
     default:
         throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(format)));
@@ -64,18 +64,18 @@ static uint32_t getPixelFormatGL(PixelFormat format) {
 
 static uint32_t getPixelTypeGL(PixelFormat format) {
     switch (format) {
-    case PixelFormat::Grayscale:
-    case PixelFormat::RGB:
-    case PixelFormat::RGBA:
-    case PixelFormat::BGR:
-    case PixelFormat::BGRA:
+    case PixelFormat::R8:
+    case PixelFormat::RGB8:
+    case PixelFormat::RGBA8:
+    case PixelFormat::BGR8:
+    case PixelFormat::BGRA8:
         return GL_UNSIGNED_BYTE;
     case PixelFormat::R16F:
         return GL_HALF_FLOAT;
-    case PixelFormat::Depth:
+    case PixelFormat::Depth32F:
         return GL_FLOAT;
-    case PixelFormat::DepthStencil:
-        return GL_UNSIGNED_INT_24_8;
+    case PixelFormat::Depth32FStencil8:
+        return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
     default:
         throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(format)));
     }
@@ -292,7 +292,7 @@ glm::vec4 Texture::sample(int x, int y) const {
         throw logic_error("Sampling compressed textures is not supported");
     }
     bool grayscale = isGrayscale();
-    bool alpha = _pixelFormat == PixelFormat::RGBA || _pixelFormat == PixelFormat::BGRA;
+    bool alpha = _pixelFormat == PixelFormat::RGBA8 || _pixelFormat == PixelFormat::BGRA8;
     int bpp = grayscale ? 1 : (alpha ? 4 : 3);
 
     auto &pixels = *_layers.front().pixels;
@@ -303,28 +303,28 @@ glm::vec4 Texture::sample(int x, int y) const {
     float b = 0.0f;
     float a = 1.0f;
     switch (_pixelFormat) {
-    case PixelFormat::Grayscale:
+    case PixelFormat::R8:
         r = static_cast<uint8_t>(pixel[0]) / 255.0f;
         g = r;
         b = r;
         break;
-    case PixelFormat::RGB:
+    case PixelFormat::RGB8:
         r = static_cast<uint8_t>(pixel[0]) / 255.0f;
         g = static_cast<uint8_t>(pixel[1]) / 255.0f;
         b = static_cast<uint8_t>(pixel[2]) / 255.0f;
         break;
-    case PixelFormat::RGBA:
+    case PixelFormat::RGBA8:
         r = static_cast<uint8_t>(pixel[0]) / 255.0f;
         g = static_cast<uint8_t>(pixel[1]) / 255.0f;
         b = static_cast<uint8_t>(pixel[2]) / 255.0f;
         a = static_cast<uint8_t>(pixel[3]) / 255.0f;
         break;
-    case PixelFormat::BGR:
+    case PixelFormat::BGR8:
         r = static_cast<uint8_t>(pixel[2]) / 255.0f;
         g = static_cast<uint8_t>(pixel[1]) / 255.0f;
         b = static_cast<uint8_t>(pixel[0]) / 255.0f;
         break;
-    case PixelFormat::BGRA:
+    case PixelFormat::BGRA8:
         r = static_cast<uint8_t>(pixel[2]) / 255.0f;
         g = static_cast<uint8_t>(pixel[1]) / 255.0f;
         b = static_cast<uint8_t>(pixel[0]) / 255.0f;

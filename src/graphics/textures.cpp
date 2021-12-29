@@ -39,19 +39,19 @@ namespace graphics {
 
 void Textures::init() {
     _defaultRGB = make_shared<Texture>("default_rgb", getTextureProperties(TextureUsage::Default));
-    _defaultRGB->clear(1, 1, PixelFormat::RGB);
+    _defaultRGB->clear(1, 1, PixelFormat::RGB8);
     _defaultRGB->init();
 
     _defaultCubemapRGB = make_shared<Texture>("default_cubemap_rgb", getTextureProperties(TextureUsage::DefaultCubeMap));
-    _defaultCubemapRGB->clear(1, 1, PixelFormat::RGB, kNumCubeFaces);
+    _defaultCubemapRGB->clear(1, 1, PixelFormat::RGB8, kNumCubeFaces);
     _defaultCubemapRGB->init();
 
     _defaultCubemapDepth = make_shared<Texture>("default_cubemap_depth", getTextureProperties(TextureUsage::DefaultCubeMap));
-    _defaultCubemapDepth->clear(1, 1, PixelFormat::Depth, kNumCubeFaces);
+    _defaultCubemapDepth->clear(1, 1, PixelFormat::Depth32F, kNumCubeFaces);
     _defaultCubemapDepth->init();
 
     _defaultArrayDepth = make_shared<Texture>("default_array_depth", getTextureProperties(TextureUsage::Default));
-    _defaultArrayDepth->clear(1, 1, PixelFormat::Depth, kNumShadowCascades);
+    _defaultArrayDepth->clear(1, 1, PixelFormat::Depth32F, kNumShadowCascades);
     _defaultArrayDepth->init();
 
     bindDefaults();

@@ -84,7 +84,7 @@ void TgaReader::loadTexture() {
         layers.push_back(Texture::Layer {move(pixels)});
     }
 
-    PixelFormat format = isGrayscale() ? PixelFormat::Grayscale : (_alpha ? PixelFormat::BGRA : PixelFormat::BGR);
+    PixelFormat format = isGrayscale() ? PixelFormat::R8 : (_alpha ? PixelFormat::BGRA8 : PixelFormat::BGR8);
     _texture = make_shared<Texture>(_resRef, getTextureProperties(_usage));
     _texture->setPixels(_width, _height, format, move(layers));
 }

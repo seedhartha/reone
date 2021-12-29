@@ -141,11 +141,11 @@ PixelFormat TpcReader::getPixelFormat() const {
     if (!_compressed) {
         switch (_encoding) {
         case EncodingType::Grayscale:
-            return PixelFormat::Grayscale;
+            return PixelFormat::R8;
         case EncodingType::RGB:
-            return PixelFormat::RGB;
+            return PixelFormat::RGB8;
         case EncodingType::RGBA:
-            return PixelFormat::RGBA;
+            return PixelFormat::RGBA8;
         default:
             throw logic_error("Unsupported uncompressed TPC encoding: " + to_string(static_cast<int>(_encoding)));
         }

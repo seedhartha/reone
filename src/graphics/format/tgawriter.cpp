@@ -84,18 +84,18 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
     vector<uint8_t> result;
 
     switch (_texture->pixelFormat()) {
-    case PixelFormat::Grayscale:
+    case PixelFormat::R8:
         dataType = TGADataType::Grayscale;
         depth = 8;
         break;
-    case PixelFormat::RGB:
-    case PixelFormat::BGR:
+    case PixelFormat::RGB8:
+    case PixelFormat::BGR8:
     case PixelFormat::DXT1:
         dataType = compress ? TGADataType::RGBA_RLE : TGADataType::RGBA;
         depth = 24;
         break;
-    case PixelFormat::RGBA:
-    case PixelFormat::BGRA:
+    case PixelFormat::RGBA8:
+    case PixelFormat::BGRA8:
     case PixelFormat::DXT5:
         dataType = compress ? TGADataType::RGBA_RLE : TGADataType::RGBA;
         depth = 32;
@@ -115,10 +115,10 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
         auto layerPixelsPtr = reinterpret_cast<const uint8_t *>(layer.pixels->data());
 
         switch (_texture->pixelFormat()) {
-        case PixelFormat::Grayscale:
+        case PixelFormat::R8:
             memcpy(pixels, layerPixelsPtr, numPixels);
             break;
-        case PixelFormat::RGB:
+        case PixelFormat::RGB8:
             for (int j = 0; j < numPixels; ++j) {
                 *(pixels++) = layerPixelsPtr[2];
                 *(pixels++) = layerPixelsPtr[1];
@@ -126,7 +126,7 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
                 layerPixelsPtr += 3;
             }
             break;
-        case PixelFormat::RGBA:
+        case PixelFormat::RGBA8:
             for (int j = 0; j < numPixels; ++j) {
                 *(pixels++) = layerPixelsPtr[2];
                 *(pixels++) = layerPixelsPtr[1];
@@ -135,10 +135,10 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
                 layerPixelsPtr += 4;
             }
             break;
-        case PixelFormat::BGR:
+        case PixelFormat::BGR8:
             memcpy(pixels, layerPixelsPtr, 3ll * numPixels);
             break;
-        case PixelFormat::BGRA:
+        case PixelFormat::BGRA8:
             memcpy(pixels, layerPixelsPtr, 4ll * numPixels);
             break;
         case PixelFormat::DXT1: {

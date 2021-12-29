@@ -25,13 +25,13 @@ namespace graphics {
 
 uint32_t getInternalPixelFormatGL(PixelFormat format) {
     switch (format) {
-    case PixelFormat::Grayscale:
+    case PixelFormat::R8:
         return GL_R8;
-    case PixelFormat::RGB:
-    case PixelFormat::BGR:
+    case PixelFormat::RGB8:
+    case PixelFormat::BGR8:
         return GL_RGB8;
-    case PixelFormat::RGBA:
-    case PixelFormat::BGRA:
+    case PixelFormat::RGBA8:
+    case PixelFormat::BGRA8:
         return GL_RGBA8;
     case PixelFormat::R16F:
         return GL_R16F;
@@ -39,10 +39,10 @@ uint32_t getInternalPixelFormatGL(PixelFormat format) {
         return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
     case PixelFormat::DXT5:
         return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-    case PixelFormat::Depth:
+    case PixelFormat::Depth32F:
         return GL_DEPTH_COMPONENT32F;
-    case PixelFormat::DepthStencil:
-        return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
+    case PixelFormat::Depth32FStencil8:
+        return GL_DEPTH32F_STENCIL8;
     default:
         throw logic_error("Unsupported pixel format: " + to_string(static_cast<int>(format)));
     }

@@ -59,7 +59,7 @@ static void decompressLayer(int width, int height, Texture::Layer &layer, PixelF
     }
 
     layer.pixels = move(destPixels);
-    dstFormat = alpha ? PixelFormat::RGBA : PixelFormat::RGB;
+    dstFormat = alpha ? PixelFormat::RGBA8 : PixelFormat::RGB8;
 }
 
 static void rotateLayer90(int width, int height, Texture::Layer &layer, int bpp) {
@@ -91,13 +91,13 @@ static void rotateLayer90(int width, int height, Texture::Layer &layer, int bpp)
 
 static int getBitsPerPixel(PixelFormat format) {
     switch (format) {
-    case PixelFormat::Grayscale:
+    case PixelFormat::R8:
         return 1;
-    case PixelFormat::RGB:
-    case PixelFormat::BGR:
+    case PixelFormat::RGB8:
+    case PixelFormat::BGR8:
         return 3;
-    case PixelFormat::RGBA:
-    case PixelFormat::BGRA:
+    case PixelFormat::RGBA8:
+    case PixelFormat::BGRA8:
         return 4;
     default:
         throw invalid_argument("Unsupported pixel format: " + to_string(static_cast<int>(format)));

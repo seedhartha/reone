@@ -46,15 +46,15 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     // Geometry framebuffer
 
     auto cbGeometry1 = make_shared<Texture>("geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
-    cbGeometry1->clear(w, h, PixelFormat::RGBA);
+    cbGeometry1->clear(w, h, PixelFormat::RGBA8);
     cbGeometry1->init();
 
     auto cbGeometry2 = make_shared<Texture>("geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
-    cbGeometry2->clear(w, h, PixelFormat::RGBA);
+    cbGeometry2->clear(w, h, PixelFormat::RGBA8);
     cbGeometry2->init();
 
     auto dbGeometry = make_shared<Renderbuffer>();
-    dbGeometry->configure(w, h, PixelFormat::Depth);
+    dbGeometry->configure(w, h, PixelFormat::Depth32F);
     dbGeometry->init();
 
     auto fbGeometry = make_unique<Framebuffer>();
@@ -64,15 +64,15 @@ void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     // Reusable ping-pong framebuffers
 
     auto cbPing = make_shared<Texture>("ping_color", getTextureProperties(TextureUsage::ColorBuffer));
-    cbPing->clear(w, h, PixelFormat::RGBA);
+    cbPing->clear(w, h, PixelFormat::RGBA8);
     cbPing->init();
 
     auto cbPong = make_shared<Texture>("pong_color", getTextureProperties(TextureUsage::ColorBuffer));
-    cbPong->clear(w, h, PixelFormat::RGBA);
+    cbPong->clear(w, h, PixelFormat::RGBA8);
     cbPong->init();
 
     auto dbCommon = make_shared<Renderbuffer>();
-    dbCommon->configure(w, h, PixelFormat::Depth);
+    dbCommon->configure(w, h, PixelFormat::Depth32F);
     dbCommon->init();
 
     auto fbPing = make_unique<Framebuffer>();

@@ -51,7 +51,7 @@ private:
 
     int _width {0};
     int _height {0};
-    PixelFormat _pixelFormat {PixelFormat::RGB};
+    PixelFormat _pixelFormat {PixelFormat::RGB8};
 
     // OpenGL
 

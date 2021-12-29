@@ -39,7 +39,7 @@ void Movie::init() {
         _width = _videoStream->width();
         _height = _videoStream->height();
         _texture = make_shared<Texture>("video", getTextureProperties(TextureUsage::Video));
-        _texture->clear(1, 1, PixelFormat::RGB, 1);
+        _texture->clear(1, 1, PixelFormat::RGB8, 1);
         _texture->init();
     }
     if (!_audioSource && _audioStream) {
@@ -81,7 +81,7 @@ void Movie::draw() {
     auto &frame = _videoStream->frame();
     if (frame.pixels) {
         _textures.bind(*_texture);
-        _texture->setPixels(_width, _height, PixelFormat::RGB, Texture::Layer {frame.pixels}, true);
+        _texture->setPixels(_width, _height, PixelFormat::RGB8, Texture::Layer {frame.pixels}, true);
     }
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();

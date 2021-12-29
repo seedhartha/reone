@@ -68,7 +68,7 @@ void MeshSceneNode::initTextures() {
             pixels->push_back(static_cast<int>(255 * con.multiplier));
         }
         auto constraints = make_unique<Texture>("dangly_constraints", getTextureProperties(TextureUsage::Lookup));
-        constraints->setPixels(mesh->danglymesh->constraints.size(), 1, PixelFormat::Grayscale, Texture::Layer {move(pixels)});
+        constraints->setPixels(mesh->danglymesh->constraints.size(), 1, PixelFormat::R8, Texture::Layer {move(pixels)});
         constraints->init();
         _nodeTextures.danglyConstraints = move(constraints);
     }
@@ -209,7 +209,7 @@ bool MeshSceneNode::isTransparent() const {
 
     // Model nodes with RGB diffuse textures are opaque
     PixelFormat format = _nodeTextures.diffuse->pixelFormat();
-    if (format == PixelFormat::RGB || format == PixelFormat::BGR || format == PixelFormat::DXT1) {
+    if (format == PixelFormat::RGB8 || format == PixelFormat::BGR8 || format == PixelFormat::DXT1) {
         return false;
     }
 
