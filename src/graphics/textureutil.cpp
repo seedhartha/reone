@@ -136,10 +136,13 @@ void prepareCubemap(Texture &texture) {
 Texture::Properties getTextureProperties(TextureUsage usage) {
     Texture::Properties properties;
 
-    if (usage == TextureUsage::GUI ||
-        usage == TextureUsage::ColorBuffer ||
-        usage == TextureUsage::Video) {
+    if (usage == TextureUsage::ColorBuffer) {
+        properties.minFilter = Texture::Filtering::Nearest;
+        properties.maxFilter = Texture::Filtering::Nearest;
+        properties.wrap = Texture::Wrapping::ClampToBorder;
+        properties.borderColor = glm::vec4(0.0f);
 
+    } else if (usage == TextureUsage::GUI || usage == TextureUsage::Video) {
         properties.minFilter = Texture::Filtering::Linear;
         properties.wrap = Texture::Wrapping::ClampToEdge;
 

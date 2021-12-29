@@ -28,9 +28,10 @@ struct GraphicsOptions {
     int height {0};
     bool fullscreen {false};
     bool vsync {true};
-    TextureQuality textureQuality {0};
-    bool grass {true};
     bool fxaa {false};
+    bool grass {true};
+    bool ssr {false};
+    TextureQuality textureQuality {0};
     int shadowResolution {0};
     float drawDistance {kDefaultObjectDrawDistance};
     int maxLights {8};

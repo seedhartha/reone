@@ -44,8 +44,9 @@ private:
         bool fullscreen {false};
         bool vsync {true};
         bool fxaa {false};
-        int texQuality {0};
         bool grass {true};
+        bool ssr {false};
+        int texQuality {0};
         int shadowres {0};
         int drawdist {64};
         int maxlights {8};
@@ -69,6 +70,7 @@ private:
     wxCheckBox *_checkBoxVSync;
     wxCheckBox *_checkBoxFXAA;
     wxCheckBox *_checkBoxGrass;
+    wxCheckBox *_checkBoxSSR;
     wxSlider *_sliderVolumeMusic;
     wxSlider *_sliderVolumeVoice;
     wxSlider *_sliderVolumeSound;

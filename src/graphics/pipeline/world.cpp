@@ -194,9 +194,43 @@ void WorldPipeline::init() {
     _cbGeometry2->clear(_options.width, _options.height, PixelFormat::RGB);
     _cbGeometry2->init();
 
+    _cbGeometryGBufColors = make_unique<Texture>("geometry_color_gbcolors", getTextureProperties(TextureUsage::ColorBuffer));
+    _cbGeometryGBufColors->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbGeometryGBufColors->init();
+
+    _cbGeometryGBufPositions = make_unique<Texture>("geometry_color_gbpositions", getTextureProperties(TextureUsage::ColorBuffer));
+    _cbGeometryGBufPositions->clear(_options.width, _options.height, PixelFormat::RGB16F);
+    _cbGeometryGBufPositions->init();
+
+    _cbGeometryGBufNormals = make_unique<Texture>("geometry_color_gbnormals", getTextureProperties(TextureUsage::ColorBuffer));
+    _cbGeometryGBufNormals->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbGeometryGBufNormals->init();
+
+    _cbGeometryGBufRoughness = make_unique<Texture>("geometry_color_gbroughness", getTextureProperties(TextureUsage::ColorBuffer));
+    _cbGeometryGBufRoughness->clear(_options.width, _options.height, PixelFormat::Grayscale);
+    _cbGeometryGBufRoughness->init();
+
     _fbGeometry = make_shared<Framebuffer>();
-    _fbGeometry->attachColorsDepth(_cbGeometry1, _cbGeometry2, _dbCommon);
+    _fbGeometry->attachColorsDepth(
+        vector<shared_ptr<IAttachment>> {
+            _cbGeometry1,
+            _cbGeometry2,
+            _cbGeometryGBufColors,
+            _cbGeometryGBufPositions,
+            _cbGeometryGBufNormals,
+            _cbGeometryGBufRoughness},
+        _dbCommon);
     _fbGeometry->init();
+
+    // SSR framebuffer
+
+    _cbSSR = make_unique<Texture>("ssr_color", getTextureProperties(TextureUsage::ColorBuffer));
+    _cbSSR->clear(_options.width, _options.height, PixelFormat::RGB);
+    _cbSSR->init();
+
+    _fbSSR = make_shared<Framebuffer>();
+    _fbSSR->attachColorDepth(_cbSSR, _dbCommon);
+    _fbSSR->init();
 
     // Screenshot framebuffer
 
@@ -220,6 +254,7 @@ void WorldPipeline::draw() {
     computeLightSpaceMatrices();
     drawShadows();
     drawGeometry();
+    applySSR();
     applyHorizontalBlur();
     applyVerticalBlur();
     applyBloom();
@@ -284,7 +319,13 @@ void WorldPipeline::drawShadows() {
 }
 
 void WorldPipeline::drawGeometry() {
-    static constexpr GLenum colors[] {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+    static constexpr GLenum colors[] {
+        GL_COLOR_ATTACHMENT0,
+        GL_COLOR_ATTACHMENT1,
+        GL_COLOR_ATTACHMENT2,
+        GL_COLOR_ATTACHMENT3,
+        GL_COLOR_ATTACHMENT4,
+        GL_COLOR_ATTACHMENT5};
 
     auto camera = _scene->camera();
 
@@ -318,7 +359,7 @@ void WorldPipeline::drawGeometry() {
     // Draw scene to geometry framebuffer
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbGeometry->nameGL());
-    glDrawBuffers(2, colors);
+    glDrawBuffers(_options.ssr ? 6 : 2, colors);
     _graphicsContext.clearColorDepth();
     if (_scene->hasShadowLight()) {
         if (_scene->isShadowLightDirectional()) {
@@ -328,6 +369,38 @@ void WorldPipeline::drawGeometry() {
         }
     }
     _scene->draw();
+}
+
+void WorldPipeline::applySSR() {
+    if (!_options.ssr) {
+        return;
+    }
+
+    // Set uniforms
+    float w = static_cast<float>(_options.width);
+    float h = static_cast<float>(_options.height);
+    auto camera = _scene->camera();
+    auto screenProjection = glm::mat4(1.0f);
+    screenProjection *= glm::scale(glm::vec3(w, h, 1.0f));
+    screenProjection *= glm::translate(glm::vec3(0.5f, 0.5f, 0.0f));
+    screenProjection *= glm::scale(glm::vec3(0.5f, 0.5f, 1.0f));
+    screenProjection *= camera->projection();
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
+    uniforms.general.screenProjection = move(screenProjection);
+    uniforms.general.screenResolution = glm::vec2(w, h);
+
+    // Apply screen-space reflections to geometry color buffers
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbSSR->nameGL());
+    _shaders.use(_shaders.ssr(), true);
+    _textures.bind(*_cbGeometry1);
+    _textures.bind(*_cbGeometryGBufColors, TextureUnits::gBufColors);
+    _textures.bind(*_cbGeometryGBufPositions, TextureUnits::gBufPositions);
+    _textures.bind(*_cbGeometryGBufNormals, TextureUnits::gBufNormals);
+    _textures.bind(*_cbGeometryGBufRoughness, TextureUnits::gBufRoughness);
+    _graphicsContext.clearColorDepth();
+    _meshes.quadNDC().draw();
 }
 
 void WorldPipeline::applyHorizontalBlur() {
@@ -342,9 +415,9 @@ void WorldPipeline::applyHorizontalBlur() {
 
     // Apply horizontal blur to bright geometry color buffer
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbPing->nameGL());
-    _graphicsContext.clearColorDepth();
     _shaders.use(_shaders.blur(), true);
     _textures.bind(*_cbGeometry2);
+    _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
@@ -372,10 +445,10 @@ void WorldPipeline::applyBloom() {
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
 
-    // Combine geometry and pong (horizontal + vertical blur) color buffers
+    // Combine geometry or SSR and pong (horizontal + vertical blur) color buffers
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbPing->nameGL());
     _shaders.use(_shaders.bloom(), true);
-    _textures.bind(*_cbGeometry1);
+    _textures.bind(_options.ssr ? *_cbSSR : *_cbGeometry1);
     _textures.bind(*_cbPong, TextureUnits::bloom);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();

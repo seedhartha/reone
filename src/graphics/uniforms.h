@@ -45,6 +45,7 @@ struct UniformsFeatureFlags {
 
 struct GeneralUniforms {
     glm::mat4 projection {1.0f};
+    glm::mat4 screenProjection {1.0f};
     glm::mat4 view {1.0f};
     glm::mat4 model {1.0f};
     glm::mat3x4 dangly {1.0f};
@@ -82,7 +83,6 @@ struct GeneralUniforms {
         worldAmbientColor = glm::vec4(1.0f);
         fogColor = glm::vec4(0.0f);
         shadowLightPosition = glm::vec4(0.0f);
-        screenResolution = glm::vec2(0.0f);
         fogNear = 0.0f;
         fogFar = 0.0f;
         shadowStrength = 1.0f;
@@ -96,6 +96,7 @@ struct GeneralUniforms {
     }
 
     void resetLocals() {
+        screenProjection = glm::mat4(1.0f);
         model = glm::mat4(1.0f);
         dangly = glm::mat3x4(1.0f);
         uv = glm::mat3x4(1.0f);
@@ -105,6 +106,7 @@ struct GeneralUniforms {
         selfIllumColor = glm::vec4(1.0f);
         discardColor = glm::vec4(0.0f);
         heightMapFrameBounds = glm::vec4(0.0f);
+        screenResolution = glm::vec2(0.0f);
         blurDirection = glm::vec2(0.0f);
         alpha = 1.0f;
         waterAlpha = 1.0f;
