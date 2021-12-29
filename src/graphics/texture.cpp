@@ -41,9 +41,9 @@ static bool isMipmapFilter(Texture::Filtering filter) {
 static uint32_t getPixelFormatGL(PixelFormat format) {
     switch (format) {
     case PixelFormat::Grayscale:
+    case PixelFormat::R16F:
         return GL_RED;
     case PixelFormat::RGB:
-    case PixelFormat::RGB16F:
         return GL_RGB;
     case PixelFormat::RGBA:
     case PixelFormat::DXT1:
@@ -70,7 +70,8 @@ static uint32_t getPixelTypeGL(PixelFormat format) {
     case PixelFormat::BGR:
     case PixelFormat::BGRA:
         return GL_UNSIGNED_BYTE;
-    case PixelFormat::RGB16F:
+    case PixelFormat::R16F:
+        return GL_HALF_FLOAT;
     case PixelFormat::Depth:
         return GL_FLOAT;
     case PixelFormat::DepthStencil:

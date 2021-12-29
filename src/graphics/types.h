@@ -76,7 +76,7 @@ enum class PixelFormat {
     RGBA,
     BGR,
     BGRA,
-    RGB16F,
+    R16F,
     DXT1,
     DXT5,
     Depth,
@@ -131,7 +131,7 @@ struct TextureUnits {
     static constexpr int lightmap = 1;
     static constexpr int bumpMap = 2;
     static constexpr int bloom = 3;
-    static constexpr int gBufPositions = 4;
+    static constexpr int gBufDepth = 4;
     static constexpr int gBufNormals = 5;
     static constexpr int gBufRoughness = 6;
     static constexpr int danglyConstraints = 7;
