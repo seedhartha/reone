@@ -172,10 +172,9 @@ in mat3 fragTBN;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragColorGBufColors;
-layout(location = 3) out vec4 fragColorGBufPositions;
-layout(location = 4) out vec4 fragColorGBufNormals;
-layout(location = 5) out vec4 fragColorGBufRoughness;
+layout(location = 2) out vec4 fragColorGBufPositions;
+layout(location = 3) out vec4 fragColorGBufNormals;
+layout(location = 4) out vec4 fragColorGBufRoughness;
 
 float getAttenuationQuadratic(int light) {
     if (uLights[light].position.w == 0.0) return 1.0;
@@ -485,6 +484,8 @@ static const string g_vsParticle = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;
 
+out vec3 fragPosWorldSpace;
+out vec3 fragNormalWorldSpace;
 out vec2 fragUV1;
 flat out int fragInstanceID;
 
@@ -492,11 +493,13 @@ void main() {
     vec3 position = uParticles[gl_InstanceID].positionFrame.xyz;
     vec3 right = uParticles[gl_InstanceID].right.xyz;
     vec3 up = uParticles[gl_InstanceID].up.xyz;
-    vec4 P = vec4(
-        position + right * aPosition.x * uParticles[gl_InstanceID].size.x + up * aPosition.y * uParticles[gl_InstanceID].size.y,
-        1.0);
+    fragPosWorldSpace = vec3(position +
+        right * aPosition.x * uParticles[gl_InstanceID].size.x +
+        up * aPosition.y * uParticles[gl_InstanceID].size.y);
 
-    gl_Position = uProjection * uView * P;
+    gl_Position = uProjection * uView * vec4(fragPosWorldSpace, 1.0);
+
+    fragNormalWorldSpace = cross(right, up);
     fragUV1 = aUV1;
     fragInstanceID = gl_InstanceID;
 }
@@ -506,6 +509,8 @@ static const string g_vsGrass = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;
 
+out vec3 fragPosWorldSpace;
+out vec3 fragNormalWorldSpace;
 out vec2 fragUV1;
 flat out int fragInstanceID;
 
@@ -521,11 +526,14 @@ void main() {
     mat4 M = pitch * uView;
     vec3 right = vec3(M[0][0], M[1][0], M[2][0]);
     vec3 up = vec3(M[0][1], M[1][1], M[2][1]);
-    vec4 P = vec4(
-        uGrassClusters[gl_InstanceID].positionVariant.xyz + right * aPosition.x * uGrassQuadSize.x + up * aPosition.y * uGrassQuadSize.y,
-        1.0);
+    fragPosWorldSpace = vec3(
+        uGrassClusters[gl_InstanceID].positionVariant.xyz +
+        right * aPosition.x * uGrassQuadSize.x +
+        up * aPosition.y * uGrassQuadSize.y);
 
-    gl_Position = uProjection * uView * P;
+    gl_Position = uProjection * uView * vec4(fragPosWorldSpace, 1.0);
+
+    fragNormalWorldSpace = cross(right, up);
     fragUV1 = aUV1;
     fragInstanceID = gl_InstanceID;
 }
@@ -681,7 +689,6 @@ void main() {
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(objectColorBright, objectAlpha);
-    fragColorGBufColors = vec4(objectColor, 1.0);
     fragColorGBufPositions = vec4(positionVS, 1.0);
     fragColorGBufNormals = vec4(normalVS * 0.5 + 0.5, 1.0);
     fragColorGBufRoughness = vec4(roughness, 0.0, 0.0, 1.0);
@@ -715,7 +722,6 @@ void main() {
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(0.0);
-    fragColorGBufColors = vec4(0.0);
     fragColorGBufPositions = vec4(0.0);
     fragColorGBufNormals = vec4(0.0);
     fragColorGBufRoughness = vec4(0.0);
@@ -729,10 +735,9 @@ in vec2 fragUV1;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragColorGBufColors;
-layout(location = 3) out vec4 fragColorGBufPositions;
-layout(location = 4) out vec4 fragColorGBufNormals;
-layout(location = 5) out vec4 fragColorGBufRoughness;
+layout(location = 2) out vec4 fragColorGBufPositions;
+layout(location = 3) out vec4 fragColorGBufNormals;
+layout(location = 4) out vec4 fragColorGBufRoughness;
 
 void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
@@ -741,7 +746,6 @@ void main() {
 
     fragColor1 = vec4(objectColor, uAlpha * diffuseSample.a);
     fragColor2 = vec4(0.0);
-    fragColorGBufColors = vec4(0.0);
     fragColorGBufPositions = vec4(0.0);
     fragColorGBufNormals = vec4(0.0);
     fragColorGBufRoughness = vec4(0.0);
@@ -751,15 +755,16 @@ void main() {
 static const string g_fsParticle = R"END(
 uniform sampler2D sDiffuseMap;
 
+in vec3 fragPosWorldSpace;
+in vec3 fragNormalWorldSpace;
 in vec2 fragUV1;
 flat in int fragInstanceID;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragColorGBufColors;
-layout(location = 3) out vec4 fragColorGBufPositions;
-layout(location = 4) out vec4 fragColorGBufNormals;
-layout(location = 5) out vec4 fragColorGBufRoughness;
+layout(location = 2) out vec4 fragColorGBufPositions;
+layout(location = 3) out vec4 fragColorGBufNormals;
+layout(location = 4) out vec4 fragColorGBufRoughness;
 
 void main() {
     float oneOverGridX = 1.0 / uParticleGridSize.x;
@@ -783,12 +788,16 @@ void main() {
         discard;
     }
 
+    vec3 positionVS = (uView * vec4(fragPosWorldSpace, 1.0)).xyz;
+
+    mat3 normalMatrix = transpose(inverse(mat3(uView)));
+    vec3 normalVS = normalMatrix * normalize(fragNormalWorldSpace);
+
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(0.0);
-    fragColorGBufColors = vec4(0.0);
-    fragColorGBufPositions = vec4(0.0);
-    fragColorGBufNormals = vec4(0.0);
-    fragColorGBufRoughness = vec4(0.0);
+    fragColorGBufPositions = vec4(positionVS, 1.0);
+    fragColorGBufNormals = vec4(normalVS * 0.5 + 0.5, 1.0);
+    fragColorGBufRoughness = vec4(1.0, 0.0, 0.0, 1.0);
 }
 )END";
 
@@ -796,15 +805,16 @@ static const string g_fsGrass = R"END(
 uniform sampler2D sDiffuseMap;
 uniform sampler2D sLightmap;
 
+in vec3 fragPosWorldSpace;
+in vec3 fragNormalWorldSpace;
 in vec2 fragUV1;
 flat in int fragInstanceID;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragColorGBufColors;
-layout(location = 3) out vec4 fragColorGBufPositions;
-layout(location = 4) out vec4 fragColorGBufNormals;
-layout(location = 5) out vec4 fragColorGBufRoughness;
+layout(location = 2) out vec4 fragColorGBufPositions;
+layout(location = 3) out vec4 fragColorGBufNormals;
+layout(location = 4) out vec4 fragColorGBufRoughness;
 
 void main() {
     vec2 uv = vec2(0.5) * fragUV1;
@@ -824,12 +834,16 @@ void main() {
         discard;
     }
 
+    vec3 positionVS = (uView * vec4(fragPosWorldSpace, 1.0)).xyz;
+
+    mat3 normalMatrix = transpose(inverse(mat3(uView)));
+    vec3 normalVS = normalMatrix * normalize(fragNormalWorldSpace);
+
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(0.0);
-    fragColorGBufColors = vec4(0.0);
-    fragColorGBufPositions = vec4(0.0);
-    fragColorGBufNormals = vec4(0.0);
-    fragColorGBufRoughness = vec4(0.0);
+    fragColorGBufPositions = vec4(positionVS, 1.0);
+    fragColorGBufNormals = vec4(normalVS * 0.5 + 0.5, 1.0);
+    fragColorGBufRoughness = vec4(1.0, 0.0, 0.0, 1.0);
 }
 )END";
 
@@ -844,7 +858,6 @@ const float MAX_DISTANCE = 1000.0;
 const float SCREEN_FADE = 0.8;
 
 uniform sampler2D sDiffuseMap;
-uniform sampler2D sGBufColors;
 uniform sampler2D sGBufPositions;
 uniform sampler2D sGBufNormals;
 uniform sampler2D sGBufRoughness;
@@ -995,7 +1008,7 @@ void main() {
     vec2 hitPixel = vec2(0.0);
     vec3 hitPoint = vec3(0.0);
     if (traceScreenSpaceRay(fragPosVS, R, jitter, hitPixel, hitPoint)) {
-        reflectionColor = texelFetch(sGBufColors, ivec2(hitPixel), 0);
+        reflectionColor = texelFetch(sDiffuseMap, ivec2(hitPixel), 0);
         vec2 hitNDC = (hitPixel / uScreenResolution) * 2.0 - 1.0;
         float maxDimension = min(1.0, max(abs(hitNDC.x), abs(hitNDC.y)));
         reflectionFuzziness = smoothstep(0.0, SCREEN_FADE, maxDimension);
@@ -1416,7 +1429,6 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sLightmap", TextureUnits::lightmap);
     program->setUniform("sBumpMap", TextureUnits::bumpMap);
     program->setUniform("sBloom", TextureUnits::bloom);
-    program->setUniform("sGBufColors", TextureUnits::gBufColors);
     program->setUniform("sGBufPositions", TextureUnits::gBufPositions);
     program->setUniform("sGBufNormals", TextureUnits::gBufNormals);
     program->setUniform("sGBufRoughness", TextureUnits::gBufRoughness);
