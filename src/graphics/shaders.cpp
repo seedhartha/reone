@@ -850,11 +850,10 @@ void main() {
 static const string g_fsSSR = R"END(
 const float Z_TICKNESS = 0.005;
 const float Z_NEAR = 0.1;
-const float PIXEL_STRIDE = 2.0;
+const float PIXEL_STRIDE = 4.0;
 const float PIXEL_STRIDE_Z_CUTOFF = 100.0;
-const int ITERATIONS = 128;
-const int BINARY_SEARCH_ITERATIONS = 0;
-const float MAX_DISTANCE = 1000.0;
+const int ITERATIONS = 64;
+const float MAX_DISTANCE = 100.0;
 const float SCREEN_FADE = 0.8;
 
 uniform sampler2D sDiffuseMap;
@@ -889,7 +888,8 @@ bool traceScreenSpaceRay(
     vec3 rayDir,
     float jitter,
     out vec2 hitPixel,
-    out vec3 hitPoint) {
+    out vec3 hitPoint,
+    out int iteration) {
 
     float rayLength = ((rayOrigin.z + rayDir.z * MAX_DISTANCE) > -Z_NEAR) ? (-Z_NEAR - rayOrigin.z) / rayDir.z : MAX_DISTANCE;
     vec3 rayEnd = rayOrigin + rayDir * rayLength;
@@ -933,7 +933,7 @@ bool traceScreenSpaceRay(
     Q0 += dQ * jitter;
     k0 += dk * jitter;
 
-    float i;
+    int i;
     float zA = 0.0;
     float zB = 0.0;
 
@@ -952,32 +952,10 @@ bool traceScreenSpaceRay(
         intersect = rayIntersectsDepth(zA, zB, hitPixel);
     }
 
-    if (pixelStride > 1.0 && intersect) {
-        pqk -= dPQK;
-        dPQK /= pixelStride;
-
-        float originalStride = pixelStride * 0.5;
-        float stride = originalStride;
-
-        zA = pqk.z / pqk.w;
-        zB = zA;
-
-        for (int j = 0; j < BINARY_SEARCH_ITERATIONS; ++j) {
-            pqk += dPQK * stride;
-
-            zA = zB;
-            zB = (dPQK.z * -0.5 + pqk.z) / (dPQK.w * -0.5 + pqk.w);
-            swapIfBigger(zB, zA);
-
-            hitPixel = permute ? pqk.yx : pqk.xy;
-            originalStride *= 0.5;
-            stride = rayIntersectsDepth(zA, zB, hitPixel) ? -originalStride : originalStride;
-        }
-    }
-
     Q0.xy += dQ.xy * i;
     Q0.z = pqk.z;
     hitPoint = Q0 / pqk.w;
+    iteration = i;
 
     return intersect;
 } 
@@ -992,7 +970,7 @@ void main() {
     }
 
     vec4 reflectionColor = vec4(0.0);
-    float reflectionFuzziness = 1.0;
+    float reflectionStrength = 0.0;
 
     vec3 fragPosVS = texture(sGBufPositions, fragUV1).xyz;
     vec3 I = normalize(fragPosVS);
@@ -1007,14 +985,17 @@ void main() {
     float jitter = mod((pixel.x + pixel.y) * 0.25, 1.0);
     vec2 hitPixel = vec2(0.0);
     vec3 hitPoint = vec3(0.0);
-    if (traceScreenSpaceRay(fragPosVS, R, jitter, hitPixel, hitPoint)) {
+    int iteration = 0;
+    if (traceScreenSpaceRay(fragPosVS, R, jitter, hitPixel, hitPoint, iteration)) {
         reflectionColor = texelFetch(sDiffuseMap, ivec2(hitPixel), 0);
         vec2 hitNDC = (hitPixel / uScreenResolution) * 2.0 - 1.0;
         float maxDimension = min(1.0, max(abs(hitNDC.x), abs(hitNDC.y)));
-        reflectionFuzziness = smoothstep(0.0, SCREEN_FADE, maxDimension);
+        reflectionStrength = 1.0 - roughness;
+        reflectionStrength *= 1.0 - iteration / float(ITERATIONS);
+        reflectionStrength *= 1.0 - max(0.0, maxDimension - SCREEN_FADE) / (1.0 - SCREEN_FADE);
     }
 
-    vec3 color = mix(defaultColor.rgb, defaultColor.rgb + reflectionColor.rgb, (1.0 - roughness) * (1.0 - reflectionFuzziness));
+    vec3 color = mix(defaultColor.rgb, defaultColor.rgb + reflectionColor.rgb, reflectionStrength);
     fragColor = vec4(color, defaultColor.a);
 }
 )END";
