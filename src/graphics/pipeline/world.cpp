@@ -194,9 +194,9 @@ void WorldPipeline::init() {
     _cbGeometry2->clear(_options.width, _options.height, PixelFormat::RGB);
     _cbGeometry2->init();
 
-    _cbGeometryGBufPositions = make_unique<Texture>("geometry_color_gbpositions", getTextureProperties(TextureUsage::ColorBuffer));
-    _cbGeometryGBufPositions->clear(_options.width, _options.height, PixelFormat::RGB16F);
-    _cbGeometryGBufPositions->init();
+    _cbGeometryGBufDepth = make_unique<Texture>("geometry_color_gbdepth", getTextureProperties(TextureUsage::ColorBuffer));
+    _cbGeometryGBufDepth->clear(_options.width, _options.height, PixelFormat::R16F);
+    _cbGeometryGBufDepth->init();
 
     _cbGeometryGBufNormals = make_unique<Texture>("geometry_color_gbnormals", getTextureProperties(TextureUsage::ColorBuffer));
     _cbGeometryGBufNormals->clear(_options.width, _options.height, PixelFormat::RGB);
@@ -211,7 +211,7 @@ void WorldPipeline::init() {
         vector<shared_ptr<IAttachment>> {
             _cbGeometry1,
             _cbGeometry2,
-            _cbGeometryGBufPositions,
+            _cbGeometryGBufDepth,
             _cbGeometryGBufNormals,
             _cbGeometryGBufRoughness},
         _dbCommon);
@@ -382,6 +382,7 @@ void WorldPipeline::applySSR() {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
+    uniforms.general.projection = camera->projection();
     uniforms.general.screenProjection = move(screenProjection);
     uniforms.general.screenResolution = glm::vec2(w, h);
 
@@ -389,7 +390,7 @@ void WorldPipeline::applySSR() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbSSR->nameGL());
     _shaders.use(_shaders.ssr(), true);
     _textures.bind(*_cbGeometry1);
-    _textures.bind(*_cbGeometryGBufPositions, TextureUnits::gBufPositions);
+    _textures.bind(*_cbGeometryGBufDepth, TextureUnits::gBufDepth);
     _textures.bind(*_cbGeometryGBufNormals, TextureUnits::gBufNormals);
     _textures.bind(*_cbGeometryGBufRoughness, TextureUnits::gBufRoughness);
     _graphicsContext.clearColorDepth();

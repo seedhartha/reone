@@ -172,7 +172,7 @@ in mat3 fragTBN;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragColorGBufPositions;
+layout(location = 2) out vec4 fragColorGBufDepth;
 layout(location = 3) out vec4 fragColorGBufNormals;
 layout(location = 4) out vec4 fragColorGBufRoughness;
 
@@ -689,7 +689,7 @@ void main() {
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(objectColorBright, objectAlpha);
-    fragColorGBufPositions = vec4(positionVS, 1.0);
+    fragColorGBufDepth = vec4(positionVS.z, 0.0, 0.0, 1.0);
     fragColorGBufNormals = vec4(normalVS * 0.5 + 0.5, 1.0);
     fragColorGBufRoughness = vec4(roughness, 0.0, 0.0, 1.0);
 }
@@ -722,7 +722,7 @@ void main() {
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(0.0);
-    fragColorGBufPositions = vec4(0.0);
+    fragColorGBufDepth = vec4(0.0);
     fragColorGBufNormals = vec4(0.0);
     fragColorGBufRoughness = vec4(0.0);
 }
@@ -735,7 +735,7 @@ in vec2 fragUV1;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragColorGBufPositions;
+layout(location = 2) out vec4 fragColorGBufDepth;
 layout(location = 3) out vec4 fragColorGBufNormals;
 layout(location = 4) out vec4 fragColorGBufRoughness;
 
@@ -746,7 +746,7 @@ void main() {
 
     fragColor1 = vec4(objectColor, uAlpha * diffuseSample.a);
     fragColor2 = vec4(0.0);
-    fragColorGBufPositions = vec4(0.0);
+    fragColorGBufDepth = vec4(0.0);
     fragColorGBufNormals = vec4(0.0);
     fragColorGBufRoughness = vec4(0.0);
 }
@@ -762,7 +762,7 @@ flat in int fragInstanceID;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragColorGBufPositions;
+layout(location = 2) out vec4 fragColorGBufDepth;
 layout(location = 3) out vec4 fragColorGBufNormals;
 layout(location = 4) out vec4 fragColorGBufRoughness;
 
@@ -795,7 +795,7 @@ void main() {
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(0.0);
-    fragColorGBufPositions = vec4(positionVS, 1.0);
+    fragColorGBufDepth = vec4(positionVS.z, 0.0, 0.0, 1.0);
     fragColorGBufNormals = vec4(normalVS * 0.5 + 0.5, 1.0);
     fragColorGBufRoughness = vec4(1.0, 0.0, 0.0, 1.0);
 }
@@ -812,7 +812,7 @@ flat in int fragInstanceID;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragColorGBufPositions;
+layout(location = 2) out vec4 fragColorGBufDepth;
 layout(location = 3) out vec4 fragColorGBufNormals;
 layout(location = 4) out vec4 fragColorGBufRoughness;
 
@@ -841,7 +841,7 @@ void main() {
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(0.0);
-    fragColorGBufPositions = vec4(positionVS, 1.0);
+    fragColorGBufDepth = vec4(positionVS.z, 0.0, 0.0, 1.0);
     fragColorGBufNormals = vec4(normalVS * 0.5 + 0.5, 1.0);
     fragColorGBufRoughness = vec4(1.0, 0.0, 0.0, 1.0);
 }
@@ -857,13 +857,21 @@ const float MAX_DISTANCE = 100.0;
 const float SCREEN_FADE = 0.8;
 
 uniform sampler2D sDiffuseMap;
-uniform sampler2D sGBufPositions;
+uniform sampler2D sGBufDepth;
 uniform sampler2D sGBufNormals;
 uniform sampler2D sGBufRoughness;
 
 in vec2 fragUV1;
 
 out vec4 fragColor;
+
+vec3 screenToViewSpace(vec2 uv, float eyeZ) {
+    vec2 ndc = uv * 2.0 - 1.0;
+    return vec3(
+        -eyeZ * ndc.x / uProjection[0][0],
+        -eyeZ * ndc.y / uProjection[1][1],
+        eyeZ);
+}
 
 float distanceSquared(vec2 a, vec2 b) {
     a -= b;
@@ -879,7 +887,7 @@ void swapIfBigger(inout float a, inout float b) {
 }
 
 bool rayIntersectsDepth(float zA, float zB, vec2 pixel) {
-    float cameraZ = texelFetch(sGBufPositions, ivec2(pixel), 0).z;
+    float cameraZ = texelFetch(sGBufDepth, ivec2(pixel), 0).r;
     return zB <= cameraZ && zA >= cameraZ - Z_TICKNESS;
 }
 
@@ -972,7 +980,8 @@ void main() {
     vec4 reflectionColor = vec4(0.0);
     float reflectionStrength = 0.0;
 
-    vec3 fragPosVS = texture(sGBufPositions, fragUV1).xyz;
+    float fragDepth = texture(sGBufDepth, fragUV1).r;
+    vec3 fragPosVS = screenToViewSpace(fragUV1, fragDepth);
     vec3 I = normalize(fragPosVS);
     vec3 N = normalize(texture(sGBufNormals, fragUV1).xyz * 2.0 - 1.0);
     if (dot(I, N) > 0.0) {
@@ -1410,7 +1419,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sLightmap", TextureUnits::lightmap);
     program->setUniform("sBumpMap", TextureUnits::bumpMap);
     program->setUniform("sBloom", TextureUnits::bloom);
-    program->setUniform("sGBufPositions", TextureUnits::gBufPositions);
+    program->setUniform("sGBufDepth", TextureUnits::gBufDepth);
     program->setUniform("sGBufNormals", TextureUnits::gBufNormals);
     program->setUniform("sGBufRoughness", TextureUnits::gBufRoughness);
     program->setUniform("sDanglyConstraints", TextureUnits::danglyConstraints);

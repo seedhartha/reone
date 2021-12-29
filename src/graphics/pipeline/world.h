@@ -93,7 +93,7 @@ private:
 
     std::shared_ptr<Texture> _cbGeometry1;
     std::shared_ptr<Texture> _cbGeometry2;
-    std::shared_ptr<Texture> _cbGeometryGBufPositions;
+    std::shared_ptr<Texture> _cbGeometryGBufDepth;
     std::shared_ptr<Texture> _cbGeometryGBufNormals;
     std::shared_ptr<Texture> _cbGeometryGBufRoughness;
     std::shared_ptr<Texture> _cbSSR;
