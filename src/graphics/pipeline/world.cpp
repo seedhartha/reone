@@ -205,6 +205,10 @@ void WorldPipeline::init() {
     _cbGeometry2->clear(_options.width, _options.height, PixelFormat::RGB8);
     _cbGeometry2->init();
 
+    _cbGeometry3 = make_unique<Texture>("geometry_color3", getTextureProperties(TextureUsage::ColorBuffer));
+    _cbGeometry3->clear(_options.width, _options.height, PixelFormat::RGB8);
+    _cbGeometry3->init();
+
     _cbGeometryEyeNormal = make_unique<Texture>("geometry_eyenormal", getTextureProperties(TextureUsage::ColorBuffer));
     _cbGeometryEyeNormal->clear(_options.width, _options.height, PixelFormat::RGB8);
     _cbGeometryEyeNormal->init();
@@ -218,7 +222,7 @@ void WorldPipeline::init() {
     _dbGeometry->init();
 
     _fbGeometry = make_shared<Framebuffer>();
-    _fbGeometry->attachColorsDepth({_cbGeometry1, _cbGeometry2, _cbGeometryEyeNormal, _cbGeometryRoughness}, _dbGeometry);
+    _fbGeometry->attachColorsDepth({_cbGeometry1, _cbGeometry2, _cbGeometry3, _cbGeometryEyeNormal, _cbGeometryRoughness}, _dbGeometry);
     _fbGeometry->init();
 
     // SSR framebuffer
@@ -365,7 +369,7 @@ void WorldPipeline::drawGeometry() {
     // Draw scene to geometry framebuffer
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbGeometry->nameGL());
-    glDrawBuffers(_options.ssr ? 4 : 2, kColorAttachments);
+    glDrawBuffers(_options.ssr ? 5 : 2, kColorAttachments);
     _graphicsContext.clearColorDepth();
     if (_scene->hasShadowLight()) {
         if (_scene->isShadowLightDirectional()) {
@@ -459,6 +463,8 @@ void WorldPipeline::applyBloom() {
     _shaders.use(_shaders.bloom(), true);
     _textures.bind(*_cbGeometry1);
     _textures.bind(*_cbGeometry2, TextureUnits::hilights);
+    _textures.bind(*_cbGeometry3, TextureUnits::envmapColor);
+    _textures.bind(*_cbGeometryRoughness, TextureUnits::roughness);
     _textures.bind(*_cbSSR, TextureUnits::ssr);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
