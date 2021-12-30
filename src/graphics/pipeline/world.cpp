@@ -253,9 +253,24 @@ void WorldPipeline::draw() {
     computeLightSpaceMatrices();
     drawShadows();
     drawGeometry();
+
+    // Blur geometry hilights
+    blitColorBuffer(_options.width, _options.height, *_fbGeometry, 1, *_fbPong, 0);
+    _graphicsContext.withBlending(BlendMode::None, [this]() {
+        applyHorizontalBlur();
+        applyVerticalBlur();
+    });
+    blitColorBuffer(_options.width, _options.height, *_fbPong, 0, *_fbGeometry, 1);
+
+    // Blur SSR
     applySSR();
-    applyHorizontalBlur();
-    applyVerticalBlur();
+    blitColorBuffer(_options.width, _options.height, *_fbSSR, 0, *_fbPong, 0);
+    _graphicsContext.withBlending(BlendMode::None, [this]() {
+        applyHorizontalBlur();
+        applyVerticalBlur();
+    });
+    blitColorBuffer(_options.width, _options.height, *_fbPong, 0, *_fbSSR, 0);
+
     applyBloom();
     applyFXAA();
     presentWorld();
@@ -385,6 +400,7 @@ void WorldPipeline::applySSR() {
 
     // Apply screen-space reflections to geometry color buffers
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbSSR->nameGL());
+    glDrawBuffer(kColorAttachments[0]);
     _shaders.use(_shaders.ssr(), true);
     _textures.bind(*_cbGeometry1);
     _textures.bind(*_dbGeometry, TextureUnits::depthMap);
@@ -406,16 +422,16 @@ void WorldPipeline::applyHorizontalBlur() {
     uniforms.general.screenResolution = glm::vec2(w, h);
     uniforms.general.blurDirection = glm::vec2(1.0f, 0.0f);
 
-    // Apply horizontal blur to bright geometry color buffer
+    // Apply horizontal blur to pong color buffer
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbPing->nameGL());
     _shaders.use(_shaders.blur(), true);
-    _textures.bind(*_cbGeometry2);
+    _textures.bind(*_cbPong);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
 void WorldPipeline::applyVerticalBlur() {
-    // Set shader uniforms
+    // Set uniforms
     float w = static_cast<float>(_options.width);
     float h = static_cast<float>(_options.height);
     auto &uniforms = _shaders.uniforms();
@@ -438,12 +454,12 @@ void WorldPipeline::applyBloom() {
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
 
-    // Combine geometry or SSR and pong (horizontal + vertical blur) color buffers
+    // Combine geometry, SSR and bloom
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbPing->nameGL());
     _shaders.use(_shaders.bloom(), true);
     _textures.bind(*_cbGeometry1);
+    _textures.bind(*_cbGeometry2, TextureUnits::hilights);
     _textures.bind(*_cbSSR, TextureUnits::ssr);
-    _textures.bind(*_cbPong, TextureUnits::bloom);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
@@ -494,6 +510,14 @@ void WorldPipeline::presentWorld() {
         _takeScreenshot = false;
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     }
+}
+
+void WorldPipeline::blitColorBuffer(int w, int h, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx) {
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, src.nameGL());
+    glReadBuffer(kColorAttachments[srcColorIdx]);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
+    glDrawBuffer(kColorAttachments[dstColorIdx]);
+    glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 } // namespace graphics

@@ -962,27 +962,28 @@ void main() {
 static const string g_fsBlur = R"END(
 uniform sampler2D sDiffuseMap;
 
-out vec4 fragColor1;
+out vec4 fragColor;
 
 void main() {
     vec2 uv = vec2(gl_FragCoord.xy / uScreenResolution);
-    vec3 color = vec3(0.0);
+    vec4 color = texture(sDiffuseMap, uv);
+    color.rgb *= 0.2270270270;
+
     vec2 off1 = vec2(1.3846153846) * uBlurDirection;
     vec2 off2 = vec2(3.2307692308) * uBlurDirection;
-    color += texture(sDiffuseMap, uv).rgb * 0.2270270270;
-    color += texture(sDiffuseMap, uv + (off1 / uScreenResolution)).rgb * 0.3162162162;
-    color += texture(sDiffuseMap, uv - (off1 / uScreenResolution)).rgb * 0.3162162162;
-    color += texture(sDiffuseMap, uv + (off2 / uScreenResolution)).rgb * 0.0702702703;
-    color += texture(sDiffuseMap, uv - (off2 / uScreenResolution)).rgb * 0.0702702703;
+    color.rgb += texture(sDiffuseMap, uv + (off1 / uScreenResolution)).rgb * 0.3162162162;
+    color.rgb += texture(sDiffuseMap, uv - (off1 / uScreenResolution)).rgb * 0.3162162162;
+    color.rgb += texture(sDiffuseMap, uv + (off2 / uScreenResolution)).rgb * 0.0702702703;
+    color.rgb += texture(sDiffuseMap, uv - (off2 / uScreenResolution)).rgb * 0.0702702703;
 
-    fragColor1 = vec4(color, 1.0);
+    fragColor = color;
 }
 )END";
 
 static const string g_fsBloom = R"END(
 uniform sampler2D sDiffuseMap;
+uniform sampler2D sHilights;
 uniform sampler2D sSSR;
-uniform sampler2D sBloom;
 
 in vec2 fragUV1;
 
@@ -990,9 +991,9 @@ out vec4 fragColor1;
 
 void main() {
     vec4 diffuseSample = texture(sDiffuseMap, fragUV1);
+    vec4 hilightsSample = texture(sHilights, fragUV1);
     vec4 ssrSample = texture(sSSR, fragUV1);
-    vec4 bloomSample = texture(sBloom, fragUV1);
-    vec3 color = diffuseSample.rgb + ssrSample.rgb * ssrSample.a + bloomSample.rgb;
+    vec3 color = diffuseSample.rgb + hilightsSample.rgb + ssrSample.rgb * ssrSample.a;
 
     fragColor1 = vec4(color, diffuseSample.a);
 }
@@ -1367,7 +1368,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sDiffuseMap", TextureUnits::diffuseMap);
     program->setUniform("sLightmap", TextureUnits::lightmap);
     program->setUniform("sBumpMap", TextureUnits::bumpMap);
-    program->setUniform("sBloom", TextureUnits::bloom);
+    program->setUniform("sHilights", TextureUnits::hilights);
     program->setUniform("sDepthMap", TextureUnits::depthMap);
     program->setUniform("sEyeNormal", TextureUnits::eyeNormal);
     program->setUniform("sRoughness", TextureUnits::roughness);

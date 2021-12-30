@@ -123,6 +123,8 @@ private:
     void applyBloom();
     void applyFXAA();
     void presentWorld();
+
+    void blitColorBuffer(int w, int h, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx);
 };
 
 } // namespace graphics
