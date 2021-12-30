@@ -631,7 +631,7 @@ void main() {
 static const string g_fsBlinnPhong = R"END(
 void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
-    vec4 diffuseSample = texture(sDiffuseMap, uv);
+    vec4 diffuseSample = isFeatureEnabled(FEATURE_DIFFUSE) ? texture(sDiffuseMap, uv) : vec4(vec3(0.0), 1.0);
     bool opaque = isFeatureEnabled(FEATURE_ENVMAP) || isFeatureEnabled(FEATURE_NORMALMAP) || isFeatureEnabled(FEATURE_HEIGHTMAP);
     vec3 N = getNormal(uv);
     float shadow = getShadow(N);
@@ -692,39 +692,6 @@ void main() {
     fragColorGBufDepth = vec4(positionVS.z, 0.0, 0.0, 1.0);
     fragColorGBufNormals = vec4(normalVS * 0.5 + 0.5, 1.0);
     fragColorGBufRoughness = vec4(roughness, 0.0, 0.0, 1.0);
-}
-)END";
-
-static const string g_fsBlinnPhongDiffuseless = R"END(
-void main() {
-    vec3 N = normalize(fragNormalWorldSpace);
-    float shadow = getShadow(N);
-
-    vec3 lighting;
-    if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
-        vec4 lightmapSample = texture(sLightmap, fragUV2);
-        lighting = (1.0 - 0.5 * shadow) * lightmapSample.rgb;
-        lighting += (1.0 - 0.5 * shadow) * getLightingDirect(N, LIGHT_DYNTYPE_AREA);
-    } else if (isFeatureEnabled(FEATURE_LIGHTING)) {
-        vec3 indirect = getLightingIndirect(N);
-        vec3 direct = getLightingDirect(N, LIGHT_DYNTYPE_BOTH);
-        lighting = min(vec3(1.0), indirect + (1.0 - shadow) * direct);
-    } else {
-        lighting = vec3(1.0);
-    }
-
-    vec3 objectColor = lighting * uColor.rgb;
-
-    float objectAlpha = uAlpha;
-    if (objectAlpha < ALPHA_THRESHOLD) {
-        discard;
-    }
-
-    fragColor1 = vec4(objectColor, objectAlpha);
-    fragColor2 = vec4(0.0);
-    fragColorGBufDepth = vec4(0.0);
-    fragColorGBufNormals = vec4(0.0);
-    fragColorGBufRoughness = vec4(0.0);
 }
 )END";
 
@@ -1314,7 +1281,6 @@ void Shaders::init() {
     auto fsPointLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsPointLightShadows});
     auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDirectionalLightShadows});
     auto fsBlinnPhong = initShader(ShaderType::Fragment, {g_glslHeader, g_glslModel, g_glslNormals, g_glslShadows, g_glslBlinnPhong, g_fsBlinnPhong});
-    auto fsBlinnPhongDiffuseless = initShader(ShaderType::Fragment, {g_glslHeader, g_glslModel, g_glslNormals, g_glslShadows, g_glslBlinnPhong, g_fsBlinnPhongDiffuseless});
     auto fsBillboard = initShader(ShaderType::Fragment, {g_glslHeader, g_fsBillboard});
     auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_fsParticle});
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_fsGrass});
@@ -1331,7 +1297,6 @@ void Shaders::init() {
     _spPointLightShadows = initShaderProgram({vsShadows, gsPointLightShadows, fsPointLightShadows});
     _spDirectionalLightShadows = initShaderProgram({vsShadows, gsDirectionalLightShadows, fsDirectionalLightShadows});
     _spBlinnPhong = initShaderProgram({vsModel, fsBlinnPhong});
-    _spBlingPhongDiffuseless = initShaderProgram({vsModel, fsBlinnPhongDiffuseless});
     _spBillboard = initShaderProgram({vsBillboard, fsBillboard});
     _spParticle = initShaderProgram({vsParticle, fsParticle});
     _spGrass = initShaderProgram({vsGrass, fsGrass});
@@ -1370,7 +1335,6 @@ void Shaders::deinit() {
     _spPointLightShadows.reset();
     _spDirectionalLightShadows.reset();
     _spBlinnPhong.reset();
-    _spBlingPhongDiffuseless.reset();
     _spBillboard.reset();
     _spParticle.reset();
     _spGrass.reset();

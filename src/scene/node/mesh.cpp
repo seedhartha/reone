@@ -234,24 +234,33 @@ void MeshSceneNode::draw() {
     if (!mesh) {
         return;
     }
-
-    // Setup shaders
-
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
     uniforms.general.model = _absTransform;
     uniforms.general.alpha = _alpha;
+    uniforms.general.uv = glm::mat3x4(
+        glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+        glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+        glm::vec4(_uvOffset.x, _uvOffset.y, 0.0f, 0.0f));
 
-    auto &program = _nodeTextures.diffuse ? _shaders.blinnPhong() : _shaders.blinnPhongDiffuseless();
-
+    bool additive = false;
     if (_nodeTextures.diffuse) {
         uniforms.general.featureMask |= UniformsFeatureFlags::diffuse;
-    }
-    if (_nodeTextures.envmap) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::envmap;
+        _textures.bind(*_nodeTextures.diffuse, TextureUnits::diffuseMap);
+        additive = _nodeTextures.diffuse->isAdditive();
+        float waterAlpha = _nodeTextures.diffuse->features().waterAlpha;
+        if (waterAlpha != -1.0f) {
+            uniforms.general.featureMask |= UniformsFeatureFlags::water;
+            uniforms.general.waterAlpha = waterAlpha;
+        }
     }
     if (_nodeTextures.lightmap) {
         uniforms.general.featureMask |= UniformsFeatureFlags::lightmap;
+        _textures.bind(*_nodeTextures.lightmap, TextureUnits::lightmap);
+    }
+    if (_nodeTextures.envmap) {
+        uniforms.general.featureMask |= UniformsFeatureFlags::envmap;
+        _textures.bind(*_nodeTextures.envmap, TextureUnits::environmentMap);
     }
     if (_nodeTextures.bumpmap) {
         if (_nodeTextures.bumpmap->isGrayscale()) {
@@ -273,39 +282,44 @@ void MeshSceneNode::draw() {
         } else {
             uniforms.general.featureMask |= UniformsFeatureFlags::normalmap;
         }
+        _textures.bind(*_nodeTextures.bumpmap, TextureUnits::bumpMap);
     }
+    auto skin = mesh->skin;
+    if (skin) {
+        uniforms.general.featureMask |= UniformsFeatureFlags::skeletal;
 
+        // Offset bone indices by 1 to account for -1 (no index)
+        uniforms.skeletal.bones[0] = glm::mat4(1.0f);
+        for (size_t i = 1; i < kMaxBones; ++i) {
+            if (i >= 1 + skin->boneNodeNumber.size()) {
+                continue;
+            }
+            auto nodeNumber = skin->boneNodeNumber[i - 1];
+            if (nodeNumber == 0xffff) {
+                continue;
+            }
+            auto bone = _model.getNodeByNumber(nodeNumber);
+            if (!bone || bone->type() != SceneNodeType::Mesh) {
+                continue;
+            }
+            uniforms.skeletal.bones[i] = _modelNode->absoluteTransformInverse() *
+                                         _model.absoluteTransformInverse() *
+                                         bone->absoluteTransform() *
+                                         skin->boneMatrices[skin->boneSerial[i - 1]];
+        }
+    }
+    auto danglymesh = mesh->danglymesh;
+    if (danglymesh) {
+        uniforms.general.featureMask |= UniformsFeatureFlags::danglymesh;
+        uniforms.general.dangly = glm::mat3x4(_danglymeshAnimation.matrix);
+        uniforms.general.danglyDisplacement = danglymesh->displacement;
+        if (_nodeTextures.danglyConstraints) {
+            _textures.bind(*_nodeTextures.danglyConstraints, TextureUnits::danglyConstraints);
+        }
+    }
     bool receivesShadows = isReceivingShadows(_model, *this);
     if (receivesShadows && _sceneGraph.hasShadowLight()) {
         uniforms.general.featureMask |= UniformsFeatureFlags::shadows;
-    }
-
-    if (mesh->skin) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::skeletal;
-
-        // Offset bone matrices by 1 to account for negative bone indices
-        uniforms.skeletal.bones[0] = glm::mat4(1.0f);
-        for (size_t i = 1; i < kMaxBones; ++i) {
-            glm::mat4 tmp(1.0f);
-            if (i < 1 + mesh->skin->boneNodeNumber.size()) {
-                uint16_t nodeNumber = mesh->skin->boneNodeNumber[i - 1];
-                if (nodeNumber != 0xffff) {
-                    shared_ptr<ModelNodeSceneNode> bone(_model.getNodeByNumber(nodeNumber));
-                    if (bone && bone->type() == SceneNodeType::Mesh) {
-                        tmp = _modelNode->absoluteTransformInverse() *
-                              _model.absoluteTransformInverse() *
-                              bone->absoluteTransform() *
-                              mesh->skin->boneMatrices[mesh->skin->boneSerial[i - 1]];
-                    }
-                }
-            }
-            uniforms.skeletal.bones[i] = move(tmp);
-        }
-    }
-
-    if (isSelfIlluminated()) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::selfillum;
-        uniforms.general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
     }
     if (isLightingEnabled()) {
         const vector<LightSceneNode *> &lights = _sceneGraph.activeLights();
@@ -325,53 +339,14 @@ void MeshSceneNode::draw() {
             shaderLight.dynamicType = lights[i]->modelNode().light()->dynamicType;
         }
     }
-
-    if (_nodeTextures.diffuse) {
-        uniforms.general.uv = glm::mat3x4(
-            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
-            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-            glm::vec4(_uvOffset.x, _uvOffset.y, 0.0f, 0.0f));
-        float waterAlpha = _nodeTextures.diffuse->features().waterAlpha;
-        if (waterAlpha != -1.0f) {
-            uniforms.general.featureMask |= UniformsFeatureFlags::water;
-            uniforms.general.waterAlpha = waterAlpha;
-        }
+    if (isSelfIlluminated()) {
+        uniforms.general.featureMask |= UniformsFeatureFlags::selfillum;
+        uniforms.general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
     }
-
     if (_sceneGraph.isFogEnabled() && _model.model().isAffectedByFog()) {
         uniforms.general.featureMask |= UniformsFeatureFlags::fog;
     }
-
-    auto danglymesh = mesh->danglymesh;
-    if (danglymesh) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::danglymesh;
-        uniforms.general.dangly = glm::mat3x4(_danglymeshAnimation.matrix);
-        uniforms.general.danglyDisplacement = danglymesh->displacement;
-    }
-
-    _shaders.use(program, true);
-
-    bool additive = false;
-
-    // Setup textures
-
-    if (_nodeTextures.diffuse) {
-        _textures.bind(*_nodeTextures.diffuse, TextureUnits::diffuseMap);
-        additive = _nodeTextures.diffuse->isAdditive();
-    }
-    if (_nodeTextures.lightmap) {
-        _textures.bind(*_nodeTextures.lightmap, TextureUnits::lightmap);
-    }
-    if (_nodeTextures.envmap) {
-        _textures.bind(*_nodeTextures.envmap, TextureUnits::environmentMap);
-    }
-    if (_nodeTextures.bumpmap) {
-        _textures.bind(*_nodeTextures.bumpmap, TextureUnits::bumpMap);
-    }
-    if (_nodeTextures.danglyConstraints) {
-        _textures.bind(*_nodeTextures.danglyConstraints, TextureUnits::danglyConstraints);
-    }
-
+    _shaders.use(_shaders.blinnPhong(), true);
     _graphicsContext.withFaceCulling(CullFaceMode::Back, [this, &additive, &mesh]() {
         auto blendMode = additive ? BlendMode::Add : BlendMode::Default;
         _graphicsContext.withBlending(blendMode, [this, &mesh]() {

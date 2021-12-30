@@ -41,7 +41,6 @@ public:
     ShaderProgram &pointLightShadows() const { return *_spPointLightShadows; }
     ShaderProgram &directionalLightShadows() const { return *_spDirectionalLightShadows; }
     ShaderProgram &blinnPhong() const { return *_spBlinnPhong; }
-    ShaderProgram &blinnPhongDiffuseless() const { return *_spBlingPhongDiffuseless; }
     ShaderProgram &particle() const { return *_spParticle; }
     ShaderProgram &grass() const { return *_spGrass; }
     ShaderProgram &billboard() const { return *_spBillboard; }
@@ -65,7 +64,6 @@ private:
     std::shared_ptr<ShaderProgram> _spPointLightShadows;
     std::shared_ptr<ShaderProgram> _spDirectionalLightShadows;
     std::shared_ptr<ShaderProgram> _spBlinnPhong;
-    std::shared_ptr<ShaderProgram> _spBlingPhongDiffuseless;
     std::shared_ptr<ShaderProgram> _spParticle;
     std::shared_ptr<ShaderProgram> _spGrass;
     std::shared_ptr<ShaderProgram> _spBillboard;
