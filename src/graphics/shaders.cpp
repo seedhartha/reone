@@ -923,14 +923,12 @@ bool traceScreenSpaceRay(
     iteration = i;
 
     return intersect;
-} 
+}
 
 void main() {
-    vec4 defaultColor = texture(sDiffuseMap, fragUV1);
-
     float roughness = texture(sRoughness, fragUV1).r;
     if (roughness == 1.0) {
-        fragColor = defaultColor;
+        fragColor = vec4(0.0);
         return;
     }
 
@@ -941,10 +939,6 @@ void main() {
     vec3 fragPosVS = screenToViewSpace(fragUV1, fragDepth);
     vec3 I = normalize(fragPosVS);
     vec3 N = normalize(texture(sEyeNormal, fragUV1).xyz * 2.0 - 1.0);
-    if (dot(I, N) > 0.0) {
-        fragColor = defaultColor;
-        return;
-    }
     vec3 R = reflect(I, N);
 
     vec2 pixel = fragUV1 * uScreenResolution;
@@ -961,8 +955,7 @@ void main() {
         reflectionStrength *= 1.0 - max(0.0, maxDimension - SCREEN_FADE) / (1.0 - SCREEN_FADE);
     }
 
-    vec3 color = mix(defaultColor.rgb, defaultColor.rgb + reflectionColor.rgb, reflectionStrength);
-    fragColor = vec4(color, defaultColor.a);
+    fragColor = vec4(reflectionColor.rgb, reflectionStrength);
 }
 )END";
 
@@ -988,6 +981,7 @@ void main() {
 
 static const string g_fsBloom = R"END(
 uniform sampler2D sDiffuseMap;
+uniform sampler2D sSSR;
 uniform sampler2D sBloom;
 
 in vec2 fragUV1;
@@ -996,8 +990,9 @@ out vec4 fragColor1;
 
 void main() {
     vec4 diffuseSample = texture(sDiffuseMap, fragUV1);
+    vec4 ssrSample = texture(sSSR, fragUV1);
     vec4 bloomSample = texture(sBloom, fragUV1);
-    vec3 color = diffuseSample.rgb + bloomSample.rgb;
+    vec3 color = diffuseSample.rgb + ssrSample.rgb * ssrSample.a + bloomSample.rgb;
 
     fragColor1 = vec4(color, diffuseSample.a);
 }
@@ -1376,6 +1371,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sDepthMap", TextureUnits::depthMap);
     program->setUniform("sEyeNormal", TextureUnits::eyeNormal);
     program->setUniform("sRoughness", TextureUnits::roughness);
+    program->setUniform("sSSR", TextureUnits::ssr);
     program->setUniform("sDanglyConstraints", TextureUnits::danglyConstraints);
     program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
     program->setUniform("sCubeShadowMap", TextureUnits::cubeShadowMap);

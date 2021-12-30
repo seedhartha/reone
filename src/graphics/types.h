@@ -134,10 +134,11 @@ struct TextureUnits {
     static constexpr int depthMap = 4;
     static constexpr int eyeNormal = 5;
     static constexpr int roughness = 6;
-    static constexpr int danglyConstraints = 7;
-    static constexpr int environmentMap = 8;
-    static constexpr int cubeShadowMap = 9;
-    static constexpr int shadowMap = 10;
+    static constexpr int ssr = 7;
+    static constexpr int danglyConstraints = 8;
+    static constexpr int environmentMap = 9;
+    static constexpr int cubeShadowMap = 10;
+    static constexpr int shadowMap = 11;
 };
 
 struct UniformBlockBindingPoints {
