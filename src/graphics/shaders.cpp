@@ -173,8 +173,9 @@ in mat3 fragTBN;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragEyeNormal;
-layout(location = 3) out vec4 fragRoughness;
+layout(location = 2) out vec4 fragColor3;
+layout(location = 3) out vec4 fragEyeNormal;
+layout(location = 4) out vec4 fragRoughness;
 
 float getAttenuationQuadratic(int light) {
     if (uLights[light].position.w == 0.0) return 1.0;
@@ -661,13 +662,13 @@ void main() {
         discard;
     }
 
+    vec4 envmapSample = vec4(0.0);
     float roughness = 1.0;
 
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
         vec3 I = normalize(fragPosWorldSpace - uCameraPosition.xyz);
         vec3 R = reflect(I, N);
-        vec4 envmapSample = texture(sEnvironmentMap, R);
-        objectColor += (1.0 - diffuseSample.a) * envmapSample.rgb;
+        envmapSample = texture(sEnvironmentMap, R);
         roughness = diffuseSample.a;
     }
     if (isFeatureEnabled(FEATURE_WATER)) {
@@ -688,6 +689,7 @@ void main() {
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(objectColorBright, objectAlpha);
+    fragColor3 = vec4(envmapSample.rgb, objectAlpha);
     fragEyeNormal = vec4(normalVS * 0.5 + 0.5, 1.0);
     fragRoughness = vec4(roughness, 0.0, 0.0, 1.0);
 }
@@ -700,8 +702,9 @@ in vec2 fragUV1;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragEyeNormal;
-layout(location = 3) out vec4 fragRoughness;
+layout(location = 2) out vec4 fragColor3;
+layout(location = 3) out vec4 fragEyeNormal;
+layout(location = 4) out vec4 fragRoughness;
 
 void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
@@ -710,6 +713,7 @@ void main() {
 
     fragColor1 = vec4(objectColor, uAlpha * diffuseSample.a);
     fragColor2 = vec4(0.0);
+    fragColor3 = vec4(0.0);
     fragEyeNormal = vec4(0.0);
     fragRoughness = vec4(0.0);
 }
@@ -725,8 +729,9 @@ flat in int fragInstanceID;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragEyeNormal;
-layout(location = 3) out vec4 fragRoughness;
+layout(location = 2) out vec4 fragColor3;
+layout(location = 3) out vec4 fragEyeNormal;
+layout(location = 4) out vec4 fragRoughness;
 
 void main() {
     float oneOverGridX = 1.0 / uParticleGridSize.x;
@@ -755,6 +760,7 @@ void main() {
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(0.0);
+    fragColor3 = vec4(0.0);
     fragEyeNormal = vec4(normalVS * 0.5 + 0.5, 1.0);
     fragRoughness = vec4(1.0, 0.0, 0.0, 1.0);
 }
@@ -771,8 +777,9 @@ flat in int fragInstanceID;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragEyeNormal;
-layout(location = 3) out vec4 fragRoughness;
+layout(location = 2) out vec4 fragColor3;
+layout(location = 3) out vec4 fragEyeNormal;
+layout(location = 4) out vec4 fragRoughness;
 
 void main() {
     vec2 uv = vec2(0.5) * fragUV1;
@@ -797,6 +804,7 @@ void main() {
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(0.0);
+    fragColor3 = vec4(0.0);
     fragEyeNormal = vec4(normalVS * 0.5 + 0.5, 1.0);
     fragRoughness = vec4(1.0, 0.0, 0.0, 1.0);
 }
@@ -950,8 +958,7 @@ void main() {
         reflectionColor = texelFetch(sDiffuseMap, ivec2(hitPixel), 0);
         vec2 hitNDC = (hitPixel / uScreenResolution) * 2.0 - 1.0;
         float maxDimension = min(1.0, max(abs(hitNDC.x), abs(hitNDC.y)));
-        reflectionStrength = 1.0 - roughness;
-        reflectionStrength *= 1.0 - iteration / float(ITERATIONS);
+        reflectionStrength = 1.0 - iteration / float(ITERATIONS);
         reflectionStrength *= 1.0 - max(0.0, maxDimension - SCREEN_FADE) / (1.0 - SCREEN_FADE);
     }
 
@@ -983,6 +990,8 @@ void main() {
 static const string g_fsBloom = R"END(
 uniform sampler2D sDiffuseMap;
 uniform sampler2D sHilights;
+uniform sampler2D sEnvmapColor;
+uniform sampler2D sRoughness;
 uniform sampler2D sSSR;
 
 in vec2 fragUV1;
@@ -992,8 +1001,10 @@ out vec4 fragColor1;
 void main() {
     vec4 diffuseSample = texture(sDiffuseMap, fragUV1);
     vec4 hilightsSample = texture(sHilights, fragUV1);
+    vec4 roughnessSample = texture(sRoughness, fragUV1);
+    vec4 envmapColorSample = texture(sEnvmapColor, fragUV1);
     vec4 ssrSample = texture(sSSR, fragUV1);
-    vec3 color = diffuseSample.rgb + hilightsSample.rgb + ssrSample.rgb * ssrSample.a;
+    vec3 color = diffuseSample.rgb + hilightsSample.rgb + mix(envmapColorSample.rgb, ssrSample.rgb, ssrSample.a) * (1.0 - roughnessSample.r);
 
     fragColor1 = vec4(color, diffuseSample.a);
 }
@@ -1369,6 +1380,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sLightmap", TextureUnits::lightmap);
     program->setUniform("sBumpMap", TextureUnits::bumpMap);
     program->setUniform("sHilights", TextureUnits::hilights);
+    program->setUniform("sEnvmapColor", TextureUnits::envmapColor);
     program->setUniform("sDepthMap", TextureUnits::depthMap);
     program->setUniform("sEyeNormal", TextureUnits::eyeNormal);
     program->setUniform("sRoughness", TextureUnits::roughness);
