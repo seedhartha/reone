@@ -152,7 +152,7 @@ void ControlPipeline::applyBloom(Attachments &attachments, const glm::ivec4 &ext
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbPing->nameGL());
     _shaders.use(_shaders.bloom(), true);
     _textures.bind(*attachments.cbGeometry1);
-    _textures.bind(*attachments.cbGeometry2, TextureUnits::bloom);
+    _textures.bind(*attachments.cbGeometry2, TextureUnits::hilights);
     _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &attachments]() {
         _graphicsContext.clearColorDepth();
         _meshes.quadNDC().draw();
