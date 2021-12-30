@@ -35,6 +35,8 @@ namespace reone {
 
 namespace graphics {
 
+static constexpr GLenum kColorAttachments[] {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+
 void ControlPipeline::prepareFor(const glm::ivec4 &extent) {
     AttachmentsId attachmentsId {extent};
     if (_attachments.count(attachmentsId) > 0) {
@@ -112,8 +114,6 @@ void ControlPipeline::draw(IScene &scene, const glm::ivec4 &extent, const glm::i
 }
 
 void ControlPipeline::drawGeometry(IScene &scene, Attachments &attachments, const glm::ivec4 &extent) {
-    static constexpr GLenum colors[] {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-
     auto camera = scene.camera();
     if (!camera) {
         return;
@@ -132,7 +132,7 @@ void ControlPipeline::drawGeometry(IScene &scene, Attachments &attachments, cons
 
     // Draw scene to geometry framebuffer
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbGeometry.nameGL());
-    glDrawBuffers(2, colors);
+    glDrawBuffers(2, kColorAttachments);
     _graphicsContext.withViewport(glm::ivec4(0, 0, w, h), [this, &w, &h, &scene]() {
         _graphicsContext.clearColorDepth();
         scene.draw();
