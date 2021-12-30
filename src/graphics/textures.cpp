@@ -74,9 +74,9 @@ void Textures::bindDefaults() {
     bind(*_defaultRGB, TextureUnits::lightmap);
     bind(*_defaultRGB, TextureUnits::bumpMap);
     bind(*_defaultRGB, TextureUnits::bloom);
-    bind(*_defaultRGB, TextureUnits::gBufDepth);
-    bind(*_defaultRGB, TextureUnits::gBufNormals);
-    bind(*_defaultRGB, TextureUnits::gBufRoughness);
+    bind(*_defaultRGB, TextureUnits::eyeDepth);
+    bind(*_defaultRGB, TextureUnits::eyeNormal);
+    bind(*_defaultRGB, TextureUnits::roughness);
     bind(*_defaultCubemapRGB, TextureUnits::environmentMap);
     bind(*_defaultCubemapDepth, TextureUnits::cubeShadowMap);
     bind(*_defaultArrayDepth, TextureUnits::shadowMap);
