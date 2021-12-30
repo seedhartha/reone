@@ -67,6 +67,7 @@ const int LIGHT_DYNTYPE_BOTH = LIGHT_DYNTYPE_AREA | LIGHT_DYNTYPE_OBJECT;
 
 layout(std140) uniform General {
     mat4 uProjection;
+    mat4 uProjectionInv;
     mat4 uScreenProjection;
     mat4 uView;
     mat4 uModel;
@@ -172,9 +173,8 @@ in mat3 fragTBN;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragEyeDepth;
-layout(location = 3) out vec4 fragEyeNormal;
-layout(location = 4) out vec4 fragRoughness;
+layout(location = 2) out vec4 fragEyeNormal;
+layout(location = 3) out vec4 fragRoughness;
 
 float getAttenuationQuadratic(int light) {
     if (uLights[light].position.w == 0.0) return 1.0;
@@ -684,12 +684,10 @@ void main() {
         objectColorBright = vec3(0.0);
     }
 
-    vec3 positionVS = (uView * vec4(fragPosWorldSpace, 1.0)).xyz;
     vec3 normalVS = transpose(inverse(mat3(uView))) * N;
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(objectColorBright, objectAlpha);
-    fragEyeDepth = vec4(positionVS.z, 0.0, 0.0, 1.0);
     fragEyeNormal = vec4(normalVS * 0.5 + 0.5, 1.0);
     fragRoughness = vec4(roughness, 0.0, 0.0, 1.0);
 }
@@ -702,9 +700,8 @@ in vec2 fragUV1;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragEyeDepth;
-layout(location = 3) out vec4 fragEyeNormal;
-layout(location = 4) out vec4 fragRoughness;
+layout(location = 2) out vec4 fragEyeNormal;
+layout(location = 3) out vec4 fragRoughness;
 
 void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
@@ -713,7 +710,6 @@ void main() {
 
     fragColor1 = vec4(objectColor, uAlpha * diffuseSample.a);
     fragColor2 = vec4(0.0);
-    fragEyeDepth = vec4(0.0);
     fragEyeNormal = vec4(0.0);
     fragRoughness = vec4(0.0);
 }
@@ -729,9 +725,8 @@ flat in int fragInstanceID;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragEyeDepth;
-layout(location = 3) out vec4 fragEyeNormal;
-layout(location = 4) out vec4 fragRoughness;
+layout(location = 2) out vec4 fragEyeNormal;
+layout(location = 3) out vec4 fragRoughness;
 
 void main() {
     float oneOverGridX = 1.0 / uParticleGridSize.x;
@@ -755,14 +750,11 @@ void main() {
         discard;
     }
 
-    vec3 positionVS = (uView * vec4(fragPosWorldSpace, 1.0)).xyz;
-
     mat3 normalMatrix = transpose(inverse(mat3(uView)));
     vec3 normalVS = normalMatrix * normalize(fragNormalWorldSpace);
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(0.0);
-    fragEyeDepth = vec4(positionVS.z, 0.0, 0.0, 1.0);
     fragEyeNormal = vec4(normalVS * 0.5 + 0.5, 1.0);
     fragRoughness = vec4(1.0, 0.0, 0.0, 1.0);
 }
@@ -779,9 +771,8 @@ flat in int fragInstanceID;
 
 layout(location = 0) out vec4 fragColor1;
 layout(location = 1) out vec4 fragColor2;
-layout(location = 2) out vec4 fragEyeDepth;
-layout(location = 3) out vec4 fragEyeNormal;
-layout(location = 4) out vec4 fragRoughness;
+layout(location = 2) out vec4 fragEyeNormal;
+layout(location = 3) out vec4 fragRoughness;
 
 void main() {
     vec2 uv = vec2(0.5) * fragUV1;
@@ -801,14 +792,11 @@ void main() {
         discard;
     }
 
-    vec3 positionVS = (uView * vec4(fragPosWorldSpace, 1.0)).xyz;
-
     mat3 normalMatrix = transpose(inverse(mat3(uView)));
     vec3 normalVS = normalMatrix * normalize(fragNormalWorldSpace);
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(0.0);
-    fragEyeDepth = vec4(positionVS.z, 0.0, 0.0, 1.0);
     fragEyeNormal = vec4(normalVS * 0.5 + 0.5, 1.0);
     fragRoughness = vec4(1.0, 0.0, 0.0, 1.0);
 }
@@ -824,7 +812,7 @@ const float MAX_DISTANCE = 100.0;
 const float SCREEN_FADE = 0.8;
 
 uniform sampler2D sDiffuseMap;
-uniform sampler2D sEyeDepth;
+uniform sampler2D sDepthMap;
 uniform sampler2D sEyeNormal;
 uniform sampler2D sRoughness;
 
@@ -832,12 +820,13 @@ in vec2 fragUV1;
 
 out vec4 fragColor;
 
-vec3 screenToViewSpace(vec2 uv, float eyeZ) {
-    vec2 ndc = uv * 2.0 - 1.0;
-    return vec3(
-        -eyeZ * ndc.x / uProjection[0][0],
-        -eyeZ * ndc.y / uProjection[1][1],
-        eyeZ);
+vec3 screenToViewSpace(vec2 uv, float depth) {
+    vec3 clip = vec3(uv, depth) * 2.0 - vec3(1.0);
+    vec4 eye = vec4(
+        vec2(uProjectionInv[0][0], uProjectionInv[1][1]) * clip.xy,
+        -1.0,
+        uProjectionInv[2][3] * clip.z + uProjectionInv[3][3]);
+    return eye.xyz / eye.w;
 }
 
 float distanceSquared(vec2 a, vec2 b) {
@@ -854,8 +843,9 @@ void swapIfBigger(inout float a, inout float b) {
 }
 
 bool rayIntersectsDepth(float zA, float zB, vec2 pixel) {
-    float cameraZ = texelFetch(sEyeDepth, ivec2(pixel), 0).r;
-    return zB <= cameraZ && zA >= cameraZ - Z_TICKNESS;
+    float depth = texelFetch(sDepthMap, ivec2(pixel), 0).r;
+    float eyeZ = -1.0 / (uProjectionInv[2][3] * (depth * 2.0 - 1.0) + uProjectionInv[3][3]);
+    return zB <= eyeZ && zA >= eyeZ - Z_TICKNESS;
 }
 
 bool traceScreenSpaceRay(
@@ -947,7 +937,7 @@ void main() {
     vec4 reflectionColor = vec4(0.0);
     float reflectionStrength = 0.0;
 
-    float fragDepth = texture(sEyeDepth, fragUV1).r;
+    float fragDepth = texture(sDepthMap, fragUV1).r;
     vec3 fragPosVS = screenToViewSpace(fragUV1, fragDepth);
     vec3 I = normalize(fragPosVS);
     vec3 N = normalize(texture(sEyeNormal, fragUV1).xyz * 2.0 - 1.0);
@@ -1383,7 +1373,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sLightmap", TextureUnits::lightmap);
     program->setUniform("sBumpMap", TextureUnits::bumpMap);
     program->setUniform("sBloom", TextureUnits::bloom);
-    program->setUniform("sEyeDepth", TextureUnits::eyeDepth);
+    program->setUniform("sDepthMap", TextureUnits::depthMap);
     program->setUniform("sEyeNormal", TextureUnits::eyeNormal);
     program->setUniform("sRoughness", TextureUnits::roughness);
     program->setUniform("sDanglyConstraints", TextureUnits::danglyConstraints);
