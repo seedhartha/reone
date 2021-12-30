@@ -93,7 +93,6 @@ private:
 
     std::shared_ptr<Texture> _cbGeometry1;
     std::shared_ptr<Texture> _cbGeometry2;
-    std::shared_ptr<Texture> _cbGeometryEyeDepth;
     std::shared_ptr<Texture> _cbGeometryEyeNormal;
     std::shared_ptr<Texture> _cbGeometryRoughness;
     std::shared_ptr<Texture> _cbSSR;
@@ -108,6 +107,7 @@ private:
 
     std::shared_ptr<Texture> _dbDirectionalLightShadows;
     std::shared_ptr<Texture> _dbPointLightShadows;
+    std::shared_ptr<Texture> _dbGeometry;
     std::shared_ptr<Renderbuffer> _dbScreenshot;
 
     std::shared_ptr<Renderbuffer> _dbCommon;

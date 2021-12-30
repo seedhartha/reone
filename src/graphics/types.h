@@ -131,7 +131,7 @@ struct TextureUnits {
     static constexpr int lightmap = 1;
     static constexpr int bumpMap = 2;
     static constexpr int bloom = 3;
-    static constexpr int eyeDepth = 4;
+    static constexpr int depthMap = 4;
     static constexpr int eyeNormal = 5;
     static constexpr int roughness = 6;
     static constexpr int danglyConstraints = 7;

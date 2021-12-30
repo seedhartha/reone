@@ -45,6 +45,7 @@ struct UniformsFeatureFlags {
 
 struct GeneralUniforms {
     glm::mat4 projection {1.0f};
+    glm::mat4 projectionInv {1.0f};
     glm::mat4 screenProjection {1.0f};
     glm::mat4 view {1.0f};
     glm::mat4 model {1.0f};
@@ -78,6 +79,7 @@ struct GeneralUniforms {
 
     void resetGlobals() {
         projection = glm::mat4(1.0f);
+        projectionInv = glm::mat4(1.0f);
         view = glm::mat4(1.0f);
         cameraPosition = glm::vec4(0.0f);
         worldAmbientColor = glm::vec4(1.0f);
