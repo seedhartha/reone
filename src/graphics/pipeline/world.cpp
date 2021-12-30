@@ -224,7 +224,7 @@ void WorldPipeline::init() {
     // SSR framebuffer
 
     _cbSSR = make_unique<Texture>("ssr_color", getTextureProperties(TextureUsage::ColorBuffer));
-    _cbSSR->clear(_options.width, _options.height, PixelFormat::RGB8);
+    _cbSSR->clear(_options.width, _options.height, PixelFormat::RGBA8);
     _cbSSR->init();
 
     _fbSSR = make_shared<Framebuffer>();
@@ -391,7 +391,9 @@ void WorldPipeline::applySSR() {
     _textures.bind(*_cbGeometryEyeNormal, TextureUnits::eyeNormal);
     _textures.bind(*_cbGeometryRoughness, TextureUnits::roughness);
     _graphicsContext.clearColorDepth();
-    _meshes.quadNDC().draw();
+    _graphicsContext.withBlending(BlendMode::None, [this]() {
+        _meshes.quadNDC().draw();
+    });
 }
 
 void WorldPipeline::applyHorizontalBlur() {
@@ -439,7 +441,8 @@ void WorldPipeline::applyBloom() {
     // Combine geometry or SSR and pong (horizontal + vertical blur) color buffers
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbPing->nameGL());
     _shaders.use(_shaders.bloom(), true);
-    _textures.bind(_options.ssr ? *_cbSSR : *_cbGeometry1);
+    _textures.bind(*_cbGeometry1);
+    _textures.bind(*_cbSSR, TextureUnits::ssr);
     _textures.bind(*_cbPong, TextureUnits::bloom);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
