@@ -17,6 +17,7 @@
 
 #include "cursor.h"
 
+#include "context.h"
 #include "mesh.h"
 #include "meshes.h"
 #include "shaders.h"
@@ -44,7 +45,9 @@ void Cursor::draw() {
     uniforms.general.model = move(transform);
 
     _shaders.use(_shaders.gui(), true);
-    _meshes.quad().draw();
+    _graphicsContext.withBlending(BlendMode::Normal, [this]() {
+        _meshes.quad().draw();
+    });
 }
 
 } // namespace graphics

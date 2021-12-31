@@ -243,15 +243,17 @@ void SelectionOverlay::update() {
 }
 
 void SelectionOverlay::draw() {
-    if (_hilightedObject) {
-        drawReticle(_hilightedHostile ? _hostileReticle : _friendlyReticle, _hilightedScreenCoords);
-    }
-    if (_selectedObject) {
-        drawReticle(_selectedHostile ? _hostileReticle2 : _friendlyReticle2, _selectedScreenCoords);
-        drawActionBar();
-        drawTitleBar();
-        drawHealthBar();
-    }
+    _services.graphicsContext.withBlending(BlendMode::Normal, [this]() {
+        if (_hilightedObject) {
+            drawReticle(_hilightedHostile ? _hostileReticle : _friendlyReticle, _hilightedScreenCoords);
+        }
+        if (_selectedObject) {
+            drawReticle(_selectedHostile ? _hostileReticle2 : _friendlyReticle2, _selectedScreenCoords);
+            drawActionBar();
+            drawTitleBar();
+            drawHealthBar();
+        }
+    });
 }
 
 void SelectionOverlay::drawReticle(shared_ptr<Texture> texture, const glm::vec3 &screenCoords) {

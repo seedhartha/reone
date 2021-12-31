@@ -34,7 +34,7 @@ void GraphicsModule::init() {
     _walkmeshes = make_unique<Walkmeshes>(_resource.resources());
     _lipAnimations = make_unique<LipAnimations>(_resource.resources());
     _shaders = make_unique<Shaders>();
-    _fonts = make_unique<Fonts>(*_meshes, *_shaders, *_textures, *_window);
+    _fonts = make_unique<Fonts>(*_graphicsContext, *_meshes, *_shaders, *_textures, *_window);
     _worldPipeline = make_unique<WorldPipeline>(_options, *_graphicsContext, *_meshes, *_shaders, *_textures);
     _controlPipeline = make_unique<ControlPipeline>(_options, *_graphicsContext, *_meshes, *_shaders, *_textures);
 

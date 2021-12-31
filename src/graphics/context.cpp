@@ -28,21 +28,15 @@ void GraphicsContext::init() {
         return;
     }
     glewInit();
+
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
-    // Viewport
-    glGetIntegerv(GL_VIEWPORT, &_viewport[0]);
-
-    // Depth Test
     glEnable(GL_DEPTH_TEST);
+
     glDepthFunc(GL_LEQUAL);
-
-    // Face Culling
     setCullFaceMode(CullFaceMode::None);
+    setBlendMode(BlendMode::None);
 
-    // Blending
-    glEnable(GL_BLEND);
-    setBlendMode(BlendMode::Default);
+    glGetIntegerv(GL_VIEWPORT, &_viewport[0]);
 
     _inited = true;
 }
@@ -128,24 +122,25 @@ void GraphicsContext::setBlendMode(BlendMode mode) {
     if (_blendMode == mode) {
         return;
     }
-    switch (mode) {
-    case BlendMode::None:
-        glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
-        glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_ZERO);
-        break;
-    case BlendMode::Add:
-        glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
-        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_SRC_ALPHA, GL_ONE);
-        break;
-    case BlendMode::Lighten:
-        glBlendEquationSeparate(GL_MAX, GL_FUNC_ADD);
-        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE);
-        break;
-    case BlendMode::Default:
-    default:
-        glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
-        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE);
-        break;
+    if (mode == BlendMode::None) {
+        glDisable(GL_BLEND);
+    } else {
+        glEnable(GL_BLEND);
+        switch (mode) {
+        case BlendMode::Additive:
+            glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE);
+            break;
+        case BlendMode::Lighten:
+            glBlendEquationSeparate(GL_MAX, GL_FUNC_ADD);
+            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+            break;
+        case BlendMode::Normal:
+        default:
+            glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+            break;
+        }
     }
     _blendMode = mode;
 }

@@ -32,8 +32,9 @@ class Textures;
 
 class Fonts : public MemoryCache<std::string, Font> {
 public:
-    Fonts(Meshes &meshes, Shaders &shaders, Textures &textures, Window &window) :
+    Fonts(GraphicsContext &graphicsContext, Meshes &meshes, Shaders &shaders, Textures &textures, Window &window) :
         MemoryCache(std::bind(&Fonts::doGet, this, std::placeholders::_1)),
+        _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
         _textures(textures),
@@ -41,6 +42,7 @@ public:
     }
 
 private:
+    GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
     Textures &_textures;

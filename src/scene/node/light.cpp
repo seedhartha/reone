@@ -81,7 +81,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
 
     _shaders.use(_shaders.billboard(), true);
     _textures.bind(*flare.texture, TextureUnits::diffuseMap);
-    _graphicsContext.withBlending(BlendMode::Add, [this]() {
+    _graphicsContext.withBlending(BlendMode::Additive, [this]() {
         _meshes.billboard().draw();
     });
 }

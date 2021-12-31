@@ -606,8 +606,8 @@ static ModelNode::Emitter::BlendMode parseEmitterBlend(const string &str) {
     auto result = ModelNode::Emitter::BlendMode::Invalid;
     if (str == "normal") {
         result = ModelNode::Emitter::BlendMode::Normal;
-    } else if (str == "punch") {
-        result = ModelNode::Emitter::BlendMode::Punch;
+    } else if (str == "punch-through") {
+        result = ModelNode::Emitter::BlendMode::PunchThrough;
     } else if (str == "lighten") {
         result = ModelNode::Emitter::BlendMode::Lighten;
     }
@@ -643,6 +643,7 @@ shared_ptr<ModelNode::Emitter> MdlReader::readEmitter() {
     emitter->texture = _textures.get(texture, TextureUsage::Diffuse);
     emitter->gridSize = glm::ivec2(glm::max(xGrid, 1u), glm::max(yGrid, 1u));
     emitter->renderOrder = renderOrder;
+    emitter->twosided = static_cast<bool>(twosided);
     emitter->loop = static_cast<bool>(loop);
     emitter->p2p = flags & EmitterFlags::p2p;
     emitter->p2pBezier = flags & EmitterFlags::p2pBezier;

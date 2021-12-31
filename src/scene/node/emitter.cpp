@@ -258,6 +258,9 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::particles;
+    if (emitter->blendMode == ModelNode::Emitter::BlendMode::PunchThrough) {
+        uniforms.general.featureMask |= UniformsFeatureFlags::alphatest;
+    }
     uniforms.particles.gridSize = emitter->gridSize;
 
     for (size_t i = 0; i < leafs.size(); ++i) {
@@ -268,26 +271,26 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
         switch (emitter->renderMode) {
         case ModelNode::Emitter::RenderMode::BillboardToLocalZ:
         case ModelNode::Emitter::RenderMode::MotionBlur:
-            uniforms.particles.particles[i].right = glm::vec4(emitterRight, 0.0f);
-            uniforms.particles.particles[i].up = glm::vec4(emitterUp, 0.0f);
+            uniforms.particles.particles[i].right = glm::vec4(emitterUp, 0.0f);
+            uniforms.particles.particles[i].up = glm::vec4(emitterRight, 0.0f);
             if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
                 uniforms.particles.particles[i].size = glm::vec2(particle->size().x, (1.0f + kMotionBlurStrength * kProjectileSpeed) * particle->size().y);
             }
             break;
         case ModelNode::Emitter::RenderMode::BillboardToWorldZ:
-            uniforms.particles.particles[i].right = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
-            uniforms.particles.particles[i].up = glm::vec4(0.0f, 1.0f, 0.0, 0.0f);
+            uniforms.particles.particles[i].right = glm::vec4(0.0f, 1.0f, 0.0, 0.0f);
+            uniforms.particles.particles[i].up = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
             break;
         case ModelNode::Emitter::RenderMode::AlignedToParticleDir:
-            uniforms.particles.particles[i].right = glm::vec4(emitterForward, 0.0f);
-            uniforms.particles.particles[i].up = glm::vec4(emitterRight, 0.0f);
+            uniforms.particles.particles[i].right = glm::vec4(emitterRight, 0.0f);
+            uniforms.particles.particles[i].up = glm::vec4(emitterForward, 0.0f);
             break;
         case ModelNode::Emitter::RenderMode::Linked: {
             auto particleUp = particle->dir();
             auto particleForward = glm::cross(particleUp, cameraRight);
             auto particleRight = glm::cross(particleForward, particleUp);
-            uniforms.particles.particles[i].right = glm::vec4(particleUp, 0.0f);
-            uniforms.particles.particles[i].up = glm::vec4(particleRight, 0.0f);
+            uniforms.particles.particles[i].right = glm::vec4(particleRight, 0.0f);
+            uniforms.particles.particles[i].up = glm::vec4(particleUp, 0.0f);
             break;
         }
         case ModelNode::Emitter::RenderMode::Normal:
@@ -300,11 +303,24 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
 
     _shaders.use(_shaders.particle(), true);
     _textures.bind(*texture, TextureUnits::diffuseMap);
-
-    auto lighten = emitter->blendMode == ModelNode::Emitter::BlendMode::Lighten;
-    auto blendMode = lighten ? BlendMode::Lighten : BlendMode::Default;
-    _graphicsContext.withBlending(blendMode, [this, &leafs]() {
-        _meshes.billboard().drawInstanced(leafs.size());
+    auto cullFaceMode = emitter->twosided ? CullFaceMode::None : CullFaceMode::Back;
+    _graphicsContext.withFaceCulling(cullFaceMode, [this, &emitter, &leafs] {
+        BlendMode blendMode;
+        switch (emitter->blendMode) {
+        case ModelNode::Emitter::BlendMode::PunchThrough:
+            blendMode = BlendMode::None;
+            break;
+        case ModelNode::Emitter::BlendMode::Lighten:
+            blendMode = BlendMode::Lighten;
+            break;
+        case ModelNode::Emitter::BlendMode::Normal:
+        default:
+            blendMode = BlendMode::Normal;
+            break;
+        }
+        _graphicsContext.withBlending(blendMode, [this, &leafs]() {
+            _meshes.billboard().drawInstanced(leafs.size());
+        });
     });
 }
 

@@ -97,11 +97,13 @@ void ProfileOverlay::calculateFPS() {
 }
 
 void ProfileOverlay::draw() {
-    if (!_enabled)
+    if (!_enabled) {
         return;
-
-    drawBackground();
-    drawText();
+    }
+    _services.graphicsContext.withBlending(BlendMode::Normal, [this]() {
+        drawBackground();
+        drawText();
+    });
 }
 
 void ProfileOverlay::drawBackground() {

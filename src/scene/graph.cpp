@@ -246,7 +246,7 @@ void SceneGraph::updateSounds() {
 
 void SceneGraph::refresh() {
     _opaqueMeshes.clear();
-    _transparentMeshes.clear();
+    _blendableMeshes.clear();
     _shadowMeshes.clear();
     _lights.clear();
     _emitters.clear();
@@ -273,8 +273,8 @@ void SceneGraph::refreshFromNode(const std::shared_ptr<SceneNode> &node) {
         auto modelNode = static_pointer_cast<MeshSceneNode>(node);
         if (modelNode->shouldRender()) {
             // Sort model nodes into transparent and opaque
-            if (modelNode->isTransparent()) {
-                _transparentMeshes.push_back(modelNode.get());
+            if (modelNode->isBlendable()) {
+                _blendableMeshes.push_back(modelNode.get());
             } else {
                 _opaqueMeshes.push_back(modelNode.get());
             }
@@ -302,28 +302,12 @@ void SceneGraph::refreshFromNode(const std::shared_ptr<SceneNode> &node) {
 }
 
 void SceneGraph::prepareLeafs() {
-    vector<pair<SceneNode *, float>> leafs;
+    vector<pair<SceneNode *, float>> blendableLeafs;
     auto camera = _activeCamera->camera();
 
-    // Add transparent meshes
-    for (auto &mesh : _transparentMeshes) {
-        leafs.push_back(make_pair(mesh, mesh->getSquareDistanceTo(camera->position())));
-    }
-
-    // Add grass clusters
-    for (auto &grass : _grassRoots) {
-        if (!grass->isEnabled()) {
-            continue;
-        }
-        for (auto &child : grass->children()) {
-            if (child->type() != SceneNodeType::GrassCluster) {
-                continue;
-            }
-            auto cluster = static_cast<GrassClusterSceneNode *>(child.get());
-            if (camera->isInFrustum(cluster->getOrigin())) {
-                leafs.push_back(make_pair(cluster, cluster->getSquareDistanceTo(camera->position())));
-            }
-        }
+    // Add blendable meshes
+    for (auto &mesh : _blendableMeshes) {
+        blendableLeafs.push_back(make_pair(mesh, mesh->getSquareDistanceTo(camera->position())));
     }
 
     // Add particles
@@ -334,13 +318,13 @@ void SceneGraph::prepareLeafs() {
             }
             auto particle = static_cast<ParticleSceneNode *>(child.get());
             if (camera->isInFrustum(particle->getOrigin())) {
-                leafs.push_back(make_pair(particle, particle->getSquareDistanceTo(camera->position())));
+                blendableLeafs.push_back(make_pair(particle, particle->getSquareDistanceTo(camera->position())));
             }
         }
     }
 
-    // Sort leafs back to front to ensure correct blending
-    sort(leafs.begin(), leafs.end(), [](auto &a, auto &b) {
+    // Sort meshes and particles back to front to ensure correct blending
+    sort(blendableLeafs.begin(), blendableLeafs.end(), [](auto &a, auto &b) {
         bool aMesh = a.first->type() == SceneNodeType::Mesh;
         bool bMesh = b.first->type() == SceneNodeType::Mesh;
         if (aMesh && bMesh) {
@@ -358,21 +342,47 @@ void SceneGraph::prepareLeafs() {
         return aDistance > bDistance;
     });
 
-    // Group leafs into buckets
     _leafBuckets.clear();
     SceneNode *bucketParent = nullptr;
     vector<SceneNode *> bucket;
-    for (auto &[leaf, distance] : leafs) {
+
+    // Group grass clusters into buckets without sorting
+    for (auto &grass : _grassRoots) {
+        if (!grass->isEnabled()) {
+            continue;
+        }
+        for (auto &child : grass->children()) {
+            if (child->type() != SceneNodeType::GrassCluster) {
+                continue;
+            }
+            auto cluster = static_cast<GrassClusterSceneNode *>(child.get());
+            if (!camera->isInFrustum(cluster->getOrigin())) {
+                continue;
+            }
+            if (bucket.size() >= kMaxGrassClusters) {
+                _leafBuckets.push_back(make_pair(grass.get(), bucket));
+                bucket.clear();
+            }
+            bucket.push_back(cluster);
+        }
+        if (!bucket.empty()) {
+            _leafBuckets.push_back(make_pair(grass.get(), bucket));
+            bucket.clear();
+        }
+    }
+
+    // Group blendable meshes and particles into buckets
+    for (auto &[leaf, _] : blendableLeafs) {
         SceneNode *parent = leaf->parent();
         if (leaf->type() == SceneNodeType::Mesh) {
             parent = &static_cast<MeshSceneNode *>(leaf)->model();
         }
         if (!bucket.empty()) {
             int maxCount = 1;
-            if (parent->type() == SceneNodeType::Grass) {
-                maxCount = kMaxGrassClusters;
-            } else if (parent->type() == SceneNodeType::Emitter) {
+            if (parent->type() == SceneNodeType::Emitter) {
                 maxCount = kMaxParticles;
+            } else if (parent->type() == SceneNodeType::Grass) {
+                maxCount = kMaxGrassClusters;
             }
             if (bucketParent != parent || bucket.size() >= maxCount) {
                 _leafBuckets.push_back(make_pair(bucketParent, bucket));
@@ -399,11 +409,10 @@ void SceneGraph::draw() {
     for (auto &mesh : _opaqueMeshes) {
         mesh->draw();
     }
-    // Render transparent meshes, particles and grass clusters
+    // Render blendable meshes and particles
     for (auto &[node, leafs] : _leafBuckets) {
         node->drawLeafs(leafs);
     }
-
     // Render lens flares
     if (!_flareLights.empty()) {
         _graphicsContext.withoutDepthTest([this]() {

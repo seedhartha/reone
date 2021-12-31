@@ -305,8 +305,10 @@ void Console::executeInputText() {
 }
 
 void Console::draw() {
-    drawBackground();
-    drawLines();
+    _services.graphicsContext.withBlending(BlendMode::Normal, [this]() {
+        drawBackground();
+        drawLines();
+    });
 }
 
 void Console::drawBackground() {

@@ -67,12 +67,14 @@ void Map::loadTextures(const string &area) {
 }
 
 void Map::draw(Mode mode, const glm::vec4 &bounds) {
-    if (!_areaTexture)
+    if (!_areaTexture) {
         return;
-
-    drawArea(mode, bounds);
-    drawNotes(mode, bounds);
-    drawPartyLeader(mode, bounds);
+    }
+    _services.graphicsContext.withBlending(BlendMode::Normal, [this, &mode, &bounds]() {
+        drawArea(mode, bounds);
+        drawNotes(mode, bounds);
+        drawPartyLeader(mode, bounds);
+    });
 }
 
 void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
