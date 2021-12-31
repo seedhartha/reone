@@ -26,6 +26,12 @@ namespace graphics {
 static const string g_glslHeader = R"END(
 #version 330 core
 
+const float ALPHA_THRESHOLD = 0.01;
+)END";
+
+static const string g_glslGeneralUniforms = R"END(
+const int NUM_SHADOW_LIGHT_SPACE = 8;
+
 const int FEATURE_DIFFUSE = 1;
 const int FEATURE_LIGHTMAP = 2;
 const int FEATURE_ENVMAP = 4;
@@ -43,23 +49,6 @@ const int FEATURE_GRASS = 0x2000;
 const int FEATURE_FOG = 0x4000;
 const int FEATURE_DANGLYMESH = 0x8000;
 const int FEATURE_FIXEDSIZE = 0x10000;
-
-const int MAX_BONES = 24;
-const int MAX_LIGHTS = 16;
-const int MAX_PARTICLES = 64;
-const int MAX_TEXT_CHARS = 128;
-const int MAX_GRASS_CLUSTERS = 256;
-
-const int NUM_CUBE_FACES = 6;
-const int NUM_SHADOW_CASCADES = 8;
-const int NUM_SHADOW_LIGHT_SPACE = 8;
-
-const float PI = 3.1415926538;
-const float SHININESS = 8.0;
-const float ALPHA_THRESHOLD = 0.01;
-
-const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
-const vec3 FORWARD = vec3(0.0, 1.0, 0.0);
 
 layout(std140) uniform General {
     mat4 uProjection;
@@ -95,14 +84,21 @@ layout(std140) uniform General {
     vec4 uShadowCascadeFarPlanes[2];
 };
 
-struct Character {
-    vec4 posScale;
-    vec4 uv;
-};
+bool isFeatureEnabled(int flag) {
+    return (uFeatureMask & flag) != 0;
+}
+)END";
 
-layout(std140) uniform Text {
-    Character uTextChars[MAX_TEXT_CHARS];
+static const string g_glslSkeletalUniforms = R"END(
+const int MAX_BONES = 24;
+
+layout(std140) uniform Skeletal {
+    mat4 uBones[MAX_BONES];
 };
+)END";
+
+static const string g_glslLightingUniforms = R"END(
+const int MAX_LIGHTS = 16;
 
 struct Light {
     vec4 position;
@@ -117,10 +113,10 @@ layout(std140) uniform Lighting {
     int uNumLights;
     Light uLights[MAX_LIGHTS];
 };
+)END";
 
-layout(std140) uniform Skeletal {
-    mat4 uBones[MAX_BONES];
-};
+static const string g_glslParticleUniforms = R"END(
+const int MAX_PARTICLES = 64;
 
 struct Particle {
     vec4 positionFrame;
@@ -134,6 +130,10 @@ layout(std140) uniform Particles {
     ivec2 uParticleGridSize;
     Particle uParticles[MAX_PARTICLES];
 };
+)END";
+
+static const string g_glslGrassUniforms = R"END(
+const int MAX_GRASS_CLUSTERS = 256;
 
 struct GrassCluster {
     vec4 positionVariant;
@@ -145,10 +145,19 @@ layout(std140) uniform Grass {
     float uGrassRadius;
     GrassCluster uGrassClusters[MAX_GRASS_CLUSTERS];
 };
+)END";
 
-bool isFeatureEnabled(int flag) {
-    return (uFeatureMask & flag) != 0;
-}
+static const string g_glslTextUniforms = R"END(
+const int MAX_TEXT_CHARS = 128;
+
+struct Character {
+    vec4 posScale;
+    vec4 uv;
+};
+
+layout(std140) uniform Text {
+    Character uTextChars[MAX_TEXT_CHARS];
+};
 )END";
 
 static const string g_vsSimple = R"END(
@@ -366,6 +375,8 @@ void main() {
 )END";
 
 static const string g_gsPointLightShadows = R"END(
+const int NUM_CUBE_FACES = 6;
+
 layout(triangles) in;
 layout(triangle_strip, max_vertices=18) out;
 
@@ -385,6 +396,8 @@ void main() {
 )END";
 
 static const string g_gsDirectionalLightShadows = R"END(
+const int NUM_SHADOW_CASCADES = 8;
+
 layout(triangles) in;
 layout(triangle_strip, max_vertices=12) out;
 
@@ -424,6 +437,9 @@ void main() {
 )END";
 
 static const string g_fsBlinnPhong = R"END(
+const int NUM_SHADOW_CASCADES = 8;
+const float SHININESS = 8.0;
+
 const int LIGHT_DYNTYPE_AREA = 1;
 const int LIGHT_DYNTYPE_OBJECT = 2;
 const int LIGHT_DYNTYPE_BOTH = LIGHT_DYNTYPE_AREA | LIGHT_DYNTYPE_OBJECT;
@@ -1256,30 +1272,30 @@ void Shaders::init() {
     }
 
     // Shaders
-    auto vsSimple = initShader(ShaderType::Vertex, {g_glslHeader, g_vsSimple});
-    auto vsShadows = initShader(ShaderType::Vertex, {g_glslHeader, g_vsShadows});
-    auto vsModel = initShader(ShaderType::Vertex, {g_glslHeader, g_vsModel});
-    auto vsBillboard = initShader(ShaderType::Vertex, {g_glslHeader, g_vsBillboard});
-    auto vsParticle = initShader(ShaderType::Vertex, {g_glslHeader, g_vsParticle});
-    auto vsGrass = initShader(ShaderType::Vertex, {g_glslHeader, g_vsGrass});
-    auto vsText = initShader(ShaderType::Vertex, {g_glslHeader, g_vsText});
+    auto vsSimple = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_vsSimple});
+    auto vsShadows = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_vsShadows});
+    auto vsModel = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslSkeletalUniforms, g_vsModel});
+    auto vsBillboard = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_vsBillboard});
+    auto vsParticle = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_vsParticle});
+    auto vsGrass = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_vsGrass});
+    auto vsText = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslTextUniforms, g_vsText});
     auto vsSSR = initShader(ShaderType::Vertex, {g_glslHeader, g_vsSSR});
-    auto gsPointLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_gsPointLightShadows});
-    auto gsDirectionalLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_gsDirectionalLightShadows});
-    auto fsColor = initShader(ShaderType::Fragment, {g_glslHeader, g_fsColor});
-    auto fsPointLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsPointLightShadows});
+    auto gsPointLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_glslGeneralUniforms, g_gsPointLightShadows});
+    auto gsDirectionalLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_glslGeneralUniforms, g_gsDirectionalLightShadows});
+    auto fsColor = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsColor});
+    auto fsPointLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsPointLightShadows});
     auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDirectionalLightShadows});
-    auto fsBlinnPhong = initShader(ShaderType::Fragment, {g_glslHeader, g_fsBlinnPhong});
-    auto fsBillboard = initShader(ShaderType::Fragment, {g_glslHeader, g_fsBillboard});
-    auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_fsParticle});
-    auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_fsGrass});
-    auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_fsSSR});
-    auto fsBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_fsBlur});
+    auto fsBlinnPhong = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_fsBlinnPhong});
+    auto fsBillboard = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBillboard});
+    auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_fsParticle});
+    auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_fsGrass});
+    auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSR});
+    auto fsBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBlur});
     auto fsBloom = initShader(ShaderType::Fragment, {g_glslHeader, g_fsBloom});
-    auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_fsFXAA});
+    auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsFXAA});
     auto fsPresentWorld = initShader(ShaderType::Fragment, {g_glslHeader, g_fsPresentWorld});
-    auto fsGUI = initShader(ShaderType::Fragment, {g_glslHeader, g_fsGUI});
-    auto fsText = initShader(ShaderType::Fragment, {g_glslHeader, g_fsText});
+    auto fsGUI = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGUI});
+    auto fsText = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslTextUniforms, g_fsText});
 
     // Shader Programs
     _spSimpleColor = initShaderProgram({vsSimple, fsColor});
