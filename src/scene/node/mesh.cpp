@@ -171,49 +171,27 @@ bool MeshSceneNode::shouldCastShadows() const {
     }
 }
 
-bool MeshSceneNode::isTransparent() const {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
-    if (!mesh) {
-        return false; // Meshless nodes are opaque
-    }
-
-    // Character models are opaque
-    if (_model.model().classification() == MdlClassification::character) {
-        return false;
-    }
-
-    // Model nodes with alpha less than 1.0 are transparent
-    if (_alpha < 1.0f) {
-        return true;
-    }
-
-    // Model nodes without a diffuse texture are opaque
+bool MeshSceneNode::isBlendable() const {
     if (!_nodeTextures.diffuse) {
         return false;
     }
-
-    // Model nodes with transparency hint greater than 0 are transparent
-    if (mesh->transparency > 0) {
+    auto blending = _nodeTextures.diffuse->features().blending;
+    switch (blending) {
+    case Texture::Blending::Additive:
+        return true;
+    case Texture::Blending::PunchThrough:
+        return false;
+    default:
+        break;
+    }
+    if (_alpha < 1.0f) {
         return true;
     }
-
-    // Model nodes with additive diffuse texture are opaque
-    if (_nodeTextures.diffuse->isAdditive()) {
+    auto mesh = _modelNode->mesh();
+    if (mesh && mesh->transparency > 0) {
         return true;
     }
-
-    // Model nodes with an environment map or a bump map are opaque
-    if (_nodeTextures.envmap || _nodeTextures.bumpmap) {
-        return false;
-    }
-
-    // Model nodes with RGB diffuse textures are opaque
-    PixelFormat format = _nodeTextures.diffuse->pixelFormat();
-    if (format == PixelFormat::RGB8 || format == PixelFormat::BGR8 || format == PixelFormat::DXT1) {
-        return false;
-    }
-
-    return true;
+    return false;
 }
 
 static bool isLightingEnabledByUsage(ModelUsage usage) {
@@ -231,7 +209,7 @@ static bool isReceivingShadows(const ModelSceneNode &model, const MeshSceneNode 
 
 void MeshSceneNode::draw() {
     shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
-    if (!mesh) {
+    if (!mesh || !_nodeTextures.diffuse) {
         return;
     }
     auto &uniforms = _shaders.uniforms();
@@ -243,11 +221,25 @@ void MeshSceneNode::draw() {
         glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
         glm::vec4(_uvOffset.x, _uvOffset.y, 0.0f, 0.0f));
 
-    bool additive = false;
+    auto blendMode = BlendMode::None;
     if (_nodeTextures.diffuse) {
         uniforms.general.featureMask |= UniformsFeatureFlags::diffuse;
         _textures.bind(*_nodeTextures.diffuse, TextureUnits::diffuseMap);
-        additive = _nodeTextures.diffuse->isAdditive();
+        switch (_nodeTextures.diffuse->features().blending) {
+        case Texture::Blending::PunchThrough:
+            uniforms.general.featureMask |= UniformsFeatureFlags::alphatest;
+            break;
+        case Texture::Blending::Additive:
+            blendMode = BlendMode::Additive;
+            break;
+        default:
+            if (isBlendable()) {
+                blendMode = BlendMode::Normal;
+            } else {
+                uniforms.general.featureMask |= UniformsFeatureFlags::alphatest;
+            }
+            break;
+        }
         float waterAlpha = _nodeTextures.diffuse->features().waterAlpha;
         if (waterAlpha != -1.0f) {
             uniforms.general.featureMask |= UniformsFeatureFlags::water;
@@ -347,8 +339,7 @@ void MeshSceneNode::draw() {
         uniforms.general.featureMask |= UniformsFeatureFlags::fog;
     }
     _shaders.use(_shaders.blinnPhong(), true);
-    _graphicsContext.withFaceCulling(CullFaceMode::Back, [this, &additive, &mesh]() {
-        auto blendMode = additive ? BlendMode::Add : BlendMode::Default;
+    _graphicsContext.withFaceCulling(CullFaceMode::Back, [this, &blendMode, &mesh]() {
         _graphicsContext.withBlending(blendMode, [this, &mesh]() {
             mesh->mesh->draw();
         });
@@ -379,7 +370,7 @@ bool MeshSceneNode::isLightingEnabled() const {
         return false;
     }
     // Lighting is disabled when diffuse texture is additive
-    if (_nodeTextures.diffuse && _nodeTextures.diffuse->isAdditive()) {
+    if (_nodeTextures.diffuse && _nodeTextures.diffuse->features().blending == Texture::Blending::Additive) {
         return false;
     }
     return true;

@@ -150,7 +150,7 @@ public:
         enum class BlendMode {
             Invalid,
             Normal,
-            Punch,
+            PunchThrough,
             Lighten
         };
 
@@ -160,6 +160,7 @@ public:
         std::shared_ptr<Texture> texture;
         glm::ivec2 gridSize {0};
         int renderOrder {0};
+        bool twosided {false};
         bool loop {false};
         bool p2p {false};
         bool p2pBezier {false};

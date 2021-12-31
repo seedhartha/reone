@@ -93,7 +93,6 @@ private:
 
     std::shared_ptr<Texture> _cbGeometry1;
     std::shared_ptr<Texture> _cbGeometry2;
-    std::shared_ptr<Texture> _cbGeometry3;
     std::shared_ptr<Texture> _cbGeometryEyeNormal;
     std::shared_ptr<Texture> _cbGeometryRoughness;
     std::shared_ptr<Texture> _cbSSR;

@@ -275,29 +275,31 @@ void GUI::update(float dt) {
 }
 
 void GUI::draw() {
-    if (_background) {
-        drawBackground();
-    }
-    if (_rootControl) {
-        _rootControl->draw(_rootOffset, _rootControl->textLines());
-    }
-    for (auto &control : _controls) {
-        if (!control->isVisible()) {
-            continue;
+    _graphicsContext.withBlending(BlendMode::Normal, [this]() {
+        if (_background) {
+            drawBackground();
         }
-        control->draw(_controlOffset, control->textLines());
-        const string &sceneName = control->sceneName();
-        if (sceneName.empty()) {
-            continue;
+        if (_rootControl) {
+            _rootControl->draw(_rootOffset, _rootControl->textLines());
         }
-        glm::ivec4 extent(
-            control->extent().left,
-            control->extent().top,
-            control->extent().width,
-            control->extent().height);
+        for (auto &control : _controls) {
+            if (!control->isVisible()) {
+                continue;
+            }
+            control->draw(_controlOffset, control->textLines());
+            const string &sceneName = control->sceneName();
+            if (sceneName.empty()) {
+                continue;
+            }
+            glm::ivec4 extent(
+                control->extent().left,
+                control->extent().top,
+                control->extent().width,
+                control->extent().height);
 
-        _controlPipeline.draw(_sceneGraphs.get(sceneName), extent, _controlOffset);
-    }
+            _controlPipeline.draw(_sceneGraphs.get(sceneName), extent, _controlOffset);
+        }
+    });
 }
 
 void GUI::drawBackground() {

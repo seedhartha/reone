@@ -17,6 +17,7 @@
 
 #include "scrollbar.h"
 
+#include "../../graphics/context.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/renderbuffer.h"

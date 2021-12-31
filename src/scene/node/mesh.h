@@ -67,7 +67,7 @@ public:
     bool shouldRender() const;
     bool shouldCastShadows() const;
 
-    bool isTransparent() const;
+    bool isBlendable() const;
     bool isSelfIlluminated() const;
 
     ModelSceneNode &model() { return _model; }
@@ -98,7 +98,7 @@ private:
     int _bumpmapCycleFrame {0};
     float _alpha {1.0f};
     glm::vec3 _selfIllumColor {0.0f};
-    bool _transparent {false};
+    bool _blendable {false};
 
     void initTextures();
 

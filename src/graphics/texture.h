@@ -45,7 +45,8 @@ public:
 
     enum class Blending {
         None,
-        Additive
+        Additive,
+        PunchThrough
     };
 
     enum class ProcedureType {
@@ -108,7 +109,6 @@ public:
     bool isLookup() const { return _properties.lookup; }
     bool is2DArray() const { return _layers.size() > 1ll && !_properties.cubemap; }
 
-    bool isAdditive() const { return _features.blending == Blending::Additive; }
     bool isGrayscale() const { return _pixelFormat == PixelFormat::R8; }
 
     bool isTexture() const override { return true; }

@@ -17,6 +17,7 @@
 
 #include "font.h"
 
+#include "context.h"
 #include "mesh.h"
 #include "meshes.h"
 #include "shaders.h"

@@ -125,6 +125,8 @@ Texture::Blending TxiReader::parseBlending(const string &s) const {
     auto result = Texture::Blending::None;
     if (s == "additive") {
         result = Texture::Blending::Additive;
+    } else if (s == "punchthrough") {
+        result = Texture::Blending::PunchThrough;
     } else {
         debug("TXI: unsupported blending: " + s);
     }

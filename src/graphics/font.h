@@ -23,6 +23,7 @@ namespace reone {
 
 namespace graphics {
 
+class GraphicsContext;
 class Meshes;
 class Shaders;
 class Texture;
@@ -31,7 +32,8 @@ class Window;
 
 class Font {
 public:
-    Font(Meshes &meshes, Shaders &shaders, Textures &textures, Window &window) :
+    Font(GraphicsContext &graphicsContext, Meshes &meshes, Shaders &shaders, Textures &textures, Window &window) :
+        _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
         _textures(textures),
@@ -57,6 +59,7 @@ private:
         glm::vec2 size {0.0f};
     };
 
+    GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
     Textures &_textures;

@@ -41,6 +41,7 @@ struct UniformsFeatureFlags {
     static constexpr int fog = 0x4000;
     static constexpr int danglymesh = 0x8000;
     static constexpr int fixedsize = 0x10000;
+    static constexpr int alphatest = 0x20000;
 };
 
 struct GeneralUniforms {
