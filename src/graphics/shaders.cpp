@@ -169,13 +169,17 @@ float hash(vec3 p) {
 }
 
 void alphaTest(float a, vec2 p) {
-    if (a < hash(p)) {
+    float pixDeriv = max(length(dFdx(p)), length(dFdy(p)));
+    float pixScale = 1.0 / pixDeriv;
+    if (a < hash(floor(pixScale * p))) {
         discard;
     }
 }
 
 void alphaTest(float a, vec3 p) {
-    if (a < hash(p)) {
+    float pixDeriv = max(length(dFdx(p.xy)), length(dFdy(p.xy)));
+    float pixScale = 1.0 / pixDeriv;
+    if (a < hash(floor(pixScale * p))) {
         discard;
     }
 }
@@ -663,9 +667,12 @@ vec3 applyFog(vec3 objectColor) {
 void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
 
-    vec4 diffuseSample = vec4(vec3(0.0), 1.0);
+    vec3 diffuseColor = vec3(0.0);
+    float diffuseAlpha = 1.0;
     if (isFeatureEnabled(FEATURE_DIFFUSE)) {
-        diffuseSample = texture(sDiffuseMap, uv);
+        vec4 diffuseSample = texture(sDiffuseMap, uv);
+        diffuseColor = diffuseSample.rgb;
+        diffuseAlpha = diffuseSample.a;
     }
 
     vec3 N = getNormal(uv);
@@ -673,7 +680,7 @@ void main() {
 
     float objectAlpha = uAlpha;
     if (isFeatureEnabled(FEATURE_DIFFUSE) && !isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_NORMALMAP)) {
-        objectAlpha *= diffuseSample.a;
+        objectAlpha *= diffuseAlpha;
     }
     if (isFeatureEnabled(FEATURE_ALPHATEST)) {
         alphaTest(objectAlpha, uv);
@@ -697,13 +704,13 @@ void main() {
         lighting = vec3(1.0);
     }
 
-    vec3 objectColor = lighting * uColor.rgb * diffuseSample.rgb;
+    vec3 objectColor = lighting * uColor.rgb * diffuseColor;
     float roughness = 1.0;
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
         vec3 I = normalize(fragPosWorldSpace - uCameraPosition.xyz);
         vec3 R = reflect(I, N);
         vec4 envmapSample = texture(sEnvironmentMap, R);
-        roughness = diffuseSample.a;
+        roughness = diffuseAlpha;
         objectColor += envmapSample.rgb * (1.0 - roughness);
     }
     if (isFeatureEnabled(FEATURE_FOG)) {
@@ -715,7 +722,7 @@ void main() {
 
     vec3 objectColorBright = vec3(0.0);
     if (isFeatureEnabled(FEATURE_SELFILLUM)) {
-        objectColorBright = smoothstep(SELFILLUM_THRESHOLD, 1.0, uSelfIllumColor.rgb * diffuseSample.rgb * diffuseSample.a);
+        objectColorBright = smoothstep(SELFILLUM_THRESHOLD, 1.0, uSelfIllumColor.rgb * diffuseColor * diffuseAlpha);
     }
 
     vec3 eyeNormal = transpose(inverse(mat3(uView))) * N;
@@ -778,6 +785,7 @@ void main() {
 
     vec4 diffuseSample = texture(sDiffuseMap, uv);
     vec3 objectColor = uParticles[fragInstanceID].color.rgb * diffuseSample.rgb;
+
     float objectAlpha = uParticles[fragInstanceID].color.a * diffuseSample.a;
     if (isFeatureEnabled(FEATURE_ALPHATEST)) {
         alphaTest(objectAlpha, uv);
@@ -813,8 +821,8 @@ void main() {
     uv.x += 0.5 * (int(uGrassClusters[fragInstanceID].positionVariant[3]) % 2);
 
     vec4 diffuseSample = texture(sDiffuseMap, uv);
-    vec3 objectColor = diffuseSample.rgb;
 
+    vec3 objectColor = diffuseSample.rgb;
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(sLightmap, uGrassClusters[fragInstanceID].lightmapUV);
         objectColor *= lightmapSample.rgb;
