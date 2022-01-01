@@ -38,6 +38,7 @@ public:
     Uniforms &uniforms() { return _uniforms; }
 
     ShaderProgram &simpleColor() const { return *_spSimpleColor; }
+    ShaderProgram &simpleTexture() const { return *_spSimpleTexture; }
     ShaderProgram &pointLightShadows() const { return *_spPointLightShadows; }
     ShaderProgram &directionalLightShadows() const { return *_spDirectionalLightShadows; }
     ShaderProgram &blinnPhong() const { return *_spBlinnPhong; }
@@ -48,7 +49,6 @@ public:
     ShaderProgram &blur() const { return *_spBlur; }
     ShaderProgram &bloom() const { return *_spBloom; }
     ShaderProgram &fxaa() const { return *_spFXAA; }
-    ShaderProgram &presentWorld() const { return *_spPresentWorld; }
     ShaderProgram &gui() const { return *_spGUI; }
     ShaderProgram &text() const { return *_spText; }
 
@@ -61,6 +61,7 @@ private:
     // Shader Programs
 
     std::shared_ptr<ShaderProgram> _spSimpleColor;
+    std::shared_ptr<ShaderProgram> _spSimpleTexture;
     std::shared_ptr<ShaderProgram> _spPointLightShadows;
     std::shared_ptr<ShaderProgram> _spDirectionalLightShadows;
     std::shared_ptr<ShaderProgram> _spBlinnPhong;
@@ -71,7 +72,6 @@ private:
     std::shared_ptr<ShaderProgram> _spBlur;
     std::shared_ptr<ShaderProgram> _spBloom;
     std::shared_ptr<ShaderProgram> _spFXAA;
-    std::shared_ptr<ShaderProgram> _spPresentWorld;
     std::shared_ptr<ShaderProgram> _spGUI;
     std::shared_ptr<ShaderProgram> _spText;
 

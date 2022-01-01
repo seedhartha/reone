@@ -33,10 +33,16 @@ void GraphicsContext::init() {
     glEnable(GL_DEPTH_TEST);
 
     glDepthFunc(GL_LEQUAL);
-    setCullFaceMode(CullFaceMode::None);
-    setBlendMode(BlendMode::None);
 
-    glGetIntegerv(GL_VIEWPORT, &_viewport[0]);
+    setCullFaceMode(CullFaceMode::None);
+    _cullFaceModes.push(CullFaceMode::None);
+
+    setBlendMode(BlendMode::None);
+    _blendModes.push(BlendMode::None);
+
+    glm::ivec4 viewport(0.0f);
+    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
+    _viewports.push(move(viewport));
 
     _inited = true;
 }
@@ -50,35 +56,46 @@ void GraphicsContext::clearDepth() {
 }
 
 void GraphicsContext::withBlending(BlendMode mode, const function<void()> &block) {
-    auto oldBlendMode = _blendMode;
-    if (oldBlendMode == mode) {
+    if (_blendModes.top() == mode) {
         block();
         return;
     }
+
     setBlendMode(mode);
+    _blendModes.push(mode);
+
     block();
-    setBlendMode(oldBlendMode);
+
+    _blendModes.pop();
+    setBlendMode(_blendModes.top());
 }
 
 void GraphicsContext::withFaceCulling(CullFaceMode mode, const function<void()> &block) {
-    auto oldCullFaceMode = _cullFaceMode;
-    if (oldCullFaceMode == mode) {
+    if (_cullFaceModes.top() == mode) {
         block();
         return;
     }
     setCullFaceMode(mode);
+    _cullFaceModes.push(mode);
+
     block();
-    setCullFaceMode(oldCullFaceMode);
+
+    _cullFaceModes.pop();
+    setCullFaceMode(_cullFaceModes.top());
 }
 
 void GraphicsContext::withViewport(glm::ivec4 viewport, const function<void()> &block) {
-    if (_viewport == viewport) {
+    if (_viewports.top() == viewport) {
         block();
         return;
     }
-    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+    setViewport(viewport);
+    _viewports.push(viewport);
+
     block();
-    glViewport(_viewport[0], _viewport[1], _viewport[2], _viewport[3]);
+
+    _viewports.pop();
+    setViewport(_viewports.top());
 }
 
 void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<void()> &block) {
@@ -102,9 +119,6 @@ void GraphicsContext::withoutDepthTest(const function<void()> &block) {
 }
 
 void GraphicsContext::setCullFaceMode(CullFaceMode mode) {
-    if (_cullFaceMode == mode) {
-        return;
-    }
     if (mode == CullFaceMode::None) {
         glDisable(GL_CULL_FACE);
     } else {
@@ -115,13 +129,9 @@ void GraphicsContext::setCullFaceMode(CullFaceMode mode) {
             glCullFace(GL_BACK);
         }
     }
-    _cullFaceMode = mode;
 }
 
 void GraphicsContext::setBlendMode(BlendMode mode) {
-    if (_blendMode == mode) {
-        return;
-    }
     if (mode == BlendMode::None) {
         glDisable(GL_BLEND);
     } else {
@@ -142,7 +152,10 @@ void GraphicsContext::setBlendMode(BlendMode mode) {
             break;
         }
     }
-    _blendMode = mode;
+}
+
+void GraphicsContext::setViewport(glm::ivec4 viewport) {
+    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 }
 
 } // namespace graphics

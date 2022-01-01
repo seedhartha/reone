@@ -448,6 +448,18 @@ void main() {
 }
 )END";
 
+static const string g_fsTexture = R"END(
+uniform sampler2D sDiffuseMap;
+
+in vec2 fragUV1;
+
+out vec4 fragColor;
+
+void main() {
+    fragColor = texture(sDiffuseMap, fragUV1);
+}
+)END";
+
 static const string g_fsPointLightShadows = R"END(
 in vec4 fragPosWorldSpace;
 
@@ -1243,18 +1255,6 @@ void main() {
 }
 )END";
 
-static const string g_fsPresentWorld = R"END(
-uniform sampler2D sDiffuseMap;
-
-in vec2 fragUV1;
-
-out vec4 fragColor;
-
-void main() {
-    fragColor = texture(sDiffuseMap, fragUV1);
-}
-)END";
-
 static const string g_fsGUI = R"END(
 uniform sampler2D sDiffuseMap;
 
@@ -1306,6 +1306,7 @@ void Shaders::init() {
     auto gsPointLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_glslGeneralUniforms, g_gsPointLightShadows});
     auto gsDirectionalLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_glslGeneralUniforms, g_gsDirectionalLightShadows});
     auto fsColor = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsColor});
+    auto fsTexture = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsTexture});
     auto fsPointLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsPointLightShadows});
     auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDirectionalLightShadows});
     auto fsBlinnPhong = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslAlphaTest, g_fsBlinnPhong});
@@ -1316,12 +1317,12 @@ void Shaders::init() {
     auto fsBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBlur});
     auto fsBloom = initShader(ShaderType::Fragment, {g_glslHeader, g_fsBloom});
     auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsFXAA});
-    auto fsPresentWorld = initShader(ShaderType::Fragment, {g_glslHeader, g_fsPresentWorld});
     auto fsGUI = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGUI});
     auto fsText = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslTextUniforms, g_fsText});
 
     // Shader Programs
     _spSimpleColor = initShaderProgram({vsSimple, fsColor});
+    _spSimpleTexture = initShaderProgram({vsSimple, fsTexture});
     _spPointLightShadows = initShaderProgram({vsShadows, gsPointLightShadows, fsPointLightShadows});
     _spDirectionalLightShadows = initShaderProgram({vsShadows, gsDirectionalLightShadows, fsDirectionalLightShadows});
     _spBlinnPhong = initShaderProgram({vsModel, fsBlinnPhong});
@@ -1332,7 +1333,6 @@ void Shaders::init() {
     _spBlur = initShaderProgram({vsSimple, fsBlur});
     _spBloom = initShaderProgram({vsSimple, fsBloom});
     _spFXAA = initShaderProgram({vsSimple, fsFXAA});
-    _spPresentWorld = initShaderProgram({vsSimple, fsPresentWorld});
     _spGUI = initShaderProgram({vsSimple, fsGUI});
     _spText = initShaderProgram({vsText, fsText});
 
@@ -1360,6 +1360,7 @@ void Shaders::deinit() {
 
     // Shader Programs
     _spSimpleColor.reset();
+    _spSimpleTexture.reset();
     _spPointLightShadows.reset();
     _spDirectionalLightShadows.reset();
     _spBlinnPhong.reset();
@@ -1370,7 +1371,6 @@ void Shaders::deinit() {
     _spBlur.reset();
     _spBloom.reset();
     _spFXAA.reset();
-    _spPresentWorld.reset();
     _spGUI.reset();
     _spText.reset();
 

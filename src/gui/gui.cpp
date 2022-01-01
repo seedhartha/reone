@@ -21,7 +21,7 @@
 #include "../graphics/context.h"
 #include "../graphics/mesh.h"
 #include "../graphics/meshes.h"
-#include "../graphics/pipeline/control.h"
+#include "../graphics/pipeline.h"
 #include "../graphics/shaders.h"
 #include "../graphics/texture.h"
 #include "../graphics/textures.h"
@@ -55,10 +55,10 @@ namespace gui {
 GUI::GUI(
     GraphicsOptions options,
     SceneGraphs &sceneGraphs,
-    GraphicsContext &graphicsContext,
-    ControlPipeline &controlPipeline,
     Fonts &fonts,
+    GraphicsContext &graphicsContext,
     Meshes &meshes,
+    Pipeline &pipeline,
     Shaders &shaders,
     Textures &textures,
     Window &window,
@@ -67,10 +67,10 @@ GUI::GUI(
     Strings &strings) :
     _options(move(options)),
     _sceneGraphs(sceneGraphs),
-    _graphicsContext(graphicsContext),
-    _controlPipeline(controlPipeline),
     _fonts(fonts),
+    _graphicsContext(graphicsContext),
     _meshes(meshes),
+    _pipeline(pipeline),
     _shaders(shaders),
     _textures(textures),
     _window(window),
@@ -269,7 +269,6 @@ void GUI::update(float dt) {
                 control->extent().height);
 
             _sceneGraphs.get(sceneName).update(dt);
-            _controlPipeline.prepareFor(extent);
         }
     }
 }
@@ -291,13 +290,28 @@ void GUI::draw() {
             if (sceneName.empty()) {
                 continue;
             }
-            glm::ivec4 extent(
-                control->extent().left,
-                control->extent().top,
-                control->extent().width,
-                control->extent().height);
-
-            _controlPipeline.draw(_sceneGraphs.get(sceneName), extent, _controlOffset);
+            int x = control->extent().left;
+            int y = control->extent().top;
+            int w = control->extent().width;
+            int h = control->extent().height;
+            glm::mat4 projection(glm::ortho(
+                0.0f,
+                static_cast<float>(_options.width),
+                static_cast<float>(_options.height),
+                0.0f));
+            glm::mat4 transform(1.0f);
+            transform = glm::translate(transform, glm::vec3(x + _controlOffset.x, y + _controlOffset.y, 0.0f));
+            transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
+            auto output = _pipeline.draw(_sceneGraphs.get(sceneName), {w, h});
+            auto &uniforms = _shaders.uniforms();
+            uniforms.general.resetGlobals();
+            uniforms.general.resetLocals();
+            uniforms.general.projection = move(projection);
+            uniforms.general.model = move(transform);
+            _shaders.use(_shaders.gui(), true);
+            _graphicsContext.withoutDepthTest([this]() {
+                _meshes.quad().draw();
+            });
         }
     });
 }

@@ -40,10 +40,10 @@ GameGUI::GameGUI(KotOR &game, Services &services) :
     GUI(
         game.options().graphics,
         services.sceneGraphs,
-        services.graphicsContext,
-        services.controlPipeline,
         services.fonts,
+        services.graphicsContext,
         services.meshes,
+        services.pipeline,
         services.shaders,
         services.textures,
         services.window,
