@@ -34,10 +34,10 @@ class Strings;
 
 namespace graphics {
 
-class GraphicsContext;
-class ControlPipeline;
 class Fonts;
+class GraphicsContext;
 class Meshes;
+class Pipeline;
 class Shaders;
 class Texture;
 class Window;
@@ -97,10 +97,10 @@ protected:
 
     scene::SceneGraphs &_sceneGraphs;
 
-    graphics::GraphicsContext &_graphicsContext;
-    graphics::ControlPipeline &_controlPipeline;
     graphics::Fonts &_fonts;
+    graphics::GraphicsContext &_graphicsContext;
     graphics::Meshes &_meshes;
+    graphics::Pipeline &_pipeline;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
     graphics::Window &_window;
@@ -114,10 +114,10 @@ protected:
     GUI(
         graphics::GraphicsOptions options,
         scene::SceneGraphs &sceneGraphs,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::ControlPipeline &controlPipeline,
         graphics::Fonts &fonts,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
+        graphics::Pipeline &pipeline,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,

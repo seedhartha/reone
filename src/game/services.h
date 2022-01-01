@@ -30,17 +30,16 @@ class TwoDas;
 
 namespace graphics {
 
-class GraphicsContext;
-class ControlPipeline;
 class Fonts;
+class GraphicsContext;
 class LipAnimations;
 class Meshes;
 class Models;
+class Pipeline;
 class Shaders;
 class Textures;
 class Walkmeshes;
 class Window;
-class WorldPipeline;
 
 } // namespace graphics
 
@@ -104,17 +103,16 @@ struct Services {
     audio::AudioContext &audioContext;
     audio::AudioFiles &audioFiles;
     audio::AudioPlayer &audioPlayer;
-    graphics::GraphicsContext &graphicsContext;
-    graphics::ControlPipeline &controlPipeline;
     graphics::Fonts &fonts;
+    graphics::GraphicsContext &graphicsContext;
     graphics::LipAnimations &lipAnimations;
     graphics::Meshes &meshes;
     graphics::Models &models;
+    graphics::Pipeline &pipeline;
     graphics::Shaders &shaders;
     graphics::Textures &textures;
     graphics::Walkmeshes &walkmeshes;
     graphics::Window &window;
-    graphics::WorldPipeline &worldPipeline;
     scene::SceneGraphs &sceneGraphs;
     script::Scripts &scripts;
     resource::Gffs &gffs;
@@ -142,17 +140,16 @@ struct Services {
         audio::AudioContext &audioContext,
         audio::AudioFiles &audioFiles,
         audio::AudioPlayer &audioPlayer,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::ControlPipeline &controlPipeline,
         graphics::Fonts &fonts,
+        graphics::GraphicsContext &graphicsContext,
         graphics::LipAnimations &lipAnimations,
         graphics::Meshes &meshes,
         graphics::Models &models,
+        graphics::Pipeline &pipeline,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
-        graphics::WorldPipeline &worldPipeline,
         scene::SceneGraphs &sceneGraphs,
         script::Scripts &scripts,
         resource::Gffs &gffs,
@@ -179,17 +176,16 @@ struct Services {
         audioContext(audioContext),
         audioFiles(audioFiles),
         audioPlayer(audioPlayer),
-        graphicsContext(graphicsContext),
-        controlPipeline(controlPipeline),
         fonts(fonts),
+        graphicsContext(graphicsContext),
         lipAnimations(lipAnimations),
         meshes(meshes),
         models(models),
+        pipeline(pipeline),
         shaders(shaders),
         textures(textures),
         walkmeshes(walkmeshes),
         window(window),
-        worldPipeline(worldPipeline),
         sceneGraphs(sceneGraphs),
         scripts(scripts),
         gffs(gffs),

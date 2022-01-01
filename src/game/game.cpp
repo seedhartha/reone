@@ -26,12 +26,16 @@
 #include "../../common/pathutil.h"
 #include "../../common/streamutil.h"
 #include "../../common/streamwriter.h"
+#include "../../graphics/context.h"
 #include "../../graphics/format/tgawriter.h"
 #include "../../graphics/lipanimations.h"
+#include "../../graphics/meshes.h"
 #include "../../graphics/models.h"
-#include "../../graphics/pipeline/world.h"
+#include "../../graphics/pipeline.h"
 #include "../../graphics/renderbuffer.h"
+#include "../../graphics/shaders.h"
 #include "../../graphics/textures.h"
+#include "../../graphics/uniforms.h"
 #include "../../graphics/walkmeshes.h"
 #include "../../graphics/window.h"
 #include "../../gui/gui.h"
@@ -134,6 +138,8 @@ void Game::update() {
 }
 
 void Game::drawAll() {
+    _services.graphicsContext.clearColorDepth();
+
     if (_movie) {
         _movie->draw();
     } else {
@@ -282,7 +288,18 @@ void Game::playMusic(const string &resRef) {
 }
 
 void Game::drawWorld() {
-    _services.worldPipeline.draw();
+    auto &scene = _services.sceneGraphs.get(kSceneMain);
+    auto output = _services.pipeline.draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
+    if (!output) {
+        return;
+    }
+
+    auto &uniforms = _services.shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
+
+    _services.shaders.use(_services.shaders.simpleTexture(), true);
+    _services.meshes.quadNDC().draw();
 }
 
 void Game::toggleInGameCameraType() {

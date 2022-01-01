@@ -47,14 +47,19 @@ private:
 
     bool _inited {false};
 
-    bool _depthTest {true};
-    CullFaceMode _cullFaceMode {CullFaceMode::None};
-    BlendMode _blendMode {BlendMode::None};
+    // States
 
-    glm::ivec4 _viewport {0};
+    bool _depthTest {true};
+
+    std::stack<CullFaceMode> _cullFaceModes;
+    std::stack<BlendMode> _blendModes;
+    std::stack<glm::ivec4> _viewports;
+
+    // END States
 
     void setCullFaceMode(CullFaceMode mode);
     void setBlendMode(BlendMode mode);
+    void setViewport(glm::ivec4 viewport);
 };
 
 } // namespace graphics

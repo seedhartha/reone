@@ -49,8 +49,6 @@ void SceneModule::init() {
     }
     _sceneGraphs->add(kScenePortraitSelect);
     _sceneGraphs->add(kSceneCharacter);
-
-    _graphics.worldPipeline().setScene(_sceneGraphs->get(kSceneMain));
 }
 
 void SceneModule::deinit() {

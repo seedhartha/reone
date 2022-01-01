@@ -28,7 +28,7 @@
 #include "../../graphics/format/tgawriter.h"
 #include "../../graphics/lipanimations.h"
 #include "../../graphics/models.h"
-#include "../../graphics/pipeline/world.h"
+#include "../../graphics/pipeline.h"
 #include "../../graphics/renderbuffer.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/walkmeshes.h"
@@ -349,10 +349,6 @@ void KotOR::openInGame() {
 }
 
 void KotOR::openInGameMenu(InGameMenuTab tab) {
-    // Take a screenshot to be used in SaveLoad menu
-    _services.worldPipeline.setTakeScreenshot(true);
-    _services.worldPipeline.draw();
-
     setCursorType(CursorType::Default);
     switch (tab) {
     case InGameMenuTab::Equipment:
