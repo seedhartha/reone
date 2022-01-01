@@ -303,24 +303,21 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
 
     _shaders.use(_shaders.particle(), true);
     _textures.bind(*texture, TextureUnits::diffuseMap);
-    auto cullFaceMode = emitter->twosided ? CullFaceMode::None : CullFaceMode::Back;
-    _graphicsContext.withFaceCulling(cullFaceMode, [this, &emitter, &leafs] {
-        BlendMode blendMode;
-        switch (emitter->blendMode) {
-        case ModelNode::Emitter::BlendMode::PunchThrough:
-            blendMode = BlendMode::None;
-            break;
-        case ModelNode::Emitter::BlendMode::Lighten:
-            blendMode = BlendMode::Lighten;
-            break;
-        case ModelNode::Emitter::BlendMode::Normal:
-        default:
-            blendMode = BlendMode::Normal;
-            break;
-        }
-        _graphicsContext.withBlending(blendMode, [this, &leafs]() {
-            _meshes.billboard().drawInstanced(leafs.size());
-        });
+    BlendMode blendMode;
+    switch (emitter->blendMode) {
+    case ModelNode::Emitter::BlendMode::PunchThrough:
+        blendMode = BlendMode::None;
+        break;
+    case ModelNode::Emitter::BlendMode::Lighten:
+        blendMode = BlendMode::Lighten;
+        break;
+    case ModelNode::Emitter::BlendMode::Normal:
+    default:
+        blendMode = BlendMode::Normal;
+        break;
+    }
+    _graphicsContext.withBlending(blendMode, [this, &leafs]() {
+        _meshes.billboard().drawInstanced(leafs.size());
     });
 }
 
