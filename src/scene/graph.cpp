@@ -307,7 +307,8 @@ void SceneGraph::prepareLeafs() {
 
     // Add blendable meshes
     for (auto &mesh : _blendableMeshes) {
-        blendableLeafs.push_back(make_pair(mesh, mesh->getSquareDistanceTo(camera->position())));
+        auto eyePos = glm::vec3(camera->view() * mesh->absoluteTransform()[3]);
+        blendableLeafs.push_back(make_pair(mesh, -eyePos.z));
     }
 
     // Add particles
@@ -317,9 +318,11 @@ void SceneGraph::prepareLeafs() {
                 continue;
             }
             auto particle = static_cast<ParticleSceneNode *>(child.get());
-            if (camera->isInFrustum(particle->getOrigin())) {
-                blendableLeafs.push_back(make_pair(particle, particle->getSquareDistanceTo(camera->position())));
+            if (!camera->isInFrustum(particle->getOrigin())) {
+                continue;
             }
+            auto eyePos = glm::vec3(camera->view() * particle->absoluteTransform()[3]);
+            blendableLeafs.push_back(make_pair(particle, -eyePos.z));
         }
     }
 
