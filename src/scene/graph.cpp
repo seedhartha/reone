@@ -116,7 +116,8 @@ void SceneGraph::update(float dt) {
     updateShadowLight(dt);
     updateFlareLights();
     updateSounds();
-    prepareLeafs();
+    prepareOpaqueLeafs();
+    prepareTranslucentLeafs();
 }
 
 void SceneGraph::cullRoots() {
@@ -301,14 +302,48 @@ void SceneGraph::refreshFromNode(const shared_ptr<SceneNode> &node) {
     }
 }
 
-void SceneGraph::prepareLeafs() {
-    vector<pair<SceneNode *, float>> translucentLeafs;
+void SceneGraph::prepareOpaqueLeafs() {
+    _opaqueLeafs.clear();
+
+    vector<SceneNode *> bucket;
+    auto camera = _activeCamera->camera();
+
+    // Group grass clusters into buckets without sorting
+    for (auto &grass : _grassRoots) {
+        if (!grass->isEnabled()) {
+            continue;
+        }
+        for (auto &child : grass->children()) {
+            if (child->type() != SceneNodeType::GrassCluster) {
+                continue;
+            }
+            auto cluster = static_cast<GrassClusterSceneNode *>(child.get());
+            if (!camera->isInFrustum(cluster->getOrigin())) {
+                continue;
+            }
+            if (bucket.size() >= kMaxGrassClusters) {
+                _opaqueLeafs.push_back(make_pair(grass.get(), bucket));
+                bucket.clear();
+            }
+            bucket.push_back(cluster);
+        }
+        if (!bucket.empty()) {
+            _opaqueLeafs.push_back(make_pair(grass.get(), bucket));
+            bucket.clear();
+        }
+    }
+}
+
+void SceneGraph::prepareTranslucentLeafs() {
+    _translucentLeafs.clear();
+
+    vector<pair<SceneNode *, float>> distances;
     auto camera = _activeCamera->camera();
 
     // Calculate view-space position of translucent meshes
     for (auto &mesh : _translucentMeshes) {
         auto eyePos = glm::vec3(camera->view() * mesh->absoluteTransform()[3]);
-        translucentLeafs.push_back(make_pair(mesh, -eyePos.z));
+        distances.push_back(make_pair(mesh, -eyePos.z));
     }
 
     // Calculate view-space position of emitter particles
@@ -322,12 +357,12 @@ void SceneGraph::prepareLeafs() {
                 continue;
             }
             auto eyePos = glm::vec3(camera->view() * particle->absoluteTransform()[3]);
-            translucentLeafs.push_back(make_pair(particle, -eyePos.z));
+            distances.push_back(make_pair(particle, -eyePos.z));
         }
     }
 
     // Sort translucent leafs back to front to ensure correct blending
-    sort(translucentLeafs.begin(), translucentLeafs.end(), [](auto &a, auto &b) {
+    sort(distances.begin(), distances.end(), [](auto &a, auto &b) {
         bool aMesh = a.first->type() == SceneNodeType::Mesh;
         bool bMesh = b.first->type() == SceneNodeType::Mesh;
         if (aMesh && bMesh) {
@@ -345,7 +380,6 @@ void SceneGraph::prepareLeafs() {
         return aDistance > bDistance;
     });
 
-    _leafBuckets.clear();
     SceneNode *bucketParent = nullptr;
     vector<SceneNode *> bucket;
 
@@ -363,19 +397,19 @@ void SceneGraph::prepareLeafs() {
                 continue;
             }
             if (bucket.size() >= kMaxGrassClusters) {
-                _leafBuckets.push_back(make_pair(grass.get(), bucket));
+                _opaqueLeafs.push_back(make_pair(grass.get(), bucket));
                 bucket.clear();
             }
             bucket.push_back(cluster);
         }
         if (!bucket.empty()) {
-            _leafBuckets.push_back(make_pair(grass.get(), bucket));
+            _opaqueLeafs.push_back(make_pair(grass.get(), bucket));
             bucket.clear();
         }
     }
 
     // Group translucent leafs into buckets
-    for (auto &[leaf, _] : translucentLeafs) {
+    for (auto &[leaf, _] : distances) {
         SceneNode *parent = leaf->parent();
         if (leaf->type() == SceneNodeType::Mesh) {
             parent = &static_cast<MeshSceneNode *>(leaf)->model();
@@ -388,7 +422,7 @@ void SceneGraph::prepareLeafs() {
                 maxCount = kMaxGrassClusters;
             }
             if (bucketParent != parent || bucket.size() >= maxCount) {
-                _leafBuckets.push_back(make_pair(bucketParent, bucket));
+                _translucentLeafs.push_back(make_pair(bucketParent, bucket));
                 bucket.clear();
             }
         }
@@ -396,7 +430,7 @@ void SceneGraph::prepareLeafs() {
         bucket.push_back(leaf);
     }
     if (bucketParent && !bucket.empty()) {
-        _leafBuckets.push_back(make_pair(bucketParent, bucket));
+        _translucentLeafs.push_back(make_pair(bucketParent, bucket));
     }
 }
 
@@ -404,9 +438,13 @@ void SceneGraph::drawOpaque() {
     if (!_activeCamera) {
         return;
     }
-    // Draw opaque leafs
+    // Draw opaque meshes
     for (auto &mesh : _opaqueMeshes) {
         mesh->draw();
+    }
+    // Draw opaque leafs
+    for (auto &[node, leafs] : _opaqueLeafs) {
+        node->drawLeafs(leafs);
     }
 }
 
@@ -415,7 +453,7 @@ void SceneGraph::drawTranslucent() {
         return;
     }
     // Draw translucent leafs
-    for (auto &[node, leafs] : _leafBuckets) {
+    for (auto &[node, leafs] : _translucentLeafs) {
         node->drawLeafs(leafs);
     }
     // Draw lens flares
