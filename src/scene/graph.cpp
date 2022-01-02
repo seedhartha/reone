@@ -246,7 +246,7 @@ void SceneGraph::updateSounds() {
 
 void SceneGraph::refresh() {
     _opaqueMeshes.clear();
-    _blendableMeshes.clear();
+    _translucentMeshes.clear();
     _shadowMeshes.clear();
     _lights.clear();
     _emitters.clear();
@@ -256,7 +256,7 @@ void SceneGraph::refresh() {
     }
 }
 
-void SceneGraph::refreshFromNode(const std::shared_ptr<SceneNode> &node) {
+void SceneGraph::refreshFromNode(const shared_ptr<SceneNode> &node) {
     bool propagate = true;
 
     switch (node->type()) {
@@ -272,9 +272,9 @@ void SceneGraph::refreshFromNode(const std::shared_ptr<SceneNode> &node) {
         // For model nodes, determine whether they should be rendered and cast shadows
         auto modelNode = static_pointer_cast<MeshSceneNode>(node);
         if (modelNode->shouldRender()) {
-            // Sort model nodes into transparent and opaque
-            if (modelNode->isBlendable()) {
-                _blendableMeshes.push_back(modelNode.get());
+            // Sort model nodes into translucent and opaque
+            if (modelNode->isTranslucent()) {
+                _translucentMeshes.push_back(modelNode.get());
             } else {
                 _opaqueMeshes.push_back(modelNode.get());
             }
@@ -302,16 +302,16 @@ void SceneGraph::refreshFromNode(const std::shared_ptr<SceneNode> &node) {
 }
 
 void SceneGraph::prepareLeafs() {
-    vector<pair<SceneNode *, float>> blendableLeafs;
+    vector<pair<SceneNode *, float>> translucentLeafs;
     auto camera = _activeCamera->camera();
 
-    // Add blendable meshes
-    for (auto &mesh : _blendableMeshes) {
+    // Calculate view-space position of translucent meshes
+    for (auto &mesh : _translucentMeshes) {
         auto eyePos = glm::vec3(camera->view() * mesh->absoluteTransform()[3]);
-        blendableLeafs.push_back(make_pair(mesh, -eyePos.z));
+        translucentLeafs.push_back(make_pair(mesh, -eyePos.z));
     }
 
-    // Add particles
+    // Calculate view-space position of emitter particles
     for (auto &emitter : _emitters) {
         for (auto &child : emitter->children()) {
             if (child->type() != SceneNodeType::Particle) {
@@ -322,12 +322,12 @@ void SceneGraph::prepareLeafs() {
                 continue;
             }
             auto eyePos = glm::vec3(camera->view() * particle->absoluteTransform()[3]);
-            blendableLeafs.push_back(make_pair(particle, -eyePos.z));
+            translucentLeafs.push_back(make_pair(particle, -eyePos.z));
         }
     }
 
-    // Sort meshes and particles back to front to ensure correct blending
-    sort(blendableLeafs.begin(), blendableLeafs.end(), [](auto &a, auto &b) {
+    // Sort translucent leafs back to front to ensure correct blending
+    sort(translucentLeafs.begin(), translucentLeafs.end(), [](auto &a, auto &b) {
         bool aMesh = a.first->type() == SceneNodeType::Mesh;
         bool bMesh = b.first->type() == SceneNodeType::Mesh;
         if (aMesh && bMesh) {
@@ -374,8 +374,8 @@ void SceneGraph::prepareLeafs() {
         }
     }
 
-    // Group blendable meshes and particles into buckets
-    for (auto &[leaf, _] : blendableLeafs) {
+    // Group translucent leafs into buckets
+    for (auto &[leaf, _] : translucentLeafs) {
         SceneNode *parent = leaf->parent();
         if (leaf->type() == SceneNodeType::Mesh) {
             parent = &static_cast<MeshSceneNode *>(leaf)->model();
@@ -400,23 +400,25 @@ void SceneGraph::prepareLeafs() {
     }
 }
 
-void SceneGraph::draw() {
-    static glm::vec3 white {1.0f, 1.0f, 1.0f};
-    static glm::vec3 red {1.0f, 0.0f, 0.0f};
-
+void SceneGraph::drawOpaque() {
     if (!_activeCamera) {
         return;
     }
-
-    // Render opaque meshes
+    // Draw opaque leafs
     for (auto &mesh : _opaqueMeshes) {
         mesh->draw();
     }
-    // Render blendable meshes and particles
+}
+
+void SceneGraph::drawTranslucent() {
+    if (!_activeCamera) {
+        return;
+    }
+    // Draw translucent leafs
     for (auto &[node, leafs] : _leafBuckets) {
         node->drawLeafs(leafs);
     }
-    // Render lens flares
+    // Draw lens flares
     if (!_flareLights.empty()) {
         _graphicsContext.withoutDepthTest([this]() {
             for (auto &light : _flareLights) {
@@ -611,7 +613,7 @@ shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) 
     if (distances.empty()) {
         return nullptr;
     }
-    std::sort(distances.begin(), distances.end(), [](auto &left, auto &right) { return left.second < right.second; });
+    sort(distances.begin(), distances.end(), [](auto &left, auto &right) { return left.second < right.second; });
 
     return distances[0].first;
 }

@@ -47,7 +47,7 @@ public:
     ShaderProgram &billboard() const { return *_spBillboard; }
     ShaderProgram &ssr() const { return *_spSSR; }
     ShaderProgram &blur() const { return *_spBlur; }
-    ShaderProgram &bloom() const { return *_spBloom; }
+    ShaderProgram &composite() const { return *_spComposite; }
     ShaderProgram &fxaa() const { return *_spFXAA; }
     ShaderProgram &gui() const { return *_spGUI; }
     ShaderProgram &text() const { return *_spText; }
@@ -70,7 +70,7 @@ private:
     std::shared_ptr<ShaderProgram> _spBillboard;
     std::shared_ptr<ShaderProgram> _spSSR;
     std::shared_ptr<ShaderProgram> _spBlur;
-    std::shared_ptr<ShaderProgram> _spBloom;
+    std::shared_ptr<ShaderProgram> _spComposite;
     std::shared_ptr<ShaderProgram> _spFXAA;
     std::shared_ptr<ShaderProgram> _spGUI;
     std::shared_ptr<ShaderProgram> _spText;

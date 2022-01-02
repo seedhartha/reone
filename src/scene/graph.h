@@ -76,8 +76,9 @@ public:
 
     void update(float dt);
 
-    void draw() override;
     void drawShadows() override;
+    void drawOpaque() override;
+    void drawTranslucent() override;
 
     const std::string &name() const { return _name; }
     const graphics::GraphicsOptions &options() const { return _options; }
@@ -212,7 +213,7 @@ private:
     // Leafs
 
     std::vector<MeshSceneNode *> _opaqueMeshes;
-    std::vector<MeshSceneNode *> _blendableMeshes;
+    std::vector<MeshSceneNode *> _translucentMeshes;
     std::vector<MeshSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;

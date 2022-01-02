@@ -1032,7 +1032,7 @@ void main() {
 }
 )END";
 
-static const string g_fsBloom = R"END(
+static const string g_fsComposite = R"END(
 uniform sampler2D sDiffuseMap;
 uniform sampler2D sHilights;
 uniform sampler2D sRoughness;
@@ -1315,7 +1315,7 @@ void Shaders::init() {
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslAlphaTest, g_fsGrass});
     auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSR});
     auto fsBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBlur});
-    auto fsBloom = initShader(ShaderType::Fragment, {g_glslHeader, g_fsBloom});
+    auto fsComposite = initShader(ShaderType::Fragment, {g_glslHeader, g_fsComposite});
     auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsFXAA});
     auto fsGUI = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGUI});
     auto fsText = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslTextUniforms, g_fsText});
@@ -1331,7 +1331,7 @@ void Shaders::init() {
     _spGrass = initShaderProgram({vsGrass, fsGrass});
     _spSSR = initShaderProgram({vsSSR, fsSSR});
     _spBlur = initShaderProgram({vsSimple, fsBlur});
-    _spBloom = initShaderProgram({vsSimple, fsBloom});
+    _spComposite = initShaderProgram({vsSimple, fsComposite});
     _spFXAA = initShaderProgram({vsSimple, fsFXAA});
     _spGUI = initShaderProgram({vsSimple, fsGUI});
     _spText = initShaderProgram({vsText, fsText});
@@ -1369,7 +1369,7 @@ void Shaders::deinit() {
     _spGrass.reset();
     _spSSR.reset();
     _spBlur.reset();
-    _spBloom.reset();
+    _spComposite.reset();
     _spFXAA.reset();
     _spGUI.reset();
     _spText.reset();

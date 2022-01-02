@@ -171,7 +171,7 @@ bool MeshSceneNode::shouldCastShadows() const {
     }
 }
 
-bool MeshSceneNode::isBlendable() const {
+bool MeshSceneNode::isTranslucent() const {
     if (!_nodeTextures.diffuse) {
         return false;
     }
@@ -233,7 +233,7 @@ void MeshSceneNode::draw() {
             blendMode = BlendMode::Additive;
             break;
         default:
-            if (isBlendable()) {
+            if (isTranslucent()) {
                 blendMode = BlendMode::Normal;
             } else {
                 uniforms.general.featureMask |= UniformsFeatureFlags::alphatest;

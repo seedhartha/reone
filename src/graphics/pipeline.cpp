@@ -268,23 +268,26 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
         drawGeometry(scene, attachments); // draw to fbGeometry
 
         // Blur geometry hilights
-        blitColorBuffer(dim, *attachments.fbGeometry, 1, *attachments.fbPong, 0);
+        blitColor(dim, *attachments.fbGeometry, 1, *attachments.fbPong, 0);
         applyHorizontalBlur(attachments, dim); // draw to fbPing
         applyVerticalBlur(attachments, dim);   // draw to fbPong
-        blitColorBuffer(dim, *attachments.fbPong, 0, *attachments.fbGeometry, 1);
+        blitColor(dim, *attachments.fbPong, 0, *attachments.fbGeometry, 1);
 
         // Blur SSR
         if (_options.ssr) {
             applySSR(scene, attachments, dim); // draw to fbSSR
-            blitColorBuffer(dim, *attachments.fbSSR, 0, *attachments.fbPong, 0);
+            blitColor(dim, *attachments.fbSSR, 0, *attachments.fbPong, 0);
             applyHorizontalBlur(attachments, dim); // draw to fbPing
             applyVerticalBlur(attachments, dim);   // draw to fbPong
-            blitColorBuffer(dim, *attachments.fbPong, 0, *attachments.fbSSR, 0);
+            blitColor(dim, *attachments.fbPong, 0, *attachments.fbSSR, 0);
         }
 
-        applyBloom(attachments);     // draw to fbPing
-        applyFXAA(attachments, dim); // draw to fbPong
-        blitColorBuffer(dim, *attachments.fbPong, 0, *attachments.fbOutput, 0);
+        drawComposite(attachments); // draw to fbPong
+        blitColor(dim, *attachments.fbPong, 0, *attachments.fbGeometry, 0);
+        drawGeometry(scene, attachments, true); // draw to fbGeometry
+        blitColorDepth(dim, *attachments.fbGeometry, 0, *attachments.fbPong, 0);
+        applyFXAA(attachments, dim); // draw to fbPing
+        blitColorDepth(dim, *attachments.fbPing, 0, *attachments.fbOutput, 0);
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -348,7 +351,7 @@ void Pipeline::drawShadows(IScene &scene, Attachments &attachments) {
     });
 }
 
-void Pipeline::drawGeometry(IScene &scene, Attachments &attachments) {
+void Pipeline::drawGeometry(IScene &scene, Attachments &attachments, bool translucent) {
     auto camera = scene.camera();
 
     // Set global uniforms
@@ -381,8 +384,11 @@ void Pipeline::drawGeometry(IScene &scene, Attachments &attachments) {
     // Draw scene to geometry framebuffer
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbGeometry->nameGL());
-    glDrawBuffers(_options.ssr ? 4 : 2, kColorAttachments);
-    _graphicsContext.clearColorDepth();
+    int numBuffers = translucent ? 1 : (_options.ssr ? 4 : 2);
+    glDrawBuffers(numBuffers, kColorAttachments);
+    if (!translucent) {
+        _graphicsContext.clearColorDepth();
+    }
     if (scene.hasShadowLight()) {
         if (scene.isShadowLightDirectional()) {
             _textures.bind(*attachments.dbDirectionalLightShadows, TextureUnits::shadowMap);
@@ -390,7 +396,11 @@ void Pipeline::drawGeometry(IScene &scene, Attachments &attachments) {
             _textures.bind(*attachments.dbPointLightShadows, TextureUnits::cubeShadowMap);
         }
     }
-    scene.draw();
+    if (translucent) {
+        scene.drawTranslucent();
+    } else {
+        scene.drawOpaque();
+    }
 }
 
 void Pipeline::applySSR(IScene &scene, Attachments &attachments, const glm::ivec2 &dim) {
@@ -452,15 +462,14 @@ void Pipeline::applyVerticalBlur(Attachments &attachments, const glm::ivec2 &dim
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::applyBloom(Attachments &attachments) {
+void Pipeline::drawComposite(Attachments &attachments) {
     // Reset uniforms
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
 
-    // Combine geometry, SSR and bloom
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbPing->nameGL());
-    _shaders.use(_shaders.bloom(), true);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbPong->nameGL());
+    _shaders.use(_shaders.composite(), true);
     _textures.bind(*attachments.cbGeometry1);
     _textures.bind(*attachments.cbGeometry2, TextureUnits::hilights);
     _textures.bind(*attachments.cbGeometryRoughness, TextureUnits::roughness);
@@ -480,20 +489,28 @@ void Pipeline::applyFXAA(Attachments &attachments, const glm::ivec2 &dim) {
     uniforms.general.resetLocals();
     uniforms.general.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
 
-    // Apply FXAA to ping (bloom) color buffer
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbPong->nameGL());
+    // Apply FXAA to pong color buffer
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbPing->nameGL());
     _shaders.use(_shaders.fxaa(), true);
-    _textures.bind(*attachments.cbPing);
+    _textures.bind(*attachments.cbPong);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::blitColorBuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx) {
+void Pipeline::blitColor(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx) {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, src.nameGL());
     glReadBuffer(kColorAttachments[srcColorIdx]);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     glDrawBuffer(kColorAttachments[dstColorIdx]);
     glBlitFramebuffer(0, 0, dim.x, dim.y, 0, 0, dim.x, dim.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+}
+
+void Pipeline::blitColorDepth(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx) {
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, src.nameGL());
+    glReadBuffer(kColorAttachments[srcColorIdx]);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
+    glDrawBuffer(kColorAttachments[dstColorIdx]);
+    glBlitFramebuffer(0, 0, dim.x, dim.y, 0, 0, dim.x, dim.y, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 }
 
 } // namespace graphics

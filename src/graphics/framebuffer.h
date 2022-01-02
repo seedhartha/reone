@@ -57,6 +57,10 @@ public:
     void init();
     void deinit();
 
+    const std::vector<std::shared_ptr<IAttachment>> &colors() const { return _colors; }
+    std::shared_ptr<IAttachment> depth() const { return _depth; }
+    std::shared_ptr<IAttachment> depthStencil() const { return _depthStencil; }
+
     // OpenGL
 
     uint32_t nameGL() const {
