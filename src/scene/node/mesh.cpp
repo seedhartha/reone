@@ -187,10 +187,6 @@ bool MeshSceneNode::isTranslucent() const {
     if (_alpha < 1.0f) {
         return true;
     }
-    auto mesh = _modelNode->mesh();
-    if (mesh && mesh->transparency > 0) {
-        return true;
-    }
     return false;
 }
 
