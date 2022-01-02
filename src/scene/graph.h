@@ -218,7 +218,8 @@ private:
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
 
-    std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _leafBuckets;
+    std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _opaqueLeafs;
+    std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _translucentLeafs;
 
     // END Leafs
 
@@ -266,7 +267,8 @@ private:
     void updateFlareLights();
     void updateSounds();
 
-    void prepareLeafs();
+    void prepareOpaqueLeafs();
+    void prepareTranslucentLeafs();
 };
 
 } // namespace scene
