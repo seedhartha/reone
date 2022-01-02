@@ -105,15 +105,12 @@ private:
     void drawShadows(IScene &scene, Attachments &attachments);
     void drawGeometry(IScene &scene, Attachments &attachments, bool translucent = false);
 
-    void applySSR(IScene &scene, Attachments &attachments, const glm::ivec2 &dim);
-    void applyHorizontalBlur(Attachments &attachments, const glm::ivec2 &dim);
-    void applyVerticalBlur(Attachments &attachments, const glm::ivec2 &dim);
-    void drawComposite(Attachments &attachments);
-    void applyFXAA(Attachments &attachments, const glm::ivec2 &dim);
+    void drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
+    void applyBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical = false);
+    void drawComposite(Attachments &attachments, Framebuffer &dst);
+    void applyFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
 
-    void blitColor(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx);
-    void blitColorDepth(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx);
-    void blitDepthBuffer(const glm::ivec2 &dim, Framebuffer &src, Framebuffer &dst);
+    void blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, bool depth = true);
 };
 
 } // namespace graphics
