@@ -283,6 +283,7 @@ private:
     uint32_t _footstepType {0};
     int _walkmeshMaterial {-1};
     int _gold {0}; /**< aka credits */
+    std::string _envmap;
 
     std::shared_ptr<audio::AudioSource> _audioSourceVoice;
     std::shared_ptr<audio::AudioSource> _audioSourceFootstep;

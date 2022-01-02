@@ -100,6 +100,7 @@ void Creature::loadAppearance() {
     _walkSpeed = appearances->getFloat(_appearance, "walkdist", 1.0f);
     _runSpeed = appearances->getFloat(_appearance, "rundist", 1.0f);
     _footstepType = appearances->getInt(_appearance, "footsteptype", -1);
+    _envmap = boost::to_lower_copy(appearances->getString(_appearance, "envmap"));
 
     if (_portraitId > 0) {
         _portrait = _services.portraits.getTextureByIndex(_portraitId);
@@ -1062,11 +1063,18 @@ void Creature::finalizeModel(ModelSceneNode &body) {
 
     // Body texture
 
+    if (!_envmap.empty()) {
+        if (_envmap == "default") {
+            body.setEnvironmentMap(_services.textures.defaultCubemapRGB());
+        } else {
+            body.setEnvironmentMap(_services.textures.get(_envmap, TextureUsage::EnvironmentMap));
+        }
+    }
     string bodyTextureName(getBodyTextureName());
     if (!bodyTextureName.empty()) {
         shared_ptr<Texture> texture(_services.textures.get(bodyTextureName, TextureUsage::Diffuse));
         if (texture) {
-            body.setDiffuseTexture(texture);
+            body.setDiffuseMap(texture);
         }
     }
 

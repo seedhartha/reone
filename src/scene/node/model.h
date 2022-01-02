@@ -70,7 +70,8 @@ public:
 
     void setModel(std::shared_ptr<graphics::Model> model);
     void setDrawDistance(float distance) { _drawDistance = distance; }
-    void setDiffuseTexture(std::shared_ptr<graphics::Texture> texture);
+    void setDiffuseMap(std::shared_ptr<graphics::Texture> texture);
+    void setEnvironmentMap(std::shared_ptr<graphics::Texture> texture);
     void setPickable(bool pickable) { _pickable = pickable; }
 
     // Animation
