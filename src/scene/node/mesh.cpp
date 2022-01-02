@@ -77,12 +77,10 @@ void MeshSceneNode::initTextures() {
 }
 
 void MeshSceneNode::refreshAdditionalTextures() {
-    _nodeTextures.envmap.reset();
     _nodeTextures.bumpmap.reset();
-
-    if (!_nodeTextures.diffuse)
+    if (!_nodeTextures.diffuse) {
         return;
-
+    }
     const Texture::Features &features = _nodeTextures.diffuse->features();
     if (!features.envmapTexture.empty()) {
         _nodeTextures.envmap = _textures.get(features.envmapTexture, TextureUsage::EnvironmentMap);
@@ -372,9 +370,13 @@ bool MeshSceneNode::isLightingEnabled() const {
     return true;
 }
 
-void MeshSceneNode::setDiffuseTexture(const shared_ptr<Texture> &texture) {
-    _nodeTextures.diffuse = texture;
+void MeshSceneNode::setDiffuseMap(shared_ptr<Texture> texture) {
+    _nodeTextures.diffuse = move(texture);
     refreshAdditionalTextures();
+}
+
+void MeshSceneNode::setEnvironmentMap(shared_ptr<Texture> texture) {
+    _nodeTextures.envmap = move(texture);
 }
 
 } // namespace scene

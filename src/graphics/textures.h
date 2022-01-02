@@ -45,6 +45,11 @@ public:
 
     std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
 
+    std::shared_ptr<Texture> defaultRGB() const { return _defaultRGB; }
+    std::shared_ptr<Texture> defaultArrayDepth() const { return _defaultArrayDepth; }
+    std::shared_ptr<Texture> defaultCubemapRGB() const { return _defaultCubemapRGB; }
+    std::shared_ptr<Texture> defaultCubemapDepth() const { return _defaultCubemapDepth; }
+
 private:
     int _activeUnit {0};
 
@@ -54,10 +59,10 @@ private:
 
     // Defaults
 
-    std::shared_ptr<graphics::Texture> _defaultRGB;
-    std::shared_ptr<graphics::Texture> _defaultArrayDepth;
-    std::shared_ptr<graphics::Texture> _defaultCubemapRGB;
-    std::shared_ptr<graphics::Texture> _defaultCubemapDepth;
+    std::shared_ptr<Texture> _defaultRGB;
+    std::shared_ptr<Texture> _defaultArrayDepth;
+    std::shared_ptr<Texture> _defaultCubemapRGB;
+    std::shared_ptr<Texture> _defaultCubemapDepth;
 
     // END Defaults
 

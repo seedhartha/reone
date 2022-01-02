@@ -73,7 +73,8 @@ public:
     ModelSceneNode &model() { return _model; }
     const ModelSceneNode &model() const { return _model; }
 
-    void setDiffuseTexture(const std::shared_ptr<graphics::Texture> &texture);
+    void setDiffuseMap(std::shared_ptr<graphics::Texture> texture);
+    void setEnvironmentMap(std::shared_ptr<graphics::Texture> texture);
     void setAlpha(float alpha) { _alpha = alpha; }
     void setSelfIllumColor(glm::vec3 color) { _selfIllumColor = std::move(color); }
 
