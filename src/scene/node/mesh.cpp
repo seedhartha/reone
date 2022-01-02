@@ -227,7 +227,7 @@ void MeshSceneNode::draw() {
         _textures.bind(*_nodeTextures.diffuse, TextureUnits::diffuseMap);
         switch (_nodeTextures.diffuse->features().blending) {
         case Texture::Blending::PunchThrough:
-            uniforms.general.featureMask |= UniformsFeatureFlags::alphatest;
+            uniforms.general.featureMask |= UniformsFeatureFlags::hashedalphatest;
             break;
         case Texture::Blending::Additive:
             blendMode = BlendMode::Additive;
@@ -236,7 +236,7 @@ void MeshSceneNode::draw() {
             if (isTranslucent()) {
                 blendMode = BlendMode::Normal;
             } else {
-                uniforms.general.featureMask |= UniformsFeatureFlags::alphatest;
+                uniforms.general.featureMask |= UniformsFeatureFlags::hashedalphatest;
             }
             break;
         }

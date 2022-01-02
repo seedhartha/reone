@@ -47,7 +47,7 @@ const int FEATURE_GRASS = 0x2000;
 const int FEATURE_FOG = 0x4000;
 const int FEATURE_DANGLYMESH = 0x8000;
 const int FEATURE_FIXEDSIZE = 0x10000;
-const int FEATURE_ALPHATEST = 0x20000;
+const int FEATURE_HASHEDALPHATEST = 0x20000;
 
 layout(std140) uniform General {
     mat4 uProjection;
@@ -168,7 +168,7 @@ float hash(vec3 p) {
     return hash(vec2(hash(p.xy), p.z));
 }
 
-void alphaTest(float a, vec2 p) {
+void hashedAlphaTest(float a, vec2 p) {
     float pixDeriv = max(length(dFdx(p)), length(dFdy(p)));
     float pixScale = 1.0 / pixDeriv;
     if (a < hash(floor(pixScale * p))) {
@@ -176,7 +176,7 @@ void alphaTest(float a, vec2 p) {
     }
 }
 
-void alphaTest(float a, vec3 p) {
+void hashedAlphaTest(float a, vec3 p) {
     float pixDeriv = max(length(dFdx(p.xy)), length(dFdy(p.xy)));
     float pixScale = 1.0 / pixDeriv;
     if (a < hash(floor(pixScale * p))) {
@@ -694,8 +694,10 @@ void main() {
     if (isFeatureEnabled(FEATURE_DIFFUSE) && !isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_NORMALMAP)) {
         objectAlpha *= diffuseAlpha;
     }
-    if (isFeatureEnabled(FEATURE_ALPHATEST)) {
-        alphaTest(objectAlpha, uv);
+    if (isFeatureEnabled(FEATURE_HASHEDALPHATEST)) {
+        hashedAlphaTest(objectAlpha, uv);
+    } else if (objectAlpha == 0.0) {
+        discard;
     }
 
     vec3 lighting;
@@ -799,8 +801,10 @@ void main() {
     vec3 objectColor = uParticles[fragInstanceID].color.rgb * diffuseSample.rgb;
 
     float objectAlpha = uParticles[fragInstanceID].color.a * diffuseSample.a;
-    if (isFeatureEnabled(FEATURE_ALPHATEST)) {
-        alphaTest(objectAlpha, uv);
+    if (isFeatureEnabled(FEATURE_HASHEDALPHATEST)) {
+        hashedAlphaTest(objectAlpha, uv);
+    } else if (objectAlpha == 0.0) {
+        discard;
     }
 
     mat3 normalMatrix = transpose(inverse(mat3(uView)));
@@ -841,8 +845,10 @@ void main() {
     }
 
     float objectAlpha = diffuseSample.a;
-    if (isFeatureEnabled(FEATURE_ALPHATEST)) {
-        alphaTest(objectAlpha, uv);
+    if (isFeatureEnabled(FEATURE_HASHEDALPHATEST)) {
+        hashedAlphaTest(objectAlpha, uv);
+    } else if (objectAlpha == 0.0) {
+        discard;
     }
 
     mat3 normalMatrix = transpose(inverse(mat3(uView)));
