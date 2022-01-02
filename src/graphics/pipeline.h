@@ -110,7 +110,7 @@ private:
     void drawComposite(Attachments &attachments, Framebuffer &dst);
     void applyFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
 
-    void blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, bool depth = true);
+    void blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, bool depth = false);
 };
 
 } // namespace graphics
