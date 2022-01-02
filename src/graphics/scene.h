@@ -29,8 +29,9 @@ class IScene {
 public:
     virtual ~IScene() = default;
 
-    virtual void draw() = 0;
     virtual void drawShadows() = 0;
+    virtual void drawOpaque() = 0;
+    virtual void drawTranslucent() = 0;
 
     virtual std::shared_ptr<Camera> camera() const = 0;
     virtual const glm::vec3 &ambientLightColor() const = 0;
