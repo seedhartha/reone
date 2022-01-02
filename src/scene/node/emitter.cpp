@@ -259,7 +259,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::particles;
     if (emitter->blendMode == ModelNode::Emitter::BlendMode::PunchThrough) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::alphatest;
+        uniforms.general.featureMask |= UniformsFeatureFlags::hashedalphatest;
     }
     uniforms.particles.gridSize = emitter->gridSize;
 
