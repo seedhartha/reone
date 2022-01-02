@@ -34,7 +34,7 @@ using namespace std;
 
 #define R_GEOMETRY_TRANSLUCENT true
 #define R_BLUR_VERTICAL true
-#define R_BLIT_COLOR_ONLY false
+#define R_BLIT_DEPTH true
 
 namespace reone {
 
@@ -274,7 +274,7 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
         // Blur geometry hilights
         applyBlur(dim, *attachments.cbGeometry2, *attachments.fbPing);
         applyBlur(dim, *attachments.cbPing, *attachments.fbPong, R_BLUR_VERTICAL);
-        blitFramebuffer(dim, *attachments.fbPong, 0, *attachments.fbGeometry, 1, R_BLIT_COLOR_ONLY);
+        blitFramebuffer(dim, *attachments.fbPong, 0, *attachments.fbGeometry, 1);
 
         // Blur SSR
         if (_options.ssr) {
@@ -284,7 +284,7 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
         }
 
         drawComposite(attachments, *attachments.fbPing);
-        blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbGeometry, 0, R_BLIT_COLOR_ONLY);
+        blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbGeometry, 0);
         drawGeometry(scene, attachments, R_GEOMETRY_TRANSLUCENT);
         applyFXAA(dim, *attachments.cbGeometry1, *attachments.fbOutput);
     });
