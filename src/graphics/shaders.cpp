@@ -164,15 +164,19 @@ float hash(vec2 p) {
     return fract(1.0e4 * sin(17.0 * p.x + 0.1 * p.y) * (0.1 + abs(sin(13.0 * p.y + p.x))));
 }
 
-void hashedAlphaTest(float a, vec2 p) {
-    float maxDeriv = max(length(dFdx(p)), length(dFdy(p)));
+float hash(vec3 p) {
+    return hash(vec2(hash(p.xy), p.z));
+}
+
+void hashedAlphaTest(float a, vec3 p) {
+    float maxDeriv = max(length(dFdx(p.xy)), length(dFdy(p.xy)));
     float pixScale = 1.0 / maxDeriv;
     vec2 pixScales = vec2(
         exp2(floor(log2(pixScale))),
         exp2(ceil(log2(pixScale))));
     vec2 alpha = vec2(
-        hash(floor(pixScales.x * p)),
-        hash(floor(pixScales.y * p)));
+        hash(floor(pixScales.x * p.xyz)),
+        hash(floor(pixScales.y * p.xyz)));
     float lerpFactor = fract(log2(pixScale));
     float x = (1.0 - lerpFactor) * alpha.x + lerpFactor * alpha.y;
     float t = min(lerpFactor, 1.0 - lerpFactor);
@@ -224,6 +228,7 @@ layout(location = 6) in vec3 aTanSpaceNormal;
 layout(location = 7) in vec4 aBoneIndices;
 layout(location = 8) in vec4 aBoneWeights;
 
+out vec3 fragPosObjSpace;
 out vec3 fragPosWorldSpace;
 out vec3 fragNormalWorldSpace;
 out vec2 fragUV1;
@@ -267,6 +272,7 @@ void main() {
         N = vec4(danglyN, 0.0);
     }
 
+    fragPosObjSpace = P.xyz;
     fragPosWorldSpace = vec3(uModel * P);
 
     mat3 normalMatrix = transpose(inverse(mat3(uModel)));
@@ -316,6 +322,7 @@ static const string g_vsParticle = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;
 
+out vec3 fragPosObjSpace;
 out vec3 fragPosWorldSpace;
 out vec3 fragNormalWorldSpace;
 out vec2 fragUV1;
@@ -326,6 +333,7 @@ void main() {
     vec3 right = uParticles[gl_InstanceID].right.xyz;
     vec3 up = uParticles[gl_InstanceID].up.xyz;
 
+    fragPosObjSpace = aPosition;
     fragPosWorldSpace = vec3(position +
         right * aPosition.x * uParticles[gl_InstanceID].size.x +
         up * aPosition.y * uParticles[gl_InstanceID].size.y);
@@ -342,6 +350,7 @@ static const string g_vsGrass = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;
 
+out vec3 fragPosObjSpace;
 out vec3 fragPosWorldSpace;
 out vec3 fragNormalWorldSpace;
 out vec2 fragUV1;
@@ -360,6 +369,7 @@ void main() {
     vec3 right = vec3(M[0][0], M[1][0], M[2][0]);
     vec3 up = vec3(M[0][1], M[1][1], M[2][1]);
 
+    fragPosObjSpace = aPosition;
     fragPosWorldSpace = vec3(
         uGrassClusters[gl_InstanceID].positionVariant.xyz +
         right * aPosition.x * uGrassQuadSize.x +
@@ -505,6 +515,7 @@ uniform samplerCube sEnvironmentMap;
 uniform samplerCube sCubeShadowMap;
 uniform sampler2DArray sShadowMap;
 
+in vec3 fragPosObjSpace;
 in vec3 fragPosWorldSpace;
 in vec3 fragNormalWorldSpace;
 in vec2 fragUV1;
@@ -698,7 +709,7 @@ void main() {
         objectAlpha *= diffuseAlpha;
     }
     if (isFeatureEnabled(FEATURE_HASHEDALPHATEST)) {
-        hashedAlphaTest(objectAlpha, uv);
+        hashedAlphaTest(objectAlpha, fragPosObjSpace);
     } else if (objectAlpha == 0.0) {
         discard;
     }
@@ -776,6 +787,7 @@ void main() {
 static const string g_fsParticle = R"END(
 uniform sampler2D sDiffuseMap;
 
+in vec3 fragPosObjSpace;
 in vec3 fragPosWorldSpace;
 in vec3 fragNormalWorldSpace;
 in vec2 fragUV1;
@@ -805,7 +817,7 @@ void main() {
 
     float objectAlpha = uParticles[fragInstanceID].color.a * diffuseSample.a;
     if (isFeatureEnabled(FEATURE_HASHEDALPHATEST)) {
-        hashedAlphaTest(objectAlpha, uv);
+        hashedAlphaTest(objectAlpha, fragPosObjSpace);
     } else if (objectAlpha == 0.0) {
         discard;
     }
@@ -824,6 +836,7 @@ static const string g_fsGrass = R"END(
 uniform sampler2D sDiffuseMap;
 uniform sampler2D sLightmap;
 
+in vec3 fragPosObjSpace;
 in vec3 fragPosWorldSpace;
 in vec3 fragNormalWorldSpace;
 in vec2 fragUV1;
@@ -849,7 +862,7 @@ void main() {
 
     float objectAlpha = diffuseSample.a;
     if (isFeatureEnabled(FEATURE_HASHEDALPHATEST)) {
-        hashedAlphaTest(objectAlpha, uv);
+        hashedAlphaTest(objectAlpha, fragPosObjSpace);
     } else if (objectAlpha == 0.0) {
         discard;
     }
