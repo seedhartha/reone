@@ -27,9 +27,11 @@ class ToggleButton : public Button {
 public:
     ToggleButton(
         GUI &gui,
-        graphics::GraphicsContext &graphicsContext,
+        scene::SceneGraphs &sceneGraphs,
         graphics::Fonts &fonts,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
+        graphics::Pipeline &pipeline,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,
@@ -37,9 +39,11 @@ public:
         Button(
             gui,
             ControlType::ToggleButton,
-            graphicsContext,
+            sceneGraphs,
             fonts,
+            graphicsContext,
             meshes,
+            pipeline,
             shaders,
             textures,
             window,

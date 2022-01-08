@@ -44,9 +44,11 @@ public:
 
     ListBox(
         GUI &gui,
-        graphics::GraphicsContext &graphicsContext,
+        scene::SceneGraphs &sceneGraphs,
         graphics::Fonts &fonts,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
+        graphics::Pipeline &pipeline,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,
@@ -54,9 +56,11 @@ public:
         Control(
             gui,
             ControlType::ListBox,
-            graphicsContext,
+            sceneGraphs,
             fonts,
+            graphicsContext,
             meshes,
+            pipeline,
             shaders,
             textures,
             window,
@@ -75,7 +79,7 @@ public:
     bool handleMouseMotion(int x, int y) override;
     bool handleMouseWheel(int x, int y) override;
     bool handleClick(int x, int y) override;
-    void draw(const glm::ivec2 &offset, const std::vector<std::string> &text) override;
+    void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) override;
     void stretch(float x, float y, int mask) override;
 
     void setFocus(bool focus) override;

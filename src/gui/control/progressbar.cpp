@@ -48,7 +48,7 @@ void ProgressBar::load(const GffStruct &gffs) {
     }
 }
 
-void ProgressBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
+void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const vector<string> &text) {
     if (_value == 0 || !_progress.fill) {
         return;
     }

@@ -55,7 +55,7 @@ void ScrollBar::load(const GffStruct &gffs) {
     }
 }
 
-void ScrollBar::draw(const glm::ivec2 &offset, const vector<string> &text) {
+void ScrollBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const vector<string> &text) {
     drawThumb(offset);
     drawArrows(offset);
 }

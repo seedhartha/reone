@@ -21,7 +21,6 @@
 #include "../graphics/context.h"
 #include "../graphics/mesh.h"
 #include "../graphics/meshes.h"
-#include "../graphics/pipeline.h"
 #include "../graphics/shaders.h"
 #include "../graphics/texture.h"
 #include "../graphics/textures.h"
@@ -29,7 +28,6 @@
 #include "../resource/gffs.h"
 #include "../resource/gffstruct.h"
 #include "../resource/resources.h"
-#include "../scene/graphs.h"
 
 #include "control/button.h"
 #include "control/imagebutton.h"
@@ -256,20 +254,6 @@ Control *GUI::getControlAt(int x, int y, const function<bool(const Control &)> &
 void GUI::update(float dt) {
     for (auto &control : _controls) {
         control->update(dt);
-
-        if (!control->isVisible()) {
-            continue;
-        }
-        const string &sceneName = control->sceneName();
-        if (!sceneName.empty()) {
-            glm::ivec4 extent(
-                control->extent().left,
-                control->extent().top,
-                control->extent().width,
-                control->extent().height);
-
-            _sceneGraphs.get(sceneName).update(dt);
-        }
     }
 }
 
@@ -279,39 +263,13 @@ void GUI::draw() {
             drawBackground();
         }
         if (_rootControl) {
-            _rootControl->draw(_rootOffset, _rootControl->textLines());
+            _rootControl->draw({_options.width, _options.height}, _rootOffset, _rootControl->textLines());
         }
         for (auto &control : _controls) {
             if (!control->isVisible()) {
                 continue;
             }
-            control->draw(_controlOffset, control->textLines());
-            const string &sceneName = control->sceneName();
-            if (sceneName.empty()) {
-                continue;
-            }
-            int x = control->extent().left;
-            int y = control->extent().top;
-            int w = control->extent().width;
-            int h = control->extent().height;
-            glm::mat4 projection(glm::ortho(
-                0.0f,
-                static_cast<float>(_options.width),
-                static_cast<float>(_options.height),
-                0.0f));
-            glm::mat4 transform(1.0f);
-            transform = glm::translate(transform, glm::vec3(x + _controlOffset.x, y + _controlOffset.y, 0.0f));
-            transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
-            auto output = _pipeline.draw(_sceneGraphs.get(sceneName), {w, h});
-            auto &uniforms = _shaders.uniforms();
-            uniforms.general.resetGlobals();
-            uniforms.general.resetLocals();
-            uniforms.general.projection = move(projection);
-            uniforms.general.model = move(transform);
-            _shaders.use(_shaders.gui(), true);
-            _graphicsContext.withoutDepthTest([this]() {
-                _meshes.quad().draw();
-            });
+            control->draw({_options.width, _options.height}, _controlOffset, control->textLines());
         }
     });
 }
@@ -357,31 +315,31 @@ unique_ptr<Control> GUI::newControl(
     unique_ptr<Control> control;
     switch (type) {
     case ControlType::Panel:
-        control = make_unique<Panel>(*this, _graphicsContext, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        control = make_unique<Panel>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _window, _strings);
         break;
     case ControlType::Label:
-        control = make_unique<Label>(*this, _graphicsContext, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        control = make_unique<Label>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _window, _strings);
         break;
     case ControlType::ImageButton:
-        control = make_unique<ImageButton>(*this, _graphicsContext, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        control = make_unique<ImageButton>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _window, _strings);
         break;
     case ControlType::Button:
-        control = make_unique<Button>(*this, _graphicsContext, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        control = make_unique<Button>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _window, _strings);
         break;
     case ControlType::ToggleButton:
-        control = make_unique<ToggleButton>(*this, _graphicsContext, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        control = make_unique<ToggleButton>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _window, _strings);
         break;
     case ControlType::Slider:
-        control = make_unique<Slider>(*this, _graphicsContext, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        control = make_unique<Slider>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _window, _strings);
         break;
     case ControlType::ScrollBar:
-        control = make_unique<ScrollBar>(*this, _graphicsContext, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        control = make_unique<ScrollBar>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _window, _strings);
         break;
     case ControlType::ProgressBar:
-        control = make_unique<ProgressBar>(*this, _graphicsContext, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        control = make_unique<ProgressBar>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _window, _strings);
         break;
     case ControlType::ListBox:
-        control = make_unique<ListBox>(*this, _graphicsContext, _fonts, _meshes, _shaders, _textures, _window, _strings);
+        control = make_unique<ListBox>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _window, _strings);
         break;
     default:
         debug("Unsupported control type: " + to_string(static_cast<int>(type)), LogChannels::gui);
