@@ -27,9 +27,11 @@ class Label : public Control {
 public:
     Label(
         GUI &gui,
-        graphics::GraphicsContext &graphicsContext,
+        scene::SceneGraphs &sceneGraphs,
         graphics::Fonts &fonts,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
+        graphics::Pipeline &pipeline,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,
@@ -37,9 +39,11 @@ public:
         Control(
             gui,
             ControlType::Label,
-            graphicsContext,
+            sceneGraphs,
             fonts,
+            graphicsContext,
             meshes,
+            pipeline,
             shaders,
             textures,
             window,

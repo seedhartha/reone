@@ -22,6 +22,7 @@
 #include "../graphics/fonts.h"
 #include "../graphics/mesh.h"
 #include "../graphics/meshes.h"
+#include "../graphics/pipeline.h"
 #include "../graphics/renderbuffer.h"
 #include "../graphics/shaders.h"
 #include "../graphics/textures.h"
@@ -29,6 +30,7 @@
 #include "../graphics/window.h"
 #include "../resource/gffstruct.h"
 #include "../resource/strings.h"
+#include "../scene/graphs.h"
 
 #include "gui.h"
 
@@ -174,12 +176,18 @@ bool Control::handleClick(int x, int y) {
     return true;
 }
 
-void Control::draw(const glm::ivec2 &offset, const vector<string> &text) {
-    if (!_visible)
+void Control::update(float dt) {
+    if (_sceneName.empty() || !_visible) {
         return;
+    }
+    _sceneGraphs.get(_sceneName).update(dt);
+}
 
+void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const vector<string> &text) {
+    if (!_visible) {
+        return;
+    }
     glm::ivec2 size(_extent.width, _extent.height);
-
     if (_focus && _hilight) {
         drawBorder(*_hilight, offset, size);
     } else if (_border) {
@@ -188,6 +196,27 @@ void Control::draw(const glm::ivec2 &offset, const vector<string> &text) {
     if (!text.empty()) {
         drawText(text, offset, size);
     }
+    if (_sceneName.empty()) {
+        return;
+    }
+    glm::mat4 projection(glm::ortho(
+        0.0f,
+        static_cast<float>(screenSize.x),
+        static_cast<float>(screenSize.y),
+        0.0f));
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
+    transform = glm::scale(transform, glm::vec3(_extent.width, _extent.height, 1.0f));
+    auto output = _pipeline.draw(_sceneGraphs.get(_sceneName), {_extent.width, _extent.height});
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
+    uniforms.general.projection = move(projection);
+    uniforms.general.model = move(transform);
+    _shaders.use(_shaders.gui(), true);
+    _graphicsContext.withoutDepthTest([this]() {
+        _meshes.quad().draw();
+    });
 }
 
 void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const glm::ivec2 &size) {

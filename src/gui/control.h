@@ -33,16 +33,23 @@ class Strings;
 
 namespace graphics {
 
-class GraphicsContext;
 class Font;
 class Fonts;
+class GraphicsContext;
 class Meshes;
+class Pipeline;
 class Shaders;
 class Texture;
 class Textures;
 class Window;
 
 } // namespace graphics
+
+namespace scene {
+
+class SceneGraphs;
+
+}
 
 namespace gui {
 
@@ -105,7 +112,7 @@ public:
     virtual ~Control() = default;
 
     virtual void load(const resource::GffStruct &gffs);
-    virtual void update(float dt) {}
+    virtual void update(float dt);
 
     /**
      * Stretches this control in both directions.
@@ -164,7 +171,7 @@ public:
 
     // Rendering
 
-    virtual void draw(const glm::ivec2 &offset, const std::vector<std::string> &text);
+    virtual void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text);
 
     // END Rendering
 
@@ -201,13 +208,15 @@ protected:
 
     // Services
 
-    graphics::GraphicsContext &_graphicsContext;
     graphics::Fonts &_fonts;
+    graphics::GraphicsContext &_graphicsContext;
     graphics::Meshes &_meshes;
+    graphics::Pipeline &_pipeline;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
     graphics::Window &_window;
     resource::Strings &_strings;
+    scene::SceneGraphs &_sceneGraphs;
 
     // END Services
 
@@ -221,18 +230,22 @@ protected:
     Control(
         GUI &gui,
         ControlType type,
-        graphics::GraphicsContext &graphicsContext,
+        scene::SceneGraphs &sceneGraphs,
         graphics::Fonts &fonts,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
+        graphics::Pipeline &pipeline,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,
         resource::Strings &strings) :
         _gui(gui),
         _type(type),
-        _graphicsContext(graphicsContext),
+        _sceneGraphs(sceneGraphs),
         _fonts(fonts),
+        _graphicsContext(graphicsContext),
         _meshes(meshes),
+        _pipeline(pipeline),
         _shaders(shaders),
         _textures(textures),
         _window(window),

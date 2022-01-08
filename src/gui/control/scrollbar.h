@@ -33,9 +33,11 @@ public:
 
     ScrollBar(
         GUI &gui,
-        graphics::GraphicsContext &graphicsContext,
+        scene::SceneGraphs &sceneGraphs,
         graphics::Fonts &fonts,
+        graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
+        graphics::Pipeline &pipeline,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
         graphics::Window &window,
@@ -43,9 +45,11 @@ public:
         Control(
             gui,
             ControlType::ScrollBar,
-            graphicsContext,
+            sceneGraphs,
             fonts,
+            graphicsContext,
             meshes,
+            pipeline,
             shaders,
             textures,
             window,
@@ -53,7 +57,7 @@ public:
     }
 
     void load(const resource::GffStruct &gffs) override;
-    void draw(const glm::ivec2 &offset, const std::vector<std::string> &text) override;
+    void draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const std::vector<std::string> &text) override;
 
     void setScrollState(ScrollState state);
 
