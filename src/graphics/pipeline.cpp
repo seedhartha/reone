@@ -286,7 +286,12 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
         drawComposite(attachments, *attachments.fbPing);
         blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbGeometry, 0);
         drawGeometry(scene, attachments, R_GEOMETRY_TRANSLUCENT);
-        applyFXAA(dim, *attachments.cbGeometry1, *attachments.fbOutput);
+
+        if (_options.fxaa) {
+            applyFXAA(dim, *attachments.cbGeometry1, *attachments.fbOutput);
+        } else {
+            blitFramebuffer(dim, *attachments.fbGeometry, 0, *attachments.fbOutput, 0);
+        }
     });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -383,7 +388,7 @@ void Pipeline::drawGeometry(IScene &scene, Attachments &attachments, bool transl
     // Draw scene to geometry framebuffer
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbGeometry->nameGL());
-    int numBuffers = translucent ? 1 : (_options.ssr ? 4 : 2);
+    int numBuffers = translucent ? 1 : (_options.ssr ? 5 : 2);
     glDrawBuffers(numBuffers, kColorAttachments);
     if (!translucent) {
         _graphicsContext.clearColorDepth();
@@ -429,21 +434,6 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::applyBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical) {
-    // Set uniforms
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
-    uniforms.general.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
-    uniforms.general.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(_shaders.blur(), true);
-    _textures.bind(srcTexture);
-    _graphicsContext.clearColorDepth();
-    _meshes.quadNDC().draw();
-}
-
 void Pipeline::drawComposite(Attachments &attachments, Framebuffer &dst) {
     // Reset uniforms
     auto &uniforms = _shaders.uniforms();
@@ -460,16 +450,27 @@ void Pipeline::drawComposite(Attachments &attachments, Framebuffer &dst) {
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::applyFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
-    if (!_options.fxaa) {
-        return;
-    }
-
-    // Reset uniforms
+void Pipeline::applyBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical) {
+    // Set uniforms
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
     uniforms.general.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
+    uniforms.general.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
+    _shaders.use(_shaders.blur(), true);
+    _textures.bind(srcTexture);
+    _graphicsContext.clearColorDepth();
+    _meshes.quadNDC().draw();
+}
+
+void Pipeline::applyFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
+    // Reset uniforms
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
+    uniforms.general.screenResolutionReciprocal = glm::vec2(1.0f) / glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(_shaders.fxaa(), true);

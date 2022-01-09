@@ -68,6 +68,7 @@ layout(std140) uniform General {
     vec4 uHeightMapFrameBounds;
     vec4 uShadowLightPosition;
     vec2 uScreenResolution;
+    vec2 uScreenResolutionReciprocal;
     vec2 uBlurDirection;
     float uAlpha;
     float uWaterAlpha;
@@ -192,7 +193,20 @@ void hashedAlphaTest(float a, vec3 p) {
 }
 )END";
 
-static const string g_vsSimple = R"END(
+static const string g_vsObjectSpace = R"END(
+layout(location = 0) in vec3 aPosition;
+layout(location = 2) in vec2 aUV1;
+
+noperspective out vec2 fragUV1;
+
+void main() {
+    fragUV1 = aUV1;
+
+    gl_Position = vec4(aPosition, 1.0);
+}
+)END";
+
+static const string g_vsClipSpace = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;
 
@@ -398,19 +412,6 @@ void main() {
     gl_Position = uProjection * uView * P;
     fragUV1 = aUV1;
     fragInstanceID = gl_InstanceID;
-}
-)END";
-
-static const string g_vsSSR = R"END(
-layout(location = 0) in vec3 aPosition;
-layout(location = 2) in vec2 aUV1;
-
-out vec2 fragUV1;
-
-void main() {
-    fragUV1 = aUV1;
-
-    gl_Position = vec4(aPosition, 1.0);
 }
 )END";
 
@@ -891,7 +892,7 @@ uniform sampler2D sDepthMap;
 uniform sampler2D sEyeNormal;
 uniform sampler2D sRoughness;
 
-in vec2 fragUV1;
+noperspective in vec2 fragUV1;
 
 out vec4 fragColor;
 
@@ -1060,7 +1061,7 @@ uniform sampler2D sHilights;
 uniform sampler2D sRoughness;
 uniform sampler2D sSSR;
 
-in vec2 fragUV1;
+noperspective in vec2 fragUV1;
 
 out vec4 fragColor;
 
@@ -1076,204 +1077,307 @@ void main() {
 )END";
 
 static const string g_fsFXAA = R"END(
-const float SUBPIX = 0.75;
+#define NUM_PASSES 5
+#define PASS0 1.0
+#define PASS1 1.5
+#define PASS2 2.0
+#define PASS3 4.0
+#define PASS4 12.0
+
 const float EDGE_THRESHOLD = 0.166;
 const float EDGE_THRESHOLD_MIN = 0.0833;
-
-const int QUALITY_PS = 5;
-const float QUALITY_P0 = 1.0;
-const float QUALITY_P1 = 1.5;
-const float QUALITY_P2 = 2.0;
-const float QUALITY_P3 = 4.0;
-const float QUALITY_P4 = 12.0;
+const float SUBPIX = 0.75;
 
 uniform sampler2D sDiffuseMap;
 
-in vec2 fragUV1;
+noperspective in vec2 fragUV1;
 
 out vec4 fragColor;
 
-float getLuma(vec4 color) {
-    return dot(color.rgb, vec3(0.299, 0.587, 0.114));
+float rgbaToLuma(vec4 rgba) {
+    return rgba.y * (0.587/0.299) + rgba.x;
 }
 
 void main() {
-    vec2 rcpFrame = 1.0 / uScreenResolution;
+    vec2 posM = fragUV1;
+    vec4 rgbaM = texture(sDiffuseMap, posM);
+    float lumaM = rgbaToLuma(rgbaM);
+    float lumaS = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(0, 1)));
+    float lumaE = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(1, 0)));
+    float lumaN = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(0, -1)));
+    float lumaW = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(-1, 0)));
 
-    vec2 posM;
-    posM.x = fragUV1.x;
-    posM.y = fragUV1.y;
-
-    vec4 rgbyM = textureLod(sDiffuseMap, posM, 0.0);
-    float lumaM = getLuma(rgbyM);
-    float lumaS = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(0, 1)));
-    float lumaE = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(1, 0)));
-    float lumaN = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(0, -1)));
-    float lumaW = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(-1, 0)));
-
-    float maxSM = max(lumaS, lumaM);
-    float minSM = min(lumaS, lumaM);
-    float maxESM = max(lumaE, maxSM);
-    float minESM = min(lumaE, minSM);
-    float maxWN = max(lumaN, lumaW);
-    float minWN = min(lumaN, lumaW);
-    float rangeMax = max(maxWN, maxESM);
-    float rangeMin = min(minWN, minESM);
-    float rangeMaxScaled = rangeMax * EDGE_THRESHOLD;
+    float rangeMax = max(max(lumaN, lumaW), max(lumaE, max(lumaS, lumaM)));
+    float rangeMin = min(min(lumaN, lumaW), min(lumaE, min(lumaS, lumaM)));
     float range = rangeMax - rangeMin;
-    float rangeMaxClamped = max(EDGE_THRESHOLD_MIN, rangeMaxScaled);
-    bool earlyExit = range < rangeMaxClamped;
-    if (earlyExit) {
-        fragColor = rgbyM;
+    if (range < max(EDGE_THRESHOLD_MIN, rangeMax * EDGE_THRESHOLD)) {
+        fragColor = rgbaM;
         return;
     }
 
-    float lumaNW = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(-1,-1)));
-    float lumaSE = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2( 1, 1)));
-    float lumaNE = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2( 1,-1)));
-    float lumaSW = getLuma(textureLodOffset(sDiffuseMap, posM, 0.0, ivec2(-1, 1)));
+    float lumaNW = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(-1, -1)));
+    float lumaSE = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(1, 1)));
+    float lumaNE = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(1, -1)));
+    float lumaSW = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(-1, 1)));
 
     float lumaNS = lumaN + lumaS;
     float lumaWE = lumaW + lumaE;
-    float subpixRcpRange = 1.0/range;
-    float subpixNSWE = lumaNS + lumaWE;
-    float edgeHorz1 = (-2.0 * lumaM) + lumaNS;
-    float edgeVert1 = (-2.0 * lumaM) + lumaWE;
-
     float lumaNESE = lumaNE + lumaSE;
     float lumaNWNE = lumaNW + lumaNE;
-    float edgeHorz2 = (-2.0 * lumaE) + lumaNESE;
-    float edgeVert2 = (-2.0 * lumaN) + lumaNWNE;
-
     float lumaNWSW = lumaNW + lumaSW;
     float lumaSWSE = lumaSW + lumaSE;
-    float edgeHorz4 = (abs(edgeHorz1) * 2.0) + abs(edgeHorz2);
-    float edgeVert4 = (abs(edgeVert1) * 2.0) + abs(edgeVert2);
-    float edgeHorz3 = (-2.0 * lumaW) + lumaNWSW;
-    float edgeVert3 = (-2.0 * lumaS) + lumaSWSE;
-    float edgeHorz = abs(edgeHorz3) + edgeHorz4;
-    float edgeVert = abs(edgeVert3) + edgeVert4;
 
-    float subpixNWSWNESE = lumaNWSW + lumaNESE;
-    float lengthSign = rcpFrame.x;
+    float edgeHorz = abs((-2.0 * lumaW) + lumaNWSW) + 2.0 * abs((-2.0 * lumaM) + lumaNS) + abs((-2.0 * lumaE) + lumaNESE);
+    float edgeVert = abs((-2.0 * lumaS) + lumaSWSE) + 2.0 * abs((-2.0 * lumaM) + lumaWE) + abs((-2.0 * lumaN) + lumaNWNE);
     bool horzSpan = edgeHorz >= edgeVert;
-    float subpixA = subpixNSWE * 2.0 + subpixNWSWNESE;
+    if (!horzSpan) {
+        lumaN = lumaW;
+        lumaS = lumaE;
+    }
 
-    if (!horzSpan) lumaN = lumaW;
-    if (!horzSpan) lumaS = lumaE;
-    if (horzSpan) lengthSign = rcpFrame.y;
-    float subpixB = (subpixA * (1.0/12.0)) - lumaM;
+    float lengthSign = horzSpan ? uScreenResolutionReciprocal.y : uScreenResolutionReciprocal.x;
+    float lumaNN = lumaN + lumaM;
+    float lumaSS = lumaS + lumaM;
 
     float gradientN = lumaN - lumaM;
     float gradientS = lumaS - lumaM;
-    float lumaNN = lumaN + lumaM;
-    float lumaSS = lumaS + lumaM;
     bool pairN = abs(gradientN) >= abs(gradientS);
+    if (pairN) {
+        lengthSign = -lengthSign;
+    } else {
+        lumaNN = lumaSS;
+    }
+
+    vec2 posB = posM;
+    if (horzSpan) {
+        posB.y += lengthSign * 0.5;
+    } else {
+        posB.x += lengthSign * 0.5;
+    }
+
+    vec2 offNP = horzSpan ? vec2(uScreenResolutionReciprocal.x, 0.0) : vec2(0.0, uScreenResolutionReciprocal.y);
+    vec2 posN = posB - offNP * PASS0;
+    vec2 posP = posB + offNP * PASS0;
+    float lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN));
+    float lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP));
+
     float gradient = max(abs(gradientN), abs(gradientS));
-    if (pairN) lengthSign = -lengthSign;
-    float subpixC = clamp(abs(subpixB) * subpixRcpRange, 0.0, 1.0);
-
-    vec2 posB;
-    posB.x = posM.x;
-    posB.y = posM.y;
-    vec2 offNP;
-    offNP.x = (!horzSpan) ? 0.0 : rcpFrame.x;
-    offNP.y = (horzSpan) ? 0.0 : rcpFrame.y;
-    if (!horzSpan) posB.x += lengthSign * 0.5;
-    if (horzSpan) posB.y += lengthSign * 0.5;
-
-    vec2 posN;
-    posN.x = posB.x - offNP.x * QUALITY_P0;
-    posN.y = posB.y - offNP.y * QUALITY_P0;
-    vec2 posP;
-    posP.x = posB.x + offNP.x * QUALITY_P0;
-    posP.y = posB.y + offNP.y * QUALITY_P0;
-    float subpixD = ((-2.0)*subpixC) + 3.0;
-    float lumaEndN = getLuma(textureLod(sDiffuseMap, posN, 0.0));
-    float subpixE = subpixC * subpixC;
-    float lumaEndP = getLuma(textureLod(sDiffuseMap, posP, 0.0));
-
-    if (!pairN) lumaNN = lumaSS;
     float gradientScaled = gradient * 1.0/4.0;
-    float lumaMM = lumaM - lumaNN * 0.5;
-    float subpixF = subpixD * subpixE;
-    bool lumaMLTZero = lumaMM < 0.0;
 
     lumaEndN -= lumaNN * 0.5;
     lumaEndP -= lumaNN * 0.5;
     bool doneN = abs(lumaEndN) >= gradientScaled;
     bool doneP = abs(lumaEndP) >= gradientScaled;
-    if (!doneN) posN.x -= offNP.x * QUALITY_P1;
-    if (!doneN) posN.y -= offNP.y * QUALITY_P1;
+    if (!doneN) posN -= offNP * PASS1;
+    if (!doneP) posP += offNP * PASS1;
     bool doneNP = (!doneN) || (!doneP);
-    if (!doneP) posP.x += offNP.x * QUALITY_P1;
-    if (!doneP) posP.y += offNP.y * QUALITY_P1;
 
     if (doneNP) {
-        if (!doneN) lumaEndN = getLuma(textureLod(sDiffuseMap, posN.xy, 0.0));
-        if (!doneP) lumaEndP = getLuma(textureLod(sDiffuseMap, posP.xy, 0.0));
-        if (!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
-        if (!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
-        doneN = abs(lumaEndN) >= gradientScaled;
-        doneP = abs(lumaEndP) >= gradientScaled;
-        if (!doneN) posN.x -= offNP.x * QUALITY_P2;
-        if (!doneN) posN.y -= offNP.y * QUALITY_P2;
-        doneNP = (!doneN) || (!doneP);
-        if (!doneP) posP.x += offNP.x * QUALITY_P2;
-        if (!doneP) posP.y += offNP.y * QUALITY_P2;
-
-        if (doneNP) {
-            if (!doneN) lumaEndN = getLuma(textureLod(sDiffuseMap, posN.xy, 0.0));
-            if (!doneP) lumaEndP = getLuma(textureLod(sDiffuseMap, posP.xy, 0.0));
-            if (!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
-            if (!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
+        if (!doneN) {
+            lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
+            lumaEndN = lumaEndN - lumaNN * 0.5;
             doneN = abs(lumaEndN) >= gradientScaled;
-            doneP = abs(lumaEndP) >= gradientScaled;
-            if (!doneN) posN.x -= offNP.x * QUALITY_P3;
-            if (!doneN) posN.y -= offNP.y * QUALITY_P3;
-            doneNP = (!doneN) || (!doneP);
-            if (!doneP) posP.x += offNP.x * QUALITY_P3;
-            if (!doneP) posP.y += offNP.y * QUALITY_P3;
-
-            if (doneNP) {
-                if (!doneN) lumaEndN = getLuma(textureLod(sDiffuseMap, posN.xy, 0.0));
-                if (!doneP) lumaEndP = getLuma(textureLod(sDiffuseMap, posP.xy, 0.0));
-                if (!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
-                if (!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
-                doneN = abs(lumaEndN) >= gradientScaled;
-                doneP = abs(lumaEndP) >= gradientScaled;
-                if (!doneN) posN.x -= offNP.x * QUALITY_P4;
-                if (!doneN) posN.y -= offNP.y * QUALITY_P4;
-                doneNP = (!doneN) || (!doneP);
-                if (!doneP) posP.x += offNP.x * QUALITY_P4;
-                if (!doneP) posP.y += offNP.y * QUALITY_P4;
-            }
+            if (!doneN) posN -= offNP * PASS2;
         }
+        if (!doneP) {
+            lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
+            lumaEndP = lumaEndP - lumaNN * 0.5;
+            doneP = abs(lumaEndP) >= gradientScaled;
+            if (!doneP) posP += offNP * PASS2;
+        }
+        doneNP = (!doneN) || (!doneP);
+
+        #if (NUM_PASSES > 3)
+        if (doneNP) {
+            if (!doneN) {
+                lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
+                lumaEndN = lumaEndN - lumaNN * 0.5;
+                doneN = abs(lumaEndN) >= gradientScaled;
+                if (!doneN) posN -= offNP * PASS3;
+            }
+            if (!doneP) {
+                lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
+                lumaEndP = lumaEndP - lumaNN * 0.5;
+                doneP = abs(lumaEndP) >= gradientScaled;
+                if (!doneP) posP += offNP * PASS3;
+            }
+            doneNP = (!doneN) || (!doneP);
+
+            #if (NUM_PASSES > 4)
+            if (doneNP) {
+                if (!doneN) {
+                    lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
+                    lumaEndN = lumaEndN - lumaNN * 0.5;
+                    doneN = abs(lumaEndN) >= gradientScaled;
+                    if (!doneN) posN -= offNP * PASS4;
+                }
+                if (!doneP) {
+                    lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
+                    lumaEndP = lumaEndP - lumaNN * 0.5;
+                    doneP = abs(lumaEndP) >= gradientScaled;
+                    if (!doneP) posP += offNP * PASS4;
+                }
+                doneNP = (!doneN) || (!doneP);
+
+                #if (NUM_PASSES > 5)
+                if (doneNP) {
+                    if (!doneN) {
+                        lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
+                        lumaEndN = lumaEndN - lumaNN * 0.5;
+                        doneN = abs(lumaEndN) >= gradientScaled;
+                        if (!doneN) posN -= offNP * PASS5;
+                    }
+                    if (!doneP) {
+                        lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
+                        lumaEndP = lumaEndP - lumaNN * 0.5;
+                        doneP = abs(lumaEndP) >= gradientScaled;
+                        if (!doneP) posP += offNP * PASS5;
+                    }
+                    doneNP = (!doneN) || (!doneP);
+
+                    #if (NUM_PASSES > 6)
+                    if (doneNP) {
+                        if (!doneN) {
+                            lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
+                            lumaEndN = lumaEndN - lumaNN * 0.5;
+                            doneN = abs(lumaEndN) >= gradientScaled;
+                            if (!doneN) posN -= offNP * PASS6;
+                        }
+                        if (!doneP) {
+                            lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
+                            lumaEndP = lumaEndP - lumaNN * 0.5;
+                            doneP = abs(lumaEndP) >= gradientScaled;
+                            if (!doneP) posP += offNP * PASS6;
+                        }
+                        doneNP = (!doneN) || (!doneP);
+
+                        #if (NUM_PASSES > 7)
+                        if (doneNP) {
+                            if (!doneN) {
+                                lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
+                                lumaEndN = lumaEndN - lumaNN * 0.5;
+                                doneN = abs(lumaEndN) >= gradientScaled;
+                                if (!doneN) posN -= offNP * PASS7;
+                            }
+                            if (!doneP) {
+                                lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
+                                lumaEndP = lumaEndP - lumaNN * 0.5;
+                                doneP = abs(lumaEndP) >= gradientScaled;
+                                if (!doneP) posP += offNP * PASS7;
+                            }
+                            doneNP = (!doneN) || (!doneP);
+
+                            #if (NUM_PASSES > 8)
+                            if (doneNP) {
+                                if (!doneN) {
+                                    lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
+                                    lumaEndN = lumaEndN - lumaNN * 0.5;
+                                    doneN = abs(lumaEndN) >= gradientScaled;
+                                    if (!doneN) posN -= offNP * PASS8;
+                                }
+                                if (!doneP) {
+                                    lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
+                                    lumaEndP = lumaEndP - lumaNN * 0.5;
+                                    doneP = abs(lumaEndP) >= gradientScaled;
+                                    if (!doneP) posP += offNP * PASS8;
+                                }
+                                doneNP = (!doneN) || (!doneP);
+
+                                #if (NUM_PASSES > 9)
+                                if (doneNP) {
+                                    if (!doneN) {
+                                        lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
+                                        lumaEndN = lumaEndN - lumaNN * 0.5;
+                                        doneN = abs(lumaEndN) >= gradientScaled;
+                                        if (!doneN) posN -= offNP * PASS9;
+                                    }
+                                    if (!doneP) {
+                                        lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
+                                        lumaEndP = lumaEndP - lumaNN * 0.5;
+                                        doneP = abs(lumaEndP) >= gradientScaled;
+                                        if (!doneP) posP += offNP * PASS9;
+                                    }
+                                    doneNP = (!doneN) || (!doneP);
+
+                                    #if (NUM_PASSES > 10)
+                                    if (doneNP) {
+                                        if (!doneN) {
+                                            lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
+                                            lumaEndN = lumaEndN - lumaNN * 0.5;
+                                            doneN = abs(lumaEndN) >= gradientScaled;
+                                            if (!doneN) posN -= offNP * PASS10;
+                                        }
+                                        if (!doneP) {
+                                            lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
+                                            lumaEndP = lumaEndP - lumaNN * 0.5;
+                                            doneP = abs(lumaEndP) >= gradientScaled;
+                                            if (!doneP) posP += offNP * PASS10;
+                                        }
+                                        doneNP = (!doneN) || (!doneP);
+
+                                        #if (NUM_PASSES > 11)
+                                        if (doneNP) {
+                                            if (!doneN) {
+                                                lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
+                                                lumaEndN = lumaEndN - lumaNN * 0.5;
+                                                doneN = abs(lumaEndN) >= gradientScaled;
+                                                if (!doneN) posN -= offNP * PASS11;
+                                            }
+                                            if (!doneP) {
+                                                lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
+                                                lumaEndP = lumaEndP - lumaNN * 0.5;
+                                                doneP = abs(lumaEndP) >= gradientScaled;
+                                                if (!doneP) posP += offNP * PASS11;
+                                            }
+                                            doneNP = (!doneN) || (!doneP);
+                                        }
+                                        #endif
+                                    }
+                                    #endif
+                                }
+                                #endif
+                            }
+                            #endif
+                        }
+                        #endif
+                    }
+                    #endif
+                }
+                #endif
+            }
+            #endif
+        }
+        #endif
     }
 
-    float dstN = posM.x - posN.x;
-    float dstP = posP.x - posM.x;
-    if (!horzSpan) dstN = posM.y - posN.y;
-    if (!horzSpan) dstP = posP.y - posM.y;
+    float dstN = horzSpan ? (posM.x - posN.x) : (posM.y - posN.y);
+    float dstP = horzSpan ? (posP.x - posM.x) : (posP.y - posM.y);
 
+    bool lumaMLTZero = (lumaM - lumaNN * 0.5) < 0.0;
     bool goodSpanN = (lumaEndN < 0.0) != lumaMLTZero;
-    float spanLength = (dstP + dstN);
     bool goodSpanP = (lumaEndP < 0.0) != lumaMLTZero;
-    float spanLengthRcp = 1.0/spanLength;
 
     bool directionN = dstN < dstP;
-    float dst = min(dstN, dstP);
     bool goodSpan = directionN ? goodSpanN : goodSpanP;
+    float pixelOffset = 0.5 - min(dstN, dstP) / (dstP + dstN);
+    float pixelOffsetGood = goodSpan ? pixelOffset : 0.0;
+
+    float subpixA = (lumaNS + lumaWE) * 2.0 + lumaNWSW + lumaNESE;
+    float subpixB = (subpixA * (1.0/12.0)) - lumaM;
+    float subpixC = clamp(abs(subpixB) / range, 0.0, 1.0);
+    float subpixD = ((-2.0)*subpixC) + 3.0;
+    float subpixE = subpixC * subpixC;
+    float subpixF = subpixD * subpixE;
     float subpixG = subpixF * subpixF;
-    float pixelOffset = (dst * (-spanLengthRcp)) + 0.5;
     float subpixH = subpixG * SUBPIX;
 
-    float pixelOffsetGood = goodSpan ? pixelOffset : 0.0;
     float pixelOffsetSubpix = max(pixelOffsetGood, subpixH);
-    if (!horzSpan) posM.x += pixelOffsetSubpix * lengthSign;
-    if (horzSpan) posM.y += pixelOffsetSubpix * lengthSign;
-
-    fragColor = vec4(textureLod(sDiffuseMap, posM, 0.0).rgb, 1.0);
+    if (horzSpan) {
+        posM.y += pixelOffsetSubpix * lengthSign;
+    } else {
+        posM.x += pixelOffsetSubpix * lengthSign;
+    }
+    fragColor = vec4(texture(sDiffuseMap, posM).xyz, rgbaM.a);
 }
 )END";
 
@@ -1317,14 +1421,14 @@ void Shaders::init() {
     }
 
     // Shaders
-    auto vsSimple = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_vsSimple});
+    auto vsObjectSpace = initShader(ShaderType::Vertex, {g_glslHeader, g_vsObjectSpace});
+    auto vsClipSpace = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_vsClipSpace});
     auto vsShadows = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_vsShadows});
     auto vsModel = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslSkeletalUniforms, g_vsModel});
     auto vsBillboard = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_vsBillboard});
     auto vsParticle = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_vsParticle});
     auto vsGrass = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_vsGrass});
     auto vsText = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslTextUniforms, g_vsText});
-    auto vsSSR = initShader(ShaderType::Vertex, {g_glslHeader, g_vsSSR});
     auto gsPointLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_glslGeneralUniforms, g_gsPointLightShadows});
     auto gsDirectionalLightShadows = initShader(ShaderType::Geometry, {g_glslHeader, g_glslGeneralUniforms, g_gsDirectionalLightShadows});
     auto fsColor = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsColor});
@@ -1343,19 +1447,19 @@ void Shaders::init() {
     auto fsText = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslTextUniforms, g_fsText});
 
     // Shader Programs
-    _spSimpleColor = initShaderProgram({vsSimple, fsColor});
-    _spSimpleTexture = initShaderProgram({vsSimple, fsTexture});
+    _spSimpleColor = initShaderProgram({vsClipSpace, fsColor});
+    _spSimpleTexture = initShaderProgram({vsClipSpace, fsTexture});
     _spPointLightShadows = initShaderProgram({vsShadows, gsPointLightShadows, fsPointLightShadows});
     _spDirectionalLightShadows = initShaderProgram({vsShadows, gsDirectionalLightShadows, fsDirectionalLightShadows});
     _spBlinnPhong = initShaderProgram({vsModel, fsBlinnPhong});
     _spBillboard = initShaderProgram({vsBillboard, fsBillboard});
     _spParticle = initShaderProgram({vsParticle, fsParticle});
     _spGrass = initShaderProgram({vsGrass, fsGrass});
-    _spSSR = initShaderProgram({vsSSR, fsSSR});
-    _spBlur = initShaderProgram({vsSimple, fsBlur});
-    _spComposite = initShaderProgram({vsSimple, fsComposite});
-    _spFXAA = initShaderProgram({vsSimple, fsFXAA});
-    _spGUI = initShaderProgram({vsSimple, fsGUI});
+    _spSSR = initShaderProgram({vsObjectSpace, fsSSR});
+    _spBlur = initShaderProgram({vsObjectSpace, fsBlur});
+    _spComposite = initShaderProgram({vsObjectSpace, fsComposite});
+    _spFXAA = initShaderProgram({vsObjectSpace, fsFXAA});
+    _spGUI = initShaderProgram({vsClipSpace, fsGUI});
     _spText = initShaderProgram({vsText, fsText});
 
     // Uniform Buffers
