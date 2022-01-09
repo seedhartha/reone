@@ -299,6 +299,7 @@ void Game::drawWorld() {
     uniforms.general.resetLocals();
 
     _services.shaders.use(_services.shaders.simpleTexture(), true);
+    _services.textures.bind(*output);
     _services.meshes.quadNDC().draw();
 }
 

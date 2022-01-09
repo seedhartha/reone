@@ -214,6 +214,7 @@ void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
     uniforms.general.projection = move(projection);
     uniforms.general.model = move(transform);
     _shaders.use(_shaders.gui(), true);
+    _textures.bind(*output);
     _graphicsContext.withoutDepthTest([this]() {
         _meshes.quad().draw();
     });
