@@ -67,8 +67,9 @@ layout(std140) uniform General {
     vec4 uFogColor;
     vec4 uHeightMapFrameBounds;
     vec4 uShadowLightPosition;
+    vec4 uScreenResolutionReciprocal;
+    vec4 uScreenResolutionReciprocal2;
     vec2 uScreenResolution;
-    vec2 uScreenResolutionReciprocal;
     vec2 uBlurDirection;
     float uAlpha;
     float uWaterAlpha;
@@ -1077,16 +1078,9 @@ void main() {
 )END";
 
 static const string g_fsFXAA = R"END(
-#define NUM_PASSES 5
-#define PASS0 1.0
-#define PASS1 1.5
-#define PASS2 2.0
-#define PASS3 4.0
-#define PASS4 12.0
-
-const float EDGE_THRESHOLD = 0.166;
-const float EDGE_THRESHOLD_MIN = 0.0833;
-const float SUBPIX = 0.75;
+const float EDGE_SHARPNESS = 8.0;
+const float EDGE_THRESHOLD = 0.125;
+const float EDGE_THRESHOLD_MIN = 0.05;
 
 uniform sampler2D sDiffuseMap;
 
@@ -1102,282 +1096,44 @@ void main() {
     vec2 posM = fragUV1;
     vec4 rgbaM = texture(sDiffuseMap, posM);
     float lumaM = rgbaToLuma(rgbaM);
-    float lumaS = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(0, 1)));
-    float lumaE = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(1, 0)));
-    float lumaN = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(0, -1)));
-    float lumaW = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(-1, 0)));
 
-    float rangeMax = max(max(lumaN, lumaW), max(lumaE, max(lumaS, lumaM)));
-    float rangeMin = min(min(lumaN, lumaW), min(lumaE, min(lumaS, lumaM)));
-    float range = rangeMax - rangeMin;
-    if (range < max(EDGE_THRESHOLD_MIN, rangeMax * EDGE_THRESHOLD)) {
+    float lumaNw = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(-1, 1)));
+    float lumaSw = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(-1, -1)));
+    float lumaNe = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(1, 1)));
+    float lumaSe = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(1, -1)));
+
+    lumaNe += 1.0/384.0;
+
+    float lumaMax = max(max(lumaNe, lumaSe), max(lumaNw, lumaSw));
+    float lumaMin = min(min(lumaNe, lumaSe), min(lumaNw, lumaSw));
+    float lumaMaxSubMinM = max(lumaMax, lumaM) - min(lumaMin, lumaM);
+    if (lumaMaxSubMinM < max(EDGE_THRESHOLD_MIN, lumaMax * EDGE_THRESHOLD)) {
         fragColor = rgbaM;
         return;
     }
 
-    float lumaNW = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(-1, -1)));
-    float lumaSE = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(1, 1)));
-    float lumaNE = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(1, -1)));
-    float lumaSW = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(-1, 1)));
+    float dirSwMinusNe = lumaSw - lumaNe;
+    float dirSeMinusNw = lumaSe - lumaNw;
+    vec2 dir = vec2(dirSwMinusNe + dirSeMinusNw, dirSwMinusNe - dirSeMinusNw);
 
-    float lumaNS = lumaN + lumaS;
-    float lumaWE = lumaW + lumaE;
-    float lumaNESE = lumaNE + lumaSE;
-    float lumaNWNE = lumaNW + lumaNE;
-    float lumaNWSW = lumaNW + lumaSW;
-    float lumaSWSE = lumaSW + lumaSE;
+    vec2 dir1 = normalize(dir);
+    vec4 rgbaN1 = texture(sDiffuseMap, posM - dir1 * uScreenResolutionReciprocal.zw);
+    vec4 rgbaP1 = texture(sDiffuseMap, posM + dir1 * uScreenResolutionReciprocal.zw);
 
-    float edgeHorz = abs((-2.0 * lumaW) + lumaNWSW) + 2.0 * abs((-2.0 * lumaM) + lumaNS) + abs((-2.0 * lumaE) + lumaNESE);
-    float edgeVert = abs((-2.0 * lumaS) + lumaSWSE) + 2.0 * abs((-2.0 * lumaM) + lumaWE) + abs((-2.0 * lumaN) + lumaNWNE);
-    bool horzSpan = edgeHorz >= edgeVert;
-    if (!horzSpan) {
-        lumaN = lumaW;
-        lumaS = lumaE;
+    float dirAbsMinTimesC = min(abs(dir1.x), abs(dir1.y)) * EDGE_SHARPNESS;
+    vec2 dir2 = clamp(dir1 / dirAbsMinTimesC, -2.0, 2.0);
+
+    vec4 rgbaN2 = texture(sDiffuseMap, posM - dir2 * uScreenResolutionReciprocal2.zw);
+    vec4 rgbaP2 = texture(sDiffuseMap, posM + dir2 * uScreenResolutionReciprocal2.zw);
+
+    vec4 rgbaA = rgbaN1 + rgbaP1;
+    vec4 rgbaB = ((rgbaN2 + rgbaP2) * 0.25) + (rgbaA * 0.25);
+
+    bool twoTap = (rgbaToLuma(rgbaB) < lumaMin) || (rgbaToLuma(rgbaB) > lumaMax);
+    if (twoTap) {
+        rgbaB.xyz = rgbaA.xyz * 0.5;
     }
-
-    float lengthSign = horzSpan ? uScreenResolutionReciprocal.y : uScreenResolutionReciprocal.x;
-    float lumaNN = lumaN + lumaM;
-    float lumaSS = lumaS + lumaM;
-
-    float gradientN = lumaN - lumaM;
-    float gradientS = lumaS - lumaM;
-    bool pairN = abs(gradientN) >= abs(gradientS);
-    if (pairN) {
-        lengthSign = -lengthSign;
-    } else {
-        lumaNN = lumaSS;
-    }
-
-    vec2 posB = posM;
-    if (horzSpan) {
-        posB.y += lengthSign * 0.5;
-    } else {
-        posB.x += lengthSign * 0.5;
-    }
-
-    vec2 offNP = horzSpan ? vec2(uScreenResolutionReciprocal.x, 0.0) : vec2(0.0, uScreenResolutionReciprocal.y);
-    vec2 posN = posB - offNP * PASS0;
-    vec2 posP = posB + offNP * PASS0;
-    float lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN));
-    float lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP));
-
-    float gradient = max(abs(gradientN), abs(gradientS));
-    float gradientScaled = gradient * 1.0/4.0;
-
-    lumaEndN -= lumaNN * 0.5;
-    lumaEndP -= lumaNN * 0.5;
-    bool doneN = abs(lumaEndN) >= gradientScaled;
-    bool doneP = abs(lumaEndP) >= gradientScaled;
-    if (!doneN) posN -= offNP * PASS1;
-    if (!doneP) posP += offNP * PASS1;
-    bool doneNP = (!doneN) || (!doneP);
-
-    if (doneNP) {
-        if (!doneN) {
-            lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
-            lumaEndN = lumaEndN - lumaNN * 0.5;
-            doneN = abs(lumaEndN) >= gradientScaled;
-            if (!doneN) posN -= offNP * PASS2;
-        }
-        if (!doneP) {
-            lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
-            lumaEndP = lumaEndP - lumaNN * 0.5;
-            doneP = abs(lumaEndP) >= gradientScaled;
-            if (!doneP) posP += offNP * PASS2;
-        }
-        doneNP = (!doneN) || (!doneP);
-
-        #if (NUM_PASSES > 3)
-        if (doneNP) {
-            if (!doneN) {
-                lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
-                lumaEndN = lumaEndN - lumaNN * 0.5;
-                doneN = abs(lumaEndN) >= gradientScaled;
-                if (!doneN) posN -= offNP * PASS3;
-            }
-            if (!doneP) {
-                lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
-                lumaEndP = lumaEndP - lumaNN * 0.5;
-                doneP = abs(lumaEndP) >= gradientScaled;
-                if (!doneP) posP += offNP * PASS3;
-            }
-            doneNP = (!doneN) || (!doneP);
-
-            #if (NUM_PASSES > 4)
-            if (doneNP) {
-                if (!doneN) {
-                    lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
-                    lumaEndN = lumaEndN - lumaNN * 0.5;
-                    doneN = abs(lumaEndN) >= gradientScaled;
-                    if (!doneN) posN -= offNP * PASS4;
-                }
-                if (!doneP) {
-                    lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
-                    lumaEndP = lumaEndP - lumaNN * 0.5;
-                    doneP = abs(lumaEndP) >= gradientScaled;
-                    if (!doneP) posP += offNP * PASS4;
-                }
-                doneNP = (!doneN) || (!doneP);
-
-                #if (NUM_PASSES > 5)
-                if (doneNP) {
-                    if (!doneN) {
-                        lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
-                        lumaEndN = lumaEndN - lumaNN * 0.5;
-                        doneN = abs(lumaEndN) >= gradientScaled;
-                        if (!doneN) posN -= offNP * PASS5;
-                    }
-                    if (!doneP) {
-                        lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
-                        lumaEndP = lumaEndP - lumaNN * 0.5;
-                        doneP = abs(lumaEndP) >= gradientScaled;
-                        if (!doneP) posP += offNP * PASS5;
-                    }
-                    doneNP = (!doneN) || (!doneP);
-
-                    #if (NUM_PASSES > 6)
-                    if (doneNP) {
-                        if (!doneN) {
-                            lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
-                            lumaEndN = lumaEndN - lumaNN * 0.5;
-                            doneN = abs(lumaEndN) >= gradientScaled;
-                            if (!doneN) posN -= offNP * PASS6;
-                        }
-                        if (!doneP) {
-                            lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
-                            lumaEndP = lumaEndP - lumaNN * 0.5;
-                            doneP = abs(lumaEndP) >= gradientScaled;
-                            if (!doneP) posP += offNP * PASS6;
-                        }
-                        doneNP = (!doneN) || (!doneP);
-
-                        #if (NUM_PASSES > 7)
-                        if (doneNP) {
-                            if (!doneN) {
-                                lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
-                                lumaEndN = lumaEndN - lumaNN * 0.5;
-                                doneN = abs(lumaEndN) >= gradientScaled;
-                                if (!doneN) posN -= offNP * PASS7;
-                            }
-                            if (!doneP) {
-                                lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
-                                lumaEndP = lumaEndP - lumaNN * 0.5;
-                                doneP = abs(lumaEndP) >= gradientScaled;
-                                if (!doneP) posP += offNP * PASS7;
-                            }
-                            doneNP = (!doneN) || (!doneP);
-
-                            #if (NUM_PASSES > 8)
-                            if (doneNP) {
-                                if (!doneN) {
-                                    lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
-                                    lumaEndN = lumaEndN - lumaNN * 0.5;
-                                    doneN = abs(lumaEndN) >= gradientScaled;
-                                    if (!doneN) posN -= offNP * PASS8;
-                                }
-                                if (!doneP) {
-                                    lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
-                                    lumaEndP = lumaEndP - lumaNN * 0.5;
-                                    doneP = abs(lumaEndP) >= gradientScaled;
-                                    if (!doneP) posP += offNP * PASS8;
-                                }
-                                doneNP = (!doneN) || (!doneP);
-
-                                #if (NUM_PASSES > 9)
-                                if (doneNP) {
-                                    if (!doneN) {
-                                        lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
-                                        lumaEndN = lumaEndN - lumaNN * 0.5;
-                                        doneN = abs(lumaEndN) >= gradientScaled;
-                                        if (!doneN) posN -= offNP * PASS9;
-                                    }
-                                    if (!doneP) {
-                                        lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
-                                        lumaEndP = lumaEndP - lumaNN * 0.5;
-                                        doneP = abs(lumaEndP) >= gradientScaled;
-                                        if (!doneP) posP += offNP * PASS9;
-                                    }
-                                    doneNP = (!doneN) || (!doneP);
-
-                                    #if (NUM_PASSES > 10)
-                                    if (doneNP) {
-                                        if (!doneN) {
-                                            lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
-                                            lumaEndN = lumaEndN - lumaNN * 0.5;
-                                            doneN = abs(lumaEndN) >= gradientScaled;
-                                            if (!doneN) posN -= offNP * PASS10;
-                                        }
-                                        if (!doneP) {
-                                            lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
-                                            lumaEndP = lumaEndP - lumaNN * 0.5;
-                                            doneP = abs(lumaEndP) >= gradientScaled;
-                                            if (!doneP) posP += offNP * PASS10;
-                                        }
-                                        doneNP = (!doneN) || (!doneP);
-
-                                        #if (NUM_PASSES > 11)
-                                        if (doneNP) {
-                                            if (!doneN) {
-                                                lumaEndN = rgbaToLuma(texture(sDiffuseMap, posN.xy));
-                                                lumaEndN = lumaEndN - lumaNN * 0.5;
-                                                doneN = abs(lumaEndN) >= gradientScaled;
-                                                if (!doneN) posN -= offNP * PASS11;
-                                            }
-                                            if (!doneP) {
-                                                lumaEndP = rgbaToLuma(texture(sDiffuseMap, posP.xy));
-                                                lumaEndP = lumaEndP - lumaNN * 0.5;
-                                                doneP = abs(lumaEndP) >= gradientScaled;
-                                                if (!doneP) posP += offNP * PASS11;
-                                            }
-                                            doneNP = (!doneN) || (!doneP);
-                                        }
-                                        #endif
-                                    }
-                                    #endif
-                                }
-                                #endif
-                            }
-                            #endif
-                        }
-                        #endif
-                    }
-                    #endif
-                }
-                #endif
-            }
-            #endif
-        }
-        #endif
-    }
-
-    float dstN = horzSpan ? (posM.x - posN.x) : (posM.y - posN.y);
-    float dstP = horzSpan ? (posP.x - posM.x) : (posP.y - posM.y);
-
-    bool lumaMLTZero = (lumaM - lumaNN * 0.5) < 0.0;
-    bool goodSpanN = (lumaEndN < 0.0) != lumaMLTZero;
-    bool goodSpanP = (lumaEndP < 0.0) != lumaMLTZero;
-
-    bool directionN = dstN < dstP;
-    bool goodSpan = directionN ? goodSpanN : goodSpanP;
-    float pixelOffset = 0.5 - min(dstN, dstP) / (dstP + dstN);
-    float pixelOffsetGood = goodSpan ? pixelOffset : 0.0;
-
-    float subpixA = (lumaNS + lumaWE) * 2.0 + lumaNWSW + lumaNESE;
-    float subpixB = (subpixA * (1.0/12.0)) - lumaM;
-    float subpixC = clamp(abs(subpixB) / range, 0.0, 1.0);
-    float subpixD = ((-2.0)*subpixC) + 3.0;
-    float subpixE = subpixC * subpixC;
-    float subpixF = subpixD * subpixE;
-    float subpixG = subpixF * subpixF;
-    float subpixH = subpixG * SUBPIX;
-
-    float pixelOffsetSubpix = max(pixelOffsetGood, subpixH);
-    if (horzSpan) {
-        posM.y += pixelOffsetSubpix * lengthSign;
-    } else {
-        posM.x += pixelOffsetSubpix * lengthSign;
-    }
-    fragColor = vec4(texture(sDiffuseMap, posM).xyz, rgbaM.a);
+    fragColor = vec4(rgbaB.xyz, rgbaM.w);
 }
 )END";
 

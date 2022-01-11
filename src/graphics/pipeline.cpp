@@ -470,7 +470,16 @@ void Pipeline::applyFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
-    uniforms.general.screenResolutionReciprocal = glm::vec2(1.0f) / glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
+    uniforms.general.screenResolutionReciprocal = glm::vec4(
+        -0.5f / dim.x,
+        -0.5f / dim.y,
+        0.5f / dim.x,
+        0.5f / dim.y);
+    uniforms.general.screenResolutionReciprocal2 = glm::vec4(
+        -2.0f / dim.x,
+        -2.0f / dim.y,
+        2.0f / dim.x,
+        2.0f / dim.y);
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(_shaders.fxaa(), true);
