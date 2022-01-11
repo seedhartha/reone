@@ -421,6 +421,7 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     uniforms.general.projectionInv = glm::inverse(camera->projection());
     uniforms.general.screenProjection = move(screenProjection);
     uniforms.general.screenResolution = glm::vec2(dim.x, dim.y);
+    uniforms.general.screenResolutionReciprocal = glm::vec4(1.0f / dim.x, 1.0f / dim.y, 0.0f, 0.0f);
 
     // Apply screen-space reflections to geometry color buffers
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSR->nameGL());

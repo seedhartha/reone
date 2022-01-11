@@ -880,13 +880,13 @@ void main() {
 )END";
 
 static const string g_fsSSR = R"END(
-const float Z_TICKNESS = 0.005;
+const float Z_THICKNESS = 0.1;
+const float STRIDE = 8.0;
 const float Z_NEAR = 0.1;
-const float PIXEL_STRIDE = 4.0;
-const float PIXEL_STRIDE_Z_CUTOFF = 100.0;
-const int ITERATIONS = 64;
+const float MAX_STEPS = 16.0;
 const float MAX_DISTANCE = 100.0;
-const float SCREEN_FADE = 0.8;
+
+const float EDGE_FADE_START = 0.75;
 
 uniform sampler2D sDiffuseMap;
 uniform sampler2D sDepthMap;
@@ -897,6 +897,17 @@ noperspective in vec2 fragUV1;
 
 out vec4 fragColor;
 
+float distanceSquared(vec2 a, vec2 b) {
+    a -= b;
+    return dot(a, a);
+}
+
+void swap(inout float a, inout float b) {
+    float tmp = a;
+    a = b;
+    b = tmp;
+}
+
 vec3 screenToViewSpace(vec2 uv, float depth) {
     vec3 clip = vec3(uv, depth) * 2.0 - vec3(1.0);
     vec4 eye = vec4(
@@ -906,32 +917,17 @@ vec3 screenToViewSpace(vec2 uv, float depth) {
     return eye.xyz / eye.w;
 }
 
-float distanceSquared(vec2 a, vec2 b) {
-    a -= b;
-    return dot(a, a);
-}
-
-void swapIfBigger(inout float a, inout float b) {
-    if (a > b) {
-        float tmp = a;
-        a = b;
-        b = tmp;
-    }
-}
-
-bool rayIntersectsDepth(float zA, float zB, vec2 pixel) {
-    float depth = texelFetch(sDepthMap, ivec2(pixel), 0).r;
-    float eyeZ = -1.0 / (uProjectionInv[2][3] * (depth * 2.0 - 1.0) + uProjectionInv[3][3]);
-    return zB <= eyeZ && zA >= eyeZ - Z_TICKNESS;
-}
-
 bool traceScreenSpaceRay(
     vec3 rayOrigin,
     vec3 rayDir,
     float jitter,
-    out vec2 hitPixel,
+    out vec2 hitUV,
     out vec3 hitPoint,
-    out int iteration) {
+    out float stepCount) {
+
+    hitUV = vec2(0.0);
+    hitPoint = vec3(0.0);
+    stepCount = 0.0;
 
     float rayLength = ((rayOrigin.z + rayDir.z * MAX_DISTANCE) > -Z_NEAR) ? (-Z_NEAR - rayOrigin.z) / rayDir.z : MAX_DISTANCE;
     vec3 rayEnd = rayOrigin + rayDir * rayLength;
@@ -940,7 +936,6 @@ bool traceScreenSpaceRay(
     vec4 H1 = uScreenProjection * vec4(rayEnd, 1.0);
     float k0 = 1.0 / H0.w;
     float k1 = 1.0 / H1.w;
-
     vec3 Q0 = rayOrigin * k0;
     vec3 Q1 = rayEnd * k1;
     vec2 P0 = H0.xy * k0;
@@ -964,41 +959,49 @@ bool traceScreenSpaceRay(
     float dk = (k1 - k0) * invdx;
     vec2 dP = vec2(stepDir, delta.y * invdx);
 
-    float strideScaler = 1.0 - min(1.0, -rayOrigin.z / PIXEL_STRIDE_Z_CUTOFF);
-    float pixelStride = 1.0 + strideScaler * PIXEL_STRIDE;
+    dP *= STRIDE;
+    dQ *= STRIDE;
+    dk *= STRIDE;
 
-    dP *= pixelStride;
-    dQ *= pixelStride;
-    dk *= pixelStride;
+    P0 += dP * jitter + dP;
+    Q0 += dQ * jitter + dQ;
+    k0 += dk * jitter + dk;
 
-    P0 += dP * jitter;
-    Q0 += dQ * jitter;
-    k0 += dk * jitter;
+    float prevZMaxEstimate = rayOrigin.z;
 
-    int i;
-    float zA = 0.0;
-    float zB = 0.0;
-
-    vec4 pqk = vec4(P0, Q0.z, k0);
-    vec4 dPQK = vec4(dP, dQ.z, dk);
+    vec3 Q = Q0;
+    float k = k0;
+    float end = P1.x * stepDir;
     bool intersect = false;
 
-    for (i = 0; i < ITERATIONS && !intersect; ++i) {
-        pqk += dPQK;
+    for (vec2 P = P0;
+         P.x * stepDir <= end && stepCount < MAX_STEPS;
+         P += dP, Q.z += dQ.z, k += dk, stepCount += 1.0) {
 
-        zA = zB;
-        zB = (dPQK.z * 0.5 + pqk.z) / (dPQK.w * 0.5 + pqk.w);
-        swapIfBigger(zB, zA);
+        hitUV = permute ? P.yx : P;
+        hitUV *= uScreenResolutionReciprocal.xy;
+        if (any(greaterThan(abs(hitUV - vec2(0.5)), vec2(0.5)))) {
+            break;
+        }
 
-        hitPixel = permute ? pqk.yx : pqk.xy;
-        intersect = rayIntersectsDepth(zA, zB, hitPixel);
+        float rayZMin = prevZMaxEstimate;
+        float rayZMax = (dQ.z * 0.5 + Q.z) / (dk * 0.5 + k);
+        prevZMaxEstimate = rayZMax;
+        if (rayZMin > rayZMax) {
+            swap(rayZMin, rayZMax);
+        }
+
+        float sceneDepth = texture(sDepthMap, hitUV).r;
+        float sceneZMax = screenToViewSpace(hitUV, sceneDepth).z;
+        float sceneZMin = sceneZMax - Z_THICKNESS;
+        if (rayZMax >= sceneZMin && rayZMin <= sceneZMax) {
+            intersect = true;
+            break;
+        }
     }
 
-    Q0.xy += dQ.xy * i;
-    Q0.z = pqk.z;
-    hitPoint = Q0 / pqk.w;
-    iteration = i;
-
+    Q.xy += dQ.xy * stepCount;
+    hitPoint = Q * (1.0 / k);
     return intersect;
 }
 
@@ -1018,17 +1021,19 @@ void main() {
     vec3 N = normalize(texture(sEyeNormal, fragUV1).xyz * 2.0 - 1.0);
     vec3 R = reflect(I, N);
 
-    vec2 pixel = fragUV1 * uScreenResolution;
-    float jitter = mod((pixel.x + pixel.y) * 0.25, 1.0);
-    vec2 hitPixel = vec2(0.0);
-    vec3 hitPoint = vec3(0.0);
-    int iteration = 0;
-    if (traceScreenSpaceRay(fragPosVS, R, jitter, hitPixel, hitPoint, iteration)) {
-        reflectionColor = texelFetch(sDiffuseMap, ivec2(hitPixel), 0);
-        vec2 hitNDC = (hitPixel / uScreenResolution) * 2.0 - 1.0;
-        float maxDimension = min(1.0, max(abs(hitNDC.x), abs(hitNDC.y)));
-        reflectionStrength = 1.0 - iteration / float(ITERATIONS);
-        reflectionStrength *= 1.0 - max(0.0, maxDimension - SCREEN_FADE) / (1.0 - SCREEN_FADE);
+    ivec2 c = ivec2(gl_FragCoord.xy);
+    float jitter = float((c.x + c.y) & 1) * 0.5;
+    vec2 hitUV;
+    vec3 hitPoint;
+    float stepCount;
+    if (traceScreenSpaceRay(fragPosVS, R, jitter, hitUV, hitPoint, stepCount)) {
+        vec2 hitNDC = hitUV * 2.0 - 1.0;
+        float maxDim = min(1.0, max(abs(hitNDC.x), abs(hitNDC.y)));
+        reflectionColor = texture(sDiffuseMap, hitUV);
+        reflectionStrength = 1.0 - clamp(R.z, 0.0, 1.0);
+        reflectionStrength *= 1.0 - stepCount / MAX_STEPS;
+        reflectionStrength *= 1.0 - clamp(distance(fragPosVS, hitPoint) / MAX_DISTANCE, 0.0, 1.0);
+        reflectionStrength *= 1.0 - max(0.0, (maxDim - EDGE_FADE_START) / (1.0 - EDGE_FADE_START));
     }
 
     fragColor = vec4(reflectionColor.rgb, reflectionStrength);
