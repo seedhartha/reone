@@ -75,6 +75,7 @@ enum class PixelFormat {
     R16F,
     RGB8,
     RGBA8,
+    RGBA16F,
     BGR8,
     BGRA8,
     DXT1,
