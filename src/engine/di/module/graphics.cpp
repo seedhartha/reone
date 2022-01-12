@@ -42,6 +42,7 @@ void GraphicsModule::init() {
     _meshes->init();
     _textures->init();
     _shaders->init();
+    _pipeline->init();
 }
 
 void GraphicsModule::deinit() {

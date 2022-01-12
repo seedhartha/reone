@@ -44,6 +44,7 @@ static uint32_t getPixelFormatGL(PixelFormat format) {
     case PixelFormat::R16F:
         return GL_RED;
     case PixelFormat::RGB8:
+    case PixelFormat::RGB16F:
         return GL_RGB;
     case PixelFormat::RGBA8:
     case PixelFormat::RGBA16F:
@@ -72,6 +73,7 @@ static uint32_t getPixelTypeGL(PixelFormat format) {
     case PixelFormat::BGRA8:
         return GL_UNSIGNED_BYTE;
     case PixelFormat::R16F:
+    case PixelFormat::RGB16F:
     case PixelFormat::RGBA16F:
         return GL_HALF_FLOAT;
     case PixelFormat::Depth32F:

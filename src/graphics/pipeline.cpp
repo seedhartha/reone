@@ -17,6 +17,8 @@
 
 #include "pipeline.h"
 
+#include "../common/randomutil.h"
+
 #include "camera/perspective.h"
 #include "context.h"
 #include "format/tgawriter.h"
@@ -152,6 +154,18 @@ static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) 
     }
 }
 
+void Pipeline::init() {
+    auto &uniforms = _shaders.uniforms();
+    for (int i = 0; i < kNumSSAOSamples; ++i) {
+        float scale = i / static_cast<float>(kNumSSAOSamples);
+        scale = glm::mix(0.1f, 1.0f, scale * scale);
+        auto sample = glm::vec3(random(-1.0f, 1.0f), random(-1.0f, 1.0f), random(0.0f, 1.0f));
+        sample = glm::normalize(sample);
+        sample *= scale;
+        uniforms.ssao.samples[i] = glm::vec4(move(sample), 0.0f);
+    }
+}
+
 void Pipeline::initAttachments(glm::ivec2 dim) {
     Attachments attachments;
 
@@ -198,6 +212,26 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
     attachments.fbPointLightShadows = make_shared<Framebuffer>();
     attachments.fbPointLightShadows->attachDepth(attachments.dbPointLightShadows);
     attachments.fbPointLightShadows->init();
+
+    // Depth framebuffer
+
+    attachments.dbDepth = make_shared<Texture>("depth_depth", getTextureProperties(TextureUsage::DepthBuffer));
+    attachments.dbDepth->clear(dim.x, dim.y, PixelFormat::Depth32F);
+    attachments.dbDepth->init();
+
+    attachments.fbDepth = make_shared<Framebuffer>();
+    attachments.fbDepth->attachDepth(attachments.dbDepth);
+    attachments.fbDepth->init();
+
+    // SSAO framebuffer
+
+    attachments.cbSSAO = make_shared<Texture>("ssao_color", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbSSAO->clear(dim.x, dim.y, PixelFormat::R8);
+    attachments.cbSSAO->init();
+
+    attachments.fbSSAO = make_shared<Framebuffer>();
+    attachments.fbSSAO->attachColorDepth(attachments.cbSSAO, attachments.dbCommon);
+    attachments.fbSSAO->init();
 
     // Geometry framebuffer
 
@@ -269,6 +303,15 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
 
     _graphicsContext.withViewport(glm::ivec4(0, 0, dim.x, dim.y), [this, &scene, &dim, &attachments] {
         drawShadows(scene, attachments);
+
+        // Screen-space ambient occlusion
+        if (_options.ssao) {
+            drawDepth(scene, attachments);
+            drawSSAO(scene, dim, attachments);
+            applyBlur(dim, *attachments.cbSSAO, *attachments.fbPing);
+            applyBlur(dim, *attachments.cbPing, *attachments.fbSSAO, R_BLUR_VERTICAL);
+        }
+
         drawGeometry(scene, attachments);
 
         // Blur geometry hilights
@@ -276,7 +319,7 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
         applyBlur(dim, *attachments.cbPing, *attachments.fbPong, R_BLUR_VERTICAL);
         blitFramebuffer(dim, *attachments.fbPong, 0, *attachments.fbGeometry, 1);
 
-        // Blur SSR
+        // Screen-space reflections
         if (_options.ssr) {
             drawSSR(scene, dim, attachments);
             applyBlur(dim, *attachments.cbSSR, *attachments.fbPing);
@@ -347,12 +390,47 @@ void Pipeline::drawShadows(IScene &scene, Attachments &attachments) {
     // Draw shadows to a separate framebuffer
     auto framebuffer = scene.isShadowLightDirectional() ? attachments.fbDirectionalLightShadows : attachments.fbPointLightShadows;
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->nameGL());
-    glReadBuffer(GL_NONE);
     glDrawBuffer(GL_NONE);
     _graphicsContext.withViewport(glm::ivec4(0, 0, _options.shadowResolution, _options.shadowResolution), [this, &scene]() {
         _graphicsContext.clearDepth();
         scene.drawShadows();
     });
+}
+
+void Pipeline::drawDepth(IScene &scene, Attachments &attachments) {
+    auto camera = scene.camera();
+
+    // Set global uniforms
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.projection = camera->projection();
+    uniforms.general.view = camera->view();
+
+    // Draw scene to depth framebuffer
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbDepth->nameGL());
+    glDrawBuffer(GL_NONE);
+    _graphicsContext.clearDepth();
+    scene.drawDepth();
+}
+
+void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments) {
+    // Reset uniforms
+    auto camera = scene.camera();
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
+    uniforms.general.featureMask = UniformsFeatureFlags::ssaosamples;
+    uniforms.general.projection = camera->projection();
+    uniforms.general.projectionInv = glm::inverse(camera->projection());
+    uniforms.general.screenResolutionReciprocal = glm::vec4(1.0f / dim.x, 1.0f / dim.y, 0.0f, 0.0f);
+
+    // Draw screen-space ambient occlusion
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSAO->nameGL());
+    glDrawBuffer(kColorAttachments[0]);
+    _shaders.use(_shaders.ssao(), true);
+    _textures.bind(*attachments.dbDepth, TextureUnits::depthMap);
+    _graphicsContext.clearColorDepth();
+    _meshes.quadNDC().draw();
 }
 
 void Pipeline::drawGeometry(IScene &scene, Attachments &attachments, bool translucent) {
@@ -392,6 +470,9 @@ void Pipeline::drawGeometry(IScene &scene, Attachments &attachments, bool transl
     glDrawBuffers(numBuffers, kColorAttachments);
     if (!translucent) {
         _graphicsContext.clearColorDepth();
+        if (_options.ssao) {
+            _textures.bind(*attachments.cbSSAO, TextureUnits::ssao);
+        }
     }
     if (scene.hasShadowLight()) {
         if (scene.isShadowLightDirectional()) {

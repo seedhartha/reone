@@ -31,6 +31,7 @@ struct GraphicsOptions {
     bool fxaa {false};
     bool grass {true};
     bool ssr {false};
+    bool ssao {false};
     TextureQuality textureQuality {0};
     int shadowResolution {0};
     float drawDistance {kDefaultObjectDrawDistance};
