@@ -41,6 +41,8 @@ public:
     ShaderProgram &simpleTexture() const { return *_spSimpleTexture; }
     ShaderProgram &pointLightShadows() const { return *_spPointLightShadows; }
     ShaderProgram &directionalLightShadows() const { return *_spDirectionalLightShadows; }
+    ShaderProgram &modelDepth() const { return *_spModelDepth; }
+    ShaderProgram &ssao() const { return *_spSSAO; }
     ShaderProgram &blinnPhong() const { return *_spBlinnPhong; }
     ShaderProgram &particle() const { return *_spParticle; }
     ShaderProgram &grass() const { return *_spGrass; }
@@ -64,6 +66,8 @@ private:
     std::shared_ptr<ShaderProgram> _spSimpleTexture;
     std::shared_ptr<ShaderProgram> _spPointLightShadows;
     std::shared_ptr<ShaderProgram> _spDirectionalLightShadows;
+    std::shared_ptr<ShaderProgram> _spModelDepth;
+    std::shared_ptr<ShaderProgram> _spSSAO;
     std::shared_ptr<ShaderProgram> _spBlinnPhong;
     std::shared_ptr<ShaderProgram> _spParticle;
     std::shared_ptr<ShaderProgram> _spGrass;
@@ -85,6 +89,7 @@ private:
     std::shared_ptr<UniformBuffer> _ubSkeletal;
     std::shared_ptr<UniformBuffer> _ubParticles;
     std::shared_ptr<UniformBuffer> _ubGrass;
+    std::shared_ptr<UniformBuffer> _ubSSAO;
 
     // END Uniform Buffers
 

@@ -45,6 +45,7 @@ Options OptionsParser::parse() {
         ("fxaa", po::value<bool>()->default_value(false), "enable anti-aliasing")                                    //
         ("grass", po::value<bool>()->default_value(true), "enable grass")                                            //
         ("ssr", po::value<bool>()->default_value(false), "enable screen-space reflections")                          //
+        ("ssao", po::value<bool>()->default_value(false), "enable screen-space ambient occlusion")                   //
         ("texquality", po::value<int>()->default_value(0), "texture quality")                                        //
         ("shadowres", po::value<int>()->default_value(0), "shadow map resolution")                                   //
         ("drawdist", po::value<int>()->default_value(static_cast<int>(kDefaultObjectDrawDistance)), "draw distance") //
@@ -80,6 +81,7 @@ Options OptionsParser::parse() {
     options.graphics.fxaa = vars["fxaa"].as<bool>();
     options.graphics.grass = vars["grass"].as<bool>();
     options.graphics.ssr = vars["ssr"].as<bool>();
+    options.graphics.ssao = vars["ssao"].as<bool>();
     options.graphics.textureQuality = static_cast<TextureQuality>(vars["texquality"].as<int>());
     options.graphics.shadowResolution = 1 << (10 + vars["shadowres"].as<int>());
     options.graphics.drawDistance = static_cast<float>(vars["drawdist"].as<int>());

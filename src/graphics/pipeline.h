@@ -47,6 +47,8 @@ public:
         _textures(textures) {
     }
 
+    void init();
+
     std::shared_ptr<Texture> draw(IScene &scene, const glm::ivec2 &dim);
 
 private:
@@ -62,12 +64,15 @@ private:
         std::shared_ptr<Framebuffer> fbPong;
         std::shared_ptr<Framebuffer> fbPointLightShadows;
         std::shared_ptr<Framebuffer> fbDirectionalLightShadows;
+        std::shared_ptr<Framebuffer> fbDepth;
+        std::shared_ptr<Framebuffer> fbSSAO;
         std::shared_ptr<Framebuffer> fbGeometry;
         std::shared_ptr<Framebuffer> fbSSR;
         std::shared_ptr<Framebuffer> fbOutput;
 
         std::shared_ptr<Texture> cbPing;
         std::shared_ptr<Texture> cbPong;
+        std::shared_ptr<Texture> cbSSAO;
         std::shared_ptr<Texture> cbGeometry1;
         std::shared_ptr<Texture> cbGeometry2;
         std::shared_ptr<Texture> cbGeometryEyeNormal;
@@ -78,6 +83,7 @@ private:
         std::shared_ptr<Renderbuffer> dbCommon;
         std::shared_ptr<Texture> dbDirectionalLightShadows;
         std::shared_ptr<Texture> dbPointLightShadows;
+        std::shared_ptr<Texture> dbDepth;
         std::shared_ptr<Texture> dbGeometry;
         std::shared_ptr<Texture> dbOutput;
     };
@@ -103,6 +109,8 @@ private:
     void computeLightSpaceMatrices(IScene &scene);
 
     void drawShadows(IScene &scene, Attachments &attachments);
+    void drawDepth(IScene &scene, Attachments &attachments);
+    void drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
     void drawGeometry(IScene &scene, Attachments &attachments, bool translucent = false);
     void drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
     void drawComposite(Attachments &attachments, Framebuffer &dst);

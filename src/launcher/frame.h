@@ -46,6 +46,7 @@ private:
         bool fxaa {false};
         bool grass {true};
         bool ssr {false};
+        bool ssao {false};
         int texQuality {0};
         int shadowres {0};
         int drawdist {64};
@@ -71,6 +72,7 @@ private:
     wxCheckBox *_checkBoxFXAA;
     wxCheckBox *_checkBoxGrass;
     wxCheckBox *_checkBoxSSR;
+    wxCheckBox *_checkBoxSSAO;
     wxSlider *_sliderVolumeMusic;
     wxSlider *_sliderVolumeVoice;
     wxSlider *_sliderVolumeSound;

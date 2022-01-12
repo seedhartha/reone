@@ -162,6 +162,9 @@ LauncherFrame::LauncherFrame() :
     _checkBoxSSR = new wxCheckBox(this, wxID_ANY, "Enable Screen-Space Reflections", wxDefaultPosition, wxDefaultSize);
     _checkBoxSSR->SetValue(_config.ssr);
 
+    _checkBoxSSAO = new wxCheckBox(this, wxID_ANY, "Enable Screen-Space Ambient Occlusion", wxDefaultPosition, wxDefaultSize);
+    _checkBoxSSAO->SetValue(_config.ssao);
+
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
     graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(textureQualitySizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
@@ -173,6 +176,7 @@ LauncherFrame::LauncherFrame() :
     graphicsSizer->Add(_checkBoxFXAA, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxGrass, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxSSR, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(_checkBoxSSAO, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
     // END Graphics
 
@@ -282,6 +286,7 @@ void LauncherFrame::LoadConfiguration() {
         ("fxaa", po::value<bool>()->default_value(false))                               //
         ("grass", po::value<bool>()->default_value(true))                               //
         ("ssr", po::value<bool>()->default_value(false))                                //
+        ("ssao", po::value<bool>()->default_value(false))                               //
         ("texquality", po::value<int>()->default_value(0))                              //
         ("shadowres", po::value<int>()->default_value(0))                               //
         ("drawdist", po::value<int>()->default_value(1024))                             //
@@ -309,6 +314,7 @@ void LauncherFrame::LoadConfiguration() {
     _config.fxaa = vars["fxaa"].as<bool>();
     _config.grass = vars["grass"].as<bool>();
     _config.ssr = vars["ssr"].as<bool>();
+    _config.ssao = vars["ssao"].as<bool>();
     _config.texQuality = vars["texquality"].as<int>();
     _config.shadowres = vars["shadowres"].as<int>();
     _config.drawdist = vars["drawdist"].as<int>();
@@ -346,6 +352,7 @@ void LauncherFrame::SaveConfiguration() {
         "fxaa=",
         "grass=",
         "ssr=",
+        "ssao=",
         "texquality=",
         "shadowres=",
         "drawdist=",
@@ -406,6 +413,7 @@ void LauncherFrame::SaveConfiguration() {
     _config.fxaa = _checkBoxFXAA->IsChecked();
     _config.grass = _checkBoxGrass->IsChecked();
     _config.ssr = _checkBoxSSR->IsChecked();
+    _config.ssao = _checkBoxSSAO->IsChecked();
     _config.texQuality = _choiceTextureQuality->GetSelection();
     _config.shadowres = _choiceShadowResolution->GetSelection();
     _config.drawdist = _sliderDrawDistance->GetValue();
@@ -444,6 +452,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "fxaa=" << (_config.fxaa ? 1 : 0) << endl;
     config << "grass=" << (_config.grass ? 1 : 0) << endl;
     config << "ssr=" << (_config.ssr ? 1 : 0) << endl;
+    config << "ssao=" << (_config.ssao ? 1 : 0) << endl;
     config << "texquality=" << _config.texQuality << endl;
     config << "shadowres=" << _config.shadowres << endl;
     config << "drawdist=" << _config.drawdist << endl;

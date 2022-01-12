@@ -28,6 +28,7 @@ constexpr float kDefaultObjectDrawDistance = 64.0f;
 constexpr int kNumCubeFaces = 6;
 constexpr int kNumShadowCascades = 8;
 constexpr int kNumShadowLightSpace = 8;
+constexpr int kNumSSAOSamples = 32;
 
 constexpr int kMaxBones = 24;
 constexpr int kMaxLights = 16;
@@ -74,6 +75,7 @@ enum class PixelFormat {
     R8,
     R16F,
     RGB8,
+    RGB16F,
     RGBA8,
     RGBA16F,
     BGR8,
@@ -135,11 +137,12 @@ struct TextureUnits {
     static constexpr int depthMap = 4;
     static constexpr int eyeNormal = 5;
     static constexpr int roughness = 6;
-    static constexpr int ssr = 7;
-    static constexpr int danglyConstraints = 8;
-    static constexpr int environmentMap = 9;
-    static constexpr int cubeShadowMap = 10;
-    static constexpr int shadowMap = 11;
+    static constexpr int ssao = 7;
+    static constexpr int ssr = 8;
+    static constexpr int danglyConstraints = 9;
+    static constexpr int environmentMap = 10;
+    static constexpr int cubeShadowMap = 11;
+    static constexpr int shadowMap = 12;
 };
 
 struct UniformBlockBindingPoints {
@@ -149,6 +152,7 @@ struct UniformBlockBindingPoints {
     static constexpr int skeletal = 3;
     static constexpr int particles = 4;
     static constexpr int grass = 5;
+    static constexpr int ssao = 6;
 };
 
 // MDL

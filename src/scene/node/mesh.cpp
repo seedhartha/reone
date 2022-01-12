@@ -311,6 +311,9 @@ void MeshSceneNode::draw() {
         const vector<LightSceneNode *> &lights = _sceneGraph.activeLights();
 
         uniforms.general.featureMask |= UniformsFeatureFlags::lighting;
+        if (_sceneGraph.options().ssao) {
+            uniforms.general.featureMask |= UniformsFeatureFlags::ssao;
+        }
         uniforms.general.ambientColor = glm::vec4(mesh->ambient, 1.0f);
         uniforms.general.diffuseColor = glm::vec4(mesh->diffuse, 1.0f);
         uniforms.lighting.numLights = static_cast<int>(lights.size());
@@ -337,6 +340,56 @@ void MeshSceneNode::draw() {
         _graphicsContext.withBlending(blendMode, [this, &mesh]() {
             mesh->mesh->draw();
         });
+    });
+}
+
+void MeshSceneNode::drawDepth() {
+    auto mesh = _modelNode->mesh();
+    if (!mesh || !_nodeTextures.diffuse) {
+        return;
+    }
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetLocals();
+    uniforms.general.model = _absTransform;
+
+    auto skin = mesh->skin;
+    if (skin) {
+        uniforms.general.featureMask |= UniformsFeatureFlags::skeletal;
+
+        // Offset bone indices by 1 to account for -1 (no index)
+        uniforms.skeletal.bones[0] = glm::mat4(1.0f);
+        for (size_t i = 1; i < kMaxBones; ++i) {
+            if (i >= 1 + skin->boneNodeNumber.size()) {
+                continue;
+            }
+            auto nodeNumber = skin->boneNodeNumber[i - 1];
+            if (nodeNumber == 0xffff) {
+                continue;
+            }
+            auto bone = _model.getNodeByNumber(nodeNumber);
+            if (!bone || bone->type() != SceneNodeType::Mesh) {
+                continue;
+            }
+            uniforms.skeletal.bones[i] = _modelNode->absoluteTransformInverse() *
+                                         _model.absoluteTransformInverse() *
+                                         bone->absoluteTransform() *
+                                         skin->boneMatrices[skin->boneSerial[i - 1]];
+        }
+    }
+
+    auto danglymesh = mesh->danglymesh;
+    if (danglymesh) {
+        uniforms.general.featureMask |= UniformsFeatureFlags::danglymesh;
+        uniforms.general.dangly = glm::mat3x4(_danglymeshAnimation.matrix);
+        uniforms.general.danglyDisplacement = danglymesh->displacement;
+        if (_nodeTextures.danglyConstraints) {
+            _textures.bind(*_nodeTextures.danglyConstraints, TextureUnits::danglyConstraints);
+        }
+    }
+
+    _shaders.use(_shaders.modelDepth(), true);
+    _graphicsContext.withFaceCulling(CullFaceMode::Back, [this, &mesh]() {
+        mesh->mesh->draw();
     });
 }
 

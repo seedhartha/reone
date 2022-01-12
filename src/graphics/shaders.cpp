@@ -48,6 +48,8 @@ const int FEATURE_FOG = 0x4000;
 const int FEATURE_DANGLYMESH = 0x8000;
 const int FEATURE_FIXEDSIZE = 0x10000;
 const int FEATURE_HASHEDALPHATEST = 0x20000;
+const int FEATURE_SSAO = 0x40000;
+const int FEATURE_SSAOSAMPLES = 0x80000;
 
 layout(std140) uniform General {
     mat4 uProjection;
@@ -161,7 +163,15 @@ layout(std140) uniform Text {
 };
 )END";
 
-static const string g_glslAlphaTest = R"END(
+static const string g_glslSSAOUniforms = R"END(
+const int NUM_SSAO_SAMPLES = 32;
+
+layout(std140) uniform SSAO {
+    vec4 uSSAOSamples[NUM_SSAO_SAMPLES];
+};
+)END";
+
+static const string g_glslHash = R"END(
 float hash(vec2 p) {
     return fract(1.0e4 * sin(17.0 * p.x + 0.1 * p.y) * (0.1 + abs(sin(13.0 * p.y + p.x))));
 }
@@ -169,7 +179,9 @@ float hash(vec2 p) {
 float hash(vec3 p) {
     return hash(vec2(hash(p.xy), p.z));
 }
+)END";
 
+static const string g_glslHashedAlphaTest = R"END(
 void hashedAlphaTest(float a, vec3 p) {
     float maxDeriv = max(length(dFdx(p.xy)), length(dFdy(p.xy)));
     float pixScale = 1.0 / maxDeriv;
@@ -191,6 +203,17 @@ void hashedAlphaTest(float a, vec3 p) {
     if (a < threshold) {
         discard;
     }
+}
+)END";
+
+static const string g_glslScreenSpace = R"END(
+vec3 screenToViewSpace(vec2 uv, float depth, mat4 projInv) {
+    vec3 clip = vec3(uv, depth) * 2.0 - vec3(1.0);
+    vec4 eye = vec4(
+        vec2(projInv[0][0], projInv[1][1]) * clip.xy,
+        -1.0,
+        projInv[2][3] * clip.z + projInv[3][3]);
+    return eye.xyz / eye.w;
 }
 )END";
 
@@ -490,6 +513,51 @@ void main() {
 }
 )END";
 
+static const string g_fsDepth = R"END(
+void main() {
+}
+)END";
+
+static const string g_fsSSAO = R"END(
+const float TWO_PI = radians(360.0);
+const float SAMPLE_RADIUS = 0.5;
+const float BIAS = 0.001;
+
+uniform sampler2D sDepthMap;
+
+noperspective in vec2 fragUV1;
+
+out vec4 fragColor;
+
+void main() {
+    vec2 uvM = fragUV1;
+    float depthM = texture(sDepthMap, uvM).r;
+    vec3 posM = screenToViewSpace(uvM, depthM, uProjectionInv);
+    vec3 normal = normalize(cross(dFdx(posM), dFdy(posM)));
+
+    float angle = TWO_PI * hash(fragUV1);
+    vec3 randomVec = vec3(cos(angle), sin(angle), 0.0);
+    vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
+    vec3 bitangent = cross(normal, tangent);
+    mat3 TBN = mat3(tangent, bitangent, normal);
+
+    float occlusion = 0.0;
+    for (int i = 0; i < NUM_SSAO_SAMPLES; ++i) {
+        vec3 posSample = posM + SAMPLE_RADIUS * (TBN * uSSAOSamples[i].xyz);
+        vec4 uvSample = uProjection * vec4(posSample, 1.0);
+        uvSample.xy /= uvSample.w;
+        uvSample.xy = uvSample.xy * 0.5 + 0.5;
+        float depthSample = texture(sDepthMap, uvSample.xy).r;
+        float sceneZ = screenToViewSpace(uvSample.xy, depthSample, uProjectionInv).z;
+        float rangeCheck = smoothstep(0.0, 1.0, SAMPLE_RADIUS / abs(posM.z - sceneZ));
+        occlusion += ((sceneZ >= posSample.z + BIAS) ? 1.0 : 0.0) * rangeCheck;
+    }
+    occlusion = 1.0 - occlusion / float(NUM_SSAO_SAMPLES);
+
+    fragColor = vec4(vec3(occlusion), 1.0);
+}
+)END";
+
 static const string g_fsBlinnPhong = R"END(
 const int NUM_SHADOW_CASCADES = 8;
 const float SHININESS = 8.0;
@@ -498,6 +566,8 @@ const int LIGHT_DYNTYPE_AREA = 1;
 const int LIGHT_DYNTYPE_OBJECT = 2;
 const int LIGHT_DYNTYPE_BOTH = LIGHT_DYNTYPE_AREA | LIGHT_DYNTYPE_OBJECT;
 
+const int NUM_PCF_SAMPLES = 20;
+const float PCF_SAMPLE_RADIUS = 0.1;
 const vec3 PCF_SAMPLE_OFFSETS[20] = vec3[](
    vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1),
    vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
@@ -505,14 +575,12 @@ const vec3 PCF_SAMPLE_OFFSETS[20] = vec3[](
    vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
    vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1));
 
-const int NUM_PCF_SAMPLES = 20;
-const float PCF_SAMPLE_RADIUS = 0.1;
-
 const float SELFILLUM_THRESHOLD = 0.85;
 
 uniform sampler2D sDiffuseMap;
 uniform sampler2D sLightmap;
 uniform sampler2D sBumpMap;
+uniform sampler2D sSSAO;
 uniform samplerCube sEnvironmentMap;
 uniform samplerCube sCubeShadowMap;
 uniform sampler2DArray sShadowMap;
@@ -592,6 +660,10 @@ vec3 getLightingIndirect(vec3 N) {
         ambient *= attenuation;
 
         result += ambient;
+    }
+
+    if (isFeatureEnabled(FEATURE_SSAO)) {
+        result *= texelFetch(sSSAO, ivec2(gl_FragCoord.xy), 0).r;
     }
 
     return result;
@@ -720,6 +792,9 @@ void main() {
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(sLightmap, fragUV2);
         lighting = (1.0 - 0.5 * shadow) * lightmapSample.rgb;
+        if (isFeatureEnabled(FEATURE_SSAO)) {
+            lighting *= texelFetch(sSSAO, ivec2(gl_FragCoord.xy), 0).r;
+        }
         lighting += (1.0 - 0.5 * shadow) * getLightingDirect(N, LIGHT_DYNTYPE_AREA);
         if (isFeatureEnabled(FEATURE_WATER)) {
             lighting = mix(vec3(1.0), lighting, 0.2);
@@ -908,15 +983,6 @@ void swap(inout float a, inout float b) {
     b = tmp;
 }
 
-vec3 screenToViewSpace(vec2 uv, float depth) {
-    vec3 clip = vec3(uv, depth) * 2.0 - vec3(1.0);
-    vec4 eye = vec4(
-        vec2(uProjectionInv[0][0], uProjectionInv[1][1]) * clip.xy,
-        -1.0,
-        uProjectionInv[2][3] * clip.z + uProjectionInv[3][3]);
-    return eye.xyz / eye.w;
-}
-
 bool traceScreenSpaceRay(
     vec3 rayOrigin,
     vec3 rayDir,
@@ -992,7 +1058,7 @@ bool traceScreenSpaceRay(
         }
 
         float sceneDepth = texture(sDepthMap, hitUV).r;
-        float sceneZMax = screenToViewSpace(hitUV, sceneDepth).z;
+        float sceneZMax = screenToViewSpace(hitUV, sceneDepth, uProjectionInv).z;
         float sceneZMin = sceneZMax - Z_THICKNESS;
         if (rayZMax >= sceneZMin && rayZMin <= sceneZMax) {
             intersect = true;
@@ -1016,7 +1082,7 @@ void main() {
     float reflectionStrength = 0.0;
 
     float fragDepth = texture(sDepthMap, fragUV1).r;
-    vec3 fragPosVS = screenToViewSpace(fragUV1, fragDepth);
+    vec3 fragPosVS = screenToViewSpace(fragUV1, fragDepth, uProjectionInv);
     vec3 I = normalize(fragPosVS);
     vec3 N = normalize(texture(sEyeNormal, fragUV1).xyz * 2.0 - 1.0);
     vec3 R = reflect(I, N);
@@ -1196,11 +1262,13 @@ void Shaders::init() {
     auto fsTexture = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsTexture});
     auto fsPointLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsPointLightShadows});
     auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDirectionalLightShadows});
-    auto fsBlinnPhong = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslAlphaTest, g_fsBlinnPhong});
+    auto fsDepth = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDepth});
+    auto fsSSAO = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslSSAOUniforms, g_glslHash, g_glslScreenSpace, g_fsSSAO});
+    auto fsBlinnPhong = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsBlinnPhong});
     auto fsBillboard = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBillboard});
-    auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_glslAlphaTest, g_fsParticle});
-    auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslAlphaTest, g_fsGrass});
-    auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSR});
+    auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsParticle});
+    auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
+    auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslScreenSpace, g_fsSSR});
     auto fsBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBlur});
     auto fsComposite = initShader(ShaderType::Fragment, {g_glslHeader, g_fsComposite});
     auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsFXAA});
@@ -1212,6 +1280,8 @@ void Shaders::init() {
     _spSimpleTexture = initShaderProgram({vsClipSpace, fsTexture});
     _spPointLightShadows = initShaderProgram({vsShadows, gsPointLightShadows, fsPointLightShadows});
     _spDirectionalLightShadows = initShaderProgram({vsShadows, gsDirectionalLightShadows, fsDirectionalLightShadows});
+    _spModelDepth = initShaderProgram({vsModel, fsDepth});
+    _spSSAO = initShaderProgram({vsObjectSpace, fsSSAO});
     _spBlinnPhong = initShaderProgram({vsModel, fsBlinnPhong});
     _spBillboard = initShaderProgram({vsBillboard, fsBillboard});
     _spParticle = initShaderProgram({vsParticle, fsParticle});
@@ -1230,12 +1300,14 @@ void Shaders::init() {
     static SkeletalUniforms defaultsSkeletal;
     static ParticlesUniforms defaultsParticles;
     static GrassUniforms defaultsGrass;
+    static SSAOUniforms defaultsSSAO;
     _ubGeneral = initUniformBuffer(&defaultsGeneral, sizeof(GeneralUniforms));
     _ubText = initUniformBuffer(&defaultsText, sizeof(TextUniforms));
     _ubLighting = initUniformBuffer(&defaultsLighting, sizeof(LightingUniforms));
     _ubSkeletal = initUniformBuffer(&defaultsSkeletal, sizeof(SkeletalUniforms));
     _ubParticles = initUniformBuffer(&defaultsParticles, sizeof(ParticlesUniforms));
     _ubGrass = initUniformBuffer(&defaultsGrass, sizeof(GrassUniforms));
+    _ubSSAO = initUniformBuffer(&defaultsSSAO, sizeof(SSAOUniforms));
 
     _inited = true;
 }
@@ -1250,6 +1322,8 @@ void Shaders::deinit() {
     _spSimpleTexture.reset();
     _spPointLightShadows.reset();
     _spDirectionalLightShadows.reset();
+    _spModelDepth.reset();
+    _spSSAO.reset();
     _spBlinnPhong.reset();
     _spBillboard.reset();
     _spParticle.reset();
@@ -1268,6 +1342,7 @@ void Shaders::deinit() {
     _ubSkeletal.reset();
     _ubParticles.reset();
     _ubGrass.reset();
+    _ubSSAO.reset();
 
     _inited = false;
 }
@@ -1301,6 +1376,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sDepthMap", TextureUnits::depthMap);
     program->setUniform("sEyeNormal", TextureUnits::eyeNormal);
     program->setUniform("sRoughness", TextureUnits::roughness);
+    program->setUniform("sSSAO", TextureUnits::ssao);
     program->setUniform("sSSR", TextureUnits::ssr);
     program->setUniform("sDanglyConstraints", TextureUnits::danglyConstraints);
     program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
@@ -1314,6 +1390,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->bindUniformBlock("Skeletal", UniformBlockBindingPoints::skeletal);
     program->bindUniformBlock("Particles", UniformBlockBindingPoints::particles);
     program->bindUniformBlock("Grass", UniformBlockBindingPoints::grass);
+    program->bindUniformBlock("SSAO", UniformBlockBindingPoints::ssao);
 
     return move(program);
 }
@@ -1348,6 +1425,10 @@ void Shaders::refreshUniforms() {
     if (_uniforms.general.featureMask & UniformsFeatureFlags::grass) {
         _ubGrass->bind(UniformBlockBindingPoints::grass);
         _ubGrass->setData(&_uniforms.grass, sizeof(GrassUniforms), true);
+    }
+    if (_uniforms.general.featureMask & UniformsFeatureFlags::ssaosamples) {
+        _ubSSAO->bind(UniformBlockBindingPoints::ssao);
+        _ubSSAO->setData(&_uniforms.ssao, sizeof(SSAOUniforms), true);
     }
 }
 

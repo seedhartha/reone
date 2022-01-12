@@ -42,6 +42,8 @@ struct UniformsFeatureFlags {
     static constexpr int danglymesh = 0x8000;
     static constexpr int fixedsize = 0x10000;
     static constexpr int hashedalphatest = 0x20000;
+    static constexpr int ssao = 0x40000;
+    static constexpr int ssaosamples = 0x80000;
 };
 
 struct GeneralUniforms {
@@ -180,6 +182,10 @@ struct TextUniforms {
     TextCharacterUniforms chars[kMaxTextChars];
 };
 
+struct SSAOUniforms {
+    glm::vec4 samples[kNumSSAOSamples] {glm::vec4(0.0f)};
+};
+
 struct Uniforms {
     GeneralUniforms general;
     TextUniforms text;
@@ -187,6 +193,7 @@ struct Uniforms {
     SkeletalUniforms skeletal;
     ParticlesUniforms particles;
     GrassUniforms grass;
+    SSAOUniforms ssao;
 };
 
 } // namespace graphics

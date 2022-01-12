@@ -77,6 +77,7 @@ public:
     void update(float dt);
 
     void drawShadows() override;
+    void drawDepth() override;
     void drawOpaque() override;
     void drawTranslucent() override;
 

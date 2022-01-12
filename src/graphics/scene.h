@@ -30,6 +30,7 @@ public:
     virtual ~IScene() = default;
 
     virtual void drawShadows() = 0;
+    virtual void drawDepth() = 0;
     virtual void drawOpaque() = 0;
     virtual void drawTranslucent() = 0;
 

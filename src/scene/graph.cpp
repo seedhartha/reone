@@ -434,6 +434,27 @@ void SceneGraph::prepareTranslucentLeafs() {
     }
 }
 
+void SceneGraph::drawShadows() {
+    if (!_activeCamera) {
+        return;
+    }
+    _graphicsContext.withFaceCulling(CullFaceMode::Front, [this]() {
+        for (auto &mesh : _shadowMeshes) {
+            mesh->drawShadow();
+        }
+    });
+}
+
+void SceneGraph::drawDepth() {
+    if (!_activeCamera) {
+        return;
+    }
+    // Draw opaque meshes
+    for (auto &mesh : _opaqueMeshes) {
+        mesh->drawDepth();
+    }
+}
+
 void SceneGraph::drawOpaque() {
     if (!_activeCamera) {
         return;
@@ -468,17 +489,6 @@ void SceneGraph::drawTranslucent() {
             }
         });
     }
-}
-
-void SceneGraph::drawShadows() {
-    if (!_activeCamera) {
-        return;
-    }
-    _graphicsContext.withFaceCulling(CullFaceMode::Front, [this]() {
-        for (auto &mesh : _shadowMeshes) {
-            mesh->drawShadow();
-        }
-    });
 }
 
 vector<LightSceneNode *> SceneGraph::computeClosestLights(int count, const function<bool(const LightSceneNode &, float)> &pred) const {
