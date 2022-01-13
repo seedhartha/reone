@@ -202,10 +202,11 @@ static bool isReceivingShadows(const ModelSceneNode &model, const MeshSceneNode 
 }
 
 void MeshSceneNode::draw() {
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    auto mesh = _modelNode->mesh();
     if (!mesh || !_nodeTextures.diffuse) {
         return;
     }
+
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
     uniforms.general.model = _absTransform;
@@ -216,30 +217,28 @@ void MeshSceneNode::draw() {
         glm::vec4(_uvOffset.x, _uvOffset.y, 0.0f, 0.0f));
 
     auto blendMode = BlendMode::None;
-    if (_nodeTextures.diffuse) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::diffuse;
-        _textures.bind(*_nodeTextures.diffuse);
-        switch (_nodeTextures.diffuse->features().blending) {
-        case Texture::Blending::PunchThrough:
+    _textures.bind(*_nodeTextures.diffuse);
+    switch (_nodeTextures.diffuse->features().blending) {
+    case Texture::Blending::PunchThrough:
+        uniforms.general.featureMask |= UniformsFeatureFlags::hashedalphatest;
+        break;
+    case Texture::Blending::Additive:
+        blendMode = BlendMode::Additive;
+        break;
+    default:
+        if (isTranslucent()) {
+            blendMode = BlendMode::Normal;
+        } else {
             uniforms.general.featureMask |= UniformsFeatureFlags::hashedalphatest;
-            break;
-        case Texture::Blending::Additive:
-            blendMode = BlendMode::Additive;
-            break;
-        default:
-            if (isTranslucent()) {
-                blendMode = BlendMode::Normal;
-            } else {
-                uniforms.general.featureMask |= UniformsFeatureFlags::hashedalphatest;
-            }
-            break;
         }
-        float waterAlpha = _nodeTextures.diffuse->features().waterAlpha;
-        if (waterAlpha != -1.0f) {
-            uniforms.general.featureMask |= UniformsFeatureFlags::water;
-            uniforms.general.waterAlpha = waterAlpha;
-        }
+        break;
     }
+    float waterAlpha = _nodeTextures.diffuse->features().waterAlpha;
+    if (waterAlpha != -1.0f) {
+        uniforms.general.featureMask |= UniformsFeatureFlags::water;
+        uniforms.general.waterAlpha = waterAlpha;
+    }
+
     if (_nodeTextures.lightmap) {
         uniforms.general.featureMask |= UniformsFeatureFlags::lightmap;
         _textures.bind(*_nodeTextures.lightmap, TextureUnits::lightmap);
