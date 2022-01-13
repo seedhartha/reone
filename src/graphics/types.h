@@ -95,6 +95,13 @@ enum class CubeMapFace {
     NegativeZ = 5
 };
 
+enum class DepthTestMode {
+    None,
+    Less,
+    Equal,
+    LessOrEqual
+};
+
 enum class CullFaceMode {
     None,
     Front,

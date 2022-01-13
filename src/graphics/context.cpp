@@ -28,11 +28,10 @@ void GraphicsContext::init() {
         return;
     }
     glewInit();
-
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-    glEnable(GL_DEPTH_TEST);
 
-    glDepthFunc(GL_LEQUAL);
+    setDepthTestMode(DepthTestMode::LessOrEqual);
+    _depthTestModes.push(DepthTestMode::LessOrEqual);
 
     setCullFaceMode(CullFaceMode::None);
     _cullFaceModes.push(CullFaceMode::None);
@@ -47,12 +46,16 @@ void GraphicsContext::init() {
     _inited = true;
 }
 
-void GraphicsContext::clearColorDepth() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void GraphicsContext::clearColor() {
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void GraphicsContext::clearDepth() {
     glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+void GraphicsContext::clearColorDepth() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GraphicsContext::withBlending(BlendMode mode, const function<void()> &block) {
@@ -68,6 +71,20 @@ void GraphicsContext::withBlending(BlendMode mode, const function<void()> &block
 
     _blendModes.pop();
     setBlendMode(_blendModes.top());
+}
+
+void GraphicsContext::withDepthTest(DepthTestMode mode, const function<void()> &block) {
+    if (_depthTestModes.top() == mode) {
+        block();
+        return;
+    }
+    setDepthTestMode(mode);
+    _depthTestModes.push(mode);
+
+    block();
+
+    _depthTestModes.pop();
+    setDepthTestMode(_depthTestModes.top());
 }
 
 void GraphicsContext::withFaceCulling(CullFaceMode mode, const function<void()> &block) {
@@ -108,14 +125,25 @@ void GraphicsContext::withScissorTest(const glm::ivec4 &bounds, const function<v
     glDisable(GL_SCISSOR_TEST);
 }
 
-void GraphicsContext::withoutDepthTest(const function<void()> &block) {
-    if (!_depthTest) {
-        block();
-        return;
+void GraphicsContext::setDepthTestMode(DepthTestMode mode) {
+    if (mode == DepthTestMode::None) {
+        glDisable(GL_DEPTH_TEST);
+    } else {
+        glEnable(GL_DEPTH_TEST);
+        switch (mode) {
+            break;
+        case DepthTestMode::Equal:
+            glDepthFunc(GL_EQUAL);
+            break;
+        case DepthTestMode::LessOrEqual:
+            glDepthFunc(GL_LEQUAL);
+            break;
+        case DepthTestMode::Less:
+        default:
+            glDepthFunc(GL_LESS);
+            break;
+        }
     }
-    glDisable(GL_DEPTH_TEST);
-    block();
-    glEnable(GL_DEPTH_TEST);
 }
 
 void GraphicsContext::setCullFaceMode(CullFaceMode mode) {

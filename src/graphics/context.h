@@ -32,15 +32,15 @@ public:
 
     void init();
 
-    void clearColorDepth();
+    void clearColor();
     void clearDepth();
+    void clearColorDepth();
 
+    void withDepthTest(DepthTestMode mode, const std::function<void()> &block);
     void withFaceCulling(CullFaceMode mode, const std::function<void()> &block);
     void withBlending(BlendMode mode, const std::function<void()> &block);
     void withViewport(glm::ivec4 viewport, const std::function<void()> &block);
     void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
-
-    void withoutDepthTest(const std::function<void()> &block);
 
 private:
     GraphicsOptions _options;
@@ -49,14 +49,14 @@ private:
 
     // States
 
-    bool _depthTest {true};
-
+    std::stack<DepthTestMode> _depthTestModes;
     std::stack<CullFaceMode> _cullFaceModes;
     std::stack<BlendMode> _blendModes;
     std::stack<glm::ivec4> _viewports;
 
     // END States
 
+    void setDepthTestMode(DepthTestMode mode);
     void setCullFaceMode(CullFaceMode mode);
     void setBlendMode(BlendMode mode);
     void setViewport(glm::ivec4 viewport);
