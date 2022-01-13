@@ -479,7 +479,7 @@ void SceneGraph::drawTranslucent() {
     }
     // Draw lens flares
     if (!_flareLights.empty()) {
-        _graphicsContext.withoutDepthTest([this]() {
+        _graphicsContext.withDepthTest(DepthTestMode::None, [this]() {
             for (auto &light : _flareLights) {
                 Collision collision;
                 if (testLineOfSight(_activeCamera->getOrigin(), light->getOrigin(), collision)) {
