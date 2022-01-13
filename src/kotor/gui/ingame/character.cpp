@@ -241,7 +241,7 @@ void CharacterMenu::refresh3D() {
 
     SceneInitializer(sceneGraph)
         .aspect(aspect)
-        .depth(0.1f, 10.0f)
+        .depth(kDefaultClipPlaneNear, 10.0f)
         .modelSupplier(bind(&CharacterMenu::getSceneModel, this, _1))
         .modelOffset(glm::vec2(0.0f, 1.7f))
         .cameraFromModelNode("camerahook")

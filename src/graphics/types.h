@@ -21,8 +21,8 @@ namespace reone {
 
 namespace graphics {
 
-constexpr float kDefaultClipPlaneNear = 0.1f;
-constexpr float kDefaultClipPlaneFar = 10000.0f;
+constexpr float kDefaultClipPlaneNear = 0.25f;
+constexpr float kDefaultClipPlaneFar = 2500.0f;
 constexpr float kDefaultObjectDrawDistance = 64.0f;
 
 constexpr int kNumCubeFaces = 6;

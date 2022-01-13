@@ -43,8 +43,8 @@ namespace reone {
 namespace graphics {
 
 static constexpr float kPointLightShadowsFOV = glm::radians(90.0f);
-static constexpr float kPointLightShadowsNearPlane = 0.1f;
-static constexpr float kPointLightShadowsFarPlane = 10000.0f;
+static constexpr float kPointLightShadowsNearPlane = 0.25f;
+static constexpr float kPointLightShadowsFarPlane = 2500.0f;
 
 static constexpr GLenum kColorAttachments[] {
     GL_COLOR_ATTACHMENT0,
