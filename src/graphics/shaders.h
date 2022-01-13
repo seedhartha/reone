@@ -48,7 +48,8 @@ public:
     ShaderProgram &grass() const { return *_spGrass; }
     ShaderProgram &billboard() const { return *_spBillboard; }
     ShaderProgram &ssr() const { return *_spSSR; }
-    ShaderProgram &blur() const { return *_spBlur; }
+    ShaderProgram &gaussianBlur() const { return *_spGaussianBlur; }
+    ShaderProgram &medianFilter() const { return *_spMedianFilter; }
     ShaderProgram &composite() const { return *_spComposite; }
     ShaderProgram &fxaa() const { return *_spFXAA; }
     ShaderProgram &gui() const { return *_spGUI; }
@@ -73,7 +74,8 @@ private:
     std::shared_ptr<ShaderProgram> _spGrass;
     std::shared_ptr<ShaderProgram> _spBillboard;
     std::shared_ptr<ShaderProgram> _spSSR;
-    std::shared_ptr<ShaderProgram> _spBlur;
+    std::shared_ptr<ShaderProgram> _spGaussianBlur;
+    std::shared_ptr<ShaderProgram> _spMedianFilter;
     std::shared_ptr<ShaderProgram> _spComposite;
     std::shared_ptr<ShaderProgram> _spFXAA;
     std::shared_ptr<ShaderProgram> _spGUI;
