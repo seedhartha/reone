@@ -40,7 +40,7 @@ public:
     void init();
     void invalidate();
 
-    void bind(Texture &texture, int unit = 0);
+    void bind(Texture &texture, int unit = TextureUnits::mainTex);
     void bindDefaults();
 
     std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);

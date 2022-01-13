@@ -218,7 +218,7 @@ void MeshSceneNode::draw() {
     auto blendMode = BlendMode::None;
     if (_nodeTextures.diffuse) {
         uniforms.general.featureMask |= UniformsFeatureFlags::diffuse;
-        _textures.bind(*_nodeTextures.diffuse, TextureUnits::diffuseMap);
+        _textures.bind(*_nodeTextures.diffuse);
         switch (_nodeTextures.diffuse->features().blending) {
         case Texture::Blending::PunchThrough:
             uniforms.general.featureMask |= UniformsFeatureFlags::hashedalphatest;

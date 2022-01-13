@@ -537,7 +537,7 @@ void Pipeline::applyBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
-    uniforms.general.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
+    uniforms.general.screenResolutionReciprocal = glm::vec4(1.0f / dim.x, 1.0f / dim.y, 0.0f, 0.0f);
     uniforms.general.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());

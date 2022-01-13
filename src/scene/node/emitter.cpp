@@ -302,7 +302,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     }
 
     _shaders.use(_shaders.particle(), true);
-    _textures.bind(*texture, TextureUnits::diffuseMap);
+    _textures.bind(*texture);
     BlendMode blendMode;
     switch (emitter->blendMode) {
     case ModelNode::Emitter::BlendMode::PunchThrough:
