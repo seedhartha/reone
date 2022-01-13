@@ -115,7 +115,8 @@ private:
     void drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
     void drawComposite(Attachments &attachments, Framebuffer &dst);
 
-    void applyBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical = false);
+    void applyGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical = false);
+    void applyMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
     void applyFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
 
     void blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, bool depth = false);

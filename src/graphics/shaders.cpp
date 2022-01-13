@@ -1101,7 +1101,7 @@ void main() {
 }
 )END";
 
-static const string g_fsBlur = R"END(
+static const string g_fsGaussianBlur = R"END(
 uniform sampler2D sMainTex;
 
 in vec2 fragUV1;
@@ -1120,6 +1120,73 @@ void main() {
     color.rgb += texture(sMainTex, fragUV1 - off2 * uScreenResolutionReciprocal.xy).rgb * 0.0702702703;
 
     fragColor = color;
+}
+)END";
+
+static const string g_fsMedianFilter = R"END(
+uniform sampler2D sMainTex;
+
+in vec2 fragUV1;
+
+out vec4 fragColor;
+
+void s2(inout vec4 a, inout vec4 b) {
+    vec4 temp = a;
+    a = min(a, b);
+    b = max(temp, b);
+}
+
+void mn3(inout vec4 a, inout vec4 b, inout vec4 c) {
+    s2(a, b);
+    s2(a, c);
+}
+
+void mx3(inout vec4 a, inout vec4 b, inout vec4 c) {
+    s2(b, c);
+    s2(a, c);
+}
+
+void mnmx3(inout vec4 a, inout vec4 b, inout vec4 c) {
+    mx3(a, b, c);
+    s2(a, b);
+}
+
+void mnmx4(inout vec4 a, inout vec4 b, inout vec4 c, inout vec4 d) {
+    s2(a, b);
+    s2(c, d);
+    s2(a, c);
+    s2(b, d);
+}
+
+void mnmx5(inout vec4 a, inout vec4 b, inout vec4 c, inout vec4 d, inout vec4 e) {
+    s2(a, b);
+    s2(c, d);
+    mn3(a, c, e);
+    mx3(b, d, e);
+}
+
+void mnmx6(inout vec4 a, inout vec4 b, inout vec4 c, inout vec4 d, inout vec4 e, inout vec4 f) {
+    s2(a, d);
+    s2(b, e);
+    s2(c, f);
+    mn3(a, b, c);
+    mx3(d, e, f);
+}
+
+void main() {
+    vec4 v[9];
+    for (int dX = -1; dX <= 1; ++dX) {
+        for (int dY = -1; dY <= 1; ++dY) {
+            vec2 offset = vec2(float(dX), float(dY));
+            v[(dX + 1) * 3 + (dY + 1)] = texture(sMainTex, fragUV1 + offset * uScreenResolutionReciprocal.xy);
+        }
+    }
+    vec4 temp;
+    mnmx6(v[0], v[1], v[2], v[3], v[4], v[5]);
+    mnmx5(v[1], v[2], v[3], v[4], v[6]);
+    mnmx4(v[2], v[3], v[4], v[7]);
+    mnmx3(v[3], v[4], v[8]);
+    fragColor = v[4];
 }
 )END";
 
@@ -1265,7 +1332,8 @@ void Shaders::init() {
     auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsParticle});
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
     auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslScreenSpace, g_fsSSR});
-    auto fsBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBlur});
+    auto fsGaussianBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur});
+    auto fsMedianFilter = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter});
     auto fsComposite = initShader(ShaderType::Fragment, {g_glslHeader, g_fsComposite});
     auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsFXAA});
     auto fsGUI = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGUI});
@@ -1283,7 +1351,8 @@ void Shaders::init() {
     _spParticle = initShaderProgram({vsParticle, fsParticle});
     _spGrass = initShaderProgram({vsGrass, fsGrass});
     _spSSR = initShaderProgram({vsObjectSpace, fsSSR});
-    _spBlur = initShaderProgram({vsObjectSpace, fsBlur});
+    _spGaussianBlur = initShaderProgram({vsObjectSpace, fsGaussianBlur});
+    _spMedianFilter = initShaderProgram({vsObjectSpace, fsMedianFilter});
     _spComposite = initShaderProgram({vsObjectSpace, fsComposite});
     _spFXAA = initShaderProgram({vsObjectSpace, fsFXAA});
     _spGUI = initShaderProgram({vsClipSpace, fsGUI});
@@ -1325,7 +1394,8 @@ void Shaders::deinit() {
     _spParticle.reset();
     _spGrass.reset();
     _spSSR.reset();
-    _spBlur.reset();
+    _spGaussianBlur.reset();
+    _spMedianFilter.reset();
     _spComposite.reset();
     _spFXAA.reset();
     _spGUI.reset();

@@ -308,22 +308,22 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
         if (_options.ssao) {
             drawDepth(scene, attachments);
             drawSSAO(scene, dim, attachments);
-            applyBlur(dim, *attachments.cbSSAO, *attachments.fbPing);
-            applyBlur(dim, *attachments.cbPing, *attachments.fbSSAO, R_BLUR_VERTICAL);
+            applyMedianFilter(dim, *attachments.cbSSAO, *attachments.fbPing);
+            blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbSSAO, 0);
         }
 
         drawGeometry(scene, attachments);
 
         // Blur geometry hilights
-        applyBlur(dim, *attachments.cbGeometry2, *attachments.fbPing);
-        applyBlur(dim, *attachments.cbPing, *attachments.fbPong, R_BLUR_VERTICAL);
+        applyGaussianBlur(dim, *attachments.cbGeometry2, *attachments.fbPing);
+        applyGaussianBlur(dim, *attachments.cbPing, *attachments.fbPong, R_BLUR_VERTICAL);
         blitFramebuffer(dim, *attachments.fbPong, 0, *attachments.fbGeometry, 1);
 
         // Screen-space reflections
         if (_options.ssr) {
             drawSSR(scene, dim, attachments);
-            applyBlur(dim, *attachments.cbSSR, *attachments.fbPing);
-            applyBlur(dim, *attachments.cbPing, *attachments.fbSSR, R_BLUR_VERTICAL);
+            applyGaussianBlur(dim, *attachments.cbSSR, *attachments.fbPing);
+            applyGaussianBlur(dim, *attachments.cbPing, *attachments.fbSSR, R_BLUR_VERTICAL);
         }
 
         drawComposite(attachments, *attachments.fbPing);
@@ -532,7 +532,7 @@ void Pipeline::drawComposite(Attachments &attachments, Framebuffer &dst) {
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::applyBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical) {
+void Pipeline::applyGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical) {
     // Set uniforms
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
@@ -541,7 +541,21 @@ void Pipeline::applyBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer
     uniforms.general.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(_shaders.blur(), true);
+    _shaders.use(_shaders.gaussianBlur(), true);
+    _textures.bind(srcTexture);
+    _graphicsContext.clearColorDepth();
+    _meshes.quadNDC().draw();
+}
+
+void Pipeline::applyMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
+    // Reset uniforms
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
+    uniforms.general.screenResolutionReciprocal = glm::vec4(1.0f / dim.x, 1.0f / dim.y, 0.0f, 0.0f);
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
+    _shaders.use(_shaders.medianFilter(), true);
     _textures.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
