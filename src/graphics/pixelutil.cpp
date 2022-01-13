@@ -27,16 +27,20 @@ uint32_t getInternalPixelFormatGL(PixelFormat format) {
     switch (format) {
     case PixelFormat::R8:
         return GL_R8;
+    case PixelFormat::R16F:
+        return GL_R16F;
+    case PixelFormat::RG8:
+        return GL_RG8;
+    case PixelFormat::RG16F:
+        return GL_RG16F;
     case PixelFormat::RGB8:
     case PixelFormat::BGR8:
         return GL_RGB8;
+    case PixelFormat::RGB16F:
+        return GL_RGB16F;
     case PixelFormat::RGBA8:
     case PixelFormat::BGRA8:
         return GL_RGBA8;
-    case PixelFormat::R16F:
-        return GL_R16F;
-    case PixelFormat::RGB16F:
-        return GL_RGB16F;
     case PixelFormat::RGBA16F:
         return GL_RGBA16F;
     case PixelFormat::DXT1:

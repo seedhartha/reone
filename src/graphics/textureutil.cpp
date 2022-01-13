@@ -155,7 +155,7 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
         properties.wrap = Texture::Wrapping::ClampToBorder;
         properties.borderColor = glm::vec4(1.0f);
 
-    } else if (usage == TextureUsage::BumpMap) {
+    } else if (usage == TextureUsage::BumpMap || usage == TextureUsage::Noise) {
         properties.minFilter = Texture::Filtering::Linear;
     }
 

@@ -41,14 +41,20 @@ public:
     void invalidate();
 
     void bind(Texture &texture, int unit = TextureUnits::mainTex);
-    void bindDefaults();
+    void bindBuiltIn();
 
     std::shared_ptr<Texture> get(const std::string &resRef, TextureUsage usage = TextureUsage::Default);
+
+    // Built-in
 
     std::shared_ptr<Texture> defaultRGB() const { return _defaultRGB; }
     std::shared_ptr<Texture> defaultArrayDepth() const { return _defaultArrayDepth; }
     std::shared_ptr<Texture> defaultCubemapRGB() const { return _defaultCubemapRGB; }
     std::shared_ptr<Texture> defaultCubemapDepth() const { return _defaultCubemapDepth; }
+
+    std::shared_ptr<Texture> noiseRGB() const { return _noiseRGB; }
+
+    // END Built-in
 
 private:
     int _activeUnit {0};
@@ -57,14 +63,16 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<Texture>> _cache;
 
-    // Defaults
+    // Built-in
 
     std::shared_ptr<Texture> _defaultRGB;
     std::shared_ptr<Texture> _defaultArrayDepth;
     std::shared_ptr<Texture> _defaultCubemapRGB;
     std::shared_ptr<Texture> _defaultCubemapDepth;
 
-    // END Defaults
+    std::shared_ptr<Texture> _noiseRGB;
+
+    // END Built-in
 
     std::shared_ptr<Texture> doGet(const std::string &resRef, TextureUsage usage);
 };

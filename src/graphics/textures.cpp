@@ -18,6 +18,7 @@
 #include "textures.h"
 
 #include "../common/logutil.h"
+#include "../common/randomutil.h"
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
 
@@ -54,7 +55,18 @@ void Textures::init() {
     _defaultArrayDepth->clear(1, 1, PixelFormat::Depth32F, kNumShadowCascades);
     _defaultArrayDepth->init();
 
-    bindDefaults();
+    auto noisePixels = make_shared<ByteArray>();
+    noisePixels->resize(4 * 32);
+    for (int i = 0; i < 32; ++i) {
+        float *val = reinterpret_cast<float *>(&(*noisePixels)[4 * i]);
+        (*val) = random(-1.0f, 1.0f);
+    }
+    auto noiseLayer = Texture::Layer {move(noisePixels)};
+    _noiseRGB = make_shared<Texture>("noise_rgb", getTextureProperties(TextureUsage::Noise));
+    _noiseRGB->setPixels(4, 4, PixelFormat::RG16F, move(noiseLayer));
+    _noiseRGB->init();
+
+    bindBuiltIn();
 }
 
 void Textures::invalidate() {
@@ -69,7 +81,7 @@ void Textures::bind(Texture &texture, int unit) {
     texture.bind();
 }
 
-void Textures::bindDefaults() {
+void Textures::bindBuiltIn() {
     bind(*_defaultRGB, TextureUnits::mainTex);
     bind(*_defaultRGB, TextureUnits::lightmap);
     bind(*_defaultRGB, TextureUnits::bumpMap);
@@ -79,6 +91,7 @@ void Textures::bindDefaults() {
     bind(*_defaultRGB, TextureUnits::roughness);
     bind(*_defaultRGB, TextureUnits::ssao);
     bind(*_defaultRGB, TextureUnits::ssr);
+    bind(*_noiseRGB, TextureUnits::noise);
     bind(*_defaultCubemapRGB, TextureUnits::environmentMap);
     bind(*_defaultCubemapDepth, TextureUnits::cubeShadowMap);
     bind(*_defaultArrayDepth, TextureUnits::shadowMap);

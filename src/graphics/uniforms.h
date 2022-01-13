@@ -42,7 +42,6 @@ struct UniformsFeatureFlags {
     static constexpr int fixedsize = 0x8000;
     static constexpr int hashedalphatest = 0x10000;
     static constexpr int ssao = 0x20000;
-    static constexpr int ssaosamples = 0x40000;
 };
 
 struct GeneralUniforms {
