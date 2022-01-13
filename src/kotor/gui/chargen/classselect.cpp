@@ -169,7 +169,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
 
     SceneInitializer(sceneGraph)
         .aspect(aspect)
-        .depth(0.1f, 10.0f)
+        .depth(kDefaultClipPlaneNear, 10.0f)
         .modelSupplier([&](SceneGraph &sceneGraph) { return getCharacterModel(appearance, sceneGraph); })
         .modelScale(kModelScale)
         .cameraFromModelNode("camerahook")

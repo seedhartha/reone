@@ -153,7 +153,7 @@ void MainMenu::setup3DView() {
 
     SceneInitializer(sceneGraph)
         .aspect(aspect)
-        .depth(0.1f, 10.0f)
+        .depth(kDefaultClipPlaneNear, 10.0f)
         .modelSupplier(bind(&MainMenu::getKotorModel, this, _1))
         .modelScale(kKotorModelSize)
         .cameraFromModelNode("camerahook")

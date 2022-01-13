@@ -63,8 +63,8 @@ private:
     scene::SceneGraph &_sceneGraph;
 
     float _aspect {1.0f};
-    float _zNear {0.1f};
-    float _zFar {1000.0f};
+    float _zNear {graphics::kDefaultClipPlaneNear};
+    float _zFar {graphics::kDefaultClipPlaneFar};
     std::function<std::shared_ptr<scene::ModelSceneNode>(scene::SceneGraph &)> _modelSupplier;
     float _modelScale {1.0f};
     glm::vec2 _modelOffset {0.0f};

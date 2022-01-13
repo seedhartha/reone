@@ -503,7 +503,7 @@ in vec4 fragPosWorldSpace;
 
 void main() {
     float lightDistance = length(fragPosWorldSpace.xyz - uShadowLightPosition.xyz);
-    lightDistance = lightDistance / 10000.0; // map to [0.0, 1.0]
+    lightDistance = lightDistance / 2500.0; // map to [0.0, 1.0]
     gl_FragDepth = lightDistance;
 }
 )END";
@@ -745,7 +745,7 @@ float getShadow(vec3 normal) {
 
         for (int i = 0; i < NUM_PCF_SAMPLES; ++i) {
             float closestDepth = texture(sCubeShadowMap, fragToLight + PCF_SAMPLE_RADIUS * PCF_SAMPLE_OFFSETS[i]).r;
-            closestDepth *= 10000.0; // map to [0.0, 10000.0]
+            closestDepth *= 2500.0; // map to [0.0, 2500.0]
             if (currentDepth > closestDepth) {
                 result += 1.0;
             }
@@ -957,7 +957,7 @@ void main() {
 static const string g_fsSSR = R"END(
 const float Z_THICKNESS = 0.1;
 const float STRIDE = 8.0;
-const float Z_NEAR = 0.1;
+const float Z_NEAR = 0.25;
 const float MAX_STEPS = 16.0;
 const float MAX_DISTANCE = 100.0;
 

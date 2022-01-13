@@ -403,7 +403,7 @@ void CharacterGeneration::reloadCharacterModel() {
 
     SceneInitializer(sceneGraph)
         .aspect(aspect)
-        .depth(0.1f, 10.0f)
+        .depth(kDefaultClipPlaneNear, 10.0f)
         .modelSupplier(bind(&CharacterGeneration::getCharacterModel, this, _1))
         .modelScale(kModelScale)
         .cameraFromModelNode("camerahook")
