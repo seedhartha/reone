@@ -70,7 +70,7 @@ void Textures::bind(Texture &texture, int unit) {
 }
 
 void Textures::bindDefaults() {
-    bind(*_defaultRGB, TextureUnits::diffuseMap);
+    bind(*_defaultRGB, TextureUnits::mainTex);
     bind(*_defaultRGB, TextureUnits::lightmap);
     bind(*_defaultRGB, TextureUnits::bumpMap);
     bind(*_defaultRGB, TextureUnits::hilights);

@@ -487,14 +487,14 @@ void main() {
 )END";
 
 static const string g_fsTexture = R"END(
-uniform sampler2D sDiffuseMap;
+uniform sampler2D sMainTex;
 
 in vec2 fragUV1;
 
 out vec4 fragColor;
 
 void main() {
-    fragColor = texture(sDiffuseMap, fragUV1);
+    fragColor = texture(sMainTex, fragUV1);
 }
 )END";
 
@@ -577,7 +577,7 @@ const vec3 PCF_SAMPLE_OFFSETS[20] = vec3[](
 
 const float SELFILLUM_THRESHOLD = 0.85;
 
-uniform sampler2D sDiffuseMap;
+uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
 uniform sampler2D sBumpMap;
 uniform sampler2D sSSAO;
@@ -770,9 +770,9 @@ void main() {
     vec3 diffuseColor = vec3(0.0);
     float diffuseAlpha = 1.0;
     if (isFeatureEnabled(FEATURE_DIFFUSE)) {
-        vec4 diffuseSample = texture(sDiffuseMap, uv);
-        diffuseColor = diffuseSample.rgb;
-        diffuseAlpha = diffuseSample.a;
+        vec4 mainTexSample = texture(sMainTex, uv);
+        diffuseColor = mainTexSample.rgb;
+        diffuseAlpha = mainTexSample.a;
     }
 
     vec3 N = getNormal(uv);
@@ -840,7 +840,7 @@ void main() {
 )END";
 
 static const string g_fsBillboard = R"END(
-uniform sampler2D sDiffuseMap;
+uniform sampler2D sMainTex;
 
 in vec2 fragUV1;
 
@@ -851,10 +851,10 @@ layout(location = 3) out vec4 fragRoughness;
 
 void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
-    vec4 diffuseSample = texture(sDiffuseMap, uv);
-    vec3 objectColor = uColor.rgb * diffuseSample.rgb;
+    vec4 mainTexSample = texture(sMainTex, uv);
+    vec3 objectColor = uColor.rgb * mainTexSample.rgb;
 
-    fragColor1 = vec4(objectColor, uAlpha * diffuseSample.a);
+    fragColor1 = vec4(objectColor, uAlpha * mainTexSample.a);
     fragColor2 = vec4(0.0);
     fragEyeNormal = vec4(0.0);
     fragRoughness = vec4(0.0);
@@ -862,7 +862,7 @@ void main() {
 )END";
 
 static const string g_fsParticle = R"END(
-uniform sampler2D sDiffuseMap;
+uniform sampler2D sMainTex;
 
 in vec3 fragPosObjSpace;
 in vec3 fragPosWorldSpace;
@@ -889,10 +889,10 @@ void main() {
         uv.x += oneOverGridX * (frame % uParticleGridSize.x);
     }
 
-    vec4 diffuseSample = texture(sDiffuseMap, uv);
-    vec3 objectColor = uParticles[fragInstanceID].color.rgb * diffuseSample.rgb;
+    vec4 mainTexSample = texture(sMainTex, uv);
+    vec3 objectColor = uParticles[fragInstanceID].color.rgb * mainTexSample.rgb;
 
-    float objectAlpha = uParticles[fragInstanceID].color.a * diffuseSample.a;
+    float objectAlpha = uParticles[fragInstanceID].color.a * mainTexSample.a;
     if (isFeatureEnabled(FEATURE_HASHEDALPHATEST)) {
         hashedAlphaTest(objectAlpha, fragPosObjSpace);
     } else if (objectAlpha == 0.0) {
@@ -910,7 +910,7 @@ void main() {
 )END";
 
 static const string g_fsGrass = R"END(
-uniform sampler2D sDiffuseMap;
+uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
 
 in vec3 fragPosObjSpace;
@@ -929,15 +929,15 @@ void main() {
     uv.y += 0.5 * (int(uGrassClusters[fragInstanceID].positionVariant[3]) / 2);
     uv.x += 0.5 * (int(uGrassClusters[fragInstanceID].positionVariant[3]) % 2);
 
-    vec4 diffuseSample = texture(sDiffuseMap, uv);
+    vec4 mainTexSample = texture(sMainTex, uv);
 
-    vec3 objectColor = diffuseSample.rgb;
+    vec3 objectColor = mainTexSample.rgb;
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(sLightmap, uGrassClusters[fragInstanceID].lightmapUV);
         objectColor *= lightmapSample.rgb;
     }
 
-    float objectAlpha = diffuseSample.a;
+    float objectAlpha = mainTexSample.a;
     if (isFeatureEnabled(FEATURE_HASHEDALPHATEST)) {
         hashedAlphaTest(objectAlpha, fragPosObjSpace);
     } else if (objectAlpha == 0.0) {
@@ -963,7 +963,7 @@ const float MAX_DISTANCE = 100.0;
 
 const float EDGE_FADE_START = 0.75;
 
-uniform sampler2D sDiffuseMap;
+uniform sampler2D sMainTex;
 uniform sampler2D sDepthMap;
 uniform sampler2D sEyeNormal;
 uniform sampler2D sRoughness;
@@ -1095,7 +1095,7 @@ void main() {
     if (traceScreenSpaceRay(fragPosVS, R, jitter, hitUV, hitPoint, stepCount)) {
         vec2 hitNDC = hitUV * 2.0 - 1.0;
         float maxDim = min(1.0, max(abs(hitNDC.x), abs(hitNDC.y)));
-        reflectionColor = texture(sDiffuseMap, hitUV);
+        reflectionColor = texture(sMainTex, hitUV);
         reflectionStrength = 1.0 - clamp(R.z, 0.0, 1.0);
         reflectionStrength *= 1.0 - stepCount / MAX_STEPS;
         reflectionStrength *= 1.0 - clamp(distance(fragPosVS, hitPoint) / MAX_DISTANCE, 0.0, 1.0);
@@ -1107,28 +1107,29 @@ void main() {
 )END";
 
 static const string g_fsBlur = R"END(
-uniform sampler2D sDiffuseMap;
+uniform sampler2D sMainTex;
+
+in vec2 fragUV1;
 
 out vec4 fragColor;
 
 void main() {
-    vec2 uv = vec2(gl_FragCoord.xy / uScreenResolution);
-    vec4 color = texture(sDiffuseMap, uv);
+    vec4 color = texture(sMainTex, fragUV1);
     color.rgb *= 0.2270270270;
 
     vec2 off1 = vec2(1.3846153846) * uBlurDirection;
     vec2 off2 = vec2(3.2307692308) * uBlurDirection;
-    color.rgb += texture(sDiffuseMap, uv + (off1 / uScreenResolution)).rgb * 0.3162162162;
-    color.rgb += texture(sDiffuseMap, uv - (off1 / uScreenResolution)).rgb * 0.3162162162;
-    color.rgb += texture(sDiffuseMap, uv + (off2 / uScreenResolution)).rgb * 0.0702702703;
-    color.rgb += texture(sDiffuseMap, uv - (off2 / uScreenResolution)).rgb * 0.0702702703;
+    color.rgb += texture(sMainTex, fragUV1 + off1 * uScreenResolutionReciprocal.xy).rgb * 0.3162162162;
+    color.rgb += texture(sMainTex, fragUV1 - off1 * uScreenResolutionReciprocal.xy).rgb * 0.3162162162;
+    color.rgb += texture(sMainTex, fragUV1 + off2 * uScreenResolutionReciprocal.xy).rgb * 0.0702702703;
+    color.rgb += texture(sMainTex, fragUV1 - off2 * uScreenResolutionReciprocal.xy).rgb * 0.0702702703;
 
     fragColor = color;
 }
 )END";
 
 static const string g_fsComposite = R"END(
-uniform sampler2D sDiffuseMap;
+uniform sampler2D sMainTex;
 uniform sampler2D sHilights;
 uniform sampler2D sRoughness;
 uniform sampler2D sSSR;
@@ -1138,13 +1139,13 @@ noperspective in vec2 fragUV1;
 out vec4 fragColor;
 
 void main() {
-    vec4 diffuseSample = texture(sDiffuseMap, fragUV1);
+    vec4 mainTexSample = texture(sMainTex, fragUV1);
     vec4 hilightsSample = texture(sHilights, fragUV1);
     vec4 roughnessSample = texture(sRoughness, fragUV1);
     vec4 ssrSample = texture(sSSR, fragUV1);
-    vec3 color = diffuseSample.rgb + hilightsSample.rgb + ssrSample.rgb * ssrSample.a * (1.0 - roughnessSample.r);
+    vec3 color = mainTexSample.rgb + hilightsSample.rgb + ssrSample.rgb * ssrSample.a * (1.0 - roughnessSample.r);
 
-    fragColor = vec4(color, diffuseSample.a);
+    fragColor = vec4(color, mainTexSample.a);
 }
 )END";
 
@@ -1153,7 +1154,7 @@ const float EDGE_SHARPNESS = 8.0;
 const float EDGE_THRESHOLD = 0.125;
 const float EDGE_THRESHOLD_MIN = 0.05;
 
-uniform sampler2D sDiffuseMap;
+uniform sampler2D sMainTex;
 
 noperspective in vec2 fragUV1;
 
@@ -1165,13 +1166,13 @@ float rgbaToLuma(vec4 rgba) {
 
 void main() {
     vec2 posM = fragUV1;
-    vec4 rgbaM = texture(sDiffuseMap, posM);
+    vec4 rgbaM = texture(sMainTex, posM);
     float lumaM = rgbaToLuma(rgbaM);
 
-    float lumaNw = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(-1, 1)));
-    float lumaSw = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(-1, -1)));
-    float lumaNe = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(1, 1)));
-    float lumaSe = rgbaToLuma(textureOffset(sDiffuseMap, posM, ivec2(1, -1)));
+    float lumaNw = rgbaToLuma(textureOffset(sMainTex, posM, ivec2(-1, 1)));
+    float lumaSw = rgbaToLuma(textureOffset(sMainTex, posM, ivec2(-1, -1)));
+    float lumaNe = rgbaToLuma(textureOffset(sMainTex, posM, ivec2(1, 1)));
+    float lumaSe = rgbaToLuma(textureOffset(sMainTex, posM, ivec2(1, -1)));
 
     lumaNe += 1.0/384.0;
 
@@ -1188,14 +1189,14 @@ void main() {
     vec2 dir = vec2(dirSwMinusNe + dirSeMinusNw, dirSwMinusNe - dirSeMinusNw);
 
     vec2 dir1 = normalize(dir);
-    vec4 rgbaN1 = texture(sDiffuseMap, posM - dir1 * uScreenResolutionReciprocal.zw);
-    vec4 rgbaP1 = texture(sDiffuseMap, posM + dir1 * uScreenResolutionReciprocal.zw);
+    vec4 rgbaN1 = texture(sMainTex, posM - dir1 * uScreenResolutionReciprocal.zw);
+    vec4 rgbaP1 = texture(sMainTex, posM + dir1 * uScreenResolutionReciprocal.zw);
 
     float dirAbsMinTimesC = min(abs(dir1.x), abs(dir1.y)) * EDGE_SHARPNESS;
     vec2 dir2 = clamp(dir1 / dirAbsMinTimesC, -2.0, 2.0);
 
-    vec4 rgbaN2 = texture(sDiffuseMap, posM - dir2 * uScreenResolutionReciprocal2.zw);
-    vec4 rgbaP2 = texture(sDiffuseMap, posM + dir2 * uScreenResolutionReciprocal2.zw);
+    vec4 rgbaN2 = texture(sMainTex, posM - dir2 * uScreenResolutionReciprocal2.zw);
+    vec4 rgbaP2 = texture(sMainTex, posM + dir2 * uScreenResolutionReciprocal2.zw);
 
     vec4 rgbaA = rgbaN1 + rgbaP1;
     vec4 rgbaB = ((rgbaN2 + rgbaP2) * 0.25) + (rgbaA * 0.25);
@@ -1209,7 +1210,7 @@ void main() {
 )END";
 
 static const string g_fsGUI = R"END(
-uniform sampler2D sDiffuseMap;
+uniform sampler2D sMainTex;
 
 in vec2 fragUV1;
 
@@ -1217,17 +1218,17 @@ out vec4 fragColor;
 
 void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
-    vec4 diffuseSample = texture(sDiffuseMap, uv);
-    vec3 objectColor = uColor.rgb * diffuseSample.rgb;
+    vec4 mainTexSample = texture(sMainTex, uv);
+    vec3 objectColor = uColor.rgb * mainTexSample.rgb;
     if (isFeatureEnabled(FEATURE_DISCARD) && length(uDiscardColor.rgb - objectColor) < 0.01) {
         discard;
     }
-    fragColor = vec4(objectColor, uAlpha * diffuseSample.a);
+    fragColor = vec4(objectColor, uAlpha * mainTexSample.a);
 }
 )END";
 
 static const string g_fsText = R"END(
-uniform sampler2D sDiffuseMap;
+uniform sampler2D sMainTex;
 
 in vec2 fragUV1;
 flat in int fragInstanceID;
@@ -1236,9 +1237,9 @@ out vec4 fragColor;
 
 void main() {
     vec2 uv = fragUV1 * uTextChars[fragInstanceID].uv.zw + uTextChars[fragInstanceID].uv.xy;
-    vec4 diffuseSample = texture(sDiffuseMap, uv);
-    vec3 objectColor = uColor.rgb * diffuseSample.rgb;
-    fragColor = vec4(objectColor, diffuseSample.a);
+    vec4 mainTexSample = texture(sMainTex, uv);
+    vec3 objectColor = uColor.rgb * mainTexSample.rgb;
+    fragColor = vec4(objectColor, mainTexSample.a);
 }
 )END";
 
@@ -1369,7 +1370,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->use();
 
     // Samplers
-    program->setUniform("sDiffuseMap", TextureUnits::diffuseMap);
+    program->setUniform("sMainTex", TextureUnits::mainTex);
     program->setUniform("sLightmap", TextureUnits::lightmap);
     program->setUniform("sBumpMap", TextureUnits::bumpMap);
     program->setUniform("sHilights", TextureUnits::hilights);

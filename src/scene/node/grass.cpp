@@ -143,7 +143,7 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     if (leafs.empty()) {
         return;
     }
-    _textures.bind(*_texture, TextureUnits::diffuseMap);
+    _textures.bind(*_texture);
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();

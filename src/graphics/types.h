@@ -137,7 +137,7 @@ enum class CameraType {
 };
 
 struct TextureUnits {
-    static constexpr int diffuseMap = 0;
+    static constexpr int mainTex = 0;
     static constexpr int lightmap = 1;
     static constexpr int bumpMap = 2;
     static constexpr int hilights = 3;
