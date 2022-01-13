@@ -30,26 +30,25 @@ static const string g_glslHeader = R"END(
 static const string g_glslGeneralUniforms = R"END(
 const int NUM_SHADOW_LIGHT_SPACE = 8;
 
-const int FEATURE_DIFFUSE = 1;
-const int FEATURE_LIGHTMAP = 2;
-const int FEATURE_ENVMAP = 4;
-const int FEATURE_NORMALMAP = 8;
-const int FEATURE_HEIGHTMAP = 0x10;
-const int FEATURE_SKELETAL = 0x20;
-const int FEATURE_LIGHTING = 0x40;
-const int FEATURE_SELFILLUM = 0x80;
-const int FEATURE_DISCARD = 0x100;
-const int FEATURE_SHADOWS = 0x200;
-const int FEATURE_PARTICLES = 0x400;
-const int FEATURE_WATER = 0x800;
-const int FEATURE_TEXT = 0x1000;
-const int FEATURE_GRASS = 0x2000;
-const int FEATURE_FOG = 0x4000;
-const int FEATURE_DANGLYMESH = 0x8000;
-const int FEATURE_FIXEDSIZE = 0x10000;
-const int FEATURE_HASHEDALPHATEST = 0x20000;
-const int FEATURE_SSAO = 0x40000;
-const int FEATURE_SSAOSAMPLES = 0x80000;
+const int FEATURE_LIGHTMAP = 1;
+const int FEATURE_ENVMAP = 2;
+const int FEATURE_NORMALMAP = 4;
+const int FEATURE_HEIGHTMAP = 8;
+const int FEATURE_SKELETAL = 0x10;
+const int FEATURE_LIGHTING = 0x20;
+const int FEATURE_SELFILLUM = 0x40;
+const int FEATURE_DISCARD = 0x80;
+const int FEATURE_SHADOWS = 0x100;
+const int FEATURE_PARTICLES = 0x200;
+const int FEATURE_WATER = 0x400;
+const int FEATURE_TEXT = 0x800;
+const int FEATURE_GRASS = 0x1000;
+const int FEATURE_FOG = 0x2000;
+const int FEATURE_DANGLYMESH = 0x4000;
+const int FEATURE_FIXEDSIZE = 0x8000;
+const int FEATURE_HASHEDALPHATEST = 0x10000;
+const int FEATURE_SSAO = 0x20000;
+const int FEATURE_SSAOSAMPLES = 0x40000;
 
 layout(std140) uniform General {
     mat4 uProjection;
@@ -767,19 +766,15 @@ vec3 applyFog(vec3 objectColor) {
 void main() {
     vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
 
-    vec3 diffuseColor = vec3(0.0);
-    float diffuseAlpha = 1.0;
-    if (isFeatureEnabled(FEATURE_DIFFUSE)) {
-        vec4 mainTexSample = texture(sMainTex, uv);
-        diffuseColor = mainTexSample.rgb;
-        diffuseAlpha = mainTexSample.a;
-    }
+    vec4 mainTexSample = texture(sMainTex, uv);
+    vec3 diffuseColor = mainTexSample.rgb;
+    float diffuseAlpha = mainTexSample.a;
 
     vec3 N = getNormal(uv);
     float shadow = getShadow(N);
 
     float objectAlpha = uAlpha;
-    if (isFeatureEnabled(FEATURE_DIFFUSE) && !isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_NORMALMAP)) {
+    if (!isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_NORMALMAP)) {
         objectAlpha *= diffuseAlpha;
     }
     if (isFeatureEnabled(FEATURE_HASHEDALPHATEST)) {

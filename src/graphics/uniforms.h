@@ -24,26 +24,25 @@ namespace reone {
 namespace graphics {
 
 struct UniformsFeatureFlags {
-    static constexpr int diffuse = 1;
-    static constexpr int lightmap = 2;
-    static constexpr int envmap = 4;
-    static constexpr int normalmap = 8;
-    static constexpr int heightmap = 0x10;
-    static constexpr int skeletal = 0x20;
-    static constexpr int lighting = 0x40;
-    static constexpr int selfillum = 0x80;
-    static constexpr int discard = 0x100;
-    static constexpr int shadows = 0x200;
-    static constexpr int particles = 0x400;
-    static constexpr int water = 0x800;
-    static constexpr int text = 0x1000;
-    static constexpr int grass = 0x2000;
-    static constexpr int fog = 0x4000;
-    static constexpr int danglymesh = 0x8000;
-    static constexpr int fixedsize = 0x10000;
-    static constexpr int hashedalphatest = 0x20000;
-    static constexpr int ssao = 0x40000;
-    static constexpr int ssaosamples = 0x80000;
+    static constexpr int lightmap = 1;
+    static constexpr int envmap = 2;
+    static constexpr int normalmap = 4;
+    static constexpr int heightmap = 8;
+    static constexpr int skeletal = 0x10;
+    static constexpr int lighting = 0x20;
+    static constexpr int selfillum = 0x40;
+    static constexpr int discard = 0x80;
+    static constexpr int shadows = 0x100;
+    static constexpr int particles = 0x200;
+    static constexpr int water = 0x400;
+    static constexpr int text = 0x800;
+    static constexpr int grass = 0x1000;
+    static constexpr int fog = 0x2000;
+    static constexpr int danglymesh = 0x4000;
+    static constexpr int fixedsize = 0x8000;
+    static constexpr int hashedalphatest = 0x10000;
+    static constexpr int ssao = 0x20000;
+    static constexpr int ssaosamples = 0x40000;
 };
 
 struct GeneralUniforms {
