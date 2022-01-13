@@ -309,8 +309,8 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
         if (_options.ssao) {
             drawDepth(scene, attachments);
             drawSSAO(scene, dim, attachments);
-            applyMedianFilter(dim, *attachments.cbSSAO, *attachments.fbPing);
-            blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbSSAO, 0);
+            applyGaussianBlur(dim, *attachments.cbSSAO, *attachments.fbPing);
+            applyGaussianBlur(dim, *attachments.cbPing, *attachments.fbSSAO, R_BLUR_VERTICAL);
         }
 
         drawGeometry(scene, attachments);
