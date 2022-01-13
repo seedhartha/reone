@@ -28,7 +28,7 @@ constexpr float kDefaultObjectDrawDistance = 64.0f;
 constexpr int kNumCubeFaces = 6;
 constexpr int kNumShadowCascades = 8;
 constexpr int kNumShadowLightSpace = 8;
-constexpr int kNumSSAOSamples = 32;
+constexpr int kNumSSAOSamples = 64;
 
 constexpr int kMaxBones = 24;
 constexpr int kMaxLights = 16;
@@ -51,7 +51,8 @@ enum class TextureUsage {
     DepthBuffer,
     DepthBufferCubeMap,
     Video,
-    Lookup
+    Lookup,
+    Noise
 };
 
 enum class TextureQuality {
@@ -74,6 +75,8 @@ enum class PolygonMode {
 enum class PixelFormat {
     R8,
     R16F,
+    RG8,
+    RG16F,
     RGB8,
     RGB16F,
     RGBA8,
@@ -146,10 +149,11 @@ struct TextureUnits {
     static constexpr int roughness = 6;
     static constexpr int ssao = 7;
     static constexpr int ssr = 8;
-    static constexpr int danglyConstraints = 9;
-    static constexpr int environmentMap = 10;
-    static constexpr int cubeShadowMap = 11;
-    static constexpr int shadowMap = 12;
+    static constexpr int noise = 9;
+    static constexpr int danglyConstraints = 10;
+    static constexpr int environmentMap = 11;
+    static constexpr int cubeShadowMap = 12;
+    static constexpr int shadowMap = 13;
 };
 
 struct UniformBlockBindingPoints {

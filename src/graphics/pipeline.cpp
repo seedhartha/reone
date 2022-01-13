@@ -164,6 +164,7 @@ void Pipeline::init() {
         sample *= scale;
         uniforms.ssao.samples[i] = glm::vec4(move(sample), 0.0f);
     }
+    _shaders.refreshSSAOUniforms();
 }
 
 void Pipeline::initAttachments(glm::ivec2 dim) {
@@ -419,10 +420,9 @@ void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attac
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
-    uniforms.general.featureMask = UniformsFeatureFlags::ssaosamples;
     uniforms.general.projection = camera->projection();
     uniforms.general.projectionInv = glm::inverse(camera->projection());
-    uniforms.general.screenResolutionReciprocal = glm::vec4(1.0f / dim.x, 1.0f / dim.y, 0.0f, 0.0f);
+    uniforms.general.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
 
     // Draw screen-space ambient occlusion
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSAO->nameGL());

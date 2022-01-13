@@ -35,6 +35,8 @@ public:
 
     void use(ShaderProgram &program, bool refreshUniforms = false);
 
+    void refreshSSAOUniforms();
+
     Uniforms &uniforms() { return _uniforms; }
 
     ShaderProgram &simpleColor() const { return *_spSimpleColor; }
@@ -99,7 +101,8 @@ private:
     std::shared_ptr<ShaderProgram> initShaderProgram(std::vector<std::shared_ptr<Shader>> shaders);
     std::unique_ptr<UniformBuffer> initUniformBuffer(const void *data, ptrdiff_t size);
 
-    void refreshUniforms();
+    void refreshGeneralUniforms();
+    void refreshFeatureUniforms();
 };
 
 } // namespace graphics
