@@ -210,7 +210,10 @@ void hashedAlphaTest(float a, vec3 p) {
 )END";
 
 static const string g_glslNormalMapping = R"END(
-vec2 packTexCoords(vec2 uv, vec4 bounds) {
+const vec2 HEIGHT_MAP_SIZE = vec2(2.0, 0.0);
+const ivec3 HEIGHT_MAP_OFF = ivec3(-1, 0, 1);
+
+vec2 packUV(vec2 uv, vec4 bounds) {
     return bounds.xy + bounds.zw * fract(uv);
 }
 
@@ -221,19 +224,16 @@ vec3 getNormalFromNormalMap(sampler2D tex, vec2 uv, mat3 TBN) {
 }
 
 vec3 getNormalFromHeightMap(sampler2D tex, vec2 uv, mat3 TBN) {
-    vec2 du = dFdx(uv);
-    vec2 dv = dFdy(uv);
+    vec2 uvM = packUV(uv, uHeightMapFrameBounds);
 
-    vec2 uvPacked = packTexCoords(uv, uHeightMapFrameBounds);
-    vec2 uvPackedDu = packTexCoords(uv + du, uHeightMapFrameBounds);
-    vec2 uvPackedDv = packTexCoords(uv + dv, uHeightMapFrameBounds);
-    vec4 texSample = texture(tex, uvPacked);
-    vec4 texSampleDu = texture(tex, uvPackedDu);
-    vec4 texSampleDv = texture(tex, uvPackedDv);
-    float dBx = texSampleDu.r - texSample.r;
-    float dBy = texSampleDv.r - texSample.r;
+    float s01 = textureOffset(tex, uvM, HEIGHT_MAP_OFF.xy).r;
+    float s21 = textureOffset(tex, uvM, HEIGHT_MAP_OFF.zy).r;
+    float s10 = textureOffset(tex, uvM, HEIGHT_MAP_OFF.yx).r;
+    float s12 = textureOffset(tex, uvM, HEIGHT_MAP_OFF.yz).r;
+    vec3 va = normalize(vec3(HEIGHT_MAP_SIZE.xy, s21 - s01));
+    vec3 vb = normalize(vec3(HEIGHT_MAP_SIZE.yx, s12 - s10));
 
-    vec3 N = vec3(-dBx, -dBy, 1.0);
+    vec3 N = cross(va, vb);
     N.xy *= uHeightMapScaling;
 
     return TBN * normalize(N);
