@@ -876,7 +876,7 @@ void main() {
 }
 )END";
 
-static const string g_fsModelTranslucent = R"END(
+static const string g_fsModelTransparent = R"END(
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
 uniform sampler2D sBumpMap;
@@ -1344,12 +1344,12 @@ void main() {
         return;
     }
 
-    vec3 translucentColor = accumColor.rgb / max(0.0001, accumWeight);
-    float translucentAlpha = 1.0 - revealage;
+    vec3 transparentColor = accumColor.rgb / max(0.0001, accumWeight);
+    float transparentAlpha = 1.0 - revealage;
 
     fragColor = vec4(
-        translucentColor * translucentAlpha + mainTexSample.rgb * (1.0 - translucentAlpha),
-        translucentAlpha + mainTexSample.a);
+        transparentColor * transparentAlpha + mainTexSample.rgb * (1.0 - transparentAlpha),
+        transparentAlpha + mainTexSample.a);
 }
 )END";
 
@@ -1466,7 +1466,7 @@ void Shaders::init() {
     auto fsDepth = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDepth});
     auto fsSSAO = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslSSAOUniforms, g_glslHash, g_glslScreenSpace, g_fsSSAO});
     auto fsModelOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslHash, g_glslHashedAlphaTest, g_glslNormalMapping, g_glslBlinnPhong, g_glslShadowMapping, g_glslFog, g_fsModelOpaque});
-    auto fsModelTranslucent = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslNormalMapping, g_glslOIT, g_glslLuma, g_fsModelTranslucent});
+    auto fsModelTransparent = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslNormalMapping, g_glslOIT, g_glslLuma, g_fsModelTransparent});
     auto fsBillboard = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBillboard});
     auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_glslOIT, g_glslLuma, g_fsParticle});
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
@@ -1487,7 +1487,7 @@ void Shaders::init() {
     _spModelDepth = initShaderProgram({vsModel, fsDepth});
     _spSSAO = initShaderProgram({vsObjectSpace, fsSSAO});
     _spModelOpaque = initShaderProgram({vsModel, fsModelOpaque});
-    _spModelTranslucent = initShaderProgram({vsModel, fsModelTranslucent});
+    _spModelTransparent = initShaderProgram({vsModel, fsModelTransparent});
     _spBillboard = initShaderProgram({vsBillboard, fsBillboard});
     _spParticle = initShaderProgram({vsParticle, fsParticle});
     _spGrass = initShaderProgram({vsGrass, fsGrass});
@@ -1532,7 +1532,7 @@ void Shaders::deinit() {
     _spModelDepth.reset();
     _spSSAO.reset();
     _spModelOpaque.reset();
-    _spModelTranslucent.reset();
+    _spModelTransparent.reset();
     _spBillboard.reset();
     _spParticle.reset();
     _spGrass.reset();

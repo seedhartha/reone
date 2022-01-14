@@ -74,7 +74,7 @@ private:
         std::shared_ptr<Framebuffer> fbDepth;
         std::shared_ptr<Framebuffer> fbSSAO;
         std::shared_ptr<Framebuffer> fbOpaqueGeometry;
-        std::shared_ptr<Framebuffer> fbTranslucentGeometry;
+        std::shared_ptr<Framebuffer> fbTransparentGeometry;
         std::shared_ptr<Framebuffer> fbSSR;
         std::shared_ptr<Framebuffer> fbOutput;
 
@@ -85,8 +85,8 @@ private:
         std::shared_ptr<Texture> cbOpaqueGeometry2;
         std::shared_ptr<Texture> cbOpaqueGeometryEyeNormal;
         std::shared_ptr<Texture> cbOpaqueGeometryRoughness;
-        std::shared_ptr<Texture> cbTranslucentGeometry1;
-        std::shared_ptr<Texture> cbTranslucentGeometry2;
+        std::shared_ptr<Texture> cbTransparentGeometry1;
+        std::shared_ptr<Texture> cbTransparentGeometry2;
         std::shared_ptr<Texture> cbSSR;
         std::shared_ptr<Texture> cbOutput;
 
@@ -122,7 +122,7 @@ private:
     void drawDepth(IScene &scene, Attachments &attachments);
     void drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
     void drawOpaqueGeometry(IScene &scene, Attachments &attachments);
-    void drawTranslucentGeometry(IScene &scene, Attachments &attachments);
+    void drawTransparentGeometry(IScene &scene, Attachments &attachments);
     void drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
     void drawCombineOpaque(Attachments &attachments, Framebuffer &dst);
     void drawCombineOIT(Attachments &attachments, Framebuffer &dst);

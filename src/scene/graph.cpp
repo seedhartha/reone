@@ -117,7 +117,7 @@ void SceneGraph::update(float dt) {
     updateFlareLights();
     updateSounds();
     prepareOpaqueLeafs();
-    prepareTranslucentLeafs();
+    prepareTransparentLeafs();
 }
 
 void SceneGraph::cullRoots() {
@@ -247,7 +247,7 @@ void SceneGraph::updateSounds() {
 
 void SceneGraph::refresh() {
     _opaqueMeshes.clear();
-    _translucentMeshes.clear();
+    _transparentMeshes.clear();
     _shadowMeshes.clear();
     _lights.clear();
     _emitters.clear();
@@ -273,9 +273,9 @@ void SceneGraph::refreshFromNode(const shared_ptr<SceneNode> &node) {
         // For model nodes, determine whether they should be rendered and cast shadows
         auto modelNode = static_pointer_cast<MeshSceneNode>(node);
         if (modelNode->shouldRender()) {
-            // Sort model nodes into translucent and opaque
-            if (modelNode->isTranslucent()) {
-                _translucentMeshes.push_back(modelNode.get());
+            // Sort model nodes into transparent and opaque
+            if (modelNode->isTransparent()) {
+                _transparentMeshes.push_back(modelNode.get());
             } else {
                 _opaqueMeshes.push_back(modelNode.get());
             }
@@ -334,14 +334,14 @@ void SceneGraph::prepareOpaqueLeafs() {
     }
 }
 
-void SceneGraph::prepareTranslucentLeafs() {
-    _translucentLeafs.clear();
+void SceneGraph::prepareTransparentLeafs() {
+    _transparentLeafs.clear();
 
     auto camera = _activeCamera->camera();
 
-    // Add meshes and emitters to translucent leafs
+    // Add meshes and emitters to transparent leafs
     vector<SceneNode *> leafs;
-    for (auto &mesh : _translucentMeshes) {
+    for (auto &mesh : _transparentMeshes) {
         leafs.push_back(mesh);
     }
     for (auto &emitter : _emitters) {
@@ -357,7 +357,7 @@ void SceneGraph::prepareTranslucentLeafs() {
         }
     }
 
-    // Group translucent leafs into buckets
+    // Group transparent leafs into buckets
     SceneNode *bucketParent = nullptr;
     vector<SceneNode *> bucket;
     for (auto leaf : leafs) {
@@ -373,7 +373,7 @@ void SceneGraph::prepareTranslucentLeafs() {
                 maxCount = kMaxGrassClusters;
             }
             if (bucketParent != parent || bucket.size() >= maxCount) {
-                _translucentLeafs.push_back(make_pair(bucketParent, bucket));
+                _transparentLeafs.push_back(make_pair(bucketParent, bucket));
                 bucket.clear();
             }
         }
@@ -381,7 +381,7 @@ void SceneGraph::prepareTranslucentLeafs() {
         bucket.push_back(leaf);
     }
     if (bucketParent && !bucket.empty()) {
-        _translucentLeafs.push_back(make_pair(bucketParent, bucket));
+        _transparentLeafs.push_back(make_pair(bucketParent, bucket));
     }
 }
 
@@ -420,12 +420,12 @@ void SceneGraph::drawOpaque() {
     }
 }
 
-void SceneGraph::drawTranslucent() {
+void SceneGraph::drawTransparent() {
     if (!_activeCamera) {
         return;
     }
-    // Draw translucent leafs (incl. meshes)
-    for (auto &[node, leafs] : _translucentLeafs) {
+    // Draw transparent leafs (incl. meshes)
+    for (auto &[node, leafs] : _transparentLeafs) {
         node->drawLeafs(leafs);
     }
 }

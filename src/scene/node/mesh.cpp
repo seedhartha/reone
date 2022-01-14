@@ -169,7 +169,7 @@ bool MeshSceneNode::shouldCastShadows() const {
     }
 }
 
-bool MeshSceneNode::isTranslucent() const {
+bool MeshSceneNode::isTransparent() const {
     if (!_nodeTextures.diffuse) {
         return false;
     }
@@ -212,7 +212,7 @@ void MeshSceneNode::draw() {
     if (!mesh || !_nodeTextures.diffuse) {
         return;
     }
-    bool translucent = isTranslucent();
+    bool transparent = isTransparent();
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
@@ -336,7 +336,7 @@ void MeshSceneNode::draw() {
     if (_sceneGraph.isFogEnabled() && _model.model().isAffectedByFog()) {
         uniforms.general.featureMask |= UniformsFeatureFlags::fog;
     }
-    auto &program = translucent ? _shaders.modelTranslucent() : _shaders.modelOpaque();
+    auto &program = transparent ? _shaders.modelTransparent() : _shaders.modelOpaque();
     _shaders.use(program, true);
     _graphicsContext.withFaceCulling(CullFaceMode::Back, [&mesh]() {
         mesh->mesh->draw();
