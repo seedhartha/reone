@@ -129,7 +129,7 @@ private:
     void drawLensFlares(IScene &scene, Framebuffer &dst);
 
     void applyGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical = false);
-    void applyMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
+    void applyMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong = false);
     void applyFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
 
     void blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, int flags = BlitFlags::color);

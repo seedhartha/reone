@@ -35,6 +35,7 @@
 using namespace std;
 
 #define R_BLUR_VERTICAL true
+#define R_MEDIAN_FILTER_STRONG true
 
 namespace reone {
 
@@ -323,8 +324,8 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
         if (_options.ssao) {
             drawDepth(scene, attachments);
             drawSSAO(scene, dim, attachments);
-            applyGaussianBlur(dim, *attachments.cbSSAO, *attachments.fbPing);
-            applyGaussianBlur(dim, *attachments.cbPing, *attachments.fbSSAO, R_BLUR_VERTICAL);
+            applyMedianFilter(dim, *attachments.cbSSAO, *attachments.fbPing, R_MEDIAN_FILTER_STRONG);
+            blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbSSAO, 0);
         }
 
         drawOpaqueGeometry(scene, attachments);
@@ -605,7 +606,7 @@ void Pipeline::applyGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Fra
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::applyMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
+void Pipeline::applyMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong) {
     // Reset uniforms
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
@@ -613,7 +614,7 @@ void Pipeline::applyMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Fra
     uniforms.general.screenResolutionReciprocal = glm::vec4(1.0f / dim.x, 1.0f / dim.y, 0.0f, 0.0f);
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(_shaders.medianFilter(), true);
+    _shaders.use(strong ? _shaders.medianFilter5() : _shaders.medianFilter3(), true);
     _textures.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
