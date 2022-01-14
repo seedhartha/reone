@@ -210,6 +210,7 @@ void MeshSceneNode::draw() {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
     uniforms.general.model = _absTransform;
+    uniforms.general.modelInv = _absTransformInv;
     uniforms.general.alpha = _alpha;
     uniforms.general.uv = glm::mat3x4(
         glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
@@ -350,6 +351,7 @@ void MeshSceneNode::drawDepth() {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
     uniforms.general.model = _absTransform;
+    uniforms.general.modelInv = _absTransformInv;
 
     auto skin = mesh->skin;
     if (skin) {
@@ -400,6 +402,7 @@ void MeshSceneNode::drawShadow() {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
     uniforms.general.model = _absTransform;
+    uniforms.general.modelInv = _absTransformInv;
     uniforms.general.alpha = _alpha;
 
     auto &program = _sceneGraph.isShadowLightDirectional() ? _shaders.directionalLightShadows() : _shaders.pointLightShadows();

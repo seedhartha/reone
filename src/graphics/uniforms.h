@@ -49,7 +49,9 @@ struct GeneralUniforms {
     glm::mat4 projectionInv {1.0f};
     glm::mat4 screenProjection {1.0f};
     glm::mat4 view {1.0f};
+    glm::mat4 viewInv {1.0f};
     glm::mat4 model {1.0f};
+    glm::mat4 modelInv {1.0f};
     glm::mat3x4 dangly {1.0f};
     glm::mat3x4 uv {1.0f};
     glm::vec4 cameraPosition {0.0f};
@@ -84,6 +86,7 @@ struct GeneralUniforms {
         projection = glm::mat4(1.0f);
         projectionInv = glm::mat4(1.0f);
         view = glm::mat4(1.0f);
+        viewInv = glm::mat4(1.0f);
         cameraPosition = glm::vec4(0.0f);
         worldAmbientColor = glm::vec4(1.0f);
         fogColor = glm::vec4(0.0f);
@@ -103,6 +106,7 @@ struct GeneralUniforms {
     void resetLocals() {
         screenProjection = glm::mat4(1.0f);
         model = glm::mat4(1.0f);
+        modelInv = glm::mat4(1.0f);
         dangly = glm::mat3x4(1.0f);
         uv = glm::mat3x4(1.0f);
         color = glm::vec4(1.0f);
