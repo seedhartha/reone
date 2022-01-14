@@ -45,7 +45,8 @@ public:
     ShaderProgram &directionalLightShadows() const { return *_spDirectionalLightShadows; }
     ShaderProgram &modelDepth() const { return *_spModelDepth; }
     ShaderProgram &ssao() const { return *_spSSAO; }
-    ShaderProgram &blinnPhong() const { return *_spBlinnPhong; }
+    ShaderProgram &modelOpaque() const { return *_spModelOpaque; }
+    ShaderProgram &modelTranslucent() const { return *_spModelTranslucent; }
     ShaderProgram &particle() const { return *_spParticle; }
     ShaderProgram &grass() const { return *_spGrass; }
     ShaderProgram &billboard() const { return *_spBillboard; }
@@ -71,7 +72,8 @@ private:
     std::shared_ptr<ShaderProgram> _spDirectionalLightShadows;
     std::shared_ptr<ShaderProgram> _spModelDepth;
     std::shared_ptr<ShaderProgram> _spSSAO;
-    std::shared_ptr<ShaderProgram> _spBlinnPhong;
+    std::shared_ptr<ShaderProgram> _spModelOpaque;
+    std::shared_ptr<ShaderProgram> _spModelTranslucent;
     std::shared_ptr<ShaderProgram> _spParticle;
     std::shared_ptr<ShaderProgram> _spGrass;
     std::shared_ptr<ShaderProgram> _spBillboard;

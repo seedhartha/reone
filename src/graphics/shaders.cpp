@@ -745,7 +745,7 @@ void main() {
 }
 )END";
 
-static const string g_fsBlinnPhong = R"END(
+static const string g_fsModelOpaque = R"END(
 const float SELFILLUM_THRESHOLD = 0.85;
 
 uniform sampler2D sMainTex;
@@ -796,8 +796,8 @@ void main() {
     vec3 diffuseColor = mainTexSample.rgb;
     float diffuseAlpha = mainTexSample.a;
 
-    vec3 N = getNormal(uv);
-    float shadow = getShadow(N);
+    vec3 normal = getNormal(uv);
+    float shadow = getShadow(normal);
 
     float objectAlpha = uAlpha;
     if (!isFeatureEnabled(FEATURE_ENVMAP) && !isFeatureEnabled(FEATURE_NORMALMAP)) {
@@ -812,18 +812,17 @@ void main() {
     vec3 lighting;
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(sLightmap, fragUV2);
-        lightmapSample.rgb = lightmapSample.rgb;
         lighting = (1.0 - 0.5 * shadow) * lightmapSample.rgb;
         if (isFeatureEnabled(FEATURE_SSAO)) {
             lighting *= texelFetch(sSSAO, ivec2(gl_FragCoord.xy), 0).r;
         }
-        lighting += (1.0 - 0.5 * shadow) * getLightingDirect(fragPosWorldSpace, N, LIGHT_DYNTYPE_AREA);
+        lighting += (1.0 - 0.5 * shadow) * getLightingDirect(fragPosWorldSpace, normal, LIGHT_DYNTYPE_AREA);
         if (isFeatureEnabled(FEATURE_WATER)) {
             lighting = mix(vec3(1.0), lighting, 0.2);
         }
     } else if (isFeatureEnabled(FEATURE_LIGHTING)) {
-        vec3 indirect = getLightingIndirect(fragPosWorldSpace, N, sSSAO);
-        vec3 direct = getLightingDirect(fragPosWorldSpace, N, LIGHT_DYNTYPE_BOTH);
+        vec3 indirect = getLightingIndirect(fragPosWorldSpace, normal, sSSAO);
+        vec3 direct = getLightingDirect(fragPosWorldSpace, normal, LIGHT_DYNTYPE_BOTH);
         lighting = indirect + (1.0 - shadow) * direct;
     } else if (isFeatureEnabled(FEATURE_SELFILLUM)) {
         lighting = uSelfIllumColor.rgb;
@@ -835,11 +834,10 @@ void main() {
     float roughness = 1.0;
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
         vec3 I = normalize(fragPosWorldSpace - uCameraPosition.xyz);
-        vec3 R = reflect(I, N);
+        vec3 R = reflect(I, normal);
         vec4 envmapSample = texture(sEnvironmentMap, R);
-        envmapSample.rgb = envmapSample.rgb;
+        objectColor += envmapSample.rgb * (1.0 - diffuseAlpha);
         roughness = diffuseAlpha;
-        objectColor += envmapSample.rgb * (1.0 - roughness);
     }
     if (isFeatureEnabled(FEATURE_WATER)) {
         objectColor *= uWaterAlpha;
@@ -853,12 +851,79 @@ void main() {
         objectColorBright = smoothstep(SELFILLUM_THRESHOLD, 1.0, uSelfIllumColor.rgb * diffuseColor * diffuseAlpha);
     }
 
-    vec3 eyeNormal = transpose(mat3(uViewInv)) * N;
+    vec3 eyeNormal = transpose(mat3(uViewInv)) * normal;
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(objectColorBright, objectAlpha);
     fragEyeNormal = vec4(eyeNormal * 0.5 + 0.5, 1.0);
     fragRoughness = vec4(roughness, 0.0, 0.0, 1.0);
+}
+)END";
+
+static const string g_fsModelTranslucent = R"END(
+uniform sampler2D sMainTex;
+uniform sampler2D sLightmap;
+uniform sampler2D sBumpMap;
+uniform samplerCube sEnvironmentMap;
+
+in vec3 fragPosWorldSpace;
+in vec3 fragNormalWorldSpace;
+in vec2 fragUV1;
+in vec2 fragUV2;
+in mat3 fragTBN;
+
+out vec4 fragColor1;
+
+vec3 getNormal(vec2 uv) {
+    if (isFeatureEnabled(FEATURE_NORMALMAP)) {
+        return getNormalFromNormalMap(sBumpMap, uv, fragTBN);
+    } else if (isFeatureEnabled(FEATURE_HEIGHTMAP)) {
+        return getNormalFromHeightMap(sBumpMap, uv, fragTBN);
+    } else {
+        return normalize(fragNormalWorldSpace);
+    }
+}
+
+void main() {
+    vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
+
+    vec4 mainTexSample = texture(sMainTex, uv);
+    vec3 diffuseColor = mainTexSample.rgb;
+    float diffuseAlpha = mainTexSample.a;
+
+    vec3 normal = getNormal(uv);
+
+    float objectAlpha = uAlpha;
+    if (!isFeatureEnabled(FEATURE_ENVMAP)) {
+        objectAlpha *= diffuseAlpha;
+    }
+    if (objectAlpha == 0.0) {
+        discard;
+    }
+
+    vec3 lighting;
+    if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
+        vec4 lightmapSample = texture(sLightmap, fragUV2);
+        lighting = lightmapSample.rgb;
+        if (isFeatureEnabled(FEATURE_WATER)) {
+            lighting = mix(vec3(1.0), lighting, 0.2);
+        }
+    } else {
+        lighting = vec3(1.0);
+    }
+
+    vec3 objectColor = lighting * uColor.rgb * diffuseColor;
+    if (isFeatureEnabled(FEATURE_ENVMAP)) {
+        vec3 I = normalize(fragPosWorldSpace - uCameraPosition.xyz);
+        vec3 R = reflect(I, normal);
+        vec4 envmapSample = texture(sEnvironmentMap, R);
+        objectColor += envmapSample.rgb * (1.0 - diffuseAlpha);
+    }
+    if (isFeatureEnabled(FEATURE_WATER)) {
+        objectColor *= uWaterAlpha;
+    }
+
+    fragColor1 = vec4(objectColor, objectAlpha);
 }
 )END";
 
@@ -1355,7 +1420,8 @@ void Shaders::init() {
     auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDirectionalLightShadows});
     auto fsDepth = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDepth});
     auto fsSSAO = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslSSAOUniforms, g_glslHash, g_glslScreenSpace, g_fsSSAO});
-    auto fsBlinnPhong = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslHash, g_glslHashedAlphaTest, g_glslNormalMapping, g_glslBlinnPhong, g_glslShadowMapping, g_glslFog, g_fsBlinnPhong});
+    auto fsModelOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslHash, g_glslHashedAlphaTest, g_glslNormalMapping, g_glslBlinnPhong, g_glslShadowMapping, g_glslFog, g_fsModelOpaque});
+    auto fsModelTranslucent = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslNormalMapping, g_fsModelTranslucent});
     auto fsBillboard = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBillboard});
     auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsParticle});
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
@@ -1374,7 +1440,8 @@ void Shaders::init() {
     _spDirectionalLightShadows = initShaderProgram({vsShadows, gsDirectionalLightShadows, fsDirectionalLightShadows});
     _spModelDepth = initShaderProgram({vsModel, fsDepth});
     _spSSAO = initShaderProgram({vsObjectSpace, fsSSAO});
-    _spBlinnPhong = initShaderProgram({vsModel, fsBlinnPhong});
+    _spModelOpaque = initShaderProgram({vsModel, fsModelOpaque});
+    _spModelTranslucent = initShaderProgram({vsModel, fsModelTranslucent});
     _spBillboard = initShaderProgram({vsBillboard, fsBillboard});
     _spParticle = initShaderProgram({vsParticle, fsParticle});
     _spGrass = initShaderProgram({vsGrass, fsGrass});
@@ -1417,7 +1484,8 @@ void Shaders::deinit() {
     _spDirectionalLightShadows.reset();
     _spModelDepth.reset();
     _spSSAO.reset();
-    _spBlinnPhong.reset();
+    _spModelOpaque.reset();
+    _spModelTranslucent.reset();
     _spBillboard.reset();
     _spParticle.reset();
     _spGrass.reset();
