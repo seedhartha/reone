@@ -411,7 +411,7 @@ vec3 screenToViewSpace(vec2 uv, float depth, mat4 projInv) {
 static const string g_glslOIT = R"END(
 float OIT_getWeight(float depth, float alpha) {
     float eyeZ = (uClipNear * uClipFar) / ((uClipNear - uClipFar) * depth + uClipFar);
-    return alpha * (1.0 / max(0.0001, abs(eyeZ)));
+    return alpha * max(0.01, min(3000.0, 0.03 / (0.00001 + pow(abs(eyeZ) / 200.0, 4.0))));
 }
 )END";
 
