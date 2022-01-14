@@ -54,7 +54,9 @@ layout(std140) uniform General {
     mat4 uProjectionInv;
     mat4 uScreenProjection;
     mat4 uView;
+    mat4 uViewInv;
     mat4 uModel;
+    mat4 uModelInv;
     mat3 uDangly;
     mat3 uUV;
     vec4 uCameraPosition;
@@ -499,7 +501,7 @@ void main() {
     fragPosObjSpace = P.xyz;
     fragPosWorldSpace = vec3(uModel * P);
 
-    mat3 normalMatrix = transpose(inverse(mat3(uModel)));
+    mat3 normalMatrix = transpose(mat3(uModelInv));
     fragNormalWorldSpace = normalize(normalMatrix * N.xyz);
 
     fragUV1 = aUV1;
@@ -851,7 +853,7 @@ void main() {
         objectColorBright = smoothstep(SELFILLUM_THRESHOLD, 1.0, uSelfIllumColor.rgb * diffuseColor * diffuseAlpha);
     }
 
-    vec3 eyeNormal = transpose(inverse(mat3(uView))) * N;
+    vec3 eyeNormal = transpose(mat3(uViewInv)) * N;
 
     fragColor1 = vec4(objectColor, objectAlpha);
     fragColor2 = vec4(objectColorBright, objectAlpha);
@@ -920,7 +922,7 @@ void main() {
         discard;
     }
 
-    mat3 normalMatrix = transpose(inverse(mat3(uView)));
+    mat3 normalMatrix = transpose(mat3(uViewInv));
     vec3 eyeNormal = normalMatrix * normalize(fragNormalWorldSpace);
 
     fragColor1 = vec4(objectColor, objectAlpha);
@@ -965,7 +967,7 @@ void main() {
         discard;
     }
 
-    mat3 normalMatrix = transpose(inverse(mat3(uView)));
+    mat3 normalMatrix = transpose(mat3(uViewInv));
     vec3 eyeNormal = normalMatrix * normalize(fragNormalWorldSpace);
 
     fragColor1 = vec4(objectColor, objectAlpha);

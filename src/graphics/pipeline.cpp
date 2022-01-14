@@ -406,6 +406,7 @@ void Pipeline::drawDepth(IScene &scene, Attachments &attachments) {
     uniforms.general.resetGlobals();
     uniforms.general.projection = camera->projection();
     uniforms.general.view = camera->view();
+    uniforms.general.viewInv = glm::inverse(camera->view());
 
     // Draw scene to depth framebuffer
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbDepth->nameGL());
@@ -442,6 +443,7 @@ void Pipeline::drawGeometry(IScene &scene, Attachments &attachments, bool transl
     uniforms.general.resetGlobals();
     uniforms.general.projection = camera->projection();
     uniforms.general.view = camera->view();
+    uniforms.general.viewInv = glm::inverse(camera->view());
     uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
     uniforms.general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
     uniforms.general.fogNear = scene.fogNear();
