@@ -1234,55 +1234,21 @@ void main() {
 }
 )END";
 
-static const string g_fsMedianFilter = R"END(
+static const string g_fsMedianFilter3 = R"END(
 uniform sampler2D sMainTex;
 
 noperspective in vec2 fragUV1;
 
 out vec4 fragColor;
 
-void s2(inout vec4 a, inout vec4 b) {
-    vec4 temp = a;
-    a = min(a, b);
-    b = max(temp, b);
-}
+#define s2(a, b)     temp = a; a = min(a, b); b = max(temp, b);
+#define mn3(a, b, c) s2(a, b); s2(a, c);
+#define mx3(a, b, c) s2(b, c); s2(a, c);
 
-void mn3(inout vec4 a, inout vec4 b, inout vec4 c) {
-    s2(a, b);
-    s2(a, c);
-}
-
-void mx3(inout vec4 a, inout vec4 b, inout vec4 c) {
-    s2(b, c);
-    s2(a, c);
-}
-
-void mnmx3(inout vec4 a, inout vec4 b, inout vec4 c) {
-    mx3(a, b, c);
-    s2(a, b);
-}
-
-void mnmx4(inout vec4 a, inout vec4 b, inout vec4 c, inout vec4 d) {
-    s2(a, b);
-    s2(c, d);
-    s2(a, c);
-    s2(b, d);
-}
-
-void mnmx5(inout vec4 a, inout vec4 b, inout vec4 c, inout vec4 d, inout vec4 e) {
-    s2(a, b);
-    s2(c, d);
-    mn3(a, c, e);
-    mx3(b, d, e);
-}
-
-void mnmx6(inout vec4 a, inout vec4 b, inout vec4 c, inout vec4 d, inout vec4 e, inout vec4 f) {
-    s2(a, d);
-    s2(b, e);
-    s2(c, f);
-    mn3(a, b, c);
-    mx3(d, e, f);
-}
+#define mnmx3(a, b, c)          mx3(a, b, c); s2(a, b);
+#define mnmx4(a, b, c, d)       s2(a, b); s2(c, d); s2(a, c); s2(b, d);
+#define mnmx5(a, b, c, d, e)    s2(a, b); s2(c, d); mn3(a, c, e); mx3(b, d, e);
+#define mnmx6(a, b, c, d, e, f) s2(a, d); s2(b, e); s2(c, f); mn3(a, b, c); mx3(d, e, f);
 
 void main() {
     vec4 v[9];
@@ -1298,6 +1264,50 @@ void main() {
     mnmx4(v[2], v[3], v[4], v[7]);
     mnmx3(v[3], v[4], v[8]);
     fragColor = v[4];
+}
+)END";
+
+static const string g_fsMedianFilter5 = R"END(
+uniform sampler2D sMainTex;
+
+noperspective in vec2 fragUV1;
+
+out vec4 fragColor;
+
+#define s2(a, b)                          temp = a; a = min(a, b); b = max(temp, b);
+#define t2(a, b)                          s2(v[a], v[b]);
+#define t24(a, b, c, d, e, f, g, h)       t2(a, b); t2(c, d); t2(e, f); t2(g, h);
+#define t25(a, b, c, d, e, f, g, h, i, j) t24(a, b, c, d, e, f, g, h); t2(i, j);
+
+void main() {
+    vec4 v[25];
+    for (int dX = -2; dX <= 2; ++dX) {
+        for (int dY = -2; dY <= 2; ++dY) {
+            vec2 offset = vec2(float(dX), float(dY));
+            v[(dX + 2) * 5 + (dY + 2)] = texture(sMainTex, fragUV1 + offset * uScreenResolutionReciprocal.xy);
+        }
+    }
+    vec4 temp;
+    t25(0, 1, 3, 4, 2, 4, 2, 3, 6, 7);
+    t25(5, 7, 5, 6, 9, 7, 1, 7, 1, 4);
+    t25(12, 13, 11, 13, 11, 12, 15, 16, 14, 16);
+    t25(14, 15, 18, 19, 17, 19, 17, 18, 21, 22);
+    t25(20, 22, 20, 21, 23, 24, 2, 5, 3, 6);
+    t25(0, 6, 0, 3, 4, 7, 1, 7, 1, 4);
+    t25(11, 14, 8, 14, 8, 11, 12, 15, 9, 15);
+    t25(9, 12, 13, 16, 10, 16, 10, 13, 20, 23);
+    t25(17, 23, 17, 20, 21, 24, 18, 24, 18, 21);
+    t25(19, 22, 8, 17, 9, 18, 0, 18, 0, 9);
+    t25(10, 19, 1, 19, 1, 10, 11, 20, 2, 20);
+    t25(2, 11, 12, 21, 3, 21, 3, 12, 13, 22);
+    t25(4, 22, 4, 13, 14, 23, 5, 23, 5, 14);
+    t25(15, 24, 6, 24, 6, 15, 7, 16, 7, 19);
+    t25(3, 11, 5, 17, 11, 17, 9, 17, 4, 10);
+    t25(6, 12, 7, 14, 4, 6, 4, 7, 12, 14);
+    t25(10, 14, 6, 7, 10, 12, 6, 10, 6, 17);
+    t25(12, 17, 7, 17, 7, 10, 12, 18, 7, 12);
+    t24(10, 18, 12, 20, 10, 20, 10, 12);
+    fragColor = v[12];
 }
 )END";
 
@@ -1472,7 +1482,8 @@ void Shaders::init() {
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
     auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslScreenSpace, g_fsSSR});
     auto fsGaussianBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur});
-    auto fsMedianFilter = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter});
+    auto fsMedianFilter3 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter3});
+    auto fsMedianFilter5 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter5});
     auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_fsCombineOpaque});
     auto fsCombineOIT = initShader(ShaderType::Fragment, {g_glslHeader, g_fsCombineOIT});
     auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLuma, g_fsFXAA});
@@ -1493,7 +1504,8 @@ void Shaders::init() {
     _spGrass = initShaderProgram({vsGrass, fsGrass});
     _spSSR = initShaderProgram({vsObjectSpace, fsSSR});
     _spGaussianBlur = initShaderProgram({vsObjectSpace, fsGaussianBlur});
-    _spMedianFilter = initShaderProgram({vsObjectSpace, fsMedianFilter});
+    _spMedianFilter3 = initShaderProgram({vsObjectSpace, fsMedianFilter3});
+    _spMedianFilter5 = initShaderProgram({vsObjectSpace, fsMedianFilter5});
     _spCombineOpaque = initShaderProgram({vsObjectSpace, fsCombineOpaque});
     _spCombineOIT = initShaderProgram({vsObjectSpace, fsCombineOIT});
     _spFXAA = initShaderProgram({vsObjectSpace, fsFXAA});
@@ -1538,7 +1550,8 @@ void Shaders::deinit() {
     _spGrass.reset();
     _spSSR.reset();
     _spGaussianBlur.reset();
-    _spMedianFilter.reset();
+    _spMedianFilter3.reset();
+    _spMedianFilter5.reset();
     _spCombineOpaque.reset();
     _spCombineOIT.reset();
     _spFXAA.reset();
