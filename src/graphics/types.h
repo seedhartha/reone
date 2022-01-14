@@ -115,7 +115,8 @@ enum class BlendMode {
     None,
     Normal,
     Additive,
-    Lighten
+    Lighten,
+    OIT_Translucent
 };
 
 enum class TextGravity {
@@ -150,10 +151,12 @@ struct TextureUnits {
     static constexpr int ssao = 7;
     static constexpr int ssr = 8;
     static constexpr int noise = 9;
-    static constexpr int danglyConstraints = 10;
-    static constexpr int environmentMap = 11;
-    static constexpr int cubeShadowMap = 12;
-    static constexpr int shadowMap = 13;
+    static constexpr int oitAccum = 10;
+    static constexpr int oitRevealage = 11;
+    static constexpr int danglyConstraints = 12;
+    static constexpr int environmentMap = 13;
+    static constexpr int cubeShadowMap = 14;
+    static constexpr int shadowMap = 15;
 };
 
 struct UniformBlockBindingPoints {

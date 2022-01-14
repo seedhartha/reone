@@ -53,7 +53,8 @@ public:
     ShaderProgram &ssr() const { return *_spSSR; }
     ShaderProgram &gaussianBlur() const { return *_spGaussianBlur; }
     ShaderProgram &medianFilter() const { return *_spMedianFilter; }
-    ShaderProgram &composite() const { return *_spComposite; }
+    ShaderProgram &combineOpaque() const { return *_spCombineOpaque; }
+    ShaderProgram &combineOIT() const { return *_spCombineOIT; }
     ShaderProgram &fxaa() const { return *_spFXAA; }
     ShaderProgram &gui() const { return *_spGUI; }
     ShaderProgram &text() const { return *_spText; }
@@ -80,7 +81,8 @@ private:
     std::shared_ptr<ShaderProgram> _spSSR;
     std::shared_ptr<ShaderProgram> _spGaussianBlur;
     std::shared_ptr<ShaderProgram> _spMedianFilter;
-    std::shared_ptr<ShaderProgram> _spComposite;
+    std::shared_ptr<ShaderProgram> _spCombineOpaque;
+    std::shared_ptr<ShaderProgram> _spCombineOIT;
     std::shared_ptr<ShaderProgram> _spFXAA;
     std::shared_ptr<ShaderProgram> _spGUI;
     std::shared_ptr<ShaderProgram> _spText;

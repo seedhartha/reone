@@ -199,6 +199,10 @@ void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
     if (_sceneName.empty()) {
         return;
     }
+    shared_ptr<Texture> output;
+    _graphicsContext.withBlending(BlendMode::None, [this, &output]() {
+        output = _pipeline.draw(_sceneGraphs.get(_sceneName), {_extent.width, _extent.height});
+    });
     glm::mat4 projection(glm::ortho(
         0.0f,
         static_cast<float>(screenSize.x),
@@ -207,7 +211,6 @@ void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.height, 1.0f));
-    auto output = _pipeline.draw(_sceneGraphs.get(_sceneName), {_extent.width, _extent.height});
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();

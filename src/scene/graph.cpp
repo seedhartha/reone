@@ -337,16 +337,13 @@ void SceneGraph::prepareOpaqueLeafs() {
 void SceneGraph::prepareTranslucentLeafs() {
     _translucentLeafs.clear();
 
-    vector<pair<SceneNode *, float>> distances;
     auto camera = _activeCamera->camera();
 
-    // Calculate view-space position of translucent meshes
+    // Add meshes and emitters to translucent leafs
+    vector<SceneNode *> leafs;
     for (auto &mesh : _translucentMeshes) {
-        auto eyePos = glm::vec3(camera->view() * mesh->absoluteTransform()[3]);
-        distances.push_back(make_pair(mesh, -eyePos.z));
+        leafs.push_back(mesh);
     }
-
-    // Calculate view-space position of emitter particles
     for (auto &emitter : _emitters) {
         for (auto &child : emitter->children()) {
             if (child->type() != SceneNodeType::Particle) {
@@ -356,60 +353,14 @@ void SceneGraph::prepareTranslucentLeafs() {
             if (!camera->isInFrustum(particle->getOrigin())) {
                 continue;
             }
-            auto eyePos = glm::vec3(camera->view() * particle->absoluteTransform()[3]);
-            distances.push_back(make_pair(particle, -eyePos.z));
-        }
-    }
-
-    // Sort translucent leafs back to front to ensure correct blending
-    sort(distances.begin(), distances.end(), [](auto &a, auto &b) {
-        bool aMesh = a.first->type() == SceneNodeType::Mesh;
-        bool bMesh = b.first->type() == SceneNodeType::Mesh;
-        if (aMesh && bMesh) {
-            int aTransparency = static_cast<MeshSceneNode *>(a.first)->modelNode().mesh()->transparency;
-            int bTransparency = static_cast<MeshSceneNode *>(b.first)->modelNode().mesh()->transparency;
-            if (aTransparency < bTransparency) {
-                return true;
-            }
-            if (aTransparency > bTransparency) {
-                return false;
-            }
-        }
-        float aDistance = a.second;
-        float bDistance = b.second;
-        return aDistance > bDistance;
-    });
-
-    SceneNode *bucketParent = nullptr;
-    vector<SceneNode *> bucket;
-
-    // Group grass clusters into buckets without sorting
-    for (auto &grass : _grassRoots) {
-        if (!grass->isEnabled()) {
-            continue;
-        }
-        for (auto &child : grass->children()) {
-            if (child->type() != SceneNodeType::GrassCluster) {
-                continue;
-            }
-            auto cluster = static_cast<GrassClusterSceneNode *>(child.get());
-            if (!camera->isInFrustum(cluster->getOrigin())) {
-                continue;
-            }
-            if (bucket.size() >= kMaxGrassClusters) {
-                _opaqueLeafs.push_back(make_pair(grass.get(), bucket));
-                bucket.clear();
-            }
-            bucket.push_back(cluster);
-        }
-        if (!bucket.empty()) {
-            _opaqueLeafs.push_back(make_pair(grass.get(), bucket));
-            bucket.clear();
+            leafs.push_back(particle);
         }
     }
 
     // Group translucent leafs into buckets
-    for (auto &[leaf, _] : distances) {
+    SceneNode *bucketParent = nullptr;
+    vector<SceneNode *> bucket;
+    for (auto leaf : leafs) {
         SceneNode *parent = leaf->parent();
         if (leaf->type() == SceneNodeType::Mesh) {
             parent = &static_cast<MeshSceneNode *>(leaf)->model();
@@ -473,22 +424,26 @@ void SceneGraph::drawTranslucent() {
     if (!_activeCamera) {
         return;
     }
-    // Draw translucent leafs
+    // Draw translucent leafs (incl. meshes)
     for (auto &[node, leafs] : _translucentLeafs) {
         node->drawLeafs(leafs);
     }
+}
+
+void SceneGraph::drawLensFlares() {
     // Draw lens flares
-    if (!_flareLights.empty()) {
-        _graphicsContext.withDepthTest(DepthTestMode::None, [this]() {
-            for (auto &light : _flareLights) {
-                Collision collision;
-                if (testLineOfSight(_activeCamera->getOrigin(), light->getOrigin(), collision)) {
-                    continue;
-                }
-                light->drawLensFlare(light->modelNode().light()->flares.front());
-            }
-        });
+    if (_flareLights.empty()) {
+        return;
     }
+    _graphicsContext.withDepthTest(DepthTestMode::None, [this]() {
+        for (auto &light : _flareLights) {
+            Collision collision;
+            if (testLineOfSight(_activeCamera->getOrigin(), light->getOrigin(), collision)) {
+                continue;
+            }
+            light->drawLensFlare(light->modelNode().light()->flares.front());
+        }
+    });
 }
 
 vector<LightSceneNode *> SceneGraph::computeClosestLights(int count, const function<bool(const LightSceneNode &, float)> &pred) const {

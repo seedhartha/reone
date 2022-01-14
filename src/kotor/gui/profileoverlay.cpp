@@ -36,7 +36,7 @@ namespace kotor {
 
 static constexpr int kFrameWidth = 125;
 static constexpr char kFontResRef[] = "fnt_console";
-static constexpr float kRefreshInterval = 10.0f; // seconds
+static constexpr float kRefreshInterval = 5.0f; // seconds
 
 void ProfileOverlay::init() {
     _refreshTimer.setTimeout(kRefreshInterval);

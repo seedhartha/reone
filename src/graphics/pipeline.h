@@ -52,6 +52,13 @@ public:
     std::shared_ptr<Texture> draw(IScene &scene, const glm::ivec2 &dim);
 
 private:
+    struct BlitFlags {
+        static constexpr int color = 1;
+        static constexpr int depth = 2;
+
+        static constexpr int colorDepth = color | depth;
+    };
+
     struct Vec2Hasher {
         size_t operator()(const glm::ivec2 &dim) const {
             std::hash<int> intHash;
@@ -66,17 +73,20 @@ private:
         std::shared_ptr<Framebuffer> fbDirectionalLightShadows;
         std::shared_ptr<Framebuffer> fbDepth;
         std::shared_ptr<Framebuffer> fbSSAO;
-        std::shared_ptr<Framebuffer> fbGeometry;
+        std::shared_ptr<Framebuffer> fbOpaqueGeometry;
+        std::shared_ptr<Framebuffer> fbTranslucentGeometry;
         std::shared_ptr<Framebuffer> fbSSR;
         std::shared_ptr<Framebuffer> fbOutput;
 
         std::shared_ptr<Texture> cbPing;
         std::shared_ptr<Texture> cbPong;
         std::shared_ptr<Texture> cbSSAO;
-        std::shared_ptr<Texture> cbGeometry1;
-        std::shared_ptr<Texture> cbGeometry2;
-        std::shared_ptr<Texture> cbGeometryEyeNormal;
-        std::shared_ptr<Texture> cbGeometryRoughness;
+        std::shared_ptr<Texture> cbOpaqueGeometry1;
+        std::shared_ptr<Texture> cbOpaqueGeometry2;
+        std::shared_ptr<Texture> cbOpaqueGeometryEyeNormal;
+        std::shared_ptr<Texture> cbOpaqueGeometryRoughness;
+        std::shared_ptr<Texture> cbTranslucentGeometry1;
+        std::shared_ptr<Texture> cbTranslucentGeometry2;
         std::shared_ptr<Texture> cbSSR;
         std::shared_ptr<Texture> cbOutput;
 
@@ -84,7 +94,7 @@ private:
         std::shared_ptr<Texture> dbDirectionalLightShadows;
         std::shared_ptr<Texture> dbPointLightShadows;
         std::shared_ptr<Texture> dbDepth;
-        std::shared_ptr<Texture> dbGeometry;
+        std::shared_ptr<Texture> dbOpaqueGeometry;
         std::shared_ptr<Texture> dbOutput;
     };
 
@@ -111,15 +121,18 @@ private:
     void drawShadows(IScene &scene, Attachments &attachments);
     void drawDepth(IScene &scene, Attachments &attachments);
     void drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
-    void drawGeometry(IScene &scene, Attachments &attachments, bool translucent = false);
+    void drawOpaqueGeometry(IScene &scene, Attachments &attachments);
+    void drawTranslucentGeometry(IScene &scene, Attachments &attachments);
     void drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
-    void drawComposite(Attachments &attachments, Framebuffer &dst);
+    void drawCombineOpaque(Attachments &attachments, Framebuffer &dst);
+    void drawCombineOIT(Attachments &attachments, Framebuffer &dst);
+    void drawLensFlares(IScene &scene, Framebuffer &dst);
 
     void applyGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical = false);
     void applyMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
     void applyFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
 
-    void blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, bool depth = false);
+    void blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, int flags = BlitFlags::color);
 };
 
 } // namespace graphics

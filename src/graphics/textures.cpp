@@ -92,6 +92,8 @@ void Textures::bindBuiltIn() {
     bind(*_defaultRGB, TextureUnits::ssao);
     bind(*_defaultRGB, TextureUnits::ssr);
     bind(*_noiseRGB, TextureUnits::noise);
+    bind(*_noiseRGB, TextureUnits::oitAccum);
+    bind(*_noiseRGB, TextureUnits::oitRevealage);
     bind(*_defaultCubemapRGB, TextureUnits::environmentMap);
     bind(*_defaultCubemapDepth, TextureUnits::cubeShadowMap);
     bind(*_defaultArrayDepth, TextureUnits::shadowMap);
