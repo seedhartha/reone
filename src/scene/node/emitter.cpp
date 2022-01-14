@@ -258,10 +258,16 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::particles;
-    if (emitter->blendMode == ModelNode::Emitter::BlendMode::PunchThrough) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::hashedalphatest;
-    }
     uniforms.particles.gridSize = emitter->gridSize;
+    switch (emitter->blendMode) {
+    case ModelNode::Emitter::BlendMode::Lighten:
+        uniforms.general.featureMask |= UniformsFeatureFlags::premulalpha;
+        break;
+    case ModelNode::Emitter::BlendMode::Normal:
+    case ModelNode::Emitter::BlendMode::PunchThrough:
+    default:
+        break;
+    }
 
     for (size_t i = 0; i < leafs.size(); ++i) {
         auto particle = static_cast<ParticleSceneNode *>(leafs[i]);
@@ -303,22 +309,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
 
     _shaders.use(_shaders.particle(), true);
     _textures.bind(*texture);
-    BlendMode blendMode;
-    switch (emitter->blendMode) {
-    case ModelNode::Emitter::BlendMode::PunchThrough:
-        blendMode = BlendMode::None;
-        break;
-    case ModelNode::Emitter::BlendMode::Lighten:
-        blendMode = BlendMode::Lighten;
-        break;
-    case ModelNode::Emitter::BlendMode::Normal:
-    default:
-        blendMode = BlendMode::Normal;
-        break;
-    }
-    _graphicsContext.withBlending(blendMode, [this, &leafs]() {
-        _meshes.billboard().drawInstanced(leafs.size());
-    });
+    _meshes.billboard().drawInstanced(leafs.size());
 }
 
 unique_ptr<ParticleSceneNode> EmitterSceneNode::newParticle() {

@@ -15,34 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "modelnode.h"
 
-#include "texture.h"
+using namespace std;
+
+using namespace reone::graphics;
 
 namespace reone {
 
-namespace graphics {
+namespace scene {
 
-void prepareCubemap(Texture &texture);
-
-Texture::Properties getTextureProperties(TextureUsage usage);
-
-inline bool isCompressed(PixelFormat format) {
-    return format == PixelFormat::DXT1 || format == PixelFormat::DXT5;
-}
-
-inline bool hasAlphaChannel(PixelFormat format) {
-    switch (format) {
-    case PixelFormat::RGBA8:
-    case PixelFormat::RGBA16F:
-    case PixelFormat::BGRA8:
-    case PixelFormat::DXT5:
-        return true;
-    default:
-        return false;
+void ModelNodeSceneNode::setDiffuseMap(shared_ptr<Texture> texture) {
+    for (auto &child : _children) {
+        if (child->type() == SceneNodeType::Dummy || child->type() == SceneNodeType::Mesh) {
+            static_pointer_cast<ModelNodeSceneNode>(child)->setDiffuseMap(texture);
+        }
     }
 }
 
-} // namespace graphics
+void ModelNodeSceneNode::setEnvironmentMap(shared_ptr<Texture> texture) {
+    for (auto &child : _children) {
+        if (child->type() == SceneNodeType::Dummy || child->type() == SceneNodeType::Mesh) {
+            static_pointer_cast<ModelNodeSceneNode>(child)->setEnvironmentMap(texture);
+        }
+    }
+}
+
+} // namespace scene
 
 } // namespace reone

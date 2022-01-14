@@ -45,6 +45,7 @@ set(SCENE_SOURCES
     node/light.cpp
     node/mesh.cpp
     node/model.cpp
+    node/modelnode.cpp
     node/particle.cpp
     node/sound.cpp
     node/walkmesh.cpp)

@@ -185,7 +185,13 @@ bool MeshSceneNode::isTranslucent() const {
     if (_alpha < 1.0f) {
         return true;
     }
-    return false;
+    if (_nodeTextures.envmap || _nodeTextures.bumpmap) {
+        return false;
+    }
+    if (isSelfIlluminated()) {
+        return false;
+    }
+    return hasAlphaChannel(_nodeTextures.diffuse->pixelFormat());
 }
 
 static bool isLightingEnabledByUsage(ModelUsage usage) {
@@ -218,21 +224,15 @@ void MeshSceneNode::draw() {
         glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
         glm::vec4(_uvOffset.x, _uvOffset.y, 0.0f, 0.0f));
 
-    auto blendMode = BlendMode::None;
     _textures.bind(*_nodeTextures.diffuse);
     switch (_nodeTextures.diffuse->features().blending) {
     case Texture::Blending::PunchThrough:
         uniforms.general.featureMask |= UniformsFeatureFlags::hashedalphatest;
         break;
     case Texture::Blending::Additive:
-        blendMode = BlendMode::Additive;
+        uniforms.general.featureMask |= UniformsFeatureFlags::premulalpha;
         break;
     default:
-        if (translucent) {
-            blendMode = BlendMode::Normal;
-        } else {
-            uniforms.general.featureMask |= UniformsFeatureFlags::hashedalphatest;
-        }
         break;
     }
     float waterAlpha = _nodeTextures.diffuse->features().waterAlpha;
@@ -338,10 +338,8 @@ void MeshSceneNode::draw() {
     }
     auto &program = translucent ? _shaders.modelTranslucent() : _shaders.modelOpaque();
     _shaders.use(program, true);
-    _graphicsContext.withFaceCulling(CullFaceMode::Back, [this, &blendMode, &mesh]() {
-        _graphicsContext.withBlending(blendMode, [this, &mesh]() {
-            mesh->mesh->draw();
-        });
+    _graphicsContext.withFaceCulling(CullFaceMode::Back, [&mesh]() {
+        mesh->mesh->draw();
     });
 }
 
@@ -428,11 +426,13 @@ bool MeshSceneNode::isLightingEnabled() const {
 }
 
 void MeshSceneNode::setDiffuseMap(shared_ptr<Texture> texture) {
-    _nodeTextures.diffuse = move(texture);
+    ModelNodeSceneNode::setDiffuseMap(texture);
+    _nodeTextures.diffuse = texture;
     refreshAdditionalTextures();
 }
 
 void MeshSceneNode::setEnvironmentMap(shared_ptr<Texture> texture) {
+    ModelNodeSceneNode::setEnvironmentMap(texture);
     _nodeTextures.envmap = move(texture);
 }
 

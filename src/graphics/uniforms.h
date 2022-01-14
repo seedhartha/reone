@@ -42,6 +42,7 @@ struct UniformsFeatureFlags {
     static constexpr int fixedsize = 0x8000;
     static constexpr int hashedalphatest = 0x10000;
     static constexpr int ssao = 0x20000;
+    static constexpr int premulalpha = 0x40000;
 };
 
 struct GeneralUniforms {
@@ -68,6 +69,8 @@ struct GeneralUniforms {
     glm::vec4 screenResolutionReciprocal2 {0.0f};
     glm::vec2 screenResolution {0.0f};
     glm::vec2 blurDirection {0.0f};
+    float clipNear {kDefaultClipPlaneNear};
+    float clipFar {kDefaultClipPlaneFar};
     float alpha {1.0f};
     float waterAlpha {1.0f};
     float fogNear {0.0f};
@@ -78,7 +81,6 @@ struct GeneralUniforms {
     float billboardSize {1.0f};
     float danglyDisplacement {0.0f};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
-    char padding[8];
     glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
     glm::vec4 shadowCascadeFarPlanes[2] {glm::vec4(0.0f)};
 

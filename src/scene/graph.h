@@ -80,6 +80,7 @@ public:
     void drawDepth() override;
     void drawOpaque() override;
     void drawTranslucent() override;
+    void drawLensFlares() override;
 
     const std::string &name() const { return _name; }
     const graphics::GraphicsOptions &options() const { return _options; }

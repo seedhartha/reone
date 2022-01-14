@@ -27,6 +27,7 @@ class GraphicsContext;
 class Meshes;
 class ModelNode;
 class Shaders;
+class Texture;
 class Textures;
 
 } // namespace graphics
@@ -36,6 +37,9 @@ namespace scene {
 class ModelNodeSceneNode : public SceneNode {
 public:
     const graphics::ModelNode &modelNode() const { return *_modelNode; }
+
+    virtual void setDiffuseMap(std::shared_ptr<graphics::Texture> texture);
+    virtual void setEnvironmentMap(std::shared_ptr<graphics::Texture> texture);
 
 protected:
     std::shared_ptr<graphics::ModelNode> _modelNode;
@@ -56,7 +60,6 @@ protected:
         _textures(textures) {
     }
 
-protected:
     // Services
 
     graphics::GraphicsContext &_graphicsContext;

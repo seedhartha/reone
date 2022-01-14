@@ -32,9 +32,9 @@ public:
 
     void init();
 
-    void clearColor();
+    void clearColor(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
     void clearDepth();
-    void clearColorDepth();
+    void clearColorDepth(glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 
     void withDepthTest(DepthTestMode mode, const std::function<void()> &block);
     void withFaceCulling(CullFaceMode mode, const std::function<void()> &block);

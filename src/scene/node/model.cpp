@@ -184,16 +184,16 @@ shared_ptr<SceneNode> ModelSceneNode::getAttachment(const string &parentName) co
 
 void ModelSceneNode::setDiffuseMap(shared_ptr<Texture> texture) {
     for (auto &child : _children) {
-        if (child->type() == SceneNodeType::Mesh) {
-            static_pointer_cast<MeshSceneNode>(child)->setDiffuseMap(texture);
+        if (child->type() == SceneNodeType::Dummy || child->type() == SceneNodeType::Mesh) {
+            static_pointer_cast<ModelNodeSceneNode>(child)->setDiffuseMap(texture);
         }
     }
 }
 
 void ModelSceneNode::setEnvironmentMap(shared_ptr<Texture> texture) {
     for (auto &child : _children) {
-        if (child->type() == SceneNodeType::Mesh) {
-            static_pointer_cast<MeshSceneNode>(child)->setEnvironmentMap(texture);
+        if (child->type() == SceneNodeType::Dummy || child->type() == SceneNodeType::Mesh) {
+            static_pointer_cast<ModelNodeSceneNode>(child)->setEnvironmentMap(texture);
         }
     }
 }

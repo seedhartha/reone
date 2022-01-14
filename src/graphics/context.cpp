@@ -46,7 +46,8 @@ void GraphicsContext::init() {
     _inited = true;
 }
 
-void GraphicsContext::clearColor() {
+void GraphicsContext::clearColor(glm::vec4 color) {
+    glClearColor(color.r, color.g, color.b, color.a);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
@@ -54,7 +55,8 @@ void GraphicsContext::clearDepth() {
     glClear(GL_DEPTH_BUFFER_BIT);
 }
 
-void GraphicsContext::clearColorDepth() {
+void GraphicsContext::clearColorDepth(glm::vec4 color) {
+    glClearColor(color.r, color.g, color.b, color.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -172,6 +174,10 @@ void GraphicsContext::setBlendMode(BlendMode mode) {
         case BlendMode::Lighten:
             glBlendEquationSeparate(GL_MAX, GL_FUNC_ADD);
             glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+            break;
+        case BlendMode::OIT_Translucent:
+            glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+            glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
             break;
         case BlendMode::Normal:
         default:
