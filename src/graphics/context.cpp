@@ -175,7 +175,7 @@ void GraphicsContext::setBlendMode(BlendMode mode) {
             glBlendEquationSeparate(GL_MAX, GL_FUNC_ADD);
             glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
             break;
-        case BlendMode::OIT_Translucent:
+        case BlendMode::OIT_Transparent:
             glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
             glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
             break;

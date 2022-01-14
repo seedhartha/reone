@@ -79,7 +79,7 @@ public:
     void drawShadows() override;
     void drawDepth() override;
     void drawOpaque() override;
-    void drawTranslucent() override;
+    void drawTransparent() override;
     void drawLensFlares() override;
 
     const std::string &name() const { return _name; }
@@ -215,13 +215,13 @@ private:
     // Leafs
 
     std::vector<MeshSceneNode *> _opaqueMeshes;
-    std::vector<MeshSceneNode *> _translucentMeshes;
+    std::vector<MeshSceneNode *> _transparentMeshes;
     std::vector<MeshSceneNode *> _shadowMeshes;
     std::vector<LightSceneNode *> _lights;
     std::vector<EmitterSceneNode *> _emitters;
 
     std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _opaqueLeafs;
-    std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _translucentLeafs;
+    std::vector<std::pair<SceneNode *, std::vector<SceneNode *>>> _transparentLeafs;
 
     // END Leafs
 
@@ -270,7 +270,7 @@ private:
     void updateSounds();
 
     void prepareOpaqueLeafs();
-    void prepareTranslucentLeafs();
+    void prepareTransparentLeafs();
 };
 
 } // namespace scene

@@ -116,7 +116,7 @@ enum class BlendMode {
     Normal,
     Additive,
     Lighten,
-    OIT_Translucent
+    OIT_Transparent
 };
 
 enum class TextGravity {

@@ -263,21 +263,21 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
         attachments.dbOpaqueGeometry);
     attachments.fbOpaqueGeometry->init();
 
-    // Translucent geometry framebuffer
+    // Transparent geometry framebuffer
 
-    attachments.cbTranslucentGeometry1 = make_unique<Texture>("translucent_geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
-    attachments.cbTranslucentGeometry1->clear(dim.x, dim.y, PixelFormat::RGBA16F);
-    attachments.cbTranslucentGeometry1->init();
+    attachments.cbTransparentGeometry1 = make_unique<Texture>("transparent_geometry_color1", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbTransparentGeometry1->clear(dim.x, dim.y, PixelFormat::RGBA16F);
+    attachments.cbTransparentGeometry1->init();
 
-    attachments.cbTranslucentGeometry2 = make_unique<Texture>("translucent_geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
-    attachments.cbTranslucentGeometry2->clear(dim.x, dim.y, PixelFormat::R16F);
-    attachments.cbTranslucentGeometry2->init();
+    attachments.cbTransparentGeometry2 = make_unique<Texture>("transparent_geometry_color2", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbTransparentGeometry2->clear(dim.x, dim.y, PixelFormat::R16F);
+    attachments.cbTransparentGeometry2->init();
 
-    attachments.fbTranslucentGeometry = make_shared<Framebuffer>();
-    attachments.fbTranslucentGeometry->attachColorsDepth(
-        {attachments.cbTranslucentGeometry1, attachments.cbTranslucentGeometry2},
+    attachments.fbTransparentGeometry = make_shared<Framebuffer>();
+    attachments.fbTransparentGeometry->attachColorsDepth(
+        {attachments.cbTransparentGeometry1, attachments.cbTransparentGeometry2},
         attachments.dbCommon);
-    attachments.fbTranslucentGeometry->init();
+    attachments.fbTransparentGeometry->init();
 
     // SSR framebuffer
 
@@ -343,8 +343,8 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
 
         drawCombineOpaque(attachments, *attachments.fbPing);
         blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbOpaqueGeometry, 0);
-        blitFramebuffer(dim, *attachments.fbOpaqueGeometry, 0, *attachments.fbTranslucentGeometry, 0, BlitFlags::depth);
-        drawTranslucentGeometry(scene, attachments);
+        blitFramebuffer(dim, *attachments.fbOpaqueGeometry, 0, *attachments.fbTransparentGeometry, 0, BlitFlags::depth);
+        drawTransparentGeometry(scene, attachments);
         drawCombineOIT(attachments, *attachments.fbOutput);
         drawLensFlares(scene, *attachments.fbOutput);
 
@@ -495,7 +495,7 @@ void Pipeline::drawOpaqueGeometry(IScene &scene, Attachments &attachments) {
     scene.drawOpaque();
 }
 
-void Pipeline::drawTranslucentGeometry(IScene &scene, Attachments &attachments) {
+void Pipeline::drawTransparentGeometry(IScene &scene, Attachments &attachments) {
     // Set global uniforms
     auto camera = scene.camera();
     auto &uniforms = _shaders.uniforms();
@@ -507,12 +507,12 @@ void Pipeline::drawTranslucentGeometry(IScene &scene, Attachments &attachments) 
     uniforms.general.clipNear = camera->zNear();
     uniforms.general.clipFar = camera->zFar();
 
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbTranslucentGeometry->nameGL());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbTransparentGeometry->nameGL());
     glDrawBuffers(2, kColorAttachments);
     _graphicsContext.clearColor({0.0f, 0.0f, 0.0f, 1.0f});
     glDepthMask(GL_FALSE);
-    _graphicsContext.withBlending(BlendMode::OIT_Translucent, [&scene] {
-        scene.drawTranslucent();
+    _graphicsContext.withBlending(BlendMode::OIT_Transparent, [&scene] {
+        scene.drawTransparent();
     });
     glDepthMask(GL_TRUE);
 }
@@ -584,8 +584,8 @@ void Pipeline::drawCombineOIT(Attachments &attachments, Framebuffer &dst) {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(_shaders.combineOIT(), true);
     _textures.bind(*attachments.cbOpaqueGeometry1);
-    _textures.bind(*attachments.cbTranslucentGeometry1, TextureUnits::oitAccum);
-    _textures.bind(*attachments.cbTranslucentGeometry2, TextureUnits::oitRevealage);
+    _textures.bind(*attachments.cbTransparentGeometry1, TextureUnits::oitAccum);
+    _textures.bind(*attachments.cbTransparentGeometry2, TextureUnits::oitRevealage);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }

@@ -46,7 +46,7 @@ public:
     ShaderProgram &modelDepth() const { return *_spModelDepth; }
     ShaderProgram &ssao() const { return *_spSSAO; }
     ShaderProgram &modelOpaque() const { return *_spModelOpaque; }
-    ShaderProgram &modelTranslucent() const { return *_spModelTranslucent; }
+    ShaderProgram &modelTransparent() const { return *_spModelTransparent; }
     ShaderProgram &particle() const { return *_spParticle; }
     ShaderProgram &grass() const { return *_spGrass; }
     ShaderProgram &billboard() const { return *_spBillboard; }
@@ -74,7 +74,7 @@ private:
     std::shared_ptr<ShaderProgram> _spModelDepth;
     std::shared_ptr<ShaderProgram> _spSSAO;
     std::shared_ptr<ShaderProgram> _spModelOpaque;
-    std::shared_ptr<ShaderProgram> _spModelTranslucent;
+    std::shared_ptr<ShaderProgram> _spModelTransparent;
     std::shared_ptr<ShaderProgram> _spParticle;
     std::shared_ptr<ShaderProgram> _spGrass;
     std::shared_ptr<ShaderProgram> _spBillboard;
