@@ -1102,7 +1102,7 @@ void main() {
 static const string g_fsGaussianBlur = R"END(
 uniform sampler2D sMainTex;
 
-in vec2 fragUV1;
+noperspective in vec2 fragUV1;
 
 out vec4 fragColor;
 
@@ -1124,7 +1124,7 @@ void main() {
 static const string g_fsMedianFilter = R"END(
 uniform sampler2D sMainTex;
 
-in vec2 fragUV1;
+noperspective in vec2 fragUV1;
 
 out vec4 fragColor;
 
