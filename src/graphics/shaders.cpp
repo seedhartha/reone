@@ -204,6 +204,194 @@ void hashedAlphaTest(float a, vec3 p) {
 }
 )END";
 
+static const string g_glslNormalMapping = R"END(
+vec2 packTexCoords(vec2 uv, vec4 bounds) {
+    return bounds.xy + bounds.zw * fract(uv);
+}
+
+vec3 getNormalFromNormalMap(sampler2D tex, vec2 uv, mat3 TBN) {
+    vec4 texSample = texture(tex, uv);
+    vec3 N = texSample.rgb * 2.0 - 1.0;
+    return TBN * normalize(N);
+}
+
+vec3 getNormalFromHeightMap(sampler2D tex, vec2 uv, mat3 TBN) {
+    vec2 du = dFdx(uv);
+    vec2 dv = dFdy(uv);
+
+    vec2 uvPacked = packTexCoords(uv, uHeightMapFrameBounds);
+    vec2 uvPackedDu = packTexCoords(uv + du, uHeightMapFrameBounds);
+    vec2 uvPackedDv = packTexCoords(uv + dv, uHeightMapFrameBounds);
+    vec4 texSample = texture(tex, uvPacked);
+    vec4 texSampleDu = texture(tex, uvPackedDu);
+    vec4 texSampleDv = texture(tex, uvPackedDv);
+    float dBx = texSampleDu.r - texSample.r;
+    float dBy = texSampleDv.r - texSample.r;
+
+    vec3 N = vec3(-dBx, -dBy, 1.0);
+    N.xy *= uHeightMapScaling;
+
+    return TBN * normalize(N);
+}
+)END";
+
+static const string g_glslBlinnPhong = R"END(
+const float SHININESS = 8.0;
+
+const float ATTENUATION_LINEAR = 0.0;
+const float ATTENUATION_QUADRATIC = 1.0;
+
+const int LIGHT_DYNTYPE_AREA = 1;
+const int LIGHT_DYNTYPE_OBJECT = 2;
+const int LIGHT_DYNTYPE_BOTH = LIGHT_DYNTYPE_AREA | LIGHT_DYNTYPE_OBJECT;
+
+float getAttenuation(vec3 fragPos, Light light, float L, float Q) {
+    if (light.position.w == 0.0) {
+        return light.multiplier;
+    }
+
+    float D = light.radius;
+    float DD = D * D;
+
+    float r = length(light.position.xyz - fragPos);
+    float rr = r * r;
+
+    return light.multiplier * (D / (D + L * r)) * (DD / (DD + Q * rr));
+}
+
+vec3 getLightingIndirect(vec3 fragPos, vec3 N, sampler2D ssao) {
+    vec3 result = uWorldAmbientColor.rgb * uAmbientColor.rgb;
+
+    for (int i = 0; i < uNumLights; ++i) {
+        if (!uLights[i].ambientOnly) continue;
+
+        vec3 ambient = uLights[i].color.rgb * uAmbientColor.rgb;
+
+        float attenuation = getAttenuation(fragPos, uLights[i], ATTENUATION_LINEAR, ATTENUATION_QUADRATIC);
+        ambient *= attenuation;
+
+        result += ambient;
+    }
+
+    if (isFeatureEnabled(FEATURE_SSAO)) {
+        result *= texelFetch(ssao, ivec2(gl_FragCoord.xy), 0).r;
+    }
+
+    return result;
+}
+
+vec3 getLightingDirect(vec3 fragPos, vec3 normal, int dynTypeMask) {
+    vec3 result = vec3(0.0);
+    vec3 V = normalize(uCameraPosition.xyz - fragPos);
+
+    for (int i = 0; i < uNumLights; ++i) {
+        if (uLights[i].ambientOnly) {
+            continue;
+        }
+        if ((uLights[i].dynamicType & dynTypeMask) == 0) {
+            continue;
+        }
+        vec3 L = normalize(uLights[i].position.xyz - fragPos);
+        vec3 H = normalize(V + L);
+
+        vec3 diff = uDiffuseColor.rgb * max(dot(L, normal), 0.0);
+        vec3 diffuse = uLights[i].color.rgb * diff;
+
+        float spec = pow(max(dot(normal, H), 0.0), SHININESS);
+        vec3 specular = uLights[i].color.rgb * spec;
+
+        float attenuation = getAttenuation(fragPos, uLights[i], ATTENUATION_LINEAR, ATTENUATION_QUADRATIC);
+        diffuse *= attenuation;
+        specular *= attenuation;
+
+        result += diffuse + specular;
+    }
+
+    return min(vec3(1.0), result);
+}
+)END";
+
+static const string g_glslShadowMapping = R"END(
+const int NUM_SHADOW_CASCADES = 8;
+const int NUM_PCF_SAMPLES = 20;
+
+const float PCF_SAMPLE_RADIUS = 0.1;
+
+const vec3 PCF_SAMPLE_OFFSETS[20] = vec3[](
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1),
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1));
+
+float getDirectionalLightShadow(vec3 fragPos, sampler2DArray tex) {
+    vec4 viewSpacePos = uView * vec4(fragPos, 1.0);
+    float depthValue = abs(viewSpacePos.z);
+
+    int cascade = NUM_SHADOW_CASCADES - 1;
+    for (int i = 0; i < NUM_SHADOW_CASCADES; ++i) {
+        if (depthValue < uShadowCascadeFarPlanes[i / 4][i % 4]) {
+            cascade = i;
+            break;
+        }
+    }
+
+    vec4 lightSpacePos = uShadowLightSpace[cascade] * vec4(fragPos, 1.0);
+    vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+    projCoords = 0.5 * projCoords + 0.5;
+
+    float currentDepth = projCoords.z;
+    if (currentDepth > 1.0) return 0.0;
+
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / vec2(textureSize(tex, 0));
+    for (int x = -1; x <= 1; ++x) {
+        for (int y = -1; y <= 1; ++y) {
+            float pcfDepth = texture(tex, vec3(projCoords.xy + vec2(x, y) * texelSize, cascade)).r;
+            shadow += currentDepth > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+    shadow /= 9.0;
+
+    return shadow;
+}
+
+float getPointLightShadow(vec3 fragPos, samplerCube tex) {
+    vec3 fragToLight = fragPos - uShadowLightPosition.xyz;
+    float currentDepth = length(fragToLight);
+
+    float shadow = 0.0;
+    for (int i = 0; i < NUM_PCF_SAMPLES; ++i) {
+        float closestDepth = 2500.0 * texture(tex, fragToLight + PCF_SAMPLE_RADIUS * PCF_SAMPLE_OFFSETS[i]).r;
+        shadow += currentDepth > closestDepth ? 1.0 : 0.0;
+    }
+    shadow /= NUM_PCF_SAMPLES;
+    shadow *= 1.0 - smoothstep(uShadowRadius, 2.0 * uShadowRadius, currentDepth);
+
+    return shadow;
+}
+)END";
+
+static const string g_glslFog = R"END(
+float getFog(vec3 fragPos) {
+    float c = length(fragPos - uCameraPosition.xyz);
+    float f = (uFogFar - c) / (uFogFar - uFogNear);
+    return clamp(f, 0.0, 1.0);
+}
+)END";
+
+static const string g_glslGammaCorrection = R"END(
+const float GAMMA = 2.2;
+
+vec3 gammaToLinear(vec3 rgb) {
+    return pow(rgb, vec3(GAMMA));
+}
+
+vec3 linearToGamma(vec3 rgb) {
+    return pow(rgb, vec3(1.0 / GAMMA));
+}
+)END";
+
 static const string g_glslScreenSpace = R"END(
 vec3 screenToViewSpace(vec2 uv, float depth, mat4 projInv) {
     vec3 clip = vec3(uv, depth) * 2.0 - vec3(1.0);
@@ -556,22 +744,6 @@ void main() {
 )END";
 
 static const string g_fsBlinnPhong = R"END(
-const int NUM_SHADOW_CASCADES = 8;
-const float SHININESS = 8.0;
-
-const int LIGHT_DYNTYPE_AREA = 1;
-const int LIGHT_DYNTYPE_OBJECT = 2;
-const int LIGHT_DYNTYPE_BOTH = LIGHT_DYNTYPE_AREA | LIGHT_DYNTYPE_OBJECT;
-
-const int NUM_PCF_SAMPLES = 20;
-const float PCF_SAMPLE_RADIUS = 0.1;
-const vec3 PCF_SAMPLE_OFFSETS[20] = vec3[](
-   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1),
-   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
-   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
-   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
-   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1));
-
 const float SELFILLUM_THRESHOLD = 0.85;
 
 uniform sampler2D sMainTex;
@@ -594,171 +766,25 @@ layout(location = 1) out vec4 fragColor2;
 layout(location = 2) out vec4 fragEyeNormal;
 layout(location = 3) out vec4 fragRoughness;
 
-vec2 packTexCoords(vec2 uv, vec4 bounds) {
-    return bounds.xy + bounds.zw * fract(uv);
-}
-
-vec3 getNormalFromNormalMap(vec2 uv) {
-    vec4 bumpMapSample = texture(sBumpMap, uv);
-    vec3 normal = bumpMapSample.rgb * 2.0 - 1.0;
-    return fragTBN * normalize(normal);
-}
-
-vec3 getNormalFromHeightMap(vec2 uv) {
-    vec2 du = dFdx(uv);
-    vec2 dv = dFdy(uv);
-
-    vec2 uvPacked = packTexCoords(uv, uHeightMapFrameBounds);
-    vec2 uvPackedDu = packTexCoords(uv + du, uHeightMapFrameBounds);
-    vec2 uvPackedDv = packTexCoords(uv + dv, uHeightMapFrameBounds);
-    vec4 bumpMapSample = texture(sBumpMap, uvPacked);
-    vec4 bumpMapSampleDu = texture(sBumpMap, uvPackedDu);
-    vec4 bumpMapSampleDv = texture(sBumpMap, uvPackedDv);
-    float dBx = bumpMapSampleDu.r - bumpMapSample.r;
-    float dBy = bumpMapSampleDv.r - bumpMapSample.r;
-
-    vec3 normal = vec3(-dBx, -dBy, 1.0);
-    normal.xy *= uHeightMapScaling;
-
-    return fragTBN * normalize(normal);
-}
-
 vec3 getNormal(vec2 uv) {
     if (isFeatureEnabled(FEATURE_NORMALMAP)) {
-        return getNormalFromNormalMap(uv);
+        return getNormalFromNormalMap(sBumpMap, uv, fragTBN);
     } else if (isFeatureEnabled(FEATURE_HEIGHTMAP)) {
-        return getNormalFromHeightMap(uv);
+        return getNormalFromHeightMap(sBumpMap, uv, fragTBN);
     } else {
         return normalize(fragNormalWorldSpace);
     }
 }
 
-float getAttenuationQuadratic(int light) {
-    if (uLights[light].position.w == 0.0) return 1.0;
-
-    float D = uLights[light].radius;
-    D *= D;
-
-    float r = length(uLights[light].position.xyz - fragPosWorldSpace);
-    r *= r;
-
-    return D / (D + r);
-}
-
-vec3 getLightingIndirect(vec3 N) {
-    vec3 result = uWorldAmbientColor.rgb * uAmbientColor.rgb;
-
-    for (int i = 0; i < uNumLights; ++i) {
-        if (!uLights[i].ambientOnly) continue;
-
-        vec3 ambient = uLights[i].multiplier * uLights[i].color.rgb * uAmbientColor.rgb;
-
-        float attenuation = getAttenuationQuadratic(i);
-        ambient *= attenuation;
-
-        result += ambient;
-    }
-
-    if (isFeatureEnabled(FEATURE_SSAO)) {
-        result *= texelFetch(sSSAO, ivec2(gl_FragCoord.xy), 0).r;
-    }
-
-    return result;
-}
-
-vec3 getLightingDirect(vec3 N, int dynTypeMask) {
-    vec3 result = vec3(0.0);
-    vec3 V = normalize(uCameraPosition.xyz - fragPosWorldSpace);
-
-    for (int i = 0; i < uNumLights; ++i) {
-        if (uLights[i].ambientOnly) {
-            continue;
-        }
-        if ((uLights[i].dynamicType & dynTypeMask) == 0) {
-            continue;
-        }
-        vec3 L = normalize(uLights[i].position.xyz - fragPosWorldSpace);
-        vec3 H = normalize(V + L);
-
-        vec3 diff = uDiffuseColor.rgb * max(dot(L, N), 0.0);
-        vec3 diffuse = uLights[i].multiplier * uLights[i].color.rgb * diff;
-
-        float spec = pow(max(dot(N, H), 0.0), SHININESS);
-        vec3 specular = uLights[i].multiplier * uLights[i].color.rgb * spec;
-
-        float attenuation = getAttenuationQuadratic(i);
-        diffuse *= attenuation;
-        specular *= attenuation;
-
-        result += diffuse + specular;
-    }
-
-    return min(vec3(1.0), result);
-}
-
 float getShadow(vec3 normal) {
-    if (!isFeatureEnabled(FEATURE_SHADOWS)) {
-        return 0.0;
-    }
-    float result = 0.0;
+    if (!isFeatureEnabled(FEATURE_SHADOWS)) return 0.0;
 
-    if (uShadowLightPosition.w == 0.0) {
-        // Directional Light
+    float shadow = (uShadowLightPosition.w == 0.0) ?
+        getDirectionalLightShadow(fragPosWorldSpace, sShadowMap) :
+        getPointLightShadow(fragPosWorldSpace, sCubeShadowMap);
 
-        vec4 viewSpacePos = uView * vec4(fragPosWorldSpace, 1.0);
-        float depthValue = abs(viewSpacePos.z);
-
-        int cascade = NUM_SHADOW_CASCADES - 1;
-        for (int i = 0; i < NUM_SHADOW_CASCADES; ++i) {
-            if (depthValue < uShadowCascadeFarPlanes[i / 4][i % 4]) {
-                cascade = i;
-                break;
-            }
-        }
-
-        vec4 lightSpacePos = uShadowLightSpace[cascade] * vec4(fragPosWorldSpace, 1.0);
-        vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
-        projCoords = 0.5 * projCoords + 0.5;
-
-        float currentDepth = projCoords.z;
-        if (currentDepth > 1.0) {
-            return 0.0;
-        }
-
-        vec2 texelSize = 1.0 / vec2(textureSize(sShadowMap, 0));
-        for (int x = -1; x <= 1; ++x) {
-            for (int y = -1; y <= 1; ++y) {
-                float pcfDepth = texture(sShadowMap, vec3(projCoords.xy + vec2(x, y) * texelSize, cascade)).r;
-                result += currentDepth > pcfDepth ? 1.0 : 0.0;
-            }
-        }
-        result /= 9.0;
-
-    } else {
-        // Point Light
-
-        vec3 fragToLight = fragPosWorldSpace - uShadowLightPosition.xyz;
-        float currentDepth = length(fragToLight);
-
-        for (int i = 0; i < NUM_PCF_SAMPLES; ++i) {
-            float closestDepth = texture(sCubeShadowMap, fragToLight + PCF_SAMPLE_RADIUS * PCF_SAMPLE_OFFSETS[i]).r;
-            closestDepth *= 2500.0; // map to [0.0, 2500.0]
-            if (currentDepth > closestDepth) {
-                result += 1.0;
-            }
-        }
-        result /= NUM_PCF_SAMPLES;
-        result *= 1.0 - smoothstep(uShadowRadius, 2.0 * uShadowRadius, currentDepth);
-    }
-
-    result *= uShadowStrength;
-    return result;
-}
-
-vec3 applyFog(vec3 objectColor) {
-    float distance = length(uCameraPosition.xyz - fragPosWorldSpace);
-    float fogAmount = clamp(distance - uFogNear, 0.0, uFogFar - uFogNear) / (uFogFar - uFogNear);
-    return mix(objectColor, uFogColor.rgb, fogAmount);
+    shadow *= uShadowStrength;
+    return shadow;
 }
 
 void main() {
@@ -784,17 +810,18 @@ void main() {
     vec3 lighting;
     if (isFeatureEnabled(FEATURE_LIGHTMAP)) {
         vec4 lightmapSample = texture(sLightmap, fragUV2);
+        lightmapSample.rgb = lightmapSample.rgb;
         lighting = (1.0 - 0.5 * shadow) * lightmapSample.rgb;
         if (isFeatureEnabled(FEATURE_SSAO)) {
             lighting *= texelFetch(sSSAO, ivec2(gl_FragCoord.xy), 0).r;
         }
-        lighting += (1.0 - 0.5 * shadow) * getLightingDirect(N, LIGHT_DYNTYPE_AREA);
+        lighting += (1.0 - 0.5 * shadow) * getLightingDirect(fragPosWorldSpace, N, LIGHT_DYNTYPE_AREA);
         if (isFeatureEnabled(FEATURE_WATER)) {
             lighting = mix(vec3(1.0), lighting, 0.2);
         }
     } else if (isFeatureEnabled(FEATURE_LIGHTING)) {
-        vec3 indirect = getLightingIndirect(N);
-        vec3 direct = getLightingDirect(N, LIGHT_DYNTYPE_BOTH);
+        vec3 indirect = getLightingIndirect(fragPosWorldSpace, N, sSSAO);
+        vec3 direct = getLightingDirect(fragPosWorldSpace, N, LIGHT_DYNTYPE_BOTH);
         lighting = indirect + (1.0 - shadow) * direct;
     } else if (isFeatureEnabled(FEATURE_SELFILLUM)) {
         lighting = uSelfIllumColor.rgb;
@@ -808,14 +835,15 @@ void main() {
         vec3 I = normalize(fragPosWorldSpace - uCameraPosition.xyz);
         vec3 R = reflect(I, N);
         vec4 envmapSample = texture(sEnvironmentMap, R);
+        envmapSample.rgb = envmapSample.rgb;
         roughness = diffuseAlpha;
         objectColor += envmapSample.rgb * (1.0 - roughness);
     }
-    if (isFeatureEnabled(FEATURE_FOG)) {
-        objectColor = applyFog(objectColor);
-    }
     if (isFeatureEnabled(FEATURE_WATER)) {
         objectColor *= uWaterAlpha;
+    }
+    if (isFeatureEnabled(FEATURE_FOG)) {
+        objectColor = mix(objectColor, uFogColor.rgb, 1.0 - getFog(fragPosWorldSpace));
     }
 
     vec3 objectColorBright = vec3(0.0);
@@ -1325,7 +1353,7 @@ void Shaders::init() {
     auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDirectionalLightShadows});
     auto fsDepth = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDepth});
     auto fsSSAO = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslSSAOUniforms, g_glslHash, g_glslScreenSpace, g_fsSSAO});
-    auto fsBlinnPhong = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsBlinnPhong});
+    auto fsBlinnPhong = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslHash, g_glslHashedAlphaTest, g_glslNormalMapping, g_glslBlinnPhong, g_glslShadowMapping, g_glslFog, g_fsBlinnPhong});
     auto fsBillboard = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBillboard});
     auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsParticle});
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
