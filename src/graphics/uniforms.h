@@ -57,8 +57,6 @@ struct GeneralUniforms {
     glm::vec4 cameraPosition {0.0f};
     glm::vec4 color {1.0f};
     glm::vec4 worldAmbientColor {1.0f};
-    glm::vec4 ambientColor {1.0f};
-    glm::vec4 diffuseColor {0.0f};
     glm::vec4 selfIllumColor {1.0f};
     glm::vec4 discardColor {0.0f};
     glm::vec4 fogColor {0.0f};
@@ -110,8 +108,6 @@ struct GeneralUniforms {
         dangly = glm::mat3x4(1.0f);
         uv = glm::mat3x4(1.0f);
         color = glm::vec4(1.0f);
-        ambientColor = glm::vec4(1.0f);
-        diffuseColor = glm::vec4(0.0f);
         selfIllumColor = glm::vec4(1.0f);
         discardColor = glm::vec4(0.0f);
         heightMapFrameBounds = glm::vec4(0.0f);

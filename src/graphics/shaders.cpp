@@ -62,8 +62,6 @@ layout(std140) uniform General {
     vec4 uCameraPosition;
     vec4 uColor;
     vec4 uWorldAmbientColor;
-    vec4 uAmbientColor;
-    vec4 uDiffuseColor;
     vec4 uSelfIllumColor;
     vec4 uDiscardColor;
     vec4 uFogColor;
@@ -262,12 +260,12 @@ float getAttenuation(vec3 fragPos, Light light, float L, float Q) {
 }
 
 vec3 getLightingIndirect(vec3 worldPos, vec3 normal) {
-    vec3 result = uWorldAmbientColor.rgb; // * uAmbientColor.rgb;
+    vec3 result = uWorldAmbientColor.rgb;
 
     for (int i = 0; i < uNumLights; ++i) {
         if (!uLights[i].ambientOnly) continue;
 
-        vec3 ambient = uLights[i].color.rgb; // * uAmbientColor.rgb;
+        vec3 ambient = uLights[i].color.rgb;
 
         float attenuation = getAttenuation(worldPos, uLights[i], ATTENUATION_LINEAR, ATTENUATION_QUADRATIC);
         ambient *= attenuation;
