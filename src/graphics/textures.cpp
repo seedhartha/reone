@@ -66,6 +66,27 @@ void Textures::init() {
     _noiseRGB->setPixels(4, 4, PixelFormat::RG16F, move(noiseLayer));
     _noiseRGB->init();
 
+    auto ssaoPixels = make_shared<ByteArray>();
+    ssaoPixels->resize(3);
+    (*ssaoPixels)[0] = 0xff;
+    (*ssaoPixels)[1] = 0xff;
+    (*ssaoPixels)[2] = 0xff;
+    auto ssaoLayer = Texture::Layer {move(ssaoPixels)};
+    _ssaoRGB = make_shared<Texture>("ssao_rgb", getTextureProperties(TextureUsage::Default));
+    _ssaoRGB->setPixels(1, 1, PixelFormat::RGB8, move(ssaoLayer));
+    _ssaoRGB->init();
+
+    auto ssrPixels = make_shared<ByteArray>();
+    ssrPixels->resize(4);
+    (*ssrPixels)[0] = 0;
+    (*ssrPixels)[1] = 0;
+    (*ssrPixels)[2] = 0;
+    (*ssrPixels)[3] = 0;
+    auto ssrLayer = Texture::Layer {move(ssrPixels)};
+    _ssrRGBA = make_shared<Texture>("ssr_rgb", getTextureProperties(TextureUsage::Default));
+    _ssrRGBA->setPixels(1, 1, PixelFormat::RGBA8, move(ssrLayer));
+    _ssrRGBA->init();
+
     bindBuiltIn();
 }
 
@@ -90,8 +111,8 @@ void Textures::bindBuiltIn() {
     bind(*_defaultRGB, TextureUnits::hilights);
     bind(*_defaultRGB, TextureUnits::eyePos);
     bind(*_defaultRGB, TextureUnits::eyeNormal);
-    bind(*_defaultRGB, TextureUnits::ssao);
-    bind(*_defaultRGB, TextureUnits::ssr);
+    bind(*_ssaoRGB, TextureUnits::ssao);
+    bind(*_ssrRGBA, TextureUnits::ssr);
     bind(*_noiseRGB, TextureUnits::noise);
     bind(*_noiseRGB, TextureUnits::oitAccum);
     bind(*_noiseRGB, TextureUnits::oitRevealage);
