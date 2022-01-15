@@ -50,7 +50,6 @@ private:
         int texQuality {0};
         int shadowres {0};
         int drawdist {64};
-        int maxlights {8};
         int musicvol {0};
         int voicevol {0};
         int soundvol {0};
@@ -66,7 +65,6 @@ private:
     wxChoice *_choiceTextureQuality;
     wxChoice *_choiceShadowResolution;
     wxSlider *_sliderDrawDistance;
-    wxSlider *_sliderMaxLights;
     wxCheckBox *_checkBoxFullscreen;
     wxCheckBox *_checkBoxVSync;
     wxCheckBox *_checkBoxFXAA;

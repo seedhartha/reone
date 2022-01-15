@@ -40,6 +40,7 @@ set(GRAPHICS_HEADERS
     framebuffer.h
     lipanimation.h
     lipanimations.h
+    lumautil.h
     mesh.h
     meshes.h
     model.h

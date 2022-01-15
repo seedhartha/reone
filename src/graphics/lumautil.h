@@ -17,25 +17,13 @@
 
 #pragma once
 
-#include "types.h"
-
 namespace reone {
 
 namespace graphics {
 
-struct GraphicsOptions {
-    int width {0};
-    int height {0};
-    bool fullscreen {false};
-    bool vsync {true};
-    bool fxaa {false};
-    bool grass {true};
-    bool ssr {false};
-    bool ssao {false};
-    TextureQuality textureQuality {0};
-    int shadowResolution {0};
-    float drawDistance {kDefaultObjectDrawDistance};
-};
+inline float rgbToLuma(glm::vec3 rgb) {
+    return glm::dot(rgb, glm::vec3(0.299f, 0.587f, 0.114f));
+}
 
 } // namespace graphics
 

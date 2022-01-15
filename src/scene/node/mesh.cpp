@@ -20,6 +20,7 @@
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
 #include "../../graphics/context.h"
+#include "../../graphics/lumautil.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
@@ -188,7 +189,7 @@ bool MeshSceneNode::isTransparent() const {
     if (_nodeTextures.envmap || _nodeTextures.bumpmap) {
         return false;
     }
-    if (isSelfIlluminated()) {
+    if ((1.0f - rgbToLuma(_selfIllumColor)) < 0.01f) {
         return false;
     }
     return hasAlphaChannel(_nodeTextures.diffuse->pixelFormat());
@@ -309,25 +310,9 @@ void MeshSceneNode::draw() {
         uniforms.general.featureMask |= UniformsFeatureFlags::shadows;
     }
     if (isLightingEnabled()) {
-        const vector<LightSceneNode *> &lights = _sceneGraph.activeLights();
-
-        uniforms.general.featureMask |= UniformsFeatureFlags::lighting;
-        if (_sceneGraph.options().ssao) {
-            uniforms.general.featureMask |= UniformsFeatureFlags::ssao;
-        }
+        // uniforms.general.featureMask |= UniformsFeatureFlags::lighting;
         uniforms.general.ambientColor = glm::vec4(mesh->ambient, 1.0f);
         uniforms.general.diffuseColor = glm::vec4(mesh->diffuse, 1.0f);
-        uniforms.lighting.numLights = static_cast<int>(lights.size());
-
-        for (size_t i = 0; i < lights.size(); ++i) {
-            LightUniforms &shaderLight = uniforms.lighting.lights[i];
-            shaderLight.position = glm::vec4(lights[i]->getOrigin(), lights[i]->isDirectional() ? 0.0f : 1.0f);
-            shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
-            shaderLight.multiplier = lights[i]->multiplier() * lights[i]->strength();
-            shaderLight.radius = lights[i]->radius();
-            shaderLight.ambientOnly = static_cast<int>(lights[i]->modelNode().light()->ambientOnly);
-            shaderLight.dynamicType = lights[i]->modelNode().light()->dynamicType;
-        }
     }
     if (isSelfIlluminated()) {
         uniforms.general.featureMask |= UniformsFeatureFlags::selfillum;
@@ -339,57 +324,6 @@ void MeshSceneNode::draw() {
     auto &program = transparent ? _shaders.modelTransparent() : _shaders.modelOpaque();
     _shaders.use(program, true);
     _graphicsContext.withFaceCulling(CullFaceMode::Back, [&mesh]() {
-        mesh->mesh->draw();
-    });
-}
-
-void MeshSceneNode::drawDepth() {
-    auto mesh = _modelNode->mesh();
-    if (!mesh || !_nodeTextures.diffuse) {
-        return;
-    }
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetLocals();
-    uniforms.general.model = _absTransform;
-    uniforms.general.modelInv = _absTransformInv;
-
-    auto skin = mesh->skin;
-    if (skin) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::skeletal;
-
-        // Offset bone indices by 1 to account for -1 (no index)
-        uniforms.skeletal.bones[0] = glm::mat4(1.0f);
-        for (size_t i = 1; i < kMaxBones; ++i) {
-            if (i >= 1 + skin->boneNodeNumber.size()) {
-                continue;
-            }
-            auto nodeNumber = skin->boneNodeNumber[i - 1];
-            if (nodeNumber == 0xffff) {
-                continue;
-            }
-            auto bone = _model.getNodeByNumber(nodeNumber);
-            if (!bone || bone->type() != SceneNodeType::Mesh) {
-                continue;
-            }
-            uniforms.skeletal.bones[i] = _modelNode->absoluteTransformInverse() *
-                                         _model.absoluteTransformInverse() *
-                                         bone->absoluteTransform() *
-                                         skin->boneMatrices[skin->boneSerial[i - 1]];
-        }
-    }
-
-    auto danglymesh = mesh->danglymesh;
-    if (danglymesh) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::danglymesh;
-        uniforms.general.dangly = glm::mat3x4(_danglymeshAnimation.matrix);
-        uniforms.general.danglyDisplacement = danglymesh->displacement;
-        if (_nodeTextures.danglyConstraints) {
-            _textures.bind(*_nodeTextures.danglyConstraints, TextureUnits::danglyConstraints);
-        }
-    }
-
-    _shaders.use(_shaders.modelDepth(), true);
-    _graphicsContext.withFaceCulling(CullFaceMode::Back, [this, &mesh]() {
         mesh->mesh->draw();
     });
 }

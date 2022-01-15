@@ -45,7 +45,6 @@ namespace scene {
 static constexpr int kMaxFlareLights = 4;
 static constexpr int kMaxSoundCount = 4;
 
-static constexpr float kLightingRadius = 8.0f;
 static constexpr float kShadowFadeSpeed = 2.0f;
 static constexpr float kElevationTestZ = 1024.0f;
 
@@ -133,10 +132,7 @@ void SceneGraph::cullRoots() {
 
 void SceneGraph::updateLighting() {
     // Find closest lights and create a lookup
-    auto closestLights = computeClosestLights(_options.maxLights, [](auto &light, float distance2) {
-        float radius = light.radius() + kLightingRadius;
-        return distance2 < radius * radius;
-    });
+    auto closestLights = computeClosestLights(kMaxLights, [](auto &, float) { return true; });
     set<LightSceneNode *> lookup;
     for (auto &light : closestLights) {
         lookup.insert(light);
@@ -160,7 +156,7 @@ void SceneGraph::updateLighting() {
     }
     // Add closest lights to active lights
     for (auto &light : lookup) {
-        if (_activeLights.size() >= _options.maxLights) {
+        if (_activeLights.size() >= kMaxLights) {
             return;
         }
         light->setActive(true);
@@ -173,7 +169,7 @@ void SceneGraph::updateShadowLight(float dt) {
         if (!light.modelNode().light()->shadow) {
             return false;
         }
-        float radius = light.radius() + kLightingRadius;
+        float radius = light.radius();
         return distance2 < radius * radius;
     });
     if (_shadowLight) {
@@ -394,16 +390,6 @@ void SceneGraph::drawShadows() {
             mesh->drawShadow();
         }
     });
-}
-
-void SceneGraph::drawDepth() {
-    if (!_activeCamera) {
-        return;
-    }
-    // Draw opaque meshes
-    for (auto &mesh : _opaqueMeshes) {
-        mesh->drawDepth();
-    }
 }
 
 void SceneGraph::drawOpaque() {

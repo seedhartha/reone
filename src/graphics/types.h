@@ -31,7 +31,7 @@ constexpr int kNumShadowLightSpace = 8;
 constexpr int kNumSSAOSamples = 64;
 
 constexpr int kMaxBones = 24;
-constexpr int kMaxLights = 16;
+constexpr int kMaxLights = 64;
 constexpr int kMaxParticles = 64;
 constexpr int kMaxTextChars = 128;
 constexpr int kMaxGrassClusters = 256;
@@ -143,20 +143,21 @@ enum class CameraType {
 struct TextureUnits {
     static constexpr int mainTex = 0;
     static constexpr int lightmap = 1;
-    static constexpr int bumpMap = 2;
-    static constexpr int hilights = 3;
-    static constexpr int depthMap = 4;
-    static constexpr int eyeNormal = 5;
-    static constexpr int roughness = 6;
-    static constexpr int ssao = 7;
-    static constexpr int ssr = 8;
-    static constexpr int noise = 9;
-    static constexpr int oitAccum = 10;
-    static constexpr int oitRevealage = 11;
-    static constexpr int danglyConstraints = 12;
-    static constexpr int environmentMap = 13;
-    static constexpr int cubeShadowMap = 14;
-    static constexpr int shadowMap = 15;
+    static constexpr int envmapColor = 2;
+    static constexpr int selfIllumColor = 3;
+    static constexpr int bumpMap = 4;
+    static constexpr int hilights = 5;
+    static constexpr int eyePos = 6;
+    static constexpr int eyeNormal = 7;
+    static constexpr int ssao = 8;
+    static constexpr int ssr = 9;
+    static constexpr int noise = 10;
+    static constexpr int oitAccum = 11;
+    static constexpr int oitRevealage = 12;
+    static constexpr int danglyConstraints = 13;
+    static constexpr int environmentMap = 14;
+    static constexpr int cubeShadowMap = 15;
+    static constexpr int shadowMap = 16;
 };
 
 struct UniformBlockBindingPoints {

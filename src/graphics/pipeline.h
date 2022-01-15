@@ -67,35 +67,38 @@ private:
     };
 
     struct Attachments {
-        std::shared_ptr<Framebuffer> fbPing;
-        std::shared_ptr<Framebuffer> fbPong;
-        std::shared_ptr<Framebuffer> fbPointLightShadows;
-        std::shared_ptr<Framebuffer> fbDirectionalLightShadows;
-        std::shared_ptr<Framebuffer> fbDepth;
-        std::shared_ptr<Framebuffer> fbSSAO;
-        std::shared_ptr<Framebuffer> fbOpaqueGeometry;
-        std::shared_ptr<Framebuffer> fbTransparentGeometry;
-        std::shared_ptr<Framebuffer> fbSSR;
-        std::shared_ptr<Framebuffer> fbOutput;
-
-        std::shared_ptr<Texture> cbPing;
-        std::shared_ptr<Texture> cbPong;
-        std::shared_ptr<Texture> cbSSAO;
+        std::shared_ptr<Texture> cbGBufferDiffuse;
+        std::shared_ptr<Texture> cbGBufferLightmap;
+        std::shared_ptr<Texture> cbGBufferEnvMap;
+        std::shared_ptr<Texture> cbGBufferSelfIllum;
+        std::shared_ptr<Texture> cbGBufferEyePos;
+        std::shared_ptr<Texture> cbGBufferEyeNormal;
         std::shared_ptr<Texture> cbOpaqueGeometry1;
         std::shared_ptr<Texture> cbOpaqueGeometry2;
-        std::shared_ptr<Texture> cbOpaqueGeometryEyeNormal;
-        std::shared_ptr<Texture> cbOpaqueGeometryRoughness;
         std::shared_ptr<Texture> cbTransparentGeometry1;
         std::shared_ptr<Texture> cbTransparentGeometry2;
+        std::shared_ptr<Texture> cbSSAO;
         std::shared_ptr<Texture> cbSSR;
+        std::shared_ptr<Texture> cbPing;
+        std::shared_ptr<Texture> cbPong;
         std::shared_ptr<Texture> cbOutput;
 
         std::shared_ptr<Renderbuffer> dbCommon;
+        std::shared_ptr<Renderbuffer> dbGBuffer;
         std::shared_ptr<Texture> dbDirectionalLightShadows;
         std::shared_ptr<Texture> dbPointLightShadows;
-        std::shared_ptr<Texture> dbDepth;
-        std::shared_ptr<Texture> dbOpaqueGeometry;
         std::shared_ptr<Texture> dbOutput;
+
+        std::shared_ptr<Framebuffer> fbPointLightShadows;
+        std::shared_ptr<Framebuffer> fbDirectionalLightShadows;
+        std::shared_ptr<Framebuffer> fbGBuffer;
+        std::shared_ptr<Framebuffer> fbOpaqueGeometry;
+        std::shared_ptr<Framebuffer> fbTransparentGeometry;
+        std::shared_ptr<Framebuffer> fbSSAO;
+        std::shared_ptr<Framebuffer> fbSSR;
+        std::shared_ptr<Framebuffer> fbPing;
+        std::shared_ptr<Framebuffer> fbPong;
+        std::shared_ptr<Framebuffer> fbOutput;
     };
 
     GraphicsOptions _options;
@@ -119,18 +122,17 @@ private:
     void computeLightSpaceMatrices(IScene &scene);
 
     void drawShadows(IScene &scene, Attachments &attachments);
-    void drawDepth(IScene &scene, Attachments &attachments);
-    void drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
     void drawOpaqueGeometry(IScene &scene, Attachments &attachments);
     void drawTransparentGeometry(IScene &scene, Attachments &attachments);
-    void drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
-    void drawCombineOpaque(Attachments &attachments, Framebuffer &dst);
-    void drawCombineOIT(Attachments &attachments, Framebuffer &dst);
     void drawLensFlares(IScene &scene, Framebuffer &dst);
+    void drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
+    void drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
+    void drawCombineOpaque(IScene &scene, Attachments &attachments, Framebuffer &dst);
+    void drawCombineOIT(Attachments &attachments, Framebuffer &dst);
 
-    void applyGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical = false);
-    void applyMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong = false);
-    void applyFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
+    void drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical = false);
+    void drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong = false);
+    void drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
 
     void blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, int flags = BlitFlags::color);
 };
