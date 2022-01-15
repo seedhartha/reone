@@ -80,10 +80,13 @@ private:
         std::shared_ptr<Texture> cbSSAO;
         std::shared_ptr<Texture> cbSSR;
         std::shared_ptr<Texture> cbPing;
+        std::shared_ptr<Texture> cbPingHalf;
         std::shared_ptr<Texture> cbPong;
+        std::shared_ptr<Texture> cbPongHalf;
         std::shared_ptr<Texture> cbOutput;
 
         std::shared_ptr<Renderbuffer> dbCommon;
+        std::shared_ptr<Renderbuffer> dbCommonHalf;
         std::shared_ptr<Renderbuffer> dbGBuffer;
         std::shared_ptr<Texture> dbDirectionalLightShadows;
         std::shared_ptr<Texture> dbPointLightShadows;
@@ -97,7 +100,9 @@ private:
         std::shared_ptr<Framebuffer> fbSSAO;
         std::shared_ptr<Framebuffer> fbSSR;
         std::shared_ptr<Framebuffer> fbPing;
+        std::shared_ptr<Framebuffer> fbPingHalf;
         std::shared_ptr<Framebuffer> fbPong;
+        std::shared_ptr<Framebuffer> fbPongHalf;
         std::shared_ptr<Framebuffer> fbOutput;
     };
 
@@ -130,7 +135,7 @@ private:
     void drawCombineOpaque(IScene &scene, Attachments &attachments, Framebuffer &dst);
     void drawCombineOIT(Attachments &attachments, Framebuffer &dst);
 
-    void drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical = false);
+    void drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong = false);
     void drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong = false);
     void drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
 

@@ -103,7 +103,7 @@ layout(std140) uniform Skeletal {
 )END";
 
 static const string g_glslLightingUniforms = R"END(
-const int MAX_LIGHTS = 64;
+const int MAX_LIGHTS = 32;
 
 struct Light {
     vec4 position;
@@ -1177,7 +1177,7 @@ void main() {
 }
 )END";
 
-static const string g_fsGaussianBlur = R"END(
+static const string g_fsGaussianBlur9 = R"END(
 uniform sampler2D sMainTex;
 
 noperspective in vec2 fragUV1;
@@ -1185,15 +1185,43 @@ noperspective in vec2 fragUV1;
 out vec4 fragColor;
 
 void main() {
-    vec4 color = texture(sMainTex, fragUV1);
+    vec2 uv = fragUV1;
+
+    vec4 color = texture(sMainTex, uv);
     color.rgb *= 0.2270270270;
 
     vec2 off1 = vec2(1.3846153846) * uBlurDirection;
     vec2 off2 = vec2(3.2307692308) * uBlurDirection;
-    color.rgb += texture(sMainTex, fragUV1 + off1 * uScreenResolutionReciprocal.xy).rgb * 0.3162162162;
-    color.rgb += texture(sMainTex, fragUV1 - off1 * uScreenResolutionReciprocal.xy).rgb * 0.3162162162;
-    color.rgb += texture(sMainTex, fragUV1 + off2 * uScreenResolutionReciprocal.xy).rgb * 0.0702702703;
-    color.rgb += texture(sMainTex, fragUV1 - off2 * uScreenResolutionReciprocal.xy).rgb * 0.0702702703;
+    color.rgb += texture(sMainTex, uv + off1 * uScreenResolutionReciprocal.xy).rgb * 0.3162162162;
+    color.rgb += texture(sMainTex, uv - off1 * uScreenResolutionReciprocal.xy).rgb * 0.3162162162;
+    color.rgb += texture(sMainTex, uv + off2 * uScreenResolutionReciprocal.xy).rgb * 0.0702702703;
+    color.rgb += texture(sMainTex, uv - off2 * uScreenResolutionReciprocal.xy).rgb * 0.0702702703;
+
+    fragColor = color;
+}
+)END";
+
+static const string g_fsGaussianBlur13 = R"END(
+uniform sampler2D sMainTex;
+
+noperspective in vec2 fragUV1;
+
+out vec4 fragColor;
+
+void main() {
+    vec2 uv = fragUV1;
+    vec4 color = vec4(0.0);
+
+    vec2 off1 = vec2(1.411764705882353) * uBlurDirection;
+    vec2 off2 = vec2(3.2941176470588234) * uBlurDirection;
+    vec2 off3 = vec2(5.176470588235294) * uBlurDirection;
+    color += texture(sMainTex, uv) * 0.1964825501511404;
+    color += texture(sMainTex, uv + (off1 * uScreenResolutionReciprocal.xy)) * 0.2969069646728344;
+    color += texture(sMainTex, uv - (off1 * uScreenResolutionReciprocal.xy)) * 0.2969069646728344;
+    color += texture(sMainTex, uv + (off2 * uScreenResolutionReciprocal.xy)) * 0.09447039785044732;
+    color += texture(sMainTex, uv - (off2 * uScreenResolutionReciprocal.xy)) * 0.09447039785044732;
+    color += texture(sMainTex, uv + (off3 * uScreenResolutionReciprocal.xy)) * 0.010381362401148057;
+    color += texture(sMainTex, uv - (off3 * uScreenResolutionReciprocal.xy)) * 0.010381362401148057;
 
     fragColor = color;
 }
@@ -1464,7 +1492,8 @@ void Shaders::init() {
     auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSR});
     auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslLuma, g_glslBlinnPhong, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
     auto fsCombineOIT = initShader(ShaderType::Fragment, {g_glslHeader, g_fsCombineOIT});
-    auto fsGaussianBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur});
+    auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur9});
+    auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur13});
     auto fsMedianFilter3 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter3});
     auto fsMedianFilter5 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter5});
     auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLuma, g_fsFXAA});
@@ -1485,7 +1514,8 @@ void Shaders::init() {
     _spSSR = initShaderProgram({vsObjectSpace, fsSSR});
     _spCombineOpaque = initShaderProgram({vsObjectSpace, fsCombineOpaque});
     _spCombineOIT = initShaderProgram({vsObjectSpace, fsCombineOIT});
-    _spGaussianBlur = initShaderProgram({vsObjectSpace, fsGaussianBlur});
+    _spGaussianBlur9 = initShaderProgram({vsObjectSpace, fsGaussianBlur9});
+    _spGaussianBlur13 = initShaderProgram({vsObjectSpace, fsGaussianBlur13});
     _spMedianFilter3 = initShaderProgram({vsObjectSpace, fsMedianFilter3});
     _spMedianFilter5 = initShaderProgram({vsObjectSpace, fsMedianFilter5});
     _spFXAA = initShaderProgram({vsObjectSpace, fsFXAA});
@@ -1530,7 +1560,8 @@ void Shaders::deinit() {
     _spSSR.reset();
     _spCombineOpaque.reset();
     _spCombineOIT.reset();
-    _spGaussianBlur.reset();
+    _spGaussianBlur9.reset();
+    _spGaussianBlur13.reset();
     _spMedianFilter3.reset();
     _spMedianFilter5.reset();
     _spFXAA.reset();
