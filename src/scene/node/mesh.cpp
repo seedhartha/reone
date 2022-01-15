@@ -309,11 +309,6 @@ void MeshSceneNode::draw() {
     if (receivesShadows && _sceneGraph.hasShadowLight()) {
         uniforms.general.featureMask |= UniformsFeatureFlags::shadows;
     }
-    if (isLightingEnabled()) {
-        // uniforms.general.featureMask |= UniformsFeatureFlags::lighting;
-        uniforms.general.ambientColor = glm::vec4(mesh->ambient, 1.0f);
-        uniforms.general.diffuseColor = glm::vec4(mesh->diffuse, 1.0f);
-    }
     if (isSelfIlluminated()) {
         uniforms.general.featureMask |= UniformsFeatureFlags::selfillum;
         uniforms.general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
