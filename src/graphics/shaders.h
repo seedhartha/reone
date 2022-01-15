@@ -41,24 +41,25 @@ public:
 
     ShaderProgram &simpleColor() const { return *_spSimpleColor; }
     ShaderProgram &simpleTexture() const { return *_spSimpleTexture; }
+    ShaderProgram &gui() const { return *_spGUI; }
+    ShaderProgram &text() const { return *_spText; }
+
     ShaderProgram &pointLightShadows() const { return *_spPointLightShadows; }
     ShaderProgram &directionalLightShadows() const { return *_spDirectionalLightShadows; }
-    ShaderProgram &modelDepth() const { return *_spModelDepth; }
-    ShaderProgram &ssao() const { return *_spSSAO; }
     ShaderProgram &modelOpaque() const { return *_spModelOpaque; }
     ShaderProgram &modelTransparent() const { return *_spModelTransparent; }
     ShaderProgram &particle() const { return *_spParticle; }
     ShaderProgram &grass() const { return *_spGrass; }
     ShaderProgram &billboard() const { return *_spBillboard; }
+    ShaderProgram &ssao() const { return *_spSSAO; }
     ShaderProgram &ssr() const { return *_spSSR; }
+    ShaderProgram &combineOpaque() const { return *_spCombineOpaque; }
+    ShaderProgram &combineOIT() const { return *_spCombineOIT; }
+
     ShaderProgram &gaussianBlur() const { return *_spGaussianBlur; }
     ShaderProgram &medianFilter3() const { return *_spMedianFilter3; }
     ShaderProgram &medianFilter5() const { return *_spMedianFilter5; }
-    ShaderProgram &combineOpaque() const { return *_spCombineOpaque; }
-    ShaderProgram &combineOIT() const { return *_spCombineOIT; }
     ShaderProgram &fxaa() const { return *_spFXAA; }
-    ShaderProgram &gui() const { return *_spGUI; }
-    ShaderProgram &text() const { return *_spText; }
 
 private:
     bool _inited {false};
@@ -70,24 +71,25 @@ private:
 
     std::shared_ptr<ShaderProgram> _spSimpleColor;
     std::shared_ptr<ShaderProgram> _spSimpleTexture;
+    std::shared_ptr<ShaderProgram> _spGUI;
+    std::shared_ptr<ShaderProgram> _spText;
+
     std::shared_ptr<ShaderProgram> _spPointLightShadows;
     std::shared_ptr<ShaderProgram> _spDirectionalLightShadows;
-    std::shared_ptr<ShaderProgram> _spModelDepth;
-    std::shared_ptr<ShaderProgram> _spSSAO;
     std::shared_ptr<ShaderProgram> _spModelOpaque;
     std::shared_ptr<ShaderProgram> _spModelTransparent;
     std::shared_ptr<ShaderProgram> _spParticle;
     std::shared_ptr<ShaderProgram> _spGrass;
     std::shared_ptr<ShaderProgram> _spBillboard;
+    std::shared_ptr<ShaderProgram> _spSSAO;
     std::shared_ptr<ShaderProgram> _spSSR;
+    std::shared_ptr<ShaderProgram> _spCombineOpaque;
+    std::shared_ptr<ShaderProgram> _spCombineOIT;
+
     std::shared_ptr<ShaderProgram> _spGaussianBlur;
     std::shared_ptr<ShaderProgram> _spMedianFilter3;
     std::shared_ptr<ShaderProgram> _spMedianFilter5;
-    std::shared_ptr<ShaderProgram> _spCombineOpaque;
-    std::shared_ptr<ShaderProgram> _spCombineOIT;
     std::shared_ptr<ShaderProgram> _spFXAA;
-    std::shared_ptr<ShaderProgram> _spGUI;
-    std::shared_ptr<ShaderProgram> _spText;
 
     // END Shader Programs
 

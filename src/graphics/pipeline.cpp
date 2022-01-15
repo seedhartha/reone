@@ -18,6 +18,7 @@
 #include "pipeline.h"
 
 #include "../common/randomutil.h"
+#include "../scene/node/light.h"
 
 #include "camera/perspective.h"
 #include "context.h"
@@ -169,13 +170,11 @@ void Pipeline::init() {
 void Pipeline::initAttachments(glm::ivec2 dim) {
     Attachments attachments;
 
-    // Reusable depth buffer
+    // Reusable attachments
 
     attachments.dbCommon = make_unique<Renderbuffer>();
     attachments.dbCommon->configure(dim.x, dim.y, PixelFormat::Depth32F);
     attachments.dbCommon->init();
-
-    // Reusable framebuffers
 
     attachments.cbPing = make_unique<Texture>("ping_color", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbPing->clear(dim.x, dim.y, PixelFormat::RGBA8);
@@ -213,25 +212,46 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
     attachments.fbPointLightShadows->attachDepth(attachments.dbPointLightShadows);
     attachments.fbPointLightShadows->init();
 
-    // Depth framebuffer
+    // G-Buffer framebuffer
 
-    attachments.dbDepth = make_shared<Texture>("depth_depth", getTextureProperties(TextureUsage::DepthBuffer));
-    attachments.dbDepth->clear(dim.x, dim.y, PixelFormat::Depth32F);
-    attachments.dbDepth->init();
+    attachments.cbGBufferDiffuse = make_unique<Texture>("gbuffer_color_diffuse", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferDiffuse->clear(dim.x, dim.y, PixelFormat::RGBA8);
+    attachments.cbGBufferDiffuse->init();
 
-    attachments.fbDepth = make_shared<Framebuffer>();
-    attachments.fbDepth->attachDepth(attachments.dbDepth);
-    attachments.fbDepth->init();
+    attachments.cbGBufferLightmap = make_unique<Texture>("gbuffer_color_lightmap", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferLightmap->clear(dim.x, dim.y, PixelFormat::RGBA8);
+    attachments.cbGBufferLightmap->init();
 
-    // SSAO framebuffer
+    attachments.cbGBufferEnvMap = make_unique<Texture>("gbuffer_color_envmap", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferEnvMap->clear(dim.x, dim.y, PixelFormat::RGBA8);
+    attachments.cbGBufferEnvMap->init();
 
-    attachments.cbSSAO = make_shared<Texture>("ssao_color", getTextureProperties(TextureUsage::ColorBuffer));
-    attachments.cbSSAO->clear(dim.x, dim.y, PixelFormat::R8);
-    attachments.cbSSAO->init();
+    attachments.cbGBufferSelfIllum = make_unique<Texture>("gbuffer_color_selfillum", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferSelfIllum->clear(dim.x, dim.y, PixelFormat::RGBA8);
+    attachments.cbGBufferSelfIllum->init();
 
-    attachments.fbSSAO = make_shared<Framebuffer>();
-    attachments.fbSSAO->attachColorDepth(attachments.cbSSAO, attachments.dbCommon);
-    attachments.fbSSAO->init();
+    attachments.cbGBufferEyePos = make_unique<Texture>("gbuffer_color_eyepos", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferEyePos->clear(dim.x, dim.y, PixelFormat::RGB16F);
+    attachments.cbGBufferEyePos->init();
+
+    attachments.cbGBufferEyeNormal = make_unique<Texture>("gbuffer_color_eyenormal", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferEyeNormal->clear(dim.x, dim.y, PixelFormat::RGB8);
+    attachments.cbGBufferEyeNormal->init();
+
+    attachments.dbGBuffer = make_shared<Renderbuffer>();
+    attachments.dbGBuffer->configure(dim.x, dim.y, PixelFormat::Depth32F);
+    attachments.dbGBuffer->init();
+
+    attachments.fbGBuffer = make_shared<Framebuffer>();
+    attachments.fbGBuffer->attachColorsDepth(
+        {attachments.cbGBufferDiffuse,
+         attachments.cbGBufferLightmap,
+         attachments.cbGBufferEnvMap,
+         attachments.cbGBufferSelfIllum,
+         attachments.cbGBufferEyePos,
+         attachments.cbGBufferEyeNormal},
+        attachments.dbGBuffer);
+    attachments.fbGBuffer->init();
 
     // Opaque geometry framebuffer
 
@@ -243,25 +263,8 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
     attachments.cbOpaqueGeometry2->clear(dim.x, dim.y, PixelFormat::RGBA8);
     attachments.cbOpaqueGeometry2->init();
 
-    attachments.cbOpaqueGeometryEyeNormal = make_unique<Texture>("opaque_geometry_eyenormal", getTextureProperties(TextureUsage::ColorBuffer));
-    attachments.cbOpaqueGeometryEyeNormal->clear(dim.x, dim.y, PixelFormat::RGB8);
-    attachments.cbOpaqueGeometryEyeNormal->init();
-
-    attachments.cbOpaqueGeometryRoughness = make_unique<Texture>("opaque_geometry_roughness", getTextureProperties(TextureUsage::ColorBuffer));
-    attachments.cbOpaqueGeometryRoughness->clear(dim.x, dim.y, PixelFormat::R8);
-    attachments.cbOpaqueGeometryRoughness->init();
-
-    attachments.dbOpaqueGeometry = make_unique<Texture>("opaque_geometry_depth", getTextureProperties(TextureUsage::DepthBuffer));
-    attachments.dbOpaqueGeometry->clear(dim.x, dim.y, PixelFormat::Depth32F);
-    attachments.dbOpaqueGeometry->init();
-
     attachments.fbOpaqueGeometry = make_shared<Framebuffer>();
-    attachments.fbOpaqueGeometry->attachColorsDepth(
-        {attachments.cbOpaqueGeometry1,
-         attachments.cbOpaqueGeometry2,
-         attachments.cbOpaqueGeometryEyeNormal,
-         attachments.cbOpaqueGeometryRoughness},
-        attachments.dbOpaqueGeometry);
+    attachments.fbOpaqueGeometry->attachColorsDepth({attachments.cbOpaqueGeometry1, attachments.cbOpaqueGeometry2}, attachments.dbCommon);
     attachments.fbOpaqueGeometry->init();
 
     // Transparent geometry framebuffer
@@ -279,6 +282,16 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
         {attachments.cbTransparentGeometry1, attachments.cbTransparentGeometry2},
         attachments.dbCommon);
     attachments.fbTransparentGeometry->init();
+
+    // SSAO framebuffer
+
+    attachments.cbSSAO = make_shared<Texture>("ssao_color", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbSSAO->clear(dim.x, dim.y, PixelFormat::R8);
+    attachments.cbSSAO->init();
+
+    attachments.fbSSAO = make_shared<Framebuffer>();
+    attachments.fbSSAO->attachColorDepth(attachments.cbSSAO, attachments.dbCommon);
+    attachments.fbSSAO->init();
 
     // SSR framebuffer
 
@@ -318,39 +331,44 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
     computeLightSpaceMatrices(scene);
 
     _graphicsContext.withViewport(glm::ivec4(0, 0, dim.x, dim.y), [this, &scene, &dim, &attachments] {
+        // Opaque geometry
+
         drawShadows(scene, attachments);
-
-        // Screen-space ambient occlusion
-        if (_options.ssao) {
-            drawDepth(scene, attachments);
-            drawSSAO(scene, dim, attachments);
-            applyMedianFilter(dim, *attachments.cbSSAO, *attachments.fbPing, R_MEDIAN_FILTER_STRONG);
-            blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbSSAO, 0);
-        }
-
         drawOpaqueGeometry(scene, attachments);
 
-        // Blur geometry hilights
-        applyGaussianBlur(dim, *attachments.cbOpaqueGeometry2, *attachments.fbPing);
-        applyGaussianBlur(dim, *attachments.cbPing, *attachments.fbPong, R_BLUR_VERTICAL);
-        blitFramebuffer(dim, *attachments.fbPong, 0, *attachments.fbOpaqueGeometry, 1);
+        // Screen-space effects
 
-        // Screen-space reflections
+        if (_options.ssao) {
+            drawSSAO(scene, dim, attachments);
+            drawMedianFilter(dim, *attachments.cbSSAO, *attachments.fbPing, R_MEDIAN_FILTER_STRONG);
+            blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbSSAO, 0);
+        }
         if (_options.ssr) {
             drawSSR(scene, dim, attachments);
-            applyGaussianBlur(dim, *attachments.cbSSR, *attachments.fbPing);
-            applyGaussianBlur(dim, *attachments.cbPing, *attachments.fbSSR, R_BLUR_VERTICAL);
+            drawGaussianBlur(dim, *attachments.cbSSR, *attachments.fbPing);
+            drawGaussianBlur(dim, *attachments.cbPing, *attachments.fbSSR, R_BLUR_VERTICAL);
         }
 
-        drawCombineOpaque(attachments, *attachments.fbPing);
-        blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbOpaqueGeometry, 0);
-        blitFramebuffer(dim, *attachments.fbOpaqueGeometry, 0, *attachments.fbTransparentGeometry, 0, BlitFlags::depth);
+        // END Screen-space effects
+
+        drawCombineOpaque(scene, attachments, *attachments.fbOpaqueGeometry);
+        drawGaussianBlur(dim, *attachments.cbOpaqueGeometry2, *attachments.fbPing);
+        drawGaussianBlur(dim, *attachments.cbPing, *attachments.fbPong, R_BLUR_VERTICAL);
+        blitFramebuffer(dim, *attachments.fbPong, 0, *attachments.fbOpaqueGeometry, 1);
+
+        // END Opaque geometry
+
+        // Transparent geometry
+
+        blitFramebuffer(dim, *attachments.fbGBuffer, 0, *attachments.fbTransparentGeometry, 0, BlitFlags::depth);
         drawTransparentGeometry(scene, attachments);
         drawCombineOIT(attachments, *attachments.fbOutput);
         drawLensFlares(scene, *attachments.fbOutput);
 
+        // END Transparent geometry
+
         if (_options.fxaa) {
-            applyFXAA(dim, *attachments.cbOutput, *attachments.fbPing);
+            drawFXAA(dim, *attachments.cbOutput, *attachments.fbPing);
             blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbOutput, 0);
         }
     });
@@ -360,44 +378,11 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
     return attachments.cbOutput;
 }
 
-void Pipeline::computeLightSpaceMatrices(IScene &scene) {
-    if (!scene.hasShadowLight()) {
-        return;
-    }
-    if (scene.isShadowLightDirectional()) {
-        auto camera = static_pointer_cast<PerspectiveCamera>(scene.camera());
-        auto lightDir = glm::normalize(camera->position() - scene.shadowLightPosition());
-        float fovy = camera->fovy();
-        float aspect = camera->aspect();
-        float cameraNear = camera->zNear();
-        float cameraFar = camera->zFar();
-        for (int i = 0; i < kNumShadowCascades; ++i) {
-            float near = cameraNear;
-            if (i > 0) {
-                near = cameraFar * g_shadowCascadeDivisors[i - 1];
-            }
-            float far = cameraFar;
-            if (i < kNumShadowCascades - 1) {
-                far *= g_shadowCascadeDivisors[i];
-            }
-            _shadowLightSpace[i] = computeDirectionalLightSpaceMatrix(fovy, aspect, near, far, lightDir, camera->view());
-            _shadowCascadeFarPlanes[i / 4][i % 4] = far;
-        }
-    } else {
-        glm::mat4 projection(glm::perspective(kPointLightShadowsFOV, 1.0f, kPointLightShadowsNearPlane, kPointLightShadowsFarPlane));
-        for (int i = 0; i < kNumCubeFaces; ++i) {
-            glm::mat4 lightView(getPointLightView(scene.shadowLightPosition(), static_cast<CubeMapFace>(i)));
-            _shadowLightSpace[i] = projection * lightView;
-        }
-    }
-}
-
 void Pipeline::drawShadows(IScene &scene, Attachments &attachments) {
     if (!scene.hasShadowLight()) {
         return;
     }
 
-    // Set global uniforms
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.shadowLightPosition = glm::vec4(scene.shadowLightPosition(), scene.isShadowLightDirectional() ? 0.0f : 1.0f);
@@ -405,7 +390,6 @@ void Pipeline::drawShadows(IScene &scene, Attachments &attachments) {
         uniforms.general.shadowLightSpace[i] = _shadowLightSpace[i];
     }
 
-    // Draw shadows to a separate framebuffer
     auto framebuffer = scene.isShadowLightDirectional() ? attachments.fbDirectionalLightShadows : attachments.fbPointLightShadows;
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->nameGL());
     glDrawBuffer(GL_NONE);
@@ -415,44 +399,7 @@ void Pipeline::drawShadows(IScene &scene, Attachments &attachments) {
     });
 }
 
-void Pipeline::drawDepth(IScene &scene, Attachments &attachments) {
-    auto camera = scene.camera();
-
-    // Set global uniforms
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.projection = camera->projection();
-    uniforms.general.view = camera->view();
-    uniforms.general.viewInv = glm::inverse(camera->view());
-
-    // Draw scene to depth framebuffer
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbDepth->nameGL());
-    glDrawBuffer(GL_NONE);
-    _graphicsContext.clearDepth();
-    scene.drawDepth();
-}
-
-void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments) {
-    // Reset uniforms
-    auto camera = scene.camera();
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
-    uniforms.general.projection = camera->projection();
-    uniforms.general.projectionInv = glm::inverse(camera->projection());
-    uniforms.general.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
-
-    // Draw screen-space ambient occlusion
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSAO->nameGL());
-    glDrawBuffer(kColorAttachments[0]);
-    _shaders.use(_shaders.ssao(), true);
-    _textures.bind(*attachments.dbDepth, TextureUnits::depthMap);
-    _graphicsContext.clearColorDepth();
-    _meshes.quadNDC().draw();
-}
-
 void Pipeline::drawOpaqueGeometry(IScene &scene, Attachments &attachments) {
-    // Set global uniforms
     auto camera = scene.camera();
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
@@ -460,44 +407,14 @@ void Pipeline::drawOpaqueGeometry(IScene &scene, Attachments &attachments) {
     uniforms.general.view = camera->view();
     uniforms.general.viewInv = glm::inverse(camera->view());
     uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
-    uniforms.general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
-    uniforms.general.fogNear = scene.fogNear();
-    uniforms.general.fogFar = scene.fogFar();
-    uniforms.general.fogColor = glm::vec4(scene.fogColor(), 1.0f);
-    if (scene.hasShadowLight()) {
-        glm::vec4 lightPosition(
-            scene.shadowLightPosition(),
-            scene.isShadowLightDirectional() ? 0.0f : 1.0f);
-        uniforms.general.shadowLightPosition = move(lightPosition);
-        uniforms.general.shadowStrength = scene.shadowStrength();
-        uniforms.general.shadowRadius = scene.shadowRadius();
-        for (int i = 0; i < kNumShadowLightSpace; ++i) {
-            uniforms.general.shadowLightSpace[i] = _shadowLightSpace[i];
-        }
-        for (int i = 0; i < 2; ++i) {
-            uniforms.general.shadowCascadeFarPlanes[i] = _shadowCascadeFarPlanes[i];
-        }
-    }
 
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbOpaqueGeometry->nameGL());
-    int numBuffers = _options.ssr ? 5 : 2;
-    glDrawBuffers(numBuffers, kColorAttachments);
-    _graphicsContext.clearColorDepth();
-    if (_options.ssao) {
-        _textures.bind(*attachments.cbSSAO, TextureUnits::ssao);
-    }
-    if (scene.hasShadowLight()) {
-        if (scene.isShadowLightDirectional()) {
-            _textures.bind(*attachments.dbDirectionalLightShadows, TextureUnits::shadowMap);
-        } else {
-            _textures.bind(*attachments.dbPointLightShadows, TextureUnits::cubeShadowMap);
-        }
-    }
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbGBuffer->nameGL());
+    glDrawBuffers(6, kColorAttachments);
+    _graphicsContext.clearDepth();
     scene.drawOpaque();
 }
 
 void Pipeline::drawTransparentGeometry(IScene &scene, Attachments &attachments) {
-    // Set global uniforms
     auto camera = scene.camera();
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
@@ -519,7 +436,6 @@ void Pipeline::drawTransparentGeometry(IScene &scene, Attachments &attachments) 
 }
 
 void Pipeline::drawLensFlares(IScene &scene, Framebuffer &dst) {
-    // Set global uniforms
     auto camera = scene.camera();
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
@@ -530,8 +446,24 @@ void Pipeline::drawLensFlares(IScene &scene, Framebuffer &dst) {
     scene.drawLensFlares();
 }
 
+void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments) {
+    auto camera = scene.camera();
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
+    uniforms.general.projection = camera->projection();
+    uniforms.general.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSAO->nameGL());
+    glDrawBuffer(kColorAttachments[0]);
+    _shaders.use(_shaders.ssao(), true);
+    _textures.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
+    _textures.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
+    _graphicsContext.clearColorDepth();
+    _meshes.quadNDC().draw();
+}
+
 void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments) {
-    // Set uniforms
     auto camera = scene.camera();
     auto screenProjection = glm::mat4(1.0f);
     screenProjection *= glm::scale(glm::vec3(dim.x, dim.y, 1.0f));
@@ -541,43 +473,93 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
-    uniforms.general.projectionInv = glm::inverse(camera->projection());
     uniforms.general.screenProjection = move(screenProjection);
     uniforms.general.screenResolution = glm::vec2(dim.x, dim.y);
     uniforms.general.screenResolutionReciprocal = glm::vec4(1.0f / dim.x, 1.0f / dim.y, 0.0f, 0.0f);
     uniforms.general.clipNear = camera->zNear();
     uniforms.general.clipFar = camera->zFar();
 
-    // Apply screen-space reflections to geometry color buffers
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSR->nameGL());
     glDrawBuffer(kColorAttachments[0]);
     _shaders.use(_shaders.ssr(), true);
-    _textures.bind(*attachments.cbOpaqueGeometry1);
-    _textures.bind(*attachments.dbOpaqueGeometry, TextureUnits::depthMap);
-    _textures.bind(*attachments.cbOpaqueGeometryEyeNormal, TextureUnits::eyeNormal);
-    _textures.bind(*attachments.cbOpaqueGeometryRoughness, TextureUnits::roughness);
+    _textures.bind(*attachments.cbGBufferDiffuse);
+    _textures.bind(*attachments.cbGBufferLightmap, TextureUnits::lightmap);
+    _textures.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);
+    _textures.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
+    _textures.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::drawCombineOpaque(Attachments &attachments, Framebuffer &dst) {
-    // Reset uniforms
+void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Framebuffer &dst) {
+    auto camera = scene.camera();
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
+    uniforms.general.featureMask = UniformsFeatureFlags::lighting;
+    if (_options.ssao) {
+        uniforms.general.featureMask |= UniformsFeatureFlags::ssao;
+    }
+    uniforms.general.viewInv = glm::inverse(camera->view());
+    uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
+    uniforms.general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
+    auto &lights = scene.activeLights();
+    uniforms.lighting.numLights = static_cast<int>(lights.size());
+    for (size_t i = 0; i < lights.size(); ++i) {
+        LightUniforms &shaderLight = uniforms.lighting.lights[i];
+        shaderLight.position = glm::vec4(lights[i]->getOrigin(), lights[i]->isDirectional() ? 0.0f : 1.0f);
+        shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
+        shaderLight.multiplier = lights[i]->multiplier() * lights[i]->strength();
+        shaderLight.radius = lights[i]->radius();
+        shaderLight.ambientOnly = static_cast<int>(lights[i]->modelNode().light()->ambientOnly);
+        shaderLight.dynamicType = lights[i]->modelNode().light()->dynamicType;
+    }
+    if (scene.hasShadowLight()) {
+        uniforms.general.featureMask |= UniformsFeatureFlags::shadows;
+        uniforms.general.shadowLightPosition = glm::vec4(scene.shadowLightPosition(), scene.isShadowLightDirectional() ? 0.0f : 1.0f);
+        uniforms.general.shadowStrength = scene.shadowStrength();
+        uniforms.general.shadowRadius = scene.shadowRadius();
+        for (int i = 0; i < kNumShadowLightSpace; ++i) {
+            uniforms.general.shadowLightSpace[i] = _shadowLightSpace[i];
+        }
+        for (int i = 0; i < 2; ++i) {
+            uniforms.general.shadowCascadeFarPlanes[i] = _shadowCascadeFarPlanes[i];
+        }
+    }
+    if (scene.isFogEnabled()) {
+        uniforms.general.featureMask |= UniformsFeatureFlags::fog;
+        uniforms.general.fogNear = scene.fogNear();
+        uniforms.general.fogFar = scene.fogFar();
+        uniforms.general.fogColor = glm::vec4(scene.fogColor(), 1.0f);
+    }
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
+    glDrawBuffers(2, kColorAttachments);
     _shaders.use(_shaders.combineOpaque(), true);
-    _textures.bind(*attachments.cbOpaqueGeometry1);
-    _textures.bind(*attachments.cbOpaqueGeometry2, TextureUnits::hilights);
-    _textures.bind(*attachments.cbOpaqueGeometryRoughness, TextureUnits::roughness);
-    _textures.bind(*attachments.cbSSR, TextureUnits::ssr);
+    _textures.bind(*attachments.cbGBufferDiffuse);
+    _textures.bind(*attachments.cbGBufferLightmap, TextureUnits::lightmap);
+    _textures.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);
+    _textures.bind(*attachments.cbGBufferSelfIllum, TextureUnits::selfIllumColor);
+    _textures.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
+    _textures.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
+    if (_options.ssao) {
+        _textures.bind(*attachments.cbSSAO, TextureUnits::ssao);
+    }
+    if (_options.ssr) {
+        _textures.bind(*attachments.cbSSR, TextureUnits::ssr);
+    }
+    if (scene.hasShadowLight()) {
+        if (scene.isShadowLightDirectional()) {
+            _textures.bind(*attachments.dbDirectionalLightShadows, TextureUnits::shadowMap);
+        } else {
+            _textures.bind(*attachments.dbPointLightShadows, TextureUnits::cubeShadowMap);
+        }
+    }
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
 void Pipeline::drawCombineOIT(Attachments &attachments, Framebuffer &dst) {
-    // Reset uniforms
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
@@ -585,14 +567,14 @@ void Pipeline::drawCombineOIT(Attachments &attachments, Framebuffer &dst) {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(_shaders.combineOIT(), true);
     _textures.bind(*attachments.cbOpaqueGeometry1);
+    _textures.bind(*attachments.cbOpaqueGeometry2, TextureUnits::hilights);
     _textures.bind(*attachments.cbTransparentGeometry1, TextureUnits::oitAccum);
     _textures.bind(*attachments.cbTransparentGeometry2, TextureUnits::oitRevealage);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::applyGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical) {
-    // Set uniforms
+void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical) {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
@@ -606,8 +588,7 @@ void Pipeline::applyGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Fra
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::applyMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong) {
-    // Reset uniforms
+void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong) {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
@@ -620,8 +601,7 @@ void Pipeline::applyMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Fra
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::applyFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
-    // Reset uniforms
+void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
@@ -657,6 +637,38 @@ void Pipeline::blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcC
         flagsGL |= GL_DEPTH_BUFFER_BIT;
     }
     glBlitFramebuffer(0, 0, dim.x, dim.y, 0, 0, dim.x, dim.y, flagsGL, GL_NEAREST);
+}
+
+void Pipeline::computeLightSpaceMatrices(IScene &scene) {
+    if (!scene.hasShadowLight()) {
+        return;
+    }
+    if (scene.isShadowLightDirectional()) {
+        auto camera = static_pointer_cast<PerspectiveCamera>(scene.camera());
+        auto lightDir = glm::normalize(camera->position() - scene.shadowLightPosition());
+        float fovy = camera->fovy();
+        float aspect = camera->aspect();
+        float cameraNear = camera->zNear();
+        float cameraFar = camera->zFar();
+        for (int i = 0; i < kNumShadowCascades; ++i) {
+            float near = cameraNear;
+            if (i > 0) {
+                near = cameraFar * g_shadowCascadeDivisors[i - 1];
+            }
+            float far = cameraFar;
+            if (i < kNumShadowCascades - 1) {
+                far *= g_shadowCascadeDivisors[i];
+            }
+            _shadowLightSpace[i] = computeDirectionalLightSpaceMatrix(fovy, aspect, near, far, lightDir, camera->view());
+            _shadowCascadeFarPlanes[i / 4][i % 4] = far;
+        }
+    } else {
+        glm::mat4 projection(glm::perspective(kPointLightShadowsFOV, 1.0f, kPointLightShadowsNearPlane, kPointLightShadowsFarPlane));
+        for (int i = 0; i < kNumCubeFaces; ++i) {
+            glm::mat4 lightView(getPointLightView(scene.shadowLightPosition(), static_cast<CubeMapFace>(i)));
+            _shadowLightSpace[i] = projection * lightView;
+        }
+    }
 }
 
 } // namespace graphics

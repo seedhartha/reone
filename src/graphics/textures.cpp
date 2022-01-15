@@ -84,11 +84,12 @@ void Textures::bind(Texture &texture, int unit) {
 void Textures::bindBuiltIn() {
     bind(*_defaultRGB, TextureUnits::mainTex);
     bind(*_defaultRGB, TextureUnits::lightmap);
+    bind(*_defaultRGB, TextureUnits::envmapColor);
+    bind(*_defaultRGB, TextureUnits::selfIllumColor);
     bind(*_defaultRGB, TextureUnits::bumpMap);
     bind(*_defaultRGB, TextureUnits::hilights);
-    bind(*_defaultRGB, TextureUnits::depthMap);
+    bind(*_defaultRGB, TextureUnits::eyePos);
     bind(*_defaultRGB, TextureUnits::eyeNormal);
-    bind(*_defaultRGB, TextureUnits::roughness);
     bind(*_defaultRGB, TextureUnits::ssao);
     bind(*_defaultRGB, TextureUnits::ssr);
     bind(*_noiseRGB, TextureUnits::noise);

@@ -77,7 +77,6 @@ public:
     void update(float dt);
 
     void drawShadows() override;
-    void drawDepth() override;
     void drawOpaque() override;
     void drawTransparent() override;
     void drawLensFlares() override;
@@ -111,10 +110,8 @@ public:
 
     // Lighting
 
-    std::vector<LightSceneNode *> computeClosestLights(int count, const std::function<bool(const LightSceneNode &, float)> &pred) const;
-
     const glm::vec3 &ambientLightColor() const override { return _ambientLightColor; }
-    const std::vector<LightSceneNode *> activeLights() const { return _activeLights; }
+    const std::vector<LightSceneNode *> activeLights() const override { return _activeLights; }
 
     void setAmbientLightColor(glm::vec3 color) { _ambientLightColor = std::move(color); }
 
@@ -122,7 +119,7 @@ public:
 
     // Fog
 
-    bool isFogEnabled() const { return _fogEnabled; }
+    bool isFogEnabled() const override { return _fogEnabled; }
 
     float fogNear() const override { return _fogNear; }
     float fogFar() const override { return _fogFar; }
@@ -271,6 +268,8 @@ private:
 
     void prepareOpaqueLeafs();
     void prepareTransparentLeafs();
+
+    std::vector<LightSceneNode *> computeClosestLights(int count, const std::function<bool(const LightSceneNode &, float)> &pred) const;
 };
 
 } // namespace scene

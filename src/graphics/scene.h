@@ -19,6 +19,16 @@
 
 namespace reone {
 
+// TODO: introduce graphics::Light
+
+namespace scene {
+
+class LightSceneNode;
+
+}
+
+// END TODO
+
 namespace graphics {
 
 struct Uniforms;
@@ -30,15 +40,17 @@ public:
     virtual ~IScene() = default;
 
     virtual void drawShadows() = 0;
-    virtual void drawDepth() = 0;
     virtual void drawOpaque() = 0;
     virtual void drawTransparent() = 0;
     virtual void drawLensFlares() = 0;
 
     virtual std::shared_ptr<Camera> camera() const = 0;
     virtual const glm::vec3 &ambientLightColor() const = 0;
+    virtual const std::vector<scene::LightSceneNode *> activeLights() const = 0;
 
     // Fog
+
+    virtual bool isFogEnabled() const = 0;
 
     virtual float fogNear() const = 0;
     virtual float fogFar() const = 0;
