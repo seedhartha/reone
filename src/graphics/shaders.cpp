@@ -386,8 +386,7 @@ vec3 linearToGamma(vec3 rgb) {
 static const string g_glslOIT = R"END(
 float OIT_getWeight(float depth, float alpha) {
     float eyeZ = (uClipNear * uClipFar) / ((uClipNear - uClipFar) * depth + uClipFar);
-    return alpha * (1.0 / max(0.01, abs(eyeZ)));
-    // return alpha * max(0.01, min(3000.0, 0.03 / (0.00001 + pow(abs(eyeZ) / 200.0, 4.0))));
+    return alpha * (1.0 / (1.0 + abs(eyeZ) / 100.0));
 }
 )END";
 
@@ -1256,7 +1255,7 @@ void main() {
     vec3 indirect = getLightingIndirect(worldPos, worldNormal);
     vec3 direct = getLightingDirect(worldPos, worldNormal, (lightmap == 1.0) ? LIGHT_DYNTYPE_AREA : LIGHT_DYNTYPE_BOTH);
     vec3 radiance = selfIllumSample.rgb + mix(
-        ssaoSample.r * indirect  + (1.0 - shadow) * direct,
+        ssaoSample.r * indirect + (1.0 - shadow) * direct,
         (1.0 - lightmapDirect) * ssaoSample.r * lightmapSample.rgb + lightmapDirect * (1.0 - shadow) * (lightmapSample.rgb + direct),
         lightmap);
 
