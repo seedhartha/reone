@@ -52,8 +52,6 @@ public:
     std::shared_ptr<Texture> defaultCubemapRGB() const { return _defaultCubemapRGB; }
     std::shared_ptr<Texture> defaultCubemapDepth() const { return _defaultCubemapDepth; }
 
-    std::shared_ptr<Texture> noiseRGB() const { return _noiseRGB; }
-
     // END Built-in
 
 private:
@@ -70,6 +68,8 @@ private:
     std::shared_ptr<Texture> _defaultCubemapRGB;
     std::shared_ptr<Texture> _defaultCubemapDepth;
 
+    std::shared_ptr<Texture> _ssaoRGB;
+    std::shared_ptr<Texture> _ssrRGBA;
     std::shared_ptr<Texture> _noiseRGB;
 
     // END Built-in
