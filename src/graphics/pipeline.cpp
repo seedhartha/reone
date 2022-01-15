@@ -35,7 +35,10 @@
 
 using namespace std;
 
-#define R_BLUR_VERTICAL true
+#define R_GAUSSIAN_BLUR_HORIZONTAL false
+#define R_GAUSSIAN_BLUR_VERTICAL true
+#define R_GAUSSIAN_BLUR_STRONG true
+
 #define R_MEDIAN_FILTER_STRONG true
 
 namespace reone {
@@ -169,12 +172,17 @@ void Pipeline::init() {
 
 void Pipeline::initAttachments(glm::ivec2 dim) {
     Attachments attachments;
+    auto halfDim = dim / 2;
 
     // Reusable attachments
 
     attachments.dbCommon = make_unique<Renderbuffer>();
     attachments.dbCommon->configure(dim.x, dim.y, PixelFormat::Depth32F);
     attachments.dbCommon->init();
+
+    attachments.dbCommonHalf = make_unique<Renderbuffer>();
+    attachments.dbCommonHalf->configure(halfDim.x, halfDim.y, PixelFormat::Depth32F);
+    attachments.dbCommonHalf->init();
 
     attachments.cbPing = make_unique<Texture>("ping_color", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbPing->clear(dim.x, dim.y, PixelFormat::RGBA8);
@@ -184,6 +192,14 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
     attachments.fbPing->attachColorDepth(attachments.cbPing, attachments.dbCommon);
     attachments.fbPing->init();
 
+    attachments.cbPingHalf = make_unique<Texture>("ping_color_half", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbPingHalf->clear(halfDim.x, halfDim.y, PixelFormat::RGBA8);
+    attachments.cbPingHalf->init();
+
+    attachments.fbPingHalf = make_unique<Framebuffer>();
+    attachments.fbPingHalf->attachColorDepth(attachments.cbPingHalf, attachments.dbCommonHalf);
+    attachments.fbPingHalf->init();
+
     attachments.cbPong = make_unique<Texture>("pong_color", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbPong->clear(dim.x, dim.y, PixelFormat::RGBA8);
     attachments.cbPong->init();
@@ -191,6 +207,14 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
     attachments.fbPong = make_unique<Framebuffer>();
     attachments.fbPong->attachColorDepth(attachments.cbPong, attachments.dbCommon);
     attachments.fbPong->init();
+
+    attachments.cbPongHalf = make_unique<Texture>("pong_color_half", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbPongHalf->clear(halfDim.x, halfDim.y, PixelFormat::RGBA8);
+    attachments.cbPongHalf->init();
+
+    attachments.fbPongHalf = make_unique<Framebuffer>();
+    attachments.fbPongHalf->attachColorDepth(attachments.cbPongHalf, attachments.dbCommonHalf);
+    attachments.fbPongHalf->init();
 
     // Directional light shadows framebuffer
 
@@ -286,21 +310,21 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
     // SSAO framebuffer
 
     attachments.cbSSAO = make_shared<Texture>("ssao_color", getTextureProperties(TextureUsage::ColorBuffer));
-    attachments.cbSSAO->clear(dim.x, dim.y, PixelFormat::R8);
+    attachments.cbSSAO->clear(halfDim.x, halfDim.y, PixelFormat::R8);
     attachments.cbSSAO->init();
 
     attachments.fbSSAO = make_shared<Framebuffer>();
-    attachments.fbSSAO->attachColorDepth(attachments.cbSSAO, attachments.dbCommon);
+    attachments.fbSSAO->attachColorDepth(attachments.cbSSAO, attachments.dbCommonHalf);
     attachments.fbSSAO->init();
 
     // SSR framebuffer
 
     attachments.cbSSR = make_unique<Texture>("ssr_color", getTextureProperties(TextureUsage::ColorBuffer));
-    attachments.cbSSR->clear(dim.x, dim.y, PixelFormat::RGBA8);
+    attachments.cbSSR->clear(halfDim.x, halfDim.y, PixelFormat::RGBA8);
     attachments.cbSSR->init();
 
     attachments.fbSSR = make_shared<Framebuffer>();
-    attachments.fbSSR->attachColorDepth(attachments.cbSSR, attachments.dbCommon);
+    attachments.fbSSR->attachColorDepth(attachments.cbSSR, attachments.dbCommonHalf);
     attachments.fbSSR->init();
 
     // Output framebuffer
@@ -338,22 +362,25 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
 
         // Screen-space effects
 
-        if (_options.ssao) {
-            drawSSAO(scene, dim, attachments);
-            drawMedianFilter(dim, *attachments.cbSSAO, *attachments.fbPing, R_MEDIAN_FILTER_STRONG);
-            blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbSSAO, 0);
-        }
-        if (_options.ssr) {
-            drawSSR(scene, dim, attachments);
-            drawGaussianBlur(dim, *attachments.cbSSR, *attachments.fbPing);
-            drawGaussianBlur(dim, *attachments.cbPing, *attachments.fbSSR, R_BLUR_VERTICAL);
-        }
+        auto halfDim = dim / 2;
+        _graphicsContext.withViewport(glm::ivec4(0, 0, halfDim.x, halfDim.y), [this, &scene, &halfDim, &attachments]() {
+            if (_options.ssao) {
+                drawSSAO(scene, halfDim, attachments);
+                drawMedianFilter(halfDim, *attachments.cbSSAO, *attachments.fbPingHalf, R_MEDIAN_FILTER_STRONG);
+                blitFramebuffer(halfDim, *attachments.fbPingHalf, 0, *attachments.fbSSAO, 0);
+            }
+            if (_options.ssr) {
+                drawSSR(scene, halfDim, attachments);
+                drawGaussianBlur(halfDim, *attachments.cbSSR, *attachments.fbPingHalf, R_GAUSSIAN_BLUR_HORIZONTAL, R_GAUSSIAN_BLUR_STRONG);
+                drawGaussianBlur(halfDim, *attachments.cbPingHalf, *attachments.fbSSR, R_GAUSSIAN_BLUR_VERTICAL, R_GAUSSIAN_BLUR_STRONG);
+            }
+        });
 
         // END Screen-space effects
 
         drawCombineOpaque(scene, attachments, *attachments.fbOpaqueGeometry);
-        drawGaussianBlur(dim, *attachments.cbOpaqueGeometry2, *attachments.fbPing);
-        drawGaussianBlur(dim, *attachments.cbPing, *attachments.fbPong, R_BLUR_VERTICAL);
+        drawGaussianBlur(dim, *attachments.cbOpaqueGeometry2, *attachments.fbPing, R_GAUSSIAN_BLUR_HORIZONTAL);
+        drawGaussianBlur(dim, *attachments.cbPing, *attachments.fbPong, R_GAUSSIAN_BLUR_VERTICAL);
         blitFramebuffer(dim, *attachments.fbPong, 0, *attachments.fbOpaqueGeometry, 1);
 
         // END Opaque geometry
@@ -574,7 +601,7 @@ void Pipeline::drawCombineOIT(Attachments &attachments, Framebuffer &dst) {
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical) {
+void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong) {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
@@ -582,7 +609,7 @@ void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Fram
     uniforms.general.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(_shaders.gaussianBlur(), true);
+    _shaders.use(strong ? _shaders.gaussianBlur13() : _shaders.gaussianBlur9(), true);
     _textures.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
