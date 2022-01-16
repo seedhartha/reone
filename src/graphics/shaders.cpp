@@ -238,10 +238,7 @@ vec3 getNormalFromHeightMap(sampler2D tex, vec2 uv, mat3 TBN) {
 )END";
 
 static const string g_glslLighting = R"END(
-// const float SHININESS = 8.0;
-
 const float PI = radians(180.0);
-const float F0 = 0.03;
 
 const float ATTENUATION_LINEAR = 0.0;
 const float ATTENUATION_QUADRATIC = 1.0;
@@ -250,13 +247,13 @@ const int LIGHT_DYNTYPE_AREA = 1;
 const int LIGHT_DYNTYPE_OBJECT = 2;
 const int LIGHT_DYNTYPE_BOTH = LIGHT_DYNTYPE_AREA | LIGHT_DYNTYPE_OBJECT;
 
-float getAttenuation(vec3 fragPos, Light light, float L, float Q) {
+float getAttenuation(vec3 worldPos, Light light, float L, float Q) {
     if (light.position.w == 0.0) return light.multiplier;
 
     float D = light.radius;
     float DD = D * D;
 
-    float r = length(light.position.xyz - fragPos);
+    float r = length(light.position.xyz - worldPos);
     float rr = r * r;
 
     return light.multiplier * (D / (D + L * r)) * (DD / (DD + Q * rr));
@@ -285,12 +282,13 @@ float BRDF_geometrySmith(float NdotL, float NdotV, float roughness) {
     return BRDF_geometryShlick(NdotL, k) * BRDF_geometryShlick(NdotV, k);
 }
 
-vec3 getLightingDirect(vec3 worldPos, vec3 normal, float roughness, int dynTypeMask) {
+vec3 getLightingDirect(vec3 worldPos, vec3 normal, vec3 albedo, float metallic, float roughness, int dynTypeMask) {
     vec3 radiance = vec3(0.0);
 
     vec3 V = normalize(uCameraPosition.xyz - worldPos);
     float NdotV = max(0.0, dot(normal, V));
 
+    vec3 F0 = mix(vec3(0.04), albedo, metallic);
     float alpha2 = roughness * roughness;
 
     for (int i = 0; i < uNumLights; ++i) {
@@ -305,18 +303,15 @@ vec3 getLightingDirect(vec3 worldPos, vec3 normal, float roughness, int dynTypeM
         float NdotH = max(0.0, dot(normal, H));
         float VdotH = max(0.0, dot(V, H));
 
-        // float diffuse = NdotL;
-        // float specular = pow(NdotH, SHININESS);
-
         float NdotH2 = NdotH * NdotH;
         float D = alpha2 / (PI * pow(NdotH2 * (alpha2 - 1.0) + 1.0, 2.0));
         float G = BRDF_geometrySmith(NdotL, NdotV, roughness);
-        float F = F0 + (1.0 - F0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
+        vec3 F = F0 + (1.0 - F0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
 
-        float diffuse = 1.0 - F;
-        float specular = (D * G * F) / ((4.0 * NdotL * NdotV) + 0.0001);
+        vec3 diffuse = 1.0 - F;
+        diffuse *= 1.0 - metallic;
 
-        // radiance += uLights[i].color.rgb * attenuation * (diffuse + specular);
+        vec3 specular = (D * G * F) / ((4.0 * NdotL * NdotV) + 0.0001);
 
         radiance += uLights[i].color.rgb * attenuation * (diffuse + specular) * NdotL;
     }
@@ -1298,14 +1293,16 @@ void main() {
     if ((features & 2) != 0) {
         fog = getFog(worldPos);
     }
-    float lightmap = step(0.0001, lightmapSample.a);
-    float roughness = 1.0 - clamp(mainTexSample.a, 0.001, 0.999);
+    float envmapped = step(0.0001, envmapSample.a);
+    float lightmapped = step(0.0001, lightmapSample.a);
+    float metallic = mix(0.0, 1.0 - mainTexSample.a, envmapped);
+    float roughness = 1.0 - clamp(mix(0.0, mainTexSample.a, envmapped), 0.001, 0.999);
     vec3 indirect = getLightingIndirect(worldPos, worldNormal);
-    vec3 direct = getLightingDirect(worldPos, worldNormal, roughness, (lightmap == 1.0) ? LIGHT_DYNTYPE_AREA : LIGHT_DYNTYPE_BOTH);
+    vec3 direct = getLightingDirect(worldPos, worldNormal, mainTexSample.rgb, metallic, roughness, (lightmapped == 1.0) ? LIGHT_DYNTYPE_AREA : LIGHT_DYNTYPE_BOTH);
     vec3 radiance = selfIllumSample.rgb + mix(
         ssaoSample.r * indirect + (1.0 - shadow) * direct,
         (ssaoSample.r * 0.5 + 0.5) * (1.0 - 0.5 * shadow) * lightmapSample.rgb + (1.0 - shadow) * direct,
-        lightmap);
+        lightmapped);
 
     vec3 color = mainTexSample.rgb;
     color *= clamp(radiance, 0.0, 1.0);

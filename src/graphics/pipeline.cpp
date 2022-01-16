@@ -437,7 +437,7 @@ void Pipeline::drawOpaqueGeometry(IScene &scene, Attachments &attachments) {
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbGBuffer->nameGL());
     glDrawBuffers(6, kColorAttachments);
-    _graphicsContext.clearDepth();
+    _graphicsContext.clearColorDepth();
     scene.drawOpaque();
 }
 
