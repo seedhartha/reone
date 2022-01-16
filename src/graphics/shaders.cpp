@@ -278,20 +278,30 @@ float getAttenuation(vec3 worldPos, Light light, float L, float Q) {
     return (D / (D + L * r)) * (DD / (DD + Q * rr));
 }
 
-vec3 getIrradianceAmbient(vec3 worldPos) {
-    vec3 irradiance = uWorldAmbientColor.rgb;
+vec3 getIrradianceAmbient(vec3 worldPos, vec3 normal, vec3 albedo, vec3 environment, float metallic, float roughness) {
+    vec3 ambient = uWorldAmbientColor.rgb + environment;
 
     for (int i = 0; i < uNumLights; ++i) {
         if (!uLights[i].ambientOnly) continue;
 
         vec3 fragToLight = uLights[i].position.xyz - worldPos;
-        if (length(fragToLight) > uLights[i].radius) continue;
+        if (length(fragToLight) > uLights[i].radius * uLights[i].radius) continue;
 
         float attenuation = getAttenuation(worldPos, uLights[i], ATTENUATION_LINEAR, ATTENUATION_QUADRATIC);
-        irradiance += uLights[i].multiplier * uLights[i].color.rgb * attenuation;
+        ambient += uLights[i].multiplier * uLights[i].color.rgb * attenuation;
     }
 
-    return irradiance;
+    vec3 V = normalize(uCameraPosition.xyz - worldPos);
+    float NdotV = max(0.0, dot(normal, V));
+
+    vec3 F0 = mix(vec3(0.04), albedo, metallic);
+    vec3 F = BRDF_fresnelSchlick(NdotV, F0);
+
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= 1.0 - metallic;
+
+    return (kD / PI) * ambient;
 }
 
 void getIrradianceDirect(
@@ -313,7 +323,7 @@ void getIrradianceDirect(
         if (uLights[i].ambientOnly || ((uLights[i].dynamicType & dynTypeMask) == 0)) continue;
 
         vec3 fragToLight = uLights[i].position.xyz - worldPos;
-        if (length(fragToLight) > uLights[i].radius) continue;
+        if (length(fragToLight) > uLights[i].radius * uLights[i].radius) continue;
 
         float attenuation = getAttenuation(worldPos, uLights[i], ATTENUATION_LINEAR, ATTENUATION_QUADRATIC);
         vec3 radiance = uLights[i].multiplier * uLights[i].color.rgb * attenuation;
@@ -1317,12 +1327,12 @@ void main() {
     }
 
     vec3 albedo = gammaToLinear(mainTexSample.rgb);
-    vec3 environment = mix(envmapSample.rgb, ssrSample.rgb, ssrSample.a);
+    vec3 environment = gammaToLinear(mix(envmapSample.rgb, ssrSample.rgb, ssrSample.a));
     float ao = ssaoSample.r;
     float metallic = mix(0.0, 1.0 - mainTexSample.a, envmapped);
     float roughness = clamp(mix(1.0, mainTexSample.a, envmapped), 0.001, 0.999);
 
-    vec3 ambient = getIrradianceAmbient(worldPos);
+    vec3 ambient = getIrradianceAmbient(worldPos, worldNormal, albedo, environment, metallic, roughness);
     vec3 emission = selfIllumSample.rgb;
 
     vec3 diffuse;
@@ -1330,11 +1340,11 @@ void main() {
     getIrradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, (lightmapped == 1.0) ? LIGHT_DYNTYPE_AREA : LIGHT_DYNTYPE_BOTH, diffuse, specular);
 
     vec3 color = mix(
-        clamp(ambient * ao + (1.0 - shadow) * diffuse + emission, 0.0, 1.0) * albedo + (1.0 - shadow) * specular,
+        clamp(ao * ambient + (1.0 - shadow) * diffuse + emission, 0.0, 1.0) * albedo + (1.0 - shadow) * specular,
         (ao * (1.0 - 0.5 * shadow) * gammaToLinear(lightmapSample.rgb) + (1.0 - shadow) * diffuse + emission) * albedo + (1.0 - shadow) * specular,
         lightmapped);
+    color += mix(vec3(0.0), (1.0 - mainTexSample.a) * ao * environment, lightmapped);
     color = linearToGamma(color);
-    color += environment * (1.0 - mainTexSample.a);
     color = mix(color, uFogColor.rgb, fog);
 
     vec3 hilights = smoothstep(SELFILLUM_THRESHOLD, 1.0, selfIllumSample.rgb * mainTexSample.rgb * mainTexSample.a);
@@ -1535,7 +1545,7 @@ void Shaders::init() {
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
     auto fsSSAO = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslSSAOUniforms, g_glslHash, g_fsSSAO});
     auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSR});
-    auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslLighting, g_glslShadowMapping, g_glslGammaCorrection, g_glslFog, g_fsCombineOpaque});
+    auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslGammaCorrection, g_glslLighting, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
     auto fsCombineOIT = initShader(ShaderType::Fragment, {g_glslHeader, g_fsCombineOIT});
     auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur9});
     auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur13});
