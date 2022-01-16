@@ -256,8 +256,9 @@ float BRDF_geometryShlick(float NdotV, float k) {
     return NdotV / (NdotV * (1.0 - k) + k);
 }
 
-float BRDF_geometrySmith(float NdotL, float NdotV, float a) {
-    float k = 0.5 * a;
+float BRDF_geometrySmith(float NdotL, float NdotV, float roughness) {
+    float k = roughness + 1.0;
+    k *= k / 8.0;
     return BRDF_geometryShlick(NdotL, k) * BRDF_geometryShlick(NdotV, k);
 }
 
@@ -325,14 +326,14 @@ void getIrradianceDirect(
         float VdotH = max(0.0, dot(V, H));
 
         float D = BRDF_distributionGGX(NdotH, a2);
-        float G = BRDF_geometrySmith(NdotL, NdotV, a);
+        float G = BRDF_geometrySmith(NdotL, NdotV, roughness);
         vec3 F = BRDF_fresnelSchlick(VdotH, F0);
         vec3 spec = (D * G * F) / ((4.0 * NdotL * NdotV) + 0.0001);
 
-        vec3 diff = vec3(1.0) - F;
-        diff *= 1.0 - metallic;
+        vec3 kD = vec3(1.0) - F;
+        kD *= 1.0 - metallic;
 
-        diffuse += diff * radiance * NdotL;
+        diffuse += (kD / PI) * radiance * NdotL;
         specular += spec * radiance * NdotL;
     }
 }
