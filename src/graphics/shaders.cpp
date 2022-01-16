@@ -1298,14 +1298,13 @@ void main() {
     if ((features & 2) != 0) {
         fog = getFog(worldPos);
     }
-    float roughness = 1.0 - clamp(mainTexSample.a, 0.001, 0.999);
     float lightmap = step(0.0001, lightmapSample.a);
-    float lightmapDirect = clamp(rgbToLuma(lightmapSample.rgb) - rgbToLuma(uWorldAmbientColor.rgb), 0.2, 0.8);
+    float roughness = 1.0 - clamp(mainTexSample.a, 0.001, 0.999);
     vec3 indirect = getLightingIndirect(worldPos, worldNormal);
     vec3 direct = getLightingDirect(worldPos, worldNormal, roughness, (lightmap == 1.0) ? LIGHT_DYNTYPE_AREA : LIGHT_DYNTYPE_BOTH);
     vec3 radiance = selfIllumSample.rgb + mix(
         ssaoSample.r * indirect + (1.0 - shadow) * direct,
-        (1.0 - lightmapDirect) * ssaoSample.r * lightmapSample.rgb + lightmapDirect * (1.0 - shadow) * (lightmapSample.rgb + direct),
+        (ssaoSample.r * 0.5 + 0.5) * (1.0 - 0.5 * shadow) * lightmapSample.rgb + (1.0 - shadow) * direct,
         lightmap);
 
     vec3 color = mainTexSample.rgb;
@@ -1511,7 +1510,7 @@ void Shaders::init() {
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
     auto fsSSAO = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslSSAOUniforms, g_glslHash, g_fsSSAO});
     auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSR});
-    auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslLuma, g_glslLighting, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
+    auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslLighting, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
     auto fsCombineOIT = initShader(ShaderType::Fragment, {g_glslHeader, g_fsCombineOIT});
     auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur9});
     auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur13});
