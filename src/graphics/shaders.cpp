@@ -238,7 +238,10 @@ vec3 getNormalFromHeightMap(sampler2D tex, vec2 uv, mat3 TBN) {
 )END";
 
 static const string g_glslLighting = R"END(
-const float SHININESS = 8.0;
+// const float SHININESS = 8.0;
+
+const float PI = radians(180.0);
+const float F0 = 0.03;
 
 const float ATTENUATION_LINEAR = 0.0;
 const float ATTENUATION_QUADRATIC = 1.0;
@@ -273,24 +276,49 @@ vec3 getLightingIndirect(vec3 worldPos, vec3 normal) {
     return radiance;
 }
 
-vec3 getLightingDirect(vec3 worldPos, vec3 normal, int dynTypeMask) {
+float BRDF_geometryShlick(float NdotV, float k) {
+    return NdotV / (NdotV * (1.0 - k) + k);
+}
+
+float BRDF_geometrySmith(float NdotL, float NdotV, float roughness) {
+    float k = 0.5 * roughness;
+    return BRDF_geometryShlick(NdotL, k) * BRDF_geometryShlick(NdotV, k);
+}
+
+vec3 getLightingDirect(vec3 worldPos, vec3 normal, float roughness, int dynTypeMask) {
     vec3 radiance = vec3(0.0);
+
     vec3 V = normalize(uCameraPosition.xyz - worldPos);
+    float NdotV = max(0.0, dot(normal, V));
+
+    float alpha2 = roughness * roughness;
 
     for (int i = 0; i < uNumLights; ++i) {
         if (uLights[i].ambientOnly || ((uLights[i].dynamicType & dynTypeMask) == 0)) continue;
+
+        float attenuation = getAttenuation(worldPos, uLights[i], ATTENUATION_LINEAR, ATTENUATION_QUADRATIC);
 
         vec3 L = normalize(uLights[i].position.xyz - worldPos);
         vec3 H = normalize(V + L);
 
         float NdotL = max(0.0, dot(normal, L));
         float NdotH = max(0.0, dot(normal, H));
+        float VdotH = max(0.0, dot(V, H));
 
-        float diffuse = NdotL;
-        float specular = pow(NdotH, SHININESS);
-        float attenuation = getAttenuation(worldPos, uLights[i], ATTENUATION_LINEAR, ATTENUATION_QUADRATIC);
+        // float diffuse = NdotL;
+        // float specular = pow(NdotH, SHININESS);
 
-        radiance += uLights[i].color.rgb * (diffuse + specular) * attenuation;
+        float NdotH2 = NdotH * NdotH;
+        float D = alpha2 / (PI * pow(NdotH2 * (alpha2 - 1.0) + 1.0, 2.0));
+        float G = BRDF_geometrySmith(NdotL, NdotV, roughness);
+        float F = F0 + (1.0 - F0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
+
+        float diffuse = 1.0 - F;
+        float specular = (D * G * F) / ((4.0 * NdotL * NdotV) + 0.0001);
+
+        // radiance += uLights[i].color.rgb * attenuation * (diffuse + specular);
+
+        radiance += uLights[i].color.rgb * attenuation * (diffuse + specular) * NdotL;
     }
 
     return radiance;
@@ -1270,10 +1298,11 @@ void main() {
     if ((features & 2) != 0) {
         fog = getFog(worldPos);
     }
-    float lightmap = step(0.00001, lightmapSample.a);
+    float roughness = 1.0 - clamp(mainTexSample.a, 0.001, 0.999);
+    float lightmap = step(0.0001, lightmapSample.a);
     float lightmapDirect = clamp(rgbToLuma(lightmapSample.rgb) - rgbToLuma(uWorldAmbientColor.rgb), 0.2, 0.8);
     vec3 indirect = getLightingIndirect(worldPos, worldNormal);
-    vec3 direct = getLightingDirect(worldPos, worldNormal, (lightmap == 1.0) ? LIGHT_DYNTYPE_AREA : LIGHT_DYNTYPE_BOTH);
+    vec3 direct = getLightingDirect(worldPos, worldNormal, roughness, (lightmap == 1.0) ? LIGHT_DYNTYPE_AREA : LIGHT_DYNTYPE_BOTH);
     vec3 radiance = selfIllumSample.rgb + mix(
         ssaoSample.r * indirect + (1.0 - shadow) * direct,
         (1.0 - lightmapDirect) * ssaoSample.r * lightmapSample.rgb + lightmapDirect * (1.0 - shadow) * (lightmapSample.rgb + direct),
@@ -1285,7 +1314,7 @@ void main() {
     color = mix(color, uFogColor.rgb, fog);
 
     vec3 hilights = smoothstep(SELFILLUM_THRESHOLD, 1.0, selfIllumSample.rgb * mainTexSample.rgb * mainTexSample.a);
-    float alpha = step(0.00001, mainTexSample.a);
+    float alpha = step(0.0001, mainTexSample.a);
 
     fragColor1 = vec4(color, alpha);
     fragColor2 = vec4(hilights, 0.0);
