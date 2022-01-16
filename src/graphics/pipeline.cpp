@@ -379,8 +379,8 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
         // END Screen-space effects
 
         drawCombineOpaque(scene, attachments, *attachments.fbOpaqueGeometry);
-        drawGaussianBlur(dim, *attachments.cbOpaqueGeometry2, *attachments.fbPing, R_GAUSSIAN_BLUR_HORIZONTAL);
-        drawGaussianBlur(dim, *attachments.cbPing, *attachments.fbPong, R_GAUSSIAN_BLUR_VERTICAL);
+        drawGaussianBlur(dim, *attachments.cbOpaqueGeometry2, *attachments.fbPing, R_GAUSSIAN_BLUR_HORIZONTAL, R_GAUSSIAN_BLUR_STRONG);
+        drawGaussianBlur(dim, *attachments.cbPing, *attachments.fbPong, R_GAUSSIAN_BLUR_VERTICAL, R_GAUSSIAN_BLUR_STRONG);
         blitFramebuffer(dim, *attachments.fbPong, 0, *attachments.fbOpaqueGeometry, 1);
 
         // END Opaque geometry
