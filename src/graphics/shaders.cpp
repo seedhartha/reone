@@ -237,7 +237,7 @@ vec3 getNormalFromHeightMap(sampler2D tex, vec2 uv, mat3 TBN) {
 }
 )END";
 
-static const string g_glslBlinnPhong = R"END(
+static const string g_glslLighting = R"END(
 const float SHININESS = 8.0;
 
 const float ATTENUATION_LINEAR = 0.0;
@@ -260,24 +260,21 @@ float getAttenuation(vec3 fragPos, Light light, float L, float Q) {
 }
 
 vec3 getLightingIndirect(vec3 worldPos, vec3 normal) {
-    vec3 result = uWorldAmbientColor.rgb;
+    vec3 radiance = uWorldAmbientColor.rgb;
 
     for (int i = 0; i < uNumLights; ++i) {
         if (!uLights[i].ambientOnly) continue;
 
-        vec3 ambient = uLights[i].color.rgb;
-
         float attenuation = getAttenuation(worldPos, uLights[i], ATTENUATION_LINEAR, ATTENUATION_QUADRATIC);
-        ambient *= attenuation;
 
-        result += ambient;
+        radiance += uLights[i].color.rgb * attenuation;
     }
 
-    return result;
+    return radiance;
 }
 
 vec3 getLightingDirect(vec3 worldPos, vec3 normal, int dynTypeMask) {
-    vec3 result = vec3(0.0);
+    vec3 radiance = vec3(0.0);
     vec3 V = normalize(uCameraPosition.xyz - worldPos);
 
     for (int i = 0; i < uNumLights; ++i) {
@@ -286,20 +283,17 @@ vec3 getLightingDirect(vec3 worldPos, vec3 normal, int dynTypeMask) {
         vec3 L = normalize(uLights[i].position.xyz - worldPos);
         vec3 H = normalize(V + L);
 
-        vec3 diff = vec3(max(dot(L, normal), 0.0)); // * uDiffuseColor.rgb;
-        vec3 diffuse = uLights[i].color.rgb * diff;
+        float NdotL = max(0.0, dot(normal, L));
+        float NdotH = max(0.0, dot(normal, H));
 
-        float spec = pow(max(dot(normal, H), 0.0), SHININESS);
-        vec3 specular = uLights[i].color.rgb * spec;
-
+        float diffuse = NdotL;
+        float specular = pow(NdotH, SHININESS);
         float attenuation = getAttenuation(worldPos, uLights[i], ATTENUATION_LINEAR, ATTENUATION_QUADRATIC);
-        diffuse *= attenuation;
-        specular *= attenuation;
 
-        result += diffuse + specular;
+        radiance += uLights[i].color.rgb * (diffuse + specular) * attenuation;
     }
 
-    return min(vec3(1.0), result);
+    return radiance;
 }
 )END";
 
@@ -1488,7 +1482,7 @@ void Shaders::init() {
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
     auto fsSSAO = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslSSAOUniforms, g_glslHash, g_fsSSAO});
     auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSR});
-    auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslLuma, g_glslBlinnPhong, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
+    auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslLuma, g_glslLighting, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
     auto fsCombineOIT = initShader(ShaderType::Fragment, {g_glslHeader, g_fsCombineOIT});
     auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur9});
     auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur13});
