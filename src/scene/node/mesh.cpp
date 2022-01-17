@@ -284,7 +284,7 @@ void MeshSceneNode::draw() {
                 continue;
             }
             auto bone = _model.getNodeByNumber(nodeNumber);
-            if (!bone || bone->type() != SceneNodeType::Mesh) {
+            if (!bone) {
                 continue;
             }
             uniforms.skeletal.bones[i] = _modelNode->absoluteTransformInverse() *
