@@ -55,17 +55,6 @@ void Textures::init() {
     _defaultArrayDepth->clear(1, 1, PixelFormat::Depth32F, kNumShadowCascades);
     _defaultArrayDepth->init();
 
-    auto noisePixels = make_shared<ByteArray>();
-    noisePixels->resize(4 * 32);
-    for (int i = 0; i < 32; ++i) {
-        float *val = reinterpret_cast<float *>(&(*noisePixels)[4 * i]);
-        (*val) = random(-1.0f, 1.0f);
-    }
-    auto noiseLayer = Texture::Layer {move(noisePixels)};
-    _noiseRGB = make_shared<Texture>("noise_rgb", getTextureProperties(TextureUsage::Noise));
-    _noiseRGB->setPixels(4, 4, PixelFormat::RG16F, move(noiseLayer));
-    _noiseRGB->init();
-
     auto ssaoPixels = make_shared<ByteArray>();
     ssaoPixels->resize(3);
     (*ssaoPixels)[0] = 0xff;
@@ -111,11 +100,10 @@ void Textures::bindBuiltIn() {
     bind(*_defaultRGB, TextureUnits::hilights);
     bind(*_defaultRGB, TextureUnits::eyePos);
     bind(*_defaultRGB, TextureUnits::eyeNormal);
+    bind(*_defaultRGB, TextureUnits::oitAccum);
+    bind(*_defaultRGB, TextureUnits::oitRevealage);
     bind(*_ssaoRGB, TextureUnits::ssao);
     bind(*_ssrRGBA, TextureUnits::ssr);
-    bind(*_noiseRGB, TextureUnits::noise);
-    bind(*_noiseRGB, TextureUnits::oitAccum);
-    bind(*_noiseRGB, TextureUnits::oitRevealage);
     bind(*_defaultCubemapRGB, TextureUnits::environmentMap);
     bind(*_defaultCubemapDepth, TextureUnits::cubeShadowMap);
     bind(*_defaultArrayDepth, TextureUnits::shadowMap);

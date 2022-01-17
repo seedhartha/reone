@@ -259,7 +259,7 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
     attachments.cbGBufferEyePos->init();
 
     attachments.cbGBufferEyeNormal = make_unique<Texture>("gbuffer_color_eyenormal", getTextureProperties(TextureUsage::ColorBuffer));
-    attachments.cbGBufferEyeNormal->clear(dim.x, dim.y, PixelFormat::RGB8);
+    attachments.cbGBufferEyeNormal->clear(dim.x, dim.y, PixelFormat::RGB16F);
     attachments.cbGBufferEyeNormal->init();
 
     attachments.dbGBuffer = make_shared<Renderbuffer>();
@@ -366,7 +366,7 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
         _graphicsContext.withViewport(glm::ivec4(0, 0, halfDim.x, halfDim.y), [this, &scene, &halfDim, &attachments]() {
             if (_options.ssao) {
                 drawSSAO(scene, halfDim, attachments);
-                drawMedianFilter(halfDim, *attachments.cbSSAO, *attachments.fbPingHalf, R_MEDIAN_FILTER_STRONG);
+                drawMedianFilter(halfDim, *attachments.cbSSAO, *attachments.fbPingHalf);
                 blitFramebuffer(halfDim, *attachments.fbPingHalf, 0, *attachments.fbSSAO, 0);
             }
             if (_options.ssr) {
