@@ -510,10 +510,10 @@ void main() {
     vec4 N = vec4(aNormal, 0.0);
 
     if (isFeatureEnabled(FEATURE_SKELETAL)) {
-        int i1 = 1 + int(aBoneIndices[0]);
-        int i2 = 1 + int(aBoneIndices[1]);
-        int i3 = 1 + int(aBoneIndices[2]);
-        int i4 = 1 + int(aBoneIndices[3]);
+        int i1 = max(0, int(aBoneIndices[0]));
+        int i2 = max(0, int(aBoneIndices[1]));
+        int i3 = max(0, int(aBoneIndices[2]));
+        int i4 = max(0, int(aBoneIndices[3]));
 
         float w1 = aBoneWeights[0];
         float w2 = aBoneWeights[1];
