@@ -698,21 +698,22 @@ void MdlReader::readControllers(uint32_t keyOffset, uint32_t keyCount, const vec
 
 void MdlReader::prepareSkinMeshes() {
     for (auto &node : _nodes) {
-        if (!node->isSkinMesh())
+        if (!node->isSkinMesh()) {
             continue;
-
-        shared_ptr<ModelNode::Skin> skin(node->mesh()->skin);
+        }
+        auto skin = node->mesh()->skin;
         for (size_t i = 0; i < skin->boneMap.size(); ++i) {
             auto boneIdx = static_cast<uint16_t>(skin->boneMap[i]);
             if (boneIdx >= skin->boneNodeNumber.size()) {
                 skin->boneSerial.resize(boneIdx + 1);
                 skin->boneNodeNumber.resize(boneIdx + 1);
             }
-            if (boneIdx != 0xffff) {
-                shared_ptr<ModelNode> boneNode(_nodes[i]);
-                skin->boneSerial[boneIdx] = i;
-                skin->boneNodeNumber[boneIdx] = boneNode->number();
+            if (boneIdx == 0xffff) {
+                continue;
             }
+            auto boneNode = _nodes[i];
+            skin->boneSerial[boneIdx] = i;
+            skin->boneNodeNumber[boneIdx] = boneNode->number();
         }
     }
 }
