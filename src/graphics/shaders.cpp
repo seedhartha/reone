@@ -240,13 +240,6 @@ vec3 getNormalFromHeightMap(sampler2D tex, vec2 uv, mat3 TBN) {
 static const string g_glslLighting = R"END(
 const float PI = radians(180.0);
 
-const float ATTENUATION_LINEAR = 0.0;
-const float ATTENUATION_QUADRATIC = 1.0;
-
-const int LIGHT_DYNTYPE_AREA = 1;
-const int LIGHT_DYNTYPE_OBJECT = 2;
-const int LIGHT_DYNTYPE_BOTH = LIGHT_DYNTYPE_AREA | LIGHT_DYNTYPE_OBJECT;
-
 float BRDF_distributionGGX(float NdotH, float a2) {
     float NdotH2 = NdotH * NdotH;
     return a2 / (PI * pow(NdotH2 * (a2 - 1.0) + 1.0, 2.0));
@@ -256,9 +249,7 @@ float BRDF_geometryShlick(float NdotV, float k) {
     return NdotV / (NdotV * (1.0 - k) + k);
 }
 
-float BRDF_geometrySmith(float NdotL, float NdotV, float roughness) {
-    float k = roughness + 1.0;
-    k *= k / 8.0;
+float BRDF_geometrySmith(float NdotL, float NdotV, float k) {
     return BRDF_geometryShlick(NdotL, k) * BRDF_geometryShlick(NdotV, k);
 }
 
@@ -266,20 +257,28 @@ vec3 BRDF_fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
-float getAttenuation(vec3 worldPos, Light light, float L, float Q) {
-    if (light.position.w == 0.0) return 1.0;
-
-    float D = light.radius;
-    float DD = D * D;
-
-    float r = length(light.position.xyz - worldPos);
-    float rr = r * r;
-
-    return (D / (D + L * r)) * (DD / (DD + Q * rr));
+vec3 BRDF_fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
+    return F0 + (max(F0, vec3(1.0 - roughness)) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
-vec3 getIrradianceAmbient(vec3 worldPos, vec3 normal, vec3 albedo, vec3 environment, float metallic, float roughness) {
-    vec3 ambient = uWorldAmbientColor.rgb + environment;
+float getLightAttenuation(Light light, vec3 worldPos) {
+    float radius = light.radius;
+    float radius2 = radius * light.radius;
+
+    float distance = max(0.0001, length(light.position.xyz - worldPos));
+    float distance2 = distance * distance;
+
+    return mix(
+        radius2 / (radius2 + distance2),
+        radius / (radius + distance2),
+        light.position.w);
+}
+
+void getIrradianceAmbient(
+    vec3 worldPos, vec3 normal, vec3 albedo, vec3 environment, float metallic, float roughness,
+    out vec3 ambientD, out vec3 ambientS) {
+
+    vec3 irradiance = uWorldAmbientColor.rgb;
 
     for (int i = 0; i < uNumLights; ++i) {
         if (!uLights[i].ambientOnly) continue;
@@ -287,25 +286,27 @@ vec3 getIrradianceAmbient(vec3 worldPos, vec3 normal, vec3 albedo, vec3 environm
         vec3 fragToLight = uLights[i].position.xyz - worldPos;
         if (length(fragToLight) > uLights[i].radius * uLights[i].radius) continue;
 
-        float attenuation = getAttenuation(worldPos, uLights[i], ATTENUATION_LINEAR, ATTENUATION_QUADRATIC);
-        ambient += uLights[i].multiplier * uLights[i].color.rgb * attenuation;
+        float attenuation = getLightAttenuation(uLights[i], worldPos);
+        irradiance += attenuation * uLights[i].multiplier * uLights[i].color.rgb;
     }
 
     vec3 V = normalize(uCameraPosition.xyz - worldPos);
     float NdotV = max(0.0, dot(normal, V));
 
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
-    vec3 F = BRDF_fresnelSchlick(NdotV, F0);
+    vec3 F = BRDF_fresnelSchlickRoughness(NdotV, F0, roughness);
 
-    vec3 kS = F;
-    vec3 kD = vec3(1.0) - kS;
+    vec3 spec = F;
+
+    vec3 kD = vec3(1.0) - F;
     kD *= 1.0 - metallic;
 
-    return (kD / PI) * ambient;
+    ambientD = kD * irradiance;
+    ambientS = spec * (irradiance + environment);
 }
 
 void getIrradianceDirect(
-    vec3 worldPos, vec3 normal, vec3 albedo, float metallic, float roughness, int dynTypeMask,
+    vec3 worldPos, vec3 normal, vec3 albedo, float metallic, float roughness,
     out vec3 diffuse, out vec3 specular) {
 
     diffuse = vec3(0.0);
@@ -317,16 +318,20 @@ void getIrradianceDirect(
     float a = roughness * roughness;
     float a2 = a * a;
 
+    float k = roughness + 1.0;
+    k *= k;
+    k *= (1.0 / 8.0);
+
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
     for (int i = 0; i < uNumLights; ++i) {
-        if (uLights[i].ambientOnly || ((uLights[i].dynamicType & dynTypeMask) == 0)) continue;
+        if (uLights[i].ambientOnly) continue;
 
         vec3 fragToLight = uLights[i].position.xyz - worldPos;
         if (length(fragToLight) > uLights[i].radius * uLights[i].radius) continue;
 
-        float attenuation = getAttenuation(worldPos, uLights[i], ATTENUATION_LINEAR, ATTENUATION_QUADRATIC);
-        vec3 radiance = uLights[i].multiplier * uLights[i].color.rgb * attenuation;
+        float attenuation = getLightAttenuation(uLights[i], worldPos);
+        vec3 radiance = attenuation * uLights[i].multiplier * uLights[i].color.rgb;
 
         vec3 L = normalize(fragToLight);
         vec3 H = normalize(V + L);
@@ -336,14 +341,14 @@ void getIrradianceDirect(
         float VdotH = max(0.0, dot(V, H));
 
         float D = BRDF_distributionGGX(NdotH, a2);
-        float G = BRDF_geometrySmith(NdotL, NdotV, roughness);
+        float G = BRDF_geometrySmith(NdotL, NdotV, k);
         vec3 F = BRDF_fresnelSchlick(VdotH, F0);
-        vec3 spec = (D * G * F) / ((4.0 * NdotL * NdotV) + 0.0001);
+        vec3 spec = (D * G * F) / max(0.0001, 4.0 * NdotL * NdotV);
 
         vec3 kD = vec3(1.0) - F;
         kD *= 1.0 - metallic;
 
-        diffuse += (kD / PI) * radiance * NdotL;
+        diffuse += kD * radiance * NdotL;
         specular += spec * radiance * NdotL;
     }
 }
@@ -845,8 +850,8 @@ void main() {
     fragLightmapColor = isFeatureEnabled(FEATURE_LIGHTMAP) ? vec4(texture(sLightmap, fragUV2).rgb, 1.0) : vec4(0.0);
     fragEnvmapColor = envmapColor;
     fragSelfIllumColor = selfIllumColor;
-    fragEyePos = vec4(eyePos * 0.5 + 0.5, 0.0);
-    fragEyeNormal = vec4(eyeNormal * 0.5 + 0.5, 0.0);
+    fragEyePos = vec4(eyePos, 0.0);
+    fragEyeNormal = vec4(eyeNormal, 0.0);
 }
 )END";
 
@@ -1012,6 +1017,8 @@ void main() {
     vec3 eyePos = (uView * vec4(fragPosWorldSpace, 1.0)).rgb;
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorldSpace);
 
+    float features = 2.0 * (1.0 / 255.0);
+
     fragDiffuseColor = mainTexSample;
 
     fragLightmapColor = isFeatureEnabled(FEATURE_LIGHTMAP) ?
@@ -1019,20 +1026,19 @@ void main() {
         vec4(0.0);
 
     fragEnvmapColor = vec4(0.0);
-    fragSelfIllumColor = vec4(0.0);
-    fragEyePos = vec4(eyePos * 0.5 + 0.5, 0.0);
-    fragEyeNormal = vec4(eyeNormal * 0.5 + 0.5, 0.0);
+    fragSelfIllumColor = vec4(vec3(0.0), features);
+    fragEyePos = vec4(eyePos, 0.0);
+    fragEyeNormal = vec4(eyeNormal, 0.0);
 }
 )END";
 
 static const string g_fsSSAO = R"END(
 const float MAX_DISTANCE = 500.0;
-const float SAMPLE_RADIUS = 0.1;
-const float BIAS = 0.01;
+const float SAMPLE_RADIUS = 0.5;
+const float BIAS = 0.05;
 
 uniform sampler2D sEyePos;
 uniform sampler2D sEyeNormal;
-uniform sampler2D sNoise;
 
 noperspective in vec2 fragUV1;
 
@@ -1040,10 +1046,10 @@ out vec4 fragColor;
 
 void main() {
     vec2 uvM = fragUV1;
-    vec3 posM = texture(sEyePos, uvM).rgb * 2.0 - 1.0;
+    vec3 posM = texture(sEyePos, uvM).rgb;
 
     vec3 normal = texture(sEyeNormal, uvM).rgb;
-    vec3 randomVec = vec3(texture(sNoise, uvM * (uScreenResolution * 0.25)).xy, 0.0);
+    vec3 randomVec = vec3(hash(uvM.xy) * 2.0 - 1.0, hash(uvM.yx) * 2.0 - 1.0, 0.0);
     vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
     vec3 bitangent = cross(normal, tangent);
     mat3 TBN = mat3(tangent, bitangent, normal);
@@ -1054,7 +1060,7 @@ void main() {
         vec4 uvSample = uProjection * vec4(posSample, 1.0);
         uvSample.xy /= uvSample.w;
         uvSample.xy = uvSample.xy * 0.5 + 0.5;
-        float sceneZ = texture(sEyePos, uvSample.xy).z * 2.0 - 1.0;
+        float sceneZ = texture(sEyePos, uvSample.xy).z;
         float rangeCheck = smoothstep(0.0, 1.0, SAMPLE_RADIUS / abs(posM.z - sceneZ));
         occlusion += ((sceneZ >= posSample.z + BIAS) ? 1.0 : 0.0) * rangeCheck;
     }
@@ -1167,7 +1173,7 @@ bool traceScreenSpaceRay(
             swap(rayZMin, rayZMax);
         }
 
-        float sceneZMax = texture(sEyePos, hitUV).z * 2.0 - 1.0;
+        float sceneZMax = texture(sEyePos, hitUV).z;
         float sceneZMin = sceneZMax - Z_THICKNESS;
         if (rayZMax >= sceneZMin && rayZMin <= sceneZMax) {
             intersect = true;
@@ -1191,9 +1197,9 @@ void main() {
     vec3 reflectionColor = vec3(0.0);
     float reflectionStrength = 0.0;
 
-    vec3 fragPosVS = texture(sEyePos, fragUV1).rgb * 2.0 - 1.0;
+    vec3 fragPosVS = texture(sEyePos, fragUV1).rgb;
     vec3 I = normalize(fragPosVS);
-    vec3 N = normalize(texture(sEyeNormal, fragUV1).xyz * 2.0 - 1.0);
+    vec3 N = normalize(texture(sEyeNormal, fragUV1).rgb);
     vec3 R = reflect(I, N);
 
     ivec2 c = ivec2(gl_FragCoord.xy);
@@ -1300,51 +1306,53 @@ float getShadow(vec3 eyePos, vec3 worldPos, vec3 normal) {
 }
 
 void main() {
-    vec4 mainTexSample = texture(sMainTex, fragUV1);
-    vec4 lightmapSample = texture(sLightmap, fragUV1);
-    vec4 envmapSample = texture(sEnvmapColor, fragUV1);
-    vec4 selfIllumSample = texture(sSelfIllumColor, fragUV1);
-    vec4 ssaoSample = texture(sSSAO, fragUV1);
-    vec4 ssrSample = texture(sSSR, fragUV1);
+    vec2 uv = fragUV1;
 
-    vec3 eyePos = texture(sEyePos, fragUV1).rgb * 2.0 - 1.0;
+    vec4 mainTexSample = texture(sMainTex, uv);
+    vec4 lightmapSample = texture(sLightmap, uv);
+    vec4 envmapSample = texture(sEnvmapColor, uv);
+    vec4 selfIllumSample = texture(sSelfIllumColor, uv);
+    vec4 ssaoSample = texture(sSSAO, uv);
+    vec4 ssrSample = texture(sSSR, uv);
+
+    vec3 eyePos = texture(sEyePos, uv).rgb;
     vec3 worldPos = (uViewInv * vec4(eyePos, 1.0)).rgb;
 
-    vec3 eyeNormal = texture(sEyeNormal, fragUV1).rgb * 2.0 - 1.0;
+    vec3 eyeNormal = texture(sEyeNormal, uv).rgb;
     vec3 worldNormal = (uViewInv * vec4(eyeNormal, 0.0)).rgb;
 
     float envmapped = step(0.0001, envmapSample.a);
     float lightmapped = step(0.0001, lightmapSample.a);
 
-    float shadow = 0.0;
+    float shadow = mix(0.0, 1.0 - rgbToLuma(lightmapSample.rgb), lightmapped);
     float fog = 0.0;
+
     int features = int(255.0 * selfIllumSample.a);
     if ((features & 1) != 0) {
-        shadow = getShadow(eyePos, worldPos, worldNormal);
+        shadow = max(shadow, getShadow(eyePos, worldPos, worldNormal));
     }
     if ((features & 2) != 0) {
         fog = getFog(worldPos);
     }
 
-    vec3 albedo = gammaToLinear(mainTexSample.rgb);
-    vec3 environment = gammaToLinear(mix(envmapSample.rgb, ssrSample.rgb, ssrSample.a));
+    vec3 albedo = mainTexSample.rgb;
+    vec3 environment = mix(envmapSample.rgb, ssrSample.rgb, ssrSample.a);
+    vec3 emission = selfIllumSample.rgb;
     float ao = ssaoSample.r;
+
     float metallic = mix(0.0, 1.0 - mainTexSample.a, envmapped);
     float roughness = clamp(mix(1.0, mainTexSample.a, envmapped), 0.001, 0.999);
 
-    vec3 ambient = getIrradianceAmbient(worldPos, worldNormal, albedo, environment, metallic, roughness);
-    vec3 emission = selfIllumSample.rgb;
+    vec3 ambientD, ambientS;
+    getIrradianceAmbient(worldPos, worldNormal, albedo, environment, metallic, roughness, ambientD, ambientS);
 
-    vec3 diffuse;
-    vec3 specular;
-    getIrradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, (lightmapped == 1.0) ? LIGHT_DYNTYPE_AREA : LIGHT_DYNTYPE_BOTH, diffuse, specular);
+    vec3 directD, directS;
+    getIrradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, directD, directS);
 
-    vec3 color = mix(
-        clamp(ao * ambient + (1.0 - shadow) * diffuse + emission, 0.0, 1.0) * albedo + (1.0 - shadow) * specular,
-        (ao * (1.0 - 0.5 * shadow) * gammaToLinear(lightmapSample.rgb) + (1.0 - shadow) * diffuse + emission) * albedo + (1.0 - shadow) * specular,
-        lightmapped);
-    color += mix(vec3(0.0), (1.0 - mainTexSample.a) * ao * environment, lightmapped);
-    color = linearToGamma(color);
+    vec3 color = clamp(ao * ambientD + (1.0 - shadow) * directD + emission, 0.0, 1.0) * albedo;
+    color += ao * ambientS;
+    color += (1.0 - shadow) * directS;
+    color = mix(color, albedo * lightmapSample.rgb + (1.0 - mainTexSample.a) * environment, 0.2 * lightmapped);
     color = mix(color, uFogColor.rgb, fog);
 
     vec3 hilights = smoothstep(SELFILLUM_THRESHOLD, 1.0, selfIllumSample.rgb * mainTexSample.rgb * mainTexSample.a);
@@ -1545,7 +1553,7 @@ void Shaders::init() {
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
     auto fsSSAO = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslSSAOUniforms, g_glslHash, g_fsSSAO});
     auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSR});
-    auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslGammaCorrection, g_glslLighting, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
+    auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslLuma, g_glslLighting, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
     auto fsCombineOIT = initShader(ShaderType::Fragment, {g_glslHeader, g_fsCombineOIT});
     auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur9});
     auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur13});
@@ -1664,11 +1672,10 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sHilights", TextureUnits::hilights);
     program->setUniform("sEyePos", TextureUnits::eyePos);
     program->setUniform("sEyeNormal", TextureUnits::eyeNormal);
-    program->setUniform("sSSAO", TextureUnits::ssao);
-    program->setUniform("sSSR", TextureUnits::ssr);
-    program->setUniform("sNoise", TextureUnits::noise);
     program->setUniform("sOITAccum", TextureUnits::oitAccum);
     program->setUniform("sOITRevealage", TextureUnits::oitRevealage);
+    program->setUniform("sSSAO", TextureUnits::ssao);
+    program->setUniform("sSSR", TextureUnits::ssr);
     program->setUniform("sDanglyConstraints", TextureUnits::danglyConstraints);
     program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
     program->setUniform("sCubeShadowMap", TextureUnits::cubeShadowMap);

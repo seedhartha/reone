@@ -70,7 +70,6 @@ private:
 
     std::shared_ptr<Texture> _ssaoRGB;
     std::shared_ptr<Texture> _ssrRGBA;
-    std::shared_ptr<Texture> _noiseRGB;
 
     // END Built-in
 
