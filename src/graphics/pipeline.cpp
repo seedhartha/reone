@@ -159,6 +159,9 @@ static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) 
 
 void Pipeline::init() {
     auto &uniforms = _shaders.uniforms();
+
+    // SSAO
+
     for (int i = 0; i < kNumSSAOSamples; ++i) {
         float scale = i / static_cast<float>(kNumSSAOSamples);
         scale = glm::mix(0.1f, 1.0f, scale * scale);
@@ -168,6 +171,30 @@ void Pipeline::init() {
         uniforms.ssao.samples[i] = glm::vec4(move(sample), 0.0f);
     }
     _shaders.refreshSSAOUniforms();
+
+    // BRDF LUT
+
+    _cbBRDFLUT = make_unique<Texture>("brdflut_color", getTextureProperties(TextureUsage::BRDFLUT));
+    _cbBRDFLUT->clear(512, 512, PixelFormat::RG16F);
+    _cbBRDFLUT->init();
+
+    _dbBRDFLUT = make_unique<Renderbuffer>();
+    _dbBRDFLUT->configure(512, 512, PixelFormat::Depth32F);
+    _dbBRDFLUT->init();
+
+    _fbBRDFLUT = make_unique<Framebuffer>();
+    _fbBRDFLUT->attachColorDepth(_cbBRDFLUT, _dbBRDFLUT);
+    _fbBRDFLUT->init();
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbBRDFLUT->nameGL());
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
+    _shaders.use(_shaders.brdfLut(), true);
+    _graphicsContext.clearColorDepth();
+    _graphicsContext.withViewport(glm::ivec4(0, 0, 512, 512), [this]() {
+        _meshes.quadNDC().draw();
+    });
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
 void Pipeline::initAttachments(glm::ivec2 dim) {
@@ -514,6 +541,7 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     _textures.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);
     _textures.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
     _textures.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
+    _textures.bind(*_cbBRDFLUT, TextureUnits::brdfLut);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
