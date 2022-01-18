@@ -52,7 +52,7 @@ enum class TextureUsage {
     DepthBufferCubeMap,
     Video,
     Lookup,
-    Noise
+    BRDFLUT
 };
 
 enum class TextureQuality {
@@ -153,10 +153,11 @@ struct TextureUnits {
     static constexpr int oitRevealage = 9;
     static constexpr int ssao = 10;
     static constexpr int ssr = 11;
-    static constexpr int danglyConstraints = 12;
-    static constexpr int environmentMap = 13;
-    static constexpr int cubeShadowMap = 14;
-    static constexpr int shadowMap = 15;
+    static constexpr int brdfLut = 12;
+    static constexpr int danglyConstraints = 13;
+    static constexpr int environmentMap = 14;
+    static constexpr int cubeShadowMap = 15;
+    static constexpr int shadowMap = 16;
 };
 
 struct UniformBlockBindingPoints {

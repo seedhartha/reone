@@ -111,6 +111,10 @@ private:
     glm::mat4 _shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
     glm::vec4 _shadowCascadeFarPlanes[2] {glm::vec4(0.0f)};
 
+    std::shared_ptr<Texture> _cbBRDFLUT;
+    std::shared_ptr<Renderbuffer> _dbBRDFLUT;
+    std::shared_ptr<Framebuffer> _fbBRDFLUT;
+
     std::unordered_map<glm::ivec2, Attachments, Vec2Hasher> _attachments;
 
     // Services
