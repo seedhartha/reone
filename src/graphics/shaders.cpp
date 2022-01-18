@@ -101,7 +101,7 @@ layout(std140) uniform Skeletal {
 )END";
 
 static const string g_glslLightingUniforms = R"END(
-const int MAX_LIGHTS = 32;
+const int MAX_LIGHTS = 64;
 
 struct Light {
     vec4 position;
