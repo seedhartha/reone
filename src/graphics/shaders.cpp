@@ -270,10 +270,7 @@ float getLightAttenuation(Light light, vec3 worldPos) {
     float distance = max(0.0001, length(light.position.xyz - worldPos));
     float distance2 = distance * distance;
 
-    return mix(
-        radius2 / (radius2 + distance2),
-        radius / (radius + distance2),
-        light.position.w);
+    return radius2 / (radius2 + distance2);
 }
 
 void getIrradianceAmbient(
