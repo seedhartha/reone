@@ -1072,8 +1072,8 @@ void main() {
 
 static const string g_fsSSR = R"END(
 const float Z_THICKNESS = 0.1;
-const float STRIDE = 8.0;
-const float MAX_STEPS = 16.0;
+const float STRIDE = 4.0;
+const float MAX_STEPS = 32.0;
 const float MAX_DISTANCE = 100.0;
 
 const float EDGE_FADE_START = 0.75;
