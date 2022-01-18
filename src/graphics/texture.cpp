@@ -229,8 +229,12 @@ void Texture::refresh2DArray() {
 }
 
 void Texture::refresh1D() {
-    auto &pixels = _layers.front().pixels;
-    fillTarget1D(_width, pixels->data());
+    if (!_layers.empty() && _layers.front().pixels) {
+        auto &pixels = _layers.front().pixels;
+        fillTarget1D(_width, pixels->data());
+    } else {
+        fillTarget1D(_width);
+    }
 }
 
 void Texture::refresh2D() {

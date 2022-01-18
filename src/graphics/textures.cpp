@@ -55,6 +55,10 @@ void Textures::init() {
     _defaultArrayDepth->clear(1, 1, PixelFormat::Depth32F, kNumShadowCascades);
     _defaultArrayDepth->init();
 
+    _default1DRGB = make_shared<Texture>("default_1d_rgb", getTextureProperties(TextureUsage::Lookup));
+    _default1DRGB->clear(1, 1, PixelFormat::RGB8);
+    _default1DRGB->init();
+
     auto ssaoPixels = make_shared<ByteArray>();
     ssaoPixels->resize(3);
     (*ssaoPixels)[0] = 0xff;
@@ -104,6 +108,7 @@ void Textures::bindBuiltIn() {
     bind(*_defaultRGB, TextureUnits::oitRevealage);
     bind(*_ssaoRGB, TextureUnits::ssao);
     bind(*_ssrRGBA, TextureUnits::ssr);
+    bind(*_default1DRGB, TextureUnits::danglyConstraints);
     bind(*_defaultCubemapRGB, TextureUnits::environmentMap);
     bind(*_defaultCubemapDepth, TextureUnits::cubeShadowMap);
     bind(*_defaultArrayDepth, TextureUnits::shadowMap);
