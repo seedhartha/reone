@@ -541,7 +541,6 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     _textures.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);
     _textures.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
     _textures.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
-    _textures.bind(*_cbBRDFLUT, TextureUnits::brdfLut);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
