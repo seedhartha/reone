@@ -142,7 +142,7 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
         properties.wrap = Texture::Wrapping::ClampToBorder;
         properties.borderColor = glm::vec4(0.0f);
 
-    } else if (usage == TextureUsage::GUI || usage == TextureUsage::Video || usage == TextureUsage::BRDFLUT) {
+    } else if (usage == TextureUsage::GUI || usage == TextureUsage::Video) {
         properties.minFilter = Texture::Filtering::Linear;
         properties.wrap = Texture::Wrapping::ClampToEdge;
 
@@ -162,7 +162,6 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
     if (usage == TextureUsage::DefaultCubeMap ||
         usage == TextureUsage::EnvironmentMap ||
         usage == TextureUsage::DepthBufferCubeMap) {
-
         properties.cubemap = true;
     }
 
