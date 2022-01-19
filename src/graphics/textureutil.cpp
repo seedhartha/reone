@@ -107,29 +107,37 @@ static int getBitsPerPixel(PixelFormat format) {
 void prepareCubemap(Texture &texture) {
     static constexpr int rotations[] = {1, 3, 0, 2, 2, 0};
 
-    auto &layers = texture.layers();
-    int numLayers = static_cast<int>(layers.size());
-    if (numLayers != kNumCubeFaces) {
-        throw invalid_argument("Invalid layer count: " + to_string(numLayers));
-    }
-    swap(layers[0], layers[1]);
-
     PixelFormat srcFormat = texture.pixelFormat();
     PixelFormat dstFormat = texture.pixelFormat();
     bool compressed = isCompressed(srcFormat);
 
-    for (int i = 0; i < kNumCubeFaces; ++i) {
-        auto &layer = layers[i];
+    auto &layers = texture.layers();
+    int numLayers = static_cast<int>(layers.size());
+    if (numLayers == 1) {
+        auto &layer = layers.front();
         if (!layer.pixels) {
-            throw invalid_argument(str(boost::format("layer %d is empty") % i));
+            throw invalid_argument(str(boost::format("Front layer of texture '%s' is empty") % texture.name()));
         }
-        if (compressed) {
-            decompressLayer(texture.width(), texture.height(), layer, srcFormat, dstFormat);
-            texture.setPixelFormat(dstFormat);
+        for (int i = 1; i < kNumCubeFaces; ++i) {
+            layers.push_back(layers.front());
         }
-        for (int j = 0; j < rotations[i]; ++j) {
-            rotateLayer90(texture.width(), texture.height(), layer, getBitsPerPixel(dstFormat));
+    } else if (numLayers == kNumCubeFaces) {
+        swap(layers[0], layers[1]);
+        for (int i = 0; i < kNumCubeFaces; ++i) {
+            auto &layer = layers[i];
+            if (!layer.pixels) {
+                throw invalid_argument(str(boost::format("Layer %d of texture '%s' is empty") % i % texture.name()));
+            }
+            if (compressed) {
+                decompressLayer(texture.width(), texture.height(), layer, srcFormat, dstFormat);
+                texture.setPixelFormat(dstFormat);
+            }
+            for (int j = 0; j < rotations[i]; ++j) {
+                rotateLayer90(texture.width(), texture.height(), layer, getBitsPerPixel(dstFormat));
+            }
         }
+    } else {
+        throw invalid_argument(str(boost::format("Texture '%s' has %d layers, %d expected") % texture.name() % numLayers % kNumCubeFaces));
     }
 }
 
