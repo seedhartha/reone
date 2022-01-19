@@ -26,8 +26,8 @@ static uint32_t packRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 }
 
 static void decompressDXT1Block(uint32_t x, uint32_t y, uint32_t width, const uint8_t *blockStorage, uint32_t *image) {
-    uint16_t color0 = *(blockStorage + 0);
-    uint16_t color1 = *(blockStorage + 2);
+    uint16_t color0 = *reinterpret_cast<const uint16_t *>(blockStorage + 0);
+    uint16_t color1 = *reinterpret_cast<const uint16_t *>(blockStorage + 2);
     uint32_t colorCodes = *reinterpret_cast<const uint32_t *>(blockStorage + 4);
 
     uint32_t temp;
@@ -108,7 +108,7 @@ void decompressDXT1(uint32_t width, uint32_t height, const uint8_t *blockStorage
 static void decompressDXT5Block(uint32_t x, uint32_t y, uint32_t width, const uint8_t *blockStorage, uint32_t *image) {
     uint8_t alpha0 = *(blockStorage + 0);
     uint8_t alpha1 = *(blockStorage + 1);
-    uint64_t alphaCodes = *(blockStorage + 2);
+    uint64_t alphaCodes = *reinterpret_cast<const uint64_t *>(blockStorage + 2);
 
     uint16_t color0 = *reinterpret_cast<const uint16_t *>(blockStorage + 8);
     uint16_t color1 = *reinterpret_cast<const uint16_t *>(blockStorage + 10);

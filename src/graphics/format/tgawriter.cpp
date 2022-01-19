@@ -146,10 +146,10 @@ vector<uint8_t> TgaWriter::getTexturePixels(bool compress, TGADataType &dataType
             decompressDXT1(_texture->width(), _texture->height(), layerPixelsPtr, &decompPixels[0]);
             uint32_t *decompPtr = &decompPixels[0];
             for (int j = 0; j < numPixels; ++j) {
-                uint32_t rgba = *(decompPtr++);
-                *(pixels++) = (rgba >> 8) & 0xff;
-                *(pixels++) = (rgba >> 16) & 0xff;
-                *(pixels++) = (rgba >> 24) & 0xff;
+                uint32_t rgb = *(decompPtr++);
+                *(pixels++) = (rgb >> 8) & 0xff;
+                *(pixels++) = (rgb >> 16) & 0xff;
+                *(pixels++) = (rgb >> 24) & 0xff;
             }
             break;
         }
