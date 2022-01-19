@@ -171,30 +171,6 @@ void Pipeline::init() {
         uniforms.ssao.samples[i] = glm::vec4(move(sample), 0.0f);
     }
     _shaders.refreshSSAOUniforms();
-
-    // BRDF LUT
-
-    _cbBRDFLUT = make_unique<Texture>("brdflut_color", getTextureProperties(TextureUsage::BRDFLUT));
-    _cbBRDFLUT->clear(512, 512, PixelFormat::RG16F);
-    _cbBRDFLUT->init();
-
-    _dbBRDFLUT = make_unique<Renderbuffer>();
-    _dbBRDFLUT->configure(512, 512, PixelFormat::Depth32F);
-    _dbBRDFLUT->init();
-
-    _fbBRDFLUT = make_unique<Framebuffer>();
-    _fbBRDFLUT->attachColorDepth(_cbBRDFLUT, _dbBRDFLUT);
-    _fbBRDFLUT->init();
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbBRDFLUT->nameGL());
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
-    _shaders.use(_shaders.brdfLut(), true);
-    _graphicsContext.clearColorDepth();
-    _graphicsContext.withViewport(glm::ivec4(0, 0, 512, 512), [this]() {
-        _meshes.quadNDC().draw();
-    });
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
 void Pipeline::initAttachments(glm::ivec2 dim) {

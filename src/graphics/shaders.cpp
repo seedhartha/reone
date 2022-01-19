@@ -1336,8 +1336,6 @@ void main() {
         fog = getFog(worldPos);
     }
 
-    float shadowLM = max(shadow, mix(0.0, 1.0 - dot(lightmapSample.rgb, lightmapSample.rgb), lightmapped));
-
     vec3 albedo = mainTexSample.rgb;
     vec3 environment = mix(envmapSample.rgb, ssrSample.rgb, ssrSample.a);
     vec3 emission = selfIllumSample.rgb;
@@ -1352,8 +1350,8 @@ void main() {
     vec3 directD, directS, directAreaD, directAreaS;
     getIrradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, directD, directS, directAreaD, directAreaS);
 
-    vec3 colorDynamic = clamp(ambientD * ao + directD * (1.0 - shadowLM) + emission, 0.0, 1.0) * albedo;
-    colorDynamic += ambientS * ao + directS * (1.0 - shadowLM);
+    vec3 colorDynamic = clamp(ambientD * ao + directD * (1.0 - shadow) + emission, 0.0, 1.0) * albedo;
+    colorDynamic += ambientS * ao + directS * (1.0 - shadow);
 
     vec3 colorLightmapped = clamp(lightmapSample.rgb * (ao * 0.5 + 0.5) * (1.0 - 0.5 * shadow) + directAreaD * (1.0 - shadow) + emission, 0.0, 1.0) * albedo;
     colorLightmapped += ambientS * ao + directAreaS * (1.0 - shadow);
@@ -1530,89 +1528,6 @@ void main() {
 }
 )END";
 
-static const string g_fsBRDFLUT = R"END(
-const uint NUM_SAMPLES = 1024u;
-
-noperspective in vec2 fragUV1;
-
-out vec4 fragColor;
-
-float radicalInverseVdc(uint bits) {
-    bits = (bits << 16u) | (bits >> 16u);
-    bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
-    bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
-    bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
-    bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
-    return float(bits) * 2.3283064365386963e-10; // / 0x100000000
-}
-
-vec2 hammersley(uint i, uint N) {
-    return vec2(float(i) / float(N), radicalInverseVdc(i));
-}
-
-vec3 importanceSampleGGX(vec2 Xi, vec3 N, float roughness) {
-    float a = roughness * roughness;
-
-    float phi = 2.0 * PI * Xi.x;
-    float cosTheta = sqrt((1.0 - Xi.y) / (1.0 + (a * a - 1.0) * Xi.y));
-    float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
-
-    vec3 H = vec3(
-        cos(phi) * sinTheta,
-        sin(phi) * sinTheta,
-        cosTheta);
-
-    vec3 up = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
-    vec3 tangent = normalize(cross(up, N));
-    vec3 bitangent = cross(N, tangent);
-
-    return normalize(tangent * H.x + bitangent * H.y + N * H.z);
-}
-
-vec2 integrateBRDF(float NdotV, float roughness) {
-    vec3 N = vec3(0.0, 0.0, 1.0);
-    vec3 V = vec3(
-        sqrt(1.0 - NdotV * NdotV),
-        0.0,
-        NdotV);
-
-    float a = roughness * roughness;
-    float k = 0.5 * a;
-
-    float A = 0.0;
-    float B = 0.0;
-    for (uint i = 0u; i < NUM_SAMPLES; ++i) {
-        vec2 Xi = hammersley(i, NUM_SAMPLES);
-        vec3 H = importanceSampleGGX(Xi, N, roughness);
-        vec3 L = normalize(2.0 * dot(V, H) * H - V);
-
-        float NdotL = max(0.0, L.z);
-        float NdotH = max(0.0, H.z);
-        float VdotH = max(0.0, dot(V, H));
-
-        if (NdotL > 0.0) {
-            float G = BRDF_geometrySmith(NdotL, NdotV, k);
-            float G_Vis = (G * VdotH) / (NdotH * NdotV);
-            float Fc = pow(1.0 - VdotH, 5.0);
-
-            A += (1.0 - Fc) * G_Vis;
-            B += Fc * G_Vis;
-        }
-
-    }
-    A /= float(NUM_SAMPLES);
-    B /= float(NUM_SAMPLES);
-
-    return vec2(A, B);
-}
-
-void main() {
-    vec2 uv = fragUV1;
-    vec2 brdf = integrateBRDF(uv.x, uv.y);
-    fragColor = vec4(brdf.xy, 0.0, 0.0);
-}
-)END";
-
 void Shaders::init() {
     if (_inited) {
         return;
@@ -1649,7 +1564,6 @@ void Shaders::init() {
     auto fsMedianFilter3 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter3});
     auto fsMedianFilter5 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter5});
     auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLuma, g_fsFXAA});
-    auto fsBRDFLUT = initShader(ShaderType::Fragment, {g_glslHeader, g_glslBRDF, g_fsBRDFLUT});
 
     // Shader Programs
     _spSimpleColor = initShaderProgram({vsClipSpace, fsColor});
@@ -1672,7 +1586,6 @@ void Shaders::init() {
     _spMedianFilter3 = initShaderProgram({vsObjectSpace, fsMedianFilter3});
     _spMedianFilter5 = initShaderProgram({vsObjectSpace, fsMedianFilter5});
     _spFXAA = initShaderProgram({vsObjectSpace, fsFXAA});
-    _spBRDFLUT = initShaderProgram({vsObjectSpace, fsBRDFLUT});
 
     // Uniform Buffers
     static GeneralUniforms defaultsGeneral;
@@ -1719,7 +1632,6 @@ void Shaders::deinit() {
     _spMedianFilter3.reset();
     _spMedianFilter5.reset();
     _spFXAA.reset();
-    _spBRDFLUT.reset();
 
     // Uniform Buffers
     _ubGeneral.reset();
@@ -1768,7 +1680,6 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sOITRevealage", TextureUnits::oitRevealage);
     program->setUniform("sSSAO", TextureUnits::ssao);
     program->setUniform("sSSR", TextureUnits::ssr);
-    program->setUniform("sBRDFLUT", TextureUnits::brdfLut);
     program->setUniform("sDanglyConstraints", TextureUnits::danglyConstraints);
     program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
     program->setUniform("sCubeShadowMap", TextureUnits::cubeShadowMap);

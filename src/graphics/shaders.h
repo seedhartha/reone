@@ -62,8 +62,6 @@ public:
     ShaderProgram &medianFilter5() const { return *_spMedianFilter5; }
     ShaderProgram &fxaa() const { return *_spFXAA; }
 
-    ShaderProgram &brdfLut() const { return *_spBRDFLUT; }
-
 private:
     bool _inited {false};
     Uniforms _uniforms;
@@ -94,8 +92,6 @@ private:
     std::shared_ptr<ShaderProgram> _spMedianFilter3;
     std::shared_ptr<ShaderProgram> _spMedianFilter5;
     std::shared_ptr<ShaderProgram> _spFXAA;
-
-    std::shared_ptr<ShaderProgram> _spBRDFLUT;
 
     // END Shader Programs
 
