@@ -238,10 +238,8 @@ vec3 getNormalFromHeightMap(sampler2D tex, vec2 uv, mat3 TBN) {
 )END";
 
 static const string g_glslBRDF = R"END(
-const float PI = radians(180.0);
-
 float BRDF_distributionGGX(float NdotH2, float a2) {
-    return a2 / (PI * pow(NdotH2 * (a2 - 1.0) + 1.0, 2.0));
+    return a2 / (pow(NdotH2 * (a2 - 1.0) + 1.0, 2.0));
 }
 
 float BRDF_geometrySchlick(float NdotV, float k) {

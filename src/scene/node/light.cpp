@@ -38,7 +38,7 @@ namespace reone {
 namespace scene {
 
 static constexpr float kFadeSpeed = 2.0f;
-static constexpr float kMinDirectionalLightRadius = 750.0f;
+static constexpr float kMinDirectionalLightRadius = 400.0f;
 
 void LightSceneNode::init() {
     _color = _modelNode->color().getByFrameOrElse(0, glm::vec3(0.0f));
