@@ -261,6 +261,8 @@ vec3 BRDF_fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
 
 static const string g_glslLighting = R"END(
 float getLightAttenuation(Light light, vec3 worldPos) {
+    if (light.position.w == 0.0) return 1.0;
+
     float radius = light.radius;
     float radius2 = radius * light.radius;
 
@@ -1334,6 +1336,9 @@ void main() {
         fog = getFog(worldPos);
     }
 
+    float shadowLM = smoothstep(0.0, 1.0, 1.0 - rgbToLuma(lightmapSample.rgb));
+    shadowLM = max(shadow, mix(0.0, shadowLM, lightmapped));
+
     vec3 albedo = mainTexSample.rgb;
     vec3 environment = mix(envmapSample.rgb, ssrSample.rgb, ssrSample.a);
     vec3 emission = selfIllumSample.rgb;
@@ -1348,8 +1353,8 @@ void main() {
     vec3 directD, directS, directAreaD, directAreaS;
     getIrradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, directD, directS, directAreaD, directAreaS);
 
-    vec3 colorDynamic = clamp(ambientD * ao + directD * (1.0 - shadow) + emission, 0.0, 1.0) * albedo;
-    colorDynamic += ambientS * ao + directS * (1.0 - shadow);
+    vec3 colorDynamic = clamp(ambientD * ao + directD * (1.0 - shadowLM) + emission, 0.0, 1.0) * albedo;
+    colorDynamic += ambientS * ao + directS * (1.0 - shadowLM);
 
     vec3 colorLightmapped = clamp(lightmapSample.rgb * (ao * 0.5 + 0.5) * (1.0 - 0.5 * shadow) + directAreaD * (1.0 - shadow) + emission, 0.0, 1.0) * albedo;
     colorLightmapped += ambientS * ao + directAreaS * (1.0 - shadow);
@@ -1555,7 +1560,7 @@ void Shaders::init() {
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
     auto fsSSAO = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslSSAOUniforms, g_glslHash, g_fsSSAO});
     auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSR});
-    auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslBRDF, g_glslLighting, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
+    auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslBRDF, g_glslLighting, g_glslLuma, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
     auto fsCombineOIT = initShader(ShaderType::Fragment, {g_glslHeader, g_fsCombineOIT});
     auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur9});
     auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur13});
