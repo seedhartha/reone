@@ -43,11 +43,13 @@ void Textures::init() {
     _defaultRGB->clear(1, 1, PixelFormat::RGB8);
     _defaultRGB->init();
 
-    _defaultCubemapRGB = make_shared<Texture>("default_cubemap_rgb", getTextureProperties(TextureUsage::DefaultCubeMap));
+    _defaultCubemapRGB = make_shared<Texture>("default_cubemap_rgb", getTextureProperties(TextureUsage::Default));
+    _defaultCubemapRGB->setCubemap(true);
     _defaultCubemapRGB->clear(1, 1, PixelFormat::RGB8, kNumCubeFaces);
     _defaultCubemapRGB->init();
 
-    _defaultCubemapDepth = make_shared<Texture>("default_cubemap_depth", getTextureProperties(TextureUsage::DefaultCubeMap));
+    _defaultCubemapDepth = make_shared<Texture>("default_cubemap_depth", getTextureProperties(TextureUsage::Default));
+    _defaultCubemapDepth->setCubemap(true);
     _defaultCubemapDepth->clear(1, 1, PixelFormat::Depth32F, kNumCubeFaces);
     _defaultCubemapDepth->init();
 
@@ -98,19 +100,20 @@ void Textures::bind(Texture &texture, int unit) {
 void Textures::bindBuiltIn() {
     bind(*_defaultRGB, TextureUnits::mainTex);
     bind(*_defaultRGB, TextureUnits::lightmap);
+    bind(*_defaultRGB, TextureUnits::environmentMap);
+    bind(*_defaultRGB, TextureUnits::bumpMap);
     bind(*_defaultRGB, TextureUnits::envmapColor);
     bind(*_defaultRGB, TextureUnits::selfIllumColor);
-    bind(*_defaultRGB, TextureUnits::bumpMap);
-    bind(*_defaultRGB, TextureUnits::hilights);
     bind(*_defaultRGB, TextureUnits::eyePos);
     bind(*_defaultRGB, TextureUnits::eyeNormal);
-    bind(*_defaultRGB, TextureUnits::oitAccum);
-    bind(*_defaultRGB, TextureUnits::oitRevealage);
     bind(*_ssaoRGB, TextureUnits::ssao);
     bind(*_ssrRGBA, TextureUnits::ssr);
+    bind(*_defaultRGB, TextureUnits::hilights);
+    bind(*_defaultRGB, TextureUnits::oitAccum);
+    bind(*_defaultRGB, TextureUnits::oitRevealage);
     bind(*_default1DRGB, TextureUnits::danglyConstraints);
-    bind(*_defaultCubemapRGB, TextureUnits::environmentMap);
-    bind(*_defaultCubemapDepth, TextureUnits::cubeShadowMap);
+    bind(*_defaultCubemapRGB, TextureUnits::environmentMapCube);
+    bind(*_defaultCubemapDepth, TextureUnits::shadowMapCube);
     bind(*_defaultArrayDepth, TextureUnits::shadowMap);
 }
 
@@ -131,14 +134,14 @@ shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {
 shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     shared_ptr<Texture> texture;
 
-    shared_ptr<ByteArray> tgaData(_resources.get(resRef, ResourceType::Tga, false));
+    auto tgaData = _resources.get(resRef, ResourceType::Tga, false);
     if (tgaData) {
         TgaReader tga(resRef, usage);
         tga.load(wrap(tgaData));
         texture = tga.texture();
 
         if (texture) {
-            shared_ptr<ByteArray> txiData(_resources.get(resRef, ResourceType::Txi, false));
+            auto txiData = _resources.get(resRef, ResourceType::Txi, false);
             if (txiData) {
                 TxiReader txi;
                 txi.load(wrap(txiData));
@@ -148,7 +151,7 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
     }
 
     if (!texture) {
-        shared_ptr<ByteArray> tpcData(_resources.get(resRef, ResourceType::Tpc, false));
+        auto tpcData = _resources.get(resRef, ResourceType::Tpc, false);
         if (tpcData) {
             TpcReader tpc(resRef, usage);
             tpc.load(wrap(tpcData));

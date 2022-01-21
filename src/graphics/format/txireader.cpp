@@ -60,7 +60,13 @@ void TxiReader::processLine(const vector<string> &tokens) {
     switch (_state) {
     case State::None:
         key = boost::to_lower_copy(tokens[0]);
-        if (key == "envmaptexture") {
+        if (key == "blending") {
+            _features.blending = parseBlending(tokens[1]);
+        } else if (key == "wateralpha") {
+            _features.waterAlpha = stof(tokens[1]);
+        } else if (key == "cube") {
+            _features.cube = stoi(tokens[1]) != 0;
+        } else if (key == "envmaptexture") {
             _features.envmapTexture = tokens[1];
         } else if (key == "bumpyshinytexture") {
             _features.bumpyShinyTexture = tokens[1];
@@ -68,8 +74,6 @@ void TxiReader::processLine(const vector<string> &tokens) {
             _features.bumpmapTexture = tokens[1];
         } else if (key == "bumpmapscaling") {
             _features.bumpMapScaling = stof(tokens[1]);
-        } else if (key == "blending") {
-            _features.blending = parseBlending(tokens[1]);
         } else if (key == "numchars") {
             _features.numChars = stoi(tokens[1]);
         } else if (key == "fontheight") {
@@ -82,8 +86,6 @@ void TxiReader::processLine(const vector<string> &tokens) {
             _lowerRightCoordCount = stoi(tokens[1]);
             _features.lowerRightCoords.reserve(_lowerRightCoordCount);
             _state = State::LowerRightCoords;
-        } else if (key == "wateralpha") {
-            _features.waterAlpha = stof(tokens[1]);
         } else if (key == "proceduretype") {
             _features.procedureType = parseProcedureType(tokens[1]);
         } else if (key == "numx") {

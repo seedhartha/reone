@@ -43,6 +43,7 @@ struct UniformsFeatureFlags {
     static constexpr int hashedalphatest = 0x10000;
     static constexpr int ssao = 0x20000;
     static constexpr int premulalpha = 0x40000;
+    static constexpr int envmapcube = 0x80000;
 };
 
 struct GeneralUniforms {

@@ -41,7 +41,6 @@ constexpr int kMaxGrassClusters = 256;
  */
 enum class TextureUsage {
     Default,
-    DefaultCubeMap,
     GUI,
     Diffuse,
     Lightmap,
@@ -49,7 +48,6 @@ enum class TextureUsage {
     BumpMap,
     ColorBuffer,
     DepthBuffer,
-    DepthBufferCubeMap,
     Video,
     Lookup
 };
@@ -140,22 +138,34 @@ enum class CameraType {
 };
 
 struct TextureUnits {
+    // 2D
+
     static constexpr int mainTex = 0;
     static constexpr int lightmap = 1;
-    static constexpr int envmapColor = 2;
-    static constexpr int selfIllumColor = 3;
-    static constexpr int bumpMap = 4;
-    static constexpr int hilights = 5;
+    static constexpr int environmentMap = 2;
+    static constexpr int bumpMap = 3;
+    static constexpr int envmapColor = 4;
+    static constexpr int selfIllumColor = 5;
     static constexpr int eyePos = 6;
     static constexpr int eyeNormal = 7;
-    static constexpr int oitAccum = 8;
-    static constexpr int oitRevealage = 9;
-    static constexpr int ssao = 10;
-    static constexpr int ssr = 11;
-    static constexpr int danglyConstraints = 12;
-    static constexpr int environmentMap = 13;
-    static constexpr int cubeShadowMap = 14;
-    static constexpr int shadowMap = 15;
+    static constexpr int ssao = 8;
+    static constexpr int ssr = 9;
+    static constexpr int hilights = 10;
+    static constexpr int oitAccum = 11;
+    static constexpr int oitRevealage = 12;
+
+    // 1D
+
+    static constexpr int danglyConstraints = 13;
+
+    // Cubemaps
+
+    static constexpr int environmentMapCube = 14;
+    static constexpr int shadowMapCube = 15;
+
+    // Arrays
+
+    static constexpr int shadowMap = 16;
 };
 
 struct UniformBlockBindingPoints {

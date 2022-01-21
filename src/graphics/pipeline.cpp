@@ -231,7 +231,8 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
 
     // Point light shadows framebuffer
 
-    attachments.dbPointLightShadows = make_unique<Texture>("directional_light_shadows_color", getTextureProperties(TextureUsage::DepthBufferCubeMap));
+    attachments.dbPointLightShadows = make_unique<Texture>("directional_light_shadows_color", getTextureProperties(TextureUsage::DepthBuffer));
+    attachments.dbPointLightShadows->setCubemap(true);
     attachments.dbPointLightShadows->clear(_options.shadowResolution, _options.shadowResolution, PixelFormat::Depth32F);
     attachments.dbPointLightShadows->init();
 
@@ -582,7 +583,7 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
         if (scene.isShadowLightDirectional()) {
             _textures.bind(*attachments.dbDirectionalLightShadows, TextureUnits::shadowMap);
         } else {
-            _textures.bind(*attachments.dbPointLightShadows, TextureUnits::cubeShadowMap);
+            _textures.bind(*attachments.dbPointLightShadows, TextureUnits::shadowMapCube);
         }
     }
     _graphicsContext.clearColorDepth();

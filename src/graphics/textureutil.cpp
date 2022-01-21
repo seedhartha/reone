@@ -113,15 +113,7 @@ void prepareCubemap(Texture &texture) {
 
     auto &layers = texture.layers();
     int numLayers = static_cast<int>(layers.size());
-    if (numLayers == 1) {
-        auto &layer = layers.front();
-        if (!layer.pixels) {
-            throw invalid_argument(str(boost::format("Front layer of texture '%s' is empty") % texture.name()));
-        }
-        for (int i = 1; i < kNumCubeFaces; ++i) {
-            layers.push_back(layers.front());
-        }
-    } else if (numLayers == kNumCubeFaces) {
+    if (numLayers == kNumCubeFaces) {
         swap(layers[0], layers[1]);
         for (int i = 0; i < kNumCubeFaces; ++i) {
             auto &layer = layers[i];
@@ -157,7 +149,7 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
     } else if (usage == TextureUsage::EnvironmentMap) {
         properties.wrap = Texture::Wrapping::ClampToEdge;
 
-    } else if (usage == TextureUsage::DepthBuffer || usage == TextureUsage::DepthBufferCubeMap) {
+    } else if (usage == TextureUsage::DepthBuffer) {
         properties.minFilter = Texture::Filtering::Nearest;
         properties.maxFilter = Texture::Filtering::Nearest;
         properties.wrap = Texture::Wrapping::ClampToBorder;
@@ -165,15 +157,8 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
 
     } else if (usage == TextureUsage::BumpMap) {
         properties.minFilter = Texture::Filtering::Linear;
-    }
 
-    if (usage == TextureUsage::DefaultCubeMap ||
-        usage == TextureUsage::EnvironmentMap ||
-        usage == TextureUsage::DepthBufferCubeMap) {
-        properties.cubemap = true;
-    }
-
-    if (usage == TextureUsage::Lookup) {
+    } else if (usage == TextureUsage::Lookup) {
         properties.minFilter = Texture::Filtering::Nearest;
         properties.lookup = true;
     }
