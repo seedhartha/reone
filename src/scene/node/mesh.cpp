@@ -248,7 +248,12 @@ void MeshSceneNode::draw() {
     }
     if (_nodeTextures.envmap) {
         uniforms.general.featureMask |= UniformsFeatureFlags::envmap;
-        _textures.bind(*_nodeTextures.envmap, TextureUnits::environmentMap);
+        if (_nodeTextures.envmap->isCubemap()) {
+            uniforms.general.featureMask |= UniformsFeatureFlags::envmapcube;
+            _textures.bind(*_nodeTextures.envmap, TextureUnits::environmentMapCube);
+        } else {
+            _textures.bind(*_nodeTextures.envmap, TextureUnits::environmentMap);
+        }
     }
     if (_nodeTextures.bumpmap) {
         if (_nodeTextures.bumpmap->isGrayscale()) {

@@ -49,6 +49,7 @@ const int FEATURE_FIXEDSIZE = 0x8000;
 const int FEATURE_HASHEDALPHATEST = 0x10000;
 const int FEATURE_SSAO = 0x20000;
 const int FEATURE_PREMULALPHA = 0x40000;
+const int FEATURE_ENVMAPCUBE = 0x80000;
 
 layout(std140) uniform General {
     mat4 uProjection;
@@ -203,6 +204,21 @@ void hashedAlphaTest(float a, vec3 p) {
     if (a < threshold) {
         discard;
     }
+}
+)END";
+
+static const string g_glslEnvironmentMapping = R"END(
+const float PI = radians(180.0);
+
+vec4 sampleEnvironmentMap(sampler2D tex2D, samplerCube texCube, vec3 R) {
+    if (isFeatureEnabled(FEATURE_ENVMAPCUBE)) return texture(texCube, R);
+
+    vec3 d = normalize(-R);
+    vec2 uv = vec2(
+        0.5 + atan(d.x, d.z) / (2.0 * PI),
+        0.5 - asin(d.y) / PI);
+
+    return texture(tex2D, uv);
 }
 )END";
 
@@ -782,8 +798,9 @@ void main() {
 static const string g_fsModelOpaque = R"END(
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
+uniform sampler2D sEnvironmentMap;
 uniform sampler2D sBumpMap;
-uniform samplerCube sEnvironmentMap;
+uniform samplerCube sEnvironmentMapCube;
 
 in vec3 fragPosObjSpace;
 in vec3 fragPosWorldSpace;
@@ -831,7 +848,8 @@ void main() {
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
         vec3 I = normalize(fragPosWorldSpace - uCameraPosition.xyz);
         vec3 R = reflect(I, normal);
-        envmapColor = vec4(texture(sEnvironmentMap, R).rgb, 1.0);
+        vec4 envmapSample = sampleEnvironmentMap(sEnvironmentMap, sEnvironmentMapCube, R);
+        envmapColor = vec4(envmapSample.rgb, 1.0);
     }
 
     float features =
@@ -858,8 +876,9 @@ void main() {
 static const string g_fsModelTransparent = R"END(
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
+uniform sampler2D sEnvironmentMap;
 uniform sampler2D sBumpMap;
-uniform samplerCube sEnvironmentMap;
+uniform samplerCube sEnvironmentMapCube;
 
 in vec3 fragPosWorldSpace;
 in vec3 fragNormalWorldSpace;
@@ -916,7 +935,7 @@ void main() {
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
         vec3 I = normalize(fragPosWorldSpace - uCameraPosition.xyz);
         vec3 R = reflect(I, normal);
-        vec4 envmapSample = texture(sEnvironmentMap, R);
+        vec4 envmapSample = sampleEnvironmentMap(sEnvironmentMap, sEnvironmentMapCube, R);
         objectColor += envmapSample.rgb * (1.0 - diffuseAlpha);
     }
     if (isFeatureEnabled(FEATURE_WATER)) {
@@ -1289,7 +1308,7 @@ uniform sampler2D sEyePos;
 uniform sampler2D sEyeNormal;
 uniform sampler2D sSSAO;
 uniform sampler2D sSSR;
-uniform samplerCube sCubeShadowMap;
+uniform samplerCube sShadowMapCube;
 uniform sampler2DArray sShadowMap;
 
 noperspective in vec2 fragUV1;
@@ -1300,7 +1319,7 @@ layout(location = 1) out vec4 fragColor2;
 float getShadow(vec3 eyePos, vec3 worldPos, vec3 normal) {
     float shadow = (uShadowLightPosition.w == 0.0) ?
         getDirectionalLightShadow(eyePos, worldPos, sShadowMap) :
-        getPointLightShadow(worldPos, sCubeShadowMap);
+        getPointLightShadow(worldPos, sShadowMapCube);
 
     shadow *= uShadowStrength;
     return shadow;
@@ -1553,8 +1572,8 @@ void Shaders::init() {
     auto fsText = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslTextUniforms, g_fsText});
     auto fsPointLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsPointLightShadows});
     auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDirectionalLightShadows});
-    auto fsModelOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslHash, g_glslHashedAlphaTest, g_glslNormalMapping, g_fsModelOpaque});
-    auto fsModelTransparent = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslNormalMapping, g_glslOIT, g_glslLuma, g_fsModelTransparent});
+    auto fsModelOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslHash, g_glslHashedAlphaTest, g_glslEnvironmentMapping, g_glslNormalMapping, g_fsModelOpaque});
+    auto fsModelTransparent = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslEnvironmentMapping, g_glslNormalMapping, g_glslOIT, g_glslLuma, g_fsModelTransparent});
     auto fsBillboard = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBillboard});
     auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_glslOIT, g_glslLuma, g_fsParticle});
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
@@ -1673,19 +1692,20 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     // Samplers
     program->setUniform("sMainTex", TextureUnits::mainTex);
     program->setUniform("sLightmap", TextureUnits::lightmap);
+    program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
+    program->setUniform("sBumpMap", TextureUnits::bumpMap);
     program->setUniform("sEnvmapColor", TextureUnits::envmapColor);
     program->setUniform("sSelfIllumColor", TextureUnits::selfIllumColor);
-    program->setUniform("sBumpMap", TextureUnits::bumpMap);
-    program->setUniform("sHilights", TextureUnits::hilights);
     program->setUniform("sEyePos", TextureUnits::eyePos);
     program->setUniform("sEyeNormal", TextureUnits::eyeNormal);
-    program->setUniform("sOITAccum", TextureUnits::oitAccum);
-    program->setUniform("sOITRevealage", TextureUnits::oitRevealage);
     program->setUniform("sSSAO", TextureUnits::ssao);
     program->setUniform("sSSR", TextureUnits::ssr);
+    program->setUniform("sHilights", TextureUnits::hilights);
+    program->setUniform("sOITAccum", TextureUnits::oitAccum);
+    program->setUniform("sOITRevealage", TextureUnits::oitRevealage);
     program->setUniform("sDanglyConstraints", TextureUnits::danglyConstraints);
-    program->setUniform("sEnvironmentMap", TextureUnits::environmentMap);
-    program->setUniform("sCubeShadowMap", TextureUnits::cubeShadowMap);
+    program->setUniform("sEnvironmentMapCube", TextureUnits::environmentMapCube);
+    program->setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
     program->setUniform("sShadowMap", TextureUnits::shadowMap);
 
     // Uniform Blocks

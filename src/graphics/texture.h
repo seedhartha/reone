@@ -59,28 +59,44 @@ public:
         Filtering maxFilter {Filtering::Linear};
         Wrapping wrap {Wrapping::Repeat};
         glm::vec3 borderColor {1.0f};
-        bool cubemap {false};
         bool lookup {false};
     };
 
     /**
-     * Container for properties found in TXI files.
+     * TXI properties container.
      */
     struct Features {
+        Blending blending {Blending::None};
+        float waterAlpha {-1.0f};
+        bool cube {false};
+
+        // Companion textures
+
         std::string envmapTexture;
         std::string bumpyShinyTexture;
         std::string bumpmapTexture;
+
         float bumpMapScaling {1.0f};
-        Blending blending {Blending::None};
+
+        // END Companion textures
+
+        // Font
+
         int numChars {0};
         float fontHeight {0.0f};
         std::vector<glm::vec3> upperLeftCoords;
         std::vector<glm::vec3> lowerRightCoords;
-        float waterAlpha {-1.0f};
+
+        // END Font
+
+        // Animation
+
         ProcedureType procedureType {ProcedureType::Invalid};
         int numX {0};
         int numY {0};
         int fps {0};
+
+        // END Animation
     };
 
     struct Layer {
@@ -105,9 +121,9 @@ public:
     glm::vec4 sample(float s, float t) const;
     glm::vec4 sample(int x, int y) const;
 
-    bool isCubemap() const { return _properties.cubemap; }
+    bool isCubemap() const { return _features.cube; }
     bool isLookup() const { return _properties.lookup; }
-    bool is2DArray() const { return _layers.size() > 1ll && !_properties.cubemap; }
+    bool is2DArray() const { return _layers.size() > 1ll && !isCubemap(); }
 
     bool isGrayscale() const { return _pixelFormat == PixelFormat::R8; }
 
@@ -124,6 +140,7 @@ public:
 
     void setFeatures(Features features) { _features = std::move(features); }
     void setPixelFormat(PixelFormat format) { _pixelFormat = format; }
+    void setCubemap(bool cubemap) { _features.cube = cubemap; }
 
     // Pixels
 
