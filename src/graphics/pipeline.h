@@ -71,6 +71,7 @@ private:
         std::shared_ptr<Texture> cbGBufferLightmap;
         std::shared_ptr<Texture> cbGBufferEnvMap;
         std::shared_ptr<Texture> cbGBufferSelfIllum;
+        std::shared_ptr<Texture> cbGBufferFeatures;
         std::shared_ptr<Texture> cbGBufferEyePos;
         std::shared_ptr<Texture> cbGBufferEyeNormal;
         std::shared_ptr<Texture> cbOpaqueGeometry1;

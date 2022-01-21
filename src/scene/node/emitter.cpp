@@ -309,7 +309,9 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
 
     _shaders.use(_shaders.particle(), true);
     _textures.bind(*texture);
-    _meshes.billboard().drawInstanced(leafs.size());
+    _graphicsContext.withFaceCulling(_modelNode->emitter()->twosided ? CullFaceMode::None : CullFaceMode::Back, [this, &leafs] {
+        _meshes.billboard().drawInstanced(leafs.size());
+    });
 }
 
 unique_ptr<ParticleSceneNode> EmitterSceneNode::newParticle() {

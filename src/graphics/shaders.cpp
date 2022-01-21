@@ -174,6 +174,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sBumpMap", TextureUnits::bumpMap);
     program->setUniform("sEnvmapColor", TextureUnits::envmapColor);
     program->setUniform("sSelfIllumColor", TextureUnits::selfIllumColor);
+    program->setUniform("sFeatures", TextureUnits::features);
     program->setUniform("sEyePos", TextureUnits::eyePos);
     program->setUniform("sEyeNormal", TextureUnits::eyeNormal);
     program->setUniform("sSSAO", TextureUnits::ssao);
