@@ -202,7 +202,7 @@ void main() {
     float diffuseAlpha = mainTexSample.a;
     if (isFeatureEnabled(FEATURE_PREMULALPHA)) {
         diffuseAlpha = rgbaToLuma(mainTexSample);
-        diffuseColor *= 1.0 / diffuseAlpha;
+        diffuseColor *= 1.0 / max(0.0001, diffuseAlpha);
     }
 
     vec3 normal = getNormal(uv);
@@ -289,7 +289,7 @@ void main() {
     float mainTexAlpha = mainTexSample.a;
     if (isFeatureEnabled(FEATURE_PREMULALPHA)) {
         mainTexAlpha = rgbaToLuma(mainTexSample);
-        mainTexColor *= 1.0 / mainTexAlpha;
+        mainTexColor *= 1.0 / max(0.0001, mainTexAlpha);
     }
     vec3 objectColor = uParticles[fragInstanceID].color.rgb * mainTexColor;
     float objectAlpha = uParticles[fragInstanceID].color.a * mainTexAlpha;

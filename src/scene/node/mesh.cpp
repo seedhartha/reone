@@ -231,7 +231,9 @@ void MeshSceneNode::draw() {
         uniforms.general.featureMask |= UniformsFeatureFlags::hashedalphatest;
         break;
     case Texture::Blending::Additive:
-        uniforms.general.featureMask |= UniformsFeatureFlags::premulalpha;
+        if (!_nodeTextures.envmap) {
+            uniforms.general.featureMask |= UniformsFeatureFlags::premulalpha;
+        }
         break;
     default:
         break;

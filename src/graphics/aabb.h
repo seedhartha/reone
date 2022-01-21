@@ -38,6 +38,8 @@ public:
 
     bool raycast(const glm::vec3 &origin, const glm::vec3 &dir, float maxDistance, float &outDistance) const;
 
+    bool isEmpty() const { return _empty; }
+
     glm::vec3 getSize() const;
 
     const glm::vec3 &min() const { return _min; }

@@ -56,9 +56,9 @@ ModelSceneNode::ModelSceneNode(
     _textures(textures),
     _animEventListener(animEventListener) {
 
-    _point = false;
     buildNodeTree(_model->rootNode(), *this);
     computeAABB();
+    _point = _aabb.isEmpty();
 }
 
 void ModelSceneNode::buildNodeTree(shared_ptr<ModelNode> node, SceneNode &parent) {
