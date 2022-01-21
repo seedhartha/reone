@@ -475,7 +475,7 @@ bool traceScreenSpaceRay(
          P += dP, Q.z += dQ.z, k += dk, stepCount += 1.0) {
 
         hitUV = permute ? P.yx : P;
-        hitUV *= uScreenResolutionReciprocal.xy;
+        hitUV *= uScreenResolutionRcp.xy;
         if (any(greaterThan(abs(hitUV - vec2(0.5)), vec2(0.5)))) {
             break;
         }
@@ -556,10 +556,10 @@ void main() {
 
     vec2 off1 = vec2(1.3846153846) * uBlurDirection;
     vec2 off2 = vec2(3.2307692308) * uBlurDirection;
-    color.rgb += texture(sMainTex, uv + off1 * uScreenResolutionReciprocal.xy).rgb * 0.3162162162;
-    color.rgb += texture(sMainTex, uv - off1 * uScreenResolutionReciprocal.xy).rgb * 0.3162162162;
-    color.rgb += texture(sMainTex, uv + off2 * uScreenResolutionReciprocal.xy).rgb * 0.0702702703;
-    color.rgb += texture(sMainTex, uv - off2 * uScreenResolutionReciprocal.xy).rgb * 0.0702702703;
+    color.rgb += texture(sMainTex, uv + off1 * uScreenResolutionRcp.xy).rgb * 0.3162162162;
+    color.rgb += texture(sMainTex, uv - off1 * uScreenResolutionRcp.xy).rgb * 0.3162162162;
+    color.rgb += texture(sMainTex, uv + off2 * uScreenResolutionRcp.xy).rgb * 0.0702702703;
+    color.rgb += texture(sMainTex, uv - off2 * uScreenResolutionRcp.xy).rgb * 0.0702702703;
 
     fragColor = color;
 }
@@ -580,12 +580,12 @@ void main() {
     vec2 off2 = vec2(3.2941176470588234) * uBlurDirection;
     vec2 off3 = vec2(5.176470588235294) * uBlurDirection;
     color += texture(sMainTex, uv) * 0.1964825501511404;
-    color += texture(sMainTex, uv + (off1 * uScreenResolutionReciprocal.xy)) * 0.2969069646728344;
-    color += texture(sMainTex, uv - (off1 * uScreenResolutionReciprocal.xy)) * 0.2969069646728344;
-    color += texture(sMainTex, uv + (off2 * uScreenResolutionReciprocal.xy)) * 0.09447039785044732;
-    color += texture(sMainTex, uv - (off2 * uScreenResolutionReciprocal.xy)) * 0.09447039785044732;
-    color += texture(sMainTex, uv + (off3 * uScreenResolutionReciprocal.xy)) * 0.010381362401148057;
-    color += texture(sMainTex, uv - (off3 * uScreenResolutionReciprocal.xy)) * 0.010381362401148057;
+    color += texture(sMainTex, uv + (off1 * uScreenResolutionRcp.xy)) * 0.2969069646728344;
+    color += texture(sMainTex, uv - (off1 * uScreenResolutionRcp.xy)) * 0.2969069646728344;
+    color += texture(sMainTex, uv + (off2 * uScreenResolutionRcp.xy)) * 0.09447039785044732;
+    color += texture(sMainTex, uv - (off2 * uScreenResolutionRcp.xy)) * 0.09447039785044732;
+    color += texture(sMainTex, uv + (off3 * uScreenResolutionRcp.xy)) * 0.010381362401148057;
+    color += texture(sMainTex, uv - (off3 * uScreenResolutionRcp.xy)) * 0.010381362401148057;
 
     fragColor = color;
 }
@@ -733,7 +733,7 @@ void main() {
     for (int dX = -1; dX <= 1; ++dX) {
         for (int dY = -1; dY <= 1; ++dY) {
             vec2 offset = vec2(float(dX), float(dY));
-            v[(dX + 1) * 3 + (dY + 1)] = texture(sMainTex, fragUV1 + offset * uScreenResolutionReciprocal.xy);
+            v[(dX + 1) * 3 + (dY + 1)] = texture(sMainTex, fragUV1 + offset * uScreenResolutionRcp.xy);
         }
     }
     vec4 temp;
@@ -762,7 +762,7 @@ void main() {
     for (int dX = -2; dX <= 2; ++dX) {
         for (int dY = -2; dY <= 2; ++dY) {
             vec2 offset = vec2(float(dX), float(dY));
-            v[(dX + 2) * 5 + (dY + 2)] = texture(sMainTex, fragUV1 + offset * uScreenResolutionReciprocal.xy);
+            v[(dX + 2) * 5 + (dY + 2)] = texture(sMainTex, fragUV1 + offset * uScreenResolutionRcp.xy);
         }
     }
     vec4 temp;
@@ -801,6 +801,9 @@ noperspective in vec2 fragUV1;
 out vec4 fragColor;
 
 void main() {
+    vec4 rcpFrameOpt = vec4(-0.5 * uScreenResolutionRcp, 0.5 * uScreenResolutionRcp);
+    vec4 rcpFrameOpt2 = vec4(-2.0 * uScreenResolutionRcp, 2.0 * uScreenResolutionRcp);
+
     vec2 posM = fragUV1;
     vec4 rgbaM = texture(sMainTex, posM);
     float lumaM = rgbaToLuma(rgbaM);
@@ -825,14 +828,14 @@ void main() {
     vec2 dir = vec2(dirSwMinusNe + dirSeMinusNw, dirSwMinusNe - dirSeMinusNw);
 
     vec2 dir1 = normalize(dir);
-    vec4 rgbaN1 = texture(sMainTex, posM - dir1 * uScreenResolutionReciprocal.zw);
-    vec4 rgbaP1 = texture(sMainTex, posM + dir1 * uScreenResolutionReciprocal.zw);
+    vec4 rgbaN1 = texture(sMainTex, posM - dir1 * rcpFrameOpt.zw);
+    vec4 rgbaP1 = texture(sMainTex, posM + dir1 * rcpFrameOpt.zw);
 
     float dirAbsMinTimesC = min(abs(dir1.x), abs(dir1.y)) * EDGE_SHARPNESS;
     vec2 dir2 = clamp(dir1 / dirAbsMinTimesC, -2.0, 2.0);
 
-    vec4 rgbaN2 = texture(sMainTex, posM - dir2 * uScreenResolutionReciprocal2.zw);
-    vec4 rgbaP2 = texture(sMainTex, posM + dir2 * uScreenResolutionReciprocal2.zw);
+    vec4 rgbaN2 = texture(sMainTex, posM - dir2 * rcpFrameOpt2.zw);
+    vec4 rgbaP2 = texture(sMainTex, posM + dir2 * rcpFrameOpt2.zw);
 
     vec4 rgbaA = rgbaN1 + rgbaP1;
     vec4 rgbaB = ((rgbaN2 + rgbaP2) * 0.25) + (rgbaA * 0.25);

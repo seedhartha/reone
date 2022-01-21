@@ -66,9 +66,8 @@ layout(std140) uniform General {
     vec4 uFogColor;
     vec4 uHeightMapFrameBounds;
     vec4 uShadowLightPosition;
-    vec4 uScreenResolutionReciprocal;
-    vec4 uScreenResolutionReciprocal2;
     vec2 uScreenResolution;
+    vec2 uScreenResolutionRcp;
     vec2 uBlurDirection;
     ivec2 uGridSize;
     float uClipNear;
