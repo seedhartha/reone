@@ -258,7 +258,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::particles;
-    uniforms.particles.gridSize = emitter->gridSize;
+    uniforms.general.gridSize = emitter->gridSize;
     switch (emitter->blendMode) {
     case ModelNode::Emitter::BlendMode::Lighten:
         uniforms.general.featureMask |= UniformsFeatureFlags::premulalpha;

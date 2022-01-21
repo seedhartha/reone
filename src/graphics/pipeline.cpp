@@ -63,11 +63,8 @@ static constexpr GLenum kColorAttachments[] {
 static const vector<float> g_shadowCascadeDivisors {
     0.005f,
     0.015f,
-    0.035f,
-    0.075f,
-    0.155f,
-    0.315f,
-    0.635f};
+    0.045f,
+    0.135f};
 
 static vector<glm::vec4> computeFrustumCornersWorldSpace(const glm::mat4 &projection, const glm::mat4 &view) {
     auto inv = glm::inverse(projection * view);
@@ -550,11 +547,9 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
         uniforms.general.shadowLightPosition = glm::vec4(scene.shadowLightPosition(), scene.isShadowLightDirectional() ? 0.0f : 1.0f);
         uniforms.general.shadowStrength = scene.shadowStrength();
         uniforms.general.shadowRadius = scene.shadowRadius();
+        uniforms.general.shadowCascadeFarPlanes = _shadowCascadeFarPlanes;
         for (int i = 0; i < kNumShadowLightSpace; ++i) {
             uniforms.general.shadowLightSpace[i] = _shadowLightSpace[i];
-        }
-        for (int i = 0; i < 2; ++i) {
-            uniforms.general.shadowCascadeFarPlanes[i] = _shadowCascadeFarPlanes[i];
         }
     }
     if (scene.isFogEnabled()) {
@@ -682,16 +677,13 @@ void Pipeline::computeLightSpaceMatrices(IScene &scene) {
         float cameraNear = camera->zNear();
         float cameraFar = camera->zFar();
         for (int i = 0; i < kNumShadowCascades; ++i) {
+            float far = cameraFar * g_shadowCascadeDivisors[i];
             float near = cameraNear;
             if (i > 0) {
                 near = cameraFar * g_shadowCascadeDivisors[i - 1];
             }
-            float far = cameraFar;
-            if (i < kNumShadowCascades - 1) {
-                far *= g_shadowCascadeDivisors[i];
-            }
             _shadowLightSpace[i] = computeDirectionalLightSpaceMatrix(fovy, aspect, near, far, lightDir, camera->view());
-            _shadowCascadeFarPlanes[i / 4][i % 4] = far;
+            _shadowCascadeFarPlanes[i] = far;
         }
     } else {
         glm::mat4 projection(glm::perspective(kPointLightShadowsFOV, 1.0f, kPointLightShadowsNearPlane, kPointLightShadowsFarPlane));
