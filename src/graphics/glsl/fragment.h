@@ -108,8 +108,9 @@ layout(location = 0) out vec4 fragDiffuseColor;
 layout(location = 1) out vec4 fragLightmapColor;
 layout(location = 2) out vec4 fragEnvmapColor;
 layout(location = 3) out vec4 fragSelfIllumColor;
-layout(location = 4) out vec4 fragEyePos;
-layout(location = 5) out vec4 fragEyeNormal;
+layout(location = 4) out vec4 fragFeatures;
+layout(location = 5) out vec4 fragEyePos;
+layout(location = 6) out vec4 fragEyeNormal;
 
 vec3 getNormal(vec2 uv) {
     if (isFeatureEnabled(FEATURE_NORMALMAP)) {
@@ -147,15 +148,12 @@ void main() {
         envmapColor = vec4(envmapSample.rgb, 1.0);
     }
 
-    float features =
-        (isFeatureEnabled(FEATURE_SHADOWS) ? 1.0 : 0.0) +
-        (isFeatureEnabled(FEATURE_FOG) ? 2.0 : 0.0);
-    features *= (1.0 / 255.0);
-    vec4 selfIllumColor = vec4(vec3(0.0), features);
-    if (isFeatureEnabled(FEATURE_SELFILLUM)) {
-        selfIllumColor.rgb = uSelfIllumColor.rgb;
-    }
-
+    vec4 selfIllumColor = isFeatureEnabled(FEATURE_SELFILLUM) ? vec4(uSelfIllumColor.rgb, 1.0) : vec4(0.0);
+    vec4 features = vec4(
+        isFeatureEnabled(FEATURE_SHADOWS) ? 1.0 : 0.0,
+        isFeatureEnabled(FEATURE_FOG) ? 1.0 : 0.0,
+        0.0,
+        0.0);
     vec3 eyePos = (uView * vec4(fragPosWorldSpace, 1.0)).rgb;
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normal;
 
@@ -163,6 +161,7 @@ void main() {
     fragLightmapColor = isFeatureEnabled(FEATURE_LIGHTMAP) ? vec4(texture(sLightmap, fragUV2).rgb, 1.0) : vec4(0.0);
     fragEnvmapColor = envmapColor;
     fragSelfIllumColor = selfIllumColor;
+    fragFeatures = features;
     fragEyePos = vec4(eyePos, 0.0);
     fragEyeNormal = vec4(eyeNormal, 0.0);
 }
@@ -317,8 +316,9 @@ layout(location = 0) out vec4 fragDiffuseColor;
 layout(location = 1) out vec4 fragLightmapColor;
 layout(location = 2) out vec4 fragEnvmapColor;
 layout(location = 3) out vec4 fragSelfIllumColor;
-layout(location = 4) out vec4 fragEyePos;
-layout(location = 5) out vec4 fragEyeNormal;
+layout(location = 4) out vec4 fragFeatures;
+layout(location = 5) out vec4 fragEyePos;
+layout(location = 6) out vec4 fragEyeNormal;
 
 void main() {
     vec2 uv = vec2(0.5) * fragUV1;
@@ -331,8 +331,6 @@ void main() {
     vec3 eyePos = (uView * vec4(fragPosWorldSpace, 1.0)).rgb;
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorldSpace);
 
-    float features = 2.0 * (1.0 / 255.0);
-
     fragDiffuseColor = mainTexSample;
 
     fragLightmapColor = isFeatureEnabled(FEATURE_LIGHTMAP) ?
@@ -340,7 +338,8 @@ void main() {
         vec4(0.0);
 
     fragEnvmapColor = vec4(0.0);
-    fragSelfIllumColor = vec4(vec3(0.0), features);
+    fragSelfIllumColor = vec4(0.0);
+    fragFeatures = vec4(0.0, 1.0, 0.0, 0.0);
     fragEyePos = vec4(eyePos, 0.0);
     fragEyeNormal = vec4(eyeNormal, 0.0);
 }
@@ -599,6 +598,7 @@ uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
 uniform sampler2D sEnvmapColor;
 uniform sampler2D sSelfIllumColor;
+uniform sampler2D sFeatures;
 uniform sampler2D sEyePos;
 uniform sampler2D sEyeNormal;
 uniform sampler2D sSSAO;
@@ -627,6 +627,7 @@ void main() {
     vec4 lightmapSample = texture(sLightmap, uv);
     vec4 envmapSample = texture(sEnvmapColor, uv);
     vec4 selfIllumSample = texture(sSelfIllumColor, uv);
+    vec4 featuresSample = texture(sFeatures, uv);
     vec4 ssaoSample = texture(sSSAO, uv);
     vec4 ssrSample = texture(sSSR, uv);
 
@@ -638,17 +639,10 @@ void main() {
 
     float envmapped = step(0.0001, envmapSample.a);
     float lightmapped = step(0.0001, lightmapSample.a);
+    float selfIllumed = step(0.0001, selfIllumSample.a);
 
-    float shadow = 0.0;
-    float fog = 0.0;
-
-    int features = int(255.0 * selfIllumSample.a);
-    if ((features & 1) != 0) {
-        shadow = getShadow(eyePos, worldPos, worldNormal);
-    }
-    if ((features & 2) != 0) {
-        fog = getFog(worldPos);
-    }
+    float shadow = mix(0.0, getShadow(eyePos, worldPos, worldNormal), featuresSample.r);
+    float fog = mix(0.0, getFog(worldPos), featuresSample.g);
 
     float shadowLM = smoothstep(0.0, 1.0, 1.0 - rgbToLuma(lightmapSample.rgb));
     shadowLM = max(shadow, mix(0.0, shadowLM, lightmapped));
@@ -668,7 +662,7 @@ void main() {
     getIrradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, directD, directS, directAreaD, directAreaS);
 
     vec3 colorDynamic = clamp(ambientD * ao + directD * (1.0 - shadowLM) + emission, 0.0, 1.0) * albedo;
-    colorDynamic += ambientS * ao + directS * (1.0 - shadowLM);
+    colorDynamic += ambientS * ao + directS * (1.0 - shadowLM) * (1.0 - selfIllumed);
 
     vec3 colorLightmapped = clamp(lightmapSample.rgb * (ao * 0.5 + 0.5) * (1.0 - 0.5 * shadow) + directAreaD * (1.0 - shadow) + emission, 0.0, 1.0) * albedo;
     colorLightmapped += ambientS * ao + directAreaS * (1.0 - shadow);

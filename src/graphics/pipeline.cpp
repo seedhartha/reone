@@ -255,6 +255,10 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
     attachments.cbGBufferSelfIllum->clear(dim.x, dim.y, PixelFormat::RGBA8);
     attachments.cbGBufferSelfIllum->init();
 
+    attachments.cbGBufferFeatures = make_unique<Texture>("gbuffer_color_features", getTextureProperties(TextureUsage::ColorBuffer));
+    attachments.cbGBufferFeatures->clear(dim.x, dim.y, PixelFormat::RG8);
+    attachments.cbGBufferFeatures->init();
+
     attachments.cbGBufferEyePos = make_unique<Texture>("gbuffer_color_eyepos", getTextureProperties(TextureUsage::ColorBuffer));
     attachments.cbGBufferEyePos->clear(dim.x, dim.y, PixelFormat::RGB16F);
     attachments.cbGBufferEyePos->init();
@@ -273,6 +277,7 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
          attachments.cbGBufferLightmap,
          attachments.cbGBufferEnvMap,
          attachments.cbGBufferSelfIllum,
+         attachments.cbGBufferFeatures,
          attachments.cbGBufferEyePos,
          attachments.cbGBufferEyeNormal},
         attachments.dbGBuffer);
@@ -437,7 +442,7 @@ void Pipeline::drawOpaqueGeometry(IScene &scene, Attachments &attachments) {
     uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbGBuffer->nameGL());
-    glDrawBuffers(6, kColorAttachments);
+    glDrawBuffers(7, kColorAttachments);
     _graphicsContext.clearColorDepth();
     scene.drawOpaque();
 }
@@ -566,6 +571,7 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
     _textures.bind(*attachments.cbGBufferLightmap, TextureUnits::lightmap);
     _textures.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);
     _textures.bind(*attachments.cbGBufferSelfIllum, TextureUnits::selfIllumColor);
+    _textures.bind(*attachments.cbGBufferFeatures, TextureUnits::features);
     _textures.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
     _textures.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
     if (_options.ssao) {

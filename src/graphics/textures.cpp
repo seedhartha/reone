@@ -104,6 +104,7 @@ void Textures::bindBuiltIn() {
     bind(*_defaultRGB, TextureUnits::bumpMap);
     bind(*_defaultRGB, TextureUnits::envmapColor);
     bind(*_defaultRGB, TextureUnits::selfIllumColor);
+    bind(*_defaultRGB, TextureUnits::features);
     bind(*_defaultRGB, TextureUnits::eyePos);
     bind(*_defaultRGB, TextureUnits::eyeNormal);
     bind(*_ssaoRGB, TextureUnits::ssao);
