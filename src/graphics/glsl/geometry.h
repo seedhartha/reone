@@ -43,7 +43,7 @@ void main() {
 )END";
 
 const std::string g_gsDirectionalLightShadows = R"END(
-const int NUM_SHADOW_CASCADES = 8;
+const int NUM_SHADOW_CASCADES = 4;
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices=12) out;

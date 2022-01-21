@@ -26,7 +26,7 @@ const std::string g_glslHeader = R"END(
 )END";
 
 const std::string g_glslGeneralUniforms = R"END(
-const int NUM_SHADOW_LIGHT_SPACE = 8;
+const int NUM_SHADOW_LIGHT_SPACE = 6;
 
 const int FEATURE_LIGHTMAP = 1;
 const int FEATURE_ENVMAP = 2;
@@ -70,6 +70,7 @@ layout(std140) uniform General {
     vec4 uScreenResolutionReciprocal2;
     vec2 uScreenResolution;
     vec2 uBlurDirection;
+    ivec2 uGridSize;
     float uClipNear;
     float uClipFar;
     float uAlpha;
@@ -82,8 +83,8 @@ layout(std140) uniform General {
     float uBillboardSize;
     float uDanglyDisplacement;
     int uFeatureMask;
+    vec4 uShadowCascadeFarPlanes;
     mat4 uShadowLightSpace[NUM_SHADOW_LIGHT_SPACE];
-    vec4 uShadowCascadeFarPlanes[2];
 };
 
 bool isFeatureEnabled(int flag) {
@@ -129,7 +130,6 @@ struct Particle {
 };
 
 layout(std140) uniform Particles {
-    ivec2 uParticleGridSize;
     Particle uParticles[MAX_PARTICLES];
 };
 )END";
@@ -369,7 +369,7 @@ void getIrradianceDirect(
 )END";
 
 const std::string g_glslShadowMapping = R"END(
-const int NUM_SHADOW_CASCADES = 8;
+const int NUM_SHADOW_CASCADES = 4;
 const int NUM_PCF_SAMPLES = 20;
 
 const float PCF_SAMPLE_RADIUS = 0.1;
@@ -384,7 +384,7 @@ const vec3 PCF_SAMPLE_OFFSETS[20] = vec3[](
 float getDirectionalLightShadow(vec3 eyePos, vec3 worldPos, sampler2DArray tex) {
     int cascade = NUM_SHADOW_CASCADES - 1;
     for (int i = 0; i < NUM_SHADOW_CASCADES; ++i) {
-        if (abs(eyePos.z) < uShadowCascadeFarPlanes[i / 4][i % 4]) {
+        if (abs(eyePos.z) < uShadowCascadeFarPlanes[i]) {
             cascade = i;
             break;
         }

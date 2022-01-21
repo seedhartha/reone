@@ -67,6 +67,7 @@ struct GeneralUniforms {
     glm::vec4 screenResolutionReciprocal2 {0.0f};
     glm::vec2 screenResolution {0.0f};
     glm::vec2 blurDirection {0.0f};
+    glm::ivec2 gridSize {0};
     float clipNear {kDefaultClipPlaneNear};
     float clipFar {kDefaultClipPlaneFar};
     float alpha {1.0f};
@@ -79,8 +80,9 @@ struct GeneralUniforms {
     float billboardSize {1.0f};
     float danglyDisplacement {0.0f};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
+    char padding[8];
+    glm::vec4 shadowCascadeFarPlanes {0.0f};
     glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
-    glm::vec4 shadowCascadeFarPlanes[2] {glm::vec4(0.0f)};
 
     void resetGlobals() {
         projection = glm::mat4(1.0f);
@@ -94,11 +96,9 @@ struct GeneralUniforms {
         fogFar = 0.0f;
         shadowStrength = 1.0f;
         shadowRadius = 0.0f;
+        shadowCascadeFarPlanes = glm::vec4(0.0f);
         for (int i = 0; i < kNumShadowLightSpace; ++i) {
             shadowLightSpace[i] = glm::mat4(1.0f);
-        }
-        for (int i = 0; i < 2; ++i) {
-            shadowCascadeFarPlanes[i] = glm::vec4(0.0f);
         }
     }
 
@@ -116,6 +116,7 @@ struct GeneralUniforms {
         screenResolutionReciprocal2 = glm::vec4(0.0f);
         screenResolution = glm::vec2(0.0f);
         blurDirection = glm::vec2(0.0f);
+        gridSize = glm::vec2(0.0f);
         alpha = 1.0f;
         waterAlpha = 1.0f;
         heightMapScaling = 1.0f;
@@ -154,8 +155,6 @@ struct ParticleUniforms {
 };
 
 struct ParticlesUniforms {
-    glm::ivec2 gridSize {0};
-    char padding[8];
     ParticleUniforms particles[kMaxParticles];
 };
 
