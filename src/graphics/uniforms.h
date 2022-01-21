@@ -113,7 +113,7 @@ struct GeneralUniforms {
         screenResolution = glm::vec2(0.0f);
         screenResolutionRcp = glm::vec2(0.0f);
         blurDirection = glm::vec2(0.0f);
-        gridSize = glm::vec2(0.0f);
+        gridSize = glm::ivec2(0);
         alpha = 1.0f;
         waterAlpha = 1.0f;
         heightMapScaling = 1.0f;
