@@ -99,6 +99,7 @@ private:
     void cmdAddItem(std::string input, std::vector<std::string> tokens);
     void cmdGiveXP(std::string input, std::vector<std::string> tokens);
     void cmdWarp(std::string input, std::vector<std::string> tokens);
+    void cmdListRoutine(std::string input, std::vector<std::string> tokens);
     void cmdExec(std::string input, std::vector<std::string> tokens);
     void cmdHelp(std::string input, std::vector<std::string> tokens);
 

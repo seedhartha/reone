@@ -64,6 +64,7 @@ void Console::init() {
     addCommand("additem", "add item to selected object", bind(&Console::cmdAddItem, this, _1, _2));
     addCommand("givexp", "give experience to selected creature", bind(&Console::cmdGiveXP, this, _1, _2));
     addCommand("warp", "warp to a module", bind(&Console::cmdWarp, this, _1, _2));
+    addCommand("listroutine", "list script routine", bind(&Console::cmdListRoutine, this, _1, _2));
     addCommand("exec", "execute script routine", bind(&Console::cmdExec, this, _1, _2));
     addCommand("help", "list all commands", bind(&Console::cmdHelp, this, _1, _2));
 }
@@ -333,6 +334,17 @@ void Console::cmdWarp(string input, vector<string> tokens) {
         return;
     }
     _game.loadModule(tokens[1]);
+}
+
+void Console::cmdListRoutine(string input, vector<string> tokens) {
+    auto query = tokens.size() > 1ll ? tokens[1] : "";
+    auto &routines = _game.routines();
+    for (int i = 0; i < routines.getNumRoutines(); ++i) {
+        auto &routine = routines.get(i);
+        if (query.empty() || boost::contains(routine.name(), query)) {
+            print(routine.name());
+        }
+    }
 }
 
 void Console::cmdExec(string input, vector<string> tokens) {

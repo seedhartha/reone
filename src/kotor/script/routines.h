@@ -47,6 +47,8 @@ public:
     void initForTSL();
 
     const script::Routine &get(int index) const override;
+
+    int getNumRoutines() const override { return static_cast<int>(_routines.size()); }
     int getIndexByName(const std::string &name) const override;
 
 private:
