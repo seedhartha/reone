@@ -48,29 +48,150 @@ namespace kotor {
 static constexpr int kMaxOutputLineCount = 100;
 static constexpr int kVisibleLineCount = 15;
 
-Console::Console(
-    Game &game,
-    Services &services) :
-    _game(game),
-    _services(services),
-    _input(TextInputFlags::console) {
+void Console::init() {
+    _font = _services.fonts.get("fnt_console");
 
-    initCommands();
+    addCommand("clear", "clear console", bind(&Console::cmdClear, this, _1));
+    addCommand("describe", "describe selected object", bind(&Console::cmdDescribe, this, _1));
+    addCommand("listanim", "list animations of selected object", bind(&Console::cmdListAnim, this, _1));
+    addCommand("playanim", "play animation on selected object", bind(&Console::cmdPlayAnim, this, _1));
+    addCommand("kill", "kill selected object", bind(&Console::cmdKill, this, _1));
+    addCommand("additem", "add item to selected object", bind(&Console::cmdAddItem, this, _1));
+    addCommand("givexp", "give experience to selected creature", bind(&Console::cmdGiveXP, this, _1));
+    addCommand("warp", "warp to a module", bind(&Console::cmdWarp, this, _1));
+    addCommand("help", "list all commands", bind(&Console::cmdHelp, this, _1));
 }
 
-void Console::initCommands() {
-    addCommand("clear", bind(&Console::cmdClear, this, _1));
-    addCommand("describe", bind(&Console::cmdDescribe, this, _1));
-    addCommand("listanim", bind(&Console::cmdListAnim, this, _1));
-    addCommand("playanim", bind(&Console::cmdPlayAnim, this, _1));
-    addCommand("kill", bind(&Console::cmdKill, this, _1));
-    addCommand("additem", bind(&Console::cmdAddItem, this, _1));
-    addCommand("givexp", bind(&Console::cmdGiveXP, this, _1));
-    addCommand("warp", bind(&Console::cmdWarp, this, _1));
+void Console::addCommand(string name, string description, CommandHandler handler) {
+    Command cmd;
+    cmd.name = move(name);
+    cmd.description = move(description);
+    cmd.handler = move(handler);
+
+    _commands.push_back(cmd);
+    _commandByName.insert(make_pair(cmd.name, cmd));
 }
 
-void Console::addCommand(const std::string &name, const CommandHandler &handler) {
-    _commands.insert(make_pair(name, handler));
+bool Console::handle(const SDL_Event &event) {
+    if (_open && _input.handle(event)) {
+        return true;
+    }
+    switch (event.type) {
+    case SDL_MOUSEWHEEL:
+        return handleMouseWheel(event.wheel);
+    case SDL_KEYUP:
+        return handleKeyUp(event.key);
+    default:
+        return false;
+    }
+}
+
+bool Console::handleMouseWheel(const SDL_MouseWheelEvent &event) {
+    bool up = event.y < 0;
+    if (up) {
+        if (_outputOffset > 0) {
+            --_outputOffset;
+        }
+    } else {
+        if (_outputOffset < static_cast<int>(_output.size()) - kVisibleLineCount + 1) {
+            ++_outputOffset;
+        }
+    }
+    return true;
+}
+
+bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
+    if (_open) {
+        switch (event.keysym.sym) {
+        case SDLK_BACKQUOTE:
+            _open = false;
+            return true;
+
+        case SDLK_RETURN: {
+            string text(_input.text());
+            if (!text.empty()) {
+                executeInputText();
+                _history.push(_input.text());
+                _input.clear();
+            }
+            return true;
+        }
+        case SDLK_UP:
+            if (!_history.empty()) {
+                _input.setText(_history.top());
+                _history.pop();
+            }
+            return true;
+        default:
+            return false;
+        }
+    } else {
+        switch (event.keysym.sym) {
+        case SDLK_BACKQUOTE:
+            _open = true;
+            return true;
+
+        default:
+            return false;
+        }
+    }
+}
+
+void Console::executeInputText() {
+    vector<string> tokens;
+    boost::split(tokens, _input.text(), boost::is_space(), boost::token_compress_on);
+    if (tokens.empty()) {
+        return;
+    }
+    auto maybeCommand = _commandByName.find(tokens[0]);
+    if (maybeCommand != _commandByName.end()) {
+        maybeCommand->second.handler(move(tokens));
+    } else {
+        print("Unknown command: " + tokens[0]);
+    }
+}
+
+void Console::draw() {
+    _services.graphicsContext.withBlending(BlendMode::Normal, [this]() {
+        drawBackground();
+        drawLines();
+    });
+}
+
+void Console::drawBackground() {
+    float height = kVisibleLineCount * _font->height();
+
+    glm::mat4 transform(1.0f);
+    transform = glm::scale(transform, glm::vec3(_game.options().graphics.width, height, 1.0f));
+
+    auto &uniforms = _services.shaders.uniforms();
+    uniforms.general.resetLocals();
+    uniforms.general.projection = _services.window.getOrthoProjection();
+    uniforms.general.model = move(transform);
+    uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    uniforms.general.alpha = 0.5f;
+
+    _services.shaders.use(_services.shaders.simpleColor(), true);
+    _services.meshes.quad().draw();
+}
+
+void Console::drawLines() {
+    float height = kVisibleLineCount * _font->height();
+
+    glm::vec3 position(3.0f, height - 0.5f * _font->height(), 0.0f);
+
+    // Input
+
+    string text("> " + _input.text());
+    _font->draw(text, position, glm::vec3(1.0f), TextGravity::RightCenter);
+
+    // Output
+
+    for (int i = 0; i < kVisibleLineCount - 1 && i < static_cast<int>(_output.size()) - _outputOffset; ++i) {
+        const string &line = _output[static_cast<size_t>(i) + _outputOffset];
+        position.y -= _font->height();
+        _font->draw(line, position, glm::vec3(1.0f), TextGravity::RightCenter);
+    }
 }
 
 void Console::cmdClear(vector<string> tokens) {
@@ -209,6 +330,12 @@ void Console::cmdWarp(vector<string> tokens) {
     _game.loadModule(tokens[1]);
 }
 
+void Console::cmdHelp(vector<string> tokens) {
+    for (auto &cmd : _commands) {
+        print(cmd.name + ": " + cmd.description);
+    }
+}
+
 void Console::print(const string &text) {
     _output.push_front(text);
     trimOutput();
@@ -217,133 +344,6 @@ void Console::print(const string &text) {
 void Console::trimOutput() {
     for (int i = static_cast<int>(_output.size()) - kMaxOutputLineCount; i > 0; --i) {
         _output.pop_back();
-    }
-}
-
-void Console::init() {
-    _font = _services.fonts.get("fnt_console");
-}
-
-bool Console::handle(const SDL_Event &event) {
-    if (_open && _input.handle(event))
-        return true;
-
-    switch (event.type) {
-    case SDL_MOUSEWHEEL:
-        return handleMouseWheel(event.wheel);
-    case SDL_KEYUP:
-        return handleKeyUp(event.key);
-    default:
-        return false;
-    }
-}
-
-bool Console::handleMouseWheel(const SDL_MouseWheelEvent &event) {
-    bool up = event.y < 0;
-    if (up) {
-        if (_outputOffset > 0) {
-            --_outputOffset;
-        }
-    } else {
-        if (_outputOffset < static_cast<int>(_output.size()) - kVisibleLineCount + 1) {
-            ++_outputOffset;
-        }
-    }
-    return true;
-}
-
-bool Console::handleKeyUp(const SDL_KeyboardEvent &event) {
-    if (_open) {
-        switch (event.keysym.sym) {
-        case SDLK_BACKQUOTE:
-            _open = false;
-            return true;
-
-        case SDLK_RETURN: {
-            string text(_input.text());
-            if (!text.empty()) {
-                executeInputText();
-                _history.push(_input.text());
-                _input.clear();
-            }
-            return true;
-        }
-        case SDLK_UP:
-            if (!_history.empty()) {
-                _input.setText(_history.top());
-                _history.pop();
-            }
-            return true;
-        default:
-            return false;
-        }
-    } else {
-        switch (event.keysym.sym) {
-        case SDLK_BACKQUOTE:
-            _open = true;
-            return true;
-
-        default:
-            return false;
-        }
-    }
-}
-
-void Console::executeInputText() {
-    vector<string> tokens;
-    boost::split(tokens, _input.text(), boost::is_space(), boost::token_compress_on);
-
-    if (tokens.empty())
-        return;
-
-    auto maybeCommand = _commands.find(tokens[0]);
-    if (maybeCommand != _commands.end()) {
-        maybeCommand->second(move(tokens));
-    } else {
-        print("Unsupported command: " + tokens[0]);
-    }
-}
-
-void Console::draw() {
-    _services.graphicsContext.withBlending(BlendMode::Normal, [this]() {
-        drawBackground();
-        drawLines();
-    });
-}
-
-void Console::drawBackground() {
-    float height = kVisibleLineCount * _font->height();
-
-    glm::mat4 transform(1.0f);
-    transform = glm::scale(transform, glm::vec3(_game.options().graphics.width, height, 1.0f));
-
-    auto &uniforms = _services.shaders.uniforms();
-    uniforms.general.resetLocals();
-    uniforms.general.projection = _services.window.getOrthoProjection();
-    uniforms.general.model = move(transform);
-    uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    uniforms.general.alpha = 0.5f;
-
-    _services.shaders.use(_services.shaders.simpleColor(), true);
-    _services.meshes.quad().draw();
-}
-
-void Console::drawLines() {
-    float height = kVisibleLineCount * _font->height();
-
-    glm::vec3 position(3.0f, height - 0.5f * _font->height(), 0.0f);
-
-    // Input
-
-    string text("> " + _input.text());
-    _font->draw(text, position, glm::vec3(1.0f), TextGravity::RightCenter);
-
-    // Output
-
-    for (int i = 0; i < kVisibleLineCount - 1 && i < static_cast<int>(_output.size()) - _outputOffset; ++i) {
-        const string &line = _output[static_cast<size_t>(i) + _outputOffset];
-        position.y -= _font->height();
-        _font->draw(line, position, glm::vec3(1.0f), TextGravity::RightCenter);
     }
 }
 

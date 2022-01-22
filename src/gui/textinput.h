@@ -25,10 +25,10 @@ struct TextInputFlags {
     static constexpr int digits = 1;
     static constexpr int letters = 2;
     static constexpr int whitespace = 4;
-    static constexpr int punctuation = 8;
+    static constexpr int symbols = 8;
 
     static constexpr int lettersWhitespace = letters | whitespace;
-    static constexpr int console = digits | letters | whitespace | punctuation;
+    static constexpr int console = digits | letters | whitespace | symbols;
 };
 
 class TextInput {
