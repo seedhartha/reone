@@ -47,11 +47,10 @@ public:
 
     // Built-in
 
-    std::shared_ptr<Texture> defaultRGB() const { return _defaultRGB; }
+    std::shared_ptr<Texture> default2DRGB() const { return _default2DRGB; }
     std::shared_ptr<Texture> defaultArrayDepth() const { return _defaultArrayDepth; }
     std::shared_ptr<Texture> defaultCubemapRGB() const { return _defaultCubemapRGB; }
     std::shared_ptr<Texture> defaultCubemapDepth() const { return _defaultCubemapDepth; }
-    std::shared_ptr<Texture> default1DRGB() const { return _default1DRGB; }
 
     // END Built-in
 
@@ -64,11 +63,10 @@ private:
 
     // Built-in
 
-    std::shared_ptr<Texture> _defaultRGB;
+    std::shared_ptr<Texture> _default2DRGB;
     std::shared_ptr<Texture> _defaultArrayDepth;
     std::shared_ptr<Texture> _defaultCubemapRGB;
     std::shared_ptr<Texture> _defaultCubemapDepth;
-    std::shared_ptr<Texture> _default1DRGB;
 
     std::shared_ptr<Texture> _ssaoRGB;
     std::shared_ptr<Texture> _ssrRGBA;

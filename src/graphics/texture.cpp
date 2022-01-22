@@ -139,8 +139,6 @@ void Texture::unbind() {
 void Texture::configure() {
     if (isCubemap()) {
         configureCubemap();
-    } else if (isLookup()) {
-        configure1D();
     } else {
         configure2D();
     }
@@ -169,10 +167,6 @@ void Texture::configureCubemap() {
     }
 }
 
-void Texture::configure1D() {
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-}
-
 void Texture::configure2D() {
     auto target = getTargetGL();
     glTexParameteri(target, GL_TEXTURE_MIN_FILTER, getFilterGL(_properties.minFilter));
@@ -198,8 +192,6 @@ void Texture::configure2D() {
 void Texture::refresh() {
     if (isCubemap()) {
         refreshCubemap();
-    } else if (isLookup()) {
-        refresh1D();
     } else if (is2DArray()) {
         refresh2DArray();
     } else {
@@ -226,15 +218,6 @@ void Texture::refreshCubemap() {
 void Texture::refresh2DArray() {
     int numLayers = static_cast<int>(_layers.size());
     fillTarget3D(_width, _height, numLayers);
-}
-
-void Texture::refresh1D() {
-    if (!_layers.empty() && _layers.front().pixels) {
-        auto &pixels = _layers.front().pixels;
-        fillTarget1D(_width, pixels->data());
-    } else {
-        fillTarget1D(_width);
-    }
 }
 
 void Texture::refresh2D() {
@@ -349,21 +332,6 @@ glm::vec4 Texture::sample(int x, int y) const {
     return glm::vec4(r, g, b, a);
 }
 
-void Texture::fillTarget1D(int width, const void *pixels) {
-    if (isCompressed(_pixelFormat)) {
-        throw logic_error("Compressed 1D textures are not supported");
-    }
-    glTexImage1D(
-        GL_TEXTURE_1D,
-        0,
-        getInternalPixelFormatGL(_pixelFormat),
-        width,
-        0,
-        getPixelFormatGL(_pixelFormat),
-        getPixelTypeGL(_pixelFormat),
-        pixels);
-}
-
 void Texture::fillTarget2D(uint32_t target, int width, int height, const void *pixels, int size) {
     switch (_pixelFormat) {
     case PixelFormat::DXT1:
@@ -399,8 +367,6 @@ void Texture::fillTarget3D(int width, int height, int depth) {
 uint32_t Texture::getTargetGL() const {
     if (isCubemap()) {
         return GL_TEXTURE_CUBE_MAP;
-    } else if (isLookup()) {
-        return GL_TEXTURE_1D;
     } else if (is2DArray()) {
         return GL_TEXTURE_2D_ARRAY;
     } else {

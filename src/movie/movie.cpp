@@ -38,7 +38,7 @@ void Movie::init() {
     if (!_texture && _videoStream) {
         _width = _videoStream->width();
         _height = _videoStream->height();
-        _texture = make_shared<Texture>("video", getTextureProperties(TextureUsage::Video));
+        _texture = make_shared<Texture>("video", getTextureProperties(TextureUsage::Movie));
         _texture->clear(1, 1, PixelFormat::RGB8, 1);
         _texture->init();
     }
