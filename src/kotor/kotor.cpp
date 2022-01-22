@@ -161,7 +161,7 @@ void KotOR::init() {
 
     auto map = make_unique<Map>(*this, _services);
     auto console = make_unique<Console>(*this, _services);
-    auto profileOverlay = make_unique<ProfileOverlay>(_services);
+    auto profileOverlay = make_unique<ProfileOverlay>(_services, _options);
 
     console->init();
     profileOverlay->init();

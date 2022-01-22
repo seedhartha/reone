@@ -19,6 +19,7 @@
 
 #include "../../common/timer.h"
 #include "../../game/gui/profileoverlay.h"
+#include "../../game/options.h"
 #include "../../graphics/font.h"
 
 namespace reone {
@@ -33,8 +34,9 @@ namespace kotor {
 
 class ProfileOverlay : public game::IProfileOverlay {
 public:
-    ProfileOverlay(game::Services &services) :
-        _services(services) {
+    ProfileOverlay(game::Services &services, game::Options &options) :
+        _services(services),
+        _options(options) {
     }
 
     void init();
@@ -44,12 +46,8 @@ public:
     void draw() override;
 
 private:
-    struct FPS {
-        int average {0};
-        int onePerLow {0}; /**< 1% Low */
-    };
-
     game::Services &_services;
+    game::Options &_options;
 
     uint64_t _frequency {0};
     uint64_t _counter {0};
@@ -59,12 +57,9 @@ private:
 
     Timer _refreshTimer;
     std::vector<float> _frametimes;
-    FPS _fps;
+    int _fps {0};
 
     void calculateFPS();
-
-    void drawBackground();
-    void drawText();
 };
 
 } // namespace kotor

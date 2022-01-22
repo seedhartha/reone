@@ -56,7 +56,7 @@ public:
 
     struct Properties {
         Filtering minFilter {Filtering::LinearMipmapLinear};
-        Filtering maxFilter {Filtering::Linear};
+        Filtering magFilter {Filtering::Linear};
         Wrapping wrap {Wrapping::Repeat};
         glm::vec3 borderColor {0.0f};
     };
