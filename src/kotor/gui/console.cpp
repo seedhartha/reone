@@ -32,6 +32,10 @@
 #include "../../graphics/window.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
+#include "../../script/executioncontext.h"
+#include "../../script/routine.h"
+#include "../../script/routines.h"
+#include "../../script/variable.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -40,6 +44,7 @@ using namespace reone::game;
 using namespace reone::gui;
 using namespace reone::graphics;
 using namespace reone::scene;
+using namespace reone::script;
 
 namespace reone {
 
@@ -51,15 +56,16 @@ static constexpr int kVisibleLineCount = 15;
 void Console::init() {
     _font = _services.fonts.get("fnt_console");
 
-    addCommand("clear", "clear console", bind(&Console::cmdClear, this, _1));
-    addCommand("describe", "describe selected object", bind(&Console::cmdDescribe, this, _1));
-    addCommand("listanim", "list animations of selected object", bind(&Console::cmdListAnim, this, _1));
-    addCommand("playanim", "play animation on selected object", bind(&Console::cmdPlayAnim, this, _1));
-    addCommand("kill", "kill selected object", bind(&Console::cmdKill, this, _1));
-    addCommand("additem", "add item to selected object", bind(&Console::cmdAddItem, this, _1));
-    addCommand("givexp", "give experience to selected creature", bind(&Console::cmdGiveXP, this, _1));
-    addCommand("warp", "warp to a module", bind(&Console::cmdWarp, this, _1));
-    addCommand("help", "list all commands", bind(&Console::cmdHelp, this, _1));
+    addCommand("clear", "clear console", bind(&Console::cmdClear, this, _1, _2));
+    addCommand("describe", "describe selected object", bind(&Console::cmdDescribe, this, _1, _2));
+    addCommand("listanim", "list animations of selected object", bind(&Console::cmdListAnim, this, _1, _2));
+    addCommand("playanim", "play animation on selected object", bind(&Console::cmdPlayAnim, this, _1, _2));
+    addCommand("kill", "kill selected object", bind(&Console::cmdKill, this, _1, _2));
+    addCommand("additem", "add item to selected object", bind(&Console::cmdAddItem, this, _1, _2));
+    addCommand("givexp", "give experience to selected creature", bind(&Console::cmdGiveXP, this, _1, _2));
+    addCommand("warp", "warp to a module", bind(&Console::cmdWarp, this, _1, _2));
+    addCommand("exec", "execute script routine", bind(&Console::cmdExec, this, _1, _2));
+    addCommand("help", "list all commands", bind(&Console::cmdHelp, this, _1, _2));
 }
 
 void Console::addCommand(string name, string description, CommandHandler handler) {
@@ -145,7 +151,7 @@ void Console::executeInputText() {
     }
     auto maybeCommand = _commandByName.find(tokens[0]);
     if (maybeCommand != _commandByName.end()) {
-        maybeCommand->second.handler(move(tokens));
+        maybeCommand->second.handler(_input.text(), move(tokens));
     } else {
         print("Unknown command: " + tokens[0]);
     }
@@ -194,12 +200,12 @@ void Console::drawLines() {
     }
 }
 
-void Console::cmdClear(vector<string> tokens) {
+void Console::cmdClear(string input, vector<string> tokens) {
     _output.clear();
     _outputOffset = 0;
 }
 
-void Console::cmdDescribe(vector<string> tokens) {
+void Console::cmdDescribe(string input, vector<string> tokens) {
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
         print("describe: no object selected");
@@ -232,8 +238,7 @@ void Console::cmdDescribe(vector<string> tokens) {
     print(ss.str());
 }
 
-void Console::cmdListAnim(vector<string> tokens) {
-    ;
+void Console::cmdListAnim(string input, vector<string> tokens) {
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
         object = _game.party().getLeader();
@@ -259,7 +264,7 @@ void Console::cmdListAnim(vector<string> tokens) {
     }
 }
 
-void Console::cmdPlayAnim(vector<string> tokens) {
+void Console::cmdPlayAnim(string input, vector<string> tokens) {
     if (tokens.size() < 2) {
         print("Usage: playanim anim_name");
         return;
@@ -276,7 +281,7 @@ void Console::cmdPlayAnim(vector<string> tokens) {
     model->playAnimation(tokens[1], AnimationProperties::fromFlags(AnimationFlags::loop));
 }
 
-void Console::cmdKill(vector<string> tokens) {
+void Console::cmdKill(string input, vector<string> tokens) {
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
         print("kill: no object selected");
@@ -286,7 +291,7 @@ void Console::cmdKill(vector<string> tokens) {
     object->applyEffect(move(effect), DurationType::Instant);
 }
 
-void Console::cmdAddItem(vector<string> tokens) {
+void Console::cmdAddItem(string input, vector<string> tokens) {
     if (tokens.size() < 2) {
         print("Usage: additem item_tpl [size]");
         return;
@@ -303,7 +308,7 @@ void Console::cmdAddItem(vector<string> tokens) {
     object->addItem(tokens[1], stackSize);
 }
 
-void Console::cmdGiveXP(vector<string> tokens) {
+void Console::cmdGiveXP(string input, vector<string> tokens) {
     if (tokens.size() < 2) {
         print("Usage: givexp amount");
         return;
@@ -322,7 +327,7 @@ void Console::cmdGiveXP(vector<string> tokens) {
     static_pointer_cast<Creature>(object)->giveXP(amount);
 }
 
-void Console::cmdWarp(vector<string> tokens) {
+void Console::cmdWarp(string input, vector<string> tokens) {
     if (tokens.size() < 2) {
         print("Usage: warp module");
         return;
@@ -330,7 +335,45 @@ void Console::cmdWarp(vector<string> tokens) {
     _game.loadModule(tokens[1]);
 }
 
-void Console::cmdHelp(vector<string> tokens) {
+void Console::cmdExec(string input, vector<string> tokens) {
+    if (tokens.size() < 3) {
+        print("Usage: exec routine_name caller_id [arguments], e.g. exec ActionMoveAwayFromObject 10 20 0 40.0");
+        return;
+    }
+    auto routineName = tokens[1];
+    auto &routines = _game.routines();
+    int routineIdx = routines.getIndexByName(routineName);
+    if (routineIdx == -1) {
+        print(str(boost::format("Routine '%s' not found") % routineName));
+        return;
+    }
+    ExecutionContext ctx;
+    ctx.routines = &routines;
+    ctx.callerId = stoi(tokens[2]);
+    auto &routine = routines.get(routineIdx);
+    vector<Variable> args;
+    for (int i = 0; i < routine.getArgumentCount() && i < tokens.size() - 3; ++i) {
+        auto argType = routine.getArgumentType(i);
+        if (argType == VariableType::Int) {
+            args.push_back(Variable::ofInt(stoi(tokens[i + 3])));
+        } else if (argType == VariableType::Float) {
+            args.push_back(Variable::ofInt(stof(tokens[i + 3])));
+        } else if (argType == VariableType::String) {
+            args.push_back(Variable::ofString(tokens[i + 3]));
+        } else if (argType == VariableType::Object) {
+            args.push_back(Variable::ofObject(stoi(tokens[i + 3])));
+        } else {
+            print(str(boost::format("Argument %d is of unsupported type %d") % i % static_cast<int>(argType)));
+            return;
+        }
+    }
+    auto result = routine.invoke(move(args), ctx);
+    if (routine.returnType() != VariableType::Void) {
+        print(routineName + " -> " + result.toString());
+    }
+}
+
+void Console::cmdHelp(string input, vector<string> tokens) {
     for (auto &cmd : _commands) {
         print(cmd.name + ": " + cmd.description);
     }

@@ -90,6 +90,7 @@ public:
     ObjectFactory &objectFactory() { return _objectFactory; }
     ScriptRunner &scriptRunner() { return *_scriptRunner; }
     IMap &map() { return *_map; }
+    script::IRoutines &routines() { return *_routines; }
 
     std::shared_ptr<Module> module() const { return _module; }
     CameraType cameraType() const { return _cameraType; }
