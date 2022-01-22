@@ -117,7 +117,7 @@ void Module::loadParty(const string &entry, bool fromSave) {
     getEntryPoint(entry, position, facing);
 
     _area->loadParty(position, facing, fromSave);
-    _area->onPartyLeaderMoved();
+    _area->onPartyLeaderMoved(true);
     _area->update3rdPersonCameraFacing();
 
     if (!fromSave) {

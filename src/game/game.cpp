@@ -325,6 +325,8 @@ void Game::toggleInGameCameraType() {
     }
 
     setRelativeMouseMode(_cameraType == CameraType::FirstPerson);
+
+    _module->area()->updateRoomVisibility();
 }
 
 Camera *Game::getActiveCamera() const {
