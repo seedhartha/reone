@@ -461,10 +461,7 @@ void Area::determineObjectRoom(SpatialObject &object) {
     auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     Collision collision;
     if (sceneGraph.testElevation(object.position(), collision)) {
-        auto userRoom = dynamic_cast<Room *>(collision.user);
-        if (userRoom) {
-            room = room;
-        }
+        room = dynamic_cast<Room *>(collision.user);
     }
 
     object.setRoom(room);
@@ -581,7 +578,7 @@ void Area::loadParty(const glm::vec3 &position, float facing, bool fromSave) {
     Party &party = _game.party();
 
     for (int i = 0; i < party.getSize(); ++i) {
-        shared_ptr<Creature> member(party.getMember(i));
+        auto member = party.getMember(i);
         if (!fromSave) {
             member->setPosition(position);
             member->setFacing(facing);
@@ -760,28 +757,29 @@ glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &objec
 }
 
 void Area::update3rdPersonCameraFacing() {
-    shared_ptr<SpatialObject> partyLeader(_game.party().getLeader());
-    if (!partyLeader)
+    auto partyLeader = _game.party().getLeader();
+    if (!partyLeader) {
         return;
-
+    }
     _thirdPersonCamera->setFacing(partyLeader->getFacing());
 }
 
 void Area::startDialog(const shared_ptr<SpatialObject> &object, const string &resRef) {
     string finalResRef(resRef);
-    if (resRef.empty())
+    if (resRef.empty()) {
         finalResRef = object->conversation();
-    if (resRef.empty())
+    }
+    if (resRef.empty()) {
         return;
-
+    }
     _game.startDialog(object, finalResRef);
 }
 
 void Area::onPartyLeaderMoved(bool roomChanged) {
-    shared_ptr<Creature> partyLeader(_game.party().getLeader());
-    if (!partyLeader)
+    auto partyLeader = _game.party().getLeader();
+    if (!partyLeader) {
         return;
-
+    }
     if (roomChanged) {
         updateRoomVisibility();
     }

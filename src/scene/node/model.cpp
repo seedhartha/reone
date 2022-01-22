@@ -137,7 +137,7 @@ unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(shared_ptr<ModelNode>
 }
 
 unique_ptr<LightSceneNode> ModelSceneNode::newLightSceneNode(shared_ptr<ModelNode> node) {
-    return make_unique<LightSceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures);
+    return make_unique<LightSceneNode>(*this, move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures);
 }
 
 unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(shared_ptr<ModelNode> node) {

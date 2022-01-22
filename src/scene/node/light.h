@@ -30,6 +30,7 @@ class ModelSceneNode;
 class LightSceneNode : public ModelNodeSceneNode {
 public:
     LightSceneNode(
+        ModelSceneNode &model,
         std::shared_ptr<graphics::ModelNode> modelNode,
         SceneGraph &sceneGraph,
         graphics::GraphicsContext &graphicsContext,
@@ -43,7 +44,9 @@ public:
             graphicsContext,
             meshes,
             shaders,
-            textures) {
+            textures),
+        _model(model) {
+
         init();
     }
 
@@ -55,6 +58,7 @@ public:
 
     bool isDirectional() const;
 
+    const ModelSceneNode &model() const { return _model; }
     const glm::vec3 &color() const { return _color; }
     float radius() const { return _radius; }
     float multiplier() const { return _multiplier; }
@@ -75,6 +79,8 @@ public:
     // END Fading
 
 private:
+    ModelSceneNode &_model;
+
     glm::vec3 _color {0.0f};
     float _radius {0.0f};
     float _multiplier {0.0f};

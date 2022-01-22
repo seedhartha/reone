@@ -82,6 +82,7 @@ public:
     void initCameras(const glm::vec3 &entryPosition, float entryFacing);
 
     void onPartyLeaderMoved(bool roomChanged = false);
+    void updateRoomVisibility();
 
     void startDialog(const std::shared_ptr<SpatialObject> &object, const std::string &resRef);
     void update3rdPersonCameraFacing();
@@ -287,7 +288,6 @@ private:
     void updateVisibility();
     void updateHeartbeat(float dt);
 
-    void updateRoomVisibility();
     void doUpdatePerception();
     void updateObjectSelection();
 

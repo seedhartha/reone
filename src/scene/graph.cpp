@@ -153,7 +153,7 @@ void SceneGraph::updateLighting() {
     // Remove active lights that are inactive and completely faded
     for (auto it = _activeLights.begin(); it != _activeLights.end();) {
         auto light = *it;
-        if (!light->isActive() && light->strength() == 1.0f) {
+        if ((!light->isActive() && light->strength() == 0.0f) || (!light->model().isEnabled())) {
             it = _activeLights.erase(it);
         } else {
             ++it;
