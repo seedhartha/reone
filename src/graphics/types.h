@@ -48,8 +48,7 @@ enum class TextureUsage {
     BumpMap,
     ColorBuffer,
     DepthBuffer,
-    Video,
-    Lookup
+    Movie
 };
 
 enum class TextureQuality {
@@ -154,9 +153,6 @@ struct TextureUnits {
     static constexpr int hilights = 11;
     static constexpr int oitAccum = 12;
     static constexpr int oitRevealage = 13;
-
-    // 1D
-
     static constexpr int danglyConstraints = 14;
 
     // Cubemaps
@@ -166,7 +162,7 @@ struct TextureUnits {
 
     // Arrays
 
-    static constexpr int shadowMap = 17;
+    static constexpr int shadowMapArray = 17;
 };
 
 struct UniformBlockBindingPoints {

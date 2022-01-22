@@ -58,8 +58,7 @@ public:
         Filtering minFilter {Filtering::LinearMipmapLinear};
         Filtering maxFilter {Filtering::Linear};
         Wrapping wrap {Wrapping::Repeat};
-        glm::vec3 borderColor {1.0f};
-        bool lookup {false};
+        glm::vec3 borderColor {0.0f};
     };
 
     /**
@@ -122,7 +121,6 @@ public:
     glm::vec4 sample(int x, int y) const;
 
     bool isCubemap() const { return _features.cube; }
-    bool isLookup() const { return _properties.lookup; }
     bool is2DArray() const { return _layers.size() > 1ll && !isCubemap(); }
 
     bool isGrayscale() const { return _pixelFormat == PixelFormat::R8; }
@@ -178,16 +176,13 @@ private:
     void configure();
     void refresh();
 
-    void configure1D();
     void configure2D();
     void configureCubemap();
 
-    void refresh1D();
     void refresh2D();
     void refresh2DArray();
     void refreshCubemap();
 
-    void fillTarget1D(int width, const void *pixels = nullptr);
     void fillTarget2D(uint32_t target, int width, int height, const void *pixels = nullptr, int size = 0);
     void fillTarget3D(int width, int height, int depth);
 

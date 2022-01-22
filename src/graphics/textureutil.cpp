@@ -140,14 +140,6 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
         properties.minFilter = Texture::Filtering::Nearest;
         properties.maxFilter = Texture::Filtering::Nearest;
         properties.wrap = Texture::Wrapping::ClampToBorder;
-        properties.borderColor = glm::vec4(0.0f);
-
-    } else if (usage == TextureUsage::GUI || usage == TextureUsage::Video) {
-        properties.minFilter = Texture::Filtering::Linear;
-        properties.wrap = Texture::Wrapping::ClampToEdge;
-
-    } else if (usage == TextureUsage::EnvironmentMap) {
-        properties.wrap = Texture::Wrapping::ClampToEdge;
 
     } else if (usage == TextureUsage::DepthBuffer) {
         properties.minFilter = Texture::Filtering::Nearest;
@@ -155,12 +147,15 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
         properties.wrap = Texture::Wrapping::ClampToBorder;
         properties.borderColor = glm::vec4(1.0f);
 
+    } else if (usage == TextureUsage::EnvironmentMap) {
+        properties.wrap = Texture::Wrapping::ClampToEdge;
+
     } else if (usage == TextureUsage::BumpMap) {
         properties.minFilter = Texture::Filtering::Linear;
 
-    } else if (usage == TextureUsage::Lookup) {
-        properties.minFilter = Texture::Filtering::Nearest;
-        properties.lookup = true;
+    } else if (usage == TextureUsage::GUI || usage == TextureUsage::Movie) {
+        properties.minFilter = Texture::Filtering::Linear;
+        properties.wrap = Texture::Wrapping::ClampToEdge;
     }
 
     return move(properties);

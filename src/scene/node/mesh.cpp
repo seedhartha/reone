@@ -68,7 +68,7 @@ void MeshSceneNode::initTextures() {
         for (auto &con : mesh->danglymesh->constraints) {
             pixels->push_back(static_cast<int>(255 * con.multiplier));
         }
-        auto constraints = make_unique<Texture>("dangly_constraints", getTextureProperties(TextureUsage::Lookup));
+        auto constraints = make_unique<Texture>("dangly_constraints", getTextureProperties(TextureUsage::Default));
         constraints->setPixels(mesh->danglymesh->constraints.size(), 1, PixelFormat::R8, Texture::Layer {move(pixels)});
         constraints->init();
         _nodeTextures.danglyConstraints = move(constraints);

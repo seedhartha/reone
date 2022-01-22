@@ -39,9 +39,9 @@ namespace reone {
 namespace graphics {
 
 void Textures::init() {
-    _defaultRGB = make_shared<Texture>("default_rgb", getTextureProperties(TextureUsage::Default));
-    _defaultRGB->clear(1, 1, PixelFormat::RGB8);
-    _defaultRGB->init();
+    _default2DRGB = make_shared<Texture>("default_rgb", getTextureProperties(TextureUsage::Default));
+    _default2DRGB->clear(1, 1, PixelFormat::RGB8);
+    _default2DRGB->init();
 
     _defaultCubemapRGB = make_shared<Texture>("default_cubemap_rgb", getTextureProperties(TextureUsage::Default));
     _defaultCubemapRGB->setCubemap(true);
@@ -56,10 +56,6 @@ void Textures::init() {
     _defaultArrayDepth = make_shared<Texture>("default_array_depth", getTextureProperties(TextureUsage::Default));
     _defaultArrayDepth->clear(1, 1, PixelFormat::Depth32F, kNumShadowCascades);
     _defaultArrayDepth->init();
-
-    _default1DRGB = make_shared<Texture>("default_1d_rgb", getTextureProperties(TextureUsage::Lookup));
-    _default1DRGB->clear(1, 1, PixelFormat::RGB8);
-    _default1DRGB->init();
 
     auto ssaoPixels = make_shared<ByteArray>();
     ssaoPixels->resize(3);
@@ -98,24 +94,24 @@ void Textures::bind(Texture &texture, int unit) {
 }
 
 void Textures::bindBuiltIn() {
-    bind(*_defaultRGB, TextureUnits::mainTex);
-    bind(*_defaultRGB, TextureUnits::lightmap);
-    bind(*_defaultRGB, TextureUnits::environmentMap);
-    bind(*_defaultRGB, TextureUnits::bumpMap);
-    bind(*_defaultRGB, TextureUnits::envmapColor);
-    bind(*_defaultRGB, TextureUnits::selfIllumColor);
-    bind(*_defaultRGB, TextureUnits::features);
-    bind(*_defaultRGB, TextureUnits::eyePos);
-    bind(*_defaultRGB, TextureUnits::eyeNormal);
+    bind(*_default2DRGB, TextureUnits::mainTex);
+    bind(*_default2DRGB, TextureUnits::lightmap);
+    bind(*_default2DRGB, TextureUnits::environmentMap);
+    bind(*_default2DRGB, TextureUnits::bumpMap);
+    bind(*_default2DRGB, TextureUnits::envmapColor);
+    bind(*_default2DRGB, TextureUnits::selfIllumColor);
+    bind(*_default2DRGB, TextureUnits::features);
+    bind(*_default2DRGB, TextureUnits::eyePos);
+    bind(*_default2DRGB, TextureUnits::eyeNormal);
     bind(*_ssaoRGB, TextureUnits::ssao);
     bind(*_ssrRGBA, TextureUnits::ssr);
-    bind(*_defaultRGB, TextureUnits::hilights);
-    bind(*_defaultRGB, TextureUnits::oitAccum);
-    bind(*_defaultRGB, TextureUnits::oitRevealage);
-    bind(*_default1DRGB, TextureUnits::danglyConstraints);
+    bind(*_default2DRGB, TextureUnits::hilights);
+    bind(*_default2DRGB, TextureUnits::oitAccum);
+    bind(*_default2DRGB, TextureUnits::oitRevealage);
+    bind(*_default2DRGB, TextureUnits::danglyConstraints);
     bind(*_defaultCubemapRGB, TextureUnits::environmentMapCube);
     bind(*_defaultCubemapDepth, TextureUnits::shadowMapCube);
-    bind(*_defaultArrayDepth, TextureUnits::shadowMap);
+    bind(*_defaultArrayDepth, TextureUnits::shadowMapArray);
 }
 
 shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {

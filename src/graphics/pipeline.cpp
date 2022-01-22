@@ -582,7 +582,7 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
     }
     if (scene.hasShadowLight()) {
         if (scene.isShadowLightDirectional()) {
-            _textures.bind(*attachments.dbDirectionalLightShadows, TextureUnits::shadowMap);
+            _textures.bind(*attachments.dbDirectionalLightShadows, TextureUnits::shadowMapArray);
         } else {
             _textures.bind(*attachments.dbPointLightShadows, TextureUnits::shadowMapCube);
         }

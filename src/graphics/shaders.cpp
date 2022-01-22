@@ -185,7 +185,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sDanglyConstraints", TextureUnits::danglyConstraints);
     program->setUniform("sEnvironmentMapCube", TextureUnits::environmentMapCube);
     program->setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
-    program->setUniform("sShadowMap", TextureUnits::shadowMap);
+    program->setUniform("sShadowMap", TextureUnits::shadowMapArray);
 
     // Uniform Blocks
     program->bindUniformBlock("General", UniformBlockBindingPoints::general);
