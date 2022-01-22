@@ -138,12 +138,12 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
 
     if (usage == TextureUsage::ColorBuffer) {
         properties.minFilter = Texture::Filtering::Nearest;
-        properties.maxFilter = Texture::Filtering::Nearest;
+        properties.magFilter = Texture::Filtering::Nearest;
         properties.wrap = Texture::Wrapping::ClampToBorder;
 
     } else if (usage == TextureUsage::DepthBuffer) {
         properties.minFilter = Texture::Filtering::Nearest;
-        properties.maxFilter = Texture::Filtering::Nearest;
+        properties.magFilter = Texture::Filtering::Nearest;
         properties.wrap = Texture::Wrapping::ClampToBorder;
         properties.borderColor = glm::vec4(1.0f);
 
@@ -152,11 +152,15 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
 
     } else if (usage == TextureUsage::BumpMap) {
         properties.minFilter = Texture::Filtering::Linear;
-        properties.maxFilter = Texture::Filtering::Nearest;
+        properties.magFilter = Texture::Filtering::Nearest;
 
     } else if (usage == TextureUsage::GUI || usage == TextureUsage::Movie) {
         properties.minFilter = Texture::Filtering::Linear;
         properties.wrap = Texture::Wrapping::ClampToEdge;
+
+    } else if (usage == TextureUsage::Font) {
+        properties.minFilter = Texture::Filtering::Linear;
+        properties.wrap = Texture::Wrapping::ClampToBorder;
     }
 
     return move(properties);

@@ -41,14 +41,15 @@ constexpr int kMaxGrassClusters = 256;
  */
 enum class TextureUsage {
     Default,
-    GUI,
+    ColorBuffer,
+    DepthBuffer,
     Diffuse,
     Lightmap,
     EnvironmentMap,
     BumpMap,
-    ColorBuffer,
-    DepthBuffer,
-    Movie
+    Movie,
+    GUI,
+    Font
 };
 
 enum class TextureQuality {
@@ -117,6 +118,7 @@ enum class BlendMode {
 
 enum class TextGravity {
     LeftCenter,
+    LeftTop,
     CenterBottom,
     CenterCenter,
     CenterTop,

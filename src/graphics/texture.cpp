@@ -146,7 +146,7 @@ void Texture::configure() {
 
 void Texture::configureCubemap() {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, getFilterGL(_properties.minFilter));
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.maxFilter));
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.magFilter));
 
     switch (_properties.wrap) {
     case Wrapping::ClampToBorder:
@@ -170,7 +170,7 @@ void Texture::configureCubemap() {
 void Texture::configure2D() {
     auto target = getTargetGL();
     glTexParameteri(target, GL_TEXTURE_MIN_FILTER, getFilterGL(_properties.minFilter));
-    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.maxFilter));
+    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, getFilterGL(_properties.magFilter));
 
     switch (_properties.wrap) {
     case Wrapping::ClampToBorder:

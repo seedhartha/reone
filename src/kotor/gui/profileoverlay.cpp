@@ -37,6 +37,7 @@ namespace kotor {
 static constexpr int kFrameWidth = 125;
 static constexpr char kFontResRef[] = "fnt_console";
 static constexpr float kRefreshInterval = 5.0f; // seconds
+static constexpr float kTextOffset = 3.0f;
 
 void ProfileOverlay::init() {
     _refreshTimer.setTimeout(kRefreshInterval);
@@ -54,8 +55,9 @@ bool ProfileOverlay::handle(const SDL_Event &event) {
 }
 
 void ProfileOverlay::update(float dt) {
-    if (!_enabled)
+    if (!_enabled) {
         return;
+    }
 
     uint64_t counter = SDL_GetPerformanceCounter();
     float frametime = static_cast<float>((counter - _counter) / static_cast<double>(_frequency));
@@ -71,68 +73,30 @@ void ProfileOverlay::update(float dt) {
 }
 
 void ProfileOverlay::calculateFPS() {
-    if (_frametimes.empty())
+    if (_frametimes.empty()) {
         return;
-
-    vector<int> fps;
-    for (size_t i = 0; i < _frametimes.size(); ++i) {
-        fps.push_back(glm::iround(1.0f / _frametimes[i]));
     }
-    sort(fps.begin(), fps.end(), less<int>());
 
-    // Average FPS
-    _fps.average = 0;
-    for (size_t i = 0; i < fps.size(); ++i) {
-        _fps.average += fps[i];
+    float totalTime = 0.0f;
+    for (auto &time : _frametimes) {
+        totalTime += time;
     }
-    _fps.average /= static_cast<int>(fps.size());
 
-    // 1% Low FPS
-    int numOnePer = glm::max(1, static_cast<int>(fps.size()) / 100);
-    _fps.onePerLow = 0;
-    for (int i = 0; i < numOnePer; ++i) {
-        _fps.onePerLow += fps[i];
-    }
-    _fps.onePerLow /= numOnePer;
+    _fps = glm::iround(_frametimes.size() / totalTime);
 }
 
 void ProfileOverlay::draw() {
     if (!_enabled) {
         return;
     }
+
     _services.graphicsContext.withBlending(BlendMode::Normal, [this]() {
-        drawBackground();
-        drawText();
+        _font->draw(
+            to_string(_fps),
+            glm::vec3(static_cast<float>(_options.graphics.width) - kTextOffset, static_cast<float>(_options.graphics.height) - kTextOffset, 0.0f),
+            glm::vec3(1.0f),
+            TextGravity::LeftTop);
     });
-}
-
-void ProfileOverlay::drawBackground() {
-    glm::mat4 transform(1.0f);
-    transform = glm::scale(transform, glm::vec3(kFrameWidth, 2.0f * _font->height(), 1.0f));
-
-    auto &uniforms = _services.shaders.uniforms();
-    uniforms.general.resetLocals();
-    uniforms.general.projection = _services.window.getOrthoProjection();
-    uniforms.general.model = move(transform);
-    uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    uniforms.general.alpha = 0.5f;
-
-    _services.shaders.use(_services.shaders.simpleColor(), true);
-    _services.meshes.quad().draw();
-}
-
-void ProfileOverlay::drawText() {
-    stringstream ss;
-    ss << "FPS: " << _fps.average << endl;
-    ss << "1% Low: " << _fps.onePerLow << endl;
-
-    vector<string> lines(breakText(ss.str(), *_font, kFrameWidth));
-    glm::vec3 position(0.0f);
-
-    for (auto &line : lines) {
-        _font->draw(line, position, glm::vec3(1.0f), TextGravity::RightBottom);
-        position.y += _font->height();
-    }
 }
 
 } // namespace kotor

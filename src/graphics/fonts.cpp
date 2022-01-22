@@ -40,7 +40,7 @@ shared_ptr<Font> Fonts::doGet(string resRef) {
     if (maybeOverride != g_fontOverride.end()) {
         resRef = maybeOverride->second;
     }
-    shared_ptr<Texture> texture(_textures.get(resRef, TextureUsage::GUI));
+    shared_ptr<Texture> texture(_textures.get(resRef, TextureUsage::Font));
     if (!texture)
         return nullptr;
 

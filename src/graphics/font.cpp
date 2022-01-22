@@ -98,6 +98,8 @@ glm::vec2 Font::getTextOffset(const string &text, TextGravity gravity) const {
     switch (gravity) {
     case TextGravity::LeftCenter:
         return glm::vec2(-w, -0.5f * _height);
+    case TextGravity::LeftTop:
+        return glm::vec2(-w, -_height);
     case TextGravity::CenterBottom:
         return glm::vec2(-0.5f * w, 0.0f);
     case TextGravity::CenterTop:
