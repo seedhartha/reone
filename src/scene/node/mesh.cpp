@@ -264,13 +264,12 @@ void MeshSceneNode::draw() {
             if (_nodeTextures.bumpmap->features().procedureType == Texture::ProcedureType::Cycle) {
                 int gridX = _nodeTextures.bumpmap->features().numX;
                 int gridY = _nodeTextures.bumpmap->features().numY;
-                float oneOverGridX = 1.0f / static_cast<float>(gridX);
-                float oneOverGridY = 1.0f / static_cast<float>(gridY);
+                glm::vec2 oneOverGrid(1.0f / glm::vec2(static_cast<float>(gridX), static_cast<float>(gridY)));
                 uniforms.general.heightMapFrameBounds = glm::vec4(
-                    oneOverGridX * (_bumpmapCycleFrame % gridX),
-                    oneOverGridY * (_bumpmapCycleFrame / gridX),
-                    oneOverGridX,
-                    oneOverGridY);
+                    oneOverGrid.x * (_bumpmapCycleFrame % gridX),
+                    oneOverGrid.y * (_bumpmapCycleFrame / gridX),
+                    oneOverGrid.x,
+                    oneOverGrid.y);
             } else {
                 uniforms.general.heightMapFrameBounds = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
             }
