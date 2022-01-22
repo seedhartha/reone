@@ -109,8 +109,7 @@ void main() {
         mat3 dangly = mat3(1.0) * (1.0 - multiplier) + uDangly * multiplier;
         vec3 danglyP = dangly * vec3(P);
         vec3 danglyN = dangly * vec3(N);
-        vec3 stride = clamp(danglyP - P.xyz, -uDanglyDisplacement, uDanglyDisplacement);
-        P = vec4(P.xyz + stride, 1.0);
+        P = vec4(danglyP, 1.0);
         N = vec4(danglyN, 0.0);
     }
 
