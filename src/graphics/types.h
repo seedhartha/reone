@@ -153,16 +153,15 @@ struct TextureUnits {
     static constexpr int hilights = 11;
     static constexpr int oitAccum = 12;
     static constexpr int oitRevealage = 13;
-    static constexpr int danglyConstraints = 14;
 
     // Cubemaps
 
-    static constexpr int environmentMapCube = 15;
-    static constexpr int shadowMapCube = 16;
+    static constexpr int environmentMapCube = 14;
+    static constexpr int shadowMapCube = 15;
 
     // Arrays
 
-    static constexpr int shadowMapArray = 17;
+    static constexpr int shadowMapArray = 16;
 };
 
 struct UniformBlockBindingPoints {

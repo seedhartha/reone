@@ -62,18 +62,6 @@ void MeshSceneNode::initTextures() {
     _nodeTextures.lightmap = mesh->lightmap;
     _nodeTextures.bumpmap = mesh->bumpmap;
 
-    // Bake danglymesh constraints into texture
-    if (mesh->danglymesh) {
-        auto pixels = make_unique<ByteArray>();
-        for (auto &con : mesh->danglymesh->constraints) {
-            pixels->push_back(static_cast<int>(255 * con.multiplier));
-        }
-        auto constraints = make_unique<Texture>("dangly_constraints", getTextureProperties(TextureUsage::Default));
-        constraints->setPixels(mesh->danglymesh->constraints.size(), 1, PixelFormat::R8, Texture::Layer {move(pixels)});
-        constraints->init();
-        _nodeTextures.danglyConstraints = move(constraints);
-    }
-
     refreshAdditionalTextures();
 }
 
@@ -100,7 +88,6 @@ void MeshSceneNode::update(float dt) {
     if (mesh) {
         updateUVAnimation(dt, *mesh);
         updateBumpmapAnimation(dt, *mesh);
-        updateDanglymeshAnimation(dt, *mesh);
     }
 }
 
@@ -125,24 +112,6 @@ void MeshSceneNode::updateBumpmapAnimation(float dt, const ModelNode::TriangleMe
             _bumpmapCycleTime = 0.0f;
         }
     }
-}
-
-void MeshSceneNode::updateDanglymeshAnimation(float dt, const ModelNode::TriangleMesh &mesh) {
-    shared_ptr<ModelNode::Danglymesh> danglymesh(mesh.danglymesh);
-    if (!danglymesh) {
-        return;
-    }
-
-    // Mesh rotation in world space
-    auto delta = _absTransformInv * _danglymeshAnimation.lastTransform;
-    auto matrix = _danglymeshAnimation.matrix * glm::mat4(glm::mat3(delta));
-
-    // Rest
-    float fac = danglymesh->period * dt;
-    matrix = matrix * (1.0f - fac) + glm::mat4(1.0f) * fac;
-
-    _danglymeshAnimation.lastTransform = _absTransform;
-    _danglymeshAnimation.matrix = move(matrix);
 }
 
 bool MeshSceneNode::shouldRender() const {
@@ -297,15 +266,6 @@ void MeshSceneNode::draw() {
                                          _model.absoluteTransformInverse() *
                                          bone->absoluteTransform() *
                                          skin->boneMatrices[skin->boneSerial[i]];
-        }
-    }
-    auto danglymesh = mesh->danglymesh;
-    if (danglymesh) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::danglymesh;
-        uniforms.general.dangly = glm::mat3x4(_danglymeshAnimation.matrix);
-        uniforms.general.danglyDisplacement = danglymesh->displacement;
-        if (_nodeTextures.danglyConstraints) {
-            _textures.bind(*_nodeTextures.danglyConstraints, TextureUnits::danglyConstraints);
         }
     }
     bool receivesShadows = isReceivingShadows(_model, *this);

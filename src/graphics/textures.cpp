@@ -108,7 +108,6 @@ void Textures::bindBuiltIn() {
     bind(*_default2DRGB, TextureUnits::hilights);
     bind(*_default2DRGB, TextureUnits::oitAccum);
     bind(*_default2DRGB, TextureUnits::oitRevealage);
-    bind(*_default2DRGB, TextureUnits::danglyConstraints);
     bind(*_defaultCubemapRGB, TextureUnits::environmentMapCube);
     bind(*_defaultCubemapDepth, TextureUnits::shadowMapCube);
     bind(*_defaultArrayDepth, TextureUnits::shadowMapArray);

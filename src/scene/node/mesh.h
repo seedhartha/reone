@@ -84,13 +84,7 @@ private:
         std::shared_ptr<graphics::Texture> lightmap;
         std::shared_ptr<graphics::Texture> envmap;
         std::shared_ptr<graphics::Texture> bumpmap;
-        std::shared_ptr<graphics::Texture> danglyConstraints;
     } _nodeTextures;
-
-    struct DanglymeshAnimation {
-        glm::mat4 lastTransform {1.0f};
-        glm::mat4 matrix {1.0f};
-    } _danglymeshAnimation;
 
     ModelSceneNode &_model;
 
@@ -110,7 +104,6 @@ private:
 
     void updateUVAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
     void updateBumpmapAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
-    void updateDanglymeshAnimation(float dt, const graphics::ModelNode::TriangleMesh &mesh);
 
     // END Animation
 };

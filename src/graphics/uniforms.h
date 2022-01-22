@@ -38,12 +38,11 @@ struct UniformsFeatureFlags {
     static constexpr int text = 0x800;
     static constexpr int grass = 0x1000;
     static constexpr int fog = 0x2000;
-    static constexpr int danglymesh = 0x4000;
-    static constexpr int fixedsize = 0x8000;
-    static constexpr int hashedalphatest = 0x10000;
-    static constexpr int ssao = 0x20000;
-    static constexpr int premulalpha = 0x40000;
-    static constexpr int envmapcube = 0x80000;
+    static constexpr int fixedsize = 0x4000;
+    static constexpr int hashedalphatest = 0x8000;
+    static constexpr int ssao = 0x10000;
+    static constexpr int premulalpha = 0x20000;
+    static constexpr int envmapcube = 0x40000;
 };
 
 struct GeneralUniforms {
@@ -53,7 +52,6 @@ struct GeneralUniforms {
     glm::mat4 viewInv {1.0f};
     glm::mat4 model {1.0f};
     glm::mat4 modelInv {1.0f};
-    glm::mat3x4 dangly {1.0f};
     glm::mat3x4 uv {1.0f};
     glm::vec4 cameraPosition {0.0f};
     glm::vec4 color {1.0f};
@@ -77,8 +75,8 @@ struct GeneralUniforms {
     float shadowStrength {0.0f};
     float shadowRadius {0.0f};
     float billboardSize {1.0f};
-    float danglyDisplacement {0.0f};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
+    char padding[12];
     glm::vec4 shadowCascadeFarPlanes {0.0f};
     glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
 
@@ -104,7 +102,6 @@ struct GeneralUniforms {
         screenProjection = glm::mat4(1.0f);
         model = glm::mat4(1.0f);
         modelInv = glm::mat4(1.0f);
-        dangly = glm::mat3x4(1.0f);
         uv = glm::mat3x4(1.0f);
         color = glm::vec4(1.0f);
         selfIllumColor = glm::vec4(1.0f);
@@ -118,7 +115,6 @@ struct GeneralUniforms {
         waterAlpha = 1.0f;
         heightMapScaling = 1.0f;
         billboardSize = 1.0f;
-        danglyDisplacement = 0.0f;
         featureMask = 0;
     }
 };

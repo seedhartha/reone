@@ -56,7 +56,6 @@ layout(std140) uniform General {
     mat4 uViewInv;
     mat4 uModel;
     mat4 uModelInv;
-    mat3 uDangly;
     mat3 uUV;
     vec4 uCameraPosition;
     vec4 uColor;
@@ -80,7 +79,6 @@ layout(std140) uniform General {
     float uShadowStrength;
     float uShadowRadius;
     float uBillboardSize;
-    float uDanglyDisplacement;
     int uFeatureMask;
     vec4 uShadowCascadeFarPlanes;
     mat4 uShadowLightSpace[NUM_SHADOW_LIGHT_SPACE];

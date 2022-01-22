@@ -27,7 +27,7 @@ void UniformBuffer::init() {
     }
     glGenBuffers(1, &_nameGL);
     glBindBuffer(GL_UNIFORM_BUFFER, _nameGL);
-    glBufferData(GL_UNIFORM_BUFFER, _size, _data, GL_STATIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, _size, _data, GL_DYNAMIC_DRAW);
     _inited = true;
 }
 
