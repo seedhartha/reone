@@ -169,6 +169,10 @@ layout(std140) uniform SSAO {
 };
 )END";
 
+const std::string g_glslMath = R"END(
+const float PI = radians(180.0);
+)END";
+
 const std::string g_glslHash = R"END(
 float hash(vec2 p) {
     return fract(1.0e4 * sin(17.0 * p.x + 0.1 * p.y) * (0.1 + abs(sin(13.0 * p.y + p.x))));
@@ -205,8 +209,6 @@ void hashedAlphaTest(float a, vec3 p) {
 )END";
 
 const std::string g_glslEnvironmentMapping = R"END(
-const float PI = radians(180.0);
-
 vec4 sampleEnvironmentMap(sampler2D tex2D, samplerCube texCube, vec3 R) {
     if (isFeatureEnabled(FEATURE_ENVMAPCUBE)) return texture(texCube, R);
 
@@ -252,7 +254,7 @@ vec3 getNormalFromHeightMap(sampler2D tex, vec2 uv, mat3 TBN) {
 
 const std::string g_glslBRDF = R"END(
 float BRDF_distributionGGX(float NdotH2, float a2) {
-    return a2 / (pow(NdotH2 * (a2 - 1.0) + 1.0, 2.0));
+    return a2 / (PI * pow(NdotH2 * (a2 - 1.0) + 1.0, 2.0));
 }
 
 float BRDF_geometrySchlick(float NdotV, float k) {
