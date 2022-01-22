@@ -54,7 +54,7 @@ public:
     bool isOpen() const override { return _open; }
 
 private:
-    typedef std::function<void(std::vector<std::string>)> CommandHandler;
+    typedef std::function<void(std::string, std::vector<std::string>)> CommandHandler;
 
     struct Command {
         std::string name;
@@ -91,15 +91,16 @@ private:
 
     void addCommand(std::string name, std::string description, CommandHandler handler);
 
-    void cmdClear(std::vector<std::string> tokens);
-    void cmdDescribe(std::vector<std::string> tokens);
-    void cmdListAnim(std::vector<std::string> tokens);
-    void cmdPlayAnim(std::vector<std::string> tokens);
-    void cmdKill(std::vector<std::string> tokens);
-    void cmdAddItem(std::vector<std::string> tokens);
-    void cmdGiveXP(std::vector<std::string> tokens);
-    void cmdWarp(std::vector<std::string> tokens);
-    void cmdHelp(std::vector<std::string> tokens);
+    void cmdClear(std::string input, std::vector<std::string> tokens);
+    void cmdDescribe(std::string input, std::vector<std::string> tokens);
+    void cmdListAnim(std::string input, std::vector<std::string> tokens);
+    void cmdPlayAnim(std::string input, std::vector<std::string> tokens);
+    void cmdKill(std::string input, std::vector<std::string> tokens);
+    void cmdAddItem(std::string input, std::vector<std::string> tokens);
+    void cmdGiveXP(std::string input, std::vector<std::string> tokens);
+    void cmdWarp(std::string input, std::vector<std::string> tokens);
+    void cmdExec(std::string input, std::vector<std::string> tokens);
+    void cmdHelp(std::string input, std::vector<std::string> tokens);
 
     // END Commands
 };

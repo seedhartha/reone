@@ -47,8 +47,7 @@ public:
     void initForTSL();
 
     const script::Routine &get(int index) const override;
-
-    int getIndexByName(const std::string &name) const;
+    int getIndexByName(const std::string &name) const override;
 
 private:
     game::Game *_game {nullptr};

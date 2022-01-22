@@ -29,6 +29,7 @@ public:
     }
 
     virtual const Routine &get(int index) const = 0;
+    virtual int getIndexByName(const std::string &name) const = 0;
 };
 
 } // namespace script
