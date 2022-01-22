@@ -37,7 +37,15 @@ namespace kotor {
 
 class Console : public game::IConsole {
 public:
-    Console(game::Game &game, game::Services &services);
+    Console(
+        game::Game &game,
+        game::Services &services) :
+        _game(game),
+        _services(services),
+        _input(gui::TextInputFlags::console) {
+
+        init();
+    }
 
     void init();
     bool handle(const SDL_Event &event) override;
@@ -48,6 +56,12 @@ public:
 private:
     typedef std::function<void(std::vector<std::string>)> CommandHandler;
 
+    struct Command {
+        std::string name;
+        std::string description;
+        CommandHandler handler;
+    };
+
     game::Game &_game;
     game::Services &_services;
 
@@ -56,8 +70,10 @@ private:
     gui::TextInput _input;
     std::deque<std::string> _output;
     int _outputOffset {0};
-    std::unordered_map<std::string, CommandHandler> _commands;
     std::stack<std::string> _history;
+
+    std::vector<Command> _commands;
+    std::unordered_map<std::string, Command> _commandByName;
 
     bool handleMouseWheel(const SDL_MouseWheelEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);
@@ -72,7 +88,8 @@ private:
     // Commands
 
     void initCommands();
-    void addCommand(const std::string &name, const CommandHandler &handler);
+
+    void addCommand(std::string name, std::string description, CommandHandler handler);
 
     void cmdClear(std::vector<std::string> tokens);
     void cmdDescribe(std::vector<std::string> tokens);
@@ -82,6 +99,7 @@ private:
     void cmdAddItem(std::vector<std::string> tokens);
     void cmdGiveXP(std::vector<std::string> tokens);
     void cmdWarp(std::vector<std::string> tokens);
+    void cmdHelp(std::vector<std::string> tokens);
 
     // END Commands
 };
