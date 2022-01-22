@@ -58,8 +58,6 @@ void main() {
 )END";
 
 const std::string g_vsModel = R"END(
-uniform sampler2D sDanglyConstraints;
-
 layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aUV1;
@@ -103,14 +101,6 @@ void main() {
             (uBones[i2] * N) * w2 +
             (uBones[i3] * N) * w3 +
             (uBones[i4] * N) * w4;
-
-    } else if (isFeatureEnabled(FEATURE_DANGLYMESH)) {
-        float multiplier = texelFetch(sDanglyConstraints, ivec2(gl_VertexID, 0), 0).r;
-        mat3 dangly = mat3(1.0) * (1.0 - multiplier) + uDangly * multiplier;
-        vec3 danglyP = dangly * vec3(P);
-        vec3 danglyN = dangly * vec3(N);
-        P = vec4(danglyP, 1.0);
-        N = vec4(danglyN, 0.0);
     }
 
     fragPosObjSpace = P.xyz;

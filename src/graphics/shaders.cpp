@@ -182,7 +182,6 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sHilights", TextureUnits::hilights);
     program->setUniform("sOITAccum", TextureUnits::oitAccum);
     program->setUniform("sOITRevealage", TextureUnits::oitRevealage);
-    program->setUniform("sDanglyConstraints", TextureUnits::danglyConstraints);
     program->setUniform("sEnvironmentMapCube", TextureUnits::environmentMapCube);
     program->setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
     program->setUniform("sShadowMap", TextureUnits::shadowMapArray);
