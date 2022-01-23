@@ -18,6 +18,7 @@
 #include "console.h"
 
 #include "../../common/logutil.h"
+#include "../../game/debug.h"
 #include "../../game/effect/factory.h"
 #include "../../game/game.h"
 #include "../../game/object/creature.h"
@@ -62,10 +63,12 @@ void Console::init() {
     addCommand("exec", "x", "execute script routine", bind(&Console::cmdExec, this, _1, _2));
     addCommand("listanim", "la", "list animations of selected object", bind(&Console::cmdListAnim, this, _1, _2));
     addCommand("playanim", "pa", "play animation on selected object", bind(&Console::cmdPlayAnim, this, _1, _2));
-    addCommand("additem", "ai", "add item to selected object", bind(&Console::cmdAddItem, this, _1, _2));
     addCommand("warp", "w", "warp to a module", bind(&Console::cmdWarp, this, _1, _2));
     addCommand("kill", "k", "kill selected object", bind(&Console::cmdKill, this, _1, _2));
+    addCommand("additem", "ai", "add item to selected object", bind(&Console::cmdAddItem, this, _1, _2));
     addCommand("givexp", "xp", "give experience to selected creature", bind(&Console::cmdGiveXP, this, _1, _2));
+    addCommand("showwalkmesh", "sw", "toggle rendering walkmesh", bind(&Console::cmdShowWalkmesh, this, _1, _2));
+    addCommand("showtriggers", "st", "toggle rendering triggers", bind(&Console::cmdShowTriggers, this, _1, _2));
 
     addCommand("help", "h", "list console commands", bind(&Console::cmdHelp, this, _1, _2));
 }
@@ -454,6 +457,24 @@ void Console::cmdExec(string input, vector<string> tokens) {
     if (routine.returnType() != VariableType::Void) {
         print(routineName + " -> " + result.toString());
     }
+}
+
+void Console::cmdShowWalkmesh(string input, vector<string> tokens) {
+    if (tokens.size() < 2) {
+        print("Usage: showwalkmesh 1|0");
+        return;
+    }
+    bool show = stoi(tokens[1]);
+    setShowWalkmesh(show);
+}
+
+void Console::cmdShowTriggers(string input, vector<string> tokens) {
+    if (tokens.size() < 2) {
+        print("Usage: showtriggers 1|0");
+        return;
+    }
+    bool show = stoi(tokens[1]);
+    setShowTriggers(show);
 }
 
 void Console::cmdHelp(string input, vector<string> tokens) {

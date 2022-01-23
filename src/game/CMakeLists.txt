@@ -89,6 +89,7 @@ set(GAME_HEADERS
     d20/skills.h
     d20/spell.h
     d20/spells.h
+    debug.h
     dialog.h
     dialogs.h
     effect.h
@@ -297,6 +298,7 @@ set(GAME_SOURCES
     d20/feats.cpp
     d20/skills.cpp
     d20/spells.cpp
+    debug.cpp
     dialogs.cpp
     effect.cpp
     effect/abilitydecrease.cpp

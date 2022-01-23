@@ -35,6 +35,7 @@ constexpr int kMaxLights = 64;
 constexpr int kMaxParticles = 64;
 constexpr int kMaxTextChars = 128;
 constexpr int kMaxGrassClusters = 256;
+constexpr int kMaxWalkmeshMaterials = 64;
 
 /**
  * This is a hint to the engine when configuring texture properties.
@@ -174,6 +175,7 @@ struct UniformBlockBindingPoints {
     static constexpr int particles = 4;
     static constexpr int grass = 5;
     static constexpr int ssao = 6;
+    static constexpr int walkmesh = 7;
 };
 
 // MDL

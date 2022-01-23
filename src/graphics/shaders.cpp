@@ -38,6 +38,7 @@ void Shaders::init() {
     auto vsClipSpace = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_vsClipSpace});
     auto vsShadows = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_vsShadows});
     auto vsModel = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslSkeletalUniforms, g_vsModel});
+    auto vsWalkmesh = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslWalkmeshUniforms, g_vsWalkmesh});
     auto vsBillboard = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_vsBillboard});
     auto vsParticle = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_vsParticle});
     auto vsGrass = initShader(ShaderType::Vertex, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_vsGrass});
@@ -52,6 +53,7 @@ void Shaders::init() {
     auto fsDirectionalLightShadows = initShader(ShaderType::Fragment, {g_glslHeader, g_fsDirectionalLightShadows});
     auto fsModelOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslMath, g_glslHash, g_glslHashedAlphaTest, g_glslEnvironmentMapping, g_glslNormalMapping, g_fsModelOpaque});
     auto fsModelTransparent = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslMath, g_glslEnvironmentMapping, g_glslNormalMapping, g_glslOIT, g_glslLuma, g_fsModelTransparent});
+    auto fsWalkmesh = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslWalkmeshUniforms, g_fsWalkmesh});
     auto fsBillboard = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBillboard});
     auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_glslOIT, g_glslLuma, g_fsParticle});
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
@@ -74,6 +76,7 @@ void Shaders::init() {
     _spDirectionalLightShadows = initShaderProgram({vsShadows, gsDirectionalLightShadows, fsDirectionalLightShadows});
     _spModelOpaque = initShaderProgram({vsModel, fsModelOpaque});
     _spModelTransparent = initShaderProgram({vsModel, fsModelTransparent});
+    _spWalkmesh = initShaderProgram({vsWalkmesh, fsWalkmesh});
     _spBillboard = initShaderProgram({vsBillboard, fsBillboard});
     _spParticle = initShaderProgram({vsParticle, fsParticle});
     _spGrass = initShaderProgram({vsGrass, fsGrass});
@@ -95,6 +98,7 @@ void Shaders::init() {
     static ParticlesUniforms defaultsParticles;
     static GrassUniforms defaultsGrass;
     static SSAOUniforms defaultsSSAO;
+    static WalkmeshUniforms defaultsWalkmesh;
     _ubGeneral = initUniformBuffer(&defaultsGeneral, sizeof(GeneralUniforms));
     _ubText = initUniformBuffer(&defaultsText, sizeof(TextUniforms));
     _ubLighting = initUniformBuffer(&defaultsLighting, sizeof(LightingUniforms));
@@ -102,6 +106,7 @@ void Shaders::init() {
     _ubParticles = initUniformBuffer(&defaultsParticles, sizeof(ParticlesUniforms));
     _ubGrass = initUniformBuffer(&defaultsGrass, sizeof(GrassUniforms));
     _ubSSAO = initUniformBuffer(&defaultsSSAO, sizeof(SSAOUniforms));
+    _ubWalkmesh = initUniformBuffer(&defaultsWalkmesh, sizeof(WalkmeshUniforms));
 
     _inited = true;
 }
@@ -120,6 +125,7 @@ void Shaders::deinit() {
     _spDirectionalLightShadows.reset();
     _spModelOpaque.reset();
     _spModelTransparent.reset();
+    _spWalkmesh.reset();
     _spBillboard.reset();
     _spParticle.reset();
     _spGrass.reset();
@@ -194,6 +200,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->bindUniformBlock("Particles", UniformBlockBindingPoints::particles);
     program->bindUniformBlock("Grass", UniformBlockBindingPoints::grass);
     program->bindUniformBlock("SSAO", UniformBlockBindingPoints::ssao);
+    program->bindUniformBlock("Walkmesh", UniformBlockBindingPoints::walkmesh);
 
     return move(program);
 }
@@ -236,6 +243,11 @@ void Shaders::refreshFeatureUniforms() {
 void Shaders::refreshSSAOUniforms() {
     _ubSSAO->bind(UniformBlockBindingPoints::ssao);
     _ubSSAO->setData(&_uniforms.ssao, sizeof(SSAOUniforms), true);
+}
+
+void Shaders::refreshWalkmeshUniforms() {
+    _ubWalkmesh->bind(UniformBlockBindingPoints::walkmesh);
+    _ubWalkmesh->setData(&_uniforms.walkmesh, sizeof(SSAOUniforms), true);
 }
 
 } // namespace graphics

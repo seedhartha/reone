@@ -176,6 +176,10 @@ struct SSAOUniforms {
     glm::vec4 samples[kNumSSAOSamples] {glm::vec4(0.0f)};
 };
 
+struct WalkmeshUniforms {
+    glm::vec4 materials[kMaxWalkmeshMaterials] {glm::vec4(1.0f)};
+};
+
 struct Uniforms {
     GeneralUniforms general;
     TextUniforms text;
@@ -184,6 +188,7 @@ struct Uniforms {
     ParticlesUniforms particles;
     GrassUniforms grass;
     SSAOUniforms ssao;
+    WalkmeshUniforms walkmesh;
 };
 
 } // namespace graphics
