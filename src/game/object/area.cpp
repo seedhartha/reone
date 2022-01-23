@@ -984,7 +984,7 @@ void Area::updateObjectSelection() {
         } else {
             Collision collision;
             auto objectPos = _hilightedObject->getSelectablePosition();
-            if (sceneGraph.testLineOfSight(cameraPos, objectPos, collision) || glm::distance2(cameraPos, objectPos) > kSelectionDistance2) {
+            if (glm::distance2(cameraPos, objectPos) > kSelectionDistance2 || (sceneGraph.testLineOfSight(cameraPos, objectPos, collision) && collision.user != _hilightedObject.get())) {
                 _hilightedObject.reset();
             }
         }
@@ -995,7 +995,7 @@ void Area::updateObjectSelection() {
         } else {
             Collision collision;
             auto objectPos = _selectedObject->getSelectablePosition();
-            if (sceneGraph.testLineOfSight(cameraPos, objectPos, collision) || glm::distance2(cameraPos, objectPos) > kSelectionDistance2) {
+            if (glm::distance2(cameraPos, objectPos) > kSelectionDistance2 || (sceneGraph.testLineOfSight(cameraPos, objectPos, collision) && collision.user != _selectedObject.get())) {
                 _selectedObject.reset();
             }
         }
