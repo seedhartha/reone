@@ -51,6 +51,7 @@ public:
     bool isSelectable() const override { return _usable; }
     bool isUsable() const { return _usable; }
 
+    int appearance() const { return _appearance; }
     std::shared_ptr<scene::WalkmeshSceneNode> walkmesh() const { return _walkmesh; }
 
     // Scripts

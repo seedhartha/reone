@@ -226,21 +226,28 @@ void Console::cmdInfo(string input, vector<string> tokens) {
     glm::vec3 position(object->position());
 
     stringstream ss;
-    ss
-        << setprecision(2) << fixed
-        << "id=" << object->id()
-        << " "
-        << "tag=\"" << object->tag() << "\""
-        << " "
-        << "tpl=\"" << object->blueprintResRef() << "\""
-        << " "
-        << "pos=[" << position.x << ", " << position.y << ", " << position.z << "]";
+    ss << setprecision(2) << fixed
+       << "id=" << object->id()
+       << " "
+       << "tag=\"" << object->tag() << "\""
+       << " "
+       << "tpl=\"" << object->blueprintResRef() << "\""
+       << " "
+       << "pos=[" << position.x << ", " << position.y << ", " << position.z << "]";
 
     switch (object->type()) {
     case ObjectType::Creature: {
         auto creature = static_pointer_cast<Creature>(object);
         ss << " "
+           << "app=" << creature->appearance()
+           << " "
            << "fac=" << static_cast<int>(creature->faction());
+        break;
+    }
+    case ObjectType::Placeable: {
+        auto placeable = static_pointer_cast<Placeable>(object);
+        ss << " "
+           << "app=" << placeable->appearance();
         break;
     }
     default:
