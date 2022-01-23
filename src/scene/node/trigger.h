@@ -49,6 +49,8 @@ public:
     void init();
     void draw();
 
+    bool isIn(const glm::vec2 &pt) const;
+
 private:
     std::vector<glm::vec3> _geometry;
 
