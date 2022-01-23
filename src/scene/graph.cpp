@@ -88,6 +88,14 @@ void SceneGraph::addRoot(shared_ptr<SoundSceneNode> node) {
 }
 
 void SceneGraph::removeRoot(const shared_ptr<ModelSceneNode> &node) {
+    for (auto it = _activeLights.begin(); it != _activeLights.end();) {
+        if (&(*it)->model() == node.get()) {
+            it = _activeLights.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
     _modelRoots.erase(node);
 }
 
