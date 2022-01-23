@@ -250,8 +250,7 @@ in vec2 fragUV1;
 out vec4 fragColor1;
 
 void main() {
-    vec2 uv = vec2(uUV * vec3(fragUV1, 1.0));
-    vec4 mainTexSample = texture(sMainTex, uv);
+    vec4 mainTexSample = texture(sMainTex, fragUV1);
     vec3 objectColor = uColor.rgb * mainTexSample.rgb;
 
     fragColor1 = vec4(objectColor, uAlpha * mainTexSample.a);
