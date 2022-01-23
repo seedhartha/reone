@@ -58,8 +58,8 @@ struct GeneralUniforms {
     glm::vec4 selfIllumColor {1.0f};
     glm::vec4 discardColor {0.0f};
     glm::vec4 fogColor {0.0f};
-    glm::vec4 heightMapFrameBounds {0.0f};
     glm::vec4 shadowLightPosition {0.0f}; /**< W = 0 if light is directional */
+    glm::vec4 heightMapFrameBounds {0.0f};
     glm::vec2 screenResolution {0.0f};
     glm::vec2 screenResolutionRcp {0.0f};
     glm::vec2 blurDirection {0.0f};

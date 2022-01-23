@@ -152,7 +152,6 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
 
     } else if (usage == TextureUsage::BumpMap) {
         properties.minFilter = Texture::Filtering::Linear;
-        properties.magFilter = Texture::Filtering::Nearest;
 
     } else if (usage == TextureUsage::GUI || usage == TextureUsage::Movie) {
         properties.minFilter = Texture::Filtering::Linear;
