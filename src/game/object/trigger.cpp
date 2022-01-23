@@ -105,13 +105,7 @@ void Trigger::addTenant(const std::shared_ptr<SpatialObject> &object) {
 }
 
 bool Trigger::isIn(const glm::vec2 &point) const {
-    glm::vec3 modelSpacePoint(glm::inverse(_transform) * glm::vec4(point, 1000.0f, 1.0f));
-    glm::vec3 down(0.0f, 0.0f, -1.0f);
-    glm::vec2 intersection;
-    float distance;
-
-    return (_geometry.size() >= 3 && glm::intersectRayTriangle(modelSpacePoint, down, _geometry[0], _geometry[1], _geometry[2], intersection, distance)) ||
-           (_geometry.size() >= 4 && glm::intersectRayTriangle(modelSpacePoint, down, _geometry[2], _geometry[3], _geometry[0], intersection, distance));
+    return static_cast<TriggerSceneNode *>(_sceneNode.get())->isIn(point);
 }
 
 bool Trigger::isTenant(const std::shared_ptr<SpatialObject> &object) const {

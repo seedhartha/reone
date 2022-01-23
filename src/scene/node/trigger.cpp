@@ -102,6 +102,23 @@ void TriggerSceneNode::draw() {
     });
 }
 
+bool TriggerSceneNode::isIn(const glm::vec2 &pt) const {
+    static glm::vec3 down(0.0f, 0.0f, -1.0f);
+
+    auto pointObjSpace = glm::vec3(_absTransformInv * glm::vec4(pt, 1000.0f, 1.0f));
+    auto intersection = glm::vec2(0.0f);
+    float distance = 0.0f;
+
+    for (auto &face : _mesh->faces()) {
+        auto verts = _mesh->getVertexCoords(face);
+        if (glm::intersectRayTriangle(pointObjSpace, down, verts[0], verts[1], verts[2], intersection, distance)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 } // namespace scene
 
 } // namespace reone
