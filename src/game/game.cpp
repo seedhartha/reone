@@ -52,6 +52,7 @@
 
 #include "combat.h"
 #include "cursors.h"
+#include "debug.h"
 #include "location.h"
 #include "object/factory.h"
 #include "party.h"
@@ -464,6 +465,7 @@ void Game::updateSceneGraph(float dt) {
     auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
     sceneGraph.setActiveCamera(camera->sceneNode());
     sceneGraph.setUpdateRoots(!_paused);
+    sceneGraph.setDrawWalkmeshes(isShowWalkmeshEnabled());
     sceneGraph.update(dt);
 }
 

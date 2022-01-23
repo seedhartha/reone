@@ -20,6 +20,7 @@
 #include "../graphics/context.h"
 #include "../graphics/mesh.h"
 #include "../graphics/meshes.h"
+#include "../graphics/shaders.h"
 #include "../graphics/walkmesh.h"
 
 #include "collision.h"
@@ -402,18 +403,33 @@ void SceneGraph::drawOpaque() {
     if (!_activeCamera) {
         return;
     }
-    // Draw opaque meshes
-    for (auto &mesh : _opaqueMeshes) {
-        mesh->draw();
-    }
-    // Draw opaque leafs
-    for (auto &[node, leafs] : _opaqueLeafs) {
-        node->drawLeafs(leafs);
+    if (_drawWalkmeshes) {
+        auto &uniforms = _shaders.uniforms();
+        for (int i = 0; i < kMaxWalkmeshMaterials; ++i) {
+            uniforms.walkmesh.materials[i] = _walkableSurfaces.count(i) > 0 ? glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) : glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        }
+        _shaders.refreshWalkmeshUniforms();
+
+        // Draw walkmeshes if enabled
+        for (auto &walkmesh : _walkmeshRoots) {
+            if (walkmesh->isEnabled()) {
+                walkmesh->draw();
+            }
+        }
+    } else {
+        // Draw opaque meshes
+        for (auto &mesh : _opaqueMeshes) {
+            mesh->draw();
+        }
+        // Draw opaque leafs
+        for (auto &[node, leafs] : _opaqueLeafs) {
+            node->drawLeafs(leafs);
+        }
     }
 }
 
 void SceneGraph::drawTransparent() {
-    if (!_activeCamera) {
+    if (!_activeCamera || _drawWalkmeshes) {
         return;
     }
     // Draw transparent leafs (incl. meshes)
@@ -424,7 +440,7 @@ void SceneGraph::drawTransparent() {
 
 void SceneGraph::drawLensFlares() {
     // Draw lens flares
-    if (_flareLights.empty()) {
+    if (_flareLights.empty() || _drawWalkmeshes) {
         return;
     }
     _graphicsContext.withDepthTest(DepthTestMode::None, [this]() {
@@ -638,7 +654,7 @@ unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUs
 }
 
 unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(shared_ptr<Walkmesh> walkmesh) {
-    return make_unique<WalkmeshSceneNode>(move(walkmesh), *this);
+    return make_unique<WalkmeshSceneNode>(move(walkmesh), *this, _graphicsContext, _shaders);
 }
 
 unique_ptr<GrassSceneNode> SceneGraph::newGrass(float density, float quadSize, glm::vec4 probabilities, set<uint32_t> materials, shared_ptr<Texture> texture, shared_ptr<ModelNode> aabbNode) {

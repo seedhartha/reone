@@ -19,28 +19,48 @@
 
 #include "../node.h"
 
+#include "../../graphics/mesh.h"
 #include "../../graphics/walkmesh.h"
 
 namespace reone {
+
+namespace graphics {
+
+class GraphicsContext;
+class Shaders;
+
+} // namespace graphics
 
 namespace scene {
 
 class WalkmeshSceneNode : public SceneNode {
 public:
-    WalkmeshSceneNode(std::shared_ptr<graphics::Walkmesh> walkmesh, SceneGraph &sceneGraph) :
+    WalkmeshSceneNode(
+        std::shared_ptr<graphics::Walkmesh> walkmesh,
+        SceneGraph &sceneGraph,
+        graphics::GraphicsContext &graphicsContext,
+        graphics::Shaders &shaders) :
         SceneNode(SceneNodeType::Walkmesh, sceneGraph),
-        _walkmesh(std::move(walkmesh)) {
+        _walkmesh(std::move(walkmesh)),
+        _graphicsContext(graphicsContext),
+        _shaders(shaders) {
 
         _point = false;
-        computeAABB();
+
+        init();
     }
+
+    void init();
+    void draw();
 
     const graphics::Walkmesh &walkmesh() const { return *_walkmesh; }
 
 private:
+    std::shared_ptr<graphics::Mesh> _mesh;
     std::shared_ptr<graphics::Walkmesh> _walkmesh;
 
-    void computeAABB();
+    graphics::GraphicsContext &_graphicsContext;
+    graphics::Shaders &_shaders;
 };
 
 } // namespace scene

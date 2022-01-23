@@ -101,12 +101,14 @@ private:
     void cmdInfo(std::string input, std::vector<std::string> tokens);
     void cmdListAnim(std::string input, std::vector<std::string> tokens);
     void cmdPlayAnim(std::string input, std::vector<std::string> tokens);
+    void cmdListRoutine(std::string input, std::vector<std::string> tokens);
+    void cmdExec(std::string input, std::vector<std::string> tokens);
+    void cmdWarp(std::string input, std::vector<std::string> tokens);
     void cmdKill(std::string input, std::vector<std::string> tokens);
     void cmdAddItem(std::string input, std::vector<std::string> tokens);
     void cmdGiveXP(std::string input, std::vector<std::string> tokens);
-    void cmdWarp(std::string input, std::vector<std::string> tokens);
-    void cmdListRoutine(std::string input, std::vector<std::string> tokens);
-    void cmdExec(std::string input, std::vector<std::string> tokens);
+    void cmdShowWalkmesh(std::string input, std::vector<std::string> tokens);
+    void cmdShowTriggers(std::string input, std::vector<std::string> tokens);
     void cmdHelp(std::string input, std::vector<std::string> tokens);
 
     // END Commands

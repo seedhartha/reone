@@ -165,6 +165,14 @@ layout(std140) uniform SSAO {
 };
 )END";
 
+const std::string g_glslWalkmeshUniforms = R"END(
+const int MAX_WALKMESH_MATERIALS = 64;
+
+layout(std140) uniform Walkmesh {
+    vec4 uWalkmeshMaterials[MAX_WALKMESH_MATERIALS];
+};
+)END";
+
 const std::string g_glslMath = R"END(
 const float PI = radians(180.0);
 )END";

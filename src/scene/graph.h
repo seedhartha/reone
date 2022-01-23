@@ -151,6 +151,7 @@ public:
 
     std::shared_ptr<ModelSceneNode> pickModelAt(int x, int y, IUser *except = nullptr) const;
 
+    void setDrawWalkmeshes(bool draw) { _drawWalkmeshes = draw; }
     void setWalkableSurfaces(std::set<uint32_t> surfaces) { _walkableSurfaces = std::move(surfaces); }
     void setWalkcheckSurfaces(std::set<uint32_t> surfaces) { _walkcheckSurfaces = std::move(surfaces); }
     void setLineOfSightSurfaces(std::set<uint32_t> surfaces) { _lineOfSightSurfaces = std::move(surfaces); }
@@ -185,6 +186,7 @@ private:
     graphics::GraphicsOptions _options;
 
     bool _updateRoots {true};
+    bool _drawWalkmeshes {false};
 
     std::shared_ptr<CameraSceneNode> _activeCamera;
     std::vector<LightSceneNode *> _flareLights;

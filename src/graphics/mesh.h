@@ -34,6 +34,7 @@ public:
         int offTanSpace {-1};
         int offBoneIndices {-1};
         int offBoneWeights {-1};
+        int offMaterial {-1};
     };
 
     struct Face {

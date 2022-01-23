@@ -310,11 +310,7 @@ void SelectionOverlay::drawTitleBar() {
             y -= kActionHeight + 2 * kActionBarMargin;
         }
         glm::vec3 position(x, y, 0.0f);
-        auto text = _selectedObject->name();
-        if (_game.options().developer) {
-            text += " [" + to_string(_selectedObject->id()) + "]";
-        }
-        _font->draw(text, position, getColorFromSelectedObject());
+        _font->draw(_selectedObject->name(), position, getColorFromSelectedObject());
     }
 }
 

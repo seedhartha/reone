@@ -83,6 +83,10 @@ void Mesh::init() {
         glEnableVertexAttribArray(8);
         glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, _spec.stride, reinterpret_cast<void *>(static_cast<size_t>(_spec.offBoneWeights)));
     }
+    if (_spec.offMaterial != -1) {
+        glEnableVertexAttribArray(9);
+        glVertexAttribPointer(9, 1, GL_FLOAT, GL_FALSE, _spec.stride, reinterpret_cast<void *>(static_cast<size_t>(_spec.offMaterial)));
+    }
 
     glBindVertexArray(0);
 

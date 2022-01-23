@@ -123,6 +123,24 @@ void main() {
 }
 )END";
 
+const std::string g_vsWalkmesh = R"END(
+layout(location = 0) in vec3 aPosition;
+layout(location = 1) in vec3 aNormal;
+layout(location = 9) in float aMaterial;
+
+out vec3 fragPosWorldSpace;
+out vec3 fragNormalWorldSpace;
+flat out int fragMaterial;
+
+void main() {
+    fragPosWorldSpace = (uModel * vec4(aPosition, 1.0)).xyz;
+    fragNormalWorldSpace = transpose(mat3(uModelInv)) * normalize(aNormal);
+    fragMaterial = int(aMaterial * MAX_WALKMESH_MATERIALS);
+
+    gl_Position = uProjection * uView * vec4(fragPosWorldSpace, 1.0);
+}
+)END";
+
 const std::string g_vsBillboard = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;
