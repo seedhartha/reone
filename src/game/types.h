@@ -31,8 +31,10 @@ constexpr int kNpcPlayer = -1;
 constexpr int kEngineTypeInvalid = -1;
 constexpr float kDefaultFollowDistance = 5.0f;
 constexpr char kObjectTagPlayer[] = "player";
-constexpr float kSelectionDistance = 8.0f;
 constexpr char kSceneMain[] = "main";
+
+constexpr float kSelectionDistance = 16.0f;
+constexpr float kSelectionDistance2 = kSelectionDistance * kSelectionDistance;
 
 enum class BackgroundType {
     None,

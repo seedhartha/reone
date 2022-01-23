@@ -977,11 +977,30 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
 }
 
 void Area::updateObjectSelection() {
-    if (_hilightedObject && !_hilightedObject->isSelectable()) {
-        _hilightedObject.reset();
+    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
+    auto cameraPos = _game.getActiveCamera()->sceneNode()->getOrigin();
+
+    if (_hilightedObject) {
+        if (!_hilightedObject->isSelectable()) {
+            _hilightedObject.reset();
+        } else {
+            Collision collision;
+            auto objectPos = _hilightedObject->getSelectablePosition();
+            if (sceneGraph.testLineOfSight(cameraPos, objectPos, collision) || glm::distance2(cameraPos, objectPos) > kSelectionDistance2) {
+                _hilightedObject.reset();
+            }
+        }
     }
-    if (_selectedObject && !_selectedObject->isSelectable()) {
-        _selectedObject.reset();
+    if (_selectedObject) {
+        if (!_selectedObject->isSelectable()) {
+            _selectedObject.reset();
+        } else {
+            Collision collision;
+            auto objectPos = _selectedObject->getSelectablePosition();
+            if (sceneGraph.testLineOfSight(cameraPos, objectPos, collision) || glm::distance2(cameraPos, objectPos) > kSelectionDistance2) {
+                _selectedObject.reset();
+            }
+        }
     }
 }
 
