@@ -309,7 +309,9 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
 
     _shaders.use(_shaders.particle(), true);
     _textures.bind(*texture);
-    _graphicsContext.withFaceCulling(_modelNode->emitter()->twosided ? CullFaceMode::None : CullFaceMode::Back, [this, &leafs] {
+
+    bool twosided = _modelNode->emitter()->twosided || _modelNode->emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;
+    _graphicsContext.withFaceCulling(twosided ? CullFaceMode::None : CullFaceMode::Back, [this, &leafs] {
         _meshes.billboard().drawInstanced(leafs.size());
     });
 }
