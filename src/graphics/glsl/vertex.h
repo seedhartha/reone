@@ -135,7 +135,7 @@ flat out int fragMaterial;
 void main() {
     fragPosWorldSpace = (uModel * vec4(aPosition, 1.0)).xyz;
     fragNormalWorldSpace = transpose(mat3(uModelInv)) * normalize(aNormal);
-    fragMaterial = int(aMaterial * MAX_WALKMESH_MATERIALS);
+    fragMaterial = int(aMaterial * (MAX_WALKMESH_MATERIALS - 1));
 
     gl_Position = uProjection * uView * vec4(fragPosWorldSpace, 1.0);
 }

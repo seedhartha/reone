@@ -38,6 +38,7 @@
 #include "../../scene/node/grasscluster.h"
 #include "../../scene/node/model.h"
 #include "../../scene/node/sound.h"
+#include "../../scene/node/trigger.h"
 #include "../../scene/node/walkmesh.h"
 #include "../../scene/types.h"
 
@@ -428,6 +429,8 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
             sceneGraph.addRoot(static_pointer_cast<ModelSceneNode>(sceneNode));
         } else if (sceneNode->type() == SceneNodeType::Sound) {
             sceneGraph.addRoot(static_pointer_cast<SoundSceneNode>(sceneNode));
+        } else if (sceneNode->type() == SceneNodeType::Trigger) {
+            sceneGraph.addRoot(static_pointer_cast<TriggerSceneNode>(sceneNode));
         }
     }
     if (object->type() == ObjectType::Placeable) {
@@ -489,6 +492,8 @@ void Area::doDestroyObject(uint32_t objectId) {
             sceneGraph.removeRoot(static_pointer_cast<ModelSceneNode>(sceneNode));
         } else if (sceneNode->type() == SceneNodeType::Sound) {
             sceneGraph.removeRoot(static_pointer_cast<SoundSceneNode>(sceneNode));
+        } else if (sceneNode->type() == SceneNodeType::Trigger) {
+            sceneGraph.removeRoot(static_pointer_cast<TriggerSceneNode>(sceneNode));
         }
     }
     if (object->type() == ObjectType::Placeable) {
