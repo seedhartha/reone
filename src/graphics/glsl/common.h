@@ -61,8 +61,8 @@ layout(std140) uniform General {
     vec4 uSelfIllumColor;
     vec4 uDiscardColor;
     vec4 uFogColor;
-    vec4 uHeightMapFrameBounds;
     vec4 uShadowLightPosition;
+    vec4 uHeightMapFrameBounds;
     vec2 uScreenResolution;
     vec2 uScreenResolutionRcp;
     vec2 uBlurDirection;
@@ -227,11 +227,6 @@ vec4 sampleEnvironmentMap(sampler2D tex2D, samplerCube texCube, vec3 R) {
 
 const std::string g_glslNormalMapping = R"END(
 const vec2 HEIGHT_MAP_SIZE = vec2(2.0, 0.0);
-const ivec3 HEIGHT_MAP_OFF = ivec3(-1, 0, 1);
-
-vec2 packUV(vec2 uv, vec4 bounds) {
-    return bounds.xy + bounds.zw * fract(uv);
-}
 
 vec3 getNormalFromNormalMap(sampler2D tex, vec2 uv, mat3 TBN) {
     vec4 texSample = texture(tex, uv);
@@ -240,14 +235,20 @@ vec3 getNormalFromNormalMap(sampler2D tex, vec2 uv, mat3 TBN) {
 }
 
 vec3 getNormalFromHeightMap(sampler2D tex, vec2 uv, mat3 TBN) {
-    vec2 uvM = packUV(uv, uHeightMapFrameBounds);
+    vec2 frameTexelSize = vec2(1.0) / uHeightMapFrameBounds.zw;
+    ivec2 pW = ivec2(uHeightMapFrameBounds.xy + uHeightMapFrameBounds.zw * fract(uv - vec2(frameTexelSize.x, 0.0)));
+    ivec2 pE = ivec2(uHeightMapFrameBounds.xy + uHeightMapFrameBounds.zw * fract(uv + vec2(frameTexelSize.x, 0.0)));
+    ivec2 pS = ivec2(uHeightMapFrameBounds.xy + uHeightMapFrameBounds.zw * fract(uv - vec2(0.0, frameTexelSize.y)));
+    ivec2 pN = ivec2(uHeightMapFrameBounds.xy + uHeightMapFrameBounds.zw * fract(uv + vec2(0.0, frameTexelSize.y)));
 
-    float s01 = textureOffset(tex, uvM, HEIGHT_MAP_OFF.xy).r;
-    float s21 = textureOffset(tex, uvM, HEIGHT_MAP_OFF.zy).r;
-    float s10 = textureOffset(tex, uvM, HEIGHT_MAP_OFF.yx).r;
-    float s12 = textureOffset(tex, uvM, HEIGHT_MAP_OFF.yz).r;
-    vec3 va = normalize(vec3(HEIGHT_MAP_SIZE.xy, s21 - s01));
-    vec3 vb = normalize(vec3(HEIGHT_MAP_SIZE.yx, s12 - s10));
+    vec2 texelSize = vec2(1.0) / textureSize(tex, 0);
+    float sW = textureLod(tex, pW * texelSize, 0).r;
+    float sE = textureLod(tex, pE * texelSize, 0).r;
+    float sS = textureLod(tex, pS * texelSize, 0).r;
+    float sN = textureLod(tex, pN * texelSize, 0).r;
+
+    vec3 va = normalize(vec3(HEIGHT_MAP_SIZE.xy, sE - sW));
+    vec3 vb = normalize(vec3(HEIGHT_MAP_SIZE.yx, sN - sS));
 
     vec3 N = cross(va, vb);
     N.xy *= uHeightMapScaling;

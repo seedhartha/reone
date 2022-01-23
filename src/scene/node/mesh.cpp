@@ -225,17 +225,24 @@ void MeshSceneNode::draw() {
         if (_nodeTextures.bumpmap->isGrayscale()) {
             uniforms.general.featureMask |= UniformsFeatureFlags::heightmap;
             uniforms.general.heightMapScaling = _nodeTextures.bumpmap->features().bumpMapScaling;
+            int bumpmapW = _nodeTextures.bumpmap->width();
+            int bumpmapH = _nodeTextures.bumpmap->height();
             if (_nodeTextures.bumpmap->features().procedureType == Texture::ProcedureType::Cycle) {
                 int gridX = _nodeTextures.bumpmap->features().numX;
                 int gridY = _nodeTextures.bumpmap->features().numY;
-                glm::vec2 oneOverGrid(1.0f / glm::vec2(static_cast<float>(gridX), static_cast<float>(gridY)));
+                int frameW = bumpmapW / gridX;
+                int frameH = bumpmapH / gridY;
                 uniforms.general.heightMapFrameBounds = glm::vec4(
-                    oneOverGrid.x * (_bumpmapCycleFrame % gridX),
-                    oneOverGrid.y * (_bumpmapCycleFrame / gridX),
-                    oneOverGrid.x,
-                    oneOverGrid.y);
+                    static_cast<float>(frameW * (_bumpmapCycleFrame % gridX)),
+                    static_cast<float>(frameH * (_bumpmapCycleFrame / gridX)),
+                    static_cast<float>(frameW),
+                    static_cast<float>(frameH));
             } else {
-                uniforms.general.heightMapFrameBounds = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+                uniforms.general.heightMapFrameBounds = glm::ivec4(
+                    0.0f,
+                    0.0f,
+                    static_cast<float>(bumpmapW),
+                    static_cast<float>(bumpmapH));
             }
         } else {
             uniforms.general.featureMask |= UniformsFeatureFlags::normalmap;
