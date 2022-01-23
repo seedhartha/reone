@@ -53,6 +53,7 @@ class Collision;
 class IAnimationEventListener;
 class ModelSceneNode;
 class SoundSceneNode;
+class TriggerSceneNode;
 class WalkmeshSceneNode;
 
 class SceneGraph : public graphics::IScene, boost::noncopyable {
@@ -89,8 +90,10 @@ public:
         return _activeCamera ? _activeCamera->camera() : nullptr;
     }
 
-    void setUpdateRoots(bool update) { _updateRoots = update; }
     void setActiveCamera(std::shared_ptr<CameraSceneNode> camera) { _activeCamera = std::move(camera); }
+    void setUpdateRoots(bool update) { _updateRoots = update; }
+    void setDrawWalkmeshes(bool draw) { _drawWalkmeshes = draw; }
+    void setDrawTriggers(bool draw) { _drawTriggers = draw; }
 
     // Roots
 
@@ -98,13 +101,15 @@ public:
 
     void addRoot(std::shared_ptr<ModelSceneNode> node);
     void addRoot(std::shared_ptr<WalkmeshSceneNode> node);
-    void addRoot(std::shared_ptr<SoundSceneNode> node);
+    void addRoot(std::shared_ptr<TriggerSceneNode> node);
     void addRoot(std::shared_ptr<GrassSceneNode> node);
+    void addRoot(std::shared_ptr<SoundSceneNode> node);
 
     void removeRoot(const std::shared_ptr<ModelSceneNode> &node);
     void removeRoot(const std::shared_ptr<WalkmeshSceneNode> &node);
-    void removeRoot(const std::shared_ptr<SoundSceneNode> &node);
+    void removeRoot(const std::shared_ptr<TriggerSceneNode> &node);
     void removeRoot(const std::shared_ptr<GrassSceneNode> &node);
+    void removeRoot(const std::shared_ptr<SoundSceneNode> &node);
 
     // END Roots
 
@@ -151,7 +156,6 @@ public:
 
     std::shared_ptr<ModelSceneNode> pickModelAt(int x, int y, IUser *except = nullptr) const;
 
-    void setDrawWalkmeshes(bool draw) { _drawWalkmeshes = draw; }
     void setWalkableSurfaces(std::set<uint32_t> surfaces) { _walkableSurfaces = std::move(surfaces); }
     void setWalkcheckSurfaces(std::set<uint32_t> surfaces) { _walkcheckSurfaces = std::move(surfaces); }
     void setLineOfSightSurfaces(std::set<uint32_t> surfaces) { _lineOfSightSurfaces = std::move(surfaces); }
@@ -161,6 +165,8 @@ public:
     // Factory methods
 
     std::unique_ptr<DummySceneNode> newDummy(std::shared_ptr<graphics::ModelNode> modelNode);
+    std::unique_ptr<WalkmeshSceneNode> newWalkmesh(std::shared_ptr<graphics::Walkmesh> walkmesh);
+    std::unique_ptr<TriggerSceneNode> newTrigger(std::vector<glm::vec3> geometry);
     std::unique_ptr<CameraSceneNode> newCamera();
     std::unique_ptr<SoundSceneNode> newSound();
 
@@ -168,8 +174,6 @@ public:
         std::shared_ptr<graphics::Model> model,
         ModelUsage usage,
         IAnimationEventListener *animEventListener = nullptr);
-
-    std::unique_ptr<WalkmeshSceneNode> newWalkmesh(std::shared_ptr<graphics::Walkmesh> walkmesh);
 
     std::unique_ptr<GrassSceneNode> newGrass(
         float density,
@@ -187,6 +191,7 @@ private:
 
     bool _updateRoots {true};
     bool _drawWalkmeshes {false};
+    bool _drawTriggers {false};
 
     std::shared_ptr<CameraSceneNode> _activeCamera;
     std::vector<LightSceneNode *> _flareLights;
@@ -206,8 +211,9 @@ private:
 
     std::set<std::shared_ptr<ModelSceneNode>> _modelRoots;
     std::set<std::shared_ptr<WalkmeshSceneNode>> _walkmeshRoots;
-    std::set<std::shared_ptr<SoundSceneNode>> _soundRoots;
+    std::set<std::shared_ptr<TriggerSceneNode>> _triggerRoots;
     std::set<std::shared_ptr<GrassSceneNode>> _grassRoots;
+    std::set<std::shared_ptr<SoundSceneNode>> _soundRoots;
 
     // END Roots
 

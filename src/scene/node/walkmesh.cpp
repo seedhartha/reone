@@ -43,7 +43,8 @@ void WalkmeshSceneNode::init() {
             vertices.push_back(wface.normal.x);
             vertices.push_back(wface.normal.y);
             vertices.push_back(wface.normal.z);
-            vertices.push_back(glm::min(kMaxWalkmeshMaterials, static_cast<int>(wface.material)) / static_cast<float>(kMaxWalkmeshMaterials));
+            float material = glm::min(1.0f, static_cast<int>(wface.material) / static_cast<float>(kMaxWalkmeshMaterials - 1));
+            vertices.push_back(material);
         }
         Mesh::Face face;
         face.indices[0] = vertIdxStart + 0;

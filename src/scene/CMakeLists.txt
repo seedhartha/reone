@@ -31,6 +31,7 @@ set(SCENE_HEADERS
     node/modelnode.h
     node/particle.h
     node/sound.h
+    node/trigger.h
     node/walkmesh.h
     types.h
     user.h)
@@ -48,6 +49,7 @@ set(SCENE_SOURCES
     node/modelnode.cpp
     node/particle.cpp
     node/sound.cpp
+    node/trigger.cpp
     node/walkmesh.cpp)
 
 add_library(scene STATIC ${SCENE_HEADERS} ${SCENE_SOURCES})

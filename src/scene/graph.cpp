@@ -33,6 +33,7 @@
 #include "node/model.h"
 #include "node/particle.h"
 #include "node/sound.h"
+#include "node/trigger.h"
 #include "node/walkmesh.h"
 
 using namespace std;
@@ -74,12 +75,16 @@ void SceneGraph::addRoot(shared_ptr<WalkmeshSceneNode> node) {
     _walkmeshRoots.insert(move(node));
 }
 
-void SceneGraph::addRoot(shared_ptr<SoundSceneNode> node) {
-    _soundRoots.insert(move(node));
+void SceneGraph::addRoot(shared_ptr<TriggerSceneNode> node) {
+    _triggerRoots.insert(move(node));
 }
 
 void SceneGraph::addRoot(shared_ptr<GrassSceneNode> node) {
     _grassRoots.insert(move(node));
+}
+
+void SceneGraph::addRoot(shared_ptr<SoundSceneNode> node) {
+    _soundRoots.insert(move(node));
 }
 
 void SceneGraph::removeRoot(const shared_ptr<ModelSceneNode> &node) {
@@ -90,12 +95,16 @@ void SceneGraph::removeRoot(const shared_ptr<WalkmeshSceneNode> &node) {
     _walkmeshRoots.erase(node);
 }
 
-void SceneGraph::removeRoot(const shared_ptr<SoundSceneNode> &node) {
-    _soundRoots.erase(node);
+void SceneGraph::removeRoot(const shared_ptr<TriggerSceneNode> &node) {
+    _triggerRoots.erase(node);
 }
 
 void SceneGraph::removeRoot(const shared_ptr<GrassSceneNode> &node) {
     _grassRoots.erase(node);
+}
+
+void SceneGraph::removeRoot(const shared_ptr<SoundSceneNode> &node) {
+    _soundRoots.erase(node);
 }
 
 void SceneGraph::update(float dt) {
@@ -403,13 +412,15 @@ void SceneGraph::drawOpaque() {
     if (!_activeCamera) {
         return;
     }
-    if (_drawWalkmeshes) {
+    if (_drawWalkmeshes || _drawTriggers) {
         auto &uniforms = _shaders.uniforms();
-        for (int i = 0; i < kMaxWalkmeshMaterials; ++i) {
+        for (int i = 0; i < kMaxWalkmeshMaterials - 1; ++i) {
             uniforms.walkmesh.materials[i] = _walkableSurfaces.count(i) > 0 ? glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) : glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
         }
+        uniforms.walkmesh.materials[kMaxWalkmeshMaterials - 1] = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f); // triggers
         _shaders.refreshWalkmeshUniforms();
-
+    }
+    if (_drawWalkmeshes) {
         // Draw walkmeshes if enabled
         for (auto &walkmesh : _walkmeshRoots) {
             if (walkmesh->isEnabled()) {
@@ -424,6 +435,11 @@ void SceneGraph::drawOpaque() {
         // Draw opaque leafs
         for (auto &[node, leafs] : _opaqueLeafs) {
             node->drawLeafs(leafs);
+        }
+    }
+    if (_drawTriggers) {
+        for (auto &trigger : _triggerRoots) {
+            trigger->draw();
         }
     }
 }
@@ -633,6 +649,14 @@ unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode)
     return make_unique<DummySceneNode>(move(modelNode), *this, _graphicsContext, _meshes, _shaders, _textures);
 }
 
+unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(shared_ptr<Walkmesh> walkmesh) {
+    return make_unique<WalkmeshSceneNode>(move(walkmesh), *this, _graphicsContext, _shaders);
+}
+
+unique_ptr<TriggerSceneNode> SceneGraph::newTrigger(vector<glm::vec3> geometry) {
+    return make_unique<TriggerSceneNode>(move(geometry), *this, _graphicsContext, _shaders);
+}
+
 unique_ptr<CameraSceneNode> SceneGraph::newCamera() {
     return make_unique<CameraSceneNode>(*this);
 }
@@ -651,10 +675,6 @@ unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUs
         _shaders,
         _textures,
         animEventListener);
-}
-
-unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(shared_ptr<Walkmesh> walkmesh) {
-    return make_unique<WalkmeshSceneNode>(move(walkmesh), *this, _graphicsContext, _shaders);
 }
 
 unique_ptr<GrassSceneNode> SceneGraph::newGrass(float density, float quadSize, glm::vec4 probabilities, set<uint32_t> materials, shared_ptr<Texture> texture, shared_ptr<ModelNode> aabbNode) {

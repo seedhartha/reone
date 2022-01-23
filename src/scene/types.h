@@ -32,7 +32,8 @@ enum class SceneNodeType {
     Particle,
     Grass,
     GrassCluster,
-    Walkmesh
+    Walkmesh,
+    Trigger
 };
 
 enum class ModelUsage {
