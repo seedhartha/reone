@@ -58,6 +58,7 @@ private:
 
     struct Command {
         std::string name;
+        std::string alias;
         std::string description;
         CommandHandler handler;
     };
@@ -72,8 +73,13 @@ private:
     int _outputOffset {0};
     std::stack<std::string> _history;
 
+    // Commands
+
     std::vector<Command> _commands;
     std::unordered_map<std::string, Command> _commandByName;
+    std::unordered_map<std::string, Command> _commandByAlias;
+
+    // END Commands
 
     bool handleMouseWheel(const SDL_MouseWheelEvent &event);
     bool handleKeyUp(const SDL_KeyboardEvent &event);
@@ -89,10 +95,10 @@ private:
 
     void initCommands();
 
-    void addCommand(std::string name, std::string description, CommandHandler handler);
+    void addCommand(std::string name, std::string alias, std::string description, CommandHandler handler);
 
     void cmdClear(std::string input, std::vector<std::string> tokens);
-    void cmdDescribe(std::string input, std::vector<std::string> tokens);
+    void cmdInfo(std::string input, std::vector<std::string> tokens);
     void cmdListAnim(std::string input, std::vector<std::string> tokens);
     void cmdPlayAnim(std::string input, std::vector<std::string> tokens);
     void cmdKill(std::string input, std::vector<std::string> tokens);
@@ -100,7 +106,7 @@ private:
     void cmdGiveXP(std::string input, std::vector<std::string> tokens);
     void cmdWarp(std::string input, std::vector<std::string> tokens);
     void cmdListRoutine(std::string input, std::vector<std::string> tokens);
-    void cmdExec(std::string input, std::vector<std::string> tokens);
+    void cmdExecRoutine(std::string input, std::vector<std::string> tokens);
     void cmdHelp(std::string input, std::vector<std::string> tokens);
 
     // END Commands

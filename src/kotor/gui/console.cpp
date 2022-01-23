@@ -56,27 +56,33 @@ static constexpr int kVisibleLineCount = 15;
 void Console::init() {
     _font = _services.fonts.get("fnt_console");
 
-    addCommand("clear", "clear console", bind(&Console::cmdClear, this, _1, _2));
-    addCommand("describe", "describe selected object", bind(&Console::cmdDescribe, this, _1, _2));
-    addCommand("listanim", "list animations of selected object", bind(&Console::cmdListAnim, this, _1, _2));
-    addCommand("playanim", "play animation on selected object", bind(&Console::cmdPlayAnim, this, _1, _2));
-    addCommand("kill", "kill selected object", bind(&Console::cmdKill, this, _1, _2));
-    addCommand("additem", "add item to selected object", bind(&Console::cmdAddItem, this, _1, _2));
-    addCommand("givexp", "give experience to selected creature", bind(&Console::cmdGiveXP, this, _1, _2));
-    addCommand("warp", "warp to a module", bind(&Console::cmdWarp, this, _1, _2));
-    addCommand("listroutine", "list script routine", bind(&Console::cmdListRoutine, this, _1, _2));
-    addCommand("exec", "execute script routine", bind(&Console::cmdExec, this, _1, _2));
-    addCommand("help", "list all commands", bind(&Console::cmdHelp, this, _1, _2));
+    addCommand("clear", "c", "clear console", bind(&Console::cmdClear, this, _1, _2));
+    addCommand("info", "i", "information on selected object", bind(&Console::cmdInfo, this, _1, _2));
+    addCommand("listroutine", "lr", "list script routines", bind(&Console::cmdListRoutine, this, _1, _2));
+    addCommand("execroutine", "xr", "execute script routine", bind(&Console::cmdExecRoutine, this, _1, _2));
+    addCommand("listanim", "la", "list animations of selected object", bind(&Console::cmdListAnim, this, _1, _2));
+    addCommand("playanim", "pa", "play animation on selected object", bind(&Console::cmdPlayAnim, this, _1, _2));
+    addCommand("additem", "ai", "add item to selected object", bind(&Console::cmdAddItem, this, _1, _2));
+    addCommand("warp", "w", "warp to a module", bind(&Console::cmdWarp, this, _1, _2));
+    addCommand("kill", "k", "kill selected object", bind(&Console::cmdKill, this, _1, _2));
+    addCommand("givexp", "xp", "give experience to selected creature", bind(&Console::cmdGiveXP, this, _1, _2));
+
+    addCommand("help", "h", "list console commands", bind(&Console::cmdHelp, this, _1, _2));
 }
 
-void Console::addCommand(string name, string description, CommandHandler handler) {
+void Console::addCommand(string name, string alias, string description, CommandHandler handler) {
     Command cmd;
     cmd.name = move(name);
+    cmd.alias = move(alias);
     cmd.description = move(description);
     cmd.handler = move(handler);
 
     _commands.push_back(cmd);
     _commandByName.insert(make_pair(cmd.name, cmd));
+
+    if (!cmd.alias.empty()) {
+        _commandByAlias.insert(make_pair(cmd.alias, cmd));
+    }
 }
 
 bool Console::handle(const SDL_Event &event) {
@@ -150,11 +156,16 @@ void Console::executeInputText() {
     if (tokens.empty()) {
         return;
     }
-    auto maybeCommand = _commandByName.find(tokens[0]);
-    if (maybeCommand != _commandByName.end()) {
-        maybeCommand->second.handler(_input.text(), move(tokens));
+    auto maybeCmdByName = _commandByName.find(tokens[0]);
+    if (maybeCmdByName != _commandByName.end()) {
+        maybeCmdByName->second.handler(_input.text(), move(tokens));
     } else {
-        print("Unknown command: " + tokens[0]);
+        auto maybeCmdByAlias = _commandByAlias.find(tokens[0]);
+        if (maybeCmdByAlias != _commandByAlias.end()) {
+            maybeCmdByAlias->second.handler(_input.text(), move(tokens));
+        } else {
+            print("Unknown command: " + tokens[0]);
+        }
     }
 }
 
@@ -206,10 +217,10 @@ void Console::cmdClear(string input, vector<string> tokens) {
     _outputOffset = 0;
 }
 
-void Console::cmdDescribe(string input, vector<string> tokens) {
+void Console::cmdInfo(string input, vector<string> tokens) {
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
-        print("describe: no object selected");
+        print("info: no object selected");
         return;
     }
     glm::vec3 position(object->position());
@@ -347,9 +358,9 @@ void Console::cmdListRoutine(string input, vector<string> tokens) {
     }
 }
 
-void Console::cmdExec(string input, vector<string> tokens) {
+void Console::cmdExecRoutine(string input, vector<string> tokens) {
     if (tokens.size() < 3) {
-        print("Usage: exec routine_name caller_id [arguments], e.g. exec ActionMoveAwayFromObject 10 20 0 40.0");
+        print("Usage: execroutine routine_name caller_id [arguments], e.g. exec ActionMoveAwayFromObject 10 20 0 40.0");
         return;
     }
     auto routineName = tokens[1];
@@ -387,13 +398,19 @@ void Console::cmdExec(string input, vector<string> tokens) {
 
 void Console::cmdHelp(string input, vector<string> tokens) {
     for (auto &cmd : _commands) {
-        print(cmd.name + ": " + cmd.description);
+        auto text = cmd.name;
+        if (!cmd.alias.empty()) {
+            text += " (" + cmd.alias + ")";
+        }
+        text += ": " + cmd.description;
+        print(text);
     }
 }
 
 void Console::print(const string &text) {
     _output.push_front(text);
     trimOutput();
+    _outputOffset = 0;
 }
 
 void Console::trimOutput() {
