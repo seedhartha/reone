@@ -59,7 +59,7 @@ void Console::init() {
     addCommand("clear", "c", "clear console", bind(&Console::cmdClear, this, _1, _2));
     addCommand("info", "i", "information on selected object", bind(&Console::cmdInfo, this, _1, _2));
     addCommand("listroutine", "lr", "list script routines", bind(&Console::cmdListRoutine, this, _1, _2));
-    addCommand("execroutine", "xr", "execute script routine", bind(&Console::cmdExecRoutine, this, _1, _2));
+    addCommand("exec", "x", "execute script routine", bind(&Console::cmdExec, this, _1, _2));
     addCommand("listanim", "la", "list animations of selected object", bind(&Console::cmdListAnim, this, _1, _2));
     addCommand("playanim", "pa", "play animation on selected object", bind(&Console::cmdPlayAnim, this, _1, _2));
     addCommand("additem", "ai", "add item to selected object", bind(&Console::cmdAddItem, this, _1, _2));
@@ -156,16 +156,24 @@ void Console::executeInputText() {
     if (tokens.empty()) {
         return;
     }
+    CommandHandler handler;
     auto maybeCmdByName = _commandByName.find(tokens[0]);
     if (maybeCmdByName != _commandByName.end()) {
-        maybeCmdByName->second.handler(_input.text(), move(tokens));
+        handler = maybeCmdByName->second.handler;
     } else {
         auto maybeCmdByAlias = _commandByAlias.find(tokens[0]);
         if (maybeCmdByAlias != _commandByAlias.end()) {
-            maybeCmdByAlias->second.handler(_input.text(), move(tokens));
-        } else {
-            print("Unknown command: " + tokens[0]);
+            handler = maybeCmdByAlias->second.handler;
         }
+    }
+    if (handler) {
+        try {
+            handler(_input.text(), move(tokens));
+        } catch (const invalid_argument &) {
+            print("Invalid argument");
+        }
+    } else {
+        print("Unknown command");
     }
 }
 
@@ -220,7 +228,7 @@ void Console::cmdClear(string input, vector<string> tokens) {
 void Console::cmdInfo(string input, vector<string> tokens) {
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
-        print("info: no object selected");
+        print("No object is selected");
         return;
     }
     glm::vec3 position(object->position());
@@ -262,7 +270,7 @@ void Console::cmdListAnim(string input, vector<string> tokens) {
     if (!object) {
         object = _game.party().getLeader();
         if (!object) {
-            print("listanim: no object selected");
+            print("No object is selected");
             return;
         }
     }
@@ -292,7 +300,7 @@ void Console::cmdPlayAnim(string input, vector<string> tokens) {
     if (!object) {
         object = _game.party().getLeader();
         if (!object) {
-            print("playanim: no object selected");
+            print("No object is selected");
             return;
         }
     }
@@ -303,7 +311,7 @@ void Console::cmdPlayAnim(string input, vector<string> tokens) {
 void Console::cmdKill(string input, vector<string> tokens) {
     auto object = _game.module()->area()->selectedObject();
     if (!object) {
-        print("kill: no object selected");
+        print("No object is selected");
         return;
     }
     auto effect = _game.effectFactory().newDamage(100000, DamageType::Universal, nullptr);
@@ -319,7 +327,7 @@ void Console::cmdAddItem(string input, vector<string> tokens) {
     if (!object) {
         object = _game.party().getLeader();
         if (!object) {
-            print("additem: no object selected");
+            print("No object is selected");
             return;
         }
     }
@@ -338,7 +346,7 @@ void Console::cmdGiveXP(string input, vector<string> tokens) {
         object = _game.party().getLeader();
     }
     if (!object || object->type() != ObjectType::Creature) {
-        print("givexp: no creature selected");
+        print("No creature is selected");
         return;
     }
 
@@ -359,28 +367,72 @@ void Console::cmdListRoutine(string input, vector<string> tokens) {
     auto &routines = _game.routines();
     for (int i = 0; i < routines.getNumRoutines(); ++i) {
         auto &routine = routines.get(i);
-        if (query.empty() || boost::contains(routine.name(), query)) {
-            print(routine.name());
+        if (!query.empty() && !boost::contains(routine.name(), query)) {
+            continue;
         }
+        auto text = routine.name();
+        for (int j = 0; j < routine.getArgumentCount(); ++j) {
+            auto argType = routine.getArgumentType(j);
+            switch (argType) {
+            case VariableType::Int:
+                text += " int";
+                break;
+            case VariableType::Float:
+                text += " float";
+                break;
+            case VariableType::String:
+                text += " string";
+                break;
+            case VariableType::Vector:
+                text += " vector";
+                break;
+            case VariableType::Object:
+                text += " object";
+                break;
+            case VariableType::Effect:
+                text += " effect";
+                break;
+            case VariableType::Event:
+                text += " event";
+                break;
+            case VariableType::Location:
+                text += " location";
+                break;
+            case VariableType::Talent:
+                text += " talent";
+                break;
+            case VariableType::Action:
+                text += " action";
+                break;
+            default:
+                text += " UNKNOWN";
+                break;
+            }
+        }
+        print(text);
     }
 }
 
-void Console::cmdExecRoutine(string input, vector<string> tokens) {
+void Console::cmdExec(string input, vector<string> tokens) {
     if (tokens.size() < 3) {
-        print("Usage: execroutine routine_name caller_id [arguments], e.g. exec ActionMoveAwayFromObject 10 20 0 40.0");
+        print("Usage: exec caller_id routine_name [arguments], e.g. exec 10 ActionMoveAwayFromObject 20 0 40.0");
         return;
     }
-    auto routineName = tokens[1];
+    auto callerId = stoi(tokens[1]);
+    auto routineName = tokens[2];
+
     auto &routines = _game.routines();
     int routineIdx = routines.getIndexByName(routineName);
     if (routineIdx == -1) {
         print(str(boost::format("Routine '%s' not found") % routineName));
         return;
     }
+    auto &routine = routines.get(routineIdx);
+
     ExecutionContext ctx;
     ctx.routines = &routines;
-    ctx.callerId = stoi(tokens[2]);
-    auto &routine = routines.get(routineIdx);
+    ctx.callerId = callerId;
+
     vector<Variable> args;
     for (int i = 0; i < routine.getArgumentCount() && i < tokens.size() - 3; ++i) {
         auto argType = routine.getArgumentType(i);
@@ -397,6 +449,7 @@ void Console::cmdExecRoutine(string input, vector<string> tokens) {
             return;
         }
     }
+
     auto result = routine.invoke(move(args), ctx);
     if (routine.returnType() != VariableType::Void) {
         print(routineName + " -> " + result.toString());
