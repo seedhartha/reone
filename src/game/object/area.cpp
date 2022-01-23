@@ -82,8 +82,6 @@ static constexpr float kMaxCollisionDistance2 = kMaxCollisionDistance * kMaxColl
 static glm::vec3 g_defaultAmbientColor {0.2f};
 static CameraStyle g_defaultCameraStyle {"", 3.2f, 83.0f, 0.45f, 55.0f};
 
-static bool g_debugPath = false;
-
 Area::Area(
     uint32_t id,
     string sceneName,

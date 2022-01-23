@@ -43,8 +43,6 @@ namespace scene {
 
 static constexpr float kUvAnimationSpeed = 250.0f;
 
-static bool g_debugWalkmesh = false;
-
 void MeshSceneNode::init() {
     _point = false;
     _alpha = _modelNode->alpha().getByFrameOrElse(0, 1.0f);
@@ -115,10 +113,7 @@ void MeshSceneNode::updateBumpmapAnimation(float dt, const ModelNode::TriangleMe
 }
 
 bool MeshSceneNode::shouldRender() const {
-    if (g_debugWalkmesh) {
-        return _modelNode->isAABBMesh();
-    }
-    shared_ptr<ModelNode::TriangleMesh> mesh(_modelNode->mesh());
+    auto mesh = _modelNode->mesh();
     if (!mesh || !mesh->render || _modelNode->alpha().getByFrameOrElse(0, 1.0f) == 0.0f) {
         return false;
     }

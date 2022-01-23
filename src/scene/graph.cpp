@@ -47,6 +47,7 @@ static constexpr int kMaxSoundCount = 4;
 
 static constexpr float kShadowFadeSpeed = 2.0f;
 static constexpr float kElevationTestZ = 1024.0f;
+
 static constexpr float kLightRadiusBias = 64.0f;
 static constexpr float kLightRadiusBias2 = kLightRadiusBias * kLightRadiusBias;
 
