@@ -42,12 +42,10 @@ const int FEATURE_WATER = 0x400;
 const int FEATURE_TEXT = 0x800;
 const int FEATURE_GRASS = 0x1000;
 const int FEATURE_FOG = 0x2000;
-const int FEATURE_DANGLYMESH = 0x4000;
-const int FEATURE_FIXEDSIZE = 0x8000;
-const int FEATURE_HASHEDALPHATEST = 0x10000;
-const int FEATURE_SSAO = 0x20000;
-const int FEATURE_PREMULALPHA = 0x40000;
-const int FEATURE_ENVMAPCUBE = 0x80000;
+const int FEATURE_FIXEDSIZE = 0x4000;
+const int FEATURE_HASHEDALPHATEST = 0x8000;
+const int FEATURE_PREMULALPHA = 0x10000;
+const int FEATURE_ENVMAPCUBE = 0x20000;
 
 layout(std140) uniform General {
     mat4 uProjection;

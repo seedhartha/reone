@@ -530,9 +530,6 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
     uniforms.general.featureMask = UniformsFeatureFlags::lighting;
-    if (_options.ssao) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::ssao;
-    }
     uniforms.general.viewInv = glm::inverse(camera->view());
     uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
     uniforms.general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
