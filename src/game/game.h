@@ -119,19 +119,24 @@ public:
 
     // END Module loading
 
-    // Globals/locals
+    // Global variables
 
     bool getGlobalBoolean(const std::string &name) const;
     int getGlobalNumber(const std::string &name) const;
     std::shared_ptr<Location> getGlobalLocation(const std::string &name) const;
     std::string getGlobalString(const std::string &name) const;
 
+    const std::map<std::string, std::string> &globalStrings() const { return _globalStrings; }
+    const std::map<std::string, bool> &globalBooleans() const { return _globalBooleans; }
+    const std::map<std::string, int> &globalNumbers() const { return _globalNumbers; }
+    const std::map<std::string, std::shared_ptr<Location>> &globalLocations() const { return _globalLocations; }
+
     void setGlobalBoolean(const std::string &name, bool value);
     void setGlobalLocation(const std::string &name, const std::shared_ptr<Location> &location);
     void setGlobalNumber(const std::string &name, int value);
     void setGlobalString(const std::string &name, const std::string &value);
 
-    // END Globals/locals
+    // END Global variables
 
     // GUI colors
 

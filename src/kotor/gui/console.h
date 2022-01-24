@@ -99,6 +99,8 @@ private:
 
     void cmdClear(std::string input, std::vector<std::string> tokens);
     void cmdInfo(std::string input, std::vector<std::string> tokens);
+    void cmdListGlobals(std::string input, std::vector<std::string> tokens);
+    void cmdListLocals(std::string input, std::vector<std::string> tokens);
     void cmdListAnim(std::string input, std::vector<std::string> tokens);
     void cmdPlayAnim(std::string input, std::vector<std::string> tokens);
     void cmdListRoutine(std::string input, std::vector<std::string> tokens);

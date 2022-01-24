@@ -21,6 +21,7 @@
 #include "../../game/debug.h"
 #include "../../game/effect/factory.h"
 #include "../../game/game.h"
+#include "../../game/location.h"
 #include "../../game/object/creature.h"
 #include "../../game/party.h"
 #include "../../game/services.h"
@@ -59,6 +60,8 @@ void Console::init() {
 
     addCommand("clear", "c", "clear console", bind(&Console::cmdClear, this, _1, _2));
     addCommand("info", "i", "information on selected object", bind(&Console::cmdInfo, this, _1, _2));
+    addCommand("listglobals", "lg", "list global variables", bind(&Console::cmdListGlobals, this, _1, _2));
+    addCommand("listlocals", "ll", "list local variables", bind(&Console::cmdListLocals, this, _1, _2));
     addCommand("listroutine", "lr", "list script routines", bind(&Console::cmdListRoutine, this, _1, _2));
     addCommand("exec", "x", "execute script routine", bind(&Console::cmdExec, this, _1, _2));
     addCommand("listanim", "la", "list animations of selected object", bind(&Console::cmdListAnim, this, _1, _2));
@@ -266,6 +269,51 @@ void Console::cmdInfo(string input, vector<string> tokens) {
     }
 
     print(ss.str());
+}
+
+void Console::cmdListGlobals(string input, vector<string> tokens) {
+    auto &strings = _game.globalStrings();
+    for (auto &var : strings) {
+        print(var.first + " = " + var.second);
+    }
+
+    auto &booleans = _game.globalBooleans();
+    for (auto &var : booleans) {
+        print(var.first + " = " + (var.second ? "true" : "false"));
+    }
+
+    auto &numbers = _game.globalNumbers();
+    for (auto &var : numbers) {
+        print(var.first + " = " + to_string(var.second));
+    }
+
+    auto &locations = _game.globalLocations();
+    for (auto &var : locations) {
+        print(str(boost::format("%s = (%.04f, %.04f, %.04f, %.04f") %
+                  var.first %
+                  var.second->position().x %
+                  var.second->position().y %
+                  var.second->position().z %
+                  var.second->facing()));
+    }
+}
+
+void Console::cmdListLocals(string input, vector<string> tokens) {
+    auto object = _game.module()->area()->selectedObject();
+    if (!object) {
+        print("No object is selected");
+        return;
+    }
+
+    auto &booleans = object->localBooleans();
+    for (auto &var : booleans) {
+        print(to_string(var.first) + " -> " + (var.second ? "true" : "false"));
+    }
+
+    auto &numbers = object->localNumbers();
+    for (auto &var : numbers) {
+        print(to_string(var.first) + " -> " + to_string(var.second));
+    }
 }
 
 void Console::cmdListAnim(string input, vector<string> tokens) {

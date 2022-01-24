@@ -90,6 +90,9 @@ public:
     bool getLocalBoolean(int index) const;
     int getLocalNumber(int index) const;
 
+    const std::map<int, bool> &localBooleans() const { return _localBooleans; }
+    const std::map<int, int> &localNumbers() const { return _localNumbers; }
+
     void setLocalBoolean(int index, bool value);
     void setLocalNumber(int index, int value);
 
