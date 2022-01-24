@@ -200,7 +200,7 @@ void main() {
     vec3 diffuseColor = mainTexSample.rgb;
     float diffuseAlpha = mainTexSample.a;
     if (isFeatureEnabled(FEATURE_PREMULALPHA)) {
-        diffuseAlpha = rgbaToLuma(mainTexSample);
+        diffuseAlpha = rgbToLuma(mainTexSample.rgb);
         diffuseColor *= 1.0 / max(0.0001, diffuseAlpha);
     }
 
@@ -313,7 +313,7 @@ void main() {
     vec3 mainTexColor = mainTexSample.rgb;
     float mainTexAlpha = mainTexSample.a;
     if (isFeatureEnabled(FEATURE_PREMULALPHA)) {
-        mainTexAlpha = rgbaToLuma(mainTexSample);
+        mainTexAlpha = rgbToLuma(mainTexSample.rgb);
         mainTexColor *= 1.0 / max(0.0001, mainTexAlpha);
     }
     vec3 objectColor = uParticles[fragInstanceID].color.rgb * mainTexColor;
@@ -566,56 +566,6 @@ void main() {
 }
 )END";
 
-const std::string g_fsGaussianBlur9 = R"END(
-uniform sampler2D sMainTex;
-
-noperspective in vec2 fragUV1;
-
-out vec4 fragColor;
-
-void main() {
-    vec2 uv = fragUV1;
-
-    vec4 color = texture(sMainTex, uv);
-    color.rgb *= 0.2270270270;
-
-    vec2 off1 = vec2(1.3846153846) * uBlurDirection;
-    vec2 off2 = vec2(3.2307692308) * uBlurDirection;
-    color.rgb += texture(sMainTex, uv + off1 * uScreenResolutionRcp.xy).rgb * 0.3162162162;
-    color.rgb += texture(sMainTex, uv - off1 * uScreenResolutionRcp.xy).rgb * 0.3162162162;
-    color.rgb += texture(sMainTex, uv + off2 * uScreenResolutionRcp.xy).rgb * 0.0702702703;
-    color.rgb += texture(sMainTex, uv - off2 * uScreenResolutionRcp.xy).rgb * 0.0702702703;
-
-    fragColor = color;
-}
-)END";
-
-const std::string g_fsGaussianBlur13 = R"END(
-uniform sampler2D sMainTex;
-
-noperspective in vec2 fragUV1;
-
-out vec4 fragColor;
-
-void main() {
-    vec2 uv = fragUV1;
-    vec4 color = vec4(0.0);
-
-    vec2 off1 = vec2(1.411764705882353) * uBlurDirection;
-    vec2 off2 = vec2(3.2941176470588234) * uBlurDirection;
-    vec2 off3 = vec2(5.176470588235294) * uBlurDirection;
-    color += texture(sMainTex, uv) * 0.1964825501511404;
-    color += texture(sMainTex, uv + (off1 * uScreenResolutionRcp.xy)) * 0.2969069646728344;
-    color += texture(sMainTex, uv - (off1 * uScreenResolutionRcp.xy)) * 0.2969069646728344;
-    color += texture(sMainTex, uv + (off2 * uScreenResolutionRcp.xy)) * 0.09447039785044732;
-    color += texture(sMainTex, uv - (off2 * uScreenResolutionRcp.xy)) * 0.09447039785044732;
-    color += texture(sMainTex, uv + (off3 * uScreenResolutionRcp.xy)) * 0.010381362401148057;
-    color += texture(sMainTex, uv - (off3 * uScreenResolutionRcp.xy)) * 0.010381362401148057;
-
-    fragColor = color;
-}
-)END";
-
 const std::string g_fsCombineOpaque = R"END(
 const float LIGHTMAP_STRENGTH = 0.5;
 const float SELFILLUM_THRESHOLD = 0.85;
@@ -732,6 +682,115 @@ void main() {
 }
 )END";
 
+const std::string g_fsFXAA = R"END(
+const float EDGE_SHARPNESS = 8.0;
+const float EDGE_THRESHOLD = 0.125;
+const float EDGE_THRESHOLD_MIN = 0.05;
+
+uniform sampler2D sMainTex;
+
+noperspective in vec2 fragUV1;
+
+out vec4 fragColor;
+
+void main() {
+    vec4 rcpFrameOpt = vec4(-0.5 * uScreenResolutionRcp, 0.5 * uScreenResolutionRcp);
+    vec4 rcpFrameOpt2 = vec4(-2.0 * uScreenResolutionRcp, 2.0 * uScreenResolutionRcp);
+
+    vec2 posM = fragUV1;
+    vec4 rgbaM = texture(sMainTex, posM);
+    float lumaM = rgbToLuma(rgbaM.rgb);
+
+    float lumaNw = rgbToLuma(textureOffset(sMainTex, posM, ivec2(-1, 1)).rgb);
+    float lumaSw = rgbToLuma(textureOffset(sMainTex, posM, ivec2(-1, -1)).rgb);
+    float lumaNe = rgbToLuma(textureOffset(sMainTex, posM, ivec2(1, 1)).rgb);
+    float lumaSe = rgbToLuma(textureOffset(sMainTex, posM, ivec2(1, -1)).rgb);
+
+    lumaNe += 1.0/384.0;
+
+    float lumaMax = max(max(lumaNe, lumaSe), max(lumaNw, lumaSw));
+    float lumaMin = min(min(lumaNe, lumaSe), min(lumaNw, lumaSw));
+    float lumaMaxSubMinM = max(lumaMax, lumaM) - min(lumaMin, lumaM);
+    if (lumaMaxSubMinM < max(EDGE_THRESHOLD_MIN, lumaMax * EDGE_THRESHOLD)) {
+        fragColor = rgbaM;
+        return;
+    }
+
+    float dirSwMinusNe = lumaSw - lumaNe;
+    float dirSeMinusNw = lumaSe - lumaNw;
+    vec2 dir = vec2(dirSwMinusNe + dirSeMinusNw, dirSwMinusNe - dirSeMinusNw);
+
+    vec2 dir1 = normalize(dir);
+    vec4 rgbaN1 = texture(sMainTex, posM - dir1 * rcpFrameOpt.zw);
+    vec4 rgbaP1 = texture(sMainTex, posM + dir1 * rcpFrameOpt.zw);
+
+    float dirAbsMinTimesC = min(abs(dir1.x), abs(dir1.y)) * EDGE_SHARPNESS;
+    vec2 dir2 = clamp(dir1 / dirAbsMinTimesC, -2.0, 2.0);
+
+    vec4 rgbaN2 = texture(sMainTex, posM - dir2 * rcpFrameOpt2.zw);
+    vec4 rgbaP2 = texture(sMainTex, posM + dir2 * rcpFrameOpt2.zw);
+
+    vec4 rgbaA = rgbaN1 + rgbaP1;
+    vec4 rgbaB = ((rgbaN2 + rgbaP2) * 0.25) + (rgbaA * 0.25);
+
+    bool twoTap = (rgbToLuma(rgbaB.rgb) < lumaMin) || (rgbToLuma(rgbaB.rgb) > lumaMax);
+    if (twoTap) {
+        rgbaB.xyz = rgbaA.xyz * 0.5;
+    }
+    fragColor = vec4(rgbaB.xyz, rgbaM.w);
+}
+)END";
+
+const std::string g_fsGaussianBlur9 = R"END(
+uniform sampler2D sMainTex;
+
+noperspective in vec2 fragUV1;
+
+out vec4 fragColor;
+
+void main() {
+    vec2 uv = fragUV1;
+
+    vec4 color = texture(sMainTex, uv);
+    color.rgb *= 0.2270270270;
+
+    vec2 off1 = vec2(1.3846153846) * uBlurDirection;
+    vec2 off2 = vec2(3.2307692308) * uBlurDirection;
+    color.rgb += texture(sMainTex, uv + off1 * uScreenResolutionRcp.xy).rgb * 0.3162162162;
+    color.rgb += texture(sMainTex, uv - off1 * uScreenResolutionRcp.xy).rgb * 0.3162162162;
+    color.rgb += texture(sMainTex, uv + off2 * uScreenResolutionRcp.xy).rgb * 0.0702702703;
+    color.rgb += texture(sMainTex, uv - off2 * uScreenResolutionRcp.xy).rgb * 0.0702702703;
+
+    fragColor = color;
+}
+)END";
+
+const std::string g_fsGaussianBlur13 = R"END(
+uniform sampler2D sMainTex;
+
+noperspective in vec2 fragUV1;
+
+out vec4 fragColor;
+
+void main() {
+    vec2 uv = fragUV1;
+    vec4 color = vec4(0.0);
+
+    vec2 off1 = vec2(1.411764705882353) * uBlurDirection;
+    vec2 off2 = vec2(3.2941176470588234) * uBlurDirection;
+    vec2 off3 = vec2(5.176470588235294) * uBlurDirection;
+    color += texture(sMainTex, uv) * 0.1964825501511404;
+    color += texture(sMainTex, uv + (off1 * uScreenResolutionRcp.xy)) * 0.2969069646728344;
+    color += texture(sMainTex, uv - (off1 * uScreenResolutionRcp.xy)) * 0.2969069646728344;
+    color += texture(sMainTex, uv + (off2 * uScreenResolutionRcp.xy)) * 0.09447039785044732;
+    color += texture(sMainTex, uv - (off2 * uScreenResolutionRcp.xy)) * 0.09447039785044732;
+    color += texture(sMainTex, uv + (off3 * uScreenResolutionRcp.xy)) * 0.010381362401148057;
+    color += texture(sMainTex, uv - (off3 * uScreenResolutionRcp.xy)) * 0.010381362401148057;
+
+    fragColor = color;
+}
+)END";
+
 const std::string g_fsMedianFilter3 = R"END(
 uniform sampler2D sMainTex;
 
@@ -806,65 +865,6 @@ void main() {
     t25(12, 17, 7, 17, 7, 10, 12, 18, 7, 12);
     t24(10, 18, 12, 20, 10, 20, 10, 12);
     fragColor = v[12];
-}
-)END";
-
-const std::string g_fsFXAA = R"END(
-const float EDGE_SHARPNESS = 8.0;
-const float EDGE_THRESHOLD = 0.125;
-const float EDGE_THRESHOLD_MIN = 0.05;
-
-uniform sampler2D sMainTex;
-
-noperspective in vec2 fragUV1;
-
-out vec4 fragColor;
-
-void main() {
-    vec4 rcpFrameOpt = vec4(-0.5 * uScreenResolutionRcp, 0.5 * uScreenResolutionRcp);
-    vec4 rcpFrameOpt2 = vec4(-2.0 * uScreenResolutionRcp, 2.0 * uScreenResolutionRcp);
-
-    vec2 posM = fragUV1;
-    vec4 rgbaM = texture(sMainTex, posM);
-    float lumaM = rgbaToLuma(rgbaM);
-
-    float lumaNw = rgbaToLuma(textureOffset(sMainTex, posM, ivec2(-1, 1)));
-    float lumaSw = rgbaToLuma(textureOffset(sMainTex, posM, ivec2(-1, -1)));
-    float lumaNe = rgbaToLuma(textureOffset(sMainTex, posM, ivec2(1, 1)));
-    float lumaSe = rgbaToLuma(textureOffset(sMainTex, posM, ivec2(1, -1)));
-
-    lumaNe += 1.0/384.0;
-
-    float lumaMax = max(max(lumaNe, lumaSe), max(lumaNw, lumaSw));
-    float lumaMin = min(min(lumaNe, lumaSe), min(lumaNw, lumaSw));
-    float lumaMaxSubMinM = max(lumaMax, lumaM) - min(lumaMin, lumaM);
-    if (lumaMaxSubMinM < max(EDGE_THRESHOLD_MIN, lumaMax * EDGE_THRESHOLD)) {
-        fragColor = rgbaM;
-        return;
-    }
-
-    float dirSwMinusNe = lumaSw - lumaNe;
-    float dirSeMinusNw = lumaSe - lumaNw;
-    vec2 dir = vec2(dirSwMinusNe + dirSeMinusNw, dirSwMinusNe - dirSeMinusNw);
-
-    vec2 dir1 = normalize(dir);
-    vec4 rgbaN1 = texture(sMainTex, posM - dir1 * rcpFrameOpt.zw);
-    vec4 rgbaP1 = texture(sMainTex, posM + dir1 * rcpFrameOpt.zw);
-
-    float dirAbsMinTimesC = min(abs(dir1.x), abs(dir1.y)) * EDGE_SHARPNESS;
-    vec2 dir2 = clamp(dir1 / dirAbsMinTimesC, -2.0, 2.0);
-
-    vec4 rgbaN2 = texture(sMainTex, posM - dir2 * rcpFrameOpt2.zw);
-    vec4 rgbaP2 = texture(sMainTex, posM + dir2 * rcpFrameOpt2.zw);
-
-    vec4 rgbaA = rgbaN1 + rgbaP1;
-    vec4 rgbaB = ((rgbaN2 + rgbaP2) * 0.25) + (rgbaA * 0.25);
-
-    bool twoTap = (rgbaToLuma(rgbaB) < lumaMin) || (rgbaToLuma(rgbaB) > lumaMax);
-    if (twoTap) {
-        rgbaB.xyz = rgbaA.xyz * 0.5;
-    }
-    fragColor = vec4(rgbaB.xyz, rgbaM.w);
 }
 )END";
 

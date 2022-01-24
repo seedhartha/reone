@@ -177,6 +177,12 @@ const std::string g_glslMath = R"END(
 const float PI = radians(180.0);
 )END";
 
+const std::string g_glslLuma = R"END(
+float rgbToLuma(vec3 rgb) {
+    return dot(rgb, vec3(0.299, 0.587, 0.114));
+}
+)END";
+
 const std::string g_glslHash = R"END(
 float hash(vec2 p) {
     return fract(1.0e4 * sin(17.0 * p.x + 0.1 * p.y) * (0.1 + abs(sin(13.0 * p.y + p.x))));
@@ -187,28 +193,32 @@ float hash(vec3 p) {
 }
 )END";
 
-const std::string g_glslHashedAlphaTest = R"END(
-void hashedAlphaTest(float a, vec3 p) {
-    float maxDeriv = max(length(dFdx(p.xy)), length(dFdy(p.xy)));
-    float pixScale = 1.0 / maxDeriv;
-    vec2 pixScales = vec2(
-        exp2(floor(log2(pixScale))),
-        exp2(ceil(log2(pixScale))));
-    vec2 alpha = vec2(
-        hash(floor(pixScales.x * p.xyz)),
-        hash(floor(pixScales.y * p.xyz)));
-    float lerpFactor = fract(log2(pixScale));
-    float x = (1.0 - lerpFactor) * alpha.x + lerpFactor * alpha.y;
-    float t = min(lerpFactor, 1.0 - lerpFactor);
-    vec3 cases = vec3(
-        x * x / (2.0 * t * (1.0 - t)),
-        (x - 0.5 * t) / (1.0 - t),
-        1.0 - (1.0 - x) * (1.0 - x) / (2.0 * t * (1.0 - t)));
-    float threshold = (x < 1.0 - t) ? ((x < t) ? cases.x : cases.y) : cases.z;
-    threshold = clamp(threshold, 1.0e-6, 1.0);
-    if (a < threshold) {
-        discard;
-    }
+const std::string g_glslBRDF = R"END(
+float BRDF_distributionGGX(float NdotH2, float a2) {
+    return a2 / (PI * pow(NdotH2 * (a2 - 1.0) + 1.0, 2.0));
+}
+
+float BRDF_geometrySchlick(float NdotV, float k) {
+    return NdotV / (NdotV * (1.0 - k) + k);
+}
+
+float BRDF_geometrySmith(float NdotL, float NdotV, float k) {
+    return BRDF_geometrySchlick(NdotL, k) * BRDF_geometrySchlick(NdotV, k);
+}
+
+vec3 BRDF_fresnelSchlick(float cosTheta, vec3 F0) {
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+vec3 BRDF_fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
+    return F0 + (max(F0, vec3(1.0 - roughness)) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+)END";
+
+const std::string g_glslOIT = R"END(
+float OIT_getWeight(float depth, float alpha) {
+    float eyeZ = (uClipNear * uClipFar) / ((uClipNear - uClipFar) * depth + uClipFar);
+    return alpha * (1.0 / (1.0 + abs(eyeZ) / 100.0));
 }
 )END";
 
@@ -254,28 +264,6 @@ vec3 getNormalFromHeightMap(sampler2D tex, vec2 uv, mat3 TBN) {
     N.xy *= uHeightMapScaling;
 
     return TBN * normalize(N);
-}
-)END";
-
-const std::string g_glslBRDF = R"END(
-float BRDF_distributionGGX(float NdotH2, float a2) {
-    return a2 / (PI * pow(NdotH2 * (a2 - 1.0) + 1.0, 2.0));
-}
-
-float BRDF_geometrySchlick(float NdotV, float k) {
-    return NdotV / (NdotV * (1.0 - k) + k);
-}
-
-float BRDF_geometrySmith(float NdotL, float NdotV, float k) {
-    return BRDF_geometrySchlick(NdotL, k) * BRDF_geometrySchlick(NdotV, k);
-}
-
-vec3 BRDF_fresnelSchlick(float cosTheta, vec3 F0) {
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
-}
-
-vec3 BRDF_fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
-    return F0 + (max(F0, vec3(1.0 - roughness)) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 )END";
 
@@ -452,20 +440,28 @@ vec3 linearToGamma(vec3 rgb) {
 }
 )END";
 
-const std::string g_glslOIT = R"END(
-float OIT_getWeight(float depth, float alpha) {
-    float eyeZ = (uClipNear * uClipFar) / ((uClipNear - uClipFar) * depth + uClipFar);
-    return alpha * (1.0 / (1.0 + abs(eyeZ) / 100.0));
-}
-)END";
-
-const std::string g_glslLuma = R"END(
-float rgbToLuma(vec3 rgb) {
-    return dot(rgb, vec3(0.299, 0.587, 0.114));
-}
-
-float rgbaToLuma(vec4 rgba) {
-    return dot(rgba.rgb, vec3(0.299, 0.587, 0.114));
+const std::string g_glslHashedAlphaTest = R"END(
+void hashedAlphaTest(float a, vec3 p) {
+    float maxDeriv = max(length(dFdx(p.xy)), length(dFdy(p.xy)));
+    float pixScale = 1.0 / maxDeriv;
+    vec2 pixScales = vec2(
+        exp2(floor(log2(pixScale))),
+        exp2(ceil(log2(pixScale))));
+    vec2 alpha = vec2(
+        hash(floor(pixScales.x * p.xyz)),
+        hash(floor(pixScales.y * p.xyz)));
+    float lerpFactor = fract(log2(pixScale));
+    float x = (1.0 - lerpFactor) * alpha.x + lerpFactor * alpha.y;
+    float t = min(lerpFactor, 1.0 - lerpFactor);
+    vec3 cases = vec3(
+        x * x / (2.0 * t * (1.0 - t)),
+        (x - 0.5 * t) / (1.0 - t),
+        1.0 - (1.0 - x) * (1.0 - x) / (2.0 * t * (1.0 - t)));
+    float threshold = (x < 1.0 - t) ? ((x < t) ? cases.x : cases.y) : cases.z;
+    threshold = clamp(threshold, 1.0e-6, 1.0);
+    if (a < threshold) {
+        discard;
+    }
 }
 )END";
 
