@@ -42,7 +42,7 @@ void Trigger::loadFromGIT(const GffStruct &gffs) {
     string templateResRef(boost::to_lower_copy(gffs.getString("TemplateResRef")));
     loadFromBlueprint(templateResRef);
 
-    _tag = boost::to_lower_copy(gffs.getString("Tag"));
+    // _tag = boost::to_lower_copy(gffs.getString("Tag"));
     _transitionDestin = _services.strings.get(gffs.getInt("TransitionDestin"));
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
