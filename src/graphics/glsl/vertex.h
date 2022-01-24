@@ -38,14 +38,14 @@ const std::string g_vsClipSpace = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;
 
-out vec3 fragPosWorldSpace;
+out vec4 fragPosWorldSpace;
 out vec2 fragUV1;
 
 void main() {
-    fragPosWorldSpace = vec3(uModel * vec4(aPosition, 1.0));
+    fragPosWorldSpace = uModel * vec4(aPosition, 1.0);
     fragUV1 = aUV1;
 
-    gl_Position = uProjection * uView * vec4(fragPosWorldSpace, 1.0);
+    gl_Position = uProjection * uView * fragPosWorldSpace;
 }
 )END";
 
@@ -68,8 +68,8 @@ layout(location = 6) in vec3 aTanSpaceNormal;
 layout(location = 7) in vec4 aBoneIndices;
 layout(location = 8) in vec4 aBoneWeights;
 
-out vec3 fragPosObjSpace;
-out vec3 fragPosWorldSpace;
+out vec4 fragPosObjSpace;
+out vec4 fragPosWorldSpace;
 out vec3 fragNormalWorldSpace;
 out vec2 fragUV1;
 out vec2 fragUV2;
@@ -103,8 +103,8 @@ void main() {
             (uBones[i4] * N) * w4;
     }
 
-    fragPosObjSpace = P.xyz;
-    fragPosWorldSpace = vec3(uModel * P);
+    fragPosObjSpace = P;
+    fragPosWorldSpace = uModel * P;
 
     mat3 normalMatrix = transpose(mat3(uModelInv));
     fragNormalWorldSpace = normalize(normalMatrix * N.xyz);
@@ -119,7 +119,7 @@ void main() {
         fragTBN = mat3(T, B, TSN);
     }
 
-    gl_Position = uProjection * uView * vec4(fragPosWorldSpace, 1.0);
+    gl_Position = uProjection * uView * fragPosWorldSpace;
 }
 )END";
 
@@ -128,16 +128,16 @@ layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
 layout(location = 9) in float aMaterial;
 
-out vec3 fragPosWorldSpace;
+out vec4 fragPosWorldSpace;
 out vec3 fragNormalWorldSpace;
 flat out int fragMaterial;
 
 void main() {
-    fragPosWorldSpace = (uModel * vec4(aPosition, 1.0)).xyz;
+    fragPosWorldSpace = uModel * vec4(aPosition, 1.0);
     fragNormalWorldSpace = transpose(mat3(uModelInv)) * normalize(aNormal);
     fragMaterial = int(aMaterial * (MAX_WALKMESH_MATERIALS - 1));
 
-    gl_Position = uProjection * uView * vec4(fragPosWorldSpace, 1.0);
+    gl_Position = uProjection * uView * fragPosWorldSpace;
 }
 )END";
 
@@ -171,8 +171,8 @@ const std::string g_vsParticle = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;
 
-out vec3 fragPosObjSpace;
-out vec3 fragPosWorldSpace;
+out vec4 fragPosObjSpace;
+out vec4 fragPosWorldSpace;
 out vec3 fragNormalWorldSpace;
 out vec2 fragUV1;
 flat out int fragInstanceID;
@@ -182,12 +182,13 @@ void main() {
     vec3 right = uParticles[gl_InstanceID].right.xyz;
     vec3 up = uParticles[gl_InstanceID].up.xyz;
 
-    fragPosObjSpace = aPosition;
-    fragPosWorldSpace = vec3(position +
+    fragPosObjSpace = vec4(aPosition, 1.0);
+    fragPosWorldSpace = vec4(position +
         right * aPosition.x * uParticles[gl_InstanceID].size.x +
-        up * aPosition.y * uParticles[gl_InstanceID].size.y);
+        up * aPosition.y * uParticles[gl_InstanceID].size.y,
+        1.0);
 
-    gl_Position = uProjection * uView * vec4(fragPosWorldSpace, 1.0);
+    gl_Position = uProjection * uView * fragPosWorldSpace;
 
     fragNormalWorldSpace = cross(right, up);
     fragUV1 = aUV1;
@@ -199,8 +200,8 @@ const std::string g_vsGrass = R"END(
 layout(location = 0) in vec3 aPosition;
 layout(location = 2) in vec2 aUV1;
 
-out vec3 fragPosObjSpace;
-out vec3 fragPosWorldSpace;
+out vec4 fragPosObjSpace;
+out vec4 fragPosWorldSpace;
 out vec3 fragNormalWorldSpace;
 out vec2 fragUV1;
 flat out int fragInstanceID;
@@ -218,13 +219,13 @@ void main() {
     vec3 right = vec3(M[0][0], M[1][0], M[2][0]);
     vec3 up = vec3(M[0][1], M[1][1], M[2][1]);
 
-    fragPosObjSpace = aPosition;
-    fragPosWorldSpace = vec3(
-        uGrassClusters[gl_InstanceID].positionVariant.xyz +
+    fragPosObjSpace = vec4(aPosition, 1.0);
+    fragPosWorldSpace = vec4(uGrassClusters[gl_InstanceID].positionVariant.xyz +
         right * aPosition.x * uGrassQuadSize.x +
-        up * aPosition.y * uGrassQuadSize.y);
+        up * aPosition.y * uGrassQuadSize.y,
+        1.0);
 
-    gl_Position = uProjection * uView * vec4(fragPosWorldSpace, 1.0);
+    gl_Position = uProjection * uView * fragPosWorldSpace;
 
     fragNormalWorldSpace = cross(right, up);
     fragUV1 = aUV1;

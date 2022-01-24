@@ -97,8 +97,8 @@ uniform sampler2D sEnvironmentMap;
 uniform sampler2D sBumpMap;
 uniform samplerCube sEnvironmentMapCube;
 
-in vec3 fragPosObjSpace;
-in vec3 fragPosWorldSpace;
+in vec4 fragPosObjSpace;
+in vec4 fragPosWorldSpace;
 in vec3 fragNormalWorldSpace;
 in vec2 fragUV1;
 in vec2 fragUV2;
@@ -129,7 +129,7 @@ void main() {
 
     if (!isFeatureEnabled(FEATURE_ENVMAP)) {
         if (isFeatureEnabled(FEATURE_HASHEDALPHATEST)) {
-            hashedAlphaTest(mainTexSample.a, fragPosObjSpace);
+            hashedAlphaTest(mainTexSample.a, fragPosObjSpace.xyz);
         } else if (mainTexSample.a == 0.0) {
             discard;
         }
@@ -142,7 +142,7 @@ void main() {
 
     vec4 envmapColor = vec4(0.0);
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
-        vec3 I = normalize(fragPosWorldSpace - uCameraPosition.xyz);
+        vec3 I = normalize(fragPosWorldSpace.xyz - uCameraPosition.xyz);
         vec3 R = reflect(I, normal);
         vec4 envmapSample = sampleEnvironmentMap(sEnvironmentMap, sEnvironmentMapCube, R);
         envmapColor = vec4(envmapSample.rgb, 1.0);
@@ -154,7 +154,7 @@ void main() {
         isFeatureEnabled(FEATURE_FOG) ? 1.0 : 0.0,
         0.0,
         0.0);
-    vec3 eyePos = (uView * vec4(fragPosWorldSpace, 1.0)).rgb;
+    vec3 eyePos = (uView * fragPosWorldSpace).xyz;
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normal;
 
     fragDiffuseColor = diffuseColor;
@@ -174,7 +174,7 @@ uniform sampler2D sEnvironmentMap;
 uniform sampler2D sBumpMap;
 uniform samplerCube sEnvironmentMapCube;
 
-in vec3 fragPosWorldSpace;
+in vec4 fragPosWorldSpace;
 in vec3 fragNormalWorldSpace;
 in vec2 fragUV1;
 in vec2 fragUV2;
@@ -227,7 +227,7 @@ void main() {
 
     vec3 objectColor = lighting * uColor.rgb * diffuseColor;
     if (isFeatureEnabled(FEATURE_ENVMAP)) {
-        vec3 I = normalize(fragPosWorldSpace - uCameraPosition.xyz);
+        vec3 I = normalize(fragPosWorldSpace.xyz - uCameraPosition.xyz);
         vec3 R = reflect(I, normal);
         vec4 envmapSample = sampleEnvironmentMap(sEnvironmentMap, sEnvironmentMapCube, R);
         objectColor += envmapSample.rgb * (1.0 - diffuseAlpha);
@@ -243,7 +243,7 @@ void main() {
 )END";
 
 const std::string g_fsWalkmesh = R"END(
-in vec3 fragPosWorldSpace;
+in vec4 fragPosWorldSpace;
 in vec3 fragNormalWorldSpace;
 flat in int fragMaterial;
 
@@ -256,7 +256,7 @@ layout(location = 5) out vec4 fragEyePos;
 layout(location = 6) out vec4 fragEyeNormal;
 
 void main() {
-    vec3 eyePos = (uView * vec4(fragPosWorldSpace, 1.0)).xyz;
+    vec3 eyePos = (uView * fragPosWorldSpace).xyz;
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorldSpace);
 
     fragDiffuseColor = vec4(uWalkmeshMaterials[fragMaterial].rgb, 1.0);
@@ -287,8 +287,6 @@ void main() {
 const std::string g_fsParticle = R"END(
 uniform sampler2D sMainTex;
 
-in vec3 fragPosWorldSpace;
-in vec3 fragNormalWorldSpace;
 in vec2 fragUV1;
 flat in int fragInstanceID;
 
@@ -332,8 +330,8 @@ const std::string g_fsGrass = R"END(
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
 
-in vec3 fragPosObjSpace;
-in vec3 fragPosWorldSpace;
+in vec4 fragPosObjSpace;
+in vec4 fragPosWorldSpace;
 in vec3 fragNormalWorldSpace;
 in vec2 fragUV1;
 flat in int fragInstanceID;
@@ -352,9 +350,9 @@ void main() {
     uv.x += 0.5 * (int(uGrassClusters[fragInstanceID].positionVariant[3]) % 2);
 
     vec4 mainTexSample = texture(sMainTex, uv);
-    hashedAlphaTest(mainTexSample.a, fragPosObjSpace);
+    hashedAlphaTest(mainTexSample.a, fragPosObjSpace.xyz);
 
-    vec3 eyePos = (uView * vec4(fragPosWorldSpace, 1.0)).xyz;
+    vec3 eyePos = (uView * fragPosWorldSpace).xyz;
     vec3 eyeNormal = transpose(mat3(uViewInv)) * normalize(fragNormalWorldSpace);
 
     fragDiffuseColor = mainTexSample;
