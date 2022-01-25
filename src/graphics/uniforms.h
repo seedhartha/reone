@@ -75,7 +75,7 @@ struct GeneralUniforms {
     float shadowRadius {0.0f};
     float billboardSize {1.0f};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
-    char padding[4];
+    float padding;
     glm::vec4 shadowCascadeFarPlanes {0.0f};
     glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
 
@@ -129,7 +129,7 @@ struct LightUniforms {
 
 struct LightingUniforms {
     int numLights {0};
-    char padding[12];
+    float padding[3];
     LightUniforms lights[kMaxLights];
 };
 
@@ -143,7 +143,7 @@ struct ParticleUniforms {
     glm::vec4 up {0.0f};
     glm::vec4 color {1.0f};
     glm::vec2 size {0.0f};
-    char padding[8];
+    float padding[2];
 };
 
 struct ParticlesUniforms {
@@ -153,13 +153,13 @@ struct ParticlesUniforms {
 struct GrassClusterUniforms {
     glm::vec4 positionVariant {0.0f}; /**< fourth component is a variant (0-3) */
     glm::vec2 lightmapUV {0.0f};
-    char padding[8];
+    float padding[2];
 };
 
 struct GrassUniforms {
     glm::vec2 quadSize {0.0f};
     float radius {0.0f};
-    char padding[4];
+    float padding;
     GrassClusterUniforms clusters[kMaxGrassClusters];
 };
 
