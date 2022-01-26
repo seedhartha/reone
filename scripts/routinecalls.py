@@ -941,7 +941,7 @@ if not is_valid_extract_dir(extract_dir):
 
 requested_module = input("Enter module name (optional): ")
 
-usage_dict = {}
+calls_dict = {}
 
 for pn in glob.glob("{}/**".format(extract_dir), recursive=True):
     _, ext = os.path.splitext(pn)
@@ -960,15 +960,15 @@ for pn in glob.glob("{}/**".format(extract_dir), recursive=True):
                 continue
             ss = line[7:]
             rn = ss[:ss.find(", ")]
-            if not rn in usage_dict:
-                usage_dict[rn] = 1
+            if not rn in calls_dict:
+                calls_dict[rn] = 1
             else:
-                usage_dict[rn] += 1
+                calls_dict[rn] += 1
 
 
 with open("routinecalls.txt", "w") as f:
-    usage_list = [(rn, usage_dict[rn]) if rn in usage_dict else (rn, 0)
+    calls_list = [(rn, calls_dict[rn]) if rn in calls_dict else (rn, 0)
                   for rn in ROUTINES]
-    sorted_usage = sorted(usage_list, key=lambda x: x[1], reverse=True)
-    lines = map(lambda x: "{} {}\n".format(x[0], x[1]), sorted_usage)
+    sorted_calls = sorted(calls_list, key=lambda x: x[1], reverse=True)
+    lines = map(lambda x: "{} {}\n".format(x[0], x[1]), sorted_calls)
     f.writelines(lines)
