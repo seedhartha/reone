@@ -16,7 +16,7 @@
  */
 
 /** @file
- *  Implementation of minigame-related routines.
+ *  Implementation of routines for mini-games.
  */
 
 #include "../declarations.h"
