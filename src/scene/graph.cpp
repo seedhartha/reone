@@ -617,10 +617,11 @@ bool SceneGraph::testWalk(const glm::vec3 &origin, const glm::vec3 &dest, const 
 }
 
 shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) const {
-    auto camera = _activeCamera->camera();
-    if (!camera) {
+    if (!_activeCamera) {
         return nullptr;
     }
+
+    auto camera = _activeCamera->camera();
     glm::vec4 viewport(0.0f, 0.0f, _options.width, _options.height);
     glm::vec3 start(glm::unProject(glm::vec3(x, _options.height - y, 0.0f), camera->view(), camera->projection(), viewport));
     glm::vec3 end(glm::unProject(glm::vec3(x, _options.height - y, 1.0f), camera->view(), camera->projection(), viewport));
