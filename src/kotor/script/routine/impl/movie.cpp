@@ -48,10 +48,6 @@ Variable playMovie(const vector<Variable> &args, const RoutineContext &ctx) {
     return Variable::ofNull();
 }
 
-Variable isMoviePlaying(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
 Variable queueMovie(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }

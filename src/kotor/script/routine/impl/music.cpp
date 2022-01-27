@@ -46,10 +46,6 @@ Variable musicBackgroundStop(const vector<Variable> &args, const RoutineContext 
     throw NotImplementedException();
 }
 
-Variable musicBackgroundSetDelay(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
 Variable musicBackgroundChangeDay(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
@@ -63,18 +59,6 @@ Variable musicBattlePlay(const vector<Variable> &args, const RoutineContext &ctx
 }
 
 Variable musicBattleStop(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable musicBattleChange(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable musicBackgroundGetDayTrack(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable musicBackgroundGetNightTrack(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

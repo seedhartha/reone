@@ -55,13 +55,6 @@ Variable talentFeat(const vector<Variable> &args, const RoutineContext &ctx) {
     return Variable::ofTalent(move(talent));
 }
 
-Variable talentSkill(const vector<Variable> &args, const RoutineContext &ctx) {
-    int skill = getInt(args, 0);
-    auto talent = make_shared<Talent>(TalentType::Skill, skill);
-
-    return Variable::ofTalent(move(talent));
-}
-
 Variable getIsTalentValid(const vector<Variable> &args, const RoutineContext &ctx) {
     try {
         auto talent = getTalent(args, 0);

@@ -17,6 +17,7 @@ set(SCRIPT_HEADERS
     enginetype.h
     exception/argument.h
     exception/notimpl.h
+    exception/unsupportedroutine.h
     execution.h
     executioncontext.h
     executionstate.h

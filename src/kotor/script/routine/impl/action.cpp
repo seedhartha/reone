@@ -102,41 +102,12 @@ Variable actionUnequipItem(const vector<Variable> &args, const RoutineContext &c
     return Variable::ofNull();
 }
 
-Variable actionPickUpItem(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto item = getItem(args, 0, ctx);
-
-    auto action = ctx.game.actionFactory().newPickUpItem(move(item));
-    getCaller(ctx)->addAction(move(action));
-
-    return Variable::ofNull();
-}
-
-Variable actionPutDownItem(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto item = getItem(args, 0, ctx);
-
-    auto action = ctx.game.actionFactory().newPutDownItem(move(item));
-    getCaller(ctx)->addAction(move(action));
-
-    return Variable::ofNull();
-}
-
 Variable actionAttack(const vector<Variable> &args, const RoutineContext &ctx) {
     auto caller = getCallerAsCreature(ctx);
     auto attackee = getSpatialObject(args, 0, ctx);
     bool passive = getBoolOrElse(args, 1, false);
 
     auto action = ctx.game.actionFactory().newAttack(attackee, caller->getAttackRange(), false, passive);
-    caller->addAction(move(action));
-
-    return Variable::ofNull();
-}
-
-Variable actionSpeakString(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto caller = getCallerAsCreature(ctx);
-    string stringToSpeak(getString(args, 0));
-    auto talkVolume = getEnumOrElse(args, 1, TalkVolume::Talk);
-
-    auto action = ctx.game.actionFactory().newSpeakString(move(stringToSpeak), talkVolume);
     caller->addAction(move(action));
 
     return Variable::ofNull();
@@ -206,16 +177,6 @@ Variable actionTakeItem(const vector<Variable> &args, const RoutineContext &ctx)
     return Variable::ofNull();
 }
 
-Variable actionForceFollowObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto follow = getObject(args, 0, ctx);
-    float followDistance = getFloatOrElse(args, 1, 0.0f);
-
-    auto action = ctx.game.actionFactory().newForceFollowObject();
-    getCaller(ctx)->addAction(move(action));
-
-    return Variable::ofNull();
-}
-
 Variable actionJumpToObject(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: pass all arguments to an action
     auto jumpTo = getObject(args, 0, ctx);
@@ -275,41 +236,6 @@ Variable actionJumpToLocation(const vector<Variable> &args, const RoutineContext
     return Variable::ofNull();
 }
 
-Variable actionCastSpellAtLocation(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto spell = getEnum<ForcePower>(args, 0);
-    auto targetLocation = getLocationEngineType(args, 1);
-    int metaMagic = getIntOrElse(args, 2, 0);
-    bool cheat = getBoolOrElse(args, 3, false);
-    auto projectilePathType = getEnumOrElse(args, 4, ProjectilePathType::Default);
-    bool instantSpell = getBoolOrElse(args, 5, false);
-
-    auto action = ctx.game.actionFactory().newCastSpellAtLocation();
-    getCaller(ctx)->addAction(move(action));
-
-    return Variable::ofNull();
-}
-
-Variable actionSpeakStringByStrRef(const vector<Variable> &args, const RoutineContext &ctx) {
-    int strRef = getInt(args, 0);
-    auto talkVolume = getEnumOrElse(args, 1, TalkVolume::Talk);
-
-    auto action = ctx.game.actionFactory().newSpeakStringByStrRef();
-    getCaller(ctx)->addAction(move(action));
-
-    return Variable::ofNull();
-}
-
-Variable actionUseFeat(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: pass all arguments to an action
-    auto feat = getEnum<FeatType>(args, 0);
-    auto target = getObject(args, 1, ctx);
-
-    auto action = ctx.game.actionFactory().newUseFeat(target, feat);
-    getCaller(ctx)->addAction(move(action));
-
-    return Variable::ofNull();
-}
-
 Variable actionUseSkill(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: pass all arguments to an action
     auto skill = getEnum<SkillType>(args, 0);
@@ -342,29 +268,10 @@ Variable actionUseTalentOnObject(const vector<Variable> &args, const RoutineCont
     return Variable::ofNull();
 }
 
-Variable actionUseTalentAtLocation(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto chosenTalen = getTalent(args, 0);
-    auto targetLocation = getLocationEngineType(args, 1);
-
-    auto action = ctx.game.actionFactory().newUseTalentAtLocation();
-    getCaller(ctx)->addAction(move(action));
-
-    return Variable::ofNull();
-}
-
 Variable actionInteractObject(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: arguments
 
     auto action = ctx.game.actionFactory().newInteractObject();
-    getCaller(ctx)->addAction(move(action));
-
-    return Variable::ofNull();
-}
-
-Variable actionMoveAwayFromLocation(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: arguments
-
-    auto action = ctx.game.actionFactory().newMoveAwayFromLocation();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -417,15 +324,6 @@ Variable actionEquipMostDamagingRanged(const vector<Variable> &args, const Routi
     // TODO: arguments
 
     auto action = ctx.game.actionFactory().newEquipMostDamagingRanged();
-    getCaller(ctx)->addAction(move(action));
-
-    return Variable::ofNull();
-}
-
-Variable actionEquipMostEffectiveArmor(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: arguments
-
-    auto action = ctx.game.actionFactory().newEquipMostEffectiveArmor();
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();

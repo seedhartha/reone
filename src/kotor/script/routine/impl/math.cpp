@@ -22,7 +22,6 @@
 #include "../declarations.h"
 
 #include "../argutil.h"
-#include "../objectutil.h"
 
 using namespace std;
 
@@ -34,95 +33,6 @@ namespace reone {
 namespace kotor {
 
 namespace routine {
-
-Variable fabs(const vector<Variable> &args, const RoutineContext &ctx) {
-    float value = getFloat(args, 0);
-    return Variable::ofFloat(glm::abs(value));
-}
-
-Variable cos(const vector<Variable> &args, const RoutineContext &ctx) {
-    float value = getFloat(args, 0);
-    float result = glm::radians(value);
-
-    return Variable::ofFloat(glm::cos(value));
-}
-
-Variable sin(const vector<Variable> &args, const RoutineContext &ctx) {
-    float value = getFloat(args, 0);
-    float result = glm::radians(value);
-
-    return Variable::ofFloat(glm::sin(value));
-}
-
-Variable tan(const vector<Variable> &args, const RoutineContext &ctx) {
-    float value = getFloat(args, 0);
-    float result = glm::radians(value);
-
-    return Variable::ofFloat(glm::tan(value));
-}
-
-Variable acos(const vector<Variable> &args, const RoutineContext &ctx) {
-    float value = getFloat(args, 0);
-
-    float result = 0.0f;
-    if (glm::abs(value) <= 1.0f) {
-        result = glm::degrees(glm::acos(value));
-    }
-
-    return Variable::ofFloat(result);
-}
-
-Variable asin(const vector<Variable> &args, const RoutineContext &ctx) {
-    float value = getFloat(args, 0);
-
-    float result = 0.0f;
-    if (glm::abs(value) <= 1.0f) {
-        result = glm::degrees(glm::asin(value));
-    }
-
-    return Variable::ofFloat(result);
-}
-
-Variable atan(const vector<Variable> &args, const RoutineContext &ctx) {
-    float value = getFloat(args, 0);
-    float result = glm::degrees(glm::atan(value));
-
-    return Variable::ofFloat(result);
-}
-
-Variable log(const vector<Variable> &args, const RoutineContext &ctx) {
-    float value = getFloat(args, 0);
-
-    float result = 0.0f;
-    if (value > 0.0f) {
-        result = glm::log(value);
-    }
-
-    return Variable::ofFloat(result);
-}
-
-Variable pow(const vector<Variable> &args, const RoutineContext &ctx) {
-    float value = getFloat(args, 0);
-    float exponent = getFloat(args, 1);
-
-    float result = 0.0f;
-    if (value != 0.0f || exponent >= 0.0f) {
-        result = glm::pow(value, exponent);
-    }
-
-    return Variable::ofFloat(result);
-}
-
-Variable sqrt(const vector<Variable> &args, const RoutineContext &ctx) {
-    float value = getFloat(args, 0);
-
-    float result = 0.0f;
-    if (value >= 0.0f) {
-        result = glm::sqrt(value);
-    }
-
-    return Variable::ofFloat(result);
-}
 
 Variable abs(const vector<Variable> &args, const RoutineContext &ctx) {
     int value = getInt(args, 0);

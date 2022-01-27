@@ -15,37 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @file
- *  Implementation of encounter-related routines.
- */
-
-#include "../declarations.h"
-
-#include "../../../../script/exception/notimpl.h"
-
-#include "../context.h"
-
-using namespace std;
-
-using namespace reone::game;
-using namespace reone::script;
+#pragma once
 
 namespace reone {
 
-namespace kotor {
+namespace script {
 
-namespace routine {
+class UnsupportedRoutineException : public std::logic_error {
+public:
+    UnsupportedRoutineException() :
+        std::logic_error("") {
+    }
+};
 
-Variable getEncounterActive(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable setEncounterActive(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-} // namespace routine
-
-} // namespace kotor
+} // namespace script
 
 } // namespace reone

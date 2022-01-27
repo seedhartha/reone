@@ -43,15 +43,7 @@ Variable setPlanetSelectable(const vector<Variable> &args, const RoutineContext 
     throw NotImplementedException();
 }
 
-Variable getPlanetSelectable(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
 Variable setPlanetAvailable(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable getPlanetAvailable(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

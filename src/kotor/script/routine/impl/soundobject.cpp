@@ -45,10 +45,6 @@ Variable soundObjectSetFixedVariance(const vector<Variable> &args, const Routine
     throw NotImplementedException();
 }
 
-Variable soundObjectGetFixedVariance(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
 Variable soundObjectPlay(const vector<Variable> &args, const RoutineContext &ctx) {
     auto sound = getSound(args, 0, ctx);
     sound->setActive(true);
@@ -70,14 +66,6 @@ Variable soundObjectSetPosition(const vector<Variable> &args, const RoutineConte
 }
 
 Variable soundObjectGetPitchVariance(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable soundObjectSetPitchVariance(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable soundObjectGetVolume(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

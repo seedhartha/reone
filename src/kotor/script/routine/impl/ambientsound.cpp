@@ -45,22 +45,6 @@ Variable ambientSoundStop(const vector<Variable> &args, const RoutineContext &ct
     throw NotImplementedException();
 }
 
-Variable ambientSoundChangeDay(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable ambientSoundChangeNight(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable ambientSoundSetDayVolume(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable ambientSoundSetNightVolume(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
 } // namespace routine
 
 } // namespace kotor

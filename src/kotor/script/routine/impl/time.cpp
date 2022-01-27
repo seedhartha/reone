@@ -39,17 +39,6 @@ namespace kotor {
 
 namespace routine {
 
-Variable setTime(const vector<Variable> &args, const RoutineContext &ctx) {
-    int hour = getInt(args, 0);
-    int minute = getInt(args, 1);
-    int second = getInt(args, 2);
-    int millisecond = getInt(args, 3);
-
-    ctx.game.module()->setTime(hour, minute, second, millisecond);
-
-    return Variable::ofNull();
-}
-
 Variable getTimeHour(const vector<Variable> &args, const RoutineContext &ctx) {
     int result = ctx.game.module()->time().hour;
     return Variable::ofInt(result);
@@ -68,34 +57,6 @@ Variable getTimeSecond(const vector<Variable> &args, const RoutineContext &ctx) 
 Variable getTimeMillisecond(const vector<Variable> &args, const RoutineContext &ctx) {
     int result = ctx.game.module()->time().millisecond;
     return Variable::ofInt(result);
-}
-
-Variable getIsDay(const vector<Variable> &args, const RoutineContext &ctx) {
-    shared_ptr<Module> module(ctx.game.module());
-    bool result = module->time().hour > module->info().dawnHour && module->time().hour < module->info().duskHour;
-
-    return Variable::ofInt(static_cast<int>(result));
-}
-
-Variable getIsNight(const vector<Variable> &args, const RoutineContext &ctx) {
-    shared_ptr<Module> module(ctx.game.module());
-    bool result = module->time().hour < module->info().dawnHour || module->time().hour > module->info().duskHour;
-
-    return Variable::ofInt(static_cast<int>(result));
-}
-
-Variable getIsDawn(const vector<Variable> &args, const RoutineContext &ctx) {
-    shared_ptr<Module> module(ctx.game.module());
-    bool result = module->time().hour == module->info().dawnHour;
-
-    return Variable::ofInt(static_cast<int>(result));
-}
-
-Variable getIsDusk(const vector<Variable> &args, const RoutineContext &ctx) {
-    shared_ptr<Module> module(ctx.game.module());
-    bool result = module->time().hour == module->info().duskHour;
-
-    return Variable::ofInt(static_cast<int>(result));
 }
 
 } // namespace routine
