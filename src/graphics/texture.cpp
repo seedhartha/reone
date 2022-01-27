@@ -201,6 +201,9 @@ void Texture::refresh() {
         auto target = getTargetGL();
         glTexParameteri(getTargetGL(), GL_TEXTURE_MAX_LEVEL, 8);
         glGenerateMipmap(target);
+        if (glewIsSupported("GL_EXT_texture_filter_anisotropic")) {
+            glTexParameterf(getTargetGL(), GL_TEXTURE_MAX_ANISOTROPY_EXT, 4.0f);
+        }
     }
 }
 
