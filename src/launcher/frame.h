@@ -23,6 +23,8 @@
 #include <wx/wx.h>
 #endif
 
+#include "../common/types.h"
+
 namespace reone {
 
 struct WindowID {
@@ -38,24 +40,24 @@ public:
 private:
     struct Configuration {
         std::string gameDir;
-        bool devMode {false};
-        int width {0};
-        int height {0};
+        bool devMode {true};
+        int width {1024};
+        int height {768};
         bool fullscreen {false};
-        bool vsync {true};
-        bool fxaa {false};
+        bool vsync {false};
+        bool fxaa {true};
         bool grass {true};
-        bool ssr {false};
-        bool ssao {false};
+        bool ssr {true};
+        bool ssao {true};
         int texQuality {0};
-        int shadowres {0};
+        int shadowres {2};
         int drawdist {64};
-        int musicvol {0};
-        int voicevol {0};
-        int soundvol {0};
-        int movievol {0};
-        int loglevel {0};
-        int logch {0};
+        int musicvol {85};
+        int voicevol {85};
+        int soundvol {85};
+        int movievol {85};
+        int loglevel {static_cast<int>(LogLevel::Info)};
+        int logch {LogChannels::general};
         bool logfile {false};
     } _config;
 

@@ -19,7 +19,6 @@
 
 #include <boost/program_options.hpp>
 
-#include "../common/types.h"
 #include "../graphics/types.h"
 
 using namespace std;
@@ -264,32 +263,34 @@ LauncherFrame::LauncherFrame() :
 
 void LauncherFrame::LoadConfiguration() {
     po::options_description options;
-    options.add_options()                                                               //
-        ("game", po::value<string>()->default_value(""))                                //
-        ("dev", po::value<bool>()->default_value(false))                                //
-        ("width", po::value<int>()->default_value(1024))                                //
-        ("height", po::value<int>()->default_value(768))                                //
-        ("fullscreen", po::value<bool>()->default_value(false))                         //
-        ("vsync", po::value<bool>()->default_value(true))                               //
-        ("fxaa", po::value<bool>()->default_value(false))                               //
-        ("grass", po::value<bool>()->default_value(true))                               //
-        ("ssr", po::value<bool>()->default_value(false))                                //
-        ("ssao", po::value<bool>()->default_value(false))                               //
-        ("texquality", po::value<int>()->default_value(0))                              //
-        ("shadowres", po::value<int>()->default_value(0))                               //
-        ("drawdist", po::value<int>()->default_value(1024))                             //
-        ("musicvol", po::value<int>()->default_value(85))                               //
-        ("voicevol", po::value<int>()->default_value(85))                               //
-        ("soundvol", po::value<int>()->default_value(85))                               //
-        ("movievol", po::value<int>()->default_value(85))                               //
-        ("loglevel", po::value<int>()->default_value(static_cast<int>(LogLevel::Info))) //
-        ("logch", po::value<int>()->default_value(LogChannels::general))                //
-        ("logfile", po::value<bool>()->default_value(false));
+    options.add_options()                                                    //
+        ("game", po::value<string>()->default_value(_config.gameDir))        //
+        ("dev", po::value<bool>()->default_value(_config.devMode))           //
+        ("width", po::value<int>()->default_value(_config.width))            //
+        ("height", po::value<int>()->default_value(_config.height))          //
+        ("fullscreen", po::value<bool>()->default_value(_config.fullscreen)) //
+        ("vsync", po::value<bool>()->default_value(_config.vsync))           //
+        ("fxaa", po::value<bool>()->default_value(_config.fxaa))             //
+        ("grass", po::value<bool>()->default_value(_config.grass))           //
+        ("ssr", po::value<bool>()->default_value(_config.ssr))               //
+        ("ssao", po::value<bool>()->default_value(_config.ssao))             //
+        ("texquality", po::value<int>()->default_value(_config.texQuality))  //
+        ("shadowres", po::value<int>()->default_value(_config.shadowres))    //
+        ("drawdist", po::value<int>()->default_value(_config.drawdist))      //
+        ("musicvol", po::value<int>()->default_value(_config.musicvol))      //
+        ("voicevol", po::value<int>()->default_value(_config.voicevol))      //
+        ("soundvol", po::value<int>()->default_value(_config.soundvol))      //
+        ("movievol", po::value<int>()->default_value(_config.movievol))      //
+        ("loglevel", po::value<int>()->default_value(_config.loglevel))      //
+        ("logch", po::value<int>()->default_value(_config.logch))            //
+        ("logfile", po::value<bool>()->default_value(_config.logfile));
 
     po::variables_map vars;
-    if (fs::exists(kConfigFilename)) {
-        po::store(po::parse_config_file<char>(kConfigFilename, options, true), vars);
+    if (!fs::exists(kConfigFilename)) {
+        return;
     }
+
+    po::store(po::parse_config_file<char>(kConfigFilename, options, true), vars);
     po::notify(vars);
 
     _config.gameDir = vars["game"].as<string>();
