@@ -16,7 +16,7 @@
  */
 
 /** @file
- *  Implementation of action-related routines.
+ *  Implementation of action factory routines.
  */
 
 #include "../declarations.h"

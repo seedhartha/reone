@@ -16,7 +16,7 @@
  */
 
 /** @file
- *  Implementation of effect-related routines.
+ *  Implementation of effect factory routines.
  */
 
 #include "../declarations.h"
@@ -71,19 +71,6 @@ Variable effectDamageResistance(const vector<Variable> &args, const RoutineConte
 Variable effectResurrection(const vector<Variable> &args, const RoutineContext &ctx) {
     auto effect = ctx.game.effectFactory().newResurrection();
     return Variable::ofEffect(move(effect));
-}
-
-Variable getIsEffectValid(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto effect = getEffect(args, 0);
-        return Variable::ofInt(1);
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(0);
-    }
-}
-
-Variable getEffectCreator(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
 }
 
 Variable effectACIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -307,10 +294,6 @@ Variable effectHorrified(const vector<Variable> &args, const RoutineContext &ctx
 Variable effectModifyAttacks(const vector<Variable> &args, const RoutineContext &ctx) {
     auto effect = ctx.game.effectFactory().newModifyAttacks();
     return Variable::ofEffect(move(effect));
-}
-
-Variable setEffectIcon(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
 }
 
 Variable effectPsychicStatic(const vector<Variable> &args, const RoutineContext &ctx) {
