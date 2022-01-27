@@ -40,11 +40,6 @@ namespace kotor {
 
 namespace routine {
 
-Variable getMaxStealthXP(const vector<Variable> &args, const RoutineContext &ctx) {
-    int result = ctx.game.module()->area()->maxStealthXP();
-    return Variable::ofInt(result);
-}
-
 Variable setMaxStealthXP(const vector<Variable> &args, const RoutineContext &ctx) {
     int max = getInt(args, 0);
     ctx.game.module()->area()->setMaxStealthXP(max);
@@ -68,26 +63,9 @@ Variable awardStealthXP(const vector<Variable> &args, const RoutineContext &ctx)
     throw NotImplementedException();
 }
 
-Variable getStealthXPEnabled(const vector<Variable> &args, const RoutineContext &ctx) {
-    bool result = ctx.game.module()->area()->isStealthXPEnabled();
-    return Variable::ofInt(static_cast<int>(result));
-}
-
 Variable setStealthXPEnabled(const vector<Variable> &args, const RoutineContext &ctx) {
     bool enabled = getBool(args, 0);
     ctx.game.module()->area()->setStealthXPEnabled(enabled);
-
-    return Variable::ofNull();
-}
-
-Variable getStealthXPDecrement(const vector<Variable> &args, const RoutineContext &ctx) {
-    int result = ctx.game.module()->area()->stealthXPDecrement();
-    return Variable::ofInt(result);
-}
-
-Variable setStealthXPDecrement(const vector<Variable> &args, const RoutineContext &ctx) {
-    int decrement = getInt(args, 0);
-    ctx.game.module()->area()->setStealthXPDecrement(decrement);
 
     return Variable::ofNull();
 }

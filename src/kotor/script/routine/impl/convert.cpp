@@ -60,21 +60,6 @@ Variable hoursToSeconds(const vector<Variable> &args, const RoutineContext &ctx)
     return Variable::ofInt(hours * 3600);
 }
 
-Variable turnsToSeconds(const vector<Variable> &args, const RoutineContext &ctx) {
-    int turns = getInt(args, 0);
-    return Variable::ofFloat(turns / 60.0f);
-}
-
-Variable feetToMeters(const vector<Variable> &args, const RoutineContext &ctx) {
-    float feet = getFloat(args, 0);
-    return Variable::ofFloat(feet * 0.3048f);
-}
-
-Variable yardsToMeters(const vector<Variable> &args, const RoutineContext &ctx) {
-    float yards = getFloat(args, 0);
-    return Variable::ofFloat(yards * 0.9144f);
-}
-
 Variable intToFloat(const vector<Variable> &args, const RoutineContext &ctx) {
     int value = getInt(args, 0);
     return Variable::ofFloat(static_cast<float>(value));
@@ -94,22 +79,6 @@ Variable stringToInt(const vector<Variable> &args, const RoutineContext &ctx) {
     }
 
     return Variable::ofInt(result);
-}
-
-Variable stringToFloat(const vector<Variable> &args, const RoutineContext &ctx) {
-    string number(getString(args, 0));
-
-    float result = 0;
-    if (!number.empty()) {
-        result = stof(number);
-    }
-
-    return Variable::ofFloat(result);
-}
-
-Variable intToHexString(const vector<Variable> &args, const RoutineContext &ctx) {
-    int value = getInt(args, 0);
-    return Variable::ofString(str(boost::format("%08x") % value));
 }
 
 } // namespace routine

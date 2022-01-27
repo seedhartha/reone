@@ -47,20 +47,6 @@ Variable getLastPerceived(const vector<Variable> &args, const RoutineContext &ct
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
-Variable getLastPerceptionHeard(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto caller = getCallerAsCreature(ctx);
-    bool heard = caller->perception().lastPerception == PerceptionType::Heard;
-
-    return Variable::ofInt(static_cast<int>(heard));
-}
-
-Variable getLastPerceptionInaudible(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto caller = getCallerAsCreature(ctx);
-    bool notHeard = caller->perception().lastPerception == PerceptionType::NotHeard;
-
-    return Variable::ofInt(static_cast<int>(notHeard));
-}
-
 Variable getLastPerceptionSeen(const vector<Variable> &args, const RoutineContext &ctx) {
     auto caller = getCallerAsCreature(ctx);
     bool seen = caller->perception().lastPerception == PerceptionType::Seen;
@@ -82,15 +68,6 @@ Variable getObjectSeen(const vector<Variable> &args, const RoutineContext &ctx) 
     bool seen = source->perception().seen.count(target) > 0;
 
     return Variable::ofInt(static_cast<int>(seen));
-}
-
-Variable getObjectHeard(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto target = getCreature(args, 0, ctx);
-    auto source = getCreatureOrCaller(args, 1, ctx);
-
-    bool heard = source->perception().heard.count(target) > 0;
-
-    return Variable::ofInt(static_cast<int>(heard));
 }
 
 } // namespace routine

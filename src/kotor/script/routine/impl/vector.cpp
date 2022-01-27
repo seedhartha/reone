@@ -37,11 +37,6 @@ namespace kotor {
 
 namespace routine {
 
-Variable vectorMagnitude(const vector<Variable> &args, const RoutineContext &ctx) {
-    glm::vec3 value(getVector(args, 0));
-    return Variable::ofFloat(glm::length(value));
-}
-
 Variable vectorNormalize(const vector<Variable> &args, const RoutineContext &ctx) {
     glm::vec3 value(getVector(args, 0));
     return Variable::ofVector(glm::normalize(value));
@@ -55,10 +50,6 @@ Variable vectorCreate(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable angleToVector(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable vectorToAngle(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

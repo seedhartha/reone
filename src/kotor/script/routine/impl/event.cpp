@@ -63,14 +63,6 @@ Variable eventSpellCastAt(const vector<Variable> &args, const RoutineContext &ct
     throw NotImplementedException();
 }
 
-Variable eventConversation(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable eventActivateItem(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
 } // namespace routine
 
 } // namespace kotor

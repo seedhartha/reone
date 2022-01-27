@@ -47,45 +47,6 @@ Variable printString(const vector<Variable> &args, const RoutineContext &ctx) {
     return Variable::ofNull();
 }
 
-Variable printFloat(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: use formatting parameters
-    float value = getFloat(args, 0);
-    int width = getIntOrElse(args, 1, 18);
-    int decimals = getIntOrElse(args, 2, 9);
-
-    info(to_string(value));
-
-    return Variable::ofNull();
-}
-
-Variable printInteger(const vector<Variable> &args, const RoutineContext &ctx) {
-    int value = getInt(args, 0);
-
-    info(to_string(value));
-
-    return Variable::ofNull();
-}
-
-Variable printObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto object = getObject(args, 0, ctx);
-
-    info(to_string(object->id()));
-
-    return Variable::ofNull();
-}
-
-Variable printVector(const vector<Variable> &args, const RoutineContext &ctx) {
-    glm::vec3 value(getVector(args, 0));
-
-    info(boost::format("%f %f %f") % value.x % value.y % value.z);
-
-    return Variable::ofNull();
-}
-
-Variable writeTimestampedLogEntry(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
 Variable aurPostString(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }

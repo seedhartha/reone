@@ -145,10 +145,6 @@ Variable getPartyAIStyle(const vector<Variable> &args, const RoutineContext &ctx
     return Variable::ofInt(static_cast<int>(PartyAIStyle::Aggressive));
 }
 
-Variable setPartyAIStyle(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
 Variable saveNPCState(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
@@ -159,10 +155,6 @@ Variable setAvailableNPCId(const vector<Variable> &args, const RoutineContext &c
 
 // TSL
 
-Variable addAvailablePUPByTemplate(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
 Variable addAvailablePUPByObject(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
@@ -172,10 +164,6 @@ Variable assignPUP(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable spawnAvailablePUP(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable addPartyPuppet(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 
@@ -197,14 +185,6 @@ Variable getPartyLeader(const vector<Variable> &args, const RoutineContext &ctx)
 }
 
 Variable removeNPCFromPartyToBase(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable saveNPCByObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable savePUPByObject(const vector<Variable> &args, const RoutineContext &ctx) {
     throw NotImplementedException();
 }
 

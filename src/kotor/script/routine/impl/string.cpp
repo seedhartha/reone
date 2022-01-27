@@ -46,16 +46,6 @@ Variable getStringLength(const vector<Variable> &args, const RoutineContext &ctx
     return Variable::ofInt(static_cast<int>(result));
 }
 
-Variable getStringUpperCase(const vector<Variable> &args, const RoutineContext &ctx) {
-    string result(boost::to_upper_copy(getString(args, 0)));
-    return Variable::ofString(move(result));
-}
-
-Variable getStringLowerCase(const vector<Variable> &args, const RoutineContext &ctx) {
-    string result(boost::to_lower_copy(getString(args, 0)));
-    return Variable::ofString(move(result));
-}
-
 Variable getStringRight(const vector<Variable> &args, const RoutineContext &ctx) {
     string str(getString(args, 0));
     int count = getInt(args, 1);
@@ -80,14 +70,6 @@ Variable getStringLeft(const vector<Variable> &args, const RoutineContext &ctx) 
     return Variable::ofString(move(result));
 }
 
-Variable insertString(const vector<Variable> &args, const RoutineContext &ctx) {
-    string dest(getString(args, 0));
-    string str(getString(args, 1));
-    int pos = getInt(args, 2);
-
-    return Variable::ofString(dest.insert(pos, str));
-}
-
 Variable getSubString(const vector<Variable> &args, const RoutineContext &ctx) {
     string str(getString(args, 0));
     int start = getInt(args, 1);
@@ -102,18 +84,6 @@ Variable findSubString(const vector<Variable> &args, const RoutineContext &ctx) 
     size_t pos = str.find(substr);
 
     return Variable::ofInt(pos != string::npos ? static_cast<int>(pos) : -1);
-}
-
-Variable testStringAgainstPattern(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable getMatchedSubstring(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
-Variable getMatchedSubstringsCount(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
 }
 
 } // namespace routine
