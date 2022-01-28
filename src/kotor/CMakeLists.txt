@@ -102,7 +102,7 @@ set(KOTOR_SOURCES
     script/routine/impl/minigame.cpp
     script/routines.cpp)
 
-add_library(kotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES})
+add_library(kotor STATIC ${KOTOR_HEADERS} ${KOTOR_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(kotor PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 target_precompile_headers(kotor PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 target_link_libraries(kotor PUBLIC game)
