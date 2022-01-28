@@ -70,6 +70,10 @@ LauncherFrame::LauncherFrame() :
     resChoices.Add("1280x1024");
     resChoices.Add("1600x1200");
 
+    int displayW, displayH;
+    wxDisplaySize(&displayW, &displayH);
+    resChoices.Add(to_string(displayW) + "x" + to_string(displayH));
+
     string configResolution(str(boost::format("%dx%d") % _config.width % _config.height));
     int resSelection = resChoices.Index(configResolution);
     if (resSelection == wxNOT_FOUND) {
