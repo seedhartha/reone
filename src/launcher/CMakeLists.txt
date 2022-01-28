@@ -26,7 +26,7 @@ if(wxWidgets_FOUND)
 
     if(WIN32)
         list(APPEND LAUNCHER_SOURCES ${CMAKE_SOURCE_DIR}/res/reone.rc)
-        add_executable(reone-launcher WIN32 ${LAUNCHER_HEADERS} ${LAUNCHER_SOURCES})
+        add_executable(reone-launcher WIN32 ${LAUNCHER_HEADERS} ${LAUNCHER_SOURCES} ${CLANG_FORMAT_PATH})
     else()
         add_executable(reone-launcher ${LAUNCHER_HEADERS} ${LAUNCHER_SOURCES})
     endif()

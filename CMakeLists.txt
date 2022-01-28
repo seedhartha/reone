@@ -17,6 +17,7 @@ cmake_minimum_required(VERSION 3.16)
 project(reone)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CLANG_FORMAT_PATH ${CMAKE_SOURCE_DIR}/.clang-format)
 
 # Options
 
