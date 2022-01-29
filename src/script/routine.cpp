@@ -33,10 +33,10 @@ Variable Routine::invoke(const vector<Variable> &args, ExecutionContext &ctx) co
     try {
         return _func(args, ctx);
     } catch (const NotImplementedException &ex) {
-        auto msg = "Routine not implemented: " + _name;
+        string msg = "Routine not implemented: " + _name;
         return onException(msg, ex);
     } catch (const ArgumentException &ex) {
-        auto msg = str(boost::format("Routine '%s' invocation failed: %s") % _name % ex.what());
+        string msg = str(boost::format("Routine '%s' invocation failed: %s") % _name % ex.what());
         return onException(msg, ex);
     }
 }

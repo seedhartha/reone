@@ -100,7 +100,7 @@ inline void throwIfUnexpectedType(script::VariableType expected, script::Variabl
 template <class T>
 inline T getIntAsEnum(const std::vector<script::Variable> &args, int index) {
     throwIfOutOfRange(args, index);
-    throwIfUnexpectedType(VariableType::Int, args[index].type);
+    throwIfUnexpectedType(script::VariableType::Int, args[index].type);
     return static_cast<T>(args[index].intValue);
 }
 
@@ -109,7 +109,7 @@ inline T getIntAsEnumOrElse(const std::vector<script::Variable> &args, int index
     if (isOutOfRange(args, index)) {
         return defValue;
     }
-    throwIfUnexpectedType(VariableType::Int, args[index].type);
+    throwIfUnexpectedType(script::VariableType::Int, args[index].type);
     return static_cast<T>(args[index].intValue);
 }
 
