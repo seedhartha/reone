@@ -26,8 +26,6 @@
 #include "../../../../game/game.h"
 #include "../../../../game/object/creature.h"
 
-#include "../../../../script/exception/argument.h"
-
 #include "../argutil.h"
 #include "../context.h"
 
@@ -50,8 +48,8 @@ Variable actionRandomWalk(const vector<Variable> &args, const RoutineContext &ct
 }
 
 Variable actionMoveToLocation(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto destination = getLocationEngineType(args, 0);
-    bool run = getBoolOrElse(args, 1, false);
+    auto destination = getLocationArgument(args, 0);
+    bool run = getIntAsBoolOrElse(args, 1, false);
 
     auto action = ctx.game.actionFactory().newMoveToLocation(move(destination), run);
     getCaller(ctx)->addAction(move(action));
@@ -61,7 +59,7 @@ Variable actionMoveToLocation(const vector<Variable> &args, const RoutineContext
 
 Variable actionMoveToObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto moveTo = getObject(args, 0, ctx);
-    bool run = getBoolOrElse(args, 1, false);
+    bool run = getIntAsBoolOrElse(args, 1, false);
     float range = getFloatOrElse(args, 2, 1.0f);
 
     auto action = ctx.game.actionFactory().newMoveToObject(move(moveTo), run, range);
@@ -72,7 +70,7 @@ Variable actionMoveToObject(const vector<Variable> &args, const RoutineContext &
 
 Variable actionMoveAwayFromObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto fleeFrom = getObject(args, 0, ctx);
-    bool run = getBoolOrElse(args, 1, false);
+    bool run = getIntAsBoolOrElse(args, 1, false);
     float range = getFloatOrElse(args, 2, 40.0f);
 
     auto action = ctx.game.actionFactory().newMoveAwayFromObject(move(fleeFrom), run, range);
@@ -82,9 +80,9 @@ Variable actionMoveAwayFromObject(const vector<Variable> &args, const RoutineCon
 }
 
 Variable actionEquipItem(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto item = getItem(args, 0, ctx);
+    auto item = getObjectAsItem(args, 0, ctx);
     int inventorySlot = getInt(args, 1);
-    bool instant = getBoolOrElse(args, 2, false);
+    bool instant = getIntAsBoolOrElse(args, 2, false);
 
     auto action = ctx.game.actionFactory().newEquipItem(move(item), inventorySlot, instant);
     getCaller(ctx)->addAction(move(action));
@@ -93,8 +91,8 @@ Variable actionEquipItem(const vector<Variable> &args, const RoutineContext &ctx
 }
 
 Variable actionUnequipItem(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto item = getItem(args, 0, ctx);
-    bool instant = getBoolOrElse(args, 1, false);
+    auto item = getObjectAsItem(args, 0, ctx);
+    bool instant = getIntAsBoolOrElse(args, 1, false);
 
     auto action = ctx.game.actionFactory().newUnequipItem(move(item), instant);
     getCaller(ctx)->addAction(move(action));
@@ -104,8 +102,8 @@ Variable actionUnequipItem(const vector<Variable> &args, const RoutineContext &c
 
 Variable actionAttack(const vector<Variable> &args, const RoutineContext &ctx) {
     auto caller = getCallerAsCreature(ctx);
-    auto attackee = getSpatialObject(args, 0, ctx);
-    bool passive = getBoolOrElse(args, 1, false);
+    auto attackee = getObjectAsSpatialObject(args, 0, ctx);
+    bool passive = getIntAsBoolOrElse(args, 1, false);
 
     auto action = ctx.game.actionFactory().newAttack(attackee, caller->getAttackRange(), false, passive);
     caller->addAction(move(action));
@@ -114,7 +112,7 @@ Variable actionAttack(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable actionPlayAnimation(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto animation = getEnum<AnimationType>(args, 0);
+    auto animation = getIntAsEnum<AnimationType>(args, 0);
     float speed = getFloatOrElse(args, 1, 1.0f);
     float durationSeconds = getFloatOrElse(args, 2, 0.0f);
 
@@ -143,13 +141,13 @@ Variable actionCloseDoor(const vector<Variable> &args, const RoutineContext &ctx
 }
 
 Variable actionCastSpellAtObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto spell = getEnum<ForcePower>(args, 0);
+    auto spell = getIntAsEnum<ForcePower>(args, 0);
     auto target = getObject(args, 1, ctx);
     int metaMagic = getIntOrElse(args, 2, 0);
-    bool cheat = getBoolOrElse(args, 3, false);
+    bool cheat = getIntAsBoolOrElse(args, 3, false);
     int domainLevel = getIntOrElse(args, 4, 0);
-    auto projectilePathType = getEnumOrElse(args, 5, ProjectilePathType::Default);
-    bool instantSpell = getBoolOrElse(args, 6, false);
+    auto projectilePathType = getIntAsEnumOrElse(args, 5, ProjectilePathType::Default);
+    bool instantSpell = getIntAsBoolOrElse(args, 6, false);
 
     auto action = ctx.game.actionFactory().newCastSpellAtObject();
     getCaller(ctx)->addAction(move(action));
@@ -158,7 +156,7 @@ Variable actionCastSpellAtObject(const vector<Variable> &args, const RoutineCont
 }
 
 Variable actionGiveItem(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto item = getItem(args, 0, ctx);
+    auto item = getObjectAsItem(args, 0, ctx);
     auto giveTo = getObject(args, 1, ctx);
 
     auto action = ctx.game.actionFactory().newGiveItem();
@@ -168,7 +166,7 @@ Variable actionGiveItem(const vector<Variable> &args, const RoutineContext &ctx)
 }
 
 Variable actionTakeItem(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto item = getItem(args, 0, ctx);
+    auto item = getObjectAsItem(args, 0, ctx);
     auto takeFrom = getObject(args, 1, ctx);
 
     auto action = ctx.game.actionFactory().newTakeItem();
@@ -180,7 +178,7 @@ Variable actionTakeItem(const vector<Variable> &args, const RoutineContext &ctx)
 Variable actionJumpToObject(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: pass all arguments to an action
     auto jumpTo = getObject(args, 0, ctx);
-    bool walkStraightLine = getBoolOrElse(args, 1, true);
+    bool walkStraightLine = getIntAsBoolOrElse(args, 1, true);
 
     auto action = ctx.game.actionFactory().newJumpToObject(move(jumpTo));
     getCaller(ctx)->addAction(move(action));
@@ -201,7 +199,7 @@ Variable actionStartConversation(const vector<Variable> &args, const RoutineCont
     // TODO: figure out all arguments
     auto objectToConverse = getObject(args, 0, ctx);
     string dialogResRef(getStringOrElse(args, 1, ""));
-    bool ignoreStartRange = getBoolOrElse(args, 4, false);
+    bool ignoreStartRange = getIntAsBoolOrElse(args, 4, false);
 
     auto caller = getCaller(ctx);
     if (dialogResRef.empty()) {
@@ -228,7 +226,7 @@ Variable actionResumeConversation(const vector<Variable> &args, const RoutineCon
 }
 
 Variable actionJumpToLocation(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto location = getLocationEngineType(args, 0);
+    auto location = getLocationArgument(args, 0);
 
     auto action = ctx.game.actionFactory().newJumpToLocation(move(location));
     getCaller(ctx)->addAction(move(action));
@@ -238,7 +236,7 @@ Variable actionJumpToLocation(const vector<Variable> &args, const RoutineContext
 
 Variable actionUseSkill(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: pass all arguments to an action
-    auto skill = getEnum<SkillType>(args, 0);
+    auto skill = getIntAsEnum<SkillType>(args, 0);
     auto target = getObject(args, 1, ctx);
     int subSkill = getIntOrElse(args, 2, 0);
     auto itemUsed = getObject(args, 3, ctx);
@@ -288,8 +286,8 @@ Variable actionSurrenderToEnemies(const vector<Variable> &args, const RoutineCon
 
 Variable actionForceMoveToLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: pass all arguments to an action
-    auto destination = getLocationEngineType(args, 0);
-    bool run = getBoolOrElse(args, 1, false);
+    auto destination = getLocationArgument(args, 0);
+    bool run = getIntAsBoolOrElse(args, 1, false);
     float timeout = getFloatOrElse(args, 2, 30.0f);
 
     auto action = ctx.game.actionFactory().newMoveToLocation(move(destination));
@@ -301,7 +299,7 @@ Variable actionForceMoveToLocation(const vector<Variable> &args, const RoutineCo
 Variable actionForceMoveToObject(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: pass all arguments to an action
     auto moveTo = getObject(args, 0, ctx);
-    bool run = getBoolOrElse(args, 1, false);
+    bool run = getIntAsBoolOrElse(args, 1, false);
     float range = getFloatOrElse(args, 2, 1.0f);
     float timeout = getFloatOrElse(args, 3, 30.0f);
 
