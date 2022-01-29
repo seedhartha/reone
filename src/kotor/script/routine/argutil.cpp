@@ -45,7 +45,7 @@ static inline void throwIfInvalidObject(uint32_t objectId, const shared_ptr<Obje
     }
 }
 
-static inline void throwIfNotSpatialObject(const shared_ptr<Object> &object) {
+static inline void throwIfObjectNotSpatial(const shared_ptr<Object> &object) {
     switch (object->type()) {
     case ObjectType::Creature:
     case ObjectType::Trigger:
@@ -61,27 +61,51 @@ static inline void throwIfNotSpatialObject(const shared_ptr<Object> &object) {
     }
 }
 
-static inline void throwIfNotCreature(const shared_ptr<Object> &object) {
+static inline void throwIfObjectNotCreature(const shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Creature) {
         throw ArgumentException(str(boost::format("Object %u is not a creature") % object->id()));
     }
 }
 
-static inline void throwIfNotDoor(const shared_ptr<Object> &object) {
+static inline void throwIfObjectNotDoor(const shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Door) {
         throw ArgumentException(str(boost::format("Object %u is not a door") % object->id()));
     }
 }
 
-static inline void throwIfNotItem(const shared_ptr<Object> &object) {
+static inline void throwIfObjectNotItem(const shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Item) {
         throw ArgumentException(str(boost::format("Object %u is not an item") % object->id()));
     }
 }
 
-static inline void throwIfNotSound(const shared_ptr<Object> &object) {
+static inline void throwIfObjectNotSound(const shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Sound) {
         throw ArgumentException(str(boost::format("Object %u is not a sound") % object->id()));
+    }
+}
+
+static inline void throwIfInvalidEffect(const shared_ptr<Effect> &effect) {
+    if (!effect || effect->type() == EffectType::Invalid) {
+        throw ArgumentException("Invalid effect");
+    }
+}
+
+static inline void throwIfInvalidEvent(const shared_ptr<Event> &event) {
+    if (!event) {
+        throw ArgumentException("Invalid event");
+    }
+}
+
+static inline void throwIfInvalidLocation(const shared_ptr<Location> &location) {
+    if (!location) {
+        throw ArgumentException("Invalid location");
+    }
+}
+
+static inline void throwIfInvalidTalent(const shared_ptr<Talent> &talent) {
+    if (!talent || talent->type() == TalentType::Invalid) {
+        throw ArgumentException("Invalid talent");
     }
 }
 
@@ -138,25 +162,33 @@ shared_ptr<Object> getObject(const vector<Variable> &args, int index, const Rout
 shared_ptr<Effect> getEffect(const vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Effect, args[index].type);
-    return static_pointer_cast<Effect>(args[index].engineType);
+    auto effect = static_pointer_cast<Effect>(args[index].engineType);
+    throwIfInvalidEffect(effect);
+    return move(effect);
 }
 
 shared_ptr<Event> getEvent(const vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Event, args[index].type);
-    return static_pointer_cast<Event>(args[index].engineType);
+    auto event = static_pointer_cast<Event>(args[index].engineType);
+    throwIfInvalidEvent(event);
+    return move(event);
 }
 
 shared_ptr<Location> getLocationArgument(const vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Location, args[index].type);
-    return static_pointer_cast<Location>(args[index].engineType);
+    auto location = static_pointer_cast<Location>(args[index].engineType);
+    throwIfInvalidLocation(location);
+    return move(location);
 }
 
 shared_ptr<Talent> getTalent(const vector<Variable> &args, int index) {
     throwIfOutOfRange(args, index);
     throwIfUnexpectedType(VariableType::Talent, args[index].type);
-    return static_pointer_cast<Talent>(args[index].engineType);
+    auto talent = static_pointer_cast<Talent>(args[index].engineType);
+    throwIfInvalidTalent(talent);
+    return move(talent);
 }
 
 shared_ptr<ExecutionContext> getAction(const vector<Variable> &args, int index) {
@@ -221,13 +253,13 @@ shared_ptr<Object> getObjectOrCaller(const vector<Variable> &args, int index, co
 
 shared_ptr<SpatialObject> getCallerAsSpatialObject(const RoutineContext &ctx) {
     auto caller = getCaller(ctx);
-    throwIfNotSpatialObject(caller);
+    throwIfObjectNotSpatial(caller);
     return static_pointer_cast<SpatialObject>(move(caller));
 }
 
 shared_ptr<SpatialObject> getObjectAsSpatialObject(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
-    throwIfNotSpatialObject(object);
+    throwIfObjectNotSpatial(object);
     return static_pointer_cast<SpatialObject>(move(object));
 }
 
@@ -241,13 +273,13 @@ shared_ptr<SpatialObject> getObjectOrCallerAsSpatialObject(const vector<Variable
 
 shared_ptr<Creature> getCallerAsCreature(const RoutineContext &ctx) {
     auto caller = getCaller(ctx);
-    throwIfNotCreature(caller);
+    throwIfObjectNotCreature(caller);
     return static_pointer_cast<Creature>(move(caller));
 }
 
 shared_ptr<Creature> getObjectAsCreature(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
-    throwIfNotCreature(object);
+    throwIfObjectNotCreature(object);
     return static_pointer_cast<Creature>(move(object));
 }
 
@@ -261,19 +293,19 @@ shared_ptr<Creature> getObjectOrCallerAsCreature(const vector<Variable> &args, i
 
 shared_ptr<Door> getObjectAsDoor(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
-    throwIfNotDoor(object);
+    throwIfObjectNotDoor(object);
     return static_pointer_cast<Door>(move(object));
 }
 
 shared_ptr<Item> getObjectAsItem(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
-    throwIfNotItem(object);
+    throwIfObjectNotItem(object);
     return static_pointer_cast<Item>(move(object));
 }
 
 shared_ptr<Sound> getObjectAsSound(const vector<Variable> &args, int index, const RoutineContext &ctx) {
     auto object = getObject(args, index, ctx);
-    throwIfNotSound(object);
+    throwIfObjectNotSound(object);
     return static_pointer_cast<Sound>(move(object));
 }
 

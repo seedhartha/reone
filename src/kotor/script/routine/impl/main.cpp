@@ -412,8 +412,10 @@ Variable removeEffect(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getIsEffectValid(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto effect = getEffect(args, 0);
-    return Variable::ofInt(1);
+    throwIfOutOfRange(args, 0);
+    throwIfUnexpectedType(VariableType::Effect, args[0].type);
+    auto effect = static_pointer_cast<Effect>(args[0].engineType);
+    return Variable::ofInt(static_cast<int>(effect && effect->type() != EffectType::Invalid));
 }
 
 Variable getEffectCreator(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -735,7 +737,12 @@ Variable resistForce(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getEffectType(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    try {
+        auto effect = getEffect(args, 0);
+        return Variable::ofInt(static_cast<int>(effect->type()));
+    } catch (const ArgumentException &) {
+        return Variable::ofInt(static_cast<int>(EffectType::Invalid));
+    }
 }
 
 Variable getFactionEqual(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1378,7 +1385,8 @@ Variable getGender(const vector<Variable> &args, const RoutineContext &ctx) {
 Variable getIsTalentValid(const vector<Variable> &args, const RoutineContext &ctx) {
     throwIfOutOfRange(args, 0);
     throwIfUnexpectedType(VariableType::Talent, args[0].type);
-    return Variable::ofInt(static_cast<int>(args[0].engineType != nullptr));
+    auto talent = static_pointer_cast<Talent>(args[0].engineType);
+    return Variable::ofInt(static_cast<int>(talent && talent->type() != TalentType::Invalid));
 }
 
 Variable getAttemptedAttackTarget(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1389,14 +1397,8 @@ Variable getAttemptedAttackTarget(const vector<Variable> &args, const RoutineCon
 }
 
 Variable getTypeFromTalent(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto talent = getTalent(args, 0);
-        auto type = talent->type();
-
-        return Variable::ofInt(static_cast<int>(type));
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(static_cast<int>(TalentType::Invalid));
-    }
+    auto talent = getTalent(args, 0);
+    return Variable::ofInt(static_cast<int>(talent->type()));
 }
 
 Variable getIdFromTalent(const vector<Variable> &args, const RoutineContext &ctx) {

@@ -295,18 +295,11 @@ void SpatialObject::stopStuntMode() {
 
 shared_ptr<Effect> SpatialObject::getFirstEffect() {
     _effectIndex = 1;
-
-    if (_effects.empty())
-        return nullptr;
-
-    return _effects.front().effect;
+    return !_effects.empty() ? _effects[0].effect : nullptr;
 }
 
 shared_ptr<Effect> SpatialObject::getNextEffect() {
-    if (_effects.size() <= _effectIndex)
-        return nullptr;
-
-    return _effects[_effectIndex++].effect;
+    return (_effectIndex < _effects.size()) ? _effects[_effectIndex++].effect : nullptr;
 }
 
 bool SpatialObject::isInLineOfSight(const SpatialObject &other, float fov) const {
