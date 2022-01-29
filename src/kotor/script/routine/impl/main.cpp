@@ -40,6 +40,9 @@
 #include "../context.h"
 #include "../objectutil.h"
 
+#define R_FALSE 0
+#define R_TRUE 1
+
 using namespace std;
 
 using namespace reone::game;
@@ -52,6 +55,8 @@ namespace kotor {
 
 namespace routine {
 
+static constexpr int kBaseItemInvalid = 256;
+
 static constexpr bool kShipBuild = true;
 
 Variable unsupported(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -59,9 +64,8 @@ Variable unsupported(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable random(const vector<Variable> &args, const RoutineContext &ctx) {
-    int max = getInt(args, 0);
-    int result = reone::random(0, max - 1);
-
+    int maxInteger = getInt(args, 0);
+    int result = reone::random(0, maxInteger - 1);
     return Variable::ofInt(result);
 }
 
@@ -269,8 +273,16 @@ Variable getDistanceToObject(const vector<Variable> &args, const RoutineContext 
 }
 
 Variable getIsObjectValid(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto object = getObject(args, 0, ctx);
-    return Variable::ofInt(1);
+    throwIfOutOfRange(args, 0);
+    throwIfUnexpectedType(VariableType::Object, args[0].type);
+
+    uint32_t objectId = args[0].objectId;
+    if (objectId == kObjectSelf) {
+        objectId = ctx.execution.callerId;
+    }
+    auto object = ctx.game.getObjectById(objectId);
+
+    return Variable::ofInt(static_cast<int>(object != nullptr));
 }
 
 Variable playSound(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -409,8 +421,8 @@ Variable getEffectCreator(const vector<Variable> &args, const RoutineContext &ct
 }
 
 Variable intToString(const vector<Variable> &args, const RoutineContext &ctx) {
-    int value = getInt(args, 0);
-    return Variable::ofString(to_string(value));
+    int integer = getInt(args, 0);
+    return Variable::ofString(to_string(integer));
 }
 
 Variable getFirstObjectInArea(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -781,14 +793,13 @@ Variable getWaypointByTag(const vector<Variable> &args, const RoutineContext &ct
 }
 
 Variable getObjectByTag(const vector<Variable> &args, const RoutineContext &ctx) {
-    shared_ptr<Object> object;
-    string tag(boost::to_lower_copy(getString(args, 0)));
+    string tag = boost::to_lower_copy(getString(args, 0));
     int nth = getIntOrElse(args, 1, 0);
 
+    shared_ptr<Object> object;
     if (!tag.empty()) {
         object = ctx.game.module()->area()->getObjectByTag(tag, nth);
     } else {
-        // Apparently, empty tag in this context stands for the player
         object = ctx.game.party().player();
     }
 
@@ -1146,14 +1157,12 @@ Variable playAnimation(const vector<Variable> &args, const RoutineContext &ctx) 
 Variable talentSpell(const vector<Variable> &args, const RoutineContext &ctx) {
     int spell = getInt(args, 0);
     auto talent = make_shared<Talent>(TalentType::Spell, spell);
-
     return Variable::ofTalent(move(talent));
 }
 
 Variable talentFeat(const vector<Variable> &args, const RoutineContext &ctx) {
     int feat = getInt(args, 0);
     auto talent = make_shared<Talent>(TalentType::Feat, feat);
-
     return Variable::ofTalent(move(talent));
 }
 
@@ -1167,7 +1176,7 @@ Variable getCreatureHasTalent(const vector<Variable> &args, const RoutineContext
 
     // TODO: implement
 
-    return Variable::ofInt(0);
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable getCreatureTalentRandom(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1367,8 +1376,9 @@ Variable getGender(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getIsTalentValid(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto talent = getTalent(args, 0);
-    return Variable::ofInt(1);
+    throwIfOutOfRange(args, 0);
+    throwIfUnexpectedType(VariableType::Talent, args[0].type);
+    return Variable::ofInt(static_cast<int>(args[0].engineType != nullptr));
 }
 
 Variable getAttemptedAttackTarget(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1447,12 +1457,12 @@ Variable getLastOpenedBy(const vector<Variable> &args, const RoutineContext &ctx
 }
 
 Variable getHasSpell(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto creature = getObjectOrCallerAsCreature(args, 1, ctx);
     auto spell = getIntAsEnum<ForcePower>(args, 0);
+    auto creature = getObjectOrCallerAsCreature(args, 1, ctx);
 
-    // TODO: Force Powers, aka spells, are not supported at the moment
+    // TODO: Force Powers are not implemented at the moment
 
-    return Variable::ofInt(static_cast<int>(false));
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable openStore(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1506,8 +1516,12 @@ Variable getXP(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getBaseItemType(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto item = getObjectAsItem(args, 0, ctx);
-    return Variable::ofInt(item->baseItemType());
+    try {
+        auto item = getObjectAsItem(args, 0, ctx);
+        return Variable::ofInt(item->baseItemType());
+    } catch (const ArgumentException &) {
+        return Variable::ofInt(kBaseItemInvalid);
+    }
 }
 
 Variable getItemHasItemProperty(const vector<Variable> &args, const RoutineContext &ctx) {
