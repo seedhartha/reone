@@ -269,12 +269,8 @@ Variable getDistanceToObject(const vector<Variable> &args, const RoutineContext 
 }
 
 Variable getIsObjectValid(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto object = getObject(args, 0, ctx);
-        return Variable::ofInt(1);
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(0);
-    }
+    auto object = getObject(args, 0, ctx);
+    return Variable::ofInt(1);
 }
 
 Variable playSound(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -286,25 +282,17 @@ Variable getSpellTargetObject(const vector<Variable> &args, const RoutineContext
 }
 
 Variable getCurrentHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto object = getObjectOrCaller(args, 0, ctx);
-        int hitPoints = object->currentHitPoints();
+    auto object = getObjectOrCaller(args, 0, ctx);
+    int hitPoints = object->currentHitPoints();
 
-        return Variable::ofInt(hitPoints);
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(0);
-    }
+    return Variable::ofInt(hitPoints);
 }
 
 Variable getMaxHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto object = getObjectOrCaller(args, 0, ctx);
-        int hitPoints = object->maxHitPoints();
+    auto object = getObjectOrCaller(args, 0, ctx);
+    int hitPoints = object->maxHitPoints();
 
-        return Variable::ofInt(hitPoints);
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(0);
-    }
+    return Variable::ofInt(hitPoints);
 }
 
 Variable getSubScreenID(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -412,12 +400,8 @@ Variable removeEffect(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getIsEffectValid(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto effect = getEffect(args, 0);
-        return Variable::ofInt(1);
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(0);
-    }
+    auto effect = getEffect(args, 0);
+    return Variable::ofInt(1);
 }
 
 Variable getEffectCreator(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -640,14 +624,10 @@ Variable getAbilityScore(const vector<Variable> &args, const RoutineContext &ctx
 }
 
 Variable getIsDead(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto creature = getObjectAsCreature(args, 0, ctx);
-        bool dead = creature->isDead();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+    bool dead = creature->isDead();
 
-        return Variable::ofInt(static_cast<int>(dead));
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(0);
-    }
+    return Variable::ofInt(static_cast<int>(dead));
 }
 
 Variable vectorCreate(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -950,39 +930,27 @@ Variable stringToInt(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getIsEnemy(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto target = getObjectAsCreature(args, 0, ctx);
-        auto source = getObjectOrCallerAsCreature(args, 1, ctx);
-        bool enemy = ctx.services.reputes.getIsEnemy(*target, *source);
+    auto target = getObjectAsCreature(args, 0, ctx);
+    auto source = getObjectOrCallerAsCreature(args, 1, ctx);
+    bool enemy = ctx.services.reputes.getIsEnemy(*target, *source);
 
-        return Variable::ofInt(static_cast<int>(enemy));
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(0);
-    }
+    return Variable::ofInt(static_cast<int>(enemy));
 }
 
 Variable getIsFriend(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto target = getObjectAsCreature(args, 0, ctx);
-        auto source = getObjectOrCallerAsCreature(args, 1, ctx);
-        bool isFriend = ctx.services.reputes.getIsFriend(*target, *source);
+    auto target = getObjectAsCreature(args, 0, ctx);
+    auto source = getObjectOrCallerAsCreature(args, 1, ctx);
+    bool isFriend = ctx.services.reputes.getIsFriend(*target, *source);
 
-        return Variable::ofInt(static_cast<int>(isFriend));
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(0);
-    }
+    return Variable::ofInt(static_cast<int>(isFriend));
 }
 
 Variable getIsNeutral(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto target = getObjectAsCreature(args, 0, ctx);
-        auto source = getObjectOrCallerAsCreature(args, 1, ctx);
-        bool neutral = ctx.services.reputes.getIsNeutral(*target, *source);
+    auto target = getObjectAsCreature(args, 0, ctx);
+    auto source = getObjectOrCallerAsCreature(args, 1, ctx);
+    bool neutral = ctx.services.reputes.getIsNeutral(*target, *source);
 
-        return Variable::ofInt(static_cast<int>(neutral));
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(0);
-    }
+    return Variable::ofInt(static_cast<int>(neutral));
 }
 
 Variable getPCSpeaker(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1194,16 +1162,12 @@ Variable getHasSpellEffect(const vector<Variable> &args, const RoutineContext &c
 }
 
 Variable getCreatureHasTalent(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto talent = getTalent(args, 0);
-        auto creature = getObjectOrCallerAsCreature(args, 1, ctx);
+    auto talent = getTalent(args, 0);
+    auto creature = getObjectOrCallerAsCreature(args, 1, ctx);
 
-        // TODO: implement
+    // TODO: implement
 
-        return Variable::ofInt(0);
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(0);
-    }
+    return Variable::ofInt(0);
 }
 
 Variable getCreatureTalentRandom(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1403,12 +1367,8 @@ Variable getGender(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getIsTalentValid(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto talent = getTalent(args, 0);
-        return Variable::ofInt(1);
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(0);
-    }
+    auto talent = getTalent(args, 0);
+    return Variable::ofInt(1);
 }
 
 Variable getAttemptedAttackTarget(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -2229,13 +2189,9 @@ Variable getWasForcePowerSuccessful(const vector<Variable> &args, const RoutineC
 }
 
 Variable getIsDebilitated(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto creature = getObjectOrCallerAsCreature(args, 0, ctx);
-        bool debilitated = creature->isDebilitated();
-        return Variable::ofInt(static_cast<int>(debilitated));
-    } catch (const ArgumentException &ex) {
-        return Variable::ofInt(0);
-    }
+    auto creature = getObjectOrCallerAsCreature(args, 0, ctx);
+    bool debilitated = creature->isDebilitated();
+    return Variable::ofInt(static_cast<int>(debilitated));
 }
 
 Variable playMovie(const vector<Variable> &args, const RoutineContext &ctx) {
