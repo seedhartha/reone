@@ -18,6 +18,8 @@
 #pragma once
 
 #include "../../../common/collectionutil.h"
+#include "../../../script/exception/argument.h"
+#include "../../../script/types.h"
 #include "../../../script/variable.h"
 
 namespace reone {
@@ -47,49 +49,68 @@ namespace kotor {
 
 struct RoutineContext;
 
-bool getBool(const std::vector<script::Variable> &args, int index);
+std::shared_ptr<game::Object> getCaller(const RoutineContext &ctx);
+std::shared_ptr<game::Object> getTriggerrer(const RoutineContext &ctx);
+
 int getInt(const std::vector<script::Variable> &args, int index);
 float getFloat(const std::vector<script::Variable> &args, int index);
 std::string getString(const std::vector<script::Variable> &args, int index);
 glm::vec3 getVector(const std::vector<script::Variable> &args, int index);
+std::shared_ptr<game::Object> getObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::Effect> getEffect(const std::vector<script::Variable> &args, int index);
+std::shared_ptr<game::Event> getEvent(const std::vector<script::Variable> &args, int index);
+std::shared_ptr<game::Location> getLocationArgument(const std::vector<script::Variable> &args, int index);
+std::shared_ptr<game::Talent> getTalent(const std::vector<script::Variable> &args, int index);
+std::shared_ptr<script::ExecutionContext> getAction(const std::vector<script::Variable> &args, int index);
 
-bool getBoolOrElse(const std::vector<script::Variable> &args, int index, bool defValue);
 int getIntOrElse(const std::vector<script::Variable> &args, int index, int defValue);
 float getFloatOrElse(const std::vector<script::Variable> &args, int index, float defValue);
 std::string getStringOrElse(const std::vector<script::Variable> &args, int index, std::string defValue);
 glm::vec3 getVectorOrElse(const std::vector<script::Variable> &args, int index, glm::vec3 defValue);
 
-std::shared_ptr<game::Object> getCaller(const RoutineContext &ctx);
-std::shared_ptr<game::SpatialObject> getCallerAsSpatial(const RoutineContext &ctx);
-std::shared_ptr<game::Creature> getCallerAsCreature(const RoutineContext &ctx);
-std::shared_ptr<game::Object> getTriggerrer(const RoutineContext &ctx);
+bool getIntAsBool(const std::vector<script::Variable> &args, int index);
+bool getIntAsBoolOrElse(const std::vector<script::Variable> &args, int index, bool defValue);
 
-std::shared_ptr<game::Object> getObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 std::shared_ptr<game::Object> getObjectOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<game::SpatialObject> getSpatialObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<game::SpatialObject> getSpatialObjectOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<game::Creature> getCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<game::Creature> getCreatureOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<game::Door> getDoor(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<game::Item> getItem(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<game::Sound> getSound(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<game::Effect> getEffect(const std::vector<script::Variable> &args, int index);
-std::shared_ptr<game::Event> getEvent(const std::vector<script::Variable> &args, int index);
-std::shared_ptr<game::Location> getLocationEngineType(const std::vector<script::Variable> &args, int index);
-std::shared_ptr<game::Talent> getTalent(const std::vector<script::Variable> &args, int index);
-std::shared_ptr<script::ExecutionContext> getAction(const std::vector<script::Variable> &args, int index);
+
+std::shared_ptr<game::SpatialObject> getCallerAsSpatialObject(const RoutineContext &ctx);
+std::shared_ptr<game::SpatialObject> getObjectAsSpatialObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::SpatialObject> getObjectOrCallerAsSpatialObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+
+std::shared_ptr<game::Creature> getCallerAsCreature(const RoutineContext &ctx);
+std::shared_ptr<game::Creature> getObjectAsCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::Creature> getObjectOrCallerAsCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+
+std::shared_ptr<game::Door> getObjectAsDoor(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::Item> getObjectAsItem(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::Sound> getObjectAsSound(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+
+inline void throwIfOutOfRange(const std::vector<script::Variable> &args, int index) {
+    if (isOutOfRange(args, index)) {
+        throw script::ArgumentException(str(boost::format("Argument index is out of range: %d/%d") % index % static_cast<int>(args.size())));
+    }
+}
+
+inline void throwIfUnexpectedType(script::VariableType expected, script::VariableType actual) {
+    if (actual != expected) {
+        throw script::ArgumentException(str(boost::format("Expected argument of type %d, but got %d") % static_cast<int>(expected) % static_cast<int>(actual)));
+    }
+}
 
 template <class T>
-inline T getEnum(const std::vector<script::Variable> &args, int index) {
-    if (isOutOfRange(args, index)) {
-        throw std::out_of_range("index is out of range");
-    }
+inline T getIntAsEnum(const std::vector<script::Variable> &args, int index) {
+    throwIfOutOfRange(args, index);
+    throwIfUnexpectedType(VariableType::Int, args[index].type);
     return static_cast<T>(args[index].intValue);
 }
 
 template <class T>
-inline T getEnumOrElse(const std::vector<script::Variable> &args, int index, T defValue) {
-    return isOutOfRange(args, index) ? std::move(defValue) : static_cast<T>(args[index].intValue);
+inline T getIntAsEnumOrElse(const std::vector<script::Variable> &args, int index, T defValue) {
+    if (isOutOfRange(args, index)) {
+        return defValue;
+    }
+    throwIfUnexpectedType(VariableType::Int, args[index].type);
+    return static_cast<T>(args[index].intValue);
 }
 
 } // namespace kotor

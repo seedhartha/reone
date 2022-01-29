@@ -26,7 +26,6 @@
 #include "../../../../game/game.h"
 #include "../../../../game/services.h"
 #include "../../../../game/types.h"
-#include "../../../../script/exception/argument.h"
 #include "../../../../script/exception/notimpl.h"
 
 #include "../argutil.h"

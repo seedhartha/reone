@@ -46,6 +46,12 @@ Variable Routine::onException(const string &msg, const exception &ex) const {
     case VariableType::Void:
         warn(msg, LogChannels::script);
         return Variable::ofNull();
+    case VariableType::Int:
+        warn(msg, LogChannels::script);
+        return Variable::ofInt(0);
+    case VariableType::Float:
+        warn(msg, LogChannels::script);
+        return Variable::ofFloat(0.0f);
     case VariableType::String:
         warn(msg, LogChannels::script);
         return Variable::ofString("");
@@ -67,8 +73,8 @@ Variable Routine::onException(const string &msg, const exception &ex) const {
     case VariableType::Talent:
         warn(msg, LogChannels::script);
         return Variable::ofTalent(nullptr);
+    case VariableType::Action:
     default:
-        // With Int, Float and Action return types, halt script execution
         error(msg, LogChannels::script);
         throw ex;
     }
