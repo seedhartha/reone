@@ -137,10 +137,6 @@ Variable effectMovementSpeedIncrease(const vector<Variable> &args, const Routine
     return Variable::ofEffect(move(effect));
 }
 
-Variable getEffectType(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
-}
-
 Variable effectVisualEffect(const vector<Variable> &args, const RoutineContext &ctx) {
     auto effect = ctx.game.effectFactory().newVisual();
     return Variable::ofEffect(move(effect));
