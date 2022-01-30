@@ -88,21 +88,21 @@ Variable floatToString(const vector<Variable> &args, const RoutineContext &ctx) 
 }
 
 Variable assignCommand(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto subject = getObject(args, 0, ctx);
-    auto action = getAction(args, 1);
+    auto actionSubject = getObject(args, 0, ctx);
+    auto actionToAssign = getAction(args, 1);
 
-    auto objectAction = ctx.game.actionFactory().newDoCommand(move(action));
-    subject->addAction(move(objectAction));
+    auto gameAction = ctx.game.actionFactory().newDoCommand(move(actionToAssign));
+    actionSubject->addAction(move(gameAction));
 
     return Variable::ofNull();
 }
 
 Variable delayCommand(const vector<Variable> &args, const RoutineContext &ctx) {
     float seconds = getFloat(args, 0);
-    auto action = getAction(args, 1);
+    auto actionToDelay = getAction(args, 1);
 
-    auto objectAction = ctx.game.actionFactory().newDoCommand(move(action));
-    getCaller(ctx)->delayAction(move(objectAction), seconds);
+    auto gameAction = ctx.game.actionFactory().newDoCommand(move(actionToDelay));
+    getCaller(ctx)->delayAction(move(gameAction), seconds);
 
     return Variable::ofNull();
 }
@@ -786,17 +786,17 @@ Variable getListenPatternNumber(const vector<Variable> &args, const RoutineConte
 }
 
 Variable getWaypointByTag(const vector<Variable> &args, const RoutineContext &ctx) {
-    string tag(boost::to_lower_copy(getString(args, 0)));
+    string waypointTag = boost::to_lower_copy(getString(args, 0));
 
-    shared_ptr<SpatialObject> object;
-    for (auto &waypoint : ctx.game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
-        if (waypoint->tag() == tag) {
-            object = waypoint;
+    shared_ptr<SpatialObject> result;
+    for (auto &object : ctx.game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
+        if (object->tag() == waypointTag) {
+            result = object;
             break;
         }
     }
 
-    return Variable::ofObject(getObjectIdOrInvalid(object));
+    return Variable::ofObject(getObjectIdOrInvalid(result));
 }
 
 Variable getObjectByTag(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1402,6 +1402,7 @@ Variable getTypeFromTalent(const vector<Variable> &args, const RoutineContext &c
 }
 
 Variable getIdFromTalent(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto talent = getTalent(args, 0);
     throw NotImplementedException();
 }
 
@@ -1928,7 +1929,6 @@ Variable isObjectPartyMember(const vector<Variable> &args, const RoutineContext 
 Variable getPartyMemberByIndex(const vector<Variable> &args, const RoutineContext &ctx) {
     int index = getInt(args, 0);
     auto member = ctx.game.party().getMember(index);
-
     return Variable::ofObject(getObjectIdOrInvalid(member));
 }
 
