@@ -85,6 +85,12 @@ static inline void throwIfObjectNotSound(const shared_ptr<Object> &object) {
     }
 }
 
+static inline void throwIfObjectNotArea(const shared_ptr<Object> &object) {
+    if (object->type() != ObjectType::Area) {
+        throw ArgumentException(str(boost::format("Object %u is not an area") % object->id()));
+    }
+}
+
 static inline void throwIfInvalidEffect(const shared_ptr<Effect> &effect) {
     if (!effect || effect->type() == EffectType::Invalid) {
         throw ArgumentException("Invalid effect");
@@ -307,6 +313,20 @@ shared_ptr<Sound> getObjectAsSound(const vector<Variable> &args, int index, cons
     auto object = getObject(args, index, ctx);
     throwIfObjectNotSound(object);
     return static_pointer_cast<Sound>(move(object));
+}
+
+shared_ptr<Area> getObjectAsAreaOrCallerArea(const vector<script::Variable> &args, int index, const RoutineContext &ctx) {
+    if (isOutOfRange(args, index)) {
+        return ctx.game.module()->area();
+    }
+    throwIfUnexpectedType(VariableType::Object, args[index].type);
+    uint32_t objectId = args[index].objectId;
+    if (objectId == kObjectInvalid) {
+        return ctx.game.module()->area();
+    }
+    auto object = ctx.game.getObjectById(objectId);
+    throwIfObjectNotArea(object);
+    return static_pointer_cast<Area>(object);
 }
 
 } // namespace kotor

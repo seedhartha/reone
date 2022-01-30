@@ -984,6 +984,37 @@ enum class TalentType {
     Invalid = 3
 };
 
+enum class SavingThrowType {
+    All = 0,
+    None = 0,
+    Acid = 1,
+    SneakAttack = 2,
+    Cold = 3,
+    Death = 4,
+    Disease = 5,
+    LightSide = 6,
+    Electrical = 7,
+    Fear = 8,
+    Fire = 9,
+    MindAffecting = 10,
+    DarkSide = 11,
+    Poison = 12,
+    Sonic = 13,
+    Trap = 14,
+    ForcePower = 15,
+    Ion = 16,
+    Blaster = 17,
+    Paralysis = 18
+};
+
+enum class Shape {
+    SpellCylinder = 0,
+    Cone = 1,
+    Cube = 2,
+    SpellCone = 3,
+    Sphere = 4
+};
+
 enum class InGameMenuTab {
     None,
     Equipment,
