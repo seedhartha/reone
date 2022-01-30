@@ -260,6 +260,8 @@ Variable actionUseTalentOnObject(const vector<Variable> &args, const RoutineCont
     auto chosenTalen = getTalent(args, 0);
     auto target = getObject(args, 1, ctx);
 
+    // TODO: use arguments
+
     auto action = ctx.game.actionFactory().newUseTalentOnObject();
     getCaller(ctx)->addAction(move(action));
 

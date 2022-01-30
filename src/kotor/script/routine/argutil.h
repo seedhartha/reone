@@ -32,6 +32,7 @@ struct ExecutionContext;
 
 namespace game {
 
+class Area;
 class Door;
 class Creature;
 class Effect;
@@ -84,6 +85,8 @@ std::shared_ptr<game::Creature> getObjectOrCallerAsCreature(const std::vector<sc
 std::shared_ptr<game::Door> getObjectAsDoor(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 std::shared_ptr<game::Item> getObjectAsItem(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 std::shared_ptr<game::Sound> getObjectAsSound(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+
+std::shared_ptr<game::Area> getObjectAsAreaOrCallerArea(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
 inline void throwIfOutOfRange(const std::vector<script::Variable> &args, int index) {
     if (isOutOfRange(args, index)) {
