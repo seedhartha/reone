@@ -62,6 +62,13 @@ private:
         script::VariableType retType,
         std::vector<script::VariableType> argTypes,
         script::Variable (*fn)(const std::vector<script::Variable> &args, const RoutineContext &ctx));
+
+    void add(
+        std::string name,
+        script::VariableType retType,
+        std::vector<script::VariableType> argTypes,
+        script::Variable (*fn)(const std::vector<script::Variable> &args, const RoutineContext &ctx),
+        script::Variable defRetValue);
 };
 
 } // namespace kotor

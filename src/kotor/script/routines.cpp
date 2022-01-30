@@ -19,6 +19,7 @@
 
 #include "../../common/collectionutil.h"
 #include "../../game/services.h"
+#include "../../game/types.h"
 #include "../../script/variable.h"
 
 #include "routine/context.h"
@@ -44,6 +45,8 @@ using namespace reone::script;
 namespace reone {
 
 namespace kotor {
+
+static constexpr int kBaseItemInvalid = 256;
 
 void Routines::initForKotOR() {
     add("Random", R_INT, {R_INT}, &routine::random);
@@ -74,7 +77,7 @@ void Routines::initForKotOR() {
     add("GetEnteringObject", R_OBJECT, {}, &routine::getEnteringObject);
     add("GetExitingObject", R_OBJECT, {}, &routine::getExitingObject);
     add("GetPosition", R_VECTOR, {R_OBJECT}, &routine::getPosition);
-    add("GetFacing", R_FLOAT, {R_OBJECT}, &routine::getFacing);
+    add("GetFacing", R_FLOAT, {R_OBJECT}, &routine::getFacing, Variable::ofFloat(-1.0f));
     add("GetItemPossessor", R_OBJECT, {R_OBJECT}, &routine::getItemPossessor);
     add("GetItemPossessedBy", R_OBJECT, {R_OBJECT, R_STRING}, &routine::getItemPossessedBy);
     add("CreateItemOnObject", R_OBJECT, {R_STRING, R_OBJECT, R_INT}, &routine::createItemOnObject);
@@ -87,7 +90,7 @@ void Routines::initForKotOR() {
     add("GetNearestCreature", R_OBJECT, {R_INT, R_INT, R_OBJECT, R_INT, R_INT, R_INT, R_INT, R_INT}, &routine::getNearestCreature);
     add("ActionSpeakString", R_VOID, {R_STRING, R_INT}, &routine::unsupported);
     add("ActionPlayAnimation", R_VOID, {R_INT, R_FLOAT, R_FLOAT}, &routine::actionPlayAnimation);
-    add("GetDistanceToObject", R_FLOAT, {R_OBJECT}, &routine::getDistanceToObject);
+    add("GetDistanceToObject", R_FLOAT, {R_OBJECT}, &routine::getDistanceToObject, Variable::ofFloat(-1.0f));
     add("GetIsObjectValid", R_INT, {R_OBJECT}, &routine::getIsObjectValid);
     add("ActionOpenDoor", R_VOID, {R_OBJECT}, &routine::actionOpenDoor);
     add("ActionCloseDoor", R_VOID, {R_OBJECT}, &routine::actionCloseDoor);
@@ -153,7 +156,7 @@ void Routines::initForKotOR() {
     add("VectorMagnitude", R_FLOAT, {R_VECTOR}, &routine::unsupported);
     add("GetMetaMagicFeat", R_INT, {}, &routine::getMetaMagicFeat);
     add("GetObjectType", R_INT, {R_OBJECT}, &routine::getObjectType);
-    add("GetRacialType", R_INT, {R_OBJECT}, &routine::getRacialType);
+    add("GetRacialType", R_INT, {R_OBJECT}, &routine::getRacialType, Variable::ofInt(static_cast<int>(RacialType::Invalid)));
     add("FortitudeSave", R_INT, {R_OBJECT, R_INT, R_INT, R_OBJECT}, &routine::fortitudeSave);
     add("ReflexSave", R_INT, {R_OBJECT, R_INT, R_INT, R_OBJECT}, &routine::reflexSave);
     add("WillSave", R_INT, {R_OBJECT, R_INT, R_INT, R_OBJECT}, &routine::willSave);
@@ -216,7 +219,7 @@ void Routines::initForKotOR() {
     add("ActionForceFollowObject", R_VOID, {R_OBJECT, R_FLOAT}, &routine::unsupported);
     add("GetTag", R_STRING, {R_OBJECT}, &routine::getTag);
     add("ResistForce", R_INT, {R_OBJECT, R_OBJECT}, &routine::resistForce);
-    add("GetEffectType", R_INT, {R_EFFECT}, &routine::getEffectType);
+    add("GetEffectType", R_INT, {R_EFFECT}, &routine::getEffectType, Variable::ofInt(static_cast<int>(EffectType::Invalid)));
     add("EffectAreaOfEffect", R_EFFECT, {R_INT, R_STRING, R_STRING, R_STRING}, &routine::unsupported);
     add("GetFactionEqual", R_INT, {R_OBJECT, R_OBJECT}, &routine::getFactionEqual);
     add("ChangeFaction", R_VOID, {R_OBJECT, R_OBJECT}, &routine::unsupported);
@@ -271,7 +274,7 @@ void Routines::initForKotOR() {
     add("GetSpellTargetLocation", R_LOCATION, {}, &routine::getSpellTargetLocation);
     add("GetPositionFromLocation", R_VECTOR, {R_LOCATION}, &routine::getPositionFromLocation);
     add("EffectBodyFuel", R_EFFECT, {}, &routine::effectBodyFuel);
-    add("GetFacingFromLocation", R_FLOAT, {R_LOCATION}, &routine::getFacingFromLocation);
+    add("GetFacingFromLocation", R_FLOAT, {R_LOCATION}, &routine::getFacingFromLocation, Variable::ofFloat(-1.0f));
     add("GetNearestCreatureToLocation", R_OBJECT, {R_INT, R_INT, R_LOCATION, R_INT, R_INT, R_INT, R_INT, R_INT}, &routine::unsupported);
     add("GetNearestObject", R_OBJECT, {R_INT, R_OBJECT, R_INT}, &routine::getNearestObject);
     add("GetNearestObjectToLocation", R_OBJECT, {R_INT, R_LOCATION, R_INT}, &routine::unsupported);
@@ -381,13 +384,13 @@ void Routines::initForKotOR() {
     add("GetIdentified", R_INT, {R_OBJECT}, &routine::unsupported);
     add("SetIdentified", R_VOID, {R_OBJECT, R_INT}, &routine::unsupported);
     add("GetDistanceBetweenLocations2D", R_FLOAT, {R_LOCATION, R_LOCATION}, &routine::unsupported);
-    add("GetDistanceToObject2D", R_FLOAT, {R_OBJECT}, &routine::getDistanceToObject2D);
+    add("GetDistanceToObject2D", R_FLOAT, {R_OBJECT}, &routine::getDistanceToObject2D, Variable::ofFloat(-1.0f));
     add("GetBlockingDoor", R_OBJECT, {}, &routine::getBlockingDoor);
     add("GetIsDoorActionPossible", R_INT, {R_OBJECT, R_INT}, &routine::getIsDoorActionPossible);
     add("DoDoorAction", R_VOID, {R_OBJECT, R_INT}, &routine::doDoorAction);
     add("GetFirstItemInInventory", R_OBJECT, {R_OBJECT}, &routine::getFirstItemInInventory);
     add("GetNextItemInInventory", R_OBJECT, {R_OBJECT}, &routine::getNextItemInInventory);
-    add("GetClassByPosition", R_INT, {R_INT, R_OBJECT}, &routine::getClassByPosition);
+    add("GetClassByPosition", R_INT, {R_INT, R_OBJECT}, &routine::getClassByPosition, Variable::ofInt(static_cast<int>(ClassType::Invalid)));
     add("GetLevelByPosition", R_INT, {R_INT, R_OBJECT}, &routine::getLevelByPosition);
     add("GetLevelByClass", R_INT, {R_INT, R_OBJECT}, &routine::getLevelByClass);
     add("GetDamageDealtByType", R_INT, {R_INT}, &routine::getDamageDealtByType);
@@ -443,7 +446,7 @@ void Routines::initForKotOR() {
     add("SetXP", R_VOID, {R_OBJECT, R_INT}, &routine::setXP);
     add("GetXP", R_INT, {R_OBJECT}, &routine::getXP);
     add("IntToHexString", R_STRING, {R_INT}, &routine::unsupported);
-    add("GetBaseItemType", R_INT, {R_OBJECT}, &routine::getBaseItemType);
+    add("GetBaseItemType", R_INT, {R_OBJECT}, &routine::getBaseItemType, Variable::ofInt(kBaseItemInvalid));
     add("GetItemHasItemProperty", R_INT, {R_OBJECT, R_INT}, &routine::getItemHasItemProperty);
     add("ActionEquipMostDamagingMelee", R_VOID, {R_OBJECT, R_INT}, &routine::actionEquipMostDamagingMelee);
     add("ActionEquipMostDamagingRanged", R_VOID, {R_OBJECT}, &routine::actionEquipMostDamagingRanged);
@@ -543,7 +546,7 @@ void Routines::initForKotOR() {
     add("GetChallengeRating", R_FLOAT, {R_OBJECT}, &routine::getChallengeRating);
     add("GetFoundEnemyCreature", R_OBJECT, {R_OBJECT}, &routine::getFoundEnemyCreature);
     add("GetMovementRate", R_INT, {R_OBJECT}, &routine::unsupported);
-    add("GetSubRace", R_INT, {R_OBJECT}, &routine::getSubRace);
+    add("GetSubRace", R_INT, {R_OBJECT}, &routine::getSubRace, Variable::ofInt(static_cast<int>(Subrace::None)));
     add("GetStealthXPDecrement", R_INT, {}, &routine::unsupported);
     add("SetStealthXPDecrement", R_VOID, {R_INT}, &routine::unsupported);
     add("DuplicateHeadAppearance", R_VOID, {R_OBJECT, R_OBJECT}, &routine::duplicateHeadAppearance);
@@ -759,7 +762,7 @@ void Routines::initForKotOR() {
     add("EffectLightsaberThrow", R_EFFECT, {R_OBJECT, R_OBJECT, R_OBJECT, R_INT}, &routine::effectLightsaberThrow);
     add("EffectWhirlWind", R_EFFECT, {}, &routine::effectWhirlWind);
     add("GetPartyAIStyle", R_INT, {}, &routine::getPartyAIStyle);
-    add("GetNPCAIStyle", R_INT, {R_OBJECT}, &routine::getNPCAIStyle);
+    add("GetNPCAIStyle", R_INT, {R_OBJECT}, &routine::getNPCAIStyle, Variable::ofInt(static_cast<int>(NPCAIStyle::DefaultAttack)));
     add("SetPartyAIStyle", R_VOID, {R_INT}, &routine::unsupported);
     add("SetNPCAIStyle", R_VOID, {R_OBJECT, R_INT}, &routine::setNPCAIStyle);
     add("SetNPCSelectability", R_VOID, {R_INT, R_INT}, &routine::setNPCSelectability);
@@ -767,7 +770,7 @@ void Routines::initForKotOR() {
     add("ClearAllEffects", R_VOID, {}, &routine::clearAllEffects);
     add("GetLastConversation", R_STRING, {}, &routine::unsupported);
     add("ShowPartySelectionGUI", R_VOID, {R_STRING, R_INT, R_INT}, &routine::showPartySelectionGUI);
-    add("GetStandardFaction", R_INT, {R_OBJECT}, &routine::getStandardFaction);
+    add("GetStandardFaction", R_INT, {R_OBJECT}, &routine::getStandardFaction, Variable::ofInt(static_cast<int>(Faction::Invalid)));
     add("GivePlotXP", R_VOID, {R_STRING, R_INT}, &routine::givePlotXP);
     add("GetMinOneHP", R_INT, {R_OBJECT}, &routine::getMinOneHP);
     add("SetMinOneHP", R_VOID, {R_OBJECT, R_INT}, &routine::setMinOneHP);
@@ -859,7 +862,7 @@ void Routines::initForTSL() {
     add("GetEnteringObject", R_OBJECT, {}, &routine::getEnteringObject);
     add("GetExitingObject", R_OBJECT, {}, &routine::getExitingObject);
     add("GetPosition", R_VECTOR, {R_OBJECT}, &routine::getPosition);
-    add("GetFacing", R_FLOAT, {R_OBJECT}, &routine::getFacing);
+    add("GetFacing", R_FLOAT, {R_OBJECT}, &routine::getFacing, Variable::ofFloat(-1.0f));
     add("GetItemPossessor", R_OBJECT, {R_OBJECT}, &routine::getItemPossessor);
     add("GetItemPossessedBy", R_OBJECT, {R_OBJECT, R_STRING}, &routine::getItemPossessedBy);
     add("CreateItemOnObject", R_OBJECT, {R_STRING, R_OBJECT, R_INT, R_INT}, &routine::createItemOnObject);
@@ -872,7 +875,7 @@ void Routines::initForTSL() {
     add("GetNearestCreature", R_OBJECT, {R_INT, R_INT, R_OBJECT, R_INT, R_INT, R_INT, R_INT, R_INT}, &routine::getNearestCreature);
     add("ActionSpeakString", R_VOID, {R_STRING, R_INT}, &routine::unsupported);
     add("ActionPlayAnimation", R_VOID, {R_INT, R_FLOAT, R_FLOAT}, &routine::actionPlayAnimation);
-    add("GetDistanceToObject", R_FLOAT, {R_OBJECT}, &routine::getDistanceToObject);
+    add("GetDistanceToObject", R_FLOAT, {R_OBJECT}, &routine::getDistanceToObject, Variable::ofFloat(-1.0f));
     add("GetIsObjectValid", R_INT, {R_OBJECT}, &routine::getIsObjectValid);
     add("ActionOpenDoor", R_VOID, {R_OBJECT}, &routine::actionOpenDoor);
     add("ActionCloseDoor", R_VOID, {R_OBJECT}, &routine::actionCloseDoor);
@@ -938,7 +941,7 @@ void Routines::initForTSL() {
     add("VectorMagnitude", R_FLOAT, {R_VECTOR}, &routine::unsupported);
     add("GetMetaMagicFeat", R_INT, {}, &routine::getMetaMagicFeat);
     add("GetObjectType", R_INT, {R_OBJECT}, &routine::getObjectType);
-    add("GetRacialType", R_INT, {R_OBJECT}, &routine::getRacialType);
+    add("GetRacialType", R_INT, {R_OBJECT}, &routine::getRacialType, Variable::ofInt(static_cast<int>(RacialType::Invalid)));
     add("FortitudeSave", R_INT, {R_OBJECT, R_INT, R_INT, R_OBJECT}, &routine::fortitudeSave);
     add("ReflexSave", R_INT, {R_OBJECT, R_INT, R_INT, R_OBJECT}, &routine::reflexSave);
     add("WillSave", R_INT, {R_OBJECT, R_INT, R_INT, R_OBJECT}, &routine::willSave);
@@ -1001,7 +1004,7 @@ void Routines::initForTSL() {
     add("ActionForceFollowObject", R_VOID, {R_OBJECT, R_FLOAT}, &routine::unsupported);
     add("GetTag", R_STRING, {R_OBJECT}, &routine::getTag);
     add("ResistForce", R_INT, {R_OBJECT, R_OBJECT}, &routine::resistForce);
-    add("GetEffectType", R_INT, {R_EFFECT}, &routine::getEffectType);
+    add("GetEffectType", R_INT, {R_EFFECT}, &routine::getEffectType, Variable::ofInt(static_cast<int>(EffectType::Invalid)));
     add("EffectAreaOfEffect", R_EFFECT, {R_INT, R_STRING, R_STRING, R_STRING}, &routine::unsupported);
     add("GetFactionEqual", R_INT, {R_OBJECT, R_OBJECT}, &routine::getFactionEqual);
     add("ChangeFaction", R_VOID, {R_OBJECT, R_OBJECT}, &routine::unsupported);
@@ -1056,7 +1059,7 @@ void Routines::initForTSL() {
     add("GetSpellTargetLocation", R_LOCATION, {}, &routine::getSpellTargetLocation);
     add("GetPositionFromLocation", R_VECTOR, {R_LOCATION}, &routine::getPositionFromLocation);
     add("EffectBodyFuel", R_EFFECT, {}, &routine::effectBodyFuel);
-    add("GetFacingFromLocation", R_FLOAT, {R_LOCATION}, &routine::getFacingFromLocation);
+    add("GetFacingFromLocation", R_FLOAT, {R_LOCATION}, &routine::getFacingFromLocation, Variable::ofFloat(-1.0f));
     add("GetNearestCreatureToLocation", R_OBJECT, {R_INT, R_INT, R_LOCATION, R_INT, R_INT, R_INT, R_INT, R_INT}, &routine::unsupported);
     add("GetNearestObject", R_OBJECT, {R_INT, R_OBJECT, R_INT}, &routine::getNearestObject);
     add("GetNearestObjectToLocation", R_OBJECT, {R_INT, R_LOCATION, R_INT}, &routine::unsupported);
@@ -1166,13 +1169,13 @@ void Routines::initForTSL() {
     add("GetIdentified", R_INT, {R_OBJECT}, &routine::unsupported);
     add("SetIdentified", R_VOID, {R_OBJECT, R_INT}, &routine::unsupported);
     add("GetDistanceBetweenLocations2D", R_FLOAT, {R_LOCATION, R_LOCATION}, &routine::unsupported);
-    add("GetDistanceToObject2D", R_FLOAT, {R_OBJECT}, &routine::getDistanceToObject2D);
+    add("GetDistanceToObject2D", R_FLOAT, {R_OBJECT}, &routine::getDistanceToObject2D, Variable::ofFloat(-1.0f));
     add("GetBlockingDoor", R_OBJECT, {}, &routine::getBlockingDoor);
     add("GetIsDoorActionPossible", R_INT, {R_OBJECT, R_INT}, &routine::getIsDoorActionPossible);
     add("DoDoorAction", R_VOID, {R_OBJECT, R_INT}, &routine::doDoorAction);
     add("GetFirstItemInInventory", R_OBJECT, {R_OBJECT}, &routine::getFirstItemInInventory);
     add("GetNextItemInInventory", R_OBJECT, {R_OBJECT}, &routine::getNextItemInInventory);
-    add("GetClassByPosition", R_INT, {R_INT, R_OBJECT}, &routine::getClassByPosition);
+    add("GetClassByPosition", R_INT, {R_INT, R_OBJECT}, &routine::getClassByPosition, Variable::ofInt(static_cast<int>(ClassType::Invalid)));
     add("GetLevelByPosition", R_INT, {R_INT, R_OBJECT}, &routine::getLevelByPosition);
     add("GetLevelByClass", R_INT, {R_INT, R_OBJECT}, &routine::getLevelByClass);
     add("GetDamageDealtByType", R_INT, {R_INT}, &routine::getDamageDealtByType);
@@ -1228,7 +1231,7 @@ void Routines::initForTSL() {
     add("SetXP", R_VOID, {R_OBJECT, R_INT}, &routine::setXP);
     add("GetXP", R_INT, {R_OBJECT}, &routine::getXP);
     add("IntToHexString", R_STRING, {R_INT}, &routine::unsupported);
-    add("GetBaseItemType", R_INT, {R_OBJECT}, &routine::getBaseItemType);
+    add("GetBaseItemType", R_INT, {R_OBJECT}, &routine::getBaseItemType, Variable::ofInt(kBaseItemInvalid));
     add("GetItemHasItemProperty", R_INT, {R_OBJECT, R_INT}, &routine::getItemHasItemProperty);
     add("ActionEquipMostDamagingMelee", R_VOID, {R_OBJECT, R_INT}, &routine::actionEquipMostDamagingMelee);
     add("ActionEquipMostDamagingRanged", R_VOID, {R_OBJECT}, &routine::actionEquipMostDamagingRanged);
@@ -1328,7 +1331,7 @@ void Routines::initForTSL() {
     add("GetChallengeRating", R_FLOAT, {R_OBJECT}, &routine::getChallengeRating);
     add("GetFoundEnemyCreature", R_OBJECT, {R_OBJECT}, &routine::getFoundEnemyCreature);
     add("GetMovementRate", R_INT, {R_OBJECT}, &routine::unsupported);
-    add("GetSubRace", R_INT, {R_OBJECT}, &routine::getSubRace);
+    add("GetSubRace", R_INT, {R_OBJECT}, &routine::getSubRace, Variable::ofInt(static_cast<int>(Subrace::None)));
     add("GetStealthXPDecrement", R_INT, {}, &routine::unsupported);
     add("SetStealthXPDecrement", R_VOID, {R_INT}, &routine::unsupported);
     add("DuplicateHeadAppearance", R_VOID, {R_OBJECT, R_OBJECT}, &routine::duplicateHeadAppearance);
@@ -1544,7 +1547,7 @@ void Routines::initForTSL() {
     add("EffectLightsaberThrow", R_EFFECT, {R_OBJECT, R_OBJECT, R_OBJECT, R_INT}, &routine::effectLightsaberThrow);
     add("EffectWhirlWind", R_EFFECT, {}, &routine::effectWhirlWind);
     add("GetPartyAIStyle", R_INT, {}, &routine::getPartyAIStyle);
-    add("GetNPCAIStyle", R_INT, {R_OBJECT}, &routine::getNPCAIStyle);
+    add("GetNPCAIStyle", R_INT, {R_OBJECT}, &routine::getNPCAIStyle, Variable::ofInt(static_cast<int>(NPCAIStyle::DefaultAttack)));
     add("SetPartyAIStyle", R_VOID, {R_INT}, &routine::unsupported);
     add("SetNPCAIStyle", R_VOID, {R_OBJECT, R_INT}, &routine::setNPCAIStyle);
     add("SetNPCSelectability", R_VOID, {R_INT, R_INT}, &routine::setNPCSelectability);
@@ -1552,7 +1555,7 @@ void Routines::initForTSL() {
     add("ClearAllEffects", R_VOID, {}, &routine::clearAllEffects);
     add("GetLastConversation", R_STRING, {}, &routine::unsupported);
     add("ShowPartySelectionGUI", R_VOID, {R_STRING, R_INT, R_INT, R_INT}, &routine::showPartySelectionGUI);
-    add("GetStandardFaction", R_INT, {R_OBJECT}, &routine::getStandardFaction);
+    add("GetStandardFaction", R_INT, {R_OBJECT}, &routine::getStandardFaction, Variable::ofInt(static_cast<int>(Faction::Invalid)));
     add("GivePlotXP", R_VOID, {R_STRING, R_INT}, &routine::givePlotXP);
     add("GetMinOneHP", R_INT, {R_OBJECT}, &routine::getMinOneHP);
     add("SetMinOneHP", R_VOID, {R_OBJECT, R_INT}, &routine::setMinOneHP);
@@ -1751,9 +1754,39 @@ void Routines::add(
     VariableType retType,
     vector<VariableType> argTypes,
     Variable (*fn)(const vector<Variable> &args, const RoutineContext &ctx)) {
+
+    Variable defRetValue;
+    defRetValue.type = retType;
+    switch (retType) {
+    case VariableType::Object:
+        defRetValue.objectId = kObjectInvalid;
+        break;
+    default:
+        break;
+    }
+
     _routines.emplace_back(
         move(name),
         retType,
+        move(defRetValue),
+        move(argTypes),
+        [this, fn](auto &args, auto &execution) {
+            RoutineContext ctx(*_game, *_services, execution);
+            return fn(args, std::move(ctx));
+        });
+}
+
+void Routines::add(
+    string name,
+    VariableType retType,
+    vector<VariableType> argTypes,
+    Variable (*fn)(const vector<Variable> &args, const RoutineContext &ctx),
+    Variable defRetValue) {
+
+    _routines.emplace_back(
+        move(name),
+        retType,
+        move(defRetValue),
         move(argTypes),
         [this, fn](auto &args, auto &execution) {
             RoutineContext ctx(*_game, *_services, execution);

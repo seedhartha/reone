@@ -18,23 +18,25 @@
 #pragma once
 
 #include "types.h"
+#include "variable.h"
 
 namespace reone {
 
 namespace script {
 
 struct ExecutionContext;
-struct Variable;
 
 class Routine {
 public:
     Routine(
         std::string name,
         VariableType retType,
+        Variable defRetValue,
         std::vector<VariableType> argTypes,
         std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> fn) :
         _name(std::move(name)),
         _returnType(retType),
+        _defaultReturnValue(std::move(defRetValue)),
         _argumentTypes(std::move(argTypes)),
         _func(std::move(fn)) {
     }
@@ -50,6 +52,7 @@ public:
 private:
     std::string _name;
     VariableType _returnType {VariableType::Void};
+    Variable _defaultReturnValue;
     std::vector<VariableType> _argumentTypes;
     std::function<Variable(const std::vector<Variable> &, ExecutionContext &ctx)> _func;
 
