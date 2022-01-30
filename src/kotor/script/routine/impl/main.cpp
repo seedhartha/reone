@@ -64,6 +64,7 @@ Variable unsupported(const vector<Variable> &args, const RoutineContext &ctx) {
 Variable random(const vector<Variable> &args, const RoutineContext &ctx) {
     int maxInteger = getInt(args, 0);
     int result = reone::random(0, maxInteger - 1);
+
     return Variable::ofInt(result);
 }
 
@@ -144,6 +145,7 @@ Variable setPartyLeader(const vector<Variable> &args, const RoutineContext &ctx)
 Variable setAreaUnescapable(const vector<Variable> &args, const RoutineContext &ctx) {
     bool unescapable = getIntAsBool(args, 0);
     ctx.game.module()->area()->setUnescapable(unescapable);
+
     return Variable::ofNull();
 }
 
@@ -249,8 +251,7 @@ Variable getNearestCreature(const vector<Variable> &args, const RoutineContext &
     if (thirdCriteriaType != -1) {
         criterias.push_back(make_pair(static_cast<CreatureType>(thirdCriteriaType), thirdCriteriaValue));
     }
-
-    shared_ptr<Creature> creature(ctx.game.module()->area()->getNearestCreature(target, criterias, nth - 1));
+    auto creature = ctx.game.module()->area()->getNearestCreature(target, criterias, nth - 1);
 
     return Variable::ofObject(getObjectIdOrInvalid(creature));
 }
@@ -258,6 +259,7 @@ Variable getNearestCreature(const vector<Variable> &args, const RoutineContext &
 Variable getDistanceToObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto caller = getCallerAsSpatialObject(ctx);
     auto object = getObjectAsSpatialObject(args, 0, ctx);
+
     return Variable::ofFloat(caller->getDistanceTo(*object));
 }
 
@@ -319,6 +321,7 @@ Variable pauseGame(const vector<Variable> &args, const RoutineContext &ctx) {
 Variable setPlayerRestrictMode(const vector<Variable> &args, const RoutineContext &ctx) {
     bool restrict = getIntAsBool(args, 0);
     ctx.game.module()->player().setRestrictMode(restrict);
+
     return Variable::ofNull();
 }
 
@@ -404,6 +407,7 @@ Variable getIsEffectValid(const vector<Variable> &args, const RoutineContext &ct
     throwIfOutOfRange(args, 0);
     throwIfUnexpectedType(VariableType::Effect, args[0].type);
     auto effect = static_pointer_cast<Effect>(args[0].engineType);
+
     return Variable::ofInt(static_cast<int>(effect && effect->type() != EffectType::Invalid));
 }
 
@@ -633,6 +637,7 @@ Variable vectorCreate(const vector<Variable> &args, const RoutineContext &ctx) {
     float x = getFloat(args, 0);
     float y = getFloat(args, 1);
     float z = getFloat(args, 2);
+
     return Variable::ofVector(glm::vec3(x, y, z));
 }
 
@@ -744,7 +749,7 @@ Variable setListening(const vector<Variable> &args, const RoutineContext &ctx) {
 
 Variable setListenPattern(const vector<Variable> &args, const RoutineContext &ctx) {
     auto object = getObject(args, 0, ctx);
-    string pattern(getString(args, 1));
+    string pattern = getString(args, 1);
     int number = getIntOrElse(args, 2, 0);
 
     // TODO: implement
@@ -812,18 +817,14 @@ Variable getModuleFileName(const vector<Variable> &args, const RoutineContext &c
 
 Variable getLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     auto object = getObjectAsSpatialObject(args, 0, ctx);
+    auto location = make_shared<Location>(object->position(), object->getFacing());
 
-    glm::vec3 position(object->position());
-    float facing = object->getFacing();
-    auto result = make_shared<Location>(move(position), facing);
-
-    return Variable::ofLocation(move(result));
+    return Variable::ofLocation(move(location));
 }
 
 Variable location(const vector<Variable> &args, const RoutineContext &ctx) {
     glm::vec3 position(getVector(args, 0));
     float orientation = glm::radians(getFloat(args, 1));
-
     auto location = make_shared<Location>(move(position), orientation);
 
     return Variable::ofLocation(location);
@@ -1141,17 +1142,24 @@ Variable playAnimation(const vector<Variable> &args, const RoutineContext &ctx) 
 Variable talentSpell(const vector<Variable> &args, const RoutineContext &ctx) {
     int spell = getInt(args, 0);
     auto talent = make_shared<Talent>(TalentType::Spell, spell);
+
     return Variable::ofTalent(move(talent));
 }
 
 Variable talentFeat(const vector<Variable> &args, const RoutineContext &ctx) {
     int feat = getInt(args, 0);
     auto talent = make_shared<Talent>(TalentType::Feat, feat);
+
     return Variable::ofTalent(move(talent));
 }
 
 Variable getHasSpellEffect(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int spell = getInt(args, 0);
+    auto object = getObjectOrCaller(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable getCreatureHasTalent(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1893,33 +1901,33 @@ Variable getPartyMemberByIndex(const vector<Variable> &args, const RoutineContex
 }
 
 Variable getGlobalBoolean(const vector<Variable> &args, const RoutineContext &ctx) {
-    string id(getString(args, 0));
-    bool value = ctx.game.getGlobalBoolean(id);
+    string identifier = getString(args, 0);
+    bool value = ctx.game.getGlobalBoolean(identifier);
 
     return Variable::ofInt(static_cast<int>(value));
 }
 
 Variable setGlobalBoolean(const vector<Variable> &args, const RoutineContext &ctx) {
-    string id(getString(args, 0));
+    string identifier = getString(args, 0);
     bool value = getIntAsBool(args, 1);
 
-    ctx.game.setGlobalBoolean(id, value);
+    ctx.game.setGlobalBoolean(identifier, value);
 
     return Variable::ofNull();
 }
 
 Variable getGlobalNumber(const vector<Variable> &args, const RoutineContext &ctx) {
-    string id(getString(args, 0));
-    int value = ctx.game.getGlobalNumber(id);
+    string identifier = getString(args, 0);
+    int value = ctx.game.getGlobalNumber(identifier);
 
     return Variable::ofInt(value);
 }
 
 Variable setGlobalNumber(const vector<Variable> &args, const RoutineContext &ctx) {
-    string id(getString(args, 0));
+    string identifier = getString(args, 0);
     int value = getInt(args, 1);
 
-    ctx.game.setGlobalNumber(id, value);
+    ctx.game.setGlobalNumber(identifier, value);
 
     return Variable::ofNull();
 }
@@ -2063,6 +2071,7 @@ Variable getNPCSelectability(const vector<Variable> &args, const RoutineContext 
 Variable clearAllEffects(const vector<Variable> &args, const RoutineContext &ctx) {
     auto caller = getCallerAsSpatialObject(ctx);
     caller->clearAllEffects();
+
     return Variable::ofNull();
 }
 
@@ -2159,6 +2168,7 @@ Variable getWasForcePowerSuccessful(const vector<Variable> &args, const RoutineC
 Variable getIsDebilitated(const vector<Variable> &args, const RoutineContext &ctx) {
     auto creature = getObjectOrCallerAsCreature(args, 0, ctx);
     bool debilitated = creature->isDebilitated();
+
     return Variable::ofInt(static_cast<int>(debilitated));
 }
 
@@ -2228,13 +2238,16 @@ Variable getIsPoisoned(const vector<Variable> &args, const RoutineContext &ctx) 
 
 Variable getSpellTarget(const vector<Variable> &args, const RoutineContext &ctx) {
     auto creature = getObjectOrCallerAsCreature(args, 0, ctx);
+
     // TODO: implement
+
     return Variable::ofObject(kObjectInvalid);
 }
 
 Variable setSoloMode(const vector<Variable> &args, const RoutineContext &ctx) {
     auto activate = getIntAsBool(args, 0);
     ctx.game.party().setSoloMode(activate);
+
     return Variable::ofNull();
 }
 
