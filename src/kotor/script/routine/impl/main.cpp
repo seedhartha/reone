@@ -55,8 +55,6 @@ namespace kotor {
 
 namespace routine {
 
-static constexpr int kBaseItemInvalid = 256;
-
 static constexpr bool kShipBuild = true;
 
 Variable unsupported(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -194,12 +192,8 @@ Variable getPosition(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getFacing(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto target = getObjectAsSpatialObject(args, 0, ctx);
-        return Variable::ofFloat(glm::degrees(target->getFacing()));
-    } catch (const ArgumentException &) {
-        return Variable::ofFloat(-1.0f);
-    }
+    auto target = getObjectAsSpatialObject(args, 0, ctx);
+    return Variable::ofFloat(glm::degrees(target->getFacing()));
 }
 
 Variable getItemPossessor(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -262,14 +256,9 @@ Variable getNearestCreature(const vector<Variable> &args, const RoutineContext &
 }
 
 Variable getDistanceToObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto caller = getCallerAsSpatialObject(ctx);
-        auto object = getObjectAsSpatialObject(args, 0, ctx);
-
-        return Variable::ofFloat(caller->getDistanceTo(*object));
-    } catch (const ArgumentException &) {
-        return Variable::ofFloat(-1.0f);
-    }
+    auto caller = getCallerAsSpatialObject(ctx);
+    auto object = getObjectAsSpatialObject(args, 0, ctx);
+    return Variable::ofFloat(caller->getDistanceTo(*object));
 }
 
 Variable getIsObjectValid(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -543,12 +532,8 @@ Variable getObjectType(const vector<Variable> &args, const RoutineContext &ctx) 
 }
 
 Variable getRacialType(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto creature = getObjectAsCreature(args, 0, ctx);
-        return Variable::ofInt(static_cast<int>(creature->racialType()));
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(static_cast<int>(RacialType::Invalid));
-    }
+    auto creature = getObjectAsCreature(args, 0, ctx);
+    return Variable::ofInt(static_cast<int>(creature->racialType()));
 }
 
 Variable fortitudeSave(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -737,12 +722,8 @@ Variable resistForce(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getEffectType(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto effect = getEffect(args, 0);
-        return Variable::ofInt(static_cast<int>(effect->type()));
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(static_cast<int>(EffectType::Invalid));
-    }
+    auto effect = getEffect(args, 0);
+    return Variable::ofInt(static_cast<int>(effect->type()));
 }
 
 Variable getFactionEqual(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -894,12 +875,8 @@ Variable getPositionFromLocation(const vector<Variable> &args, const RoutineCont
 }
 
 Variable getFacingFromLocation(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto location = getLocationArgument(args, 0);
-        return Variable::ofFloat(glm::degrees(location->facing()));
-    } catch (const ArgumentException &) {
-        return Variable::ofFloat(-1.0f);
-    }
+    auto location = getLocationArgument(args, 0);
+    return Variable::ofFloat(glm::degrees(location->facing()));
 }
 
 Variable getNearestObject(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1291,13 +1268,9 @@ Variable getAbilityModifier(const vector<Variable> &args, const RoutineContext &
 }
 
 Variable getDistanceToObject2D(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto caller = getCallerAsSpatialObject(ctx);
-        auto object = getObjectAsSpatialObject(args, 0, ctx);
-        return Variable::ofFloat(caller->getDistanceTo(glm::vec2(object->position())));
-    } catch (const ArgumentException &) {
-        return Variable::ofFloat(-1.0f);
-    }
+    auto caller = getCallerAsSpatialObject(ctx);
+    auto object = getObjectAsSpatialObject(args, 0, ctx);
+    return Variable::ofFloat(caller->getDistanceTo(glm::vec2(object->position())));
 }
 
 Variable getBlockingDoor(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1327,15 +1300,10 @@ Variable getNextItemInInventory(const vector<Variable> &args, const RoutineConte
 }
 
 Variable getClassByPosition(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        int position = getInt(args, 0);
-        auto creature = getObjectOrCallerAsCreature(args, 1, ctx);
-        ClassType clazz = creature->attributes().getClassByPosition(position);
-
-        return Variable::ofInt(static_cast<int>(clazz));
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(static_cast<int>(ClassType::Invalid));
-    }
+    int position = getInt(args, 0);
+    auto creature = getObjectOrCallerAsCreature(args, 1, ctx);
+    ClassType clazz = creature->attributes().getClassByPosition(position);
+    return Variable::ofInt(static_cast<int>(clazz));
 }
 
 Variable getLevelByPosition(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1519,12 +1487,8 @@ Variable getXP(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getBaseItemType(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto item = getObjectAsItem(args, 0, ctx);
-        return Variable::ofInt(item->baseItemType());
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(kBaseItemInvalid);
-    }
+    auto item = getObjectAsItem(args, 0, ctx);
+    return Variable::ofInt(item->baseItemType());
 }
 
 Variable getItemHasItemProperty(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1731,12 +1695,8 @@ Variable getFoundEnemyCreature(const vector<Variable> &args, const RoutineContex
 }
 
 Variable getSubRace(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto creature = getObjectAsCreature(args, 0, ctx);
-        return Variable::ofInt(static_cast<int>(creature->subrace()));
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(static_cast<int>(Subrace::None));
-    }
+    auto creature = getObjectAsCreature(args, 0, ctx);
+    return Variable::ofInt(static_cast<int>(creature->subrace()));
 }
 
 Variable duplicateHeadAppearance(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -2079,12 +2039,8 @@ Variable getPartyAIStyle(const vector<Variable> &args, const RoutineContext &ctx
 }
 
 Variable getNPCAIStyle(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto creature = getObjectAsCreature(args, 0, ctx);
-        return Variable::ofInt(static_cast<int>(creature->aiStyle()));
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(static_cast<int>(NPCAIStyle::DefaultAttack));
-    }
+    auto creature = getObjectAsCreature(args, 0, ctx);
+    return Variable::ofInt(static_cast<int>(creature->aiStyle()));
 }
 
 Variable setNPCAIStyle(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -2126,12 +2082,8 @@ Variable showPartySelectionGUI(const vector<Variable> &args, const RoutineContex
 }
 
 Variable getStandardFaction(const vector<Variable> &args, const RoutineContext &ctx) {
-    try {
-        auto object = getObjectAsCreature(args, 0, ctx);
-        return Variable::ofInt(static_cast<int>(object->faction()));
-    } catch (const ArgumentException &) {
-        return Variable::ofInt(static_cast<int>(Faction::Invalid));
-    }
+    auto object = getObjectAsCreature(args, 0, ctx);
+    return Variable::ofInt(static_cast<int>(object->faction()));
 }
 
 Variable givePlotXP(const vector<Variable> &args, const RoutineContext &ctx) {
