@@ -139,6 +139,7 @@ private:
     void drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong = false);
     void drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong = false);
     void drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
+    void drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
 
     void blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, int flags = BlitFlags::color);
 };

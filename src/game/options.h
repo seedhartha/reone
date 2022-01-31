@@ -33,8 +33,8 @@ struct Options {
     audio::AudioOptions audio;
 
     // Logging
-    LogLevel logLevel {LogChannels::general};
-    int logChannels {0};
+    LogLevel logLevel {LogLevel::Info};
+    int logChannels {LogChannels::general};
     bool logToFile {false};
 };
 

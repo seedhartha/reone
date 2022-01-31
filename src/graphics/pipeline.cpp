@@ -400,8 +400,15 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
 
         // END Transparent geometry
 
-        if (_options.fxaa) {
+        if (_options.fxaa && _options.sharpen) {
             drawFXAA(dim, *attachments.cbOutput, *attachments.fbPing);
+            drawSharpen(dim, *attachments.cbPing, *attachments.fbPong);
+            blitFramebuffer(dim, *attachments.fbPong, 0, *attachments.fbOutput, 0);
+        } else if (_options.fxaa) {
+            drawFXAA(dim, *attachments.cbOutput, *attachments.fbPing);
+            blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbOutput, 0);
+        } else if (_options.sharpen) {
+            drawSharpen(dim, *attachments.cbOutput, *attachments.fbPing);
             blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbOutput, 0);
         }
     });
@@ -638,6 +645,19 @@ void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer 
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(_shaders.fxaa(), true);
+    _textures.bind(srcTexture);
+    _graphicsContext.clearColorDepth();
+    _meshes.quadNDC().draw();
+}
+
+void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
+    uniforms.general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
+    _shaders.use(_shaders.sharpen(), true);
     _textures.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
