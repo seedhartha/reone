@@ -62,6 +62,7 @@ public:
     ShaderProgram &gaussianBlur13() const { return *_spGaussianBlur13; }
     ShaderProgram &medianFilter3() const { return *_spMedianFilter3; }
     ShaderProgram &medianFilter5() const { return *_spMedianFilter5; }
+    ShaderProgram &ssaoBlur() const { return *_spSSAOBlur; }
     ShaderProgram &fxaa() const { return *_spFXAA; }
     ShaderProgram &sharpen() const { return *_spSharpen; }
 
@@ -95,6 +96,7 @@ private:
     std::shared_ptr<ShaderProgram> _spGaussianBlur13;
     std::shared_ptr<ShaderProgram> _spMedianFilter3;
     std::shared_ptr<ShaderProgram> _spMedianFilter5;
+    std::shared_ptr<ShaderProgram> _spSSAOBlur;
     std::shared_ptr<ShaderProgram> _spFXAA;
     std::shared_ptr<ShaderProgram> _spSharpen;
 
