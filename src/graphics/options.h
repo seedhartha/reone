@@ -24,16 +24,17 @@ namespace reone {
 namespace graphics {
 
 struct GraphicsOptions {
-    int width {0};
-    int height {0};
+    int width {1024};
+    int height {768};
     bool fullscreen {false};
     bool vsync {true};
-    bool fxaa {false};
+    bool fxaa {true};
+    bool sharpen {true};
     bool grass {true};
-    bool ssr {false};
-    bool ssao {false};
-    TextureQuality textureQuality {0};
-    int shadowResolution {0};
+    bool ssr {true};
+    bool ssao {true};
+    TextureQuality textureQuality {TextureQuality::High};
+    int shadowResolution {2048};
     float drawDistance {kDefaultObjectDrawDistance};
 };
 

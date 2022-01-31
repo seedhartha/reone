@@ -66,6 +66,7 @@ void Shaders::init() {
     auto fsMedianFilter3 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter3});
     auto fsMedianFilter5 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter5});
     auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLuma, g_fsFXAA});
+    auto fsSharpen = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSharpen});
 
     // Shader Programs
     _spSimpleColor = initShaderProgram({vsClipSpace, fsColor});
@@ -89,6 +90,7 @@ void Shaders::init() {
     _spMedianFilter3 = initShaderProgram({vsObjectSpace, fsMedianFilter3});
     _spMedianFilter5 = initShaderProgram({vsObjectSpace, fsMedianFilter5});
     _spFXAA = initShaderProgram({vsObjectSpace, fsFXAA});
+    _spSharpen = initShaderProgram({vsObjectSpace, fsSharpen});
 
     // Uniform Buffers
     static GeneralUniforms defaultsGeneral;
@@ -138,6 +140,7 @@ void Shaders::deinit() {
     _spMedianFilter3.reset();
     _spMedianFilter5.reset();
     _spFXAA.reset();
+    _spSharpen.reset();
 
     // Uniform Buffers
     _ubGeneral.reset();

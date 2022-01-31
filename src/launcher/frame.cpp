@@ -148,6 +148,9 @@ LauncherFrame::LauncherFrame() :
     _checkBoxFXAA = new wxCheckBox(this, wxID_ANY, "Enable FXAA", wxDefaultPosition, wxDefaultSize);
     _checkBoxFXAA->SetValue(_config.fxaa);
 
+    _checkBoxSharpen = new wxCheckBox(this, wxID_ANY, "Enable Image Sharpening", wxDefaultPosition, wxDefaultSize);
+    _checkBoxSharpen->SetValue(_config.sharpen);
+
     _checkBoxGrass = new wxCheckBox(this, wxID_ANY, "Enable Grass", wxDefaultPosition, wxDefaultSize);
     _checkBoxGrass->SetValue(_config.grass);
 
@@ -165,6 +168,7 @@ LauncherFrame::LauncherFrame() :
     graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxVSync, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxFXAA, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(_checkBoxSharpen, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxGrass, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxSSR, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxSSAO, wxSizerFlags(0).Expand().Border(wxALL, 3));
@@ -275,6 +279,7 @@ void LauncherFrame::LoadConfiguration() {
         ("fullscreen", po::value<bool>()->default_value(_config.fullscreen)) //
         ("vsync", po::value<bool>()->default_value(_config.vsync))           //
         ("fxaa", po::value<bool>()->default_value(_config.fxaa))             //
+        ("sharpen", po::value<bool>()->default_value(_config.sharpen))             //
         ("grass", po::value<bool>()->default_value(_config.grass))           //
         ("ssr", po::value<bool>()->default_value(_config.ssr))               //
         ("ssao", po::value<bool>()->default_value(_config.ssao))             //
@@ -304,6 +309,7 @@ void LauncherFrame::LoadConfiguration() {
     _config.fullscreen = vars["fullscreen"].as<bool>();
     _config.vsync = vars["vsync"].as<bool>();
     _config.fxaa = vars["fxaa"].as<bool>();
+    _config.sharpen = vars["sharpen"].as<bool>();
     _config.grass = vars["grass"].as<bool>();
     _config.ssr = vars["ssr"].as<bool>();
     _config.ssao = vars["ssao"].as<bool>();
@@ -341,6 +347,7 @@ void LauncherFrame::SaveConfiguration() {
         "fullscreen=",
         "vsync=",
         "fxaa=",
+        "sharpen=",
         "grass=",
         "ssr=",
         "ssao=",
@@ -401,6 +408,7 @@ void LauncherFrame::SaveConfiguration() {
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
     _config.vsync = _checkBoxVSync->IsChecked();
     _config.fxaa = _checkBoxFXAA->IsChecked();
+    _config.sharpen = _checkBoxSharpen->IsChecked();
     _config.grass = _checkBoxGrass->IsChecked();
     _config.ssr = _checkBoxSSR->IsChecked();
     _config.ssao = _checkBoxSSAO->IsChecked();
@@ -439,6 +447,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
     config << "vsync=" << (_config.vsync ? 1 : 0) << endl;
     config << "fxaa=" << (_config.fxaa ? 1 : 0) << endl;
+    config << "sharpen=" << (_config.sharpen ? 1 : 0) << endl;
     config << "grass=" << (_config.grass ? 1 : 0) << endl;
     config << "ssr=" << (_config.ssr ? 1 : 0) << endl;
     config << "ssao=" << (_config.ssao ? 1 : 0) << endl;

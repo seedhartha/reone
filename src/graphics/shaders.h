@@ -63,6 +63,7 @@ public:
     ShaderProgram &medianFilter3() const { return *_spMedianFilter3; }
     ShaderProgram &medianFilter5() const { return *_spMedianFilter5; }
     ShaderProgram &fxaa() const { return *_spFXAA; }
+    ShaderProgram &sharpen() const { return *_spSharpen; }
 
 private:
     bool _inited {false};
@@ -95,6 +96,7 @@ private:
     std::shared_ptr<ShaderProgram> _spMedianFilter3;
     std::shared_ptr<ShaderProgram> _spMedianFilter5;
     std::shared_ptr<ShaderProgram> _spFXAA;
+    std::shared_ptr<ShaderProgram> _spSharpen;
 
     // END Shader Programs
 

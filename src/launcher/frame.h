@@ -46,11 +46,12 @@ private:
         bool fullscreen {false};
         bool vsync {false};
         bool fxaa {true};
+        bool sharpen {true};
         bool grass {true};
         bool ssr {true};
         bool ssao {true};
         int texQuality {0};
-        int shadowres {2};
+        int shadowres {1};
         int drawdist {64};
         int musicvol {85};
         int voicevol {85};
@@ -70,6 +71,7 @@ private:
     wxCheckBox *_checkBoxFullscreen;
     wxCheckBox *_checkBoxVSync;
     wxCheckBox *_checkBoxFXAA;
+    wxCheckBox *_checkBoxSharpen;
     wxCheckBox *_checkBoxGrass;
     wxCheckBox *_checkBoxSSR;
     wxCheckBox *_checkBoxSSAO;
