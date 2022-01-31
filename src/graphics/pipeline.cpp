@@ -629,7 +629,6 @@ void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Fram
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
-    uniforms.general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(strong ? _shaders.medianFilter5() : _shaders.medianFilter3(), true);
