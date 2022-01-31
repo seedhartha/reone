@@ -370,7 +370,7 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
 
         if (_options.ssao) {
             drawSSAO(scene, dim, attachments);
-            drawMedianFilter(dim, *attachments.cbSSAO, *attachments.fbPing);
+            drawSSAOBlur(dim, *attachments.cbSSAO, *attachments.fbPing);
             blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbSSAO, 0);
         }
 
@@ -633,6 +633,18 @@ void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Fram
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(strong ? _shaders.medianFilter5() : _shaders.medianFilter3(), true);
+    _textures.bind(srcTexture);
+    _graphicsContext.clearColorDepth();
+    _meshes.quadNDC().draw();
+}
+
+void Pipeline::drawSSAOBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
+    _shaders.use(_shaders.ssaoBlur(), true);
     _textures.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();

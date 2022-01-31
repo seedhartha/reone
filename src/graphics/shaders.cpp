@@ -65,6 +65,7 @@ void Shaders::init() {
     auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur13});
     auto fsMedianFilter3 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter3});
     auto fsMedianFilter5 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter5});
+    auto fsSSAOBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSAOBlur});
     auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLuma, g_fsFXAA});
     auto fsSharpen = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSharpen});
 
@@ -89,6 +90,7 @@ void Shaders::init() {
     _spGaussianBlur13 = initShaderProgram({vsObjectSpace, fsGaussianBlur13});
     _spMedianFilter3 = initShaderProgram({vsObjectSpace, fsMedianFilter3});
     _spMedianFilter5 = initShaderProgram({vsObjectSpace, fsMedianFilter5});
+    _spSSAOBlur = initShaderProgram({vsObjectSpace, fsSSAOBlur});
     _spFXAA = initShaderProgram({vsObjectSpace, fsFXAA});
     _spSharpen = initShaderProgram({vsObjectSpace, fsSharpen});
 
@@ -139,6 +141,7 @@ void Shaders::deinit() {
     _spGaussianBlur13.reset();
     _spMedianFilter3.reset();
     _spMedianFilter5.reset();
+    _spSSAOBlur.reset();
     _spFXAA.reset();
     _spSharpen.reset();
 
