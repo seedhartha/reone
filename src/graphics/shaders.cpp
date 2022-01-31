@@ -57,7 +57,7 @@ void Shaders::init() {
     auto fsBillboard = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBillboard});
     auto fsParticle = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslParticleUniforms, g_glslOIT, g_glslLuma, g_fsParticle});
     auto fsGrass = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslGrassUniforms, g_glslHash, g_glslHashedAlphaTest, g_fsGrass});
-    auto fsSSAO = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslSSAOUniforms, g_glslHash, g_fsSSAO});
+    auto fsSSAO = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslSSAOUniforms, g_fsSSAO});
     auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSR});
     auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslMath, g_glslBRDF, g_glslLighting, g_glslLuma, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
     auto fsCombineOIT = initShader(ShaderType::Fragment, {g_glslHeader, g_fsCombineOIT});
@@ -191,6 +191,7 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->setUniform("sHilights", TextureUnits::hilights);
     program->setUniform("sOITAccum", TextureUnits::oitAccum);
     program->setUniform("sOITRevealage", TextureUnits::oitRevealage);
+    program->setUniform("sNoise", TextureUnits::noise);
     program->setUniform("sEnvironmentMapCube", TextureUnits::environmentMapCube);
     program->setUniform("sShadowMapCube", TextureUnits::shadowMapCube);
     program->setUniform("sShadowMap", TextureUnits::shadowMapArray);

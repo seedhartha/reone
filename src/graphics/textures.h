@@ -67,7 +67,8 @@ private:
     std::shared_ptr<Texture> _defaultArrayDepth;
     std::shared_ptr<Texture> _defaultCubemapRGB;
     std::shared_ptr<Texture> _defaultCubemapDepth;
-
+    
+    std::shared_ptr<Texture> _noiseRG;
     std::shared_ptr<Texture> _ssaoRGB;
     std::shared_ptr<Texture> _ssrRGBA;
 

@@ -57,6 +57,17 @@ void Textures::init() {
     _defaultArrayDepth->clear(1, 1, PixelFormat::Depth32F, kNumShadowCascades);
     _defaultArrayDepth->init();
 
+    auto noisePixels = make_shared<ByteArray>();
+    noisePixels->resize(4 * 4 * 2 * sizeof(float));
+    for (int i = 0; i < 4 * 4 * 2; ++i) {
+        float *pixel = reinterpret_cast<float *>(&(*noisePixels)[4 * i]);
+        *pixel = random(-1.0f, 1.0f);
+    }
+    auto noiseLayer = Texture::Layer {move(noisePixels)};
+    _noiseRG = make_shared<Texture>("noise_rg", getTextureProperties(TextureUsage::Noise));
+    _noiseRG->setPixels(4, 4, PixelFormat::RG16F, move(noiseLayer));
+    _noiseRG->init();
+
     auto ssaoPixels = make_shared<ByteArray>();
     ssaoPixels->resize(3);
     (*ssaoPixels)[0] = 0xff;
@@ -74,7 +85,7 @@ void Textures::init() {
     (*ssrPixels)[2] = 0;
     (*ssrPixels)[3] = 0;
     auto ssrLayer = Texture::Layer {move(ssrPixels)};
-    _ssrRGBA = make_shared<Texture>("ssr_rgb", getTextureProperties(TextureUsage::Default));
+    _ssrRGBA = make_shared<Texture>("ssr_rgba", getTextureProperties(TextureUsage::Default));
     _ssrRGBA->setPixels(1, 1, PixelFormat::RGBA8, move(ssrLayer));
     _ssrRGBA->init();
 
@@ -103,14 +114,16 @@ void Textures::bindBuiltIn() {
     bind(*_default2DRGB, TextureUnits::features);
     bind(*_default2DRGB, TextureUnits::eyePos);
     bind(*_default2DRGB, TextureUnits::eyeNormal);
-    bind(*_ssaoRGB, TextureUnits::ssao);
-    bind(*_ssrRGBA, TextureUnits::ssr);
     bind(*_default2DRGB, TextureUnits::hilights);
     bind(*_default2DRGB, TextureUnits::oitAccum);
     bind(*_default2DRGB, TextureUnits::oitRevealage);
     bind(*_defaultCubemapRGB, TextureUnits::environmentMapCube);
     bind(*_defaultCubemapDepth, TextureUnits::shadowMapCube);
     bind(*_defaultArrayDepth, TextureUnits::shadowMapArray);
+
+    bind(*_noiseRG, TextureUnits::noise);
+    bind(*_ssaoRGB, TextureUnits::ssao);
+    bind(*_ssrRGBA, TextureUnits::ssr);
 }
 
 shared_ptr<Texture> Textures::get(const string &resRef, TextureUsage usage) {
