@@ -370,12 +370,14 @@ void main() {
 )END";
 
 const std::string g_fsSSAO = R"END(
+const float NOISE_SCALE = 1.0 / 4.0;
 const float MAX_DISTANCE = 500.0;
 const float SAMPLE_RADIUS = 0.5;
 const float BIAS = 0.05;
 
 uniform sampler2D sEyePos;
 uniform sampler2D sEyeNormal;
+uniform sampler2D sNoise;
 
 noperspective in vec2 fragUV1;
 
@@ -386,7 +388,7 @@ void main() {
     vec3 posM = texture(sEyePos, uvM).rgb;
 
     vec3 normal = texture(sEyeNormal, uvM).rgb;
-    vec3 randomVec = vec3(hash(uvM.xy) * 2.0 - 1.0, hash(uvM.yx) * 2.0 - 1.0, 0.0);
+    vec3 randomVec = vec3(texture(sNoise, uvM * uScreenResolution * NOISE_SCALE).rg, 0.0);
     vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
     vec3 bitangent = cross(normal, tangent);
     mat3 TBN = mat3(tangent, bitangent, normal);
