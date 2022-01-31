@@ -38,6 +38,10 @@ set(GRAPHICS_HEADERS
     format/tpcreader.h
     format/txireader.h
     framebuffer.h
+    glsl/common.h
+    glsl/fragment.h
+    glsl/geometry.h
+    glsl/vertex.h
     lipanimation.h
     lipanimations.h
     lumautil.h
