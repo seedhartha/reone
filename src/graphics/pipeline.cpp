@@ -395,7 +395,7 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
 
         blitFramebuffer(dim, *attachments.fbGBuffer, 0, *attachments.fbTransparentGeometry, 0, BlitFlags::depth);
         drawTransparentGeometry(scene, attachments);
-        drawCombineOIT(attachments, *attachments.fbOutput);
+        drawCombineGeometry(attachments, *attachments.fbOutput);
         drawLensFlares(scene, *attachments.fbOutput);
 
         // END Transparent geometry
@@ -591,13 +591,13 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::drawCombineOIT(Attachments &attachments, Framebuffer &dst) {
+void Pipeline::drawCombineGeometry(Attachments &attachments, Framebuffer &dst) {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(_shaders.combineOIT(), true);
+    _shaders.use(_shaders.combineGeometry(), true);
     _textures.bind(*attachments.cbOpaqueGeometry1);
     _textures.bind(*attachments.cbOpaqueGeometry2, TextureUnits::hilights);
     _textures.bind(*attachments.cbTransparentGeometry1, TextureUnits::oitAccum);
