@@ -28,7 +28,7 @@ class GraphicsModule;
 class SceneModule : boost::noncopyable {
 public:
     SceneModule(graphics::GraphicsOptions &options, AudioModule &audio, GraphicsModule &graphics) :
-        _options(std::move(options)),
+        _options(options),
         _audio(audio),
         _graphics(graphics) {
     }

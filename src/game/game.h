@@ -54,7 +54,7 @@ public:
         Options &options,
         Services &services) :
         _path(std::move(path)),
-        _options(std::move(options)),
+        _options(options),
         _services(services),
         _party(*this),
         _combat(*this, services),
