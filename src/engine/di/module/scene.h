@@ -27,7 +27,7 @@ class GraphicsModule;
 
 class SceneModule : boost::noncopyable {
 public:
-    SceneModule(graphics::GraphicsOptions options, AudioModule &audio, GraphicsModule &graphics) :
+    SceneModule(graphics::GraphicsOptions &options, AudioModule &audio, GraphicsModule &graphics) :
         _options(std::move(options)),
         _audio(audio),
         _graphics(graphics) {
@@ -41,7 +41,7 @@ public:
     scene::SceneGraphs &sceneGraphs() { return *_sceneGraphs; }
 
 private:
-    graphics::GraphicsOptions _options;
+    graphics::GraphicsOptions &_options;
     AudioModule &_audio;
     GraphicsModule &_graphics;
 

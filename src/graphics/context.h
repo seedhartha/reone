@@ -26,8 +26,8 @@ namespace graphics {
 
 class GraphicsContext : boost::noncopyable {
 public:
-    GraphicsContext(GraphicsOptions options) :
-        _options(std::move(options)) {
+    GraphicsContext(GraphicsOptions &options) :
+        _options(options) {
     }
 
     void init();
@@ -43,7 +43,7 @@ public:
     void withScissorTest(const glm::ivec4 &bounds, const std::function<void()> &block);
 
 private:
-    GraphicsOptions _options;
+    GraphicsOptions &_options;
 
     bool _inited {false};
 

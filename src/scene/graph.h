@@ -60,14 +60,14 @@ class SceneGraph : public graphics::IScene, boost::noncopyable {
 public:
     SceneGraph(
         std::string name,
-        graphics::GraphicsOptions options,
+        graphics::GraphicsOptions &options,
         audio::AudioPlayer &audioPlayer,
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
         graphics::Textures &textures) :
         _name(std::move(name)),
-        _options(std::move(options)),
+        _options(options),
         _audioPlayer(audioPlayer),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
@@ -187,7 +187,7 @@ public:
 
 private:
     std::string _name;
-    graphics::GraphicsOptions _options;
+    graphics::GraphicsOptions &_options;
 
     bool _updateRoots {true};
     bool _drawWalkmeshes {false};

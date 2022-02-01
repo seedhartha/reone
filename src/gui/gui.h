@@ -74,7 +74,7 @@ protected:
         Stretch
     };
 
-    graphics::GraphicsOptions _options;
+    graphics::GraphicsOptions &_options;
 
     std::string _resRef;
     int _resolutionX {kDefaultResolutionX};
@@ -112,7 +112,7 @@ protected:
     // END Services
 
     GUI(
-        graphics::GraphicsOptions options,
+        graphics::GraphicsOptions &options,
         scene::SceneGraphs &sceneGraphs,
         graphics::Fonts &fonts,
         graphics::GraphicsContext &graphicsContext,

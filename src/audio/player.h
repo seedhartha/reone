@@ -30,8 +30,8 @@ class AudioStream;
 
 class AudioPlayer : boost::noncopyable {
 public:
-    AudioPlayer(AudioOptions options, AudioFiles &audioFiles) :
-        _options(std::move(options)),
+    AudioPlayer(AudioOptions &options, AudioFiles &audioFiles) :
+        _options(options),
         _audioFiles(audioFiles) {
     }
 
@@ -39,7 +39,7 @@ public:
     std::shared_ptr<AudioSource> play(std::shared_ptr<AudioStream> stream, AudioType type, bool loop = false, float gain = 1.0f, bool positional = false, glm::vec3 position = glm::vec3(0.0f));
 
 private:
-    AudioOptions _options;
+    AudioOptions &_options;
     AudioFiles &_audioFiles;
 
     float getGain(AudioType type, float gain) const;

@@ -31,9 +31,9 @@ namespace reone {
 
 class IocContainer {
 public:
-    IocContainer(game::GameID gameId, game::Options gameOptions) :
+    IocContainer(game::GameID gameId, game::Options &gameOptions) :
         _gameId(gameId),
-        _gameOptions(std::move(gameOptions)) {
+        _gameOptions(gameOptions) {
     }
 
     ~IocContainer() { deinit(); }
@@ -45,7 +45,7 @@ public:
 
 private:
     game::GameID _gameId;
-    game::Options _gameOptions;
+    game::Options &_gameOptions;
 
     std::unique_ptr<ResourceModule> _resource;
     std::unique_ptr<GraphicsModule> _graphics;

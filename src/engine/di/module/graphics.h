@@ -35,8 +35,8 @@ class ResourceModule;
 
 class GraphicsModule : boost::noncopyable {
 public:
-    GraphicsModule(graphics::GraphicsOptions options, ResourceModule &resource) :
-        _options(std::move(options)),
+    GraphicsModule(graphics::GraphicsOptions &options, ResourceModule &resource) :
+        _options(options),
         _resource(resource) {
     }
 
@@ -57,7 +57,7 @@ public:
     graphics::Window &window() { return *_window; }
 
 private:
-    graphics::GraphicsOptions _options;
+    graphics::GraphicsOptions &_options;
     ResourceModule &_resource;
 
     std::unique_ptr<graphics::Fonts> _fonts;

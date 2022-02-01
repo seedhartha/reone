@@ -578,12 +578,8 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
     _textures.bind(*attachments.cbGBufferFeatures, TextureUnits::features);
     _textures.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
     _textures.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
-    if (_options.ssao) {
-        _textures.bind(*attachments.cbSSAO, TextureUnits::ssao);
-    }
-    if (_options.ssr) {
-        _textures.bind(*attachments.cbSSR, TextureUnits::ssr);
-    }
+    _textures.bind(_options.ssao ? *attachments.cbSSAO : *_textures.ssaoRGB(), TextureUnits::ssao);
+    _textures.bind(_options.ssr ? *attachments.cbSSR : *_textures.ssrRGBA(), TextureUnits::ssr);
     if (scene.hasShadowLight()) {
         if (scene.isShadowLightDirectional()) {
             _textures.bind(*attachments.dbDirectionalLightShadows, TextureUnits::shadowMapArray);

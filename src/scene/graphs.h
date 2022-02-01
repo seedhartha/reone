@@ -43,13 +43,13 @@ namespace scene {
 class SceneGraphs {
 public:
     SceneGraphs(
-        graphics::GraphicsOptions options,
+        graphics::GraphicsOptions &options,
         audio::AudioPlayer &audioPlayer,
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
         graphics::Textures &textures) :
-        _options(std::move(options)),
+        _options(options),
         _audioPlayer(audioPlayer),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
@@ -64,7 +64,7 @@ public:
     const std::unordered_map<std::string, std::unique_ptr<SceneGraph>> &scenes() const { return _scenes; }
 
 private:
-    graphics::GraphicsOptions _options;
+    graphics::GraphicsOptions &_options;
 
     std::unordered_map<std::string, std::unique_ptr<SceneGraph>> _scenes;
 
