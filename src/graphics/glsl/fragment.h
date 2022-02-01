@@ -410,7 +410,7 @@ void main() {
 const std::string g_fsSSR = R"END(
 const float MAX_DISTANCE = 100.0;
 
-const float EDGE_FADE_START = 0.75;
+const float EDGE_FADE_START = 0.8;
 
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
@@ -427,10 +427,12 @@ float distanceSquared(vec2 a, vec2 b) {
     return dot(a, a);
 }
 
-void swap(inout float a, inout float b) {
-    float tmp = a;
-    a = b;
-    b = tmp;
+void swapIfGreater(inout float a, inout float b) {
+    if (a > b) {
+        float t = a;
+        a = b;
+        b = t;
+    }
 }
 
 bool traceScreenSpaceRay(
@@ -439,22 +441,23 @@ bool traceScreenSpaceRay(
     float jitter,
     out vec2 hitUV,
     out vec3 hitPoint,
-    out float stepCount) {
+    out float numSteps) {
 
     hitUV = vec2(0.0);
     hitPoint = vec3(0.0);
-    stepCount = 0.0;
+    numSteps = 0.0;
 
-    float rayLength = ((rayOrigin.z + rayDir.z * MAX_DISTANCE) > -uClipNear) ? (-uClipNear - rayOrigin.z) / rayDir.z : MAX_DISTANCE;
+    float rayLength = ((rayOrigin.z + rayDir.z * MAX_DISTANCE) > -uClipNear) ? ((-uClipNear - rayOrigin.z) / rayDir.z) : MAX_DISTANCE;
     vec3 rayEnd = rayOrigin + rayDir * rayLength;
 
     vec4 H0 = uScreenProjection * vec4(rayOrigin, 1.0);
-    vec4 H1 = uScreenProjection * vec4(rayEnd, 1.0);
     float k0 = 1.0 / H0.w;
-    float k1 = 1.0 / H1.w;
     vec3 Q0 = rayOrigin * k0;
-    vec3 Q1 = rayEnd * k1;
     vec2 P0 = H0.xy * k0;
+
+    vec4 H1 = uScreenProjection * vec4(rayEnd, 1.0);
+    float k1 = 1.0 / H1.w;
+    vec3 Q1 = rayEnd * k1;
     vec2 P1 = H1.xy * k1;
 
     P1 += vec2((distanceSquared(P0, P1) < 0.0001) ? 0.01 : 0.0);
@@ -475,49 +478,45 @@ bool traceScreenSpaceRay(
     float dk = (k1 - k0) * invdx;
     vec2 dP = vec2(stepDir, delta.y * invdx);
 
-    dP *= uSSRPixelStride;
-    dQ *= uSSRPixelStride;
-    dk *= uSSRPixelStride;
+    float stride = uSSRPixelStride;
+    dP *= stride;
+    dQ *= stride;
+    dk *= stride;
 
-    P0 += dP * jitter + dP;
-    Q0 += dQ * jitter + dQ;
-    k0 += dk * jitter + dk;
+    P0 += (1.0 + jitter) * dP;
+    Q0 += (1.0 + jitter) * dQ;
+    k0 += (1.0 + jitter) * dk;
 
-    float prevZMaxEstimate = rayOrigin.z;
-
+    vec2 P = P0;
     vec3 Q = Q0;
     float k = k0;
+
     float end = P1.x * stepDir;
-    bool intersect = false;
+    float prevZMax = rayOrigin.z;
 
-    for (vec2 P = P0;
-         P.x * stepDir <= end && stepCount < uSSRMaxSteps;
-         P += dP, Q.z += dQ.z, k += dk, stepCount += 1.0) {
+    for (float i = 0.0; i < uSSRMaxSteps && P.x * stepDir <= end; i += 1.0) {
+        vec2 sceneUV = permute ? P.yx : P;
+        sceneUV *= uScreenResolutionRcp.xy;
 
-        hitUV = permute ? P.yx : P;
-        hitUV *= uScreenResolutionRcp.xy;
-        if (any(greaterThan(abs(hitUV - vec2(0.5)), vec2(0.5)))) {
-            break;
-        }
-
-        float rayZMin = prevZMaxEstimate;
+        float rayZMin = prevZMax;
         float rayZMax = (dQ.z * 0.5 + Q.z) / (dk * 0.5 + k);
-        prevZMaxEstimate = rayZMax;
-        if (rayZMin > rayZMax) {
-            swap(rayZMin, rayZMax);
+        prevZMax = rayZMax;
+        swapIfGreater(rayZMin, rayZMax);
+
+        float sceneZ = texture(sEyePos, sceneUV).z;
+        if (rayZMin <= sceneZ && rayZMax >= sceneZ - uSSRBias) {
+            hitUV = sceneUV;
+            hitPoint = Q * (1.0 / k);
+            numSteps = i;
+            return true;
         }
 
-        float sceneZMax = texture(sEyePos, hitUV).z;
-        float sceneZMin = sceneZMax - uSSRBias;
-        if (rayZMax >= sceneZMin && rayZMin <= sceneZMax) {
-            intersect = true;
-            break;
-        }
+        P += dP;
+        Q += dQ;
+        k += dk;
     }
 
-    Q.xy += dQ.xy * stepCount;
-    hitPoint = Q * (1.0 / k);
-    return intersect;
+    return false;
 }
 
 void main() {
@@ -540,8 +539,8 @@ void main() {
     float jitter = float((c.x + c.y) & 1) * 0.5;
     vec2 hitUV;
     vec3 hitPoint;
-    float stepCount;
-    if (traceScreenSpaceRay(fragPosVS, R, jitter, hitUV, hitPoint, stepCount)) {
+    float numSteps;
+    if (traceScreenSpaceRay(fragPosVS, R, jitter, hitUV, hitPoint, numSteps)) {
         vec2 hitNDC = hitUV * 2.0 - 1.0;
         float maxDim = min(1.0, max(abs(hitNDC.x), abs(hitNDC.y)));
 
@@ -552,7 +551,7 @@ void main() {
         reflectionColor = mix(hitMainTexSample.rgb, hitMainTexSample.rgb * hitLightmapSample.rgb, hitLightmapSample.a);
         reflectionColor += hitEnvmapSample.rgb * (1.0 - hitMainTexSample.a);
         reflectionStrength = 1.0 - clamp(R.z, 0.0, 1.0);
-        reflectionStrength *= 1.0 - stepCount / uSSRMaxSteps;
+        reflectionStrength *= 1.0 - numSteps / uSSRMaxSteps;
         reflectionStrength *= 1.0 - clamp(distance(fragPosVS, hitPoint) / MAX_DISTANCE, 0.0, 1.0);
         reflectionStrength *= 1.0 - max(0.0, (maxDim - EDGE_FADE_START) / (1.0 - EDGE_FADE_START));
     }
@@ -632,20 +631,17 @@ void main() {
     vec3 directD, directS, directAreaD, directAreaS;
     getIrradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, directD, directS, directAreaD, directAreaS);
 
-    vec3 colorDynamic = (ambientD * ao + directD * (1.0 - shadowLM)) * albedo;
+    vec3 colorDynamic = clamp(ambientD * ao + directD * (1.0 - shadowLM) + emission, 0.0, 1.0) * albedo;
     colorDynamic += ambientS * ao + directS * (1.0 - shadowLM);
 
-    vec3 colorLightmapped = (lightmapSample.rgb * (ao * 0.5 + 0.5) * (1.0 - 0.5 * shadow) + directAreaD * (1.0 - shadow)) * albedo;
+    vec3 colorLightmapped = clamp(lightmapSample.rgb * (ao * 0.5 + 0.5) * (1.0 - 0.5 * shadow) + directAreaD * (1.0 - shadow) + emission, 0.0, 1.0) * albedo;
     colorLightmapped += ambientS * ao + directAreaS * (1.0 - shadow);
 
-    vec3 colorSelfIllumed = emission * albedo;
-
     vec3 color = mix(colorDynamic, colorLightmapped, LIGHTMAP_STRENGTH * lightmapped);
-    color = mix(color, colorSelfIllumed, selfIllumed);
     color = mix(color, uFogColor.rgb, fog);
 
     float alpha = step(0.0001, mainTexSample.a);
-    vec3 hilights = mix(color - vec3(1.0), smoothstep(SELFILLUM_THRESHOLD, 1.0, colorSelfIllumed), selfIllumed);
+    vec3 hilights = smoothstep(SELFILLUM_THRESHOLD, 1.0, emission * albedo * mainTexSample.a);
 
     fragColor1 = vec4(color, alpha);
     fragColor2 = vec4(hilights, 0.0);
