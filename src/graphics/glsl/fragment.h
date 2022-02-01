@@ -613,7 +613,7 @@ void main() {
 
     float envmapped = step(0.0001, envmapSample.a);
     float lightmapped = step(0.0001, lightmapSample.a);
-    float selfIllumed = step(0.0001, selfIllumSample.a);
+    float selfIllumed = step(1.0, selfIllumSample.a);
 
     float shadow = mix(0.0, getShadow(eyePos, worldPos, worldNormal), featuresSample.r);
     float fog = mix(0.0, getFog(worldPos), featuresSample.g);
@@ -635,10 +635,10 @@ void main() {
     vec3 directD, directS, directAreaD, directAreaS;
     getIrradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, directD, directS, directAreaD, directAreaS);
 
-    vec3 colorDynamic = (ambientD * ao + directD * (1.0 - shadowLM)) * albedo;
-    colorDynamic += ambientS * ao + directS * (1.0 - shadowLM) * (1.0 - selfIllumed);
+    vec3 colorDynamic = (ambientD * ao + directD * (1.0 - shadowLM) + emission) * albedo;
+    colorDynamic += ambientS * ao + directS * (1.0 - shadowLM);
 
-    vec3 colorLightmapped = (lightmapSample.rgb * (ao * 0.5 + 0.5) * (1.0 - 0.5 * shadow) + directAreaD * (1.0 - shadow)) * albedo;
+    vec3 colorLightmapped = (lightmapSample.rgb * (ao * 0.5 + 0.5) * (1.0 - 0.5 * shadow) + directAreaD * (1.0 - shadow) + emission) * albedo;
     colorLightmapped += ambientS * ao + directAreaS * (1.0 - shadow);
 
     vec3 colorSelfIllumed = emission * albedo;
@@ -648,7 +648,7 @@ void main() {
     color = mix(color, uFogColor.rgb, fog);
 
     float alpha = step(0.0001, mainTexSample.a);
-    vec3 hilights = mix(color - vec3(1.0), colorSelfIllumed - vec3(SELFILLUM_THRESHOLD), selfIllumed);
+    vec3 hilights = mix(color - vec3(1.0), smoothstep(SELFILLUM_THRESHOLD, 1.0, colorSelfIllumed), selfIllumed);
 
     fragColor1 = vec4(color, alpha);
     fragColor2 = vec4(hilights, 0.0);
