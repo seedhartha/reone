@@ -372,7 +372,7 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
         _graphicsContext.withViewport(glm::ivec4(0, 0, halfDim.x, halfDim.y), [this, &scene, &halfDim, &attachments]() {
             if (_options.ssao) {
                 drawSSAO(scene, halfDim, attachments, 0.5f, 0.1f);
-                drawSSAOBlur(halfDim, *attachments.cbSSAO, *attachments.fbPingHalf);
+                drawBoxBlur(halfDim, *attachments.cbSSAO, *attachments.fbPingHalf);
                 blitFramebuffer(halfDim, *attachments.fbPingHalf, 0, *attachments.fbSSAO, 0);
             }
             if (_options.ssr) {
@@ -611,6 +611,18 @@ void Pipeline::drawCombineGeometry(Attachments &attachments, Framebuffer &dst) {
     _meshes.quadNDC().draw();
 }
 
+void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
+    auto &uniforms = _shaders.uniforms();
+    uniforms.general.resetGlobals();
+    uniforms.general.resetLocals();
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
+    _shaders.use(_shaders.boxBlur4(), true);
+    _textures.bind(srcTexture);
+    _graphicsContext.clearColorDepth();
+    _meshes.quadNDC().draw();
+}
+
 void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong) {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
@@ -632,18 +644,6 @@ void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Fram
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(strong ? _shaders.medianFilter5() : _shaders.medianFilter3(), true);
-    _textures.bind(srcTexture);
-    _graphicsContext.clearColorDepth();
-    _meshes.quadNDC().draw();
-}
-
-void Pipeline::drawSSAOBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(_shaders.ssaoBlur(), true);
     _textures.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();

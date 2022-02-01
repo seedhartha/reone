@@ -136,9 +136,9 @@ private:
     void drawCombineOpaque(IScene &scene, Attachments &attachments, Framebuffer &dst);
     void drawCombineGeometry(Attachments &attachments, Framebuffer &dst);
 
+    void drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
     void drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong = false);
     void drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong = false);
-    void drawSSAOBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
     void drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
     void drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount);
 

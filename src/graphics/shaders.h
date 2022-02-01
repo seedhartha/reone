@@ -57,12 +57,12 @@ public:
     ShaderProgram &ssr() const { return *_spSSR; }
     ShaderProgram &combineOpaque() const { return *_spCombineOpaque; }
     ShaderProgram &combineGeometry() const { return *_spCombineGeometry; }
-
+    
+    ShaderProgram &boxBlur4() const { return *_spBoxBlur4; }
     ShaderProgram &gaussianBlur9() const { return *_spGaussianBlur9; }
     ShaderProgram &gaussianBlur13() const { return *_spGaussianBlur13; }
     ShaderProgram &medianFilter3() const { return *_spMedianFilter3; }
     ShaderProgram &medianFilter5() const { return *_spMedianFilter5; }
-    ShaderProgram &ssaoBlur() const { return *_spSSAOBlur; }
     ShaderProgram &fxaa() const { return *_spFXAA; }
     ShaderProgram &sharpen() const { return *_spSharpen; }
 
@@ -91,12 +91,12 @@ private:
     std::shared_ptr<ShaderProgram> _spSSR;
     std::shared_ptr<ShaderProgram> _spCombineOpaque;
     std::shared_ptr<ShaderProgram> _spCombineGeometry;
-
+    
+    std::shared_ptr<ShaderProgram> _spBoxBlur4;
     std::shared_ptr<ShaderProgram> _spGaussianBlur9;
     std::shared_ptr<ShaderProgram> _spGaussianBlur13;
     std::shared_ptr<ShaderProgram> _spMedianFilter3;
     std::shared_ptr<ShaderProgram> _spMedianFilter5;
-    std::shared_ptr<ShaderProgram> _spSSAOBlur;
     std::shared_ptr<ShaderProgram> _spFXAA;
     std::shared_ptr<ShaderProgram> _spSharpen;
 

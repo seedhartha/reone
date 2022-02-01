@@ -61,11 +61,11 @@ void Shaders::init() {
     auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSR});
     auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslMath, g_glslBRDF, g_glslLighting, g_glslLuma, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
     auto fsCombineGeometry = initShader(ShaderType::Fragment, {g_glslHeader, g_fsCombineGeometry});
+    auto fsBoxBlur4 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsBoxBlur4});
     auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur9});
     auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur13});
     auto fsMedianFilter3 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter3});
     auto fsMedianFilter5 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter5});
-    auto fsSSAOBlur = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSAOBlur});
     auto fsFXAA = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLuma, g_fsFXAA});
     auto fsSharpen = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSharpen});
 
@@ -86,11 +86,11 @@ void Shaders::init() {
     _spSSR = initShaderProgram({vsObjectSpace, fsSSR});
     _spCombineOpaque = initShaderProgram({vsObjectSpace, fsCombineOpaque});
     _spCombineGeometry = initShaderProgram({vsObjectSpace, fsCombineGeometry});
+    _spBoxBlur4 = initShaderProgram({vsObjectSpace, fsBoxBlur4});
     _spGaussianBlur9 = initShaderProgram({vsObjectSpace, fsGaussianBlur9});
     _spGaussianBlur13 = initShaderProgram({vsObjectSpace, fsGaussianBlur13});
     _spMedianFilter3 = initShaderProgram({vsObjectSpace, fsMedianFilter3});
     _spMedianFilter5 = initShaderProgram({vsObjectSpace, fsMedianFilter5});
-    _spSSAOBlur = initShaderProgram({vsObjectSpace, fsSSAOBlur});
     _spFXAA = initShaderProgram({vsObjectSpace, fsFXAA});
     _spSharpen = initShaderProgram({vsObjectSpace, fsSharpen});
 
@@ -137,11 +137,11 @@ void Shaders::deinit() {
     _spSSR.reset();
     _spCombineOpaque.reset();
     _spCombineGeometry.reset();
+    _spBoxBlur4.reset();
     _spGaussianBlur9.reset();
     _spGaussianBlur13.reset();
     _spMedianFilter3.reset();
     _spMedianFilter5.reset();
-    _spSSAOBlur.reset();
     _spFXAA.reset();
     _spSharpen.reset();
 
