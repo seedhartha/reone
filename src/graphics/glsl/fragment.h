@@ -679,6 +679,40 @@ void main() {
 }
 )END";
 
+const std::string g_fsBoxBlur4 = R"END(
+uniform sampler2D sMainTex;
+
+noperspective in vec2 fragUV1;
+
+out vec4 fragColor;
+
+void main() {
+    vec3 color = vec3(0.0);
+
+    color += textureOffset(sMainTex, fragUV1, ivec2(-2, -2)).rgb;
+    color += textureOffset(sMainTex, fragUV1, ivec2(-2, -1)).rgb;
+    color += textureOffset(sMainTex, fragUV1, ivec2(-2, 0)).rgb;
+    color += textureOffset(sMainTex, fragUV1, ivec2(-2, 1)).rgb;
+
+    color += textureOffset(sMainTex, fragUV1, ivec2(-1, -2)).rgb;
+    color += textureOffset(sMainTex, fragUV1, ivec2(-1, -1)).rgb;
+    color += textureOffset(sMainTex, fragUV1, ivec2(-1, 0)).rgb;
+    color += textureOffset(sMainTex, fragUV1, ivec2(-1, 1)).rgb;
+
+    color += textureOffset(sMainTex, fragUV1, ivec2(0, -2)).rgb;
+    color += textureOffset(sMainTex, fragUV1, ivec2(0, -1)).rgb;
+    color += textureOffset(sMainTex, fragUV1, ivec2(0, 0)).rgb;
+    color += textureOffset(sMainTex, fragUV1, ivec2(0, 1)).rgb;
+
+    color += textureOffset(sMainTex, fragUV1, ivec2(1, -2)).rgb;
+    color += textureOffset(sMainTex, fragUV1, ivec2(1, -1)).rgb;
+    color += textureOffset(sMainTex, fragUV1, ivec2(1, 0)).rgb;
+    color += textureOffset(sMainTex, fragUV1, ivec2(1, 1)).rgb;
+
+    fragColor = vec4(color * (1.0 / 16.0), 1.0);
+}
+)END";
+
 const std::string g_fsGaussianBlur9 = R"END(
 uniform sampler2D sMainTex;
 
@@ -837,40 +871,6 @@ void main() {
     t24(10, 18, 12, 20, 10, 20, 10, 12);
 
     fragColor = v[12];
-}
-)END";
-
-const std::string g_fsSSAOBlur = R"END(
-uniform sampler2D sMainTex;
-
-noperspective in vec2 fragUV1;
-
-out vec4 fragColor;
-
-void main() {
-    vec3 color = vec3(0.0);
-
-    color += textureOffset(sMainTex, fragUV1, ivec2(-2, -2)).rgb;
-    color += textureOffset(sMainTex, fragUV1, ivec2(-2, -1)).rgb;
-    color += textureOffset(sMainTex, fragUV1, ivec2(-2, 0)).rgb;
-    color += textureOffset(sMainTex, fragUV1, ivec2(-2, 1)).rgb;
-
-    color += textureOffset(sMainTex, fragUV1, ivec2(-1, -2)).rgb;
-    color += textureOffset(sMainTex, fragUV1, ivec2(-1, -1)).rgb;
-    color += textureOffset(sMainTex, fragUV1, ivec2(-1, 0)).rgb;
-    color += textureOffset(sMainTex, fragUV1, ivec2(-1, 1)).rgb;
-
-    color += textureOffset(sMainTex, fragUV1, ivec2(0, -2)).rgb;
-    color += textureOffset(sMainTex, fragUV1, ivec2(0, -1)).rgb;
-    color += textureOffset(sMainTex, fragUV1, ivec2(0, 0)).rgb;
-    color += textureOffset(sMainTex, fragUV1, ivec2(0, 1)).rgb;
-
-    color += textureOffset(sMainTex, fragUV1, ivec2(1, -2)).rgb;
-    color += textureOffset(sMainTex, fragUV1, ivec2(1, -1)).rgb;
-    color += textureOffset(sMainTex, fragUV1, ivec2(1, 0)).rgb;
-    color += textureOffset(sMainTex, fragUV1, ivec2(1, 1)).rgb;
-
-    fragColor = vec4(color * (1.0 / 16.0), 1.0);
 }
 )END";
 
