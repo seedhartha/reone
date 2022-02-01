@@ -117,9 +117,6 @@ public:
 
     void flushGPUToCPU();
 
-    glm::vec4 sample(float s, float t) const;
-    glm::vec4 sample(int x, int y) const;
-
     bool isCubemap() const { return _features.cube; }
     bool is2DArray() const { return _layers.size() > 1ll && !isCubemap(); }
 
