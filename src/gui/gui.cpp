@@ -51,7 +51,7 @@ namespace reone {
 namespace gui {
 
 GUI::GUI(
-    GraphicsOptions options,
+    GraphicsOptions &options,
     SceneGraphs &sceneGraphs,
     Fonts &fonts,
     GraphicsContext &graphicsContext,
@@ -63,7 +63,7 @@ GUI::GUI(
     Gffs &gffs,
     Resources &resources,
     Strings &strings) :
-    _options(move(options)),
+    _options(options),
     _sceneGraphs(sceneGraphs),
     _fonts(fonts),
     _graphicsContext(graphicsContext),

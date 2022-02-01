@@ -28,8 +28,8 @@ class ResourceModule;
 
 class AudioModule : boost::noncopyable {
 public:
-    AudioModule(audio::AudioOptions options, ResourceModule &resource) :
-        _options(std::move(options)),
+    AudioModule(audio::AudioOptions &options, ResourceModule &resource) :
+        _options(options),
         _resource(resource) {
     }
 
@@ -43,7 +43,7 @@ public:
     audio::AudioPlayer &audioPlayer() { return *_audioPlayer; }
 
 private:
-    audio::AudioOptions _options;
+    audio::AudioOptions &_options;
     ResourceModule &_resource;
 
     std::unique_ptr<audio::AudioContext> _audioContext;

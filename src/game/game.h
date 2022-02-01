@@ -51,7 +51,7 @@ class Game : public graphics::IEventHandler, boost::noncopyable {
 public:
     Game(
         boost::filesystem::path path,
-        Options options,
+        Options &options,
         Services &services) :
         _path(std::move(path)),
         _options(std::move(options)),
@@ -82,6 +82,7 @@ public:
     Camera *getActiveCamera() const;
     std::shared_ptr<Object> getObjectById(uint32_t id) const;
 
+    Options &options() { return _options; }
     const Options &options() const { return _options; }
     Party &party() { return _party; }
     Combat &combat() { return _combat; }
@@ -167,7 +168,7 @@ protected:
     };
 
     boost::filesystem::path _path;
-    Options _options;
+    Options &_options;
     Services &_services;
 
     GameScreen _screen {GameScreen::None};

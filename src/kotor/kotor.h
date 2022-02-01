@@ -40,11 +40,11 @@ public:
     KotOR(
         bool tsl,
         boost::filesystem::path path,
-        game::Options options,
+        game::Options &options,
         game::Services &services) :
         Game(
             std::move(path),
-            std::move(options),
+            options,
             services),
         _tsl(tsl) {
     }

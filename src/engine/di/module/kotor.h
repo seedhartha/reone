@@ -50,7 +50,7 @@ class KotorModule : boost::noncopyable {
 public:
     KotorModule(
         game::GameID gameId,
-        game::Options gameOptions,
+        game::Options &gameOptions,
         boost::filesystem::path gamePath,
         ResourceModule &resource,
         GraphicsModule &graphics,
@@ -59,7 +59,7 @@ public:
         ScriptModule &script) :
         _gameId(gameId),
         _gamePath(std::move(gamePath)),
-        _gameOptions(std::move(gameOptions)),
+        _gameOptions(gameOptions),
         _resource(resource),
         _graphics(graphics),
         _audio(audio),
@@ -76,7 +76,7 @@ public:
 
 private:
     game::GameID _gameId;
-    game::Options _gameOptions;
+    game::Options &_gameOptions;
     boost::filesystem::path _gamePath;
 
     ResourceModule &_resource;

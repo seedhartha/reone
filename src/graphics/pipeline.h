@@ -35,12 +35,12 @@ class Textures;
 class Pipeline : boost::noncopyable {
 public:
     Pipeline(
-        GraphicsOptions options,
+        GraphicsOptions &options,
         GraphicsContext &graphicsContext,
         Meshes &meshes,
         Shaders &shaders,
         Textures &textures) :
-        _options(std::move(options)),
+        _options(options),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
@@ -107,7 +107,7 @@ private:
         std::shared_ptr<Framebuffer> fbOutput;
     };
 
-    GraphicsOptions _options;
+    GraphicsOptions &_options;
 
     glm::mat4 _shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
     glm::vec4 _shadowCascadeFarPlanes {glm::vec4(0.0f)};

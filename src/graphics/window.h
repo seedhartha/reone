@@ -29,8 +29,8 @@ class IEventHandler;
 
 class Window : boost::noncopyable {
 public:
-    Window(GraphicsOptions options) :
-        _options(std::move(options)) {
+    Window(GraphicsOptions &options) :
+        _options(options) {
     }
 
     ~Window() { deinit(); }
@@ -52,7 +52,7 @@ public:
     void setCursor(const std::shared_ptr<Cursor> &cursor);
 
 private:
-    GraphicsOptions _options;
+    GraphicsOptions &_options;
 
     IEventHandler *_eventHandler {nullptr};
     bool _inited {false};
