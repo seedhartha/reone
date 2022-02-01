@@ -372,8 +372,6 @@ void main() {
 const std::string g_fsSSAO = R"END(
 const float NOISE_SCALE = 1.0 / 4.0;
 const float MAX_DISTANCE = 500.0;
-const float SAMPLE_RADIUS = 0.5;
-const float BIAS = 0.05;
 
 uniform sampler2D sEyePos;
 uniform sampler2D sEyeNormal;
@@ -395,13 +393,13 @@ void main() {
 
     float occlusion = 0.0;
     for (int i = 0; i < NUM_SSAO_SAMPLES; ++i) {
-        vec3 posSample = posM + SAMPLE_RADIUS * (TBN * uSSAOSamples[i].xyz);
+        vec3 posSample = posM + uSSAOSampleRadius * (TBN * uSSAOSamples[i].xyz);
         vec4 uvSample = uProjection * vec4(posSample, 1.0);
         uvSample.xy /= uvSample.w;
         uvSample.xy = uvSample.xy * 0.5 + 0.5;
         float sceneZ = texture(sEyePos, uvSample.xy).z;
-        float rangeCheck = smoothstep(0.0, 1.0, SAMPLE_RADIUS / abs(posM.z - sceneZ));
-        occlusion += ((sceneZ >= posSample.z + BIAS) ? 1.0 : 0.0) * rangeCheck;
+        float rangeCheck = smoothstep(0.0, 1.0, uSSAOSampleRadius / abs(posM.z - sceneZ));
+        occlusion += ((sceneZ >= posSample.z + uSSAOBias) ? 1.0 : 0.0) * rangeCheck;
     }
     occlusion = 1.0 - (occlusion / float(NUM_SSAO_SAMPLES)) * (1.0 - smoothstep(0.0, MAX_DISTANCE, abs(posM.z)));
 

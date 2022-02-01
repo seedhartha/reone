@@ -138,7 +138,7 @@ Texture::Properties getTextureProperties(TextureUsage usage) {
 
     if (usage == TextureUsage::ColorBuffer) {
         properties.minFilter = Texture::Filtering::Linear;
-        properties.wrap = Texture::Wrapping::ClampToBorder;
+        properties.wrap = Texture::Wrapping::ClampToEdge;
 
     } else if (usage == TextureUsage::DepthBuffer) {
         properties.minFilter = Texture::Filtering::Nearest;
