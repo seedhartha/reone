@@ -60,7 +60,7 @@ void Shaders::init() {
     auto fsSSAO = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslSSAOUniforms, g_fsSSAO});
     auto fsSSR = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsSSR});
     auto fsCombineOpaque = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_glslLightingUniforms, g_glslMath, g_glslBRDF, g_glslLighting, g_glslLuma, g_glslShadowMapping, g_glslFog, g_fsCombineOpaque});
-    auto fsCombineOIT = initShader(ShaderType::Fragment, {g_glslHeader, g_fsCombineOIT});
+    auto fsCombineGeometry = initShader(ShaderType::Fragment, {g_glslHeader, g_fsCombineGeometry});
     auto fsGaussianBlur9 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur9});
     auto fsGaussianBlur13 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsGaussianBlur13});
     auto fsMedianFilter3 = initShader(ShaderType::Fragment, {g_glslHeader, g_glslGeneralUniforms, g_fsMedianFilter3});
@@ -85,7 +85,7 @@ void Shaders::init() {
     _spSSAO = initShaderProgram({vsObjectSpace, fsSSAO});
     _spSSR = initShaderProgram({vsObjectSpace, fsSSR});
     _spCombineOpaque = initShaderProgram({vsObjectSpace, fsCombineOpaque});
-    _spCombineOIT = initShaderProgram({vsObjectSpace, fsCombineOIT});
+    _spCombineGeometry = initShaderProgram({vsObjectSpace, fsCombineGeometry});
     _spGaussianBlur9 = initShaderProgram({vsObjectSpace, fsGaussianBlur9});
     _spGaussianBlur13 = initShaderProgram({vsObjectSpace, fsGaussianBlur13});
     _spMedianFilter3 = initShaderProgram({vsObjectSpace, fsMedianFilter3});
@@ -136,7 +136,7 @@ void Shaders::deinit() {
     _spSSAO.reset();
     _spSSR.reset();
     _spCombineOpaque.reset();
-    _spCombineOIT.reset();
+    _spCombineGeometry.reset();
     _spGaussianBlur9.reset();
     _spGaussianBlur13.reset();
     _spMedianFilter3.reset();

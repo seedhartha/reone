@@ -134,7 +134,7 @@ private:
     void drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
     void drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
     void drawCombineOpaque(IScene &scene, Attachments &attachments, Framebuffer &dst);
-    void drawCombineOIT(Attachments &attachments, Framebuffer &dst);
+    void drawCombineGeometry(Attachments &attachments, Framebuffer &dst);
 
     void drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong = false);
     void drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong = false);

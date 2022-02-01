@@ -56,7 +56,7 @@ public:
     ShaderProgram &ssao() const { return *_spSSAO; }
     ShaderProgram &ssr() const { return *_spSSR; }
     ShaderProgram &combineOpaque() const { return *_spCombineOpaque; }
-    ShaderProgram &combineOIT() const { return *_spCombineOIT; }
+    ShaderProgram &combineGeometry() const { return *_spCombineGeometry; }
 
     ShaderProgram &gaussianBlur9() const { return *_spGaussianBlur9; }
     ShaderProgram &gaussianBlur13() const { return *_spGaussianBlur13; }
@@ -90,7 +90,7 @@ private:
     std::shared_ptr<ShaderProgram> _spSSAO;
     std::shared_ptr<ShaderProgram> _spSSR;
     std::shared_ptr<ShaderProgram> _spCombineOpaque;
-    std::shared_ptr<ShaderProgram> _spCombineOIT;
+    std::shared_ptr<ShaderProgram> _spCombineGeometry;
 
     std::shared_ptr<ShaderProgram> _spGaussianBlur9;
     std::shared_ptr<ShaderProgram> _spGaussianBlur13;

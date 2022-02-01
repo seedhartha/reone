@@ -648,14 +648,14 @@ void main() {
     color = mix(color, uFogColor.rgb, fog);
 
     float alpha = step(0.0001, mainTexSample.a);
-    vec3 hilights = mix(color - vec3(1.0), colorSelfIllumed - SELFILLUM_THRESHOLD, selfIllumed);
+    vec3 hilights = mix(color - vec3(1.0), colorSelfIllumed - vec3(SELFILLUM_THRESHOLD), selfIllumed);
 
     fragColor1 = vec4(color, alpha);
     fragColor2 = vec4(hilights, 0.0);
 }
 )END";
 
-const std::string g_fsCombineOIT = R"END(
+const std::string g_fsCombineGeometry = R"END(
 uniform sampler2D sMainTex;
 uniform sampler2D sHilights;
 uniform sampler2D sOITAccum;
@@ -676,10 +676,9 @@ void main() {
     float revealage = oitAccumSample.a;
 
     float alpha = 1.0 - revealage;
+    vec3 color = alpha * (accumColor.rgb / max(0.0001, accumWeight)) + (1.0 - alpha) * (mainTexSample.rgb + hilightsSample.rgb);
 
-    fragColor = vec4(
-        alpha * (accumColor.rgb / max(0.0001, accumWeight)) + (1.0 - alpha) * (mainTexSample.rgb + hilightsSample.rgb),
-        alpha + mainTexSample.a);
+    fragColor = vec4(color, alpha + mainTexSample.a);
 }
 )END";
 
