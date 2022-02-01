@@ -79,6 +79,9 @@ layout(std140) uniform General {
     float uBillboardSize;
     float uSSAOSampleRadius;
     float uSSAOBias;
+    float uSSRBias;
+    float uSSRPixelStride;
+    float uSSRMaxSteps;
     float uSharpenAmount;
     int uFeatureMask;
     vec4 uShadowCascadeFarPlanes;
