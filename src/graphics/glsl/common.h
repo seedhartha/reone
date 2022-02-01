@@ -79,6 +79,7 @@ layout(std140) uniform General {
     float uBillboardSize;
     float uSSAOSampleRadius;
     float uSSAOBias;
+    float uSharpenAmount;
     int uFeatureMask;
     vec4 uShadowCascadeFarPlanes;
     mat4 uShadowLightSpace[NUM_SHADOW_LIGHT_SPACE];

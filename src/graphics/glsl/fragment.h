@@ -1188,8 +1188,6 @@ void main() {
 )END";
 
 const std::string g_fsSharpen = R"END(
-const float SHARPEN_AMOUNT = 0.15;
-
 uniform sampler2D sMainTex;
 
 noperspective in vec2 fragUV1;
@@ -1197,8 +1195,8 @@ noperspective in vec2 fragUV1;
 out vec4 fragColor;
 
 void main() {
-    float neighbor = SHARPEN_AMOUNT * -1.0;
-    float center = SHARPEN_AMOUNT * 4.0 + 1.0;
+    float neighbor = uSharpenAmount * -1.0;
+    float center = uSharpenAmount * 4.0 + 1.0;
 
     vec4 rgbaM = texture(sMainTex, fragUV1);
     vec3 color =

@@ -657,11 +657,12 @@ void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer 
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
+void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount) {
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
     uniforms.general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+    uniforms.general.sharpenAmount = amount;
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     _shaders.use(_shaders.sharpen(), true);
