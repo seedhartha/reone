@@ -316,11 +316,11 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
     // SSAO framebuffer
 
     attachments.cbSSAO = make_shared<Texture>("ssao_color", getTextureProperties(TextureUsage::ColorBuffer));
-    attachments.cbSSAO->clear(dim.x, dim.y, PixelFormat::R8);
+    attachments.cbSSAO->clear(halfDim.x, halfDim.y, PixelFormat::R8);
     attachments.cbSSAO->init();
 
     attachments.fbSSAO = make_shared<Framebuffer>();
-    attachments.fbSSAO->attachColorDepth(attachments.cbSSAO, attachments.dbCommon);
+    attachments.fbSSAO->attachColorDepth(attachments.cbSSAO, attachments.dbCommonHalf);
     attachments.fbSSAO->init();
 
     // SSR framebuffer
@@ -368,14 +368,13 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
 
         // Screen-space effects
 
-        if (_options.ssao) {
-            drawSSAO(scene, dim, attachments);
-            drawSSAOBlur(dim, *attachments.cbSSAO, *attachments.fbPing);
-            blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbSSAO, 0);
-        }
-
         auto halfDim = dim / 2;
         _graphicsContext.withViewport(glm::ivec4(0, 0, halfDim.x, halfDim.y), [this, &scene, &halfDim, &attachments]() {
+            if (_options.ssao) {
+                drawSSAO(scene, halfDim, attachments);
+                drawSSAOBlur(halfDim, *attachments.cbSSAO, *attachments.fbPingHalf);
+                blitFramebuffer(halfDim, *attachments.fbPingHalf, 0, *attachments.fbSSAO, 0);
+            }
             if (_options.ssr) {
                 drawSSR(scene, halfDim, attachments);
                 drawGaussianBlur(halfDim, *attachments.cbSSR, *attachments.fbPingHalf, R_GAUSSIAN_BLUR_HORIZONTAL, R_GAUSSIAN_BLUR_STRONG);
