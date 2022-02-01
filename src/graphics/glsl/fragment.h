@@ -408,9 +408,6 @@ void main() {
 )END";
 
 const std::string g_fsSSR = R"END(
-const float Z_THICKNESS = 0.1;
-const float STRIDE = 4.0;
-const float MAX_STEPS = 32.0;
 const float MAX_DISTANCE = 100.0;
 
 const float EDGE_FADE_START = 0.75;
@@ -478,9 +475,9 @@ bool traceScreenSpaceRay(
     float dk = (k1 - k0) * invdx;
     vec2 dP = vec2(stepDir, delta.y * invdx);
 
-    dP *= STRIDE;
-    dQ *= STRIDE;
-    dk *= STRIDE;
+    dP *= uSSRPixelStride;
+    dQ *= uSSRPixelStride;
+    dk *= uSSRPixelStride;
 
     P0 += dP * jitter + dP;
     Q0 += dQ * jitter + dQ;
@@ -494,7 +491,7 @@ bool traceScreenSpaceRay(
     bool intersect = false;
 
     for (vec2 P = P0;
-         P.x * stepDir <= end && stepCount < MAX_STEPS;
+         P.x * stepDir <= end && stepCount < uSSRMaxSteps;
          P += dP, Q.z += dQ.z, k += dk, stepCount += 1.0) {
 
         hitUV = permute ? P.yx : P;
@@ -511,7 +508,7 @@ bool traceScreenSpaceRay(
         }
 
         float sceneZMax = texture(sEyePos, hitUV).z;
-        float sceneZMin = sceneZMax - Z_THICKNESS;
+        float sceneZMin = sceneZMax - uSSRBias;
         if (rayZMax >= sceneZMin && rayZMin <= sceneZMax) {
             intersect = true;
             break;
@@ -555,7 +552,7 @@ void main() {
         reflectionColor = mix(hitMainTexSample.rgb, hitMainTexSample.rgb * hitLightmapSample.rgb, hitLightmapSample.a);
         reflectionColor += hitEnvmapSample.rgb * (1.0 - hitMainTexSample.a);
         reflectionStrength = 1.0 - clamp(R.z, 0.0, 1.0);
-        reflectionStrength *= 1.0 - stepCount / MAX_STEPS;
+        reflectionStrength *= 1.0 - stepCount / uSSRMaxSteps;
         reflectionStrength *= 1.0 - clamp(distance(fragPosVS, hitPoint) / MAX_DISTANCE, 0.0, 1.0);
         reflectionStrength *= 1.0 - max(0.0, (maxDim - EDGE_FADE_START) / (1.0 - EDGE_FADE_START));
     }

@@ -76,9 +76,12 @@ struct GeneralUniforms {
     float billboardSize {1.0f};
     float ssaoSampleRadius {0.5f};
     float ssaoBias {0.1f};
+    float ssrBias {0.5f};
+    float ssrPixelStride {4.0f};
+    float ssrMaxSteps {32.0f};
     float sharpenAmount {0.25f};
     int featureMask {0}; /**< any combination of UniformFeaturesFlags */
-    float padding[2];
+    float padding[3];
     glm::vec4 shadowCascadeFarPlanes {0.0f};
     glm::mat4 shadowLightSpace[kNumShadowLightSpace] {glm::mat4(1.0f)};
 
@@ -117,6 +120,12 @@ struct GeneralUniforms {
         waterAlpha = 1.0f;
         heightMapScaling = 1.0f;
         billboardSize = 1.0f;
+        ssaoSampleRadius = 0.5f;
+        ssaoBias = 0.1f;
+        ssrBias = 0.5f;
+        ssrPixelStride = 4.0f;
+        ssrMaxSteps = 32.0f;
+        sharpenAmount = 0.25f;
         featureMask = 0;
     }
 };

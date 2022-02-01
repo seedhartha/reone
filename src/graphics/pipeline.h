@@ -131,8 +131,8 @@ private:
     void drawOpaqueGeometry(IScene &scene, Attachments &attachments);
     void drawTransparentGeometry(IScene &scene, Attachments &attachments);
     void drawLensFlares(IScene &scene, Framebuffer &dst);
-    void drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
-    void drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments);
+    void drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments, float sampleRadius, float bias);
+    void drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments, float bias, float pixelStride, float maxSteps);
     void drawCombineOpaque(IScene &scene, Attachments &attachments, Framebuffer &dst);
     void drawCombineGeometry(Attachments &attachments, Framebuffer &dst);
 
@@ -140,7 +140,7 @@ private:
     void drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong = false);
     void drawSSAOBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
     void drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst);
-    void drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount = 0.25f);
+    void drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount);
 
     void blitFramebuffer(const glm::ivec2 &dim, Framebuffer &src, int srcColorIdx, Framebuffer &dst, int dstColorIdx, int flags = BlitFlags::color);
 };

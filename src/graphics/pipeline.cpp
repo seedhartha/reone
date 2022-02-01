@@ -371,12 +371,12 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
         auto halfDim = dim / 2;
         _graphicsContext.withViewport(glm::ivec4(0, 0, halfDim.x, halfDim.y), [this, &scene, &halfDim, &attachments]() {
             if (_options.ssao) {
-                drawSSAO(scene, halfDim, attachments);
+                drawSSAO(scene, halfDim, attachments, 0.5f, 0.1f);
                 drawSSAOBlur(halfDim, *attachments.cbSSAO, *attachments.fbPingHalf);
                 blitFramebuffer(halfDim, *attachments.fbPingHalf, 0, *attachments.fbSSAO, 0);
             }
             if (_options.ssr) {
-                drawSSR(scene, halfDim, attachments);
+                drawSSR(scene, halfDim, attachments, 0.25f, 4.0f, 64.0f);
                 drawGaussianBlur(halfDim, *attachments.cbSSR, *attachments.fbPingHalf, R_GAUSSIAN_BLUR_HORIZONTAL, R_GAUSSIAN_BLUR_STRONG);
                 drawGaussianBlur(halfDim, *attachments.cbPingHalf, *attachments.fbSSR, R_GAUSSIAN_BLUR_VERTICAL, R_GAUSSIAN_BLUR_STRONG);
             }
@@ -402,13 +402,13 @@ shared_ptr<Texture> Pipeline::draw(IScene &scene, const glm::ivec2 &dim) {
 
         if (_options.fxaa && _options.sharpen) {
             drawFXAA(dim, *attachments.cbOutput, *attachments.fbPing);
-            drawSharpen(dim, *attachments.cbPing, *attachments.fbPong);
+            drawSharpen(dim, *attachments.cbPing, *attachments.fbPong, 0.25f);
             blitFramebuffer(dim, *attachments.fbPong, 0, *attachments.fbOutput, 0);
         } else if (_options.fxaa) {
             drawFXAA(dim, *attachments.cbOutput, *attachments.fbPing);
             blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbOutput, 0);
         } else if (_options.sharpen) {
-            drawSharpen(dim, *attachments.cbOutput, *attachments.fbPing);
+            drawSharpen(dim, *attachments.cbOutput, *attachments.fbPing, 0.25f);
             blitFramebuffer(dim, *attachments.fbPing, 0, *attachments.fbOutput, 0);
         }
     });
@@ -486,13 +486,15 @@ void Pipeline::drawLensFlares(IScene &scene, Framebuffer &dst) {
     scene.drawLensFlares();
 }
 
-void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments) {
+void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments, float sampleRadius, float bias) {
     auto camera = scene.camera();
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
     uniforms.general.projection = camera->projection();
     uniforms.general.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
+    uniforms.general.ssaoSampleRadius = sampleRadius;
+    uniforms.general.ssaoBias = bias;
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSAO->nameGL());
     glDrawBuffer(kColorAttachments[0]);
@@ -503,7 +505,7 @@ void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attac
     _meshes.quadNDC().draw();
 }
 
-void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments) {
+void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attachments, float bias, float pixelStride, float maxSteps) {
     auto camera = scene.camera();
     auto screenProjection = glm::mat4(1.0f);
     screenProjection *= glm::scale(glm::vec3(dim.x, dim.y, 1.0f));
@@ -518,6 +520,9 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     uniforms.general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
     uniforms.general.clipNear = camera->zNear();
     uniforms.general.clipFar = camera->zFar();
+    uniforms.general.ssrBias = bias;
+    uniforms.general.ssrPixelStride = pixelStride;
+    uniforms.general.ssrMaxSteps = maxSteps;
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSR->nameGL());
     glDrawBuffer(kColorAttachments[0]);
