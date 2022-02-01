@@ -566,7 +566,7 @@ void main() {
 
 const std::string g_fsCombineOpaque = R"END(
 const float LIGHTMAP_STRENGTH = 0.5;
-const float SELFILLUM_THRESHOLD = 0.85;
+const float SELFILLUM_THRESHOLD = 0.8;
 
 uniform sampler2D sMainTex;
 uniform sampler2D sLightmap;
@@ -647,8 +647,8 @@ void main() {
     color = mix(color, colorSelfIllumed, selfIllumed);
     color = mix(color, uFogColor.rgb, fog);
 
-    vec3 hilights = smoothstep(SELFILLUM_THRESHOLD, 1.0, selfIllumSample.rgb * mainTexSample.rgb * mainTexSample.a);
     float alpha = step(0.0001, mainTexSample.a);
+    vec3 hilights = mix(color - vec3(1.0), colorSelfIllumed - SELFILLUM_THRESHOLD, selfIllumed);
 
     fragColor1 = vec4(color, alpha);
     fragColor2 = vec4(hilights, 0.0);
