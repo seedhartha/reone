@@ -635,13 +635,16 @@ void main() {
     vec3 directD, directS, directAreaD, directAreaS;
     getIrradianceDirect(worldPos, worldNormal, albedo, metallic, roughness, directD, directS, directAreaD, directAreaS);
 
-    vec3 colorDynamic = clamp(ambientD * ao + directD * (1.0 - shadowLM) + emission, 0.0, 1.0) * albedo;
+    vec3 colorDynamic = (ambientD * ao + directD * (1.0 - shadowLM)) * albedo;
     colorDynamic += ambientS * ao + directS * (1.0 - shadowLM) * (1.0 - selfIllumed);
 
-    vec3 colorLightmapped = clamp(lightmapSample.rgb * (ao * 0.5 + 0.5) * (1.0 - 0.5 * shadow) + directAreaD * (1.0 - shadow) + emission, 0.0, 1.0) * albedo;
+    vec3 colorLightmapped = (lightmapSample.rgb * (ao * 0.5 + 0.5) * (1.0 - 0.5 * shadow) + directAreaD * (1.0 - shadow)) * albedo;
     colorLightmapped += ambientS * ao + directAreaS * (1.0 - shadow);
 
+    vec3 colorSelfIllumed = emission * albedo;
+
     vec3 color = mix(colorDynamic, colorLightmapped, LIGHTMAP_STRENGTH * lightmapped);
+    color = mix(color, colorSelfIllumed, selfIllumed);
     color = mix(color, uFogColor.rgb, fog);
 
     vec3 hilights = smoothstep(SELFILLUM_THRESHOLD, 1.0, selfIllumSample.rgb * mainTexSample.rgb * mainTexSample.a);
