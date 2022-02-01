@@ -264,75 +264,51 @@ void Texture::setPixels(int w, int h, PixelFormat format, vector<Layer> layers, 
 }
 
 void Texture::flushGPUToCPU() {
-    if (is2DArray()) {
+    if (isCubemap() || is2DArray()) {
         throw logic_error("Flushing cubemap or array textures is not supported");
     }
-    Layer layer;
-    layer.pixels = make_shared<ByteArray>();
-    layer.pixels->resize(3 * _width * _height);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, &(*layer.pixels)[0]);
 
-    _layers.clear();
-    _layers.push_back(move(layer));
-}
-
-glm::vec4 Texture::sample(float s, float t) const {
-    int x = glm::round(glm::fract(s) * (_width - 1));
-    int y = glm::round(glm::fract(t) * (_height - 1));
-    return sample(x, y);
-}
-
-glm::vec4 Texture::sample(int x, int y) const {
-    if (is2DArray()) {
-        throw logic_error("Sampling cubemap or array textures is not supported");
+    if (_layers.empty()) {
+        _layers.push_back(Texture::Layer());
     }
-    if (isCompressed(_pixelFormat)) {
-        throw logic_error("Sampling compressed textures is not supported");
+    auto &layer = _layers.front();
+    if (!layer.pixels) {
+        layer.pixels = make_shared<ByteArray>();
     }
-    bool grayscale = isGrayscale();
-    bool alpha = _pixelFormat == PixelFormat::RGBA8 || _pixelFormat == PixelFormat::BGRA8;
-    int bpp = grayscale ? 1 : (alpha ? 4 : 3);
-
-    auto &pixels = *_layers.front().pixels;
-    auto pixel = &pixels[bpp * (y * _width + x)];
-
-    float r = 0.0f;
-    float g = 0.0f;
-    float b = 0.0f;
-    float a = 1.0f;
+    int bpp;
     switch (_pixelFormat) {
     case PixelFormat::R8:
-        r = static_cast<uint8_t>(pixel[0]) / 255.0f;
-        g = r;
-        b = r;
+        bpp = 1;
+        break;
+    case PixelFormat::R16F:
+        bpp = 1 * 4;
+        break;
+    case PixelFormat::RG8:
+        bpp = 2 * 1;
+        break;
+    case PixelFormat::RG16F:
+        bpp = 2 * 4;
         break;
     case PixelFormat::RGB8:
-        r = static_cast<uint8_t>(pixel[0]) / 255.0f;
-        g = static_cast<uint8_t>(pixel[1]) / 255.0f;
-        b = static_cast<uint8_t>(pixel[2]) / 255.0f;
+    case PixelFormat::BGR8:
+        bpp = 3 * 1;
+        break;
+    case PixelFormat::RGB16F:
+        bpp = 3 * 4;
         break;
     case PixelFormat::RGBA8:
-        r = static_cast<uint8_t>(pixel[0]) / 255.0f;
-        g = static_cast<uint8_t>(pixel[1]) / 255.0f;
-        b = static_cast<uint8_t>(pixel[2]) / 255.0f;
-        a = static_cast<uint8_t>(pixel[3]) / 255.0f;
-        break;
-    case PixelFormat::BGR8:
-        r = static_cast<uint8_t>(pixel[2]) / 255.0f;
-        g = static_cast<uint8_t>(pixel[1]) / 255.0f;
-        b = static_cast<uint8_t>(pixel[0]) / 255.0f;
-        break;
     case PixelFormat::BGRA8:
-        r = static_cast<uint8_t>(pixel[2]) / 255.0f;
-        g = static_cast<uint8_t>(pixel[1]) / 255.0f;
-        b = static_cast<uint8_t>(pixel[0]) / 255.0f;
-        a = static_cast<uint8_t>(pixel[3]) / 255.0f;
+        bpp = 4 * 1;
+        break;
+    case PixelFormat::RGBA16F:
+        bpp = 4 * 4;
         break;
     default:
-        throw logic_error("Unsupported texture format: " + to_string(static_cast<int>(_pixelFormat)));
+        throw logic_error(str(boost::format("Flushing texture of pixel format %d is not supported") % static_cast<int>(_pixelFormat)));
     }
+    layer.pixels->resize(bpp * _width * _height);
 
-    return glm::vec4(r, g, b, a);
+    glGetTexImage(GL_TEXTURE_2D, 0, getPixelFormatGL(_pixelFormat), getPixelTypeGL(_pixelFormat), &(*layer.pixels)[0]);
 }
 
 void Texture::fillTarget2D(uint32_t target, int width, int height, const void *pixels, int size) {
