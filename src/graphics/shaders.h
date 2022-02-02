@@ -19,8 +19,6 @@
 
 #include "shader.h"
 #include "shaderprogram.h"
-#include "uniformbuffer.h"
-#include "uniforms.h"
 
 namespace reone {
 
@@ -33,17 +31,7 @@ public:
     void init();
     void deinit();
 
-    void use(ShaderProgram &program, bool refreshUniforms = false);
-
-    void refreshTextUniforms();
-    void refreshSkeletalUniforms();
-    void refreshLightingUniforms();
-    void refreshParticlesUniforms();
-    void refreshGrassUniforms();
-    void refreshSSAOUniforms();
-    void refreshWalkmeshUniforms();
-
-    Uniforms &uniforms() { return _uniforms; }
+    void use(ShaderProgram &program);
 
     ShaderProgram &simpleColor() const { return *_spSimpleColor; }
     ShaderProgram &simpleTexture() const { return *_spSimpleTexture; }
@@ -73,7 +61,6 @@ public:
 
 private:
     bool _inited {false};
-    Uniforms _uniforms;
 
     ShaderProgram *_usedProgram {nullptr};
 
@@ -107,24 +94,8 @@ private:
 
     // END Shader Programs
 
-    // Uniform Buffers
-
-    std::shared_ptr<UniformBuffer> _ubGeneral;
-    std::shared_ptr<UniformBuffer> _ubText;
-    std::shared_ptr<UniformBuffer> _ubLighting;
-    std::shared_ptr<UniformBuffer> _ubSkeletal;
-    std::shared_ptr<UniformBuffer> _ubParticles;
-    std::shared_ptr<UniformBuffer> _ubGrass;
-    std::shared_ptr<UniformBuffer> _ubSSAO;
-    std::shared_ptr<UniformBuffer> _ubWalkmesh;
-
-    // END Uniform Buffers
-
     std::shared_ptr<Shader> initShader(ShaderType type, std::vector<std::string> sources);
     std::shared_ptr<ShaderProgram> initShaderProgram(std::vector<std::shared_ptr<Shader>> shaders);
-    std::unique_ptr<UniformBuffer> initUniformBuffer(const void *data, ptrdiff_t size);
-
-    void refreshGeneralUniforms();
 };
 
 } // namespace graphics

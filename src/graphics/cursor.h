@@ -26,6 +26,7 @@ class Meshes;
 class Shaders;
 class Texture;
 class Textures;
+class UniformBuffers;
 class Window;
 
 class Cursor : boost::noncopyable {
@@ -37,6 +38,7 @@ public:
         Meshes &meshes,
         Shaders &shaders,
         Textures &textures,
+        UniformBuffers &uniformBuffers,
         Window &window) :
         _up(std::move(up)),
         _down(std::move(down)),
@@ -44,6 +46,7 @@ public:
         _meshes(meshes),
         _shaders(shaders),
         _textures(textures),
+        _uniformBuffers(uniformBuffers),
         _window(window) {
     }
 
@@ -65,6 +68,7 @@ private:
     Meshes &_meshes;
     Shaders &_shaders;
     Textures &_textures;
+    UniformBuffers &_uniformBuffers;
     Window &_window;
 
     // END Services

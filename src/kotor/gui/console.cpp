@@ -31,6 +31,7 @@
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/shaders.h"
+#include "../../graphics/uniformbuffers.h"
 #include "../../graphics/window.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
@@ -196,14 +197,14 @@ void Console::drawBackground() {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(_game.options().graphics.width, height, 1.0f));
 
-    auto &uniforms = _services.shaders.uniforms();
-    uniforms.general.resetLocals();
-    uniforms.general.projection = _services.window.getOrthoProjection();
-    uniforms.general.model = move(transform);
-    uniforms.general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    uniforms.general.alpha = 0.5f;
-
-    _services.shaders.use(_services.shaders.simpleColor(), true);
+    _services.uniformBuffers.setGeneral([this, transform](auto &general) {
+        general.resetLocals();
+        general.projection = _services.window.getOrthoProjection();
+        general.model = move(transform);
+        general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        general.alpha = 0.5f;
+    });
+    _services.shaders.use(_services.shaders.simpleColor());
     _services.meshes.quad().draw();
 }
 

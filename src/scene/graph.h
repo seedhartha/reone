@@ -37,6 +37,7 @@ class GraphicsContext;
 class Meshes;
 class Shaders;
 class Textures;
+class UniformBuffers;
 class Walkmesh;
 
 } // namespace graphics
@@ -65,14 +66,16 @@ public:
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
-        graphics::Textures &textures) :
+        graphics::Textures &textures,
+        graphics::UniformBuffers &uniformBuffers) :
         _name(std::move(name)),
         _options(options),
         _audioPlayer(audioPlayer),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
-        _textures(textures) {
+        _textures(textures),
+        _uniformBuffers(uniformBuffers) {
     }
 
     void update(float dt);
@@ -204,6 +207,7 @@ private:
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
+    graphics::UniformBuffers &_uniformBuffers;
 
     // END Services
 

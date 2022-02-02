@@ -29,24 +29,38 @@ class GraphicsContext;
 class Meshes;
 class Shaders;
 class Textures;
+class UniformBuffers;
+class Window;
 
 class Fonts : public MemoryCache<std::string, Font> {
 public:
-    Fonts(GraphicsContext &graphicsContext, Meshes &meshes, Shaders &shaders, Textures &textures, Window &window) :
+    Fonts(
+        GraphicsContext &graphicsContext,
+        Meshes &meshes,
+        Shaders &shaders,
+        Textures &textures,
+        UniformBuffers &uniformBuffers,
+        Window &window) :
         MemoryCache(std::bind(&Fonts::doGet, this, std::placeholders::_1)),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
         _textures(textures),
+        _uniformBuffers(uniformBuffers),
         _window(window) {
     }
 
 private:
+    // Services
+
     GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
     Textures &_textures;
+    UniformBuffers &_uniformBuffers;
     Window &_window;
+
+    // END Services
 
     std::shared_ptr<Font> doGet(std::string resRef);
 };

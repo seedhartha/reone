@@ -38,6 +38,7 @@ class Models;
 class Pipeline;
 class Shaders;
 class Textures;
+class UniformBuffers;
 class Walkmeshes;
 class Window;
 
@@ -111,6 +112,7 @@ struct Services {
     graphics::Pipeline &pipeline;
     graphics::Shaders &shaders;
     graphics::Textures &textures;
+    graphics::UniformBuffers &uniformBuffers;
     graphics::Walkmeshes &walkmeshes;
     graphics::Window &window;
     scene::SceneGraphs &sceneGraphs;
@@ -148,6 +150,7 @@ struct Services {
         graphics::Pipeline &pipeline,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
+        graphics::UniformBuffers &uniformBuffers,
         graphics::Walkmeshes &walkmeshes,
         graphics::Window &window,
         scene::SceneGraphs &sceneGraphs,
@@ -184,6 +187,7 @@ struct Services {
         pipeline(pipeline),
         shaders(shaders),
         textures(textures),
+        uniformBuffers(uniformBuffers),
         walkmeshes(walkmeshes),
         window(window),
         sceneGraphs(sceneGraphs),

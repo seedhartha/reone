@@ -38,7 +38,8 @@ void SceneModule::init() {
         _graphics.graphicsContext(),
         _graphics.meshes(),
         _graphics.shaders(),
-        _graphics.textures());
+        _graphics.textures(),
+        _graphics.uniformBuffers());
 
     // Init scenes
     _sceneGraphs->add(kSceneMain);

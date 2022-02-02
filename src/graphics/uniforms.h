@@ -187,17 +187,6 @@ struct WalkmeshUniforms {
     glm::vec4 materials[kMaxWalkmeshMaterials] {glm::vec4(1.0f)};
 };
 
-struct Uniforms {
-    GeneralUniforms general;
-    TextUniforms text;
-    LightingUniforms lighting;
-    SkeletalUniforms skeletal;
-    ParticlesUniforms particles;
-    GrassUniforms grass;
-    SSAOUniforms ssao;
-    WalkmeshUniforms walkmesh;
-};
-
 } // namespace graphics
 
 } // namespace reone

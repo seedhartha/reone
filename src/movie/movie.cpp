@@ -24,6 +24,7 @@
 #include "../graphics/shaders.h"
 #include "../graphics/textures.h"
 #include "../graphics/textureutil.h"
+#include "../graphics/uniformbuffers.h"
 
 using namespace std;
 
@@ -83,15 +84,15 @@ void Movie::draw() {
         _textures.bind(*_texture);
         _texture->setPixels(_width, _height, PixelFormat::RGB8, Texture::Layer {frame.pixels}, true);
     }
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
-    uniforms.general.uv = glm::mat3x4(
-        glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
-        glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
-        glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
-
-    _shaders.use(_shaders.gui(), true);
+    _uniformBuffers.setGeneral([](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+        general.uv = glm::mat3x4(
+            glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
+    });
+    _shaders.use(_shaders.gui());
     _meshes.quadNDC().draw();
 }
 

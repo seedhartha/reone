@@ -36,7 +36,7 @@ namespace reone {
 void KotorModule::init() {
     _cameraStyles = make_unique<CameraStyles>(_resource.twoDas());
     _classes = make_unique<Classes>(_resource.strings(), _resource.twoDas());
-    _cursors = make_unique<Cursors>(_graphics.graphicsContext(), _graphics.meshes(), _graphics.shaders(), _graphics.textures(), _graphics.window(), _resource.resources());
+    _cursors = make_unique<Cursors>(_graphics.graphicsContext(), _graphics.meshes(), _graphics.shaders(), _graphics.textures(), _graphics.uniformBuffers(), _graphics.window(), _resource.resources());
     _dialogs = make_unique<Dialogs>(_resource.gffs(), _resource.strings());
     _feats = make_unique<Feats>(_graphics.textures(), _resource.strings(), _resource.twoDas());
     _footstepSounds = make_unique<FootstepSounds>(_audio.audioFiles(), _resource.twoDas());
@@ -79,6 +79,7 @@ void KotorModule::init() {
         _graphics.pipeline(),
         _graphics.shaders(),
         _graphics.textures(),
+        _graphics.uniformBuffers(),
         _graphics.walkmeshes(),
         _graphics.window(),
         _scene.sceneGraphs(),

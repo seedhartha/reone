@@ -41,6 +41,7 @@ class Pipeline;
 class Shaders;
 class Texture;
 class Textures;
+class UniformBuffers;
 class Window;
 
 } // namespace graphics
@@ -214,6 +215,7 @@ protected:
     graphics::Pipeline &_pipeline;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
+    graphics::UniformBuffers &_uniformBuffers;
     graphics::Window &_window;
     resource::Strings &_strings;
     scene::SceneGraphs &_sceneGraphs;
@@ -237,6 +239,7 @@ protected:
         graphics::Pipeline &pipeline,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
+        graphics::UniformBuffers &uniformBuffers,
         graphics::Window &window,
         resource::Strings &strings) :
         _gui(gui),
@@ -248,6 +251,7 @@ protected:
         _pipeline(pipeline),
         _shaders(shaders),
         _textures(textures),
+        _uniformBuffers(uniformBuffers),
         _window(window),
         _strings(strings) {
     }

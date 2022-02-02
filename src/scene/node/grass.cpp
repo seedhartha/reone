@@ -25,6 +25,7 @@
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/triangleutil.h"
+#include "../../graphics/uniformbuffers.h"
 
 #include "../graph.h"
 
@@ -144,24 +145,24 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
         return;
     }
     _textures.bind(*_texture);
-
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetLocals();
-    uniforms.general.featureMask = UniformsFeatureFlags::hashedalphatest;
-    if (_aabbNode->mesh()->lightmap) {
-        _textures.bind(*_aabbNode->mesh()->lightmap, TextureUnits::lightmap);
-        uniforms.general.featureMask |= UniformsFeatureFlags::lightmap;
-    }
-    for (size_t i = 0; i < leafs.size(); ++i) {
-        auto cluster = static_cast<GrassClusterSceneNode *>(leafs[i]);
-        uniforms.grass.quadSize = glm::vec2(_quadSize);
-        uniforms.grass.radius = kMaxClusterDistance;
-        uniforms.grass.clusters[i].positionVariant = glm::vec4(cluster->getOrigin(), static_cast<float>(cluster->variant()));
-        uniforms.grass.clusters[i].lightmapUV = cluster->lightmapUV();
-    }
-
-    _shaders.use(_shaders.grass(), true);
-    _shaders.refreshGrassUniforms();
+    _uniformBuffers.setGeneral([this](auto &general) {
+        general.resetLocals();
+        general.featureMask = UniformsFeatureFlags::hashedalphatest;
+        if (_aabbNode->mesh()->lightmap) {
+            _textures.bind(*_aabbNode->mesh()->lightmap, TextureUnits::lightmap);
+            general.featureMask |= UniformsFeatureFlags::lightmap;
+        }
+    });
+    _uniformBuffers.setGrass([this, &leafs](auto &grass) {
+        for (size_t i = 0; i < leafs.size(); ++i) {
+            auto cluster = static_cast<GrassClusterSceneNode *>(leafs[i]);
+            grass.quadSize = glm::vec2(_quadSize);
+            grass.radius = kMaxClusterDistance;
+            grass.clusters[i].positionVariant = glm::vec4(cluster->getOrigin(), static_cast<float>(cluster->variant()));
+            grass.clusters[i].lightmapUV = cluster->lightmapUV();
+        }
+    });
+    _shaders.use(_shaders.grass());
     _meshes.grass().drawInstanced(leafs.size());
 }
 

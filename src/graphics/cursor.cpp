@@ -23,6 +23,7 @@
 #include "shaders.h"
 #include "texture.h"
 #include "textures.h"
+#include "uniformbuffers.h"
 #include "window.h"
 
 using namespace std;
@@ -39,12 +40,12 @@ void Cursor::draw() {
     transform = glm::translate(transform, glm::vec3(static_cast<float>(_position.x), static_cast<float>(_position.y), 0.0f));
     transform = glm::scale(transform, glm::vec3(texture->width(), texture->height(), 1.0f));
 
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetLocals();
-    uniforms.general.projection = _window.getOrthoProjection();
-    uniforms.general.model = move(transform);
-
-    _shaders.use(_shaders.gui(), true);
+    _uniformBuffers.setGeneral([this, transform](auto &general) {
+        general.resetLocals();
+        general.projection = _window.getOrthoProjection();
+        general.model = move(transform);
+    });
+    _shaders.use(_shaders.gui());
     _graphicsContext.withBlending(BlendMode::Normal, [this]() {
         _meshes.quad().draw();
     });
