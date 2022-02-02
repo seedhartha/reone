@@ -257,7 +257,6 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
-    uniforms.general.featureMask = UniformsFeatureFlags::particles;
     uniforms.general.gridSize = emitter->gridSize;
     switch (emitter->blendMode) {
     case ModelNode::Emitter::BlendMode::Lighten:
@@ -308,6 +307,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     }
 
     _shaders.use(_shaders.particle(), true);
+    _shaders.refreshParticlesUniforms();
     _textures.bind(*texture);
 
     bool twosided = _modelNode->emitter()->twosided || _modelNode->emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;

@@ -164,7 +164,6 @@ void Shaders::use(ShaderProgram &program, bool refreshUniforms) {
     }
     if (refreshUniforms) {
         this->refreshGeneralUniforms();
-        this->refreshFeatureUniforms();
     }
 }
 
@@ -224,27 +223,29 @@ void Shaders::refreshGeneralUniforms() {
     _ubGeneral->setData(&_uniforms.general, sizeof(GeneralUniforms), true);
 }
 
-void Shaders::refreshFeatureUniforms() {
-    if (_uniforms.general.featureMask & UniformsFeatureFlags::text) {
-        _ubText->bind(UniformBlockBindingPoints::text);
-        _ubText->setData(&_uniforms.text, sizeof(TextUniforms), true);
-    }
-    if (_uniforms.general.featureMask & UniformsFeatureFlags::lighting) {
-        _ubLighting->bind(UniformBlockBindingPoints::lighting);
-        _ubLighting->setData(&_uniforms.lighting, sizeof(LightingUniforms), true);
-    }
-    if (_uniforms.general.featureMask & UniformsFeatureFlags::skeletal) {
-        _ubSkeletal->bind(UniformBlockBindingPoints::skeletal);
-        _ubSkeletal->setData(&_uniforms.skeletal, sizeof(SkeletalUniforms), true);
-    }
-    if (_uniforms.general.featureMask & UniformsFeatureFlags::particles) {
-        _ubParticles->bind(UniformBlockBindingPoints::particles);
-        _ubParticles->setData(&_uniforms.particles, sizeof(ParticlesUniforms), true);
-    }
-    if (_uniforms.general.featureMask & UniformsFeatureFlags::grass) {
-        _ubGrass->bind(UniformBlockBindingPoints::grass);
-        _ubGrass->setData(&_uniforms.grass, sizeof(GrassUniforms), true);
-    }
+void Shaders::refreshTextUniforms() {
+    _ubText->bind(UniformBlockBindingPoints::text);
+    _ubText->setData(&_uniforms.text, sizeof(TextUniforms), true);
+}
+
+void Shaders::refreshSkeletalUniforms() {
+    _ubSkeletal->bind(UniformBlockBindingPoints::skeletal);
+    _ubSkeletal->setData(&_uniforms.skeletal, sizeof(SkeletalUniforms), true);
+}
+
+void Shaders::refreshLightingUniforms() {
+    _ubLighting->bind(UniformBlockBindingPoints::lighting);
+    _ubLighting->setData(&_uniforms.lighting, sizeof(LightingUniforms), true);
+}
+
+void Shaders::refreshParticlesUniforms() {
+    _ubParticles->bind(UniformBlockBindingPoints::particles);
+    _ubParticles->setData(&_uniforms.particles, sizeof(ParticlesUniforms), true);
+}
+
+void Shaders::refreshGrassUniforms() {
+    _ubGrass->bind(UniformBlockBindingPoints::grass);
+    _ubGrass->setData(&_uniforms.grass, sizeof(GrassUniforms), true);
 }
 
 void Shaders::refreshSSAOUniforms() {

@@ -147,7 +147,7 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
-    uniforms.general.featureMask = UniformsFeatureFlags::grass | UniformsFeatureFlags::hashedalphatest;
+    uniforms.general.featureMask = UniformsFeatureFlags::hashedalphatest;
     if (_aabbNode->mesh()->lightmap) {
         _textures.bind(*_aabbNode->mesh()->lightmap, TextureUnits::lightmap);
         uniforms.general.featureMask |= UniformsFeatureFlags::lightmap;
@@ -161,6 +161,7 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     }
 
     _shaders.use(_shaders.grass(), true);
+    _shaders.refreshGrassUniforms();
     _meshes.grass().drawInstanced(leafs.size());
 }
 
