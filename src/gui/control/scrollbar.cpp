@@ -24,7 +24,7 @@
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
-#include "../../graphics/uniformbuffers.h"
+#include "../../graphics/uniforms.h"
 #include "../../graphics/window.h"
 #include "../../resource/gffstruct.h"
 #include "../../resource/resources.h"
@@ -70,7 +70,7 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     _textures.bind(*_thumb.image);
 
     // Top edge
-    _uniformBuffers.setGeneral([this, &offset](auto &general) {
+    _uniforms.setGeneral([this, &offset](auto &general) {
         general.resetLocals();
         general.projection = _window.getOrthoProjection();
         general.model = glm::translate(glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
@@ -79,21 +79,21 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     _meshes.quad().draw();
 
     // Left edge
-    _uniformBuffers.setGeneral([this, &offset](auto &general) {
+    _uniforms.setGeneral([this, &offset](auto &general) {
         general.model = glm::translate(glm::vec3(_extent.left + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
         general.model *= glm::scale(glm::vec3(1.0f, _extent.height - 2.0f * _extent.width, 1.0f));
     });
     _meshes.quad().draw();
 
     // Right edge
-    _uniformBuffers.setGeneral([this, &offset](auto &general) {
+    _uniforms.setGeneral([this, &offset](auto &general) {
         general.model = glm::translate(glm::vec3(_extent.left + _extent.width - 1.0f + offset.x, _extent.top + _extent.width + offset.y, 0.0f));
         general.model *= glm::scale(glm::vec3(1.0f, _extent.height - 2.0f * _extent.width, 1.0f));
     });
     _meshes.quad().draw();
 
     // Bottom edge
-    _uniformBuffers.setGeneral([this, &offset](auto &general) {
+    _uniforms.setGeneral([this, &offset](auto &general) {
         general.model = glm::translate(glm::vec3(_extent.left + offset.x, _extent.top + _extent.height - _extent.width - 1.0f + offset.y, 0.0f));
         general.model *= glm::scale(glm::vec3(_extent.width, 1.0f, 1.0f));
     });
@@ -103,7 +103,7 @@ void ScrollBar::drawThumb(const glm::ivec2 &offset) {
     float frameHeight = _extent.height - 2.0f * _extent.width - 4.0f;
     float thumbHeight = frameHeight * _state.numVisible / static_cast<float>(_state.count);
     float y = glm::mix(0.0f, frameHeight - thumbHeight, _state.offset / static_cast<float>(_state.count - _state.numVisible));
-    _uniformBuffers.setGeneral([this, &offset, &thumbHeight, &y](auto &general) {
+    _uniforms.setGeneral([this, &offset, &thumbHeight, &y](auto &general) {
         general.model = glm::translate(glm::vec3(_extent.left + 2.0f + offset.x, _extent.top + _extent.width + 2.0f + offset.y + y, 0.0f));
         general.model *= glm::scale(glm::vec3(_extent.width - 4.0f, thumbHeight, 1.0f));
     });
@@ -134,7 +134,7 @@ void ScrollBar::drawUpArrow(const glm::ivec2 &offset) {
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
 
-    _uniformBuffers.setGeneral([this, transform](auto &general) {
+    _uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _window.getOrthoProjection();
         general.model = move(transform);
@@ -149,7 +149,7 @@ void ScrollBar::drawDownArrow(const glm::ivec2 &offset) {
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.width, 1.0f));
     transform = glm::rotate(transform, glm::pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
 
-    _uniformBuffers.setGeneral([this, transform](auto &general) {
+    _uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _window.getOrthoProjection();
         general.model = move(transform);

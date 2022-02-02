@@ -28,7 +28,7 @@ namespace graphics {
 
 class GraphicsContext;
 class Shaders;
-class UniformBuffers;
+class Uniforms;
 
 } // namespace graphics
 
@@ -41,12 +41,12 @@ public:
         SceneGraph &sceneGraph,
         graphics::GraphicsContext &graphicsContext,
         graphics::Shaders &shaders,
-        graphics::UniformBuffers &uniformBuffers) :
+        graphics::Uniforms &uniforms) :
         SceneNode(SceneNodeType::Walkmesh, sceneGraph),
         _walkmesh(std::move(walkmesh)),
         _graphicsContext(graphicsContext),
         _shaders(shaders),
-        _uniformBuffers(uniformBuffers) {
+        _uniforms(uniforms) {
 
         _point = false;
 
@@ -64,7 +64,7 @@ private:
 
     graphics::GraphicsContext &_graphicsContext;
     graphics::Shaders &_shaders;
-    graphics::UniformBuffers &_uniformBuffers;
+    graphics::Uniforms &_uniforms;
 };
 
 } // namespace scene

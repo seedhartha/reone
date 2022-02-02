@@ -33,16 +33,16 @@ void GraphicsModule::init() {
     _models = make_unique<Models>(*_textures, _resource.resources());
     _walkmeshes = make_unique<Walkmeshes>(_resource.resources());
     _lipAnimations = make_unique<LipAnimations>(_resource.resources());
-    _uniformBuffers = make_unique<UniformBuffers>();
+    _uniforms = make_unique<Uniforms>();
     _shaders = make_unique<Shaders>();
-    _fonts = make_unique<Fonts>(*_graphicsContext, *_meshes, *_shaders, *_textures, *_uniformBuffers, *_window);
-    _pipeline = make_unique<Pipeline>(_options, *_graphicsContext, *_meshes, *_shaders, *_textures, *_uniformBuffers);
+    _fonts = make_unique<Fonts>(*_graphicsContext, *_meshes, *_shaders, *_textures, *_uniforms, *_window);
+    _pipeline = make_unique<Pipeline>(_options, *_graphicsContext, *_meshes, *_shaders, *_textures, *_uniforms);
 
     _window->init();
     _graphicsContext->init();
     _meshes->init();
     _textures->init();
-    _uniformBuffers->init();
+    _uniforms->init();
     _shaders->init();
     _pipeline->init();
 }
@@ -50,7 +50,7 @@ void GraphicsModule::init() {
 void GraphicsModule::deinit() {
     _pipeline.reset();
     _shaders.reset();
-    _uniformBuffers.reset();
+    _uniforms.reset();
     _textures.reset();
     _meshes.reset();
     _graphicsContext.reset();

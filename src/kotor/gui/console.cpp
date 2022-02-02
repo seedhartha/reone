@@ -31,7 +31,7 @@
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/shaders.h"
-#include "../../graphics/uniformbuffers.h"
+#include "../../graphics/uniforms.h"
 #include "../../graphics/window.h"
 #include "../../resource/resources.h"
 #include "../../scene/types.h"
@@ -197,7 +197,7 @@ void Console::drawBackground() {
     glm::mat4 transform(1.0f);
     transform = glm::scale(transform, glm::vec3(_game.options().graphics.width, height, 1.0f));
 
-    _services.uniformBuffers.setGeneral([this, transform](auto &general) {
+    _services.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _services.window.getOrthoProjection();
         general.model = move(transform);

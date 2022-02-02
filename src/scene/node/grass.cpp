@@ -25,7 +25,7 @@
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/triangleutil.h"
-#include "../../graphics/uniformbuffers.h"
+#include "../../graphics/uniforms.h"
 
 #include "../graph.h"
 
@@ -145,7 +145,7 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
         return;
     }
     _textures.bind(*_texture);
-    _uniformBuffers.setGeneral([this](auto &general) {
+    _uniforms.setGeneral([this](auto &general) {
         general.resetLocals();
         general.featureMask = UniformsFeatureFlags::hashedalphatest;
         if (_aabbNode->mesh()->lightmap) {
@@ -153,7 +153,7 @@ void GrassSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
             general.featureMask |= UniformsFeatureFlags::lightmap;
         }
     });
-    _uniformBuffers.setGrass([this, &leafs](auto &grass) {
+    _uniforms.setGrass([this, &leafs](auto &grass) {
         for (size_t i = 0; i < leafs.size(); ++i) {
             auto cluster = static_cast<GrassClusterSceneNode *>(leafs[i]);
             grass.quadSize = glm::vec2(_quadSize);

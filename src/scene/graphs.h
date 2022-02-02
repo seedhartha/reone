@@ -29,7 +29,7 @@ class GraphicsContext;
 class Meshes;
 class Shaders;
 class Textures;
-class UniformBuffers;
+class Uniforms;
 
 } // namespace graphics
 
@@ -50,14 +50,14 @@ public:
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
-        graphics::UniformBuffers &uniformBuffers) :
+        graphics::Uniforms &uniforms) :
         _options(options),
         _audioPlayer(audioPlayer),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
         _textures(textures),
-        _uniformBuffers(uniformBuffers) {
+        _uniforms(uniforms) {
     }
 
     void add(std::string name);
@@ -77,7 +77,7 @@ private:
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
-    graphics::UniformBuffers &_uniformBuffers;
+    graphics::Uniforms &_uniforms;
 
     audio::AudioPlayer &_audioPlayer;
 

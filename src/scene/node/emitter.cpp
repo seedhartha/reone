@@ -24,7 +24,7 @@
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
-#include "../../graphics/uniformbuffers.h"
+#include "../../graphics/uniforms.h"
 
 #include "../graph.h"
 
@@ -256,7 +256,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     auto cameraUp = glm::vec3(view[0][1], view[1][1], view[2][1]);
     auto cameraForward = glm::vec3(view[0][2], view[1][2], view[2][2]);
 
-    _uniformBuffers.setGeneral([&emitter](auto &general) {
+    _uniforms.setGeneral([&emitter](auto &general) {
         general.resetLocals();
         general.gridSize = emitter->gridSize;
         switch (emitter->blendMode) {
@@ -269,7 +269,7 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
             break;
         }
     });
-    _uniformBuffers.setParticles([&](auto &particles) {
+    _uniforms.setParticles([&](auto &particles) {
         for (size_t i = 0; i < leafs.size(); ++i) {
             auto particle = static_cast<ParticleSceneNode *>(leafs[i]);
             particles.particles[i].positionFrame = glm::vec4(particle->getOrigin(), static_cast<float>(particle->frame()));

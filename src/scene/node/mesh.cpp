@@ -26,7 +26,7 @@
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/textureutil.h"
-#include "../../graphics/uniformbuffers.h"
+#include "../../graphics/uniforms.h"
 
 #include "../graph.h"
 
@@ -175,7 +175,7 @@ void MeshSceneNode::draw() {
     }
     bool transparent = isTransparent();
 
-    _uniformBuffers.setGeneral([this, &mesh](auto &general) {
+    _uniforms.setGeneral([this, &mesh](auto &general) {
         general.resetLocals();
         general.model = _absTransform;
         general.modelInv = _absTransformInv;
@@ -260,7 +260,7 @@ void MeshSceneNode::draw() {
 
     auto skin = mesh->skin;
     if (skin) {
-        _uniformBuffers.setSkeletal([this, &skin](auto &skeletal) {
+        _uniforms.setSkeletal([this, &skin](auto &skeletal) {
             for (size_t i = 0; i < kMaxBones; ++i) {
                 if (i >= skin->boneNodeNumber.size()) {
                     break;
@@ -292,7 +292,7 @@ void MeshSceneNode::drawShadow() {
     if (!mesh) {
         return;
     }
-    _uniformBuffers.setGeneral([this](auto &general) {
+    _uniforms.setGeneral([this](auto &general) {
         general.resetLocals();
         general.model = _absTransform;
         general.modelInv = _absTransformInv;

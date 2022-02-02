@@ -24,7 +24,7 @@
 #include "../graphics/shaders.h"
 #include "../graphics/texture.h"
 #include "../graphics/textures.h"
-#include "../graphics/uniformbuffers.h"
+#include "../graphics/uniforms.h"
 #include "../graphics/window.h"
 #include "../resource/gffs.h"
 #include "../resource/gffstruct.h"
@@ -60,7 +60,7 @@ GUI::GUI(
     Pipeline &pipeline,
     Shaders &shaders,
     Textures &textures,
-    UniformBuffers &uniformBuffers,
+    Uniforms &uniforms,
     Window &window,
     Gffs &gffs,
     Resources &resources,
@@ -73,7 +73,7 @@ GUI::GUI(
     _pipeline(pipeline),
     _shaders(shaders),
     _textures(textures),
-    _uniformBuffers(uniformBuffers),
+    _uniforms(uniforms),
     _window(window),
     _gffs(gffs),
     _resources(resources),
@@ -284,7 +284,7 @@ void GUI::drawBackground() {
     transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0));
     transform = glm::scale(transform, glm::vec3(_options.width, _options.height, 1.0f));
 
-    _uniformBuffers.setGeneral([this, transform](auto &general) {
+    _uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _window.getOrthoProjection();
         general.model = move(transform);
@@ -318,31 +318,31 @@ unique_ptr<Control> GUI::newControl(
     unique_ptr<Control> control;
     switch (type) {
     case ControlType::Panel:
-        control = make_unique<Panel>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniformBuffers, _window, _strings);
+        control = make_unique<Panel>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
         break;
     case ControlType::Label:
-        control = make_unique<Label>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniformBuffers, _window, _strings);
+        control = make_unique<Label>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
         break;
     case ControlType::ImageButton:
-        control = make_unique<ImageButton>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniformBuffers, _window, _strings);
+        control = make_unique<ImageButton>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
         break;
     case ControlType::Button:
-        control = make_unique<Button>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniformBuffers, _window, _strings);
+        control = make_unique<Button>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
         break;
     case ControlType::ToggleButton:
-        control = make_unique<ToggleButton>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniformBuffers, _window, _strings);
+        control = make_unique<ToggleButton>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
         break;
     case ControlType::Slider:
-        control = make_unique<Slider>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniformBuffers, _window, _strings);
+        control = make_unique<Slider>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
         break;
     case ControlType::ScrollBar:
-        control = make_unique<ScrollBar>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniformBuffers, _window, _strings);
+        control = make_unique<ScrollBar>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
         break;
     case ControlType::ProgressBar:
-        control = make_unique<ProgressBar>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniformBuffers, _window, _strings);
+        control = make_unique<ProgressBar>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
         break;
     case ControlType::ListBox:
-        control = make_unique<ListBox>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniformBuffers, _window, _strings);
+        control = make_unique<ListBox>(*this, _sceneGraphs, _fonts, _graphicsContext, _meshes, _pipeline, _shaders, _textures, _uniforms, _window, _strings);
         break;
     default:
         debug("Unsupported control type: " + to_string(static_cast<int>(type)), LogChannels::gui);

@@ -20,7 +20,7 @@
 #include "../../graphics/context.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/shaders.h"
-#include "../../graphics/uniformbuffers.h"
+#include "../../graphics/uniforms.h"
 
 using namespace std;
 
@@ -93,7 +93,7 @@ void TriggerSceneNode::init() {
 }
 
 void TriggerSceneNode::draw() {
-    _uniformBuffers.setGeneral([this](auto &general) {
+    _uniforms.setGeneral([this](auto &general) {
         general.resetLocals();
         general.model = _absTransform;
     });

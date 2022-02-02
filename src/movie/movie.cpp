@@ -24,7 +24,7 @@
 #include "../graphics/shaders.h"
 #include "../graphics/textures.h"
 #include "../graphics/textureutil.h"
-#include "../graphics/uniformbuffers.h"
+#include "../graphics/uniforms.h"
 
 using namespace std;
 
@@ -84,7 +84,7 @@ void Movie::draw() {
         _textures.bind(*_texture);
         _texture->setPixels(_width, _height, PixelFormat::RGB8, Texture::Layer {frame.pixels}, true);
     }
-    _uniformBuffers.setGeneral([](auto &general) {
+    _uniforms.setGeneral([](auto &general) {
         general.resetGlobals();
         general.resetLocals();
         general.uv = glm::mat3x4(

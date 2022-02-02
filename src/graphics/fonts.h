@@ -29,7 +29,7 @@ class GraphicsContext;
 class Meshes;
 class Shaders;
 class Textures;
-class UniformBuffers;
+class Uniforms;
 class Window;
 
 class Fonts : public MemoryCache<std::string, Font> {
@@ -39,14 +39,14 @@ public:
         Meshes &meshes,
         Shaders &shaders,
         Textures &textures,
-        UniformBuffers &uniformBuffers,
+        Uniforms &uniforms,
         Window &window) :
         MemoryCache(std::bind(&Fonts::doGet, this, std::placeholders::_1)),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
         _textures(textures),
-        _uniformBuffers(uniformBuffers),
+        _uniforms(uniforms),
         _window(window) {
     }
 
@@ -57,7 +57,7 @@ private:
     Meshes &_meshes;
     Shaders &_shaders;
     Textures &_textures;
-    UniformBuffers &_uniformBuffers;
+    Uniforms &_uniforms;
     Window &_window;
 
     // END Services

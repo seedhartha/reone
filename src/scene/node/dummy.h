@@ -32,7 +32,7 @@ public:
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
-        graphics::UniformBuffers &uniformBuffers) :
+        graphics::Uniforms &uniforms) :
         ModelNodeSceneNode(
             std::move(modelNode),
             SceneNodeType::Dummy,
@@ -41,7 +41,7 @@ public:
             meshes,
             shaders,
             textures,
-            uniformBuffers) {
+            uniforms) {
     }
 };
 

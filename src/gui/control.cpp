@@ -27,7 +27,7 @@
 #include "../graphics/shaders.h"
 #include "../graphics/textures.h"
 #include "../graphics/textutil.h"
-#include "../graphics/uniformbuffers.h"
+#include "../graphics/uniforms.h"
 #include "../graphics/window.h"
 #include "../resource/gffstruct.h"
 #include "../resource/strings.h"
@@ -213,7 +213,7 @@ void Control::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, const
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(_extent.width, _extent.height, 1.0f));
 
-    _uniformBuffers.setGeneral([this, projection, transform](auto &general) {
+    _uniforms.setGeneral([this, projection, transform](auto &general) {
         general.resetGlobals();
         general.resetLocals();
         general.projection = move(projection);
@@ -243,7 +243,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         transform = glm::translate(glm::vec3(x, y, 0.0f));
         transform *= glm::scale(glm::vec3(w, h, 1.0f));
 
-        _uniformBuffers.setGeneral([this, &transform](auto &general) {
+        _uniforms.setGeneral([this, &transform](auto &general) {
             general.resetLocals();
             general.featureMask = _discardEnabled ? UniformsFeatureFlags::discard : 0;
             general.projection = _window.getOrthoProjection();
@@ -271,7 +271,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(glm::vec3(x, y, 0.0f));
             transform *= glm::scale(glm::vec3(border.dimension, height, 1.0f));
 
-            _uniformBuffers.setGeneral([this, &transform, &color](auto &general) {
+            _uniforms.setGeneral([this, &transform, &color](auto &general) {
                 general.resetLocals();
                 general.projection = _window.getOrthoProjection();
                 general.model = transform;
@@ -288,7 +288,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(glm::vec3(x + size.x - border.dimension, y, 0.0f));
             transform *= glm::scale(glm::vec3(border.dimension, height, 1.0f));
 
-            _uniformBuffers.setGeneral([this, &transform, &color](auto &general) {
+            _uniforms.setGeneral([this, &transform, &color](auto &general) {
                 general.resetLocals();
                 general.projection = _window.getOrthoProjection();
                 general.model = transform;
@@ -310,7 +310,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(glm::vec3(x, y, 0.0f));
             transform *= glm::scale(glm::vec3(width, border.dimension, 1.0f));
 
-            _uniformBuffers.setGeneral([this, &transform, &color](auto &general) {
+            _uniforms.setGeneral([this, &transform, &color](auto &general) {
                 general.resetLocals();
                 general.projection = _window.getOrthoProjection();
                 general.model = transform;
@@ -323,7 +323,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
             transform = glm::translate(glm::vec3(x, y + size.y - border.dimension, 0.0f));
             transform *= glm::scale(glm::vec3(width, border.dimension, 1.0f));
 
-            _uniformBuffers.setGeneral([this, &transform, &color](auto &general) {
+            _uniforms.setGeneral([this, &transform, &color](auto &general) {
                 general.resetLocals();
                 general.projection = _window.getOrthoProjection();
                 general.model = transform;
@@ -348,7 +348,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         transform = glm::translate(glm::vec3(x, y, 0.0f));
         transform *= glm::scale(glm::vec3(border.dimension, border.dimension, 1.0f));
 
-        _uniformBuffers.setGeneral([this, &transform, &color](auto &general) {
+        _uniforms.setGeneral([this, &transform, &color](auto &general) {
             general.resetLocals();
             general.projection = _window.getOrthoProjection();
             general.model = transform;
@@ -361,7 +361,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         transform = glm::translate(glm::vec3(x, y + size.y - border.dimension, 0.0f));
         transform *= glm::scale(glm::vec3(border.dimension, border.dimension, 1.0f));
 
-        _uniformBuffers.setGeneral([this, &transform, &color](auto &general) {
+        _uniforms.setGeneral([this, &transform, &color](auto &general) {
             general.resetLocals();
             general.projection = _window.getOrthoProjection();
             general.model = transform;
@@ -378,7 +378,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         transform = glm::translate(glm::vec3(x + size.x - border.dimension, y, 0.0f));
         transform *= glm::scale(glm::vec3(border.dimension, border.dimension, 1.0f));
 
-        _uniformBuffers.setGeneral([this, &transform, &color](auto &general) {
+        _uniforms.setGeneral([this, &transform, &color](auto &general) {
             general.resetLocals();
             general.projection = _window.getOrthoProjection();
             general.model = transform;
@@ -395,7 +395,7 @@ void Control::drawBorder(const Border &border, const glm::ivec2 &offset, const g
         transform = glm::translate(glm::vec3(x + size.x - border.dimension, y + size.y - border.dimension, 0.0f));
         transform *= glm::scale(glm::vec3(border.dimension, border.dimension, 1.0f));
 
-        _uniformBuffers.setGeneral([this, &transform, &color](auto &general) {
+        _uniforms.setGeneral([this, &transform, &color](auto &general) {
             general.resetLocals();
             general.projection = _window.getOrthoProjection();
             general.model = transform;

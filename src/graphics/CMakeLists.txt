@@ -65,7 +65,6 @@ set(GRAPHICS_HEADERS
     triangleutil.h
     types.h
     uniformbuffer.h
-    uniformbuffers.h
     uniforms.h
     walkmesh.h
     walkmeshes.h
@@ -107,7 +106,7 @@ set(GRAPHICS_SOURCES
     textureutil.cpp
     textutil.cpp
     uniformbuffer.cpp
-    uniformbuffers.cpp
+    uniforms.cpp
     walkmesh.cpp
     walkmeshes.cpp
     window.cpp)

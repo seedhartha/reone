@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "uniformbuffers.h"
+#include "uniforms.h"
 
 using namespace std;
 
@@ -23,7 +23,7 @@ namespace reone {
 
 namespace graphics {
 
-void UniformBuffers::init() {
+void Uniforms::init() {
     if (_inited) {
         return;
     }
@@ -49,7 +49,7 @@ void UniformBuffers::init() {
     _inited = true;
 }
 
-void UniformBuffers::deinit() {
+void Uniforms::deinit() {
     if (!_inited) {
         return;
     }
@@ -65,54 +65,54 @@ void UniformBuffers::deinit() {
     _inited = false;
 }
 
-void UniformBuffers::setGeneral(const function<void(GeneralUniforms &)> &block) {
+void Uniforms::setGeneral(const function<void(GeneralUniforms &)> &block) {
     block(_general);
     refreshBuffer(*_ubGeneral, UniformBlockBindingPoints::general, &_general, sizeof(GeneralUniforms));
 }
 
-void UniformBuffers::setText(const function<void(TextUniforms &)> &block) {
+void Uniforms::setText(const function<void(TextUniforms &)> &block) {
     block(_text);
     refreshBuffer(*_ubText, UniformBlockBindingPoints::text, &_text, sizeof(TextUniforms));
 }
 
-void UniformBuffers::setLighting(const function<void(LightingUniforms &)> &block) {
+void Uniforms::setLighting(const function<void(LightingUniforms &)> &block) {
     block(_lighting);
     refreshBuffer(*_ubLighting, UniformBlockBindingPoints::lighting, &_lighting, sizeof(LightingUniforms));
 }
 
-void UniformBuffers::setSkeletal(const function<void(SkeletalUniforms &)> &block) {
+void Uniforms::setSkeletal(const function<void(SkeletalUniforms &)> &block) {
     block(_skeletal);
     refreshBuffer(*_ubSkeletal, UniformBlockBindingPoints::skeletal, &_skeletal, sizeof(SkeletalUniforms));
 }
 
-void UniformBuffers::setParticles(const function<void(ParticlesUniforms &)> &block) {
+void Uniforms::setParticles(const function<void(ParticlesUniforms &)> &block) {
     block(_particles);
     refreshBuffer(*_ubParticles, UniformBlockBindingPoints::particles, &_particles, sizeof(ParticlesUniforms));
 }
 
-void UniformBuffers::setGrass(const function<void(GrassUniforms &)> &block) {
+void Uniforms::setGrass(const function<void(GrassUniforms &)> &block) {
     block(_grass);
     refreshBuffer(*_ubGrass, UniformBlockBindingPoints::grass, &_grass, sizeof(GrassUniforms));
 }
 
-void UniformBuffers::setSSAO(const function<void(SSAOUniforms &)> &block) {
+void Uniforms::setSSAO(const function<void(SSAOUniforms &)> &block) {
     block(_ssao);
     refreshBuffer(*_ubSSAO, UniformBlockBindingPoints::ssao, &_ssao, sizeof(SSAOUniforms));
 }
 
-void UniformBuffers::setWalkmesh(const function<void(WalkmeshUniforms &)> &block) {
+void Uniforms::setWalkmesh(const function<void(WalkmeshUniforms &)> &block) {
     block(_walkmesh);
     refreshBuffer(*_ubWalkmesh, UniformBlockBindingPoints::walkmesh, &_walkmesh, sizeof(WalkmeshUniforms));
 }
 
-unique_ptr<UniformBuffer> UniformBuffers::initBuffer(const void *data, ptrdiff_t size) {
+unique_ptr<UniformBuffer> Uniforms::initBuffer(const void *data, ptrdiff_t size) {
     auto buf = make_unique<UniformBuffer>();
     buf->setData(data, size);
     buf->init();
     return move(buf);
 }
 
-void UniformBuffers::refreshBuffer(UniformBuffer &buffer, int bindingPoint, const void *data, ptrdiff_t size) {
+void Uniforms::refreshBuffer(UniformBuffer &buffer, int bindingPoint, const void *data, ptrdiff_t size) {
     buffer.bind(bindingPoint);
     buffer.setData(data, size, true);
 }
