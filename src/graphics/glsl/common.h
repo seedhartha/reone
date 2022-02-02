@@ -33,18 +33,14 @@ const int FEATURE_ENVMAP = 2;
 const int FEATURE_NORMALMAP = 4;
 const int FEATURE_HEIGHTMAP = 8;
 const int FEATURE_SKELETAL = 0x10;
-const int FEATURE_LIGHTING = 0x20;
-const int FEATURE_DISCARD = 0x40;
-const int FEATURE_SHADOWS = 0x80;
-const int FEATURE_PARTICLES = 0x100;
-const int FEATURE_WATER = 0x200;
-const int FEATURE_TEXT = 0x400;
-const int FEATURE_GRASS = 0x800;
-const int FEATURE_FOG = 0x1000;
-const int FEATURE_FIXEDSIZE = 0x2000;
-const int FEATURE_HASHEDALPHATEST = 0x4000;
-const int FEATURE_PREMULALPHA = 0x8000;
-const int FEATURE_ENVMAPCUBE = 0x10000;
+const int FEATURE_DISCARD = 0x20;
+const int FEATURE_SHADOWS = 0x40;
+const int FEATURE_WATER = 0x80;
+const int FEATURE_FOG = 0x100;
+const int FEATURE_FIXEDSIZE = 0x200;
+const int FEATURE_HASHEDALPHATEST = 0x400;
+const int FEATURE_PREMULALPHA = 0x800;
+const int FEATURE_ENVMAPCUBE = 0x1000;
 
 layout(std140) uniform General {
     mat4 uProjection;

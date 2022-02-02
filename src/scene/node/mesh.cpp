@@ -265,6 +265,7 @@ void MeshSceneNode::draw() {
                                          bone->absoluteTransform() *
                                          skin->boneMatrices[skin->boneSerial[i]];
         }
+        _shaders.refreshSkeletalUniforms();
     }
     bool receivesShadows = isReceivingShadows(_model, *this);
     if (receivesShadows && _sceneGraph.hasShadowLight()) {

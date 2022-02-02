@@ -35,6 +35,11 @@ public:
 
     void use(ShaderProgram &program, bool refreshUniforms = false);
 
+    void refreshTextUniforms();
+    void refreshSkeletalUniforms();
+    void refreshLightingUniforms();
+    void refreshParticlesUniforms();
+    void refreshGrassUniforms();
     void refreshSSAOUniforms();
     void refreshWalkmeshUniforms();
 
@@ -57,7 +62,7 @@ public:
     ShaderProgram &ssr() const { return *_spSSR; }
     ShaderProgram &combineOpaque() const { return *_spCombineOpaque; }
     ShaderProgram &combineGeometry() const { return *_spCombineGeometry; }
-    
+
     ShaderProgram &boxBlur4() const { return *_spBoxBlur4; }
     ShaderProgram &gaussianBlur9() const { return *_spGaussianBlur9; }
     ShaderProgram &gaussianBlur13() const { return *_spGaussianBlur13; }
@@ -91,7 +96,7 @@ private:
     std::shared_ptr<ShaderProgram> _spSSR;
     std::shared_ptr<ShaderProgram> _spCombineOpaque;
     std::shared_ptr<ShaderProgram> _spCombineGeometry;
-    
+
     std::shared_ptr<ShaderProgram> _spBoxBlur4;
     std::shared_ptr<ShaderProgram> _spGaussianBlur9;
     std::shared_ptr<ShaderProgram> _spGaussianBlur13;
@@ -120,7 +125,6 @@ private:
     std::unique_ptr<UniformBuffer> initUniformBuffer(const void *data, ptrdiff_t size);
 
     void refreshGeneralUniforms();
-    void refreshFeatureUniforms();
 };
 
 } // namespace graphics

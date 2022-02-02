@@ -62,7 +62,6 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
 
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetLocals();
-    uniforms.general.featureMask = UniformsFeatureFlags::text;
     uniforms.general.projection = _window.getOrthoProjection();
     uniforms.general.color = glm::vec4(color, 1.0f);
 
@@ -88,6 +87,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
             textOffset.x += glyph.size.x;
         }
         _shaders.use(_shaders.text(), true);
+        _shaders.refreshTextUniforms();
         _meshes.quad().drawInstanced(numChars);
     }
 }

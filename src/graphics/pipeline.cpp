@@ -541,7 +541,6 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
     auto &uniforms = _shaders.uniforms();
     uniforms.general.resetGlobals();
     uniforms.general.resetLocals();
-    uniforms.general.featureMask = UniformsFeatureFlags::lighting;
     uniforms.general.viewInv = glm::inverse(camera->view());
     uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
     uniforms.general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
@@ -576,6 +575,7 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     glDrawBuffers(2, kColorAttachments);
     _shaders.use(_shaders.combineOpaque(), true);
+    _shaders.refreshLightingUniforms();
     _textures.bind(*attachments.cbGBufferDiffuse);
     _textures.bind(*attachments.cbGBufferLightmap, TextureUnits::lightmap);
     _textures.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);

@@ -29,18 +29,14 @@ struct UniformsFeatureFlags {
     static constexpr int normalmap = 4;
     static constexpr int heightmap = 8;
     static constexpr int skeletal = 0x10;
-    static constexpr int lighting = 0x20;
-    static constexpr int discard = 0x40;
-    static constexpr int shadows = 0x80;
-    static constexpr int particles = 0x100;
-    static constexpr int water = 0x200;
-    static constexpr int text = 0x400;
-    static constexpr int grass = 0x800;
-    static constexpr int fog = 0x1000;
-    static constexpr int fixedsize = 0x2000;
-    static constexpr int hashedalphatest = 0x4000;
-    static constexpr int premulalpha = 0x8000;
-    static constexpr int envmapcube = 0x10000;
+    static constexpr int discard = 0x20;
+    static constexpr int shadows = 0x40;
+    static constexpr int water = 0x80;
+    static constexpr int fog = 0x100;
+    static constexpr int fixedsize = 0x200;
+    static constexpr int hashedalphatest = 0x400;
+    static constexpr int premulalpha = 0x800;
+    static constexpr int envmapcube = 0x1000;
 };
 
 struct GeneralUniforms {
