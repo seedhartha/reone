@@ -21,7 +21,7 @@
 #include "../graphics/mesh.h"
 #include "../graphics/meshes.h"
 #include "../graphics/shaders.h"
-#include "../graphics/uniformbuffers.h"
+#include "../graphics/uniforms.h"
 #include "../graphics/walkmesh.h"
 
 #include "collision.h"
@@ -422,7 +422,7 @@ void SceneGraph::drawOpaque() {
         return;
     }
     if (_drawWalkmeshes || _drawTriggers) {
-        _uniformBuffers.setWalkmesh([this](auto &walkmesh) {
+        _uniforms.setWalkmesh([this](auto &walkmesh) {
             for (int i = 0; i < kMaxWalkmeshMaterials - 1; ++i) {
                 walkmesh.materials[i] = _walkableSurfaces.count(i) > 0 ? glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) : glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
             }
@@ -656,15 +656,15 @@ shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) 
 }
 
 unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {
-    return make_unique<DummySceneNode>(move(modelNode), *this, _graphicsContext, _meshes, _shaders, _textures, _uniformBuffers);
+    return make_unique<DummySceneNode>(move(modelNode), *this, _graphicsContext, _meshes, _shaders, _textures, _uniforms);
 }
 
 unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(shared_ptr<Walkmesh> walkmesh) {
-    return make_unique<WalkmeshSceneNode>(move(walkmesh), *this, _graphicsContext, _shaders, _uniformBuffers);
+    return make_unique<WalkmeshSceneNode>(move(walkmesh), *this, _graphicsContext, _shaders, _uniforms);
 }
 
 unique_ptr<TriggerSceneNode> SceneGraph::newTrigger(vector<glm::vec3> geometry) {
-    return make_unique<TriggerSceneNode>(move(geometry), *this, _graphicsContext, _shaders, _uniformBuffers);
+    return make_unique<TriggerSceneNode>(move(geometry), *this, _graphicsContext, _shaders, _uniforms);
 }
 
 unique_ptr<CameraSceneNode> SceneGraph::newCamera() {
@@ -684,7 +684,7 @@ unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUs
         _meshes,
         _shaders,
         _textures,
-        _uniformBuffers,
+        _uniforms,
         animEventListener);
 }
 
@@ -701,7 +701,7 @@ unique_ptr<GrassSceneNode> SceneGraph::newGrass(float density, float quadSize, g
         _meshes,
         _shaders,
         _textures,
-        _uniformBuffers);
+        _uniforms);
 }
 
 } // namespace scene

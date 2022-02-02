@@ -23,7 +23,7 @@
 #include "shaders.h"
 #include "texture.h"
 #include "textures.h"
-#include "uniformbuffers.h"
+#include "uniforms.h"
 #include "window.h"
 
 using namespace std;
@@ -63,7 +63,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
     _shaders.use(_shaders.text());
     _textures.bind(*_texture);
 
-    _uniformBuffers.setGeneral([this, &color](auto &general) {
+    _uniforms.setGeneral([this, &color](auto &general) {
         general.resetLocals();
         general.projection = _window.getOrthoProjection();
         general.color = glm::vec4(color, 1.0f);
@@ -76,7 +76,7 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
     glm::vec3 textOffset(getTextOffset(text, gravity), 0.0f);
     for (int i = 0; i < numBlocks; ++i) {
         int numChars = glm::min(kMaxTextChars, static_cast<int>(text.size()) - i * kMaxTextChars);
-        _uniformBuffers.setText([this, &text, &position, &textOffset, &i, &numChars](auto &uniforms) {
+        _uniforms.setText([this, &text, &position, &textOffset, &i, &numChars](auto &uniforms) {
             for (int j = 0; j < numChars; ++j) {
                 const Glyph &glyph = _glyphs[static_cast<unsigned char>(text[i * kMaxTextChars + j])];
 

@@ -24,7 +24,7 @@
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
-#include "../../graphics/uniformbuffers.h"
+#include "../../graphics/uniforms.h"
 #include "../../graphics/window.h"
 
 #include "../gui.h"
@@ -96,7 +96,7 @@ void ImageButton::drawIcon(
         transform = glm::translate(transform, glm::vec3(offset.x + _extent.left, offset.y + _extent.top, 0.0f));
         transform = glm::scale(transform, glm::vec3(_extent.height, _extent.height, 1.0f));
 
-        _uniformBuffers.setGeneral([this, transform, &color](auto &general) {
+        _uniforms.setGeneral([this, transform, &color](auto &general) {
             general.resetLocals();
             general.projection = _window.getOrthoProjection();
             general.model = move(transform);
@@ -113,7 +113,7 @@ void ImageButton::drawIcon(
 
         _textures.bind(*iconTexture);
 
-        _uniformBuffers.setGeneral([this, transform](auto &general) {
+        _uniforms.setGeneral([this, transform](auto &general) {
             general.resetLocals();
             general.projection = _window.getOrthoProjection();
             general.model = move(transform);

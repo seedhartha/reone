@@ -46,7 +46,7 @@ ModelSceneNode::ModelSceneNode(
     Meshes &meshes,
     Shaders &shaders,
     Textures &textures,
-    UniformBuffers &uniformBuffers,
+    Uniforms &uniforms,
     IAnimationEventListener *animEventListener) :
     SceneNode(SceneNodeType::Model, sceneGraph),
     _model(model),
@@ -55,7 +55,7 @@ ModelSceneNode::ModelSceneNode(
     _meshes(meshes),
     _shaders(shaders),
     _textures(textures),
-    _uniformBuffers(uniformBuffers),
+    _uniforms(uniforms),
     _animEventListener(animEventListener) {
 
     buildNodeTree(_model->rootNode(), *this);
@@ -131,19 +131,19 @@ void ModelSceneNode::computeAABB() {
 }
 
 unique_ptr<DummySceneNode> ModelSceneNode::newDummySceneNode(shared_ptr<ModelNode> node) {
-    return make_unique<DummySceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures, _uniformBuffers);
+    return make_unique<DummySceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures, _uniforms);
 }
 
 unique_ptr<MeshSceneNode> ModelSceneNode::newMeshSceneNode(shared_ptr<ModelNode> node) {
-    return make_unique<MeshSceneNode>(*this, move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures, _uniformBuffers);
+    return make_unique<MeshSceneNode>(*this, move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures, _uniforms);
 }
 
 unique_ptr<LightSceneNode> ModelSceneNode::newLightSceneNode(shared_ptr<ModelNode> node) {
-    return make_unique<LightSceneNode>(*this, move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures, _uniformBuffers);
+    return make_unique<LightSceneNode>(*this, move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures, _uniforms);
 }
 
 unique_ptr<EmitterSceneNode> ModelSceneNode::newEmitterSceneNode(shared_ptr<ModelNode> node) {
-    return make_unique<EmitterSceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures, _uniformBuffers);
+    return make_unique<EmitterSceneNode>(move(node), _sceneGraph, _graphicsContext, _meshes, _shaders, _textures, _uniforms);
 }
 
 void ModelSceneNode::signalEvent(const string &name) {

@@ -26,7 +26,7 @@ namespace graphics {
 class GraphicsContext;
 class Mesh;
 class Shaders;
-class UniformBuffers;
+class Uniforms;
 
 } // namespace graphics
 
@@ -39,12 +39,12 @@ public:
         SceneGraph &sceneGraph,
         graphics::GraphicsContext &graphicsContext,
         graphics::Shaders &shaders,
-        graphics::UniformBuffers &uniformBuffers) :
+        graphics::Uniforms &uniforms) :
         SceneNode(SceneNodeType::Trigger, sceneGraph),
         _geometry(std::move(geometry)),
         _graphicsContext(graphicsContext),
         _shaders(shaders),
-        _uniformBuffers(uniformBuffers) {
+        _uniforms(uniforms) {
 
         init();
     }
@@ -59,7 +59,7 @@ private:
 
     graphics::GraphicsContext &_graphicsContext;
     graphics::Shaders &_shaders;
-    graphics::UniformBuffers &_uniformBuffers;
+    graphics::Uniforms &_uniforms;
 
     std::unique_ptr<graphics::Mesh> _mesh;
 };

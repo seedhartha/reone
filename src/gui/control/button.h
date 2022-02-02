@@ -34,7 +34,7 @@ public:
         graphics::Pipeline &pipeline,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
-        graphics::UniformBuffers &uniformBuffers,
+        graphics::Uniforms &uniforms,
         graphics::Window &window,
         resource::Strings &strings) :
         Button(
@@ -47,7 +47,7 @@ public:
             pipeline,
             shaders,
             textures,
-            uniformBuffers,
+            uniforms,
             window,
             strings) {
     }
@@ -63,7 +63,7 @@ protected:
         graphics::Pipeline &pipeline,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
-        graphics::UniformBuffers &uniformBuffers,
+        graphics::Uniforms &uniforms,
         graphics::Window &window,
         resource::Strings &strings) :
         Control(
@@ -76,7 +76,7 @@ protected:
             pipeline,
             shaders,
             textures,
-            uniformBuffers,
+            uniforms,
             window,
             strings) {
 

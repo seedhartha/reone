@@ -24,7 +24,7 @@
 #include "../../graphics/meshes.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/textures.h"
-#include "../../graphics/uniformbuffers.h"
+#include "../../graphics/uniforms.h"
 #include "../../graphics/window.h"
 #include "../../resource/gffstruct.h"
 
@@ -97,7 +97,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, topLeft);
         transform = glm::scale(transform, glm::vec3(_areaTexture->width(), _areaTexture->height(), 1.0f));
 
-        _services.uniformBuffers.setGeneral([this, transform](auto &general) {
+        _services.uniforms.setGeneral([this, transform](auto &general) {
             general.resetLocals();
             general.projection = _services.window.getOrthoProjection();
             general.model = move(transform);
@@ -117,7 +117,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, glm::vec3(bounds[0], bounds[1], 0.0f));
         transform = glm::scale(transform, glm::vec3(bounds[2], bounds[3], 1.0f));
 
-        _services.uniformBuffers.setGeneral([this, transform](auto &general) {
+        _services.uniforms.setGeneral([this, transform](auto &general) {
             general.resetLocals();
             general.projection = _services.window.getOrthoProjection();
             general.model = move(transform);
@@ -153,7 +153,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, glm::vec3(notePos.x - 0.5f * noteSize, notePos.y - 0.5f * noteSize, 0.0f));
         transform = glm::scale(transform, glm::vec3(noteSize, noteSize, 1.0f));
 
-        _services.uniformBuffers.setGeneral([this, transform, &selected](auto &general) {
+        _services.uniforms.setGeneral([this, transform, &selected](auto &general) {
             general.resetLocals();
             general.projection = _services.window.getOrthoProjection();
             general.model = move(transform);
@@ -236,7 +236,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     transform = glm::translate(transform, glm::vec3(-0.5f * kArrowSize, -0.5f * kArrowSize, 0.0f));
     transform = glm::scale(transform, glm::vec3(kArrowSize, kArrowSize, 1.0f));
 
-    _services.uniformBuffers.setGeneral([this, transform](auto &general) {
+    _services.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _services.window.getOrthoProjection();
         general.model = move(transform);

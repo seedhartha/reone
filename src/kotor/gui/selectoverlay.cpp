@@ -36,7 +36,7 @@
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
-#include "../../graphics/uniformbuffers.h"
+#include "../../graphics/uniforms.h"
 #include "../../graphics/window.h"
 #include "../../resource/resources.h"
 
@@ -268,7 +268,7 @@ void SelectionOverlay::drawReticle(shared_ptr<Texture> texture, const glm::vec3 
     transform = glm::translate(transform, glm::vec3((opts.width * screenCoords.x) - width / 2, (opts.height * (1.0f - screenCoords.y)) - height / 2, 0.0f));
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
-    _services.uniformBuffers.setGeneral([this, transform](auto &general) {
+    _services.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _services.window.getOrthoProjection();
         general.model = move(transform);
@@ -294,7 +294,7 @@ void SelectionOverlay::drawTitleBar() {
         transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
         transform = glm::scale(transform, glm::vec3(kTitleBarWidth, barHeight, 1.0f));
 
-        _services.uniformBuffers.setGeneral([this, transform](auto &general) {
+        _services.uniforms.setGeneral([this, transform](auto &general) {
             general.resetLocals();
             general.projection = _services.window.getOrthoProjection();
             general.model = move(transform);
@@ -328,7 +328,7 @@ void SelectionOverlay::drawHealthBar() {
     transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, kHealthBarHeight, 1.0f));
 
-    _services.uniformBuffers.setGeneral([this, transform](auto &general) {
+    _services.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _services.window.getOrthoProjection();
         general.model = move(transform);
@@ -366,7 +366,7 @@ void SelectionOverlay::drawActionFrame(int index) {
     transform = glm::translate(transform, glm::vec3(frameX, frameY, 0.0f));
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionHeight, 1.0f));
 
-    _services.uniformBuffers.setGeneral([this, transform](auto &general) {
+    _services.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _services.window.getOrthoProjection();
         general.model = move(transform);
@@ -429,7 +429,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     transform = glm::translate(transform, glm::vec3(frameX, y, 0.0f));
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionWidth, 1.0f));
 
-    _services.uniformBuffers.setGeneral([this, transform](auto &general) {
+    _services.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
         general.projection = _services.window.getOrthoProjection();
         general.model = move(transform);

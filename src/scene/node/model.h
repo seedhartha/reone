@@ -35,7 +35,7 @@ namespace reone {
 namespace graphics {
 
 class Textures;
-class UniformBuffers;
+class Uniforms;
 
 } // namespace graphics
 
@@ -51,7 +51,7 @@ public:
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
-        graphics::UniformBuffers &uniformBuffers,
+        graphics::Uniforms &uniforms,
         IAnimationEventListener *animEventListener = nullptr);
 
     void update(float dt) override;
@@ -146,7 +146,7 @@ private:
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
-    graphics::UniformBuffers &_uniformBuffers;
+    graphics::Uniforms &_uniforms;
 
     // END Services
 

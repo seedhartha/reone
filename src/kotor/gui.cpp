@@ -46,7 +46,7 @@ GameGUI::GameGUI(KotOR &game, Services &services) :
         services.pipeline,
         services.shaders,
         services.textures,
-        services.uniformBuffers,
+        services.uniforms,
         services.window,
         services.gffs,
         services.resources,

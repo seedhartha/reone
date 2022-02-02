@@ -19,7 +19,7 @@
 
 #include "../../graphics/context.h"
 #include "../../graphics/shaders.h"
-#include "../../graphics/uniformbuffers.h"
+#include "../../graphics/uniforms.h"
 
 #include "../graph.h"
 
@@ -66,7 +66,7 @@ void WalkmeshSceneNode::init() {
 }
 
 void WalkmeshSceneNode::draw() {
-    _uniformBuffers.setGeneral([this](auto &general) {
+    _uniforms.setGeneral([this](auto &general) {
         general.resetLocals();
         general.model = _absTransform;
     });

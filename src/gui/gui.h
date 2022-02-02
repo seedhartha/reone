@@ -40,7 +40,7 @@ class Meshes;
 class Pipeline;
 class Shaders;
 class Texture;
-class UniformBuffers;
+class Uniforms;
 class Window;
 
 } // namespace graphics
@@ -104,7 +104,7 @@ protected:
     graphics::Pipeline &_pipeline;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
-    graphics::UniformBuffers &_uniformBuffers;
+    graphics::Uniforms &_uniforms;
     graphics::Window &_window;
 
     resource::Gffs &_gffs;
@@ -122,7 +122,7 @@ protected:
         graphics::Pipeline &pipeline,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
-        graphics::UniformBuffers &uniformBuffers,
+        graphics::Uniforms &uniforms,
         graphics::Window &window,
         resource::Gffs &gffs,
         resource::Resources &resources,

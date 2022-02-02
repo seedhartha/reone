@@ -35,7 +35,7 @@ void SceneGraphs::add(string name) {
         _meshes,
         _shaders,
         _textures,
-        _uniformBuffers);
+        _uniforms);
 
     _scenes.insert(make_pair(name, move(scene)));
 }

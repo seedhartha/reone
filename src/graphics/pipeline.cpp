@@ -31,7 +31,7 @@
 #include "texture.h"
 #include "textures.h"
 #include "textureutil.h"
-#include "uniformbuffers.h"
+#include "uniforms.h"
 #include "window.h"
 
 using namespace std;
@@ -157,7 +157,7 @@ static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) 
 
 void Pipeline::init() {
     // SSAO
-    _uniformBuffers.setSSAO([](auto &ssao) {
+    _uniforms.setSSAO([](auto &ssao) {
         for (int i = 0; i < kNumSSAOSamples; ++i) {
             float scale = i / static_cast<float>(kNumSSAOSamples);
             scale = glm::mix(0.1f, 1.0f, scale * scale);
@@ -422,7 +422,7 @@ void Pipeline::drawShadows(IScene &scene, Attachments &attachments) {
         return;
     }
 
-    _uniformBuffers.setGeneral([this, &scene](auto &general) {
+    _uniforms.setGeneral([this, &scene](auto &general) {
         general.resetGlobals();
         general.shadowLightPosition = glm::vec4(scene.shadowLightPosition(), scene.isShadowLightDirectional() ? 0.0f : 1.0f);
         for (int i = 0; i < kNumShadowLightSpace; ++i) {
@@ -442,7 +442,7 @@ void Pipeline::drawShadows(IScene &scene, Attachments &attachments) {
 void Pipeline::drawOpaqueGeometry(IScene &scene, Attachments &attachments) {
     auto camera = scene.camera();
 
-    _uniformBuffers.setGeneral([&camera](auto &general) {
+    _uniforms.setGeneral([&camera](auto &general) {
         general.resetGlobals();
         general.projection = camera->projection();
         general.view = camera->view();
@@ -459,7 +459,7 @@ void Pipeline::drawOpaqueGeometry(IScene &scene, Attachments &attachments) {
 void Pipeline::drawTransparentGeometry(IScene &scene, Attachments &attachments) {
     auto camera = scene.camera();
 
-    _uniformBuffers.setGeneral([&camera](auto &general) {
+    _uniforms.setGeneral([&camera](auto &general) {
         general.resetGlobals();
         general.projection = camera->projection();
         general.view = camera->view();
@@ -482,7 +482,7 @@ void Pipeline::drawTransparentGeometry(IScene &scene, Attachments &attachments) 
 void Pipeline::drawLensFlares(IScene &scene, Framebuffer &dst) {
     auto camera = scene.camera();
 
-    _uniformBuffers.setGeneral([&camera](auto &general) {
+    _uniforms.setGeneral([&camera](auto &general) {
         general.resetGlobals();
         general.projection = camera->projection();
         general.view = camera->view();
@@ -495,7 +495,7 @@ void Pipeline::drawLensFlares(IScene &scene, Framebuffer &dst) {
 void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments, float sampleRadius, float bias) {
     auto camera = scene.camera();
 
-    _uniformBuffers.setGeneral([&dim, &sampleRadius, &bias, &camera](auto &general) {
+    _uniforms.setGeneral([&dim, &sampleRadius, &bias, &camera](auto &general) {
         general.resetGlobals();
         general.resetLocals();
         general.projection = camera->projection();
@@ -521,7 +521,7 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     screenProjection *= glm::scale(glm::vec3(0.5f, 0.5f, 1.0f));
     screenProjection *= camera->projection();
 
-    _uniformBuffers.setGeneral([&dim, &bias, &pixelStride, &maxSteps, &camera, screenProjection](auto &general) {
+    _uniforms.setGeneral([&dim, &bias, &pixelStride, &maxSteps, &camera, screenProjection](auto &general) {
         general.resetGlobals();
         general.resetLocals();
         general.screenProjection = move(screenProjection);
@@ -548,7 +548,7 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
 
 void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Framebuffer &dst) {
     auto camera = scene.camera();
-    _uniformBuffers.setGeneral([this, &scene, &camera](auto &general) {
+    _uniforms.setGeneral([this, &scene, &camera](auto &general) {
         general.resetGlobals();
         general.resetLocals();
         general.viewInv = glm::inverse(camera->view());
@@ -573,7 +573,7 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
     });
 
     auto &lights = scene.activeLights();
-    _uniformBuffers.setLighting([&lights](auto &lighting) {
+    _uniforms.setLighting([&lights](auto &lighting) {
         lighting.numLights = static_cast<int>(lights.size());
         for (size_t i = 0; i < lights.size(); ++i) {
             LightUniforms &shaderLight = lighting.lights[i];
@@ -610,7 +610,7 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
 }
 
 void Pipeline::drawCombineGeometry(Attachments &attachments, Framebuffer &dst) {
-    _uniformBuffers.setGeneral([](auto &general) {
+    _uniforms.setGeneral([](auto &general) {
         general.resetGlobals();
         general.resetLocals();
     });
@@ -626,7 +626,7 @@ void Pipeline::drawCombineGeometry(Attachments &attachments, Framebuffer &dst) {
 }
 
 void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
-    _uniformBuffers.setGeneral([](auto &general) {
+    _uniforms.setGeneral([](auto &general) {
         general.resetGlobals();
         general.resetLocals();
     });
@@ -639,7 +639,7 @@ void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuff
 }
 
 void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong) {
-    _uniformBuffers.setGeneral([&dim, &vertical](auto &general) {
+    _uniforms.setGeneral([&dim, &vertical](auto &general) {
         general.resetGlobals();
         general.resetLocals();
         general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
@@ -654,7 +654,7 @@ void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Fram
 }
 
 void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong) {
-    _uniformBuffers.setGeneral([](auto &general) {
+    _uniforms.setGeneral([](auto &general) {
         general.resetGlobals();
         general.resetLocals();
     });
@@ -667,7 +667,7 @@ void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Fram
 }
 
 void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
-    _uniformBuffers.setGeneral([&dim](auto &general) {
+    _uniforms.setGeneral([&dim](auto &general) {
         general.resetGlobals();
         general.resetLocals();
         general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
@@ -681,7 +681,7 @@ void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer 
 }
 
 void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount) {
-    _uniformBuffers.setGeneral([&dim, &amount](auto &general) {
+    _uniforms.setGeneral([&dim, &amount](auto &general) {
         general.resetGlobals();
         general.resetLocals();
         general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));

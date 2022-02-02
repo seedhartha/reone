@@ -23,7 +23,7 @@
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
-#include "../../graphics/uniformbuffers.h"
+#include "../../graphics/uniforms.h"
 #include "../../graphics/window.h"
 
 #include "../graph.h"
@@ -72,7 +72,7 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     if (!camera) {
         return;
     }
-    _uniformBuffers.setGeneral([this, &flare](auto &general) {
+    _uniforms.setGeneral([this, &flare](auto &general) {
         general.resetLocals();
         general.featureMask = UniformsFeatureFlags::fixedsize;
         general.model = glm::translate(getOrigin());
