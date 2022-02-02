@@ -31,6 +31,7 @@
 #include "texture.h"
 #include "textures.h"
 #include "textureutil.h"
+#include "uniformbuffers.h"
 #include "window.h"
 
 using namespace std;
@@ -155,19 +156,17 @@ static glm::mat4 getPointLightView(const glm::vec3 &lightPos, CubeMapFace face) 
 }
 
 void Pipeline::init() {
-    auto &uniforms = _shaders.uniforms();
-
     // SSAO
-
-    for (int i = 0; i < kNumSSAOSamples; ++i) {
-        float scale = i / static_cast<float>(kNumSSAOSamples);
-        scale = glm::mix(0.1f, 1.0f, scale * scale);
-        auto sample = glm::vec3(random(-1.0f, 1.0f), random(-1.0f, 1.0f), random(0.0f, 1.0f));
-        sample = glm::normalize(sample);
-        sample *= scale;
-        uniforms.ssao.samples[i] = glm::vec4(move(sample), 0.0f);
-    }
-    _shaders.refreshSSAOUniforms();
+    _uniformBuffers.setSSAO([](auto &ssao) {
+        for (int i = 0; i < kNumSSAOSamples; ++i) {
+            float scale = i / static_cast<float>(kNumSSAOSamples);
+            scale = glm::mix(0.1f, 1.0f, scale * scale);
+            auto sample = glm::vec3(random(-1.0f, 1.0f), random(-1.0f, 1.0f), random(0.0f, 1.0f));
+            sample = glm::normalize(sample);
+            sample *= scale;
+            ssao.samples[i] = glm::vec4(move(sample), 0.0f);
+        }
+    });
 }
 
 void Pipeline::initAttachments(glm::ivec2 dim) {
@@ -423,12 +422,13 @@ void Pipeline::drawShadows(IScene &scene, Attachments &attachments) {
         return;
     }
 
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.shadowLightPosition = glm::vec4(scene.shadowLightPosition(), scene.isShadowLightDirectional() ? 0.0f : 1.0f);
-    for (int i = 0; i < kNumShadowLightSpace; ++i) {
-        uniforms.general.shadowLightSpace[i] = _shadowLightSpace[i];
-    }
+    _uniformBuffers.setGeneral([this, &scene](auto &general) {
+        general.resetGlobals();
+        general.shadowLightPosition = glm::vec4(scene.shadowLightPosition(), scene.isShadowLightDirectional() ? 0.0f : 1.0f);
+        for (int i = 0; i < kNumShadowLightSpace; ++i) {
+            general.shadowLightSpace[i] = _shadowLightSpace[i];
+        }
+    });
 
     auto framebuffer = scene.isShadowLightDirectional() ? attachments.fbDirectionalLightShadows : attachments.fbPointLightShadows;
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->nameGL());
@@ -441,12 +441,14 @@ void Pipeline::drawShadows(IScene &scene, Attachments &attachments) {
 
 void Pipeline::drawOpaqueGeometry(IScene &scene, Attachments &attachments) {
     auto camera = scene.camera();
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.projection = camera->projection();
-    uniforms.general.view = camera->view();
-    uniforms.general.viewInv = glm::inverse(camera->view());
-    uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
+
+    _uniformBuffers.setGeneral([&camera](auto &general) {
+        general.resetGlobals();
+        general.projection = camera->projection();
+        general.view = camera->view();
+        general.viewInv = glm::inverse(camera->view());
+        general.cameraPosition = glm::vec4(camera->position(), 1.0f);
+    });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbGBuffer->nameGL());
     glDrawBuffers(7, kColorAttachments);
@@ -456,14 +458,16 @@ void Pipeline::drawOpaqueGeometry(IScene &scene, Attachments &attachments) {
 
 void Pipeline::drawTransparentGeometry(IScene &scene, Attachments &attachments) {
     auto camera = scene.camera();
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.projection = camera->projection();
-    uniforms.general.view = camera->view();
-    uniforms.general.viewInv = glm::inverse(camera->view());
-    uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
-    uniforms.general.clipNear = camera->zNear();
-    uniforms.general.clipFar = camera->zFar();
+
+    _uniformBuffers.setGeneral([&camera](auto &general) {
+        general.resetGlobals();
+        general.projection = camera->projection();
+        general.view = camera->view();
+        general.viewInv = glm::inverse(camera->view());
+        general.cameraPosition = glm::vec4(camera->position(), 1.0f);
+        general.clipNear = camera->zNear();
+        general.clipFar = camera->zFar();
+    });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbTransparentGeometry->nameGL());
     glDrawBuffers(2, kColorAttachments);
@@ -477,10 +481,12 @@ void Pipeline::drawTransparentGeometry(IScene &scene, Attachments &attachments) 
 
 void Pipeline::drawLensFlares(IScene &scene, Framebuffer &dst) {
     auto camera = scene.camera();
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.projection = camera->projection();
-    uniforms.general.view = camera->view();
+
+    _uniformBuffers.setGeneral([&camera](auto &general) {
+        general.resetGlobals();
+        general.projection = camera->projection();
+        general.view = camera->view();
+    });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     scene.drawLensFlares();
@@ -488,17 +494,19 @@ void Pipeline::drawLensFlares(IScene &scene, Framebuffer &dst) {
 
 void Pipeline::drawSSAO(IScene &scene, const glm::ivec2 &dim, Attachments &attachments, float sampleRadius, float bias) {
     auto camera = scene.camera();
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
-    uniforms.general.projection = camera->projection();
-    uniforms.general.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
-    uniforms.general.ssaoSampleRadius = sampleRadius;
-    uniforms.general.ssaoBias = bias;
+
+    _uniformBuffers.setGeneral([&dim, &sampleRadius, &bias, &camera](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+        general.projection = camera->projection();
+        general.screenResolution = glm::vec2(static_cast<float>(dim.x), static_cast<float>(dim.y));
+        general.ssaoSampleRadius = sampleRadius;
+        general.ssaoBias = bias;
+    });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSAO->nameGL());
     glDrawBuffer(kColorAttachments[0]);
-    _shaders.use(_shaders.ssao(), true);
+    _shaders.use(_shaders.ssao());
     _textures.bind(*attachments.cbGBufferEyePos, TextureUnits::eyePos);
     _textures.bind(*attachments.cbGBufferEyeNormal, TextureUnits::eyeNormal);
     _graphicsContext.clearColorDepth();
@@ -512,21 +520,23 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
     screenProjection *= glm::translate(glm::vec3(0.5f, 0.5f, 0.0f));
     screenProjection *= glm::scale(glm::vec3(0.5f, 0.5f, 1.0f));
     screenProjection *= camera->projection();
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
-    uniforms.general.screenProjection = move(screenProjection);
-    uniforms.general.screenResolution = glm::vec2(dim.x, dim.y);
-    uniforms.general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-    uniforms.general.clipNear = camera->zNear();
-    uniforms.general.clipFar = camera->zFar();
-    uniforms.general.ssrBias = bias;
-    uniforms.general.ssrPixelStride = pixelStride;
-    uniforms.general.ssrMaxSteps = maxSteps;
+
+    _uniformBuffers.setGeneral([&dim, &bias, &pixelStride, &maxSteps, &camera, screenProjection](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+        general.screenProjection = move(screenProjection);
+        general.screenResolution = glm::vec2(dim.x, dim.y);
+        general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+        general.clipNear = camera->zNear();
+        general.clipFar = camera->zFar();
+        general.ssrBias = bias;
+        general.ssrPixelStride = pixelStride;
+        general.ssrMaxSteps = maxSteps;
+    });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, attachments.fbSSR->nameGL());
     glDrawBuffer(kColorAttachments[0]);
-    _shaders.use(_shaders.ssr(), true);
+    _shaders.use(_shaders.ssr());
     _textures.bind(*attachments.cbGBufferDiffuse);
     _textures.bind(*attachments.cbGBufferLightmap, TextureUnits::lightmap);
     _textures.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);
@@ -538,44 +548,47 @@ void Pipeline::drawSSR(IScene &scene, const glm::ivec2 &dim, Attachments &attach
 
 void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Framebuffer &dst) {
     auto camera = scene.camera();
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
-    uniforms.general.viewInv = glm::inverse(camera->view());
-    uniforms.general.cameraPosition = glm::vec4(camera->position(), 1.0f);
-    uniforms.general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
-    auto &lights = scene.activeLights();
-    uniforms.lighting.numLights = static_cast<int>(lights.size());
-    for (size_t i = 0; i < lights.size(); ++i) {
-        LightUniforms &shaderLight = uniforms.lighting.lights[i];
-        shaderLight.position = glm::vec4(lights[i]->getOrigin(), lights[i]->isDirectional() ? 0.0f : 1.0f);
-        shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
-        shaderLight.multiplier = lights[i]->multiplier() * lights[i]->strength();
-        shaderLight.radius = lights[i]->radius();
-        shaderLight.ambientOnly = static_cast<int>(lights[i]->modelNode().light()->ambientOnly);
-        shaderLight.dynamicType = lights[i]->modelNode().light()->dynamicType;
-    }
-    if (scene.hasShadowLight()) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::shadows;
-        uniforms.general.shadowLightPosition = glm::vec4(scene.shadowLightPosition(), scene.isShadowLightDirectional() ? 0.0f : 1.0f);
-        uniforms.general.shadowStrength = scene.shadowStrength();
-        uniforms.general.shadowRadius = scene.shadowRadius();
-        uniforms.general.shadowCascadeFarPlanes = _shadowCascadeFarPlanes;
-        for (int i = 0; i < kNumShadowLightSpace; ++i) {
-            uniforms.general.shadowLightSpace[i] = _shadowLightSpace[i];
+    _uniformBuffers.setGeneral([this, &scene, &camera](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+        general.viewInv = glm::inverse(camera->view());
+        general.cameraPosition = glm::vec4(camera->position(), 1.0f);
+        general.worldAmbientColor = glm::vec4(scene.ambientLightColor(), 1.0f);
+        if (scene.hasShadowLight()) {
+            general.featureMask |= UniformsFeatureFlags::shadows;
+            general.shadowLightPosition = glm::vec4(scene.shadowLightPosition(), scene.isShadowLightDirectional() ? 0.0f : 1.0f);
+            general.shadowStrength = scene.shadowStrength();
+            general.shadowRadius = scene.shadowRadius();
+            general.shadowCascadeFarPlanes = _shadowCascadeFarPlanes;
+            for (int i = 0; i < kNumShadowLightSpace; ++i) {
+                general.shadowLightSpace[i] = _shadowLightSpace[i];
+            }
         }
-    }
-    if (scene.isFogEnabled()) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::fog;
-        uniforms.general.fogNear = scene.fogNear();
-        uniforms.general.fogFar = scene.fogFar();
-        uniforms.general.fogColor = glm::vec4(scene.fogColor(), 1.0f);
-    }
+        if (scene.isFogEnabled()) {
+            general.featureMask |= UniformsFeatureFlags::fog;
+            general.fogNear = scene.fogNear();
+            general.fogFar = scene.fogFar();
+            general.fogColor = glm::vec4(scene.fogColor(), 1.0f);
+        }
+    });
+
+    auto &lights = scene.activeLights();
+    _uniformBuffers.setLighting([&lights](auto &lighting) {
+        lighting.numLights = static_cast<int>(lights.size());
+        for (size_t i = 0; i < lights.size(); ++i) {
+            LightUniforms &shaderLight = lighting.lights[i];
+            shaderLight.position = glm::vec4(lights[i]->getOrigin(), lights[i]->isDirectional() ? 0.0f : 1.0f);
+            shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
+            shaderLight.multiplier = lights[i]->multiplier() * lights[i]->strength();
+            shaderLight.radius = lights[i]->radius();
+            shaderLight.ambientOnly = static_cast<int>(lights[i]->modelNode().light()->ambientOnly);
+            shaderLight.dynamicType = lights[i]->modelNode().light()->dynamicType;
+        }
+    });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     glDrawBuffers(2, kColorAttachments);
-    _shaders.use(_shaders.combineOpaque(), true);
-    _shaders.refreshLightingUniforms();
+    _shaders.use(_shaders.combineOpaque());
     _textures.bind(*attachments.cbGBufferDiffuse);
     _textures.bind(*attachments.cbGBufferLightmap, TextureUnits::lightmap);
     _textures.bind(*attachments.cbGBufferEnvMap, TextureUnits::envmapColor);
@@ -597,12 +610,13 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
 }
 
 void Pipeline::drawCombineGeometry(Attachments &attachments, Framebuffer &dst) {
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
+    _uniformBuffers.setGeneral([](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+    });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(_shaders.combineGeometry(), true);
+    _shaders.use(_shaders.combineGeometry());
     _textures.bind(*attachments.cbOpaqueGeometry1);
     _textures.bind(*attachments.cbOpaqueGeometry2, TextureUnits::hilights);
     _textures.bind(*attachments.cbTransparentGeometry1, TextureUnits::oitAccum);
@@ -612,65 +626,70 @@ void Pipeline::drawCombineGeometry(Attachments &attachments, Framebuffer &dst) {
 }
 
 void Pipeline::drawBoxBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
+    _uniformBuffers.setGeneral([](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+    });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(_shaders.boxBlur4(), true);
+    _shaders.use(_shaders.boxBlur4());
     _textures.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
 void Pipeline::drawGaussianBlur(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool vertical, bool strong) {
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
-    uniforms.general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-    uniforms.general.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
+    _uniformBuffers.setGeneral([&dim, &vertical](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+        general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+        general.blurDirection = vertical ? glm::vec2(0.0f, 1.0f) : glm::vec2(1.0f, 0.0f);
+    });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(strong ? _shaders.gaussianBlur13() : _shaders.gaussianBlur9(), true);
+    _shaders.use(strong ? _shaders.gaussianBlur13() : _shaders.gaussianBlur9());
     _textures.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
 void Pipeline::drawMedianFilter(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, bool strong) {
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
+    _uniformBuffers.setGeneral([](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+    });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(strong ? _shaders.medianFilter5() : _shaders.medianFilter3(), true);
+    _shaders.use(strong ? _shaders.medianFilter5() : _shaders.medianFilter3());
     _textures.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
 void Pipeline::drawFXAA(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst) {
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
-    uniforms.general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+    _uniformBuffers.setGeneral([&dim](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+        general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+    });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(_shaders.fxaa(), true);
+    _shaders.use(_shaders.fxaa());
     _textures.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();
 }
 
 void Pipeline::drawSharpen(const glm::ivec2 &dim, Texture &srcTexture, Framebuffer &dst, float amount) {
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
-    uniforms.general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
-    uniforms.general.sharpenAmount = amount;
+    _uniformBuffers.setGeneral([&dim, &amount](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+        general.screenResolutionRcp = glm::vec2(1.0f / static_cast<float>(dim.x), 1.0f / static_cast<float>(dim.y));
+        general.sharpenAmount = amount;
+    });
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
-    _shaders.use(_shaders.sharpen(), true);
+    _shaders.use(_shaders.sharpen());
     _textures.bind(srcTexture);
     _graphicsContext.clearColorDepth();
     _meshes.quadNDC().draw();

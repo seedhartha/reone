@@ -28,15 +28,23 @@ class Meshes;
 class Shaders;
 class Texture;
 class Textures;
+class UniformBuffers;
 class Window;
 
 class Font {
 public:
-    Font(GraphicsContext &graphicsContext, Meshes &meshes, Shaders &shaders, Textures &textures, Window &window) :
+    Font(
+        GraphicsContext &graphicsContext,
+        Meshes &meshes,
+        Shaders &shaders,
+        Textures &textures,
+        UniformBuffers &uniformBuffers,
+        Window &window) :
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
         _textures(textures),
+        _uniformBuffers(uniformBuffers),
         _window(window) {
     }
 
@@ -59,15 +67,20 @@ private:
         glm::vec2 size {0.0f};
     };
 
+    std::shared_ptr<Texture> _texture;
+    float _height {0.0f};
+    std::vector<Glyph> _glyphs;
+
+    // Services
+
     GraphicsContext &_graphicsContext;
     Meshes &_meshes;
     Shaders &_shaders;
     Textures &_textures;
+    UniformBuffers &_uniformBuffers;
     Window &_window;
 
-    std::shared_ptr<Texture> _texture;
-    float _height {0.0f};
-    std::vector<Glyph> _glyphs;
+    // END Services
 
     glm::vec2 getTextOffset(const std::string &text, TextGravity gravity) const;
 };

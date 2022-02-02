@@ -28,6 +28,7 @@
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/shaders.h"
+#include "../../graphics/uniformbuffers.h"
 #include "../../graphics/window.h"
 #include "../../gui/control/label.h"
 
@@ -444,13 +445,13 @@ void HUD::drawHealth(int memberIndex) {
     transform = glm::translate(transform, glm::vec3(_controlOffset.x + extent.left + extent.width - 14.0f, _controlOffset.y + extent.top + extent.height - h, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, h, 1.0f));
 
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetLocals();
-    uniforms.general.projection = _window.getOrthoProjection();
-    uniforms.general.model = move(transform);
-    uniforms.general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-
-    _shaders.use(_shaders.simpleColor(), true);
+    _uniformBuffers.setGeneral([this, transform](auto &general) {
+        general.resetLocals();
+        general.projection = _window.getOrthoProjection();
+        general.model = move(transform);
+        general.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    });
+    _shaders.use(_shaders.simpleColor());
     _meshes.quad().draw();
 }
 

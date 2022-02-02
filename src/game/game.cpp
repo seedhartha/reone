@@ -35,6 +35,7 @@
 #include "../../graphics/renderbuffer.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/textures.h"
+#include "../../graphics/uniformbuffers.h"
 #include "../../graphics/uniforms.h"
 #include "../../graphics/walkmeshes.h"
 #include "../../graphics/window.h"
@@ -263,7 +264,7 @@ void Game::playVideo(const string &name) {
         return;
     }
 
-    BikReader bik(path, _services.graphicsContext, _services.meshes, _services.shaders, _services.textures, _services.audioPlayer);
+    BikReader bik(path, _services.graphicsContext, _services.meshes, _services.shaders, _services.textures, _services.uniformBuffers, _services.audioPlayer);
     bik.load();
 
     _movie = bik.movie();
@@ -294,12 +295,11 @@ void Game::drawWorld() {
     if (!output) {
         return;
     }
-
-    auto &uniforms = _services.shaders.uniforms();
-    uniforms.general.resetGlobals();
-    uniforms.general.resetLocals();
-
-    _services.shaders.use(_services.shaders.simpleTexture(), true);
+    _services.uniformBuffers.setGeneral([](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+    });
+    _services.shaders.use(_services.shaders.simpleTexture());
     _services.textures.bind(*output);
     _services.meshes.quadNDC().draw();
 }

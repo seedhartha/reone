@@ -23,6 +23,7 @@
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
+#include "../../graphics/uniformbuffers.h"
 #include "../../graphics/window.h"
 
 #include "../graph.h"
@@ -71,15 +72,15 @@ void LightSceneNode::drawLensFlare(const ModelNode::LensFlare &flare) {
     if (!camera) {
         return;
     }
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetLocals();
-    uniforms.general.featureMask = UniformsFeatureFlags::fixedsize;
-    uniforms.general.model = glm::translate(getOrigin());
-    uniforms.general.billboardSize = 0.2f * flare.size;
-    uniforms.general.alpha = 0.5f;
-    uniforms.general.color = glm::vec4(_color, 1.0f);
-
-    _shaders.use(_shaders.billboard(), true);
+    _uniformBuffers.setGeneral([this, &flare](auto &general) {
+        general.resetLocals();
+        general.featureMask = UniformsFeatureFlags::fixedsize;
+        general.model = glm::translate(getOrigin());
+        general.billboardSize = 0.2f * flare.size;
+        general.alpha = 0.5f;
+        general.color = glm::vec4(_color, 1.0f);
+    });
+    _shaders.use(_shaders.billboard());
     _textures.bind(*flare.texture);
     _graphicsContext.withBlending(BlendMode::Additive, [this]() {
         _meshes.billboard().draw();

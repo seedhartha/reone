@@ -40,6 +40,7 @@ public:
         graphics::Pipeline &pipeline,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
+        graphics::UniformBuffers &uniformBuffers,
         graphics::Window &window,
         resource::Strings &strings) :
         Control(
@@ -52,6 +53,7 @@ public:
             pipeline,
             shaders,
             textures,
+            uniformBuffers,
             window,
             strings) {
     }

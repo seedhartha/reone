@@ -31,6 +31,7 @@ class IScene;
 class Meshes;
 class Shaders;
 class Textures;
+class UniformBuffers;
 
 class Pipeline : boost::noncopyable {
 public:
@@ -39,12 +40,14 @@ public:
         GraphicsContext &graphicsContext,
         Meshes &meshes,
         Shaders &shaders,
-        Textures &textures) :
+        Textures &textures,
+        UniformBuffers &uniformBuffers) :
         _options(options),
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
-        _textures(textures) {
+        _textures(textures),
+        _uniformBuffers(uniformBuffers) {
     }
 
     void init();
@@ -120,6 +123,7 @@ private:
     Meshes &_meshes;
     Shaders &_shaders;
     Textures &_textures;
+    UniformBuffers &_uniformBuffers;
 
     // END Services
 

@@ -23,6 +23,7 @@
 #include "shaders.h"
 #include "texture.h"
 #include "textures.h"
+#include "uniformbuffers.h"
 #include "window.h"
 
 using namespace std;
@@ -58,12 +59,15 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
     if (text.empty()) {
         return;
     }
+
+    _shaders.use(_shaders.text());
     _textures.bind(*_texture);
 
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetLocals();
-    uniforms.general.projection = _window.getOrthoProjection();
-    uniforms.general.color = glm::vec4(color, 1.0f);
+    _uniformBuffers.setGeneral([this, &color](auto &general) {
+        general.resetLocals();
+        general.projection = _window.getOrthoProjection();
+        general.color = glm::vec4(color, 1.0f);
+    });
 
     int numBlocks = static_cast<int>(text.size()) / kMaxTextChars;
     if (text.size() % kMaxTextChars > 0) {
@@ -72,22 +76,22 @@ void Font::draw(const string &text, const glm::vec3 &position, const glm::vec3 &
     glm::vec3 textOffset(getTextOffset(text, gravity), 0.0f);
     for (int i = 0; i < numBlocks; ++i) {
         int numChars = glm::min(kMaxTextChars, static_cast<int>(text.size()) - i * kMaxTextChars);
-        for (int j = 0; j < numChars; ++j) {
-            const Glyph &glyph = _glyphs[static_cast<unsigned char>(text[i * kMaxTextChars + j])];
+        _uniformBuffers.setText([this, &text, &position, &textOffset, &i, &numChars](auto &uniforms) {
+            for (int j = 0; j < numChars; ++j) {
+                const Glyph &glyph = _glyphs[static_cast<unsigned char>(text[i * kMaxTextChars + j])];
 
-            glm::vec4 posScale;
-            posScale[0] = position.x + textOffset.x;
-            posScale[1] = position.y + textOffset.y;
-            posScale[2] = glyph.size.x;
-            posScale[3] = glyph.size.y;
+                glm::vec4 posScale;
+                posScale[0] = position.x + textOffset.x;
+                posScale[1] = position.y + textOffset.y;
+                posScale[2] = glyph.size.x;
+                posScale[3] = glyph.size.y;
 
-            uniforms.text.chars[j].posScale = move(posScale);
-            uniforms.text.chars[j].uv = glm::vec4(glyph.ul.x, glyph.lr.y, glyph.lr.x - glyph.ul.x, glyph.ul.y - glyph.lr.y);
+                uniforms.chars[j].posScale = move(posScale);
+                uniforms.chars[j].uv = glm::vec4(glyph.ul.x, glyph.lr.y, glyph.lr.x - glyph.ul.x, glyph.ul.y - glyph.lr.y);
 
-            textOffset.x += glyph.size.x;
-        }
-        _shaders.use(_shaders.text(), true);
-        _shaders.refreshTextUniforms();
+                textOffset.x += glyph.size.x;
+            }
+        });
         _meshes.quad().drawInstanced(numChars);
     }
 }

@@ -36,7 +36,8 @@ public:
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
-        graphics::Textures &textures) :
+        graphics::Textures &textures,
+        graphics::UniformBuffers &uniformBuffers) :
         ModelNodeSceneNode(
             modelNode,
             SceneNodeType::Light,
@@ -44,7 +45,8 @@ public:
             graphicsContext,
             meshes,
             shaders,
-            textures),
+            textures,
+            uniformBuffers),
         _model(model) {
 
         init();

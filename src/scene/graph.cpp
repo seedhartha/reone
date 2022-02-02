@@ -21,6 +21,7 @@
 #include "../graphics/mesh.h"
 #include "../graphics/meshes.h"
 #include "../graphics/shaders.h"
+#include "../graphics/uniformbuffers.h"
 #include "../graphics/walkmesh.h"
 
 #include "collision.h"
@@ -421,12 +422,12 @@ void SceneGraph::drawOpaque() {
         return;
     }
     if (_drawWalkmeshes || _drawTriggers) {
-        auto &uniforms = _shaders.uniforms();
-        for (int i = 0; i < kMaxWalkmeshMaterials - 1; ++i) {
-            uniforms.walkmesh.materials[i] = _walkableSurfaces.count(i) > 0 ? glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) : glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        }
-        uniforms.walkmesh.materials[kMaxWalkmeshMaterials - 1] = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f); // triggers
-        _shaders.refreshWalkmeshUniforms();
+        _uniformBuffers.setWalkmesh([this](auto &walkmesh) {
+            for (int i = 0; i < kMaxWalkmeshMaterials - 1; ++i) {
+                walkmesh.materials[i] = _walkableSurfaces.count(i) > 0 ? glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) : glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+            }
+            walkmesh.materials[kMaxWalkmeshMaterials - 1] = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f); // triggers
+        });
     }
     if (_drawWalkmeshes) {
         // Draw walkmeshes if enabled
@@ -655,15 +656,15 @@ shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) 
 }
 
 unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {
-    return make_unique<DummySceneNode>(move(modelNode), *this, _graphicsContext, _meshes, _shaders, _textures);
+    return make_unique<DummySceneNode>(move(modelNode), *this, _graphicsContext, _meshes, _shaders, _textures, _uniformBuffers);
 }
 
 unique_ptr<WalkmeshSceneNode> SceneGraph::newWalkmesh(shared_ptr<Walkmesh> walkmesh) {
-    return make_unique<WalkmeshSceneNode>(move(walkmesh), *this, _graphicsContext, _shaders);
+    return make_unique<WalkmeshSceneNode>(move(walkmesh), *this, _graphicsContext, _shaders, _uniformBuffers);
 }
 
 unique_ptr<TriggerSceneNode> SceneGraph::newTrigger(vector<glm::vec3> geometry) {
-    return make_unique<TriggerSceneNode>(move(geometry), *this, _graphicsContext, _shaders);
+    return make_unique<TriggerSceneNode>(move(geometry), *this, _graphicsContext, _shaders, _uniformBuffers);
 }
 
 unique_ptr<CameraSceneNode> SceneGraph::newCamera() {
@@ -683,6 +684,7 @@ unique_ptr<ModelSceneNode> SceneGraph::newModel(shared_ptr<Model> model, ModelUs
         _meshes,
         _shaders,
         _textures,
+        _uniformBuffers,
         animEventListener);
 }
 
@@ -698,7 +700,8 @@ unique_ptr<GrassSceneNode> SceneGraph::newGrass(float density, float quadSize, g
         _graphicsContext,
         _meshes,
         _shaders,
-        _textures);
+        _textures,
+        _uniformBuffers);
 }
 
 } // namespace scene

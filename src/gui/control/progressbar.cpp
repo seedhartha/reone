@@ -24,6 +24,7 @@
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
+#include "../../graphics/uniformbuffers.h"
 #include "../../graphics/window.h"
 #include "../../resource/gffstruct.h"
 
@@ -60,12 +61,12 @@ void ProgressBar::draw(const glm::ivec2 &screenSize, const glm::ivec2 &offset, c
     transform = glm::translate(transform, glm::vec3(_extent.left + offset.x, _extent.top + offset.y, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, _extent.height, 1.0f));
 
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetLocals();
-    uniforms.general.projection = _window.getOrthoProjection();
-    uniforms.general.model = move(transform);
-
-    _shaders.use(_shaders.gui(), true);
+    _uniformBuffers.setGeneral([this, transform](auto &general) {
+        general.resetLocals();
+        general.projection = _window.getOrthoProjection();
+        general.model = move(transform);
+    });
+    _shaders.use(_shaders.gui());
     _meshes.quad().draw();
 }
 

@@ -33,6 +33,7 @@ class ModelNode;
 class Shaders;
 class Texture;
 class Textures;
+class UniformBuffers;
 
 } // namespace graphics
 
@@ -51,7 +52,8 @@ public:
         graphics::GraphicsContext &graphicsContext,
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
-        graphics::Textures &textures) :
+        graphics::Textures &textures,
+        graphics::UniformBuffers &uniformBuffers) :
         SceneNode(SceneNodeType::Grass, sceneGraph),
         _density(density),
         _quadSize(quadSize),
@@ -62,7 +64,8 @@ public:
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
-        _textures(textures) {
+        _textures(textures),
+        _uniformBuffers(uniformBuffers) {
 
         init();
     }
@@ -96,6 +99,7 @@ private:
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
+    graphics::UniformBuffers &_uniformBuffers;
 
     // END Services
 };

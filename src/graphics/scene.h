@@ -31,8 +31,6 @@ class LightSceneNode;
 
 namespace graphics {
 
-struct Uniforms;
-
 class Camera;
 
 class IScene {

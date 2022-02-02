@@ -94,24 +94,6 @@ void Shaders::init() {
     _spFXAA = initShaderProgram({vsObjectSpace, fsFXAA});
     _spSharpen = initShaderProgram({vsObjectSpace, fsSharpen});
 
-    // Uniform Buffers
-    static GeneralUniforms defaultsGeneral;
-    static TextUniforms defaultsText;
-    static LightingUniforms defaultsLighting;
-    static SkeletalUniforms defaultsSkeletal;
-    static ParticlesUniforms defaultsParticles;
-    static GrassUniforms defaultsGrass;
-    static SSAOUniforms defaultsSSAO;
-    static WalkmeshUniforms defaultsWalkmesh;
-    _ubGeneral = initUniformBuffer(&defaultsGeneral, sizeof(GeneralUniforms));
-    _ubText = initUniformBuffer(&defaultsText, sizeof(TextUniforms));
-    _ubLighting = initUniformBuffer(&defaultsLighting, sizeof(LightingUniforms));
-    _ubSkeletal = initUniformBuffer(&defaultsSkeletal, sizeof(SkeletalUniforms));
-    _ubParticles = initUniformBuffer(&defaultsParticles, sizeof(ParticlesUniforms));
-    _ubGrass = initUniformBuffer(&defaultsGrass, sizeof(GrassUniforms));
-    _ubSSAO = initUniformBuffer(&defaultsSSAO, sizeof(SSAOUniforms));
-    _ubWalkmesh = initUniformBuffer(&defaultsWalkmesh, sizeof(WalkmeshUniforms));
-
     _inited = true;
 }
 
@@ -120,7 +102,6 @@ void Shaders::deinit() {
         return;
     }
 
-    // Shader Programs
     _spSimpleColor.reset();
     _spSimpleTexture.reset();
     _spGUI.reset();
@@ -145,25 +126,13 @@ void Shaders::deinit() {
     _spFXAA.reset();
     _spSharpen.reset();
 
-    // Uniform Buffers
-    _ubGeneral.reset();
-    _ubText.reset();
-    _ubLighting.reset();
-    _ubSkeletal.reset();
-    _ubParticles.reset();
-    _ubGrass.reset();
-    _ubSSAO.reset();
-
     _inited = false;
 }
 
-void Shaders::use(ShaderProgram &program, bool refreshUniforms) {
+void Shaders::use(ShaderProgram &program) {
     if (_usedProgram != &program) {
         program.use();
         _usedProgram = &program;
-    }
-    if (refreshUniforms) {
-        this->refreshGeneralUniforms();
     }
 }
 
@@ -209,53 +178,6 @@ shared_ptr<ShaderProgram> Shaders::initShaderProgram(vector<shared_ptr<Shader>> 
     program->bindUniformBlock("Walkmesh", UniformBlockBindingPoints::walkmesh);
 
     return move(program);
-}
-
-unique_ptr<UniformBuffer> Shaders::initUniformBuffer(const void *data, ptrdiff_t size) {
-    auto buf = make_unique<UniformBuffer>();
-    buf->setData(data, size);
-    buf->init();
-    return move(buf);
-}
-
-void Shaders::refreshGeneralUniforms() {
-    _ubGeneral->bind(UniformBlockBindingPoints::general);
-    _ubGeneral->setData(&_uniforms.general, sizeof(GeneralUniforms), true);
-}
-
-void Shaders::refreshTextUniforms() {
-    _ubText->bind(UniformBlockBindingPoints::text);
-    _ubText->setData(&_uniforms.text, sizeof(TextUniforms), true);
-}
-
-void Shaders::refreshSkeletalUniforms() {
-    _ubSkeletal->bind(UniformBlockBindingPoints::skeletal);
-    _ubSkeletal->setData(&_uniforms.skeletal, sizeof(SkeletalUniforms), true);
-}
-
-void Shaders::refreshLightingUniforms() {
-    _ubLighting->bind(UniformBlockBindingPoints::lighting);
-    _ubLighting->setData(&_uniforms.lighting, sizeof(LightingUniforms), true);
-}
-
-void Shaders::refreshParticlesUniforms() {
-    _ubParticles->bind(UniformBlockBindingPoints::particles);
-    _ubParticles->setData(&_uniforms.particles, sizeof(ParticlesUniforms), true);
-}
-
-void Shaders::refreshGrassUniforms() {
-    _ubGrass->bind(UniformBlockBindingPoints::grass);
-    _ubGrass->setData(&_uniforms.grass, sizeof(GrassUniforms), true);
-}
-
-void Shaders::refreshSSAOUniforms() {
-    _ubSSAO->bind(UniformBlockBindingPoints::ssao);
-    _ubSSAO->setData(&_uniforms.ssao, sizeof(SSAOUniforms), true);
-}
-
-void Shaders::refreshWalkmeshUniforms() {
-    _ubWalkmesh->bind(UniformBlockBindingPoints::walkmesh);
-    _ubWalkmesh->setData(&_uniforms.walkmesh, sizeof(SSAOUniforms), true);
 }
 
 } // namespace graphics

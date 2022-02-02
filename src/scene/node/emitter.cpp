@@ -24,6 +24,7 @@
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
+#include "../../graphics/uniformbuffers.h"
 
 #include "../graph.h"
 
@@ -255,59 +256,59 @@ void EmitterSceneNode::drawLeafs(const vector<SceneNode *> &leafs) {
     auto cameraUp = glm::vec3(view[0][1], view[1][1], view[2][1]);
     auto cameraForward = glm::vec3(view[0][2], view[1][2], view[2][2]);
 
-    auto &uniforms = _shaders.uniforms();
-    uniforms.general.resetLocals();
-    uniforms.general.gridSize = emitter->gridSize;
-    switch (emitter->blendMode) {
-    case ModelNode::Emitter::BlendMode::Lighten:
-        uniforms.general.featureMask |= UniformsFeatureFlags::premulalpha;
-        break;
-    case ModelNode::Emitter::BlendMode::Normal:
-    case ModelNode::Emitter::BlendMode::PunchThrough:
-    default:
-        break;
-    }
-
-    for (size_t i = 0; i < leafs.size(); ++i) {
-        auto particle = static_cast<ParticleSceneNode *>(leafs[i]);
-        uniforms.particles.particles[i].positionFrame = glm::vec4(particle->getOrigin(), static_cast<float>(particle->frame()));
-        uniforms.particles.particles[i].color = glm::vec4(particle->color(), particle->alpha());
-        uniforms.particles.particles[i].size = glm::vec2(particle->size());
-        switch (emitter->renderMode) {
-        case ModelNode::Emitter::RenderMode::BillboardToLocalZ:
-        case ModelNode::Emitter::RenderMode::MotionBlur:
-            uniforms.particles.particles[i].right = glm::vec4(emitterUp, 0.0f);
-            uniforms.particles.particles[i].up = glm::vec4(emitterRight, 0.0f);
-            if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
-                uniforms.particles.particles[i].size = glm::vec2(particle->size().x, (1.0f + kMotionBlurStrength * kProjectileSpeed) * particle->size().y);
-            }
+    _uniformBuffers.setGeneral([&emitter](auto &general) {
+        general.resetLocals();
+        general.gridSize = emitter->gridSize;
+        switch (emitter->blendMode) {
+        case ModelNode::Emitter::BlendMode::Lighten:
+            general.featureMask |= UniformsFeatureFlags::premulalpha;
             break;
-        case ModelNode::Emitter::RenderMode::BillboardToWorldZ:
-            uniforms.particles.particles[i].right = glm::vec4(0.0f, 1.0f, 0.0, 0.0f);
-            uniforms.particles.particles[i].up = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
-            break;
-        case ModelNode::Emitter::RenderMode::AlignedToParticleDir:
-            uniforms.particles.particles[i].right = glm::vec4(emitterRight, 0.0f);
-            uniforms.particles.particles[i].up = glm::vec4(emitterForward, 0.0f);
-            break;
-        case ModelNode::Emitter::RenderMode::Linked: {
-            auto particleUp = particle->dir();
-            auto particleForward = glm::cross(particleUp, cameraRight);
-            auto particleRight = glm::cross(particleForward, particleUp);
-            uniforms.particles.particles[i].right = glm::vec4(particleRight, 0.0f);
-            uniforms.particles.particles[i].up = glm::vec4(particleUp, 0.0f);
-            break;
-        }
-        case ModelNode::Emitter::RenderMode::Normal:
+        case ModelNode::Emitter::BlendMode::Normal:
+        case ModelNode::Emitter::BlendMode::PunchThrough:
         default:
-            uniforms.particles.particles[i].right = glm::vec4(cameraRight, 0.0f);
-            uniforms.particles.particles[i].up = glm::vec4(cameraUp, 0.0f);
             break;
         }
-    }
-
-    _shaders.use(_shaders.particle(), true);
-    _shaders.refreshParticlesUniforms();
+    });
+    _uniformBuffers.setParticles([&](auto &particles) {
+        for (size_t i = 0; i < leafs.size(); ++i) {
+            auto particle = static_cast<ParticleSceneNode *>(leafs[i]);
+            particles.particles[i].positionFrame = glm::vec4(particle->getOrigin(), static_cast<float>(particle->frame()));
+            particles.particles[i].color = glm::vec4(particle->color(), particle->alpha());
+            particles.particles[i].size = glm::vec2(particle->size());
+            switch (emitter->renderMode) {
+            case ModelNode::Emitter::RenderMode::BillboardToLocalZ:
+            case ModelNode::Emitter::RenderMode::MotionBlur:
+                particles.particles[i].right = glm::vec4(emitterUp, 0.0f);
+                particles.particles[i].up = glm::vec4(emitterRight, 0.0f);
+                if (emitter->renderMode == ModelNode::Emitter::RenderMode::MotionBlur) {
+                    particles.particles[i].size = glm::vec2(particle->size().x, (1.0f + kMotionBlurStrength * kProjectileSpeed) * particle->size().y);
+                }
+                break;
+            case ModelNode::Emitter::RenderMode::BillboardToWorldZ:
+                particles.particles[i].right = glm::vec4(0.0f, 1.0f, 0.0, 0.0f);
+                particles.particles[i].up = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
+                break;
+            case ModelNode::Emitter::RenderMode::AlignedToParticleDir:
+                particles.particles[i].right = glm::vec4(emitterRight, 0.0f);
+                particles.particles[i].up = glm::vec4(emitterForward, 0.0f);
+                break;
+            case ModelNode::Emitter::RenderMode::Linked: {
+                auto particleUp = particle->dir();
+                auto particleForward = glm::cross(particleUp, cameraRight);
+                auto particleRight = glm::cross(particleForward, particleUp);
+                particles.particles[i].right = glm::vec4(particleRight, 0.0f);
+                particles.particles[i].up = glm::vec4(particleUp, 0.0f);
+                break;
+            }
+            case ModelNode::Emitter::RenderMode::Normal:
+            default:
+                particles.particles[i].right = glm::vec4(cameraRight, 0.0f);
+                particles.particles[i].up = glm::vec4(cameraUp, 0.0f);
+                break;
+            }
+        }
+    });
+    _shaders.use(_shaders.particle());
     _textures.bind(*texture);
 
     bool twosided = _modelNode->emitter()->twosided || _modelNode->emitter()->renderMode == ModelNode::Emitter::RenderMode::MotionBlur;

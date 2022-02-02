@@ -31,6 +31,7 @@ class Meshes;
 class Shaders;
 class Texture;
 class Textures;
+class UniformBuffers;
 
 } // namespace graphics
 
@@ -51,11 +52,13 @@ public:
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
+        graphics::UniformBuffers &uniformBuffers,
         audio::AudioPlayer &audioPlayer) :
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
         _textures(textures),
+        _uniformBuffers(uniformBuffers),
         _audioPlayer(audioPlayer) {
     }
 
@@ -91,6 +94,7 @@ private:
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
+    graphics::UniformBuffers &_uniformBuffers;
 
     audio::AudioPlayer &_audioPlayer;
 

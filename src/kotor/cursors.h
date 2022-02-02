@@ -34,6 +34,7 @@ class Meshes;
 class Shaders;
 class Texture;
 class Textures;
+class UniformBuffers;
 class Window;
 
 } // namespace graphics
@@ -47,12 +48,14 @@ public:
         graphics::Meshes &meshes,
         graphics::Shaders &shaders,
         graphics::Textures &textures,
+        graphics::UniformBuffers &uniformBuffers,
         graphics::Window &window,
         resource::Resources &resources) :
         _graphicsContext(graphicsContext),
         _meshes(meshes),
         _shaders(shaders),
         _textures(textures),
+        _uniformBuffers(uniformBuffers),
         _window(window),
         _resources(resources) {
     }
@@ -72,6 +75,7 @@ private:
     graphics::Meshes &_meshes;
     graphics::Shaders &_shaders;
     graphics::Textures &_textures;
+    graphics::UniformBuffers &_uniformBuffers;
     graphics::Window &_window;
     resource::Resources &_resources;
 
