@@ -252,7 +252,7 @@ void Pipeline::initAttachments(glm::ivec2 dim) {
     attachments.cbGBufferEnvMap->init();
 
     attachments.cbGBufferSelfIllum = make_unique<Texture>("gbuffer_color_selfillum", getTextureProperties(TextureUsage::ColorBuffer));
-    attachments.cbGBufferSelfIllum->clear(dim.x, dim.y, PixelFormat::RGBA8);
+    attachments.cbGBufferSelfIllum->clear(dim.x, dim.y, PixelFormat::RGB8);
     attachments.cbGBufferSelfIllum->init();
 
     attachments.cbGBufferFeatures = make_unique<Texture>("gbuffer_color_features", getTextureProperties(TextureUsage::ColorBuffer));
