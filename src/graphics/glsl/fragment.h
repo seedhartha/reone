@@ -148,7 +148,6 @@ void main() {
         envmapColor = vec4(envmapSample.rgb, 1.0);
     }
 
-    vec4 selfIllumColor = isFeatureEnabled(FEATURE_SELFILLUM) ? vec4(uSelfIllumColor.rgb, 1.0) : vec4(0.0);
     vec4 features = vec4(
         isFeatureEnabled(FEATURE_SHADOWS) ? 1.0 : 0.0,
         isFeatureEnabled(FEATURE_FOG) ? 1.0 : 0.0,
@@ -160,7 +159,7 @@ void main() {
     fragDiffuseColor = diffuseColor;
     fragLightmapColor = isFeatureEnabled(FEATURE_LIGHTMAP) ? vec4(texture(sLightmap, fragUV2).rgb, 1.0) : vec4(0.0);
     fragEnvmapColor = envmapColor;
-    fragSelfIllumColor = selfIllumColor;
+    fragSelfIllumColor = vec4(uSelfIllumColor.rgb, 1.0);
     fragFeatures = features;
     fragEyePos = vec4(eyePos, 0.0);
     fragEyeNormal = vec4(eyeNormal, 0.0);
@@ -609,7 +608,6 @@ void main() {
 
     float envmapped = step(0.0001, envmapSample.a);
     float lightmapped = step(0.0001, lightmapSample.a);
-    float selfIllumed = step(0.0001, selfIllumSample.a);
 
     float shadow = mix(0.0, getShadow(eyePos, worldPos, worldNormal), featuresSample.r);
     float fog = mix(0.0, getFog(worldPos), featuresSample.g);

@@ -163,13 +163,8 @@ static bool isLightingEnabledByUsage(ModelUsage usage) {
     return usage != ModelUsage::Projectile;
 }
 
-bool MeshSceneNode::isSelfIlluminated() const {
-    return !_nodeTextures.lightmap && glm::dot(_selfIllumColor, _selfIllumColor) > 0.0f;
-}
-
 static bool isReceivingShadows(const ModelSceneNode &model, const MeshSceneNode &modelNode) {
-    // Only room models receive shadows, unless model node is self-illuminated
-    return model.usage() == ModelUsage::Room && !modelNode.isSelfIlluminated();
+    return model.usage() == ModelUsage::Room;
 }
 
 void MeshSceneNode::draw() {
@@ -183,11 +178,12 @@ void MeshSceneNode::draw() {
     uniforms.general.resetLocals();
     uniforms.general.model = _absTransform;
     uniforms.general.modelInv = _absTransformInv;
-    uniforms.general.alpha = _alpha;
     uniforms.general.uv = glm::mat3x4(
         glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
         glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
         glm::vec4(_uvOffset.x, _uvOffset.y, 0.0f, 0.0f));
+    uniforms.general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
+    uniforms.general.alpha = _alpha;
 
     _textures.bind(*_nodeTextures.diffuse);
     switch (_nodeTextures.diffuse->features().blending) {
@@ -274,10 +270,6 @@ void MeshSceneNode::draw() {
     if (receivesShadows && _sceneGraph.hasShadowLight()) {
         uniforms.general.featureMask |= UniformsFeatureFlags::shadows;
     }
-    if (isSelfIlluminated()) {
-        uniforms.general.featureMask |= UniformsFeatureFlags::selfillum;
-        uniforms.general.selfIllumColor = glm::vec4(_selfIllumColor, 1.0f);
-    }
     if (_sceneGraph.isFogEnabled() && _model.model().isAffectedByFog()) {
         uniforms.general.featureMask |= UniformsFeatureFlags::fog;
     }
@@ -306,10 +298,6 @@ void MeshSceneNode::drawShadow() {
 
 bool MeshSceneNode::isLightingEnabled() const {
     if (!isLightingEnabledByUsage(_model.usage())) {
-        return false;
-    }
-    // Lighting is disabled for self-illuminated model nodes, e.g. sky boxes
-    if (isSelfIlluminated()) {
         return false;
     }
     // Lighting is disabled when diffuse texture is additive

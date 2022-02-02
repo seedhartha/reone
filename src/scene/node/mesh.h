@@ -68,7 +68,6 @@ public:
     bool shouldCastShadows() const;
 
     bool isTransparent() const;
-    bool isSelfIlluminated() const;
 
     ModelSceneNode &model() { return _model; }
     const ModelSceneNode &model() const { return _model; }
