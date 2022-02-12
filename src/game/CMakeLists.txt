@@ -19,26 +19,22 @@ set(GAME_HEADERS
     action/barkstring.h
     action/castfakespellatlocation.h
     action/castfakespellatobject.h
-    action/castspellatlocation.h
     action/castspellatobject.h
     action/closedoor.h
     action/docommand.h
     action/equipitem.h
     action/equipmostdamagingmelee.h
     action/equipmostdamagingranged.h
-    action/equipmosteffectivearmor.h
     action/factory.h
     action/follow.h
     action/followleader.h
     action/followowner.h
-    action/forcefollowobject.h
     action/giveitem.h
     action/interactobject.h
     action/jumptolocation.h
     action/jumptoobject.h
     action/locationaction.h
     action/lockobject.h
-    action/moveawayfromlocation.h
     action/moveawayfromobject.h
     action/movetolocation.h
     action/movetoobject.h
@@ -48,13 +44,9 @@ set(GAME_HEADERS
     action/opendoor.h
     action/openlock.h
     action/pauseconversation.h
-    action/pickupitem.h
     action/playanimation.h
-    action/putdownitem.h
     action/randomwalk.h
     action/resumeconversation.h
-    action/speakstring.h
-    action/speakstringbystrref.h
     action/startconversation.h
     action/surrendertoenemies.h
     action/switchweapons.h
@@ -63,7 +55,6 @@ set(GAME_HEADERS
     action/unlockobject.h
     action/usefeat.h
     action/useskill.h
-    action/usetalentatlocation.h
     action/usetalentonobject.h
     action/wait.h
     animationutil.h
@@ -97,19 +88,14 @@ set(GAME_HEADERS
     effect/abilityincrease.h
     effect/acdecrease.h
     effect/acincrease.h
-    effect/areaofeffect.h
-    effect/assureddeflection.h
     effect/assuredhit.h
     effect/attackdecrease.h
     effect/attackincrease.h
     effect/beam.h
-    effect/blasterdeflectiondecrease.h
     effect/blasterdeflectionincrease.h
     effect/blind.h
     effect/bodyfuel.h
     effect/choke.h
-    effect/concealment.h
-    effect/confused.h
     effect/crush.h
     effect/cutscenehorrified.h
     effect/cutsceneparalyze.h
@@ -117,48 +103,33 @@ set(GAME_HEADERS
     effect/damage.h
     effect/damagedecrease.h
     effect/damageforcepoints.h
-    effect/damageimmunitydecrease.h
     effect/damageimmunityincrease.h
     effect/damageincrease.h
-    effect/damagereduction.h
     effect/damageresistance.h
-    effect/damageshield.h
     effect/death.h
     effect/disguise.h
-    effect/dispelmagicall.h
-    effect/dispelmagicbest.h
-    effect/droidconfused.h
     effect/droidscramble.h
     effect/droidstun.h
     effect/entangle.h
     effect/factionmodifier.h
     effect/factory.h
     effect/forcebody.h
-    effect/forcedrain.h
     effect/forcefizzle.h
-    effect/forcejump.h
     effect/forcepushed.h
     effect/forcepushtargeted.h
-    effect/forceresistancedecrease.h
     effect/forceresistanceincrease.h
     effect/forceresisted.h
     effect/forceshield.h
     effect/forcesight.h
-    effect/fpregenmodifier.h
-    effect/frightened.h
     effect/fury.h
-    effect/haste.h
     effect/heal.h
     effect/healforcepoints.h
-    effect/hitpointschangewhendying.h
     effect/horrified.h
     effect/immunity.h
     effect/invisibility.h
-    effect/knockdown.h
     effect/lightsaberthrow.h
     effect/linkeffects.h
     effect/mindtrick.h
-    effect/misschance.h
     effect/modifyattacks.h
     effect/movementspeeddecrease.h
     effect/movementspeedincrease.h
@@ -169,16 +140,11 @@ set(GAME_HEADERS
     effect/resurrection.h
     effect/savingthrowdecrease.h
     effect/savingthrowincrease.h
-    effect/seeinvisible.h
-    effect/skilldecrease.h
     effect/skillincrease.h
     effect/sleep.h
-    effect/spellimmunity.h
-    effect/spelllevelabsorption.h
     effect/stunned.h
     effect/temporaryforcepoints.h
     effect/temporaryhitpoints.h
-    effect/timestop.h
     effect/trueseeing.h
     effect/visual.h
     effect/vpregenmodifier.h
@@ -239,24 +205,20 @@ set(GAME_SOURCES
     action/barkstring.cpp
     action/castfakespellatlocation.cpp
     action/castfakespellatobject.cpp
-    action/castspellatlocation.cpp
     action/castspellatobject.cpp
     action/closedoor.cpp
     action/docommand.cpp
     action/equipitem.cpp
     action/equipmostdamagingmelee.cpp
     action/equipmostdamagingranged.cpp
-    action/equipmosteffectivearmor.cpp
     action/follow.cpp
     action/followleader.cpp
     action/followowner.cpp
-    action/forcefollowobject.cpp
     action/giveitem.cpp
     action/interactobject.cpp
     action/jumptolocation.cpp
     action/jumptoobject.cpp
     action/lockobject.cpp
-    action/moveawayfromlocation.cpp
     action/moveawayfromobject.cpp
     action/movetolocation.cpp
     action/movetoobject.cpp
@@ -265,13 +227,9 @@ set(GAME_SOURCES
     action/opendoor.cpp
     action/openlock.cpp
     action/pauseconversation.cpp
-    action/pickupitem.cpp
     action/playanimation.cpp
-    action/putdownitem.cpp
     action/randomwalk.cpp
     action/resumeconversation.cpp
-    action/speakstring.cpp
-    action/speakstringbystrref.cpp
     action/startconversation.cpp
     action/surrendertoenemies.cpp
     action/switchweapons.cpp
@@ -280,7 +238,6 @@ set(GAME_SOURCES
     action/unlockobject.cpp
     action/usefeat.cpp
     action/useskill.cpp
-    action/usetalentatlocation.cpp
     action/usetalentonobject.cpp
     action/wait.cpp
     animationutil.cpp
@@ -305,19 +262,14 @@ set(GAME_SOURCES
     effect/abilityincrease.cpp
     effect/acdecrease.cpp
     effect/acincrease.cpp
-    effect/areaofeffect.cpp
-    effect/assureddeflection.cpp
     effect/assuredhit.cpp
     effect/attackdecrease.cpp
     effect/attackincrease.cpp
     effect/beam.cpp
-    effect/blasterdeflectiondecrease.cpp
     effect/blasterdeflectionincrease.cpp
     effect/blind.cpp
     effect/bodyfuel.cpp
     effect/choke.cpp
-    effect/concealment.cpp
-    effect/confused.cpp
     effect/crush.cpp
     effect/cutscenehorrified.cpp
     effect/cutsceneparalyze.cpp
@@ -325,47 +277,32 @@ set(GAME_SOURCES
     effect/damage.cpp
     effect/damagedecrease.cpp
     effect/damageforcepoints.cpp
-    effect/damageimmunitydecrease.cpp
     effect/damageimmunityincrease.cpp
     effect/damageincrease.cpp
-    effect/damagereduction.cpp
     effect/damageresistance.cpp
-    effect/damageshield.cpp
     effect/death.cpp
     effect/disguise.cpp
-    effect/dispelmagicall.cpp
-    effect/dispelmagicbest.cpp
-    effect/droidconfused.cpp
     effect/droidscramble.cpp
     effect/droidstun.cpp
     effect/entangle.cpp
     effect/factionmodifier.cpp
     effect/forcebody.cpp
-    effect/forcedrain.cpp
     effect/forcefizzle.cpp
-    effect/forcejump.cpp
     effect/forcepushed.cpp
     effect/forcepushtargeted.cpp
-    effect/forceresistancedecrease.cpp
     effect/forceresistanceincrease.cpp
     effect/forceresisted.cpp
     effect/forceshield.cpp
     effect/forcesight.cpp
-    effect/fpregenmodifier.cpp
-    effect/frightened.cpp
     effect/fury.cpp
-    effect/haste.cpp
     effect/heal.cpp
     effect/healforcepoints.cpp
-    effect/hitpointschangewhendying.cpp
     effect/horrified.cpp
     effect/immunity.cpp
     effect/invisibility.cpp
-    effect/knockdown.cpp
     effect/lightsaberthrow.cpp
     effect/linkeffects.cpp
     effect/mindtrick.cpp
-    effect/misschance.cpp
     effect/modifyattacks.cpp
     effect/movementspeeddecrease.cpp
     effect/movementspeedincrease.cpp
@@ -376,16 +313,11 @@ set(GAME_SOURCES
     effect/resurrection.cpp
     effect/savingthrowdecrease.cpp
     effect/savingthrowincrease.cpp
-    effect/seeinvisible.cpp
-    effect/skilldecrease.cpp
     effect/skillincrease.cpp
     effect/sleep.cpp
-    effect/spellimmunity.cpp
-    effect/spelllevelabsorption.cpp
     effect/stunned.cpp
     effect/temporaryforcepoints.cpp
     effect/temporaryhitpoints.cpp
-    effect/timestop.cpp
     effect/trueseeing.cpp
     effect/visual.cpp
     effect/vpregenmodifier.cpp
