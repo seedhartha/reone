@@ -21,24 +21,20 @@
 #include "barkstring.h"
 #include "castfakespellatlocation.h"
 #include "castfakespellatobject.h"
-#include "castspellatlocation.h"
 #include "castspellatobject.h"
 #include "closedoor.h"
 #include "docommand.h"
 #include "equipitem.h"
 #include "equipmostdamagingmelee.h"
 #include "equipmostdamagingranged.h"
-#include "equipmosteffectivearmor.h"
 #include "follow.h"
 #include "followleader.h"
 #include "followowner.h"
-#include "forcefollowobject.h"
 #include "giveitem.h"
 #include "interactobject.h"
 #include "jumptolocation.h"
 #include "jumptoobject.h"
 #include "lockobject.h"
-#include "moveawayfromlocation.h"
 #include "moveawayfromobject.h"
 #include "movetolocation.h"
 #include "movetoobject.h"
@@ -47,13 +43,9 @@
 #include "opendoor.h"
 #include "openlock.h"
 #include "pauseconversation.h"
-#include "pickupitem.h"
 #include "playanimation.h"
-#include "putdownitem.h"
 #include "randomwalk.h"
 #include "resumeconversation.h"
-#include "speakstring.h"
-#include "speakstringbystrref.h"
 #include "startconversation.h"
 #include "surrendertoenemies.h"
 #include "switchweapons.h"
@@ -62,7 +54,6 @@
 #include "unlockobject.h"
 #include "usefeat.h"
 #include "useskill.h"
-#include "usetalentatlocation.h"
 #include "usetalentonobject.h"
 #include "wait.h"
 
@@ -96,10 +87,6 @@ public:
         return std::make_unique<CastFakeSpellAtObjectAction>(_game, _services);
     }
 
-    std::unique_ptr<CastSpellAtLocationAction> newCastSpellAtLocation() {
-        return std::make_unique<CastSpellAtLocationAction>(_game, _services);
-    }
-
     std::unique_ptr<CastSpellAtObjectAction> newCastSpellAtObject() {
         return std::make_unique<CastSpellAtObjectAction>(_game, _services);
     }
@@ -124,10 +111,6 @@ public:
         return std::make_unique<EquipMostDamagingRangedAction>(_game, _services);
     }
 
-    std::unique_ptr<EquipMostEffectiveArmorAction> newEquipMostEffectiveArmor() {
-        return std::make_unique<EquipMostEffectiveArmorAction>(_game, _services);
-    }
-
     std::unique_ptr<FollowAction> newFollow(std::shared_ptr<Object> object, float distance) {
         return std::make_unique<FollowAction>(_game, _services, std::move(object), distance);
     }
@@ -138,10 +121,6 @@ public:
 
     std::unique_ptr<FollowOwnerAction> newFollowOwner() {
         return std::make_unique<FollowOwnerAction>(_game, _services);
-    }
-
-    std::unique_ptr<ForceFollowObjectAction> newForceFollowObject() {
-        return std::make_unique<ForceFollowObjectAction>(_game, _services);
     }
 
     std::unique_ptr<GiveItemAction> newGiveItem() {
@@ -162,10 +141,6 @@ public:
 
     std::unique_ptr<LockObjectAction> newLockObject() {
         return std::make_unique<LockObjectAction>(_game, _services);
-    }
-
-    std::unique_ptr<MoveAwayFromLocationAction> newMoveAwayFromLocation() {
-        return std::make_unique<MoveAwayFromLocationAction>(_game, _services);
     }
 
     std::unique_ptr<MoveAwayFromObject> newMoveAwayFromObject(std::shared_ptr<Object> fleeFrom, bool run, float range) {
@@ -200,16 +175,8 @@ public:
         return std::make_unique<PauseConversationAction>(_game, _services);
     }
 
-    std::unique_ptr<PickUpItemAction> newPickUpItem(std::shared_ptr<Item> item) {
-        return std::make_unique<PickUpItemAction>(_game, _services, std::move(item));
-    }
-
     std::unique_ptr<PlayAnimationAction> newPlayAnimation(AnimationType anim, float speed = 1.0f, float durationSeconds = 0.0f) {
         return std::make_unique<PlayAnimationAction>(_game, _services, anim, speed, durationSeconds);
-    }
-
-    std::unique_ptr<PutDownItemAction> newPutDownItem(std::shared_ptr<Item> item) {
-        return std::make_unique<PutDownItemAction>(_game, _services, std::move(item));
     }
 
     std::unique_ptr<RandomWalkAction> newRandomWalk() {
@@ -218,14 +185,6 @@ public:
 
     std::unique_ptr<ResumeConversationAction> newResumeConversation() {
         return std::make_unique<ResumeConversationAction>(_game, _services);
-    }
-
-    std::unique_ptr<SpeakStringAction> newSpeakString(std::string stringToSpeak, TalkVolume talkVolume) {
-        return std::make_unique<SpeakStringAction>(_game, _services, std::move(stringToSpeak), talkVolume);
-    }
-
-    std::unique_ptr<SpeakStringByStrRefAction> newSpeakStringByStrRef() {
-        return std::make_unique<SpeakStringByStrRefAction>(_game, _services);
     }
 
     std::unique_ptr<StartConversationAction> newStartConversation(std::shared_ptr<Object> object, std::string dialogResRef, bool ignoreStartRange = false) {
@@ -258,10 +217,6 @@ public:
 
     std::unique_ptr<UseSkillAction> newUseSkill(std::shared_ptr<Object> object, SkillType skill) {
         return std::make_unique<UseSkillAction>(_game, _services, std::move(object), skill);
-    }
-
-    std::unique_ptr<UseTalentAtLocationAction> newUseTalentAtLocation() {
-        return std::make_unique<UseTalentAtLocationAction>(_game, _services);
     }
 
     std::unique_ptr<UseTalentOnObjectAction> newUseTalentOnObject() {
