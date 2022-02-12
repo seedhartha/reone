@@ -40,6 +40,7 @@ class Event;
 class Item;
 class Location;
 class Object;
+class Placeable;
 class Sound;
 class SpatialObject;
 class Talent;
@@ -72,6 +73,7 @@ glm::vec3 getVectorOrElse(const std::vector<script::Variable> &args, int index, 
 bool getIntAsBool(const std::vector<script::Variable> &args, int index);
 bool getIntAsBoolOrElse(const std::vector<script::Variable> &args, int index, bool defValue);
 
+std::shared_ptr<game::Object> getObjectOrNull(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 std::shared_ptr<game::Object> getObjectOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
 std::shared_ptr<game::SpatialObject> getCallerAsSpatialObject(const RoutineContext &ctx);
@@ -83,9 +85,15 @@ std::shared_ptr<game::Creature> getObjectAsCreature(const std::vector<script::Va
 std::shared_ptr<game::Creature> getObjectOrCallerAsCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
 std::shared_ptr<game::Door> getObjectAsDoor(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+
+std::shared_ptr<game::Placeable> getObjectAsPlaceable(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+
 std::shared_ptr<game::Item> getObjectAsItem(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+std::shared_ptr<game::Item> getObjectAsItemOrNull(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
+
 std::shared_ptr<game::Sound> getObjectAsSound(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
+std::shared_ptr<game::Area> getObjectAsArea(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 std::shared_ptr<game::Area> getObjectAsAreaOrCallerArea(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
 inline void throwIfOutOfRange(const std::vector<script::Variable> &args, int index) {

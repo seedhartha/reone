@@ -51,10 +51,10 @@ public:
 
     void init();
 
-    std::shared_ptr<Spell> get(ForcePower type) const;
+    std::shared_ptr<Spell> get(SpellType type) const;
 
 private:
-    std::unordered_map<ForcePower, std::shared_ptr<Spell>> _spells;
+    std::unordered_map<SpellType, std::shared_ptr<Spell>> _spells;
 
     // Services
 

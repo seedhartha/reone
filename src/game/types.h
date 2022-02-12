@@ -679,7 +679,7 @@ enum class FeatType {
     // END TSL
 };
 
-enum class ForcePower {
+enum class SpellType {
     All = -1,
     MasterAlter = 0,
     MasterControl = 1,
@@ -871,16 +871,19 @@ enum class NPCAIStyle {
     JediSupport = 5,
 
     // TSL
-    Healer = 6,           // no fighting, just heals
-    Skirmish = 7,         // this AI moves and shoots
-    Turtle = 8,           // turtles then unleashes charged attack
-    PartyAggro = 9,       // all out attacking party member
-    PartyDefense = 10,    // attacks, but doesn't stray to far
-    PartyRanged = 11,     // doesn't run around a lot, but does heal
-    PartyStationary = 12, // uses healing and defensive force powers
-    PartySupport = 13,    // revisiting party AI stuff
-    PartyRemote = 14,     // combat AI for the floating remote
-    MonsterPowers = 15    // combat AI for the Malachor Storm Beasts and other ability-using monsters
+
+    Healer = 6,
+    Skirmish = 7,
+    Turtle = 8,
+    PartyAggro = 9,
+    PartyDefense = 10,
+    PartyRanged = 11,
+    PartyStationary = 12,
+    PartySupport = 13,
+    PartyRemote = 14,
+    MonsterPowers = 15
+
+    // END TSL
 };
 
 enum class ActionType {
@@ -1033,6 +1036,263 @@ enum class SaveLoadMode {
     LoadFromInGame
 };
 
+enum class MovementSpeed {
+    PC = 0,
+    Immobile = 1,
+    VerySlow = 2,
+    Slow = 3,
+    Normal = 4,
+    Fast = 5,
+    VeryFast = 6,
+    Default = 7,
+    DMFast = 8
+};
+
+enum class TrapBaseType {
+    FlashStunMinor = 0,
+    FlashStunAverage = 1,
+    FlashStunDeadly = 2,
+    FragmentationMineMinor = 3,
+    FragmentationMineAverage = 4,
+    FragmentationMineDeadly = 5,
+    LaserSlicingMinor = 6,
+    LaserSlicingAverage = 7,
+    LaserSlicingDeadly = 8,
+    PoisonGasMinor = 9,
+    PoisonGasAverage = 10,
+    PoisonGasDeadly = 11,
+    SonicChargeMinor = 14,
+    SonicChargeAverage = 15,
+    SonicChargeDeadly = 16,
+
+    // TSL
+
+    FlashStunStrong = 17,
+    FlashStunDevastating = 18,
+    FragmentationMineStrong = 19,
+    FragmentationMineDevastating = 20,
+    LaserSlicingStrong = 21,
+    LaserSlicingDevastating = 22,
+    PoisonGasStrong = 23,
+    PoisonGasDevastating = 24,
+    SonicChargeStrong = 25,
+    SonicChargeDevastating = 26
+
+    // END TSL
+};
+
+enum class GameDifficulty {
+    VeryEasy = 0,
+    Easy = 1,
+    Normal = 2,
+    CoreRules = 3,
+    Difficult = 4
+};
+
+enum class CreatureSize {
+    Invalid = 0,
+    Tiny = 1,
+    Small = 2,
+    Medium = 3,
+    Large = 4,
+    Huge = 5
+};
+
+enum class Alignment {
+    All = 0,
+    Neutral = 1,
+    LightSide = 2,
+    DarkSide = 3
+};
+
+enum class ItemProperty {
+    AbilityBonus = 0,
+    AcBonus = 1,
+    AcBonusVsAlignmentGroup = 2,
+    AcBonusVsDamageType = 3,
+    AcBonusVsRacialGroup = 4,
+    EnhancementBonus = 5,
+    EnhancementBonusVsAlignmentGroup = 6,
+    EnhancementBonusVsRacialGroup = 7,
+    AttackPenalty = 8,
+    BonusFeat = 9,
+    ActivateItem = 10,
+    DamageBonus = 11,
+    DamageBonusVsAlignmentGroup = 12,
+    DamageBonusVsRacialGroup = 13,
+    ImmunityDamageType = 14,
+    DecreasedDamage = 15,
+    DamageReduction = 16,
+    DamageResistance = 17,
+    DamageVulnerability = 18,
+    DecreasedAbilityScore = 19,
+    DecreasedAc = 20,
+    DecreasedSkillModifier = 21,
+    ExtraMeleeDamageType = 22,
+    ExtraRangedDamageType = 23,
+    Immunity = 24,
+    ImprovedForceResistance = 25,
+    ImprovedSavingThrow = 26,
+    ImprovedSavingThrowSpecific = 27,
+    Keen = 28,
+    Light = 29,
+    Mighty = 30,
+    NoDamage = 31,
+    OnHitProperties = 32,
+    DecreasedSavingThrows = 33,
+    DecreasedSavingThrowsSpecific = 34,
+    Regeneration = 35,
+    SkillBonus = 36,
+    SecuritySpike = 37,
+    AttackBonus = 38,
+    AttackBonusVsAlignmentGroup = 39,
+    AttackBonusVsRacialGroup = 40,
+    DecreasedAttackModifier = 41,
+    UnlimitedAmmunition = 42,
+    UseLimitationAlignmentGroup = 43,
+    UseLimitationClass = 44,
+    UseLimitationRacialType = 45,
+    Trap = 46,
+    TrueSeeing = 47,
+    OnMonsterHit = 48,
+    MassiveCriticals = 49,
+    FreedomOfMovement = 50,
+    MonsterDamage = 51,
+    SpecialWalk = 52,
+    ComputerSpike = 53,
+    RegenerationForcePoints = 54,
+    BlasterBoltDeflectIncrease = 55,
+    BlasterBoltDeflectDecrease = 56,
+    UseLimitationFeat = 57,
+    DroidRepairKit = 58,
+
+    // TSL
+
+    Disguise = 59,
+    LimitUseByGender = 60,
+    LimitUseBySubrace = 61,
+    LimitUseByPc = 62,
+    DampenSound = 63,
+    Doorcutting = 64,
+    Doorsabering = 65
+
+    // END TSL
+};
+
+enum class PersistentZone {
+    Active = 0,
+    Follow = 1
+};
+
+enum class ImmunityType {
+    None = 0,
+    MindSpells = 1,
+    Poison = 2,
+    Disease = 3,
+    Fear = 4,
+    Trap = 5,
+    Paralysis = 6,
+    Blindness = 7,
+    Deafness = 8,
+    Slow = 9,
+    Entangle = 10,
+    Silence = 11,
+    Stun = 12,
+    Sleep = 13,
+    Charm = 14,
+    Dominate = 15,
+    Confused = 16,
+    Cursed = 17,
+    Dazed = 18,
+    AbilityDecrease = 19,
+    AttackDecrease = 20,
+    DamageDecrease = 21,
+    DamageImmunityDecrease = 22,
+    AcDecrease = 23,
+    MovementSpeedDecrease = 24,
+    SavingThrowDecrease = 25,
+    ForceResistanceDecrease = 26,
+    SkillDecrease = 27,
+    Knockdown = 28,
+    NegativeLevel = 29,
+    SneakAttack = 30,
+    CriticalHit = 31,
+    Death = 32,
+    DroidConfused = 33
+};
+
+enum class InventoryDisturbType {
+    Added = 0,
+    Removed = 1,
+    Stolen = 2
+};
+
+enum class DoorAction {
+    Open = 0,
+    Unlock = 1,
+    Bash = 2,
+    Ignore = 3,
+    Knock = 4
+};
+
+enum class DamagePower {
+    Normal = 0,
+    PlusOne = 1,
+    PlusTwo = 2,
+    PlusThree = 3,
+    PlusFour = 4,
+    PlusFive = 5,
+    Energy = 6
+};
+
+enum class ACBonus {
+    Dodge = 0,
+    Natural = 1,
+    ArmourEnchantment = 2,
+    ShieldEnchantment = 3,
+    Deflection = 4
+};
+
+enum class AttackBonus {
+    Misc = 0,
+    Onhand = 1,
+    Offhand = 2
+};
+
+enum class BodyNode {
+    Hand = 0,
+    Chest = 1,
+    Head = 2,
+    HandLeft = 3,
+    HandRight = 4
+};
+
+enum class Poison {
+    AbilityScoreMild = 0,
+    AbilityScoreAverage = 1,
+    AbilityScoreVirulent = 2,
+    DamageMild = 3,
+    DamageAverage = 4,
+    DamageVirulent = 5,
+    AbilityAndDamageAverage = 6,
+    AbilityAndDamageVirulent = 7,
+
+    // TSL
+
+    DamageRocket = 8,
+    DamageNormalDart = 9,
+    DamageKyberDart = 10,
+    DamageKyberDartHalf = 11
+
+    // END TSL
+};
+
+enum class InvisibilityType {
+    Normal = 1,
+    Darkness = 2,
+    Improved = 4
+};
+
 struct InventorySlot {
     static constexpr int head = 0;
     static constexpr int body = 1;
@@ -1049,6 +1309,17 @@ struct InventorySlot {
     static constexpr int cArmour = 17;
     static constexpr int rightWeapon2 = 18;
     static constexpr int leftWeapon2 = 19;
+};
+
+struct Forfeit {
+    static constexpr int noForcePowers = 1;
+    static constexpr int noItems = 2;
+    static constexpr int noWeapons = 4;
+    static constexpr int dxunSwordOnly = 8;
+    static constexpr int noArmor = 16;
+    static constexpr int noRanged = 32;
+    static constexpr int noLightsaber = 64;
+    static constexpr int noItemButShield = 128;
 };
 
 struct PartySelectionContext {

@@ -257,7 +257,7 @@ void Routines::initForKotOR() {
     add("ActionPauseConversation", R_VOID, {}, &routine::actionPauseConversation);
     add("ActionResumeConversation", R_VOID, {}, &routine::actionResumeConversation);
     add("EffectBeam", R_EFFECT, {R_INT, R_OBJECT, R_INT, R_INT}, &routine::effectBeam);
-    add("GetReputation", R_INT, {R_OBJECT, R_OBJECT}, &routine::getReputation);
+    add("GetReputation", R_INT, {R_OBJECT, R_OBJECT}, &routine::getReputation, Variable::ofInt(-1));
     add("AdjustReputation", R_VOID, {R_OBJECT, R_OBJECT, R_INT}, &routine::adjustReputation);
     add("GetModuleFileName", R_STRING, {}, &routine::getModuleFileName);
     add("GetGoingToBeAttackedBy", R_OBJECT, {R_OBJECT}, &routine::unsupported);
@@ -543,7 +543,7 @@ void Routines::initForKotOR() {
     add("GetFortitudeSavingThrow", R_INT, {R_OBJECT}, &routine::unsupported);
     add("GetWillSavingThrow", R_INT, {R_OBJECT}, &routine::unsupported);
     add("GetReflexSavingThrow", R_INT, {R_OBJECT}, &routine::unsupported);
-    add("GetChallengeRating", R_FLOAT, {R_OBJECT}, &routine::getChallengeRating);
+    add("GetChallengeRating", R_FLOAT, {R_OBJECT}, &routine::getChallengeRating, Variable::ofFloat(0.0f));
     add("GetFoundEnemyCreature", R_OBJECT, {R_OBJECT}, &routine::getFoundEnemyCreature);
     add("GetMovementRate", R_INT, {R_OBJECT}, &routine::unsupported);
     add("GetSubRace", R_INT, {R_OBJECT}, &routine::getSubRace, Variable::ofInt(static_cast<int>(Subrace::None)));
@@ -619,7 +619,7 @@ void Routines::initForKotOR() {
 
     add("EndGame", R_VOID, {R_INT}, &routine::endGame);
     add("GetRunScriptVar", R_INT, {}, &routine::getRunScriptVar);
-    add("GetCreatureMovmentType", R_INT, {R_OBJECT}, &routine::getCreatureMovmentType);
+    add("GetCreatureMovmentType", R_INT, {R_OBJECT}, &routine::getCreatureMovmentType, Variable::ofInt(static_cast<int>(MovementSpeed::Immobile)));
     add("AmbientSoundSetDayVolume", R_VOID, {R_OBJECT, R_INT}, &routine::unsupported);
     add("AmbientSoundSetNightVolume", R_VOID, {R_OBJECT, R_INT}, &routine::unsupported);
     add("MusicBackgroundGetBattleTrack", R_INT, {R_OBJECT}, &routine::musicBackgroundGetBattleTrack);
@@ -1042,7 +1042,7 @@ void Routines::initForTSL() {
     add("ActionPauseConversation", R_VOID, {}, &routine::actionPauseConversation);
     add("ActionResumeConversation", R_VOID, {}, &routine::actionResumeConversation);
     add("EffectBeam", R_EFFECT, {R_INT, R_OBJECT, R_INT, R_INT}, &routine::effectBeam);
-    add("GetReputation", R_INT, {R_OBJECT, R_OBJECT}, &routine::getReputation);
+    add("GetReputation", R_INT, {R_OBJECT, R_OBJECT}, &routine::getReputation, Variable::ofInt(-1));
     add("AdjustReputation", R_VOID, {R_OBJECT, R_OBJECT, R_INT}, &routine::adjustReputation);
     add("GetModuleFileName", R_STRING, {}, &routine::getModuleFileName);
     add("GetGoingToBeAttackedBy", R_OBJECT, {R_OBJECT}, &routine::unsupported);
@@ -1328,7 +1328,7 @@ void Routines::initForTSL() {
     add("GetFortitudeSavingThrow", R_INT, {R_OBJECT}, &routine::unsupported);
     add("GetWillSavingThrow", R_INT, {R_OBJECT}, &routine::unsupported);
     add("GetReflexSavingThrow", R_INT, {R_OBJECT}, &routine::unsupported);
-    add("GetChallengeRating", R_FLOAT, {R_OBJECT}, &routine::getChallengeRating);
+    add("GetChallengeRating", R_FLOAT, {R_OBJECT}, &routine::getChallengeRating, Variable::ofFloat(0.0f));
     add("GetFoundEnemyCreature", R_OBJECT, {R_OBJECT}, &routine::getFoundEnemyCreature);
     add("GetMovementRate", R_INT, {R_OBJECT}, &routine::unsupported);
     add("GetSubRace", R_INT, {R_OBJECT}, &routine::getSubRace, Variable::ofInt(static_cast<int>(Subrace::None)));
