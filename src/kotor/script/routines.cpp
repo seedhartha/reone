@@ -1629,7 +1629,7 @@ void Routines::initForTSL() {
 
     add("SWMG_GetSwoopUpgrade", R_INT, {R_INT}, &routine::minigame::getSwoopUpgrade);
 
-    add("GetFeatAcquired", R_INT, {R_INT, R_OBJECT}, &routine::unsupported);
+    add("GetFeatAcquired", R_INT, {R_INT, R_OBJECT}, &routine::getFeatAcquired);
     add("GetSpellAcquired", R_INT, {R_INT, R_OBJECT}, &routine::getSpellAcquired);
     add("ShowSwoopUpgradeScreen", R_VOID, {}, &routine::showSwoopUpgradeScreen);
     add("GrantFeat", R_VOID, {R_INT, R_OBJECT}, &routine::grantFeat);

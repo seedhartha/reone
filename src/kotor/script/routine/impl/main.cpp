@@ -3014,6 +3014,15 @@ Variable getSpellForcePointCost(const vector<Variable> &args, const RoutineConte
     return Variable::ofInt(0);
 }
 
+Variable getFeatAcquired(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto feat = getIntAsEnum<FeatType>(args, 0);
+    auto creature = getObjectOrCallerAsCreature(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
+}
+
 Variable getSpellAcquired(const vector<Variable> &args, const RoutineContext &ctx) {
     auto spell = getIntAsEnum<SpellType>(args, 0);
     auto creature = getObjectOrCallerAsCreature(args, 1, ctx);
