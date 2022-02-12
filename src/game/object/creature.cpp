@@ -1368,7 +1368,7 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
         int level = classGffs->getInt("ClassLevel");
         attributes.addClassLevels(_services.classes.get(static_cast<ClassType>(clazz)).get(), level);
         for (auto &spellGffs : classGffs->getList("KnownList0")) {
-            auto spell = static_cast<ForcePower>(spellGffs->getUint("Spell"));
+            auto spell = static_cast<SpellType>(spellGffs->getUint("Spell"));
             attributes.addSpell(spell);
         }
     }

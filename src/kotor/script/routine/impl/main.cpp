@@ -81,7 +81,6 @@ Variable floatToString(const vector<Variable> &args, const RoutineContext &ctx) 
     int decimals = getIntOrElse(args, 2, 9);
 
     // TODO: use width and decimals
-
     return Variable::ofString(to_string(flt));
 }
 
@@ -203,7 +202,9 @@ Variable getFacing(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getItemPossessor(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getItemPossessedBy(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -238,7 +239,9 @@ Variable createItemOnObject(const vector<Variable> &args, const RoutineContext &
 Variable getLastAttacker(const vector<Variable> &args, const RoutineContext &ctx) {
     auto attackee = getObjectOrCaller(args, 0, ctx);
 
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getNearestCreature(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -287,11 +290,15 @@ Variable getIsObjectValid(const vector<Variable> &args, const RoutineContext &ct
 Variable playSound(const vector<Variable> &args, const RoutineContext &ctx) {
     string soundName = getString(args, 0);
 
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getSpellTargetObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getCurrentHitPoints(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -442,7 +449,9 @@ Variable getIsEffectValid(const vector<Variable> &args, const RoutineContext &ct
 Variable getEffectCreator(const vector<Variable> &args, const RoutineContext &ctx) {
     auto effect = getEffect(args, 0);
 
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable intToString(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -455,14 +464,18 @@ Variable getFirstObjectInArea(const vector<Variable> &args, const RoutineContext
     auto area = getObjectAsAreaOrCallerArea(args, 0, ctx);
     int objectFilter = getIntOrElse(args, 1, static_cast<int>(ObjectType::Creature));
 
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getNextObjectInArea(const vector<Variable> &args, const RoutineContext &ctx) {
     auto area = getObjectAsAreaOrCallerArea(args, 0, ctx);
     int objectFilter = getIntOrElse(args, 1, static_cast<int>(ObjectType::Creature));
 
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable d2(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -626,7 +639,9 @@ Variable soundObjectSetFixedVariance(const vector<Variable> &args, const Routine
 Variable getGoodEvilValue(const vector<Variable> &args, const RoutineContext &ctx) {
     auto creature = getObjectAsCreature(args, 0, ctx);
 
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofInt(-1);
 }
 
 Variable getPartyMemberCount(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -796,7 +811,12 @@ Variable getTag(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable resistForce(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto source = getObject(args, 0, ctx);
+    auto target = getObject(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getEffectType(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -831,16 +851,24 @@ Variable setListenPattern(const vector<Variable> &args, const RoutineContext &ct
 }
 
 Variable getFactionAverageReputation(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto sourceFactionMember = getObject(args, 0, ctx);
+    auto target = getObject(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(-1);
 }
 
 Variable getGlobalString(const vector<Variable> &args, const RoutineContext &ctx) {
-    string id(getString(args, 0));
-    return Variable::ofString(ctx.game.getGlobalString(id));
+    string identifier = getString(args, 0);
+    string result = ctx.game.getGlobalString(identifier);
+
+    return Variable::ofString(move(result));
 }
 
 Variable getListenPatternNumber(const vector<Variable> &args, const RoutineContext &ctx) {
     // TODO: implement
+
     return Variable::ofInt(-1);
 }
 
@@ -873,15 +901,31 @@ Variable getObjectByTag(const vector<Variable> &args, const RoutineContext &ctx)
 }
 
 Variable adjustAlignment(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto subject = getObject(args, 0, ctx);
+    auto alignment = getIntAsEnum<Alignment>(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getReputation(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto source = getObject(args, 0, ctx);
+    auto target = getObject(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(-1);
 }
 
 Variable adjustReputation(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto target = getObject(args, 0, ctx);
+    auto sourceFactionMember = getObject(args, 1, ctx);
+    auto adjustment = getInt(args, 2);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getModuleFileName(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -916,7 +960,9 @@ Variable applyEffectAtLocation(const vector<Variable> &args, const RoutineContex
 
 Variable getIsPC(const vector<Variable> &args, const RoutineContext &ctx) {
     auto creature = getObjectAsCreature(args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(creature == ctx.game.party().player()));
+    bool result = creature == ctx.game.party().player();
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable applyEffectToObject(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -931,7 +977,7 @@ Variable applyEffectToObject(const vector<Variable> &args, const RoutineContext 
 }
 
 Variable speakString(const vector<Variable> &args, const RoutineContext &ctx) {
-    string stringToSpeak(getString(args, 0));
+    string stringToSpeak = getString(args, 0);
     auto talkVolume = getIntAsEnumOrElse(args, 1, TalkVolume::Talk);
 
     // TODO: implement
@@ -950,7 +996,9 @@ Variable getPositionFromLocation(const vector<Variable> &args, const RoutineCont
 
 Variable getFacingFromLocation(const vector<Variable> &args, const RoutineContext &ctx) {
     auto location = getLocationArgument(args, 0);
-    return Variable::ofFloat(glm::degrees(location->facing()));
+    float result = glm::degrees(location->facing());
+
+    return Variable::ofFloat(result);
 }
 
 Variable getNearestObject(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -958,21 +1006,21 @@ Variable getNearestObject(const vector<Variable> &args, const RoutineContext &ct
     auto target = getObjectOrCallerAsSpatialObject(args, 1, ctx);
     int nth = getIntOrElse(args, 2, 1);
 
-    shared_ptr<SpatialObject> object(ctx.game.module()->area()->getNearestObject(target->position(), nth - 1, [&objectType](auto &object) {
+    auto object = ctx.game.module()->area()->getNearestObject(target->position(), nth - 1, [&objectType](auto &object) {
         return object->type() == objectType;
-    }));
+    });
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
 Variable getNearestObjectByTag(const vector<Variable> &args, const RoutineContext &ctx) {
-    string tag(boost::to_lower_copy(getString(args, 0)));
+    string tag = boost::to_lower_copy(getString(args, 0));
     auto target = getObjectOrCallerAsSpatialObject(args, 1, ctx);
     int nth = getIntOrElse(args, 2, 1);
 
-    shared_ptr<SpatialObject> object(ctx.game.module()->area()->getNearestObject(target->position(), nth - 1, [&tag](auto &object) {
+    auto object = ctx.game.module()->area()->getNearestObject(target->position(), nth - 1, [&tag](auto &object) {
         return object->tag() == tag;
-    }));
+    });
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
@@ -988,7 +1036,7 @@ Variable floatToInt(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable stringToInt(const vector<Variable> &args, const RoutineContext &ctx) {
-    string number(getString(args, 0));
+    string number = getString(args, 0);
 
     int result = 0;
     if (!number.empty()) {
@@ -1001,25 +1049,28 @@ Variable stringToInt(const vector<Variable> &args, const RoutineContext &ctx) {
 Variable getIsEnemy(const vector<Variable> &args, const RoutineContext &ctx) {
     auto target = getObjectAsCreature(args, 0, ctx);
     auto source = getObjectOrCallerAsCreature(args, 1, ctx);
-    bool enemy = ctx.services.reputes.getIsEnemy(*target, *source);
 
-    return Variable::ofInt(static_cast<int>(enemy));
+    bool result = ctx.services.reputes.getIsEnemy(*target, *source);
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable getIsFriend(const vector<Variable> &args, const RoutineContext &ctx) {
     auto target = getObjectAsCreature(args, 0, ctx);
     auto source = getObjectOrCallerAsCreature(args, 1, ctx);
-    bool isFriend = ctx.services.reputes.getIsFriend(*target, *source);
 
-    return Variable::ofInt(static_cast<int>(isFriend));
+    bool result = ctx.services.reputes.getIsFriend(*target, *source);
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable getIsNeutral(const vector<Variable> &args, const RoutineContext &ctx) {
     auto target = getObjectAsCreature(args, 0, ctx);
     auto source = getObjectOrCallerAsCreature(args, 1, ctx);
-    bool neutral = ctx.services.reputes.getIsNeutral(*target, *source);
 
-    return Variable::ofInt(static_cast<int>(neutral));
+    bool result = ctx.services.reputes.getIsNeutral(*target, *source);
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable getPCSpeaker(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1029,13 +1080,19 @@ Variable getPCSpeaker(const vector<Variable> &args, const RoutineContext &ctx) {
 
 Variable getStringByStrRef(const vector<Variable> &args, const RoutineContext &ctx) {
     int strRef = getInt(args, 0);
-    string str(ctx.services.strings.get(strRef));
+    string result = ctx.services.strings.get(strRef);
 
-    return Variable::ofString(move(str));
+    return Variable::ofString(move(result));
 }
 
 Variable destroyObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto destroy = getObjectAsSpatialObject(args, 0, ctx);
+    float delay = getFloatOrElse(args, 1, 0.0f);
+    bool noFade = getIntAsBoolOrElse(args, 2, false);
+    float delayUntilFade = getFloatOrElse(args, 3, 0.0f);
+    int hideFeedback = getIntOrElse(args, 4, 0);
+
+    // TODO: use delay, noFade, delayUntilFade and hideFeedback
     ctx.game.module()->area()->destroyObject(*destroy);
 
     return Variable::ofNull();
@@ -1048,21 +1105,28 @@ Variable getModule(const vector<Variable> &args, const RoutineContext &ctx) {
 
 Variable createObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto objectType = getIntAsEnum<ObjectType>(args, 0);
-    string blueprint(boost::to_lower_copy(getString(args, 1)));
+    string tmplt = boost::to_lower_copy(getString(args, 1));
     auto location = getLocationArgument(args, 2);
     bool useAppearAnimation = getIntAsBoolOrElse(args, 3, false);
 
-    auto object = ctx.game.module()->area()->createObject(objectType, blueprint, location);
+    // TODO: use useAppearAnimation
+    auto object = ctx.game.module()->area()->createObject(objectType, tmplt, location);
 
     return Variable::ofObject(getObjectIdOrInvalid(object));
 }
 
 Variable eventSpellCastAt(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto caster = getObject(args, 0, ctx);
+    int spell = getInt(args, 1);
+    bool harmful = getIntAsBoolOrElse(args, 2, true);
+
     throw NotImplementedException();
 }
 
 Variable getLastSpellCaster(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getLastSpell(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1078,6 +1142,8 @@ Variable getSpellId(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getLoadFromSaveGame(const vector<Variable> &args, const RoutineContext &ctx) {
+    // TODO: implement
+
     return Variable::ofInt(static_cast<int>(false));
 }
 
@@ -1087,10 +1153,15 @@ Variable getName(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getLastSpeaker(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable beginConversation(const vector<Variable> &args, const RoutineContext &ctx) {
+    string resRef = boost::to_lower_copy(getStringOrElse(args, 0, ""));
+    auto objectToDialog = getObjectOrNull(args, 1, ctx);
+
     throw NotImplementedException();
 }
 
@@ -1109,7 +1180,8 @@ Variable getLastPerceptionSeen(const vector<Variable> &args, const RoutineContex
 }
 
 Variable getLastClosedBy(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto triggerrer = getTriggerrer(ctx);
+    return Variable::ofObject(getObjectIdOrInvalid(triggerrer));
 }
 
 Variable getLastPerceptionVanished(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1120,52 +1192,104 @@ Variable getLastPerceptionVanished(const vector<Variable> &args, const RoutineCo
 }
 
 Variable getFirstInPersistentObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto persistentObject = getObjectOrCaller(args, 0, ctx);
+    auto residentObjectType = getIntAsEnumOrElse(args, 1, ObjectType::Creature);
+    auto persistentZone = getIntAsEnumOrElse(args, 2, PersistentZone::Active);
+
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getNextInPersistentObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto persistentObject = getObjectOrCaller(args, 0, ctx);
+    auto residentObjectType = getIntAsEnumOrElse(args, 1, ObjectType::Creature);
+    auto persistentZone = getIntAsEnumOrElse(args, 2, PersistentZone::Active);
+
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable showLevelUpGUI(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable setItemNonEquippable(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto item = getObjectAsItem(args, 0, ctx);
+    bool nonEquippable = getIntAsBool(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable setButtonMashCheck(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    bool check = getIntAsBool(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable giveItem(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto item = getObjectAsItem(args, 0, ctx);
+    auto giveTo = getObject(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable objectToString(const vector<Variable> &args, const RoutineContext &ctx) {
     auto object = getObject(args, 0, ctx);
-    return Variable::ofString(str(boost::format("%x") % object->id()));
+    string result = str(boost::format("%x") % object->id());
+
+    return Variable::ofString(move(result));
 }
 
 Variable getIsImmune(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+    auto immunityType = getIntAsEnum<ImmunityType>(args, 1);
+    auto versus = getObject(args, 2, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable getModuleItemAcquired(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getEncounterActive(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto encounter = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable setEncounterActive(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    bool newValue = getIntAsBool(args, 0);
+    auto encounter = getObject(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable setCustomToken(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int customTokenNumber = getInt(args, 0);
+    string tokenValue = getString(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getHasFeat(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1192,19 +1316,30 @@ Variable getObjectSeen(const vector<Variable> &args, const RoutineContext &ctx) 
 }
 
 Variable getLastPlayerDied(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getReflexAdjustedDamage(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int damage = getInt(args, 0);
+    auto target = getObject(args, 1, ctx);
+    int dc = getInt(args, 2);
+    auto saveType = getIntAsEnumOrElse(args, 3, SavingThrowType::None);
+    auto saveVersus = getObject(args, 4, ctx);
+
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable playAnimation(const vector<Variable> &args, const RoutineContext &ctx) {
     auto caller = getCallerAsSpatialObject(ctx);
     auto animType = getIntAsEnum<AnimationType>(args, 0);
     float speed = getFloatOrElse(args, 1, 1.0f);
-    float seconds = getFloatOrElse(args, 2, 0.0f); // TODO: handle duration
+    float seconds = getFloatOrElse(args, 2, 0.0f);
 
+    // TODO: use seconds
     AnimationProperties properties;
     properties.speed = speed;
     caller->playAnimation(animType, move(properties));
@@ -1233,6 +1368,14 @@ Variable getHasSpellEffect(const vector<Variable> &args, const RoutineContext &c
     // TODO: implement
 
     return Variable::ofInt(R_FALSE);
+}
+
+Variable getEffectSpellId(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto effect = getEffect(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofInt(-1);
 }
 
 Variable getCreatureHasTalent(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1337,33 +1480,59 @@ Variable getLocked(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getLastWeaponUsed(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getLastUsedBy(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getAbilityModifier(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto ability = getIntAsEnum<Ability>(args, 0);
+    auto creature = getObjectAsCreature(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable getDistanceToObject2D(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto caller = getCallerAsSpatialObject(ctx);
     auto object = getObjectAsSpatialObject(args, 0, ctx);
-    return Variable::ofFloat(caller->getDistanceTo(glm::vec2(object->position())));
+
+    auto caller = getCallerAsSpatialObject(ctx);
+    float result = caller->getDistanceTo(glm::vec2(object->position()));
+
+    return Variable::ofFloat(result);
 }
 
 Variable getBlockingDoor(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getIsDoorActionPossible(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto targetDoor = getObjectAsDoor(args, 0, ctx);
+    auto doorAction = getIntAsEnum<DoorAction>(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable doDoorAction(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto targetDoor = getObjectAsDoor(args, 0, ctx);
+    auto doorAction = getIntAsEnum<DoorAction>(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getFirstItemInInventory(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1381,37 +1550,50 @@ Variable getNextItemInInventory(const vector<Variable> &args, const RoutineConte
 }
 
 Variable getClassByPosition(const vector<Variable> &args, const RoutineContext &ctx) {
-    int position = getInt(args, 0);
+    int classPosition = getInt(args, 0);
     auto creature = getObjectOrCallerAsCreature(args, 1, ctx);
-    ClassType clazz = creature->attributes().getClassByPosition(position);
-    return Variable::ofInt(static_cast<int>(clazz));
+
+    auto result = creature->attributes().getClassByPosition(classPosition);
+
+    return Variable::ofInt(static_cast<int>(result));
 }
 
 Variable getLevelByPosition(const vector<Variable> &args, const RoutineContext &ctx) {
+    int classPosition = getInt(args, 0);
     auto creature = getObjectOrCallerAsCreature(args, 1, ctx);
-    int position = getInt(args, 0);
-    int level = creature->attributes().getLevelByPosition(position);
 
-    return Variable::ofInt(level);
+    int result = creature->attributes().getLevelByPosition(classPosition);
+
+    return Variable::ofInt(result);
 }
 
 Variable getLevelByClass(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto classType = getIntAsEnum<ClassType>(args, 0);
     auto creature = getObjectOrCallerAsCreature(args, 1, ctx);
-    auto clazz = getIntAsEnum<ClassType>(args, 0);
 
-    return Variable::ofInt(creature->attributes().getClassLevel(clazz));
+    int result = creature->attributes().getClassLevel(classType);
+
+    return Variable::ofInt(result);
 }
 
 Variable getDamageDealtByType(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto damageType = getIntAsEnum<DamageType>(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable getTotalDamageDealt(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable getLastDamager(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getInventoryDisturbType(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1419,11 +1601,21 @@ Variable getInventoryDisturbType(const vector<Variable> &args, const RoutineCont
 }
 
 Variable getInventoryDisturbItem(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable showUpgradeScreen(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto item = getObjectAsItemOrNull(args, 0, ctx);
+    auto character = getObjectOrNull(args, 1, ctx);
+    bool disableItemCreation = getIntAsBoolOrElse(args, 2, false);
+    bool disableUpgrade = getIntAsBoolOrElse(args, 3, false);
+    string override2DA = getStringOrElse(args, 4, "");
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getGender(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1456,27 +1648,56 @@ Variable getIdFromTalent(const vector<Variable> &args, const RoutineContext &ctx
 }
 
 Variable playPazaak(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int opponentPazaakDeck = getInt(args, 0);
+    string endScript = getString(args, 1);
+    int maxWager = getInt(args, 2);
+    bool showTutorial = getIntAsBoolOrElse(args, 3, false);
+    auto opponent = getObjectOrNull(args, 4, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getLastPazaakResult(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable displayFeedBackText(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+    int textConstant = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable addJournalQuestEntry(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    string plotId = getString(args, 0);
+    int state = getInt(args, 1);
+    bool allowOverrideHigher = getIntAsBoolOrElse(args, 2, false);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable removeJournalQuestEntry(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    string plotId = getString(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getJournalEntry(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    string plotId = getString(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable playRumblePattern(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1509,7 +1730,7 @@ Variable getLastOpenedBy(const vector<Variable> &args, const RoutineContext &ctx
 }
 
 Variable getHasSpell(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto spell = getIntAsEnum<ForcePower>(args, 0);
+    auto spell = getIntAsEnum<SpellType>(args, 0);
     auto creature = getObjectOrCallerAsCreature(args, 1, ctx);
 
     // TODO: Force Powers are not implemented at the moment
@@ -1518,30 +1739,52 @@ Variable getHasSpell(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable openStore(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto store = getObject(args, 0, ctx);
+    auto pc = getObject(args, 1, ctx);
+    int bonusMarkUp = getIntOrElse(args, 2, 0);
+    int bonusMarkDown = getIntOrElse(args, 3, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable jumpToObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    // TODO: pass all arguments to an action
-    auto jumpTo = getObject(args, 0, ctx);
-    bool walkStraightLine = getIntAsBoolOrElse(args, 1, true);
+    auto toJumpTo = getObject(args, 0, ctx);
+    bool walkStraightLineToPoint = getIntAsBoolOrElse(args, 1, true);
 
-    auto action = ctx.game.actionFactory().newJumpToObject(move(jumpTo));
+    // TODO: use walkStraightLineToPoint
+    auto action = ctx.game.actionFactory().newJumpToObject(move(toJumpTo));
     getCaller(ctx)->addActionOnTop(move(action));
 
     return Variable::ofNull();
 }
 
 Variable setMapPinEnabled(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto mapPin = getObject(args, 0, ctx);
+    bool enabled = getIntAsBool(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable addMultiClass(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int classType = getInt(args, 0);
+    auto source = getObject(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getIsLinkImmune(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto target = getObject(args, 0, ctx);
+    auto effect = getEffect(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable giveXPToCreature(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1573,7 +1816,12 @@ Variable getBaseItemType(const vector<Variable> &args, const RoutineContext &ctx
 }
 
 Variable getItemHasItemProperty(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto item = getObjectAsItem(args, 0, ctx);
+    auto property = getIntAsEnum<ItemProperty>(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable getIsEncounterCreature(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1581,14 +1829,14 @@ Variable getIsEncounterCreature(const vector<Variable> &args, const RoutineConte
 
     // TODO: implement
 
-    return Variable::ofInt(0);
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable changeToStandardFaction(const vector<Variable> &args, const RoutineContext &ctx) {
     auto creatureToChange = getObjectAsCreature(args, 0, ctx);
-    auto faction = getIntAsEnum<Faction>(args, 1);
+    auto standardFaction = getIntAsEnum<Faction>(args, 1);
 
-    creatureToChange->setFaction(faction);
+    creatureToChange->setFaction(standardFaction);
 
     return Variable::ofNull();
 }
@@ -1596,21 +1844,33 @@ Variable changeToStandardFaction(const vector<Variable> &args, const RoutineCont
 Variable soundObjectPlay(const vector<Variable> &args, const RoutineContext &ctx) {
     auto sound = getObjectAsSound(args, 0, ctx);
     sound->setActive(true);
+
     return Variable::ofNull();
 }
 
 Variable soundObjectStop(const vector<Variable> &args, const RoutineContext &ctx) {
     auto sound = getObjectAsSound(args, 0, ctx);
     sound->setActive(false);
+
     return Variable::ofNull();
 }
 
 Variable soundObjectSetVolume(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto sound = getObjectAsSound(args, 0, ctx);
+    int volume = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable soundObjectSetPosition(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto sound = getObjectAsSound(args, 0, ctx);
+    auto position = getVector(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getGold(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1619,55 +1879,106 @@ Variable getGold(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable setLightsaberPowered(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+    bool ovrrd = getIntAsBool(args, 1);
+    bool powered = getIntAsBoolOrElse(args, 2, true);
+    bool showTransition = getIntAsBoolOrElse(args, 3, false);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getLastSpellHarmful(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable musicBackgroundPlay(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto area = getObjectAsArea(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable musicBackgroundStop(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto area = getObjectAsArea(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable musicBackgroundChangeDay(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto area = getObjectAsArea(args, 0, ctx);
+    int track = getInt(args, 1);
+    bool streamingMusic = getIntAsBoolOrElse(args, 2, false);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable musicBackgroundChangeNight(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto area = getObjectAsArea(args, 0, ctx);
+    int track = getInt(args, 1);
+    bool streamingMusic = getIntAsBoolOrElse(args, 2, false);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable musicBattlePlay(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto area = getObjectAsArea(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable musicBattleStop(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto area = getObjectAsArea(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable ambientSoundPlay(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto area = getObjectAsArea(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable ambientSoundStop(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto area = getObjectAsArea(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getLastKiller(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getItemActivated(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getItemActivator(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getIsOpen(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1676,9 +1987,9 @@ Variable getIsOpen(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable takeGoldFromCreature(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto amount = getInt(args, 0);
+    int amount = getInt(args, 0);
     auto creatureToTakeFrom = getObjectAsCreature(args, 1, ctx);
-    auto destroy = getIntAsBoolOrElse(args, 2, false);
+    bool destroy = getIntAsBoolOrElse(args, 2, false);
 
     if (creatureToTakeFrom) {
         creatureToTakeFrom->takeGold(amount);
@@ -1692,7 +2003,11 @@ Variable takeGoldFromCreature(const vector<Variable> &args, const RoutineContext
 }
 
 Variable getIsInConversation(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getPlotFlag(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1710,7 +2025,11 @@ Variable setPlotFlag(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable setDialogPlaceableCamera(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int cameraId = getInt(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getSoloMode(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1730,11 +2049,17 @@ Variable getCurrentStealthXP(const vector<Variable> &args, const RoutineContext 
 }
 
 Variable getNumStackedItems(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto item = getObjectAsItem(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable surrenderToEnemies(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable setCurrentStealthXP(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1745,11 +2070,19 @@ Variable setCurrentStealthXP(const vector<Variable> &args, const RoutineContext 
 }
 
 Variable getCreatureSize(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(static_cast<int>(CreatureSize::Invalid));
 }
 
 Variable awardStealthXP(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto target = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable setStealthXPEnabled(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1760,19 +2093,33 @@ Variable setStealthXPEnabled(const vector<Variable> &args, const RoutineContext 
 }
 
 Variable getAttemptedMovementTarget(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getBlockingCreature(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto target = getObjectOrCaller(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getChallengeRating(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofFloat(0.0f);
 }
 
 Variable getFoundEnemyCreature(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto target = getObjectOrCaller(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getSubRace(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1781,58 +2128,84 @@ Variable getSubRace(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable duplicateHeadAppearance(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creatureToChange = getObjectAsCreature(args, 0, ctx);
+    auto creatureToMatch = getObjectAsCreature(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable cutsceneAttack(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto caller = getCallerAsCreature(ctx);
     auto target = getObjectAsSpatialObject(args, 0, ctx);
     int animation = getInt(args, 1);
     auto attackResult = getIntAsEnum<AttackResultType>(args, 2);
     int damage = getInt(args, 3);
 
+    auto caller = getCallerAsCreature(ctx);
     ctx.game.combat().addAttack(caller, target, nullptr, attackResult, damage);
 
     return Variable::ofNull();
 }
 
 Variable setLockOrientationInDialog(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+    bool value = getIntAsBool(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable setLockHeadFollowInDialog(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+    bool value = getIntAsBool(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable enableVideoEffect(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int effectType = getInt(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable startNewModule(const vector<Variable> &args, const RoutineContext &ctx) {
-    string moduleName(boost::to_lower_copy(getString(args, 0)));
-    string waypoint(boost::to_lower_copy(getStringOrElse(args, 1, "")));
-    string movie1(boost::to_lower_copy(getStringOrElse(args, 2, "")));
-    string movie2(boost::to_lower_copy(getStringOrElse(args, 3, "")));
-    string movie3(boost::to_lower_copy(getStringOrElse(args, 4, "")));
-    string movie4(boost::to_lower_copy(getStringOrElse(args, 5, "")));
-    string movie5(boost::to_lower_copy(getStringOrElse(args, 6, "")));
-    string movie6(boost::to_lower_copy(getStringOrElse(args, 7, "")));
+    string moduleName = boost::to_lower_copy(getString(args, 0));
+    string waypoint = boost::to_lower_copy(getStringOrElse(args, 1, ""));
+    string movie1 = boost::to_lower_copy(getStringOrElse(args, 2, ""));
+    string movie2 = boost::to_lower_copy(getStringOrElse(args, 3, ""));
+    string movie3 = boost::to_lower_copy(getStringOrElse(args, 4, ""));
+    string movie4 = boost::to_lower_copy(getStringOrElse(args, 5, ""));
+    string movie5 = boost::to_lower_copy(getStringOrElse(args, 6, ""));
+    string movie6 = boost::to_lower_copy(getStringOrElse(args, 7, ""));
 
+    // TODO: use movie arguments
     ctx.game.scheduleModuleTransition(moduleName, waypoint);
 
     return Variable::ofNull();
 }
 
 Variable disableVideoEffect(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable doSinglePlayerAutoSave(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getGameDifficulty(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofInt(static_cast<int>(GameDifficulty::Normal));
 }
 
 Variable getUserActionsPending(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1841,32 +2214,56 @@ Variable getUserActionsPending(const vector<Variable> &args, const RoutineContex
 }
 
 Variable revealMap(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto point = getVectorOrElse(args, 0, glm::vec3(0.0f));
+    int radius = getIntOrElse(args, 1, -1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable showTutorialWindow(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int window = getInt(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable startCreditSequence(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    bool transparentBackground = getIntAsBool(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable isCreditSequenceInProgress(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable getCurrentAction(const vector<Variable> &args, const RoutineContext &ctx) {
     auto object = getObjectOrCaller(args, 0, ctx);
-    shared_ptr<Action> action(object->getCurrentAction());
+    auto action = object->getCurrentAction();
+
     return Variable::ofInt(static_cast<int>(action ? action->type() : ActionType::QueueEmpty));
 }
 
 Variable getAppearanceType(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable getTrapBaseType(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto trapObject = getObject(args, 0, ctx);
+
+    // TODO: implement
+
     throw NotImplementedException();
 }
 
@@ -1876,19 +2273,33 @@ Variable getFirstPC(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getNextPC(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable setTrapDetectedBy(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto trap = getObject(args, 0, ctx);
+    auto detector = getObject(args, 1, ctx);
+
     throw NotImplementedException();
 }
 
 Variable getIsTrapped(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable setEffectIcon(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto effect = getEffect(args, 0);
+    int icon = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofEffect(move(effect));
 }
 
 Variable faceObjectAwayFromObject(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1901,15 +2312,25 @@ Variable faceObjectAwayFromObject(const vector<Variable> &args, const RoutineCon
 }
 
 Variable getLastHostileActor(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto attacker = getObjectOrCaller(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getModuleName(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofString("");
 }
 
 Variable endGame(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    bool showEndGameGUI = getIntAsBoolOrElse(args, 0, true);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getRunScriptVar(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -1917,59 +2338,82 @@ Variable getRunScriptVar(const vector<Variable> &args, const RoutineContext &ctx
 }
 
 Variable getCreatureMovmentType(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(static_cast<int>(MovementSpeed::Immobile));
 }
 
 Variable musicBackgroundGetBattleTrack(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto area = getObjectAsArea(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getHasInventory(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable addToParty(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto pc = getObjectAsCreature(args, 0, ctx);
+    auto partyLeader = getObjectAsCreature(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable removeFromParty(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto pc = getObjectAsCreature(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable addPartyMember(const vector<Variable> &args, const RoutineContext &ctx) {
     int npc = getInt(args, 0);
     auto creature = getObjectAsCreature(args, 1, ctx);
+    bool added = ctx.game.party().addAvailableMember(npc, creature->blueprintResRef());
 
-    bool result = ctx.game.party().addAvailableMember(npc, creature->blueprintResRef());
-
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(added));
 }
 
 Variable removePartyMember(const vector<Variable> &args, const RoutineContext &ctx) {
-    bool result = false;
     int npc = getInt(args, 0);
 
+    bool removed = false;
     if (ctx.game.party().isMember(npc)) {
         ctx.game.party().removeMember(npc);
 
-        shared_ptr<Area> area(ctx.game.module()->area());
+        auto area = ctx.game.module()->area();
         area->unloadParty();
         area->reloadParty();
 
-        result = true;
+        removed = true;
     }
 
-    return Variable::ofInt(static_cast<int>(result));
+    return Variable::ofInt(static_cast<int>(removed));
 }
 
 Variable isObjectPartyMember(const vector<Variable> &args, const RoutineContext &ctx) {
     auto creature = getObjectAsCreature(args, 0, ctx);
-    return Variable::ofInt(static_cast<int>(ctx.game.party().isMember(*creature)));
+    bool member = ctx.game.party().isMember(*creature);
+
+    return Variable::ofInt(static_cast<int>(member));
 }
 
 Variable getPartyMemberByIndex(const vector<Variable> &args, const RoutineContext &ctx) {
     int index = getInt(args, 0);
     auto member = ctx.game.party().getMember(index);
+
     return Variable::ofObject(getObjectIdOrInvalid(member));
 }
 
@@ -2543,139 +2987,288 @@ Variable yavinHackCloseDoor(const vector<Variable> &args, const RoutineContext &
 // TSL
 
 Variable getScriptParameter(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int index = getInt(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable setFadeUntilScript(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable showChemicalUpgradeScreen(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto character = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getSpellForcePointCost(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable getSpellAcquired(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto spell = getIntAsEnum<SpellType>(args, 0);
+    auto creature = getObjectOrCallerAsCreature(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable showSwoopUpgradeScreen(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable grantFeat(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto feat = getIntAsEnum<FeatType>(args, 0);
+    auto creature = getObjectAsCreature(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable grantSpell(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto spell = getIntAsEnum<SpellType>(args, 0);
+    auto creature = getObjectAsCreature(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable spawnMine(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int mineType = getInt(args, 0);
+    auto point = getLocationArgument(args, 1);
+    int detectDCBase = getInt(args, 2);
+    int disarmDCBase = getInt(args, 3);
+    auto creature = getObject(args, 4, ctx);
+
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable setFakeCombatState(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+    bool enable = getIntAsBool(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getOwnerDemolitionsSkill(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable setOrientOnClick(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObjectOrCallerAsCreature(args, 0, ctx);
+    bool state = getIntAsBool(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getInfluence(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int npc = getInt(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable setInfluence(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int npc = getInt(args, 0);
+    int influence = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable modifyInfluence(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int npc = getInt(args, 0);
+    int modifier = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable incrementGlobalNumber(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    string identifier = getString(args, 0);
+    int amount = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable decrementGlobalNumber(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    string identifier = getString(args, 0);
+    int amount = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable addBonusForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+    int bonusFP = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable isStealthed(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable isMeditating(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable setHealTarget(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto healer = getObject(args, 0, ctx);
+    auto target = getObject(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getHealTarget(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto healer = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getRandomDestination(const vector<Variable> &args, const RoutineContext &ctx) {
+    auto creature = getObjectAsCreature(args, 0, ctx);
+    int rangeLimit = getInt(args, 1);
+
     throw NotImplementedException();
 }
 
 Variable isFormActive(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+    int formID = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable getSpellBaseForcePointCost(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto spellID = getInt(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable setKeepStealthInDialog(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    bool stealthState = getIntAsBool(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable hasLineOfSight(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto vSource = getVector(args, 0);
+    auto vTarget = getVector(args, 1);
+    auto oSource = getObjectOrNull(args, 2, ctx);
+    auto oTarget = getObjectOrNull(args, 3, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable forceHeartbeat(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable isRunning(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable setForfeitConditions(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int forfeitFlags = getInt(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getLastForfeitViolation(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable modifyReflexSavingThrowBase(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+    int modValue = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable modifyFortitudeSavingThrowBase(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+    int modValue = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable modifyWillSavingThrowBase(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+    int modValue = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getScriptStringParameter(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -2683,43 +3276,89 @@ Variable getScriptStringParameter(const vector<Variable> &args, const RoutineCon
 }
 
 Variable getObjectPersonalSpace(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofFloat(0.0f);
 }
 
 Variable adjustCreatureAttributes(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+    auto attribute = getIntAsEnum<Ability>(args, 1);
+    int amount = getInt(args, 2);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable setCreatureAILevel(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+    int priority = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable resetCreatureAILevel(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable addAvailablePUPByObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int pup = getInt(args, 0);
+    auto puppet = getObject(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable assignPUP(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int pup = getInt(args, 0);
+    int npc = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable spawnAvailablePUP(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int pup = getInt(args, 0);
+    auto location = getLocationArgument(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getPUPOwner(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto pup = getObjectOrCaller(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofObject(kObjectInvalid);
 }
 
 Variable getIsPuppet(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto pup = getObjectOrCaller(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable getIsPartyLeader(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto character = getObjectOrCaller(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable getPartyLeader(const vector<Variable> &args, const RoutineContext &ctx) {
@@ -2728,99 +3367,198 @@ Variable getPartyLeader(const vector<Variable> &args, const RoutineContext &ctx)
 }
 
 Variable removeNPCFromPartyToBase(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int npc = getInt(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable creatureFlourishWeapon(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable changeObjectAppearance(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+    int appearance = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getIsXBox(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable playOverlayAnimation(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto target = getObject(args, 0, ctx);
+    int animation = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable unlockAllSongs(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable disableMap(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    bool flag = getIntAsBoolOrElse(args, 0, false);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable detonateMine(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto mine = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable disableHealthRegen(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    bool flag = getIntAsBoolOrElse(args, 0, false);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable setCurrentForm(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+    int formID = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable setDisableTransit(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    bool flag = getIntAsBoolOrElse(args, 0, false);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable setInputClass(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int clazz = getInt(args, 0);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable setForceAlwaysUpdate(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+    int flag = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable displayMessageBox(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    int strRef = getInt(args, 0);
+    string icon = getStringOrElse(args, 1, "");
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable displayDatapad(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto datapad = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable removeHeartbeat(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto placeable = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable removeEffectByID(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+    int effectID = getInt(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable removeEffectByExactMatch(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObjectAsCreature(args, 0, ctx);
+    auto effect = getEffect(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable adjustCreatureSkills(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+    auto skill = getIntAsEnum<SkillType>(args, 1);
+    int amount = getInt(args, 2);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getSkillRankBase(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto skill = getIntAsEnum<SkillType>(args, 0);
+    auto object = getObjectOrCaller(args, 1, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(0);
 }
 
 Variable enableRendering(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto object = getObject(args, 0, ctx);
+    bool enable = getIntAsBool(args, 1);
+
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 Variable getCombatActionsPending(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto creature = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable getIsPlayerMadeCharacter(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    auto character = getObject(args, 0, ctx);
+
+    // TODO: implement
+
+    return Variable::ofInt(R_FALSE);
 }
 
 Variable rebuildPartyTable(const vector<Variable> &args, const RoutineContext &ctx) {
-    throw NotImplementedException();
+    // TODO: implement
+
+    return Variable::ofNull();
 }
 
 // END TSL

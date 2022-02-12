@@ -116,6 +116,7 @@ void Object::executeActions(float dt) {
 }
 
 bool Object::hasUserActionsPending() const {
+    // TODO: must only work during combat
     for (auto &action : _actions) {
         if (action->isUserAction())
             return true;

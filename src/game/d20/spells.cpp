@@ -48,11 +48,11 @@ void Spells::init() {
         spell->description = move(description);
         spell->icon = move(icon);
         spell->pips = pips;
-        _spells.insert(make_pair(static_cast<ForcePower>(row), move(spell)));
+        _spells.insert(make_pair(static_cast<SpellType>(row), move(spell)));
     }
 }
 
-shared_ptr<Spell> Spells::get(ForcePower type) const {
+shared_ptr<Spell> Spells::get(SpellType type) const {
     return getFromLookupOrNull(_spells, type);
 }
 
