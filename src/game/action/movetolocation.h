@@ -25,9 +25,11 @@ namespace game {
 
 class MoveToLocationAction : public LocationAction {
 public:
-    MoveToLocationAction(Game &game, Services &services, std::shared_ptr<Location> destination, bool run) :
+    MoveToLocationAction(Game &game, Services &services, std::shared_ptr<Location> destination, bool run, float timeout, bool force) :
         LocationAction(game, services, ActionType::MoveToLocation, std::move(destination)),
-        _run(run) {
+        _run(run),
+        _timeout(timeout),
+        _force(force) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
@@ -35,7 +37,9 @@ public:
     bool isRun() const { return _run; }
 
 private:
-    bool _run {false};
+    bool _run;
+    float _timeout;
+    bool _force;
 };
 
 } // namespace game
