@@ -200,7 +200,7 @@ void Texture::refresh() {
     if (isMipmapFilter(_properties.minFilter)) {
         auto target = getTargetGL();
         glGenerateMipmap(target);
-        if (_properties.anisotropy > 1.0f && glewIsSupported("GL_EXT_texture_filter_anisotropic")) {
+        if (_properties.anisotropy > 1.0f) {
             glTexParameterf(getTargetGL(), GL_TEXTURE_MAX_ANISOTROPY_EXT, _properties.anisotropy);
         }
     }
