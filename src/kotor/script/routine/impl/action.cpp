@@ -123,18 +123,18 @@ Variable actionPlayAnimation(const vector<Variable> &args, const RoutineContext 
 }
 
 Variable actionOpenDoor(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto door = getObject(args, 0, ctx);
+    auto door = getObjectAsDoor(args, 0, ctx);
 
-    auto action = ctx.game.actionFactory().newOpenDoor(door);
+    auto action = ctx.game.actionFactory().newOpenDoor(move(door));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
 }
 
 Variable actionCloseDoor(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto door = getObject(args, 0, ctx);
+    auto door = getObjectAsDoor(args, 0, ctx);
 
-    auto action = ctx.game.actionFactory().newCloseDoor(door);
+    auto action = ctx.game.actionFactory().newCloseDoor(move(door));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -142,15 +142,14 @@ Variable actionCloseDoor(const vector<Variable> &args, const RoutineContext &ctx
 
 Variable actionCastSpellAtObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto spell = getIntAsEnum<SpellType>(args, 0);
-    auto target = getObject(args, 1, ctx);
+    auto target = getObjectAsSpatialObject(args, 1, ctx);
     int metaMagic = getIntOrElse(args, 2, 0);
     bool cheat = getIntAsBoolOrElse(args, 3, false);
     int domainLevel = getIntOrElse(args, 4, 0);
     auto projectilePathType = getIntAsEnumOrElse(args, 5, ProjectilePathType::Default);
     bool instantSpell = getIntAsBoolOrElse(args, 6, false);
 
-    // TODO: use arguments
-    auto action = ctx.game.actionFactory().newCastSpellAtObject();
+    auto action = ctx.game.actionFactory().newCastSpellAtObject(spell, move(target), metaMagic, cheat, domainLevel, projectilePathType, instantSpell);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();

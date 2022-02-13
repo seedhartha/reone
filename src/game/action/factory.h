@@ -87,8 +87,8 @@ public:
         return std::make_unique<CastFakeSpellAtObjectAction>(_game, _services);
     }
 
-    std::unique_ptr<CastSpellAtObjectAction> newCastSpellAtObject() {
-        return std::make_unique<CastSpellAtObjectAction>(_game, _services);
+    std::unique_ptr<CastSpellAtObjectAction> newCastSpellAtObject(SpellType spell, std::shared_ptr<SpatialObject> target, int metaMagic, bool cheat, int domainLevel, ProjectilePathType projectilePathType, bool instantSpell) {
+        return std::make_unique<CastSpellAtObjectAction>(_game, _services, spell, std::move(target), metaMagic, cheat, domainLevel, projectilePathType, instantSpell);
     }
 
     std::unique_ptr<CloseDoorAction> newCloseDoor(std::shared_ptr<Object> object) {
