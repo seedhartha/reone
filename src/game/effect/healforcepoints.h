@@ -25,11 +25,15 @@ namespace game {
 
 class HealForcePointsEffect : public Effect {
 public:
-    HealForcePointsEffect() :
-        Effect(EffectType::HealForcePoints) {
+    HealForcePointsEffect(int heal) :
+        Effect(EffectType::HealForcePoints),
+        _heal(heal) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    int _heal;
 };
 
 } // namespace game
