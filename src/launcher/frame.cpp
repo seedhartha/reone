@@ -168,10 +168,10 @@ LauncherFrame::LauncherFrame() :
     _checkBoxGrass = new wxCheckBox(this, wxID_ANY, "Enable Grass", wxDefaultPosition, wxDefaultSize);
     _checkBoxGrass->SetValue(_config.grass);
 
-    _checkBoxSSAO = new wxCheckBox(this, wxID_ANY, "Enable Screen-Space Ambient Occlusion", wxDefaultPosition, wxDefaultSize);
+    _checkBoxSSAO = new wxCheckBox(this, wxID_ANY, "Enable SSAO", wxDefaultPosition, wxDefaultSize);
     _checkBoxSSAO->SetValue(_config.ssao);
 
-    _checkBoxSSR = new wxCheckBox(this, wxID_ANY, "Enable Screen-Space Reflections", wxDefaultPosition, wxDefaultSize);
+    _checkBoxSSR = new wxCheckBox(this, wxID_ANY, "Enable SSR", wxDefaultPosition, wxDefaultSize);
     _checkBoxSSR->SetValue(_config.ssr);
 
     _checkBoxFXAA = new wxCheckBox(this, wxID_ANY, "Enable FXAA", wxDefaultPosition, wxDefaultSize);
