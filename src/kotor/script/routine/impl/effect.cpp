@@ -489,9 +489,7 @@ Variable effectCutSceneStunned(const vector<Variable> &args, const RoutineContex
 
 Variable effectForceBody(const vector<Variable> &args, const RoutineContext &ctx) {
     int level = getInt(args, 0);
-
-    // TODO: use level
-    auto effect = ctx.game.effectFactory().newForceBody();
+    auto effect = ctx.game.effectFactory().newForceBody(level);
 
     return Variable::ofEffect(move(effect));
 }
@@ -508,9 +506,7 @@ Variable effectBlind(const vector<Variable> &args, const RoutineContext &ctx) {
 
 Variable effectVPRegenModifier(const vector<Variable> &args, const RoutineContext &ctx) {
     int percent = getInt(args, 0);
-
-    // TODO: use percent
-    auto effect = ctx.game.effectFactory().newVPRegenModifier();
+    auto effect = ctx.game.effectFactory().newVPRegenModifier(percent);
 
     return Variable::ofEffect(move(effect));
 }
@@ -532,9 +528,7 @@ Variable effectMindTrick(const vector<Variable> &args, const RoutineContext &ctx
 
 Variable effectFactionModifier(const vector<Variable> &args, const RoutineContext &ctx) {
     int newFaction = getInt(args, 0);
-
-    // TODO: use newFaction
-    auto effect = ctx.game.effectFactory().newFactionModifier();
+    auto effect = ctx.game.effectFactory().newFactionModifier(newFaction);
 
     return Variable::ofEffect(move(effect));
 }

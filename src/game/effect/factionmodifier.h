@@ -25,11 +25,15 @@ namespace game {
 
 class FactionModifierEffect : public Effect {
 public:
-    FactionModifierEffect() :
-        Effect(EffectType::FactionModifier) {
+    FactionModifierEffect(int newFaction) :
+        Effect(EffectType::FactionModifier),
+        _newFaction(newFaction) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    int _newFaction;
 };
 
 } // namespace game
