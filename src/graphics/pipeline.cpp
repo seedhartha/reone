@@ -571,20 +571,7 @@ void Pipeline::drawCombineOpaque(IScene &scene, Attachments &attachments, Frameb
             general.fogColor = glm::vec4(scene.fogColor(), 1.0f);
         }
     });
-
-    auto &lights = scene.activeLights();
-    _uniforms.setLighting([&lights](auto &lighting) {
-        lighting.numLights = static_cast<int>(lights.size());
-        for (size_t i = 0; i < lights.size(); ++i) {
-            LightUniforms &shaderLight = lighting.lights[i];
-            shaderLight.position = glm::vec4(lights[i]->getOrigin(), lights[i]->isDirectional() ? 0.0f : 1.0f);
-            shaderLight.color = glm::vec4(lights[i]->color(), 1.0f);
-            shaderLight.multiplier = lights[i]->multiplier() * lights[i]->strength();
-            shaderLight.radius = lights[i]->radius();
-            shaderLight.ambientOnly = static_cast<int>(lights[i]->modelNode().light()->ambientOnly);
-            shaderLight.dynamicType = lights[i]->modelNode().light()->dynamicType;
-        }
-    });
+    scene.fillLightingUniforms();
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst.nameGL());
     glDrawBuffers(2, kColorAttachments);

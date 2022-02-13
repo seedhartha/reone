@@ -655,6 +655,21 @@ shared_ptr<ModelSceneNode> SceneGraph::pickModelAt(int x, int y, IUser *except) 
     return distances[0].first;
 }
 
+void SceneGraph::fillLightingUniforms() {
+    _uniforms.setLighting([this](auto &lighting) {
+        lighting.numLights = static_cast<int>(_activeLights.size());
+        for (size_t i = 0; i < _activeLights.size(); ++i) {
+            LightUniforms &shaderLight = lighting.lights[i];
+            shaderLight.position = glm::vec4(_activeLights[i]->getOrigin(), _activeLights[i]->isDirectional() ? 0.0f : 1.0f);
+            shaderLight.color = glm::vec4(_activeLights[i]->color(), 1.0f);
+            shaderLight.multiplier = _activeLights[i]->multiplier() * _activeLights[i]->strength();
+            shaderLight.radius = _activeLights[i]->radius();
+            shaderLight.ambientOnly = static_cast<int>(_activeLights[i]->modelNode().light()->ambientOnly);
+            shaderLight.dynamicType = _activeLights[i]->modelNode().light()->dynamicType;
+        }
+    });
+}
+
 unique_ptr<DummySceneNode> SceneGraph::newDummy(shared_ptr<ModelNode> modelNode) {
     return make_unique<DummySceneNode>(move(modelNode), *this, _graphicsContext, _meshes, _shaders, _textures, _uniforms);
 }

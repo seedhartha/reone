@@ -19,16 +19,6 @@
 
 namespace reone {
 
-// TODO: introduce graphics::Light
-
-namespace scene {
-
-class LightSceneNode;
-
-}
-
-// END TODO
-
 namespace graphics {
 
 class Camera;
@@ -42,9 +32,10 @@ public:
     virtual void drawTransparent() = 0;
     virtual void drawLensFlares() = 0;
 
+    virtual void fillLightingUniforms() = 0;
+
     virtual std::shared_ptr<Camera> camera() const = 0;
     virtual const glm::vec3 &ambientLightColor() const = 0;
-    virtual const std::vector<scene::LightSceneNode *> activeLights() const = 0;
 
     // Fog
 
