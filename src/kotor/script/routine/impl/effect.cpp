@@ -97,8 +97,7 @@ Variable effectACIncrease(const vector<Variable> &args, const RoutineContext &ct
     auto modifyType = getIntAsEnumOrElse(args, 1, ACBonus::Dodge);
     int damageType = getIntOrElse(args, 2, kAcVsDamageTypeAll);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newACIncrease();
+    auto effect = ctx.game.effectFactory().newACIncrease(value, modifyType, damageType);
 
     return Variable::ofEffect(move(effect));
 }
@@ -108,8 +107,7 @@ Variable effectSavingThrowIncrease(const vector<Variable> &args, const RoutineCo
     int value = getInt(args, 1);
     auto saveType = getIntAsEnumOrElse(args, 2, SavingThrowType::All);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newSavingThrowIncrease();
+    auto effect = ctx.game.effectFactory().newSavingThrowIncrease(save, value, saveType);
 
     return Variable::ofEffect(move(effect));
 }
@@ -118,8 +116,7 @@ Variable effectAttackIncrease(const vector<Variable> &args, const RoutineContext
     int bonus = getInt(args, 0);
     auto modifierType = getIntAsEnumOrElse(args, 1, AttackBonus::Misc);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newAttackIncrease();
+    auto effect = ctx.game.effectFactory().newAttackIncrease(bonus, modifierType);
 
     return Variable::ofEffect(move(effect));
 }
@@ -139,8 +136,7 @@ Variable effectDeath(const vector<Variable> &args, const RoutineContext &ctx) {
     bool displayFeedback = getIntAsBoolOrElse(args, 1, true);
     bool noFadeAway = getIntAsBoolOrElse(args, 2, false);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newDeath();
+    auto effect = ctx.game.effectFactory().newDeath(spectacularDeath, displayFeedback, noFadeAway);
 
     return Variable::ofEffect(std::move(effect));
 }
@@ -157,9 +153,7 @@ Variable effectSleep(const vector<Variable> &args, const RoutineContext &ctx) {
 
 Variable effectTemporaryForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
     int tempForce = getInt(args, 0);
-
-    // TODO: use tempForce
-    auto effect = ctx.game.effectFactory().newTemporaryForcePoints();
+    auto effect = ctx.game.effectFactory().newTemporaryForcePoints(tempForce);
 
     return Variable::ofEffect(move(effect));
 }
@@ -178,8 +172,7 @@ Variable effectRegenerate(const vector<Variable> &args, const RoutineContext &ct
     int amount = getInt(args, 0);
     float intervalSeconds = getFloat(args, 1);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newRegenerate();
+    auto effect = ctx.game.effectFactory().newRegenerate(amount, intervalSeconds);
 
     return Variable::ofEffect(move(effect));
 }
@@ -187,8 +180,7 @@ Variable effectRegenerate(const vector<Variable> &args, const RoutineContext &ct
 Variable effectMovementSpeedIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
     int newSpeedPercent = getInt(args, 0);
 
-    // TODO: use newSpeedPercent
-    auto effect = ctx.game.effectFactory().newMovementSpeedIncrease();
+    auto effect = ctx.game.effectFactory().newMovementSpeedIncrease(newSpeedPercent);
 
     return Variable::ofEffect(move(effect));
 }
@@ -197,8 +189,7 @@ Variable effectVisualEffect(const vector<Variable> &args, const RoutineContext &
     int visualEffectId = getInt(args, 0);
     bool missEffect = getIntAsBoolOrElse(args, 1, false);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newVisual();
+    auto effect = ctx.game.effectFactory().newVisual(visualEffectId, missEffect);
 
     return Variable::ofEffect(move(effect));
 }
@@ -207,8 +198,7 @@ Variable effectLinkEffects(const vector<Variable> &args, const RoutineContext &c
     auto childEffect = getEffect(args, 0);
     auto parentEffect = getEffect(args, 1);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newLinkEffects();
+    auto effect = ctx.game.effectFactory().newLinkEffects(move(childEffect), move(parentEffect));
 
     return Variable::ofEffect(move(effect));
 }
@@ -219,8 +209,7 @@ Variable effectBeam(const vector<Variable> &args, const RoutineContext &ctx) {
     auto bodyPart = getIntAsEnum<BodyNode>(args, 2);
     bool missEffect = getIntAsBoolOrElse(args, 3, false);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newBeam();
+    auto effect = ctx.game.effectFactory().newBeam(beamVisualEffect, std::move(effector), bodyPart, missEffect);
 
     return Variable::ofEffect(move(effect));
 }

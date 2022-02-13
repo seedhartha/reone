@@ -25,11 +25,15 @@ namespace game {
 
 class TemporaryForcePointsEffect : public Effect {
 public:
-    TemporaryForcePointsEffect() :
-        Effect(EffectType::TemporaryForcePoints) {
+    TemporaryForcePointsEffect(int tempForce) :
+        Effect(EffectType::TemporaryForcePoints),
+        _tempForce(tempForce) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    int _tempForce;
 };
 
 } // namespace game

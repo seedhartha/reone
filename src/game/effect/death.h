@@ -25,11 +25,19 @@ namespace game {
 
 class DeathEffect : public Effect {
 public:
-    DeathEffect() :
-        Effect(EffectType::Death) {
+    DeathEffect(bool spectacularDeath, bool displayFeedback, bool noFadeAway) :
+        Effect(EffectType::Death),
+        _spectacularDeath(spectacularDeath),
+        _displayFeedback(displayFeedback),
+        _noFadeAway(noFadeAway) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    bool _spectacularDeath;
+    bool _displayFeedback;
+    bool _noFadeAway;
 };
 
 } // namespace game
