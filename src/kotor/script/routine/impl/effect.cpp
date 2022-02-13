@@ -353,8 +353,7 @@ Variable effectDamageDecrease(const vector<Variable> &args, const RoutineContext
     int penalty = getInt(args, 0);
     auto modifierType = getIntAsEnumOrElse(args, 1, AttackBonus::Misc);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newDamageDecrease();
+    auto effect = ctx.game.effectFactory().newDamageDecrease(penalty, modifierType);
 
     return Variable::ofEffect(move(effect));
 }
@@ -362,10 +361,9 @@ Variable effectDamageDecrease(const vector<Variable> &args, const RoutineContext
 Variable effectACDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
     int value = getInt(args, 0);
     auto modifyType = getIntAsEnumOrElse(args, 1, ACBonus::Dodge);
-    auto damageType = getIntAsEnumOrElse(args, 2, kAcVsDamageTypeAll);
+    int damageType = getIntOrElse(args, 2, kAcVsDamageTypeAll);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newACDecrease();
+    auto effect = ctx.game.effectFactory().newACDecrease(value, modifyType, damageType);
 
     return Variable::ofEffect(move(effect));
 }
@@ -373,8 +371,7 @@ Variable effectACDecrease(const vector<Variable> &args, const RoutineContext &ct
 Variable effectMovementSpeedDecrease(const vector<Variable> &args, const RoutineContext &ctx) {
     int percentChange = getInt(args, 0);
 
-    // TODO: use percentChange
-    auto effect = ctx.game.effectFactory().newMovementSpeedDecrease();
+    auto effect = ctx.game.effectFactory().newMovementSpeedDecrease(percentChange);
 
     return Variable::ofEffect(move(effect));
 }
@@ -384,8 +381,7 @@ Variable effectSavingThrowDecrease(const vector<Variable> &args, const RoutineCo
     int value = getInt(args, 1);
     auto saveType = getIntAsEnumOrElse(args, 2, SavingThrowType::All);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newSavingThrowDecrease();
+    auto effect = ctx.game.effectFactory().newSavingThrowDecrease(save, value, saveType);
 
     return Variable::ofEffect(move(effect));
 }
