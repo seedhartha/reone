@@ -25,11 +25,15 @@ namespace game {
 
 class JumpToObjectAction : public ObjectAction {
 public:
-    JumpToObjectAction(Game &game, Services &services, std::shared_ptr<Object> object) :
-        ObjectAction(game, services, ActionType::JumpToObject, std::move(object)) {
+    JumpToObjectAction(Game &game, Services &services, std::shared_ptr<Object> object, bool walkStraightLine) :
+        ObjectAction(game, services, ActionType::JumpToObject, std::move(object)),
+        _walkStraightLine(walkStraightLine) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    bool _walkStraightLine;
 };
 
 } // namespace game

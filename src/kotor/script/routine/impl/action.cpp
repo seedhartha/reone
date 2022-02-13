@@ -179,8 +179,7 @@ Variable actionJumpToObject(const vector<Variable> &args, const RoutineContext &
     auto jumpTo = getObject(args, 0, ctx);
     bool walkStraightLine = getIntAsBoolOrElse(args, 1, true);
 
-    // TODO: use walkStraightLine
-    auto action = ctx.game.actionFactory().newJumpToObject(move(jumpTo));
+    auto action = ctx.game.actionFactory().newJumpToObject(move(jumpTo), walkStraightLine);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -216,8 +215,22 @@ Variable actionStartConversation(const vector<Variable> &args, const RoutineCont
     if (dialogResRef.empty()) {
         dialogResRef = caller->conversation();
     }
-    // TODO: use all arguments
-    auto action = ctx.game.actionFactory().newStartConversation(move(objectToConverse), move(dialogResRef), ignoreStartRange);
+    auto action = ctx.game.actionFactory().newStartConversation(
+        move(objectToConverse),
+        move(dialogResRef),
+        privateConversation,
+        conversationType,
+        ignoreStartRange,
+        nameObjectToIgnore1,
+        nameObjectToIgnore2,
+        nameObjectToIgnore3,
+        nameObjectToIgnore4,
+        nameObjectToIgnore5,
+        nameObjectToIgnore6,
+        useLeader,
+        barkX,
+        barkY,
+        dontClearAllActions);
     caller->addAction(move(action));
 
     return Variable::ofNull();
