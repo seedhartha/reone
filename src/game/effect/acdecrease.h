@@ -25,11 +25,19 @@ namespace game {
 
 class ACDecreaseEffect : public Effect {
 public:
-    ACDecreaseEffect() :
-        Effect(EffectType::ACDecrease) {
+    ACDecreaseEffect(int value, ACBonus modifyType, int damageType) :
+        Effect(EffectType::ACDecrease),
+        _value(value),
+        _modifyType(modifyType),
+        _damageType(damageType) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    int _value;
+    ACBonus _modifyType;
+    int _damageType;
 };
 
 } // namespace game

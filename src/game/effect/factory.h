@@ -96,8 +96,8 @@ public:
         return std::make_unique<AbilityIncreaseEffect>(abilityToIncrease, modifyBy);
     }
 
-    std::unique_ptr<ACDecreaseEffect> newACDecrease() {
-        return std::make_unique<ACDecreaseEffect>();
+    std::unique_ptr<ACDecreaseEffect> newACDecrease(int value, ACBonus modifyType, int damageType) {
+        return std::make_unique<ACDecreaseEffect>(value, modifyType, damageType);
     }
 
     std::unique_ptr<ACIncreaseEffect> newACIncrease() {
@@ -156,8 +156,8 @@ public:
         return std::make_unique<DamageEffect>(amount, type, power, std::move(damager));
     }
 
-    std::unique_ptr<DamageDecreaseEffect> newDamageDecrease() {
-        return std::make_unique<DamageDecreaseEffect>();
+    std::unique_ptr<DamageDecreaseEffect> newDamageDecrease(int penalty, AttackBonus modifierType) {
+        return std::make_unique<DamageDecreaseEffect>(penalty, modifierType);
     }
 
     std::unique_ptr<DamageForcePointsEffect> newDamageForcePoints() {
@@ -272,8 +272,8 @@ public:
         return std::make_unique<ModifyAttacksEffect>(attacks);
     }
 
-    std::unique_ptr<MovementSpeedDecreaseEffect> newMovementSpeedDecrease() {
-        return std::make_unique<MovementSpeedDecreaseEffect>();
+    std::unique_ptr<MovementSpeedDecreaseEffect> newMovementSpeedDecrease(int percentChange) {
+        return std::make_unique<MovementSpeedDecreaseEffect>(percentChange);
     }
 
     std::unique_ptr<MovementSpeedIncreaseEffect> newMovementSpeedIncrease() {
@@ -300,8 +300,8 @@ public:
         return std::make_unique<ResurrectionEffect>(hpPercent);
     }
 
-    std::unique_ptr<SavingThrowDecreaseEffect> newSavingThrowDecrease() {
-        return std::make_unique<SavingThrowDecreaseEffect>();
+    std::unique_ptr<SavingThrowDecreaseEffect> newSavingThrowDecrease(int save, int value, SavingThrowType savingThrowType) {
+        return std::make_unique<SavingThrowDecreaseEffect>(save, value, savingThrowType);
     }
 
     std::unique_ptr<SavingThrowIncreaseEffect> newSavingThrowIncrease() {

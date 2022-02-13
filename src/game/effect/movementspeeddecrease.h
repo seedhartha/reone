@@ -25,11 +25,15 @@ namespace game {
 
 class MovementSpeedDecreaseEffect : public Effect {
 public:
-    MovementSpeedDecreaseEffect() :
-        Effect(EffectType::MovementSpeedDecrease) {
+    MovementSpeedDecreaseEffect(int percentChange) :
+        Effect(EffectType::MovementSpeedDecrease),
+        _percentChange(percentChange) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    int _percentChange;
 };
 
 } // namespace game
