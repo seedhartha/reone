@@ -135,8 +135,8 @@ public:
         return std::make_unique<JumpToLocationAction>(_game, _services, std::move(location));
     }
 
-    std::unique_ptr<JumpToObjectAction> newJumpToObject(std::shared_ptr<Object> object) {
-        return std::make_unique<JumpToObjectAction>(_game, _services, std::move(object));
+    std::unique_ptr<JumpToObjectAction> newJumpToObject(std::shared_ptr<Object> object, bool walkStraightLine) {
+        return std::make_unique<JumpToObjectAction>(_game, _services, std::move(object), walkStraightLine);
     }
 
     std::unique_ptr<LockObjectAction> newLockObject() {
@@ -187,8 +187,40 @@ public:
         return std::make_unique<ResumeConversationAction>(_game, _services);
     }
 
-    std::unique_ptr<StartConversationAction> newStartConversation(std::shared_ptr<Object> object, std::string dialogResRef, bool ignoreStartRange = false) {
-        return std::make_unique<StartConversationAction>(_game, _services, std::move(object), std::move(dialogResRef), ignoreStartRange);
+    std::unique_ptr<StartConversationAction> newStartConversation(
+        std::shared_ptr<Object> object,
+        std::string dialogResRef,
+        bool privateConversation = false,
+        ConversationType conversationType = ConversationType::Cinematic,
+        bool ignoreStartRange = false,
+        std::string nameToIgnore1 = "",
+        std::string nameToIgnore2 = "",
+        std::string nameToIgnore3 = "",
+        std::string nameToIgnore4 = "",
+        std::string nameToIgnore5 = "",
+        std::string nameToIgnore6 = "",
+        bool useLeader = false,
+        int barkX = -1,
+        int barkY = -1,
+        bool dontClearAllActions = false) {
+        return std::make_unique<StartConversationAction>(
+            _game,
+            _services,
+            std::move(object),
+            std::move(dialogResRef),
+            privateConversation,
+            conversationType,
+            ignoreStartRange,
+            std::move(nameToIgnore1),
+            std::move(nameToIgnore2),
+            std::move(nameToIgnore3),
+            std::move(nameToIgnore4),
+            std::move(nameToIgnore5),
+            std::move(nameToIgnore6),
+            useLeader,
+            barkX,
+            barkY,
+            dontClearAllActions);
     }
 
     std::unique_ptr<SurrenderToEnemiesAction> newSurrenderToEnemies() {

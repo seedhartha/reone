@@ -1753,8 +1753,7 @@ Variable jumpToObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto toJumpTo = getObject(args, 0, ctx);
     bool walkStraightLineToPoint = getIntAsBoolOrElse(args, 1, true);
 
-    // TODO: use walkStraightLineToPoint
-    auto action = ctx.game.actionFactory().newJumpToObject(move(toJumpTo));
+    auto action = ctx.game.actionFactory().newJumpToObject(move(toJumpTo), walkStraightLineToPoint);
     getCaller(ctx)->addActionOnTop(move(action));
 
     return Variable::ofNull();
