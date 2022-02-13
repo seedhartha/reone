@@ -25,11 +25,15 @@ namespace game {
 
 class InvisibilityEffect : public Effect {
 public:
-    InvisibilityEffect() :
-        Effect(EffectType::Invisibility) {
+    InvisibilityEffect(InvisibilityType type) :
+        Effect(EffectType::Invisibility),
+        _type(type) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    InvisibilityType _type;
 };
 
 } // namespace game

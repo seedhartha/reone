@@ -25,11 +25,15 @@ namespace game {
 
 class ForceShieldEffect : public Effect {
 public:
-    ForceShieldEffect() :
-        Effect(EffectType::ForceShield) {
+    ForceShieldEffect(int shield) :
+        Effect(EffectType::ForceShield),
+        _shield(shield) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    int _shield;
 };
 
 } // namespace game

@@ -80,17 +80,14 @@ Variable effectDamageResistance(const vector<Variable> &args, const RoutineConte
     int amount = getInt(args, 1);
     int limit = getIntOrElse(args, 2, 0);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newDamageResistance();
+    auto effect = ctx.game.effectFactory().newDamageResistance(damageType, amount, limit);
 
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectResurrection(const vector<Variable> &args, const RoutineContext &ctx) {
     int hpPercent = getIntOrElse(args, 0, 0);
-
-    // TODO: use hpPercent
-    auto effect = ctx.game.effectFactory().newResurrection();
+    auto effect = ctx.game.effectFactory().newResurrection(hpPercent);
 
     return Variable::ofEffect(move(effect));
 }
@@ -395,18 +392,14 @@ Variable effectSavingThrowDecrease(const vector<Variable> &args, const RoutineCo
 
 Variable effectInvisibility(const vector<Variable> &args, const RoutineContext &ctx) {
     auto invisibilityType = getIntAsEnum<InvisibilityType>(args, 0);
-
-    // TODO: use invisibilityType
-    auto effect = ctx.game.effectFactory().newInvisibility();
+    auto effect = ctx.game.effectFactory().newInvisibility(invisibilityType);
 
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectForceShield(const vector<Variable> &args, const RoutineContext &ctx) {
     int shield = getInt(args, 0);
-
-    // TODO: use shield
-    auto effect = ctx.game.effectFactory().newForceShield();
+    auto effect = ctx.game.effectFactory().newForceShield(shield);
 
     return Variable::ofEffect(move(effect));
 }

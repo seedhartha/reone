@@ -172,8 +172,8 @@ public:
         return std::make_unique<DamageIncreaseEffect>();
     }
 
-    std::unique_ptr<DamageResistanceEffect> newDamageResistance() {
-        return std::make_unique<DamageResistanceEffect>();
+    std::unique_ptr<DamageResistanceEffect> newDamageResistance(DamageType damageType, int amount, int limit) {
+        return std::make_unique<DamageResistanceEffect>(damageType, amount, limit);
     }
 
     std::unique_ptr<DeathEffect> newDeath() {
@@ -224,8 +224,8 @@ public:
         return std::make_unique<ForceResistedEffect>();
     }
 
-    std::unique_ptr<ForceShieldEffect> newForceShield() {
-        return std::make_unique<ForceShieldEffect>();
+    std::unique_ptr<ForceShieldEffect> newForceShield(int shield) {
+        return std::make_unique<ForceShieldEffect>(shield);
     }
 
     std::unique_ptr<ForceSightEffect> newForceSight() {
@@ -252,8 +252,8 @@ public:
         return std::make_unique<ImmunityEffect>();
     }
 
-    std::unique_ptr<InvisibilityEffect> newInvisibility() {
-        return std::make_unique<InvisibilityEffect>();
+    std::unique_ptr<InvisibilityEffect> newInvisibility(InvisibilityType type) {
+        return std::make_unique<InvisibilityEffect>(type);
     }
 
     std::unique_ptr<LightsaberThrowEffect> newLightsaberThrow(std::shared_ptr<Object> target1, std::shared_ptr<Object> target2, std::shared_ptr<Object> target3, int advancedDamage) {
@@ -296,8 +296,8 @@ public:
         return std::make_unique<RegenerateEffect>();
     }
 
-    std::unique_ptr<ResurrectionEffect> newResurrection() {
-        return std::make_unique<ResurrectionEffect>();
+    std::unique_ptr<ResurrectionEffect> newResurrection(int hpPercent) {
+        return std::make_unique<ResurrectionEffect>(hpPercent);
     }
 
     std::unique_ptr<SavingThrowDecreaseEffect> newSavingThrowDecrease() {
