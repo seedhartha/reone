@@ -88,8 +88,8 @@ namespace game {
 
 class EffectFactory {
 public:
-    std::unique_ptr<AbilityDecreaseEffect> newAbilityDecrease() {
-        return std::make_unique<AbilityDecreaseEffect>();
+    std::unique_ptr<AbilityDecreaseEffect> newAbilityDecrease(Ability ability, int modifyBy) {
+        return std::make_unique<AbilityDecreaseEffect>(ability, modifyBy);
     }
 
     std::unique_ptr<AbilityIncreaseEffect> newAbilityIncrease(Ability abilityToIncrease, int modifyBy) {
@@ -160,8 +160,8 @@ public:
         return std::make_unique<DamageDecreaseEffect>(penalty, modifierType);
     }
 
-    std::unique_ptr<DamageForcePointsEffect> newDamageForcePoints() {
-        return std::make_unique<DamageForcePointsEffect>();
+    std::unique_ptr<DamageForcePointsEffect> newDamageForcePoints(int damage) {
+        return std::make_unique<DamageForcePointsEffect>(damage);
     }
 
     std::unique_ptr<DamageImmunityIncreaseEffect> newDamageImmunityIncrease() {
@@ -240,8 +240,8 @@ public:
         return std::make_unique<HealEffect>(damageToHeal);
     }
 
-    std::unique_ptr<HealForcePointsEffect> newHealForcePoints() {
-        return std::make_unique<HealForcePointsEffect>();
+    std::unique_ptr<HealForcePointsEffect> newHealForcePoints(int heal) {
+        return std::make_unique<HealForcePointsEffect>(heal);
     }
 
     std::unique_ptr<HorrifiedEffect> newHorrified() {
@@ -308,8 +308,8 @@ public:
         return std::make_unique<SavingThrowIncreaseEffect>();
     }
 
-    std::unique_ptr<SkillIncreaseEffect> newSkillIncrease() {
-        return std::make_unique<SkillIncreaseEffect>();
+    std::unique_ptr<SkillIncreaseEffect> newSkillIncrease(SkillType skill, int value) {
+        return std::make_unique<SkillIncreaseEffect>(skill, value);
     }
 
     std::unique_ptr<SleepEffect> newSleep() {
@@ -324,8 +324,8 @@ public:
         return std::make_unique<TemporaryForcePointsEffect>();
     }
 
-    std::unique_ptr<TemporaryHitPointsEffect> newTemporaryHitPoints() {
-        return std::make_unique<TemporaryHitPointsEffect>();
+    std::unique_ptr<TemporaryHitPointsEffect> newTemporaryHitPoints(int hitPoints) {
+        return std::make_unique<TemporaryHitPointsEffect>(hitPoints);
     }
 
     std::unique_ptr<TrueSeeingEffect> newTrueSeeing() {

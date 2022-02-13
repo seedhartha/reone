@@ -279,9 +279,7 @@ Variable effectDamageImmunityIncrease(const vector<Variable> &args, const Routin
 
 Variable effectTemporaryHitpoints(const vector<Variable> &args, const RoutineContext &ctx) {
     int hitPoints = getInt(args, 0);
-
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newTemporaryHitPoints();
+    auto effect = ctx.game.effectFactory().newTemporaryHitPoints(hitPoints);
 
     return Variable::ofEffect(move(effect));
 }
@@ -290,26 +288,21 @@ Variable effectSkillIncrease(const vector<Variable> &args, const RoutineContext 
     auto skill = getIntAsEnum<SkillType>(args, 0);
     int value = getInt(args, 1);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newSkillIncrease();
+    auto effect = ctx.game.effectFactory().newSkillIncrease(skill, value);
 
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectDamageForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
     int damage = getInt(args, 0);
-
-    // TODO: use damage
-    auto effect = ctx.game.effectFactory().newDamageForcePoints();
+    auto effect = ctx.game.effectFactory().newDamageForcePoints(damage);
 
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectHealForcePoints(const vector<Variable> &args, const RoutineContext &ctx) {
     int heal = getInt(args, 0);
-
-    // TODO: use heal
-    auto effect = ctx.game.effectFactory().newHealForcePoints();
+    auto effect = ctx.game.effectFactory().newHealForcePoints(heal);
 
     return Variable::ofEffect(move(effect));
 }
@@ -338,8 +331,7 @@ Variable effectAbilityDecrease(const vector<Variable> &args, const RoutineContex
     auto ability = getIntAsEnum<Ability>(args, 0);
     int modifyBy = getInt(args, 1);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newAbilityDecrease();
+    auto effect = ctx.game.effectFactory().newAbilityDecrease(ability, modifyBy);
 
     return Variable::ofEffect(move(effect));
 }
