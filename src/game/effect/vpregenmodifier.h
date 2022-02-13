@@ -25,11 +25,15 @@ namespace game {
 
 class VPRegenModifierEffect : public Effect {
 public:
-    VPRegenModifierEffect() :
-        Effect(EffectType::VPRegenModifier) {
+    VPRegenModifierEffect(int percent) :
+        Effect(EffectType::VPRegenModifier),
+        _percent(percent) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    int _percent;
 };
 
 } // namespace game

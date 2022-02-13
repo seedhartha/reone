@@ -196,12 +196,12 @@ public:
         return std::make_unique<EntangleEffect>();
     }
 
-    std::unique_ptr<FactionModifierEffect> newFactionModifier() {
-        return std::make_unique<FactionModifierEffect>();
+    std::unique_ptr<FactionModifierEffect> newFactionModifier(int newFaction) {
+        return std::make_unique<FactionModifierEffect>(newFaction);
     }
 
-    std::unique_ptr<ForceBodyEffect> newForceBody() {
-        return std::make_unique<ForceBodyEffect>();
+    std::unique_ptr<ForceBodyEffect> newForceBody(int level) {
+        return std::make_unique<ForceBodyEffect>(level);
     }
 
     std::unique_ptr<ForceFizzleEffect> newForceFizzle() {
@@ -336,8 +336,8 @@ public:
         return std::make_unique<VisualEffect>();
     }
 
-    std::unique_ptr<VPRegenModifierEffect> newVPRegenModifier() {
-        return std::make_unique<VPRegenModifierEffect>();
+    std::unique_ptr<VPRegenModifierEffect> newVPRegenModifier(int percent) {
+        return std::make_unique<VPRegenModifierEffect>(percent);
     }
 
     std::unique_ptr<WhirlWindEffect> newWhirlWind() {

@@ -25,11 +25,15 @@ namespace game {
 
 class ForceBodyEffect : public Effect {
 public:
-    ForceBodyEffect() :
-        Effect(EffectType::ForceBody) {
+    ForceBodyEffect(int level) :
+        Effect(EffectType::ForceBody),
+        _level(level) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    int _level;
 };
 
 } // namespace game
