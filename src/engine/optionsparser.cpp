@@ -44,13 +44,14 @@ Options OptionsParser::parse() {
         ("height", po::value<int>()->default_value(options.graphics.height), "window height")                                      //
         ("fullscreen", po::value<bool>()->default_value(options.graphics.fullscreen), "enable fullscreen")                         //
         ("vsync", po::value<bool>()->default_value(options.graphics.vsync), "enable v-sync")                                       //
+        ("grass", po::value<bool>()->default_value(options.graphics.grass), "enable grass")                                        //
+        ("ssao", po::value<bool>()->default_value(options.graphics.ssao), "enable screen-space ambient occlusion")                 //
+        ("ssr", po::value<bool>()->default_value(options.graphics.ssr), "enable screen-space reflections")                         //
         ("fxaa", po::value<bool>()->default_value(options.graphics.fxaa), "enable anti-aliasing")                                  //
         ("sharpen", po::value<bool>()->default_value(options.graphics.sharpen), "enable image sharpening")                         //
-        ("grass", po::value<bool>()->default_value(options.graphics.grass), "enable grass")                                        //
-        ("ssr", po::value<bool>()->default_value(options.graphics.ssr), "enable screen-space reflections")                         //
-        ("ssao", po::value<bool>()->default_value(options.graphics.ssao), "enable screen-space ambient occlusion")                 //
         ("texquality", po::value<int>()->default_value(static_cast<int>(options.graphics.textureQuality)), "texture quality")      //
         ("shadowres", po::value<int>()->default_value(glm::log2(options.graphics.shadowResolution) - 10), "shadow map resolution") //
+        ("anisofilter", po::value<int>()->default_value(options.graphics.anisotropicFiltering), "anisotropic filtering")           //
         ("drawdist", po::value<int>()->default_value(static_cast<int>(kDefaultObjectDrawDistance)), "draw distance")               //
         ("musicvol", po::value<int>()->default_value(options.audio.musicVolume), "music volume in percents")                       //
         ("voicevol", po::value<int>()->default_value(options.audio.voiceVolume), "voice volume in percents")                       //
@@ -79,13 +80,14 @@ Options OptionsParser::parse() {
     options.graphics.height = vars["height"].as<int>();
     options.graphics.fullscreen = vars["fullscreen"].as<bool>();
     options.graphics.vsync = vars["vsync"].as<bool>();
+    options.graphics.grass = vars["grass"].as<bool>();
+    options.graphics.ssao = vars["ssao"].as<bool>();
+    options.graphics.ssr = vars["ssr"].as<bool>();
     options.graphics.fxaa = vars["fxaa"].as<bool>();
     options.graphics.sharpen = vars["sharpen"].as<bool>();
-    options.graphics.grass = vars["grass"].as<bool>();
-    options.graphics.ssr = vars["ssr"].as<bool>();
-    options.graphics.ssao = vars["ssao"].as<bool>();
     options.graphics.textureQuality = static_cast<TextureQuality>(vars["texquality"].as<int>());
     options.graphics.shadowResolution = 1 << (10 + vars["shadowres"].as<int>());
+    options.graphics.anisotropicFiltering = vars["anisofilter"].as<int>();
     options.graphics.drawDistance = static_cast<float>(vars["drawdist"].as<int>());
     options.audio.musicVolume = vars["musicvol"].as<int>();
     options.audio.voiceVolume = vars["voicevol"].as<int>();

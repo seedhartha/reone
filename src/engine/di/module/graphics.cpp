@@ -29,7 +29,7 @@ void GraphicsModule::init() {
     _window = make_unique<Window>(_options);
     _graphicsContext = make_unique<GraphicsContext>(_options);
     _meshes = make_unique<Meshes>();
-    _textures = make_unique<Textures>(_resource.resources());
+    _textures = make_unique<Textures>(_options, _resource.resources());
     _models = make_unique<Models>(*_textures, _resource.resources());
     _walkmeshes = make_unique<Walkmeshes>(_resource.resources());
     _lipAnimations = make_unique<LipAnimations>(_resource.resources());

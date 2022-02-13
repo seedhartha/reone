@@ -59,6 +59,7 @@ public:
         Filtering magFilter {Filtering::Linear};
         Wrapping wrap {Wrapping::Repeat};
         glm::vec3 borderColor {0.0f};
+        float anisotropy {1.0f};
     };
 
     /**
@@ -136,6 +137,7 @@ public:
     void setFeatures(Features features) { _features = std::move(features); }
     void setPixelFormat(PixelFormat format) { _pixelFormat = format; }
     void setCubemap(bool cubemap) { _features.cube = cubemap; }
+    void setAnisotropy(float anisotropy) { _properties.anisotropy = anisotropy; }
 
     // Pixels
 

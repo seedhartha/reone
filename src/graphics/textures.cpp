@@ -26,6 +26,7 @@
 #include "format/tgareader.h"
 #include "format/tpcreader.h"
 #include "format/txireader.h"
+#include "options.h"
 #include "texture.h"
 #include "textureutil.h"
 #include "types.h"
@@ -172,6 +173,8 @@ shared_ptr<Texture> Textures::doGet(const string &resRef, TextureUsage usage) {
         if (texture->isCubemap()) {
             prepareCubemap(*texture);
         }
+        float anisotropy = max(1.0f, exp2f(_options.anisotropicFiltering));
+        texture->setAnisotropy(anisotropy);
         texture->init();
     } else {
         warn("Texture not found: " + resRef, LogChannels::graphics);

@@ -128,6 +128,26 @@ LauncherFrame::LauncherFrame() :
 
     // END Shadow Map Resolution
 
+    // Anisotropic Filtering
+
+    wxArrayString anisoFilterChoices;
+    anisoFilterChoices.Add("Off");
+    anisoFilterChoices.Add("2x");
+    anisoFilterChoices.Add("4x");
+    anisoFilterChoices.Add("8x");
+    anisoFilterChoices.Add("16x");
+
+    auto labelAnisoFilter = new wxStaticText(this, wxID_ANY, "Anisotropic Filtering", wxDefaultPosition, wxDefaultSize);
+
+    _choiceAnisoFilter = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, anisoFilterChoices);
+    _choiceAnisoFilter->SetSelection(_config.anisofilter);
+
+    auto anisoFilterSizer = new wxBoxSizer(wxVERTICAL);
+    anisoFilterSizer->Add(labelAnisoFilter, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    anisoFilterSizer->Add(_choiceAnisoFilter, wxSizerFlags(0).Expand().Border(wxALL, 3));
+
+    // END Anisotropic Filtering
+
     // Object Draw Distance
 
     auto labelDrawDistance = new wxStaticText(this, wxID_ANY, "Object Draw Distance", wxDefaultPosition, wxDefaultSize);
@@ -164,6 +184,7 @@ LauncherFrame::LauncherFrame() :
     graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(textureQualitySizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(shadowResSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(anisoFilterSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(drawDistanceSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxVSync, wxSizerFlags(0).Expand().Border(wxALL, 3));
@@ -271,27 +292,28 @@ LauncherFrame::LauncherFrame() :
 
 void LauncherFrame::LoadConfiguration() {
     po::options_description options;
-    options.add_options()                                                    //
-        ("game", po::value<string>()->default_value(_config.gameDir))        //
-        ("dev", po::value<bool>()->default_value(_config.devMode))           //
-        ("width", po::value<int>()->default_value(_config.width))            //
-        ("height", po::value<int>()->default_value(_config.height))          //
-        ("fullscreen", po::value<bool>()->default_value(_config.fullscreen)) //
-        ("vsync", po::value<bool>()->default_value(_config.vsync))           //
-        ("fxaa", po::value<bool>()->default_value(_config.fxaa))             //
-        ("sharpen", po::value<bool>()->default_value(_config.sharpen))       //
-        ("grass", po::value<bool>()->default_value(_config.grass))           //
-        ("ssr", po::value<bool>()->default_value(_config.ssr))               //
-        ("ssao", po::value<bool>()->default_value(_config.ssao))             //
-        ("texquality", po::value<int>()->default_value(_config.texQuality))  //
-        ("shadowres", po::value<int>()->default_value(_config.shadowres))    //
-        ("drawdist", po::value<int>()->default_value(_config.drawdist))      //
-        ("musicvol", po::value<int>()->default_value(_config.musicvol))      //
-        ("voicevol", po::value<int>()->default_value(_config.voicevol))      //
-        ("soundvol", po::value<int>()->default_value(_config.soundvol))      //
-        ("movievol", po::value<int>()->default_value(_config.movievol))      //
-        ("loglevel", po::value<int>()->default_value(_config.loglevel))      //
-        ("logch", po::value<int>()->default_value(_config.logch))            //
+    options.add_options()                                                     //
+        ("game", po::value<string>()->default_value(_config.gameDir))         //
+        ("dev", po::value<bool>()->default_value(_config.devMode))            //
+        ("width", po::value<int>()->default_value(_config.width))             //
+        ("height", po::value<int>()->default_value(_config.height))           //
+        ("fullscreen", po::value<bool>()->default_value(_config.fullscreen))  //
+        ("vsync", po::value<bool>()->default_value(_config.vsync))            //
+        ("grass", po::value<bool>()->default_value(_config.grass))            //
+        ("ssao", po::value<bool>()->default_value(_config.ssao))              //
+        ("ssr", po::value<bool>()->default_value(_config.ssr))                //
+        ("fxaa", po::value<bool>()->default_value(_config.fxaa))              //
+        ("sharpen", po::value<bool>()->default_value(_config.sharpen))        //
+        ("texquality", po::value<int>()->default_value(_config.texQuality))   //
+        ("anisofilter", po::value<int>()->default_value(_config.anisofilter)) //
+        ("shadowres", po::value<int>()->default_value(_config.shadowres))     //
+        ("drawdist", po::value<int>()->default_value(_config.drawdist))       //
+        ("musicvol", po::value<int>()->default_value(_config.musicvol))       //
+        ("voicevol", po::value<int>()->default_value(_config.voicevol))       //
+        ("soundvol", po::value<int>()->default_value(_config.soundvol))       //
+        ("movievol", po::value<int>()->default_value(_config.movievol))       //
+        ("loglevel", po::value<int>()->default_value(_config.loglevel))       //
+        ("logch", po::value<int>()->default_value(_config.logch))             //
         ("logfile", po::value<bool>()->default_value(_config.logfile));
 
     po::variables_map vars;
@@ -308,13 +330,14 @@ void LauncherFrame::LoadConfiguration() {
     _config.height = vars["height"].as<int>();
     _config.fullscreen = vars["fullscreen"].as<bool>();
     _config.vsync = vars["vsync"].as<bool>();
+    _config.grass = vars["grass"].as<bool>();
+    _config.ssao = vars["ssao"].as<bool>();
+    _config.ssr = vars["ssr"].as<bool>();
     _config.fxaa = vars["fxaa"].as<bool>();
     _config.sharpen = vars["sharpen"].as<bool>();
-    _config.grass = vars["grass"].as<bool>();
-    _config.ssr = vars["ssr"].as<bool>();
-    _config.ssao = vars["ssao"].as<bool>();
     _config.texQuality = vars["texquality"].as<int>();
     _config.shadowres = vars["shadowres"].as<int>();
+    _config.anisofilter = vars["anisofilter"].as<int>();
     _config.drawdist = vars["drawdist"].as<int>();
     _config.musicvol = vars["musicvol"].as<int>();
     _config.voicevol = vars["voicevol"].as<int>();
@@ -352,6 +375,7 @@ void LauncherFrame::SaveConfiguration() {
         "fxaa=",
         "sharpen=",
         "texquality=",
+        "anisofilter=",
         "shadowres=",
         "drawdist=",
         "musicvol=",
@@ -407,13 +431,14 @@ void LauncherFrame::SaveConfiguration() {
     _config.height = stoi(tokens[1]);
     _config.fullscreen = _checkBoxFullscreen->IsChecked();
     _config.vsync = _checkBoxVSync->IsChecked();
+    _config.grass = _checkBoxGrass->IsChecked();
+    _config.ssao = _checkBoxSSAO->IsChecked();
+    _config.ssr = _checkBoxSSR->IsChecked();
     _config.fxaa = _checkBoxFXAA->IsChecked();
     _config.sharpen = _checkBoxSharpen->IsChecked();
-    _config.grass = _checkBoxGrass->IsChecked();
-    _config.ssr = _checkBoxSSR->IsChecked();
-    _config.ssao = _checkBoxSSAO->IsChecked();
     _config.texQuality = _choiceTextureQuality->GetSelection();
     _config.shadowres = _choiceShadowResolution->GetSelection();
+    _config.anisofilter = _choiceAnisoFilter->GetSelection();
     _config.drawdist = _sliderDrawDistance->GetValue();
     _config.musicvol = _sliderVolumeMusic->GetValue();
     _config.voicevol = _sliderVolumeVoice->GetValue();
@@ -453,6 +478,7 @@ void LauncherFrame::SaveConfiguration() {
     config << "sharpen=" << (_config.sharpen ? 1 : 0) << endl;
     config << "texquality=" << _config.texQuality << endl;
     config << "shadowres=" << _config.shadowres << endl;
+    config << "anisofilter=" << _config.anisofilter << endl;
     config << "drawdist=" << _config.drawdist << endl;
     config << "musicvol=" << _config.musicvol << endl;
     config << "voicevol=" << _config.voicevol << endl;
