@@ -25,11 +25,25 @@ namespace game {
 
 class LightsaberThrowEffect : public Effect {
 public:
-    LightsaberThrowEffect() :
-        Effect(EffectType::LightsaberThrow) {
+    LightsaberThrowEffect(
+        std::shared_ptr<Object> target1,
+        std::shared_ptr<Object> target2,
+        std::shared_ptr<Object> target3,
+        int advancedDamage) :
+        Effect(EffectType::LightsaberThrow),
+        _target1(std::move(target1)),
+        _target2(std::move(target2)),
+        _target3(std::move(target3)),
+        _advancedDamage(advancedDamage) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    std::shared_ptr<Object> _target1;
+    std::shared_ptr<Object> _target2;
+    std::shared_ptr<Object> _target3;
+    int _advancedDamage;
 };
 
 } // namespace game

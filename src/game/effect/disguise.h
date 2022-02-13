@@ -25,11 +25,15 @@ namespace game {
 
 class DisguiseEffect : public Effect {
 public:
-    DisguiseEffect() :
-        Effect(EffectType::Disguise) {
+    DisguiseEffect(int appearance) :
+        Effect(EffectType::Disguise),
+        _appearance(appearance) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    int _appearance;
 };
 
 } // namespace game

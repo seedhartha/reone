@@ -413,9 +413,7 @@ Variable effectForceShield(const vector<Variable> &args, const RoutineContext &c
 
 Variable effectDisguise(const vector<Variable> &args, const RoutineContext &ctx) {
     int disguiseAppearance = getInt(args, 0);
-
-    // TODO: use disguiseAppearance
-    auto effect = ctx.game.effectFactory().newDisguise();
+    auto effect = ctx.game.effectFactory().newDisguise(disguiseAppearance);
 
     return Variable::ofEffect(move(effect));
 }
@@ -427,9 +425,7 @@ Variable effectTrueSeeing(const vector<Variable> &args, const RoutineContext &ct
 
 Variable effectBlasterDeflectionIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
     int change = getInt(args, 0);
-
-    // TODO: use change
-    auto effect = ctx.game.effectFactory().newBlasterDeflectionIncrease();
+    auto effect = ctx.game.effectFactory().newBlasterDeflectionIncrease(change);
 
     return Variable::ofEffect(move(effect));
 }
@@ -441,9 +437,7 @@ Variable effectHorrified(const vector<Variable> &args, const RoutineContext &ctx
 
 Variable effectModifyAttacks(const vector<Variable> &args, const RoutineContext &ctx) {
     int attacks = getInt(args, 0);
-
-    // TODO: use attacks
-    auto effect = ctx.game.effectFactory().newModifyAttacks();
+    auto effect = ctx.game.effectFactory().newModifyAttacks(attacks);
 
     return Variable::ofEffect(move(effect));
 }
@@ -459,8 +453,7 @@ Variable effectLightsaberThrow(const vector<Variable> &args, const RoutineContex
     auto target3 = getObjectOrNull(args, 2, ctx);
     int advancedDamage = getInt(args, 3);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newLightsaberThrow();
+    auto effect = ctx.game.effectFactory().newLightsaberThrow(move(target1), move(target2), move(target3), advancedDamage);
 
     return Variable::ofEffect(move(effect));
 }
