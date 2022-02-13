@@ -92,8 +92,8 @@ public:
         return std::make_unique<AbilityDecreaseEffect>();
     }
 
-    std::unique_ptr<AbilityIncreaseEffect> newAbilityIncrease() {
-        return std::make_unique<AbilityIncreaseEffect>();
+    std::unique_ptr<AbilityIncreaseEffect> newAbilityIncrease(Ability abilityToIncrease, int modifyBy) {
+        return std::make_unique<AbilityIncreaseEffect>(abilityToIncrease, modifyBy);
     }
 
     std::unique_ptr<ACDecreaseEffect> newACDecrease() {
@@ -152,8 +152,8 @@ public:
         return std::make_unique<CutsceneStunnedEffect>();
     }
 
-    std::unique_ptr<DamageEffect> newDamage(int amount, DamageType type, std::shared_ptr<Creature> damager) {
-        return std::make_unique<DamageEffect>(amount, type, std::move(damager));
+    std::unique_ptr<DamageEffect> newDamage(int amount, DamageType type, DamagePower power, std::shared_ptr<Creature> damager) {
+        return std::make_unique<DamageEffect>(amount, type, power, std::move(damager));
     }
 
     std::unique_ptr<DamageDecreaseEffect> newDamageDecrease() {
@@ -236,8 +236,8 @@ public:
         return std::make_unique<FuryEffect>();
     }
 
-    std::unique_ptr<HealEffect> newHeal() {
-        return std::make_unique<HealEffect>();
+    std::unique_ptr<HealEffect> newHeal(int damageToHeal) {
+        return std::make_unique<HealEffect>(damageToHeal);
     }
 
     std::unique_ptr<HealForcePointsEffect> newHealForcePoints() {

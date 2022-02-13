@@ -25,11 +25,17 @@ namespace game {
 
 class AbilityIncreaseEffect : public Effect {
 public:
-    AbilityIncreaseEffect() :
-        Effect(EffectType::AbilityIncrease) {
+    AbilityIncreaseEffect(Ability abilityToIncrease, int modifyBy) :
+        Effect(EffectType::AbilityIncrease),
+        _abilityToIncrease(abilityToIncrease),
+        _modifyBy(modifyBy) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    Ability _abilityToIncrease;
+    int _modifyBy;
 };
 
 } // namespace game
