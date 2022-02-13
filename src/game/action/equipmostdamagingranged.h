@@ -25,11 +25,15 @@ namespace game {
 
 class EquipMostDamagingRangedAction : public Action {
 public:
-    EquipMostDamagingRangedAction(Game &game, Services &services) :
-        Action(game, services, ActionType::EquipMostDamagingRanged) {
+    EquipMostDamagingRangedAction(Game &game, Services &services, std::shared_ptr<Object> versus) :
+        Action(game, services, ActionType::EquipMostDamagingRanged),
+        _versus(std::move(versus)) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    std::shared_ptr<Object> _versus;
 };
 
 } // namespace game

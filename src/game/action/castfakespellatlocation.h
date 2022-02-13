@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../action.h"
+#include "../location.h"
 
 namespace reone {
 
@@ -25,11 +26,24 @@ namespace game {
 
 class CastFakeSpellAtLocationAction : public Action {
 public:
-    CastFakeSpellAtLocationAction(Game &game, Services &services) :
-        Action(game, services, ActionType::CastFakeSpellAtLocation) {
+    CastFakeSpellAtLocationAction(
+        Game &game,
+        Services &services,
+        SpellType spell,
+        std::shared_ptr<Location> location,
+        ProjectilePathType projectilePathType) :
+        Action(game, services, ActionType::CastFakeSpellAtLocation),
+        _spell(spell),
+        _location(std::move(location)),
+        _projectilePathType(projectilePathType) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    SpellType _spell;
+    std::shared_ptr<Location> _location;
+    ProjectilePathType _projectilePathType;
 };
 
 } // namespace game

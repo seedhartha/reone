@@ -25,11 +25,15 @@ namespace game {
 
 class UnlockObjectAction : public Action {
 public:
-    UnlockObjectAction(Game &game, Services &services) :
-        Action(game, services, ActionType::OpenLock) {
+    UnlockObjectAction(Game &game, Services &services, std::shared_ptr<Object> target) :
+        Action(game, services, ActionType::OpenLock),
+        _target(std::move(target)) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    std::shared_ptr<Object> _target;
 };
 
 } // namespace game
