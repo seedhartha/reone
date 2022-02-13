@@ -29,9 +29,9 @@
 #include "../../script/types.h"
 
 #include "../d20/attributes.h"
+#include "../object.h"
 
 #include "item.h"
-#include "spatial.h"
 
 namespace reone {
 
@@ -39,7 +39,7 @@ namespace game {
 
 constexpr float kDefaultAttackRange = 2.0f;
 
-class Creature : public SpatialObject, public scene::IAnimationEventListener {
+class Creature : public Object, public scene::IAnimationEventListener {
 public:
     enum class ModelType {
         Creature,
@@ -71,16 +71,16 @@ public:
     struct Perception {
         float sightRange {0.0f};
         float hearingRange {0.0f};
-        std::set<std::shared_ptr<SpatialObject>> seen;
-        std::set<std::shared_ptr<SpatialObject>> heard;
+        std::set<std::shared_ptr<Object>> seen;
+        std::set<std::shared_ptr<Object>> heard;
         PerceptionType lastPerception {PerceptionType::Seen};
-        std::shared_ptr<SpatialObject> lastPerceived;
+        std::shared_ptr<Object> lastPerceived;
     };
 
     struct CombatState {
         bool active {false};
         bool debilitated {false};
-        std::shared_ptr<SpatialObject> attackTarget;
+        std::shared_ptr<Object> attackTarget;
         Timer deactivationTimer;
     };
 
@@ -89,7 +89,7 @@ public:
         std::string sceneName,
         Game &game,
         Services &services) :
-        SpatialObject(
+        Object(
             id,
             ObjectType::Creature,
             std::move(sceneName),
@@ -186,10 +186,10 @@ public:
 
     // Perception
 
-    void onObjectSeen(const std::shared_ptr<SpatialObject> &object);
-    void onObjectVanished(const std::shared_ptr<SpatialObject> &object);
-    void onObjectHeard(const std::shared_ptr<SpatialObject> &object);
-    void onObjectInaudible(const std::shared_ptr<SpatialObject> &object);
+    void onObjectSeen(const std::shared_ptr<Object> &object);
+    void onObjectVanished(const std::shared_ptr<Object> &object);
+    void onObjectHeard(const std::shared_ptr<Object> &object);
+    void onObjectInaudible(const std::shared_ptr<Object> &object);
 
     const Perception &perception() const { return _perception; }
 
@@ -204,14 +204,14 @@ public:
     bool isDebilitated() const { return _combatState.debilitated; }
     bool isTwoWeaponFighting() const;
 
-    std::shared_ptr<SpatialObject> getAttemptedAttackTarget() const;
-    std::shared_ptr<SpatialObject> getAttackTarget() const { return _combatState.attackTarget; }
+    std::shared_ptr<Object> getAttemptedAttackTarget() const;
+    std::shared_ptr<Object> getAttackTarget() const { return _combatState.attackTarget; }
     int getAttackBonus(bool offHand = false) const;
     int getDefense() const;
     void getMainHandDamage(int &min, int &max) const;
     void getOffhandDamage(int &min, int &max) const;
 
-    void setAttackTarget(std::shared_ptr<SpatialObject> target) {
+    void setAttackTarget(std::shared_ptr<Object> target) {
         _combatState.attackTarget = std::move(target);
     }
 

@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void FuryEffect::applyTo(SpatialObject &object) {
+void FuryEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

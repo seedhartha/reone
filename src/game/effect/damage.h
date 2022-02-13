@@ -34,7 +34,7 @@ public:
         _damager(std::move(damager)) {
     }
 
-    void applyTo(SpatialObject &object) override;
+    void applyTo(Object &object) override;
 
     int amount() const { return _amount; }
     DamageType type() const { return _type; }

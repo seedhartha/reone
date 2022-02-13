@@ -17,24 +17,23 @@
 
 #pragma once
 
-#include "spatial.h"
-
 #include "../../resource/format/gffreader.h"
 
 #include "../camera.h"
+#include "../object.h"
 
 namespace reone {
 
 namespace game {
 
-class PlaceableCamera : public SpatialObject, public Camera {
+class PlaceableCamera : public Object, public Camera {
 public:
     PlaceableCamera(
         uint32_t id,
         std::string sceneName,
         Game &game,
         Services &services) :
-        SpatialObject(
+        Object(
             id,
             ObjectType::Camera,
             std::move(sceneName),

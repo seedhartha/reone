@@ -28,7 +28,7 @@ namespace game {
 struct Services;
 
 class Game;
-class SpatialObject;
+class Object;
 
 } // namespace game
 
@@ -63,8 +63,8 @@ private:
     std::shared_ptr<graphics::Texture> _friendlyScroll;
     std::shared_ptr<graphics::Texture> _hostileScroll;
     std::shared_ptr<graphics::Texture> _hilightedScroll;
-    std::shared_ptr<game::SpatialObject> _hilightedObject;
-    std::shared_ptr<game::SpatialObject> _selectedObject;
+    std::shared_ptr<game::Object> _hilightedObject;
+    std::shared_ptr<game::Object> _selectedObject;
     std::vector<ActionSlot> _actionSlots;
     glm::vec3 _hilightedScreenCoords {0.0f};
     glm::vec3 _selectedScreenCoords {0.0f};

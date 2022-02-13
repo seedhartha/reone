@@ -30,9 +30,7 @@ namespace reone {
 namespace game {
 
 void AttackAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
-    // If target is dead, complete the action
-    shared_ptr<SpatialObject> target(static_pointer_cast<SpatialObject>(_object));
-    if (target->isDead()) {
+    if (_object->isDead()) {
         complete();
         return;
     }
@@ -40,8 +38,8 @@ void AttackAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
 
     // Make the actor follow its target. When reached, register an attack
-    if (creatureActor->navigateTo(target->position(), true, _range, dt)) {
-        _game.combat().addAttack(move(creatureActor), move(target), static_pointer_cast<ObjectAction>(self));
+    if (creatureActor->navigateTo(_object->position(), true, _range, dt)) {
+        _game.combat().addAttack(move(creatureActor), _object, static_pointer_cast<ObjectAction>(self));
     }
 }
 

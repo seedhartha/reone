@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void FactionModifierEffect::applyTo(SpatialObject &object) {
+void FactionModifierEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

@@ -48,11 +48,11 @@ const float kHeartbeatInterval = 6.0f;
 class Creature;
 class Game;
 class Location;
+class Object;
 class Room;
-class SpatialObject;
 
 typedef std::unordered_map<std::string, std::shared_ptr<Room>> RoomMap;
-typedef std::vector<std::shared_ptr<SpatialObject>> ObjectList;
+typedef std::vector<std::shared_ptr<Object>> ObjectList;
 
 class Area : public Object {
 public:
@@ -78,24 +78,24 @@ public:
     bool handle(const SDL_Event &event);
     void update(float dt);
 
-    void destroyObject(const SpatialObject &object);
+    void destroyObject(const Object &object);
     void initCameras(const glm::vec3 &entryPosition, float entryFacing);
 
     void onPartyLeaderMoved(bool roomChanged = false);
     void updateRoomVisibility();
 
-    void startDialog(const std::shared_ptr<SpatialObject> &object, const std::string &resRef);
+    void startDialog(const std::shared_ptr<Object> &object, const std::string &resRef);
     void update3rdPersonCameraFacing();
     void update3rdPersonCameraTarget();
-    void landObject(SpatialObject &object);
+    void landObject(Object &object);
 
     bool moveCreature(const std::shared_ptr<Creature> &creature, const glm::vec2 &dir, bool run, float dt);
     bool moveCreatureTowards(const std::shared_ptr<Creature> &creature, const glm::vec2 &dest, bool run, float dt);
 
     bool isUnescapable() const { return _unescapable; }
 
-    SpatialObject *getObjectAt(int x, int y) const;
-    glm::vec3 getSelectableScreenCoords(const std::shared_ptr<SpatialObject> &object, const glm::mat4 &projection, const glm::mat4 &view) const;
+    Object *getObjectAt(int x, int y) const;
+    glm::vec3 getSelectableScreenCoords(const std::shared_ptr<Object> &object, const glm::mat4 &projection, const glm::mat4 &view) const;
 
     const CameraStyle &camStyleDefault() const { return _camStyleDefault; }
     const std::string &music() const { return _music; }
@@ -112,10 +112,10 @@ public:
 
     std::shared_ptr<Object> createObject(ObjectType type, const std::string &blueprintResRef, const std::shared_ptr<Location> &location);
 
-    bool isObjectSeen(const Creature &subject, const SpatialObject &object) const;
+    bool isObjectSeen(const Creature &subject, const Object &object) const;
 
     ObjectList &getObjectsByType(ObjectType type);
-    std::shared_ptr<SpatialObject> getObjectByTag(const std::string &tag, int nth = 0) const;
+    std::shared_ptr<Object> getObjectByTag(const std::string &tag, int nth = 0) const;
 
     // END Objects
 
@@ -126,13 +126,13 @@ public:
      *
      * @param nth a 0-based object index
      */
-    std::shared_ptr<SpatialObject> getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<SpatialObject> &)> &predicate);
+    std::shared_ptr<Object> getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<Object> &)> &predicate);
 
     /**
      * @param nth 0-based index of the creature
      * @return nth nearest creature to the target object, that matches the specified criterias
      */
-    std::shared_ptr<Creature> getNearestCreature(const std::shared_ptr<SpatialObject> &target, const SearchCriteriaList &criterias, int nth = 0);
+    std::shared_ptr<Creature> getNearestCreature(const std::shared_ptr<Object> &target, const SearchCriteriaList &criterias, int nth = 0);
 
     /**
      * @param nth 0-based index of the creature
@@ -172,11 +172,11 @@ public:
 
     // Object Selection
 
-    void hilightObject(std::shared_ptr<SpatialObject> object);
-    void selectObject(std::shared_ptr<SpatialObject> object);
+    void hilightObject(std::shared_ptr<Object> object);
+    void selectObject(std::shared_ptr<Object> object);
 
-    std::shared_ptr<SpatialObject> hilightedObject() const { return _hilightedObject; }
-    std::shared_ptr<SpatialObject> selectedObject() const { return _selectedObject; }
+    std::shared_ptr<Object> hilightedObject() const { return _hilightedObject; }
+    std::shared_ptr<Object> selectedObject() const { return _selectedObject; }
 
     // END Object Selection
 
@@ -227,8 +227,8 @@ private:
     Grass _grass;
     glm::vec3 _ambientColor {0.0f};
     Timer _perceptionTimer;
-    std::shared_ptr<SpatialObject> _hilightedObject;
-    std::shared_ptr<SpatialObject> _selectedObject;
+    std::shared_ptr<Object> _hilightedObject;
+    std::shared_ptr<Object> _selectedObject;
 
     // Scripts
 
@@ -282,7 +282,7 @@ private:
     void loadVIS();
     void loadPTH();
 
-    void add(const std::shared_ptr<SpatialObject> &object);
+    void add(const std::shared_ptr<Object> &object);
     void doDestroyObject(uint32_t objectId);
     void doDestroyObjects();
     void updateVisibility();
@@ -291,7 +291,7 @@ private:
     void doUpdatePerception();
     void updateObjectSelection();
 
-    bool matchesCriterias(const Creature &creature, const SearchCriteriaList &criterias, std::shared_ptr<SpatialObject> target = nullptr) const;
+    bool matchesCriterias(const Creature &creature, const SearchCriteriaList &criterias, std::shared_ptr<Object> target = nullptr) const;
 
     /**
      * Certain VIS files in the original game have a bug: room A is visible from
@@ -300,8 +300,8 @@ private:
      */
     Visibility fixVisibility(const Visibility &visiblity);
 
-    void determineObjectRoom(SpatialObject &object);
-    void checkTriggersIntersection(const std::shared_ptr<SpatialObject> &triggerrer);
+    void determineObjectRoom(Object &object);
+    void checkTriggersIntersection(const std::shared_ptr<Object> &triggerrer);
 
     // Loading ARE
 

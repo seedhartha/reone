@@ -176,7 +176,7 @@ bool Creature::isSelectable() const {
 }
 
 void Creature::update(float dt) {
-    SpatialObject::update(dt);
+    Object::update(dt);
 
     updateModelAnimation();
     updateHealth();
@@ -252,7 +252,7 @@ void Creature::updateCombat(float dt) {
 }
 
 void Creature::clearAllActions() {
-    SpatialObject::clearAllActions();
+    Object::clearAllActions();
     setMovementType(MovementType::None);
 }
 
@@ -543,7 +543,7 @@ void Creature::stopTalking() {
     }
 }
 
-void Creature::onObjectSeen(const shared_ptr<SpatialObject> &object) {
+void Creature::onObjectSeen(const shared_ptr<Object> &object) {
     _perception.seen.insert(object);
     _perception.lastPerception = PerceptionType::Seen;
     _perception.lastPerceived = object;
@@ -556,21 +556,21 @@ void Creature::runOnNoticeScript() {
     }
 }
 
-void Creature::onObjectVanished(const shared_ptr<SpatialObject> &object) {
+void Creature::onObjectVanished(const shared_ptr<Object> &object) {
     _perception.seen.erase(object);
     _perception.lastPerception = PerceptionType::NotSeen;
     _perception.lastPerceived = object;
     runOnNoticeScript();
 }
 
-void Creature::onObjectHeard(const shared_ptr<SpatialObject> &object) {
+void Creature::onObjectHeard(const shared_ptr<Object> &object) {
     _perception.heard.insert(object);
     _perception.lastPerception = PerceptionType::Heard;
     _perception.lastPerceived = object;
     runOnNoticeScript();
 }
 
-void Creature::onObjectInaudible(const shared_ptr<SpatialObject> &object) {
+void Creature::onObjectInaudible(const shared_ptr<Object> &object) {
     _perception.heard.erase(object);
     _perception.lastPerception = PerceptionType::NotHeard;
     _perception.lastPerceived = object;
@@ -594,12 +594,12 @@ bool Creature::isTwoWeaponFighting() const {
     return static_cast<bool>(getEquippedItem(InventorySlot::leftWeapon));
 }
 
-shared_ptr<SpatialObject> Creature::getAttemptedAttackTarget() const {
-    shared_ptr<SpatialObject> result;
+shared_ptr<Object> Creature::getAttemptedAttackTarget() const {
+    shared_ptr<Object> result;
 
     auto attackAction = dynamic_pointer_cast<ObjectAction>(getCurrentAction());
     if (attackAction) {
-        result = static_pointer_cast<SpatialObject>(attackAction->object());
+        result = attackAction->object();
     }
 
     return move(result);

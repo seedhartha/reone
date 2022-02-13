@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void VPRegenModifierEffect::applyTo(SpatialObject &object) {
+void VPRegenModifierEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

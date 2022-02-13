@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void InvisibilityEffect::applyTo(SpatialObject &object) {
+void InvisibilityEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

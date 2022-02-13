@@ -29,8 +29,7 @@ namespace game {
 
 void FollowAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
     auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
-    auto object = static_pointer_cast<SpatialObject>(_object);
-    glm::vec3 dest(object->position());
+    auto dest = _object->position();
     float distance2 = creatureActor->getSquareDistanceTo(glm::vec2(dest));
     bool run = distance2 > kDistanceWalk * kDistanceWalk;
 

@@ -211,7 +211,7 @@ void Door::loadUTD(const GffStruct &utd) {
 }
 
 void Door::updateTransform() {
-    SpatialObject::updateTransform();
+    Object::updateTransform();
 
     if (_walkmeshOpen1) {
         _walkmeshOpen1->setLocalTransform(_transform);

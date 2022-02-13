@@ -19,7 +19,7 @@
 
 #include "../../scene/animproperties.h"
 
-#include "../object/spatial.h"
+#include "../object.h"
 
 using namespace std;
 
@@ -30,15 +30,9 @@ namespace reone {
 namespace game {
 
 void PlayAnimationAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
-    auto spatial = dynamic_cast<SpatialObject *>(&actor);
-    if (!spatial) {
-        complete();
-        return;
-    }
-
-    string animName(spatial->getAnimationName(_anim));
+    string animName = actor.getAnimationName(_anim);
     if (_playing) {
-        if (spatial->getActiveAnimationName() != animName) {
+        if (actor.getActiveAnimationName() != animName) {
             complete();
         }
         return;
@@ -48,7 +42,7 @@ void PlayAnimationAction::execute(shared_ptr<Action> self, Object &actor, float 
     properties.speed = _speed;
     properties.duration = _durationSeconds;
 
-    spatial->playAnimation(_anim, move(properties));
+    actor.playAnimation(_anim, move(properties));
 
     _playing = true;
 }

@@ -196,7 +196,7 @@ void DialogGUI::onLoadEntry() {
 
 void DialogGUI::loadCurrentSpeaker() {
     shared_ptr<Area> area(_game.module()->area());
-    shared_ptr<SpatialObject> speaker;
+    shared_ptr<Object> speaker;
 
     if (!_currentEntry->speaker.empty()) {
         speaker = area->getObjectByTag(_currentEntry->speaker);
@@ -245,7 +245,7 @@ void DialogGUI::updateCamera() {
     }
 }
 
-glm::vec3 DialogGUI::getTalkPosition(const SpatialObject &object) const {
+glm::vec3 DialogGUI::getTalkPosition(const Object &object) const {
     auto model = static_pointer_cast<ModelSceneNode>(object.sceneNode());
     if (!model)
         return object.position();

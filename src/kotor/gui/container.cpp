@@ -89,7 +89,7 @@ void ContainerGUI::configureItemsListBox() {
     protoItem.setText(text);
 }
 
-void ContainerGUI::open(shared_ptr<SpatialObject> container) {
+void ContainerGUI::open(shared_ptr<Object> container) {
     _binding.lbItems->clearItems();
 
     for (auto &item : container->items()) {

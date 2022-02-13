@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void PsychicStaticEffect::applyTo(SpatialObject &object) {
+void PsychicStaticEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

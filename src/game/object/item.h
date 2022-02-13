@@ -50,6 +50,7 @@ public:
         Object(
             id,
             ObjectType::Item,
+            "",
             game,
             services) {
     }

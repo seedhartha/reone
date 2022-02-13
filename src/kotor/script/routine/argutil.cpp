@@ -45,22 +45,6 @@ static inline void throwIfInvalidObject(uint32_t objectId, const shared_ptr<Obje
     }
 }
 
-static inline void throwIfObjectNotSpatial(const shared_ptr<Object> &object) {
-    switch (object->type()) {
-    case ObjectType::Creature:
-    case ObjectType::Trigger:
-    case ObjectType::Door:
-    case ObjectType::Waypoint:
-    case ObjectType::Placeable:
-    case ObjectType::Encounter:
-    case ObjectType::Sound:
-    case ObjectType::Camera:
-        break;
-    default:
-        throw ArgumentException(str(boost::format("Object %u is not a spatial object") % object->id()));
-    }
-}
-
 static inline void throwIfObjectNotCreature(const shared_ptr<Object> &object) {
     if (object->type() != ObjectType::Creature) {
         throw ArgumentException(str(boost::format("Object %u is not a creature") % object->id()));
@@ -268,26 +252,6 @@ shared_ptr<Object> getObjectOrCaller(const vector<Variable> &args, int index, co
         return getCaller(ctx);
     } else {
         return getObject(args, index, ctx);
-    }
-}
-
-shared_ptr<SpatialObject> getCallerAsSpatialObject(const RoutineContext &ctx) {
-    auto caller = getCaller(ctx);
-    throwIfObjectNotSpatial(caller);
-    return static_pointer_cast<SpatialObject>(move(caller));
-}
-
-shared_ptr<SpatialObject> getObjectAsSpatialObject(const vector<Variable> &args, int index, const RoutineContext &ctx) {
-    auto object = getObject(args, index, ctx);
-    throwIfObjectNotSpatial(object);
-    return static_pointer_cast<SpatialObject>(move(object));
-}
-
-shared_ptr<SpatialObject> getObjectOrCallerAsSpatialObject(const vector<Variable> &args, int index, const RoutineContext &ctx) {
-    if (isOutOfRange(args, index)) {
-        return getCallerAsSpatialObject(ctx);
-    } else {
-        return getObjectAsSpatialObject(args, index, ctx);
     }
 }
 

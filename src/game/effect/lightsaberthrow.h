@@ -29,7 +29,7 @@ public:
         Effect(EffectType::LightsaberThrow) {
     }
 
-    void applyTo(SpatialObject &object) override;
+    void applyTo(Object &object) override;
 };
 
 } // namespace game

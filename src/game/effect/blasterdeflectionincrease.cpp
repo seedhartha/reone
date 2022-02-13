@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void BlasterDeflectionIncreaseEffect::applyTo(SpatialObject &object) {
+void BlasterDeflectionIncreaseEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

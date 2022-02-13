@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void HorrifiedEffect::applyTo(SpatialObject &object) {
+void HorrifiedEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

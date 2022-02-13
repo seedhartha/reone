@@ -29,7 +29,7 @@ public:
         Effect(EffectType::Visual) {
     }
 
-    void applyTo(SpatialObject &object) override;
+    void applyTo(Object &object) override;
 };
 
 } // namespace game

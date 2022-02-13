@@ -26,7 +26,7 @@ namespace reone {
 
 namespace game {
 
-class SpatialObject;
+class Object;
 
 class Room : public scene::IUser {
 public:
@@ -60,8 +60,8 @@ public:
 
     // Tenants
 
-    void addTenant(SpatialObject *object);
-    void removeTenant(SpatialObject *object);
+    void addTenant(Object *object);
+    void removeTenant(Object *object);
 
     // END Tenants
 
@@ -69,7 +69,7 @@ private:
     std::string _name;
     glm::vec3 _position {0.0f};
 
-    std::set<SpatialObject *> _tenants;
+    std::set<Object *> _tenants;
     bool _visible {true};
 
     // Scene Nodes

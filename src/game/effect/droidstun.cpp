@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void DroidStunEffect::applyTo(SpatialObject &object) {
+void DroidStunEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

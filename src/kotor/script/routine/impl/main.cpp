@@ -24,8 +24,8 @@
 #include "../../../../game/event.h"
 #include "../../../../game/game.h"
 #include "../../../../game/location.h"
+#include "../../../../game/object.h"
 #include "../../../../game/object/door.h"
-#include "../../../../game/object/spatial.h"
 #include "../../../../game/party.h"
 #include "../../../../game/reputes.h"
 #include "../../../../game/script/runner.h"
@@ -120,7 +120,7 @@ Variable clearAllActions(const vector<Variable> &args, const RoutineContext &ctx
 }
 
 Variable setFacing(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto caller = getCallerAsSpatialObject(ctx);
+    auto caller = getCaller(ctx);
     float direction = getFloat(args, 0);
 
     caller->setFacing(glm::radians(direction));
@@ -190,12 +190,12 @@ Variable getExitingObject(const vector<Variable> &args, const RoutineContext &ct
 }
 
 Variable getPosition(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto target = getObjectAsSpatialObject(args, 0, ctx);
+    auto target = getObject(args, 0, ctx);
     return Variable::ofVector(target->position());
 }
 
 Variable getFacing(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto target = getObjectAsSpatialObject(args, 0, ctx);
+    auto target = getObject(args, 0, ctx);
     float facing = glm::degrees(target->getFacing());
 
     return Variable::ofFloat(facing);
@@ -225,7 +225,7 @@ Variable createItemOnObject(const vector<Variable> &args, const RoutineContext &
         return Variable::ofObject(kObjectInvalid);
     }
 
-    auto target = getObjectOrCallerAsSpatialObject(args, 1, ctx);
+    auto target = getObjectOrCaller(args, 1, ctx);
     int stackSize = getIntOrElse(args, 2, 1);
     bool hideMessage = getIntAsBoolOrElse(args, 3, 0);
 
@@ -247,7 +247,7 @@ Variable getLastAttacker(const vector<Variable> &args, const RoutineContext &ctx
 Variable getNearestCreature(const vector<Variable> &args, const RoutineContext &ctx) {
     int firstCriteriaType = getInt(args, 0);
     int firstCriteriaValue = getInt(args, 1);
-    auto target = getObjectOrCallerAsSpatialObject(args, 2, ctx);
+    auto target = getObjectOrCaller(args, 2, ctx);
     int nth = getIntOrElse(args, 3, 1);
     int secondCriteriaType = getIntOrElse(args, 4, -1);
     int secondCriteriaValue = getIntOrElse(args, 5, -1);
@@ -268,8 +268,8 @@ Variable getNearestCreature(const vector<Variable> &args, const RoutineContext &
 }
 
 Variable getDistanceToObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto caller = getCallerAsSpatialObject(ctx);
-    auto object = getObjectAsSpatialObject(args, 0, ctx);
+    auto caller = getCaller(ctx);
+    auto object = getObject(args, 0, ctx);
 
     return Variable::ofFloat(caller->getDistanceTo(*object));
 }
@@ -727,7 +727,7 @@ Variable vectorCreate(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable setFacingPoint(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto caller = getCallerAsSpatialObject(ctx);
+    auto caller = getCaller(ctx);
     auto target = getVector(args, 0);
 
     caller->face(target);
@@ -752,8 +752,8 @@ Variable setItemStackSize(const vector<Variable> &args, const RoutineContext &ct
 }
 
 Variable getDistanceBetween(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto objectA = getObjectAsSpatialObject(args, 0, ctx);
-    auto objectB = getObjectAsSpatialObject(args, 1, ctx);
+    auto objectA = getObject(args, 0, ctx);
+    auto objectB = getObject(args, 1, ctx);
 
     return Variable::ofFloat(objectA->getDistanceTo(*objectB));
 }
@@ -875,7 +875,7 @@ Variable getListenPatternNumber(const vector<Variable> &args, const RoutineConte
 Variable getWaypointByTag(const vector<Variable> &args, const RoutineContext &ctx) {
     string waypointTag = boost::to_lower_copy(getString(args, 0));
 
-    shared_ptr<SpatialObject> result;
+    shared_ptr<Object> result;
     for (auto &object : ctx.game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         if (object->tag() == waypointTag) {
             result = object;
@@ -933,7 +933,7 @@ Variable getModuleFileName(const vector<Variable> &args, const RoutineContext &c
 }
 
 Variable getLocation(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto object = getObjectAsSpatialObject(args, 0, ctx);
+    auto object = getObject(args, 0, ctx);
     auto location = make_shared<Location>(object->position(), object->getFacing());
 
     return Variable::ofLocation(move(location));
@@ -968,7 +968,7 @@ Variable getIsPC(const vector<Variable> &args, const RoutineContext &ctx) {
 Variable applyEffectToObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto durationType = getIntAsEnum<DurationType>(args, 0);
     auto effect = getEffect(args, 1);
-    auto target = getObjectAsSpatialObject(args, 2, ctx);
+    auto target = getObject(args, 2, ctx);
     float duration = getFloatOrElse(args, 3, 0.0f);
 
     target->applyEffect(effect, durationType, duration);
@@ -1003,7 +1003,7 @@ Variable getFacingFromLocation(const vector<Variable> &args, const RoutineContex
 
 Variable getNearestObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto objectType = getIntAsEnumOrElse(args, 0, ObjectType::All);
-    auto target = getObjectOrCallerAsSpatialObject(args, 1, ctx);
+    auto target = getObjectOrCaller(args, 1, ctx);
     int nth = getIntOrElse(args, 2, 1);
 
     auto object = ctx.game.module()->area()->getNearestObject(target->position(), nth - 1, [&objectType](auto &object) {
@@ -1015,7 +1015,7 @@ Variable getNearestObject(const vector<Variable> &args, const RoutineContext &ct
 
 Variable getNearestObjectByTag(const vector<Variable> &args, const RoutineContext &ctx) {
     string tag = boost::to_lower_copy(getString(args, 0));
-    auto target = getObjectOrCallerAsSpatialObject(args, 1, ctx);
+    auto target = getObjectOrCaller(args, 1, ctx);
     int nth = getIntOrElse(args, 2, 1);
 
     auto object = ctx.game.module()->area()->getNearestObject(target->position(), nth - 1, [&tag](auto &object) {
@@ -1086,7 +1086,7 @@ Variable getStringByStrRef(const vector<Variable> &args, const RoutineContext &c
 }
 
 Variable destroyObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto destroy = getObjectAsSpatialObject(args, 0, ctx);
+    auto destroy = getObject(args, 0, ctx);
     float delay = getFloatOrElse(args, 1, 0.0f);
     bool noFade = getIntAsBoolOrElse(args, 2, false);
     float delayUntilFade = getFloatOrElse(args, 3, 0.0f);
@@ -1334,7 +1334,7 @@ Variable getReflexAdjustedDamage(const vector<Variable> &args, const RoutineCont
 }
 
 Variable playAnimation(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto caller = getCallerAsSpatialObject(ctx);
+    auto caller = getCaller(ctx);
     auto animType = getIntAsEnum<AnimationType>(args, 0);
     float speed = getFloatOrElse(args, 1, 1.0f);
     float seconds = getFloatOrElse(args, 2, 0.0f);
@@ -1434,8 +1434,8 @@ Variable getAttackTarget(const vector<Variable> &args, const RoutineContext &ctx
 }
 
 Variable getDistanceBetween2D(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto objectA = getObjectAsSpatialObject(args, 0, ctx);
-    auto objectB = getObjectAsSpatialObject(args, 1, ctx);
+    auto objectA = getObject(args, 0, ctx);
+    auto objectB = getObject(args, 1, ctx);
     float result = objectA->getDistanceTo(glm::vec2(objectB->position()));
 
     return Variable::ofFloat(result);
@@ -1503,9 +1503,9 @@ Variable getAbilityModifier(const vector<Variable> &args, const RoutineContext &
 }
 
 Variable getDistanceToObject2D(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto object = getObjectAsSpatialObject(args, 0, ctx);
+    auto object = getObject(args, 0, ctx);
 
-    auto caller = getCallerAsSpatialObject(ctx);
+    auto caller = getCaller(ctx);
     float result = caller->getDistanceTo(glm::vec2(object->position()));
 
     return Variable::ofFloat(result);
@@ -1536,14 +1536,14 @@ Variable doDoorAction(const vector<Variable> &args, const RoutineContext &ctx) {
 }
 
 Variable getFirstItemInInventory(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto target = getObjectOrCallerAsSpatialObject(args, 0, ctx);
+    auto target = getObjectOrCaller(args, 0, ctx);
     auto item = target->getFirstItem();
 
     return Variable::ofObject(getObjectIdOrInvalid(item));
 }
 
 Variable getNextItemInInventory(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto target = getObjectOrCallerAsSpatialObject(args, 0, ctx);
+    auto target = getObjectOrCaller(args, 0, ctx);
     auto item = target->getNextItem();
 
     return Variable::ofObject(getObjectIdOrInvalid(item));
@@ -1981,7 +1981,7 @@ Variable getItemActivator(const vector<Variable> &args, const RoutineContext &ct
 }
 
 Variable getIsOpen(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto object = getObjectAsSpatialObject(args, 0, ctx);
+    auto object = getObject(args, 0, ctx);
     return Variable::ofInt(static_cast<int>(object->isOpen()));
 }
 
@@ -2136,7 +2136,7 @@ Variable duplicateHeadAppearance(const vector<Variable> &args, const RoutineCont
 }
 
 Variable cutsceneAttack(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto target = getObjectAsSpatialObject(args, 0, ctx);
+    auto target = getObject(args, 0, ctx);
     int animation = getInt(args, 1);
     auto attackResult = getIntAsEnum<AttackResultType>(args, 2);
     int damage = getInt(args, 3);
@@ -2302,8 +2302,8 @@ Variable setEffectIcon(const vector<Variable> &args, const RoutineContext &ctx) 
 }
 
 Variable faceObjectAwayFromObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto facer = getObjectAsSpatialObject(args, 0, ctx);
-    auto objectToFaceAwayFrom = getObjectAsSpatialObject(args, 1, ctx);
+    auto facer = getObject(args, 0, ctx);
+    auto objectToFaceAwayFrom = getObject(args, 1, ctx);
 
     facer->faceAwayFrom(*objectToFaceAwayFrom);
 
@@ -2627,7 +2627,7 @@ Variable getNPCSelectability(const vector<Variable> &args, const RoutineContext 
 }
 
 Variable clearAllEffects(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto caller = getCallerAsSpatialObject(ctx);
+    auto caller = getCaller(ctx);
     caller->clearAllEffects();
 
     return Variable::ofNull();

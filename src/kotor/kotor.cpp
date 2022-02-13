@@ -381,7 +381,7 @@ void KotOR::openInGameMenu(InGameMenuTab tab) {
     changeScreen(GameScreen::InGameMenu);
 }
 
-void KotOR::openContainer(const shared_ptr<SpatialObject> &container) {
+void KotOR::openContainer(const shared_ptr<Object> &container) {
     stopMovement();
     setRelativeMouseMode(false);
     setCursorType(CursorType::Default);
@@ -424,7 +424,7 @@ void KotOR::startCharacterGeneration() {
     });
 }
 
-void KotOR::startDialog(const shared_ptr<SpatialObject> &owner, const string &resRef) {
+void KotOR::startDialog(const shared_ptr<Object> &owner, const string &resRef) {
     if (!g_conversationsEnabled)
         return;
 

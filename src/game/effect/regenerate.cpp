@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void RegenerateEffect::applyTo(SpatialObject &object) {
+void RegenerateEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

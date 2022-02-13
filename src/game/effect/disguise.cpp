@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void DisguiseEffect::applyTo(SpatialObject &object) {
+void DisguiseEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void BodyFuelEffect::applyTo(SpatialObject &object) {
+void BodyFuelEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

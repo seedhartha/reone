@@ -87,7 +87,7 @@ public:
         return std::make_unique<CastFakeSpellAtObjectAction>(_game, _services);
     }
 
-    std::unique_ptr<CastSpellAtObjectAction> newCastSpellAtObject(SpellType spell, std::shared_ptr<SpatialObject> target, int metaMagic, bool cheat, int domainLevel, ProjectilePathType projectilePathType, bool instantSpell) {
+    std::unique_ptr<CastSpellAtObjectAction> newCastSpellAtObject(SpellType spell, std::shared_ptr<Object> target, int metaMagic, bool cheat, int domainLevel, ProjectilePathType projectilePathType, bool instantSpell) {
         return std::make_unique<CastSpellAtObjectAction>(_game, _services, spell, std::move(target), metaMagic, cheat, domainLevel, projectilePathType, instantSpell);
     }
 
@@ -123,7 +123,7 @@ public:
         return std::make_unique<FollowOwnerAction>(_game, _services);
     }
 
-    std::unique_ptr<GiveItemAction> newGiveItem(std::shared_ptr<Item> item, std::shared_ptr<SpatialObject> giveTo) {
+    std::unique_ptr<GiveItemAction> newGiveItem(std::shared_ptr<Item> item, std::shared_ptr<Object> giveTo) {
         return std::make_unique<GiveItemAction>(_game, _services, move(item), move(giveTo));
     }
 
@@ -231,7 +231,7 @@ public:
         return std::make_unique<SwitchWeaponsAction>(_game, _services);
     }
 
-    std::unique_ptr<TakeItemAction> newTakeItem(std::shared_ptr<Item> item, std::shared_ptr<SpatialObject> takeFrom) {
+    std::unique_ptr<TakeItemAction> newTakeItem(std::shared_ptr<Item> item, std::shared_ptr<Object> takeFrom) {
         return std::make_unique<TakeItemAction>(_game, _services, move(item), move(takeFrom));
     }
 

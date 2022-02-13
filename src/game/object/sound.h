@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "spatial.h"
+#include "../object.h"
 
 namespace reone {
 
@@ -31,14 +31,14 @@ namespace game {
 
 class Game;
 
-class Sound : public SpatialObject {
+class Sound : public Object {
 public:
     Sound(
         uint32_t id,
         std::string sceneName,
         Game &game,
         Services &services) :
-        SpatialObject(
+        Object(
             id,
             ObjectType::Sound,
             std::move(sceneName),

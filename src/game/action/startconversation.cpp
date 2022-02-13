@@ -31,18 +31,17 @@ namespace game {
 static constexpr float kMaxConversationDistance = 4.0f;
 
 void StartConversationAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
-    shared_ptr<Object> actorPtr(_game.objectFactory().getObjectById(actor.id()));
+    auto actorPtr = _game.objectFactory().getObjectById(actor.id());
     auto creatureActor = static_pointer_cast<Creature>(actorPtr);
-    auto object = static_pointer_cast<SpatialObject>(_object);
 
     bool reached =
         !creatureActor ||
         _ignoreStartRange ||
-        creatureActor->navigateTo(object->position(), true, kMaxConversationDistance, dt);
+        creatureActor->navigateTo(_object->position(), true, kMaxConversationDistance, dt);
 
     if (reached) {
         bool isActorLeader = _game.party().getLeader() == actorPtr;
-        _game.module()->area()->startDialog(isActorLeader ? object : static_pointer_cast<SpatialObject>(actorPtr), _dialogResRef);
+        _game.module()->area()->startDialog(isActorLeader ? _object : actorPtr, _dialogResRef);
         complete();
     }
 }

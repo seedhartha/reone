@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void ChokeEffect::applyTo(SpatialObject &object) {
+void ChokeEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

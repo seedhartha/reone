@@ -37,7 +37,7 @@ class Combat {
 public:
     struct Attack {
         std::shared_ptr<Creature> attacker;
-        std::shared_ptr<SpatialObject> target;
+        std::shared_ptr<Object> target;
         std::shared_ptr<ObjectAction> action; /**< action to complete on round end */
         AttackResultType resultType {AttackResultType::Invalid};
         int damage {-1};
@@ -59,7 +59,7 @@ public:
      */
     void addAttack(
         std::shared_ptr<Creature> attacker,
-        std::shared_ptr<SpatialObject> target,
+        std::shared_ptr<Object> target,
         std::shared_ptr<ObjectAction> action,
         AttackResultType resultType = AttackResultType::Invalid,
         int damage = -1);
@@ -125,7 +125,7 @@ private:
 
     // Projectiles
 
-    void fireProjectile(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<SpatialObject> &target, Round &round);
+    void fireProjectile(const std::shared_ptr<Creature> &attacker, const std::shared_ptr<Object> &target, Round &round);
     void updateProjectile(Round &round, float dt);
 
     // END Projectiles

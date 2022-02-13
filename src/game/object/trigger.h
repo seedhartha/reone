@@ -19,7 +19,7 @@
 
 #include "../../resource/format/gffreader.h"
 
-#include "spatial.h"
+#include "../object.h"
 
 namespace reone {
 
@@ -27,14 +27,14 @@ namespace game {
 
 class Game;
 
-class Trigger : public SpatialObject {
+class Trigger : public Object {
 public:
     Trigger(
         uint32_t id,
         std::string sceneName,
         Game &game,
         Services &services) :
-        SpatialObject(
+        Object(
             id,
             ObjectType::Trigger,
             std::move(sceneName),
@@ -47,10 +47,10 @@ public:
 
     void update(float dt) override;
 
-    void addTenant(const std::shared_ptr<SpatialObject> &object);
+    void addTenant(const std::shared_ptr<Object> &object);
 
     bool isIn(const glm::vec2 &point) const;
-    bool isTenant(const std::shared_ptr<SpatialObject> &object) const;
+    bool isTenant(const std::shared_ptr<Object> &object) const;
 
     const std::string &getOnEnter() const { return _onEnter; }
     const std::string &getOnExit() const { return _onExit; }
@@ -73,7 +73,7 @@ private:
     bool _trapFlag {false};
     int _trapType {0};
     std::vector<glm::vec3> _geometry;
-    std::set<std::shared_ptr<SpatialObject>> _tenants;
+    std::set<std::shared_ptr<Object>> _tenants;
     std::string _keyName;
 
     // Scripts

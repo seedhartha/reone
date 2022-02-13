@@ -18,8 +18,8 @@
 #include "movetoobject.h"
 
 #include "../game.h"
+#include "../object.h"
 #include "../object/factory.h"
-#include "../object/spatial.h"
 #include "../services.h"
 
 using namespace std;
@@ -29,8 +29,7 @@ namespace reone {
 namespace game {
 
 void MoveToObjectAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
-    auto object = static_pointer_cast<SpatialObject>(_object);
-    glm::vec3 dest(object->position());
+    auto dest = _object->position();
     auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
 
     bool reached = creatureActor->navigateTo(dest, _run, _distance, dt);

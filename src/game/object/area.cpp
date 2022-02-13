@@ -91,6 +91,7 @@ Area::Area(
     Object(
         id,
         ObjectType::Area,
+        "",
         game,
         services),
     _sceneName(move(sceneName)) {
@@ -415,7 +416,7 @@ void Area::initCameras(const glm::vec3 &entryPosition, float entryFacing) {
     _staticCamera = make_unique<StaticCamera>(_cameraAspect, sceneGraph);
 }
 
-void Area::add(const shared_ptr<SpatialObject> &object) {
+void Area::add(const shared_ptr<Object> &object) {
     _objects.push_back(object);
     _objectsByType[object->type()].push_back(object);
     _objectsByTag[object->tag()].push_back(object);
@@ -456,7 +457,7 @@ void Area::add(const shared_ptr<SpatialObject> &object) {
     }
 }
 
-void Area::determineObjectRoom(SpatialObject &object) {
+void Area::determineObjectRoom(Object &object) {
     Room *room = nullptr;
 
     auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
@@ -476,7 +477,7 @@ void Area::doDestroyObjects() {
 }
 
 void Area::doDestroyObject(uint32_t objectId) {
-    shared_ptr<SpatialObject> object(dynamic_pointer_cast<SpatialObject>(_game.objectFactory().getObjectById(objectId)));
+    auto object = _game.objectFactory().getObjectById(objectId);
     if (!object) {
         return;
     }
@@ -544,7 +545,7 @@ ObjectList &Area::getObjectsByType(ObjectType type) {
     return _objectsByType.find(type)->second;
 }
 
-shared_ptr<SpatialObject> Area::getObjectByTag(const string &tag, int nth) const {
+shared_ptr<Object> Area::getObjectByTag(const string &tag, int nth) const {
     auto objects = _objectsByTag.find(tag);
     if (objects == _objectsByTag.end())
         return nullptr;
@@ -554,7 +555,7 @@ shared_ptr<SpatialObject> Area::getObjectByTag(const string &tag, int nth) const
     return objects->second[nth];
 }
 
-void Area::landObject(SpatialObject &object) {
+void Area::landObject(Object &object) {
     auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     glm::vec3 position(object.position());
     Collision collision;
@@ -698,7 +699,7 @@ bool Area::moveCreatureTowards(const shared_ptr<Creature> &creature, const glm::
     return moveCreature(creature, dir, run, dt);
 }
 
-bool Area::isObjectSeen(const Creature &subject, const SpatialObject &object) const {
+bool Area::isObjectSeen(const Creature &subject, const Object &object) const {
     if (!subject.isInLineOfSight(object, kLineOfSightFOV)) {
         return false;
     }
@@ -747,11 +748,11 @@ void Area::runOnExitScript() {
     _game.scriptRunner().run(_onExit, _id, player->id());
 }
 
-void Area::destroyObject(const SpatialObject &object) {
+void Area::destroyObject(const Object &object) {
     _objectsToDestroy.insert(object.id());
 }
 
-glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<SpatialObject> &object, const glm::mat4 &projection, const glm::mat4 &view) const {
+glm::vec3 Area::getSelectableScreenCoords(const shared_ptr<Object> &object, const glm::mat4 &projection, const glm::mat4 &view) const {
     static glm::vec4 viewport(0.0f, 0.0f, 1.0f, 1.0f);
 
     glm::vec3 position(object->getSelectablePosition());
@@ -767,7 +768,7 @@ void Area::update3rdPersonCameraFacing() {
     _thirdPersonCamera->setFacing(partyLeader->getFacing());
 }
 
-void Area::startDialog(const shared_ptr<SpatialObject> &object, const string &resRef) {
+void Area::startDialog(const shared_ptr<Object> &object, const string &resRef) {
     string finalResRef(resRef);
     if (resRef.empty()) {
         finalResRef = object->conversation();
@@ -820,7 +821,7 @@ void Area::updateRoomVisibility() {
 }
 
 void Area::update3rdPersonCameraTarget() {
-    shared_ptr<SpatialObject> partyLeader(_game.party().getLeader());
+    shared_ptr<Object> partyLeader(_game.party().getLeader());
     if (!partyLeader) {
         return;
     }
@@ -842,7 +843,7 @@ void Area::updateVisibility() {
     }
 }
 
-void Area::checkTriggersIntersection(const shared_ptr<SpatialObject> &triggerrer) {
+void Area::checkTriggersIntersection(const shared_ptr<Object> &triggerrer) {
     glm::vec2 position2d(triggerrer->position());
 
     for (auto &object : _objectsByType[ObjectType::Trigger]) {
@@ -938,7 +939,6 @@ void Area::setUnescapable(bool value) {
 
 shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintResRef, const shared_ptr<Location> &location) {
     shared_ptr<Object> object;
-
     switch (type) {
     case ObjectType::Item: {
         auto item = _game.objectFactory().newItem();
@@ -964,16 +964,15 @@ shared_ptr<Object> Area::createObject(ObjectType type, const string &blueprintRe
         warn("Unsupported object type: " + to_string(static_cast<int>(type)));
         break;
     }
-    if (!object)
+    if (!object) {
         return nullptr;
+    }
 
-    auto spatial = dynamic_pointer_cast<SpatialObject>(object);
-    if (spatial) {
-        add(spatial);
-        auto creature = dynamic_pointer_cast<Creature>(spatial);
-        if (creature) {
-            creature->runSpawnScript();
-        }
+    add(object);
+
+    auto creature = dynamic_pointer_cast<Creature>(object);
+    if (creature) {
+        creature->runSpawnScript();
     }
 
     return move(object);
@@ -1007,16 +1006,16 @@ void Area::updateObjectSelection() {
     }
 }
 
-void Area::hilightObject(shared_ptr<SpatialObject> object) {
+void Area::hilightObject(shared_ptr<Object> object) {
     _hilightedObject = move(object);
 }
 
-void Area::selectObject(shared_ptr<SpatialObject> object) {
+void Area::selectObject(shared_ptr<Object> object) {
     _selectedObject = move(object);
 }
 
-shared_ptr<SpatialObject> Area::getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<SpatialObject> &)> &predicate) {
-    vector<pair<shared_ptr<SpatialObject>, float>> candidates;
+shared_ptr<Object> Area::getNearestObject(const glm::vec3 &origin, int nth, const std::function<bool(const std::shared_ptr<Object> &)> &predicate) {
+    vector<pair<shared_ptr<Object>, float>> candidates;
 
     for (auto &object : _objects) {
         if (predicate(object)) {
@@ -1034,7 +1033,7 @@ shared_ptr<SpatialObject> Area::getNearestObject(const glm::vec3 &origin, int nt
     return candidates[nth].first;
 }
 
-shared_ptr<Creature> Area::getNearestCreature(const std::shared_ptr<SpatialObject> &target, const SearchCriteriaList &criterias, int nth) {
+shared_ptr<Creature> Area::getNearestCreature(const std::shared_ptr<Object> &target, const SearchCriteriaList &criterias, int nth) {
     vector<pair<shared_ptr<Creature>, float>> candidates;
 
     for (auto &object : getObjectsByType(ObjectType::Creature)) {
@@ -1052,7 +1051,7 @@ shared_ptr<Creature> Area::getNearestCreature(const std::shared_ptr<SpatialObjec
     return nth < candidates.size() ? candidates[nth].first : nullptr;
 }
 
-bool Area::matchesCriterias(const Creature &creature, const SearchCriteriaList &criterias, std::shared_ptr<SpatialObject> target) const {
+bool Area::matchesCriterias(const Creature &creature, const SearchCriteriaList &criterias, std::shared_ptr<Object> target) const {
     for (auto &criteria : criterias) {
         switch (criteria.first) {
         case CreatureType::Reputation: {
@@ -1200,7 +1199,7 @@ void Area::doUpdatePerception() {
     }
 }
 
-SpatialObject *Area::getObjectAt(int x, int y) const {
+Object *Area::getObjectAt(int x, int y) const {
     auto partyLeader = _game.party().getLeader();
     if (!partyLeader) {
         return nullptr;
@@ -1210,7 +1209,7 @@ SpatialObject *Area::getObjectAt(int x, int y) const {
     if (!model) {
         return nullptr;
     }
-    return dynamic_cast<SpatialObject *>(model->user());
+    return dynamic_cast<Object *>(model->user());
 }
 
 } // namespace game

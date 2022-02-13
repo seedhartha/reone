@@ -29,7 +29,7 @@ public:
         Effect(EffectType::ForceBody) {
     }
 
-    void applyTo(SpatialObject &object) override;
+    void applyTo(Object &object) override;
 };
 
 } // namespace game

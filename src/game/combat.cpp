@@ -41,7 +41,7 @@ static constexpr float kDeactivateDelay = 8.0f;
 static constexpr char kModelEventDetonate[] = "detonate";
 static constexpr float kProjectileSpeed = 16.0f;
 
-static unique_ptr<Combat::Attack> makeAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, shared_ptr<ObjectAction> action, AttackResultType resultType, int damage) {
+static unique_ptr<Combat::Attack> makeAttack(shared_ptr<Creature> attacker, shared_ptr<Object> target, shared_ptr<ObjectAction> action, AttackResultType resultType, int damage) {
     auto attack = make_unique<Combat::Attack>();
     attack->attacker = move(attacker);
     attack->target = move(target);
@@ -55,7 +55,7 @@ static bool isRoundPastFirstAttack(float time) {
     return time >= 0.5f * kRoundDuration;
 }
 
-void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<SpatialObject> target, shared_ptr<ObjectAction> action, AttackResultType resultType, int damage) {
+void Combat::addAttack(shared_ptr<Creature> attacker, shared_ptr<Object> target, shared_ptr<ObjectAction> action, AttackResultType resultType, int damage) {
     RoundMap::iterator maybeRound;
 
     // If attacker has already started a combat round, do nothing
@@ -390,7 +390,7 @@ vector<shared_ptr<DamageEffect>> Combat::getDamageEffects(shared_ptr<Creature> d
     return vector<shared_ptr<DamageEffect>> {move(effect)};
 }
 
-void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_ptr<SpatialObject> &target, Round &round) {
+void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_ptr<Object> &target, Round &round) {
     auto attackerModel = static_pointer_cast<ModelSceneNode>(attacker->sceneNode());
     auto targetModel = static_pointer_cast<ModelSceneNode>(target->sceneNode());
     if (!attackerModel || !targetModel)

@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void CrushEffect::applyTo(SpatialObject &object) {
+void CrushEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

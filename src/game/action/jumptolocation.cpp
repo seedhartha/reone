@@ -18,7 +18,7 @@
 #include "jumptolocation.h"
 
 #include "../location.h"
-#include "../object/spatial.h"
+#include "../object.h"
 
 using namespace std;
 
@@ -27,9 +27,8 @@ namespace reone {
 namespace game {
 
 void JumpToLocationAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
-    auto spatialActor = static_cast<SpatialObject *>(&actor);
-    spatialActor->setPosition(_location->position());
-    spatialActor->setFacing(_location->facing());
+    actor.setPosition(_location->position());
+    actor.setFacing(_location->facing());
 
     complete();
 }

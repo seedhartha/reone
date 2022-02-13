@@ -20,7 +20,7 @@
 #include "../../audio/source.h"
 #include "../../common/timer.h"
 #include "../../game/dialog.h"
-#include "../../game/object/spatial.h"
+#include "../../game/object.h"
 #include "../../game/types.h"
 #include "../../graphics/lipanimation.h"
 #include "../../graphics/model.h"
@@ -51,7 +51,7 @@ public:
      *
      * @param owner owner of the conversation
      */
-    void start(const std::shared_ptr<game::Dialog> &dialog, const std::shared_ptr<game::SpatialObject> &owner);
+    void start(const std::shared_ptr<game::Dialog> &dialog, const std::shared_ptr<game::Object> &owner);
 
     /**
      * Get camera used in this conversation.
@@ -69,7 +69,7 @@ public:
 
 protected:
     std::shared_ptr<game::Dialog> _dialog;
-    std::shared_ptr<game::SpatialObject> _owner;
+    std::shared_ptr<game::Object> _owner;
     std::shared_ptr<graphics::Model> _cameraModel;
     std::shared_ptr<graphics::LipAnimation> _lipAnimation;
     const game::Dialog::EntryReply *_currentEntry {nullptr};

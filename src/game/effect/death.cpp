@@ -17,13 +17,13 @@
 
 #include "death.h"
 
-#include "../object/spatial.h"
+#include "../object.h"
 
 namespace reone {
 
 namespace game {
 
-void DeathEffect::applyTo(SpatialObject &object) {
+void DeathEffect::applyTo(Object &object) {
     object.die();
 }
 

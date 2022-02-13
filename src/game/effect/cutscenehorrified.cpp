@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void CutsceneHorrifiedEffect::applyTo(SpatialObject &object) {
+void CutsceneHorrifiedEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

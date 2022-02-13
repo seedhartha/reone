@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void ForceShieldEffect::applyTo(SpatialObject &object) {
+void ForceShieldEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

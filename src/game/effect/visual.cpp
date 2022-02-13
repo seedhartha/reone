@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void VisualEffect::applyTo(SpatialObject &object) {
+void VisualEffect::applyTo(Object &object) {
     // TODO: implement
 }
 
