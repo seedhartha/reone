@@ -17,6 +17,7 @@
 
 #include "models.h"
 
+#include "../common/exception/validation.h"
 #include "../common/logutil.h"
 #include "../common/streamutil.h"
 #include "../resource/resources.h"
@@ -42,12 +43,14 @@ void Models::invalidate() {
 }
 
 shared_ptr<Model> Models::get(const string &resRef) {
-    if (resRef.empty())
+    if (resRef.empty()) {
         return nullptr;
+    }
 
     auto maybeModel = _cache.find(resRef);
-    if (maybeModel != _cache.end())
+    if (maybeModel != _cache.end()) {
         return maybeModel->second;
+    }
 
     auto inserted = _cache.insert(make_pair(resRef, doGet(resRef)));
     return inserted.first->second;
@@ -62,10 +65,14 @@ shared_ptr<Model> Models::doGet(const string &resRef) {
 
     if (mdlData && mdxData) {
         MdlReader mdl(*this, _textures);
-        mdl.load(wrap(mdlData), wrap(mdxData));
-        model = mdl.model();
-        if (model) {
-            model->init();
+        try {
+            mdl.load(wrap(mdlData), wrap(mdxData));
+            model = mdl.model();
+            if (model) {
+                model->init();
+            }
+        } catch (const ValidationException &e) {
+            error(boost::format("Error loading model %s: %s") % resRef % string(e.what()), LogChannels::graphics);
         }
     }
 

@@ -18,6 +18,7 @@
 #include "mdlreader.h"
 
 #include "../../common/collectionutil.h"
+#include "../../common/exception/validation.h"
 #include "../../common/logutil.h"
 
 #include "../animation.h"
@@ -171,7 +172,7 @@ shared_ptr<ModelNode> MdlReader::readNodes(uint32_t offset, const ModelNode *par
     ArrayDefinition controllerDataArrayDef(readArrayDefinition());
 
     if (flags & 0xf408) {
-        throw runtime_error("Unsupported MDL node flags: " + to_string(flags));
+        throw ValidationException("Unsupported MDL node flags: " + to_string(flags));
     }
     string name(_nodeNames[nameIndex]);
     glm::vec3 restPosition(glm::make_vec3(&positionValues[0]));
@@ -261,8 +262,9 @@ shared_ptr<ModelNode::TriangleMesh> MdlReader::readMesh(int flags) {
     ignore(2); // unknown
     float totalArea = readFloat();
     ignore(4); // unknown
-    if (_tsl)
+    if (_tsl) {
         ignore(8);
+    }
     uint32_t offMdxData = readUint32();
     uint32_t offVertices = readUint32();
 
@@ -856,7 +858,7 @@ MdlReader::ControllerFn MdlReader::getControllerFn(uint32_t type, int nodeFlags)
 
 static inline void ensureNumColumnsEquals(int type, int expected, int actual) {
     if (actual != expected) {
-        throw runtime_error(str(boost::format("Controller %d: number of columns is %d, expected %d") % type % actual % expected));
+        throw ValidationException(str(boost::format("Controller %d: number of columns is %d, expected %d") % type % actual % expected));
     }
 }
 
@@ -876,6 +878,12 @@ void MdlReader::readFloatController(const ControllerKey &key, const vector<float
 void MdlReader::readVectorController(const ControllerKey &key, const vector<float> &data, AnimatedProperty<glm::vec3> &prop) {
     bool bezier = key.numColumns & kFlagBezier;
     int numColumns = key.numColumns & ~kFlagBezier;
+
+    // HACK: workaround for s_male02 from TSLRCM
+    if (numColumns == 9) {
+        numColumns = 3;
+    }
+
     ensureNumColumnsEquals(key.type, 3, numColumns);
 
     for (uint16_t i = 0; i < key.numRows; ++i) {
@@ -936,7 +944,7 @@ void MdlReader::readOrientationController(const ControllerKey &key, const vector
         }
         break;
     default:
-        throw runtime_error("Unexpected number of columns: " + to_string(key.numColumns));
+        throw ValidationException("Unexpected number of columns: " + to_string(key.numColumns));
     }
 
     node.orientation().update();
