@@ -263,10 +263,9 @@ Variable actionUseSkill(const vector<Variable> &args, const RoutineContext &ctx)
     auto skill = getIntAsEnum<SkillType>(args, 0);
     auto target = getObject(args, 1, ctx);
     int subSkill = getIntOrElse(args, 2, 0);
-    auto itemUsed = getObjectOrNull(args, 3, ctx);
+    auto itemUsed = getObjectAsItemOrNull(args, 3, ctx);
 
-    // TODO: use subSkill, itemUsed
-    auto action = ctx.game.actionFactory().newUseSkill(target, skill);
+    auto action = ctx.game.actionFactory().newUseSkill(move(target), skill, subSkill, move(itemUsed));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -282,11 +281,10 @@ Variable actionDoCommand(const vector<Variable> &args, const RoutineContext &ctx
 }
 
 Variable actionUseTalentOnObject(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto chosenTalen = getTalent(args, 0);
+    auto chosenTalent = getTalent(args, 0);
     auto target = getObject(args, 1, ctx);
 
-    // TODO: use arguments
-    auto action = ctx.game.actionFactory().newUseTalentOnObject();
+    auto action = ctx.game.actionFactory().newUseTalentOnObject(move(chosenTalent), move(target));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
