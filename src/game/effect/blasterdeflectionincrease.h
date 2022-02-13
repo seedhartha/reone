@@ -25,11 +25,15 @@ namespace game {
 
 class BlasterDeflectionIncreaseEffect : public Effect {
 public:
-    BlasterDeflectionIncreaseEffect() :
-        Effect(EffectType::BlasterDeflectionIncrease) {
+    BlasterDeflectionIncreaseEffect(int change) :
+        Effect(EffectType::BlasterDeflectionIncrease),
+        _change(change) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    int _change;
 };
 
 } // namespace game

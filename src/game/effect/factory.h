@@ -120,8 +120,8 @@ public:
         return std::make_unique<BeamEffect>();
     }
 
-    std::unique_ptr<BlasterDeflectionIncreaseEffect> newBlasterDeflectionIncrease() {
-        return std::make_unique<BlasterDeflectionIncreaseEffect>();
+    std::unique_ptr<BlasterDeflectionIncreaseEffect> newBlasterDeflectionIncrease(int change) {
+        return std::make_unique<BlasterDeflectionIncreaseEffect>(change);
     }
 
     std::unique_ptr<BlindEffect> newBlind() {
@@ -180,8 +180,8 @@ public:
         return std::make_unique<DeathEffect>();
     }
 
-    std::unique_ptr<DisguiseEffect> newDisguise() {
-        return std::make_unique<DisguiseEffect>();
+    std::unique_ptr<DisguiseEffect> newDisguise(int appearance) {
+        return std::make_unique<DisguiseEffect>(appearance);
     }
 
     std::unique_ptr<DroidScrambleEffect> newDroidScramble() {
@@ -256,8 +256,8 @@ public:
         return std::make_unique<InvisibilityEffect>();
     }
 
-    std::unique_ptr<LightsaberThrowEffect> newLightsaberThrow() {
-        return std::make_unique<LightsaberThrowEffect>();
+    std::unique_ptr<LightsaberThrowEffect> newLightsaberThrow(std::shared_ptr<Object> target1, std::shared_ptr<Object> target2, std::shared_ptr<Object> target3, int advancedDamage) {
+        return std::make_unique<LightsaberThrowEffect>(std::move(target1), std::move(target2), std::move(target3), advancedDamage);
     }
 
     std::unique_ptr<LinkEffectsEffect> newLinkEffects() {
@@ -268,8 +268,8 @@ public:
         return std::make_unique<MindTrickEffect>();
     }
 
-    std::unique_ptr<ModifyAttacksEffect> newModifyAttacks() {
-        return std::make_unique<ModifyAttacksEffect>();
+    std::unique_ptr<ModifyAttacksEffect> newModifyAttacks(int attacks) {
+        return std::make_unique<ModifyAttacksEffect>(attacks);
     }
 
     std::unique_ptr<MovementSpeedDecreaseEffect> newMovementSpeedDecrease() {
