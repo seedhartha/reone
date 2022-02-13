@@ -52,6 +52,7 @@ private:
         bool sharpen {true};
         int texQuality {0};
         int shadowres {1};
+        int anisofilter {2};
         int drawdist {64};
         int musicvol {85};
         int voicevol {85};
@@ -67,6 +68,7 @@ private:
     wxChoice *_choiceResolution;
     wxChoice *_choiceTextureQuality;
     wxChoice *_choiceShadowResolution;
+    wxChoice *_choiceAnisoFilter;
     wxSlider *_sliderDrawDistance;
     wxCheckBox *_checkBoxFullscreen;
     wxCheckBox *_checkBoxVSync;

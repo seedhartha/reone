@@ -35,6 +35,7 @@ struct GraphicsOptions {
     bool sharpen {true};
     TextureQuality textureQuality {TextureQuality::High};
     int shadowResolution {2048};
+    int anisotropicFiltering {2};
     float drawDistance {kDefaultObjectDrawDistance};
 };
 
