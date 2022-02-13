@@ -147,12 +147,12 @@ public:
         return std::make_unique<MoveAwayFromObject>(_game, _services, std::move(fleeFrom), run, range);
     }
 
-    std::unique_ptr<MoveToLocationAction> newMoveToLocation(std::shared_ptr<Location> destination, bool run = false) {
-        return std::make_unique<MoveToLocationAction>(_game, _services, std::move(destination), run);
+    std::unique_ptr<MoveToLocationAction> newMoveToLocation(std::shared_ptr<Location> destination, bool run = false, float timeout = 30.0f, bool force = false) {
+        return std::make_unique<MoveToLocationAction>(_game, _services, std::move(destination), run, timeout, force);
     }
 
-    std::unique_ptr<MoveToObjectAction> newMoveToObject(std::shared_ptr<Object> object, bool run, float distance) {
-        return std::make_unique<MoveToObjectAction>(_game, _services, std::move(object), run, distance);
+    std::unique_ptr<MoveToObjectAction> newMoveToObject(std::shared_ptr<Object> object, bool run, float range, float timeout = 30.0f, bool force = false) {
+        return std::make_unique<MoveToObjectAction>(_game, _services, std::move(object), run, range, timeout, force);
     }
 
     std::unique_ptr<MoveToPointAction> newMoveToPoint(glm::vec3 point) {

@@ -25,21 +25,21 @@ namespace game {
 
 class MoveToObjectAction : public ObjectAction {
 public:
-    MoveToObjectAction(Game &game, Services &services, std::shared_ptr<Object> object, bool run, float distance) :
-        ObjectAction(game, services, ActionType::MoveToObject, std::move(object)),
+    MoveToObjectAction(Game &game, Services &services, std::shared_ptr<Object> object, bool run, float range, float timeout, bool force) :
+        ObjectAction(game, services, ActionType::MoveToObject, std::move(object), range),
         _run(run),
-        _distance(distance) {
+        _timeout(timeout),
+        _force(force) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
 
     bool isRun() const { return _run; }
 
-    float distance() const { return _distance; }
-
 private:
-    bool _run {false};
-    float _distance {0.0f};
+    bool _run;
+    float _timeout;
+    bool _force;
 };
 
 } // namespace game

@@ -32,7 +32,7 @@ void MoveToObjectAction::execute(shared_ptr<Action> self, Object &actor, float d
     auto dest = _object->position();
     auto creatureActor = _game.objectFactory().getObjectById<Creature>(actor.id());
 
-    bool reached = creatureActor->navigateTo(dest, _run, _distance, dt);
+    bool reached = creatureActor->navigateTo(dest, _run, _range, dt);
     if (reached) {
         complete();
     }

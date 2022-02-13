@@ -311,8 +311,7 @@ Variable actionForceMoveToLocation(const vector<Variable> &args, const RoutineCo
     bool run = getIntAsBoolOrElse(args, 1, false);
     float timeout = getFloatOrElse(args, 2, 30.0f);
 
-    // TODO: use run, timeout
-    auto action = ctx.game.actionFactory().newMoveToLocation(move(destination));
+    auto action = ctx.game.actionFactory().newMoveToLocation(move(destination), run, timeout, true);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -324,8 +323,7 @@ Variable actionForceMoveToObject(const vector<Variable> &args, const RoutineCont
     float range = getFloatOrElse(args, 2, 1.0f);
     float timeout = getFloatOrElse(args, 3, 30.0f);
 
-    // TODO: use timeout
-    auto action = ctx.game.actionFactory().newMoveToObject(move(moveTo), run, range);
+    auto action = ctx.game.actionFactory().newMoveToObject(move(moveTo), run, range, timeout, true);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
