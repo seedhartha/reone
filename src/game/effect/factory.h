@@ -164,8 +164,8 @@ public:
         return std::make_unique<DamageForcePointsEffect>(damage);
     }
 
-    std::unique_ptr<DamageImmunityIncreaseEffect> newDamageImmunityIncrease() {
-        return std::make_unique<DamageImmunityIncreaseEffect>();
+    std::unique_ptr<DamageImmunityIncreaseEffect> newDamageImmunityIncrease(DamageType damageType, int percentImmunity) {
+        return std::make_unique<DamageImmunityIncreaseEffect>(damageType, percentImmunity);
     }
 
     std::unique_ptr<DamageIncreaseEffect> newDamageIncrease() {
@@ -212,12 +212,12 @@ public:
         return std::make_unique<ForcePushedEffect>();
     }
 
-    std::unique_ptr<ForcePushTargetedEffect> newForcePushTargeted() {
-        return std::make_unique<ForcePushTargetedEffect>();
+    std::unique_ptr<ForcePushTargetedEffect> newForcePushTargeted(std::shared_ptr<Location> centre, bool ignoreTestDirectLine) {
+        return std::make_unique<ForcePushTargetedEffect>(std::move(centre), ignoreTestDirectLine);
     }
 
-    std::unique_ptr<ForceResistanceIncreaseEffect> newForceResistanceIncrease() {
-        return std::make_unique<ForceResistanceIncreaseEffect>();
+    std::unique_ptr<ForceResistanceIncreaseEffect> newForceResistanceIncrease(int value) {
+        return std::make_unique<ForceResistanceIncreaseEffect>(value);
     }
 
     std::unique_ptr<ForceResistedEffect> newForceResisted() {
@@ -248,8 +248,8 @@ public:
         return std::make_unique<HorrifiedEffect>();
     }
 
-    std::unique_ptr<ImmunityEffect> newImmunity() {
-        return std::make_unique<ImmunityEffect>();
+    std::unique_ptr<ImmunityEffect> newImmunity(ImmunityType immunityType) {
+        return std::make_unique<ImmunityEffect>(immunityType);
     }
 
     std::unique_ptr<InvisibilityEffect> newInvisibility(InvisibilityType type) {
@@ -284,8 +284,8 @@ public:
         return std::make_unique<ParalyzeEffect>();
     }
 
-    std::unique_ptr<PoisonEffect> newPoison() {
-        return std::make_unique<PoisonEffect>();
+    std::unique_ptr<PoisonEffect> newPoison(Poison poisonType) {
+        return std::make_unique<PoisonEffect>(poisonType);
     }
 
     std::unique_ptr<PsychicStaticEffect> newPsychicStatic() {

@@ -227,9 +227,7 @@ Variable effectBeam(const vector<Variable> &args, const RoutineContext &ctx) {
 
 Variable effectForceResistanceIncrease(const vector<Variable> &args, const RoutineContext &ctx) {
     int value = getInt(args, 0);
-
-    // TODO: use value
-    auto effect = ctx.game.effectFactory().newForceResistanceIncrease();
+    auto effect = ctx.game.effectFactory().newForceResistanceIncrease(value);
 
     return Variable::ofEffect(move(effect));
 }
@@ -241,9 +239,7 @@ Variable effectBodyFuel(const vector<Variable> &args, const RoutineContext &ctx)
 
 Variable effectPoison(const vector<Variable> &args, const RoutineContext &ctx) {
     auto poisonType = getIntAsEnum<Poison>(args, 0);
-
-    // TODO: use poisonType
-    auto effect = ctx.game.effectFactory().newPoison();
+    auto effect = ctx.game.effectFactory().newPoison(poisonType);
 
     return Variable::ofEffect(move(effect));
 }
@@ -252,17 +248,14 @@ Variable effectForcePushTargeted(const vector<Variable> &args, const RoutineCont
     auto centre = getLocationArgument(args, 0);
     bool ignoreTestDirectLine = getIntAsBoolOrElse(args, 1, false);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newForcePushTargeted();
+    auto effect = ctx.game.effectFactory().newForcePushTargeted(centre, ignoreTestDirectLine);
 
     return Variable::ofEffect(move(effect));
 }
 
 Variable effectImmunity(const vector<Variable> &args, const RoutineContext &ctx) {
     auto immunityType = getIntAsEnum<ImmunityType>(args, 0);
-
-    // TODO: use immunityType
-    auto effect = ctx.game.effectFactory().newImmunity();
+    auto effect = ctx.game.effectFactory().newImmunity(immunityType);
 
     return Variable::ofEffect(move(effect));
 }
@@ -271,8 +264,7 @@ Variable effectDamageImmunityIncrease(const vector<Variable> &args, const Routin
     auto damageType = getIntAsEnum<DamageType>(args, 0);
     int percentImmunity = getInt(args, 1);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newDamageImmunityIncrease();
+    auto effect = ctx.game.effectFactory().newDamageImmunityIncrease(damageType, percentImmunity);
 
     return Variable::ofEffect(move(effect));
 }

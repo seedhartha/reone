@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../effect.h"
+#include "../location.h"
 
 namespace reone {
 
@@ -25,11 +26,17 @@ namespace game {
 
 class ForcePushTargetedEffect : public Effect {
 public:
-    ForcePushTargetedEffect() :
-        Effect(EffectType::ForcePushTargeted) {
+    ForcePushTargetedEffect(std::shared_ptr<Location> centre, bool ignoreTestDirectLine) :
+        Effect(EffectType::ForcePushTargeted),
+        _centre(std::move(centre)),
+        _ignoreTestDirectLine(ignoreTestDirectLine) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    std::shared_ptr<Location> _centre;
+    bool _ignoreTestDirectLine;
 };
 
 } // namespace game
