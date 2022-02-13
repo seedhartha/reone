@@ -51,9 +51,7 @@ Variable effectAssuredHit(const vector<Variable> &args, const RoutineContext &ct
 
 Variable effectHeal(const vector<Variable> &args, const RoutineContext &ctx) {
     int damageToHeal = getInt(args, 0);
-
-    // TODO: use damageToHeal
-    auto effect = ctx.game.effectFactory().newHeal();
+    auto effect = ctx.game.effectFactory().newHeal(damageToHeal);
 
     return Variable::ofEffect(move(effect));
 }
@@ -63,8 +61,7 @@ Variable effectDamage(const vector<Variable> &args, const RoutineContext &ctx) {
     auto damageType = getIntAsEnumOrElse(args, 1, DamageType::Universal);
     auto damagePower = getIntAsEnumOrElse(args, 2, DamagePower::Normal);
 
-    // TODO: use damagePower
-    auto effect = ctx.game.effectFactory().newDamage(damageAmount, damageType, nullptr);
+    auto effect = ctx.game.effectFactory().newDamage(damageAmount, damageType, damagePower, nullptr);
 
     return Variable::ofEffect(move(effect));
 }
@@ -73,8 +70,7 @@ Variable effectAbilityIncrease(const vector<Variable> &args, const RoutineContex
     auto abilityToIncrease = getIntAsEnum<Ability>(args, 0);
     int modifyBy = getInt(args, 1);
 
-    // TODO: use arguments
-    auto effect = ctx.game.effectFactory().newAbilityIncrease();
+    auto effect = ctx.game.effectFactory().newAbilityIncrease(abilityToIncrease, modifyBy);
 
     return Variable::ofEffect(move(effect));
 }
