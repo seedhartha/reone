@@ -25,11 +25,15 @@ namespace game {
 
 class ImmunityEffect : public Effect {
 public:
-    ImmunityEffect() :
-        Effect(EffectType::Immunity) {
+    ImmunityEffect(ImmunityType immunityType) :
+        Effect(EffectType::Immunity),
+        _immunityType(immunityType) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    ImmunityType _immunityType;
 };
 
 } // namespace game

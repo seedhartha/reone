@@ -25,11 +25,15 @@ namespace game {
 
 class PoisonEffect : public Effect {
 public:
-    PoisonEffect() :
-        Effect(EffectType::Poison) {
+    PoisonEffect(Poison poisonType) :
+        Effect(EffectType::Poison),
+        _poisonType(poisonType) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    Poison _poisonType;
 };
 
 } // namespace game

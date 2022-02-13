@@ -25,11 +25,15 @@ namespace game {
 
 class ForceResistanceIncreaseEffect : public Effect {
 public:
-    ForceResistanceIncreaseEffect() :
-        Effect(EffectType::ForceResistanceIncrease) {
+    ForceResistanceIncreaseEffect(int value) :
+        Effect(EffectType::ForceResistanceIncrease),
+        _value(value) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    int _value;
 };
 
 } // namespace game
