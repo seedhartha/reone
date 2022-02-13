@@ -25,11 +25,19 @@ namespace game {
 
 class DamageResistanceEffect : public Effect {
 public:
-    DamageResistanceEffect() :
-        Effect(EffectType::DamageResistance) {
+    DamageResistanceEffect(DamageType damageType, int amount, int limit) :
+        Effect(EffectType::DamageResistance),
+        _damageType(damageType),
+        _amount(amount),
+        _limit(limit) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    DamageType _damageType;
+    int _amount;
+    int _limit;
 };
 
 } // namespace game
