@@ -28,11 +28,11 @@ struct GraphicsOptions {
     int height {768};
     bool fullscreen {false};
     bool vsync {true};
+    bool grass {true};
+    bool ssao {true};
+    bool ssr {true};
     bool fxaa {true};
     bool sharpen {true};
-    bool grass {true};
-    bool ssr {true};
-    bool ssao {true};
     TextureQuality textureQuality {TextureQuality::High};
     int shadowResolution {2048};
     float drawDistance {kDefaultObjectDrawDistance};

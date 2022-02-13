@@ -145,20 +145,20 @@ LauncherFrame::LauncherFrame() :
     _checkBoxVSync = new wxCheckBox(this, wxID_ANY, "Enable V-Sync", wxDefaultPosition, wxDefaultSize);
     _checkBoxVSync->SetValue(_config.vsync);
 
+    _checkBoxGrass = new wxCheckBox(this, wxID_ANY, "Enable Grass", wxDefaultPosition, wxDefaultSize);
+    _checkBoxGrass->SetValue(_config.grass);
+
+    _checkBoxSSAO = new wxCheckBox(this, wxID_ANY, "Enable Screen-Space Ambient Occlusion", wxDefaultPosition, wxDefaultSize);
+    _checkBoxSSAO->SetValue(_config.ssao);
+
+    _checkBoxSSR = new wxCheckBox(this, wxID_ANY, "Enable Screen-Space Reflections", wxDefaultPosition, wxDefaultSize);
+    _checkBoxSSR->SetValue(_config.ssr);
+
     _checkBoxFXAA = new wxCheckBox(this, wxID_ANY, "Enable FXAA", wxDefaultPosition, wxDefaultSize);
     _checkBoxFXAA->SetValue(_config.fxaa);
 
     _checkBoxSharpen = new wxCheckBox(this, wxID_ANY, "Enable Image Sharpening", wxDefaultPosition, wxDefaultSize);
     _checkBoxSharpen->SetValue(_config.sharpen);
-
-    _checkBoxGrass = new wxCheckBox(this, wxID_ANY, "Enable Grass", wxDefaultPosition, wxDefaultSize);
-    _checkBoxGrass->SetValue(_config.grass);
-
-    _checkBoxSSR = new wxCheckBox(this, wxID_ANY, "Enable Screen-Space Reflections", wxDefaultPosition, wxDefaultSize);
-    _checkBoxSSR->SetValue(_config.ssr);
-
-    _checkBoxSSAO = new wxCheckBox(this, wxID_ANY, "Enable Screen-Space Ambient Occlusion", wxDefaultPosition, wxDefaultSize);
-    _checkBoxSSAO->SetValue(_config.ssao);
 
     auto graphicsSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Graphics");
     graphicsSizer->Add(resSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
@@ -167,11 +167,11 @@ LauncherFrame::LauncherFrame() :
     graphicsSizer->Add(drawDistanceSizer, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxFullscreen, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxVSync, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(_checkBoxGrass, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(_checkBoxSSAO, wxSizerFlags(0).Expand().Border(wxALL, 3));
+    graphicsSizer->Add(_checkBoxSSR, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxFXAA, wxSizerFlags(0).Expand().Border(wxALL, 3));
     graphicsSizer->Add(_checkBoxSharpen, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(_checkBoxGrass, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(_checkBoxSSR, wxSizerFlags(0).Expand().Border(wxALL, 3));
-    graphicsSizer->Add(_checkBoxSSAO, wxSizerFlags(0).Expand().Border(wxALL, 3));
 
     // END Graphics
 
@@ -279,7 +279,7 @@ void LauncherFrame::LoadConfiguration() {
         ("fullscreen", po::value<bool>()->default_value(_config.fullscreen)) //
         ("vsync", po::value<bool>()->default_value(_config.vsync))           //
         ("fxaa", po::value<bool>()->default_value(_config.fxaa))             //
-        ("sharpen", po::value<bool>()->default_value(_config.sharpen))             //
+        ("sharpen", po::value<bool>()->default_value(_config.sharpen))       //
         ("grass", po::value<bool>()->default_value(_config.grass))           //
         ("ssr", po::value<bool>()->default_value(_config.ssr))               //
         ("ssao", po::value<bool>()->default_value(_config.ssao))             //
@@ -346,11 +346,11 @@ void LauncherFrame::SaveConfiguration() {
         "height=",
         "fullscreen=",
         "vsync=",
+        "grass=",
+        "ssao=",
+        "ssr=",
         "fxaa=",
         "sharpen=",
-        "grass=",
-        "ssr=",
-        "ssao=",
         "texquality=",
         "shadowres=",
         "drawdist=",
@@ -446,11 +446,11 @@ void LauncherFrame::SaveConfiguration() {
     config << "height=" << _config.height << endl;
     config << "fullscreen=" << (_config.fullscreen ? 1 : 0) << endl;
     config << "vsync=" << (_config.vsync ? 1 : 0) << endl;
+    config << "grass=" << (_config.grass ? 1 : 0) << endl;
+    config << "ssao=" << (_config.ssao ? 1 : 0) << endl;
+    config << "ssr=" << (_config.ssr ? 1 : 0) << endl;
     config << "fxaa=" << (_config.fxaa ? 1 : 0) << endl;
     config << "sharpen=" << (_config.sharpen ? 1 : 0) << endl;
-    config << "grass=" << (_config.grass ? 1 : 0) << endl;
-    config << "ssr=" << (_config.ssr ? 1 : 0) << endl;
-    config << "ssao=" << (_config.ssao ? 1 : 0) << endl;
     config << "texquality=" << _config.texQuality << endl;
     config << "shadowres=" << _config.shadowres << endl;
     config << "drawdist=" << _config.drawdist << endl;
