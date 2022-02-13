@@ -67,12 +67,21 @@ LauncherFrame::LauncherFrame() :
     wxArrayString resChoices;
     resChoices.Add("800x600");
     resChoices.Add("1024x768");
+    resChoices.Add("1280x720");
     resChoices.Add("1280x1024");
+    resChoices.Add("1366x768");
+    resChoices.Add("1600x900");
     resChoices.Add("1600x1200");
+    resChoices.Add("1920x1080");
+    resChoices.Add("2560x1440");
+    resChoices.Add("3840x2160");
 
     int displayW, displayH;
     wxDisplaySize(&displayW, &displayH);
-    resChoices.Add(to_string(displayW) + "x" + to_string(displayH));
+    string displayRes = to_string(displayW) + "x" + to_string(displayH);
+    if (resChoices.Index(displayRes) == wxNOT_FOUND) {
+        resChoices.Add(displayRes);
+    }
 
     string configResolution(str(boost::format("%dx%d") % _config.width % _config.height));
     int resSelection = resChoices.Index(configResolution);
