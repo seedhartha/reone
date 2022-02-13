@@ -247,12 +247,12 @@ public:
         return std::make_unique<UseFeatAction>(_game, _services, std::move(object), feat);
     }
 
-    std::unique_ptr<UseSkillAction> newUseSkill(std::shared_ptr<Object> object, SkillType skill) {
-        return std::make_unique<UseSkillAction>(_game, _services, std::move(object), skill);
+    std::unique_ptr<UseSkillAction> newUseSkill(std::shared_ptr<Object> object, SkillType skill, int subSkill = 0, std::shared_ptr<Item> itemUsed = nullptr) {
+        return std::make_unique<UseSkillAction>(_game, _services, std::move(object), skill, subSkill, std::move(itemUsed));
     }
 
-    std::unique_ptr<UseTalentOnObjectAction> newUseTalentOnObject() {
-        return std::make_unique<UseTalentOnObjectAction>(_game, _services);
+    std::unique_ptr<UseTalentOnObjectAction> newUseTalentOnObject(std::shared_ptr<Talent> chosenTalent, std::shared_ptr<Object> target) {
+        return std::make_unique<UseTalentOnObjectAction>(_game, _services, std::move(chosenTalent), std::move(target));
     }
 
     std::unique_ptr<WaitAction> newWait(float seconds) {

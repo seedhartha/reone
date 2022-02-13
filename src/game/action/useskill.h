@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../object/item.h"
+
 #include "objectaction.h"
 
 namespace reone {
@@ -25,9 +27,17 @@ namespace game {
 
 class UseSkillAction : public ObjectAction {
 public:
-    UseSkillAction(Game &game, Services &services, std::shared_ptr<Object> object, SkillType skill) :
+    UseSkillAction(
+        Game &game,
+        Services &services,
+        std::shared_ptr<Object> object,
+        SkillType skill,
+        int subSkill,
+        std::shared_ptr<Item> itemUsed) :
         ObjectAction(game, services, ActionType::UseSkill, std::move(object)),
-        _skill(skill) {
+        _skill(skill),
+        _subSkill(subSkill),
+        _itemUsed(std::move(itemUsed)) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
@@ -36,6 +46,8 @@ public:
 
 private:
     SkillType _skill;
+    int _subSkill;
+    std::shared_ptr<Item> _itemUsed;
 };
 
 } // namespace game
