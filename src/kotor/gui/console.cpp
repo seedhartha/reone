@@ -56,6 +56,8 @@ namespace kotor {
 static constexpr int kMaxOutputLineCount = 100;
 static constexpr int kVisibleLineCount = 15;
 
+static constexpr float kTextOffset = 3.0f;
+
 void Console::init() {
     _font = _services.fonts.get("fnt_console");
 
@@ -210,7 +212,7 @@ void Console::drawBackground() {
 void Console::drawLines() {
     float height = kVisibleLineCount * _font->height();
 
-    glm::vec3 position(3.0f, height - 0.5f * _font->height(), 0.0f);
+    glm::vec3 position(kTextOffset, height - 0.5f * _font->height(), 0.0f);
 
     // Input
 
@@ -426,7 +428,7 @@ void Console::cmdRunScript(string input, vector<string> tokens) {
     int scriptVar = tokens.size() > 5 ? stoi(tokens[5]) : -1;
 
     int result = _game.scriptRunner().run(resRef, callerId, triggerrerId, eventNumber, scriptVar);
-    print("Exit code: " + to_string(result));
+    print(str(boost::format("%s -> %d") % resRef % result));
 }
 
 void Console::cmdShowWalkmesh(string input, vector<string> tokens) {
@@ -459,7 +461,23 @@ void Console::cmdHelp(string input, vector<string> tokens) {
 }
 
 void Console::print(const string &text) {
-    _output.push_front(text);
+    float maxWidth = _game.options().graphics.width - 2.0f * kTextOffset;
+
+    ostringstream ss;
+    for (size_t i = 0; i < text.length(); ++i) {
+        ss << text[i];
+        string s = ss.str();
+        float w = _font->measure(s);
+        if (w >= maxWidth) {
+            _output.push_front(s.substr(0, s.length() - 1));
+            ss.str("");
+            ss << text[i];
+        }
+    }
+    if (ss.tellp() > 0) {
+        _output.push_front(ss.str());
+    }
+
     trimOutput();
     _outputOffset = 0;
 }
