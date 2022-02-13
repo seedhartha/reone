@@ -63,8 +63,7 @@ void Console::init() {
     addCommand("info", "i", "information on selected object", bind(&Console::cmdInfo, this, _1, _2));
     addCommand("listglobals", "lg", "list global variables", bind(&Console::cmdListGlobals, this, _1, _2));
     addCommand("listlocals", "ll", "list local variables", bind(&Console::cmdListLocals, this, _1, _2));
-    addCommand("listroutine", "lr", "list script routines", bind(&Console::cmdListRoutine, this, _1, _2));
-    addCommand("exec", "x", "execute script routine", bind(&Console::cmdExec, this, _1, _2));
+    addCommand("runscript", "rs", "run script", bind(&Console::cmdRunScript, this, _1, _2));
     addCommand("listanim", "la", "list animations of selected object", bind(&Console::cmdListAnim, this, _1, _2));
     addCommand("playanim", "pa", "play animation on selected object", bind(&Console::cmdPlayAnim, this, _1, _2));
     addCommand("warp", "w", "warp to a module", bind(&Console::cmdWarp, this, _1, _2));
@@ -414,98 +413,20 @@ void Console::cmdWarp(string input, vector<string> tokens) {
     _game.loadModule(tokens[1]);
 }
 
-void Console::cmdListRoutine(string input, vector<string> tokens) {
-    auto query = tokens.size() > 1ll ? tokens[1] : "";
-    auto &routines = _game.routines();
-    for (int i = 0; i < routines.getNumRoutines(); ++i) {
-        auto &routine = routines.get(i);
-        if (!query.empty() && !boost::contains(routine.name(), query)) {
-            continue;
-        }
-        auto text = routine.name();
-        for (int j = 0; j < routine.getArgumentCount(); ++j) {
-            auto argType = routine.getArgumentType(j);
-            switch (argType) {
-            case VariableType::Int:
-                text += " int";
-                break;
-            case VariableType::Float:
-                text += " float";
-                break;
-            case VariableType::String:
-                text += " string";
-                break;
-            case VariableType::Vector:
-                text += " vector";
-                break;
-            case VariableType::Object:
-                text += " object";
-                break;
-            case VariableType::Effect:
-                text += " effect";
-                break;
-            case VariableType::Event:
-                text += " event";
-                break;
-            case VariableType::Location:
-                text += " location";
-                break;
-            case VariableType::Talent:
-                text += " talent";
-                break;
-            case VariableType::Action:
-                text += " action";
-                break;
-            default:
-                text += " UNKNOWN";
-                break;
-            }
-        }
-        print(text);
-    }
-}
-
-void Console::cmdExec(string input, vector<string> tokens) {
+void Console::cmdRunScript(string input, vector<string> tokens) {
     if (tokens.size() < 3) {
-        print("Usage: exec caller_id routine_name [arguments], e.g. exec 10 ActionMoveAwayFromObject 20 0 40.0");
+        print("Usage: runscript resref caller_id [triggerrer_id [event_number [script_var]]], e.g. runscript k_ai_master 1 2 3 4");
         return;
     }
-    auto callerId = stoi(tokens[1]);
-    auto routineName = tokens[2];
 
-    auto &routines = _game.routines();
-    int routineIdx = routines.getIndexByName(routineName);
-    if (routineIdx == -1) {
-        print(str(boost::format("Routine '%s' not found") % routineName));
-        return;
-    }
-    auto &routine = routines.get(routineIdx);
+    string resRef = tokens[1];
+    auto callerId = static_cast<uint32_t>(stoi(tokens[2]));
+    auto triggerrerId = tokens.size() > 3 ? static_cast<uint32_t>(stoi(tokens[3])) : kObjectInvalid;
+    int eventNumber = tokens.size() > 4 ? stoi(tokens[4]) : -1;
+    int scriptVar = tokens.size() > 5 ? stoi(tokens[5]) : -1;
 
-    ExecutionContext ctx;
-    ctx.routines = &routines;
-    ctx.callerId = callerId;
-
-    vector<Variable> args;
-    for (int i = 0; i < routine.getArgumentCount() && i < tokens.size() - 3; ++i) {
-        auto argType = routine.getArgumentType(i);
-        if (argType == VariableType::Int) {
-            args.push_back(Variable::ofInt(stoi(tokens[i + 3])));
-        } else if (argType == VariableType::Float) {
-            args.push_back(Variable::ofInt(stof(tokens[i + 3])));
-        } else if (argType == VariableType::String) {
-            args.push_back(Variable::ofString(tokens[i + 3]));
-        } else if (argType == VariableType::Object) {
-            args.push_back(Variable::ofObject(stoi(tokens[i + 3])));
-        } else {
-            print(str(boost::format("Argument %d is of unsupported type %d") % i % static_cast<int>(argType)));
-            return;
-        }
-    }
-
-    auto result = routine.invoke(move(args), ctx);
-    if (routine.returnType() != VariableType::Void) {
-        print(routineName + " -> " + result.toString());
-    }
+    int result = _game.scriptRunner().run(resRef, callerId, triggerrerId, eventNumber, scriptVar);
+    print("Exit code: " + to_string(result));
 }
 
 void Console::cmdShowWalkmesh(string input, vector<string> tokens) {
