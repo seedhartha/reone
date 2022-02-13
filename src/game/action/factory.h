@@ -124,11 +124,11 @@ public:
     }
 
     std::unique_ptr<GiveItemAction> newGiveItem(std::shared_ptr<Item> item, std::shared_ptr<Object> giveTo) {
-        return std::make_unique<GiveItemAction>(_game, _services, move(item), move(giveTo));
+        return std::make_unique<GiveItemAction>(_game, _services, std::move(item), std::move(giveTo));
     }
 
-    std::unique_ptr<InteractObjectAction> newInteractObject() {
-        return std::make_unique<InteractObjectAction>(_game, _services);
+    std::unique_ptr<InteractObjectAction> newInteractObject(std::shared_ptr<Placeable> placeable) {
+        return std::make_unique<InteractObjectAction>(_game, _services, std::move(placeable));
     }
 
     std::unique_ptr<JumpToLocationAction> newJumpToLocation(std::shared_ptr<Location> location) {

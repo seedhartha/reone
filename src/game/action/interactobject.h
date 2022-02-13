@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../action.h"
+#include "../object/placeable.h"
 
 namespace reone {
 
@@ -25,11 +26,15 @@ namespace game {
 
 class InteractObjectAction : public Action {
 public:
-    InteractObjectAction(Game &game, Services &services) :
-        Action(game, services, ActionType::InteractObject) {
+    InteractObjectAction(Game &game, Services &services, std::shared_ptr<Placeable> placeable) :
+        Action(game, services, ActionType::InteractObject),
+        _placeable(std::move(placeable)) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    std::shared_ptr<Placeable> _placeable;
 };
 
 } // namespace game

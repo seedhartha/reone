@@ -293,8 +293,7 @@ Variable actionUseTalentOnObject(const vector<Variable> &args, const RoutineCont
 Variable actionInteractObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto placeable = getObjectAsPlaceable(args, 0, ctx);
 
-    // TODO: use placeable
-    auto action = ctx.game.actionFactory().newInteractObject();
+    auto action = ctx.game.actionFactory().newInteractObject(move(placeable));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
