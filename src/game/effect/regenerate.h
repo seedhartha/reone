@@ -25,11 +25,17 @@ namespace game {
 
 class RegenerateEffect : public Effect {
 public:
-    RegenerateEffect() :
-        Effect(EffectType::Regenerate) {
+    RegenerateEffect(int amount, float intervalSeconds) :
+        Effect(EffectType::Regenerate),
+        _amount(amount),
+        _intervalSeconds(intervalSeconds) {
     }
 
     void applyTo(Object &object) override;
+
+private:
+    int _amount;
+    float _intervalSeconds;
 };
 
 } // namespace game

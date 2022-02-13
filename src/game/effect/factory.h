@@ -100,8 +100,8 @@ public:
         return std::make_unique<ACDecreaseEffect>(value, modifyType, damageType);
     }
 
-    std::unique_ptr<ACIncreaseEffect> newACIncrease() {
-        return std::make_unique<ACIncreaseEffect>();
+    std::unique_ptr<ACIncreaseEffect> newACIncrease(int value, ACBonus modifyType, int damageType) {
+        return std::make_unique<ACIncreaseEffect>(value, modifyType, damageType);
     }
 
     std::unique_ptr<AssuredHitEffect> newAssuredHit() {
@@ -112,12 +112,12 @@ public:
         return std::make_unique<AttackDecreaseEffect>();
     }
 
-    std::unique_ptr<AttackIncreaseEffect> newAttackIncrease() {
-        return std::make_unique<AttackIncreaseEffect>();
+    std::unique_ptr<AttackIncreaseEffect> newAttackIncrease(int bonus, AttackBonus modifierType) {
+        return std::make_unique<AttackIncreaseEffect>(bonus, modifierType);
     }
 
-    std::unique_ptr<BeamEffect> newBeam() {
-        return std::make_unique<BeamEffect>();
+    std::unique_ptr<BeamEffect> newBeam(int beamVisualEffect, std::shared_ptr<Object> effector, BodyNode bodyPart, bool missEffect) {
+        return std::make_unique<BeamEffect>(beamVisualEffect, std::move(effector), bodyPart, missEffect);
     }
 
     std::unique_ptr<BlasterDeflectionIncreaseEffect> newBlasterDeflectionIncrease(int change) {
@@ -176,8 +176,8 @@ public:
         return std::make_unique<DamageResistanceEffect>(damageType, amount, limit);
     }
 
-    std::unique_ptr<DeathEffect> newDeath() {
-        return std::make_unique<DeathEffect>();
+    std::unique_ptr<DeathEffect> newDeath(bool spectacularDeath, bool displayFeedback, bool noFadeAway) {
+        return std::make_unique<DeathEffect>(spectacularDeath, displayFeedback, noFadeAway);
     }
 
     std::unique_ptr<DisguiseEffect> newDisguise(int appearance) {
@@ -260,8 +260,8 @@ public:
         return std::make_unique<LightsaberThrowEffect>(std::move(target1), std::move(target2), std::move(target3), advancedDamage);
     }
 
-    std::unique_ptr<LinkEffectsEffect> newLinkEffects() {
-        return std::make_unique<LinkEffectsEffect>();
+    std::unique_ptr<LinkEffectsEffect> newLinkEffects(std::shared_ptr<Effect> childEffect, std::shared_ptr<Effect> parentEffect) {
+        return std::make_unique<LinkEffectsEffect>(std::move(childEffect), std::move(parentEffect));
     }
 
     std::unique_ptr<MindTrickEffect> newMindTrick() {
@@ -276,8 +276,8 @@ public:
         return std::make_unique<MovementSpeedDecreaseEffect>(percentChange);
     }
 
-    std::unique_ptr<MovementSpeedIncreaseEffect> newMovementSpeedIncrease() {
-        return std::make_unique<MovementSpeedIncreaseEffect>();
+    std::unique_ptr<MovementSpeedIncreaseEffect> newMovementSpeedIncrease(int newSpeedPercent) {
+        return std::make_unique<MovementSpeedIncreaseEffect>(newSpeedPercent);
     }
 
     std::unique_ptr<ParalyzeEffect> newParalyze() {
@@ -292,8 +292,8 @@ public:
         return std::make_unique<PsychicStaticEffect>();
     }
 
-    std::unique_ptr<RegenerateEffect> newRegenerate() {
-        return std::make_unique<RegenerateEffect>();
+    std::unique_ptr<RegenerateEffect> newRegenerate(int amount, float intervalSeconds) {
+        return std::make_unique<RegenerateEffect>(amount, intervalSeconds);
     }
 
     std::unique_ptr<ResurrectionEffect> newResurrection(int hpPercent) {
@@ -304,8 +304,8 @@ public:
         return std::make_unique<SavingThrowDecreaseEffect>(save, value, savingThrowType);
     }
 
-    std::unique_ptr<SavingThrowIncreaseEffect> newSavingThrowIncrease() {
-        return std::make_unique<SavingThrowIncreaseEffect>();
+    std::unique_ptr<SavingThrowIncreaseEffect> newSavingThrowIncrease(int save, int value, SavingThrowType savingThrowType) {
+        return std::make_unique<SavingThrowIncreaseEffect>(save, value, savingThrowType);
     }
 
     std::unique_ptr<SkillIncreaseEffect> newSkillIncrease(SkillType skill, int value) {
@@ -320,8 +320,8 @@ public:
         return std::make_unique<StunnedEffect>();
     }
 
-    std::unique_ptr<TemporaryForcePointsEffect> newTemporaryForcePoints() {
-        return std::make_unique<TemporaryForcePointsEffect>();
+    std::unique_ptr<TemporaryForcePointsEffect> newTemporaryForcePoints(int tempForce) {
+        return std::make_unique<TemporaryForcePointsEffect>(tempForce);
     }
 
     std::unique_ptr<TemporaryHitPointsEffect> newTemporaryHitPoints(int hitPoints) {
@@ -332,8 +332,8 @@ public:
         return std::make_unique<TrueSeeingEffect>();
     }
 
-    std::unique_ptr<VisualEffect> newVisual() {
-        return std::make_unique<VisualEffect>();
+    std::unique_ptr<VisualEffect> newVisual(int visualEffectId, bool missEffect) {
+        return std::make_unique<VisualEffect>(visualEffectId, missEffect);
     }
 
     std::unique_ptr<VPRegenModifierEffect> newVPRegenModifier(int percent) {
