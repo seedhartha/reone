@@ -18,13 +18,12 @@
 #pragma once
 
 #include "../action.h"
+#include "../object/spatial.h"
 #include "../types.h"
 
 namespace reone {
 
 namespace game {
-
-class SpatialObject;
 
 class CastSpellAtObjectAction : public Action {
 public:

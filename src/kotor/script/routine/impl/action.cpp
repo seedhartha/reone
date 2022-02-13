@@ -157,10 +157,9 @@ Variable actionCastSpellAtObject(const vector<Variable> &args, const RoutineCont
 
 Variable actionGiveItem(const vector<Variable> &args, const RoutineContext &ctx) {
     auto item = getObjectAsItem(args, 0, ctx);
-    auto giveTo = getObject(args, 1, ctx);
+    auto giveTo = getObjectAsSpatialObject(args, 1, ctx);
 
-    // TODO: use arguments
-    auto action = ctx.game.actionFactory().newGiveItem();
+    auto action = ctx.game.actionFactory().newGiveItem(move(item), move(giveTo));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -168,10 +167,9 @@ Variable actionGiveItem(const vector<Variable> &args, const RoutineContext &ctx)
 
 Variable actionTakeItem(const vector<Variable> &args, const RoutineContext &ctx) {
     auto item = getObjectAsItem(args, 0, ctx);
-    auto takeFrom = getObject(args, 1, ctx);
+    auto takeFrom = getObjectAsSpatialObject(args, 1, ctx);
 
-    // TODO: use arguments
-    auto action = ctx.game.actionFactory().newTakeItem();
+    auto action = ctx.game.actionFactory().newTakeItem(move(item), move(takeFrom));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
