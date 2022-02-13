@@ -75,16 +75,16 @@ public:
         return std::make_unique<AttackAction>(_game, _services, std::move(object), range, userAction, passive);
     }
 
-    std::unique_ptr<BarkStringAction> newBarkString() {
-        return std::make_unique<BarkStringAction>(_game, _services);
+    std::unique_ptr<BarkStringAction> newBarkString(int strRef) {
+        return std::make_unique<BarkStringAction>(_game, _services, strRef);
     }
 
-    std::unique_ptr<CastFakeSpellAtLocationAction> newCastFakeSpellAtLocation() {
-        return std::make_unique<CastFakeSpellAtLocationAction>(_game, _services);
+    std::unique_ptr<CastFakeSpellAtLocationAction> newCastFakeSpellAtLocation(SpellType spell, std::shared_ptr<Location> location, ProjectilePathType projectilePathType) {
+        return std::make_unique<CastFakeSpellAtLocationAction>(_game, _services, spell, std::move(location), projectilePathType);
     }
 
-    std::unique_ptr<CastFakeSpellAtObjectAction> newCastFakeSpellAtObject() {
-        return std::make_unique<CastFakeSpellAtObjectAction>(_game, _services);
+    std::unique_ptr<CastFakeSpellAtObjectAction> newCastFakeSpellAtObject(SpellType spell, std::shared_ptr<Object> target, ProjectilePathType projectilePathType) {
+        return std::make_unique<CastFakeSpellAtObjectAction>(_game, _services, spell, std::move(target), projectilePathType);
     }
 
     std::unique_ptr<CastSpellAtObjectAction> newCastSpellAtObject(SpellType spell, std::shared_ptr<Object> target, int metaMagic, bool cheat, int domainLevel, ProjectilePathType projectilePathType, bool instantSpell) {
@@ -103,12 +103,12 @@ public:
         return std::make_unique<EquipItemAction>(_game, _services, std::move(item), inventorySlot, instant);
     }
 
-    std::unique_ptr<EquipMostDamagingMeleeAction> newEquipMostDamagingMelee() {
-        return std::make_unique<EquipMostDamagingMeleeAction>(_game, _services);
+    std::unique_ptr<EquipMostDamagingMeleeAction> newEquipMostDamagingMelee(std::shared_ptr<Object> versus, bool offHand) {
+        return std::make_unique<EquipMostDamagingMeleeAction>(_game, _services, std::move(versus), offHand);
     }
 
-    std::unique_ptr<EquipMostDamagingRangedAction> newEquipMostDamagingRanged() {
-        return std::make_unique<EquipMostDamagingRangedAction>(_game, _services);
+    std::unique_ptr<EquipMostDamagingRangedAction> newEquipMostDamagingRanged(std::shared_ptr<Object> versus) {
+        return std::make_unique<EquipMostDamagingRangedAction>(_game, _services, std::move(versus));
     }
 
     std::unique_ptr<FollowAction> newFollow(std::shared_ptr<Object> object, float distance) {
@@ -119,8 +119,8 @@ public:
         return std::make_unique<FollowLeaderAction>(_game, _services);
     }
 
-    std::unique_ptr<FollowOwnerAction> newFollowOwner() {
-        return std::make_unique<FollowOwnerAction>(_game, _services);
+    std::unique_ptr<FollowOwnerAction> newFollowOwner(float range) {
+        return std::make_unique<FollowOwnerAction>(_game, _services, range);
     }
 
     std::unique_ptr<GiveItemAction> newGiveItem(std::shared_ptr<Item> item, std::shared_ptr<Object> giveTo) {
@@ -139,8 +139,8 @@ public:
         return std::make_unique<JumpToObjectAction>(_game, _services, std::move(object), walkStraightLine);
     }
 
-    std::unique_ptr<LockObjectAction> newLockObject() {
-        return std::make_unique<LockObjectAction>(_game, _services);
+    std::unique_ptr<LockObjectAction> newLockObject(std::shared_ptr<Object> target) {
+        return std::make_unique<LockObjectAction>(_game, _services, std::move(target));
     }
 
     std::unique_ptr<MoveAwayFromObject> newMoveAwayFromObject(std::shared_ptr<Object> fleeFrom, bool run, float range) {
@@ -239,8 +239,8 @@ public:
         return std::make_unique<UnequipItemAction>(_game, _services, std::move(item), instant);
     }
 
-    std::unique_ptr<UnlockObjectAction> newUnlockObject() {
-        return std::make_unique<UnlockObjectAction>(_game, _services);
+    std::unique_ptr<UnlockObjectAction> newUnlockObject(std::shared_ptr<Object> target) {
+        return std::make_unique<UnlockObjectAction>(_game, _services, std::move(target));
     }
 
     std::unique_ptr<UseFeatAction> newUseFeat(std::shared_ptr<Object> object, FeatType feat) {

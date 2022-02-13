@@ -333,8 +333,7 @@ Variable actionEquipMostDamagingMelee(const vector<Variable> &args, const Routin
     auto versus = getObjectOrNull(args, 0, ctx);
     bool offHand = getIntAsBoolOrElse(args, 1, false);
 
-    // TODO: use arguments
-    auto action = ctx.game.actionFactory().newEquipMostDamagingMelee();
+    auto action = ctx.game.actionFactory().newEquipMostDamagingMelee(move(versus), offHand);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -343,8 +342,7 @@ Variable actionEquipMostDamagingMelee(const vector<Variable> &args, const Routin
 Variable actionEquipMostDamagingRanged(const vector<Variable> &args, const RoutineContext &ctx) {
     auto versus = getObjectOrNull(args, 0, ctx);
 
-    // TODO: use versus
-    auto action = ctx.game.actionFactory().newEquipMostDamagingRanged();
+    auto action = ctx.game.actionFactory().newEquipMostDamagingRanged(move(versus));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -353,8 +351,7 @@ Variable actionEquipMostDamagingRanged(const vector<Variable> &args, const Routi
 Variable actionUnlockObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto target = getObject(args, 0, ctx);
 
-    // TODO: use target
-    auto action = ctx.game.actionFactory().newUnlockObject();
+    auto action = ctx.game.actionFactory().newUnlockObject(move(target));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -363,8 +360,7 @@ Variable actionUnlockObject(const vector<Variable> &args, const RoutineContext &
 Variable actionLockObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto target = getObject(args, 0, ctx);
 
-    // TODO: use target
-    auto action = ctx.game.actionFactory().newLockObject();
+    auto action = ctx.game.actionFactory().newLockObject(move(target));
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -375,8 +371,7 @@ Variable actionCastFakeSpellAtObject(const vector<Variable> &args, const Routine
     auto target = getObject(args, 1, ctx);
     auto projectilePathType = getIntAsEnum<ProjectilePathType>(args, 2);
 
-    // TODO: use arguments
-    auto action = ctx.game.actionFactory().newCastFakeSpellAtObject();
+    auto action = ctx.game.actionFactory().newCastFakeSpellAtObject(spell, move(target), projectilePathType);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -387,8 +382,7 @@ Variable actionCastFakeSpellAtLocation(const vector<Variable> &args, const Routi
     auto location = getLocationArgument(args, 1);
     auto projectilePathType = getIntAsEnum<ProjectilePathType>(args, 2);
 
-    // TODO: use arguments
-    auto action = ctx.game.actionFactory().newCastFakeSpellAtLocation();
+    auto action = ctx.game.actionFactory().newCastFakeSpellAtLocation(spell, move(location), projectilePathType);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -397,8 +391,7 @@ Variable actionCastFakeSpellAtLocation(const vector<Variable> &args, const Routi
 Variable actionBarkString(const vector<Variable> &args, const RoutineContext &ctx) {
     int strRef = getInt(args, 0);
 
-    // TODO: use strRef
-    auto action = ctx.game.actionFactory().newBarkString();
+    auto action = ctx.game.actionFactory().newBarkString(strRef);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
@@ -416,8 +409,7 @@ Variable actionFollowLeader(const vector<Variable> &args, const RoutineContext &
 Variable actionFollowOwner(const vector<Variable> &args, const RoutineContext &ctx) {
     float range = getFloatOrElse(args, 0, 2.5f);
 
-    // TODO: use range
-    auto action = ctx.game.actionFactory().newFollowOwner();
+    auto action = ctx.game.actionFactory().newFollowOwner(range);
     getCaller(ctx)->addAction(move(action));
 
     return Variable::ofNull();
