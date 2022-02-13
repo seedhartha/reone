@@ -123,8 +123,8 @@ public:
         return std::make_unique<FollowOwnerAction>(_game, _services);
     }
 
-    std::unique_ptr<GiveItemAction> newGiveItem() {
-        return std::make_unique<GiveItemAction>(_game, _services);
+    std::unique_ptr<GiveItemAction> newGiveItem(std::shared_ptr<Item> item, std::shared_ptr<SpatialObject> giveTo) {
+        return std::make_unique<GiveItemAction>(_game, _services, move(item), move(giveTo));
     }
 
     std::unique_ptr<InteractObjectAction> newInteractObject() {
@@ -199,8 +199,8 @@ public:
         return std::make_unique<SwitchWeaponsAction>(_game, _services);
     }
 
-    std::unique_ptr<TakeItemAction> newTakeItem() {
-        return std::make_unique<TakeItemAction>(_game, _services);
+    std::unique_ptr<TakeItemAction> newTakeItem(std::shared_ptr<Item> item, std::shared_ptr<SpatialObject> takeFrom) {
+        return std::make_unique<TakeItemAction>(_game, _services, move(item), move(takeFrom));
     }
 
     std::unique_ptr<UnequipItemAction> newUnequipItem(std::shared_ptr<Item> item, bool instant) {

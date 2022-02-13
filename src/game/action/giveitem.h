@@ -18,6 +18,8 @@
 #pragma once
 
 #include "../action.h"
+#include "../object/item.h"
+#include "../object/spatial.h"
 
 namespace reone {
 
@@ -25,11 +27,17 @@ namespace game {
 
 class GiveItemAction : public Action {
 public:
-    GiveItemAction(Game &game, Services &services) :
-        Action(game, services, ActionType::GiveItem) {
+    GiveItemAction(Game &game, Services &services, std::shared_ptr<Item> item, std::shared_ptr<SpatialObject> giveTo) :
+        Action(game, services, ActionType::GiveItem),
+        _item(std::move(item)),
+        _giveTo(std::move(giveTo)) {
     }
 
     void execute(std::shared_ptr<Action> self, Object &actor, float dt) override;
+
+private:
+    std::shared_ptr<Item> _item;
+    std::shared_ptr<SpatialObject> _giveTo;
 };
 
 } // namespace game
