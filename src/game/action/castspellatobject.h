@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../action.h"
-#include "../object/spatial.h"
+#include "../object.h"
 #include "../types.h"
 
 namespace reone {
@@ -31,7 +31,7 @@ public:
         Game &game,
         Services &services,
         SpellType spell,
-        std::shared_ptr<SpatialObject> target,
+        std::shared_ptr<Object> target,
         int metaMagic,
         bool cheat,
         int domainLevel,
@@ -51,7 +51,7 @@ public:
 
 private:
     SpellType _spell;
-    std::shared_ptr<SpatialObject> _target;
+    std::shared_ptr<Object> _target;
     int _metaMagic;
     bool _cheat;
     int _domainLevel;

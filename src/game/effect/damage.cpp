@@ -19,13 +19,13 @@
 
 #include "../../common/logutil.h"
 
-#include "../object/spatial.h"
+#include "../object.h"
 
 namespace reone {
 
 namespace game {
 
-void DamageEffect::applyTo(SpatialObject &object) {
+void DamageEffect::applyTo(Object &object) {
     debug(boost::format("Damage taken: %s %d") % object.tag() % _amount);
     object.setCurrentHitPoints(glm::max(object.isMinOneHP() ? 1 : 0, object.currentHitPoints() - _amount));
 }

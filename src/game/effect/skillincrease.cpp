@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void SkillIncreaseEffect::applyTo(SpatialObject &object) {
+void SkillIncreaseEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

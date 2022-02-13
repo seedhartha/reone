@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void SleepEffect::applyTo(SpatialObject &object) {
+void SleepEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

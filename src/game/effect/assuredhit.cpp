@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void AssuredHitEffect::applyTo(SpatialObject &object) {
+void AssuredHitEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

@@ -25,7 +25,7 @@ namespace reone {
 
 namespace game {
 
-void Effect::applyTo(SpatialObject &object) {
+void Effect::applyTo(Object &object) {
     debug("Unsupported effect type: " + to_string(static_cast<int>(_type)));
 }
 

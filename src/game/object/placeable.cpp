@@ -86,13 +86,13 @@ void Placeable::loadTransformFromGIT(const GffStruct &gffs) {
     updateTransform();
 }
 
-void Placeable::runOnUsed(shared_ptr<SpatialObject> usedBy) {
+void Placeable::runOnUsed(shared_ptr<Object> usedBy) {
     if (!_onUsed.empty()) {
         _game.scriptRunner().run(_onUsed, _id, usedBy ? usedBy->id() : kObjectInvalid);
     }
 }
 
-void Placeable::runOnInvDisturbed(shared_ptr<SpatialObject> triggerrer) {
+void Placeable::runOnInvDisturbed(shared_ptr<Object> triggerrer) {
     if (!_onInvDisturbed.empty()) {
         _game.scriptRunner().run(_onInvDisturbed, _id, triggerrer ? triggerrer->id() : kObjectInvalid);
     }
@@ -167,7 +167,7 @@ void Placeable::loadUTP(const GffStruct &utp) {
 }
 
 void Placeable::updateTransform() {
-    SpatialObject::updateTransform();
+    Object::updateTransform();
 
     if (_walkmesh) {
         _walkmesh->setLocalTransform(_transform);

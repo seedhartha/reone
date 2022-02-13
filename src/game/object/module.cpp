@@ -130,7 +130,7 @@ void Module::getEntryPoint(const string &waypoint, glm::vec3 &position, float &f
     facing = _info.entryFacing;
 
     if (!waypoint.empty()) {
-        shared_ptr<SpatialObject> object(_area->getObjectByTag(waypoint));
+        shared_ptr<Object> object(_area->getObjectByTag(waypoint));
         if (object) {
             position = object->position();
             facing = object->getFacing();
@@ -170,7 +170,7 @@ bool Module::handleMouseMotion(const SDL_MouseMotionEvent &event) {
     auto object = _area->getObjectAt(event.x, event.y);
     if (object && object->isSelectable()) {
         auto objectPtr = _game.objectFactory().getObjectById(object->id());
-        _area->hilightObject(static_pointer_cast<SpatialObject>(objectPtr));
+        _area->hilightObject(objectPtr);
 
         switch (object->type()) {
         case ObjectType::Creature: {
@@ -209,7 +209,7 @@ bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     if (!object || !object->isSelectable()) {
         return false;
     }
-    auto objectPtr = static_pointer_cast<SpatialObject>(_game.objectFactory().getObjectById(object->id()));
+    auto objectPtr = _game.objectFactory().getObjectById(object->id());
     auto selectedObject = _area->selectedObject();
     if (objectPtr != selectedObject) {
         _area->selectObject(objectPtr);
@@ -220,7 +220,7 @@ bool Module::handleMouseButtonDown(const SDL_MouseButtonEvent &event) {
     return true;
 }
 
-void Module::onObjectClick(const shared_ptr<SpatialObject> &object) {
+void Module::onObjectClick(const shared_ptr<Object> &object) {
     switch (object->type()) {
     case ObjectType::Creature:
         onCreatureClick(static_pointer_cast<Creature>(object));

@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void TemporaryHitPointsEffect::applyTo(SpatialObject &object) {
+void TemporaryHitPointsEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

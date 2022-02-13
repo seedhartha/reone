@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void AbilityDecreaseEffect::applyTo(SpatialObject &object) {
+void AbilityDecreaseEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

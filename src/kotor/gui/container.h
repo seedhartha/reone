@@ -23,7 +23,7 @@
 #include "../../gui/control/label.h"
 #include "../../gui/control/listbox.h"
 
-#include "../../game/object/spatial.h"
+#include "../../game/object.h"
 
 namespace reone {
 
@@ -34,9 +34,9 @@ public:
     ContainerGUI(KotOR &game, game::Services &services);
 
     void load() override;
-    void open(std::shared_ptr<game::SpatialObject> contanier);
+    void open(std::shared_ptr<game::Object> contanier);
 
-    game::SpatialObject &container() const { return *_container; }
+    game::Object &container() const { return *_container; }
 
 private:
     struct Binding {
@@ -47,7 +47,7 @@ private:
         std::shared_ptr<gui::Button> btnCancel;
     } _binding;
 
-    std::shared_ptr<game::SpatialObject> _container;
+    std::shared_ptr<game::Object> _container;
 
     void bindControls();
     void configureItemsListBox();

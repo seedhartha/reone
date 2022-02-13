@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void HealForcePointsEffect::applyTo(SpatialObject &object) {
+void HealForcePointsEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

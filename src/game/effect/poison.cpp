@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void PoisonEffect::applyTo(SpatialObject &object) {
+void PoisonEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

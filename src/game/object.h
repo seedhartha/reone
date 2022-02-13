@@ -18,8 +18,14 @@
 #pragma once
 
 #include "../common/timer.h"
+#include "../scene/animproperties.h"
+#include "../scene/graph.h"
+#include "../scene/node.h"
+#include "../scene/user.h"
 
 #include "action.h"
+#include "action/playanimation.h"
+#include "effect.h"
 #include "types.h"
 
 namespace reone {
@@ -30,17 +36,39 @@ struct Services;
 
 class Action;
 class Game;
+class Item;
+class Room;
 
-class Object : public boost::noncopyable {
+class Object : public scene::IUser, boost::noncopyable {
 public:
     virtual ~Object() = default;
 
     virtual void update(float dt);
-    virtual void clearAllActions();
+    virtual void die();
+
+    void face(const Object &other);
+    void face(const glm::vec3 &point);
+    void faceAwayFrom(const Object &other);
+
+    bool contains(const glm::vec3 &point) const;
+
+    virtual bool isSelectable() const;
+    bool isOpen() const { return _open; }
+    bool isInLineOfSight(const Object &other, float fov) const;
 
     bool isMinOneHP() const { return _minOneHP; }
     bool isDead() const { return _dead; }
     bool isCommandable() const { return _commandable; }
+
+    float getDistanceTo(const glm::vec2 &point) const;
+    float getSquareDistanceTo(const glm::vec2 &point) const;
+    float getDistanceTo(const glm::vec3 &point) const;
+    float getSquareDistanceTo(const glm::vec3 &point) const;
+    float getDistanceTo(const Object &other) const;
+    float getSquareDistanceTo(const Object &other) const;
+
+    virtual glm::vec3 getSelectablePosition() const;
+    float getFacing() const { return glm::eulerAngles(_orientation).z; }
 
     uint32_t id() const { return _id; }
     const std::string &tag() const { return _tag; }
@@ -50,9 +78,70 @@ public:
     const std::string &conversation() const { return _conversation; }
     bool plotFlag() const { return _plot; }
 
+    Room *room() const { return _room; }
+    const glm::vec3 &position() const { return _position; }
+    const glm::mat4 &transform() const { return _transform; }
+    bool visible() const { return _visible; }
+    std::shared_ptr<scene::SceneNode> sceneNode() const { return _sceneNode; }
+
     void setTag(std::string tag) { _tag = std::move(tag); }
     void setPlotFlag(bool plot) { _plot = plot; }
     void setCommandable(bool commandable) { _commandable = commandable; }
+
+    void setRoom(Room *room);
+    void setPosition(const glm::vec3 &position);
+    void setFacing(float facing);
+    void setVisible(bool visible);
+
+    // Animation
+
+    virtual void playAnimation(AnimationType type, scene::AnimationProperties properties = scene::AnimationProperties());
+
+    virtual std::string getAnimationName(AnimationType type) const { return ""; }
+    virtual std::string getActiveAnimationName() const { return ""; };
+
+    // END Animation
+
+    // Inventory
+
+    std::shared_ptr<Item> addItem(const std::string &resRef, int stackSize = 1, bool dropable = true);
+    void addItem(const std::shared_ptr<Item> &item);
+    bool removeItem(const std::shared_ptr<Item> &item, bool &last);
+    void moveDropableItemsTo(Object &other);
+
+    std::shared_ptr<Item> getFirstItem();
+    std::shared_ptr<Item> getNextItem();
+    std::shared_ptr<Item> getItemByTag(const std::string &tag);
+
+    const std::vector<std::shared_ptr<Item>> &items() const { return _items; }
+
+    // END Inventory
+
+    // Effects
+
+    void clearAllEffects();
+    void applyEffect(const std::shared_ptr<Effect> &effect, DurationType durationType, float duration = 0.0f);
+
+    std::shared_ptr<Effect> getFirstEffect();
+    std::shared_ptr<Effect> getNextEffect();
+
+    // END Effects
+
+    // Stunt mode
+
+    bool isStuntMode() const { return _stunt; }
+
+    /**
+     * Places this object into the stunt mode. Objects in this mode have their
+     * position and orientation fixed to the world origin. Subsequent changes to
+     * position and orientation will be buffered and applied when
+     * stopStuntMode is called.
+     */
+    void startStuntMode();
+
+    void stopStuntMode();
+
+    // END Stunt mode
 
     // Hit Points
 
@@ -72,6 +161,8 @@ public:
     // END Hit Points
 
     // Actions
+
+    virtual void clearAllActions();
 
     void addAction(std::unique_ptr<Action> action);
     void addActionOnTop(std::unique_ptr<Action> action);
@@ -111,8 +202,15 @@ protected:
         Timer timer;
     };
 
+    struct AppliedEffect {
+        std::shared_ptr<Effect> effect;
+        DurationType durationType {DurationType::Instant};
+        float duration {0.0f};
+    };
+
     uint32_t _id;
     ObjectType _type;
+    std::string _sceneName;
     Game &_game;
     Services &_services;
 
@@ -129,6 +227,22 @@ protected:
     bool _commandable {true};
     bool _autoRemoveKey {false};
     bool _interruptable {false};
+
+    glm::vec3 _position {0.0f};
+    glm::quat _orientation {1.0f, 0.0f, 0.0f, 0.0f};
+    glm::mat4 _transform {1.0f};
+    bool _visible {true};
+    Room *_room {nullptr};
+    std::vector<std::shared_ptr<Item>> _items;
+    std::deque<AppliedEffect> _effects;
+    bool _open {false};
+    bool _stunt {false};
+    std::string _activeAnimName;
+
+    std::shared_ptr<scene::SceneNode> _sceneNode;
+
+    int _itemIndex {0};
+    int _effectIndex {0};
 
     // Actions
 
@@ -155,13 +269,17 @@ protected:
     Object(
         uint32_t id,
         ObjectType type,
+        std::string sceneName,
         Game &game,
         Services &services) :
         _id(id),
         _type(type),
+        _sceneName(std::move(sceneName)),
         _game(game),
         _services(services) {
     }
+
+    virtual void updateTransform();
 
     // Actions
 
@@ -172,6 +290,13 @@ protected:
     void executeActions(float dt);
 
     // END Actions
+
+    // Effects
+
+    void updateEffects(float dt);
+    void applyInstantEffect(Effect &effect);
+
+    // END Effects
 };
 
 } // namespace game

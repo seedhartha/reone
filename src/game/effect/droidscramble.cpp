@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void DroidScrambleEffect::applyTo(SpatialObject &object) {
+void DroidScrambleEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

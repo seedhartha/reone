@@ -101,7 +101,7 @@ Variable actionUnequipItem(const vector<Variable> &args, const RoutineContext &c
 }
 
 Variable actionAttack(const vector<Variable> &args, const RoutineContext &ctx) {
-    auto attackee = getObjectAsSpatialObject(args, 0, ctx);
+    auto attackee = getObject(args, 0, ctx);
     bool passive = getIntAsBoolOrElse(args, 1, false);
 
     auto caller = getCallerAsCreature(ctx);
@@ -142,7 +142,7 @@ Variable actionCloseDoor(const vector<Variable> &args, const RoutineContext &ctx
 
 Variable actionCastSpellAtObject(const vector<Variable> &args, const RoutineContext &ctx) {
     auto spell = getIntAsEnum<SpellType>(args, 0);
-    auto target = getObjectAsSpatialObject(args, 1, ctx);
+    auto target = getObject(args, 1, ctx);
     int metaMagic = getIntOrElse(args, 2, 0);
     bool cheat = getIntAsBoolOrElse(args, 3, false);
     int domainLevel = getIntOrElse(args, 4, 0);
@@ -157,7 +157,7 @@ Variable actionCastSpellAtObject(const vector<Variable> &args, const RoutineCont
 
 Variable actionGiveItem(const vector<Variable> &args, const RoutineContext &ctx) {
     auto item = getObjectAsItem(args, 0, ctx);
-    auto giveTo = getObjectAsSpatialObject(args, 1, ctx);
+    auto giveTo = getObject(args, 1, ctx);
 
     auto action = ctx.game.actionFactory().newGiveItem(move(item), move(giveTo));
     getCaller(ctx)->addAction(move(action));
@@ -167,7 +167,7 @@ Variable actionGiveItem(const vector<Variable> &args, const RoutineContext &ctx)
 
 Variable actionTakeItem(const vector<Variable> &args, const RoutineContext &ctx) {
     auto item = getObjectAsItem(args, 0, ctx);
-    auto takeFrom = getObjectAsSpatialObject(args, 1, ctx);
+    auto takeFrom = getObject(args, 1, ctx);
 
     auto action = ctx.game.actionFactory().newTakeItem(move(item), move(takeFrom));
     getCaller(ctx)->addAction(move(action));

@@ -17,23 +17,23 @@
 
 #pragma once
 
-#include "spatial.h"
-
 #include "../../resource/format/gffreader.h"
 #include "../../scene/node/walkmesh.h"
+
+#include "../object.h"
 
 namespace reone {
 
 namespace game {
 
-class Door : public SpatialObject {
+class Door : public Object {
 public:
     Door(
         uint32_t id,
         std::string sceneName,
         Game &game,
         Services &services) :
-        SpatialObject(
+        Object(
             id,
             ObjectType::Door,
             std::move(sceneName),

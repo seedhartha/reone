@@ -17,7 +17,7 @@
 
 #include "jumptoobject.h"
 
-#include "../object/spatial.h"
+#include "../object.h"
 
 using namespace std;
 
@@ -26,11 +26,8 @@ namespace reone {
 namespace game {
 
 void JumpToObjectAction::execute(shared_ptr<Action> self, Object &actor, float dt) {
-    auto spatialObject = static_pointer_cast<SpatialObject>(_object);
-
-    auto spatialActor = static_cast<SpatialObject *>(&actor);
-    spatialActor->setPosition(spatialObject->position());
-    spatialActor->setFacing(spatialObject->getFacing());
+    actor.setPosition(_object->position());
+    actor.setFacing(_object->getFacing());
 
     complete();
 }

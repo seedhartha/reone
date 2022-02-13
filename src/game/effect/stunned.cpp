@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void StunnedEffect::applyTo(SpatialObject &object) {
+void StunnedEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

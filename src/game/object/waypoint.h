@@ -17,22 +17,22 @@
 
 #pragma once
 
-#include "spatial.h"
-
 #include "../../resource/format/gffreader.h"
+
+#include "../object.h"
 
 namespace reone {
 
 namespace game {
 
-class Waypoint : public SpatialObject {
+class Waypoint : public Object {
 public:
     Waypoint(
         uint32_t id,
         std::string sceneName,
         Game &game,
         Services &services) :
-        SpatialObject(
+        Object(
             id,
             ObjectType::Waypoint,
             std::move(sceneName),

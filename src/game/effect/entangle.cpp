@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void EntangleEffect::applyTo(SpatialObject &object) {
+void EntangleEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

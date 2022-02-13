@@ -57,12 +57,12 @@ public:
     void openSaveLoad(game::SaveLoadMode mode) override;
     void openInGame() override;
     void openInGameMenu(game::InGameMenuTab tab);
-    void openContainer(const std::shared_ptr<game::SpatialObject> &container) override;
+    void openContainer(const std::shared_ptr<game::Object> &container) override;
     void openPartySelection(const game::PartySelectionContext &ctx) override;
     void openLevelUp();
 
     void startCharacterGeneration();
-    void startDialog(const std::shared_ptr<game::SpatialObject> &owner, const std::string &resRef) override;
+    void startDialog(const std::shared_ptr<game::Object> &owner, const std::string &resRef) override;
 
     void resumeConversation() override;
     void pauseConversation() override;

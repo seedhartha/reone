@@ -176,7 +176,6 @@ set(GAME_HEADERS
     object/placeable.h
     object/placeablecamera.h
     object/sound.h
-    object/spatial.h
     object/trigger.h
     object/waypoint.h
     options.h
@@ -342,7 +341,6 @@ set(GAME_SOURCES
     object/placeable.cpp
     object/placeablecamera.cpp
     object/sound.cpp
-    object/spatial.cpp
     object/trigger.cpp
     object/waypoint.cpp
     party.cpp

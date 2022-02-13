@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void TemporaryForcePointsEffect::applyTo(SpatialObject &object) {
+void TemporaryForcePointsEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

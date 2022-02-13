@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void MovementSpeedDecreaseEffect::applyTo(SpatialObject &object) {
+void MovementSpeedDecreaseEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

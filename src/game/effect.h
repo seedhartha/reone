@@ -25,7 +25,7 @@ namespace reone {
 
 namespace game {
 
-class SpatialObject;
+class Object;
 
 class Effect : public script::EngineType {
 public:
@@ -33,7 +33,7 @@ public:
         _type(type) {
     }
 
-    virtual void applyTo(SpatialObject &object);
+    virtual void applyTo(Object &object);
 
     EffectType type() const { return _type; }
 

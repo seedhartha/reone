@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void BlindEffect::applyTo(SpatialObject &object) {
+void BlindEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

@@ -111,7 +111,7 @@ void Sound::loadTransformFromGIT(const GffStruct &gffs) {
 }
 
 void Sound::update(float dt) {
-    SpatialObject::update(dt);
+    Object::update(dt);
     if (!_active) {
         return;
     }
@@ -143,7 +143,7 @@ void Sound::update(float dt) {
 }
 
 void Sound::updateTransform() {
-    SpatialObject::updateTransform();
+    Object::updateTransform();
     if (!_sceneNode) {
         return;
     }

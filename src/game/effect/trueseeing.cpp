@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void TrueSeeingEffect::applyTo(SpatialObject &object) {
+void TrueSeeingEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

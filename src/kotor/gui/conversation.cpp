@@ -46,7 +46,7 @@ static constexpr float kDefaultEntryDuration = 10.0f;
 
 static bool g_allEntriesSkippable = false;
 
-void Conversation::start(const shared_ptr<Dialog> &dialog, const shared_ptr<SpatialObject> &owner) {
+void Conversation::start(const shared_ptr<Dialog> &dialog, const shared_ptr<Object> &owner) {
     debug("Start " + dialog->resRef, LogChannels::conversation);
 
     _dialog = dialog;

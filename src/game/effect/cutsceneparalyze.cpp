@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void CutsceneParalyzeEffect::applyTo(SpatialObject &object) {
+void CutsceneParalyzeEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

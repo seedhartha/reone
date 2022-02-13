@@ -102,10 +102,10 @@ public:
     void setRelativeMouseMode(bool relative);
 
     virtual void openMainMenu() = 0;
-    virtual void openContainer(const std::shared_ptr<SpatialObject> &container) = 0;
+    virtual void openContainer(const std::shared_ptr<Object> &container) = 0;
     virtual void openPartySelection(const PartySelectionContext &ctx) = 0;
     virtual void openSaveLoad(SaveLoadMode mode) = 0;
-    virtual void startDialog(const std::shared_ptr<SpatialObject> &owner, const std::string &resRef) = 0;
+    virtual void startDialog(const std::shared_ptr<Object> &owner, const std::string &resRef) = 0;
     virtual void pauseConversation() = 0;
     virtual void resumeConversation() = 0;
 

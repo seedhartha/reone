@@ -42,7 +42,6 @@ class Location;
 class Object;
 class Placeable;
 class Sound;
-class SpatialObject;
 class Talent;
 
 } // namespace game
@@ -75,10 +74,6 @@ bool getIntAsBoolOrElse(const std::vector<script::Variable> &args, int index, bo
 
 std::shared_ptr<game::Object> getObjectOrNull(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 std::shared_ptr<game::Object> getObjectOrCaller(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-
-std::shared_ptr<game::SpatialObject> getCallerAsSpatialObject(const RoutineContext &ctx);
-std::shared_ptr<game::SpatialObject> getObjectAsSpatialObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
-std::shared_ptr<game::SpatialObject> getObjectOrCallerAsSpatialObject(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);
 
 std::shared_ptr<game::Creature> getCallerAsCreature(const RoutineContext &ctx);
 std::shared_ptr<game::Creature> getObjectAsCreature(const std::vector<script::Variable> &args, int index, const RoutineContext &ctx);

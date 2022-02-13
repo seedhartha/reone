@@ -83,7 +83,7 @@ void Trigger::loadFromBlueprint(const string &resRef) {
 }
 
 void Trigger::update(float dt) {
-    set<shared_ptr<SpatialObject>> tenantsToRemove;
+    set<shared_ptr<Object>> tenantsToRemove;
     for (auto &tenant : _tenants) {
         if (tenant) {
             glm::vec2 position2d(tenant->position());
@@ -100,7 +100,7 @@ void Trigger::update(float dt) {
     }
 }
 
-void Trigger::addTenant(const std::shared_ptr<SpatialObject> &object) {
+void Trigger::addTenant(const std::shared_ptr<Object> &object) {
     _tenants.insert(object);
 }
 
@@ -108,7 +108,7 @@ bool Trigger::isIn(const glm::vec2 &point) const {
     return static_cast<TriggerSceneNode *>(_sceneNode.get())->isIn(point);
 }
 
-bool Trigger::isTenant(const std::shared_ptr<SpatialObject> &object) const {
+bool Trigger::isTenant(const std::shared_ptr<Object> &object) const {
     auto maybeTenant = find(_tenants.begin(), _tenants.end(), object);
     return maybeTenant != _tenants.end();
 }

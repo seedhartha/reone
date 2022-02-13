@@ -19,7 +19,7 @@
 
 #include "../../scene/node/model.h"
 
-#include "object/spatial.h"
+#include "object.h"
 
 using namespace std;
 
@@ -30,11 +30,11 @@ namespace reone {
 
 namespace game {
 
-void Room::addTenant(SpatialObject *object) {
+void Room::addTenant(Object *object) {
     _tenants.insert(object);
 }
 
-void Room::removeTenant(SpatialObject *object) {
+void Room::removeTenant(Object *object) {
     _tenants.erase(object);
 }
 

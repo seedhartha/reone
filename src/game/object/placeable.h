@@ -20,7 +20,7 @@
 #include "../../resource/format/gffreader.h"
 #include "../../scene/node/walkmesh.h"
 
-#include "spatial.h"
+#include "../object.h"
 
 namespace reone {
 
@@ -29,14 +29,14 @@ namespace game {
 class Game;
 class ObjectFactory;
 
-class Placeable : public SpatialObject {
+class Placeable : public Object {
 public:
     Placeable(
         uint32_t id,
         std::string sceneName,
         Game &game,
         Services &services) :
-        SpatialObject(
+        Object(
             id,
             ObjectType::Placeable,
             std::move(sceneName),
@@ -56,8 +56,8 @@ public:
 
     // Scripts
 
-    void runOnUsed(std::shared_ptr<SpatialObject> usedBy);
-    void runOnInvDisturbed(std::shared_ptr<SpatialObject> triggerrer);
+    void runOnUsed(std::shared_ptr<Object> usedBy);
+    void runOnInvDisturbed(std::shared_ptr<Object> triggerrer);
 
     // END Scripts
 

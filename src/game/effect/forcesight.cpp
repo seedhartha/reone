@@ -21,7 +21,7 @@ namespace reone {
 
 namespace game {
 
-void ForceSightEffect::applyTo(SpatialObject &object) {
+void ForceSightEffect::applyTo(Object &object) {
     // TODO: implement
 }
 

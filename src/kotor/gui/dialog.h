@@ -47,7 +47,7 @@ private:
         std::shared_ptr<gui::ListBox> lbReplies;
     } _binding;
 
-    std::shared_ptr<game::SpatialObject> _currentSpeaker;
+    std::shared_ptr<game::Object> _currentSpeaker;
     std::map<std::string, Participant> _participantByTag;
 
     void bindControls();
@@ -59,7 +59,7 @@ private:
     void updateCamera();
     void updateParticipantAnimations();
 
-    glm::vec3 getTalkPosition(const game::SpatialObject &object) const;
+    glm::vec3 getTalkPosition(const game::Object &object) const;
     game::DialogCamera::Variant getRandomCameraVariant() const;
     std::string getStuntAnimationName(int ordinal) const;
     game::AnimationType getStuntAnimationType(int ordinal) const;
