@@ -34,23 +34,29 @@ namespace reone {
 
 namespace kotor {
 
-static constexpr int kFrameWidth = 125;
 static constexpr char kFontResRef[] = "fnt_console";
-static constexpr float kRefreshInterval = 5.0f; // seconds
+
+static constexpr float kRefreshDelay = 1.0f;  // seconds
+static constexpr float kRefreshPeriod = 5.0f; // seconds
+
+static constexpr int kFrameWidth = 125;
 static constexpr float kTextOffset = 3.0f;
 
 void ProfileOverlay::init() {
-    _refreshTimer.setTimeout(kRefreshInterval);
     _frequency = SDL_GetPerformanceFrequency();
-    _counter = SDL_GetPerformanceCounter();
     _font = _services.fonts.get(kFontResRef);
 }
 
 bool ProfileOverlay::handle(const SDL_Event &event) {
     if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F5) {
         _enabled = !_enabled;
+        if (_enabled) {
+            _counter = SDL_GetPerformanceCounter();
+            _refreshTimer.setTimeout(kRefreshDelay);
+        }
         return true;
     }
+
     return false;
 }
 
@@ -59,30 +65,15 @@ void ProfileOverlay::update(float dt) {
         return;
     }
 
-    uint64_t counter = SDL_GetPerformanceCounter();
-    float frametime = static_cast<float>((counter - _counter) / static_cast<double>(_frequency));
-    _frametimes.push_back(frametime);
+    ++_numFrames;
 
     if (_refreshTimer.advance(dt)) {
-        calculateFPS();
-        _frametimes.clear();
-        _refreshTimer.setTimeout(kRefreshInterval);
+        uint64_t counter = SDL_GetPerformanceCounter();
+        _fps = static_cast<int>(_numFrames * _frequency / (counter - _counter));
+        _numFrames = 0;
+        _counter = counter;
+        _refreshTimer.setTimeout(kRefreshPeriod);
     }
-
-    _counter = counter;
-}
-
-void ProfileOverlay::calculateFPS() {
-    if (_frametimes.empty()) {
-        return;
-    }
-
-    float totalTime = 0.0f;
-    for (auto &time : _frametimes) {
-        totalTime += time;
-    }
-
-    _fps = glm::iround(_frametimes.size() / totalTime);
 }
 
 void ProfileOverlay::draw() {
