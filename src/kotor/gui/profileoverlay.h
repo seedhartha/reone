@@ -49,17 +49,15 @@ private:
     game::Services &_services;
     game::Options &_options;
 
-    uint64_t _frequency {0};
-    uint64_t _counter {0};
-    std::shared_ptr<graphics::Font> _font;
-
     bool _enabled {false};
 
-    Timer _refreshTimer;
-    std::vector<float> _frametimes;
+    uint64_t _frequency {0};
+    uint64_t _counter {0};
+    int _numFrames {0};
     int _fps {0};
 
-    void calculateFPS();
+    Timer _refreshTimer;
+    std::shared_ptr<graphics::Font> _font;
 };
 
 } // namespace kotor
