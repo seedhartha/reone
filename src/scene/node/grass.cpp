@@ -111,7 +111,7 @@ void GrassSceneNode::update(float dt) {
         if (distance2 > kMaxClusterDistance2) {
             continue;
         }
-        closestFaces.insert(make_pair(distance2, faceIdx));
+        closestFaces.insert(make_pair(distance2, static_cast<int>(faceIdx)));
     }
 
     // Materialize grass clusters in closest faces, from the pool

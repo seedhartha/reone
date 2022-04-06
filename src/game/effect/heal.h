@@ -25,7 +25,7 @@ namespace game {
 
 class HealEffect : public Effect {
 public:
-    HealEffect(float damageToHeal) :
+    HealEffect(int damageToHeal) :
         Effect(EffectType::Heal),
         _damageToHeal(damageToHeal) {
     }
@@ -33,7 +33,7 @@ public:
     void applyTo(Object &object) override;
 
 private:
-    float _damageToHeal;
+    int _damageToHeal;
 };
 
 } // namespace game
