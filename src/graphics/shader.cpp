@@ -31,6 +31,8 @@ static GLenum getShaderTypeGL(ShaderType type) {
         return GL_GEOMETRY_SHADER;
     case ShaderType::Fragment:
         return GL_FRAGMENT_SHADER;
+    default:
+        throw invalid_argument("Unexpected shader type: " + to_string(static_cast<int>(type)));
     }
 }
 

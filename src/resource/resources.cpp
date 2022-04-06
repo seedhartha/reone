@@ -39,7 +39,7 @@ void Resources::indexKeyFile(const fs::path &path) {
     if (!fs::exists(path)) {
         return;
     }
-    auto keyBif = make_unique<KeyBifResourceProvider>(_providers.size());
+    auto keyBif = make_unique<KeyBifResourceProvider>(static_cast<int>(_providers.size()));
     keyBif->init(path);
     indexProvider(move(keyBif), path);
 }

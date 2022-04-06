@@ -25,7 +25,7 @@ namespace script {
 
 void ScriptProgram::add(Instruction instr) {
     _instructions.push_back(move(instr));
-    _insIdxByOffset.insert(make_pair(instr.offset, _instructions.size() - 1));
+    _insIdxByOffset.insert(make_pair(instr.offset, static_cast<int>(_instructions.size() - 1)));
 }
 
 const Instruction &ScriptProgram::getInstruction(uint32_t offset) const {
