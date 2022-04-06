@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "../common/logutil.h"
+
 #include "program.h"
 
 using namespace std;
@@ -22,6 +24,7 @@ using namespace std;
 using namespace reone;
 
 int main(int argc, char **argv) {
+    initLog();
     try {
         return Program(argc, argv).run();
     } catch (const exception &ex) {
