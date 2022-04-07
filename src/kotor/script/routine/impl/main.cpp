@@ -154,26 +154,6 @@ Variable getAreaUnescapable(const vector<Variable> &args, const RoutineContext &
     return Variable::ofInt(static_cast<int>(unescapable));
 }
 
-Variable getTimeHour(const vector<Variable> &args, const RoutineContext &ctx) {
-    int time = ctx.game.module()->time().hour;
-    return Variable::ofInt(time);
-}
-
-Variable getTimeMinute(const vector<Variable> &args, const RoutineContext &ctx) {
-    int time = ctx.game.module()->time().minute;
-    return Variable::ofInt(time);
-}
-
-Variable getTimeSecond(const vector<Variable> &args, const RoutineContext &ctx) {
-    int time = ctx.game.module()->time().second;
-    return Variable::ofInt(time);
-}
-
-Variable getTimeMillisecond(const vector<Variable> &args, const RoutineContext &ctx) {
-    int time = ctx.game.module()->time().millisecond;
-    return Variable::ofInt(time);
-}
-
 Variable getArea(const vector<Variable> &args, const RoutineContext &ctx) {
     auto area = ctx.game.module()->area();
     return Variable::ofObject(getObjectIdOrInvalid(area));
