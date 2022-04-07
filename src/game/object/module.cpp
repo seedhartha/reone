@@ -44,11 +44,6 @@ namespace reone {
 
 namespace game {
 
-static constexpr int kMaxMillisecond = 1000;
-static constexpr int kMaxSecond = 60;
-static constexpr int kMaxMinute = 60;
-static constexpr int kMaxHour = 24;
-
 void Module::load(string name, const GffStruct &ifo, bool fromSave) {
     _name = move(name);
 
@@ -79,14 +74,6 @@ void Module::loadInfo(const GffStruct &ifo) {
     float dirX = ifo.getFloat("Mod_Entry_Dir_X");
     float dirY = ifo.getFloat("Mod_Entry_Dir_Y");
     _info.entryFacing = -glm::atan(dirX, dirY);
-
-    // Time
-
-    _info.dawnHour = ifo.getInt("Mod_DawnHour");
-    _info.duskHour = ifo.getInt("Mod_DuskHour");
-    _info.minPerHour = ifo.getInt("Mod_MinPerHour");
-
-    _time.hour = ifo.getInt("Mod_StartHour");
 }
 
 void Module::loadArea(const GffStruct &ifo, bool fromSave) {
@@ -372,33 +359,6 @@ bool Module::handleKeyDown(const SDL_KeyboardEvent &event) {
     }
     default:
         return false;
-    }
-}
-
-void Module::setTime(int hour, int minute, int second, int millisecond) {
-    if (millisecond <= _time.millisecond) {
-        _time.millisecond = millisecond;
-    } else {
-        _time.millisecond = millisecond % kMaxMillisecond;
-        second += millisecond / kMaxMillisecond;
-    }
-    if (second <= _time.second) {
-        _time.second = second;
-    } else {
-        _time.second = second % kMaxSecond;
-        minute += second / kMaxSecond;
-    }
-    if (minute <= _time.minute) {
-        _time.minute = minute;
-    } else {
-        _time.minute = minute % kMaxMinute;
-        hour += minute / kMaxMinute;
-    }
-    if (hour <= _time.hour) {
-        _time.hour = hour;
-    } else {
-        _time.hour = hour % kMaxHour;
-        _time.day += hour / kMaxHour;
     }
 }
 
