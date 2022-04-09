@@ -14,26 +14,26 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 set(REONE_HEADERS
-    di/ioccontainer.h
     di/module/audio.h
     di/module/graphics.h
     di/module/kotor.h
     di/module/resource.h
     di/module/scene.h
     di/module/script.h
+    di/services.h
     engine.h
     gameprobe.h
     optionsparser.h
     types.h)
 
 set(REONE_SOURCES
-    di/ioccontainer.cpp
     di/module/audio.cpp
     di/module/graphics.cpp
     di/module/kotor.cpp
     di/module/resource.cpp
     di/module/scene.cpp
     di/module/script.cpp
+    di/services.cpp
     engine.cpp
     gameprobe.cpp
     main.cpp

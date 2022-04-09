@@ -29,14 +29,14 @@
 
 namespace reone {
 
-class IocContainer {
+class Services {
 public:
-    IocContainer(game::GameID gameId, game::Options &gameOptions) :
+    Services(game::GameID gameId, game::Options &gameOptions) :
         _gameId(gameId),
         _gameOptions(gameOptions) {
     }
 
-    ~IocContainer() { deinit(); }
+    ~Services() { deinit(); }
 
     void init();
     void deinit();
