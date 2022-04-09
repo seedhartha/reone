@@ -28,6 +28,7 @@ set(SCRIPT_HEADERS
     routine.h
     routines.h
     scripts.h
+    services.h
     types.h
     variable.h)
 

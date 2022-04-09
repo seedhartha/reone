@@ -25,6 +25,7 @@
 #include "../../../graphics/services.h"
 #include "../../../gui/sceneinitializer.h"
 #include "../../../scene/graphs.h"
+#include "../../../scene/services.h"
 
 #include "../../kotor.h"
 #include "../../types.h"
@@ -237,7 +238,7 @@ void CharacterMenu::refreshPortraits() {
 }
 
 void CharacterMenu::refresh3D() {
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneCharacter);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(kSceneCharacter);
     float aspect = _binding.lbl3dChar->extent().width / static_cast<float>(_binding.lbl3dChar->extent().height);
 
     SceneInitializer(sceneGraph)

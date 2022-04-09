@@ -28,6 +28,7 @@
 #include "../../gui/sceneinitializer.h"
 #include "../../resource/resources.h"
 #include "../../scene/graphs.h"
+#include "../../scene/services.h"
 
 #include "../kotor.h"
 #include "../types.h"
@@ -398,7 +399,7 @@ void CharacterGeneration::setCharacter(Character character) {
 }
 
 void CharacterGeneration::reloadCharacterModel() {
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneCharGen);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(kSceneCharGen);
     const Control::Extent &extent = _binding.modelLbl->extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 

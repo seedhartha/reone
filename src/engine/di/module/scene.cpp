@@ -41,6 +41,8 @@ void SceneModule::init() {
         _graphics.textures(),
         _graphics.uniforms());
 
+    _services = make_unique<SceneServices>(*_sceneGraphs);
+
     // Init scenes
     _sceneGraphs->add(kSceneMain);
     _sceneGraphs->add(kSceneMainMenu);
@@ -53,6 +55,7 @@ void SceneModule::init() {
 }
 
 void SceneModule::deinit() {
+    _services.reset();
     _sceneGraphs.reset();
 }
 

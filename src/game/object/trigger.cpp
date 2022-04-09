@@ -24,6 +24,7 @@
 #include "../../resource/strings.h"
 #include "../../scene/graphs.h"
 #include "../../scene/node/trigger.h"
+#include "../../scene/services.h"
 
 #include "../game.h"
 #include "../script/runner.h"
@@ -52,7 +53,7 @@ void Trigger::loadFromGIT(const GffStruct &gffs) {
     loadTransformFromGIT(gffs);
     loadGeometryFromGIT(gffs);
 
-    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(_sceneName);
     _sceneNode = sceneGraph.newTrigger(_geometry);
     _sceneNode->setLocalTransform(glm::translate(_position));
 }

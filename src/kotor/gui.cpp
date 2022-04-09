@@ -24,6 +24,7 @@
 #include "../graphics/services.h"
 #include "../graphics/textures.h"
 #include "../resource/services.h"
+#include "../scene/services.h"
 
 #include "kotor.h"
 
@@ -42,7 +43,7 @@ namespace kotor {
 GameGUI::GameGUI(KotOR &game, Services &services) :
     GUI(
         game.options().graphics,
-        services.sceneGraphs,
+        services.scene.sceneGraphs,
         services.graphics.fonts,
         services.graphics.graphicsContext,
         services.graphics.meshes,

@@ -39,13 +39,13 @@ struct GraphicsServices;
 
 namespace scene {
 
-class SceneGraphs;
+struct SceneServices;
 
-} // namespace scene
+}
 
 namespace script {
 
-class Scripts;
+struct ScriptServices;
 
 }
 
@@ -88,8 +88,8 @@ struct Services {
 
     audio::AudioServices &audio;
     graphics::GraphicsServices &graphics;
-    scene::SceneGraphs &sceneGraphs;
-    script::Scripts &scripts;
+    scene::SceneServices &scene;
+    script::ScriptServices &script;
     resource::ResourceServices &resource;
 
     Services(
@@ -111,8 +111,8 @@ struct Services {
         Visibilities &visibilities,
         audio::AudioServices &audio,
         graphics::GraphicsServices &graphics,
-        scene::SceneGraphs &sceneGraphs,
-        script::Scripts &scripts,
+        scene::SceneServices &scene,
+        script::ScriptServices &script,
         resource::ResourceServices &resource) :
         cameraStyles(cameraStyles),
         classes(classes),
@@ -133,8 +133,8 @@ struct Services {
 
         audio(audio),
         graphics(graphics),
-        sceneGraphs(sceneGraphs),
-        scripts(scripts),
+        scene(scene),
+        script(script),
         resource(resource) {
     }
 };

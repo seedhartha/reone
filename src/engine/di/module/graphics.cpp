@@ -61,6 +61,8 @@ void GraphicsModule::init() {
 }
 
 void GraphicsModule::deinit() {
+    _services.reset();
+
     _pipeline.reset();
     _shaders.reset();
     _uniforms.reset();

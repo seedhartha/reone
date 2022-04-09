@@ -33,6 +33,7 @@ set(SCENE_HEADERS
     node/sound.h
     node/trigger.h
     node/walkmesh.h
+    services.h
     types.h
     user.h)
 

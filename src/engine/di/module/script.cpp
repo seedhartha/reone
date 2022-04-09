@@ -27,9 +27,11 @@ namespace reone {
 
 void ScriptModule::init() {
     _scripts = make_unique<Scripts>(_resource.resources());
+    _services = make_unique<ScriptServices>(*_scripts);
 }
 
 void ScriptModule::deinit() {
+    _services.reset();
     _scripts.reset();
 }
 

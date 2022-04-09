@@ -43,6 +43,7 @@
 #include "../../resource/resources.h"
 #include "../../resource/services.h"
 #include "../../script/scripts.h"
+#include "../../script/services.h"
 
 #include "../game/combat.h"
 #include "../game/dialogs.h"
@@ -158,7 +159,7 @@ void KotOR::init() {
     Game::init();
 
     auto routines = make_unique<Routines>(*this, _services);
-    _scriptRunner = make_unique<ScriptRunner>(*routines, _services.scripts);
+    _scriptRunner = make_unique<ScriptRunner>(*routines, _services.script.scripts);
 
     auto map = make_unique<Map>(*this, _services);
     auto console = make_unique<Console>(*this, _services);

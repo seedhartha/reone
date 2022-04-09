@@ -17,34 +17,20 @@
 
 #pragma once
 
-#include "../../script/scripts.h"
-#include "../../script/services.h"
-
 namespace reone {
 
-class ResourceModule;
+namespace scene {
 
-class ScriptModule : boost::noncopyable {
-public:
-    ScriptModule(ResourceModule &resource) :
-        _resource(resource) {
+class SceneGraphs;
+
+struct SceneServices {
+    SceneGraphs &sceneGraphs;
+
+    SceneServices(SceneGraphs &sceneGraphs) :
+        sceneGraphs(sceneGraphs) {
     }
-
-    ~ScriptModule() { deinit(); }
-
-    void init();
-    void deinit();
-
-    script::Scripts &scripts() { return *_scripts; }
-
-    script::ScriptServices &services() { return *_services; }
-
-private:
-    ResourceModule &_resource;
-
-    std::unique_ptr<script::Scripts> _scripts;
-
-    std::unique_ptr<script::ScriptServices> _services;
 };
+
+} // namespace scene
 
 } // namespace reone
