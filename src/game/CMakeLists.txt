@@ -162,6 +162,48 @@ set(GAME_HEADERS
     gui/map.h
     gui/profileoverlay.h
     guisounds.h
+    kotor/cursors.h
+    kotor/gui.h
+    kotor/gui/barkbubble.h
+    kotor/gui/chargen.h
+    kotor/gui/chargen/abilities.h
+    kotor/gui/chargen/classselect.h
+    kotor/gui/chargen/custom.h
+    kotor/gui/chargen/feats.h
+    kotor/gui/chargen/levelup.h
+    kotor/gui/chargen/nameentry.h
+    kotor/gui/chargen/portraitselect.h
+    kotor/gui/chargen/quick.h
+    kotor/gui/chargen/quickorcustom.h
+    kotor/gui/chargen/skills.h
+    kotor/gui/computer.h
+    kotor/gui/console.h
+    kotor/gui/container.h
+    kotor/gui/conversation.h
+    kotor/gui/dialog.h
+    kotor/gui/hud.h
+    kotor/gui/ingame.h
+    kotor/gui/ingame/abilities.h
+    kotor/gui/ingame/character.h
+    kotor/gui/ingame/equip.h
+    kotor/gui/ingame/inventory.h
+    kotor/gui/ingame/journal.h
+    kotor/gui/ingame/map.h
+    kotor/gui/ingame/messages.h
+    kotor/gui/ingame/options.h
+    kotor/gui/loadscreen.h
+    kotor/gui/mainmenu.h
+    kotor/gui/map.h
+    kotor/gui/partyselect.h
+    kotor/gui/profileoverlay.h
+    kotor/gui/saveload.h
+    kotor/gui/selectoverlay.h
+    kotor/kotor.h
+    kotor/script/routine/argutil.h
+    kotor/script/routine/context.h
+    kotor/script/routine/declarations.h
+    kotor/script/routine/objectutil.h
+    kotor/script/routines.h
     layout.h
     layouts.h
     location.h
@@ -329,6 +371,49 @@ set(GAME_SOURCES
     format/visreader.cpp
     game.cpp
     guisounds.cpp
+    kotor/cursors.cpp
+    kotor/gui.cpp
+    kotor/gui/barkbubble.cpp
+    kotor/gui/chargen.cpp
+    kotor/gui/chargen/abilities.cpp
+    kotor/gui/chargen/classselect.cpp
+    kotor/gui/chargen/custom.cpp
+    kotor/gui/chargen/feats.cpp
+    kotor/gui/chargen/levelup.cpp
+    kotor/gui/chargen/nameentry.cpp
+    kotor/gui/chargen/portraitselect.cpp
+    kotor/gui/chargen/quick.cpp
+    kotor/gui/chargen/quickorcustom.cpp
+    kotor/gui/chargen/skills.cpp
+    kotor/gui/computer.cpp
+    kotor/gui/console.cpp
+    kotor/gui/container.cpp
+    kotor/gui/conversation.cpp
+    kotor/gui/dialog.cpp
+    kotor/gui/hud.cpp
+    kotor/gui/ingame.cpp
+    kotor/gui/ingame/abilities.cpp
+    kotor/gui/ingame/character.cpp
+    kotor/gui/ingame/equip.cpp
+    kotor/gui/ingame/inventory.cpp
+    kotor/gui/ingame/journal.cpp
+    kotor/gui/ingame/map.cpp
+    kotor/gui/ingame/messages.cpp
+    kotor/gui/ingame/options.cpp
+    kotor/gui/loadscreen.cpp
+    kotor/gui/mainmenu.cpp
+    kotor/gui/map.cpp
+    kotor/gui/partyselect.cpp
+    kotor/gui/profileoverlay.cpp
+    kotor/gui/saveload.cpp
+    kotor/gui/selectoverlay.cpp
+    kotor/kotor.cpp
+    kotor/script/routine/argutil.cpp
+    kotor/script/routine/impl/action.cpp
+    kotor/script/routine/impl/effect.cpp
+    kotor/script/routine/impl/main.cpp
+    kotor/script/routine/impl/minigame.cpp
+    kotor/script/routines.cpp
     layouts.cpp
     object.cpp
     object/area.cpp
@@ -350,10 +435,10 @@ set(GAME_SOURCES
     portraits.cpp
     reputes.cpp
     room.cpp
+    script/runner.cpp
     soundsets.cpp
     surfaces.cpp
-    visibilities.cpp
-    script/runner.cpp)
+    visibilities.cpp)
 
 add_library(game STATIC ${GAME_HEADERS} ${GAME_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(game PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

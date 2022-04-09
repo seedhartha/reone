@@ -21,7 +21,7 @@
 
 #include "../../common/collectionutil.h"
 #include "../../common/exception/validation.h"
-#include "../../kotor/script/routines.h"
+#include "../../game/kotor/script/routines.h"
 #include "../../script/format/ncsreader.h"
 #include "../../script/format/ncswriter.h"
 #include "../../script/instrutil.h"

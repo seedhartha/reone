@@ -29,18 +29,18 @@ void Services::init() {
     _audio = make_unique<AudioModule>(_gameOptions.audio, *_resource);
     _scene = make_unique<SceneModule>(_gameOptions.graphics, *_audio, *_graphics);
     _script = make_unique<ScriptModule>(*_resource);
-    _kotor = make_unique<KotorModule>(_gameId, _gameOptions, _gameOptions.gamePath, *_resource, *_graphics, *_audio, *_scene, *_script);
+    _game = make_unique<GameModule>(_gameId, _gameOptions, _gameOptions.gamePath, *_resource, *_graphics, *_audio, *_scene, *_script);
 
     _resource->init();
     _graphics->init();
     _audio->init();
     _scene->init();
     _script->init();
-    _kotor->init();
+    _game->init();
 }
 
 void Services::deinit() {
-    _kotor.reset();
+    _game.reset();
     _script.reset();
     _scene.reset();
     _audio.reset();
@@ -49,7 +49,7 @@ void Services::deinit() {
 }
 
 Game &Services::getGame() {
-    return _kotor->game();
+    return _game->game();
 }
 
 } // namespace reone

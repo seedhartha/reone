@@ -21,8 +21,8 @@
 #include "../../game/types.h"
 
 #include "module/audio.h"
+#include "module/game.h"
 #include "module/graphics.h"
-#include "module/kotor.h"
 #include "module/resource.h"
 #include "module/scene.h"
 #include "module/script.h"
@@ -52,7 +52,7 @@ private:
     std::unique_ptr<AudioModule> _audio;
     std::unique_ptr<SceneModule> _scene;
     std::unique_ptr<ScriptModule> _script;
-    std::unique_ptr<KotorModule> _kotor;
+    std::unique_ptr<GameModule> _game;
 };
 
 } // namespace reone
