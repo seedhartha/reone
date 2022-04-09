@@ -24,6 +24,7 @@
 #include "../../graphics/models.h"
 #include "../../graphics/options.h"
 #include "../../graphics/pipeline.h"
+#include "../../graphics/services.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/uniforms.h"
@@ -58,6 +59,8 @@ public:
     graphics::Walkmeshes &walkmeshes() { return *_walkmeshes; }
     graphics::Window &window() { return *_window; }
 
+    graphics::GraphicsServices &services() { return *_services; }
+
 private:
     graphics::GraphicsOptions &_options;
     ResourceModule &_resource;
@@ -73,6 +76,8 @@ private:
     std::unique_ptr<graphics::Uniforms> _uniforms;
     std::unique_ptr<graphics::Walkmeshes> _walkmeshes;
     std::unique_ptr<graphics::Window> _window;
+
+    std::unique_ptr<graphics::GraphicsServices> _services;
 };
 
 } // namespace reone

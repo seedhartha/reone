@@ -19,6 +19,7 @@
 
 #include "../../common/streamutil.h"
 #include "../../graphics/models.h"
+#include "../../graphics/services.h"
 #include "../../graphics/walkmeshes.h"
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
@@ -66,7 +67,7 @@ void Door::loadFromBlueprint(const string &resRef) {
     shared_ptr<TwoDA> doors(_services.resource.twoDas.get("genericdoors"));
     string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
-    auto model = _services.models.get(modelName);
+    auto model = _services.graphics.models.get(modelName);
     if (!model) {
         return;
     }
@@ -78,20 +79,20 @@ void Door::loadFromBlueprint(const string &resRef) {
     // modelSceneNode->setDrawDistance(_game.options().graphics.drawDistance);
     _sceneNode = move(modelSceneNode);
 
-    auto walkmeshClosed = _services.walkmeshes.get(modelName + "0", ResourceType::Dwk);
+    auto walkmeshClosed = _services.graphics.walkmeshes.get(modelName + "0", ResourceType::Dwk);
     if (walkmeshClosed) {
         _walkmeshClosed = sceneGraph.newWalkmesh(move(walkmeshClosed));
         _walkmeshClosed->setUser(*this);
     }
 
-    auto walkmeshOpen1 = _services.walkmeshes.get(modelName + "1", ResourceType::Dwk);
+    auto walkmeshOpen1 = _services.graphics.walkmeshes.get(modelName + "1", ResourceType::Dwk);
     if (walkmeshOpen1) {
         _walkmeshOpen1 = sceneGraph.newWalkmesh(move(walkmeshOpen1));
         _walkmeshOpen1->setUser(*this);
         _walkmeshOpen1->setEnabled(false);
     }
 
-    auto walkmeshOpen2 = _services.walkmeshes.get(modelName + "2", ResourceType::Dwk);
+    auto walkmeshOpen2 = _services.graphics.walkmeshes.get(modelName + "2", ResourceType::Dwk);
     if (walkmeshOpen2) {
         _walkmeshOpen2 = sceneGraph.newWalkmesh(move(walkmeshOpen2));
         _walkmeshOpen2->setUser(*this);

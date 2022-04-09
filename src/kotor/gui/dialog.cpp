@@ -25,6 +25,7 @@
 #include "../../game/party.h"
 #include "../../game/services.h"
 #include "../../graphics/models.h"
+#include "../../graphics/services.h"
 #include "../../gui/control/panel.h"
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
@@ -173,7 +174,7 @@ void DialogGUI::loadStuntParticipants() {
         participant.creature = creature;
 
         if (_dialog->isAnimatedCutscene()) {
-            shared_ptr<Model> model(_services.models.get(stunt.stuntModel));
+            shared_ptr<Model> model(_services.graphics.models.get(stunt.stuntModel));
             if (!model) {
                 warn("Dialog: stunt model not found: " + stunt.stuntModel);
                 continue;

@@ -22,6 +22,7 @@
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
+#include "../../graphics/services.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/textutil.h"
 #include "../../graphics/window.h"
@@ -44,7 +45,7 @@ static constexpr float kTextOffset = 3.0f;
 
 void ProfileOverlay::init() {
     _frequency = SDL_GetPerformanceFrequency();
-    _font = _services.fonts.get(kFontResRef);
+    _font = _services.graphics.fonts.get(kFontResRef);
 }
 
 bool ProfileOverlay::handle(const SDL_Event &event) {
@@ -81,7 +82,7 @@ void ProfileOverlay::draw() {
         return;
     }
 
-    _services.graphicsContext.withBlending(BlendMode::Normal, [this]() {
+    _services.graphics.graphicsContext.withBlending(BlendMode::Normal, [this]() {
         _font->draw(
             to_string(_fps),
             glm::vec3(static_cast<float>(_options.graphics.width) - kTextOffset, static_cast<float>(_options.graphics.height) - kTextOffset, 0.0f),

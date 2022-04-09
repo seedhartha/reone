@@ -24,6 +24,7 @@
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/models.h"
+#include "../../graphics/services.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/walkmesh.h"
 #include "../../graphics/walkmeshes.h"
@@ -190,7 +191,7 @@ void Area::loadStealthXP(const GffStruct &are) {
 void Area::loadGrass(const GffStruct &are) {
     string texName(boost::to_lower_copy(are.getString("Grass_TexName")));
     if (!texName.empty()) {
-        _grass.texture = _services.textures.get(texName, TextureUsage::Diffuse);
+        _grass.texture = _services.graphics.textures.get(texName, TextureUsage::Diffuse);
     }
     _grass.density = are.getFloat("Grass_Density");
     _grass.quadSize = are.getFloat("Grass_QuadSize");
@@ -312,7 +313,7 @@ void Area::loadLYT() {
     }
     auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
     for (auto &lytRoom : layout->rooms) {
-        auto model = _services.models.get(lytRoom.name);
+        auto model = _services.graphics.models.get(lytRoom.name);
         if (!model) {
             continue;
         }
@@ -330,7 +331,7 @@ void Area::loadLYT() {
 
         // Walkmesh
         shared_ptr<WalkmeshSceneNode> walkmeshSceneNode;
-        auto walkmesh = _services.walkmeshes.get(lytRoom.name, ResourceType::Wok);
+        auto walkmesh = _services.graphics.walkmeshes.get(lytRoom.name, ResourceType::Wok);
         if (walkmesh) {
             walkmeshSceneNode = sceneGraph.newWalkmesh(walkmesh);
             sceneGraph.addRoot(walkmeshSceneNode);

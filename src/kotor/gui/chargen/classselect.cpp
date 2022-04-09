@@ -25,6 +25,7 @@
 #include "../../../game/portraits.h"
 #include "../../../game/services.h"
 #include "../../../graphics/models.h"
+#include "../../../graphics/services.h"
 #include "../../../gui/control/button.h"
 #include "../../../gui/control/label.h"
 #include "../../../gui/sceneinitializer.h"
@@ -235,7 +236,7 @@ shared_ptr<ModelSceneNode> ClassSelection::getCharacterModel(int appearance, Sce
     character->sceneNode()->setCullable(false);
     character->updateModelAnimation();
 
-    auto model = sceneGraph.newModel(_services.models.get("cgbody_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(_services.graphics.models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", character->sceneNode());
 
     return move(model);

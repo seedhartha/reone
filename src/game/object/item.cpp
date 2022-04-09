@@ -21,6 +21,7 @@
 #include "../../audio/player.h"
 #include "../../audio/services.h"
 #include "../../graphics/models.h"
+#include "../../graphics/services.h"
 #include "../../graphics/textures.h"
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
@@ -138,7 +139,7 @@ void Item::loadUTI(const GffStruct &uti) {
     } else {
         iconResRef = str(boost::format("i%s_%03d") % _itemClass % _modelVariation);
     }
-    _icon = _services.textures.get(iconResRef, TextureUsage::GUI);
+    _icon = _services.graphics.textures.get(iconResRef, TextureUsage::GUI);
 
     loadAmmunitionType();
 
@@ -157,7 +158,7 @@ void Item::loadAmmunitionType() {
     if (ammunitionIdx != -1) {
         shared_ptr<TwoDA> twoDa(_services.resource.twoDas.get("ammunitiontypes"));
         _ammunitionType = make_shared<Item::AmmunitionType>();
-        _ammunitionType->model = _services.models.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "model")));
+        _ammunitionType->model = _services.graphics.models.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "model")));
         _ammunitionType->shotSound1 = _services.audio.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound0")));
         _ammunitionType->shotSound2 = _services.audio.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "shotsound1")));
         _ammunitionType->impactSound1 = _services.audio.files.get(boost::to_lower_copy(twoDa->getString(ammunitionIdx, "impactsound0")));

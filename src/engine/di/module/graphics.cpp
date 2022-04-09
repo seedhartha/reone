@@ -38,6 +38,19 @@ void GraphicsModule::init() {
     _fonts = make_unique<Fonts>(*_graphicsContext, *_meshes, *_shaders, *_textures, *_uniforms, *_window);
     _pipeline = make_unique<Pipeline>(_options, *_graphicsContext, *_meshes, *_shaders, *_textures, *_uniforms);
 
+    _services = make_unique<GraphicsServices>(
+        *_fonts,
+        *_graphicsContext,
+        *_lipAnimations,
+        *_meshes,
+        *_models,
+        *_pipeline,
+        *_shaders,
+        *_textures,
+        *_uniforms,
+        *_walkmeshes,
+        *_window);
+
     _window->init();
     _graphicsContext->init();
     _meshes->init();
