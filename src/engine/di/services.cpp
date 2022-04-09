@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ioccontainer.h"
+#include "services.h"
 
 using namespace std;
 
@@ -23,7 +23,7 @@ using namespace reone::game;
 
 namespace reone {
 
-void IocContainer::init() {
+void Services::init() {
     _resource = make_unique<ResourceModule>(_gameOptions.gamePath);
     _graphics = make_unique<GraphicsModule>(_gameOptions.graphics, *_resource);
     _audio = make_unique<AudioModule>(_gameOptions.audio, *_resource);
@@ -39,7 +39,7 @@ void IocContainer::init() {
     _kotor->init();
 }
 
-void IocContainer::deinit() {
+void Services::deinit() {
     _kotor.reset();
     _script.reset();
     _scene.reset();
@@ -48,7 +48,7 @@ void IocContainer::deinit() {
     _resource.reset();
 }
 
-Game &IocContainer::getGame() {
+Game &Services::getGame() {
     return _kotor->game();
 }
 

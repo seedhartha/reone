@@ -19,7 +19,7 @@
 
 #include "../common/logutil.h"
 
-#include "di/ioccontainer.h"
+#include "di/services.h"
 #include "gameprobe.h"
 #include "optionsparser.h"
 
@@ -38,10 +38,10 @@ int Engine::run() {
     GameProbe gameProbe(gameOptions.gamePath);
     GameID gameId = gameProbe.probe();
 
-    IocContainer container(gameId, gameOptions);
-    container.init();
+    Services services(gameId, gameOptions);
+    services.init();
 
-    return container.getGame().run();
+    return services.getGame().run();
 }
 
 } // namespace reone
