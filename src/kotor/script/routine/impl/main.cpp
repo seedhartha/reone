@@ -31,6 +31,7 @@
 #include "../../../../game/script/runner.h"
 #include "../../../../game/services.h"
 #include "../../../../game/talent.h"
+#include "../../../../resource/services.h"
 #include "../../../../resource/strings.h"
 #include "../../../../script/exception/notimpl.h"
 #include "../../../../script/exception/unsupportedroutine.h"
@@ -1060,7 +1061,7 @@ Variable getPCSpeaker(const vector<Variable> &args, const RoutineContext &ctx) {
 
 Variable getStringByStrRef(const vector<Variable> &args, const RoutineContext &ctx) {
     int strRef = getInt(args, 0);
-    string result = ctx.services.strings.get(strRef);
+    string result = ctx.services.resource.strings.get(strRef);
 
     return Variable::ofString(move(result));
 }

@@ -43,7 +43,7 @@ public:
     audio::AudioFiles &audioFiles() { return *_audioFiles; }
     audio::AudioPlayer &audioPlayer() { return *_audioPlayer; }
 
-    audio::AudioServices &audioServices() { return *_audioServices; }
+    audio::AudioServices &services() { return *_services; }
 
 private:
     audio::AudioOptions &_options;
@@ -53,7 +53,7 @@ private:
     std::unique_ptr<audio::AudioFiles> _audioFiles;
     std::unique_ptr<audio::AudioPlayer> _audioPlayer;
 
-    std::unique_ptr<audio::AudioServices> _audioServices;
+    std::unique_ptr<audio::AudioServices> _services;
 };
 
 } // namespace reone

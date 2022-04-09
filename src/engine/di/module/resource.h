@@ -20,6 +20,7 @@
 #include "../../resource/2das.h"
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
+#include "../../resource/services.h"
 #include "../../resource/strings.h"
 
 namespace reone {
@@ -40,6 +41,8 @@ public:
     resource::Strings &strings() { return *_strings; }
     resource::TwoDas &twoDas() { return *_twoDas; }
 
+    resource::ResourceServices &services() { return *_services; }
+
 private:
     boost::filesystem::path _gamePath;
 
@@ -47,6 +50,8 @@ private:
     std::unique_ptr<resource::Resources> _resources;
     std::unique_ptr<resource::Strings> _strings;
     std::unique_ptr<resource::TwoDas> _twoDas;
+
+    std::unique_ptr<resource::ResourceServices> _services;
 };
 
 } // namespace reone

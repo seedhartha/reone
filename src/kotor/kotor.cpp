@@ -41,6 +41,7 @@
 #include "../../resource/format/gffwriter.h"
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
+#include "../../resource/services.h"
 #include "../../script/scripts.h"
 
 #include "../game/combat.h"
@@ -111,45 +112,45 @@ void KotOR::initResourceProviders() {
         {TextureQuality::Low, kTexturePackFilenameLow}};
 
     if (_tsl) {
-        _services.resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
+        _services.resource.resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
 
         fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
-        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
+        _services.resource.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
 
         auto texPack = texPackByQuality.find(_options.graphics.textureQuality)->second;
-        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, texPack));
+        _services.resource.resources.indexErfFile(getPathIgnoreCase(texPacksPath, texPack));
 
-        _services.resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
-        _services.resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
-        _services.resources.indexDirectory(getPathIgnoreCase(_path, kVoiceDirectoryName));
+        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
+        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
+        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kVoiceDirectoryName));
 
         fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-        _services.resources.indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
+        _services.resource.resources.indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
 
-        _services.resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
-        _services.resources.indexExeFile(getPathIgnoreCase(_path, kExeFilenameTsl));
+        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
+        _services.resource.resources.indexExeFile(getPathIgnoreCase(_path, kExeFilenameTsl));
 
     } else {
-        _services.resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
-        _services.resources.indexErfFile(getPathIgnoreCase(_path, kPatchFilename));
+        _services.resource.resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
+        _services.resource.resources.indexErfFile(getPathIgnoreCase(_path, kPatchFilename));
 
         fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
-        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
+        _services.resource.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
 
         auto texPack = texPackByQuality.find(_options.graphics.textureQuality)->second;
-        _services.resources.indexErfFile(getPathIgnoreCase(texPacksPath, texPack));
+        _services.resource.resources.indexErfFile(getPathIgnoreCase(texPacksPath, texPack));
 
-        _services.resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
-        _services.resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
-        _services.resources.indexDirectory(getPathIgnoreCase(_path, kWavesDirectoryName));
+        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
+        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
+        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kWavesDirectoryName));
 
         fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
         for (auto &filename : g_nonTransientLipFiles) {
-            _services.resources.indexErfFile(getPathIgnoreCase(lipsPath, filename));
+            _services.resource.resources.indexErfFile(getPathIgnoreCase(lipsPath, filename));
         }
 
-        _services.resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
-        _services.resources.indexExeFile(getPathIgnoreCase(_path, kExeFilenameKotor));
+        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
+        _services.resource.resources.indexExeFile(getPathIgnoreCase(_path, kExeFilenameKotor));
     }
 }
 
@@ -219,9 +220,9 @@ void KotOR::start() {
 }
 
 void KotOR::loadModuleResources(const string &moduleName) {
-    _services.twoDas.invalidate();
-    _services.gffs.invalidate();
-    _services.resources.clearTransientProviders();
+    _services.resource.twoDas.invalidate();
+    _services.resource.gffs.invalidate();
+    _services.resource.resources.clearTransientProviders();
 
     fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));
     if (modulesPath.empty()) {
@@ -230,19 +231,19 @@ void KotOR::loadModuleResources(const string &moduleName) {
 
     fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod"));
     if (!modPath.empty()) {
-        _services.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false));
+        _services.resource.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false));
     } else {
-        _services.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"));
-        _services.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"));
+        _services.resource.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"));
+        _services.resource.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"));
     }
 
     fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
     if (!lipsPath.empty()) {
-        _services.resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"));
+        _services.resource.resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"));
     }
 
     if (isTSL()) {
-        _services.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"));
+        _services.resource.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"));
     }
 }
 
@@ -428,7 +429,7 @@ void KotOR::startDialog(const shared_ptr<Object> &owner, const string &resRef) {
     if (!g_conversationsEnabled)
         return;
 
-    shared_ptr<GffStruct> dlg(_services.gffs.get(resRef, ResourceType::Dlg));
+    shared_ptr<GffStruct> dlg(_services.resource.gffs.get(resRef, ResourceType::Dlg));
     if (!dlg) {
         warn("Game: conversation not found: " + resRef);
         return;

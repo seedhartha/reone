@@ -26,6 +26,7 @@
 #include "../../graphics/textures.h"
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
+#include "../../resource/services.h"
 #include "../../resource/strings.h"
 #include "../../script/types.h"
 
@@ -240,7 +241,7 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
 
         if (party.isMemberAvailable(i)) {
             string blueprintResRef(party.getAvailableMember(i));
-            shared_ptr<GffStruct> utc(_services.gffs.get(blueprintResRef, ResourceType::Utc));
+            shared_ptr<GffStruct> utc(_services.resource.gffs.get(blueprintResRef, ResourceType::Utc));
             shared_ptr<Texture> portrait;
             int portraitId = utc->getInt("PortraitId", 0);
             if (portraitId > 0) {

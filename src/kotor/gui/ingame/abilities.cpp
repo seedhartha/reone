@@ -26,6 +26,7 @@
 #include "../../../gui/control/listbox.h"
 #include "../../../resource/2da.h"
 #include "../../../resource/2das.h"
+#include "../../../resource/services.h"
 #include "../../../resource/strings.h"
 
 #include "../../kotor.h"
@@ -128,7 +129,7 @@ void AbilitiesMenu::bindControls() {
 }
 
 void AbilitiesMenu::loadSkills() {
-    shared_ptr<TwoDA> skills(_services.twoDas.get("skills"));
+    shared_ptr<TwoDA> skills(_services.resource.twoDas.get("skills"));
     for (int row = 0; row < skills->getRowCount(); ++row) {
         auto skill = static_cast<SkillType>(row);
 

@@ -48,6 +48,7 @@
 #include "../../resource/format/gffwriter.h"
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
+#include "../../resource/services.h"
 #include "../../scene/graphs.h"
 #include "../../script/scripts.h"
 
@@ -188,7 +189,7 @@ void Game::loadModule(const string &name, string entry) {
             } else {
                 _module = _objectFactory.newModule();
 
-                shared_ptr<GffStruct> ifo(_services.gffs.get("module", ResourceType::Ifo));
+                shared_ptr<GffStruct> ifo(_services.resource.gffs.get("module", ResourceType::Ifo));
                 if (!ifo) {
                     throw ValidationException("Module IFO file not found");
                 }

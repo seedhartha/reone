@@ -37,6 +37,7 @@ set(RESOURCE_HEADERS
     keybifprovider.h
     resourceprovider.h
     resources.h
+    services.h
     strings.h
     talktable.h
     types.h
