@@ -18,6 +18,7 @@
 #include "placeable.h"
 
 #include "../../graphics/models.h"
+#include "../../graphics/services.h"
 #include "../../graphics/walkmeshes.h"
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
@@ -59,7 +60,7 @@ void Placeable::loadFromBlueprint(const string &resRef) {
     shared_ptr<TwoDA> placeables(_services.resource.twoDas.get("placeables"));
     string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
-    auto model = _services.models.get(modelName);
+    auto model = _services.graphics.models.get(modelName);
     if (!model) {
         return;
     }
@@ -71,7 +72,7 @@ void Placeable::loadFromBlueprint(const string &resRef) {
     sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
     _sceneNode = move(sceneNode);
 
-    auto walkmesh = _services.walkmeshes.get(modelName, ResourceType::Pwk);
+    auto walkmesh = _services.graphics.walkmeshes.get(modelName, ResourceType::Pwk);
     if (walkmesh) {
         _walkmesh = sceneGraph.newWalkmesh(move(walkmesh));
     }

@@ -24,6 +24,7 @@
 #include "../../../game/portraits.h"
 #include "../../../game/services.h"
 #include "../../../graphics/models.h"
+#include "../../../graphics/services.h"
 #include "../../../graphics/textures.h"
 #include "../../../gui/control/button.h"
 #include "../../../gui/control/label.h"
@@ -154,7 +155,7 @@ shared_ptr<ModelSceneNode> PortraitSelection::getCharacterModel(SceneGraph &scen
     if (cameraHook) {
         creature->setPosition(glm::vec3(0.0f, 0.0f, -cameraHook->getOrigin().z));
     }
-    auto model = sceneGraph.newModel(_services.models.get("cghead_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(_services.graphics.models.get("cghead_light"), ModelUsage::GUI);
     model->attach("cghead_light", creatureModel);
 
     return move(model);

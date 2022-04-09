@@ -25,6 +25,7 @@
 #include "../../common/streamutil.h"
 #include "../../common/timer.h"
 #include "../../graphics/models.h"
+#include "../../graphics/services.h"
 #include "../../graphics/textures.h"
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
@@ -141,7 +142,7 @@ void Creature::updateModel() {
     if (bodyModelName.empty()) {
         return;
     }
-    auto replacement = _services.models.get(bodyModelName);
+    auto replacement = _services.graphics.models.get(bodyModelName);
     if (!replacement) {
         return;
     }
@@ -1048,7 +1049,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (modelName.empty()) {
         return nullptr;
     }
-    shared_ptr<Model> model(_services.models.get(modelName));
+    shared_ptr<Model> model(_services.graphics.models.get(modelName));
     if (!model) {
         return nullptr;
     }
@@ -1067,14 +1068,14 @@ void Creature::finalizeModel(ModelSceneNode &body) {
 
     if (!_envmap.empty()) {
         if (_envmap == "default") {
-            body.setEnvironmentMap(_services.textures.defaultCubemapRGB());
+            body.setEnvironmentMap(_services.graphics.textures.defaultCubemapRGB());
         } else {
-            body.setEnvironmentMap(_services.textures.get(_envmap, TextureUsage::EnvironmentMap));
+            body.setEnvironmentMap(_services.graphics.textures.get(_envmap, TextureUsage::EnvironmentMap));
         }
     }
     string bodyTextureName(getBodyTextureName());
     if (!bodyTextureName.empty()) {
-        shared_ptr<Texture> texture(_services.textures.get(bodyTextureName, TextureUsage::Diffuse));
+        shared_ptr<Texture> texture(_services.graphics.textures.get(bodyTextureName, TextureUsage::Diffuse));
         if (texture) {
             body.setDiffuseMap(texture);
         }
@@ -1085,14 +1086,14 @@ void Creature::finalizeModel(ModelSceneNode &body) {
     shared_ptr<Model> maskModel;
     string maskModelName(getMaskModelName());
     if (!maskModelName.empty()) {
-        maskModel = _services.models.get(maskModelName);
+        maskModel = _services.graphics.models.get(maskModelName);
     }
 
     // Head
 
     string headModelName(getHeadModelName());
     if (!headModelName.empty()) {
-        shared_ptr<Model> headModel(_services.models.get(headModelName));
+        shared_ptr<Model> headModel(_services.graphics.models.get(headModelName));
         if (headModel) {
             shared_ptr<ModelSceneNode> headSceneNode(sceneGraph.newModel(headModel, ModelUsage::Creature, this));
             body.attach(g_headHookNode, headSceneNode);
@@ -1107,7 +1108,7 @@ void Creature::finalizeModel(ModelSceneNode &body) {
 
     string rightWeaponModelName(getWeaponModelName(InventorySlot::rightWeapon));
     if (!rightWeaponModelName.empty()) {
-        shared_ptr<Model> weaponModel(_services.models.get(rightWeaponModelName));
+        shared_ptr<Model> weaponModel(_services.graphics.models.get(rightWeaponModelName));
         if (weaponModel) {
             shared_ptr<ModelSceneNode> weaponSceneNode(sceneGraph.newModel(weaponModel, ModelUsage::Equipment, this));
             body.attach(g_rightHandNode, move(weaponSceneNode));
@@ -1118,7 +1119,7 @@ void Creature::finalizeModel(ModelSceneNode &body) {
 
     string leftWeaponModelName(getWeaponModelName(InventorySlot::leftWeapon));
     if (!leftWeaponModelName.empty()) {
-        shared_ptr<Model> weaponModel(_services.models.get(leftWeaponModelName));
+        shared_ptr<Model> weaponModel(_services.graphics.models.get(leftWeaponModelName));
         if (weaponModel) {
             shared_ptr<ModelSceneNode> weaponSceneNode(sceneGraph.newModel(weaponModel, ModelUsage::Equipment, this));
             body.attach(g_leftHandNode, move(weaponSceneNode));
@@ -1185,7 +1186,7 @@ string Creature::getBodyTextureName() const {
         bool texFound = false;
         if (bodyItem) {
             string tmp(str(boost::format("%s%02d") % texName % bodyItem->textureVariation()));
-            shared_ptr<Texture> texture(_services.textures.get(tmp, TextureUsage::Diffuse));
+            shared_ptr<Texture> texture(_services.graphics.textures.get(tmp, TextureUsage::Diffuse));
             if (texture) {
                 texName = move(tmp);
                 texFound = true;

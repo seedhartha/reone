@@ -33,19 +33,9 @@ struct AudioServices;
 
 namespace graphics {
 
-class Fonts;
-class GraphicsContext;
-class LipAnimations;
-class Meshes;
-class Models;
-class Pipeline;
-class Shaders;
-class Textures;
-class Uniforms;
-class Walkmeshes;
-class Window;
+struct GraphicsServices;
 
-} // namespace graphics
+}
 
 namespace scene {
 
@@ -97,17 +87,7 @@ struct Services {
     Visibilities &visibilities;
 
     audio::AudioServices &audio;
-    graphics::Fonts &fonts;
-    graphics::GraphicsContext &graphicsContext;
-    graphics::LipAnimations &lipAnimations;
-    graphics::Meshes &meshes;
-    graphics::Models &models;
-    graphics::Pipeline &pipeline;
-    graphics::Shaders &shaders;
-    graphics::Textures &textures;
-    graphics::Uniforms &uniforms;
-    graphics::Walkmeshes &walkmeshes;
-    graphics::Window &window;
+    graphics::GraphicsServices &graphics;
     scene::SceneGraphs &sceneGraphs;
     script::Scripts &scripts;
     resource::ResourceServices &resource;
@@ -130,17 +110,7 @@ struct Services {
         Surfaces &surfaces,
         Visibilities &visibilities,
         audio::AudioServices &audio,
-        graphics::Fonts &fonts,
-        graphics::GraphicsContext &graphicsContext,
-        graphics::LipAnimations &lipAnimations,
-        graphics::Meshes &meshes,
-        graphics::Models &models,
-        graphics::Pipeline &pipeline,
-        graphics::Shaders &shaders,
-        graphics::Textures &textures,
-        graphics::Uniforms &uniforms,
-        graphics::Walkmeshes &walkmeshes,
-        graphics::Window &window,
+        graphics::GraphicsServices &graphics,
         scene::SceneGraphs &sceneGraphs,
         script::Scripts &scripts,
         resource::ResourceServices &resource) :
@@ -162,17 +132,7 @@ struct Services {
         visibilities(visibilities),
 
         audio(audio),
-        fonts(fonts),
-        graphicsContext(graphicsContext),
-        lipAnimations(lipAnimations),
-        meshes(meshes),
-        models(models),
-        pipeline(pipeline),
-        shaders(shaders),
-        textures(textures),
-        uniforms(uniforms),
-        walkmeshes(walkmeshes),
-        window(window),
+        graphics(graphics),
         sceneGraphs(sceneGraphs),
         scripts(scripts),
         resource(resource) {

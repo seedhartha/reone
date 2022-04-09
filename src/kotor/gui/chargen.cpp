@@ -23,6 +23,7 @@
 #include "../../game/portraits.h"
 #include "../../game/services.h"
 #include "../../graphics/models.h"
+#include "../../graphics/services.h"
 #include "../../gui/control/label.h"
 #include "../../gui/sceneinitializer.h"
 #include "../../resource/resources.h"
@@ -422,7 +423,7 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
     creature->sceneNode()->setCullable(false);
     creature->updateModelAnimation();
 
-    auto model = sceneGraph.newModel(_services.models.get("cgbody_light"), ModelUsage::GUI);
+    auto model = sceneGraph.newModel(_services.graphics.models.get("cgbody_light"), ModelUsage::GUI);
     model->attach("cgbody_light", creature->sceneNode());
 
     return move(model);

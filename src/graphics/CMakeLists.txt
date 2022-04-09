@@ -55,6 +55,7 @@ set(GRAPHICS_HEADERS
     pixelutil.h
     renderbuffer.h
     scene.h
+    services.h
     shader.h
     shaderprogram.h
     shaders.h

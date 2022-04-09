@@ -33,6 +33,7 @@
 #include "../../graphics/fonts.h"
 #include "../../graphics/mesh.h"
 #include "../../graphics/meshes.h"
+#include "../../graphics/services.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/texture.h"
 #include "../../graphics/textures.h"
@@ -73,14 +74,14 @@ SelectionOverlay::SelectionOverlay(
 }
 
 void SelectionOverlay::load() {
-    _font = _services.fonts.get("dialogfont16x16");
-    _friendlyReticle = _services.textures.get("friendlyreticle", TextureUsage::GUI);
-    _friendlyReticle2 = _services.textures.get("friendlyreticle2", TextureUsage::GUI);
-    _hostileReticle = _services.textures.get("hostilereticle", TextureUsage::GUI);
-    _hostileReticle2 = _services.textures.get("hostilereticle2", TextureUsage::GUI);
-    _friendlyScroll = _services.textures.get("lbl_miscroll_f", TextureUsage::GUI);
-    _hostileScroll = _services.textures.get("lbl_miscroll_h", TextureUsage::GUI);
-    _hilightedScroll = _services.textures.get("lbl_miscroll_hi", TextureUsage::GUI);
+    _font = _services.graphics.fonts.get("dialogfont16x16");
+    _friendlyReticle = _services.graphics.textures.get("friendlyreticle", TextureUsage::GUI);
+    _friendlyReticle2 = _services.graphics.textures.get("friendlyreticle2", TextureUsage::GUI);
+    _hostileReticle = _services.graphics.textures.get("hostilereticle", TextureUsage::GUI);
+    _hostileReticle2 = _services.graphics.textures.get("hostilereticle2", TextureUsage::GUI);
+    _friendlyScroll = _services.graphics.textures.get("lbl_miscroll_f", TextureUsage::GUI);
+    _hostileScroll = _services.graphics.textures.get("lbl_miscroll_h", TextureUsage::GUI);
+    _hilightedScroll = _services.graphics.textures.get("lbl_miscroll_hi", TextureUsage::GUI);
     _reticleHeight = _friendlyReticle2->height();
 }
 
@@ -244,7 +245,7 @@ void SelectionOverlay::update() {
 }
 
 void SelectionOverlay::draw() {
-    _services.graphicsContext.withBlending(BlendMode::Normal, [this]() {
+    _services.graphics.graphicsContext.withBlending(BlendMode::Normal, [this]() {
         if (_hilightedObject) {
             drawReticle(_hilightedHostile ? _hostileReticle : _friendlyReticle, _hilightedScreenCoords);
         }
@@ -258,7 +259,7 @@ void SelectionOverlay::draw() {
 }
 
 void SelectionOverlay::drawReticle(shared_ptr<Texture> texture, const glm::vec3 &screenCoords) {
-    _services.textures.bind(*texture);
+    _services.graphics.textures.bind(*texture);
 
     const GraphicsOptions &opts = _game.options().graphics;
     int width = texture->width();
@@ -268,13 +269,13 @@ void SelectionOverlay::drawReticle(shared_ptr<Texture> texture, const glm::vec3 
     transform = glm::translate(transform, glm::vec3((opts.width * screenCoords.x) - width / 2, (opts.height * (1.0f - screenCoords.y)) - height / 2, 0.0f));
     transform = glm::scale(transform, glm::vec3(width, height, 1.0f));
 
-    _services.uniforms.setGeneral([this, transform](auto &general) {
+    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
-        general.projection = _services.window.getOrthoProjection();
+        general.projection = _services.graphics.window.getOrthoProjection();
         general.model = move(transform);
     });
-    _services.shaders.use(_services.shaders.gui());
-    _services.meshes.quad().draw();
+    _services.graphics.shaders.use(_services.graphics.shaders.gui());
+    _services.graphics.meshes.quad().draw();
 }
 
 void SelectionOverlay::drawTitleBar() {
@@ -294,15 +295,15 @@ void SelectionOverlay::drawTitleBar() {
         transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
         transform = glm::scale(transform, glm::vec3(kTitleBarWidth, barHeight, 1.0f));
 
-        _services.uniforms.setGeneral([this, transform](auto &general) {
+        _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
             general.resetLocals();
-            general.projection = _services.window.getOrthoProjection();
+            general.projection = _services.graphics.window.getOrthoProjection();
             general.model = move(transform);
             general.color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
             general.alpha = 0.5f;
         });
-        _services.shaders.use(_services.shaders.simpleColor());
-        _services.meshes.quad().draw();
+        _services.graphics.shaders.use(_services.graphics.shaders.simpleColor());
+        _services.graphics.meshes.quad().draw();
     }
     {
         float x = opts.width * _selectedScreenCoords.x;
@@ -328,14 +329,14 @@ void SelectionOverlay::drawHealthBar() {
     transform = glm::translate(transform, glm::vec3(x, y, 0.0f));
     transform = glm::scale(transform, glm::vec3(w, kHealthBarHeight, 1.0f));
 
-    _services.uniforms.setGeneral([this, transform](auto &general) {
+    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
-        general.projection = _services.window.getOrthoProjection();
+        general.projection = _services.graphics.window.getOrthoProjection();
         general.model = move(transform);
         general.color = glm::vec4(getColorFromSelectedObject(), 1.0f);
     });
-    _services.shaders.use(_services.shaders.simpleColor());
-    _services.meshes.quad().draw();
+    _services.graphics.shaders.use(_services.graphics.shaders.simpleColor());
+    _services.graphics.meshes.quad().draw();
 }
 
 void SelectionOverlay::drawActionBar() {
@@ -357,7 +358,7 @@ void SelectionOverlay::drawActionFrame(int index) {
     } else {
         frameTexture = _friendlyScroll;
     }
-    _services.textures.bind(*frameTexture);
+    _services.graphics.textures.bind(*frameTexture);
 
     float frameX, frameY;
     getActionScreenCoords(index, frameX, frameY);
@@ -366,13 +367,13 @@ void SelectionOverlay::drawActionFrame(int index) {
     transform = glm::translate(transform, glm::vec3(frameX, frameY, 0.0f));
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionHeight, 1.0f));
 
-    _services.uniforms.setGeneral([this, transform](auto &general) {
+    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
-        general.projection = _services.window.getOrthoProjection();
+        general.projection = _services.graphics.window.getOrthoProjection();
         general.model = move(transform);
     });
-    _services.shaders.use(_services.shaders.gui());
-    _services.meshes.quad().draw();
+    _services.graphics.shaders.use(_services.graphics.shaders.gui());
+    _services.graphics.meshes.quad().draw();
 }
 
 bool SelectionOverlay::getActionScreenCoords(int index, float &x, float &y) const {
@@ -395,7 +396,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     const ContextAction &action = slot.actions[slot.indexSelected];
     switch (action.type) {
     case ActionType::AttackObject:
-        texture = _services.textures.get(g_attackIcon, TextureUsage::GUI);
+        texture = _services.graphics.textures.get(g_attackIcon, TextureUsage::GUI);
         break;
     case ActionType::UseFeat: {
         shared_ptr<Feat> feat(_services.feats.get(action.feat));
@@ -417,7 +418,7 @@ void SelectionOverlay::drawActionIcon(int index) {
     if (!texture)
         return;
 
-    _services.textures.bind(*texture);
+    _services.graphics.textures.bind(*texture);
 
     float frameX, frameY;
     getActionScreenCoords(index, frameX, frameY);
@@ -429,13 +430,13 @@ void SelectionOverlay::drawActionIcon(int index) {
     transform = glm::translate(transform, glm::vec3(frameX, y, 0.0f));
     transform = glm::scale(transform, glm::vec3(kActionWidth, kActionWidth, 1.0f));
 
-    _services.uniforms.setGeneral([this, transform](auto &general) {
+    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
-        general.projection = _services.window.getOrthoProjection();
+        general.projection = _services.graphics.window.getOrthoProjection();
         general.model = move(transform);
     });
-    _services.shaders.use(_services.shaders.gui());
-    _services.meshes.quad().draw();
+    _services.graphics.shaders.use(_services.graphics.shaders.gui());
+    _services.graphics.meshes.quad().draw();
 }
 
 glm::vec3 SelectionOverlay::getColorFromSelectedObject() const {

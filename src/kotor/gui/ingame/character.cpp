@@ -22,6 +22,7 @@
 #include "../../../game/party.h"
 #include "../../../game/services.h"
 #include "../../../graphics/models.h"
+#include "../../../graphics/services.h"
 #include "../../../gui/sceneinitializer.h"
 #include "../../../scene/graphs.h"
 
@@ -270,7 +271,7 @@ shared_ptr<ModelSceneNode> CharacterMenu::getSceneModel(SceneGraph &sceneGraph) 
     character->loadAppearance();
     character->updateModelAnimation();
 
-    auto sceneModel = sceneGraph.newModel(_services.models.get("charmain_light"), ModelUsage::GUI);
+    auto sceneModel = sceneGraph.newModel(_services.graphics.models.get("charmain_light"), ModelUsage::GUI);
     sceneModel->attach("charmain_light", character->sceneNode());
 
     return move(sceneModel);

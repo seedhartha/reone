@@ -22,6 +22,7 @@
 #include "../../game/services.h"
 #include "../../graphics/context.h"
 #include "../../graphics/meshes.h"
+#include "../../graphics/services.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/uniforms.h"
@@ -57,13 +58,13 @@ void Map::loadProperties(const GffStruct &gffs) {
 
 void Map::loadTextures(const string &area) {
     string resRef("lbl_map" + area);
-    _areaTexture = _services.textures.get(resRef, TextureUsage::GUI);
+    _areaTexture = _services.graphics.textures.get(resRef, TextureUsage::GUI);
 
     if (!_arrowTexture) {
-        _arrowTexture = _services.textures.get(_arrowResRef, TextureUsage::GUI);
+        _arrowTexture = _services.graphics.textures.get(_arrowResRef, TextureUsage::GUI);
     }
     if (!_noteTexture) {
-        _noteTexture = _services.textures.get("whitetarget", TextureUsage::GUI);
+        _noteTexture = _services.graphics.textures.get("whitetarget", TextureUsage::GUI);
     }
 }
 
@@ -71,7 +72,7 @@ void Map::draw(Mode mode, const glm::vec4 &bounds) {
     if (!_areaTexture) {
         return;
     }
-    _services.graphicsContext.withBlending(BlendMode::Normal, [this, &mode, &bounds]() {
+    _services.graphics.graphicsContext.withBlending(BlendMode::Normal, [this, &mode, &bounds]() {
         drawArea(mode, bounds);
         drawNotes(mode, bounds);
         drawPartyLeader(mode, bounds);
@@ -84,7 +85,7 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         if (!partyLeader) {
             return;
         }
-        _services.textures.bind(*_areaTexture);
+        _services.graphics.textures.bind(*_areaTexture);
 
         glm::vec2 worldPos(partyLeader->position());
         glm::vec2 mapPos(getMapPosition(worldPos));
@@ -97,33 +98,33 @@ void Map::drawArea(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, topLeft);
         transform = glm::scale(transform, glm::vec3(_areaTexture->width(), _areaTexture->height(), 1.0f));
 
-        _services.uniforms.setGeneral([this, transform](auto &general) {
+        _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
             general.resetLocals();
-            general.projection = _services.window.getOrthoProjection();
+            general.projection = _services.graphics.window.getOrthoProjection();
             general.model = move(transform);
         });
-        _services.shaders.use(_services.shaders.gui());
+        _services.graphics.shaders.use(_services.graphics.shaders.gui());
 
         int height = _game.options().graphics.height;
         glm::ivec4 scissorBounds(bounds[0], height - (bounds[1] + bounds[3]), bounds[2], bounds[3]);
-        _services.graphicsContext.withScissorTest(scissorBounds, [&]() {
-            _services.meshes.quad().draw();
+        _services.graphics.graphicsContext.withScissorTest(scissorBounds, [&]() {
+            _services.graphics.meshes.quad().draw();
         });
 
     } else {
-        _services.textures.bind(*_areaTexture);
+        _services.graphics.textures.bind(*_areaTexture);
 
         glm::mat4 transform(1.0f);
         transform = glm::translate(transform, glm::vec3(bounds[0], bounds[1], 0.0f));
         transform = glm::scale(transform, glm::vec3(bounds[2], bounds[3], 1.0f));
 
-        _services.uniforms.setGeneral([this, transform](auto &general) {
+        _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
             general.resetLocals();
-            general.projection = _services.window.getOrthoProjection();
+            general.projection = _services.graphics.window.getOrthoProjection();
             general.model = move(transform);
         });
-        _services.shaders.use(_services.shaders.gui());
-        _services.meshes.quad().draw();
+        _services.graphics.shaders.use(_services.graphics.shaders.gui());
+        _services.graphics.meshes.quad().draw();
     }
 }
 
@@ -131,7 +132,7 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
     if (mode != Mode::Default) {
         return;
     }
-    _services.textures.bind(*_noteTexture);
+    _services.graphics.textures.bind(*_noteTexture);
 
     for (auto &object : _game.module()->area()->getObjectsByType(ObjectType::Waypoint)) {
         auto waypoint = static_pointer_cast<Waypoint>(object);
@@ -153,14 +154,14 @@ void Map::drawNotes(Mode mode, const glm::vec4 &bounds) {
         transform = glm::translate(transform, glm::vec3(notePos.x - 0.5f * noteSize, notePos.y - 0.5f * noteSize, 0.0f));
         transform = glm::scale(transform, glm::vec3(noteSize, noteSize, 1.0f));
 
-        _services.uniforms.setGeneral([this, transform, &selected](auto &general) {
+        _services.graphics.uniforms.setGeneral([this, transform, &selected](auto &general) {
             general.resetLocals();
-            general.projection = _services.window.getOrthoProjection();
+            general.projection = _services.graphics.window.getOrthoProjection();
             general.model = move(transform);
             general.color = glm::vec4(selected ? _game.getGUIColorHilight() : _game.getGUIColorBase(), 1.0f);
         });
-        _services.shaders.use(_services.shaders.gui());
-        _services.meshes.quad().draw();
+        _services.graphics.shaders.use(_services.graphics.shaders.gui());
+        _services.graphics.meshes.quad().draw();
     }
 }
 
@@ -196,7 +197,7 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     if (!partyLeader) {
         return;
     }
-    _services.textures.bind(*_arrowTexture);
+    _services.graphics.textures.bind(*_arrowTexture);
 
     glm::vec3 arrowPos(0.0f);
 
@@ -236,13 +237,13 @@ void Map::drawPartyLeader(Mode mode, const glm::vec4 &bounds) {
     transform = glm::translate(transform, glm::vec3(-0.5f * kArrowSize, -0.5f * kArrowSize, 0.0f));
     transform = glm::scale(transform, glm::vec3(kArrowSize, kArrowSize, 1.0f));
 
-    _services.uniforms.setGeneral([this, transform](auto &general) {
+    _services.graphics.uniforms.setGeneral([this, transform](auto &general) {
         general.resetLocals();
-        general.projection = _services.window.getOrthoProjection();
+        general.projection = _services.graphics.window.getOrthoProjection();
         general.model = move(transform);
     });
-    _services.shaders.use(_services.shaders.gui());
-    _services.meshes.quad().draw();
+    _services.graphics.shaders.use(_services.graphics.shaders.gui());
+    _services.graphics.meshes.quad().draw();
 }
 
 } // namespace kotor

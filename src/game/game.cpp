@@ -34,6 +34,7 @@
 #include "../../graphics/models.h"
 #include "../../graphics/pipeline.h"
 #include "../../graphics/renderbuffer.h"
+#include "../../graphics/services.h"
 #include "../../graphics/shaders.h"
 #include "../../graphics/textures.h"
 #include "../../graphics/uniforms.h"
@@ -103,8 +104,8 @@ int Game::run() {
 void Game::runMainLoop() {
     _ticks = SDL_GetTicks();
     while (!_quit) {
-        _services.window.processEvents(_quit);
-        if (!_services.window.isInFocus()) {
+        _services.graphics.window.processEvents(_quit);
+        if (!_services.graphics.window.isInFocus()) {
             continue;
         }
         update();
@@ -141,18 +142,18 @@ void Game::update() {
 }
 
 void Game::drawAll() {
-    _services.graphicsContext.clearColorDepth();
+    _services.graphics.graphicsContext.clearColorDepth();
 
     if (_movie) {
         _movie->draw();
     } else {
         drawWorld();
         drawGUI();
-        _services.window.drawCursor();
+        _services.graphics.window.drawCursor();
     }
 
     _profileOverlay->draw();
-    _services.window.swapBuffers();
+    _services.graphics.window.swapBuffers();
 }
 
 void Game::loadModule(const string &name, string entry) {
@@ -162,10 +163,10 @@ void Game::loadModule(const string &name, string entry) {
         loadInGameMenus();
 
         _services.soundSets.invalidate();
-        _services.textures.invalidate();
-        _services.models.invalidate();
-        _services.walkmeshes.invalidate();
-        _services.lipAnimations.invalidate();
+        _services.graphics.textures.invalidate();
+        _services.graphics.models.invalidate();
+        _services.graphics.walkmeshes.invalidate();
+        _services.graphics.lipAnimations.invalidate();
         _services.audio.files.invalidate();
         _services.scripts.invalidate();
 
@@ -251,9 +252,9 @@ void Game::loadDefaultParty() {
 void Game::setCursorType(CursorType type) {
     if (_cursorType != type) {
         if (type == CursorType::None) {
-            _services.window.setCursor(nullptr);
+            _services.graphics.window.setCursor(nullptr);
         } else {
-            _services.window.setCursor(_services.cursors.get(type));
+            _services.graphics.window.setCursor(_services.cursors.get(type));
         }
         _cursorType = type;
     }
@@ -267,11 +268,11 @@ void Game::playVideo(const string &name) {
 
     BikReader bik(
         path,
-        _services.graphicsContext,
-        _services.meshes,
-        _services.shaders,
-        _services.textures,
-        _services.uniforms,
+        _services.graphics.graphicsContext,
+        _services.graphics.meshes,
+        _services.graphics.shaders,
+        _services.graphics.textures,
+        _services.graphics.uniforms,
         _services.audio.player);
     bik.load();
 
@@ -299,17 +300,17 @@ void Game::playMusic(const string &resRef) {
 
 void Game::drawWorld() {
     auto &scene = _services.sceneGraphs.get(kSceneMain);
-    auto output = _services.pipeline.draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
+    auto output = _services.graphics.pipeline.draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
     if (!output) {
         return;
     }
-    _services.uniforms.setGeneral([](auto &general) {
+    _services.graphics.uniforms.setGeneral([](auto &general) {
         general.resetGlobals();
         general.resetLocals();
     });
-    _services.shaders.use(_services.shaders.simpleTexture());
-    _services.textures.bind(*output);
-    _services.meshes.quadNDC().draw();
+    _services.graphics.shaders.use(_services.graphics.shaders.simpleTexture());
+    _services.graphics.textures.bind(*output);
+    _services.graphics.meshes.quadNDC().draw();
 }
 
 void Game::toggleInGameCameraType() {
@@ -607,7 +608,7 @@ void Game::setPaused(bool paused) {
 }
 
 void Game::setRelativeMouseMode(bool relative) {
-    _services.window.setRelativeMouseMode(relative);
+    _services.graphics.window.setRelativeMouseMode(relative);
 }
 
 void Game::withLoadingScreen(const string &imageResRef, const function<void()> &block) {

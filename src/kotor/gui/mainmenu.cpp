@@ -23,6 +23,7 @@
 #include "../../game/party.h"
 #include "../../game/services.h"
 #include "../../graphics/models.h"
+#include "../../graphics/services.h"
 #include "../../gui/sceneinitializer.h"
 #include "../../scene/graphs.h"
 #include "../../scene/types.h"
@@ -163,7 +164,7 @@ void MainMenu::setup3DView() {
 }
 
 shared_ptr<ModelSceneNode> MainMenu::getKotorModel(SceneGraph &sceneGraph) {
-    return sceneGraph.newModel(_services.models.get("mainmenu"), ModelUsage::GUI);
+    return sceneGraph.newModel(_services.graphics.models.get("mainmenu"), ModelUsage::GUI);
 }
 
 void MainMenu::startModuleSelection() {

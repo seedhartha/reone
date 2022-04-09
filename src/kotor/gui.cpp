@@ -21,6 +21,7 @@
 #include "../audio/services.h"
 #include "../game/guisounds.h"
 #include "../game/services.h"
+#include "../graphics/services.h"
 #include "../graphics/textures.h"
 #include "../resource/services.h"
 
@@ -42,14 +43,14 @@ GameGUI::GameGUI(KotOR &game, Services &services) :
     GUI(
         game.options().graphics,
         services.sceneGraphs,
-        services.fonts,
-        services.graphicsContext,
-        services.meshes,
-        services.pipeline,
-        services.shaders,
-        services.textures,
-        services.uniforms,
-        services.window,
+        services.graphics.fonts,
+        services.graphics.graphicsContext,
+        services.graphics.meshes,
+        services.graphics.pipeline,
+        services.graphics.shaders,
+        services.graphics.textures,
+        services.graphics.uniforms,
+        services.graphics.window,
         services.resource.gffs,
         services.resource.resources,
         services.resource.strings),

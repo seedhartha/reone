@@ -26,6 +26,7 @@
 #include "../../graphics/animation.h"
 #include "../../graphics/lipanimations.h"
 #include "../../graphics/models.h"
+#include "../../graphics/services.h"
 #include "../../gui/control/listbox.h"
 #include "../../resource/resources.h"
 
@@ -78,7 +79,7 @@ void Conversation::loadConversationBackground() {
 
 void Conversation::loadCameraModel() {
     string modelResRef(_dialog->cameraModel);
-    _cameraModel = modelResRef.empty() ? nullptr : _services.models.get(modelResRef);
+    _cameraModel = modelResRef.empty() ? nullptr : _services.graphics.models.get(modelResRef);
 }
 
 void Conversation::onStart() {
@@ -165,14 +166,14 @@ void Conversation::loadVoiceOver() {
     string voiceResRef;
     if (!_currentEntry->sound.empty()) {
         voiceResRef = _currentEntry->sound;
-        _lipAnimation = _services.lipAnimations.get(_currentEntry->sound);
+        _lipAnimation = _services.graphics.lipAnimations.get(_currentEntry->sound);
     }
     if (!_currentEntry->voResRef.empty()) {
         if (voiceResRef.empty()) {
             voiceResRef = _currentEntry->voResRef;
         }
         if (!_lipAnimation) {
-            _lipAnimation = _services.lipAnimations.get(_currentEntry->voResRef);
+            _lipAnimation = _services.graphics.lipAnimations.get(_currentEntry->voResRef);
         }
     }
     if (!voiceResRef.empty()) {
