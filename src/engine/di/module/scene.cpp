@@ -17,8 +17,8 @@
 
 #include "scene.h"
 
+#include "../../game/kotor/types.h"
 #include "../../game/types.h"
-#include "../../kotor/types.h"
 
 #include "audio.h"
 #include "graphics.h"
