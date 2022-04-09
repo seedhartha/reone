@@ -15,31 +15,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "audio.h"
-
-#include "resource.h"
-
-using namespace std;
-
-using namespace reone::audio;
+#pragma once
 
 namespace reone {
 
-void AudioModule::init() {
-    _audioFiles = make_unique<AudioFiles>(_resource.resources());
-    _audioContext = make_unique<AudioContext>();
-    _audioPlayer = make_unique<AudioPlayer>(_options, *_audioFiles);
+namespace audio {
 
-    _audioServices = make_unique<AudioServices>(*_audioContext, *_audioFiles, *_audioPlayer);
+class AudioContext;
+class AudioFiles;
+class AudioPlayer;
 
-    _audioContext->init();
-}
+struct AudioServices {
+    AudioContext &context;
+    AudioFiles &files;
+    AudioPlayer &player;
 
-void AudioModule::deinit() {
-    _audioServices.reset();
-    _audioPlayer.reset();
-    _audioContext.reset();
-    _audioFiles.reset();
-}
+    AudioServices(
+        AudioContext &context,
+        AudioFiles &files,
+        AudioPlayer &player) :
+        context(context),
+        files(files),
+        player(player) {
+    }
+};
+
+} // namespace audio
 
 } // namespace reone
