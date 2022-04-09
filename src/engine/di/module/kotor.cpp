@@ -68,7 +68,7 @@ void KotorModule::init() {
         *_spells,
         *_surfaces,
         *_visibilities,
-        _audio.audioServices(),
+        _audio.services(),
         _graphics.fonts(),
         _graphics.graphicsContext(),
         _graphics.lipAnimations(),
@@ -82,10 +82,7 @@ void KotorModule::init() {
         _graphics.window(),
         _scene.sceneGraphs(),
         _script.scripts(),
-        _resource.gffs(),
-        _resource.resources(),
-        _resource.strings(),
-        _resource.twoDas());
+        _resource.services());
 
     _game = newGame();
 

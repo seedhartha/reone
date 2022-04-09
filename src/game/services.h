@@ -21,12 +21,9 @@ namespace reone {
 
 namespace resource {
 
-class Gffs;
-class Resources;
-class Strings;
-class TwoDas;
+struct ResourceServices;
 
-} // namespace resource
+}
 
 namespace audio {
 
@@ -113,10 +110,7 @@ struct Services {
     graphics::Window &window;
     scene::SceneGraphs &sceneGraphs;
     script::Scripts &scripts;
-    resource::Gffs &gffs;
-    resource::Resources &resources;
-    resource::Strings &strings;
-    resource::TwoDas &twoDas;
+    resource::ResourceServices &resource;
 
     Services(
         CameraStyles &cameraStyles,
@@ -149,10 +143,7 @@ struct Services {
         graphics::Window &window,
         scene::SceneGraphs &sceneGraphs,
         script::Scripts &scripts,
-        resource::Gffs &gffs,
-        resource::Resources &resources,
-        resource::Strings &strings,
-        resource::TwoDas &twoDas) :
+        resource::ResourceServices &resource) :
         cameraStyles(cameraStyles),
         classes(classes),
         dialogs(dialogs),
@@ -184,10 +175,7 @@ struct Services {
         window(window),
         sceneGraphs(sceneGraphs),
         scripts(scripts),
-        gffs(gffs),
-        resources(resources),
-        strings(strings),
-        twoDas(twoDas) {
+        resource(resource) {
     }
 };
 

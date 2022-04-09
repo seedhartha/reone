@@ -21,6 +21,7 @@
 #include "../../common/logutil.h"
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
+#include "../../resource/services.h"
 
 #include "../action/attack.h"
 #include "../action/factory.h"
@@ -81,12 +82,12 @@ void Module::loadArea(const GffStruct &ifo, bool fromSave) {
 
     _area = _game.objectFactory().newArea();
 
-    shared_ptr<GffStruct> are(_services.gffs.get(_info.entryArea, ResourceType::Are));
+    shared_ptr<GffStruct> are(_services.resource.gffs.get(_info.entryArea, ResourceType::Are));
     if (!are) {
         throw ValidationException("Area ARE file not found");
     }
 
-    shared_ptr<GffStruct> git(_services.gffs.get(_info.entryArea, ResourceType::Git));
+    shared_ptr<GffStruct> git(_services.resource.gffs.get(_info.entryArea, ResourceType::Git));
     if (!git) {
         throw ValidationException("Area GIT file not found");
     }

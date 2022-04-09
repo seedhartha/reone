@@ -29,10 +29,14 @@ void ResourceModule::init() {
     _twoDas = make_unique<TwoDas>(*_resources);
     _gffs = make_unique<Gffs>(*_resources);
 
+    _services = make_unique<ResourceServices>(*_gffs, *_resources, *_strings, *_twoDas);
+
     _strings->init(_gamePath);
 }
 
 void ResourceModule::deinit() {
+    _services.reset();
+
     _gffs.reset();
     _twoDas.reset();
     _strings.reset();

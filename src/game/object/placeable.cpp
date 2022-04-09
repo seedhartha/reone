@@ -23,6 +23,7 @@
 #include "../../resource/2das.h"
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
+#include "../../resource/services.h"
 #include "../../resource/strings.h"
 #include "../../scene/graphs.h"
 #include "../../scene/node/model.h"
@@ -50,12 +51,12 @@ void Placeable::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Placeable::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utp(_services.gffs.get(resRef, ResourceType::Utp));
+    shared_ptr<GffStruct> utp(_services.resource.gffs.get(resRef, ResourceType::Utp));
     if (!utp) {
         return;
     }
     loadUTP(*utp);
-    shared_ptr<TwoDA> placeables(_services.twoDas.get("placeables"));
+    shared_ptr<TwoDA> placeables(_services.resource.twoDas.get("placeables"));
     string modelName(boost::to_lower_copy(placeables->getString(_appearance, "modelname")));
 
     auto model = _services.models.get(modelName);
@@ -100,7 +101,7 @@ void Placeable::runOnInvDisturbed(shared_ptr<Object> triggerrer) {
 
 void Placeable::loadUTP(const GffStruct &utp) {
     _tag = boost::to_lower_copy(utp.getString("Tag"));
-    _name = _services.strings.get(utp.getInt("LocName"));
+    _name = _services.resource.strings.get(utp.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utp.getString("TemplateResRef"));
     _conversation = boost::to_lower_copy(utp.getString("Conversation"));
     _interruptable = utp.getBool("Interruptable");

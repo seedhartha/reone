@@ -19,6 +19,7 @@
 
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
+#include "../../resource/services.h"
 #include "../../resource/strings.h"
 
 #include "../game.h"
@@ -40,7 +41,7 @@ void Waypoint::loadFromGIT(const GffStruct &gffs) {
 
     _tag = gffs.getString("Tag");
     _hasMapNote = gffs.getBool("HasMapNote");
-    _mapNote = _services.strings.get(gffs.getInt("MapNote"));
+    _mapNote = _services.resource.strings.get(gffs.getInt("MapNote"));
     _mapNoteEnabled = gffs.getBool("MapNoteEnabled");
     _tag = boost::to_lower_copy(gffs.getString("Tag"));
 
@@ -48,7 +49,7 @@ void Waypoint::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Waypoint::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utw(_services.gffs.get(resRef, ResourceType::Utw));
+    shared_ptr<GffStruct> utw(_services.resource.gffs.get(resRef, ResourceType::Utw));
     if (utw) {
         loadUTW(*utw);
     }
@@ -70,9 +71,9 @@ void Waypoint::loadUTW(const GffStruct &utw) {
     _appearance = utw.getInt("Appearance");
     _blueprintResRef = boost::to_lower_copy(utw.getString("TemplateResRef"));
     _tag = boost::to_lower_copy(utw.getString("Tag"));
-    _name = _services.strings.get(utw.getInt("LocalizedName"));
+    _name = _services.resource.strings.get(utw.getInt("LocalizedName"));
     _hasMapNote = utw.getBool("HasMapNote");
-    _mapNote = _services.strings.get(utw.getInt("MapNote"));
+    _mapNote = _services.resource.strings.get(utw.getInt("MapNote"));
     _mapNoteEnabled = utw.getInt("MapNoteEnabled");
 
     // Unused fields:

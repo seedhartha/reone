@@ -22,6 +22,7 @@
 #include "../game/guisounds.h"
 #include "../game/services.h"
 #include "../graphics/textures.h"
+#include "../resource/services.h"
 
 #include "kotor.h"
 
@@ -49,9 +50,9 @@ GameGUI::GameGUI(KotOR &game, Services &services) :
         services.textures,
         services.uniforms,
         services.window,
-        services.gffs,
-        services.resources,
-        services.strings),
+        services.resource.gffs,
+        services.resource.resources,
+        services.resource.strings),
     _game(game),
     _services(services) {
 }

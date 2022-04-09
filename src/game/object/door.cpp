@@ -24,6 +24,7 @@
 #include "../../resource/2das.h"
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
+#include "../../resource/services.h"
 #include "../../resource/strings.h"
 #include "../../scene/graphs.h"
 #include "../../scene/node/model.h"
@@ -51,18 +52,18 @@ void Door::loadFromGIT(const GffStruct &gffs) {
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
     _linkedToFlags = gffs.getInt("LinkedToFlags");
-    _transitionDestin = _services.strings.get(gffs.getInt("TransitionDestin"));
+    _transitionDestin = _services.resource.strings.get(gffs.getInt("TransitionDestin"));
 
     loadTransformFromGIT(gffs);
 }
 
 void Door::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utd(_services.gffs.get(resRef, ResourceType::Utd));
+    shared_ptr<GffStruct> utd(_services.resource.gffs.get(resRef, ResourceType::Utd));
     if (!utd) {
         return;
     }
     loadUTD(*utd);
-    shared_ptr<TwoDA> doors(_services.twoDas.get("genericdoors"));
+    shared_ptr<TwoDA> doors(_services.resource.twoDas.get("genericdoors"));
     string modelName(boost::to_lower_copy(doors->getString(_genericType, "modelname")));
 
     auto model = _services.models.get(modelName);
@@ -154,7 +155,7 @@ void Door::setLocked(bool locked) {
 
 void Door::loadUTD(const GffStruct &utd) {
     _tag = boost::to_lower_copy(utd.getString("Tag"));
-    _name = _services.strings.get(utd.getInt("LocName"));
+    _name = _services.resource.strings.get(utd.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(utd.getString("TemplateResRef"));
     _autoRemoveKey = utd.getBool("AutoRemoveKey");
     _conversation = boost::to_lower_copy(utd.getString("Conversation"));

@@ -31,6 +31,7 @@
 #include "../../resource/2das.h"
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
+#include "../../resource/services.h"
 #include "../../resource/strings.h"
 #include "../../scene/collision.h"
 #include "../../scene/graphs.h"
@@ -127,7 +128,7 @@ void Area::load(string name, const GffStruct &are, const GffStruct &git, bool fr
 }
 
 void Area::loadARE(const GffStruct &are) {
-    _localizedName = _services.strings.get(are.getInt("Name"));
+    _localizedName = _services.resource.strings.get(are.getInt("Name"));
 
     loadCameraStyle(are);
     loadAmbientColor(are);
@@ -234,7 +235,7 @@ void Area::loadProperties(const GffStruct &git) {
     }
     int musicIdx = props->getInt("MusicDay");
     if (musicIdx) {
-        shared_ptr<TwoDA> musicTable(_services.twoDas.get("ambientmusic"));
+        shared_ptr<TwoDA> musicTable(_services.resource.twoDas.get("ambientmusic"));
         _music = musicTable->getString(musicIdx, "resource");
     }
 }

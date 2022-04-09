@@ -20,6 +20,7 @@
 #include "../../common/logutil.h"
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
+#include "../../resource/services.h"
 #include "../../resource/strings.h"
 #include "../../scene/graphs.h"
 #include "../../scene/node/trigger.h"
@@ -43,7 +44,7 @@ void Trigger::loadFromGIT(const GffStruct &gffs) {
     loadFromBlueprint(templateResRef);
 
     // _tag = boost::to_lower_copy(gffs.getString("Tag"));
-    _transitionDestin = _services.strings.get(gffs.getInt("TransitionDestin"));
+    _transitionDestin = _services.resource.strings.get(gffs.getInt("TransitionDestin"));
     _linkedToModule = boost::to_lower_copy(gffs.getString("LinkedToModule"));
     _linkedTo = boost::to_lower_copy(gffs.getString("LinkedTo"));
     _linkedToFlags = gffs.getInt("LinkedToFlags");
@@ -76,7 +77,7 @@ void Trigger::loadGeometryFromGIT(const GffStruct &gffs) {
 }
 
 void Trigger::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> utt(_services.gffs.get(resRef, ResourceType::Utt));
+    shared_ptr<GffStruct> utt(_services.resource.gffs.get(resRef, ResourceType::Utt));
     if (utt) {
         loadUTT(*utt);
     }
@@ -116,7 +117,7 @@ bool Trigger::isTenant(const std::shared_ptr<Object> &object) const {
 void Trigger::loadUTT(const GffStruct &utt) {
     _tag = boost::to_lower_copy(utt.getString("Tag"));
     _blueprintResRef = boost::to_lower_copy(utt.getString("TemplateResRef"));
-    _name = _services.strings.get(utt.getInt("LocalizedName"));
+    _name = _services.resource.strings.get(utt.getInt("LocalizedName"));
     _autoRemoveKey = utt.getBool("AutoRemoveKey"); // always 0, but could be useful
     _faction = utt.getEnum("Faction", Faction::Invalid);
     _keyName = utt.getString("KeyName");

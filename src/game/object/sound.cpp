@@ -23,6 +23,7 @@
 #include "../../resource/2das.h"
 #include "../../resource/gffs.h"
 #include "../../resource/resources.h"
+#include "../../resource/services.h"
 #include "../../resource/strings.h"
 #include "../../scene/graphs.h"
 #include "../../scene/node/sound.h"
@@ -47,7 +48,7 @@ void Sound::loadFromGIT(const GffStruct &gffs) {
 }
 
 void Sound::loadFromBlueprint(const string &resRef) {
-    shared_ptr<GffStruct> uts(_services.gffs.get(resRef, ResourceType::Uts));
+    shared_ptr<GffStruct> uts(_services.resource.gffs.get(resRef, ResourceType::Uts));
     if (!uts) {
         return;
     }
@@ -56,7 +57,7 @@ void Sound::loadFromBlueprint(const string &resRef) {
 
 void Sound::loadUTS(const GffStruct &uts) {
     _tag = boost::to_lower_copy(uts.getString("Tag"));
-    _name = _services.strings.get(uts.getInt("LocName"));
+    _name = _services.resource.strings.get(uts.getInt("LocName"));
     _blueprintResRef = boost::to_lower_copy(uts.getString("TemplateResRef"));
     _active = uts.getBool("Active");
     _continuous = uts.getBool("Continuous");
@@ -90,7 +91,7 @@ void Sound::loadUTS(const GffStruct &uts) {
 }
 
 void Sound::loadPriorityFromUTS(const GffStruct &uts) {
-    shared_ptr<TwoDA> priorityGroups(_services.twoDas.get("prioritygroups"));
+    shared_ptr<TwoDA> priorityGroups(_services.resource.twoDas.get("prioritygroups"));
     int priorityIdx = uts.getInt("Priority");
     _priority = priorityGroups->getInt(priorityIdx, "priority");
 }

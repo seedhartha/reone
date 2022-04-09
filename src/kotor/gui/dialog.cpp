@@ -28,6 +28,7 @@
 #include "../../gui/control/panel.h"
 #include "../../resource/2da.h"
 #include "../../resource/2das.h"
+#include "../../resource/services.h"
 #include "../../scene/types.h"
 #include "../../script/execution.h"
 
@@ -309,7 +310,7 @@ string DialogGUI::getStuntAnimationName(int ordinal) const {
 }
 
 AnimationType DialogGUI::getStuntAnimationType(int ordinal) const {
-    shared_ptr<TwoDA> animations(_services.twoDas.get("dialoganimations"));
+    shared_ptr<TwoDA> animations(_services.resource.twoDas.get("dialoganimations"));
     int index = ordinal - 10000;
 
     if (index < 0 || index >= animations->getRowCount()) {
