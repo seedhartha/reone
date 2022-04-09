@@ -29,6 +29,7 @@
 #include "../../resource/strings.h"
 #include "../../scene/graphs.h"
 #include "../../scene/node/model.h"
+#include "../../scene/services.h"
 #include "../../scene/types.h"
 #include "../../script/scripts.h"
 
@@ -71,7 +72,7 @@ void Door::loadFromBlueprint(const string &resRef) {
     if (!model) {
         return;
     }
-    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(_sceneName);
 
     auto modelSceneNode = sceneGraph.newModel(move(model), ModelUsage::Door);
     modelSceneNode->setUser(*this);

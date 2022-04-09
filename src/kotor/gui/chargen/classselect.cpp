@@ -31,6 +31,7 @@
 #include "../../../gui/sceneinitializer.h"
 #include "../../../resource/strings.h"
 #include "../../../scene/graphs.h"
+#include "../../../scene/services.h"
 
 #include "../../kotor.h"
 #include "../../types.h"
@@ -165,7 +166,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     string sceneName(kSceneClassSelect);
     sceneName += "." + to_string(index);
 
-    auto &sceneGraph = _services.sceneGraphs.get(sceneName);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(sceneName);
     float aspect = extent.width / static_cast<float>(extent.height);
 
     SceneInitializer(sceneGraph)

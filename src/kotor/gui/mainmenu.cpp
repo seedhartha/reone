@@ -26,6 +26,7 @@
 #include "../../graphics/services.h"
 #include "../../gui/sceneinitializer.h"
 #include "../../scene/graphs.h"
+#include "../../scene/services.h"
 #include "../../scene/types.h"
 
 #include "../kotor.h"
@@ -148,7 +149,7 @@ void MainMenu::setup3DView() {
         return;
     }
 
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMainMenu);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(kSceneMainMenu);
     const Control::Extent &extent = _binding.lbl3dView->extent();
     float aspect = extent.width / static_cast<float>(extent.height);
 

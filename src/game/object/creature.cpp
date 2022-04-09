@@ -34,6 +34,7 @@
 #include "../../resource/services.h"
 #include "../../resource/strings.h"
 #include "../../scene/graphs.h"
+#include "../../scene/services.h"
 #include "../../scene/types.h"
 #include "../../script/types.h"
 
@@ -1053,7 +1054,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
     if (!model) {
         return nullptr;
     }
-    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(_sceneName);
     auto sceneNode = sceneGraph.newModel(model, ModelUsage::Creature, this);
     sceneNode->setCullable(true);
     sceneNode->setDrawDistance(_game.options().graphics.drawDistance);
@@ -1062,7 +1063,7 @@ shared_ptr<ModelSceneNode> Creature::buildModel() {
 }
 
 void Creature::finalizeModel(ModelSceneNode &body) {
-    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(_sceneName);
 
     // Body texture
 

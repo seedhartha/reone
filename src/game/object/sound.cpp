@@ -27,6 +27,7 @@
 #include "../../resource/strings.h"
 #include "../../scene/graphs.h"
 #include "../../scene/node/sound.h"
+#include "../../scene/services.h"
 
 #include "../game.h"
 #include "../services.h"
@@ -103,7 +104,7 @@ void Sound::loadTransformFromGIT(const GffStruct &gffs) {
 
     updateTransform();
 
-    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(_sceneName);
     auto sceneNode = sceneGraph.newSound();
     sceneNode->setEnabled(_active);
     sceneNode->setPriority(_priority);

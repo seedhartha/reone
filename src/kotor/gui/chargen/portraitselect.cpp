@@ -32,6 +32,7 @@
 #include "../../../resource/resources.h"
 #include "../../../scene/graphs.h"
 #include "../../../scene/node/model.h"
+#include "../../../scene/services.h"
 
 #include "../../kotor.h"
 #include "../../types.h"
@@ -123,7 +124,7 @@ void PortraitSelection::setButtonColors(Control &control) {
 }
 
 void PortraitSelection::loadHeadModel() {
-    auto &sceneGraph = _services.sceneGraphs.get(kScenePortraitSelect);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(kScenePortraitSelect);
     float aspect = _binding.lblHead->extent().width / static_cast<float>(_binding.lblHead->extent().height);
 
     SceneInitializer(sceneGraph)

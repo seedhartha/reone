@@ -20,6 +20,7 @@
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
 #include "../../scene/graphs.h"
+#include "../../scene/services.h"
 
 #include "effect/factory.h"
 #include "game.h"
@@ -428,7 +429,7 @@ void Combat::fireProjectile(const shared_ptr<Creature> &attacker, const shared_p
     round.projectileDir = glm::normalize(projectileTarget - projectilePos);
 
     // Create and add a projectile to the scene graph
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(kSceneMain);
     round.projectile = sceneGraph.newModel(ammunitionType->model, ModelUsage::Projectile);
     round.projectile->signalEvent(kModelEventDetonate);
     round.projectile->setLocalTransform(glm::translate(projectilePos));
@@ -455,7 +456,7 @@ void Combat::resetProjectile(Round &round) {
     if (!round.projectile) {
         return;
     }
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(kSceneMain);
     sceneGraph.removeRoot(round.projectile);
     round.projectile.reset();
 }

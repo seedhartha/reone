@@ -28,6 +28,7 @@
 #include "../../resource/strings.h"
 #include "../../scene/graphs.h"
 #include "../../scene/node/model.h"
+#include "../../scene/services.h"
 #include "../../script/types.h"
 
 #include "../game.h"
@@ -64,7 +65,7 @@ void Placeable::loadFromBlueprint(const string &resRef) {
     if (!model) {
         return;
     }
-    auto &sceneGraph = _services.sceneGraphs.get(_sceneName);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(_sceneName);
 
     auto sceneNode = sceneGraph.newModel(move(model), ModelUsage::Placeable);
     sceneNode->setUser(*this);

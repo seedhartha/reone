@@ -70,8 +70,8 @@ void KotorModule::init() {
         *_visibilities,
         _audio.services(),
         _graphics.services(),
-        _scene.sceneGraphs(),
-        _script.scripts(),
+        _scene.services(),
+        _script.services(),
         _resource.services());
 
     _game = newGame();

@@ -19,6 +19,7 @@
 
 #include "../../graphics/options.h"
 #include "../../scene/graphs.h"
+#include "../../scene/services.h"
 
 namespace reone {
 
@@ -40,12 +41,16 @@ public:
 
     scene::SceneGraphs &sceneGraphs() { return *_sceneGraphs; }
 
+    scene::SceneServices &services() { return *_services; }
+
 private:
     graphics::GraphicsOptions &_options;
     AudioModule &_audio;
     GraphicsModule &_graphics;
 
     std::unique_ptr<scene::SceneGraphs> _sceneGraphs;
+
+    std::unique_ptr<scene::SceneServices> _services;
 };
 
 } // namespace reone

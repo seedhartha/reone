@@ -51,7 +51,9 @@
 #include "../../resource/resources.h"
 #include "../../resource/services.h"
 #include "../../scene/graphs.h"
+#include "../../scene/services.h"
 #include "../../script/scripts.h"
+#include "../../script/services.h"
 
 #include "combat.h"
 #include "cursors.h"
@@ -85,7 +87,7 @@ void Game::init() {
     auto walkableSurfaces = _services.surfaces.getWalkableSurfaces();
     auto walkcheckSurfaces = _services.surfaces.getWalkcheckSurfaces();
     auto lineOfSightSurfaces = _services.surfaces.getLineOfSightSurfaces();
-    for (auto &scene : _services.sceneGraphs.scenes()) {
+    for (auto &scene : _services.scene.sceneGraphs.scenes()) {
         scene.second->setWalkableSurfaces(walkableSurfaces);
         scene.second->setWalkcheckSurfaces(walkcheckSurfaces);
         scene.second->setLineOfSightSurfaces(lineOfSightSurfaces);
@@ -168,7 +170,7 @@ void Game::loadModule(const string &name, string entry) {
         _services.graphics.walkmeshes.invalidate();
         _services.graphics.lipAnimations.invalidate();
         _services.audio.files.invalidate();
-        _services.scripts.invalidate();
+        _services.script.scripts.invalidate();
 
         try {
             if (_module) {
@@ -182,7 +184,7 @@ void Game::loadModule(const string &name, string entry) {
             }
             drawAll();
 
-            _services.sceneGraphs.get(kSceneMain).clear();
+            _services.scene.sceneGraphs.get(kSceneMain).clear();
 
             auto maybeModule = _loadedModules.find(name);
             if (maybeModule != _loadedModules.end()) {
@@ -299,7 +301,7 @@ void Game::playMusic(const string &resRef) {
 }
 
 void Game::drawWorld() {
-    auto &scene = _services.sceneGraphs.get(kSceneMain);
+    auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
     auto output = _services.graphics.pipeline.draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
     if (!output) {
         return;
@@ -471,7 +473,7 @@ void Game::updateSceneGraph(float dt) {
     if (!camera) {
         return;
     }
-    auto &sceneGraph = _services.sceneGraphs.get(kSceneMain);
+    auto &sceneGraph = _services.scene.sceneGraphs.get(kSceneMain);
     sceneGraph.setActiveCamera(camera->sceneNode());
     sceneGraph.setUpdateRoots(!_paused);
     sceneGraph.setDrawWalkmeshes(isShowWalkmeshEnabled());
