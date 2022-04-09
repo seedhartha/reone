@@ -21,6 +21,7 @@
 #include "../../audio/files.h"
 #include "../../audio/options.h"
 #include "../../audio/player.h"
+#include "../../audio/services.h"
 
 namespace reone {
 
@@ -42,6 +43,8 @@ public:
     audio::AudioFiles &audioFiles() { return *_audioFiles; }
     audio::AudioPlayer &audioPlayer() { return *_audioPlayer; }
 
+    audio::AudioServices &audioServices() { return *_audioServices; }
+
 private:
     audio::AudioOptions &_options;
     ResourceModule &_resource;
@@ -49,6 +52,8 @@ private:
     std::unique_ptr<audio::AudioContext> _audioContext;
     std::unique_ptr<audio::AudioFiles> _audioFiles;
     std::unique_ptr<audio::AudioPlayer> _audioPlayer;
+
+    std::unique_ptr<audio::AudioServices> _audioServices;
 };
 
 } // namespace reone

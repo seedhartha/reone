@@ -18,6 +18,7 @@
 #include "gui.h"
 
 #include "../audio/player.h"
+#include "../audio/services.h"
 #include "../game/guisounds.h"
 #include "../game/services.h"
 #include "../graphics/textures.h"
@@ -121,12 +122,12 @@ string GameGUI::getResRef(const std::string &base) const {
 }
 
 void GameGUI::onClick(const string &control) {
-    _audioSource = _services.audioPlayer.play(_services.guiSounds.getOnClick(), AudioType::Sound);
+    _audioSource = _services.audio.player.play(_services.guiSounds.getOnClick(), AudioType::Sound);
 }
 
 void GameGUI::onFocusChanged(const string &control, bool focus) {
     if (focus) {
-        _audioSource = _services.audioPlayer.play(_services.guiSounds.getOnEnter(), AudioType::Sound);
+        _audioSource = _services.audio.player.play(_services.guiSounds.getOnEnter(), AudioType::Sound);
     }
 }
 

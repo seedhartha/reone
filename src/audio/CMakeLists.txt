@@ -20,6 +20,7 @@ set(AUDIO_HEADERS
     format/wavreader.h
     options.h
     player.h
+    services.h
     source.h
     stream.h
     types.h)

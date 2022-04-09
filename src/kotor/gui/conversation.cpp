@@ -19,6 +19,7 @@
 
 #include "../../audio/files.h"
 #include "../../audio/player.h"
+#include "../../audio/services.h"
 #include "../../common/logutil.h"
 #include "../../game/script/runner.h"
 #include "../../game/services.h"
@@ -175,7 +176,7 @@ void Conversation::loadVoiceOver() {
         }
     }
     if (!voiceResRef.empty()) {
-        _currentVoice = _services.audioPlayer.play(voiceResRef, AudioType::Voice);
+        _currentVoice = _services.audio.player.play(voiceResRef, AudioType::Voice);
     }
 }
 

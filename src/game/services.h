@@ -28,6 +28,12 @@ class TwoDas;
 
 } // namespace resource
 
+namespace audio {
+
+struct AudioServices;
+
+}
+
 namespace graphics {
 
 class Fonts;
@@ -43,14 +49,6 @@ class Walkmeshes;
 class Window;
 
 } // namespace graphics
-
-namespace audio {
-
-class AudioContext;
-class AudioFiles;
-class AudioPlayer;
-
-} // namespace audio
 
 namespace scene {
 
@@ -101,9 +99,7 @@ struct Services {
     Surfaces &surfaces;
     Visibilities &visibilities;
 
-    audio::AudioContext &audioContext;
-    audio::AudioFiles &audioFiles;
-    audio::AudioPlayer &audioPlayer;
+    audio::AudioServices &audio;
     graphics::Fonts &fonts;
     graphics::GraphicsContext &graphicsContext;
     graphics::LipAnimations &lipAnimations;
@@ -139,9 +135,7 @@ struct Services {
         Spells &spells,
         Surfaces &surfaces,
         Visibilities &visibilities,
-        audio::AudioContext &audioContext,
-        audio::AudioFiles &audioFiles,
-        audio::AudioPlayer &audioPlayer,
+        audio::AudioServices &audio,
         graphics::Fonts &fonts,
         graphics::GraphicsContext &graphicsContext,
         graphics::LipAnimations &lipAnimations,
@@ -176,9 +170,7 @@ struct Services {
         surfaces(surfaces),
         visibilities(visibilities),
 
-        audioContext(audioContext),
-        audioFiles(audioFiles),
-        audioPlayer(audioPlayer),
+        audio(audio),
         fonts(fonts),
         graphicsContext(graphicsContext),
         lipAnimations(lipAnimations),

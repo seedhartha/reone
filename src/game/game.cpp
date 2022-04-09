@@ -20,6 +20,7 @@
 #include "../../audio/context.h"
 #include "../../audio/files.h"
 #include "../../audio/player.h"
+#include "../../audio/services.h"
 #include "../../common/collectionutil.h"
 #include "../../common/exception/validation.h"
 #include "../../common/logutil.h"
@@ -164,7 +165,7 @@ void Game::loadModule(const string &name, string entry) {
         _services.models.invalidate();
         _services.walkmeshes.invalidate();
         _services.lipAnimations.invalidate();
-        _services.audioFiles.invalidate();
+        _services.audio.files.invalidate();
         _services.scripts.invalidate();
 
         try {
@@ -263,7 +264,14 @@ void Game::playVideo(const string &name) {
         return;
     }
 
-    BikReader bik(path, _services.graphicsContext, _services.meshes, _services.shaders, _services.textures, _services.uniforms, _services.audioPlayer);
+    BikReader bik(
+        path,
+        _services.graphicsContext,
+        _services.meshes,
+        _services.shaders,
+        _services.textures,
+        _services.uniforms,
+        _services.audio.player);
     bik.load();
 
     _movie = bik.movie();
@@ -387,7 +395,7 @@ void Game::updateMusic() {
     if (_music && _music->isPlaying()) {
         _music->update();
     } else {
-        _music = _services.audioPlayer.play(_musicResRef, AudioType::Music);
+        _music = _services.audio.player.play(_musicResRef, AudioType::Music);
     }
 }
 
@@ -452,7 +460,7 @@ void Game::updateCamera(float dt) {
         } else {
             listenerPosition = camera->sceneNode()->getOrigin();
         }
-        _services.audioContext.setListenerPosition(move(listenerPosition));
+        _services.audio.context.setListenerPosition(move(listenerPosition));
     }
 }
 

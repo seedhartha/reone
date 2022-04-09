@@ -18,6 +18,7 @@
 #include "creature.h"
 
 #include "../../audio/player.h"
+#include "../../audio/services.h"
 #include "../../common/exception/validation.h"
 #include "../../common/logutil.h"
 #include "../../common/randomutil.h"
@@ -479,7 +480,7 @@ void Creature::playSound(SoundSetEntry entry, bool positional) {
         return;
     }
     glm::vec3 position(_position + 1.7f);
-    _audioSourceVoice = _services.audioPlayer.play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
+    _audioSourceVoice = _services.audio.player.play(maybeSound->second, AudioType::Sound, false, 1.0f, positional, position);
 }
 
 void Creature::die() {
@@ -694,7 +695,7 @@ void Creature::onEventSignalled(const string &name) {
     }
     shared_ptr<AudioStream> sound(materialSounds[index]);
     if (sound) {
-        _audioSourceFootstep = _services.audioPlayer.play(sound, AudioType::Sound, false, 1.0f, true, _position);
+        _audioSourceFootstep = _services.audio.player.play(sound, AudioType::Sound, false, 1.0f, true, _position);
     }
 }
 
