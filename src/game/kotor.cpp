@@ -64,7 +64,6 @@
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
@@ -75,7 +74,7 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace kotor {
+namespace game {
 
 static constexpr char kKeyFilename[] = "chitin.key";
 static constexpr char kPatchFilename[] = "patch.erf";
@@ -499,6 +498,6 @@ void KotOR::getDefaultPartyMembers(string &member1, string &member2, string &mem
     member3.clear();
 }
 
-} // namespace kotor
+} // namespace game
 
 } // namespace reone

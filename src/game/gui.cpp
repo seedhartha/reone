@@ -17,29 +17,27 @@
 
 #include "gui.h"
 
-#include "../../audio/player.h"
-#include "../../audio/services.h"
-#include "../../graphics/services.h"
-#include "../../graphics/textures.h"
-#include "../../resource/services.h"
-#include "../../scene/services.h"
+#include "../audio/player.h"
+#include "../audio/services.h"
+#include "../graphics/services.h"
+#include "../graphics/textures.h"
+#include "../resource/services.h"
+#include "../scene/services.h"
 
-#include "../guisounds.h"
-#include "../services.h"
-
+#include "guisounds.h"
 #include "kotor.h"
+#include "services.h"
 
 using namespace std;
 
 using namespace reone::audio;
-using namespace reone::game;
 using namespace reone::graphics;
 using namespace reone::gui;
 using namespace reone::resource;
 
 namespace reone {
 
-namespace kotor {
+namespace game {
 
 GameGUI::GameGUI(KotOR &game, GameServices &services) :
     GUI(
@@ -121,7 +119,7 @@ void GameGUI::loadBackground(BackgroundType type) {
     _background = _textures.get(resRef, TextureUsage::Diffuse);
 }
 
-string GameGUI::getResRef(const std::string &base) const {
+string GameGUI::getResRef(const string &base) const {
     return _game.isTSL() ? base + "_p" : base;
 }
 
@@ -135,6 +133,6 @@ void GameGUI::onFocusChanged(const string &control, bool focus) {
     }
 }
 
-} // namespace kotor
+} // namespace game
 
 } // namespace reone

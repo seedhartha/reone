@@ -18,30 +18,29 @@
 
 #pragma once
 
-#include "../game.h"
-
-#include "gui/chargen.h"
-#include "gui/computer.h"
-#include "gui/container.h"
-#include "gui/conversation.h"
-#include "gui/dialog.h"
-#include "gui/hud.h"
-#include "gui/ingame.h"
-#include "gui/mainmenu.h"
-#include "gui/partyselect.h"
-#include "gui/saveload.h"
+#include "game.h"
+#include "kotor/gui/chargen.h"
+#include "kotor/gui/computer.h"
+#include "kotor/gui/container.h"
+#include "kotor/gui/conversation.h"
+#include "kotor/gui/dialog.h"
+#include "kotor/gui/hud.h"
+#include "kotor/gui/ingame.h"
+#include "kotor/gui/mainmenu.h"
+#include "kotor/gui/partyselect.h"
+#include "kotor/gui/saveload.h"
 
 namespace reone {
 
-namespace kotor {
+namespace game {
 
-class KotOR : public game::Game {
+class KotOR : public Game {
 public:
     KotOR(
         bool tsl,
         boost::filesystem::path path,
-        game::Options &options,
-        game::GameServices &services) :
+        Options &options,
+        GameServices &services) :
         Game(
             std::move(path),
             options,
@@ -54,15 +53,15 @@ public:
     void init() override;
 
     void openMainMenu() override;
-    void openSaveLoad(game::SaveLoadMode mode) override;
+    void openSaveLoad(SaveLoadMode mode) override;
     void openInGame() override;
-    void openInGameMenu(game::InGameMenuTab tab);
-    void openContainer(const std::shared_ptr<game::Object> &container) override;
-    void openPartySelection(const game::PartySelectionContext &ctx) override;
+    void openInGameMenu(InGameMenuTab tab);
+    void openContainer(const std::shared_ptr<Object> &container) override;
+    void openPartySelection(const PartySelectionContext &ctx) override;
     void openLevelUp();
 
     void startCharacterGeneration();
-    void startDialog(const std::shared_ptr<game::Object> &owner, const std::string &resRef) override;
+    void startDialog(const std::shared_ptr<Object> &owner, const std::string &resRef) override;
 
     void resumeConversation() override;
     void pauseConversation() override;
@@ -114,9 +113,9 @@ private:
 
     void getDefaultPartyMembers(std::string &member1, std::string &member2, std::string &member3) const override;
     gui::GUI *getScreenGUI() const override;
-    game::CameraType getConversationCamera(int &cameraId) const override;
+    CameraType getConversationCamera(int &cameraId) const override;
 };
 
-} // namespace kotor
+} // namespace game
 
 } // namespace reone
