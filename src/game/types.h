@@ -31,10 +31,17 @@ constexpr int kNpcPlayer = -1;
 constexpr int kEngineTypeInvalid = -1;
 constexpr float kDefaultFollowDistance = 5.0f;
 constexpr char kObjectTagPlayer[] = "player";
-constexpr char kSceneMain[] = "main";
+constexpr int kNumClasses = 6;
 
 constexpr float kSelectionDistance = 16.0f;
 constexpr float kSelectionDistance2 = kSelectionDistance * kSelectionDistance;
+
+constexpr char kSceneMain[] = "main";
+constexpr char kSceneMainMenu[] = "mainmenu";
+constexpr char kSceneCharGen[] = "chargen";
+constexpr char kSceneClassSelect[] = "classselect";
+constexpr char kScenePortraitSelect[] = "portraitselect";
+constexpr char kSceneCharacter[] = "character";
 
 enum class BackgroundType {
     None,

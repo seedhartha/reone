@@ -27,9 +27,9 @@
 #include "../../../object/factory.h"
 #include "../../../party.h"
 #include "../../../services.h"
+#include "../../../types.h"
 
 #include "../../kotor.h"
-#include "../../types.h"
 
 #include "../ingame.h"
 

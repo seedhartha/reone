@@ -19,9 +19,6 @@
 
 #include "../../audio/player.h"
 #include "../../common/logutil.h"
-#include "../../game/object/factory.h"
-#include "../../game/party.h"
-#include "../../game/services.h"
 #include "../../graphics/models.h"
 #include "../../graphics/services.h"
 #include "../../gui/sceneinitializer.h"
@@ -29,8 +26,12 @@
 #include "../../scene/services.h"
 #include "../../scene/types.h"
 
+#include "../../object/factory.h"
+#include "../../party.h"
+#include "../../services.h"
+#include "../../types.h"
+
 #include "../kotor.h"
-#include "../types.h"
 
 using namespace std;
 using namespace std::placeholders;
