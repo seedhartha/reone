@@ -17,43 +17,34 @@
 
 #pragma once
 
-#include "../../common/timer.h"
-#include "../../graphics/font.h"
-
-#include "../options.h"
+#include "../../gui.h"
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+
+}
+
 namespace game {
 
-struct GameServices;
-
-class ProfileOverlay {
+class MessagesMenu : public GameGUI {
 public:
-    ProfileOverlay(GameServices &services, Options &options) :
-        _services(services),
-        _options(options) {
-    }
+    MessagesMenu(KotOR &game, GameServices &services);
 
-    void init();
-
-    bool handle(const SDL_Event &event);
-    void update(float dt);
-    void draw();
+    void load() override;
 
 private:
-    GameServices &_services;
-    Options &_options;
+    struct Binding {
+        std::shared_ptr<gui::Button> btnExit;
 
-    bool _enabled {false};
+        // KotOR only
+        std::shared_ptr<gui::Button> btnShow;
+        // END KotOR only
+    } _binding;
 
-    uint64_t _frequency {0};
-    uint64_t _counter {0};
-    int _numFrames {0};
-    int _fps {0};
-
-    Timer _refreshTimer;
-    std::shared_ptr<graphics::Font> _font;
+    void bindControls();
 };
 
 } // namespace game

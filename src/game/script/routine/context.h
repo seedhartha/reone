@@ -17,43 +17,33 @@
 
 #pragma once
 
-#include "../../common/timer.h"
-#include "../../graphics/font.h"
-
-#include "../options.h"
-
 namespace reone {
+
+namespace script {
+
+class ExecutionContext;
+
+}
 
 namespace game {
 
 struct GameServices;
 
-class ProfileOverlay {
-public:
-    ProfileOverlay(GameServices &services, Options &options) :
-        _services(services),
-        _options(options) {
+class Game;
+
+struct RoutineContext {
+    Game &game;
+    GameServices &services;
+    script::ExecutionContext &execution;
+
+    RoutineContext(
+        Game &game,
+        GameServices &services,
+        script::ExecutionContext &execution) :
+        game(game),
+        services(services),
+        execution(execution) {
     }
-
-    void init();
-
-    bool handle(const SDL_Event &event);
-    void update(float dt);
-    void draw();
-
-private:
-    GameServices &_services;
-    Options &_options;
-
-    bool _enabled {false};
-
-    uint64_t _frequency {0};
-    uint64_t _counter {0};
-    int _numFrames {0};
-    int _fps {0};
-
-    Timer _refreshTimer;
-    std::shared_ptr<graphics::Font> _font;
 };
 
 } // namespace game

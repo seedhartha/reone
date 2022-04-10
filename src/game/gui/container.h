@@ -17,33 +17,43 @@
 
 #pragma once
 
-#include "../../gui/control/label.h"
-#include "../../gui/control/progressbar.h"
-
 #include "../gui.h"
+
+#include "../../gui/control/button.h"
+#include "../../gui/control/label.h"
+#include "../../gui/control/listbox.h"
+
+#include "../../game/object.h"
 
 namespace reone {
 
 namespace game {
 
-class LoadingScreen : public GameGUI {
+class ContainerGUI : public GameGUI {
 public:
-    LoadingScreen(KotOR &game, GameServices &services);
+    ContainerGUI(KotOR &game, GameServices &services);
 
     void load() override;
+    void open(std::shared_ptr<Object> contanier);
 
-    void setImage(const std::string &resRef);
-    void setProgress(int progress);
+    Object &container() const { return *_container; }
 
 private:
     struct Binding {
-        std::shared_ptr<gui::ProgressBar> pbProgress;
-        std::shared_ptr<gui::Label> lblHint;
-        std::shared_ptr<gui::Label> lblLogo;
-        std::shared_ptr<gui::Label> lblLoading;
+        std::shared_ptr<gui::Label> lblMessage;
+        std::shared_ptr<gui::ListBox> lbItems;
+        std::shared_ptr<gui::Button> btnOk;
+        std::shared_ptr<gui::Button> btnGiveItems;
+        std::shared_ptr<gui::Button> btnCancel;
     } _binding;
 
+    std::shared_ptr<Object> _container;
+
     void bindControls();
+    void configureItemsListBox();
+    void transferItemsToPlayer();
+
+    std::shared_ptr<graphics::Texture> getItemFrameTexture(int stackSize) const;
 };
 
 } // namespace game

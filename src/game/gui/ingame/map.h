@@ -17,33 +17,50 @@
 
 #pragma once
 
-#include "../../gui/control/label.h"
-#include "../../gui/control/progressbar.h"
-
-#include "../gui.h"
+#include "../../gui.h"
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+class Label;
+
+} // namespace gui
+
 namespace game {
 
-class LoadingScreen : public GameGUI {
+class Waypoint;
+
+class MapMenu : public GameGUI {
 public:
-    LoadingScreen(KotOR &game, GameServices &services);
+    MapMenu(KotOR &game, GameServices &services);
 
     void load() override;
+    void draw() override;
 
-    void setImage(const std::string &resRef);
-    void setProgress(int progress);
+    void refreshControls();
 
 private:
     struct Binding {
-        std::shared_ptr<gui::ProgressBar> pbProgress;
-        std::shared_ptr<gui::Label> lblHint;
-        std::shared_ptr<gui::Label> lblLogo;
-        std::shared_ptr<gui::Label> lblLoading;
+        std::shared_ptr<gui::Button> btnExit;
+        std::shared_ptr<gui::Button> btnUp;
+        std::shared_ptr<gui::Button> btnDown;
+        std::shared_ptr<gui::Button> btnReturn;
+        std::shared_ptr<gui::Label> lblArea;
+        std::shared_ptr<gui::Label> lblMap;
+        std::shared_ptr<gui::Label> lblMapNote;
+
+        // KotOR only
+        std::shared_ptr<gui::Button> btnPrtySlct;
+        // END KotOR only
     } _binding;
 
+    std::vector<std::shared_ptr<Waypoint>> _notes;
+    int _selectedNoteIdx {0};
+
     void bindControls();
+    void refreshSelectedNote();
 };
 
 } // namespace game
