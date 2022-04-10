@@ -59,6 +59,7 @@
 #include "gui/loadscreen.h"
 #include "gui/map.h"
 #include "gui/profileoverlay.h"
+#include "resourcelayout.h"
 #include "script/routines.h"
 
 using namespace std;
@@ -76,81 +77,20 @@ namespace reone {
 
 namespace game {
 
-static constexpr char kKeyFilename[] = "chitin.key";
-static constexpr char kPatchFilename[] = "patch.erf";
 static constexpr char kModulesDirectoryName[] = "modules";
-static constexpr char kTexturePackDirectoryName[] = "texturepacks";
-static constexpr char kMusicDirectoryName[] = "streammusic";
-static constexpr char kSoundsDirectoryName[] = "streamsounds";
-static constexpr char kWavesDirectoryName[] = "streamwaves";
-static constexpr char kVoiceDirectoryName[] = "streamvoice";
-static constexpr char kLipsDirectoryName[] = "lips";
-static constexpr char kLocalizationLipFilename[] = "localization";
-static constexpr char kOverrideDirectoryName[] = "override";
-
-static constexpr char kTexturePackFilenameGUI[] = "swpc_tex_gui.erf";
-static constexpr char kTexturePackFilenameHigh[] = "swpc_tex_tpa.erf";
-static constexpr char kTexturePackFilenameMedium[] = "swpc_tex_tpb.erf";
-static constexpr char kTexturePackFilenameLow[] = "swpc_tex_tpc.erf";
 
 static constexpr char kBlueprintResRefCarth[] = "p_carth";
 static constexpr char kBlueprintResRefBastila[] = "p_bastilla";
 static constexpr char kBlueprintResRefAtton[] = "p_atton";
 static constexpr char kBlueprintResRefKreia[] = "p_kreia";
 
-static constexpr char kExeFilenameKotor[] = "swkotor.exe";
-static constexpr char kExeFilenameTsl[] = "swkotor2.exe";
-
-static const vector<string> g_nonTransientLipFiles {"global.mod", "localization.mod"};
-
 static bool g_conversationsEnabled = true;
 
 void KotOR::initResourceProviders() {
-    static const unordered_map<TextureQuality, string> texPackByQuality {
-        {TextureQuality::High, kTexturePackFilenameHigh},
-        {TextureQuality::Medium, kTexturePackFilenameMedium},
-        {TextureQuality::Low, kTexturePackFilenameLow}};
-
     if (_tsl) {
-        _services.resource.resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
-
-        fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
-        _services.resource.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
-
-        auto texPack = texPackByQuality.find(_options.graphics.textureQuality)->second;
-        _services.resource.resources.indexErfFile(getPathIgnoreCase(texPacksPath, texPack));
-
-        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
-        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
-        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kVoiceDirectoryName));
-
-        fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-        _services.resource.resources.indexErfFile(getPathIgnoreCase(lipsPath, kLocalizationLipFilename));
-
-        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
-        _services.resource.resources.indexExeFile(getPathIgnoreCase(_path, kExeFilenameTsl));
-
+        _services.resourceLayout.initForTSL();
     } else {
-        _services.resource.resources.indexKeyFile(getPathIgnoreCase(_path, kKeyFilename));
-        _services.resource.resources.indexErfFile(getPathIgnoreCase(_path, kPatchFilename));
-
-        fs::path texPacksPath(getPathIgnoreCase(_path, kTexturePackDirectoryName));
-        _services.resource.resources.indexErfFile(getPathIgnoreCase(texPacksPath, kTexturePackFilenameGUI));
-
-        auto texPack = texPackByQuality.find(_options.graphics.textureQuality)->second;
-        _services.resource.resources.indexErfFile(getPathIgnoreCase(texPacksPath, texPack));
-
-        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kMusicDirectoryName));
-        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kSoundsDirectoryName));
-        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kWavesDirectoryName));
-
-        fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-        for (auto &filename : g_nonTransientLipFiles) {
-            _services.resource.resources.indexErfFile(getPathIgnoreCase(lipsPath, filename));
-        }
-
-        _services.resource.resources.indexDirectory(getPathIgnoreCase(_path, kOverrideDirectoryName));
-        _services.resource.resources.indexExeFile(getPathIgnoreCase(_path, kExeFilenameKotor));
+        _services.resourceLayout.initForKotOR();
     }
 }
 
@@ -220,31 +160,7 @@ void KotOR::start() {
 }
 
 void KotOR::loadModuleResources(const string &moduleName) {
-    _services.resource.twoDas.invalidate();
-    _services.resource.gffs.invalidate();
-    _services.resource.resources.clearTransientProviders();
-
-    fs::path modulesPath(getPathIgnoreCase(_path, kModulesDirectoryName));
-    if (modulesPath.empty()) {
-        throw ValidationException("Modules directory not found");
-    }
-
-    fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod"));
-    if (!modPath.empty()) {
-        _services.resource.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false));
-    } else {
-        _services.resource.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"));
-        _services.resource.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"));
-    }
-
-    fs::path lipsPath(getPathIgnoreCase(_path, kLipsDirectoryName));
-    if (!lipsPath.empty()) {
-        _services.resource.resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"));
-    }
-
-    if (isTSL()) {
-        _services.resource.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"));
-    }
+    _services.resourceLayout.loadModuleResources(moduleName, isTSL());
 }
 
 void KotOR::onModuleSelected(const string &module) {

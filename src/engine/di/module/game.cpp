@@ -44,6 +44,7 @@ void GameModule::init() {
     _paths = make_unique<Paths>(_resource.gffs());
     _portraits = make_unique<Portraits>(_graphics.textures(), _resource.twoDas());
     _reputes = make_unique<Reputes>(_resource.twoDas());
+    _resourceLayout = make_unique<ResourceLayout>(_gameOptions, _resource.services());
     _skills = make_unique<Skills>(_graphics.textures(), _resource.strings(), _resource.twoDas());
     _soundSets = make_unique<SoundSets>(_audio.audioFiles(), _resource.resources(), _resource.strings());
     _spells = make_unique<Spells>(_graphics.textures(), _resource.strings(), _resource.twoDas());
@@ -62,6 +63,7 @@ void GameModule::init() {
         *_paths,
         *_portraits,
         *_reputes,
+        *_resourceLayout,
         *_skills,
         *_soundSets,
         *_spells,

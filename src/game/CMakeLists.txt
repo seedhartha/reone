@@ -223,6 +223,7 @@ set(GAME_HEADERS
     portrait.h
     portraits.h
     reputes.h
+    resourcelayout.h
     room.h
     savedgame.h
     script/routine/argutil.h
@@ -427,6 +428,7 @@ set(GAME_SOURCES
     player.cpp
     portraits.cpp
     reputes.cpp
+    resourcelayout.cpp
     room.cpp
     script/routine/argutil.cpp
     script/routine/impl/action.cpp
