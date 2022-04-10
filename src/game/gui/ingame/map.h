@@ -34,7 +34,7 @@ class Waypoint;
 
 class MapMenu : public GameGUI {
 public:
-    MapMenu(KotOR &game, GameServices &services);
+    MapMenu(Game &game, GameServices &services);
 
     void load() override;
     void draw() override;

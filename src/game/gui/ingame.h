@@ -34,7 +34,7 @@ namespace game {
 
 class InGameMenu : public GameGUI {
 public:
-    InGameMenu(KotOR &game, GameServices &services);
+    InGameMenu(Game &game, GameServices &services);
 
     void load() override;
     bool handle(const SDL_Event &event) override;
@@ -103,6 +103,6 @@ private:
     void setTabLabelsFocusable(bool focusable);
 };
 
-} // namespace kotor
+} // namespace game
 
 } // namespace reone

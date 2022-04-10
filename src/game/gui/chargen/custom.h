@@ -36,7 +36,7 @@ class CustomCharacterGeneration : public GameGUI {
 public:
     CustomCharacterGeneration(
         CharacterGeneration &charGen,
-        KotOR &game,
+        Game &game,
         GameServices &services);
 
     void load() override;

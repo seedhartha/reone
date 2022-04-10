@@ -23,7 +23,7 @@
 
 #include "../../object/waypoint.h"
 
-#include "../../kotor.h"
+#include "../../game.h"
 
 using namespace std;
 
@@ -39,7 +39,7 @@ namespace game {
 
 static constexpr int kStrRefMapNote = 349;
 
-MapMenu::MapMenu(KotOR &game, GameServices &services) :
+MapMenu::MapMenu(Game &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("map");
 

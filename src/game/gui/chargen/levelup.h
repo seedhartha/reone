@@ -36,7 +36,7 @@ class LevelUpMenu : public GameGUI {
 public:
     LevelUpMenu(
         CharacterGeneration &charGen,
-        KotOR &game,
+        Game &game,
         GameServices &services);
 
     void load() override;

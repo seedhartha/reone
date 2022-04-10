@@ -20,7 +20,7 @@
 #include "../../../graphics/textures.h"
 #include "../../../resource/strings.h"
 
-#include "../../kotor.h"
+#include "../../game.h"
 #include "../../object/creature.h"
 #include "../../object/factory.h"
 #include "../../object/item.h"
@@ -71,7 +71,7 @@ static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
     {Equipment::Slot::WeapR2, 31379}};
 
 Equipment::Equipment(
-    KotOR &game,
+    Game &game,
     InGameMenu &inGameMenu,
     GameServices &services) :
     GameGUI(game, services),

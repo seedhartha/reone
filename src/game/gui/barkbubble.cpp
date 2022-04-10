@@ -17,7 +17,7 @@
 
 #include "barkbubble.h"
 
-#include "../kotor.h"
+#include "../game.h"
 
 using namespace std;
 
@@ -30,7 +30,7 @@ namespace reone {
 
 namespace game {
 
-BarkBubble::BarkBubble(KotOR &game, GameServices &services) :
+BarkBubble::BarkBubble(Game &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("barkbubble");
     _scaling = ScalingMode::PositionRelativeToCenter;

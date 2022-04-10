@@ -17,7 +17,7 @@
 
 #include "ingame.h"
 
-#include "../kotor.h"
+#include "../game.h"
 
 using namespace std;
 
@@ -32,7 +32,7 @@ namespace reone {
 namespace game {
 
 InGameMenu::InGameMenu(
-    KotOR &game,
+    Game &game,
     GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("top");

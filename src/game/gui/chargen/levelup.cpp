@@ -20,7 +20,7 @@
 #include "../../../gui/control/button.h"
 #include "../../../gui/control/label.h"
 
-#include "../../kotor.h"
+#include "../../game.h"
 
 #include "../chargen.h"
 
@@ -36,7 +36,7 @@ namespace game {
 
 LevelUpMenu::LevelUpMenu(
     CharacterGeneration &charGen,
-    KotOR &game,
+    Game &game,
     GameServices &services) :
     GameGUI(game, services),
     _charGen(charGen) {

@@ -54,7 +54,7 @@ public:
     };
 
     Equipment(
-        KotOR &game,
+        Game &game,
         InGameMenu &inGameMenu,
         GameServices &services);
 

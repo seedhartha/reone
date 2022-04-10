@@ -36,7 +36,7 @@ class QuickCharacterGeneration : public GameGUI {
 public:
     QuickCharacterGeneration(
         CharacterGeneration &charGen,
-        KotOR &game,
+        Game &game,
         GameServices &services);
 
     void load() override;

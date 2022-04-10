@@ -35,7 +35,7 @@ class ActionFactory;
 
 class HUD : public GameGUI {
 public:
-    HUD(KotOR &game, GameServices &services);
+    HUD(Game &game, GameServices &services);
 
     void load() override;
 

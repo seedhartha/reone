@@ -33,7 +33,7 @@ namespace game {
 
 class InventoryMenu : public GameGUI {
 public:
-    InventoryMenu(KotOR &game, GameServices &services);
+    InventoryMenu(Game &game, GameServices &services);
 
     void load() override;
 

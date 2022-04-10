@@ -37,7 +37,7 @@ class QuickOrCustom : public GameGUI {
 public:
     QuickOrCustom(
         CharacterGeneration &charGen,
-        KotOR &game,
+        Game &game,
         GameServices &services);
 
     void load() override;

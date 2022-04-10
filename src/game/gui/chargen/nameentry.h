@@ -38,7 +38,7 @@ class NameEntry : public GameGUI {
 public:
     NameEntry(
         CharacterGeneration &charGen,
-        KotOR &game,
+        Game &game,
         GameServices &services);
 
     void load() override;

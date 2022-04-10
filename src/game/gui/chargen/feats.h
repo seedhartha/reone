@@ -35,7 +35,7 @@ class CharGenFeats : public GameGUI {
 public:
     CharGenFeats(
         CharacterGeneration &charGen,
-        KotOR &game,
+        Game &game,
         GameServices &services);
 
     void load() override;

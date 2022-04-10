@@ -28,14 +28,14 @@ namespace game {
 
 struct GameServices;
 
-class KotOR;
+class Game;
 
 /**
  * Encapsulates game-specific GUI configuration.
  */
 class GameGUI : public gui::GUI {
 protected:
-    GameGUI(KotOR &game, GameServices &services);
+    GameGUI(Game &game, GameServices &services);
 
     void initForGame();
 
@@ -44,7 +44,7 @@ protected:
     std::string getResRef(const std::string &base) const;
 
 protected:
-    KotOR &_game;
+    Game &_game;
     GameServices &_services;
 
     void loadBackground(BackgroundType type);

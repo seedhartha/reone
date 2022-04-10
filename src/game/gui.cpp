@@ -24,8 +24,8 @@
 #include "../resource/services.h"
 #include "../scene/services.h"
 
+#include "game.h"
 #include "guisounds.h"
-#include "kotor.h"
 #include "services.h"
 
 using namespace std;
@@ -39,7 +39,7 @@ namespace reone {
 
 namespace game {
 
-GameGUI::GameGUI(KotOR &game, GameServices &services) :
+GameGUI::GameGUI(Game &game, GameServices &services) :
     GUI(
         game.options().graphics,
         services.scene.sceneGraphs,

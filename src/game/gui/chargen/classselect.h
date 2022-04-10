@@ -48,7 +48,7 @@ class ClassSelection : public GameGUI {
 public:
     ClassSelection(
         CharacterGeneration &charGen,
-        KotOR &game,
+        Game &game,
         GameServices &services);
 
     void load() override;

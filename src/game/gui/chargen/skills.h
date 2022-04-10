@@ -38,7 +38,7 @@ class CharGenSkills : public GameGUI {
 public:
     CharGenSkills(
         CharacterGeneration &charGen,
-        KotOR &game,
+        Game &game,
         GameServices &services);
 
     void load() override;

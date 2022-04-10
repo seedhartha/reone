@@ -23,7 +23,7 @@
 #include "../../../resource/strings.h"
 
 #include "../../d20/classes.h"
-#include "../../kotor.h"
+#include "../../game.h"
 #include "../../services.h"
 
 #include "../chargen.h"
@@ -62,7 +62,7 @@ static const unordered_map<Ability, int> g_descStrRefByAbility {
 
 CharGenAbilities::CharGenAbilities(
     CharacterGeneration &charGen,
-    KotOR &game,
+    Game &game,
     GameServices &services) :
     GameGUI(game, services),
     _charGen(charGen) {

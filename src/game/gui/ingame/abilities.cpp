@@ -26,7 +26,7 @@
 #include "../../../resource/services.h"
 #include "../../../resource/strings.h"
 
-#include "../../kotor.h"
+#include "../../game.h"
 #include "../../object/creature.h"
 #include "../../party.h"
 #include "../../services.h"
@@ -47,7 +47,7 @@ static constexpr int kStrRefSkillRank = 1579;
 static constexpr int kStrRefBonus = 32129;
 static constexpr int kStrRefTotalRank = 41904;
 
-AbilitiesMenu::AbilitiesMenu(KotOR &game, GameServices &services) :
+AbilitiesMenu::AbilitiesMenu(Game &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("abilities");
 

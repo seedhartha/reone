@@ -24,7 +24,7 @@
 #include "../../../scene/services.h"
 
 #include "../../d20/classes.h"
-#include "../../kotor.h"
+#include "../../game.h"
 #include "../../object/factory.h"
 #include "../../party.h"
 #include "../../services.h"
@@ -47,7 +47,7 @@ namespace reone {
 namespace game {
 
 CharacterMenu::CharacterMenu(
-    KotOR &game,
+    Game &game,
     InGameMenu &inGameMenu,
     GameServices &services) :
     GameGUI(game, services),

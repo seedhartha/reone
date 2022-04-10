@@ -28,7 +28,7 @@ namespace game {
 
 class BarkBubble : public GameGUI {
 public:
-    BarkBubble(KotOR &game, GameServices &services);
+    BarkBubble(Game &game, GameServices &services);
 
     void load() override;
     void update(float dt) override;
