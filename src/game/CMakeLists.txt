@@ -157,12 +157,13 @@ set(GAME_HEADERS
     format/ssfwriter.h
     format/visreader.h
     game.h
+    gui.h
     gui/console.h
     gui/loadscreen.h
     gui/map.h
     gui/profileoverlay.h
     guisounds.h
-    kotor/gui.h
+    kotor.h
     kotor/gui/barkbubble.h
     kotor/gui/chargen.h
     kotor/gui/chargen/abilities.h
@@ -197,7 +198,6 @@ set(GAME_HEADERS
     kotor/gui/profileoverlay.h
     kotor/gui/saveload.h
     kotor/gui/selectoverlay.h
-    kotor/kotor.h
     kotor/script/routine/argutil.h
     kotor/script/routine/context.h
     kotor/script/routine/declarations.h
@@ -370,8 +370,9 @@ set(GAME_SOURCES
     format/ssfwriter.cpp
     format/visreader.cpp
     game.cpp
+    gui.cpp
     guisounds.cpp
-    kotor/gui.cpp
+    kotor.cpp
     kotor/gui/barkbubble.cpp
     kotor/gui/chargen.cpp
     kotor/gui/chargen/abilities.cpp
@@ -406,7 +407,6 @@ set(GAME_SOURCES
     kotor/gui/profileoverlay.cpp
     kotor/gui/saveload.cpp
     kotor/gui/selectoverlay.cpp
-    kotor/kotor.cpp
     kotor/script/routine/argutil.cpp
     kotor/script/routine/impl/action.cpp
     kotor/script/routine/impl/effect.cpp

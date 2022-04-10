@@ -17,20 +17,16 @@
 
 #pragma once
 
-#include "../../audio/source.h"
-#include "../../gui/gui.h"
+#include "../audio/source.h"
+#include "../gui/gui.h"
 
-#include "../types.h"
+#include "types.h"
 
 namespace reone {
 
 namespace game {
 
 struct GameServices;
-
-}
-
-namespace kotor {
 
 class KotOR;
 
@@ -39,7 +35,7 @@ class KotOR;
  */
 class GameGUI : public gui::GUI {
 protected:
-    GameGUI(KotOR &game, game::GameServices &services);
+    GameGUI(KotOR &game, GameServices &services);
 
     void initForGame();
 
@@ -49,9 +45,9 @@ protected:
 
 protected:
     KotOR &_game;
-    game::GameServices &_services;
+    GameServices &_services;
 
-    void loadBackground(game::BackgroundType type);
+    void loadBackground(BackgroundType type);
 
 private:
     std::shared_ptr<audio::AudioSource> _audioSource;
@@ -60,6 +56,6 @@ private:
     void onFocusChanged(const std::string &control, bool focus) override;
 };
 
-} // namespace kotor
+} // namespace game
 
 } // namespace reone
