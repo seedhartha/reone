@@ -33,9 +33,9 @@
 #include "../../../party.h"
 #include "../../../portraits.h"
 #include "../../../services.h"
+#include "../../../types.h"
 
 #include "../../kotor.h"
-#include "../../types.h"
 
 #include "../chargen.h"
 
