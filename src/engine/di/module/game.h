@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../../game/camerastyles.h"
+#include "../../game/cursors.h"
 #include "../../game/d20/classes.h"
 #include "../../game/d20/feats.h"
 #include "../../game/d20/skills.h"
@@ -26,7 +27,6 @@
 #include "../../game/footstepsounds.h"
 #include "../../game/game.h"
 #include "../../game/guisounds.h"
-#include "../../game/kotor/cursors.h"
 #include "../../game/layouts.h"
 #include "../../game/paths.h"
 #include "../../game/portraits.h"
@@ -85,10 +85,9 @@ private:
     SceneModule &_scene;
     ScriptModule &_script;
 
-    std::unique_ptr<kotor::Cursors> _cursors;
-
     std::unique_ptr<game::CameraStyles> _cameraStyles;
     std::unique_ptr<game::Classes> _classes;
+    std::unique_ptr<game::Cursors> _cursors;
     std::unique_ptr<game::Dialogs> _dialogs;
     std::unique_ptr<game::Feats> _feats;
     std::unique_ptr<game::FootstepSounds> _footstepSounds;

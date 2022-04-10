@@ -162,7 +162,6 @@ set(GAME_HEADERS
     gui/map.h
     gui/profileoverlay.h
     guisounds.h
-    kotor/cursors.h
     kotor/gui.h
     kotor/gui/barkbubble.h
     kotor/gui/chargen.h
@@ -290,6 +289,7 @@ set(GAME_SOURCES
     camera/thirdperson.cpp
     camerastyles.cpp
     combat.cpp
+    cursors.cpp
     d20/attributes.cpp
     d20/class.cpp
     d20/classes.cpp
@@ -371,7 +371,6 @@ set(GAME_SOURCES
     format/visreader.cpp
     game.cpp
     guisounds.cpp
-    kotor/cursors.cpp
     kotor/gui.cpp
     kotor/gui/barkbubble.cpp
     kotor/gui/chargen.cpp
