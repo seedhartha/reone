@@ -41,7 +41,7 @@ public:
         bool tsl,
         boost::filesystem::path path,
         game::Options &options,
-        game::Services &services) :
+        game::GameServices &services) :
         Game(
             std::move(path),
             options,

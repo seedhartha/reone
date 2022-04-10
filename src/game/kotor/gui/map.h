@@ -30,7 +30,7 @@ class GffStruct;
 
 namespace game {
 
-struct Services;
+struct GameServices;
 
 class Game;
 class Waypoint;
@@ -42,7 +42,7 @@ namespace kotor {
 class Map : public game::IMap {
 public:
     Map(game::Game &game,
-        game::Services &services) :
+        game::GameServices &services) :
         _game(game),
         _services(services) {
     }
@@ -57,7 +57,7 @@ public:
 
 private:
     game::Game &_game;
-    game::Services &_services;
+    game::GameServices &_services;
 
     int _northAxis {0};
     glm::vec2 _worldPoint1 {0.0f};

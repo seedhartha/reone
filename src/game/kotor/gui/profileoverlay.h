@@ -26,7 +26,7 @@ namespace reone {
 
 namespace game {
 
-struct Services;
+struct GameServices;
 
 }
 
@@ -34,7 +34,7 @@ namespace kotor {
 
 class ProfileOverlay : public game::IProfileOverlay {
 public:
-    ProfileOverlay(game::Services &services, game::Options &options) :
+    ProfileOverlay(game::GameServices &services, game::Options &options) :
         _services(services),
         _options(options) {
     }
@@ -46,7 +46,7 @@ public:
     void draw() override;
 
 private:
-    game::Services &_services;
+    game::GameServices &_services;
     game::Options &_options;
 
     bool _enabled {false};

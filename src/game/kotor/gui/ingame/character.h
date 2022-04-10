@@ -36,7 +36,7 @@ public:
     CharacterMenu(
         KotOR &game,
         InGameMenu &inGameMenu,
-        game::Services &services);
+        game::GameServices &services);
 
     void load() override;
     void update(float dt) override;

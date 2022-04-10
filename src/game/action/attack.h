@@ -25,7 +25,7 @@ namespace game {
 
 class AttackAction : public ObjectAction {
 public:
-    AttackAction(Game &game, Services &services, std::shared_ptr<Object> object, float range, bool userAction, bool passive) :
+    AttackAction(Game &game, GameServices &services, std::shared_ptr<Object> object, float range, bool userAction, bool passive) :
         ObjectAction(
             game,
             services,

@@ -25,7 +25,7 @@ namespace game {
 
 class SurrenderToEnemiesAction : public Action {
 public:
-    SurrenderToEnemiesAction(Game &game, Services &services) :
+    SurrenderToEnemiesAction(Game &game, GameServices &services) :
         Action(game, services, ActionType::SurrenderToEnemies) {
     }
 

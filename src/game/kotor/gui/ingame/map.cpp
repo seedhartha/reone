@@ -40,7 +40,7 @@ namespace kotor {
 
 static constexpr int kStrRefMapNote = 349;
 
-MapMenu::MapMenu(KotOR &game, Services &services) :
+MapMenu::MapMenu(KotOR &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("map");
 

@@ -29,7 +29,7 @@ class UseSkillAction : public ObjectAction {
 public:
     UseSkillAction(
         Game &game,
-        Services &services,
+        GameServices &services,
         std::shared_ptr<Object> object,
         SkillType skill,
         int subSkill,

@@ -28,7 +28,7 @@ namespace kotor {
 
 class ComputerGUI : public Conversation {
 public:
-    ComputerGUI(KotOR &game, game::Services &services);
+    ComputerGUI(KotOR &game, game::GameServices &services);
 
     void load() override;
 

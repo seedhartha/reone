@@ -67,7 +67,7 @@ static string g_attackIcon("i_attack");
 
 SelectionOverlay::SelectionOverlay(
     Game &game,
-    Services &services) :
+    GameServices &services) :
     _game(game),
     _services(services) {
     _actionSlots.resize(kNumActionSlots);

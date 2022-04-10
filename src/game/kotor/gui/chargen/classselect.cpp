@@ -69,7 +69,7 @@ static map<ClassType, int> g_classDescStrRefs {
 ClassSelection::ClassSelection(
     CharacterGeneration &charGen,
     KotOR &game,
-    Services &services) :
+    GameServices &services) :
     GameGUI(game, services),
     _charGen(charGen) {
     _resRef = getResRef("classsel");

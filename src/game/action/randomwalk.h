@@ -25,7 +25,7 @@ namespace game {
 
 class RandomWalkAction : public Action {
 public:
-    RandomWalkAction(Game &game, Services &services) :
+    RandomWalkAction(Game &game, GameServices &services) :
         Action(game, services, ActionType::RandomWalk) {
     }
 

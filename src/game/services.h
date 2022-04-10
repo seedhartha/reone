@@ -68,7 +68,7 @@ class Spells;
 class Surfaces;
 class Visibilities;
 
-struct Services {
+struct GameServices {
     CameraStyles &cameraStyles;
     Classes &classes;
     Dialogs &dialogs;
@@ -92,7 +92,7 @@ struct Services {
     script::ScriptServices &script;
     resource::ResourceServices &resource;
 
-    Services(
+    GameServices(
         CameraStyles &cameraStyles,
         Classes &classes,
         Dialogs &dialogs,
@@ -109,11 +109,13 @@ struct Services {
         Spells &spells,
         Surfaces &surfaces,
         Visibilities &visibilities,
+
         audio::AudioServices &audio,
         graphics::GraphicsServices &graphics,
         scene::SceneServices &scene,
         script::ScriptServices &script,
         resource::ResourceServices &resource) :
+
         cameraStyles(cameraStyles),
         classes(classes),
         dialogs(dialogs),

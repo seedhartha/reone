@@ -48,7 +48,7 @@ namespace kotor {
 
 static string g_attackIcon("i_attack");
 
-HUD::HUD(KotOR &game, Services &services) :
+HUD::HUD(KotOR &game, GameServices &services) :
     GameGUI(game, services),
     _select(game, services) {
     _resRef = getResRef("mipc28x6");

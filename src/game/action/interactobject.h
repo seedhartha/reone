@@ -26,7 +26,7 @@ namespace game {
 
 class InteractObjectAction : public Action {
 public:
-    InteractObjectAction(Game &game, Services &services, std::shared_ptr<Placeable> placeable) :
+    InteractObjectAction(Game &game, GameServices &services, std::shared_ptr<Placeable> placeable) :
         Action(game, services, ActionType::InteractObject),
         _placeable(std::move(placeable)) {
     }

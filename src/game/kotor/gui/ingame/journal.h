@@ -31,7 +31,7 @@ namespace kotor {
 
 class JournalMenu : public GameGUI {
 public:
-    JournalMenu(KotOR &game, game::Services &services);
+    JournalMenu(KotOR &game, game::GameServices &services);
 
     void load() override;
 

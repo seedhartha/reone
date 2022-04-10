@@ -40,7 +40,7 @@ namespace kotor {
 NameEntry::NameEntry(
     CharacterGeneration &charGen,
     KotOR &game,
-    Services &services) :
+    GameServices &services) :
     GameGUI(game, services),
     _charGen(charGen),
     _input(TextInputFlags::lettersWhitespace) {

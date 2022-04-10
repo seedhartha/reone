@@ -47,7 +47,7 @@ static constexpr int kStrRefSave = 1587;
 static constexpr int kStrRefSaveGame = 1588;
 static constexpr int kStrRefLoad = 1589;
 
-SaveLoad::SaveLoad(KotOR &game, Services &services) :
+SaveLoad::SaveLoad(KotOR &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("saveload");
 

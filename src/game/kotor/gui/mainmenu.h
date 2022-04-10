@@ -33,7 +33,7 @@ namespace kotor {
 
 class MainMenu : public GameGUI {
 public:
-    MainMenu(KotOR &game, game::Services &services);
+    MainMenu(KotOR &game, game::GameServices &services);
 
     void load() override;
 

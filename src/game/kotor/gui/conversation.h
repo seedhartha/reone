@@ -39,7 +39,7 @@ namespace kotor {
  */
 class Conversation : public GameGUI {
 public:
-    Conversation(KotOR &game, game::Services &services) :
+    Conversation(KotOR &game, game::GameServices &services) :
         GameGUI(game, services) {
     }
 

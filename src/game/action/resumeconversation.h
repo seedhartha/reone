@@ -25,7 +25,7 @@ namespace game {
 
 class ResumeConversationAction : public Action {
 public:
-    ResumeConversationAction(Game &game, Services &services) :
+    ResumeConversationAction(Game &game, GameServices &services) :
         Action(game, services, ActionType::ResumeConversation) {
     }
 

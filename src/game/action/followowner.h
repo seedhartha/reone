@@ -25,7 +25,7 @@ namespace game {
 
 class FollowOwnerAction : public Action {
 public:
-    FollowOwnerAction(Game &game, Services &services, float range) :
+    FollowOwnerAction(Game &game, GameServices &services, float range) :
         Action(game, services, ActionType::FollowOwner),
         _range(range) {
     }

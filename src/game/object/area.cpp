@@ -90,7 +90,7 @@ Area::Area(
     uint32_t id,
     string sceneName,
     Game &game,
-    Services &services) :
+    GameServices &services) :
     Object(
         id,
         ObjectType::Area,

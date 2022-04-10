@@ -33,7 +33,7 @@ namespace reone {
 
 namespace kotor {
 
-OptionsMenu::OptionsMenu(KotOR &game, Services &services) :
+OptionsMenu::OptionsMenu(KotOR &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("optionsingame");
 

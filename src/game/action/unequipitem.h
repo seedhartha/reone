@@ -27,7 +27,7 @@ class Item;
 
 class UnequipItemAction : public Action {
 public:
-    UnequipItemAction(Game &game, Services &services, std::shared_ptr<Item> item, bool instant) :
+    UnequipItemAction(Game &game, GameServices &services, std::shared_ptr<Item> item, bool instant) :
         Action(game, services, ActionType::UnequipItem),
         _item(std::move(item)),
         _instant(instant) {

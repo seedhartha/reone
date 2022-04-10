@@ -52,7 +52,7 @@ public:
     Game(
         boost::filesystem::path path,
         Options &options,
-        Services &services) :
+        GameServices &services) :
         _path(std::move(path)),
         _options(options),
         _services(services),
@@ -169,7 +169,7 @@ protected:
 
     boost::filesystem::path _path;
     Options &_options;
-    Services &_services;
+    GameServices &_services;
 
     GameScreen _screen {GameScreen::None};
     std::string _mainMenuMusicResRef;

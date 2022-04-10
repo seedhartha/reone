@@ -38,7 +38,7 @@ namespace kotor {
 CharGenFeats::CharGenFeats(
     CharacterGeneration &charGen,
     KotOR &game,
-    Services &services) :
+    GameServices &services) :
     GameGUI(game, services),
     _charGen(charGen) {
 

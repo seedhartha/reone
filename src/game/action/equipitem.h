@@ -27,7 +27,7 @@ class Item;
 
 class EquipItemAction : public Action {
 public:
-    EquipItemAction(Game &game, Services &services, std::shared_ptr<Item> item, int inventorySlot, bool instant) :
+    EquipItemAction(Game &game, GameServices &services, std::shared_ptr<Item> item, int inventorySlot, bool instant) :
         Action(game, services, ActionType::EquipItem),
         _item(std::move(item)),
         _inventorySlot(inventorySlot),

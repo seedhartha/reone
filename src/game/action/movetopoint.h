@@ -25,7 +25,7 @@ namespace game {
 
 class MoveToPointAction : public Action {
 public:
-    MoveToPointAction(Game &game, Services &services, glm::vec3 point) :
+    MoveToPointAction(Game &game, GameServices &services, glm::vec3 point) :
         Action(game, services, ActionType::MoveToPoint),
         _point(std::move(point)) {
     }

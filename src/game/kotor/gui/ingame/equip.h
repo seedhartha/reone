@@ -56,7 +56,7 @@ public:
     Equipment(
         KotOR &game,
         InGameMenu &inGameMenu,
-        game::Services &services);
+        game::GameServices &services);
 
     void load() override;
 

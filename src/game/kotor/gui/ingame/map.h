@@ -38,7 +38,7 @@ namespace kotor {
 
 class MapMenu : public GameGUI {
 public:
-    MapMenu(KotOR &game, game::Services &services);
+    MapMenu(KotOR &game, game::GameServices &services);
 
     void load() override;
     void draw() override;

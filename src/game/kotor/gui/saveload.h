@@ -31,7 +31,7 @@ namespace kotor {
 
 class SaveLoad : public GameGUI {
 public:
-    SaveLoad(KotOR &game, game::Services &services);
+    SaveLoad(KotOR &game, game::GameServices &services);
 
     void load() override;
 

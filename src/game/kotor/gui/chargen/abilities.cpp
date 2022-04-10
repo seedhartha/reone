@@ -64,7 +64,7 @@ static const unordered_map<Ability, int> g_descStrRefByAbility {
 CharGenAbilities::CharGenAbilities(
     CharacterGeneration &charGen,
     KotOR &game,
-    Services &services) :
+    GameServices &services) :
     GameGUI(game, services),
     _charGen(charGen) {
     _resRef = getResRef("abchrgen");

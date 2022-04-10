@@ -31,7 +31,7 @@ namespace reone {
 
 namespace kotor {
 
-ComputerGUI::ComputerGUI(KotOR &game, Services &services) :
+ComputerGUI::ComputerGUI(KotOR &game, GameServices &services) :
     Conversation(game, services) {
     _resRef = getResRef("computer");
     _scaling = ScalingMode::Stretch;

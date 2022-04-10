@@ -25,7 +25,7 @@ namespace game {
 
 class MoveAwayFromObject : public ObjectAction {
 public:
-    MoveAwayFromObject(Game &game, Services &services, std::shared_ptr<Object> fleeFrom, bool run, float range) :
+    MoveAwayFromObject(Game &game, GameServices &services, std::shared_ptr<Object> fleeFrom, bool run, float range) :
         ObjectAction(game, services, ActionType::MoveAwayFromObject, std::move(fleeFrom), range, false),
         _run(run) {
     }

@@ -25,7 +25,7 @@ namespace game {
 
 class MoveToObjectAction : public ObjectAction {
 public:
-    MoveToObjectAction(Game &game, Services &services, std::shared_ptr<Object> object, bool run, float range, float timeout, bool force) :
+    MoveToObjectAction(Game &game, GameServices &services, std::shared_ptr<Object> object, bool run, float range, float timeout, bool force) :
         ObjectAction(game, services, ActionType::MoveToObject, std::move(object), range),
         _run(run),
         _timeout(timeout),

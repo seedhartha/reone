@@ -31,7 +31,7 @@ namespace kotor {
 
 class OptionsMenu : public GameGUI {
 public:
-    OptionsMenu(KotOR &game, game::Services &services);
+    OptionsMenu(KotOR &game, game::GameServices &services);
 
     void load() override;
 

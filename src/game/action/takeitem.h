@@ -27,7 +27,7 @@ namespace game {
 
 class TakeItemAction : public Action {
 public:
-    TakeItemAction(Game &game, Services &services, std::shared_ptr<Item> item, std::shared_ptr<Object> takeFrom) :
+    TakeItemAction(Game &game, GameServices &services, std::shared_ptr<Item> item, std::shared_ptr<Object> takeFrom) :
         Action(game, services, ActionType::TakeItem),
         _item(std::move(item)),
         _takeFrom(std::move(takeFrom)) {

@@ -48,7 +48,7 @@ static constexpr int kStrRefSkillRank = 1579;
 static constexpr int kStrRefBonus = 32129;
 static constexpr int kStrRefTotalRank = 41904;
 
-AbilitiesMenu::AbilitiesMenu(KotOR &game, Services &services) :
+AbilitiesMenu::AbilitiesMenu(KotOR &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("abilities");
 
