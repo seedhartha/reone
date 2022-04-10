@@ -19,16 +19,16 @@
 #pragma once
 
 #include "game.h"
-#include "kotor/gui/chargen.h"
-#include "kotor/gui/computer.h"
-#include "kotor/gui/container.h"
-#include "kotor/gui/conversation.h"
-#include "kotor/gui/dialog.h"
-#include "kotor/gui/hud.h"
-#include "kotor/gui/ingame.h"
-#include "kotor/gui/mainmenu.h"
-#include "kotor/gui/partyselect.h"
-#include "kotor/gui/saveload.h"
+#include "gui/chargen.h"
+#include "gui/computer.h"
+#include "gui/container.h"
+#include "gui/conversation.h"
+#include "gui/dialog.h"
+#include "gui/hud.h"
+#include "gui/ingame.h"
+#include "gui/mainmenu.h"
+#include "gui/partyselect.h"
+#include "gui/saveload.h"
 
 namespace reone {
 

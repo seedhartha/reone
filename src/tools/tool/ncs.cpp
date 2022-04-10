@@ -21,7 +21,7 @@
 
 #include "../../common/collectionutil.h"
 #include "../../common/exception/validation.h"
-#include "../../game/kotor/script/routines.h"
+#include "../../game/script/routines.h"
 #include "../../script/format/ncsreader.h"
 #include "../../script/format/ncswriter.h"
 #include "../../script/instrutil.h"
@@ -32,7 +32,6 @@
 using namespace std;
 
 using namespace reone::game;
-using namespace reone::kotor;
 using namespace reone::resource;
 using namespace reone::script;
 

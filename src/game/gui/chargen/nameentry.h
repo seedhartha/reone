@@ -17,33 +17,53 @@
 
 #pragma once
 
-#include "../../gui/control/label.h"
-#include "../../gui/control/progressbar.h"
+#include "../../../gui/textinput.h"
 
-#include "../gui.h"
+#include "../../format/ltrreader.h"
+#include "../../gui.h"
 
 namespace reone {
 
+namespace gui {
+
+class Button;
+
+}
+
 namespace game {
 
-class LoadingScreen : public GameGUI {
+class CharacterGeneration;
+
+class NameEntry : public GameGUI {
 public:
-    LoadingScreen(KotOR &game, GameServices &services);
+    NameEntry(
+        CharacterGeneration &charGen,
+        KotOR &game,
+        GameServices &services);
 
     void load() override;
+    bool handle(const SDL_Event &event) override;
 
-    void setImage(const std::string &resRef);
-    void setProgress(int progress);
+    void loadRandomName();
 
 private:
     struct Binding {
-        std::shared_ptr<gui::ProgressBar> pbProgress;
-        std::shared_ptr<gui::Label> lblHint;
-        std::shared_ptr<gui::Label> lblLogo;
-        std::shared_ptr<gui::Label> lblLoading;
+        std::shared_ptr<gui::Button> btnBack;
+        std::shared_ptr<gui::Button> btnRandom;
+        std::shared_ptr<gui::Button> endBtn;
+        std::shared_ptr<gui::Control> nameBoxEdit;
     } _binding;
 
+    CharacterGeneration &_charGen;
+    gui::TextInput _input;
+    LtrReader _maleLtr;
+    LtrReader _femaleLtr;
+    LtrReader _lastNameLtr;
+
     void bindControls();
+    void loadLtrFile(const std::string &resRef, LtrReader &ltr);
+
+    std::string getRandomName() const;
 };
 
 } // namespace game

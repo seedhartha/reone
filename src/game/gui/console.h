@@ -17,18 +17,97 @@
 
 #pragma once
 
+#include "../../graphics/font.h"
+#include "../../graphics/options.h"
+#include "../../graphics/types.h"
+#include "../../gui/textinput.h"
+
 namespace reone {
 
 namespace game {
 
-class IConsole : boost::noncopyable {
+struct GameServices;
+
+class Game;
+
+class Console {
 public:
-    virtual ~IConsole() = default;
+    Console(
+        Game &game,
+        GameServices &services) :
+        _game(game),
+        _services(services),
+        _input(gui::TextInputFlags::console) {
 
-    virtual bool handle(const SDL_Event &event) = 0;
-    virtual void draw() = 0;
+        init();
+    }
 
-    virtual bool isOpen() const = 0;
+    void init();
+    bool handle(const SDL_Event &event);
+    void draw();
+
+    bool isOpen() const { return _open; }
+
+private:
+    typedef std::function<void(std::string, std::vector<std::string>)> CommandHandler;
+
+    struct Command {
+        std::string name;
+        std::string alias;
+        std::string description;
+        CommandHandler handler;
+    };
+
+    Game &_game;
+    GameServices &_services;
+
+    std::shared_ptr<graphics::Font> _font;
+    bool _open {false};
+    gui::TextInput _input;
+    std::deque<std::string> _output;
+    int _outputOffset {0};
+    std::stack<std::string> _history;
+
+    // Commands
+
+    std::vector<Command> _commands;
+    std::unordered_map<std::string, Command> _commandByName;
+    std::unordered_map<std::string, Command> _commandByAlias;
+
+    // END Commands
+
+    bool handleMouseWheel(const SDL_MouseWheelEvent &event);
+    bool handleKeyUp(const SDL_KeyboardEvent &event);
+
+    void executeInputText();
+    void print(const std::string &text);
+    void trimOutput();
+
+    void drawBackground();
+    void drawLines();
+
+    // Commands
+
+    void initCommands();
+
+    void addCommand(std::string name, std::string alias, std::string description, CommandHandler handler);
+
+    void cmdClear(std::string input, std::vector<std::string> tokens);
+    void cmdInfo(std::string input, std::vector<std::string> tokens);
+    void cmdListGlobals(std::string input, std::vector<std::string> tokens);
+    void cmdListLocals(std::string input, std::vector<std::string> tokens);
+    void cmdListAnim(std::string input, std::vector<std::string> tokens);
+    void cmdPlayAnim(std::string input, std::vector<std::string> tokens);
+    void cmdRunScript(std::string input, std::vector<std::string> tokens);
+    void cmdWarp(std::string input, std::vector<std::string> tokens);
+    void cmdKill(std::string input, std::vector<std::string> tokens);
+    void cmdAddItem(std::string input, std::vector<std::string> tokens);
+    void cmdGiveXP(std::string input, std::vector<std::string> tokens);
+    void cmdShowWalkmesh(std::string input, std::vector<std::string> tokens);
+    void cmdShowTriggers(std::string input, std::vector<std::string> tokens);
+    void cmdHelp(std::string input, std::vector<std::string> tokens);
+
+    // END Commands
 };
 
 } // namespace game

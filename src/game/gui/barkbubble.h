@@ -17,43 +17,33 @@
 
 #pragma once
 
-#include "../../common/timer.h"
-#include "../../graphics/font.h"
+#include "../gui.h"
 
-#include "../options.h"
+#include "../../common/timer.h"
+#include "../../gui/control/label.h"
 
 namespace reone {
 
 namespace game {
 
-struct GameServices;
-
-class ProfileOverlay {
+class BarkBubble : public GameGUI {
 public:
-    ProfileOverlay(GameServices &services, Options &options) :
-        _services(services),
-        _options(options) {
-    }
+    BarkBubble(KotOR &game, GameServices &services);
 
-    void init();
+    void load() override;
+    void update(float dt) override;
 
-    bool handle(const SDL_Event &event);
-    void update(float dt);
-    void draw();
+    void setBarkText(const std::string &text, float duration);
 
 private:
-    GameServices &_services;
-    Options &_options;
+    struct Binding {
+        std::shared_ptr<gui::Label> lblBarkText;
+    } _binding;
 
-    bool _enabled {false};
+    std::string _barkText;
+    Timer _timer;
 
-    uint64_t _frequency {0};
-    uint64_t _counter {0};
-    int _numFrames {0};
-    int _fps {0};
-
-    Timer _refreshTimer;
-    std::shared_ptr<graphics::Font> _font;
+    void bindControls();
 };
 
 } // namespace game

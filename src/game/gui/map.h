@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../../graphics/texture.h"
+
 namespace reone {
 
 namespace resource {
@@ -27,24 +29,57 @@ class GffStruct;
 
 namespace game {
 
+struct GameServices;
+
+class Game;
 class Waypoint;
 
-class IMap : boost::noncopyable {
+class Map {
 public:
     enum class Mode {
         Default,
         Minimap
     };
 
-    virtual ~IMap() = default;
+    Map(Game &game,
+        GameServices &services) :
+        _game(game),
+        _services(services) {
+    }
 
-    virtual void load(const std::string &area, const resource::GffStruct &gffs) = 0;
+    void load(const std::string &area, const resource::GffStruct &gffs);
+    void draw(Mode mode, const glm::vec4 &bounds);
 
-    virtual void draw(Mode mode, const glm::vec4 &bounds) = 0;
+    bool isLoaded() const { return static_cast<bool>(_areaTexture); }
 
-    virtual bool isLoaded() const = 0;
+    void setArrowResRef(std::string resRef) { _arrowResRef = std::move(resRef); }
+    void setSelectedNote(std::shared_ptr<Waypoint> waypoint) { _selectedNote = std::move(waypoint); }
 
-    virtual void setSelectedNote(std::shared_ptr<Waypoint> waypoint) = 0;
+private:
+    Game &_game;
+    GameServices &_services;
+
+    int _northAxis {0};
+    glm::vec2 _worldPoint1 {0.0f};
+    glm::vec2 _worldPoint2 {0.0f};
+    glm::vec2 _mapPoint1 {0.0f};
+    glm::vec2 _mapPoint2 {0.0f};
+
+    std::shared_ptr<graphics::Texture> _areaTexture;
+    std::shared_ptr<graphics::Texture> _arrowTexture;
+    std::shared_ptr<graphics::Texture> _noteTexture;
+
+    std::string _arrowResRef;
+    std::shared_ptr<Waypoint> _selectedNote;
+
+    void loadProperties(const resource::GffStruct &gffs);
+    void loadTextures(const std::string &area);
+
+    void drawArea(Mode mode, const glm::vec4 &bounds);
+    void drawPartyLeader(Mode mode, const glm::vec4 &bounds);
+    void drawNotes(Mode mode, const glm::vec4 &bounds);
+
+    glm::vec2 getMapPosition(const glm::vec2 &world) const;
 };
 
 } // namespace game

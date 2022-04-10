@@ -15,46 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "../../../script/types.h"
 
-#include "../../common/timer.h"
-#include "../../graphics/font.h"
-
-#include "../options.h"
+#include "../../object.h"
 
 namespace reone {
 
 namespace game {
 
-struct GameServices;
-
-class ProfileOverlay {
-public:
-    ProfileOverlay(GameServices &services, Options &options) :
-        _services(services),
-        _options(options) {
-    }
-
-    void init();
-
-    bool handle(const SDL_Event &event);
-    void update(float dt);
-    void draw();
-
-private:
-    GameServices &_services;
-    Options &_options;
-
-    bool _enabled {false};
-
-    uint64_t _frequency {0};
-    uint64_t _counter {0};
-    int _numFrames {0};
-    int _fps {0};
-
-    Timer _refreshTimer;
-    std::shared_ptr<graphics::Font> _font;
-};
+inline uint32_t getObjectIdOrInvalid(const std::shared_ptr<Object> &object) {
+    return object ? object->id() : script::kObjectInvalid;
+}
 
 } // namespace game
 

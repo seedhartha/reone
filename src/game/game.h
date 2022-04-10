@@ -90,7 +90,7 @@ public:
     EffectFactory &effectFactory() { return _effectFactory; }
     ObjectFactory &objectFactory() { return _objectFactory; }
     ScriptRunner &scriptRunner() { return *_scriptRunner; }
-    IMap &map() { return *_map; }
+    Map &map() { return *_map; }
     script::IRoutines &routines() { return *_routines; }
 
     std::shared_ptr<Module> module() const { return _module; }
@@ -217,10 +217,10 @@ protected:
 
     // GUI
 
-    std::unique_ptr<IMap> _map;
-    std::unique_ptr<IConsole> _console;
-    std::unique_ptr<ILoadingScreen> _loadScreen;
-    std::unique_ptr<IProfileOverlay> _profileOverlay;
+    std::unique_ptr<Map> _map;
+    std::unique_ptr<Console> _console;
+    std::unique_ptr<LoadingScreen> _loadScreen;
+    std::unique_ptr<ProfileOverlay> _profileOverlay;
 
     // END GUI
 

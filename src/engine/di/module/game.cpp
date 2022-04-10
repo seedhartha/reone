@@ -17,7 +17,7 @@
 
 #include "game.h"
 
-#include "../../game/kotor/kotor.h"
+#include "../../game/kotor.h"
 #include "../../game/types.h"
 
 #include "audio.h"
@@ -29,7 +29,6 @@
 using namespace std;
 
 using namespace reone::game;
-using namespace reone::kotor;
 
 namespace reone {
 
