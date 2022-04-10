@@ -46,6 +46,7 @@
 #include "../../script/services.h"
 
 #include "../combat.h"
+#include "../cursors.h"
 #include "../dialogs.h"
 #include "../location.h"
 #include "../object/factory.h"
@@ -54,7 +55,6 @@
 #include "../soundsets.h"
 #include "../surfaces.h"
 
-#include "cursors.h"
 #include "gui/console.h"
 #include "gui/loadscreen.h"
 #include "gui/map.h"

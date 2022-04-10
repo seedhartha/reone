@@ -21,7 +21,7 @@ namespace reone {
 
 namespace audio {
 
-class AudioContext : public boost::noncopyable {
+class AudioContext : boost::noncopyable {
 public:
     ~AudioContext() { deinit(); }
 

@@ -53,11 +53,11 @@ namespace game {
 
 class CameraStyles;
 class Classes;
+class Cursors;
 class Dialogs;
 class Feats;
 class FootstepSounds;
 class GUISounds;
-class ICursors;
 class Layouts;
 class Paths;
 class Portraits;
@@ -71,11 +71,11 @@ class Visibilities;
 struct GameServices {
     CameraStyles &cameraStyles;
     Classes &classes;
+    Cursors &cursors;
     Dialogs &dialogs;
     Feats &feats;
     FootstepSounds &footstepSounds;
     GUISounds &guiSounds;
-    ICursors &cursors;
     Layouts &layouts;
     Paths &paths;
     Portraits &portraits;
@@ -95,11 +95,11 @@ struct GameServices {
     GameServices(
         CameraStyles &cameraStyles,
         Classes &classes,
+        Cursors &cursors,
         Dialogs &dialogs,
         Feats &feats,
         FootstepSounds &footstepSounds,
         GUISounds &guiSounds,
-        ICursors &cursors,
         Layouts &layouts,
         Paths &paths,
         Portraits &portraits,
@@ -118,11 +118,11 @@ struct GameServices {
 
         cameraStyles(cameraStyles),
         classes(classes),
+        cursors(cursors),
         dialogs(dialogs),
         feats(feats),
         footstepSounds(footstepSounds),
         guiSounds(guiSounds),
-        cursors(cursors),
         layouts(layouts),
         paths(paths),
         portraits(portraits),

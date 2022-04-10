@@ -17,11 +17,11 @@
 
 #include "cursors.h"
 
-#include "../../common/streamutil.h"
-#include "../../graphics/cursor.h"
-#include "../../graphics/format/curreader.h"
-#include "../../graphics/texture.h"
-#include "../../resource/resources.h"
+#include "../common/streamutil.h"
+#include "../graphics/cursor.h"
+#include "../graphics/format/curreader.h"
+#include "../graphics/texture.h"
+#include "../resource/resources.h"
 
 using namespace std;
 
@@ -31,7 +31,7 @@ using namespace reone::resource;
 
 namespace reone {
 
-namespace kotor {
+namespace game {
 
 static unordered_map<CursorType, pair<uint32_t, uint32_t>> g_groupNamesByType {
     {CursorType::Default, {1, 2}},
@@ -108,6 +108,6 @@ shared_ptr<Texture> Cursors::newTextureFromCursor(uint32_t name) {
     return cur.texture();
 }
 
-} // namespace kotor
+} // namespace game
 
 } // namespace reone
