@@ -62,6 +62,7 @@ class Layouts;
 class Paths;
 class Portraits;
 class Reputes;
+class ResourceLayout;
 class Skills;
 class SoundSets;
 class Spells;
@@ -80,6 +81,7 @@ struct GameServices {
     Paths &paths;
     Portraits &portraits;
     Reputes &reputes;
+    ResourceLayout &resourceLayout;
     Skills &skills;
     SoundSets &soundSets;
     Spells &spells;
@@ -104,6 +106,7 @@ struct GameServices {
         Paths &paths,
         Portraits &portraits,
         Reputes &reputes,
+        ResourceLayout &resourceLayout,
         Skills &skills,
         SoundSets &soundSets,
         Spells &spells,
@@ -127,6 +130,7 @@ struct GameServices {
         paths(paths),
         portraits(portraits),
         reputes(reputes),
+        resourceLayout(resourceLayout),
         skills(skills),
         soundSets(soundSets),
         spells(spells),

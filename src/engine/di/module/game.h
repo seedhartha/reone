@@ -31,6 +31,7 @@
 #include "../../game/paths.h"
 #include "../../game/portraits.h"
 #include "../../game/reputes.h"
+#include "../../game/resourcelayout.h"
 #include "../../game/services.h"
 #include "../../game/soundsets.h"
 #include "../../game/surfaces.h"
@@ -96,6 +97,7 @@ private:
     std::unique_ptr<game::Paths> _paths;
     std::unique_ptr<game::Portraits> _portraits;
     std::unique_ptr<game::Reputes> _reputes;
+    std::unique_ptr<game::ResourceLayout> _resourceLayout;
     std::unique_ptr<game::Skills> _skills;
     std::unique_ptr<game::SoundSets> _soundSets;
     std::unique_ptr<game::Spells> _spells;
