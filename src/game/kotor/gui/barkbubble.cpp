@@ -31,7 +31,7 @@ namespace reone {
 
 namespace kotor {
 
-BarkBubble::BarkBubble(KotOR &game, Services &services) :
+BarkBubble::BarkBubble(KotOR &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("barkbubble");
     _scaling = ScalingMode::PositionRelativeToCenter;

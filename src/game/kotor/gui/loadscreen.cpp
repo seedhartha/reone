@@ -33,7 +33,7 @@ namespace reone {
 
 namespace kotor {
 
-LoadingScreen::LoadingScreen(KotOR &game, Services &services) :
+LoadingScreen::LoadingScreen(KotOR &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("loadscreen");
 

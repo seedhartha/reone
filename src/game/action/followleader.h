@@ -25,7 +25,7 @@ namespace game {
 
 class FollowLeaderAction : public Action {
 public:
-    FollowLeaderAction(Game &game, Services &services) :
+    FollowLeaderAction(Game &game, GameServices &services) :
         Action(game, services, ActionType::FollowLeader) {
     }
 

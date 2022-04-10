@@ -25,7 +25,7 @@ namespace game {
 
 class LockObjectAction : public Action {
 public:
-    LockObjectAction(Game &game, Services &services, std::shared_ptr<Object> target) :
+    LockObjectAction(Game &game, GameServices &services, std::shared_ptr<Object> target) :
         Action(game, services, ActionType::Lock),
         _target(std::move(target)) {
     }

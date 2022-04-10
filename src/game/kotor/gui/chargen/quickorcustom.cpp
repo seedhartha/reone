@@ -44,7 +44,7 @@ static constexpr int kStrRefCustomHelpText = 242;
 QuickOrCustom::QuickOrCustom(
     CharacterGeneration &charGen,
     KotOR &game,
-    Services &services) :
+    GameServices &services) :
     GameGUI(game, services),
     _charGen(charGen) {
 

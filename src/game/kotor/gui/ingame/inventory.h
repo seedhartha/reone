@@ -33,7 +33,7 @@ namespace kotor {
 
 class InventoryMenu : public GameGUI {
 public:
-    InventoryMenu(KotOR &game, game::Services &services);
+    InventoryMenu(KotOR &game, game::GameServices &services);
 
     void load() override;
 

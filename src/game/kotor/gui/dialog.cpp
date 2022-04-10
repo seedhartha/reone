@@ -86,7 +86,7 @@ static const unordered_map<string, AnimationType> g_animTypeByName {
     {"kneel_talk_angry", AnimationType::LoopingKneelTalkAngry},
     {"kneel_talk_sad", AnimationType::LoopingKneelTalkSad}};
 
-DialogGUI::DialogGUI(KotOR &game, Services &services) :
+DialogGUI::DialogGUI(KotOR &game, GameServices &services) :
     Conversation(game, services) {
     _resRef = getResRef("dialog");
     _scaling = ScalingMode::Stretch;

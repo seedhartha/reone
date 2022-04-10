@@ -51,7 +51,7 @@ void GameModule::init() {
     _surfaces = make_unique<Surfaces>(_resource.twoDas());
     _visibilities = make_unique<Visibilities>(_resource.resources());
 
-    _services = make_unique<Services>(
+    _services = make_unique<GameServices>(
         *_cameraStyles,
         *_classes,
         *_dialogs,

@@ -34,7 +34,7 @@ namespace kotor {
 
 class InGameMenu : public GameGUI {
 public:
-    InGameMenu(KotOR &game, game::Services &services);
+    InGameMenu(KotOR &game, game::GameServices &services);
 
     void load() override;
     bool handle(const SDL_Event &event) override;

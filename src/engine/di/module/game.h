@@ -103,7 +103,7 @@ private:
     std::unique_ptr<game::Surfaces> _surfaces;
     std::unique_ptr<game::Visibilities> _visibilities;
 
-    std::unique_ptr<game::Services> _services;
+    std::unique_ptr<game::GameServices> _services;
     std::unique_ptr<game::Game> _game;
 
     std::unique_ptr<game::Game> newGame();

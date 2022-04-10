@@ -49,7 +49,7 @@ namespace kotor {
 
 static constexpr float kModelScale = 1.1f;
 
-CharacterGeneration::CharacterGeneration(KotOR &game, Services &services) :
+CharacterGeneration::CharacterGeneration(KotOR &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("maincg");
 

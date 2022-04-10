@@ -31,7 +31,7 @@ constexpr int kNpcCount = 9;
 
 class PartySelection : public GameGUI {
 public:
-    PartySelection(KotOR &game, game::Services &services);
+    PartySelection(KotOR &game, game::GameServices &services);
 
     void load() override;
 

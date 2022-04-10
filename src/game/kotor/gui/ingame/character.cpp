@@ -50,7 +50,7 @@ namespace kotor {
 CharacterMenu::CharacterMenu(
     KotOR &game,
     InGameMenu &inGameMenu,
-    Services &services) :
+    GameServices &services) :
     GameGUI(game, services),
     _inGameMenu(inGameMenu) {
     _resRef = getResRef("character");

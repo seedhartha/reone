@@ -39,7 +39,7 @@ namespace reone {
 
 namespace kotor {
 
-InventoryMenu::InventoryMenu(KotOR &game, Services &services) :
+InventoryMenu::InventoryMenu(KotOR &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("inventory");
 

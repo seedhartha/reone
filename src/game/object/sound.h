@@ -37,7 +37,7 @@ public:
         uint32_t id,
         std::string sceneName,
         Game &game,
-        Services &services) :
+        GameServices &services) :
         Object(
             id,
             ObjectType::Sound,

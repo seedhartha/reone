@@ -35,7 +35,7 @@ namespace kotor {
 
 class AbilitiesMenu : public GameGUI {
 public:
-    AbilitiesMenu(KotOR &game, game::Services &services);
+    AbilitiesMenu(KotOR &game, game::GameServices &services);
 
     void load() override;
 

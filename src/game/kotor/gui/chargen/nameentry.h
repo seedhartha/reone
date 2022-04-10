@@ -40,7 +40,7 @@ public:
     NameEntry(
         CharacterGeneration &charGen,
         KotOR &game,
-        game::Services &services);
+        game::GameServices &services);
 
     void load() override;
     bool handle(const SDL_Event &event) override;

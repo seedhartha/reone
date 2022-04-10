@@ -25,7 +25,7 @@ namespace reone {
 
 namespace game {
 
-struct Services;
+struct GameServices;
 
 class Game;
 class Object;
@@ -38,7 +38,7 @@ class SelectionOverlay {
 public:
     SelectionOverlay(
         game::Game &game,
-        game::Services &services);
+        game::GameServices &services);
 
     void load();
 
@@ -53,7 +53,7 @@ private:
     };
 
     game::Game &_game;
-    game::Services &_services;
+    game::GameServices &_services;
 
     std::shared_ptr<graphics::Font> _font;
     std::shared_ptr<graphics::Texture> _friendlyReticle;

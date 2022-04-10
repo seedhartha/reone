@@ -27,7 +27,7 @@ class ExecutionContext;
 
 namespace game {
 
-struct Services;
+struct GameServices;
 
 class Game;
 
@@ -37,12 +37,12 @@ namespace kotor {
 
 struct RoutineContext {
     game::Game &game;
-    game::Services &services;
+    game::GameServices &services;
     script::ExecutionContext &execution;
 
     RoutineContext(
         game::Game &game,
-        game::Services &services,
+        game::GameServices &services,
         script::ExecutionContext &execution) :
         game(game),
         services(services),

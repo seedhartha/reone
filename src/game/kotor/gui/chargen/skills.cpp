@@ -54,7 +54,7 @@ static const unordered_map<SkillType, int> g_descStrRefBySkill {
 CharGenSkills::CharGenSkills(
     CharacterGeneration &charGen,
     KotOR &game,
-    Services &services) :
+    GameServices &services) :
     GameGUI(game, services),
     _charGen(charGen) {
 

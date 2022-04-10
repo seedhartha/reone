@@ -46,7 +46,7 @@ public:
     Item(
         uint32_t id,
         Game &game,
-        Services &services) :
+        GameServices &services) :
         Object(
             id,
             ObjectType::Item,

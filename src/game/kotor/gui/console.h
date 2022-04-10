@@ -27,7 +27,7 @@ namespace reone {
 
 namespace game {
 
-struct Services;
+struct GameServices;
 
 class Game;
 
@@ -39,7 +39,7 @@ class Console : public game::IConsole {
 public:
     Console(
         game::Game &game,
-        game::Services &services) :
+        game::GameServices &services) :
         _game(game),
         _services(services),
         _input(gui::TextInputFlags::console) {
@@ -64,7 +64,7 @@ private:
     };
 
     game::Game &_game;
-    game::Services &_services;
+    game::GameServices &_services;
 
     std::shared_ptr<graphics::Font> _font;
     bool _open {false};

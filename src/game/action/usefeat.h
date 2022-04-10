@@ -25,7 +25,7 @@ namespace game {
 
 class UseFeatAction : public ObjectAction {
 public:
-    UseFeatAction(Game &game, Services &services, std::shared_ptr<Object> object, FeatType feat) :
+    UseFeatAction(Game &game, GameServices &services, std::shared_ptr<Object> object, FeatType feat) :
         ObjectAction(game, services, ActionType::UseFeat, std::move(object)),
         _feat(feat) {
     }

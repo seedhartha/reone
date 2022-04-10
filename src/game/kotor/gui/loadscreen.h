@@ -29,7 +29,7 @@ namespace kotor {
 
 class LoadingScreen : public GameGUI, public game::ILoadingScreen {
 public:
-    LoadingScreen(KotOR &game, game::Services &services);
+    LoadingScreen(KotOR &game, game::GameServices &services);
 
     void load() override;
 

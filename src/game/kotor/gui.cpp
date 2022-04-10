@@ -41,7 +41,7 @@ namespace reone {
 
 namespace kotor {
 
-GameGUI::GameGUI(KotOR &game, Services &services) :
+GameGUI::GameGUI(KotOR &game, GameServices &services) :
     GUI(
         game.options().graphics,
         services.scene.sceneGraphs,

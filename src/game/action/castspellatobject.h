@@ -29,7 +29,7 @@ class CastSpellAtObjectAction : public Action {
 public:
     CastSpellAtObjectAction(
         Game &game,
-        Services &services,
+        GameServices &services,
         SpellType spell,
         std::shared_ptr<Object> target,
         int metaMagic,

@@ -31,7 +31,7 @@ namespace kotor {
 
 class ContainerGUI : public GameGUI {
 public:
-    ContainerGUI(KotOR &game, game::Services &services);
+    ContainerGUI(KotOR &game, game::GameServices &services);
 
     void load() override;
     void open(std::shared_ptr<game::Object> contanier);

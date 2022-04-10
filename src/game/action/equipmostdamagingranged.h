@@ -25,7 +25,7 @@ namespace game {
 
 class EquipMostDamagingRangedAction : public Action {
 public:
-    EquipMostDamagingRangedAction(Game &game, Services &services, std::shared_ptr<Object> versus) :
+    EquipMostDamagingRangedAction(Game &game, GameServices &services, std::shared_ptr<Object> versus) :
         Action(game, services, ActionType::EquipMostDamagingRanged),
         _versus(std::move(versus)) {
     }

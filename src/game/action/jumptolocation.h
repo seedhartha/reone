@@ -25,7 +25,7 @@ namespace game {
 
 class JumpToLocationAction : public LocationAction {
 public:
-    JumpToLocationAction(Game &game, Services &services, std::shared_ptr<Location> location) :
+    JumpToLocationAction(Game &game, GameServices &services, std::shared_ptr<Location> location) :
         LocationAction(game, services, ActionType::JumpToLocation, std::move(location)) {
     }
 

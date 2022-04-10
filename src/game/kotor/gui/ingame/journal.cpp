@@ -35,7 +35,7 @@ namespace kotor {
 
 JournalMenu::JournalMenu(
     KotOR &game,
-    Services &services) :
+    GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("journal");
 

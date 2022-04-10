@@ -37,11 +37,11 @@ namespace reone {
 
 namespace game {
 
-struct Services;
+struct GameServices;
 
 class ObjectFactory {
 public:
-    ObjectFactory(Game &game, Services &services) :
+    ObjectFactory(Game &game, GameServices &services) :
         _game(game),
         _services(services) {
     }
@@ -68,7 +68,7 @@ public:
 
 private:
     Game &_game;
-    Services &_services;
+    GameServices &_services;
 
     uint32_t _counter {2}; // ids 0 and 1 are reserved
     std::unordered_map<uint32_t, std::shared_ptr<Object>> _objectById;

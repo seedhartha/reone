@@ -31,7 +31,7 @@ namespace kotor {
 
 class DialogGUI : public Conversation {
 public:
-    DialogGUI(KotOR &game, game::Services &services);
+    DialogGUI(KotOR &game, game::GameServices &services);
 
     void load() override;
     void update(float dt) override;

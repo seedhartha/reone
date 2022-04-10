@@ -33,7 +33,7 @@ namespace reone {
 
 namespace kotor {
 
-MessagesMenu::MessagesMenu(KotOR &game, Services &services) :
+MessagesMenu::MessagesMenu(KotOR &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("messages");
 

@@ -37,7 +37,7 @@ public:
     LevelUpMenu(
         CharacterGeneration &charGen,
         KotOR &game,
-        game::Services &services);
+        game::GameServices &services);
 
     void load() override;
 

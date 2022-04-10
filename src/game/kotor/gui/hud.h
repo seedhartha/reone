@@ -39,7 +39,7 @@ namespace kotor {
 
 class HUD : public GameGUI {
 public:
-    HUD(KotOR &game, game::Services &services);
+    HUD(KotOR &game, game::GameServices &services);
 
     void load() override;
 

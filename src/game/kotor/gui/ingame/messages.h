@@ -31,7 +31,7 @@ namespace kotor {
 
 class MessagesMenu : public GameGUI {
 public:
-    MessagesMenu(KotOR &game, game::Services &services);
+    MessagesMenu(KotOR &game, game::GameServices &services);
 
     void load() override;
 
