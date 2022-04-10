@@ -21,7 +21,7 @@
 #include "../../../gui/control/label.h"
 #include "../../../gui/control/listbox.h"
 
-#include "../../kotor.h"
+#include "../../game.h"
 #include "../../object/creature.h"
 #include "../../party.h"
 #include "../../services.h"
@@ -38,7 +38,7 @@ namespace reone {
 
 namespace game {
 
-InventoryMenu::InventoryMenu(KotOR &game, GameServices &services) :
+InventoryMenu::InventoryMenu(Game &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("inventory");
 

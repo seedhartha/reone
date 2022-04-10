@@ -26,7 +26,7 @@
 #include "../../scene/services.h"
 #include "../../scene/types.h"
 
-#include "../kotor.h"
+#include "../game.h"
 #include "../object/factory.h"
 #include "../party.h"
 #include "../services.h"
@@ -48,7 +48,7 @@ namespace game {
 
 static constexpr float kKotorModelSize = 1.4f;
 
-MainMenu::MainMenu(KotOR &game, GameServices &services) :
+MainMenu::MainMenu(Game &game, GameServices &services) :
     GameGUI(game, services) {
     if (game.isTSL()) {
         _resRef = "mainmenu8x6_p";

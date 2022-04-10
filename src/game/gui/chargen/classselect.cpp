@@ -28,7 +28,7 @@
 #include "../../../scene/services.h"
 
 #include "../../d20/classes.h"
-#include "../../kotor.h"
+#include "../../game.h"
 #include "../../object/creature.h"
 #include "../../object/factory.h"
 #include "../../party.h"
@@ -66,7 +66,7 @@ static map<ClassType, int> g_classDescStrRefs {
 
 ClassSelection::ClassSelection(
     CharacterGeneration &charGen,
-    KotOR &game,
+    Game &game,
     GameServices &services) :
     GameGUI(game, services),
     _charGen(charGen) {

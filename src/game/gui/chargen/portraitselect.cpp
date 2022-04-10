@@ -30,7 +30,7 @@
 #include "../../../scene/node/model.h"
 #include "../../../scene/services.h"
 
-#include "../../kotor.h"
+#include "../../game.h"
 #include "../../object/factory.h"
 #include "../../portrait.h"
 #include "../../portraits.h"
@@ -57,7 +57,7 @@ static constexpr float kModelScale = 0.2f;
 
 PortraitSelection::PortraitSelection(
     CharacterGeneration &charGen,
-    KotOR &game,
+    Game &game,
     GameServices &services) :
     GameGUI(game, services),
     _charGen(charGen) {

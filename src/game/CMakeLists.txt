@@ -197,7 +197,6 @@ set(GAME_HEADERS
     gui/saveload.h
     gui/selectoverlay.h
     guisounds.h
-    kotor.h
     layout.h
     layouts.h
     location.h
@@ -407,7 +406,6 @@ set(GAME_SOURCES
     gui/saveload.cpp
     gui/selectoverlay.cpp
     guisounds.cpp
-    kotor.cpp
     layouts.cpp
     object.cpp
     object/area.cpp

@@ -31,7 +31,7 @@ namespace game {
 
 class SaveLoad : public GameGUI {
 public:
-    SaveLoad(KotOR &game, GameServices &services);
+    SaveLoad(Game &game, GameServices &services);
 
     void load() override;
 

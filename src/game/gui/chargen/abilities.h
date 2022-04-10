@@ -39,7 +39,7 @@ class CharGenAbilities : public GameGUI {
 public:
     CharGenAbilities(
         CharacterGeneration &charGen,
-        KotOR &game,
+        Game &game,
         GameServices &services);
 
     void load() override;

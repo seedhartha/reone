@@ -29,7 +29,7 @@
 #include "../action/usefeat.h"
 #include "../d20/feat.h"
 #include "../d20/feats.h"
-#include "../kotor.h"
+#include "../game.h"
 #include "../object/creature.h"
 #include "../party.h"
 #include "../services.h"
@@ -48,7 +48,7 @@ namespace game {
 
 static string g_attackIcon("i_attack");
 
-HUD::HUD(KotOR &game, GameServices &services) :
+HUD::HUD(Game &game, GameServices &services) :
     GameGUI(game, services),
     _select(game, services) {
     _resRef = getResRef("mipc28x6");

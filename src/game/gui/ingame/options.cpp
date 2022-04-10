@@ -19,7 +19,7 @@
 
 #include "../../../gui/control/button.h"
 
-#include "../../kotor.h"
+#include "../../game.h"
 
 using namespace std;
 
@@ -33,7 +33,7 @@ namespace reone {
 
 namespace game {
 
-OptionsMenu::OptionsMenu(KotOR &game, GameServices &services) :
+OptionsMenu::OptionsMenu(Game &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("optionsingame");
 

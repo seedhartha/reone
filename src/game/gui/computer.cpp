@@ -17,7 +17,7 @@
 
 #include "computer.h"
 
-#include "../kotor.h"
+#include "../game.h"
 
 using namespace std;
 
@@ -31,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-ComputerGUI::ComputerGUI(KotOR &game, GameServices &services) :
+ComputerGUI::ComputerGUI(Game &game, GameServices &services) :
     Conversation(game, services) {
     _resRef = getResRef("computer");
     _scaling = ScalingMode::Stretch;

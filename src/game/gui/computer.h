@@ -28,7 +28,7 @@ namespace game {
 
 class ComputerGUI : public Conversation {
 public:
-    ComputerGUI(KotOR &game, GameServices &services);
+    ComputerGUI(Game &game, GameServices &services);
 
     void load() override;
 

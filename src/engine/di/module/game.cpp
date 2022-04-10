@@ -17,7 +17,7 @@
 
 #include "game.h"
 
-#include "../../game/kotor.h"
+#include "../../game/game.h"
 #include "../../game/types.h"
 
 #include "audio.h"
@@ -117,7 +117,7 @@ unique_ptr<Game> GameModule::newGame() {
     switch (_gameId) {
     case GameID::KotOR:
     case GameID::TSL:
-        return make_unique<KotOR>(_gameId == GameID::TSL, _gamePath, _gameOptions, *_services);
+        return make_unique<Game>(_gameId == GameID::TSL, _gamePath, _gameOptions, *_services);
     default:
         throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
     }

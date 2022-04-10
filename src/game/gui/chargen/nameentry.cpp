@@ -21,7 +21,7 @@
 #include "../../../gui/control/button.h"
 #include "../../../resource/resources.h"
 
-#include "../../kotor.h"
+#include "../../game.h"
 
 #include "../chargen.h"
 
@@ -39,7 +39,7 @@ namespace game {
 
 NameEntry::NameEntry(
     CharacterGeneration &charGen,
-    KotOR &game,
+    Game &game,
     GameServices &services) :
     GameGUI(game, services),
     _charGen(charGen),

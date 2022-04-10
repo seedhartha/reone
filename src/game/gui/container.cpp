@@ -21,7 +21,7 @@
 #include "../../gui/control/imagebutton.h"
 #include "../../resource/strings.h"
 
-#include "../kotor.h"
+#include "../game.h"
 #include "../object/creature.h"
 #include "../object/item.h"
 #include "../object/placeable.h"
@@ -44,7 +44,7 @@ static constexpr int kSwitchToResRef = 47884;
 static constexpr int kGiveItemResRef = 47885;
 static constexpr int kInventoryResRef = 393;
 
-ContainerGUI::ContainerGUI(KotOR &game, GameServices &services) :
+ContainerGUI::ContainerGUI(Game &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("container");
 

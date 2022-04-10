@@ -28,7 +28,7 @@
 #include "../../gui/control/listbox.h"
 #include "../../resource/resources.h"
 
-#include "../kotor.h"
+#include "../game.h"
 #include "../script/runner.h"
 #include "../services.h"
 

@@ -34,7 +34,7 @@ class InGameMenu;
 class CharacterMenu : public GameGUI {
 public:
     CharacterMenu(
-        KotOR &game,
+        Game &game,
         InGameMenu &inGameMenu,
         GameServices &services);
 

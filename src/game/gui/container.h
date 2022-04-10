@@ -31,7 +31,7 @@ namespace game {
 
 class ContainerGUI : public GameGUI {
 public:
-    ContainerGUI(KotOR &game, GameServices &services);
+    ContainerGUI(Game &game, GameServices &services);
 
     void load() override;
     void open(std::shared_ptr<Object> contanier);

@@ -39,7 +39,7 @@ class PortraitSelection : public GameGUI {
 public:
     PortraitSelection(
         CharacterGeneration &charGen,
-        KotOR &game,
+        Game &game,
         GameServices &services);
 
     void load() override;

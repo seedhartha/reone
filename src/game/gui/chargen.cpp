@@ -26,7 +26,7 @@
 #include "../../scene/services.h"
 
 #include "../d20/classes.h"
-#include "../kotor.h"
+#include "../game.h"
 #include "../object/factory.h"
 #include "../party.h"
 #include "../portraits.h"
@@ -49,7 +49,7 @@ namespace game {
 
 static constexpr float kModelScale = 1.1f;
 
-CharacterGeneration::CharacterGeneration(KotOR &game, GameServices &services) :
+CharacterGeneration::CharacterGeneration(Game &game, GameServices &services) :
     GameGUI(game, services) {
     _resRef = getResRef("maincg");
 

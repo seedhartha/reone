@@ -38,7 +38,7 @@
 #include "../d20/feats.h"
 #include "../d20/skill.h"
 #include "../d20/skills.h"
-#include "../kotor.h"
+#include "../game.h"
 #include "../party.h"
 #include "../reputes.h"
 #include "../services.h"
