@@ -35,9 +35,8 @@
 #include "../../game/services.h"
 #include "../../game/soundsets.h"
 #include "../../game/surfaces.h"
+#include "../../game/types.h"
 #include "../../game/visibilities.h"
-
-#include "../../types.h"
 
 namespace reone {
 
@@ -73,7 +72,7 @@ public:
     void init();
     void deinit();
 
-    game::Game &game() { return *_game; }
+    game::GameServices &services() { return *_services; }
 
 private:
     game::GameID _gameId;
@@ -105,9 +104,6 @@ private:
     std::unique_ptr<game::Visibilities> _visibilities;
 
     std::unique_ptr<game::GameServices> _services;
-    std::unique_ptr<game::Game> _game;
-
-    std::unique_ptr<game::Game> newGame();
 };
 
 } // namespace reone

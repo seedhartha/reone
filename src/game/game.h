@@ -74,8 +74,6 @@ public:
         _objectFactory(*this, services) {
     }
 
-    void initResourceProviders();
-
     void init();
 
     /**

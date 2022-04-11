@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "types.h"
+
 namespace reone {
 
 namespace resource {
@@ -31,19 +33,23 @@ struct Options;
 
 class ResourceLayout : boost::noncopyable {
 public:
-    ResourceLayout(Options &options, resource::ResourceServices &resourceSvc) :
+    ResourceLayout(GameID gameId, Options &options, resource::ResourceServices &resourceSvc) :
+        _gameId(gameId),
         _options(options),
         _resourceSvc(resourceSvc) {
     }
 
-    void initForKotOR();
-    void initForTSL();
+    void init();
 
-    void loadModuleResources(const std::string &moduleName, bool tsl);
+    void loadModuleResources(const std::string &moduleName);
 
 private:
+    GameID _gameId;
     Options &_options;
     resource::ResourceServices &_resourceSvc;
+
+    void initForKotOR();
+    void initForTSL();
 };
 
 } // namespace game

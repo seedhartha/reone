@@ -40,8 +40,13 @@ public:
 
     void init();
     void deinit();
-
-    game::Game &getGame();
+    
+    ResourceModule &resource() { return *_resource; }
+    GraphicsModule &graphics() { return *_graphics; }
+    AudioModule &audio() { return *_audio; }
+    SceneModule &scene() { return *_scene; }
+    ScriptModule &script() { return *_script; }
+    GameModule &game() { return *_game; }
 
 private:
     game::GameID _gameId;

@@ -94,14 +94,6 @@ static constexpr char kBlueprintResRefKreia[] = "p_kreia";
 
 static bool g_conversationsEnabled = true;
 
-void Game::initResourceProviders() {
-    if (isTSL()) {
-        _services.resourceLayout.initForTSL();
-    } else {
-        _services.resourceLayout.initForKotOR();
-    }
-}
-
 void Game::init() {
     // Surfaces
     auto walkableSurfaces = _services.surfaces.getWalkableSurfaces();
@@ -936,7 +928,7 @@ void Game::start() {
 }
 
 void Game::loadModuleResources(const string &moduleName) {
-    _services.resourceLayout.loadModuleResources(moduleName, isTSL());
+    _services.resourceLayout.loadModuleResources(moduleName);
 }
 
 void Game::onModuleSelected(const string &module) {
