@@ -48,8 +48,4 @@ void Services::deinit() {
     _resource.reset();
 }
 
-Game &Services::getGame() {
-    return _game->game();
-}
-
 } // namespace reone

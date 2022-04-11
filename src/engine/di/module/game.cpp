@@ -17,9 +17,6 @@
 
 #include "game.h"
 
-#include "../../game/game.h"
-#include "../../game/types.h"
-
 #include "audio.h"
 #include "graphics.h"
 #include "resource.h"
@@ -44,7 +41,7 @@ void GameModule::init() {
     _paths = make_unique<Paths>(_resource.gffs());
     _portraits = make_unique<Portraits>(_graphics.textures(), _resource.twoDas());
     _reputes = make_unique<Reputes>(_resource.twoDas());
-    _resourceLayout = make_unique<ResourceLayout>(_gameOptions, _resource.services());
+    _resourceLayout = make_unique<ResourceLayout>(_gameId, _gameOptions, _resource.services());
     _skills = make_unique<Skills>(_graphics.textures(), _resource.strings(), _resource.twoDas());
     _soundSets = make_unique<SoundSets>(_audio.audioFiles(), _resource.resources(), _resource.strings());
     _spells = make_unique<Spells>(_graphics.textures(), _resource.strings(), _resource.twoDas());
@@ -75,9 +72,7 @@ void GameModule::init() {
         _script.services(),
         _resource.services());
 
-    _game = newGame();
-
-    _game->initResourceProviders();
+    _resourceLayout->init();
     _cameraStyles->init();
     _feats->init();
     _guiSounds->init();
@@ -86,41 +81,28 @@ void GameModule::init() {
     _skills->init();
     _spells->init();
     _surfaces->init();
-    _game->init();
-
-    _graphics.window().setEventHandler(_game.get());
 }
 
 void GameModule::deinit() {
-    _game.reset();
     _services.reset();
-
-    _layouts.reset();
-    _cameraStyles.reset();
-    _classes.reset();
-    _cursors.reset();
-    _dialogs.reset();
-    _feats.reset();
-    _footstepSounds.reset();
-    _guiSounds.reset();
-    _paths.reset();
-    _portraits.reset();
-    _reputes.reset();
+    
     _visibilities.reset();
-    _skills.reset();
-    _soundSets.reset();
-    _spells.reset();
     _surfaces.reset();
-}
-
-unique_ptr<Game> GameModule::newGame() {
-    switch (_gameId) {
-    case GameID::KotOR:
-    case GameID::TSL:
-        return make_unique<Game>(_gameId == GameID::TSL, _gamePath, _gameOptions, *_services);
-    default:
-        throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
-    }
+    _spells.reset();
+    _soundSets.reset();
+    _skills.reset();
+    _resourceLayout.reset();
+    _reputes.reset();
+    _portraits.reset();
+    _paths.reset();
+    _layouts.reset();
+    _guiSounds.reset();
+    _footstepSounds.reset();
+    _feats.reset();
+    _dialogs.reset();
+    _cursors.reset();
+    _classes.reset();
+    _cameraStyles.reset();
 }
 
 } // namespace reone

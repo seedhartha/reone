@@ -23,9 +23,21 @@
 #include "gameprobe.h"
 #include "optionsparser.h"
 
+using namespace std;
+
 using namespace reone::game;
 
 namespace reone {
+
+static unique_ptr<Game> newGame(GameID gameId, Options options, GameServices &services) {
+    switch (gameId) {
+    case GameID::KotOR:
+    case GameID::TSL:
+        return make_unique<Game>(gameId == GameID::TSL, options.gamePath, options, services);
+    default:
+        throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(gameId)));
+    }
+}
 
 int Engine::run() {
     OptionsParser optionsParser(_argc, _argv);
@@ -41,7 +53,12 @@ int Engine::run() {
     Services services(gameId, gameOptions);
     services.init();
 
-    return services.getGame().run();
+    auto game = newGame(gameId, gameOptions, services.game().services());
+    game->init();
+
+    services.graphics().window().setEventHandler(game.get());
+
+    return game->run();
 }
 
 } // namespace reone

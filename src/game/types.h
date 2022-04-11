@@ -43,6 +43,11 @@ constexpr char kSceneClassSelect[] = "classselect";
 constexpr char kScenePortraitSelect[] = "portraitselect";
 constexpr char kSceneCharacter[] = "character";
 
+enum class GameID {
+    KotOR,
+    TSL
+};
+
 enum class BackgroundType {
     None,
     Menu,

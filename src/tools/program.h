@@ -19,7 +19,7 @@
 
 #include <boost/program_options.hpp>
 
-#include "../engine/types.h"
+#include "../game/types.h"
 
 #include "types.h"
 

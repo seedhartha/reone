@@ -23,8 +23,7 @@ set(REONE_HEADERS
     di/services.h
     engine.h
     gameprobe.h
-    optionsparser.h
-    types.h)
+    optionsparser.h)
 
 set(REONE_SOURCES
     di/module/audio.cpp

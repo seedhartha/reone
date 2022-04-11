@@ -65,6 +65,16 @@ static const unordered_map<TextureQuality, string> texPackByQuality {
     {TextureQuality::Medium, kTexturePackFilenameMedium},
     {TextureQuality::Low, kTexturePackFilenameLow}};
 
+void ResourceLayout::init() {
+    if (_gameId == GameID::KotOR) {
+        initForKotOR();
+    } else if (_gameId == GameID::TSL) {
+        initForTSL();
+    } else {
+        throw logic_error("Unsupported game ID: " + to_string(static_cast<int>(_gameId)));
+    }
+}
+
 void ResourceLayout::initForKotOR() {
     _resourceSvc.resources.indexKeyFile(getPathIgnoreCase(_options.gamePath, kKeyFilename));
     _resourceSvc.resources.indexErfFile(getPathIgnoreCase(_options.gamePath, kPatchFilename));
@@ -108,7 +118,7 @@ void ResourceLayout::initForTSL() {
     _resourceSvc.resources.indexExeFile(getPathIgnoreCase(_options.gamePath, kExeFilenameTsl));
 }
 
-void ResourceLayout::loadModuleResources(const string &moduleName, bool tsl) {
+void ResourceLayout::loadModuleResources(const string &moduleName) {
     _resourceSvc.twoDas.invalidate();
     _resourceSvc.gffs.invalidate();
     _resourceSvc.resources.clearTransientProviders();
@@ -131,7 +141,7 @@ void ResourceLayout::loadModuleResources(const string &moduleName, bool tsl) {
         _resourceSvc.resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"));
     }
 
-    if (tsl) {
+    if (_gameId == GameID::TSL) {
         _resourceSvc.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"));
     }
 }
