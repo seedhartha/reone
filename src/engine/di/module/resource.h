@@ -25,6 +25,8 @@
 
 namespace reone {
 
+namespace engine {
+
 class ResourceModule : boost::noncopyable {
 public:
     ResourceModule(boost::filesystem::path gamePath) :
@@ -53,5 +55,7 @@ private:
 
     std::unique_ptr<resource::ResourceServices> _services;
 };
+
+} // namespace engine
 
 } // namespace reone

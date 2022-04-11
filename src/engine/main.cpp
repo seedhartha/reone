@@ -22,6 +22,7 @@
 using namespace std;
 
 using namespace reone;
+using namespace reone::engine;
 
 int main(int argc, char **argv) {
     initLog();

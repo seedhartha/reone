@@ -27,7 +27,7 @@ namespace fs = boost::filesystem;
 
 namespace reone {
 
-namespace game {
+namespace engine {
 
 GameID GameProbe::probe() {
     // If there is a KotOR executable then game is KotOR
@@ -45,6 +45,6 @@ GameID GameProbe::probe() {
     throw logic_error("Unable to determine game ID: " + _gamePath.string());
 }
 
-} // namespace game
+} // namespace engine
 
 } // namespace reone

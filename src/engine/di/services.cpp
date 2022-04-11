@@ -23,6 +23,8 @@ using namespace reone::game;
 
 namespace reone {
 
+namespace engine {
+
 void Services::init() {
     _resource = make_unique<ResourceModule>(_gameOptions.gamePath);
     _graphics = make_unique<GraphicsModule>(_gameOptions.graphics, *_resource);
@@ -57,5 +59,7 @@ void Services::deinit() {
     _graphics.reset();
     _resource.reset();
 }
+
+} // namespace engine
 
 } // namespace reone
