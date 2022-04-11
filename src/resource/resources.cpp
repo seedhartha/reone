@@ -48,7 +48,7 @@ void Resources::indexErfFile(const fs::path &path, bool transient) {
     if (!fs::exists(path)) {
         return;
     }
-    auto erf = make_unique<ErfReader>(_providers.size());
+    auto erf = make_unique<ErfReader>(static_cast<int>(_providers.size()));
     erf->load(path);
     indexProvider(move(erf), path, transient);
 }
@@ -57,7 +57,7 @@ void Resources::indexRimFile(const fs::path &path, bool transient) {
     if (!fs::exists(path)) {
         return;
     }
-    auto rim = make_unique<RimReader>(_providers.size());
+    auto rim = make_unique<RimReader>(static_cast<int>(_providers.size()));
     rim->load(path);
     indexProvider(move(rim), path, transient);
 }

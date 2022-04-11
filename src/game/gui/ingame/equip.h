@@ -56,7 +56,7 @@ public:
     Equipment(
         Game &game,
         InGameMenu &inGameMenu,
-        GameServices &services);
+        ServicesView &services);
 
     void load() override;
 

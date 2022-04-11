@@ -26,7 +26,7 @@ namespace reone {
 
 namespace game {
 
-struct GameServices;
+struct ServicesView;
 
 class Game;
 
@@ -35,7 +35,7 @@ class Game;
  */
 class GameGUI : public gui::GUI {
 protected:
-    GameGUI(Game &game, GameServices &services);
+    GameGUI(Game &game, ServicesView &services);
 
     void initForGame();
 
@@ -45,7 +45,7 @@ protected:
 
 protected:
     Game &_game;
-    GameServices &_services;
+    ServicesView &_services;
 
     void loadBackground(BackgroundType type);
 

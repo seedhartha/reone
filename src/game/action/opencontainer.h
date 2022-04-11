@@ -25,7 +25,7 @@ namespace game {
 
 class OpenContainerAction : public ObjectAction {
 public:
-    OpenContainerAction(Game &game, GameServices &services, std::shared_ptr<Object> object) :
+    OpenContainerAction(Game &game, ServicesView &services, std::shared_ptr<Object> object) :
         ObjectAction(game, services, ActionType::OpenContainer, std::move(object)) {
     }
 

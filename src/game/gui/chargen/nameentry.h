@@ -39,7 +39,7 @@ public:
     NameEntry(
         CharacterGeneration &charGen,
         Game &game,
-        GameServices &services);
+        ServicesView &services);
 
     void load() override;
     bool handle(const SDL_Event &event) override;

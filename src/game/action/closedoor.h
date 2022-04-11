@@ -25,7 +25,7 @@ namespace game {
 
 class CloseDoorAction : public ObjectAction {
 public:
-    CloseDoorAction(Game &game, GameServices &services, std::shared_ptr<Object> object) :
+    CloseDoorAction(Game &game, ServicesView &services, std::shared_ptr<Object> object) :
         ObjectAction(game, services, ActionType::CloseDoor, std::move(object)) {
     }
 

@@ -31,7 +31,7 @@ namespace game {
 
 class CommandAction : public Action {
 public:
-    CommandAction(Game &game, GameServices &services, std::shared_ptr<script::ExecutionContext> context) :
+    CommandAction(Game &game, ServicesView &services, std::shared_ptr<script::ExecutionContext> context) :
         Action(game, services, ActionType::DoCommand),
         _context(move(context)) {
     }

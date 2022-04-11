@@ -27,7 +27,7 @@ class StartConversationAction : public ObjectAction {
 public:
     StartConversationAction(
         Game &game,
-        GameServices &services,
+        ServicesView &services,
         std::shared_ptr<Object> object,
         std::string dialogResRef,
         bool privateConversation,

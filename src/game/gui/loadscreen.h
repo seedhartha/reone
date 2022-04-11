@@ -28,7 +28,7 @@ namespace game {
 
 class LoadingScreen : public GameGUI {
 public:
-    LoadingScreen(Game &game, GameServices &services);
+    LoadingScreen(Game &game, ServicesView &services);
 
     void load() override;
 

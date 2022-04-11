@@ -27,7 +27,7 @@ class CastFakeSpellAtObjectAction : public Action {
 public:
     CastFakeSpellAtObjectAction(
         Game &game,
-        GameServices &services,
+        ServicesView &services,
         SpellType spell,
         std::shared_ptr<Object> target,
         ProjectilePathType projectilePathType) :

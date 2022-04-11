@@ -40,7 +40,7 @@ public:
     CharGenAbilities(
         CharacterGeneration &charGen,
         Game &game,
-        GameServices &services);
+        ServicesView &services);
 
     void load() override;
 

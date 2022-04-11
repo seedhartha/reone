@@ -88,12 +88,6 @@ struct GameServices {
     Surfaces &surfaces;
     Visibilities &visibilities;
 
-    audio::AudioServices &audio;
-    graphics::GraphicsServices &graphics;
-    scene::SceneServices &scene;
-    script::ScriptServices &script;
-    resource::ResourceServices &resource;
-
     GameServices(
         CameraStyles &cameraStyles,
         Classes &classes,
@@ -111,14 +105,7 @@ struct GameServices {
         SoundSets &soundSets,
         Spells &spells,
         Surfaces &surfaces,
-        Visibilities &visibilities,
-
-        audio::AudioServices &audio,
-        graphics::GraphicsServices &graphics,
-        scene::SceneServices &scene,
-        script::ScriptServices &script,
-        resource::ResourceServices &resource) :
-
+        Visibilities &visibilities) :
         cameraStyles(cameraStyles),
         classes(classes),
         cursors(cursors),
@@ -135,8 +122,26 @@ struct GameServices {
         soundSets(soundSets),
         spells(spells),
         surfaces(surfaces),
-        visibilities(visibilities),
+        visibilities(visibilities) {
+    }
+};
 
+struct ServicesView {
+    GameServices &game;
+    audio::AudioServices &audio;
+    graphics::GraphicsServices &graphics;
+    scene::SceneServices &scene;
+    script::ScriptServices &script;
+    resource::ResourceServices &resource;
+
+    ServicesView(
+        GameServices &game,
+        audio::AudioServices &audio,
+        graphics::GraphicsServices &graphics,
+        scene::SceneServices &scene,
+        script::ScriptServices &script,
+        resource::ResourceServices &resource) :
+        game(game),
         audio(audio),
         graphics(graphics),
         scene(scene),

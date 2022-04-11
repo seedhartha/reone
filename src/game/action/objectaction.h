@@ -34,7 +34,7 @@ protected:
     std::shared_ptr<Object> _object;
     float _range;
 
-    ObjectAction(Game &game, GameServices &services, ActionType type, std::shared_ptr<Object> object, float range = 1.0f, bool userAction = false) :
+    ObjectAction(Game &game, ServicesView &services, ActionType type, std::shared_ptr<Object> object, float range = 1.0f, bool userAction = false) :
         Action(game, services, type, userAction),
         _object(std::move(object)),
         _range(range) {

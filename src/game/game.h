@@ -63,7 +63,7 @@ public:
         bool tsl,
         boost::filesystem::path path,
         Options &options,
-        GameServices &services) :
+        ServicesView &services) :
         _tsl(tsl),
         _path(std::move(path)),
         _options(options),
@@ -186,7 +186,7 @@ protected:
 
     boost::filesystem::path _path;
     Options &_options;
-    GameServices &_services;
+    ServicesView &_services;
 
     GameScreen _screen {GameScreen::None};
     std::string _mainMenuMusicResRef;

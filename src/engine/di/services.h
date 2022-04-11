@@ -40,13 +40,8 @@ public:
 
     void init();
     void deinit();
-    
-    ResourceModule &resource() { return *_resource; }
-    GraphicsModule &graphics() { return *_graphics; }
-    AudioModule &audio() { return *_audio; }
-    SceneModule &scene() { return *_scene; }
-    ScriptModule &script() { return *_script; }
-    GameModule &game() { return *_game; }
+
+    game::ServicesView &view() { return *_view; }
 
 private:
     game::GameID _gameId;
@@ -58,6 +53,8 @@ private:
     std::unique_ptr<SceneModule> _scene;
     std::unique_ptr<ScriptModule> _script;
     std::unique_ptr<GameModule> _game;
+
+    std::unique_ptr<game::ServicesView> _view;
 };
 
 } // namespace reone

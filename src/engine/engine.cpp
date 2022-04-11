@@ -29,7 +29,7 @@ using namespace reone::game;
 
 namespace reone {
 
-static unique_ptr<Game> newGame(GameID gameId, Options options, GameServices &services) {
+static unique_ptr<Game> newGame(GameID gameId, Options options, ServicesView &services) {
     switch (gameId) {
     case GameID::KotOR:
     case GameID::TSL:
@@ -53,10 +53,10 @@ int Engine::run() {
     Services services(gameId, gameOptions);
     services.init();
 
-    auto game = newGame(gameId, gameOptions, services.game().services());
+    auto game = newGame(gameId, gameOptions, services.view());
     game->init();
 
-    services.graphics().window().setEventHandler(game.get());
+    services.view().graphics.window.setEventHandler(game.get());
 
     return game->run();
 }

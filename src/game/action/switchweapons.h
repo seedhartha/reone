@@ -25,7 +25,7 @@ namespace game {
 
 class SwitchWeaponsAction : public Action {
 public:
-    SwitchWeaponsAction(Game &game, GameServices &services) :
+    SwitchWeaponsAction(Game &game, ServicesView &services) :
         Action(game, services, ActionType::SwitchWeapons) {
     }
 

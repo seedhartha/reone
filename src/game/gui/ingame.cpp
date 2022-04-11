@@ -33,7 +33,7 @@ namespace game {
 
 InGameMenu::InGameMenu(
     Game &game,
-    GameServices &services) :
+    ServicesView &services) :
     GameGUI(game, services) {
     _resRef = getResRef("top");
 

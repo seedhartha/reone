@@ -49,7 +49,7 @@ namespace game {
 CharacterMenu::CharacterMenu(
     Game &game,
     InGameMenu &inGameMenu,
-    GameServices &services) :
+    ServicesView &services) :
     GameGUI(game, services),
     _inGameMenu(inGameMenu) {
     _resRef = getResRef("character");
@@ -219,7 +219,7 @@ string CharacterMenu::describeClass(ClassType clazz) const {
     if (clazz == ClassType::Invalid)
         return "";
 
-    return _services.classes.get(clazz)->name();
+    return _services.game.classes.get(clazz)->name();
 }
 
 void CharacterMenu::refreshPortraits() {

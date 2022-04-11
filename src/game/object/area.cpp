@@ -90,7 +90,7 @@ Area::Area(
     uint32_t id,
     string sceneName,
     Game &game,
-    GameServices &services) :
+    ServicesView &services) :
     Object(
         id,
         ObjectType::Area,
@@ -144,7 +144,7 @@ void Area::loadARE(const GffStruct &are) {
 void Area::loadCameraStyle(const GffStruct &are) {
     // Area
     int areaStyleIdx = are.getInt("CameraStyle");
-    shared_ptr<CameraStyle> areaStyle(_services.cameraStyles.get(areaStyleIdx));
+    shared_ptr<CameraStyle> areaStyle(_services.game.cameraStyles.get(areaStyleIdx));
     if (areaStyle) {
         _camStyleDefault = *areaStyle;
     } else {
@@ -152,7 +152,7 @@ void Area::loadCameraStyle(const GffStruct &are) {
     }
 
     // Combat
-    shared_ptr<CameraStyle> combatStyle(_services.cameraStyles.get("Combat"));
+    shared_ptr<CameraStyle> combatStyle(_services.game.cameraStyles.get("Combat"));
     if (combatStyle) {
         _camStyleDefault = *combatStyle;
     } else {
@@ -308,7 +308,7 @@ void Area::loadEncounters(const GffStruct &git) {
 }
 
 void Area::loadLYT() {
-    auto layout = _services.layouts.get(_name);
+    auto layout = _services.game.layouts.get(_name);
     if (!layout) {
         throw ValidationException("Area LYT file not found");
     }
@@ -346,7 +346,7 @@ void Area::loadLYT() {
                 _grass.density,
                 _grass.quadSize,
                 _grass.probabilities,
-                _services.surfaces.getGrassSurfaces(),
+                _services.game.surfaces.getGrassSurfaces(),
                 _grass.texture,
                 aabbNode);
             grassSceneNode->setLocalTransform(glm::translate(position) * aabbNode->absoluteTransform());
@@ -362,7 +362,7 @@ void Area::loadLYT() {
 }
 
 void Area::loadVIS() {
-    auto visibility = _services.visibilities.get(_name);
+    auto visibility = _services.game.visibilities.get(_name);
     if (!visibility) {
         return;
     }
@@ -379,7 +379,7 @@ Visibility Area::fixVisibility(const Visibility &visibility) {
 }
 
 void Area::loadPTH() {
-    shared_ptr<Path> path(_services.paths.get(_name));
+    shared_ptr<Path> path(_services.game.paths.get(_name));
     if (!path) {
         return;
     }
@@ -1061,15 +1061,15 @@ bool Area::matchesCriterias(const Creature &creature, const SearchCriteriaList &
             auto reputation = static_cast<ReputationType>(criteria.second);
             switch (reputation) {
             case ReputationType::Friend:
-                if (!target || !_services.reputes.getIsFriend(creature, *static_pointer_cast<Creature>(target)))
+                if (!target || !_services.game.reputes.getIsFriend(creature, *static_pointer_cast<Creature>(target)))
                     return false;
                 break;
             case ReputationType::Enemy:
-                if (!target || !_services.reputes.getIsEnemy(creature, *static_pointer_cast<Creature>(target)))
+                if (!target || !_services.game.reputes.getIsEnemy(creature, *static_pointer_cast<Creature>(target)))
                     return false;
                 break;
             case ReputationType::Neutral:
-                if (!target || !_services.reputes.getIsNeutral(creature, *static_pointer_cast<Creature>(target)))
+                if (!target || !_services.game.reputes.getIsNeutral(creature, *static_pointer_cast<Creature>(target)))
                     return false;
                 break;
             default:

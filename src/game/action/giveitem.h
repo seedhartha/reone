@@ -27,7 +27,7 @@ namespace game {
 
 class GiveItemAction : public Action {
 public:
-    GiveItemAction(Game &game, GameServices &services, std::shared_ptr<Item> item, std::shared_ptr<Object> giveTo) :
+    GiveItemAction(Game &game, ServicesView &services, std::shared_ptr<Item> item, std::shared_ptr<Object> giveTo) :
         Action(game, services, ActionType::GiveItem),
         _item(std::move(item)),
         _giveTo(std::move(giveTo)) {

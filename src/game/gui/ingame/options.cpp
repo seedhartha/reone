@@ -33,7 +33,7 @@ namespace reone {
 
 namespace game {
 
-OptionsMenu::OptionsMenu(Game &game, GameServices &services) :
+OptionsMenu::OptionsMenu(Game &game, ServicesView &services) :
     GameGUI(game, services) {
     _resRef = getResRef("optionsingame");
 

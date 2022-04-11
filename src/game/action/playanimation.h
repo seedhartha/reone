@@ -27,7 +27,7 @@ namespace game {
 
 class PlayAnimationAction : public Action {
 public:
-    PlayAnimationAction(Game &game, GameServices &services, AnimationType anim, float speed, float durationSeconds) :
+    PlayAnimationAction(Game &game, ServicesView &services, AnimationType anim, float speed, float durationSeconds) :
         Action(game, services, ActionType::PlayAnimation),
         _anim(anim),
         _speed(speed),

@@ -35,7 +35,7 @@ namespace game {
 
 JournalMenu::JournalMenu(
     Game &game,
-    GameServices &services) :
+    ServicesView &services) :
     GameGUI(game, services) {
     _resRef = getResRef("journal");
 

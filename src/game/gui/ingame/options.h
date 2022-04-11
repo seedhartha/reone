@@ -31,7 +31,7 @@ namespace game {
 
 class OptionsMenu : public GameGUI {
 public:
-    OptionsMenu(Game &game, GameServices &services);
+    OptionsMenu(Game &game, ServicesView &services);
 
     void load() override;
 

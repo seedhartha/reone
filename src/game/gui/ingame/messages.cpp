@@ -33,7 +33,7 @@ namespace reone {
 
 namespace game {
 
-MessagesMenu::MessagesMenu(Game &game, GameServices &services) :
+MessagesMenu::MessagesMenu(Game &game, ServicesView &services) :
     GameGUI(game, services) {
     _resRef = getResRef("messages");
 

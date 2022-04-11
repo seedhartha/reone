@@ -32,7 +32,7 @@ public:
         uint32_t id,
         std::string sceneName,
         Game &game,
-        GameServices &services) :
+        ServicesView &services) :
         Object(
             id,
             ObjectType::Camera,

@@ -34,7 +34,7 @@ namespace game {
 
 class InGameMenu : public GameGUI {
 public:
-    InGameMenu(Game &game, GameServices &services);
+    InGameMenu(Game &game, ServicesView &services);
 
     void load() override;
     bool handle(const SDL_Event &event) override;

@@ -39,7 +39,7 @@ namespace reone {
 
 namespace game {
 
-GameGUI::GameGUI(Game &game, GameServices &services) :
+GameGUI::GameGUI(Game &game, ServicesView &services) :
     GUI(
         game.options().graphics,
         services.scene.sceneGraphs,
@@ -124,12 +124,12 @@ string GameGUI::getResRef(const string &base) const {
 }
 
 void GameGUI::onClick(const string &control) {
-    _audioSource = _services.audio.player.play(_services.guiSounds.getOnClick(), AudioType::Sound);
+    _audioSource = _services.audio.player.play(_services.game.guiSounds.getOnClick(), AudioType::Sound);
 }
 
 void GameGUI::onFocusChanged(const string &control, bool focus) {
     if (focus) {
-        _audioSource = _services.audio.player.play(_services.guiSounds.getOnEnter(), AudioType::Sound);
+        _audioSource = _services.audio.player.play(_services.game.guiSounds.getOnEnter(), AudioType::Sound);
     }
 }
 

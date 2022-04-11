@@ -33,7 +33,7 @@ namespace reone {
 
 namespace game {
 
-LoadingScreen::LoadingScreen(Game &game, GameServices &services) :
+LoadingScreen::LoadingScreen(Game &game, ServicesView &services) :
     GameGUI(game, services) {
     _resRef = getResRef("loadscreen");
 

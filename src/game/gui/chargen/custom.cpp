@@ -38,7 +38,7 @@ namespace game {
 CustomCharacterGeneration::CustomCharacterGeneration(
     CharacterGeneration &charGen,
     Game &game,
-    GameServices &services) :
+    ServicesView &services) :
     GameGUI(game, services),
     _charGen(charGen) {
 
