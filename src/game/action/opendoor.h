@@ -25,7 +25,7 @@ namespace game {
 
 class OpenDoorAction : public ObjectAction {
 public:
-    OpenDoorAction(Game &game, GameServices &services, std::shared_ptr<Object> object) :
+    OpenDoorAction(Game &game, ServicesView &services, std::shared_ptr<Object> object) :
         ObjectAction(game, services, ActionType::OpenDoor, std::move(object)) {
     }
 

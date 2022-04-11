@@ -25,7 +25,7 @@ namespace game {
 
 class BarkStringAction : public Action {
 public:
-    BarkStringAction(Game &game, GameServices &services, int strRef) :
+    BarkStringAction(Game &game, ServicesView &services, int strRef) :
         Action(game, services, ActionType::BarkString),
         _strRef(strRef) {
     }

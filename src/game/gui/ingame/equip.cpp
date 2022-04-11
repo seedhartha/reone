@@ -73,7 +73,7 @@ static unordered_map<Equipment::Slot, int32_t> g_slotStrRefs = {
 Equipment::Equipment(
     Game &game,
     InGameMenu &inGameMenu,
-    GameServices &services) :
+    ServicesView &services) :
     GameGUI(game, services),
     _inGameMenu(inGameMenu) {
     _resRef = getResRef("equip");

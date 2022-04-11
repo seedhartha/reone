@@ -67,7 +67,7 @@ static map<ClassType, int> g_classDescStrRefs {
 ClassSelection::ClassSelection(
     CharacterGeneration &charGen,
     Game &game,
-    GameServices &services) :
+    ServicesView &services) :
     GameGUI(game, services),
     _charGen(charGen) {
     _resRef = getResRef("classsel");
@@ -128,7 +128,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
     Character character;
     character.gender = gender;
     character.appearance = appearance;
-    character.attributes = _services.classes.get(clazz)->defaultAttributes();
+    character.attributes = _services.game.classes.get(clazz)->defaultAttributes();
 
     // Button control
 
@@ -196,7 +196,7 @@ void ClassSelection::setupClassButton(int index, Gender gender, ClassType clazz)
 vector<Portrait> ClassSelection::getPCPortraitsByGender(Gender gender) {
     vector<Portrait> result;
     int sex = gender == Gender::Female ? 1 : 0;
-    for (auto &portrait : _services.portraits.portraits()) {
+    for (auto &portrait : _services.game.portraits.portraits()) {
         if (portrait.forPC && portrait.sex == sex) {
             result.push_back(portrait);
         }
@@ -271,7 +271,7 @@ void ClassSelection::onClassButtonFocusChanged(int index, bool focus) {
     ClassType clazz = button.character.attributes.getEffectiveClass();
 
     string classText(_strings.get(g_genderStrRefs[button.character.gender]));
-    classText += " " + _services.classes.get(clazz)->name();
+    classText += " " + _services.game.classes.get(clazz)->name();
     _binding.lblClass->setTextMessage(classText);
 
     string descText(_strings.get(g_classDescStrRefs[clazz]));

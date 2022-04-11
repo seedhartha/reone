@@ -40,7 +40,7 @@ namespace game {
 NameEntry::NameEntry(
     CharacterGeneration &charGen,
     Game &game,
-    GameServices &services) :
+    ServicesView &services) :
     GameGUI(game, services),
     _charGen(charGen),
     _input(TextInputFlags::lettersWhitespace) {

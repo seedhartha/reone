@@ -26,11 +26,11 @@ namespace reone {
 
 namespace game {
 
-struct GameServices;
+struct ServicesView;
 
 class ProfileOverlay {
 public:
-    ProfileOverlay(GameServices &services, Options &options) :
+    ProfileOverlay(ServicesView &services, Options &options) :
         _services(services),
         _options(options) {
     }
@@ -42,7 +42,7 @@ public:
     void draw();
 
 private:
-    GameServices &_services;
+    ServicesView &_services;
     Options &_options;
 
     bool _enabled {false};

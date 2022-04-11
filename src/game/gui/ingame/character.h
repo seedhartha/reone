@@ -36,7 +36,7 @@ public:
     CharacterMenu(
         Game &game,
         InGameMenu &inGameMenu,
-        GameServices &services);
+        ServicesView &services);
 
     void load() override;
     void update(float dt) override;

@@ -23,7 +23,7 @@ namespace reone {
 
 namespace game {
 
-struct GameServices;
+struct ServicesView;
 
 class Creature;
 class Game;
@@ -47,7 +47,7 @@ protected:
     const float kDistanceWalk = 4.0f;
 
     Game &_game;
-    GameServices &_services;
+    ServicesView &_services;
     ActionType _type;
     bool _userAction;
 
@@ -55,7 +55,7 @@ protected:
 
     Action(
         Game &game,
-        GameServices &services,
+        ServicesView &services,
         ActionType type,
         bool userAction = false) :
         _game(game),

@@ -37,9 +37,19 @@ void Services::init() {
     _scene->init();
     _script->init();
     _game->init();
+
+    _view = make_unique<ServicesView>(
+        _game->services(),
+        _audio->services(),
+        _graphics->services(),
+        _scene->services(),
+        _script->services(),
+        _resource->services());
 }
 
 void Services::deinit() {
+    _view.reset();
+
     _game.reset();
     _script.reset();
     _scene.reset();

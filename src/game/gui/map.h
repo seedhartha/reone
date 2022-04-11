@@ -29,7 +29,7 @@ class GffStruct;
 
 namespace game {
 
-struct GameServices;
+struct ServicesView;
 
 class Game;
 class Waypoint;
@@ -42,7 +42,7 @@ public:
     };
 
     Map(Game &game,
-        GameServices &services) :
+        ServicesView &services) :
         _game(game),
         _services(services) {
     }
@@ -57,7 +57,7 @@ public:
 
 private:
     Game &_game;
-    GameServices &_services;
+    ServicesView &_services;
 
     int _northAxis {0};
     glm::vec2 _worldPoint1 {0.0f};

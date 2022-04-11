@@ -25,7 +25,7 @@ namespace game {
 
 class PauseConversationAction : public Action {
 public:
-    PauseConversationAction(Game &game, GameServices &services) :
+    PauseConversationAction(Game &game, ServicesView &services) :
         Action(game, services, ActionType::PauseConversation) {
     }
 

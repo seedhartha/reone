@@ -31,7 +31,7 @@ namespace game {
 
 class SaveLoad : public GameGUI {
 public:
-    SaveLoad(Game &game, GameServices &services);
+    SaveLoad(Game &game, ServicesView &services);
 
     void load() override;
 

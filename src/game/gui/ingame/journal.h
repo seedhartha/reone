@@ -31,7 +31,7 @@ namespace game {
 
 class JournalMenu : public GameGUI {
 public:
-    JournalMenu(Game &game, GameServices &services);
+    JournalMenu(Game &game, ServicesView &services);
 
     void load() override;
 

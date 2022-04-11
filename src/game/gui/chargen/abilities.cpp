@@ -63,7 +63,7 @@ static const unordered_map<Ability, int> g_descStrRefByAbility {
 CharGenAbilities::CharGenAbilities(
     CharacterGeneration &charGen,
     Game &game,
-    GameServices &services) :
+    ServicesView &services) :
     GameGUI(game, services),
     _charGen(charGen) {
     _resRef = getResRef("abchrgen");
@@ -108,7 +108,7 @@ void CharGenAbilities::load() {
     });
     _binding.btnRecommended->setOnClick([this]() {
         ClassType classType = _charGen.character().attributes.getEffectiveClass();
-        shared_ptr<CreatureClass> clazz(_services.classes.get(classType));
+        shared_ptr<CreatureClass> clazz(_services.game.classes.get(classType));
         _attributes = clazz->defaultAttributes();
         _points = 0;
         refreshControls();

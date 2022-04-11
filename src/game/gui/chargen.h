@@ -65,7 +65,7 @@ public:
         LevelUp
     };
 
-    CharacterGeneration(Game &game, GameServices &services);
+    CharacterGeneration(Game &game, ServicesView &services);
 
     void load() override;
     bool handle(const SDL_Event &event) override;

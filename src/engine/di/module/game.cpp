@@ -65,12 +65,7 @@ void GameModule::init() {
         *_soundSets,
         *_spells,
         *_surfaces,
-        *_visibilities,
-        _audio.services(),
-        _graphics.services(),
-        _scene.services(),
-        _script.services(),
-        _resource.services());
+        *_visibilities);
 
     _resourceLayout->init();
     _cameraStyles->init();

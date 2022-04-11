@@ -38,7 +38,7 @@ namespace reone {
 
 namespace game {
 
-InventoryMenu::InventoryMenu(Game &game, GameServices &services) :
+InventoryMenu::InventoryMenu(Game &game, ServicesView &services) :
     GameGUI(game, services) {
     _resRef = getResRef("inventory");
 

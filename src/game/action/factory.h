@@ -62,11 +62,11 @@ namespace reone {
 namespace game {
 
 class Game;
-struct GameServices;
+struct ServicesView;
 
 class ActionFactory {
 public:
-    ActionFactory(Game &game, GameServices &services) :
+    ActionFactory(Game &game, ServicesView &services) :
         _game(game),
         _services(services) {
     }
@@ -261,7 +261,7 @@ public:
 
 private:
     Game &_game;
-    GameServices &_services;
+    ServicesView &_services;
 };
 
 } // namespace game

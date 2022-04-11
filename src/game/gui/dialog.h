@@ -31,7 +31,7 @@ namespace game {
 
 class DialogGUI : public Conversation {
 public:
-    DialogGUI(Game &game, GameServices &services);
+    DialogGUI(Game &game, ServicesView &services);
 
     void load() override;
     void update(float dt) override;

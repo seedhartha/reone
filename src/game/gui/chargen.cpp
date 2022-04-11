@@ -49,7 +49,7 @@ namespace game {
 
 static constexpr float kModelScale = 1.1f;
 
-CharacterGeneration::CharacterGeneration(Game &game, GameServices &services) :
+CharacterGeneration::CharacterGeneration(Game &game, ServicesView &services) :
     GameGUI(game, services) {
     _resRef = getResRef("maincg");
 
@@ -359,7 +359,7 @@ void CharacterGeneration::cancel() {
 void CharacterGeneration::finish() {
     if (_type == Type::LevelUp) {
         ClassType classType = _character.attributes.getEffectiveClass();
-        shared_ptr<CreatureClass> clazz(_services.classes.get(classType));
+        shared_ptr<CreatureClass> clazz(_services.game.classes.get(classType));
         _character.attributes.addClassLevels(clazz.get(), 1);
         shared_ptr<Creature> partyLeader(_game.party().getLeader());
         partyLeader->attributes() = _character.attributes;
@@ -412,7 +412,7 @@ void CharacterGeneration::reloadCharacterModel() {
         .invoke();
 
     _binding.modelLbl->setSceneName(kSceneCharGen);
-    _binding.portraitLbl->setBorderFill(_services.portraits.getTextureByAppearance(_character.appearance));
+    _binding.portraitLbl->setBorderFill(_services.game.portraits.getTextureByAppearance(_character.appearance));
 }
 
 shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sceneGraph) {
@@ -431,7 +431,7 @@ shared_ptr<ModelSceneNode> CharacterGeneration::getCharacterModel(SceneGraph &sc
 }
 
 void CharacterGeneration::updateAttributes() {
-    shared_ptr<CreatureClass> clazz(_services.classes.get(_character.attributes.getEffectiveClass()));
+    shared_ptr<CreatureClass> clazz(_services.game.classes.get(_character.attributes.getEffectiveClass()));
     _binding.lblClass->setTextMessage(clazz->name());
 
     int vitality = clazz->hitdie() + _character.attributes.getAbilityModifier(Ability::Constitution);

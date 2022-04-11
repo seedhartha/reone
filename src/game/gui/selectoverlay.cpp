@@ -66,7 +66,7 @@ static string g_attackIcon("i_attack");
 
 SelectionOverlay::SelectionOverlay(
     Game &game,
-    GameServices &services) :
+    ServicesView &services) :
     _game(game),
     _services(services) {
     _actionSlots.resize(kNumActionSlots);
@@ -197,7 +197,7 @@ void SelectionOverlay::update() {
 
             auto hilightedCreature = dynamic_pointer_cast<Creature>(hilightedObject);
             if (hilightedCreature) {
-                _hilightedHostile = !hilightedCreature->isDead() && _services.reputes.getIsEnemy(*(_game.party().getLeader()), *hilightedCreature);
+                _hilightedHostile = !hilightedCreature->isDead() && _services.game.reputes.getIsEnemy(*(_game.party().getLeader()), *hilightedCreature);
             }
         }
     }
@@ -237,7 +237,7 @@ void SelectionOverlay::update() {
 
             auto selectedCreature = dynamic_pointer_cast<Creature>(selectedObject);
             if (selectedCreature) {
-                _selectedHostile = !selectedCreature->isDead() && _services.reputes.getIsEnemy(*_game.party().getLeader(), *selectedCreature);
+                _selectedHostile = !selectedCreature->isDead() && _services.game.reputes.getIsEnemy(*_game.party().getLeader(), *selectedCreature);
             }
         }
     }
@@ -398,14 +398,14 @@ void SelectionOverlay::drawActionIcon(int index) {
         texture = _services.graphics.textures.get(g_attackIcon, TextureUsage::GUI);
         break;
     case ActionType::UseFeat: {
-        shared_ptr<Feat> feat(_services.feats.get(action.feat));
+        shared_ptr<Feat> feat(_services.game.feats.get(action.feat));
         if (feat) {
             texture = feat->icon;
         }
         break;
     }
     case ActionType::UseSkill: {
-        shared_ptr<Skill> skill(_services.skills.get(action.skill));
+        shared_ptr<Skill> skill(_services.game.skills.get(action.skill));
         if (skill) {
             texture = skill->icon;
         }

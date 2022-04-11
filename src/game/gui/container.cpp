@@ -44,7 +44,7 @@ static constexpr int kSwitchToResRef = 47884;
 static constexpr int kGiveItemResRef = 47885;
 static constexpr int kInventoryResRef = 393;
 
-ContainerGUI::ContainerGUI(Game &game, GameServices &services) :
+ContainerGUI::ContainerGUI(Game &game, ServicesView &services) :
     GameGUI(game, services) {
     _resRef = getResRef("container");
 

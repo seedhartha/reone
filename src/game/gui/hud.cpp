@@ -48,7 +48,7 @@ namespace game {
 
 static string g_attackIcon("i_attack");
 
-HUD::HUD(Game &game, GameServices &services) :
+HUD::HUD(Game &game, ServicesView &services) :
     GameGUI(game, services),
     _select(game, services) {
     _resRef = getResRef("mipc28x6");
@@ -490,7 +490,7 @@ void HUD::refreshActionQueueItems() const {
                 break;
             case ActionType::UseFeat: {
                 auto featAction = static_pointer_cast<UseFeatAction>(actions[i]);
-                shared_ptr<Feat> feat(_services.feats.get(featAction->feat()));
+                shared_ptr<Feat> feat(_services.game.feats.get(featAction->feat()));
                 if (feat) {
                     item.setBorderFill(feat->icon);
                 }

@@ -31,7 +31,7 @@ namespace game {
 constexpr float kDetectionRange = 20.0f;
 
 class Game;
-struct GameServices;
+struct ServicesView;
 
 class Combat {
 public:
@@ -45,7 +45,7 @@ public:
 
     Combat(
         Game &game,
-        GameServices &services) :
+        ServicesView &services) :
         _game(game),
         _services(services) {
     }
@@ -100,7 +100,7 @@ private:
     typedef std::map<uint32_t, std::unique_ptr<Round>> RoundMap;
 
     Game &_game;
-    GameServices &_services;
+    ServicesView &_services;
 
     RoundMap _roundByAttacker;
 

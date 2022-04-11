@@ -39,7 +39,7 @@ namespace game {
  */
 class Conversation : public GameGUI {
 public:
-    Conversation(Game &game, GameServices &services) :
+    Conversation(Game &game, ServicesView &services) :
         GameGUI(game, services) {
     }
 

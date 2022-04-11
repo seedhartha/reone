@@ -107,9 +107,9 @@ void Creature::loadAppearance() {
     _envmap = boost::to_lower_copy(appearances->getString(_appearance, "envmap"));
 
     if (_portraitId > 0) {
-        _portrait = _services.portraits.getTextureByIndex(_portraitId);
+        _portrait = _services.game.portraits.getTextureByIndex(_portraitId);
     } else {
-        _portrait = _services.portraits.getTextureByAppearance(_appearance);
+        _portrait = _services.game.portraits.getTextureByAppearance(_appearance);
     }
 
     auto modelSceneNode = buildModel();
@@ -669,11 +669,11 @@ void Creature::onEventSignalled(const string &name) {
     if (_footstepType == -1 || _walkmeshMaterial == -1 || name != "snd_footstep") {
         return;
     }
-    shared_ptr<FootstepTypeSounds> sounds(_services.footstepSounds.get(_footstepType));
+    shared_ptr<FootstepTypeSounds> sounds(_services.game.footstepSounds.get(_footstepType));
     if (!sounds) {
         return;
     }
-    const Surface &surface = _services.surfaces.getSurface(_walkmeshMaterial);
+    const Surface &surface = _services.game.surfaces.getSurface(_walkmeshMaterial);
     vector<shared_ptr<AudioStream>> materialSounds;
     if (surface.sound == "DT") {
         materialSounds = sounds->dirt;
@@ -1343,7 +1343,7 @@ void Creature::loadSoundSetFromUTC(const GffStruct &utc) {
     }
     string soundSetResRef(soundSetTable->getString(soundSetIdx, "resref"));
     if (!soundSetResRef.empty()) {
-        _soundSet = _services.soundSets.get(soundSetResRef);
+        _soundSet = _services.game.soundSets.get(soundSetResRef);
     }
 }
 
@@ -1370,7 +1370,7 @@ void Creature::loadAttributesFromUTC(const GffStruct &utc) {
     for (auto &classGffs : utc.getList("ClassList")) {
         int clazz = classGffs->getInt("Class");
         int level = classGffs->getInt("ClassLevel");
-        attributes.addClassLevels(_services.classes.get(static_cast<ClassType>(clazz)).get(), level);
+        attributes.addClassLevels(_services.game.classes.get(static_cast<ClassType>(clazz)).get(), level);
         for (auto &spellGffs : classGffs->getList("KnownList0")) {
             auto spell = static_cast<SpellType>(spellGffs->getUint("Spell"));
             attributes.addSpell(spell);

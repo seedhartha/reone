@@ -24,7 +24,7 @@ namespace reone {
 
 namespace game {
 
-struct GameServices;
+struct ServicesView;
 struct RoutineContext;
 
 class Game;
@@ -33,7 +33,7 @@ class Routines : public script::IRoutines {
 public:
     Routines() = default;
 
-    Routines(Game &game, GameServices &services) :
+    Routines(Game &game, ServicesView &services) :
         _game(&game),
         _services(&services) {
     }
@@ -48,7 +48,7 @@ public:
 
 private:
     Game *_game {nullptr};
-    GameServices *_services {nullptr};
+    ServicesView *_services {nullptr};
 
     std::vector<script::Routine> _routines;
 

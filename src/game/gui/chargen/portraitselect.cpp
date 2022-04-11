@@ -58,7 +58,7 @@ static constexpr float kModelScale = 0.2f;
 PortraitSelection::PortraitSelection(
     CharacterGeneration &charGen,
     Game &game,
-    GameServices &services) :
+    ServicesView &services) :
     GameGUI(game, services),
     _charGen(charGen) {
 
@@ -176,7 +176,7 @@ int PortraitSelection::getAppearanceFromCurrentPortrait() const {
 void PortraitSelection::updatePortraits() {
     _filteredPortraits.clear();
     int sex = _charGen.character().gender == Gender::Female ? 1 : 0;
-    for (auto &portrait : _services.portraits.portraits()) {
+    for (auto &portrait : _services.game.portraits.portraits()) {
         if (portrait.forPC && portrait.sex == sex) {
             _filteredPortraits.push_back(move(portrait));
         }

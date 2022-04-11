@@ -27,18 +27,18 @@ class ExecutionContext;
 
 namespace game {
 
-struct GameServices;
+struct ServicesView;
 
 class Game;
 
 struct RoutineContext {
     Game &game;
-    GameServices &services;
+    ServicesView &services;
     script::ExecutionContext &execution;
 
     RoutineContext(
         Game &game,
-        GameServices &services,
+        ServicesView &services,
         script::ExecutionContext &execution) :
         game(game),
         services(services),

@@ -31,7 +31,7 @@ namespace game {
 
 class MessagesMenu : public GameGUI {
 public:
-    MessagesMenu(Game &game, GameServices &services);
+    MessagesMenu(Game &game, ServicesView &services);
 
     void load() override;
 

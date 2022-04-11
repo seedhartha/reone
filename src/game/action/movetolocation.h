@@ -25,7 +25,7 @@ namespace game {
 
 class MoveToLocationAction : public LocationAction {
 public:
-    MoveToLocationAction(Game &game, GameServices &services, std::shared_ptr<Location> destination, bool run, float timeout, bool force) :
+    MoveToLocationAction(Game &game, ServicesView &services, std::shared_ptr<Location> destination, bool run, float timeout, bool force) :
         LocationAction(game, services, ActionType::MoveToLocation, std::move(destination)),
         _run(run),
         _timeout(timeout),

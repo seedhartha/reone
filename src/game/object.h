@@ -32,7 +32,7 @@ namespace reone {
 
 namespace game {
 
-struct GameServices;
+struct ServicesView;
 
 class Action;
 class Game;
@@ -212,7 +212,7 @@ protected:
     ObjectType _type;
     std::string _sceneName;
     Game &_game;
-    GameServices &_services;
+    ServicesView &_services;
 
     std::string _tag;
     std::string _blueprintResRef;
@@ -271,7 +271,7 @@ protected:
         ObjectType type,
         std::string sceneName,
         Game &game,
-        GameServices &services) :
+        ServicesView &services) :
         _id(id),
         _type(type),
         _sceneName(std::move(sceneName)),

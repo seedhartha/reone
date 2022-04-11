@@ -48,7 +48,7 @@ namespace game {
 
 static constexpr float kKotorModelSize = 1.4f;
 
-MainMenu::MainMenu(Game &game, GameServices &services) :
+MainMenu::MainMenu(Game &game, ServicesView &services) :
     GameGUI(game, services) {
     if (game.isTSL()) {
         _resRef = "mainmenu8x6_p";

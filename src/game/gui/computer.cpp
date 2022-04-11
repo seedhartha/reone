@@ -31,7 +31,7 @@ namespace reone {
 
 namespace game {
 
-ComputerGUI::ComputerGUI(Game &game, GameServices &services) :
+ComputerGUI::ComputerGUI(Game &game, ServicesView &services) :
     Conversation(game, services) {
     _resRef = getResRef("computer");
     _scaling = ScalingMode::Stretch;

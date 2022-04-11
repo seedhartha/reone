@@ -53,7 +53,7 @@ static int g_strRefRemove = 38456;
 static glm::vec3 g_kotorColorOn = {0.984314f, 1.0f, 0};
 static glm::vec3 g_kotorColorAdded = {0, 0.831373f, 0.090196f};
 
-PartySelection::PartySelection(Game &game, GameServices &services) :
+PartySelection::PartySelection(Game &game, ServicesView &services) :
     GameGUI(game, services) {
     if (game.isTSL()) {
         _resRef = "partyselect_p";
@@ -245,10 +245,10 @@ void PartySelection::prepare(const PartySelectionContext &ctx) {
             shared_ptr<Texture> portrait;
             int portraitId = utc->getInt("PortraitId", 0);
             if (portraitId > 0) {
-                portrait = _services.portraits.getTextureByIndex(portraitId);
+                portrait = _services.game.portraits.getTextureByIndex(portraitId);
             } else {
                 int appearance = utc->getInt("Appearance_Type");
-                portrait = _services.portraits.getTextureByAppearance(appearance);
+                portrait = _services.game.portraits.getTextureByAppearance(appearance);
             }
             btnNpc.setDisabled(false);
             lblChar.setBorderFill(move(portrait));
