@@ -25,9 +25,12 @@
 
 using namespace std;
 
+using namespace reone::engine;
 using namespace reone::game;
 
 namespace reone {
+
+namespace engine {
 
 static unique_ptr<Game> newGame(GameID gameId, Options options, ServicesView &services) {
     switch (gameId) {
@@ -60,5 +63,7 @@ int Engine::run() {
 
     return game->run();
 }
+
+} // namespace engine
 
 } // namespace reone

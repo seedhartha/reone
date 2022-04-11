@@ -33,6 +33,8 @@
 
 namespace reone {
 
+namespace engine {
+
 class ResourceModule;
 
 class GraphicsModule : boost::noncopyable {
@@ -79,5 +81,7 @@ private:
 
     std::unique_ptr<graphics::GraphicsServices> _services;
 };
+
+} // namespace engine
 
 } // namespace reone

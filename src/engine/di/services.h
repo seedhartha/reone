@@ -29,6 +29,8 @@
 
 namespace reone {
 
+namespace engine {
+
 class Services {
 public:
     Services(game::GameID gameId, game::Options &gameOptions) :
@@ -56,5 +58,7 @@ private:
 
     std::unique_ptr<game::ServicesView> _view;
 };
+
+} // namespace engine
 
 } // namespace reone

@@ -21,7 +21,7 @@
 
 namespace reone {
 
-namespace game {
+namespace engine {
 
 class GameProbe {
 public:
@@ -29,12 +29,12 @@ public:
         _gamePath(std::move(gamePath)) {
     }
 
-    GameID probe();
+    game::GameID probe();
 
 private:
     boost::filesystem::path _gamePath;
 };
 
-} // namespace game
+} // namespace engine
 
 } // namespace reone

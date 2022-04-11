@@ -25,6 +25,8 @@ using namespace reone::audio;
 
 namespace reone {
 
+namespace engine {
+
 void AudioModule::init() {
     _audioFiles = make_unique<AudioFiles>(_resource.resources());
     _audioContext = make_unique<AudioContext>();
@@ -42,5 +44,7 @@ void AudioModule::deinit() {
     _audioContext.reset();
     _audioFiles.reset();
 }
+
+} // namespace engine
 
 } // namespace reone

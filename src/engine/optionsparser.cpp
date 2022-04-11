@@ -21,6 +21,7 @@
 
 using namespace std;
 
+using namespace reone::engine;
 using namespace reone::game;
 using namespace reone::graphics;
 
@@ -28,6 +29,8 @@ namespace fs = boost::filesystem;
 namespace po = boost::program_options;
 
 namespace reone {
+
+namespace engine {
 
 static constexpr char kConfigFilename[] = "reone.cfg";
 
@@ -100,5 +103,7 @@ Options OptionsParser::parse() {
 
     return move(options);
 }
+
+} // namespace engine
 
 } // namespace reone

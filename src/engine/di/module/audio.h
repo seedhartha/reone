@@ -25,6 +25,8 @@
 
 namespace reone {
 
+namespace engine {
+
 class ResourceModule;
 
 class AudioModule : boost::noncopyable {
@@ -55,5 +57,7 @@ private:
 
     std::unique_ptr<audio::AudioServices> _services;
 };
+
+} // namespace engine
 
 } // namespace reone

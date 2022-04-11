@@ -29,6 +29,8 @@ using namespace reone::scene;
 
 namespace reone {
 
+namespace engine {
+
 void SceneModule::init() {
     _sceneGraphs = make_unique<SceneGraphs>(
         _options,
@@ -56,5 +58,7 @@ void SceneModule::deinit() {
     _services.reset();
     _sceneGraphs.reset();
 }
+
+} // namespace engine
 
 } // namespace reone
