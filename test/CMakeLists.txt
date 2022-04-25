@@ -16,6 +16,10 @@
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 set(TEST_SOURCES
+    2dareader.cpp
+    2dawriter.cpp
+    gffreader.cpp
+    gffwriter.cpp
     main.cpp
     streamreader.cpp
     streamwriter.cpp
