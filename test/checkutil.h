@@ -17,7 +17,7 @@
 
 #pragma once
 
-std::string hexify(std::string s) {
+inline std::string hexify(const std::string &s) {
     std::ostringstream ss;
     ss << std::hex << std::setfill('0') << std::setw(2);
     for (auto &ch : s) {
@@ -26,6 +26,6 @@ std::string hexify(std::string s) {
     return ss.str();
 }
 
-std::string notEqualMessage(std::string l, std::string r) {
+inline std::string notEqualMessage(const std::string &l, const std::string &r) {
     return hexify(l) + " != " + hexify(r);
 }

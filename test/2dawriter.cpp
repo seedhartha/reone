@@ -21,6 +21,8 @@
 #include "../src/resource/2da.h"
 #include "../src/resource/format/2dawriter.h"
 
+#include "checkutil.h"
+
 using namespace std;
 
 using namespace reone;
@@ -30,6 +32,7 @@ BOOST_AUTO_TEST_SUITE(two_da_writer)
 
 BOOST_AUTO_TEST_CASE(should_write_two_da) {
     // given
+
     auto twoDa = make_shared<TwoDA>();
     twoDa->addColumn("key");
     twoDa->addColumn("value");
@@ -37,14 +40,30 @@ BOOST_AUTO_TEST_CASE(should_write_two_da) {
 
     auto writer = TwoDaWriter(twoDa);
     auto stream = make_shared<ostringstream>();
-    auto expectedOutput = string("2DA V2.b\x0akey\x09value\x09\x00\x01\x00\x00\x00\x30\x09\x00\x00\x02\x00\x04\x00\x40\x00\x41\x00", 36);
+
+    auto ss = ostringstream();
+    ss << "2DA V2.b";
+    ss << string("\x0a", 1);
+    ss << string("key\x09", 4);
+    ss << string("value\x09", 6);
+    ss << string("\x00", 1);
+    ss << string("\x01\x00\x00\x00", 4);
+    ss << string("\x30\x09", 2);
+    ss << string("\x00\x00", 2);
+    ss << string("\x02\x00", 2);
+    ss << string("\x04\x00", 2);
+    ss << string("\x40\x00", 2);
+    ss << string("\x41\x00", 2);
+    auto expectedOutput = ss.str();
 
     // when
+
     writer.save(stream);
 
     // then
+
     auto actualOutput = stream->str();
-    BOOST_CHECK_EQUAL(expectedOutput, actualOutput);
+    BOOST_TEST(expectedOutput == actualOutput, notEqualMessage(expectedOutput, actualOutput));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
