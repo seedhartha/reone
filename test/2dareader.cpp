@@ -37,13 +37,15 @@ BOOST_AUTO_TEST_CASE(should_read_two_da) {
     ss << string("key\x09", 4);
     ss << string("value\x09", 6);
     ss << string("\x00", 1);
-    ss << string("\x01\x00\x00\x00", 4);
-    ss << string("\x30\x09", 2);
+    ss << string("\x02\x00\x00\x00", 4);
+    ss << string("\x30\x09\x31\x09", 4);
     ss << string("\x00\x00", 2);
-    ss << string("\x02\x00", 2);
-    ss << string("\x04\x00", 2);
-    ss << string("\x40\x00", 2);
-    ss << string("\x41\x00", 2);
+    ss << string("\x07\x00", 2);
+    ss << string("\x07\x00", 2);
+    ss << string("\x07\x00", 2);
+    ss << string("\x0c\x00", 2);
+    ss << string("unique\x00", 7);
+    ss << string("same\x00", 5);
 
     auto stream = make_shared<istringstream>(ss.str());
     auto reader = TwoDaReader();
@@ -56,9 +58,11 @@ BOOST_AUTO_TEST_CASE(should_read_two_da) {
 
     auto twoDa = reader.twoDa();
     BOOST_CHECK_EQUAL(twoDa->getColumnCount(), 2);
-    BOOST_CHECK_EQUAL(twoDa->getRowCount(), 1);
-    BOOST_CHECK_EQUAL(string("@", 1), twoDa->getString(0, "key"));
-    BOOST_CHECK_EQUAL(string("A", 1), twoDa->getString(0, "value"));
+    BOOST_CHECK_EQUAL(twoDa->getRowCount(), 2);
+    BOOST_CHECK_EQUAL(string("unique"), twoDa->getString(0, "key"));
+    BOOST_CHECK_EQUAL(string("same"), twoDa->getString(0, "value"));
+    BOOST_CHECK_EQUAL(string("same"), twoDa->getString(1, "key"));
+    BOOST_CHECK_EQUAL(string("same"), twoDa->getString(1, "value"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
