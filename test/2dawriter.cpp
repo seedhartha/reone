@@ -36,7 +36,8 @@ BOOST_AUTO_TEST_CASE(should_write_two_da) {
     auto twoDa = make_shared<TwoDA>();
     twoDa->addColumn("key");
     twoDa->addColumn("value");
-    twoDa->add(TwoDA::Row {vector<string> {"@", "A"}});
+    twoDa->add(TwoDA::Row {vector<string> {"unique", "same"}});
+    twoDa->add(TwoDA::Row {vector<string> {"same", "same"}});
 
     auto writer = TwoDaWriter(twoDa);
     auto stream = make_shared<ostringstream>();
@@ -47,13 +48,15 @@ BOOST_AUTO_TEST_CASE(should_write_two_da) {
     ss << string("key\x09", 4);
     ss << string("value\x09", 6);
     ss << string("\x00", 1);
-    ss << string("\x01\x00\x00\x00", 4);
-    ss << string("\x30\x09", 2);
+    ss << string("\x02\x00\x00\x00", 4);
+    ss << string("\x30\x09\x31\x09", 4);
     ss << string("\x00\x00", 2);
-    ss << string("\x02\x00", 2);
-    ss << string("\x04\x00", 2);
-    ss << string("\x40\x00", 2);
-    ss << string("\x41\x00", 2);
+    ss << string("\x07\x00", 2);
+    ss << string("\x07\x00", 2);
+    ss << string("\x07\x00", 2);
+    ss << string("\x0c\x00", 2);
+    ss << string("unique\x00", 7);
+    ss << string("same\x00", 5);
     auto expectedOutput = ss.str();
 
     // when
