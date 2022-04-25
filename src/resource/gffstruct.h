@@ -50,6 +50,7 @@ public:
     glm::quat getOrientation(const std::string &name, glm::quat defValue = glm::quat(1.0f, 0.0f, 0.0f, 0.0f)) const;
     std::shared_ptr<GffStruct> getStruct(const std::string &name) const;
     std::vector<std::shared_ptr<GffStruct>> getList(const std::string &name) const;
+    ByteArray getData(const std::string &name) const;
 
     uint32_t type() const { return _type; }
     const std::vector<GffField> &fields() const { return _fields; }

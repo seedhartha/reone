@@ -153,6 +153,14 @@ vector<shared_ptr<GffStruct>> GffStruct::getList(const string &name) const {
     return field->children;
 }
 
+ByteArray GffStruct::getData(const string &name) const {
+    const GffField *field = get(name);
+    if (!field)
+        return ByteArray();
+
+    return field->data;
+}
+
 } // namespace resource
 
 } // namespace reone
