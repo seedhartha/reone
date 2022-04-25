@@ -19,7 +19,7 @@
 
 #include "../src/common/types.h"
 
-inline std::string hexify(const std::string &s) {
+inline std::string describe(const std::string &s) {
     std::ostringstream ss;
     ss << std::hex << std::setfill('0') << std::setw(2);
     for (auto &ch : s) {
@@ -28,7 +28,7 @@ inline std::string hexify(const std::string &s) {
     return ss.str();
 }
 
-inline std::string hexify(const std::u16string &s) {
+inline std::string describe(const std::u16string &s) {
     std::ostringstream ss;
     ss << std::hex << std::setfill('0') << std::setw(4);
     for (auto &ch : s) {
@@ -37,7 +37,7 @@ inline std::string hexify(const std::u16string &s) {
     return ss.str();
 }
 
-inline std::string hexify(const reone::ByteArray &ba) {
+inline std::string describe(const reone::ByteArray &ba) {
     std::ostringstream ss;
     ss << std::hex << std::setfill('0') << std::setw(4);
     for (auto &b : ba) {
@@ -46,7 +46,33 @@ inline std::string hexify(const reone::ByteArray &ba) {
     return ss.str();
 }
 
+inline std::string describe(const glm::vec3 &v) {
+    std::ostringstream ss;
+    ss << "[";
+    ss << v.x;
+    ss << ", ";
+    ss << v.y;
+    ss << ", ";
+    ss << v.z;
+    ss << "]";
+    return ss.str();
+}
+
+inline std::string describe(const glm::quat &q) {
+    std::ostringstream ss;
+    ss << "[";
+    ss << q.w;
+    ss << ", ";
+    ss << q.x;
+    ss << ", ";
+    ss << q.y;
+    ss << ", ";
+    ss << q.z;
+    ss << "]";
+    return ss.str();
+}
+
 template <class T>
 inline std::string notEqualMessage(const T &l, const T &r) {
-    return hexify(l) + " != " + hexify(r);
+    return describe(l) + " != " + describe(r);
 }
