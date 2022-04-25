@@ -54,12 +54,28 @@ int GffStruct::getInt(const string &name, int defValue) const {
     return field->intValue;
 }
 
+int64_t GffStruct::getInt64(const string &name, int64_t defValue) const {
+    const GffField *field = get(name);
+    if (!field)
+        return defValue;
+
+    return field->int64Value;
+}
+
 uint32_t GffStruct::getUint(const string &name, uint32_t defValue) const {
     const GffField *field = get(name);
     if (!field)
         return defValue;
 
     return field->uintValue;
+}
+
+uint64_t GffStruct::getUint64(const string &name, uint64_t defValue) const {
+    const GffField *field = get(name);
+    if (!field)
+        return defValue;
+
+    return field->uint64Value;
 }
 
 static glm::vec3 colorFromUint32(uint32_t value) {
@@ -87,6 +103,14 @@ float GffStruct::getFloat(const string &name, float defValue) const {
         return defValue;
 
     return field->floatValue;
+}
+
+double GffStruct::getDouble(const string &name, double defValue) const {
+    const GffField *field = get(name);
+    if (!field)
+        return defValue;
+
+    return field->doubleValue;
 }
 
 string GffStruct::getString(const string &name, string defValue) const {
