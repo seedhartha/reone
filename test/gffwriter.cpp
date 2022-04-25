@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(should_write_gff) {
     // then
 
     auto actualOutput = stream->str();
-    BOOST_TEST(expectedOutput == actualOutput, notEqualMessage(expectedOutput, actualOutput));
+    BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

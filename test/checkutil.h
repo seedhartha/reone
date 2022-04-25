@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../src/common/types.h"
+
 inline std::string hexify(const std::string &s) {
     std::ostringstream ss;
     ss << std::hex << std::setfill('0') << std::setw(2);
@@ -26,6 +28,25 @@ inline std::string hexify(const std::string &s) {
     return ss.str();
 }
 
-inline std::string notEqualMessage(const std::string &l, const std::string &r) {
+inline std::string hexify(const std::u16string &s) {
+    std::ostringstream ss;
+    ss << std::hex << std::setfill('0') << std::setw(4);
+    for (auto &ch : s) {
+        ss << static_cast<int>(ch & 0xffff);
+    }
+    return ss.str();
+}
+
+inline std::string hexify(const reone::ByteArray &ba) {
+    std::ostringstream ss;
+    ss << std::hex << std::setfill('0') << std::setw(4);
+    for (auto &b : ba) {
+        ss << static_cast<int>(b & 0xff);
+    }
+    return ss.str();
+}
+
+template <class T>
+inline std::string notEqualMessage(const T &l, const T &r) {
     return hexify(l) + " != " + hexify(r);
 }
