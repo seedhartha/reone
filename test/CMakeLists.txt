@@ -17,6 +17,8 @@ find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 set(TEST_SOURCES
     main.cpp
+    streamreader.cpp
+    streamwriter.cpp
     unicode.cpp)
 
 add_executable(reone-tests ${TEST_SOURCES} ${CLANG_FORMAT_PATH})
