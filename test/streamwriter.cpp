@@ -17,34 +17,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../src/common/unicodeutil.h"
+#include "../src/common/streamwriter.h"
 
-using namespace std;
-
-using namespace reone;
-
-BOOST_AUTO_TEST_SUITE(unicode_utils)
-
-BOOST_AUTO_TEST_CASE(should_convert_utf8_to_utf16) {
-    // given
-    auto expected = u16string(u"Hello, world!");
-
-    // when
-    auto actual = convertUTF8ToUTF16(string("Hello, world!"));
-
-    // then
-    BOOST_CHECK(expected == actual);
-}
-
-BOOST_AUTO_TEST_CASE(should_convert_utf16_to_utf8) {
-    // given
-    auto expected = string("Hello, world!");
-
-    // when
-    auto actual = convertUTF16ToUTF8(u16string(u"Hello, world!"));
-
-    // then
-    BOOST_CHECK_EQUAL(expected, actual);
-}
+BOOST_AUTO_TEST_SUITE(stream_writer)
 
 BOOST_AUTO_TEST_SUITE_END()
