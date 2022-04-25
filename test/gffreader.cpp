@@ -37,28 +37,38 @@ BOOST_AUTO_TEST_CASE(should_read_gff) {
     ss << string("\x38\x00\x00\x00", 4); // offset to structs
     ss << string("\x01\x00\x00\x00", 4); // number of structs
     ss << string("\x44\x00\x00\x00", 4); // offset to fields
-    ss << string("\x01\x00\x00\x00", 4); // number of fields
-    ss << string("\x50\x00\x00\x00", 4); // offset to labels
-    ss << string("\x01\x00\x00\x00", 4); // number of labels
-    ss << string("\x60\x00\x00\x00", 4); // offset to field data
+    ss << string("\x02\x00\x00\x00", 4); // number of fields
+    ss << string("\x5c\x00\x00\x00", 4); // offset to labels
+    ss << string("\x02\x00\x00\x00", 4); // number of labels
+    ss << string("\x7c\x00\x00\x00", 4); // offset to field data
     ss << string("\x00\x00\x00\x00", 4); // size of field data
-    ss << string("\x60\x00\x00\x00", 4); // offset to field indices
-    ss << string("\x00\x00\x00\x00", 4); // size of field indices
-    ss << string("\x60\x00\x00\x00", 4); // offset to list indices
+    ss << string("\x7c\x00\x00\x00", 4); // offset to field indices
+    ss << string("\x08\x00\x00\x00", 4); // size of field indices
+    ss << string("\x84\x00\x00\x00", 4); // offset to list indices
     ss << string("\x00\x00\x00\x00", 4); // size of list indices
 
     // structs
     ss << string("\xff\xff\xff\xff", 4); // type
     ss << string("\x00\x00\x00\x00", 4); // data offset
-    ss << string("\x01\x00\x00\x00", 4); // field count
+    ss << string("\x02\x00\x00\x00", 4); // field count
 
     // fields
     ss << string("\x00\x00\x00\x00", 4); // type
     ss << string("\x00\x00\x00\x00", 4); // label index
     ss << string("\x01\x00\x00\x00", 4); // data
+    ss << string("\x00\x00\x00\x00", 4); // type
+    ss << string("\x01\x00\x00\x00", 4); // label index
+    ss << string("\x02\x00\x00\x00", 4); // data
 
     // labels
     ss << string("Name\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16);
+    ss << string("Surname\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16);
+
+    // field data
+
+    // field indices
+    ss << string("\x00\x00\x00\x00", 4);
+    ss << string("\x01\x00\x00\x00", 4);
 
     auto stream = make_shared<istringstream>(ss.str());
     auto reader = GffReader();
@@ -70,9 +80,11 @@ BOOST_AUTO_TEST_CASE(should_read_gff) {
     // then
 
     auto gff = reader.root();
-    BOOST_CHECK_EQUAL(1ll, gff->fields().size());
+    BOOST_CHECK_EQUAL(2ll, gff->fields().size());
     BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Byte), static_cast<int>(gff->fields()[0].type));
+    BOOST_CHECK_EQUAL(static_cast<int>(GffFieldType::Byte), static_cast<int>(gff->fields()[1].type));
     BOOST_CHECK_EQUAL(1, gff->getUint("Name"));
+    BOOST_CHECK_EQUAL(2, gff->getUint("Surname"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
