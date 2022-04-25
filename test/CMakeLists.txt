@@ -15,6 +15,9 @@
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
+set(TEST_HEADERS
+    checkutil.h)
+
 set(TEST_SOURCES
     2dareader.cpp
     2dawriter.cpp
@@ -25,7 +28,7 @@ set(TEST_SOURCES
     streamwriter.cpp
     unicode.cpp)
 
-add_executable(reone-tests ${TEST_SOURCES} ${CLANG_FORMAT_PATH})
+add_executable(reone-tests ${TEST_HEADERS} ${TEST_SOURCES} ${CLANG_FORMAT_PATH})
 set_target_properties(reone-tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_compile_definitions(reone-tests PRIVATE BOOST_TEST_DYN_LINK)
 target_precompile_headers(reone-tests PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
