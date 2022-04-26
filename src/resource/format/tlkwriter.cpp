@@ -36,6 +36,11 @@ struct StringFlags {
 };
 
 void TlkWriter::save(const fs::path &path) {
+    auto tlk = make_shared<fs::ofstream>(path, ios::binary);
+    save(tlk);
+}
+
+void TlkWriter::save(std::shared_ptr<std::ostream> out) {
     vector<StringDataElement> strData;
 
     uint32_t offString = 0;
@@ -49,12 +54,10 @@ void TlkWriter::save(const fs::path &path) {
         strDataElem.stringSize = strSize;
         strData.push_back(move(strDataElem));
 
-        offString += strSize + 1;
+        offString += strSize;
     }
 
-    auto tlk = make_shared<fs::ofstream>(path, ios::binary);
-    StreamWriter writer(tlk);
-
+    StreamWriter writer(out);
     writer.putString("TLK V3.0");
     writer.putUint32(0); // language id
     writer.putUint32(_talkTable->getStringCount());
@@ -76,7 +79,7 @@ void TlkWriter::save(const fs::path &path) {
     }
 
     for (int i = 0; i < _talkTable->getStringCount(); ++i) {
-        writer.putCString(_talkTable->getString(i).text);
+        writer.putString(_talkTable->getString(i).text);
     }
 }
 
