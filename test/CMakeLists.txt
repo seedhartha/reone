@@ -21,11 +21,17 @@ set(TEST_HEADERS
 set(TEST_SOURCES
     2dareader.cpp
     2dawriter.cpp
+    bifreader.cpp
+    erfreader.cpp
+    erfwriter.cpp
     gffreader.cpp
     gffwriter.cpp
+    keyreader.cpp
     main.cpp
     ncsreader.cpp
     ncswriter.cpp
+    rimreader.cpp
+    rimwriter.cpp
     streamreader.cpp
     streamwriter.cpp
     tlkreader.cpp
