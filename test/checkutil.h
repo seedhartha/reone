@@ -21,27 +21,24 @@
 
 inline std::string describe(const std::string &s) {
     std::ostringstream ss;
-    ss << std::hex << std::setfill('0') << std::setw(2);
     for (auto &ch : s) {
-        ss << static_cast<int>(ch & 0xff);
+        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(ch & 0xff);
     }
     return ss.str();
 }
 
 inline std::string describe(const std::u16string &s) {
     std::ostringstream ss;
-    ss << std::hex << std::setfill('0') << std::setw(4);
     for (auto &ch : s) {
-        ss << static_cast<int>(ch & 0xffff);
+        ss << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(ch & 0xffff);
     }
     return ss.str();
 }
 
 inline std::string describe(const reone::ByteArray &ba) {
     std::ostringstream ss;
-    ss << std::hex << std::setfill('0') << std::setw(4);
     for (auto &b : ba) {
-        ss << static_cast<int>(b & 0xff);
+        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(b & 0xff);
     }
     return ss.str();
 }
