@@ -47,6 +47,29 @@ struct Instruction {
         int sizeLocals;
         int sizeNoDestroy;
     };
+
+    static Instruction newCPDOWNSP(uint32_t offset, int stackOffset, uint16_t size);
+    static Instruction newCPTOPSP(uint32_t offset, int stackOffset, uint16_t size);
+    static Instruction newCPDOWNBP(uint32_t offset, int stackOffset, uint16_t size);
+    static Instruction newCPTOPBP(uint32_t offset, int stackOffset, uint16_t size);
+    static Instruction newCONSTI(uint32_t offset, int value);
+    static Instruction newCONSTF(uint32_t offset, float value);
+    static Instruction newCONSTS(uint32_t offset, std::string value);
+    static Instruction newCONSTO(uint32_t offset, int objectId);
+    static Instruction newACTION(uint32_t offset, int routine, int argCount);
+    static Instruction newMOVSP(uint32_t offset, int stackOffset);
+    static Instruction newJMP(uint32_t offset, int jumpOffset);
+    static Instruction newJSR(uint32_t offset, int jumpOffset);
+    static Instruction newJZ(uint32_t offset, int jumpOffset);
+    static Instruction newJNZ(uint32_t offset, int jumpOffset);
+    static Instruction newDESTRUCT(uint32_t offset, uint16_t size, int stackOffset, uint16_t sizeNoDestroy);
+    static Instruction newDECISP(uint32_t offset, int stackOffset);
+    static Instruction newINCISP(uint32_t offset, int stackOffset);
+    static Instruction newDECIBP(uint32_t offset, int stackOffset);
+    static Instruction newINCIBP(uint32_t offset, int stackOffset);
+    static Instruction newSTORE_STATE(uint32_t offset, uint16_t size, int sizeLocals);
+    static Instruction newEQUALTT(uint32_t offset, uint16_t size);
+    static Instruction newNEQUALTT(uint32_t offset, uint16_t size);
 };
 
 class ScriptProgram : boost::noncopyable {
