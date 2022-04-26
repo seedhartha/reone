@@ -34,6 +34,11 @@ namespace reone {
 namespace script {
 
 void NcsWriter::save(const fs::path &path) {
+    auto ncs = make_shared<fs::ofstream>(path, ios::binary);
+    save(ncs);
+}
+
+void NcsWriter::save(std::shared_ptr<std::ostream> out) {
     auto stream = make_shared<ostringstream>();
     StreamWriter writer(stream, endian::order::big);
 
@@ -105,8 +110,7 @@ void NcsWriter::save(const fs::path &path) {
         }
     }
 
-    auto ncs = make_shared<fs::ofstream>(path, ios::binary);
-    StreamWriter ncsWriter(ncs, endian::order::big);
+    StreamWriter ncsWriter(out, endian::order::big);
 
     ncsWriter.putString(string("NCS V1.0", 8));
     ncsWriter.putByte(0x42);

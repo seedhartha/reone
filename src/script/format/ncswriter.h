@@ -30,6 +30,7 @@ public:
     }
 
     void save(const boost::filesystem::path &path);
+    void save(std::shared_ptr<std::ostream> out);
 
 private:
     ScriptProgram &_program;
