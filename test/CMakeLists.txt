@@ -24,8 +24,12 @@ set(TEST_SOURCES
     gffreader.cpp
     gffwriter.cpp
     main.cpp
+    ncsreader.cpp
+    ncswriter.cpp
     streamreader.cpp
     streamwriter.cpp
+    tlkreader.cpp
+    tlkwriter.cpp
     unicode.cpp)
 
 add_executable(reone-tests ${TEST_HEADERS} ${TEST_SOURCES} ${CLANG_FORMAT_PATH})

@@ -15,33 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <boost/test/unit_test.hpp>
 
-namespace reone {
+#include "../src/script/format/ncsreader.h"
 
-namespace resource {
+using namespace std;
 
-class TalkTable;
+using namespace reone;
+using namespace reone::script;
 
-class TlkWriter : boost::noncopyable {
-public:
-    TlkWriter(std::shared_ptr<TalkTable> talkTable) :
-        _talkTable(std::move(talkTable)) {
-    }
+BOOST_AUTO_TEST_SUITE(ncs_reader)
 
-    void save(const boost::filesystem::path &path);
-    void save(std::shared_ptr<std::ostream> out);
+BOOST_AUTO_TEST_CASE(should_read_ncs) {
+    // given
 
-private:
-    struct StringDataElement {
-        std::string soundResRef;
-        uint32_t offString {0};
-        uint32_t stringSize {0};
-    };
+    // when
 
-    std::shared_ptr<TalkTable> _talkTable;
-};
+    // then
+}
 
-} // namespace resource
-
-} // namespace reone
+BOOST_AUTO_TEST_SUITE_END()
