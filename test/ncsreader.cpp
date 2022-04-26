@@ -18,6 +18,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../src/script/format/ncsreader.h"
+#include "../src/script/program.h"
 
 using namespace std;
 
@@ -29,9 +30,24 @@ BOOST_AUTO_TEST_SUITE(ncs_reader)
 BOOST_AUTO_TEST_CASE(should_read_ncs) {
     // given
 
+    auto ss = ostringstream();
+    ss << "NCS V1.0";
+    // T
+    ss << string("\x42", 1); 
+    ss << string("\x00\x00\x00\x0d", 4);
+
+    auto reader = NcsReader("");
+    auto stream = make_shared<istringstream>(ss.str());
+
     // when
 
+    reader.load(stream);
+
     // then
+
+    auto program = reader.program();
+    BOOST_CHECK_EQUAL(13, program->length());
+    BOOST_CHECK_EQUAL(0ll, program->instructions().size());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

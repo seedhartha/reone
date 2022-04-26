@@ -18,6 +18,9 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../src/script/format/ncswriter.h"
+#include "../src/script/program.h"
+
+#include "checkutil.h"
 
 using namespace std;
 
@@ -29,9 +32,25 @@ BOOST_AUTO_TEST_SUITE(ncs_writer)
 BOOST_AUTO_TEST_CASE(should_write_ncs) {
     // given
 
+    auto ss = ostringstream();
+    ss << "NCS V1.0";
+    // T
+    ss << string("\x42", 1);
+    ss << string("\x00\x00\x00\x0d", 4);
+
+    auto program = ScriptProgram("");
+    auto writer = NcsWriter(program);
+    auto stream = make_shared<ostringstream>();
+    auto expectedOutput = ss.str();
+
     // when
 
+    writer.save(stream);
+
     // then
+
+    auto actualOutput = stream->str();
+    BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
