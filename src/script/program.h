@@ -48,6 +48,13 @@ struct Instruction {
         int sizeNoDestroy;
     };
 
+    Instruction() = default;
+
+    Instruction(uint32_t offset, InstructionType type) :
+        offset(offset),
+        type(type) {
+    }
+
     static Instruction newCPDOWNSP(uint32_t offset, int stackOffset, uint16_t size);
     static Instruction newCPTOPSP(uint32_t offset, int stackOffset, uint16_t size);
     static Instruction newCPDOWNBP(uint32_t offset, int stackOffset, uint16_t size);
