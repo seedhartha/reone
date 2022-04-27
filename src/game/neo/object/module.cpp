@@ -17,11 +17,44 @@
 
 #include "module.h"
 
+#include "../../../common/exception/validation.h"
+#include "../../../common/logutil.h"
+#include "../../../resource/gffs.h"
+#include "../../../resource/gffstruct.h"
+
+using namespace std;
+
+using namespace reone::resource;
+
 namespace reone {
 
 namespace game {
 
 namespace neo {
+
+unique_ptr<Module> Module::Loader::load(const string &name) {
+    info("Loading module " + name);
+
+    auto ifo = _gffs.get("module", ResourceType::Ifo);
+    if (!ifo) {
+        throw ValidationException("IFO not found: " + name);
+    }
+
+    auto areas = vector<shared_ptr<Area>>();
+    auto areaLoader = Area::Loader(_idSeq, _gffs);
+    auto ifoAreas = ifo->getList("Mod_Area_list");
+
+    for (auto &ifoArea : ifoAreas) {
+        auto areaName = ifoArea->getString("Area_Name");
+        areas.push_back(areaLoader.load(areaName));
+    }
+
+    return Module::Builder()
+        .id(_idSeq.nextObjectId())
+        .tag(name)
+        .areas(std::move(areas))
+        .build();
+}
 
 } // namespace neo
 

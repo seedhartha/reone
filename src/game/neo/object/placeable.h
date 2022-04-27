@@ -27,15 +27,15 @@ namespace neo {
 
 class Placeable : public Object {
 public:
-    class Builder : public Object::Builder<Placeable> {
+    class Builder : public Object::Builder<Placeable, Builder> {
     public:
         std::unique_ptr<Placeable> build() override {
-            return std::make_unique<Placeable>(_id);
+            return std::make_unique<Placeable>(_id, _tag);
         }
     };
 
-    Placeable(uint32_t id) :
-        Object(id) {
+    Placeable(uint32_t id, std::string tag) :
+        Object(id, ObjectType::Placeable, std::move(tag)) {
     }
 };
 

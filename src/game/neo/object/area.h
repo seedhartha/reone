@@ -17,9 +17,18 @@
 
 #pragma once
 
+#include "../../../common/logutil.h"
+
 #include "../object.h"
 
 namespace reone {
+
+namespace resource {
+
+class GffStruct;
+class Gffs;
+
+} // namespace resource
 
 namespace game {
 
@@ -27,15 +36,29 @@ namespace neo {
 
 class Area : public Object {
 public:
-    class Builder : public Object::Builder<Area> {
+    class Builder : public Object::Builder<Area, Builder> {
     public:
         std::unique_ptr<Area> build() override {
-            return std::make_unique<Area>(_id);
+            return std::make_unique<Area>(_id, _tag);
         }
     };
 
-    Area(uint32_t id) :
-        Object(id) {
+    class Loader : boost::noncopyable {
+    public:
+        Loader(IObjectIdSequence &idSeq, resource::Gffs &gffs) :
+            _idSeq(idSeq),
+            _gffs(gffs) {
+        }
+
+        std::unique_ptr<Area> load(const std::string &name);
+
+    private:
+        IObjectIdSequence &_idSeq;
+        resource::Gffs &_gffs;
+    };
+
+    Area(uint32_t id, std::string tag) :
+        Object(id, ObjectType::Area, std::move(tag)) {
     }
 };
 

@@ -27,15 +27,15 @@ namespace neo {
 
 class Door : public Object {
 public:
-    class Builder : public Object::Builder<Door> {
+    class Builder : public Object::Builder<Door, Builder> {
     public:
         std::unique_ptr<Door> build() override {
-            return std::make_unique<Door>(_id);
+            return std::make_unique<Door>(_id, _tag);
         }
     };
 
-    Door(uint32_t id) :
-        Object(id) {
+    Door(uint32_t id, std::string tag) :
+        Object(id, ObjectType::Door, std::move(tag)) {
     }
 };
 
