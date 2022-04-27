@@ -30,12 +30,22 @@ public:
     class Builder : public Object::Builder<Room, Builder> {
     public:
         std::unique_ptr<Room> build() override {
-            return std::make_unique<Room>(_id, _tag);
+            return std::make_unique<Room>(_id, _tag, _sceneNode);
         }
+
+    private:
+        std::string _modelName;
     };
 
-    Room(uint32_t id, std::string tag) :
-        Object(id, ObjectType::Room, std::move(tag)) {
+    Room(
+        uint32_t id,
+        std::string tag,
+        std::shared_ptr<scene::SceneNode> sceneNode) :
+        Object(
+            id,
+            ObjectType::Room,
+            std::move(tag),
+            std::move(sceneNode)) {
     }
 };
 

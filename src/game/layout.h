@@ -28,6 +28,15 @@ struct Layout {
     };
 
     std::vector<Room> rooms;
+
+    const Room *findByName(const std::string &name) const {
+        for (auto &room : rooms) {
+            if (room.name == name) {
+                return &room;
+            }
+        }
+        return nullptr;
+    }
 };
 
 } // namespace game

@@ -28,11 +28,12 @@ namespace reone {
 namespace resource {
 
 class GffStruct;
-class Gffs;
 
-} // namespace resource
+}
 
 namespace game {
+
+struct ServicesView;
 
 namespace neo {
 
@@ -40,8 +41,8 @@ class Area : public Object {
 public:
     class Builder : public Object::Builder<Area, Builder> {
     public:
-        Builder &rooms(std::vector<std::shared_ptr<Room>> val) {
-            _rooms = std::move(val);
+        Builder &rooms(std::vector<std::shared_ptr<Room>> rooms) {
+            _rooms = std::move(rooms);
             return *this;
         }
 
@@ -55,16 +56,16 @@ public:
 
     class Loader : boost::noncopyable {
     public:
-        Loader(IObjectIdSequence &idSeq, resource::Gffs &gffs) :
+        Loader(IObjectIdSequence &idSeq, ServicesView &services) :
             _idSeq(idSeq),
-            _gffs(gffs) {
+            _services(services) {
         }
 
         std::unique_ptr<Area> load(const std::string &name);
 
     private:
         IObjectIdSequence &_idSeq;
-        resource::Gffs &_gffs;
+        ServicesView &_services;
     };
 
     Area(
@@ -74,8 +75,13 @@ public:
         Object(
             id,
             ObjectType::Area,
-            std::move(tag)),
+            std::move(tag),
+            nullptr),
         _rooms(std::move(rooms)) {
+    }
+
+    const std::vector<std::shared_ptr<Room>> &rooms() const {
+        return _rooms;
     }
 
 private:

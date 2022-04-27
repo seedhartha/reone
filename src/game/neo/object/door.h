@@ -35,7 +35,11 @@ public:
     };
 
     Door(uint32_t id, std::string tag) :
-        Object(id, ObjectType::Door, std::move(tag)) {
+        Object(
+            id,
+            ObjectType::Door,
+            std::move(tag),
+            nullptr) {
     }
 };
 

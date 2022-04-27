@@ -35,7 +35,11 @@ public:
     };
 
     Placeable(uint32_t id, std::string tag) :
-        Object(id, ObjectType::Placeable, std::move(tag)) {
+        Object(
+            id,
+            ObjectType::Placeable,
+            std::move(tag),
+            nullptr) {
     }
 };
 

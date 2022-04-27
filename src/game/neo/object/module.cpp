@@ -21,6 +21,9 @@
 #include "../../../common/logutil.h"
 #include "../../../resource/gffs.h"
 #include "../../../resource/gffstruct.h"
+#include "../../../resource/services.h"
+
+#include "../../services.h"
 
 using namespace std;
 
@@ -35,13 +38,13 @@ namespace neo {
 unique_ptr<Module> Module::Loader::load(const string &name) {
     info("Loading module " + name);
 
-    auto ifo = _gffs.get("module", ResourceType::Ifo);
+    auto ifo = _services.resource.gffs.get("module", ResourceType::Ifo);
     if (!ifo) {
         throw ValidationException("IFO not found: " + name);
     }
 
     auto areas = vector<shared_ptr<Area>>();
-    auto areaLoader = Area::Loader(_idSeq, _gffs);
+    auto areaLoader = Area::Loader(_idSeq, _services);
     auto ifoAreas = ifo->getList("Mod_Area_list");
 
     for (auto &ifoArea : ifoAreas) {
