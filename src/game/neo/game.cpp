@@ -80,9 +80,9 @@ void Game::update() {
     // Calculate delta time
     auto then = _prevFrameTicks;
     if (then == 0) {
-        then = _prevFrameTicks = SDL_GetTicks64();
+        then = _prevFrameTicks = SDL_GetTicks();
     }
-    auto now = SDL_GetTicks64();
+    auto now = SDL_GetTicks();
     float delta = (now - then) / 1000.0f;
     _prevFrameTicks = now;
 
