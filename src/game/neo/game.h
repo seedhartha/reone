@@ -47,6 +47,8 @@ struct Options;
 
 namespace neo {
 
+class Creature;
+
 class Game : public IObjectIdSequence, public graphics::IEventHandler, boost::noncopyable {
 public:
     Game(GameID id, Options &options, ServicesView &services) :
@@ -98,6 +100,28 @@ private:
         bool _highSpeed {false};
     };
 
+    class PlayerController : boost::noncopyable {
+    public:
+        bool handle(const SDL_Event &e);
+        void update(float delta);
+
+        void setCreature(Creature &creature) {
+            _creature = &creature;
+        }
+
+    private:
+        Creature *_creature {nullptr};
+
+        // Orientation
+        float _bearing {0.0f};
+
+        // Movement
+        float _forward {0.0f};
+        float _left {0.0f};
+        float _backward {0.0f};
+        float _right {0.0f};
+    };
+
     class WorldRenderer : boost::noncopyable {
     public:
         WorldRenderer(
@@ -122,6 +146,7 @@ private:
     ServicesView &_services;
 
     std::unique_ptr<CameraController> _cameraController;
+    std::unique_ptr<PlayerController> _playerController;
     std::unique_ptr<WorldRenderer> _worldRenderer;
 
     bool _finished {false};

@@ -48,7 +48,6 @@ namespace neo {
 
 void Game::init() {
     auto &scene = _services.scene.graphs.get(kSceneMain);
-    _worldRenderer = make_unique<WorldRenderer>(scene, _options.graphics, _services.graphics);
 
     auto camera = scene.newCamera();
     camera->setPerspectiveProjection(
@@ -58,6 +57,9 @@ void Game::init() {
         2500.0f);
     _cameraController = make_unique<CameraController>(*camera);
     scene.setActiveCamera(move(camera));
+
+    _playerController = make_unique<PlayerController>();
+    _worldRenderer = make_unique<WorldRenderer>(scene, _options.graphics, _services.graphics);
 
     _services.graphics.window.setEventHandler(this);
     _services.graphics.window.setRelativeMouseMode(true);
@@ -89,6 +91,7 @@ void Game::update() {
     _prevFrameTicks = now;
 
     _cameraController->update(delta);
+    _playerController->update(delta);
 
     auto &scene = _services.scene.graphs.get(kSceneMain);
     scene.update(delta);
@@ -100,7 +103,13 @@ void Game::render() {
 }
 
 bool Game::handle(const SDL_Event &e) {
-    return _cameraController->handle(e);
+    if (_playerController->handle(e)) {
+        return true;
+    }
+    if (_cameraController->handle(e)) {
+        return true;
+    }
+    return false;
 }
 
 void Game::loadModule(const string &name) {
@@ -112,6 +121,7 @@ void Game::loadModule(const string &name) {
 
     auto &scene = _services.scene.graphs.get(kSceneMain);
     scene.clear();
+
     for (auto &room : _module->area().rooms()) {
         auto model = static_pointer_cast<ModelSceneNode>(room->sceneNodePtr());
         if (model) {
@@ -124,7 +134,11 @@ void Game::loadModule(const string &name) {
             scene.addRoot(move(model));
         }
     }
-    auto pcModel = static_pointer_cast<ModelSceneNode>(_module->pc().sceneNodePtr());
+
+    auto &pc = _module->pc();
+    _playerController->setCreature(pc);
+
+    auto pcModel = static_pointer_cast<ModelSceneNode>(pc.sceneNodePtr());
     scene.addRoot(move(pcModel));
 }
 
@@ -176,14 +190,62 @@ bool Game::CameraController::handle(const SDL_Event &e) {
 }
 
 void Game::CameraController::update(float delta) {
+    float speed = _highSpeed ? kCameraMovementSpeedHigh : kCameraMovementSpeedNormal;
+
     auto transform = glm::translate(_sceneNode.getOrigin());
     transform *= glm::rotate(_yaw, glm::vec3(0.0f, 0.0f, 1.0f));
     transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
-
-    float speed = _highSpeed ? kCameraMovementSpeedHigh : kCameraMovementSpeedNormal;
     transform *= glm::translate(delta * speed * glm::vec3(_right - _left, 0.0f, _backward - _forward));
-    
+
     _sceneNode.setLocalTransform(move(transform));
+}
+
+static constexpr float kPlayerOrientationSpeed = 1.0f;
+static constexpr float kPlayerMovementSpeed = 1.0f;
+
+bool Game::PlayerController::handle(const SDL_Event &e) {
+    if (e.type == SDL_KEYDOWN) {
+        if (e.key.keysym.sym == SDLK_w) {
+            _forward = 1.0f;
+            return true;
+        } else if (e.key.keysym.sym == SDLK_a) {
+            _left = 1.0f;
+            return true;
+        } else if (e.key.keysym.sym == SDLK_s) {
+            _backward = 1.0f;
+            return true;
+        } else if (e.key.keysym.sym == SDLK_d) {
+            _right = 1.0f;
+            return true;
+        }
+    } else if (e.type == SDL_KEYUP) {
+        if (e.key.keysym.sym == SDLK_w) {
+            _forward = 0.0f;
+            return true;
+        } else if (e.key.keysym.sym == SDLK_a) {
+            _left = 0.0f;
+            return true;
+        } else if (e.key.keysym.sym == SDLK_s) {
+            _backward = 0.0f;
+            return true;
+        } else if (e.key.keysym.sym == SDLK_d) {
+            _right = 0.0f;
+            return true;
+        }
+    }
+    return false;
+}
+
+void Game::PlayerController::update(float delta) {
+    _bearing -= delta * kPlayerOrientationSpeed * (_right - _left);
+
+    auto &sceneNode = _creature->sceneNode();
+
+    auto transform = glm::translate(sceneNode.getOrigin());
+    transform *= glm::rotate(_bearing, glm::vec3(0.0f, 0.0f, 1.0f));
+    transform *= glm::translate(delta * kPlayerMovementSpeed * glm::vec3(0.0f, _forward - _backward, 0.0f));
+
+    sceneNode.setLocalTransform(move(transform));
 }
 
 void Game::WorldRenderer::render() {
