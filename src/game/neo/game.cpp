@@ -49,7 +49,7 @@ namespace neo {
 void Game::init() {
     _services.graphics.window.setEventHandler(this);
 
-    auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
+    auto &scene = _services.scene.graphs.get(kSceneMain);
     auto camera = scene.newCamera();
     camera->setPerspectiveProjection(
         glm::radians(90.0f),
@@ -86,12 +86,12 @@ void Game::update() {
     float delta = (now - then) / 1000.0f;
     _prevFrameTicks = now;
 
-    auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
+    auto &scene = _services.scene.graphs.get(kSceneMain);
     scene.update(delta);
 }
 
 void Game::render() {
-    auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
+    auto &scene = _services.scene.graphs.get(kSceneMain);
     WorldRenderer(scene, _options.graphics, _services.graphics).render();
 }
 
@@ -106,7 +106,7 @@ void Game::loadModule(const string &name) {
 
     _module = move(newModule);
 
-    auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
+    auto &scene = _services.scene.graphs.get(kSceneMain);
     scene.clear();
     for (auto &room : _module->area().rooms()) {
         scene.addRoot(static_pointer_cast<ModelSceneNode>(room->sceneNodePtr()));
@@ -118,7 +118,7 @@ void Game::WorldRenderer::render() {
     if (!output) {
         return;
     }
-    _graphicsSvc.graphicsContext.clearColorDepth();
+    _graphicsSvc.context.clearColorDepth();
     _graphicsSvc.uniforms.setGeneral([](auto &general) {
         general.resetGlobals();
         general.resetLocals();

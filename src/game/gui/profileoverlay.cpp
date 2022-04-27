@@ -83,7 +83,7 @@ void ProfileOverlay::draw() {
         return;
     }
 
-    _services.graphics.graphicsContext.withBlending(BlendMode::Normal, [this]() {
+    _services.graphics.context.withBlending(BlendMode::Normal, [this]() {
         _font->draw(
             to_string(_fps),
             glm::vec3(static_cast<float>(_options.graphics.width) - kTextOffset, static_cast<float>(_options.graphics.height) - kTextOffset, 0.0f),

@@ -187,7 +187,7 @@ void Console::executeInputText() {
 }
 
 void Console::draw() {
-    _services.graphics.graphicsContext.withBlending(BlendMode::Normal, [this]() {
+    _services.graphics.context.withBlending(BlendMode::Normal, [this]() {
         drawBackground();
         drawLines();
     });

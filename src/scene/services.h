@@ -24,10 +24,10 @@ namespace scene {
 class SceneGraphs;
 
 struct SceneServices {
-    SceneGraphs &sceneGraphs;
+    SceneGraphs &graphs;
 
     SceneServices(SceneGraphs &sceneGraphs) :
-        sceneGraphs(sceneGraphs) {
+        graphs(sceneGraphs) {
     }
 };
 

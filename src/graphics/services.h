@@ -35,7 +35,7 @@ class Window;
 
 struct GraphicsServices {
     Fonts &fonts;
-    GraphicsContext &graphicsContext;
+    GraphicsContext &context;
     LipAnimations &lipAnimations;
     Meshes &meshes;
     Models &models;
@@ -59,7 +59,7 @@ struct GraphicsServices {
         Walkmeshes &walkmeshes,
         Window &window) :
         fonts(fonts),
-        graphicsContext(graphicsContext),
+        context(graphicsContext),
         lipAnimations(lipAnimations),
         meshes(meshes),
         models(models),
