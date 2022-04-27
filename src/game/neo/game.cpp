@@ -17,17 +17,27 @@
 
 #include "game.h"
 
+#include "../../graphics/context.h"
+#include "../../graphics/meshes.h"
+#include "../../graphics/pipeline.h"
 #include "../../graphics/services.h"
+#include "../../graphics/shaders.h"
+#include "../../graphics/textures.h"
 #include "../../graphics/window.h"
 #include "../../resource/gffs.h"
 #include "../../resource/services.h"
+#include "../../scene/graphs.h"
+#include "../../scene/node/model.h"
+#include "../../scene/services.h"
 
+#include "../options.h"
 #include "../resourcelayout.h"
 
 #include "object/module.h"
 
 using namespace std;
 
+using namespace reone::scene;
 using namespace reone::resource;
 
 namespace reone {
@@ -38,6 +48,17 @@ namespace neo {
 
 void Game::init() {
     _services.graphics.window.setEventHandler(this);
+
+    auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
+    auto camera = scene.newCamera();
+    camera->setPerspectiveProjection(
+        glm::radians(90.0f),
+        _options.graphics.width / static_cast<float>(_options.graphics.height),
+        0.25f,
+        2500.0f);
+    auto transform = glm::rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    camera->setLocalTransform(move(transform));
+    scene.setActiveCamera(move(camera));
 }
 
 void Game::run() {
@@ -56,9 +77,34 @@ void Game::handleInput() {
 }
 
 void Game::update() {
+    // Calculate delta time
+    auto then = _prevFrameTicks;
+    if (then == 0) {
+        then = _prevFrameTicks = SDL_GetTicks64();
+    }
+    auto now = SDL_GetTicks64();
+    float delta = (now - then) / 1000.0f;
+    _prevFrameTicks = now;
+
+    auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
+    scene.update(delta);
 }
 
 void Game::render() {
+    auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
+    auto output = _services.graphics.pipeline.draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
+    if (!output) {
+        return;
+    }
+    _services.graphics.graphicsContext.clearColorDepth();
+    _services.graphics.uniforms.setGeneral([](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+    });
+    _services.graphics.shaders.use(_services.graphics.shaders.simpleTexture());
+    _services.graphics.textures.bind(*output);
+    _services.graphics.meshes.quadNDC().draw();
+    _services.graphics.window.swapBuffers();
 }
 
 bool Game::handle(const SDL_Event &e) {
@@ -68,9 +114,15 @@ bool Game::handle(const SDL_Event &e) {
 void Game::loadModule(const string &name) {
     _services.game.resourceLayout.loadModuleResources(name);
 
-    auto newModule = Module::Loader(*this, _services.resource.gffs).load(name);
+    auto newModule = Module::Loader(*this, _services).load(name);
 
     _module = move(newModule);
+
+    auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
+    scene.clear();
+    for (auto &room : _module->area().rooms()) {
+        scene.addRoot(static_pointer_cast<ModelSceneNode>(room->sceneNodePtr()));
+    }
 }
 
 } // namespace neo

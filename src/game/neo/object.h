@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "../../scene/node.h"
+
 #include "../types.h"
 
 namespace reone {
@@ -35,13 +37,18 @@ public:
     template <class TObject, class TBuilder>
     class Builder : boost::noncopyable {
     public:
-        TBuilder &id(uint32_t val) {
-            _id = val;
+        TBuilder &id(uint32_t id) {
+            _id = id;
             return static_cast<TBuilder &>(*this);
         }
 
         TBuilder &tag(std::string tag) {
             _tag = std::move(tag);
+            return static_cast<TBuilder &>(*this);
+        }
+
+        TBuilder &sceneNode(std::shared_ptr<scene::SceneNode> sceneNode) {
+            _sceneNode = std::move(sceneNode);
             return static_cast<TBuilder &>(*this);
         }
 
@@ -51,6 +58,7 @@ public:
         uint32_t _id;
         ObjectType _type;
         std::string _tag;
+        std::shared_ptr<scene::SceneNode> _sceneNode;
     };
 
     uint32_t id() const {
@@ -61,15 +69,29 @@ public:
         return _type;
     }
 
+    scene::SceneNode &sceneNode() const {
+        return *_sceneNode;
+    }
+
+    std::shared_ptr<scene::SceneNode> sceneNodePtr() const {
+        return _sceneNode;
+    }
+
 protected:
     uint32_t _id;
     ObjectType _type;
     std::string _tag;
+    std::shared_ptr<scene::SceneNode> _sceneNode;
 
-    Object(uint32_t id, ObjectType type, std::string tag) :
+    Object(
+        uint32_t id,
+        ObjectType type,
+        std::string tag,
+        std::shared_ptr<scene::SceneNode> sceneNode) :
         _id(id),
         _type(type),
-        _tag(std::move(tag)) {
+        _tag(std::move(tag)),
+        _sceneNode(std::move(sceneNode)) {
     }
 };
 

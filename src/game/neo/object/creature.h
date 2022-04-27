@@ -35,7 +35,11 @@ public:
     };
 
     Creature(uint32_t id, std::string tag) :
-        Object(id, ObjectType::Creature, std::move(tag)) {
+        Object(
+            id,
+            ObjectType::Creature,
+            std::move(tag),
+            nullptr) {
     }
 };
 

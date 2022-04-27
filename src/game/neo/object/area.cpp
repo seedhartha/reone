@@ -17,12 +17,25 @@
 
 #include "area.h"
 
-#include "../../common/exception/validation.h"
-#include "../../resource/gffs.h"
-#include "../../resource/gffstruct.h"
+#include "../../../common/exception/validation.h"
+#include "../../../common/streamutil.h"
+#include "../../../graphics/models.h"
+#include "../../../graphics/services.h"
+#include "../../../resource/gffs.h"
+#include "../../../resource/gffstruct.h"
+#include "../../../resource/resources.h"
+#include "../../../resource/services.h"
+#include "../../../scene/graph.h"
+#include "../../../scene/graphs.h"
+#include "../../../scene/node/model.h"
+#include "../../../scene/services.h"
+
+#include "../../format/lytreader.h"
+#include "../../services.h"
 
 using namespace std;
 
+using namespace reone::scene;
 using namespace reone::resource;
 
 namespace reone {
@@ -34,23 +47,41 @@ namespace neo {
 unique_ptr<Area> Area::Loader::load(const std::string &name) {
     info("Loading area " + name);
 
-    auto are = _gffs.get(name, ResourceType::Are);
+    auto are = _services.resource.gffs.get(name, ResourceType::Are);
     if (!are) {
         throw ValidationException("ARE not found: " + name);
     }
 
-    auto git = _gffs.get(name, ResourceType::Git);
+    auto git = _services.resource.gffs.get(name, ResourceType::Git);
     if (!git) {
         throw ValidationException("GIT not found: " + name);
     }
+
+    auto lyt = _services.resource.resources.get(name, ResourceType::Lyt);
+    if (!lyt) {
+        throw ValidationException("LYT not found: " + name);
+    }
+    auto lytReader = LytReader();
+    lytReader.load(wrap(*lyt));
+    auto &layout = lytReader.layout();
 
     auto rooms = vector<shared_ptr<Room>>();
     auto areRooms = are->getList("Rooms");
     for (auto &areRoom : areRooms) {
         auto roomName = areRoom->getString("RoomName");
+
+        auto lytRoom = layout.findByName(roomName);
+        auto transform = glm::translate(lytRoom->position);
+
+        auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
+        auto model = _services.graphics.models.get(roomName);
+        auto sceneNode = scene.newModel(move(model), ModelUsage::Room, nullptr);
+        sceneNode->setLocalTransform(move(transform));
+
         rooms.push_back(Room::Builder()
                             .id(_idSeq.nextObjectId())
-                            .tag(roomName)
+                            .tag(move(roomName))
+                            .sceneNode(move(sceneNode))
                             .build());
     }
 
