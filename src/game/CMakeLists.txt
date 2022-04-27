@@ -200,6 +200,7 @@ set(GAME_HEADERS
     layout.h
     layouts.h
     location.h
+    neo/game.h
     object.h
     object/area.h
     object/creature.h
@@ -407,6 +408,7 @@ set(GAME_SOURCES
     gui/selectoverlay.cpp
     guisounds.cpp
     layouts.cpp
+    neo/game.cpp
     object.cpp
     object/area.cpp
     object/creature.cpp

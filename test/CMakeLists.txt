@@ -24,6 +24,7 @@ set(TEST_SOURCES
     bifreader.cpp
     erfreader.cpp
     erfwriter.cpp
+    game.cpp
     gffreader.cpp
     gffwriter.cpp
     keyreader.cpp
