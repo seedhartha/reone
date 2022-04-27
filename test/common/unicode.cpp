@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../src/common/unicodeutil.h"
+#include "../../src/common/unicodeutil.h"
 
 using namespace std;
 

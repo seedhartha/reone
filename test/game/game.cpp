@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../src/game/neo/game.h"
+#include "../../src/game/neo/game.h"
 
 BOOST_AUTO_TEST_SUITE(game)
 

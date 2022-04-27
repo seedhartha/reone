@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../src/resource/format/keyreader.h"
+#include "../../src/resource/format/keyreader.h"
 
 using namespace std;
 

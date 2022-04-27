@@ -17,19 +17,30 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "../src/common/streamwriter.h"
-#include "../src/resource/2da.h"
-#include "../src/resource/format/2dareader.h"
+#include "../../src/common/streamwriter.h"
+#include "../../src/resource/2da.h"
+#include "../../src/resource/format/2dawriter.h"
+
+#include "../checkutil.h"
 
 using namespace std;
 
 using namespace reone;
 using namespace reone::resource;
 
-BOOST_AUTO_TEST_SUITE(two_da_reader)
+BOOST_AUTO_TEST_SUITE(two_da_writer)
 
-BOOST_AUTO_TEST_CASE(should_read_two_da) {
+BOOST_AUTO_TEST_CASE(should_write_two_da) {
     // given
+
+    auto twoDa = make_shared<TwoDA>();
+    twoDa->addColumn("key");
+    twoDa->addColumn("value");
+    twoDa->add(TwoDA::Row {vector<string> {"unique", "same"}});
+    twoDa->add(TwoDA::Row {vector<string> {"same", "same"}});
+
+    auto writer = TwoDaWriter(twoDa);
+    auto stream = make_shared<ostringstream>();
 
     auto ss = ostringstream();
     ss << "2DA V2.b";
@@ -46,23 +57,16 @@ BOOST_AUTO_TEST_CASE(should_read_two_da) {
     ss << string("\x0c\x00", 2);
     ss << string("unique\x00", 7);
     ss << string("same\x00", 5);
-
-    auto stream = make_shared<istringstream>(ss.str());
-    auto reader = TwoDaReader();
+    auto expectedOutput = ss.str();
 
     // when
 
-    reader.load(stream);
+    writer.save(stream);
 
     // then
 
-    auto twoDa = reader.twoDa();
-    BOOST_CHECK_EQUAL(twoDa->getColumnCount(), 2);
-    BOOST_CHECK_EQUAL(twoDa->getRowCount(), 2);
-    BOOST_CHECK_EQUAL(string("unique"), twoDa->getString(0, "key"));
-    BOOST_CHECK_EQUAL(string("same"), twoDa->getString(0, "value"));
-    BOOST_CHECK_EQUAL(string("same"), twoDa->getString(1, "key"));
-    BOOST_CHECK_EQUAL(string("same"), twoDa->getString(1, "value"));
+    auto actualOutput = stream->str();
+    BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
