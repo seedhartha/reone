@@ -34,10 +34,13 @@ void ErfWriter::add(Resource &&res) {
     _resources.push_back(res);
 }
 
-// Adapted from Bioware ERF specification
 void ErfWriter::save(FileType type, const fs::path &path) {
-    auto rim = make_shared<fs::ofstream>(path, ios::binary);
-    StreamWriter writer(rim);
+    auto out = make_shared<fs::ofstream>(path, ios::binary);
+    save(type, out);
+}
+
+void ErfWriter::save(FileType type, shared_ptr<ostream> out) {
+    StreamWriter writer(out);
     auto numResources = static_cast<uint32_t>(_resources.size());
     uint32_t offResources = 0xa0 + kKeyStructSize * numResources;
 

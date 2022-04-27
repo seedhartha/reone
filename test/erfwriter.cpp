@@ -19,6 +19,8 @@
 
 #include "../src/resource/format/erfwriter.h"
 
+#include "checkutil.h"
+
 using namespace std;
 
 using namespace reone;
@@ -29,9 +31,44 @@ BOOST_AUTO_TEST_SUITE(erf_writer)
 BOOST_AUTO_TEST_CASE(should_write_erf) {
     // given
 
+    auto ss = ostringstream();
+    // header
+    ss << "ERF V1.0";
+    ss << string("\x00\x00\x00\x00", 4); // number of languages
+    ss << string("\x00\x00\x00\x00", 4); // size of localized strings
+    ss << string("\x01\x00\x00\x00", 4); // number of entries
+    ss << string("\xa0\x00\x00\x00", 4); // offset to localized strings
+    ss << string("\xa0\x00\x00\x00", 4); // offset to key list
+    ss << string("\xb8\x00\x00\x00", 4); // offset to resource list
+    ss << string("\x00\x00\x00\x00", 4); // build year
+    ss << string("\x00\x00\x00\x00", 4); // build day
+    ss << string("\xff\xff\xff\xff", 4); // description strref
+    ss << string(116, '\x00');           // reserved
+    // key list
+    ss << string("Aa\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16); // resref
+    ss << string("\x00\x00\x00\x00", 4);                                            // resid
+    ss << string("\xe6\x07", 2);                                                    // restype
+    ss << string("\x00\x00", 2);                                                    // unused
+    // resource list
+    ss << string("\xc0\x00\x00\x00", 4); // offset to resource
+    ss << string("\x02\x00\x00\x00", 4); // resource size
+    // resource data
+    ss << "Bb";
+
+    auto writer = ErfWriter();
+    writer.add(ErfWriter::Resource {"Aa", ResourceType::Txi, ByteArray {'B', 'b'}});
+
+    auto erf = make_shared<ostringstream>();
+    auto expectedOutput = ss.str();
+
     // when
 
+    writer.save(ErfWriter::FileType::ERF, erf);
+
     // then
+
+    auto actualOutput = erf->str();
+    BOOST_TEST((expectedOutput == actualOutput), notEqualMessage(expectedOutput, actualOutput));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
