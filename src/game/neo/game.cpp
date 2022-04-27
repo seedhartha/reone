@@ -47,18 +47,20 @@ namespace game {
 namespace neo {
 
 void Game::init() {
-    _services.graphics.window.setEventHandler(this);
-
     auto &scene = _services.scene.graphs.get(kSceneMain);
+    _worldRenderer = make_unique<WorldRenderer>(scene, _options.graphics, _services.graphics);
+
     auto camera = scene.newCamera();
     camera->setPerspectiveProjection(
         glm::radians(90.0f),
         _options.graphics.width / static_cast<float>(_options.graphics.height),
         0.25f,
         2500.0f);
-    auto transform = glm::rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    camera->setLocalTransform(move(transform));
+    _cameraController = make_unique<CameraController>(*camera);
     scene.setActiveCamera(move(camera));
+
+    _services.graphics.window.setEventHandler(this);
+    _services.graphics.window.setRelativeMouseMode(true);
 }
 
 void Game::run() {
@@ -86,17 +88,19 @@ void Game::update() {
     float delta = (now - then) / 1000.0f;
     _prevFrameTicks = now;
 
+    _cameraController->update(delta);
+
     auto &scene = _services.scene.graphs.get(kSceneMain);
     scene.update(delta);
 }
 
 void Game::render() {
     auto &scene = _services.scene.graphs.get(kSceneMain);
-    WorldRenderer(scene, _options.graphics, _services.graphics).render();
+    _worldRenderer->render();
 }
 
 bool Game::handle(const SDL_Event &e) {
-    return false;
+    return _cameraController->handle(e);
 }
 
 void Game::loadModule(const string &name) {
@@ -111,6 +115,47 @@ void Game::loadModule(const string &name) {
     for (auto &room : _module->area().rooms()) {
         scene.addRoot(static_pointer_cast<ModelSceneNode>(room->sceneNodePtr()));
     }
+}
+
+static constexpr float kCameraMouseSensitivity = 0.001f;
+static constexpr float kCameraMovementSpeed = 2.0f;
+
+bool Game::CameraController::handle(const SDL_Event &e) {
+    if (e.type == SDL_MOUSEMOTION) {
+        _yaw -= kCameraMouseSensitivity * static_cast<float>(e.motion.xrel);
+        _pitch -= kCameraMouseSensitivity * static_cast<float>(e.motion.yrel);
+        return true;
+    } else if (e.type == SDL_KEYDOWN) {
+        if (e.key.keysym.sym == SDLK_w) {
+            _forward = 1.0f;
+        } else if (e.key.keysym.sym == SDLK_a) {
+            _left = 1.0f;
+        } else if (e.key.keysym.sym == SDLK_s) {
+            _backward = 1.0f;
+        } else if (e.key.keysym.sym == SDLK_d) {
+            _right = 1.0f;
+        }
+    } else if (e.type == SDL_KEYUP) {
+        if (e.key.keysym.sym == SDLK_w) {
+            _forward = 0.0f;
+        } else if (e.key.keysym.sym == SDLK_a) {
+            _left = 0.0f;
+        } else if (e.key.keysym.sym == SDLK_s) {
+            _backward = 0.0f;
+        } else if (e.key.keysym.sym == SDLK_d) {
+            _right = 0.0f;
+        }
+    } else {
+        return false;
+    }
+}
+
+void Game::CameraController::update(float delta) {
+    auto transform = glm::translate(_sceneNode.getOrigin());
+    transform *= glm::rotate(_yaw, glm::vec3(0.0f, 0.0f, 1.0f));
+    transform *= glm::rotate(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+    transform *= glm::translate(delta * kCameraMovementSpeed * glm::vec3(_right - _left, 0.0f, _backward - _forward));
+    _sceneNode.setLocalTransform(move(transform));
 }
 
 void Game::WorldRenderer::render() {

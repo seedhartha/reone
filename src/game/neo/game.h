@@ -30,8 +30,9 @@ namespace reone {
 namespace scene {
 
 class SceneGraph;
+class SceneNode;
 
-}
+} // namespace scene
 
 namespace graphics {
 
@@ -73,6 +74,27 @@ public:
     // END IEventHandler
 
 private:
+    class CameraController : boost::noncopyable {
+    public:
+        CameraController(scene::SceneNode &sceneNode) :
+            _sceneNode(sceneNode) {
+        }
+
+        bool handle(const SDL_Event &e);
+        void update(float delta);
+
+    private:
+        scene::SceneNode &_sceneNode;
+
+        float _yaw {0.0f};
+        float _pitch {glm::half_pi<float>()};
+
+        float _forward {0.0f};
+        float _left {0.0f};
+        float _backward {0.0f};
+        float _right {0.0f};
+    };
+
     class WorldRenderer : boost::noncopyable {
     public:
         WorldRenderer(
@@ -95,6 +117,9 @@ private:
     GameID _id;
     Options &_options;
     ServicesView &_services;
+
+    std::unique_ptr<CameraController> _cameraController;
+    std::unique_ptr<WorldRenderer> _worldRenderer;
 
     bool _finished {false};
     uint32_t _prevFrameTicks {0};
