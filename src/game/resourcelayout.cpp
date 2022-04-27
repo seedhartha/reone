@@ -130,19 +130,19 @@ void ResourceLayout::loadModuleResources(const string &moduleName) {
 
     fs::path modPath(getPathIgnoreCase(modulesPath, moduleName + ".mod"));
     if (!modPath.empty()) {
-        _resourceSvc.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false));
+        _resourceSvc.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + ".mod", false), true);
     } else {
-        _resourceSvc.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"));
-        _resourceSvc.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"));
+        _resourceSvc.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + ".rim"), true);
+        _resourceSvc.resources.indexRimFile(getPathIgnoreCase(modulesPath, moduleName + "_s.rim"), true);
     }
 
     fs::path lipsPath(getPathIgnoreCase(_options.gamePath, kLipsDirectoryName));
     if (!lipsPath.empty()) {
-        _resourceSvc.resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"));
+        _resourceSvc.resources.indexErfFile(getPathIgnoreCase(lipsPath, moduleName + "_loc.mod"), true);
     }
 
     if (_gameId == GameID::TSL) {
-        _resourceSvc.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"));
+        _resourceSvc.resources.indexErfFile(getPathIgnoreCase(modulesPath, moduleName + "_dlg.erf"), true);
     }
 }
 

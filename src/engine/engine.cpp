@@ -58,7 +58,7 @@ int Engine::run() {
     services.init();
 
     if (gameOptions.neo) {
-        auto game = neo::Game(GameID::KotOR, services.view());
+        auto game = neo::Game(GameID::KotOR, gameOptions, services.view());
         game.init();
         game.run();
         return 0;

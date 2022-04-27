@@ -19,7 +19,16 @@
 
 #include "../object.h"
 
+#include "area.h"
+
 namespace reone {
+
+namespace resource {
+
+class GffStruct;
+class Gffs;
+
+} // namespace resource
 
 namespace game {
 
@@ -27,16 +36,48 @@ namespace neo {
 
 class Module : public Object {
 public:
-    class Builder : public Object::Builder<Module> {
+    class Builder : public Object::Builder<Module, Builder> {
     public:
-        std::unique_ptr<Module> build() override {
-            return std::make_unique<Module>(_id);
+        Builder &areas(std::vector<std::shared_ptr<Area>> val) {
+            _areas = std::move(val);
+            return *this;
         }
+
+        std::unique_ptr<Module> build() override {
+            return std::make_unique<Module>(_id, _tag, _areas);
+        }
+
+    private:
+        std::vector<std::shared_ptr<Area>> _areas;
     };
 
-    Module(uint32_t id) :
-        Object(id) {
+    class Loader : boost::noncopyable {
+    public:
+        Loader(IObjectIdSequence &idSeq, resource::Gffs &gffs) :
+            _idSeq(idSeq),
+            _gffs(gffs) {
+        }
+
+        std::unique_ptr<Module> load(const std::string &name);
+
+    private:
+        IObjectIdSequence &_idSeq;
+        resource::Gffs &_gffs;
+    };
+
+    Module(
+        uint32_t id,
+        std::string tag,
+        std::vector<std::shared_ptr<Area>> areas) :
+        Object(
+            id,
+            ObjectType::Module,
+            std::move(tag)),
+        _areas(std::move(areas)) {
     }
+
+private:
+    std::vector<std::shared_ptr<Area>> _areas;
 };
 
 } // namespace neo

@@ -19,6 +19,16 @@
 
 #include "../../graphics/services.h"
 #include "../../graphics/window.h"
+#include "../../resource/gffs.h"
+#include "../../resource/services.h"
+
+#include "../resourcelayout.h"
+
+#include "object/module.h"
+
+using namespace std;
+
+using namespace reone::resource;
 
 namespace reone {
 
@@ -31,6 +41,9 @@ void Game::init() {
 }
 
 void Game::run() {
+    auto moduleName = _id == GameID::KotOR ? "end_m01aa" : "001ebo";
+    loadModule("end_m01aa");
+
     while (!_finished) {
         handleInput();
         update();
@@ -50,6 +63,14 @@ void Game::render() {
 
 bool Game::handle(const SDL_Event &e) {
     return false;
+}
+
+void Game::loadModule(const string &name) {
+    _services.game.resourceLayout.loadModuleResources(name);
+
+    auto newModule = Module::Loader(*this, _services.resource.gffs).load(name);
+
+    _module = move(newModule);
 }
 
 } // namespace neo

@@ -17,11 +17,30 @@
 
 #include "area.h"
 
+#include "../../resource/gffs.h"
+#include "../../resource/gffstruct.h"
+
+using namespace std;
+
+using namespace reone::resource;
+
 namespace reone {
 
 namespace game {
 
 namespace neo {
+
+unique_ptr<Area> Area::Loader::load(const std::string &name) {
+    info("Loading area " + name);
+
+    auto are = _gffs.get(name, ResourceType::Are);
+    auto git = _gffs.get(name, ResourceType::Git);
+
+    return Area::Builder()
+        .id(_idSeq.nextObjectId())
+        .tag(name)
+        .build();
+}
 
 } // namespace neo
 

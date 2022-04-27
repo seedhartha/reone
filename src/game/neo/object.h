@@ -17,32 +17,59 @@
 
 #pragma once
 
+#include "../types.h"
+
 namespace reone {
 
 namespace game {
 
 namespace neo {
 
+class IObjectIdSequence {
+public:
+    virtual uint32_t nextObjectId() = 0;
+};
+
 class Object : boost::noncopyable {
 public:
-    template <class T>
-    class Builder {
+    template <class TObject, class TBuilder>
+    class Builder : boost::noncopyable {
     public:
-        void id(uint32_t val) {
+        TBuilder &id(uint32_t val) {
             _id = val;
+            return static_cast<TBuilder &>(*this);
         }
 
-        virtual std::unique_ptr<T> build() = 0;
+        TBuilder &tag(std::string tag) {
+            _tag = std::move(tag);
+            return static_cast<TBuilder &>(*this);
+        }
+
+        virtual std::unique_ptr<TObject> build() = 0;
 
     protected:
         uint32_t _id;
+        ObjectType _type;
+        std::string _tag;
     };
+
+    uint32_t id() const {
+        return _id;
+    }
+
+    ObjectType type() const {
+        return _type;
+    }
 
 protected:
     uint32_t _id;
+    ObjectType _type;
+    std::string _tag;
 
-    Object(uint32_t id) :
-        _id(id) {
+    Object(uint32_t id, ObjectType type, std::string tag) :
+        _id(id),
+        _type(type),
+        _tag(std::move(tag)) {
     }
 };
 

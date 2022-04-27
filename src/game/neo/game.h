@@ -22,16 +22,22 @@
 #include "../services.h"
 #include "../types.h"
 
+#include "object.h"
+#include "object/module.h"
+
 namespace reone {
 
 namespace game {
 
+struct Options;
+
 namespace neo {
 
-class Game : public graphics::IEventHandler, boost::noncopyable {
+class Game : public IObjectIdSequence, public graphics::IEventHandler, boost::noncopyable {
 public:
-    Game(GameID id, ServicesView &services) :
+    Game(GameID id, Options &options, ServicesView &services) :
         _id(id),
+        _options(options),
         _services(services) {
     }
 
@@ -39,17 +45,35 @@ public:
 
     void run();
 
+    // IObjectIdSequence
+
+    uint32_t nextObjectId() override {
+        return _objectIdCounter++;
+    }
+
+    // END IObjectIdSequence
+
+    // IEventHandler
+
     bool handle(const SDL_Event &e) override;
+
+    // END IEventHandler
 
 private:
     GameID _id;
+    Options &_options;
     ServicesView &_services;
 
     bool _finished {false};
 
+    uint32_t _objectIdCounter {2}; // 0 is self, 1 is invalid
+    std::unique_ptr<Module> _module;
+
     void handleInput();
     void update();
     void render();
+
+    void loadModule(const std::string &name);
 };
 
 } // namespace neo
