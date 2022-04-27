@@ -97,7 +97,7 @@ private:
     ServicesView &_services;
 
     bool _finished {false};
-    uint64_t _prevFrameTicks {0};
+    uint32_t _prevFrameTicks {0};
 
     uint32_t _objectIdCounter {2}; // 0 is self, 1 is invalid
     std::unique_ptr<Module> _module;
