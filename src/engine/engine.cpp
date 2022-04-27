@@ -18,6 +18,7 @@
 #include "engine.h"
 
 #include "../common/logutil.h"
+#include "../game/neo/game.h"
 
 #include "di/services.h"
 #include "gameprobe.h"
@@ -56,12 +57,17 @@ int Engine::run() {
     Services services(gameId, gameOptions);
     services.init();
 
-    auto game = newGame(gameId, gameOptions, services.view());
-    game->init();
-
-    services.view().graphics.window.setEventHandler(game.get());
-
-    return game->run();
+    if (gameOptions.neo) {
+        auto game = neo::Game(GameID::KotOR, services.view());
+        game.init();
+        game.run();
+        return 0;
+    } else {
+        auto game = newGame(gameId, gameOptions, services.view());
+        game->init();
+        services.view().graphics.window.setEventHandler(game.get());
+        return game->run();
+    }
 }
 
 } // namespace engine

@@ -62,7 +62,8 @@ Options OptionsParser::parse() {
         ("movievol", po::value<int>()->default_value(options.audio.movieVolume), "movie volume in percents")                       //
         ("loglevel", po::value<int>()->default_value(static_cast<int>(options.logLevel)), "log level")                             //
         ("logch", po::value<int>()->default_value(options.logChannels), "log channel mask")                                        //
-        ("logfile", po::value<bool>()->default_value(options.logToFile), "log to file");
+        ("logfile", po::value<bool>()->default_value(options.logToFile), "log to file")                                            //
+        ("neo", po::value<bool>()->default_value(false), "use new game logic (experimental)");
 
     po::options_description descCmdLine {"Usage"};
     descCmdLine.add(descCommon);
@@ -100,6 +101,7 @@ Options OptionsParser::parse() {
     options.logLevel = static_cast<LogLevel>(vars["loglevel"].as<int>());
     options.logChannels = vars["logch"].as<int>();
     options.logToFile = vars["logfile"].as<bool>();
+    options.neo = vars["neo"].as<bool>();
 
     return move(options);
 }
