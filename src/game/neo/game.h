@@ -27,6 +27,19 @@
 
 namespace reone {
 
+namespace scene {
+
+class SceneGraph;
+
+}
+
+namespace graphics {
+
+struct GraphicsOptions;
+struct GraphicsServices;
+
+} // namespace graphics
+
 namespace game {
 
 struct Options;
@@ -60,6 +73,25 @@ public:
     // END IEventHandler
 
 private:
+    class WorldRenderer : boost::noncopyable {
+    public:
+        WorldRenderer(
+            scene::SceneGraph &sceneGraph,
+            graphics::GraphicsOptions &graphicsOptions,
+            graphics::GraphicsServices &graphicsSvc) :
+            _sceneGraph(sceneGraph),
+            _graphicsOptions(graphicsOptions),
+            _graphicsSvc(graphicsSvc) {
+        }
+
+        void render();
+
+    private:
+        scene::SceneGraph &_sceneGraph;
+        graphics::GraphicsOptions &_graphicsOptions;
+        graphics::GraphicsServices &_graphicsSvc;
+    };
+
     GameID _id;
     Options &_options;
     ServicesView &_services;

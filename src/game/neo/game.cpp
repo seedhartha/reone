@@ -17,6 +17,8 @@
 
 #include "game.h"
 
+#include "SDL2/SDL_timer.h"
+
 #include "../../graphics/context.h"
 #include "../../graphics/meshes.h"
 #include "../../graphics/pipeline.h"
@@ -92,19 +94,7 @@ void Game::update() {
 
 void Game::render() {
     auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
-    auto output = _services.graphics.pipeline.draw(scene, glm::ivec2(_options.graphics.width, _options.graphics.height));
-    if (!output) {
-        return;
-    }
-    _services.graphics.graphicsContext.clearColorDepth();
-    _services.graphics.uniforms.setGeneral([](auto &general) {
-        general.resetGlobals();
-        general.resetLocals();
-    });
-    _services.graphics.shaders.use(_services.graphics.shaders.simpleTexture());
-    _services.graphics.textures.bind(*output);
-    _services.graphics.meshes.quadNDC().draw();
-    _services.graphics.window.swapBuffers();
+    WorldRenderer(scene, _options.graphics, _services.graphics).render();
 }
 
 bool Game::handle(const SDL_Event &e) {
@@ -123,6 +113,22 @@ void Game::loadModule(const string &name) {
     for (auto &room : _module->area().rooms()) {
         scene.addRoot(static_pointer_cast<ModelSceneNode>(room->sceneNodePtr()));
     }
+}
+
+void Game::WorldRenderer::render() {
+    auto output = _graphicsSvc.pipeline.draw(_sceneGraph, glm::ivec2(_graphicsOptions.width, _graphicsOptions.height));
+    if (!output) {
+        return;
+    }
+    _graphicsSvc.graphicsContext.clearColorDepth();
+    _graphicsSvc.uniforms.setGeneral([](auto &general) {
+        general.resetGlobals();
+        general.resetLocals();
+    });
+    _graphicsSvc.shaders.use(_graphicsSvc.shaders.simpleTexture());
+    _graphicsSvc.textures.bind(*output);
+    _graphicsSvc.meshes.quadNDC().draw();
+    _graphicsSvc.window.swapBuffers();
 }
 
 } // namespace neo
