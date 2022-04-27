@@ -19,6 +19,8 @@
 
 #include "../src/resource/format/rimreader.h"
 
+#include "checkutil.h"
+
 using namespace std;
 
 using namespace reone;
@@ -29,9 +31,40 @@ BOOST_AUTO_TEST_SUITE(rim_reader)
 BOOST_AUTO_TEST_CASE(should_read_rim) {
     // given
 
+    auto ss = ostringstream();
+    // header
+    ss << "RIM V1.0";
+    ss << string("\x00\x00\x00\x00", 4); // reserved
+    ss << string("\x01\x00\x00\x00", 4); // number of resources
+    ss << string("\x78\x00\x00\x00", 4); // offset to resources
+    ss << string(100, '\x00');           // reserved
+    // resources
+    ss << string("Aa\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16); // resref
+    ss << string("\xe6\x07\x00\x00", 4);                                            // type
+    ss << string("\x00\x00\x00\x00", 4);                                            // id
+    ss << string("\x98\x00\x00\x00", 4);                                            // offset
+    ss << string("\x02\x00\x00\x00", 4);                                            // size
+    // resource data
+    ss << string("Bb", 2);
+
+    auto reader = RimReader();
+    auto rim = make_shared<istringstream>(ss.str());
+    auto expectedData = ByteArray {'B', 'b'};
+
     // when
 
+    reader.load(rim);
+
     // then
+
+    auto resources = reader.resources();
+    BOOST_CHECK_EQUAL(1ll, resources.size());
+    BOOST_CHECK_EQUAL("aa", resources.front().resId.resRef);
+    BOOST_CHECK_EQUAL(static_cast<int>(ResourceType::Txi), static_cast<int>(resources.front().resId.type));
+    BOOST_CHECK_EQUAL(152, resources.front().offset);
+    BOOST_CHECK_EQUAL(2, resources.front().size);
+    auto actualData = reader.getResourceData(0);
+    BOOST_TEST((expectedData == actualData), notEqualMessage(expectedData, actualData));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

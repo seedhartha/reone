@@ -33,7 +33,11 @@ void RimWriter::add(Resource &&res) {
 
 void RimWriter::save(const fs::path &path) {
     auto rim = make_shared<fs::ofstream>(path, ios::binary);
-    StreamWriter writer(rim);
+    save(rim);
+}
+
+void RimWriter::save(shared_ptr<ostream> out) {
+    StreamWriter writer(out);
     uint32_t numResources = static_cast<uint32_t>(_resources.size());
 
     writer.putString("RIM V1.0");
