@@ -18,16 +18,9 @@
 #include "area.h"
 
 #include "../../../common/exception/validation.h"
-#include "../../../common/streamutil.h"
-#include "../../../graphics/models.h"
-#include "../../../graphics/services.h"
 #include "../../../resource/gffs.h"
 #include "../../../resource/gffstruct.h"
 #include "../../../resource/services.h"
-#include "../../../scene/graph.h"
-#include "../../../scene/graphs.h"
-#include "../../../scene/node/model.h"
-#include "../../../scene/services.h"
 
 #include "../../layouts.h"
 #include "../../services.h"
@@ -62,23 +55,13 @@ unique_ptr<Area> Area::Loader::load(const std::string &name) {
     }
 
     auto rooms = vector<shared_ptr<Room>>();
+    auto roomLoader = Room::Loader(_idSeq, _services);
     auto areRooms = are->getList("Rooms");
+
     for (auto &areRoom : areRooms) {
         auto roomName = areRoom->getString("RoomName");
-
-        auto lytRoom = layout->findByName(roomName);
-        auto transform = glm::translate(lytRoom->position);
-
-        auto &scene = _services.scene.graphs.get(kSceneMain);
-        auto model = _services.graphics.models.get(roomName);
-        auto sceneNode = scene.newModel(move(model), ModelUsage::Room, nullptr);
-        sceneNode->setLocalTransform(move(transform));
-
-        rooms.push_back(Room::Builder()
-                            .id(_idSeq.nextObjectId())
-                            .tag(move(roomName))
-                            .sceneNode(move(sceneNode))
-                            .build());
+        auto layoutRoom = layout->findByName(roomName);
+        rooms.push_back(roomLoader.load(roomName, layoutRoom->position));
     }
 
     return Area::Builder()

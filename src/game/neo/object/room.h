@@ -23,6 +23,8 @@ namespace reone {
 
 namespace game {
 
+struct ServicesView;
+
 namespace neo {
 
 class Room : public Object {
@@ -35,6 +37,20 @@ public:
 
     private:
         std::string _modelName;
+    };
+
+    class Loader : boost::noncopyable {
+    public:
+        Loader(IObjectIdSequence &idSeq, ServicesView &services) :
+            _idSeq(idSeq),
+            _services(services) {
+        }
+
+        std::unique_ptr<Room> load(const std::string &name, const glm::vec3 &position);
+
+    private:
+        IObjectIdSequence &_idSeq;
+        ServicesView &_services;
     };
 
     Room(
