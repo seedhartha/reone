@@ -21,6 +21,8 @@
 
 #include "../object.h"
 
+#include "room.h"
+
 namespace reone {
 
 namespace resource {
@@ -38,9 +40,17 @@ class Area : public Object {
 public:
     class Builder : public Object::Builder<Area, Builder> {
     public:
-        std::unique_ptr<Area> build() override {
-            return std::make_unique<Area>(_id, _tag);
+        Builder &rooms(std::vector<std::shared_ptr<Room>> val) {
+            _rooms = std::move(val);
+            return *this;
         }
+
+        std::unique_ptr<Area> build() override {
+            return std::make_unique<Area>(_id, _tag, _rooms);
+        }
+
+    private:
+        std::vector<std::shared_ptr<Room>> _rooms;
     };
 
     class Loader : boost::noncopyable {
@@ -57,9 +67,19 @@ public:
         resource::Gffs &_gffs;
     };
 
-    Area(uint32_t id, std::string tag) :
-        Object(id, ObjectType::Area, std::move(tag)) {
+    Area(
+        uint32_t id,
+        std::string tag,
+        std::vector<std::shared_ptr<Room>> rooms) :
+        Object(
+            id,
+            ObjectType::Area,
+            std::move(tag)),
+        _rooms(std::move(rooms)) {
     }
+
+private:
+    std::vector<std::shared_ptr<Room>> _rooms;
 };
 
 } // namespace neo
