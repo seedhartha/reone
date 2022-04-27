@@ -23,14 +23,13 @@
 #include "../../../graphics/services.h"
 #include "../../../resource/gffs.h"
 #include "../../../resource/gffstruct.h"
-#include "../../../resource/resources.h"
 #include "../../../resource/services.h"
 #include "../../../scene/graph.h"
 #include "../../../scene/graphs.h"
 #include "../../../scene/node/model.h"
 #include "../../../scene/services.h"
 
-#include "../../format/lytreader.h"
+#include "../../layouts.h"
 #include "../../services.h"
 
 using namespace std;
@@ -57,20 +56,17 @@ unique_ptr<Area> Area::Loader::load(const std::string &name) {
         throw ValidationException("GIT not found: " + name);
     }
 
-    auto lyt = _services.resource.resources.get(name, ResourceType::Lyt);
-    if (!lyt) {
+    auto layout = _services.game.layouts.get(name);
+    if (!layout) {
         throw ValidationException("LYT not found: " + name);
     }
-    auto lytReader = LytReader();
-    lytReader.load(wrap(*lyt));
-    auto &layout = lytReader.layout();
 
     auto rooms = vector<shared_ptr<Room>>();
     auto areRooms = are->getList("Rooms");
     for (auto &areRoom : areRooms) {
         auto roomName = areRoom->getString("RoomName");
 
-        auto lytRoom = layout.findByName(roomName);
+        auto lytRoom = layout->findByName(roomName);
         auto transform = glm::translate(lytRoom->position);
 
         auto &scene = _services.scene.sceneGraphs.get(kSceneMain);
